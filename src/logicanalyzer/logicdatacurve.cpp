@@ -57,6 +57,13 @@ LogicDataCurve::LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::Log
 
 void LogicDataCurve::dataAvailable(uint64_t from, uint64_t to)
 {
+
+	std::unique_lock<std::mutex> lock(m_dataAvailableMutex);
+
+    if (from == 0) {
+	    reset();
+    }
+
     m_data = m_logic->getData();
 
     // Take into account the last pushed edge from the previous chunk of
@@ -104,6 +111,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
                                const QwtScaleMap &yMap, const QRectF &canvasRect,
                                int from, int to) const
 {
+	std::unique_lock<std::mutex> lock(m_dataAvailableMutex);
 
 	QElapsedTimer tt;
 	tt.start();
@@ -118,6 +126,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 	const double heightInPoints = yMap.invTransform(0) - yMap.invTransform(m_traceHeight);
 
     // No data to plot
+//	qDebug() << "m_edges.size() : " << m_edges.size();
     if (!m_edges.size()) {
 	    if (m_startSample != m_endSample) {
 		const bool logicLevel = (m_logic->getData()[m_startSample] & (1 << m_bit)) >> m_bit;
@@ -255,6 +264,11 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
     if (lastEdge < m_edges.size() - 1) {
 //	    qDebug() << "lastEdge: " << lastEdge << " < " << "m_edges.size() - 1: " << m_edges.size() - 1;
         lastEdge++;
+    }
+
+    if (m_edges.size() == 1) { // corner case
+	    edges.emplace_back(m_edges.front());
+	    return;
     }
 
     // If plot is zoomed in / not so many edges close together

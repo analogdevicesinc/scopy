@@ -1365,6 +1365,9 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 		connect(oscilloscope, &Oscilloscope::showTool, [=]() {
 			menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn()->click();
 		});
+		if (logic_analyzer) {
+			oscilloscope->setLogicAnalyzer(logic_analyzer);
+		}
 	}
 
 	if (filter->compatible(TOOL_DMM)) {
