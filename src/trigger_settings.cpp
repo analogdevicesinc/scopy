@@ -433,17 +433,17 @@ bool TriggerSettings::triggerIsArmed() const
 	return ui->intern_en->isChecked() || ui->extern_en->isChecked();
 }
 
-void TriggerSettings::on_btnAuto_toggled(bool checked)
+void TriggerSettings::on_btnTrigger_toggled(bool checked)
 {
 	trigger_auto_mode = checked;
-	int mode = checked ? AUTO : NORMAL;
+	int mode = checked ? NORMAL : AUTO;
 
 	Q_EMIT triggerModeChanged(mode);
 }
 
 TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 {
-	return ui->btnTrigger->isChecked() ? AUTO : NORMAL;
+	return ui->btnTrigger->isChecked() ? NORMAL : AUTO;
 }
 
 void TriggerSettings::updateHwVoltLevels(int chnIdx)
