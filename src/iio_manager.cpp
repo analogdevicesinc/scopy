@@ -40,7 +40,9 @@ iio_manager::iio_manager(unsigned int block_id,
 		unsigned long _buffer_size) :
 	QObject(nullptr),
 	top_block("IIO Manager " + std::to_string(block_id)),
-	id(block_id), _started(false), buffer_size(_buffer_size)
+	id(block_id), _started(false), buffer_size(_buffer_size),
+	m_analogin(libm2k::context::m2kOpen(ctx, "")->getAnalogIn()),
+	m_context(libm2k::context::m2kOpen(ctx, ""))
 {
 	if (!ctx)
 		throw std::runtime_error("IIO context not created");
@@ -51,10 +53,29 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	nb_channels = iio_device_get_channels_count(dev);
 
-	iio_block = iio::device_source::make_from(ctx, _dev,
-			std::vector<std::string>(), _dev,
-			std::vector<std::string>(),
-			_buffer_size);
+//	iio_block = iio::device_source::make_from(ctx, _dev,
+//			std::vector<std::string>(), _dev,
+//			std::vector<std::string>(),
+//			_buffer_size);
+
+//	iio_context_set_timeout(ctx, 1000);
+
+	iio_block = gr::m2k::analog_in_source::make_from(libm2k::context::m2kOpen(ctx, ""),
+							     _buffer_size,
+							     {1, 1},
+							     {0, 0},
+							     10000,
+							     1,
+							     4,
+							     false,
+							     false,
+							     {0, 0},
+							     {0, 0},
+							     0,
+							     0,
+							     {0, 0},
+							     false,
+							     false);
 
 	/* Avoid unconnected channel errors by connecting a dummy sink */
 	auto dummy_copy = blocks::copy::make(sizeof(short));
@@ -234,6 +255,7 @@ void iio_manager::stop(iio_manager::port_id copy)
 	if (!inuse) {
 		qDebug(CAT_IIO_MANAGER) << "Stopping top block";
 		top_block::stop();
+		m_analogin->cancelAcquisition();
 		top_block::wait();
 
 		_started = false;

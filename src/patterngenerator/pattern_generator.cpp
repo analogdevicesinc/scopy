@@ -162,7 +162,7 @@ PatternGenerator::~PatternGenerator()
 	disconnect(prefPanel, &Preferences::notify, this, &PatternGenerator::readPreferences);
 
 	if (m_isRunning) {
-		startStop(false);
+		run_button->setChecked(false);
 	}
 
 	for (auto &curve : m_plotCurves) {
@@ -175,8 +175,16 @@ PatternGenerator::~PatternGenerator()
 		m_buffer = nullptr;
 	}
 
+	auto i = m_annotationCurvePatternUiMap.begin();
+	while (i != m_annotationCurvePatternUiMap.end()) {
+		delete i.key();
+		disconnect(i.value().second);
+		++i;
+	}
+
 	delete m_ui;
 }
+
 void PatternGenerator::setupUi()
 {
 	m_ui->setupUi(this);
@@ -727,7 +735,6 @@ void PatternGenerator::startStop(bool start)
 					}
 				});
 			}
-
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
