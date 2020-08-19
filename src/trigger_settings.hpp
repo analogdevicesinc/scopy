@@ -111,7 +111,7 @@ namespace adiscope {
 		void on_extern_to_en_toggled(bool);
 		void on_cmb_analog_extern_currentIndexChanged(int);
 		void on_cmb_extern_to_src_currentIndexChanged(int);
-		void on_btnAuto_toggled(bool);
+		void on_btnTrigger_toggled(bool);
 
 		void on_cmb_extern_src_currentIndexChanged(int idx);
 		void on_spin_daisyChain_valueChanged(int arg1);
