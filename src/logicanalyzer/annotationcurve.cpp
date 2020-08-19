@@ -137,6 +137,10 @@ void AnnotationCurve::annotationCallback(srd_proto_data *pdata, void *annotation
 
 void AnnotationCurve::dataAvailable(uint64_t from, uint64_t to)
 {
+	if (from == 0) {
+		reset();
+	}
+
     m_annotationDecoder->dataAvailable(from, to);
 }
 
@@ -164,6 +168,8 @@ void AnnotationCurve::newAnnotations()
 
 void AnnotationCurve::reset()
 {
+		std::unique_lock<std::mutex> lock(m_mutex);
+
     m_classRows.clear();
     m_annotationRows.clear();
 	m_annotationDecoder->reset();

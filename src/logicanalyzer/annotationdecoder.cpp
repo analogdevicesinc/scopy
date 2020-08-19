@@ -318,6 +318,8 @@ std::vector<DecodeChannel *> AnnotationDecoder::getDecoderChannels()
 
 void AnnotationDecoder::reset()
 {
+//	std::unique_lock<std::mutex> lock(m_newDataMutex);
+
 	m_lastSample = 0;
 	stopDecode();
 	stackChanged();
@@ -485,6 +487,11 @@ void AnnotationDecoder::decodeProc()
         std::unique_ptr<uint16_t []> chunk(new uint16_t[chunkSize]);
 
         uint16_t *data = m_logic->getData();
+
+	if (!data) {
+		continue;
+	}
+
         memcpy(chunk.get(), data + start, chunkSize * sizeof(uint16_t));
 
 //        qDebug() << "send data!";
