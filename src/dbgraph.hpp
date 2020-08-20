@@ -30,13 +30,14 @@
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
 #include "plotpickerwrapper.h"
+#include "DisplayPlot.h"
 
 namespace adiscope {
 class OscScaleDraw;
 class PrefixFormatter;
 class OscScaleZoomer;
 
-class dBgraph : public QwtPlot
+class dBgraph : public DisplayPlot
 {
 	Q_OBJECT
 
@@ -96,6 +97,8 @@ public:
 
 	void setPlotBarEnabled(bool enabled);
 	void parametersOverrange(bool enable);
+
+    void replot();
 Q_SIGNALS:
 	void VBar1PixelPosChanged(int);
 	void VBar2PixelPosChanged(int);

@@ -104,7 +104,7 @@ void dBgraph::setupReadouts()
 	d_cursorReadouts->setTransparency(0);
 }
 
-dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
+dBgraph::dBgraph(QWidget *parent) : DisplayPlot(0, parent),
 	curve("data"),
 	reference("reference"),
 	d_cursorsCentered(false),
@@ -247,6 +247,11 @@ dBgraph::~dBgraph()
 	delete markerIntersection2;
 	delete formatter;
 	delete picker;
+}
+
+void dBgraph::replot()
+{
+    QwtPlot::replot();
 }
 
 void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
