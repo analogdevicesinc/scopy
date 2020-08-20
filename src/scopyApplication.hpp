@@ -34,13 +34,20 @@
 #include "client/linux/handler/exception_handler.h"
 #endif
 
-//#define CATCH_UNHANDLED_EXCEPTIONS
-
+#define CATCH_UNHANDLED_EXCEPTIONS
+#endif
+#define GetScopyApplicationInstance() dynamic_cast<ScopyApplication*>(qApp)
 
 class ScopyApplication final : public QApplication {
 
+private:
+	bool debugMode;
 public:
 	ScopyApplication(int& argc, char** argv);
+#if BREAKPAD_HANDLER
+	bool getDebugMode() const;
+	void setDebugMode(bool value);
+
 	~ScopyApplication();
 	QString initBreakPadHandler(QString crashDumpPath) ;
 #ifdef CATCH_UNHANDLED_EXCEPTIONS
@@ -68,6 +75,7 @@ private:
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor *descriptor;
 #endif
-};
 #endif
+};
+
 #endif

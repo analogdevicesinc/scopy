@@ -29,9 +29,11 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
+#include <scopyApplication.hpp>
 
 
 using namespace adiscope;
+
 
 Preferences::Preferences(QWidget *parent) :
 	QWidget(parent),
@@ -59,7 +61,8 @@ Preferences::Preferences(QWidget *parent) :
 	m_useNativeDialogs(true),
 	language("auto"),
 	m_displaySamplingPoints(false),
-	m_instrument_notes_active(false)
+	m_instrument_notes_active(false),
+	m_debug_messages_active(false)
 
 {
 	ui->setupUi(this);
@@ -146,6 +149,17 @@ Preferences::Preferences(QWidget *parent) :
 		mini_hist_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->debugMessagesCheckbox, &QCheckBox::stateChanged, [=](int state){
+		setDebugMessagesActive(state);
+		Q_EMIT notify();
+	});
+
+	connect(ui->debugInstrumentCheckbox, &QCheckBox::stateChanged, [=](int state){
+		debugger_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->decodersCheckBox, &QCheckBox::stateChanged, [=](int state){
 		digital_decoders_enabled = (!state ? false : true);
 		Q_EMIT notify();
@@ -292,6 +306,8 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->languageCombo->setCurrentText(language);
 	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
 	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
+	ui->debugMessagesCheckbox->setChecked(m_debug_messages_active);
+	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
 
 	QWidget::showEvent(event);
 }
@@ -404,6 +420,16 @@ bool Preferences::getDouble_click_to_detach() const
 	return double_click_to_detach;
 }
 
+bool Preferences::getDebugMessagesActive() const
+{
+	return m_debug_messages_active;
+}
+void Preferences::setDebugMessagesActive(bool val)
+{
+	m_debug_messages_active = val;
+	GetScopyApplicationInstance()->setDebugMode(val);
+}
+
 void Preferences::setDouble_click_to_detach(bool value)
 {
 	double_click_to_detach = value;
@@ -461,6 +487,12 @@ void Preferences::setManual_calib_script_enabled(bool value)
 	manual_calib_script_enabled = value;
 	ui->manualCalibCheckBox->setChecked(manual_calib_script_enabled);
 	Q_EMIT notify();
+}
+
+
+bool Preferences::getDebugger_enabled() const
+{
+	return debugger_enabled;
 }
 
 void Preferences::setDebugger_enabled(bool value)
@@ -711,4 +743,13 @@ bool Preferences_API::getDisplaySampling() const
 void Preferences_API::setDisplaySampling(bool display)
 {
 	preferencePanel->m_displaySamplingPoints = display;
+}
+
+bool Preferences_API::getDebugMessagesActive() const
+{
+	return preferencePanel->m_debug_messages_active;
+}
+void Preferences_API::setDebugMessagesActive(bool val)
+{
+	preferencePanel->setDebugMessagesActive(val);
 }

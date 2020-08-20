@@ -38,6 +38,7 @@ using namespace adiscope;
 
 int main(int argc, char **argv)
 {
+	ScopyApplication app(argc, argv);
 #if BREAKPAD_HANDLER
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor descriptor("/tmp");
@@ -54,11 +55,7 @@ int main(int argc, char **argv)
 										(wchar_t*)NULL,
 										NULL);
 #endif
-
-	ScopyApplication app(argc, argv);
 	app.setExceptionHandler(&eh);
-#else
-	QApplication app(argc, argv);
 #endif
 
 	QFontDatabase::addApplicationFont(":/open-sans-regular.ttf");
@@ -84,6 +81,10 @@ int main(int argc, char **argv)
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
 #if BREAKPAD_HANDLER
+	QSettings test;
+	QString path = test.fileName();
+	QString fn("Scopy.ini");
+	path.chop(fn.length());
 	QString prevCrashDump = app.initBreakPadHandler(path);
 #else
 	QString prevCrashDump = "";
@@ -109,7 +110,7 @@ int main(int argc, char **argv)
 	// TODO: Use Preferences_API to get language key - cannot be done right now
 	// as this involves instantiating Preferences object
 	QSettings pref(Preferences::getPreferenceIniFile(), QSettings::IniFormat);
-	QString language = pref.value(QString("Preferences/language")).toString();
+	QString language = pref.value(QString("Preferences/language")).toString();	
 
 	QString languageFileName = ":/translations/";
 	QString osLanguage = QLocale::system().name().split("_")[0];
