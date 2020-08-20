@@ -1513,6 +1513,8 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
 	GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 
+	curve->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
+
 	/* Channel offset widget */
 	HorizBar *chOffsetBar = new HorizBar(this);
 	d_symbolCtrl->attachSymbol(chOffsetBar);
