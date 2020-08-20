@@ -83,7 +83,9 @@ public:
 	bool getManual_calib_script_enabled() const;
 	void setManual_calib_script_enabled(bool value);
 
+	bool getDebugger_enabled() const;
 	void setDebugger_enabled(bool value);
+
 	void setManual_calib_enabled(bool value);
 
 	bool getAnimations_enabled() const;
@@ -112,6 +114,8 @@ public:
 	bool getInstrumentNotesActive() const;
 	void setInstrumentNotesActive(bool display);
 
+	bool getDebugMessagesActive() const;
+	void setDebugMessagesActive(bool display);
 
 Q_SIGNALS:
 
@@ -154,6 +158,7 @@ private:
 	QString language;
 	bool m_instrument_notes_active;
 	bool m_displaySamplingPoints;
+	bool m_debug_messages_active;
 
 	Preferences_API *pref_api;
 };
@@ -182,6 +187,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(QString language READ getLanguage WRITE setLanguage);
 	Q_PROPERTY(bool displaySamplingPoints READ getDisplaySampling WRITE setDisplaySampling)
 	Q_PROPERTY(bool instrument_notes_active READ getInstrumentNotesActive WRITE setInstrumentNotesActive)
+	Q_PROPERTY(bool debug_messages_active READ getDebugMessagesActive WRITE setDebugMessagesActive)
 
 
 public:
@@ -244,9 +250,11 @@ public:
 	bool getDisplaySampling() const;
 	void setDisplaySampling(bool display);
 
-
 	bool getInstrumentNotesActive() const;
 	void setInstrumentNotesActive(bool display);
+
+	bool getDebugMessagesActive() const;
+	void setDebugMessagesActive(bool display);
 
 private:
 	Preferences *preferencePanel;

@@ -296,7 +296,7 @@ void ToolLauncher::_toolSelected(enum tool tool)
 void ToolLauncher::readPreferences()
 {
 	m_use_decoders = prefPanel->getDigital_decoders_enabled();
-
+	debugger_enabled = prefPanel->getDebugger_enabled();
 	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
 	allowExternalScript(prefPanel->getExternal_script_enabled());
 	if (manual_calibration) {

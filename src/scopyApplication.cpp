@@ -25,10 +25,20 @@
 #include <QDateTime>
 #include <QDebug>
 
+bool ScopyApplication::getDebugMode() const
+{
+	return debugMode;
+}
+
+void ScopyApplication::setDebugMode(bool value)
+{
+	debugMode = value;
+}
+
+ScopyApplication::ScopyApplication(int& argc, char** argv) : QApplication(argc, argv), debugMode(false) {}
+
 #if BREAKPAD_HANDLER
 using namespace google_breakpad;
-
-ScopyApplication::ScopyApplication(int& argc, char** argv) : QApplication(argc, argv) {}
 QString ScopyApplication::initBreakPadHandler(QString crashDumpPath) {
 	QString prevCrashDump="";
 	QString appDir = crashDumpPath;
