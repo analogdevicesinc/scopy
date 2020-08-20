@@ -47,6 +47,7 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <scopyExceptionHandler.h>
 
 #include "dmm_api.hpp"
 
@@ -646,6 +647,7 @@ void DMM::setLineThicknessCh2(int idx)
 
 void DMM::writeAllSettingsToHardware()
 {
+	HANDLE_EXCEPTION(1);
 	if (m_m2k_analogin) {
 		try {
 			m_m2k_analogin->setSampleRate(sample_rate);
