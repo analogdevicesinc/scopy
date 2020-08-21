@@ -34,6 +34,8 @@
 #include <iio.h>
 #include <QDebug>
 #include <QTranslator>
+#include "scopyExceptionHandler.h"
+
 
 using namespace adiscope;
 using namespace std;
@@ -372,6 +374,7 @@ void TriggerSettings::enableExternalTriggerOut(bool enabled)
 			m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
 		}
 	} catch (libm2k::m2k_exception& e) {
+		HANDLE_EXCEPTION(e);
 		qDebug() << e.what();
 	}
 }
@@ -403,6 +406,7 @@ void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 		try {
 			m_trigger->setAnalogMode(currentChannel(), mode);
 		} catch (libm2k::m2k_exception& e){
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -458,6 +462,7 @@ void TriggerSettings::updateHwVoltLevels(int chnIdx)
 	}
 	catch (libm2k::m2k_exception& e)
 	{
+		HANDLE_EXCEPTION(e);
 		qDebug() << e.what();
 	}
 }
@@ -551,6 +556,7 @@ void TriggerSettings::writeHwDelay(long long raw_delay)
 			m_trigger->setAnalogDelay(raw_delay);
 		}
 		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -567,6 +573,7 @@ void TriggerSettings::writeHwLevel(double level)
 			m_trigger->setAnalogLevel(currentChannel(), level);
 		}
 		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -579,6 +586,7 @@ void TriggerSettings::writeHwHysteresis(double level)
 			m_trigger->setAnalogHysteresis(currentChannel(), level);
 		}
 		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -594,6 +602,7 @@ void TriggerSettings::writeHwAnalogCondition(int cond)
 			m_trigger->setAnalogCondition(currentChannel(), t_cond);
 		}
 		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -609,6 +618,7 @@ void TriggerSettings::writeHwDigitalCondition(int cond)
 			m_trigger->setAnalogExternalCondition(currentChannel(), t_cond);
 		}
 		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -623,6 +633,7 @@ void TriggerSettings::writeHwMode(int mode)
 		}
 		catch (libm2k::m2k_exception& e)
 		{
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -666,6 +677,7 @@ void TriggerSettings::writeHwSource(int source_chn)
 			m_trigger->setAnalogSource(source);
 		}
 		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}

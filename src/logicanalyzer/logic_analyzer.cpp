@@ -44,7 +44,7 @@
 #include "filter.hpp"
 
 #include <libm2k/m2kexceptions.hpp>
-
+#include "scopyExceptionHandler.h"
 #include "osc_export_settings.h"
 #include "filemanager.h"
 #include "config.h"
@@ -1072,6 +1072,7 @@ void LogicAnalyzer::startStop(bool start)
 					updateBufferPreviewer(0, m_lastCapturedSample);
 
 				} catch (libm2k::m2k_exception &e) {
+					HANDLE_EXCEPTION(e)
 					qDebug() << e.what();
 				}
 			} else {
@@ -1098,6 +1099,7 @@ void LogicAnalyzer::startStop(bool start)
 						}, Qt::QueuedConnection);
 
 					} catch (libm2k::m2k_exception &e) {
+						HANDLE_EXCEPTION(e)
 						qDebug() << e.what();
 						break;
 					}

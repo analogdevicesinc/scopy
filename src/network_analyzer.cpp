@@ -62,6 +62,7 @@
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2kexceptions.hpp>
+#include "scopyExceptionHandler.h"
 
 using namespace adiscope;
 using namespace gr;
@@ -1141,6 +1142,7 @@ void NetworkAnalyzer::setFilterParameters()
 			f21->set_high_gain(range1);
 			f22->set_high_gain(range1);
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1201,6 +1203,7 @@ void NetworkAnalyzer::goertzel()
 				QThread::msleep(pushDelay->value());
 				m_m2k_analogout->push(buffers);
 			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				return;
 			}
 		}
@@ -1233,6 +1236,7 @@ void NetworkAnalyzer::goertzel()
 				m_m2k_analogin->setOversamplingRatio(1);
 				m_m2k_analogin->setSampleRate(adc_rate);
 			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				qDebug(CAT_NETWORK_ANALYZER) << e.what();
 			}
 		}
@@ -1249,6 +1253,7 @@ void NetworkAnalyzer::goertzel()
 				try {
 					buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
 				} catch (libm2k::m2k_exception &e) {
+					HANDLE_EXCEPTION(e)
 					qDebug(CAT_NETWORK_ANALYZER) << e.what();
 					return;
 				}
@@ -1494,6 +1499,7 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 	try {
 		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
 	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		return false;
 	}
@@ -1652,6 +1658,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			m_m2k_analogin->stopAcquisition();
 			m_m2k_analogout->stop();
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 		m_dBgraph.sweepDone();
@@ -1674,6 +1681,7 @@ std::vector<double> NetworkAnalyzer::generateSinWave(
 				return {};
 			}
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1717,6 +1725,7 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 			}
 
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}

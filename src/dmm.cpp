@@ -648,7 +648,6 @@ void DMM::setLineThicknessCh2(int idx)
 
 void DMM::writeAllSettingsToHardware()
 {
-	HANDLE_EXCEPTION(1);
 	if (m_m2k_analogin) {
 		try {
 			m_m2k_analogin->setSampleRate(sample_rate);
@@ -663,6 +662,7 @@ void DMM::writeAllSettingsToHardware()
 				}
 			}
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e);
 			qDebug(CAT_VOLTMETER) << "Can't write to hardware: " << e.what();
 		}
 	}
