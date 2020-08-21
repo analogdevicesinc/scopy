@@ -13,7 +13,7 @@ using namespace adiscope;
 		QMessageBox msg; \
 		QString str = QString("Exception %1 thrown from %2:%3 caught in %4:%5. Scopy git tag %6.") \
 		.arg("TestString").arg( __FILE__).arg(__LINE__).arg(__FILE__).arg(__LINE__).arg(SCOPY_VERSION_GIT); \
-		if(GetScopyApplicationInstance()->getExceptionHandler()->WriteMinidump()) str = str + "Created minidump.";\
+		if(WriteScopyMinidump()) str = str + "Created minidump.";\
 		msg.setText(str);\
 		msg.exec();\
 	} \
