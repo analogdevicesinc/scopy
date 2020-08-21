@@ -107,6 +107,7 @@ endif()
 
 
 option(BREAKPAD_HANDLER "Build with breakpad exception handler " OFF)
+message(BREAKPAD_HANDLER - ${BREAKPAD_HANDLER})
 if (${BREAKPAD_HANDLER})
 	message("-- Building with breakpad crash handler")
 	set(BREAKPAD_HANDLER_BOOL 1)
