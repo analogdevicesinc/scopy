@@ -38,16 +38,21 @@
 #endif
 #define GetScopyApplicationInstance() dynamic_cast<ScopyApplication*>(qApp)
 
+#if BREAKPAD_HANDLER
+#define WriteScopyMinidump() GetScopyApplicationInstance()->getExceptionHandler()->WriteMinidump()
+#else
+#define WriteScopyMinidump() (0)
+#endif
+
 class ScopyApplication final : public QApplication {
 
 private:
 	bool debugMode;
 public:
 	ScopyApplication(int& argc, char** argv);
-#if BREAKPAD_HANDLER
 	bool getDebugMode() const;
 	void setDebugMode(bool value);
-
+#if BREAKPAD_HANDLER
 	~ScopyApplication();
 	QString initBreakPadHandler(QString crashDumpPath) ;
 #ifdef CATCH_UNHANDLED_EXCEPTIONS
