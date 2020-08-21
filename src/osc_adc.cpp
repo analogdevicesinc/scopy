@@ -24,6 +24,7 @@
 
 #include "hardware_trigger.hpp"
 #include <libm2k/m2kexceptions.hpp>
+#include "scopyExceptionHandler.h"
 using namespace adiscope;
 
 /*
@@ -238,6 +239,7 @@ M2kAdc::M2kAdc(struct iio_context *ctx, struct iio_device *adc_dev):
 	try {
 		m_trigger = std::make_shared<HardwareTrigger>(m2k_trigger);
 	} catch (libm2k::m2k_exception& e){
+		HANDLE_EXCEPTION(e)
 		qDebug() << "Disabling hardware trigger support." << e.what();
 	}
 

@@ -61,6 +61,7 @@
 #include <iio/device_sink.h>
 #include <scopy/math.h>
 #include <scopy/trapezoidal.h>
+#include "scopyExceptionHandler.h"
 
 #ifdef MATLAB_SUPPORT_SIGGEN
 #include <matio.h>
@@ -1477,6 +1478,7 @@ void SignalGenerator::stop()
 		m_running = false;
 		m_m2k_analogout->stop();
 	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_SIGNAL_GENERATOR) << e.what();
 	}
 }

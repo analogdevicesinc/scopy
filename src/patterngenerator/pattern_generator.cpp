@@ -35,6 +35,7 @@
 #include "pattern_generator_api.h"
 
 #include <libm2k/m2kexceptions.hpp>
+#include "scopyExceptionHandler.h"
 
 using namespace adiscope;
 using namespace adiscope::logic;
@@ -721,12 +722,14 @@ void PatternGenerator::startStop(bool start)
 							}
 						}
 					} catch (libm2k::m2k_exception &e) {
+						HANDLE_EXCEPTION(e);
 						qDebug() << e.what();
 					}
 				});
 			}
 
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 
@@ -743,6 +746,7 @@ void PatternGenerator::startStop(bool start)
 				}
 			}
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}

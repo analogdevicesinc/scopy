@@ -61,7 +61,7 @@
 #include "channel_widget.hpp"
 #include "signal_sample.hpp"
 #include "filemanager.h"
-
+#include "scopyExceptionHandler.h"
 #include "oscilloscope_api.hpp"
 
 #include "runsinglewidget.h"
@@ -4470,6 +4470,7 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 	try {
 		m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(false);
 	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 	cleanBuffersAllSinks();
@@ -4482,6 +4483,7 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 			m_m2k_analogin->getTrigger()->setAnalogStreamingFlag(true);
 		}
 	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 
@@ -4673,6 +4675,7 @@ void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
 			m_m2k_analogin->setRange(chn, gain_mode);
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_OSCILLOSCOPE) << e.what();
 		}
 	}
@@ -4693,6 +4696,7 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
 			m_m2k_analogin->setVerticalOffset(chn, offset);
 		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_OSCILLOSCOPE) << e.what();
 		}
 	}
@@ -4732,6 +4736,7 @@ void Oscilloscope::writeAllSettingsToHardware()
 				m_m2k_analogin->setRange(chn, mode);
 				m_m2k_analogin->setVerticalOffset(chn, channel_offset[i]);
 			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				qDebug(CAT_OSCILLOSCOPE) << e.what();
 			}
 		}
@@ -4841,6 +4846,7 @@ void Oscilloscope::setSampleRate(double sample_rate)
 			m_m2k_analogin->setOversamplingRatio(1);
 		}
 	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
 }
@@ -4859,6 +4865,7 @@ double Oscilloscope::getSampleRate()
 		}
 		return sr;
 	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 		return 0;
 	}
