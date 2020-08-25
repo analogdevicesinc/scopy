@@ -1715,7 +1715,6 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 				trigger->setAnalogMode(i, libm2k::ALWAYS);
 				trigger->setAnalogDelay(0);
 			}
-
 		} catch (libm2k::m2k_exception &e) {
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}

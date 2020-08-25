@@ -30,6 +30,8 @@ logic_analyzer_sink_impl::logic_analyzer_sink_impl(adiscope::logic::LogicAnalyze
 	, d_triggered(false)
 	, d_update_time(0.1 * gr::high_res_timer_tps())
 	, d_last_time(0)
+	, d_can_plot(true)
+	, d_scope_sink(nullptr)
 {
 
 	d_buffer = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
@@ -48,6 +50,11 @@ int logic_analyzer_sink_impl::work(int noutput_items,
 				   gr_vector_void_star &output_items)
 {
 	gr::thread::scoped_lock lock(d_setlock);
+
+	//	if (!d_can_plot.load(std::memory_order_acquire) && d_scope_sink) {
+	//		std::cout << "waiting analog" << std::endl;
+	//		return 0;
+	//	}
 
 	// space left in buffer
 	const int nfill = d_end - d_index;
@@ -77,6 +84,14 @@ int logic_analyzer_sink_impl::work(int noutput_items,
 		if (gr::high_res_timer_now() - d_last_time > d_update_time) {
 			d_last_time = gr::high_res_timer_now();
 			d_logic_analyzer->setData(d_buffer_temp + d_start, d_size);
+
+			d_can_plot.store(false, std::memory_order_release);
+			std::cout << "logic sink ploted" << std::endl;
+			if (d_scope_sink) {
+				d_scope_sink->set_can_plot(true);
+				std::cout << "analog can plot now" << std::endl;
+
+			}
 		}
 
 		_reset();
@@ -127,6 +142,17 @@ void logic_analyzer_sink_impl::set_nsamps(int newsize)
 
 		_reset();
 	}
+}
+
+void logic_analyzer_sink_impl::set_can_plot(bool canPlot)
+{
+	d_can_plot.store(canPlot, std::memory_order_acquire);
+}
+
+void logic_analyzer_sink_impl::set_scope_sink(adiscope::scope_sink_f::sptr scope_sink)
+{
+	d_scope_sink = scope_sink;
+	set_can_plot(true);
 }
 
 void logic_analyzer_sink_impl::_adjust_tags(int adj)

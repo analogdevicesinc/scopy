@@ -2,6 +2,9 @@
 #define LOGIC_ANALYZER_SINK_IMPL_H
 
 #include "logic_analyzer_sink.h"
+#include "scope_sink_f.h"
+
+#include <atomic>
 
 class logic_analyzer_sink_impl : public logic_analyzer_sink
 {
@@ -14,6 +17,8 @@ public:
 
 	void clean_buffers();
 	void set_nsamps(int newsize);
+	void set_can_plot(bool canPlot);
+	void set_scope_sink(adiscope::scope_sink_f::sptr scope_sink);
 
 private:
 	void _adjust_tags(int adj);
@@ -36,6 +41,9 @@ private:
 
 	gr::high_res_timer_type d_update_time;
 	gr::high_res_timer_type d_last_time;
+
+	std::atomic<bool> d_can_plot;
+	adiscope::scope_sink_f::sptr d_scope_sink;
 };
 
 #endif // LOGIC_ANALYZER_SINK_IMPL_H

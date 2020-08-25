@@ -1327,6 +1327,9 @@ void Oscilloscope::enableMixedSignalView()
 	iio->connect(block, 0, add, 1);
 	iio->connect(add, 0, nullSink, 0);
 
+	qt_time_block->set_scope_sink(logic_sink);
+	logic_sink->set_scope_sink(qt_time_block);
+
 //	m_m2k_context->startMixedSignalAcquisition(active_sample_count);
 }
 
@@ -1377,12 +1380,9 @@ void Oscilloscope::disableMixedSignalView()
 
 void Oscilloscope::setDigitalPlotCurvesParams()
 {
+	qDebug() << "Setting params for logic";
 	m_m2k_digital->setSampleRateIn(active_sample_rate);
-	// active_sample_count
-	qDebug() << "Delay: " << -(static_cast<int>(active_sample_count) / 2) + active_time_pos * active_sample_rate;
-	m_m2k_digital->getTrigger()->setDigitalStreamingFlag(false);
 	m_m2k_digital->getTrigger()->setDigitalDelay(-(static_cast<int>(active_sample_count) / 2) + active_time_pos * active_sample_rate);
-//		qDebug() << "time pos: " << active_time_pos << "   active sample rate: " << active_sample_rate;
 	for (int i = 0; i < plot.getNrDigitalPlotCurves(); ++i) {
 		QwtPlotCurve *curve = plot.getDigitalPlotCurve(i);
 		GenericLogicPlotCurve *logic_curve = dynamic_cast<GenericLogicPlotCurve *>(curve);
@@ -2599,7 +2599,10 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 {
 	if (en) {
 
-		if (logic_source) {
+		if (logic_source && !iio->started()) {
+
+			qDebug() << "started mixed signal!!!!!";
+
 			// set digital params; analog should be already set when this method is called
 			setDigitalPlotCurvesParams();
 
@@ -2610,20 +2613,14 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			logic_sink->clean_buffers();
 			logic_sink->set_nsamps(active_sample_count);
 
-			// flush device buffers
-//			m_m2k_digital->reset();
-//			m_m2k_analogin->reset();
-//			m_m2k_context->
-
 			// set kernel buffers
 			m_m2k_digital->setKernelBuffersCountIn(64);
 			m_m2k_analogin->setKernelBuffersCount(64);
 
-			// start mixed signal acquisition
-//			m_m2k_analogin->cancelAcquisition();
-//			m_m2k_analogin->stopAcquisition();
-//			m_m2k_context->stopMixedSignalAcquisition();
 			m_m2k_context->startMixedSignalAcquisition(active_sample_count);
+
+			qt_time_block->set_can_plot(false);
+			logic_sink->set_can_plot(true);
 		}
 
 		if (autosetRequested) {
@@ -2633,9 +2630,8 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->start(ids[i]);
 
-		scaleHistogramPlot();
-
 	} else {
+		const bool wasRunning = iio->started();
 
 		for (unsigned int i = 0; i < nb_channels; i++)
 			iio->stop(ids[i]);
@@ -2644,8 +2640,10 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			iio->stop(autoset_id[0]);			
 		}
 
-		if (logic_source) {
+		if (logic_source && wasRunning) {
 			m_m2k_context->stopMixedSignalAcquisition();
+			qDebug() << "stoped mixed signal!!!!!";
+
 		}
 	}
 }
@@ -2661,6 +2659,10 @@ void Oscilloscope::stop()
 
 void Oscilloscope::runStopToggled(bool checked)
 {
+	if (m_running == checked) {
+		return;
+	}
+
 	Q_EMIT activateExportButton();
 
 	if (checked) {
@@ -4589,7 +4591,7 @@ void Oscilloscope::requestAutoset()
 void Oscilloscope::periodicFlowRestart(bool force)
 {
 	static uint64_t restartFlowCounter = 0;
-	const uint64_t NO_FLOW_BUFFERS = 1024;
+	const uint64_t NO_FLOW_BUFFERS = 64;
 	if(force) {
 		restartFlowCounter = NO_FLOW_BUFFERS;
 	}
@@ -4599,6 +4601,8 @@ void Oscilloscope::periodicFlowRestart(bool force)
 		QElapsedTimer t;
 		t.start();
 		iio->lock();
+		m_m2k_context->stopMixedSignalAcquisition();
+		m_m2k_context->startMixedSignalAcquisition(active_sample_count);
 		iio->unlock();
 		qDebug(CAT_OSCILLOSCOPE)<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
 	}

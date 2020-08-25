@@ -1430,7 +1430,11 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		return false;
 	}
 
-	m_m2k = m2kOpen(ctx, "");
+	try {
+		m_m2k = m2kOpen(ctx, "");
+	} catch (libm2k::m2k_exception &e) {
+		qDebug() << e.what();
+	}
 
 	alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
 

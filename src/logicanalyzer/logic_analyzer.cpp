@@ -857,10 +857,6 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 	QSignalBlocker triggerComboBoxBlocker(ui->triggerComboBox);
 	if (m_selectedChannel != chIdx && selected) {
 
-		if (!ui->btnChannelSettings->isChecked()) {
-			ui->btnChannelSettings->setChecked(true);
-		}
-
 		qDebug() << "Selected channel: " << chIdx;
 
 		m_selectedChannel = chIdx;

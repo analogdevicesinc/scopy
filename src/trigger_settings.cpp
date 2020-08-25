@@ -618,6 +618,7 @@ void TriggerSettings::writeHwMode(int mode)
 {
 	if (adc_running) {
 		try {
+			qDebug() << "No bueno!";
 			m_trigger->setAnalogMode(currentChannel(),
 				static_cast<libm2k::M2K_TRIGGER_MODE>(mode));
 		}

@@ -48,6 +48,8 @@
 #include "TimeDomainDisplayPlot.h"
 #include "FftDisplayPlot.h"
 
+#include "logic_analyzer_sink.h"
+
 namespace adiscope {
 
     class scope_sink_f_impl : public scope_sink_f
@@ -78,6 +80,9 @@ namespace adiscope {
 
       bool d_displayOneBuffer;
       bool d_cleanBuffers;
+
+      std::atomic<bool> d_can_plot;
+      logic_analyzer_sink::sptr d_logic_sink;
 
       void _reset();
       void _npoints_resize();
@@ -112,6 +117,10 @@ namespace adiscope {
       int work(int noutput_items,
 	       gr_vector_const_void_star &input_items,
 	       gr_vector_void_star &output_items);
+
+      void set_can_plot(bool canPlot);
+      void set_scope_sink(logic_analyzer_sink::sptr logic_sink);
+
     };
 
 } /* namespace adiscope */

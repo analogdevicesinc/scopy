@@ -187,6 +187,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
     QwtPointSeriesData *d = new QwtPointSeriesData(displayedData);
     QPolygonF polyline = mapper.toPolygonF(xMap, yMap, d, 0, displayedData.size() - 1);
+
     QwtPainter::drawPolyline(painter, polyline);
 
     painter->restore();

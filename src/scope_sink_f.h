@@ -50,6 +50,8 @@
 #include <gnuradio/sync_block.h>
 #include <qapplication.h>
 
+class logic_analyzer_sink;
+
 namespace adiscope {
 
     class scope_sink_f : virtual public gr::sync_block
@@ -77,6 +79,8 @@ namespace adiscope {
       virtual void reset() = 0;
       virtual void set_displayOneBuffer(bool) = 0;
       virtual void clean_buffers() = 0;
+      virtual void set_can_plot(bool canPlot) = 0;
+      virtual void set_scope_sink(boost::shared_ptr<logic_analyzer_sink> logic_sink) = 0;
 
       QApplication *d_qApplication;
     };

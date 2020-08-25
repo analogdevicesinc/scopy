@@ -76,7 +76,8 @@ namespace adiscope {
                    io_signature::make(nconnections, nconnections, sizeof(float)),
                    io_signature::make(0, 0, 0)),
 	d_size(size), d_buffer_size(2*size), d_samp_rate(samp_rate), d_name(name),
-	d_nconnections(nconnections), d_index(0), d_start(0), d_end(size)
+	d_nconnections(nconnections), d_index(0), d_start(0), d_end(size), d_can_plot(false)
+      , d_logic_sink(nullptr)
     {
 
 
@@ -326,6 +327,11 @@ namespace adiscope {
 
       gr::thread::scoped_lock lock(d_setlock);
 
+//      if (!d_can_plot.load(std::memory_order_acquire) && d_logic_sink) {
+//	      std::cout << "waiting logic" << std::endl;
+//	      return 0;
+//      }
+
       if (!d_displayOneBuffer && !d_cleanBuffers) {
               return 0;
       }
@@ -387,8 +393,14 @@ namespace adiscope {
                                                         new IdentifiableTimeUpdateEvent(d_buffers,
                                                                                         nItemsToSend,
                                                                                         d_tags,
-                                                                                        d_name));
-                      }
+											d_name));
+			      d_can_plot.store(false, std::memory_order_release);
+			      std::cout << "analog sink ploted" << std::endl;
+			      if (d_logic_sink) {
+				      d_logic_sink->set_can_plot(true);
+				      std::cout << "logic can plot now" << std::endl;
+			      }
+		      }
               }
 
               // We've plotting, so reset the state
@@ -401,5 +413,16 @@ namespace adiscope {
               _reset();
       }
       return nitems;
+    }
+
+    void scope_sink_f_impl::set_can_plot(bool canPlot)
+    {
+	    d_can_plot.store(canPlot, std::memory_order_release);
+    }
+
+    void scope_sink_f_impl::set_scope_sink(logic_analyzer_sink::sptr logic_sink)
+    {
+	    d_logic_sink = logic_sink;
+	    set_can_plot(false);
     }
 } /* namespace gr */
