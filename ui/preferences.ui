@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1082</width>
-    <height>722</height>
+    <height>777</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1009,7 +1009,7 @@ color: white;
                <number>0</number>
               </property>
               <property name="verticalSpacing">
-               <number>15</number>
+               <number>10</number>
               </property>
               <item row="2" column="0">
                <layout class="QHBoxLayout" name="horizontalLayout_13">
@@ -1570,6 +1570,9 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
            </item>
            <item row="8" column="1">
             <layout class="QVBoxLayout" name="verticalLayout_8">
+             <property name="spacing">
+              <number>10</number>
+             </property>
              <property name="topMargin">
               <number>0</number>
              </property>

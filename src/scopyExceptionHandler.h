@@ -13,11 +13,12 @@ using namespace adiscope;
 	if(GetScopyApplicationInstance()->getDebugMode()) { \
 		QMessageBox msg; \
 		QString str; \
-		if(dynamic_cast<libm2k::m2k_exception*>(&e)) { \
-		str = QString("Exception %1 - %2 %3 thrown from %2:%3 caught in %4:%5. Scopy git tag %6.") \
-		.arg("m2k_exception").arg(e.type()).arg(e.what()).arg(QString::fromStdString(e.file())).arg(QString::number(e.line())).arg(__FILE__).arg(__LINE__).arg(SCOPY_VERSION_GIT); \
+		auto me = dynamic_cast<libm2k::m2k_exception*>(&e);\
+		if(me) { \
+		str = QString("Exception %1\ne.type() - %2\ne.what()  - %3\ne.iioCode() - %4\nthrown from %5:%6\ncaught in %7:%8\nScopy git tag %9\n") \
+		.arg("m2k_exception").arg(me->type()).arg(me->what()).arg(me->iioCode()).arg(QString::fromStdString(me->file())).arg(QString::number(me->line())).arg(__FILE__).arg(__LINE__).arg(SCOPY_VERSION_GIT); \
 		} \
-		else { str = QString("Exception  %1 - caught in %2:%3. Scopy git tag %4").arg(e.what()).arg(__FILE__).arg(__LINE__).arg(SCOPY_VERSION_GIT);} \
+		else { str = QString("Exception  %1\ncaught in %2:%3\nScopy git tag %4\n").arg(e.what()).arg(__FILE__).arg(__LINE__).arg(SCOPY_VERSION_GIT);} \
 		if(WriteScopyMinidump()) str = str + "Created minidump.";\
 		msg.setText(str);\
 		msg.exec();\

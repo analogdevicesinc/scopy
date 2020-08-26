@@ -34,7 +34,7 @@
 #include "client/linux/handler/exception_handler.h"
 #endif
 
-#define CATCH_UNHANDLED_EXCEPTIONS
+//#define CATCH_UNHANDLED_EXCEPTIONS
 #endif
 #define GetScopyApplicationInstance() dynamic_cast<ScopyApplication*>(qApp)
 
