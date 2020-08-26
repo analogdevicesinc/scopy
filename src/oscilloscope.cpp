@@ -3582,6 +3582,9 @@ void adiscope::Oscilloscope::onTimePositionChanged(double value)
 	if (started) {
 		trigger_settings.setTriggerDelay(active_trig_sample_count);
 		last_set_time_pos = active_time_pos;
+		if (logic_source) {
+			setDigitalPlotCurvesParams();
+		}
 	}
 	updateBufferPreviewer();
 	if (reset_horiz_offset) {
