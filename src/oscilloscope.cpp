@@ -4601,8 +4601,10 @@ void Oscilloscope::periodicFlowRestart(bool force)
 		QElapsedTimer t;
 		t.start();
 		iio->lock();
-		m_m2k_context->stopMixedSignalAcquisition();
-		m_m2k_context->startMixedSignalAcquisition(active_sample_count);
+		if (logic_source && !trigger_settings.analogEnabled()) {
+			m_m2k_context->stopMixedSignalAcquisition();
+			m_m2k_context->startMixedSignalAcquisition(active_sample_count);
+		}
 		iio->unlock();
 		qDebug(CAT_OSCILLOSCOPE)<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
 	}
