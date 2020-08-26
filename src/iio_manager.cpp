@@ -255,7 +255,6 @@ void iio_manager::stop(iio_manager::port_id copy)
 	if (!inuse) {
 		qDebug(CAT_IIO_MANAGER) << "Stopping top block";
 		top_block::stop();
-		m_analogin->cancelAcquisition();
 		top_block::wait();
 
 		_started = false;
