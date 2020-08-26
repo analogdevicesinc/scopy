@@ -73,7 +73,8 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	adc_running(false),
 	trigger_raw_delay(0),
 	daisyChainCompensation(0),
-	m_trigger_in(false)
+	m_trigger_in(false),
+	m_has_external_trigger_out(false)
 {
 	initInstrumentStrings();
 	ui->setupUi(this);
@@ -148,12 +149,14 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	}
 
 	if (m_trigger->hasExternalTriggerOut()) {
+		m_has_external_trigger_out = true;
 		for (const auto &val : externalTriggerOutMapping)
 		{
 			ui->cmb_extern_to_src->addItem(val.first);
 			connect(ui->extern_to_en,SIGNAL(toggled(bool)),ui->cmb_extern_to_src,SLOT(setEnabled(bool)));
 		}
 	} else {
+		m_has_external_trigger_out = false;
 		ui->cmb_extern_to_src->addItem(tr("None"));
 		ui->cmb_extern_to_src->setEnabled(false);
 		ui->extern_to_en->setEnabled(false);
@@ -367,15 +370,20 @@ void TriggerSettings::enableExternalTriggerOut(bool enabled)
 {
 	const int TRIGGER_OUT_PIN = 1;
 
-	try {
-		if(enabled) {
-			m_trigger->setAnalogExternalOutSelect(externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
-		} else {
-			m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
+	if(m_has_external_trigger_out) {
+		try {
+			if(enabled) {
+				m_trigger->setAnalogExternalOutSelect(externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
+			} else {
+				m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
+			}
+		} catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
+			qDebug() << e.what();
+		} catch(std::exception e) {
+			HANDLE_EXCEPTION(e);
+			qDebug() << e.what();
 		}
-	} catch (libm2k::m2k_exception& e) {
-		HANDLE_EXCEPTION(e);
-		qDebug() << e.what();
 	}
 }
 

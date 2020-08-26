@@ -154,6 +154,7 @@ namespace adiscope {
 		long long daisyChainCompensation;
 		bool adc_running;
 		bool m_ac_coupled;
+		bool m_has_external_trigger_out;
 		double m_displayScale;
 		void setTriggerIn(bool bo);
 	};
