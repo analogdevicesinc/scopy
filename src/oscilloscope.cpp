@@ -1322,10 +1322,12 @@ void Oscilloscope::enableMixedSignalView()
 	add = gr::blocks::add_ff::make();
 	nullSink = gr::blocks::null_sink::make(sizeof(float));
 
+	// hack #################
 	iio->connect(logic_source, 0, s2f, 0);
 	iio->connect(s2f, 0, add, 0);
 	iio->connect(block, 0, add, 1);
 	iio->connect(add, 0, nullSink, 0);
+	// hack #################
 
 //	m_m2k_context->startMixedSignalAcquisition(active_sample_count);
 }
@@ -1353,10 +1355,12 @@ void Oscilloscope::disableMixedSignalView()
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 
+	// hack ###################################
 	iio->disconnect(logic_source, 0, s2f, 0);
 	iio->disconnect(s2f, 0, add, 0);
 	iio->disconnect(block, 0, add, 1);
 	iio->disconnect(add, 0, nullSink, 0);
+	// hack ###################################
 
 	logic_top_block->disconnect_all();
 	logic_top_block = nullptr;
@@ -2688,6 +2692,10 @@ void Oscilloscope::stop()
 
 void Oscilloscope::runStopToggled(bool checked)
 {
+	if (m_running == checked) {
+		return;
+	}
+
 	Q_EMIT activateExportButton();
 
 	if (checked) {
@@ -4616,7 +4624,7 @@ void Oscilloscope::requestAutoset()
 void Oscilloscope::periodicFlowRestart(bool force)
 {
 	static uint64_t restartFlowCounter = 0;
-	const uint64_t NO_FLOW_BUFFERS = 1024;
+	const uint64_t NO_FLOW_BUFFERS = 64;
 	if(force) {
 		restartFlowCounter = NO_FLOW_BUFFERS;
 	}
@@ -4626,6 +4634,8 @@ void Oscilloscope::periodicFlowRestart(bool force)
 		QElapsedTimer t;
 		t.start();
 		iio->lock();
+		m_m2k_context->stopMixedSignalAcquisition();
+		m_m2k_context->startMixedSignalAcquisition(active_sample_count);
 		iio->unlock();
 		qDebug(CAT_OSCILLOSCOPE)<<"Restarted flow @ " << QTime::currentTime().toString("hh:mm:ss") <<"restart took " << t.elapsed() << "ms";
 	}
