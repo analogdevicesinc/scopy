@@ -809,12 +809,12 @@ void SignalGenerator_API::setNotes(QString str)
 
 QList<int> SignalGenerator_API::getLineThickness() const
 {
-
         QList<int> list;
 
         for (int i = 0; i < gen->channels.size(); i++) {
                 auto ptr = gen->getData(gen->channels[i]);
-                list.append(ptr->lineThickness);
+                int lineThicknessIndex = (int)(ptr->lineThickness / 0.5) - 1;
+                list.append(lineThicknessIndex);
         }
 
         return list;
