@@ -1971,6 +1971,27 @@ void Oscilloscope::create_add_channel_panel()
 	Ui::MathPanel math_ui;
 
 	math_ui.setupUi(panel);
+
+	QWidget *logic = new QWidget(panel);
+
+	QVBoxLayout *layout_logic = new QVBoxLayout(logic);
+	logic->setLayout(layout_logic);
+
+	QLabel *labelWarningMixedSignal = new QLabel(tr("\"Warning: This feature is not supported on the current firmware version!\""));
+	labelWarningMixedSignal->setObjectName(QString::fromUtf8("lblWarningMixedSignal"));
+	QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	sizePolicy.setHorizontalStretch(0);
+	sizePolicy.setVerticalStretch(0);
+	sizePolicy.setHeightForWidth(labelWarningMixedSignal->sizePolicy().hasHeightForWidth());
+	labelWarningMixedSignal->setSizePolicy(sizePolicy);
+	labelWarningMixedSignal->setStyleSheet(QString::fromUtf8("color: white;"));
+	labelWarningMixedSignal->setWordWrap(true);
+	labelWarningMixedSignal->setVisible(false);
+
+	layout_logic->insertSpacerItem(0, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	layout_logic->setContentsMargins(0,0,0,0);
+	layout_logic->insertWidget(1, labelWarningMixedSignal);
+
 	QPushButton *btn = math_ui.btnAddChannel;
 
 	Math *math = new Math(nullptr, nb_channels);
@@ -2052,23 +2073,29 @@ void Oscilloscope::create_add_channel_panel()
 
 	tabWidget->addTab(ref, tr("Reference"));
 
-	tabWidget->addTab(new QWidget(), tr("Logic"));
+	tabWidget->addTab(logic, tr("Logic"));
 
 	connect(btnOpenFile, &QPushButton::clicked, this, &Oscilloscope::import);
 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
 		btn->setVisible(true);
-		if (index == 0) {
-			btn->setText(tr("Add channel"));
-			btn->setEnabled(lastFunctionValid);
-		} else if (index == 1) {
-			btn->setText(tr("Import selected channels"));
-			btn->setEnabled(importSettings->isEnabled());
-		} else if (index == 2) {
-//			btn->setVisible(false);
-			btn->setText(tr("Enable Mixed Signal View"));
-			btn->setEnabled(true);
-		}
+        if (index == 0) {
+            btn->setText(tr("Add channel"));
+            btn->setEnabled(lastFunctionValid);
+            labelWarningMixedSignal->setVisible(false);
+        } else if (index == 1) {
+            btn->setText(tr("Import selected channels"));
+            btn->setEnabled(importSettings->isEnabled());
+            labelWarningMixedSignal->setVisible(false);
+        } else if (index == 2) {
+            btn->setText(tr("Enable Mixed Signal View"));
+            if (m_m2k_context->hasMixedSignal()) {
+                btn->setEnabled(true);
+            } else {
+                btn->setEnabled(false);
+                labelWarningMixedSignal->setVisible(true);
+            }
+        }
 	});
 
 	connect(btn, &QPushButton::clicked,
