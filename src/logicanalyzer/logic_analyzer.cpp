@@ -65,9 +65,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_m2k_context(m2kOpen(ctx, "")),
 	m_m2kDigital(m_m2k_context->getDigital()),
 	m_sampleRateButton(new ScaleSpinButton({
-					{"Hz", 1E0},
-					{"kHz", 1E+3},
-					{"MHz", 1E+6}
+					{"sps", 1E0},
+					{"ksps", 1E+3},
+					{"Msps", 1E+6}
 					}, tr("Sample Rate"), 1,
 					10e7,
 					true, false, this, {1, 2, 5})),
