@@ -98,7 +98,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	m_use_decoders(true),
 	menu(nullptr),
 	m_useNativeDialogs(true),
-	m_m2k(nullptr)
+	m_m2k(nullptr),
+	initialCalibrationFlag(true)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -299,6 +300,7 @@ void ToolLauncher::readPreferences()
 {
 	m_use_decoders = prefPanel->getDigital_decoders_enabled();
 	debugger_enabled = prefPanel->getDebugger_enabled();
+	skip_calibration_if_already_calibrated = prefPanel->getSkipCalIfCalibrated();
 	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
 	allowExternalScript(prefPanel->getExternal_script_enabled());
 	if (manual_calibration) {
@@ -1024,6 +1026,8 @@ void adiscope::ToolLauncher::disconnect()
 		loadToolTips(false);
 		resetStylesheets();
 		search_timer->start(TIMER_TIMEOUT_MS);
+		selectedDev->infoPage()->setConnectionStatusLabel("Not connected");
+		selectedDev->infoPage()->setCalibrationStatusLabel("");
 	}
 
 	/* Update the list of devices now */
@@ -1067,6 +1071,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 		connectedDev->setConnected(false, false);
 		disconnect();
 		connectedDev->connectButton()->setToolTip(QString(tr("Click to connect the device")));
+		connectedDev->connectButton()->setText(tr("Connect"));
 	}
 
 	if (connectedDev != selectedDev) {
@@ -1262,9 +1267,13 @@ void adiscope::ToolLauncher::requestCalibrationCancel()
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
+void adiscope::ToolLauncher::calibrationSuccessCallback()
+{
+}
+
 void adiscope::ToolLauncher::calibrationFailedCallback()
 {
-	selectedDev->infoPage()->setStatusLabel(tr("Calibration Failed"));
+	selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration Failed"));
 	selectedDev->connectButton()->setText(tr("Disconnect"));
 	selectedDev->connectButton()->setEnabled(true);
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
@@ -1275,7 +1284,9 @@ void adiscope::ToolLauncher::initialCalibration()
 	bool ok = true;
 
 	if (!skip_calibration) {
+		initialCalibrationFlag = true;
 		ok = calibrate();
+		initialCalibrationFlag = false;
 	}
 }
 
@@ -1302,7 +1313,26 @@ bool adiscope::ToolLauncher::calibrate()
 	network_btn->setText(status);
 
 	if (calib->isInitialized()) {
-		ok = calib->calibrateAll();
+		if(prefPanel->getAttemptTempLutCalib())
+		{
+			//calib->calibrateFromTemperature();
+			//selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated from temperature @ ") + "50G");
+			ok = true;
+		}
+		else
+		{
+			if(!(initialCalibrationFlag && skip_calibration_if_already_calibrated && calib->isCalibrated() )) {
+				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrating"));
+				ok = calib->calibrateAll();
+				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated"));
+			}
+			else
+			{
+				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration skipped because already calibrated."));
+				ok = true;
+			}
+
+		}
 	}
 
 	dmm_btn->setText(old_dmm_text);
@@ -1533,6 +1563,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		this, SLOT(enableDacBasedTools()));
 	connect(this, SIGNAL(calibrationFailed()),
 		this, SLOT(calibrationFailedCallback()));
+	connect(this, SIGNAL(calibrationFailed()),
+		this, SLOT(calibrationSuccessCallback()));
 	connect(this, SIGNAL(calibrationDone()),
 		this, SLOT(restartToolsAfterCalibration()));
 

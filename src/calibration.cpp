@@ -69,6 +69,11 @@ bool Calibration::isInitialized() const
 	return m_initialized;
 }
 
+bool Calibration::isCalibrated()
+{
+	return m_m2k->isCalibrated();
+}
+
 
 bool Calibration::resetCalibration()
 {

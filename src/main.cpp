@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 	// TODO: Use Preferences_API to get language key - cannot be done right now
 	// as this involves instantiating Preferences object
 	QSettings pref(Preferences::getPreferenceIniFile(), QSettings::IniFormat);
-	QString language = pref.value(QString("Preferences/language")).toString();	
+	QString language = pref.value(QString("Preferences/language")).toString();
 
 	QString languageFileName = ":/translations/";
 	QString osLanguage = QLocale::system().name().split("_")[0];

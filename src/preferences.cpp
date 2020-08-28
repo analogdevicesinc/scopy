@@ -62,8 +62,9 @@ Preferences::Preferences(QWidget *parent) :
 	language("auto"),
 	m_displaySamplingPoints(false),
 	m_instrument_notes_active(false),
-	m_debug_messages_active(false)
-
+	m_debug_messages_active(false),
+	m_attemptTempLutCalib(false),
+	m_skipCalIfCalibrated(false)
 {
 	ui->setupUi(this);
 
@@ -136,6 +137,12 @@ Preferences::Preferences(QWidget *parent) :
 		manual_calib_script_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->skipCalCheckbox, &QCheckBox::stateChanged, [=](int state) {
+		m_skipCalIfCalibrated = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->enableAnimCheckBox, &QCheckBox::stateChanged, [=](int state) {
 		animations_enabled = (!state ? false : true);
 		Q_EMIT notify();
@@ -178,6 +185,11 @@ Preferences::Preferences(QWidget *parent) :
 		Q_EMIT notify();
 	});
 
+	connect(ui->tempLutCalibCheckbox, &QCheckBox::stateChanged, [=](int state) {
+		m_attemptTempLutCalib = state;
+		Q_EMIT notify();
+	});
+
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -185,6 +197,12 @@ Preferences::Preferences(QWidget *parent) :
 	pref_api->load(settings);
 
 	ui->label_restart->setVisible(false);
+	//////////////////////
+	// TEMPORARY UNTIL ACTUAL IMPLEMENTATION
+	ui->tempLutCalibCheckbox->setVisible(false);
+	ui->label_28->setVisible(false);
+	//////////////////////////
+
 	ui->languageCombo->addItems(getOptionsList());
 
 
@@ -308,6 +326,8 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
 	ui->debugMessagesCheckbox->setChecked(m_debug_messages_active);
 	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
+	ui->tempLutCalibCheckbox->setChecked(m_attemptTempLutCalib);
+	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
 
 	QWidget::showEvent(event);
 }
@@ -537,6 +557,24 @@ void Preferences::setOsc_graticule_enabled(bool value)
 	graticule_enabled = value;
 }
 
+bool Preferences::getAttemptTempLutCalib() const
+{
+	return m_attemptTempLutCalib;
+}
+void Preferences::setAttemptTempLutCalib(bool val)
+{
+	m_attemptTempLutCalib = val;
+}
+
+bool Preferences::getSkipCalIfCalibrated() const
+{
+	return m_skipCalIfCalibrated;
+}
+void Preferences::setSkipCalIfCalibrated(bool val)
+{
+	m_skipCalIfCalibrated = val;
+}
+
 bool Preferences_API::getAnimationsEnabled() const
 {
 	return preferencePanel->animations_enabled;
@@ -704,6 +742,25 @@ void Preferences_API::setDigitalDecoders(bool enabled)
 {
 	preferencePanel->digital_decoders_enabled = enabled;
 }
+
+bool Preferences_API::getAttemptTempLutCalib() const
+{
+	return preferencePanel->m_attemptTempLutCalib;
+}
+void Preferences_API::setAttemptTempLutCalib(bool val)
+{
+	preferencePanel->m_attemptTempLutCalib = val;
+}
+
+bool Preferences_API::getSkipCalIfCalibrated() const
+{
+	return preferencePanel->m_skipCalIfCalibrated;
+}
+void Preferences_API::setSkipCalIfCalibrated(bool val)
+{
+	preferencePanel->m_skipCalIfCalibrated = val;
+}
+
 bool Preferences::hasNativeDialogs() const
 {
     return m_useNativeDialogs;
