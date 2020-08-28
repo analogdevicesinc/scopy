@@ -117,6 +117,12 @@ public:
 	bool getDebugMessagesActive() const;
 	void setDebugMessagesActive(bool display);
 
+	bool getAttemptTempLutCalib() const;
+	void setAttemptTempLutCalib(bool display);
+
+	bool getSkipCalIfCalibrated() const;
+	void setSkipCalIfCalibrated(bool val);
+
 Q_SIGNALS:
 
 	void notify();
@@ -159,6 +165,8 @@ private:
 	bool m_instrument_notes_active;
 	bool m_displaySamplingPoints;
 	bool m_debug_messages_active;
+	bool m_attemptTempLutCalib;
+	bool m_skipCalIfCalibrated;
 
 	Preferences_API *pref_api;
 };
@@ -188,6 +196,8 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool displaySamplingPoints READ getDisplaySampling WRITE setDisplaySampling)
 	Q_PROPERTY(bool instrument_notes_active READ getInstrumentNotesActive WRITE setInstrumentNotesActive)
 	Q_PROPERTY(bool debug_messages_active READ getDebugMessagesActive WRITE setDebugMessagesActive)
+	Q_PROPERTY(bool attemptTempLutCalib READ getAttemptTempLutCalib WRITE setAttemptTempLutCalib)
+	Q_PROPERTY(bool skipCalIfCalibrated READ getSkipCalIfCalibrated WRITE setSkipCalIfCalibrated)
 
 
 public:
@@ -255,6 +265,12 @@ public:
 
 	bool getDebugMessagesActive() const;
 	void setDebugMessagesActive(bool display);
+
+	bool getAttemptTempLutCalib() const;
+	void setAttemptTempLutCalib(bool val);
+
+	bool getSkipCalIfCalibrated() const;
+	void setSkipCalIfCalibrated(bool val);
 
 private:
 	Preferences *preferencePanel;

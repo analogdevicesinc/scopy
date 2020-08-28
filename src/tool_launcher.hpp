@@ -155,6 +155,7 @@ private Q_SLOTS:
 	void _toolSelected(tool tool);
 	void restartToolsAfterCalibration();
 	void calibrationFailedCallback();
+	void calibrationSuccessCallback();
 	void calibrationThreadWatcherFinished();
 private:
 	QList<Tool*> calibration_saved_tools;
@@ -242,6 +243,8 @@ private:
 
 	bool calibrating;
 	bool skip_calibration;
+	bool skip_calibration_if_already_calibrated;
+	bool initialCalibrationFlag;
 
 	bool debugger_enabled;
 	bool manual_calibration_enabled;

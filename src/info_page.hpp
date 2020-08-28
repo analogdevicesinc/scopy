@@ -26,6 +26,7 @@
 #include <QMap>
 #include <QPushButton>
 #include <QFuture>
+#include <QLabel>
 
 #include "iio.h"
 
@@ -59,7 +60,7 @@ public:
 	QPushButton *connectButton();
 	QPushButton *calibrateButton();
 
-	void getDeviceInfo();
+	virtual void getDeviceInfo();
 	void refreshInfoWidget();
 
 	void setConnectionStatus(bool);
@@ -69,7 +70,13 @@ public:
 public Q_SLOTS:
 	void readPreferences();
 	void identifyDevice(bool clicked = true);
-	void setStatusLabel(QString str, QString color="red");
+	void setStatusLabel(QLabel *lbl, QString str = "", QString color="white");
+
+
+	void setCalibrationStatusLabel(QString str = "", QString color = "white");
+	void setCalibrationInfoLabel(QString str = "", QString color = "white");
+	void setIdentyifyLabel(QString str = "", QString color = "white");
+	void setConnectionStatusLabel(QString str = "", QString color = "white");
 
 private Q_SLOTS:
 	virtual void blinkTimeout();
@@ -110,6 +117,7 @@ public:
 			     struct iio_context *ctx = nullptr,
 			     QWidget *parent = 0);
 	~M2kInfoPage();
+	void getDeviceInfo();
 
 protected:
 	virtual void startIdentification(bool);
