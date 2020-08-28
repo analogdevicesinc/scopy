@@ -244,10 +244,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	}, tr("Offset"), -5, 5, true, true, this);
 
 	fileSampleRate = new ScaleSpinButton({
-		{"mHz",1e-3},
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
+		{"msps",1e-3},
+		{"sps",1e0},
+		{"ksps",1e3},
+		{"Msps",1e6}
 	},tr("SampleRate"), 0.001, 0.0, true, false, this);
 	fileSampleRate->setIntegerDivider(75000000);
 
@@ -258,10 +258,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	mathSampleRate =  new ScaleSpinButton({
-		{"mHz",1e-3},
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
+		{"msps",1e-3},
+		{"sps",1e0},
+		{"ksps",1e3},
+		{"Msps",1e6}
 	},tr("SampleRate"), 0.001, 75000000.0, true, false, this);
 
 	mathSampleRate->setIntegerDivider(75000000);
