@@ -73,7 +73,7 @@ void NetworkAnalyzer::_configureDacFlowgraph()
 {
 	// Create the blocks that are used to generate sine waves
 	top_block = make_top_block("Signal Generator");
-	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE,
+	source_block = gr::analog::sig_source_f::make(1, gr::analog::GR_SIN_WAVE,
 			1, 1, 1);
 	head_block = blocks::head::make(sizeof(float), 1);
 	vector_block = blocks::vector_sink_f::make();
