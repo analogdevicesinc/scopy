@@ -65,6 +65,10 @@
 #include "plot_utils.hpp"
 #include "extendingplotzoomer.h"
 #include "printableplot.h"
+#include "symbol_controller.h"
+#include "plot_line_handle.h"
+#include "cursor_readouts.h"
+#include "handles_area.hpp"
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )
@@ -213,6 +217,16 @@ private:
 	{
 		return ((*step) * pow(m_magnitude_step, power));
 	}
+};
+
+struct cursorReadoutsText {
+    QString t1;
+    QString t2;
+    QString tDelta;
+    QString freq;
+    QString v1;
+    QString v2;
+    QString vDelta;
 };
 
 /*!
@@ -377,16 +391,24 @@ public:
   QwtPlotZoomer *getZoomer() const;
   void setZoomerParams(bool bounded, int maxStackDepth);
 
-
-
   void bringCurveToFront(unsigned int curveIdx);
   void enableColoredLabels(bool colored);
 
   void enableMouseGesturesOnScales(bool enable);
 
   void setDisplayScale(double value);
-
   void setAllYAxis(double min, double max);
+
+  bool vertCursorsEnabled();
+  bool horizCursorsEnabled();
+  struct cursorReadoutsText allCursorReadouts() const;
+
+  QWidget *bottomHandlesArea();
+  QWidget *rightHandlesArea();
+
+  void trackModeEnabled(bool enabled);
+  void repositionCursors();
+
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
@@ -498,6 +520,20 @@ public Q_SLOTS:
   unsigned int xAxisNumDiv() const;
   unsigned int yAxisNumDiv() const;
 
+  void setVertCursorsEnabled(bool en);
+  void setHorizCursorsEnabled(bool en);
+  void setCursorReadoutsVisible(bool en);
+  void setHorizCursorsLocked(bool value);
+  void setVertCursorsLocked(bool value);
+
+  virtual void onHCursor1Moved(double);
+  virtual void onHCursor2Moved(double);
+  virtual void onVCursor1Moved(double);
+  virtual void onVCursor2Moved(double);
+
+  void setCursorReadoutsTransparency(int value);
+  void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
+
 Q_SIGNALS:
   void horizScaleDivisionChanged(double);
   void vertScaleDivisionChanged(double);
@@ -508,6 +544,14 @@ Q_SIGNALS:
 
   // signals that the plot size changed
   void plotSizeChanged();
+
+  void cursorReadoutsChanged(struct cursorReadoutsText);
+
+private Q_SLOTS:
+  void onHbar1PixelPosChanged(int);
+  void onHbar2PixelPosChanged(int);
+  void onVbar1PixelPosChanged(int);
+  void onVbar2PixelPosChanged(int);
 
 protected Q_SLOTS:
   virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
@@ -578,10 +622,51 @@ protected:
 
   void resizeEvent(QResizeEvent *event);
 
+  HorizHandlesArea *d_bottomHandlesArea;
+  VertHandlesArea *d_rightHandlesArea;
+
+  VertBar *d_vBar1;
+  VertBar *d_vBar2;
+  HorizBar *d_hBar1;
+  HorizBar *d_hBar2;
+  SymbolController *d_symbolCtrl;
+
+  PlotLineHandleV *d_vCursorHandle1;
+  PlotLineHandleV *d_vCursorHandle2;
+  PlotLineHandleH *d_hCursorHandle1;
+  PlotLineHandleH *d_hCursorHandle2;
+
+  struct cursorReadoutsText d_cursorReadoutsText;
+  CursorReadouts *d_cursorReadouts;
+
+  bool d_trackMode;
+  int d_selected_channel;
+  double getHorizontalCursorIntersection(double time);
+
 private:
   void AddAxisOffset(int axisPos, int axisIdx, double offset);
   bool d_coloredLabels;
   bool d_mouseGesturesEnabled;
+
+  bool d_vertCursorsEnabled;
+  bool d_horizCursorsEnabled;
+  bool horizCursorsLocked;
+  bool vertCursorsLocked;
+
+  int pixelPosHandleHoriz1;
+  int pixelPosHandleHoriz2;
+  int pixelPosHandleVert1;
+  int pixelPosHandleVert2;
+
+  PrefixFormatter *formatter;
+  bool d_cursorReadoutsVisible;
+
+  QwtPlotMarker *markerIntersection1;
+  QwtPlotMarker *markerIntersection2;
+
+  void setupCursors();
+  void setupReadouts();
+  void displayIntersection();
 
 };
 
