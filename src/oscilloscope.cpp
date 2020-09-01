@@ -1813,11 +1813,11 @@ void Oscilloscope::cursor_panel_init()
 	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 
 	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
-		&plot, SLOT(setVertCursorsEnabled(bool)));
+        &plot, SLOT(setVertCursorsEnabled(bool)));
 	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
-		&plot, SLOT(setHorizCursorsEnabled(bool)));
+        &plot, SLOT(setHorizCursorsEnabled(bool)));
 
-	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
+    connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		cursor_readouts_ui->TimeCursors,
 		SLOT(setVisible(bool)));
 	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),

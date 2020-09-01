@@ -22,10 +22,6 @@
 #define M2K_OSCILLOSCOPE_PLOT_H
 
 #include "TimeDomainDisplayPlot.h"
-#include "symbol_controller.h"
-#include "handles_area.hpp"
-#include "plot_line_handle.h"
-#include "cursor_readouts.h"
 #include "measure.h"
 #include "customplotpositionbutton.h"
 #include "graticule.h"
@@ -48,16 +44,6 @@ namespace adiscope {
 		OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10,
 				 unsigned int yNumDiv = 10);
 		~OscilloscopePlot();
-	};
-
-	struct cursorReadoutsText {
-		QString t1;
-		QString t2;
-		QString tDelta;
-		QString freq;
-		QString v1;
-		QString v2;
-		QString vDelta;
 	};
 
 	class CapturePlot: public OscilloscopePlot
@@ -87,19 +73,14 @@ namespace adiscope {
 
 		QWidget *topArea();
 		QWidget *topHandlesArea();
-		QWidget *bottomHandlesArea();
 		QWidget *leftHandlesArea();
-		QWidget *rightHandlesArea();
 
 		void setBonusWidthForHistogram(int width);
 
 		bool triggerAEnabled();
 		bool triggerBEnabled();
-		bool vertCursorsEnabled();
-		bool horizCursorsEnabled();
 		int selectedChannel();
 		bool measurementsEnabled();
-		struct cursorReadoutsText allCursorReadouts() const;
 
 		void setOffsetWidgetVisible(int chnIdx, bool visible);
 		void removeOffsetWidgets(int chnIdx);
@@ -129,8 +110,6 @@ namespace adiscope {
 
 		void setTimeTriggerInterval(double min, double max);
 		bool labelsEnabled();
-		void trackModeEnabled(bool enabled);
-		void repositionCursors();
 
 		void setGraticuleEnabled(bool enabled);
 		void setGatingEnabled(bool enabled);
@@ -148,7 +127,6 @@ namespace adiscope {
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);
 		void measurementsAvailable();
-		void cursorReadoutsChanged(struct cursorReadoutsText);
 		void canvasSizeChanged();
 		void leftGateChanged(double);
 		void rightGateChanged(double);
@@ -157,22 +135,16 @@ namespace adiscope {
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
 		void setTriggerBEnabled(bool en);
-		void setVertCursorsEnabled(bool en);
-		void setHorizCursorsEnabled(bool en);
 		void setSelectedChannel(int id);
 		void setMeasuremensEnabled(bool en);
 		void setPeriodDetectLevel(int chnIdx, double lvl);
 		void setPeriodDetectHyst(int chnIdx, double hyst);
-		void setCursorReadoutsVisible(bool en);
 		void setTimeBaseLabelValue(double timebase);
 		void setBufferSizeLabelValue(int numSamples);
 		void setSampleRatelabelValue(double sampleRate);
 		void setTriggerState(int triggerState);
 		void setMaxBufferSizeErrorLabel(bool reached);
-		void setCursorReadoutsTransparency(int value);
-		void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
-		void setHorizCursorsLocked(bool value);
-		void setVertCursorsLocked(bool value);
+
 		void showEvent(QShowEvent *event);
 		void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
 		void onDigitalChannelAdded(int chnIdx);
@@ -188,6 +160,11 @@ namespace adiscope {
 		void positionInGroupChanged(int chnIdx, int from, int to);
 		void setGroups(const QVector<QVector<int>> &groups);
 
+        void onHCursor1Moved(double);
+        void onHCursor2Moved(double);
+        void onVCursor1Moved(double);
+        void onVCursor2Moved(double);
+
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
@@ -195,24 +172,13 @@ namespace adiscope {
 		Measure* measureOfChannel(int chnIdx) const;
 		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 		void updateHandleAreaPadding(bool);
-		double getHorizontalCursorIntersection(double time);
-		void displayIntersection();
 		void updateGateMargins();
+       // double getHorizontalCursorIntersection(double time);
+       // void displayIntersection();
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
 		void onNewDataReceived();
-
-
-		void onHbar1PixelPosChanged(int);
-		void onHbar2PixelPosChanged(int);
-		void onVbar1PixelPosChanged(int);
-		void onVbar2PixelPosChanged(int);
-
-		void onTimeCursor1Moved(double);
-		void onTimeCursor2Moved(double);
-		void onVoltageCursor1Moved(double);
-		void onVoltageCursor2Moved(double);
 
 		void onGateBar1PixelPosChanged(int);
 		void onGateBar2PixelPosChanged(int);
@@ -229,22 +195,15 @@ namespace adiscope {
 		void handleInGroupChangedPosition(int position);
 	private:
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
-		SymbolController *d_symbolCtrl;
 
 		bool d_triggerAEnabled;
 		bool d_triggerBEnabled;
-		bool d_vertCursorsEnabled;
-		bool d_horizCursorsEnabled;
 		bool d_measurementsEnabled;
 		bool d_labelsEnabled;
 
-		int d_selected_channel;
-
 		QWidget *d_topWidget;
 		GateHandlesArea *d_topHandlesArea;
-		HorizHandlesArea *d_bottomHandlesArea;
 		VertHandlesArea *d_leftHandlesArea;
-		VertHandlesArea *d_rightHandlesArea;
 		int d_bonusWidth;
 
 		QLabel *d_timeBaseLabel;
@@ -263,18 +222,8 @@ namespace adiscope {
 		bool d_startedGrouping;
 		QVector<QwtPlotZoneItem *> d_groupMarkers;
 
-		PlotLineHandleV *d_vCursorHandle1;
-		PlotLineHandleV *d_vCursorHandle2;
-		PlotLineHandleH *d_hCursorHandle1;
-		PlotLineHandleH *d_hCursorHandle2;
-
 		PlotGateHandle *d_hGatingHandle1;
 		PlotGateHandle *d_hGatingHandle2;
-
-		VertBar *d_vBar1;
-		VertBar *d_vBar2;
-		HorizBar *d_hBar1;
-		HorizBar *d_hBar2;
 
 		VertBar *d_gateBar1;
 		VertBar *d_gateBar2;
@@ -286,13 +235,8 @@ namespace adiscope {
 		FreePlotLineHandleV *d_levelTriggerAHandle;
 		FreePlotLineHandleV *d_levelTriggerBHandle;
 
-
-
-		CursorReadouts *d_cursorReadouts;
 		MetricPrefixFormatter d_cursorMetricFormatter;
-	        TimePrefixFormatter d_cursorTimeFormatter;
-	        struct cursorReadoutsText d_cursorReadoutsText;
-	        bool d_cursorReadoutsVisible;
+        TimePrefixFormatter d_cursorTimeFormatter;
 
 	        QPen d_trigAactiveLinePen;
 	        QPen d_trigAinactiveLinePen;
@@ -303,7 +247,6 @@ namespace adiscope {
 
 	        QList<Measure *> d_measureObjs;
 
-		double value_v1, value_v2, value_h1, value_h2;
 		double value_gateLeft, value_gateRight;
 		double d_minOffsetValue, d_maxOffsetValue;
 		double d_timeTriggerMinValue, d_timeTriggerMaxValue;
@@ -311,15 +254,9 @@ namespace adiscope {
 		bool displayGraticule;
 		Graticule *graticule;
 
-		bool d_trackMode;
-		QwtPlotMarker *markerIntersection1;
-		QwtPlotMarker *markerIntersection2;
-		bool horizCursorsLocked;
-		bool vertCursorsLocked;
-		int pixelPosHandleHoriz1;
-		int pixelPosHandleHoriz2;
-		int pixelPosHandleVert1;
-		int pixelPosHandleVert2;
+//		bool d_trackMode;
+//		QwtPlotMarker *markerIntersection1;
+//		QwtPlotMarker *markerIntersection2;
 
 		QwtPlotShapeItem *leftGate, *rightGate;
 		QRectF leftGateRect, rightGateRect;
