@@ -64,24 +64,16 @@ CapturePlot::CapturePlot(QWidget *parent,
 	OscilloscopePlot(parent, xNumDivs, yNumDivs),
 	d_triggerAEnabled(false),
 	d_triggerBEnabled(false),
-	d_selected_channel(-1),
 	d_measurementsEnabled(false),
-	d_cursorReadoutsVisible(false),
 	d_bufferSizeLabelVal(0),
 	d_sampleRateLabelVal(1.0),
 	d_labelsEnabled(false),
 	d_timeTriggerMinValue(-1),
 	d_timeTriggerMaxValue(1),
-	d_trackMode(false),
-	horizCursorsLocked(false),
-	vertCursorsLocked(false),
-	d_horizCursorsEnabled(false),
-	d_vertCursorsEnabled(false),
 	d_bonusWidth(0),
 	d_gatingEnabled(false),
 	m_conversion_function(nullptr),
 	d_startedGrouping(false),
-	d_bottomHandlesArea(nullptr),
 	d_xAxisInterval{0.0, 0.0},
 	d_currentHandleInitPx(30),
 	d_maxBufferError(nullptr)
@@ -98,40 +90,20 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_timeTriggerActiveLinePen = QPen(QColor(74, 100, 255), 2, Qt::SolidLine);
 	/* End of: Initial colors scheme */
 
-	markerIntersection1 = new QwtPlotMarker();
-	markerIntersection2 = new QwtPlotMarker();
-	markerIntersection1->setSymbol(new QwtSymbol(
-			QwtSymbol::Ellipse, QColor(237, 28, 36),
-			QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
-			QSize(5, 5)));
-	markerIntersection2->setSymbol(new QwtSymbol(
-		       QwtSymbol::Ellipse, QColor(237, 28, 36),
-		       QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
-		       QSize(5, 5)));
-
-	d_symbolCtrl = new SymbolController(this);
-
 	setHorizUnitsPerDiv(1E-6);
 	zoomBaseUpdate();
 
-	/* Adjacent areas (top/bottom/left/right) */
+    /* Adjacent areas */
 	d_topWidget = new QWidget(this);
 	d_topHandlesArea = new GateHandlesArea(this->canvas());
-	d_bottomHandlesArea = new HorizHandlesArea(this->canvas());
 	d_leftHandlesArea = new VertHandlesArea(this->canvas());
-	d_rightHandlesArea = new VertHandlesArea(this->canvas());
 
 	d_topWidget->setStyleSheet("QWidget {background-color: transparent}");
 	d_topWidget->setMinimumHeight(50);
 	d_topHandlesArea->setMinimumHeight(20);
 	d_topHandlesArea->setLargestChildWidth(80);
-	d_bottomHandlesArea->setMinimumHeight(50);
 	d_leftHandlesArea->setMinimumWidth(50);
-	d_rightHandlesArea->setMinimumWidth(50);
-	d_bottomHandlesArea->setLargestChildWidth(60);
-	d_rightHandlesArea->setLargestChildHeight(60);
 	d_leftHandlesArea->setMinimumHeight(this->minimumHeight());
-	d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
 
 	d_topHandlesArea->hide();
 	/* Add content to the top area of the plot */
@@ -292,21 +264,6 @@ CapturePlot::CapturePlot(QWidget *parent,
 	connect(d_levelTriggerBHandle, SIGNAL(grabbedChanged(bool)),
 		SLOT(onTriggerBHandleGrabbed(bool)));
 
-
-	/* Measurement Cursors */
-	d_vCursorHandle1 = new PlotLineHandleV(
-				QPixmap(":/icons/v_cursor_handle.svg"),
-				d_rightHandlesArea);
-	d_vCursorHandle2 = new PlotLineHandleV(
-				QPixmap(":/icons/v_cursor_handle.svg"),
-				d_rightHandlesArea);
-	d_hCursorHandle1 = new PlotLineHandleH(
-				QPixmap(":/icons/h_cursor_handle.svg"),
-				d_bottomHandlesArea);
-	d_hCursorHandle2 = new PlotLineHandleH(
-				QPixmap(":/icons/h_cursor_handle.svg"),
-				d_bottomHandlesArea);
-
 	/* Measurement gate cursors */
 	d_hGatingHandle1 = new PlotGateHandle(
 				QPixmap(":/icons/gate_handle.svg"),
@@ -317,10 +274,6 @@ CapturePlot::CapturePlot(QWidget *parent,
 				d_topHandlesArea);
 
 	d_hGatingHandle1->setCenterLeft(false);
-	d_vBar1 = new VertBar(this, true);
-	d_vBar2 = new VertBar(this, true);
-	d_hBar1 = new HorizBar(this, true);
-	d_hBar2 = new HorizBar(this, true);
 
 	d_gateBar1 = new VertBar(this,true);
 	d_gateBar2 = new VertBar(this,true);
@@ -328,25 +281,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_gateBar1->setVisible(false);
 	d_gateBar2->setVisible(false);
 
-	d_symbolCtrl->attachSymbol(d_vBar1);
-	d_symbolCtrl->attachSymbol(d_vBar2);
-	d_symbolCtrl->attachSymbol(d_hBar1);
-	d_symbolCtrl->attachSymbol(d_hBar2);
-
 	d_symbolCtrl->attachSymbol(d_gateBar1);
 	d_symbolCtrl->attachSymbol(d_gateBar2);
-
-	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
-	d_hBar1->setPen(cursorsLinePen);
-	d_hBar2->setPen(cursorsLinePen);
-	d_vBar1->setPen(cursorsLinePen);
-	d_vBar2->setPen(cursorsLinePen);
-
-	d_vCursorHandle1->setPen(cursorsLinePen);
-	d_vCursorHandle2->setPen(cursorsLinePen);
-	d_hCursorHandle1->setPen(cursorsLinePen);
-	d_hCursorHandle2->setPen(cursorsLinePen);
-
 
 	/* gate bars */
 	QPen gatePen = QPen(QColor(255,255,255),1,Qt::SolidLine);
@@ -359,80 +295,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_hGatingHandle1->hide();
 	d_hGatingHandle2->hide();
 
-	d_vCursorHandle1->hide();
-	d_vCursorHandle2->hide();
-	d_hCursorHandle1->hide();
-	d_hCursorHandle2->hide();
-
-	d_vBar1->setVisible(false);
-	d_vBar2->setVisible(false);
-	d_hBar1->setVisible(false);
-	d_hBar2->setVisible(false);
-
-	d_cursorReadouts = new CursorReadouts(this);
-	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
-	d_cursorReadouts->setTimeReadoutVisible(false);
-	d_cursorReadouts->setVoltageReadoutVisible(false);
-
-	/* Set initial values for cursors */
-	double voltsPerDiv = VertUnitsPerDiv(activeVertAxis());
-	double secPerDiv = HorizUnitsPerDiv();
-
-	/* Update Cursor Readouts */
-	onVoltageCursor1Moved(d_hBar1->plotCoord().y());
-	onVoltageCursor2Moved(d_hBar2->plotCoord().y());
-	onTimeCursor1Moved(d_vBar1->plotCoord().x());
-	onTimeCursor2Moved(d_vBar2->plotCoord().x());
-
 	d_cursorMetricFormatter.setTwoDecimalMode(false);
 	d_cursorTimeFormatter.setTwoDecimalMode(false);
-
-	/* When a handle position changes the bar follows */
-	connect(d_vCursorHandle1, &PlotLineHandleV::positionChanged,
-		[=](int value) {
-
-		if (vertCursorsLocked) {
-			int position2 = value - (pixelPosHandleVert1 - pixelPosHandleVert2);
-			pixelPosHandleVert2 = position2;
-			d_hBar2->setPixelPosition(position2);
-		}
-
-		pixelPosHandleVert1 = value;
-		d_hBar1->setPixelPosition(value);
-	});
-	connect(d_vCursorHandle2, &PlotLineHandleV::positionChanged,
-		[=](int value) {
-
-		if (vertCursorsLocked) {
-			int position1 = value + (pixelPosHandleVert1 - pixelPosHandleVert2);
-			pixelPosHandleVert1 = position1;
-			d_hBar1->setPixelPosition(position1);
-		}
-
-		pixelPosHandleVert2 = value;
-		d_hBar2->setPixelPosition(value);
-	});
-
-	connect(d_hCursorHandle1, &PlotLineHandleH::positionChanged,
-		[=](int value) {
-		if (horizCursorsLocked) {
-			int position2 = value - (pixelPosHandleHoriz1 - pixelPosHandleHoriz2);
-			pixelPosHandleHoriz2 = position2;
-			d_vBar2->setPixelPosition(position2);
-		}
-		pixelPosHandleHoriz1 = value;
-		d_vBar1->setPixelPosition(value);
-	});
-	connect(d_hCursorHandle2, &PlotLineHandleH::positionChanged,
-		[=](int value) {
-		if (horizCursorsLocked) {
-			int position1 = value + (pixelPosHandleHoriz1 - pixelPosHandleHoriz2);
-			pixelPosHandleHoriz1 = position1;
-			d_vBar1->setPixelPosition(position1);
-		}
-		pixelPosHandleHoriz2 = value;
-		d_vBar2->setPixelPosition(value);
-	});
 
 	connect(d_hGatingHandle1, &PlotLineHandleH::positionChanged,[=](int value){
 		d_hGatingHandle2->setOtherCursorPosition(d_hGatingHandle1->position());
@@ -460,36 +324,13 @@ CapturePlot::CapturePlot(QWidget *parent,
 		}
 	});
 
-	d_hBar1->setPosition(0 + voltsPerDiv);
-	d_hBar2->setPosition(0 - voltsPerDiv);
-	d_vBar1->setPosition(0 + secPerDiv);
-	d_vBar2->setPosition(0 - secPerDiv);
-
+    double secPerDiv = HorizUnitsPerDiv();
 	d_gateBar1->setPosition(0 - 4 * secPerDiv);
 	d_gateBar2->setPosition(0 + 4 * secPerDiv);
 
 	/* initialise gate handle positions */
 	d_hGatingHandle1->setOtherCursorPosition(d_hGatingHandle2->position());
 	d_hGatingHandle2->setOtherCursorPosition(d_hGatingHandle1->position());
-
-	/* When bar position changes due to plot resizes update the handle */
-	connect(d_hBar1, SIGNAL(pixelPositionChanged(int)),
-			SLOT(onHbar1PixelPosChanged(int)));
-	connect(d_hBar2, SIGNAL(pixelPositionChanged(int)),
-			SLOT(onHbar2PixelPosChanged(int)));
-	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
-			SLOT(onVbar1PixelPosChanged(int)));
-	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
-			SLOT(onVbar2PixelPosChanged(int)));
-
-	connect(d_vBar1, SIGNAL(positionChanged(double)),
-			SLOT(onTimeCursor1Moved(double)));
-	connect(d_vBar2, SIGNAL(positionChanged(double)),
-			SLOT(onTimeCursor2Moved(double)));
-	connect(d_hBar1, SIGNAL(positionChanged(double)),
-			SLOT(onVoltageCursor1Moved(double)));
-	connect(d_hBar2, SIGNAL(positionChanged(double)),
-			SLOT(onVoltageCursor2Moved(double)));
 
 	connect(d_timeTriggerHandle, &FreePlotLineHandleH::reset, [=](){
 		Q_EMIT timeTriggerValueChanged(0);
@@ -508,7 +349,6 @@ CapturePlot::CapturePlot(QWidget *parent,
 			SLOT(onGateBar1Moved(double)));
 	connect(d_gateBar2,SIGNAL(positionChanged(double)),
 			SLOT(onGateBar2Moved(double)));
-
 
 	/* Apply measurements for every new batch of data */
 	connect(this, SIGNAL(newData()),
@@ -552,17 +392,17 @@ CapturePlot::CapturePlot(QWidget *parent,
 	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
 	rightGate->setRect(rightGateRect);
 	rightGate->setBrush(gateBrush);
+
 }
 
 CapturePlot::~CapturePlot()
 {
-	markerIntersection1->detach();
-	markerIntersection2->detach();
+//	markerIntersection1->detach();
+//	markerIntersection2->detach();
 	removeEventFilter(this);
-	canvas()->removeEventFilter(d_cursorReadouts);
 	canvas()->removeEventFilter(d_symbolCtrl);
-	delete markerIntersection1;
-	delete markerIntersection2;
+//	delete markerIntersection1;
+//	delete markerIntersection2;
 	for (auto it = d_measureObjs.begin(); it != d_measureObjs.end(); ++it) {
 		delete *it;
 	}
@@ -607,146 +447,113 @@ void CapturePlot::enableTimeTrigger(bool enable)
 	d_timeTriggerHandle->setVisible(enable);
 }
 
-void CapturePlot::onHbar1PixelPosChanged(int pos)
-{
-	d_vCursorHandle1->setPositionSilenty(pos);
+void CapturePlot::onVCursor1Moved(double value) {
+    QString text;
+    text = d_cursorTimeFormatter.format(value, "", 3);
+    d_cursorReadouts->setTimeCursor1Text(text);
+    d_cursorReadoutsText.t1 = text;
+
+    double diff = value - d_vBar2->plotCoord().x();
+    text = d_cursorTimeFormatter.format(diff, "", 3);
+    d_cursorReadouts->setTimeDeltaText(text);
+    d_cursorReadoutsText.tDelta = text;
+
+    if (diff !=0 )
+        text = d_cursorMetricFormatter.format(1 / diff, "Hz", 3);
+    else
+        text = "Infinity";
+    d_cursorReadouts->setFreqDeltaText(text);
+    d_cursorReadoutsText.freq = text;
+    if (d_trackMode) {
+        onHCursor1Moved(getHorizontalCursorIntersection(d_vBar1->plotCoord().x()));
+    }
+
+    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
+void CapturePlot::onVCursor2Moved(double value){
 
-void CapturePlot::onHbar2PixelPosChanged(int pos)
-{
-	d_vCursorHandle2->setPositionSilenty(pos);
+    QString text;
+
+    text = d_cursorTimeFormatter.format(value, "", 3);
+    d_cursorReadouts->setTimeCursor2Text(text);
+    d_cursorReadoutsText.t2 = text;
+
+    double diff = d_vBar1->plotCoord().x() - value;
+    text = d_cursorTimeFormatter.format(diff, "", 3);
+    d_cursorReadouts->setTimeDeltaText(text);
+    d_cursorReadoutsText.tDelta = text;
+
+    if (diff !=0 )
+        text = d_cursorMetricFormatter.format(1 / diff, "Hz", 3);
+    else
+        text = "Infinity";
+    d_cursorReadouts->setFreqDeltaText(text);
+    d_cursorReadoutsText.freq = text;
+    if (d_trackMode) {
+        onHCursor2Moved(getHorizontalCursorIntersection(d_vBar2->plotCoord().x()));
+    }
+
+    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
+void CapturePlot::onHCursor1Moved(double value) {
 
-void CapturePlot::onVbar1PixelPosChanged(int pos)
-{
-	d_hCursorHandle1->setPositionSilenty(pos);
-	displayIntersection();
+    QString text;
+
+    bool error = false;
+    if (d_trackMode) {
+        if (value == ERROR_VALUE) {
+            error = true;
+        }
+    }
+
+    value *= d_displayScale;
+    text = d_cursorMetricFormatter.format(value, "V", 3);
+    d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
+    d_cursorReadoutsText.v1 = error ? "-" : text;
+
+    double valueCursor2;
+    if (d_trackMode) {
+        valueCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
+    } else {
+        valueCursor2 = d_hBar2->plotCoord().y();
+    }
+
+    double diff = value - (valueCursor2 * d_displayScale) ;
+    text = d_cursorMetricFormatter.format(diff, "V", 3);
+    d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+    d_cursorReadoutsText.vDelta = error ? "-" : text;
+
+    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
+void CapturePlot::onHCursor2Moved(double value) {
 
-void CapturePlot::onVbar2PixelPosChanged(int pos)
-{
-	displayIntersection();
-	d_hCursorHandle2->setPositionSilenty(pos);
-}
+    QString text;
 
-void CapturePlot::onTimeCursor1Moved(double value)
-{
-	QString text;
+    bool error = false;
+    if (d_trackMode) {
+        if (value == ERROR_VALUE) {
+            error = true;
+        }
+    }
 
-	text = d_cursorTimeFormatter.format(value, "", 3);
-	d_cursorReadouts->setTimeCursor1Text(text);
-	d_cursorReadoutsText.t1 = text;
+    value *= d_displayScale;
+    text = d_cursorMetricFormatter.format(value, "V", 3);
+    d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
+    d_cursorReadoutsText.v2 = error ? "-" : text;
 
-	double diff = value - d_vBar2->plotCoord().x();
-	text = d_cursorTimeFormatter.format(diff, "", 3);
-	d_cursorReadouts->setTimeDeltaText(text);
-	d_cursorReadoutsText.tDelta = text;
+    double valueCursor1;
+    if (d_trackMode) {
+        valueCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
+    } else {
+        valueCursor1 = d_hBar1->plotCoord().y();
+    }
 
-	if (diff !=0 )
-		text = d_cursorMetricFormatter.format(1 / diff, "Hz", 3);
-	else
-		text = "Infinity";
-	d_cursorReadouts->setFreqDeltaText(text);
-	d_cursorReadoutsText.freq = text;
+    double diff = (valueCursor1 * d_displayScale) - value;
+    text = d_cursorMetricFormatter.format(diff, "V", 3);
+    d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+    d_cursorReadoutsText.vDelta = error ? "-" : text;
 
-	if (d_trackMode) {
-		onVoltageCursor1Moved(getHorizontalCursorIntersection(d_vBar1->plotCoord().x()));
-	}
-
-	value_v1 = value;
-	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
-}
-
-void CapturePlot::onTimeCursor2Moved(double value)
-{
-	QString text;
-
-	text = d_cursorTimeFormatter.format(value, "", 3);
-	d_cursorReadouts->setTimeCursor2Text(text);
-	d_cursorReadoutsText.t2 = text;
-
-	double diff = d_vBar1->plotCoord().x() - value;
-	text = d_cursorTimeFormatter.format(diff, "", 3);
-	d_cursorReadouts->setTimeDeltaText(text);
-	d_cursorReadoutsText.tDelta = text;
-
-	if (diff !=0 )
-		text = d_cursorMetricFormatter.format(1 / diff, "Hz", 3);
-	else
-		text = "Infinity";
-	d_cursorReadouts->setFreqDeltaText(text);
-	d_cursorReadoutsText.freq = text;
-
-	if (d_trackMode) {
-		onVoltageCursor2Moved(getHorizontalCursorIntersection(d_vBar2->plotCoord().x()));
-	}
-
-	value_v2 = value;
-	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
-}
-
-void CapturePlot::onVoltageCursor1Moved(double value)
-{
-	QString text;
-
-	bool error = false;
-	if (d_trackMode) {
-		if (value == ERROR_VALUE) {
-			error = true;
-		}
-	}
-
-	value *= d_displayScale;
-	text = d_cursorMetricFormatter.format(value, "V", 3);
-	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
-	d_cursorReadoutsText.v1 = error ? "-" : text;
-
-	double valueCursor2;
-	if (d_trackMode) {
-		valueCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
-	} else {
-		valueCursor2 = d_hBar2->plotCoord().y();
-	}
-
-	double diff = value - (valueCursor2 * d_displayScale) ;
-	text = d_cursorMetricFormatter.format(diff, "V", 3);
-	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
-	d_cursorReadoutsText.vDelta = error ? "-" : text;
-
-	value_h1 = value;
-	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
-}
-
-void CapturePlot::onVoltageCursor2Moved(double value)
-{
-	QString text;
-
-	bool error = false;
-	if (d_trackMode) {
-		if (value == ERROR_VALUE) {
-			error = true;
-		}
-	}
-
-	value *= d_displayScale;
-	text = d_cursorMetricFormatter.format(value, "V", 3);
-	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
-	d_cursorReadoutsText.v2 = error ? "-" : text;
-
-	double valueCursor1;
-	if (d_trackMode) {
-		valueCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
-	} else {
-		valueCursor1 = d_hBar1->plotCoord().y();
-	}
-
-	double diff = (valueCursor1 * d_displayScale) - value;
-	text = d_cursorMetricFormatter.format(diff, "V", 3);
-	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
-	d_cursorReadoutsText.vDelta = error ? "-" : text;
-
-	value_h2 = value;
-	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void CapturePlot::onGateBar1PixelPosChanged(int pos)
@@ -855,23 +662,14 @@ QWidget * CapturePlot::topArea()
 }
 
 QWidget * CapturePlot::topHandlesArea()
-{/* handle area for gate cursors */
-	return d_topHandlesArea;
-}
-
-QWidget * CapturePlot::bottomHandlesArea()
 {
-	return d_bottomHandlesArea;
+    /* handle area for gate cursors */
+	return d_topHandlesArea;
 }
 
 QWidget * CapturePlot::leftHandlesArea()
 {
 	return d_leftHandlesArea;
-}
-
-QWidget * CapturePlot::rightHandlesArea()
-{
-	return d_rightHandlesArea;
 }
 
 void CapturePlot::setBonusWidthForHistogram(int width)
@@ -907,64 +705,11 @@ bool CapturePlot::triggerBEnabled()
 	return d_triggerBEnabled;
 }
 
-void CapturePlot::setVertCursorsEnabled(bool en)
-{
-	if (d_vertCursorsEnabled != en) {
-		d_vertCursorsEnabled = en;
-		d_vBar1->setVisible(en);
-		d_vBar2->setVisible(en);
-		d_hCursorHandle1->setVisible(en);
-		d_hCursorHandle2->setVisible(en);
-		d_cursorReadouts->setTimeReadoutVisible(en &&
-			d_cursorReadoutsVisible);
-	}
-}
-
-bool CapturePlot::vertCursorsEnabled()
-{
-	return d_vertCursorsEnabled;
-}
-
-void CapturePlot::setHorizCursorsEnabled(bool en)
-{
-	if (d_horizCursorsEnabled != en) {
-		d_horizCursorsEnabled = en;
-		d_hBar1->setVisible(en);
-		d_hBar2->setVisible(en);
-		d_vCursorHandle1->setVisible(en);
-		d_vCursorHandle2->setVisible(en);
-		d_cursorReadouts->setVoltageReadoutVisible(en &&
-			d_cursorReadoutsVisible);
-	}
-}
-
-bool CapturePlot::horizCursorsEnabled()
-{
-	return d_horizCursorsEnabled;
-}
-
-void CapturePlot::setCursorReadoutsVisible(bool en)
-{
-	if (d_cursorReadoutsVisible != en) {
-		d_cursorReadoutsVisible = en;
-		d_cursorReadouts->setVoltageReadoutVisible(en &&
-			d_vertCursorsEnabled);
-		d_cursorReadouts->setTimeReadoutVisible(en &&
-			d_horizCursorsEnabled);
-	}
-}
-
 void CapturePlot::setSelectedChannel(int id)
 {
 	if (d_selected_channel != id)  {
 		d_selected_channel = id;
-
-		if (id > -1) {
-			d_hBar1->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
-			d_hBar2->setMobileAxis(QwtAxisId(QwtPlot::yLeft, id));
-		}
 	}
-	//
 }
 
 int CapturePlot::selectedChannel()
@@ -1019,17 +764,12 @@ void CapturePlot::onTriggerBHandleGrabbed(bool grabbed)
 	d_symbolCtrl->updateOverlay();
 }
 
-void CapturePlot::setVertCursorsLocked(bool value)
-{
-	vertCursorsLocked = value;
-}
-
 void CapturePlot::showEvent(QShowEvent *event)
 {
-	d_vCursorHandle1->triggerMove();
-	d_vCursorHandle2->triggerMove();
-	d_hCursorHandle1->triggerMove();
-	d_hCursorHandle2->triggerMove();
+    d_vCursorHandle1->triggerMove();
+    d_vCursorHandle2->triggerMove();
+    d_hCursorHandle1->triggerMove();
+    d_hCursorHandle2->triggerMove();
 }
 
 void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleDraw)
@@ -1109,8 +849,8 @@ void CapturePlot::enableAxisLabels(bool enabled)
 void CapturePlot::setDisplayScale(double value)
 {
 	DisplayPlot::setDisplayScale(value);
-	onVoltageCursor1Moved(d_hBar1->plotCoord().y());
-	onVoltageCursor2Moved(d_hBar2->plotCoord().y());
+    onHCursor1Moved(d_hBar1->plotCoord().y());
+    onHCursor2Moved(d_hBar2->plotCoord().y());
 }
 
 void CapturePlot::setTimeTriggerInterval(double min, double max)
@@ -1175,35 +915,6 @@ void CapturePlot::setGatingEnabled(bool enabled){
 
 		replot();
 	}
-}
-
-void CapturePlot::trackModeEnabled(bool enabled)
-{
-	d_trackMode = !enabled;
-	if (d_horizCursorsEnabled) {
-		d_hBar1->setVisible(enabled);
-		d_hBar2->setVisible(enabled);
-		d_vCursorHandle1->setVisible(enabled);
-		d_vCursorHandle2->setVisible(enabled);
-	}
-	if (d_trackMode) {
-		onTimeCursor1Moved(d_vBar1->plotCoord().x());
-		onTimeCursor2Moved(d_vBar2->plotCoord().x());
-		displayIntersection();
-	} else {
-		onVoltageCursor1Moved(d_hBar1->plotCoord().y());
-		onVoltageCursor2Moved(d_hBar2->plotCoord().y());
-		markerIntersection1->detach();
-		markerIntersection2->detach();
-		replot();
-	}
-}
-
-void CapturePlot::repositionCursors()
-{
-	onTimeCursor1Moved(d_vBar1->plotCoord().x());
-	onTimeCursor2Moved(d_vBar2->plotCoord().x());
-	displayIntersection();
 }
 
 void CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
@@ -1285,109 +996,11 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 	}
 
 	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
-	d_hCursorHandle1->updatePosition();
-	d_hCursorHandle2->updatePosition();
+    d_hCursorHandle1->updatePosition();
+    d_hCursorHandle2->updatePosition();
 
-	d_vCursorHandle1->updatePosition();
-	d_vCursorHandle2->updatePosition();
-}
-
-double CapturePlot::getHorizontalCursorIntersection(double time)
-{
-	int n = Curve(d_selected_channel)->data()->size();
-
-	if (n == 0) {
-		return ERROR_VALUE;
-	} else {
-		double leftTime, rightTime, leftCustom, rightCustom;
-		int rightIndex = -1;
-		int leftIndex = -1;
-
-		int left = 0;
-		int right = n - 1;
-
-		if (Curve(d_selected_channel)->data()->sample(right).x() < time ||
-				Curve(d_selected_channel)->data()->sample(left).x() > time) {
-			return ERROR_VALUE;
-		}
-
-		while (left <= right) {
-			int mid = (left + right) / 2;
-			double xData = Curve(d_selected_channel)->data()->sample(mid).x();
-			if (xData == time) {
-				if (mid > 0) {
-					leftIndex = mid - 1;
-					rightIndex = mid;
-				}
-				break;
-			} else if (xData < time) {
-				left = mid + 1;
-			} else {
-				right = mid - 1;
-			}
-		}
-
-		if ((leftIndex == -1 || rightIndex == -1) && left > 0) {
-			leftIndex = left - 1;
-			rightIndex = left;
-		}
-
-		if (leftIndex == -1 || rightIndex == -1) {
-			return ERROR_VALUE;
-		}
-
-		leftTime = Curve(d_selected_channel)->data()->sample(leftIndex).x();
-		rightTime = Curve(d_selected_channel)->data()->sample(rightIndex).x();
-
-		leftCustom = Curve(d_selected_channel)->data()->sample(leftIndex).y();
-		rightCustom = Curve(d_selected_channel)->data()->sample(rightIndex).y();
-
-		double value = (rightCustom - leftCustom) / (rightTime - leftTime) *
-				(time - leftTime) + leftCustom;
-
-		return value;
-	}
-}
-
-void CapturePlot::displayIntersection()
-{
-	if (!d_trackMode) {
-		return;
-	}
-
-	double intersectionCursor1, intersectionCursor2;
-	bool attachmk1 = true;
-	bool attachmk2 = true;
-
-
-	intersectionCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
-	intersectionCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
-
-	if (intersectionCursor1 == -1000000){
-		attachmk1 = false;
-	}
-	if (intersectionCursor2 == -1000000) {
-		attachmk2 = false;
-	}
-
-	markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
-	markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
-
-	markerIntersection1->setValue(d_vBar1->plotCoord().x(), intersectionCursor1);
-	markerIntersection2->setValue(d_vBar2->plotCoord().x(), intersectionCursor2);
-
-	if (attachmk1) {
-		markerIntersection1->attach(this);
-	} else {
-		markerIntersection1->detach();
-	}
-	if (attachmk2) {
-		markerIntersection2->attach(this);
-	} else {
-		markerIntersection2->detach();
-	}
-
-	replot();
+    d_vCursorHandle1->updatePosition();
+    d_vCursorHandle2->updatePosition();
 }
 
 void CapturePlot::updateGateMargins(){
@@ -1410,10 +1023,10 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 
 		//force cursor handles to emit position changed
 		//when the plot canvas is being resized
-		d_hCursorHandle1->triggerMove();
-		d_hCursorHandle2->triggerMove();
-		d_vCursorHandle1->triggerMove();
-		d_vCursorHandle2->triggerMove();
+        d_hCursorHandle1->triggerMove();
+        d_hCursorHandle2->triggerMove();
+        d_vCursorHandle1->triggerMove();
+        d_vCursorHandle2->triggerMove();
 
 		/* update the size of the gates when the plot canvas is resized */
 		updateGateMargins();
@@ -2308,11 +1921,6 @@ void CapturePlot::setPeriodDetectHyst(int chnIdx, double hyst)
 		measure->setHysteresisSpan(hyst);
 }
 
-struct cursorReadoutsText CapturePlot::allCursorReadouts() const
-{
-	return d_cursorReadoutsText;
-}
-
 void CapturePlot::setTimeBaseLabelValue(double value)
 {
 	QString text = d_cursorTimeFormatter.format(value, "", 3);
@@ -2379,16 +1987,6 @@ void CapturePlot::setMaxBufferSizeErrorLabel(bool reached, const QString &custom
 		errorMessage = customWarning;
 	}
 	d_maxBufferError->setText(reached ? errorMessage : "");
-}
-
-void CapturePlot::setCursorReadoutsTransparency(int value)
-{
-	d_cursorReadouts->setTransparency(value);
-}
-
-void CapturePlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position)
-{
-	d_cursorReadouts->moveToPosition(position);
 }
 
 void CapturePlot::updateBufferSizeSampleRateLabel(int nsamples, double sr)
