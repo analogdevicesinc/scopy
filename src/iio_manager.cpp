@@ -40,10 +40,10 @@ iio_manager::iio_manager(unsigned int block_id,
 		unsigned long _buffer_size) :
 	QObject(nullptr),
 	top_block("IIO Manager " + std::to_string(block_id)),
-	id(block_id), _started(false), buffer_size(_buffer_size),
-	m_analogin(libm2k::context::m2kOpen(ctx, "")->getAnalogIn()),
-	m_context(libm2k::context::m2kOpen(ctx, ""))
+	id(block_id), _started(false), buffer_size(_buffer_size)
 {
+	m_context = libm2k::context::m2kOpen(ctx, "");
+	m_analogin = m_context->getAnalogIn();
 	if (!ctx)
 		throw std::runtime_error("IIO context not created");
 
@@ -60,7 +60,7 @@ iio_manager::iio_manager(unsigned int block_id,
 
 //	iio_context_set_timeout(ctx, 1000);
 
-	iio_block = gr::m2k::analog_in_source::make_from(libm2k::context::m2kOpen(ctx, ""),
+	iio_block = gr::m2k::analog_in_source::make_from(m_context,
 							     _buffer_size,
 							     {1, 1},
 							     {0, 0},
