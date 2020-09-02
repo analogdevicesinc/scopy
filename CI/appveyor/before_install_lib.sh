@@ -177,7 +177,7 @@ patch_qwt() {
 	patch -p1 <<-EOF
 --- a/qwtconfig.pri
 +++ b/qwtconfig.pri
-@@ -19,7 +19,7 @@ QWT_VERSION      = \$\${QWT_VER_MAJ}.\$\${QWT_VER_MIN}.\$\${QWT_VER_PAT}
+@@ -19,7 +19,7 @@
  QWT_INSTALL_PREFIX = \$\$[QT_INSTALL_PREFIX]
  
  unix {
@@ -186,12 +186,30 @@ patch_qwt() {
      # QWT_INSTALL_PREFIX = /usr/local/qwt-\$\$QWT_VERSION-svn-qt-\$\$QT_VERSION
  }
  
-@@ -161,7 +161,7 @@ QWT_CONFIG     += QwtPlayground
+@@ -107,7 +107,7 @@
+ # Otherwise you have to build it from the designer directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtDesigner
++#QWT_CONFIG     += QwtDesigner
+ 
+ ######################################################################
+ # Compile all Qwt classes into the designer plugin instead
+@@ -148,7 +148,7 @@
+ # Otherwise you have to build them from the tests directory.
+ ######################################################################
+ 
+-QWT_CONFIG     += QwtTests
++#QWT_CONFIG     += QwtTests
+ 
+ ######################################################################
+ # When Qt has been built as framework qmake wants
+@@ -157,7 +157,7 @@
  
  macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
  
 -    QWT_CONFIG += QwtFramework
-+    #QWT_CONFIG += QwtFramework
++#    QWT_CONFIG += QwtFramework
  }
  
  ######################################################################
@@ -204,18 +222,6 @@ patch_qwt() {
 -        QWT_SONAME=libqwt.so.\$\${VER_MAJ}.\$\${VER_MIN}
 +        !macx: QWT_SONAME=libqwt.so.\$\${VER_MAJ}.\$\${VER_MIN}
 +        macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt.dylib
-         QMAKE_LFLAGS *= \$\${QMAKE_LFLAGS_SONAME}\$\${QWT_SONAME}
-         QMAKE_LFLAGS_SONAME=
-     }
---- a/textengines/mathml/mathml.pro
-+++ b/textengines/mathml/mathml.pro
-@@ -57,7 +57,8 @@ contains(QWT_CONFIG, QwtDll) {
- 
-         # we increase the SONAME for every minor number
- 
--        QWT_SONAME=libqwtmathml.so.\$\${VER_MAJ}.\$\${VER_MIN}
-+        !macx: QWT_SONAME=libqwtmathml.so.\$\${VER_MAJ}.\$\${VER_MIN}
-+        macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwtmathml.dylib
          QMAKE_LFLAGS *= \$\${QMAKE_LFLAGS_SONAME}\$\${QWT_SONAME}
          QMAKE_LFLAGS_SONAME=
      }
