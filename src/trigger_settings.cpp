@@ -672,14 +672,20 @@ void TriggerSettings::writeHwSource(int source_chn)
 			libm2k::M2K_TRIGGER_SOURCE_ANALOG source = static_cast<M2K_TRIGGER_SOURCE_ANALOG>(source_chn);
 			/* analog trigger on */
 			bool intern_checked = ui->intern_en->isChecked();
-			/* extern trigger on & ext trigger in */
-			bool extern_trigger_in_checked = (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex() == 0);
+			/* extern trigger on & ext digital */
+			bool extern_digital_checked = (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex() == 1);
 			if(m_trigger_in) {
-				if (!intern_checked && !extern_trigger_in_checked) {
-					source = libm2k::SRC_DIGITAL_IN;
+				if (!intern_checked) {
+				        if (extern_digital_checked) {
+				                // digital trigger enabled
+                                                source = libm2k::SRC_DIGITAL_IN;
+                                        }
 				} else {
-					source = static_cast<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(
-							(source_chn + 1) + libm2k::SRC_DIGITAL_IN);
+                                        if (extern_digital_checked) {
+                                                // analog + digital trigger
+                                                source = static_cast<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(
+                                                        (source_chn + 1) + libm2k::SRC_DIGITAL_IN);
+                                        }
 				}
 			}
 			m_trigger->setAnalogSource(source);
