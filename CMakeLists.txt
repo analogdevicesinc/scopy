@@ -168,6 +168,7 @@ pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 message(CMAKE_PATH ${CMAKE_PREFIX_PATH})
 include_directories(
 	${Boost_INCLUDE_DIRS}
@@ -251,11 +252,11 @@ if (ENABLE_APPLICATION_BUNDLE)
 		set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
 	endforeach()
 
-	file(GLOB_RECURSE DECODERS ${CMAKE_SOURCE_DIR}/resources/decoders/*.py)
+	file(GLOB_RECURSE DECODERS ${LIBSIGROK_DECODERS_DIR}/*.py)
 	foreach(_decoder ${DECODERS})
-		file(RELATIVE_PATH _file ${CMAKE_SOURCE_DIR}/resources ${_decoder})
+		file(RELATIVE_PATH _file ${LIBSIGROK_DECODERS_DIR} ${_decoder})
 		get_filename_component(_path ${_file} DIRECTORY)
-		set_source_files_properties(${_decoder} PROPERTIES MACOSX_PACKAGE_LOCATION MacOS/${_path})
+		set_source_files_properties(${_decoder} PROPERTIES MACOSX_PACKAGE_LOCATION MacOS/decoders/${_path})
 	endforeach()
 
 	install(CODE "
