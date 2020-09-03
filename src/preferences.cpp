@@ -64,7 +64,7 @@ Preferences::Preferences(QWidget *parent) :
 	m_instrument_notes_active(false),
 	m_debug_messages_active(false),
 	m_attemptTempLutCalib(false),
-	m_skipCalIfCalibrated(false)
+	m_skipCalIfCalibrated(true)
 {
 	ui->setupUi(this);
 
