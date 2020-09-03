@@ -99,7 +99,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	menu(nullptr),
 	m_useNativeDialogs(true),
 	m_m2k(nullptr),
-	initialCalibrationFlag(true)
+	initialCalibrationFlag(true),
+	skip_calibration_if_already_calibrated(true)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
