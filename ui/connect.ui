@@ -44,7 +44,7 @@
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>Hostname</string>
+        <string>URI (Hostname)</string>
        </property>
       </widget>
      </item>

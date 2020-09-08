@@ -40,6 +40,9 @@ public:
 	explicit ConnectDialog(QWidget *widget = 0);
 	~ConnectDialog();
 
+
+	static QString URIstringParser(QString uri);
+
 Q_SIGNALS:
 	void newContext(const QString& uri);
 	void finished(struct iio_context *ctx);

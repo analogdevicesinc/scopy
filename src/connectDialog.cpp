@@ -57,6 +57,23 @@ ConnectDialog::~ConnectDialog()
 	delete ui;
 }
 
+QString ConnectDialog::URIstringParser(QString uri)
+{
+	QStringList prefixes =
+	{
+		"usb","xml","local","serial","ip"
+	};
+
+	bool prependIP = true;
+	for( auto pre:prefixes)
+	{
+		if(uri.startsWith(pre) == true)
+			prependIP = false;
+	}
+
+	return ((prependIP) ? "ip:" : "") + uri;
+}
+
 void ConnectDialog::btnClicked()
 {
 	if (!ui->connectBtn->isEnabled()) {
@@ -66,7 +83,7 @@ void ConnectDialog::btnClicked()
 	}
 
 	if (connected) {
-		QString new_uri = "ip:" + ui->hostname->text();
+		QString new_uri = URIstringParser(ui->hostname->text());
 		Q_EMIT newContext(new_uri);
 	} else {
 		validateInput();
@@ -96,7 +113,7 @@ void ConnectDialog::validateInput()
 {
 	ui->connectBtn->setDisabled(true);
 
-	QString new_uri = "ip:" + ui->hostname->text();
+	QString new_uri = URIstringParser(ui->hostname->text());
 	this->ui->hostname->setDisabled(true);
 	QtConcurrent::run(std::bind(&ConnectDialog::createContext,this,new_uri));
 }
