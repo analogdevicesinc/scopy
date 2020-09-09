@@ -67,9 +67,7 @@
 
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
-#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
-#include "scopyExceptionHandler.h"
 
 #define TIMER_TIMEOUT_MS 5000
 #define ALIVE_TIMER_TIMEOUT_MS 5000
@@ -380,8 +378,7 @@ void ToolLauncher::readPreferences()
 {
 	m_logging_enable = prefPanel->getLogging_enabled();
 	m_use_decoders = prefPanel->getDigital_decoders_enabled();
-	debugger_enabled = prefPanel->getDebugger_enabled();
-	skip_calibration_if_already_calibrated = prefPanel->getSkipCalIfCalibrated();
+
 	ui->btnNotes->setVisible(prefPanel->getUser_notes_active());
 	allowExternalScript(prefPanel->getExternal_script_enabled());
 	if (manual_calibration) {
@@ -1108,10 +1105,8 @@ void adiscope::ToolLauncher::disconnect()
 			calib->cancelCalibration();
 			calibration_thread.waitForFinished();
 		}
-		auto iio = iio_manager::has_instance(filter->device_name(TOOL_DMM));
-		if (iio) {
-			iio->stop_all();
-		}
+		auto iio=iio_manager::get_instance(ctx,filter->device_name(TOOL_DMM));
+		iio->stop_all();
 		alive_timer->stop();
 
 		ui->saveBtn->parentWidget()->setEnabled(false);
@@ -1168,7 +1163,6 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 		connectedDev->setConnected(false, false);
 		disconnect();
 		connectedDev->connectButton()->setToolTip(QString(tr("Click to connect the device")));
-		connectedDev->connectButton()->setText(tr("Connect"));
 	}
 
 	if (connectedDev != selectedDev) {
@@ -1300,8 +1294,7 @@ void adiscope::ToolLauncher::destroyContext()
 		if (m_m2k) {
 			try {
 				libm2k::context::contextClose(m_m2k);
-			} catch (libm2k::m2k_exception &e) {
-				HANDLE_EXCEPTION(e);
+			} catch (std::exception &e) {
 				qDebug() << e.what();
 			}
 			m_m2k = nullptr;
@@ -1347,21 +1340,11 @@ bool ToolLauncher::loadDecoders(QString path)
 
 void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
 {
-	if (dmm->isRunning()) calibration_saved_tools.push_back(dmm);
-	if (oscilloscope->isRunning()) calibration_saved_tools.push_back(oscilloscope);
-	if (signal_generator->isRunning()) calibration_saved_tools.push_back(signal_generator);
-	if (spectrum_analyzer->isRunning()) calibration_saved_tools.push_back(spectrum_analyzer);
-	if (network_analyzer->isRunning()) calibration_saved_tools.push_back(network_analyzer);
-	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_DMM)->setDisabled(true);
-	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setDisabled(true);
-	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setDisabled(true);
-	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setDisabled(true);
-	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setDisabled(true);
+	if(dmm->isRunning()) calibration_saved_tools.push_back(dmm);
+	if(oscilloscope->isRunning()) calibration_saved_tools.push_back(oscilloscope);
+	if(signal_generator->isRunning()) calibration_saved_tools.push_back(signal_generator);
+	if(spectrum_analyzer->isRunning()) calibration_saved_tools.push_back(spectrum_analyzer);
+	if(network_analyzer->isRunning()) calibration_saved_tools.push_back(network_analyzer);
 }
 
 void adiscope::ToolLauncher::stopToolsBeforeCalibration()
@@ -1371,21 +1354,7 @@ void adiscope::ToolLauncher::stopToolsBeforeCalibration()
 }
 void adiscope::ToolLauncher::restartToolsAfterCalibration()
 {
-	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(false);
-	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(false);
-	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(false);
-	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(false);
-	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(false);
-	menu->getToolMenuItemFor(TOOL_DMM)->setEnabled(true);
-	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setEnabled(true);
-	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setEnabled(true);
-	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setEnabled(true);
-	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setEnabled(true);
-	auto dev = getConnectedDevice();
-	if (!dev) {
-		return;
-	}
-	dev->calibrateButton()->setEnabled(true);
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
 	while(!calibration_saved_tools.empty())
 	{
 		Tool* tool = calibration_saved_tools.back();
@@ -1398,7 +1367,6 @@ void adiscope::ToolLauncher::requestCalibration()
 	getConnectedDevice()->calibrateButton()->setEnabled(false);
 	saveRunningToolsBeforeCalibration();
 	stopToolsBeforeCalibration();
-
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
 					       this));
 }
@@ -1409,40 +1377,48 @@ void adiscope::ToolLauncher::requestCalibrationCancel()
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
-void adiscope::ToolLauncher::calibrationSuccessCallback()
-{
-}
-
 void adiscope::ToolLauncher::calibrationFailedCallback()
 {
-	selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration Failed"));
+	selectedDev->infoPage()->setStatusLabel(tr("Calibration Failed"));
 	selectedDev->connectButton()->setText(tr("Disconnect"));
 	selectedDev->connectButton()->setEnabled(true);
 	getConnectedDevice()->calibrateButton()->setEnabled(true);
 }
 
-QPair<bool, bool> adiscope::ToolLauncher::initialCalibration()
+void adiscope::ToolLauncher::initialCalibration()
 {
-	QPair<bool, bool> okc = {true, false};
+	bool ok = true;
 
 	if (!skip_calibration) {
-		initialCalibrationFlag = true;
-		okc = calibrate();
-		initialCalibrationFlag = false;
+		ok = calibrate();
 	}
-
-	return okc;
 }
 
-QPair<bool, bool> adiscope::ToolLauncher::calibrate()
+bool adiscope::ToolLauncher::calibrate()
 {
 	bool ok=false;
-	calibrating = true;
+	calibrating=true;
 
-	bool skipCalib = false;
+	QPushButton *dmm_btn = menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn();
+	QPushButton *osc_btn = menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn();
+	QPushButton *siggen_btn = menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn();
+	QPushButton *spectrum_btn = menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn();
+	QPushButton *network_btn = menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn();
+	auto old_dmm_text = dmm_btn->text();
+	auto old_osc_text = osc_btn->text();
+	auto old_siggen_text = siggen_btn->text();
+	auto old_spectrum_text = spectrum_btn->text();
+	auto old_network_text = network_btn->text();
+	QString status = tr("Calibrating...");
+	dmm_btn->setText(status);
+	osc_btn->setText(status);
+	siggen_btn->setText(status);
+	spectrum_btn->setText(status);
+	network_btn->setText(status);
 
 	QString statusLabel;
 	if (calib->isInitialized()) {
+<<<<<<< HEAD
 		if (prefPanel->getAttemptTempLutCalib() && calib->hasContextCalibration()) {
 			float calibTemperature = calib->calibrateFromContext();
 
@@ -1462,13 +1438,22 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 				ok = true;
 			}
 		}
+=======
+		ok = calib->calibrateAll();
+>>>>>>> Moving cursors (dBgraph) in the base class: DisplayPlot
 	}
 	QMetaObject::invokeMethod(selectedDev->infoPage(),
 				  "setCalibrationStatusLabel",
 				  Qt::QueuedConnection,
 				  Q_ARG(QString, statusLabel));
 
-	calibrating = false;
+	dmm_btn->setText(old_dmm_text);
+	osc_btn->setText(old_osc_text);
+	siggen_btn->setText(old_siggen_text);
+	spectrum_btn->setText(old_spectrum_text);
+	network_btn->setText(old_network_text);
+
+	calibrating=false;
 
 	if (ok) {
 		Q_EMIT adcCalibrationDone();
@@ -1479,113 +1464,100 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 		Q_EMIT calibrationFailed();
 	}
 
-	return { ok, skipCalib };
+	return ok;
 }
 
 void adiscope::ToolLauncher::enableAdcBasedTools()
 {
-	try {
-		if (filter->compatible(TOOL_OSCILLOSCOPE)) {
-			oscilloscope = new Oscilloscope(ctx, filter, menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
-							&js_engine, this);
-			toolList.push_back(oscilloscope);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolStopBtn());
-			connect(oscilloscope, &Oscilloscope::showTool, [=]() {
-				menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn()->click();
-			});
-			if (logic_analyzer) {
-				oscilloscope->setLogicAnalyzer(logic_analyzer);
-			}
-		}
+    if (filter->compatible(TOOL_OSCILLOSCOPE)) {
+        oscilloscope = new Oscilloscope(ctx, filter, menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE),
+                        &js_engine, this);
+        toolList.push_back(oscilloscope);
+        adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolStopBtn());
+        connect(oscilloscope, &Oscilloscope::showTool, [=]() {
+            menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn()->click();
+        });
+    }
 
-		if (filter->compatible(TOOL_DMM)) {
-			dmm = new DMM(ctx, filter, menu->getToolMenuItemFor(TOOL_DMM),
-				      &js_engine, this);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DMM)->getToolStopBtn());
-			toolList.push_back(dmm);
-			connect(dmm, &DMM::showTool, [=]() {
-				menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn()->click();
-			});
-		}
-
-		if (filter->compatible(TOOL_DEBUGGER)) {
-			debugger = new Debugger(ctx, filter,menu->getToolMenuItemFor(TOOL_DEBUGGER),
-						&js_engine, this);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DEBUGGER)->getToolStopBtn());
-			QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
-					 &ToolLauncher::addDebugWindow);
-		}
-
-		if (filter->compatible(TOOL_CALIBRATION)) {
-			manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),
-								   &js_engine, this, calib);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
-			toolList.push_back(manual_calibration);
-		}
-
-		if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
-			spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
-			toolList.push_back(spectrum_analyzer);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
-			connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
-				menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->click();
-			});
-		}
-
-		if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
-
-			network_analyzer = new NetworkAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
-			toolList.push_back(network_analyzer);
-			connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
-				menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->click();
-			});
-			network_analyzer->setOscilloscope(oscilloscope);
-		}
-
-		m_adc_tools_failed = false;
-		Q_EMIT adcToolsCreated();
-	} catch (libm2k::m2k_exception &e) {
-		qDebug(CAT_TOOL_LAUNCHER) << e.what();
-		m_adc_tools_failed = true;
+	if (filter->compatible(TOOL_DMM)) {
+		dmm = new DMM(ctx, filter, menu->getToolMenuItemFor(TOOL_DMM),
+				&js_engine, this);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DMM)->getToolStopBtn());
+		toolList.push_back(dmm);
+		connect(dmm, &DMM::showTool, [=]() {
+			menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn()->click();
+		});
 	}
+
+	if (filter->compatible(TOOL_DEBUGGER)) {
+		debugger = new Debugger(ctx, filter,menu->getToolMenuItemFor(TOOL_DEBUGGER),
+				&js_engine, this);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DEBUGGER)->getToolStopBtn());
+		QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
+				 &ToolLauncher::addDebugWindow);
+	}
+
+	if (filter->compatible(TOOL_CALIBRATION)) {
+		manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),
+				&js_engine, this, calib);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
+		toolList.push_back(manual_calibration);
+	}
+
+    if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
+        spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
+        toolList.push_back(spectrum_analyzer);
+        adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
+        connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
+            menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->click();
+        });
+    }
+
+	if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
+
+		network_analyzer = new NetworkAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER), &js_engine, this);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn());
+		toolList.push_back(network_analyzer);
+		connect(network_analyzer, &NetworkAnalyzer::showTool, [=]() {
+			menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->click();
+		});
+		network_analyzer->setOscilloscope(oscilloscope);
+	}
+
+	Q_EMIT adcToolsCreated();
 }
 
 
 void adiscope::ToolLauncher::enableDacBasedTools()
 {
-	try {
-		if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
-			signal_generator = new SignalGenerator(ctx, filter,
-							       menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR), &js_engine, this);
-			toolList.push_back(signal_generator);
-			connect(signal_generator, &SignalGenerator::showTool, [=]() {
-				menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn()->click();
-			});
-		}
-		if (pathToFile != "") {
-			this->tl_api->load(pathToFile);
-		}
 
-		m_dac_tools_failed = false;
-		Q_EMIT dacToolsCreated();
-		selectedDev->connectButton()->setText(tr("Disconnect"));
-		selectedDev->connectButton()->setEnabled(true);
-
-		for (auto &tool : toolList) {
-			tool->setNativeDialogs(m_useNativeDialogs);
-			qDebug() << tool << " will use native dialogs: " << m_useNativeDialogs;
-		}
-	} catch (libm2k::m2k_exception &e) {
-		qDebug(CAT_TOOL_LAUNCHER) << e.what();
-		m_dac_tools_failed = true;
+    if (filter->compatible(TOOL_SIGNAL_GENERATOR)) {
+        signal_generator = new SignalGenerator(ctx, filter,
+            menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR), &js_engine, this);
+        toolList.push_back(signal_generator);
+        connect(signal_generator, &SignalGenerator::showTool, [=]() {
+            menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn()->click();
+        });
+    }
+	if (pathToFile != "") {
+		this->tl_api->load(pathToFile);
 	}
 
+<<<<<<< HEAD
 	if (m_adc_tools_failed || m_dac_tools_failed) {
 		disconnect();
 	} else {
 		m_sessionInfo.setLastConnectedFirmware(selectedDev->infoPage()->getFirmwareVersion());
 		m_sessionInfo.setLastConnectedSerialNumber(selectedDev->infoPage()->getSerialNumber());
+=======
+	Q_EMIT dacToolsCreated();
+	selectedDev->connectButton()->setText(tr("Disconnect"));
+	selectedDev->connectButton()->setEnabled(true);
+
+	for (auto &tool : toolList) {
+		tool->setNativeDialogs(m_useNativeDialogs);
+		qDebug() << tool << " will use native dialogs: " << m_useNativeDialogs;
+>>>>>>> Moving cursors (dBgraph) in the base class: DisplayPlot
 	}
 }
 
@@ -1718,25 +1690,17 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		this, SLOT(enableDacBasedTools()));
 	connect(this, SIGNAL(calibrationFailed()),
 		this, SLOT(calibrationFailedCallback()));
-	connect(this, SIGNAL(calibrationFailed()),
-		this, SLOT(calibrationSuccessCallback()));
 	connect(this, SIGNAL(calibrationDone()),
 		this, SLOT(restartToolsAfterCalibration()));
 
 	selectedDev->calibrateButton()->setEnabled(false);
 
-	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(true);
-	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(true);
-
-	selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrating"));
-
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
 					       this));
 
 	calibration_thread_watcher.setFuture(calibration_thread);
+	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
+
 	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
 
 	return true;
@@ -1749,11 +1713,8 @@ void ToolLauncher::calibrationThreadWatcherFinished()
 	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
 		   this, SLOT(enableDacBasedTools()));
 
-	auto dev = getConnectedDevice();
-	if (dev) {
-		dev->calibrateButton()->setEnabled(true);
-		connect(dev->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
-	}
+	getConnectedDevice()->calibrateButton()->setEnabled(true);
+	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
 }
 
 void ToolLauncher::hasText()
