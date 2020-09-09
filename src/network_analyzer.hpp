@@ -197,10 +197,8 @@ private:
 	bool justStarted;
 	bool autoAdjustGain;
 
-	PlotLineHandleH *d_hCursorHandle1;
-	PlotLineHandleH *d_hCursorHandle2;
 	FreePlotLineHandleH *d_frequencyHandle;
-	bool d_cursorsEnabled;
+    bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
 	ScaleSpinButton *samplesPerDecadeCount;
@@ -216,8 +214,6 @@ private:
 	PositionSpinButton *captureDelay;
 
 	void setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance);
-
-	HorizHandlesArea *d_bottomHandlesArea;
 
 	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 
@@ -270,9 +266,7 @@ private Q_SLOTS:
 	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
 	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 
-	void toggleCursors(bool en);
-	void onVbar1PixelPosChanged(int pos);
-	void onVbar2PixelPosChanged(int pos);
+    void toggleCursors(bool en);
 	void readPreferences();
 	void onGraphIndexChanged(int);
 	void on_btnExport_clicked();

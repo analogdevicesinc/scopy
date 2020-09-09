@@ -158,11 +158,6 @@ namespace adiscope {
 		void positionInGroupChanged(int chnIdx, int from, int to);
 		void setGroups(const QVector<QVector<int>> &groups);
 
-        void onHCursor1Moved(double);
-        void onHCursor2Moved(double);
-        void onVCursor1Moved(double);
-        void onVCursor2Moved(double);
-
 	protected:
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
@@ -171,8 +166,6 @@ namespace adiscope {
 		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 		void updateHandleAreaPadding(bool);
 		void updateGateMargins();
-       // double getHorizontalCursorIntersection(double time);
-       // void displayIntersection();
 
 	private Q_SLOTS:
 		void onChannelAdded(int);
@@ -191,7 +184,13 @@ namespace adiscope {
 		void onTriggerBHandleGrabbed(bool);
 
 		void handleInGroupChangedPosition(int position);
-	private:
+
+        void onHCursor1Moved(double);
+        void onHCursor2Moved(double);
+        void onVCursor1Moved(double);
+        void onVCursor2Moved(double);
+
+    private:
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
 
 		bool d_triggerAEnabled;
@@ -250,10 +249,6 @@ namespace adiscope {
 
 		bool displayGraticule;
 		Graticule *graticule;
-
-//		bool d_trackMode;
-//		QwtPlotMarker *markerIntersection1;
-//		QwtPlotMarker *markerIntersection2;
 
 		QwtPlotShapeItem *leftGate, *rightGate;
 		QRectF leftGateRect, rightGateRect;

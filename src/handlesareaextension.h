@@ -29,4 +29,21 @@ public:
 };
 
 
+class YLeftRuller: public HandlesAreaExtension {
+public:
+    YLeftRuller(QwtPlot *plot);
+    virtual ~YLeftRuller() = default;
+
+    virtual bool draw(QPainter *painter, QWidget *owner) Q_DECL_OVERRIDE;
+};
+
+class XTopRuller: public HandlesAreaExtension {
+public:
+    XTopRuller(QwtPlot *plot);
+    virtual ~XTopRuller() = default;
+
+    virtual bool draw(QPainter *painter, QWidget *owner) Q_DECL_OVERRIDE;
+};
+
+
 #endif // HANDLESAREAEXTENSION_H
