@@ -183,7 +183,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	/* When bar position changes due to plot resizes update the handle */
 	connect(d_timeTriggerBar, &VertBar::pixelPositionChanged,
 		[=](int pos) {
-				updateHandleAreaPadding(d_labelsEnabled);
+                updateHandleAreaPadding(d_labelsEnabled);
 				d_timeTriggerHandle->setPositionSilenty(pos);
 		});
 
@@ -395,7 +395,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	rightGateRect.setLeft(d_gateBar2->plotCoord().x());
 	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
 	rightGate->setRect(rightGateRect);
-	rightGate->setBrush(gateBrush);
+    rightGate->setBrush(gateBrush);
 
 }
 
@@ -450,6 +450,7 @@ void CapturePlot::enableTimeTrigger(bool enable)
 	d_timeTriggerBar->setVisible(enable);
 	d_timeTriggerHandle->setVisible(enable);
 }
+
 
 void CapturePlot::onVCursor1Moved(double value) {
     QString text;
@@ -529,6 +530,7 @@ void CapturePlot::onHCursor1Moved(double value) {
 
     Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
+
 void CapturePlot::onHCursor2Moved(double value) {
 
     QString text;
@@ -885,7 +887,7 @@ void CapturePlot::setGatingEnabled(bool enabled){
 		d_gateBar2->setVisible(enabled);
 		d_hGatingHandle1->setVisible(enabled);
 		d_hGatingHandle2->setVisible(enabled);
-		updateHandleAreaPadding(d_labelsEnabled);
+        updateHandleAreaPadding(d_labelsEnabled);
 
 		if(enabled){
 			leftGate->attach(this);
@@ -915,7 +917,7 @@ void CapturePlot::setGatingEnabled(bool enabled){
 void CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 {
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);
-	updateHandleAreaPadding(d_labelsEnabled);
+    updateHandleAreaPadding(d_labelsEnabled);
 	if (d_labelsEnabled) {
 		enableAxis(QwtPlot::xBottom, true);
 	}
@@ -937,7 +939,7 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 
 	if (allAxisDisabled) {
 		setAxisVisible(QwtPlot::xBottom, false);
-		updateHandleAreaPadding(false);
+        updateHandleAreaPadding(false);
 	}
 	if (en) {
 		setAxisVisible(QwtPlot::xBottom, true);
@@ -1014,10 +1016,10 @@ void CapturePlot::updateGateMargins(){
 bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 {
 	if (object == canvas() && event->type() == QEvent::Resize) {
-		updateHandleAreaPadding(d_labelsEnabled);
+        updateHandleAreaPadding(d_labelsEnabled);
 
-		//force cursor handles to emit position changed
-		//when the plot canvas is being resized
+        //force cursor handles to emit position changed
+        //when the plot canvas is being resized
         d_hCursorHandle1->triggerMove();
         d_hCursorHandle2->triggerMove();
         d_vCursorHandle1->triggerMove();
