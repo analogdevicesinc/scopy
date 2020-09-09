@@ -94,6 +94,7 @@ namespace adiscope {
 		Ui::CursorReadouts *ui;
 		bool d_voltage_rd_visible;
 		bool d_time_rd_visible;
+        bool freq_delta_visible;
 		QPoint d_topLeft;
 		void moveTopLeft(bool resize = false);
 		void moveTopRight(bool resize = false);

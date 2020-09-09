@@ -69,6 +69,7 @@
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
 #include "handles_area.hpp"
+#include "plotpickerwrapper.h"
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )
@@ -298,8 +299,8 @@ class DisplayPlot:public PrintablePlot
 
 public:
 
-  DisplayPlot(int nplots, QWidget*, unsigned int xNumDivs = 10,
-	      unsigned int yNumDivs = 10);
+  DisplayPlot(int nplots, QWidget*,  bool isdBgraph = false, unsigned int xNumDivs = 10,
+          unsigned int yNumDivs = 10);
   virtual ~DisplayPlot();
 
   virtual void replot() = 0;
@@ -403,11 +404,14 @@ public:
   bool horizCursorsEnabled();
   struct cursorReadoutsText allCursorReadouts() const;
 
-  QWidget *bottomHandlesArea();
+  HorizHandlesArea* bottomHandlesArea();
   QWidget *rightHandlesArea();
+  VertBar* vBar1();
+  VertBar* vBar2();
 
   void trackModeEnabled(bool enabled);
   void repositionCursors();
+  void toggleCursors(bool en);
 
 public Q_SLOTS:
   virtual void disableLegend();
@@ -522,14 +526,10 @@ public Q_SLOTS:
 
   void setVertCursorsEnabled(bool en);
   void setHorizCursorsEnabled(bool en);
+  void setVertCursorsHandleEnabled(bool en);
   void setCursorReadoutsVisible(bool en);
   void setHorizCursorsLocked(bool value);
   void setVertCursorsLocked(bool value);
-
-  virtual void onHCursor1Moved(double);
-  virtual void onHCursor2Moved(double);
-  virtual void onVCursor1Moved(double);
-  virtual void onVCursor2Moved(double);
 
   void setCursorReadoutsTransparency(int value);
   void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
@@ -553,6 +553,11 @@ private Q_SLOTS:
   void onVbar1PixelPosChanged(int);
   void onVbar2PixelPosChanged(int);
 
+  void onHorizCursorHandle1Changed(int value);
+  void onVertCursorHandle1Changed(int value);
+  void onVertCursorHandle2Changed(int value);
+  void onHorizCursorHandle2Changed(int value);
+
 protected Q_SLOTS:
   virtual void legendEntryChecked(QwtPlotItem *plotItem, bool on);
   virtual void legendEntryChecked(const QVariant &plotItem, bool on, int index);
@@ -561,6 +566,11 @@ protected Q_SLOTS:
   void onHorizAxisOffsetIncrease();
   void onVertAxisOffsetDecrease();
   void onVertAxisOffsetIncrease();
+
+  virtual void onHCursor1Moved(double);
+  virtual void onHCursor2Moved(double);
+  virtual void onVCursor1Moved(double);
+  virtual void onVCursor2Moved(double);
 
   void _onXbottomAxisWidgetScaleDivChanged();
   void _onYleftAxisWidgetScaleDivChanged();
@@ -641,6 +651,14 @@ protected:
 
   bool d_trackMode;
   int d_selected_channel;
+  bool d_cursorsEnabled;
+  bool d_cursorsCentered;
+
+  QwtPlotMarker *markerIntersection1;
+  QwtPlotMarker *markerIntersection2;
+
+  void setupCursors();
+  void setupReadouts();
   double getHorizontalCursorIntersection(double time);
 
 private:
@@ -648,6 +666,7 @@ private:
   bool d_coloredLabels;
   bool d_mouseGesturesEnabled;
 
+  bool d_vertCursorsHandleEnabled;
   bool d_vertCursorsEnabled;
   bool d_horizCursorsEnabled;
   bool horizCursorsLocked;
@@ -661,12 +680,8 @@ private:
   PrefixFormatter *formatter;
   bool d_cursorReadoutsVisible;
 
-  QwtPlotMarker *markerIntersection1;
-  QwtPlotMarker *markerIntersection2;
-
-  void setupCursors();
-  void setupReadouts();
   void displayIntersection();
+  void setupDisplayPlotDiv(bool isdBgraph);
 
 };
 

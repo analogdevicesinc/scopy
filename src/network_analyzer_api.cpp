@@ -181,18 +181,19 @@ int NetworkAnalyzer_API::getCursorsPosition() const
     if (!net->ui->boxCursors->isChecked()) {
         return 0;
     }
-    auto currentPos = net->m_dBgraph.getCursorReadoutCurrentPosition();
-    switch (currentPos) {
-    case CustomPlotPositionButton::ReadoutsPosition::topLeft:
-    default:
-        return 0;
-    case CustomPlotPositionButton::ReadoutsPosition::topRight:
-        return 1;
-    case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
-        return 2;
-    case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
-        return 3;
-    }
+    //auto currentPos = net->m_dBgraph.getCursorReadoutCurrentPosition();
+//    switch (currentPos) {
+//    case CustomPlotPositionButton::ReadoutsPosition::topLeft:
+//    default:
+//        return 0;
+//    case CustomPlotPositionButton::ReadoutsPosition::topRight:
+//        return 1;
+//    case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
+//        return 2;
+//    case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
+//        return 3;
+//    }
+    return 2;
 }
 
 void NetworkAnalyzer_API::setCursorsPosition(int val)

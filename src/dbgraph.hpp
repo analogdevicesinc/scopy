@@ -29,7 +29,6 @@
 #include "symbol_controller.h"
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
-#include "plotpickerwrapper.h"
 #include "DisplayPlot.h"
 
 namespace adiscope {
@@ -65,7 +64,8 @@ class dBgraph : public DisplayPlot
 	Q_PROPERTY(bool log_freq MEMBER log_freq WRITE useLogFreq);
 
 public:
-	explicit dBgraph(QWidget *parent = nullptr);
+    explicit dBgraph(QWidget *parent = nullptr, bool isdBgraph = true);
+
 	~dBgraph();
 
 	void setAxesScales(double xmin, double xmax,
@@ -73,6 +73,8 @@ public:
 	void setAxesTitles(const QString& x, const QString& y);
 
 	int getNumSamples() const;
+
+    bool eventFilter(QObject *, QEvent *);
 
 	QString getScaleValueFormat(double value, QwtAxisId scale) const;
 	QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
@@ -85,9 +87,6 @@ public:
 	QString xTitle() const;
 	QString yTitle() const;
 
-	void toggleCursors(bool);
-	CustomPlotPositionButton::ReadoutsPosition getCursorReadoutCurrentPosition();
-
 	QString cursorIntersection(qreal text);
 	QVector<double> getXAxisData();
 	QVector<double> getYAxisData();
@@ -98,10 +97,14 @@ public:
 	void setPlotBarEnabled(bool enabled);
 	void parametersOverrange(bool enable);
 
+    void enableXaxisLabels();
+    void enableYaxisLabels();
+    QWidget *leftHandlesArea();
+    QWidget *topHandlesArea();
+    PrefixFormatter *formatter;
+
     void replot();
 Q_SIGNALS:
-	void VBar1PixelPosChanged(int);
-	void VBar2PixelPosChanged(int);
 
 	void resetZoom();
 	void frequencySelected(double);
@@ -130,18 +133,6 @@ public Q_SLOTS:
 	void useDeltaLabel(bool use_delta);
 	void sweepDone();
 
-	void onVbar1PixelPosChanged(int pos);
-	void onVbar2PixelPosChanged(int pos);
-
-	void onCursor1PositionChanged(int pos);
-	void onCursor2PositionChanged(int pos);
-
-	void onCursor1Moved(int);
-	void onCursor2Moved(int);
-
-	void setCursorReadoutsTransparency(int value);
-	void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
-
 	void scaleDivChanged();
 	void mousePressEvent(QMouseEvent *event);
 	void onResetZoom();
@@ -153,15 +144,15 @@ public Q_SLOTS:
 	void removeReferenceWaveform();
 	bool addReferenceWaveformFromPlot();
 
-
+private Q_SLOTS:
+    void onVCursor1Moved(double);
+    void onVCursor2Moved(double);
 protected Q_SLOTS:
 	void showEvent(QShowEvent *event);
 
 private:
 	QwtPlotCurve curve;
 	QwtPlotCurve reference;
-	QwtPlotMarker *markerIntersection1;
-	QwtPlotMarker *markerIntersection2;
 	unsigned int numSamples;
 	double xmin, xmax, ymin, ymax;
 	QColor color;
@@ -169,26 +160,20 @@ private:
 	bool log_freq;
 	bool delta_label;
 	bool d_plotBarEnabled;
+    VertHandlesArea *d_leftHandlesArea;
+    HorizHandlesArea *d_topHandlesArea;
 
-	bool d_cursorsEnabled;
-	bool d_cursorsCentered;
-	OscScaleDraw *draw_x, *draw_y;
-	PrefixFormatter *formatter;
-	OscScaleZoomer *zoomer;
+    OscScaleDraw *draw_x, *draw_y;
+
+    OscScaleZoomer *zoomer;
 
 	QVector<double> xdata, ydata;
 	unsigned int d_plotPosition;
 
-	SymbolController *d_symbolCtrl;
-	VertBar *d_vBar1;
-	VertBar *d_vBar2;
 	VertBar *d_plotBar;
 	VertBar *d_frequencyBar;
 
-	PlotPickerWrapper *picker;
-
-	CursorReadouts *d_cursorReadouts;
-	void setupCursors();
+    void setupVerticalBars();
 	void setupReadouts();
 };
 }
