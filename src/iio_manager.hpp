@@ -35,7 +35,11 @@
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 
+#include <m2k/mixed_signal_source.h>
+
 #include <mutex>
+
+#include "timeout_block.hpp"
 
 /* 1k samples by default */
 #define IIO_BUFFER_SIZE 0x400
@@ -122,6 +126,12 @@ namespace adiscope {
 		/* Set the timeout for the source device */
 		void set_device_timeout(unsigned int mseconds);
 
+		/* Replace the iio_block source with the mixed source */
+		void enableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source);
+
+		/* Bring back the data from the iio_block source */
+		void disableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source);
+
 		adiscope::frequency_compensation_filter::sptr freq_comp_filt[2][2];
 
 	private:
@@ -140,6 +150,9 @@ namespace adiscope {
 
 		gr::m2k::analog_in_source::sptr iio_block;
 		unsigned int nb_channels;
+
+		boost::shared_ptr<timeout_block> timeout_b;
+		gr::m2k::mixed_signal_source::sptr m_mixed_source;
 
 		struct connection {
 			gr::basic_block_sptr src;

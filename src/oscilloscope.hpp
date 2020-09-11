@@ -77,6 +77,7 @@
 /* gr-m2k includes */
 #include <m2k/digital_in_source.h>
 #include "logic_analyzer_sink.h"
+#include "mixed_signal_sink.h"
 
 /*Generated UI */
 #include "ui_math_panel.h"
@@ -487,6 +488,9 @@ namespace adiscope {
 		gr::blocks::add_ff::sptr add;
 		gr::blocks::null_sink::sptr nullSink;
 		std::vector<QWidget *> m_mixedSignalViewMenu;
+
+		gr::m2k::mixed_signal_source::sptr mixed_source;
+		mixed_signal_sink::sptr mixed_sink;
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */

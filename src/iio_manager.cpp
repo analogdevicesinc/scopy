@@ -20,7 +20,6 @@
 
 #include "logging_categories.h"
 #include "iio_manager.hpp"
-#include "timeout_block.hpp"
 
 #include <QDebug>
 
@@ -40,7 +39,8 @@ iio_manager::iio_manager(unsigned int block_id,
 		unsigned long _buffer_size) :
 	QObject(nullptr),
 	top_block("IIO Manager " + std::to_string(block_id)),
-	id(block_id), _started(false), buffer_size(_buffer_size)
+	id(block_id), _started(false), buffer_size(_buffer_size),
+	m_mixed_source(nullptr)
 {
 	m_context = libm2k::context::m2kOpen(ctx, "");
 	m_analogin = m_context->getAnalogIn();
@@ -52,13 +52,6 @@ iio_manager::iio_manager(unsigned int block_id,
 		throw std::runtime_error("Device not found");
 
 	nb_channels = iio_device_get_channels_count(dev);
-
-//	iio_block = iio::device_source::make_from(ctx, _dev,
-//			std::vector<std::string>(), _dev,
-//			std::vector<std::string>(),
-//			_buffer_size);
-
-//	iio_context_set_timeout(ctx, 1000);
 
 	iio_block = gr::m2k::analog_in_source::make_from(m_context,
 							     _buffer_size,
@@ -100,7 +93,7 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	dummy_copy->set_enabled(true);
 
-	auto timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
+	timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
 	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
 
 	QObject::connect(&*timeout_b, SIGNAL(timeout()), this,
@@ -204,6 +197,9 @@ void iio_manager::update_buffer_size_unlocked()
 
 	if (size) {
 		iio_block->set_buffer_size(size);
+		if (m_mixed_source) {
+			m_mixed_source->set_buffer_size(size);
+		}
 		this->buffer_size = size;
 	}
 }
@@ -360,4 +356,33 @@ void iio_manager::got_timeout()
 void iio_manager::set_device_timeout(unsigned int mseconds)
 {
 	iio_block->set_timeout_ms(mseconds);
+	if (m_mixed_source) {
+		m_mixed_source->set_timeout_ms(mseconds);
+	}
+}
+
+void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
+{
+	for (int i = 0; i < nb_channels; ++i) {
+		hier_block2::disconnect(iio_block, i, freq_comp_filt[i][0], 0);
+		hier_block2::connect(mixed_source, i, freq_comp_filt[i][0], 0);
+	}
+
+	hier_block2::msg_disconnect(iio_block, "msg", timeout_b, "msg");
+	hier_block2::msg_connect(mixed_source, "msg", timeout_b, "msg");
+
+	m_mixed_source = mixed_source;
+}
+
+void iio_manager::disableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
+{
+	for (int i = 0; i < nb_channels; ++i) {
+		hier_block2::disconnect(mixed_source, i, freq_comp_filt[i][0], 0);
+		hier_block2::connect(iio_block, i, freq_comp_filt[i][0], 0);
+	}
+
+	hier_block2::msg_disconnect(mixed_source, "msg", timeout_b, "msg");
+	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
+
+	m_mixed_source = nullptr;
 }

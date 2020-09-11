@@ -297,11 +297,11 @@ void LogicAnalyzer::setData(const uint16_t * const data, int size)
 	memcpy(m_buffer, data, size * sizeof(uint16_t));
 	Q_EMIT dataAvailable(0, size);
 
-	if (m_oscPlot) {
-		QMetaObject::invokeMethod(this, [=](){
-			m_oscPlot->replot();
-		}, Qt::QueuedConnection);
-	}
+//	if (m_oscPlot) {
+//		QMetaObject::invokeMethod(this, [=](){
+//			m_oscPlot->replot();
+//		}, Qt::QueuedConnection);
+//	}
 
 }
 
@@ -426,6 +426,62 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	QWidget *decoderMenu = nullptr;
 	QVBoxLayout *decoderSettingsLayout = new QVBoxLayout();
 
+	QComboBox *stackDecoderComboBox = new QComboBox();
+	auto updateButtonStackedDecoder = [=](){
+		if (m_oscChannelSelected < m_nbChannels) {
+			stackDecoderComboBox->setVisible(false);
+			return;
+		}
+
+		if (m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
+			return;
+		}
+
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
+
+		if (!curve) {
+			return;
+		}
+
+		auto stack = curve->getDecoderStack();
+		auto top = stack.back();
+
+		QSignalBlocker stackDecoderComboBoxBlocker(stackDecoderComboBox);
+		stackDecoderComboBox->clear();
+		stackDecoderComboBox->addItem("-");
+
+		QString decoderOutput = "";
+		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+		decoderList = g_slist_sort(decoderList, sort_pds);
+		GSList *dec_channels = g_slist_copy(top->decoder()->outputs);
+		for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+		    decoderOutput = QString::fromUtf8((char*)sl->data);
+		}
+		g_slist_free(dec_channels);
+		for (const GSList *sl = decoderList; sl; sl = sl->next) {
+
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+
+		    QString decoderInput = "";
+
+		    GSList *dec_channels = g_slist_copy(dec->inputs);
+		    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+			decoderInput = QString::fromUtf8((char*)sl->data);
+		    }
+		    g_slist_free(dec_channels);
+
+		    if (decoderInput == decoderOutput) {
+			qDebug() << "Added: " << QString::fromUtf8(dec->id);
+			stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+		    }
+		}
+		g_slist_free(decoderList);
+
+		const bool shouldBeVisible = stackDecoderComboBox->count() > 1;
+
+		stackDecoderComboBox->setVisible(shouldBeVisible);
+	};
+
 	connect(decoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
 		if (!decoderComboBox->currentIndex()) {
 			return;
@@ -444,6 +500,16 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
 		curve->setTraceHeight(25);
 		m_oscPlot->addDigitalPlotCurve(curve, true);
+
+		// In case the Osc is running the annotation curve will not
+		// be displayed properly due to lack of information about
+		// sr buffer size and trigger offset. We borrow this values
+		// from a logic curve on the plot
+		QwtPlotCurve* dummyCurve = m_oscPlot->getDigitalPlotCurve(0);
+		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(dummyCurve);
+		curve->setSampleRate(logicCurve->getSampleRate());
+		curve->setBufferSize(logicCurve->getBufferSize());
+		curve->setTimeTriggerOffset(logicCurve->getTimeTriggerOffset());
 
 		m_oscPlotCurves.push_back(curve);
 
@@ -476,10 +542,16 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		deleteBtn->setVisible(true);
 
 		connect(deleteBtn, &QPushButton::clicked, [=](){
-//			decoderEnumerator->addWidget(decoderMenuItem);
 			decoderMenuItem->deleteLater();
 
-			int chIdx = m_plotCurves.indexOf(curve);
+			int chIdx = m_oscPlotCurves.indexOf(curve);
+
+			if (chIdx == m_oscChannelSelected) {
+				m_oscPlot->channelSelected(chIdx + m_oscAnalogChannels, false);
+			} else if (chIdx < m_oscChannelSelected) {
+				m_oscChannelSelected--;
+			}
+
 			bool groupDeleted = false;
 			m_oscPlot->removeFromGroup(chIdx,
 					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
@@ -498,8 +570,17 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 			disconnect(connectionHandle);
 
-
 			delete curve;
+
+			// reposition decoder menu items after deleting one
+			for (int i = chIdx; i < m_oscPlotCurves.size(); ++i) {
+				const int index = i - 16; // subtract logic channels count
+				QLayoutItem *next = decoderEnumerator->itemAtPosition((index + 1) / 2, (index + 1) % 2);
+				decoderEnumerator->removeItem(next);
+				decoderEnumerator->addItem(next, index / 2, index % 2);
+			}
+
+			updateButtonStackedDecoder();
 		});
 
 		const int itemsInLayout = decoderEnumerator->count();
@@ -529,7 +610,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			m_oscDecoderMenu = curve->getCurrentDecoderStackMenu();
 			decoderSettingsLayout->addWidget(m_oscDecoderMenu);
 
-//			updateStackDecoderButton();
+			updateButtonStackedDecoder();
 		});
 
 		decoderBox->setChecked(true);
@@ -555,41 +636,42 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	currentChannelMenuLayout->addWidget(nameLineEdit);
 	currentChannelMenuLayout->addLayout(decoderSettingsLayout);
-	currentChannelMenuLayout->insertItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	currentChannelMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	currentChannelMenuScrollArea->setMinimumSize(200, 300);
 	currentChannelMenuScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
+	QHBoxLayout *stackDecoderLayout = new QHBoxLayout();
+	currentChannelMenuLayout->addLayout(stackDecoderLayout);
+	stackDecoderLayout->insertSpacerItem(0, new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+	stackDecoderLayout->insertWidget(1, stackDecoderComboBox);
+
+	currentChannelMenuLayout->insertItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
 	connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
+		chIdx -= m_oscAnalogChannels;
 		if (m_oscChannelSelected != chIdx && selected) {
 			m_oscChannelSelected = chIdx;
 			nameLineEdit->setEnabled(true);
-			nameLineEdit->setText(m_oscPlotCurves[chIdx - m_oscAnalogChannels]->getName());
+			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
 
-			if (m_oscChannelSelected < m_nbChannels + m_oscAnalogChannels) {
+			if (m_oscChannelSelected < m_nbChannels) {
 				if (m_oscDecoderMenu) {
-					if (m_oscDecoderMenu) {
-						decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
-						m_oscDecoderMenu->deleteLater();
-						m_oscDecoderMenu = nullptr;
-					}
+					decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+					m_oscDecoderMenu->deleteLater();
+					m_oscDecoderMenu = nullptr;
 				}
 			} else {
 				if (m_oscDecoderMenu) {
-					if (m_oscDecoderMenu) {
-						decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
-						m_oscDecoderMenu->deleteLater();
-						m_oscDecoderMenu = nullptr;
-					}
+					decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+					m_oscDecoderMenu->deleteLater();
+					m_oscDecoderMenu = nullptr;
 				}
 
-				AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected - m_oscAnalogChannels]);
+				AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
 				m_oscDecoderMenu = annCurve->getCurrentDecoderStackMenu();
 				decoderSettingsLayout->addWidget(m_oscDecoderMenu);
-
 			}
-
 		} else if (m_oscChannelSelected == chIdx && !selected) {
 			m_oscChannelSelected = -1;
 			nameLineEdit->setDisabled(true);
@@ -601,6 +683,49 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 				m_oscDecoderMenu = nullptr;
 			}
 		}
+
+		updateButtonStackedDecoder();
+	});
+
+	connect(stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
+		if (m_oscChannelSelected < m_nbChannels) {
+			return;
+		}
+
+		if (m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
+			return;
+		}
+
+		if (!stackDecoderComboBox->currentIndex()) {
+			return;
+		}
+
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
+
+		if (!curve) {
+			return;
+		}
+
+		GSList *dl = g_slist_copy((GSList *)srd_decoder_list());
+		for (const GSList *sl = dl; sl; sl = sl->next) {
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		    if (QString::fromUtf8(dec->id) == text) {
+			curve->stackDecoder(std::make_shared<logic::Decoder>(dec));
+			break;
+		    }
+		}
+
+		// Update decoder menu. New decoder must be shown
+		// and it might also have some options that can
+		// be modified
+		if (m_oscDecoderMenu) {
+			decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+			m_oscDecoderMenu->deleteLater();
+			m_oscDecoderMenu = nullptr;
+		}
+
+		m_oscDecoderMenu = curve->getCurrentDecoderStackMenu();
+		decoderSettingsLayout->addWidget(m_oscDecoderMenu);
 	});
 
 	currentChannelMenuScrollArea->setWidget(currentChannelMenu);

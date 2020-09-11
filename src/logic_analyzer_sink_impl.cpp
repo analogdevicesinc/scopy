@@ -72,7 +72,6 @@ int logic_analyzer_sink_impl::work(int noutput_items,
 
 	d_index += nitems;
 
-
 	if (d_triggered && (d_index == d_end) && d_end != 0) {
 		if (gr::high_res_timer_now() - d_last_time > d_update_time) {
 			d_last_time = gr::high_res_timer_now();
