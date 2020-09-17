@@ -381,8 +381,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 			ui->wNoise->setVisible(!check);
 		});
 
-	ui->cbLineThickness->setCurrentIndex(1);
-
 	unsigned int nb_channels = m_m2k_analogout->getNbChannels();
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		auto ptr = QSharedPointer<signal_generator_data>(
@@ -413,6 +411,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		ptr->file_type=FORMAT_NO_FILE;
 		ptr->file_nr_of_channels=0;
 		ptr->file_channel=0;
+		ptr->lineThickness = 1.0;
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -493,8 +492,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
 	ui->wAppearance->hide();
-
-
 
 	fileManager = new FileManager("Signal Generator");
 
