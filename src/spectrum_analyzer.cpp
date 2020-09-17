@@ -605,7 +605,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
-	delete sample_timer;
 	disconnect(prefPanel, &Preferences::notify, this, &SpectrumAnalyzer::readPreferences);
 	ui->runSingleWidget->toggle(false);
 	setDynamicProperty(runButton(), "disabled", false);
@@ -613,6 +612,8 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	if (saveOnExit) {
 		api->save(*settings);
 	}
+
+	delete sample_timer;
 
 	delete api;
 	for (auto it = ch_api.begin(); it != ch_api.end(); ++it) {
