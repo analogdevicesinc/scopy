@@ -1333,9 +1333,8 @@ void NetworkAnalyzer::goertzel()
 		if (m_stop) {
 			return;
 		}
-
-		Q_EMIT sweepDone();
 	}
+	Q_EMIT sweepDone();
 }
 
 void NetworkAnalyzer::onFrequencyBarMoved(int pos)
