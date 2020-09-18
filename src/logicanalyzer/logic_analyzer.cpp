@@ -427,6 +427,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	QVBoxLayout *decoderSettingsLayout = new QVBoxLayout();
 
 	QComboBox *stackDecoderComboBox = new QComboBox();
+	stackDecoderComboBox->setVisible(false);
 	auto updateButtonStackedDecoder = [=](){
 		if (m_oscChannelSelected < m_nbChannels) {
 			stackDecoderComboBox->setVisible(false);
@@ -595,9 +596,9 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			m_oscPlot->replot();
 		});
 
-		int chId = m_oscPlotCurves.size() - 1 + m_oscAnalogChannels;
+		int chId = m_oscPlotCurves.size() - 1;
 
-		connect(curve, &AnnotationCurve::decoderMenuChanged, [&](){
+		connect(curve, &AnnotationCurve::decoderMenuChanged, [=](){
 			if (m_oscChannelSelected != chId) {
 				return;
 			}
@@ -726,6 +727,8 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		m_oscDecoderMenu = curve->getCurrentDecoderStackMenu();
 		decoderSettingsLayout->addWidget(m_oscDecoderMenu);
+
+		updateButtonStackedDecoder();
 	});
 
 	currentChannelMenuScrollArea->setWidget(currentChannelMenu);
