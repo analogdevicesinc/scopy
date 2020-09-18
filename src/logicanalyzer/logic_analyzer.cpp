@@ -521,6 +521,10 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			curve->dataAvailable(from, to);
 		}, Qt::DirectConnection);
 
+		connect(curve, &QObject::destroyed, [=](){
+			disconnect(connectionHandle);
+		});
+
 		g_slist_free(decoderList);
 
 		QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
