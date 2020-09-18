@@ -115,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>266</width>
-        <height>823</height>
+        <height>887</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -481,6 +481,19 @@ color: rgba(255,255,255,51);
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="mixedSignalLbl">
+         <property name="styleSheet">
+          <string notr="true">color: white;</string>
+         </property>
+         <property name="text">
+          <string>This feature is not supported while the Mixed Signal View is enabled!</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -924,6 +937,7 @@ color: rgba(255,255,255,51);
       <zorder>verticalSpacer_3</zorder>
       <zorder></zorder>
       <zorder>trigger_logic_controls</zorder>
+      <zorder>mixedSignalLbl</zorder>
      </widget>
     </widget>
    </item>
