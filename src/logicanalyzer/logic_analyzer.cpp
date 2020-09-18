@@ -584,7 +584,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		});
 
 		const int itemsInLayout = decoderEnumerator->count();
-		decoderEnumerator->addWidget(decoderMenuItem, itemsInLayout / 2, itemsInLayout / 2);
+		decoderEnumerator->addWidget(decoderMenuItem, itemsInLayout / 2, itemsInLayout % 2);
 
 		decoderComboBox->setCurrentIndex(0);
 
