@@ -653,12 +653,17 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	currentChannelMenuLayout->insertItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
+	tabWidget->addTab(channelEnumerator, "General");
+	const int channelMenuTabId = tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
+
 	connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
 		chIdx -= m_oscAnalogChannels;
 		if (m_oscChannelSelected != chIdx && selected) {
 			m_oscChannelSelected = chIdx;
 			nameLineEdit->setEnabled(true);
 			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
+
+			tabWidget->setCurrentIndex(channelMenuTabId);
 
 			if (m_oscChannelSelected < m_nbChannels) {
 				if (m_oscDecoderMenu) {
