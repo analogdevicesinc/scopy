@@ -1322,6 +1322,8 @@ void Oscilloscope::enableMixedSignalView()
 		setDigitalPlotCurvesParams();
 		iio->unlock();
 	}
+
+	trigger_settings.enableMixedSignalView();
 }
 
 void Oscilloscope::disableMixedSignalView()
@@ -1360,6 +1362,8 @@ void Oscilloscope::disableMixedSignalView()
 
 	mixed_sink = nullptr;
 	mixed_source = nullptr;
+
+	trigger_settings.disaleMixedSignalView();
 }
 
 void Oscilloscope::setDigitalPlotCurvesParams()
