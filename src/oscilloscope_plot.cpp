@@ -1734,6 +1734,9 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 		}
 	}
 
+	group.first()->setSelected(true);
+	group.first()->selected(true);
+
 	for (QwtPlotZoneItem *groupMarker : d_groupMarkers) {
 		groupMarker->detach();
 		delete groupMarker;

@@ -971,7 +971,7 @@ void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
 		m_plot.beginGroupSelection();
 	} else {
 		if (m_plot.endGroupSelection()) {
-			channelSelectedChanged(m_selectedChannel, false);
+//			channelSelectedChanged(m_selectedChannel, false);
 		}
 	}
 }
