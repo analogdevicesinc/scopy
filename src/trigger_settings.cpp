@@ -168,6 +168,7 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
 
+	ui->mixedSignalLbl->setVisible(false);
 }
 
 TriggerSettings::~TriggerSettings()
@@ -245,6 +246,20 @@ void TriggerSettings::setChannelAttenuation(double value)
 	m_displayScale = value;
 	trigger_hysteresis->setDisplayScale(value);
 	trigger_level->setDisplayScale(value);
+}
+
+void TriggerSettings::enableMixedSignalView()
+{
+	ui->extern_en->setDisabled(true);
+	ui->extern_to_en->setDisabled(true);
+	ui->mixedSignalLbl->setVisible(true);
+}
+
+void TriggerSettings::disaleMixedSignalView()
+{
+	ui->extern_en->setEnabled(true);
+	ui->extern_to_en->setEnabled(true);
+	ui->mixedSignalLbl->setVisible(false);
 }
 
 void TriggerSettings::setDcLevelCoupled(double value)
