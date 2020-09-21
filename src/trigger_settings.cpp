@@ -255,7 +255,7 @@ void TriggerSettings::enableMixedSignalView()
 	ui->mixedSignalLbl->setVisible(true);
 }
 
-void TriggerSettings::disaleMixedSignalView()
+void TriggerSettings::disableMixedSignalView()
 {
 	ui->extern_en->setEnabled(true);
 	ui->extern_to_en->setEnabled(true);
