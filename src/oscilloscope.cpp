@@ -1363,7 +1363,7 @@ void Oscilloscope::disableMixedSignalView()
 	mixed_sink = nullptr;
 	mixed_source = nullptr;
 
-	trigger_settings.disaleMixedSignalView();
+	trigger_settings.disableMixedSignalView();
 }
 
 void Oscilloscope::setDigitalPlotCurvesParams()
