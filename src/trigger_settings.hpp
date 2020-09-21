@@ -77,7 +77,7 @@ namespace adiscope {
 		void setChannelAttenuation(double value);
 
 		void enableMixedSignalView();
-		void disaleMixedSignalView();
+		void disableMixedSignalView();
 
 	Q_SIGNALS:
 		void sourceChanged(int);
