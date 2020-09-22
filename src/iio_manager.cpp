@@ -27,10 +27,10 @@
 #include <gnuradio/blocks/short_to_float.h>
 
 #include <iio.h>
-
 using namespace adiscope;
 using namespace gr;
 
+static const int KERNEL_BUFFERS_DEFAULT = 4;
 std::map<const std::string, iio_manager::map_entry> iio_manager::dev_map;
 unsigned iio_manager::_id = 0;
 
@@ -59,7 +59,7 @@ iio_manager::iio_manager(unsigned int block_id,
 							     {0, 0},
 							     10000,
 							     1,
-							     4,
+							     KERNEL_BUFFERS_DEFAULT,
 							     false,
 							     false,
 							     {0, 0},
@@ -385,4 +385,5 @@ void iio_manager::disableMixedSignal(m2k::mixed_signal_source::sptr mixed_source
 	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
 
 	m_mixed_source = nullptr;
+	m_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 }
