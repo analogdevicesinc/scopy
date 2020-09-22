@@ -196,7 +196,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			m_m2k_analogout = m_m2k_context->getAnalogOut();
 			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
 			m_dac_nb_channels = m_m2k_analogout->getNbChannels();
-			m_m2k_analogin->setKernelBuffersCount(1);
 			m_m2k_analogout->setKernelBuffersCount(0, 1);
 			m_m2k_analogout->setKernelBuffersCount(1, 1);
 		}
