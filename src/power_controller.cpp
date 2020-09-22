@@ -201,6 +201,7 @@ void PowerController::dac1_set_enabled(bool enabled)
 		dac2_set_enabled(enabled);
 
 	setDynamicProperty(ui->dac1, "running", enabled);
+	ui->dac1->setText(enabled ? tr("Disable") : tr("Enable"));
 }
 
 void PowerController::dac2_set_enabled(bool enabled)
@@ -213,6 +214,7 @@ void PowerController::dac2_set_enabled(bool enabled)
 	}
 	averageVoltageCh2.clear();
 	setDynamicProperty(ui->dac2, "running", enabled);
+	ui->dac2->setText(enabled ? tr("Disable") : tr("Enable"));
 }
 
 void PowerController::sync_enabled(bool enabled)

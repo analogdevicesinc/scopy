@@ -853,11 +853,9 @@ QSlider::sub-page:horizontal {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: tr(&quot;Enable&quot;);
 }
 
 QPushButton[running=true] {
-  qproperty-text: tr(&quot;Disable&quot;);
   background-color: #F45000;
 }
 
@@ -984,11 +982,9 @@ QPushButton:disabled {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: tr(&quot;Enable&quot;);
 }
 
 QPushButton[running=true] {
-  qproperty-text: tr(&quot;Disable&quot;);
   background-color: #F45000;
 }
 
