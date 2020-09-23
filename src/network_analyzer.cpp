@@ -64,6 +64,8 @@
 #include <libm2k/m2kexceptions.hpp>
 #include "scopyExceptionHandler.h"
 
+static const int KERNEL_BUFFERS_DEFAULT = 4;
+
 using namespace adiscope;
 using namespace gr;
 using namespace libm2k::context;
@@ -1632,6 +1634,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->spinBox_periods->setEnabled(!pressed);
 
 	if (pressed) {
+		m_m2k_analogin->setKernelBuffersCount(1);
 		if (shouldClear) {
 			m_dBgraph.reset();
 			m_phaseGraph.reset();
@@ -1662,6 +1665,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
+		m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 	}
 }
 
