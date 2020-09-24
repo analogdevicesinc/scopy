@@ -166,8 +166,8 @@ private:
 	bool loadDecoders(QString path);
 	bool switchContext(const QString& uri);
 	void resetStylesheets();
-	void initialCalibration();
-	bool calibrate();
+	QPair<bool, bool> initialCalibration();
+	QPair<bool, bool> calibrate();
 	void checkIp(const QString& ip);
 	void disconnect();
 	void saveSettings();
@@ -203,8 +203,8 @@ private:
 	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;
 	QFuture<QVector<QString>> future;
-	QFuture<void> calibration_thread;
-	QFutureWatcher<void> calibration_thread_watcher;
+	QFuture<QPair<bool, bool>> calibration_thread;
+	QFutureWatcher<QPair<bool, bool>> calibration_thread_watcher;
 
 	DMM *dmm;
 	PowerController *power_control;
