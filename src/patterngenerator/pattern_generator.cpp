@@ -783,6 +783,7 @@ void PatternGenerator::generateBuffer()
 		commitBuffer(pattern, m_buffer, bufferSize);
 		pattern.second->get_pattern()->delete_buffer();
 		updateAnnotationCurveChannelsForPattern(pattern);
+		pattern.second->get_pattern()->setNrOfChannels(pattern.first.size());
 	}
 
 	Q_EMIT dataAvailable(0, bufferSize);
