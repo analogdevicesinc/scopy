@@ -198,7 +198,7 @@ private:
 	bool autoAdjustGain;
 
 	FreePlotLineHandleH *d_frequencyHandle;
-    bool d_cursorsEnabled;
+	bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
 	ScaleSpinButton *samplesPerDecadeCount;
@@ -266,7 +266,7 @@ private Q_SLOTS:
 	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
 	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 
-    void toggleCursors(bool en);
+	void toggleCursors(bool en);
 	void readPreferences();
 	void onGraphIndexChanged(int);
 	void on_btnExport_clicked();

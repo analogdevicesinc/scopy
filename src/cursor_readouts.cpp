@@ -35,7 +35,7 @@ CursorReadouts::CursorReadouts(QwtPlot *plot):
 	ui(new Ui::CursorReadouts),
 	d_voltage_rd_visible(true),
 	d_time_rd_visible(true),
-    freq_delta_visible(true),
+	freq_delta_visible(true),
 	d_topLeft(QPoint(0, 0)),
     currentPosition(CustomPlotPositionButton::topLeft),
     hAxis(QwtPlot::xBottom),
@@ -259,6 +259,10 @@ QString CursorReadouts::timeCursor2LabelText(){
     return ui->cursorT2label->text();
 }
 
+void CursorReadouts::setTimeDeltaLabelText(const QString &text){
+    ui->timeDeltaLabel->setText(text);
+}
+
 void CursorReadouts::setVoltageCursor1LabelText(const QString &text){
     ui->cursorV1label->setText(text);
 }
@@ -384,14 +388,14 @@ void CursorReadouts::moveTopRight(bool resize)
 
 	QRect timeRect, voltageRect;
 
-    if (d_time_rd_visible && !d_voltage_rd_visible) {
-        voltageRect = QRect(0,0,0,0);
-        timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y(),d_topLeft.x(),d_topLeft.y()+ui->TimeCursors->height());
-    } else {
-        voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y(),d_topLeft.x(),d_topLeft.y()+ui->VoltageCursors->height());
-        timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),d_topLeft.y(),voltageRect.x(),d_topLeft.y()+ui->VoltageCursors->height());
+	if (d_time_rd_visible && !d_voltage_rd_visible) {
+		voltageRect = QRect(0,0,0,0);
+		timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y(),d_topLeft.x(),d_topLeft.y()+ui->TimeCursors->height());
+	} else {
+		voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y(),d_topLeft.x(),d_topLeft.y()+ui->VoltageCursors->height());
+		timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),d_topLeft.y(),voltageRect.x(),d_topLeft.y()+ui->VoltageCursors->height());
 
-    }
+	}
 
 	int diff = timeRect.x() - lastTimeRect.x();
 	if (diff < 10 && diff > -10) diff = timeRect.y() - lastTimeRect.y();
@@ -420,25 +424,25 @@ void CursorReadouts::moveBottomLeft(bool resize)
 
 	QRect timeRect, voltageRect;
 
-    int value = plot()->canvas()->height()-8;
-    d_topLeft.setY(value);
-    d_topLeft.setX(8);
+	int value = plot()->canvas()->height()-8;
+	d_topLeft.setY(value);
+	d_topLeft.setX(8);
 
-    if(freq_delta_visible)
-    {
-        if (!d_time_rd_visible && d_voltage_rd_visible) {
-            voltageRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->VoltageCursors->height()-20), QPoint(d_topLeft.x()+ui->VoltageCursors->width(),d_topLeft.y()));
-            timeRect = QRect(0,0,0,0);
-        } else {
-            timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()-20), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
-            voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()-20), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
-        }
-    }
-    else
-    {
-        timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()+5), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
-        voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()+5), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
-    }
+	if(freq_delta_visible)
+	{
+		if (!d_time_rd_visible && d_voltage_rd_visible) {
+			voltageRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->VoltageCursors->height()-20), QPoint(d_topLeft.x()+ui->VoltageCursors->width(),d_topLeft.y()));
+			timeRect = QRect(0,0,0,0);
+		} else {
+			timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()-20), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
+			voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()-20), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
+		}
+	}
+	else
+	{
+		timeRect = QRect(QPoint(d_topLeft.x(),d_topLeft.y()-ui->TimeCursors->height()+5), QPoint(ui->TimeCursors->width()+d_topLeft.x(),d_topLeft.y()));
+		voltageRect = QRect(QPoint(d_topLeft.x()+timeRect.width(),d_topLeft.y()-ui->VoltageCursors->height()+5), QPoint(d_topLeft.x()+timeRect.width()+ui->VoltageCursors->width(),d_topLeft.y()));
+	}
 
 
 	int diff = voltageRect.x() - lastVoltageRect.x();
@@ -468,24 +472,24 @@ void CursorReadouts::moveBottomRight(bool resize)
 
 	QRect timeRect, voltageRect;
 
-    d_topLeft.setY(plot()->canvas()->height()-8);
-    d_topLeft.setX(plot()->canvas()->width()-8);
+	d_topLeft.setY(plot()->canvas()->height()-8);
+	d_topLeft.setX(plot()->canvas()->width()-8);
 
-    if(freq_delta_visible)
-    {
-        if (d_time_rd_visible && !d_voltage_rd_visible) {
-            voltageRect = QRect(0,0,0,0);
-            timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y()-ui->TimeCursors->height()-20,d_topLeft.x(),d_topLeft.y());
-        } else {
-            voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()-20,d_topLeft.x(),d_topLeft.y());
-            timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),voltageRect.y(),voltageRect.x(),voltageRect.y()+ui->TimeCursors->height());
-        }
-    }
-    else
-    {
-        voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()+5,d_topLeft.x(),d_topLeft.y());
-        timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),voltageRect.y(),voltageRect.x(),voltageRect.y()+ui->TimeCursors->height()+5);
-    }
+	if(freq_delta_visible)
+	{
+		if (d_time_rd_visible && !d_voltage_rd_visible) {
+			voltageRect = QRect(0,0,0,0);
+			timeRect = QRect(d_topLeft.x() - ui->TimeCursors->width(),d_topLeft.y()-ui->TimeCursors->height()-20,d_topLeft.x(),d_topLeft.y());
+		} else {
+			voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()-20,d_topLeft.x(),d_topLeft.y());
+			timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),voltageRect.y(),voltageRect.x(),voltageRect.y()+ui->TimeCursors->height());
+		}
+	}
+	else
+	{
+		voltageRect = QRect(d_topLeft.x() - ui->VoltageCursors->width(),d_topLeft.y()-ui->VoltageCursors->height()+5,d_topLeft.x(),d_topLeft.y());
+		timeRect = QRect(voltageRect.x()-ui->TimeCursors->width(),voltageRect.y(),voltageRect.x(),voltageRect.y()+ui->TimeCursors->height()+5);
+	}
 
 	int diff = timeRect.x() - lastTimeRect.x();
 	if (diff < 10 && diff > -10) diff = timeRect.y() - lastTimeRect.y();

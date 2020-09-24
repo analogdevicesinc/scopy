@@ -100,7 +100,7 @@ class TimeDomainDisplayPlot: public DisplayPlot
   Q_PROPERTY ( Qt::BrushStyle tag_background_style READ getTagBackgroundStyle WRITE setTagBackgroundStyle )
 
 public:
-  TimeDomainDisplayPlot(QWidget*, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
+  TimeDomainDisplayPlot(QWidget*, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
   virtual ~TimeDomainDisplayPlot();
 
   void plotNewData(const std::string &sender,
