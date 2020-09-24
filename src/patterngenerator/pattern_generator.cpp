@@ -610,7 +610,7 @@ uint64_t PatternGenerator::computeBufferSize(uint64_t sampleRate) const
 		bufferSize = result;
 	}
 
-	return bufferSize;
+	return bufferSize > MAX_BUFFER_SIZE ? MAX_BUFFER_SIZE : bufferSize;
 }
 
 uint16_t PatternGenerator::remapBuffer(uint8_t *mapping, uint32_t val)
