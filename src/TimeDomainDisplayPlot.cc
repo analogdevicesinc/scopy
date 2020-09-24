@@ -171,8 +171,8 @@ int SinkManager::sinkFirstChannelPos(const std::string& name)
 /***********************************************************************
  * Main Time domain plotter widget
  **********************************************************************/
-TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumDivs, unsigned int yNumDivs)
-  : DisplayPlot(0, parent, xNumDivs, yNumDivs)
+TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs)
+  : DisplayPlot(0, parent, isdBgraph, xNumDivs, yNumDivs)
 {
   d_tag_text_color = Qt::black;
   d_tag_background_color = Qt::white;

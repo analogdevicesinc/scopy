@@ -50,6 +50,8 @@
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
+#include "ui_cursors_settings.h"
+#include "ui_cursor_readouts.h"
 
 #include <boost/make_shared.hpp>
 #include <iio.h>
@@ -129,6 +131,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	crt_peak(0),
 	max_peak_count(10),
 	fft_size(32768),
+	hCursorsEnabled(true),
+	vCursorsEnabled(true),
 	searchVisiblePeaks(true),
 	m_max_sample_rate(100e6),
 	sample_rate_divider(1),
@@ -203,6 +207,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->addButton(ui->btnSweep);
 	settings_group->addButton(ui->btnMarkers);
 	settings_group->addButton(ui->btnAddRef);
+	settings_group->addButton(ui->btnCursors);
 	settings_group->setExclusive(true);
 
 	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
@@ -216,9 +221,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
 	}
 
-	QGridLayout *gLayout = static_cast<QGridLayout *>
-	                       (ui->widgetPlotContainer->layout());
-	gLayout->addWidget(fft_plot, 1, 0, 1, 1);
+	ui->gridLayout_plot->addWidget(fft_plot->getPlotwithElements(), 1, 0, 1, 1);
+
+	fft_plot->enableXaxisLabels();
+	fft_plot->enableYaxisLabels();
 
 	// Initialize spectrum channels
 	for (int i = 0 ; i < m_adc_nb_channels; i++) {
@@ -295,6 +301,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setStartStop(start, stop);
 		fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
 		fft_plot->replot();
+		fft_plot->bottomHandlesArea()->repaint();
 
 		setSampleRate(2 * stop);
 
@@ -439,6 +446,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		SLOT(onTopValueChanged(double)));
 	connect(bottom_scale, SIGNAL(valueChanged(double)),
 		SLOT(onBottomValueChanged(double)));
+
+	cursor_panel_init();
+
+	connect(fft_plot,
+		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
+		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
 
 	// UI default
 	ui->comboBox_window->setCurrentText("Hamming");
@@ -788,6 +801,8 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 			index = 3;
 		} else if (btn == ui->btnAddRef) {
 			index = 4;
+		} else if (btn == ui->btnCursors) {
+			index = 5;
 		}
 	}
 
@@ -820,6 +835,23 @@ void SpectrumAnalyzer::rightMenuFinished(bool opened)
 	}
 }
 
+void SpectrumAnalyzer::on_boxCursors_toggled(bool on)
+{
+	fft_plot->setHorizCursorsEnabled(
+				on ? cr_ui->vCursorsEnable->isChecked() : false);
+	fft_plot->setVertCursorsEnabled(
+				on ? cr_ui->hCursorsEnable->isChecked() : false);
+
+	if (on) {
+		fft_plot->setCursorReadoutsVisible(on);
+	} else {
+		if (ui->btnCursors->isChecked())
+			ui->btnCursors->setChecked(false);
+
+		menuOrder.removeOne(ui->btnCursors);
+	}
+}
+
 void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)
 {
 	triggerRightMenuToggle(
@@ -842,6 +874,12 @@ void SpectrumAnalyzer::on_btnSettings_clicked(bool checked)
 	if (btn) {
 		btn->setChecked(checked);
 	}
+}
+
+void SpectrumAnalyzer::on_btnCursors_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+				static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void SpectrumAnalyzer::on_btnSweep_toggled(bool checked)
@@ -924,6 +962,59 @@ void SpectrumAnalyzer::on_btnImport_clicked()
 			add_ref_waveform(key);
 		}
 	}
+}
+
+void SpectrumAnalyzer::cursor_panel_init()
+{
+	cr_ui = new Ui::CursorsSettings;
+	cr_ui->setupUi(ui->cursorsSettings);
+	cr_ui->btnNormalTrack->hide();
+	setDynamicProperty(cr_ui->btnLockHorizontal, "use_icon", true);
+	setDynamicProperty(cr_ui->btnLockVertical, "use_icon", true);
+
+	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled,
+		fft_plot, &FftDisplayPlot::setHorizCursorsLocked);
+	connect(cr_ui->btnLockVertical, &QPushButton::toggled,
+		fft_plot, &FftDisplayPlot::setVertCursorsLocked);
+
+	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
+
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
+		fft_plot, SLOT(setVertCursorsEnabled(bool)));
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
+		fft_plot, SLOT(setHorizCursorsEnabled(bool)));
+
+	cr_ui->horizontalSlider->setMaximum(100);
+	cr_ui->horizontalSlider->setMinimum(0);
+	cr_ui->horizontalSlider->setSingleStep(1);
+
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
+		fft_plot->setCursorReadoutsTransparency(value);
+	});
+	cr_ui->horizontalSlider->setSliderPosition(0);
+
+	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
+		[=](CustomPlotPositionButton::ReadoutsPosition position){
+		fft_plot->moveCursorReadouts(position);
+	});
+
+}
+
+void SpectrumAnalyzer::onCursorReadoutsChanged(struct cursorReadoutsText data)
+{
+	fillCursorReadouts(data);
+}
+
+void SpectrumAnalyzer::fillCursorReadouts(const struct cursorReadoutsText& data)
+{
+	//    cursor_readouts_ui->cursorT1->setText(data.t1);
+	//    cursor_readouts_ui->cursorT2->setText(data.t2);
+	//    cursor_readouts_ui->timeDelta->setText(data.tDelta);
+	//    cursor_readouts_ui->frequencyDelta->setText(data.freq);
+	//    cursor_readouts_ui->cursorV1->setText(data.v1);
+	//    cursor_readouts_ui->cursorV2->setText(data.v2);
+	//    cursor_readouts_ui->voltageDelta->setText(data.vDelta);
 }
 
 QString SpectrumAnalyzer::getReferenceChannelName() const
@@ -2113,6 +2204,7 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	fft_plot->recalculateMagnitudes();
 
 	fft_plot->replot();
+	fft_plot->leftHandlesArea()->repaint();
 
 	ui->lblMagUnit->setText(unit);
 
@@ -2170,11 +2262,11 @@ void SpectrumAnalyzer::on_btnMarkerTable_toggled(bool checked)
 
 	// Set the Plot 3 times taller than the Marker Table (when visible)
 	QGridLayout *layout = static_cast<QGridLayout *>(
-	                              ui->widgetPlotContainer->layout());
+				ui->widgetPlotContainer->layout());
 	int row1 = getGridLayoutPosFromIndex(layout,
-	                                     layout->indexOf(ui->markerTable)).first;
+					     layout->indexOf(ui->markerTable)).first;
 	int row2 = getGridLayoutPosFromIndex(layout,
-	                                     layout->indexOf(fft_plot)).first;
+					     layout->indexOf(ui->gridLayout_plot)).first;
 
 	if (checked) {
 		layout->setRowStretch(row1, 1);
@@ -2215,6 +2307,9 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_value);
 	}
 	fft_plot->replot();
+	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
+	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
+	fft_plot->leftHandlesArea()->repaint();
 }
 
 void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
@@ -2257,6 +2352,9 @@ void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_scale->value());
 	}
 	fft_plot->replot();
+	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
+	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
+	fft_plot->leftHandlesArea()->repaint();
 }
 
 void SpectrumAnalyzer::onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx)

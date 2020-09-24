@@ -409,6 +409,9 @@ QPushButton:checked:hover {
            <property name="verticalSpacing">
             <number>10</number>
            </property>
+           <item row="1" column="0">
+            <layout class="QGridLayout" name="gridLayout_plot"/>
+           </item>
            <item row="3" column="0">
             <layout class="QHBoxLayout" name="hLayout_plotBottomBar">
              <property name="spacing">
@@ -2367,6 +2370,7 @@ background-color: #727273;
                </item>
               </layout>
              </widget>
+             <widget class="QWidget" name="cursorsSettings"/>
             </widget>
            </item>
           </layout>
@@ -2475,6 +2479,26 @@ QLabel {
 }</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QCheckBox" name="boxCursors">
+             <property name="text">
+              <string>Cursors</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="adiscope::CustomPushButton" name="btnCursors">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
@@ -2586,5 +2610,38 @@ QLabel {
  <resources>
   <include location="../resources/resources.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>boxCursors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnCursors</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>654</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>719</x>
+     <y>635</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCursors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>719</x>
+     <y>635</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>922</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

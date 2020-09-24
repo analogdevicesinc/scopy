@@ -77,7 +77,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 			     bool offline_mode_):
 	LogicTool(nullptr, toolMenuItem, new LogicAnalyzer_API(this), "Logic Analyzer", parent),
 	ui(new Ui::LogicAnalyzer),
-	m_plot(this, 16, 10),
+	m_plot(this, false, 16, 10),
 	m_bufferPreviewer(new DigitalBufferPreviewer(40, this)),
 	m_m2k_context(m2kOpen(ctx, "")),
 	m_m2kDigital(m_m2k_context->getDigital()),

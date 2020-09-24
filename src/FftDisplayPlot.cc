@@ -129,6 +129,9 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
 	xScaleDraw->setFloatPrecision(2);
 
+	d_yAxisUnit = "dB";
+	d_xAxisUnit = "Hz";
+
 	_resetXAxisPoints();
 
 	d_mrkCtrl = new MarkerController(this);
@@ -156,6 +159,24 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	setMaxYaxisDivision(100); // A maximum division of 100 dB
 	setVertUnitsPerDiv(20);
 	setVertOffset(-VertUnitsPerDiv() * 5);
+
+	setYaxisNumDiv(11);
+
+	d_topHandlesArea->setMinimumHeight(50);
+	d_topHandlesArea->setLargestChildWidth(50);
+
+	d_leftHandlesArea->setMinimumWidth(50);
+	d_leftHandlesArea->setTopPadding(50);
+	d_leftHandlesArea->setBottomPadding(55);
+	d_leftHandlesArea->setMinimumHeight(this->minimumHeight());
+
+	enableAxis(QwtPlot::xBottom, false);
+	enableAxis(QwtPlot::yLeft, false);
+	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
+
+	setupReadouts();
+
+	installEventFilter(this);
 }
 
 FftDisplayPlot::~FftDisplayPlot()
@@ -182,15 +203,178 @@ FftDisplayPlot::~FftDisplayPlot()
 	}
 	d_refXdata.clear();
 	d_refYdata.clear();
+	removeEventFilter(this);
+	canvas()->removeEventFilter(d_cursorReadouts);
+	canvas()->removeEventFilter(d_symbolCtrl);
 }
 
 void FftDisplayPlot::replot()
 {
+	if (!d_leftHandlesArea || !d_bottomHandlesArea) {
+		return;
+	}
+
+	d_leftHandlesArea->repaint();
+	d_bottomHandlesArea->repaint();
+
 	QwtPlot::replot();
+}
+
+QString FftDisplayPlot::formatXValue(double value, int precision) const
+{
+	return d_formatter->format(value, "Hz", precision);
+}
+
+QString FftDisplayPlot::formatYValue(double value, int precision) const
+{
+	return d_formatter->format(value, "dB", precision);
+}
+
+void FftDisplayPlot::setupReadouts()
+{
+	d_cursorReadouts = new CursorReadouts(this);
+	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
+	d_cursorReadouts->setTimeReadoutVisible(false);
+	d_cursorReadouts->setVoltageReadoutVisible(false);
+
+	d_cursorReadouts->setTimeCursor1LabelText("Mag1 = ");
+	d_cursorReadouts->setTimeCursor2LabelText("Mag2 = ");
+	d_cursorReadouts->setTimeDeltaLabelText("ΔMag = ");
+	d_cursorReadouts->setVoltageCursor1LabelText("F1 = ");
+	d_cursorReadouts->setVoltageCursor2LabelText("F2 = ");
+	d_cursorReadouts->setDeltaVoltageLabelText("ΔF = ");
+
+	d_cursorReadouts->setFrequencyDeltaVisible(false);
+	d_cursorReadouts->setTransparency(0);
+}
+
+void FftDisplayPlot::updateHandleAreaPadding()
+{
+	d_leftHandlesArea->repaint();
+	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
+	d_bottomHandlesArea->setRightPadding(50);
+
+	d_rightHandlesArea->setTopPadding(50);
+	d_rightHandlesArea->setBottomPadding(50);
+
+	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
+	d_hCursorHandle1->updatePosition();
+	d_hCursorHandle2->updatePosition();
+	d_vCursorHandle1->updatePosition();
+	d_vCursorHandle2->updatePosition();
+}
+
+void FftDisplayPlot::onHCursor1Moved(double value)
+{
+	QString text;
+
+	text = d_formatter->format(value, "dB", 3);
+	d_cursorReadouts->setTimeCursor1Text(text);
+	d_cursorReadoutsText.t1 = text;
+
+	double diff = value - d_hBar2->plotCoord().y();
+	text = d_formatter->format(diff, "dB", 3);
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.tDelta = text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void FftDisplayPlot::onHCursor2Moved(double value)
+{
+	QString text;
+
+	text = d_formatter->format(value, "dB", 3);
+	d_cursorReadouts->setTimeCursor2Text(text);
+	d_cursorReadoutsText.t2 = text;
+
+	double diff = d_hBar1->plotCoord().y() - value;
+	text = d_formatter->format(diff, "dB", 3);
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.tDelta = text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void FftDisplayPlot::onVCursor1Moved(double value)
+{
+
+	QString text;
+	bool error = false;
+
+	value *= d_displayScale;
+	text = d_formatter->format(value, "Hz", 3);
+	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
+	d_cursorReadoutsText.v1 = error ? "-" : text;
+
+	double valueCursor2 = d_vBar2->plotCoord().x();
+
+	double diff = value - (valueCursor2 * d_displayScale) ;
+	text = d_formatter->format(diff, "Hz", 3);
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.vDelta = error ? "-" : text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void FftDisplayPlot::onVCursor2Moved(double value)
+{
+	QString text;
+	bool error = false;
+
+	value *= d_displayScale;
+	text = d_formatter->format(value, "Hz", 3);
+	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
+	d_cursorReadoutsText.v2 = error ? "-" : text;
+
+	double valueCursor1 = d_vBar1->plotCoord().x();
+
+	double diff = (valueCursor1 * d_displayScale) - value;
+	text = d_formatter->format(diff, "Hz", 3);
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.vDelta = error ? "-" : text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void FftDisplayPlot::enableXaxisLabels()
+{
+	d_bottomHandlesArea->installExtension(std::unique_ptr<HandlesAreaExtension>(new XBottomRuller(this)));
+}
+
+void FftDisplayPlot::enableYaxisLabels()
+{
+	d_leftHandlesArea->installExtension(std::unique_ptr<HandlesAreaExtension>(new YLeftRuller(this)));
+}
+
+bool FftDisplayPlot::eventFilter(QObject *object, QEvent *event)
+{
+	if (object == canvas() && event->type() == QEvent::Resize) {
+		updateHandleAreaPadding();
+
+		//force cursor handles to emit position changed
+		//when the plot canvas is being resized
+		d_hCursorHandle1->triggerMove();
+		d_hCursorHandle2->triggerMove();
+		d_vCursorHandle1->triggerMove();
+		d_vCursorHandle2->triggerMove();
+
+	}
+	return QObject::eventFilter(object, event);
+}
+
+void FftDisplayPlot::showEvent(QShowEvent *event)
+{
+	d_vCursorHandle1->triggerMove();
+	d_vCursorHandle2->triggerMove();
+	d_hCursorHandle1->triggerMove();
+	d_hCursorHandle2->triggerMove();
 }
 
 void FftDisplayPlot::setZoomerEnabled()
 {
+	enableAxis(QwtPlot::xBottom, true);
+	enableAxis(QwtPlot::yLeft, true);
 	if(!d_zoomer[0]) {
 		d_zoomer[0] = new FftDisplayZoomer(canvas());
 
@@ -323,37 +507,47 @@ void FftDisplayPlot::setWindowCoefficientSum(unsigned int ch, float sum, float s
 void FftDisplayPlot::useLogScaleY(bool log_scale)
 {
 	if (log_scale) {
+		setPlotYLogaritmic(true);
 		QwtLogScaleEngine *scaleEngine = new QwtLogScaleEngine();
 		setAxisScaleEngine(QwtPlot::yLeft,  (QwtScaleEngine *)scaleEngine);
-		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "V/√Hz");
-		yScaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, true);
-		yScaleDraw->setFloatPrecision(2);
-		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+//		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "V/√Hz");
+//		yScaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, true);
+//		yScaleDraw->setFloatPrecision(2);
+//		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+		replot();
+		auto div = axisScaleDiv(QwtPlot::yLeft);
+		setYaxisMajorTicksPos(div.ticks(2));
 	} else {
+		setPlotYLogaritmic(false);
 		OscScaleEngine *scaleEngine = new OscScaleEngine();
 		this->setAxisScaleEngine(QwtPlot::yLeft, (QwtScaleEngine *)scaleEngine);
-		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "");
-		yScaleDraw->setFloatPrecision(2);
-		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+//		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "");
+//		yScaleDraw->setFloatPrecision(2);
+//		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+		replot();
+		auto div = axisScaleDiv(QwtPlot::yLeft);
+		setYaxisNumDiv((div.ticks(2)).size());
 	}
+
 	replot();
 }
 
 void FftDisplayPlot::useLogFreq(bool use_log_freq)
 {
 	if (use_log_freq) {
+		setPlotLogaritmic(true);
 		setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
-		OscScaleDraw *xScaleDraw = new OscScaleDraw(&freqFormatter, "Hz");
-		setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
-		xScaleDraw->setFloatPrecision(2);
+		replot();
+		auto div = axisScaleDiv(QwtPlot::xBottom);
+		setXaxisMajorTicksPos(div.ticks(2));
 	} else {
+		setPlotLogaritmic(false);
 		OscScaleEngine *scaleEngine = new OscScaleEngine();
 		this->setAxisScaleEngine(QwtPlot::xBottom, (QwtScaleEngine *)scaleEngine);
-		OscScaleDraw *xScaleDraw = new OscScaleDraw(&freqFormatter, "Hz");
-		setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
-		xScaleDraw->setFloatPrecision(2);
+		replot();
+		auto div = axisScaleDiv(QwtPlot::xBottom);
+		setXaxisNumDiv((div.ticks(2)).size() - 1);
 	}
-
 	d_logScaleEnabled = use_log_freq;
 	replot();
 }
@@ -1257,6 +1451,9 @@ void FftDisplayPlot::setStartStop(double start, double stop)
 {
 	m_sweepStart = start;
 	m_sweepStop = stop;
+	auto div = axisScaleDiv(QwtPlot::xBottom);
+	setXaxisNumDiv((div.ticks(2)).size() - 1);
+	setXaxisMajorTicksPos(div.ticks(2));
 }
 
 void FftDisplayPlot::setVisiblePeakSearch(bool enabled)

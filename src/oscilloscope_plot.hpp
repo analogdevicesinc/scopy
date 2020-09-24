@@ -41,7 +41,7 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
-		OscilloscopePlot(QWidget *parent, unsigned int xNumDivs = 10,
+		OscilloscopePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10,
 				 unsigned int yNumDiv = 10);
 		~OscilloscopePlot();
 	};
@@ -62,7 +62,7 @@ namespace adiscope {
 		};
 
 	public:
-		CapturePlot(QWidget *parent, unsigned int xNumDivs = 10,
+		CapturePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10,
 			    unsigned int yNumDivs = 10);
 		~CapturePlot();
 
@@ -73,7 +73,6 @@ namespace adiscope {
 
 		QWidget *topArea();
 		QWidget *topHandlesArea();
-		QWidget *leftHandlesArea();
 
 		void setBonusWidthForHistogram(int width);
 
@@ -122,6 +121,10 @@ namespace adiscope {
 		void enableTimeTrigger(bool enable);
 		QString getChannelName(int chIdx) const;
 		void setChannelName(const QString &name, int chIdx);
+
+		QString formatXValue(double value, int precision) const;
+		QString formatYValue(double value, int precision) const;
+
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
@@ -185,10 +188,10 @@ namespace adiscope {
 
 		void handleInGroupChangedPosition(int position);
 
-        void onHCursor1Moved(double);
-        void onHCursor2Moved(double);
-        void onVCursor1Moved(double);
-        void onVCursor2Moved(double);
+		void onHCursor1Moved(double);
+		void onHCursor2Moved(double);
+		void onVCursor1Moved(double);
+		void onVCursor2Moved(double);
 
     private:
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
@@ -199,8 +202,7 @@ namespace adiscope {
 		bool d_labelsEnabled;
 
 		QWidget *d_topWidget;
-		GateHandlesArea *d_topHandlesArea;
-		VertHandlesArea *d_leftHandlesArea;
+		GateHandlesArea *d_topGateHandlesArea;
 		int d_bonusWidth;
 
 		QLabel *d_timeBaseLabel;
@@ -232,7 +234,7 @@ namespace adiscope {
 		FreePlotLineHandleV *d_levelTriggerBHandle;
 
 		MetricPrefixFormatter d_cursorMetricFormatter;
-        TimePrefixFormatter d_cursorTimeFormatter;
+		TimePrefixFormatter d_cursorTimeFormatter;
 
 	        QPen d_trigAactiveLinePen;
 	        QPen d_trigAinactiveLinePen;

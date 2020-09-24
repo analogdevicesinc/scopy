@@ -23,6 +23,10 @@
 
 #include "DisplayPlot.h"
 #include "spectrum_marker.hpp"
+#include "symbol_controller.h"
+#include "plot_line_handle.h"
+#include "handles_area.hpp"
+#include "cursor_readouts.h"
 #include <boost/shared_ptr.hpp>
 
 namespace adiscope {
@@ -82,6 +86,7 @@ namespace adiscope {
 		};
 
 	typedef boost::shared_ptr<SpectrumAverage> average_sptr;
+
 	private:
 		QList<QList<marker>> d_markers;
 		double* x_data;
@@ -104,6 +109,7 @@ namespace adiscope {
 
 		MetricPrefixFormatter dBFormatter;
 		MetricPrefixFormatter freqFormatter;
+		PrefixFormatter *d_formatter;
 
 		std::vector<enum AverageType> d_ch_average_type;
 		std::vector<average_sptr> d_ch_avg_obj;
@@ -132,6 +138,8 @@ namespace adiscope {
 		unsigned int d_nb_overlapping_avg;
 		std::vector<std::vector<double>> d_ps_avg;
 
+		void setupReadouts();
+		void updateHandleAreaPadding();
 
 		void plotData(const std::vector<double *> &pts,
 				uint64_t num_points);
@@ -162,6 +170,10 @@ namespace adiscope {
 		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);
 		void onMrkCtrlMarkerReleased(std::shared_ptr<SpectrumMarker> &);
 
+		void onHCursor1Moved(double);
+		void onHCursor2Moved(double);
+		void onVCursor1Moved(double);
+		void onVCursor2Moved(double);
 	public:
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
 		~FftDisplayPlot();
@@ -228,6 +240,13 @@ namespace adiscope {
 		void setWindowCoefficientSum(unsigned int ch, float sum, float sqr_sum);
 		void setNbOverlappingAverages(unsigned int nb_avg);
 		void useLogScaleY(bool log_scale);
+
+		bool eventFilter(QObject *, QEvent *);
+		void enableXaxisLabels();
+		void enableYaxisLabels();
+		QString formatXValue(double value, int precision) const;
+		QString formatYValue(double value, int precision) const;
+
 	Q_SIGNALS:
 		void newData();
 		void sampleRateUpdated(double);
@@ -242,6 +261,7 @@ namespace adiscope {
 		void presetSampleRate(double sr);
 		void useLogFreq(bool use_log_freq);
 		void customEvent(QEvent *e);
+		void showEvent(QShowEvent *event);
 		bool getLogScale() const;
 	};
 }

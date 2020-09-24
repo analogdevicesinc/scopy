@@ -70,6 +70,7 @@
 #include "cursor_readouts.h"
 #include "handles_area.hpp"
 #include "plotpickerwrapper.h"
+#include <QWidget>
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )
@@ -299,8 +300,10 @@ class DisplayPlot:public PrintablePlot
 
 public:
 
-  DisplayPlot(int nplots, QWidget*,  bool isdBgraph = false, unsigned int xNumDivs = 10,
-          unsigned int yNumDivs = 10);
+	DisplayPlot(int nplots, QWidget*,
+		    bool isdBgraph = false,
+		    unsigned int xNumDivs = 10,
+		    unsigned int yNumDivs = 10);
   virtual ~DisplayPlot();
 
   virtual void replot() = 0;
@@ -400,18 +403,30 @@ public:
   void setDisplayScale(double value);
   void setAllYAxis(double min, double max);
 
+  HorizHandlesArea* bottomHandlesArea();
+  QWidget *rightHandlesArea();
+  QWidget *leftHandlesArea();
+  virtual QWidget *topHandlesArea();
+  VertBar* vBar1();
+  VertBar* vBar2();
+  bool isLogaritmicPlot() const;
+  void setPlotLogaritmic(bool );
+  bool isLogaritmicYPlot() const;
+  void setPlotYLogaritmic(bool value);
+  void setXaxisMajorTicksPos(QList<double>);
+  QList<double> getXaxisMajorTicksPos() const;
+  void setYaxisMajorTicksPos(QList<double>);
+  QList<double> getYaxisMajorTicksPos() const;
+  QWidget* getPlotwithElements();
+
   bool vertCursorsEnabled();
   bool horizCursorsEnabled();
   struct cursorReadoutsText allCursorReadouts() const;
-
-  HorizHandlesArea* bottomHandlesArea();
-  QWidget *rightHandlesArea();
-  VertBar* vBar1();
-  VertBar* vBar2();
-
   void trackModeEnabled(bool enabled);
   void repositionCursors();
   void toggleCursors(bool en);
+  virtual QString formatXValue(double value, int precision) const;
+  virtual QString formatYValue(double value, int precision) const;
 
 public Q_SLOTS:
   virtual void disableLegend();
@@ -634,6 +649,8 @@ protected:
 
   HorizHandlesArea *d_bottomHandlesArea;
   VertHandlesArea *d_rightHandlesArea;
+  VertHandlesArea *d_leftHandlesArea;
+  HorizHandlesArea *d_topHandlesArea;
 
   VertBar *d_vBar1;
   VertBar *d_vBar2;
@@ -652,13 +669,10 @@ protected:
   bool d_trackMode;
   int d_selected_channel;
   bool d_cursorsEnabled;
-  bool d_cursorsCentered;
 
   QwtPlotMarker *markerIntersection1;
   QwtPlotMarker *markerIntersection2;
 
-  void setupCursors();
-  void setupReadouts();
   double getHorizontalCursorIntersection(double time);
 
 private:
@@ -677,9 +691,15 @@ private:
   int pixelPosHandleVert1;
   int pixelPosHandleVert2;
 
-  PrefixFormatter *formatter;
+  bool d_isLogaritmicPlot;
+  bool d_isLogaritmicYPlot;
+  QList<double> d_majorTicks;
+  QList<double> d_majorTicksY;
   bool d_cursorReadoutsVisible;
+  PrefixFormatter * d_formatter;
 
+  void setupCursors();
+  void setupReadouts();
   void displayIntersection();
   void setupDisplayPlotDiv(bool isdBgraph);
 
