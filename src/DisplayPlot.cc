@@ -57,6 +57,7 @@
 #include <stdexcept>
 #include <QDebug>
 #include <QIcon>
+#include <QGridLayout>
 
 using namespace adiscope;
 
@@ -423,7 +424,7 @@ PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPl
 	scaleWidget->setStyleSheet("background-color: none;");
 
 	// This helps creating a fixed 5 X 5 grid
-    d_plot->setAxisScale(d_axis, -5.0, 5.0, 1);
+	d_plot->setAxisScale(d_axis, -5.0, 5.0, 1);
 
 	d_ptsPerDiv = 1.0;
 	d_offset = 0.0;
@@ -508,74 +509,73 @@ void PlotAxisConfiguration::setMouseGesturesEnabled(bool en)
  * DisplayPlot class
  */
 
-DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph ,
-             unsigned int xNumDivs, unsigned int yNumDivs)
-  : PrintablePlot(parent), d_nplots(nplots), d_stop(false),
-    d_coloredLabels(false), d_mouseGesturesEnabled(false),
-    d_displayScale(1), d_xAxisNumDiv(1), d_trackMode(false),
-    d_yAxisNumDiv(1)
+DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
+			 unsigned int xNumDivs, unsigned int yNumDivs)
+	: PrintablePlot(parent), d_nplots(nplots), d_stop(false),
+	  d_coloredLabels(false), d_mouseGesturesEnabled(false),
+	  d_displayScale(1), d_xAxisNumDiv(1), d_trackMode(false),
+	  d_cursorsEnabled(false), d_isLogaritmicPlot(false),
+	  d_isLogaritmicYPlot(false),
+	  d_yAxisNumDiv(1)
 {
 
-    d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
-         << QColor(Qt::cyan) << QColor(Qt::magenta)
-         << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
-         << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
-         << QColor(Qt::black);
+	d_CurveColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
+		      << QColor(Qt::cyan) << QColor(Qt::magenta)
+		      << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
+		      << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
+		      << QColor(Qt::black);
 
-    d_printColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::darkGreen)
-         << QColor(Qt::blue) << QColor(Qt::magenta)
-         << QColor(Qt::darkRed);
+	d_printColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::darkGreen)
+		      << QColor(Qt::blue) << QColor(Qt::magenta)
+		      << QColor(Qt::darkRed);
 
-    qRegisterMetaType<QColorList>("QColorList");
-    resize(parent->width(), parent->height());
+	qRegisterMetaType<QColorList>("QColorList");
+	resize(parent->width(), parent->height());
 
-    d_autoscale_state = false;
+	d_autoscale_state = false;
 
-    d_yAxisUnit = "";
-    d_xAxisUnit = "";
+	d_yAxisUnit = "";
+	d_xAxisUnit = "";
 
-    setXaxisNumDiv(xNumDivs);
-    setYaxisNumDiv(yNumDivs);
+	setXaxisNumDiv(xNumDivs);
+	setYaxisNumDiv(yNumDivs);
 
-    d_usingLeftAxisScales = true;
+	d_usingLeftAxisScales = true;
 
-    // Disable polygon clipping
-  #if QWT_VERSION < 0x060000
-    QwtPainter::setDeviceClipping(false);
-  #else
-    QwtPainter::setPolylineSplitting(false);
-  #endif
+	// Disable polygon clipping
+#if QWT_VERSION < 0x060000
+	QwtPainter::setDeviceClipping(false);
+#else
+	QwtPainter::setPolylineSplitting(false);
+#endif
 
-  #if QWT_VERSION < 0x060000
-    // We don't need the cache here
-    canvas()->setPaintAttribute(QwtPlotCanvas::PaintCached, false);
-    canvas()->setPaintAttribute(QwtPlotCanvas::PaintPacked, false);
-  #endif
+#if QWT_VERSION < 0x060000
+	// We don't need the cache here
+	canvas()->setPaintAttribute(QwtPlotCanvas::PaintCached, false);
+	canvas()->setPaintAttribute(QwtPlotCanvas::PaintPacked, false);
+#endif
 
-    QColor default_palette_color = QColor("white");
-    setPaletteColor(default_palette_color);
+	QColor default_palette_color = QColor("white");
+	setPaletteColor(default_palette_color);
 
-    d_panner = new QwtPlotPanner(canvas());
-    d_panner->setAxisEnabled(QwtPlot::yRight, false);
-    d_panner->setMouseButton(Qt::MidButton, Qt::ControlModifier);
+	d_panner = new QwtPlotPanner(canvas());
+	d_panner->setAxisEnabled(QwtPlot::yRight, false);
+	d_panner->setMouseButton(Qt::MidButton, Qt::ControlModifier);
 
-    // emit the position of clicks on widget
-    d_picker = new QwtDblClickPlotPicker(canvas());
+	// emit the position of clicks on widget
+	d_picker = new QwtDblClickPlotPicker(canvas());
 
-  #if QWT_VERSION < 0x060000
-    connect(d_picker, SIGNAL(selected(const QPointF &)),
-        this, SLOT(onPickerPointSelected(const QPointF &)));
-  #else
-    d_picker->setStateMachine(new QwtPickerDblClickPointMachine());
-    connect(d_picker, SIGNAL(selected(const QPointF &)),
-        this, SLOT(onPickerPointSelected6(const QPointF &)));
-  #endif
+#if QWT_VERSION < 0x060000
+	connect(d_picker, SIGNAL(selected(const QPointF &)),
+		this, SLOT(onPickerPointSelected(const QPointF &)));
+#else
+	d_picker->setStateMachine(new QwtPickerDblClickPointMachine());
+	connect(d_picker, SIGNAL(selected(const QPointF &)),
+		this, SLOT(onPickerPointSelected6(const QPointF &)));
+#endif
 
-    // Configure horizontal axis
-    bottomHorizAxisInit();
-
-    // One vertical axis by default
-    setLeftVertAxesCount(1);
+	// Configure horizontal axis
+	bottomHorizAxisInit();
 
   QColor plotColor;
   if (QIcon::themeName() == "scopy-default") {
@@ -583,75 +583,72 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph ,
   } else {
 	  plotColor = QColor("#D3D3D3");
   }
-    setActiveVertAxis(0);
 
-    plotLayout()->setAlignCanvasToScales(true);
+	// One vertical axis by default
+	setLeftVertAxesCount(1);
 
-    this->plotLayout()->setCanvasMargin(0, QwtPlot::yLeft);
-    this->plotLayout()->setCanvasMargin(0, QwtPlot::yRight);
-    this->plotLayout()->setCanvasMargin(0, QwtPlot::xTop);
-    this->plotLayout()->setCanvasMargin(0, QwtPlot::xBottom);
+	setActiveVertAxis(0);
 
-  QPalette palette = scaleItem->palette();
+	plotLayout()->setAlignCanvasToScales(true);
 
-	palette.setBrush(QPalette::Foreground, plotColor);
-	palette.setBrush(QPalette::Text, plotColor);
-	scaleItem->setPalette(palette);
-	scaleItem->setBorderDistance(0);
-	scaleItem->attach(this);
-	scaleItems.push_back(scaleItem);
-	scaleItem->setZ(200);
-  }
-    ((QFrame*) canvas())->setLineWidth(0);
 
-    // Avoid jumping when labels with more/less digits
-    // appear/disappear when scrolling vertically
+	this->plotLayout()->setCanvasMargin(0, QwtPlot::yLeft);
+	this->plotLayout()->setCanvasMargin(0, QwtPlot::yRight);
+	this->plotLayout()->setCanvasMargin(0, QwtPlot::xTop);
+	this->plotLayout()->setCanvasMargin(0, QwtPlot::xBottom);
 
-    QwtLegend* legendDisplay = new QwtLegend(this);
+	((QFrame*) canvas())->setLineWidth(0);
 
-  #if QWT_VERSION < 0x060100
-    legendDisplay->setItemMode(QwtLegend::CheckableItem);
-    insertLegend(legendDisplay);
-    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),
-        this, SLOT(legendEntryChecked(QwtPlotItem *, bool)));
-  #else /* QWT_VERSION < 0x060100 */
-    legendDisplay->setDefaultItemMode(QwtLegendData::Checkable);
-    insertLegend(legendDisplay);
-    connect(legendDisplay, SIGNAL(checked(const QVariant&, bool, int)),
-        this, SLOT(legendEntryChecked(const QVariant&, bool, int)));
-  #endif /* QWT_VERSION < 0x060100 */
+	// Avoid jumping when labels with more/less digits
+	// appear/disappear when scrolling vertically
 
-  setupDisplayPlotDiv(isdBgraph);
+	QwtLegend* legendDisplay = new QwtLegend(this);
 
-  d_symbolCtrl = new SymbolController(this);
+#if QWT_VERSION < 0x060100
+	legendDisplay->setItemMode(QwtLegend::CheckableItem);
+	insertLegend(legendDisplay);
+	connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),
+		this, SLOT(legendEntryChecked(QwtPlotItem *, bool)));
+#else /* QWT_VERSION < 0x060100 */
+	legendDisplay->setDefaultItemMode(QwtLegendData::Checkable);
+	insertLegend(legendDisplay);
+	connect(legendDisplay, SIGNAL(checked(const QVariant&, bool, int)),
+		this, SLOT(legendEntryChecked(const QVariant&, bool, int)));
+#endif /* QWT_VERSION < 0x060100 */
 
-  /* Adjacent areas */
-  d_bottomHandlesArea = new HorizHandlesArea(this->canvas());
-  d_rightHandlesArea = new VertHandlesArea(this->canvas());
+	setupDisplayPlotDiv(isdBgraph);
 
-  d_bottomHandlesArea->setMinimumHeight(50);
-  d_rightHandlesArea->setMinimumWidth(50);
-  d_bottomHandlesArea->setLargestChildWidth(60);
-  d_rightHandlesArea->setLargestChildHeight(60);
-  d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
+	d_symbolCtrl = new SymbolController(this);
 
-  formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
+	/* Adjacent areas */
+	d_bottomHandlesArea = new HorizHandlesArea(this->canvas());
+	d_rightHandlesArea = new VertHandlesArea(this->canvas());
+	d_topHandlesArea = new HorizHandlesArea(this->canvas());
+	d_leftHandlesArea = new VertHandlesArea(this->canvas());
 
-  markerIntersection1 = new QwtPlotMarker();
-  markerIntersection2 = new QwtPlotMarker();
-  markerIntersection1->setSymbol(new QwtSymbol(
-          QwtSymbol::Ellipse, QColor(237, 28, 36),
-          QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
-          QSize(5, 5)));
-  markerIntersection2->setSymbol(new QwtSymbol(
-             QwtSymbol::Ellipse, QColor(237, 28, 36),
-             QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
-             QSize(5, 5)));
+	d_bottomHandlesArea->setMinimumHeight(50);
+	d_rightHandlesArea->setMinimumWidth(50);
+	d_bottomHandlesArea->setLargestChildWidth(60);
+	d_rightHandlesArea->setLargestChildHeight(60);
+	d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
 
-  d_selected_channel = -1;
+	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
 
-  setupCursors();
-  setupReadouts();
+	markerIntersection1 = new QwtPlotMarker();
+	markerIntersection2 = new QwtPlotMarker();
+	markerIntersection1->setSymbol(new QwtSymbol(
+					       QwtSymbol::Ellipse, QColor(237, 28, 36),
+					       QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
+					       QSize(5, 5)));
+	markerIntersection2->setSymbol(new QwtSymbol(
+					       QwtSymbol::Ellipse, QColor(237, 28, 36),
+					       QPen(QColor(255, 255 ,255, 140), 2, Qt::SolidLine),
+					       QSize(5, 5)));
+
+	d_selected_channel = -1;
+
+	setupCursors();
+	setupReadouts();
 }
 
 
@@ -689,8 +686,8 @@ void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph) {
 
 DisplayPlot::~DisplayPlot()
 {
-    markerIntersection1->detach();
-    markerIntersection2->detach();
+	markerIntersection1->detach();
+	markerIntersection2->detach();
     // d_zoomer and d_panner deleted when parent deleted
     // Since some curves may not be attached to the plot they won't get deleted
     for (auto it = d_plot_curve.begin(); it != d_plot_curve.end() ; ++it) {
@@ -708,504 +705,553 @@ DisplayPlot::~DisplayPlot()
         delete *it;
     }
 
-    delete d_grid;
-    delete markerIntersection1;
-    delete markerIntersection2;
-    delete horizAxis;
+	delete markerIntersection1;
+	delete markerIntersection2;
+	delete horizAxis;
 }
+
+QWidget* DisplayPlot::getPlotwithElements()
+{
+	QWidget* widget = new QWidget();
+	QGridLayout *gridplot = new QGridLayout();
+
+	gridplot->addWidget(topHandlesArea(), 0, 0, 1, 3);
+	gridplot->addWidget(leftHandlesArea(), 0, 0, 3, 1);
+	gridplot->addWidget(this, 1, 1, 1, 1);
+	gridplot->addWidget(rightHandlesArea(), 0, 2, 3, 1);
+	gridplot->addWidget(bottomHandlesArea(), 2, 0, 1, 3);
+
+	gridplot->setVerticalSpacing(0);
+	gridplot->setHorizontalSpacing(0);
+	gridplot->setContentsMargins(0, 0, 0, 0);
+	widget->setLayout(gridplot);
+
+	return widget;
+}
+
 
 void DisplayPlot::setupCursors() {
 
-    d_vBar1 = new VertBar(this, true);
-    d_vBar2 = new VertBar(this, true);
-    d_hBar1 = new HorizBar(this, true);
-    d_hBar2 = new HorizBar(this, true);
+	d_vBar1 = new VertBar(this, true);
+	d_vBar2 = new VertBar(this, true);
+	d_hBar1 = new HorizBar(this, true);
+	d_hBar2 = new HorizBar(this, true);
 
-    d_vCursorHandle1 = new PlotLineHandleV(
-               QPixmap(":/icons/v_cursor_handle.svg"),
-               d_rightHandlesArea);
-    d_vCursorHandle2 = new PlotLineHandleV(
-                QPixmap(":/icons/v_cursor_handle.svg"),
-                d_rightHandlesArea);
-    d_hCursorHandle1 = new PlotLineHandleH(
-                QPixmap(":/icons/h_cursor_handle.svg"),
-                d_bottomHandlesArea);
-    d_hCursorHandle2 = new PlotLineHandleH(
-                QPixmap(":/icons/h_cursor_handle.svg"),
-                d_bottomHandlesArea);
+	d_vCursorHandle1 = new PlotLineHandleV(
+				QPixmap(":/icons/v_cursor_handle.svg"),
+				d_rightHandlesArea);
+	d_vCursorHandle2 = new PlotLineHandleV(
+				QPixmap(":/icons/v_cursor_handle.svg"),
+				d_rightHandlesArea);
+	d_hCursorHandle1 = new PlotLineHandleH(
+				QPixmap(":/icons/h_cursor_handle.svg"),
+				d_bottomHandlesArea);
+	d_hCursorHandle2 = new PlotLineHandleH(
+				QPixmap(":/icons/h_cursor_handle.svg"),
+				d_bottomHandlesArea);
 
-    d_vertCursorsHandleEnabled = true;
+	d_vertCursorsHandleEnabled = true;
 
-    d_symbolCtrl->attachSymbol(d_vBar1);
-    d_symbolCtrl->attachSymbol(d_vBar2);
-    d_symbolCtrl->attachSymbol(d_hBar1);
-    d_symbolCtrl->attachSymbol(d_hBar2);
+	d_symbolCtrl->attachSymbol(d_vBar1);
+	d_symbolCtrl->attachSymbol(d_vBar2);
+	d_symbolCtrl->attachSymbol(d_hBar1);
+	d_symbolCtrl->attachSymbol(d_hBar2);
 
-    QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
-    d_hBar1->setPen(cursorsLinePen);
-    d_hBar2->setPen(cursorsLinePen);
-    d_vBar1->setPen(cursorsLinePen);
-    d_vBar2->setPen(cursorsLinePen);
+	QPen cursorsLinePen = QPen(QColor(155, 155, 155), 1, Qt::DashLine);
+	d_hBar1->setPen(cursorsLinePen);
+	d_hBar2->setPen(cursorsLinePen);
+	d_vBar1->setPen(cursorsLinePen);
+	d_vBar2->setPen(cursorsLinePen);
 
-    d_vCursorHandle1->setPen(cursorsLinePen);
-    d_vCursorHandle2->setPen(cursorsLinePen);
-    d_hCursorHandle1->setPen(cursorsLinePen);
-    d_hCursorHandle2->setPen(cursorsLinePen);
+	d_vCursorHandle1->setPen(cursorsLinePen);
+	d_vCursorHandle2->setPen(cursorsLinePen);
+	d_hCursorHandle1->setPen(cursorsLinePen);
+	d_hCursorHandle2->setPen(cursorsLinePen);
 
-    d_vBar1->setVisible(false);
-    d_vBar2->setVisible(false);
-    d_hBar1->setVisible(false);
-    d_hBar2->setVisible(false);
+	d_vBar1->setVisible(false);
+	d_vBar2->setVisible(false);
+	d_hBar1->setVisible(false);
+	d_hBar2->setVisible(false);
 
-    d_vCursorHandle1->hide();
-    d_vCursorHandle2->hide();
-    d_hCursorHandle1->hide();
-    d_hCursorHandle2->hide();
+	d_vCursorHandle1->hide();
+	d_vCursorHandle2->hide();
+	d_hCursorHandle1->hide();
+	d_hCursorHandle2->hide();
 
-    vertCursorsLocked = false;
-    horizCursorsLocked = false;
+	vertCursorsLocked = false;
+	horizCursorsLocked = false;
 
-    /* When a handle position changes the bar follows */
-    connect(d_vCursorHandle1, SIGNAL(positionChanged(int)),
-        SLOT(onVertCursorHandle1Changed(int)));
-    connect(d_vCursorHandle2, SIGNAL(positionChanged(int)),
-        SLOT(onVertCursorHandle2Changed(int)));
-    connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),
-        SLOT(onHorizCursorHandle1Changed(int)));
-    connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),
-        SLOT(onHorizCursorHandle2Changed(int)));
+	/* When a handle position changes the bar follows */
+	connect(d_vCursorHandle1, SIGNAL(positionChanged(int)),
+		SLOT(onVertCursorHandle1Changed(int)));
+	connect(d_vCursorHandle2, SIGNAL(positionChanged(int)),
+		SLOT(onVertCursorHandle2Changed(int)));
+	connect(d_hCursorHandle1, SIGNAL(positionChanged(int)),
+		SLOT(onHorizCursorHandle1Changed(int)));
+	connect(d_hCursorHandle2, SIGNAL(positionChanged(int)),
+		SLOT(onHorizCursorHandle2Changed(int)));
 
-    /* When bar position changes due to plot resizes update the handle */
-    connect(d_hBar1, SIGNAL(pixelPositionChanged(int)),
-            SLOT(onHbar1PixelPosChanged(int)));
-    connect(d_hBar2, SIGNAL(pixelPositionChanged(int)),
-            SLOT(onHbar2PixelPosChanged(int)));
-    connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
-            SLOT(onVbar1PixelPosChanged(int)));
-    connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
-            SLOT(onVbar2PixelPosChanged(int)));
+	/* When bar position changes due to plot resizes update the handle */
+	connect(d_hBar1, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onHbar1PixelPosChanged(int)));
+	connect(d_hBar2, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onHbar2PixelPosChanged(int)));
+	connect(d_vBar1, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onVbar1PixelPosChanged(int)));
+	connect(d_vBar2, SIGNAL(pixelPositionChanged(int)),
+		SLOT(onVbar2PixelPosChanged(int)));
 }
 
 void DisplayPlot::setupReadouts() {
-    d_cursorReadoutsVisible = false;
+	d_cursorReadoutsVisible = false;
 
-    d_cursorReadouts = new CursorReadouts(this);
-    d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
-    d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
-    d_cursorReadouts->setTimeReadoutVisible(false);
-    d_cursorReadouts->setVoltageReadoutVisible(false);
+	d_cursorReadouts = new CursorReadouts(this);
+	d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
+	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
+	d_cursorReadouts->setTimeReadoutVisible(false);
+	d_cursorReadouts->setVoltageReadoutVisible(false);
 
-    /* Update Cursor Readouts */
-    connect(d_hBar1, SIGNAL(positionChanged(double)),
-            SLOT(onHCursor1Moved(double)));
-    connect(d_hBar2, SIGNAL(positionChanged(double)),
-            SLOT(onHCursor2Moved(double)));
-    connect(d_vBar1, SIGNAL(positionChanged(double)),
-            SLOT(onVCursor1Moved(double)));
-    connect(d_vBar2, SIGNAL(positionChanged(double)),
-            SLOT(onVCursor2Moved(double)));
+	/* Update Cursor Readouts */
+	connect(d_hBar1, SIGNAL(positionChanged(double)),
+		SLOT(onHCursor1Moved(double)));
+	connect(d_hBar2, SIGNAL(positionChanged(double)),
+		SLOT(onHCursor2Moved(double)));
+	connect(d_vBar1, SIGNAL(positionChanged(double)),
+		SLOT(onVCursor1Moved(double)));
+	connect(d_vBar2, SIGNAL(positionChanged(double)),
+		SLOT(onVCursor2Moved(double)));
 }
 
 void DisplayPlot::onVertCursorHandle1Changed(int value)
 {
-    if (vertCursorsLocked) {
-        int position2 = value - (pixelPosHandleVert1 - pixelPosHandleVert2);
-        pixelPosHandleVert2 = position2;
-        d_hBar2->setPixelPosition(position2);
-    }
-    pixelPosHandleVert1 = value;
+	if (vertCursorsLocked) {
+		int position2 = value - (pixelPosHandleVert1 - pixelPosHandleVert2);
+		pixelPosHandleVert2 = position2;
+		d_hBar2->setPixelPosition(position2);
+	}
+	pixelPosHandleVert1 = value;
 
-    d_hBar1->setPixelPosition(value);
+	d_hBar1->setPixelPosition(value);
 }
 
 void DisplayPlot::onVertCursorHandle2Changed(int value)
 {
-    if (vertCursorsLocked) {
-        int position1 = value + (pixelPosHandleVert1 - pixelPosHandleVert2);
-        pixelPosHandleVert1 = position1;
-        d_hBar1->setPixelPosition(position1);
-    }
-    pixelPosHandleVert2 = value;
-    d_hBar2->setPixelPosition(value);
+	if (vertCursorsLocked) {
+		int position1 = value + (pixelPosHandleVert1 - pixelPosHandleVert2);
+		pixelPosHandleVert1 = position1;
+		d_hBar1->setPixelPosition(position1);
+	}
+	pixelPosHandleVert2 = value;
+	d_hBar2->setPixelPosition(value);
 }
 
 
 void DisplayPlot::onHorizCursorHandle1Changed(int value)
 {
-    if (horizCursorsLocked) {
-        int position2 = value - (pixelPosHandleHoriz1 - pixelPosHandleHoriz2);
-        pixelPosHandleHoriz2 = position2;
-        d_vBar2->setPixelPosition(position2);
-    }
-    pixelPosHandleHoriz1 = value;
-    d_vBar1->setPixelPosition(value);
+	if (horizCursorsLocked) {
+		int position2 = value - (pixelPosHandleHoriz1 - pixelPosHandleHoriz2);
+		pixelPosHandleHoriz2 = position2;
+		d_vBar2->setPixelPosition(position2);
+	}
+	pixelPosHandleHoriz1 = value;
+	d_vBar1->setPixelPosition(value);
 }
 
 void DisplayPlot::onHorizCursorHandle2Changed(int value)
 {
-    if (horizCursorsLocked) {
-        int position1 = value + (pixelPosHandleHoriz1 - pixelPosHandleHoriz2);
-        pixelPosHandleHoriz1 = position1;
-        d_vBar1->setPixelPosition(position1);
-    }
-    pixelPosHandleHoriz2 = value;
-    d_vBar2->setPixelPosition(value);
+	if (horizCursorsLocked) {
+		int position1 = value + (pixelPosHandleHoriz1 - pixelPosHandleHoriz2);
+		pixelPosHandleHoriz1 = position1;
+		d_vBar1->setPixelPosition(position1);
+	}
+	pixelPosHandleHoriz2 = value;
+	d_vBar2->setPixelPosition(value);
 }
 
 VertBar* DisplayPlot::vBar1()
 {
-    return d_vBar1;
+	return d_vBar1;
 }
 
 VertBar* DisplayPlot::vBar2()
 {
-    return d_vBar2;
+	return d_vBar2;
 }
 
 HorizHandlesArea* DisplayPlot::bottomHandlesArea()
 {
-    return d_bottomHandlesArea;
+	return d_bottomHandlesArea;
 }
 
 QWidget * DisplayPlot::rightHandlesArea()
 {
-    return d_rightHandlesArea;
+	return d_rightHandlesArea;
+}
+
+QWidget * DisplayPlot::leftHandlesArea()
+{
+	return d_leftHandlesArea;
+}
+
+QWidget * DisplayPlot::topHandlesArea()
+{
+	return d_topHandlesArea;
+}
+
+QString DisplayPlot::formatXValue(double value, int precision) const
+{
+	return d_formatter->format(value, d_xAxisUnit, precision);
+}
+
+QString DisplayPlot::formatYValue(double value, int precision) const
+{
+	return d_formatter->format(value, d_yAxisUnit, precision);
 }
 
 void DisplayPlot::onHbar1PixelPosChanged(int pos)
 {
-    d_vCursorHandle1->setPositionSilenty(pos);
+	d_vCursorHandle1->setPositionSilenty(pos);
 }
 
 void DisplayPlot::onHbar2PixelPosChanged(int pos)
 {
-    d_vCursorHandle2->setPositionSilenty(pos);
+	d_vCursorHandle2->setPositionSilenty(pos);
 }
 
 void DisplayPlot::onVbar1PixelPosChanged(int pos)
 {
-    d_hCursorHandle1->setPositionSilenty(pos);
-    displayIntersection();
+	d_hCursorHandle1->setPositionSilenty(pos);
+	displayIntersection();
 }
 
 void DisplayPlot::onVbar2PixelPosChanged(int pos)
 {
-    d_hCursorHandle2->setPositionSilenty(pos);
-    displayIntersection();
+	d_hCursorHandle2->setPositionSilenty(pos);
+	displayIntersection();
 }
 
 struct cursorReadoutsText DisplayPlot::allCursorReadouts() const
 {
-    return d_cursorReadoutsText;
+	return d_cursorReadoutsText;
 }
-
 
 void DisplayPlot::onVCursor1Moved(double value)
 {
-    QString text;
+	QString text;
 
-    text = formatter->format(value, "", 3);
-    d_cursorReadouts->setTimeCursor1Text(text);
-    d_cursorReadoutsText.t1 = text;
+	text = d_formatter->format(value, "", 3);
+	d_cursorReadouts->setTimeCursor1Text(text);
+	d_cursorReadoutsText.t1 = text;
 
-    double diff = value - d_vBar2->plotCoord().y();
-    text = formatter->format(diff, "", 3);
-    d_cursorReadouts->setTimeDeltaText(text);
-    d_cursorReadoutsText.tDelta = text;
+	double diff = value - d_vBar2->plotCoord().y();
+	text = d_formatter->format(diff, "", 3);
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.tDelta = text;
 
-    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void DisplayPlot::onVCursor2Moved(double value)
 {
-    QString text;
+	QString text;
 
-    text = formatter->format(value, "", 3);
-    d_cursorReadouts->setTimeCursor2Text(text);
-    d_cursorReadoutsText.t2 = text;
+	text = d_formatter->format(value, "", 3);
+	d_cursorReadouts->setTimeCursor2Text(text);
+	d_cursorReadoutsText.t2 = text;
 
-    double diff = d_vBar1->plotCoord().y() - value;
-    text = formatter->format(diff, "", 3);
-    d_cursorReadouts->setTimeDeltaText(text);
-    d_cursorReadoutsText.tDelta = text;
+	double diff = d_vBar1->plotCoord().y() - value;
+	text = d_formatter->format(diff, "", 3);
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.tDelta = text;
 
-    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 
 void DisplayPlot::onHCursor1Moved(double value)
 {
-    QString text;
-    bool error = false;
+	QString text;
+	bool error = false;
 
-    value *= d_displayScale;
-    text = formatter->format(value, "", 3);
-    d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
-    d_cursorReadoutsText.v1 = error ? "-" : text;
+	value *= d_displayScale;
+	text = d_formatter->format(value, "", 3);
+	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
+	d_cursorReadoutsText.v1 = error ? "-" : text;
 
-    double valueCursor2 = d_hBar2->plotCoord().x();
+	double valueCursor2 = d_hBar2->plotCoord().x();
 
-    double diff = value - (valueCursor2 * d_displayScale) ;
-    text = formatter->format(diff, "", 3);
-    d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
-    d_cursorReadoutsText.vDelta = error ? "-" : text;
+	double diff = value - (valueCursor2 * d_displayScale) ;
+	text = d_formatter->format(diff, "", 3);
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.vDelta = error ? "-" : text;
 
-    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void DisplayPlot::onHCursor2Moved(double value)
 {
-    QString text;
-    bool error = false;
+	QString text;
+	bool error = false;
 
-    value *= d_displayScale;
-    text = formatter->format(value, "", 3);
-    d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
-    d_cursorReadoutsText.v2 = error ? "-" : text;
+	value *= d_displayScale;
+	text = d_formatter->format(value, "", 3);
+	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
+	d_cursorReadoutsText.v2 = error ? "-" : text;
 
-    double valueCursor1 = d_hBar1->plotCoord().x();
+	double valueCursor1 = d_hBar1->plotCoord().x();
 
-    double diff = (valueCursor1 * d_displayScale) - value;
-    text = formatter->format(diff, "", 3);
-    d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
-    d_cursorReadoutsText.vDelta = error ? "-" : text;
+	double diff = (valueCursor1 * d_displayScale) - value;
+	text = d_formatter->format(diff, "", 3);
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.vDelta = error ? "-" : text;
 
-    Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void DisplayPlot::setVertCursorsEnabled(bool en)
 {
-    if (d_vertCursorsEnabled != en) {
-        d_vertCursorsEnabled = en;
-        d_vBar1->setVisible(en);
-        d_vBar2->setVisible(en);
-        d_hCursorHandle1->setVisible(en);
-        d_hCursorHandle2->setVisible(en);
-        d_cursorReadouts->setTimeReadoutVisible(en &&
-            d_cursorReadoutsVisible);
-    }
+	if (d_vertCursorsEnabled != en) {
+		d_vertCursorsEnabled = en;
+		d_vBar1->setVisible(en);
+		d_vBar2->setVisible(en);
+		d_hCursorHandle1->setVisible(en);
+		d_hCursorHandle2->setVisible(en);
+		d_cursorReadouts->setTimeReadoutVisible(en &&
+							d_cursorReadoutsVisible);
+	}
 }
 
 void DisplayPlot::toggleCursors(bool en)
 {
-    if (d_cursorsEnabled != en) {
-        if (!d_cursorsCentered) {
-            d_cursorsCentered=true;
-            d_vBar1->setPixelPosition(canvas()->width()/2);
-            d_vBar2->setPixelPosition(canvas()->width()/2);
-        }
+	if (d_cursorsEnabled != en) {
+		d_cursorsEnabled = en;
+		d_vBar1->setVisible(en);
+		d_vBar2->setVisible(en);
 
-        d_cursorsEnabled = en;
-        d_vBar1->setVisible(en);
-        d_vBar2->setVisible(en);
+		if(d_vertCursorsHandleEnabled)
+		{            d_hCursorHandle1->setVisible(en);
+			d_hCursorHandle2->setVisible(en);
+		}
 
-        if(d_vertCursorsHandleEnabled)
-        {
-            d_hCursorHandle1->setVisible(en);
-            d_hCursorHandle2->setVisible(en);
-        }
+		d_cursorReadouts->setTimeReadoutVisible(en);
+		d_cursorReadouts->setVoltageReadoutVisible(en);
 
-        d_cursorReadouts->setTimeReadoutVisible(en);
-        d_cursorReadouts->setVoltageReadoutVisible(en);
+		if (en) {
+			onVCursor1Moved(d_vBar1->plotCoord().x());
+			onVCursor2Moved(d_vBar2->plotCoord().x());
+		} else {
+			markerIntersection1->detach();
+			markerIntersection2->detach();
+			replot();
+		}
+	}
+}
 
-        if (en) {
-            onVCursor1Moved(d_vBar1->plotCoord().x());
-            onVCursor2Moved(d_vBar2->plotCoord().x());
-        } else {
-            markerIntersection1->detach();
-            markerIntersection2->detach();
-            replot();
-        }
-    }
+bool DisplayPlot::isLogaritmicPlot() const
+{
+	return d_isLogaritmicPlot;
+}
+
+void DisplayPlot::setPlotLogaritmic(bool value)
+{
+	d_isLogaritmicPlot = value;
+}
+
+bool DisplayPlot::isLogaritmicYPlot() const
+{
+	return d_isLogaritmicYPlot;
+}
+
+void DisplayPlot::setPlotYLogaritmic(bool value)
+{
+	d_isLogaritmicYPlot = value;
 }
 
 void DisplayPlot::setVertCursorsHandleEnabled(bool en)
 {
-    d_vertCursorsHandleEnabled = en;
+	d_vertCursorsHandleEnabled = en;
 }
 
 bool DisplayPlot::vertCursorsEnabled()
 {
-    return d_vertCursorsEnabled;
+	return d_vertCursorsEnabled;
 }
 
 void DisplayPlot::setHorizCursorsEnabled(bool en)
 {
-    if (d_horizCursorsEnabled != en) {
-        d_horizCursorsEnabled = en;
-        d_hBar1->setVisible(en);
-        d_hBar2->setVisible(en);
-        d_vCursorHandle1->setVisible(en);
-        d_vCursorHandle2->setVisible(en);
-        d_cursorReadouts->setVoltageReadoutVisible(en &&
-            d_cursorReadoutsVisible);
-    }
+	if (d_horizCursorsEnabled != en) {
+		d_horizCursorsEnabled = en;
+		d_hBar1->setVisible(en);
+		d_hBar2->setVisible(en);
+		d_vCursorHandle1->setVisible(en);
+		d_vCursorHandle2->setVisible(en);
+		d_cursorReadouts->setVoltageReadoutVisible(en &&
+							   d_cursorReadoutsVisible);
+	}
 }
 
 bool DisplayPlot::horizCursorsEnabled()
 {
-    return d_horizCursorsEnabled;
+	return d_horizCursorsEnabled;
 }
 
 void DisplayPlot::setCursorReadoutsVisible(bool en)
 {
-    if (d_cursorReadoutsVisible != en) {
-        d_cursorReadoutsVisible = en;
-        d_cursorReadouts->setVoltageReadoutVisible(en &&
-            d_vertCursorsEnabled );
-        d_cursorReadouts->setTimeReadoutVisible(en &&
-            d_horizCursorsEnabled );
-    }
+	if (d_cursorReadoutsVisible != en) {
+		d_cursorReadoutsVisible = en;
+		d_cursorReadouts->setVoltageReadoutVisible(en &&
+							   d_vertCursorsEnabled );
+		d_cursorReadouts->setTimeReadoutVisible(en &&
+							d_horizCursorsEnabled );
+	}
 }
 
 void DisplayPlot::setHorizCursorsLocked(bool value)
 {
-    horizCursorsLocked = value;
+	horizCursorsLocked = value;
 }
 
 void DisplayPlot::setVertCursorsLocked(bool value)
 {
-    vertCursorsLocked = value;
+	vertCursorsLocked = value;
 }
 
 void DisplayPlot::setCursorReadoutsTransparency(int value)
 {
-    d_cursorReadouts->setTransparency(value);
+	d_cursorReadouts->setTransparency(value);
 }
 
 void DisplayPlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position)
 {
-    d_cursorReadouts->moveToPosition(position);
+	d_cursorReadouts->moveToPosition(position);
 }
 
 void DisplayPlot::trackModeEnabled(bool enabled)
 {
-    d_trackMode = !enabled;
-    if (d_horizCursorsEnabled) {
-        d_hBar1->setVisible(enabled);
-        d_hBar2->setVisible(enabled);
-        d_vCursorHandle1->setVisible(enabled);
-        d_vCursorHandle2->setVisible(enabled);
-    }
-    if (d_trackMode) {
-        onVCursor1Moved(d_vBar1->plotCoord().x());
-        onVCursor2Moved(d_vBar2->plotCoord().x());
-        displayIntersection();
-    } else {
-        onHCursor1Moved(d_hBar1->plotCoord().y());
-        onHCursor2Moved(d_hBar2->plotCoord().y());
-        markerIntersection1->detach();
-        markerIntersection2->detach();
-        replot();
-    }
+	d_trackMode = !enabled;
+	if (d_horizCursorsEnabled) {
+		d_hBar1->setVisible(enabled);
+		d_hBar2->setVisible(enabled);
+		d_vCursorHandle1->setVisible(enabled);
+		d_vCursorHandle2->setVisible(enabled);
+	}
+	if (d_trackMode) {
+		onVCursor1Moved(d_vBar1->plotCoord().x());
+		onVCursor2Moved(d_vBar2->plotCoord().x());
+		displayIntersection();
+	} else {
+		onHCursor1Moved(d_hBar1->plotCoord().y());
+		onHCursor2Moved(d_hBar2->plotCoord().y());
+		markerIntersection1->detach();
+		markerIntersection2->detach();
+		replot();
+	}
 }
-
 
 void DisplayPlot::displayIntersection()
 {
-    if (!d_trackMode) {
-        return;
-    }
+	if (!d_trackMode) {
+		return;
+	}
 
-    double intersectionCursor1, intersectionCursor2;
-    bool attachmk1 = true;
-    bool attachmk2 = true;
+	double intersectionCursor1, intersectionCursor2;
+	bool attachmk1 = true;
+	bool attachmk2 = true;
 
 
-    intersectionCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
-    intersectionCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
+	intersectionCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
+	intersectionCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
 
-    if (intersectionCursor1 == -1000000){
-        attachmk1 = false;
-    }
-    if (intersectionCursor2 == -1000000) {
-        attachmk2 = false;
-    }
+	if (intersectionCursor1 == -1000000){
+		attachmk1 = false;
+	}
+	if (intersectionCursor2 == -1000000) {
+		attachmk2 = false;
+	}
 
-    markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
-    markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+	markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+	markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
 
-    markerIntersection1->setValue(d_vBar1->plotCoord().x(), intersectionCursor1);
-    markerIntersection2->setValue(d_vBar2->plotCoord().x(), intersectionCursor2);
+	markerIntersection1->setValue(d_vBar1->plotCoord().x(), intersectionCursor1);
+	markerIntersection2->setValue(d_vBar2->plotCoord().x(), intersectionCursor2);
 
-    if (attachmk1) {
-        markerIntersection1->attach(this);
-    } else {
-        markerIntersection1->detach();
-    }
-    if (attachmk2) {
-        markerIntersection2->attach(this);
-    } else {
-        markerIntersection2->detach();
-    }
+	if (attachmk1) {
+		markerIntersection1->attach(this);
+	} else {
+		markerIntersection1->detach();
+	}
+	if (attachmk2) {
+		markerIntersection2->attach(this);
+	} else {
+		markerIntersection2->detach();
+	}
 
-    replot();
+	replot();
 }
 
 double DisplayPlot::getHorizontalCursorIntersection(double time)
 {
-    int n = Curve(d_selected_channel)->data()->size();
+	int n = Curve(d_selected_channel)->data()->size();
 
-    if (n == 0) {
-        return -1;
-    } else {
-        double leftTime, rightTime, leftCustom, rightCustom;
-        int rightIndex = -1;
-        int leftIndex = -1;
+	if (n == 0) {
+		return -1;
+	} else {
+		double leftTime, rightTime, leftCustom, rightCustom;
+		int rightIndex = -1;
+		int leftIndex = -1;
 
-        int left = 0;
-        int right = n - 1;
+		int left = 0;
+		int right = n - 1;
 
-        if (Curve(d_selected_channel)->data()->sample(right).x() < time ||
-                Curve(d_selected_channel)->data()->sample(left).x() > time) {
-            return -1;
-        }
+		if (Curve(d_selected_channel)->data()->sample(right).x() < time ||
+				Curve(d_selected_channel)->data()->sample(left).x() > time) {
+			return -1;
+		}
 
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            double xData = Curve(d_selected_channel)->data()->sample(mid).x();
-            if (xData == time) {
-                if (mid > 0) {
-                    leftIndex = mid - 1;
-                    rightIndex = mid;
-                }
-                break;
-            } else if (xData < time) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
-        }
+		while (left <= right) {
+			int mid = (left + right) / 2;
+			double xData = Curve(d_selected_channel)->data()->sample(mid).x();
+			if (xData == time) {
+				if (mid > 0) {
+					leftIndex = mid - 1;
+					rightIndex = mid;
+				}
+				break;
+			} else if (xData < time) {
+				left = mid + 1;
+			} else {
+				right = mid - 1;
+			}
+		}
 
-        if ((leftIndex == -1 || rightIndex == -1) && left > 0) {
-            leftIndex = left - 1;
-            rightIndex = left;
-        }
+		if ((leftIndex == -1 || rightIndex == -1) && left > 0) {
+			leftIndex = left - 1;
+			rightIndex = left;
+		}
 
-        if (leftIndex == -1 || rightIndex == -1) {
-            return -1;
-        }
+		if (leftIndex == -1 || rightIndex == -1) {
+			return -1;
+		}
 
-        leftTime = Curve(d_selected_channel)->data()->sample(leftIndex).x();
-        rightTime = Curve(d_selected_channel)->data()->sample(rightIndex).x();
+		leftTime = Curve(d_selected_channel)->data()->sample(leftIndex).x();
+		rightTime = Curve(d_selected_channel)->data()->sample(rightIndex).x();
 
-        leftCustom = Curve(d_selected_channel)->data()->sample(leftIndex).y();
-        rightCustom = Curve(d_selected_channel)->data()->sample(rightIndex).y();
+		leftCustom = Curve(d_selected_channel)->data()->sample(leftIndex).y();
+		rightCustom = Curve(d_selected_channel)->data()->sample(rightIndex).y();
 
-        double value = (rightCustom - leftCustom) / (rightTime - leftTime) *
-                (time - leftTime) + leftCustom;
+		double value = (rightCustom - leftCustom) / (rightTime - leftTime) *
+				(time - leftTime) + leftCustom;
 
-        return value;
-    }
+		return value;
+	}
 }
 
 void DisplayPlot::repositionCursors()
 {
-    onVCursor1Moved(d_vBar1->plotCoord().x());
-    onVCursor2Moved(d_vBar2->plotCoord().x());
-    displayIntersection();
+	onVCursor1Moved(d_vBar1->plotCoord().x());
+	onVCursor2Moved(d_vBar2->plotCoord().x());
+	displayIntersection();
 }
-
 
 void
 DisplayPlot::disableLegend()
@@ -1710,7 +1756,7 @@ void DisplayPlot::setDisplayScale(double value)
 	osd = static_cast<OscScaleDraw*>(axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->scaleDraw());
 	osd->setDisplayScale(d_displayScale);
 	osd->invalidateCache();
-    axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->update();
+	axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->update();
 }
 
 void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
@@ -2052,13 +2098,13 @@ void DisplayPlot::configureAxis(int axisPos, int axisIdx)
 {
 	QwtAxisId axis(axisPos, axisIdx);
 
-    // Use a custom Scale Engine to keep the grid fixed
-    OscScaleEngine *scaleEngine = new OscScaleEngine();
-    this->setAxisScaleEngine(axis, (QwtScaleEngine *)scaleEngine);
+	// Use a custom Scale Engine to keep the grid fixed
+	OscScaleEngine *scaleEngine = new OscScaleEngine();
+	this->setAxisScaleEngine(axis, (QwtScaleEngine *)scaleEngine);
 
-    // Use a custom Scale Draw to control the drawing of axis values
-    OscScaleDraw *scaleDraw = new OscScaleDraw();
-    this->setAxisScaleDraw(axis, scaleDraw);
+	// Use a custom Scale Draw to control the drawing of axis values
+	OscScaleDraw *scaleDraw = new OscScaleDraw();
+	this->setAxisScaleDraw(axis, scaleDraw);
 }
 
 void DisplayPlot::resizeEvent(QResizeEvent *event)
@@ -2072,7 +2118,7 @@ void DisplayPlot::bottomHorizAxisInit()
 {
 	horizAxis = new PlotAxisConfiguration(QwtPlot::xBottom, 0, this);
 	horizAxis->setMouseGesturesEnabled(d_mouseGesturesEnabled);
-    configureAxis(QwtPlot::xBottom, 0);
+	configureAxis(QwtPlot::xBottom, 0);
 	connect(axisWidget(horizAxis->axis()), SIGNAL(scaleDivChanged()),
 		      this, SLOT(_onXbottomAxisWidgetScaleDivChanged()));
 }
@@ -2095,6 +2141,26 @@ static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv)
 		majorTicks.erase(majorTicks.end() - 1);
 	}
 	return QwtScaleDiv(lowerBound, upperBound, minorTicks, mediumTicks, majorTicks);
+}
+
+void DisplayPlot::setXaxisMajorTicksPos(QList<double> ticks)
+{
+    d_majorTicks = ticks;
+}
+
+QList<double> DisplayPlot::getXaxisMajorTicksPos() const
+{
+    return d_majorTicks;
+}
+
+void DisplayPlot::setYaxisMajorTicksPos(QList<double> ticks)
+{
+    d_majorTicksY = ticks;
+}
+
+QList<double> DisplayPlot::getYaxisMajorTicksPos() const
+{
+    return d_majorTicksY;
 }
 
 unsigned int DisplayPlot::xAxisNumDiv() const

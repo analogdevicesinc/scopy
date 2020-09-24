@@ -66,19 +66,20 @@ namespace adiscope {
 		QString voltageCursor2Text();
 		void setVoltageDeltaText(const QString &);
 		QString voltageDeltaText();
-        void setTimeDeltaVisible(bool);
-        void setFrequencyDeltaVisible(bool);
-        void setTimeCursor1LabelText(const QString &);
-        QString timeCursor1LabelText();
-        void setTimeCursor2LabelText(const QString &);
-        QString timeCursor2LabelText();
-        void setVoltageCursor1LabelText(const QString &);
-        QString voltageCursor1LabelText();
-        void setVoltageCursor2LabelText(const QString &);
-        QString voltageCursor2LabelText();
-        void setDeltaVoltageLabelText(const QString &);
-        QString deltaVoltageLabelText();
-        void setAxis(QwtAxisId hAxis,QwtAxisId vAxis);
+		void setTimeDeltaVisible(bool);
+		void setFrequencyDeltaVisible(bool);
+		void setTimeCursor1LabelText(const QString &);
+		QString timeCursor1LabelText();
+		void setTimeCursor2LabelText(const QString &);
+		QString timeCursor2LabelText();
+		void setTimeDeltaLabelText(const QString &text);
+		void setVoltageCursor1LabelText(const QString &);
+		QString voltageCursor1LabelText();
+		void setVoltageCursor2LabelText(const QString &);
+		QString voltageCursor2LabelText();
+		void setDeltaVoltageLabelText(const QString &);
+		QString deltaVoltageLabelText();
+		void setAxis(QwtAxisId hAxis,QwtAxisId vAxis);
 		virtual bool eventFilter(QObject *, QEvent *);
 
 		void setTransparency(int value);
@@ -94,7 +95,7 @@ namespace adiscope {
 		Ui::CursorReadouts *ui;
 		bool d_voltage_rd_visible;
 		bool d_time_rd_visible;
-        bool freq_delta_visible;
+		bool freq_delta_visible;
 		QPoint d_topLeft;
 		void moveTopLeft(bool resize = false);
 		void moveTopRight(bool resize = false);
@@ -103,7 +104,7 @@ namespace adiscope {
 		CustomPlotPositionButton::ReadoutsPosition currentPosition;
 		CustomAnimation *anim, *anim2;
 		QRect lastTimeRect, lastVoltageRect;
-        QwtAxisId hAxis,vAxis;
+		QwtAxisId hAxis,vAxis;
 	};
 }
 

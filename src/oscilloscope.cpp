@@ -107,7 +107,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui(new Ui::Oscilloscope),
 	trigger_settings(m_m2k_analogin),
 	measure_settings(nullptr),
-	plot(this, 16, 10),
+	plot(this, false, 16, 10),
 	fft_plot(nb_channels, this),
 	xy_plot(nb_channels / 2, this),
 	hist_plot(nb_channels, this),
@@ -1825,11 +1825,11 @@ void Oscilloscope::cursor_panel_init()
 	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 
 	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
-        &plot, SLOT(setVertCursorsEnabled(bool)));
+		&plot, SLOT(setVertCursorsEnabled(bool)));
 	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
-        &plot, SLOT(setHorizCursorsEnabled(bool)));
+		&plot, SLOT(setHorizCursorsEnabled(bool)));
 
-    connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		cursor_readouts_ui->TimeCursors,
 		SLOT(setVisible(bool)));
 	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
