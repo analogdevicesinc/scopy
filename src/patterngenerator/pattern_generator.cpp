@@ -710,38 +710,19 @@ void PatternGenerator::startStop(bool start)
 			m_m2kDigital->setCyclic(!isSingle);
 			m_m2kDigital->push(m_buffer, m_bufferSize);
 
-			if (isSingle) {
-				QSignalBlocker blocker(m_ui->runSingleWidget);
-				QSignalBlocker runBtnBlocker(runButton());
-				runButton()->setChecked(false);
-				m_ui->runSingleWidget->toggle(false);
-				start = false;
-				const double timeout = 500.0 + static_cast<double>(m_bufferSize) /
-						static_cast<double>(m_sampleRate) * 500.0;
-				m_singleTimer->singleShot(timeout, [=]() {
-					try {
-						m_diom->unlock();
-						m_m2kDigital->stopBufferOut();
+			// timeout = buffer duration for the given samplerate + 200 milliseconds usb transfer (push)
+			const double timeout = 0.2 + static_cast<double>(m_bufferSize) / static_cast<double>(m_sampleRate);
+			// * 1000.0 (timeout is in seconds, start expects milliseconds)
+			m_singleTimer->start(timeout * 1000.0);
 
-						for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
-							bool enabled = !!m_plotCurves[i]->plot();
-							if (enabled) {
-								m_m2kDigital->enableChannel(i, false);
-							}
-						}
-					} catch (libm2k::m2k_exception &e) {
-						HANDLE_EXCEPTION(e);
-						qDebug() << e.what();
-					}
-				});
-			}
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
-
 	} else {
 		try {
+			m_singleTimer->stop();
+
 			m_diom->unlock();
 			m_m2kDigital->cancelBufferOut();
 			m_m2kDigital->stopBufferOut();
@@ -871,9 +852,9 @@ void PatternGenerator::connectSignalsAndSlots()
 		btn->setChecked(checked);
 		connect(run_button, &QPushButton::toggled,
 			m_ui->runSingleWidget, &RunSingleWidget::toggle);
-//		if (!checked) {
-//			m_plot.setTriggerState(CapturePlot::Stop);
-//		}
+		if (!checked) {
+			m_plot.setTriggerState(CapturePlot::Stop);
+		}
 	});
 	connect(run_button, &QPushButton::toggled,
 		m_ui->runSingleWidget, &RunSingleWidget::toggle);
@@ -923,6 +904,12 @@ void PatternGenerator::connectSignalsAndSlots()
 
 	connect(m_ui->printBtn, &QPushButton::clicked, [=](){
 		m_plot.printWithNoBackground("Pattern Generator");
+	});
+
+	connect(m_singleTimer, &QTimer::timeout, [=](){
+		if (m_ui->runSingleWidget->singleButtonChecked()) {
+			m_ui->runSingleWidget->toggle(false);
+		}
 	});
 }
 
