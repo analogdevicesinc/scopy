@@ -1525,6 +1525,7 @@ UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
 		m_decoder->set_option("parity", parityStr);
 		m_decoder->set_option("stop_bits",
 				      g_variant_new_double(pattern->get_stop_bits()));
+		m_decoder->set_option("format", g_variant_new_string("ascii"));
 
 		dynamic_cast<AnnotationCurve*>(m_annotationCurve)->getAnnotationDecoder()->startDecode();
 	});
