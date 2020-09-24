@@ -59,6 +59,7 @@ Pattern::Pattern()
 	// qDebug()<<"PatternCreated";
 	buffer = nullptr;
 	periodic = true;
+	channels = 1;
 }
 
 Pattern::~Pattern()
@@ -134,6 +135,16 @@ std::string Pattern::toString()
 bool Pattern::fromString(std::string from)
 {
 	return 0;
+}
+
+int Pattern::nrOfChannels() const
+{
+	return channels;
+}
+
+void Pattern::setNrOfChannels(int channels)
+{
+	this->channels = channels;
 }
 
 uint32_t Pattern::get_min_sampling_freq()
@@ -765,7 +776,8 @@ void NumberPatternUI::parse_ui()
 		qDebug()<<"Cannot set frequency, not an int";
 	}
 
-	if (val<max && ok) {
+	max = (1 << pattern->nrOfChannels()) - 1;
+	if (val <= max && ok) {
 		ui->numberLineEdit->setStyleSheet("color:white");
 	} else {
 		ui->numberLineEdit->setStyleSheet("color:red");
