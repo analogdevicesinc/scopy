@@ -103,7 +103,7 @@ void RunSingleWidget::toggle(bool checked)
 			d_ui->runButton->setText(tr("Stop"));
 		} else if (singleButtonEnabled()) {
 			d_ui->singleButton->setChecked(true);
-			d_ui->runButton->setText(tr("Stop"));
+			d_ui->singleButton->setText(tr("Stop"));
 		}
 		setDynamicProperty(d_ui->runButton, "running", true);
 		d_ui->runButton->setText(tr("Stop"));
@@ -122,16 +122,22 @@ void RunSingleWidget::_toggle(bool checked)
 	QPushButton *btn = dynamic_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 
+	if (btn == d_ui->singleButton) {
+		btn->setText(checked ? tr("Stop") : tr("Single"));
+	} else if (btn == d_ui->runButton) {
+		btn->setText(checked ? tr("Stop") : tr("Run"));
+	}
+
 	if (btn == d_ui->singleButton && d_ui->runButton->isChecked()) {
 		QSignalBlocker blocker(d_ui->runButton);
 		d_ui->runButton->setChecked(false);
 		setDynamicProperty(d_ui->runButton, "running", false);
-		d_ui->runButton->setText(tr("Stop"));
+		d_ui->runButton->setText(tr("Run"));
 	} else if (btn == d_ui->runButton && d_ui->singleButton->isChecked()) {
 		QSignalBlocker blocker(d_ui->singleButton);
 		d_ui->singleButton->setChecked(false);
 		setDynamicProperty(d_ui->singleButton, "running", false);
-		d_ui->singleButton->setText(tr("Stop"));
+		d_ui->singleButton->setText(tr("Single"));
 	} else {
 		Q_EMIT toggled(checked);
 	}
