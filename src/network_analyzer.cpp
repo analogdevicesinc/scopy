@@ -181,8 +181,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_dac_nb_channels(0),
 	d_cursorsEnabled(false),
 	m_stop(true),
-    m_dBgraph(this, true),
-    m_phaseGraph(this, true),
+	m_dBgraph(this, true),
+	m_phaseGraph(this, true),
 	wheelEventGuard(nullptr), wasChecked(false),
 	justStarted(false),
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
@@ -272,16 +272,16 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_dBgraph.setXMax(50000.000000);
 	m_dBgraph.setYMin(-80.000000);
 	m_dBgraph.setYMax(20.000000);
-    m_dBgraph.useLogFreq(true);
+	m_dBgraph.useLogFreq(true);
 
 	m_phaseGraph.setColor(QColor(144,19,254));
 	m_phaseGraph.setYTitle(tr("Phase (°)"));
-    m_phaseGraph.setYUnit("°");
+	m_phaseGraph.setYUnit("°");
 	m_phaseGraph.setXMin(1000.000000);
 	m_phaseGraph.setXMax(50000.000000);
 	m_phaseGraph.setYMin(-180.000000);
 	m_phaseGraph.setYMax(180.000000);
-    m_phaseGraph.useLogFreq(true);
+	m_phaseGraph.useLogFreq(true);
 
 	sampleStackedWidget = new QStackedWidget(this);
 	samplesCount = new ScaleSpinButton({
@@ -374,14 +374,14 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(magMax, &PositionSpinButton::valueChanged,
 		ui->xygraph, &NyquistGraph::setMax);
-    connect(magMax, &PositionSpinButton::valueChanged,
-        ui->nicholsgraph, &dBgraph::setYMax);
+	connect(magMax, &PositionSpinButton::valueChanged,
+		ui->nicholsgraph, &dBgraph::setYMax);
 	connect(magMin, &PositionSpinButton::valueChanged,
 		ui->xygraph, &NyquistGraph::setMin);
 	connect(magMin, &PositionSpinButton::valueChanged,
 		ui->nicholsgraph, &dBgraph::setYMin);
-    connect(phaseMax, &PositionSpinButton::valueChanged,
-        ui->nicholsgraph, &dBgraph::setXMax);
+	connect(phaseMax, &PositionSpinButton::valueChanged,
+		ui->nicholsgraph, &dBgraph::setXMax);
 	connect(phaseMin, &PositionSpinButton::valueChanged,
 		ui->nicholsgraph, &dBgraph::setXMin);
 
@@ -389,15 +389,15 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		&m_dBgraph, SLOT(setYMin(double)));
 	connect(magMax, SIGNAL(valueChanged(double)),
 		&m_dBgraph, SLOT(setYMax(double)));
-    connect(ui->btnIsLog, SIGNAL(toggled(bool)),
-        &m_dBgraph, SLOT(useLogFreq(bool)));
+	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
+		&m_dBgraph, SLOT(useLogFreq(bool)));
 
 	connect(phaseMin, SIGNAL(valueChanged(double)),
 		&m_phaseGraph, SLOT(setYMin(double)));
 	connect(phaseMax, SIGNAL(valueChanged(double)),
 		&m_phaseGraph, SLOT(setYMax(double)));
-    connect(ui->btnIsLog, SIGNAL(toggled(bool)),
-        &m_phaseGraph, SLOT(useLogFreq(bool)));
+	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
+		&m_phaseGraph, SLOT(useLogFreq(bool)));
 	connect(ui->btnIsLog, &CustomSwitch::toggled, [=](bool value) {
 		sampleStackedWidget->setCurrentIndex(value);
 		computeIterations();
@@ -420,48 +420,50 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->xygraph,
 		SLOT(setThickness(int)));
 
-    m_phaseGraph.setVertCursorsHandleEnabled(false);
+	m_phaseGraph.setVertCursorsHandleEnabled(false);
 
-    ui->gridLayout_plots->addWidget(bufferPreviewer, 0, 1, 1, 1);
-    ui->gridLayout_plots->addWidget(ui->statusWidget, 1, 1, 1, 1);
-    ui->gridLayout_plots->addWidget(m_dBgraph.topHandlesArea(), 2, 0, 1, 2);
-    ui->gridLayout_plots->addWidget(m_dBgraph.leftHandlesArea(), 3, 0, 1, 1);
-    ui->gridLayout_plots->addWidget(&m_dBgraph, 3, 1, 1, 1);
-    ui->gridLayout_plots->addWidget(m_phaseGraph.topHandlesArea(), 4, 0, 1, 2);
-    ui->gridLayout_plots->addWidget(m_phaseGraph.leftHandlesArea(), 5, 0, 1, 1);
-    ui->gridLayout_plots->addWidget(&m_phaseGraph, 5, 1, 1, 1);
-    ui->gridLayout_plots->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 2);
+	ui->gridLayout_plots->addWidget(bufferPreviewer, 0, 1, 1, 1);
+	ui->gridLayout_plots->addWidget(ui->statusWidget, 1, 1, 1, 1);
+	ui->gridLayout_plots->addWidget(m_dBgraph.topHandlesArea(), 2, 0, 1, 2);
+	ui->gridLayout_plots->addWidget(m_dBgraph.leftHandlesArea(), 3, 0, 1, 1);
+	ui->gridLayout_plots->addWidget(&m_dBgraph, 3, 1, 1, 1);
 
-    m_phaseGraph.enableXaxisLabels();
-    m_dBgraph.enableXaxisLabels();
+	ui->gridLayout_plots->addWidget(m_phaseGraph.topHandlesArea(), 4, 0, 1, 2);
+	ui->gridLayout_plots->addWidget(m_phaseGraph.leftHandlesArea(), 5, 0, 1, 1);
+	ui->gridLayout_plots->addWidget(&m_phaseGraph, 5, 1, 1, 1);
 
-    m_phaseGraph.enableYaxisLabels();
-    m_dBgraph.enableYaxisLabels();
+	ui->gridLayout_plots->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 2);
 
-    connect(m_dBgraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-            [=](double x)
-    {
-        m_phaseGraph.vBar1()->setPosition(x);
-    });
+	m_phaseGraph.enableXaxisLabels();
+	m_dBgraph.enableXaxisLabels();
 
-    connect(m_dBgraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-            [=](double x)
-    {
-        m_phaseGraph.vBar2()->setPosition(x);
-    });
+	m_phaseGraph.enableYaxisLabels();
+	m_dBgraph.enableYaxisLabels();
 
-    //The inverse connection is neccesary for chnage of the boundaries for sweep
-    connect(m_phaseGraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-            [=](double x)
-    {
-        m_dBgraph.vBar1()->setPosition(x);
-    });
+	connect(m_dBgraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
+		[=](double x)
+	{
+		m_phaseGraph.vBar1()->setPosition(x);
+	});
 
-    connect(m_phaseGraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-            [=](double x)
-    {
-        m_dBgraph.vBar2()->setPosition(x);
-    });
+	connect(m_dBgraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
+		[=](double x)
+	{
+		m_phaseGraph.vBar2()->setPosition(x);
+	});
+
+	//The inverse connection is neccesary for the change of the boundaries for sweep
+	connect(m_phaseGraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
+		[=](double x)
+	{
+		m_dBgraph.vBar1()->setPosition(x);
+	});
+
+	connect(m_phaseGraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
+		[=](double x)
+	{
+		m_dBgraph.vBar2()->setPosition(x);
+	});
 
 
 	ui->currentFrequencyLabel->setVisible(false);
@@ -472,10 +474,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 				QPixmap(":/icons/time_trigger_handle.svg"),
 				QPixmap(":/icons/time_trigger_left.svg"),
 				QPixmap(":/icons/time_trigger_right.svg"),
-                m_dBgraph.bottomHandlesArea());
+				m_dBgraph.bottomHandlesArea());
 	d_frequencyHandle->setPen(QPen(QColor(74, 100, 255), 2, Qt::SolidLine));
 	d_frequencyHandle->setVisible(true);
-    d_frequencyHandle->triggerMove();
+	d_frequencyHandle->triggerMove();
 
 	ui->nicholsgraph->enableFrequencyBar(false);
 
@@ -849,16 +851,7 @@ void NetworkAnalyzer::rightMenuFinished(bool opened)
 
 void NetworkAnalyzer::showEvent(QShowEvent *event)
 {
-//    m_dBgraph.bottomHandlesArea()->setLeftPadding(m_dBgraph.axisWidget(QwtAxisId(
-//            QwtPlot::yLeft, 0))->width()
-//                        + ui->gridLayout_plots->margin()
-//                        + ui->widgetPlotContainer->layout()->margin() + 1);
-//    int rightPadding = 0;
-//    rightPadding = rightPadding + m_dBgraph.width()
-//               - m_dBgraph.axisWidget(QwtPlot::yLeft)->width() - m_dBgraph.canvas()->width()
-//               - ui->widgetPlotContainer->layout()->margin() ;
-//    m_dBgraph.bottomHandlesArea()->setRightPadding(rightPadding);
-    Tool::showEvent(event);
+	Tool::showEvent(event);
 }
 
 void NetworkAnalyzer::on_btnExport_clicked()
@@ -1761,11 +1754,10 @@ void NetworkAnalyzer::toggleCursors(bool en)
 
 	if (d_cursorsEnabled != en) {
 		d_cursorsEnabled = en;
-        m_dBgraph.toggleCursors(en);
-        m_phaseGraph.toggleCursors(en);
+		m_dBgraph.toggleCursors(en);
+		m_phaseGraph.toggleCursors(en);
 		ui->btnCursors->setEnabled(en);
 	}
-
 }
 
 void NetworkAnalyzer::readPreferences()

@@ -54,6 +54,8 @@ extern "C" {
 
 namespace Ui {
 class SpectrumAnalyzer;
+class CursorReadouts;
+class CursorsSettings;
 }
 
 namespace adiscope {
@@ -119,6 +121,11 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
+
+	void on_boxCursors_toggled(bool on);
+	void on_btnCursors_toggled(bool);
+	void onCursorReadoutsChanged(struct cursorReadoutsText);
+
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
     void on_comboBox_line_thickness_currentIndexChanged(int index);
@@ -197,6 +204,15 @@ private:
 	libm2k::context::Generic* m_generic_context;
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
+
+
+	Ui::CursorReadouts *cursor_readouts_ui;
+	QWidget *cursorReadouts;
+	Ui::CursorsSettings *cr_ui;
+	CustomPlotPositionButton *cursorsPositionButton;
+	bool hCursorsEnabled;
+	bool vCursorsEnabled;
+
 	adiscope::DbClickButtons *marker_selector;
 	unsigned int m_nb_overlapping_avg;
 
@@ -253,6 +269,9 @@ private:
 	void updateMarkerMenu(unsigned int id);
 	bool isIioManagerStarted() const;
 	void setCurrentSampleLabel(double);
+
+	void cursor_panel_init();
+	void fillCursorReadouts(const struct cursorReadoutsText &);
 
 	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
 };

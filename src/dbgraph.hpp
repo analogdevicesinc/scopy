@@ -64,7 +64,7 @@ class dBgraph : public DisplayPlot
 	Q_PROPERTY(bool log_freq MEMBER log_freq WRITE useLogFreq);
 
 public:
-    explicit dBgraph(QWidget *parent = nullptr, bool isdBgraph = true);
+	explicit dBgraph(QWidget *parent = nullptr, bool isdBgraph = true);
 
 	~dBgraph();
 
@@ -74,7 +74,7 @@ public:
 
 	int getNumSamples() const;
 
-    bool eventFilter(QObject *, QEvent *);
+	bool eventFilter(QObject *, QEvent *);
 
 	QString getScaleValueFormat(double value, QwtAxisId scale) const;
 	QString getScaleValueFormat(double value, QwtAxisId scale, int precision) const;
@@ -97,13 +97,12 @@ public:
 	void setPlotBarEnabled(bool enabled);
 	void parametersOverrange(bool enable);
 
-    void enableXaxisLabels();
-    void enableYaxisLabels();
-    QWidget *leftHandlesArea();
-    QWidget *topHandlesArea();
-    PrefixFormatter *formatter;
+	void enableXaxisLabels();
+	void enableYaxisLabels();
+	QString formatXValue(double value, int precision) const;
+	QString formatYValue(double value, int precision) const;
 
-    void replot();
+	void replot();
 Q_SIGNALS:
 
 	void resetZoom();
@@ -145,8 +144,8 @@ public Q_SLOTS:
 	bool addReferenceWaveformFromPlot();
 
 private Q_SLOTS:
-    void onVCursor1Moved(double);
-    void onVCursor2Moved(double);
+	void onVCursor1Moved(double);
+	void onVCursor2Moved(double);
 protected Q_SLOTS:
 	void showEvent(QShowEvent *event);
 
@@ -160,20 +159,19 @@ private:
 	bool log_freq;
 	bool delta_label;
 	bool d_plotBarEnabled;
-    VertHandlesArea *d_leftHandlesArea;
-    HorizHandlesArea *d_topHandlesArea;
 
-    OscScaleDraw *draw_x, *draw_y;
+	OscScaleDraw *draw_x, *draw_y;
 
-    OscScaleZoomer *zoomer;
+	OscScaleZoomer *zoomer;
 
 	QVector<double> xdata, ydata;
 	unsigned int d_plotPosition;
 
 	VertBar *d_plotBar;
 	VertBar *d_frequencyBar;
+	PrefixFormatter *d_formatter;
 
-    void setupVerticalBars();
+	void setupVerticalBars();
 	void setupReadouts();
 };
 }
