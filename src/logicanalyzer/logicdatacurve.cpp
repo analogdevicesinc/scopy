@@ -113,10 +113,6 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 {
 	std::unique_lock<std::mutex> lock(m_dataAvailableMutex);
 
-	QElapsedTimer tt;
-	tt.start();
-
-
 	QwtPointMapper mapper;
 	mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
 	mapper.setBoundingRect(canvasRect);
@@ -125,8 +121,6 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
 	const double heightInPoints = yMap.invTransform(0) - yMap.invTransform(m_traceHeight);
 
-    // No data to plot
-//	qDebug() << "m_edges.size() : " << m_edges.size();
     if (!m_edges.size()) {
 	    if (m_startSample != m_endSample) {
 		const bool logicLevel = (m_logic->getData()[m_startSample] & (1 << m_bit)) >> m_bit;
@@ -151,16 +145,10 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     std::vector<std::pair<uint64_t, bool>> edges;
     getSubsampledEdges(edges, xMap);
 
-//    qDebug() << "edges size: " << edges.size() << " m_edges size: " << m_edges.size();
-
-//    qDebug() << "Subsampled edges: " << edges.size();
 
     if (!edges.size()) {
-//	    qDebug() << "NO EDGE FOR CURVE: " << getName();
         return;
     }
-
-//    qDebug() << "Drawing: " << edges.size() << " edges!";
 
     if (edges.front().first > 0) {
 	displayedData += QPointF(fromSampleToTime(0), edges.front().second * heightInPoints + m_pixelOffset);
@@ -182,6 +170,8 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 	displayedData += QPointF(fromSampleToTime(m_endSample - 1), (!edges.back().second) * heightInPoints + m_pixelOffset);
     }
 
+    displayedData += QPointF(plot()->axisInterval(QwtAxis::xBottom).maxValue(), displayedData.back().y());
+
     painter->save();
     painter->setPen(QColor(74, 100, 255)); //4a64ff
 
@@ -192,9 +182,6 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     painter->restore();
 
     delete d;
-
-//    qDebug() << "Drawing of edge took: " << tt.elapsed();
-    tt.restart();
 
     // Draw sampling points
     // Optimize for each segment we can draw the points connecting it
