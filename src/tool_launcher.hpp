@@ -260,6 +260,8 @@ private:
 
 	bool m_useNativeDialogs;
 
+	bool m_dac_tools_failed, m_adc_tools_failed;
+
 	void _setupToolMenu();
 	void saveRunningToolsBeforeCalibration();
 	void stopToolsBeforeCalibration();
