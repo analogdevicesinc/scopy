@@ -1076,6 +1076,13 @@ void BinaryCounterPatternUI::setAnnotationCurve(GenericLogicPlotCurve *curve)
 	m_annotationCurve = curve;
 }
 
+QVector<int> BinaryCounterPatternUI::getChannelsToAssign()
+{
+	// we don't want to assign the first channel 0 (clock) of the
+	// parallel decoder. Only the data lines.
+	return {1, 2, 3, 4, 5, 6, 7, 8};
+}
+
 Pattern *BinaryCounterPatternUI::get_pattern()
 {
 	return pattern;

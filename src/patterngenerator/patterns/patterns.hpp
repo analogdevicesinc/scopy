@@ -334,6 +334,7 @@ public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
 	virtual std::shared_ptr<logic::Decoder> getDecoder() override;
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
+	virtual QVector<int> getChannelsToAssign() override;
 
 private Q_SLOTS:
 	void parse_ui();
