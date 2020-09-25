@@ -52,6 +52,8 @@ PowerController::PowerController(struct iio_context *ctx,
 	ui->setupUi(this);
 
 	try {
+		m_m2k_powersupply->enableChannel(0, false);
+		m_m2k_powersupply->enableChannel(1, false);
 		m_m2k_powersupply->pushChannel(0, 0.0);
 		m_m2k_powersupply->pushChannel(1, 0.0);
 	} catch (libm2k::m2k_exception &e) {
