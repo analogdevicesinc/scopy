@@ -121,6 +121,15 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 	return QObject::event(event);
 }
 
+void ToolMenuItem::setCalibrating(bool calibrating)
+{
+	if (calibrating) {
+		d_toolBtn->setText(tr("Calibrating..."));
+	} else {
+		d_toolBtn->setText(d_name);
+	}
+}
+
 void ToolMenuItem::setDisabled(bool disabled)
 {
 	BaseMenuItem::setDisabled(disabled);

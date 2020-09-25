@@ -225,15 +225,15 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		QFuture<QPair<bool, bool>> ft = calibration_thread_watcher.future();
 		QPair<bool, bool> okc = ft.result();
 
-		menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn()->setText(dmm->getName());
-		menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn()->setText(oscilloscope->getName());
-		menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn()->setText(signal_generator->getName());
-		menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->setText(spectrum_analyzer->getName());
-		menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->setText(network_analyzer->getName());
+		menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(false);
+		menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(false);
+		menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(false);
+		menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(false);
+		menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(false);
 
 		if (okc.second) {
 			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration skipped because already calibrated."));
-		} else {
+		} else if (okc.first) {
 			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated"));
 		}
 	});
@@ -1266,7 +1266,11 @@ void adiscope::ToolLauncher::stopToolsBeforeCalibration()
 }
 void adiscope::ToolLauncher::restartToolsAfterCalibration()
 {
-	getConnectedDevice()->calibrateButton()->setEnabled(true);
+	auto dev = getConnectedDevice();
+	if (!dev) {
+		return;
+	}
+	dev->calibrateButton()->setEnabled(true);
 	while(!calibration_saved_tools.empty())
 	{
 		Tool* tool = calibration_saved_tools.back();
@@ -1569,12 +1573,11 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	selectedDev->calibrateButton()->setEnabled(false);
 
-	const QString status = tr("Calibrating...");
-	menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn()->setText(status);
-	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->getToolBtn()->setText(status);
-	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolBtn()->setText(status);
-	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->setText(status);
-	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->setText(status);
+	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(true);
 
 	selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrating"));
 
@@ -1593,8 +1596,11 @@ void ToolLauncher::calibrationThreadWatcherFinished()
 	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
 		   this, SLOT(enableDacBasedTools()));
 
-	getConnectedDevice()->calibrateButton()->setEnabled(true);
-	connect(getConnectedDevice()->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
+	auto dev = getConnectedDevice();
+	if (dev) {
+		dev->calibrateButton()->setEnabled(true);
+		connect(dev->calibrateButton(), SIGNAL(clicked()),this, SLOT(requestCalibration()));
+	}
 }
 
 void ToolLauncher::hasText()
