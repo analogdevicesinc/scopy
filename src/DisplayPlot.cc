@@ -665,6 +665,19 @@ DisplayPlot::disableLegend()
 }
 
 void
+DisplayPlot::setAllYAxis(double min, double max)
+{
+	for (unsigned int i = 0; i < vertAxes.size(); ++i) {
+		setAxisScale(QwtAxisId(QwtPlot::yLeft, i), min, max);
+	}
+
+	if (!d_autoscale_state) {
+		for (int i = 0; i < d_zoomer.size(); ++i)
+			d_zoomer[i]->setZoomBase();
+	}
+}
+
+void
 DisplayPlot::setYaxis(double min, double max)
 {
   setAxisScale(QwtPlot::yLeft, min, max);

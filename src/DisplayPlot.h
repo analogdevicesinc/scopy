@@ -386,6 +386,7 @@ public:
 
   void setDisplayScale(double value);
 
+  void setAllYAxis(double min, double max);
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
