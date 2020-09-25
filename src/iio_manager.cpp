@@ -22,6 +22,7 @@
 #include "iio_manager.hpp"
 
 #include <QDebug>
+#include "scopyExceptionHandler.h"
 
 #include <gnuradio/blocks/null_sink.h>
 #include <gnuradio/blocks/short_to_float.h>
@@ -104,9 +105,7 @@ iio_manager::~iio_manager()
 {
 }
 
-boost::shared_ptr<iio_manager> iio_manager::get_instance(
-		struct iio_context *ctx, const std::string &_dev,
-		unsigned long buffer_size)
+boost::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
 {
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
@@ -121,6 +120,17 @@ boost::shared_ptr<iio_manager> iio_manager::get_instance(
 			else
 				break;
 		}
+	}
+	return nullptr;
+}
+
+boost::shared_ptr<iio_manager> iio_manager::get_instance(
+		struct iio_context *ctx, const std::string &_dev,
+		unsigned long buffer_size)
+{
+	auto instance = has_instance(_dev);
+	if (instance) {
+		return instance;
 	}
 
 	/* No manager found - create a new one */
@@ -385,5 +395,10 @@ void iio_manager::disableMixedSignal(m2k::mixed_signal_source::sptr mixed_source
 	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
 
 	m_mixed_source = nullptr;
-	m_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
+	try {
+		m_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
+		qDebug() << e.what();
+	}
 }
