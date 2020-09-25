@@ -1036,8 +1036,10 @@ void adiscope::ToolLauncher::disconnect()
 			calib->cancelCalibration();
 			calibration_thread.waitForFinished();
 		}
-		auto iio=iio_manager::get_instance(ctx,filter->device_name(TOOL_DMM));
-		iio->stop_all();
+		auto iio = iio_manager::has_instance(filter->device_name(TOOL_DMM));
+		if (iio) {
+			iio->stop_all();
+		}
 		alive_timer->stop();
 
 		ui->saveBtn->parentWidget()->setEnabled(false);

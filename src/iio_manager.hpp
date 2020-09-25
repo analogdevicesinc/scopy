@@ -56,6 +56,12 @@ namespace adiscope {
 		const unsigned id;
 
 		/* Get a shared pointer to the instance of iio_manager that
+		 * manages the requested device if there is one.
+		 * Return a NULL pointer if there is no instance yet.
+		 */
+		static boost::shared_ptr<iio_manager> has_instance(const std::string &_dev);
+
+		/* Get a shared pointer to the instance of iio_manager that
 		 * manages the requested device */
 		static boost::shared_ptr<iio_manager> get_instance(
 				struct iio_context *ctx,
