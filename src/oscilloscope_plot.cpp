@@ -1503,6 +1503,8 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 {
 	qDebug() << "Digital Channel Added!";
 	setLeftVertAxesCount(d_ydata.size() + d_ref_ydata.size() + chnIdx + 1);
+	setAxisScale( QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx), -5, 5);
+	replot();
 
 	QColor chnColor;
 	const int h = (55 * chnIdx) % 360;
