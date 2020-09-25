@@ -1217,6 +1217,9 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 	}
 
 	const bool visible = ((*it).second != FftDisplayPlot::AverageType::SAMPLE);
+	if (!visible) {
+		ui->spinBox_averaging->setValue(1);
+	}
 	ui->spinBox_averaging->setVisible(visible);
 	ui->label_averaging->setVisible(visible);
 
