@@ -871,7 +871,7 @@ void PatternGenerator::connectSignalsAndSlots()
 
 
 	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
-		m_plot.setYaxis(-5 - (value * 0.05), 5 - (value * 0.05));
+		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
 
