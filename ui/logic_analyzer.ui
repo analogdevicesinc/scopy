@@ -1379,7 +1379,7 @@ font-weight: normal;
                          </property>
                          <property name="icon">
                           <iconset>
-                           <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                           <normalon>:/icons/trigger_low_enabled.svg</normalon>
                           </iconset>
                          </property>
                         </item>
@@ -1389,7 +1389,7 @@ font-weight: normal;
                          </property>
                          <property name="icon">
                           <iconset>
-                           <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                           <normalon>:/icons/trigger_high_enabled.svg</normalon>
                           </iconset>
                          </property>
                         </item>
