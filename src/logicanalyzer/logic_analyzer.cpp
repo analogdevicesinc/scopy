@@ -54,14 +54,6 @@
 #include "filemanager.h"
 #include "config.h"
 
-#include <m2k/digital_in_source.h>
-#include <gnuradio/top_block.h>
-#include <gnuradio/blocks/vector_sink.h>
-#include <gnuradio/blocks/head.h>
-
-#include <m2k/analog_in_source.h>
-
-
 using namespace adiscope;
 using namespace adiscope::logic;
 
