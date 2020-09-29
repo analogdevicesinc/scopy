@@ -140,9 +140,7 @@ find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
-set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
-find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
-find_library(M2K_LIBRARIES NAMES m2k libm2k)
+find_package(libm2k REQUIRED)
 
 if (ENABLE_MATIO)
 	message("-- Building with MATLAB support for SignalGenerator")
@@ -150,18 +148,11 @@ if (ENABLE_MATIO)
 	add_definitions(-DMATLAB_SUPPORT_SIGGEN)
 endif()
 
-find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
-find_path(M2K_INCLUDE_DIRS libm2k/m2k.hpp)
-
 find_library(QWTPOLAR_LIBRARIES qwtpolar)
 find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
 if (NOT QWTPOLAR_LIBRARIES OR NOT QWTPOLAR_INCLUDE_DIRS)
 	message(SEND_ERROR "QwtPolar not found")
 endif()
-
-# Find libm2k
-find_library(LIBM2K_LIBRARIES NAMES m2k libm2k REQUIRED)
-find_path(LIBM2K_INCLUDE_DIRS libm2k/m2k.hpp)
 
 find_package(PkgConfig)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
@@ -180,7 +171,6 @@ include_directories(
 	${QWTPOLAR_INCLUDE_DIRS}
 	${Qt5Svg_INCLUDE_DIRS}
 	${Qt5Xml_INCLUDE_DIRS}
-	${IIO_INCLUDE_DIRS}
 	${SCOPY_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
 	${GLIB_INCLUDE_DIRS}
@@ -192,7 +182,6 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/src
 	${BREAKPAD_INCLUDE_DIRS}
 	${BREAKPAD_INCLUDE_DIRS}/breakpad
-	${M2K_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -305,13 +294,12 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${QWTPOLAR_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${Qt5Xml_LIBRARIES}
-		${IIO_LIBRARIES}
 		${MATIO_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}
 		${GLIBMM_LIBRARIES}
 		${SIGCPP_LIBRARIES}
 		${GLIB_LIBRARIES}
-		${M2K_LIBRARIES}
+		libm2k::libm2k
 )
 
 if (NOT WIN32)
