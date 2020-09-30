@@ -2095,6 +2095,7 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		top_scale->setValue(2.5E1);
 		bottom_scale->setValue(1E-12);
+		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
 		break;
 	default:
 		ui->divisionWidget->setVisible(true);
