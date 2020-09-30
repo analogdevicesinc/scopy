@@ -1254,11 +1254,21 @@ bool ToolLauncher::loadDecoders(QString path)
 
 void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
 {
-	if(dmm->isRunning()) calibration_saved_tools.push_back(dmm);
-	if(oscilloscope->isRunning()) calibration_saved_tools.push_back(oscilloscope);
-	if(signal_generator->isRunning()) calibration_saved_tools.push_back(signal_generator);
-	if(spectrum_analyzer->isRunning()) calibration_saved_tools.push_back(spectrum_analyzer);
-	if(network_analyzer->isRunning()) calibration_saved_tools.push_back(network_analyzer);
+	if (dmm->isRunning()) calibration_saved_tools.push_back(dmm);
+	if (oscilloscope->isRunning()) calibration_saved_tools.push_back(oscilloscope);
+	if (signal_generator->isRunning()) calibration_saved_tools.push_back(signal_generator);
+	if (spectrum_analyzer->isRunning()) calibration_saved_tools.push_back(spectrum_analyzer);
+	if (network_analyzer->isRunning()) calibration_saved_tools.push_back(network_analyzer);
+	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(true);
+	menu->getToolMenuItemFor(TOOL_DMM)->setDisabled(true);
+	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setDisabled(true);
+	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setDisabled(true);
+	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setDisabled(true);
+	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setDisabled(true);
 }
 
 void adiscope::ToolLauncher::stopToolsBeforeCalibration()
@@ -1268,6 +1278,16 @@ void adiscope::ToolLauncher::stopToolsBeforeCalibration()
 }
 void adiscope::ToolLauncher::restartToolsAfterCalibration()
 {
+	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(false);
+	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setCalibrating(false);
+	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setCalibrating(false);
+	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(false);
+	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(false);
+	menu->getToolMenuItemFor(TOOL_DMM)->setEnabled(true);
+	menu->getToolMenuItemFor(TOOL_OSCILLOSCOPE)->setEnabled(true);
+	menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->setEnabled(true);
+	menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setEnabled(true);
+	menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setEnabled(true);
 	auto dev = getConnectedDevice();
 	if (!dev) {
 		return;
