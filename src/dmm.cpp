@@ -331,6 +331,7 @@ void DMM::toggleTimer(bool start)
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);
+	ui->run_button->setText(start ? tr("Stop") : tr("Run"));
 	m_running = start;
 }
 
