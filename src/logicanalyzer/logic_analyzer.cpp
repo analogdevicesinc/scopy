@@ -175,7 +175,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 		// of the available data to be done in the capture thread
 		connect(this, &LogicAnalyzer::dataAvailable, this,
 			[=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			if (!m_oscPlot) {
+				curve->dataAvailable(from, to);
+			}
 		}, Qt::DirectConnection);
 
 		m_plotCurves.push_back(curve);
@@ -756,6 +758,8 @@ void LogicAnalyzer::disableMixedSignalView()
 
 		curve = m_oscPlot->getDigitalPlotCurve(0);
 	}
+
+	m_oscPlot = nullptr;
 }
 
 void LogicAnalyzer::addCurveToPlot(QwtPlotCurve *curve)
@@ -1739,7 +1743,9 @@ void LogicAnalyzer::setupDecoders()
 		// of the available data to be done in the capture thread
 		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
 			this, [=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			if (!m_oscPlot) {
+				curve->dataAvailable(from, to);
+			}
 		}, Qt::DirectConnection);
 
 		curve->setSampleRate(m_sampleRate);
