@@ -51,6 +51,8 @@ mixed_signal_sink_impl::mixed_signal_sink_impl(adiscope::logic::LogicAnalyzer *l
 	, d_triggered(false)
 	, d_update_time(0.1 * gr::high_res_timer_tps())
 	, d_last_time(0)
+	, d_display_one_buffer(true)
+	, d_cleanBuffers(true)
 {
 	d_digital_buffer = static_cast<uint16_t*>(volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment()));
 	memset(d_digital_buffer, 0, d_buffer_size * sizeof(uint16_t));
@@ -72,13 +74,19 @@ int mixed_signal_sink_impl::work(int noutput_items,
 {
 	gr::thread::scoped_lock lock(d_setlock);
 
+	if (!d_display_one_buffer && !d_cleanBuffers) {
+		return 0;
+	}
+
 	// space left in buffer
 	const int nfill = d_end - d_index;
 	// num items we can put in the buffer
 	const int nitems = std::min(noutput_items, nfill);
 
 	// look for trigger tag
-	_test_trigger_tags(nitems);
+	if (!d_triggered) {
+		_test_trigger_tags(nitems);
+	}
 
 	for (int i = 0; i < 2; ++i) {
 		const float *in = static_cast<const float*>(input_items[i]);
@@ -90,27 +98,42 @@ int mixed_signal_sink_impl::work(int noutput_items,
 
 	d_index += nitems;
 
-	if (d_triggered && (d_index == d_end) && d_end != 0) {
-		if (gr::high_res_timer_now() - d_last_time > d_update_time) {
-			d_last_time = gr::high_res_timer_now();
+	if ((d_end !=  0 && !d_display_one_buffer) ||
+			(d_triggered && (d_index == d_end) && d_end != 0 && d_display_one_buffer)) {
 
-			for (int i = 0; i < 2; ++i) {
-				volk_32f_convert_64f(d_analog_plot_buffers[i], &d_analog_buffer[i][d_start], d_size);
+		int nitemsToSend = d_size;
+
+		if (!d_display_one_buffer) {
+			nitemsToSend = d_index;
+			if (nitemsToSend >= d_size) {
+				nitemsToSend = d_size;
+				d_cleanBuffers = false;
 			}
+		}
 
-			d_logic_analyzer->setData(d_digital_buffer + d_start, d_size);
+		for (int i = 0; i < 2; ++i) {
+			volk_32f_convert_64f(d_analog_plot_buffers[i], &d_analog_buffer[i][d_start], nitemsToSend);
+		}
+
+		if (gr::high_res_timer_now() - d_last_time > d_update_time
+				|| !d_cleanBuffers) {
+
+			d_last_time = gr::high_res_timer_now();
+			d_logic_analyzer->setData(d_digital_buffer + d_start, nitemsToSend);
 			qApp->postEvent(d_osc_plot,
 					new IdentifiableTimeUpdateEvent(d_analog_plot_buffers,
-									d_size,
+									nitemsToSend,
 									d_tags,
 									"Osc Time"));
 		}
 
-		_reset();
+		if (d_display_one_buffer) {
+			_reset();
+		}
 	}
 
 
-	if (d_index == d_end) {
+	if (d_index == d_end && d_display_one_buffer) {
 		_reset();
 	}
 
@@ -129,6 +152,7 @@ void mixed_signal_sink_impl::clean_buffers()
 	}
 
 	_reset();
+	d_cleanBuffers = true;
 }
 
 void mixed_signal_sink_impl::set_nsamps(int newsize)
@@ -164,6 +188,15 @@ void mixed_signal_sink_impl::set_nsamps(int newsize)
 		}
 
 		_reset();
+	}
+}
+
+void mixed_signal_sink_impl::set_displayOneBuffer(bool display)
+{
+	if (d_display_one_buffer != display) {
+		gr::thread::scoped_lock lock(d_setlock);
+
+		d_display_one_buffer = display;
 	}
 }
 

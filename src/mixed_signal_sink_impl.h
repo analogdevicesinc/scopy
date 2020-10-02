@@ -29,11 +29,13 @@ public:
 	mixed_signal_sink_impl(adiscope::logic::LogicAnalyzer *logicAnalyzer,
 			       adiscope::TimeDomainDisplayPlot *oscPlot,
 			       int bufferSize);
+
 	int work(int noutput_items,
 		 gr_vector_const_void_star &input_items,
 		 gr_vector_void_star &output_items) override;
 	void clean_buffers() override;
 	void set_nsamps(int newsize) override;
+	void set_displayOneBuffer(bool display) override;
 
 private:
 	void _adjust_tags(int adj);
@@ -60,6 +62,9 @@ private:
 
 	gr::high_res_timer_type d_update_time;
 	gr::high_res_timer_type d_last_time;
+
+	bool d_display_one_buffer;
+	bool d_cleanBuffers;
 };
 
 #endif // MIXED_SIGNAL_SINK_IMPL_H

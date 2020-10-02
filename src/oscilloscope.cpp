@@ -1324,6 +1324,9 @@ void Oscilloscope::enableMixedSignalView()
 	}
 
 	trigger_settings.enableMixedSignalView();
+
+	onHorizScaleValueChanged(timeBase->value());
+	onTimePositionChanged(timePosition->value());
 }
 
 void Oscilloscope::disableMixedSignalView()
@@ -3385,6 +3388,10 @@ void Oscilloscope::setSinksDisplayOneBuffer(bool val)
 	d_displayOneBuffer = val;
 	qt_time_block->set_displayOneBuffer(val);
 
+	if (mixed_sink) {
+		mixed_sink->set_displayOneBuffer(val);
+	}
+
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {
 		scope_sink_f::sptr math_sink = dynamic_pointer_cast<
@@ -4787,6 +4794,10 @@ void Oscilloscope::resetStreamingFlag(bool enable)
 void Oscilloscope::cleanBuffersAllSinks()
 {
 	this->qt_time_block->clean_buffers();
+
+	if (mixed_sink) {
+		mixed_sink->clean_buffers();
+	}
 
 	auto it = math_sinks.constBegin();
 	while (it != math_sinks.constEnd()) {

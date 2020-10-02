@@ -37,6 +37,7 @@ public:
 
 	virtual void clean_buffers() = 0;
 	virtual void set_nsamps(int newsize) = 0;
+	virtual void set_displayOneBuffer(bool display) = 0;
 };
 
 #endif // MIXED_SIGNAL_SINK_H
