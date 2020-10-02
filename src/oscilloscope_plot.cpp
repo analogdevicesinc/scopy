@@ -1893,8 +1893,10 @@ void CapturePlot::setGroups(const QVector<QVector<int> > &groups)
 			d_groupHandles.back().push_back(d_offsetHandles.at(hdl));
 		}
 		endGroupSelection();
+
+		d_groupHandles.back().front()->setSelected(false);
+		d_groupHandles.back().front()->selected(false);
 		d_groupHandles.back().front()->setPosition(d_groupHandles.back().front()->position());
-//		d_groupHandles.back().front()->triggerMove();
 	}
 
 	replot();
