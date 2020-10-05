@@ -1421,6 +1421,7 @@ void SpectrumAnalyzer::updateChannelSettingsPanel(unsigned int id)
 			ui->btnHistory->setDisabled(true);
 			ui->btnApply->setDisabled(true);
 			ui->comboBox_line_thickness->setDisabled(true);
+			ui->cmbGainMode->setDisabled(true);
 		} else {
 			ui->comboBox_type->setVisible(false);
 			ui->comboBox_window->setVisible(false);
