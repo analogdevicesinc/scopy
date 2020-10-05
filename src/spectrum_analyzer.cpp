@@ -309,7 +309,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 
 		ui->cmb_rbw->blockSignals(false);
-		ui->cmb_rbw->setCurrentIndex(i - 1);
+		ui->cmb_rbw->setCurrentIndex((int)bin_sizes.size() / 2);
 
 		marker_freq_pos->setMaxValue(stop);
 		marker_freq_pos->setStep(2 * (stop -
