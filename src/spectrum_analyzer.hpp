@@ -236,6 +236,7 @@ private:
 	MetricPrefixFormatter freq_formatter;
 
 	gr::top_block_sptr top_block;
+	QPair<double, double> m_mag_min_max;
 
 	bool marker_menu_opened;
 
