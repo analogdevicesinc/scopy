@@ -496,7 +496,7 @@ void FftDisplayPlot::_editFirstPoint()
 	// be plotted and make the y_data[i][0] values equal to the ones
 	// of the next point to draw a straight line from the start of
 	// the plot to the start of the sweep
-	x_data[0] = 1;
+	x_data[0] = d_logScaleEnabled;
 	for (size_t i = 0; i < y_data.size(); ++i) {
 		y_data[i][0] = y_data[i][1];
 	}

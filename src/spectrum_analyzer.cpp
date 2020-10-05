@@ -290,7 +290,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	sample_timer = new QTimer();
 	connect(sample_timer, SIGNAL(timeout()), this, SLOT(refreshCurrentSampleLabel()));
 
-	startStopRange = new StartStopRangeWidget();
+	startStopRange = new StartStopRangeWidget(0);
 	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=](double start, double stop){
 		fft_plot->setStartStop(start, stop);
 		fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
@@ -466,6 +466,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->logBtn, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::useLogFreq);
+	connect(ui->logBtn, &QPushButton::toggled,
+		[=](bool use_log_freq){
+		startStopRange->setMinimumValue(use_log_freq);
+	});
 
 	ui->btnHistory->setEnabled(true);
 	ui->btnHistory->setChecked(true);
