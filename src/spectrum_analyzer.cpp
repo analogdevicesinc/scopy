@@ -881,7 +881,9 @@ void SpectrumAnalyzer::on_btnBrowseFile_clicked()
 
 		for (int i = 0; i < fm.getNrOfChannels(); ++i) {
 			/* Amplitude CHX UNIT => mid(10, 3) strip CHX from column name */
-			ui->importSettings->addChannel(i, fm.getColumnName(i).mid(10, 3));
+			QString chn_name = fm.getColumnName(i).mid(10, 3);
+			chn_name = (chn_name == "") ? "CH" + i : chn_name;
+			ui->importSettings->addChannel(i, chn_name);
 		}
 
 		QVector<QVector<double>> data = fm.read();
