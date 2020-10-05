@@ -2086,12 +2086,9 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	case FftDisplayPlot::VRMS:
 		ui->divisionWidget->setVisible(true);
 		fft_plot->useLogScaleY(false);
-		fft_plot->setAxisScale(QwtPlot::yLeft, 0, 25, 10);
 		ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
-		top->setValue(25);
-		bottom->setValue(0);
 		break;
 	case FftDisplayPlot::VROOTHZ:
 		ui->divisionWidget->setVisible(false);
@@ -2107,19 +2104,42 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	default:
 		ui->divisionWidget->setVisible(true);
 		fft_plot->useLogScaleY(false);
-		fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 		ui->topWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		ui->bottomWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
-		top->setValue(0);
-		bottom->setValue(-200);
 		break;
 	}
 	fft_plot->setMagnitudeType((*it).second);
 	fft_plot->recalculateMagnitudes();
+
 	fft_plot->replot();
 
 	ui->lblMagUnit->setText(unit);
+
+	// TODO: Check a different fix for this.
+	// The QwtPlot and ticks are not correctly repainted.
+	// This seems to be a timing issue.
+	// Need more investigation, this is a temporary hack.
+	QTimer::singleShot(20, [=](){
+		switch (magType) {
+		case FftDisplayPlot::VPEAK:
+		case FftDisplayPlot::VRMS:
+			unit_per_div->setValue(1);
+			bottom->setValue(-100);
+			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
+			break;
+		case FftDisplayPlot::VROOTHZ:
+			top_scale->setValue(2.5E1);
+			bottom_scale->setValue(1E-12);
+			fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
+			break;
+		default:
+			unit_per_div->setValue(1);
+			bottom->setValue(-200);
+			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
+			break;
+		}
+	});
 }
 
 void SpectrumAnalyzer::on_btnHistory_toggled(bool checked)
