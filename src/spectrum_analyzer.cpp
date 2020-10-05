@@ -209,7 +209,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->canvas()->setStyleSheet(QString("QwtPlotCanvas { "
 	                                  "background-color: #141416; }"));
 	fft_plot->disableLegend();
-	fft_plot->setAxisScale(QwtPlot::yLeft, -200, 0, 10);
 	// Disable mouse interactions with the axes until they are in a working state
 	fft_plot->setXaxisMouseGesturesEnabled(false);
 
@@ -253,9 +252,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->divisionWidget->addWidget(unit_per_div);
 
+	m_mag_min_max = QPair<double, double>(-200, 300);
 	top = new PositionSpinButton({
 		{" ",1e0},
-	}, tr("Top"), -100.0, 300.0, false, false, this);
+	}, tr("Top"), -200.0, 300.0, false, false, this);
 	top_scale = new ScaleSpinButton({
 			{{"pV/√Hz",1e-12},
 			 {"nV/√Hz",1e-9},
@@ -268,7 +268,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	bottom = new PositionSpinButton({
 		{" ",1e0},
-	}, tr("Bottom"), -300.0, 100.0, false, false, this);
+	}, tr("Bottom"), -200.0, 300.0, false, false, this);
 	bottom_scale = new ScaleSpinButton({
 			   {{"pV/√Hz",1e-12},
 			    {"nV/√Hz",1e-9},
@@ -2179,19 +2179,20 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 	return pos;
 }
 
-void SpectrumAnalyzer::onTopValueChanged(double top)
+void SpectrumAnalyzer::onTopValueChanged(double top_value)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
 	double perDiv = unit_per_div->value();
-	double bottomValue = top - perDiv * 10;
+	double bottomValue = top_value - perDiv * 10;
+
 	if (!isScaleBtn) {
 		bottom->blockSignals(true);
 		bottom->setValue(bottomValue);
 		bottom->blockSignals(false);
+		fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
 	} else {
-		bottomValue = bottom_scale->value();
+		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_value);
 	}
-	fft_plot->setAxisScale(QwtPlot::yLeft, bottomValue, top);
 	fft_plot->replot();
 }
 
@@ -2207,6 +2208,9 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 			bottom_scale->setValue(bottomValue);
 		}
 	} else {
+		bottom->setMaxValue(m_mag_min_max.second - perDiv * 10);
+		top->setMinValue(m_mag_min_max.first + perDiv * 10);
+
 		double topValue = bottom->value() + perDiv * 10;
 		top->setValue(topValue);
 
@@ -2217,19 +2221,20 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 	}
 }
 
-void SpectrumAnalyzer::onBottomValueChanged(double bottom)
+void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
 	double perDiv = unit_per_div->value();
-	double topValue = bottom + perDiv * 10;
+	double topValue = bottom_value + perDiv * 10;
+
 	if (!isScaleBtn) {
 		top->blockSignals(true);
 		top->setValue(topValue);
 		top->blockSignals(false);
+		fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
 	} else {
-		topValue = top_scale->value();
+		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_scale->value());
 	}
-	fft_plot->setAxisScale(QwtPlot::yLeft, bottom, topValue);
 	fft_plot->replot();
 }
 
