@@ -38,7 +38,7 @@ using namespace adiscope;
 Preferences::Preferences(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::Preferences),
-	sig_gen_periods_nr(2),
+	sig_gen_periods_nr(1),
 	save_session_on_exit(true),
 	double_click_to_detach(false),
 	pref_api(new Preferences_API(this)),
