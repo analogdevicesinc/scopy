@@ -2273,9 +2273,6 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 		}
 	}
 
-	qDebug(CAT_SIGNAL_GENERATOR) << QString("Input ratio %1, ratio: %2 (fract left %3)")
-	         .arg(ratio).arg(best_ratio).arg(best_fract);
-
 	if (fract) {
 		*fract = best_fract;
 	}
