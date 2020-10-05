@@ -261,6 +261,7 @@ private:
 
 	DeviceWidget* selectedDev;
 	bool m_use_decoders;
+	bool m_logging_enable;
 
 	bool m_useNativeDialogs;
 

@@ -32,6 +32,9 @@
 #include "tool_launcher.hpp"
 #include "scopyApplication.hpp"
 #include <stdio.h>
+#ifdef LIBM2K_ENABLE_LOG
+#include <glog/logging.h>
+#endif
 
 //#include "coloreditor.h"
 #include "scopy_color_editor.h"
@@ -43,6 +46,12 @@ using namespace adiscope;
 int main(int argc, char **argv)
 {
 	ScopyApplication app(argc, argv);
+#ifdef LIBM2K_ENABLE_LOG
+	enableLogging(true);
+	google::InitGoogleLogging(argv[0]);
+	FLAGS_logbuflevel = -1;
+#endif
+
 #if BREAKPAD_HANDLER
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor descriptor("/tmp");
