@@ -144,6 +144,15 @@ void StartStopRangeWidget::_onCenterSpanFrequencyChanged()
 	Q_EMIT rangeChanged(start, stop);
 }
 
+void StartStopRangeWidget::setMinimumValue(double value)
+{
+	minValue = value;
+	start_freq->setMinValue(value);
+	stop_freq->setMinValue(value);
+	center_freq->setMinValue(value);
+	span_freq->setMinValue(value);
+}
+
 void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget)
 {
 	// Create spin buttons
