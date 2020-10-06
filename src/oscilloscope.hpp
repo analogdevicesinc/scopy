@@ -290,7 +290,7 @@ namespace adiscope {
 		const int autosetSkippedTimeSamples = 4096;
 		const int autosetFFTSize = 8192;
 		const int autosetNrOfSkippedTones=50;
-		const int autosetValidTone = 150;
+		const int autosetValidTone = 51;
 
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
@@ -365,7 +365,6 @@ namespace adiscope {
 		QPair<boost::shared_ptr<signal_sample>, int> triggerLevelSink;
 		boost::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
 		boost::shared_ptr<gr::blocks::vector_sink_f> autosetFFTSink;
-		boost::shared_ptr<gr::blocks::vector_sink_f> autosetDataSink;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
