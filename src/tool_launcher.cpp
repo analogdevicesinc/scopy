@@ -240,7 +240,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		}
 	});
 
-	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
 }
 
 void ToolLauncher::_setupToolMenu()
@@ -1623,6 +1622,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 					       this));
 
 	calibration_thread_watcher.setFuture(calibration_thread);
+	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
 
 	return true;
 }
