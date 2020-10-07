@@ -452,6 +452,9 @@ void TriggerSettings::autoTriggerEnable()
 
 			temporarily_disabled = false;
 		}
+	} else {
+		writeHwMode(determineTriggerMode(ui->intern_en->isChecked(),
+                                                ui->extern_en->isChecked()));
 	}
 }
 
