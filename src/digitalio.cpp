@@ -78,7 +78,6 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 	connect(this,SIGNAL(slider(int)),dio,SLOT(setSlider(int)));
 	ui->label_2->setText(label);
 	auto max = (1<<nr_of_channels) -1;
-	ui->lineEdit->setValidator(new QIntValidator(0, max, this));
 	ui->lineEdit->setText(QString::number(max/2));
 	ui->horizontalSlider->setValue(max/2);	
 }
@@ -306,7 +305,13 @@ void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
 void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
 {
 	qDebug(CAT_DIGITAL_IO)<<"lineedit";
-	ui->horizontalSlider->setValue(ui->lineEdit->text().toInt());
+	auto max = (1<<nr_of_channels) -1;
+	auto nr = ui->lineEdit->text().toInt();
+	if(nr > max)
+	{
+		nr = max;
+	}
+	ui->horizontalSlider->setValue(nr);
 }
 
 void adiscope::DigitalIoGroup::on_comboBox_activated(int index)
