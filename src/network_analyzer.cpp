@@ -702,6 +702,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	});
 
+	connect(this, SIGNAL(sweepStart()), ui->xygraph, SLOT(reset()));
 	_configureDacFlowgraph();
 	_configureAdcFlowgraph();
 }
@@ -1178,6 +1179,7 @@ void NetworkAnalyzer::goertzel()
 		}
 	}
 
+	Q_EMIT sweepStart();
 	for (int i = 0; !m_stop && i < iterations.size(); ++i) {
 
 		// Get current sweep settings
