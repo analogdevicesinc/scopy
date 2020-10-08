@@ -542,7 +542,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>3</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -575,6 +575,9 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
                    <property name="horizontalScrollBarPolicy">
                     <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
@@ -589,8 +592,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>298</height>
+                      <width>300</width>
+                      <height>469</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1430,9 +1433,6 @@ font-weight: normal;
                   <height>0</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
                 <layout class="QVBoxLayout" name="verticalLayout_4">
                  <property name="spacing">
                   <number>15</number>
@@ -1451,6 +1451,12 @@ font-weight: normal;
                  </property>
                  <item>
                   <widget class="QScrollArea" name="generalSettingsScrollArea">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
+                   <property name="lineWidth">
+                    <number>0</number>
+                   </property>
                    <property name="horizontalScrollBarPolicy">
                     <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
@@ -1462,8 +1468,8 @@ font-weight: normal;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>278</width>
-                      <height>467</height>
+                      <width>280</width>
+                      <height>469</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
