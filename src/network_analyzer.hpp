@@ -293,6 +293,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void sweepDone();
+	void sweepStart();
 	void showTool();
 };
 } /* namespace adiscope */
