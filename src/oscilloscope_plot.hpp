@@ -49,6 +49,7 @@ namespace adiscope {
 	class CapturePlot: public OscilloscopePlot
 	{
 		friend class Oscilloscope_API;
+		friend class LogicAnalyzer_API;
 		friend class Channel_API;
 
 		Q_OBJECT
@@ -125,6 +126,7 @@ namespace adiscope {
 		QString formatXValue(double value, int precision) const;
 		QString formatYValue(double value, int precision) const;
 
+		CursorReadouts * getCursorReadouts() const;
 
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
@@ -193,7 +195,7 @@ namespace adiscope {
 		void onVCursor1Moved(double);
 		void onVCursor2Moved(double);
 
-    private:
+	private:
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
 
 		bool d_triggerAEnabled;
@@ -245,6 +247,7 @@ namespace adiscope {
 
 	        QList<Measure *> d_measureObjs;
 
+		double value_v1, value_v2, value_h1, value_h2;
 		double value_gateLeft, value_gateRight;
 		double d_minOffsetValue, d_maxOffsetValue;
 		double d_timeTriggerMinValue, d_timeTriggerMaxValue;

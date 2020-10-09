@@ -2205,7 +2205,7 @@ color: rgba(255, 255, 255, 153);
   </connection>
   <connection>
    <sender>cursorsBox</sender>
-   <signal>clicked(bool)</signal>
+   <signal>toggled(bool)</signal>
    <receiver>btnCursors</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>

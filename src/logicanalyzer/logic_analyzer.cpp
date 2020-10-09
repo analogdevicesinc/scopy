@@ -1148,7 +1148,7 @@ void LogicAnalyzer::setupUi()
 
 	setDynamicProperty(cr_ui->btnLockHorizontal, "use_icon", true);
 
-	auto cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
+	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
 		[=](CustomPlotPositionButton::ReadoutsPosition position){
 		m_plot.moveCursorReadouts(position);

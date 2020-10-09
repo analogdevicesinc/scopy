@@ -103,6 +103,7 @@ public:
 
 	int getLineThickness() const;
 	void setLineThickness(int index);
+
 	int getCursorsPosition() const;
 	void setCursorsPosition(int val);
 

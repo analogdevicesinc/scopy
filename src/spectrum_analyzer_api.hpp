@@ -27,6 +27,7 @@ namespace adiscope {
 class SpectrumAnalyzer_API : public ApiObject
 {
 	Q_OBJECT
+	Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool single READ isSingle WRITE single STORED false);
 	Q_PROPERTY(double startFreq READ startFreq WRITE setStartFreq);
@@ -42,6 +43,15 @@ class SpectrumAnalyzer_API : public ApiObject
 	           setMarkerTableVisible);
 	Q_PROPERTY(QVariantList markers READ getMarkers);
 
+	Q_PROPERTY(bool horizontal_cursors READ horizontalCursors
+			WRITE setHorizontalCursors)
+	Q_PROPERTY(bool vertical_cursors READ verticalCursors
+			WRITE setVerticalCursors)
+	Q_PROPERTY(int cursors_position READ getCursorsPosition
+		  WRITE setCursorsPosition)
+	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
+		  WRITE setCursorsTransparency)
+
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
@@ -53,6 +63,10 @@ public:
 
 private:
 	SpectrumAnalyzer *sp;
+
+	bool hasCursors() const;
+	void setCursors(bool en);
+
 	bool running();
 	void run(bool);
 
@@ -88,6 +102,18 @@ private:
 
 	bool markerTableVisible();
 	void setMarkerTableVisible(bool);
+
+	bool horizontalCursors() const;
+	void setHorizontalCursors(bool en);
+
+	bool verticalCursors() const;
+	void setVerticalCursors(bool en);
+
+	int getCursorsPosition() const;
+	void setCursorsPosition(int val);
+
+	int getCursorsTransparency() const;
+	void setCursorsTransparency(int val);
 
 	bool getLogScale() const;
 	void setLogScale(bool useLogScale);

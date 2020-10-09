@@ -31,6 +31,13 @@ class LogicAnalyzer_API : public ApiObject
 {
 	Q_OBJECT
 
+	/*cursor settings*/
+	Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
+	Q_PROPERTY(int cursors_position READ getCursorsPosition
+		  WRITE setCursorsPosition)
+	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
+		  WRITE setCursorsTransparency)
+
 	/* sweep settings */
 	Q_PROPERTY(double sampleRate READ getSampleRate WRITE setSampleRate)
 	Q_PROPERTY(int bufferSize READ getBufferSize WRITE setBufferSize)
@@ -124,6 +131,15 @@ public:
 
 private:
 	logic::LogicAnalyzer *m_logic;
+
+	bool hasCursors() const;
+	void setCursors(bool en);
+
+	int getCursorsPosition() const;
+	void setCursorsPosition(int val);
+
+	int getCursorsTransparency() const;
+	void setCursorsTransparency(int val);
 };
 }
 }
