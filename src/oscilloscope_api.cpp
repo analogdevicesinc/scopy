@@ -115,46 +115,42 @@ void Oscilloscope_API::setVerticalCursors(bool en)
 
 double Oscilloscope_API::cursorV1() const
 {
-    return 0.0;
-    //return osc->plot.value_v1;
+    return osc->plot.value_v1;
 }
 
 double Oscilloscope_API::cursorV2() const
 {
-    return 0.0;
-    //return osc->plot.value_v2;
+    return osc->plot.value_v2;
 }
 
 double Oscilloscope_API::cursorH1() const
 {
-    return 0.0;
-    //return osc->plot.value_h1;
+    return osc->plot.value_h1;
 }
 
 double Oscilloscope_API::cursorH2() const
 {
-    return 0.0;
-    //return osc->plot.value_h2;
+    return osc->plot.value_h2;
 }
 
 void Oscilloscope_API::setCursorV1(double val)
 {
-    //osc->plot.d_vBar1->setPosition(val);
+    osc->plot.d_vBar1->setPosition(val);
 }
 
 void Oscilloscope_API::setCursorV2(double val)
 {
-    //osc->plot.d_vBar2->setPosition(val);
+    osc->plot.d_vBar2->setPosition(val);
 }
 
 void Oscilloscope_API::setCursorH1(double val)
 {
-    //osc->plot.d_hBar1->setPosition(val);
+    osc->plot.d_hBar1->setPosition(val);
 }
 
 void Oscilloscope_API::setCursorH2(double val)
 {
-    //osc->plot.d_hBar2->setPosition(val);
+    osc->plot.d_hBar2->setPosition(val);
 }
 
 bool Oscilloscope_API::autoTrigger() const
@@ -577,19 +573,19 @@ int Oscilloscope_API::getCursorsPosition() const
 	if (!hasCursors()) {
 		return 0;
 	}
-//	auto currentPos = osc->plot.d_cursorReadouts->getCurrentPosition();
-//	switch (currentPos) {
-//	case CustomPlotPositionButton::ReadoutsPosition::topLeft:
-//	default:
-//		return 0;
-//	case CustomPlotPositionButton::ReadoutsPosition::topRight:
-//		return 1;
-//	case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
-//		return 2;
-//	case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
-//		return 3;
-//	}
-    return 3;
+	auto currentPos = osc->plot.d_cursorReadouts->getCurrentPosition();
+	switch (currentPos) {
+	case CustomPlotPositionButton::ReadoutsPosition::topLeft:
+	default:
+		return 0;
+	case CustomPlotPositionButton::ReadoutsPosition::topRight:
+		return 1;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
+		return 2;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
+		return 3;
+	}
+	return 3;
 }
 
 void Oscilloscope_API::setCursorsPosition(int val)

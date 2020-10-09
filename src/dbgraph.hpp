@@ -38,6 +38,7 @@ class OscScaleZoomer;
 
 class dBgraph : public DisplayPlot
 {
+	friend class NetworkAnalyzer_API;
 	Q_OBJECT
 
 	Q_PROPERTY(int numSamples
