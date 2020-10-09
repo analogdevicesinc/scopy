@@ -417,6 +417,11 @@ QString CapturePlot::formatYValue(double value, int precision) const
 	return d_cursorMetricFormatter.format(value, "", precision);
 }
 
+CursorReadouts * CapturePlot::getCursorReadouts() const
+{
+	return d_cursorReadouts;
+}
+
 void CapturePlot::replot()
 {
 
@@ -474,6 +479,7 @@ void CapturePlot::onVCursor1Moved(double value) {
 		onHCursor1Moved(getHorizontalCursorIntersection(d_vBar1->plotCoord().x()));
 	}
 
+	value_v1 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
@@ -500,6 +506,7 @@ void CapturePlot::onVCursor2Moved(double value){
 		onHCursor2Moved(getHorizontalCursorIntersection(d_vBar2->plotCoord().x()));
 	}
 
+	value_v2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
@@ -531,6 +538,7 @@ void CapturePlot::onHCursor1Moved(double value) {
 	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
 	d_cursorReadoutsText.vDelta = error ? "-" : text;
 
+	value_h1 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
@@ -562,6 +570,7 @@ void CapturePlot::onHCursor2Moved(double value) {
 	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
 	d_cursorReadoutsText.vDelta = error ? "-" : text;
 
+	value_h2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 

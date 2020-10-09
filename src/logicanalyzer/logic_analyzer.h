@@ -149,6 +149,7 @@ private:
 	// TODO: consisten naming (m_ui, m_crUi)
 	Ui::LogicAnalyzer *ui;
 	Ui::CursorsSettings *cr_ui;
+	CustomPlotPositionButton *cursorsPositionButton;
 
 	QList<CustomPushButton *> m_menuOrder;
 	QQueue<QPair<CustomPushButton *, bool>> m_menuButtonActions;
