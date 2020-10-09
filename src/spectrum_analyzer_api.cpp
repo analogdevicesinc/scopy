@@ -19,6 +19,7 @@
  */
 #include "spectrum_analyzer_api.hpp"
 #include "ui_spectrum_analyzer.h"
+#include "ui_cursors_settings.h"
 #include "channel_widget.hpp"
 #include "db_click_buttons.hpp"
 
@@ -226,6 +227,16 @@ QVariantList SpectrumAnalyzer_API::getMarkers()
 }
 
 
+bool SpectrumAnalyzer_API::hasCursors() const
+{
+	return sp->ui->boxCursors->isChecked();
+}
+
+void SpectrumAnalyzer_API::setCursors(bool en)
+{
+	sp->ui->boxCursors->setChecked(en);
+}
+
 bool SpectrumAnalyzer_API::running()
 {
 	return sp->runButton()->isChecked();
@@ -364,9 +375,80 @@ void SpectrumAnalyzer_API::setMarkerTableVisible(bool en)
 	sp->ui->btnMarkerTable->setChecked(en);
 }
 
+bool SpectrumAnalyzer_API::horizontalCursors() const
+{
+	return sp->cr_ui->hCursorsEnable->isChecked();
+}
+
+void SpectrumAnalyzer_API::setHorizontalCursors(bool en)
+{
+	sp->cr_ui->hCursorsEnable->setChecked(en);
+}
+
+bool SpectrumAnalyzer_API::verticalCursors() const
+{
+	return sp->cr_ui->vCursorsEnable->isChecked();
+}
+
+void SpectrumAnalyzer_API::setVerticalCursors(bool en)
+{
+	sp->cr_ui->vCursorsEnable->setChecked(en);
+}
+
 bool SpectrumAnalyzer_API::getLogScale() const
 {
 	return sp->fft_plot->getLogScale();
+}
+
+int SpectrumAnalyzer_API::getCursorsPosition() const
+{
+	if (!hasCursors()) {
+		return 0;
+	}
+	auto currentPos = sp->fft_plot->d_cursorReadouts->getCurrentPosition();
+	switch (currentPos) {
+	case CustomPlotPositionButton::ReadoutsPosition::topLeft:
+	default:
+		return 0;
+	case CustomPlotPositionButton::ReadoutsPosition::topRight:
+		return 1;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
+		return 2;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
+		return 3;
+	}
+	return 3;
+}
+
+void SpectrumAnalyzer_API::setCursorsPosition(int val)
+{
+	if (!hasCursors()) {
+		return;
+	}
+	enum CustomPlotPositionButton::ReadoutsPosition types[] = {
+		CustomPlotPositionButton::ReadoutsPosition::topLeft,
+		CustomPlotPositionButton::ReadoutsPosition::topRight,
+		CustomPlotPositionButton::ReadoutsPosition::bottomLeft,
+		CustomPlotPositionButton::ReadoutsPosition::bottomRight
+	};
+	sp->cursorsPositionButton->setPosition(types[val]);
+	sp->fft_plot->replot();
+}
+
+int SpectrumAnalyzer_API::getCursorsTransparency() const
+{
+	if (!hasCursors()) {
+		return 0;
+	}
+	return sp->cr_ui->horizontalSlider->value();
+}
+
+void SpectrumAnalyzer_API::setCursorsTransparency(int val)
+{
+	if (!hasCursors()) {
+		return;
+	}
+	sp->cr_ui->horizontalSlider->setValue(val);
 }
 
 void SpectrumAnalyzer_API::setLogScale(bool useLogScale)

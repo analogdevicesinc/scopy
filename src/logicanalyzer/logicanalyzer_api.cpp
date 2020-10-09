@@ -24,6 +24,7 @@
 
 #include "annotationcurve.h"
 #include "annotationdecoder.h"
+#include "ui_cursors_settings.h"
 
 #include <QCheckBox>
 #include <QJsonDocument>
@@ -403,7 +404,69 @@ QString LogicAnalyzer_API::getNotes()
 {
 	return m_logic->ui->instrumentNotes->getNotes();
 }
+
 void LogicAnalyzer_API::setNotes(QString str)
 {
 	m_logic->ui->instrumentNotes->setNotes(str);
+}
+
+bool LogicAnalyzer_API::hasCursors() const
+{
+	return m_logic->ui->cursorsBox->isChecked();
+}
+
+void LogicAnalyzer_API::setCursors(bool en)
+{
+	m_logic->ui->cursorsBox->setChecked(en);
+}
+
+int LogicAnalyzer_API::getCursorsPosition() const
+{
+	if (!hasCursors()) {
+		return 0;
+	}
+	auto currentPos = m_logic->m_plot.getCursorReadouts()->getCurrentPosition();
+	switch (currentPos) {
+	case CustomPlotPositionButton::ReadoutsPosition::topLeft:
+	default:
+		return 0;
+	case CustomPlotPositionButton::ReadoutsPosition::topRight:
+		return 1;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomLeft:
+		return 2;
+	case CustomPlotPositionButton::ReadoutsPosition::bottomRight:
+		return 3;
+	}
+	return 2;
+}
+
+void LogicAnalyzer_API::setCursorsPosition(int val)
+{
+	if (!hasCursors()) {
+		return;
+	}
+	enum CustomPlotPositionButton::ReadoutsPosition types[] = {
+		CustomPlotPositionButton::ReadoutsPosition::topLeft,
+		CustomPlotPositionButton::ReadoutsPosition::topRight,
+		CustomPlotPositionButton::ReadoutsPosition::bottomLeft,
+		CustomPlotPositionButton::ReadoutsPosition::bottomRight
+	};
+	m_logic->cursorsPositionButton->setPosition(types[val]);
+	m_logic->m_plot.replot();
+}
+
+int LogicAnalyzer_API::getCursorsTransparency() const
+{
+	if (!hasCursors()) {
+		return 0;
+	}
+	return m_logic->cr_ui->horizontalSlider->value();
+}
+
+void LogicAnalyzer_API::setCursorsTransparency(int val)
+{
+	if (!hasCursors()) {
+		return;
+	}
+	m_logic->cr_ui->horizontalSlider->setValue(val);
 }
