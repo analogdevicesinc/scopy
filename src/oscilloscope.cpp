@@ -4674,8 +4674,10 @@ void Oscilloscope::autosetFinalStep() {
 		autoset_id[0] = nullptr;
 	}
 	autosetRequested = false;
-	if(ui->runSingleWidget->runButtonChecked())
+	if (ui->runSingleWidget->runButtonChecked()) {
+		runStopToggled(false);
 		runStopToggled(true);
+	}
 
 	// autoset frequency found
 	if(autosetFFTIndex>1) {
