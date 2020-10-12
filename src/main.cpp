@@ -70,9 +70,15 @@ int main(int argc, char **argv)
 		app.setStyleSheet(stylesheet);
 	}
 
+#ifdef WIN32
 	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+	auto path_str = QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
+	path_str += QString::fromLocal8Bit(pythonpath);
+	qputenv("PYTHONPATH", path_str.toLocal8Bit());
+#endif
 
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
