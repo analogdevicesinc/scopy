@@ -1,7 +1,7 @@
 #!/usr/bin/bash.exe
 
 SCOPY_MINGW_BUILD_DEPS_FORK=analogdevicesinc
-SCOPY_MINGW_BUILD_DEPS_BRANCH=test-mirrors #TODO: change before merging to master;
+SCOPY_MINGW_BUILD_DEPS_BRANCH=master
 
 echo "Download and install pre-compiled libraries ... "
 wget "https://ci.appveyor.com/api/projects/$SCOPY_MINGW_BUILD_DEPS_FORK/scopy-mingw-build-deps/artifacts/scopy-$MINGW_VERSION-build-deps-pacman.txt?branch=$SCOPY_MINGW_BUILD_DEPS_BRANCH&job=Environment: MINGW_VERSION=$MINGW_VERSION, ARCH=$ARCH" -O /tmp/scopy-$MINGW_VERSION-build-deps-pacman.txt
