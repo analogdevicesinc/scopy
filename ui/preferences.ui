@@ -1747,7 +1747,7 @@ color: rgba(255, 255, 255, 70);
              <item>
               <widget class="QLabel" name="label_26">
                <property name="text">
-                <string>Skip calibration if already calibrated (cal values are not default)</string>
+                <string>Skip calibration if already calibrated (needs FW &gt;= 0.26)</string>
                </property>
               </widget>
              </item>
