@@ -853,9 +853,11 @@ void PatternGenerator::connectSignalsAndSlots()
 		btn->setChecked(checked);
 		connect(run_button, &QPushButton::toggled,
 			m_ui->runSingleWidget, &RunSingleWidget::toggle);
-		if (!checked) {
-			m_plot.setTriggerState(CapturePlot::Stop);
-		}
+		// TODO: play with the trigger state when the pattern generator will support
+		// trigger features, till then do not show any trigger state on the plot
+//		if (!checked) {
+//			m_plot.setTriggerState(CapturePlot::Stop);
+//		}
 	});
 	connect(run_button, &QPushButton::toggled,
 		m_ui->runSingleWidget, &RunSingleWidget::toggle);
