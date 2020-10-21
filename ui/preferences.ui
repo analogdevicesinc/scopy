@@ -1677,7 +1677,7 @@ color: rgba(255, 255, 255, 70);
                <item>
                 <widget class="QLabel" name="label_26">
                  <property name="text">
-                  <string>Enable Debug Instrument</string>
+                  <string>Enable IIO Debug Instrument (Requires Scopy restart)</string>
                  </property>
                 </widget>
                </item>
