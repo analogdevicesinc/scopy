@@ -1815,7 +1815,7 @@ void SpectrumAnalyzer::validateSpinboxAveraging()
 void SpectrumAnalyzer::setCurrentSampleLabel(double percentage)
 {
 	QString percentage_str = QString::number(percentage, 'f', 2);
-	QString txt = QString("Sample: %1 % / %2 ").arg(percentage_str).arg(fft_size);
+	QString txt = QString(tr("Sample:") + " %1 % / %2 ").arg(percentage_str).arg(fft_size);
 	ui->lbl_crtSampleNb->setText(txt);
 }
 
@@ -2270,7 +2270,7 @@ void SpectrumAnalyzer::setCurrentAverageIndexLabel(uint chnIdx)
 	if (chnIdx == crt_channel_id) {
 		if (channels[chnIdx]->averaging() != 1) {
 			ui->lbl_crtAvgSample->setVisible(true);
-			QString txt = QString("Average Sample: %1 / %2 ").arg(channels[chnIdx]->averageIdx())
+			QString txt = QString(tr("Average Sample:")+" %1 / %2 ").arg(channels[chnIdx]->averageIdx())
 					.arg(channels[chnIdx]->averaging());
 			ui->lbl_crtAvgSample->setText(txt);
 			ui->lbl_crtAvgSample->setStyleSheet(QString("QLabel {"
