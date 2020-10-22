@@ -31,6 +31,8 @@
 #include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
 
+#define ERROR_VALUE -10000000
+
 using namespace adiscope;
 
 class FftDisplayZoomer: public LimitedPlotZoomer
@@ -162,6 +164,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 
 	setYaxisNumDiv(11);
 
+	d_selected_channel = 0;
+
 	d_topHandlesArea->setMinimumHeight(50);
 	d_topHandlesArea->setLargestChildWidth(50);
 
@@ -232,17 +236,15 @@ QString FftDisplayPlot::formatYValue(double value, int precision) const
 
 void FftDisplayPlot::setupReadouts()
 {
-	d_cursorReadouts = new CursorReadouts(this);
-	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
 	d_cursorReadouts->setTimeReadoutVisible(false);
 	d_cursorReadouts->setVoltageReadoutVisible(false);
 
-	d_cursorReadouts->setTimeCursor1LabelText("Mag1 = ");
-	d_cursorReadouts->setTimeCursor2LabelText("Mag2 = ");
-	d_cursorReadouts->setTimeDeltaLabelText("ΔMag = ");
-	d_cursorReadouts->setVoltageCursor1LabelText("F1 = ");
-	d_cursorReadouts->setVoltageCursor2LabelText("F2 = ");
-	d_cursorReadouts->setDeltaVoltageLabelText("ΔF = ");
+	d_cursorReadouts->setTimeCursor1LabelText("F1 = ");
+	d_cursorReadouts->setTimeCursor2LabelText("F2 = ");
+	d_cursorReadouts->setTimeDeltaLabelText("ΔF = ");
+	d_cursorReadouts->setVoltageCursor1LabelText("Mag1 = ");
+	d_cursorReadouts->setVoltageCursor2LabelText("Mag2 = ");
+	d_cursorReadouts->setDeltaVoltageLabelText("ΔMag = ");
 
 	d_cursorReadouts->setFrequencyDeltaVisible(false);
 	d_cursorReadouts->setTransparency(0);
@@ -267,15 +269,29 @@ void FftDisplayPlot::updateHandleAreaPadding()
 void FftDisplayPlot::onHCursor1Moved(double value)
 {
 	QString text;
+	bool error = false;
+	if (d_trackMode) {
+		if (value == ERROR_VALUE) {
+			error = true;
+		}
+	}
 
+	value *= d_displayScale;
 	text = d_formatter->format(value, "dB", 3);
-	d_cursorReadouts->setTimeCursor1Text(text);
-	d_cursorReadoutsText.t1 = text;
+	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
+	d_cursorReadoutsText.t1 = error ? "-" : text;
 
-	double diff = value - d_hBar2->plotCoord().y();
+	double valueCursor2;
+	if (d_trackMode) {
+		valueCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
+	} else {
+		valueCursor2 = d_hBar2->plotCoord().y();
+	}
+
+	double diff = value - (valueCursor2 * d_displayScale);
 	text = d_formatter->format(diff, "dB", 3);
-	d_cursorReadouts->setTimeDeltaText(text);
-	d_cursorReadoutsText.tDelta = text;
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.tDelta = error ? "-" : text;
 
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
@@ -283,36 +299,48 @@ void FftDisplayPlot::onHCursor1Moved(double value)
 void FftDisplayPlot::onHCursor2Moved(double value)
 {
 	QString text;
+	bool error = false;
+	if (d_trackMode) {
+		if (value == ERROR_VALUE) {
+			error = true;
+		}
+	}
 
+	value *= d_displayScale;
 	text = d_formatter->format(value, "dB", 3);
-	d_cursorReadouts->setTimeCursor2Text(text);
-	d_cursorReadoutsText.t2 = text;
+	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
+	d_cursorReadoutsText.t2 = error ? "-" : text;
 
-	double diff = d_hBar1->plotCoord().y() - value;
+	double valueCursor1;
+	if (d_trackMode) {
+		valueCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
+	} else {
+		valueCursor1 = d_hBar1->plotCoord().y();
+	}
+
+	double diff = (valueCursor1 * d_displayScale) - value;
 	text = d_formatter->format(diff, "dB", 3);
-	d_cursorReadouts->setTimeDeltaText(text);
-	d_cursorReadoutsText.tDelta = text;
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.tDelta = error ? "-" : text;
 
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
 void FftDisplayPlot::onVCursor1Moved(double value)
 {
-
 	QString text;
-	bool error = false;
-
-	value *= d_displayScale;
 	text = d_formatter->format(value, "Hz", 3);
-	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
-	d_cursorReadoutsText.v1 = error ? "-" : text;
+	d_cursorReadouts->setTimeCursor1Text(text);
+	d_cursorReadoutsText.v1 = text;
 
-	double valueCursor2 = d_vBar2->plotCoord().x();
-
-	double diff = value - (valueCursor2 * d_displayScale) ;
+	double diff = value - d_vBar2->plotCoord().x();
 	text = d_formatter->format(diff, "Hz", 3);
-	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
-	d_cursorReadoutsText.vDelta = error ? "-" : text;
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.vDelta = text;
+
+	if (d_trackMode) {
+		onHCursor1Moved(getHorizontalCursorIntersection(d_vBar1->plotCoord().x()));
+	}
 
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
@@ -320,19 +348,18 @@ void FftDisplayPlot::onVCursor1Moved(double value)
 void FftDisplayPlot::onVCursor2Moved(double value)
 {
 	QString text;
-	bool error = false;
-
-	value *= d_displayScale;
 	text = d_formatter->format(value, "Hz", 3);
-	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
-	d_cursorReadoutsText.v2 = error ? "-" : text;
+	d_cursorReadouts->setTimeCursor2Text(text);
+	d_cursorReadoutsText.v2 = text;
 
-	double valueCursor1 = d_vBar1->plotCoord().x();
-
-	double diff = (valueCursor1 * d_displayScale) - value;
+	double diff = d_vBar1->plotCoord().x() - value;
 	text = d_formatter->format(diff, "Hz", 3);
-	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
-	d_cursorReadoutsText.vDelta = error ? "-" : text;
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.vDelta = text;
+
+	if (d_trackMode) {
+		onHCursor2Moved(getHorizontalCursorIntersection(d_vBar2->plotCoord().x()));
+	}
 
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
@@ -369,6 +396,13 @@ void FftDisplayPlot::showEvent(QShowEvent *event)
 	d_vCursorHandle2->triggerMove();
 	d_hCursorHandle1->triggerMove();
 	d_hCursorHandle2->triggerMove();
+}
+
+void FftDisplayPlot::setSelectedChannel(int id)
+{
+	if (d_selected_channel != id)  {
+		d_selected_channel = id;
+	}
 }
 
 void FftDisplayPlot::setZoomerEnabled()

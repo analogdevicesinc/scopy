@@ -57,11 +57,6 @@ void dBgraph::setupVerticalBars()
 
 void dBgraph::setupReadouts()
 {
-	d_cursorReadouts = new CursorReadouts(this);
-	d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
-	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
-	d_cursorReadouts->moveToPosition(CustomPlotPositionButton::topLeft);
-
 	d_cursorReadouts->setTimeReadoutVisible(false);
 	d_cursorReadouts->setVoltageReadoutVisible(false);
 
@@ -140,6 +135,10 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	d_leftHandlesArea->setTopPadding(10);
 	d_leftHandlesArea->setBottomPadding(0);
 	d_leftHandlesArea->setMinimumHeight(this->minimumHeight());
+
+	d_rightHandlesArea->setMinimumWidth(40);
+	d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
+
 
 	d_topHandlesArea->setMinimumHeight(20);
 	d_topHandlesArea->setLargestChildWidth(60);
@@ -301,7 +300,7 @@ bool dBgraph::eventFilter(QObject *object, QEvent *event)
 
 		d_leftHandlesArea->repaint();
 		d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width() + 10);
-		d_bottomHandlesArea->setRightPadding(80);
+		d_bottomHandlesArea->setRightPadding(d_rightHandlesArea->width() + 24);
 
 		d_hCursorHandle1->triggerMove();
 		d_hCursorHandle2->triggerMove();

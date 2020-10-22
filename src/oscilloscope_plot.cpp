@@ -462,7 +462,8 @@ void CapturePlot::enableTimeTrigger(bool enable)
 	d_timeTriggerHandle->setVisible(enable);
 }
 
-void CapturePlot::onVCursor1Moved(double value) {
+void CapturePlot::onVCursor1Moved(double value)
+{
 	QString text;
 	text = d_cursorTimeFormatter.format(value, "", 3);
 	d_cursorReadouts->setTimeCursor1Text(text);
@@ -487,10 +488,9 @@ void CapturePlot::onVCursor1Moved(double value) {
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
-void CapturePlot::onVCursor2Moved(double value){
-
+void CapturePlot::onVCursor2Moved(double value)
+{
 	QString text;
-
 	text = d_cursorTimeFormatter.format(value, "", 3);
 	d_cursorReadouts->setTimeCursor2Text(text);
 	d_cursorReadoutsText.t2 = text;
@@ -514,8 +514,8 @@ void CapturePlot::onVCursor2Moved(double value){
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
-void CapturePlot::onHCursor1Moved(double value) {
-
+void CapturePlot::onHCursor1Moved(double value)
+{
 	QString text;
 
 	bool error = false;
@@ -546,8 +546,8 @@ void CapturePlot::onHCursor1Moved(double value) {
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
 }
 
-void CapturePlot::onHCursor2Moved(double value) {
-
+void CapturePlot::onHCursor2Moved(double value)
+{
 	QString text;
 
 	bool error = false;
