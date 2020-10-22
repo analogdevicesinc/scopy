@@ -355,7 +355,7 @@ AC Coupling</source>
     </message>
     <message>
         <location filename="../../ui/connect.ui" line="47"/>
-        <source>Hostname</source>
+        <source>URI (Hostname)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -551,88 +551,154 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="716"/>
+        <location filename="../../ui/dmm.ui" line="717"/>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="823"/>
+        <location filename="../../ui/dmm.ui" line="824"/>
         <source>Channel 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="854"/>
-        <location filename="../../ui/dmm.ui" line="1010"/>
+        <location filename="../../ui/dmm.ui" line="855"/>
+        <location filename="../../ui/dmm.ui" line="1107"/>
         <source>DC (Direct Current)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="867"/>
-        <location filename="../../ui/dmm.ui" line="1023"/>
+        <location filename="../../ui/dmm.ui" line="868"/>
+        <location filename="../../ui/dmm.ui" line="1120"/>
         <source>AC (20 Hz - 40 kHz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="900"/>
-        <location filename="../../ui/dmm.ui" line="1056"/>
+        <location filename="../../ui/dmm.ui" line="901"/>
+        <location filename="../../ui/dmm.ui" line="1153"/>
         <source>1s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="905"/>
-        <location filename="../../ui/dmm.ui" line="1061"/>
+        <location filename="../../ui/dmm.ui" line="906"/>
+        <location filename="../../ui/dmm.ui" line="1158"/>
         <source>10s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="910"/>
-        <location filename="../../ui/dmm.ui" line="1066"/>
+        <location filename="../../ui/dmm.ui" line="911"/>
+        <location filename="../../ui/dmm.ui" line="1163"/>
         <source>60s</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="926"/>
-        <location filename="../../ui/dmm.ui" line="1082"/>
+        <location filename="../../ui/dmm.ui" line="927"/>
+        <location filename="../../ui/dmm.ui" line="1179"/>
         <source>History</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="979"/>
+        <location filename="../../ui/dmm.ui" line="970"/>
+        <location filename="../../ui/dmm.ui" line="1222"/>
+        <source>Line thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="989"/>
+        <location filename="../../ui/dmm.ui" line="1241"/>
+        <source>0.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="994"/>
+        <location filename="../../ui/dmm.ui" line="1246"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="999"/>
+        <location filename="../../ui/dmm.ui" line="1251"/>
+        <source>1.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1004"/>
+        <location filename="../../ui/dmm.ui" line="1256"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1009"/>
+        <location filename="../../ui/dmm.ui" line="1261"/>
+        <source>2.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1014"/>
+        <location filename="../../ui/dmm.ui" line="1266"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1019"/>
+        <location filename="../../ui/dmm.ui" line="1271"/>
+        <source>3.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1024"/>
+        <location filename="../../ui/dmm.ui" line="1276"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1029"/>
+        <location filename="../../ui/dmm.ui" line="1281"/>
+        <source>4.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1034"/>
+        <location filename="../../ui/dmm.ui" line="1286"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/dmm.ui" line="1076"/>
         <source>Channel 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1167"/>
+        <location filename="../../ui/dmm.ui" line="1360"/>
         <source> PEAK HOLD </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1281"/>
+        <location filename="../../ui/dmm.ui" line="1474"/>
         <source>Reset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1357"/>
+        <location filename="../../ui/dmm.ui" line="1550"/>
         <source> DATA LOGGING </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1528"/>
+        <location filename="../../ui/dmm.ui" line="1721"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1559"/>
+        <location filename="../../ui/dmm.ui" line="1752"/>
         <source>Append</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1569"/>
+        <location filename="../../ui/dmm.ui" line="1762"/>
         <source>Choose a file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/dmm.ui" line="1592"/>
+        <location filename="../../ui/dmm.ui" line="1785"/>
         <source>Overwrite</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1046,22 +1112,22 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/info_page.ui" line="67"/>
+        <location filename="../../ui/info_page.ui" line="84"/>
         <source>Forget device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/info_page.ui" line="118"/>
+        <location filename="../../ui/info_page.ui" line="135"/>
         <source>Identify</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/info_page.ui" line="200"/>
+        <location filename="../../ui/info_page.ui" line="184"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/info_page.ui" line="395"/>
+        <location filename="../../ui/info_page.ui" line="379"/>
         <source>Calibrate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1076,6 +1142,33 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/info_widget.ui" line="35"/>
         <source>Move</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>InstrumentNotes</name>
+    <message>
+        <location filename="../../ui/instrumentnotes.ui" line="32"/>
+        <source>Form</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/instrumentnotes.ui" line="80"/>
+        <source>Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/instrumentnotes.ui" line="126"/>
+        <source>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:&apos;Ubuntu&apos;; font-size:11pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/instrumentnotes.ui" line="136"/>
+        <source>Insert notes here</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1321,104 +1414,109 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="752"/>
-        <location filename="../../ui/logic_analyzer.ui" line="2058"/>
+        <location filename="../../ui/logic_analyzer.ui" line="638"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1991"/>
         <source>Channel Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="803"/>
-        <location filename="../../ui/logic_analyzer.ui" line="1426"/>
+        <location filename="../../ui/logic_analyzer.ui" line="689"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1353"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="873"/>
+        <location filename="../../ui/logic_analyzer.ui" line="759"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="889"/>
+        <location filename="../../ui/logic_analyzer.ui" line="775"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="905"/>
+        <location filename="../../ui/logic_analyzer.ui" line="791"/>
         <source>Trace Height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="960"/>
+        <location filename="../../ui/logic_analyzer.ui" line="846"/>
         <source>GROUP </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1029"/>
+        <location filename="../../ui/logic_analyzer.ui" line="915"/>
         <source>Stack Decoder:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1133"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1023"/>
         <source>Trigger Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1186"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1076"/>
         <source>Trigger mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1281"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1171"/>
         <source>auto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1284"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1174"/>
         <source>normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1302"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1192"/>
         <source>Trigger Logic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1335"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1225"/>
         <source>EXTERNAL TRIGGER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1401"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1283"/>
+        <source>&quot;Warning: This feature is not supported on the current firmware version!&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/logic_analyzer.ui" line="1328"/>
         <source>Source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1408"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1335"/>
         <source>Condition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1578"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1508"/>
         <source>General Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1687"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1617"/>
         <source>OneShot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1715"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1645"/>
         <source>AVAILABLE CHANNELS </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1834"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1764"/>
         <source>DECODERS </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="2181"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2114"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1428,18 +1526,18 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="1690"/>
+        <location filename="../../ui/logic_analyzer.ui" line="1620"/>
         <source>Stream</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="2105"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2038"/>
         <source>Cursors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/logic_analyzer.ui" line="860"/>
-        <location filename="../../ui/logic_analyzer.ui" line="2153"/>
+        <location filename="../../ui/logic_analyzer.ui" line="746"/>
+        <location filename="../../ui/logic_analyzer.ui" line="2086"/>
         <source>Trigger</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1736,270 +1834,291 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="742"/>
+        <location filename="../../ui/network_analyzer.ui" line="485"/>
+        <source>Average: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/network_analyzer.ui" line="761"/>
         <source>Phase (°)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="745"/>
+        <location filename="../../ui/network_analyzer.ui" line="764"/>
         <source>Magnitude (dB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="748"/>
+        <location filename="../../ui/network_analyzer.ui" line="767"/>
         <source>°</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="760"/>
+        <location filename="../../ui/network_analyzer.ui" line="779"/>
         <source>10</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="904"/>
+        <location filename="../../ui/network_analyzer.ui" line="923"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="967"/>
-        <location filename="../../ui/network_analyzer.ui" line="2404"/>
+        <location filename="../../ui/network_analyzer.ui" line="986"/>
+        <location filename="../../ui/network_analyzer.ui" line="2614"/>
         <source>REFERENCE </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1074"/>
+        <location filename="../../ui/network_analyzer.ui" line="1093"/>
         <source>Channel 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1077"/>
+        <location filename="../../ui/network_analyzer.ui" line="1096"/>
         <source>Channel 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1080"/>
+        <location filename="../../ui/network_analyzer.ui" line="1099"/>
         <source>0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1145"/>
+        <location filename="../../ui/network_analyzer.ui" line="1164"/>
         <source>Gain Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1153"/>
+        <location filename="../../ui/network_analyzer.ui" line="1172"/>
         <source>Automatic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1158"/>
+        <location filename="../../ui/network_analyzer.ui" line="1177"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1163"/>
+        <location filename="../../ui/network_analyzer.ui" line="1182"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1197"/>
+        <location filename="../../ui/network_analyzer.ui" line="1216"/>
         <source>RESPONSE </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1230"/>
+        <location filename="../../ui/network_analyzer.ui" line="1249"/>
         <source>DC Filtering</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1246"/>
-        <location filename="../../ui/network_analyzer.ui" line="1618"/>
+        <location filename="../../ui/network_analyzer.ui" line="1265"/>
+        <location filename="../../ui/network_analyzer.ui" line="1828"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1249"/>
-        <location filename="../../ui/network_analyzer.ui" line="1621"/>
+        <location filename="../../ui/network_analyzer.ui" line="1268"/>
+        <location filename="../../ui/network_analyzer.ui" line="1831"/>
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1315"/>
+        <location filename="../../ui/network_analyzer.ui" line="1334"/>
         <source>SWEEP </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1456"/>
+        <location filename="../../ui/network_analyzer.ui" line="1475"/>
         <source>Logarithmic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1459"/>
+        <location filename="../../ui/network_analyzer.ui" line="1478"/>
         <source>Linear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1528"/>
+        <location filename="../../ui/network_analyzer.ui" line="1563"/>
+        <source>Average</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/network_analyzer.ui" line="1609"/>
+        <location filename="../../ui/network_analyzer.ui" line="1703"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/network_analyzer.ui" line="1629"/>
+        <source>Periods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/network_analyzer.ui" line="1738"/>
         <source>DISPLAY </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1608"/>
+        <location filename="../../ui/network_analyzer.ui" line="1818"/>
         <source>Delta Label</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1654"/>
+        <location filename="../../ui/network_analyzer.ui" line="1864"/>
         <source>BUFFER PREVIEWER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1787"/>
+        <location filename="../../ui/network_analyzer.ui" line="1997"/>
         <source>ViewInOsc</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1835"/>
+        <location filename="../../ui/network_analyzer.ui" line="2045"/>
         <source>Previous</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1904"/>
+        <location filename="../../ui/network_analyzer.ui" line="2114"/>
         <source>     Next</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="1966"/>
+        <location filename="../../ui/network_analyzer.ui" line="2176"/>
         <source>General Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2042"/>
+        <location filename="../../ui/network_analyzer.ui" line="2252"/>
         <source>PLOT </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2106"/>
+        <location filename="../../ui/network_analyzer.ui" line="2316"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2120"/>
+        <location filename="../../ui/network_analyzer.ui" line="2330"/>
         <source>Bode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2125"/>
+        <location filename="../../ui/network_analyzer.ui" line="2335"/>
         <source>Nyquist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2130"/>
+        <location filename="../../ui/network_analyzer.ui" line="2340"/>
         <source>Nichols</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2178"/>
+        <location filename="../../ui/network_analyzer.ui" line="2388"/>
         <source>Line thickness</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2197"/>
+        <location filename="../../ui/network_analyzer.ui" line="2407"/>
         <source>0.5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2202"/>
+        <location filename="../../ui/network_analyzer.ui" line="2412"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2207"/>
+        <location filename="../../ui/network_analyzer.ui" line="2417"/>
         <source>1.5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2212"/>
+        <location filename="../../ui/network_analyzer.ui" line="2422"/>
         <source>2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2217"/>
+        <location filename="../../ui/network_analyzer.ui" line="2427"/>
         <source>2.5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2222"/>
+        <location filename="../../ui/network_analyzer.ui" line="2432"/>
         <source>3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2227"/>
+        <location filename="../../ui/network_analyzer.ui" line="2437"/>
         <source>3.5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2232"/>
+        <location filename="../../ui/network_analyzer.ui" line="2442"/>
         <source>4</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2237"/>
+        <location filename="../../ui/network_analyzer.ui" line="2447"/>
         <source>4.5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2242"/>
+        <location filename="../../ui/network_analyzer.ui" line="2452"/>
         <source>5</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2288"/>
+        <location filename="../../ui/network_analyzer.ui" line="2498"/>
         <source>EXPORT </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2351"/>
+        <location filename="../../ui/network_analyzer.ui" line="2561"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2497"/>
+        <location filename="../../ui/network_analyzer.ui" line="2707"/>
         <source>Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2546"/>
+        <location filename="../../ui/network_analyzer.ui" line="2756"/>
         <source>Snapshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2598"/>
+        <location filename="../../ui/network_analyzer.ui" line="2808"/>
         <source>Remove Reference</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2638"/>
+        <location filename="../../ui/network_analyzer.ui" line="2848"/>
         <source>Cursors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2721"/>
+        <location filename="../../ui/network_analyzer.ui" line="2931"/>
         <source>CURSOR READOUTS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2776"/>
+        <location filename="../../ui/network_analyzer.ui" line="2986"/>
         <source>Transparency 0%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2818"/>
+        <location filename="../../ui/network_analyzer.ui" line="3028"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/network_analyzer.ui" line="2955"/>
+        <location filename="../../ui/network_analyzer.ui" line="3165"/>
         <source>Cursors </source>
         <translation type="unfinished"></translation>
     </message>
@@ -2041,53 +2160,108 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="77"/>
+        <location filename="../../ui/osc_general_settings.ui" line="94"/>
         <source>General settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="122"/>
+        <location filename="../../ui/osc_general_settings.ui" line="171"/>
         <source>VIEWS </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="202"/>
+        <location filename="../../ui/osc_general_settings.ui" line="219"/>
         <source>FFT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="212"/>
+        <location filename="../../ui/osc_general_settings.ui" line="253"/>
         <source>X-Y</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="243"/>
+        <location filename="../../ui/osc_general_settings.ui" line="229"/>
         <source>Histogram</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="303"/>
+        <location filename="../../ui/osc_general_settings.ui" line="320"/>
         <source>X-Y </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="348"/>
+        <location filename="../../ui/osc_general_settings.ui" line="365"/>
         <source>Y-Axis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="361"/>
+        <location filename="../../ui/osc_general_settings.ui" line="378"/>
         <source>X-Axis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="382"/>
+        <location filename="../../ui/osc_general_settings.ui" line="399"/>
         <source>dots</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/osc_general_settings.ui" line="385"/>
+        <location filename="../../ui/osc_general_settings.ui" line="402"/>
         <source>lines</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="417"/>
+        <source>X-Y Line thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="428"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="433"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="438"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="443"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="448"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="453"/>
+        <source>6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="458"/>
+        <source>7</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="463"/>
+        <source>8</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="468"/>
+        <source>9</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/osc_general_settings.ui" line="473"/>
+        <source>10</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2104,22 +2278,22 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="893"/>
+        <location filename="../../ui/oscilloscope.ui" line="960"/>
         <source>Cursors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="932"/>
+        <location filename="../../ui/oscilloscope.ui" line="999"/>
         <source>Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="971"/>
+        <location filename="../../ui/oscilloscope.ui" line="1038"/>
         <source>Trigger</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/oscilloscope.ui" line="999"/>
+        <location filename="../../ui/oscilloscope.ui" line="1066"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2375,113 +2549,113 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="752"/>
-        <location filename="../../ui/pattern_generator.ui" line="1884"/>
+        <location filename="../../ui/pattern_generator.ui" line="648"/>
+        <location filename="../../ui/pattern_generator.ui" line="1783"/>
         <source>Channel Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="811"/>
+        <location filename="../../ui/pattern_generator.ui" line="707"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="824"/>
+        <location filename="../../ui/pattern_generator.ui" line="720"/>
         <source>Trace Height</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="840"/>
+        <location filename="../../ui/pattern_generator.ui" line="736"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="920"/>
+        <location filename="../../ui/pattern_generator.ui" line="816"/>
         <source>Open-Drain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="923"/>
+        <location filename="../../ui/pattern_generator.ui" line="819"/>
         <source>Push-Pull</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="981"/>
+        <location filename="../../ui/pattern_generator.ui" line="877"/>
         <source>GROUP </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1030"/>
+        <location filename="../../ui/pattern_generator.ui" line="926"/>
         <source>Pattern</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1162"/>
+        <location filename="../../ui/pattern_generator.ui" line="1058"/>
         <source>Trigger Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1215"/>
+        <location filename="../../ui/pattern_generator.ui" line="1111"/>
         <source>Trigger mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1310"/>
+        <location filename="../../ui/pattern_generator.ui" line="1206"/>
         <source>auto</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1313"/>
+        <location filename="../../ui/pattern_generator.ui" line="1209"/>
         <source>normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1331"/>
+        <location filename="../../ui/pattern_generator.ui" line="1227"/>
         <source>Trigger Logic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1364"/>
+        <location filename="../../ui/pattern_generator.ui" line="1260"/>
         <source>EXTERNAL TRIGGER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1430"/>
+        <location filename="../../ui/pattern_generator.ui" line="1326"/>
         <source>Source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1437"/>
+        <location filename="../../ui/pattern_generator.ui" line="1333"/>
         <source>Condition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1455"/>
+        <location filename="../../ui/pattern_generator.ui" line="1351"/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1607"/>
+        <location filename="../../ui/pattern_generator.ui" line="1506"/>
         <source>General Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1651"/>
+        <location filename="../../ui/pattern_generator.ui" line="1550"/>
         <source>AVAILABLE CHANNELS </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1931"/>
+        <location filename="../../ui/pattern_generator.ui" line="1830"/>
         <source>Cursors</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="1979"/>
+        <location filename="../../ui/pattern_generator.ui" line="1878"/>
         <source>Trigger</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/pattern_generator.ui" line="2007"/>
+        <location filename="../../ui/pattern_generator.ui" line="1906"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2495,62 +2669,62 @@ AC Coupling</source>
     </message>
     <message>
         <location filename="../../ui/powercontrol.ui" line="96"/>
-        <location filename="../../ui/powercontrol.ui" line="376"/>
+        <location filename="../../ui/powercontrol.ui" line="382"/>
         <source>Set</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/powercontrol.ui" line="144"/>
-        <location filename="../../ui/powercontrol.ui" line="310"/>
+        <location filename="../../ui/powercontrol.ui" line="316"/>
         <source>Measure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/powercontrol.ui" line="154"/>
         <location filename="../../ui/powercontrol.ui" line="223"/>
-        <location filename="../../ui/powercontrol.ui" line="430"/>
-        <location filename="../../ui/powercontrol.ui" line="440"/>
+        <location filename="../../ui/powercontrol.ui" line="436"/>
+        <location filename="../../ui/powercontrol.ui" line="446"/>
         <source>VDC</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="531"/>
+        <location filename="../../ui/powercontrol.ui" line="549"/>
         <source>Tracking ratio control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="636"/>
+        <location filename="../../ui/powercontrol.ui" line="654"/>
         <source>Independent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="639"/>
+        <location filename="../../ui/powercontrol.ui" line="657"/>
         <source>Tracking</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="713"/>
+        <location filename="../../ui/powercontrol.ui" line="731"/>
         <source>100</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="732"/>
+        <location filename="../../ui/powercontrol.ui" line="750"/>
         <source>%</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="770"/>
+        <location filename="../../ui/powercontrol.ui" line="788"/>
         <source>Positive output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="851"/>
-        <location filename="../../ui/powercontrol.ui" line="982"/>
+        <location filename="../../ui/powercontrol.ui" line="867"/>
+        <location filename="../../ui/powercontrol.ui" line="996"/>
         <source>Enable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/powercontrol.ui" line="901"/>
+        <location filename="../../ui/powercontrol.ui" line="917"/>
         <source>Negative output</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2563,137 +2737,167 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="113"/>
+        <location filename="../../ui/preferences.ui" line="132"/>
         <source>GENERAL </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1406"/>
+        <location filename="../../ui/preferences.ui" line="943"/>
         <source>OSCILLOSCOPE </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1364"/>
+        <location filename="../../ui/preferences.ui" line="901"/>
         <source>Enable labels on the plot </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1118"/>
+        <location filename="../../ui/preferences.ui" line="688"/>
         <source>Enable graticule</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1230"/>
+        <location filename="../../ui/preferences.ui" line="785"/>
         <source>Enable mini histogram</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="324"/>
+        <location filename="../../ui/preferences.ui" line="1333"/>
+        <source>Enable all instrument notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1384"/>
         <source>Language (requires app restart)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="362"/>
+        <location filename="../../ui/preferences.ui" line="1422"/>
         <source>Restart the application for changes to take effect </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="479"/>
+        <location filename="../../ui/preferences.ui" line="1522"/>
+        <source>Attempt temperature-based calibration (EXPERIMENTAL)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1556"/>
         <source>Enable animations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="764"/>
+        <location filename="../../ui/preferences.ui" line="1088"/>
         <source>1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="984"/>
+        <location filename="../../ui/preferences.ui" line="488"/>
         <source>Run external scripts (Experimental)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="836"/>
+        <location filename="../../ui/preferences.ui" line="544"/>
         <source>SPECTRUM ANALYZER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="910"/>
+        <location filename="../../ui/preferences.ui" line="612"/>
         <source>Only search marker peaks in visible domain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1495"/>
+        <location filename="../../ui/preferences.ui" line="1472"/>
         <source>Double click to detach a tool</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1737"/>
+        <location filename="../../ui/preferences.ui" line="399"/>
         <source>Save session when closing Scopy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1555"/>
+        <location filename="../../ui/preferences.ui" line="243"/>
         <source>NETWORK ANALYZER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1648"/>
+        <location filename="../../ui/preferences.ui" line="330"/>
         <source>Always display 0db value on graph</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="217"/>
-        <source>Enable user notes</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../ui/preferences.ui" line="416"/>
+        <location filename="../../ui/preferences.ui" line="1280"/>
         <source>Scriptable manual calibration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="273"/>
+        <location filename="../../ui/preferences.ui" line="1441"/>
         <source>Show advanced device information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="529"/>
+        <location filename="../../ui/preferences.ui" line="1157"/>
         <source>LOGIC ANALYZER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="604"/>
+        <location filename="../../ui/preferences.ui" line="1226"/>
         <source>Display sampling points when zoomed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="682"/>
+        <location filename="../../ui/preferences.ui" line="1015"/>
         <source>SIGNAL GENERATOR </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="740"/>
+        <location filename="../../ui/preferences.ui" line="1064"/>
         <source>Number of displayed periods </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1041"/>
+        <location filename="../../ui/preferences.ui" line="433"/>
         <source>Enable digital decoders</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1174"/>
+        <location filename="../../ui/preferences.ui" line="735"/>
         <source>Enable sample rate filters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1296"/>
+        <location filename="../../ui/preferences.ui" line="845"/>
         <source>Show ADC digital filter config</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/preferences.ui" line="1855"/>
+        <location filename="../../ui/preferences.ui" line="1603"/>
+        <source>DEBUG</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1646"/>
+        <source>Enable Debug Messages (Only for Debugging, Bugreporting)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1680"/>
+        <source>Enable Debug Instrument</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1713"/>
+        <source>Enable user notes in main page</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1750"/>
+        <source>Skip calibration if already calibrated (cal values are not default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/preferences.ui" line="1868"/>
         <source>Reset Scopy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2969,143 +3173,203 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="266"/>
+        <location filename="../../ui/signal_generator.ui" line="276"/>
         <source>Constant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="333"/>
+        <location filename="../../ui/signal_generator.ui" line="343"/>
         <source>Waveform</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="361"/>
+        <location filename="../../ui/signal_generator.ui" line="371"/>
         <source>Sine</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="366"/>
+        <location filename="../../ui/signal_generator.ui" line="376"/>
         <source>Square</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="371"/>
+        <location filename="../../ui/signal_generator.ui" line="381"/>
         <source>Triangle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="376"/>
+        <location filename="../../ui/signal_generator.ui" line="386"/>
         <source>Trapezoidal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="381"/>
+        <location filename="../../ui/signal_generator.ui" line="391"/>
         <source>Rising Ramp Sawtooth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="386"/>
+        <location filename="../../ui/signal_generator.ui" line="396"/>
         <source>Falling Ramp Sawtooth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="391"/>
+        <location filename="../../ui/signal_generator.ui" line="401"/>
         <source>Stair Step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="447"/>
+        <location filename="../../ui/signal_generator.ui" line="457"/>
         <source>TIMING </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="534"/>
+        <location filename="../../ui/signal_generator.ui" line="544"/>
         <source>Buffer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="566"/>
+        <location filename="../../ui/signal_generator.ui" line="576"/>
         <source>FILE </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="636"/>
+        <location filename="../../ui/signal_generator.ui" line="646"/>
         <source>Path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="652"/>
-        <location filename="../../ui/signal_generator.ui" line="683"/>
+        <location filename="../../ui/signal_generator.ui" line="662"/>
+        <location filename="../../ui/signal_generator.ui" line="693"/>
         <source>No file loaded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="667"/>
+        <location filename="../../ui/signal_generator.ui" line="677"/>
         <source>Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="698"/>
+        <location filename="../../ui/signal_generator.ui" line="708"/>
         <source>Size</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="714"/>
+        <location filename="../../ui/signal_generator.ui" line="724"/>
         <source>0 samples</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="783"/>
+        <location filename="../../ui/signal_generator.ui" line="793"/>
         <source>Load file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="844"/>
+        <location filename="../../ui/signal_generator.ui" line="854"/>
         <source>Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="893"/>
+        <location filename="../../ui/signal_generator.ui" line="903"/>
         <source>SCALING </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="968"/>
+        <location filename="../../ui/signal_generator.ui" line="978"/>
         <source>Math</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1061"/>
-        <source>NOISE </source>
+        <location filename="../../ui/signal_generator.ui" line="1083"/>
+        <source> NOISE </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1099"/>
+        <location filename="../../ui/signal_generator.ui" line="1139"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1104"/>
+        <location filename="../../ui/signal_generator.ui" line="1144"/>
         <source>Uniform</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1109"/>
+        <location filename="../../ui/signal_generator.ui" line="1149"/>
         <source>Gaussian</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1114"/>
+        <location filename="../../ui/signal_generator.ui" line="1154"/>
         <source>Laplacian</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1119"/>
+        <location filename="../../ui/signal_generator.ui" line="1159"/>
         <source>Impulse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/signal_generator.ui" line="1195"/>
+        <location filename="../../ui/signal_generator.ui" line="1246"/>
+        <source>OTHER</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1320"/>
+        <source>Line thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1339"/>
+        <source>0.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1344"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1349"/>
+        <source>1.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1354"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1359"/>
+        <source>2.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1364"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1369"/>
+        <source>3.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1374"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1379"/>
+        <source>4.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1384"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/signal_generator.ui" line="1445"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3128,177 +3392,268 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="430"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1234"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="437"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1518"/>
         <source>dBFS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="450"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="472"/>
+        <source>Sample:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="495"/>
+        <source>Average Sample: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="515"/>
         <source>Marker_n 0.000 Hz 0dB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="532"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="593"/>
         <source>Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="578"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="639"/>
         <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="586"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="647"/>
         <source>Sample</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="591"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="652"/>
         <source>and other types</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="612"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="673"/>
         <source>Window</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="620"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="681"/>
         <source>Uniform (none)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="625"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="686"/>
         <source>and others windows</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="652"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="716"/>
         <source>Averaging</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="709"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="793"/>
+        <source>Apply</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="813"/>
+        <source>CH Thickness</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="821"/>
+        <source>0.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="826"/>
+        <source>1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="831"/>
+        <source>1.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="836"/>
+        <source>2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="841"/>
+        <source>2.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="846"/>
+        <source>3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="851"/>
+        <source>3.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="856"/>
+        <source>4</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="861"/>
+        <source>4.5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="866"/>
+        <source>5</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="884"/>
+        <source>History</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="908"/>
+        <source>Gain mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="915"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="919"/>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="924"/>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/spectrum_analyzer.ui" line="962"/>
         <source>Snapshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="769"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1041"/>
         <source>General settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="858"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1130"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="907"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2197"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1179"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2481"/>
         <source>Sweep</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1040"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1312"/>
         <source>Logarithmic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1043"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1315"/>
         <source>Linear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1073"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1345"/>
         <source>FREQUENCY </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1140"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1412"/>
         <source>AMPLITUDE </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1203"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1484"/>
         <source>Resolution BW</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1226"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1510"/>
         <source>Units</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1291"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2230"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1575"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2514"/>
         <source>Markers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1316"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1600"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1383"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1667"/>
         <source>MARKER </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1457"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1741"/>
         <source>Normal</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1487"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1771"/>
         <source>Delta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1568"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1852"/>
         <source> Peak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1615"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1748"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1899"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2032"/>
         <source>Peak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1658"/>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1701"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1942"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="1985"/>
         <source>Ampl</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1795"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2079"/>
         <source>GENERAL </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1841"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2125"/>
         <source>Marker Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1925"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2209"/>
         <source>Import Reference Channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="1986"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2270"/>
         <source>No file selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2022"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2306"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/spectrum_analyzer.ui" line="2065"/>
+        <location filename="../../ui/spectrum_analyzer.ui" line="2349"/>
         <source>Import</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3448,103 +3803,108 @@ AC Coupling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="284"/>
-        <location filename="../../ui/trigger_settings.ui" line="584"/>
+        <location filename="../../ui/trigger_settings.ui" line="387"/>
+        <location filename="../../ui/trigger_settings.ui" line="597"/>
         <source>Source</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="342"/>
+        <location filename="../../ui/trigger_settings.ui" line="303"/>
         <source>INTERNAL (ANALOG) </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/trigger_settings.ui" line="418"/>
-        <location filename="../../ui/trigger_settings.ui" line="603"/>
+        <location filename="../../ui/trigger_settings.ui" line="616"/>
         <source>Condition</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/trigger_settings.ui" line="435"/>
-        <location filename="../../ui/trigger_settings.ui" line="620"/>
+        <location filename="../../ui/trigger_settings.ui" line="633"/>
         <source>Rising Edge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/trigger_settings.ui" line="440"/>
-        <location filename="../../ui/trigger_settings.ui" line="625"/>
+        <location filename="../../ui/trigger_settings.ui" line="638"/>
         <source>Falling Edge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/trigger_settings.ui" line="445"/>
-        <location filename="../../ui/trigger_settings.ui" line="630"/>
+        <location filename="../../ui/trigger_settings.ui" line="643"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../ui/trigger_settings.ui" line="450"/>
-        <location filename="../../ui/trigger_settings.ui" line="635"/>
+        <location filename="../../ui/trigger_settings.ui" line="648"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="522"/>
+        <location filename="../../ui/trigger_settings.ui" line="491"/>
+        <source>This feature is not supported while the Mixed Signal View is enabled!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../ui/trigger_settings.ui" line="535"/>
         <source>DIGITAL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="640"/>
+        <location filename="../../ui/trigger_settings.ui" line="653"/>
         <source>Any Edge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="648"/>
+        <location filename="../../ui/trigger_settings.ui" line="661"/>
         <source>M2K daisychain position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="713"/>
+        <location filename="../../ui/trigger_settings.ui" line="726"/>
         <source>TRIGGER LOGIC </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="761"/>
+        <location filename="../../ui/trigger_settings.ui" line="774"/>
         <source>Analog - Digital</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="778"/>
+        <location filename="../../ui/trigger_settings.ui" line="791"/>
         <source>Digital OR Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="783"/>
+        <location filename="../../ui/trigger_settings.ui" line="796"/>
         <source>Digital AND Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="788"/>
+        <location filename="../../ui/trigger_settings.ui" line="801"/>
         <source>Digital XOR Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="793"/>
+        <location filename="../../ui/trigger_settings.ui" line="806"/>
         <source>!Digital OR Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="798"/>
+        <location filename="../../ui/trigger_settings.ui" line="811"/>
         <source>!Digital AND Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="803"/>
+        <location filename="../../ui/trigger_settings.ui" line="816"/>
         <source>!Digital XOR Analog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../ui/trigger_settings.ui" line="835"/>
+        <location filename="../../ui/trigger_settings.ui" line="848"/>
         <source>EXTERNAL TRIGGER OUT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3776,7 +4136,7 @@ AC Coupling</source>
 <context>
     <name>adiscope::BinaryCounterPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1012"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1024"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3784,38 +4144,38 @@ AC Coupling</source>
 <context>
     <name>adiscope::CapturePlot</name>
     <message>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2293"/>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2294"/>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2303"/>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2304"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2306"/>
         <location filename="../../src/oscilloscope_plot.cpp" line="2307"/>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2308"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2316"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2317"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2320"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2321"/>
         <source>Zoom: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2294"/>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2296"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2307"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2309"/>
         <source>/div</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2332"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2345"/>
         <source>Waiting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2335"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2348"/>
         <source>Triggered</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2338"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2351"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope_plot.cpp" line="2341"/>
+        <location filename="../../src/oscilloscope_plot.cpp" line="2354"/>
         <source>Auto</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3823,17 +4183,17 @@ AC Coupling</source>
 <context>
     <name>adiscope::ClockPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="517"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="528"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="522"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="533"/>
         <source>Phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="525"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="536"/>
         <source>Duty</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3842,33 +4202,33 @@ AC Coupling</source>
     <name>adiscope::ConnectDialog</name>
     <message>
         <location filename="../../src/connectDialog.cpp" line="37"/>
-        <location filename="../../src/connectDialog.cpp" line="88"/>
+        <location filename="../../src/connectDialog.cpp" line="105"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/connectDialog.cpp" line="65"/>
+        <location filename="../../src/connectDialog.cpp" line="82"/>
         <source>Waiting for connection ...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/connectDialog.cpp" line="84"/>
-        <location filename="../../src/connectDialog.cpp" line="127"/>
+        <location filename="../../src/connectDialog.cpp" line="101"/>
+        <location filename="../../src/connectDialog.cpp" line="144"/>
         <source>Context info</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/connectDialog.cpp" line="130"/>
+        <location filename="../../src/connectDialog.cpp" line="147"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/connectDialog.cpp" line="136"/>
+        <location filename="../../src/connectDialog.cpp" line="153"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/connectDialog.cpp" line="137"/>
+        <location filename="../../src/connectDialog.cpp" line="154"/>
         <source>Error: Unable to find host: No such host is known!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3889,34 +4249,44 @@ AC Coupling</source>
 <context>
     <name>adiscope::DMM</name>
     <message>
-        <location filename="../../src/dmm.cpp" line="84"/>
+        <location filename="../../src/dmm.cpp" line="86"/>
         <source>Timer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/dmm.cpp" line="373"/>
+        <location filename="../../src/dmm.cpp" line="334"/>
+        <source>Stop</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/dmm.cpp" line="334"/>
+        <source>Run</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/dmm.cpp" line="391"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/dmm.cpp" line="373"/>
+        <location filename="../../src/dmm.cpp" line="391"/>
         <source>Comma-separated values files (*.csv);;All Files(*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/dmm.cpp" line="410"/>
+        <location filename="../../src/dmm.cpp" line="428"/>
         <source>No file selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/dmm.cpp" line="428"/>
-        <location filename="../../src/dmm.cpp" line="511"/>
+        <location filename="../../src/dmm.cpp" line="446"/>
+        <location filename="../../src/dmm.cpp" line="529"/>
         <source>File is open in another program</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/dmm.cpp" line="435"/>
-        <location filename="../../src/dmm.cpp" line="518"/>
+        <location filename="../../src/dmm.cpp" line="453"/>
+        <location filename="../../src/dmm.cpp" line="536"/>
         <source>Choose a file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3937,12 +4307,12 @@ AC Coupling</source>
 <context>
     <name>adiscope::DigitalIO</name>
     <message>
-        <location filename="../../src/digitalio.cpp" line="355"/>
+        <location filename="../../src/digitalio.cpp" line="368"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/digitalio.cpp" line="358"/>
+        <location filename="../../src/digitalio.cpp" line="371"/>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3968,7 +4338,7 @@ AC Coupling</source>
 <context>
     <name>adiscope::GrayCounterPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1141"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1160"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3976,7 +4346,7 @@ AC Coupling</source>
 <context>
     <name>adiscope::I2CPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1874"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="1894"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3984,32 +4354,32 @@ AC Coupling</source>
 <context>
     <name>adiscope::ImportPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3485"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3505"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3488"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3508"/>
         <source>Open file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3489"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3509"/>
         <source>Import selected channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3491"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3511"/>
         <source>No file selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3601"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3621"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3601"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="3621"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4030,53 +4400,18 @@ AC Coupling</source>
 <context>
     <name>adiscope::InfoPage</name>
     <message>
-        <location filename="../../src/info_page.cpp" line="140"/>
-        <source>Firmware version</source>
+        <location filename="../../src/info_page.cpp" line="217"/>
+        <source>Error: Connection failed!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/info_page.cpp" line="142"/>
-        <source>Model</source>
+        <location filename="../../src/info_page.cpp" line="219"/>
+        <source>Connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/info_page.cpp" line="144"/>
-        <source>Model variant</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="147"/>
-        <source>Serial</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="151"/>
-        <source>Product ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="154"/>
-        <source>Vendor ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="157"/>
-        <source>Product name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="159"/>
-        <source>Vendor</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="161"/>
-        <source>Release</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/info_page.cpp" line="164"/>
-        <source>IP Address</source>
+        <location filename="../../src/info_page.cpp" line="227"/>
+        <source>Your hardware revision does not support the identify feature</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4089,21 +4424,82 @@ AC Coupling</source>
     </message>
 </context>
 <context>
+    <name>adiscope::M2kInfoPage</name>
+    <message>
+        <location filename="../../src/info_page.cpp" line="402"/>
+        <source>Not connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="403"/>
+        <source>Always disconnect analog inputs/outputs before calibration</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="425"/>
+        <source>Can&apos;t identify this device.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="444"/>
+        <source>Can&apos;t identify device. Please try to update your firmware!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/info_page.cpp" line="470"/>
+        <source>Your hardware revision does not support the identify feature</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>adiscope::ManualCalibration</name>
     <message>
-        <location filename="../../src/manualcalibration.cpp" line="542"/>
+        <location filename="../../src/manualcalibration.cpp" line="552"/>
         <source>Save File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/manualcalibration.cpp" line="544"/>
+        <location filename="../../src/manualcalibration.cpp" line="554"/>
         <source>ini (*.ini)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/manualcalibration.cpp" line="564"/>
-        <location filename="../../src/manualcalibration.cpp" line="565"/>
+        <location filename="../../src/manualcalibration.cpp" line="574"/>
+        <location filename="../../src/manualcalibration.cpp" line="575"/>
         <source> °C</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>adiscope::MarkerTable</name>
+    <message>
+        <location filename="../../src/marker_table.cpp" line="80"/>
+        <source>Id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/marker_table.cpp" line="81"/>
+        <source>Marker</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/marker_table.cpp" line="82"/>
+        <source>Channel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/marker_table.cpp" line="83"/>
+        <source>Frequency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/marker_table.cpp" line="84"/>
+        <source>Magnitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/marker_table.cpp" line="85"/>
+        <source>Type</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4153,171 +4549,186 @@ AC Coupling</source>
 <context>
     <name>adiscope::NetworkAnalyzer</name>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="206"/>
-        <location filename="../../src/network_analyzer.cpp" line="1558"/>
+        <location filename="../../src/network_analyzer.cpp" line="211"/>
+        <location filename="../../src/network_analyzer.cpp" line="1669"/>
         <source>Stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="260"/>
+        <location filename="../../src/network_analyzer.cpp" line="265"/>
         <source>Frequency (Hz)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="261"/>
+        <location filename="../../src/network_analyzer.cpp" line="266"/>
         <source>Magnitude(dB)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="269"/>
+        <location filename="../../src/network_analyzer.cpp" line="274"/>
         <source>Phase (°)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="279"/>
+        <location filename="../../src/network_analyzer.cpp" line="285"/>
         <source>Samples count</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="286"/>
-        <source>Amplitude</source>
+        <location filename="../../src/network_analyzer.cpp" line="290"/>
+        <source>Samps/decade</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="293"/>
-        <source>Offset</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/network_analyzer.cpp" line="299"/>
-        <source>Max. Magnitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/network_analyzer.cpp" line="304"/>
-        <source>Min. Magnitude</source>
+        <location filename="../../src/network_analyzer.cpp" line="297"/>
+        <source>Step</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="309"/>
+        <source>Amplitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/network_analyzer.cpp" line="316"/>
+        <source>Offset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/network_analyzer.cpp" line="322"/>
+        <source>Max. Magnitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/network_analyzer.cpp" line="327"/>
+        <source>Min. Magnitude</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/network_analyzer.cpp" line="332"/>
         <source>Max. Phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="314"/>
+        <location filename="../../src/network_analyzer.cpp" line="337"/>
         <source>Min. Phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="320"/>
-        <location filename="../../src/network_analyzer.cpp" line="328"/>
+        <location filename="../../src/network_analyzer.cpp" line="343"/>
+        <location filename="../../src/network_analyzer.cpp" line="351"/>
         <source>Settling time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="323"/>
+        <location filename="../../src/network_analyzer.cpp" line="346"/>
         <source>Before Buffer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="331"/>
+        <location filename="../../src/network_analyzer.cpp" line="354"/>
         <source>After Buffer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="440"/>
-        <location filename="../../src/network_analyzer.cpp" line="1354"/>
+        <location filename="../../src/network_analyzer.cpp" line="466"/>
+        <location filename="../../src/network_analyzer.cpp" line="1458"/>
         <source>Sample: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="445"/>
-        <location filename="../../src/network_analyzer.cpp" line="1360"/>
+        <location filename="../../src/network_analyzer.cpp" line="472"/>
+        <location filename="../../src/network_analyzer.cpp" line="1464"/>
         <source>Current Frequency: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="450"/>
-        <location filename="../../src/network_analyzer.cpp" line="1364"/>
+        <location filename="../../src/network_analyzer.cpp" line="477"/>
+        <location filename="../../src/network_analyzer.cpp" line="1468"/>
         <source>DC Voltage: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="453"/>
-        <location filename="../../src/network_analyzer.cpp" line="1407"/>
+        <location filename="../../src/network_analyzer.cpp" line="480"/>
+        <location filename="../../src/network_analyzer.cpp" line="1512"/>
         <source>Response channel voltage &lt; 50mV!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="458"/>
-        <location filename="../../src/network_analyzer.cpp" line="1377"/>
+        <location filename="../../src/network_analyzer.cpp" line="485"/>
+        <location filename="../../src/network_analyzer.cpp" line="1481"/>
         <source>Low</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="458"/>
-        <location filename="../../src/network_analyzer.cpp" line="1377"/>
+        <location filename="../../src/network_analyzer.cpp" line="485"/>
+        <location filename="../../src/network_analyzer.cpp" line="1481"/>
         <source>High</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="459"/>
-        <location filename="../../src/network_analyzer.cpp" line="1378"/>
+        <location filename="../../src/network_analyzer.cpp" line="486"/>
+        <location filename="../../src/network_analyzer.cpp" line="1482"/>
         <source>Gain Mode: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="535"/>
+        <location filename="../../src/network_analyzer.cpp" line="569"/>
         <source>Transparency </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="569"/>
+        <location filename="../../src/network_analyzer.cpp" line="603"/>
         <source>Image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="575"/>
+        <location filename="../../src/network_analyzer.cpp" line="609"/>
         <source>Save to</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="636"/>
+        <location filename="../../src/network_analyzer.cpp" line="670"/>
         <source>Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="636"/>
+        <location filename="../../src/network_analyzer.cpp" line="670"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="822"/>
+        <location filename="../../src/network_analyzer.cpp" line="857"/>
         <source>Comma-separated values files (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="823"/>
+        <location filename="../../src/network_analyzer.cpp" line="858"/>
         <source>Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="824"/>
+        <location filename="../../src/network_analyzer.cpp" line="859"/>
         <source>All Files(*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="829"/>
+        <location filename="../../src/network_analyzer.cpp" line="864"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="1542"/>
+        <location filename="../../src/network_analyzer.cpp" line="1298"/>
+        <source>Average: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/network_analyzer.cpp" line="1652"/>
         <source>Running</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/network_analyzer.cpp" line="1544"/>
+        <location filename="../../src/network_analyzer.cpp" line="1654"/>
         <source>Stopping...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4333,118 +4744,139 @@ AC Coupling</source>
 <context>
     <name>adiscope::Oscilloscope</name>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="407"/>
-        <location filename="../../src/oscilloscope.cpp" line="1891"/>
+        <location filename="../../src/oscilloscope.cpp" line="416"/>
+        <location filename="../../src/oscilloscope.cpp" line="2055"/>
         <source>Time Base</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="416"/>
-        <location filename="../../src/oscilloscope.cpp" line="430"/>
+        <location filename="../../src/oscilloscope.cpp" line="425"/>
+        <location filename="../../src/oscilloscope.cpp" line="439"/>
         <source>Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="424"/>
+        <location filename="../../src/oscilloscope.cpp" line="433"/>
         <source>Volts/Div</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1284"/>
-        <location filename="../../src/oscilloscope.cpp" line="3651"/>
+        <location filename="../../src/oscilloscope.cpp" line="1412"/>
+        <location filename="../../src/oscilloscope.cpp" line="3944"/>
         <source>Add Channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1305"/>
-        <location filename="../../src/oscilloscope.cpp" line="1776"/>
-        <location filename="../../src/oscilloscope.cpp" line="3548"/>
+        <location filename="../../src/oscilloscope.cpp" line="1433"/>
+        <location filename="../../src/oscilloscope.cpp" line="1911"/>
+        <location filename="../../src/oscilloscope.cpp" line="3841"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1298"/>
-        <location filename="../../src/oscilloscope.cpp" line="1769"/>
+        <location filename="../../src/oscilloscope.cpp" line="1426"/>
+        <location filename="../../src/oscilloscope.cpp" line="1904"/>
         <source>Comma-separated values files (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1299"/>
-        <location filename="../../src/oscilloscope.cpp" line="1770"/>
+        <location filename="../../src/oscilloscope.cpp" line="1427"/>
+        <location filename="../../src/oscilloscope.cpp" line="1905"/>
         <source>Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1300"/>
-        <location filename="../../src/oscilloscope.cpp" line="1771"/>
+        <location filename="../../src/oscilloscope.cpp" line="1428"/>
+        <location filename="../../src/oscilloscope.cpp" line="1906"/>
         <source>All Files(*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1689"/>
+        <location filename="../../src/oscilloscope.cpp" line="1824"/>
         <source>Transparency </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1859"/>
+        <location filename="../../src/oscilloscope.cpp" line="1974"/>
+        <source>&quot;Warning: This feature is not supported on the current firmware version!&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/oscilloscope.cpp" line="1989"/>
+        <source>* When the Mixed Signal View is enabled the LogicAnalyzer tool will be disabled!
+** The trigger can be disabled or set only on the Digital channels or Analog channels, not on both at the same time!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/oscilloscope.cpp" line="2023"/>
         <source>Math</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1883"/>
+        <location filename="../../src/oscilloscope.cpp" line="2047"/>
         <source>Browse</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1909"/>
+        <location filename="../../src/oscilloscope.cpp" line="2073"/>
         <source>No file selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1912"/>
-        <location filename="../../src/oscilloscope.cpp" line="3636"/>
+        <location filename="../../src/oscilloscope.cpp" line="2076"/>
+        <location filename="../../src/oscilloscope.cpp" line="3929"/>
         <source>Reference</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1918"/>
+        <location filename="../../src/oscilloscope.cpp" line="2078"/>
+        <source>Logic</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/oscilloscope.cpp" line="2085"/>
         <source>Add channel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1921"/>
+        <location filename="../../src/oscilloscope.cpp" line="2089"/>
         <source>Import selected channels</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1976"/>
+        <location filename="../../src/oscilloscope.cpp" line="2093"/>
+        <source>Enable Mixed Signal View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/oscilloscope.cpp" line="2207"/>
         <source>Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="1976"/>
+        <location filename="../../src/oscilloscope.cpp" line="2207"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="3542"/>
-        <location filename="../../src/oscilloscope.cpp" line="3569"/>
+        <location filename="../../src/oscilloscope.cpp" line="3835"/>
+        <location filename="../../src/oscilloscope.cpp" line="3862"/>
         <source>Snapshot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="3596"/>
+        <location filename="../../src/oscilloscope.cpp" line="3889"/>
         <source>Filter 1 - Enable - </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="3597"/>
+        <location filename="../../src/oscilloscope.cpp" line="3890"/>
         <source>Filter 2 - Enable - </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/oscilloscope.cpp" line="3627"/>
-        <location filename="../../src/oscilloscope.cpp" line="3634"/>
+        <location filename="../../src/oscilloscope.cpp" line="3920"/>
+        <location filename="../../src/oscilloscope.cpp" line="3927"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4452,48 +4884,60 @@ AC Coupling</source>
 <context>
     <name>adiscope::PowerController</name>
     <message>
-        <location filename="../../src/power_controller.cpp" line="62"/>
         <location filename="../../src/power_controller.cpp" line="67"/>
+        <location filename="../../src/power_controller.cpp" line="72"/>
         <source>mVolts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/power_controller.cpp" line="63"/>
         <location filename="../../src/power_controller.cpp" line="68"/>
+        <location filename="../../src/power_controller.cpp" line="73"/>
         <source>Volts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/power_controller.cpp" line="64"/>
         <location filename="../../src/power_controller.cpp" line="69"/>
+        <location filename="../../src/power_controller.cpp" line="74"/>
         <source>Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/power_controller.cpp" line="206"/>
+        <location filename="../../src/power_controller.cpp" line="219"/>
+        <source>Disable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/power_controller.cpp" line="206"/>
+        <location filename="../../src/power_controller.cpp" line="219"/>
+        <source>Enable</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>adiscope::Preferences</name>
     <message>
-        <location filename="../../src/preferences.cpp" line="154"/>
+        <location filename="../../src/preferences.cpp" line="176"/>
         <source>This change will be applied only after a Scopy reset.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/preferences.cpp" line="295"/>
+        <location filename="../../src/preferences.cpp" line="347"/>
         <source>By resetting scopy you will lose the current configuration!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/preferences.cpp" line="296"/>
+        <location filename="../../src/preferences.cpp" line="348"/>
         <source>Do you want to reset?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/preferences.cpp" line="664"/>
+        <location filename="../../src/preferences.cpp" line="778"/>
         <source>Load language</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/preferences.cpp" line="664"/>
+        <location filename="../../src/preferences.cpp" line="778"/>
         <source>Language files (*.qm)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4522,7 +4966,7 @@ AC Coupling</source>
 <context>
     <name>adiscope::PulsePatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="4108"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="4128"/>
         <source>Sample Rate</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4530,7 +4974,7 @@ AC Coupling</source>
 <context>
     <name>adiscope::RandomPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="850"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="862"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4539,11 +4983,15 @@ AC Coupling</source>
     <name>adiscope::RunSingleWidget</name>
     <message>
         <location filename="../../src/runsinglewidget.cpp" line="96"/>
+        <location filename="../../src/runsinglewidget.cpp" line="128"/>
+        <location filename="../../src/runsinglewidget.cpp" line="135"/>
         <source>Run</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/runsinglewidget.cpp" line="97"/>
+        <location filename="../../src/runsinglewidget.cpp" line="126"/>
+        <location filename="../../src/runsinglewidget.cpp" line="140"/>
         <source>Single</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4551,8 +4999,8 @@ AC Coupling</source>
         <location filename="../../src/runsinglewidget.cpp" line="103"/>
         <location filename="../../src/runsinglewidget.cpp" line="106"/>
         <location filename="../../src/runsinglewidget.cpp" line="109"/>
-        <location filename="../../src/runsinglewidget.cpp" line="129"/>
-        <location filename="../../src/runsinglewidget.cpp" line="134"/>
+        <location filename="../../src/runsinglewidget.cpp" line="126"/>
+        <location filename="../../src/runsinglewidget.cpp" line="128"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4560,7 +5008,7 @@ AC Coupling</source>
 <context>
     <name>adiscope::SPIPatternUI</name>
     <message>
-        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="2236"/>
+        <location filename="../../src/patterngenerator/patterns/patterns.cpp" line="2256"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4568,31 +5016,13 @@ AC Coupling</source>
 <context>
     <name>adiscope::SignalGenerator</name>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="161"/>
+        <location filename="../../src/signal_generator.cpp" line="163"/>
         <source>deg</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="162"/>
-        <source>π rad</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/signal_generator.cpp" line="163"/>
-        <location filename="../../src/signal_generator.cpp" line="206"/>
-        <location filename="../../src/signal_generator.cpp" line="213"/>
-        <location filename="../../src/signal_generator.cpp" line="220"/>
-        <location filename="../../src/signal_generator.cpp" line="227"/>
-        <source>ns</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../src/signal_generator.cpp" line="164"/>
-        <location filename="../../src/signal_generator.cpp" line="207"/>
-        <location filename="../../src/signal_generator.cpp" line="214"/>
-        <location filename="../../src/signal_generator.cpp" line="221"/>
-        <location filename="../../src/signal_generator.cpp" line="228"/>
-        <source>μs</source>
+        <source>π rad</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4601,7 +5031,7 @@ AC Coupling</source>
         <location filename="../../src/signal_generator.cpp" line="215"/>
         <location filename="../../src/signal_generator.cpp" line="222"/>
         <location filename="../../src/signal_generator.cpp" line="229"/>
-        <source>ms</source>
+        <source>ns</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4610,53 +5040,54 @@ AC Coupling</source>
         <location filename="../../src/signal_generator.cpp" line="216"/>
         <location filename="../../src/signal_generator.cpp" line="223"/>
         <location filename="../../src/signal_generator.cpp" line="230"/>
-        <source>s</source>
+        <source>μs</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="167"/>
-        <location filename="../../src/signal_generator.cpp" line="199"/>
-        <location filename="../../src/signal_generator.cpp" line="237"/>
+        <location filename="../../src/signal_generator.cpp" line="210"/>
+        <location filename="../../src/signal_generator.cpp" line="217"/>
+        <location filename="../../src/signal_generator.cpp" line="224"/>
+        <location filename="../../src/signal_generator.cpp" line="231"/>
+        <source>ms</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="168"/>
+        <location filename="../../src/signal_generator.cpp" line="211"/>
+        <location filename="../../src/signal_generator.cpp" line="218"/>
+        <location filename="../../src/signal_generator.cpp" line="225"/>
+        <location filename="../../src/signal_generator.cpp" line="232"/>
+        <source>s</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="169"/>
+        <location filename="../../src/signal_generator.cpp" line="201"/>
+        <location filename="../../src/signal_generator.cpp" line="239"/>
         <source>Phase</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="170"/>
+        <location filename="../../src/signal_generator.cpp" line="172"/>
         <source>μVolts p-p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="171"/>
+        <location filename="../../src/signal_generator.cpp" line="173"/>
         <source>mVolts p-p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="172"/>
+        <location filename="../../src/signal_generator.cpp" line="174"/>
         <source>Volts p-p</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="173"/>
-        <location filename="../../src/signal_generator.cpp" line="258"/>
-        <location filename="../../src/signal_generator.cpp" line="280"/>
+        <location filename="../../src/signal_generator.cpp" line="175"/>
+        <location filename="../../src/signal_generator.cpp" line="260"/>
+        <location filename="../../src/signal_generator.cpp" line="282"/>
         <source>Amplitude</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/signal_generator.cpp" line="176"/>
-        <location filename="../../src/signal_generator.cpp" line="241"/>
-        <location filename="../../src/signal_generator.cpp" line="255"/>
-        <location filename="../../src/signal_generator.cpp" line="277"/>
-        <source>μVolts</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/signal_generator.cpp" line="177"/>
-        <location filename="../../src/signal_generator.cpp" line="242"/>
-        <location filename="../../src/signal_generator.cpp" line="256"/>
-        <location filename="../../src/signal_generator.cpp" line="278"/>
-        <location filename="../../src/signal_generator.cpp" line="283"/>
-        <source>mVolts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4664,106 +5095,123 @@ AC Coupling</source>
         <location filename="../../src/signal_generator.cpp" line="243"/>
         <location filename="../../src/signal_generator.cpp" line="257"/>
         <location filename="../../src/signal_generator.cpp" line="279"/>
-        <location filename="../../src/signal_generator.cpp" line="284"/>
-        <source>Volts</source>
+        <source>μVolts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="179"/>
         <location filename="../../src/signal_generator.cpp" line="244"/>
+        <location filename="../../src/signal_generator.cpp" line="258"/>
+        <location filename="../../src/signal_generator.cpp" line="280"/>
+        <location filename="../../src/signal_generator.cpp" line="285"/>
+        <source>mVolts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="180"/>
+        <location filename="../../src/signal_generator.cpp" line="245"/>
+        <location filename="../../src/signal_generator.cpp" line="259"/>
+        <location filename="../../src/signal_generator.cpp" line="281"/>
+        <location filename="../../src/signal_generator.cpp" line="286"/>
+        <source>Volts</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/signal_generator.cpp" line="181"/>
+        <location filename="../../src/signal_generator.cpp" line="246"/>
         <source>Offset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="182"/>
+        <location filename="../../src/signal_generator.cpp" line="184"/>
         <source>mHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="183"/>
+        <location filename="../../src/signal_generator.cpp" line="185"/>
         <source>Hz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="184"/>
+        <location filename="../../src/signal_generator.cpp" line="186"/>
         <source>kHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="185"/>
+        <location filename="../../src/signal_generator.cpp" line="187"/>
         <source>MHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="186"/>
+        <location filename="../../src/signal_generator.cpp" line="188"/>
         <source>Frequency</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="191"/>
+        <location filename="../../src/signal_generator.cpp" line="193"/>
         <source>Rising</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="195"/>
+        <location filename="../../src/signal_generator.cpp" line="197"/>
         <source>Falling</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="210"/>
+        <location filename="../../src/signal_generator.cpp" line="212"/>
         <source>Rise Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="217"/>
+        <location filename="../../src/signal_generator.cpp" line="219"/>
         <source>Fall Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="224"/>
+        <location filename="../../src/signal_generator.cpp" line="226"/>
         <source>High Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="231"/>
+        <location filename="../../src/signal_generator.cpp" line="233"/>
         <source>Low Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="251"/>
-        <location filename="../../src/signal_generator.cpp" line="265"/>
+        <location filename="../../src/signal_generator.cpp" line="253"/>
+        <location filename="../../src/signal_generator.cpp" line="267"/>
         <source>SampleRate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="274"/>
+        <location filename="../../src/signal_generator.cpp" line="276"/>
         <source>Record Length</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="285"/>
+        <location filename="../../src/signal_generator.cpp" line="287"/>
         <source>Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="289"/>
+        <location filename="../../src/signal_generator.cpp" line="291"/>
         <source>Duty Cycle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="809"/>
-        <location filename="../../src/signal_generator.cpp" line="1346"/>
-        <location filename="../../src/signal_generator.cpp" line="2014"/>
+        <location filename="../../src/signal_generator.cpp" line="820"/>
+        <location filename="../../src/signal_generator.cpp" line="1368"/>
+        <location filename="../../src/signal_generator.cpp" line="2040"/>
         <source> samples</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="1357"/>
+        <location filename="../../src/signal_generator.cpp" line="1379"/>
         <source>Open File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/signal_generator.cpp" line="1357"/>
+        <location filename="../../src/signal_generator.cpp" line="1379"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt);;Waveform Audio File Format (*.wav);;Matlab files (*.mat)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4784,216 +5232,238 @@ AC Coupling</source>
 <context>
     <name>adiscope::SpectrumAnalyzer</name>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="459"/>
-        <location filename="../../src/spectrum_analyzer.cpp" line="578"/>
-        <location filename="../../src/spectrum_analyzer.cpp" line="776"/>
-        <location filename="../../src/spectrum_analyzer.cpp" line="1194"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="548"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="672"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="870"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="1340"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="68"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="75"/>
         <source>dBFS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="69"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="76"/>
         <source>dBV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="70"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="77"/>
         <source>dBu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="71"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="78"/>
         <source>Vpeak</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="72"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="79"/>
         <source>Vrms</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="77"/>
-        <source>Sample</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="78"/>
-        <source>Peak Hold</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="79"/>
-        <source>Peak Hold Continous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="80"/>
-        <source>Min Hold</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="81"/>
-        <source>Min Hold Continous</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="82"/>
-        <source>Linear RMS</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="83"/>
-        <source>Linear dB</source>
+        <source>V/√Hz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="84"/>
-        <source>Exponential RMS</source>
+        <source>Sample</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="85"/>
-        <source>Exponential dB</source>
+        <source>Peak Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="86"/>
+        <source>Peak Hold Continous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="87"/>
+        <source>Min Hold</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="88"/>
+        <source>Min Hold Continous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="89"/>
+        <source>Linear RMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="90"/>
-        <source>Flat top</source>
+        <source>Linear dB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="91"/>
-        <source>Rectangular</source>
+        <source>Exponential RMS</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="92"/>
-        <source>Triangular (Bartlett)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="93"/>
-        <source>Hamming</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="94"/>
-        <source>Hann</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="95"/>
-        <source>Blackman-Harris</source>
+        <source>Exponential dB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="96"/>
-        <source>Kaiser</source>
+        <source>Flat top</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="97"/>
+        <source>Rectangular</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="98"/>
+        <source>Triangular (Bartlett)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="99"/>
+        <source>Hamming</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="100"/>
-        <source>Manual</source>
+        <source>Hann</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="101"/>
-        <source>Peak</source>
+        <source>Blackman-Harris</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="102"/>
+        <source>Kaiser</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="106"/>
+        <source>Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="107"/>
+        <source>Peak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="108"/>
         <source>Delta</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="103"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="109"/>
         <source>Fixed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="244"/>
-        <source>Range</source>
+        <location filename="../../src/spectrum_analyzer.cpp" line="251"/>
+        <source>Scale/Div</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="249"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="258"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="265"/>
         <source>Top</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="253"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="271"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="278"/>
+        <source>Bottom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="283"/>
         <source>Hz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="254"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="284"/>
         <source>kHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="255"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="285"/>
         <source>MHz</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="256"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="286"/>
         <source>Frequency Position</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="452"/>
-        <location filename="../../src/spectrum_analyzer.cpp" line="571"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="541"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="665"/>
         <source>Comma-separated values files (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="453"/>
-        <location filename="../../src/spectrum_analyzer.cpp" line="572"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="542"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="666"/>
         <source>Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="454"/>
-        <location filename="../../src/spectrum_analyzer.cpp" line="573"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="543"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="667"/>
         <source>All Files(*)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="776"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="870"/>
         <source>Comma-separated values files (*.csv);;Tab-delimited values files (*.txt)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/spectrum_analyzer.cpp" line="1196"/>
+        <location filename="../../src/spectrum_analyzer.cpp" line="1342"/>
         <source>Snapshot</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="1818"/>
+        <source>Sample:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/spectrum_analyzer.cpp" line="2273"/>
+        <source>Average Sample:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>adiscope::StartStopRangeWidget</name>
     <message>
-        <location filename="../../src/startstoprangewidget.cpp" line="154"/>
+        <location filename="../../src/startstoprangewidget.cpp" line="163"/>
         <source>Start</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/startstoprangewidget.cpp" line="161"/>
+        <location filename="../../src/startstoprangewidget.cpp" line="170"/>
         <source>Stop</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/startstoprangewidget.cpp" line="168"/>
+        <location filename="../../src/startstoprangewidget.cpp" line="177"/>
         <source>Center</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/startstoprangewidget.cpp" line="175"/>
+        <location filename="../../src/startstoprangewidget.cpp" line="184"/>
         <source>Span</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5001,100 +5471,119 @@ AC Coupling</source>
 <context>
     <name>adiscope::ToolLauncher</name>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="203"/>
+        <location filename="../../src/tool_launcher.cpp" line="209"/>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="353"/>
+        <location filename="../../src/tool_launcher.cpp" line="237"/>
+        <source>Calibration skipped because already calibrated.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/tool_launcher.cpp" line="239"/>
+        <source>Calibrated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/tool_launcher.cpp" line="378"/>
         <source>Save session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="353"/>
-        <location filename="../../src/tool_launcher.cpp" line="397"/>
+        <location filename="../../src/tool_launcher.cpp" line="378"/>
+        <location filename="../../src/tool_launcher.cpp" line="422"/>
         <source>Scopy-Files (*.ini)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="397"/>
+        <location filename="../../src/tool_launcher.cpp" line="422"/>
         <source>Load session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="576"/>
+        <location filename="../../src/tool_launcher.cpp" line="601"/>
         <source>Click to open the home menu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="577"/>
+        <location filename="../../src/tool_launcher.cpp" line="602"/>
         <source>Click to disconnect the device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="578"/>
+        <location filename="../../src/tool_launcher.cpp" line="603"/>
         <source>Click to save the current session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="579"/>
-        <location filename="../../src/tool_launcher.cpp" line="583"/>
+        <location filename="../../src/tool_launcher.cpp" line="604"/>
+        <location filename="../../src/tool_launcher.cpp" line="608"/>
         <source>Click to load a session</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="584"/>
-        <location filename="../../src/tool_launcher.cpp" line="996"/>
+        <location filename="../../src/tool_launcher.cpp" line="609"/>
+        <location filename="../../src/tool_launcher.cpp" line="1021"/>
         <source>Select a device first</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="643"/>
-        <location filename="../../src/tool_launcher.cpp" line="994"/>
-        <location filename="../../src/tool_launcher.cpp" line="1067"/>
+        <location filename="../../src/tool_launcher.cpp" line="668"/>
+        <location filename="../../src/tool_launcher.cpp" line="1019"/>
+        <location filename="../../src/tool_launcher.cpp" line="1096"/>
         <source>Click to connect the device</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="793"/>
+        <location filename="../../src/tool_launcher.cpp" line="818"/>
         <source>Report a bug!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1053"/>
+        <location filename="../../src/tool_launcher.cpp" line="1082"/>
         <source>Connecting...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1055"/>
+        <location filename="../../src/tool_launcher.cpp" line="1084"/>
         <source>Disconnecting...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1078"/>
-        <location filename="../../src/tool_launcher.cpp" line="1294"/>
+        <location filename="../../src/tool_launcher.cpp" line="1097"/>
+        <source>Connect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/tool_launcher.cpp" line="1108"/>
         <source>Calibrating...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1264"/>
+        <location filename="../../src/tool_launcher.cpp" line="1324"/>
         <source>Calibration Failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1265"/>
-        <location filename="../../src/tool_launcher.cpp" line="1401"/>
+        <location filename="../../src/tool_launcher.cpp" line="1325"/>
+        <location filename="../../src/tool_launcher.cpp" line="1466"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1450"/>
+        <location filename="../../src/tool_launcher.cpp" line="1523"/>
         <source>Digital decoders support is disabled. Some features may be missing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/tool_launcher.cpp" line="1460"/>
+        <location filename="../../src/tool_launcher.cpp" line="1533"/>
         <source>There was a problem initializing libsigrokdecode. Some features may be missing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/tool_launcher.cpp" line="1619"/>
+        <source>Calibrating</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5157,58 +5646,66 @@ AC Coupling</source>
     </message>
 </context>
 <context>
+    <name>adiscope::ToolMenuItem</name>
+    <message>
+        <location filename="../../src/toolmenuitem.cpp" line="127"/>
+        <source>Calibrating...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>adiscope::TriggerSettings</name>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="56"/>
+        <location filename="../../src/trigger_settings.cpp" line="60"/>
         <source>Forward Trigger In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="57"/>
+        <location filename="../../src/trigger_settings.cpp" line="61"/>
         <source>Oscilloscope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="58"/>
-        <location filename="../../src/trigger_settings.cpp" line="141"/>
+        <location filename="../../src/trigger_settings.cpp" line="62"/>
+        <location filename="../../src/trigger_settings.cpp" line="148"/>
         <source>Logic Analyzer</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="82"/>
-        <location filename="../../src/trigger_settings.cpp" line="88"/>
+        <location filename="../../src/trigger_settings.cpp" line="89"/>
+        <location filename="../../src/trigger_settings.cpp" line="95"/>
         <source>μVolts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="83"/>
-        <location filename="../../src/trigger_settings.cpp" line="89"/>
+        <location filename="../../src/trigger_settings.cpp" line="90"/>
+        <location filename="../../src/trigger_settings.cpp" line="96"/>
         <source>mVolts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="84"/>
-        <location filename="../../src/trigger_settings.cpp" line="90"/>
+        <location filename="../../src/trigger_settings.cpp" line="91"/>
+        <location filename="../../src/trigger_settings.cpp" line="97"/>
         <source>Volts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="85"/>
+        <location filename="../../src/trigger_settings.cpp" line="92"/>
         <source>Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="91"/>
+        <location filename="../../src/trigger_settings.cpp" line="98"/>
         <source>Hysteresis</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="138"/>
+        <location filename="../../src/trigger_settings.cpp" line="145"/>
         <source>External Trigger In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/trigger_settings.cpp" line="151"/>
+        <location filename="../../src/trigger_settings.cpp" line="160"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5244,38 +5741,63 @@ AC Coupling</source>
 <context>
     <name>adiscope::logic::LogicAnalyzer</name>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="65"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="88"/>
         <source>Sample Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="73"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="96"/>
         <source>Nr of samples</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="78"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="101"/>
         <source>Delay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="698"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1240"/>
         <source>Transparency </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1154"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1696"/>
         <source>Select a decoder to add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1456"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2017"/>
         <source>External Trigger In</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="1457"/>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2018"/>
         <source>Oscilloscope</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2144"/>
+        <source>Comma-separated values files (*.csv)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2145"/>
+        <source>Tab-delimited values files (*.txt)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2146"/>
+        <source>Value Change Dump(*.vcd)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2147"/>
+        <source>All Files(*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2150"/>
+        <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
