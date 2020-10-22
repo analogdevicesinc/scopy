@@ -424,6 +424,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->gridLayout_plots->addWidget(bufferPreviewer, 0, 1, 1, 1);
 	ui->gridLayout_plots->addWidget(ui->statusWidget, 1, 1, 1, 1);
+	ui->gridLayout_plots->addWidget(m_dBgraph.rightHandlesArea(), 0, 2, 6, 1);
 	ui->gridLayout_plots->addWidget(m_dBgraph.topHandlesArea(), 2, 0, 1, 2);
 	ui->gridLayout_plots->addWidget(m_dBgraph.leftHandlesArea(), 3, 0, 1, 1);
 	ui->gridLayout_plots->addWidget(&m_dBgraph, 3, 1, 1, 1);
@@ -432,7 +433,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->gridLayout_plots->addWidget(m_phaseGraph.leftHandlesArea(), 5, 0, 1, 1);
 	ui->gridLayout_plots->addWidget(&m_phaseGraph, 5, 1, 1, 1);
 
-	ui->gridLayout_plots->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 2);
+	ui->gridLayout_plots->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 3);
 
 	m_phaseGraph.enableXaxisLabels();
 	m_dBgraph.enableXaxisLabels();
@@ -585,6 +586,20 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		m_dBgraph.setCursorReadoutsTransparency(value);
 		m_phaseGraph.setCursorReadoutsTransparency(value);
 	});
+
+	setDynamicProperty(ui->btnLockHorizontal, "use_icon", true);
+
+	connect(ui->btnLockHorizontal, &QPushButton::toggled,
+		&m_dBgraph, &dBgraph::setHorizCursorsLocked);
+
+	connect(ui->btnLockHorizontal, &QPushButton::toggled,
+		&m_phaseGraph, &dBgraph::setHorizCursorsLocked);
+
+	connect(ui->hCursorsEnable,  &QPushButton::toggled,
+		&m_dBgraph,  &dBgraph::toggleCursors);
+
+	connect(ui->hCursorsEnable,  &QPushButton::toggled,
+		&m_phaseGraph,  &dBgraph::toggleCursors);
 
 	connect(ui->posSelect, &CustomPlotPositionButton::positionChanged,
 	[=](CustomPlotPositionButton::ReadoutsPosition position) {
