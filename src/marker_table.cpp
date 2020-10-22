@@ -77,12 +77,12 @@ ui(new Ui::MarkerTable)
 	ui->setupUi(this);
 
 	model = new QStandardItemModel(0, Columns::NUM_COLUMNS, this);
-	model->setHeaderData(COL_ID, Qt::Horizontal, QVariant("Id"));
-	model->setHeaderData(COL_NAME, Qt::Horizontal, QVariant("Marker"));
-	model->setHeaderData(COL_CH, Qt::Horizontal, QVariant("Channel"));
-	model->setHeaderData(COL_FREQ, Qt::Horizontal, QVariant("Frequency"));
-	model->setHeaderData(COL_MAGN, Qt::Horizontal, QVariant("Magnitude"));
-	model->setHeaderData(COL_TYPE, Qt::Horizontal, QVariant("Type"));
+	model->setHeaderData(COL_ID, Qt::Horizontal, QVariant(tr("Id")));
+	model->setHeaderData(COL_NAME, Qt::Horizontal, QVariant(tr("Marker")));
+	model->setHeaderData(COL_CH, Qt::Horizontal, QVariant(tr("Channel")));
+	model->setHeaderData(COL_FREQ, Qt::Horizontal, QVariant(tr("Frequency")));
+	model->setHeaderData(COL_MAGN, Qt::Horizontal, QVariant(tr("Magnitude")));
+	model->setHeaderData(COL_TYPE, Qt::Horizontal, QVariant(tr("Type")));
 
 	ui->tableView->setModel(model);
 	ui->tableView->setSortingEnabled(true);
