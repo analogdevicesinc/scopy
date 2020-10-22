@@ -523,7 +523,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/cursors_settings.ui" line="681"/>
         <source>Position</source>
-        <translation>坐标</translation>
+        <translation>位移</translation>
     </message>
 </context>
 <context>
@@ -1779,7 +1779,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="745"/>
         <source>Magnitude (dB)</source>
-        <translation>幅度(dB)</translation>
+        <translation>振幅(dB)</translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="748"/>
@@ -2036,7 +2036,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="2818"/>
         <source>Position</source>
-        <translation>坐标</translation>
+        <translation>位移</translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="2955"/>
@@ -2854,22 +2854,22 @@ AC Coupling</source>
     <message>
         <location filename="../../src/measure.cpp" line="380"/>
         <source>Cycle Mean</source>
-        <translation type="unfinished">周期平均值</translation>
+        <translation>周期平均值</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="382"/>
         <source>RMS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="384"/>
         <source>Cycle RMS</source>
-        <translation type="unfinished">周期RMS</translation>
+        <translation>周期RMS</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="386"/>
         <source>AC RMS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="388"/>
@@ -2879,7 +2879,7 @@ AC Coupling</source>
     <message>
         <location filename="../../src/measure.cpp" line="390"/>
         <source>Cycle Area</source>
-        <translation type="unfinished"></translation>
+        <translation>循环区</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="392"/>
@@ -2894,7 +2894,7 @@ AC Coupling</source>
     <message>
         <location filename="../../src/measure.cpp" line="396"/>
         <source>Amplitude</source>
-        <translation>幅度</translation>
+        <translation>振幅</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="398"/>
@@ -3075,7 +3075,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/signal_generator.ui" line="391"/>
         <source>Stair Step</source>
-        <translation type="unfinished">楼梯台阶</translation>
+        <translation type="unfinished">梯形台阶</translation>
     </message>
     <message>
         <location filename="../../ui/signal_generator.ui" line="447"/>
@@ -3281,7 +3281,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="1140"/>
         <source>AMPLITUDE </source>
-        <translation>幅度</translation>
+        <translation>振幅</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="1203"/>
@@ -3471,7 +3471,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/tool_launcher.ui" line="1674"/>
         <source>ADC Offset</source>
-        <translation>ADC偏移</translation>
+        <translation>ADC偏置</translation>
     </message>
     <message>
         <location filename="../../ui/tool_launcher.ui" line="1679"/>
@@ -3793,7 +3793,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/patterns/walkingpattern.ui" line="46"/>
         <source>Walking level</source>
-        <translation type="unfinished">步行水平</translation>
+        <translation>步进距离</translation>
     </message>
     <message>
         <location filename="../../ui/patterns/walkingpattern.ui" line="54"/>
@@ -4152,7 +4152,7 @@ AC Coupling</source>
     </message>
     <message>
         <source>Position</source>
-        <translation type="vanished">坐标</translation>
+        <translation type="vanished">位移</translation>
     </message>
     <message>
         <source>Frequency</source>
@@ -4298,7 +4298,7 @@ AC Coupling</source>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="261"/>
         <source>Magnitude(dB)</source>
-        <translation>幅度(dB)</translation>
+        <translation>振幅(dB)</translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="269"/>
@@ -4313,22 +4313,22 @@ AC Coupling</source>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="286"/>
         <source>Amplitude</source>
-        <translation>幅度</translation>
+        <translation>振幅</translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="293"/>
         <source>Offset</source>
-        <translation>偏移</translation>
+        <translation>偏置</translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="299"/>
         <source>Max. Magnitude</source>
-        <translation>最大幅度</translation>
+        <translation>最大振幅</translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="304"/>
         <source>Min. Magnitude</source>
-        <translation>最小幅度</translation>
+        <translation>最小振幅</translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="309"/>
@@ -4479,12 +4479,12 @@ AC Coupling</source>
         <location filename="../../src/oscilloscope.cpp" line="416"/>
         <location filename="../../src/oscilloscope.cpp" line="430"/>
         <source>Position</source>
-        <translation>坐标</translation>
+        <translation>位移</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope.cpp" line="424"/>
         <source>Volts/Div</source>
-        <translation>伏特/格</translation>
+        <translation>刻度</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope.cpp" line="1284"/>
@@ -4805,7 +4805,7 @@ AC Coupling</source>
         <location filename="../../src/signal_generator.cpp" line="258"/>
         <location filename="../../src/signal_generator.cpp" line="280"/>
         <source>Amplitude</source>
-        <translation>幅度</translation>
+        <translation>振幅</translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="176"/>
@@ -4837,7 +4837,7 @@ AC Coupling</source>
         <location filename="../../src/signal_generator.cpp" line="179"/>
         <location filename="../../src/signal_generator.cpp" line="244"/>
         <source>Offset</source>
-        <translation>偏移</translation>
+        <translation>偏置</translation>
     </message>
     <message>
         <location filename="../../src/signal_generator.cpp" line="182"/>
@@ -5571,7 +5571,7 @@ AC Coupling</source>
     <message>
         <location filename="../../js/patterngenerator/pulsegen/scriptpulsegen.ui" line="44"/>
         <source>PulseScript</source>
-        <translation type="unfinished">脉冲脚本</translation>
+        <translation>脉冲脚本</translation>
     </message>
     <message>
         <location filename="../../js/patterngenerator/pulsegen/scriptpulsegen.ui" line="51"/>
