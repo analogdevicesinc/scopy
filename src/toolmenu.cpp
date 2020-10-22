@@ -34,7 +34,7 @@ ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
 								     << tr("Network Analyzer") << tr("Signal Generator")
 								     << tr("Logic Analyzer") << tr("Pattern Generator")
 								     << tr("Digital IO") << tr("Voltmeter")
-								     << tr("Power Supply") << tr("Debugger") << tr("Calibration");
+								     << tr("Power Supply") << tr("Debugger") << tr("Calibration") << tr("NewInstrument");
 
 	d_availableIcons = QStringList() << ":/menu/oscilloscope.png"
 								     << ":/menu/spectrum_analyzer.png"
@@ -46,6 +46,7 @@ ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
 								     << ":/menu/voltmeter.png"
 								     << ":/menu/power_supply.png"
 								     << ":/menu/debugger.png"
+								     << ":/menu/calibration.png"
 								     << ":/menu/calibration.png";
 	_loadState();
 
