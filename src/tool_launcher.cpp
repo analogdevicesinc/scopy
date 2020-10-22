@@ -482,6 +482,9 @@ void ToolLauncher::_toolSelected(enum tool tool)
 			selectedTool = nullptr;
 		}
 		break;
+	case TOOL_NEWINSTRUMENT:
+		selectedTool = newInstrument;
+		break;
 	case TOOL_LAUNCHER:
 		break;
 	}
@@ -1706,6 +1709,18 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 				menu->getToolMenuItemFor(TOOL_DMM)->getToolBtn()->click();
 			});
 		}
+
+		if (filter->compatible(TOOL_DEBUGGER)) {
+			debugger = new Debugger(ctx, filter,menu->getToolMenuItemFor(TOOL_DEBUGGER),
+						&js_engine, this);
+			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_DEBUGGER)->getToolStopBtn());
+			QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
+					 &ToolLauncher::addDebugWindow);
+		}
+
+		newInstrument = new NewInstrument(ctx, filter, menu->getToolMenuItemFor(TOOL_NEWINSTRUMENT), &js_engine,this);
+		toolList.push_back(newInstrument);
+
 
 		if (filter->compatible(TOOL_CALIBRATION)) {
 			manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),

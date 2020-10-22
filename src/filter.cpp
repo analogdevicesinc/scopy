@@ -45,6 +45,7 @@ static const std::string tool_names[] = {
 	"debugger",
 	"calibration",
 	"datalogger",
+	"newinstrument",
 	"launcher"
 };
 
