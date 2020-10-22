@@ -264,6 +264,7 @@ namespace adiscope {
 		void customEvent(QEvent *e);
 		void showEvent(QShowEvent *event);
 		bool getLogScale() const;
+		void setSelectedChannel(int id);
 	};
 }
 

@@ -593,20 +593,6 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 	// Avoid jumping when labels with more/less digits
 	// appear/disappear when scrolling vertically
 
-	QwtLegend* legendDisplay = new QwtLegend(this);
-
-#if QWT_VERSION < 0x060100
-	legendDisplay->setItemMode(QwtLegend::CheckableItem);
-	insertLegend(legendDisplay);
-	connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),
-		this, SLOT(legendEntryChecked(QwtPlotItem *, bool)));
-#else /* QWT_VERSION < 0x060100 */
-	legendDisplay->setDefaultItemMode(QwtLegendData::Checkable);
-	insertLegend(legendDisplay);
-	connect(legendDisplay, SIGNAL(checked(const QVariant&, bool, int)),
-		this, SLOT(legendEntryChecked(const QVariant&, bool, int)));
-#endif /* QWT_VERSION < 0x060100 */
-
 	setupDisplayPlotDiv(isdBgraph);
 
 	d_symbolCtrl = new SymbolController(this);
@@ -646,6 +632,20 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph) {
     if(!isdBgraph)
     {
+	    QwtLegend* legendDisplay = new QwtLegend(this);
+
+#if QWT_VERSION < 0x060100
+	    legendDisplay->setItemMode(QwtLegend::CheckableItem);
+	    insertLegend(legendDisplay);
+	    connect(this, SIGNAL(legendChecked(QwtPlotItem *, bool)),
+		    this, SLOT(legendEntryChecked(QwtPlotItem *, bool)));
+#else /* QWT_VERSION < 0x060100 */
+	    legendDisplay->setDefaultItemMode(QwtLegendData::Checkable);
+	    insertLegend(legendDisplay);
+	    connect(legendDisplay, SIGNAL(checked(const QVariant&, bool, int)),
+		    this, SLOT(legendEntryChecked(const QVariant&, bool, int)));
+#endif /* QWT_VERSION < 0x060100 */
+
           for (unsigned int i = 0; i < 4; i++) {
           QwtScaleDraw::Alignment scale =
               static_cast<QwtScaleDraw::Alignment>(i);
@@ -1020,7 +1020,8 @@ void DisplayPlot::toggleCursors(bool en)
 		d_vBar2->setVisible(en);
 
 		if(d_vertCursorsHandleEnabled)
-		{            d_hCursorHandle1->setVisible(en);
+		{
+			d_hCursorHandle1->setVisible(en);
 			d_hCursorHandle2->setVisible(en);
 		}
 
@@ -1160,8 +1161,18 @@ void DisplayPlot::displayIntersection()
 		attachmk2 = false;
 	}
 
-	markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
-	markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+	bool value = isAxisValid(QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+
+	if(value)
+	{
+		markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+		markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_selected_channel));
+	}
+	else
+	{
+		markerIntersection1->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, 0));
+		markerIntersection2->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, 0));
+	}
 
 	markerIntersection1->setValue(d_vBar1->plotCoord().x(), intersectionCursor1);
 	markerIntersection2->setValue(d_vBar2->plotCoord().x(), intersectionCursor2);
@@ -1801,6 +1812,7 @@ void DisplayPlot::bringCurveToFront(unsigned int curveIdx)
 {
 	DetachCurve(curveIdx);
 	AttachCurve(curveIdx);
+	displayIntersection();
 	replot();
 }
 
