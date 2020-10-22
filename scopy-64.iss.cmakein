@@ -55,6 +55,7 @@ Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "deleteini"; Description: Delete previous settings (Scopy.ini)
 
 [Files]
 Source: "c:\scopy_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -64,5 +65,5 @@ Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
-[Registry]
-Root: HKLM; Subkey: "System\CurrentControlSet\Control\Session Manager\Environment"; ValueType:string; ValueName: "SCOPY_PYTHONPATH"; ValueData: "{app}\{#Python};{app}\{#Python}\plat-win;{app}\{#Python}\lib-dynload;{app}\{#Python}\site-packages"; Flags: uninsdeletevalue
+[InstallDelete]
+Type: files; Name: "{userappdata}\ADI\Scopy.ini"; Tasks: deleteini

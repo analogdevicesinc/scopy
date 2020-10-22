@@ -61,6 +61,10 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
+#include "scopyExceptionHandler.h"
+
+static const int KERNEL_BUFFERS_DEFAULT = 4;
 
 using namespace adiscope;
 using namespace gr;
@@ -71,7 +75,7 @@ void NetworkAnalyzer::_configureDacFlowgraph()
 {
 	// Create the blocks that are used to generate sine waves
 	top_block = make_top_block("Signal Generator");
-	source_block = analog::sig_source_f::make(1, analog::GR_SIN_WAVE,
+	source_block = gr::analog::sig_source_f::make(1, gr::analog::GR_SIN_WAVE,
 			1, 1, 1);
 	head_block = blocks::head::make(sizeof(float), 1);
 	vector_block = blocks::vector_sink_f::make();
@@ -180,7 +184,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	iterationsThreadCanceled(false), iterationsThreadReady(false),
 	iterationsThread(nullptr), autoAdjustGain(true),
 	filterDc(false), m_initFlowgraph(true), m_hasReference(false),
-	m_importDataLoaded(false)
+	m_importDataLoaded(false),
+	m_nb_averaging(1),
+	m_nb_periods(2)
 {
 	if (ctx) {
 		iio = iio_manager::get_instance(ctx,
@@ -192,7 +198,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			m_m2k_analogout = m_m2k_context->getAnalogOut();
 			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
 			m_dac_nb_channels = m_m2k_analogout->getNbChannels();
-			m_m2k_analogin->setKernelBuffersCount(1);
 			m_m2k_analogout->setKernelBuffersCount(0, 1);
 			m_m2k_analogout->setKernelBuffersCount(1, 1);
 		}
@@ -274,10 +279,28 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_phaseGraph.setYMax(180.000000);
 	m_phaseGraph.useLogFreq(true);
 
+	sampleStackedWidget = new QStackedWidget(this);
 	samplesCount = new ScaleSpinButton({
 		{"samples",1e0},
-	}, tr("Samples count"), 10, 1000, false, false, this);
+	}, tr("Samples count"), 10, 10000, false, false, this);
 	samplesCount->setValue(1000);
+
+	samplesPerDecadeCount = new ScaleSpinButton({
+		{"samples",1e0},
+	}, tr("Samps/decade"), 1, 10000, false, false, this);
+	samplesPerDecadeCount->setValue(1000);
+
+	samplesStepSize = new ScaleSpinButton({
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	},tr("Step"), 1.0, 25e06,
+	false, false, this,
+	{1, 2.5, 5, 7.5});
+
+	sampleStackedWidget->addWidget(samplesStepSize);
+	sampleStackedWidget->addWidget(samplesPerDecadeCount);
+	startStopRange->insertWidgetIntoLayout(sampleStackedWidget, 2, 0);
 
 	amplitude = new ScaleSpinButton({
 		{"μVolts",1e-6},
@@ -340,6 +363,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->phaseMaxLayout->addWidget(phaseMax);
 	ui->phaseMinLayout->addWidget(phaseMin);
 
+	sampleStackedWidget->setCurrentIndex(ui->btnIsLog->isChecked());
+
 	setMinimumDistanceBetween(magMin, magMax, 1);
 	setMinimumDistanceBetween(phaseMin, phaseMax, 1);
 
@@ -370,7 +395,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
 		&m_phaseGraph, SLOT(useLogFreq(bool)));
 	connect(ui->btnIsLog, &CustomSwitch::toggled, [=](bool value) {
-		Q_UNUSED(value);
+		sampleStackedWidget->setCurrentIndex(value);
 		computeIterations();
 	});
 
@@ -402,6 +427,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->currentFrequencyLabel->setVisible(false);
 	ui->currentSampleLabel->setVisible(false);
+	ui->currentAverageLabel->setVisible(false);
 
 	d_frequencyHandle = new FreePlotLineHandleH(
 				QPixmap(":/icons/time_trigger_handle.svg"),
@@ -439,6 +465,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->currentSampleLabel->setVisible(true);
 		ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + value)
 							+ " / " + QString::number(m_dBgraph.getNumSamples()) + " "));
+		ui->currentAverageLabel->setVisible(true);
 		MetricPrefixFormatter d_cursorTimeFormatter;
 		d_cursorTimeFormatter.setTwoDecimalMode(false);
 		QString text = d_cursorTimeFormatter.format(iterations[value].frequency, "Hz", 3);
@@ -488,6 +515,11 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(samplesCount, SIGNAL(valueChanged(double)),
 		this, SLOT(updateNumSamples()));
+	connect(samplesPerDecadeCount, SIGNAL(valueChanged(double)),
+		this, SLOT(updateNumSamplesPerDecade()));
+	connect(samplesStepSize, SIGNAL(valueChanged(double)),
+		this, SLOT(updateSampleStepSize()));
+
 	connect(ui->boxCursors,SIGNAL(toggled(bool)),
 		SLOT(toggleCursors(bool)));
 
@@ -525,6 +557,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked) {
 		triggerRightMenuToggle(ui->btnCursors, checked);
 	});
+	connect(ui->btnApplyAverage, SIGNAL(clicked()), this, SLOT(validateSpinboxAveraging()));
+	connect(ui->btnApplyPeriod, SIGNAL(clicked()), this, SLOT(validateSpinboxPeriods()));
 
 	ui->btnSettings->setProperty("id",QVariant(-1));
 	ui->btnGeneralSettings->setProperty("id",QVariant(-2));
@@ -668,6 +702,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	});
 
+	connect(this, SIGNAL(sweepStart()), ui->xygraph, SLOT(reset()));
 	_configureDacFlowgraph();
 	_configureAdcFlowgraph();
 }
@@ -867,8 +902,51 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 	ui->nicholsgraph->setNumSamples(num_samples);
 	bufferPreviewer->setNumBuffers(num_samples);
 
+	if (ui->btnIsLog->isChecked()) {
+		double num_of_decades = log10(startStopRange->getStopValue() / startStopRange->getStartValue());
+		samplesPerDecadeCount->blockSignals(true);
+		samplesPerDecadeCount->setValue(num_samples / num_of_decades);
+		samplesPerDecadeCount->blockSignals(false);
+		updateNumSamplesPerDecade();
+	} else {
+		double stop_freq = startStopRange->getStopValue();
+		double start_freq = startStopRange->getStartValue();
+		double step = (stop_freq - start_freq) / (double)(num_samples - 1);
+		samplesStepSize->blockSignals(true);
+		samplesStepSize->setValue(step);
+		samplesStepSize->blockSignals(false);
+		updateSampleStepSize();
+	}
+
 	if (QObject::sender() == samplesCount) {
 		computeIterations();
+	}
+}
+
+void NetworkAnalyzer::updateNumSamplesPerDecade(bool force)
+{
+	unsigned int num_samples;
+	unsigned int num_samples_per_decade;
+	double num_of_decades;
+	num_samples_per_decade = (unsigned int) samplesPerDecadeCount->value();
+	num_of_decades = log10(startStopRange->getStopValue() / startStopRange->getStartValue());
+
+	num_samples = num_samples_per_decade * num_of_decades;
+
+	if (QObject::sender() == samplesPerDecadeCount) {
+		samplesCount->setValue(num_samples);
+	}
+}
+
+void NetworkAnalyzer::updateSampleStepSize(bool force)
+{
+	double step = samplesStepSize->value();
+	double stop_freq = startStopRange->getStopValue();
+	double start_freq = startStopRange->getStartValue();
+	unsigned int new_num_samples = (unsigned int) (stop_freq - start_freq) / step + 1;
+
+	if (QObject::sender() == samplesStepSize) {
+		samplesCount->setValue(new_num_samples);
 	}
 }
 
@@ -1065,7 +1143,8 @@ void NetworkAnalyzer::setFilterParameters()
 			f12->set_high_gain(range0);
 			f21->set_high_gain(range1);
 			f22->set_high_gain(range1);
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1073,6 +1152,10 @@ void NetworkAnalyzer::setFilterParameters()
 
 void NetworkAnalyzer::goertzel()
 {
+	float mag1_averaged_sum = 0;
+	float mag2_averaged_sum = 0;
+	float dcOffset_averaged_sum = 0;
+	unsigned int m_averaged_count = 0;
 	// Network Analyzer run method using the Goertzel Algorithm (single bin DFT)
 
 	// Adjust the gain of the ADC channels based on sweep settings
@@ -1096,6 +1179,7 @@ void NetworkAnalyzer::goertzel()
 		}
 	}
 
+	Q_EMIT sweepStart();
 	for (int i = 0; !m_stop && i < iterations.size(); ++i) {
 
 		// Get current sweep settings
@@ -1121,7 +1205,8 @@ void NetworkAnalyzer::goertzel()
 				// Sleep before DACs start
 				QThread::msleep(pushDelay->value());
 				m_m2k_analogout->push(buffers);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				return;
 			}
 		}
@@ -1153,7 +1238,8 @@ void NetworkAnalyzer::goertzel()
 			try {
 				m_m2k_analogin->setOversamplingRatio(1);
 				m_m2k_analogin->setSampleRate(adc_rate);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				qDebug(CAT_NETWORK_ANALYZER) << e.what();
 			}
 		}
@@ -1164,46 +1250,85 @@ void NetworkAnalyzer::goertzel()
 		// Sleep before ADC capture
 		QThread::msleep(captureDelay->value());
 
-		const short* buffer_p = nullptr;
-		if (m_m2k_analogin) {
-			try {
-				buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
-			} catch (std::exception &e) {
-				qDebug(CAT_NETWORK_ANALYZER) << e.what();
-				return;
+		for (unsigned int avg = 1; avg <= m_nb_averaging; avg++) {
+			const short* buffer_p = nullptr;
+			if (m_m2k_analogin) {
+				try {
+					buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
+				} catch (libm2k::m2k_exception &e) {
+					HANDLE_EXCEPTION(e)
+					qDebug(CAT_NETWORK_ANALYZER) << e.what();
+					return;
+				}
+				if (m_stop) {
+					return;
+				}
 			}
-			if (m_stop) {
-				return;
+
+			std::vector<short> data0;
+			std::vector<short> data1;
+			for (unsigned int data_i = 0; data_i < buffer_size; data_i++) {
+				data0.push_back(buffer_p[data_i * 2]);
+				data1.push_back(buffer_p[data_i * 2 + 1]);
+			}
+
+			capture1->rewind();
+			capture1->set_data(data0);
+			capture2->rewind();
+			capture2->set_data(data1);
+			{
+				boost::unique_lock<boost::mutex> lock(bufferMutex);
+				sink1->reset();
+				sink2->reset();
+			}
+
+			captureDone = false;
+
+			QElapsedTimer t;
+			t.start();
+
+			capture_top_block->run();
+
+			float dcOffset = 0.0;
+			dcOffset = dc_cancel2->get_dc_offset();
+
+			mag1_averaged_sum += mag1;
+			mag2_averaged_sum += mag2;
+			dcOffset_averaged_sum += dcOffset;
+			ui->currentAverageLabel->setText(QString(tr("Average: ") + QString::number(avg)
+								 + " / " + QString::number(m_nb_averaging)));
+			if (avg == m_nb_averaging) {
+				mag1 = mag1_averaged_sum / m_nb_averaging;
+				mag2 = mag2_averaged_sum / m_nb_averaging;
+				dcOffset = dcOffset_averaged_sum / m_nb_averaging;
+
+				dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
+
+				QMetaObject::invokeMethod(this,
+							  "_saveChannelBuffers",
+							  Qt::QueuedConnection,
+							  Q_ARG(double, frequency),
+							  Q_ARG(double, adc_rate),
+							  Q_ARG(std::vector<float>, sink1->data()),
+							  Q_ARG(std::vector<float>, sink2->data()));
+
+				// Plot the data captured for this iteration
+				QMetaObject::invokeMethod(this,
+							  "plot",
+							  Qt::QueuedConnection,
+							  Q_ARG(double, frequency),
+							  Q_ARG(double, mag1),
+							  Q_ARG(double, mag2),
+							  Q_ARG(double, phase),
+							  Q_ARG(float, dcOffset));
+
+				mag1_averaged_sum = 0;
+				mag2_averaged_sum = 0;
+				dcOffset_averaged_sum = 0;
+				m_averaged_count = 0;
+
 			}
 		}
-
-		std::vector<short> data0;
-		std::vector<short> data1;
-		for (unsigned int i = 0; i < buffer_size; i++) {
-			data0.push_back(buffer_p[i * 2]);
-			data1.push_back(buffer_p[i * 2 + 1]);
-		}
-
-		capture1->rewind();
-		capture1->set_data(data0);
-		capture2->rewind();
-		capture2->set_data(data1);
-		{
-			boost::unique_lock<boost::mutex> lock(bufferMutex);
-			sink1->reset();
-			sink2->reset();
-		}
-
-		captureDone = false;
-
-		QElapsedTimer t;
-		t.start();
-
-		capture_top_block->run();
-
-		float dcOffset = 0.0;
-		dcOffset = dc_cancel2->get_dc_offset();
-		dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
 
 		m_m2k_analogout->stop();
 
@@ -1211,28 +1336,6 @@ void NetworkAnalyzer::goertzel()
 		if (m_stop) {
 			return;
 		}
-
-		QMetaObject::invokeMethod(this,
-					  "_saveChannelBuffers",
-					  Qt::QueuedConnection,
-					  Q_ARG(double, frequency),
-					  Q_ARG(double, adc_rate),
-					  Q_ARG(std::vector<float>, sink1->data()),
-					  Q_ARG(std::vector<float>, sink2->data()));
-
-		// Plot the data captured for this iteration
-		QMetaObject::invokeMethod(this,
-					  "plot",
-					  Qt::QueuedConnection,
-					  Q_ARG(double, frequency),
-					  Q_ARG(double, mag1),
-					  Q_ARG(double, mag2),
-					  Q_ARG(double, phase),
-					  Q_ARG(float, dcOffset));
-
-
-
-
 	}
 	Q_EMIT sweepDone();
 }
@@ -1264,7 +1367,7 @@ void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, 
 void NetworkAnalyzer::computeCaptureParams(double frequency,
 		size_t& buffer_size, size_t& adc_rate)
 {
-	size_t nrOfPeriods = 2;
+	size_t nrOfPeriods = m_nb_periods;
 
 	for (const auto& rate : sampleRates) {
 
@@ -1347,6 +1450,7 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 		justStarted = false;
 		ui->currentFrequencyLabel->setVisible(true);
 		ui->currentSampleLabel->setVisible(true);
+		ui->currentAverageLabel->setVisible(true);
 		index = 0;
 		magBonus = autoUpdateGainMode(mag, magBonus, dcVoltage);
 	}
@@ -1396,7 +1500,8 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 
 	try {
 		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		return false;
 	}
@@ -1525,8 +1630,13 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->responseGainCmb->setEnabled(!pressed);
 	pushDelay->setEnabled(!pressed);
 	captureDelay->setEnabled(!pressed);
+	ui->btnApplyAverage->setEnabled(!pressed);
+	ui->btnApplyPeriod->setEnabled(!pressed);
+	ui->spinBox_averaging->setEnabled(!pressed);
+	ui->spinBox_periods->setEnabled(!pressed);
 
 	if (pressed) {
+		m_m2k_analogin->setKernelBuffersCount(1);
 		if (shouldClear) {
 			m_dBgraph.reset();
 			m_phaseGraph.reset();
@@ -1550,12 +1660,14 @@ void NetworkAnalyzer::startStop(bool pressed)
 			thd.waitForFinished();
 			m_m2k_analogin->stopAcquisition();
 			m_m2k_analogout->stop();
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
+		m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
 	}
 }
 
@@ -1572,7 +1684,8 @@ std::vector<double> NetworkAnalyzer::generateSinWave(
 			if (!m_m2k_analogout->isChannelEnabled(chn_idx)) {
 				return {};
 			}
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1615,7 +1728,8 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 				trigger->setAnalogDelay(0);
 			}
 
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_NETWORK_ANALYZER) << e.what();
 		}
 	}
@@ -1652,10 +1766,32 @@ void NetworkAnalyzer::readPreferences()
 {
 	m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
 	m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
+
 //	autoAdjustGain = prefPanel->getNaGainUpdateEnabled();
 }
 
 void NetworkAnalyzer::onGraphIndexChanged(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
+}
+
+void NetworkAnalyzer::on_spinBox_averaging_valueChanged(int n)
+{
+	m_nb_averaging = n;
+}
+
+void NetworkAnalyzer::validateSpinboxAveraging()
+{
+	on_spinBox_averaging_valueChanged(ui->spinBox_averaging->value());
+}
+
+void NetworkAnalyzer::on_spinBox_periods_valueChanged(int n)
+{
+	m_nb_periods = n;
+}
+
+void NetworkAnalyzer::validateSpinboxPeriods()
+{
+	on_spinBox_periods_valueChanged(ui->spinBox_periods->value());
 }

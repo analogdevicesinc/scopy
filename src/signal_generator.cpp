@@ -61,6 +61,7 @@
 #include <iio/device_sink.h>
 #include <scopy/math.h>
 #include <scopy/trapezoidal.h>
+#include "scopyExceptionHandler.h"
 
 #ifdef MATLAB_SUPPORT_SIGGEN
 #include <matio.h>
@@ -72,6 +73,7 @@
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 
 #define NB_POINTS	32768
 #define DAC_BIT_COUNT   12
@@ -244,10 +246,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	}, tr("Offset"), -5, 5, true, true, this);
 
 	fileSampleRate = new ScaleSpinButton({
-		{"mHz",1e-3},
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
+		{"msps",1e-3},
+		{"sps",1e0},
+		{"ksps",1e3},
+		{"Msps",1e6}
 	},tr("SampleRate"), 0.001, 0.0, true, false, this);
 	fileSampleRate->setIntegerDivider(75000000);
 
@@ -258,10 +260,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	}, tr("Amplitude"), 0.000001, 10, true, true, this);
 
 	mathSampleRate =  new ScaleSpinButton({
-		{"mHz",1e-3},
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
+		{"msps",1e-3},
+		{"sps",1e0},
+		{"ksps",1e3},
+		{"Msps",1e6}
 	},tr("SampleRate"), 0.001, 75000000.0, true, false, this);
 
 	mathSampleRate->setIntegerDivider(75000000);
@@ -367,7 +369,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->cbNoiseType->setCurrentIndex(0);
 	noiseAmplitude->setMinValue(1e-06);
 	noiseAmplitude->setValue(noiseAmplitude->minValue());
-	ui->btnNoiseCollapse->setVisible(false);
+	ui->btnNoiseCollapse->setVisible(true);
 	ui->cbNoiseType->setItemData(SG_NO_NOISE,0);
 	ui->cbNoiseType->setItemData(SG_UNIFORM_NOISE, analog::GR_UNIFORM);
 	ui->cbNoiseType->setItemData(SG_GAUSSIAN_NOISE, analog::GR_GAUSSIAN);
@@ -409,6 +411,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		ptr->file_type=FORMAT_NO_FILE;
 		ptr->file_nr_of_channels=0;
 		ptr->file_channel=0;
+		ptr->lineThickness = 1.0;
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -485,7 +488,11 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	plot->setHorizOffset((double) nb_points /
 	                     ((double) sample_rate * 2.0));
 	plot->zoomBaseUpdate();
-	ui->plot->addWidget(plot, 0, 0);
+	ui->plot->insertWidget(0,plot, 0, 0);
+
+	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
+	ui->wAppearance->hide();
+
 	fileManager = new FileManager("Signal Generator");
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
@@ -554,6 +561,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(ui->cbNoiseType, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(noiseTypeChanged(int)));
 
+        connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)),
+                this, SLOT(lineThicknessChanged(int)));
+
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)),
 	        this, SLOT(tabChanged(int)));
 
@@ -588,7 +598,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 SignalGenerator::~SignalGenerator()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
-	ui->run_button->toggle(false);
+	ui->run_button->toggle(false);	
 	setDynamicProperty(runButton(), "disabled", false);
 	if (saveOnExit) {
 		api->save(*settings);
@@ -614,6 +624,7 @@ void SignalGenerator::readPreferences()
 		nr_of_periods = prefered_periods_nr;
 		resetZoom();
 	}
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 void SignalGenerator::resetZoom()
@@ -877,6 +888,17 @@ void SignalGenerator::noiseAmplitudeChanged(double value)
 		ptr->noiseAmplitude = value;
 		resetZoom();
 	}
+}
+
+void SignalGenerator::lineThicknessChanged(int index)
+{
+        auto ptr = getCurrentData();
+        int lineThickness = (int)(ptr->lineThickness / 0.5) - 1;
+        if (lineThickness != index) {
+                ptr->lineThickness = 0.5 * (index + 1);
+                plot->setLineWidth(ptr->id, ptr->lineThickness);
+                plot->replot();
+        }
 }
 
 void SignalGenerator::dutyChanged(double value)
@@ -1452,7 +1474,8 @@ void SignalGenerator::stop()
 		buffers.clear();
 		m_running = false;
 		m_m2k_analogout->stop();
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_SIGNAL_GENERATOR) << e.what();
 	}
 }
@@ -1546,9 +1569,9 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		src = analog::sig_source_f::make(samp_rate, analog::GR_SIN_WAVE,
 			data.frequency, amplitude, offset, phase*0.01745329);
 	else if(data.waveform==SG_STAIR_WAVE) {
-		std::vector<float> stairdata = get_stairstep(rising_steps, falling_steps,
+		data.stairdata = get_stairstep(rising_steps, falling_steps,
 					  amplitude, offset, stairphase);
-		src = blocks::vector_source_f::make(stairdata, true);
+		src = blocks::vector_source_f::make(data.stairdata, true);
 
 	}
 	else
@@ -1999,6 +2022,9 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	auto noiseIndex = ui->cbNoiseType->findData(ptr->noiseType);
 	ui->cbNoiseType->setCurrentIndex(noiseIndex);
 
+	int lineThicknessIndex = (int)(ptr->lineThickness / 0.5) - 1;
+	ui->cbLineThickness->setCurrentIndex(lineThicknessIndex);
+
 	fallTime->setValue(ptr->fall);
 	riseTime->setValue(ptr->rise);
 	holdHighTime->setValue(ptr->holdh);
@@ -2247,9 +2273,6 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 		}
 	}
 
-	qDebug(CAT_SIGNAL_GENERATOR) << QString("Input ratio %1, ratio: %2 (fract left %3)")
-	         .arg(ratio).arg(best_ratio).arg(best_fract);
-
 	if (fract) {
 		*fract = best_fract;
 	}
@@ -2319,6 +2342,11 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 
 	switch (ptr->type) {
 	case SIGNAL_TYPE_WAVEFORM:
+		if(ptr->waveform == SG_STAIR_WAVE)
+		{
+			return (ptr->steps_up+ptr->steps_down)*MULTIPLY_CT;
+		}
+
 		ratio = (double) rate / ptr->frequency;
 
 		// for less than max sample rates, generate at least 10 samples per period
@@ -2329,7 +2357,8 @@ size_t SignalGenerator::get_samples_count(unsigned int chnIdx,
 		}
 
 		/* The ratio must be even for square waveforms */
-		if (perfect	&& (ptr->waveform == SG_SQR_WAVE)
+		if (perfect && (ptr->type == SIGNAL_TYPE_WAVEFORM)
+				&& (ptr->waveform == SG_SQR_WAVE)
 				&& (fmod(ratio, 2.0) != 0.0)) {
 			return 0;
 		}

@@ -34,8 +34,10 @@
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kpowersupply.hpp>
 #include <libm2k/analog/dmm.hpp>
+#include "scopyExceptionHandler.h"
 
 using namespace adiscope;
 using namespace libm2k::context;
@@ -241,7 +243,8 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 		/*adc offset calibration*/
 		try {
 			value = m_m2k_powersupply->readChannel(0);
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
 		}
 
@@ -274,7 +277,8 @@ void ManualCalibration::positivePowerSupplyParam(const int step)
 			/*adc gain calibration*/
 			try {
 				value = m_m2k_powersupply->readChannel(0);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
 			}
 			stParameters.gain_pos_adc = offset_Value / (value +
@@ -306,7 +310,8 @@ void ManualCalibration::setEnablePositiveSuppply(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(0, enabled);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_CALIBRATION_MANUAL) << "Can't enable channel: " << e.what();
 	}
 }
@@ -315,7 +320,8 @@ void ManualCalibration::setPositiveValue(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(0, value);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_CALIBRATION_MANUAL) << "Can't write value: " << e.what();
 	}
 }
@@ -358,7 +364,8 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 		/*adc offset calibration*/
 		try {
 			value = m_m2k_powersupply->readChannel(1);
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e)
 			qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
 		}
 		stParameters.offset_neg_adc = offset_Value - value;
@@ -390,7 +397,8 @@ void ManualCalibration::negativePowerSupplyParam(const int step)
 			/*adc gain calibration*/
 			try {
 				value = m_m2k_powersupply->readChannel(1);
-			} catch (std::exception &e) {
+			} catch (libm2k::m2k_exception &e) {
+				HANDLE_EXCEPTION(e)
 				qDebug(CAT_CALIBRATION_MANUAL) << "Can't read value: " << e.what();
 			}
 			stParameters.gain_neg_adc =  offset_Value / (value +
@@ -421,7 +429,8 @@ void ManualCalibration::setEnableNegativeSuppply(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(1, enabled);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_CALIBRATION_MANUAL) << "Can't enable channel: " << e.what();
 	}
 }
@@ -430,7 +439,8 @@ void ManualCalibration::setNegativeValue(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(1, value);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		qDebug(CAT_CALIBRATION_MANUAL) << "Can't write value: " << e.what();
 	}
 }

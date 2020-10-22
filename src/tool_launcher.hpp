@@ -155,6 +155,7 @@ private Q_SLOTS:
 	void _toolSelected(tool tool);
 	void restartToolsAfterCalibration();
 	void calibrationFailedCallback();
+	void calibrationSuccessCallback();
 	void calibrationThreadWatcherFinished();
 private:
 	QList<Tool*> calibration_saved_tools;
@@ -165,8 +166,8 @@ private:
 	bool loadDecoders(QString path);
 	bool switchContext(const QString& uri);
 	void resetStylesheets();
-	void initialCalibration();
-	bool calibrate();
+	QPair<bool, bool> initialCalibration();
+	QPair<bool, bool> calibrate();
 	void checkIp(const QString& ip);
 	void disconnect();
 	void saveSettings();
@@ -202,8 +203,8 @@ private:
 	QTimer *search_timer, *alive_timer;
 	QFutureWatcher<QVector<QString>> watcher;
 	QFuture<QVector<QString>> future;
-	QFuture<void> calibration_thread;
-	QFutureWatcher<void> calibration_thread_watcher;
+	QFuture<QPair<bool, bool>> calibration_thread;
+	QFutureWatcher<QPair<bool, bool>> calibration_thread_watcher;
 
 	DMM *dmm;
 	PowerController *power_control;
@@ -242,6 +243,8 @@ private:
 
 	bool calibrating;
 	bool skip_calibration;
+	bool skip_calibration_if_already_calibrated;
+	bool initialCalibrationFlag;
 
 	bool debugger_enabled;
 	bool manual_calibration_enabled;
@@ -256,6 +259,8 @@ private:
 	bool m_use_decoders;
 
 	bool m_useNativeDialogs;
+
+	bool m_dac_tools_failed, m_adc_tools_failed;
 
 	void _setupToolMenu();
 	void saveRunningToolsBeforeCalibration();

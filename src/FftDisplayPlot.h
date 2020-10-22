@@ -71,6 +71,7 @@ namespace adiscope {
 			DBU = 2,
 			VPEAK = 3,
 			VRMS = 4,
+			VROOTHZ = 5
 		};
 
 		enum MarkerType {
@@ -106,6 +107,7 @@ namespace adiscope {
 
 		std::vector<enum AverageType> d_ch_average_type;
 		std::vector<average_sptr> d_ch_avg_obj;
+		std::vector<unsigned int> d_current_avg_index;
 
 		enum MagnitudeType d_presetMagType;
 		enum MagnitudeType d_magType;
@@ -124,6 +126,13 @@ namespace adiscope {
 		std::vector<double *> d_refXdata;
 		std::vector<double *> d_refYdata;
 
+		std::vector<double> d_win_coefficient_sum;
+		std::vector<double> d_win_coefficient_sum_sqr;
+		unsigned int d_buffer_idx;
+		unsigned int d_nb_overlapping_avg;
+		std::vector<std::vector<double>> d_ps_avg;
+
+
 		void plotData(const std::vector<double *> &pts,
 				uint64_t num_points);
 		void _resetXAxisPoints();
@@ -133,7 +142,7 @@ namespace adiscope {
 			in_data, std::vector<double *> out_data,
 			uint64_t nb_points);
 		average_sptr getNewAvgObject(enum AverageType avg_type,
-			uint data_width, uint history);
+			uint data_width, uint history, bool history_en);
 
 		void add_marker(int chn);
 		void remove_marker(int chn, int which);
@@ -171,7 +180,7 @@ namespace adiscope {
 		enum AverageType averageType(uint chIdx) const;
 		uint averageHistory(uint chIdx) const;
 		void setAverage(uint chIdx, enum AverageType avg_type,
-			uint history);
+			uint history, bool history_en = true);
 		void resetAverageHistory();
 		void setStartStop(double start, double stop);
 		void setVisiblePeakSearch(bool enabled);
@@ -216,12 +225,16 @@ namespace adiscope {
 		void registerReferenceWaveform(QString name, QVector<double> xData, QVector<double> yData);
 		void unregisterReferenceWaveform(QString name);
 
+		void setWindowCoefficientSum(unsigned int ch, float sum, float sqr_sum);
+		void setNbOverlappingAverages(unsigned int nb_avg);
+		void useLogScaleY(bool log_scale);
 	Q_SIGNALS:
 		void newData();
 		void sampleRateUpdated(double);
 		void sampleCountUpdated(uint);
 		void newMarkerData();
 		void markerSelected(uint chIdx, uint mkIdx);
+		void currentAverageIndex(unsigned int chnIdx, unsigned int avgIdx);
 
 	public Q_SLOTS:
 		void setSampleRate(double sr, double units,

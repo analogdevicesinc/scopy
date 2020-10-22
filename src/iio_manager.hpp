@@ -29,7 +29,17 @@
 #include <gnuradio/blocks/float_to_complex.h>
 #include <frequency_compensation_filter.h>
 
+#include <m2k/analog_in_source.h>
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2k.hpp>
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/digital/m2kdigital.hpp>
+
+#include <m2k/mixed_signal_source.h>
+
 #include <mutex>
+
+#include "timeout_block.hpp"
 
 /* 1k samples by default */
 #define IIO_BUFFER_SIZE 0x400
@@ -44,6 +54,12 @@ namespace adiscope {
 		typedef gr::blocks::copy::sptr port_id;
 
 		const unsigned id;
+
+		/* Get a shared pointer to the instance of iio_manager that
+		 * manages the requested device if there is one.
+		 * Return a NULL pointer if there is no instance yet.
+		 */
+		static boost::shared_ptr<iio_manager> has_instance(const std::string &_dev);
 
 		/* Get a shared pointer to the instance of iio_manager that
 		 * manages the requested device */
@@ -95,15 +111,39 @@ namespace adiscope {
 		 * are not properly routed to the blocks connected during the
 		 * reconfiguration. So until GNU Radio gets fixed, we just force
 		 * the whole flowgraph to stop when connecting new blocks. */
-		void lock() { gr::top_block::stop(); gr::top_block::wait(); }
-		void unlock() { gr::top_block::start(); }
+		void lock() {
+			gr::top_block::stop();
+			// cancel acquisition, work might be blocked waiting for a trigger
+			// and the timeout. Don't wait for it just cancel the acquisition
+//			m_analogin->cancelAcquisition();
+//			m_analogin->stopAcquisition();
+//			m_context->stopMixedSignalAcquisition();
+//			m_analogin->cancelAcquisition();
+//			m_context->getDigital()->cancelAcquisition();
+
+//			m_context->stopMixedSignalAcquisition();
+
+			gr::top_block::wait();
+		}
+		void unlock() {
+//			m_context->startMixedSignalAcquisition(buffer_size);
+			gr::top_block::start(); }
 
 		/* Set the timeout for the source device */
 		void set_device_timeout(unsigned int mseconds);
 
+		/* Replace the iio_block source with the mixed source */
+		void enableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source);
+
+		/* Bring back the data from the iio_block source */
+		void disableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source);
+
 		adiscope::frequency_compensation_filter::sptr freq_comp_filt[2][2];
 
 	private:
+		libm2k::analog::M2kAnalogIn *m_analogin;
+		libm2k::context::M2k *m_context;
+
 		static std::map<const std::string, map_entry> dev_map;
 		static unsigned _id;
 		std::mutex copy_mutex;
@@ -114,8 +154,11 @@ namespace adiscope {
 
 		std::vector<std::pair<port_id, unsigned long> > copy_blocks;
 
-		gr::iio::device_source::sptr iio_block;
+		gr::m2k::analog_in_source::sptr iio_block;
 		unsigned int nb_channels;
+
+		boost::shared_ptr<timeout_block> timeout_b;
+		gr::m2k::mixed_signal_source::sptr m_mixed_source;
 
 		struct connection {
 			gr::basic_block_sptr src;

@@ -139,3 +139,13 @@ void logic::PatternGenerator_API::setEnabledPatterns(const QVector<QPair<QVector
 		m_pattern->patternSelected("", pattern.first.first(), pattern.second);
 	}
 }
+
+QString logic::PatternGenerator_API::getNotes()
+{
+	return m_pattern->m_ui->instrumentNotes->getNotes();
+}
+void logic::PatternGenerator_API::setNotes(QString str)
+{
+	m_pattern->m_ui->instrumentNotes->setNotes(str);
+}
+

@@ -20,6 +20,7 @@
 
 #include "logging_categories.h"
 #include "calibration.hpp"
+#include <libm2k/m2kexceptions.hpp>
 
 #include <errno.h>
 #include <QDebug>
@@ -69,6 +70,11 @@ bool Calibration::isInitialized() const
 	return m_initialized;
 }
 
+bool Calibration::isCalibrated()
+{
+	return m_m2k->isCalibrated();
+}
+
 
 bool Calibration::resetCalibration()
 {
@@ -89,10 +95,21 @@ bool Calibration::calibrateAll()
 	}
 
 	bool ok = false;
-	ok = m_m2k->calibrateADC();
+	try {
+		ok = m_m2k->calibrateADC();
+	} catch (libm2k::m2k_exception &e) {
+		qDebug(CAT_CALIBRATION) << e.what();
+		ok = false;
+	}
 	if(!ok || m_cancel)
 		goto calibration_fail;
-	ok = m_m2k->calibrateDAC();
+
+	try {
+		ok = m_m2k->calibrateDAC();
+	} catch (libm2k::m2k_exception &e) {
+		qDebug(CAT_CALIBRATION) << e.what();
+		ok = false;
+	}
 	if(!ok || m_cancel)
 		goto calibration_fail;
 

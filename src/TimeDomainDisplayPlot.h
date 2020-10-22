@@ -154,6 +154,7 @@ public:
   void removeDigitalPlotCurve(QwtPlotCurve *curve);
   void enableDigitalPlotCurve(int curveId, bool enable);
   QwtPlotCurve *getDigitalPlotCurve(int curveId);
+  int getNrDigitalPlotCurves() const;
 Q_SIGNALS:
   void channelAdded(int);
   void newData();

@@ -115,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>266</width>
-        <height>828</height>
+        <height>887</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -261,45 +261,6 @@ color: rgba(255,255,255,51);
            </item>
           </layout>
          </item>
-         <item>
-          <layout class="QGridLayout" name="gridLayout">
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="horizontalSpacing">
-            <number>3</number>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="lbl_source">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
-             <property name="text">
-              <string>Source</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QComboBox" name="cmb_source">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="currentIndex">
-              <number>-1</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
         </layout>
        </item>
        <item>
@@ -404,6 +365,45 @@ color: rgba(255,255,255,51);
                <number>0</number>
               </property>
               <item>
+               <layout class="QGridLayout" name="gridLayout">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>3</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="lbl_source">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 13px;</string>
+                  </property>
+                  <property name="text">
+                   <string>Source</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QComboBox" name="cmb_source">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="currentIndex">
+                   <number>-1</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
                <widget class="QLabel" name="lbl_condition">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -481,6 +481,19 @@ color: rgba(255,255,255,51);
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QLabel" name="mixedSignalLbl">
+         <property name="styleSheet">
+          <string notr="true">color: white;</string>
+         </property>
+         <property name="text">
+          <string>This feature is not supported while the Mixed Signal View is enabled!</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -924,6 +937,7 @@ color: rgba(255,255,255,51);
       <zorder>verticalSpacer_3</zorder>
       <zorder></zorder>
       <zorder>trigger_logic_controls</zorder>
+      <zorder>mixedSignalLbl</zorder>
      </widget>
     </widget>
    </item>

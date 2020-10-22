@@ -31,7 +31,9 @@
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kpowersupply.hpp>
+#include "scopyExceptionHandler.h"
 
 #define TIMER_TIMEOUT_MS	200
 
@@ -50,9 +52,12 @@ PowerController::PowerController(struct iio_context *ctx,
 	ui->setupUi(this);
 
 	try {
+		m_m2k_powersupply->enableChannel(0, false);
+		m_m2k_powersupply->enableChannel(1, false);
 		m_m2k_powersupply->pushChannel(0, 0.0);
 		m_m2k_powersupply->pushChannel(1, 0.0);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
 
@@ -104,16 +109,20 @@ PowerController::PowerController(struct iio_context *ctx,
 	api->load(*settings);
 	api->js_register(engine);
 
+	readPreferences();
+
 }
 
 PowerController::~PowerController()
 {
+	disconnect(prefPanel, &Preferences::notify, this, &PowerController::readPreferences);
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
 	try {
 		m_m2k_powersupply->powerDownDacs(true);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << e.what();
 	}
 
@@ -123,6 +132,11 @@ PowerController::~PowerController()
 	delete api;
 
 	delete ui;
+}
+
+void PowerController::readPreferences()
+{
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 void PowerController::toggleRunButton(bool enabled)
@@ -150,7 +164,8 @@ void PowerController::dac1_set_value(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(0, value);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
 	averageVoltageCh1.clear();
@@ -167,7 +182,8 @@ void PowerController::dac2_set_value(double value)
 {
 	try {
 		m_m2k_powersupply->pushChannel(1, value);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << "Can't write push value: " << e.what();
 	}
 	averageVoltageCh2.clear();
@@ -177,7 +193,8 @@ void PowerController::dac1_set_enabled(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(0, enabled);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << "Can't enable channel: " << e.what();
 	}
 	averageVoltageCh1.clear();
@@ -186,17 +203,20 @@ void PowerController::dac1_set_enabled(bool enabled)
 		dac2_set_enabled(enabled);
 
 	setDynamicProperty(ui->dac1, "running", enabled);
+	ui->dac1->setText(enabled ? tr("Disable") : tr("Enable"));
 }
 
 void PowerController::dac2_set_enabled(bool enabled)
 {
 	try {
 		m_m2k_powersupply->enableChannel(1, enabled);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << "Can't enable channel: " << e.what();
 	}
 	averageVoltageCh2.clear();
 	setDynamicProperty(ui->dac2, "running", enabled);
+	ui->dac2->setText(enabled ? tr("Disable") : tr("Enable"));
 }
 
 void PowerController::sync_enabled(bool enabled)
@@ -226,7 +246,8 @@ void PowerController::update_lcd()
 	try {
 		value1 = m_m2k_powersupply->readChannel(0);
 		value2 = m_m2k_powersupply->readChannel(1);
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e);
 		qDebug(CAT_POWER_CONTROLLER) << "Can't read value: " << e.what();
 	}
 

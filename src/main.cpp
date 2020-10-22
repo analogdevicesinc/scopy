@@ -38,6 +38,7 @@ using namespace adiscope;
 
 int main(int argc, char **argv)
 {
+	ScopyApplication app(argc, argv);
 #if BREAKPAD_HANDLER
 #ifdef Q_OS_LINUX
 	google_breakpad::MinidumpDescriptor descriptor("/tmp");
@@ -54,11 +55,7 @@ int main(int argc, char **argv)
 										(wchar_t*)NULL,
 										NULL);
 #endif
-
-	ScopyApplication app(argc, argv);
 	app.setExceptionHandler(&eh);
-#else
-	QApplication app(argc, argv);
 #endif
 
 	QFontDatabase::addApplicationFont(":/open-sans-regular.ttf");
@@ -73,9 +70,15 @@ int main(int argc, char **argv)
 		app.setStyleSheet(stylesheet);
 	}
 
+#ifdef WIN32
 	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	if (!pythonpath.isNull())
-		qputenv("PYTHONPATH", pythonpath);
+	auto path_str = QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
+	path_str += QString::fromLocal8Bit(pythonpath);
+	qputenv("PYTHONPATH", path_str.toLocal8Bit());
+#endif
 
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
@@ -84,6 +87,10 @@ int main(int argc, char **argv)
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
 #if BREAKPAD_HANDLER
+	QSettings test;
+	QString path = test.fileName();
+	QString fn("Scopy.ini");
+	path.chop(fn.length());
 	QString prevCrashDump = app.initBreakPadHandler(path);
 #else
 	QString prevCrashDump = "";

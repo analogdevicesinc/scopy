@@ -29,14 +29,16 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
+#include <scopyApplication.hpp>
 
 
 using namespace adiscope;
 
+
 Preferences::Preferences(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::Preferences),
-	sig_gen_periods_nr(2),
+	sig_gen_periods_nr(1),
 	save_session_on_exit(true),
 	double_click_to_detach(false),
 	pref_api(new Preferences_API(this)),
@@ -58,8 +60,11 @@ Preferences::Preferences(QWidget *parent) :
 	show_ADC_digital_filters(false),
 	m_useNativeDialogs(true),
 	language("auto"),
-	m_displaySamplingPoints(false)
-
+	m_displaySamplingPoints(false),
+	m_instrument_notes_active(false),
+	m_debug_messages_active(false),
+	m_attemptTempLutCalib(false),
+	m_skipCalIfCalibrated(true)
 {
 	ui->setupUi(this);
 
@@ -132,6 +137,12 @@ Preferences::Preferences(QWidget *parent) :
 		manual_calib_script_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->skipCalCheckbox, &QCheckBox::stateChanged, [=](int state) {
+		m_skipCalIfCalibrated = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->enableAnimCheckBox, &QCheckBox::stateChanged, [=](int state) {
 		animations_enabled = (!state ? false : true);
 		Q_EMIT notify();
@@ -145,6 +156,17 @@ Preferences::Preferences(QWidget *parent) :
 		mini_hist_enabled = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	connect(ui->debugMessagesCheckbox, &QCheckBox::stateChanged, [=](int state){
+		setDebugMessagesActive(state);
+		Q_EMIT notify();
+	});
+
+	connect(ui->debugInstrumentCheckbox, &QCheckBox::stateChanged, [=](int state){
+		debugger_enabled = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->decodersCheckBox, &QCheckBox::stateChanged, [=](int state){
 		digital_decoders_enabled = (!state ? false : true);
 		Q_EMIT notify();
@@ -158,6 +180,16 @@ Preferences::Preferences(QWidget *parent) :
 		}
 	});
 
+	connect(ui->instrumentNotesCheckbox, &QCheckBox::stateChanged, [=](int state) {
+		m_instrument_notes_active = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
+	connect(ui->tempLutCalibCheckbox, &QCheckBox::stateChanged, [=](int state) {
+		m_attemptTempLutCalib = state;
+		Q_EMIT notify();
+	});
+
 	QString preference_ini_file = getPreferenceIniFile();
 	QSettings settings(preference_ini_file, QSettings::IniFormat);
 
@@ -165,6 +197,12 @@ Preferences::Preferences(QWidget *parent) :
 	pref_api->load(settings);
 
 	ui->label_restart->setVisible(false);
+	//////////////////////
+	// TEMPORARY UNTIL ACTUAL IMPLEMENTATION
+	ui->tempLutCalibCheckbox->setVisible(false);
+	ui->label_28->setVisible(false);
+	//////////////////////////
+
 	ui->languageCombo->addItems(getOptionsList());
 
 
@@ -239,6 +277,15 @@ void Preferences::setDisplaySamplingPoints(bool display)
 	m_displaySamplingPoints = display;
 }
 
+bool Preferences::getInstrumentNotesActive() const
+{
+	return m_instrument_notes_active;
+}
+void Preferences::setInstrumentNotesActive(bool en)
+{
+	m_instrument_notes_active = en;
+}
+
 Preferences::~Preferences()
 {
 	QString preference_ini_file = getPreferenceIniFile();
@@ -276,6 +323,11 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
 	ui->languageCombo->setCurrentText(language);
 	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
+	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
+	ui->debugMessagesCheckbox->setChecked(m_debug_messages_active);
+	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
+	ui->tempLutCalibCheckbox->setChecked(m_attemptTempLutCalib);
+	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
 
 	QWidget::showEvent(event);
 }
@@ -388,6 +440,16 @@ bool Preferences::getDouble_click_to_detach() const
 	return double_click_to_detach;
 }
 
+bool Preferences::getDebugMessagesActive() const
+{
+	return m_debug_messages_active;
+}
+void Preferences::setDebugMessagesActive(bool val)
+{
+	m_debug_messages_active = val;
+	GetScopyApplicationInstance()->setDebugMode(val);
+}
+
 void Preferences::setDouble_click_to_detach(bool value)
 {
 	double_click_to_detach = value;
@@ -447,6 +509,12 @@ void Preferences::setManual_calib_script_enabled(bool value)
 	Q_EMIT notify();
 }
 
+
+bool Preferences::getDebugger_enabled() const
+{
+	return debugger_enabled;
+}
+
 void Preferences::setDebugger_enabled(bool value)
 {
 	debugger_enabled = value;
@@ -487,6 +555,24 @@ bool Preferences::getOsc_graticule_enabled() const
 void Preferences::setOsc_graticule_enabled(bool value)
 {
 	graticule_enabled = value;
+}
+
+bool Preferences::getAttemptTempLutCalib() const
+{
+	return m_attemptTempLutCalib;
+}
+void Preferences::setAttemptTempLutCalib(bool val)
+{
+	m_attemptTempLutCalib = val;
+}
+
+bool Preferences::getSkipCalIfCalibrated() const
+{
+	return m_skipCalIfCalibrated;
+}
+void Preferences::setSkipCalIfCalibrated(bool val)
+{
+	m_skipCalIfCalibrated = val;
 }
 
 bool Preferences_API::getAnimationsEnabled() const
@@ -588,6 +674,15 @@ void Preferences_API::setGraticuleEnabled(const bool& enabled)
 	preferencePanel->graticule_enabled = enabled;
 }
 
+bool Preferences_API::getInstrumentNotesActive() const
+{
+	return preferencePanel->m_instrument_notes_active;
+}
+void Preferences_API::setInstrumentNotesActive(bool en)
+{
+	preferencePanel->m_instrument_notes_active = en;
+}
+
 bool Preferences_API::getExternalScript() const
 {
 	return preferencePanel->external_script_enabled;
@@ -647,6 +742,25 @@ void Preferences_API::setDigitalDecoders(bool enabled)
 {
 	preferencePanel->digital_decoders_enabled = enabled;
 }
+
+bool Preferences_API::getAttemptTempLutCalib() const
+{
+	return preferencePanel->m_attemptTempLutCalib;
+}
+void Preferences_API::setAttemptTempLutCalib(bool val)
+{
+	preferencePanel->m_attemptTempLutCalib = val;
+}
+
+bool Preferences_API::getSkipCalIfCalibrated() const
+{
+	return preferencePanel->m_skipCalIfCalibrated;
+}
+void Preferences_API::setSkipCalIfCalibrated(bool val)
+{
+	preferencePanel->m_skipCalIfCalibrated = val;
+}
+
 bool Preferences::hasNativeDialogs() const
 {
     return m_useNativeDialogs;
@@ -686,4 +800,13 @@ bool Preferences_API::getDisplaySampling() const
 void Preferences_API::setDisplaySampling(bool display)
 {
 	preferencePanel->m_displaySamplingPoints = display;
+}
+
+bool Preferences_API::getDebugMessagesActive() const
+{
+	return preferencePanel->m_debug_messages_active;
+}
+void Preferences_API::setDebugMessagesActive(bool val)
+{
+	preferencePanel->setDebugMessagesActive(val);
 }

@@ -266,6 +266,12 @@ color: #ff7200;
         <property name="scaleMaxMinor" stdset="0">
          <number>10</number>
         </property>
+	<property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermo::LeadingScale</enum>
+        </property>
         <property name="borderWidth" stdset="0">
          <number>0</number>
         </property>
@@ -486,10 +492,22 @@ color: #9013fe;
         <property name="scaleMaxMinor" stdset="0">
          <number>10</number>
         </property>
+	<property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="scalePosition">
+         <enum>QwtThermo::LeadingScale</enum>
+        </property>
+        <property name="originMode">
+         <enum>QwtThermo::OriginMaximum</enum>
+        </property>
         <property name="borderWidth" stdset="0">
          <number>0</number>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
       </item>
      </layout>
     </widget>
@@ -835,11 +853,9 @@ QSlider::sub-page:horizontal {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: tr(&quot;Enable&quot;);
 }
 
 QPushButton[running=true] {
-  qproperty-text: tr(&quot;Disable&quot;);
   background-color: #F45000;
 }
 
@@ -966,11 +982,9 @@ QPushButton:disabled {
   text-align: left;
   padding-left: 20px;
   padding-right: 20px;
-  qproperty-text: tr(&quot;Enable&quot;);
 }
 
 QPushButton[running=true] {
-  qproperty-text: tr(&quot;Disable&quot;);
   background-color: #F45000;
 }
 
@@ -1017,14 +1031,20 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -1042,6 +1062,38 @@ QPushButton:disabled {
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
+ <connection>
+   <sender>valuePos</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>lcd1_set</receiver>
+   <slot>display(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>233</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>281</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>valueNeg</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>lcd2_set</receiver>
+   <slot>display(double)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>917</x>
+     <y>380</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>260</x>
+     <y>335</y>
+    </hint>
+   </hints>
+  </connection>
   <connection>
    <sender>btnSync</sender>
    <signal>toggled(bool)</signal>

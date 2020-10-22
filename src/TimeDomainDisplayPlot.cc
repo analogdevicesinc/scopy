@@ -1084,6 +1084,11 @@ void TimeDomainDisplayPlot::enableDigitalPlotCurve(int curveId, bool enable)
 	}
 }
 
+int TimeDomainDisplayPlot::getNrDigitalPlotCurves() const
+{
+	return d_logic_curves.size();
+}
+
 QwtPlotCurve * TimeDomainDisplayPlot::getDigitalPlotCurve(int curveId)
 {
 	if (curveId < 0 || curveId > d_logic_curves.size() - 1) {

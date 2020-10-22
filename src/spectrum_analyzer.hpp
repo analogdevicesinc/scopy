@@ -102,6 +102,7 @@ public:
 
 	void setNativeDialogs(bool nativeDialogs) override;
 
+	void setCurrentAverageIndexLabel(uint chnIdx);
 public Q_SLOTS:
 	void readPreferences();	
 	void run() override;
@@ -112,13 +113,16 @@ Q_SIGNALS:
 	void showTool();
 
 private Q_SLOTS:
+	void on_btnHistory_toggled(bool checked);
+	void onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx);
 	void on_btnToolSettings_toggled(bool checked);
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
-	void on_spinBox_averaging_valueChanged(int);
+    void on_comboBox_line_thickness_currentIndexChanged(int index);
+    void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
 	void onChannelSettingsToggled(bool);
 	void onChannelSelected(bool);
@@ -140,7 +144,8 @@ private Q_SLOTS:
 	void singleCaptureDone();
 	void on_btnMarkerTable_toggled(bool checked);
 	void onTopValueChanged(double);
-	void onRangeValueChanged(double);
+	void onScalePerDivValueChanged(double);
+	void onBottomValueChanged(double);
 	void rightMenuFinished(bool opened);	
 	void btnExportClicked();
 	void updateRunButton(bool);
@@ -148,8 +153,11 @@ private Q_SLOTS:
 	void on_btnBrowseFile_clicked();
 	void on_btnImport_clicked();
 	void onReferenceChannelDeleted();
+	void refreshCurrentSampleLabel();
+	void validateSpinboxAveraging();
 
 private:
+	void initInstrumentStrings();
 	void build_gnuradio_block_chain();
 	void build_gnuradio_block_chain_no_ctx();
 	void start_blockchain_flow();
@@ -190,18 +198,24 @@ private:
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 	adiscope::DbClickButtons *marker_selector;
+	unsigned int m_nb_overlapping_avg;
 
 	QButtonGroup *settings_group;
 	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
 
-	PositionSpinButton *range;
+	ScaleSpinButton *top_scale;
+	ScaleSpinButton *bottom_scale;
+	PositionSpinButton *unit_per_div;
 	PositionSpinButton *top;
+	PositionSpinButton *bottom;
 	PositionSpinButton *marker_freq_pos;
 
 	StartStopRangeWidget *startStopRange;
 
 	QList<channel_sptr> channels;
+	QTimer *sample_timer;
+	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
 	adiscope::scope_sink_f::sptr fft_sink;
 	iio_manager::port_id *fft_ids;
@@ -222,21 +236,25 @@ private:
 	MetricPrefixFormatter freq_formatter;
 
 	gr::top_block_sptr top_block;
+	QPair<double, double> m_mag_min_max;
 
 	bool marker_menu_opened;
 
-	static std::vector<std::pair<QString,
+	std::vector<std::pair<QString,
 	       FftDisplayPlot::MagnitudeType>> mag_types;
-	static std::vector<std::pair<QString,
+	std::vector<std::pair<QString,
 	       FftDisplayPlot::AverageType>> avg_types;
-	static std::vector<std::pair<QString, FftWinType>> win_types;
-	static std::vector<QString> markerTypes;
+	std::vector<std::pair<QString, FftWinType>> win_types;
+	std::vector<QString> markerTypes;
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
 	void toggleRightMenu(CustomPushButton *btn, bool checked);
 	void updateChannelSettingsPanel(unsigned int id);
 	ChannelWidget *getChannelWidgetAt(unsigned int id);
 	void updateMarkerMenu(unsigned int id);
 	bool isIioManagerStarted() const;
+	void setCurrentSampleLabel(double);
+
+	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
 };
 
 class SpectrumChannel: public QObject
@@ -275,18 +293,31 @@ public:
 	uint averaging() const;
 	void setAveraging(uint);
 
+	uint averageIdx() const;
+	void setAverageIdx(uint);
+
 	FftDisplayPlot::AverageType averageType() const;
 	void setAverageType(FftDisplayPlot::AverageType);
 
 	SpectrumAnalyzer::FftWinType fftWindow() const;
 	void setFftWindow(SpectrumAnalyzer::FftWinType win, int taps);
 
+	bool isAverageHistoryEnabled() const;
+	void setAverageHistoryEnabled(bool enabled);
+	bool canStoreAverageHistory() const;
+
+	void setGainMode(int index);
+	libm2k::analog::M2K_RANGE getGainMode();
+	static double win_overlap_factor(SpectrumAnalyzer::FftWinType type);
 private:
 	int m_id;
 	QString m_name;
 	float m_line_width;
 	QColor m_color;
 	uint m_averaging;
+	uint m_average_current_index;
+	libm2k::analog::M2K_RANGE m_gain_mode;
+	bool m_average_history;
 	FftDisplayPlot::AverageType m_avg_type;
 	SpectrumAnalyzer::FftWinType m_fft_win;
 	FftDisplayPlot *m_plot;

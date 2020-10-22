@@ -26,6 +26,8 @@
 
 #include "logic_tool.h"
 
+#include <mutex>
+
 class LogicDataCurve : public GenericLogicPlotCurve
 {
 public:
@@ -65,6 +67,8 @@ private:
     std::vector<std::pair<uint64_t, bool>> m_edges;
 
     bool m_displaySampling;
+
+    mutable std::mutex m_dataAvailableMutex;
 
 };
 

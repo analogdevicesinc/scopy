@@ -83,7 +83,9 @@ public:
 	bool getManual_calib_script_enabled() const;
 	void setManual_calib_script_enabled(bool value);
 
+	bool getDebugger_enabled() const;
 	void setDebugger_enabled(bool value);
+
 	void setManual_calib_enabled(bool value);
 
 	bool getAnimations_enabled() const;
@@ -108,6 +110,18 @@ public:
 
 	bool getDisplaySamplingPoints() const;
 	void setDisplaySamplingPoints(bool display);
+
+	bool getInstrumentNotesActive() const;
+	void setInstrumentNotesActive(bool display);
+
+	bool getDebugMessagesActive() const;
+	void setDebugMessagesActive(bool display);
+
+	bool getAttemptTempLutCalib() const;
+	void setAttemptTempLutCalib(bool display);
+
+	bool getSkipCalIfCalibrated() const;
+	void setSkipCalIfCalibrated(bool val);
 
 Q_SIGNALS:
 
@@ -148,7 +162,11 @@ private:
 	bool m_initialized;
 	bool m_useNativeDialogs;
 	QString language;
+	bool m_instrument_notes_active;
 	bool m_displaySamplingPoints;
+	bool m_debug_messages_active;
+	bool m_attemptTempLutCalib;
+	bool m_skipCalIfCalibrated;
 
 	Preferences_API *pref_api;
 };
@@ -176,6 +194,11 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool show_ADC_digital_filters READ getShowADCDigitalFilters WRITE setShowADCDigitalFilters)
 	Q_PROPERTY(QString language READ getLanguage WRITE setLanguage);
 	Q_PROPERTY(bool displaySamplingPoints READ getDisplaySampling WRITE setDisplaySampling)
+	Q_PROPERTY(bool instrument_notes_active READ getInstrumentNotesActive WRITE setInstrumentNotesActive)
+	Q_PROPERTY(bool debug_messages_active READ getDebugMessagesActive WRITE setDebugMessagesActive)
+	Q_PROPERTY(bool attemptTempLutCalib READ getAttemptTempLutCalib WRITE setAttemptTempLutCalib)
+	Q_PROPERTY(bool skipCalIfCalibrated READ getSkipCalIfCalibrated WRITE setSkipCalIfCalibrated)
+
 
 public:
 
@@ -236,6 +259,18 @@ public:
 
 	bool getDisplaySampling() const;
 	void setDisplaySampling(bool display);
+
+	bool getInstrumentNotesActive() const;
+	void setInstrumentNotesActive(bool display);
+
+	bool getDebugMessagesActive() const;
+	void setDebugMessagesActive(bool display);
+
+	bool getAttemptTempLutCalib() const;
+	void setAttemptTempLutCalib(bool val);
+
+	bool getSkipCalIfCalibrated() const;
+	void setSkipCalIfCalibrated(bool val);
 
 private:
 	Preferences *preferencePanel;

@@ -34,13 +34,17 @@ class SpectrumAnalyzer_API : public ApiObject
 	Q_PROPERTY(QString units READ units WRITE setUnits);
 	Q_PROPERTY(QString resBW READ resBW WRITE setResBW);
 	Q_PROPERTY(double topScale READ topScale WRITE setTopScale);
-	Q_PROPERTY(double range READ range WRITE setRange);
+	Q_PROPERTY(double bottomScale READ bottomScale WRITE setBottomScale);
+	Q_PROPERTY(double unitPerDiv READ unitPerDiv WRITE setunitPerDiv);
 	Q_PROPERTY(QVariantList channels READ getChannels);
 	Q_PROPERTY(int currentChannel READ currentChannel WRITE setCurrentChannel);
 	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE
 	           setMarkerTableVisible);
 	Q_PROPERTY(QVariantList markers READ getMarkers);
+
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
+
 public:
 	Q_INVOKABLE void show();
 	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) :
@@ -76,14 +80,20 @@ private:
 	double topScale();
 	void setTopScale(double);
 
-	double range();
-	void setRange(double);
+	double bottomScale();
+	void setBottomScale(double);
+
+	double unitPerDiv();
+	void setunitPerDiv(double);
 
 	bool markerTableVisible();
 	void setMarkerTableVisible(bool);
 
 	bool getLogScale() const;
 	void setLogScale(bool useLogScale);
+
+	QString getNotes();
+	void setNotes(QString str);
 
 };
 
@@ -94,7 +104,8 @@ class SpectrumChannel_API : public ApiObject
 	Q_PROPERTY(int type READ type WRITE setType);
 	Q_PROPERTY(int window READ window WRITE setWindow);
 	Q_PROPERTY(int averaging READ averaging WRITE setAveraging);
-	Q_PROPERTY(QList<double> data READ data STORED false)
+        Q_PROPERTY(float line_thickness READ lineThickness WRITE setLineThickness);
+        Q_PROPERTY(QList<double> data READ data STORED false)
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
 
 public:
@@ -107,11 +118,13 @@ public:
 	int type();
 	int window();
 	int averaging();
+        float lineThickness();
 
-	void enable(bool);
+        void enable(bool);
 	void setType(int);
 	void setWindow(int);
 	void setAveraging(int);
+        void setLineThickness(float val);
 
 	QList<double> data() const;
 	QList<double> freq() const;

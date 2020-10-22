@@ -76,6 +76,9 @@ namespace adiscope {
 
 		void setChannelAttenuation(double value);
 
+		void enableMixedSignalView();
+		void disableMixedSignalView();
+
 	Q_SIGNALS:
 		void sourceChanged(int);
 		void levelChanged(double);
@@ -111,12 +114,13 @@ namespace adiscope {
 		void on_extern_to_en_toggled(bool);
 		void on_cmb_analog_extern_currentIndexChanged(int);
 		void on_cmb_extern_to_src_currentIndexChanged(int);
-		void on_btnAuto_toggled(bool);
+		void on_btnTrigger_toggled(bool);
 
 		void on_cmb_extern_src_currentIndexChanged(int idx);
 		void on_spin_daisyChain_valueChanged(int arg1);
 
 	private:
+		void initInstrumentStrings();
 		void writeHwDelay(long long delay);
 		void writeHwLevel(double level);
 		void writeHwHysteresis(double level);
@@ -141,7 +145,7 @@ namespace adiscope {
 		libm2k::M2kHardwareTrigger* m_trigger;
 		bool m_trigger_in;
 
-		static const std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
+		std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
 
 		QList<trigg_channel_config> trigg_configs;
 		PositionSpinButton *trigger_level;
@@ -153,6 +157,7 @@ namespace adiscope {
 		long long daisyChainCompensation;
 		bool adc_running;
 		bool m_ac_coupled;
+		bool m_has_external_trigger_out;
 		double m_displayScale;
 		void setTriggerIn(bool bo);
 	};

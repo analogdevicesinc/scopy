@@ -21,12 +21,14 @@
 #ifndef AVERAGE_H
 #define AVERAGE_H
 
+#include <boost/thread/mutex.hpp>
+
 namespace adiscope {
 
 
 class SpectrumAverage {
 public:
-	SpectrumAverage(unsigned int data_width, unsigned int history);
+	SpectrumAverage(unsigned int data_width, unsigned int history, bool history_en);
 	virtual ~SpectrumAverage();
 	virtual void pushNewData(double *data) = 0;
 	virtual void getAverage(double *out_data,
@@ -34,10 +36,13 @@ public:
 	virtual void reset() = 0;
 	unsigned int dataWidth() const;
 	unsigned int history() const;
+	virtual void setHistory(unsigned int);
+	bool historyEnabled() const;
 
 protected:
 	unsigned int m_data_width;
 	unsigned int m_history_size;
+	bool m_history_enabled;
 	double *m_average;
 };
 
@@ -63,10 +68,12 @@ protected:
 	double **m_history;
 	unsigned int m_insert_index;
 	unsigned int m_inserted_count;
+	boost::mutex m_history_mutex;
 
 private:
 	void alloc_history(unsigned int data_width, unsigned int history_size);
 	void free_history();
+	void setHistory(unsigned int) override;
 };
 
 class PeakHoldContinuous: public AverageHistoryOne
@@ -95,6 +102,30 @@ class ExponentialAverage: public AverageHistoryOne
 public:
 	ExponentialAverage(unsigned int data_width, unsigned int history);
 	virtual void pushNewData(double *data);
+};
+
+class LinearRMSOne: public AverageHistoryOne
+{
+public:
+	LinearRMSOne(unsigned int data_width, unsigned int history);
+	~LinearRMSOne();
+	virtual void pushNewData(double *data);
+
+private:
+	double *m_sqr_sums;
+	unsigned int m_inserted_count;
+};
+
+class LinearAverageOne: public AverageHistoryOne
+{
+public:
+	LinearAverageOne(unsigned int data_width, unsigned int history);
+	~LinearAverageOne();
+	virtual void pushNewData(double *data);
+
+private:
+	double *m_sums;
+	unsigned int m_inserted_count;
 };
 
 class PeakHold: public AverageHistoryN

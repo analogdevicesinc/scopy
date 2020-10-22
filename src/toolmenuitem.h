@@ -44,6 +44,8 @@ public:
 
 	bool eventFilter(QObject *watched, QEvent *event);
 
+	void setCalibrating(bool calibrating);
+
 Q_SIGNALS:
 	void detach();
 	void toggleButtonGroup(bool);

@@ -31,6 +31,8 @@
 #include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/vector_sink.h>
 #include <gnuradio/blocks/multiply_const.h>
+#include <gnuradio/blocks/add_blk.h>
+#include <gnuradio/blocks/null_sink.h>
 
 
 /* Qt includes */
@@ -65,10 +67,17 @@
 #include "cancel_dc_offset_block.h"
 #include "frequency_compensation_filter.h"
 #include "oscilloscope_api.hpp"
+#include "logicanalyzer/logic_analyzer.h"
 
 /* libm2k includes */
 #include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/m2k.hpp>
+
+/* gr-m2k includes */
+#include <m2k/digital_in_source.h>
+#include "logic_analyzer_sink.h"
+#include "mixed_signal_sink.h"
 
 /*Generated UI */
 #include "ui_math_panel.h"
@@ -123,6 +132,9 @@ namespace adiscope {
 		void add_ref_waveform(QString name, QVector<double> xData, QVector<double> yData, unsigned int sampleRate);
 		void remove_ref_waveform(QString name);
 		void setNativeDialogs(bool nativeDialogs) override;
+
+		void setLogicAnalyzer(logic::LogicAnalyzer *la);
+
 	Q_SIGNALS:
 		void triggerALevelChanged(double);
 		void triggerBLevelChanged(double);
@@ -163,6 +175,7 @@ namespace adiscope {
 
 		void onChannelCouplingChanged(bool en);
 		void onChannelOffsetChanged(unsigned int chnIdx, double value);
+		void on_xyLineThickness_currentIndexChanged(int idx);
 
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
@@ -229,6 +242,11 @@ namespace adiscope {
 		void toggleCursorsMode(bool toggled);
 		void toolDetached(bool);
 		void setFilteringEnabled(bool set);
+
+		void enableMixedSignalView();
+		void disableMixedSignalView();
+		void setDigitalPlotCurvesParams();
+
 	public Q_SLOTS:
 		void requestAutoset();
 		void enableLabels(bool);
@@ -239,6 +257,7 @@ namespace adiscope {
 	private:
 		libm2k::context::M2k* m_m2k_context;
 		libm2k::analog::M2kAnalogIn* m_m2k_analogin;
+		libm2k::digital::M2kDigital* m_m2k_digital;
 		bool m_filtering_enabled;
 
 		unsigned int nb_channels, nb_math_channels;
@@ -271,7 +290,7 @@ namespace adiscope {
 		const int autosetSkippedTimeSamples = 4096;
 		const int autosetFFTSize = 8192;
 		const int autosetNrOfSkippedTones=50;
-		const int autosetValidTone = 150;
+		const int autosetValidTone = 51;
 
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
@@ -346,7 +365,6 @@ namespace adiscope {
 		QPair<boost::shared_ptr<signal_sample>, int> triggerLevelSink;
 		boost::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
 		boost::shared_ptr<gr::blocks::vector_sink_f> autosetFFTSink;
-		boost::shared_ptr<gr::blocks::vector_sink_f> autosetDataSink;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
@@ -459,6 +477,19 @@ namespace adiscope {
 		void updateXyPlotScales();
 		void setSampleRate(double sample_rate);
 		double getSampleRate();
+
+		logic::LogicAnalyzer *m_logicAnalyzer;
+		bool m_mixedSignalViewEnabled;
+		gr::m2k::digital_in_source::sptr logic_source;
+		gr::top_block_sptr logic_top_block;
+		logic_analyzer_sink::sptr logic_sink;
+		gr::blocks::short_to_float::sptr s2f;
+		gr::blocks::add_ff::sptr add;
+		gr::blocks::null_sink::sptr nullSink;
+		std::vector<QWidget *> m_mixedSignalViewMenu;
+
+		gr::m2k::mixed_signal_source::sptr mixed_source;
+		mixed_signal_sink::sptr mixed_sink;
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */

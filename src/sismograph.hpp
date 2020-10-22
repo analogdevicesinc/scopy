@@ -60,8 +60,9 @@ namespace adiscope {
 		void reset();
 		void setColor(const QColor& color);
 		void updateScale(const QwtScaleDiv);
+                void setLineWidth(qreal width);
 
-	private:
+        private:
 		QwtPlotCurve curve;
 		unsigned int numSamples;
 		double sampleRate;

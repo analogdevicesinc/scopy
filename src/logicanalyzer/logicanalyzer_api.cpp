@@ -398,3 +398,12 @@ void LogicAnalyzer_API::setCurrentGroups(const QVector<QVector<int> > &groups)
 {
 	m_logic->m_plot.setGroups(groups);
 }
+
+QString LogicAnalyzer_API::getNotes()
+{
+	return m_logic->ui->instrumentNotes->getNotes();
+}
+void LogicAnalyzer_API::setNotes(QString str)
+{
+	m_logic->ui->instrumentNotes->setNotes(str);
+}

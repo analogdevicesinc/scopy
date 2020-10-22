@@ -104,7 +104,10 @@ namespace adiscope {
 		void setHistorySizeCh1(int idx);
 		void setHistorySizeCh2(int idx);
 
-		void updateValuesList(std::vector<float> values);
+		void setLineThicknessCh1(int idx);
+                void setLineThicknessCh2(int idx);
+
+                void updateValuesList(std::vector<float> values);
 
 		void toggleAC();
 
@@ -124,6 +127,8 @@ namespace adiscope {
 
 		void collapsePeakHold(bool);
 		void collapseDataLog(bool);
+
+		void readPreferences();
 
 	Q_SIGNALS:
 		void showTool();

@@ -34,6 +34,9 @@
 #include "../logicanalyzer/annotationdecoder.h"
 #include "pattern_generator_api.h"
 
+#include <libm2k/m2kexceptions.hpp>
+#include "scopyExceptionHandler.h"
+
 using namespace adiscope;
 using namespace adiscope::logic;
 
@@ -132,7 +135,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	checkEnabledChannels();
 
 	// TODO:
-	// readPreferences()
+	readPreferences();
 
 	m_ui->btnGeneralSettings->setChecked(true);
 
@@ -141,6 +144,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 							  TOOL_PATTERN_GENERATOR)));
 	api->load(*settings);
 	api->js_register(engine);
+}
+
+void PatternGenerator::readPreferences()
+{
+	m_ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
 PatternGenerator::~PatternGenerator()
@@ -154,7 +162,7 @@ PatternGenerator::~PatternGenerator()
 	disconnect(prefPanel, &Preferences::notify, this, &PatternGenerator::readPreferences);
 
 	if (m_isRunning) {
-		startStop(false);
+		run_button->setChecked(false);
 	}
 
 	for (auto &curve : m_plotCurves) {
@@ -167,8 +175,16 @@ PatternGenerator::~PatternGenerator()
 		m_buffer = nullptr;
 	}
 
+	auto i = m_annotationCurvePatternUiMap.begin();
+	while (i != m_annotationCurvePatternUiMap.end()) {
+		delete i.key();
+		disconnect(i.value().second);
+		++i;
+	}
+
 	delete m_ui;
 }
+
 void PatternGenerator::setupUi()
 {
 	m_ui->setupUi(this);
@@ -340,7 +356,7 @@ void PatternGenerator::on_btnGroupChannels_toggled(bool checked)
 		m_plot.beginGroupSelection();
 	} else {
 		if (m_plot.endGroupSelection(true)) {
-			channelSelectedChanged(m_selectedChannel, false);
+//			channelSelectedChanged(m_selectedChannel, false);
 			updateGroupsAndPatterns();
 		}
 	}
@@ -594,7 +610,7 @@ uint64_t PatternGenerator::computeBufferSize(uint64_t sampleRate) const
 		bufferSize = result;
 	}
 
-	return bufferSize;
+	return bufferSize > MAX_BUFFER_SIZE ? MAX_BUFFER_SIZE : bufferSize;
 }
 
 uint16_t PatternGenerator::remapBuffer(uint8_t *mapping, uint32_t val)
@@ -694,37 +710,19 @@ void PatternGenerator::startStop(bool start)
 			m_m2kDigital->setCyclic(!isSingle);
 			m_m2kDigital->push(m_buffer, m_bufferSize);
 
-			if (isSingle) {
-				QSignalBlocker blocker(m_ui->runSingleWidget);
-				QSignalBlocker runBtnBlocker(runButton());
-				runButton()->setChecked(false);
-				m_ui->runSingleWidget->toggle(false);
-				start = false;
-				const double timeout = 500.0 + static_cast<double>(m_bufferSize) /
-						static_cast<double>(m_sampleRate) * 500.0;
-				m_singleTimer->singleShot(timeout, [=]() {
-					try {
-						m_diom->unlock();
-						m_m2kDigital->stopBufferOut();
+			// timeout = buffer duration for the given samplerate + 200 milliseconds usb transfer (push)
+			const double timeout = 0.2 + static_cast<double>(m_bufferSize) / static_cast<double>(m_sampleRate);
+			// * 1000.0 (timeout is in seconds, start expects milliseconds)
+			m_singleTimer->start(timeout * 1000.0);
 
-						for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
-							bool enabled = !!m_plotCurves[i]->plot();
-							if (enabled) {
-								m_m2kDigital->enableChannel(i, false);
-							}
-						}
-					} catch (std::exception &e) {
-						qDebug() << e.what();
-					}
-				});
-			}
-
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
-
 	} else {
 		try {
+			m_singleTimer->stop();
+
 			m_diom->unlock();
 			m_m2kDigital->cancelBufferOut();
 			m_m2kDigital->stopBufferOut();
@@ -735,7 +733,8 @@ void PatternGenerator::startStop(bool start)
 					m_m2kDigital->enableChannel(i, false);
 				}
 			}
-		} catch (std::exception &e) {
+		} catch (libm2k::m2k_exception &e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -784,6 +783,7 @@ void PatternGenerator::generateBuffer()
 		commitBuffer(pattern, m_buffer, bufferSize);
 		pattern.second->get_pattern()->delete_buffer();
 		updateAnnotationCurveChannelsForPattern(pattern);
+		pattern.second->get_pattern()->setNrOfChannels(pattern.first.size());
 	}
 
 	Q_EMIT dataAvailable(0, bufferSize);
@@ -853,9 +853,9 @@ void PatternGenerator::connectSignalsAndSlots()
 		btn->setChecked(checked);
 		connect(run_button, &QPushButton::toggled,
 			m_ui->runSingleWidget, &RunSingleWidget::toggle);
-//		if (!checked) {
-//			m_plot.setTriggerState(CapturePlot::Stop);
-//		}
+		if (!checked) {
+			m_plot.setTriggerState(CapturePlot::Stop);
+		}
 	});
 	connect(run_button, &QPushButton::toggled,
 		m_ui->runSingleWidget, &RunSingleWidget::toggle);
@@ -871,7 +871,7 @@ void PatternGenerator::connectSignalsAndSlots()
 
 
 	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
-		m_plot.setYaxis(-5 - (value * 0.05), 5 - (value * 0.05));
+		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
 
@@ -905,6 +905,12 @@ void PatternGenerator::connectSignalsAndSlots()
 
 	connect(m_ui->printBtn, &QPushButton::clicked, [=](){
 		m_plot.printWithNoBackground("Pattern Generator");
+	});
+
+	connect(m_singleTimer, &QTimer::timeout, [=](){
+		if (m_ui->runSingleWidget->singleButtonChecked()) {
+			m_ui->runSingleWidget->toggle(false);
+		}
 	});
 }
 

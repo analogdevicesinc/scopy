@@ -16,10 +16,10 @@ PACMAN_SYNC_DEPS="
 "
 
 PACMAN_REPO_DEPS="
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz \
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-libusb-1.0.21-2-any.pkg.tar.xz \
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-boost-1.72.0-3-any.pkg.tar.zst \
-	http://repo.msys2.org/mingw/$ARCH/mingw-w64-$ARCH-qt5-5.14.2-3-any.pkg.tar.zst \
+	/c/old_msys_deps_$MINGW_VERSION/mingw-w64-$ARCH-breakpad-git-r1680.70914b2d-1-any.pkg.tar.xz \
+	/c/old_msys_deps_$MINGW_VERSION/mingw-w64-$ARCH-libusb-1.0.21-2-any.pkg.tar.xz \
+	/c/old_msys_deps_$MINGW_VERSION/mingw-w64-$ARCH-boost-1.72.0-3-any.pkg.tar.zst \
+	/c/old_msys_deps_$MINGW_VERSION/mingw-w64-$ARCH-qt5-5.14.2-3-any.pkg.tar.zst \
 "
 
 PATH=/c/msys64/$MINGW_VERSION/bin:$PATH

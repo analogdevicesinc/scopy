@@ -66,6 +66,7 @@ public:
 
 	bool initialize();
 	bool isInitialized() const;
+	bool isCalibrated();
 
 	bool calibrateAll();
 	bool calibrateAdc();

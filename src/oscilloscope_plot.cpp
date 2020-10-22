@@ -1448,7 +1448,10 @@ void CapturePlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
 //					group.first()->triggerMove();
 //				}
 //			}
-			removeOffsetWidgets(i);
+			// remove digital plot curves
+			// TODO: always keep digital stuff at the end ch1 ch2 ref1 ref2 d1 d2 ...
+			// add ref3 -> ch1 ch2 ref1 ref2 ref3 d1 d2 ...
+			removeOffsetWidgets(d_ydata.size() + d_ref_ydata.size() + i);
 
 //			int groupIndx = -1;
 //			for (int i = 0; i < d_groupHandles.size(); ++i) {
@@ -1499,6 +1502,9 @@ void CapturePlot::addToGroup(int currentGroup, int toAdd)
 void CapturePlot::onDigitalChannelAdded(int chnIdx)
 {
 	qDebug() << "Digital Channel Added!";
+	setLeftVertAxesCount(d_ydata.size() + d_ref_ydata.size() + chnIdx + 1);
+	setAxisScale( QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx), -5, 5);
+	replot();
 
 	QColor chnColor;
 	const int h = (55 * chnIdx) % 360;
@@ -1509,12 +1515,14 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
 	GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 
+	curve->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
+
 	/* Channel offset widget */
 	HorizBar *chOffsetBar = new HorizBar(this);
 	d_symbolCtrl->attachSymbol(chOffsetBar);
 	chOffsetBar->setCanLeavePlot(true);
 	chOffsetBar->setVisible(false);
-	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
 	d_offsetBars.push_back(chOffsetBar);
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
@@ -1576,9 +1584,9 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 
 //			qDebug() << pos;
 
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chn_id));
 
-			auto y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+			auto y = axisInterval(QwtAxisId(QwtPlot::yLeft, chn_id));
 
 //			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
 //			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
@@ -1727,6 +1735,9 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 			hdl->setSelected(false);
 		}
 	}
+
+	group.first()->setSelected(true);
+	group.first()->selected(true);
 
 	for (QwtPlotZoneItem *groupMarker : d_groupMarkers) {
 		groupMarker->detach();
@@ -1882,8 +1893,10 @@ void CapturePlot::setGroups(const QVector<QVector<int> > &groups)
 			d_groupHandles.back().push_back(d_offsetHandles.at(hdl));
 		}
 		endGroupSelection();
+
+		d_groupHandles.back().front()->setSelected(false);
+		d_groupHandles.back().front()->selected(false);
 		d_groupHandles.back().front()->setPosition(d_groupHandles.back().front()->position());
-//		d_groupHandles.back().front()->triggerMove();
 	}
 
 	replot();
@@ -2358,10 +2371,9 @@ void CapturePlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition 
 
 void CapturePlot::updateBufferSizeSampleRateLabel(int nsamples, double sr)
 {
-	QString txtSampleRate = d_cursorMetricFormatter.format(sr, "Hz", 0);
+	QString txtSampleRate = d_cursorMetricFormatter.format(sr, "sps", 0);
 	QString txtSamplingPeriod = d_cursorTimeFormatter.format(1 / sr, "", 0);
-	QString text = QString("%1 Samples at ").arg(nsamples) + txtSampleRate +
-		"/" + txtSamplingPeriod;
+	QString text = QString("%1 Samples at ").arg(nsamples) + txtSampleRate;
 	d_sampleRateLabel->setText(text);
 }
 

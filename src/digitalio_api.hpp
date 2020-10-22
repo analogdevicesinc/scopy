@@ -34,6 +34,7 @@ class DigitalIO_API : public ApiObject
 	Q_PROPERTY(QList<bool> gpi READ gpi STORED false);
 	Q_PROPERTY(QList<bool> locked READ locked STORED false);
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes);
 
 public:
 	explicit DigitalIO_API(DigitalIO *dio) : ApiObject(), dio(dio) {}
@@ -51,6 +52,9 @@ public:
 	QList<bool> locked() const;
 	bool running() const;
 	void run(bool en);
+
+	QString getNotes();
+	void setNotes(QString str);
 
 	Q_INVOKABLE void show();
 

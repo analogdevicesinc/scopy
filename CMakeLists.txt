@@ -18,7 +18,7 @@
 
 
 cmake_minimum_required(VERSION 3.5)
-project(scopy LANGUAGES CXX VERSION 1.1.2)
+project(scopy LANGUAGES CXX VERSION 1.2.0)
 
 set(Python_ADDITIONAL_VERSIONS 3)
 FIND_PACKAGE(PythonInterp REQUIRED)
@@ -107,12 +107,15 @@ endif()
 
 
 option(BREAKPAD_HANDLER "Build with breakpad exception handler " OFF)
+message(BREAKPAD_HANDLER - ${BREAKPAD_HANDLER})
 if (${BREAKPAD_HANDLER})
+	message("-- Building with breakpad crash handler")
 	set(BREAKPAD_HANDLER_BOOL 1)
 	find_library(BREAKPAD_LIBRARIES NAMES breakpad)
 	find_library(BREAKPADCLIENT_LIBRARIES NAMES breakpad_client)
 	find_path(BREAKPAD_INCLUDE_DIRS breakpad)
 else()
+	message("-- Building without breakpad crash handler")
 	set(BREAKPAD_HANDLER_BOOL 0)
 	SET(BREAKPAD_LIBRARIES "")
 	SET(BREAKPAD_INCLUDE_DIRS "")
@@ -135,11 +138,9 @@ find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
 add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost COMPONENTS system filesystem thread REQUIRED)
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
-set(VC_PATH "$ENV{VS120COMNTOOLS}/../../VC")
-find_library(IIO_LIBRARIES NAMES iio libiio PATHS ${VC_PATH}/lib ${VC_PATH}/lib/amd64)
-find_library(M2K_LIBRARIES NAMES m2k libm2k)
+find_package(libm2k REQUIRED)
 
 if (ENABLE_MATIO)
 	message("-- Building with MATLAB support for SignalGenerator")
@@ -147,24 +148,18 @@ if (ENABLE_MATIO)
 	add_definitions(-DMATLAB_SUPPORT_SIGGEN)
 endif()
 
-find_path(IIO_INCLUDE_DIRS iio.h PATHS ${VC_PATH}/include)
-find_path(M2K_INCLUDE_DIRS libm2k/m2k.hpp)
-
 find_library(QWTPOLAR_LIBRARIES qwtpolar)
 find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
 if (NOT QWTPOLAR_LIBRARIES OR NOT QWTPOLAR_INCLUDE_DIRS)
 	message(SEND_ERROR "QwtPolar not found")
 endif()
 
-# Find libm2k
-find_library(LIBM2K_LIBRARIES NAMES m2k libm2k REQUIRED)
-find_path(LIBM2K_INCLUDE_DIRS libm2k/m2k.hpp)
-
 find_package(PkgConfig)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 message(CMAKE_PATH ${CMAKE_PREFIX_PATH})
 include_directories(
 	${Boost_INCLUDE_DIRS}
@@ -176,7 +171,6 @@ include_directories(
 	${QWTPOLAR_INCLUDE_DIRS}
 	${Qt5Svg_INCLUDE_DIRS}
 	${Qt5Xml_INCLUDE_DIRS}
-	${IIO_INCLUDE_DIRS}
 	${SCOPY_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
 	${GLIB_INCLUDE_DIRS}
@@ -188,7 +182,6 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/src
 	${BREAKPAD_INCLUDE_DIRS}
 	${BREAKPAD_INCLUDE_DIRS}/breakpad
-	${M2K_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -248,11 +241,11 @@ if (ENABLE_APPLICATION_BUNDLE)
 		set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
 	endforeach()
 
-	file(GLOB_RECURSE DECODERS ${CMAKE_SOURCE_DIR}/resources/decoders/*.py)
+	file(GLOB_RECURSE DECODERS ${LIBSIGROK_DECODERS_DIR}/*.py)
 	foreach(_decoder ${DECODERS})
-		file(RELATIVE_PATH _file ${CMAKE_SOURCE_DIR}/resources ${_decoder})
+		file(RELATIVE_PATH _file ${LIBSIGROK_DECODERS_DIR} ${_decoder})
 		get_filename_component(_path ${_file} DIRECTORY)
-		set_source_files_properties(${_decoder} PROPERTIES MACOSX_PACKAGE_LOCATION MacOS/${_path})
+		set_source_files_properties(${_decoder} PROPERTIES MACOSX_PACKAGE_LOCATION MacOS/decoders/${_path})
 	endforeach()
 
 	install(CODE "
@@ -301,13 +294,12 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${QWTPOLAR_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${Qt5Xml_LIBRARIES}
-		${IIO_LIBRARIES}
 		${MATIO_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}
 		${GLIBMM_LIBRARIES}
 		${SIGCPP_LIBRARIES}
 		${GLIB_LIBRARIES}
-		${M2K_LIBRARIES}
+		libm2k::libm2k
 )
 
 if (NOT WIN32)

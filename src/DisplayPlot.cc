@@ -665,6 +665,19 @@ DisplayPlot::disableLegend()
 }
 
 void
+DisplayPlot::setAllYAxis(double min, double max)
+{
+	for (unsigned int i = 0; i < vertAxes.size(); ++i) {
+		setAxisScale(QwtAxisId(QwtPlot::yLeft, i), min, max);
+	}
+
+	if (!d_autoscale_state) {
+		for (int i = 0; i < d_zoomer.size(); ++i)
+			d_zoomer[i]->setZoomBase();
+	}
+}
+
+void
 DisplayPlot::setYaxis(double min, double max)
 {
   setAxisScale(QwtPlot::yLeft, min, max);
@@ -863,12 +876,12 @@ DisplayPlot::getAxesLabelFontSize() const {
 }
 
 void
-DisplayPlot::setLineWidth(int which, int width)
+DisplayPlot::setLineWidth(int which, qreal width)
 {
   if(which < d_nplots) {
     // Set the new line width
     QPen pen(d_plot_curve[which]->pen());
-    pen.setWidth(width);
+    pen.setWidthF(width);
     d_plot_curve[which]->setPen(pen);
 
     // Scale the marker size proportionally

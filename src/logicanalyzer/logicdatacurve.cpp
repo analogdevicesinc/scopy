@@ -57,6 +57,13 @@ LogicDataCurve::LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::Log
 
 void LogicDataCurve::dataAvailable(uint64_t from, uint64_t to)
 {
+
+	std::unique_lock<std::mutex> lock(m_dataAvailableMutex);
+
+    if (from == 0) {
+	    reset();
+    }
+
     m_data = m_logic->getData();
 
     // Take into account the last pushed edge from the previous chunk of
@@ -104,10 +111,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
                                const QwtScaleMap &yMap, const QRectF &canvasRect,
                                int from, int to) const
 {
-
-	QElapsedTimer tt;
-	tt.start();
-
+	std::unique_lock<std::mutex> lock(m_dataAvailableMutex);
 
 	QwtPointMapper mapper;
 	mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
@@ -117,7 +121,6 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 
 	const double heightInPoints = yMap.invTransform(0) - yMap.invTransform(m_traceHeight);
 
-    // No data to plot
     if (!m_edges.size()) {
 	    if (m_startSample != m_endSample) {
 		const bool logicLevel = (m_logic->getData()[m_startSample] & (1 << m_bit)) >> m_bit;
@@ -142,16 +145,10 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     std::vector<std::pair<uint64_t, bool>> edges;
     getSubsampledEdges(edges, xMap);
 
-//    qDebug() << "edges size: " << edges.size() << " m_edges size: " << m_edges.size();
-
-//    qDebug() << "Subsampled edges: " << edges.size();
 
     if (!edges.size()) {
-//	    qDebug() << "NO EDGE FOR CURVE: " << getName();
         return;
     }
-
-//    qDebug() << "Drawing: " << edges.size() << " edges!";
 
     if (edges.front().first > 0) {
 	displayedData += QPointF(fromSampleToTime(0), edges.front().second * heightInPoints + m_pixelOffset);
@@ -173,6 +170,8 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 	displayedData += QPointF(fromSampleToTime(m_endSample - 1), (!edges.back().second) * heightInPoints + m_pixelOffset);
     }
 
+    displayedData += QPointF(plot()->axisInterval(QwtAxis::xBottom).maxValue(), displayedData.back().y());
+
     painter->save();
     painter->setPen(QColor(74, 100, 255)); //4a64ff
 
@@ -183,9 +182,6 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     painter->restore();
 
     delete d;
-
-//    qDebug() << "Drawing of edge took: " << tt.elapsed();
-    tt.restart();
 
     // Draw sampling points
     // Optimize for each segment we can draw the points connecting it
@@ -255,6 +251,11 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
     if (lastEdge < m_edges.size() - 1) {
 //	    qDebug() << "lastEdge: " << lastEdge << " < " << "m_edges.size() - 1: " << m_edges.size() - 1;
         lastEdge++;
+    }
+
+    if (m_edges.size() == 1) { // corner case
+	    edges.emplace_back(m_edges.front());
+	    return;
     }
 
     // If plot is zoomed in / not so many edges close together

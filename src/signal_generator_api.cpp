@@ -795,4 +795,50 @@ void SignalGenerator_API::setBufferPhase(const QList<double>& list){
     }
     gen->filePhase->setValue(gen->getCurrentData()->file_phase);
 }
+
+
+QString SignalGenerator_API::getNotes()
+{
+	return gen->ui->instrumentNotes->getNotes();
+}
+void SignalGenerator_API::setNotes(QString str)
+{
+	gen->ui->instrumentNotes->setNotes(str);
+}
+
+
+QList<int> SignalGenerator_API::getLineThickness() const
+{
+        QList<int> list;
+
+        for (int i = 0; i < gen->channels.size(); i++) {
+                auto ptr = gen->getData(gen->channels[i]);
+                int lineThicknessIndex = (int)(ptr->lineThickness / 0.5) - 1;
+                list.append(lineThicknessIndex);
+        }
+
+        return list;
+}
+
+void SignalGenerator_API::setLineThickness(const QList<int>& list)
+{
+        if (list.size() != gen->channels.size()) {
+                return;
+        }
+
+        for (int i = 0; i < gen->channels.size(); i++) {
+                auto ptr = gen->getData(gen->channels[i]);
+
+                ptr->lineThickness = 0.5 * (list.at(i) + 1);
+
+                if(i == gen->currentChannel){
+                        gen->updateRightMenuForChn(i);
+                        gen->plot->setLineWidth(i, ptr->lineThickness);
+                        gen->plot->replot();
+                }
+        }
+        int index = (int)(gen->getCurrentData()->lineThickness / 0.5) - 1;
+        gen->ui->cbLineThickness->setCurrentIndex(index);
+}
+
 }

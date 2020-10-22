@@ -19,7 +19,13 @@
  */
 
 #include "adc_sample_conv.hpp"
+
+#include <libm2k/m2k.hpp>
+#include <libm2k/contextbuilder.hpp>
+
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
+#include "scopyExceptionHandler.h"
 
 using namespace gr;
 using namespace adiscope;
@@ -49,7 +55,8 @@ double adc_sample_conv::conversionWrapper(unsigned int chn_idx, double sample, b
 		} else {
 			return m2k_adc->convertVoltsToRaw(chn_idx, sample);
 		}
-	} catch (std::exception &e) {
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
 		return 0;
 	}
 }

@@ -59,6 +59,7 @@ Pattern::Pattern()
 	// qDebug()<<"PatternCreated";
 	buffer = nullptr;
 	periodic = true;
+	channels = 1;
 }
 
 Pattern::~Pattern()
@@ -134,6 +135,16 @@ std::string Pattern::toString()
 bool Pattern::fromString(std::string from)
 {
 	return 0;
+}
+
+int Pattern::nrOfChannels() const
+{
+	return channels;
+}
+
+void Pattern::setNrOfChannels(int channels)
+{
+	this->channels = channels;
 }
 
 uint32_t Pattern::get_min_sampling_freq()
@@ -765,7 +776,8 @@ void NumberPatternUI::parse_ui()
 		qDebug()<<"Cannot set frequency, not an int";
 	}
 
-	if (val<max && ok) {
+	max = (1 << pattern->nrOfChannels()) - 1;
+	if (val <= max && ok) {
 		ui->numberLineEdit->setStyleSheet("color:white");
 	} else {
 		ui->numberLineEdit->setStyleSheet("color:red");
@@ -1062,6 +1074,13 @@ std::shared_ptr<logic::Decoder> BinaryCounterPatternUI::getDecoder()
 void BinaryCounterPatternUI::setAnnotationCurve(GenericLogicPlotCurve *curve)
 {
 	m_annotationCurve = curve;
+}
+
+QVector<int> BinaryCounterPatternUI::getChannelsToAssign()
+{
+	// we don't want to assign the first channel 0 (clock) of the
+	// parallel decoder. Only the data lines.
+	return {1, 2, 3, 4, 5, 6, 7, 8};
 }
 
 Pattern *BinaryCounterPatternUI::get_pattern()
@@ -1525,6 +1544,7 @@ UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
 		m_decoder->set_option("parity", parityStr);
 		m_decoder->set_option("stop_bits",
 				      g_variant_new_double(pattern->get_stop_bits()));
+		m_decoder->set_option("format", g_variant_new_string("ascii"));
 
 		dynamic_cast<AnnotationCurve*>(m_annotationCurve)->getAnnotationDecoder()->startDecode();
 	});

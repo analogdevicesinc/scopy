@@ -1,3 +1,4 @@
+
 /*
  * Copyright (c) 2020 Analog Devices Inc.
  *
@@ -38,10 +39,16 @@
 #include "dynamicWidget.hpp"
 
 #include <QDebug>
+
 #include <QFileDialog>
 #include <QDateTime>
 
+#include <QTabWidget>
+
 #include "filter.hpp"
+
+#include <libm2k/m2kexceptions.hpp>
+#include "scopyExceptionHandler.h"
 
 #include "osc_export_settings.h"
 #include "filemanager.h"
@@ -54,6 +61,16 @@ constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 64 * 4 * 1024 * 1024; // 64 x 4M
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
+/* helper method to sort srd_decoder objects based on ids(name) */
+static gint sort_pds(gconstpointer a, gconstpointer b)
+{
+    const struct srd_decoder *sda, *sdb;
+
+    sda = (const struct srd_decoder *)a;
+    sdb = (const struct srd_decoder *)b;
+    return strcmp(sda->id, sdb->id);
+}
+
 LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 			     adiscope::ToolMenuItem *toolMenuItem,
 			     QJSEngine *engine, adiscope::ToolLauncher *parent,
@@ -65,9 +82,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_m2k_context(m2kOpen(ctx, "")),
 	m_m2kDigital(m_m2k_context->getDigital()),
 	m_sampleRateButton(new ScaleSpinButton({
-					{"Hz", 1E0},
-					{"kHz", 1E+3},
-					{"MHz", 1E+6}
+					{"sps", 1E0},
+					{"ksps", 1E+3},
+					{"Msps", 1E+6}
 					}, tr("Sample Rate"), 1,
 					10e7,
 					true, false, this, {1, 2, 5})),
@@ -102,7 +119,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_autoMode(false),
 	m_timer(new QTimer(this)),
 	m_timerTimeout(1000),
-	m_exportSettings(nullptr)
+	m_exportSettings(nullptr),
+	m_saveRestoreSettings(nullptr),
+	m_oscPlot(nullptr),
+	m_oscChannelSelected(-1),
+	m_oscDecoderMenu(nullptr)
 {
 	// setup ui
 	setupUi();
@@ -154,7 +175,9 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 		// of the available data to be done in the capture thread
 		connect(this, &LogicAnalyzer::dataAvailable, this,
 			[=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			if (!m_oscPlot) {
+				curve->dataAvailable(from, to);
+			}
 		}, Qt::DirectConnection);
 
 		m_plotCurves.push_back(curve);
@@ -251,6 +274,507 @@ LogicAnalyzer::~LogicAnalyzer()
 
 	delete cr_ui;
 	delete ui;
+}
+
+void LogicAnalyzer::setData(const uint16_t * const data, int size)
+{
+
+	qDebug() << "Set data arrived: ";
+
+	if (m_buffer) {
+		delete m_buffer;
+		m_buffer = nullptr;
+	}
+
+	m_buffer = new uint16_t[size];
+
+	memcpy(m_buffer, data, size * sizeof(uint16_t));
+	Q_EMIT dataAvailable(0, size);
+
+//	if (m_oscPlot) {
+//		QMetaObject::invokeMethod(this, [=](){
+//			m_oscPlot->replot();
+//		}, Qt::QueuedConnection);
+//	}
+
+}
+
+std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, int oscAnalogChannels)
+{
+	// save the state of the tool
+	m_saveRestoreSettings = std::unique_ptr<SaveRestoreToolSettings>(new SaveRestoreToolSettings(this));
+
+	// disable the menu item for the logic analyzer when mixed signal view is enabled
+	toolMenuItem->setDisabled(true);
+
+	m_oscPlot = osc;
+
+	m_oscAnalogChannels = oscAnalogChannels;
+
+	QTabWidget *tabWidget = new QTabWidget();
+	tabWidget->setMovable(true);
+
+	QWidget *channelEnumerator = new QWidget();
+	QVBoxLayout *layout = new QVBoxLayout();
+	QGridLayout *chEnumeratorLayout = new QGridLayout();
+	channelEnumerator->setLayout(layout);
+	chEnumeratorLayout->setSpacing(15);
+
+	// add title for ch enumerator
+
+	layout->insertLayout(0, chEnumeratorLayout);
+	// move plot curves (logic + decoder) to osc plot
+	for (uint8_t i = 0; i < m_nbChannels; ++i) {
+
+		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
+		curve->setTraceHeight(25);
+		m_oscPlot->addDigitalPlotCurve(curve, false);
+
+		m_oscPlotCurves.push_back(curve);
+
+		auto handle = connect(this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to){
+			curve->dataAvailable(from, to);
+		}, Qt::DirectConnection);
+
+		connect(curve, &GenericLogicPlotCurve::destroyed, [=](){
+			disconnect(handle);
+		});
+
+		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
+
+		QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
+
+		chEnumeratorLayout->addLayout(hBoxLayout, i % 8, i / 8);
+
+		hBoxLayout->addWidget(channelBox);
+
+		QComboBox *triggerBox = new QComboBox();
+		triggerBox->addItem("-");
+
+		hBoxLayout->addWidget(triggerBox);
+
+		channelBox->setChecked(true);
+
+		for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
+			triggerBox->addItem(ui->triggerComboBox->itemIcon(i),
+					    ui->triggerComboBox->itemText(i));
+		}
+
+		int condition = static_cast<int>(
+					m_m2kDigital->getTrigger()->getDigitalCondition(i));
+		triggerBox->setCurrentIndex((condition + 1) % 6);
+
+		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+			m_m2kDigital->getTrigger()->setDigitalCondition(i,
+					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+		});
+
+		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+			m_oscPlot->enableDigitalPlotCurve(i, toggled);
+			m_oscPlot->setOffsetWidgetVisible(i + m_oscAnalogChannels, toggled);
+			m_oscPlot->positionInGroupChanged(i + m_oscAnalogChannels, 0, 0);
+			m_oscPlot->replot();
+		});
+		channelBox->setChecked(false);
+	}
+
+	layout->insertSpacerItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	// title
+	// combobox add decoder
+	QComboBox *decoderComboBox = new QComboBox();
+
+	decoderComboBox->addItem("Select a decoder to add");
+
+
+	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+	decoderList = g_slist_sort(decoderList, sort_pds);
+
+	for (const GSList *sl = decoderList; sl; sl = sl->next) {
+
+	    srd_decoder *dec = (struct srd_decoder *)sl->data;
+
+	    QString decoderInput = "";
+
+	    GSList *dec_channels = g_slist_copy(dec->inputs);
+	    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+		decoderInput = QString::fromUtf8((char*)sl->data);
+	    }
+	    g_slist_free(dec_channels);
+
+	    if (decoderInput == "logic") {
+		decoderComboBox->addItem(QString::fromUtf8(dec->id));
+	    }
+	}
+
+	g_slist_free(decoderList);
+
+	layout->insertWidget(1, decoderComboBox);
+
+	// decoder enumerator
+	QGridLayout *decoderEnumerator = new QGridLayout();
+
+	layout->insertLayout(2, decoderEnumerator);
+
+	QWidget *decoderMenu = nullptr;
+	QVBoxLayout *decoderSettingsLayout = new QVBoxLayout();
+
+	QComboBox *stackDecoderComboBox = new QComboBox();
+	stackDecoderComboBox->setVisible(false);
+	auto updateButtonStackedDecoder = [=](){
+		if (m_oscChannelSelected < m_nbChannels) {
+			stackDecoderComboBox->setVisible(false);
+			return;
+		}
+
+		if (m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
+			return;
+		}
+
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
+
+		if (!curve) {
+			return;
+		}
+
+		auto stack = curve->getDecoderStack();
+		auto top = stack.back();
+
+		QSignalBlocker stackDecoderComboBoxBlocker(stackDecoderComboBox);
+		stackDecoderComboBox->clear();
+		stackDecoderComboBox->addItem("-");
+
+		QString decoderOutput = "";
+		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+		decoderList = g_slist_sort(decoderList, sort_pds);
+		GSList *dec_channels = g_slist_copy(top->decoder()->outputs);
+		for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+		    decoderOutput = QString::fromUtf8((char*)sl->data);
+		}
+		g_slist_free(dec_channels);
+		for (const GSList *sl = decoderList; sl; sl = sl->next) {
+
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+
+		    QString decoderInput = "";
+
+		    GSList *dec_channels = g_slist_copy(dec->inputs);
+		    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
+			decoderInput = QString::fromUtf8((char*)sl->data);
+		    }
+		    g_slist_free(dec_channels);
+
+		    if (decoderInput == decoderOutput) {
+			qDebug() << "Added: " << QString::fromUtf8(dec->id);
+			stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+		    }
+		}
+		g_slist_free(decoderList);
+
+		const bool shouldBeVisible = stackDecoderComboBox->count() > 1;
+
+		stackDecoderComboBox->setVisible(shouldBeVisible);
+	};
+
+	connect(decoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+		if (!decoderComboBox->currentIndex()) {
+			return;
+		}
+
+		std::shared_ptr<logic::Decoder> initialDecoder = nullptr;
+
+		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
+		for (const GSList *sl = decoderList; sl; sl = sl->next) {
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		    if (QString::fromUtf8(dec->id) == decoder) {
+			initialDecoder = std::make_shared<logic::Decoder>(dec);
+		    }
+		}
+
+		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
+		curve->setTraceHeight(25);
+		m_oscPlot->addDigitalPlotCurve(curve, true);
+
+		// In case the Osc is running the annotation curve will not
+		// be displayed properly due to lack of information about
+		// sr buffer size and trigger offset. We borrow this values
+		// from a logic curve on the plot
+		QwtPlotCurve* dummyCurve = m_oscPlot->getDigitalPlotCurve(0);
+		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(dummyCurve);
+		curve->setSampleRate(logicCurve->getSampleRate());
+		curve->setBufferSize(logicCurve->getBufferSize());
+		curve->setTimeTriggerOffset(logicCurve->getTimeTriggerOffset());
+
+		m_oscPlotCurves.push_back(curve);
+
+		// use direct connection we want the processing
+		// of the available data to be done in the capture thread
+		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
+			this, [=](uint64_t from, uint64_t to){
+			curve->dataAvailable(from, to);
+		}, Qt::DirectConnection);
+
+		connect(curve, &QObject::destroyed, [=](){
+			disconnect(connectionHandle);
+		});
+
+		g_slist_free(decoderList);
+
+		QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+		QWidget *decoderMenuItem = new QWidget();
+		QHBoxLayout *layout = new QHBoxLayout(this);
+		decoderMenuItem->setLayout(layout);
+		QCheckBox *decoderBox = new QCheckBox(decoder);
+		decoderBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+		layout->addWidget(decoderBox);
+
+		QPushButton *deleteBtn = new QPushButton(this);
+		deleteBtn->setFlat(true);
+		deleteBtn->setIcon(QIcon(":/icons/close_hovered.svg"));
+		deleteBtn->setMaximumSize(QSize(16, 16));
+
+		layout->addWidget(deleteBtn);
+		layout->insertSpacerItem(2, spacer);
+
+		decoderBox->setVisible(true);
+		deleteBtn->setVisible(true);
+
+		connect(deleteBtn, &QPushButton::clicked, [=](){
+			decoderMenuItem->deleteLater();
+
+			int chIdx = m_oscPlotCurves.indexOf(curve);
+
+			if (chIdx == m_oscChannelSelected) {
+				m_oscPlot->channelSelected(chIdx + m_oscAnalogChannels, false);
+			} else if (chIdx < m_oscChannelSelected) {
+				m_oscChannelSelected--;
+			}
+
+			bool groupDeleted = false;
+			m_oscPlot->removeFromGroup(chIdx,
+					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
+					       groupDeleted);
+
+			if (groupDeleted) {
+				ui->groupWidget->setVisible(false);
+				m_currentGroup.clear();
+				ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
+				m_currentGroupMenu->deleteLater();
+				m_currentGroupMenu = nullptr;
+			}
+
+			m_oscPlot->removeDigitalPlotCurve(curve);
+			m_oscPlotCurves.removeOne(curve);
+
+			disconnect(connectionHandle);
+
+			delete curve;
+
+			// reposition decoder menu items after deleting one
+			for (int i = chIdx; i < m_oscPlotCurves.size(); ++i) {
+				const int index = i - 16; // subtract logic channels count
+				QLayoutItem *next = decoderEnumerator->itemAtPosition((index + 1) / 2, (index + 1) % 2);
+				decoderEnumerator->removeItem(next);
+				decoderEnumerator->addItem(next, index / 2, index % 2);
+			}
+
+			updateButtonStackedDecoder();
+		});
+
+		const int itemsInLayout = decoderEnumerator->count();
+		decoderEnumerator->addWidget(decoderMenuItem, itemsInLayout / 2, itemsInLayout % 2);
+
+		decoderComboBox->setCurrentIndex(0);
+
+		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
+			m_oscPlot->enableDigitalPlotCurve(m_oscAnalogChannels + m_nbChannels + itemsInLayout, toggled);
+			m_oscPlot->setOffsetWidgetVisible(m_oscAnalogChannels + m_nbChannels + itemsInLayout, toggled);
+			m_oscPlot->positionInGroupChanged(m_oscAnalogChannels + m_nbChannels + itemsInLayout, 0, 0);
+			m_oscPlot->replot();
+		});
+
+		int chId = m_oscPlotCurves.size() - 1;
+
+		connect(curve, &AnnotationCurve::decoderMenuChanged, [=](){
+			if (m_oscChannelSelected != chId) {
+				return;
+			}
+
+			if (m_oscDecoderMenu) {
+				decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+				m_oscDecoderMenu->deleteLater();
+				m_oscDecoderMenu = nullptr;
+			}
+			m_oscDecoderMenu = curve->getCurrentDecoderStackMenu();
+			decoderSettingsLayout->addWidget(m_oscDecoderMenu);
+
+			updateButtonStackedDecoder();
+		});
+
+		decoderBox->setChecked(true);
+	});
+
+	// Current Channel Tab ! QWidget(QScrollArea(ch settings + decoder settings))
+	QScrollArea *currentChannelMenuScrollArea = new QScrollArea();
+	QWidget *currentChannelMenu = new QWidget();
+
+	currentChannelMenuScrollArea->setWidgetResizable(true);
+
+	QVBoxLayout *currentChannelMenuLayout = new QVBoxLayout();
+	currentChannelMenu->setLayout(currentChannelMenuLayout);
+	currentChannelMenuLayout->setContentsMargins(15, 0, 15, 0);
+
+	QLineEdit *nameLineEdit = new QLineEdit();
+	nameLineEdit->setReadOnly(true);
+	nameLineEdit->setText("No channel selected!");
+	nameLineEdit->setVisible(true);
+	nameLineEdit->setDisabled(true);
+	nameLineEdit->setAlignment(Qt::AlignCenter);
+	nameLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	currentChannelMenuLayout->addWidget(nameLineEdit);
+	currentChannelMenuLayout->addLayout(decoderSettingsLayout);
+
+	currentChannelMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	currentChannelMenuScrollArea->setMinimumSize(200, 300);
+	currentChannelMenuScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+	QHBoxLayout *stackDecoderLayout = new QHBoxLayout();
+	currentChannelMenuLayout->addLayout(stackDecoderLayout);
+	stackDecoderLayout->insertSpacerItem(0, new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
+	stackDecoderLayout->insertWidget(1, stackDecoderComboBox);
+
+	currentChannelMenuLayout->insertItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	tabWidget->addTab(channelEnumerator, "General");
+	const int channelMenuTabId = tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
+
+	connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
+		chIdx -= m_oscAnalogChannels;
+		if (m_oscChannelSelected != chIdx && selected) {
+			m_oscChannelSelected = chIdx;
+			nameLineEdit->setEnabled(true);
+			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
+
+			tabWidget->setCurrentIndex(channelMenuTabId);
+
+			if (m_oscChannelSelected < m_nbChannels) {
+				if (m_oscDecoderMenu) {
+					decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+					m_oscDecoderMenu->deleteLater();
+					m_oscDecoderMenu = nullptr;
+				}
+			} else {
+				if (m_oscDecoderMenu) {
+					decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+					m_oscDecoderMenu->deleteLater();
+					m_oscDecoderMenu = nullptr;
+				}
+
+				AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
+				m_oscDecoderMenu = annCurve->getCurrentDecoderStackMenu();
+				decoderSettingsLayout->addWidget(m_oscDecoderMenu);
+			}
+		} else if (m_oscChannelSelected == chIdx && !selected) {
+			m_oscChannelSelected = -1;
+			nameLineEdit->setDisabled(true);
+			nameLineEdit->setText("No channel selected!");
+
+			if (m_oscDecoderMenu) {
+				decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+				m_oscDecoderMenu->deleteLater();
+				m_oscDecoderMenu = nullptr;
+			}
+		}
+
+		updateButtonStackedDecoder();
+	});
+
+	connect(stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
+		if (m_oscChannelSelected < m_nbChannels) {
+			return;
+		}
+
+		if (m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
+			return;
+		}
+
+		if (!stackDecoderComboBox->currentIndex()) {
+			return;
+		}
+
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
+
+		if (!curve) {
+			return;
+		}
+
+		GSList *dl = g_slist_copy((GSList *)srd_decoder_list());
+		for (const GSList *sl = dl; sl; sl = sl->next) {
+		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		    if (QString::fromUtf8(dec->id) == text) {
+			curve->stackDecoder(std::make_shared<logic::Decoder>(dec));
+			break;
+		    }
+		}
+
+		// Update decoder menu. New decoder must be shown
+		// and it might also have some options that can
+		// be modified
+		if (m_oscDecoderMenu) {
+			decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+			m_oscDecoderMenu->deleteLater();
+			m_oscDecoderMenu = nullptr;
+		}
+
+		m_oscDecoderMenu = curve->getCurrentDecoderStackMenu();
+		decoderSettingsLayout->addWidget(m_oscDecoderMenu);
+
+		updateButtonStackedDecoder();
+	});
+
+	currentChannelMenuScrollArea->setWidget(currentChannelMenu);
+
+	tabWidget->addTab(channelEnumerator, "General");
+	tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
+
+	return {tabWidget};
+}
+
+void LogicAnalyzer::disableMixedSignalView()
+{
+	// restore the menu item availability
+	toolMenuItem->setEnabled(true);
+
+	// restore the state of the tool
+	m_saveRestoreSettings.reset(nullptr);
+
+	// remove from osc plot the logic curves
+	QwtPlotCurve *curve = m_oscPlot->getDigitalPlotCurve(0);
+	while (curve != nullptr) {
+		m_oscPlot->removeDigitalPlotCurve(curve);
+		delete curve;
+
+		curve = m_oscPlot->getDigitalPlotCurve(0);
+	}
+
+	m_oscPlot = nullptr;
+}
+
+void LogicAnalyzer::addCurveToPlot(QwtPlotCurve *curve)
+{
+
+}
+
+QwtPlot *LogicAnalyzer::getCurrentPlot()
+{
+	return nullptr;
+}
+
+void LogicAnalyzer::connectSignalsAndSlotsForPlot(CapturePlot *plot)
+{
+
 }
 
 void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
@@ -455,7 +979,7 @@ void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
 		m_plot.beginGroupSelection();
 	} else {
 		if (m_plot.endGroupSelection()) {
-			channelSelectedChanged(m_selectedChannel, false);
+//			channelSelectedChanged(m_selectedChannel, false);
 		}
 	}
 }
@@ -738,7 +1262,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 
 	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
-		m_plot.setYaxis(-5 - (value * 0.05), 5 - (value * 0.05));
+		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
 
@@ -974,7 +1498,7 @@ void LogicAnalyzer::initBufferScrolling()
 void LogicAnalyzer::startStop(bool start)
 {
 	if (m_started == start) {
-		return;
+			return;
 	}
 
 	m_started = start;
@@ -1069,7 +1593,8 @@ void LogicAnalyzer::startStop(bool start)
 					Q_EMIT dataAvailable(0, bufferSize);
 					updateBufferPreviewer(0, m_lastCapturedSample);
 
-				} catch (std::invalid_argument &e) {
+				} catch (libm2k::m2k_exception &e) {
+					HANDLE_EXCEPTION(e)
 					qDebug() << e.what();
 				}
 			} else {
@@ -1095,7 +1620,8 @@ void LogicAnalyzer::startStop(bool start)
 							m_plot.setTriggerState(CapturePlot::Triggered);
 						}, Qt::QueuedConnection);
 
-					} catch (std::invalid_argument &e) {
+					} catch (libm2k::m2k_exception &e) {
+						HANDLE_EXCEPTION(e)
 						qDebug() << e.what();
 						break;
 					}
@@ -1161,15 +1687,6 @@ void LogicAnalyzer::startStop(bool start)
 
 }
 
-static gint sort_pds(gconstpointer a, gconstpointer b)
-{
-    const struct srd_decoder *sda, *sdb;
-
-    sda = (const struct srd_decoder *)a;
-    sdb = (const struct srd_decoder *)b;
-    return strcmp(sda->id, sdb->id);
-}
-
 void LogicAnalyzer::setupDecoders()
 {
 	if (srd_decoder_load_all() != SRD_OK) {
@@ -1226,7 +1743,9 @@ void LogicAnalyzer::setupDecoders()
 		// of the available data to be done in the capture thread
 		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
 			this, [=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			if (!m_oscPlot) {
+				curve->dataAvailable(from, to);
+			}
 		}, Qt::DirectConnection);
 
 		curve->setSampleRate(m_sampleRate);
@@ -1596,6 +2115,7 @@ void LogicAnalyzer::readPreferences()
 			ldc->setDisplaySampling(prefPanel->getDisplaySamplingPoints());
 		}
 	}
+	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 
 	m_plot.replot();
 }

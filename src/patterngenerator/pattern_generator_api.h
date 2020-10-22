@@ -46,6 +46,8 @@ class PatternGenerator_API : public ApiObject
 	Q_PROPERTY(QList<double> channelHeights READ getChannelHeights WRITE setChannelHeights)
 	Q_PROPERTY(QList<double> channelPosition READ getChannelPosition WRITE setChannelPosition)
 
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
+
 
 public:
 	explicit PatternGenerator_API(logic::PatternGenerator *pattern)
@@ -81,6 +83,9 @@ public:
 
 	QVector<QPair<QVector<int>, QString>> getEnabledPatterns() const;
 	void setEnabledPatterns(const QVector<QPair<QVector<int>, QString>> &enabledPatterns);
+
+	QString getNotes();
+	void setNotes(QString);
 
 private:
 	logic::PatternGenerator *m_pattern;

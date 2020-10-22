@@ -124,6 +124,10 @@ class Oscilloscope_API : public ApiObject
 	Q_PROPERTY(int memory_depth READ getMemoryDepth
 		   WRITE setMemoryDepth)
 
+	Q_PROPERTY(int xy_thickness READ getXyThickness WRITE setXyThickness)
+
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
+
 public:
 	explicit Oscilloscope_API(Oscilloscope *osc) :
 		ApiObject(), osc(osc) {}
@@ -237,6 +241,9 @@ public:
 	int getCurrentChannel() const;
 	void setCurrentChannel(int chn_id);
 
+	int getXyThickness() const;
+	void setXyThickness(int val);
+
 	bool getFftEn() const;
 	void setFftEn(bool en);
 
@@ -257,6 +264,9 @@ public:
 
 	int getMemoryDepth();
 	void setMemoryDepth(int val);
+
+	QString getNotes();
+	void setNotes(QString);
 
 	Q_INVOKABLE void show();
 

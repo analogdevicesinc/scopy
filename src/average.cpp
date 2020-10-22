@@ -21,14 +21,17 @@
 #include "average.h"
 #include <algorithm>
 #include <cstring>
+#include <boost/make_shared.hpp>
 
 using namespace adiscope;
 
 /*
  * class SpectrumAverage
  */
-SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history):
-	m_data_width(data_width), m_history_size(history)
+SpectrumAverage::SpectrumAverage(unsigned int data_width, unsigned int history,
+				 bool history_en):
+	m_data_width(data_width), m_history_size(history),
+	m_history_enabled(history_en)
 {
 	if (data_width < 1)
 		m_data_width = 1;
@@ -62,11 +65,22 @@ unsigned int SpectrumAverage::history() const
 	return m_history_size;
 }
 
+void SpectrumAverage::setHistory(unsigned int history)
+{
+	m_history_size = history;
+}
+
+bool SpectrumAverage::historyEnabled() const
+{
+	return m_history_enabled;
+}
+
+
 /*
  * class AverageHistoryOne
  */
 AverageHistoryOne::AverageHistoryOne(unsigned int data_width, unsigned history):
-	SpectrumAverage(data_width, history), m_anyDataPushed(false)
+	SpectrumAverage(data_width, history, false), m_anyDataPushed(false)
 {
 }
 
@@ -79,7 +93,7 @@ void AverageHistoryOne::reset()
  * class AverageHistoryN
  */
 AverageHistoryN::AverageHistoryN(unsigned int data_width, unsigned int history):
-	SpectrumAverage(data_width, history), m_insert_index(0),
+	SpectrumAverage(data_width, history, true), m_insert_index(0),
 	m_inserted_count(0)
 {
 	alloc_history(m_data_width, m_history_size);
@@ -99,6 +113,7 @@ void AverageHistoryN::reset()
 void AverageHistoryN::alloc_history(unsigned int data_width,
 	unsigned int history_size)
 {
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
 	m_history = new double*[history_size];
 	for (unsigned int i = 0; i < history_size; i++)
 		m_history[i] = new double[data_width];
@@ -107,13 +122,60 @@ void AverageHistoryN::alloc_history(unsigned int data_width,
 
 void AverageHistoryN::free_history()
 {
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
 	for (unsigned int i = 0; i < m_history_size; i++)
 		delete[] m_history[i];
 	delete[] m_history;
 }
 
+void AverageHistoryN::setHistory(unsigned int history)
+{
+	double **tmp_history;
+	tmp_history = new double*[history];
+
+	for (unsigned int i = 0; i < history; i++) {
+		tmp_history[i] = new double[m_data_width];
+	}
+
+	if (history > m_history_size) {
+		for (unsigned int i = 0; i < m_history_size; i++) {
+			std::memcpy(tmp_history[i], m_history[i],
+				    m_data_width * sizeof(double));
+		}
+	} else {
+		int start_index = (m_insert_index > history) ? (m_insert_index - history) : 0;
+		int remaining_samples = std::min(m_inserted_count, history);
+		int tmp_i = 0;
+
+		for (unsigned int i = start_index; i < m_insert_index; i++) {
+			std::memcpy(tmp_history[tmp_i], m_history[i],
+				    m_data_width * sizeof(double));
+			remaining_samples--;
+			tmp_i++;
+		}
+
+		for (unsigned int i = m_history_size - remaining_samples; i < m_history_size; i++) {
+			std::memcpy(tmp_history[tmp_i], m_history[i],
+				    m_data_width * sizeof(double));
+			tmp_i++;
+		}
+
+		if (m_insert_index > history) {
+			m_insert_index = 0;
+		}
+		m_inserted_count = std::min(m_inserted_count, history);
+	}
+
+	free_history();
+
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
+	m_history = tmp_history;
+	SpectrumAverage::setHistory(history);
+}
+
 void AverageHistoryN::pushNewData(double *data)
 {
+	boost::unique_lock<boost::mutex> lock(m_history_mutex);
 	std::memcpy(m_history[m_insert_index], data,
 		m_data_width * sizeof(double));
 	m_insert_index = (m_insert_index + 1) % m_history_size;
@@ -298,6 +360,81 @@ double MinHold::getMinFromHistoryColumn(unsigned int col)
 }
 
 /*
+ * class LinearRMSOne
+ */
+LinearRMSOne::LinearRMSOne(unsigned int data_width, unsigned int history):
+	AverageHistoryOne(data_width, history)
+{
+	m_sqr_sums = new double[m_data_width];
+	m_inserted_count = 0;
+}
+
+LinearRMSOne::~LinearRMSOne()
+{
+	delete[] m_sqr_sums;
+}
+
+void LinearRMSOne::pushNewData(double *data)
+{
+	if (m_anyDataPushed) {
+		if (m_inserted_count < m_history_size) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_sqr_sums[i] += (data[i] * data[i]);
+			}
+			m_inserted_count++;
+		} else if (m_inserted_count != 0) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_average[i] = m_sqr_sums[i] / m_inserted_count;
+				m_sqr_sums[i] = 0;
+			}
+			m_inserted_count = 0;
+		}
+	} else {
+		std::memcpy(m_average, data, m_data_width * sizeof(double));
+		m_anyDataPushed = true;
+	}
+
+}
+
+
+/*
+ * class LinearAverageOne
+ */
+LinearAverageOne::LinearAverageOne(unsigned int data_width, unsigned int history):
+	AverageHistoryOne(data_width, history)
+{
+	m_sums = new double[m_data_width];
+	m_inserted_count = 0;
+}
+
+LinearAverageOne::~LinearAverageOne()
+{
+	delete[] m_sums;
+}
+
+void LinearAverageOne::pushNewData(double *data)
+{
+	if (m_anyDataPushed) {
+		if (m_inserted_count < m_history_size) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_sums[i] += data[i];
+			}
+			m_inserted_count++;
+		} else if (m_inserted_count != 0) {
+			for (unsigned int i = 0; i < m_data_width; i++) {
+				m_average[i] = m_sums[i] / m_inserted_count;
+				m_sums[i] = 0;
+			}
+			m_inserted_count = 0;
+		}
+	} else {
+		std::memcpy(m_average, data, m_data_width * sizeof(double));
+		m_anyDataPushed = true;
+	}
+}
+
+
+/*
  * class LinearRMS
  */
 LinearRMS::LinearRMS(unsigned int data_width, unsigned int history):
@@ -334,7 +471,7 @@ void LinearRMS::getAverage(double *out_data, unsigned int num_samples) const
 	unsigned int num = std::min(m_data_width, num_samples);
 
 	for (unsigned int i = 0; i < num; i++)
-		out_data[i] = m_sqr_sums[i] / m_inserted_count;
+		out_data[i] = sqrt(m_sqr_sums[i] / m_inserted_count);
 }
 
 void LinearRMS::reset()

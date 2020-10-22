@@ -59,6 +59,9 @@ class NetworkAnalyzer_API : public ApiObject
 	Q_PROPERTY(QList<double> data READ data STORED false)
 	Q_PROPERTY(QList<double> phase READ phase STORED false)
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
+	Q_PROPERTY(int averaging READ getAveraging WRITE setAveraging)
+	Q_PROPERTY(int periods READ getPeriods WRITE setPeriods)
+	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 public:
 	explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
 		ApiObject(), net(net) {}
@@ -109,11 +112,20 @@ public:
 	int getPlotType() const;
 	void setPlotType(int val);
 
+	int getAveraging() const;
+	void setAveraging(int val);
+
+	int getPeriods() const;
+	void setPeriods(int val);
+
 	Q_INVOKABLE void show();
 
 	QList<double> data() const;
 	QList<double> freq() const;
 	QList<double> phase() const;
+
+	QString getNotes();
+	void setNotes(QString str);
 
 private:
 	NetworkAnalyzer *net;

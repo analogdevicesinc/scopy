@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1188</width>
-    <height>657</height>
+    <height>694</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -470,6 +470,22 @@ color:  red;</string>
                         </property>
                        </spacer>
                       </item>
+                      <item row="0" column="3">
+                       <widget class="QLabel" name="currentAverageLabel">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">color:white;</string>
+                        </property>
+                        <property name="text">
+                         <string>Average: </string>
+                        </property>
+                       </widget>
+                      </item>
                      </layout>
                     </item>
                    </layout>
@@ -477,6 +493,9 @@ color:  red;</string>
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_plots"/>
+                 </item>
+                 <item>
+                  <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -1495,6 +1514,197 @@ color: rgba(255,255,255,51);
                           </property>
                          </layout>
                         </widget>
+                       </item>
+                       <item row="4" column="0" colspan="2">
+                        <layout class="QGridLayout" name="sweepAverageLayout">
+                         <property name="topMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="horizontalSpacing">
+                          <number>3</number>
+                         </property>
+                         <property name="verticalSpacing">
+                          <number>0</number>
+                         </property>
+                         <item row="1" column="0">
+                          <widget class="QSpinBox" name="spinBox_averaging">
+                           <property name="styleSheet">
+                            <string notr="true">font-size: 14px;
+height:24px;
+color: white;
+border: 0px;
+border-bottom: 1px solid rgba(255,255,255,100);
+
+
+QSpinBox[invalid=true] {
+border-color: red;
+}
+QSpinBox[valid=true] {
+border-color: green;
+}</string>
+                           </property>
+                           <property name="buttonSymbols">
+                            <enum>QAbstractSpinBox::NoButtons</enum>
+                           </property>
+                           <property name="minimum">
+                            <number>1</number>
+                           </property>
+                           <property name="maximum">
+                            <number>1000000</number>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="lblAveraging">
+                           <property name="text">
+                            <string>Average</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="1">
+                          <widget class="QPushButton" name="btnApplyAverage">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="minimumSize">
+                            <size>
+                             <width>64</width>
+                             <height>25</height>
+                            </size>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true">QPushButton {
+color: white;
+background-color: #4a64ff;
+font-family:  14pt;
+border-width: 0px;
+border-radius: 3px;
+min-width: 64px;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:pressed {
+background-color: #F45000;
+}
+
+QPushButton:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton:pressed {
+background-color: #4a64ff;
+}
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
+                           </property>
+                           <property name="text">
+                            <string>Apply</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </item>
+                       <item row="3" column="0" colspan="2">
+                        <layout class="QGridLayout" name="sweepPeriodLayout">
+                         <property name="bottomMargin">
+                          <number>0</number>
+                         </property>
+                         <property name="horizontalSpacing">
+                          <number>3</number>
+                         </property>
+                         <property name="verticalSpacing">
+                          <number>0</number>
+                         </property>
+                         <item row="0" column="0">
+                          <widget class="QLabel" name="lblPeriods">
+                           <property name="text">
+                            <string>Periods</string>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="0">
+                          <widget class="QSpinBox" name="spinBox_periods">
+                           <property name="styleSheet">
+                            <string notr="true">font-size: 14px;
+height:24px;
+color: white;
+border: 0px;
+border-bottom: 1px solid rgba(255,255,255,100);
+
+
+QSpinBox[invalid=true] {
+border-color: red;
+}
+QSpinBox[valid=true] {
+border-color: green;
+}</string>
+                           </property>
+                           <property name="buttonSymbols">
+                            <enum>QAbstractSpinBox::NoButtons</enum>
+                           </property>
+                           <property name="minimum">
+                            <number>2</number>
+                           </property>
+                           <property name="maximum">
+                            <number>100</number>
+                           </property>
+                          </widget>
+                         </item>
+                         <item row="1" column="1">
+                          <widget class="QPushButton" name="btnApplyPeriod">
+                           <property name="sizePolicy">
+                            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                             <horstretch>0</horstretch>
+                             <verstretch>0</verstretch>
+                            </sizepolicy>
+                           </property>
+                           <property name="minimumSize">
+                            <size>
+                             <width>64</width>
+                             <height>25</height>
+                            </size>
+                           </property>
+                           <property name="styleSheet">
+                            <string notr="true">QPushButton {
+color: white;
+background-color: #4a64ff;
+font-family:  14pt;
+border-width: 0px;
+border-radius: 3px;
+min-width: 64px;
+}
+QPushButton:disabled {
+background-color: grey;
+}
+QPushButton:pressed {
+background-color: #F45000;
+}
+
+QPushButton:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
+QPushButton:pressed {
+background-color: #4a64ff;
+}
+QPushButton:hover
+{
+	 background-color: #4a34ff;
+}</string>
+                           </property>
+                           <property name="text">
+                            <string>Apply</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
                        </item>
                       </layout>
                      </item>
@@ -3001,11 +3211,6 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -3026,6 +3231,17 @@ QLabel {
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

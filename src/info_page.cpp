@@ -21,6 +21,9 @@
 #include "info_page.hpp"
 #include "ui_info_page.h"
 #include "preferences.h"
+#include <libm2k/m2k.hpp>
+#include <libm2k/contextbuilder.hpp>
+#include "libm2k/analog/dmm.hpp"
 
 #include <QString>
 #include <QTimer>
@@ -60,6 +63,10 @@ InfoPage::InfoPage(QString uri, Preferences *pref,
 	connect(m_blink_timer, SIGNAL(timeout()),
 		this, SLOT(blinkTimeout()));
 	readPreferences();
+	setStatusLabel(ui->lblCalibrationInfo);
+	setStatusLabel(ui->lblCalibrationStatus);
+	setStatusLabel(ui->lblConnectionStatus);
+	setStatusLabel(ui->lblIdentifyStatus);
 }
 
 void InfoPage::readPreferences() {
@@ -137,31 +144,31 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key)
 {
 	bool advanced = false;
 	if (key.contains("fw_version")) {
-		key = tr("Firmware version");
+		key = "Firmware version";
 	} else if (key == "hw_model") {
-		key = tr("Model");
+		key = "Model";
 	} else if (key.contains("hw_model_variant")) {
-		key = tr("Model variant");
+		key = "Model variant";
 		advanced = true;
 	} else if (key.contains("serial")) {
-		key = tr("Serial");
+		key = "Serial";
 	} else if (key.contains("local,kernel")) {
 		key = "";
 	} else if (key.contains("idProduct")) {
-		key = tr("Product ID");
+		key = "Product ID";
 		advanced = true;
 	} else if (key.contains("idVendor")) {
-		key = tr("Vendor ID");
+		key = "Vendor ID";
 		advanced = true;
 	} else if (key.contains("usb,product")) {
-		key = tr("Product name");
+		key = "Product name";
 	} else if (key.contains("usb,vendor")) {
-		key = tr("Vendor");
+		key = "Vendor";
 	} else if (key.contains("release")) {
-		key = tr("Release");
+		key = "Release";
 		advanced = true;
 	} else if (key.contains("ip")) {
-		key = tr("IP Address");
+		key = "IP Address";
 	} else if (key.startsWith("cal,gain") ||
 		   key.startsWith("cal,offset")) {
 		key = "";
@@ -169,24 +176,55 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key)
 	return QPair<bool, QString>(advanced, key);
 }
 
-void InfoPage::setStatusLabel(QString str, QString color)
+void InfoPage::setCalibrationStatusLabel(QString str, QString color)
 {
-	ui->lblConnectionStatus->setText(str);
-	ui->lblConnectionStatus->setStyleSheet("color: " + color);
+	setStatusLabel(ui->lblCalibrationStatus,str,color);
+}
+
+void InfoPage::setCalibrationInfoLabel(QString str, QString color)
+{
+	setStatusLabel(ui->lblCalibrationInfo,str,color);
+}
+
+void InfoPage::setIdentyifyLabel(QString str, QString color)
+{
+	setStatusLabel(ui->lblIdentifyStatus,str,color);
+}
+
+void InfoPage::setConnectionStatusLabel(QString str, QString color)
+{
+	setStatusLabel(ui->lblConnectionStatus,str,color);
+}
+
+void InfoPage::setStatusLabel(QLabel *lbl, QString str, QString color)
+{
+	if(!str.isEmpty())
+	{
+		lbl->setVisible(true);
+		lbl->setText(str);
+		lbl->setStyleSheet("color: " + color);
+	}
+	else
+	{
+		lbl->setVisible(false);
+	}
+
 }
 
 void InfoPage::setConnectionStatus(bool failed)
 {
-	(failed) ? setStatusLabel("Error: Connection failed!") :
-		   setStatusLabel("");
+	if(failed)
+		setStatusLabel(ui->lblConnectionStatus, tr("Error: Connection failed!"), "red");
+	else
+		setStatusLabel(ui->lblConnectionStatus, tr("Connected"));
 }
 
 void InfoPage::refreshInfoWidget()
 {
 	if(supportsIdentification())
-		setStatusLabel("");
+		setStatusLabel(ui->lblIdentifyStatus);
 	else
-		setStatusLabel("Your hardware revision does not support the identify feature", "white");
+		setStatusLabel(ui->lblIdentifyStatus, tr("Your hardware revision does not support the identify feature"));
 
 	if(supportsCalibration())
 		ui->btnCalibrate->setVisible(true);
@@ -250,7 +288,6 @@ QPushButton* InfoPage::forgetDeviceButton()
 
 void InfoPage::identifyDevice(bool clicked)
 {
-	setStatusLabel("");
 	if (clicked) {
 		/* If identification is already on for
 		 * this device, don't start it again
@@ -280,7 +317,6 @@ void InfoPage::blinkTimeout()
 
 void InfoPage::startIdentification(bool start)
 {
-	setStatusLabel("Can't identify this device.");
 	if (!m_connected) {
 		iio_context_destroy(m_ctx);
 		m_ctx = nullptr;
@@ -363,12 +399,20 @@ M2kInfoPage::M2kInfoPage(QString uri,
 	ui->extraWidget->setSource(QUrl("qrc:/m2k.html"));
 	ui->extraWidget->setMaximumHeight(700);
 	ui->extraWidget->setMinimumHeight(700);
+	setConnectionStatusLabel(tr("Not connected"));
+	setCalibrationInfoLabel(tr("Always disconnect analog inputs/outputs before calibration"));
 
 }
 
 M2kInfoPage::~M2kInfoPage()
 {
 
+}
+
+void M2kInfoPage::getDeviceInfo()
+{
+	InfoPage::getDeviceInfo();
+	//refreshTemperature();
 }
 
 void M2kInfoPage::startIdentification(bool start)
@@ -378,7 +422,7 @@ void M2kInfoPage::startIdentification(bool start)
 			struct iio_device *m2k_fabric = iio_context_find_device(m_ctx,
 										"m2k-fabric");
 			if (!m2k_fabric) {
-				setStatusLabel("Can't identify this device.");
+				setStatusLabel(ui->lblIdentifyStatus, tr("Can't identify this device."), "red");
 				if (!m_connected) {
 					iio_context_destroy(m_ctx);
 					m_ctx = nullptr;
@@ -397,7 +441,7 @@ void M2kInfoPage::startIdentification(bool start)
 				m_led_timer->start(3000);
 				m_blink_timer->start(100);
 			} else {
-				setStatusLabel("Can't identify device. Please try to update your firmware!");
+				setStatusLabel(ui->lblIdentifyStatus, tr("Can't identify device. Please try to update your firmware!"), "red");
 
 				if (!m_connected) {
 					iio_context_destroy(m_ctx);
@@ -423,7 +467,7 @@ void M2kInfoPage::startIdentification(bool start)
 	}
 	else
 	{
-		setStatusLabel("Your hardware revision does not support the identify feature", "white");
+		setStatusLabel(ui->lblIdentifyStatus, tr("Your hardware revision does not support the identify feature"));
 	}
 }
 

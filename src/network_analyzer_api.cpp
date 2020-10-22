@@ -241,6 +241,27 @@ void NetworkAnalyzer_API::setPlotType(int val)
 {
 	 net->ui->cmb_graphs->setCurrentIndex(val);
 }
+
+int NetworkAnalyzer_API::getAveraging() const
+{
+	return net->ui->spinBox_averaging->value();
+}
+
+void NetworkAnalyzer_API::setAveraging(int val)
+{
+	net->ui->spinBox_averaging->setValue(val);
+}
+
+int NetworkAnalyzer_API::getPeriods() const
+{
+	return net->ui->spinBox_periods->value();
+}
+
+void NetworkAnalyzer_API::setPeriods(int val)
+{
+	net->ui->spinBox_periods->setValue(val);
+}
+
 int NetworkAnalyzer_API::getLineThickness() const
 {
 	return net->ui->cbLineThickness->currentIndex();
@@ -266,6 +287,15 @@ QList<double> NetworkAnalyzer_API::phase() const
 {
 	QList<double> list = net->m_phaseGraph.getXAxisData().toList();
 	return list;
+}
+
+QString NetworkAnalyzer_API::getNotes()
+{
+	return net->ui->instrumentNotes->getNotes();
+}
+void NetworkAnalyzer_API::setNotes(QString str)
+{
+	net->ui->instrumentNotes->setNotes(str);
 }
 
 }

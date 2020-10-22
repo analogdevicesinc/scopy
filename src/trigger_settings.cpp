@@ -20,6 +20,7 @@
 
 #include <libm2k/context.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2khardwaretrigger.hpp>
 #include <libm2k/contextbuilder.hpp>
@@ -33,6 +34,8 @@
 #include <iio.h>
 #include <QDebug>
 #include <QTranslator>
+#include "scopyExceptionHandler.h"
+
 
 using namespace adiscope;
 using namespace std;
@@ -52,11 +55,13 @@ struct TriggerSettings::trigg_channel_config {
 	double dc_level;
 };
 
-const std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> TriggerSettings::externalTriggerOutMapping = {
-	{tr("Forward Trigger In"), libm2k::SELECT_TRIGGER_IN},
-	{tr("Oscilloscope"),  libm2k::SELECT_ANALOG_IN},
-	{tr("Logic Analyzer"), libm2k::SELECT_DIGITAL_IN}
-};
+void TriggerSettings::initInstrumentStrings() {
+	externalTriggerOutMapping = {
+		{tr("Forward Trigger In"), libm2k::SELECT_TRIGGER_IN},
+		{tr("Oscilloscope"),  libm2k::SELECT_ANALOG_IN},
+		{tr("Logic Analyzer"), libm2k::SELECT_DIGITAL_IN}
+	};
+}
 
 TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 		QWidget *parent) :
@@ -68,8 +73,10 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	adc_running(false),
 	trigger_raw_delay(0),
 	daisyChainCompensation(0),
-	m_trigger_in(false)
+	m_trigger_in(false),
+	m_has_external_trigger_out(false)
 {
+	initInstrumentStrings();
 	ui->setupUi(this);
 	m_trigger = (m_m2k_adc) ? m_m2k_adc->getTrigger() : nullptr;
 
@@ -142,12 +149,14 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	}
 
 	if (m_trigger->hasExternalTriggerOut()) {
+		m_has_external_trigger_out = true;
 		for (const auto &val : externalTriggerOutMapping)
 		{
 			ui->cmb_extern_to_src->addItem(val.first);
 			connect(ui->extern_to_en,SIGNAL(toggled(bool)),ui->cmb_extern_to_src,SLOT(setEnabled(bool)));
 		}
 	} else {
+		m_has_external_trigger_out = false;
 		ui->cmb_extern_to_src->addItem(tr("None"));
 		ui->cmb_extern_to_src->setEnabled(false);
 		ui->extern_to_en->setEnabled(false);
@@ -159,6 +168,7 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	MouseWheelWidgetGuard *wheelEventGuard = new MouseWheelWidgetGuard(this);
 	wheelEventGuard->installEventRecursively(this);
 
+	ui->mixedSignalLbl->setVisible(false);
 }
 
 TriggerSettings::~TriggerSettings()
@@ -236,6 +246,20 @@ void TriggerSettings::setChannelAttenuation(double value)
 	m_displayScale = value;
 	trigger_hysteresis->setDisplayScale(value);
 	trigger_level->setDisplayScale(value);
+}
+
+void TriggerSettings::enableMixedSignalView()
+{
+	ui->extern_en->setDisabled(true);
+	ui->extern_to_en->setDisabled(true);
+	ui->mixedSignalLbl->setVisible(true);
+}
+
+void TriggerSettings::disableMixedSignalView()
+{
+	ui->extern_en->setEnabled(true);
+	ui->extern_to_en->setEnabled(true);
+	ui->mixedSignalLbl->setVisible(false);
 }
 
 void TriggerSettings::setDcLevelCoupled(double value)
@@ -361,14 +385,20 @@ void TriggerSettings::enableExternalTriggerOut(bool enabled)
 {
 	const int TRIGGER_OUT_PIN = 1;
 
-	try {
-		if(enabled) {
-			m_trigger->setAnalogExternalOutSelect(externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
-		} else {
-			m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
+	if(m_has_external_trigger_out) {
+		try {
+			if(enabled) {
+				m_trigger->setAnalogExternalOutSelect(externalTriggerOutMapping[ui->cmb_extern_to_src->currentIndex()].second);
+			} else {
+				m_trigger->setAnalogExternalOutSelect(libm2k::SELECT_NONE);
+			}
+		} catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
+			qDebug() << e.what();
+		} catch(std::exception e) {
+			HANDLE_EXCEPTION(e);
+			qDebug() << e.what();
 		}
-	} catch (std::exception& e) {
-		qDebug() << e.what();
 	}
 }
 
@@ -398,7 +428,8 @@ void TriggerSettings::on_cmb_analog_extern_currentIndexChanged(int index)
 		mode = static_cast<libm2k::M2K_TRIGGER_MODE>(start_idx + index);
 		try {
 			m_trigger->setAnalogMode(currentChannel(), mode);
-		} catch (std::exception& e){
+		} catch (libm2k::m2k_exception& e){
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -421,6 +452,9 @@ void TriggerSettings::autoTriggerEnable()
 
 			temporarily_disabled = false;
 		}
+	} else {
+		writeHwMode(determineTriggerMode(ui->intern_en->isChecked(),
+                                                ui->extern_en->isChecked()));
 	}
 }
 
@@ -429,17 +463,17 @@ bool TriggerSettings::triggerIsArmed() const
 	return ui->intern_en->isChecked() || ui->extern_en->isChecked();
 }
 
-void TriggerSettings::on_btnAuto_toggled(bool checked)
+void TriggerSettings::on_btnTrigger_toggled(bool checked)
 {
 	trigger_auto_mode = checked;
-	int mode = checked ? AUTO : NORMAL;
+	int mode = checked ? NORMAL : AUTO;
 
 	Q_EMIT triggerModeChanged(mode);
 }
 
 TriggerSettings::TriggerMode TriggerSettings::triggerMode() const
 {
-	return ui->btnTrigger->isChecked() ? AUTO : NORMAL;
+	return ui->btnTrigger->isChecked() ? NORMAL : AUTO;
 }
 
 void TriggerSettings::updateHwVoltLevels(int chnIdx)
@@ -452,8 +486,9 @@ void TriggerSettings::updateHwVoltLevels(int chnIdx)
 		m_trigger->setAnalogLevel(chnIdx, level);
 		m_trigger->setAnalogHysteresis(chnIdx, trigg_configs[chnIdx].hyst_val);
 	}
-	catch (std::exception& e)
+	catch (libm2k::m2k_exception& e)
 	{
+		HANDLE_EXCEPTION(e);
 		qDebug() << e.what();
 	}
 }
@@ -546,7 +581,8 @@ void TriggerSettings::writeHwDelay(long long raw_delay)
 		try {
 			m_trigger->setAnalogDelay(raw_delay);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -562,7 +598,8 @@ void TriggerSettings::writeHwLevel(double level)
 		try {
 			m_trigger->setAnalogLevel(currentChannel(), level);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -574,7 +611,8 @@ void TriggerSettings::writeHwHysteresis(double level)
 		try {
 			m_trigger->setAnalogHysteresis(currentChannel(), level);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -589,7 +627,8 @@ void TriggerSettings::writeHwAnalogCondition(int cond)
 		try {
 			m_trigger->setAnalogCondition(currentChannel(), t_cond);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -604,7 +643,8 @@ void TriggerSettings::writeHwDigitalCondition(int cond)
 		try {
 			m_trigger->setAnalogExternalCondition(currentChannel(), t_cond);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -617,8 +657,9 @@ void TriggerSettings::writeHwMode(int mode)
 			m_trigger->setAnalogMode(currentChannel(),
 				static_cast<libm2k::M2K_TRIGGER_MODE>(mode));
 		}
-		catch (std::exception& e)
+		catch (libm2k::m2k_exception& e)
 		{
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}
@@ -649,19 +690,26 @@ void TriggerSettings::writeHwSource(int source_chn)
 			libm2k::M2K_TRIGGER_SOURCE_ANALOG source = static_cast<M2K_TRIGGER_SOURCE_ANALOG>(source_chn);
 			/* analog trigger on */
 			bool intern_checked = ui->intern_en->isChecked();
-			/* extern trigger on & ext trigger in */
-			bool extern_trigger_in_checked = (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex() == 0);
+			/* extern trigger on & ext digital */
+			bool extern_digital_checked = (ui->extern_en->isChecked() && ui->cmb_extern_src->currentIndex() == 1);
 			if(m_trigger_in) {
-				if (!intern_checked && !extern_trigger_in_checked) {
-					source = libm2k::SRC_DIGITAL_IN;
+				if (!intern_checked) {
+				        if (extern_digital_checked) {
+				                // digital trigger enabled
+                                                source = libm2k::SRC_DIGITAL_IN;
+                                        }
 				} else {
-					source = static_cast<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(
-							(source_chn + 1) + libm2k::SRC_DIGITAL_IN);
+                                        if (extern_digital_checked) {
+                                                // analog + digital trigger
+                                                source = static_cast<libm2k::M2K_TRIGGER_SOURCE_ANALOG>(
+                                                        (source_chn + 1) + libm2k::SRC_DIGITAL_IN);
+                                        }
 				}
 			}
 			m_trigger->setAnalogSource(source);
 		}
-		catch (std::exception& e) {
+		catch (libm2k::m2k_exception& e) {
+			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
 	}

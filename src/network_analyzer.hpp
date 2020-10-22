@@ -52,6 +52,7 @@
 #include <gnuradio/blocks/vector_source.h>
 #include "frequency_compensation_filter.h"
 
+#include <QStackedWidget>
 #include "oscilloscope.hpp"
 
 #include "TimeDomainDisplayPlot.h"
@@ -202,6 +203,9 @@ private:
 	bool d_cursorsEnabled;
 
 	ScaleSpinButton *samplesCount;
+	ScaleSpinButton *samplesPerDecadeCount;
+	ScaleSpinButton *samplesStepSize;
+	QStackedWidget *sampleStackedWidget;
 	ScaleSpinButton *amplitude;
 	PositionSpinButton *offset;
 	PositionSpinButton *magMax;
@@ -226,6 +230,8 @@ private:
 	bool m_hasReference;
 	bool m_importDataLoaded;
 	QVector<QVector<double>> m_importData;
+	unsigned int m_nb_averaging;
+	unsigned int m_nb_periods;
 
 	void goertzel();
 	void setFilterParameters();
@@ -259,6 +265,8 @@ private:
 private Q_SLOTS:
 	void startStop(bool start);
 	void updateNumSamples(bool force = false);
+	void updateNumSamplesPerDecade(bool force = false);
+	void updateSampleStepSize(bool force = false);
 	void plot(double frequency, double mag, double mag2, double phase, float dcVoltage);
 	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 
@@ -273,6 +281,10 @@ private Q_SLOTS:
 	void onFrequencyBarMoved(int pos);
 	void toggleBufferPreview(bool toggle = false);
 
+	void validateSpinboxAveraging();
+	void on_spinBox_averaging_valueChanged(int n);
+	void on_spinBox_periods_valueChanged(int n);
+	void validateSpinboxPeriods();
 public Q_SLOTS:
 
 	void showEvent(QShowEvent *event);
@@ -281,6 +293,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void sweepDone();
+	void sweepStart();
 	void showTool();
 };
 } /* namespace adiscope */

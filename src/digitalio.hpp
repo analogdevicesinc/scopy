@@ -99,6 +99,9 @@ private:
 
 	QPair<QWidget *,Ui::dioChannel *>  *findIndividualUi(int ch);
 
+private Q_SLOTS:
+	void readPreferences();
+
 public:
 	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	                   DIOManager *diom, QJSEngine *engine,

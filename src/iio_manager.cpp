@@ -20,18 +20,18 @@
 
 #include "logging_categories.h"
 #include "iio_manager.hpp"
-#include "timeout_block.hpp"
 
 #include <QDebug>
+#include "scopyExceptionHandler.h"
 
 #include <gnuradio/blocks/null_sink.h>
 #include <gnuradio/blocks/short_to_float.h>
 
 #include <iio.h>
-
 using namespace adiscope;
 using namespace gr;
 
+static const int KERNEL_BUFFERS_DEFAULT = 4;
 std::map<const std::string, iio_manager::map_entry> iio_manager::dev_map;
 unsigned iio_manager::_id = 0;
 
@@ -40,8 +40,11 @@ iio_manager::iio_manager(unsigned int block_id,
 		unsigned long _buffer_size) :
 	QObject(nullptr),
 	top_block("IIO Manager " + std::to_string(block_id)),
-	id(block_id), _started(false), buffer_size(_buffer_size)
+	id(block_id), _started(false), buffer_size(_buffer_size),
+	m_mixed_source(nullptr)
 {
+	m_context = libm2k::context::m2kOpen(ctx, "");
+	m_analogin = m_context->getAnalogIn();
 	if (!ctx)
 		throw std::runtime_error("IIO context not created");
 
@@ -51,10 +54,22 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	nb_channels = iio_device_get_channels_count(dev);
 
-	iio_block = iio::device_source::make_from(ctx, _dev,
-			std::vector<std::string>(), _dev,
-			std::vector<std::string>(),
-			_buffer_size);
+	iio_block = gr::m2k::analog_in_source::make_from(m_context,
+							     _buffer_size,
+							     {1, 1},
+							     {0, 0},
+							     10000,
+							     1,
+							     KERNEL_BUFFERS_DEFAULT,
+							     false,
+							     false,
+							     {0, 0},
+							     {0, 0},
+							     0,
+							     0,
+							     {0, 0},
+							     false,
+							     false);
 
 	/* Avoid unconnected channel errors by connecting a dummy sink */
 	auto dummy_copy = blocks::copy::make(sizeof(short));
@@ -79,7 +94,7 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	dummy_copy->set_enabled(true);
 
-	auto timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
+	timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
 	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
 
 	QObject::connect(&*timeout_b, SIGNAL(timeout()), this,
@@ -90,9 +105,7 @@ iio_manager::~iio_manager()
 {
 }
 
-boost::shared_ptr<iio_manager> iio_manager::get_instance(
-		struct iio_context *ctx, const std::string &_dev,
-		unsigned long buffer_size)
+boost::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
 {
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
@@ -107,6 +120,17 @@ boost::shared_ptr<iio_manager> iio_manager::get_instance(
 			else
 				break;
 		}
+	}
+	return nullptr;
+}
+
+boost::shared_ptr<iio_manager> iio_manager::get_instance(
+		struct iio_context *ctx, const std::string &_dev,
+		unsigned long buffer_size)
+{
+	auto instance = has_instance(_dev);
+	if (instance) {
+		return instance;
 	}
 
 	/* No manager found - create a new one */
@@ -183,6 +207,9 @@ void iio_manager::update_buffer_size_unlocked()
 
 	if (size) {
 		iio_block->set_buffer_size(size);
+		if (m_mixed_source) {
+			m_mixed_source->set_buffer_size(size);
+		}
 		this->buffer_size = size;
 	}
 }
@@ -339,4 +366,39 @@ void iio_manager::got_timeout()
 void iio_manager::set_device_timeout(unsigned int mseconds)
 {
 	iio_block->set_timeout_ms(mseconds);
+	if (m_mixed_source) {
+		m_mixed_source->set_timeout_ms(mseconds);
+	}
+}
+
+void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
+{
+	for (int i = 0; i < nb_channels; ++i) {
+		hier_block2::disconnect(iio_block, i, freq_comp_filt[i][0], 0);
+		hier_block2::connect(mixed_source, i, freq_comp_filt[i][0], 0);
+	}
+
+	hier_block2::msg_disconnect(iio_block, "msg", timeout_b, "msg");
+	hier_block2::msg_connect(mixed_source, "msg", timeout_b, "msg");
+
+	m_mixed_source = mixed_source;
+}
+
+void iio_manager::disableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
+{
+	for (int i = 0; i < nb_channels; ++i) {
+		hier_block2::disconnect(mixed_source, i, freq_comp_filt[i][0], 0);
+		hier_block2::connect(iio_block, i, freq_comp_filt[i][0], 0);
+	}
+
+	hier_block2::msg_disconnect(mixed_source, "msg", timeout_b, "msg");
+	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
+
+	m_mixed_source = nullptr;
+	try {
+		m_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
+	} catch (libm2k::m2k_exception &e) {
+		HANDLE_EXCEPTION(e)
+		qDebug() << e.what();
+	}
 }

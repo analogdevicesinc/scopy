@@ -442,7 +442,7 @@ image: url(:/icons/setup3_checked_hover.svg);
              <property name="spacing">
               <number>0</number>
              </property>
-             <item row="1" column="0">
+             <item row="0" column="0">
               <layout class="QVBoxLayout" name="plot_and_scales">
                <property name="spacing">
                 <number>0</number>
@@ -475,124 +475,10 @@ image: url(:/icons/setup3_checked_hover.svg);
                  </property>
                 </layout>
                </item>
-               <item>
-                <layout class="QHBoxLayout" name="scales">
-                 <property name="spacing">
-                  <number>0</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="topMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="bottomMargin">
-                  <number>3</number>
-                 </property>
-                 <item>
-                  <layout class="QHBoxLayout" name="chn_scales">
-                   <property name="spacing">
-                    <number>15</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>10</number>
-                   </property>
-                  </layout>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>0</width>
-                     <height>15</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
               </layout>
              </item>
-             <item row="0" column="0">
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>20</number>
-               </property>
-               <property name="rightMargin">
-                <number>20</number>
-               </property>
-               <item>
-                <spacer name="horizontalSpacer_12">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QWidget" name="hist_widget" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>20</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <layout class="QHBoxLayout" name="hist_layout">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                 </layout>
-                </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_13">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
+             <item row="1" column="0">
+              <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
              </item>
             </layout>
            </widget>
@@ -649,7 +535,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>3</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -696,8 +582,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>310</width>
-                      <height>469</height>
+                      <width>200</width>
+                      <height>272</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1031,7 +917,11 @@ font-weight: normal;
                          </widget>
                         </item>
                         <item>
-                         <widget class="QComboBox" name="stackDecoderComboBox"/>
+                         <widget class="QComboBox" name="stackDecoderComboBox">
+                          <property name="minimumContentsLength">
+                           <number>15</number>
+                          </property>
+                         </widget>
                         </item>
                        </layout>
                       </widget>
@@ -1489,7 +1379,7 @@ font-weight: normal;
                          </property>
                          <property name="icon">
                           <iconset>
-                           <normalon>:/icons/trigger_high_enabled.svg</normalon>
+                           <normalon>:/icons/trigger_low_enabled.svg</normalon>
                           </iconset>
                          </property>
                         </item>
@@ -1499,7 +1389,7 @@ font-weight: normal;
                          </property>
                          <property name="icon">
                           <iconset>
-                           <normalon>:/icons/trigger_low_enabled.svg</normalon>
+                           <normalon>:/icons/trigger_high_enabled.svg</normalon>
                           </iconset>
                          </property>
                         </item>
@@ -1580,7 +1470,7 @@ font-weight: normal;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>300</width>
+                      <width>315</width>
                       <height>469</height>
                      </rect>
                     </property>
@@ -2253,6 +2143,12 @@ color: rgba(255, 255, 255, 153);
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>

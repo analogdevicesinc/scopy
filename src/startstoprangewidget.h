@@ -51,6 +51,8 @@ public:
 
 	void insertWidgetIntoLayout(QWidget *widget, int row, int column);
 
+	void setMinimumValue(double value);
+
 public Q_SLOTS:
 	void setMinimumSpanValue(double value);
 

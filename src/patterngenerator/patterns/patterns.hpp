@@ -130,6 +130,7 @@ private:
 	std::string name;
 	std::string description;
 	bool periodic;
+	int channels;
 protected: // temp
 	short *buffer;
 public:
@@ -155,7 +156,8 @@ public:
 
 	virtual std::string toString();
 	virtual bool fromString(std::string from);
-
+	int nrOfChannels() const;
+	void setNrOfChannels(int channels);
 };
 
 uint32_t changeBit(uint32_t number,uint8_t n, bool x);
@@ -332,6 +334,7 @@ public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
 	virtual std::shared_ptr<logic::Decoder> getDecoder() override;
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
+	virtual QVector<int> getChannelsToAssign() override;
 
 private Q_SLOTS:
 	void parse_ui();

@@ -379,6 +379,15 @@ int Oscilloscope_API::getMemoryDepth()
 	return bufferSize;
 }
 
+QString Oscilloscope_API::getNotes()
+{
+	return osc->ui->instrumentNotes->getNotes();
+}
+void Oscilloscope_API::setNotes(QString str)
+{
+	osc->ui->instrumentNotes->setNotes(str);
+}
+
 void Oscilloscope_API::show()
 {
 	Q_EMIT osc->showTool();
@@ -507,6 +516,16 @@ void Oscilloscope_API::setCurrentChannel(int chn_id)
 		chn_widget->nameButton()->setChecked(true);
 		chn_widget->menuButton()->setChecked(true);
 	}
+}
+
+int Oscilloscope_API::getXyThickness() const
+{
+	return osc->xy_plot.getLineWidth(0);
+}
+void Oscilloscope_API::setXyThickness(int val)
+{
+	osc->gsettings_ui->xyLineThickness->setCurrentIndex(val);
+	osc->xy_plot.setLineWidth(0,val);
 }
 
 bool Oscilloscope_API::getFftEn() const
