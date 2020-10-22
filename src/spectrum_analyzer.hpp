@@ -113,6 +113,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void started(bool);
 	void showTool();
+	void selectedChannelChanged(int);
 
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
@@ -125,6 +126,7 @@ private Q_SLOTS:
 	void on_boxCursors_toggled(bool on);
 	void on_btnCursors_toggled(bool);
 	void onCursorReadoutsChanged(struct cursorReadoutsText);
+	void toggleCursorsMode(bool toggled);
 
 	void on_comboBox_type_currentIndexChanged(const QString&);
 	void on_comboBox_window_currentIndexChanged(const QString&);
