@@ -175,8 +175,6 @@ Preferences::Preferences(QWidget *parent) :
 			QMessageBox info(this);
 			info.setText(tr("This change will be applied only after a Scopy reset."));
 			info.exec();
-		} else {
-			m_initialized = true;
 		}
 	});
 
@@ -207,34 +205,31 @@ Preferences::Preferences(QWidget *parent) :
 
 
 	connect(ui->languageCombo, &QComboBox::currentTextChanged, [=](QString lang) {
-			if(lang=="browse"){
-				QString langtemp = loadLanguage();
-				if(!langtemp.isEmpty()){
-					language=langtemp;
-					ui->languageCombo->addItem(language);
-					ui->languageCombo->setCurrentText(language);
-					if (m_initialized)
-						ui->label_restart->setVisible(true);
-					else
-						m_initialized = true;
-						}
-				else{
-					if(!getLanguageList().contains(language)){
-						QFileInfo info(language);
-						language = info.fileName().remove(".qm");
-						}
-					ui->languageCombo->setCurrentText(language);
-					ui->label_restart->setVisible(false);
-				}
-				}
-			else{
-				language = lang;
-				if (m_initialized)
+		if(lang == "browse"){
+			QString langtemp = loadLanguage();
+			if(!langtemp.isEmpty()) {
+				language=langtemp;
+				ui->languageCombo->addItem(language);
+				ui->languageCombo->setCurrentText(language);
+				if (m_initialized) {
 					ui->label_restart->setVisible(true);
-				else
-					m_initialized = true;
-        			}
+				}
+			} else {
+				if(!getLanguageList().contains(language)){
+					QFileInfo info(language);
+					language = info.fileName().remove(".qm");
+				}
+				ui->languageCombo->setCurrentText(language);
+				ui->label_restart->setVisible(false);
+			}
+		} else {
+			language = lang;
+			if (m_initialized) {
+				ui->label_restart->setVisible(true);
+			}
+
 			Q_EMIT notify();
+		}
 	});
 
 	connect(ui->logicAnalyzerDisplaySamplingPoints, &QCheckBox::stateChanged, [=](int state){
@@ -328,6 +323,8 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
 	ui->tempLutCalibCheckbox->setChecked(m_attemptTempLutCalib);
 	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
+	// by this point the preferences menu is initialized
+	m_initialized = true;
 
 	QWidget::showEvent(event);
 }
