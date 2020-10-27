@@ -69,6 +69,8 @@ class DMM_API : public ApiObject
 		  WRITE setPeakHoldEn)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
+	Q_PROPERTY(QVector<int> gainModes READ getGainModes WRITE setGainModes)
+
 public:
 	bool get_mode_ac_ch1() const;
 	bool get_mode_ac_ch2() const;
@@ -112,6 +114,9 @@ public:
 
 	QString getNotes();
 	void setNotes(QString);
+
+	QVector<int> getGainModes() const;
+	void setGainModes(const QVector<int> &gainModes);
 
 	Q_INVOKABLE void show();
 

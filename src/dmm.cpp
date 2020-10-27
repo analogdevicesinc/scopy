@@ -33,6 +33,10 @@
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/delay.h>
 #include <gnuradio/filter/dc_blocker_ff.h>
+#include <gnuradio/blocks/max_blk.h>
+#include <gnuradio/blocks/min_blk.h>
+#include <gnuradio/blocks/stream_to_vector.h>
+#include <gnuradio/blocks/vector_to_stream.h>
 
 #include <boost/make_shared.hpp>
 
@@ -69,7 +73,10 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	filename(""),
 	use_timer(false),
 	logging_refresh_rate(0),
-	wheelEventGuard(nullptr)
+	wheelEventGuard(nullptr),
+	m_autoGainEnabled({true, true}),
+	m_historyForGain({0, 0}),
+	m_gainHistorySize(10)
 {
 	ui->setupUi(this);
 
@@ -167,6 +174,14 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	connect(ui->btnCollapsePeakHold, SIGNAL(toggled(bool)),
 		SLOT(collapsePeakHold(bool)));
 
+	std::vector<QComboBox *> comboBoxes {ui->gainCh1ComboBox, ui->gainCh2ComboBox};
+
+	for (auto cb : comboBoxes) {
+		connect(cb, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			this, &DMM::gainModeChanged);
+		cb->setCurrentIndex(0);
+	}
+
 	setHistorySizeCh1(ui->historySizeCh1->currentIndex());
 	setHistorySizeCh2(ui->historySizeCh2->currentIndex());
 
@@ -202,6 +217,52 @@ void DMM::readPreferences()
 	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
+void DMM::gainModeChanged(int idx)
+{
+	const QObject *who = QObject::sender();
+	const int channelIdx = who == ui->gainCh1ComboBox ? 0 : (who == ui->gainCh2ComboBox ? 1 : -1);
+
+	if (channelIdx == -1 || !who) {
+		return;
+	}
+
+	QLabel *gainLabel = channelIdx == 0 ? ui->currentGainCh1Label : ui->currentGainCh2Label;
+
+	const bool started = isIioManagerStarted();
+	if (started) {
+		manager->lock();
+	}
+
+	// rebuild the flowgraph
+	// there might be data on in the gnuradio flowgraph that
+	// was captured using one gain mode and plotted and converted
+	// with another gain mode. This will ensure this situation doesn't
+	// happen
+	manager->disconnect(id_ch1);
+	manager->disconnect(id_ch2);
+
+	configureModes();
+
+	m_autoGainEnabled[channelIdx] = false;
+	if (idx == 0) { // auto
+		m_autoGainEnabled[channelIdx] = true;
+	} else if (idx == 1) { // low
+		gainLabel->setText("Low Gain");
+		m_m2k_analogin->setRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(channelIdx),
+					 libm2k::analog::PLUS_MINUS_25V);
+	} else if (idx == 2) { // high
+		gainLabel->setText("High Gain");
+		m_m2k_analogin->setRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(channelIdx),
+					 libm2k::analog::PLUS_MINUS_2_5V);
+	}
+
+	if (started) {
+		manager->start(id_ch1);
+		manager->start(id_ch2);
+		manager->unlock();
+	}
+}
+
 void DMM::disconnectAll()
 {
 	bool started = isIioManagerStarted();
@@ -234,8 +295,8 @@ void DMM::updateValuesList(std::vector<float> values)
 	if(!use_timer)
 		boost::unique_lock<boost::mutex> lock(data_mutex);
 
-	double volts_ch1 = m_m2k_analogin->convertRawToVolts(0, (int)values[0]);
-	double volts_ch2 = m_m2k_analogin->convertRawToVolts(1, (int)values[1]);
+	const double volts_ch1 = m_m2k_analogin->convertRawToVolts(0, static_cast<int>(values[0]));
+	const double volts_ch2 = m_m2k_analogin->convertRawToVolts(1, static_cast<int>(values[1]));
 
 	ui->lcdCh1->display(volts_ch1);
 	ui->lcdCh2->display(volts_ch2);
@@ -248,6 +309,11 @@ void DMM::updateValuesList(std::vector<float> values)
 
 	checkPeakValues(0, volts_ch1);
 	checkPeakValues(1, volts_ch2);
+
+	checkAndUpdateGainMode({m_m2k_analogin->convertRawToVolts(0, static_cast<int>(values[2])),
+			       m_m2k_analogin->convertRawToVolts(0, static_cast<int>(values[3])),
+			       m_m2k_analogin->convertRawToVolts(0, static_cast<int>(values[4])),
+			       m_m2k_analogin->convertRawToVolts(0, static_cast<int>(values[5]))});
 
 	if(!use_timer)
 		data_cond.notify_all();
@@ -272,6 +338,102 @@ void DMM::checkPeakValues(int ch, double peak)
 bool DMM::isIioManagerStarted() const
 {
 	return manager->started() && ui->run_button->isChecked();
+}
+
+void DMM::checkAndUpdateGainMode(const std::vector<double> &volts)
+{
+	if (volts.size() < m_adc_nb_channels * 2) {
+		return;
+	}
+
+	std::vector<QLabel *> gainLabels {ui->currentGainCh1Label, ui->currentGainCh2Label};
+	std::vector<QLabel *> errorLabels {ui->ch1ErrorLabel, ui->ch2ErrorLabel};
+
+	double hi = 0.0;
+	double lo = 0.0;
+	std::tie(lo, hi) = m_m2k_analogin->getRangeLimits(libm2k::analog::PLUS_MINUS_2_5V);
+
+	// hist interval 10% from range of High gain ~ 250 mV
+	const double percent = 0.1; // 10%
+	const double half_hist_interval = (hi * percent) / 2.0;
+
+	const double hi_hi = hi + half_hist_interval;
+	const double hi_lo = hi - half_hist_interval;
+	const double lo_hi = lo + half_hist_interval;
+	const double lo_lo = lo - half_hist_interval;
+
+	for (int i = 0; i < m_adc_nb_channels; ++i) {
+		libm2k::analog::M2K_RANGE gain = libm2k::analog::PLUS_MINUS_25V;
+
+		bool changed = false;
+		if (volts[m_adc_nb_channels * i] > 0.0) {
+			changed = true;
+			if (volts[m_adc_nb_channels * i] >= hi_hi) {
+				gain = libm2k::analog::PLUS_MINUS_25V;
+			} else if (volts[m_adc_nb_channels * i] <= hi_lo) {
+				gain = libm2k::analog::PLUS_MINUS_2_5V;
+			} else {
+				changed = false;
+			}
+		}
+
+		if (volts[m_adc_nb_channels * i + 1] <= 0.0) {
+			changed = true;
+			if (volts[m_adc_nb_channels * i + 1] <= lo_lo ) {
+				gain = libm2k::analog::PLUS_MINUS_25V;
+			} else if (volts[m_adc_nb_channels * i + 1] >= lo_hi) {
+				gain = libm2k::analog::PLUS_MINUS_2_5V;
+			} else {
+				changed = false;
+			}
+		}
+
+		if (!changed) {
+			continue;
+		}
+
+		if (gain == libm2k::analog::PLUS_MINUS_2_5V && m_m2k_analogin->getRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i)) != gain
+				&& m_historyForGain[i] < m_gainHistorySize) {
+			m_historyForGain[i]++;
+			continue; // we don't wanna change the gain now;
+		}
+
+		if (gain == libm2k::analog::PLUS_MINUS_25V) {
+			m_historyForGain[i] = 0;
+		}
+
+		errorLabels[i]->setText("");
+		if (m_m2k_analogin->getRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i)) != gain) {
+			if (m_autoGainEnabled[i]) {
+				const bool started = isIioManagerStarted();
+				if (started) {
+					manager->lock();
+				}
+
+				// rebuild the flowgraph
+				// there might be data on in the gnuradio flowgraph that
+				// was captured using one gain mode and plotted and converted
+				// with another gain mode. This will ensure this situation doesn't
+				// happen
+				manager->disconnect(id_ch1);
+				manager->disconnect(id_ch2);
+
+				configureModes();
+
+				m_m2k_analogin->setRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i), gain);
+
+				gainLabels[i]->setText(gain == libm2k::analog::PLUS_MINUS_25V ? "Low Gain" : "High Gain");
+
+				if (started) {
+					manager->start(id_ch1);
+					manager->start(id_ch2);
+					manager->unlock();
+				}
+			} else {
+				errorLabels[i]->setText("Out of range!");
+			}
+		}
+	}
 }
 
 void DMM::collapseDataLog(bool checked)
@@ -377,17 +539,36 @@ void DMM::configureModes()
 	auto s2f1 = gr::blocks::short_to_float::make();
 	auto s2f2 = gr::blocks::short_to_float::make();
 
-	bool is_ac_ch1 = ui->btn_ch1_ac->isChecked();
-	bool is_ac_ch2 = ui->btn_ch2_ac->isChecked();
+	auto max1 = gr::blocks::max_ff::make(sample_rate / 10);
+	auto max2 = gr::blocks::max_ff::make(sample_rate / 10);
+	auto min1 = gr::blocks::min_ff::make(sample_rate / 10);
+	auto min2 = gr::blocks::min_ff::make(sample_rate / 10);
+	auto stv1 = gr::blocks::stream_to_vector::make(sizeof(float), sample_rate / 10);
+	auto stv2 = gr::blocks::stream_to_vector::make(sizeof(float), sample_rate / 10);
+
+	const bool is_ac_ch1 = ui->btn_ch1_ac->isChecked();
+	const bool is_ac_ch2 = ui->btn_ch2_ac->isChecked();
 
 	id_ch1 = manager->connect(s2f1, 0, 0, false, sample_rate / 10);
 	id_ch2 = manager->connect(s2f2, 1, 0, false, sample_rate / 10);
+
+	manager->connect(s2f1, 0, stv1, 0);
+	manager->connect(s2f2, 0, stv2, 0);
+	manager->connect(stv1, 0, max1, 0);
+	manager->connect(stv2, 0, max2, 0);
+	manager->connect(stv1, 0, min1, 0);
+	manager->connect(stv2, 0, min2, 0);
 
 	auto block1 = configureGraph(s2f1, is_ac_ch1);
 	auto block2 = configureGraph(s2f2, is_ac_ch2);
 
 	manager->connect(block1, 0, signal, 0);
 	manager->connect(block2, 0, signal, 1);
+
+	manager->connect(max1, 0, signal, 2);
+	manager->connect(min1, 0, signal, 3);
+	manager->connect(max2, 0, signal, 4);
+	manager->connect(min2, 0, signal, 5);
 }
 
 void DMM::chooseFile()
@@ -664,7 +845,6 @@ void DMM::writeAllSettingsToHardware()
 			for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 				auto chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
 				m_m2k_analogin->setVerticalOffset(chn, 0.0);
-				m_m2k_analogin->setRange(chn, libm2k::analog::PLUS_MINUS_25V);
 				if (trigger) {
 					trigger->setAnalogMode(i, libm2k::ALWAYS);
 				}
