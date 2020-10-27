@@ -86,6 +86,10 @@ namespace adiscope {
 
 		std::vector<double> m_min, m_max;
 
+		std::vector<bool> m_autoGainEnabled;
+		std::vector<int> m_historyForGain;
+		int m_gainHistorySize;
+
 		void disconnectAll();
 		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
 				bool is_ac);
@@ -94,6 +98,7 @@ namespace adiscope {
 		void writeAllSettingsToHardware();
 		void checkPeakValues(int, double);
 		bool isIioManagerStarted() const;
+		void checkAndUpdateGainMode(const std::vector<double> &volts);
 
 	public Q_SLOTS:
 		void toggleTimer(bool start);
@@ -129,6 +134,8 @@ namespace adiscope {
 		void collapseDataLog(bool);
 
 		void readPreferences();
+
+		void gainModeChanged(int idx);
 
 	Q_SIGNALS:
 		void showTool();

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>818</height>
+    <height>830</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -78,17 +78,55 @@ QLabel { color: rgba(255, 255, 255, 90); font-size: 51px; font-weight: bold; qpr
            <number>12</number>
           </property>
           <item>
-           <widget class="adiscope::Sismograph" name="sismograph_ch1">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </widget>
+            <item>
+             <widget class="adiscope::Sismograph" name="sismograph_ch1">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_17">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="currentGainCh1Label">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;</string>
+                </property>
+                <property name="text">
+                 <string>Low Gain</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="ch1ErrorLabel">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;
+color: red;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -324,15 +362,6 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
               <property name="scaleMaxMinor" stdset="0">
                <number>5</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="scalePosition">
-               <enum>QwtThermo::LeadingScale</enum>
-              </property>
-              <property name="originMode">
-               <enum>QwtThermo::OriginCustom</enum>
-              </property>
               <property name="borderWidth" stdset="0">
                <number>0</number>
               </property>
@@ -364,17 +393,55 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
            <number>12</number>
           </property>
           <item>
-           <widget class="adiscope::Sismograph" name="sismograph_ch2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="leftMargin">
+             <number>0</number>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
+            <property name="bottomMargin">
+             <number>0</number>
             </property>
-           </widget>
+            <item>
+             <widget class="adiscope::Sismograph" name="sismograph_ch2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_18">
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="currentGainCh2Label">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;</string>
+                </property>
+                <property name="text">
+                 <string>Low Gain</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="ch2ErrorLabel">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;
+color: red;</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -611,18 +678,6 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
                <number>5</number>
               </property>
               <property name="borderWidth" stdset="0">
-	       <number>0</number>
-	      </property>
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="scalePosition">
-               <enum>QwtThermo::LeadingScale</enum>
-              </property>
-              <property name="originMode">
-               <enum>QwtThermo::OriginCustom</enum>
-              </property>
-              <property name="borderWidth">
                <number>0</number>
               </property>
              </widget>
@@ -780,7 +835,7 @@ QPushButton:disabled {
            <x>0</x>
            <y>0</y>
            <width>186</width>
-           <height>914</height>
+           <height>1065</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -875,6 +930,39 @@ QPushButton:disabled {
            </layout>
           </item>
           <item>
+           <layout class="QGridLayout" name="gridLayout_6">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Gain</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="gainCh1ComboBox">
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Low</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>High</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QGridLayout" name="gridLayout">
             <property name="spacing">
              <number>5</number>
@@ -961,83 +1049,83 @@ QPushButton:disabled {
               <property name="bottomMargin">
                <number>0</number>
               </property>
-          <item>
-           <widget class="QLabel" name="labelThicknessCh1">
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
-            </property>
-            <property name="text">
-             <string>Line thickness</string>
-            </property>
-           </widget>
+              <item>
+               <widget class="QLabel" name="labelThicknessCh1">
+                <property name="styleSheet">
+                 <string notr="true">font-size: 13px;</string>
+                </property>
+                <property name="text">
+                 <string>Line thickness</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cbLineThicknessCh1">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>0.5</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>1</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>1.5</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>2</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>2.5</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>3</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>3.5</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>4</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>4.5</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>5</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </item>
-         </layout>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cbLineThicknessCh1">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="currentIndex">
-         <number>1</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>0.5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>1</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>1.5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>2</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>2.5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>3</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>3.5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>4</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>4.5</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>5</string>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-   </item>
           <item>
            <spacer name="verticalSpacer_3">
             <property name="orientation">
@@ -1127,6 +1215,39 @@ QPushButton:disabled {
            </layout>
           </item>
           <item>
+           <layout class="QGridLayout" name="gridLayout_8">
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Gain</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QComboBox" name="gainCh2ComboBox">
+              <item>
+               <property name="text">
+                <string>Auto</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Low</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>High</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
            <layout class="QGridLayout" name="gridLayout_2">
             <property name="spacing">
              <number>5</number>
@@ -1195,7 +1316,7 @@ QPushButton:disabled {
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_1">5
+           <layout class="QHBoxLayout" name="horizontalLayout_1">
             <property name="spacing">
              <number>0</number>
             </property>

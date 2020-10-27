@@ -189,4 +189,20 @@ void DMM_API::setNotes(QString str)
 	dmm->ui->instrumentNotes->setNotes(str);
 }
 
+QVector<int> DMM_API::getGainModes() const
+{
+	return {dmm->ui->gainCh1ComboBox->currentIndex(),
+		dmm->ui->gainCh2ComboBox->currentIndex()};
+}
+
+void DMM_API::setGainModes(const QVector<int> &gainModes)
+{
+	if (gainModes.size() < dmm->m_adc_nb_channels) {
+		return;
+	}
+
+	dmm->ui->gainCh1ComboBox->setCurrentIndex(gainModes[0]);
+	dmm->ui->gainCh2ComboBox->setCurrentIndex(gainModes[1]);
+}
+
 }
