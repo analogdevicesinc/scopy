@@ -364,7 +364,7 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/connect.ui" line="47"/>
         <source>URI (Hostname)</source>
-        <translation type="unfinished"></translation>
+        <translation>URI(主机名称)</translation>
     </message>
     <message>
         <location filename="../../ui/connect.ui" line="140"/>
@@ -608,67 +608,67 @@ AC Coupling</source>
         <location filename="../../ui/dmm.ui" line="970"/>
         <location filename="../../ui/dmm.ui" line="1222"/>
         <source>Line thickness</source>
-        <translation type="unfinished">线宽</translation>
+        <translation>线宽</translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="989"/>
         <location filename="../../ui/dmm.ui" line="1241"/>
         <source>0.5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="994"/>
         <location filename="../../ui/dmm.ui" line="1246"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="999"/>
         <location filename="../../ui/dmm.ui" line="1251"/>
         <source>1.5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1004"/>
         <location filename="../../ui/dmm.ui" line="1256"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1009"/>
         <location filename="../../ui/dmm.ui" line="1261"/>
         <source>2.5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1014"/>
         <location filename="../../ui/dmm.ui" line="1266"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1019"/>
         <location filename="../../ui/dmm.ui" line="1271"/>
         <source>3.5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1024"/>
         <location filename="../../ui/dmm.ui" line="1276"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1029"/>
         <location filename="../../ui/dmm.ui" line="1281"/>
         <source>4.5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1034"/>
         <location filename="../../ui/dmm.ui" line="1286"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/dmm.ui" line="1076"/>
@@ -1158,12 +1158,12 @@ AC Coupling</source>
     <message>
         <location filename="../../ui/instrumentnotes.ui" line="32"/>
         <source>Form</source>
-        <translation type="unfinished">表格</translation>
+        <translation>表格</translation>
     </message>
     <message>
         <location filename="../../ui/instrumentnotes.ui" line="80"/>
         <source>Notes</source>
-        <translation type="unfinished">注释</translation>
+        <translation>注释</translation>
     </message>
     <message>
         <location filename="../../ui/instrumentnotes.ui" line="126"/>
@@ -1177,7 +1177,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/instrumentnotes.ui" line="136"/>
         <source>Insert notes here</source>
-        <translation type="unfinished"></translation>
+        <translation>在这里添加注释</translation>
     </message>
 </context>
 <context>
@@ -1491,7 +1491,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/logic_analyzer.ui" line="1283"/>
         <source>&quot;Warning: This feature is not supported on the current firmware version!&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;警告：当前固件版本不支持此功能！&quot;警告：当前固件版本不支持此功能！&quot;</translation>
     </message>
     <message>
         <location filename="../../ui/logic_analyzer.ui" line="1328"/>
@@ -1876,7 +1876,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/network_analyzer.ui" line="485"/>
         <source>Average: </source>
-        <translation type="unfinished"></translation>
+        <translation>平均值：</translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="761"/>
@@ -1988,18 +1988,18 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/network_analyzer.ui" line="1563"/>
         <source>Average</source>
-        <translation type="unfinished"></translation>
+        <translation>平均值</translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="1609"/>
         <location filename="../../ui/network_analyzer.ui" line="1703"/>
         <source>Apply</source>
-        <translation type="unfinished">启用</translation>
+        <translation>启用</translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="1629"/>
         <source>Periods</source>
-        <translation type="unfinished"></translation>
+        <translation>周期</translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="1738"/>
@@ -2059,7 +2059,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/network_analyzer.ui" line="2340"/>
         <source>Nichols</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/network_analyzer.ui" line="2388"/>
@@ -2256,57 +2256,57 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="417"/>
         <source>X-Y Line thickness</source>
-        <translation type="unfinished"></translation>
+        <translation>X-Y 线宽</translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="428"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="433"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="438"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="443"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="448"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="453"/>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="458"/>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="463"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="468"/>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/osc_general_settings.ui" line="473"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2842,7 +2842,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/preferences.ui" line="1522"/>
         <source>Attempt temperature-based calibration (EXPERIMENTAL)</source>
-        <translation type="unfinished"></translation>
+        <translation>尝试基于温度的校准(实验)</translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1556"/>
@@ -2872,7 +2872,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/preferences.ui" line="1333"/>
         <source>Enable all instrument notes</source>
-        <translation type="unfinished"></translation>
+        <translation>开启所有仪器注释</translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1472"/>
@@ -2946,27 +2946,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/preferences.ui" line="1603"/>
         <source>DEBUG</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1646"/>
         <source>Enable Debug Messages (Only for Debugging, Bugreporting)</source>
-        <translation type="unfinished"></translation>
+        <translation>使能debug信息</translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1680"/>
         <source>Enable Debug Instrument</source>
-        <translation type="unfinished"></translation>
+        <translation>启用调试工具</translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1713"/>
         <source>Enable user notes in main page</source>
-        <translation type="unfinished"></translation>
+        <translation>在主页使能用户注释</translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1750"/>
         <source>Skip calibration if already calibrated (cal values are not default)</source>
-        <translation type="unfinished"></translation>
+        <translation>跳过标定如果已经标定</translation>
     </message>
     <message>
         <location filename="../../ui/preferences.ui" line="1868"/>
@@ -3066,7 +3066,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/measure.cpp" line="380"/>
         <source>Cycle Mean</source>
-        <translation type="unfinished">周期平均值</translation>
+        <translation>周期平均值</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="382"/>
@@ -3076,12 +3076,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/measure.cpp" line="384"/>
         <source>Cycle RMS</source>
-        <translation type="unfinished">周期RMS</translation>
+        <translation>周期RMS</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="386"/>
         <source>AC RMS</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="388"/>
@@ -3091,7 +3091,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/measure.cpp" line="390"/>
         <source>Cycle Area</source>
-        <translation type="unfinished"></translation>
+        <translation>循环区</translation>
     </message>
     <message>
         <location filename="../../src/measure.cpp" line="392"/>
@@ -3287,7 +3287,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/signal_generator.ui" line="401"/>
         <source>Stair Step</source>
-        <translation type="unfinished">楼梯台阶</translation>
+        <translation>梯形台阶波</translation>
     </message>
     <message>
         <location filename="../../ui/signal_generator.ui" line="457"/>
@@ -3387,12 +3387,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/signal_generator.ui" line="1246"/>
         <source>OTHER</source>
-        <translation type="unfinished"></translation>
+        <translation>其他</translation>
     </message>
     <message>
         <location filename="../../ui/signal_generator.ui" line="1320"/>
         <source>Line thickness</source>
-        <translation type="unfinished">线宽</translation>
+        <translation>线宽</translation>
     </message>
     <message>
         <location filename="../../ui/signal_generator.ui" line="1339"/>
@@ -3476,12 +3476,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="472"/>
         <source>Sample:</source>
-        <translation type="unfinished"></translation>
+        <translation>样本：</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="495"/>
         <source>Average Sample: </source>
-        <translation type="unfinished"></translation>
+        <translation>平均样本： </translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="515"/>
@@ -3531,12 +3531,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="793"/>
         <source>Apply</source>
-        <translation type="unfinished">启用</translation>
+        <translation>启用</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="813"/>
         <source>CH Thickness</source>
-        <translation type="unfinished">通道显示线宽</translation>
+        <translation>通道显示线宽</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="821"/>
@@ -3591,23 +3591,23 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="884"/>
         <source>History</source>
-        <translation type="unfinished">历史记录</translation>
+        <translation>历史记录</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="908"/>
         <source>Gain mode</source>
-        <translation type="unfinished"></translation>
+        <translation>增益模式</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="915"/>
         <location filename="../../ui/spectrum_analyzer.ui" line="919"/>
         <source>Low</source>
-        <translation type="unfinished">低电平</translation>
+        <translation>低电平</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="924"/>
         <source>High</source>
-        <translation type="unfinished">高电平</translation>
+        <translation>高电平</translation>
     </message>
     <message>
         <location filename="../../ui/spectrum_analyzer.ui" line="962"/>
@@ -3922,7 +3922,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/trigger_settings.ui" line="491"/>
         <source>This feature is not supported while the Mixed Signal View is enabled!</source>
-        <translation type="unfinished"></translation>
+        <translation>启用混合信号视图时，不支持此功能!</translation>
     </message>
     <message>
         <location filename="../../ui/trigger_settings.ui" line="535"/>
@@ -4165,7 +4165,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/patterns/walkingpattern.ui" line="46"/>
         <source>Walking level</source>
-        <translation type="unfinished">步行水平</translation>
+        <translation>步进等级</translation>
     </message>
     <message>
         <location filename="../../ui/patterns/walkingpattern.ui" line="54"/>
@@ -4332,12 +4332,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/dmm.cpp" line="334"/>
         <source>Stop</source>
-        <translation type="unfinished">停止频率</translation>
+        <translation>停止频率</translation>
     </message>
     <message>
         <location filename="../../src/dmm.cpp" line="334"/>
         <source>Run</source>
-        <translation type="unfinished">运行</translation>
+        <translation>运行</translation>
     </message>
     <message>
         <location filename="../../src/dmm.cpp" line="391"/>
@@ -4518,17 +4518,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/info_page.cpp" line="217"/>
         <source>Error: Connection failed!</source>
-        <translation type="unfinished"></translation>
+        <translation>错误：连接失败</translation>
     </message>
     <message>
         <location filename="../../src/info_page.cpp" line="219"/>
         <source>Connected</source>
-        <translation type="unfinished"></translation>
+        <translation>已连接</translation>
     </message>
     <message>
         <location filename="../../src/info_page.cpp" line="227"/>
         <source>Your hardware revision does not support the identify feature</source>
-        <translation type="unfinished"></translation>
+        <translation>您的硬件版本不支持识别功能</translation>
     </message>
 </context>
 <context>
@@ -4612,27 +4612,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/info_page.cpp" line="402"/>
         <source>Not connected</source>
-        <translation type="unfinished"></translation>
+        <translation>没有链接</translation>
     </message>
     <message>
         <location filename="../../src/info_page.cpp" line="403"/>
         <source>Always disconnect analog inputs/outputs before calibration</source>
-        <translation type="unfinished"></translation>
+        <translation>校准前一定要断开模拟输入/输出的连接。</translation>
     </message>
     <message>
         <location filename="../../src/info_page.cpp" line="425"/>
         <source>Can&apos;t identify this device.</source>
-        <translation type="unfinished"></translation>
+        <translation>无法识别这个设备。</translation>
     </message>
     <message>
         <location filename="../../src/info_page.cpp" line="444"/>
         <source>Can&apos;t identify device. Please try to update your firmware!</source>
-        <translation type="unfinished"></translation>
+        <translation>无法识别设备。请尝试更新您的固件</translation>
     </message>
     <message>
         <location filename="../../src/info_page.cpp" line="470"/>
         <source>Your hardware revision does not support the identify feature</source>
-        <translation type="unfinished"></translation>
+        <translation>您的硬件版本不支持识别功能</translation>
     </message>
 </context>
 <context>
@@ -4664,27 +4664,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/marker_table.cpp" line="81"/>
         <source>Marker</source>
-        <translation type="unfinished"></translation>
+        <translation>标记</translation>
     </message>
     <message>
         <location filename="../../src/marker_table.cpp" line="82"/>
         <source>Channel</source>
-        <translation type="unfinished">通道</translation>
+        <translation>通道</translation>
     </message>
     <message>
         <location filename="../../src/marker_table.cpp" line="83"/>
         <source>Frequency</source>
-        <translation type="unfinished">频率</translation>
+        <translation>频率</translation>
     </message>
     <message>
         <location filename="../../src/marker_table.cpp" line="84"/>
         <source>Magnitude</source>
-        <translation type="unfinished"></translation>
+        <translation>幅度</translation>
     </message>
     <message>
         <location filename="../../src/marker_table.cpp" line="85"/>
         <source>Type</source>
-        <translation type="unfinished">类型</translation>
+        <translation>类型</translation>
     </message>
 </context>
 <context>
@@ -4766,7 +4766,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/network_analyzer.cpp" line="297"/>
         <source>Step</source>
-        <translation type="unfinished"></translation>
+        <translation>步进</translation>
     </message>
     <message>
         <location filename="../../src/network_analyzer.cpp" line="309"/>
@@ -4904,7 +4904,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/network_analyzer.cpp" line="1298"/>
         <source>Average: </source>
-        <translation type="unfinished"></translation>
+        <translation>平均值：</translation>
     </message>
     <message>
         <source>Comma-separated values files (*.csv)</source>
@@ -4993,13 +4993,14 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/oscilloscope.cpp" line="1974"/>
         <source>&quot;Warning: This feature is not supported on the current firmware version!&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;警告：当前固件版本不支持此功能！&quot;警告：当前固件版本不支持此功能！&quot;</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope.cpp" line="1989"/>
         <source>* When the Mixed Signal View is enabled the LogicAnalyzer tool will be disabled!
 ** The trigger can be disabled or set only on the Digital channels or Analog channels, not on both at the same time!</source>
-        <translation type="unfinished"></translation>
+        <translation>* 当混合信号视图启用时，LogicAnalyzer工具将被禁用!
+** 触发器只能在数字通道或模拟通道上禁用或设置，不能同时在两个通道上禁用或设置。</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope.cpp" line="2023"/>
@@ -5025,7 +5026,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/oscilloscope.cpp" line="2078"/>
         <source>Logic</source>
-        <translation type="unfinished"></translation>
+        <translation>逻辑</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope.cpp" line="2085"/>
@@ -5040,7 +5041,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/oscilloscope.cpp" line="2093"/>
         <source>Enable Mixed Signal View</source>
-        <translation type="unfinished"></translation>
+        <translation>启用混合信号视图</translation>
     </message>
     <message>
         <location filename="../../src/oscilloscope.cpp" line="2207"/>
@@ -5118,13 +5119,13 @@ p, li { white-space: pre-wrap; }
         <location filename="../../src/power_controller.cpp" line="206"/>
         <location filename="../../src/power_controller.cpp" line="219"/>
         <source>Disable</source>
-        <translation type="unfinished"></translation>
+        <translation>失能</translation>
     </message>
     <message>
         <location filename="../../src/power_controller.cpp" line="206"/>
         <location filename="../../src/power_controller.cpp" line="219"/>
         <source>Enable</source>
-        <translation type="unfinished">使能</translation>
+        <translation>使能</translation>
     </message>
 </context>
 <context>
@@ -5594,17 +5595,17 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="251"/>
         <source>Scale/Div</source>
-        <translation type="unfinished"></translation>
+        <translation>刻度</translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="1818"/>
         <source>Sample:</source>
-        <translation type="unfinished"></translation>
+        <translation>样本</translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="2273"/>
         <source>Average Sample:</source>
-        <translation type="unfinished"></translation>
+        <translation>平均样本</translation>
     </message>
     <message>
         <source>Range</source>
@@ -5620,7 +5621,7 @@ p, li { white-space: pre-wrap; }
         <location filename="../../src/spectrum_analyzer.cpp" line="271"/>
         <location filename="../../src/spectrum_analyzer.cpp" line="278"/>
         <source>Bottom</source>
-        <translation type="unfinished"></translation>
+        <translation>按键</translation>
     </message>
     <message>
         <location filename="../../src/spectrum_analyzer.cpp" line="283"/>
@@ -5704,12 +5705,12 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/tool_launcher.cpp" line="237"/>
         <source>Calibration skipped because already calibrated.</source>
-        <translation type="unfinished"></translation>
+        <translation>因为已经标定，所以跳过标定。</translation>
     </message>
     <message>
         <location filename="../../src/tool_launcher.cpp" line="239"/>
         <source>Calibrated</source>
-        <translation type="unfinished"></translation>
+        <translation>已校准</translation>
     </message>
     <message>
         <location filename="../../src/tool_launcher.cpp" line="378"/>
@@ -5779,7 +5780,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/tool_launcher.cpp" line="1097"/>
         <source>Connect</source>
-        <translation type="unfinished">连接</translation>
+        <translation>连接</translation>
     </message>
     <message>
         <location filename="../../src/tool_launcher.cpp" line="1108"/>
@@ -5810,7 +5811,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/tool_launcher.cpp" line="1619"/>
         <source>Calibrating</source>
-        <translation type="unfinished"></translation>
+        <translation>标定中</translation>
     </message>
 </context>
 <context>
@@ -5876,7 +5877,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/toolmenuitem.cpp" line="127"/>
         <source>Calibrating...</source>
-        <translation type="unfinished">校准中...</translation>
+        <translation>校准中...</translation>
     </message>
 </context>
 <context>
@@ -6004,27 +6005,27 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2144"/>
         <source>Comma-separated values files (*.csv)</source>
-        <translation type="unfinished">逗号分隔值文件(*.csv)</translation>
+        <translation>逗号分隔值文件(*.csv)</translation>
     </message>
     <message>
         <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2145"/>
         <source>Tab-delimited values files (*.txt)</source>
-        <translation type="unfinished">标签分隔的值文件(*.txt)</translation>
+        <translation>标签分隔的值文件(*.txt)</translation>
     </message>
     <message>
         <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2146"/>
         <source>Value Change Dump(*.vcd)</source>
-        <translation type="unfinished"></translation>
+        <translation>值变化转存(*.vcd)</translation>
     </message>
     <message>
         <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2147"/>
         <source>All Files(*)</source>
-        <translation type="unfinished">所有文件(*)</translation>
+        <translation>所有文件(*)</translation>
     </message>
     <message>
         <location filename="../../src/logicanalyzer/logic_analyzer.cpp" line="2150"/>
         <source>Export</source>
-        <translation type="unfinished">导出</translation>
+        <translation>导出</translation>
     </message>
 </context>
 <context>
@@ -6149,7 +6150,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../js/patterngenerator/pulsegen/scriptpulsegen.ui" line="44"/>
         <source>PulseScript</source>
-        <translation type="unfinished">脉冲脚本</translation>
+        <translation>脉冲脚本</translation>
     </message>
     <message>
         <location filename="../../js/patterngenerator/pulsegen/scriptpulsegen.ui" line="51"/>
