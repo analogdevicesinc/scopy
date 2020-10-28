@@ -2,6 +2,7 @@ clone_depth: 1
 #init:
 #    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
+image: Visual Studio 2019
 
 environment:
     BUILD_NO: $(APPVEYOR_BUILD_NUMBER)
@@ -11,14 +12,14 @@ environment:
         - MINGW_VERSION: mingw64
           ARCH: x86_64
           ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
           DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
 
         - MINGW_VERSION: mingw32
           ARCH: i686
           ARCH_BIT: 32
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
+          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
           BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
           DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
 
@@ -64,12 +65,6 @@ install:
 
 build_script:
     - cmd: C:\msys64\usr\bin\bash -lc "/c/projects/scopy/CI/appveyor/extract_msys_deps.sh"
-    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -U /c/old_msys_deps_$MINGW_VERSION/pacman-5.2.2-1-x86_64.pkg.tar.xz"
- #   - cmd: C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
- #   - cmd: C:\msys64\usr\bin\bash -lc "curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-    - cmd: C:\msys64\usr\bin\bash -lc "cd /c/old_msys_deps_$MINGW_VERSION; pacman-key --verify msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz{.sig,}"
-    - cmd: C:\msys64\usr\bin\bash -lc "pacman-key --populate"
-    - cmd: C:\msys64\usr\bin\bash -lc "cd /c/old_msys_deps_$MINGW_VERSION; pacman --noconfirm -U msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
     - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syu"
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 5"
     - cmd: "%BUILD_DEPS_CMD%"
