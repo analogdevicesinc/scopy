@@ -2,7 +2,7 @@
 
 set -e
 
-export PATH=/bin:/usr/bin:/${MINGW_VERSION}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/7-Zip:/c/Program\ Files\ \(x86\)/Inno\ Setup\ \5:/c/Program\ Files/Appveyor/BuildAgent
+export PATH=/bin:/usr/bin:/${MINGW_VERSION}/bin:/c/Program\ Files/Git/cmd:/c/Windows/System32:/c/Program\ Files/7-Zip:/c/Program\ Files\ \(x86\)/Inno\ Setup\ \6:/c/Program\ Files/Appveyor/BuildAgent
 echo $PATH
 
 RC_COMPILER_OPT="-DCMAKE_RC_COMPILER=/c/msys64/${MINGW_VERSION}/bin/windres.exe"
