@@ -135,6 +135,16 @@ void Calibration::cancelCalibration()
 	m_cancel = true;
 }
 
+bool Calibration::hasContextCalibration() const
+{
+	return m_m2k->hasContextCalibration();
+}
+
+float Calibration::calibrateFromContext()
+{
+	return m_m2k->calibrateFromContext();
+}
+
 /* FIXME: TODO: Move this into a HW class / lib M2k */
 double Calibration::getIioDevTemp(const QString& devName) const
 {

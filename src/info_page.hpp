@@ -27,9 +27,14 @@
 #include <QPushButton>
 #include <QFuture>
 #include <QLabel>
+#include <QTimer>
 
 #include "iio.h"
+
 #include "phonehome.h"
+#include "libm2k/contextbuilder.hpp"
+#include "libm2k/context.hpp"
+
 
 namespace Ui {
 class InfoPage;
@@ -52,7 +57,7 @@ public:
 
 
 	struct iio_context *ctx() const;
-	void setCtx(iio_context *ctx);
+	virtual void setCtx(iio_context *ctx);
 
 	QString uri() const;
 	void setUri(QString uri);
@@ -121,19 +126,25 @@ public:
 			     struct iio_context *ctx = nullptr,
 				 QWidget *parent = 0);
 	~M2kInfoPage();
-	void getDeviceInfo();
-	int checkLatestFwVersion(const QString &currentVersion) const;
 
+	void getDeviceInfo() override;
+	void setCtx(iio_context *ctx) override;
+	int checkLatestFwVersion(const QString &currentVersion) const;
 
 protected:
 	virtual void startIdentification(bool);
 
 private Q_SLOTS:
 	void blinkTimeout();
+public Q_SLOTS:
+	void refreshTemperature();
 
 private:
 	struct iio_channel *m_fabric_channel;
 	QFuture<void> calibration_thread;
+	libm2k::context::M2k *m_m2k;
+	QTimer *m_refreshTemperatureTimer;
+	const int m_temperatureUpdateInterval = 5000;
 };
 
 
