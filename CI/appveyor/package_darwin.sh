@@ -37,8 +37,11 @@ elif [ -e /usr/local/opt/python/Frameworks/Python.framework/Versions/3.6/Python 
 elif [ -e /usr/local/opt/python/Frameworks/Python.framework/Versions/3.8/Python ] ; then
 	pyversion=3.8
 	pythonidrpath="$(otool -D /usr/local/opt/python/Frameworks/Python.framework/Versions/3.8/Python | head -2 |  tail -1)"
+elif [ -e /usr/local/opt/python/Frameworks/Python.framework/Versions/3.9/Python ] ; then
+	pyversion=3.9
+	pythonidrpath="$(otool -D /usr/local/opt/python/Frameworks/Python.framework/Versions/3.9/Python | head -2 |  tail -1)"
 else
-	echo "No Python 3.8, 3.7 or 3.6 paths found"
+	echo "No Python 3.9, 3.8, 3.7 or 3.6 paths found"
 	exit 1
 fi
 libusbpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libusb | cut -d " " -f 1)"
@@ -50,6 +53,8 @@ iioid=${iiorpath#"@rpath/"}
 ad9361id=${ad9361rpath#"@rpath/"}
 if [ "${pyversion}" = "3.8" ] ; then
 	pythonid=${pythonidrpath#"/usr/local/opt/python@3.8/Frameworks/"}
+elif [ "${pyversion}" = "3.9" ] ; then
+	pythonid=${pythonidrpath#"/usr/local/opt/python@3.9/Frameworks/"}
 else
 	pythonid=${pythonidrpath#"/usr/local/opt/python/Frameworks/"}
 fi
