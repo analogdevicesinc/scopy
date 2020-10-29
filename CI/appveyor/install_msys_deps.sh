@@ -24,7 +24,7 @@ PACMAN_REPO_DEPS="
 
 PATH=/c/msys64/$MINGW_VERSION/bin:$PATH
 echo "### Installing the dependencies"
-pacman --noconfirm -Sy $PACMAN_SYNC_DEPS
+pacman --noconfirm --needed -Sy $PACMAN_SYNC_DEPS
 pacman --noconfirm -U  $PACMAN_REPO_DEPS
 
 # Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.
