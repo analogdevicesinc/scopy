@@ -71,6 +71,8 @@ public:
 	bool calibrateAll();
 	bool calibrateAdc();
 	bool calibrateDac();
+	bool hasContextCalibration() const;
+	float calibrateFromContext();
 
 	bool resetCalibration();
 	void updateCorrections();

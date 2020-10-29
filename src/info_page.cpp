@@ -185,8 +185,9 @@ QPair<bool, QString> InfoPage::translateInfoParams(QString key)
 	} else if (key.contains("ip")) {
 		key = "IP Address";
 	} else if (key.startsWith("cal,gain") ||
-		   key.startsWith("cal,offset")) {
-		key = "";
+		   key.startsWith("cal,offset") ||
+		   key.startsWith("cal,temp_lut")) {
+		advanced = true;
 	}
 	return QPair<bool, QString>(advanced, key);
 }
@@ -260,6 +261,7 @@ void InfoPage::refreshInfoWidget()
 		QLabel *keyLbl = new QLabel(this);
 		valueLbl->setText(m_info_params.value(key));
 		valueLbl->setStyleSheet("color: white");
+		valueLbl->setWordWrap(true);
 		keyLbl->setText(key);
 		keyLbl->setMinimumWidth(240);
 		keyLbl->setMaximumWidth(240);
@@ -276,9 +278,12 @@ void InfoPage::refreshInfoWidget()
 		for (auto key : m_info_params_advanced.keys()) {
 			QLabel *valueLbl = new QLabel(this);
 			QLabel *keyLbl = new QLabel(this);
+
+			valueLbl->setWordWrap(true);
 			valueLbl->setText(m_info_params_advanced.value(key));
 			valueLbl->setStyleSheet("color: white");
 			keyLbl->setText(key);
+
 			ui->paramLayout->addWidget(keyLbl, pos, 0, 1, 1);
 			ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
 			pos++;
@@ -407,7 +412,7 @@ M2kInfoPage::M2kInfoPage(QString uri,
 			 struct iio_context *ctx,
 			 QWidget *parent) :
 	InfoPage(uri, prefPanel, phoneHome, ctx, parent),
-	m_fabric_channel(nullptr)
+	m_fabric_channel(nullptr), m_m2k(nullptr), m_refreshTemperatureTimer(nullptr)
 {
 	ui->btnCalibrate->setEnabled(false);
 	ui->extraWidget->setFrameShape(QFrame::NoFrame);
@@ -417,6 +422,13 @@ M2kInfoPage::M2kInfoPage(QString uri,
 	ui->extraWidget->setMinimumHeight(700);
 	setConnectionStatusLabel(tr("Not connected"));
 	setCalibrationInfoLabel(tr("Always disconnect analog inputs/outputs before calibration"));
+	if(ctx) {
+		m_m2k = libm2k::context::m2kOpen(ctx, uri.toLocal8Bit().constData());
+	}
+
+	m_refreshTemperatureTimer = new QTimer(this);
+	connect(m_refreshTemperatureTimer, SIGNAL(timeout()), this, SLOT(refreshTemperature()));
+	m_refreshTemperatureTimer->start(m_temperatureUpdateInterval);
 
 }
 
@@ -428,7 +440,41 @@ M2kInfoPage::~M2kInfoPage()
 void M2kInfoPage::getDeviceInfo()
 {
 	InfoPage::getDeviceInfo();
-	//refreshTemperature();
+	refreshTemperature();
+}
+
+void M2kInfoPage::refreshTemperature()
+{
+
+	libm2k::context::M2k *temp_m2k = nullptr;
+	if(!m_ctx) {
+		temp_m2k = libm2k::context::m2kOpen(m_uri.toLocal8Bit().constData());
+	} else {
+		temp_m2k = m_m2k;
+	}
+
+	if(temp_m2k) {
+		auto dmm = temp_m2k->getDMM("ad9963");
+		auto ch = dmm->readChannel("temp0");
+		auto val = ch.value;
+		m_info_params["Temperature"] = QString::number(val);
+	}
+
+	if(!m_ctx) {
+		libm2k::context::contextClose(temp_m2k, false);
+	}
+
+	refreshInfoWidget();
+}
+
+void M2kInfoPage::setCtx(iio_context *ctx)
+{
+	InfoPage::setCtx(ctx);
+	if(ctx) {
+		m_m2k = libm2k::context::m2kOpen(ctx, "");
+	} else {
+		m_m2k = nullptr;
+	}
 }
 
 void M2kInfoPage::startIdentification(bool start)

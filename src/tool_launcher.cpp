@@ -267,11 +267,10 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->setCalibrating(false);
 		menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(false);
 
-		if (okc.second) {
-			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration skipped because already calibrated."));
-		} else if (okc.first) {
+		if (!okc.second && okc.first) {
 			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated"));
 		}
+
 	});
 
 
@@ -1428,14 +1427,19 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 	bool skipCalib = false;
 
 	if (calib->isInitialized()) {
-		if (prefPanel->getAttemptTempLutCalib()) {
-			//calib->calibrateFromTemperature();
-			//selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated from temperature @ ") + "50G");
+		if (prefPanel->getAttemptTempLutCalib() && calib->hasContextCalibration()) {
+			float calibTemperature = calib->calibrateFromContext();
+			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated from look-up table @ ") + QString::number(calibTemperature) + " deg. Celsius" );
+			skipCalib = true;
 			ok = true;
+
 		} else {
+			// always calibrate if initial flag is set
+			// if it's calibrated and skip_calibration_if_calibrated - do not calibrate
 			if (!(initialCalibrationFlag && skip_calibration_if_already_calibrated && calib->isCalibrated() )) {
 				ok = calib->calibrateAll();
 			} else {
+				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration skipped because already calibrated."));
 				skipCalib = true;
 				ok = true;
 			}

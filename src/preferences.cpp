@@ -205,12 +205,6 @@ Preferences::Preferences(QWidget *parent) :
 	pref_api->setObjectName(QString("Preferences"));
 	pref_api->load(settings);
 
-	//////////////////////
-	// TEMPORARY UNTIL ACTUAL IMPLEMENTATION
-	ui->tempLutCalibCheckbox->setVisible(false);
-	ui->label_28->setVisible(false);
-	//////////////////////////
-
 	ui->languageCombo->addItems(getOptionsList());
 
 
