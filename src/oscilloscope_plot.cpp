@@ -1886,6 +1886,16 @@ void CapturePlot::positionInGroupChanged(int chnIdx, int from, int to)
 
 void CapturePlot::setGroups(const QVector<QVector<int> > &groups)
 {
+	auto selectedHandleIt = std::find_if(d_offsetHandles.begin(), d_offsetHandles.end(),
+					  [](RoundedHandleV *handle){
+		return handle->isSelected();
+	});
+
+	if (selectedHandleIt != d_offsetHandles.end()) {
+		(*selectedHandleIt)->setSelected(false);
+		(*selectedHandleIt)->selected(false);
+	}
+
 	for (const auto &grp : groups) {
 		if (grp.size() < 2) { continue; }
 		beginGroupSelection();
@@ -1897,6 +1907,11 @@ void CapturePlot::setGroups(const QVector<QVector<int> > &groups)
 		d_groupHandles.back().front()->setSelected(false);
 		d_groupHandles.back().front()->selected(false);
 		d_groupHandles.back().front()->setPosition(d_groupHandles.back().front()->position());
+	}
+
+	if (selectedHandleIt != d_offsetHandles.end()) {
+		(*selectedHandleIt)->setSelected(true);
+		(*selectedHandleIt)->selected(true);
 	}
 
 	replot();
