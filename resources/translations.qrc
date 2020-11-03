@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/translations">
-        <file>scopy_en.qm</file>
-        <file>scopy_ro.qm</file>
-        <file>scopy_fr.qm</file>
-        <file>scopy_cn.qm</file>
+        @TRANSLATIONS@
     </qresource>
 </RCC>
