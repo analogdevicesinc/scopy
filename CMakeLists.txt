@@ -76,9 +76,15 @@ set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRE
 # Generate .qm files from the .ts files
 qt5_add_translation(QM_FILES ${TS_FILES})
 
+set(TRANSLATIONS)
+foreach(file ${TS_FILES})
+	get_filename_component(file_name ${file} NAME_WE)
+	set(TRANSLATIONS "${TRANSLATIONS}\n<file>${file_name}.qm</file>")
+endforeach()
+
 configure_file(${CMAKE_SOURCE_DIR}/resources/translations.qrc
 	${CMAKE_BINARY_DIR}/translations.qrc
-	COPYONLY)
+	@ONLY)
 
 qt5_add_resources(TRANSLATION_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
 
