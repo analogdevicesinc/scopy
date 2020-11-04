@@ -1048,9 +1048,12 @@ void adiscope::ToolLauncher::disconnect()
 		destroyContext();
 		loadToolTips(false);
 		resetStylesheets();
+		auto infoPg = selectedDev->infoPage();
+		if (infoPg) {
+			infoPg->setConnectionStatusLabel("Not connected");
+			infoPg->setCalibrationStatusLabel("");
+		}
 		search_timer->start(TIMER_TIMEOUT_MS);
-		selectedDev->infoPage()->setConnectionStatusLabel("Not connected");
-		selectedDev->infoPage()->setCalibrationStatusLabel("");
 	}
 
 	/* Update the list of devices now */
@@ -1102,6 +1105,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 		if (selectedDev) {
 			QString uri = selectedDev->uri();
 			selectedDev->infoPage()->identifyDevice(false);
+			search_timer->stop();
 			bool success = switchContext(uri);
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);
@@ -1110,14 +1114,14 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 				selectedDev->infoPage()->identifyDevice(true);
 				setDynamicProperty(ui->btnConnect, "connected", true);
 
-				search_timer->stop();
-
+				alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
 				ui->saveBtn->parentWidget()->setEnabled(true);
 
 			} else {
 				setDynamicProperty(ui->btnConnect, "failed", true);
 				selectedDev->setConnected(false, true);
 				selectedDev->connectButton()->setEnabled(true);
+				disconnect();
 			}
 
 			Q_EMIT connectionDone(success);
@@ -1501,77 +1505,80 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	m_m2k = m2kOpen(ctx, "");
 
-	alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
-
 	filter = new Filter(ctx);
 
 	calib = new Calibration(ctx, &js_engine);
 	calib->initialize();
 
-	if (filter->compatible(TOOL_PATTERN_GENERATOR)
-	    || filter->compatible(TOOL_DIGITALIO)) {
-		dioManager = new DIOManager(ctx, filter);
-	}
+	try {
+		if (filter->compatible(TOOL_PATTERN_GENERATOR)
+				|| filter->compatible(TOOL_DIGITALIO)) {
+			dioManager = new DIOManager(ctx, filter);
+		}
 
-	if (filter->compatible(TOOL_LOGIC_ANALYZER)
-	    || filter->compatible(TOOL_PATTERN_GENERATOR)) {
+		if (filter->compatible(TOOL_LOGIC_ANALYZER)
+				|| filter->compatible(TOOL_PATTERN_GENERATOR)) {
 
-		if (!m_use_decoders) {
-			search_timer->stop();
-
-			QMessageBox info(this);
-			info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
-			info.exec();
-		} else {
-			bool success = loadDecoders(QCoreApplication::applicationDirPath() +
-						    "/decoders");
-
-			if (!success) {
+			if (!m_use_decoders) {
 				search_timer->stop();
 
-				QMessageBox error(this);
-				error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
-				error.exec();
+				QMessageBox info(this);
+				info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
+				info.exec();
+			} else {
+				bool success = loadDecoders(QCoreApplication::applicationDirPath() +
+							    "/decoders");
+
+				if (!success) {
+					search_timer->stop();
+
+					QMessageBox error(this);
+					error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
+					error.exec();
+				}
 			}
 		}
+
+		if (filter->compatible(TOOL_DIGITALIO)) {
+			dio = new DigitalIO(nullptr, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
+					    dioManager, &js_engine, this);
+			toolList.push_back(dio);
+			connect(dio, &DigitalIO::showTool, [=]() {
+				menu->getToolMenuItemFor(TOOL_DIGITALIO)->getToolBtn()->click();
+			});
+		}
+
+
+		if (filter->compatible(TOOL_POWER_CONTROLLER)) {
+			power_control = new PowerController(ctx, menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER),
+							    &js_engine, this);
+			toolList.push_back(power_control);
+			connect(power_control, &PowerController::showTool, [=]() {
+				menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER)->getToolBtn()->click();
+			});
+		}
+
+		if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
+			logic_analyzer = new logic::LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
+								  &js_engine, this);
+			toolList.push_back(logic_analyzer);
+			connect(logic_analyzer, &logic::LogicAnalyzer::showTool, [=]() {
+				menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
+			});
+		}
+
+
+		if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
+			pattern_generator = new logic::PatternGenerator(ctx, filter,
+									menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine, dioManager, this);
+			toolList.push_back(pattern_generator);
+			connect(pattern_generator, &logic::PatternGenerator::showTool, [=]() {
+				menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR)->getToolBtn()->click();
+			});
+		}
 	}
-
-	if (filter->compatible(TOOL_DIGITALIO)) {
-		dio = new DigitalIO(nullptr, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
-				dioManager, &js_engine, this);
-		toolList.push_back(dio);
-		connect(dio, &DigitalIO::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_DIGITALIO)->getToolBtn()->click();
-		});
-	}
-
-
-	if (filter->compatible(TOOL_POWER_CONTROLLER)) {
-		power_control = new PowerController(ctx, menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER),
-				&js_engine, this);
-		toolList.push_back(power_control);
-		connect(power_control, &PowerController::showTool, [=]() {
-			menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER)->getToolBtn()->click();
-		});
-	}
-
-	if (filter->compatible(TOOL_LOGIC_ANALYZER)) {
-		logic_analyzer = new logic::LogicAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER),
-		&js_engine, this);
-		toolList.push_back(logic_analyzer);
-		connect(logic_analyzer, &logic::LogicAnalyzer::showTool, [=]() {
-		     menu->getToolMenuItemFor(TOOL_LOGIC_ANALYZER)->getToolBtn()->click();
-		});
-	}
-
-
-	if (filter->compatible((TOOL_PATTERN_GENERATOR))) {
-		pattern_generator = new logic::PatternGenerator(ctx, filter,
-				 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR), &js_engine, dioManager, this);
-		toolList.push_back(pattern_generator);
-		connect(pattern_generator, &logic::PatternGenerator::showTool, [=]() {
-			 menu->getToolMenuItemFor(TOOL_PATTERN_GENERATOR)->getToolBtn()->click();
-		});
+	catch (libm2k::m2k_exception &e) {
+		return false;
 	}
 
 	connect(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn(),
