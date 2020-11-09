@@ -21,6 +21,7 @@
 #include "spinbox_a.hpp"
 #include "completion_circle.h"
 #include "apiobjectmanager.h"
+#include "singletone_wrapper.h"
 
 #include "ui_spinbox_a.h"
 
@@ -119,7 +120,7 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 
 	QSettings oldSettings;
 	QFile tempFile(oldSettings.fileName() + ".bak");
-	m_settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
+	m_settings = SingleToneWrapper<QSettings *>::getInstance().getWrapped();
 
 	m_sba_api->load(*m_settings);
 	m_is_step_down = false;
@@ -130,8 +131,8 @@ SpinBoxA::~SpinBoxA()
 	current_id--;
 
 	m_sba_api->save(*m_settings);
+
 	delete m_sba_api;
-	delete m_settings;
 	delete ui;
 }
 
