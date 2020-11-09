@@ -412,6 +412,8 @@ M2kInfoPage::~M2kInfoPage()
 void M2kInfoPage::getDeviceInfo()
 {
 	InfoPage::getDeviceInfo();
+	QString libm2k_version = QString::fromStdString(libm2k::context::getVersion());
+	m_info_params["libm2k"] = libm2k_version;
 	//refreshTemperature();
 }
 
