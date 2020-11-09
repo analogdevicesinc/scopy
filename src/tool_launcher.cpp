@@ -35,6 +35,7 @@
 #include "user_notes.hpp"
 #include "external_script_api.hpp"
 #include "animationmanager.h"
+#include "singletone_wrapper.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -192,6 +193,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 
 	scopy.copy(tempFile.fileName());
 	settings = new QSettings(tempFile.fileName(), QSettings::IniFormat);
+	SingleToneWrapper<QSettings *>::getInstance().setWrapped(settings);
 
 	tl_api->ApiObject::load(*settings);
 
@@ -635,6 +637,8 @@ ToolLauncher::~ToolLauncher()
 	tl_api->ApiObject::save(*settings);
 
 	delete settings;
+	SingleToneWrapper<QSettings *>::getInstance().setWrapped(nullptr);
+
 	delete tl_api;
 	delete ui;
 
