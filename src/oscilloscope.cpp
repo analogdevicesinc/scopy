@@ -1987,12 +1987,11 @@ void Oscilloscope::create_add_channel_panel()
 	layout_logic->insertWidget(1, labelWarningMixedSignal);
 
 	QLabel *infoLabel = new QLabel(tr("* When the Mixed Signal View is enabled the LogicAnalyzer tool will be disabled!\n"
-					  "** The trigger can be disabled or set only on the Digital channels or Analog channels, not on both at the same time!"));
+					  "** The trigger can be disabled or set only on the Digital channels or Analog channels, not on both at the same time!"), panel);
+	layout_logic->insertWidget(2, infoLabel);
 	infoLabel->setStyleSheet(QString::fromUtf8("color: white;"));
 	infoLabel->setWordWrap(true);
 	infoLabel->setVisible(true);
-
-	layout_logic->insertWidget(2, infoLabel);
 
 	QPushButton *btn = math_ui.btnAddChannel;
 
