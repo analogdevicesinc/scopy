@@ -1039,6 +1039,7 @@ void SpectrumAnalyzer::onCursorReadoutsChanged(struct cursorReadoutsText data)
 
 void SpectrumAnalyzer::fillCursorReadouts(const struct cursorReadoutsText& data)
 {
+	//needs to be filled when measure ui is added
 	//    cursor_readouts_ui->cursorT1->setText(data.t1);
 	//    cursor_readouts_ui->cursorT2->setText(data.t2);
 	//    cursor_readouts_ui->timeDelta->setText(data.tDelta);

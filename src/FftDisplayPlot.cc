@@ -236,8 +236,6 @@ QString FftDisplayPlot::formatYValue(double value, int precision) const
 
 void FftDisplayPlot::setupReadouts()
 {
-	d_cursorReadouts = new CursorReadouts(this);
-	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
 	d_cursorReadouts->setTimeReadoutVisible(false);
 	d_cursorReadouts->setVoltageReadoutVisible(false);
 

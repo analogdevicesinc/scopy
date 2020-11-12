@@ -57,11 +57,6 @@ void dBgraph::setupVerticalBars()
 
 void dBgraph::setupReadouts()
 {
-	d_cursorReadouts = new CursorReadouts(this);
-	d_cursorReadouts->setAxis(QwtPlot::xTop,QwtPlot::yLeft);
-	d_cursorReadouts->setTopLeftStartingPoint(QPoint(8, 8));
-	d_cursorReadouts->moveToPosition(CustomPlotPositionButton::topLeft);
-
 	d_cursorReadouts->setTimeReadoutVisible(false);
 	d_cursorReadouts->setVoltageReadoutVisible(false);
 

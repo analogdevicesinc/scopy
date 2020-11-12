@@ -457,7 +457,9 @@ void CapturePlot::enableTimeTrigger(bool enable)
 void CapturePlot::onVCursor1Moved(double value)
 {
 	QString text;
-	text = d_cursorTimeFormatter.format(value, "", 3);
+
+	//text = d_cursorTimeFormatter.format(value, "", 3);
+	text = QString::number(value);
 	d_cursorReadouts->setTimeCursor1Text(text);
 	d_cursorReadoutsText.t1 = text;
 
@@ -483,7 +485,8 @@ void CapturePlot::onVCursor1Moved(double value)
 void CapturePlot::onVCursor2Moved(double value)
 {
 	QString text;
-	text = d_cursorTimeFormatter.format(value, "", 3);
+	text = QString::number(value);
+	//text = d_cursorTimeFormatter.format(value, "", 3);
 	d_cursorReadouts->setTimeCursor2Text(text);
 	d_cursorReadoutsText.t2 = text;
 
@@ -518,7 +521,8 @@ void CapturePlot::onHCursor1Moved(double value)
 	}
 
 	value *= d_displayScale;
-	text = d_cursorMetricFormatter.format(value, "V", 3);
+	//text = d_cursorMetricFormatter.format(value, "V", 3);
+	text = QString::number(value);
 	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
 	d_cursorReadoutsText.v1 = error ? "-" : text;
 
@@ -550,7 +554,8 @@ void CapturePlot::onHCursor2Moved(double value)
 	}
 
 	value *= d_displayScale;
-	text = d_cursorMetricFormatter.format(value, "V", 3);
+	//text = d_cursorMetricFormatter.format(value, "V", 3);
+	text = QString::number(value);
 	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
 	d_cursorReadoutsText.v2 = error ? "-" : text;
 

@@ -215,8 +215,8 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
   d_semilogy = false;
   d_autoscale_shot = false;
 
-  d_metricFormatter.setTwoDecimalMode(true);
-  d_timeFormatter.setTwoDecimalMode(true);
+//  d_metricFormatter.setTwoDecimalMode(true);
+//  d_timeFormatter.setTwoDecimalMode(true);
 
   d_tag_markers.resize(d_nplots);
   d_tag_markers_en = std::vector<bool>(d_nplots, true);
@@ -317,155 +317,6 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
       for (int i = 0; i < d_plot_curve.size(); i++)
 		d_plot_curve.at(i)->show();
       d_curves_hidden = false;
-
-//      // Detach and delete any tags that were plotted last time
-//      for(int n = 0; n < d_nplots; n++) {
-//        for(size_t i = 0; i < d_tag_markers[n].size(); i++) {
-//          d_tag_markers[n][i]->detach();
-//          delete d_tag_markers[n][i];
-//        }
-//        d_tag_markers[n].clear();
-//      }
-
-      // Plot and attach any new tags found.
-      // First test if this was a complex input where real/imag get
-      // split here into two stream.
-//      if(tags.size() > 0) {
-//        bool cmplx = false;
-//        int mult = (int)d_nplots / (int)tags.size();
-//        if(mult == 2)
-//          cmplx = true;
-
-//        std::vector< std::vector<gr::tag_t> >::const_iterator tag = tags.begin();
-//        for(int i = 0; i < d_nplots; i+=mult) {
-//          std::vector<gr::tag_t>::const_iterator t;
-//          for(t = tag->begin(); t != tag->end(); t++) {
-//            uint64_t offset = (*t).offset;
-
-//            // Ignore tag if its offset is outside our plottable vector.
-//            if(offset >= (uint64_t)d_numPoints) {
-//              continue;
-//            }
-
-//            double sample_offset = double(offset)/d_sample_rate;
-
-//            std::stringstream s;
-//            s << (*t).key << ": " << (*t).value;
-
-//            // Select the right input stream to put the tag on. If real,
-//            // just use i; if it's a complex stream, find the max of the
-//            // real and imaginary parts and put the tag on that one.
-//            int which = i;
-//            if(cmplx) {
-//              bool show0 = d_plot_curve[i]->isVisible();
-//              bool show1 = d_plot_curve[i+1]->isVisible();
-
-//              // If we are showing both streams, select the inptu stream
-//              // with the larger value
-//              if(show0 && show1) {
-//                if(fabs(d_ydata[i][offset]) < fabs(d_ydata[i+1][offset]))
-//                  which = i+1;
-//              }
-//              else {
-//                // If show0, we keep which = i; otherwise, use i+1.
-//                if(show1)
-//                  which = i+1;
-//              }
-//            }
-
-//            double yval = d_ydata[which][offset];
-
-//            // Find if we already have a marker at this location
-//            std::vector<QwtPlotMarker*>::iterator mitr;
-//            for(mitr = d_tag_markers[which].begin(); mitr != d_tag_markers[which].end(); mitr++) {
-//              if((*mitr)->xValue() == sample_offset) {
-//                break;
-//              }
-//            }
-
-//            // If no matching marker, create a new one
-//            if(mitr == d_tag_markers[which].end()) {
-//              bool show = d_plot_curve[which]->isVisible();
-
-//              QwtPlotMarker *m = new QwtPlotMarker();
-//              m->setXValue(sample_offset);
-//              m->setYValue(yval);
-
-//              QBrush brush;
-//              brush.setColor(QColor(0xC8, 0x2F, 0x1F));
-//              brush.setStyle(Qt::SolidPattern);
-
-//              QPen pen;
-//              pen.setColor(Qt::black);
-//              pen.setWidth(1);
-
-//              QwtSymbol *sym = new QwtSymbol(QwtSymbol::NoSymbol, brush, pen, QSize(12,12));
-
-//              if(yval >= 0) {
-//                sym->setStyle(QwtSymbol::DTriangle);
-//                m->setLabelAlignment(Qt::AlignTop);
-//              }
-//              else {
-//                sym->setStyle(QwtSymbol::UTriangle);
-//                m->setLabelAlignment(Qt::AlignBottom);
-//              }
-
-//#if QWT_VERSION < 0x060000
-//              m->setSymbol(*sym);
-//#else
-//              m->setSymbol(sym);
-//#endif
-
-//              m->setLabel(QwtText(s.str().c_str()));
-//              m->attach(this);
-
-//              if(!(show && d_tag_markers_en[which])) {
-//                m->hide();
-//              }
-
-//              d_tag_markers[which].push_back(m);
-//            }
-//            else {
-//              // Prepend the new tag to the existing marker
-//              // And set it at the max value
-//              if(fabs(yval) < fabs((*mitr)->yValue()))
-//                (*mitr)->setYValue(yval);
-//              QString orig = (*mitr)->label().text();
-//              s << std::endl;
-//              orig.prepend(s.str().c_str());
-
-//              QwtText newtext(orig);
-//              newtext.setColor(getTagTextColor());
-
-//              QBrush brush(getTagBackgroundColor(), getTagBackgroundStyle());
-//              newtext.setBackgroundBrush(brush);
-
-//              (*mitr)->setLabel(newtext);
-//            }
-//          }
-
-//          tag++;
-//        }
-//      }
-
-//      if(d_autoscale_state) {
-//	double bottom=1e20, top=-1e20;
-//	for(int n = 0; n < d_nplots; n++) {
-//	  for(int64_t point = 0; point < numDataPoints; point++) {
-//	    if(d_ydata[n][point] < bottom) {
-//	      bottom = d_ydata[n][point];
-//	    }
-//	    if(d_ydata[n][point] > top) {
-//	      top = d_ydata[n][point];
-//	    }
-//	  }
-//	}
-//	_autoScale(bottom, top);
-//        if(d_autoscale_shot) {
-//          d_autoscale_state = false;
-//          d_autoscale_shot = false;
-//        }
-//      }
 
       replot();
 
@@ -883,7 +734,10 @@ void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
 
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value, int precision) const
 {
-	return d_timeFormatter.format(value, "", precision);
+//	return d_timeFormatter.format(value, "", precision);
+	QString str;
+	str = QString::number(value);
+	return str;
 }
 
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value)
@@ -891,12 +745,18 @@ QString TimeDomainDisplayPlot::timeScaleValueFormat(double value)
 	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::xBottom));
 
 	return d_timeFormatter.format(value, "", scale->getFloatPrecison());
+//	QString str;
+//	str = QString::number(value);
+//	return str;
 }
 
 QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value, int precision) const
 {
 	value *= d_displayScale;
-	return d_metricFormatter.format(value, d_yAxisUnit, precision);
+//	return d_metricFormatter.format(value, d_yAxisUnit, precision);
+	QString str;
+	str = QString::number(value) + d_yAxisUnit;
+	return str;
 }
 
 QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value)
@@ -904,6 +764,9 @@ QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value)
 	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::yLeft));
 
 	return d_metricFormatter.format(value, d_yAxisUnit, scale->getFloatPrecison());
+//	QString str;
+//	str = QString::number(value) + d_yAxisUnit;
+//	return str;
 }
 
 void
@@ -1325,13 +1188,13 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
 
 	if (axisPos == QwtPlot::yLeft) {
 		prefixFormatter = &d_metricFormatter;
-		unit = d_yAxisUnit;
-		floatPrecision = 2;
+		unit = "";
+		floatPrecision = 3;
 		numDivs = yAxisNumDiv();
 	} else {
-		prefixFormatter = &d_timeFormatter;
-		unit = d_xAxisUnit;
-		floatPrecision = 2;
+		prefixFormatter = &d_metricFormatter;
+		unit = "";
+		floatPrecision = 3;
 		numDivs = xAxisNumDiv();
 	}
 
@@ -1405,6 +1268,37 @@ void TimeDomainDisplayPlot::hideCurvesUntilNewData()
 	for (int i = 0; i < d_plot_curve.size(); i++)
 		d_plot_curve.at(i)->hide();
 	d_curves_hidden = true;
+}
+
+
+
+/***********************************************************************
+ * Main New domain plotter widget
+ **********************************************************************/
+SimpleDisplayPlot::SimpleDisplayPlot(QWidget* parent, unsigned int xNumDivs, unsigned int yNumDivs)
+  : DisplayPlot(0, parent, xNumDivs, yNumDivs)
+{
+	;
+}
+
+
+SimpleDisplayPlot::~SimpleDisplayPlot()
+{
+	;
+}
+
+
+void SimpleDisplayPlot::replot()
+{
+  QwtPlot::replot();
+}
+
+void SimpleDisplayPlot::plotNewData(const std::string &sender,
+				   const std::vector<double*> &dataPoints,
+				   const int64_t numDataPoints,
+				   const double timeInterval,
+				   const std::vector< std::vector<gr::tag_t> > &tags)
+{
 }
 
 #endif /* TIME_DOMAIN_DISPLAY_PLOT_C */

@@ -52,6 +52,7 @@ double adc_sample_conv::conversionWrapper(unsigned int chn_idx, double sample, b
 	try {
 		if (raw_to_volts) {
 			return m2k_adc->convertRawToVolts(chn_idx, (short)sample);
+			//return (double)sample;
 		} else {
 			return m2k_adc->convertVoltsToRaw(chn_idx, sample);
 		}

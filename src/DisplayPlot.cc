@@ -590,9 +590,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 
 	((QFrame*) canvas())->setLineWidth(0);
 
-	// Avoid jumping when labels with more/less digits
-	// appear/disappear when scrolling vertically
-
+	//dbGraph does not need the grid and the legend
 	setupDisplayPlotDiv(isdBgraph);
 
 	d_symbolCtrl = new SymbolController(this);
@@ -632,6 +630,8 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph) {
     if(!isdBgraph)
     {
+	    // Avoid jumping when labels with more/less digits
+	    // appear/disappear when scrolling vertically
 	    QwtLegend* legendDisplay = new QwtLegend(this);
 
 #if QWT_VERSION < 0x060100

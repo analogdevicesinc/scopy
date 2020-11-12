@@ -258,6 +258,25 @@ private:
   int d_nb_ref_curves;
   int getCurveNextTo(int pos);
 };
+
+//de sters
+
+class SimpleDisplayPlot: public DisplayPlot {
+	Q_OBJECT
+	public:
+	  SimpleDisplayPlot(QWidget*, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
+	  virtual ~SimpleDisplayPlot();
+	  void replot();
+	  void plotNewData(const std::string &sender,
+			   const std::vector<double*> &dataPoints,
+			   const int64_t numDataPoints, const double timeInterval,
+			   const std::vector< std::vector<gr::tag_t> > &tags \
+			   = std::vector< std::vector<gr::tag_t> >());
+	private:
+	  std::vector<double*> d_ydata;
+	  std::vector<double*> d_xdata;
+};
+
 } //adiscope
 
 #endif /* M2K_TIME_DOMAIN_DISPLAY_PLOT_H */
