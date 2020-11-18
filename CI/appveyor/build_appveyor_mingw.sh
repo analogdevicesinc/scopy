@@ -28,9 +28,12 @@ SCOPY_CMAKE_OPTS="\
 	-DPYTHON_EXECUTABLE=/$MINGW_VERSION/bin/python3.exe \
 	"
 
-PYTHON_FILES=/$MINGW_VERSION/lib/python3.*
+PYTHON_LOCATION=/$MINGW_VERSION/lib/python3.8
+PYTHON_FILES="${PYTHON_LOCATION}/*.py ${PYTHON_LOCATION}/asyncio ${PYTHON_LOCATION}/collections ${PYTHON_LOCATION}/concurrent ${PYTHON_LOCATION}/config-3.* ${PYTHON_LOCATION}/ctypes ${PYTHON_LOCATION}/distutils ${PYTHON_LOCATION}/encodings ${PYTHON_LOCATION}/lib-dynload ${PYTHON_LOCATION}/site-packages"
+
 DLL_DEPS=$(cat ${WORKDIR}/CI/appveyor/mingw_dll_deps)
 DLL_DEPS="$DLL_DEPS $PYTHON_FILES"
+
 echo $DLL_DEPS
 
 OLD_PATH=$PATH
@@ -90,7 +93,8 @@ echo "### Extracting debug symbols ..."
 mkdir /c/scopy_$ARCH_BIT/.debug
 #/$MINGW_VERSION/bin/objcopy -v --only-keep-debug /c/$DEST_FOLDER/Scopy.exe /c/$DEST_FOLDER/.debug/Scopy.exe.debug
 dump_syms -r /c/$DEST_FOLDER/Scopy.exe > /c/$DEST_FOLDER/Scopy.exe.sym
-#/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded /c/$DEST_FOLDER/Scopy.exe
+/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded /c/$DEST_FOLDER/Scopy.exe
+/c/msys64/$MINGW_VERSION/bin/strip.exe --strip-debug --strip-unneeded /c/$DEST_FOLDER/*.dll
 #/c/msys64/$MINGW_VERSION/bin/objcopy.exe -v --add-gnu-debuglink=/c/$DEST_FOLDER/.debug/Scopy.exe.debug /c/$DEST_FOLDER/Scopy.exe
 mkdir /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/Scopy.exe.sym /c/$DEBUG_FOLDER
