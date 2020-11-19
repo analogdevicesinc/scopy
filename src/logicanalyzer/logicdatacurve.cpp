@@ -38,7 +38,7 @@ static const QColor LowColor(0xC0, 0x00, 0x00);
 static const QColor SamplingPointColor(0x77, 0x77, 0x77);
 
 LogicDataCurve::LogicDataCurve(uint16_t *data, uint8_t bit, adiscope::logic::LogicTool *logic) :
-    GenericLogicPlotCurve(QString("Dio " + QString::number(bit)), QString("Dio " + QString::number(bit))),
+    GenericLogicPlotCurve(QString(QString::number(bit)), QString(QString::number(bit))),
     m_logic(logic),
     m_startSample(0),
     m_endSample(0),

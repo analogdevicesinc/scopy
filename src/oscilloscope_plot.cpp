@@ -1501,7 +1501,6 @@ void CapturePlot::addToGroup(int currentGroup, int toAdd)
 
 void CapturePlot::onDigitalChannelAdded(int chnIdx)
 {
-	qDebug() << "Digital Channel Added!";
 	setLeftVertAxesCount(d_ydata.size() + d_ref_ydata.size() + chnIdx + 1);
 	setAxisScale( QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx), -5, 5);
 	replot();
