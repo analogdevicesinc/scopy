@@ -662,14 +662,14 @@ void FreePlotLineHandleV::paintEvent(QPaintEvent *)
 				setToolTip("");
 			}
 
-			const double textHeight = QFontMetrics(QFont(fontFamily, fontSize)).height();
-
-			QPointF textPos(0.0, m_height / 2.0 + textHeight / 4.0);
+			const QSizeF size = QFontMetricsF(QFont(fontFamily, fontSize)).size(Qt::TextSingleLine, m_name);
+			QRectF textRect(QPointF(0.0, 0.0), size);
+			textRect.moveCenter(QPointF(m_image.width() / 2.0, m_height / 2.0));
 
 			p.save();
 			p.setPen(QPen(QBrush(Qt::white), 20));
 			p.setFont(QFont(fontFamily, fontSize));
-			p.drawText(textPos, m_name);
+			p.drawText(textRect, m_name);
 			p.restore();
 		} else {
 			p.drawPixmap(imageTopLeft, m_image);
