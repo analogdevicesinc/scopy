@@ -458,6 +458,7 @@ class I2CPattern: virtual public Pattern
 	uint8_t bytesPerFrame;
 
 	short *buf_ptr;
+	short *buf_ptr_end;
 
 	const int SDA = 1;
 	const int SCL = 0;
