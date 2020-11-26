@@ -1,0 +1,11 @@
+The script assumes that the flatpak is uncompressed/opened like this (on linux)
+
+ostree init --repo=repo --mode=bare-user
+ostree static-delta apply-offline --repo=repo scopy.flatpak
+ostree checkout --repo=repo -U $(basename $(echo repo/objects/*/*.commit | cut -d/ -f3- --output-delimiter= ) .commit) outdir
+
+then run the attached shell script (table.sh) which pokes ubuntu/debian sites to find the home pages of projects.
+This will create the attached html file in a couple minutes (5 or so)…
+(then you only need to fix things that are missing from upstream).
+
+
