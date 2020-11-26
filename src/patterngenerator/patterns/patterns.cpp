@@ -1728,19 +1728,19 @@ void I2CPattern::sample_bit(bool bit)
 {
 	// SDA Transitions must occur when SCL is LOW (unless starting or stopping)
 	// Set SDA whilst SCL is low from previous bit
-	for (auto i=0; i<samples_per_bit/4; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/4 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
 
 	// Sample SDA by clocking SCL
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
 	// Leave SCL low for next bit
-	for (auto i=0; i<samples_per_bit/4; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/4 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
@@ -1749,22 +1749,22 @@ void I2CPattern::sample_bit(bool bit)
 void I2CPattern::sample_start_bit()
 {
 	// Explicitly set start condition, consume 2 bits
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,1);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
 
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
@@ -1835,22 +1835,22 @@ void I2CPattern::sample_payload()
 void I2CPattern::sample_stop()
 {
 	// Explicitly set stop condition, consume 2 bits
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
 
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,1);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,1);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
@@ -1863,6 +1863,7 @@ uint8_t I2CPattern::generate_pattern(uint32_t sample_rate,
 
 	buffer = new short[number_of_samples]; // no need to recreate buffer
 	buf_ptr = buffer;
+	buf_ptr_end = buffer + number_of_samples;
 	memset(buffer, (0xff), (number_of_samples)*sizeof(short));
 
 	samples_per_bit = 1*(sample_rate/clkFrequency);
