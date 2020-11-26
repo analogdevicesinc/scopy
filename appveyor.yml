@@ -75,10 +75,6 @@ build_script:
     - sh: $PACKAGE_CMD
 
     - echo "### Push artifacts ... "
-    - cmd: appveyor PushArtifact c:\scopy-%ARCH_BIT%bit.zip
-    - cmd: appveyor PushArtifact C:\debug-%ARCH_BIT%bit.zip
-   
-    - cmd: appveyor PushArtifact %DEPLOY_FILE%
     - sh: if [[ $DEPLOY_FILE != "" ]]; then appveyor PushArtifact $DEPLOY_FILE; fi
 
 #on_finish:
