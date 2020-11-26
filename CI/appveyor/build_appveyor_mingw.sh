@@ -13,7 +13,7 @@ JOBS=$(nproc)
 
 CC=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-gcc.exe
 CXX=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-g++.exe
-CMAKE_OPTS="
+CMAKE_OPTS="\
 	-DCMAKE_C_COMPILER:FILEPATH=${CC} \
 	-DCMAKE_CXX_COMPILER:FILEPATH=${CXX} \
 	-DPKG_CONFIG_EXECUTABLE=/$MINGW_VERSION/bin/pkg-config.exe \
@@ -21,10 +21,9 @@ CMAKE_OPTS="
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 	"
 
-SCOPY_CMAKE_OPTS="
+SCOPY_CMAKE_OPTS="\
 	$RC_COMPILER_OPT \
 	-DBREAKPAD_HANDLER=ON \
-	-DGIT_EXECUTABLE=/c/Program\\ Files/Git/cmd/git.exe \
 	-DPYTHON_EXECUTABLE=/$MINGW_VERSION/bin/python3.exe \
 	"
 
@@ -48,7 +47,11 @@ echo "### Building Scopy ..."
 /$MINGW_VERSION/bin/python3.exe --version
 mkdir /c/$BUILD_FOLDER
 cd /c/$BUILD_FOLDER
+cp /tmp/scopy-mingw-build-status /c/projects/scopy
+cat /c/projects/scopy/scopy-mingw-build-status
 cmake -G 'Unix Makefiles' $SCOPY_CMAKE_OPTS $CMAKE_OPTS /c/projects/scopy
+cat /c/$BUILD_FOLDER/buildinfo.html
+appveyor PushArtifact /c/$BUILD_FOLDER/buildinfo.html
 
 cd /c/$BUILD_FOLDER/resources
 sed -i  's/^\(FILEVERSION .*\)$/\1,'$BUILD_NO'/' properties.rc

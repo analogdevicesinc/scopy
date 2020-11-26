@@ -803,6 +803,41 @@ border-radius:5px;
         </widget>
        </item>
        <item>
+        <widget class="QWidget" name="aboutWidget" native="true">
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
+.QWidget:hover {
+background-color: rgba(0, 0, 0, 60);
+border: 1px solid rgba(0, 0, 0, 30);
+border-radius:5px;
+}
+QWidget[selected=true] { 
+background-color: rgba(0, 0, 0, 60);
+border: 1px solid rgba(0, 0, 0, 30);
+border-radius:5px; 
+}</string>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QPushButton" name="btnAbout">
+            <property name="styleSheet">
+             <string notr="true">text-align:center</string>
+            </property>
+            <property name="text">
+             <string>About</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QWidget" name="notes" native="true">
          <property name="minimumSize">
           <size>

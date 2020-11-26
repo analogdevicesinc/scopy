@@ -24,6 +24,26 @@ set(Python_ADDITIONAL_VERSIONS 3)
 FIND_PACKAGE(PythonInterp REQUIRED)
 set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
 
+
+function(dump_cmake_variables)
+    get_cmake_property(_variableNames VARIABLES)
+    list (SORT _variableNames)
+    foreach (_variableName ${_variableNames})
+	if (ARGV0)
+	    unset(MATCHED)
+	    string(REGEX MATCH ${ARGV0} MATCHED ${_variableName})
+	    if (NOT MATCHED)
+		continue()
+	    endif()
+	endif()
+	message(STATUS "${_variableName}=${${_variableName}}")
+    endforeach()
+endfunction()
+
+
+function(create_build_info_html_pages)
+
+endfunction()
 # Get the GIT hash of the latest commit
 include(FindGit OPTIONAL)
 if (GIT_FOUND)
@@ -33,15 +53,12 @@ if (GIT_FOUND)
 		OUTPUT_VARIABLE SCOPY_GIT_REPO
 		OUTPUT_STRIP_TRAILING_WHITESPACE
 	)
-
-	if (${SCOPY_GIT_REPO} MATCHES ${CMAKE_CURRENT_SOURCE_DIR})
-		execute_process(
-			COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-			OUTPUT_VARIABLE SCOPY_VERSION_GIT
-			OUTPUT_STRIP_TRAILING_WHITESPACE
-		)
-	endif()
+	execute_process(
+		COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+		OUTPUT_VARIABLE SCOPY_VERSION_GIT
+		OUTPUT_STRIP_TRAILING_WHITESPACE
+	)
 endif()
 
 if (NOT SCOPY_VERSION_GIT)
@@ -206,7 +223,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui)
 qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 
-FILE(GLOB M2KSCOPE_RESOURCES resources/*.qrc)
+FILE(GLOB M2KSCOPE_RESOURCES resources/resources.qrc)
 qt5_add_resources(m2kscope_RESOURCES ${M2KSCOPE_RESOURCES})
 
 if (WIN32)
@@ -264,8 +281,53 @@ if (ENABLE_APPLICATION_BUNDLE)
 	set(EXTRA_BUNDLE_FILES ${QT_PLUGINS} ${ICON_FILE} ${PKGINFO} ${QT_CONF} ${DECODERS})
 endif()
 
-# Creates translation .ts files from ${CMAKE_SOURCE_DIR}
-#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES}
+#dump_cmake_variables("iio")
+
+string(TIMESTAMP TODAY "%Y-%m-%d")
+string(TIMESTAMP NOW "%H:%M:%S")
+cmake_host_system_information(RESULT BUILD_HOST QUERY HOSTNAME)
+
+set(APPVEYOR_INFO)
+if($ENV{APPVEYOR})
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}Built\ on\ Appveyor\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}url:\ $ENV{APPVEYOR_URL}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}api_url:\ $ENV{APPVEYOR_API_URL}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}acc_name:\ $ENV{APPVEYOR_ACCOUNT_NAME}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}prj_name:\ $ENV{APPVEYOR_PROJECT_NAME}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}build_id:\ $ENV{APPVEYOR_BUILD_ID}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}build_nr:\ $ENV{APPVEYOR_BUILD_NUMBER}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}build_version:\ $ENV{APPVEYOR_BUILD_VERSION}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_id:\ $ENV{APPVEYOR_JOB_ID}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_name:\ $ENV{APPVEYOR_JOB_NAME}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_nr:\ $ENV{APPVEYOR_JOB_NUMBER}\n)
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_link:\ $ENV{APPVEYOR_URL}/project/$ENV{APPVEYOR_ACCOUNT_NAME}/$ENV{APPVEYOR_PROJECT_NAME}/builds/$ENV{APPVEYOR_BUILD_ID}/job/$ENV{APPVEYOR_JOB_ID}\n)		
+	if(EXISTS ${CMAKE_SOURCE_DIR}/scopy-mingw-build-status)
+		message(scopy-mingw-build-status found .. populating)
+		FILE(READ ${CMAKE_SOURCE_DIR}/scopy-mingw-build-status SCOPY_MINGW_BUILD_STATUS_INFO)
+	endif()
+else()
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}Built\ locally\n)
+endif()
+
+# TODO: Pack these in a GLOB and run foreach
+configure_file(resources/buildinfo.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/buildinfo.html)
+configure_file(resources/scopy_osp.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy_osp.html)
+configure_file(resources/credits.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/credits.html)
+configure_file(resources/about.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/about.html)
+
+SET(ABOUT_HTML_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/resources/buildinfo.html ${CMAKE_CURRENT_BINARY_DIR}/resources/scopy_osp.html ${CMAKE_CURRENT_BINARY_DIR}/resources/credits.html ${CMAKE_CURRENT_BINARY_DIR}/resources/about.html)
+
+set(ABOUT_HTML_QRC_SOURCES)
+foreach(file ${ABOUT_HTML_SOURCES})
+	get_filename_component(file_name ${file} NAME)
+	set(ABOUT_HTML_QRC_SOURCES "${ABOUT_HTML_QRC_SOURCES}\n<file>${file_name}</file>")
+endforeach()
+
+configure_file(${CMAKE_SOURCE_DIR}/resources/aboutpage.qrc
+	${CMAKE_BINARY_DIR}/aboutpage.qrc
+	@ONLY)
+
+qt5_add_resources(ABOUT_PAGE_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/aboutpage.qrc)
 
 add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${SRC_LIST}
@@ -274,6 +336,7 @@ add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${m2kscope_FORMS_HEADERS}
 		${EXTRA_BUNDLE_FILES}
 		${TRANSLATION_RESOURCES}
+		${ABOUT_PAGE_RESOURCES}
 )
 
 if (WIN32 OR ENABLE_APPLICATION_BUNDLE)

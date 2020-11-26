@@ -41,6 +41,7 @@
 #include "oscilloscope.hpp"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
+#include "scopyaboutdialog.hpp"
 
 #include "logicanalyzer/logic_analyzer.h"
 #include "patterngenerator/pattern_generator.h"
@@ -190,6 +191,7 @@ private:
 	Ui::ToolLauncher *ui;
 	struct iio_context *ctx;
 	libm2k::context::M2k *m_m2k;
+	ScopyAboutDialog *about;
 
 	ToolMenu *menu;
 

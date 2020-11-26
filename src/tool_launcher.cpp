@@ -103,7 +103,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	initialCalibrationFlag(true),
 	skip_calibration_if_already_calibrated(true),
 	m_adc_tools_failed(false),
-	m_dac_tools_failed(false)
+	m_dac_tools_failed(false),
+	about(nullptr)
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -128,6 +129,14 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	});
 	connect(ui->btnNotes, &QPushButton::clicked, [=](){
 		swapMenu(static_cast<QWidget*>(notesPanel));
+	});
+	connect(ui->btnAbout, &QPushButton::clicked, [=](){
+		if(!about)
+			about = new ScopyAboutDialog(this);
+		about->setModal(false);
+		about->show();
+		about->raise();
+		about->activateWindow();
 	});
 
 	connect(prefPanel, &Preferences::reset, this, &ToolLauncher::resetSession);
