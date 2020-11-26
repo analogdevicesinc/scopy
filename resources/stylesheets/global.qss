@@ -33,7 +33,6 @@ QLabel:disabled, QRadioButton:disabled {
 QTextBrowser {
 	background-color: rgba(0, 0, 0, 150);
 }
-
 /* Apply a gradiant to the MenuAnim widgets */
 adiscope--MenuAnim {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
@@ -325,4 +324,20 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
   border: none;
   background: none;
+}
+
+QDialog {
+	background-color: #1b1b21;
+}
+
+ScopyAboutDialog QPushButton{
+	background-color: #4a64ff;
+	color: #ffffff;
+}
+
+QTextBrowser#aboutTextBrowser{
+	background-color: transparent;
+	link-color: yellow;
+	selection-color: yellow;
+	color: white;
 }
