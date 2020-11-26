@@ -130,7 +130,7 @@ endif()
 
 
 option(BREAKPAD_HANDLER "Build with breakpad exception handler " OFF)
-message(BREAKPAD_HANDLER - ${BREAKPAD_HANDLER})
+message(STATUS BREAKPAD_HANDLER - ${BREAKPAD_HANDLER})
 if (${BREAKPAD_HANDLER})
 	message("-- Building with breakpad crash handler")
 	set(BREAKPAD_HANDLER_BOOL 1)
@@ -409,8 +409,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 set(CMAKE_INSTALL_DOCDIR "${CMAKE_CURRENT_BINARY_DIR}/doc")
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-	option(WITH_DOC "Generate documentation with Doxygen" ON)
-
+	option(WITH_DOC "Generate documentation with Doxygen" OFF)
 	if (WITH_DOC)
 		configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doc/Doxyfile_API.in ${CMAKE_CURRENT_BINARY_DIR}/doc/Doxyfile @ONLY)
 		set(HTML_DEST_DIR ${CMAKE_CURRENT_BINARY_DIR})
