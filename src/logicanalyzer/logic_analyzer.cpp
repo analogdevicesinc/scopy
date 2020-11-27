@@ -57,8 +57,11 @@
 using namespace adiscope;
 using namespace adiscope::logic;
 
-constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
-constexpr int MAX_BUFFER_SIZE_STREAM = 64 * 4 * 1024 * 1024; // 64 x 4M
+constexpr int MAX_BUFFER_SIZE_ONESHOT = 64 * 4 * 1024 * 1024; // 64 x 4M
+constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024 * 1024; // 1Gb
+constexpr int MAX_SR_ONESHOT = 10e7; // 100M
+constexpr int MAX_SR_STREAM = 10e6; // 10M
+constexpr int MAX_KERNEL_BUFFERS = 64;
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
 /* helper method to sort srd_decoder objects based on ids(name) */
@@ -218,8 +221,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	m_timePositionButton->setStep(1);
 
-	// default: stream
-	ui->btnStreamOneShot->setChecked(false);
+	// default: oneshot
+	ui->btnStreamOneShot->setChecked(true);
 
 	// default
 	m_sampleRateButton->setValue(m_sampleRate);
@@ -944,8 +947,8 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 {
 	qDebug() << "Btn stream one shot toggled !!!!!: " << toggled;
 
-	m_plot.enableTimeTrigger(toggled);
-	m_timePositionButton->setVisible(toggled);
+//	m_plot.enableTimeTrigger(toggled);
+//	m_timePositionButton->setVisible(toggled);
 
 	m_m2kDigital->getTrigger()->setDigitalStreamingFlag(toggled);
 
@@ -967,6 +970,9 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 
 	m_bufferSizeButton->setMaxValue(toggled ? MAX_BUFFER_SIZE_ONESHOT
 						: MAX_BUFFER_SIZE_STREAM);
+	m_sampleRateButton->setMaxValue(toggled ? MAX_SR_ONESHOT
+						: MAX_SR_STREAM);
+	m_sampleRateButton->setIntegerDivider(m_sampleRateButton->maxValue());
 	m_bufferPreviewer->setCursorVisible(toggled);
 }
 
@@ -1065,7 +1071,7 @@ void LogicAnalyzer::setupUi()
 	ui->setupUi(this);
 
 	// Hide the run button
-	ui->runSingleWidget->enableRunButton(false);
+//	ui->runSingleWidget->enableRunButton(false);
 
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
@@ -1580,66 +1586,60 @@ void LogicAnalyzer::startStop(bool start)
 				m_plot.setTriggerState(CapturePlot::Waiting);
 			}, Qt::QueuedConnection);
 
-			if (ui->btnStreamOneShot->isChecked()) {
+			uint64_t chunks = 4;
+			while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
+				chunks++; // select a small size for the chunks
+				// example: 2^19 samples in each chunk
+			}
+			const uint64_t chunk_size = (bufferSizeAdjusted >> chunks) > 0 ? (bufferSizeAdjusted >> chunks) : 4 ;
+			uint64_t totalSamples = bufferSizeAdjusted;
+
+			do {
 				try {
-					const uint16_t * const temp = m_m2kDigital->getSamplesP(bufferSize);
-					memcpy(m_buffer, temp, bufferSizeAdjusted * sizeof(uint16_t));
+					m_m2kDigital->setKernelBuffersCountIn(64);
+					break;
+				} catch (libm2k::m2k_exception &e) {
+					qDebug() << e.what();
+				}
+			} while (true);
+
+			uint64_t absIndex = 0;
+
+			do {
+				const uint64_t captureSize = std::min(chunk_size, totalSamples);
+				try {
+					const uint16_t * const temp = m_m2kDigital->getSamplesP(captureSize);
+					memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
+					absIndex += captureSize;
+					totalSamples -= captureSize;
 
 					QMetaObject::invokeMethod(this, [=](){
 						m_plot.setTriggerState(CapturePlot::Triggered);
 					}, Qt::QueuedConnection);
 
-					m_lastCapturedSample = bufferSize;
-					Q_EMIT dataAvailable(0, bufferSize);
-					updateBufferPreviewer(0, m_lastCapturedSample);
-
 				} catch (libm2k::m2k_exception &e) {
-					HANDLE_EXCEPTION(e)
-					qDebug() << e.what();
+//					HANDLE_EXCEPTION(e)
+					qDebug() << e.what() << " code: " << e.iioCode();
+					break;
 				}
-			} else {
-				uint64_t chunks = 4;
-				while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
-					chunks++; // select a small size for the chunks
-					// example: 2^19 samples in each chunk
+
+				if (m_stopRequested) {
+					break;
 				}
-				const uint64_t chunk_size = (bufferSizeAdjusted >> chunks) > 0 ? (bufferSizeAdjusted >> chunks) : 4 ;
-				uint64_t totalSamples = bufferSizeAdjusted;
-				m_m2kDigital->setKernelBuffersCountIn(64);
-				uint64_t absIndex = 0;
 
-				do {
-					const uint64_t captureSize = std::min(chunk_size, totalSamples);
-					try {
-						const uint16_t * const temp = m_m2kDigital->getSamplesP(captureSize);
-						memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
-						absIndex += captureSize;
-						totalSamples -= captureSize;
+				Q_EMIT dataAvailable(absIndex - captureSize, absIndex);
 
-						QMetaObject::invokeMethod(this, [=](){
-							m_plot.setTriggerState(CapturePlot::Triggered);
-						}, Qt::QueuedConnection);
+				QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
+							  "replot",
+							  Qt::QueuedConnection);
+				m_lastCapturedSample = absIndex;
+				updateBufferPreviewer(0, m_lastCapturedSample);
 
-					} catch (libm2k::m2k_exception &e) {
-						HANDLE_EXCEPTION(e)
-						qDebug() << e.what();
-						break;
-					}
-
-					if (m_stopRequested) {
-						break;
-					}
-
-					Q_EMIT dataAvailable(absIndex - captureSize, absIndex);
-
-					QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
-								  "replot",
-								  Qt::QueuedConnection);
-					m_lastCapturedSample = absIndex;
-					updateBufferPreviewer(0, m_lastCapturedSample);
-
-				} while (totalSamples);
-			}
+				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
+					totalSamples = bufferSizeAdjusted;
+					absIndex = 0;
+				}
+			} while (totalSamples);
 
 			m_started = false;
 

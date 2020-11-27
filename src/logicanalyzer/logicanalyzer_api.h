@@ -32,9 +32,9 @@ class LogicAnalyzer_API : public ApiObject
 	Q_OBJECT
 
 	/* sweep settings */
+	Q_PROPERTY(bool streamOneShot READ getStreamOrOneShot WRITE setStreamOrOneShot)
 	Q_PROPERTY(double sampleRate READ getSampleRate WRITE setSampleRate)
 	Q_PROPERTY(int bufferSize READ getBufferSize WRITE setBufferSize)
-	Q_PROPERTY(bool streamOneShot READ getStreamOrOneShot WRITE setStreamOrOneShot)
 	Q_PROPERTY(int delay READ getDelay WRITE setDelay)
 
 	/* channel settings */
