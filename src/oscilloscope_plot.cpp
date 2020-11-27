@@ -2386,8 +2386,8 @@ void CapturePlot::moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition 
 void CapturePlot::updateBufferSizeSampleRateLabel(int nsamples, double sr)
 {
 	QString txtSampleRate = d_cursorMetricFormatter.format(sr, "sps", 0);
-	QString txtSamplingPeriod = d_cursorTimeFormatter.format(1 / sr, "", 0);
-	QString text = QString("%1 Samples at ").arg(nsamples) + txtSampleRate;
+	QString txtSamples = d_cursorMetricFormatter.format(nsamples, "", 0);
+	QString text = QString("%1 Samples at ").arg(txtSamples) + txtSampleRate;
 	d_sampleRateLabel->setText(text);
 }
 
