@@ -751,6 +751,7 @@ void PatternGenerator::generateBuffer()
 	m_sampleRate = sr;
 
 	const uint64_t bufferSize = computeBufferSize(sr);
+	m_plot.setMaxBufferSizeErrorLabel(bufferSize == MAX_BUFFER_SIZE);
 
 	qDebug() << "Buffer size is: " << bufferSize;
 	m_bufferSize = bufferSize;

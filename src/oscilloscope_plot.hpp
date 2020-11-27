@@ -168,6 +168,7 @@ namespace adiscope {
 		void setBufferSizeLabelValue(int numSamples);
 		void setSampleRatelabelValue(double sampleRate);
 		void setTriggerState(int triggerState);
+		void setMaxBufferSizeErrorLabel(bool reached);
 		void setCursorReadoutsTransparency(int value);
 		void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 		void setHorizCursorsLocked(bool value);
@@ -249,6 +250,7 @@ namespace adiscope {
 		QLabel *d_timeBaseLabel;
 		QLabel *d_sampleRateLabel;
 		QLabel *d_triggerStateLabel;
+		QLabel *d_maxBufferError;
 
 		int d_bufferSizeLabelVal;
 		double d_sampleRateLabelVal;

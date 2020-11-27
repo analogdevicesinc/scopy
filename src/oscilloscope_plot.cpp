@@ -83,7 +83,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_startedGrouping(false),
 	d_bottomHandlesArea(nullptr),
 	d_xAxisInterval{0.0, 0.0},
-	d_currentHandleInitPx(1)
+	d_currentHandleInitPx(1),
+	d_maxBufferError(nullptr)
 {
 	setMinimumHeight(250);
 	setMinimumWidth(500);
@@ -160,6 +161,11 @@ CapturePlot::CapturePlot(QWidget *parent,
 		"color: #ffffff;"
 		"}");
 
+	d_maxBufferError = new QLabel(this);
+	d_maxBufferError->setStyleSheet("QLabel {"
+		"color: #ff0000;"
+		"}");
+
 	// Top area layout
 	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
 	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
@@ -171,7 +177,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 		Qt::AlignBottom);
 	topWidgetLayout->insertWidget(1, d_sampleRateLabel, 0, Qt::AlignLeft |
 		Qt::AlignBottom);
-	topWidgetLayout->insertWidget(2, d_triggerStateLabel, 0, Qt::AlignRight |
+	topWidgetLayout->insertWidget(2, d_maxBufferError, 0, Qt::AlignRight |
+		Qt::AlignBottom);
+	topWidgetLayout->insertWidget(3, d_triggerStateLabel, 0, Qt::AlignRight |
 		Qt::AlignBottom);
 
 	QSpacerItem *spacerItem = new QSpacerItem(0, 0, QSizePolicy::Expanding,
@@ -2371,6 +2379,11 @@ void CapturePlot::setTriggerState(int triggerState)
 		break;
 	};
 	d_triggerStateLabel->show();
+}
+
+void CapturePlot::setMaxBufferSizeErrorLabel(bool reached)
+{
+	d_maxBufferError->setText(reached ? "Maximum buffer size reached" : "");
 }
 
 void CapturePlot::setCursorReadoutsTransparency(int value)
