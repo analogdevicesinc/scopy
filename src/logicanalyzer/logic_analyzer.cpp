@@ -1517,6 +1517,9 @@ void LogicAnalyzer::startStop(bool start)
 			m_captureThread = nullptr;
 		}
 
+		m_plot.setSampleRatelabelValue(m_sampleRate);
+		m_plot.setBufferSizeLabelValue(m_bufferSize);
+
 		m_stopRequested = false;
 
 		m_m2kDigital->stopAcquisition();

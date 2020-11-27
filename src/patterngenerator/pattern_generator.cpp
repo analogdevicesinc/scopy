@@ -755,6 +755,9 @@ void PatternGenerator::generateBuffer()
 	qDebug() << "Buffer size is: " << bufferSize;
 	m_bufferSize = bufferSize;
 
+	m_plot.setSampleRatelabelValue(m_sampleRate);
+	m_plot.setBufferSizeLabelValue(m_bufferSize);
+
 	if (m_buffer) {
 		delete[] m_buffer;
 	}
