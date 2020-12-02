@@ -140,6 +140,37 @@ QPushButton:hover {
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="mixedSignalBtn">
+          <property name="styleSheet">
+           <string notr="true">
+QPushButton {
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}</string>
+          </property>
+          <property name="text">
+           <string>Mixed Signal</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_11">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

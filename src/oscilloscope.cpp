@@ -1285,7 +1285,7 @@ void Oscilloscope::setFilteringEnabled(bool set)
 	setSampleRate(active_sample_rate);
 }
 
-void Oscilloscope::enableMixedSignalView()
+void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 {
 	const bool iioStarted = isIioManagerStarted();
 	if (iioStarted) {
@@ -1298,6 +1298,13 @@ void Oscilloscope::enableMixedSignalView()
 								       nb_math_channels + nb_ref_channels);
 
 	ui->logicSettingsLayout->addWidget(m_mixedSignalViewMenu[0]);
+
+	QTabWidget *tb = qobject_cast<QTabWidget *>(m_mixedSignalViewMenu[0]);
+	showLogicAnalyzerTriggerConnection = connect(&trigger_settings, &TriggerSettings::showLogicAnalyzerTriggerSettings,
+						     this, [=](){
+		cw->menuButton()->setChecked(true);
+		tb->setCurrentIndex(tb->indexOf(m_mixedSignalViewMenu[1]));
+	});
 
 	mixed_sink = mixed_signal_sink::make(m_logicAnalyzer, &this->plot, active_sample_count);
 
@@ -1338,6 +1345,8 @@ void Oscilloscope::disableMixedSignalView()
 	}
 
 	m_mixedSignalViewEnabled = false;
+
+	disconnect(showLogicAnalyzerTriggerConnection);
 
 	// disable mixed signal from logic
 	ui->logicSettingsLayout->removeWidget(m_mixedSignalViewMenu[0]);
@@ -2076,6 +2085,13 @@ void Oscilloscope::create_add_channel_panel()
 
 	tabWidget->addTab(logic, tr("Logic"));
 
+	connect(ui->mixedSignalBtn, &QPushButton::clicked, [=](){
+		if (!m_mixedSignalViewEnabled) {
+			ui->btnAddMath->click();
+			tabWidget->setCurrentIndex(tabWidget->indexOf(logic));
+		}
+	});
+
 	connect(btnOpenFile, &QPushButton::clicked, this, &Oscilloscope::import);
 
 	connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
@@ -2150,7 +2166,7 @@ void Oscilloscope::create_add_channel_panel()
 
 			logicAnalyzerChannelWidget->menuButton()->setChecked(true);
 
-			enableMixedSignalView();
+			enableMixedSignalView(logicAnalyzerChannelWidget);
 
 			return;
 		}
