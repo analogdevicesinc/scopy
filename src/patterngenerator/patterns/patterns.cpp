@@ -1443,12 +1443,12 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 	memset(buffer, 0xff, (number_of_samples)*sizeof(short));
 
 	short *buf_ptr = buffer;
+	short *buf_ptr_end = buffer + number_of_samples;
 	const char *str_ptr = str.c_str();
 	int i;
 
-	for (i=0; i<samples_per_frame/2; i++) { // pad with half a frame
+	for (i=0; i<samples_per_frame/2 && buf_ptr < buf_ptr_end; i++, buf_ptr++) { // pad with half a frame
 		*buf_ptr = 1;
-		buf_ptr++;
 	}
 
 	for (i=0; i<str.length(); i++,str_ptr++) {
@@ -1466,18 +1466,17 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 				frame_to_send = frame_to_send << 1;
 			}
 
-			for (auto k=0; k<samples_per_bit; k++,buf_ptr++) {
+			for (auto k=0; k<samples_per_bit && buf_ptr < buf_ptr_end; k++,buf_ptr++) {
 				*buf_ptr =  bit_to_send;// set bit here
 			}
 		}
 	}
 
-	for (i=0; i<samples_per_frame/2; i++) { // pad with half a frame
+	for (i=0; i<samples_per_frame/2 && buf_ptr < buf_ptr_end; i++, buf_ptr++) { // pad with half a frame
 		*buf_ptr = 1;
-		buf_ptr++;
 	}
 
-	for (; buf_ptr!=(short *)(buffer+number_of_samples); buf_ptr++) {
+	for (; buf_ptr!=(short *)(buffer+number_of_samples) && buf_ptr < buf_ptr_end; buf_ptr++) {
 		*buf_ptr = 1;
 	}
 
@@ -2126,6 +2125,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 	}
 
 	short *buf_ptr = buffer;
+	short *buf_ptr_end = buffer + number_of_samples;
 
 	auto samples_per_bit = 2 * (sample_rate/clkFrequency);
 	buf_ptr += waitClocks * samples_per_bit;
@@ -2140,7 +2140,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 
 		if(CPHA && start_new_frame)
 		{
-			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+			for (auto i=samples_per_bit/2; i<samples_per_bit && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
 				*buf_ptr = changeBit(*buf_ptr,outputBit,oldbit);
@@ -2157,7 +2157,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 				val = val >> 1;
 			}
 
-			for (auto i=0; i<samples_per_bit/2; i++,buf_ptr++) {
+			for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,CPOL);
 
@@ -2168,7 +2168,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 				}
 			}
 
-			for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+			for (auto i=samples_per_bit/2; i<samples_per_bit && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
 				*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
@@ -2182,7 +2182,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 		if (frameBytesLeft == 0) {
 			if(!CPHA)
 			{
-				for (auto i=samples_per_bit/2; i<samples_per_bit; i++,buf_ptr++) {
+				for (auto i=samples_per_bit/2; i<samples_per_bit && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 					*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
 					*buf_ptr = changeBit(*buf_ptr,clkActiveBit,!CPOL);
 					*buf_ptr = changeBit(*buf_ptr,outputBit,bit);
