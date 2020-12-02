@@ -169,6 +169,10 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	wheelEventGuard->installEventRecursively(this);
 
 	ui->mixedSignalLbl->setVisible(false);
+	ui->btnLogicAnalyzerTriggers->setVisible(false);
+
+	connect(ui->btnLogicAnalyzerTriggers, &QPushButton::clicked,
+		this, &TriggerSettings::showLogicAnalyzerTriggerSettings);
 }
 
 TriggerSettings::~TriggerSettings()
@@ -253,6 +257,7 @@ void TriggerSettings::enableMixedSignalView()
 	ui->extern_en->setDisabled(true);
 	ui->extern_to_en->setDisabled(true);
 	ui->mixedSignalLbl->setVisible(true);
+	ui->btnLogicAnalyzerTriggers->setVisible(true);
 }
 
 void TriggerSettings::disableMixedSignalView()
@@ -260,6 +265,7 @@ void TriggerSettings::disableMixedSignalView()
 	ui->extern_en->setEnabled(true);
 	ui->extern_to_en->setEnabled(true);
 	ui->mixedSignalLbl->setVisible(false);
+	ui->btnLogicAnalyzerTriggers->setVisible(false);
 }
 
 void TriggerSettings::setDcLevelCoupled(double value)

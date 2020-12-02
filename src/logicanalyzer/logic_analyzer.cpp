@@ -742,7 +742,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	tabWidget->addTab(channelEnumerator, "General");
 	tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
-	return {tabWidget};
+	return {tabWidget, channelEnumerator};
 }
 
 void LogicAnalyzer::disableMixedSignalView()

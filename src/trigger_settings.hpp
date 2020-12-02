@@ -84,6 +84,7 @@ namespace adiscope {
 		void levelChanged(double);
 		void analogTriggerEnabled(bool);
 		void triggerModeChanged(int);
+		void showLogicAnalyzerTriggerSettings();
 
 	public Q_SLOTS:
 		void setTriggerDelay(long long);

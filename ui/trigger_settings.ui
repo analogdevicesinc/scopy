@@ -115,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>266</width>
-        <height>887</height>
+        <height>924</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -483,19 +483,6 @@ color: rgba(255,255,255,51);
         </layout>
        </item>
        <item>
-        <widget class="QLabel" name="mixedSignalLbl">
-         <property name="styleSheet">
-          <string notr="true">color: white;</string>
-         </property>
-         <property name="text">
-          <string>This feature is not supported while the Mixed Signal View is enabled!</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
         <layout class="QVBoxLayout" name="verticalLayout_8">
          <property name="spacing">
           <number>15</number>
@@ -559,6 +546,51 @@ color: rgba(255,255,255,51);
             </widget>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="mixedSignalLbl">
+           <property name="styleSheet">
+            <string notr="true">color: white;</string>
+           </property>
+           <property name="text">
+            <string>This feature is not supported while the Mixed Signal View is enabled!</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnLogicAnalyzerTriggers">
+           <property name="styleSheet">
+            <string notr="true">
+QPushButton {
+
+height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}</string>
+           </property>
+           <property name="text">
+            <string>Logic Analyzer trigger settings</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="adiscope::CustomSwitch" name="extern_en">
@@ -937,7 +969,6 @@ color: rgba(255,255,255,51);
       <zorder>verticalSpacer_3</zorder>
       <zorder></zorder>
       <zorder>trigger_logic_controls</zorder>
-      <zorder>mixedSignalLbl</zorder>
      </widget>
     </widget>
    </item>
