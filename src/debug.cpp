@@ -147,7 +147,7 @@ void Debug::scanChannels(const QString& devName)
 void Debug::scanChannelAttributes(QString devName, QString& channel)
 {
 	struct iio_device *device;
-	struct iio_channel *ch;
+	struct iio_channel *ch = nullptr;
 	const char *attr;
 	unsigned int nb_attrs;
 	bool isOutput;
@@ -166,36 +166,37 @@ void Debug::scanChannelAttributes(QString devName, QString& channel)
 		attributeAvailable.clear();
 		filename.clear();
 
-		if (channel != QString("Global")) {
+		const bool isGlobal = (channel == QString("Global"));
+		if (isGlobal) {
+			nb_attrs = iio_device_get_attrs_count(device);
+		} else {
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
-
 			nb_attrs = iio_channel_get_attrs_count(ch);
+		}
 
-			for (unsigned int k = 0; k < nb_attrs; k++) {
+		for (unsigned int k = 0; k < nb_attrs; k++) {
+			if (isGlobal) {
+				attr = iio_device_get_attr(device, k);
+			} else {
 				attr = iio_channel_get_attr(ch, k);
+			}
 
-				if (QString(attr).contains("available", Qt::CaseInsensitive)) {
-					attributeAvailable.append(QString(attr));
+			if (QString(attr).contains("available", Qt::CaseInsensitive)) {
+				std::string tmp_attr = std::string(attr);
+				std::string to_erase = "_available";
+				size_t pos = tmp_attr.find(to_erase);
+				if (pos != std::string::npos) {
+					tmp_attr.erase(pos, to_erase.length());
+				}
+				attributeAvailable.append(QString::fromStdString(tmp_attr));
+			} else {
+				if (isGlobal) {
+					filename << QString(attr);
 				} else {
 					filename << QString(iio_channel_attr_get_filename(ch, attr));
-					attributeList << QString(attr);
 				}
+				attributeList << QString(attr);
 			}
-		} else {
-			nb_attrs = iio_device_get_attrs_count(device);
-
-			for (unsigned int k = 0; k < nb_attrs; k++) {
-				attr = iio_device_get_attr(device, k);
-
-				if (QString(attr).contains("available", Qt::CaseInsensitive)) {
-					attributeAvailable.append(QString(attr));
-				} else {
-					filename << QString(attr);
-					attributeList << QString(attr);
-				}
-
-			}
-
 		}
 	}
 
