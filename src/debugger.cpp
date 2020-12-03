@@ -153,7 +153,7 @@ void Debugger::updateValueWidget(QString attribute)
 	ui->valueStackedWidget->setEnabled(true);
 
 	for (QString t : availableValues) {
-		if (t.contains(attribute.toLatin1(), Qt::CaseInsensitive)) {
+		if (!QString::compare(t, attribute, Qt::CaseInsensitive)) {
 			available = true;
 
 			/*read device, channel and get values to update widget*/
