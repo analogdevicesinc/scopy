@@ -2089,6 +2089,16 @@ void Oscilloscope::create_add_channel_panel()
 		if (!m_mixedSignalViewEnabled) {
 			ui->btnAddMath->click();
 			tabWidget->setCurrentIndex(tabWidget->indexOf(logic));
+		} else {
+			for (int i = 0; i < ui->channelsList->count(); ++i) {
+				ChannelWidget *cw = qobject_cast<ChannelWidget *>(
+							ui->channelsList->itemAt(i)->widget());
+				if (cw && cw->fullName() == "Logic Analyzer") {
+					cw->deleteButton()->click();
+					break;
+				}
+			}
+			ui->mixedSignalBtn->setText("Mixed Signal");
 		}
 	});
 
@@ -2121,6 +2131,7 @@ void Oscilloscope::create_add_channel_panel()
 		if (tabWidget->currentIndex() == 2) {
 
 			qDebug() << "Enable mixed signal view!";
+			ui->mixedSignalBtn->setText("Disable Mixed");
 
 			ChannelWidget *logicAnalyzerChannelWidget = new ChannelWidget(-1, true, false,
 										      QColor(Qt::yellow), this);
