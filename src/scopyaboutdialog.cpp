@@ -4,6 +4,7 @@
 #include <iio.h>
 #include <gnuradio/constants.h>
 #include <QFile>
+#include <utils.h>
 #include <QDebug>
 #include <QDateTime>
 
@@ -18,9 +19,13 @@ ScopyAboutDialog::ScopyAboutDialog(QWidget *parent) :
 	ui->setupUi(this);
 	ui->centeredUnderLogo->setText("Released under GPLv3");
 
+	QString stylesheet = Util::loadStylesheetFromFile(":stylesheets/stylesheets/browserStylesheet.qss");
+	ui->aboutTextBrowser->document()->setDefaultStyleSheet(stylesheet);
+
 	ui->aboutTextBrowser->setWordWrapMode(QTextOption::WordWrap);
 	ui->aboutTextBrowser->setSource(landingPage);
 	ui->checkForUpdatesLbl->setText("");
+
 	connect(ui->backButton,SIGNAL(clicked()),ui->aboutTextBrowser,SLOT(backward()));
 	connect(ui->okButton,SIGNAL(clicked()),this,SLOT(accept()));
 	connect(this,SIGNAL(finished(int)),this,SLOT(dismiss(int)));
