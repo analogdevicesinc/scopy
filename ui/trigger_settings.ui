@@ -115,7 +115,7 @@
         <x>0</x>
         <y>0</y>
         <width>266</width>
-        <height>924</height>
+        <height>914</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -561,38 +561,6 @@ color: rgba(255,255,255,51);
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnLogicAnalyzerTriggers">
-           <property name="styleSheet">
-            <string notr="true">
-QPushButton {
-
-height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}</string>
-           </property>
-           <property name="text">
-            <string>Logic Analyzer trigger settings</string>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="adiscope::CustomSwitch" name="extern_en">
            <property name="text">
             <string/>
@@ -620,6 +588,38 @@ QPushButton:hover {
             <property name="bottomMargin">
              <number>0</number>
             </property>
+            <item>
+             <widget class="QPushButton" name="btnLogicAnalyzerTriggers">
+              <property name="styleSheet">
+               <string notr="true">
+QPushButton {
+
+height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+}
+
+QPushButton:pressed {
+  background-color: #2a44df;
+}
+
+QPushButton:hover {
+	background-color: #4a34ff;
+}</string>
+              </property>
+              <property name="text">
+               <string>Logic Analyzer trigger settings</string>
+              </property>
+             </widget>
+            </item>
             <item>
              <widget class="QLabel" name="label_6">
               <property name="styleSheet">
