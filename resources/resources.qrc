@@ -146,5 +146,6 @@
         <file>stylesheets/bigCustomSwitch.qss</file>
         <file>stylesheets/toolMenuItem.qss</file>
         <file>stylesheets/stopButton.qss</file>
+        <file>stylesheets/browserStylesheet.qss</file>
     </qresource>
 </RCC>

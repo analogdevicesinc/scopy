@@ -124,11 +124,11 @@ void Util::setWidgetNrOfChars(QWidget *w,
 	}
 }
 
-void Util::loadStylesheetFromFile(QString path, QWidget *widget)
+QString Util::loadStylesheetFromFile(QString path)
 {
 	QFile file(path);
 	file.open(QFile::ReadOnly);
 	QString stylesheet = QString::fromLatin1(file.readAll());
-	widget->setStyleSheet(stylesheet);
+	return stylesheet;
 }
 

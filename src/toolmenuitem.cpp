@@ -44,8 +44,8 @@ ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent):
 	_buildUI();
 
 	// Load stylesheets
-	Util::loadStylesheetFromFile(":stylesheets/stylesheets/toolMenuItem.qss", this);
-	Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss", d_toolStopBtn);
+	this->setStyleSheet(Util::loadStylesheetFromFile(":stylesheets/stylesheets/toolMenuItem.qss"));
+	d_toolStopBtn->setStyleSheet(Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss"));
 
 	setDynamicProperty(this, "allowHover", true);
 
