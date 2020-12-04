@@ -131,6 +131,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	connect(ui->btnNotes, &QPushButton::clicked, [=](){
 		swapMenu(static_cast<QWidget*>(notesPanel));
 	});
+	about = new ScopyAboutDialog(this);
 	connect(ui->btnAbout, &QPushButton::clicked, [=](){
 		if(!about)
 			about = new ScopyAboutDialog(this);
@@ -234,6 +235,11 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		msgBox->activateWindow();
 		connect(msgBox->button(QMessageBox::Yes), &QAbstractButton::pressed, [&] () { prefPanel->setAutomatical_version_checking_enabled(true); });
 	}
+	connect(about, &ScopyAboutDialog::forceCheckForUpdates,[=](){
+		m_phoneHome->versionsRequest(true);
+	});
+	connect(m_phoneHome, SIGNAL(checkUpdatesFinished(qint64)), about, SLOT(updateCheckUpdateLabel(qint64)));
+
 
 	setupHomepage();
 	ui->stackedWidget->setCurrentIndex(0);
@@ -268,7 +274,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		addContext(each);
 
 	if (prefPanel->getAutomatical_version_checking_enabled()) {
-		m_phoneHome->setPreferences(prefPanel);
 		m_phoneHome->versionsRequest();
 	}
 
@@ -840,15 +845,14 @@ void ToolLauncher::setupHomepage()
 
 	QWidget *homepage = new QWidget(ui->stackedWidget);
 	QVBoxLayout *layout = new QVBoxLayout(homepage);
+	QLabel* versionLabel = new QLabel();
 
 	connect(m_phoneHome, &PhoneHome::scopyVersionChanged, this, [=] () {
-		QLabel* versionLabel = new QLabel();
-
 		if (m_phoneHome->getScopyVersion().isEmpty()) {
-			versionLabel->setStyleSheet("{ color : white; }");
-			versionLabel->setText("Unable to check for latest Scopy version!");
+			/*versionLabel->setStyleSheet("{ color : white; }");
+			versionLabel->setText("Unable to check for latest Scopy version!");*/
 		} else if (m_phoneHome->getScopyVersion() != QString("v" + QString(PROJECT_VERSION))) {
-			versionLabel->setText("There is a new scopy version! Version " + m_phoneHome->getScopyVersion() + " is out! " +
+			versionLabel->setText("There is a new Scopy version! Version " + m_phoneHome->getScopyVersion() + " is out! " +
 								  "<a style=\"color:white\" href=\"" + m_phoneHome->getScopyLink() +
 								  "\">CLICK TO UPDATE </a>");
 			versionLabel->setTextFormat(Qt::RichText);
@@ -856,11 +860,9 @@ void ToolLauncher::setupHomepage()
 			versionLabel->setOpenExternalLinks(true);
 		} else {
 			versionLabel->setStyleSheet("{ color : white; }");
-			versionLabel->setText("Scopy is up to date! Current version: " + m_phoneHome->getScopyVersion());
+			versionLabel->setText("Scopy is up to date!" + m_phoneHome->getScopyVersion());
 		}
-
-		layout->addWidget(versionLabel);
-		versionLabel->raise();
+		versionLabel->setVisible(true);
 	});
 
 	welcome = new QTextBrowser(homepage);
@@ -920,6 +922,10 @@ void ToolLauncher::setupHomepage()
 	// Index page
 	index = new QTextBrowser(ui->stackedWidget);
 	index->setFrameShape(QFrame::NoFrame);
+
+	layout->addWidget(versionLabel);
+	versionLabel->raise();
+	versionLabel->setVisible(false);
 
 	if (indexFile == "") {
 		return;

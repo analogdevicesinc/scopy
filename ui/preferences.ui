@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1082</width>
-    <height>777</height>
+    <height>790</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,24 @@ QCheckBox::indicator {
   border-radius: 4px;
 }
 QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+
+QPushButton
+{
+  color:#ffffff;
+  height: 30px;
+  border-radius: 4px;
+  background-color: #4a64ff;
+  font-size: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+}
+
+QPushButton:hover
+{
+         background-color: #4a34ff;
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -1870,39 +1887,44 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
          <widget class="QPushButton" name="resetBtn">
           <property name="minimumSize">
            <size>
-            <width>100</width>
+            <width>150</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>100</width>
+            <width>150</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton
-{
-  color:#ffffff;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
-}
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
-}</string>
           </property>
           <property name="text">
            <string>Reset Scopy</string>
           </property>
           <property name="flat">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_32">
+        <property name="leftMargin">
+         <number>40</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>40</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="checkUpdateDateLbl">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
