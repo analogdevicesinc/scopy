@@ -5,6 +5,7 @@
 #include <gnuradio/constants.h>
 #include <QFile>
 #include <QDebug>
+#include <QDateTime>
 
 using namespace adiscope;
 
@@ -19,9 +20,13 @@ ScopyAboutDialog::ScopyAboutDialog(QWidget *parent) :
 
 	ui->aboutTextBrowser->setWordWrapMode(QTextOption::WordWrap);
 	ui->aboutTextBrowser->setSource(landingPage);
+	ui->checkForUpdatesLbl->setText("");
 	connect(ui->backButton,SIGNAL(clicked()),ui->aboutTextBrowser,SLOT(backward()));
 	connect(ui->okButton,SIGNAL(clicked()),this,SLOT(accept()));
 	connect(this,SIGNAL(finished(int)),this,SLOT(dismiss(int)));
+	connect(ui->checkForUpdatesBtn, &QPushButton::clicked, [=](int state) {
+		Q_EMIT forceCheckForUpdates();
+	});
 }
 
 void ScopyAboutDialog::dismiss(int)
@@ -33,4 +38,12 @@ void ScopyAboutDialog::dismiss(int)
 ScopyAboutDialog::~ScopyAboutDialog()
 {
 	delete ui;
+}
+
+void ScopyAboutDialog::updateCheckUpdateLabel(qint64 timestamp)
+{
+	if(timestamp)
+		ui->checkForUpdatesLbl->setText("Last checked for updates at " + QDateTime::fromMSecsSinceEpoch(timestamp).toString("dddd d MMMM yyyy hh:mm:ss"));
+	else
+		ui->checkForUpdatesLbl->setText("Check updates failed");
 }

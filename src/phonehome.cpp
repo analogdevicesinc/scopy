@@ -23,13 +23,13 @@ void PhoneHome::setPreferences(Preferences* preferences)
 	PhoneHome::preferences = preferences;
 }
 
-void PhoneHome::versionsRequest()
+void PhoneHome::versionsRequest(bool force)
 {
 	qint64 timeout = 24 * 60 * 60 * 1000; // 24 hours
 	//qint64 timeout = 5 * 1000;  // 5 seconds
 	qint64 now = QDateTime::currentMSecsSinceEpoch();
 
-	if(m_timestamp +  timeout < now )
+	if(m_timestamp +  timeout < now  || force)
 	{
 		// from swdownloads
 		QNetworkAccessManager* manager = new QNetworkAccessManager();
@@ -46,6 +46,7 @@ void PhoneHome::versionsRequest()
 			QJsonDocument doc = QJsonDocument::fromJson(m_versionsJson.toUtf8());
 			extractVersionStringsFromJson(doc);
 		}
+		Q_EMIT(checkUpdatesFinished(m_timestamp));
 	}
 }
 
@@ -69,9 +70,11 @@ void PhoneHome::onVersionsRequestFinished(QNetworkReply* reply)
 		extractVersionStringsFromJson(doc);
 		m_versionsJson = QString(data.trimmed());
 		m_timestamp = QDateTime::currentMSecsSinceEpoch();
+		Q_EMIT checkUpdatesFinished(m_timestamp);
 
 	} else {
 		qDebug() << "Wasn't able to access versions database!\n";
+		Q_EMIT checkUpdatesFinished(0);
 	}
 }
 

@@ -30,7 +30,7 @@ private:
 public:
 	PhoneHome(QSettings *settings, Preferences *preferences);
 	~PhoneHome();
-	void versionsRequest();
+	void versionsRequest(bool force = false);
 	void extractVersionStringsFromJson(QJsonDocument doc);
 	QString getScopyVersion() { return m_scopyVersion; }
 	QString getM2kVersion() { return m_m2kVersion; }
@@ -45,6 +45,7 @@ public:
 Q_SIGNALS:
 	void scopyVersionChanged();
 	void m2kVersionChanged();
+	void checkUpdatesFinished(qint64);
 
 public Q_SLOTS:
 	void onVersionsRequestFinished(QNetworkReply*);
