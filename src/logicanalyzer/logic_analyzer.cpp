@@ -1519,6 +1519,7 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_plot.setSampleRatelabelValue(m_sampleRate);
 		m_plot.setBufferSizeLabelValue(m_bufferSize);
+		m_plot.setTimeBaseLabelValue(m_bufferSize / m_sampleRate / m_plot.xAxisNumDiv());
 
 		m_stopRequested = false;
 

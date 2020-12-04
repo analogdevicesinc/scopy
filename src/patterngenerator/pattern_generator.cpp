@@ -758,6 +758,9 @@ void PatternGenerator::generateBuffer()
 
 	m_plot.setSampleRatelabelValue(m_sampleRate);
 	m_plot.setBufferSizeLabelValue(m_bufferSize);
+	m_plot.setTimeBaseLabelValue(static_cast<double>(m_bufferSize) /
+				     static_cast<double>(m_sampleRate) /
+				     m_plot.xAxisNumDiv());
 
 	if (m_buffer) {
 		delete[] m_buffer;
