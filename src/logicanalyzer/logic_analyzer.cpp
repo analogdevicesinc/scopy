@@ -1641,6 +1641,7 @@ void LogicAnalyzer::startStop(bool start)
 				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
+					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
 			} while (totalSamples);
 
