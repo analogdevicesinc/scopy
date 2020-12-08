@@ -535,7 +535,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>3</number>
+                <number>2</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -582,8 +582,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>272</height>
+                      <width>310</width>
+                      <height>469</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -636,6 +636,13 @@ font-weight: normal;
                        </property>
                        <property name="text">
                         <string>Channel Settings</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QLabel" name="hardwareName">
+                       <property name="text">
+                        <string/>
                        </property>
                       </widget>
                      </item>
@@ -1470,8 +1477,8 @@ font-weight: normal;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>315</width>
-                      <height>469</height>
+                      <width>300</width>
+                      <height>258</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -2117,6 +2124,11 @@ color: rgba(255, 255, 255, 153);
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2138,11 +2150,6 @@ color: rgba(255, 255, 255, 153);
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
