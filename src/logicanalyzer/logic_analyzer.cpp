@@ -139,7 +139,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	// TODO: get number of channels from libm2k;
 
 	for (uint8_t i = 0; i < m_nbChannels; ++i) {
-		QCheckBox *channelBox = new QCheckBox("Dio " + QString::number(i));
+		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 
 		QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
 
