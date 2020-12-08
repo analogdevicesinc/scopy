@@ -170,7 +170,9 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 	displayedData += QPointF(fromSampleToTime(m_endSample - 1), (!edges.back().second) * heightInPoints + m_pixelOffset);
     }
 
-    displayedData += QPointF(plot()->axisInterval(QwtAxis::xBottom).maxValue(), displayedData.back().y());
+    if (edges.back().first + 1 == m_endSample - 1) {
+	    displayedData += QPointF(plot()->axisInterval(QwtAxis::xBottom).maxValue(), displayedData.back().y());
+    }
 
     painter->save();
     painter->setPen(QColor(74, 100, 255)); //4a64ff
@@ -230,26 +232,14 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
     double dist = xMap.transform(fromSampleToTime(1)) - xMap.transform(fromSampleToTime(0));
 
     QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
-//    qDebug() << "from plot, left: " << interval.minValue() << " right: " << interval.maxValue();
     uint64_t firstEdge = edgeAtX(fromTimeToSample(interval.minValue()), m_edges);
     uint64_t lastEdge = edgeAtX(fromTimeToSample(interval.maxValue()), m_edges);
-
-//    qDebug() << "First edge is: " << firstEdge;
-//    qDebug() << "Last edge is: " << lastEdge;
-
-//    qDebug() << "first edge: " << firstEdge;
-//    qDebug() << "last edge: " << lastEdge;
-
-    if (m_edges.size() == 0) {
-//	    qDebug() << "first edge: " << firstEdge << " last edge: " << lastEdge;
-    }
 
     if (firstEdge > 0) {
         firstEdge--;
     }
 
     if (lastEdge < m_edges.size() - 1) {
-//	    qDebug() << "lastEdge: " << lastEdge << " < " << "m_edges.size() - 1: " << m_edges.size() - 1;
         lastEdge++;
     }
 
@@ -304,12 +294,10 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
             // between the blocks and we want to make sure we display the correct logic level
             if (std::abs(a1 - a2) > pointsPerPixel) {
                 edges.emplace_back(m_edges[std::distance(m_edges.begin(), previous)]);
-//                qDebug() << "gap emplace!!!!!!!";
             } else {
                 const int64_t currentSample = (*next).first;
                 if ((*next).second == lastTransition) {
                     edges.emplace_back((lastSample + currentSample) / 2, !lastTransition);
-//                    qDebug() << "HACK!!!!!!";
                 }
             }
 
