@@ -139,7 +139,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	// TODO: get number of channels from libm2k;
 
 	for (uint8_t i = 0; i < m_nbChannels; ++i) {
-		QCheckBox *channelBox = new QCheckBox(QString::number(i));
+		QCheckBox *channelBox = new QCheckBox("Dio " + QString::number(i));
 
 		QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
 
@@ -317,6 +317,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	QTabWidget *tabWidget = new QTabWidget();
 	tabWidget->setMovable(true);
 
+	QScrollArea *generalScrollArea = new QScrollArea();
+	generalScrollArea->setWidgetResizable(true);
+	generalScrollArea->setMinimumSize(220, 300);
+	generalScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	generalScrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
 	QWidget *channelEnumerator = new QWidget();
 	QVBoxLayout *layout = new QVBoxLayout();
 	QGridLayout *chEnumeratorLayout = new QGridLayout();
@@ -345,6 +351,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		});
 
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
+		curve->setName("DIO " + QString::number(i));
 
 		QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
 
@@ -648,8 +655,80 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	stackDecoderLayout->insertSpacerItem(0, new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding));
 	stackDecoderLayout->insertWidget(1, stackDecoderComboBox);
 
-	currentChannelMenuLayout->insertItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	/* Setup external trigger menu */
+	QWidget *externalTrigger = new QWidget(currentChannelMenu);
+	QVBoxLayout *externalTriggerLayout = new QVBoxLayout(externalTrigger);
+	externalTriggerLayout->setContentsMargins(0, 0, 0, 0);
+	externalTrigger->setLayout(externalTriggerLayout);
 
+	QHBoxLayout *externalSubTitle = new QHBoxLayout();
+	auto label = new QLabel("EXTERNAL TRIGGER ");
+	label->setStyleSheet("QLabel {"
+			     "font-size: 12px;"
+			   "color: rgba(255, 255, 255, 70);"
+			   "font-weight: normal;"
+			   "}");
+	externalSubTitle->addWidget(label);
+	externalSubTitle->setContentsMargins(0, 0, 0, 0);
+	externalSubTitle->setSpacing(0);
+
+	QFrame *line = new QFrame(externalTrigger);
+	line->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	line->setMaximumSize(QSize(16777215, 1));
+	line->setStyleSheet(QString::fromUtf8("border: 1px solid rgba(255, 255, 255, 70);"));
+	line->setFrameShape(QFrame::HLine);
+	line->setFrameShadow(QFrame::Sunken);
+
+	externalSubTitle->addWidget(line);
+
+	externalTriggerLayout->addLayout(externalSubTitle);
+
+	QGridLayout *externalGridLayout = new QGridLayout();
+	auto externalOnOff = new adiscope::CustomSwitch();
+	externalGridLayout->addWidget(externalOnOff, 0, 0);
+	auto labelCondition = new QLabel("Condition");
+	externalGridLayout->addWidget(labelCondition, 1, 0);
+
+	QFile file(":stylesheets/stylesheets/customSwitch.qss");
+	file.open(QFile::ReadOnly);
+	QString styleSheet = QString::fromLatin1(file.readAll());
+	externalOnOff->setStyleSheet(styleSheet);
+
+	auto comboBoxCondition = new QComboBox();
+	externalGridLayout->addWidget(comboBoxCondition, 1, 1);
+
+	comboBoxCondition->setDisabled(true);
+
+	connect(externalOnOff, &CustomSwitch::toggled, [=](bool on){
+		if (on) {
+			comboBoxCondition->setEnabled(true);
+			m_m2kDigital->getTrigger()->setDigitalSource(SRC_TRIGGER_IN);
+			const int condition = comboBoxCondition->currentIndex();
+			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+		} else {
+			comboBoxCondition->setDisabled(true);
+			m_m2kDigital->getTrigger()->setDigitalSource(SRC_NONE);
+			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(0));
+		}
+	});
+	comboBoxCondition->addItem("-");
+	for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
+		comboBoxCondition->addItem(ui->triggerComboBox->itemIcon(i),
+				    ui->triggerComboBox->itemText(i));
+	}
+
+	connect(comboBoxCondition, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+	});
+
+	externalTriggerLayout->addLayout(externalGridLayout);
+
+	layout->addWidget(externalTrigger);
+
+	currentChannelMenuLayout->insertItem(-1, new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	tabWidget->addTab(channelEnumerator, "General");
 	const int channelMenuTabId = tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
@@ -738,11 +817,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	});
 
 	currentChannelMenuScrollArea->setWidget(currentChannelMenu);
+	generalScrollArea->setWidget(channelEnumerator);
 
-	tabWidget->addTab(channelEnumerator, "General");
+	tabWidget->addTab(generalScrollArea, "General");
 	tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
-	return {tabWidget, channelEnumerator};
+	return {tabWidget, generalScrollArea};
 }
 
 void LogicAnalyzer::disableMixedSignalView()
@@ -1004,6 +1084,13 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		qDebug() << "Selected channel: " << chIdx;
 
 		m_selectedChannel = chIdx;
+
+		if (m_selectedChannel < m_nbChannels) {
+			ui->hardwareName->setText("Dio " + QString::number(m_selectedChannel));
+		} else {
+			ui->hardwareName->setText("");
+		}
+
 		ui->nameLineEdit->setEnabled(true);
 		ui->nameLineEdit->setText(m_plotCurves[m_selectedChannel]->getName());
 		ui->traceHeightLineEdit->setEnabled(true);
@@ -1046,6 +1133,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		}
 	} else if (m_selectedChannel == chIdx && !selected) {
 		m_selectedChannel = -1;
+		ui->hardwareName->setText("");
 		ui->nameLineEdit->setDisabled(true);
 		ui->nameLineEdit->setText("");
 		ui->traceHeightLineEdit->setDisabled(true);
@@ -1278,18 +1366,6 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
-		if (m_selectedChannel < m_nbChannels) {
-			QLayout *widgetInLayout = ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8,
-								    m_selectedChannel / 8)->layout();
-			auto channelBox = dynamic_cast<QCheckBox *>(widgetInLayout->itemAt(0)->widget());
-			channelBox->setText(text);
-		} else {
-			const int selectedDecoder = m_selectedChannel - m_nbChannels;
-			QLayout *widgetInLayout = ui->decoderEnumeratorLayout->itemAtPosition(selectedDecoder / 2,
-								    selectedDecoder % 2)->widget()->layout();
-			auto decoderBox = dynamic_cast<QCheckBox *>(widgetInLayout->itemAt(0)->widget());
-			decoderBox->setText(text);
-		}
 	});
 
 	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
