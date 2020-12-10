@@ -133,6 +133,7 @@ public:
 	bool getFirst_application_run() const;
 	void setFirst_application_run(bool value);
 
+	void requestRestart();
 Q_SIGNALS:
 
 	void notify();
