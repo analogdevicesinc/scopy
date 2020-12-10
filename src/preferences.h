@@ -137,6 +137,7 @@ Q_SIGNALS:
 
 	void notify();
 	void reset();
+	void requestUpdateCheck();
 
 public Q_SLOTS:
 	
