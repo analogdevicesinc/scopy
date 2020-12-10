@@ -225,7 +225,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 
 	m_phoneHome = new PhoneHome(settings, prefPanel);
 	if (prefPanel->getFirst_application_run()) {
-		prefPanel->setFirst_application_run(false);
 		QMessageBox* msgBox = new QMessageBox(this);
 		msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
 		msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
@@ -233,7 +232,13 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		msgBox->setModal(false);
 		msgBox->show();
 		msgBox->activateWindow();
-		connect(msgBox->button(QMessageBox::Yes), &QAbstractButton::pressed, [&] () { prefPanel->setAutomatical_version_checking_enabled(true); });
+		connect(msgBox->button(QMessageBox::Yes), &QAbstractButton::pressed, [&] () {
+			prefPanel->setAutomatical_version_checking_enabled(true);
+			prefPanel->setFirst_application_run(false);
+		});
+		connect(msgBox->button(QMessageBox::No), &QAbstractButton::pressed, [&] () {
+			prefPanel->setFirst_application_run(false);
+		});
 	}
 	connect(about, &ScopyAboutDialog::forceCheckForUpdates,[=](){
 		m_phoneHome->versionsRequest(true);
