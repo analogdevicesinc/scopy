@@ -182,6 +182,7 @@ Preferences::Preferences(QWidget *parent) :
 	});
 	connect(ui->autoUpdatesCheckBox, &QCheckBox::stateChanged, [=](int state) {
 		automatical_version_checking_enabled = (!state ? false : true);
+		ui->label_restart->setVisible(true);
 		Q_EMIT notify();
 	});
 
