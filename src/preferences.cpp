@@ -30,6 +30,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <scopyApplication.hpp>
+#include <QProcess>
 
 
 using namespace adiscope;
@@ -184,7 +185,7 @@ Preferences::Preferences(QWidget *parent) :
 		automatical_version_checking_enabled = (!state ? false : true);
 		if(automatical_version_checking_enabled) {
 			Q_EMIT requestUpdateCheck();
-		ui->label_restart->setVisible(true);
+		}
 		Q_EMIT notify();
 	});
 
@@ -204,7 +205,6 @@ Preferences::Preferences(QWidget *parent) :
 	pref_api->setObjectName(QString("Preferences"));
 	pref_api->load(settings);
 
-	ui->label_restart->setVisible(false);
 	//////////////////////
 	// TEMPORARY UNTIL ACTUAL IMPLEMENTATION
 	ui->tempLutCalibCheckbox->setVisible(false);
@@ -222,7 +222,7 @@ Preferences::Preferences(QWidget *parent) :
 				ui->languageCombo->addItem(language);
 				ui->languageCombo->setCurrentText(language);
 				if (m_initialized) {
-					ui->label_restart->setVisible(true);
+					requestRestart();
 				}
 			} else {
 				if(!getLanguageList().contains(language)){
@@ -230,12 +230,11 @@ Preferences::Preferences(QWidget *parent) :
 					language = info.fileName().remove(".qm");
 				}
 				ui->languageCombo->setCurrentText(language);
-				ui->label_restart->setVisible(false);
 			}
 		} else {
 			language = lang;
 			if (m_initialized) {
-				ui->label_restart->setVisible(true);
+				requestRestart();
 			}
 
 			Q_EMIT notify();
@@ -246,6 +245,25 @@ Preferences::Preferences(QWidget *parent) :
 		m_displaySamplingPoints = (!state ? false : true);
 		Q_EMIT notify();
 	});
+}
+
+void Preferences::requestRestart()
+{
+	QMessageBox msgBox;
+	msgBox.setText(tr("An application restart is required for these settings to take effect .. "));
+	msgBox.setInformativeText(tr("Do you want to restart now ?"));
+	msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+	auto buttonOk = msgBox.button(QMessageBox::Ok);
+	auto buttonCancel = msgBox.button(QMessageBox::Cancel);
+	buttonOk->setText("Now");
+	buttonCancel->setText("Later");
+	int ret = msgBox.exec();
+
+	if (ret == QMessageBox::Ok) {
+		// restart:
+		qApp->quit();
+		QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+	}
 }
 
 QStringList Preferences::getOptionsList()

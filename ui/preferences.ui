@@ -1736,16 +1736,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                 </item>
                </layout>
               </item>
-              <item>
-               <widget class="QLabel" name="label_restart">
-                <property name="styleSheet">
-                 <string notr="true">color:red</string>
-                </property>
-                <property name="text">
-                 <string>Restart the application for changes to take effect </string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
