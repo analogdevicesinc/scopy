@@ -240,6 +240,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 			prefPanel->setFirst_application_run(false);
 		});
 	}
+	connect(prefPanel, &Preferences::requestUpdateCheck, [=]() { m_phoneHome->versionsRequest(true);});
 	connect(about, &ScopyAboutDialog::forceCheckForUpdates,[=](){
 		m_phoneHome->versionsRequest(true);
 	});
