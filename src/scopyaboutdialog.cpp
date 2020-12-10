@@ -30,6 +30,7 @@ ScopyAboutDialog::ScopyAboutDialog(QWidget *parent) :
 	connect(ui->okButton,SIGNAL(clicked()),this,SLOT(accept()));
 	connect(this,SIGNAL(finished(int)),this,SLOT(dismiss(int)));
 	connect(ui->checkForUpdatesBtn, &QPushButton::clicked, [=](int state) {
+		ui->checkForUpdatesLbl->setText(tr("Checking server for updates ... "));
 		Q_EMIT forceCheckForUpdates();
 	});
 }
@@ -48,8 +49,8 @@ ScopyAboutDialog::~ScopyAboutDialog()
 void ScopyAboutDialog::updateCheckUpdateLabel(qint64 timestamp)
 {
 	if(timestamp) {
-		ui->checkForUpdatesLbl->setText("Last checked for updates at " + QDateTime::fromMSecsSinceEpoch(timestamp).toString("dddd d MMMM yyyy hh:mm:ss"));
+		ui->checkForUpdatesLbl->setText(tr("Last checked for updates at ") + QDateTime::fromMSecsSinceEpoch(timestamp).toString("dddd d MMMM yyyy hh:mm:ss"));
 	} else {
-		ui->checkForUpdatesLbl->setText("Check updates failed");
+		ui->checkForUpdatesLbl->setText(tr("Check for updates failed ... "));
 	}
 }

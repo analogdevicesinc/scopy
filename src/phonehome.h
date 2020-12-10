@@ -64,6 +64,7 @@ public:
 	void setVersionsJson(const QString &val);
 
 Q_SIGNALS:
+	void scopyVersionCheckRequested();
 	void scopyVersionChanged();
 	void m2kVersionChanged();
 	void checkUpdatesFinished(qint64);

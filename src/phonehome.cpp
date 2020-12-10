@@ -55,6 +55,7 @@ void PhoneHome::versionsRequest(bool force)
 		connect(manager, &QNetworkAccessManager::finished, manager, &QNetworkAccessManager::deleteLater);
 
 		manager->get(QNetworkRequest(QUrl(preferences->getCheck_updates_url())));
+		Q_EMIT scopyVersionCheckRequested();
 	} else {
 		// from cache
 		if(!m_versionsJson.isEmpty())
@@ -62,7 +63,7 @@ void PhoneHome::versionsRequest(bool force)
 			const QJsonDocument doc = QJsonDocument::fromJson(m_versionsJson.toUtf8());
 			extractVersionStringsFromJson(doc);
 		}
-		Q_EMIT(checkUpdatesFinished(m_timestamp));
+		Q_EMIT checkUpdatesFinished(m_timestamp);
 	}
 }
 
