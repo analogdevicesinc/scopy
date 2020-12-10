@@ -25,8 +25,6 @@
 
 using namespace adiscope;
 
-PHONEHOME_H
-
 PhoneHome::PhoneHome(QSettings *settings, Preferences *pref) :
 	ApiObject(), m_timestamp(0), m_versionsJson(""),
 	preferences(pref), settings(settings)
@@ -46,32 +44,29 @@ void PhoneHome::setPreferences(Preferences* preferences)
 
 void PhoneHome::versionsRequest(bool force)
 {
-	qint64 timeout = 24 * 60 * 60 * 1000; // 24 hours
-	//qint64 timeout = 5 * 1000;  // 5 seconds
-	qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	const qint64 timeout = 24 * 60 * 60 * 1000; // 24 hours
+	//qint64 timeout = 5 * 1000;  // 5 seconds for testing
 
-	if(m_timestamp +  timeout < now  || force)
-	{
+	if(m_timestamp +  timeout < now  || force) {
 		// from swdownloads
-		QNetworkAccessManager* manager = new QNetworkAccessManager();
+		QNetworkAccessManager* manager = new QNetworkAccessManager(this);
 		connect(manager, &QNetworkAccessManager::finished, this, &PhoneHome::onVersionsRequestFinished);
 		connect(manager, &QNetworkAccessManager::finished, manager, &QNetworkAccessManager::deleteLater);
 
 		manager->get(QNetworkRequest(QUrl(preferences->getCheck_updates_url())));
-	}
-	else
-	{
+	} else {
 		// from cache
 		if(!m_versionsJson.isEmpty())
 		{
-			QJsonDocument doc = QJsonDocument::fromJson(m_versionsJson.toUtf8());
+			const QJsonDocument doc = QJsonDocument::fromJson(m_versionsJson.toUtf8());
 			extractVersionStringsFromJson(doc);
 		}
 		Q_EMIT(checkUpdatesFinished(m_timestamp));
 	}
 }
 
-void PhoneHome::extractVersionStringsFromJson(QJsonDocument doc)
+void PhoneHome::extractVersionStringsFromJson(const QJsonDocument &doc)
 {
 	auto content = doc.object().toVariantMap();
 	m_scopyVersion = content["scopy"].toMap()["version"].toString();
@@ -84,10 +79,10 @@ void PhoneHome::extractVersionStringsFromJson(QJsonDocument doc)
 
 void PhoneHome::onVersionsRequestFinished(QNetworkReply* reply)
 {
-	auto err = reply->error();
+	const auto err = reply->error();
 	if (err == QNetworkReply::NoError) {
-		auto data = reply->readAll().trimmed();
-		auto doc = QJsonDocument::fromJson(data);
+		const auto data = reply->readAll().trimmed();
+		const auto doc = QJsonDocument::fromJson(data);
 		extractVersionStringsFromJson(doc);
 		m_versionsJson = QString(data.trimmed());
 		m_timestamp = QDateTime::currentMSecsSinceEpoch();
@@ -111,7 +106,7 @@ QString PhoneHome::getVersionsJson() const
 {
 	return m_versionsJson;
 }
-void PhoneHome::setVersionsJson(QString val)
+void PhoneHome::setVersionsJson(const QString &val)
 {
 	m_versionsJson = val;
 

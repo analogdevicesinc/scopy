@@ -52,7 +52,7 @@ public:
 	PhoneHome(QSettings *settings, Preferences *preferences);
 	~PhoneHome();
 	void versionsRequest(bool force = false);
-	void extractVersionStringsFromJson(QJsonDocument doc);
+	void extractVersionStringsFromJson(const QJsonDocument &doc);
 	QString getScopyVersion() { return m_scopyVersion; }
 	QString getM2kVersion() { return m_m2kVersion; }
 	QString getScopyLink() { return m_scopyLink; }
@@ -61,7 +61,7 @@ public:
 	QString getTimestamp() const;
 	void setTimestamp(QString);
 	QString getVersionsJson() const;
-	void setVersionsJson(QString);
+	void setVersionsJson(const QString &val);
 
 Q_SIGNALS:
 	void scopyVersionChanged();

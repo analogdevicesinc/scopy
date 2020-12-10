@@ -124,7 +124,7 @@ void Util::setWidgetNrOfChars(QWidget *w,
 	}
 }
 
-QString Util::loadStylesheetFromFile(QString path)
+QString Util::loadStylesheetFromFile(const QString &path)
 {
 	QFile file(path);
 	file.open(QFile::ReadOnly);

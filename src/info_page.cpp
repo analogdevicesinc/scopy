@@ -64,11 +64,11 @@ InfoPage::InfoPage(QString uri, Preferences *pref, PhoneHome* phoneHome,
 	connect(m_blink_timer, SIGNAL(timeout()),
 		this, SLOT(blinkTimeout()));
 	connect(m_phoneHome, &PhoneHome::m2kVersionChanged, this, [=] {
-		int checked = dynamic_cast<M2kInfoPage*>(this)->checkLatestFwVersion(m_info_params.value("Firmware version"));
+		const int checked = dynamic_cast<M2kInfoPage*>(this)->checkLatestFwVersion(m_info_params.value("Firmware version"));
 		if (checked == 1) {
 			ui->lblFirmware->setText("Firmware is up to date!");
 		} else if (checked == 0) {
-			QString message = "Your firmware is outdated. "
+			const QString message = "Your firmware is outdated. "
 							  "Version " + m_phoneHome->getM2kVersion() + " was released. "
 							  "<a style=\"color:white\" href=\"";
 			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\">CLICK TO UPDATE </a>");
@@ -500,12 +500,12 @@ void M2kInfoPage::blinkTimeout()
 				    !oldVal);
 }
 
-int M2kInfoPage::checkLatestFwVersion(QString currentVersion) const {
+int M2kInfoPage::checkLatestFwVersion(const QString &currentVersion) const {
 	if (m_phoneHome->getM2kVersion().isEmpty()) {
 		return -1;
 	}
 
-	if (m_phoneHome->getM2kVersion() == QString(currentVersion)) {
+	if (m_phoneHome->getM2kVersion() == currentVersion) {
 		return 1;
 	}
 
