@@ -47,8 +47,9 @@ ScopyAboutDialog::~ScopyAboutDialog()
 
 void ScopyAboutDialog::updateCheckUpdateLabel(qint64 timestamp)
 {
-	if(timestamp)
+	if(timestamp) {
 		ui->checkForUpdatesLbl->setText("Last checked for updates at " + QDateTime::fromMSecsSinceEpoch(timestamp).toString("dddd d MMMM yyyy hh:mm:ss"));
-	else
+	} else {
 		ui->checkForUpdatesLbl->setText("Check updates failed");
+	}
 }

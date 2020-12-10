@@ -122,7 +122,7 @@ public:
 				 QWidget *parent = 0);
 	~M2kInfoPage();
 	void getDeviceInfo();
-	int checkLatestFwVersion(QString currentVersion) const;
+	int checkLatestFwVersion(const QString &currentVersion) const;
 
 
 protected:
