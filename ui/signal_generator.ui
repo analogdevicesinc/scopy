@@ -107,10 +107,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
           <property name="styleSheet">
            <string notr="true">background-color: rgb(0, 0, 0);</string>
           </property>
-          <layout class="QVBoxLayout" name="plot">
-           <property name="spacing">
-            <number>0</number>
-           </property>
+          <layout class="QGridLayout" name="plot">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -123,7 +120,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
+           <item row="0" column="0">
             <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
              <property name="styleSheet">
               <string notr="true"/>

@@ -833,8 +833,8 @@ void SignalGenerator_API::setLineThickness(const QList<int>& list)
 
                 if(i == gen->currentChannel){
                         gen->updateRightMenuForChn(i);
-                        gen->plot->setLineWidth(i, ptr->lineThickness);
-                        gen->plot->replot();
+                        gen->m_plot->setLineWidth(i, ptr->lineThickness);
+                        gen->m_plot->replot();
                 }
         }
         int index = (int)(gen->getCurrentData()->lineThickness / 0.5) - 1;

@@ -148,7 +148,7 @@ private:
 	libm2k::analog::M2kAnalogOut* m_m2k_analogout;
 
 	Ui::SignalGenerator *ui;
-	OscilloscopePlot *plot;
+	CapturePlot *m_plot;
 	gr::top_block_sptr top_block;
 	struct time_block_data *time_block_data;
 
