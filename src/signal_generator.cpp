@@ -143,7 +143,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->run_button->enableSingleButton(false);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
-	this->plot = new OscilloscopePlot(this);
+	this->m_plot = new CapturePlot(this);
 
 	QVector<struct iio_channel *> iio_channels;
 
@@ -460,35 +460,35 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	time_block_data->time_block = scope_sink_f::make(
 					      nb_points, sample_rate,
 					      "Signal Generator", nb_channels,
-					      static_cast<QWidget *>(plot));
+					      static_cast<QWidget *>(m_plot));
 
 	/* Attach all curves by default */
-	plot->registerSink(time_block_data->time_block->name(),
+	m_plot->registerSink(time_block_data->time_block->name(),
 	                   nb_channels, nb_points);
 
 	for(auto i = 0; i < nb_channels; i++) {
-		plot->Curve(i)->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
-		plot->Curve(i)->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive, true);
+		m_plot->Curve(i)->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
+		m_plot->Curve(i)->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive, true);
 	}
 
 
 	/* This must be done after attaching the curves; otherwise
 	 * plot->getLineColor(i) returns black. */
 	for (unsigned int i = 0; i < nb_channels; i++) {
-		channels[i]->setColor(plot->getLineColor(i));
+		channels[i]->setColor(m_plot->getLineColor(i));
 	}
 
-	plot->disableLegend();
-	plot->setPaletteColor(QColor("black"));
+	m_plot->disableLegend();
+	m_plot->setPaletteColor(QColor("black"));
 
-	plot->setVertUnitsPerDiv(AMPLITUDE_VOLTS * 2.0 / 10.0);
+	m_plot->setVertUnitsPerDiv(AMPLITUDE_VOLTS * 2.0 / 10.0);
 
-	plot->setHorizUnitsPerDiv((double) nb_points /
+	m_plot->setHorizUnitsPerDiv((double) nb_points /
 	                          ((double) sample_rate * 10.0));
-	plot->setHorizOffset((double) nb_points /
+	m_plot->setHorizOffset((double) nb_points /
 	                     ((double) sample_rate * 2.0));
-	plot->zoomBaseUpdate();
-	ui->plot->insertWidget(0,plot, 0, 0);
+	m_plot->zoomBaseUpdate();
+	//ui->plot->insertWidget(0,m_plot, 0, 0);
 
 	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
 
@@ -585,7 +585,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	time_block_data->time_block->set_update_time(0.001);
 
-	plot->addZoomer(0);
+	m_plot->addZoomer(0);
 	resetZoom();
 
 	auto ptr = getCurrentData();
@@ -593,10 +593,20 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	readPreferences();
 
-	// Reduce the extent of the yLeft axis because it is not needed
-	plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(65);
-
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/siggen");
+	
+	m_plot->setOffsetHandleVisible(0,false);
+	m_plot->setOffsetHandleVisible(1,false);
+	m_plot->enableAxis(QwtPlot::yLeft, false);
+	m_plot->setActiveVertAxis(0);
+
+	m_plot->enableTimeTrigger(false);
+
+	ui->plot->addWidget(m_plot->topArea(), 0, 0, 1, 4);
+	ui->plot->addWidget(m_plot->topHandlesArea(), 1, 0, 1, 4);
+	ui->plot->removeWidget(ui->instrumentNotes);
+	ui->plot->addWidget(ui->instrumentNotes,3,0,1,4);
+	ui->plot->addWidget(m_plot, 2, 1, 1, 1);
 }
 
 SignalGenerator::~SignalGenerator()
@@ -611,7 +621,7 @@ SignalGenerator::~SignalGenerator()
 
 	delete fileManager;
 
-	delete plot;
+	delete m_plot;
 	delete ui;
 	delete time_block_data;
 }
@@ -634,7 +644,7 @@ void SignalGenerator::readPreferences()
 void SignalGenerator::resetZoom()
 {
 
-	disconnect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
+	disconnect(m_plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
 	bool disable_zoom=false;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
@@ -647,7 +657,7 @@ void SignalGenerator::resetZoom()
 	}
 
 	if (!disable_zoom) {
-		connect(plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
+		connect(m_plot->getZoomer(),SIGNAL(zoomed(QRectF)),this,SLOT(rescale()));
 	}
 
 	double period = 0.0;
@@ -704,23 +714,23 @@ void SignalGenerator::resetZoom()
 		period=0.1;
 	}
 
-	plot->setVertUnitsPerDiv(1);
-	plot->setVertOffset(0);
-	plot->setHorizUnitsPerDiv(period/10);
-	plot->setHorizOffset(period/2);
-	plot->zoomBaseUpdate();
+	m_plot->setVertUnitsPerDiv(1);
+	m_plot->setVertOffset(0);
+	m_plot->setHorizUnitsPerDiv(period/10);
+	m_plot->setHorizOffset(period/2);
+	m_plot->zoomBaseUpdate();
 	rescale();
 	if(slowSignalId != -1) {
-		plot->DetachCurve(slowSignalId);
-		plot->AttachCurve(slowSignalId);
+		m_plot->DetachCurve(slowSignalId);
+		m_plot->AttachCurve(slowSignalId);
 	}
 }
 
 void SignalGenerator::rescale()
 {
 
-	auto hOffset=plot->HorizOffset();
-	auto hUnitsPerDiv=plot->HorizUnitsPerDiv();
+	auto hOffset=m_plot->HorizOffset();
+	auto hUnitsPerDiv=m_plot->HorizUnitsPerDiv();
 	auto xDivisions=10;
 
 
@@ -743,15 +753,15 @@ void SignalGenerator::rescale()
 	}
 
 	long startSample=sample_rate*zoomT1;
-	plot->setDataStartingPoint(startSample);
-	plot->setSampleRate(sample_rate,1,"Hz");
+	m_plot->setDataStartingPoint(startSample);
+	m_plot->setSampleRate(sample_rate,1,"Hz");
 	if (nb_points < 16) {
 		nb_points = 16;
 	}
 	time_block_data->time_block->set_nsamps(nb_points);
 	time_block_data->time_block->set_samp_rate(sample_rate);
 	updatePreview();
-	plot->replot();
+	m_plot->replot();
 }
 
 void SignalGenerator::constantValueChanged(double value)
@@ -902,8 +912,8 @@ void SignalGenerator::lineThicknessChanged(int index)
         int lineThickness = (int)(ptr->lineThickness / 0.5) - 1;
         if (lineThickness != index) {
                 ptr->lineThickness = 0.5 * (index + 1);
-                plot->setLineWidth(ptr->id, ptr->lineThickness);
-                plot->replot();
+		m_plot->setLineWidth(ptr->id, ptr->lineThickness);
+		m_plot->replot();
         }
 }
 
@@ -1460,7 +1470,9 @@ void SignalGenerator::start()
 
 		m_m2k_analogout->setOversamplingRatio(i, oversampling);
 		m_m2k_analogout->setSampleRate(i, final_rate);
+
 	}
+
 
 	qDebug(CAT_SIGNAL_GENERATOR) << "Pushed cyclic buffer";
 
@@ -1898,13 +1910,13 @@ void adiscope::SignalGenerator::channelWidgetEnabled(bool en)
 	m_m2k_analogout->enableChannel(id, en);
 
 	if (en) {
-		plot->AttachCurve(id);
+		m_plot->AttachCurve(id);
 	} else {
-		plot->DetachCurve(id);
+		m_plot->DetachCurve(id);
 	}
 
 	resetZoom();
-	plot->replot();
+	m_plot->replot();
 
 	bool enable_run = en;
 
@@ -1939,8 +1951,6 @@ void adiscope::SignalGenerator::triggerRightMenuToggle(int chIdx, bool checked)
 void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
-
-	plot->setActiveVertAxis(cw->id());
 
 	triggerRightMenuToggle(cw->id(), checked);
 }

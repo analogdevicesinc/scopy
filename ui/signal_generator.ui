@@ -121,10 +121,7 @@
           <property name="plot_container" stdset="0">
            <bool>true</bool>
           </property>
-          <layout class="QVBoxLayout" name="plot">
-           <property name="spacing">
-            <number>0</number>
-           </property>
+          <layout class="QGridLayout" name="plot">
            <property name="leftMargin">
             <number>0</number>
            </property>
@@ -137,7 +134,7 @@
            <property name="bottomMargin">
             <number>0</number>
            </property>
-           <item>
+           <item row="0" column="0">
             <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
              <property name="styleSheet">
               <string notr="true"/>
