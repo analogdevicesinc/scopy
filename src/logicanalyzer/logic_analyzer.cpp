@@ -1090,7 +1090,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		m_selectedChannel = chIdx;
 
 		if (m_selectedChannel < m_nbChannels) {
-			ui->hardwareName->setText("Dio " + QString::number(m_selectedChannel));
+			ui->hardwareName->setText("DIO " + QString::number(m_selectedChannel));
 		} else {
 			ui->hardwareName->setText("");
 		}
