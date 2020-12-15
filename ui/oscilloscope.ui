@@ -166,7 +166,8 @@ QPushButton:hover {
 }</string>
           </property>
           <property name="text">
-           <string>Mixed Signal</string>
+           <string>Enable Mixed
+Signal View</string>
           </property>
          </widget>
         </item>
