@@ -732,7 +732,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	tabWidget->addTab(channelEnumerator, "General");
 	const int channelMenuTabId = tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
-	connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
+	m_oscChannelSelectedConnection = connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
 		chIdx -= m_oscAnalogChannels;
 		if (m_oscChannelSelected != chIdx && selected) {
 			m_oscChannelSelected = chIdx;
@@ -841,6 +841,10 @@ void LogicAnalyzer::disableMixedSignalView()
 
 		curve = m_oscPlot->getDigitalPlotCurve(0);
 	}
+	m_oscPlotCurves.clear();
+	m_oscChannelSelected = -1;
+
+	disconnect(m_oscChannelSelectedConnection);
 
 	m_oscPlot = nullptr;
 }
