@@ -206,6 +206,7 @@ private:
 	int m_oscChannelSelected;
 	QVector<GenericLogicPlotCurve *> m_oscPlotCurves;
 	QWidget *m_oscDecoderMenu;
+	QMetaObject::Connection m_oscChannelSelectedConnection;
 
 
 };
