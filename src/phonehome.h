@@ -53,7 +53,7 @@ public:
 	~PhoneHome();
 	void versionsRequest(bool force = false);
 	void extractVersionStringsFromJson(const QJsonDocument &doc);
-	QString getScopyVersion() { return m_scopyVersion; }
+	QString getScopyVersion() const { return m_scopyVersion; }
 	QString getM2kVersion() { return m_m2kVersion; }
 	QString getScopyLink() { return m_scopyLink; }
 	QString getM2kLink() { return m_m2kLink; }
