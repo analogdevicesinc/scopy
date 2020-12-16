@@ -58,8 +58,7 @@ void PhoneHome::versionsRequest(bool force)
 		Q_EMIT scopyVersionCheckRequested();
 	} else {
 		// from cache
-		if(!m_versionsJson.isEmpty())
-		{
+		if(!m_versionsJson.isEmpty()) {
 			const QJsonDocument doc = QJsonDocument::fromJson(m_versionsJson.toUtf8());
 			extractVersionStringsFromJson(doc);
 		}
