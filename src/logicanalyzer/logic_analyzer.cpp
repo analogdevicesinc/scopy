@@ -643,7 +643,24 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	nameLineEdit->setAlignment(Qt::AlignCenter);
 	nameLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+	QLineEdit *traceHeightLineEdit = new QLineEdit();
+	traceHeightLineEdit->setText("");
+	traceHeightLineEdit->setVisible(true);
+	traceHeightLineEdit->setDisabled(true);
+	traceHeightLineEdit->setAlignment(Qt::AlignCenter);
+	traceHeightLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	QComboBox *currentChannelTriggerComboBox = new QComboBox();
+	currentChannelTriggerComboBox->addItem("-");
+	for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
+		currentChannelTriggerComboBox->addItem(ui->triggerComboBox->itemIcon(i),
+				    ui->triggerComboBox->itemText(i));
+	}
+
 	currentChannelMenuLayout->addWidget(nameLineEdit);
+	currentChannelMenuLayout->addWidget(traceHeightLineEdit);
+	currentChannelMenuLayout->addWidget(currentChannelTriggerComboBox);
+
 	currentChannelMenuLayout->addLayout(decoderSettingsLayout);
 
 	currentChannelMenu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -737,6 +754,19 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			m_oscChannelSelected = chIdx;
 			nameLineEdit->setEnabled(true);
 			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
+			traceHeightLineEdit->setEnabled(true);
+			traceHeightLineEdit->setText(QString::number(m_oscPlotCurves[chIdx]->getTraceHeight()));
+
+			if (m_oscChannelSelected < m_nbChannels) {
+				currentChannelTriggerComboBox->setEnabled(true);
+				QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
+														    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
+				currentChannelTriggerComboBox->setCurrentIndex(triggerBox->currentIndex());
+			} else {
+				currentChannelTriggerComboBox->setDisabled(true);
+				QSignalBlocker sb(currentChannelTriggerComboBox);
+				currentChannelTriggerComboBox->setCurrentIndex(0);
+			}
 
 			tabWidget->setCurrentIndex(channelMenuTabId);
 
@@ -761,6 +791,10 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			m_oscChannelSelected = -1;
 			nameLineEdit->setDisabled(true);
 			nameLineEdit->setText("No channel selected!");
+			traceHeightLineEdit->setDisabled(true);
+			traceHeightLineEdit->setText("");
+			currentChannelTriggerComboBox->setDisabled(true);
+			currentChannelTriggerComboBox->setCurrentIndex(0);
 
 			if (m_oscDecoderMenu) {
 				decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
@@ -770,6 +804,32 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		}
 
 		updateButtonStackedDecoder();
+	});
+
+	connect(traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+		int value = traceHeightLineEdit->text().toInt();
+		m_oscPlotCurves[m_oscChannelSelected]->setTraceHeight(value);
+		m_oscPlot->replot();
+		m_oscPlot->positionInGroupChanged(m_oscChannelSelected, 0, 0);
+	});
+
+	connect(currentChannelTriggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		if (m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
+			QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
+													    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
+			triggerBox->setCurrentIndex(index);
+		}
+	});
+
+	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
+		if (index == tabWidget->indexOf(currentChannelMenuScrollArea)) {
+			if (m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
+				currentChannelTriggerComboBox->setEnabled(true);
+				QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
+														    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
+				currentChannelTriggerComboBox->setCurrentIndex(triggerBox->currentIndex());
+			}
+		}
 	});
 
 	connect(stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
