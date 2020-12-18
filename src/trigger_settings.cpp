@@ -74,7 +74,8 @@ TriggerSettings::TriggerSettings(M2kAnalogIn* libm2k_adc,
 	trigger_raw_delay(0),
 	daisyChainCompensation(0),
 	m_trigger_in(false),
-	m_has_external_trigger_out(false)
+	m_has_external_trigger_out(false),
+	digital_trigger_was_on(false)
 {
 	initInstrumentStrings();
 	ui->setupUi(this);
@@ -258,6 +259,11 @@ void TriggerSettings::enableMixedSignalView()
 	ui->extern_to_en->setDisabled(true);
 	ui->mixedSignalLbl->setVisible(true);
 	ui->btnLogicAnalyzerTriggers->setVisible(true);
+	ui->btnLogicAnalyzerTriggers->setEnabled(true);
+	digital_trigger_was_on = ui->digital_controls->isEnabled();
+	if (digital_trigger_was_on) {
+		ui->digital_controls->setDisabled(true);
+	}
 }
 
 void TriggerSettings::disableMixedSignalView()
@@ -266,6 +272,10 @@ void TriggerSettings::disableMixedSignalView()
 	ui->extern_to_en->setEnabled(true);
 	ui->mixedSignalLbl->setVisible(false);
 	ui->btnLogicAnalyzerTriggers->setVisible(false);
+	ui->btnLogicAnalyzerTriggers->setDisabled(true);
+	if (digital_trigger_was_on) {
+		ui->digital_controls->setEnabled(true);
+	}
 }
 
 void TriggerSettings::setDcLevelCoupled(double value)
