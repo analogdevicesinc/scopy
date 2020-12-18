@@ -707,10 +707,9 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
 						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
 		} else {
+			comboBoxCondition->setCurrentIndex(0);
 			comboBoxCondition->setDisabled(true);
 			m_m2kDigital->getTrigger()->setDigitalSource(SRC_NONE);
-			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>(0));
 		}
 	});
 	comboBoxCondition->addItem("-");

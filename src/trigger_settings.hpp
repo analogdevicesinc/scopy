@@ -146,6 +146,8 @@ namespace adiscope {
 		libm2k::M2kHardwareTrigger* m_trigger;
 		bool m_trigger_in;
 
+		bool digital_trigger_was_on;
+
 		std::vector<std::pair<QString, libm2k::M2K_TRIGGER_OUT_SELECT>> externalTriggerOutMapping;
 
 		QList<trigg_channel_config> trigg_configs;
