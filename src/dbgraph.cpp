@@ -302,8 +302,6 @@ bool dBgraph::eventFilter(QObject *object, QEvent *event)
 		d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width() + 10);
 		d_bottomHandlesArea->setRightPadding(d_rightHandlesArea->width() + 24);
 
-		d_hCursorHandle1->triggerMove();
-		d_hCursorHandle2->triggerMove();
 	}
 	return QObject::eventFilter(object, event);
 }
