@@ -100,29 +100,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
            <enum>Qt::RightToLeft</enum>
           </property>
           <property name="styleSheet">
-           <string notr="true">
-QPushButton {
-  width: 80px;
-  height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Print</string>
@@ -137,37 +115,19 @@ QPushButton:hover {
             <height>10</height>
            </size>
           </property>
+          <property name="menu_blue_button" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="mixedSignalBtn">
-          <property name="styleSheet">
-           <string notr="true">
-QPushButton {
-  height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}</string>
-          </property>
           <property name="text">
            <string>Enable Mixed
 Signal View</string>
+          </property>
+          <property name="menu_blue_button" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -1091,15 +1051,16 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
@@ -1108,10 +1069,9 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
-   <container>1</container>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -310,14 +310,14 @@
          <height>1</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-       </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="subsection_line" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -329,14 +329,11 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-       </property>
        <property name="text">
         <string>SETTINGS </string>
+       </property>
+       <property name="subsection_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -398,27 +395,9 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>10</width>
-         <height>6</height>
+         <width>16777215</width>
+         <height>16777215</height>
         </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QPushButton {
-  max-height: 6px;
-  max-width: 10px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-
-QPushButton:checked
-{
-  max-height: 10px;
-  max-width:  6px;
-border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
-}
-
-
-
-</string>
        </property>
        <property name="text">
         <string/>
@@ -428,6 +407,9 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
        </property>
        <property name="checked">
         <bool>false</bool>
+       </property>
+       <property name="subsection_arrow_button" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -439,14 +421,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-       </property>
        <property name="text">
         <string> COLOR SETTINGS </string>
+       </property>
+       <property name="subsection_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -464,14 +443,14 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
          <height>1</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-       </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="subsection_line" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

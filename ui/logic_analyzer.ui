@@ -102,31 +102,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
           </property>
-          <property name="styleSheet">
-           <string notr="true">
-QPushButton {
-width: 80px;
-  height: 40px;
-
-text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-border-radius: 4px;
-
-background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-background-color: #2a44df;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}</string>
-          </property>
           <property name="text">
            <string>Print</string>
           </property>
@@ -140,40 +115,20 @@ background-color: #4a34ff;
             <height>10</height>
            </size>
           </property>
+          <property name="menu_blue_button" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnGroupChannels">
-          <property name="styleSheet">
-           <string notr="true">
-QPushButton {
-width: 80px;
-  height: 40px;
-
-text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-
-border-radius: 4px;
-
-background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-background-color: #2a44df;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}</string>
-          </property>
           <property name="text">
            <string>Group</string>
           </property>
           <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="menu_blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
@@ -504,9 +459,6 @@ image: url(:/icons/setup3_checked_hover.svg);
               <height>0</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QWidget {border:none;}</string>
-            </property>
             <layout class="QVBoxLayout" name="verticalLayout">
              <property name="spacing">
               <number>0</number>
@@ -535,7 +487,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>3</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -582,8 +534,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>310</width>
-                      <height>469</height>
+                      <width>200</width>
+                      <height>329</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -628,14 +580,11 @@ image: url(:/icons/setup3_checked_hover.svg);
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-                       </property>
                        <property name="text">
                         <string>Channel Settings</string>
+                       </property>
+                       <property name="general_settings_label" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -654,9 +603,6 @@ font-weight: normal;
                          <height>1</height>
                         </size>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">border: 2px solid #4a64ff</string>
-                       </property>
                        <property name="frameShadow">
                         <enum>QFrame::Plain</enum>
                        </property>
@@ -665,6 +611,9 @@ font-weight: normal;
                        </property>
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="blue_line" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -842,15 +791,11 @@ border-color: grey;
                               <verstretch>0</verstretch>
                              </sizepolicy>
                             </property>
-                            <property name="styleSheet">
-                             <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-font-weight: normal;
-}</string>
-                            </property>
                             <property name="text">
                              <string>GROUP </string>
+                            </property>
+                            <property name="subsection_label" stdset="0">
+                             <bool>true</bool>
                             </property>
                            </widget>
                           </item>
@@ -862,11 +807,11 @@ font-weight: normal;
                               <height>1</height>
                              </size>
                             </property>
-                            <property name="styleSheet">
-                             <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                            </property>
                             <property name="orientation">
                              <enum>Qt::Horizontal</enum>
+                            </property>
+                            <property name="subsection_line" stdset="0">
+                             <bool>true</bool>
                             </property>
                            </widget>
                           </item>
@@ -1020,30 +965,42 @@ font-weight: normal;
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-                   </property>
                    <property name="text">
                     <string>Trigger Settings</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="Line" name="line_6">
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 2px solid #4a64ff</string>
+                   <property name="autoFillBackground">
+                    <bool>false</bool>
+                   </property>
+                   <property name="lineWidth">
+                    <number>1</number>
+                   </property>
+                   <property name="midLineWidth">
+                    <number>0</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="blue_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1221,15 +1178,11 @@ color: rgba(255,255,255,51);
                        <verstretch>0</verstretch>
                       </sizepolicy>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-font-weight: normal;
-}</string>
-                     </property>
                      <property name="text">
                       <string>EXTERNAL TRIGGER </string>
+                     </property>
+                     <property name="subsection_label" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -1247,11 +1200,11 @@ font-weight: normal;
                        <height>1</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                     </property>
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="subsection_line" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -1477,8 +1430,8 @@ font-weight: normal;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>300</width>
-                      <height>258</height>
+                      <width>319</width>
+                      <height>467</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1505,14 +1458,11 @@ font-weight: normal;
                      </property>
                      <item>
                       <widget class="QLabel" name="label_3">
-                       <property name="styleSheet">
-                        <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-                       </property>
                        <property name="text">
                         <string>General Settings</string>
+                       </property>
+                       <property name="general_settings_label" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1524,9 +1474,6 @@ font-weight: normal;
                          <height>1</height>
                         </size>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">border: 2px solid #4a64ff</string>
-                       </property>
                        <property name="frameShadow">
                         <enum>QFrame::Plain</enum>
                        </property>
@@ -1535,6 +1482,9 @@ font-weight: normal;
                        </property>
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="blue_line" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1641,15 +1591,11 @@ color: rgba(255,255,255,51);
                        </property>
                        <item>
                         <widget class="QLabel" name="label_6">
-                         <property name="styleSheet">
-                          <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-font-weight: normal;
-}</string>
-                         </property>
                          <property name="text">
                           <string>AVAILABLE CHANNELS </string>
+                         </property>
+                         <property name="subsection_label" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -1667,11 +1613,11 @@ font-weight: normal;
                            <height>1</height>
                           </size>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="subsection_line" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -1760,15 +1706,11 @@ color: rgba(255, 255, 255, 153);
                            <verstretch>0</verstretch>
                           </sizepolicy>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-font-weight: normal;
-}</string>
-                         </property>
                          <property name="text">
                           <string>DECODERS </string>
+                         </property>
+                         <property name="subsection_label" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -1786,11 +1728,11 @@ font-weight: normal;
                            <height>1</height>
                           </size>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                         </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="subsection_line" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -2124,14 +2066,20 @@ color: rgba(255, 255, 255, 153);
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -2141,21 +2089,15 @@ color: rgba(255, 255, 255, 153);
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
-   <container>1</container>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

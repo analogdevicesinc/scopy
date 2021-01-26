@@ -143,9 +143,9 @@ font-weight: normal;</string>
         <property name="geometry">
          <rect>
           <x>0</x>
-          <y>-10</y>
+          <y>0</y>
           <width>252</width>
-          <height>545</height>
+          <height>561</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -183,14 +183,11 @@ font-weight: normal;</string>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-             </property>
              <property name="text">
               <string>MEASUREMENTS </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -202,11 +199,11 @@ font-weight: normal;</string>
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -360,14 +357,11 @@ QPushButton:hover {
                <height>0</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-             </property>
              <property name="text">
               <string>STATISTICS </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -385,11 +379,11 @@ QPushButton:hover {
                <height>0</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -541,17 +535,14 @@ QPushButton:hover {
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-             </property>
              <property name="frameShadow">
               <enum>QFrame::Sunken</enum>
              </property>
              <property name="text">
               <string>CUSTOM SELECTION </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -569,11 +560,11 @@ QPushButton:hover {
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -650,11 +641,11 @@ QPushButton:hover {
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -670,14 +661,11 @@ QPushButton:hover {
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_4">
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-             </property>
              <property name="text">
               <string>GATING SETTINGS</string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

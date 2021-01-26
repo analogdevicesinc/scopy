@@ -147,14 +147,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-             </property>
              <property name="text">
               <string>SCRIPTING ENGINE</string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -172,11 +169,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -326,7 +323,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                  </size>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="page_0">
                  <property name="sizePolicy">
@@ -498,17 +495,14 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-                  </property>
                   <property name="text">
                    <string>DEVICE SELECTION</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="subsection_label" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -526,11 +520,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                     <height>1</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="subsection_line" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -829,17 +823,14 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-                  </property>
                   <property name="text">
                    <string>REGISTER MAP SETTINGS</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
+                  </property>
+                  <property name="subsection_label" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -857,11 +848,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                     <height>1</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="subsection_line" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>

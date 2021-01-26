@@ -99,14 +99,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel {
- font-size: 12px;
- color: rgba(255, 255, 255, 70);
-}</string>
-          </property>
           <property name="text">
            <string>EXPORT </string>
+          </property>
+          <property name="subsection_label" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -124,11 +121,11 @@
             <height>1</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);</string>
-          </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="subsection_line" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

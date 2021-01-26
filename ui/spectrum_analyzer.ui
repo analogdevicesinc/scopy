@@ -126,31 +126,6 @@ QComboBox:disabled
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
           </property>
-          <property name="styleSheet">
-           <string notr="true">
-QPushButton {
-  width: 80px;
-  height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-</string>
-          </property>
           <property name="text">
            <string>Print</string>
           </property>
@@ -163,6 +138,9 @@ QPushButton:hover {
             <width>10</width>
             <height>10</height>
            </size>
+          </property>
+          <property name="menu_blue_button" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -796,80 +774,80 @@ QPushButton:hover
                  </item>
                 </layout>
                </item>
-                  <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_13">
-                          <property name="spacing">
-                              <number>5</number>
-                          </property>
-                          <property name="topMargin">
-                              <number>0</number>
-                          </property>
-                          <item>
-                              <widget class="QLabel" name="label_thickness">
-                                  <property name="styleSheet">
-                                      <string notr="true"> font-size: 13px;</string>
-                                  </property>
-                                  <property name="text">
-                                      <string>CH Thickness</string>
-                                  </property>
-                              </widget>
-                          </item>
-                          <item>
-                              <widget class="QComboBox" name="comboBox_line_thickness">
-                                  <item>
-                                      <property name="text">
-                                          <string>0.5</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>1</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>1.5</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>2</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>2.5</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>3</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>3.5</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>4</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>4.5</string>
-                                      </property>
-                                  </item>
-                                  <item>
-                                      <property name="text">
-                                          <string>5</string>
-                                      </property>
-                                  </item>
-                              </widget>
-                          </item>
-                      </layout>
-                  </item>
+               <item>
+                <layout class="QVBoxLayout" name="verticalLayout_13">
+                 <property name="spacing">
+                  <number>5</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <item>
+                  <widget class="QLabel" name="label_thickness">
+                   <property name="styleSheet">
+                    <string notr="true"> font-size: 13px;</string>
+                   </property>
+                   <property name="text">
+                    <string>CH Thickness</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_line_thickness">
+                   <item>
+                    <property name="text">
+                     <string>0.5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>1</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>1.5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>2.5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>3</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>3.5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>4</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>4.5</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>5</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_15">
                  <property name="spacing">
@@ -1033,12 +1011,13 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                <item>
                 <widget class="QLabel" name="labelGeneralSettingsTitle">
                  <property name="styleSheet">
-                  <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string>General settings</string>
+                 </property>
+                 <property name="general_settings_label" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1073,7 +1052,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                   </size>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">color: #4A64FF;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="frameShadow">
                   <enum>QFrame::Plain</enum>
@@ -1083,6 +1062,9 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="blue_line" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -2543,23 +2525,6 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::RunSingleWidget</class>
-   <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
@@ -2569,6 +2534,23 @@ QLabel {
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::RunSingleWidget</class>
+   <extends>QWidget</extends>
+   <header>runsinglewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MarkerTable</class>

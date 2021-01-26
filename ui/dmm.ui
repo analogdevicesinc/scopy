@@ -835,7 +835,7 @@ QPushButton:disabled {
            <x>0</x>
            <y>0</y>
            <width>186</width>
-           <height>1065</height>
+           <height>1102</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1437,28 +1437,13 @@ QPushButton:disabled {
             </property>
             <item>
              <widget class="QPushButton" name="btnCollapsePeakHold">
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
-  max-height: 6px;
-  max-width: 10px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-
-QPushButton:checked
-{
-  max-height: 10px;
-  max-width:  6px;
-border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
-}
-
-
-
-</string>
-              </property>
               <property name="text">
                <string/>
               </property>
               <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="subsection_arrow_button" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
@@ -1471,14 +1456,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QLabel {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 70);
-}</string>
-              </property>
               <property name="text">
                <string> PEAK HOLD </string>
+              </property>
+              <property name="subsection_label" stdset="0">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1496,9 +1478,6 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <height>1</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-              </property>
               <property name="frameShadow">
                <enum>QFrame::Plain</enum>
               </property>
@@ -1507,6 +1486,9 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="subsection_line" stdset="0">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1627,28 +1609,13 @@ QPushButton:hover
             </property>
             <item>
              <widget class="QPushButton" name="btnCollapseDataLog">
-              <property name="styleSheet">
-               <string notr="true">QPushButton {
-  max-height: 6px;
-  max-width: 10px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-
-QPushButton:checked
-{
-  max-height: 10px;
-  max-width:  6px;
-border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
-}
-
-
-
-</string>
-              </property>
               <property name="text">
                <string/>
               </property>
               <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="subsection_arrow_button" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
@@ -1661,14 +1628,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QLabel {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 70);
-}</string>
-              </property>
               <property name="text">
                <string> DATA LOGGING </string>
+              </property>
+              <property name="subsection_label" stdset="0">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -1686,9 +1650,6 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                 <height>1</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-              </property>
               <property name="frameShadow">
                <enum>QFrame::Plain</enum>
               </property>
@@ -1697,6 +1658,9 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
               </property>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="subsection_line" stdset="0">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -2019,7 +1983,7 @@ QPushButton:disabled {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>

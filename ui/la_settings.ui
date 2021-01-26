@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>334</width>
-    <height>266</height>
+    <height>273</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -230,14 +230,14 @@ font-weight: normal;</string>
             <height>1</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-          </property>
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="subsection_line" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -249,14 +249,11 @@ font-weight: normal;</string>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-          </property>
           <property name="text">
            <string>REQUIRED </string>
+          </property>
+          <property name="subsection_label" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -340,14 +337,11 @@ font-weight: normal;</string>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-          </property>
           <property name="text">
            <string>OPTIONAL </string>
+          </property>
+          <property name="subsection_label" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -365,14 +359,14 @@ font-weight: normal;</string>
             <height>1</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-          </property>
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="subsection_line" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -465,14 +459,14 @@ font-weight: normal;</string>
             <height>1</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-          </property>
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="subsection_line" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -484,14 +478,11 @@ font-weight: normal;</string>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-          </property>
           <property name="text">
            <string>OPTIONS </string>
+          </property>
+          <property name="subsection_label" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>

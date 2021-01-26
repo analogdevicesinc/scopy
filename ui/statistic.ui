@@ -145,11 +145,11 @@ font-size: 14px;</string>
        <height>16777215</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">border: 1px solid rgba(255, 255, 255, 33);</string>
-     </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+     <property name="section_line" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
