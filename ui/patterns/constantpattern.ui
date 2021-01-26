@@ -34,9 +34,6 @@
    </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label">
-     <property name="styleSheet">
-      <string notr="true">font-size: 13px;</string>
-     </property>
      <property name="text">
       <string>Constant </string>
      </property>

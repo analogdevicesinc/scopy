@@ -34,14 +34,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-     </property>
      <property name="text">
       <string>Channel</string>
+     </property>
+     <property name="menu_title_label" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -76,10 +73,13 @@ font-weight: normal;
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">border: 2px solid #ff7200</string>
+      <string notr="true"/>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="orange_line" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -311,37 +311,22 @@ font-weight: normal;
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">QPushButton {
+               <string notr="true">QPushButton{
   min-height: 30px;
   max-height: 30px;
   min-width: 240px;
   max-width: 240px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
               </property>
               <property name="text">
                <string>Edit Function</string>
               </property>
               <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="blue_button" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
@@ -672,9 +657,6 @@ QPushButton:hover {
            </property>
            <item>
             <widget class="QLabel" name="lblLineWidth">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>CH Thickness</string>
              </property>
@@ -752,9 +734,6 @@ QPushButton:hover {
            </property>
            <item>
             <widget class="QLabel" name="label_3">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Memory depth</string>
              </property>
@@ -775,9 +754,6 @@ QPushButton:hover {
            </property>
            <item>
             <widget class="QLabel" name="label_4">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Curve Style</string>
              </property>
@@ -845,9 +821,6 @@ QPushButton:hover {
               </property>
               <item>
                <widget class="QLabel" name="probe_label">
-                <property name="styleSheet">
-                 <string notr="true">font-size: 13px;</string>
-                </property>
                 <property name="text">
                  <string>Probe
 Attenuation</string>
@@ -914,9 +887,6 @@ Attenuation</string>
           </property>
           <item>
            <widget class="QLabel" name="label_2">
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
-            </property>
             <property name="text">
              <string>Software 
 AC Coupling</string>
@@ -1309,35 +1279,16 @@ text-align: center;
           <bool>true</bool>
          </property>
          <property name="styleSheet">
-          <string notr="true">QPushButton{
-  width: 175px;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:disabled {
-  background-color: grey;
-  color:white;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Autoset</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="large_blue_button" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -1360,35 +1311,16 @@ QPushButton:hover {
        <item>
         <widget class="QPushButton" name="snapshotBtn">
          <property name="styleSheet">
-          <string notr="true">QPushButton{
-  width: 175px;
-  height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  
-  font-size: 14px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:disabled {
-  background-color: grey;
-  color:white;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}</string>
+          <string notr="true"/>
          </property>
          <property name="text">
           <string>Snapshot</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="large_blue_button" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

@@ -142,6 +142,9 @@ QComboBox:disabled
           <property name="menu_blue_button" stdset="0">
            <bool>true</bool>
           </property>
+          <property name="blue_button" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>

@@ -380,6 +380,28 @@ QFrame[blue_line=true]{
 	border: 2px solid #4A64FF;
 }
 
+/* General style for blue buttons */
+
+QPushButton[blue_button=true]{
+	background-color: #4a64ff;
+	color: #ffffff;
+	border-radius: 4px;
+	font-size: 14px;
+}
+
+QPushButton[blue_button=true]:pressed{
+	background-color: #2a44df;
+}
+
+QPushButton[blue_button=true]:hover{
+	background-color: #4a34ff;
+}
+
+QPushButton[blue_button=true]:disabled {
+  background-color: grey;
+}
+
+
 /* Blue buttons from all upper menus. (such as print enable-mixed-signal, or group */
 
 QPushButton[menu_blue_button=true]{
@@ -390,23 +412,34 @@ QPushButton[menu_blue_button=true]{
   font-weight: bold;
   padding-left: 15px;
   padding-right: 15px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
 }
 
-QPushButton[menu_blue_button=true]:pressed{
-  background-color: #2a44df;
-}
-
-QPushButton[menu_blue_button=true]:hover{
-	background-color: #4a34ff;
-}
 
 /* Line separators for things like basemenu or basemanuitem */
 
 QFrame[line_separator=true]{
 	color: rgba(255,255,255,50);
+}
+
+
+/* Menu title label */
+
+QLabel[menu_title_label=true]{
+	color: white;
+	font-weight: normal;
+}
+
+QFrame[orange_line=true]{
+	border: 2px solid #ff7200;
+}
+
+/* Style for all large blue buttons */
+
+QPushButton[large_blue_button=true]{
+  width: 175px;
+  height: 30px;
+
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
 }

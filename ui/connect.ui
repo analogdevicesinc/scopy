@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: transparent;</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>20</number>
@@ -117,27 +114,13 @@ color: green;
   min-height: 30px;
   max-height: 30px;
   border: 0px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  color: #ffffff;
-  font-size: 14px;
-}
-
-QPushButton:disabled {
-background-color: grey;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-</string>
+}</string>
        </property>
        <property name="text">
         <string>Connect</string>
+       </property>
+       <property name="blue_button" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
