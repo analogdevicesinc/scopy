@@ -17,7 +17,7 @@ BOOST_VERSION=1.73.0
 
 PYTHON="python3"
 PACKAGES=" qt pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
-PACKAGES="$PACKAGES glibmm doxygen wget gnu-sed libmatio dylibbundler libxml2"
+PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2"
 
 set -e
 cd ~
@@ -54,8 +54,8 @@ export PATH="/usr/local/opt/bison/bin:$PATH"
 export PATH="${QT_PATH}:$PATH"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
-export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/glibmm/lib/pkgconfig"
 
+echo $PKG_CONFIG_PATH
 QMAKE="$(command -v qmake)"
 
 CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
@@ -200,7 +200,6 @@ build_grm2k() {
 
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
-
 	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH ${WORKDIR}/gr-scopy
 	mkdir ${WORKDIR}/gr-scopy/build-${ARCH}
@@ -209,6 +208,27 @@ build_grscopy() {
 	cmake ${CMAKE_OPTS} \
 		${WORKDIR}/gr-scopy
 
+	make $JOBS
+	sudo make $JOBS install
+}
+build_glibmm() {
+	echo "### Building glibmm - 2.64.0"
+	cd ~
+	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
+	tar xzvf glibmm-2.64.0.tar.xz
+	cd glibmm-2.64.0
+	./configure
+	make $JOBS
+	sudo make $JOBS install
+}
+
+build_sigcpp() {
+	echo "### Building libsigc++ -2.10.0"
+	cd ~
+	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
+	tar xvzf libsigc++-2.10.0.tar.xz
+	cd libsigc++-2.10.0
+	./configure
 	make $JOBS
 	sudo make $JOBS install
 }
@@ -256,6 +276,8 @@ build_qwtpolar() {
 	qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_mac"
 }
 
+build_sigcpp
+build_glibmm
 build_libiio
 build_libad9361
 build_libm2k
@@ -268,8 +290,3 @@ build_grm2k
 build_qwt
 build_qwtpolar
 build_libsigrokdecode
-
-
-
-
-
