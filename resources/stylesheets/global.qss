@@ -341,3 +341,72 @@ QTextBrowser#aboutTextBrowser{
 	selection-color: yellow;
 	color: white;
 }
+
+/* Label, line and arrow button dividers between sections */
+
+QLabel[subsection_label=true]{
+	font-size: 12px;
+	color: rgba(255, 255, 255, 70);
+}
+
+QFrame[subsection_line=true]{
+	border: 1px solid rgba(255, 255, 255, 70);
+}
+
+QPushButton[subsection_arrow_button=true]{
+	max-height: 6px;
+	max-width: 10px;
+	border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}
+
+QPushButton[subsection_arrow_button=true]:checked{
+	max-height: 10px;
+	max-width:  6px;
+	border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
+
+
+/* Label associated with settings menu, right above a blue line divider */
+
+QLabel[general_settings_label=true]{
+	color: white;
+	font-size: 14px;
+	font-weight: normal;
+}
+
+/* Blue line divider */
+
+QFrame[blue_line=true]{
+	border: 2px solid #4A64FF;
+}
+
+/* Blue buttons from all upper menus. (such as print enable-mixed-signal, or group */
+
+QPushButton[menu_blue_button=true]{
+  width: 80px;
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+  border-radius: 4px;
+
+  background-color: #4a64ff;
+  color: #ffffff;
+
+}
+
+QPushButton[menu_blue_button=true]:pressed{
+  background-color: #2a44df;
+}
+
+QPushButton[menu_blue_button=true]:hover{
+	background-color: #4a34ff;
+}
+
+/* Line separators for things like basemenu or basemanuitem */
+
+QFrame[line_separator=true]{
+	color: rgba(255,255,255,50);
+}
