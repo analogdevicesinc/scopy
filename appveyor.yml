@@ -36,6 +36,7 @@ environment:
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
+          PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
           BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_18_deps.sh /home/appveyor/Qt/5.14.2"
           BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
           PACKAGE_CMD: ""
@@ -44,6 +45,7 @@ environment:
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
+          PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
           BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_20_deps.sh /home/appveyor/Qt/5.14.2"
           BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
           PACKAGE_CMD: ""
@@ -67,6 +69,7 @@ build_script:
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 6"
     - cmd: "%BUILD_DEPS_CMD%"
 
+    - sh: $PKG_MANAGER_UPDATE_CMD
     - sh: echo $BUILD_DEPS_CMD
     - sh: $BUILD_DEPS_CMD
     - sh: $BUILD_CMD
