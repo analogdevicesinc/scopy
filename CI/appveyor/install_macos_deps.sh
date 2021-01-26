@@ -12,8 +12,8 @@ QWT_BRANCH=qwt-6.1-multiaxes
 QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master #not used
-BOOST_VERSION_FILE=1_65_1
-BOOST_VERSION=1.65.1
+BOOST_VERSION_FILE=1_73_0
+BOOST_VERSION=1.73.0
 
 PYTHON="python3"
 PACKAGES=" qt pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
