@@ -102,6 +102,17 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
           </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton{
+  width: 80px;
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+}</string>
+          </property>
           <property name="text">
            <string>Print</string>
           </property>
@@ -125,6 +136,17 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
         </item>
         <item>
          <widget class="QPushButton" name="btnGroupChannels">
+          <property name="styleSheet">
+           <string notr="true">QPushButton{
+  width: 80px;
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+}</string>
+          </property>
           <property name="text">
            <string>Group</string>
           </property>
@@ -2072,26 +2094,26 @@ color: rgba(255, 255, 255, 153);
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>

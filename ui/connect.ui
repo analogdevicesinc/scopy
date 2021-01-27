@@ -66,12 +66,7 @@
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">QLineEdit {
-border-color: grey;
-color: white;
-}
-
-QLineEdit[invalid=true] {
+        <string notr="true">QLineEdit[invalid=true] {
 border-color: red;
 color: red;
 }
@@ -129,7 +124,7 @@ color: green;
    <item row="2" column="0">
     <widget class="QLabel" name="description">
      <property name="styleSheet">
-      <string notr="true">color:white</string>
+      <string notr="true">color: white;</string>
      </property>
      <property name="text">
       <string/>

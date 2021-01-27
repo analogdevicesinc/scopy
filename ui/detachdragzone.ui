@@ -50,7 +50,6 @@ border: 1px solid white;
    </property>
    <property name="font">
     <font>
-     
      <pointsize>-1</pointsize>
     </font>
    </property>
@@ -59,7 +58,6 @@ border: 1px solid white;
    </property>
    <property name="styleSheet">
     <string notr="true">font-size: 30px;
-color: 	white;
 
 </string>
    </property>

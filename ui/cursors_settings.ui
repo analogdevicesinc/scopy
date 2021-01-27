@@ -621,9 +621,6 @@ color: rgba(255,255,255,51);
       </item>
       <item>
        <widget class="QLabel" name="transLabel">
-        <property name="styleSheet">
-         <string notr="true">font-size: 13px;</string>
-        </property>
         <property name="text">
          <string>Transparency 0%</string>
         </property>
@@ -663,9 +660,6 @@ QSlider::sub-page:horizontal {
       </item>
       <item>
        <widget class="QLabel" name="label_8">
-        <property name="styleSheet">
-         <string notr="true">font-size: 13px;</string>
-        </property>
         <property name="text">
          <string>Position</string>
         </property>

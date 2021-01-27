@@ -100,7 +100,15 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
            <enum>Qt::RightToLeft</enum>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QPushButton{
+  width: 80px;
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+}</string>
           </property>
           <property name="text">
            <string>Print</string>
@@ -115,9 +123,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
             <height>10</height>
            </size>
           </property>
-          <property name="menu_blue_button" stdset="0">
-           <bool>true</bool>
-          </property>
           <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
@@ -125,12 +130,20 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
         </item>
         <item>
          <widget class="QPushButton" name="mixedSignalBtn">
+          <property name="styleSheet">
+           <string notr="true">QPushButton{
+  width: 80px;
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+}</string>
+          </property>
           <property name="text">
            <string>Enable Mixed
 Signal View</string>
-          </property>
-          <property name="menu_blue_button" stdset="0">
-           <bool>true</bool>
           </property>
           <property name="blue_button" stdset="0">
            <bool>true</bool>
@@ -1057,15 +1070,15 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

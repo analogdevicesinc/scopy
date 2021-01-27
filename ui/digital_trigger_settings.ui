@@ -186,9 +186,6 @@ background-color: rgb(73, 99, 255);
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true"> font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Trigger mode</string>
        </property>
@@ -275,9 +272,6 @@ background-color: rgb(73, 99, 255);
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true"> font-size: 13px;</string>
          </property>
          <property name="text">
           <string>Trigger Logic</string>
@@ -504,9 +498,6 @@ background-color: rgb(73, 99, 255);
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
          </property>
          <property name="text">
           <string>Condition</string>

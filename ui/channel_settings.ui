@@ -1071,6 +1071,24 @@ text-align: center;
        </item>
        <item>
         <widget class="QWidget" name="filter2" native="true">
+         <property name="styleSheet">
+          <string notr="true">QCheckBox::indicator {
+  border: 2px solid rgb(74, 100, 255);
+  border-radius: 4px;
+  width: 16px;
+  height: 16px;
+  subcontrol-position: left;
+}
+
+QCheckBox::indicator:checked {
+  background-color: rgb(74, 100, 255);
+}
+
+QCheckBox{
+text-align: center;
+
+}</string>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="spacing">
            <number>0</number>
@@ -1112,22 +1130,7 @@ text-align: center;
           <item>
            <widget class="QCheckBox" name="filter2_en">
             <property name="styleSheet">
-             <string notr="true">QCheckBox::indicator {
-  border: 2px solid rgb(74, 100, 255);
-  border-radius: 4px;
-  width: 16px;
-  height: 16px;
-  subcontrol-position: left;
-}
-
-QCheckBox::indicator:checked {
-  background-color: rgb(74, 100, 255);
-}
-
-QCheckBox{
-text-align: center;
-
-}</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Filter 2 - Enabled</string>
@@ -1279,15 +1282,19 @@ text-align: center;
           <bool>true</bool>
          </property>
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">QPushButton{
+  width: 175px;
+  height: 30px;
+
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+}</string>
          </property>
          <property name="text">
           <string>Autoset</string>
          </property>
          <property name="blue_button" stdset="0">
-          <bool>true</bool>
-         </property>
-         <property name="large_blue_button" stdset="0">
           <bool>true</bool>
          </property>
         </widget>
@@ -1311,15 +1318,19 @@ text-align: center;
        <item>
         <widget class="QPushButton" name="snapshotBtn">
          <property name="styleSheet">
-          <string notr="true"/>
+          <string notr="true">QPushButton{
+  width: 175px;
+  height: 30px;
+
+  font-weight: normal;
+  font-style: normal;
+  text-align: center;
+}</string>
          </property>
          <property name="text">
           <string>Snapshot</string>
          </property>
          <property name="blue_button" stdset="0">
-          <bool>true</bool>
-         </property>
-         <property name="large_blue_button" stdset="0">
           <bool>true</bool>
          </property>
         </widget>

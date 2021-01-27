@@ -1139,34 +1139,25 @@ min-height: 30px;</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
 
 height: 30px;
 border-width: 0px;
-border-radius: 3px;
 min-width: 6em;
 qproperty-text: &quot;Connect&quot;;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
 }
 
 QPushButton[connected=true] {
 /*background-color: green;*/
 qproperty-text: &quot;Disconnect&quot;;
 }
+
 QPushButton[failed=true] {
 background-color: red;
 qproperty-text: &quot;Failed&quot;;
 }</string>
+               </property>
+               <property name="blue_button" stdset="0">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -1187,7 +1178,7 @@ qproperty-text: &quot;Failed&quot;;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 16);</string>
+              <string notr="true">color: rgba(255, 255, 255, 16);</string>
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -1231,8 +1222,7 @@ qproperty-text: &quot;Failed&quot;;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: transparent;
-border: 0px;</string>
+              <string notr="true">border: 0px;</string>
              </property>
              <property name="title">
               <string/>
@@ -1348,15 +1338,7 @@ border: 0px;</string>
                       </size>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
+                      <string notr="true"/>
                      </property>
                      <property name="selected" stdset="0">
                       <bool>false</bool>
@@ -1399,16 +1381,6 @@ border: 0px;</string>
 height: 40px;
 width: 40px;
 border-width: 0px;
-border-radius: 4px;
-background-color: #4A64FF;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
 }</string>
                         </property>
                         <property name="text">
@@ -1420,6 +1392,9 @@ background-color: #4a34ff;
                          </iconset>
                         </property>
                         <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                        <property name="blue_button" stdset="0">
                          <bool>true</bool>
                         </property>
                        </widget>
@@ -1502,16 +1477,6 @@ background-color: #4a34ff;
 height: 40px;
 width: 40px;
 border-width: 0px;
-border-radius: 4px;
-background-color: #4A64FF;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
 }</string>
                         </property>
                         <property name="text">
@@ -1535,6 +1500,9 @@ background-color: #4a34ff;
                         </property>
                         <property name="flat">
                          <bool>false</bool>
+                        </property>
+                        <property name="blue_button" stdset="0">
+                         <bool>true</bool>
                         </property>
                        </widget>
                       </item>

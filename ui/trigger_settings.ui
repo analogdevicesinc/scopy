@@ -49,14 +49,11 @@
    </property>
    <item>
     <widget class="QLabel" name="label_title">
-     <property name="styleSheet">
-      <string notr="true">color: white;
-        font-size: 14px;
-        font-weight: normal;
-</string>
-     </property>
      <property name="text">
       <string>Trigger Settings</string>
+     </property>
+     <property name="general_settings_label" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -90,11 +87,11 @@
        <height>2</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">border: 2px solid rgb(74, 100, 255);</string>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="blue_line" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -113,9 +110,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
+        <y>-18</y>
         <width>266</width>
-        <height>948</height>
+        <height>958</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -147,9 +144,6 @@
          </property>
          <item>
           <widget class="QLabel" name="label">
-           <property name="styleSheet">
-            <string notr="true">font-size: 13px;</string>
-           </property>
            <property name="text">
             <string>Trigger mode</string>
            </property>
@@ -383,9 +377,6 @@ color: rgba(255,255,255,51);
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">font-size: 13px;</string>
-                  </property>
                   <property name="text">
                    <string>Source</string>
                   </property>
@@ -413,9 +404,6 @@ color: rgba(255,255,255,51);
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">font-size: 13px;</string>
                 </property>
                 <property name="text">
                  <string>Condition</string>
@@ -549,13 +537,13 @@ color: rgba(255,255,255,51);
          </item>
          <item>
           <widget class="QLabel" name="mixedSignalLbl">
-           <property name="styleSheet">
-            <string notr="true">color: white;</string>
-           </property>
            <property name="text">
             <string>This feature is not supported while the Mixed Signal View is enabled!</string>
            </property>
            <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="general_settings_label" stdset="0">
             <bool>true</bool>
            </property>
           </widget>
@@ -590,9 +578,6 @@ color: rgba(255,255,255,51);
             </property>
             <item>
              <widget class="QLabel" name="label_6">
-              <property name="styleSheet">
-               <string notr="true">font-size: 13px;</string>
-              </property>
               <property name="text">
                <string>Source</string>
               </property>
@@ -608,9 +593,6 @@ color: rgba(255,255,255,51);
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">font-size: 13px;</string>
               </property>
               <property name="text">
                <string>Condition</string>
@@ -673,32 +655,22 @@ color: rgba(255,255,255,51);
        <item>
         <widget class="QPushButton" name="btnLogicAnalyzerTriggers">
          <property name="styleSheet">
-          <string notr="true">
-QPushButton {
+          <string notr="true">QPushButton {
 
-height: 40px;
+  height: 40px;
 
   text-align: left;
   font-weight: bold;
   padding-left: 15px;
   padding-right: 15px;
-  border-radius: 4px;
 
-  background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
          </property>
          <property name="text">
           <string>Logic Analyzer trigger settings</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -796,9 +768,6 @@ QPushButton:hover {
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font-size: 13px;</string>
-              </property>
               <property name="text">
                <string>Analog - Digital</string>
               </property>
@@ -867,14 +836,11 @@ QPushButton:hover {
            </property>
            <item>
             <widget class="QLabel" name="label_5">
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-                font-size: 12px;
-                color: rgba(255, 255, 255, 70);
-        }</string>
-             </property>
              <property name="text">
               <string>EXTERNAL TRIGGER OUT</string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -892,14 +858,14 @@ QPushButton:hover {
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="frameShadow">
               <enum>QFrame::Sunken</enum>
              </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

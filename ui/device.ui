@@ -79,6 +79,10 @@
 
 [selected=false] {
 	background-color: transparent;
+}
+
+QLabel {
+qproperty-alignment: AlignCenter;
 }</string>
      </property>
      <property name="selected" stdset="0">
@@ -109,11 +113,7 @@
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">QLabel {
-qproperty-alignment: AlignCenter;
-color: white;
-
-}</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -135,27 +135,7 @@ color: white;
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">/*QPushButton {
-color: white;
-
-font-weight: bold;
-height: 30px;
-border-width: 0px;
-border-radius: 3px;
-min-width: 6em;
-}
-QPushButton:hover {
-background-color: orange;
-}
-QPushButton:checked {
-background-color: #F45000;
-}
-QPushButton[connected=true] {
-background-color: green;
-}
-QPushButton[failed=true] {
-background-color: red;
-}*/</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string/>
@@ -185,12 +165,6 @@ background-color: red;
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-color: white;
-qproperty-alignment: AlignCenter;
-}</string>
         </property>
         <property name="text">
          <string/>

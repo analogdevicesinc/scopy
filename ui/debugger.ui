@@ -45,20 +45,10 @@ QPushButton
   min-width: 240px;
   max-width: 240px;
 
-  background-color: #4a64ff;
-  border-radius: 4px;
-
-  font-size: 14px;
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
 
-}
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
 }
 
 QCheckBox::indicator {
@@ -99,9 +89,7 @@ QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
   border: none;
   background: none;
-}
-
-</string>
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
@@ -212,6 +200,9 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               <property name="text">
                <string>Load Script</string>
               </property>
+              <property name="blue_button" stdset="0">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item>
@@ -221,6 +212,9 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
               </property>
               <property name="text">
                <string>Run</string>
+              </property>
+              <property name="blue_button" stdset="0">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
@@ -381,6 +375,9 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>Read</string>
                 </property>
+                <property name="blue_button" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item row="2" column="0">
@@ -407,12 +404,18 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>New Window</string>
                 </property>
+                <property name="blue_button" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item row="5" column="0">
                <widget class="QPushButton" name="WriteButton">
                 <property name="text">
                  <string>Write</string>
+                </property>
+                <property name="blue_button" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -680,6 +683,9 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                 <property name="text">
                  <string>Read</string>
                 </property>
+                <property name="blue_button" stdset="0">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item row="5" column="4">
@@ -734,6 +740,9 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                <widget class="QPushButton" name="writeRegPushButton">
                 <property name="text">
                  <string>Write</string>
+                </property>
+                <property name="blue_button" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
