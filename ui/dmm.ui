@@ -35,8 +35,15 @@
    <item>
     <widget class="adiscope::DetachDragZone" name="leftPanel" native="true">
      <property name="styleSheet">
-      <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
-QLabel { color: rgba(255, 255, 255, 90); font-size: 51px; font-weight: bold; qproperty-alignment: 'AlignBottom | AlignLeft'; }</string>
+      <string notr="true">QWidget#leftPanel { 
+	background-color: rgba(0, 0, 0, 40); 
+}
+QLabel { 
+	color: rgba(255, 255, 255, 90);
+	 font-size: 51px; 
+	font-weight: bold; 
+	qproperty-alignment: 'AlignBottom | AlignLeft';
+ }</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_8">
       <property name="leftMargin">
@@ -868,15 +875,11 @@ QPushButton:disabled {
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-	color: white;
-	font-size:14px;
-	font-weight:normal;
-}</string>
-            </property>
             <property name="text">
              <string>Channel 1</string>
+            </property>
+            <property name="general_settings_label" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1051,9 +1054,6 @@ QPushButton:disabled {
               </property>
               <item>
                <widget class="QLabel" name="labelThicknessCh1">
-                <property name="styleSheet">
-                 <string notr="true">font-size: 13px;</string>
-                </property>
                 <property name="text">
                  <string>Line thickness</string>
                 </property>
@@ -1153,15 +1153,11 @@ QPushButton:disabled {
             <property name="autoFillBackground">
              <bool>false</bool>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QLabel {
-	color: white;
-	font-size:14px;
-	font-weight:normal;
-}</string>
-            </property>
             <property name="text">
              <string>Channel 2</string>
+            </property>
+            <property name="general_settings_label" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1336,9 +1332,6 @@ QPushButton:disabled {
               </property>
               <item>
                <widget class="QLabel" name="labelThicknessCh2">
-                <property name="styleSheet">
-                 <string notr="true">font-size: 13px;</string>
-                </property>
                 <property name="text">
                  <string>Line thickness</string>
                 </property>
@@ -1560,21 +1553,16 @@ QPushButton:disabled {
                  <property name="styleSheet">
                   <string notr="true">QPushButton{
 height:25px;
-background-color: #4A64FF;
-border-radius: 4px;
-
 
 font-size: 12px;
 line-height: 14px;
-color: #FFFFFF;
-}
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                  </property>
                  <property name="text">
                   <string>Reset</string>
+                 </property>
+                 <property name="blue_button" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1785,21 +1773,9 @@ border-color: grey;
                     <property name="styleSheet">
                      <string notr="true">QPushButton{
 height:25px;
-background-color: #4A64FF;
-border-radius: 4px;
-
 
 font-size: 12px;
 line-height: 14px;
-color: #FFFFFF;
-}
-QPushButton:hover
-{
-         background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-  background-color: grey;
 }</string>
                     </property>
                     <property name="text">
@@ -1810,6 +1786,9 @@ QPushButton:disabled {
                       <width>20</width>
                       <height>20</height>
                      </size>
+                    </property>
+                    <property name="blue_button" stdset="0">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -1907,15 +1886,15 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
@@ -1983,7 +1962,7 @@ QPushButton:disabled {
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

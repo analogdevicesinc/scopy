@@ -1264,9 +1264,6 @@ color: rgba(255,255,255,51);
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">color: white;</string>
-                      </property>
                       <property name="text">
                        <string>&quot;Warning: This feature is not supported on the current firmware version!&quot;</string>
                       </property>

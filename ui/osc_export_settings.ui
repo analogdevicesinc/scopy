@@ -19,14 +19,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QWidget {
-	background-color: transparent;
-	color: #bebebe;
-	font-weight: normal;
-	font-size: 13px;
-}</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -261,24 +253,15 @@
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
             </property>
             <property name="text">
              <string>Export</string>
+            </property>
+            <property name="blue_button" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>

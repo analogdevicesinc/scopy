@@ -2282,9 +2282,6 @@ background-color: #727273;
                      </property>
                      <item>
                       <widget class="QLabel" name="label_16">
-                       <property name="styleSheet">
-                        <string notr="true">font-size: 13px;</string>
-                       </property>
                        <property name="text">
                         <string>Type</string>
                        </property>
@@ -2354,9 +2351,6 @@ background-color: #727273;
                        </property>
                        <item>
                         <widget class="QLabel" name="label_10">
-                         <property name="styleSheet">
-                          <string notr="true">font-size: 13px;</string>
-                         </property>
                          <property name="text">
                           <string>Line thickness</string>
                          </property>
@@ -2511,24 +2505,14 @@ background-color: #727273;
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
                      </property>
                      <property name="text">
                       <string>Export</string>
+                     </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -2649,29 +2633,16 @@ QPushButton:hover {
   min-height: 30px;
   max-height: 30px;
 
-  border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
+  border: 0px;f;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                      </property>
                      <property name="text">
                       <string>Import</string>
+                     </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -2699,28 +2670,15 @@ background-color: #727273;
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                      </property>
                      <property name="text">
                       <string>Snapshot</string>
+                     </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -2751,24 +2709,7 @@ background-color: #727273;
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                      </property>
                      <property name="text">
@@ -2776,6 +2717,9 @@ background-color: #727273;
                      </property>
                      <property name="checkable">
                       <bool>false</bool>
+                     </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -2806,13 +2750,11 @@ background-color: #727273;
                  </property>
                  <item>
                   <widget class="QLabel" name="label_8">
-                   <property name="styleSheet">
-                    <string notr="true">	color: white;
-	font-size: 14px;
-	font-weight: normal;</string>
-                   </property>
                    <property name="text">
                     <string>Cursors</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -3121,8 +3063,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
 }</string>
             </property>
             <property name="text">
@@ -3149,8 +3089,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
 QLabel {
   font-size: 14px;
   font-weight: bold;
-  
-  color: rgba(255, 255, 255, 153);
 }</string>
             </property>
             <property name="text">

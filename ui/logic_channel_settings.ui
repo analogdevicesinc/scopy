@@ -19,13 +19,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">QLabel:disabled
-{
-  color: rgb(85, 85, 85);
-}
-</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>0</number>
@@ -82,9 +75,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">font-size: 13px;</string>
-          </property>
           <property name="text">
            <string>BG Color</string>
           </property>
@@ -97,9 +87,6 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font-size: 13px;</string>
           </property>
           <property name="text">
            <string>Edge Color</string>
@@ -184,9 +171,6 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">font-size: 13px;</string>
-          </property>
           <property name="text">
            <string>Low Color</string>
           </property>
@@ -199,9 +183,6 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">font-size: 13px;</string>
           </property>
           <property name="text">
            <string>High Color</string>
@@ -496,9 +477,6 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
-         </property>
          <property name="text">
           <string>Name</string>
          </property>
@@ -511,9 +489,6 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
          </property>
          <property name="text">
           <string>Thickness</string>

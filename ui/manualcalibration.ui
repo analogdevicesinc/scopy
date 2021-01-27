@@ -19,7 +19,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
 }
 
 QLabel {
-	color: rgba(255, 255, 255, 150);
 	text-align: left;
 	font-size: 18px;
 }
@@ -28,18 +27,8 @@ QPushButton
 {
   width: 175px;
   height: 30px;
-  background-color: #4a64ff;
-  border-radius: 4px;
 
   text-align: center;
-  color: #ffffff;
-
-}
-
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
 }
 
 QTabWidget::pane {
@@ -233,6 +222,9 @@ QListWidget{
            <property name="text">
             <string>Load Calibration </string>
            </property>
+           <property name="blue_button" stdset="0">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
          <item>
@@ -245,6 +237,9 @@ QListWidget{
            </property>
            <property name="text">
             <string>Save Calibration</string>
+           </property>
+           <property name="blue_button" stdset="0">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -282,6 +277,9 @@ QListWidget{
            </property>
            <property name="text">
             <string>Run automatic</string>
+           </property>
+           <property name="blue_button" stdset="0">
+            <bool>true</bool>
            </property>
           </widget>
          </item>

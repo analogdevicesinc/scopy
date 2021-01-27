@@ -31,19 +31,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">Line
-{
-color: rgb(255, 190, 190);
-border: 1px solid rgba(255, 255, 255, 70);
-}
-
-QLabel {
-	font-size: 12px;
-	color: rgba(255, 255, 255, 70);
-}
-</string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>

@@ -47,13 +47,11 @@
        </property>
        <item>
         <widget class="QLabel" name="label">
-         <property name="styleSheet">
-          <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;</string>
-         </property>
          <property name="text">
           <string>Measure</string>
+         </property>
+         <property name="general_settings_label" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -72,13 +70,11 @@ font-weight: normal;</string>
        </item>
        <item>
         <widget class="QLabel" name="lblChanName">
-         <property name="styleSheet">
-          <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;</string>
-         </property>
          <property name="text">
           <string>Channel</string>
+         </property>
+         <property name="general_settings_label" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -145,7 +141,7 @@ font-weight: normal;</string>
           <x>0</x>
           <y>0</y>
           <width>252</width>
-          <height>561</height>
+          <height>563</height>
          </rect>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -257,9 +253,6 @@ font-weight: normal;</string>
            </property>
            <item row="0" column="1">
             <widget class="QLabel" name="label_3">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Counter</string>
              </property>
@@ -267,9 +260,6 @@ font-weight: normal;</string>
            </item>
            <item row="0" column="0">
             <widget class="QLabel" name="label_2">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Display All</string>
              </property>
@@ -302,30 +292,17 @@ font-weight: normal;</string>
   max-width: 240px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-
-QPushButton:hover {
-         background-color: #4a34ff;
 }</string>
              </property>
              <property name="text">
               <string>Delete All</string>
              </property>
              <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="blue_button" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
@@ -452,20 +429,8 @@ QPushButton:hover {
   max-width: 100px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-         background-color: #4a34ff;
 }</string>
              </property>
              <property name="text">
@@ -473,6 +438,9 @@ QPushButton:hover {
              </property>
              <property name="checkable">
               <bool>false</bool>
+             </property>
+             <property name="blue_button" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -486,30 +454,16 @@ QPushButton:hover {
   max-width: 240px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-
-QPushButton:hover {
-         background-color: #4a34ff;
 }</string>
              </property>
              <property name="text">
               <string>Delete All</string>
              </property>
              <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="blue_button" stdset="0">
               <bool>true</bool>
              </property>
             </widget>
@@ -651,9 +605,6 @@ QPushButton:hover {
            </item>
            <item row="1" column="0">
             <widget class="QLabel" name="label_5">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Enable</string>
              </property>

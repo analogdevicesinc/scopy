@@ -402,19 +402,6 @@ QPushButton[blue_button=true]:disabled {
 }
 
 
-/* Blue buttons from all upper menus. (such as print enable-mixed-signal, or group */
-
-QPushButton[menu_blue_button=true]{
-  width: 80px;
-  height: 40px;
-
-  text-align: left;
-  font-weight: bold;
-  padding-left: 15px;
-  padding-right: 15px;
-}
-
-
 /* Line separators for things like basemenu or basemanuitem */
 
 QFrame[line_separator=true]{
@@ -431,15 +418,4 @@ QLabel[menu_title_label=true]{
 
 QFrame[orange_line=true]{
 	border: 2px solid #ff7200;
-}
-
-/* Style for all large blue buttons */
-
-QPushButton[large_blue_button=true]{
-  width: 175px;
-  height: 30px;
-
-  font-weight: normal;
-  font-style: normal;
-  text-align: center;
 }

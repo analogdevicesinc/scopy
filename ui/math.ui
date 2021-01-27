@@ -29,8 +29,6 @@ QPushButton:pressed {
 background-color: #F45000;
 }
 QLabel {
-color: white;
-
 font-weight: bold;
 }
 QMenu {

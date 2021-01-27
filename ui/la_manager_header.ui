@@ -47,14 +47,7 @@
   font-weight: normal;
   font-style: normal;
   text-align: left;
-  color: #ffffff;
-}
-
-QLabel:disabled
-{
-	color:rgb(85,85,85);
-}
-</string>
+}</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -104,21 +97,11 @@ QLabel:disabled
      </property>
      <property name="styleSheet">
       <string notr="true">QLabel
-{  
-  
+{ 
   font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
   border: 0px solid red;
   margin:0px;
   padding:0px;
-}
-
-QLabel:disabled
-{
-	color:rgb(85,85,85);
 }
 </string>
      </property>
