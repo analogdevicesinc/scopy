@@ -126,9 +126,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
             <height>10</height>
            </size>
           </property>
-          <property name="menu_blue_button" stdset="0">
-           <bool>true</bool>
-          </property>
           <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
@@ -151,9 +148,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
            <string>Group</string>
           </property>
           <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="menu_blue_button" stdset="0">
            <bool>true</bool>
           </property>
           <property name="blue_button" stdset="0">
@@ -575,8 +569,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>300</height>
+                      <width>300</width>
+                      <height>469</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -621,14 +615,11 @@ image: url(:/icons/setup3_checked_hover.svg);
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-                       </property>
                        <property name="text">
                         <string>Channel Settings</string>
+                       </property>
+                       <property name="general_settings_label" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -640,9 +631,6 @@ font-weight: normal;
                          <height>1</height>
                         </size>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">border: 2px solid #4a64ff</string>
-                       </property>
                        <property name="frameShadow">
                         <enum>QFrame::Plain</enum>
                        </property>
@@ -651,6 +639,9 @@ font-weight: normal;
                        </property>
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="blue_line" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1027,14 +1018,11 @@ color: rgba(255,255,255,51);
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-                   </property>
                    <property name="text">
                     <string>Trigger Settings</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1046,11 +1034,11 @@ font-weight: normal;
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 2px solid #4a64ff</string>
-                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="blue_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1719,14 +1707,7 @@ width: 40px;
 QPushButton:pressed { border-image: url(:/icons/setup_btn_checked.svg); }
 QPushButton:!pressed { border-image: url(:/icons/setup_btn_unchecked.svg); }
 QPushButton:hover:!pressed:!checked { border-image: url(:/icons/setup_btn_hover.svg); }
-QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
-
-QLabel {
-font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}</string>
+QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <property name="spacing">
@@ -1758,6 +1739,9 @@ color: rgba(255, 255, 255, 153);
              </property>
              <property name="text">
               <string>Channel Settings</string>
+             </property>
+             <property name="general_settings_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1831,6 +1815,9 @@ color: rgba(255, 255, 255, 153);
              <property name="text">
               <string/>
              </property>
+             <property name="general_settings_label" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -1853,6 +1840,9 @@ color: rgba(255, 255, 255, 153);
             <widget class="QLabel" name="triggerLabel">
              <property name="text">
               <string>Trigger</string>
+             </property>
+             <property name="general_settings_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>

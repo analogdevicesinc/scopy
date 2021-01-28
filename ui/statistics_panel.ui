@@ -44,19 +44,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QScrollBar:horizontal {
-  background: #262628;
-  max-height: 6px;
-  border-radius: 3px;
-}
-
-QScrollBar::handle:horizontal {
-  background: #4a4a4b;
-  border: 0;
-  border-radius: 3px;
-}
-
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+      <string notr="true">QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
     background: none;
 }
 

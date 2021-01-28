@@ -419,3 +419,13 @@ QLabel[menu_title_label=true]{
 QFrame[orange_line=true]{
 	border: 2px solid #ff7200;
 }
+
+/* Text color for all CheckBoxes */
+QCheckBox{
+	  color: rgba(255, 255, 255, 153);
+}
+
+/* Text color for all SpinBoxes */
+QSpinBox{
+	color: white;
+}

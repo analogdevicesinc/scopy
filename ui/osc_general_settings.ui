@@ -29,7 +29,6 @@ QCheckBox {
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 153);
 }
 
 QCheckBox::indicator {

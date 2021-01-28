@@ -758,32 +758,19 @@ QTabBar::tab:selected {
                             </property>
                             <property name="styleSheet">
                              <string notr="true">QPushButton{
-
-/*height: 128px;
-width: 128px;
-background-image: url(:/icons/floppy.svg);*/
 background-position: center center;
 background-repeat: no-repeat;
-background-color: #4a64ff;
   height: 30px;
-  border-radius: 4px;
-  
-  font-size: 14px;
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}
-</string>
+}</string>
                             </property>
                             <property name="text">
                              <string>Load file</string>
+                            </property>
+                            <property name="blue_button" stdset="0">
+                             <bool>true</bool>
                             </property>
                            </widget>
                           </item>
@@ -798,32 +785,22 @@ QPushButton:hover
                             <property name="styleSheet">
                              <string notr="true">QPushButton{
 
-/*height: 128px;
-width: 128px;*/
 image: url(:/icons/refresh.svg);
 
 background-position: center center;
 background-repeat: no-repeat;
-background-color: #4a64ff;
   height: 30px;
-  border-radius: 4px;
-  
-  font-size: 14px;
+
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}
-</string>
+}</string>
                             </property>
                             <property name="text">
                              <string/>
+                            </property>
+                            <property name="blue_button" stdset="0">
+                             <bool>true</bool>
                             </property>
                            </widget>
                           </item>
@@ -1277,9 +1254,6 @@ QPushButton:hover
                          </property>
                          <item>
                           <widget class="QLabel" name="label_10">
-                           <property name="styleSheet">
-                            <string notr="true">font-size: 13px;</string>
-                           </property>
                            <property name="text">
                             <string>Line thickness</string>
                            </property>
@@ -1424,15 +1398,15 @@ QPushButton:hover
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::RunSingleWidget</class>
-   <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::RunSingleWidget</class>
+   <extends>QWidget</extends>
+   <header>runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

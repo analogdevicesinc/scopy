@@ -68,29 +68,13 @@
          <property name="styleSheet">
           <string notr="true">QPushButton {
   	border: 0px;
-  	border-radius: 4px;
-  	background-color: #4a64ff;
-	color: #ffffff;
-  	font-size: 14px;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-</string>
+}</string>
          </property>
          <property name="text">
           <string>Save</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -197,32 +181,16 @@ QLineEdit[invalid=true] {
              <property name="styleSheet">
               <string notr="true">QPushButton {
   	border: 0px;
-  	border-radius: 4px;
-  	background-color: #4a64ff;
-	color: #ffffff;
-  	font-size: 14px;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-</string>
+}</string>
              </property>
              <property name="text">
               <string>Browse</string>
              </property>
              <property name="checkable">
               <bool>false</bool>
+             </property>
+             <property name="blue_button" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -471,16 +439,6 @@ QPushButton:disabled {
 height: 40px;
 width: 40px;
 border-width: 0px;
-border-radius: 4px;
-background-color: #4A64FF;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
 }</string>
           </property>
           <property name="text">
@@ -497,6 +455,9 @@ background-color: #4a34ff;
            </size>
           </property>
           <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
@@ -563,15 +524,15 @@ background-color: #4a34ff;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::StackedHomepage</class>
-   <extends>QStackedWidget</extends>
-   <header>stacked_homepage.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::OscCustomScrollArea</class>
    <extends>QScrollArea</extends>
    <header>osc_custom_scroll.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::StackedHomepage</class>
+   <extends>QStackedWidget</extends>
+   <header>stacked_homepage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

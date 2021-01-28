@@ -87,14 +87,15 @@
               <string notr="true">QLabel
 {
 
-font-size: 14px;
 font-weight: bold;
 line-height: 16px;
-color: #FFFFFF;
 }</string>
              </property>
              <property name="text">
               <string>TextLabel</string>
+             </property>
+             <property name="general_settings_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -171,11 +172,13 @@ color: #FFFFFF;
            </property>
            <property name="styleSheet">
             <string notr="true">width: 240px;
-height: 2px;
-background-color: #4A64FF;</string>
+height: 2px;</string>
            </property>
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="blue_line" stdset="0">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -263,9 +266,6 @@ background-color: #4A64FF;</string>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">font-size: 13px;</string>
-                   </property>
                    <property name="text">
                     <string>Pattern</string>
                    </property>
@@ -307,9 +307,6 @@ background-color: #4A64FF;</string>
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
-                   </property>
-                   <property name="styleSheet">
-                    <string notr="true">font-size: 13px;</string>
                    </property>
                    <property name="text">
                     <string>Output</string>
@@ -523,7 +520,7 @@ background-color: #4A64FF;</string>
                      <string> SETTINGS </string>
                     </property>
                     <property name="subsection_label" stdset="0">
-                     <bool>false</bool>
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>

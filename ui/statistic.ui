@@ -169,13 +169,11 @@ font-size: 14px;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">color: #ffffff;
-font-size: 14px;
-font-weight: bold;</string>
-       </property>
        <property name="text">
         <string>1</string>
+       </property>
+       <property name="general_settings_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -203,13 +201,11 @@ font-weight: bold;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">color: #ffffff;
-font-size: 14px;
-font-weight: bold;</string>
-       </property>
        <property name="text">
         <string>Measurement</string>
+       </property>
+       <property name="general_settings_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

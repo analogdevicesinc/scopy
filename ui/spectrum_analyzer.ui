@@ -52,7 +52,6 @@ QComboBox
 {
   height: 24px;
   border: 0px;
-  color: white;
   font-size: 14px;
   border-bottom: 1px solid rgba(255, 255, 255, 102);
   padding-bottom: 4px;
@@ -150,9 +149,6 @@ QComboBox:disabled
             <height>10</height>
            </size>
           </property>
-          <property name="menu_blue_button" stdset="0">
-           <bool>true</bool>
-          </property>
           <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
@@ -210,27 +206,21 @@ QComboBox:disabled
          <widget class="QPushButton" name="btnPreset">
           <property name="styleSheet">
            <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
-
 font-size: 12px;
 font-weight: bold;
 height: 30px;
 border-width: 0px;
 border-radius: 3px;
 min-width: 6em;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:checked {
-background-color: #F45000;
 }</string>
           </property>
           <property name="text">
            <string>Preset</string>
           </property>
           <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>
@@ -522,13 +512,7 @@ QPushButton:checked:hover {
         <item>
          <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
           <property name="styleSheet">
-           <string notr="true">QWidget#rightMenu {
-  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1, stop:0 rgba(35, 35, 43, 255), stop:0.1 rgba(39, 39, 48, 255), stop: 0.9 rgba(39, 39, 48, 255), stop: 1 rgba(35, 35, 43, 255));
-}
-
-QWidget {
-   background-color: rgba(39, 39, 48, 255);
-}</string>
+           <string notr="true"/>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <property name="spacing">
@@ -555,7 +539,7 @@ QWidget {
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>0</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -576,13 +560,11 @@ QWidget {
                </property>
                <item>
                 <widget class="QLabel" name="channelSettingsTitle">
-                 <property name="styleSheet">
-                  <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
-                 </property>
                  <property name="text">
                   <string>Channel</string>
+                 </property>
+                 <property name="general_settings_label" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -600,9 +582,6 @@ QWidget {
                    <height>16777215</height>
                   </size>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">color: #4A64FF;</string>
-                 </property>
                  <property name="frameShadow">
                   <enum>QFrame::Plain</enum>
                  </property>
@@ -611,6 +590,9 @@ QWidget {
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="blue_line" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -624,9 +606,6 @@ QWidget {
                  </property>
                  <item>
                   <widget class="QLabel" name="label_type">
-                   <property name="styleSheet">
-                    <string notr="true"> font-size: 13px;</string>
-                   </property>
                    <property name="text">
                     <string>Type</string>
                    </property>
@@ -658,9 +637,6 @@ QWidget {
                  </property>
                  <item>
                   <widget class="QLabel" name="label_window">
-                   <property name="styleSheet">
-                    <string notr="true"> font-size: 13px;</string>
-                   </property>
                    <property name="text">
                     <string>Window</string>
                    </property>
@@ -701,9 +677,6 @@ QWidget {
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true"> font-size: 13px;</string>
-                   </property>
                    <property name="text">
                     <string>Averaging</string>
                    </property>
@@ -714,7 +687,6 @@ QWidget {
                    <property name="styleSheet">
                     <string notr="true">font-size: 14px;
 height:24px;
-color: white;
 border: 0px;
 border-bottom: 1px solid rgba(255,255,255,100);
 
@@ -756,33 +728,20 @@ border-color: green;
                    </property>
                    <property name="styleSheet">
                     <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
-font-family:  14pt;
 border-width: 0px;
 border-radius: 3px;
 min-width: 64px;
 }
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
 
 QPushButton:enabled:!pressed { background-color: #4a64ff; }
 QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
-QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
-QPushButton:pressed {
-background-color: #4a64ff;
-}
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}</string>
+QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }</string>
                    </property>
                    <property name="text">
                     <string>Apply</string>
+                   </property>
+                   <property name="blue_button" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -798,9 +757,6 @@ QPushButton:hover
                  </property>
                  <item>
                   <widget class="QLabel" name="label_thickness">
-                   <property name="styleSheet">
-                    <string notr="true"> font-size: 13px;</string>
-                   </property>
                    <property name="text">
                     <string>CH Thickness</string>
                    </property>
@@ -926,32 +882,16 @@ QPushButton:hover
                   <string notr="true">QPushButton{
   width: 175px;
   height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  
-  font-size: 14px;
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:disabled {
-  background-color: grey;
-  color:white;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
                  </property>
                  <property name="text">
                   <string>Snapshot</string>
+                 </property>
+                 <property name="blue_button" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -994,7 +934,6 @@ QCheckBox {
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 153);
 }
 
 QCheckBox::indicator {
@@ -1106,24 +1045,13 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
                  </property>
                  <property name="text">
                   <string>Export</string>
+                 </property>
+                 <property name="blue_button" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1166,13 +1094,11 @@ QPushButton:hover {
                  </property>
                  <item>
                   <widget class="QLabel" name="labelSettingsTitle">
-                   <property name="styleSheet">
-                    <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
-                   </property>
                    <property name="text">
                     <string>Sweep</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1205,9 +1131,6 @@ QPushButton:hover {
                    <height>2</height>
                   </size>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">color: #4A64FF;</string>
-                 </property>
                  <property name="frameShadow">
                   <enum>QFrame::Plain</enum>
                  </property>
@@ -1216,6 +1139,9 @@ QPushButton:hover {
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="blue_line" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1331,14 +1257,11 @@ color: rgba(255,255,255,51);
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70)
-    }</string>
-                   </property>
                    <property name="text">
                     <string>FREQUENCY </string>
+                   </property>
+                   <property name="subsection_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1356,11 +1279,11 @@ color: rgba(255,255,255,51);
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);</string>
-                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="subsection_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1398,14 +1321,11 @@ color: rgba(255,255,255,51);
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70)
-    }</string>
-                   </property>
                    <property name="text">
                     <string>AMPLITUDE </string>
+                   </property>
+                   <property name="subsection_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1423,11 +1343,11 @@ color: rgba(255,255,255,51);
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true"> border: 1px solid rgba(255, 255, 255, 70);</string>
-                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="subsection_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1473,9 +1393,6 @@ color: rgba(255,255,255,51);
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_rbw">
-                     <property name="styleSheet">
-                      <string notr="true"> font-size: 13px;</string>
-                     </property>
                      <property name="text">
                       <string>Resolution BW</string>
                      </property>
@@ -1499,9 +1416,6 @@ color: rgba(255,255,255,51);
                    </item>
                    <item>
                     <widget class="QLabel" name="lbl_units">
-                     <property name="styleSheet">
-                      <string notr="true"> font-size: 13px;</string>
-                     </property>
                      <property name="text">
                       <string>Units</string>
                      </property>
@@ -1562,13 +1476,11 @@ color: rgba(255,255,255,51);
                  </property>
                  <item>
                   <widget class="QLabel" name="label_4">
-                   <property name="styleSheet">
-                    <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
-                   </property>
                    <property name="text">
                     <string>Markers</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1587,13 +1499,11 @@ color: rgba(255,255,255,51);
                  </item>
                  <item>
                   <widget class="QLabel" name="labelMarkerSettingsTitle">
-                   <property name="styleSheet">
-                    <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
-                   </property>
                    <property name="text">
                     <string>Settings</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1653,14 +1563,11 @@ color: rgba(255,255,255,51);
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70)
-    }</string>
-                   </property>
                    <property name="text">
                     <string>MARKER </string>
+                   </property>
+                   <property name="subsection_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1684,11 +1591,11 @@ color: rgba(255,255,255,51);
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="subsection_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1712,29 +1619,16 @@ color: rgba(255,255,255,51);
                   <widget class="QPushButton" name="pushButton_3">
                    <property name="styleSheet">
                     <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
-
-font-size:14px;
 height: 30px;
 width: 120px;
 border-width: 0px;
-border-radius: 4px;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                    </property>
                    <property name="text">
                     <string>Normal</string>
+                   </property>
+                   <property name="blue_button" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2065,14 +1959,11 @@ QPushButton:hover
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70)
-    }</string>
-                   </property>
                    <property name="text">
                     <string>GENERAL </string>
+                   </property>
+                   <property name="subsection_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2090,12 +1981,11 @@ QPushButton:hover
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-</string>
-                   </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="subsection_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2196,13 +2086,11 @@ QPushButton:hover
                 <layout class="QVBoxLayout" name="verticalLayout_14">
                  <item>
                   <widget class="QLabel" name="label">
-                   <property name="styleSheet">
-                    <string notr="true"> color: white;
-    font-size: 14px;
-    font-weight: normal;</string>
-                   </property>
                    <property name="text">
                     <string>Import Reference Channels</string>
+                   </property>
+                   <property name="general_settings_label" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2230,14 +2118,14 @@ QPushButton:hover
                      <height>1</height>
                     </size>
                    </property>
-                   <property name="styleSheet">
-                    <string notr="true">color: #4A64FF;</string>
-                   </property>
                    <property name="frameShadow">
                     <enum>QFrame::Plain</enum>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="blue_line" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2278,28 +2166,13 @@ QPushButton:hover
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                    </property>
                    <property name="text">
                     <string>Browse</string>
+                   </property>
+                   <property name="blue_button" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2321,28 +2194,13 @@ background-color: #727273;
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                    </property>
                    <property name="text">
                     <string>Import</string>
+                   </property>
+                   <property name="blue_button" stdset="0">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -2440,8 +2298,6 @@ background-color: #727273;
   background-color: transparent;
   font-size: 14px;
   font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
 }
 
 QCheckBox::indicator {
@@ -2461,20 +2317,16 @@ QPushButton {
 QPushButton:pressed { border-image: url(:/icons/setup_btn_checked.svg); }
 QPushButton:!pressed { border-image: url(:/icons/setup_btn_unchecked.svg); }
 QPushButton:hover:!pressed:!checked { border-image: url(:/icons/setup_btn_hover.svg); }
-QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
-
-QLabel {
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}</string>
+QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QLabel" name="label_2">
              <property name="text">
               <string>Sweep</string>
+             </property>
+             <property name="general_settings_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -2508,6 +2360,9 @@ QLabel {
             <widget class="QLabel" name="label_3">
              <property name="text">
               <string>Markers</string>
+             </property>
+             <property name="general_settings_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
