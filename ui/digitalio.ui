@@ -49,11 +49,6 @@
        <height>50</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">#widget {
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
-}</string>
-     </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>0</number>

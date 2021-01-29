@@ -25,6 +25,12 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget {
+  background-color: rgb(20, 20, 22);
+  color: white;
+}</string>
+  </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
     <number>0</number>
@@ -62,11 +68,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget {
-  background-color: rgb(20, 20, 22);
-  color: white;
-}
-</string>
+      <string notr="true"/>
      </property>
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
@@ -156,9 +158,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>Δt =</string>
         </property>
@@ -188,9 +187,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>CurT2 =</string>
         </property>
@@ -206,9 +202,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
         </property>
         <property name="text">
          <string>1/Δt =</string>
@@ -265,9 +258,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>CurT1 =</string>
         </property>
@@ -300,10 +290,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget {
-  background-color: rgb(20, 20, 22);
-  color: white;
-}</string>
+      <string notr="true"/>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
@@ -329,9 +316,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>CurV2</string>
         </property>
@@ -348,9 +332,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>    ΔV</string>
         </property>
@@ -366,9 +347,6 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
         </property>
         <property name="text">
          <string>CurV1</string>
@@ -499,9 +477,6 @@
       </item>
       <item row="3" column="1">
        <widget class="QLabel" name="label">
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>=</string>
         </property>
@@ -509,9 +484,6 @@
       </item>
       <item row="2" column="1">
        <widget class="QLabel" name="label_2">
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>=</string>
         </property>
@@ -519,9 +491,6 @@
       </item>
       <item row="1" column="1">
        <widget class="QLabel" name="label_3">
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>=</string>
         </property>

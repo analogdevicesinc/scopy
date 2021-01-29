@@ -44,8 +44,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>Avg:</string>
@@ -61,8 +60,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -78,8 +76,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>Min:</string>
@@ -95,8 +92,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -112,8 +108,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>Max:</string>
@@ -129,8 +124,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>

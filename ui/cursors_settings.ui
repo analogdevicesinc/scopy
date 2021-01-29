@@ -629,29 +629,7 @@ color: rgba(255,255,255,51);
       <item>
        <widget class="QSlider" name="horizontalSlider">
         <property name="styleSheet">
-         <string notr="true">QSlider::groove {
-    border: 1px solid #444444;
-    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: #999999;
-    margin: 2px 0;
-    border-radius: 2px;
-}
-
-QSlider::handle {
-    background: rgb(73, 99, 255);
-    border: 0px solid;
-    width: 18px;
-    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
-    border-radius: 8px;
-}
-
-QSlider::handle:disabled {
-    background: #444444;
-}
-
-QSlider::sub-page:horizontal {
-    background: #4A64FF;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>

@@ -46,11 +46,6 @@
    </property>
    <item>
     <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
-     <property name="styleSheet">
-      <string notr="true">#mainWidget {
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
-}</string>
-     </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>0</number>
@@ -195,31 +190,6 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
             <height>0</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  min-height: 40px;
-  max-height: 40px;
-  min-width: 60px;
-  max-width: 60px;
-  padding-top:5px
-}
-
-QPushButton:checked {
-border-top: 1px solid rgba(255,255,255,150);
-}
-
-QPushButton:!checked {
-border-top: 1px solid rgba(255,255,255,0);
-}
-
-QPushButton:!checked:hover {
-border-top: 1px solid rgba(255,255,255,0);
-}
-
-QPushButton:checked:hover {
-border-top: 1px solid rgba(255,255,255,200);
-}</string>
-          </property>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
             <number>0</number>
@@ -239,7 +209,8 @@ border-top: 1px solid rgba(255,255,255,200);
            <item>
             <widget class="adiscope::CustomPushButton" name="btnGeneralSettings">
              <property name="styleSheet">
-              <string notr="true">QPushButton:checked {
+              <string notr="true">
+QPushButton:checked {
   image: url(:/icons/gear_wheel_pressed.svg);
 }
 
@@ -254,12 +225,16 @@ image: url(:/icons/gear_wheel_hover.svg);
 
 QPushButton:checked:hover {
 image: url(:/icons/gear_wheel_pressed.svg);
-}</string>
+}
+</string>
              </property>
              <property name="text">
               <string/>
              </property>
              <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="menu_icon_button" stdset="0">
               <bool>true</bool>
              </property>
              <attribute name="buttonGroup">
@@ -292,6 +267,9 @@ image: url(:/icons/setup3_checked_hover.svg);
              <property name="checkable">
               <bool>true</bool>
              </property>
+             <property name="menu_icon_button" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
@@ -314,9 +292,6 @@ image: url(:/icons/setup3_checked_hover.svg);
          <layout class="QVBoxLayout" name="plot_and_buffPreviewer">
           <item>
            <widget class="QWidget" name="hLayoutBufferPreview" native="true">
-            <property name="styleSheet">
-             <string notr="true">background-color:black;</string>
-            </property>
             <layout class="QHBoxLayout" name="hLayout_buffPreview">
              <property name="spacing">
               <number>0</number>
@@ -405,9 +380,6 @@ image: url(:/icons/setup3_checked_hover.svg);
            <widget class="QWidget" name="widgetPlotContainer" native="true">
             <property name="acceptDrops">
              <bool>false</bool>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: black;</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_5">
              <property name="leftMargin">
@@ -515,7 +487,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>3</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -562,8 +534,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>329</width>
-                      <height>467</height>
+                      <width>200</width>
+                      <height>329</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1456,7 +1428,7 @@ color: rgba(255,255,255,51);
                       <x>0</x>
                       <y>0</y>
                       <width>319</width>
-                      <height>467</height>
+                      <height>472</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1651,40 +1623,7 @@ color: rgba(255,255,255,51);
                      <item>
                       <widget class="QWidget" name="widget_2" native="true">
                        <property name="styleSheet">
-                        <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton {
-width: 40px;
-  height: 20px;
-  background-color: transparent;
-}
-QPushButton:pressed { border-image: url(:/icons/setup_btn_checked.svg); }
-QPushButton:!pressed { border-image: url(:/icons/setup_btn_unchecked.svg); }
-QPushButton:hover:!pressed:!checked { border-image: url(:/icons/setup_btn_hover.svg); }
-QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
-
-QLabel {
-font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}</string>
+                        <string notr="true"/>
                        </property>
                        <layout class="QVBoxLayout" name="verticalLayout_7">
                         <property name="spacing">
@@ -1772,42 +1711,6 @@ color: rgba(255, 255, 255, 153);
                      </item>
                      <item>
                       <widget class="QWidget" name="widget_4" native="true">
-                       <property name="styleSheet">
-                        <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton {
-width: 40px;
-  height: 20px;
-  background-color: transparent;
-}
-QPushButton:pressed { border-image: url(:/icons/setup_btn_checked.svg); }
-QPushButton:!pressed { border-image: url(:/icons/setup_btn_unchecked.svg); }
-QPushButton:hover:!pressed:!checked { border-image: url(:/icons/setup_btn_hover.svg); }
-QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }
-
-QLabel {
-font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}</string>
-                       </property>
                        <layout class="QVBoxLayout" name="verticalLayout_8">
                         <property name="spacing">
                          <number>0</number>
@@ -2104,6 +2007,11 @@ font-size: 14px;
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
@@ -2114,11 +2022,6 @@ font-size: 14px;
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

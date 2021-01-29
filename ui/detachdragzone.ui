@@ -23,12 +23,7 @@
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget {
-background-color : black;
-}
-QWidget#DetachDragZone[hover=true] { 
-border: 1px solid white;
- }</string>
+   <string notr="true"/>
   </property>
   <widget class="QLabel" name="label">
    <property name="enabled">

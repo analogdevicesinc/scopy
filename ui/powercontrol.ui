@@ -44,8 +44,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
-QLabel { color: #444444; }</string>
+      <string notr="true"/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="leftMargin">

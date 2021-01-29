@@ -71,18 +71,8 @@
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget#menuControl:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-.QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <property name="spacing">
@@ -216,18 +206,8 @@ background-position: left center;
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <property name="spacing">
@@ -417,14 +397,8 @@ border-radius:5px;
                 <height>16777215</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}
-QWidget[selected=true] { background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}</string>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <property name="spacing">
@@ -544,14 +518,8 @@ border-radius:5px;}</string>
                 <height>16777215</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}
-QWidget[selected=true] { background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}</string>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <property name="spacing">
@@ -677,18 +645,8 @@ border-radius:5px;}</string>
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <property name="spacing">
@@ -810,18 +768,8 @@ border-radius:5px;
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
@@ -851,18 +799,8 @@ border-radius:5px;
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <property name="spacing">

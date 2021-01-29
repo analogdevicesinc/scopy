@@ -20,7 +20,7 @@
 #include "channel_widget.hpp"
 #include "ui_channel.h"
 #include "dynamicWidget.hpp"
-
+#include "utils.h"
 #include <QButtonGroup>
 
 using namespace adiscope;
@@ -47,6 +47,8 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 {
 	init();
 	nameButton()->installEventFilter(this);
+
+	setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/stylesheets/channel_widget.qss"));
 }
 
 ChannelWidget::~ChannelWidget()

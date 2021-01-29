@@ -270,11 +270,7 @@
               <item>
                <widget class="QLabel" name="function_2">
                 <property name="styleSheet">
-                 <string notr="true">QLabel {
-	color: white;
-	font: bold  ;	
-	font-size: 16px;
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="text">
                  <string/>
@@ -912,22 +908,7 @@ AC Coupling</string>
        <item>
         <widget class="QWidget" name="filter1" native="true">
          <property name="styleSheet">
-          <string notr="true">QCheckBox::indicator {
-  border: 2px solid rgb(74, 100, 255);
-  border-radius: 4px;
-  width: 16px;
-  height: 16px;
-  subcontrol-position: left;
-}
-
-QCheckBox::indicator:checked {
-  background-color: rgb(74, 100, 255);
-}
-
-QCheckBox{
-text-align: center;
-
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="leftMargin">
@@ -1072,22 +1053,7 @@ text-align: center;
        <item>
         <widget class="QWidget" name="filter2" native="true">
          <property name="styleSheet">
-          <string notr="true">QCheckBox::indicator {
-  border: 2px solid rgb(74, 100, 255);
-  border-radius: 4px;
-  width: 16px;
-  height: 16px;
-  subcontrol-position: left;
-}
-
-QCheckBox::indicator:checked {
-  background-color: rgb(74, 100, 255);
-}
-
-QCheckBox{
-text-align: center;
-
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="spacing">

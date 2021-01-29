@@ -420,12 +420,97 @@ QFrame[orange_line=true]{
 	border: 2px solid #ff7200;
 }
 
-/* Text color for all CheckBoxes */
-QCheckBox{
-	  color: rgba(255, 255, 255, 153);
-}
 
 /* Text color for all SpinBoxes */
 QSpinBox{
 	color: white;
+}
+
+
+QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 153);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+
+
+
+QSlider::groove {
+    border: 1px solid #444444;
+    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: #999999;
+    margin: 2px 0;
+    border-radius: 2px;
+}
+
+QSlider::handle {
+    background: rgb(73, 99, 255);
+    border: 0px solid;
+    width: 18px;
+    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 8px;
+}
+
+QSlider::handle:disabled {
+    background: #444444;
+}
+
+QSlider::sub-page:horizontal {
+    background: #4A64FF;
+}
+
+/* Style for settings and general settings buttons from all menus */
+
+QPushButton[menu_icon_button=true] {
+  min-height: 40px;
+  max-height: 40px;
+  min-width: 60px;
+  max-width: 60px;
+  padding-top:5px
+}
+
+QPushButton[menu_icon_button=true]:checked {
+border-top: 1px solid rgba(255,255,255,150);
+}
+
+QPushButton[menu_icon_button=true]:!checked {
+border-top: 1px solid rgba(255,255,255,0);
+}
+
+QPushButton[menu_icon_button=true]:!checked:hover {
+border-top: 1px solid rgba(255,255,255,0);
+}
+
+QPushButton[menu_icon_button=true]:checked:hover {
+border-top: 1px solid rgba(255,255,255,200);
+}
+
+
+/* Style for all Tool launcher buttons, such as Home, Menu, Preferences, Load, Save, Notes, etc. */
+
+QPushButton[tool_launcher_custom_widget=true] {
+	text-align:left;
+	 border: none;
+	background-color: none;
+}
+.QWidget[tool_launcher_custom_widget=true]:hover {
+background-color: rgba(0, 0, 0, 60);
+border: 1px solid rgba(0, 0, 0, 30);
+border-radius:5px;
+}
+QWidget[tool_launcher_custom_widget="true"][selected="true"] {
+background-color: rgba(0, 0, 0, 60);
+border: 1px solid rgba(0, 0, 0, 30);
+border-radius:5px;
 }

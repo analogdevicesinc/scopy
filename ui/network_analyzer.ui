@@ -26,7 +26,7 @@
    <item>
     <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
      <property name="styleSheet">
-      <string notr="true">#mainWidget { background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent); }</string>
+      <string notr="true"/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -135,31 +135,6 @@
             <height>0</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton {
-  min-height: 40px;
-  max-height: 40px;
-  min-width: 60px;
-  max-width: 60px;
-  padding-top:5px
-}
-
-QPushButton:checked {
-  border-top: 1px solid rgba(255,255,255,150);
-}
-
-QPushButton:!checked {
-  border-top: 1px solid rgba(255,255,255,0);
-}
-
-QPushButton:!checked:hover {
-  border-top: 1px solid rgba(255,255,255,0);
-}
-
-QPushButton:checked:hover {
-  border-top: 1px solid rgba(255,255,255,200);
-}</string>
-          </property>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <property name="spacing">
             <number>0</number>
@@ -180,14 +155,14 @@ QPushButton:checked:hover {
             <widget class="adiscope::CustomPushButton" name="btnGeneralSettings">
              <property name="minimumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>16777215</width>
+               <height>16777215</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -214,6 +189,9 @@ QPushButton:checked:hover {
              <property name="checkable">
               <bool>true</bool>
              </property>
+             <property name="menu_icon_button" stdset="0">
+              <bool>true</bool>
+             </property>
              <attribute name="buttonGroup">
               <string notr="true">buttonGroup</string>
              </attribute>
@@ -223,14 +201,14 @@ QPushButton:checked:hover {
             <widget class="adiscope::CustomPushButton" name="btnSettings">
              <property name="minimumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>62</width>
-               <height>47</height>
+               <width>16777215</width>
+               <height>16777215</height>
               </size>
              </property>
              <property name="styleSheet">
@@ -252,6 +230,9 @@ QPushButton:checked:hover {
 }</string>
              </property>
              <property name="checkable">
+              <bool>true</bool>
+             </property>
+             <property name="menu_icon_button" stdset="0">
               <bool>true</bool>
              </property>
              <attribute name="buttonGroup">
@@ -277,7 +258,7 @@ QPushButton:checked:hover {
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="currentIndex">
-             <number>2</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="stackedWidgetPage1">
              <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -2895,31 +2876,6 @@ background-color: #727273;
                  </item>
                  <item>
                   <widget class="QSlider" name="horizontalSlider">
-                   <property name="styleSheet">
-                    <string notr="true">QSlider::groove {
-    border: 1px solid #444444;
-    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: #999999;
-    margin: 2px 0;
-    border-radius: 2px;
-}
-
-QSlider::handle {
-    background: rgb(73, 99, 255);
-    border: 0px solid;
-    width: 18px;
-    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
-    border-radius: 8px;
-}
-
-QSlider::handle:disabled {
-    background: #444444;
-}
-
-QSlider::sub-page:horizontal {
-    background: #4A64FF;
-}</string>
-                   </property>
                    <property name="maximum">
                     <number>100</number>
                    </property>
@@ -3042,23 +2998,7 @@ QSlider::sub-page:horizontal {
           <item>
            <widget class="QCheckBox" name="boxCursors">
             <property name="styleSheet">
-             <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QLabel {
+             <string notr="true">QLabel {
   font-size: 14px;
   font-weight: bold;
 }</string>
@@ -3128,6 +3068,11 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
@@ -3138,11 +3083,6 @@ QLabel {
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::dBgraph</class>

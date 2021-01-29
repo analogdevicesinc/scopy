@@ -251,7 +251,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	ui->stackedWidget->setCurrentIndex(0);
 	setupAddPage();
 	readPreferences();
-	ui->stackedWidget->setStyleSheet("background-color:black;");
+	//ui->stackedWidget->setStyleSheet("background-color:black;");
 	this->installEventFilter(this);
 	ui->btnConnect->hide();	
 

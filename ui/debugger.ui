@@ -32,11 +32,7 @@
    <double>1.000000000000000</double>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget#dragContainer{
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
-}
-
-QPushButton
+   <string notr="true">QPushButton
 {
   width: 175px;
   height: 30px;
@@ -51,44 +47,8 @@ QPushButton
 
 }
 
-QCheckBox::indicator {
-  border: 2px solid rgb(74, 100, 255);
-  border-radius: 4px;
-  width: 16px;
-  height: 16px;
-  subcontrol-position: left;
-}
-
-QCheckBox::indicator:checked {
-  background-color: rgb(74, 100, 255);
-}
-
-QCheckBox{
-text-align: center;
-
-}
-
 QLabel {
 background-color: transparent;
-}
-
-QScrollBar:horizontal {
-  background: #262628;
-}
-
-QScrollBar::handle:horizontal {
-  background: #4a4a4b;
-  border: 0;
-  border-radius: 3px;
-}
-
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
-    background: none;
-}
-
-QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-  border: none;
-  background: none;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -597,9 +557,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">color: rgb(238, 238, 236);</string>
-                </property>
                 <property name="text">
                  <string>Address:</string>
                 </property>
@@ -753,9 +710,6 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">color: rgb(238, 238, 236);</string>
                 </property>
                 <property name="text">
                  <string>Value:</string>
