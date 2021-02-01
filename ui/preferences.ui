@@ -351,23 +351,6 @@
                <layout class="QHBoxLayout" name="horizontalLayout_13">
                 <item>
                  <widget class="QCheckBox" name="oscGraticuleCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -398,25 +381,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
               <item row="2" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_17">
                 <item>
-                 <widget class="QCheckBox" name="oscFilteringCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
-                 </widget>
+                 <widget class="QCheckBox" name="oscFilteringCheckBox"/>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_17">
@@ -444,23 +409,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                <layout class="QHBoxLayout" name="horizontalLayout_19">
                 <item>
                  <widget class="QCheckBox" name="histCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -504,25 +452,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
               <item row="1" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_20">
                 <item>
-                 <widget class="QCheckBox" name="oscADCFiltersCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
-                 </widget>
+                 <widget class="QCheckBox" name="oscADCFiltersCheckBox"/>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_20">
@@ -899,23 +829,6 @@ color: white;
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QCheckBox" name="spectrumVisiblePeakSearch">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1027,23 +940,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
               <layout class="QHBoxLayout" name="horizontalLayout_22">
                <item>
                 <widget class="QCheckBox" name="logicAnalyzerDisplaySamplingPoints">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1358,23 +1254,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                     <width>16777215</width>
                     <height>16777215</height>
                    </size>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                   </property>
                   <property name="text">
                    <string/>

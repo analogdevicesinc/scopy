@@ -1660,24 +1660,11 @@ QPushButton:hover
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
 height: 60px;
 width: 55px;
-border-radius: 4px;
 padding-left: 5px;
 
 text-align: left;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                      </property>
                      <property name="text">
@@ -1693,6 +1680,9 @@ QPushButton:hover
                        <height>12</height>
                       </size>
                      </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="0">
@@ -1705,26 +1695,10 @@ QPushButton:hover
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
 height: 60px;
 width: 55px;
-border-radius: 4px;
 
 padding-left: 5px;
-}
-
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
-
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                      </property>
                      <property name="text">
@@ -1740,6 +1714,9 @@ QPushButton:hover
                        <height>12</height>
                       </size>
                      </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                    <item row="0" column="1">
@@ -1752,22 +1729,8 @@ QPushButton:hover
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
 height: 60px;
 width: 60px;
-border-radius: 4px;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                      </property>
                      <property name="text">
@@ -1783,6 +1746,9 @@ QPushButton:hover
                        <height>12</height>
                       </size>
                      </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                    <item row="2" column="1">
@@ -1795,22 +1761,8 @@ QPushButton:hover
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
 height: 60px;
 width: 60px;
-border-radius: 4px;
-}
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                      </property>
                      <property name="text">
@@ -1826,6 +1778,9 @@ QPushButton:hover
                        <height>12</height>
                       </size>
                      </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
+                     </property>
                     </widget>
                    </item>
                    <item row="1" column="1">
@@ -1838,30 +1793,17 @@ QPushButton:hover
                      </property>
                      <property name="styleSheet">
                       <string notr="true">QPushButton {
-color: white;
-background-color: #4A64FF;
-
 font-size:16px;
 height: 60px;
 width: 60px;
-border-radius: 4px;
 border-width: 0px;
-}
-
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
                      </property>
                      <property name="text">
                       <string>Peak</string>
+                     </property>
+                     <property name="blue_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                     </widget>
                    </item>
@@ -2330,11 +2272,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2345,6 +2282,11 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

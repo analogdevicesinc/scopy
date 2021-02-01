@@ -823,7 +823,7 @@ border: 5px solid white;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -866,7 +866,7 @@ border: 5px solid white;
                     <property name="geometry">
                      <rect>
                       <x>0</x>
-                      <y>0</y>
+                      <y>-414</y>
                       <width>322</width>
                       <height>985</height>
                      </rect>
@@ -3051,11 +3051,6 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -3066,6 +3061,11 @@ QLabel {
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

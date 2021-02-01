@@ -35,56 +35,6 @@
    <string notr="true">QWidget
 {
   color: rgb(190, 190, 190);
-}
-
-/* QComboBoxes*/
-QComboBox
-{
-  height: 24px;
-  border: 0px;
-  color: white;
-  font-size: 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  padding-bottom: 4px;
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  color: white;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* QLabels 
-QLabel:disabled
-{
-  color: rgb(85, 85, 85);
-}*/
-
-QRadioButton {
-color: white;
-spacing: 12px;
-background-color: transparent;
-}
-QRadioButton::indicator {
-width: 14px;
-height: 14px;
-border: 2px solid;
-border-radius: 9px;
-border-color: rgb(73, 99, 255);
-}
-QRadioButton::indicator:checked {
-background-color: rgb(73, 99, 255);
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -518,9 +468,9 @@ background-color: rgb(73, 99, 255);
             <colorrole role="WindowText">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -536,18 +486,18 @@ background-color: rgb(73, 99, 255);
             <colorrole role="Text">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
             <colorrole role="ButtonText">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -572,9 +522,9 @@ background-color: rgb(73, 99, 255);
             <colorrole role="PlaceholderText">
              <brush brushstyle="NoBrush">
               <color alpha="128">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -583,9 +533,9 @@ background-color: rgb(73, 99, 255);
             <colorrole role="WindowText">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -601,18 +551,18 @@ background-color: rgb(73, 99, 255);
             <colorrole role="Text">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
             <colorrole role="ButtonText">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -637,9 +587,9 @@ background-color: rgb(73, 99, 255);
             <colorrole role="PlaceholderText">
              <brush brushstyle="NoBrush">
               <color alpha="128">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -648,9 +598,9 @@ background-color: rgb(73, 99, 255);
             <colorrole role="WindowText">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>85</red>
-               <green>85</green>
-               <blue>85</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -666,18 +616,18 @@ background-color: rgb(73, 99, 255);
             <colorrole role="Text">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>85</red>
-               <green>85</green>
-               <blue>85</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
             <colorrole role="ButtonText">
              <brush brushstyle="SolidPattern">
               <color alpha="255">
-               <red>85</red>
-               <green>85</green>
-               <blue>85</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
@@ -702,82 +652,14 @@ background-color: rgb(73, 99, 255);
             <colorrole role="PlaceholderText">
              <brush brushstyle="NoBrush">
               <color alpha="128">
-               <red>255</red>
-               <green>255</green>
-               <blue>255</blue>
+               <red>190</red>
+               <green>190</green>
+               <blue>190</blue>
               </color>
              </brush>
             </colorrole>
            </disabled>
           </palette>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">QComboBox
-{
-  height: 19px;
-
-  border: 0px;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
-  
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-/*background-color:green;*/
-
-}
-QComboBox::drop-down
-{
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #e0e0e0;
-}
-QComboBox QAbstractItemView {
-  border: 0px;
-  selection-background-color: rgba(25, 25, 25);
-  outline: 0px;
-}
-
-QComboBox QAbstractItemView::item {
-width:30px;
-hieght:20px;
-margin-top: 0px;
-border:0px;
-padding:0px;
-}
-
-QComboBox:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
-/* Color of the selected list item. */
-QComboBox::item:selected {
-  
-  font-size: 16px;
-  font-weight: normal;
-  font-style: normal;
-  text-align: left;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 102);
- 
-}
-/* Indicator will shine through the label text if you don't make it hidden. */
-QComboBox::indicator{
-    background-color:transparent;
-    selection-background-color:transparent;
-    color:transparent;
-    selection-color:transparent;
-}
-</string>
          </property>
          <property name="sizeAdjustPolicy">
           <enum>QComboBox::AdjustToMinimumContentsLengthWithIcon</enum>

@@ -73,13 +73,10 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">border: 2px solid #ff7200;</string>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="orange_line" stdset="0">
-      <bool>true</bool>
      </property>
     </widget>
    </item>

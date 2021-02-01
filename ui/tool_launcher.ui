@@ -51,7 +51,7 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">.QWidget[selected=true] { background-color: rgba(0, 0, 0, 60); }</string>
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
@@ -132,6 +132,9 @@ color: rgb(255, 255, 255);
             <property name="flat">
              <bool>true</bool>
             </property>
+            <property name="tool_launcher_custom_widget" stdset="0">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -184,17 +187,29 @@ background-position: left center;
        </item>
        <item>
         <widget class="Line" name="line_3">
-         <property name="styleSheet">
-          <string notr="true">color: rgba(255, 255, 255, 16);</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="lineWidth">
           <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="line_separator" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -264,6 +279,9 @@ background-position: left center;
             <property name="flat">
              <bool>true</bool>
             </property>
+            <property name="tool_launcher_custom_widget" stdset="0">
+             <bool>true</bool>
+            </property>
             <attribute name="buttonGroup">
              <string notr="true">buttonGroup_2</string>
             </attribute>
@@ -290,14 +308,26 @@ background-position: left center;
        </item>
        <item>
         <widget class="Line" name="line_2">
-         <property name="styleSheet">
-          <string notr="true">color: rgba(255, 255, 255, 16);</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="line_separator" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -324,14 +354,26 @@ background-position: left center;
        </item>
        <item>
         <widget class="Line" name="line">
-         <property name="styleSheet">
-          <string notr="true">color: rgba(255, 255, 255, 16);</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="line_separator" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -734,6 +776,9 @@ background-position: left center;
               <property name="flat">
                <bool>true</bool>
               </property>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
+              </property>
               <attribute name="buttonGroup">
                <string notr="true">buttonGroup_2</string>
               </attribute>
@@ -779,6 +824,9 @@ background-position: left center;
             </property>
             <property name="text">
              <string>About</string>
+            </property>
+            <property name="tool_launcher_custom_widget" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -863,6 +911,9 @@ background-position: left center;
                <bool>true</bool>
               </property>
               <property name="flat">
+               <bool>true</bool>
+              </property>
+              <property name="tool_launcher_custom_widget" stdset="0">
                <bool>true</bool>
               </property>
               <attribute name="buttonGroup">
@@ -1115,11 +1166,11 @@ qproperty-text: &quot;Failed&quot;;
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 16);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="line_separator" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1181,6 +1232,115 @@ qproperty-text: &quot;Failed&quot;;
               <property name="spacing">
                <number>0</number>
               </property>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item row="0" column="1">
+               <widget class="adiscope::OscCustomScrollArea" name="scrollArea_2">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>200</height>
+                 </size>
+                </property>
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="verticalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAlwaysOff</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="devicesWidget">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>261</width>
+                   <height>200</height>
+                  </rect>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>16777215</width>
+                   <height>200</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="devicesList">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <spacer name="horizontalSpacer_16">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>0</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>100</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
               <item row="0" column="0">
                <layout class="QVBoxLayout" name="verticalLayout_2">
                 <property name="spacing">
@@ -1360,19 +1520,11 @@ border-width: 0px;
                        <height>60</height>
                       </size>
                      </property>
-                     <property name="styleSheet">
-                      <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
-                     </property>
                      <property name="selected" stdset="0">
                       <bool>false</bool>
+                     </property>
+                     <property name="menu_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_7">
                       <property name="spacing">
@@ -1477,115 +1629,6 @@ border-width: 0px;
                  </spacer>
                 </item>
                </layout>
-              </item>
-              <item row="0" column="1">
-               <widget class="adiscope::OscCustomScrollArea" name="scrollArea_2">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>200</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>200</height>
-                 </size>
-                </property>
-                <property name="frameShape">
-                 <enum>QFrame::NoFrame</enum>
-                </property>
-                <property name="verticalScrollBarPolicy">
-                 <enum>Qt::ScrollBarAlwaysOff</enum>
-                </property>
-                <property name="widgetResizable">
-                 <bool>true</bool>
-                </property>
-                <widget class="QWidget" name="devicesWidget">
-                 <property name="geometry">
-                  <rect>
-                   <x>0</x>
-                   <y>0</y>
-                   <width>261</width>
-                   <height>200</height>
-                  </rect>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>200</height>
-                  </size>
-                 </property>
-                 <layout class="QHBoxLayout" name="devicesList">
-                  <property name="spacing">
-                   <number>0</number>
-                  </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
-                   <number>0</number>
-                  </property>
-                  <item>
-                   <spacer name="horizontalSpacer_16">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>0</width>
-                      <height>0</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
-                </widget>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item row="0" column="3">
-               <spacer name="verticalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>100</height>
-                 </size>
-                </property>
-               </spacer>
               </item>
              </layout>
             </widget>

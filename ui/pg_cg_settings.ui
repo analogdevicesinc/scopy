@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>294</width>
+    <width>298</width>
     <height>690</height>
    </rect>
   </property>
@@ -23,8 +23,6 @@
    <string notr="true">#PBLeft, #PBRight {
   width: 40px;
   height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -140,6 +138,9 @@ line-height: 16px;
                <height>30</height>
               </size>
              </property>
+             <property name="blue_button" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
            <item>
@@ -157,6 +158,9 @@ line-height: 16px;
                <width>40</width>
                <height>30</height>
               </size>
+             </property>
+             <property name="blue_button" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -216,8 +220,8 @@ height: 2px;</string>
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>250</width>
-              <height>616</height>
+              <width>254</width>
+              <height>610</height>
              </rect>
             </property>
             <property name="sizePolicy">

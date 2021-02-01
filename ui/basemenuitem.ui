@@ -46,7 +46,7 @@
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
-     <property name="line_separator" stdset="0">
+     <property name="subsection_line" stdset="0">
       <bool>true</bool>
      </property>
     </widget>
@@ -89,7 +89,7 @@
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
-     <property name="line_separator" stdset="0">
+     <property name="subsection_line" stdset="0">
       <bool>true</bool>
      </property>
     </widget>

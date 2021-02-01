@@ -402,22 +402,12 @@ QPushButton[blue_button=true]:disabled {
 }
 
 
-/* Line separators for things like basemenu or basemanuitem */
-
-QFrame[line_separator=true]{
-	color: rgba(255,255,255,50);
-}
-
-
 /* Menu title label */
 
 QLabel[menu_title_label=true]{
 	color: white;
 	font-weight: normal;
-}
-
-QFrame[orange_line=true]{
-	border: 2px solid #ff7200;
+	font-size: 14px;
 }
 
 
@@ -509,8 +499,45 @@ background-color: rgba(0, 0, 0, 60);
 border: 1px solid rgba(0, 0, 0, 30);
 border-radius:5px;
 }
-QWidget[tool_launcher_custom_widget="true"][selected="true"] {
+QWidget[tool_launcher_custom_widget=true][selected=true] {
 background-color: rgba(0, 0, 0, 60);
 border: 1px solid rgba(0, 0, 0, 30);
 border-radius:5px;
+}
+
+
+/* Style for buttons such as Device, Home, Plus, etc. */
+QWidget[menu_button=true][selected=true] {
+	opacity: 0.6;
+	border-radius: 4px;
+	background-color: #141416;
+}
+
+QWidget[menu_button=true][selected=false] {
+	background-color: transparent;
+}
+
+
+/* Styles for DigitalIO widgets */
+
+QWidget#page{
+	border-radius: 12px;
+	background-color: rgba(0, 0, 0, 80);
+}
+
+QWidget#stackedWidgetPage1{
+	border-radius: 12px;
+	background-color: #141416;
+}
+
+
+/* Background color for info page */
+.adiscope--StackedHomepage#stackedWidget{
+	background-color: black;
+}
+
+
+/* Style for all line separators */
+QFrame[line_separator=true]{
+	background-color: rgba(255, 255, 255, 16);
 }

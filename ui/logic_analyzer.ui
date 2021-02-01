@@ -1801,23 +1801,7 @@ color: rgba(255,255,255,51);
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton {
+           <string notr="true">QPushButton {
 width: 40px;
   height: 20px;
   background-color: transparent;
@@ -1990,11 +1974,6 @@ font-size: 14px;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2005,6 +1984,11 @@ font-size: 14px;
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

@@ -62,7 +62,7 @@ UserNotes::UserNotes(QWidget *parent) :
         QSettings settings(tempFile.fileName(), QSettings::IniFormat);
 
         notes_api->load(settings);
-        ui->stackedWidget->setStyleSheet("background-color: black;");
+	//ui->stackedWidget->setStyleSheet("background-color: black;");
 
         ui->stackedWidget->set_controls_enabled(false);
 }
