@@ -489,7 +489,7 @@ image: url(:/icons/setup3_checked_hover.svg);
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>3</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -539,8 +539,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>300</height>
+                      <width>300</width>
+                      <height>474</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1401,8 +1401,8 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>220</width>
-                      <height>134</height>
+                      <width>280</width>
+                      <height>474</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1846,11 +1846,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1861,6 +1856,11 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

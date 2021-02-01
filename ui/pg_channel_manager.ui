@@ -88,9 +88,6 @@
    </item>
    <item>
     <widget class="Line" name="line">
-     <property name="styleSheet">
-      <string notr="true">color: rgba(255,255,255,60);</string>
-     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -99,6 +96,9 @@
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="line_separator" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

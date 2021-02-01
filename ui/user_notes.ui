@@ -339,14 +339,14 @@ QLineEdit[invalid=true] {
           <height>1</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">border: 1px solid rgba(255, 255, 255, 16);</string>
-        </property>
         <property name="frameShadow">
          <enum>QFrame::Sunken</enum>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="line_separator" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

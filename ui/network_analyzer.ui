@@ -823,7 +823,7 @@ border: 5px solid white;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>2</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -868,7 +868,7 @@ border: 5px solid white;
                       <x>0</x>
                       <y>-414</y>
                       <width>322</width>
-                      <height>985</height>
+                      <height>987</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1686,15 +1686,11 @@ QPushButton:hover
                            <verstretch>0</verstretch>
                           </sizepolicy>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">QLabel {
-       font-size: 12px;
-       color: rgba(255, 255, 255, 70)
-    }
-   </string>
-                         </property>
                          <property name="text">
                           <string>DISPLAY </string>
+                         </property>
+                         <property name="subsection_label" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -1712,10 +1708,6 @@ QPushButton:hover
                            <height>1</height>
                           </size>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
-</string>
-                         </property>
                          <property name="frameShadow">
                           <enum>QFrame::Sunken</enum>
                          </property>
@@ -1724,6 +1716,9 @@ QPushButton:hover
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="subsection_line" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -1812,15 +1807,11 @@ QPushButton:hover
                            <verstretch>0</verstretch>
                           </sizepolicy>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70)
-    }
-</string>
-                         </property>
                          <property name="text">
                           <string>BUFFER PREVIEWER </string>
+                         </property>
+                         <property name="subsection_label" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>
@@ -1832,14 +1823,14 @@ QPushButton:hover
                            <height>1</height>
                           </size>
                          </property>
-                         <property name="styleSheet">
-                          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                         </property>
                          <property name="frameShadow">
                           <enum>QFrame::Plain</enum>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="subsection_line" stdset="0">
+                          <bool>true</bool>
                          </property>
                         </widget>
                        </item>

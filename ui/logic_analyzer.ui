@@ -534,8 +534,8 @@ image: url(:/icons/setup3_checked_hover.svg);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>329</height>
+                      <width>329</width>
+                      <height>472</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
