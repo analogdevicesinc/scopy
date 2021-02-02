@@ -381,9 +381,10 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		});
 
 		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+			const int oscAnalogChannels = m_oscPlot->getAnalogChannels();
 			m_oscPlot->enableDigitalPlotCurve(i, toggled);
-			m_oscPlot->setOffsetWidgetVisible(i + m_oscAnalogChannels, toggled);
-			m_oscPlot->positionInGroupChanged(i + m_oscAnalogChannels, 0, 0);
+			m_oscPlot->setOffsetWidgetVisible(i + oscAnalogChannels, toggled);
+			m_oscPlot->positionInGroupChanged(i + oscAnalogChannels, 0, 0);
 			m_oscPlot->replot();
 		});
 		channelBox->setChecked(false);
@@ -598,9 +599,10 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		decoderComboBox->setCurrentIndex(0);
 
 		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
-			m_oscPlot->enableDigitalPlotCurve(m_oscAnalogChannels + m_nbChannels + itemsInLayout, toggled);
-			m_oscPlot->setOffsetWidgetVisible(m_oscAnalogChannels + m_nbChannels + itemsInLayout, toggled);
-			m_oscPlot->positionInGroupChanged(m_oscAnalogChannels + m_nbChannels + itemsInLayout, 0, 0);
+			const int analogChannels = m_oscPlot->getAnalogChannels();
+			m_oscPlot->enableDigitalPlotCurve(analogChannels + m_nbChannels + itemsInLayout, toggled);
+			m_oscPlot->setOffsetWidgetVisible(analogChannels + m_nbChannels + itemsInLayout, toggled);
+			m_oscPlot->positionInGroupChanged(analogChannels + m_nbChannels + itemsInLayout, 0, 0);
 			m_oscPlot->replot();
 		});
 

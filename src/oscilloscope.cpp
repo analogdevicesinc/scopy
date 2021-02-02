@@ -1292,6 +1292,11 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 		iio->lock();
 	}
 
+	const bool hasLabels = plot.labelsEnabled();
+	if (hasLabels) {
+		enableLabels(false);
+	}
+
 	m_mixedSignalViewEnabled = true;
 
 	m_mixedSignalViewMenu = m_logicAnalyzer->enableMixedSignalView(&plot, nb_channels +
@@ -1334,6 +1339,10 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 
 	onHorizScaleValueChanged(timeBase->value());
 	onTimePositionChanged(timePosition->value());
+
+	if (hasLabels) {
+		enableLabels(true);
+	}
 }
 
 void Oscilloscope::disableMixedSignalView()
