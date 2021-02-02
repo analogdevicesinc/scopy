@@ -219,6 +219,7 @@ protected:
   bool isReferenceWaveform(QwtPlotCurve *curve);
   bool isMathWaveform(QwtPlotCurve *curve) const;
   int countReferenceWaveform(int position);
+  QVector<QwtPlotCurve *> d_logic_curves;
 
 private:
   void _resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate);
@@ -254,7 +255,6 @@ private:
 
   QMap<QString, QwtPlotCurve *> d_ref_curves;
   QMap<QString, QwtPlotCurve *> d_math_curves;
-  QVector<QwtPlotCurve *> d_logic_curves;
   int d_nb_ref_curves;
   int getCurveNextTo(int pos);
 };

@@ -1055,6 +1055,11 @@ void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleD
 	DisplayPlot::printWithNoBackground(toolName, editScaleDraw);
 }
 
+int CapturePlot::getAnalogChannels() const
+{
+	return d_ydata.size() + d_ref_ydata.size();
+}
+
 void CapturePlot::setHorizCursorsLocked(bool value)
 {
 	horizCursorsLocked = value;
@@ -1447,37 +1452,8 @@ void CapturePlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
 {
 	for (int i = 0; i < d_offsetHandles.size(); ++i) {
 		if (curve == getDigitalPlotCurve(i)) {
-
-//			auto hdl = d_offsetHandles.at(i);
-//			qDebug() << "Removed id: " << i;
-//			for (auto &group : d_groupHandles) {
-//				group.removeOne(hdl);
-//				if (!group.isEmpty()) {
-//					group.first()->triggerMove();
-//				}
-//			}
-			// remove digital plot curves
-			// TODO: always keep digital stuff at the end ch1 ch2 ref1 ref2 d1 d2 ...
-			// add ref3 -> ch1 ch2 ref1 ref2 ref3 d1 d2 ...
 			removeOffsetWidgets(d_ydata.size() + d_ref_ydata.size() + i);
-
-//			int groupIndx = -1;
-//			for (int i = 0; i < d_groupHandles.size(); ++i) {
-//				if (d_groupHandles[i].size() < 2) {
-//					groupIndx = i;
-//				}
-//			}
-
-//			if (groupIndx != -1) {
-//				d_groupHandles.removeAt(groupIndx);
-//			}
-
-//			if (d_groupMarkers.size() > d_groupHandles.size()){
-//				auto marker = d_groupMarkers.takeLast();
-//				marker->detach();
-//				delete marker;
-//			}
-
+			removeLeftVertAxis(d_ydata.size() + d_ref_ydata.size() + i);
 			break;
 		}
 	}
@@ -2037,9 +2013,24 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 	replot();
 }
 
+void adiscope::CapturePlot::pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar)
+{
+	int indexOfNewChannel = d_ydata.size() - 1;
+	d_offsetBars.insert(indexOfNewChannel, chOffsetBar);
+	d_offsetHandles.insert(indexOfNewChannel, chOffsetHdl);
+
+	for (int i = 0; i < d_offsetBars.size(); ++i) {
+		d_offsetBars[i]->setMobileAxis(QwtAxisId(QwtPlot::yLeft, i));
+	}
+
+	for (int i = 0; i < d_logic_curves.size(); ++i) {
+		d_logic_curves[i]->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + i));
+	}
+}
+
 void CapturePlot::onChannelAdded(int chnIdx)
 {
-	setLeftVertAxesCount(chnIdx + 1);
+	setLeftVertAxesCount(d_offsetHandles.size() + 1);
 	QColor chnColor = getLineColor(chnIdx);
 
 	/* Channel offset widget */
@@ -2048,7 +2039,6 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	chOffsetBar->setCanLeavePlot(true);
 	chOffsetBar->setVisible(false);
 	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
-	d_offsetBars.push_back(chOffsetBar);
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
 				QPixmap(":/icons/handle_right_arrow.svg"),
@@ -2058,7 +2048,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	chOffsetHdl->setRoundRectColor(chnColor);
 	chOffsetHdl->setPen(QPen(chnColor, 2, Qt::SolidLine));
 	chOffsetHdl->setVisible(true);
-	d_offsetHandles.push_back(chOffsetHdl);
+	pushBackNewOffsetWidgets(chOffsetHdl, chOffsetBar);
 
 	connect(chOffsetHdl, &RoundedHandleV::positionChanged,
 		[=](int pos) {
