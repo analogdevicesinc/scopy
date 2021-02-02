@@ -26,43 +26,32 @@ QLabel {
 	text-align: left;
 }
 
-QLabel:disabled, QRadioButton:disabled {
-	color: rgba(255, 255, 255, 80);
-}
+QLabel:disabled, QRadioButton:disabled {color: rgba(255, 255, 255, 80); }
 
-QTextBrowser {
-	background-color: rgba(0, 0, 0, 150);
-}
-/* Apply a gradiant to the MenuAnim widgets */
+QTextBrowser { background-color: rgba(0, 0, 0, 150); }
+
+/* Apply a gradient to the MenuAnim widgets */
 adiscope--MenuAnim {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
 }
 
 /* Except for the tool launcher's MenuAnim */
-QMainWindow > .QWidget > .adiscope--MenuAnim {
-	background-color: none;
-}
+QMainWindow > .QWidget > .adiscope--MenuAnim { background-color: none; }
 
-QwtPlot, QwtPolarPlot, pv--view--Viewport, adiscope--SignalGenerator #plot_2, adiscope--Oscilloscope #widgetPlotContainer, adiscope--NetworkAnalyzer #widgetPlotContainer  {
+QwtPlot, QwtPolarPlot, pv--view--Viewport, adiscope--SignalGenerator #plot_and_notes, adiscope--Oscilloscope #widgetPlotContainer,
+adiscope--NetworkAnalyzer #widgetPlotContainer, adiscope--SpectrumAnalyzer #widgetPlotContainer,
+adiscope--logic--PatternGenerator #widgetPlotContainer, adiscope--logic--LogicAnalyzer #widgetPlotContainer {
 	background-color: black;
 }
 
 /* QwtPlot should have a black background, except the sismographs */
-adiscope--Sismograph {
-	background-color: transparent;
-}
+adiscope--Sismograph { background-color: transparent; }
 
-QwtPlotCanvas {
-	background-color: #141416;
-}
+QwtPlotCanvas { background-color: #141416; }
 
-QwtPolarCanvas {
-	background-color: none;
-}
+QwtPolarCanvas { background-color: none; }
 
-QwtScaleWidget {
-	color: rgba(255, 255, 255, 180);
-}
+QwtScaleWidget { color: rgba(255, 255, 255, 180); }
 
 QwtThermo {
 	color: #999999;
@@ -82,13 +71,9 @@ QDial {
   color: #4963ff;
 }
 
-QTabWidget::tab-bar {
-        left: 0;
-}
+QTabWidget::tab-bar { left: 0; }
 
-QTabWidget::pane {
-	border-top: 0px;
-}
+QTabWidget::pane { border-top: 0px; }
 
 QTabBar::tab {
 	min-width: 100px;
@@ -121,17 +106,11 @@ QRadioButton::indicator {
 	border-color: #4963FF;
 }
 
-QRadioButton::indicator:checked {
-	background-color: #4963FF;
-}
+QRadioButton::indicator:checked { background-color: #4963FF; }
 
-QRadioButton::indicator:disabled {
-	border-color: #555555;
-}
+QRadioButton::indicator:disabled { border-color: #555555; }
 
-QRadioButton::indicator:checked:disabled {
-	background-color: #555555;
-}
+QRadioButton::indicator:checked:disabled { background-color: #555555; }
 
 QLineEdit {
 	color: white;
@@ -150,10 +129,7 @@ QComboBox {
 	padding-bottom: 4px;
 }
 
-QComboBox:disabled, QLineEdit:disabled
-{
-	color: #555555;
-}
+QComboBox:disabled, QLineEdit:disabled { color: #555555; }
 
 QComboBox QAbstractItemView {
 	border: none;
@@ -216,8 +192,7 @@ QMessageBox QPushButton {
 	border-width: 1px;
 }
 
-QAbstractSpinBox
-{
+QAbstractSpinBox {
 	height: 45px;
 	font-size: 16px;
 	font-weight: bold;
@@ -229,35 +204,17 @@ QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
 	width: 20px;
 }
 
-QAbstractSpinBox::up-button
-{
-	border-image: url(:/icons/sba_up_btn.svg);
-}
+QAbstractSpinBox::up-button { border-image: url(:/icons/sba_up_btn.svg); }
 
-QAbstractSpinBox::up-button:hover
-{
-	border-image: url(:/icons/sba_up_btn_hover.svg);
-}
+QAbstractSpinBox::up-button:hover { border-image: url(:/icons/sba_up_btn_hover.svg); }
 
-QAbstractSpinBox::up-button:pressed
-{
-	border-image: url(:/icons/sba_up_btn_pressed.svg);
-}
+QAbstractSpinBox::up-button:pressed { border-image: url(:/icons/sba_up_btn_pressed.svg); }
 
-QAbstractSpinBox::down-button
-{
-	border-image: url(:/icons/sba_dn_btn.svg);
-}
+QAbstractSpinBox::down-button { border-image: url(:/icons/sba_dn_btn.svg); }
 
-QAbstractSpinBox::down-button:hover
-{
-	border-image: url(:/icons/sba_dn_btn_hover.svg);
-}
+QAbstractSpinBox::down-button:hover { border-image: url(:/icons/sba_dn_btn_hover.svg); }
 
-QAbstractSpinBox::down-button:pressed
-{
-	border-image: url(:/icons/sba_dn_btn_pressed.svg);
-}
+QAbstractSpinBox::down-button:pressed { border-image: url(:/icons/sba_dn_btn_pressed.svg); }
 
 QGroupBox {
 	border: 2px solid rgba(255, 255, 255, 40);
@@ -290,9 +247,7 @@ QScrollBar::handle:vertical:hover {
   border-radius: 3px;
 }
 
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
-    background: none;
-}
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
   border: none;
@@ -317,18 +272,14 @@ QScrollBar::handle:horizontal:hover {
   border-radius: 3px;
 }
 
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
-    background: none;
-}
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-  border: none;
-  background: none;
+	border: none;
+	background: none;
 }
 
-QDialog {
-	background-color: #1b1b21;
-}
+QDialog { background-color: #1b1b21; }
 
 ScopyAboutDialog QPushButton{
 	background-color: #4a64ff;
@@ -349,9 +300,7 @@ QLabel[subsection_label=true]{
 	color: rgba(255, 255, 255, 70);
 }
 
-QFrame[subsection_line=true]{
-	border: 1px solid rgba(255, 255, 255, 70);
-}
+QFrame[subsection_line=true]{ border: 1px solid rgba(255, 255, 255, 70); }
 
 QPushButton[subsection_arrow_button=true]{
 	max-height: 6px;
@@ -376,9 +325,8 @@ QLabel[general_settings_label=true]{
 
 /* Blue line divider */
 
-QFrame[blue_line=true]{
-	border: 2px solid #4A64FF;
-}
+QFrame[blue_line=true]{ border: 2px solid #4A64FF; }
+
 
 /* General style for blue buttons */
 
@@ -389,17 +337,11 @@ QPushButton[blue_button=true]{
 	font-size: 14px;
 }
 
-QPushButton[blue_button=true]:pressed{
-	background-color: #2a44df;
-}
+QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
 
-QPushButton[blue_button=true]:hover{
-	background-color: #4a34ff;
-}
+QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 
-QPushButton[blue_button=true]:disabled {
-  background-color: grey;
-}
+QPushButton[blue_button=true]:disabled { background-color: grey; }
 
 
 /* Menu title label */
@@ -412,9 +354,8 @@ QLabel[menu_title_label=true]{
 
 
 /* Text color for all SpinBoxes */
-QSpinBox{
-	color: white;
-}
+
+QSpinBox{ color: white; }
 
 
 QCheckBox {
@@ -431,60 +372,49 @@ QCheckBox::indicator {
   border: 2px solid rgb(74,100,255);
   border-radius: 4px;
 }
+
 QCheckBox::indicator:unchecked { background-color: transparent; }
 QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
 
 
-
 QSlider::groove {
-    border: 1px solid #444444;
-    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: #999999;
-    margin: 2px 0;
-    border-radius: 2px;
+	border: 1px solid #444444;
+	height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+	background: #999999;
+	margin: 2px 0;
+	border-radius: 2px;
 }
 
 QSlider::handle {
-    background: rgb(73, 99, 255);
-    border: 0px solid;
-    width: 18px;
-    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
-    border-radius: 8px;
+	background: rgb(73, 99, 255);
+	border: 0px solid;
+	width: 18px;
+	margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+	border-radius: 8px;
 }
 
-QSlider::handle:disabled {
-    background: #444444;
-}
+QSlider::handle:disabled { background: #444444; }
 
-QSlider::sub-page:horizontal {
-    background: #4A64FF;
-}
+QSlider::sub-page:horizontal { background: #4A64FF; }
+
 
 /* Style for settings and general settings buttons from all menus */
 
 QPushButton[menu_icon_button=true] {
-  min-height: 40px;
-  max-height: 40px;
-  min-width: 60px;
-  max-width: 60px;
-  padding-top:5px
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 60px;
+	 max-width: 60px;
+	 padding-top:5px
 }
 
-QPushButton[menu_icon_button=true]:checked {
-border-top: 1px solid rgba(255,255,255,150);
-}
+QPushButton[menu_icon_button=true]:checked { border-top: 1px solid rgba(255,255,255,150); }
 
-QPushButton[menu_icon_button=true]:!checked {
-border-top: 1px solid rgba(255,255,255,0);
-}
+QPushButton[menu_icon_button=true]:!checked { border-top: 1px solid rgba(255,255,255,0); }
 
-QPushButton[menu_icon_button=true]:!checked:hover {
-border-top: 1px solid rgba(255,255,255,0);
-}
+QPushButton[menu_icon_button=true]:!checked:hover { border-top: 1px solid rgba(255,255,255,0); }
 
-QPushButton[menu_icon_button=true]:checked:hover {
-border-top: 1px solid rgba(255,255,255,200);
-}
+QPushButton[menu_icon_button=true]:checked:hover { border-top: 1px solid rgba(255,255,255,200); }
 
 
 /* Style for all Tool launcher buttons, such as Home, Menu, Preferences, Load, Save, Notes, etc. */
@@ -494,50 +424,65 @@ QPushButton[tool_launcher_custom_widget=true] {
 	 border: none;
 	background-color: none;
 }
+
 .QWidget[tool_launcher_custom_widget=true]:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
+	background-color: rgba(0, 0, 0, 60);
+	border: 1px solid rgba(0, 0, 0, 30);
+	border-radius:5px;
 }
+
 QWidget[tool_launcher_custom_widget=true][selected=true] {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
+	background-color: rgba(0, 0, 0, 60);
+	border: 1px solid rgba(0, 0, 0, 30);
+	border-radius:5px;
 }
 
 
-/* Style for buttons such as Device, Home, Plus, etc. */
+/* Style for icon-buttons such as Device, Home, Plus, etc. */
+
 QWidget[menu_button=true][selected=true] {
 	opacity: 0.6;
 	border-radius: 4px;
 	background-color: #141416;
 }
 
-QWidget[menu_button=true][selected=false] {
-	background-color: transparent;
-}
+QWidget[menu_button=true][selected=false] { background-color: transparent; }
 
 
 /* Styles for DigitalIO widgets */
 
-QWidget#page{
+QWidget#page {
 	border-radius: 12px;
 	background-color: rgba(0, 0, 0, 80);
 }
 
-QWidget#stackedWidgetPage1{
+QWidget#stackedWidgetPage1 {
 	border-radius: 12px;
 	background-color: #141416;
 }
 
 
 /* Background color for info page */
-.adiscope--StackedHomepage#stackedWidget{
-	background-color: black;
-}
+
+.adiscope--StackedHomepage#stackedWidget{ background-color: black; }
 
 
 /* Style for all line separators */
-QFrame[line_separator=true]{
-	background-color: rgba(255, 255, 255, 16);
+
+QFrame[line_separator=true]{ background-color: rgba(255, 255, 255, 16); }
+
+
+/* Background color for Voltmeter and Power Supply */
+
+.adiscope--PowerController #leftPanel, .adiscope--DMM #leftPanel{
+	background-color: rgba(0, 0, 0, 40);
+}
+
+
+/* Gradient background for all instruments, but Voltmeter and Power Supply */
+
+.adiscope--Oscilloscope #mainWidget, .adiscope--SpectrumAnalyzer #mainWidget,
+.adiscope--NetworkAnalyzer #mainWidget, .adiscope--SignalGenerator #mainWidget,
+.adiscope--logic--LogicAnalyzer #mainWidget, .adiscope--logic--PatternGenerator #mainWidget, .adiscope--DigitalIO #widget{
+	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgba(0, 0, 0, 40), stop: 0.1 transparent, stop: 1.0 transparent);
 }
