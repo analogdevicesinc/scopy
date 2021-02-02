@@ -118,6 +118,11 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 			m_plot.replot();
 
 			checkEnabledChannels();
+
+			if (m_isRunning) {
+				startStop(false);
+				startStop(true);
+			}
 		});
 		channelBox->setChecked(false);
 	}
@@ -697,8 +702,8 @@ void PatternGenerator::startStop(bool start)
 			lockMask = lockMask | enabled << i;
 			if (enabled) {
 				m_m2kDigital->setDirection(i, DIO_OUTPUT);
-				m_m2kDigital->enableChannel(i, true);
 			}
+			m_m2kDigital->enableChannel(i, enabled);
 		}
 
 		m_diom->setMode(m_outputMode);
