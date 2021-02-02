@@ -292,8 +292,6 @@
   max-width: 240px;
 
   border: 0px;
-
-  font-size: 14px;
 }</string>
              </property>
              <property name="text">
@@ -454,7 +452,6 @@
   max-width: 240px;
 
   border: 0px;
-  font-size: 14px;
 }</string>
              </property>
              <property name="text">

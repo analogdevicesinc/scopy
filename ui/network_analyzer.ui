@@ -789,9 +789,6 @@ border: 5px solid white;
               <height>0</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
-            </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
              <property name="spacing">
               <number>0</number>
@@ -823,7 +820,7 @@ border: 5px solid white;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -866,9 +863,9 @@ border: 5px solid white;
                     <property name="geometry">
                      <rect>
                       <x>0</x>
-                      <y>-414</y>
+                      <y>0</y>
                       <width>322</width>
-                      <height>987</height>
+                      <height>1000</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -1123,9 +1120,6 @@ color: rgba(255,255,255,51);
                          </property>
                          <item>
                           <widget class="QLabel" name="label_19">
-                           <property name="styleSheet">
-                            <string notr="true">font-size: 13px;</string>
-                           </property>
                            <property name="text">
                             <string>Gain Mode</string>
                            </property>
@@ -1204,9 +1198,6 @@ color: rgba(255,255,255,51);
                          </property>
                          <item>
                           <widget class="QLabel" name="label_12">
-                           <property name="styleSheet">
-                            <string notr="true">font-size: 13px;</string>
-                           </property>
                            <property name="text">
                             <string>DC Filtering</string>
                            </property>
@@ -1493,7 +1484,6 @@ color: rgba(255,255,255,51);
                            <property name="styleSheet">
                             <string notr="true">font-size: 14px;
 height:24px;
-color: white;
 border: 0px;
 border-bottom: 1px solid rgba(255,255,255,100);
 
@@ -1539,33 +1529,23 @@ border-color: green;
                            </property>
                            <property name="styleSheet">
                             <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
-font-family:  14pt;
 border-width: 0px;
 border-radius: 3px;
 min-width: 64px;
 }
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
 
+/*
 QPushButton:enabled:!pressed { background-color: #4a64ff; }
 QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
 QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
-QPushButton:pressed {
-background-color: #4a64ff;
-}
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}</string>
+*/
+</string>
                            </property>
                            <property name="text">
                             <string>Apply</string>
+                           </property>
+                           <property name="blue_button" stdset="0">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -1594,7 +1574,6 @@ QPushButton:hover
                            <property name="styleSheet">
                             <string notr="true">font-size: 14px;
 height:24px;
-color: white;
 border: 0px;
 border-bottom: 1px solid rgba(255,255,255,100);
 
@@ -1633,30 +1612,16 @@ border-color: green;
                            </property>
                            <property name="styleSheet">
                             <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
-font-family:  14pt;
 border-width: 0px;
 border-radius: 3px;
 min-width: 64px;
 }
-QPushButton:disabled {
-background-color: grey;
-}
-QPushButton:pressed {
-background-color: #F45000;
-}
 
+/*
 QPushButton:enabled:!pressed { background-color: #4a64ff; }
 QPushButton[valid=true]:enabled:!pressed { background-color: #4a64ff; }
 QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
-QPushButton:pressed {
-background-color: #4a64ff;
-}
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}</string>
+*/</string>
                            </property>
                            <property name="text">
                             <string>Apply</string>
@@ -1740,9 +1705,6 @@ QPushButton:hover
                        </item>
                        <item row="6" column="0">
                         <widget class="QLabel" name="label_13">
-                         <property name="styleSheet">
-                          <string notr="true">font-size: 13px;</string>
-                         </property>
                          <property name="text">
                           <string/>
                          </property>
@@ -1764,9 +1726,6 @@ QPushButton:hover
                            <horstretch>0</horstretch>
                            <verstretch>0</verstretch>
                           </sizepolicy>
-                         </property>
-                         <property name="styleSheet">
-                          <string notr="true">font-size: 13px;</string>
                          </property>
                          <property name="text">
                           <string>Delta Label</string>
@@ -1924,27 +1883,13 @@ QPushButton:hover
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                            </property>
                            <property name="text">
                             <string>ViewInOsc</string>
+                           </property>
+                           <property name="blue_button" stdset="0">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -1972,23 +1917,7 @@ background-color: #727273;
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
 
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                            </property>
                            <property name="text">
@@ -2003,6 +1932,9 @@ background-color: #727273;
                              <width>12</width>
                              <height>12</height>
                             </size>
+                           </property>
+                           <property name="blue_button" stdset="0">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>
@@ -2039,25 +1971,9 @@ background-color: #727273;
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
 
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
 text-align: right;
 padding-left: 20px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-QPushButton:disabled {
-background-color: #727273;
 }</string>
                            </property>
                            <property name="text">
@@ -2072,6 +1988,9 @@ background-color: #727273;
                              <width>12</width>
                              <height>12</height>
                             </size>
+                           </property>
+                           <property name="blue_button" stdset="0">
+                            <bool>true</bool>
                            </property>
                           </widget>
                          </item>

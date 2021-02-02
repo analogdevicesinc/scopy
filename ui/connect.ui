@@ -123,9 +123,6 @@ color: green;
    </item>
    <item row="2" column="0">
     <widget class="QLabel" name="description">
-     <property name="styleSheet">
-      <string notr="true">color: white;</string>
-     </property>
      <property name="text">
       <string/>
      </property>

@@ -1404,22 +1404,7 @@ QPushButton:!checked {
                </palette>
               </property>
               <property name="styleSheet">
-               <string notr="true">QCheckBox
-{
-  spacing: 0px;
-}
-QCheckBox:indicator
-{
-height: 16px;
-width: 16px;
-border-radius:4px;
-border: 2px solid #4a64ff;
-}
-
-QCheckBox:indicator:checked
-{
-background:#4a64ff;
-}</string>
+               <string notr="true"/>
               </property>
               <property name="text">
                <string/>
@@ -1489,15 +1474,15 @@ background:#4a64ff;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
-   <extends>QPushButton</extends>
-   <header>smallOnOffSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

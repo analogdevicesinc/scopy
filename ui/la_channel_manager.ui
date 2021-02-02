@@ -104,10 +104,6 @@ text-align: left;
    </item>
    <item>
     <widget class="Line" name="line">
-     <property name="styleSheet">
-      <string notr="true">color: rgba(255,255,255,60);
-</string>
-     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
