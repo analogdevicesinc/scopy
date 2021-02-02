@@ -104,6 +104,13 @@ PowerController::PowerController(struct iio_context *ctx,
 	connect(ui->dac1, &QPushButton::toggled, this, &PowerController::toggleRunButton);
 	connect(ui->dac2, &QPushButton::toggled, this, &PowerController::toggleRunButton);
 
+	std::vector<QwtThermo *> scales {ui->scale_dac1, ui->scale_dac2};
+	for (auto scale : scales) {
+		scale->setOrientation(Qt::Horizontal);
+		scale->setScalePosition(QwtThermo::LeadingScale);
+		scale->setOriginMode(QwtThermo::OriginCustom);
+	}
+
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_POWER_CONTROLLER)));
 	api->load(*settings);
