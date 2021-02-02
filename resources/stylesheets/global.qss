@@ -486,3 +486,7 @@ QFrame[line_separator=true]{ background-color: rgba(255, 255, 255, 16); }
 .adiscope--logic--LogicAnalyzer #mainWidget, .adiscope--logic--PatternGenerator #mainWidget, .adiscope--DigitalIO #widget{
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgba(0, 0, 0, 40), stop: 0.1 transparent, stop: 1.0 transparent);
 }
+
+/* Remove inherited gradient from the export setting of the Oscilloscope */
+
+.adiscope--ExportSettings #mainWidget, .adiscope--ImportSettings #mainWidget{ background-color: none; }
