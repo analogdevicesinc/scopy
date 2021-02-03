@@ -489,4 +489,6 @@ QFrame[line_separator=true]{ background-color: rgba(255, 255, 255, 16); }
 
 /* Remove inherited gradient from the export setting of the Oscilloscope */
 
-.adiscope--ExportSettings #mainWidget, .adiscope--ImportSettings #mainWidget{ background-color: none; }
+.adiscope--ExportSettings #mainWidget, .adiscope--ImportSettings #mainWidget {
+	background-color: none;
+}
