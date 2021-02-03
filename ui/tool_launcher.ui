@@ -1372,17 +1372,6 @@ qproperty-text: &quot;Failed&quot;;
                     <height>160</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
-                  </property>
                   <property name="selected" stdset="0">
                    <bool>false</bool>
                   </property>
@@ -1440,6 +1429,9 @@ qproperty-text: &quot;Failed&quot;;
                      </property>
                      <property name="selected" stdset="0">
                       <bool>false</bool>
+                     </property>
+                     <property name="menu_button" stdset="0">
+                      <bool>true</bool>
                      </property>
                      <layout class="QVBoxLayout" name="verticalLayout_8">
                       <property name="leftMargin">
