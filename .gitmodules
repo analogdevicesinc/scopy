@@ -1,0 +1,3 @@
+[submodule "iio-emu"]
+	path = iio-emu
+	url = https://github.com/analogdevicesinc/iio-emu.git
