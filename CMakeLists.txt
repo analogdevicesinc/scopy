@@ -337,6 +337,18 @@ configure_file(${CMAKE_SOURCE_DIR}/resources/aboutpage.qrc
 
 qt5_add_resources(ABOUT_PAGE_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/aboutpage.qrc)
 
+option(CLONE_IIO_EMU "Clone iio-emu" ON)
+if (CLONE_IIO_EMU)
+	message(STATUS "Checking for iio-emu")
+	execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive
+			WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+			RESULT_VARIABLE GIT_SUBMOD_RESULT)
+	if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+		message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
+	endif()
+	add_subdirectory(iio-emu)
+endif()
+
 add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${SRC_LIST}
 		${RESOURCES}
