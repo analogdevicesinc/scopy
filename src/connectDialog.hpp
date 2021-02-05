@@ -22,6 +22,7 @@
 #define CONNECTDIALOG_HPP
 
 #include <QWidget>
+#include <QProcess>
 
 extern "C" {
 	struct iio_context;
@@ -52,6 +53,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void btnClicked();
+	void enableDemoBtn();
 	void validateInput();
 	void updatePopUp(struct iio_context *ctx);
 
@@ -59,6 +61,8 @@ private Q_SLOTS:
 private:
 	Ui::Connect *ui;
 	bool connected;
+	bool enableDemo;
+	QProcess *process;
 	void createContext(const QString& uri);
 	bool eventFilter(QObject *watched, QEvent *event);
 };

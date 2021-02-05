@@ -213,6 +213,7 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/src
 	${BREAKPAD_INCLUDE_DIRS}
 	${BREAKPAD_INCLUDE_DIRS}/breakpad
+	${CMAKE_CURRENT_SOURCE_DIR}/iio-emu
 )
 
 link_directories(
