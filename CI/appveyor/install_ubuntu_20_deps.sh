@@ -13,6 +13,7 @@ QWT_BRANCH=qwt-6.1-multiaxes
 QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master #not used
+LIBTINYIIOD_BRANCH=master
 
 set -e
 if [ $# -eq 0 ]; then
@@ -239,6 +240,22 @@ build_qwtpolar() {
 
 }
 
+build_libtinyiiod() {
+	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
+
+	cd ~
+	git clone --depth 1 https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH ${WORKDIR}/libtinyiiod
+	mkdir ${WORKDIR}/libtinyiiod/build-${ARCH}
+	cd ${WORKDIR}/libtinyiiod/build-${ARCH}
+
+	cmake ${CMAKE_OPTS} \
+		-DBUILD_EXAMPLES=OFF \
+		${WORKDIR}/libtinyiiod
+
+	make $JOBS
+	sudo make $JOBS install
+}
+
 install_apt
 build_libiio
 build_libad9361
@@ -251,3 +268,4 @@ build_qwt
 build_qwtpolar
 #build_libsigrok
 build_libsigrokdecode
+build_libtinyiiod
