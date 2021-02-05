@@ -27,11 +27,12 @@
 
 #include <iio.h>
 #include <iostream>
+#include <QCoreApplication>
 
 using namespace adiscope;
 
 ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget),
-	ui(new Ui::Connect), connected(false)
+	ui(new Ui::Connect), connected(false), enableDemo(false)
 {
 	ui->setupUi(this);
 	ui->connectBtn->setText(tr("Connect"));
@@ -39,6 +40,7 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget),
 	ui->connectBtn->setDisabled(true);
 
 	connect(ui->connectBtn, SIGNAL(clicked()), this, SLOT(btnClicked()));
+	connect(ui->enableDemoBtn, SIGNAL(clicked()), this, SLOT(enableDemoBtn()));
 	connect(ui->hostname, SIGNAL(returnPressed()),
 	        this, SLOT(btnClicked()));
 	connect(ui->hostname, SIGNAL(textChanged(const QString&)),
@@ -50,6 +52,10 @@ ConnectDialog::ConnectDialog(QWidget *widget) : QWidget(widget),
 	setDynamicProperty(ui->hostname, "invalid", false);
 	setDynamicProperty(ui->hostname, "valid", false);
 	ui->infoSection->hide();
+
+	ui->demoDevicesComboBox->addItem("adalm2000");
+	ui->demoDevicesComboBox->setDisabled(false);
+	process = new QProcess(this);
 }
 
 ConnectDialog::~ConnectDialog()
@@ -88,6 +94,56 @@ void ConnectDialog::btnClicked()
 	} else {
 		validateInput();
 	}
+}
+
+void ConnectDialog::enableDemoBtn()
+{
+	if (!enableDemo) {
+		QProcess killProcess;
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+		killProcess.start("taskkill /im iio-emu /f");
+#else
+		killProcess.start("pkill iio-emu");
+#endif
+		killProcess.waitForFinished();
+
+		// iio-emu found in system
+		QString dirPath = QCoreApplication::applicationDirPath();
+		QString program = dirPath + "/iio-emu";
+		QStringList arguments;
+		arguments.append(ui->demoDevicesComboBox->currentText());
+		process->setProgram(program);
+		process->setArguments(arguments);
+		process->start();
+		auto started = process->waitForStarted();
+		if (!started) {
+			// retry to start the process
+			// path for iio-emu when Scopy is built manually
+			program = dirPath + "/iio-emu/iio-emu";
+			process->setProgram(program);
+			process->start();
+			started = process->waitForStarted();
+			if (!started) {
+				ui->description->setText("Server failed to start");
+				qDebug() << "Process failed to start";
+				return;
+			}
+		}
+
+		ui->enableDemoBtn->setChecked(true);
+		ui->enableDemoBtn->setText("Disable Demo");
+		ui->hostname->setText("127.0.0.1");
+
+		enableDemo = true;
+	} else {
+		process->kill();
+		ui->enableDemoBtn->setChecked(false);
+		ui->enableDemoBtn->setText("Enable Demo");
+		ui->hostname->setText("");
+
+		enableDemo = false;
+	}
+
 }
 
 void ConnectDialog::discardSettings()
