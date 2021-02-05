@@ -14,6 +14,7 @@ LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master #not used
 BOOST_VERSION_FILE=1_73_0
 BOOST_VERSION=1.73.0
+LIBTINYIIOD_BRANCH=master
 
 PYTHON="python3"
 PACKAGES=" ${QT_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
@@ -278,6 +279,22 @@ build_qwtpolar() {
 	qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_mac"
 }
 
+build_libtinyiiod() {
+	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
+
+	cd ~
+	git clone --depth 1 https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH ${WORKDIR}/libtinyiiod
+	mkdir ${WORKDIR}/libtinyiiod/build-${ARCH}
+	cd ${WORKDIR}/libtinyiiod/build-${ARCH}
+
+	cmake ${CMAKE_OPTS} \
+		-DBUILD_EXAMPLES=OFF \
+		${WORKDIR}/libtinyiiod
+
+	make $JOBS
+	sudo make $JOBS install
+}
+
 build_sigcpp
 build_glibmm
 build_libiio
@@ -292,3 +309,4 @@ build_grm2k
 build_qwt
 build_qwtpolar
 build_libsigrokdecode
+build_libtinyiiod
