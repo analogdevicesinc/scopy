@@ -55,6 +55,10 @@
 #include <QJsonDocument>
 #include <QDesktopServices>
 #include <QSpacerItem>
+#if __ANDROID__
+	#include <QtAndroidExtras/QtAndroid>
+	#include <QAndroidJniEnvironment>
+#endif
 
 #include <iio.h>
 
@@ -70,6 +74,9 @@
 #include <libm2k/m2kexceptions.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include "scopyExceptionHandler.h"
+#ifdef __ANDROID__
+#include <libusb.h>
+#endif
 
 #define TIMER_TIMEOUT_MS 5000
 #define ALIVE_TIMER_TIMEOUT_MS 5000
@@ -90,7 +97,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
 	infoWidget(nullptr),
 	calib(nullptr),
-	skip_calibration(false),
+    skip_calibration(false),
 	calibrating(false),
 	debugger_enabled(false),
 	indexFile(""), deviceInfo(""), pathToFile(""),
@@ -106,11 +113,19 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	m_adc_tools_failed(false),
 	m_dac_tools_failed(false),
 	about(nullptr)
+#ifdef __ANDROID__
+	,jnienv(new QAndroidJniEnvironment())
+#endif
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
 
 	ui->setupUi(this);
+
+#ifdef __ANDROID__
+	libusb_set_option(NULL,LIBUSB_OPTION_ANDROID_JAVAVM,jnienv->javaVM());
+	libusb_set_option(NULL,LIBUSB_OPTION_WEAK_AUTHORITY,NULL);
+#endif
 
 	setWindowIcon(QIcon(":/icon.ico"));
 	QApplication::setWindowIcon(QIcon(":/icon.ico"));
@@ -292,13 +307,37 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	} else {
 
 	}
+#if __ANDROID__
+	auto  result = QtAndroid::checkPermission(QString("android.permission.WRITE_EXTERNAL_STORAGE"));
+	    if(result == QtAndroid::PermissionResult::Denied){
+		QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.WRITE_EXTERNAL_STORAGE"}));
+		if(resultHash["android.permission.WRITE_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
+		    return;
+	    }
+	result = QtAndroid::checkPermission(QString("android.permission.READ_EXTERNAL_STORAGE"));
+		if(result == QtAndroid::PermissionResult::Denied){
+		    QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.READ_EXTERNAL_STORAGE"}));
+		    if(resultHash["android.permission.READ_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
+			return;
+		}
 
-	// TO DO: Remove temporary spaces
+#endif
+//	    skip_calibration=true;
+
+//	    QFile f("/sdcard/gnuradio/bla.txt");
+//	    f.open(QIODevice::ReadWrite);
+//	    f.write("blabla");
+//	    f.close();
+
+    // TO DO: Remove temporary spaces
 	// set home icon
 	ui->btnHome->setText("  Home");
 	ui->btnHome->setIcon(QIcon::fromTheme("house"));
 	ui->btnHome->setIconSize(QSize(32,32));
 
+//	f.open(QIODevice::ReadOnly);
+//	qDebug()<<f.readAll();
+//	f.close();
 }
 
 void ToolLauncher::_setupToolMenu()
@@ -1433,6 +1472,15 @@ QPair<bool, bool> adiscope::ToolLauncher::initialCalibration()
 		initialCalibrationFlag = false;
 	}
 
+//	if (okc.first) {
+//		Q_EMIT adcCalibrationDone();
+//		Q_EMIT dacCalibrationDone();
+//		Q_EMIT calibrationDone();
+//	}
+//	else {
+//		Q_EMIT calibrationFailed();
+//	}
+
 	return okc;
 }
 
@@ -1473,14 +1521,14 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 
 	calibrating = false;
 
-	if (ok) {
-		Q_EMIT adcCalibrationDone();
-		Q_EMIT dacCalibrationDone();
-		Q_EMIT calibrationDone();
-	}
-	else {
-		Q_EMIT calibrationFailed();
-	}
+    if (ok) {
+        Q_EMIT adcCalibrationDone();
+        Q_EMIT dacCalibrationDone();
+        Q_EMIT calibrationDone();
+    }
+    else {
+        Q_EMIT calibrationFailed();
+    }
 
 	return { ok, skipCalib };
 }
@@ -1519,12 +1567,12 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 					 &ToolLauncher::addDebugWindow);
 		}
 
-		if (filter->compatible(TOOL_CALIBRATION)) {
-			manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),
-								   &js_engine, this, calib);
-			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
-			toolList.push_back(manual_calibration);
-		}
+        if (filter->compatible(TOOL_CALIBRATION)) {
+            manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),
+                                   &js_engine, this, calib);
+            adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
+            toolList.push_back(manual_calibration);
+        }
 
 		if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 			spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
@@ -1544,7 +1592,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 				menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->click();
 			});
 			network_analyzer->setOscilloscope(oscilloscope);
-		}
+        }
 
 		m_adc_tools_failed = false;
 		Q_EMIT adcToolsCreated();
@@ -1624,28 +1672,27 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			dioManager = new DIOManager(ctx, filter);
 		}
 
-		if (filter->compatible(TOOL_LOGIC_ANALYZER)
-				|| filter->compatible(TOOL_PATTERN_GENERATOR)) {
+        if (filter->compatible(TOOL_LOGIC_ANALYZER)
+                || filter->compatible(TOOL_PATTERN_GENERATOR)) {
 
-			if (!m_use_decoders) {
-				search_timer->stop();
+            if (!m_use_decoders) {
+                search_timer->stop();
 
-				QMessageBox info(this);
-				info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
-				info.exec();
-			} else {
-				bool success = loadDecoders(QCoreApplication::applicationDirPath() +
-							    "/decoders");
+                QMessageBox info(this);
+                info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
+                info.exec();
+            } else {
+//                bool success = loadDecoders("decoders");
 
-				if (!success) {
-					search_timer->stop();
+//                if (!success) {
+//                    search_timer->stop();
 
-					QMessageBox error(this);
-					error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
-					error.exec();
-				}
-			}
-		}
+//                    QMessageBox error(this);
+//                    error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
+//                    error.exec();
+//                }
+            }
+        }
 
 		if (filter->compatible(TOOL_DIGITALIO)) {
 			dio = new DigitalIO(nullptr, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),

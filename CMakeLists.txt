@@ -80,10 +80,22 @@ if (MSVC)
 	add_definitions(-DQWT_DLL)
 endif (MSVC)
 
+if(ANDROID)
+    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+    if (ANDROID_ABI STREQUAL "armeabi-v7a")
+	set(ANDROID_EXTRA_LIBS
+	    ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libcrypto.so
+	    ${CMAKE_CURRENT_SOURCE_DIR}/path/to/libssl.so)
+    endif()
+endif()
+
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
 find_package(Qt5Network REQUIRED)
+if(ANDROID)
+	find_package(Qt5AndroidExtras REQUIRED)
+endif()
 
 FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/translations/*.ts)
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -147,7 +159,6 @@ else()
 
 endif()
 
-find_package(Qwt REQUIRED)
 find_package(Qt5Qml REQUIRED)
 find_package(Qt5Svg REQUIRED)
 find_package(Qt5UiTools REQUIRED)
@@ -156,7 +167,6 @@ find_package(Qt5Xml REQUIRED)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt )
 
-set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
@@ -165,6 +175,7 @@ add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
 find_package(libm2k REQUIRED)
+find_library(LIBUSB_LIBRARIES NAMES usb-1.0 usb)
 
 if (ENABLE_MATIO)
 	message("-- Building with MATLAB support for SignalGenerator")
@@ -172,32 +183,43 @@ if (ENABLE_MATIO)
 	add_definitions(-DMATLAB_SUPPORT_SIGGEN)
 endif()
 
-find_library(QWTPOLAR_LIBRARIES qwtpolar)
-find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
-if (QWTPOLAR_LIBRARIES)
-	message(STATUS "QwtPolar libraries found - ${QWTPOLAR_LIBRARIES}")
+
+
+
+find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
+set(CMAKE_FIND_DEBUG_MODE OFF)
+if(ANDROID)
+	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
 else()
-	message(STATUS "QwtPolar libraries not found - assuming they are built in Qwt")
-	set(QWTPOLAR_LIBRARIES "")
-endif()
-if (NOT QWTPOLAR_INCLUDE_DIRS)
-	message(SEND_ERROR "QwtPolar includes not found")
-else()
-	message(STATUS "Found QwtPolar include files - ${QWTPOLAR_INCLUDE_DIRS}/qwt_polar_plot.h")
+	find_library(QWTPOLAR_LIBRARIES qwtpolar)
+	find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
+	if (QWTPOLAR_LIBRARIES)
+		message(STATUS "QwtPolar libraries found - ${QWTPOLAR_LIBRARIES}")
+	else()
+		message(STATUS "QwtPolar libraries not found - assuming they are built in Qwt")
+		set(QWTPOLAR_LIBRARIES "")
+	endif()
+	if (NOT QWTPOLAR_INCLUDE_DIRS)
+		message(SEND_ERROR "QwtPolar includes not found")
+	else()
+		message(STATUS "Found QwtPolar include files - ${QWTPOLAR_INCLUDE_DIRS}/qwt_polar_plot.h")
+	endif()
 endif()
 
 find_package(PkgConfig)
+set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
-message(CMAKE_PATH ${CMAKE_PREFIX_PATH})
-message(NETWORK ${Qt5Network_INCLUDE_DIRS} ${Qt5Network_LIBRARIES})
+
 include_directories(
 	${Boost_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
 	${Qt5Concurrent_INCLUDE_DIRS}
+	${Qt5AndroidExtras_INCLUDE_DIRS}
 	${Qt5Qml_INCLUDE_DIRS}
 	${Qt5UiTools_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
@@ -311,7 +333,7 @@ if($ENV{APPVEYOR})
 	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_id:\ $ENV{APPVEYOR_JOB_ID}\n)
 	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_name:\ $ENV{APPVEYOR_JOB_NAME}\n)
 	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_nr:\ $ENV{APPVEYOR_JOB_NUMBER}\n)
-	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_link:\ $ENV{APPVEYOR_URL}/project/$ENV{APPVEYOR_ACCOUNT_NAME}/$ENV{APPVEYOR_PROJECT_NAME}/builds/$ENV{APPVEYOR_BUILD_ID}/job/$ENV{APPVEYOR_JOB_ID}\n)		
+	set(APPVEYOR_INFO ${APPVEYOR_INFO}job_link:\ $ENV{APPVEYOR_URL}/project/$ENV{APPVEYOR_ACCOUNT_NAME}/$ENV{APPVEYOR_PROJECT_NAME}/builds/$ENV{APPVEYOR_BUILD_ID}/job/$ENV{APPVEYOR_JOB_ID}\n)
 	if(EXISTS ${CMAKE_SOURCE_DIR}/scopy-mingw-build-status)
 		message(scopy-mingw-build-status found .. populating)
 		FILE(READ ${CMAKE_SOURCE_DIR}/scopy-mingw-build-status SCOPY_MINGW_BUILD_STATUS_INFO)
@@ -349,10 +371,13 @@ if (CLONE_IIO_EMU)
 	if(NOT GIT_SUBMOD_RESULT EQUAL "0")
 		message(FATAL_ERROR "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules")
 	endif()
-	add_subdirectory(iio-emu)
+	if(NOT ANDROID)
+		add_subdirectory(iio-emu)
+	endif()
 endif()
 
-add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
+if(ANDROID)
+	add_library(${PROJECT_NAME} SHARED
 		${SRC_LIST}
 		${RESOURCES}
 		${m2kscope_RESOURCES}
@@ -360,7 +385,19 @@ add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 		${EXTRA_BUNDLE_FILES}
 		${TRANSLATION_RESOURCES}
 		${ABOUT_PAGE_RESOURCES}
-)
+		)
+    else()
+	add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
+		${SRC_LIST}
+		${RESOURCES}
+		${m2kscope_RESOURCES}
+		${m2kscope_FORMS_HEADERS}
+		${EXTRA_BUNDLE_FILES}
+		${TRANSLATION_RESOURCES}
+		${ABOUT_PAGE_RESOURCES}
+        )
+endif()
+
 
 if (WIN32 OR ENABLE_APPLICATION_BUNDLE)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
@@ -374,6 +411,8 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Qml_LIBRARIES}
 		${Qt5UiTools_LIBRARIES}
 		${Qt5Network_LIBRARIES}
+		${Qt5AndroidExtras_LIBRARIES}
+		${LIBUSB_LIBRARIES}
 		gnuradio::gnuradio-runtime
 		gnuradio::gnuradio-analog
 		gnuradio::gnuradio-blocks
