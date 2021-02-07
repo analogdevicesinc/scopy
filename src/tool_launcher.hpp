@@ -35,6 +35,10 @@
 #include <info_widget.h>
 #include <QTextBrowser>
 
+#ifdef __ANDROID__
+#include <QAndroidJniEnvironment>
+#endif
+
 #include "apiObject.hpp"
 #include "dmm.hpp"
 #include "filter.hpp"
@@ -202,6 +206,9 @@ private:
 	QVector<int> position;
 	QVector<Debugger*> debugInstances;
 	QVector<DetachedWindow *> debugWindows;
+#if __ANDROID__
+	QAndroidJniEnvironment *jnienv;
+#endif
 
 	std::vector<DeviceWidget *> devices;
 	QVector<Tool*> toolList;
