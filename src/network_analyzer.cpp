@@ -1667,7 +1667,15 @@ void NetworkAnalyzer::startStop(bool pressed)
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
 		ui->statusLabel->setText(tr("Stopped"));
-		m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
+		do {
+			try {
+				m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
+				break;
+			} catch (libm2k::m2k_exception &e) {
+				qDebug() << e.what();
+			}
+
+		} while (true);
 	}
 }
 
