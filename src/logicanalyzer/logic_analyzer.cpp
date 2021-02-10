@@ -57,10 +57,9 @@
 using namespace adiscope;
 using namespace adiscope::logic;
 
-constexpr int MAX_BUFFER_SIZE_ONESHOT = 64 * 4 * 1024 * 1024; // 64 x 4M
+constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024 * 1024; // 1Gb
-constexpr int MAX_SR_ONESHOT = 10e7; // 100M
-constexpr int MAX_SR_STREAM = 10e6; // 10M
+constexpr int MAX_SR_STREAM = 5e6; // 10M
 constexpr int MAX_KERNEL_BUFFERS = 64;
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
@@ -126,7 +125,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_saveRestoreSettings(nullptr),
 	m_oscPlot(nullptr),
 	m_oscChannelSelected(-1),
-	m_oscDecoderMenu(nullptr)
+	m_oscDecoderMenu(nullptr),
+	m_currentKernelBuffers(4)
 {
 	// setup ui
 	setupUi();
@@ -135,8 +135,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	connectSignalsAndSlots();
 
 	m_plot.setLeftVertAxesCount(1);
-
-	// TODO: get number of channels from libm2k;
 
 	for (uint8_t i = 0; i < m_nbChannels; ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
@@ -999,6 +997,11 @@ void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 		return;
 	}
 
+	const bool wasRunning = m_started;
+	if (wasRunning) {
+		startStop(false);
+	}
+
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate();
 
@@ -1014,16 +1017,25 @@ void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 	m_m2kDigital->getTrigger()->setDigitalDelay(value);
 
 	updateBufferPreviewer(0, m_lastCapturedSample);
+
+	if (wasRunning) {
+		startStop(true);
+	}
 }
 
 void LogicAnalyzer::onSampleRateValueChanged(double value)
 {
+	const bool wasRunning = m_started;
+	if (wasRunning) {
+		startStop(false);
+	}
+
 	qDebug() << "Sample rate: " << value;
 	m_sampleRate = value;
 
 	if (ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
-		m_timePositionButton->setValue(m_timeTriggerOffset);
+//		m_timePositionButton->setValue(m_timeTriggerOffset * m_sampleRate);
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset;
 		m_plot.replot();
@@ -1049,15 +1061,24 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 	double maxT = (1 << 13) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
 	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
 	m_plot.setTimeTriggerInterval(minT, maxT);
+
+	if (wasRunning) {
+		startStop(true);
+	}
 }
 
 void LogicAnalyzer::onBufferSizeChanged(double value)
 {
+	const bool wasRunning = m_started;
+	if (wasRunning) {
+		startStop(false);
+	}
+
 	m_bufferSize = value;
 
 	if (ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
-		m_timePositionButton->setValue(m_timeTriggerOffset);
+//		m_timePositionButton->setValue(m_timeTriggerOffset);
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset;
 		m_plot.replot();
@@ -1082,22 +1103,29 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 	double maxT = (1 << 13) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
 	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
 	m_plot.setTimeTriggerInterval(minT, maxT);
+
+	if (wasRunning) {
+		startStop(true);
+	}
 }
 
 void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 {
-	qDebug() << "Btn stream one shot toggled !!!!!: " << toggled;
+	const bool wasRunning = m_started;
+	if (wasRunning) {
+		startStop(false);
+	}
 
-//	m_plot.enableTimeTrigger(toggled);
-//	m_timePositionButton->setVisible(toggled);
+	m_plot.enableTimeTrigger(toggled);
+	m_timePositionButton->setVisible(toggled);
 
 	m_m2kDigital->getTrigger()->setDigitalStreamingFlag(toggled);
 
 	if (toggled) { // oneshot
 		m_plot.cancelZoom();
-		m_timePositionButton->setValue(m_timeTriggerOffset);
-		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 - m_timeTriggerOffset);
-		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 - m_timeTriggerOffset;
+		m_timePositionButton->setValue(m_timeTriggerOffset * m_sampleRate);
+		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
+		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset;
 		m_plot.replot();
 		m_plot.zoomBaseUpdate();
 	} else { // streaming
@@ -1111,10 +1139,11 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 
 	m_bufferSizeButton->setMaxValue(toggled ? MAX_BUFFER_SIZE_ONESHOT
 						: MAX_BUFFER_SIZE_STREAM);
-	m_sampleRateButton->setMaxValue(toggled ? MAX_SR_ONESHOT
-						: MAX_SR_STREAM);
-	m_sampleRateButton->setIntegerDivider(m_sampleRateButton->maxValue());
 	m_bufferPreviewer->setCursorVisible(toggled);
+
+	if (wasRunning) {
+		startStop(true);
+	}
 }
 
 void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
@@ -1568,10 +1597,10 @@ void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 	long long totalSamples = m_bufferSize;
 
 	if (totalSamples > 0) {
-		const int offset = ui->btnStreamOneShot->isChecked() ? m_timePositionButton->value() * (1.0 / m_sampleRate)
+		const int offset = ui->btnStreamOneShot->isChecked() ? m_timePositionButton->value()
 								     : 0;
-		dataInterval.setMinValue(-((min / m_sampleRate) + offset));
-		dataInterval.setMaxValue((max / m_sampleRate) - offset);
+		dataInterval.setMinValue(offset / m_sampleRate);
+		dataInterval.setMaxValue((offset + max) / m_sampleRate);
 	}
 
 	// Use the two intervals to determine the width and position of the
@@ -1628,11 +1657,11 @@ void LogicAnalyzer::initBufferScrolling()
 	});
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=](){
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 +
-				      (ui->btnStreamOneShot ? 0 : m_timeTriggerOffset));
+				      (ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate));
 		m_plot.replot();
 		updateBufferPreviewer(0, m_lastCapturedSample);
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 +
-				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset);
+				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
 	});
 }
 
@@ -1672,7 +1701,7 @@ void LogicAnalyzer::startStop(bool start)
 		const double delay = oneShotOrStream ? m_timeTriggerOffset * m_sampleRate
 					       : 0;
 
-		const double setSampleRate = m_m2kDigital->setSampleRateIn((sampleRate+1));
+		const double setSampleRate = m_m2kDigital->setSampleRateIn((sampleRate + 1));
 		m_sampleRateButton->setValue(setSampleRate);
 
 		m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
@@ -1689,26 +1718,6 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_lastCapturedSample = 0;
 
-		if (m_autoMode) {
-
-			m_plot.setTriggerState(CapturePlot::Auto);
-
-			double oneBufferTimeOut = m_timerTimeout;
-
-			if (!oneShotOrStream) {
-				uint64_t chunks = 4;
-				while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
-					chunks++; // select a small size for the chunks
-					// example: 2^19 samples in each chunk
-				}
-				const uint64_t chunk_size = (bufferSizeAdjusted >> chunks) > 0 ? (bufferSizeAdjusted >> chunks) : 4 ;
-				const uint64_t buffersCount = bufferSizeAdjusted / chunk_size;
-				oneBufferTimeOut /= buffersCount;
-			}
-
-			m_timer->start(oneBufferTimeOut);
-		}
-
 		m_captureThread = new std::thread([=](){
 
 			if (m_buffer) {
@@ -1716,7 +1725,7 @@ void LogicAnalyzer::startStop(bool start)
 				m_buffer = nullptr;
 			}
 
-			m_buffer = new uint16_t[bufferSize];
+			m_buffer = new uint16_t[bufferSizeAdjusted];
 			QMetaObject::invokeMethod(this, [=](){
 				m_exportSettings->enableExportButton(true);
 			}, Qt::DirectConnection);
@@ -1725,27 +1734,104 @@ void LogicAnalyzer::startStop(bool start)
 				m_plot.setTriggerState(CapturePlot::Waiting);
 			}, Qt::QueuedConnection);
 
-			uint64_t chunks = 4;
-			while ((bufferSizeAdjusted >> chunks) > (1 << 19)) {
-				chunks++; // select a small size for the chunks
-				// example: 2^19 samples in each chunk
-			}
-			const uint64_t chunk_size = (bufferSizeAdjusted >> chunks) > 0 ? (bufferSizeAdjusted >> chunks) : 4 ;
 			uint64_t totalSamples = bufferSizeAdjusted;
+			uint64_t chunk_size = 0;
 
-			do {
-				try {
-					m_m2kDigital->setKernelBuffersCountIn(64);
-					break;
-				} catch (libm2k::m2k_exception &e) {
-					qDebug() << e.what();
+			double oneBufferTimeout = m_timerTimeout;
+
+			// clear any warning
+			m_plot.setMaxBufferSizeErrorLabel(false);
+
+			if (oneShotOrStream) { // oneshot
+				do {
+					try {
+						m_m2kDigital->setKernelBuffersCountIn(4);
+						break;
+					} catch (libm2k::m2k_exception &e) {
+						qDebug() << e.what();
+					}
+				} while (true);
+
+				chunk_size = bufferSizeAdjusted;
+
+			} else { // streaming
+				const int minKernelBuffers = 4;
+				const int oneBufferMaxSize = 4 * 1024 * 1024; // 4M
+
+				m_currentKernelBuffers = minKernelBuffers;
+
+				/* ensure we have the minimum amount of kernel buffers to fit the buffer
+				 * ex: we want to capture a 40M buffer, we will use (at least) 10 kernel buffers
+				 * */
+				while (bufferSizeAdjusted < m_currentKernelBuffers * oneBufferMaxSize
+						&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+					m_currentKernelBuffers++;
 				}
-			} while (true);
+
+				/* ensure we don't spend more than 100ms on a acquiring a buffer if we can
+				 * further divide it into smaller buffers (kernel buffers still available)
+				 * */
+				const double maxCaptureDuration = 0.1; // 100ms
+				while (setSampleRate * static_cast<double>(bufferSizeAdjusted)
+						/ static_cast<double>(m_currentKernelBuffers) > maxCaptureDuration
+						&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+					m_currentKernelBuffers++;
+				}
+
+				// buffer size per kernel buffer
+				chunk_size = bufferSizeAdjusted / m_currentKernelBuffers;
+
+				// buffer size must be divisible by 4
+				chunk_size = 4 * (chunk_size / 4);
+
+				/* If the chunk_size was not disible by 4 in the first place we would get a smaller
+				 * value for it. Let's check if we can increase the chunk_size to the next divisible by 4
+				 * number otherwise we need to add another kernel buffer if this is possible
+				 * */
+				if (chunk_size + 4 <= oneBufferMaxSize) {
+					chunk_size += 4;
+				} else if (m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+					m_currentKernelBuffers++;
+				}
+
+				// If the buffer size is > 64 * 4M we need to cap the chunk_size to 4M
+				if (chunk_size > oneBufferMaxSize) {
+					chunk_size = oneBufferMaxSize;
+
+					/* in this case if the sample rate is greater than 5M samples / s
+					 * warn that data might not be continuos
+					 * */
+					if (setSampleRate > MAX_SR_STREAM) {
+						m_plot.setMaxBufferSizeErrorLabel(true, "Data might not be continuous, lower sample rate or buffer size");
+					}
+				}
+
+				do {
+					try {
+						m_m2kDigital->setKernelBuffersCountIn(m_currentKernelBuffers);
+						break;
+					} catch (libm2k::m2k_exception &e) {
+						qDebug() << e.what();
+					}
+				} while (true);
+
+				oneBufferTimeout /= m_currentKernelBuffers;
+			}
+
+			if (m_autoMode) {
+				QMetaObject::invokeMethod(this, [=](){
+					m_plot.setTriggerState(CapturePlot::Auto);
+				}, Qt::QueuedConnection);
+
+				QMetaObject::invokeMethod(this, [=](){
+					m_timer->start(oneBufferTimeout);
+				});
+			}
 
 			uint64_t absIndex = 0;
-
 			do {
 				const uint64_t captureSize = std::min(chunk_size, totalSamples);
+
 				try {
 					const uint16_t * const temp = m_m2kDigital->getSamplesP(captureSize);
 					memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
@@ -1777,6 +1863,11 @@ void LogicAnalyzer::startStop(bool start)
 				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
+
+					QMetaObject::invokeMethod(this, [=](){
+						m_plot.setTriggerState(CapturePlot::Waiting);
+					}, Qt::QueuedConnection);
+
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
 			} while (totalSamples);
@@ -1787,11 +1878,12 @@ void LogicAnalyzer::startStop(bool start)
 						  "restoreTriggerState",
 						  Qt::DirectConnection);
 
-			//
-			QMetaObject::invokeMethod(ui->runSingleWidget,
-						  "toggle",
-						  Qt::QueuedConnection,
-						  Q_ARG(bool, false));
+			if (ui->runSingleWidget->singleButtonChecked()) {
+				QMetaObject::invokeMethod(ui->runSingleWidget,
+							  "toggle",
+							  Qt::QueuedConnection,
+							  Q_ARG(bool, false));
+			}
 
 			QMetaObject::invokeMethod(&m_plot,
 						  "replot");
@@ -2126,14 +2218,7 @@ void LogicAnalyzer::setupTriggerMenu()
 			double oneBufferTimeOut = m_timerTimeout;
 
 			if (!ui->btnStreamOneShot->isChecked()) {
-				uint64_t chunks = 4;
-				while ((m_bufferSize >> chunks) > (1 << 19)) {
-					chunks++; // select a small size for the chunks
-					// example: 2^19 samples in each chunk
-				}
-				const uint64_t chunk_size = (m_bufferSize >> chunks) > 0 ? (m_bufferSize >> chunks) : 4 ;
-				const uint64_t buffersCount = m_bufferSize / chunk_size;
-				oneBufferTimeOut /= buffersCount;
+				oneBufferTimeOut /= m_currentKernelBuffers;
 			}
 
 			m_timer->start(oneBufferTimeOut);
