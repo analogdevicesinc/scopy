@@ -251,7 +251,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	ui->stackedWidget->setCurrentIndex(0);
 	setupAddPage();
 	readPreferences();
-	ui->stackedWidget->setStyleSheet("background-color:black;");
 	this->installEventFilter(this);
 	ui->btnConnect->hide();	
 
@@ -283,6 +282,12 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	} else {
 
 	}
+
+	// TO DO: Remove temporary spaces
+	// set home icon
+	ui->btnHome->setText("  Home");
+	ui->btnHome->setIcon(QIcon::fromTheme("house"));
+	ui->btnHome->setIconSize(QSize(32,32));
 
 }
 
@@ -857,17 +862,15 @@ void ToolLauncher::setupHomepage()
 	versionLabel->setText(tr("Auto update checks not enabled. Check preferences menu."));
 	connect(m_phoneHome, &PhoneHome::scopyVersionChanged, this, [=] () {
 		if (m_phoneHome->getScopyVersion().isEmpty()) {
-			/*versionLabel->setStyleSheet("{ color : white; }");
-			versionLabel->setText(tr("Unable to check update server!"));*/
+			//versionLabel->setText(tr("Unable to check update server!"));
 		} else if (m_phoneHome->getScopyVersion() != QString("v" + QString(PROJECT_VERSION))) {
 			versionLabel->setText(tr("Version ") + m_phoneHome->getScopyVersion() + " of Scopy was released. " +
-								  "<a style=\"color:white\" href=\"" + m_phoneHome->getScopyLink() +
+								  "<a href=\"" + m_phoneHome->getScopyLink() +
 								  tr("\">Click to update </a>"));
 			versionLabel->setTextFormat(Qt::RichText);
 			versionLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
 			versionLabel->setOpenExternalLinks(true);
 		} else {
-			versionLabel->setStyleSheet("{ color : white; }");
 			versionLabel->setText(tr("Scopy is up to date!"));
 		}
 		versionLabel->setVisible(true);

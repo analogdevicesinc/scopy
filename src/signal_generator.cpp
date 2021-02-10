@@ -378,7 +378,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	connect(ui->btnNoiseCollapse,&QPushButton::clicked,
 		[=](bool check) {
-			ui->wNoise->setVisible(!check);
+			ui->wNoise->setVisible(check);
 		});
 
 	unsigned int nb_channels = m_m2k_analogout->getNbChannels();
@@ -1938,18 +1938,6 @@ void adiscope::SignalGenerator::channelWidgetMenuToggled(bool checked)
 	triggerRightMenuToggle(cw->id(), checked);
 }
 
-void adiscope::SignalGenerator::renameConfigPanel()
-{
-	/*ui->config_panel->setTitle(QString("Configuration for %1").arg(
-					   channels[currentChannel]->fullName()));*/
-	QString stylesheet = "QTabBar::tab:selected {\
-			color: white;\
-			margin-top: 0px;\
-			border-bottom: 2px solid "
-		      + channels[currentChannel]->color().name() + "}";
-	ui->tabWidget->setStyleSheet(stylesheet);
-}
-
 int SignalGenerator::sg_waveform_to_idx(enum sg_waveform wave)
 {
 	switch (wave) {
@@ -2051,7 +2039,6 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 
 	ui->type->setCurrentIndex(sg_waveform_to_idx(ptr->waveform));
 	waveformUpdateUi(ptr->waveform);
-	renameConfigPanel();
 	ui->tabWidget->setCurrentIndex((int) ptr->type);
 	resizeTabWidget((int)ptr->type);
 }

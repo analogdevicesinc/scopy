@@ -180,7 +180,6 @@ private:
 
 	QSharedPointer<signal_generator_data> getData(QWidget *obj);
 	QSharedPointer<signal_generator_data> getCurrentData();
-	void renameConfigPanel();
 
 	void start();	
 	void resetZoom();

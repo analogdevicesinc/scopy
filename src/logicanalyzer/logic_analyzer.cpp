@@ -680,11 +680,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	QHBoxLayout *externalSubTitle = new QHBoxLayout();
 	auto label = new QLabel("EXTERNAL TRIGGER ");
-	label->setStyleSheet("QLabel {"
-			     "font-size: 12px;"
-			   "color: rgba(255, 255, 255, 70);"
-			   "font-weight: normal;"
-			   "}");
+
 	externalSubTitle->addWidget(label);
 	externalSubTitle->setContentsMargins(0, 0, 0, 0);
 	externalSubTitle->setSpacing(0);
@@ -1283,8 +1279,6 @@ void LogicAnalyzer::setupUi()
 	m_bufferPreviewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	ui->vLayoutBufferSlot->addWidget(m_bufferPreviewer);
-
-	m_plot.canvas()->setStyleSheet("background-color: #272730");
 
 
 	// Setup sweep settings menu

@@ -69,11 +69,9 @@ void CursorReadouts::setTransparency(int value)
 
 	ui->TimeCursors->setStyleSheet("QWidget {"
 					"background-color: " + color + ");"
-					"color: white;"
 					"}");
 	ui->VoltageCursors->setStyleSheet("QWidget {"
 					"background-color: " + color + ");"
-					"color: white;"
 					"}");
 }
 

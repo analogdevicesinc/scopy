@@ -1987,7 +1987,6 @@ void Oscilloscope::create_add_channel_panel()
 	sizePolicy.setVerticalStretch(0);
 	sizePolicy.setHeightForWidth(labelWarningMixedSignal->sizePolicy().hasHeightForWidth());
 	labelWarningMixedSignal->setSizePolicy(sizePolicy);
-	labelWarningMixedSignal->setStyleSheet(QString::fromUtf8("color: white;"));
 	labelWarningMixedSignal->setWordWrap(true);
 	labelWarningMixedSignal->setVisible(false);
 
@@ -1998,7 +1997,6 @@ void Oscilloscope::create_add_channel_panel()
 	QLabel *infoLabel = new QLabel(tr("* When the Mixed Signal View is enabled the LogicAnalyzer tool will be disabled!\n"
 					  "** The trigger can be disabled or set only on the Digital channels or Analog channels, not on both at the same time!"), panel);
 	layout_logic->insertWidget(2, infoLabel);
-	infoLabel->setStyleSheet(QString::fromUtf8("color: white;"));
 	infoLabel->setWordWrap(true);
 	infoLabel->setVisible(true);
 
@@ -4340,11 +4338,11 @@ void Oscilloscope::measure_panel_init()
 	cursor_readouts_ui->setupUi(cursorReadouts);
 
 	cursor_readouts_ui->TimeCursors->setStyleSheet("QWidget {"
-		"background-color: transparent;"
-		"color: white;}");
+		"background-color: transparent;}"
+						       );
 	cursor_readouts_ui->VoltageCursors->setStyleSheet("QWidget {"
-		"background-color: transparent;"
-		"color: white;}");
+		"background-color: transparent;}"
+							  );
 
 	// Avoid labels jumping around to left or right by imposing a min width
 	QLabel *label = new QLabel(this);

@@ -237,8 +237,6 @@ void PatternGenerator::setupUi()
 	m_ui->gridLayoutPlot->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
 	m_ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 4);
 
-	// TODO: investigate why the plot's canvas background color is weird
-	m_plot.canvas()->setStyleSheet("background-color: #272730");
 
 	m_plot.enableAxis(QwtPlot::yLeft, false);
 	m_plot.enableAxis(QwtPlot::xBottom, false);

@@ -26,7 +26,7 @@
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOption>
-
+#include "dynamicWidget.hpp"
 #include "dynamicWidget.hpp"
 #include "utils.h"
 
@@ -45,7 +45,6 @@ ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent):
 
 	// Load stylesheets
 	this->setStyleSheet(Util::loadStylesheetFromFile(":stylesheets/stylesheets/toolMenuItem.qss"));
-	d_toolStopBtn->setStyleSheet(Util::loadStylesheetFromFile(":stylesheets/stylesheets/stopButton.qss"));
 
 	setDynamicProperty(this, "allowHover", true);
 
@@ -183,10 +182,16 @@ void ToolMenuItem::_buildUI()
 	layout->addWidget(d_toolBtn);
 	layout->addWidget(d_toolStopBtn);
 
+	setDynamicProperty(d_toolStopBtn, "stopButton", true);
 	d_toolStopBtn->setMaximumSize(32, 32);
 	d_toolBtn->setMinimumHeight(42);
 
-	d_toolBtn->setIcon(QIcon(d_iconPath));
+
+	// TO BE REMOVED
+	QIcon::setThemeName("scopy-light");
+	//QIcon::setThemeName("scopy-default");
+
+	d_toolBtn->setIcon(QIcon::fromTheme(d_iconPath));
 	d_toolBtn->setCheckable(true);
 	d_toolBtn->setIconSize(QSize(32, 32));
 

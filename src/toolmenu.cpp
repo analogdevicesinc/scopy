@@ -36,17 +36,17 @@ ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
 								     << tr("Digital IO") << tr("Voltmeter")
 								     << tr("Power Supply") << tr("Debugger") << tr("Calibration");
 
-	d_availableIcons = QStringList() << ":/menu/oscilloscope.png"
-								     << ":/menu/spectrum_analyzer.png"
-								     << ":/menu/network_analyzer.png"
-								     << ":/menu/signal_generator.png"
-								     << ":/menu/logic_analyzer.png"
-								     << ":/menu/pattern_generator.png"
-								     << ":/menu/io.png"
-								     << ":/menu/voltmeter.png"
-								     << ":/menu/power_supply.png"
-								     << ":/menu/debugger.png"
-								     << ":/menu/calibration.png";
+	d_availableIcons = QStringList() << "oscilloscope"
+								     << "spectrum_analyzer"
+								     << "network_analyzer"
+								     << "signal_generator"
+								     << "logic_analyzer"
+								     << "pattern_generator"
+								     << "io"
+								     << "voltmeter"
+								     << "power_supply"
+								     << "debugger"
+								     << "calibration";
 	_loadState();
 
 	d_buttonGroup = new QButtonGroup(this);

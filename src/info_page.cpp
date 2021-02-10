@@ -24,7 +24,7 @@
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
 #include "libm2k/analog/dmm.hpp"
-
+#include "dynamicWidget.hpp"
 #include <QString>
 #include <QTimer>
 #include <QtConcurrentRun>
@@ -70,7 +70,7 @@ InfoPage::InfoPage(QString uri, Preferences *pref, PhoneHome* phoneHome,
 		} else if (checked == 0) {
 			const QString message = "Your firmware is outdated. "
 							  "Version " + m_phoneHome->getM2kVersion() + " was released. "
-							  "<a style=\"color:white\" href=\"";
+							  "<a href=\"";
 			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\">CLICK TO UPDATE </a>");
 			ui->lblFirmware->setTextFormat(Qt::RichText);
 			ui->lblFirmware->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -218,7 +218,14 @@ void InfoPage::setStatusLabel(QLabel *lbl, QString str, QString color)
 	{
 		lbl->setVisible(true);
 		lbl->setText(str);
-		lbl->setStyleSheet("color: " + color);
+
+		if(color == "white"){
+			setDynamicProperty(lbl, "invalid", false);
+			setDynamicProperty(lbl, "valid", true);
+		}
+		else { setDynamicProperty(lbl, "valid", false);
+			setDynamicProperty(lbl, "invalid", true);
+		}
 	}
 	else
 	{
@@ -260,7 +267,6 @@ void InfoPage::refreshInfoWidget()
 		QLabel *valueLbl = new QLabel(this);
 		QLabel *keyLbl = new QLabel(this);
 		valueLbl->setText(m_info_params.value(key));
-		valueLbl->setStyleSheet("color: white");
 		valueLbl->setWordWrap(true);
 		keyLbl->setText(key);
 		keyLbl->setMinimumWidth(240);
@@ -281,7 +287,6 @@ void InfoPage::refreshInfoWidget()
 
 			valueLbl->setWordWrap(true);
 			valueLbl->setText(m_info_params_advanced.value(key));
-			valueLbl->setStyleSheet("color: white");
 			keyLbl->setText(key);
 
 			ui->paramLayout->addWidget(keyLbl, pos, 0, 1, 1);
