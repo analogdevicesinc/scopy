@@ -127,7 +127,6 @@
         <file>icons/ic arrow left.svg</file>
         <file>icons/ic arrow right.svg</file>
         <file>icons/ic arrow up.svg</file>
-        <file>icons/house.png</file>
         <file>icons/ic_note_checked.svg</file>
         <file>icons/ic_note_unchecked.svg</file>
         <file>m2k.html</file>
@@ -136,6 +135,86 @@
         <file>icons/gate_handle.svg</file>
         <file>icons/refresh.svg</file>
         <file>open-sans-regular.ttf</file>
+        <file>icons/dio101.svg1</file>
+        <file>icons/setup3_checked.xcf-setup3_checked.svg.svg</file>
+        <file>icons/setup3_checked.xcf.svg</file>
+        <file>icons/zoom-out.png</file>
+        <file>stylesheets/bigCustomSwitch.qss</file>
+        <file>stylesheets/browser.qss</file>
+        <file>stylesheets/channel_widget.qss</file>
+        <file>stylesheets/customSwitch.qss</file>
+        <file>stylesheets/dropdown_switch_list.qss</file>
+        <file>stylesheets/global.qss</file>
+        <file>stylesheets/smallOnOffSwitch.qss</file>
+        <file>stylesheets/spinbox_type_a.qss</file>
+        <file>stylesheets/stopButton.qss</file>
+        <file>stylesheets/toolMenuItem.qss</file>
+        <file>translations/scopy_ar.ts</file>
+        <file>translations/scopy_cn.ts</file>
+        <file>translations/scopy_de.ts</file>
+        <file>translations/scopy_en.ts</file>
+        <file>translations/scopy_es.ts</file>
+        <file>translations/scopy_fr.ts</file>
+        <file>translations/scopy_it.ts</file>
+        <file>translations/scopy_jp.ts</file>
+        <file>translations/scopy_kr.ts</file>
+        <file>translations/scopy_ro.ts</file>
+        <file>about.html.cmakein</file>
+        <file>aboutpage.qrc</file>
+        <file>buildinfo.html.cmakein</file>
+        <file>credits.html.cmakein</file>
+        <file>icon_big.svg</file>
+        <file>icon_small.svg</file>
+        <file>resources.qrc</file>
+        <file>scopy.desktop.cmakein</file>
+        <file>Scopy.icns</file>
+        <file>scopy_osp.html.cmakein</file>
+        <file>translations.qrc</file>
+        <file>stylesheets/default.qss</file>
+        <file>icons/scopy-default/index.theme</file>
+        <file>icons/scopy-default/icons/oscilloscope.png</file>
+        <file>icons/scopy-default/icons/calibration.png</file>
+        <file>icons/scopy-default/icons/debugger.png</file>
+        <file>icons/scopy-default/icons/io.png</file>
+        <file>icons/scopy-default/icons/logic_analyzer.png</file>
+        <file>icons/scopy-default/icons/network_analyzer.png</file>
+        <file>icons/scopy-default/icons/pattern_generator.png</file>
+        <file>icons/scopy-default/icons/power_supply.png</file>
+        <file>icons/scopy-default/icons/signal_generator.png</file>
+        <file>icons/scopy-default/icons/spectrum_analyzer.png</file>
+        <file>icons/scopy-default/icons/voltmeter.png</file>
+        <file>icons/scopy-light/index.theme</file>
+        <file>icons/scopy-light/icons/debugger.png</file>
+        <file>icons/scopy-light/icons/house.png</file>
+        <file>icons/scopy-light/icons/ic load.svg</file>
+        <file>icons/scopy-light/icons/ico info.png</file>
+        <file>icons/scopy-light/icons/ic save.svg</file>
+        <file>icons/scopy-light/icons/io.png</file>
+        <file>icons/scopy-light/icons/logic_analyzer.png</file>
+        <file>icons/scopy-light/icons/logo.png</file>
+        <file>icons/scopy-light/icons/logo analog.png</file>
+        <file>icons/scopy-light/icons/menu.png</file>
+        <file>icons/scopy-light/icons/network_analyzer.png</file>
+        <file>icons/scopy-light/icons/oscilloscope.png</file>
+        <file>icons/scopy-light/icons/pattern_generator.png</file>
+        <file>icons/scopy-light/icons/power_supply.png</file>
+        <file>icons/scopy-light/icons/signal_generator.png</file>
+        <file>icons/scopy-light/icons/spectrum_analyzer.png</file>
+        <file>icons/scopy-light/icons/voltmeter.png</file>
+        <file>icons/scopy-light/icons/gear_wheel_pressed.svg</file>
+        <file>icons/scopy-light/icons/sba_cmb_box_arrow.svg</file>
+        <file>icons/scopy-light/icons/sba_cmb_box_arrow_right.svg</file>
+        <file>icons/scopy-light/icons/setup3_checked_hover.svg</file>
+        <file>icons/scopy-light/icons/ico-play-green.svg</file>
+        <file>icons/scopy-light/icons/ico-stop.svg</file>
+        <file>icons/scopy-light/icons/Gear.svg</file>
+        <file>icons/scopy-light/icons/Gear.png</file>
+        <file>icons/scopy-light/icons/gear_wheel_hover.png</file>
+        <file>icons/scopy-light/icons/setup3_unchecked.png</file>
+        <file>icons/scopy-light/icons/setup3_unchecked_hover.png</file>
+        <file>icons/scopy-default/icons/house.png</file>
+        <file>icons/scopy-light/icons/ic loadD.png</file>
+        <file>icons/scopy-light/icons/ic saveD.png</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/global.qss</file>
@@ -147,5 +226,7 @@
         <file>stylesheets/toolMenuItem.qss</file>
         <file>stylesheets/stopButton.qss</file>
         <file>stylesheets/browser.qss</file>
+        <file>stylesheets/channel_widget.qss</file>
+        <file>stylesheets/default.qss</file>
     </qresource>
 </RCC>
