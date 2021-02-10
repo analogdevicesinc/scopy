@@ -166,6 +166,8 @@ CapturePlot::CapturePlot(QWidget *parent,
 		"color: #ff0000;"
 		"}");
 
+	d_maxBufferError->setWordWrap(true);
+
 	// Top area layout
 	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
 	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
@@ -2371,9 +2373,13 @@ void CapturePlot::setTriggerState(int triggerState)
 	d_triggerStateLabel->show();
 }
 
-void CapturePlot::setMaxBufferSizeErrorLabel(bool reached)
+void CapturePlot::setMaxBufferSizeErrorLabel(bool reached, const QString &customWarning)
 {
-	d_maxBufferError->setText(reached ? "Maximum buffer size reached" : "");
+	QString errorMessage = "Maximum buffer size reached";
+	if (customWarning.length()) {
+		errorMessage = customWarning;
+	}
+	d_maxBufferError->setText(reached ? errorMessage : "");
 }
 
 void CapturePlot::setCursorReadoutsTransparency(int value)

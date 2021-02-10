@@ -168,7 +168,7 @@ namespace adiscope {
 		void setBufferSizeLabelValue(int numSamples);
 		void setSampleRatelabelValue(double sampleRate);
 		void setTriggerState(int triggerState);
-		void setMaxBufferSizeErrorLabel(bool reached);
+		void setMaxBufferSizeErrorLabel(bool reached, const QString &customWarning = "");
 		void setCursorReadoutsTransparency(int value);
 		void moveCursorReadouts(CustomPlotPositionButton::ReadoutsPosition position);
 		void setHorizCursorsLocked(bool value);
