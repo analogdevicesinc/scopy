@@ -70,14 +70,14 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QWidget[highlight=true] { background-color: #1b1b21; }
+
 QWidget[hover-property=true] { border:1px solid #4a64ff; }
+
 QLabel {
-color: white;
 font-size: 16px;
 font-weight: normal;
 font-style: normal;
-}
-QLabel:disabled { color: #555555; }</string>
+}</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -341,6 +341,15 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                    </color>
                   </brush>
                  </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
                 </active>
                 <inactive>
                  <colorrole role="WindowText">
@@ -397,6 +406,15 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                    </color>
                   </brush>
                  </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
                 </inactive>
                 <disabled>
                  <colorrole role="WindowText">
@@ -450,6 +468,15 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                     <red>0</red>
                     <green>0</green>
                     <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>255</red>
+                    <green>255</green>
+                    <blue>255</blue>
                    </color>
                   </brush>
                  </colorrole>
@@ -1072,6 +1099,15 @@ QPushButton:!checked {
                    </color>
                   </brush>
                  </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
                 </active>
                 <inactive>
                  <colorrole role="WindowText">
@@ -1203,6 +1239,15 @@ QPushButton:!checked {
                  <colorrole role="ToolTipText">
                   <brush brushstyle="SolidPattern">
                    <color alpha="255">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
                     <red>0</red>
                     <green>0</green>
                     <blue>0</blue>
@@ -1346,26 +1391,20 @@ QPushButton:!checked {
                    </color>
                   </brush>
                  </colorrole>
+                 <colorrole role="PlaceholderText">
+                  <brush brushstyle="NoBrush">
+                   <color alpha="128">
+                    <red>0</red>
+                    <green>0</green>
+                    <blue>0</blue>
+                   </color>
+                  </brush>
+                 </colorrole>
                 </disabled>
                </palette>
               </property>
               <property name="styleSheet">
-               <string notr="true">QCheckBox
-{
-  spacing: 0px;
-}
-QCheckBox:indicator
-{
-height: 16px;
-width: 16px;
-border-radius:4px;
-border: 2px solid #4a64ff;
-}
-
-QCheckBox:indicator:checked
-{
-background:#4a64ff;
-}</string>
+               <string notr="true"/>
               </property>
               <property name="text">
                <string/>

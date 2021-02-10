@@ -68,7 +68,7 @@
          </sizepolicy>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="channelGroup">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -94,9 +94,6 @@
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
             </property>
             <property name="text">
              <string>Settings</string>
@@ -156,9 +153,6 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
-            </property>
             <property name="text">
              <string>Role</string>
             </property>
@@ -182,9 +176,6 @@
           </item>
           <item>
            <widget class="QLabel" name="labelChRole">
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
-            </property>
             <property name="text">
              <string>Role</string>
             </property>

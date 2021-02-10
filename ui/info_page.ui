@@ -14,24 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*background-color:black;*/
-QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="2">
@@ -60,28 +43,15 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
 }</string>
      </property>
      <property name="text">
       <string>Forget device</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -108,29 +78,15 @@ QPushButton:disabled {
      <property name="styleSheet">
       <string notr="true">QPushButton {
   	border: 0px;
-  	border-radius: 4px;
-  	background-color: #4a64ff;
-	color: #ffffff;
   	font-size: 14px;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
 }
 </string>
      </property>
      <property name="text">
       <string>Connect</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -238,7 +194,7 @@ QPushButton:disabled {
           </size>
          </property>
          <property name="styleSheet">
-          <string notr="true">background-color: transparent;</string>
+          <string notr="true"/>
          </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
@@ -291,28 +247,16 @@ QPushButton:disabled {
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
 }
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}</string>
+</string>
      </property>
      <property name="text">
       <string>Calibrate</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -342,28 +286,15 @@ QPushButton:disabled {
   max-height: 30px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
 
   font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
 }</string>
      </property>
      <property name="text">
       <string>Identify</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -452,11 +383,6 @@ QPushButton:disabled {
          <width>16777215</width>
          <height>20</height>
         </size>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">QLabel {
-	color: red;
-}</string>
        </property>
        <property name="text">
         <string/>

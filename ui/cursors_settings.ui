@@ -37,13 +37,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">	color: white;
-	font-size: 14px;
-	font-weight: normal;</string>
-     </property>
      <property name="text">
       <string>Cursors</string>
+     </property>
+     <property name="general_settings_label" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -77,11 +75,11 @@
        <height>2</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">border: 2px solid rgb(74, 100, 255);</string>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="blue_line" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -249,14 +247,11 @@ color: rgba(255,255,255,51);
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-         </property>
          <property name="text">
           <string>HORIZONTAL </string>
+         </property>
+         <property name="subsection_label" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -274,11 +269,11 @@ color: rgba(255,255,255,51);
            <height>1</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-         </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="subsection_line" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -365,14 +360,11 @@ color: rgba(255,255,255,51);
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-       </property>
        <property name="text">
         <string>VERTICAL </string>
+       </property>
+       <property name="subsection_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -422,11 +414,11 @@ color: rgba(255,255,255,51);
          <height>1</height>
         </size>
        </property>
-       <property name="styleSheet">
-        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-       </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="subsection_line" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -560,9 +552,6 @@ color: rgba(255,255,255,51);
           <property name="autoFillBackground">
            <bool>false</bool>
           </property>
-          <property name="styleSheet">
-           <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-          </property>
           <property name="frameShadow">
            <enum>QFrame::Sunken</enum>
           </property>
@@ -575,6 +564,9 @@ color: rgba(255,255,255,51);
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
           </property>
+          <property name="subsection_line" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="1" column="0">
@@ -585,14 +577,11 @@ color: rgba(255,255,255,51);
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel {
-		font-size: 12px;
-		color: rgba(255, 255, 255, 70);
-	}</string>
-          </property>
           <property name="text">
            <string>CURSOR READOUTS </string>
+          </property>
+          <property name="subsection_label" stdset="0">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -632,9 +621,6 @@ color: rgba(255,255,255,51);
       </item>
       <item>
        <widget class="QLabel" name="transLabel">
-        <property name="styleSheet">
-         <string notr="true">font-size: 13px;</string>
-        </property>
         <property name="text">
          <string>Transparency 0%</string>
         </property>
@@ -643,29 +629,7 @@ color: rgba(255,255,255,51);
       <item>
        <widget class="QSlider" name="horizontalSlider">
         <property name="styleSheet">
-         <string notr="true">QSlider::groove {
-    border: 1px solid #444444;
-    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-    background: #999999;
-    margin: 2px 0;
-    border-radius: 2px;
-}
-
-QSlider::handle {
-    background: rgb(73, 99, 255);
-    border: 0px solid;
-    width: 18px;
-    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
-    border-radius: 8px;
-}
-
-QSlider::handle:disabled {
-    background: #444444;
-}
-
-QSlider::sub-page:horizontal {
-    background: #4A64FF;
-}</string>
+         <string notr="true"/>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -674,9 +638,6 @@ QSlider::sub-page:horizontal {
       </item>
       <item>
        <widget class="QLabel" name="label_8">
-        <property name="styleSheet">
-         <string notr="true">font-size: 13px;</string>
-        </property>
         <property name="text">
          <string>Position</string>
         </property>
@@ -731,14 +692,14 @@ QSlider::sub-page:horizontal {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
-   <extends>QPushButton</extends>
-   <header>smallOnOffSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header>smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

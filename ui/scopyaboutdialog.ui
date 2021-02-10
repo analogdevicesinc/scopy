@@ -24,19 +24,6 @@
   font-weight: bold;
   padding-left: 15px;
   padding-right: 15px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
   </property>
   <property name="modal">
@@ -119,6 +106,9 @@ p, li { white-space: pre-wrap; }
         <string>Check for
  updates</string>
        </property>
+       <property name="blue_button" stdset="0">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
@@ -139,12 +129,18 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>Back</string>
        </property>
+       <property name="blue_button" stdset="0">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="okButton">
        <property name="text">
         <string>Ok</string>
+       </property>
+       <property name="blue_button" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

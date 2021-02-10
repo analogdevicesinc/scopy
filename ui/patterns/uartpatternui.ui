@@ -55,9 +55,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_3">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Stop</string>
        </property>
@@ -94,9 +91,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_4">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Baud</string>
        </property>
@@ -182,9 +176,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_2">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Parity</string>
        </property>
@@ -231,9 +222,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_5">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Parameters</string>
        </property>
@@ -258,9 +246,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Data to Send</string>
        </property>

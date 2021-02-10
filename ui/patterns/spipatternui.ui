@@ -69,9 +69,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_8">
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
-         </property>
          <property name="text">
           <string>MSB First</string>
          </property>
@@ -111,9 +108,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_3">
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
-         </property>
          <property name="text">
           <string>CLK Phase</string>
          </property>
@@ -156,9 +150,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_7">
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
-         </property>
          <property name="text">
           <string>CS Polarity</string>
          </property>
@@ -204,9 +195,6 @@
        </item>
        <item>
         <widget class="QLabel" name="label_4">
-         <property name="styleSheet">
-          <string notr="true">font-size: 13px;</string>
-         </property>
          <property name="text">
           <string>CLK Polarity</string>
          </property>
@@ -226,9 +214,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_6">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Bytes per frame</string>
        </property>
@@ -249,9 +234,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_5">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Inter frame space</string>
        </property>
@@ -272,9 +254,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_2">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Data</string>
        </property>

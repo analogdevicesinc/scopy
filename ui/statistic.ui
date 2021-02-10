@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">background-color: #000000;</string>
-  </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
     <number>0</number>
@@ -44,8 +41,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>Avg:</string>
@@ -61,8 +57,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -78,8 +73,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>Min:</string>
@@ -95,8 +89,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -112,8 +105,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>Max:</string>
@@ -129,8 +121,7 @@ font-size: 14px;</string>
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">color: rgba(255, 255, 255, 153);
-font-size: 14px;</string>
+      <string notr="true">font-size: 14px;</string>
      </property>
      <property name="text">
       <string>0.000</string>
@@ -145,11 +136,11 @@ font-size: 14px;</string>
        <height>16777215</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">border: 1px solid rgba(255, 255, 255, 33);</string>
-     </property>
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+     <property name="line_separator" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -169,13 +160,11 @@ font-size: 14px;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">color: #ffffff;
-font-size: 14px;
-font-weight: bold;</string>
-       </property>
        <property name="text">
         <string>1</string>
+       </property>
+       <property name="general_settings_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -203,13 +192,11 @@ font-weight: bold;</string>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="styleSheet">
-        <string notr="true">color: #ffffff;
-font-size: 14px;
-font-weight: bold;</string>
-       </property>
        <property name="text">
         <string>Measurement</string>
+       </property>
+       <property name="general_settings_label" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

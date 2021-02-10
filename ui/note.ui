@@ -53,18 +53,13 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
+      <string notr="true"/>
      </property>
      <property name="selected" stdset="0">
       <bool>false</bool>
+     </property>
+     <property name="menu_button" stdset="0">
+      <bool>true</bool>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
@@ -91,8 +86,7 @@
          </sizepolicy>
         </property>
         <property name="styleSheet">
-         <string notr="true">qproperty-alignment: AlignCenter;
-color: white;</string>
+         <string notr="true">qproperty-alignment: AlignCenter;</string>
         </property>
         <property name="text">
          <string>TextLabel</string>

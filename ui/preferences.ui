@@ -14,39 +14,12 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton
+   <string notr="true">QPushButton
 {
-  color:#ffffff;
   height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  font-size: 14px;
   font-weight: normal;
   font-style: normal;
   text-align: center;
-}
-
-QPushButton:hover
-{
-         background-color: #4a34ff;
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -139,14 +112,11 @@ QPushButton:hover
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-             </property>
              <property name="text">
               <string>GENERAL </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -170,11 +140,11 @@ color: rgba(255, 255, 255, 70);
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -381,25 +351,6 @@ color: rgba(255, 255, 255, 70);
                <layout class="QHBoxLayout" name="horizontalLayout_13">
                 <item>
                  <widget class="QCheckBox" name="oscGraticuleCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -430,27 +381,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
               <item row="2" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_17">
                 <item>
-                 <widget class="QCheckBox" name="oscFilteringCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
-                 </widget>
+                 <widget class="QCheckBox" name="oscFilteringCheckBox"/>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_17">
@@ -478,25 +409,6 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                <layout class="QHBoxLayout" name="horizontalLayout_19">
                 <item>
                  <widget class="QCheckBox" name="histCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
                   <property name="text">
                    <string/>
                   </property>
@@ -540,27 +452,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
               <item row="1" column="1">
                <layout class="QHBoxLayout" name="horizontalLayout_20">
                 <item>
-                 <widget class="QCheckBox" name="oscADCFiltersCheckBox">
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                  </property>
-                 </widget>
+                 <widget class="QCheckBox" name="oscADCFiltersCheckBox"/>
                 </item>
                 <item>
                  <widget class="QLabel" name="label_20">
@@ -595,23 +487,7 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                    </sizepolicy>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string/>
@@ -656,14 +532,11 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                  </property>
                   <property name="text">
                    <string>OSCILLOSCOPE </string>
+                  </property>
+                  <property name="subsection_label" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -681,11 +554,11 @@ color: rgba(255, 255, 255, 70);
                     <height>1</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="subsection_line" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -778,14 +651,11 @@ color: rgba(255, 255, 255, 70);
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                  </property>
                   <property name="text">
                    <string>SIGNAL GENERATOR </string>
+                  </property>
+                  <property name="subsection_label" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -803,11 +673,11 @@ color: rgba(255, 255, 255, 70);
                     <height>1</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="subsection_line" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -923,14 +793,11 @@ color: white;
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                 </property>
                  <property name="text">
                   <string>SPECTRUM ANALYZER </string>
+                 </property>
+                 <property name="subsection_label" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -948,11 +815,11 @@ color: rgba(255, 255, 255, 70);
                    <height>1</height>
                   </size>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="subsection_line" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -962,25 +829,6 @@ color: rgba(255, 255, 255, 70);
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <widget class="QCheckBox" name="spectrumVisiblePeakSearch">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1046,14 +894,11 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                 </property>
                  <property name="text">
                   <string>LOGIC ANALYZER </string>
+                 </property>
+                 <property name="subsection_label" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1065,11 +910,11 @@ color: rgba(255, 255, 255, 70);
                    <height>1</height>
                   </size>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="subsection_line" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1095,25 +940,6 @@ color: rgba(255, 255, 255, 70);
               <layout class="QHBoxLayout" name="horizontalLayout_22">
                <item>
                 <widget class="QCheckBox" name="logicAnalyzerDisplaySamplingPoints">
-                 <property name="styleSheet">
-                  <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
-                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -1235,14 +1061,11 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                    <verstretch>0</verstretch>
                   </sizepolicy>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                 </property>
                  <property name="text">
                   <string>DEBUG</string>
+                 </property>
+                 <property name="subsection_label" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1260,11 +1083,11 @@ color: rgba(255, 255, 255, 70);
                    <height>1</height>
                   </size>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                 </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="subsection_line" stdset="0">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -1374,14 +1197,11 @@ color: rgba(255, 255, 255, 70);
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                  </property>
                   <property name="text">
                    <string>NETWORK ANALYZER </string>
+                  </property>
+                  <property name="subsection_label" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -1399,11 +1219,11 @@ color: rgba(255, 255, 255, 70);
                     <height>1</height>
                    </size>
                   </property>
-                  <property name="styleSheet">
-                   <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                  </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="subsection_line" stdset="0">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </item>
@@ -1434,25 +1254,6 @@ color: rgba(255, 255, 255, 70);
                     <width>16777215</width>
                     <height>16777215</height>
                    </size>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-  color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1891,6 +1692,9 @@ QCheckBox::indicator:checked { background-color: rgb(74,100,255); }</string>
            <string>Reset Scopy</string>
           </property>
           <property name="flat">
+           <bool>true</bool>
+          </property>
+          <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>

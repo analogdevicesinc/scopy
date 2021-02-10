@@ -67,6 +67,15 @@
           </color>
          </brush>
         </colorrole>
+        <colorrole role="PlaceholderText">
+         <brush brushstyle="NoBrush">
+          <color alpha="128">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
        </active>
        <inactive>
         <colorrole role="WindowText">
@@ -90,6 +99,15 @@
         <colorrole role="ButtonText">
          <brush brushstyle="SolidPattern">
           <color alpha="255">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
+        <colorrole role="PlaceholderText">
+         <brush brushstyle="NoBrush">
+          <color alpha="128">
            <red>255</red>
            <green>255</green>
            <blue>255</blue>
@@ -125,17 +143,24 @@
           </color>
          </brush>
         </colorrole>
+        <colorrole role="PlaceholderText">
+         <brush brushstyle="NoBrush">
+          <color alpha="128">
+           <red>255</red>
+           <green>255</green>
+           <blue>255</blue>
+          </color>
+         </brush>
+        </colorrole>
        </disabled>
       </palette>
      </property>
      <property name="styleSheet">
       <string notr="true">QLabel
 {
-
 font-size: 14px;
 font-weight: bold;
 line-height: 16px;
-color: #FFFFFF;
 }</string>
      </property>
      <property name="midLineWidth">
@@ -159,9 +184,6 @@ color: #FFFFFF;
      </property>
      <item>
       <widget class="Line" name="line">
-       <property name="styleSheet">
-        <string notr="true">QFrame { color:  rgb(73, 99, 255); }</string>
-       </property>
        <property name="frameShadow">
         <enum>QFrame::Plain</enum>
        </property>
@@ -170,6 +192,9 @@ color: #FFFFFF;
        </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="blue_line" stdset="0">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -273,17 +298,15 @@ color: #FFFFFF;
     <widget class="QPushButton" name="PB_Reset">
      <property name="styleSheet">
       <string notr="true">height:40px;
-background-color: #4A64FF;
-border-radius: 4px;
 
-
-font-size: 14px;
 font-weight: bold;
-line-height: 16px;
-color: #FFFFFF;</string>
+line-height: 16px;</string>
      </property>
      <property name="text">
       <string>Reset Instrument</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

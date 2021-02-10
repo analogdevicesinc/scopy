@@ -68,11 +68,12 @@
         </sizepolicy>
        </property>
        <property name="styleSheet">
-        <string notr="true">height: 55px;	width: 195px;	color: rgba(255,255,255,255);
-  
-  font-size: 18px;
-  font-weight: normal;
-  font-style: normal;</string>
+        <string notr="true">	height: 55px;	
+	width: 195px;	
+  	
+	font-size: 18px;
+   font-weight: normal;
+   font-style: normal;</string>
        </property>
        <property name="text">
         <string>0 - 7</string>
@@ -138,12 +139,10 @@
 {
 height: 190px;
 width: 1310px;
-border-radius: 12px;
-background-color: rgba(0, 0, 0, 80);
 }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -215,8 +214,6 @@ background-color: rgba(0, 0, 0, 80);
 {
 height: 190px;
 width: 1310px;
-border-radius: 12px;
-background-color: #141416;
 }
 
 QWidget#stackedWidgetPage1[locked=true]
@@ -317,27 +314,19 @@ background:transparent;
 }
 
 QSlider::groove:horizontal {
-    background-color: rgba(255,255,255,50);
     height:20px;
 }
 
 QSlider::handle:horizontal:enabled {
  border-image:url(&quot;:/icons/time_trigger_handle.svg&quot;); 
- height: 30px;	width: 40px;	border-radius: 4px;
+ height: 30px;	
+ width: 40px;	
+ border-radius: 4px;
  margin: -5 -20px;
  border-bot:2px;
  border-left:2px;
  border-backgroundcolor:black;
-}
-
-QSlider::handle:horizontal:!enabled {
- 
-}
-
-QSlider::sub-page:horizontal {
-    background: #4A64FF;
-}
-</string>
+}</string>
              </property>
              <property name="maximum">
               <number>255</number>

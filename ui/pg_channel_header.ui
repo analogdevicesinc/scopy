@@ -20,14 +20,11 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*  background-color: rgb(170, 0, 0);*/
-QLabel{
-  
+   <string notr="true">QLabel{
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
   text-align: left;
-  color: rgba(255,255,255,140)
 }</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -71,15 +68,11 @@ QLabel{
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QLabel{
-/*  background-color: rgb(170, 0, 0);*/
-
-  
+      <string notr="true">QLabel{  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
   text-align: left;
-  color: rgba(255,255,255,140)
 }</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">

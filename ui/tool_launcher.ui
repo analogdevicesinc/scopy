@@ -51,7 +51,7 @@
        </size>
       </property>
       <property name="styleSheet">
-       <string notr="true">.QWidget[selected=true] { background-color: rgba(0, 0, 0, 60); }</string>
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
@@ -71,18 +71,8 @@
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget#menuControl:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-.QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
           <property name="spacing">
@@ -114,18 +104,8 @@ border-radius:5px;
               <height>64</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QPushButton {
-font: 75 18pt &quot;10 Pitch&quot;;
-color: rgb(255, 255, 255);
-}</string>
-            </property>
             <property name="text">
              <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/resources.qrc">
-              <normaloff>:/menu/menu_button.png</normaloff>:/menu/menu_button.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -140,6 +120,12 @@ color: rgb(255, 255, 255);
              <bool>true</bool>
             </property>
             <property name="flat">
+             <bool>true</bool>
+            </property>
+            <property name="tool_launcher_custom_widget" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="menu_icon" stdset="0">
              <bool>true</bool>
             </property>
            </widget>
@@ -164,12 +150,8 @@ color: rgb(255, 255, 255);
               <height>64</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">QWidget {
-background-image: url(:/menu/scopy_title.png);
-background-repeat: no-repeat;
-background-position: left center;
-}</string>
+            <property name="scopy_logo" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -194,17 +176,29 @@ background-position: left center;
        </item>
        <item>
         <widget class="Line" name="line_3">
-         <property name="styleSheet">
-          <string notr="true">color: rgba(255, 255, 255, 16);</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="lineWidth">
           <number>1</number>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="line_separator" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -216,25 +210,15 @@ background-position: left center;
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <property name="spacing">
            <number>2</number>
           </property>
           <property name="leftMargin">
-           <number>0</number>
+           <number>6</number>
           </property>
           <property name="topMargin">
            <number>0</number>
@@ -256,7 +240,7 @@ border-radius:5px;
             <property name="minimumSize">
              <size>
               <width>32</width>
-              <height>0</height>
+              <height>32</height>
              </size>
             </property>
             <property name="maximumSize">
@@ -264,13 +248,6 @@ border-radius:5px;
               <width>16777215</width>
               <height>16777215</height>
              </size>
-            </property>
-            <property name="text">
-             <string>  Home</string>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/resources.qrc">
-              <normaloff>:/menu/home.png</normaloff>:/menu/home.png</iconset>
             </property>
             <property name="iconSize">
              <size>
@@ -282,6 +259,9 @@ border-radius:5px;
              <bool>true</bool>
             </property>
             <property name="flat">
+             <bool>true</bool>
+            </property>
+            <property name="tool_launcher_custom_widget" stdset="0">
              <bool>true</bool>
             </property>
             <attribute name="buttonGroup">
@@ -310,14 +290,26 @@ border-radius:5px;
        </item>
        <item>
         <widget class="Line" name="line_2">
-         <property name="styleSheet">
-          <string notr="true">color: rgba(255, 255, 255, 16);</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="line_separator" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -344,14 +336,26 @@ border-radius:5px;
        </item>
        <item>
         <widget class="Line" name="line">
-         <property name="styleSheet">
-          <string notr="true">color: rgba(255, 255, 255, 16);</string>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>1</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>1</height>
+          </size>
          </property>
          <property name="frameShadow">
-          <enum>QFrame::Plain</enum>
+          <enum>QFrame::Sunken</enum>
          </property>
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="line_separator" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -417,14 +421,8 @@ border-radius:5px;
                 <height>16777215</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}
-QWidget[selected=true] { background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}</string>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <property name="spacing">
@@ -481,12 +479,10 @@ border-radius:5px;}</string>
                  <property name="text">
                   <string/>
                  </property>
-                 <property name="icon">
-                  <iconset resource="../resources/resources.qrc">
-                   <normaloff>:/icons/ic load.svg</normaloff>
-                   <normalon>:/icons/ic load.svg</normalon>:/icons/ic load.svg</iconset>
-                 </property>
                  <property name="flat">
+                  <bool>true</bool>
+                 </property>
+                 <property name="save_logo" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -504,10 +500,6 @@ border-radius:5px;}</string>
                    <width>16777215</width>
                    <height>16777215</height>
                   </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">	background-color: transparent;
-	color: #bebebe;</string>
                  </property>
                  <property name="text">
                   <string>Save</string>
@@ -544,14 +536,8 @@ border-radius:5px;}</string>
                 <height>16777215</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}
-QWidget[selected=true] { background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;}</string>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
               </property>
               <layout class="QHBoxLayout" name="horizontalLayout_6">
                <property name="spacing">
@@ -599,10 +585,6 @@ border-radius:5px;}</string>
                    <height>16777215</height>
                   </size>
                  </property>
-                 <property name="styleSheet">
-                  <string notr="true">	background-color: transparent;
-	color: #bebebe;</string>
-                 </property>
                  <property name="text">
                   <string>Load</string>
                  </property>
@@ -634,12 +616,10 @@ border-radius:5px;}</string>
                  <property name="text">
                   <string/>
                  </property>
-                 <property name="icon">
-                  <iconset>
-                   <normalon>:/icons/ic save.svg</normalon>
-                  </iconset>
-                 </property>
                  <property name="flat">
+                  <bool>true</bool>
+                 </property>
+                 <property name="load_logo" stdset="0">
                   <bool>true</bool>
                  </property>
                 </widget>
@@ -671,24 +651,20 @@ border-radius:5px;}</string>
        </item>
        <item>
         <widget class="QWidget" name="preference" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="maximumSize">
           <size>
            <width>200</width>
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_9">
           <property name="spacing">
@@ -727,7 +703,7 @@ border-radius:5px;
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>25</width>
                 <height>20</height>
                </size>
               </property>
@@ -753,17 +729,6 @@ border-radius:5px;
                 <height>16777215</height>
                </size>
               </property>
-              <property name="styleSheet">
-               <string notr="true">background-position: left center;</string>
-              </property>
-              <property name="text">
-               <string>Preferences</string>
-              </property>
-              <property name="icon">
-               <iconset>
-                <normalon>:/menu/debugger.png</normalon>
-               </iconset>
-              </property>
               <property name="iconSize">
                <size>
                 <width>64</width>
@@ -774,6 +739,12 @@ border-radius:5px;
                <bool>true</bool>
               </property>
               <property name="flat">
+               <bool>true</bool>
+              </property>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
+              </property>
+              <property name="preferences_icon" stdset="0">
                <bool>true</bool>
               </property>
               <attribute name="buttonGroup">
@@ -791,7 +762,7 @@ border-radius:5px;
               </property>
               <property name="sizeHint" stdset="0">
                <size>
-                <width>40</width>
+                <width>25</width>
                 <height>20</height>
                </size>
               </property>
@@ -810,18 +781,8 @@ border-radius:5px;
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_12">
           <item>
@@ -831,6 +792,9 @@ border-radius:5px;
             </property>
             <property name="text">
              <string>About</string>
+            </property>
+            <property name="tool_launcher_custom_widget" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -851,18 +815,8 @@ border-radius:5px;
            <height>16777215</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true">QPushButton { text-align:left; border: none; background-color: none; }
-.QWidget:hover {
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px;
-}
-QWidget[selected=true] { 
-background-color: rgba(0, 0, 0, 60);
-border: 1px solid rgba(0, 0, 0, 30);
-border-radius:5px; 
-}</string>
+         <property name="tool_launcher_custom_widget" stdset="0">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_11">
           <property name="spacing">
@@ -927,6 +881,9 @@ border-radius:5px;
               <property name="flat">
                <bool>true</bool>
               </property>
+              <property name="tool_launcher_custom_widget" stdset="0">
+               <bool>true</bool>
+              </property>
               <attribute name="buttonGroup">
                <string notr="true">buttonGroup_2</string>
               </attribute>
@@ -978,13 +935,8 @@ border-radius:5px;
              <height>30</height>
             </size>
            </property>
-           <property name="styleSheet">
-            <string notr="true">.QWidget:hover { background-color: rgba(0, 0, 0, 60);} 
-QWidget {
-background-image: url(:/menu/adi.png);
-background-repeat: no-repeat;
-background-position: left center;
-}</string>
+           <property name="adi_logo" stdset="0">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -1086,8 +1038,8 @@ background-position: left center;
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>104</width>
-                 <height>30</height>
+                 <width>0</width>
+                 <height>0</height>
                 </size>
                </property>
                <property name="maximumSize">
@@ -1097,11 +1049,10 @@ background-position: left center;
                 </size>
                </property>
                <property name="styleSheet">
-                <string notr="true">background-image: url(:/menu/adi.png);
-background-repeat: no-repeat;
-background-position: left center;
-min-width: 104px;
-min-height: 30px;</string>
+                <string notr="true"/>
+               </property>
+               <property name="adi_logo" stdset="0">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -1139,34 +1090,25 @@ min-height: 30px;</string>
                </property>
                <property name="styleSheet">
                 <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
 
 height: 30px;
 border-width: 0px;
-border-radius: 3px;
 min-width: 6em;
 qproperty-text: &quot;Connect&quot;;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
 }
 
 QPushButton[connected=true] {
 /*background-color: green;*/
 qproperty-text: &quot;Disconnect&quot;;
 }
+
 QPushButton[failed=true] {
 background-color: red;
 qproperty-text: &quot;Failed&quot;;
 }</string>
+               </property>
+               <property name="blue_button" stdset="0">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
@@ -1186,11 +1128,11 @@ qproperty-text: &quot;Failed&quot;;
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 16);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="line_separator" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -1231,8 +1173,7 @@ qproperty-text: &quot;Failed&quot;;
               </size>
              </property>
              <property name="styleSheet">
-              <string notr="true">background-color: transparent;
-border: 0px;</string>
+              <string notr="true">border: 0px;</string>
              </property>
              <property name="title">
               <string/>
@@ -1253,324 +1194,18 @@ border: 0px;</string>
               <property name="spacing">
                <number>0</number>
               </property>
-              <item row="0" column="0">
-               <layout class="QVBoxLayout" name="verticalLayout_2">
-                <property name="spacing">
-                 <number>0</number>
+              <item row="0" column="2">
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
                 </property>
-                <property name="leftMargin">
-                 <number>0</number>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
                 </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="QWidget" name="btnsWidget" native="true">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>160</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>160</height>
-                   </size>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
-                  </property>
-                  <property name="selected" stdset="0">
-                   <bool>false</bool>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_6">
-                   <property name="spacing">
-                    <number>0</number>
-                   </property>
-                   <property name="leftMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="rightMargin">
-                    <number>0</number>
-                   </property>
-                   <property name="bottomMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <spacer name="verticalSpacer_2">
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                   <item>
-                    <widget class="QWidget" name="homepageWidget" native="true">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
-                     </property>
-                     <property name="selected" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_8">
-                      <property name="leftMargin">
-                       <number>10</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>10</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>10</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>10</number>
-                      </property>
-                      <item>
-                       <widget class="QPushButton" name="btnHomepage">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>40</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>40</width>
-                          <height>40</height>
-                         </size>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QPushButton {
-height: 40px;
-width: 40px;
-border-width: 0px;
-border-radius: 4px;
-background-color: #4A64FF;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
-}</string>
-                        </property>
-                        <property name="text">
-                         <string/>
-                        </property>
-                        <property name="icon">
-                         <iconset>
-                          <normalon>:/icons/house.png</normalon>
-                         </iconset>
-                        </property>
-                        <property name="checkable">
-                         <bool>true</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QWidget" name="addWidget" native="true">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="minimumSize">
-                      <size>
-                       <width>0</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>60</height>
-                      </size>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
-                     </property>
-                     <property name="selected" stdset="0">
-                      <bool>false</bool>
-                     </property>
-                     <layout class="QVBoxLayout" name="verticalLayout_7">
-                      <property name="spacing">
-                       <number>0</number>
-                      </property>
-                      <property name="leftMargin">
-                       <number>10</number>
-                      </property>
-                      <property name="topMargin">
-                       <number>10</number>
-                      </property>
-                      <property name="rightMargin">
-                       <number>10</number>
-                      </property>
-                      <property name="bottomMargin">
-                       <number>10</number>
-                      </property>
-                      <item>
-                       <widget class="QPushButton" name="btnAdd">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>40</height>
-                         </size>
-                        </property>
-                        <property name="maximumSize">
-                         <size>
-                          <width>40</width>
-                          <height>40</height>
-                         </size>
-                        </property>
-                        <property name="styleSheet">
-                         <string notr="true">QPushButton {
-height: 40px;
-width: 40px;
-border-width: 0px;
-border-radius: 4px;
-background-color: #4A64FF;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
-}</string>
-                        </property>
-                        <property name="text">
-                         <string/>
-                        </property>
-                        <property name="icon">
-                         <iconset resource="../resources/resources.qrc">
-                          <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
-                        </property>
-                        <property name="iconSize">
-                         <size>
-                          <width>40</width>
-                          <height>40</height>
-                         </size>
-                        </property>
-                        <property name="checkable">
-                         <bool>true</bool>
-                        </property>
-                        <property name="checked">
-                         <bool>false</bool>
-                        </property>
-                        <property name="flat">
-                         <bool>false</bool>
-                        </property>
-                       </widget>
-                      </item>
-                     </layout>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="verticalSpacer_3">
-                     <property name="orientation">
-                      <enum>Qt::Vertical</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>0</width>
-                       <height>0</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <spacer name="verticalSpacer_5">
-                  <property name="orientation">
-                   <enum>Qt::Vertical</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                 </spacer>
-                </item>
-               </layout>
+               </spacer>
               </item>
               <item row="0" column="1">
                <widget class="adiscope::OscCustomScrollArea" name="scrollArea_2">
@@ -1655,19 +1290,6 @@ background-color: #4a34ff;
                 </widget>
                </widget>
               </item>
-              <item row="0" column="2">
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
               <item row="0" column="3">
                <spacer name="verticalSpacer">
                 <property name="orientation">
@@ -1680,6 +1302,290 @@ background-color: #4a34ff;
                  </size>
                 </property>
                </spacer>
+              </item>
+              <item row="0" column="0">
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QWidget" name="btnsWidget" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>160</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>160</height>
+                   </size>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true"/>
+                  </property>
+                  <property name="selected" stdset="0">
+                   <bool>false</bool>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_6">
+                   <property name="spacing">
+                    <number>0</number>
+                   </property>
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <spacer name="verticalSpacer_2">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="homepageWidget" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>60</height>
+                      </size>
+                     </property>
+                     <property name="styleSheet">
+                      <string notr="true"/>
+                     </property>
+                     <property name="selected" stdset="0">
+                      <bool>false</bool>
+                     </property>
+                     <property name="menu_button" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_8">
+                      <property name="leftMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>10</number>
+                      </property>
+                      <item>
+                       <widget class="QPushButton" name="btnHomepage">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>40</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">QPushButton {
+height: 40px;
+width: 40px;
+border-width: 0px;
+}</string>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset>
+                          <normalon>:/icons/scopy-default/icons/house.png</normalon>
+                         </iconset>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                        <property name="blue_button" stdset="0">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QWidget" name="addWidget" native="true">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="minimumSize">
+                      <size>
+                       <width>0</width>
+                       <height>60</height>
+                      </size>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>16777215</width>
+                       <height>60</height>
+                      </size>
+                     </property>
+                     <property name="selected" stdset="0">
+                      <bool>false</bool>
+                     </property>
+                     <property name="menu_button" stdset="0">
+                      <bool>true</bool>
+                     </property>
+                     <layout class="QVBoxLayout" name="verticalLayout_7">
+                      <property name="spacing">
+                       <number>0</number>
+                      </property>
+                      <property name="leftMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>10</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>10</number>
+                      </property>
+                      <item>
+                       <widget class="QPushButton" name="btnAdd">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>40</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="styleSheet">
+                         <string notr="true">QPushButton {
+height: 40px;
+width: 40px;
+border-width: 0px;
+}</string>
+                        </property>
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="icon">
+                         <iconset resource="../resources/resources.qrc">
+                          <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
+                        </property>
+                        <property name="iconSize">
+                         <size>
+                          <width>40</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="checkable">
+                         <bool>true</bool>
+                        </property>
+                        <property name="checked">
+                         <bool>false</bool>
+                        </property>
+                        <property name="flat">
+                         <bool>false</bool>
+                        </property>
+                        <property name="blue_button" stdset="0">
+                         <bool>true</bool>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="verticalSpacer_3">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>0</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </item>
              </layout>
             </widget>
@@ -1723,18 +1629,6 @@ background-color: #4a34ff;
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>adiscope::StackedHomepage</class>
-   <extends>QStackedWidget</extends>
-   <header>stacked_homepage.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::OscCustomScrollArea</class>
-   <extends>QScrollArea</extends>
-   <header>osc_custom_scroll.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1746,8 +1640,21 @@ background-color: #4a34ff;
    <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>adiscope::OscCustomScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>osc_custom_scroll.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::StackedHomepage</class>
+   <extends>QStackedWidget</extends>
+   <header>stacked_homepage.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
