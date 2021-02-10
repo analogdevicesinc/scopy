@@ -616,7 +616,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 
 		painter.end();
-		img.invertPixels(QImage::InvertRgb);
 		img.save(fileName, 0, -1);
 	});
 

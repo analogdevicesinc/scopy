@@ -89,11 +89,6 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent):
 	m_treeView->setUniformRowHeights(true);
 	m_treeView->header()->setSectionResizeMode(0, QHeaderView::Fixed);
 	m_treeView->header()->setDefaultAlignment(Qt::AlignCenter);
-
-	QFile file(":stylesheets/stylesheets/dropdown_switch_list.qss");
-	file.open(QFile::ReadOnly);
-	QString styleSheet = QString::fromLatin1(file.readAll());
-	setStyleSheet(styleSheet);
 }
 
 QString DropdownSwitchList::title() const

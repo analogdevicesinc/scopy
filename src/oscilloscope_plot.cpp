@@ -151,15 +151,9 @@ CapturePlot::CapturePlot(QWidget *parent,
 
 	// Sample Rate and Buffer Size
 	d_sampleRateLabel = new QLabel("", this);
-	d_sampleRateLabel->setStyleSheet("QLabel {"
-		"color: #ffffff;"
-		"}");
 
 	// Trigger State
 	d_triggerStateLabel = new QLabel(this);
-	d_triggerStateLabel->setStyleSheet("QLabel {"
-		"color: #ffffff;"
-		"}");
 
 	d_maxBufferError = new QLabel(this);
 	d_maxBufferError->setStyleSheet("QLabel {"
