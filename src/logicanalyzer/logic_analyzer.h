@@ -208,6 +208,8 @@ private:
 	QWidget *m_oscDecoderMenu;
 	QMetaObject::Connection m_oscChannelSelectedConnection;
 
+	int m_currentKernelBuffers;
+
 
 };
 } // namespace logic
