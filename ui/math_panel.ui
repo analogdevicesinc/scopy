@@ -24,29 +24,20 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QPushButton {
-color: white;
-background-color: #4a64ff;
-
 font-weight: bold;
 height: 30px;
 border-width: 0px;
 border-radius: 3px;
 min-width: 6em;
-}
-QPushButton:disabled {
-background-color: gray;
-color:white;
-
-}
-QPushButton:hover
-{
-	 background-color: #4a34ff;
 }</string>
      </property>
      <property name="text">
       <string>Add channel</string>
      </property>
      <property name="flat">
+      <bool>true</bool>
+     </property>
+     <property name="blue_button" stdset="0">
       <bool>true</bool>
      </property>
     </widget>

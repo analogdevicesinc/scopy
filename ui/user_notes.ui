@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">/*background-color: qlineargradient(spread:pad, x1:0, y1:1, x2:0, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);*/</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -68,31 +68,73 @@
          <property name="styleSheet">
           <string notr="true">QPushButton {
   	border: 0px;
-  	border-radius: 4px;
-  	background-color: #4a64ff;
-	color: #ffffff;
-  	font-size: 14px;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-</string>
+}</string>
          </property>
          <property name="text">
           <string>Save</string>
          </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
+         </property>
         </widget>
+       </item>
+       <item row="0" column="0">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Note name</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="nameLineEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>240</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>240</width>
+             <height>16777215</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="1" column="0">
         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
@@ -197,26 +239,7 @@ QLineEdit[invalid=true] {
              <property name="styleSheet">
               <string notr="true">QPushButton {
   	border: 0px;
-  	border-radius: 4px;
-  	background-color: #4a64ff;
-	color: #ffffff;
-  	font-size: 14px;
-}
-
-QPushButton:hover
-{
-background-color: #4a34ff;
-}
-
-QPushButton:disabled {
-background-color: gray;
-color:white;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-</string>
+}</string>
              </property>
              <property name="text">
               <string>Browse</string>
@@ -224,67 +247,12 @@ QPushButton:disabled {
              <property name="checkable">
               <bool>false</bool>
              </property>
+             <property name="blue_button" stdset="0">
+              <bool>true</bool>
+             </property>
             </widget>
            </item>
           </layout>
-         </item>
-        </layout>
-       </item>
-       <item row="6" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="0" column="0">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="spacing">
-          <number>5</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Note name</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="nameLineEdit">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>240</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>240</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
          </item>
         </layout>
        </item>
@@ -371,14 +339,14 @@ QPushButton:disabled {
           <height>1</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">border: 1px solid rgba(255, 255, 255, 16);</string>
-        </property>
         <property name="frameShadow">
          <enum>QFrame::Sunken</enum>
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="line_separator" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -417,18 +385,13 @@ QPushButton:disabled {
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">[selected=true] {
-  	opacity: 0.6;
-	border-radius: 4px;
-	background-color: #141416;
-}
-
-[selected=false] {
-	background-color: transparent;
-}</string>
+        <string notr="true"/>
        </property>
        <property name="selected" stdset="0">
         <bool>false</bool>
+       </property>
+       <property name="menu_button" stdset="0">
+        <bool>true</bool>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="spacing">
@@ -471,16 +434,6 @@ QPushButton:disabled {
 height: 40px;
 width: 40px;
 border-width: 0px;
-border-radius: 4px;
-background-color: #4A64FF;
-}
-
-QPushButton:hover {
-background-color: #4a34ff;
-}
-
-QPushButton:checked {
-background-color: #4a34ff;
 }</string>
           </property>
           <property name="text">
@@ -497,6 +450,9 @@ background-color: #4a34ff;
            </size>
           </property>
           <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="blue_button" stdset="0">
            <bool>true</bool>
           </property>
          </widget>

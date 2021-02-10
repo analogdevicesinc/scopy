@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>240</width>
-    <height>43</height>
+    <height>51</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,9 +31,6 @@
    </property>
    <item>
     <widget class="QLabel" name="label">
-     <property name="styleSheet">
-      <string notr="true">font-size: 13px;</string>
-     </property>
      <property name="text">
       <string>Frequency</string>
      </property>

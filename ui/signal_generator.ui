@@ -37,11 +37,6 @@
    </property>
    <item>
     <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
-     <property name="styleSheet">
-      <string notr="true">#mainWidget {
-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
-}</string>
-     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>0</number>
@@ -104,8 +99,8 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
         </property>
         <item>
          <widget class="QWidget" name="plot_and_notes" native="true">
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(0, 0, 0);</string>
+          <property name="plot_container" stdset="0">
+           <bool>true</bool>
           </property>
           <layout class="QVBoxLayout" name="plot">
            <property name="spacing">
@@ -197,7 +192,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>380</width>
+                <width>314</width>
                 <height>597</height>
                </rect>
               </property>
@@ -238,29 +233,10 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0.1, y2:0, stop:0 r
                   </sizepolicy>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">/* QTabsWidgets */
-QTabWidget::pane {
-  border-top: 0px;
-}
-QTabBar::tab {
-  min-width: 100px;
-  min-height: 32px;
-  padding-bottom: 5px;
-  font: bold;
-}
-QTabBar::tab:!selected {
-  border-bottom: 2px solid rgba(55, 55, 64);
-  margin-top: 0px;
-}
-QTabBar::tab:selected {
-  color: white;
-  border-bottom: 2px solid rgba(74, 100, 255);
-  margin-top: 0px;
-}
-</string>
+                  <string notr="true"/>
                  </property>
                  <property name="currentIndex">
-                  <number>1</number>
+                  <number>0</number>
                  </property>
                  <property name="usesScrollButtons">
                   <bool>false</bool>
@@ -447,14 +423,11 @@ QTabBar::tab:selected {
                             <verstretch>0</verstretch>
                            </sizepolicy>
                           </property>
-                          <property name="styleSheet">
-                           <string notr="true">  QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70);
-    }</string>
-                          </property>
                           <property name="text">
                            <string>TIMING </string>
+                          </property>
+                          <property name="subsection_label" stdset="0">
+                           <bool>true</bool>
                           </property>
                          </widget>
                         </item>
@@ -471,10 +444,6 @@ QTabBar::tab:selected {
                             <width>16777215</width>
                             <height>1</height>
                            </size>
-                          </property>
-                          <property name="styleSheet">
-                           <string notr="true">border: 1px solid rgba(255, 255, 255, 70);
- </string>
                           </property>
                           <property name="orientation">
                            <enum>Qt::Horizontal</enum>
@@ -494,6 +463,9 @@ QTabBar::tab:selected {
                           </property>
                           <property name="max_value" stdset="0">
                            <double>360.000000000000000</double>
+                          </property>
+                          <property name="subsection_line" stdset="0">
+                           <bool>true</bool>
                           </property>
                          </widget>
                         </item>
@@ -566,14 +538,11 @@ QTabBar::tab:selected {
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">  QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70);
-    }</string>
-                       </property>
                        <property name="text">
                         <string>FILE </string>
+                       </property>
+                       <property name="subsection_label" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -591,11 +560,11 @@ QTabBar::tab:selected {
                          <height>1</height>
                         </size>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                       </property>
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="subsection_line" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -765,32 +734,19 @@ QTabBar::tab:selected {
                             </property>
                             <property name="styleSheet">
                              <string notr="true">QPushButton{
-
-/*height: 128px;
-width: 128px;
-background-image: url(:/icons/floppy.svg);*/
 background-position: center center;
 background-repeat: no-repeat;
-background-color: #4a64ff;
   height: 30px;
-  border-radius: 4px;
-  
-  font-size: 14px;
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}
-</string>
+}</string>
                             </property>
                             <property name="text">
                              <string>Load file</string>
+                            </property>
+                            <property name="blue_button" stdset="0">
+                             <bool>true</bool>
                             </property>
                            </widget>
                           </item>
@@ -805,32 +761,22 @@ QPushButton:hover
                             <property name="styleSheet">
                              <string notr="true">QPushButton{
 
-/*height: 128px;
-width: 128px;*/
 image: url(:/icons/refresh.svg);
 
 background-position: center center;
 background-repeat: no-repeat;
-background-color: #4a64ff;
   height: 30px;
-  border-radius: 4px;
-  
-  font-size: 14px;
+
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:hover
-{
-	 background-color: #4a34ff;
-}
-</string>
+}</string>
                             </property>
                             <property name="text">
                              <string/>
+                            </property>
+                            <property name="blue_button" stdset="0">
+                             <bool>true</bool>
                             </property>
                            </widget>
                           </item>
@@ -893,14 +839,11 @@ QPushButton:hover
                          <verstretch>0</verstretch>
                         </sizepolicy>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">  QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70);
-    }</string>
-                       </property>
                        <property name="text">
                         <string>SCALING </string>
+                       </property>
+                       <property name="subsection_label" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -918,11 +861,11 @@ QPushButton:hover
                          <height>1</height>
                         </size>
                        </property>
-                       <property name="styleSheet">
-                        <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                       </property>
                        <property name="orientation">
                         <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="subsection_line" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1040,19 +983,7 @@ QPushButton:hover
                     <item>
                      <widget class="QPushButton" name="btnNoiseCollapse">
                       <property name="styleSheet">
-                       <string notr="true">QPushButton {
-  max-height: 6px;
-  max-width: 10px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}
-
-QPushButton:checked
-{
-  max-height: 10px;
-  max-width:  6px;
-border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
-}
-</string>
+                       <string notr="true"/>
                       </property>
                       <property name="text">
                        <string/>
@@ -1061,7 +992,10 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                        <bool>true</bool>
                       </property>
                       <property name="checked">
-                       <bool>false</bool>
+                       <bool>true</bool>
+                      </property>
+                      <property name="subsection_arrow_button" stdset="0">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -1073,14 +1007,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                         <verstretch>0</verstretch>
                        </sizepolicy>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">  QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70);
-    }</string>
-                      </property>
                       <property name="text">
                        <string> NOISE </string>
+                      </property>
+                      <property name="subsection_label" stdset="0">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -1104,11 +1035,11 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                         <height>1</height>
                        </size>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                      </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="subsection_line" stdset="0">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -1205,23 +1136,9 @@ border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
                       </property>
                       <property name="maximumSize">
                        <size>
-                        <width>10</width>
-                        <height>6</height>
+                        <width>16777215</width>
+                        <height>16777215</height>
                        </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton {
-  max-height: 6px;
-  max-width: 10px;
-border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
-}
-
-QPushButton:checked
-{
-  max-height: 10px;
-  max-width:  6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-}</string>
                       </property>
                       <property name="text">
                        <string/>
@@ -1232,18 +1149,18 @@ QPushButton:checked
                       <property name="checked">
                        <bool>false</bool>
                       </property>
+                      <property name="subsection_arrow_button" stdset="0">
+                       <bool>true</bool>
+                      </property>
                      </widget>
                     </item>
                     <item>
                      <widget class="QLabel" name="label_8">
-                      <property name="styleSheet">
-                       <string notr="true">  QLabel {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 70);
-    }</string>
-                      </property>
                       <property name="text">
                        <string>OTHER</string>
+                      </property>
+                      <property name="subsection_label" stdset="0">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -1267,11 +1184,11 @@ QPushButton:checked
                         <height>1</height>
                        </size>
                       </property>
-                      <property name="styleSheet">
-                       <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                      </property>
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="subsection_line" stdset="0">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
@@ -1313,9 +1230,6 @@ QPushButton:checked
                          </property>
                          <item>
                           <widget class="QLabel" name="label_10">
-                           <property name="styleSheet">
-                            <string notr="true">font-size: 13px;</string>
-                           </property>
                            <property name="text">
                             <string>Line thickness</string>
                            </property>
@@ -1460,15 +1374,15 @@ QPushButton:checked
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::RunSingleWidget</class>
-   <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::RunSingleWidget</class>
+   <extends>QWidget</extends>
+   <header>runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

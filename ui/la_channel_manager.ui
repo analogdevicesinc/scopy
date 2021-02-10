@@ -20,9 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">#LAChannelManager {
-background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 rgba(0, 0, 0, 40), stop:1 transparent);
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_1">
    <property name="spacing">
@@ -76,7 +74,12 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 r
         </size>
        </property>
        <property name="styleSheet">
-        <string notr="true">QLabel{\n\n  \n  font-size: 16px;\n  font-weight: normal;\n  font-style: normal;\n  text-align: left;\n  color: rgba(255,255,255,140)\n}</string>
+        <string notr="true">QLabel{
+font-size: 16px;
+ font-weight: normal;
+font-style: normal;
+text-align: left;
+}</string>
        </property>
        <layout class="QHBoxLayout" name="headerWidgetLayout">
         <property name="spacing">
@@ -101,15 +104,14 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 r
    </item>
    <item>
     <widget class="Line" name="line">
-     <property name="styleSheet">
-      <string notr="true">color: rgba(255,255,255,60);
-</string>
-     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="line_separator" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -159,7 +161,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 r
           <x>0</x>
           <y>0</y>
           <width>16</width>
-          <height>314</height>
+          <height>321</height>
          </rect>
         </property>
        </widget>
@@ -205,7 +207,7 @@ background-color: qlineargradient(spread:pad, x1:0, y1:0.9, x2:0, y2:0, stop:0 r
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>85</width>
+          <width>68</width>
           <height>335</height>
          </rect>
         </property>

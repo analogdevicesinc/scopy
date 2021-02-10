@@ -73,7 +73,6 @@ border:1px solid red;
 background:transparent;
 height: 28px;
 width: 14px;
-color: #FFFFFF;
 
 font-size: 24px;	
 line-height: 28px;

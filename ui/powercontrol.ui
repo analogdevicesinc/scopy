@@ -44,8 +44,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">QWidget#leftPanel { background-color: rgba(0, 0, 0, 40); }
-QLabel { color: #444444; }</string>
+      <string notr="true"/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="leftMargin">
@@ -265,12 +264,6 @@ color: #ff7200;
         </property>
         <property name="scaleMaxMinor" stdset="0">
          <number>10</number>
-        </property>
-	<property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="scalePosition">
-         <enum>QwtThermo::LeadingScale</enum>
         </property>
         <property name="borderWidth" stdset="0">
          <number>0</number>
@@ -492,15 +485,6 @@ color: #9013fe;
         <property name="scaleMaxMinor" stdset="0">
          <number>10</number>
         </property>
-	<property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="scalePosition">
-         <enum>QwtThermo::LeadingScale</enum>
-        </property>
-        <property name="originMode">
-         <enum>QwtThermo::OriginMaximum</enum>
-        </property>
         <property name="borderWidth" stdset="0">
          <number>0</number>
         </property>
@@ -538,15 +522,11 @@ color: #9013fe;
       </property>
       <item>
        <widget class="QLabel" name="label_12">
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-	 color: white;
-	font-size:14px;
-	font-weight:normal;
-}</string>
-        </property>
         <property name="text">
          <string>Tracking ratio control</string>
+        </property>
+        <property name="general_settings_label" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -568,9 +548,6 @@ color: #9013fe;
       </item>
       <item>
        <widget class="Line" name="line_3">
-        <property name="styleSheet">
-         <string notr="true">color: #4a64ff;</string>
-        </property>
         <property name="frameShadow">
          <enum>QFrame::Plain</enum>
         </property>
@@ -579,6 +556,9 @@ color: #9013fe;
         </property>
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="blue_line" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -724,9 +704,6 @@ QSlider::sub-page:horizontal {
             <height>0</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: white; }</string>
-          </property>
           <property name="text">
            <string>100</string>
           </property>
@@ -742,9 +719,6 @@ QSlider::sub-page:horizontal {
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QLabel { color: white; }</string>
           </property>
           <property name="text">
            <string>%</string>
@@ -777,15 +751,11 @@ QSlider::sub-page:horizontal {
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-	 color: white;
-	font-size:14px;
-	font-weight:normal;
-}</string>
-        </property>
         <property name="text">
          <string>Positive output</string>
+        </property>
+        <property name="general_settings_label" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -906,15 +876,11 @@ QPushButton:disabled {
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">QLabel {
-	 color: white;
-	font-size:14px;
-	font-weight:normal;
-}</string>
-        </property>
         <property name="text">
          <string>Negative output</string>
+        </property>
+        <property name="general_settings_label" stdset="0">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -1031,15 +997,15 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
@@ -1062,38 +1028,6 @@ QPushButton:disabled {
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
- <connection>
-   <sender>valuePos</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>lcd1_set</receiver>
-   <slot>display(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>917</x>
-     <y>233</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>281</x>
-     <y>105</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>valueNeg</sender>
-   <signal>valueChanged(double)</signal>
-   <receiver>lcd2_set</receiver>
-   <slot>display(double)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>917</x>
-     <y>380</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>260</x>
-     <y>335</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>btnSync</sender>
    <signal>toggled(bool)</signal>

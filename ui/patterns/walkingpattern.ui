@@ -39,9 +39,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Walking level</string>
        </property>
@@ -73,9 +70,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_2">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Frequency</string>
        </property>
@@ -100,9 +94,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_3">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Direction</string>
        </property>
@@ -134,9 +125,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label_4">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Length</string>
        </property>

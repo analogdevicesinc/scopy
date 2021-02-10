@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>258</width>
-    <height>284</height>
+    <height>290</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -58,9 +58,6 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Init Value</string>
        </property>
@@ -88,9 +85,6 @@
      </property>
      <item>
       <widget class="QLabel" name="label">
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>Frequency</string>
        </property>
@@ -117,9 +111,6 @@
       <widget class="QLabel" name="label_2">
        <property name="enabled">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
        </property>
        <property name="text">
         <string>Start counter</string>
@@ -157,9 +148,6 @@
        <property name="enabled">
         <bool>false</bool>
        </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
-       </property>
        <property name="text">
         <string>End counter</string>
        </property>
@@ -192,9 +180,6 @@
       <widget class="QLabel" name="label_4">
        <property name="enabled">
         <bool>false</bool>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">font-size: 13px;</string>
        </property>
        <property name="text">
         <string>Increment</string>

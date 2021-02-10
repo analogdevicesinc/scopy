@@ -44,19 +44,7 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QScrollBar:horizontal {
-  background: #262628;
-  max-height: 6px;
-  border-radius: 3px;
-}
-
-QScrollBar::handle:horizontal {
-  background: #4a4a4b;
-  border: 0;
-  border-radius: 3px;
-}
-
-QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+      <string notr="true">QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
     background: none;
 }
 
@@ -156,11 +144,11 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
        <height>1</height>
       </size>
      </property>
-     <property name="styleSheet">
-      <string notr="true">border: 1px solid rgba(255, 255, 255, 33);</string>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="line_separator" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

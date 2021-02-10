@@ -16,19 +16,10 @@
   <property name="styleSheet">
    <string notr="true">QLineEdit
 {
-  
   font-size: 18px;
   line-height: 21px;
-  color: #FFFFFF;
-  border: 0px;
   border-bottom: 1px solid rgba(255,255,255,100);
 }
-
-QLineEdit:disabled
-{
-  color: rgb(85, 85, 85);
-}
-
 
 </string>
   </property>

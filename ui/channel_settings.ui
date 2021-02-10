@@ -34,14 +34,11 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="styleSheet">
-      <string notr="true">color: white;
-font-size: 14px;
-font-weight: normal;
-</string>
-     </property>
      <property name="text">
       <string>Channel</string>
+     </property>
+     <property name="menu_title_label" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -76,7 +73,7 @@ font-weight: normal;
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">border: 2px solid #ff7200</string>
+      <string notr="true">border: 2px solid #ff7200;</string>
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -198,11 +195,11 @@ font-weight: normal;
                   <height>1</height>
                  </size>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-                </property>
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="subsection_line" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -214,14 +211,11 @@ font-weight: normal;
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-                </property>
                 <property name="text">
                  <string>MATH </string>
+                </property>
+                <property name="subsection_label" stdset="0">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -273,11 +267,7 @@ color: rgba(255, 255, 255, 70);
               <item>
                <widget class="QLabel" name="function_2">
                 <property name="styleSheet">
-                 <string notr="true">QLabel {
-	color: white;
-	font: bold  ;	
-	font-size: 16px;
-}</string>
+                 <string notr="true"/>
                 </property>
                 <property name="text">
                  <string/>
@@ -314,37 +304,22 @@ color: rgba(255, 255, 255, 70);
                </size>
               </property>
               <property name="styleSheet">
-               <string notr="true">QPushButton {
+               <string notr="true">QPushButton{
   min-height: 30px;
   max-height: 30px;
   min-width: 240px;
   max-width: 240px;
 
   border: 0px;
-  border-radius: 4px;
-
-  background-color: #4a64ff;
-  color: #ffffff;
-
-  font-size: 14px;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:disabled {
-  background-color:  #727273;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
               </property>
               <property name="text">
                <string>Edit Function</string>
               </property>
               <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="blue_button" stdset="0">
                <bool>true</bool>
               </property>
              </widget>
@@ -403,14 +378,11 @@ QPushButton:hover {
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-             </property>
              <property name="text">
               <string>HORIZONTAL </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -428,11 +400,11 @@ color: rgba(255, 255, 255, 70);
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -495,11 +467,11 @@ color: rgba(255, 255, 255, 70);
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -511,14 +483,11 @@ color: rgba(255, 255, 255, 70);
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-             </property>
              <property name="text">
               <string>VERTICAL </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -604,14 +573,11 @@ color: rgba(255, 255, 255, 70);
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <property name="styleSheet">
-              <string notr="true">QLabel {
-  font-size: 12px;
-color: rgba(255, 255, 255, 70);
-}</string>
-             </property>
              <property name="text">
               <string>SETTINGS </string>
+             </property>
+             <property name="subsection_label" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -629,11 +595,11 @@ color: rgba(255, 255, 255, 70);
                <height>1</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-             </property>
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="subsection_line" stdset="0">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -684,9 +650,6 @@ color: rgba(255, 255, 255, 70);
            </property>
            <item>
             <widget class="QLabel" name="lblLineWidth">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>CH Thickness</string>
              </property>
@@ -764,9 +727,6 @@ color: rgba(255, 255, 255, 70);
            </property>
            <item>
             <widget class="QLabel" name="label_3">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Memory depth</string>
              </property>
@@ -787,9 +747,6 @@ color: rgba(255, 255, 255, 70);
            </property>
            <item>
             <widget class="QLabel" name="label_4">
-             <property name="styleSheet">
-              <string notr="true">font-size: 13px;</string>
-             </property>
              <property name="text">
               <string>Curve Style</string>
              </property>
@@ -857,9 +814,6 @@ color: rgba(255, 255, 255, 70);
               </property>
               <item>
                <widget class="QLabel" name="probe_label">
-                <property name="styleSheet">
-                 <string notr="true">font-size: 13px;</string>
-                </property>
                 <property name="text">
                  <string>Probe
 Attenuation</string>
@@ -926,9 +880,6 @@ Attenuation</string>
           </property>
           <item>
            <widget class="QLabel" name="label_2">
-            <property name="styleSheet">
-             <string notr="true">font-size: 13px;</string>
-            </property>
             <property name="text">
              <string>Software 
 AC Coupling</string>
@@ -954,22 +905,7 @@ AC Coupling</string>
        <item>
         <widget class="QWidget" name="filter1" native="true">
          <property name="styleSheet">
-          <string notr="true">QCheckBox::indicator {
-  border: 2px solid rgb(74, 100, 255);
-  border-radius: 4px;
-  width: 16px;
-  height: 16px;
-  subcontrol-position: left;
-}
-
-QCheckBox::indicator:checked {
-  background-color: rgb(74, 100, 255);
-}
-
-QCheckBox{
-text-align: center;
-
-}</string>
+          <string notr="true"/>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="leftMargin">
@@ -998,11 +934,11 @@ text-align: center;
               <height>1</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="subsection_line" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1113,6 +1049,9 @@ text-align: center;
        </item>
        <item>
         <widget class="QWidget" name="filter2" native="true">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="spacing">
            <number>0</number>
@@ -1143,33 +1082,18 @@ text-align: center;
               <height>1</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="subsection_line" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QCheckBox" name="filter2_en">
             <property name="styleSheet">
-             <string notr="true">QCheckBox::indicator {
-  border: 2px solid rgb(74, 100, 255);
-  border-radius: 4px;
-  width: 16px;
-  height: 16px;
-  subcontrol-position: left;
-}
-
-QCheckBox::indicator:checked {
-  background-color: rgb(74, 100, 255);
-}
-
-QCheckBox{
-text-align: center;
-
-}</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Filter 2 - Enabled</string>
@@ -1288,11 +1212,11 @@ text-align: center;
               <height>1</height>
              </size>
             </property>
-            <property name="styleSheet">
-             <string notr="true">border: 1px solid rgba(255, 255, 255, 70);</string>
-            </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="subsection_line" stdset="0">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -1324,32 +1248,17 @@ text-align: center;
           <string notr="true">QPushButton{
   width: 175px;
   height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  
-  font-size: 14px;
+
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:disabled {
-  background-color: grey;
-  color:white;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
          </property>
          <property name="text">
           <string>Autoset</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -1375,32 +1284,17 @@ QPushButton:hover {
           <string notr="true">QPushButton{
   width: 175px;
   height: 30px;
-  border-radius: 4px;
-  background-color: #4a64ff;
-  
-  font-size: 14px;
+
   font-weight: normal;
   font-style: normal;
   text-align: center;
-  color: #ffffff;
-}
-
-
-QPushButton:disabled {
-  background-color: grey;
-  color:white;
-}
-
-QPushButton:pressed {
-  background-color: #2a44df;
-}
-
-QPushButton:hover {
-	background-color: #4a34ff;
 }</string>
          </property>
          <property name="text">
           <string>Snapshot</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

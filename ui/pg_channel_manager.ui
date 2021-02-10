@@ -59,15 +59,10 @@
        </property>
        <property name="styleSheet">
         <string notr="true">QLabel{
-
-/*  background-color: rgb(170, 0, 0);*/
-
-  
   font-size: 16px;
   font-weight: normal;
   font-style: normal;
   text-align: left;
-  color: rgba(255,255,255,140)
 }</string>
        </property>
        <layout class="QHBoxLayout" name="chmHeaderSlotLayout">
@@ -93,9 +88,6 @@
    </item>
    <item>
     <widget class="Line" name="line">
-     <property name="styleSheet">
-      <string notr="true">color: rgba(255,255,255,60);</string>
-     </property>
      <property name="frameShadow">
       <enum>QFrame::Plain</enum>
      </property>
@@ -104,6 +96,9 @@
      </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="line_separator" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

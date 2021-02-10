@@ -20,6 +20,10 @@
   height: 26px;
   border-radius: 4px;
   background-color: none;
+}
+
+QPushButton[is_selected=true] {
+	border: 4px solid white;
 }</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -50,12 +54,7 @@
 
 QPushButton[is_checked=true] {
   background-color: #F44336;
-}
-
-QPushButton[is_selected=true] {
-	border: 4px solid white;
-}
-</string>
+}</string>
      </property>
      <property name="text">
       <string>1</string>
@@ -83,12 +82,7 @@ QPushButton[is_selected=true] {
 
 QPushButton[is_checked=true] {
   background-color: #2096F3;
-}
-
-QPushButton[is_selected=true] {
-	border: 4px solid white;
-}
-</string>
+}</string>
      </property>
      <property name="text">
       <string>2</string>
@@ -116,12 +110,7 @@ QPushButton[is_selected=true] {
 
 QPushButton[is_checked=true] {
   background-color: #8BC34A;
-}
-
-QPushButton[is_selected=true] {
-	border: 4px solid white;
-}
-</string>
+}</string>
      </property>
      <property name="text">
       <string>3</string>
@@ -149,12 +138,7 @@ QPushButton[is_selected=true] {
 
 QPushButton[is_checked=true] {
   background-color: #FF5721;
-}
-
-QPushButton[is_selected=true] {
-	border: 4px solid white;
-}
-</string>
+}</string>
      </property>
      <property name="text">
       <string>4</string>
@@ -182,10 +166,6 @@ QPushButton[is_selected=true] {
 
 QPushButton[is_checked=true] {
   background-color: #607D8B;
-}
-
-QPushButton[is_selected=true] {
-	border: 4px solid white;
 }
 </string>
      </property>
