@@ -46,6 +46,8 @@ public:
 
 	void setCalibrating(bool calibrating);
 
+	void hideText(bool hidden);
+
 Q_SIGNALS:
 	void detach();
 	void toggleButtonGroup(bool);

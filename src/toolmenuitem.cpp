@@ -129,6 +129,15 @@ void ToolMenuItem::setCalibrating(bool calibrating)
 	}
 }
 
+void ToolMenuItem::hideText(bool hidden)
+{
+	if(hidden) {
+		d_toolBtn->setText("");
+	} else {
+		d_toolBtn->setText(d_name);
+	}
+}
+
 void ToolMenuItem::setDisabled(bool disabled)
 {
 	BaseMenuItem::setDisabled(disabled);

@@ -217,6 +217,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		ui->saveLbl->setVisible(opened);
 		ui->loadLbl->setVisible(opened);
 		ui->prefBtn->setText(opened ? tr("Preferences") : "");
+		menu->hideMenuText(!opened);
 	});
 
 	connect(ui->stackedWidget, SIGNAL(moved(int)),

@@ -43,6 +43,8 @@ public:
 
 	QButtonGroup *getButtonGroup();
 
+	void hideMenuText(bool hidden);
+
 Q_SIGNALS:
 	void toolSelected(tool);
 	void enableInfoWidget(bool);
