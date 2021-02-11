@@ -117,6 +117,13 @@ QButtonGroup *ToolMenu::getButtonGroup()
 	return d_buttonGroup;
 }
 
+void ToolMenu::hideMenuText(bool hidden)
+{
+	for (int i = 0; i < d_tools.size(); ++i) {
+		static_cast<ToolMenuItem*>(d_tools[i].first)->hideText(hidden);
+	}
+}
+
 void ToolMenu::_updateToolList(short from, short to)
 {
 	if (d_items == d_tools.size()) {
