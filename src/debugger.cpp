@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "utils.h"
 #include "debugger.h"
 #include "ui_debugger.h"
 #include <QDebug>
@@ -104,7 +105,10 @@ void Debugger::updateChannelComboBox(QString devName)
 		channels.append(QString("None"));
 	}
 
-	std::sort(channels.begin(), channels.end(), std::less_equal<QString>());
+	std::sort(channels.begin(), channels.end(), [](QString a, QString b) {
+		return Util::compareNatural(a.toStdString(), b.toStdString());
+	});
+
 	ui->ChannelComboBox->addItems(channels);
 
 	updateAttributeComboBox(ui->ChannelComboBox->currentText());
