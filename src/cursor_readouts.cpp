@@ -41,12 +41,13 @@ CursorReadouts::CursorReadouts(QwtPlot *plot):
     vAxis(QwtPlot::yLeft)
 {
 	ui->setupUi(this);
-
 	ui->TimeCursors->setParent(plot->canvas());
 	ui->VoltageCursors->setParent(plot->canvas());
 	this->setGeometry(0, 0, 0, 0);
 
-    plot->canvas()->installEventFilter(this);
+	// TO DO: add initial color based on theme
+
+	plot->canvas()->installEventFilter(this);
 
 	ui->TimeCursors->setAttribute(Qt::WA_TransparentForMouseEvents);
 	ui->VoltageCursors->setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -65,7 +66,9 @@ CursorReadouts::~CursorReadouts()
 void CursorReadouts::setTransparency(int value)
 {
 	double percent = (100 - value) / 100.0;
-	QString color = "rgba(20, 20, 22, " + QString::number(percent);
+
+	// TO DO: select color based on theme (20,20,22)
+	QString color = "rgba(197, 197, 197, " + QString::number(percent);
 
 	ui->TimeCursors->setStyleSheet("QWidget {"
 					"background-color: " + color + ");"
