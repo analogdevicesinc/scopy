@@ -392,7 +392,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	for (uint i = 0; i < nb_channels; i++)
 		xy_plot.setYaxisMouseGesturesEnabled(i, false);
 
-	xy_plot.setLineColor(0, QColor("#F8E71C"));
+	xy_plot.setLineColor(0, QColor("#4a64ff"));
 
 	ui->hlayout_fft->addWidget(&fft_plot);
 	ui->container_fft_plot->hide();
