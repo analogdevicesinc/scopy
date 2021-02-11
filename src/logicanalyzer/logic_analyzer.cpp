@@ -95,7 +95,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 					{"k samples", 1E+3},
 					{"M samples", 1E+6},
 					{"G samples", 1E+9},
-					}, tr("Nr of samples"), 1,
+					}, tr("Nr of samples"), 1024,
 					MAX_BUFFER_SIZE_ONESHOT,
 					true, false, this, {1, 2, 5})),
 	m_timePositionButton(new PositionSpinButton({
@@ -1769,7 +1769,7 @@ void LogicAnalyzer::startStop(bool start)
 				/* ensure we have the minimum amount of kernel buffers to fit the buffer
 				 * ex: we want to capture a 40M buffer, we will use (at least) 10 kernel buffers
 				 * */
-				while (bufferSizeAdjusted < m_currentKernelBuffers * oneBufferMaxSize
+				while (bufferSizeAdjusted > (m_currentKernelBuffers * oneBufferMaxSize)
 						&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
 					m_currentKernelBuffers++;
 				}
@@ -1778,14 +1778,16 @@ void LogicAnalyzer::startStop(bool start)
 				 * further divide it into smaller buffers (kernel buffers still available)
 				 * */
 				const double maxCaptureDuration = 0.1; // 100ms
-				while (setSampleRate * static_cast<double>(bufferSizeAdjusted)
-						/ static_cast<double>(m_currentKernelBuffers) > maxCaptureDuration
+				while (((static_cast<double>(bufferSizeAdjusted) / setSampleRate)
+						/ static_cast<double>(m_currentKernelBuffers)) > maxCaptureDuration
 						&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
 					m_currentKernelBuffers++;
 				}
 
 				// buffer size per kernel buffer
 				chunk_size = bufferSizeAdjusted / m_currentKernelBuffers;
+
+				uint64_t chunkSizeBeforeAdjust = chunk_size;
 
 				// buffer size must be divisible by 4
 				chunk_size = 4 * (chunk_size / 4);
@@ -1794,10 +1796,8 @@ void LogicAnalyzer::startStop(bool start)
 				 * value for it. Let's check if we can increase the chunk_size to the next divisible by 4
 				 * number otherwise we need to add another kernel buffer if this is possible
 				 * */
-				if (chunk_size + 4 <= oneBufferMaxSize) {
+				if (chunk_size + 4 <= oneBufferMaxSize && chunkSizeBeforeAdjust != chunk_size) {
 					chunk_size += 4;
-				} else if (m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
-					m_currentKernelBuffers++;
 				}
 
 				// If the buffer size is > 64 * 4M we need to cap the chunk_size to 4M
