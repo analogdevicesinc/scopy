@@ -118,11 +118,6 @@ background-color: transparent;
         <property name="text">
          <string/>
         </property>
-        <property name="icon">
-         <iconset resource="../resources/resources.qrc">
-          <normaloff>:/icons/ic_note_unchecked.svg</normaloff>
-          <normalon>:/icons/ic_note_checked.svg</normalon>:/icons/ic_note_unchecked.svg</iconset>
-        </property>
         <property name="iconSize">
          <size>
           <width>40</width>
@@ -135,6 +130,9 @@ background-color: transparent;
         <property name="checked">
          <bool>false</bool>
         </property>
+        <property name="userNote" stdset="0">
+         <bool>true</bool>
+        </property>
        </widget>
       </item>
      </layout>
@@ -142,8 +140,6 @@ background-color: transparent;
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

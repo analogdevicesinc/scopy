@@ -839,3 +839,15 @@ QPushButton[stopButton=true]:checked {
 }
 
 /*************************************************************/
+
+/******************** User Notes *************************/
+
+QPushButton[userNote=true] {
+        background-image: url(:/icons/ic_note_unchecked.svg);
+}
+
+QPushButton[userNote=true]:checked {
+        background-image: url(:/icons/ic_note_checked.svg);
+}
+
+/*************************************************************/
