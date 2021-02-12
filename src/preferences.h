@@ -26,6 +26,8 @@
 #include <QSettings>
 
 #include "apiObject.hpp"
+//#include "coloreditor.h"
+#include "scopy_color_editor.h"
 
 
 namespace Ui {
@@ -134,6 +136,8 @@ public:
 	void setFirst_application_run(bool value);
 
 	void requestRestart();
+	void setColorEditor(ScopyColorEditor *colorEditor);
+
 Q_SIGNALS:
 
 	void notify();
@@ -184,6 +188,8 @@ private:
 	bool m_skipCalIfCalibrated;
 
 	Preferences_API *pref_api;
+
+	ScopyColorEditor *m_colorEditor;
 };
 
 class Preferences_API : public ApiObject
@@ -216,6 +222,8 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool automatical_version_checking_enabled READ getAutomaticalVersionCheckingEnabled WRITE setAutomaticalVersionCheckingEnabled)
 	Q_PROPERTY(QString check_updates_url READ getCheckUpdatesUrl WRITE setCheckUpdatesUrl)
 	Q_PROPERTY(bool first_application_run READ getFirstApplicationRun WRITE setFirstApplicationRun)
+	Q_PROPERTY(QString currentStylesheet READ getCurrentStylesheet WRITE setCurrentStylesheet)
+	Q_PROPERTY(QStringList userStylesheets READ getUserStylesheets WRITE setUserStylesheets)
 
 public:
 
@@ -297,6 +305,12 @@ public:
 
 	bool getFirstApplicationRun() const;
 	void setFirstApplicationRun(const bool& first);
+
+	QString getCurrentStylesheet() const;
+	void setCurrentStylesheet(const QString &currentStylesheet);
+
+	QStringList getUserStylesheets() const;
+	void setUserStylesheets(const QStringList &userStylesheets);
 
 private:
 	Preferences *preferencePanel;

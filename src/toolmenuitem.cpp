@@ -195,11 +195,6 @@ void ToolMenuItem::_buildUI()
 	d_toolStopBtn->setMaximumSize(32, 32);
 	d_toolBtn->setMinimumHeight(42);
 
-
-	// TO BE REMOVED
-	QIcon::setThemeName("scopy-light");
-	//QIcon::setThemeName("scopy-default");
-
 	d_toolBtn->setIcon(QIcon::fromTheme(d_iconPath));
 	d_toolBtn->setCheckable(true);
 	d_toolBtn->setIconSize(QSize(32, 32));

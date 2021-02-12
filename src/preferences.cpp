@@ -30,7 +30,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <scopyApplication.hpp>
-#include <QProcess>
+#include "application_restarter.h"
 
 
 using namespace adiscope;
@@ -68,7 +68,8 @@ Preferences::Preferences(QWidget *parent) :
 	m_skipCalIfCalibrated(true),
 	automatical_version_checking_enabled(false),
 	first_application_run(true),
-	check_updates_url("https://swdownloads.analog.com/cse/sw_versions.json")
+	check_updates_url("https://swdownloads.analog.com/cse/sw_versions.json"),
+	m_colorEditor(nullptr)
 {
 	ui->setupUi(this);
 
@@ -239,6 +240,21 @@ Preferences::Preferences(QWidget *parent) :
 		m_displaySamplingPoints = (!state ? false : true);
 		Q_EMIT notify();
 	});
+
+	ui->comboBoxTheme->addItem("default");
+	ui->comboBoxTheme->addItem("light");
+	connect(ui->comboBoxTheme, &QComboBox::currentTextChanged, [=](const QString &stylesheet){
+			m_colorEditor->setCurrentStylesheet(stylesheet);
+
+			// force saving of the ini file as the new Scopy process
+			// when restarted will start before scopy closes. A race condition
+			// will appear on who gets to read/write to the .ini file first
+			QString preference_ini_file = getPreferenceIniFile();
+			QSettings settings(preference_ini_file, QSettings::IniFormat);
+			pref_api->save(settings);
+
+			requestRestart();
+	});
 }
 
 void Preferences::requestRestart()
@@ -255,8 +271,7 @@ void Preferences::requestRestart()
 
 	if (ret == QMessageBox::Ok) {
 		// restart:
-		qApp->quit();
-		QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+		adiscope::ApplicationRestarter::triggerRestart();
 	}
 }
 
@@ -625,6 +640,14 @@ void Preferences::setFirst_application_run(bool value)
 }
 
 
+void Preferences::setColorEditor(ScopyColorEditor *colorEditor)
+{
+	m_colorEditor = colorEditor;
+	QSignalBlocker blocker(ui->comboBoxTheme);
+	ui->comboBoxTheme->setCurrentText(m_colorEditor->getCurrentStylesheet());
+	QIcon::setThemeName("scopy-" + m_colorEditor->getCurrentStylesheet());
+}
+
 bool Preferences_API::getAnimationsEnabled() const
 {
 	return preferencePanel->animations_enabled;
@@ -809,6 +832,34 @@ bool Preferences_API::getSkipCalIfCalibrated() const
 void Preferences_API::setSkipCalIfCalibrated(bool val)
 {
 	preferencePanel->m_skipCalIfCalibrated = val;
+}
+
+QString Preferences_API::getCurrentStylesheet() const
+{
+	if (!preferencePanel->m_colorEditor) {
+		return "";
+	}
+
+	return preferencePanel->m_colorEditor->getCurrentStylesheet();
+}
+
+void Preferences_API::setCurrentStylesheet(const QString &currentStylesheet)
+{
+//	preferencePanel->m_colorEditor->setCurrentStylesheet(currentStylesheet);
+}
+
+QStringList Preferences_API::getUserStylesheets() const
+{
+	if (!preferencePanel->m_colorEditor) {
+		return QStringList();
+	}
+
+	return preferencePanel->m_colorEditor->getUserStylesheets();
+}
+
+void Preferences_API::setUserStylesheets(const QStringList &userStylesheets)
+{
+//	preferencePanel->m_colorEditor->setUserStylesheets(userStylesheets);
 }
 
 bool Preferences::hasNativeDialogs() const
