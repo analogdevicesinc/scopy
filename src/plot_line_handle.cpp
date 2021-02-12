@@ -23,6 +23,7 @@
 
 #include <QPainter>
 #include <QMoveEvent>
+#include <QIcon>
 
 #include <QApplication>
 
@@ -734,8 +735,11 @@ void RoundedHandleV::paintEvent(QPaintEvent *pv)
 	QRect rect(0, 0, m_image.width() - 1, m_image.height() - 1);
 
 	if (m_selected && m_selectable) {
-		// TO DO: get selected color from theme
-		p.setPen(QPen(Qt::white, 2, Qt::SolidLine));
+		if (QIcon::themeName() == "scopy-default") {
+			p.setPen(QPen(Qt::white, 2, Qt::SolidLine));
+		} else {
+			p.setPen(QPen(Qt::black, 2, Qt::SolidLine));
+		}
 	} else {
 		p.setPen(QPen(m_roundRectColor, 1, Qt::SolidLine));
 	}
