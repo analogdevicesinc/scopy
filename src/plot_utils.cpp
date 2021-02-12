@@ -54,6 +54,17 @@ bool PrefixFormatter::getTwoDecimalMode()
 
 QString PrefixFormatter::buildString(double value, QString prefix, QString unitType, int precision) const
 {
+
+	if (m_trimZeroes) {
+		for (auto i = 0; i < precision; i++) {
+			const double singlePrecision = value * pow(10,i);
+			if (singlePrecision == round(singlePrecision)) {
+				precision = i;
+				break;
+			}
+		}
+	}
+
 	return QLocale().toString(value, 'f', precision) + " " + prefix + unitType;
 }
 
@@ -73,6 +84,16 @@ int PrefixFormatter::findPrefixIndex(double value) const
 	}
 
 	return index;
+}
+
+bool PrefixFormatter::getTrimZeroes() const
+{
+	return m_trimZeroes;
+}
+
+void PrefixFormatter::setTrimZeroes(bool trimZeroes)
+{
+	m_trimZeroes = trimZeroes;
 }
 
 QString PrefixFormatter::format(double value, QString unitType = "", int precision = 0) const
