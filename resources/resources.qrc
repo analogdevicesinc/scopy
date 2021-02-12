@@ -215,6 +215,8 @@
         <file>icons/scopy-default/icons/house.png</file>
         <file>icons/scopy-light/icons/ic loadD.png</file>
         <file>icons/scopy-light/icons/ic saveD.png</file>
+        <file>icons/scopy-light/icons/ic_note_checked.svg</file>
+        <file>icons/scopy-light/icons/ic_note_unchecked.svg</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/spinbox_type_a.qss</file>
