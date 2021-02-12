@@ -35,6 +35,9 @@ namespace adiscope {
 		virtual QString format(double value, QString unitType, int precision) const;
 		void getFormatAttributes(double value, QString& prefix, double& scale) const;
 
+		bool getTrimZeroes() const;
+		void setTrimZeroes(bool trimZeroes);
+
 	protected:
 		virtual QString buildString(double value, QString prefix, QString unitType, int precision) const;
 		int findPrefixIndex(double value) const;
@@ -43,6 +46,7 @@ namespace adiscope {
 		std::vector<std::pair<QString, double>> m_prefixes;
 		int m_defaultPrefixIndex;
 		bool m_twoDecimalMode;
+		bool m_trimZeroes;
 	};
 
 	class MetricPrefixFormatter: public PrefixFormatter
