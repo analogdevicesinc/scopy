@@ -14,13 +14,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QHeaderView::section {
-  background-color: transparent;
-}
-
-QHeaderView::section:checked {
-  background-color: transparent;
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
