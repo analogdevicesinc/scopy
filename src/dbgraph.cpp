@@ -25,6 +25,7 @@
 #include "plotpickerwrapper.h"
 
 #include <qwt_plot_layout.h>
+#include <QIcon>
 
 using namespace adiscope;
 
@@ -123,8 +124,15 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 	setAxisAutoScale(QwtPlot::yLeft, false);
 	setAxisAutoScale(QwtPlot::xTop, false);
 
+	QColor plotColor;
+	if (QIcon::themeName() == "scopy-default") {
+		plotColor = QColor("#6E6E6F");
+	} else {
+		plotColor = QColor("#D3D3D3");
+	}
+
 	EdgelessPlotGrid *grid = new EdgelessPlotGrid;
-	grid->setMajorPen(QColor("#353537"), 1.0, Qt::DashLine);
+	grid->setMajorPen(plotColor, 1.0, Qt::DashLine);
 	grid->setXAxis(QwtPlot::xTop);
 	grid->attach(this);
 
@@ -183,8 +191,8 @@ dBgraph::dBgraph(QWidget *parent) : QwtPlot(parent),
 			QwtAbstractScaleDraw::Labels, false);
 
 		QPalette palette = scaleItem->palette();
-		palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
-		palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
+		palette.setBrush(QPalette::Foreground, plotColor);
+		palette.setBrush(QPalette::Text, plotColor);
 		scaleItem->setPalette(palette);
 		scaleItem->setBorderDistance(0);
 		scaleItem->attach(this);
