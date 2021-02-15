@@ -461,7 +461,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>3</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -508,8 +508,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>329</height>
+                      <width>329</width>
+                      <height>472</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -621,51 +621,27 @@
                           </item>
                           <item>
                            <property name="text">
-                            <string/>
-                           </property>
-                           <property name="icon">
-                            <iconset resource="../resources/resources.qrc">
-                             <normaloff>:/icons/trigger_rising_enabled.svg</normaloff>:/icons/trigger_rising_enabled.svg</iconset>
+                            <string>Rising Edge</string>
                            </property>
                           </item>
                           <item>
                            <property name="text">
-                            <string/>
-                           </property>
-                           <property name="icon">
-                            <iconset>
-                             <normalon>:/icons/trigger_falling_enabled.svg</normalon>
-                            </iconset>
+                            <string>Falling Edge</string>
                            </property>
                           </item>
                           <item>
                            <property name="text">
-                            <string/>
-                           </property>
-                           <property name="icon">
-                            <iconset>
-                             <normalon>:/icons/trigger_low_enabled.svg</normalon>
-                            </iconset>
+                            <string>Low</string>
                            </property>
                           </item>
                           <item>
                            <property name="text">
-                            <string/>
-                           </property>
-                           <property name="icon">
-                            <iconset>
-                             <normalon>:/icons/trigger_high_enabled.svg</normalon>
-                            </iconset>
+                            <string>High</string>
                            </property>
                           </item>
                           <item>
                            <property name="text">
-                            <string/>
-                           </property>
-                           <property name="icon">
-                            <iconset>
-                             <normalon>:/icons/trigger_any_enabled.svg</normalon>
-                            </iconset>
+                            <string>Any Edge</string>
                            </property>
                           </item>
                          </widget>
@@ -1286,52 +1262,27 @@ color: rgba(255,255,255,51);
                         </item>
                         <item>
                          <property name="text">
-                          <string/>
-                         </property>
-                         <property name="icon">
-                          <iconset>
-                           <normalon>:/icons/trigger_rising_enabled.svg</normalon>
-                          </iconset>
+                          <string>Rising Edge</string>
                          </property>
                         </item>
                         <item>
                          <property name="text">
-                          <string/>
-                         </property>
-                         <property name="icon">
-                          <iconset>
-                           <normalon>:/icons/trigger_falling_enabled.svg</normalon>
-                          </iconset>
+                          <string>Falling Edge</string>
                          </property>
                         </item>
                         <item>
                          <property name="text">
-                          <string/>
-                         </property>
-                         <property name="icon">
-                          <iconset>
-                           <normalon>:/icons/trigger_low_enabled.svg</normalon>
-                          </iconset>
+                          <string>Low</string>
                          </property>
                         </item>
                         <item>
                          <property name="text">
-                          <string/>
-                         </property>
-                         <property name="icon">
-                          <iconset>
-                           <normalon>:/icons/trigger_high_enabled.svg</normalon>
-                          </iconset>
+                          <string>High</string>
                          </property>
                         </item>
                         <item>
                          <property name="text">
-                          <string/>
-                         </property>
-                         <property name="icon">
-                          <iconset>
-                           <disabledon>:/icons/trigger_any_enabled.svg</disabledon>
-                          </iconset>
+                          <string>Any Edge</string>
                          </property>
                         </item>
                        </widget>
