@@ -40,7 +40,6 @@
      </property>
      <property name="styleSheet">
       <string notr="true">QWidget {
-background-image: url(:/menu/scopy_title.png);
 background-repeat: no-repeat;
 background-position: center center;
 }</string>
@@ -50,6 +49,9 @@ background-position: center center;
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
+     </property>
+     <property name="scopy_logo" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
