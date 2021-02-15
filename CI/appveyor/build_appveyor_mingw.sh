@@ -85,6 +85,8 @@ cp /c/$BUILD_FOLDER/Scopy.exe /c/$DEST_FOLDER/
 cp /c/$BUILD_FOLDER/qt.conf /c/$DEST_FOLDER/
 mkdir /c/$DEST_FOLDER/resources
 
+cp /c/$BUILD_FOLDER/iio-emu/iio-emu.exe /c/$DEST_FOLDER/
+
 # windeployqt was broken in qt version 5.14.2 - it should be fixed in Qt 5.15 - https://bugreports.qt.io/browse/QTBUG-80763
 /c/msys64/$MINGW_VERSION/bin/windeployqt.exe --dir /c/$DEST_FOLDER --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport /c/$BUILD_FOLDER/Scopy.exe
 cp -r /$MINGW_VERSION/share/libsigrokdecode/decoders  /c/$DEST_FOLDER/
