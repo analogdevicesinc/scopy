@@ -56,6 +56,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <QDebug>
+#include <QIcon>
 
 using namespace adiscope;
 
@@ -579,6 +580,12 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 
   plotLayout()->setAlignCanvasToScales(true);
 
+  QColor plotColor;
+  if (QIcon::themeName() == "scopy-default") {
+	  plotColor = QColor("#6E6E6F");
+  } else {
+	  plotColor = QColor("#D3D3D3");
+  }
 
   for (unsigned int i = 0; i < 4; i++) {
 	QwtScaleDraw::Alignment scale =
@@ -591,8 +598,9 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 	scaleItem->setFont(this->axisWidget(QwtPlot::yLeft)->font());
 
 	QPalette palette = scaleItem->palette();
-	palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
-	palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
+
+	palette.setBrush(QPalette::Foreground, plotColor);
+	palette.setBrush(QPalette::Text, plotColor);
 	scaleItem->setPalette(palette);
 	scaleItem->setBorderDistance(0);
 	scaleItem->attach(this);
@@ -626,7 +634,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,
 
   // Plot needs a grid
   d_grid = new EdgelessPlotGrid();
-  QColor majorPenColor("#353537");
+  QColor majorPenColor(plotColor);
   d_grid->setMajorPen(majorPenColor, 1.0, Qt::DashLine);
   d_grid->attach(this);
 }
