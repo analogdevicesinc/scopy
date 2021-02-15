@@ -38,7 +38,9 @@ void ScopyColorEditor::parseAndBuildMap(QString toParse)
 	QString textEditText = "";
 
 	for (auto token : print) {
-		QStringList ttoken = token.split("\n", Qt::SkipEmptyParts);
+		// TODO: skip empty parts is only available in qt >= 5.14
+//		QStringList ttoken = token.split("\n", Qt::SkipEmptyParts);
+		QStringList ttoken;
 		if (ttoken.size()) {
 			for (auto t : ttoken) {
 				if (t.startsWith("/*")) continue; //ignore comments
