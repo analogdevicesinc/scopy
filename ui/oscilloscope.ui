@@ -130,6 +130,7 @@
   width: 80px;
   height: 40px;
 
+  font-size: 12px;
   text-align: left;
   font-weight: bold;
   padding-left: 15px;
