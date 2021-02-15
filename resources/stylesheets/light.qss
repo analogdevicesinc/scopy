@@ -26,7 +26,7 @@ QLabel {
 	text-align: left;
 }
 
-QLabel:disabled, QRadioButton:disabled {color: rgba(0, 0, 0, 120); }
+QLabel:disabled, QRadioButton:disabled {color: rgba(0, 0, 0, 70); }
 
 QLabel[invalid=true] { color: red; }
 
@@ -130,7 +130,7 @@ QComboBox {
 	padding-bottom: 4px;
 }
 
-QComboBox:disabled, QLineEdit:disabled { color: #555555; }
+QComboBox:disabled, QLineEdit:disabled { color: rgba(0, 0, 0, 70); }
 
 QComboBox QAbstractItemView {
 	border: none;
