@@ -574,6 +574,14 @@ QPushButton[settings_icon=true]:checked:hover {
   image: url(:/icons/setup3_checked_hover.svg);
 }
 
+QHeaderView::section {
+  background-color: transparent;
+}
+
+QHeaderView::section:checked {
+  background-color: transparent;
+}
+
 /*************************************************************/
 
 
