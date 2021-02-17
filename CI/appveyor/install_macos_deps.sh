@@ -16,7 +16,7 @@ BOOST_VERSION_FILE=1_73_0
 BOOST_VERSION=1.73.0
 
 PYTHON="python3"
-PACKAGES=" qt pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb $PYTHON"
+PACKAGES=" qt pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2"
 
 set -e
@@ -98,6 +98,7 @@ build_libm2k() {
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
+		-DENABLE_LOG=ON\
 		${WORKDIR}/libm2k
 
 	make $JOBS

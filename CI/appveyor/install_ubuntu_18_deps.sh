@@ -2,6 +2,7 @@
 
 LIBIIO_BRANCH=master
 LIBAD9361_BRANCH=master
+GLOG_BRANCH=v0.4.0
 LIBM2K_BRANCH=master
 GRIIO_BRANCH=upgrade-3.8
 GNURADIO_FORK=analogdevicesinc
@@ -65,6 +66,25 @@ build_libiio() {
 #	DESTDIR=${WORKDIR} make ${JOBS} install
 }
 
+build_glog() {
+
+	echo "### Building glog - branch $GLOG_BRANCH"
+
+	cd ~
+	git clone --depth 1 https://github.com/google/glog.git -b $GLOG_BRANCH ${WORKDIR}/glog
+
+	mkdir ${WORKDIR}/glog/build-${ARCH}
+	cd ${WORKDIR}/glog/build-${ARCH}
+
+	cmake	${CMAKE_OPTS} \
+		-DWITH_GFLAGS=OFF\
+		${WORKDIR}/glog
+
+	make $JOBS
+	sudo make ${JOBS} install
+	#DESTDIR=${WORKDIR} make ${JOBS} install
+}
+
 build_libm2k() {
 
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
@@ -81,6 +101,7 @@ build_libm2k() {
 		-DENABLE_EXAMPLES=OFF\
 		-DENABLE_TOOLS=OFF\
 		-DINSTALL_UDEV_RULES=OFF\
+		-DENABLE_LOG=ON\
 		${WORKDIR}/libm2k
 
 	make $JOBS
@@ -230,6 +251,7 @@ build_qwtpolar() {
 install_apt
 build_libiio
 build_libad9361
+build_glog
 build_libm2k
 build_griio
 build_grscopy
