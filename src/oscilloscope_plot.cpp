@@ -83,7 +83,7 @@ CapturePlot::CapturePlot(QWidget *parent,
 	d_startedGrouping(false),
 	d_bottomHandlesArea(nullptr),
 	d_xAxisInterval{0.0, 0.0},
-	d_currentHandleInitPx(1),
+	d_currentHandleInitPx(30),
 	d_maxBufferError(nullptr)
 {
 	setMinimumHeight(250);
