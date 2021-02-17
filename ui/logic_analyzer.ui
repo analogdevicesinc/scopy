@@ -461,7 +461,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>3</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -1352,7 +1352,7 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>319</width>
+                      <width>420</width>
                       <height>472</height>
                      </rect>
                     </property>
@@ -1419,12 +1419,27 @@ color: rgba(255,255,255,51);
                      </item>
                      <item>
                       <widget class="adiscope::CustomSwitch" name="btnStreamOneShot">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>400</width>
+                         <height>30</height>
+                        </size>
+                       </property>
+                       <property name="layoutDirection">
+                        <enum>Qt::LeftToRight</enum>
+                       </property>
                        <property name="styleSheet">
                         <string notr="true">QPushButton {
 min-height: 30px;
 max-height: 30px;
-min-width: 280px;
-max-width: 280px;
+min-width: 400px;
+max-width: 400px;
 background-color: black;
 border-radius: 4px;
 }
@@ -1436,8 +1451,8 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop
 QWidget#handle {
 min-height: 30px;
 max-height: 30px;
-min-width: 142px;
-max-width: 142px;
+min-width: 200px;
+max-width: 200px;
 background-color: #4a64ff;
 border-radius: 2px;
 }
@@ -1456,8 +1471,8 @@ QLabel#on {
 margin-top: 0px;
 min-height:30px;
 max-height:30px;
-min-width:140px;
-max-width:140px;
+min-width:200px;
+max-width:200px;
 qproperty-alignment: AlignCenter AlignCenter;
 margin-left: 0px;
 color: white;
@@ -1471,9 +1486,9 @@ QLabel#off {
 margin-top: 0px;
 min-height:30px;
 max-height:30px;
-min-width:140px;
-max-width:140px;
-margin-left: 140px;
+min-width:200px;
+max-width:200px;
+margin-left: 200px;
 color: white;
 qproperty-alignment: AlignCenter AlignCenter;
 }
@@ -1502,6 +1517,22 @@ color: rgba(255,255,255,51);
                         <number>100</number>
                        </property>
                       </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeType">
+                        <enum>QSizePolicy::Fixed</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>400</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
                      </item>
                      <item>
                       <layout class="QHBoxLayout" name="subTitleLayout">
