@@ -88,6 +88,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="styleSheet">
+        <string notr="true">QComboBox QAbstractItemView { min-width: 130px; }</string>
+       </property>
        <item>
         <property name="text">
          <string>Individual</string>
