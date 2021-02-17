@@ -152,9 +152,11 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 		channelBox->setChecked(true);
 
+		triggerBox->setStyleSheet("QComboBox QAbstractItemView { min-width: 130px; }");
+
+		triggerBox->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
 		for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
-			triggerBox->addItem(ui->triggerComboBox->itemIcon(i),
-					    ui->triggerComboBox->itemText(i));
+			triggerBox->addItem(ui->triggerComboBox->itemText(i));
 		}
 
 		int condition = static_cast<int>(
