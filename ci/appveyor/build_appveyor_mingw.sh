@@ -31,7 +31,7 @@ SCOPY_CMAKE_OPTS="\
 PYTHON_LOCATION=/$MINGW_VERSION/lib/python3.8
 PYTHON_FILES="${PYTHON_LOCATION}/*.py ${PYTHON_LOCATION}/asyncio ${PYTHON_LOCATION}/collections ${PYTHON_LOCATION}/concurrent ${PYTHON_LOCATION}/config-3.* ${PYTHON_LOCATION}/ctypes ${PYTHON_LOCATION}/distutils ${PYTHON_LOCATION}/encodings ${PYTHON_LOCATION}/lib-dynload ${PYTHON_LOCATION}/site-packages"
 
-DLL_DEPS=$(cat ${WORKDIR}/CI/appveyor/mingw_dll_deps)
+DLL_DEPS=$(cat ${WORKDIR}/ci/appveyor/mingw_dll_deps)
 DLL_DEPS="$DLL_DEPS $PYTHON_FILES"
 
 echo $DLL_DEPS
@@ -43,7 +43,7 @@ DEBUG_FOLDER=debug_$ARCH_BIT
 
 appveyor AddMessage "2. Installing msys deps.sw"
 cd /c
-source ${WORKDIR}/CI/appveyor/install_msys_deps.sh
+source ${WORKDIR}/ci/appveyor/install_msys_deps.sh
 appveyor AddMessage "3. Installed msys deps.sw"
 
 # Download a 32-bit version of windres.exe

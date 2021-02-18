@@ -216,7 +216,7 @@ build_qwtpolar() {
 		| tar xj --strip-components=1 -C ${WORKDIR}/qwtpolar
 
 	cd ~/qwtpolar
-	wget https://raw.githubusercontent.com/analogdevicesinc/scopy/master/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
+	wget https://raw.githubusercontent.com/analogdevicesinc/scopy/master/ci/appveyor/patches/qwtpolar-qwt-qt-compat.patch
 	patch -p1 < qwtpolar-qwt-qt-compat.patch
 	sed -i 's/\/usr\/local\/qwtpolar-$$QWT_POLAR_VERSION/\/usr\/local/g' qwtpolarconfig.pri
 	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarExamples/ /g' qwtpolarconfig.pri

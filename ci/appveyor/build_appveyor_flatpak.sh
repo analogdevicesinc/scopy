@@ -17,7 +17,7 @@ commit_nb=$(sudo docker run -d \
 		-e "BRANCH=$BRANCH" \
 		-e "REPO=$REPO" \
 		alexandratr/scopy-flatpak-bionic:latest \
-		/bin/bash -xe /scopy/CI/appveyor/inside_flatpak_docker.sh)
+		/bin/bash -xe /scopy/ci/appveyor/inside_flatpak_docker.sh)
 
 # Attach ourselves to the running docker and wait for it to finish
 sudo docker attach $commit_nb
