@@ -227,12 +227,18 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	m_phoneHome = new PhoneHome(settings, prefPanel);
 	if (prefPanel->getFirst_application_run()) {
 		QMessageBox* msgBox = new QMessageBox(this);
+
+		QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
+		QRect screenRect = QDesktopWidget().screenGeometry();
+
 		msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
 		msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
 		msgBox->setStandardButtons(msgBox->Yes | msgBox->No);
 		msgBox->setModal(false);
 		msgBox->show();
 		msgBox->activateWindow();
+		msgBox->move( QPoint( screenRect.x() + screenRect.width()/2 - mSize.width()/2,
+				     screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
 		connect(msgBox->button(QMessageBox::Yes), &QAbstractButton::pressed, [&] () {
 			prefPanel->setAutomatical_version_checking_enabled(true);
 			prefPanel->setFirst_application_run(false);
