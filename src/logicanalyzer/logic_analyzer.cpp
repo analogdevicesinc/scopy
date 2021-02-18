@@ -1864,6 +1864,10 @@ void LogicAnalyzer::startStop(bool start)
 				m_lastCapturedSample = absIndex;
 				updateBufferPreviewer(0, m_lastCapturedSample);
 
+				QMetaObject::invokeMethod(this,
+							  "restoreTriggerState",
+							  Qt::DirectConnection);
+
 				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					m_m2kDigital->stopAcquisition();
 
@@ -1879,10 +1883,6 @@ void LogicAnalyzer::startStop(bool start)
 			} while (totalSamples);
 
 			m_started = false;
-
-			QMetaObject::invokeMethod(this,
-						  "restoreTriggerState",
-						  Qt::DirectConnection);
 
 			if (ui->runSingleWidget->singleButtonChecked()) {
 				QMetaObject::invokeMethod(ui->runSingleWidget,
@@ -2232,6 +2232,10 @@ void LogicAnalyzer::setupTriggerMenu()
 			qDebug() << "auto mode: " << m_autoMode << " with timeout: "
 				 << oneBufferTimeOut << " when logic is started: " << m_started;
 		}
+
+		if (!m_autoMode) {
+			m_timer->stop();
+		}
 	});
 
 	ui->triggerLogicComboBox->addItem("OR");
@@ -2295,7 +2299,6 @@ void LogicAnalyzer::setupTriggerMenu()
 		ui->lblWarningFw->setVisible(true);
 	}
 
-	m_timer->setSingleShot(true);
 	connect(m_timer, &QTimer::timeout,
 		this, &LogicAnalyzer::saveTriggerState);
 
@@ -2306,7 +2309,7 @@ void LogicAnalyzer::setupTriggerMenu()
 void LogicAnalyzer::saveTriggerState()
 {
 	// save trigger state and set to no trigger each channel
-	if (m_started) {
+	if (m_started && !m_triggerState.size()) {
 		for (int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
@@ -2321,7 +2324,7 @@ void LogicAnalyzer::saveTriggerState()
 void LogicAnalyzer::restoreTriggerState()
 {
 	// restored saved trigger state
-	if (!m_started && m_triggerState.size()) {
+	if (m_triggerState.size()) {
 		for (int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, m_triggerState[i]);
