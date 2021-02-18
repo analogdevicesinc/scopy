@@ -68,10 +68,10 @@ InfoPage::InfoPage(QString uri, Preferences *pref, PhoneHome* phoneHome,
 		if (checked == 1) {
 			ui->lblFirmware->setText("Firmware is up to date!");
 		} else if (checked == 0) {
-			const QString message = "Your firmware is outdated. "
-							  "Version " + m_phoneHome->getM2kVersion() + " was released. "
+			const QString message = "New firmware version is available. "
+							  "Download " + m_phoneHome->getM2kVersion() + " "
 							  "<a href=\"";
-			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\">CLICK TO UPDATE </a>");
+			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\">here</a>");
 			ui->lblFirmware->setTextFormat(Qt::RichText);
 			ui->lblFirmware->setTextInteractionFlags(Qt::TextBrowserInteraction);
 			ui->lblFirmware->setOpenExternalLinks(true);
