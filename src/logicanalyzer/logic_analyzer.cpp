@@ -95,7 +95,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 					{"k samples", 1E+3},
 					{"M samples", 1E+6},
 					{"G samples", 1E+9},
-					}, tr("Nr of samples"), 1024,
+					}, tr("Nr of samples"), 1000,
 					MAX_BUFFER_SIZE_ONESHOT,
 					true, false, this, {1, 2, 5})),
 	m_timePositionButton(new PositionSpinButton({
