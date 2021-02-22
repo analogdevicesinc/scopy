@@ -1837,7 +1837,7 @@ void LogicAnalyzer::startStop(bool start)
 				const uint64_t captureSize = std::min(chunk_size, totalSamples);
 
 				try {
-					const uint16_t * const temp = m_m2kDigital->getSamplesP(captureSize);
+					const uint16_t * const temp = m_m2kDigital->getSamplesP(chunk_size);
 					memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
 					absIndex += captureSize;
 					totalSamples -= captureSize;
