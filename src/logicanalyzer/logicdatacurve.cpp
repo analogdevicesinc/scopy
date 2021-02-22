@@ -69,10 +69,8 @@ void LogicDataCurve::dataAvailable(uint64_t from, uint64_t to)
     // Take into account the last pushed edge from the previous chunk of
     // available data
     uint64_t currentSample = from;
-    if (m_edges.size()) {
-        if (m_edges.back().first + 1 < currentSample) {
-            currentSample = m_edges.back().first + 1;
-        }
+    if (from > 0) {
+	    currentSample--;
     }
 
     if (from == to) {
@@ -229,87 +227,75 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
 
 
 
-    double dist = xMap.transform(fromSampleToTime(1)) - xMap.transform(fromSampleToTime(0));
+	double dist = xMap.transform(fromSampleToTime(1)) - xMap.transform(fromSampleToTime(0));
 
-    QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
-    uint64_t firstEdge = edgeAtX(fromTimeToSample(interval.minValue()), m_edges);
-    uint64_t lastEdge = edgeAtX(fromTimeToSample(interval.maxValue()), m_edges);
+	QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
+	uint64_t firstEdge = edgeAtX(fromTimeToSample(interval.minValue()), m_edges);
+	uint64_t lastEdge = edgeAtX(fromTimeToSample(interval.maxValue()), m_edges);
 
-    if (firstEdge > 0) {
-        firstEdge--;
-    }
-
-    if (lastEdge < m_edges.size() - 1) {
-        lastEdge++;
-    }
-
-    if (m_edges.size() == 1) { // corner case
-	    edges.emplace_back(m_edges.front());
-	    return;
-    }
-
-    // If plot is zoomed in / not so many edges close together
-    // draw them all
-    if (dist > 0.10) {
-
-	if (lastEdge == m_edges.size() - 1) {
-	    lastEdge = m_edges.size();
+	if (firstEdge > 0) {
+		firstEdge--;
 	}
 
-        for (; firstEdge < lastEdge; ++firstEdge) {
-            edges.emplace_back(m_edges[firstEdge]);
-        }
-    } else {
+	if (lastEdge < m_edges.size() - 1) {
+		lastEdge++;
+	}
 
-        const uint64_t pointsPerPixel = 1.0 / dist;
+	if (m_edges.size() == 1) { // corner case
+		edges.emplace_back(m_edges.front());
+		return;
+	}
 
-        // Save last transition (high, low)
-	bool reachedEnd = false;
-        bool lastTransition = m_edges[firstEdge].second;
-	for (; firstEdge < lastEdge && !reachedEnd; ) {
-            const int64_t lastSample = m_edges[firstEdge].first;
-            edges.emplace_back(m_edges[firstEdge]);
-
-            // Find the next edge that is at least "pointsPerPixel" away
-            // from the current one
-            auto next = std::upper_bound(m_edges.begin(), m_edges.end(),
-                        std::make_pair(edges.back().first + pointsPerPixel - 1, false),
-                        [=](const std::pair<uint64_t, bool> &lhs, const std::pair<uint64_t, bool> &rhs) -> bool {
-                return lhs.first < rhs.first;
-            });
-
-		if (next == m_edges.end()) {
-			next = m_edges.end() - 1;
-			reachedEnd = true;
+	// If plot is zoomed in / not so many edges close together
+	// draw them all
+	if (dist > 0.10) {
+		if (lastEdge == m_edges.size() - 1) {
+			lastEdge = m_edges.size();
 		}
 
-		auto previous = next;
-		std::advance(previous, -1);
+		for (; firstEdge < lastEdge; ++firstEdge) {
+			edges.emplace_back(m_edges[firstEdge]);
+		}
+	} else {
 
-            const int64_t a1 = (*next).first;
-            const int64_t a2 = (*previous).first;
+		const uint64_t pointsPerPixel = 1.0 / dist;
 
-            // If the distance between next found edge and it's predecessor is greater
-            // than the nr of samples/1px draw both edges as there will be a visible gap
-            // between the blocks and we want to make sure we display the correct logic level
-            if (std::abs(a1 - a2) > pointsPerPixel) {
-                edges.emplace_back(m_edges[std::distance(m_edges.begin(), previous)]);
-            } else {
-                const int64_t currentSample = (*next).first;
-                if ((*next).second == lastTransition) {
-                    edges.emplace_back((lastSample + currentSample) / 2, !lastTransition);
-                }
-            }
-
-            firstEdge = std::distance(m_edges.begin(), next);
-
-            lastTransition = (*next).second;
-
-	    if (reachedEnd) {
+		// always add the first edge
 		edges.emplace_back(m_edges[firstEdge]);
-	    }
-        }
-    }
+
+		for (; firstEdge < lastEdge; ) {
+			// Find the next edge that is at least "pointsPerPixel" away
+			// from the current one
+			auto next = std::upper_bound(m_edges.begin(), m_edges.end(),
+				std::make_pair(edges.back().first + pointsPerPixel - 1, false),
+				[=](const std::pair<uint64_t, bool> &lhs, const std::pair<uint64_t, bool> &rhs) -> bool {
+			return lhs.first < rhs.first;
+			});
+
+			bool didReachEnd = false;
+			if (next == m_edges.end()) {
+				next = m_edges.end() - 1;
+				didReachEnd = true;
+			}
+
+			if (next->second == edges.back().second) {
+				std::advance(next, -1);
+				if (didReachEnd) {
+					// If the end is reached (next == last edge) and it has the same transition as the last
+					// edge in the "edges" vector we have to add "next - 1" and "next" to the "edges" array
+					// in order to have valid transition, and also plot the last edge.
+					edges.emplace_back(*next);
+					std::advance(next, 1);
+					edges.emplace_back(*next);
+					break;
+				}
+			}
+
+			edges.emplace_back(*next);
+
+			firstEdge = std::distance(m_edges.begin(), next);
+		}
+	}
 }
 
 uint64_t LogicDataCurve::edgeAtX(int x, const std::vector<std::pair<uint64_t, bool>> &edges) const {
