@@ -53,6 +53,7 @@
 #include "osc_export_settings.h"
 #include "filemanager.h"
 #include "config.h"
+#include "state_updater.h"
 
 using namespace adiscope;
 using namespace adiscope::logic;
@@ -126,7 +127,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_oscPlot(nullptr),
 	m_oscChannelSelected(-1),
 	m_oscDecoderMenu(nullptr),
-	m_currentKernelBuffers(4)
+	m_currentKernelBuffers(4),
+	m_triggerUpdater(new StateUpdater(250, this))
 {
 	// setup ui
 	setupUi();
@@ -228,6 +230,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_sampleRateButton->setValue(m_sampleRate);
 	m_sampleRateButton->setIntegerDivider(m_sampleRateButton->maxValue());
 	m_bufferSizeButton->setValue(m_bufferSize);
+
+	m_triggerUpdater->setOffState(CapturePlot::Stop);
+	connect(m_triggerUpdater, &StateUpdater::outputChanged,
+		&m_plot, &CapturePlot::setTriggerState);
 
 	readPreferences();
 
@@ -1675,6 +1681,7 @@ void LogicAnalyzer::startStop(bool start)
 
 	m_started = start;
 
+	m_triggerUpdater->setEnabled(start);
 	if (start) {
 		if (m_captureThread) {
 			m_stopRequested = true;
@@ -1731,10 +1738,6 @@ void LogicAnalyzer::startStop(bool start)
 			QMetaObject::invokeMethod(this, [=](){
 				m_exportSettings->enableExportButton(true);
 			}, Qt::DirectConnection);
-
-			QMetaObject::invokeMethod(this, [=](){
-				m_plot.setTriggerState(CapturePlot::Waiting);
-			}, Qt::QueuedConnection);
 
 			uint64_t totalSamples = bufferSizeAdjusted;
 			uint64_t chunk_size = 0;
@@ -1819,32 +1822,45 @@ void LogicAnalyzer::startStop(bool start)
 					}
 				} while (true);
 
-				oneBufferTimeout /= m_currentKernelBuffers;
-			}
-
-			if (m_autoMode) {
-				QMetaObject::invokeMethod(this, [=](){
-					m_plot.setTriggerState(CapturePlot::Auto);
-				}, Qt::QueuedConnection);
-
-				QMetaObject::invokeMethod(this, [=](){
-					m_timer->start(oneBufferTimeout);
-				});
+				// time for one kernel buffer + 100ms for the transfer
+				oneBufferTimeout = ((oneBufferTimeout - 100) / m_currentKernelBuffers) + 100;
 			}
 
 			uint64_t absIndex = 0;
+
+			}
+
 			do {
 				const uint64_t captureSize = std::min(chunk_size, totalSamples);
 
 				try {
+					if (m_autoMode) {
+						QMetaObject::invokeMethod(this, [=](){
+							m_timer->start(oneBufferTimeout);
+						});
+					}
+
 					const uint16_t * const temp = m_m2kDigital->getSamplesP(chunk_size);
 					memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
+
 					absIndex += captureSize;
 					totalSamples -= captureSize;
 
-					QMetaObject::invokeMethod(this, [=](){
-						m_plot.setTriggerState(CapturePlot::Triggered);
-					}, Qt::QueuedConnection);
+					if (m_autoMode) {
+						QMetaObject::invokeMethod(this, [=](){
+							m_timer->stop();
+						});
+					}
+
+					if (m_triggerState.empty()) {
+						QMetaObject::invokeMethod(this, [=](){
+							m_triggerUpdater->setInput(CapturePlot::Triggered);
+						}, Qt::QueuedConnection);
+					} else {
+						QMetaObject::invokeMethod(this, [=](){
+							m_triggerUpdater->setInput(CapturePlot::Auto);
+						}, Qt::QueuedConnection);
+					}
 
 				} catch (libm2k::m2k_exception &e) {
 //					HANDLE_EXCEPTION(e)
@@ -1874,10 +1890,6 @@ void LogicAnalyzer::startStop(bool start)
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
 
-					QMetaObject::invokeMethod(this, [=](){
-						m_plot.setTriggerState(CapturePlot::Waiting);
-					}, Qt::QueuedConnection);
-
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
 			} while (totalSamples);
@@ -1893,10 +1905,6 @@ void LogicAnalyzer::startStop(bool start)
 
 			QMetaObject::invokeMethod(&m_plot,
 						  "replot");
-
-			QMetaObject::invokeMethod(this, [=](){
-				m_plot.setTriggerState(CapturePlot::Stop);
-			}, Qt::QueuedConnection);
 
 			QMetaObject::invokeMethod(this, [=](){
 				m_exportSettings->enableExportButton(true);
@@ -1918,11 +1926,7 @@ void LogicAnalyzer::startStop(bool start)
 			m_captureThread = nullptr;
 			restoreTriggerState();
 		}
-
-		m_plot.setTriggerState(CapturePlot::Stop);
-
 	}
-
 }
 
 void LogicAnalyzer::setupDecoders()
@@ -2218,7 +2222,6 @@ void LogicAnalyzer::setupTriggerMenu()
 {
 	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
 		m_autoMode = toggled;
-
 		if (m_autoMode && m_started) {
 
 			double oneBufferTimeOut = m_timerTimeout;
@@ -2231,6 +2234,14 @@ void LogicAnalyzer::setupTriggerMenu()
 
 			qDebug() << "auto mode: " << m_autoMode << " with timeout: "
 				 << oneBufferTimeOut << " when logic is started: " << m_started;
+		}
+
+		if (toggled) {
+			m_triggerUpdater->setIdleState(CapturePlot::Auto);
+			m_triggerUpdater->setInput(CapturePlot::Auto);
+		} else {
+			m_triggerUpdater->setIdleState(CapturePlot::Waiting);
+			m_triggerUpdater->setInput(CapturePlot::Waiting);
 		}
 
 		if (!m_autoMode) {
@@ -2301,9 +2312,6 @@ void LogicAnalyzer::setupTriggerMenu()
 
 	connect(m_timer, &QTimer::timeout,
 		this, &LogicAnalyzer::saveTriggerState);
-
-	m_plot.setTriggerState(CapturePlot::Stop);
-
 }
 
 void LogicAnalyzer::saveTriggerState()

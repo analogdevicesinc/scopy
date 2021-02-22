@@ -61,6 +61,7 @@ class Filter;
 class BaseMenu;
 class LogicAnalyzer_API;
 class ExportSettings;
+class StateUpdater;
 
 namespace logic {
 
@@ -209,6 +210,8 @@ private:
 	QMetaObject::Connection m_oscChannelSelectedConnection;
 
 	int m_currentKernelBuffers;
+
+	StateUpdater *m_triggerUpdater;
 
 
 };
