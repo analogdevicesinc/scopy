@@ -112,6 +112,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_resetHorizAxisOffset(true),
 	m_captureThread(nullptr),
 	m_stopRequested(false),
+	m_acquisitionStarted(false),
 	m_plotScrollBar(new QScrollBar(Qt::Vertical, this)),
 	m_started(false),
 	m_selectedChannel(-1),
@@ -1828,7 +1829,14 @@ void LogicAnalyzer::startStop(bool start)
 
 			uint64_t absIndex = 0;
 
+			// notify that the acquisition started one waiting for it
+			// to start, in order to correctly stop it
+			{
+				std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
+				m_m2kDigital->startAcquisition(chunk_size);
+				m_acquisitionStarted = true;
 			}
+			m_acquisitionStartedCv.notify_one();
 
 			do {
 				const uint64_t captureSize = std::min(chunk_size, totalSamples);
@@ -1915,6 +1923,14 @@ void LogicAnalyzer::startStop(bool start)
 
 	} else {
 		if (m_captureThread) {
+			// a stop request might be triggered before getting to getSamplesP,
+			// thus cancelAcquisition in this case will be a no-op. In order to avoid
+			// this issue we wait for acquisition to be started
+			{
+				std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
+				m_acquisitionStartedCv.wait(lock, [=]{ return m_acquisitionStarted; });
+			}
+
 			m_stopRequested = true;
 			try {
 				m_m2kDigital->cancelAcquisition(); // cancelBufferIn
@@ -1923,6 +1939,8 @@ void LogicAnalyzer::startStop(bool start)
 			}
 
 			m_captureThread->join();
+			m_acquisitionStarted = false;
+
 			delete m_captureThread;
 			m_captureThread = nullptr;
 			restoreTriggerState();
