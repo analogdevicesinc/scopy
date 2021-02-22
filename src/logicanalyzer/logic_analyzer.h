@@ -177,9 +177,10 @@ private:
 	// capture
 	std::thread *m_captureThread;
 	std::atomic<bool> m_stopRequested;
+	bool m_acquisitionStarted;
 	// prob not needed
-	std::mutex m_captureMutex;
-	std::condition_variable m_captureCv;
+	std::mutex m_acquisitionStartedMutex;
+	std::condition_variable m_acquisitionStartedCv;
 
 	bool m_started;
 
