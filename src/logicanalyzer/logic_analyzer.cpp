@@ -1886,6 +1886,7 @@ void LogicAnalyzer::startStop(bool start)
 
 				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					m_m2kDigital->stopAcquisition();
+					m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
 
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
