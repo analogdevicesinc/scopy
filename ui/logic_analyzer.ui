@@ -1248,6 +1248,9 @@ color: rgba(255,255,255,51);
                         <property name="enabled">
                          <bool>false</bool>
                         </property>
+                        <property name="minimumContentsLength">
+                         <number>26</number>
+                        </property>
                        </widget>
                       </item>
                       <item row="1" column="1">
