@@ -1894,14 +1894,27 @@ void LogicAnalyzer::startStop(bool start)
 
 				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					m_m2kDigital->stopAcquisition();
+					{
+						std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
+						m_acquisitionStarted = false;
+					}
 					m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
+
+					// notify that the acquisition started one waiting for it
+					// to start, in order to correctly stop it
+					{
+						std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
+						m_m2kDigital->startAcquisition(chunk_size);
+						m_acquisitionStarted = true;
+					}
+					m_acquisitionStartedCv.notify_one();
 
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
 
 					std::this_thread::sleep_for(std::chrono::milliseconds(100));
 				}
-			} while (totalSamples);
+			} while (totalSamples && !m_stopRequested);
 
 			m_started = false;
 
