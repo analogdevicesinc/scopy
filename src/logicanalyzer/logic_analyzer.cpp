@@ -2350,6 +2350,11 @@ void LogicAnalyzer::saveTriggerState()
 {
 	// save trigger state and set to no trigger each channel
 	if (m_started && !m_triggerState.size()) {
+		const bool streaming = !ui->btnStreamOneShot->isChecked();
+		if (streaming) {
+			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(false);
+		}
+
 		for (int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
@@ -2358,6 +2363,10 @@ void LogicAnalyzer::saveTriggerState()
 		auto externalTriggerCondition = m_m2kDigital->getTrigger()->getDigitalExternalCondition();
 		m_triggerState.push_back(externalTriggerCondition);
 		m_m2kDigital->getTrigger()->setDigitalExternalCondition(M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
+
+		if (streaming) {
+			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(true);
+		}
 	}
 }
 
@@ -2365,12 +2374,21 @@ void LogicAnalyzer::restoreTriggerState()
 {
 	// restored saved trigger state
 	if (m_triggerState.size()) {
+		const bool streaming = !ui->btnStreamOneShot->isChecked();
+		if (streaming) {
+			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(false);
+		}
+
 		for (int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, m_triggerState[i]);
 		}
 
 		m_m2kDigital->getTrigger()->setDigitalExternalCondition(m_triggerState.back());
+
+		if (streaming) {
+			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(true);
+		}
 
 		m_triggerState.clear();
 	}
