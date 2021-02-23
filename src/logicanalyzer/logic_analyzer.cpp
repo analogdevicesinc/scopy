@@ -1890,7 +1890,7 @@ void LogicAnalyzer::startStop(bool start)
 
 				QMetaObject::invokeMethod(this,
 							  "restoreTriggerState",
-							  Qt::DirectConnection);
+							  Qt::QueuedConnection);
 
 				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					m_m2kDigital->stopAcquisition();
