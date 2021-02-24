@@ -1923,7 +1923,9 @@ void LogicAnalyzer::startStop(bool start)
 							  "toggle",
 							  Qt::QueuedConnection,
 							  Q_ARG(bool, false));
+				m_triggerUpdater->setEnabled(false);
 			}
+			m_m2kDigital->stopAcquisition();
 
 			QMetaObject::invokeMethod(&m_plot,
 						  "replot");
