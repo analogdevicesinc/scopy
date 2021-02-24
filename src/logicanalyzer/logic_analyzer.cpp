@@ -1126,7 +1126,7 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 	}
 
 	m_plot.enableTimeTrigger(toggled);
-	m_timePositionButton->setVisible(toggled);
+	m_timePositionButton->setEnabled(toggled);
 
 	m_m2kDigital->getTrigger()->setDigitalStreamingFlag(toggled);
 
