@@ -827,7 +827,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	connect(this, &Tool::detachedState,
 		this, &Oscilloscope::toolDetached);
-	min_detached_width = this->minimumWidth();
 	toolDetached(false);
 
 	connect(&plot,SIGNAL(leftGateChanged(double)),SLOT(onLeftGateChanged(double)));
@@ -1876,7 +1875,7 @@ void Oscilloscope::toggleCursorsMode(bool toggled)
 void Oscilloscope::toolDetached(bool detached)
 {
 	if (detached) {
-		this->setMinimumWidth(min_detached_width);
+		this->setMinimumSize(920, 500);
 		this->setSizePolicy(QSizePolicy::Preferred,
 				    QSizePolicy::Preferred);
 	} else {
