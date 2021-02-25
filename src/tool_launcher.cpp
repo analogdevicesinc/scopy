@@ -1814,6 +1814,8 @@ void ToolLauncher::toolDetached(bool detached)
 	}
 
 	tool->setVisible(detached);
+
+	tool->setMinimumSize(920, 500);
 }
 
 void ToolLauncher::closeEvent(QCloseEvent *event)
