@@ -8,6 +8,5 @@ moc_*.cpp
 ui_*.h
 build
 deps
-scopy
 *.swp
 html/
