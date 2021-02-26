@@ -411,6 +411,16 @@ bool InfoPage::supportsCalibration()
 	return false;
 }
 
+QString InfoPage::getFirmwareVersion() const
+{
+	return m_info_params.value("Firmware version", "");
+}
+
+QString InfoPage::getSerialNumber() const
+{
+	return m_info_params.value("Serial", "");
+}
+
 M2kInfoPage::M2kInfoPage(QString uri,
 			 Preferences* prefPanel,
 			 PhoneHome* phoneHome,

@@ -74,6 +74,9 @@ public:
 	bool supportsIdentification();
 	bool supportsCalibration();
 
+	QString getFirmwareVersion() const;
+	QString getSerialNumber() const;
+
 public Q_SLOTS:
 	void readPreferences();
 	void identifyDevice(bool clicked = true);
