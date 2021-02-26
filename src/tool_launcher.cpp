@@ -690,6 +690,7 @@ ToolLauncher::~ToolLauncher()
 	delete infoWidget;
 	delete m_phoneHome;
 	tl_api->ApiObject::save(*settings);
+	m_sessionInfo.save(*settings);
 
 	delete settings;	
 	SingleToneWrapper<QSettings *>::getInstance().setWrapped(nullptr);
@@ -1204,7 +1205,6 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 
 				alive_timer->start(ALIVE_TIMER_TIMEOUT_MS);
 				ui->saveBtn->parentWidget()->setEnabled(true);
-
 			} else {
 				setDynamicProperty(ui->btnConnect, "failed", true);
 				selectedDev->setConnected(false, true);
@@ -1574,6 +1574,9 @@ void adiscope::ToolLauncher::enableDacBasedTools()
 
 	if (m_adc_tools_failed || m_dac_tools_failed) {
 		disconnect();
+	} else {
+		m_sessionInfo.setLastConnectedFirmware(selectedDev->infoPage()->getFirmwareVersion());
+		m_sessionInfo.setLastConnectedSerialNumber(selectedDev->infoPage()->getSerialNumber());
 	}
 }
 

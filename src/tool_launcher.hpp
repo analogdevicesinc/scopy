@@ -54,6 +54,7 @@
 #include "device_widget.hpp"
 #include "connectDialog.hpp"
 #include "toolmenu.h"
+#include "session_info.h"
 
 extern "C" {
 	struct iio_context;
@@ -272,6 +273,8 @@ private:
 	void stopToolsBeforeCalibration();
 
 	PhoneHome* m_phoneHome;
+
+	SessionInfo m_sessionInfo;
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H
