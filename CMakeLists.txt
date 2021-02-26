@@ -173,8 +173,16 @@ endif()
 
 find_library(QWTPOLAR_LIBRARIES qwtpolar)
 find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
-if (NOT QWTPOLAR_LIBRARIES OR NOT QWTPOLAR_INCLUDE_DIRS)
-	message(SEND_ERROR "QwtPolar not found")
+if (QWTPOLAR_LIBRARIES)
+	message(STATUS "QwtPolar libraries found - ${QWTPOLAR_LIBRARIES}")
+else()
+	message(STATUS "QwtPolar libraries not found - assuming they are built in Qwt")
+	set(QWTPOLAR_LIBRARIES "")
+endif()
+if (NOT QWTPOLAR_INCLUDE_DIRS)
+	message(SEND_ERROR "QwtPolar includes not found")
+else()
+	message(STATUS "Found QwtPolar include files - ${QWTPOLAR_INCLUDE_DIRS}/qwt_polar_plot.h")
 endif()
 
 find_package(PkgConfig)
@@ -342,6 +350,7 @@ add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
 if (WIN32 OR ENABLE_APPLICATION_BUNDLE)
 	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
 endif()
+
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${BREAKPAD_LIBRARIES}
 		${BREAKPADCLIENT_LIBRARIES}
