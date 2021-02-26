@@ -249,6 +249,7 @@ void ToolLauncher_API::save(const QString& file)
 	QSettings settings(file, QSettings::IniFormat);
 
 	this->ApiObject::save(settings);
+	this->tl->m_sessionInfo.save(settings);
 
 	if (tl->notesPanel)
 		tl->notesPanel->api()->save(settings);
