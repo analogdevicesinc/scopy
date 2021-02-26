@@ -25,9 +25,14 @@
 
 using namespace adiscope;
 
+bool PhoneHome::getDone() const
+{
+	return done;
+}
+
 PhoneHome::PhoneHome(QSettings *settings, Preferences *pref) :
 	ApiObject(), m_timestamp(0), m_versionsJson(""),
-	preferences(pref), settings(settings)
+	preferences(pref), settings(settings), done(false)
 {
 	setObjectName("phonehome");
 	load(*settings);
@@ -73,8 +78,10 @@ void PhoneHome::extractVersionStringsFromJson(const QJsonDocument &doc)
 	m_m2kVersion = content["m2k-fw"].toMap()["version"].toString();
 	m_scopyLink = content["scopy"].toMap()["link"].toString();
 	m_m2kLink = content["m2k-fw"].toMap()["link"].toString();
+	done = true;
 	Q_EMIT scopyVersionChanged();
 	Q_EMIT m2kVersionChanged();
+
 }
 
 void PhoneHome::onVersionsRequestFinished(QNetworkReply* reply)

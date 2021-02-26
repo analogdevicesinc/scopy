@@ -43,6 +43,7 @@ private:
 	PhoneHome* instance;
 	Preferences* preferences;
 	QSettings *settings;
+	bool done;
 
 
 	Q_PROPERTY(QString timestamp READ getTimestamp WRITE setTimestamp)
@@ -62,6 +63,7 @@ public:
 	void setTimestamp(QString);
 	QString getVersionsJson() const;
 	void setVersionsJson(const QString &val);
+	bool getDone() const;
 
 Q_SIGNALS:
 	void scopyVersionCheckRequested();
