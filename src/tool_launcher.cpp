@@ -913,31 +913,7 @@ void ToolLauncher::setupHomepage()
 	layout->addWidget(reportRegion);
 
 	connect(reportBtn, &QPushButton::clicked, [=](){
-		std::string os = QSysInfo::prettyProductName().toStdString();
-		std::string gittag = SCOPY_VERSION_GIT;
-		std::string fw = "";
-		if (ctx) {
-			fw = std::string(iio_context_get_attr_value(ctx, "fw_version"));
-		}
-		QSettings settings;
-		QFileInfo info(settings.fileName());
-		QString log_file_location = QFileInfo(settings.fileName()).absolutePath();
-		log_file_location.append("/ScopyLog-*");
-		std::string head = "https://github.com/analogdevicesinc/scopy/issues/new?title=%3CInstrument%3E:%20%3CShort%20description%20of%20the%20bug%3E&body=";
-		std::string os_version_urlstring = "OS%20Version: " + os;
-		std::string fw_version_urlstring = "%0AFW%20Version: " + fw;
-		std::string gittag_urlstring = "%0ASW%20Version: " + gittag;
-		std::string description_urlstring = "%0A%0ADescription%20of%20the%20bug:%3Cdescription%3E%0ASteps%20to%20reproduce:"
-					  "%0A-%0A-%0A%0AThe%20ini%20and%20the%20log%20files%20might%20be%20useful%20to%20reproduce%20the%20error."
-					  "%0ABy%20default%20Scopy%20logging%20is%20disabled.%20To%20enable%20the%20logging%20system%20check%20'Enable%20logging'%20from%20Preferences%20"
-					  "and%20then%20try%20to%20reproduce%20the%20bug.";
-		std::string ini_file_urlstring = "%0AThe%20ini%20file%20is%20located%20at: " + info.absoluteFilePath().toStdString();
-		std::string log_file_urlstring = "%0AThe%20log%20file%20is%20located%20at: " + log_file_location.toStdString();
-		std::string finalpart = "%0APlease%20consider%20attaching%20them.&labels=bug,reported-from-scopy";
-		QUrl url(QString::fromStdString(head + os_version_urlstring +
-						fw_version_urlstring + gittag_urlstring +
-						description_urlstring + ini_file_urlstring +
-						log_file_urlstring + finalpart));
+		const QUrl url("https://wiki.analog.com/university/tools/m2k/scopy/report");
 		QDesktopServices::openUrl(url);
 	});
 
