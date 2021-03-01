@@ -9,15 +9,16 @@ class TwoButtonsWidget;
 
 namespace scopy {
 namespace gui {
-class TwoButtonsWidget : public QWidget {
-  Q_OBJECT
+class TwoButtonsWidget : public QWidget
+{
+	Q_OBJECT
 
 public:
-  explicit TwoButtonsWidget(const QString &text, QWidget *parent = nullptr);
-  virtual ~TwoButtonsWidget();
+	explicit TwoButtonsWidget(const QString& text, QWidget* parent = nullptr);
+	virtual ~TwoButtonsWidget();
 
 private:
-  Ui::TwoButtonsWidget *ui;
+	Ui::TwoButtonsWidget* m_ui;
 };
 } // namespace gui
 } // namespace scopy
