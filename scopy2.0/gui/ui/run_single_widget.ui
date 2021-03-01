@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RunSingleWidget</class>
+ <widget class="QWidget" name="RunSingleWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>300</width>
+    <height>78</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="runButton">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>20</y>
+     <width>100</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+QPushButton[running=true] {
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+  background-color: grey;
+}</string>
+   </property>
+   <property name="text">
+    <string>Run</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>8</width>
+     <height>10</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="singleButton">
+   <property name="geometry">
+    <rect>
+     <x>180</x>
+     <y>20</y>
+     <width>100</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #ff7200;
+  color: white;
+  
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+QPushButton[running=true] {
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+  background-color: grey;
+}</string>
+   </property>
+   <property name="text">
+    <string>Single</string>
+   </property>
+   <property name="iconSize">
+    <size>
+     <width>10</width>
+     <height>10</height>
+    </size>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

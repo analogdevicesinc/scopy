@@ -14,17 +14,23 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 add_library(gui SHARED
         # source files
-        src/twobuttonswidget.cpp
+	src/two_buttons_widget.cpp
+
+	src/run_single_widget.cpp
+	src/dynamic_widget.cpp
+	src/dynamic_widget.hpp
 
         # ui files
-        ui/twobuttonswidget.ui
+	ui/two_buttons_widget.ui
+
+	ui/run_single_widget.ui
 
         # resources
         resources/resources.qrc
 )
 
 # MOC hack in order to have the header files in include/scopy/gui
-file(GLOB_RECURSE HEADERS_TO_MOC ${CMAKE_CURRENT_SOURCE_DIR}/include/scopy/gui/*.h)
+file(GLOB_RECURSE HEADERS_TO_MOC ${CMAKE_CURRENT_SOURCE_DIR}/include/scopy/gui/*.hpp)
 qt5_wrap_cpp(gui_moc
     ${HEADERS_TO_MOC}
   TARGET gui
