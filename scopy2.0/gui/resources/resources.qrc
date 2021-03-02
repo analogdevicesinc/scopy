@@ -1,5 +1,27 @@
 <RCC>
     <qresource prefix="/">
         <file>twobuttonsstylesheet</file>
+        <file>stylesheets/channel_widget.qss</file>
+        <file>stylesheets/global.qss</file>
+        <file>stylesheets/smallOnOffSwitch.qss</file>
+        <file>icons/Gear.png</file>
+        <file>icons/gear_wheel_hover.png</file>
+        <file>icons/gear_wheel_pressed.svg</file>
+        <file>icons/ic-locked.svg</file>
+        <file>icons/ic-unlocked.svg</file>
+        <file>icons/sba_cmb_box_arrow.svg</file>
+        <file>icons/sba_cmb_box_arrow_right.svg</file>
+        <file>icons/sba_dn_btn.svg</file>
+        <file>icons/sba_dn_btn_hover.svg</file>
+        <file>icons/sba_dn_btn_pressed.svg</file>
+        <file>icons/sba_up_btn.svg</file>
+        <file>icons/sba_up_btn_hover.svg</file>
+        <file>icons/sba_up_btn_pressed.svg</file>
+        <file>icons/setup3_checked_hover.svg</file>
+        <file>icons/setup3_unchecked.png</file>
+        <file>icons/setup3_unchecked_hover.png</file>
+        <file>icons/setup_btn_checked.svg</file>
+        <file>icons/setup_btn_hover.svg</file>
+        <file>icons/setup_btn_unchecked.svg</file>
     </qresource>
 </RCC>

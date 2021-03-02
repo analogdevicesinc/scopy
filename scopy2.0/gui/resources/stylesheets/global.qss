@@ -1,0 +1,122 @@
+/*********************************** Global *******************************************/
+
+QMainWindow > .QWidget {
+	background-color: #F7F7F7;
+}
+
+/* Default settings for QWidget and its sub-classes */
+QWidget {
+	background-color: transparent;
+	color: #141416;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 13px;
+}
+
+QLabel {
+	color: rgba(0, 0, 0, 200);
+	font-size: 13px;
+	font-style: normal;
+	font-weight: normal;
+	text-align: left;
+}
+
+QLabel:disabled, QRadioButton:disabled {color: rgba(0, 0, 0, 70); }
+
+QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 200);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+
+QLineEdit {
+	color: rgba(0, 0, 0, 200);
+	font-size: 16px;
+	border: 0px solid gray;
+	border-bottom: 1px solid rgba(0, 0, 0, 40);
+	padding: 2px;
+}
+
+QComboBox {
+	height: 24px;
+	border: none;
+	font-size: 14px;
+
+	border-bottom: 1px solid rgba(0, 0, 0, 40);
+	padding-bottom: 4px;
+}
+
+QComboBox:disabled, QLineEdit:disabled { color: rgba(0, 0, 0, 70); }
+
+QComboBox QAbstractItemView {
+	border: none;
+	background-color: white;
+	text-align: left;
+	color: #bebebe;
+	outline: none;
+
+	border-bottom: 1px solid #bebebe;
+	border-top: 1px solid #bebebe;
+}
+
+/* This only works on Windows */
+QComboBox QAbstractItemView {
+	selection-background-color: #EDEDED;
+}
+
+/* This does not work on Windows */
+QComboBox::item:selected {
+	font-weight: bold;
+	font-size: 18px;
+	border-bottom: 0px solid none;
+	background-color: #EDEDED;
+}
+
+QComboBox::drop-down {
+	subcontrol-position: center right;
+	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	width: 10px;
+	height: 6px;
+	font-size: 16px;
+	text-align: left;
+}
+
+QComboBox::indicator {
+	background-color: transparent;
+	selection-background-color: transparent;
+	color: transparent;
+	selection-color: transparent;
+}
+
+/*********************************** Subsection separator *******************************************/
+
+QLabel#lblSubsectionSeparator{
+	font-size: 12px;
+	color: rgba(0, 0, 0, 70);
+}
+
+QFrame#lineSubsectionSeparator{ border: 1px solid rgba(0, 0, 0, 70); }
+
+QPushButton#btnSubsectionSeparator{
+	max-height: 6px;
+	max-width: 10px;
+	border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}
+
+QPushButton#btnSubsectionSeparator:checked{
+	max-height: 10px;
+	max-width:  6px;
+	border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
