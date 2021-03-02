@@ -14,7 +14,11 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="centralLayout"/>
+   <layout class="QHBoxLayout" name="centralLayout">
+    <item>
+     <layout class="QVBoxLayout" name="vLayout"/>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>
