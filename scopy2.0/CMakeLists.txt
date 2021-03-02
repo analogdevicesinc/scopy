@@ -33,3 +33,6 @@ add_subdirectory(plugins)
 
 # scopy application
 add_subdirectory(app)
+
+include(cmake/doxygen.cmake)
+enable_doxygen("scopy::gui;")
