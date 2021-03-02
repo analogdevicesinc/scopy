@@ -18,9 +18,11 @@ add_library(
     src/two_buttons_widget.cpp
     src/run_single_widget.cpp
     src/dynamic_widget.cpp
+    src/subsection_separator.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
+    ui/subsection_separator.ui
     # resources
     resources/resources.qrc
 )
