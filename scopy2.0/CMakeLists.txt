@@ -19,6 +19,9 @@ target_compile_options(project_warnings INTERFACE -Wall)
 include(cmake/sanitizers.cmake)
 enable_sanitizers(project_options)
 
+# allow code style analysis
+include(cmake/codeStyle.cmake)
+
 # scopy core library
 add_subdirectory(core)
 
