@@ -16,3 +16,14 @@ when configuring the project. After this the following command can be used in th
 ```
 make cmake-format
 ```
+
+# Documentation
+
+For documentation we use Doxygen. In order to generate documentation the following option must be passed when configuring the project
+```
+-DENABLE_DOXYGEN=on
+```
+After this the following command can be used in the build folder to generate documentation
+```
+make doxygen
+```
