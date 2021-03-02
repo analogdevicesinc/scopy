@@ -9,17 +9,9 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
-add_executable(scopy
-        mainwindow.cpp
-        main.cpp
+add_executable(scopy mainwindow.cpp main.cpp mainwindow.ui)
 
-        mainwindow.ui
-)
-
-target_link_libraries(scopy
-        PRIVATE
-                Qt${QT_VERSION_MAJOR}::Widgets
-                scopy::gui
-                project_options
-                project_warnings
+target_link_libraries(
+    scopy PRIVATE Qt${QT_VERSION_MAJOR}::Widgets scopy::gui project_options
+                  project_warnings
 )
