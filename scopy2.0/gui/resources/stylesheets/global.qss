@@ -100,7 +100,7 @@ QComboBox::indicator {
 	selection-color: transparent;
 }
 
-/*********************************** Subsection separator *******************************************/
+/*********************************** SubsectionSeparator ***************************************/
 
 QLabel#lblSubsectionSeparator{
 	font-size: 12px;
@@ -119,4 +119,57 @@ QPushButton#btnSubsectionSeparator:checked{
 	max-height: 10px;
 	max-width:  6px;
 	border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
+
+/****************************************  SettingsPairWidget *********************************/
+
+/* Style for settings and general settings buttons from all menus */
+
+QPushButton[menu_icon_button=true] {
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 60px;
+	 max-width: 60px;
+	 padding-top:5px
+}
+
+QPushButton[menu_icon_button=true]:checked { border-top: 1px solid rgba(0, 0, 0, 150); }
+
+QPushButton[menu_icon_button=true]:!checked { border-top: 1px solid rgba(0, 0, 0, 0); }
+
+QPushButton[menu_icon_button=true]:!checked:hover { border-top: 1px solid rgba(0, 0, 0, 0); }
+
+QPushButton[menu_icon_button=true]:checked:hover { border-top: 1px solid rgba(0, 0, 0, 200); }
+
+QPushButton[general_settings_icon=true]:checked {
+  image: url(:/icons/gear_wheel_pressed.svg);
+}
+
+QPushButton[general_settings_icon=true]:!checked {
+  image: url(:/icons/Gear.png);
+}
+
+
+QPushButton[general_settings_icon=true]:!checked:hover {
+  image: url(:/icons/gear_wheel_hover.png);
+}
+
+QPushButton[general_settings_icon=true]:checked:hover {
+  image: url(:/icons/gear_wheel_pressed.svg);
+}
+
+QPushButton[settings_icon=true]:checked {
+  image: url(:/icons/setup3_checked_hover.svg);
+}
+
+QPushButton[settings_icon=true]:!checked {
+  image: url(:/icons/setup3_unchecked.png);
+}
+
+QPushButton[settings_icon=true]:!checked:hover {
+  image: url(:/icons/setup3_unchecked_hover.png);
+}
+
+QPushButton[settings_icon=true]:checked:hover {
+  image: url(:/icons/setup3_checked_hover.svg);
 }
