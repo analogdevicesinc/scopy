@@ -19,10 +19,13 @@ add_library(
     src/run_single_widget.cpp
     src/dynamic_widget.cpp
     src/subsection_separator.cpp
+    src/settings_pair_widget.cpp
+    src/custom_push_button.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
     ui/subsection_separator.ui
+    ui/settings_pair_widget.ui
     # resources
     resources/resources.qrc
 )
@@ -49,6 +52,7 @@ set_target_properties(
 target_include_directories(
     gui PUBLIC $<INSTALL_INTERFACE:include>
                $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(
