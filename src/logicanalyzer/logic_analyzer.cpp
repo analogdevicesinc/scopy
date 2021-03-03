@@ -260,17 +260,17 @@ LogicAnalyzer::~LogicAnalyzer()
 
 	disconnect(prefPanel, &Preferences::notify, this, &LogicAnalyzer::readPreferences);
 
-	for (auto &curve : m_plotCurves) {
-		m_plot.removeDigitalPlotCurve(curve);
-		delete curve;
-	}
-
 	if (m_captureThread) {
 		m_stopRequested = true;
 		m_m2kDigital->cancelAcquisition();
 		m_captureThread->join();
 		delete m_captureThread;
 		m_captureThread = nullptr;
+	}
+
+	for (auto &curve : m_plotCurves) {
+		m_plot.removeDigitalPlotCurve(curve);
+		delete curve;
 	}
 
 	if (m_buffer) {
