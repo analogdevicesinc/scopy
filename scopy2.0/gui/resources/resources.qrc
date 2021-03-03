@@ -1,9 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>twobuttonsstylesheet</file>
-        <file>stylesheets/channel_widget.qss</file>
         <file>stylesheets/global.qss</file>
-        <file>stylesheets/smallOnOffSwitch.qss</file>
         <file>icons/Gear.png</file>
         <file>icons/gear_wheel_hover.png</file>
         <file>icons/gear_wheel_pressed.svg</file>
