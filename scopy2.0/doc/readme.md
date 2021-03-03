@@ -74,5 +74,8 @@ When adding gui elements in .ui files make sure to follow the naming convention 
 | QHBoxLayout | hLayout* |
 | QVBoxLayout | vLayout* |
 | QPushButton | btn* |
-| QLabel | label* |
+| QComboBox | cmbBox* |
+| QCheckBox | checkBox* |
+| QLineEdit | lineEdit* |
+| QLabel | lbl* |
 | Line | line* |
