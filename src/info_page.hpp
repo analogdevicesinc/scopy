@@ -131,6 +131,7 @@ public:
 	~M2kInfoPage();
 
 	void getDeviceInfo() override;
+	void updateFwVersionWidget();
 	void setCtx(iio_context *ctx) override;
 	int checkLatestFwVersion(const QString &currentVersion) const;
 
