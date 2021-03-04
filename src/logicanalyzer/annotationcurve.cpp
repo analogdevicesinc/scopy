@@ -441,8 +441,15 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
 
 	painter->save();
 
-	painter->setPen(QPen(QBrush(Qt::white), 2));
-	painter->setBrush(QBrush(Qt::black));
+	QColor painterColor;
+
+	if (QIcon::themeName() == "scopy-default") {
+		painterColor = Qt::white;
+	} else {
+		painterColor = Qt::black;
+	}
+
+	painter->setPen(QPen(QBrush(painterColor), 2));
 	int currentTitleIndex = 0;
 	const int pixOffsetFromCanvasMargin = 5;
 	for (const QString &title : titles) {
