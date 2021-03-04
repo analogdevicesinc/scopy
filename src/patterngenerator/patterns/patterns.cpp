@@ -34,6 +34,7 @@
 #include "../pattern_generator.h"
 #include "../../logicanalyzer/annotationcurve.h"
 #include "../../logicanalyzer/annotationdecoder.h"
+#include "dynamicWidget.hpp"
 
 #include <math.h>
 
@@ -778,9 +779,11 @@ void NumberPatternUI::parse_ui()
 
 	max = (1 << pattern->nrOfChannels()) - 1;
 	if (val <= max && ok) {
-		ui->numberLineEdit->setStyleSheet("color:white");
+		setDynamicProperty(ui->numberLineEdit, "valid", true);
+		setDynamicProperty(ui->numberLineEdit, "invalid", false);
 	} else {
-		ui->numberLineEdit->setStyleSheet("color:red");
+		setDynamicProperty(ui->numberLineEdit, "invalid", true);
+		setDynamicProperty(ui->numberLineEdit, "valid", false);
 	}
 
 	pattern->set_nr(val);
@@ -2031,9 +2034,11 @@ void I2CPatternUI::parse_ui()
 	}
 
 	if (fail) {
-		ui->LE_toSend->setStyleSheet("color:red");
+		setDynamicProperty(ui->LE_toSend, "invalid", true);
+		setDynamicProperty(ui->LE_toSend, "valid", false);
 	} else {
-		ui->LE_toSend->setStyleSheet("color:white");
+		setDynamicProperty(ui->LE_toSend, "valid", true);
+		setDynamicProperty(ui->LE_toSend, "invalid", false);
 	}
 
 
@@ -2431,9 +2436,11 @@ void SPIPatternUI::parse_ui()
 	}
 
 	if (fail) {
-		ui->LE_toSend->setStyleSheet("color:red");
+		setDynamicProperty(ui->LE_toSend, "invalid", true);
+		setDynamicProperty(ui->LE_toSend, "valid", false);
 	} else {
-		ui->LE_toSend->setStyleSheet("color:white");
+		setDynamicProperty(ui->LE_toSend, "valid", true);
+		setDynamicProperty(ui->LE_toSend, "invalid", false);
 	}
 
 
