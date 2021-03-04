@@ -10,6 +10,9 @@
     <height>818</height>
    </rect>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -56,6 +59,9 @@
    </item>
    <item>
     <widget class="QScrollArea" name="scrollArea">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
@@ -67,7 +73,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1066</width>
+        <width>1068</width>
         <height>760</height>
        </rect>
       </property>

@@ -494,6 +494,9 @@
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
                    <property name="horizontalScrollBarPolicy">
                     <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
@@ -508,8 +511,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>322</height>
+                      <width>400</width>
+                      <height>474</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1344,6 +1347,9 @@ color: rgba(255,255,255,51);
                  </property>
                  <item>
                   <widget class="QScrollArea" name="generalSettingsScrollArea">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
                    <property name="horizontalScrollBarPolicy">
                     <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
@@ -1356,7 +1362,7 @@ color: rgba(255,255,255,51);
                       <x>0</x>
                       <y>0</y>
                       <width>420</width>
-                      <height>472</height>
+                      <height>474</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
