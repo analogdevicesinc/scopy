@@ -235,23 +235,6 @@ void InfoPage::refreshInfoWidget()
 	else
 		setStatusLabel(ui->lblIdentifyStatus, tr("Your hardware revision does not support the identify feature"));
 
-	if(m_phoneHome->getDone())
-	{
-		const int checked = dynamic_cast<M2kInfoPage*>(this)->checkLatestFwVersion(m_info_params.value("Firmware version"));
-		if (checked == 1) {
-			ui->lblFirmware->setText(tr("Firmware is up to date!"));
-		} else if (checked == 0) {
-			const QString message = tr("New firmware version is available. ") +
-							  "Download " + m_phoneHome->getM2kVersion() + " "
-							  "<a href=\"";
-			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\">here</a>");
-			ui->lblFirmware->setTextFormat(Qt::RichText);
-			ui->lblFirmware->setTextInteractionFlags(Qt::TextBrowserInteraction);
-			ui->lblFirmware->setOpenExternalLinks(true);
-		}
-	}
-
-
 	if(supportsCalibration())
 		ui->btnCalibrate->setVisible(true);
 
@@ -455,9 +438,29 @@ M2kInfoPage::~M2kInfoPage()
 
 }
 
+
+void M2kInfoPage::updateFwVersionWidget() {
+	if(m_phoneHome->getDone())
+	{
+		const int checked = this->checkLatestFwVersion(m_info_params.value("Firmware version"));
+		if (checked == 1) {
+			ui->lblFirmware->setText(tr("Firmware is up to date!"));
+		} else if (checked == 0) {
+			const QString message = tr("New firmware version is available. ") +
+							  "Download " + m_phoneHome->getM2kVersion() + " "
+							  "<a href=\"";
+			ui->lblFirmware->setText(message + m_phoneHome->getM2kLink() + "\">here</a>");
+			ui->lblFirmware->setTextFormat(Qt::RichText);
+			ui->lblFirmware->setTextInteractionFlags(Qt::TextBrowserInteraction);
+			ui->lblFirmware->setOpenExternalLinks(true);
+		}
+	}
+}
+
 void M2kInfoPage::getDeviceInfo()
 {
 	InfoPage::getDeviceInfo();
+	updateFwVersionWidget();
 	refreshTemperature();
 }
 
