@@ -12,6 +12,10 @@ set(CMAKE_AUTORCC ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Test REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Test REQUIRED)
 
+# add qwt, the findQwt script will create the qwt::qwt target containing all
+# that is needed for qwt and qwtpolar
+include(cmake/findQwt.cmake)
+
 add_library(
     gui SHARED
     # source files
@@ -62,8 +66,12 @@ target_include_directories(
 )
 
 target_link_libraries(
-    gui PRIVATE scopy::core Qt${QT_VERSION_MAJOR}::Widgets project_options
-                project_warnings
+    gui
+    PRIVATE scopy::core
+            Qt${QT_VERSION_MAJOR}::Widgets
+            project_options
+            project_warnings
+            qwt::qwt
 )
 
 add_library(scopy::gui ALIAS gui)
