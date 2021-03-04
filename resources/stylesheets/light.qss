@@ -121,6 +121,9 @@ QLineEdit {
 	padding: 2px;
 }
 
+QLineEdit[valid=true]{ color: rgba(0, 0, 0, 200); }
+QLineEdit[invalid=true]{ color: red; }
+
 QComboBox {
 	height: 24px;
 	border: none;
