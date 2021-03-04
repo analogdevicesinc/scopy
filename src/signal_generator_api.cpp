@@ -838,7 +838,17 @@ void SignalGenerator_API::setLineThickness(const QList<int>& list)
                 }
         }
         int index = (int)(gen->getCurrentData()->lineThickness / 0.5) - 1;
-        gen->ui->cbLineThickness->setCurrentIndex(index);
+	gen->ui->cbLineThickness->setCurrentIndex(index);
+}
+
+bool SignalGenerator_API::getAutoscale() const
+{
+	return gen->ui->btnSigGenAutoscale->isChecked();
+}
+
+void SignalGenerator_API::setAutoscale(bool checked)
+{
+	gen->ui->btnSigGenAutoscale->setChecked(checked);
 }
 
 }

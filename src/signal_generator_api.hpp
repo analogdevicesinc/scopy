@@ -93,6 +93,8 @@ class SignalGenerator_API : public ApiObject
         Q_PROPERTY(QList<int> line_thickness
                    READ getLineThickness WRITE setLineThickness)
 
+	Q_PROPERTY(bool autoscale READ getAutoscale WRITE setAutoscale);
+
 
 public:
 	bool running() const;
@@ -170,6 +172,10 @@ public:
 
 	QList<int> getLineThickness() const;
 	void setLineThickness(const QList<int>& list);
+
+	bool getAutoscale() const;
+	void setAutoscale(bool checked);
+
 
 
         Q_INVOKABLE void show();
