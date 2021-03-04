@@ -25,6 +25,8 @@ include(cmake/codeStyle.cmake)
 # scopy core library
 add_subdirectory(core)
 
+enable_testing()
+
 # scopy gui library
 add_subdirectory(gui)
 
