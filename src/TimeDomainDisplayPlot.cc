@@ -185,6 +185,8 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, unsigned int xNumD
 
   d_nb_ref_curves = 0;
 
+  d_autoscale_state = false;
+
   // Reconfigure the bottom horizontal axis that was created by the base class
   configureAxis(QwtPlot::xBottom, 0);
   configureAxis(QwtPlot::yLeft, 0);
@@ -448,24 +450,27 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
 //        }
 //      }
 
-//      if(d_autoscale_state) {
-//	double bottom=1e20, top=-1e20;
-//	for(int n = 0; n < d_nplots; n++) {
-//	  for(int64_t point = 0; point < numDataPoints; point++) {
-//	    if(d_ydata[n][point] < bottom) {
-//	      bottom = d_ydata[n][point];
-//	    }
-//	    if(d_ydata[n][point] > top) {
-//	      top = d_ydata[n][point];
-//	    }
-//	  }
-//	}
-//	_autoScale(bottom, top);
-//        if(d_autoscale_shot) {
-//          d_autoscale_state = false;
-//          d_autoscale_shot = false;
-//        }
-//      }
+
+      if(d_autoscale_state) {
+	double bottom=1e20, top=-1e20;
+	for(int n = 0; n < d_nplots; n++) {
+	  if(d_plot_curve[n]->isVisible()) {
+	    for(int64_t point = 0; point < numDataPoints; point++) {
+	      if(d_ydata[n][point] < bottom) {
+		bottom = d_ydata[n][point];
+	      }
+	      if(d_ydata[n][point] > top) {
+		top = d_ydata[n][point];
+	      }
+	    }
+	  }
+	}
+	_autoScale(bottom, top);
+	if(d_autoscale_shot) {
+	  d_autoscale_state = false;
+	  d_autoscale_shot = false;
+	}
+      }
 
       replot();
 
@@ -563,8 +568,8 @@ void
 TimeDomainDisplayPlot::_autoScale(double bottom, double top)
 {
   // Auto scale the y-axis with a margin of 20% (10 dB for log scale)
-  double _bot = bottom - fabs(bottom)*0.20;
-  double _top = top + fabs(top)*0.20;
+  double _bot = bottom - fabs(bottom-top)*0.125;
+  double _top = top + fabs(bottom-top)*0.125;
   if(d_semilogy) {
     if(bottom > 0) {
       setYaxis(_bot-10, _top+10);
@@ -574,8 +579,15 @@ TimeDomainDisplayPlot::_autoScale(double bottom, double top)
     }
   }
   else {
-    setYaxis(_bot, _top);
+	  if(_bot == 0 && _top == 0){
+		 setYaxis(-1e-3, 1e-3);
+	  }
+	  else{
+		 setYaxis(_bot, _top);
+	  }
   }
+
+  replot();
 }
 
 void
@@ -636,10 +648,32 @@ void TimeDomainDisplayPlot::setXAxisNumPoints(unsigned int pts)
 	d_nbPtsXAxis = pts;
 }
 
-void
-TimeDomainDisplayPlot::setAutoScale(bool state)
+void TimeDomainDisplayPlot::setAutoScale(bool state)
 {
   d_autoscale_state = state;
+
+  if(d_autoscale_state) {
+    double bottom=1e20, top=-1e20;
+    for(int n = 0; n < d_nplots; n++) {
+      for(int64_t point = 0; point < Curve(n)->data()->size(); point++) {
+	if(d_ydata[n][point] < bottom) {
+	  bottom = d_ydata[n][point];
+	}
+	if(d_ydata[n][point] > top) {
+	  top = d_ydata[n][point];
+	}
+      }
+    }
+    _autoScale(bottom, top);
+    if(d_autoscale_shot) {
+      d_autoscale_state = false;
+      d_autoscale_shot = false;
+    }
+  }
+  else{
+	  setYaxis(-5, 5);
+	  replot();
+  }
 }
 
 void

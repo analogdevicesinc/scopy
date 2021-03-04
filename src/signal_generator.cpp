@@ -491,7 +491,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->plot->insertWidget(0,plot, 0, 0);
 
 	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
-	ui->wAppearance->hide();
+
+	connect(ui->btnSigGenAutoscale, &QPushButton::toggled, [=](bool checked){
+		plot->setAutoScale(checked);
+	});
 
 	fileManager = new FileManager("Signal Generator");
 
@@ -1082,8 +1085,8 @@ void SignalGenerator::tabChanged(int index)
 
 void SignalGenerator::updatePreview()
 {
-	static const float MAX_PREVIEW_RANGE = (float)(SHRT_MAX);
-	static const float MIN_PREVIEW_RANGE = (float)(SHRT_MIN);
+	static const float MAX_PREVIEW_RANGE = AMPLITUDE_VOLTS;
+	static const float MIN_PREVIEW_RANGE = -AMPLITUDE_VOLTS;
 
 	const int nb_points_correction = 16; // generate slightly more points to avoid incomplete scope_sink_f buffer
 	gr::top_block_sptr top = make_top_block("Signal Generator Update");
