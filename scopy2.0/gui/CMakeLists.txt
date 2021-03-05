@@ -10,7 +10,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Test REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Test Qml REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Test REQUIRED)
 
 add_library(
     gui SHARED
@@ -22,9 +22,7 @@ add_library(
     src/settings_pair_widget.cpp
     src/custom_push_button.cpp
     src/spinbox_a.cpp
-    src/api_object_manager.cpp
     src/completion_circle.cpp
-    src/api_object.cpp
     src/plot_utils.cpp
     # ui files
     ui/two_buttons_widget.ui
@@ -62,8 +60,8 @@ target_include_directories(
 )
 
 target_link_libraries(
-    gui PRIVATE Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Qml
-                project_options project_warnings
+    gui PRIVATE scopy::core Qt${QT_VERSION_MAJOR}::Widgets project_options
+                project_warnings
 )
 
 add_library(scopy::gui ALIAS gui)

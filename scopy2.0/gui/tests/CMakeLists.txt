@@ -5,7 +5,7 @@ function(create_test test_name source_file)
 
     target_link_libraries(
         ${test_name} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
-                             Qt${QT_VERSION_MAJOR}::Test scopy::gui
+                             Qt${QT_VERSION_MAJOR}::Test scopy::gui scopy::core
     )
 endfunction()
 

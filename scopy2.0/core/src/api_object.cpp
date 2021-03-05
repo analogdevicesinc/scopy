@@ -18,15 +18,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <scopy/gui/api_object.hpp>
-
 #include <QDebug>
 #include <QJSEngine>
 #include <QList>
 #include <QMetaProperty>
 #include <QSettings>
 
-using namespace scopy::gui;
+#include <scopy/core/api_object.hpp>
+
+using namespace scopy::core;
 
 ApiObject::ApiObject()
 	: QObject(nullptr)
