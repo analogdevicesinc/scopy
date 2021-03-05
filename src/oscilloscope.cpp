@@ -1875,7 +1875,7 @@ void Oscilloscope::toggleCursorsMode(bool toggled)
 void Oscilloscope::toolDetached(bool detached)
 {
 	if (detached) {
-		this->setMinimumSize(920, 500);
+		this->setMinimumSize(910, 490);
 		this->setSizePolicy(QSizePolicy::Preferred,
 				    QSizePolicy::Preferred);
 	} else {
