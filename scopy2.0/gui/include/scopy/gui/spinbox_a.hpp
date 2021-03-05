@@ -21,13 +21,12 @@
 #ifndef SPIN_BOX_A_H
 #define SPIN_BOX_A_H
 
-#include <scopy/gui/api_object_manager.hpp>
-#include <scopy/gui/plot_utils.hpp>
-
 #include <QSettings>
 #include <QStringList>
 #include <QWidget>
 
+#include <scopy/core/api_object_manager.hpp>
+#include <scopy/gui/plot_utils.hpp>
 #include <vector>
 
 class QHBoxLayout;
@@ -167,7 +166,7 @@ private:
 	QSettings* m_settings;
 };
 
-class SpinBoxA_API : public ApiObject
+class SpinBoxA_API : public scopy::core::ApiObject
 {
 	Q_OBJECT
 

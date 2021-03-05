@@ -18,11 +18,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <scopy/gui/api_object_manager.hpp>
-
 #include <algorithm>
+#include <scopy/core/api_object_manager.hpp>
 
-using namespace scopy::gui;
+using namespace scopy::core;
 
 ApiObjectManager::ApiObjectManager() {}
 

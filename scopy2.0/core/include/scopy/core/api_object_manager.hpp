@@ -21,12 +21,11 @@
 #ifndef APIOBJECTMANAGER_H
 #define APIOBJECTMANAGER_H
 
-#include <scopy/gui/api_object.hpp>
-
+#include <scopy/core/api_object.hpp>
 #include <vector>
 
 namespace scopy {
-namespace gui {
+namespace core {
 class ApiObjectManager
 {
 public:
@@ -42,7 +41,7 @@ private:
 	ApiObjectManager();
 	std::vector<ApiObject*> api_objects;
 };
-} // namespace gui
+} // namespace core
 } // namespace scopy
 
 #endif // APIOBJECTMANAGER_H

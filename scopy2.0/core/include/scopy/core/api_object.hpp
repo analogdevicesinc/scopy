@@ -29,7 +29,7 @@ template <typename T>
 class QList;
 
 namespace scopy {
-namespace gui {
+namespace core {
 class ApiObject : public QObject
 {
 	Q_OBJECT
@@ -61,9 +61,9 @@ private:
 	void save_nogroup(ApiObject*, QSettings&);
 	void load_nogroup(ApiObject*, QSettings&);
 };
-} // namespace gui
+} // namespace core
 } // namespace scopy
 
-Q_DECLARE_METATYPE(scopy::gui::ApiObject*)
+Q_DECLARE_METATYPE(scopy::core::ApiObject*)
 
 #endif /* APIOBJECT_HPP */

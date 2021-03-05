@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <scopy/gui/api_object_manager.hpp>
 #include "completion_circle.hpp"
 #include "singletone_wrapper.hpp"
 
@@ -37,10 +36,12 @@
 #include <QVBoxLayout>
 #include <qmath.h>
 
+#include <scopy/core/api_object_manager.hpp>
 #include <scopy/gui/spinbox_a.hpp>
 
 using namespace std;
 using namespace scopy::gui;
+using namespace scopy::core;
 
 /*
  * SpinBoxA class implementation
