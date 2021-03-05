@@ -454,7 +454,7 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
       if(d_autoscale_state) {
 	double bottom=1e20, top=-1e20;
 	for(int n = 0; n < d_nplots; n++) {
-	  if(d_plot_curve[n]->isVisible()) {
+	  if(d_plot_curve[n]->plot()) {
 	    for(int64_t point = 0; point < numDataPoints; point++) {
 	      if(d_ydata[n][point] < bottom) {
 		bottom = d_ydata[n][point];
@@ -655,12 +655,14 @@ void TimeDomainDisplayPlot::setAutoScale(bool state)
   if(d_autoscale_state) {
     double bottom=1e20, top=-1e20;
     for(int n = 0; n < d_nplots; n++) {
-      for(int64_t point = 0; point < Curve(n)->data()->size(); point++) {
-	if(d_ydata[n][point] < bottom) {
-	  bottom = d_ydata[n][point];
-	}
-	if(d_ydata[n][point] > top) {
-	  top = d_ydata[n][point];
+      if(d_plot_curve[n]->plot()) {
+	for(int64_t point = 0; point < Curve(n)->data()->size(); point++) {
+	  if(d_ydata[n][point] < bottom) {
+	    bottom = d_ydata[n][point];
+	  }
+	  if(d_ydata[n][point] > top) {
+	    top = d_ydata[n][point];
+	  }
 	}
       }
     }
