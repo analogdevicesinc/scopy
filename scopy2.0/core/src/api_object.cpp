@@ -53,7 +53,7 @@ void ApiObject::save(QSettings& settings, const QString& prop, const QVariantLis
 
 	for (int i = 0; i < list.size(); i++) {
 		settings.setArrayIndex(i);
-		save_nogroup(list.at(i).value<ApiObject*>(), settings);
+		saveNoGroup(list.at(i).value<ApiObject*>(), settings);
 	}
 
 	settings.endArray();
@@ -80,13 +80,13 @@ void ApiObject::load(QSettings& settings, const QString& prop, const QVariantLis
 
 	for (int i = 0; i < nb; i++) {
 		settings.setArrayIndex(i);
-		load_nogroup(list.at(i).value<ApiObject*>(), settings);
+		loadNoGroup(list.at(i).value<ApiObject*>(), settings);
 	}
 
 	settings.endArray();
 }
 
-void ApiObject::load_nogroup(ApiObject* obj, QSettings& settings)
+void ApiObject::loadNoGroup(ApiObject* obj, QSettings& settings)
 {
 	auto meta = obj->metaObject();
 	for (int i = meta->propertyOffset(); i < meta->propertyCount(); i++) {
@@ -124,7 +124,7 @@ void ApiObject::load_nogroup(ApiObject* obj, QSettings& settings)
 		} else {
 			if (data.canConvert<ApiObject*>()) {
 				settings.beginGroup(prop.name());
-				load_nogroup(data.value<ApiObject*>(), settings);
+				loadNoGroup(data.value<ApiObject*>(), settings);
 				settings.endGroup();
 			} else if (data.canConvert<QVariantList>()) {
 				load(settings, prop.name(), data.value<QVariantList>());
@@ -133,7 +133,7 @@ void ApiObject::load_nogroup(ApiObject* obj, QSettings& settings)
 	}
 }
 
-void ApiObject::save_nogroup(ApiObject* obj, QSettings& settings)
+void ApiObject::saveNoGroup(ApiObject* obj, QSettings& settings)
 {
 	auto meta = obj->metaObject();
 	for (int i = meta->propertyOffset(); i < meta->propertyCount(); i++) {
@@ -161,7 +161,7 @@ void ApiObject::save_nogroup(ApiObject* obj, QSettings& settings)
 		} else {
 			if (data.canConvert<ApiObject*>()) {
 				settings.beginGroup(prop.name());
-				save_nogroup(data.value<ApiObject*>(), settings);
+				saveNoGroup(data.value<ApiObject*>(), settings);
 				settings.endGroup();
 			} else if (data.canConvert<QVariantList>()) {
 				save(settings, prop.name(), data.value<QVariantList>());
@@ -174,7 +174,7 @@ void ApiObject::load(QSettings& settings)
 {
 	settings.beginGroup(objectName());
 
-	load_nogroup(this, settings);
+	loadNoGroup(this, settings);
 
 	settings.endGroup();
 
@@ -185,7 +185,7 @@ void ApiObject::save(QSettings& settings)
 {
 	settings.beginGroup(objectName());
 
-	save_nogroup(this, settings);
+	saveNoGroup(this, settings);
 
 	settings.endGroup();
 }
@@ -204,7 +204,7 @@ void ApiObject::save()
 	save(settings);
 }
 
-void ApiObject::js_register(QJSEngine* engine)
+void ApiObject::jsRegister(QJSEngine* engine)
 {
 	if (engine) {
 		engine->globalObject().setProperty(objectName(), engine->newQObject(this));

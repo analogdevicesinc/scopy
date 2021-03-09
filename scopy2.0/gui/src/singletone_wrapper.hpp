@@ -22,31 +22,31 @@
 #define SINGLETONE_WRAPPER_H
 
 namespace scopy {
+namespace gui {
 template <typename T>
-class SingleToneWrapper {
+class SingleToneWrapper
+{
 public:
-        SingleToneWrapper() = default;
+	SingleToneWrapper() = default;
 
-        SingleToneWrapper(const SingleToneWrapper<T>&) = delete;
-        SingleToneWrapper& operator=(const SingleToneWrapper<T> &) = delete;
+	SingleToneWrapper(const SingleToneWrapper<T>&) = delete;
+	SingleToneWrapper& operator=(const SingleToneWrapper<T>&) = delete;
+
 public:
-        static SingleToneWrapper& getInstance() {
-                static SingleToneWrapper<T> instance;
-                return instance;
-        }
+	static SingleToneWrapper& getInstance()
+	{
+		static SingleToneWrapper<T> instance;
+		return instance;
+	}
 
-        void setWrapped(T wrapped) {
-                m_wrapped = wrapped;
-        }
+	void setWrapped(T wrapped) { m_wrapped = wrapped; }
 
-        T getWrapped() {
-              return m_wrapped;
-        }
+	T getWrapped() { return m_wrapped; }
 
 private:
-        T m_wrapped;
+	T m_wrapped;
 };
-
+} // namespace gui
 } // namespace scopy
 
 #endif // SINGLETONE_WRAPPER_H

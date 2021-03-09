@@ -18,9 +18,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "custom_push_button.hpp"
-
 #include <QButtonGroup>
+
+#include <scopy/gui/custom_push_button.hpp>
 
 using namespace scopy::gui;
 
