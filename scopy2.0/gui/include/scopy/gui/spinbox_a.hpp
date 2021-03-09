@@ -26,7 +26,7 @@
 #include <QWidget>
 
 #include <scopy/core/api_object_manager.hpp>
-#include <scopy/gui/plot_utils.hpp>
+#include <scopy/gui/prefix_formatter.hpp>
 #include <vector>
 
 class QHBoxLayout;
@@ -149,18 +149,18 @@ protected:
 
 protected:
 	Ui::SpinBoxA* ui;
-	QStringList m_units_list;
+	QStringList m_unitsList;
 
 	double m_value;
-	double m_min_value;
-	double m_max_value;
-	int m_decimal_count;
+	double m_minValue;
+	double m_maxValue;
+	int m_decimalCount;
 	std::vector<std::pair<QString, double>> m_units;
 	QRegExpValidator* m_validator;
 	double m_displayScale;
-	SpinBoxA_API* m_sba_api;
+	SpinBoxA_API* m_sbaApi;
 	unsigned int m_id;
-	bool m_is_step_down;
+	bool m_isStepDown;
 
 private:
 	QSettings* m_settings;
@@ -236,10 +236,10 @@ public Q_SLOTS:
 
 protected:
 	scopy::gui::NumberSeries m_steps;
-	double m_fine_increment;
+	double m_fineIncrement;
 	bool m_numberSeriesRebuild;
-	int integer_divider;
-	int integer_step;
+	int m_integerDivider;
+	int m_integerStep;
 };
 
 class PositionSpinButton : public SpinBoxA
@@ -295,7 +295,7 @@ public Q_SLOTS:
 protected:
 	std::vector<std::vector<double>> m_unit;
 	double m_step;
-	double m_fine_increment;
+	double m_fineIncrement;
 	double m_frequency;
 	double m_secondsValue;
 	bool m_inSeconds;

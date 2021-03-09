@@ -1,10 +1,10 @@
-#include <scopy/gui/two_buttons_widget.hpp>
-
 #include "ui_two_buttons_widget.h"
 
 #include <QFile>
 #include <QPushButton>
 #include <QVBoxLayout>
+
+#include <scopy/gui/two_buttons_widget.hpp>
 
 using namespace scopy::gui;
 

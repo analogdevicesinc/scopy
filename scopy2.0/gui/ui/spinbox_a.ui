@@ -36,12 +36,12 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="vLayout">
      <property name="spacing">
       <number>2</number>
      </property>
      <item>
-      <widget class="QPushButton" name="SBA_UpButton">
+      <widget class="QPushButton" name="btnUpSBA">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -60,7 +60,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="SBA_DownButton">
+      <widget class="QPushButton" name="btnDownSBA">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -81,19 +81,19 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QVBoxLayout" name="vLayout_2">
      <property name="spacing">
       <number>0</number>
      </property>
      <item>
-      <widget class="QLabel" name="SBA_Label">
+      <widget class="QLabel" name="lblSBA">
        <property name="text">
         <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="SBA_LineEdit">
+      <widget class="QLineEdit" name="lineEditSBA">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -103,7 +103,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QFrame" name="SBA_Line">
+      <widget class="QFrame" name="lineSBA">
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -125,7 +125,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QComboBox" name="SBA_Combobox"/>
+      <widget class="QComboBox" name="cmbBoxSBA"/>
      </item>
     </layout>
    </item>

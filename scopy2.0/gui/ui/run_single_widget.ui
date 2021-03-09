@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="runButton">
+  <widget class="QPushButton" name="btnRun">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -51,6 +51,11 @@ QPushButton:disabled {
    <property name="text">
     <string>Run</string>
    </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/ico-play.svg</normaloff>
+     <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-play.svg</iconset>
+   </property>
    <property name="iconSize">
     <size>
      <width>8</width>
@@ -64,7 +69,7 @@ QPushButton:disabled {
     <bool>false</bool>
    </property>
   </widget>
-  <widget class="QPushButton" name="singleButton">
+  <widget class="QPushButton" name="btnSingle">
    <property name="geometry">
     <rect>
      <x>180</x>
@@ -102,6 +107,11 @@ QPushButton:disabled {
    <property name="text">
     <string>Single</string>
    </property>
+   <property name="icon">
+    <iconset resource="../resources/resources.qrc">
+     <normaloff>:/icons/ico-oneshot.svg</normaloff>
+     <normalon>:/icons/ico-stop.svg</normalon>:/icons/ico-oneshot.svg</iconset>
+   </property>
    <property name="iconSize">
     <size>
      <width>10</width>
@@ -113,6 +123,8 @@ QPushButton:disabled {
    </property>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

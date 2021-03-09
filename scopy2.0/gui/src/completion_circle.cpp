@@ -27,18 +27,18 @@
 
 using namespace scopy::gui;
 
-CompletionCircle::CompletionCircle(QWidget* parent, bool invert_circle)
+CompletionCircle::CompletionCircle(QWidget* parent, bool invertCircle)
 	: QDial(parent)
-	, m_double_value(0.5)
-	, m_double_minimum(1.0)
-	, m_double_maximum(0.0)
+	, m_doubleValue(0.5)
+	, m_doubleMinimum(1.0)
+	, m_doubleMaximum(0.0)
 	, m_origin(90)
 	, m_xc(0)
 	, m_yc(0)
 	, m_radius(23)
 	, m_pressed(false)
-	, m_log_scale(false)
-	, invert_circle(invert_circle)
+	, m_logScale(false)
+	, m_invertCircle(invertCircle)
 	, m_toggleable(true)
 {
 	setWrapping(true);
@@ -62,7 +62,7 @@ void CompletionCircle::paintEvent(QPaintEvent*)
 	m_xc = xc;
 	m_yc = yc;
 
-	if (!m_log_scale) {
+	if (!m_logScale) {
 		min = minimumDouble();
 		max = maximumDouble();
 		val = valueDouble();
@@ -74,7 +74,7 @@ void CompletionCircle::paintEvent(QPaintEvent*)
 
 	completeRatio = qAbs((val - min) / (max - min));
 
-	if (invert_circle) {
+	if (m_invertCircle) {
 		completeRatio = 1.0 - completeRatio;
 	}
 
@@ -158,18 +158,18 @@ bool CompletionCircle::pointInsideCircle(const QPoint& p, int xc, int yc, int r)
 	return ((x - xc) * (x - xc) + (y - yc) * (y - yc) < r * r);
 }
 
-double CompletionCircle::valueDouble() { return m_double_value; }
+double CompletionCircle::valueDouble() { return m_doubleValue; }
 
 void CompletionCircle::setValueDouble(double value)
 {
-	if (value < m_double_minimum) {
-		value = m_double_minimum;
-	} else if (value > m_double_maximum) {
-		value = m_double_maximum;
+	if (value < m_doubleMinimum) {
+		value = m_doubleMinimum;
+	} else if (value > m_doubleMaximum) {
+		value = m_doubleMaximum;
 	}
 
-	if (m_double_value != value) {
-		m_double_value = value;
+	if (m_doubleValue != value) {
+		m_doubleValue = value;
 		sliderChange(SliderValueChange);
 	}
 }
@@ -184,28 +184,28 @@ void CompletionCircle::setToggled(bool on)
 	}
 }
 
-double CompletionCircle::minimumDouble() { return m_double_minimum; }
+double CompletionCircle::minimumDouble() { return m_doubleMinimum; }
 
 void CompletionCircle::setOrigin(double value) { m_origin = value; }
 
 void CompletionCircle::setMinimumDouble(double value)
 {
-	m_double_minimum = value;
+	m_doubleMinimum = value;
 
-	if (m_double_value < m_double_minimum) {
+	if (m_doubleValue < m_doubleMinimum) {
 		setValueDouble(value);
 	}
 
 	repaint();
 }
 
-double CompletionCircle::maximumDouble() { return m_double_maximum; }
+double CompletionCircle::maximumDouble() { return m_doubleMaximum; }
 
 void CompletionCircle::setMaximumDouble(double value)
 {
-	m_double_maximum = value;
+	m_doubleMaximum = value;
 
-	if (m_double_value > m_double_maximum) {
+	if (m_doubleValue > m_doubleMaximum) {
 		setValueDouble(value);
 	}
 
@@ -214,7 +214,7 @@ void CompletionCircle::setMaximumDouble(double value)
 
 void CompletionCircle::setToggleable(bool tog) { m_toggleable = tog; }
 
-bool CompletionCircle::isLogScale() { return m_log_scale; }
+bool CompletionCircle::isLogScale() { return m_logScale; }
 
 bool CompletionCircle::toggleable() { return m_toggleable; }
-void CompletionCircle::setIsLogScale(bool state) { m_log_scale = state; }
+void CompletionCircle::setIsLogScale(bool state) { m_logScale = state; }
