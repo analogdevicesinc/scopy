@@ -23,13 +23,15 @@ add_library(
     src/custom_push_button.cpp
     src/spinbox_a.cpp
     src/completion_circle.cpp
-    src/plot_utils.cpp
+    src/prefix_formatter.cpp
+    src/custom_menu_button.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
     ui/subsection_separator.ui
     ui/settings_pair_widget.ui
     ui/spinbox_a.ui
+    ui/custom_menu_button.ui
     # resources
     resources/resources.qrc
 )

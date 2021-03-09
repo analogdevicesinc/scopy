@@ -12,6 +12,10 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 add_executable(scopy mainwindow.cpp main.cpp mainwindow.ui)
 
 target_link_libraries(
-    scopy PRIVATE Qt${QT_VERSION_MAJOR}::Widgets scopy::gui project_options
-                  project_warnings
+    scopy
+    PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+            scopy::core
+            scopy::gui
+            project_options
+            project_warnings
 )
