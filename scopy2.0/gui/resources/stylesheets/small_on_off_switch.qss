@@ -50,3 +50,4 @@ color: white;
 QLabel#off:disabled {
 color: rgba(255,255,255,51);
 }
+

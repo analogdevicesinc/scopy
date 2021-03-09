@@ -12,6 +12,7 @@
 #include <scopy/gui/connect_dialog.hpp>
 #include <scopy/gui/linked_button.hpp>
 #include <scopy/gui/small_on_off_switch.hpp>
+#include <scopy/gui/channel_widget.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget* parent)
 							    tr("Sample Rate"), 1, 10e7, true, false, ui->centralwidget, {1, 2, 5});
 
 	ui->vLayout->addWidget(scaleSpinBox);
+
 	ui->vLayout->addWidget(new scopy::gui::CustomMenuButton(ui->centralwidget, "Curors", true));
 	ui->vLayout->addWidget(new scopy::gui::CustomMenuButton(ui->centralwidget, "Trigger", false));
 
@@ -43,6 +45,11 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout->addWidget(btn);
 
 	ui->vLayout->addWidget(new scopy::gui::SmallOnOffSwitch(ui->centralwidget));
+
+	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(0, true, true, "orange", ui->centralwidget));
+	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(1, false, true, "purple", ui->centralwidget));
+	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(2, false, false, "red", ui->centralwidget));
+	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(3, true, false, "green", ui->centralwidget));
 }
 
 MainWindow::~MainWindow() { delete ui; }
