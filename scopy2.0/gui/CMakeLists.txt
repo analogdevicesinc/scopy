@@ -36,6 +36,9 @@ add_library(
     src/homepage_controls.cpp
     src/connect_dialog.cpp
     src/linked_button.cpp
+    src/small_on_off_switch.cpp
+    src/custom_animation.cpp
+    src/animation_manager.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
