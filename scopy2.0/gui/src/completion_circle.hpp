@@ -29,10 +29,10 @@ class CompletionCircle : public QDial
 {
 	Q_OBJECT
 
-	Q_PROPERTY(bool inverted MEMBER invert_circle);
+	Q_PROPERTY(bool inverted MEMBER m_invertCircle);
 
 public:
-	explicit CompletionCircle(QWidget* parent = 0, bool invert_circle = false);
+	explicit CompletionCircle(QWidget* parent = 0, bool m_invertCircle = false);
 
 	double valueDouble();
 	double minimumDouble();
@@ -73,16 +73,16 @@ protected:
 	using QAbstractSlider::value;
 
 private:
-	double m_double_value;
-	double m_double_minimum;
-	double m_double_maximum;
+	double m_doubleValue;
+	double m_doubleMinimum;
+	double m_doubleMaximum;
 	double m_origin;
 	int m_xc;
 	int m_yc;
 	int m_radius;
 	bool m_pressed;
-	bool m_log_scale;
-	bool invert_circle;
+	bool m_logScale;
+	bool m_invertCircle;
 	bool m_toggleable;
 };
 } // namespace gui

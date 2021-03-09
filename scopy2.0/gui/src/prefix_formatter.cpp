@@ -18,11 +18,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <scopy/gui/plot_utils.hpp>
-
 #include <qlocale.h>
 
 #include <cmath>
+#include <scopy/gui/prefix_formatter.hpp>
 
 using namespace scopy::gui;
 using namespace std;

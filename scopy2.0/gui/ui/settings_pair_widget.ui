@@ -74,7 +74,7 @@
   <customwidget>
    <class>scopy::gui::CustomPushButton</class>
    <extends>QPushButton</extends>
-   <header>custom_push_button.hpp</header>
+   <header location="global">scopy/gui/custom_push_button.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

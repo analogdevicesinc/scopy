@@ -47,7 +47,7 @@ public:
 	virtual void load(QSettings& settings);
 	virtual void save(QSettings& settings);
 
-	void js_register(QJSEngine* engine);
+	void jsRegister(QJSEngine* engine);
 
 private:
 	template <typename T>
@@ -58,8 +58,8 @@ private:
 	void save(QSettings& settings, const QString& prop, const QVariantList& list);
 	void load(QSettings& settings, const QString& prop, const QVariantList& list);
 
-	void save_nogroup(ApiObject*, QSettings&);
-	void load_nogroup(ApiObject*, QSettings&);
+	void saveNoGroup(ApiObject*, QSettings&);
+	void loadNoGroup(ApiObject*, QSettings&);
 };
 } // namespace core
 } // namespace scopy

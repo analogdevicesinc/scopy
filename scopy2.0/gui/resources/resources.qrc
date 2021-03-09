@@ -21,5 +21,8 @@
         <file>icons/setup_btn_checked.svg</file>
         <file>icons/setup_btn_hover.svg</file>
         <file>icons/setup_btn_unchecked.svg</file>
+        <file>icons/ico-oneshot.svg</file>
+        <file>icons/ico-play.svg</file>
+        <file>icons/ico-stop.svg</file>
     </qresource>
 </RCC>

@@ -53,22 +53,22 @@ SpinBoxA::SpinBoxA(QWidget* parent)
 	: QWidget(parent)
 	, ui(new Ui::SpinBoxA)
 	, m_value(0.0)
-	, m_min_value(0.0)
-	, m_max_value(0.0)
-	, m_decimal_count(3)
+	, m_minValue(0.0)
+	, m_maxValue(0.0)
+	, m_decimalCount(3)
 	, m_validator(new QRegExpValidator(this))
-	, m_sba_api(new SpinBoxA_API(this))
+	, m_sbaApi(new SpinBoxA_API(this))
 {
 	ui->setupUi(this);
-	ui->SBA_LineEdit->setValidator(m_validator);
+	ui->lineEditSBA->setValidator(m_validator);
 
-	ui->SBA_LineEdit->installEventFilter(this);
+	ui->lineEditSBA->installEventFilter(this);
 	ui->SBA_CompletionCircle->installEventFilter(this);
 
-	connect(ui->SBA_Combobox, SIGNAL(currentIndexChanged(int)), SLOT(onComboboxIndexChanged(int)));
-	connect(ui->SBA_LineEdit, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
-	connect(ui->SBA_UpButton, SIGNAL(pressed()), SLOT(onUpButtonPressed()));
-	connect(ui->SBA_DownButton, SIGNAL(pressed()), SLOT(onDownButtonPressed()));
+	connect(ui->cmbBoxSBA, SIGNAL(currentIndexChanged(int)), SLOT(onComboboxIndexChanged(int)));
+	connect(ui->lineEditSBA, SIGNAL(editingFinished()), SLOT(onLineEditTextEdited()));
+	connect(ui->btnUpSBA, SIGNAL(pressed()), SLOT(onUpButtonPressed()));
+	connect(ui->btnDownSBA, SIGNAL(pressed()), SLOT(onDownButtonPressed()));
 
 	connect(this, SIGNAL(valueChanged(double)), ui->SBA_CompletionCircle, SLOT(setValueDouble(double)));
 	connect(ui->SBA_CompletionCircle, SIGNAL(toggled(bool)), SLOT(setFineMode(bool)));
@@ -94,7 +94,7 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double>> units, const QString& name, dou
 	setMinValue(min_value);
 	setMaxValue(max_value);
 
-	ui->SBA_Label->setText(name);
+	ui->lblSBA->setText(name);
 
 	m_displayScale = 1;
 
@@ -108,14 +108,14 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double>> units, const QString& name, dou
 
 	QString spinBoxName = parent->objectName() + "SpinBox" + name + QString::number(m_id);
 	spinBoxName.remove(" ");
-	m_sba_api->setObjectName(spinBoxName);
+	m_sbaApi->setObjectName(spinBoxName);
 
 	QSettings oldSettings;
 	QFile tempFile(oldSettings.fileName() + ".bak");
 	m_settings = SingleToneWrapper<QSettings*>::getInstance().getWrapped();
 
 	// m_sba_api->load(*m_settings);
-	m_is_step_down = false;
+	m_isStepDown = false;
 }
 
 SpinBoxA::~SpinBoxA()
@@ -124,7 +124,7 @@ SpinBoxA::~SpinBoxA()
 
 	// m_sba_api->save(*m_settings);
 
-	delete m_sba_api;
+	delete m_sbaApi;
 	delete ui;
 }
 
@@ -159,7 +159,7 @@ void SpinBoxA::onDownButtonPressed() { stepDown(); }
 
 void SpinBoxA::onComboboxIndexChanged(int index)
 {
-	double value = ui->SBA_LineEdit->text().toDouble();
+	double value = ui->lineEditSBA->text().toDouble();
 
 	setValue(value * m_units[index].second);
 }
@@ -183,7 +183,7 @@ void SpinBoxA::onLineEditTextEdited()
 	unit = rx.cap(6);
 
 	if (unit.isEmpty()) {
-		unit = m_units[ui->SBA_Combobox->currentIndex()].first;
+		unit = m_units[ui->cmbBoxSBA->currentIndex()].first;
 	} else if (unit.startsWith(QString("u"), Qt::CaseInsensitive)) {
 		qDebug() << "before unit " << unit;
 		unit = unit.replace(0, 1, "μ");
@@ -228,17 +228,17 @@ bool SpinBoxA::isUnitMatched(const QString& unit, double value)
 	return false;
 }
 
-QPushButton* SpinBoxA::upButton() { return ui->SBA_UpButton; }
+QPushButton* SpinBoxA::upButton() { return ui->btnUpSBA; }
 
-QPushButton* SpinBoxA::downButton() { return ui->SBA_DownButton; }
+QPushButton* SpinBoxA::downButton() { return ui->btnDownSBA; }
 
-QLabel* SpinBoxA::nameLabel() { return ui->SBA_Label; }
+QLabel* SpinBoxA::nameLabel() { return ui->lblSBA; }
 
-QLineEdit* SpinBoxA::lineEdit() { return ui->SBA_LineEdit; }
+QLineEdit* SpinBoxA::lineEdit() { return ui->lineEditSBA; }
 
-QFrame* SpinBoxA::line() { return ui->SBA_Line; }
+QFrame* SpinBoxA::line() { return ui->lineSBA; }
 
-QComboBox* SpinBoxA::comboBox() { return ui->SBA_Combobox; }
+QComboBox* SpinBoxA::comboBox() { return ui->cmbBoxSBA; }
 
 double SpinBoxA::value() { return m_value; }
 
@@ -252,10 +252,10 @@ void SpinBoxA::setValue(double value)
 		value = 0;
 	}
 
-	if (value < m_min_value) {
-		value = m_min_value;
-	} else if (value > m_max_value) {
-		value = m_max_value;
+	if (value < m_minValue) {
+		value = m_minValue;
+	} else if (value > m_maxValue) {
+		value = m_maxValue;
 	}
 
 	if (m_value != value) {
@@ -268,7 +268,7 @@ void SpinBoxA::setValue(double value)
 	double scale = findUnitOfValue(m_value * m_displayScale, &index);
 	double number = m_value / scale;
 	double abs_number = qAbs(number);
-	int significant_digits = m_decimal_count;
+	int significant_digits = m_decimalCount;
 
 	if (abs_number >= 100) {
 		significant_digits += 3;
@@ -280,25 +280,25 @@ void SpinBoxA::setValue(double value)
 
 	number *= m_displayScale;
 
-	ui->SBA_LineEdit->setText(QString::number(number, 'g', significant_digits));
-	ui->SBA_LineEdit->setCursorPosition(0);
+	ui->lineEditSBA->setText(QString::number(number, 'g', significant_digits));
+	ui->lineEditSBA->setCursorPosition(0);
 
 	if (m_value != 0) {
-		ui->SBA_Combobox->blockSignals(true);
-		ui->SBA_Combobox->setCurrentIndex(index);
-		ui->SBA_Combobox->blockSignals(false);
+		ui->cmbBoxSBA->blockSignals(true);
+		ui->cmbBoxSBA->setCurrentIndex(index);
+		ui->cmbBoxSBA->blockSignals(false);
 	}
 
-	if (m_value == m_min_value) {
-		ui->SBA_DownButton->setEnabled(false);
+	if (m_value == m_minValue) {
+		ui->btnDownSBA->setEnabled(false);
 	} else {
-		ui->SBA_DownButton->setEnabled(true);
+		ui->btnDownSBA->setEnabled(true);
 	}
 
-	if (m_value == m_max_value) {
-		ui->SBA_UpButton->setEnabled(false);
+	if (m_value == m_maxValue) {
+		ui->btnUpSBA->setEnabled(false);
 	} else {
-		ui->SBA_UpButton->setEnabled(true);
+		ui->btnUpSBA->setEnabled(true);
 	}
 
 	if (emitValueChanged) {
@@ -306,40 +306,40 @@ void SpinBoxA::setValue(double value)
 	}
 }
 
-double SpinBoxA::minValue() { return m_min_value; }
+double SpinBoxA::minValue() { return m_minValue; }
 
 void SpinBoxA::setMinValue(double value)
 {
-	m_min_value = value;
+	m_minValue = value;
 
-	if (m_value < m_min_value) {
-		setValue(m_min_value);
-	} else if (m_value > m_min_value) {
-		ui->SBA_DownButton->setEnabled(true);
+	if (m_value < m_minValue) {
+		setValue(m_minValue);
+	} else if (m_value > m_minValue) {
+		ui->btnDownSBA->setEnabled(true);
 	}
 
 	ui->SBA_CompletionCircle->setMinimumDouble(value);
 }
 
-int SpinBoxA::decimalCount() const { return m_decimal_count; }
+int SpinBoxA::decimalCount() const { return m_decimalCount; }
 
 void SpinBoxA::setDecimalCount(int count)
 {
 	if (count >= 0) {
-		m_decimal_count = count;
+		m_decimalCount = count;
 	}
 }
 
-double SpinBoxA::maxValue() { return m_max_value; }
+double SpinBoxA::maxValue() { return m_maxValue; }
 
 void SpinBoxA::setMaxValue(double value)
 {
-	m_max_value = value;
+	m_maxValue = value;
 
-	if (m_value > m_max_value) {
-		setValue(m_max_value);
-	} else if (m_value < m_max_value) {
-		ui->SBA_UpButton->setEnabled(true);
+	if (m_value > m_maxValue) {
+		setValue(m_maxValue);
+	} else if (m_value < m_maxValue) {
+		ui->btnUpSBA->setEnabled(true);
 	}
 
 	ui->SBA_CompletionCircle->setMaximumDouble(value);
@@ -351,7 +351,7 @@ void SpinBoxA::setFineMode(bool en) { ui->SBA_CompletionCircle->setToggled(en); 
 
 bool SpinBoxA::eventFilter(QObject* obj, QEvent* event)
 {
-	if (obj == ui->SBA_LineEdit) {
+	if (obj == ui->lineEditSBA) {
 		if (event->type() == QEvent::KeyPress) {
 			QKeyEvent* keyE = static_cast<QKeyEvent*>(event);
 
@@ -449,13 +449,13 @@ void SpinBoxA::showProgress(bool show) { ui->SBA_CompletionCircle->setVisible(sh
 bool SpinBoxA::fineModeAvailable() { return ui->SBA_CompletionCircle->toggleable(); }
 void SpinBoxA::setFineModeAvailable(bool tog) { ui->SBA_CompletionCircle->setToggleable(tog); }
 
-bool SpinBoxA::isStepDown() const { return m_is_step_down; }
+bool SpinBoxA::isStepDown() const { return m_isStepDown; }
 
 void SpinBoxA::triggerCircleRedraw() { ui->SBA_CompletionCircle->setValueDouble(value()); }
 
-QString SpinBoxA::getName() const { return ui->SBA_Label->text(); }
+QString SpinBoxA::getName() const { return ui->lblSBA->text(); }
 
-void SpinBoxA::setName(const QString& name) { ui->SBA_Label->setText(name); }
+void SpinBoxA::setName(const QString& name) { ui->lblSBA->setText(name); }
 
 void SpinBoxA::setDisplayScale(double value)
 {
@@ -468,10 +468,10 @@ void SpinBoxA::setUnits(const QStringList& list)
 	QString regex = "^(?!^.{18})(([+,-]?)([0-9]*)([.]?)([0-9]+))";
 	QString sufixes;
 
-	ui->SBA_Combobox->clear();
+	ui->cmbBoxSBA->clear();
 
 	if (list.at(0).section("=", 0, 0).trimmed().isEmpty() || list.count() == 1) {
-		ui->SBA_Combobox->setEnabled(false);
+		ui->cmbBoxSBA->setEnabled(false);
 	}
 
 	for (auto it = list.begin(); it != list.end(); ++it) {
@@ -481,7 +481,7 @@ void SpinBoxA::setUnits(const QStringList& list)
 		sufixes += (s.at(0) + '|');
 
 		m_units.push_back(std::pair<QString, double>(s, val));
-		ui->SBA_Combobox->addItem(s);
+		ui->cmbBoxSBA->addItem(s);
 	}
 
 	if (!sufixes.isEmpty()) {
@@ -506,7 +506,7 @@ void SpinBoxA::setUnits(const QStringList& list)
 
 	m_validator->setRegExp(QRegExp(regex));
 
-	m_units_list = list;
+	m_unitsList = list;
 }
 
 /*
@@ -515,7 +515,7 @@ void SpinBoxA::setUnits(const QStringList& list)
 ScaleSpinButton::ScaleSpinButton(QWidget* parent)
 	: SpinBoxA(parent)
 	, m_steps(1E-3, 1E+3, 10, {1, 2, 5})
-	, m_fine_increment(1)
+	, m_fineIncrement(1)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(true);
 }
@@ -525,9 +525,9 @@ ScaleSpinButton::ScaleSpinButton(vector<pair<QString, double>> units, const QStr
 				 std::vector<double> steps)
 	: SpinBoxA(units, name, min_value, max_value, hasProgressWidget, invertCircle, parent)
 	, m_steps(1E-3, 1E+3, 10, steps)
-	, m_fine_increment(1)
+	, m_fineIncrement(1)
 	, m_numberSeriesRebuild(true)
-	, integer_divider(0)
+	, m_integerDivider(0)
 {
 	ui->SBA_CompletionCircle->setIsLogScale(true);
 
@@ -542,10 +542,10 @@ void ScaleSpinButton::setMinValue(double value)
 	}
 	SpinBoxA::setMinValue(value);
 
-	if (m_value == m_min_value) {
-		ui->SBA_DownButton->setEnabled(false);
+	if (m_value == m_minValue) {
+		ui->btnDownSBA->setEnabled(false);
 	} else {
-		ui->SBA_DownButton->setEnabled(true);
+		ui->btnDownSBA->setEnabled(true);
 	}
 }
 
@@ -556,39 +556,39 @@ void ScaleSpinButton::setMaxValue(double value)
 	}
 	SpinBoxA::setMaxValue(value);
 
-	if (m_value == m_max_value) {
-		ui->SBA_UpButton->setEnabled(false);
+	if (m_value == m_maxValue) {
+		ui->btnUpSBA->setEnabled(false);
 	} else {
-		ui->SBA_UpButton->setEnabled(true);
+		ui->btnUpSBA->setEnabled(true);
 	}
 }
 
 void ScaleSpinButton::enableNumberSeriesRebuild(bool enable) { m_numberSeriesRebuild = enable; }
 
-void ScaleSpinButton::setIntegerDivider(int val) { integer_divider = val; }
+void ScaleSpinButton::setIntegerDivider(int val) { m_integerDivider = val; }
 
-int ScaleSpinButton::getIntegerDivider() { return integer_divider; }
+int ScaleSpinButton::getIntegerDivider() { return m_integerDivider; }
 
 void ScaleSpinButton::setValue(double newVal)
 {
-	if (integer_divider) {
-		integer_step = round(integer_divider / newVal);
-		newVal = integer_divider / integer_step;
+	if (m_integerDivider) {
+		m_integerStep = round(m_integerDivider / newVal);
+		newVal = m_integerDivider / m_integerStep;
 	}
 	SpinBoxA::setValue(newVal);
 }
 
 void ScaleSpinButton::stepUp()
 {
-	double current_val = ui->SBA_LineEdit->text().toDouble();
+	double current_val = ui->lineEditSBA->text().toDouble();
 	current_val /= m_displayScale;
-	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
+	double current_scale = m_units[ui->cmbBoxSBA->currentIndex()].second;
 	double newVal;
 
 	double epsilon = 1E-12;
 
 	if (isInFineMode()) {
-		newVal = (current_val + m_fine_increment) * current_scale;
+		newVal = (current_val + m_fineIncrement) * current_scale;
 	} else {
 		auto oldVal = current_val * current_scale + epsilon;
 		newVal = m_steps.getNumberAfter(oldVal);
@@ -597,13 +597,13 @@ void ScaleSpinButton::stepUp()
 			newVal = maxValue();
 		}
 	}
-	if (integer_divider) {
-		auto new_integer_step = ceil(integer_divider / newVal);
-		if (new_integer_step == integer_step && new_integer_step > 1)
-			integer_step--;
+	if (m_integerDivider) {
+		auto new_integer_step = ceil(m_integerDivider / newVal);
+		if (new_integer_step == m_integerStep && new_integer_step > 1)
+			m_integerStep--;
 		else
-			integer_step = new_integer_step;
-		newVal = integer_divider / integer_step;
+			m_integerStep = new_integer_step;
+		newVal = m_integerDivider / m_integerStep;
 	}
 
 	setValue(newVal);
@@ -611,25 +611,25 @@ void ScaleSpinButton::stepUp()
 
 void ScaleSpinButton::stepDown()
 {
-	double current_val = ui->SBA_LineEdit->text().toDouble();
+	double current_val = ui->lineEditSBA->text().toDouble();
 	current_val /= m_displayScale;
-	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
+	double current_scale = m_units[ui->cmbBoxSBA->currentIndex()].second;
 	double newVal;
 
 	double epsilon = 1E-12;
 
 	if (isInFineMode()) {
-		newVal = (current_val - m_fine_increment) * current_scale;
+		newVal = (current_val - m_fineIncrement) * current_scale;
 
-		if (current_val - m_fine_increment < 1 && current_val - m_fine_increment > 0) {
+		if (current_val - m_fineIncrement < 1 && current_val - m_fineIncrement > 0) {
 			newVal = 0;
 		}
 
-		if ((m_min_value > 0 && newVal <= m_min_value) && (ui->SBA_Combobox->currentIndex() > 0)) {
-			int i = ui->SBA_Combobox->currentIndex() - 1;
+		if ((m_minValue > 0 && newVal <= m_minValue) && (ui->cmbBoxSBA->currentIndex() > 0)) {
+			int i = ui->cmbBoxSBA->currentIndex() - 1;
 			double nextLowerScale = m_units[i].second;
 
-			newVal = current_scale / nextLowerScale - m_fine_increment;
+			newVal = current_scale / nextLowerScale - m_fineIncrement;
 			newVal *= nextLowerScale;
 		}
 
@@ -637,13 +637,13 @@ void ScaleSpinButton::stepDown()
 		newVal = m_steps.getNumberBefore(current_val * current_scale - epsilon);
 	}
 
-	if (integer_divider) {
-		auto new_integer_step = floor(integer_divider / newVal);
-		if (new_integer_step == integer_step)
-			integer_step++;
+	if (m_integerDivider) {
+		auto new_integer_step = floor(m_integerDivider / newVal);
+		if (new_integer_step == m_integerStep)
+			m_integerStep++;
 		else
-			integer_step = new_integer_step;
-		newVal = integer_divider / integer_step;
+			m_integerStep = new_integer_step;
+		newVal = m_integerDivider / m_integerStep;
 	}
 	setValue(newVal);
 }
@@ -668,9 +668,9 @@ void PositionSpinButton::setStep(double step) { m_step = step; }
 
 void PositionSpinButton::stepUp()
 {
-	double current_val = ui->SBA_LineEdit->text().toDouble();
+	double current_val = ui->lineEditSBA->text().toDouble();
 	current_val /= m_displayScale;
-	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
+	double current_scale = m_units[ui->cmbBoxSBA->currentIndex()].second;
 	double newVal;
 	double step = m_step;
 
@@ -691,9 +691,9 @@ void PositionSpinButton::stepUp()
 
 void PositionSpinButton::stepDown()
 {
-	double current_val = ui->SBA_LineEdit->text().toDouble();
+	double current_val = ui->lineEditSBA->text().toDouble();
 	current_val /= m_displayScale;
-	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
+	double current_scale = m_units[ui->cmbBoxSBA->currentIndex()].second;
 	double newVal;
 	double step = m_step;
 
@@ -714,7 +714,7 @@ void PositionSpinButton::stepDown()
 
 PhaseSpinButton::PhaseSpinButton(QWidget* parent)
 	: SpinBoxA(parent)
-	, m_fine_increment(1)
+	, m_fineIncrement(1)
 	, m_inSeconds(false)
 	, m_indexValue(0)
 	, m_step(15)
@@ -729,7 +729,7 @@ PhaseSpinButton::PhaseSpinButton(QWidget* parent)
 PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double>> units, const QString& name, double min_value,
 				 double max_value, bool hasProgressWidget, bool invertCircle, QWidget* parent)
 	: SpinBoxA(units, name, min_value, max_value, hasProgressWidget, invertCircle, parent)
-	, m_fine_increment(1)
+	, m_fineIncrement(1)
 	, m_inSeconds(false)
 	, m_indexValue(0)
 	, m_step(15)
@@ -743,8 +743,8 @@ PhaseSpinButton::PhaseSpinButton(std::vector<std::pair<QString, double>> units, 
 	setFrequency(0.01);
 	ui->SBA_CompletionCircle->setOrigin(0);
 
-	ui->SBA_DownButton->setEnabled(true);
-	ui->SBA_UpButton->setEnabled(true);
+	ui->btnDownSBA->setEnabled(true);
+	ui->btnUpSBA->setEnabled(true);
 }
 
 void PhaseSpinButton::setValue(double value)
@@ -781,7 +781,7 @@ void PhaseSpinButton::setValue(double value)
 		scale = findUnitOfValue(value, &index);
 		value = computeSecondsTransformation(scale, index, value);
 	} else {
-		scale = m_units.at(ui->SBA_Combobox->currentIndex()).second;
+		scale = m_units.at(ui->cmbBoxSBA->currentIndex()).second;
 	}
 
 	// Update line edit
@@ -808,7 +808,7 @@ void PhaseSpinButton::setValue(double value)
 	}
 
 	if (!inSeconds() || m_value == 0) {
-		ui->SBA_LineEdit->setText(QString::number(round((m_value * 10) / 10) / scale));
+		ui->lineEditSBA->setText(QString::number(round((m_value * 10) / 10) / scale));
 	}
 
 	// adjust scale for the ecurrent measure unit and handle unit measure change
@@ -818,7 +818,7 @@ void PhaseSpinButton::setValue(double value)
 	}
 }
 
-void PhaseSpinButton::setComboboxIndex(int index) { ui->SBA_Combobox->setCurrentIndex(index); }
+void PhaseSpinButton::setComboboxIndex(int index) { ui->cmbBoxSBA->setCurrentIndex(index); }
 
 void PhaseSpinButton::onComboboxIndexChanged(int index)
 {
@@ -841,7 +841,7 @@ void PhaseSpinButton::onComboboxIndexChanged(int index)
 		if (isGoingFromDegreesToSeconds) {
 			setValue(m_secondsValue);
 		} else {
-			double value = ui->SBA_LineEdit->text().toDouble();
+			double value = ui->lineEditSBA->text().toDouble();
 			setValue(value * m_units[index].second);
 		}
 
@@ -902,7 +902,7 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 	double period = 360;
 	double number = value / scale;
 	double abs_number = qAbs(number);
-	int significant_digits = m_decimal_count;
+	int significant_digits = m_decimalCount;
 
 	if (abs_number >= 100) {
 		significant_digits += 3;
@@ -919,8 +919,8 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 	degreesValue -= full_periods * period;
 
 	if (value != 0 && degreesValue != 0) {
-		ui->SBA_Combobox->blockSignals(true);
-		ui->SBA_Combobox->setCurrentIndex(index);
+		ui->cmbBoxSBA->blockSignals(true);
+		ui->cmbBoxSBA->setCurrentIndex(index);
 
 		if (index < 2) {
 			setInSeconds(false);
@@ -928,9 +928,9 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 			setInSeconds(true);
 		}
 
-		ui->SBA_Combobox->blockSignals(false);
-		ui->SBA_LineEdit->setText(QString::number(number, 'g', significant_digits));
-		ui->SBA_LineEdit->setCursorPosition(0);
+		ui->cmbBoxSBA->blockSignals(false);
+		ui->lineEditSBA->setText(QString::number(number, 'g', significant_digits));
+		ui->lineEditSBA->setCursorPosition(0);
 	}
 	value = degreesValue;
 
@@ -939,8 +939,8 @@ double PhaseSpinButton::computeSecondsTransformation(double scale, int index, do
 
 void PhaseSpinButton::stepUp()
 {
-	m_is_step_down = false;
-	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
+	m_isStepDown = false;
+	double current_scale = m_units[ui->cmbBoxSBA->currentIndex()].second;
 	double newVal;
 	double step = inSeconds() ? changeValueFromDegreesToSeconds(45) : 45;
 
@@ -954,14 +954,14 @@ void PhaseSpinButton::stepUp()
 
 	newVal = m_value + step;
 
-	ui->SBA_LineEdit->setText(QString::number(round((newVal * 10) / 10) / current_scale));
+	ui->lineEditSBA->setText(QString::number(round((newVal * 10) / 10) / current_scale));
 	setValue(newVal);
 }
 
 void PhaseSpinButton::stepDown()
 {
-	m_is_step_down = true;
-	double current_scale = m_units[ui->SBA_Combobox->currentIndex()].second;
+	m_isStepDown = true;
+	double current_scale = m_units[ui->cmbBoxSBA->currentIndex()].second;
 	double newVal;
 	double step = inSeconds() ? changeValueFromDegreesToSeconds(45) : 45;
 
@@ -975,7 +975,7 @@ void PhaseSpinButton::stepDown()
 
 	newVal = m_value - step;
 
-	ui->SBA_LineEdit->setText(QString::number(round((newVal * 10) / 10) / current_scale));
+	ui->lineEditSBA->setText(QString::number(round((newVal * 10) / 10) / current_scale));
 	setValue(newVal);
 }
 
