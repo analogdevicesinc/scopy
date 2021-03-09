@@ -11,6 +11,7 @@
 #include <scopy/gui/homepage_controls.hpp>
 #include <scopy/gui/connect_dialog.hpp>
 #include <scopy/gui/linked_button.hpp>
+#include <scopy/gui/small_on_off_switch.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -41,6 +42,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	ui->vLayout->addWidget(btn);
 
+	ui->vLayout->addWidget(new scopy::gui::SmallOnOffSwitch(ui->centralwidget));
 }
 
 MainWindow::~MainWindow() { delete ui; }
