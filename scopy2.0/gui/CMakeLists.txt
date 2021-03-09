@@ -39,6 +39,7 @@ add_library(
     src/small_on_off_switch.cpp
     src/custom_animation.cpp
     src/animation_manager.cpp
+    src/channel_widget.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -48,6 +49,7 @@ add_library(
     ui/custom_menu_button.ui
     ui/homepage_controls.ui
     ui/connect_dialog.ui
+    ui/channel_widget.ui
     # resources
     resources/resources.qrc
 )
