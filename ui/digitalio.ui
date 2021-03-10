@@ -71,8 +71,27 @@
          <number>0</number>
         </property>
         <property name="topMargin">
-         <number>20</number>
+         <number>15</number>
         </property>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="adiscope::LinkedButton" name="btnHelp"/>
+        </item>
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
@@ -142,7 +161,7 @@ background-color: grey;
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>30</width>
+            <width>50</width>
             <height>0</height>
            </size>
           </property>
@@ -250,8 +269,14 @@ background-color: grey;
    <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>linked_button.hpp</header>
+  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>

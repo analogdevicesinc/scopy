@@ -248,6 +248,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	// Scroll wheel event filter
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	m_wheelEventGuard->installEventRecursively(ui->mainWidget);
+
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/logicanalyzer");
 }
 
 LogicAnalyzer::~LogicAnalyzer()

@@ -118,6 +118,8 @@ PowerController::PowerController(struct iio_context *ctx,
 
 	readPreferences();
 
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/power-supply");
+
 }
 
 PowerController::~PowerController()

@@ -165,6 +165,8 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 
 	// Build the flowgraph only once
 	m_initFlowgraph = false;
+
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/networkanalyzer");
 }
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,

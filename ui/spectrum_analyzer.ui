@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>969</width>
+    <width>989</width>
     <height>661</height>
    </rect>
   </property>
@@ -85,6 +85,13 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="adiscope::LinkedButton" name="btnHelp">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="btnPrint">
@@ -997,7 +1004,7 @@ min-width: 64px;
                     <x>0</x>
                     <y>0</y>
                     <width>298</width>
-                    <height>521</height>
+                    <height>313</height>
                    </rect>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
@@ -1399,7 +1406,7 @@ color: rgba(255,255,255,51);
                   <property name="geometry">
                    <rect>
                     <x>0</x>
-                    <y>-26</y>
+                    <y>0</y>
                     <width>284</width>
                     <height>547</height>
                    </rect>
@@ -1573,7 +1580,7 @@ background-color: #F45000;
 
 QPushButton:hover
 {
-         background-color: #4a34ff;
+	 background-color: #4a34ff;
 }</string>
                        </property>
                        <property name="text">
@@ -2244,15 +2251,25 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -2260,11 +2277,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <extends>QWidget</extends>
    <header>runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomPushButton</class>

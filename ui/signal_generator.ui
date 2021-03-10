@@ -68,6 +68,25 @@
          <number>16</number>
         </property>
         <item>
+         <spacer name="horizontalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="adiscope::LinkedButton" name="btnHelp"/>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -1420,15 +1439,20 @@ background-repeat: no-repeat;
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::Math</class>
-   <extends>QWidget</extends>
-   <header>math.hpp</header>
-   <container>1</container>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::Math</class>
+   <extends>QWidget</extends>
+   <header>math.hpp</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

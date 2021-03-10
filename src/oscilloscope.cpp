@@ -832,6 +832,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(&plot,SIGNAL(leftGateChanged(double)),SLOT(onLeftGateChanged(double)));
 	connect(&plot,SIGNAL(rightGateChanged(double)),SLOT(onRightGateChanged(double)));
 
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/oscilloscope");
+
 }
 
 int Oscilloscope::binSearchPointOnXaxis(double time)

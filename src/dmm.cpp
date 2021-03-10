@@ -210,6 +210,8 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->widget_2);
 	wheelEventGuard->installEventRecursively(ui->widget_2);
 	readPreferences();
+
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/voltmeter");
 }
 
 void DMM::readPreferences()
