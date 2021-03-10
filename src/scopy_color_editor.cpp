@@ -175,11 +175,11 @@ QStringList ScopyColorEditor::getUserStylesheets() const
 void ScopyColorEditor::setUserStylesheets(const QStringList &userStylesheets)
 {
 	m_userStylesheets = userStylesheets;
-	for (const QString &entry : m_userStylesheets) {
-		QFile entryFile(entry);
-		if (!entryFile.exists()) { continue; }
-		m_ui->stylesheetsCmbBox->addItem(entry);
-	}
+//	for (const QString &entry : m_userStylesheets) {
+//		QFile entryFile(entry);
+//		if (!entryFile.exists()) { continue; }
+//		m_ui->stylesheetsCmbBox->addItem(entry);
+//	}
 }
 
 void ScopyColorEditor::buildMenuForMap()
