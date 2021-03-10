@@ -28,6 +28,8 @@
 #include <QString>
 #include <QTimer>
 #include <QtConcurrentRun>
+#include <QDesktopServices>
+#include <QUrl>
 
 using namespace std;
 using namespace adiscope;
@@ -249,6 +251,8 @@ void InfoPage::refreshInfoWidget()
 	}
 
 	int pos = 0;
+	ui->paramLayout->setRowMinimumHeight(pos, 20);
+
 	for (auto key : m_info_params.keys()) {
 		QLabel *valueLbl = new QLabel(this);
 		QLabel *keyLbl = new QLabel(this);
@@ -261,9 +265,10 @@ void InfoPage::refreshInfoWidget()
 		ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
 		pos++;
 	}
+	pos++;
+	ui->paramLayout->addWidget(new QLabel(""), pos, 0, 1, 1);
 
 	if (m_advanced) {
-		ui->paramLayout->setRowMinimumHeight(pos, 20);
 		pos++;
 		ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1, 1);
 		pos++;
@@ -279,7 +284,12 @@ void InfoPage::refreshInfoWidget()
 			ui->paramLayout->addWidget(valueLbl, pos, 1, 1, 1);
 			pos++;
 		}
+		pos++;
+		ui->paramLayout->addWidget(new QLabel(""), pos, 0, 1, 1);
 	}
+	// creates some spacing
+
+
 }
 
 QString InfoPage::uri() const
@@ -429,6 +439,7 @@ M2kInfoPage::M2kInfoPage(QString uri,
 
 	m_refreshTemperatureTimer = new QTimer(this);
 	connect(m_refreshTemperatureTimer, SIGNAL(timeout()), this, SLOT(refreshTemperature()));
+	connect(ui->btnRegister,SIGNAL(clicked()),this,SLOT(m2kRegistration()));
 	m_refreshTemperatureTimer->start(m_temperatureUpdateInterval);
 
 }
@@ -455,6 +466,13 @@ void M2kInfoPage::updateFwVersionWidget() {
 			ui->lblFirmware->setOpenExternalLinks(true);
 		}
 	}
+}
+
+void M2kInfoPage::m2kRegistration()
+{
+	QString versionString = QString(m_info_params["Model"].split("Rev")[1][1]);
+	QString url = "https://my.analog.com/en/app/registration/hardware/ADALM2000?sn="+QString(getSerialNumber())+"&v=Rev."+versionString;
+	QDesktopServices::openUrl(QUrl(url));
 }
 
 void M2kInfoPage::getDeviceInfo()

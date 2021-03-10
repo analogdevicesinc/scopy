@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>789</width>
+    <width>948</width>
     <height>394</height>
    </rect>
   </property>
@@ -17,6 +17,71 @@
    <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="3">
+    <widget class="QPushButton" name="btnCalibrate">
+     <property name="minimumSize">
+      <size>
+       <width>180</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+
+  font-size: 14px;
+}
+</string>
+     </property>
+     <property name="text">
+      <string>Calibrate</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="btnIdentify">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>180</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>240</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+  min-height: 30px;
+  max-height: 30px;
+
+  border: 0px;
+
+  font-size: 14px;
+}</string>
+     </property>
+     <property name="text">
+      <string>Identify</string>
+     </property>
+     <property name="blue_button" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="2">
     <widget class="QPushButton" name="btnForget">
      <property name="sizePolicy">
@@ -90,7 +155,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0" colspan="5">
+   <item row="3" column="0" colspan="6">
     <widget class="QScrollArea" name="scrollArea">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
@@ -103,7 +168,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>771</width>
+        <width>930</width>
         <height>242</height>
        </rect>
       </property>
@@ -123,22 +188,9 @@
        <property name="rightMargin">
         <number>0</number>
        </property>
-       <item row="4" column="0" colspan="2">
-        <widget class="QWidget" name="descriptionWidget" native="true">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </widget>
-       </item>
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <item row="2" column="0" colspan="3">
         <widget class="QWidget" name="paramWidget" native="true">
          <property name="minimumSize">
@@ -163,7 +215,7 @@
           <property name="spacing">
            <number>0</number>
           </property>
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="paramLabel">
             <property name="text">
              <string/>
@@ -173,7 +225,23 @@
          </layout>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="7" column="0" colspan="2">
+        <widget class="QWidget" name="descriptionWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
         <widget class="QTextBrowser" name="extraWidget">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -193,9 +261,6 @@
            <height>0</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true"/>
-         </property>
          <property name="frameShape">
           <enum>QFrame::NoFrame</enum>
          </property>
@@ -213,7 +278,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0" colspan="3">
+       <item row="10" column="0" colspan="3">
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -233,8 +298,21 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QPushButton" name="btnCalibrate">
+   <item row="0" column="5" rowspan="2">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="4">
+    <widget class="QPushButton" name="btnRegister">
      <property name="minimumSize">
       <size>
        <width>180</width>
@@ -253,65 +331,14 @@
 </string>
      </property>
      <property name="text">
-      <string>Calibrate</string>
+      <string>Register</string>
      </property>
      <property name="blue_button" stdset="0">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QPushButton" name="btnIdentify">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>180</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>240</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton {
-  min-height: 30px;
-  max-height: 30px;
-
-  border: 0px;
-
-  font-size: 14px;
-}</string>
-     </property>
-     <property name="text">
-      <string>Identify</string>
-     </property>
-     <property name="blue_button" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="4" rowspan="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="0" colspan="4">
+   <item row="1" column="0" colspan="5">
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
       <number>0</number>

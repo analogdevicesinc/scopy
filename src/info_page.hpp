@@ -142,6 +142,7 @@ private Q_SLOTS:
 	void blinkTimeout();
 public Q_SLOTS:
 	void refreshTemperature();
+	void m2kRegistration();
 
 private:
 	struct iio_channel *m_fabric_channel;

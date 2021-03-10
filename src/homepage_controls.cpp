@@ -52,7 +52,7 @@ HomepageControls::~HomepageControls()
 
 void HomepageControls::updatePosition()
 {
-	move(parentWidget()->width() - 150, geometry().topLeft().y());
+	move(parentWidget()->width() - 120, 5);
 }
 
 bool HomepageControls::eventFilter(QObject *watched, QEvent *event)
