@@ -249,7 +249,26 @@ Preferences::Preferences(QWidget *parent) :
 
 	ui->comboBoxTheme->addItem("default");
 	ui->comboBoxTheme->addItem("light");
-	connect(ui->comboBoxTheme, &QComboBox::currentTextChanged, [=](const QString &stylesheet){
+	ui->comboBoxTheme->addItem("browse");
+	connect(ui->comboBoxTheme, &QComboBox::currentTextChanged, [=](const QString &stylesheet) {
+		if (stylesheet == "browse") {
+			QString filePath = QFileDialog::getOpenFileName(this,
+					tr("Load Theme"), "", tr("Stylesheet files (*.qss)"),
+					nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+
+			if (filePath.isEmpty()) {
+				QSignalBlocker blocker(ui->comboBoxTheme);
+				ui->comboBoxTheme->setCurrentText(m_colorEditor->getCurrentStylesheet());
+				return;
+			}
+
+			m_colorEditor->setUserStylesheets({filePath});
+			m_colorEditor->setCurrentStylesheet(filePath);
+
+			requestRestart();
+
+
+		} else {
 			m_colorEditor->setCurrentStylesheet(stylesheet);
 
 			// force saving of the ini file as the new Scopy process
@@ -260,6 +279,7 @@ Preferences::Preferences(QWidget *parent) :
 			pref_api->save(settings);
 
 			requestRestart();
+		}
 	});
 }
 
@@ -658,6 +678,9 @@ void Preferences::setColorEditor(ScopyColorEditor *colorEditor)
 {
 	m_colorEditor = colorEditor;
 	QSignalBlocker blocker(ui->comboBoxTheme);
+	if (m_colorEditor->getUserStylesheets().size()) {
+		ui->comboBoxTheme->insertItem(2, m_colorEditor->getUserStylesheets().back());
+	}
 	ui->comboBoxTheme->setCurrentText(m_colorEditor->getCurrentStylesheet());
 	QIcon::setThemeName("scopy-" + m_colorEditor->getCurrentStylesheet());
 }
