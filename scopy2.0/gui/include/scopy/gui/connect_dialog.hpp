@@ -57,8 +57,8 @@ private Q_SLOTS:
 	void updatePopUp(struct iio_context* ctx);
 
 private:
-	Ui::Connect* ui;
-	bool connected;
+	Ui::Connect* m_ui;
+	bool m_connected;
 	void createContext(const QString& uri);
 	bool eventFilter(QObject* watched, QEvent* event);
 };

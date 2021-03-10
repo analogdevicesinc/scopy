@@ -10,6 +10,7 @@
 #include <scopy/gui/custom_menu_button.hpp>
 #include <scopy/gui/homepage_controls.hpp>
 #include <scopy/gui/connect_dialog.hpp>
+#include <scopy/gui/linked_button.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -34,6 +35,11 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout->addWidget(new scopy::gui::HomepageControls(this));
 
 //	ui->centralLayout->addWidget(new scopy::gui::ConnectDialog(this));
+
+	scopy::gui::LinkedButton* btn = new scopy::gui::LinkedButton;
+	btn->setUrl("https://stackoverflow.com/questions/10838654/qt-designer-adding-a-link-to-a-qpushbutton");
+
+	ui->vLayout->addWidget(btn);
 
 }
 
