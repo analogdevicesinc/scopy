@@ -26,5 +26,6 @@
         <file>icons/ico-stop.svg</file>
         <file>icons/time_trigger_left.svg</file>
         <file>icons/time_trigger_right.svg</file>
+        <file>icons/ico info.png</file>
     </qresource>
 </RCC>
