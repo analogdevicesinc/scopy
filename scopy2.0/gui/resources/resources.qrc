@@ -24,5 +24,7 @@
         <file>icons/ico-oneshot.svg</file>
         <file>icons/ico-play.svg</file>
         <file>icons/ico-stop.svg</file>
+        <file>icons/time_trigger_left.svg</file>
+        <file>icons/time_trigger_right.svg</file>
     </qresource>
 </RCC>
