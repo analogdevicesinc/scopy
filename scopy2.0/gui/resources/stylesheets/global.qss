@@ -100,6 +100,21 @@ QComboBox::indicator {
 	selection-color: transparent;
 }
 
+/* General style for blue buttons */
+
+QPushButton[blue_button=true]{
+	background-color: #4a64ff;
+	color: #ffffff;
+	border-radius: 4px;
+	font-size: 14px;
+}
+
+QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
+
+QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
+
+QPushButton[blue_button=true]:disabled { background-color: grey; }
+
 /*********************************** SubsectionSeparator ***************************************/
 
 QLabel#lblSubsectionSeparator{
