@@ -603,6 +603,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->btnExport, &QPushButton::clicked,
 		this, &SpectrumAnalyzer::btnExportClicked);
 	readPreferences();
+
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/spectrumanalyzer");
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()

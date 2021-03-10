@@ -595,6 +595,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	// Reduce the extent of the yLeft axis because it is not needed
 	plot->axisWidget(QwtPlot::yLeft)->scaleDraw()->setMinimumExtent(65);
+
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/siggen");
 }
 
 SignalGenerator::~SignalGenerator()

@@ -35,7 +35,7 @@ QLabel[valid=true] { color: rgba(255, 255, 255, 150) }
 QTextBrowser { background-color: rgba(0, 0, 0, 150); }
 
 /* Apply a gradient to the MenuAnim widgets */
-adiscope--MenuAnim {
+adiscope--MenuAnim, adiscope--DMM #widget_2, .adiscope--PowerController #rightMenu {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
 }
 
@@ -347,6 +347,19 @@ QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 
 QPushButton[blue_button=true]:disabled { background-color: grey; }
 
+/* Info button for each tool */
+
+QPushButton[info_button=true]{
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 40px;
+	 max-width: 40px;
+	 background-color: transparent;
+	 border-radius: 4px;
+}
+
+QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
+
 
 /* Menu title label */
 
@@ -487,11 +500,12 @@ QFrame[line_separator=true]{ background-color: rgba(255, 255, 255, 16); }
 }
 
 
-/* Gradient background for all instruments, but Voltmeter and Power Supply */
+/* Gradient background for all instruments */
 
 .adiscope--Oscilloscope #mainWidget, .adiscope--SpectrumAnalyzer #mainWidget,
 .adiscope--NetworkAnalyzer #mainWidget, .adiscope--SignalGenerator #mainWidget,
-.adiscope--logic--LogicAnalyzer #mainWidget, .adiscope--logic--PatternGenerator #mainWidget, .adiscope--DigitalIO #widget{
+.adiscope--logic--LogicAnalyzer #mainWidget, .adiscope--logic--PatternGenerator #mainWidget,
+.adiscope--DigitalIO #widget, .adiscope--DMM #hLayout_top_btn_area_voltmeter, .adiscope--PowerController #hWidget_top_area {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgba(0, 0, 0, 40), stop: 0.1 transparent, stop: 1.0 transparent);
 }
 

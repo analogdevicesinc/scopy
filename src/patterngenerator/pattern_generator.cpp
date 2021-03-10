@@ -149,6 +149,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 							  TOOL_PATTERN_GENERATOR)));
 	api->load(*settings);
 	api->js_register(engine);
+
+	m_ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/pattgen");
 }
 
 void PatternGenerator::readPreferences()

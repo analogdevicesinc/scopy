@@ -217,6 +217,7 @@
         <file>icons/scopy-light/icons/ic saveD.png</file>
         <file>icons/scopy-light/icons/ic_note_checked.svg</file>
         <file>icons/scopy-light/icons/ic_note_unchecked.svg</file>
+        <file>icons/scopy-default/icons/ico info.png</file>
     </qresource>
     <qresource prefix="/stylesheets">
         <file>stylesheets/spinbox_type_a.qss</file>

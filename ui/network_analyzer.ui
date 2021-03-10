@@ -75,6 +75,9 @@
          </spacer>
         </item>
         <item>
+         <widget class="adiscope::LinkedButton" name="btnHelp"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="btnPrint">
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
@@ -3029,6 +3032,11 @@ QLabel {
    <extends>QWidget</extends>
    <header>customplotpositionbutton.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>linked_button.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

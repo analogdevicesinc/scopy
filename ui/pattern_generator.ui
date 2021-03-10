@@ -93,6 +93,9 @@
          </spacer>
         </item>
         <item>
+         <widget class="adiscope::LinkedButton" name="btnHelp"/>
+        </item>
+        <item>
          <widget class="QPushButton" name="printBtn">
           <property name="layoutDirection">
            <enum>Qt::RightToLeft</enum>
@@ -1830,6 +1833,11 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>linked_button.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -183,6 +183,8 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 	updateUi();
 	readPreferences();
 
+	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/digitalio");
+
 }
 
 void DigitalIO::readPreferences()
