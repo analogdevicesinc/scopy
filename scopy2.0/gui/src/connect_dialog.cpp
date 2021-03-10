@@ -34,27 +34,27 @@ using namespace scopy::gui;
 
 ConnectDialog::ConnectDialog(QWidget* widget)
 	: QWidget(widget)
-	, ui(new Ui::Connect)
-	, connected(false)
+	, m_ui(new Ui::Connect)
+	, m_connected(false)
 {
-	ui->setupUi(this);
-	ui->btnConnect->setText(tr("Connect"));
+	m_ui->setupUi(this);
+	m_ui->btnConnect->setText(tr("Connect"));
 
 	// The connect button will be disabled untill we write something in the lineEditHostName
-	ui->btnConnect->setDisabled(true);
+	m_ui->btnConnect->setDisabled(true);
 
-	connect(ui->btnConnect, SIGNAL(clicked()), this, SLOT(btnClicked()));
-	connect(ui->lineEditHostName, SIGNAL(returnPressed()), this, SLOT(btnClicked()));
-	connect(ui->lineEditHostName, SIGNAL(textChanged(const QString&)), this, SLOT(discardSettings()));
+	connect(m_ui->btnConnect, SIGNAL(clicked()), this, SLOT(btnClicked()));
+	connect(m_ui->lineEditHostName, SIGNAL(returnPressed()), this, SLOT(btnClicked()));
+	connect(m_ui->lineEditHostName, SIGNAL(textChanged(const QString&)), this, SLOT(discardSettings()));
 	connect(this, SIGNAL(finished(struct iio_context*)), this, SLOT(updatePopUp(struct iio_context*)));
-	ui->lineEditHostName->activateWindow();
-	ui->lineEditHostName->setFocus();
-	DynamicWidget::setDynamicProperty(ui->lineEditHostName, "invalid", false);
-	DynamicWidget::setDynamicProperty(ui->lineEditHostName, "valid", false);
-	ui->lblInfoSection->hide();
+	m_ui->lineEditHostName->activateWindow();
+	m_ui->lineEditHostName->setFocus();
+	DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "invalid", false);
+	DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "valid", false);
+	m_ui->lblInfoSection->hide();
 }
 
-ConnectDialog::~ConnectDialog() { delete ui; }
+ConnectDialog::~ConnectDialog() { delete m_ui; }
 
 QString ConnectDialog::URIstringParser(QString uri)
 {
@@ -71,14 +71,14 @@ QString ConnectDialog::URIstringParser(QString uri)
 
 void ConnectDialog::btnClicked()
 {
-	if (!ui->btnConnect->isEnabled()) {
+	if (!m_ui->btnConnect->isEnabled()) {
 		return;
 	} else {
-		ui->lblInfoSection->setText(tr("Waiting for connection ..."));
+		m_ui->lblInfoSection->setText(tr("Waiting for connection ..."));
 	}
 
-	if (connected) {
-		QString new_uri = URIstringParser(ui->lineEditHostName->text());
+	if (m_connected) {
+		QString new_uri = URIstringParser(m_ui->lineEditHostName->text());
 		Q_EMIT newContext(new_uri);
 	} else {
 		validateInput();
@@ -87,29 +87,29 @@ void ConnectDialog::btnClicked()
 
 void ConnectDialog::discardSettings()
 {
-	if (!ui->lineEditHostName->text().isEmpty()) {
-		ui->btnConnect->setDisabled(false);
+	if (!m_ui->lineEditHostName->text().isEmpty()) {
+		m_ui->btnConnect->setDisabled(false);
 	} else {
-		ui->btnConnect->setDisabled(true);
+		m_ui->btnConnect->setDisabled(true);
 	}
 
-	ui->lblInfoSection->setText(tr("Context info"));
-	DynamicWidget::setDynamicProperty(ui->btnConnect, "failed", false);
-	DynamicWidget::setDynamicProperty(ui->lineEditHostName, "invalid", false);
-	DynamicWidget::setDynamicProperty(ui->lineEditHostName, "valid", false);
-	ui->btnConnect->setText(tr("Connect"));
+	m_ui->lblInfoSection->setText(tr("Context info"));
+	DynamicWidget::setDynamicProperty(m_ui->btnConnect, "failed", false);
+	DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "invalid", false);
+	DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "valid", false);
+	m_ui->btnConnect->setText(tr("Connect"));
 
-	ui->lblInfoSection->hide();
-	ui->lblDescription->setText(QString(""));
-	this->connected = false;
+	m_ui->lblInfoSection->hide();
+	m_ui->lblDescription->setText(QString(""));
+	this->m_connected = false;
 }
 
 void ConnectDialog::validateInput()
 {
-	ui->btnConnect->setDisabled(true);
+	m_ui->btnConnect->setDisabled(true);
 
-	QString new_uri = URIstringParser(ui->lineEditHostName->text());
-	this->ui->lineEditHostName->setDisabled(true);
+	QString new_uri = URIstringParser(m_ui->lineEditHostName->text());
+	this->m_ui->lineEditHostName->setDisabled(true);
 	QtConcurrent::run(std::bind(&ConnectDialog::createContext, this, new_uri));
 }
 
@@ -126,25 +126,25 @@ void ConnectDialog::createContext(const QString& uri)
 }
 void ConnectDialog::updatePopUp(struct iio_context* ctx)
 {
-	this->ui->lineEditHostName->setDisabled(false);
-	this->connected = !!ctx;
+	this->m_ui->lineEditHostName->setDisabled(false);
+	this->m_connected = !!ctx;
 
-	ui->lblInfoSection->show();
+	m_ui->lblInfoSection->show();
 	if (!!ctx) {
-		ui->btnConnect->setDisabled(false);
+		m_ui->btnConnect->setDisabled(false);
 		QString lblDescription(iio_context_get_description(ctx));
-		ui->lblDescription->setText(lblDescription);
-		ui->lblInfoSection->setText(tr("Context info"));
-		DynamicWidget::setDynamicProperty(ui->lineEditHostName, "invalid", false);
-		DynamicWidget::setDynamicProperty(ui->lineEditHostName, "valid", true);
-		ui->btnConnect->setText(tr("Add"));
+		m_ui->lblDescription->setText(lblDescription);
+		m_ui->lblInfoSection->setText(tr("Context info"));
+		DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "invalid", false);
+		DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "valid", true);
+		m_ui->btnConnect->setText(tr("Add"));
 
 		iio_context_destroy(ctx);
 	} else {
-		DynamicWidget::setDynamicProperty(ui->lineEditHostName, "valid", false);
-		DynamicWidget::setDynamicProperty(ui->lineEditHostName, "invalid", true);
-		ui->lblInfoSection->setText(tr("Warning"));
-		ui->lblDescription->setText(tr("Error: Unable to find host: No such host is known!"));
+		DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "valid", false);
+		DynamicWidget::setDynamicProperty(m_ui->lineEditHostName, "invalid", true);
+		m_ui->lblInfoSection->setText(tr("Warning"));
+		m_ui->lblDescription->setText(tr("Error: Unable to find host: No such host is known!"));
 	}
 }
 bool ConnectDialog::eventFilter(QObject* watched, QEvent* event)

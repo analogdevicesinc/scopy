@@ -189,6 +189,16 @@ QPushButton[settings_icon=true]:checked:hover {
   image: url(:/icons/setup3_checked_hover.svg);
 }
 
+/* Info button for each tool */
+
+QPushButton[info_button=true]{
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 50px;
+	 max-width: 50px;
+	 image: url(:/icons/ico info.png);
+}
+
 /***************************************** SpinBoxes ************************************************/
 
 QPushButton#btnUpSBA {
