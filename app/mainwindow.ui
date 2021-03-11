@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>507</height>
+    <width>573</width>
+    <height>557</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,11 +15,22 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="centralLayout">
+    <property name="sizeConstraint">
+     <enum>QLayout::SetDefaultConstraint</enum>
+    </property>
     <item>
-     <layout class="QVBoxLayout" name="vLayout"/>
+     <layout class="QVBoxLayout" name="vLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+     </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="vLayout1"/>
+     <layout class="QVBoxLayout" name="vLayout1">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+     </layout>
     </item>
    </layout>
   </widget>

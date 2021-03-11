@@ -41,6 +41,8 @@ add_library(
     src/animation_manager.cpp
     src/channel_widget.cpp
     src/custom_switch.cpp
+    src/custom_plot_position_button.cpp
+    src/colored_qwidget.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -51,6 +53,7 @@ add_library(
     ui/homepage_controls.ui
     ui/connect_dialog.ui
     ui/channel_widget.ui
+    ui/custom_plot_position_button.ui
     # resources
     resources/resources.qrc
 )

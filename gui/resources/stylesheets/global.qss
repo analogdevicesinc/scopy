@@ -13,6 +13,12 @@ QWidget {
 	font-size: 13px;
 }
 
+QToolTip {
+    padding: 6px;
+    border: 1px solid rgba(149, 152, 154, 150);
+    color: rgba(0, 0, 0, 200);
+}
+
 QLabel {
 	color: rgba(0, 0, 0, 200);
 	font-size: 13px;
