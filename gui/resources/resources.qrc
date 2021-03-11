@@ -27,7 +27,9 @@
         <file>icons/time_trigger_left.svg</file>
         <file>icons/time_trigger_right.svg</file>
         <file>icons/ico info.png</file>
-	<file>stylesheets/small_on_off_switch.qss</file>
-	<file>icons/redX.svg</file>
+        <file>stylesheets/small_on_off_switch.qss</file>
+        <file>icons/redX.svg</file>
+        <file>stylesheets/big_custom_switch.qss</file>
+        <file>stylesheets/custom_switch.qss</file>
     </qresource>
 </RCC>

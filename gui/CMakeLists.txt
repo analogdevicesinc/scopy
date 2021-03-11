@@ -40,6 +40,7 @@ add_library(
     src/custom_animation.cpp
     src/animation_manager.cpp
     src/channel_widget.cpp
+    src/custom_switch.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
