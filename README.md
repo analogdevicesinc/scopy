@@ -1,12 +1,29 @@
-[![appveyor status](https://ci.appveyor.com/api/projects/status/61orx0yhjipv9i7l/branch/master?svg=true)](https://ci.appveyor.com/project/analogdevicesinc/scopy/branch/master)
-
 # Scopy
+
+## Overview
 Scopy is a software oscilloscope and signal analysis toolset.
 
-## Appveyor Builds 
-Nightly builds for Windows are available at: https://ci.appveyor.com/project/analogdevicesinc/scopy/build/artifacts
+## Supported Platforms
+| OS | CI status |
+| -- | --------- |
+| Windows | windows ci badge |
+| Ubuntu | ubuntu18 ci badge<br> ubuntu20 ci badge |
+| MacOS | MacOS 10.15 ci badge<br> MacOS 11.0 ci badge |
+| Kuiper | kuiper ci badge |
+| Android<br> (TODO: version?) | android ci badge |
 
-Each build contains files that allow two types of installations:
-- System install:  The scopy-setup.exe installs Scopy and all required dependencies. Recommended for a quick and easy installation.
-- Local install: To install, extract scopy.zip which contains Scopy dependencies and copy scopy.exe next to the extracted files.
-Local installs can be used when there is a need for multiple versions of Scopy to exist simultaneously on a system or when new changes are made only to the scopy.exe file and there is no need for the scopy.zip to be downloaded again.
+## Dependencies
+| Dependency | Version | Affected targets |
+| ---------- | ------- | ---------------- |
+| CMake | >= 3.9.6 | build |
+| Qt | >= 5.12 | gui, core, plugins, scopy |
+
+## Directory Structure
+
+| Directory | Description |
+| --------- | ----------- |
+| cmake | Cmake helper scripts for setting up the project |
+| core | Core library containing |
+| gui | Gui library containing the widgets that are used in Scopy
+| plugins | Plugins directory containing all the tool packages that are available in Scopy with different hardware |
+| app | Scopy executable |

@@ -1,0 +1,9 @@
+[Icon Theme]
+Name=Zafiro-icons
+Comment=icon theme flat for gnome,xfce and lxde
+
+Directories=icons
+
+[icons]
+Size=16
+

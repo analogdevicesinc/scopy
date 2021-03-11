@@ -1,0 +1,14 @@
+diff --git a/src/oscilloscope.cpp b/src/oscilloscope.cpp
+index 35f023b..8fbd061 100644
+--- a/src/oscilloscope.cpp
++++ b/src/oscilloscope.cpp
+@@ -147,7 +147,8 @@ Oscilloscope::Oscilloscope(struct iio_context* ctx, Filter* filt, ToolMenuItem*
+ 	, gatingEnabled(false)
+ 	, m_filtering_enabled(true)
+ 	, m_logicAnalyzer(nullptr)
+-	, m_mixedSignalViewEnabled(false), logic_top_block(nullptr)
++	, m_mixedSignalViewEnabled(false)
++	, logic_top_block(nullptr)
+ {
+ 	ui->setupUi(this);
+ 	int triggers_panel = ui->stackedWidget->insertWidget(-1, &trigger_settings);

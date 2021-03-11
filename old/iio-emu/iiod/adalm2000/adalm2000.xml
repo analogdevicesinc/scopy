@@ -1,0 +1,725 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE context [
+<!ELEMENT context (device | context-attribute)*>
+<!ELEMENT context-attribute EMPTY>
+<!ELEMENT device (channel | attribute | debug-attribute | buffer-attribute)*>
+<!ELEMENT channel (scan-element? , attribute*)>
+<!ELEMENT attribute EMPTY>
+<!ELEMENT scan-element EMPTY>
+<!ELEMENT debug-attribute EMPTY>
+<!ELEMENT buffer-attribute EMPTY>
+<!ATTLIST context name CDATA #REQUIRED>
+<!ATTLIST context description CDATA #IMPLIED>
+<!ATTLIST context-attribute name CDATA #REQUIRED>
+<!ATTLIST context-attribute value CDATA #REQUIRED>
+<!ATTLIST device id CDATA #REQUIRED>
+<!ATTLIST device name CDATA #IMPLIED>
+<!ATTLIST channel id CDATA #REQUIRED>
+<!ATTLIST channel type (input | output) #REQUIRED>
+<!ATTLIST channel name CDATA #IMPLIED>
+<!ATTLIST scan-element index CDATA #REQUIRED>
+<!ATTLIST scan-element format CDATA #REQUIRED>
+<!ATTLIST scan-element scale CDATA #IMPLIED>
+<!ATTLIST attribute name CDATA #REQUIRED>
+<!ATTLIST attribute filename CDATA #IMPLIED>
+<!ATTLIST attribute value CDATA #IMPLIED>
+<!ATTLIST debug-attribute name CDATA #REQUIRED>
+<!ATTLIST debug-attribute value CDATA #IMPLIED>
+<!ATTLIST buffer-attribute name CDATA #REQUIRED>
+<!ATTLIST buffer-attribute value CDATA #IMPLIED>
+]>
+<context name="network" description="192.168.2.1 Linux (none) 4.19.0-gbd9f616 #102 SMP PREEMPT Thu Sep 17 09:44:38 CEST 2020 armv7l">
+    <context-attribute name="hw_model" value="Analog Devices M2k Rev.C (Z7010)"/>
+    <context-attribute name="hw_model_variant" value="0"/>
+    <context-attribute name="hw_serial" value="ADALM2000 Demo"/>
+    <context-attribute name="fw_version" value="v0.26"/>
+    <context-attribute name="cal,offset_pos_dac" value="0.018"/>
+    <context-attribute name="cal,gain_pos_dac" value="0.998048"/>
+    <context-attribute name="cal,offset_pos_adc" value="0.000730159"/>
+    <context-attribute name="cal,gain_pos_adc" value="0.995132"/>
+    <context-attribute name="cal,offset_neg_dac" value="0.0017"/>
+    <context-attribute name="cal,gain_neg_dac" value="0.996722"/>
+    <context-attribute name="cal,offset_neg_adc" value="-0.00167558"/>
+    <context-attribute name="cal,gain_neg_adc" value="1.00724"/>
+    <context-attribute name="local,kernel" value="4.19.0-gbd9f616"/>
+    <context-attribute name="uri" value="ip:127.0.0.1"/>
+    <context-attribute name="ip,ip-addr" value="127.0.0.1"/>
+    <device id="iio:device0" name="m2k-adc">
+        <channel id="voltage0" type="input">
+            <scan-element index="0" format="le:s12/16&gt;&gt;0"/>
+            <attribute name="calibbias" filename="in_voltage0_calibbias" value="1050"/>
+            <attribute name="calibscale" filename="in_voltage0_calibscale" value="1.000000"/>
+        </channel>
+        <channel id="voltage1" type="input">
+            <scan-element index="1" format="le:s12/16&gt;&gt;0"/>
+            <attribute name="calibbias" filename="in_voltage1_calibbias" value="1060"/>
+            <attribute name="calibscale" filename="in_voltage1_calibscale" value="1.000000"/>
+        </channel>
+        <attribute name="oversampling_ratio" value="0"/>
+        <attribute name="sampling_frequency" value="100000000"/>
+        <attribute name="sampling_frequency_available" value="1000 10000 100000 1000000 10000000 100000000"/>
+        <buffer-attribute name="data_available" value="0"/>
+        <buffer-attribute name="length_align_bytes" value="8"/>
+        <buffer-attribute name="watermark" value="2048"/>
+        <debug-attribute name="direct_reg_access" value="0xA0162"/>
+    </device>
+    <device id="iio:device1" name="xadc">
+        <channel id="voltage5" name="vccoddr" type="input">
+            <attribute name="raw" filename="in_voltage5_vccoddr_raw" value="1815"/>
+            <attribute name="scale" filename="in_voltage5_vccoddr_scale" value="0.732421875"/>
+        </channel>
+        <channel id="voltage0" name="vccint" type="input">
+            <attribute name="raw" filename="in_voltage0_vccint_raw" value="1352"/>
+            <attribute name="scale" filename="in_voltage0_vccint_scale" value="0.732421875"/>
+        </channel>
+        <channel id="voltage4" name="vccpaux" type="input">
+            <attribute name="raw" filename="in_voltage4_vccpaux_raw" value="2421"/>
+            <attribute name="scale" filename="in_voltage4_vccpaux_scale" value="0.732421875"/>
+        </channel>
+        <channel id="temp0" type="input">
+            <attribute name="offset" filename="in_temp0_offset" value="-2219"/>
+            <attribute name="raw" filename="in_temp0_raw" value="2659"/>
+            <attribute name="scale" filename="in_temp0_scale" value="123.040771484"/>
+        </channel>
+        <channel id="voltage7" name="vrefn" type="input">
+            <attribute name="raw" filename="in_voltage7_vrefn_raw" value="-7"/>
+            <attribute name="scale" filename="in_voltage7_vrefn_scale" value="0.732421875"/>
+        </channel>
+        <channel id="voltage1" name="vccaux" type="input">
+            <attribute name="raw" filename="in_voltage1_vccaux_raw" value="2426"/>
+            <attribute name="scale" filename="in_voltage1_vccaux_scale" value="0.732421875"/>
+        </channel>
+        <channel id="voltage2" name="vccbram" type="input">
+            <attribute name="raw" filename="in_voltage2_vccbram_raw" value="1354"/>
+            <attribute name="scale" filename="in_voltage2_vccbram_scale" value="0.732421875"/>
+        </channel>
+        <channel id="voltage3" name="vccpint" type="input">
+            <attribute name="raw" filename="in_voltage3_vccpint_raw" value="1351"/>
+            <attribute name="scale" filename="in_voltage3_vccpint_scale" value="0.732421875"/>
+        </channel>
+        <channel id="voltage8" type="input">
+            <attribute name="raw" filename="in_voltage8_raw" value="2845"/>
+            <attribute name="scale" filename="in_voltage8_scale" value="0.244140625"/>
+        </channel>
+        <channel id="voltage6" name="vrefp" type="input">
+            <attribute name="raw" filename="in_voltage6_vrefp_raw" value="1696"/>
+            <attribute name="scale" filename="in_voltage6_vrefp_scale" value="0.732421875"/>
+        </channel>
+        <attribute name="sampling_frequency" value="240384"/>
+    </device>
+    <device id="iio:device10" name="m2k-logic-analyzer-rx">
+        <channel id="voltage0" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;0"/>
+            <attribute name="trigger" filename="in_voltage0_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage1" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;1"/>
+            <attribute name="trigger" filename="in_voltage1_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage2" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;2"/>
+            <attribute name="trigger" filename="in_voltage2_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage3" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;3"/>
+            <attribute name="trigger" filename="in_voltage3_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage4" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;4"/>
+            <attribute name="trigger" filename="in_voltage4_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage5" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;5"/>
+            <attribute name="trigger" filename="in_voltage5_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage6" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;6"/>
+            <attribute name="trigger" filename="in_voltage6_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage7" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;7"/>
+            <attribute name="trigger" filename="in_voltage7_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage8" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;8"/>
+            <attribute name="trigger" filename="in_voltage8_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage9" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;9"/>
+            <attribute name="trigger" filename="in_voltage9_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage10" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;10"/>
+            <attribute name="trigger" filename="in_voltage10_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage11" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;11"/>
+            <attribute name="trigger" filename="in_voltage11_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage12" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;12"/>
+            <attribute name="trigger" filename="in_voltage12_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage13" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;13"/>
+            <attribute name="trigger" filename="in_voltage13_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage14" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;14"/>
+            <attribute name="trigger" filename="in_voltage14_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage15" type="input">
+            <scan-element index="0" format="le:u1/16&gt;&gt;15"/>
+            <attribute name="trigger" filename="in_voltage15_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage16" type="input">
+            <attribute name="trigger" filename="in_voltage16_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <channel id="voltage17" type="input">
+            <attribute name="trigger" filename="in_voltage17_trigger" value="none"/>
+            <attribute name="trigger_available" filename="in_voltage_trigger_available" value="none edge-any edge-rising edge-falling level-low level-high"/>
+            <attribute name="trigger_delay" filename="in_voltage_trigger_delay" value="0"/>
+            <attribute name="trigger_logic_mode" filename="in_voltage_trigger_logic_mode" value="or"/>
+            <attribute name="trigger_logic_mode_available" filename="in_voltage_trigger_logic_mode_available" value="or and"/>
+            <attribute name="trigger_mux_out" filename="in_voltage_trigger_mux_out" value="trigger-logic"/>
+            <attribute name="trigger_mux_out_available" filename="in_voltage_trigger_mux_out_available" value="trigger-in disabled"/>
+        </channel>
+        <attribute name="data_delay_auto" value="auto"/>
+        <attribute name="data_delay_auto_available" value="auto manual"/>
+        <attribute name="data_in_delay" value="0"/>
+        <attribute name="rate_mux" value="logic_analyzer"/>
+        <attribute name="rate_mux_available" value="logic_analyzer oscilloscope"/>
+        <attribute name="sampling_frequency" value="100000000"/>
+        <attribute name="streaming" value="0"/>
+        <attribute name="triggered" value="1"/>
+        <buffer-attribute name="data_available" value="0"/>
+        <buffer-attribute name="length_align_bytes" value="8"/>
+        <buffer-attribute name="watermark" value="2048"/>
+    </device>
+    <device id="iio:device11" name="m2k-fabric">
+        <channel id="voltage0" type="input">
+            <attribute name="gain" filename="in_voltage0_gain" value="low"/>
+            <attribute name="gain_available" filename="in_voltage_gain_available" value="low high"/>
+            <attribute name="powerdown" filename="in_voltage_powerdown" value="1"/>
+        </channel>
+        <channel id="voltage0" type="output">
+            <attribute name="powerdown" filename="out_voltage0_powerdown" value="1"/>
+        </channel>
+        <channel id="voltage3" type="output">
+            <attribute name="user_supply_powerdown" filename="out_voltage3_user_supply_powerdown" value="1"/>
+        </channel>
+        <channel id="voltage4" type="output">
+            <attribute name="done_led_overwrite_powerdown" filename="out_voltage4_done_led_overwrite_powerdown" value="0"/>
+        </channel>
+        <channel id="voltage1" type="output">
+            <attribute name="powerdown" filename="out_voltage1_powerdown" value="1"/>
+        </channel>
+        <channel id="voltage2" type="output">
+            <attribute name="user_supply_powerdown" filename="out_voltage2_user_supply_powerdown" value="1"/>
+        </channel>
+        <channel id="voltage1" type="input">
+            <attribute name="gain" filename="in_voltage1_gain" value="low"/>
+            <attribute name="gain_available" filename="in_voltage_gain_available" value="low high"/>
+            <attribute name="powerdown" filename="in_voltage_powerdown" value="1"/>
+        </channel>
+        <attribute name="calibration_mode" value="none"/>
+        <attribute name="calibration_mode_available" value="none adc_ref1 adc_ref2 adc_gnd dac"/>
+        <attribute name="clk_powerdown" value="1"/>
+    </device>
+    <device id="iio:device12" name="m2k-adc-trigger">
+        <channel id="voltage4" name="trigger_logic" type="input">
+            <attribute name="mode" filename="in_voltage4_trigger_logic_mode" value="always"/>
+            <attribute name="mode_available" filename="in_voltage4_trigger_logic_mode_available" value="gital_AND_analog !digital_XOR_analog"/>
+            <attribute name="out_direction" filename="in_voltage4_trigger_logic_out_direction" value="in"/>
+            <attribute name="out_direction_available" filename="in_voltage4_trigger_logic_out_direction_available" value="out in"/>
+            <attribute name="out_select" filename="in_voltage4_trigger_logic_out_select" value="sw-trigger"/>
+            <attribute name="out_select_available" filename="in_voltage4_trigger_logic_out_select_available" value="sw-trigger trigger-i-same-chan trigger-i-swap-chan trigger-adc trigger-in"/>
+        </channel>
+        <channel id="voltage5" name="trigger_logic" type="input">
+            <attribute name="mode" filename="in_voltage5_trigger_logic_mode" value="always"/>
+            <attribute name="mode_available" filename="in_voltage5_trigger_logic_mode_available" value="gital_AND_analog !digital_XOR_analog"/>
+            <attribute name="out_direction" filename="in_voltage5_trigger_logic_out_direction" value="out"/>
+            <attribute name="out_direction_available" filename="in_voltage5_trigger_logic_out_direction_available" value="out in"/>
+            <attribute name="out_select" filename="in_voltage5_trigger_logic_out_select" value="sw-trigger"/>
+            <attribute name="out_select_available" filename="in_voltage5_trigger_logic_out_select_available" value="sw-trigger trigger-i-same-chan trigger-i-swap-chan trigger-adc trigger-in"/>
+        </channel>
+        <channel id="voltage1" type="input">
+            <attribute name="trigger" filename="in_voltage1_trigger" value="edge-rising"/>
+            <attribute name="trigger_available" filename="in_voltage1_trigger_available" value="level-low level-high edge-rising edge-falling"/>
+            <attribute name="trigger_hysteresis" filename="in_voltage1_trigger_hysteresis" value="0"/>
+            <attribute name="trigger_level" filename="in_voltage1_trigger_level" value="0"/>
+        </channel>
+        <channel id="voltage6" name="trigger" type="input">
+            <attribute name="delay" filename="in_voltage6_trigger_delay" value="0"/>
+            <attribute name="embedded" filename="in_voltage6_trigger_embedded" value="0"/>
+            <attribute name="logic_mode" filename="in_voltage6_trigger_logic_mode" value="a"/>
+            <attribute name="logic_mode_available" filename="in_voltage6_trigger_logic_mode_available" value="  b a_OR_b a_AND_b a_XOR_b trigger_in a_OR_trigger_in b_OR_trigger_in a_OR_b_OR_trigger_in disabled"/>
+        </channel>
+        <channel id="voltage2" type="input">
+            <attribute name="trigger" filename="in_voltage2_trigger" value="level-low"/>
+            <attribute name="trigger_available" filename="in_voltage2_trigger_available" value="level-low level-high edge-any edge-rising edge-falling"/>
+        </channel>
+        <channel id="voltage0" type="input">
+            <attribute name="trigger" filename="in_voltage0_trigger" value="edge-rising"/>
+            <attribute name="trigger_available" filename="in_voltage0_trigger_available" value="level-low level-high edge-rising edge-falling"/>
+            <attribute name="trigger_hysteresis" filename="in_voltage0_trigger_hysteresis" value="0"/>
+            <attribute name="trigger_level" filename="in_voltage0_trigger_level" value="0"/>
+        </channel>
+        <channel id="voltage3" type="input">
+            <attribute name="trigger" filename="in_voltage3_trigger" value="level-low"/>
+            <attribute name="trigger_available" filename="in_voltage3_trigger_available" value="level-low level-high edge-any edge-rising edge-falling"/>
+        </channel>
+        <attribute name="holdoff_raw" value="0"/>
+        <attribute name="sampling_frequency" value="100000000"/>
+        <attribute name="streaming" value="0"/>
+        <attribute name="triggered" value="1"/>
+        <debug-attribute name="direct_reg_access" value="0x30000"/>
+    </device>
+    <device id="iio:device13" name="ad9963">
+        <channel id="voltage1" type="output">
+            <attribute name="raw" filename="out_voltage1_raw" value="0"/>
+        </channel>
+        <channel id="temp0" type="input">
+            <attribute name="offset" filename="in_temp0_offset" value="-1366"/>
+            <attribute name="raw" filename="in_temp0_raw" value="1595"/>
+            <attribute name="scale" filename="in_temp0_scale" value="200.000000000"/>
+        </channel>
+        <channel id="voltage0" type="input">
+            <attribute name="raw" filename="in_voltage0_raw" value="3130"/>
+            <attribute name="scale" filename="in_voltage0_scale" value="0.781250000"/>
+        </channel>
+        <channel id="voltage3" type="input">
+            <attribute name="raw" filename="in_voltage3_raw" value="1073"/>
+            <attribute name="scale" filename="in_voltage3_scale" value="0.781250000"/>
+        </channel>
+        <channel id="voltage1" type="input">
+            <attribute name="raw" filename="in_voltage1_raw" value="2"/>
+            <attribute name="scale" filename="in_voltage1_scale" value="0.781250000"/>
+        </channel>
+        <channel id="voltage4" type="input">
+            <attribute name="raw" filename="in_voltage4_raw" value="953"/>
+            <attribute name="scale" filename="in_voltage4_scale" value="0.781250000"/>
+        </channel>
+        <channel id="voltage5" type="input">
+            <attribute name="raw" filename="in_voltage5_raw" value="1772"/>
+            <attribute name="scale" filename="in_voltage5_scale" value="0.781250000"/>
+        </channel>
+        <channel id="voltage0" type="output">
+            <attribute name="raw" filename="out_voltage0_raw" value="0"/>
+        </channel>
+        <channel id="voltage2" type="input">
+            <attribute name="raw" filename="in_voltage2_raw" value="0"/>
+            <attribute name="scale" filename="in_voltage2_scale" value="0.781250000"/>
+        </channel>
+        <debug-attribute name="direct_reg_access" value="0x18"/>
+    </device>
+    <device id="iio:device2" name="ad5625">
+        <channel id="voltage1" type="output">
+            <attribute name="powerdown" filename="out_voltage1_powerdown" value="0"/>
+            <attribute name="powerdown_mode" filename="out_voltage1_powerdown_mode" value="1kohm_to_gnd"/>
+            <attribute name="powerdown_mode_available" filename="out_voltage_powerdown_mode_available" value="1kohm_to_gnd 100kohm_to_gnd three_state"/>
+            <attribute name="raw" filename="out_voltage1_raw" value="2048"/>
+            <attribute name="scale" filename="out_voltage1_scale" value="0.292968750"/>
+        </channel>
+        <channel id="voltage2" type="output">
+            <attribute name="powerdown" filename="out_voltage2_powerdown" value="0"/>
+            <attribute name="powerdown_mode" filename="out_voltage2_powerdown_mode" value="1kohm_to_gnd"/>
+            <attribute name="powerdown_mode_available" filename="out_voltage_powerdown_mode_available" value="1kohm_to_gnd 100kohm_to_gnd three_state"/>
+            <attribute name="raw" filename="out_voltage2_raw" value="2048"/>
+            <attribute name="scale" filename="out_voltage2_scale" value="0.292968750"/>
+        </channel>
+        <channel id="voltage0" type="output">
+            <attribute name="powerdown" filename="out_voltage0_powerdown" value="0"/>
+            <attribute name="powerdown_mode" filename="out_voltage0_powerdown_mode" value="1kohm_to_gnd"/>
+            <attribute name="powerdown_mode_available" filename="out_voltage_powerdown_mode_available" value="1kohm_to_gnd 100kohm_to_gnd three_state"/>
+            <attribute name="raw" filename="out_voltage0_raw" value="2048"/>
+            <attribute name="scale" filename="out_voltage0_scale" value="0.292968750"/>
+        </channel>
+        <channel id="voltage3" type="output">
+            <attribute name="powerdown" filename="out_voltage3_powerdown" value="0"/>
+            <attribute name="powerdown_mode" filename="out_voltage3_powerdown_mode" value="1kohm_to_gnd"/>
+            <attribute name="powerdown_mode_available" filename="out_voltage_powerdown_mode_available" value="1kohm_to_gnd 100kohm_to_gnd three_state"/>
+            <attribute name="raw" filename="out_voltage3_raw" value="2048"/>
+            <attribute name="scale" filename="out_voltage3_scale" value="0.292968750"/>
+        </channel>
+    </device>
+    <device id="iio:device3" name="ad5627">
+        <channel id="voltage1" type="output">
+            <attribute name="powerdown" filename="out_voltage1_powerdown" value="1"/>
+            <attribute name="powerdown_mode" filename="out_voltage1_powerdown_mode" value="1kohm_to_gnd"/>
+            <attribute name="powerdown_mode_available" filename="out_voltage_powerdown_mode_available" value="1kohm_to_gnd 100kohm_to_gnd three_state"/>
+            <attribute name="raw" filename="out_voltage1_raw" value="-0.000000"/>
+            <attribute name="scale" filename="out_voltage1_scale" value="0.292968750"/>
+        </channel>
+        <channel id="voltage0" type="output">
+            <attribute name="powerdown" filename="out_voltage0_powerdown" value="1"/>
+            <attribute name="powerdown_mode" filename="out_voltage0_powerdown_mode" value="1kohm_to_gnd"/>
+            <attribute name="powerdown_mode_available" filename="out_voltage_powerdown_mode_available" value="1kohm_to_gnd 100kohm_to_gnd three_state"/>
+            <attribute name="raw" filename="out_voltage0_raw" value="0.000000"/>
+            <attribute name="scale" filename="out_voltage0_scale" value="0.292968750"/>
+        </channel>
+    </device>
+    <device id="iio:device4" name="pll">
+        <channel id="altvoltage0" type="output">
+            <attribute name="frequency" filename="out_altvoltage0_frequency" value="100000000"/>
+            <attribute name="mute_till_lock_detect" filename="out_altvoltage0_mute_till_lock_detect" value="1"/>
+            <attribute name="muxout_mode" filename="out_altvoltage0_muxout_mode" value="lock-detect"/>
+            <attribute name="muxout_mode_available" filename="out_altvoltage_muxout_mode_available" value="three-state lock-detect ndiv dvdd rdiv od-ld sdo gnd"/>
+            <attribute name="pfd_frequency" filename="out_altvoltage0_pfd_frequency" value="5000000"/>
+            <attribute name="power_down" filename="out_altvoltage0_power_down" value="normal"/>
+            <attribute name="power_down_available" filename="out_altvoltage_power_down_available" value="normal soft-async ce soft-sync regulator"/>
+            <attribute name="power_level" filename="out_altvoltage0_power_level" value="5000-uA"/>
+            <attribute name="power_level_available" filename="out_altvoltage_power_level_available" value="3500-uA 5000-uA 7500-uA 11000-uA"/>
+            <attribute name="refin_frequency" filename="out_altvoltage0_refin_frequency" value="20000000"/>
+        </channel>
+        <debug-attribute name="direct_reg_access" value="0xFD924"/>
+    </device>
+    <device id="iio:device5" name="m2k-dds">
+        <channel id="altvoltage3" name="2B" type="output">
+            <attribute name="frequency" filename="out_altvoltage3_2B_frequency" value="0"/>
+            <attribute name="phase" filename="out_altvoltage3_2B_phase" value="0"/>
+            <attribute name="raw" filename="out_altvoltage3_2B_raw" value="1"/>
+            <attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="75000000"/>
+            <attribute name="scale" filename="out_altvoltage3_2B_scale" value="0.000000"/>
+        </channel>
+        <channel id="altvoltage0" name="1A" type="output">
+            <attribute name="frequency" filename="out_altvoltage0_1A_frequency" value="0"/>
+            <attribute name="phase" filename="out_altvoltage0_1A_phase" value="0"/>
+            <attribute name="raw" filename="out_altvoltage0_1A_raw" value="1"/>
+            <attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="75000000"/>
+            <attribute name="scale" filename="out_altvoltage0_1A_scale" value="0.000000"/>
+        </channel>
+        <channel id="altvoltage1" name="1B" type="output">
+            <attribute name="frequency" filename="out_altvoltage1_1B_frequency" value="0"/>
+            <attribute name="phase" filename="out_altvoltage1_1B_phase" value="0"/>
+            <attribute name="raw" filename="out_altvoltage1_1B_raw" value="1"/>
+            <attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="75000000"/>
+            <attribute name="scale" filename="out_altvoltage1_1B_scale" value="0.000000"/>
+        </channel>
+        <channel id="altvoltage2" name="2A" type="output">
+            <attribute name="frequency" filename="out_altvoltage2_2A_frequency" value="0"/>
+            <attribute name="phase" filename="out_altvoltage2_2A_phase" value="0"/>
+            <attribute name="raw" filename="out_altvoltage2_2A_raw" value="1"/>
+            <attribute name="sampling_frequency" filename="out_altvoltage_sampling_frequency" value="75000000"/>
+            <attribute name="scale" filename="out_altvoltage2_2A_scale" value="0.000000"/>
+        </channel>
+        <debug-attribute name="direct_reg_access" value="0x90162"/>
+    </device>
+    <device id="iio:device6" name="m2k-dac-a">
+        <channel id="voltage0" type="output">
+            <scan-element index="0" format="le:S16/16&gt;&gt;0"/>
+        </channel>
+        <attribute name="calibscale" value="1.000000"/>
+        <attribute name="dma_sync" value="1"/>
+        <attribute name="dma_sync_start" value="1"/>
+        <attribute name="oversampling_ratio" value="1"/>
+        <attribute name="sampling_frequency" value="75000000"/>
+        <attribute name="sampling_frequency_available" value="750 7500 75000 750000 7500000 75000000"/>
+        <attribute name="trigger_condition" value="none"/>
+        <attribute name="trigger_condition_available" value="none level-low level-high edge-any edge-rising edge-falling"/>
+        <attribute name="trigger_src" value="none"/>
+        <attribute name="trigger_src_available" value="none trigger-i_0 trigger-i_1 trigger-adc trigger-la"/>
+        <buffer-attribute name="data_available" value="0"/>
+        <buffer-attribute name="length_align_bytes" value="8"/>
+        <buffer-attribute name="watermark" value="2048"/>
+        <debug-attribute name="direct_reg_access" value="0x20100"/>
+    </device>
+    <device id="iio:device7" name="m2k-dac-b">
+        <channel id="voltage0" type="output">
+            <scan-element index="0" format="le:S16/16&gt;&gt;0"/>
+        </channel>
+        <attribute name="calibscale" value="1.000000"/>
+        <attribute name="dma_sync" value="1"/>
+        <attribute name="dma_sync_start" value="1"/>
+        <attribute name="oversampling_ratio" value="1"/>
+        <attribute name="sampling_frequency" value="75000000"/>
+        <attribute name="sampling_frequency_available" value="750 7500 75000 750000 7500000 75000000"/>
+        <attribute name="trigger_condition" value="none"/>
+        <attribute name="trigger_condition_available" value="none level-low level-high edge-any edge-rising edge-falling"/>
+        <attribute name="trigger_src" value="none"/>
+        <attribute name="trigger_src_available" value="none trigger-i_0 trigger-i_1 trigger-adc trigger-la"/>
+        <buffer-attribute name="data_available" value="0"/>
+        <buffer-attribute name="length_align_bytes" value="8"/>
+        <buffer-attribute name="watermark" value="2048"/>
+        <debug-attribute name="direct_reg_access" value="0x20100"/>
+    </device>
+    <device id="iio:device8" name="m2k-logic-analyzer">
+        <channel id="voltage6" type="input">
+            <attribute name="direction" filename="in_voltage6_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage6_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage6_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage3" type="input">
+            <attribute name="direction" filename="in_voltage3_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage3_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage3_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage8" type="input">
+            <attribute name="direction" filename="in_voltage8_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage8_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage8_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage10" type="input">
+            <attribute name="direction" filename="in_voltage10_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage10_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage10_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage2" type="input">
+            <attribute name="direction" filename="in_voltage2_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage2_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage2_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage14" type="input">
+            <attribute name="direction" filename="in_voltage14_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage14_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage14_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage12" type="input">
+            <attribute name="direction" filename="in_voltage12_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage12_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage12_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage5" type="input">
+            <attribute name="direction" filename="in_voltage5_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage5_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage5_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage4" type="input">
+            <attribute name="direction" filename="in_voltage4_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage4_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage4_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage9" type="input">
+            <attribute name="direction" filename="in_voltage9_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage9_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage9_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage7" type="input">
+            <attribute name="direction" filename="in_voltage7_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage7_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage7_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage0" type="input">
+            <attribute name="direction" filename="in_voltage0_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage0_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage0_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage11" type="input">
+            <attribute name="direction" filename="in_voltage11_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage11_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage11_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage15" type="input">
+            <attribute name="direction" filename="in_voltage15_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage15_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage15_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage13" type="input">
+            <attribute name="direction" filename="in_voltage13_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage13_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage13_raw" value="0.000000"/>
+        </channel>
+        <channel id="voltage1" type="input">
+            <attribute name="direction" filename="in_voltage1_direction" value="in"/>
+            <attribute name="direction_available" filename="in_voltage_direction_available" value="in out"/>
+            <attribute name="outputmode" filename="in_voltage1_outputmode" value="push-pull"/>
+            <attribute name="outputmode_available" filename="in_voltage_outputmode_available" value="push-pull open-drain"/>
+            <attribute name="raw" filename="in_voltage1_raw" value="0.000000"/>
+        </channel>
+        <attribute name="clocksource" value="internal"/>
+        <attribute name="clocksource_available" value="internal external"/>
+        <attribute name="powerdown" value="0"/>
+        <attribute name="sampling_frequency" value="99999999"/>
+        <debug-attribute name="direct_reg_access" value="0x20100"/>
+    </device>
+    <device id="iio:device9" name="m2k-logic-analyzer-tx">
+        <channel id="voltage0" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;0"/>
+        </channel>
+        <channel id="voltage1" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;1"/>
+        </channel>
+        <channel id="voltage2" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;2"/>
+        </channel>
+        <channel id="voltage3" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;3"/>
+        </channel>
+        <channel id="voltage4" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;4"/>
+        </channel>
+        <channel id="voltage5" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;5"/>
+        </channel>
+        <channel id="voltage6" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;6"/>
+        </channel>
+        <channel id="voltage7" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;7"/>
+        </channel>
+        <channel id="voltage8" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;8"/>
+        </channel>
+        <channel id="voltage9" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;9"/>
+        </channel>
+        <channel id="voltage10" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;10"/>
+        </channel>
+        <channel id="voltage11" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;11"/>
+        </channel>
+        <channel id="voltage12" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;12"/>
+        </channel>
+        <channel id="voltage13" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;13"/>
+        </channel>
+        <channel id="voltage14" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;14"/>
+        </channel>
+        <channel id="voltage15" type="output">
+            <scan-element index="0" format="le:u1/16&gt;&gt;15"/>
+        </channel>
+        <attribute name="sampling_frequency" value="100000000"/>
+        <attribute name="trigger_condition" value="none"/>
+        <attribute name="trigger_condition_available" value="none level-low level-high edge-any edge-rising edge-falling"/>
+        <attribute name="trigger_src" value="none"/>
+        <attribute name="trigger_src_available" value="none trigger-i_0 trigger-i_1 trigger-adc trigger-la"/>
+        <buffer-attribute name="data_available" value="0"/>
+        <buffer-attribute name="length_align_bytes" value="8"/>
+        <buffer-attribute name="watermark" value="2048"/>
+    </device>
+</context>
