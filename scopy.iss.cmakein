@@ -2,6 +2,7 @@
 #define AppName "Scopy"
 #define AppDev "Analog Devices"
 #define Python "@PYTHON_VERSION@"
+#define DriverVersion "0.7"
 
 [Setup]
 AppId={{02A7A7F9-F068-4B1C-85F6-B6D325938E19}
@@ -48,13 +49,25 @@ Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
 Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
+[Code]
+function isDriverInstalled(): Boolean;
+begin
+  Result := True;
+  if not RegKeyExists(HKLM, 'Software\Analog Devices\{#AppName}\Settings') then
+  begin
+    Result := False;
+  end;
+end;
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "deleteini"; Description: Delete previous settings (Scopy.ini)
+Name: "drivers"; Description: Install drivers for ADALM2000; Check: not isDriverInstalled;
 
 [Files]
-Source: "c:\scopy_32\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "c:\scopy_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "c:\scopy_32\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
@@ -63,3 +76,18 @@ Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desk
 
 [InstallDelete]
 Type: files; Name: "{userappdata}\ADI\Scopy.ini"; Tasks: deleteini
+
+[Run]
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/PATH ""{app}\drivers"" {param:dpinstflags|/F}" ; Flags: waituntilterminated; Tasks: drivers
+
+[UninstallRun]
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-cdc-acm.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-rndis.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-usbd.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-dfu.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
+
+[Registry]
+Root: HKLM; Subkey: "Software\Analog Devices"; Flags: uninsdeletekeyifempty
+Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
+Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallVersion"; ValueData: {#DriverVersion}

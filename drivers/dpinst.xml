@@ -1,0 +1,14 @@
+<?xml version="1.0" ?> 
+  <dpinst>
+    <search> 
+      <subDirectory>*</subDirectory> 
+    </search>
+
+      <dpinstTitle>PlutoSDR/M2k Device Driver Updater</dpinstTitle> 
+      <welcomeTitle>Welcome to the PlutoSDR/M2k Installer!</welcomeTitle> 
+      <welcomeIntro>This wizard will walk you through updating the drivers for your PlutoSDR/M2k.</welcomeIntro> 
+      <installHeaderTitle>Installing the software for your PlutoSDR/M2k...</installHeaderTitle> 
+      <finishTitle>Congratulations! You finished installing your PlutoSDR/M2k drivers.</finishTitle> 
+
+  </dpinst>
+	

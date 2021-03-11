@@ -11,6 +11,11 @@ WORKDIR=${PWD}
 echo BUILD_NO $BUILD_NO
 JOBS=$(nproc)
 
+wget http://swdownloads.analog.com/cse/m1k/drivers/dpinst.zip
+wget http://swdownloads.analog.com/cse/m1k/drivers/dfu-util.zip
+7z x -y "dpinst.zip" -o"/c/dpinst"
+7z x -y "dfu-util.zip" -o"/c/dfu-util"
+
 CC=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-gcc.exe
 CXX=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-g++.exe
 CMAKE_OPTS="\
@@ -99,6 +104,15 @@ dump_syms -r /c/$DEST_FOLDER/Scopy.exe > /c/$DEST_FOLDER/Scopy.exe.sym
 mkdir /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/Scopy.exe.sym /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/.debug /c/$DEBUG_FOLDER
+
+cp -r /c/projects/scopy/drivers /c/$DEST_FOLDER
+if [[ $ARCH_BIT == "64" ]]; then
+	cp /c/dfu-util/dfu-util-static-amd64.exe /c/$DEST_FOLDER/drivers/dfu-util.exe
+	cp /c/dpinst/dpinst_amd64.exe /c/$DEST_FOLDER/drivers/dpinst.exe
+else
+	cp /c/dfu-util/dfu-util-static.exe /c/$DEST_FOLDER/drivers/dfu-util.exe
+	cp /c/dpinst/dpinst.exe /c/$DEST_FOLDER/drivers/dpinst.exe
+fi
 
 appveyor AddMessage "9. Scopy succesfully deployed"
 
