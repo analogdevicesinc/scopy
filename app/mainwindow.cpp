@@ -13,6 +13,7 @@
 #include <scopy/gui/linked_button.hpp>
 #include <scopy/gui/small_on_off_switch.hpp>
 #include <scopy/gui/channel_widget.hpp>
+#include <scopy/gui/custom_switch.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -20,7 +21,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 
-	ui->centralLayout->addWidget(new scopy::gui::RunSingleWidget);
+	ui->vLayout1->addWidget(new scopy::gui::RunSingleWidget);
 
 	ui->vLayout->addWidget(new scopy::gui::SubsectionSeparator("My label", true));
 	ui->vLayout->addWidget(new scopy::gui::SubsectionSeparator("Another label", false));
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	ui->vLayout->addWidget(new scopy::gui::HomepageControls(this));
 
-//	ui->centralLayout->addWidget(new scopy::gui::ConnectDialog(this));
+	ui->vLayout1->addWidget(new scopy::gui::ConnectDialog(this));
 
 	scopy::gui::LinkedButton* btn = new scopy::gui::LinkedButton;
 	btn->setUrl("https://stackoverflow.com/questions/10838654/qt-designer-adding-a-link-to-a-qpushbutton");
@@ -46,10 +47,13 @@ MainWindow::MainWindow(QWidget* parent)
 
 	ui->vLayout->addWidget(new scopy::gui::SmallOnOffSwitch(ui->centralwidget));
 
-	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(0, true, true, "orange", ui->centralwidget));
-	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(1, false, true, "purple", ui->centralwidget));
-	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(2, false, false, "red", ui->centralwidget));
-	ui->vLayout->addWidget(new scopy::gui::ChannelWidget(3, true, false, "green", ui->centralwidget));
+	ui->vLayout1->addWidget(new scopy::gui::ChannelWidget(0, true, true, "orange", ui->centralwidget));
+	ui->vLayout1->addWidget(new scopy::gui::ChannelWidget(1, false, true, "purple", ui->centralwidget));
+	ui->vLayout1->addWidget(new scopy::gui::ChannelWidget(2, false, false, "red", ui->centralwidget));
+	ui->vLayout1->addWidget(new scopy::gui::ChannelWidget(3, true, false, "green", ui->centralwidget));
+
+	ui->vLayout1->addWidget(new scopy::gui::CustomSwitch);
+
 }
 
 MainWindow::~MainWindow() { delete ui; }
