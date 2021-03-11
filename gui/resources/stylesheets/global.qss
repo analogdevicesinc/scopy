@@ -115,6 +115,19 @@ QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 
 QPushButton[blue_button=true]:disabled { background-color: grey; }
 
+/* Info button for each tool */
+
+QPushButton[info_button=true]{
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 40px;
+	 max-width: 40px;
+	 background-color: transparent;
+	 border-radius: 4px;
+}
+
+QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
+
 /*********************************** SubsectionSeparator ***************************************/
 
 QLabel#lblSubsectionSeparator{
