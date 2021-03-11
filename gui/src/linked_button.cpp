@@ -10,8 +10,16 @@ using namespace scopy::gui;
 LinkedButton::LinkedButton(QWidget* parent)
 	: QPushButton(parent)
 {
-	DynamicWidget::setDynamicProperty(this,"blue_button", true);
 	DynamicWidget::setDynamicProperty(this,"info_button", true);
+
+	// TODO: replace with this line
+	//this->setIcon(QIcon::fromTheme("ico info"));
+
+	// to be removed, used just for testing outside of scopy 2.0
+	this->setIcon(QIcon(":/icons/ico info.png"));
+	///
+
+	this->setIconSize(QSize(32, 32));
 
 	this->setToolTip("See more info");
 
