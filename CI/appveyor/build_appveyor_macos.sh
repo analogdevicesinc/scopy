@@ -10,7 +10,7 @@ if [ -f /opt/qt59/bin/qt59-env.sh ] ; then
 fi
 
 if command -v brew ; then
-	QT_PATH="$(brew --prefix qt)/bin"
+	QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
 	export PATH="${QT_PATH}:$PATH"
 fi
 

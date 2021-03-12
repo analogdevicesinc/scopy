@@ -32,6 +32,7 @@ environment:
           DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
           C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
           CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
+          QT_FORMULAE: "qt5"
 
         - ARCH: x86_64
           ARCH_BIT: 64
