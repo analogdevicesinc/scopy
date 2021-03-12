@@ -16,7 +16,7 @@ BOOST_VERSION_FILE=1_73_0
 BOOST_VERSION=1.73.0
 
 PYTHON="python3"
-PACKAGES=" qt pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
+PACKAGES=" ${QT_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2"
 
 set -e
@@ -48,7 +48,8 @@ pip3 install mako six
 pwd
 source ./projects/scopy/CI/appveyor/before_install_lib.sh
 
-QT_PATH="$(brew --prefix qt)/bin"
+QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
+
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/opt/bison/bin:$PATH"
 export PATH="${QT_PATH}:$PATH"

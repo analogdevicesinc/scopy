@@ -80,12 +80,17 @@ sudo install_name_tool -change ${ad9361rpath} @executable_path/../Frameworks/${a
 sudo install_name_tool -change ${pythonidrpath} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/libsigrokdecode*
 sudo install_name_tool -change ${libusbpath} @executable_path/../Frameworks/${libusbid} ./Scopy.app/Contents/Frameworks/iio.framework/iio
 
+if command -v brew ; then
+	QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
+	export PATH="${QT_PATH}:$PATH"
+fi
+
 ## Bundle the Qt libraries
-sudo /usr/local/opt/qt/bin/macdeployqt Scopy.app
+sudo macdeployqt Scopy.app
 
 curl -o /tmp/macdeployqtfix.py https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
 sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy /usr/local/opt/qt/
 sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ./Scopy.app/Contents/Frameworks/
 
-sudo /usr/local/opt/qt/bin/macdeployqt Scopy.app -dmg
+sudo macdeployqt Scopy.app -dmg
 ls
