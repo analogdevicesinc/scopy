@@ -6,14 +6,15 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Xml REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml REQUIRED)
 
 add_executable(scopy mainwindow.cpp main.cpp mainwindow.ui)
 
 target_link_libraries(
     scopy
     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+	    Qt${QT_VERSION_MAJOR}::Xml
             scopy::core
             scopy::gui
             project_options

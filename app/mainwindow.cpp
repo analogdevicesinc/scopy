@@ -15,6 +15,7 @@
 #include <scopy/gui/spinbox_a.hpp>
 #include <scopy/gui/subsection_separator.hpp>
 #include <scopy/gui/two_buttons_widget.hpp>
+#include <scopy/gui/bitfield_widget.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -57,6 +58,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout1->addWidget(new scopy::gui::CustomSwitch);
 
 	ui->vLayout1->addWidget(new scopy::gui::CustomPlotPositionButton);
+
+	ui->vLayout1->addWidget(new scopy::gui::BitfieldWidget(this, new QDomElement));
 }
 
 MainWindow::~MainWindow() { delete ui; }
