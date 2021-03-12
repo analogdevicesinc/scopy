@@ -28,5 +28,3 @@ ColoredQWidget::ColoredQWidget(QWidget* parent)
 	/* Permits the QWidget to have a visible background */
 	setAttribute(Qt::WA_StyledBackground, true);
 }
-
-ColoredQWidget::~ColoredQWidget() {}
