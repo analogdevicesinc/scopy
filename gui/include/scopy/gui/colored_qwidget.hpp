@@ -30,7 +30,7 @@ class ColoredQWidget : public QWidget
 {
 public:
 	explicit ColoredQWidget(QWidget* parent = nullptr);
-	virtual ~ColoredQWidget();
+	virtual ~ColoredQWidget() = default;
 };
 } // namespace gui
 } // namespace scopy
