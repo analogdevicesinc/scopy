@@ -14,7 +14,7 @@ add_executable(scopy mainwindow.cpp main.cpp mainwindow.ui)
 target_link_libraries(
     scopy
     PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
-	    Qt${QT_VERSION_MAJOR}::Xml
+            Qt${QT_VERSION_MAJOR}::Xml
             scopy::core
             scopy::gui
             project_options
