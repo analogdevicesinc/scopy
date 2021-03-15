@@ -1,0 +1,45 @@
+
+trigger:
+  branches:
+    exclude:
+    - no_ci_*
+
+variables:
+  ARTIFACTS_DIR: "$(Agent.BuildDirectory)/s/artifacts"
+
+jobs:
+- job: LinuxBuilds
+  strategy:
+    matrix:
+
+      clang_format:
+        imageName: 'ubuntu-20.04'
+        BUILD_TYPE: "clang_format"
+  pool:
+    vmImage: $(imageName)
+  steps:
+    - checkout: self
+      fetchDepth: 1
+      clean: true
+      persistCredentials: true
+
+    - script: ./ci/azure/deps.sh
+      displayName: Install Dependencies
+
+    - script: ./ci/azure/run_build.sh
+      displayName: Run Build
+
+    - bash: |
+        if [ -f $(Agent.BuildDirectory)/s/artifacts/format-code.patch ]; then
+          echo "##vso[task.setVariable variable=patchexists]true"
+        fi
+      condition: eq(variables['BUILD_TYPE'], 'clang_format')
+
+    - task: PublishBuildArtifacts@1
+      condition: and(
+        eq(variables['BUILD_TYPE'], 'clang_format'),
+        eq(variables.patchexists, 'true')
+        )
+      inputs:
+        pathToPublish: '$(Agent.BuildDirectory)/s/artifacts'
+        artifactName: format-patch
