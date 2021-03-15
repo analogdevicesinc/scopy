@@ -20,10 +20,10 @@
 #ifndef CUSTOMPLOTPOSITIONBUTTON_H
 #define CUSTOMPLOTPOSITIONBUTTON_H
 
-#include <scopy/gui/colored_qwidget.hpp>
-
 #include <QButtonGroup>
 #include <QWidget>
+
+#include <scopy/gui/colored_qwidget.hpp>
 
 namespace Ui {
 class CustomPlotPositionButton;

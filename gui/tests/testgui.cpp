@@ -3,19 +3,20 @@
 
 //#include "spinbox_a.hpp"
 
-//class TestGui: public QObject
+// class TestGui: public QObject
 //{
 //    Q_OBJECT
 
-//private:
-//	void testCustomSpinBox(scopy::SpinBoxA *spinBox, QString *label, QVector<QString> *cboxData, QVector<QString> *lineEditData);
+// private:
+//	void testCustomSpinBox(scopy::SpinBoxA *spinBox, QString *label, QVector<QString> *cboxData, QVector<QString>
+//*lineEditData);
 
-//private slots:
+// private slots:
 //	void testSpinBoxButtons();
 
 //};
 
-//void TestGui::testSpinBoxButtons()
+// void TestGui::testSpinBoxButtons()
 //{
 //	QWidget *parent = new QWidget();
 //	scopy::ScaleSpinButton *scaleSpinBox = new scopy::ScaleSpinButton({
@@ -52,9 +53,9 @@
 
 //}
 
-//void TestGui::testCustomSpinBox(scopy::SpinBoxA *spinBox, QString *labelValue, QVector<QString> *cboxData, QVector<QString> *lineEditData){
-//	QLabel *label = spinBox->getLabel();
-//	QComboBox *comboBox = spinBox->getComboBox();
+// void TestGui::testCustomSpinBox(scopy::SpinBoxA *spinBox, QString *labelValue, QVector<QString> *cboxData,
+// QVector<QString> *lineEditData){ 	QLabel *label = spinBox->getLabel(); 	QComboBox *comboBox =
+// spinBox->getComboBox();
 //	QLineEdit *lineEdit = spinBox->getLineEdit();
 //	QPushButton *upButton = spinBox->getUpButton();
 //	QPushButton *downButton = spinBox->getDownButton();
@@ -80,5 +81,5 @@
 
 //}
 
-//QTEST_MAIN(TestGui)
+// QTEST_MAIN(TestGui)
 //#include "testgui.moc"
