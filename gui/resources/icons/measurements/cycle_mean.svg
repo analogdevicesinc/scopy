@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="20px" viewBox="0 0 30 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 43.2 (39069) - http://www.bohemiancoding.com/sketch -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gating-icons" transform="translate(-1640.000000, -230.000000)">
+            <g id="Group" transform="translate(1640.000000, 231.000000)">
+                <g id="cycle-mean">
+                    <path d="M1,18 C1.46850694,18 4.10782519e-15,18 3,18 C6,18 7,15.687662 7,14 C7,10 7,5.09375245 7,4 C7,2 8,4.299242e-13 11,1.84741098e-13 C14,-6.03961325e-14 15,2 15,4 C15,6 14.8639909,14 15,14 C15,16 16,18 19,18 C22,18 23,15 23,14 C23,11 23,6.5 23,4 C23,1.91680005e-13 27,1.81188398e-13 27,1.81188398e-13 L29,3.44613227e-13" id="Line-Copy-17" stroke="#727273" stroke-width="2" stroke-linecap="square" transform="translate(15.000000, 9.000000) rotate(-180.000000) translate(-15.000000, -9.000000) "></path>
+                    <rect id="Rectangle_2_copy_122-Copy-32" fill="#4A64FF" x="0" y="8" width="30" height="1"></rect>
+                </g>
+                <rect id="Rectangle-3" fill="#4A64FF" x="5" y="8" width="4" height="3"></rect>
+                <rect id="Rectangle-3-Copy" fill="#4A64FF" x="21" y="8" width="4" height="3"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

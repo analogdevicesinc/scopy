@@ -44,6 +44,7 @@ add_library(
     src/custom_plot_position_button.cpp
     src/colored_qwidget.cpp
     src/bitfield_widget.cpp
+    src/theme_manager.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui

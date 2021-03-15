@@ -48,7 +48,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normalon>:/icons/time_trigger_left.svg</normalon>
+       <normalon>:/icons/common/time_trigger_left.svg</normalon>
       </iconset>
      </property>
      <property name="iconSize">
@@ -87,7 +87,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normalon>:/icons/time_trigger_right.svg</normalon>
+       <normalon>:/icons/common/time_trigger_right.svg</normalon>
       </iconset>
      </property>
      <property name="iconSize">
@@ -120,7 +120,7 @@
      </property>
      <property name="icon">
       <iconset>
-       <normalon>:/icons/sba_up_btn_pressed.svg</normalon>
+       <normalon>:/icons/common/sba_up_btn_pressed.svg</normalon>
        <activeon>:/icons/sba_up_btn_pressed.svg</activeon>
       </iconset>
      </property>

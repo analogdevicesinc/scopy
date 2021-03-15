@@ -1,0 +1,8 @@
+[Icon Theme]
+Name=DefaultTheme
+Comment=Default dark theme
+
+Directories=icons
+
+[icons]
+Size=16

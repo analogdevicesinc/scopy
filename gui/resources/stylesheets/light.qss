@@ -1,0 +1,379 @@
+/*********************************** Global *******************************************/
+
+QMainWindow > .QWidget {
+	background-color: #F7F7F7;
+}
+
+/* Default settings for QWidget and its sub-classes */
+QWidget {
+	background-color: transparent;
+	color: #141416;
+	font-style: normal;
+	font-weight: normal;
+	font-size: 13px;
+}
+
+QToolTip {
+    padding: 6px;
+    border: 1px solid rgba(149, 152, 154, 150);
+    color: rgba(0, 0, 0, 200);
+}
+
+QLabel {
+	color: rgba(0, 0, 0, 200);
+	font-size: 13px;
+	font-style: normal;
+	font-weight: normal;
+	text-align: left;
+}
+
+QLabel:disabled, QRadioButton:disabled {color: rgba(0, 0, 0, 70); }
+
+QCheckBox {
+  spacing: 8px;
+  background-color: transparent;
+  font-size: 14px;
+  font-weight: normal;
+  color: rgba(0, 0, 0, 200);
+}
+
+QCheckBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgb(74,100,255);
+  border-radius: 4px;
+}
+
+QCheckBox::indicator:unchecked { background-color: transparent; }
+QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+
+QLineEdit {
+	color: rgba(0, 0, 0, 200);
+	font-size: 16px;
+	border: 0px solid gray;
+	border-bottom: 1px solid rgba(0, 0, 0, 40);
+	padding: 2px;
+}
+
+QComboBox {
+	height: 24px;
+	border: none;
+	font-size: 14px;
+
+	border-bottom: 1px solid rgba(0, 0, 0, 40);
+	padding-bottom: 4px;
+}
+
+QComboBox:disabled, QLineEdit:disabled { color: rgba(0, 0, 0, 70); }
+
+QComboBox QAbstractItemView {
+	border: none;
+	background-color: white;
+	text-align: left;
+	color: #bebebe;
+	outline: none;
+
+	border-bottom: 1px solid #bebebe;
+	border-top: 1px solid #bebebe;
+}
+
+/* This only works on Windows */
+
+QComboBox QAbstractItemView { selection-background-color: #EDEDED; }
+
+/* This does not work on Windows */
+QComboBox::item:selected {
+	font-weight: bold;
+	font-size: 18px;
+	border-bottom: 0px solid none;
+	background-color: #EDEDED;
+}
+
+QComboBox::drop-down {
+	subcontrol-position: center right;
+	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	width: 10px;
+	height: 6px;
+	font-size: 16px;
+	text-align: left;
+}
+
+QComboBox::indicator {
+	background-color: transparent;
+	selection-background-color: transparent;
+	color: transparent;
+	selection-color: transparent;
+}
+
+/* General style for blue buttons */
+
+QPushButton[blue_button=true]{
+	background-color: #4a64ff;
+	color: #ffffff;
+	border-radius: 4px;
+	font-size: 14px;
+}
+
+QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
+QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
+QPushButton[blue_button=true]:disabled { background-color: grey; }
+
+/* Info button for each tool */
+
+QPushButton[info_button=true]{
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 40px;
+	 max-width: 40px;
+	 background-color: transparent;
+	 border-radius: 4px;
+}
+
+QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
+
+
+/*********************************** SubsectionSeparator ***************************************/
+
+QLabel#lblSubsectionSeparator{
+	font-size: 12px;
+	color: rgba(0, 0, 0, 70);
+}
+
+QFrame#lineSubsectionSeparator{ border: 1px solid rgba(0, 0, 0, 70); }
+
+QPushButton#btnSubsectionSeparator{
+	max-height: 6px;
+	max-width: 10px;
+	border-image: url(:/icons/light-theme/icons/sba_cmb_box_arrow.svg);
+}
+
+QPushButton#btnSubsectionSeparator:checked{
+	max-height: 10px;
+	max-width:  6px;
+	border-image: url(:/icons/light-theme/icons/sba_cmb_box_arrow_right.svg);
+}
+
+
+/**********************************  SettingsPairWidget *********************************/
+
+/* Style for settings and general settings buttons from all menus */
+
+QPushButton[menu_icon_button=true] {
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 60px;
+	 max-width: 60px;
+	 padding-top:5px
+}
+
+QPushButton[menu_icon_button=true]:checked { border-top: 1px solid rgba(0, 0, 0, 150); }
+QPushButton[menu_icon_button=true]:!checked { border-top: 1px solid rgba(0, 0, 0, 0); }
+QPushButton[menu_icon_button=true]:!checked:hover { border-top: 1px solid rgba(0, 0, 0, 0); }
+QPushButton[menu_icon_button=true]:checked:hover { border-top: 1px solid rgba(0, 0, 0, 200); }
+
+
+QPushButton[general_settings_icon=true]:checked { image: url(:/icons/common/gear_wheel_pressed.svg); }
+QPushButton[general_settings_icon=true]:!checked { image: url(:/icons/light-theme/icons/Gear.png); }
+QPushButton[general_settings_icon=true]:!checked:hover { image: url(:/icons/light-theme/icons/gear_wheel_hover.png); }
+QPushButton[general_settings_icon=true]:checked:hover { image: url(:/icons/common/gear_wheel_pressed.svg); }
+
+
+QPushButton[settings_icon=true]:checked { image: url(:/icons/common/setup3_checked_hover.svg); }
+QPushButton[settings_icon=true]:!checked { image: url(:/icons/light-theme/icons/setup3_unchecked.png); }
+QPushButton[settings_icon=true]:!checked:hover { image: url(:/icons/light-theme/icons/setup3_unchecked_hover.png); }
+QPushButton[settings_icon=true]:checked:hover { image: url(:/icons/common/setup3_checked_hover.svg); }
+
+
+/********************** Info button for each tool ***************************/
+
+QPushButton[info_button=true]{
+	 min-height: 40px;
+	 max-height: 40px;
+	 min-width: 50px;
+	 max-width: 50px;
+	 image: url(:/icons/light-theme/icons/ico info.png);
+}
+
+
+QAbstractSpinBox {
+	height: 45px;
+	font-size: 16px;
+	font-weight: bold;
+	border-bottom: 1px solid rgba(0, 0, 0, 40);
+}
+
+QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
+	height: 20px;
+	width: 20px;
+}
+
+QAbstractSpinBox::up-button { border-image: url(:/icons/common/sba_up_btn.svg); }
+QAbstractSpinBox::up-button:hover { border-image: url(:/icons/common/sba_up_btn_hover.svg); }
+QAbstractSpinBox::up-button:pressed { border-image: url(:/icons/common/sba_up_btn_pressed.svg); }
+
+QAbstractSpinBox::down-button { border-image: url(:/icons/common/sba_dn_btn.svg); }
+QAbstractSpinBox::down-button:hover { border-image: url(:/icons/common/sba_dn_btn_hover.svg); }
+QAbstractSpinBox::down-button:pressed { border-image: url(:/icons/common/sba_dn_btn_pressed.svg); }
+
+
+/***************************************** SpinBoxes ************************************************/
+
+QPushButton#btnUpSBA {
+  width: 30px;
+  height: 30px;
+  border-image: url(:/icons/common/sba_up_btn.svg);
+  border: 0px;
+}
+QPushButton#btnUpSBA:pressed {
+  border-image: url(:/icons/common/sba_up_btn_pressed.svg);
+}
+QPushButton#btnUpSBA:hover:!pressed {
+  border-image: url(:/icons/common/sba_up_btn_hover.svg);
+}
+
+QPushButton#btnDownSBA {
+  width: 30px;
+  height: 30px;
+  border-image: url(:/icons/common/sba_dn_btn.svg);
+  border: 0px;
+}
+QPushButton#btnDownSBA:pressed {
+  border-image: url(:/icons/common/sba_dn_btn_pressed.svg);
+}
+QPushButton#btnDownSBA:hover:!pressed {
+  border-image: url(:/icons/common/sba_dn_btn_hover.svg);
+}
+
+QLabel#lblSBA {
+  color: rgba(0, 0, 0, 200);
+  font-size: 14px;
+}
+
+QLineEdit#lineEditSBA {
+  height: 20px;
+  width: 75px;
+  font-size: 18px;
+  border: 0px;
+  bottom: 10px;
+}
+
+QFrame#lineSBA {
+  color: #4a64ff;
+}
+
+QFrame#lineSBA:disabled {
+  color: #555555;
+}
+
+QComboBox#cmbBoxSBA {
+  height: 20px;
+  font-size: 12px;
+  font-weight: normal;
+  border-bottom: 0px;
+  padding-bottom: 0px;
+}
+
+QComboBox#cmbBoxSBA::drop-down {
+  subcontrol-position: center right;
+  width: 10px;
+  height: 6px;
+  border-image: url(:/icons/light-theme/icons/sba_cmb_box_arrow.svg);
+}
+
+QComboBox#cmbBoxSBA::drop-down:disabled {
+  subcontrol-position: center right;
+  width: 0px;
+  height: 0px;
+  border-image: url(:/icons/light-theme/icons/sba_cmb_box_arrow.svg);
+}
+
+QDial#SBA_CompletionCircle {
+  background-color: #C5C5C5;
+  color: #4963ff;
+}
+
+
+/**************************** Custom Menu Button  *********************************/
+
+QPushButton#CustomMenuButton_pushButton {
+  width: 40px;
+  height: 20px;
+  background-color: transparent;
+}
+QPushButton#btnCustomMenuButton:pressed { border-image: url(:/icons/common/setup_btn_checked.svg); }
+QPushButton#btnCustomMenuButton:!pressed { border-image: url(:/icons/common/setup_btn_unchecked.svg); }
+QPushButton#btnCustomMenuButton:hover:!pressed:!checked { border-image: url(:/icons/common/setup_btn_hover.svg); }
+QPushButton#btnCustomMenuButton:checked { border-image: url(:/icons/common/setup_btn_checked.svg); }
+
+
+/***************************** Channel widget ***********************/
+
+scopy--gui--ChannelWidget QWidget {
+  color: rgba(0, 0, 0, 170);
+  border-width: 0px;
+  border-radius: 6px;
+}
+
+/* Widget containing checkBox, btnName, btn */
+scopy--gui--ChannelWidget QWidget#widget {
+  background-color: transparent;
+  border-radius: 4px;
+}
+
+scopy--gui--ChannelWidget QWidget#widget[selected=true] { background-color: rbga(0, 0, 0, 40); }
+
+/* Round check box */
+scopy--gui--ChannelWidget QCheckBox#checkBox{
+  spacing: 0px;
+  background-color: none;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+scopy--gui--ChannelWidget QCheckBox#checkBox::indicator {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
+  border-radius: 9px;
+}
+
+scopy--gui--ChannelWidget QCheckBox#checkBox::indicator:unchecked { background-color: transparent; }
+
+/* Will be overwritted in the ChannelWidget constructor */
+scopy--gui--ChannelWidget QCheckBox#checkBox::indicator:checked { background-color: #000000; }
+
+/* btnName */
+scopy--gui--ChannelWidget QPushButton#btnName {
+  font-size: 14px;
+  font-weight: bold;
+  background-color: none;
+}
+
+/* Delete Button */
+scopy--gui--ChannelWidget QPushButton#btnDel {
+  width: 24px;
+  height: 24px;
+  background-color: transparent;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-image: url(:/icons/common/redX.svg);
+}
+scopy--gui--ChannelWidget QPushButton#btnDel::hover { background-image: url(:/icons/common/redX.svg); }
+
+/* Menu button */
+scopy--gui--ChannelWidget QPushButton#btn {
+  width: 40px;
+  height: 20px;
+  background-color: transparent;
+}
+
+scopy--gui--ChannelWidget QPushButton#btn:pressed { border-image: url(:/icons/common/setup_btn_checked.svg); }
+scopy--gui--ChannelWidget QPushButton#btn:!pressed { border-image: url(:/icons/common/setup_btn_unchecked.svg); }
+scopy--gui--ChannelWidget QPushButton#btn:hover:!pressed:!checked { border-image: url(:/icons/common/setup_btn_hover.svg); }
+scopy--gui--ChannelWidget QPushButton#btn:checked { border-image: url(:/icons/common/setup_btn_checked.svg); }
+
+/* Underline */
+scopy--gui--ChannelWidget QFrame#line { border: 2px solid transparent; }
+
+/* Will be overwritted in the ChannelWidget constructor */
+scopy--gui--ChannelWidget QFrame#line[selected=true] { border: 2px solid #000000; }
