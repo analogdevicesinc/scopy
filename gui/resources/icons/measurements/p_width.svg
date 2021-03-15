@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="30px" height="20px" viewBox="0 0 30 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 41 (35326) - http://www.bohemiancoding.com/sketch -->
+    <title>+ width</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gating-icons-HD" transform="translate(-1640.000000, -550.000000)">
+            <g id="+-width" transform="translate(1641.000000, 551.000000)">
+                <polyline id="Line" stroke="#727273" stroke-width="2" stroke-linecap="square" points="0 18 6 18 6 0 22 0 22 18 28 18"></polyline>
+                <rect id="Rectangle_2_copy_122-Copy-7" fill="#4A64FF" x="3" y="8" width="6" height="2"></rect>
+                <rect id="Rectangle_2_copy_122-Copy-8" fill="#4A64FF" x="19" y="8" width="6" height="2"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

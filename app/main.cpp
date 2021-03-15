@@ -1,18 +1,21 @@
 #include "mainwindow.h"
 
 #include <QApplication>
-#include <QFile>
 
-int main(int argc, char *argv[])
+#include <scopy/gui/theme_manager.hpp>
+
+int main(int argc, char* argv[])
 {
 	QApplication a(argc, argv);
 
-	QFile file(":/stylesheets/global.qss");
-	file.open(QFile::ReadOnly);
-	QString stylesheet = QString::fromLatin1(file.readAll());
-	a.setStyleSheet(stylesheet);
+	QString theme = "default";
+
+	scopy::gui::ThemeManager::getInstance().setApplication(&a);
+	scopy::gui::ThemeManager::getInstance().setCurrentTheme(theme);
+
 
 	MainWindow w;
 	w.show();
+
 	return a.exec();
 }

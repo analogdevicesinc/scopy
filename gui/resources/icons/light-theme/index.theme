@@ -1,0 +1,8 @@
+[Icon Theme]
+Name=LightTheme
+Comment=An example icon theme
+
+[icons]
+Size=16
+Context=Actions
+Type=Fixed
