@@ -2,6 +2,7 @@
 
 #include "./ui_mainwindow.h"
 
+#include <scopy/gui/bitfield_widget.hpp>
 #include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/connect_dialog.hpp>
 #include <scopy/gui/custom_menu_button.hpp>
@@ -15,7 +16,6 @@
 #include <scopy/gui/spinbox_a.hpp>
 #include <scopy/gui/subsection_separator.hpp>
 #include <scopy/gui/two_buttons_widget.hpp>
-#include <scopy/gui/bitfield_widget.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
