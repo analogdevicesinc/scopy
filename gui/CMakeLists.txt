@@ -47,6 +47,7 @@ add_library(
     src/theme_manager.cpp
     src/menu_header.cpp
     src/db_click_buttons.cpp
+    src/cursor_readouts.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
