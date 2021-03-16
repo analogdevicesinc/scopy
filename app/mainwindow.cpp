@@ -17,6 +17,7 @@
 #include <scopy/gui/spinbox_a.hpp>
 #include <scopy/gui/subsection_separator.hpp>
 #include <scopy/gui/two_buttons_widget.hpp>
+#include <scopy/gui/db_click_buttons.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -63,6 +64,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout1->addWidget(new scopy::gui::BitfieldWidget(this, new QDomElement));
 
 	ui->vLayout1->addWidget(new scopy::gui::MenuHeader(this, "Header", new QColor("#4A64FF")));
+
+	ui->vLayout1->addWidget(new scopy::gui::DbClickButtons);
 }
 
 MainWindow::~MainWindow() { delete ui; }
