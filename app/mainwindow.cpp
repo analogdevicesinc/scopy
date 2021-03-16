@@ -10,6 +10,7 @@
 #include <scopy/gui/custom_switch.hpp>
 #include <scopy/gui/homepage_controls.hpp>
 #include <scopy/gui/linked_button.hpp>
+#include <scopy/gui/menu_header.hpp>
 #include <scopy/gui/run_single_widget.hpp>
 #include <scopy/gui/settings_pair_widget.hpp>
 #include <scopy/gui/small_on_off_switch.hpp>
@@ -60,6 +61,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout1->addWidget(new scopy::gui::CustomPlotPositionButton);
 
 	ui->vLayout1->addWidget(new scopy::gui::BitfieldWidget(this, new QDomElement));
+
+	ui->vLayout1->addWidget(new scopy::gui::MenuHeader(this, "Header", new QColor("#4A64FF")));
 }
 
 MainWindow::~MainWindow() { delete ui; }
