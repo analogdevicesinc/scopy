@@ -45,6 +45,7 @@ add_library(
     src/colored_qwidget.cpp
     src/bitfield_widget.cpp
     src/theme_manager.cpp
+    src/menu_header.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -57,6 +58,7 @@ add_library(
     ui/channel_widget.ui
     ui/custom_plot_position_button.ui
     ui/bitfield_widget.ui
+    ui/menu_header.ui
     # resources
     resources/resources.qrc
 )
