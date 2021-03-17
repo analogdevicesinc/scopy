@@ -49,6 +49,7 @@ add_library(
     src/db_click_buttons.cpp
     src/cursor_readouts.cpp
     src/info_widget.cpp
+    src/instrument_notes.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -64,6 +65,7 @@ add_library(
     ui/menu_header.ui
     ui/db_click_buttons.ui
     ui/info_widget.ui
+    ui/instrument_notes.ui
     # resources
     resources/resources.qrc
 )
