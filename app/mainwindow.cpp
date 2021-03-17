@@ -18,6 +18,7 @@
 #include <scopy/gui/subsection_separator.hpp>
 #include <scopy/gui/two_buttons_widget.hpp>
 #include <scopy/gui/db_click_buttons.hpp>
+#include <scopy/gui/instrument_notes.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -28,7 +29,7 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout1->addWidget(new scopy::gui::RunSingleWidget);
 
 	ui->vLayout->addWidget(new scopy::gui::SubsectionSeparator("My label", true));
-	ui->vLayout->addWidget(new scopy::gui::SubsectionSeparator("Another label", false));
+	ui->vLayout->addWidget(new scopy::gui::SubsectionSeparator("Another label"));
 
 	ui->vLayout->addWidget(new scopy::gui::SettingsPairWidget);
 
@@ -47,7 +48,6 @@ MainWindow::MainWindow(QWidget* parent)
 
 	scopy::gui::LinkedButton* btn = new scopy::gui::LinkedButton;
 	btn->setUrl("https://stackoverflow.com/questions/10838654/qt-designer-adding-a-link-to-a-qpushbutton");
-
 	ui->vLayout->addWidget(btn);
 
 	ui->vLayout->addWidget(new scopy::gui::SmallOnOffSwitch(ui->centralwidget));
@@ -66,6 +66,8 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->vLayout1->addWidget(new scopy::gui::MenuHeader(this, "Header", new QColor("#4A64FF")));
 
 	ui->vLayout1->addWidget(new scopy::gui::DbClickButtons);
+
+	ui->vLayout1->addWidget(new scopy::gui::InstrumentNotes);
 }
 
 MainWindow::~MainWindow() { delete ui; }
