@@ -140,6 +140,54 @@ QComboBox::indicator {
 	selection-color: transparent;
 }
 
+QScrollBar:vertical {
+  background: #262628;
+  max-width: 8px;
+}
+
+QScrollBar::handle:vertical {
+  background: #404040;
+  border: 0;
+  border-radius: 3px;
+}
+QScrollBar::handle:vertical:hover {
+  background: #4a4a4b;
+  border: 0;
+  border-radius: 3px;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+  border: none;
+  background: none;
+}
+
+QScrollBar:horizontal {
+  background: #262628;
+  max-height: 6px;
+  border-radius: 3px;
+}
+
+QScrollBar::handle:horizontal {
+  background: #404040;
+  border: 0;
+  border-radius: 3px;
+}
+
+QScrollBar::handle:horizontal:hover {
+  background: #4a4a4b;
+  border: 0;
+  border-radius: 3px;
+}
+
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+	border: none;
+	background: none;
+}
+
 /* General style for blue buttons */
 
 QPushButton[blue_button=true]{
@@ -401,3 +449,21 @@ scopy--gui--ChannelWidget QFrame#line { border: 2px solid transparent; }
 
 /* Will be overwritted in the ChannelWidget constructor */
 scopy--gui--ChannelWidget QFrame#line[selected=true] { border: 2px solid #000000; }
+
+
+/******************** User Notes *************************/
+
+scopy--gui--Note QPushButton#btn { background-image: url(:/icons/default-theme/icons/ic_note_unchecked.svg); }
+
+scopy--gui--Note QPushButton#btn:checked { background-image: url(:/icons/common/ic_note_checked.svg); }
+
+
+/* Style for icon-buttons such as Device, Home, Plus, etc. */
+
+QWidget[menu_button=true][selected=true] {
+	opacity: 0.6;
+	border-radius: 4px;
+	background-color: #141416;
+}
+
+QWidget[menu_button=true][selected=false] { background-color: transparent; }

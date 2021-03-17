@@ -39,14 +39,14 @@ InfoWidget::~InfoWidget() { delete m_ui; }
 
 void InfoWidget::updatePosition()
 {
-	QPoint p = this->parentWidget()->mapFromGlobal(QCursor::pos());
+	const QPoint p = this->parentWidget()->mapFromGlobal(QCursor::pos());
 
 	// Position the widget in the bottom right corner of the pixmap
 	// that is dragged
 	this->move(p.x() + 159, p.y() + 54);
 }
 
-void InfoWidget::setText(QString text) { m_ui->lbl->setText(text); }
+void InfoWidget::setText(const QString &text) { m_ui->lbl->setText(text); }
 
 void InfoWidget::enable(bool on)
 {
