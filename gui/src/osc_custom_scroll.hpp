@@ -17,37 +17,35 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef INFO_WIDGET_H
-#define INFO_WIDGET_H
+#ifndef OSCCUSTOMSCROLL_H
+#define OSCCUSTOMSCROLL_H
 
-#include <QWidget>
+#include <QEvent>
+#include <QScrollArea>
+#include <QScroller>
+#include <QTimer>
 
-namespace Ui {
-class InfoWidget;
-}
 namespace scopy {
 namespace gui {
 
-class InfoWidget : public QWidget
+class OscCustomScrollArea : public QScrollArea
 {
 	Q_OBJECT
-
 public:
-	explicit InfoWidget(QWidget* parent = 0);
-	~InfoWidget();
-
-private:
-	Ui::InfoWidget* m_ui;
-	QTimer* m_timer;
+	OscCustomScrollArea(QWidget* parent = 0);
+	~OscCustomScrollArea();
 
 public Q_SLOTS:
-	void enable(bool);
-	void setText(const QString&);
+	void enterEvent(QEvent*);
+	void leaveEvent(QEvent*);
 
-private Q_SLOTS:
-	void updatePosition();
+private:
+	QScroller* m_scroll;
+	bool m_inside;
+	// QScrollBar *bar;
+	bool m_disableCursor;
 };
 } // namespace gui
 } // namespace scopy
 
-#endif // INFO_WIDGET_H
+#endif // OSCCUSTOMSCROLL_H

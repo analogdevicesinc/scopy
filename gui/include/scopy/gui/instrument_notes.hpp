@@ -19,7 +19,7 @@ public:
 
 public Q_SLOTS:
 	QString getNotes();
-	void setNotes(QString);
+	void setNotes(const QString&);
 
 private:
 	Ui::InstrumentNotes* m_ui;
