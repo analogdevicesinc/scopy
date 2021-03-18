@@ -15,6 +15,10 @@ jobs:
       clang_format:
         imageName: 'ubuntu-20.04'
         BUILD_TYPE: "clang_format"
+
+      cmake_format:
+        imageName: 'ubuntu-20.04'
+        BUILD_TYPE: "cmake_format"
   pool:
     vmImage: $(imageName)
   steps:
@@ -30,14 +34,18 @@ jobs:
       displayName: Run Build
 
     - bash: |
-        if [ -f $(Agent.BuildDirectory)/s/artifacts/format-code.patch ]; then
+        if [ -d $(Agent.BuildDirectory)/s/artifacts ]; then
           echo "##vso[task.setVariable variable=patchexists]true"
         fi
-      condition: eq(variables['BUILD_TYPE'], 'clang_format')
+      condition: or(
+        eq(variables['BUILD_TYPE'], 'clang_format'),
+        eq(variables['BUILD_TYPE'], 'cmake_format')
+        )
 
     - task: PublishBuildArtifacts@1
       condition: and(
-        eq(variables['BUILD_TYPE'], 'clang_format'),
+        or(eq(variables['BUILD_TYPE'], 'clang_format'),
+        eq(variables['BUILD_TYPE'], 'cmake_format')),
         eq(variables.patchexists, 'true')
         )
       inputs:
