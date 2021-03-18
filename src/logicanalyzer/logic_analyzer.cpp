@@ -316,6 +316,13 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	// save the state of the tool
 	m_saveRestoreSettings = std::unique_ptr<SaveRestoreToolSettings>(new SaveRestoreToolSettings(this));
 
+	if (m_started) {
+		auto btn = dynamic_cast<CustomPushButton *>(run_button);
+		if (btn) {
+			btn->setChecked(false);
+		}
+	}
+
 	// disable the menu item for the logic analyzer when mixed signal view is enabled
 	toolMenuItem->setDisabled(true);
 
