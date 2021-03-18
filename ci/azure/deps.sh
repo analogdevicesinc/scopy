@@ -13,4 +13,8 @@ deps_clang_format() {
     echo_green "Clang-format version: " `/usr/bin/clang-format-11 --version`
 }
 
+deps_cmake_format() {
+    pip3 install cmakelang
+}
+
 deps_${BUILD_TYPE:-default}

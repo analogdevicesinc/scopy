@@ -86,3 +86,24 @@ check_clangformat() {
         exit 1
     }
 }
+
+check_cmakeformat() {
+    find . -type f -iname CMakeLists.txt ! -path "*old*" -o -type f -iname "*.cmake" ! -path "*old*" | xargs cmake-format -i
+
+    git diff --exit-code || {
+        echo_red "The cmake files are not properly formatted."
+
+        mkdir -p ${ARTIFACTS_DIR}
+        pushd ${ARTIFACTS_DIR}
+
+        touch format-cmake.patch
+        git diff > format-cmake.patch
+
+        popd # pushd ${ARTIFACTS_DIR}
+
+        echo_red "The cmake style issues can be fixed by applying the format-cmake.patch found in the artifacts sections"
+        echo_red "The command to apply the patch is: git apply format-cmake.patch"
+
+        exit 1
+    }
+}
