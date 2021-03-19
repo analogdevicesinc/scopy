@@ -32,3 +32,7 @@ void SubsectionSeparator::setButton(bool buttonVisible) { m_ui->btnSubsectionSep
 QLabel* SubsectionSeparator::getLabel() { return m_ui->lblSubsectionSeparator; }
 
 void SubsectionSeparator::setLabel(const QString& text) { m_ui->lblSubsectionSeparator->setText(text); }
+
+void SubsectionSeparator::setLabelVisible(bool visible) { m_ui->lblSubsectionSeparator->setVisible(visible); }
+
+void SubsectionSeparator::setLineVisible(bool visible) { m_ui->lineSubsectionSeparator->setVisible(visible); }

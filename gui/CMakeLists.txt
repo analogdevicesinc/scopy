@@ -56,6 +56,11 @@ add_library(
     src/user_notes_api.cpp
     src/osc_custom_scroll.cpp
     src/stacked_homepage.cpp
+    src/osc_import_settings.cpp
+    src/osc_export_settings.cpp
+    src/dropdown_switch_list.cpp
+    src/comboBox_lineEdit.cpp
+    src/checkbox_delegate.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -75,6 +80,7 @@ add_library(
     ui/note.ui
     ui/user_notes.ui
     ui/user_note_page.ui
+    ui/osc_export_settings.ui
     # resources
     resources/resources.qrc
 )

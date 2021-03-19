@@ -29,6 +29,9 @@ public:
 
 	QLabel* getLabel();
 	void setLabel(const QString& text);
+
+	void setLabelVisible(bool visible);
+	void setLineVisible(bool visible);
 };
 } // namespace gui
 } // namespace scopy
