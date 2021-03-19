@@ -461,7 +461,7 @@ min-width: 6em;
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>3</number>
+              <number>2</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1004,8 +1004,14 @@ min-width: 64px;
                     <x>0</x>
                     <y>0</y>
                     <width>298</width>
-                    <height>313</height>
+                    <height>521</height>
                    </rect>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
                   </property>
                   <layout class="QVBoxLayout" name="verticalLayout_16">
                    <item>
@@ -1291,67 +1297,161 @@ color: rgba(255,255,255,51);
                      <property name="spacing">
                       <number>15</number>
                      </property>
-                     <item row="0" column="1">
-                      <layout class="QVBoxLayout" name="verticalLayout_9">
-                       <property name="spacing">
-                        <number>2</number>
+                     <item row="1" column="0">
+                      <widget class="QWidget" name="widget2" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
                        </property>
-                       <item>
-                        <widget class="QStackedWidget" name="bottomWidget"/>
-                       </item>
-                       <item>
-                        <spacer name="verticalSpacer_11">
-                         <property name="orientation">
-                          <enum>Qt::Vertical</enum>
-                         </property>
-                         <property name="sizeHint" stdset="0">
-                          <size>
-                           <width>0</width>
-                           <height>0</height>
-                          </size>
-                         </property>
-                        </spacer>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="lbl_rbw">
-                         <property name="text">
-                          <string>Resolution BW</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="cmb_rbw"/>
-                       </item>
-                      </layout>
+                       <layout class="QVBoxLayout" name="verticalLayout_5">
+                        <property name="spacing">
+                         <number>2</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="lbl_units">
+                          <property name="text">
+                           <string>Units</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="cmb_units">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <item>
+                           <property name="text">
+                            <string>dBFS</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QWidget" name="widget1" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_9">
+                        <property name="spacing">
+                         <number>2</number>
+                        </property>
+                        <item>
+                         <widget class="QLabel" name="lbl_rbw">
+                          <property name="text">
+                           <string>Resolution BW</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QComboBox" name="cmb_rbw"/>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                      <item row="0" column="0">
-                      <layout class="QVBoxLayout" name="verticalLayout_5">
-                       <property name="spacing">
-                        <number>2</number>
+                      <widget class="QWidget" name="verticalWidget" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
                        </property>
-                       <item>
-                        <widget class="QStackedWidget" name="topWidget"/>
-                       </item>
-                       <item>
-                        <widget class="QStackedWidget" name="divisionWidget"/>
-                       </item>
-                       <item>
-                        <widget class="QLabel" name="lbl_units">
-                         <property name="text">
-                          <string>Units</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="cmb_units">
-                         <item>
-                          <property name="text">
-                           <string>dBFS</string>
+                       <layout class="QVBoxLayout" name="verticalLayout_19">
+                        <property name="topMargin">
+                         <number>1</number>
+                        </property>
+                        <item>
+                         <widget class="QStackedWidget" name="topWidget">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
                           </property>
-                         </item>
-                        </widget>
-                       </item>
-                      </layout>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <widget class="QStackedWidget" name="divisionWidget">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                       </layout>
+                      </widget>
+                     </item>
+                     <item row="0" column="1">
+                      <widget class="QWidget" name="verticalWidget_2" native="true">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <layout class="QVBoxLayout" name="verticalLayout_20">
+                        <property name="topMargin">
+                         <number>1</number>
+                        </property>
+                        <item>
+                         <widget class="QStackedWidget" name="bottomWidget">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
+                          </property>
+                          <property name="minimumSize">
+                           <size>
+                            <width>0</width>
+                            <height>0</height>
+                           </size>
+                          </property>
+                         </widget>
+                        </item>
+                        <item>
+                         <spacer name="verticalSpacer_7">
+                          <property name="orientation">
+                           <enum>Qt::Vertical</enum>
+                          </property>
+                          <property name="sizeType">
+                           <enum>QSizePolicy::Expanding</enum>
+                          </property>
+                          <property name="sizeHint" stdset="0">
+                           <size>
+                            <width>0</width>
+                            <height>72</height>
+                           </size>
+                          </property>
+                         </spacer>
+                        </item>
+                       </layout>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -1407,7 +1507,7 @@ color: rgba(255,255,255,51);
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>284</width>
+                    <width>268</width>
                     <height>547</height>
                    </rect>
                   </property>

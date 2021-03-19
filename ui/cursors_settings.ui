@@ -517,7 +517,7 @@ color: rgba(255,255,255,51);
        <item>
         <widget class="QWidget" name="readoutsWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
