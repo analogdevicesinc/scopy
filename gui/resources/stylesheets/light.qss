@@ -445,3 +445,75 @@ QWidget[menu_button=true][selected=true] {
 
 QWidget[menu_button=true][selected=false] { background-color: transparent; }
 
+
+/******************* Dropdown switch list ***************/
+
+scopy--gui--DropdownSwitchList {
+  height: 30px;
+  border: 0px;
+  font-size: 18px;
+  border-radius: 4px;
+  padding-left: 20px;
+}
+
+scopy--gui--DropdownSwitchList:editable{
+  background-color: white;
+  color: rgba(0, 0, 0, 200);
+}
+
+scopy--gui--DropdownSwitchList::drop-down {
+  subcontrol-position: center right;
+  width: 10px;
+  height: 6px;
+  border-image: url(:/icons/light-theme/icons/sba_cmb_box_arrow.svg);
+  margin-right: 20px;
+}
+
+scopy--gui--DropdownSwitchList QAbstractItemView {
+  border: 0px;
+  background-color: white;
+  font-size: 18px;
+  outline: 0px;
+
+  /* Add left space. Color should match background-color*/
+  border-left: 0px solid white; /* setting to 0 for now */
+}
+
+scopy--gui--DropdownSwitchList QAbstractItemView::item {
+  color: rgba(0, 0, 0, 200);
+  height: 60px;
+}
+
+scopy--gui--DropdownSwitchList QAbstractItemView::item:hover {
+  background-color: #EDEDED;
+  font-weight: bold;
+  border-bottom: 0px solid none;
+}
+
+scopy--gui--DropdownSwitchList QHeaderView {
+  /* Cancel the effect of the QAbstractItemView border-left property. It's
+  necessary because the border (or padding) of the QAbstractItemView applies to
+  this element as well. */
+  padding-left: -0px;
+}
+
+scopy--gui--DropdownSwitchList QHeaderView:section {
+  color: rgba(0, 0, 0, 200);
+  background-color: white;
+  border: 0px;
+  font: 14px;
+}
+
+scopy--gui--DropdownSwitchList QCheckBox {
+	background-color: white;
+}
+
+scopy--gui--DropdownSwitchList QCheckBox::indicator {
+  width: 16px;
+  height: 16px;
+  subcontrol-position: center;
+}
+
+/*************************************************************/
+
+
