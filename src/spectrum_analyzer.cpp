@@ -2124,8 +2124,8 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		switch (magType) {
 		case FftDisplayPlot::VPEAK:
 		case FftDisplayPlot::VRMS:
-			unit_per_div->setValue(1);
-			bottom->setValue(-100);
+			unit_per_div->setValue(2);
+			bottom->setValue(-10);
 			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
 			break;
 		case FftDisplayPlot::VROOTHZ:
@@ -2134,7 +2134,7 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 			fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
 			break;
 		default:
-			unit_per_div->setValue(1);
+			unit_per_div->setValue(20);
 			bottom->setValue(-200);
 			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
 			break;
