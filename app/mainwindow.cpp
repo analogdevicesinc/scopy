@@ -20,6 +20,9 @@
 #include <scopy/gui/db_click_buttons.hpp>
 #include <scopy/gui/instrument_notes.hpp>
 #include <scopy/gui/user_notes.hpp>
+#include <scopy/gui/osc_export_settings.hpp>
+#include <scopy/gui/osc_import_settings.hpp>
+#include <scopy/gui/start_stop_range_widget.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -72,7 +75,12 @@ MainWindow::MainWindow(QWidget* parent)
 
 //	ui->vLayout1->addWidget(new scopy::gui::InstrumentNotes);
 
-	ui->vLayout1->addWidget(new scopy::gui::UserNotes);
+//	ui->vLayout1->addWidget(new scopy::gui::UserNotes);
+
+//	ui->vLayout->addWidget(new scopy::gui::ExportSettings);
+//	ui->vLayout->addWidget(new scopy::gui::ImportSettings);
+
+	ui->vLayout->addWidget(new scopy::gui::StartStopRangeWidget);
 }
 
 MainWindow::~MainWindow() { delete ui; }
