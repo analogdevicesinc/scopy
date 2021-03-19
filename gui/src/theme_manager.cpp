@@ -25,7 +25,7 @@ void ThemeManager::setCurrentTheme(const QString& theme)
 	m_currentTheme = theme;
 
 	// TODO: replace this with already defined logic from utils
-	QFile file(":/stylesheets/" + theme + ".qss");
+	QFile file(":/stylesheets/themes/" + theme + ".qss");
 	file.open(QFile::ReadOnly);
 	QString stylesheet = QString::fromLatin1(file.readAll());
 
