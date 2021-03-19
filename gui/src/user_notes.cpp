@@ -41,9 +41,9 @@ UserNotes::UserNotes(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
-	connect(m_ui->btnAdd, SIGNAL(toggled(bool)), this, SLOT(btnAddClicked(bool)));
-	connect(m_ui->btnBrowse, SIGNAL(clicked(bool)), SLOT(btnBrowseClicked(bool)));
-	connect(m_ui->btnSave, SIGNAL(clicked(bool)), SLOT(btnSaveClicked(bool)));
+	connect(m_ui->btnAdd, SIGNAL(toggled(bool)), this, SLOT(addBtnClicked(bool)));
+	connect(m_ui->btnBrowse, SIGNAL(clicked(bool)), SLOT(browseBtnClicked(bool)));
+	connect(m_ui->btnSave, SIGNAL(clicked(bool)), SLOT(saveBtnClicked(bool)));
 	connect(m_ui->stackedWidget, SIGNAL(moved(int)), this, SLOT(pageMoved(int)));
 
 	m_notesGroup->addButton(m_ui->btnAdd);
