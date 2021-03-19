@@ -63,6 +63,7 @@ add_library(
     src/checkbox_delegate.cpp
     src/scopy_color_editor.cpp
     src/application_restarter.cpp
+    src/start_stop_range_widget.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -84,6 +85,7 @@ add_library(
     ui/user_note_page.ui
     ui/osc_export_settings.ui
     ui/scopy_color_editor.ui
+    ui/start_stop_range_widget.ui
     # resources
     resources/resources.qrc
 )
