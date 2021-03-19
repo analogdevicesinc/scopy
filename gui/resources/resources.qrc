@@ -5,8 +5,6 @@
         <file>stylesheets/small_on_off_switch.qss</file>
         <file>stylesheets/big_custom_switch.qss</file>
         <file>stylesheets/custom_switch.qss</file>
-        <file>stylesheets/default.qss</file>
-        <file>stylesheets/light.qss</file>
         <file>icons/common/add-decoder.svg</file>
         <file>icons/common/channels.svg</file>
         <file>icons/common/close.svg</file>
@@ -162,5 +160,7 @@
         <file>icons/default-theme/icons/setup3_unchecked_hover.svg</file>
         <file>icons/default-theme/icons/ico info.png</file>
         <file>icons/common/add.svg</file>
+        <file>stylesheets/themes/default.qss</file>
+        <file>stylesheets/themes/light.qss</file>
     </qresource>
 </RCC>
