@@ -3,6 +3,7 @@ option(ENABLE_CLANG_TIDY "Enable static analysis with clang-tidy" OFF)
 option(ENABLE_INCLUDE_WHAT_YOU_USE
        "Enable static analysis with include-what-you-use" OFF
 )
+option(ENABLE_SHELLCHECK "Enable static analysis with shellcheck" OFF)
 
 if(ENABLE_CPPCHECK)
     find_program(CPPCHECK cppcheck)
@@ -40,5 +41,27 @@ if(ENABLE_INCLUDE_WHAT_YOU_USE)
         message(
             SEND_ERROR "include-what-you-use requested but executable not found"
         )
+    endif()
+endif()
+
+if(ENABLE_SHELLCHECK)
+    find_program(SHELLCHECK shellcheck)
+    if(SHELLCHECK)
+        file(GLOB_RECURSE SH_FILES *.sh)
+
+        # ignore old source code files
+        foreach(element ${SH_FILES})
+            string(REGEX MATCH ".*old.*" result ${element})
+            if(result)
+                list(REMOVE_ITEM SH_FILES ${element})
+            endif()
+        endforeach()
+
+        add_custom_target(
+            shellcheck COMMAND ${SHELLCHECK} ${SH_FILES} || (exit 0)
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        )
+    else()
+        message(SEND_ERROR "shellcheck requested but executable not found")
     endif()
 endif()
