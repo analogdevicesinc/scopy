@@ -14,10 +14,19 @@
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
    <item>
     <widget class="QLabel" name="lblTitle">
      <property name="text">
       <string>TextLabel</string>
+     </property>
+     <property name="menu_header_lbl" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -32,7 +41,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>0</width>
-       <height>15</height>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -61,7 +70,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>0</width>
-       <height>25</height>
+       <height>15</height>
       </size>
      </property>
     </spacer>

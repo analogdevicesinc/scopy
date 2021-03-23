@@ -36,19 +36,19 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget* parent)
 	, m_off(this)
 	, m_handle(this)
 	, m_anim(&m_handle, "geometry")
-	, m_colorAnim(this, "color")
+	, m_colorAnim(this, "m_color")
 	, m_showIcon(false)
 	, m_bothValid(false)
 {
-	m_handle.setObjectName("handle");
-	m_on.setObjectName("on");
-	m_off.setObjectName("off");
+	m_handle.setObjectName("m_handle");
+	m_on.setObjectName("m_on");
+	m_off.setObjectName("m_off");
 
 	setFlat(true);
 	setCheckable(true);
 	setDuration(100);
 
-	QFile file(":/stylesheets/small_on_off_switch.qss");
+	QFile file(":stylesheets/small_on_off_switch.qss");
 	file.open(QFile::ReadOnly);
 	m_stylesheet = QString::fromLatin1(file.readAll());
 	this->setStyleSheet(m_stylesheet);
@@ -69,7 +69,7 @@ void SmallOnOffSwitch::setDuration(int ms)
 
 void SmallOnOffSwitch::setHandleColor(const QColor& color)
 {
-	QString ss(m_stylesheet + QString("QWidget#handle { background-color: %1; }").arg(color.name()));
+	QString ss(m_stylesheet + QString("QWidget#m_handle { background-color: %1; }").arg(color.name()));
 	this->setStyleSheet(ss);
 }
 
@@ -132,8 +132,8 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent* e)
 		return;
 	}
 
-	QIcon locked(":/icons/ic-locked.svg");
-	QIcon unlocked(":/icons/ic-unlocked.svg");
+	QIcon locked(":/icons/common/ic-locked.svg");
+	QIcon unlocked(":/icons/common/ic-unlocked.svg");
 	QPixmap pixmap;
 
 	QStylePainter p(this);
