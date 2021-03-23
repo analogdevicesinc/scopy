@@ -66,6 +66,7 @@ add_library(
     src/start_stop_range_widget.cpp
     src/scopy_about_dialog.cpp
     src/cursors_settings.cpp
+    src/channel_settings.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -90,6 +91,7 @@ add_library(
     ui/start_stop_range_widget.ui
     ui/scopy_about_dialog.ui
     ui/cursors_settings.ui
+    ui/channel_settings.ui
     # resources
     resources/resources.qrc
 )
