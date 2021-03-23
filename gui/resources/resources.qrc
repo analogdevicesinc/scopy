@@ -162,5 +162,9 @@
         <file>icons/common/add.svg</file>
         <file>stylesheets/themes/default.qss</file>
         <file>stylesheets/themes/light.qss</file>
+        <file>html-pages/about.html.cmakein</file>
+        <file>html-pages/buildinfo.html.cmakein</file>
+        <file>html-pages/scopy_osp.html.cmakein</file>
+        <file>icons/default-theme/icons/logo.png</file>
     </qresource>
 </RCC>
