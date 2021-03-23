@@ -23,6 +23,7 @@
 #include <scopy/gui/osc_export_settings.hpp>
 #include <scopy/gui/osc_import_settings.hpp>
 #include <scopy/gui/start_stop_range_widget.hpp>
+#include <scopy/gui/scopy_about_dialog.hpp>
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent)
@@ -80,7 +81,9 @@ MainWindow::MainWindow(QWidget* parent)
 //	ui->vLayout->addWidget(new scopy::gui::ExportSettings);
 //	ui->vLayout->addWidget(new scopy::gui::ImportSettings);
 
-	ui->vLayout->addWidget(new scopy::gui::StartStopRangeWidget);
+//	ui->vLayout->addWidget(new scopy::gui::StartStopRangeWidget);
+
+//	ui->vLayout->addWidget(new scopy::gui::ScopyAboutDialog);
 }
 
 MainWindow::~MainWindow() { delete ui; }

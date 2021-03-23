@@ -214,6 +214,20 @@ QPushButton[info_button=true]{
 
 QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
 
+QWidget[scopy_logo=true]{
+	background-image: url(:/icons/default-theme/icons/logo.png);
+	background-repeat: no-repeat;
+	background-position: left center;
+}
+
+
+/* Label associated with settings menu, right above a blue line divider */
+
+QLabel[menu_header_lbl=true]{
+	color: white;
+	font-size: 14px;
+	font-weight: normal;
+}
 
 /*********************************** SubsectionSeparator ***************************************/
 
