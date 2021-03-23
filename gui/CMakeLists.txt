@@ -65,6 +65,7 @@ add_library(
     src/application_restarter.cpp
     src/start_stop_range_widget.cpp
     src/scopy_about_dialog.cpp
+    src/cursors_settings.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -88,6 +89,7 @@ add_library(
     ui/scopy_color_editor.ui
     ui/start_stop_range_widget.ui
     ui/scopy_about_dialog.ui
+    ui/cursors_settings.ui
     # resources
     resources/resources.qrc
 )
