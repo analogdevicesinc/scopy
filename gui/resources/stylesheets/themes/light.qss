@@ -91,7 +91,7 @@ QComboBox::item:selected {
 
 QComboBox::drop-down {
 	subcontrol-position: center right;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	border-image: url(:/icons/light-theme/icons/sba_cmb_box_arrow.svg);
 	width: 10px;
 	height: 6px;
 	font-size: 16px;

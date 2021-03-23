@@ -24,7 +24,7 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
-       <widget class="scopy::gui::CursorsSettings" name="widget" native="true"/>
+       <widget class="scopy::gui::ChannelSettings" name="widget" native="true"/>
       </item>
      </layout>
     </item>
@@ -40,9 +40,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>scopy::gui::CursorsSettings</class>
+   <class>scopy::gui::ChannelSettings</class>
    <extends>QWidget</extends>
-   <header location="global">scopy/gui/cursors_settings.hpp</header>
+   <header location="global">scopy/gui/channel_settings.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
