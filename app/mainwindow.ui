@@ -23,6 +23,9 @@
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
+      <item>
+       <widget class="scopy::gui::CursorsSettings" name="widget" native="true"/>
+      </item>
      </layout>
     </item>
     <item>
@@ -35,6 +38,14 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>scopy::gui::CursorsSettings</class>
+   <extends>QWidget</extends>
+   <header location="global">scopy/gui/cursors_settings.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
