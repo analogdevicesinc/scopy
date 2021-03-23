@@ -15,12 +15,17 @@ class MenuHeader : public QWidget
 	Q_OBJECT
 
 public:
-	explicit MenuHeader(QWidget* parent = nullptr, const QString& label = nullptr,
-			    const QColor* color = new QColor("#6E6E6F"));
+	explicit MenuHeader(QWidget* parent = nullptr);
+	explicit MenuHeader(const QString& label = nullptr, const QColor* color = new QColor("#6E6E6F"),
+			    QWidget* parent = nullptr);
 	~MenuHeader();
 
 private:
 	Ui::MenuHeader* m_ui;
+
+public:
+	void setLabel(const QString& text);
+	void setLineColor(const QColor* color);
 };
 } // namespace gui
 } // namespace scopy

@@ -5,11 +5,11 @@ min-width: 40px;
 max-width: 40px;
 border-radius: 4px;
 background-color: #141416;
-qproperty-color_start: #4a64ff;
-qproperty-color_end: #727273;
+qproperty-m_colorStart: #4a64ff;
+qproperty-m_colorEnd: #727273;
 }
 
-QWidget#handle {
+QWidget#m_handle {
 margin-right: 2px;
 margin-top: 2px;
 margin-left: 2px;
@@ -22,7 +22,7 @@ border-radius: 2px;
 background-color: white;
 }
 
-QWidget#handle:disabled {
+QWidget#m_handle:disabled {
 background-color: #aaaaaa;
 }
 
@@ -33,21 +33,21 @@ background-color: transparent;
 font: 12px ;
 }
 
-QLabel#on {
+QLabel#m_on {
 margin-left: 2px;
 color: white;
 }
 
-QLabel#on:disabled {
+QLabel#m_on:disabled {
 color: rgba(255,255,255,102);
 }
 
-QLabel#off {
+QLabel#m_off {
 margin-left: 23px;
 color: white;
 }
 
-QLabel#off:disabled {
+QLabel#m_off:disabled {
 color: rgba(255,255,255,51);
 }
 
