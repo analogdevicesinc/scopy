@@ -23,8 +23,8 @@ ScopyAboutDialog::ScopyAboutDialog(QWidget* parent)
 	m_ui->lblCenteredUnderLogo->setText("Released under GPLv3");
 
 	// Is this neccessary? I could not find this stylesheet
-//	QString stylesheet = Util::loadStylesheetFromFile(":stylesheets/stylesheets/browserStylesheet.qss");
-//	m_ui->textBrowserAbout->document()->setDefaultStyleSheet(stylesheet);
+	//	QString stylesheet = Util::loadStylesheetFromFile(":stylesheets/stylesheets/browserStylesheet.qss");
+	//	m_ui->textBrowserAbout->document()->setDefaultStyleSheet(stylesheet);
 
 	m_ui->textBrowserAbout->setWordWrapMode(QTextOption::WordWrap);
 	m_ui->textBrowserAbout->setSource(m_landingPage);

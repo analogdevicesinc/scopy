@@ -18,4 +18,4 @@ InstrumentNotes::~InstrumentNotes() { delete m_ui; }
 
 QString InstrumentNotes::getNotes() { return m_ui->textEdit->toPlainText(); }
 
-void InstrumentNotes::setNotes(const QString &str) { m_ui->textEdit->setPlainText(str); }
+void InstrumentNotes::setNotes(const QString& str) { m_ui->textEdit->setPlainText(str); }

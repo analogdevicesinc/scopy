@@ -20,7 +20,6 @@ public:
 	void setCurrentTheme(const QString& theme);
 	QString getCurrentTheme() const;
 
-
 private:
 	ThemeManager();
 

@@ -18,8 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "application_restarter.hpp"
-
 #include "ui_scopy_color_editor.h"
 
 #include <QColorDialog>
@@ -30,6 +28,7 @@
 #include <QPushButton>
 
 #include <iostream>
+#include <scopy/core/application_restarter.hpp>
 #include <scopy/gui/scopy_color_editor.hpp>
 
 void ScopyColorEditor::parseAndBuildMap(QString toParse)
@@ -102,7 +101,8 @@ ScopyColorEditor::ScopyColorEditor(QApplication* app, QWidget* parent)
 	connect(m_ui->btnPrevMatch, &QPushButton::clicked, this, &ScopyColorEditor::prevMatch);
 	connect(m_ui->btnSave, &QPushButton::clicked, this, &ScopyColorEditor::advancedEditorChanged);
 	connect(m_ui->textEditAdvancedEditor, &QTextEdit::textChanged, [=]() { m_ui->btnSave->setEnabled(true); });
-	connect(m_ui->btnRestart, &QPushButton::clicked, [=]() { scopy::gui::ApplicationRestarter::triggerRestart(); });
+	connect(m_ui->btnRestart, &QPushButton::clicked,
+		[=]() { scopy::core::ApplicationRestarter::triggerRestart(); });
 
 	m_sh = new SearchHighlight(m_ui->textEditAdvancedEditor->document());
 
@@ -184,7 +184,8 @@ void ScopyColorEditor::buildMenuForMap()
 			std::vector<QPushButton*> controls;
 			int index = 0;
 			while ((index = line.indexOf("rgba(", index)) != -1) {
-				//				std::cout << "Found rgba( on line: " << line.toStdString()
+				//				std::cout << "Found rgba( on line: " <<
+				// line.toStdString()
 				//<< " at index: " << index << std::endl;
 				auto btn = new QPushButton(line.split(":")[0].replace(" ", ""));
 				btn->setProperty("key", QVariant(it.key()));
@@ -197,8 +198,8 @@ void ScopyColorEditor::buildMenuForMap()
 
 			index = 0;
 			while ((index = line.indexOf("#", index)) != -1) {
-				//				std::cout << "Found # on line: " << line.toStdString() << "
-				//at index: " << index << std::endl;
+				//				std::cout << "Found # on line: " << line.toStdString()
+				//<< " at index: " << index << std::endl;
 				auto btn = new QPushButton(line.split(":")[0].replace(" ", ""));
 				btn->setProperty("key", QVariant(it.key()));
 				btn->setProperty("line", QVariant(line));

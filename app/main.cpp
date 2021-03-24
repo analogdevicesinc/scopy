@@ -13,7 +13,6 @@ int main(int argc, char* argv[])
 	scopy::gui::ThemeManager::getInstance().setApplication(&a);
 	scopy::gui::ThemeManager::getInstance().setCurrentTheme(theme);
 
-
 	MainWindow w;
 	w.show();
 

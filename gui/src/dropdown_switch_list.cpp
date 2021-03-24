@@ -18,8 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <scopy/gui/dropdown_switch_list.hpp>
-
 #include "checkbox_delegate.hpp"
 
 #include <QFile>
@@ -28,6 +26,8 @@
 #include <QStandardItem>
 #include <QStandardItemModel>
 #include <QTreeView>
+
+#include <scopy/gui/dropdown_switch_list.hpp>
 
 using namespace scopy::gui;
 

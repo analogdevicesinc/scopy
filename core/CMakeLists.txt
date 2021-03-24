@@ -7,13 +7,13 @@ project(core LANGUAGES CXX)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Qml REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Core Qml REQUIRED)
 
 add_library(
     core SHARED
     # source files
-    src/api_object.cpp src/api_object_manager.cpp
+    src/api_object.cpp src/api_object_manager.cpp src/application_restarter.cpp
 )
 
 # MOC hack in order to have the header files in include/scopy/gui
@@ -38,8 +38,12 @@ target_include_directories(
 )
 
 target_link_libraries(
-    core PRIVATE Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Qml
-                 project_options project_warnings
+    core
+    PRIVATE Qt${QT_VERSION_MAJOR}::Core
+            Qt${QT_VERSION_MAJOR}::Qml
+            Qt${QT_VERSION_MAJOR}::Widgets
+            project_options
+            project_warnings
 )
 
 add_library(scopy::core ALIAS core)

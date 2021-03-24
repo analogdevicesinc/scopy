@@ -24,26 +24,13 @@ using namespace scopy::gui;
 /*
  * Note_API class
  */
-void Note_API::setPath(QString path)
-{
-	m_note->setPath(path);
-}
+void Note_API::setPath(QString path) { m_note->setPath(path); }
 
-QString Note_API::getPath()
-{
-	return m_note->getPath();
-}
+QString Note_API::getPath() { return m_note->getPath(); }
 
-void Note_API::setName(QString name)
-{
-	m_note->setName(name);
-}
+void Note_API::setName(QString name) { m_note->setName(name); }
 
-QString Note_API::getName()
-{
-	return m_note->getName();
-}
-
+QString Note_API::getName() { return m_note->getName(); }
 
 /*
  * UserNotes_API class
@@ -58,7 +45,7 @@ int UserNotes_API::notesListSize()
 void UserNotes_API::setNotesListSize(int size)
 {
 	m_notesPanel->clearAllNotes();
-	for (int i = 0; i < size; i++){
+	for (int i = 0; i < size; i++) {
 		auto n = m_notesPanel->addNote("", "");
 	}
 }
@@ -68,7 +55,7 @@ QVariantList UserNotes_API::getNotes()
 	QVariantList list;
 	refreshApi();
 
-	for (auto *each : m_notesListApi) {
+	for (auto* each : m_notesListApi) {
 		list.append(QVariant::fromValue(each));
 	}
 	return list;

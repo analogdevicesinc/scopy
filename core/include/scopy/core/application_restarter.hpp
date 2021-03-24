@@ -5,7 +5,7 @@
 #include <QStringList>
 
 namespace scopy {
-namespace gui {
+namespace core {
 
 class ApplicationRestarter
 {
@@ -23,7 +23,7 @@ private:
 	QStringList m_arguments;
 	QString m_currentPath;
 };
-} // namespace gui
+} // namespace core
 } // namespace scopy
 
 #endif // APPLICATIONRESTARTER_H
