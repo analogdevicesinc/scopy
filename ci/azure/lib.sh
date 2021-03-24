@@ -88,7 +88,7 @@ check_clangformat() {
 }
 
 check_cmakeformat() {
-    find . -type f -iname CMakeLists.txt ! -path "*old*" -o -type f -iname "*.cmake" ! -path "*old*" | xargs cmake-format -i
+    find . -type f -iname CMakeLists.txt ! -path "*old*" -o -type f -iname "*.cmake" ! -path "*old*" | xargs /home/vsts/.local/bin/cmake-format -i
 
     git diff --exit-code || {
         echo_red "The cmake files are not properly formatted."
