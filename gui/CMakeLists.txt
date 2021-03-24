@@ -62,7 +62,6 @@ add_library(
     src/comboBox_lineEdit.cpp
     src/checkbox_delegate.cpp
     src/scopy_color_editor.cpp
-    src/application_restarter.cpp
     src/start_stop_range_widget.cpp
     src/scopy_about_dialog.cpp
     src/cursors_settings.cpp

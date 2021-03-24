@@ -21,9 +21,9 @@
 #ifndef DROPDOWN_SWITCH_LIST_H
 #define DROPDOWN_SWITCH_LIST_H
 
-#include <scopy/gui/comboBox_lineEdit.hpp>
-
 #include <QComboBox>
+
+#include <scopy/gui/comboBox_lineEdit.hpp>
 
 class QStandardItemModel;
 class QTreeView;

@@ -46,7 +46,7 @@ void InfoWidget::updatePosition()
 	this->move(p.x() + 159, p.y() + 54);
 }
 
-void InfoWidget::setText(const QString &text) { m_ui->lbl->setText(text); }
+void InfoWidget::setText(const QString& text) { m_ui->lbl->setText(text); }
 
 void InfoWidget::enable(bool on)
 {

@@ -5,8 +5,8 @@
 
 using namespace scopy::gui;
 
-ThemeManager::ThemeManager():
-	m_app(nullptr)
+ThemeManager::ThemeManager()
+	: m_app(nullptr)
 {
 	m_availableThemes.append("default");
 	m_availableThemes.append("light");
@@ -29,7 +29,7 @@ void ThemeManager::setCurrentTheme(const QString& theme)
 	file.open(QFile::ReadOnly);
 	QString stylesheet = QString::fromLatin1(file.readAll());
 
-	if(m_app) {
+	if (m_app) {
 		m_app->setStyleSheet(stylesheet);
 	}
 

@@ -1,10 +1,10 @@
-#include "application_restarter.hpp"
-
 #include <QApplication>
 #include <QDir>
 #include <QProcess>
 
-using namespace scopy::gui;
+#include <scopy/core/application_restarter.hpp>
+
+using namespace scopy::core;
 
 ApplicationRestarter::ApplicationRestarter(const QString& executable)
 	: m_executable(executable)
