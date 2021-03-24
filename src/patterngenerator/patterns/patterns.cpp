@@ -150,7 +150,7 @@ void Pattern::setNrOfChannels(int channels)
 
 uint32_t Pattern::get_min_sampling_freq()
 {
-	return 1; // minimum 1 hertz if not specified otherwise
+	return 1000; // minimum 1 kHz if not specified otherwise
 }
 
 uint32_t Pattern::get_required_nr_of_samples(uint32_t sample_rate,
