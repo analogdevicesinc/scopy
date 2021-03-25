@@ -114,7 +114,6 @@
         <file>icons/light-theme/icons/io.png</file>
         <file>icons/light-theme/icons/logic_analyzer.png</file>
         <file>icons/light-theme/icons/logo.png</file>
-        <file>icons/light-theme/icons/logo analog.png</file>
         <file>icons/light-theme/icons/menu.png</file>
         <file>icons/light-theme/icons/network_analyzer.png</file>
         <file>icons/light-theme/icons/oscilloscope.png</file>
@@ -160,11 +159,19 @@
         <file>icons/default-theme/icons/setup3_unchecked_hover.svg</file>
         <file>icons/default-theme/icons/ico info.png</file>
         <file>icons/common/add.svg</file>
-        <file>stylesheets/themes/default.qss</file>
-        <file>stylesheets/themes/light.qss</file>
+        <file>stylesheets/themes/default-theme.qss</file>
+        <file>stylesheets/themes/light-theme.qss</file>
         <file>html-pages/about.html.cmakein</file>
         <file>html-pages/buildinfo.html.cmakein</file>
         <file>html-pages/scopy_osp.html.cmakein</file>
         <file>icons/default-theme/icons/logo.png</file>
+        <file>icons/default-theme/icons/adi.png</file>
+        <file>icons/default-theme/icons/menu.png</file>
+        <file>icons/default-theme/icons/ic load.svg</file>
+        <file>icons/default-theme/icons/ic printer.svg</file>
+        <file>icons/default-theme/icons/ic save.svg</file>
+        <file>json-files/filter.json</file>
+        <file>stylesheets/tool_menu_item.qss</file>
+        <file>icons/light-theme/icons/adi.png</file>
     </qresource>
 </RCC>
