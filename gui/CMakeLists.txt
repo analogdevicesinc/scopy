@@ -66,6 +66,18 @@ add_library(
     src/scopy_about_dialog.cpp
     src/cursors_settings.cpp
     src/channel_settings.cpp
+    src/tool_launcher.cpp
+    src/menu_anim.cpp
+    src/tool_menu.cpp
+    src/base_menu.cpp
+    src/base_menu_item.cpp
+    src/filter.cpp
+    src/preferences.cpp
+    src/tool_menu_item.cpp
+    src/utils.cc
+    src/tool.cpp
+    src/detached_window.cpp
+    src/detached_windows_manager.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -91,6 +103,10 @@ add_library(
     ui/scopy_about_dialog.ui
     ui/cursors_settings.ui
     ui/channel_settings.ui
+    ui/tool_launcher.ui
+    ui/base_menu.ui
+    ui/base_menu_item.ui
+    ui/preferences.ui
     # resources
     resources/resources.qrc
 )

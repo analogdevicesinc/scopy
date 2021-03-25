@@ -14,6 +14,7 @@ add_library(
     core SHARED
     # source files
     src/api_object.cpp src/api_object_manager.cpp src/application_restarter.cpp
+    src/scopy_application.cpp
 )
 
 # MOC hack in order to have the header files in include/scopy/gui
