@@ -21,3 +21,12 @@ jobs:
       with:
         name: Scopy.flatpak
         path: ${{ github.workspace }}/Scopy.flatpak
+    - name: Upload master flatpak build to continous prerelease
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: |
+        wget https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz 
+        tar xvf ghr_v0.13.0_linux_amd64.tar.gz
+        ghr_v0.13.0_linux_amd64/ghr -u ${{ github.repository_owner }} -r scopy -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous ${{ github.workspace }}/Scopy.flatpak
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
