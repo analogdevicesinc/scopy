@@ -24,6 +24,7 @@ SCOPY_MINGW_BUILD_DEPS_PACMAN=$(</tmp/scopy-$MINGW_VERSION-build-deps-pacman.txt
 PACMAN_SYNC_DEPS="
 	$SCOPY_MINGW_BUILD_DEPS_PACMAN\
 	mingw-w64-$ARCH-matio \
+	unzip \
 "
 
 #	/c/old_msys_deps_$MINGW_VERSION/mingw-w64-$ARCH-boost-1.72.0-3-any.pkg.tar.zst \
