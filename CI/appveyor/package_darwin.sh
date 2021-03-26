@@ -104,3 +104,14 @@ sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ./Scopy.app/
 
 sudo macdeployqt Scopy.app -dmg
 ls
+
+UPLOAD_TOOL=ghr
+
+if [ "$APPVEYOR_REPO_BRANCH" = "master" ]; then
+	echo Identified master branch
+	if [ -z "$APPVEYOR_PULL_REQUEST_NUMBER" ]; then
+		echo Not a pull request
+		$UPLOAD_TOOL -u $APPVEYOR_ACCOUNT_NAME -r $APPVEYOR_PROJECT_NAME -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous $DEPLOY_FILE
+	fi
+fi
+
