@@ -11,10 +11,17 @@ WORKDIR=${PWD}
 echo BUILD_NO $BUILD_NO
 JOBS=$(nproc)
 
+
 wget http://swdownloads.analog.com/cse/m1k/drivers/dpinst.zip
 wget http://swdownloads.analog.com/cse/m1k/drivers/dfu-util.zip
 7z x -y "dpinst.zip" -o"/c/dpinst"
 7z x -y "dfu-util.zip" -o"/c/dfu-util"
+
+# github release upload tool install
+wget https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_windows_amd64.zip
+7z x -y ghr_v0.13.0_windows_amd64.zip -o"/c/ghr"
+UPLOAD_TOOL=/c/ghr/ghr_v0.13.0_windows_amd64/ghr.exe
+
 
 CC=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-gcc.exe
 CXX=/${MINGW_VERSION}/bin/${ARCH}-w64-mingw32-g++.exe
@@ -137,3 +144,16 @@ appveyor AddMessage "11. Creating installer"
 iscc //Qp /c/$BUILD_FOLDER/scopy-$ARCH_BIT.iss
 appveyor PushArtifact $DEPLOY_FILE
 appveyor AddMessage "12. Job complete"
+
+if [ "$APPVEYOR_REPO_BRANCH" = "master" ]; then
+	echo Identified master branch
+	if [ -z "$APPVEYOR_PULL_REQUEST_NUMBER" ]; then
+		echo Not a pull request
+		mkdir /c/to_deploy
+		cp /c/scopy-${ARCH_BIT}bit.zip /c/to_deploy
+		cp /c/debug-${ARCH_BIT}bit.zip /c/to_deploy
+		cp $DEPLOY_FILE /c/to_deploy
+		$UPLOAD_TOOL -u $APPVEYOR_ACCOUNT_NAME -r $APPVEYOR_PROJECT_NAME -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous /c/to_deploy
+	fi
+fi
+
