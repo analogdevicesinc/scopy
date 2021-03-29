@@ -42,7 +42,7 @@ ToolLauncher::ToolLauncher(QWidget* parent)
 		//		m_toolMenu->hideMenuText(!opened);
 	});
 
-	connect(m_ui->btnHome, &QPushButton::clicked, this, &scopy::gui::ToolLauncher::onBtnHomeClicked);
+	connect(m_ui->btnHome, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_ui->widgetHome)); });
 
 	m_ui->saveBtn->parentWidget()->setEnabled(false);
 	m_ui->loadBtn->parentWidget()->setEnabled(true);
