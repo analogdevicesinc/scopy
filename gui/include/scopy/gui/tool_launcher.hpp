@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 
+#include <scopy/core/context_enumerator.hpp>
 #include <scopy/gui/connect_dialog.hpp>
 #include <scopy/gui/scopy_about_dialog.hpp>
 #include <scopy/gui/tool_menu.hpp>
@@ -24,6 +25,8 @@ public:
 private:
 	void swapMenu(QWidget* menu);
 
+	void setTestLbl(const QString& text);
+
 private:
 	Ui::ToolLauncher* m_ui;
 
@@ -36,8 +39,11 @@ private:
 	Preferences* m_prefPanel;
 	UserNotes* m_notesPanel;
 
+	scopy::core::ContextEnumerator* m_boardDetector;
+
 private Q_SLOTS:
 	void onBtnHomeClicked();
+	void printUris(const QStringList& uris);
 };
 } // namespace gui
 } // namespace scopy

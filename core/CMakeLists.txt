@@ -8,12 +8,17 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Core Qml REQUIRED)
+find_package(
+    Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Core Qml Concurrent REQUIRED
+)
 
 add_library(
     core SHARED
     # source files
-    src/api_object.cpp src/api_object_manager.cpp src/application_restarter.cpp
+    src/api_object.cpp
+    src/api_object_manager.cpp
+    src/application_restarter.cpp
+    src/context_enumerator.cpp
     src/scopy_application.cpp
 )
 
@@ -43,6 +48,7 @@ target_link_libraries(
     PRIVATE Qt${QT_VERSION_MAJOR}::Core
             Qt${QT_VERSION_MAJOR}::Qml
             Qt${QT_VERSION_MAJOR}::Widgets
+            Qt${QT_VERSION_MAJOR}::Concurrent
             project_options
             project_warnings
 )

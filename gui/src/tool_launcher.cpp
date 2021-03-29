@@ -56,6 +56,11 @@ ToolLauncher::ToolLauncher(QWidget* parent)
 	m_ui->btnHome->setIconSize(QSize(32, 32));
 
 	m_current = m_ui->widgetHome;
+
+	// Visualize all connected uris
+	m_boardDetector = new scopy::core::ContextEnumerator();
+	connect(m_boardDetector, &scopy::core::ContextEnumerator::printData, this,
+		&scopy::gui::ToolLauncher::printUris);
 }
 
 void ToolLauncher::swapMenu(QWidget* menu)
@@ -71,6 +76,15 @@ void ToolLauncher::swapMenu(QWidget* menu)
 
 	m_ui->hLayoutCentral->addWidget(m_current);
 	m_current->setVisible(true);
+}
+
+void ToolLauncher::setTestLbl(const QString& text) { m_ui->lblTestDevFound->setText(text); }
+
+void ToolLauncher::printUris(const QStringList& uris)
+{
+	QString text = std::accumulate(uris.cbegin(), uris.cend(), QString{});
+	this->setTestLbl(text);
+	m_boardDetector->start();
 }
 
 void ToolLauncher::onBtnHomeClicked() { swapMenu(m_ui->widgetHome); }
