@@ -63,6 +63,7 @@ end;
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "deleteini"; Description: Delete previous settings (Scopy.ini)
 Name: "drivers"; Description: Install drivers for ADALM2000; Check: not isDriverInstalled;
+Name: "drivers_overwrite"; Description: Install drivers for ADALM2000; Check: isDriverInstalled; Flags: unchecked
 
 [Files]
 Source: "c:\scopy_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -78,7 +79,7 @@ Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desk
 Type: files; Name: "{userappdata}\ADI\Scopy.ini"; Tasks: deleteini
 
 [Run]
-Filename: "{app}\drivers\dpinst.exe"; Parameters: "/PATH ""{app}\drivers"" {param:dpinstflags|/F}" ; Flags: waituntilterminated; Tasks: drivers
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/PATH ""{app}\drivers"" {param:dpinstflags|/F}" ; Flags: waituntilterminated; Tasks: drivers drivers_overwrite
 
 [UninstallRun]
 Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-cdc-acm.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
