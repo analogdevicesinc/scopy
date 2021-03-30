@@ -79,6 +79,7 @@ add_library(
     src/detached_window.cpp
     src/detached_windows_manager.cpp
     src/measure_settings.cpp
+    src/osc_general_settings.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -109,6 +110,7 @@ add_library(
     ui/base_menu_item.ui
     ui/preferences.ui
     ui/measure_settings.ui
+    ui/osc_general_settings.ui
     # resources
     resources/resources.qrc
 )
