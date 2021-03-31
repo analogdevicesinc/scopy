@@ -83,6 +83,7 @@ add_library(
     src/trigger_settings.cpp
     src/scroll_filter.cpp
     src/spectrum_analyzer_menu.cpp
+    src/network_analyzer_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -116,6 +117,7 @@ add_library(
     ui/osc_general_settings.ui
     ui/trigger_settings.ui
     ui/spectrum_analyzer_menu.ui
+    ui/network_analyzer_menu.ui
     # resources
     resources/resources.qrc
 )
