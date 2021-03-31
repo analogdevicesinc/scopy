@@ -24,7 +24,7 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
-       <widget class="scopy::gui::TriggerSettings" name="widget" native="true"/>
+       <widget class="scopy::gui::SpectrumAnalyzerMenu" name="widget" native="true"/>
       </item>
      </layout>
     </item>
@@ -40,9 +40,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>scopy::gui::TriggerSettings</class>
+   <class>scopy::gui::SpectrumAnalyzerMenu</class>
    <extends>QWidget</extends>
-   <header location="global">scopy/gui/trigger_settings.hpp</header>
+   <header location="global">scopy/gui/spectrum_analyzer_menu.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
