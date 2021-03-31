@@ -80,6 +80,8 @@ add_library(
     src/detached_windows_manager.cpp
     src/measure_settings.cpp
     src/osc_general_settings.cpp
+    src/trigger_settings.cpp
+    src/scroll_filter.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -111,6 +113,7 @@ add_library(
     ui/preferences.ui
     ui/measure_settings.ui
     ui/osc_general_settings.ui
+    ui/trigger_settings.ui
     # resources
     resources/resources.qrc
 )
@@ -150,7 +153,7 @@ target_link_libraries(
             Qt${QT_VERSION_MAJOR}::Xml
             project_options
             project_warnings
-            qwt::qwt
+	    qwt::qwt
     PUBLIC ${IIO_LIBRARIES}
 )
 

@@ -16,7 +16,7 @@ class MenuHeader : public QWidget
 
 public:
 	explicit MenuHeader(QWidget* parent = nullptr);
-	explicit MenuHeader(const QString& label = nullptr, const QColor* color = new QColor("#6E6E6F"),
+	explicit MenuHeader(const QString& label = nullptr, const QColor* color = new QColor("#4A64FF"),
 			    QWidget* parent = nullptr);
 	~MenuHeader();
 
