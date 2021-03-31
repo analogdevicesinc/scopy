@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TriggerSettings</class>
+ <widget class="QWidget" name="TriggerSettings">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>306</width>
+    <height>810</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>306</width>
+    <height>16777215</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>18</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>8</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="scopy::gui::MenuHeader" name="widgetTriggerSettingsMenuHeader" native="true"/>
+   </item>
+   <item>
+    <spacer name="vSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>15</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>266</width>
+        <height>892</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_4">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>2</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="vLayout_11">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <property name="topMargin">
+          <number>20</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="lbl">
+           <property name="text">
+            <string>Trigger mode</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="hLayout">
+           <property name="spacing">
+            <number>20</number>
+           </property>
+           <property name="bottomMargin">
+            <number>10</number>
+           </property>
+           <item>
+            <widget class="scopy::gui::CustomSwitch" name="btnTrigger">
+             <property name="styleSheet">
+              <string notr="true">QPushButton {
+min-height: 30px;
+max-height: 30px;
+min-width: 225px;
+max-width: 225px;
+background-color: black;
+border-radius: 4px;
+}
+
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+}
+
+QWidget#handle {
+min-height: 30px;
+max-height: 30px;
+min-width: 115px;
+max-width: 115px;
+background-color: #4a64ff;
+border-radius: 2px;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
+
+QLabel {
+margin-top: 6px;
+background-color: transparent;
+line-height: 19px;
+}
+
+QLabel#on {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:112px;
+max-width:112px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
+color: white;
+}
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:113px;
+max-width:113px;
+margin-left: 112px;
+color: white;
+qproperty-alignment: AlignCenter AlignCenter;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="leftText" stdset="0">
+              <string>auto</string>
+             </property>
+             <property name="rightText" stdset="0">
+              <string>normal</string>
+             </property>
+             <property name="duration_ms" stdset="0">
+              <number>0</number>
+             </property>
+             <property name="polarity" stdset="0">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="hSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="vLayout_6">
+         <property name="spacing">
+          <number>20</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>15</number>
+         </property>
+         <item>
+          <widget class="scopy::gui::SubsectionSeparator" name="widgetInternalAnalogSubsSep" native="true"/>
+         </item>
+         <item>
+          <widget class="scopy::gui::CustomSwitch" name="btnInternEn">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widgetAnalogControls" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>10</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QVBoxLayout" name="vLayout_9">
+              <property name="spacing">
+               <number>5</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <item>
+               <layout class="QGridLayout" name="gridLayout">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="horizontalSpacing">
+                 <number>3</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="lblSource">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Source</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QComboBox" name="cmbBoxSource">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="currentIndex">
+                   <number>-1</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QLabel" name="lblCondition">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Condition</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="cmbBoxCondition">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="currentIndex">
+                 <number>0</number>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>Rising Edge</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Falling Edge</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Low</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>High</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="vSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="vLayoutControls">
+              <property name="spacing">
+               <number>5</number>
+              </property>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="vLayout_8">
+         <property name="spacing">
+          <number>15</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="scopy::gui::SubsectionSeparator" name="widgetDigitalSubsSep" native="true"/>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblMixedSignal">
+           <property name="text">
+            <string>This feature is not supported while the Mixed Signal View is enabled!</string>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+           <property name="general_settings_label" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="scopy::gui::CustomSwitch" name="btnExternEn">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widgetDigitalControls" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="lbl_6">
+              <property name="text">
+               <string>Source</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmbBoxExternSrc"/>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblExternCondition">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Condition</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmbBoxExternCondition">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Rising Edge</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Falling Edge</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Low</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>High</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Any Edge</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lblDaisyChain">
+              <property name="text">
+               <string>M2K daisychain position</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBoxDaisyChain"/>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnLogicAnalyzerTriggers">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+
+  height: 40px;
+
+  text-align: left;
+  font-weight: bold;
+  padding-left: 15px;
+  padding-right: 15px;
+
+}</string>
+         </property>
+         <property name="text">
+          <string>Logic Analyzer trigger settings</string>
+         </property>
+         <property name="blue_button" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widgetTriggerLogicControls" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_7">
+          <property name="spacing">
+           <number>15</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="scopy::gui::SubsectionSeparator" name="widgetTriggerLogicSubsSep" native="true"/>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="vLayout_5">
+            <property name="spacing">
+             <number>5</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="lblAnalogExtern">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>Analog - Digital</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="cmbBoxAnalogExtern">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <item>
+               <property name="text">
+                <string>Digital OR Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Digital AND Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Digital XOR Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>!Digital OR Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>!Digital AND Analog</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>!Digital XOR Analog</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="vLayout_10">
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="scopy::gui::SubsectionSeparator" name="widgetExternalTriggerOutSubsSep" native="true"/>
+         </item>
+         <item>
+          <widget class="scopy::gui::CustomSwitch" name="btnExternToEn">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="widgetExternalToControls" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>0</height>
+            </size>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QComboBox" name="cmbBoxExternToSrc">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+      <zorder></zorder>
+      <zorder>verticalSpacer_3</zorder>
+      <zorder></zorder>
+      <zorder>widgetTriggerLogicControls</zorder>
+      <zorder>btnLogicAnalyzerTriggers</zorder>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>scopy::gui::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header location="global">scopy/gui/custom_switch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::gui::SubsectionSeparator</class>
+   <extends>QWidget</extends>
+   <header location="global">scopy/gui/subsection_separator.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::gui::MenuHeader</class>
+   <extends>QWidget</extends>
+   <header location="global">scopy/gui/menu_header.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
