@@ -1,11 +1,12 @@
-#include <scopy/gui/network_analyzer_menu.hpp>
 #include "ui_network_analyzer_menu.h"
+
+#include <scopy/gui/network_analyzer_menu.hpp>
 
 using namespace scopy::gui;
 
-NetworkAnalyzerMenu::NetworkAnalyzerMenu(QWidget *parent) :
-	QWidget(parent),
-	m_ui(new Ui::NetworkAnalyzerMenu)
+NetworkAnalyzerMenu::NetworkAnalyzerMenu(QWidget* parent)
+	: QWidget(parent)
+	, m_ui(new Ui::NetworkAnalyzerMenu)
 {
 	m_ui->setupUi(this);
 
@@ -46,7 +47,4 @@ NetworkAnalyzerMenu::NetworkAnalyzerMenu(QWidget *parent) :
 	m_ui->widgetBufferPreviewerSubsSep->setButtonVisible(false);
 }
 
-NetworkAnalyzerMenu::~NetworkAnalyzerMenu()
-{
-	delete m_ui;
-}
+NetworkAnalyzerMenu::~NetworkAnalyzerMenu() { delete m_ui; }
