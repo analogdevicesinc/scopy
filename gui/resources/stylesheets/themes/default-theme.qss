@@ -339,13 +339,13 @@ QFrame#lineSubsectionSeparator{ border: 1px solid rgba(255, 255, 255, 70); }
 QPushButton#btnSubsectionSeparator{
 	max-height: 6px;
 	max-width: 10px;
-	border-image: url(:/icons/default-theme/icons/sba_cmb_box_arrow.svg);
+	border-image: url(:/icons/default-theme/icons/sba_cmb_box_arrow_right.svg);
 }
 
 QPushButton#btnSubsectionSeparator:checked{
 	max-height: 10px;
 	max-width:  6px;
-	border-image: url(:/icons/default-theme/icons/sba_cmb_box_arrow_right.svg);
+	border-image: url(:/icons/default-theme/icons/sba_cmb_box_arrow.svg);
 }
 
 
