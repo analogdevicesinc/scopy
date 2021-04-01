@@ -84,6 +84,7 @@ add_library(
     src/scroll_filter.cpp
     src/spectrum_analyzer_menu.cpp
     src/network_analyzer_menu.cpp
+    src/signal_generator_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -118,6 +119,7 @@ add_library(
     ui/trigger_settings.ui
     ui/spectrum_analyzer_menu.ui
     ui/network_analyzer_menu.ui
+    ui/signal_generator_menu.ui
     # resources
     resources/resources.qrc
 )
