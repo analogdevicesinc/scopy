@@ -11,7 +11,7 @@ InstrumentNotes::InstrumentNotes(QWidget* parent)
 	m_ui->setupUi(this);
 
 	m_ui->widgetSubsectionSeparator->setLabel("Note");
-	m_ui->widgetSubsectionSeparator->setButton(false);
+	m_ui->widgetSubsectionSeparator->setButtonVisible(false);
 }
 
 InstrumentNotes::~InstrumentNotes() { delete m_ui; }

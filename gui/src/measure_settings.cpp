@@ -68,16 +68,16 @@ MeasureSettings::MeasureSettings(QWidget* parent)
 	treeView->setIconSize(QSize(30, 20));
 
 	m_ui->widgetStatisticsSubsSep->setLabel("STATISTICS");
-	m_ui->widgetStatisticsSubsSep->setButton(false);
+	m_ui->widgetStatisticsSubsSep->setButtonVisible(false);
 
 	m_ui->widgetMeasurementsSubsSep->setLabel("MEASUREMENTS");
-	m_ui->widgetMeasurementsSubsSep->setButton(false);
+	m_ui->widgetMeasurementsSubsSep->setButtonVisible(false);
 
 	m_ui->widgetGatingSettingsSubsSep->setLabel("GATING SETTINGS");
-	m_ui->widgetGatingSettingsSubsSep->setButton(false);
+	m_ui->widgetGatingSettingsSubsSep->setButtonVisible(false);
 
 	m_ui->widgetCustomSelectionSubsSep->setLabel("CUSTOM SELECTION");
-	m_ui->widgetCustomSelectionSubsSep->setButton(false);
+	m_ui->widgetCustomSelectionSubsSep->setButtonVisible(false);
 }
 
 MeasureSettings::~MeasureSettings() { delete m_ui; }

@@ -20,14 +20,21 @@ SubsectionSeparator::SubsectionSeparator(const QString& text, const bool buttonV
 	m_ui->setupUi(this);
 
 	setLabel(text);
-	setButton(buttonVisible);
+	setButtonVisible(buttonVisible);
 }
 
 SubsectionSeparator::~SubsectionSeparator() { delete m_ui; }
 
 QPushButton* SubsectionSeparator::getButton() { return m_ui->btnSubsectionSeparator; }
 
-void SubsectionSeparator::setButton(bool buttonVisible) { m_ui->btnSubsectionSeparator->setVisible(buttonVisible); }
+void SubsectionSeparator::setButtonVisible(bool buttonVisible)
+{
+	m_ui->btnSubsectionSeparator->setVisible(buttonVisible);
+}
+
+bool SubsectionSeparator::getButtonChecked() { return m_ui->btnSubsectionSeparator->isChecked(); }
+
+void SubsectionSeparator::setButtonChecked(bool checked) { m_ui->btnSubsectionSeparator->setChecked(checked); }
 
 QLabel* SubsectionSeparator::getLabel() { return m_ui->lblSubsectionSeparator; }
 

@@ -23,16 +23,16 @@ SpectrumAnalyzerMenu::SpectrumAnalyzerMenu(QWidget* parent)
 	m_ui->widgetImportReferenceChannelsMenuHeader->setLineColor(new QColor("#4A64FF"));
 
 	m_ui->widgetMarkerSubsSep->setLabel("MARKER");
-	m_ui->widgetMarkerSubsSep->setButton(false);
+	m_ui->widgetMarkerSubsSep->setButtonVisible(false);
 
 	m_ui->widgetGeneralSubsSep->setLabel("GENERAL");
-	m_ui->widgetGeneralSubsSep->setButton(false);
+	m_ui->widgetGeneralSubsSep->setButtonVisible(false);
 
 	m_ui->widgetAmplitudeSubsSep->setLabel("AMPLITUDE");
-	m_ui->widgetAmplitudeSubsSep->setButton(false);
+	m_ui->widgetAmplitudeSubsSep->setButtonVisible(false);
 
 	m_ui->widgetFrequencySubsSep->setLabel("FREQUENCY");
-	m_ui->widgetFrequencySubsSep->setButton(false);
+	m_ui->widgetFrequencySubsSep->setButtonVisible(false);
 }
 
 SpectrumAnalyzerMenu::~SpectrumAnalyzerMenu() { delete m_ui; }

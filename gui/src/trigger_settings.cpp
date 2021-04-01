@@ -102,16 +102,16 @@ TriggerSettings::TriggerSettings(QWidget* parent)
 	m_ui->widgetTriggerSettingsMenuHeader->setLineColor(new QColor("#4A64FF"));
 
 	m_ui->widgetDigitalSubsSep->setLabel("DIGITAL");
-	m_ui->widgetDigitalSubsSep->setButton(false);
+	m_ui->widgetDigitalSubsSep->setButtonVisible(false);
 
 	m_ui->widgetTriggerLogicSubsSep->setLabel("TRIGGER LOGIC");
-	m_ui->widgetTriggerLogicSubsSep->setButton(false);
+	m_ui->widgetTriggerLogicSubsSep->setButtonVisible(false);
 
 	m_ui->widgetInternalAnalogSubsSep->setLabel("INTERNAL (ANALOG)");
-	m_ui->widgetInternalAnalogSubsSep->setButton(false);
+	m_ui->widgetInternalAnalogSubsSep->setButtonVisible(false);
 
 	m_ui->widgetExternalTriggerOutSubsSep->setLabel("EXTERNAL TRIGGER OUT");
-	m_ui->widgetExternalTriggerOutSubsSep->setButton(false);
+	m_ui->widgetExternalTriggerOutSubsSep->setButtonVisible(false);
 }
 
 TriggerSettings::~TriggerSettings() { delete m_ui; }

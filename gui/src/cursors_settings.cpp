@@ -13,13 +13,13 @@ CursorsSettings::CursorsSettings(QWidget* parent)
 	m_ui->setupUi(this);
 
 	m_ui->widgetVerticalSubsSpr->setLabel("VERTICAL");
-	m_ui->widgetVerticalSubsSpr->setButton(false);
+	m_ui->widgetVerticalSubsSpr->setButtonVisible(false);
 
 	m_ui->widgetHorizontalSubsSpr->setLabel("HORIZONTAL");
-	m_ui->widgetHorizontalSubsSpr->setButton(false);
+	m_ui->widgetHorizontalSubsSpr->setButtonVisible(false);
 
 	m_ui->widgetCursorReadoutsSubsSpr->setLabel("CURSOR READOUTS");
-	m_ui->widgetCursorReadoutsSubsSpr->setButton(false);
+	m_ui->widgetCursorReadoutsSubsSpr->setButtonVisible(false);
 
 	m_ui->widgetCursorsMenuHeader->setLabel("Cursors");
 	m_ui->widgetCursorsMenuHeader->setLineColor(new QColor("#4A64FF"));
