@@ -32,6 +32,27 @@ QLabel:disabled, QRadioButton:disabled {color: rgba(255, 255, 255, 80); }
 QLabel[invalid=true] { color: red; }
 QLabel[valid=true] { color: rgba(255, 255, 255, 150) }
 
+QTabWidget::tab-bar { left: 0; }
+
+QTabWidget::pane { border-top: 0px; }
+
+QTabBar::tab {
+	min-width: 100px;
+	min-height: 32px;
+	padding-bottom: 5px;
+	font: normal;
+}
+
+QTabBar::tab:selected {
+	color: white;
+	border-bottom: 2px solid #f36d0a;
+	margin-top: 0px;
+}
+
+QTabBar::tab:!selected {
+	border-bottom: 2px solid #373740;
+}
+
 QRadioButton {
 	color: white;
 	spacing: 12px;

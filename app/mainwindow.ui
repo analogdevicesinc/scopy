@@ -24,7 +24,7 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
-       <widget class="scopy::gui::NetworkAnalyzerMenu" name="widget" native="true"/>
+       <widget class="scopy::gui::SignalGeneratorMenu" name="widget" native="true"/>
       </item>
      </layout>
     </item>
@@ -40,9 +40,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>scopy::gui::NetworkAnalyzerMenu</class>
+   <class>scopy::gui::SignalGeneratorMenu</class>
    <extends>QWidget</extends>
-   <header location="global">scopy/gui/network_analyzer_menu.hpp</header>
+   <header location="global">scopy/gui/signal_generator_menu.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
