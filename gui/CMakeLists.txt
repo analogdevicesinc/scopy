@@ -87,6 +87,7 @@ add_library(
     src/signal_generator_menu.cpp
     src/power_supply_menu.cpp
     src/voltmeter_menu.cpp
+    src/pattern_generator_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -124,6 +125,7 @@ add_library(
     ui/signal_generator_menu.ui
     ui/power_supply_menu.ui
     ui/voltmeter_menu.ui
+    ui/pattern_generator_menu.ui
     # resources
     resources/resources.qrc
 )
