@@ -24,7 +24,7 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item>
-       <widget class="scopy::gui::PatternGeneratorMenu" name="widget" native="true"/>
+       <widget class="scopy::gui::LogicAnalyzerMenu" name="widget" native="true"/>
       </item>
      </layout>
     </item>
@@ -40,9 +40,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>scopy::gui::PatternGeneratorMenu</class>
+   <class>scopy::gui::LogicAnalyzerMenu</class>
    <extends>QWidget</extends>
-   <header location="global">scopy/gui/pattern_generator_menu.hpp</header>
+   <header location="global">scopy/gui/logic_analyzer_menu.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

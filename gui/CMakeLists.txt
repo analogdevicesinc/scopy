@@ -88,6 +88,7 @@ add_library(
     src/power_supply_menu.cpp
     src/voltmeter_menu.cpp
     src/pattern_generator_menu.cpp
+    src/logic_analyzer_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -126,6 +127,7 @@ add_library(
     ui/power_supply_menu.ui
     ui/voltmeter_menu.ui
     ui/pattern_generator_menu.ui
+    ui/logic_analyzer_menu.ui
     # resources
     resources/resources.qrc
 )
@@ -165,7 +167,7 @@ target_link_libraries(
             Qt${QT_VERSION_MAJOR}::Xml
             project_options
             project_warnings
-	    qwt::qwt
+            qwt::qwt
     PUBLIC ${IIO_LIBRARIES}
 )
 
