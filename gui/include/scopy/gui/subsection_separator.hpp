@@ -25,7 +25,10 @@ private:
 
 public:
 	QPushButton* getButton();
-	void setButton(bool buttonVisible);
+	void setButtonVisible(bool buttonVisible);
+
+	bool getButtonChecked();
+	void setButtonChecked(bool checked);
 
 	QLabel* getLabel();
 	void setLabel(const QString& text);

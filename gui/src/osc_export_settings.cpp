@@ -52,7 +52,7 @@ ExportSettings::ExportSettings(QWidget* parent)
 	m_ui->vLayoutDropDown->addWidget(m_exportChannels);
 
 	m_ui->widgetSubsSeparator->setLabel("EXPORT");
-	m_ui->widgetSubsSeparator->setButton(false);
+	m_ui->widgetSubsSeparator->setButtonVisible(false);
 }
 
 ExportSettings::~ExportSettings() { delete m_ui; }

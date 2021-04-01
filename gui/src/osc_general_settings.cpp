@@ -14,10 +14,10 @@ OscGeneralSettings::OscGeneralSettings(QWidget* parent)
 	m_ui->widgetGeneralSettingsMenuHeader->setLineColor(new QColor("#4a64ff"));
 
 	m_ui->widgetXYSubsSep->setLabel("X-Y");
-	m_ui->widgetXYSubsSep->setButton(false);
+	m_ui->widgetXYSubsSep->setButtonVisible(false);
 
 	m_ui->widgetViewsSubsSep->setLabel("VIEWS");
-	m_ui->widgetViewsSubsSep->setButton(false);
+	m_ui->widgetViewsSubsSep->setButtonVisible(false);
 }
 
 OscGeneralSettings::~OscGeneralSettings() { delete m_ui; }

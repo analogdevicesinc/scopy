@@ -14,16 +14,16 @@ ChannelSettings::ChannelSettings(QWidget* parent)
 	m_ui->widgetMenuHeader->setLineColor(new QColor("#ff7200"));
 
 	m_ui->widgetSubsectionSeparatorMath->setLabel("MATH");
-	m_ui->widgetSubsectionSeparatorMath->setButton(false);
+	m_ui->widgetSubsectionSeparatorMath->setButtonVisible(false);
 
 	m_ui->widgetSubsectionSeparatorSettings->setLabel("SETTINGS");
-	m_ui->widgetSubsectionSeparatorSettings->setButton(false);
+	m_ui->widgetSubsectionSeparatorSettings->setButtonVisible(false);
 
 	m_ui->widgetSubsectionSeparatorVertical->setLabel("VERTICAL");
-	m_ui->widgetSubsectionSeparatorVertical->setButton(false);
+	m_ui->widgetSubsectionSeparatorVertical->setButtonVisible(false);
 
 	m_ui->widgetSubsectionSeparatorHorizontal->setLabel("HORIZONTAL");
-	m_ui->widgetSubsectionSeparatorHorizontal->setButton(false);
+	m_ui->widgetSubsectionSeparatorHorizontal->setButtonVisible(false);
 }
 
 ChannelSettings::~ChannelSettings() { delete m_ui; }
