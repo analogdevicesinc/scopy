@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PowerSupplyMenu</class>
+ <widget class="QWidget" name="PowerSupplyMenu">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>238</width>
+    <height>483</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QScrollArea" name="scrollArea">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>218</width>
+        <height>463</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="scopy::gui::MenuHeader" name="widgetTrakingRationControlMenuHeader" native="true"/>
+       </item>
+       <item>
+        <widget class="scopy::gui::CustomSwitch" name="btnSync">
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+min-height: 30px;
+max-height: 30px;
+min-width: 200px;
+max-width: 200px;
+background-color: black;
+border-radius: 4px;
+}
+
+QPushButton:disabled {
+background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+}
+
+QWidget#handle {
+min-height: 30px;
+max-height: 30px;
+min-width: 102px;
+max-width: 102px;
+background-color: #4a64ff;
+border-radius: 2px;
+}
+
+QWidget#handle:disabled {
+background-color: #aaaaaa;
+}
+
+QLabel {
+margin-top: 6px;
+background-color: transparent;
+}
+
+QLabel#on {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:100px;
+max-width:100px;
+qproperty-alignment: AlignCenter AlignCenter;
+margin-left: 0px;
+color: white;
+}
+
+QLabel#on:disabled {
+color: rgba(255,255,255,102);
+}
+
+QLabel#off {
+margin-top: 0px;
+min-height:30px;
+max-height:30px;
+min-width:100px;
+max-width:100px;
+margin-left: 100px;
+color: white;
+qproperty-alignment: AlignCenter AlignCenter;
+}
+
+QLabel#off:disabled {
+color: rgba(255,255,255,51);
+}
+</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="leftText" stdset="0">
+          <string>Independent</string>
+         </property>
+         <property name="rightText" stdset="0">
+          <string>Tracking</string>
+         </property>
+         <property name="duration_ms" stdset="0">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="hLayout">
+         <property name="spacing">
+          <number>1</number>
+         </property>
+         <item>
+          <widget class="QSlider" name="sliderTrackingRatio">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QSlider::groove {
+    border: 1px solid #444444;
+    height: 2px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+    background: #999999;
+    margin: 2px 0;
+    border-radius: 2px;
+}
+
+QSlider::handle {
+    background: rgb(73, 99, 255);
+    border: 0px solid;
+    width: 18px;
+    margin: -8px 0; /* handle is placed by default on the contents rect of the groove. Expand outside the groove */
+    border-radius: 8px;
+}
+
+QSlider::handle:disabled {
+    background: #444444;
+}
+
+QSlider::sub-page:horizontal {
+    background: #4A64FF;
+}</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>100</number>
+           </property>
+           <property name="value">
+            <number>100</number>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblTrackingRatio">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>25</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>100</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lbl_13">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>%</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="vSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>15</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="scopy::gui::MenuHeader" name="widgetPositiveOutputMenuHeader" native="true"/>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="vLayoutValuePos">
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnDac1">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+QPushButton[running=true] {
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+  background-color: grey;
+}</string>
+         </property>
+         <property name="text">
+          <string>Enable</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/resources.qrc">
+           <normaloff>:/icons/common/ico-play.svg</normaloff>:/icons/common/ico-play.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>8</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="vSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>15</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="scopy::gui::MenuHeader" name="widgetNegativeOutputMenuHeader" native="true"/>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="vLayoutValueNeg">
+         <property name="bottomMargin">
+          <number>10</number>
+         </property>
+        </layout>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnDac2">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::RightToLeft</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+  width: 80px;
+  height: 40px;
+  border-radius: 4px;
+  background-color: #27b34f;
+  color: white;
+  font-weight: bold;
+
+  text-align: left;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+QPushButton[running=true] {
+  background-color: #F45000;
+}
+
+QPushButton:disabled {
+  background-color: grey;
+}</string>
+         </property>
+         <property name="text">
+          <string>Enable</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../resources/resources.qrc">
+           <normaloff>:/icons/common/ico-play.svg</normaloff>:/icons/common/ico-play.svg</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>8</width>
+           <height>10</height>
+          </size>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="vSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>scopy::gui::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header location="global">scopy/gui/custom_switch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>scopy::gui::MenuHeader</class>
+   <extends>QWidget</extends>
+   <header location="global">scopy/gui/menu_header.hpp</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
+ <connections/>
+</ui>
