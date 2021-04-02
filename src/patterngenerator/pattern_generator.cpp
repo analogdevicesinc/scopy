@@ -334,6 +334,13 @@ void PatternGenerator::channelSelectedChanged(int chIdx, bool selected)
 		m_ui->patternComboBox->setEnabled(true);
 		m_ui->btnOutputMode->setEnabled(true);
 
+		if (m_selectedChannel < m_nbChannels) {
+			const DIO_MODE outputMode = m_m2kDigital->getOutputMode(m_selectedChannel);
+			const bool btnOutputModeSelected = (outputMode == DIO_MODE::DIO_OPENDRAIN ? true
+												  :false);
+			m_ui->btnOutputMode->setChecked(btnOutputModeSelected);
+		}
+
 		updateChannelGroupWidget(true);
 		updateChannelGroupPattern(true);
 
