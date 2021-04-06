@@ -2045,6 +2045,9 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	waveformUpdateUi(ptr->waveform);
 	ui->tabWidget->setCurrentIndex((int) ptr->type);
 	resizeTabWidget((int)ptr->type);
+
+	ui->tabWidget->setStyleSheet(QString("QTabBar::tab:selected { border-bottom: 2px solid %1; }")
+				     .arg(plot->getLineColor(chIdx).name()));
 }
 
 void SignalGenerator::updateAndToggleMenu(int chIdx, bool open)
