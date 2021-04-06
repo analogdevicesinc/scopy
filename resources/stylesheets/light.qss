@@ -139,15 +139,14 @@ QComboBox QAbstractItemView {
 	border: none;
 	background-color: white;
 	text-align: left;
-	color: #bebebe;
+	color: black;
 	outline: none;
 
 	border-bottom: 1px solid #bebebe;
 	border-top: 1px solid #bebebe;
-}
 
-/* This only works on Windows */
-QComboBox QAbstractItemView {
+	/* This only works on Windows */
+	selection-color: black;
 	selection-background-color: #EDEDED;
 }
 
