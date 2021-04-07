@@ -2011,7 +2011,7 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 
 void adiscope::CapturePlot::pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar)
 {
-	int indexOfNewChannel = d_ydata.size() - 1;
+	const int indexOfNewChannel = (d_ydata.size() + d_ref_ydata.size()) - 1;
 	d_offsetBars.insert(indexOfNewChannel, chOffsetBar);
 	d_offsetHandles.insert(indexOfNewChannel, chOffsetHdl);
 
