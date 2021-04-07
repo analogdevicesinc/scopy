@@ -26,7 +26,7 @@ table, th, td {
 </tr>
 <tr>
 <td>Qt</td>
-<td><a href="https://doc.qt.io/qt-5/opensourcelicense.html">License</a></td>
+<td><a href="https://doc.qt.io/qt-5/licensing.html">License</a></td>
 <td><a href="https://www.qt.io">Homepage</a></td>
 </tr>
 <tr>
@@ -51,7 +51,7 @@ table, th, td {
 </tr>
 <tr>
 <td>PulseView</td>
-<td><a href="https://github.com/sigrokproject/pulseview">License</a></td>
+<td><a href="https://github.com/sigrokproject/pulseview/blob/master/COPYING">License</a></td>
 <td><a href="https://sigrok.org">Homepage</a></td>
 </tr>
 <tr>
