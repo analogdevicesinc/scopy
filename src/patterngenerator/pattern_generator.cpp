@@ -909,12 +909,6 @@ void PatternGenerator::connectSignalsAndSlots()
 	connect(m_ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
-		if (m_selectedChannel < m_nbChannels) {
-			QWidget *widgetInLayout = m_ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8,
-								    m_selectedChannel / 8)->widget();
-			auto channelBox = dynamic_cast<QCheckBox *>(widgetInLayout);
-			channelBox->setText(text);
-		}
 	});
 
 	connect(m_ui->printBtn, &QPushButton::clicked, [=](){
