@@ -147,8 +147,6 @@ int main(int argc, char **argv)
 	myappTranslator.load(languageFileName);
 	app.installTranslator(&myappTranslator);
 
-	ToolLauncher launcher(prevCrashDump);
-
 	ScopyColorEditor *colorEditor = new ScopyColorEditor(&app);
 	colorEditor->setVisible(false);
 
@@ -161,6 +159,7 @@ int main(int argc, char **argv)
 		app.setStyleSheet(colorEditor->getStyleSheet());
 	}
 
+	ToolLauncher launcher(prevCrashDump);
 	launcher.getPrefPanel()->setColorEditor(colorEditor);
 
 	bool nogui = parser.isSet("nogui");
