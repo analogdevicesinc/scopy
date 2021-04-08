@@ -37,6 +37,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
@@ -51,8 +54,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>276</width>
-        <height>601</height>
+        <width>278</width>
+        <height>603</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7">
