@@ -796,7 +796,7 @@ border: 5px solid white;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>2</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -839,7 +839,7 @@ border: 5px solid white;
                     <property name="geometry">
                      <rect>
                       <x>0</x>
-                      <y>-465</y>
+                      <y>0</y>
                       <width>340</width>
                       <height>1036</height>
                      </rect>
@@ -2041,6 +2041,9 @@ padding-left: 20px;
                  </property>
                  <item>
                   <widget class="QScrollArea" name="scrollArea_2">
+                   <property name="frameShape">
+                    <enum>QFrame::NoFrame</enum>
+                   </property>
                    <property name="horizontalScrollBarPolicy">
                     <enum>Qt::ScrollBarAlwaysOff</enum>
                    </property>
@@ -2052,8 +2055,8 @@ padding-left: 20px;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>298</width>
-                      <height>529</height>
+                      <width>300</width>
+                      <height>531</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -2988,6 +2991,11 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -3003,11 +3011,6 @@ QLabel {
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>linked_button.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>

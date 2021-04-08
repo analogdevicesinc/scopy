@@ -461,7 +461,7 @@ min-width: 6em;
               </sizepolicy>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>4</number>
              </property>
              <widget class="QWidget" name="channelSettings">
               <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -992,6 +992,9 @@ min-width: 64px;
                </property>
                <item>
                 <widget class="QScrollArea" name="scrollArea">
+                 <property name="frameShape">
+                  <enum>QFrame::NoFrame</enum>
+                 </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
@@ -1004,7 +1007,7 @@ min-width: 64px;
                     <x>0</x>
                     <y>0</y>
                     <width>298</width>
-                    <height>521</height>
+                    <height>523</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1496,6 +1499,9 @@ color: rgba(255,255,255,51);
                </property>
                <item>
                 <widget class="QScrollArea" name="scrollArea_2">
+                 <property name="frameShape">
+                  <enum>QFrame::NoFrame</enum>
+                 </property>
                  <property name="horizontalScrollBarPolicy">
                   <enum>Qt::ScrollBarAlwaysOff</enum>
                  </property>
@@ -1507,7 +1513,7 @@ color: rgba(255,255,255,51);
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>268</width>
+                    <width>284</width>
                     <height>547</height>
                    </rect>
                   </property>
@@ -2345,6 +2351,11 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -2360,11 +2371,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>linked_button.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>

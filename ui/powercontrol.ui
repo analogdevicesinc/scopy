@@ -590,6 +590,9 @@ color: #9013fe;
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOff</enum>
           </property>
@@ -602,7 +605,7 @@ color: #9013fe;
              <x>0</x>
              <y>0</y>
              <width>218</width>
-             <height>471</height>
+             <height>473</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1089,6 +1092,11 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
@@ -1104,11 +1112,6 @@ QPushButton:disabled {
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>linked_button.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>QwtThermo</class>
