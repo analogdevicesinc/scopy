@@ -2330,11 +2330,12 @@ void LogicAnalyzer::setupTriggerMenu()
 
 		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
 			if (on) {
-				int source = ui->externalTriggerSourceComboBox->currentIndex();
-				int condition = ui->externalTriggerConditionComboBox->currentIndex();
+				const int source = ui->externalTriggerSourceComboBox->currentIndex();
+				const int condition = ui->externalTriggerConditionComboBox->currentIndex();
 				m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
 				m_m2kDigital->getTrigger()->setDigitalExternalCondition(
 							static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+				ui->externalTriggerConditionComboBox->setDisabled(source);
 			} else {
 				m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
 			}
