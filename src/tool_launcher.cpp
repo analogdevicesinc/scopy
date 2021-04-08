@@ -1198,7 +1198,6 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 			bool success = switchContext(uri);
 			if (success) {
 				selectedDev->setConnected(true, false, ctx);
-				selectedDev->connectButton()->setText(tr("Calibrating..."));
 				selectedDev->setName(filter->hw_name());
 				selectedDev->infoPage()->identifyDevice(true);
 				setDynamicProperty(ui->btnConnect, "connected", true);
@@ -1450,6 +1449,7 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 			// always calibrate if initial flag is set
 			// if it's calibrated and skip_calibration_if_calibrated - do not calibrate
 			if (!(initialCalibrationFlag && skip_calibration_if_already_calibrated && calib->isCalibrated() )) {
+				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrating ... "));
 				ok = calib->calibrateAll();
 			} else {
 				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration skipped because already calibrated."));
