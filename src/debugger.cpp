@@ -156,7 +156,7 @@ void Debugger::updateValueWidget(QString attribute)
 	QVector<QString> availableValues = debug.getAttributeVector();
 	ui->valueStackedWidget->setEnabled(true);
 
-	for (QString t : availableValues) {
+	for (const QString &t : qAsConst(availableValues)) {
 		if (!QString::compare(t, attribute, Qt::CaseInsensitive)) {
 			available = true;
 

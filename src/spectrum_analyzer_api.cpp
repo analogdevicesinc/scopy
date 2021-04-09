@@ -218,7 +218,7 @@ QVariantList SpectrumAnalyzer_API::getMarkers()
 {
 	QVariantList list;
 
-	for (SpectrumMarker_API *each : sp->marker_api) {
+	for (SpectrumMarker_API *each : qAsConst(sp->marker_api)) {
 		list.append(QVariant::fromValue(each));
 	}
 
@@ -249,7 +249,7 @@ QVariantList SpectrumAnalyzer_API::getChannels()
 {
 	QVariantList list;
 
-	for (SpectrumChannel_API *each : sp->ch_api) {
+	for (SpectrumChannel_API *each : qAsConst(sp->ch_api)) {
 		list.append(QVariant::fromValue(each));
 	}
 

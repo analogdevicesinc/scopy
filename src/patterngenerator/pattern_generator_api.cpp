@@ -125,7 +125,7 @@ void logic::PatternGenerator_API::setCurrentGroups(const QVector<QVector<int> > 
 QVector<QPair<QVector<int>, QString> > logic::PatternGenerator_API::getEnabledPatterns() const
 {
 	QVector<QPair<QVector<int>, QString> > enabledPatterns;
-	for (const QPair<QVector<int>, PatternUI *> &pattern : m_pattern->m_enabledPatterns) {
+	for (const QPair<QVector<int>, PatternUI *> &pattern : qAsConst(m_pattern->m_enabledPatterns)) {
 		enabledPatterns.push_back({pattern.first,
 					Pattern_API::toString(pattern.second->get_pattern())});
 	}

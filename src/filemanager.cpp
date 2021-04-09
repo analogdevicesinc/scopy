@@ -88,7 +88,7 @@ void FileManager::open(QString fileName,
 			QVector<QString> line_data;
 			QString line = in.readLine();
 			QStringList list = line.split(separator, QString::SkipEmptyParts);
-			for (QString list_item : list) {
+			for (const QString &list_item : qAsConst(list)) {
 				line_data.push_back(list_item);
 			}
 			if (line_data.size() > 0) {
@@ -289,7 +289,7 @@ void FileManager::performWrite()
 	//column names row
 	exportStream << "Sample" << separator;
 	bool skipFirstSeparator=true;
-	for (QString columnName : columnNames) {
+	for (const QString &columnName : qAsConst(columnNames)) {
 		if(!skipFirstSeparator)
 			exportStream << separator;
 		exportStream << columnName;

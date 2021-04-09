@@ -37,12 +37,12 @@ void ScopyColorEditor::parseAndBuildMap(QString toParse)
 
 	QString textEditText = "";
 
-	for (auto token : print) {
+	for (const auto &token : qAsConst(print)) {
 		// TODO: skip empty parts is only available in qt >= 5.14
 //		QStringList ttoken = token.split("\n", Qt::SkipEmptyParts);
 		QStringList ttoken;
 		if (ttoken.size()) {
-			for (auto t : ttoken) {
+			for (const auto &t : ttoken) {
 				if (t.startsWith("/*")) continue; //ignore comments
 				textEditText += t;
 				textEditText += '\n';
@@ -86,7 +86,7 @@ ScopyColorEditor::ScopyColorEditor(QApplication *app, QWidget *parent)
 	QDir themes(":/stylesheets/themes/");
 	QStringList stylesheets = themes.entryList();
 
-	for (const QString &entry : stylesheets) {
+	for (const QString &entry : qAsConst(stylesheets)) {
 		m_ui->stylesheetsCmbBox->addItem(entry);
 	}
 
@@ -361,7 +361,7 @@ void ScopyColorEditor::rebuildAndApplyStylesheet()
 	for (auto it = m_entityStylesheetMap.begin(); it != m_entityStylesheetMap.end(); ++it) {
 		stylesheet += it.key() + " {\n";
 
-		for (auto line : it.value()) {
+		for (const auto &line : it.value()) {
 			stylesheet += line + "\n";
 		}
 
@@ -448,7 +448,7 @@ QString ScopyColorEditor::clearAndRebuildEditor(const QString &stylesheet)
 {
 	m_entityStylesheetMap.clear();
 	auto layout = m_ui->scrollArea->widget()->layout();
-	for (QWidget *widget : m_colorEditors) {
+	for (QWidget *widget : qAsConst(m_colorEditors)) {
 		layout->removeWidget(widget);
 		widget->deleteLater();
 	}
@@ -491,7 +491,7 @@ void ScopyColorEditor::stylesheetSelected(const QString &stylesheet)
 
 void ScopyColorEditor::search(const QString &searchText)
 {
-	for (QWidget *w : m_colorEditors) {
+	for (QWidget *w : qAsConst(m_colorEditors)) {
 		QLabel *label = qobject_cast<QLabel*>(w->layout()->itemAt(0)->widget());
 		bool hasSearchedWords = label->text().contains(searchText);
 		w->setVisible(hasSearchedWords);

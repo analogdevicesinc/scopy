@@ -47,7 +47,7 @@ DbClickButtons::DbClickButtons(QWidget *parent, int maxRowBtnCount) :
 	btn_list = findChildren<QPushButton *>();
 
 	int n = 0;
-	for (const auto& i : btn_list) {
+	for (const auto& i : qAsConst(btn_list)) {
 		btn_states.push_back(false);
 		i->setProperty("id", QVariant(n++));
 		connect(i, SIGNAL(clicked()),

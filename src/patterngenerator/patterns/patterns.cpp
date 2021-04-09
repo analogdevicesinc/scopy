@@ -2010,7 +2010,7 @@ void I2CPatternUI::parse_ui()
 	std::vector<uint8_t> b;
 	std::reverse(strList.begin(),strList.end());
 
-	for (QString str: strList) {
+	for (const QString &str: qAsConst(strList)) {
 		uint64_t val;
 		bool ok;
 		b.clear();
@@ -2412,7 +2412,7 @@ void SPIPatternUI::parse_ui()
 	std::vector<uint8_t> b;
 	std::reverse(strList.begin(),strList.end());
 
-	for (QString str: strList) {
+	for (const QString &str: qAsConst(strList)) {
 		uint64_t val;
 		bool ok;
 		b.clear();
@@ -3799,7 +3799,7 @@ Pattern *PatternFactory::create(QString name)
 {
 	int i=0;
 
-	for (auto str : ui_list) {
+	for (const auto &str : qAsConst(ui_list)) {
 		if (name==str) {
 			return create(i);
 		}
@@ -3878,7 +3878,7 @@ PatternUI *PatternFactory::create_ui(Pattern *pattern, QWidget *parent)
 	int i=0;
 	QString name = QString::fromStdString(pattern->get_name());
 
-	for (auto str : ui_list) {
+	for (const auto &str : qAsConst(ui_list)) {
 		if (name==str) {
 			return create_ui(pattern,i,parent);
 		}
