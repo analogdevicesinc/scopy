@@ -1128,13 +1128,13 @@ void CapturePlot::setGraticuleEnabled(bool enabled){
 	displayGraticule = enabled;
 
 	if(!displayGraticule){
-		for(QwtPlotScaleItem* scale : scaleItems){
+		for(QwtPlotScaleItem* scale : qAsConst(scaleItems)){
 			scale->attach(this);
 		}
 		graticule->enableGraticule(displayGraticule);
 	}
 	else{
-		for(QwtPlotScaleItem* scale : scaleItems){
+		for(QwtPlotScaleItem* scale : qAsConst(scaleItems)){
 			scale->detach();
 		}
 		graticule->enableGraticule(displayGraticule);
@@ -1645,7 +1645,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 	// merge new group if selected channels already have a group
 	QList<RoundedHandleV *> group = d_groupHandles.takeLast();
 	QList<RoundedHandleV *> updatedGroup;
-	for (RoundedHandleV *hdl : group) {
+	for (RoundedHandleV *hdl : qAsConst(group)) {
 		auto hdlGroup = std::find_if(d_groupHandles.begin(), d_groupHandles.end(),
 					     [&hdl](const QList<RoundedHandleV*> &group){
 			return group.contains(hdl);
@@ -1718,14 +1718,14 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 	group.first()->setSelected(true);
 	group.first()->selected(true);
 
-	for (QwtPlotZoneItem *groupMarker : d_groupMarkers) {
+	for (QwtPlotZoneItem *groupMarker : qAsConst(d_groupMarkers)) {
 		groupMarker->detach();
 		delete groupMarker;
 	}
 
 	d_groupMarkers.clear();
 
-	for (const auto &group : d_groupHandles) {
+	for (const auto &group : qAsConst(d_groupHandles)) {
 		// Add group marker
 		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
 		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
@@ -1749,7 +1749,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 	}
 
 	if (!newGroup) {
-		for (const auto &group : d_groupHandles) {
+		for (const auto &group : qAsConst(d_groupHandles)) {
 			group.first()->triggerMove();
 		}
 	}

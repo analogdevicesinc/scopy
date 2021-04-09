@@ -458,7 +458,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
 	ui->markerTable->hide();
 
-	for (auto ch: channels) {
+	for (auto ch: qAsConst(channels)) {
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
 
@@ -933,7 +933,7 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 		bool isOk = true;
 		for (const auto &ref_channel : referenceChannels) {
 			QString shortName = ref_channel->shortName();
-			int channel_counter = shortName.mid(shortName.size() - 1).toInt();
+			int channel_counter = shortName.midRef(shortName.size() - 1).toInt();
 			if (current == channel_counter) {
 				isOk = false;
 				break;

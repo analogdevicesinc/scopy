@@ -197,7 +197,7 @@ void ToolLauncher_API::load(const QString& file)
 
 	ApiObjectManager::getInstance().load(settings);
 
-	for (auto tool : tl->toolList)
+	for (auto tool : qAsConst(tl->toolList))
 		tool->settingsLoaded();
 }
 

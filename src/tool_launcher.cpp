@@ -1363,7 +1363,7 @@ void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
 
 void adiscope::ToolLauncher::stopToolsBeforeCalibration()
 {
-	for(Tool* tool : calibration_saved_tools)
+	for(Tool* tool : qAsConst(calibration_saved_tools))
 		tool->stop();
 }
 void adiscope::ToolLauncher::restartToolsAfterCalibration()
@@ -1826,12 +1826,12 @@ void ToolLauncher::closeEvent(QCloseEvent *event)
 	// Close all detached windows
 	QApplication::closeAllWindows();
 
-	for (auto iterator : debugInstances) {
+	for (auto iterator : qAsConst(debugInstances)) {
 		delete iterator;
 	}
 	debugInstances.clear();
 
-	for (auto iterator : debugWindows) {
+	for (auto iterator : qAsConst(debugWindows)) {
 		iterator->close();
 		delete iterator;
 	}
