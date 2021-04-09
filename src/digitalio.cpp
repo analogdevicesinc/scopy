@@ -213,7 +213,7 @@ QPair<QWidget *,Ui::dioChannel *> *DigitalIO::findIndividualUi(int ch)
 	for (auto &&group : groups) {
 		auto i=0;
 
-		for (auto wid : group->chui) {
+		for (auto wid : qAsConst(group->chui)) {
 			if (wid->first->property("dio")==ch) {
 				return group->chui[i];
 			}
@@ -274,7 +274,7 @@ void adiscope::DigitalIoGroup::changeDirection()
 	auto val = 0;
 	auto i=0;
 
-	for (auto ch:chui) {
+	for (auto ch:qAsConst(chui)) {
 		ch->second->inout->setChecked(!chk);
 		auto channel = ch->first->property("dio").toInt();
 		dio->setDirection(channel,!chk);

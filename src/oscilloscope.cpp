@@ -2979,7 +2979,7 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 								      adc_samp_conv_block, i));
 				}
 			}
-			for(auto p : math_sinks) {
+			for(const auto &p : qAsConst(math_sinks)) {
 				auto math = p.first;
 				xy_channels.push_back(QPair<gr::basic_block_sptr, int>(
 							      math, 0));

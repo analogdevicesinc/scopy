@@ -65,7 +65,7 @@ DetachedWindowsManager::DetachedWindowsManager()
 
 DetachedWindowsManager::~DetachedWindowsManager()
 {
-	for (auto iterator : pool) {
+	for (auto iterator : qAsConst(pool)) {
 		delete iterator;
 	}
 

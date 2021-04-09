@@ -71,7 +71,7 @@ QString ConnectDialog::URIstringParser(QString uri)
 	};
 
 	bool prependIP = true;
-	for( auto pre:prefixes)
+	for( const auto &pre:prefixes)
 	{
 		if(uri.startsWith(pre) == true)
 			prependIP = false;

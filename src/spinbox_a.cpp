@@ -86,7 +86,7 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 	/* Compat */
 	QStringList list;
 
-	for (auto unit : units) {
+	for (const auto &unit : units) {
 		list.append(QString("%1=%2").arg(unit.first).arg(unit.second));
 	}
 

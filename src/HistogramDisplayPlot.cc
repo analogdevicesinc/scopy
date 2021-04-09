@@ -332,7 +332,7 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
   insertLegend(nullptr);
 
   d_grid->detach();
-  for(QwtPlotScaleItem* scale : scaleItems){
+  for(QwtPlotScaleItem* scale : qAsConst(scaleItems)){
 	  scale->detach();
   }
 }
@@ -353,12 +353,12 @@ void HistogramDisplayPlot::setOrientation(Qt::Orientation orientation)
 
 	if (orientation == Qt::Vertical) {
 		d_grid->attach(this);
-		for(QwtPlotScaleItem* scale : scaleItems){
+		for(QwtPlotScaleItem* scale : qAsConst(scaleItems)){
 			scale->attach(this);
 		}
 	} else {
 		d_grid->detach();
-		for(QwtPlotScaleItem* scale : scaleItems){
+		for(QwtPlotScaleItem* scale : qAsConst(scaleItems)){
 			scale->detach();
 		}
 	}

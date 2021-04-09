@@ -68,7 +68,7 @@ QVariantList UserNotes_API::getNotes()
 	QVariantList list;
 	refreshApi();
 
-	for (auto *each : notes_list_api) {
+	for (auto *each : qAsConst(notes_list_api)) {
 		list.append(QVariant::fromValue(each));
 	}
 	return list;

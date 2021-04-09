@@ -207,7 +207,7 @@ void OscScaleDraw::draw(QPainter *painter, const QPalette &) const
 		drawLabel(painter, delta);
 	}
 
-	for (const auto &tick : ticks) {
+	for (const auto &tick : qAsConst(ticks)) {
 		if (tick != delta) {
 			drawLabel(painter, tick);
 		}

@@ -176,7 +176,7 @@ QList<QList<QPair<int, int>>> LogicAnalyzer_API::getAssignedDecoderChannels() co
 		}
 		auto stack = annCurve->getDecoderStack();
 		QList<QPair<int, int>> assignedChannels;
-		for (std::shared_ptr<Decoder> decoder : stack) {
+		for (const std::shared_ptr<Decoder> &decoder : stack) {
 			for (const auto &ch : decoder->channels()) {
 				if (ch->assigned_signal) {
 					assignedChannels.push_back({ch->id, ch->bit_id});
@@ -261,7 +261,7 @@ QList<QStringList> LogicAnalyzer_API::getDecoderSettings() const
 
 			QJsonObject obj;
 			QJsonArray propArray;
-			for(auto p : bindings[i]->properties()) {
+			for(const auto &p : bindings[i]->properties()) {
 
 				QJsonObject propObj;
 				QString prop_name(p->name());
@@ -344,7 +344,7 @@ void LogicAnalyzer_API::setDecoderSettings(const QList<QStringList> &decoderSett
 			}
 
 			QJsonArray propArray = obj["properties"].toArray();
-			for (auto propRef : propArray) {
+			for (auto propRef : qAsConst(propArray)) {
 				auto prop = propRef.toObject();
 				for(auto p : binding->properties())
 				{

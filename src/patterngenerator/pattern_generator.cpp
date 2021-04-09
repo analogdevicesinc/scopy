@@ -1023,7 +1023,7 @@ void PatternGenerator::updateChannelGroupPattern(bool visible)
 	qDebug() << "Enabled patterns: " << m_enabledPatterns;
 	qDebug() << "################################################################";
 
-	for (const auto &ep : m_enabledPatterns) {
+	for (const auto &ep : qAsConst(m_enabledPatterns)) {
 		if (ep.first.contains(m_selectedChannel)) {
 			pattern = QString::fromStdString(ep.second->get_pattern()->get_name());
 			ep.second->setVisible(visible);
