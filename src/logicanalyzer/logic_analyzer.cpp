@@ -2460,19 +2460,23 @@ void LogicAnalyzer::exportData()
 	// Check the selected file type
 	if (selectedFilter != "") {
 		if(selectedFilter.contains("comma", Qt::CaseInsensitive)) {
-			fileName += ".csv";
 			separator = ",";
 		}
 		if(selectedFilter.contains("tab", Qt::CaseInsensitive)) {
-			fileName += ".txt";
 			separator = "\t";
 		}
 		if(selectedFilter.contains("Change Dump", Qt::CaseInsensitive)) {
 			endRow = " $end\n";
 			startRow = "$";
-			fileName += ".vcd";
 		}
 	}
+
+	if (fileName.split(".").size() <= 1) {
+		// file name w/o extension. Let's append it
+		QString ext = selectedFilter.split(".")[1].split(")")[0];
+		fileName += "." + ext;
+	}
+
 
 
 	if (separator != "") {
