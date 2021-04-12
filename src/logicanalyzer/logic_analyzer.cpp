@@ -1357,11 +1357,9 @@ void LogicAnalyzer::setupUi()
 	cursorsPositionButton->setPosition(CustomPlotPositionButton::ReadoutsPosition::bottomRight);
 
 	// Disable some options we don't need for this cursor settings panel
-	cr_ui->btnNormalTrack->setVisible(false);
-	cr_ui->label_3->setVisible(false);
-	cr_ui->line_3->setVisible(false);
-	cr_ui->vCursorsEnable->setVisible(false);
-	cr_ui->btnLockVertical->setVisible(false);
+	cr_ui->widgteBtnNormalTrack->setVisible(false);
+	cr_ui->widgetVertical->setVisible(false);
+	cr_ui->widgetVerticalBtns->setVisible(false);
 
 	cr_ui->horizontalSlider->setMaximum(100);
 	cr_ui->horizontalSlider->setMinimum(0);
