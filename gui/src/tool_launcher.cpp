@@ -24,6 +24,7 @@ ToolLauncher::ToolLauncher(QWidget* parent)
 
 	connect(m_ui->prefBtn, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_prefPanel)); });
 	connect(m_ui->btnNotes, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_notesPanel)); });
+	connect(m_ui->btnHome, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_ui->widgetHome)); });
 
 	m_about = new ScopyAboutDialog(this);
 	connect(m_ui->btnAbout, &QPushButton::clicked, [=]() {
