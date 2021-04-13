@@ -651,7 +651,7 @@ void SignalGenerator::resetZoom()
 	}
 
 	double period = 0.0;
-	unsigned int slowSignalId = 0;
+	int slowSignalId = -1;
 
 	for (auto it = channels.begin(); it != channels.end(); ++it) {
 		if ((*it)->enableButton()->isChecked()) {
@@ -710,8 +710,10 @@ void SignalGenerator::resetZoom()
 	plot->setHorizOffset(period/2);
 	plot->zoomBaseUpdate();
 	rescale();
-	plot->DetachCurve(slowSignalId);
-	plot->AttachCurve(slowSignalId);
+	if(slowSignalId != -1) {
+		plot->DetachCurve(slowSignalId);
+		plot->AttachCurve(slowSignalId);
+	}
 }
 
 void SignalGenerator::rescale()
