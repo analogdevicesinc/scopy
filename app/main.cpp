@@ -14,11 +14,11 @@ int main(int argc, char* argv[])
 	scopy::gui::ThemeManager::getInstance().setApplication(&a);
 	scopy::gui::ThemeManager::getInstance().setCurrentTheme(theme);
 
-	MainWindow w;
-	w.show();
+//	MainWindow w;
+//	w.show();
 
-//	scopy::gui::ToolLauncher tl;
-//	tl.show();
+	scopy::gui::ToolLauncher tl;
+	tl.show();
 
 	return a.exec();
 }

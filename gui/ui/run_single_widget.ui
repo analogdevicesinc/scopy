@@ -13,20 +13,29 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QPushButton" name="btnRun">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>100</width>
-     <height>40</height>
-    </rect>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <property name="layoutDirection">
-    <enum>Qt::RightToLeft</enum>
+   <property name="leftMargin">
+    <number>0</number>
    </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton {
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QPushButton" name="btnRun">
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
   width: 80px;
   height: 40px;
   border-radius: 4px;
@@ -47,42 +56,52 @@ QPushButton[running=true] {
 QPushButton:disabled {
   background-color: grey;
 }</string>
-   </property>
-   <property name="text">
-    <string>Run</string>
-   </property>
-   <property name="icon">
-    <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/common/ico-play.svg</normaloff>
-     <normalon>:/icons/ico-stop.svg</normalon>:/icons/common/ico-play.svg</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>8</width>
-     <height>10</height>
-    </size>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="btnSingle">
-   <property name="geometry">
-    <rect>
-     <x>180</x>
-     <y>20</y>
-     <width>100</width>
-     <height>40</height>
-    </rect>
-   </property>
-   <property name="layoutDirection">
-    <enum>Qt::RightToLeft</enum>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">QPushButton {
+     </property>
+     <property name="text">
+      <string>Run</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/icons/common/ico-play.svg</normaloff>
+       <normalon>:/icons/default-theme/icons/ico-stop.svg</normalon>:/icons/common/ico-play.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>8</width>
+       <height>10</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnSingle">
+     <property name="layoutDirection">
+      <enum>Qt::RightToLeft</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
   width: 80px;
   height: 40px;
   border-radius: 4px;
@@ -103,25 +122,27 @@ QPushButton[running=true] {
 QPushButton:disabled {
   background-color: grey;
 }</string>
-   </property>
-   <property name="text">
-    <string>Single</string>
-   </property>
-   <property name="icon">
-    <iconset resource="../resources/resources.qrc">
-     <normaloff>:/icons/common/ico-oneshot.svg</normaloff>
-     <normalon>:/icons/ico-stop.svg</normalon>:/icons/common/ico-oneshot.svg</iconset>
-   </property>
-   <property name="iconSize">
-    <size>
-     <width>10</width>
-     <height>10</height>
-    </size>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-  </widget>
+     </property>
+     <property name="text">
+      <string>Single</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/icons/common/ico-oneshot.svg</normaloff>
+       <normalon>:/icons/default-theme/icons/ico-stop.svg</normalon>:/icons/common/ico-oneshot.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>10</width>
+       <height>10</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources>
   <include location="../resources/resources.qrc"/>

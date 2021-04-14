@@ -388,7 +388,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QWidget" name="saveLoadWidget" native="true">
+        <widget class="QWidget" name="widgetSaveLoad" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -418,7 +418,7 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <layout class="QHBoxLayout" name="hLayout_4">
             <property name="spacing">
              <number>2</number>
             </property>
@@ -429,7 +429,7 @@
              <number>10</number>
             </property>
             <item>
-             <widget class="QWidget" name="Save" native="true">
+             <widget class="QWidget" name="widgetSave" native="true">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -459,7 +459,7 @@
                 <number>3</number>
                </property>
                <item>
-                <spacer name="horizontalSpacer_12">
+                <spacer name="hSpacer_12">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -475,7 +475,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="saveBtn">
+                <widget class="QPushButton" name="btnSave">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -506,7 +506,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="saveLbl">
+                <widget class="QLabel" name="lblSave">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -525,7 +525,7 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_6">
+                <spacer name="hSpacer_6">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -544,7 +544,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="Load" native="true">
+             <widget class="QWidget" name="widgetLoad" native="true">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -574,7 +574,7 @@
                 <number>3</number>
                </property>
                <item>
-                <spacer name="horizontalSpacer_11">
+                <spacer name="hSpacer_11">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -590,7 +590,7 @@
                 </spacer>
                </item>
                <item>
-                <widget class="QLabel" name="loadLbl">
+                <widget class="QLabel" name="lblLoad">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -609,7 +609,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="loadBtn">
+                <widget class="QPushButton" name="btnLoad">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                    <horstretch>0</horstretch>
@@ -643,7 +643,7 @@
                 </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_8">
+                <spacer name="hSpacer_8">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
                  </property>
@@ -668,7 +668,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="preference" native="true">
+        <widget class="QWidget" name="widgetPreference" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -707,7 +707,7 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="hLayout_2">
             <property name="leftMargin">
              <number>10</number>
             </property>
@@ -718,7 +718,7 @@
              <number>10</number>
             </property>
             <item>
-             <spacer name="horizontalSpacer_13">
+             <spacer name="hSpacer_13">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -734,7 +734,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="prefBtn">
+             <widget class="QPushButton" name="btnPref">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                 <horstretch>0</horstretch>
@@ -780,7 +780,7 @@
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer_9">
+             <spacer name="hSpacer_9">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -835,7 +835,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="notes" native="true">
+        <widget class="QWidget" name="widgetNotes" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -874,7 +874,7 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_10">
+           <layout class="QHBoxLayout" name="hLayout_10">
             <property name="leftMargin">
              <number>10</number>
             </property>
@@ -885,7 +885,7 @@
              <number>10</number>
             </property>
             <item>
-             <spacer name="horizontalSpacer_14">
+             <spacer name="hSpacer_14">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -929,7 +929,7 @@
              </widget>
             </item>
             <item>
-             <spacer name="horizontalSpacer_15">
+             <spacer name="hSpacer_15">
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
@@ -1288,6 +1288,19 @@
                      </size>
                     </property>
                    </spacer>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="btnSeeToolBuilder">
+                    <property name="text">
+                     <string>Tool builder</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="blue_button" stdset="0">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </widget>

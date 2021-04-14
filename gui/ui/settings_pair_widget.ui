@@ -10,65 +10,76 @@
     <height>42</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="minimumSize">
    <size>
-    <width>30</width>
+    <width>100</width>
     <height>0</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="scopy::gui::CustomPushButton" name="btnSettings">
-   <property name="geometry">
-    <rect>
-     <x>50</x>
-     <y>10</y>
-     <width>48</width>
-     <height>25</height>
-    </rect>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
    </property>
-   <property name="styleSheet">
-    <string notr="true"/>
+   <property name="leftMargin">
+    <number>0</number>
    </property>
-   <property name="text">
-    <string/>
+   <property name="topMargin">
+    <number>0</number>
    </property>
-   <property name="checkable">
-    <bool>true</bool>
+   <property name="rightMargin">
+    <number>0</number>
    </property>
-   <property name="settings_icon" stdset="0">
-    <bool>true</bool>
+   <property name="bottomMargin">
+    <number>0</number>
    </property>
-   <property name="menu_icon_button" stdset="0">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="scopy::gui::CustomPushButton" name="btnGenSettings">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>10</y>
-     <width>48</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="menu_icon_button" stdset="0">
-    <bool>true</bool>
-   </property>
-   <property name="general_settings_icon" stdset="0">
-    <bool>true</bool>
-   </property>
-  </widget>
+   <item>
+    <widget class="scopy::gui::CustomPushButton" name="btnGenSettings">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="menu_icon_button" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="general_settings_icon" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnSettings">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+     <property name="settings_icon" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="menu_icon_button" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <customwidgets>
   <customwidget>

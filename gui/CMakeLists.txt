@@ -89,6 +89,9 @@ add_library(
     src/voltmeter_menu.cpp
     src/pattern_generator_menu.cpp
     src/logic_analyzer_menu.cpp
+    src/tool_view.cpp
+    src/tool_view_builder.cpp
+    src/test_tool.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -128,6 +131,7 @@ add_library(
     ui/voltmeter_menu.ui
     ui/pattern_generator_menu.ui
     ui/logic_analyzer_menu.ui
+    ui/tool_view.ui
     # resources
     resources/resources.qrc
 )

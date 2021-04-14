@@ -77,10 +77,10 @@ public Q_SLOTS:
 	void setColor(QColor color);
 
 private Q_SLOTS:
-	void onBoxToggled(bool);
-	void onNameToggled(bool);
-	void onBtnToggled(bool);
-	void onDelBtnClicked();
+	void on_checkBox_toggled(bool);
+	void on_btnName_toggled(bool);
+	void on_btn_toggled(bool);
+	void on_btnDel_clicked();
 
 private:
 	Ui::Channel* m_ui;

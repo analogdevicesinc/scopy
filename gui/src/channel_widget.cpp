@@ -168,7 +168,7 @@ bool ChannelWidget::eventFilter(QObject* object, QEvent* event)
 	return QObject::eventFilter(object, event);
 }
 
-void ChannelWidget::onBoxToggled(bool checked)
+void ChannelWidget::on_checkBox_toggled(bool checked)
 {
 	if (checked) {
 		if (!m_simplified)
@@ -207,15 +207,17 @@ void ChannelWidget::onBoxToggled(bool checked)
 	Q_EMIT enabled(checked);
 }
 
-void ChannelWidget::onNameToggled(bool checked) { Q_EMIT selected(checked); }
+void ChannelWidget::on_btnName_toggled(bool checked) { Q_EMIT selected(checked); }
 
-void ChannelWidget::onBtnToggled(bool checked) { Q_EMIT menuToggled(checked); }
+void ChannelWidget::on_btn_toggled(bool checked) { Q_EMIT menuToggled(checked); }
 
-void ChannelWidget::onDelBtnClicked()
+void ChannelWidget::on_btnDel_clicked()
 {
 	setButtonNoGroup(m_ui->checkBox);
 	setButtonNoGroup(m_ui->btnName);
 	setButtonNoGroup(m_ui->btn);
+
+	m_ui->btn->setChecked(false);
 
 	Q_EMIT deleteClicked();
 }

@@ -4,6 +4,8 @@
 #include <QButtonGroup>
 #include <QWidget>
 
+#include <scopy/gui/custom_push_button.hpp>
+
 namespace Ui {
 class SettingsPairWidget;
 }
@@ -18,9 +20,11 @@ public:
 	explicit SettingsPairWidget(QWidget* parent = nullptr);
 	~SettingsPairWidget();
 
+	CustomPushButton* getGeneralSettingsBtn();
+	QPushButton* getSettingsBtn();
+
 private:
 	Ui::SettingsPairWidget* m_ui;
-	QButtonGroup* m_buttonGroup;
 };
 } // namespace gui
 } // namespace scopy

@@ -6,6 +6,7 @@
 #include <scopy/core/context_enumerator.hpp>
 #include <scopy/gui/connect_dialog.hpp>
 #include <scopy/gui/scopy_about_dialog.hpp>
+#include <scopy/gui/test_tool.hpp>
 #include <scopy/gui/tool_menu.hpp>
 #include <scopy/gui/user_notes.hpp>
 
@@ -27,6 +28,10 @@ private:
 
 	void setTestLbl(const QString& text);
 
+private Q_SLOTS:
+	void onBtnHomeClicked();
+	void printUris(const QStringList& uris);
+
 private:
 	Ui::ToolLauncher* m_ui;
 
@@ -41,9 +46,7 @@ private:
 
 	scopy::core::ContextEnumerator* m_boardDetector;
 
-private Q_SLOTS:
-	void onBtnHomeClicked();
-	void printUris(const QStringList& uris);
+	TestTool m_testTool;
 };
 } // namespace gui
 } // namespace scopy

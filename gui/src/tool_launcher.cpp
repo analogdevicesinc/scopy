@@ -22,7 +22,7 @@ ToolLauncher::ToolLauncher(QWidget* parent)
 	m_notesPanel = new UserNotes(this);
 	m_notesPanel->setVisible(false);
 
-	connect(m_ui->prefBtn, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_prefPanel)); });
+	connect(m_ui->btnPref, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_prefPanel)); });
 	connect(m_ui->btnNotes, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_notesPanel)); });
 	connect(m_ui->btnHome, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_ui->widgetHome)); });
 
@@ -37,16 +37,16 @@ ToolLauncher::ToolLauncher(QWidget* parent)
 	});
 
 	connect(m_ui->menuAnimMenu, &MenuAnim::finished, [=](bool opened) {
-		m_ui->saveLbl->setVisible(opened);
-		m_ui->loadLbl->setVisible(opened);
-		m_ui->prefBtn->setText(opened ? tr("Preferences") : "");
+		m_ui->lblSave->setVisible(opened);
+		m_ui->lblLoad->setVisible(opened);
+		m_ui->btnPref->setText(opened ? tr("Preferences") : "");
 		//		m_toolMenu->hideMenuText(!opened);
 	});
 
 	connect(m_ui->btnHome, &QPushButton::clicked, [=]() { swapMenu(static_cast<QWidget*>(m_ui->widgetHome)); });
 
-	m_ui->saveBtn->parentWidget()->setEnabled(false);
-	m_ui->loadBtn->parentWidget()->setEnabled(true);
+	m_ui->btnSave->parentWidget()->setEnabled(false);
+	m_ui->btnLoad->parentWidget()->setEnabled(true);
 
 	m_ui->btnHome->toggle();
 
@@ -62,6 +62,9 @@ ToolLauncher::ToolLauncher(QWidget* parent)
 	m_boardDetector = new scopy::core::ContextEnumerator();
 	connect(m_boardDetector, &scopy::core::ContextEnumerator::printData, this,
 		&scopy::gui::ToolLauncher::printUris);
+
+	connect(m_ui->btnSeeToolBuilder, &QPushButton::clicked,
+		[=]() { swapMenu(m_testTool.getToolView()); });
 }
 
 void ToolLauncher::swapMenu(QWidget* menu)
