@@ -106,6 +106,7 @@ dump_syms -r /c/$DEST_FOLDER/Scopy.exe > /c/$DEST_FOLDER/Scopy.exe.sym
 mkdir /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/Scopy.exe.sym /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/.debug /c/$DEBUG_FOLDER
+/c/cv2pdb/cv2pdb /c/$DEST_FOLDER/Scopy.exe
 
 cp -r /c/projects/scopy/drivers /c/$DEST_FOLDER
 if [[ $ARCH_BIT == "64" ]]; then
