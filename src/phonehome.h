@@ -40,6 +40,7 @@ private:
 	QString m_m2kLink;
 	qint64 m_timestamp;
 	QString m_versionsJson;
+	QNetworkAccessManager* manager;
 	PhoneHome* instance;
 	Preferences* preferences;
 	QSettings *settings;
