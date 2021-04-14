@@ -1,6 +1,6 @@
 /*********************************** Global *******************************************/
 
-QMainWindow > .QWidget {
+QMainWindow > .QWidget, QMessageBox, QToolTip {
 	background-color: #F7F7F7;
 }
 
@@ -217,7 +217,7 @@ QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
 QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 QPushButton[blue_button=true]:disabled { background-color: grey; }
 
-/* Info button for each tool */
+/********************** Info button for each tool ***************************/
 
 QPushButton[info_button=true]{
 	 min-height: 40px;
@@ -635,4 +635,24 @@ scopy--gui--DropdownSwitchList QCheckBox::indicator {
 
 /*************************************************************/
 
+/*********************************** Tool builder ***************************************/
 
+/* Gradient background for all instruments */
+
+.scopy--gui--ToolView #widgetMain {
+	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #EDEDED, stop: 0.1 #F7F7F7, stop: 1.0 #F7F7F7);
+}
+
+/* Apply a gradient to the MenuAnim widgets */
+scopy--gui--MenuAnim {
+	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EDEDED, stop: 0.15 #F7F7F7, stop: 0.85 #F7F7F7, stop: 1.0 #EDEDED);
+}
+
+/* Except for the tool launcher's MenuAnim */
+QMainWindow > .QWidget > .scopy--gui--MenuAnim { background-color: none; }
+
+QwtPlot, QwtPolarPlot, pv--view--Viewport, scopy--gui--ToolView #widgetPlotContainer{
+	background-color: white;
+}
+
+/*************************************************************/

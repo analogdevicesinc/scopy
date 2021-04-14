@@ -4,20 +4,42 @@
 
 using namespace scopy::gui;
 
-CustomMenuButton::CustomMenuButton(QWidget* parent, QString labelText, bool checkboxVisible)
+CustomMenuButton::CustomMenuButton(QString labelText, bool checkboxVisible, bool checkBoxChecked, QWidget* parent)
+	: CustomMenuButton(parent)
+{
+
+	m_ui->lblCustomMenuButton->setText(labelText);
+	m_ui->checkBoxCustomMenuButton->setVisible(checkboxVisible);
+	m_ui->checkBoxCustomMenuButton->setChecked(checkBoxChecked);
+}
+
+CustomMenuButton::CustomMenuButton(QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::CustomMenuButton)
 {
 	m_ui->setupUi(this);
-
-	m_ui->lblCustomMenuButton->setText(labelText);
-	m_ui->checkBoxCustomMenuButton->setVisible(checkboxVisible);
+	connect(m_ui->checkBoxCustomMenuButton, &QCheckBox::toggled, this, &CustomMenuButton::checkBoxToggled);
 }
 
 CustomMenuButton::~CustomMenuButton() { delete m_ui; }
 
-CustomPushButton* CustomMenuButton::getButton() { return m_ui->btnCustomMenuButton; }
+void CustomMenuButton::setLabel(const QString& text) { m_ui->lblCustomMenuButton->setText(text); }
 
-QLabel* CustomMenuButton::getLabel() { return m_ui->lblCustomMenuButton; }
+void CustomMenuButton::setCheckboxVisible(bool visible) { m_ui->checkBoxCustomMenuButton->setVisible(visible); }
+
+CustomPushButton* CustomMenuButton::getBtn() { return m_ui->btnCustomMenuButton; }
 
 QCheckBox* CustomMenuButton::getCheckBox() { return m_ui->checkBoxCustomMenuButton; }
+
+bool CustomMenuButton::getCheckBoxState() { return getCheckBox()->isChecked(); }
+
+void CustomMenuButton::setCheckBoxState(bool checked) { m_ui->checkBoxCustomMenuButton->setChecked(checked); }
+
+void CustomMenuButton::checkBoxToggled(bool toggled)
+{
+	if (!toggled) {
+		m_ui->btnCustomMenuButton->setChecked(false);
+	}
+
+	m_ui->btnCustomMenuButton->setEnabled(toggled);
+}

@@ -1,6 +1,6 @@
 /*********************************** Global *******************************************/
 
-QMainWindow > .QWidget {
+QMainWindow > .QWidget, QMessageBox, QToolTip {
 	background-color: #272730;
 }
 
@@ -249,19 +249,6 @@ QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
 QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 QPushButton[blue_button=true]:disabled { background-color: grey; }
 
-/* Info button for each tool */
-
-QPushButton[info_button=true]{
-	 min-height: 40px;
-	 max-height: 40px;
-	 min-width: 40px;
-	 max-width: 40px;
-	 background-color: transparent;
-	 border-radius: 4px;
-}
-
-QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
-
 QWidget[scopy_logo=true]{
 	background-image: url(:/icons/default-theme/icons/logo.png);
 	background-repeat: no-repeat;
@@ -368,14 +355,14 @@ QPushButton[menu_icon_button=true]:checked:hover { border-top: 1px solid rgba(25
 
 
 QPushButton[general_settings_icon=true]:checked { image: url(:/icons/common/gear_wheel_pressed.svg); }
-QPushButton[general_settings_icon=true]:!checked { image: url(:/icons/default-theme/icons/Gear.png); }
-QPushButton[general_settings_icon=true]:!checked:hover { image: url(:/icons/default-theme/icons/gear_wheel_hover.png); }
+QPushButton[general_settings_icon=true]:!checked { image: url(:/icons/default-theme/icons/gear_wheel.svg); }
+QPushButton[general_settings_icon=true]:!checked:hover { image: url(:/icons/default-theme/icons/gear_wheel_hover.svg); }
 QPushButton[general_settings_icon=true]:checked:hover { image: url(:/icons/common/gear_wheel_pressed.svg); }
 
 
 QPushButton[settings_icon=true]:checked { image: url(:/icons/common/setup3_checked_hover.svg); }
-QPushButton[settings_icon=true]:!checked { image: url(:/icons/default-theme/icons/setup3_unchecked.png); }
-QPushButton[settings_icon=true]:!checked:hover { image: url(:/icons/default-theme/icons/setup3_unchecked_hover.png); }
+QPushButton[settings_icon=true]:!checked { image: url(:/icons/default-theme/icons/setup3_unchecked.svg); }
+QPushButton[settings_icon=true]:!checked:hover { image: url(:/icons/default-theme/icons/setup3_unchecked_hover.svg); }
 QPushButton[settings_icon=true]:checked:hover { image: url(:/icons/common/setup3_checked_hover.svg); }
 
 
@@ -384,10 +371,13 @@ QPushButton[settings_icon=true]:checked:hover { image: url(:/icons/common/setup3
 QPushButton[info_button=true]{
 	 min-height: 40px;
 	 max-height: 40px;
-	 min-width: 50px;
-	 max-width: 50px;
-	 image: url(:/icons/default-theme/icons/ico info.png);
+	 min-width: 40px;
+	 max-width: 40px;
+	 background-color: transparent;
+	 border-radius: 4px;
 }
+
+QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
 
 
 QAbstractSpinBox {
@@ -652,6 +642,28 @@ scopy--gui--DropdownSwitchList QCheckBox::indicator {
   width: 16px;
   height: 16px;
   subcontrol-position: center;
+}
+
+/*************************************************************/
+
+/*********************************** Tool builder ***************************************/
+
+/* Gradient background for all instruments */
+
+.scopy--gui--ToolView #widgetMain {
+	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgba(0, 0, 0, 40), stop: 0.1 transparent, stop: 1.0 transparent);
+}
+
+/* Apply a gradient to the MenuAnim widgets */
+scopy--gui--MenuAnim {
+	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
+}
+
+/* Except for the tool launcher's MenuAnim */
+QMainWindow > .QWidget > .scopy--gui--MenuAnim { background-color: none; }
+
+QwtPlot, QwtPolarPlot, pv--view--Viewport, scopy--gui--ToolView #widgetPlotContainer{
+	background-color: black;
 }
 
 /*************************************************************/

@@ -119,10 +119,8 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset>
-       <normalon>:/icons/common/sba_up_btn_pressed.svg</normalon>
-       <activeon>:/icons/sba_up_btn_pressed.svg</activeon>
-      </iconset>
+      <iconset resource="../resources/resources.qrc">
+       <normaloff>:/icons/common/sba_up_btn_pressed.svg</normaloff>:/icons/common/sba_up_btn_pressed.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -137,6 +135,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

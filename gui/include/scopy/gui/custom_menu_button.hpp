@@ -19,15 +19,24 @@ class CustomMenuButton : public QWidget
 	Q_OBJECT
 
 public:
-	explicit CustomMenuButton(QWidget* parent = nullptr, QString labelText = nullptr, bool checkboxVisible = false);
+	explicit CustomMenuButton(QString labelText = nullptr, bool checkboxVisible = false,
+				  bool checkBoxChecked = false, QWidget* parent = nullptr);
+	explicit CustomMenuButton(QWidget* parent = nullptr);
 	~CustomMenuButton();
+
+	void setLabel(const QString& text);
+	void setCheckboxVisible(bool visible);
+
+	CustomPushButton* getBtn();
+	QCheckBox* getCheckBox();
+	bool getCheckBoxState();
+	void setCheckBoxState(bool checked);
+
+public Q_SLOTS:
+	void checkBoxToggled(bool toggled);
 
 private:
 	Ui::CustomMenuButton* m_ui;
-
-	CustomPushButton* getButton();
-	QLabel* getLabel();
-	QCheckBox* getCheckBox();
 };
 } // namespace gui
 } // namespace scopy
