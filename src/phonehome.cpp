@@ -35,11 +35,13 @@ PhoneHome::PhoneHome(QSettings *settings, Preferences *pref) :
 	preferences(pref), settings(settings), done(false)
 {
 	setObjectName("phonehome");
+	manager = new QNetworkAccessManager(this);
 	load(*settings);
 }
 
 PhoneHome::~PhoneHome() {
 	save(*settings);
+	delete manager;
 }
 
 void PhoneHome::setPreferences(Preferences* preferences)
@@ -55,9 +57,7 @@ void PhoneHome::versionsRequest(bool force)
 
 	if(m_timestamp +  timeout < now  || force) {
 		// from swdownloads
-		QNetworkAccessManager* manager = new QNetworkAccessManager(this);
 		connect(manager, &QNetworkAccessManager::finished, this, &PhoneHome::onVersionsRequestFinished);
-		connect(manager, &QNetworkAccessManager::finished, manager, &QNetworkAccessManager::deleteLater);
 
 		manager->get(QNetworkRequest(QUrl(preferences->getCheck_updates_url())));
 		Q_EMIT scopyVersionCheckRequested();
