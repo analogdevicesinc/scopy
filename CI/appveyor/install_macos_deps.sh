@@ -17,7 +17,7 @@ BOOST_VERSION=1.73.0
 LIBTINYIIOD_BRANCH=master
 
 PYTHON="python3"
-PACKAGES=" ${QT_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
+PACKAGES="${QT_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2"
 
 set -e
@@ -25,6 +25,8 @@ cd ~
 WORKDIR=${PWD}
 NUM_JOBS=4
 
+brew update
+brew search ${QT_FORMULAE}
 brew_install_or_upgrade() {
 	brew install $1 || \
 		brew upgrade $1 || \
