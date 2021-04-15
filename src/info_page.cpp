@@ -253,7 +253,8 @@ void InfoPage::refreshInfoWidget()
 	int pos = 0;
 	ui->paramLayout->setRowMinimumHeight(pos, 20);
 
-	for (const auto &key : m_info_params.keys()) {
+	auto info_param_keys = m_info_params.keys();
+	for (const auto &key : qAsConst(info_param_keys)) {
 		QLabel *valueLbl = new QLabel(this);
 		QLabel *keyLbl = new QLabel(this);
 		valueLbl->setText(m_info_params.value(key));
@@ -272,7 +273,8 @@ void InfoPage::refreshInfoWidget()
 		pos++;
 		ui->paramLayout->addWidget(new QLabel("Advanced"), pos, 0, 1, 1);
 		pos++;
-		for (const auto &key : m_info_params_advanced.keys()) {
+		auto info_params_advanced = m_info_params_advanced.keys();
+		for (const auto &key : qAsConst(info_params_advanced)) {
 			QLabel *valueLbl = new QLabel(this);
 			QLabel *keyLbl = new QLabel(this);
 
