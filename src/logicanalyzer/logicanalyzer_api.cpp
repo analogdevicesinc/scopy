@@ -344,7 +344,7 @@ void LogicAnalyzer_API::setDecoderSettings(const QList<QStringList> &decoderSett
 			}
 
 			QJsonArray propArray = obj["properties"].toArray();
-			for (auto propRef : qAsConst(propArray)) {
+			for (const auto &propRef : qAsConst(propArray)) {
 				auto prop = propRef.toObject();
 				for(auto p : binding->properties())
 				{

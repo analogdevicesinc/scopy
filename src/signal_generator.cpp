@@ -1618,7 +1618,8 @@ void SignalGenerator::loadFileChannelData(int chIdx)
 				return;
 			}
 
-			for (auto x : fileManager->read(ptr->file_channel)) {
+			auto fileChannels = fileManager->read(ptr->file_channel);
+			for (auto x : qAsConst(fileChannels)) {
 				ptr->file_data.push_back(x);
 			}
 		}
