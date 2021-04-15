@@ -493,7 +493,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
 
 	connect(ui->btnSigGenAutoscale, &QPushButton::toggled, [=](bool checked){
-		plot->setAutoScale(checked);
+		m_plot->setAutoScale(checked);
 	});
 
 	fileManager = new FileManager("Signal Generator");
