@@ -148,7 +148,7 @@ private:
 	QVector<networkIteration> iterations;
 	QVector<NetworkIterationStats> iterationStats;
 
-	boost::thread *iterationsThread;
+	std::thread *iterationsThread;
 	bool iterationsThreadCanceled;
 	bool iterationsThreadReady;
 
