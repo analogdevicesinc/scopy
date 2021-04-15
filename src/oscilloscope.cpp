@@ -720,7 +720,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		}
 
 		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
-		for (auto rail : math_rails.values()) {
+
+		auto const values = math_rails.values();
+		for (auto rail : values) {
 			rail->set_lo(MIN_MATH_RANGE);
 			rail->set_hi(MAX_MATH_RANGE);
 		}
@@ -1936,7 +1938,9 @@ void Oscilloscope::btnExport_clicked(){
 		fileName += "." + ext;
 	}
 	bool atleastOneChannelEnabled = false;
-	for (auto x : exportConfig.keys())
+
+	auto keys = exportConfig.keys();
+	for (auto x : qAsConst(keys))
 		if (exportConfig[x]){
 			atleastOneChannelEnabled = true;
 			break;
@@ -2193,7 +2197,8 @@ void Oscilloscope::create_add_channel_panel()
 		if (tabWidget->currentIndex() != 0) {
 			QMap<int, bool> import_map = importSettings->getExportConfig();
 
-			for (int key : import_map.keys()) {
+			auto keys = import_map.keys();
+			for (int key : qAsConst(keys)) {
 				if (import_map[key]) {
 					add_ref_waveform(key);
 				}

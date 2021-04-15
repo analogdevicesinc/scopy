@@ -134,7 +134,9 @@ void ExportSettings::setExportConfig(QMap<int, bool> config)
 {
 	QStandardItemModel *model =
 		static_cast<QStandardItemModel *>(exportChannels->model());
-	for (int key : config.keys()) {
+
+	auto keys = config.keys();
+	for (int key : qAsConst(keys)) {
 		model->item(key, 1)->setData(QVariant((int) config[key]),
 					     Qt::EditRole);
 	}

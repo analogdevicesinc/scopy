@@ -919,7 +919,8 @@ void SpectrumAnalyzer::on_btnImport_clicked()
 {
 	QMap<int, bool> import_map = ui->importSettings->getExportConfig();
 
-	for (int key : import_map.keys()) {
+	auto keys = import_map.keys();
+	for (int key : qAsConst(keys)) {
 		if (import_map[key]) {
 			add_ref_waveform(key);
 		}

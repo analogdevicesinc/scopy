@@ -2432,7 +2432,8 @@ void LogicAnalyzer::exportData()
 	bool noChannelEnabled = true;
 
 	m_exportConfig = m_exportSettings->getExportConfig();
-	for (auto x : m_exportConfig.keys()) {
+	auto keys = m_exportConfig.keys();
+	for (auto x : qAsConst(keys)) {
 		if(m_exportConfig[x]) {
 			noChannelEnabled =  false;
 			break;
