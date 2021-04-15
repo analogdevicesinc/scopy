@@ -809,11 +809,6 @@ int CapturePlot::getAnalogChannels() const
 	return d_ydata.size() + d_ref_ydata.size();
 }
 
-void CapturePlot::setHorizCursorsLocked(bool value)
-{
-	horizCursorsLocked = value;
-}
-
 Measure* CapturePlot::measureOfChannel(int chnIdx) const
 {
 	Measure *measure = nullptr;
