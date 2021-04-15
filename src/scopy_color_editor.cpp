@@ -198,7 +198,8 @@ void ScopyColorEditor::buildMenuForMap()
 
 		bool toAdd = false;
 
-		for (auto line : it.value()) {
+		auto itContainer = it.value();
+		for (auto line : qAsConst(itContainer)) {
 			std::vector<QPushButton *> controls;
 			int index = 0;
 			while ((index = line.indexOf("rgba(", index)) != -1) {
@@ -361,7 +362,8 @@ void ScopyColorEditor::rebuildAndApplyStylesheet()
 	for (auto it = m_entityStylesheetMap.begin(); it != m_entityStylesheetMap.end(); ++it) {
 		stylesheet += it.key() + " {\n";
 
-		for (const auto &line : it.value()) {
+		auto itContainer = it.value();
+		for (const auto &line : qAsConst(itContainer)) {
 			stylesheet += line + "\n";
 		}
 

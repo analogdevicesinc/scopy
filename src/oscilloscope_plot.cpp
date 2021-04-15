@@ -1658,7 +1658,9 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 			continue;
 		}
 
-		for (const auto &grpHdl : *hdlGroup) {
+
+		auto hdlGroupContainer = *hdlGroup;
+		for (const auto &grpHdl : qAsConst(hdlGroupContainer)) {
 			if (!updatedGroup.contains(grpHdl)) {
 				updatedGroup.push_back(grpHdl);
 			}
@@ -1775,7 +1777,8 @@ QVector<int> CapturePlot::getGroupOfChannel(int chnIdx)
 		return groupIdxList;
 	}
 
-	for (const auto &hdl : *hdlGroup) {
+	auto hdlGroupContainer = *hdlGroup;
+	for (const auto &hdl : qAsConst(hdlGroupContainer)) {
 		groupIdxList.push_back(d_offsetHandles.indexOf(hdl));
 	}
 
@@ -2171,7 +2174,9 @@ void CapturePlot::setOffsetWidgetVisible(int chnIdx, bool visible)
 	}
 
 	int count = 0;
-	for (const auto &handle : *hdlGroup) {
+
+	auto hdlGroupContainer = *hdlGroup;
+	for (const auto &handle : qAsConst(hdlGroupContainer)) {
 		if (handle->isVisible()) {
 			count++;
 		}

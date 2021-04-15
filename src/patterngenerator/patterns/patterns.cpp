@@ -350,7 +350,8 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		sp->setCSPol(params["CS"].toBool());
 		sp->setMsbFirst(params["MSB"].toBool());
 
-		for (auto val : params["v"].toArray()) {
+		auto paramsContainer = params["v"].toArray();
+		for (auto val : qAsConst(paramsContainer)) {
 			sp->v.push_back(val.toInt());
 		}
 	} else if (ip) {
@@ -361,7 +362,8 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		ip->setMsbFirst(params["MSB"].toBool());
 		ip->setWrite(params["write"].toBool());
 
-		for (auto val : params["v"].toArray()) {
+		auto paramsContainer = params["v"].toArray();
+		for (auto val : qAsConst(paramsContainer)) {
 			ip->v.push_back(val.toInt());
 		}
 	} else if (imp) {
@@ -3680,7 +3682,8 @@ void ImportPatternUI::parse_ui()
 	}
 
 	unsigned short mask = 0;
-	for (int key : import_settings->getExportConfig().keys()) {
+	auto keys = import_settings->getExportConfig().keys();
+	for (int key : qAsConst(keys)) {
 		mask = mask | (import_settings->getExportConfig()[key] << key);
 	}
 

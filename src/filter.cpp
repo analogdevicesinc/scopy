@@ -55,7 +55,8 @@ Filter::Filter(const struct iio_context *ctx)
 	auto doc = QJsonDocument::fromJson(file.readAll());
 	auto obj = doc.object();
 
-	for (const auto &key : obj.keys()) {
+	auto obj_keys = obj.keys();
+	for (const auto &key : qAsConst(obj_keys)) {
 		const auto child = obj[key].toObject();
 
 		if (!child.contains("compatible-devices"))
@@ -67,7 +68,8 @@ Filter::Filter(const struct iio_context *ctx)
 
 		bool compatible = true;
 
-		for (const auto &value : compatible_devices.toArray()) {
+		auto comp_dev = compatible_devices.toArray();
+		for (const auto &value : qAsConst(comp_dev)) {
 			if (!value.isString()) {
 				compatible = false;
 				break;
