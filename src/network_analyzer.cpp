@@ -787,7 +787,7 @@ void NetworkAnalyzer::computeIterations()
 	// it is safe to modify without using a lock
 	iterationsThreadCanceled = false;
 	iterationsThreadReady = false;
-	iterationsThread = new boost::thread(boost::bind(&NetworkAnalyzer::computeFrequencyArray, this));
+	iterationsThread = new std::thread(boost::bind(&NetworkAnalyzer::computeFrequencyArray, this));
 }
 
 void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
