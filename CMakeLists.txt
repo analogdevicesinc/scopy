@@ -83,6 +83,7 @@ endif (MSVC)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
+find_package(Qt5Network REQUIRED)
 
 FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/translations/*.ts)
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR})
@@ -192,6 +193,7 @@ pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 message(CMAKE_PATH ${CMAKE_PREFIX_PATH})
+message(NETWORK ${Qt5Network_INCLUDE_DIRS} ${Qt5Network_LIBRARIES})
 include_directories(
 	${Boost_INCLUDE_DIRS}
 	${Qt5Widgets_INCLUDE_DIRS}
@@ -371,6 +373,7 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${Qt5Concurrent_LIBRARIES}
 		${Qt5Qml_LIBRARIES}
 		${Qt5UiTools_LIBRARIES}
+		${Qt5Network_LIBRARIES}
 		gnuradio::gnuradio-runtime
 		gnuradio::gnuradio-analog
 		gnuradio::gnuradio-blocks
