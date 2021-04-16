@@ -68,8 +68,6 @@ public:
 	QPushButton *calibrateButton();
 
 	virtual void getDeviceInfo();
-	void refreshInfoWidget();
-
 	void setConnectionStatus(bool);
 	bool supportsIdentification();
 	bool supportsCalibration();
@@ -81,7 +79,7 @@ public Q_SLOTS:
 	void readPreferences();
 	void identifyDevice(bool clicked = true);
 	void setStatusLabel(QLabel *lbl, QString str = "", QString color="white");
-
+	void refreshInfoWidget();
 
 	void setCalibrationStatusLabel(QString str = "", QString color = "white");
 	void setCalibrationInfoLabel(QString str = "", QString color = "white");

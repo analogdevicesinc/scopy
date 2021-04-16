@@ -505,7 +505,7 @@ void M2kInfoPage::refreshTemperature()
 		libm2k::context::contextClose(temp_m2k, false);
 	}
 
-	refreshInfoWidget();
+	QMetaObject::invokeMethod(this,"refreshInfoWidget",Qt::QueuedConnection);
 }
 
 void M2kInfoPage::setCtx(iio_context *ctx)
