@@ -274,7 +274,10 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->setCalibrating(false);
 
 		if (!okc.second && okc.first) {
-			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated"));
+			QMetaObject::invokeMethod(selectedDev->infoPage(),
+						  "setCalibrationStatusLabel",
+						  Qt::QueuedConnection,
+						  Q_ARG(QString, tr("Calibrated")));
 		}
 
 	});
@@ -1438,10 +1441,12 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 
 	bool skipCalib = false;
 
+	QString statusLabel;
 	if (calib->isInitialized()) {
 		if (prefPanel->getAttemptTempLutCalib() && calib->hasContextCalibration()) {
 			float calibTemperature = calib->calibrateFromContext();
-			selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrated from look-up table @ ") + QString::number(calibTemperature) + " deg. Celsius" );
+
+			statusLabel = tr("Calibrated from look-up table @ ") + QString::number(calibTemperature) + " deg. Celsius";
 			skipCalib = true;
 			ok = true;
 
@@ -1449,15 +1454,19 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 			// always calibrate if initial flag is set
 			// if it's calibrated and skip_calibration_if_calibrated - do not calibrate
 			if (!(initialCalibrationFlag && skip_calibration_if_already_calibrated && calib->isCalibrated() )) {
-				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrating ... "));
+				statusLabel = tr("Calibrating ... ");
 				ok = calib->calibrateAll();
 			} else {
-				selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibration skipped because already calibrated."));
+				statusLabel = tr("Calibration skipped because already calibrated.");
 				skipCalib = true;
 				ok = true;
 			}
 		}
 	}
+	QMetaObject::invokeMethod(selectedDev->infoPage(),
+				  "setCalibrationStatusLabel",
+				  Qt::QueuedConnection,
+				  Q_ARG(QString, statusLabel));
 
 	calibrating = false;
 
