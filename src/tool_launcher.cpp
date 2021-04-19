@@ -223,8 +223,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	connect(ui->stackedWidget, SIGNAL(moved(int)),
 		this, SLOT(pageMoved(int)));
 
-
-	m_phoneHome = new PhoneHome(settings, prefPanel);
+	networkAccessManager = new QNetworkAccessManager(this);
+	m_phoneHome = new PhoneHome(settings, prefPanel, networkAccessManager);
 	if (prefPanel->getFirst_application_run()) {
 		QMessageBox* msgBox = new QMessageBox(this);
 
