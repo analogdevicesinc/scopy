@@ -51,7 +51,7 @@ private:
 	Q_PROPERTY(QString versionsJson READ getVersionsJson WRITE setVersionsJson)
 
 public:
-	PhoneHome(QSettings *settings, Preferences *preferences);
+	PhoneHome(QSettings *settings, Preferences *preferences, QNetworkAccessManager* manager);
 	~PhoneHome();
 	void versionsRequest(bool force = false);
 	void extractVersionStringsFromJson(const QJsonDocument &doc);

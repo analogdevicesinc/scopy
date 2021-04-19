@@ -30,12 +30,12 @@ bool PhoneHome::getDone() const
 	return done;
 }
 
-PhoneHome::PhoneHome(QSettings *settings, Preferences *pref) :
+PhoneHome::PhoneHome(QSettings *settings, Preferences *pref, QNetworkAccessManager* manager) :
 	ApiObject(), m_timestamp(0), m_versionsJson(""),
 	preferences(pref), settings(settings), done(false)
 {
 	setObjectName("phonehome");
-	manager = new QNetworkAccessManager(this);
+	this->manager = manager;
 	load(*settings);
 }
 
