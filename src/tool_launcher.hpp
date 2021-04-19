@@ -31,6 +31,7 @@
 #include <QButtonGroup>
 #include <QMap>
 #include <QStringList>
+#include <QNetworkAccessManager>
 #include <info_widget.h>
 #include <QTextBrowser>
 
@@ -272,6 +273,7 @@ private:
 	void saveRunningToolsBeforeCalibration();
 	void stopToolsBeforeCalibration();
 
+	QNetworkAccessManager* networkAccessManager;
 	PhoneHome* m_phoneHome;
 
 	SessionInfo m_sessionInfo;
