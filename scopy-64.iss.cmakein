@@ -59,6 +59,124 @@ begin
   end;
 end;
 
+var
+  UninstallPage: TNewNotebookPage;
+  UninstallButton: TNewButton;
+  UninstallDriverCheckBox: TNewCheckBox;
+
+procedure UpdateUninstallWizard;
+begin
+  if UninstallProgressForm.InnerNotebook.ActivePage = UninstallPage then
+  begin
+    UninstallProgressForm.PageNameLabel.Caption := 'Uninstall Scopy';
+    UninstallProgressForm.PageDescriptionLabel.Caption := '';
+  end;
+  UninstallButton.Caption := 'Uninstall';
+  UninstallButton.ModalResult := mrOK;
+end;  
+
+procedure UninstallButtonClick(Sender: TObject);
+begin
+  UninstallButton.Visible := False;
+end;
+
+procedure InitializeUninstallProgressForm();
+var
+  PageNameLabel: string;
+  PageDescriptionLabel: string;
+  CancelButtonEnabled: Boolean;
+  CancelButtonModalResult: Integer;
+  ResultCode : Integer;
+  PageCaption: TNewStaticText;
+begin
+  if not UninstallSilent then
+  begin
+    { Create the first page and make it active }
+    UninstallPage := TNewNotebookPage.Create(UninstallProgressForm);
+    UninstallPage.Notebook := UninstallProgressForm.InnerNotebook;
+    UninstallPage.Parent := UninstallProgressForm.InnerNotebook;
+    UninstallPage.Align := alClient;
+
+    PageCaption := TNewStaticText.Create(UninstallProgressForm);
+    PageCaption.Parent := UninstallPage;
+    PageCaption.Top := UninstallProgressForm.StatusLabel.Top;
+    PageCaption.Left := UninstallProgressForm.StatusLabel.Left;
+    PageCaption.Width := UninstallProgressForm.StatusLabel.Width;
+    PageCaption.Height := UninstallProgressForm.StatusLabel.Height;
+    PageCaption.AutoSize := False;
+    PageCaption.ShowAccelChar := False;
+    PageCaption.Caption := 'Press Uninstall to proceeed with uninstallation.';
+
+    UninstallDriverCheckBox := TNewCheckBox.Create(UninstallProgressForm);
+    UninstallDriverCheckBox.Parent := UninstallPage;
+    UninstallDriverCheckBox.Top := PageCaption.Top;
+    UninstallDriverCheckBox.Left := PageCaption.Left;
+    UninstallDriverCheckBox.Width := PageCaption.Width;
+    UninstallDriverCheckBox.Height := PageCaption.Height;
+    UninstallDriverCheckBox.Caption := 'Uninstall ADALM2000 drivers.';
+    UninstallProgressForm.InnerNotebook.ActivePage := UninstallPage;
+
+    PageNameLabel := UninstallProgressForm.PageNameLabel.Caption;
+    PageDescriptionLabel := UninstallProgressForm.PageDescriptionLabel.Caption;
+
+
+    UninstallButton := TNewButton.Create(UninstallProgressForm);
+    UninstallButton.Parent := UninstallProgressForm;
+    UninstallButton.Left :=
+      UninstallProgressForm.CancelButton.Left -
+      UninstallProgressForm.CancelButton.Width -
+      ScaleX(10);
+    UninstallButton.Top := UninstallProgressForm.CancelButton.Top;
+    UninstallButton.Width := UninstallProgressForm.CancelButton.Width;
+    UninstallButton.Height := UninstallProgressForm.CancelButton.Height;
+    UninstallButton.OnClick := @UninstallButtonClick;
+    UninstallProgressForm.CancelButton.TabOrder := UninstallButton.TabOrder + 1;
+
+    { Run the wizard } 
+    UpdateUninstallWizard;
+    CancelButtonEnabled := UninstallProgressForm.CancelButton.Enabled
+    UninstallProgressForm.CancelButton.Enabled := True;
+    CancelButtonModalResult := UninstallProgressForm.CancelButton.ModalResult;
+    UninstallProgressForm.CancelButton.ModalResult := mrCancel;
+
+    { Display the First uninstaller page }
+    if UninstallProgressForm.ShowModal = mrCancel then Abort;
+    
+    if UninstallDriverCheckBox.Checked = True then
+    begin
+        if not Exec(ExpandConstant('{app}\drivers\dpinst.exe'), '/s /U pluto-cdc-acm.inf', ExpandConstant('{app}\drivers'), SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+        begin
+           MsgBox('Failed to uninstall drivers: ' +  SysErrorMessage(ResultCode) + '.', mbInformation, MB_OK);
+        end;
+
+        if not Exec(ExpandConstant('{app}\drivers\dpinst.exe'), '/s /U pluto-rndis.inf', ExpandConstant('{app}\drivers'), SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+        begin
+           MsgBox('Failed to uninstall drivers: ' +  SysErrorMessage(ResultCode) + '.', mbInformation, MB_OK);
+        end;
+
+        if not Exec(ExpandConstant('{app}\drivers\dpinst.exe'), '/s /U pluto-usbd.inf', ExpandConstant('{app}\drivers'), SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+        begin
+           MsgBox('Failed to uninstall drivers: ' +  SysErrorMessage(ResultCode) + '.', mbInformation, MB_OK);
+        end;
+
+        if not Exec(ExpandConstant('{app}\drivers\dpinst.exe'), '/s /U pluto-dfu.inf', ExpandConstant('{app}\drivers'), SW_SHOW, ewWaitUntilTerminated, ResultCode) then
+        begin
+           MsgBox('Failed to uninstall drivers: ' +  SysErrorMessage(ResultCode) + '.', mbInformation, MB_OK);
+        end;
+
+        if not RegDeleteKeyIncludingSubkeys(HKEY_LOCAL_MACHINE, 'Software\Analog Devices\Scopy') then
+        begin
+           MsgBox('Failed to remove registry key: Scopy.', mbInformation, MB_OK);
+        end;
+    end;
+    UninstallProgressForm.CancelButton.Enabled := CancelButtonEnabled;
+    UninstallProgressForm.CancelButton.ModalResult := CancelButtonModalResult;
+    UninstallProgressForm.PageNameLabel.Caption := PageNameLabel;
+    UninstallProgressForm.PageDescriptionLabel.Caption := PageDescriptionLabel;
+    UninstallProgressForm.InnerNotebook.ActivePage := UninstallProgressForm.InstallingPage;
+  end;
+end;
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "deleteini"; Description: Delete previous settings (Scopy.ini)
@@ -79,14 +197,8 @@ Type: files; Name: "{userappdata}\ADI\Scopy.ini"; Tasks: deleteini
 [Run]
 Filename: "{app}\drivers\dpinst.exe"; Parameters: "/PATH ""{app}\drivers"" {param:dpinstflags|/F}" ; Flags: waituntilterminated; Tasks: drivers drivers_overwrite
 
-[UninstallRun]
-Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-cdc-acm.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
-Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-rndis.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
-Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-usbd.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
-Filename: "{app}\drivers\dpinst.exe"; Parameters: "/s /U pluto-dfu.inf"; WorkingDir: "{app}\drivers"; Flags: waituntilterminated;
-
 [Registry]
-Root: HKLM; Subkey: "Software\Analog Devices"; Flags: uninsdeletekeyifempty
-Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\Analog Devices"
+Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}"
 Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
 Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallVersion"; ValueData: {#DriverVersion}
