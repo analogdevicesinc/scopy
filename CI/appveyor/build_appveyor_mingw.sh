@@ -109,6 +109,12 @@ mkdir /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/Scopy.exe.sym /c/$DEBUG_FOLDER
 mv /c/$DEST_FOLDER/.debug /c/$DEBUG_FOLDER
 /c/cv2pdb/cv2pdb /c/$DEST_FOLDER/Scopy.exe
+/c/cv2pdb/cv2pdb /c/$DEST_FOLDER/libm2k.dll
+/c/cv2pdb/cv2pdb /c/$DEST_FOLDER/libiio.dll
+/c/cv2pdb/cv2pdb /c/$DEST_FOLDER/libgnuradio-m2k.dll
+/c/cv2pdb/cv2pdb /c/$DEST_FOLDER/libgnuradio-scopy.dll
+cp -R /c/projects/scopy /c/$DEBUG_FOLDER/scopy
+mv /c/$DEST_FOLDER/*.pdb /c/$DEBUG_FOLDER
 
 cp -r /c/projects/scopy/drivers /c/$DEST_FOLDER
 if [[ $ARCH_BIT == "64" ]]; then
