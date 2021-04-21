@@ -35,6 +35,7 @@
 #include "spinbox_a.hpp"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/circular_buffer.hpp>
 
 /* libm2k includes */
 #include <libm2k/analog/m2kanalogin.hpp>
@@ -87,13 +88,14 @@ namespace adiscope {
 		std::vector<double> m_min, m_max;
 
 		std::vector<bool> m_autoGainEnabled;
-		std::vector<int> m_historyForGain;
+		std::vector<boost::circular_buffer<libm2k::analog::M2K_RANGE>> m_gainHistory;
 		int m_gainHistorySize;
 
 		void disconnectAll();
 		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
 				bool is_ac);
 		void configureModes();
+		libm2k::analog::M2K_RANGE suggestRange(double volt_max, double volt_min);
 		int numSamplesFromIdx(int idx);
 		void writeAllSettingsToHardware();
 		void checkPeakValues(int, double);

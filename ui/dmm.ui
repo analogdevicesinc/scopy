@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>900</width>
-    <height>830</height>
+    <height>890</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -227,23 +227,41 @@ QPushButton:disabled {
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="currentGainCh1Label">
-                  <property name="styleSheet">
-                   <string notr="true">font-size: 13px;</string>
+                 <spacer name="horizontalSpacer_6">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="text">
-                   <string>Low Gain</string>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
                   </property>
-                 </widget>
+                 </spacer>
                 </item>
                 <item>
                  <widget class="QLabel" name="ch1ErrorLabel">
                   <property name="styleSheet">
                    <string notr="true">font-size: 13px;
-color: red;</string>
+color: red;
+text-align:right;</string>
                   </property>
                   <property name="text">
                    <string/>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="currentGainCh1Label">
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 13px;
+text-align:center;</string>
+                  </property>
+                  <property name="text">
+                   <string>±25V</string>
                   </property>
                  </widget>
                 </item>
@@ -542,23 +560,44 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
                  <number>0</number>
                 </property>
                 <item>
-                 <widget class="QLabel" name="currentGainCh2Label">
-                  <property name="styleSheet">
-                   <string notr="true">font-size: 13px;</string>
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
-                  <property name="text">
-                   <string>Low Gain</string>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
                   </property>
-                 </widget>
+                 </spacer>
                 </item>
                 <item>
                  <widget class="QLabel" name="ch2ErrorLabel">
                   <property name="styleSheet">
                    <string notr="true">font-size: 13px;
-color: red;</string>
+color: red;
+text-align:right;</string>
                   </property>
                   <property name="text">
                    <string/>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="currentGainCh2Label">
+                  <property name="styleSheet">
+                   <string notr="true">font-size: 13px;
+text-align:center;</string>
+                  </property>
+                  <property name="text">
+                   <string>±25V</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
                   </property>
                  </widget>
                 </item>
@@ -987,7 +1026,7 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
               <item row="0" column="0">
                <widget class="QLabel" name="label_6">
                 <property name="text">
-                 <string>Gain</string>
+                 <string>Range</string>
                 </property>
                </widget>
               </item>
@@ -1000,12 +1039,12 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Low</string>
+                  <string>± 25V</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>High</string>
+                  <string>± 2.5V</string>
                  </property>
                 </item>
                </widget>
@@ -1265,7 +1304,7 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
               <item row="0" column="0">
                <widget class="QLabel" name="label_7">
                 <property name="text">
-                 <string>Gain</string>
+                 <string>Range</string>
                 </property>
                </widget>
               </item>
@@ -1278,12 +1317,12 @@ QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
                 </item>
                 <item>
                  <property name="text">
-                  <string>Low</string>
+                  <string>± 25V</string>
                  </property>
                 </item>
                 <item>
                  <property name="text">
-                  <string>High</string>
+                  <string>± 2.5V</string>
                  </property>
                 </item>
                </widget>
@@ -1981,6 +2020,9 @@ line-height: 14px;
  <resources>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2017,7 +2059,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
