@@ -249,6 +249,9 @@
         </item>
         <item>
          <layout class="QVBoxLayout" name="vLayoutMenuContainer">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -274,7 +277,7 @@
               <number>0</number>
              </property>
              <property name="topMargin">
-              <number>20</number>
+              <number>0</number>
              </property>
              <property name="rightMargin">
               <number>0</number>
@@ -292,7 +295,7 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>100</width>
+                 <width>340</width>
                  <height>0</height>
                 </size>
                </property>

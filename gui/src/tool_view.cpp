@@ -21,6 +21,8 @@ ToolView::ToolView(QWidget* parent)
 
 	m_ui->widgetInstrumentNotes->setVisible(false);
 
+	m_ui->widgetMenuAnim->setMaximumWidth(0);
+
 	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
 }
 
@@ -166,6 +168,11 @@ void ToolView::settingsPanelUpdate(int id)
 }
 
 QWidget* ToolView::getMenu(MenusEnum menu) { return m_menus[menu]; }
+
+QWidget *ToolView::getGeneralSettingsMenu()
+{
+	return m_generalSettingsMenu;
+}
 
 QWidget* ToolView::getButtonMenu(MenusEnum btn) { return m_btns[btn]; }
 

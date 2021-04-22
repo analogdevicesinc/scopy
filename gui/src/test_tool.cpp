@@ -2,6 +2,7 @@
 
 #include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/settings_pair_widget.hpp>
+#include <scopy/gui/spectrum_analyzer_general_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
 
 using namespace scopy::gui;
@@ -29,6 +30,8 @@ TestTool::TestTool()
 	m_toolView = ToolViewBuilder(recipe).build();
 
 	QWidget* newCh = m_toolView->buildNewChannel(0, true, false, QColor("green"), "Math", "M");
+	SpectrumAnalyzerGeneralMenu* generalMenu =
+		new SpectrumAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
