@@ -92,6 +92,7 @@ add_library(
     src/tool_view.cpp
     src/tool_view_builder.cpp
     src/test_tool.cpp
+    src/spectrum_analyzer_general_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -132,6 +133,7 @@ add_library(
     ui/pattern_generator_menu.ui
     ui/logic_analyzer_menu.ui
     ui/tool_view.ui
+    ui/spectrum_analyzer_general_menu.ui
     # resources
     resources/resources.qrc
 )

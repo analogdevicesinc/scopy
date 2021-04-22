@@ -43,6 +43,7 @@ public:
 	void setUpperMenus();
 
 	QWidget* getMenu(MenusEnum menu);
+	QWidget* getGeneralSettingsMenu();
 	QWidget* getButtonMenu(MenusEnum btn);
 
 	LinkedButton* getHelpBtn();
