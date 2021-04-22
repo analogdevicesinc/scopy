@@ -314,6 +314,14 @@ QWidget[tool_launcher_custom_widget=true][selected=true] {
 	border-radius:5px;
 }
 
+/* Label associated with settings menu, right above a blue line divider */
+
+QLabel[general_settings_label=true]{
+	color: white;
+	font-size: 14px;
+	font-weight: normal;
+}
+
 /*********************************** SubsectionSeparator ***************************************/
 
 QLabel#lblSubsectionSeparator{

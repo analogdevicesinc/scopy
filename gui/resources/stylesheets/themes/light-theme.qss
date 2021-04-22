@@ -217,6 +217,15 @@ QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
 QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 QPushButton[blue_button=true]:disabled { background-color: grey; }
 
+
+/* Label associated with settings menu, right above a blue line divider */
+
+QLabel[general_settings_label=true]{
+	color: rgba(0, 0, 0, 200);
+	font-size: 14px;
+	font-weight: normal;
+}
+
 /********************** Info button for each tool ***************************/
 
 QPushButton[info_button=true]{
