@@ -3,6 +3,7 @@
 #include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/settings_pair_widget.hpp>
 #include <scopy/gui/spectrum_analyzer_general_menu.hpp>
+#include <scopy/gui/spectrum_analyzer_markers_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
 
@@ -23,6 +24,7 @@ TestTool::TestTool()
 	recipe.hasAddMathBtn = true;
 
 	recipe.hasSweep = true;
+	recipe.hasMarkers = true;
 
 	m_toolView = ToolViewBuilder(recipe).build();
 
@@ -31,6 +33,8 @@ TestTool::TestTool()
 	SpectrumAnalyzerSweepMenu* sweepMenu = new SpectrumAnalyzerSweepMenu(m_toolView->getMenu(MenusEnum::SWEEP));
 	SpectrumAnalyzerGeneralMenu* generalMenu =
 		new SpectrumAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
+	SpectrumAnalyzerMarkersMenu* markersMenu =
+		new SpectrumAnalyzerMarkersMenu(m_toolView->getMenu(MenusEnum::MARKERS));
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
