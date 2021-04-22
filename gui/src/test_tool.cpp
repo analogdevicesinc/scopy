@@ -2,6 +2,7 @@
 
 #include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/settings_pair_widget.hpp>
+#include <scopy/gui/spectrum_analyzer_channel_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_general_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_markers_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
@@ -35,6 +36,8 @@ TestTool::TestTool()
 		new SpectrumAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
 	SpectrumAnalyzerMarkersMenu* markersMenu =
 		new SpectrumAnalyzerMarkersMenu(m_toolView->getMenu(MenusEnum::MARKERS));
+	SpectrumAnalyzerChannelMenu* channelMenu =
+		new SpectrumAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNELS_SETTINGS));
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
