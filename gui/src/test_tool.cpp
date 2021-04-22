@@ -3,6 +3,7 @@
 #include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/settings_pair_widget.hpp>
 #include <scopy/gui/spectrum_analyzer_general_menu.hpp>
+#include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
 
 using namespace scopy::gui;
@@ -16,20 +17,18 @@ TestTool::TestTool()
 	recipe.hasPrintBtn = true;
 	recipe.hasGroupBtn = true;
 
-	recipe.hasExtraWidget = new QPushButton;
-
 	recipe.hasPairSettingsBtn = true;
 
 	recipe.hasChannels = true;
 	recipe.hasAddMathBtn = true;
 
-	recipe.hasCursors = true;
-	recipe.hasMeasure = true;
-	recipe.hasTrigger = true;
+	recipe.hasSweep = true;
 
 	m_toolView = ToolViewBuilder(recipe).build();
 
 	QWidget* newCh = m_toolView->buildNewChannel(0, true, false, QColor("green"), "Math", "M");
+
+	SpectrumAnalyzerSweepMenu* sweepMenu = new SpectrumAnalyzerSweepMenu(m_toolView->getMenu(MenusEnum::SWEEP));
 	SpectrumAnalyzerGeneralMenu* generalMenu =
 		new SpectrumAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
 }
