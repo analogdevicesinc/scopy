@@ -154,8 +154,7 @@ void ExportSettings::disableUIMargins() { m_ui->vLayout_3->setMargin(0); }
 
 void ExportSettings::setTitleLabelVisible(bool enabled)
 {
-	m_ui->widgetSubsSeparator->setLabelVisible(enabled);
-	m_ui->widgetSubsSeparator->setLineVisible(enabled);
+	m_ui->widgetSubsSeparator->setVisible(enabled);
 }
 
 void ExportSettings::setExportAllButtonLabel(const QString& text) { m_ui->lbl_3->setText(text); }
