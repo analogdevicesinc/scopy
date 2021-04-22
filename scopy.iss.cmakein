@@ -177,6 +177,68 @@ begin
   end;
 end;
 
+function GetInstallLocation(): String;
+var
+  regPath: String;
+  installLocationString: String;
+begin
+  regPath := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1');
+  installLocationString := '';
+  if not RegQueryStringValue(HKLM, regPath, 'InstallLocation', installLocationString) then
+    RegQueryStringValue(HKCU, regPath, 'InstallLocation', installLocationString);
+  Result := installLocationString;
+end;
+
+function GetUninstallerString(): String;
+var
+  regPath: String;
+  uninstallerString: String;
+begin
+  regPath := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1');
+  uninstallerString := '';
+  if not RegQueryStringValue(HKLM, regPath, 'UninstallString', uninstallerString) then
+    RegQueryStringValue(HKCU, regPath, 'UninstallString', uninstallerString);
+  Result := uninstallerString;
+end;
+
+
+function IsUpgrade(): Boolean;
+begin
+  Result := (GetInstallLocation() = ExpandConstant('{app}\'));
+end;
+
+
+procedure RemoveOldVersion();
+var
+  installLocationString: String;
+  uninstallerString: String;
+  resultCode: Integer;
+begin
+  installLocationString := GetInstallLocation();
+  uninstallerString := GetUninstallerString();
+  if installLocationString <> '' then begin
+    uninstallerString := RemoveQuotes(uninstallerString);
+    if not Exec(uninstallerString, '/SILENT /NORESTART /SUPPRESSMSGBOXES','', SW_HIDE, ewWaitUntilTerminated, resultCode) then
+    begin
+      MsgBox('Failed to uninstall previous version!', mbInformation, MB_OK);
+    end;
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if (CurStep=ssInstall) then
+  begin
+    if (isUpgrade()) then
+    begin
+      if MsgBox('A different Scopy version was found at this location. Remove before installing?', mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDYES then
+      begin
+        RemoveOldVersion();
+      end;
+    end;
+  end;
+end;
+
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "deleteini"; Description: Delete previous settings (Scopy.ini)
