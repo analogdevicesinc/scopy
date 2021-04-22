@@ -82,7 +82,6 @@ add_library(
     src/osc_general_settings.cpp
     src/trigger_settings.cpp
     src/scroll_filter.cpp
-    src/spectrum_analyzer_menu.cpp
     src/network_analyzer_menu.cpp
     src/signal_generator_menu.cpp
     src/power_supply_menu.cpp
@@ -94,6 +93,7 @@ add_library(
     src/test_tool.cpp
     src/spectrum_analyzer_sweep_menu.cpp
     src/spectrum_analyzer_general_menu.cpp
+    src/spectrum_analyzer_add_reference_menu.cpp
     src/spectrum_analyzer_markers_menu.cpp
     src/spectrum_analyzer_channel_menu.cpp
     # ui files
@@ -128,7 +128,6 @@ add_library(
     ui/measure_settings.ui
     ui/osc_general_settings.ui
     ui/trigger_settings.ui
-    ui/spectrum_analyzer_menu.ui
     ui/network_analyzer_menu.ui
     ui/signal_generator_menu.ui
     ui/power_supply_menu.ui
@@ -138,6 +137,7 @@ add_library(
     ui/tool_view.ui
     ui/spectrum_analyzer_sweep_menu.ui
     ui/spectrum_analyzer_general_menu.ui
+    ui/spectrum_analyzer_add_reference_menu.ui
     ui/spectrum_analyzer_markers_menu.ui
     ui/spectrum_analyzer_channel_menu.ui
     # resources
