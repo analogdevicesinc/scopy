@@ -258,7 +258,7 @@
           <item>
            <widget class="scopy::gui::MenuAnim" name="widgetMenuAnim" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+             <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -272,6 +272,9 @@
             <layout class="QVBoxLayout" name="verticalLayout_3">
              <property name="spacing">
               <number>0</number>
+             </property>
+             <property name="sizeConstraint">
+              <enum>QLayout::SetDefaultConstraint</enum>
              </property>
              <property name="leftMargin">
               <number>0</number>
@@ -288,7 +291,7 @@
              <item>
               <widget class="QStackedWidget" name="stackedWidget">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
@@ -420,6 +423,12 @@ QPushButton:checked { border-image: url(:/icons/common/setup_btn_checked.svg); }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>scopy::gui::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>scopy::gui::LinkedButton</class>
    <extends>QPushButton</extends>
    <header location="global">scopy/gui/linked_button.hpp</header>
@@ -434,12 +443,6 @@ QPushButton:checked { border-image: url(:/icons/common/setup_btn_checked.svg); }
    <class>scopy::gui::SettingsPairWidget</class>
    <extends>QWidget</extends>
    <header location="global">scopy/gui/settings_pair_widget.hpp</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>scopy::gui::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>

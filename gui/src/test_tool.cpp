@@ -1,13 +1,12 @@
 #include "menu_anim.hpp"
 
-#include <scopy/gui/channel_widget.hpp>
-#include <scopy/gui/settings_pair_widget.hpp>
 #include <scopy/gui/spectrum_analyzer_add_reference_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_channel_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_general_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_markers_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
+#include <scopy/gui/network_analyzer_general_menu.hpp>
 
 using namespace scopy::gui;
 
@@ -41,6 +40,10 @@ TestTool::TestTool()
 		new SpectrumAnalyzerMarkersMenu(m_toolView->getMenu(MenusEnum::MARKERS));
 	SpectrumAnalyzerChannelMenu* channelMenu =
 		new SpectrumAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNELS_SETTINGS));
+	// Network Analyzer
+//	QWidget* menu = m_toolView->getGeneralSettingsMenu();
+//	menu->setLayout(new QVBoxLayout);
+//	NetworkAnalyzerGeneralMenu* generalMenu = new NetworkAnalyzerGeneralMenu(menu);
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
