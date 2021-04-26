@@ -12,6 +12,13 @@ CursorsSettings::CursorsSettings(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
+	initUi();
+}
+
+CursorsSettings::~CursorsSettings() { delete m_ui; }
+
+void CursorsSettings::initUi()
+{
 	m_ui->widgetVerticalSubsSpr->setLabel("VERTICAL");
 	m_ui->widgetVerticalSubsSpr->setButtonVisible(false);
 
@@ -24,10 +31,21 @@ CursorsSettings::CursorsSettings(QWidget* parent)
 	m_ui->widgetCursorsMenuHeader->setLabel("Cursors");
 	m_ui->widgetCursorsMenuHeader->setLineColor(new QColor("#4A64FF"));
 
-	// TODO: Add all the functionalities
-	this->setCursorReadoutsVisible(true);
+	//	setCursorReadoutsVisible(true);
 }
 
-CursorsSettings::~CursorsSettings() { delete m_ui; }
+void CursorsSettings::setBtnNormalTrackVisible(bool visible) { m_ui->widgetBtnNormalTrack->setVisible(visible); }
 
 void CursorsSettings::setCursorReadoutsVisible(bool visible) { m_ui->widgetReadouts->setVisible(visible); }
+
+void CursorsSettings::setHorizontalVisible(bool visible)
+{
+	m_ui->widgetHorizontalSubsSpr->setVisible(visible);
+	m_ui->widgetHorizontal->setVisible(visible);
+}
+
+void CursorsSettings::setVerticalVisible(bool visible)
+{
+	m_ui->widgetVerticalSubsSpr->setVisible(visible);
+	m_ui->widgetVertical->setVisible(visible);
+}
