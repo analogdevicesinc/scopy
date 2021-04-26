@@ -98,6 +98,7 @@ add_library(
     src/spectrum_analyzer_channel_menu.cpp
     src/network_analyzer_general_menu.cpp
     src/network_analyzer_channel_menu.cpp
+    src/logic_analyzer_channel_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -144,6 +145,7 @@ add_library(
     ui/spectrum_analyzer_channel_menu.ui
     ui/network_analyzer_general_menu.ui
     ui/network_analyzer_channel_menu.ui
+    ui/logic_analyzer_channel_menu.ui
     # resources
     resources/resources.qrc
 )
