@@ -11,6 +11,13 @@ SignalGeneratorMenu::SignalGeneratorMenu(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
+	initUi();
+}
+
+SignalGeneratorMenu::~SignalGeneratorMenu() { delete m_ui; }
+
+void SignalGeneratorMenu::initUi()
+{
 	m_ui->widgetFileSubsSep->setLabel("FILE");
 	m_ui->widgetFileSubsSep->setButtonVisible(false);
 
@@ -192,5 +199,3 @@ SignalGeneratorMenu::SignalGeneratorMenu(QWidget* parent)
 	connect(m_ui->widgetOtherSubsSep->getButton(), &QPushButton::clicked,
 		[=](bool check) { m_ui->widgetAppearance->setVisible(check); });
 }
-
-SignalGeneratorMenu::~SignalGeneratorMenu() { delete m_ui; }

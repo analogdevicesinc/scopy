@@ -22,6 +22,10 @@ public:
 	explicit SignalGeneratorMenu(QWidget* parent = nullptr);
 	~SignalGeneratorMenu();
 
+private:
+	void initUi();
+
+public:
 	static constexpr float maxFrequency = 30000000;
 
 private:

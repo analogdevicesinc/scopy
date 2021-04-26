@@ -7,6 +7,7 @@
 #include <QStackedWidget>
 #include <QWidget>
 
+#include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/custom_menu_button.hpp>
 #include <scopy/gui/custom_push_button.hpp>
 #include <scopy/gui/linked_button.hpp>
@@ -76,8 +77,8 @@ public:
 
 	QWidget* getChannels();
 	void buildDefaultChannels();
-	QWidget* buildNewChannel(int chId, bool deletable, bool simplified, QColor color, const QString& fullName,
-				 const QString& shortName);
+	ChannelWidget* buildNewChannel(int chId, bool deletable, bool simplified, QColor color, const QString& fullName,
+				       const QString& shortName);
 
 	QStackedWidget* getStackedWidget();
 
