@@ -10,6 +10,7 @@
 #include <scopy/gui/network_analyzer_channel_menu.hpp>
 #include <scopy/gui/logic_analyzer_channel_menu.hpp>
 #include <scopy/gui/logic_analyzer_trigger_menu.hpp>
+#include <scopy/gui/logic_analyzer_general_menu.hpp>
 
 using namespace scopy::gui;
 
@@ -63,6 +64,7 @@ TestTool::TestTool()
 	// Logic Analyzer
 	LogicAnalyzerChannelMenu* channelMenu = new LogicAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNEL));
 	LogicAnalyzerTriggerMenu* triggerMenu = new LogicAnalyzerTriggerMenu(m_toolView->getMenu(MenusEnum::TRIGGER));
+	LogicAnalyzerGeneralMenu* generalMenu = new LogicAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }

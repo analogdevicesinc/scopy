@@ -100,6 +100,7 @@ add_library(
     src/network_analyzer_channel_menu.cpp
     src/logic_analyzer_channel_menu.cpp
     src/logic_analyzer_trigger_menu.cpp
+    src/logic_analyzer_general_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -148,6 +149,7 @@ add_library(
     ui/network_analyzer_channel_menu.ui
     ui/logic_analyzer_channel_menu.ui
     ui/logic_analyzer_trigger_menu.ui
+    ui/logic_analyzer_general_menu.ui
     # resources
     resources/resources.qrc
 )
