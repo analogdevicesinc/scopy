@@ -15,19 +15,19 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>0</number>
+    <number>6</number>
    </property>
    <property name="leftMargin">
     <number>18</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>20</number>
    </property>
    <property name="rightMargin">
     <number>18</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>9</number>
    </property>
    <item>
     <widget class="QScrollArea" name="scrollArea">
@@ -55,10 +55,13 @@
         <x>0</x>
         <y>0</y>
         <width>278</width>
-        <height>603</height>
+        <height>574</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="topMargin">
         <number>0</number>
        </property>
@@ -66,37 +69,33 @@
         <widget class="scopy::gui::MenuHeader" name="widgetCursorsMenuHeader" native="true"/>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="vLayout_5">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="sizeConstraint">
-          <enum>QLayout::SetDefaultConstraint</enum>
-         </property>
-         <item>
-          <layout class="QVBoxLayout" name="vLayout_6">
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="scopy::gui::CustomSwitch" name="btnNormalTrack">
-             <property name="enabled">
-              <bool>true</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>238</width>
-               <height>30</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">QPushButton {
+        <widget class="QWidget" name="widgetBtnNormalTrack" native="true">
+         <layout class="QVBoxLayout" name="vLayout_5">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="sizeConstraint">
+           <enum>QLayout::SetDefaultConstraint</enum>
+          </property>
+          <item>
+           <widget class="scopy::gui::CustomSwitch" name="btnNormalTrack">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>238</width>
+              <height>30</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QPushButton {
 min-height: 30px;
 max-height: 30px;
 min-width: 238px;
@@ -158,164 +157,145 @@ QLabel#off:disabled {
 color: rgba(255,255,255,51);
 }
 </string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-             <property name="flat">
-              <bool>false</bool>
-             </property>
-             <property name="leftText" stdset="0">
-              <string>Normal</string>
-             </property>
-             <property name="rightText" stdset="0">
-              <string>Track</string>
-             </property>
-             <property name="duration_ms" stdset="0">
-              <string>0</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <widget class="scopy::gui::SubsectionSeparator" name="widgetHorizontalSubsSpr" native="true"/>
-         </item>
-        </layout>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="flat">
+             <bool>false</bool>
+            </property>
+            <property name="leftText" stdset="0">
+             <string>Normal</string>
+            </property>
+            <property name="rightText" stdset="0">
+             <string>Track</string>
+            </property>
+            <property name="duration_ms" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="vLayout_3">
-         <property name="spacing">
-          <number>6</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="hLayout">
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="scopy::gui::CustomSwitch" name="hCursorsEnable">
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="hSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="scopy::gui::SmallOnOffSwitch" name="btnLockHorizontal">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="use_icon" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
+        <widget class="scopy::gui::SubsectionSeparator" name="widgetHorizontalSubsSpr" native="true"/>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="vLayout_7">
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="scopy::gui::SubsectionSeparator" name="widgetVerticalSubsSpr" native="true"/>
-         </item>
-        </layout>
+        <widget class="QWidget" name="widgetHorizontal" native="true">
+         <layout class="QHBoxLayout" name="hLayout">
+          <property name="leftMargin">
+           <number>9</number>
+          </property>
+          <property name="topMargin">
+           <number>1</number>
+          </property>
+          <property name="rightMargin">
+           <number>9</number>
+          </property>
+          <property name="bottomMargin">
+           <number>9</number>
+          </property>
+          <item>
+           <widget class="scopy::gui::CustomSwitch" name="hCursorsEnable">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="hSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="scopy::gui::SmallOnOffSwitch" name="btnLockHorizontal">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="use_icon" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="vLayout_4">
-         <property name="spacing">
-          <number>10</number>
-         </property>
-         <item>
-          <layout class="QHBoxLayout" name="hLayout_2">
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="scopy::gui::CustomSwitch" name="vCursorsEnable">
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="hSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="scopy::gui::SmallOnOffSwitch" name="btnLockVertical">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checkable">
-              <bool>true</bool>
-             </property>
-             <property name="use_icon" stdset="0">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-        </layout>
+        <widget class="scopy::gui::SubsectionSeparator" name="widgetVerticalSubsSpr" native="true"/>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="vLayout_2">
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-        </layout>
+        <widget class="QWidget" name="widgetVertical" native="true">
+         <layout class="QHBoxLayout" name="hLayout_2">
+          <property name="topMargin">
+           <number>1</number>
+          </property>
+          <item>
+           <widget class="scopy::gui::CustomSwitch" name="vCursorsEnable">
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="hSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="scopy::gui::SmallOnOffSwitch" name="btnLockVertical">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="checkable">
+             <bool>true</bool>
+            </property>
+            <property name="use_icon" stdset="0">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="scopy::gui::SubsectionSeparator" name="widgetCursorReadoutsSubsSpr" native="true"/>
        </item>
        <item>
         <widget class="QWidget" name="widgetReadouts" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -331,13 +311,13 @@ color: rgba(255,255,255,51);
            <number>10</number>
           </property>
           <property name="sizeConstraint">
-           <enum>QLayout::SetMinimumSize</enum>
+           <enum>QLayout::SetDefaultConstraint</enum>
           </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
           <property name="topMargin">
-           <number>0</number>
+           <number>5</number>
           </property>
           <property name="rightMargin">
            <number>0</number>
@@ -360,19 +340,6 @@ color: rgba(255,255,255,51);
              </size>
             </property>
            </spacer>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="vLayout_8">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="scopy::gui::SubsectionSeparator" name="widgetCursorReadoutsSubsSpr" native="true"/>
-            </item>
-           </layout>
           </item>
           <item>
            <widget class="QLabel" name="lblTrans">
@@ -468,15 +435,15 @@ color: rgba(255,255,255,51);
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::gui::SmallOnOffSwitch</class>
-   <extends>QPushButton</extends>
-   <header location="global">scopy/gui/small_on_off_switch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>scopy::gui::CustomPlotPositionButton</class>
    <extends>QWidget</extends>
    <header location="global">scopy/gui/custom_plot_position_button.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::gui::SmallOnOffSwitch</class>
+   <extends>QPushButton</extends>
+   <header location="global">scopy/gui/small_on_off_switch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
