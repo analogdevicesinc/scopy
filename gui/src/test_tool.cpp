@@ -7,6 +7,7 @@
 #include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
 #include <scopy/gui/network_analyzer_general_menu.hpp>
+#include <scopy/gui/network_analyzer_channel_menu.hpp>
 
 using namespace scopy::gui;
 
@@ -44,6 +45,17 @@ TestTool::TestTool()
 //	QWidget* menu = m_toolView->getGeneralSettingsMenu();
 //	menu->setLayout(new QVBoxLayout);
 //	NetworkAnalyzerGeneralMenu* generalMenu = new NetworkAnalyzerGeneralMenu(menu);
+
+//	menu = m_toolView->getMenu(MenusEnum::CHANNEL);
+//	menu->setLayout(new QVBoxLayout);
+//	NetworkAnalyzerChannelMenu* channelMenu = new NetworkAnalyzerChannelMenu(menu);
+
+//	menu = m_toolView->getMenu(MenusEnum::CURSORS);
+//	menu->setLayout(new QVBoxLayout);
+//	CursorsSettings* cursorsMenu = new CursorsSettings(menu);
+//	cursorsMenu->setBtnNormalTrackVisible(false);
+//	cursorsMenu->setHorizontalVisible(false);
+//	cursorsMenu->setVerticalVisible(false);
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
