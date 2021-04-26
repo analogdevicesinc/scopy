@@ -13,7 +13,8 @@ ToolView::ToolView(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
-	m_ui->widgetRunSingleBtns->setVisible(false);
+	m_ui->widgetRunSingleBtns->enableRunButton(false);
+	m_ui->widgetRunSingleBtns->enableSingleButton(false);
 	m_ui->widgetSettingsPairBtns->setVisible(false);
 	m_ui->btnHelp->setVisible(false);
 	m_ui->btnPrint->setVisible(false);
@@ -178,9 +179,9 @@ QWidget* ToolView::getButtonMenu(MenusEnum btn) { return m_btns[btn]; }
 
 void ToolView::setPrintBtnVisible(bool visible) { m_ui->btnPrint->setVisible(visible); }
 
-void ToolView::setRunBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->setVisible(visible); }
+void ToolView::setRunBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->enableRunButton(visible); }
 
-void ToolView::setSingleBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->setVisible(visible); }
+void ToolView::setSingleBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->enableSingleButton(visible); }
 
 void ToolView::setPairSettingsVisible(bool visible) { m_ui->widgetSettingsPairBtns->setVisible(visible); }
 
@@ -218,6 +219,11 @@ QWidget* ToolView::getChannels() { return m_ui->widgetChannelsList; }
 void ToolView::buildDefaultChannels()
 {
 	QWidget* menu = new QWidget;
+
+	// TODO: remove layout, find a way to only set parent
+	menu->setLayout(new QVBoxLayout);
+	menu->layout()->setMargin(0);
+
 	m_menus.insert(MenusEnum::CHANNELS_SETTINGS, menu);
 	m_ui->stackedWidget->addWidget(menu);
 
@@ -225,7 +231,7 @@ void ToolView::buildDefaultChannels()
 	buildNewChannel(1, false, false, QColor("#9013FE"), "Channel", "CH");
 }
 
-QWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefied, QColor color, const QString& fullName,
+ChannelWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefied, QColor color, const QString& fullName,
 				   const QString& shortName)
 {
 	ChannelWidget* ch = new ChannelWidget(chId, deletable, simplefied, color, m_ui->widgetChannelsList);
