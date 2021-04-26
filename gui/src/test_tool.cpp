@@ -9,6 +9,7 @@
 #include <scopy/gui/network_analyzer_general_menu.hpp>
 #include <scopy/gui/network_analyzer_channel_menu.hpp>
 #include <scopy/gui/logic_analyzer_channel_menu.hpp>
+#include <scopy/gui/logic_analyzer_trigger_menu.hpp>
 
 using namespace scopy::gui;
 
@@ -16,7 +17,7 @@ TestTool::TestTool()
 {
 	ToolViewRecipe recipe;
 	recipe.url = "https://stackoverflow.com/questions/45481362/set-parent-qwidget-for-promoted-widgets";
-	recipe.hasRunBtn = true;
+//	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPrintBtn = true;
 	recipe.hasGroupBtn = true;
@@ -28,6 +29,8 @@ TestTool::TestTool()
 
 	recipe.hasSweep = true;
 	recipe.hasMarkers = true;
+	recipe.hasTrigger = true;
+	recipe.hasChannelSettings = true;
 
 	m_toolView = ToolViewBuilder(recipe).build();
 
@@ -59,6 +62,7 @@ TestTool::TestTool()
 //	cursorsMenu->setVerticalVisible(false);
 	// Logic Analyzer
 	LogicAnalyzerChannelMenu* channelMenu = new LogicAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNEL));
+	LogicAnalyzerTriggerMenu* triggerMenu = new LogicAnalyzerTriggerMenu(m_toolView->getMenu(MenusEnum::TRIGGER));
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
