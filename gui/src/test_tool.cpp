@@ -8,6 +8,7 @@
 #include <scopy/gui/test_tool.hpp>
 #include <scopy/gui/network_analyzer_general_menu.hpp>
 #include <scopy/gui/network_analyzer_channel_menu.hpp>
+#include <scopy/gui/logic_analyzer_channel_menu.hpp>
 
 using namespace scopy::gui;
 
@@ -56,6 +57,8 @@ TestTool::TestTool()
 //	cursorsMenu->setBtnNormalTrackVisible(false);
 //	cursorsMenu->setHorizontalVisible(false);
 //	cursorsMenu->setVerticalVisible(false);
+	// Logic Analyzer
+	LogicAnalyzerChannelMenu* channelMenu = new LogicAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNEL));
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
