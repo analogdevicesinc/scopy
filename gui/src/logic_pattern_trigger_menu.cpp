@@ -1,24 +1,21 @@
-#include "ui_logic_analyzer_trigger_menu.h"
+#include "ui_logic_pattern_trigger_menu.h"
 
-#include <scopy/gui/logic_analyzer_trigger_menu.hpp>
+#include <scopy/gui/logic_pattern_trigger_menu.hpp>
 
 using namespace scopy::gui;
 
-LogicAnalyzerTriggerMenu::LogicAnalyzerTriggerMenu(QWidget* parent)
+TriggerMenu::TriggerMenu(QWidget* parent)
 	: QWidget(parent)
-	, m_ui(new Ui::LogicAnalyzerTriggerMenu)
+	, m_ui(new Ui::TriggerMenu)
 {
 	m_ui->setupUi(this);
-
-	// TODO: remove this and find a way to resize a single menu
-//	parent->setMinimumWidth(375);
 
 	initUi();
 }
 
-LogicAnalyzerTriggerMenu::~LogicAnalyzerTriggerMenu() { delete m_ui; }
+TriggerMenu::~TriggerMenu() { delete m_ui; }
 
-void LogicAnalyzerTriggerMenu::initUi()
+void TriggerMenu::initUi()
 {
 	m_ui->widgetMenuHeader->setLabel("Trigger Settings");
 	m_ui->widgetMenuHeader->setLineColor(new QColor("#4a64ff"));
