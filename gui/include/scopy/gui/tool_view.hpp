@@ -82,6 +82,8 @@ public:
 
 	QStackedWidget* getStackedWidget();
 
+	void setFixedMenu(QWidget* menu);
+
 private:
 	void toggleRightMenu(CustomPushButton* btn, bool checked);
 	void settingsPanelUpdate(int id);

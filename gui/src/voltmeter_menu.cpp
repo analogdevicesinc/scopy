@@ -13,6 +13,15 @@ VoltmeterMenu::VoltmeterMenu(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
+	parent->setMinimumWidth(240);
+
+	initUi();
+}
+
+VoltmeterMenu::~VoltmeterMenu() { delete m_ui; }
+
+void VoltmeterMenu::initUi()
+{
 	m_ui->widgetChannel1MenuHeader->setLabel("Channel 1");
 	m_ui->widgetChannel1MenuHeader->setLineColor(new QColor("#ff7200"));
 
@@ -41,8 +50,6 @@ VoltmeterMenu::VoltmeterMenu(QWidget* parent)
 	m_dataLoggingTimer->setValue(0);
 	enableDataLogging(false);
 }
-
-VoltmeterMenu::~VoltmeterMenu() { delete m_ui; }
 
 void VoltmeterMenu::enableDataLogging(bool en)
 {
