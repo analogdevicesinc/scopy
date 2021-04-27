@@ -15,6 +15,7 @@
 #include <scopy/gui/spectrum_analyzer_markers_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
+#include <scopy/gui/pattern_generator_channel_menu.hpp>
 
 using namespace scopy::gui;
 
@@ -28,8 +29,6 @@ TestTool::TestTool()
 
 	recipe.hasPairSettingsBtn = true;
 
-	recipe.hasCursors = true;
-	recipe.hasTrigger = true;
 	recipe.hasChannelSettings = true;
 
 	m_toolView = ToolViewBuilder(recipe).build();
@@ -72,9 +71,13 @@ TestTool::TestTool()
 	//	m_toolView->getStackedWidget()->setMinimumWidth(430);
 
 	// Logic Analyzer
-	LogicAnalyzerChannelMenu* channelMenu = new LogicAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNEL));
-	TriggerMenu* triggerMenu = new TriggerMenu(m_toolView->getMenu(MenusEnum::TRIGGER));
-	LogicAnalyzerGeneralMenu* generalMenu = new LogicAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
+//	LogicAnalyzerChannelMenu* channelMenu = new LogicAnalyzerChannelMenu(m_toolView->getMenu(MenusEnum::CHANNEL));
+//	TriggerMenu* triggerMenu = new TriggerMenu(m_toolView->getMenu(MenusEnum::TRIGGER));
+//	LogicAnalyzerGeneralMenu* generalMenu = new LogicAnalyzerGeneralMenu(m_toolView->getGeneralSettingsMenu());
+
+	// Pattern Generator
+	PatternGeneratorChannelMenu* channelMenu = new PatternGeneratorChannelMenu(m_toolView->getMenu(MenusEnum::CHANNEL));
+
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }
