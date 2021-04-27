@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>LogicAnalyzerTriggerMenu</class>
- <widget class="QWidget" name="LogicAnalyzerTriggerMenu">
+ <class>TriggerMenu</class>
+ <widget class="QWidget" name="TriggerMenu">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>384</width>
+    <width>336</width>
     <height>543</height>
    </rect>
   </property>
@@ -181,14 +181,8 @@ color: rgba(255,255,255,51);
     </layout>
    </item>
    <item>
-    <widget class="scopy::gui::SubsectionSeparator" name="widgetExternalTriggerSubsSep" native="true"/>
-   </item>
-   <item>
-    <widget class="QWidget" name="externalWidget" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_11">
-      <property name="spacing">
-       <number>15</number>
-      </property>
+    <widget class="QWidget" name="widgetExternal" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -202,12 +196,27 @@ color: rgba(255,255,255,51);
        <number>0</number>
       </property>
       <item>
+       <widget class="scopy::gui::SubsectionSeparator" name="widgetExternalTriggerSubsSep" native="true"/>
+      </item>
+      <item>
        <widget class="QLabel" name="lblWarningFw">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>280</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>280</width>
+          <height>16777215</height>
+         </size>
         </property>
         <property name="text">
          <string>&quot;Warning: This feature is not supported on the current firmware version!&quot;</string>
@@ -271,9 +280,6 @@ color: rgba(255,255,255,51);
           <property name="enabled">
            <bool>false</bool>
           </property>
-          <property name="minimumContentsLength">
-           <number>26</number>
-          </property>
          </widget>
         </item>
         <item row="1" column="1">
@@ -288,27 +294,47 @@ color: rgba(255,255,255,51);
           </item>
           <item>
            <property name="text">
-            <string>Rising Edge</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/icons/common/trigger_rising_enabled.svg</normaloff>:/icons/common/trigger_rising_enabled.svg</iconset>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Falling Edge</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/icons/common/trigger_falling_enabled.svg</normaloff>:/icons/common/trigger_falling_enabled.svg</iconset>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Low</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/icons/common/trigger_high_enabled.svg</normaloff>:/icons/common/trigger_high_enabled.svg</iconset>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>High</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/icons/common/trigger_low_enabled.svg</normaloff>:/icons/common/trigger_low_enabled.svg</iconset>
            </property>
           </item>
           <item>
            <property name="text">
-            <string>Any Edge</string>
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/resources.qrc">
+             <normaloff>:/icons/common/trigger_any_enabled.svg</normaloff>:/icons/common/trigger_any_enabled.svg</iconset>
            </property>
           </item>
          </widget>
@@ -326,7 +352,7 @@ color: rgba(255,255,255,51);
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>353</height>
+       <height>191</height>
       </size>
      </property>
     </spacer>
@@ -352,6 +378,8 @@ color: rgba(255,255,255,51);
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
