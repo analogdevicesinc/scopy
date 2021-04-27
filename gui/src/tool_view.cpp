@@ -170,10 +170,7 @@ void ToolView::settingsPanelUpdate(int id)
 
 QWidget* ToolView::getMenu(MenusEnum menu) { return m_menus[menu]; }
 
-QWidget *ToolView::getGeneralSettingsMenu()
-{
-	return m_generalSettingsMenu;
-}
+QWidget* ToolView::getGeneralSettingsMenu() { return m_generalSettingsMenu; }
 
 QWidget* ToolView::getButtonMenu(MenusEnum btn) { return m_btns[btn]; }
 
@@ -231,8 +228,8 @@ void ToolView::buildDefaultChannels()
 	buildNewChannel(1, false, false, QColor("#9013FE"), "Channel", "CH");
 }
 
-ChannelWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefied, QColor color, const QString& fullName,
-				   const QString& shortName)
+ChannelWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefied, QColor color,
+					 const QString& fullName, const QString& shortName)
 {
 	ChannelWidget* ch = new ChannelWidget(chId, deletable, simplefied, color, m_ui->widgetChannelsList);
 	auto id = m_ui->stackedWidget->indexOf(getMenu(MenusEnum::CHANNELS_SETTINGS));
@@ -277,6 +274,14 @@ ChannelWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefi
 }
 
 QStackedWidget* ToolView::getStackedWidget() { return m_ui->stackedWidget; }
+
+void ToolView::setFixedMenu(QWidget* menu)
+{
+	int id = m_ui->stackedWidget->addWidget(menu);
+
+	settingsPanelUpdate(id);
+	m_ui->widgetMenuAnim->toggleMenu(true);
+}
 
 void ToolView::setUrlHelpBtn(const QString& url) { m_ui->btnHelp->setUrl(url); }
 

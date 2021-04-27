@@ -21,11 +21,13 @@ public:
 	~VoltmeterMenu();
 
 private:
+	void initUi();
+	void enableDataLogging(bool en);
+
+private:
 	Ui::VoltmeterMenu* m_ui;
 
 	PositionSpinButton* m_dataLoggingTimer;
-
-	void enableDataLogging(bool en);
 };
 } // namespace gui
 } // namespace scopy

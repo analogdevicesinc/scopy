@@ -11,6 +11,15 @@ PowerSupplyMenu::PowerSupplyMenu(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
+	parent->setMinimumWidth(240);
+
+	initUi();
+}
+
+PowerSupplyMenu::~PowerSupplyMenu() { delete m_ui; }
+
+void PowerSupplyMenu::initUi()
+{
 	m_ui->widgetTrakingRationControlMenuHeader->setLabel("Traking ratio control");
 	m_ui->widgetTrakingRationControlMenuHeader->setLineColor(new QColor("#4a64ff"));
 
@@ -31,5 +40,3 @@ PowerSupplyMenu::PowerSupplyMenu(QWidget* parent)
 	m_ui->vLayoutValuePos->addWidget(m_valuePos);
 	m_ui->vLayoutValueNeg->addWidget(m_valueNeg);
 }
-
-PowerSupplyMenu::~PowerSupplyMenu() { delete m_ui; }

@@ -21,6 +21,9 @@ public:
 	~PowerSupplyMenu();
 
 private:
+	void initUi();
+
+private:
 	Ui::PowerSupplyMenu* m_ui;
 
 	PositionSpinButton* m_valuePos;
