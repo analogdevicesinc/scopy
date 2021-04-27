@@ -85,7 +85,6 @@ add_library(
     src/signal_generator_menu.cpp
     src/power_supply_menu.cpp
     src/voltmeter_menu.cpp
-    src/pattern_generator_menu.cpp
     src/tool_view.cpp
     src/tool_view_builder.cpp
     src/test_tool.cpp
@@ -100,6 +99,7 @@ add_library(
     src/logic_pattern_trigger_menu.cpp
     src/logic_analyzer_general_menu.cpp
     src/pattern_generator_channel_menu.cpp
+    src/pattern_generator_general_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
@@ -135,7 +135,6 @@ add_library(
     ui/signal_generator_menu.ui
     ui/power_supply_menu.ui
     ui/voltmeter_menu.ui
-    ui/pattern_generator_menu.ui
     ui/tool_view.ui
     ui/spectrum_analyzer_sweep_menu.ui
     ui/spectrum_analyzer_general_menu.ui
@@ -148,6 +147,7 @@ add_library(
     ui/logic_pattern_trigger_menu.ui
     ui/logic_analyzer_general_menu.ui
     ui/pattern_generator_channel_menu.ui
+    ui/pattern_generator_general_menu.ui
     # resources
     resources/resources.qrc
 )
