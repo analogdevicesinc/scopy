@@ -4,22 +4,22 @@
 
 using namespace scopy::gui;
 
-SpectrumAnalyzerChannelMenu::SpectrumAnalyzerChannelMenu(QWidget* parent)
+SpectrumAnalyzerChannelMenu::SpectrumAnalyzerChannelMenu(const QString& menuTitle, QColor* lineColor, QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::SpectrumAnalyzerChannelMenu)
 {
 	m_ui->setupUi(this);
 
-	initUi();
+	initUi(menuTitle, lineColor);
 }
 
 SpectrumAnalyzerChannelMenu::~SpectrumAnalyzerChannelMenu() { delete m_ui; }
 
-void SpectrumAnalyzerChannelMenu::initUi()
+void SpectrumAnalyzerChannelMenu::initUi(const QString& menuTitle, QColor* lineColor)
 {
 	// Temporary: each channel will set its name and line color
-	m_ui->widgetMenuHeader->setLabel("Channel");
-	m_ui->widgetMenuHeader->setLineColor(new QColor("#4A64FF"));
+	m_ui->widgetMenuHeader->setLabel(menuTitle);
+	m_ui->widgetMenuHeader->setLineColor(lineColor);
 
 	// Initialize Type ComboBox
 	m_avgTypes = {

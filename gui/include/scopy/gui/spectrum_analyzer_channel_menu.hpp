@@ -28,11 +28,12 @@ public:
 		KAISER = 6,
 	};
 
-	explicit SpectrumAnalyzerChannelMenu(QWidget* parent = nullptr);
+	explicit SpectrumAnalyzerChannelMenu(const QString& menuTitle = "Channel",
+					     QColor* lineColor = new QColor("#4A64FF"), QWidget* parent = nullptr);
 	~SpectrumAnalyzerChannelMenu();
 
 private:
-	void initUi();
+	void initUi(const QString& menuTitle, QColor* lineColor);
 
 private:
 	Ui::SpectrumAnalyzerChannelMenu* m_ui;
