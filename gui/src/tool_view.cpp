@@ -18,62 +18,25 @@ ToolView::ToolView(QWidget* parent)
 	m_ui->widgetSettingsPairBtns->setVisible(false);
 	m_ui->btnHelp->setVisible(false);
 	m_ui->btnPrint->setVisible(false);
-	m_ui->btnAddMath->setVisible(false);
 
 	m_ui->widgetInstrumentNotes->setVisible(false);
+	m_ui->widgetVerticalChannels->setVisible(false);
+	m_ui->widgetFooter->setVisible(false);
 
 	m_ui->widgetMenuAnim->setMaximumWidth(0);
 
 	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
 }
 
-ToolView::~ToolView()
-{
-	delete m_generalSettingsMenu;
-	delete m_ui;
-}
+ToolView::~ToolView() { delete m_ui; }
 
-void ToolView::setBtns(QMap<MenusEnum, CustomMenuButton*> btns)
-{
-	m_btns = btns;
-
-	for (MenusEnum key : btns.keys()) {
-		QWidget* menu = new QWidget;
-		m_menus.insert(MenusEnum(key), menu);
-
-		int id = m_ui->stackedWidget->addWidget(menu);
-
-		CustomMenuButton* btn = qobject_cast<CustomMenuButton*>(btns.value(key));
-		m_ui->hLayoutMenuBtnsContainer->addWidget(btn);
-		m_group.addButton(btn->getBtn());
-		btn->getBtn()->setProperty("id", QVariant(-id));
-
-		connect(btn->getBtn(), &CustomPushButton::toggled, this, &ToolView::triggerRightMenuToggle);
-
-		connect(btn->getBtn(), &CustomPushButton::toggled, m_ui->widgetSettingsPairBtns->getSettingsBtn(),
-			&QPushButton::setChecked);
-
-		connect(btn->getCheckBox(), &QCheckBox::toggled, [=](bool toggled) {
-			if (!toggled) {
-				// we also remove the button from the history
-				// so that the last menu opened button on top
-				// won't open the menu when it is disabled
-				m_menuOrder.removeOne(btn->getBtn());
-			}
-		});
-
-		m_menuOrder.push_back(btn->getBtn());
-	}
-}
-
-void ToolView::setUpperMenus()
+void ToolView::configurePairSettings()
 {
 	CustomPushButton* generalSettingsBtn = m_ui->widgetSettingsPairBtns->getGeneralSettingsBtn();
 	QPushButton* settingsBtn = m_ui->widgetSettingsPairBtns->getSettingsBtn();
 
 	// General settings
-	m_generalSettingsMenu = new QWidget;
-	int id = m_ui->stackedWidget->addWidget(m_generalSettingsMenu);
+	int id = m_ui->stackedWidget->indexOf(m_ui->widgetGeneralMenu);
 
 	generalSettingsBtn->setProperty("id", QVariant(-id));
 	m_group.addButton(generalSettingsBtn);
@@ -89,19 +52,22 @@ void ToolView::setUpperMenus()
 
 	// Settings/Last opened menu
 	connect(settingsBtn, &QPushButton::clicked, this, [=](bool checked) {
-		CustomPushButton* btn = nullptr;
-		if (checked && !m_menuOrder.isEmpty()) {
-			btn = m_menuOrder.back();
-			m_menuOrder.pop_back();
-		} else {
-			btn = static_cast<CustomPushButton*>(m_group.checkedButton());
-		}
+		if (!m_menuOrder.isEmpty()) {
+			CustomPushButton* btn = nullptr;
 
-		btn->setChecked(checked);
+			if (checked) {
+				btn = m_menuOrder.back();
+				m_menuOrder.pop_back();
+			} else {
+				btn = static_cast<CustomPushButton*>(m_group.checkedButton());
+			}
+
+			btn->setChecked(checked);
+		} else {
+			getSettingsBtn()->setChecked(false);
+		}
 	});
 }
-
-QWidget* ToolView::getCentralWidget() { return m_ui->widgetCentral; }
 
 void ToolView::rightMenuFinished(bool opened)
 {
@@ -132,7 +98,7 @@ void ToolView::triggerRightMenuToggle(bool checked)
 void ToolView::toggleRightMenu(CustomPushButton* btn, bool checked)
 {
 	int id = btn->property("id").toInt();
-	if (id != -m_ui->stackedWidget->indexOf(m_generalSettingsMenu)) {
+	if (id != -m_ui->stackedWidget->indexOf(m_ui->widgetGeneralMenu)) {
 		if (!m_menuOrder.contains(btn)) {
 			m_menuOrder.push_back(btn);
 		} else {
@@ -168,76 +134,42 @@ void ToolView::settingsPanelUpdate(int id)
 	m_ui->stackedWidget->adjustSize();
 }
 
-QWidget* ToolView::getMenu(MenusEnum menu) { return m_menus[menu]; }
-
-QWidget* ToolView::getGeneralSettingsMenu() { return m_generalSettingsMenu; }
-
-QWidget* ToolView::getButtonMenu(MenusEnum btn) { return m_btns[btn]; }
-
-void ToolView::setPrintBtnVisible(bool visible) { m_ui->btnPrint->setVisible(visible); }
-
-void ToolView::setRunBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->enableRunButton(visible); }
-
-void ToolView::setSingleBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->enableSingleButton(visible); }
-
-void ToolView::setPairSettingsVisible(bool visible) { m_ui->widgetSettingsPairBtns->setVisible(visible); }
-
-QWidget* ToolView::getExtraWidget() { return m_ui->widgetExtraWidget; }
-
-void ToolView::setExtraWidget(QWidget* widget) { m_ui->hLayoutExtraWidgets->addWidget(widget); }
-
-void ToolView::setHelpBtnVisible(bool visible) { m_ui->btnHelp->setVisible(visible); }
-
-void ToolView::setInstrumentNotesVisible(bool visible) { m_ui->widgetInstrumentNotes->setVisible(visible); }
-
-CustomPushButton* ToolView::getAddMathBtn() { return m_ui->btnAddMath; }
-
-void ToolView::setAddMathBtnVisible(bool visible) { m_ui->btnAddMath->setVisible(visible); }
-
-void ToolView::configureAddMathBtn()
+void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum position)
 {
-	setAddMathBtnVisible(true);
+	connect(cm, &ChannelManager::configureAddBtn, this, &ToolView::configureAddMathBtn);
 
-	QWidget* menu = new QWidget;
-	m_menus.insert(MenusEnum::ADD_CHANNEL, menu);
+	if (position == ChannelsPositionEnum::HORIZONTAL) {
+		m_ui->widgetFooter->setVisible(true);
+
+		cm->build(m_ui->widgetHorizontalChannelsContainer);
+	} else {
+		m_ui->widgetVerticalChannels->setVisible(true);
+		cm->build(m_ui->widgetVerticalChannelsContainer);
+	}
+}
+
+void ToolView::configureAddMathBtn(QWidget* menu)
+{
+	ChannelManager* cm = static_cast<ChannelManager*>(QObject::sender());
+
 	int id = m_ui->stackedWidget->addWidget(menu);
 
-	m_group.addButton(getAddMathBtn());
-	getAddMathBtn()->setProperty("id", QVariant(-id));
+	CustomPushButton* addBtn = cm->getAddChannelBtn();
 
-	connect(getAddMathBtn(), &CustomPushButton::toggled, this, &ToolView::triggerRightMenuToggle);
+	m_group.addButton(addBtn);
+	addBtn->setProperty("id", QVariant(-id));
 
-	connect(getAddMathBtn(), &CustomPushButton::toggled, m_ui->widgetSettingsPairBtns->getSettingsBtn(),
+	connect(addBtn, &CustomPushButton::toggled, this, &ToolView::triggerRightMenuToggle);
+	connect(addBtn, &CustomPushButton::toggled, m_ui->widgetSettingsPairBtns->getSettingsBtn(),
 		&QPushButton::setChecked);
 }
 
-QWidget* ToolView::getChannels() { return m_ui->widgetChannelsList; }
-
-void ToolView::buildDefaultChannels()
+ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, QWidget* menu, int chId, bool deletable,
+					 bool simplefied, QColor color, const QString& fullName,
+					 const QString& shortName)
 {
-	QWidget* menu = new QWidget;
-
-	// TODO: remove layout, find a way to only set parent
-	menu->setLayout(new QVBoxLayout);
-	menu->layout()->setMargin(0);
-
-	m_menus.insert(MenusEnum::CHANNELS_SETTINGS, menu);
-	m_ui->stackedWidget->addWidget(menu);
-
-	buildNewChannel(0, false, false, QColor("#FF7200"), "Channel", "CH");
-	buildNewChannel(1, false, false, QColor("#9013FE"), "Channel", "CH");
-}
-
-ChannelWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefied, QColor color,
-					 const QString& fullName, const QString& shortName)
-{
-	ChannelWidget* ch = new ChannelWidget(chId, deletable, simplefied, color, m_ui->widgetChannelsList);
-	auto id = m_ui->stackedWidget->indexOf(getMenu(MenusEnum::CHANNELS_SETTINGS));
-
-	m_ui->hLayoutChannelList->addWidget(ch);
-	ch->setFullName(fullName + QString(" %1").arg(chId + 1));
-	ch->setShortName(shortName + QString(" %1").arg(chId + 1));
-	ch->nameButton()->setText(ch->shortName());
+	ChannelWidget* ch = channelManager->buildNewChannel(chId, deletable, simplefied, color, fullName, shortName);
+	int id = m_ui->stackedWidget->addWidget(menu);
 
 	m_group.addButton(ch->menuButton());
 	m_channelsGroup.addButton(ch->nameButton());
@@ -266,32 +198,87 @@ ChannelWidget* ToolView::buildNewChannel(int chId, bool deletable, bool simplefi
 			}
 			m_menuOrder.removeOne(qobject_cast<CustomPushButton*>(ch->menuButton()));
 
-			m_ui->hLayoutChannelList->removeWidget(ch);
+			channelManager->removeChannel(ch);
 		});
 	}
 
 	return ch;
 }
 
-QStackedWidget* ToolView::getStackedWidget() { return m_ui->stackedWidget; }
+void ToolView::buildNewInstrumentMenu(QWidget* menu, const QString& name, bool checkBoxVisible, bool checkBoxChecked)
+{
+	m_ui->widgetFooter->setVisible(true);
+
+	int id = m_ui->stackedWidget->addWidget(menu);
+
+	CustomMenuButton* btn = new CustomMenuButton(name, checkBoxVisible, checkBoxChecked);
+	m_ui->hLayoutMenuBtnsContainer->addWidget(btn);
+	m_group.addButton(btn->getBtn());
+	btn->getBtn()->setProperty("id", QVariant(-id));
+
+	connect(btn->getBtn(), &CustomPushButton::toggled, this, &ToolView::triggerRightMenuToggle);
+	connect(btn->getBtn(), &CustomPushButton::toggled, m_ui->widgetSettingsPairBtns->getSettingsBtn(),
+		&QPushButton::setChecked);
+	connect(btn->getCheckBox(), &QCheckBox::toggled, [=](bool toggled) {
+		if (!toggled) {
+			// we also remove the button from the history
+			// so that the last menu opened button on top
+			// won't open the menu when it is disabled
+			m_menuOrder.removeOne(btn->getBtn());
+		}
+	});
+
+	m_menuOrder.push_back(btn->getBtn());
+}
+
+void ToolView::setGeneralSettingsMenu(QWidget* menu)
+{
+	m_ui->widgetGeneralMenu->setLayout(new QHBoxLayout);
+	m_ui->widgetGeneralMenu->layout()->addWidget(menu);
+}
 
 void ToolView::setFixedMenu(QWidget* menu)
 {
 	int id = m_ui->stackedWidget->addWidget(menu);
-
 	settingsPanelUpdate(id);
 	m_ui->widgetMenuAnim->toggleMenu(true);
 }
+
+QWidget* ToolView::getTopExtraWidget() { return m_ui->widgetTopExtra; }
+
+void ToolView::setVisibleTopExtraWidget(bool visible) { m_ui->widgetTopExtra->setVisible(visible); }
+
+void ToolView::addTopExtraWidget(QWidget* widget) { m_ui->widgetTopExtra->layout()->addWidget(widget); }
+
+QWidget* ToolView::getBottomExtraWidget() { return m_ui->widgetBottomExtra; }
+
+void ToolView::setVisibleBottomExtraWidget(bool visible) { m_ui->widgetBottomExtra->setVisible(visible); }
+
+void ToolView::addBottomExtraWidget(QWidget* widget) { m_ui->widgetBottomExtra->layout()->addWidget(widget); }
+
+QWidget* ToolView::getCentralWidget() { return m_ui->widgetCentral; }
+
+void ToolView::setInstrumentNotesVisible(bool visible) { m_ui->widgetInstrumentNotes->setVisible(visible); }
+
+LinkedButton* ToolView::getHelpBtn() { return m_ui->btnHelp; }
+
+void ToolView::setHelpBtnVisible(bool visible) { m_ui->btnHelp->setVisible(visible); }
 
 void ToolView::setUrlHelpBtn(const QString& url) { m_ui->btnHelp->setUrl(url); }
 
 QPushButton* ToolView::getRunBtn() { return m_ui->widgetRunSingleBtns->getRunButton(); }
 
+void ToolView::setRunBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->enableRunButton(visible); }
+
 QPushButton* ToolView::getSingleBtn() { return m_ui->widgetRunSingleBtns->getSingleButton(); }
 
-LinkedButton* ToolView::getHelpBtn() { return m_ui->btnHelp; }
+void ToolView::setSingleBtnVisible(bool visible) { m_ui->widgetRunSingleBtns->enableSingleButton(visible); }
 
 QPushButton* ToolView::getPrintBtn() { return m_ui->btnPrint; }
+
+void ToolView::setPrintBtnVisible(bool visible) { m_ui->btnPrint->setVisible(visible); }
+
+void ToolView::setPairSettingsVisible(bool visible) { m_ui->widgetSettingsPairBtns->setVisible(visible); }
 
 CustomPushButton* ToolView::getGeneralSettingsBtn() { return m_ui->widgetSettingsPairBtns->getGeneralSettingsBtn(); }
 
