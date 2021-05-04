@@ -24,17 +24,37 @@ using namespace scopy::gui;
 
 TestTool::TestTool()
 {
+	// Spectrum Analyzer wannabe
+
 	ToolViewRecipe recipe;
-	recipe.url = "https://stackoverflow.com/questions/45481362/set-parent-qwidget-for-promoted-widgets";
+	recipe.helpBtnUrl = "https://google.com";
+	recipe.hasRunBtn = true;
+	recipe.hasSingleBtn = true;
+	recipe.hasPrintBtn = true;
 
-	m_toolView = ToolViewBuilder(recipe).build();
+	recipe.hasPairSettingsBtn = true;
 
-	// Power Supply
-	// PowerSupplyMenu* menu = new PowerSupplyMenu(m_toolView->getStackedWidget());
+	recipe.hasChannels = true;
+	//	recipe.channelsPosition = ChannelsPositionEnum::VERTICAL;
 
-	// Voltmeter
-	VoltmeterMenu* menu = new VoltmeterMenu(m_toolView->getStackedWidget());
-	m_toolView->setFixedMenu(menu);
+	ChannelManager* channelManager = new ChannelManager(recipe.channelsPosition);
+
+	m_toolView = ToolViewBuilder(recipe, channelManager).build();
+
+	m_toolView->setGeneralSettingsMenu(new SpectrumAnalyzerGeneralMenu);
+
+	m_toolView->buildNewInstrumentMenu(new SpectrumAnalyzerSweepMenu, "Sweep");
+	m_toolView->buildNewInstrumentMenu(new SpectrumAnalyzerMarkersMenu, "Markers");
+
+	SpectrumAnalyzerChannelMenu* ch1Menu = new SpectrumAnalyzerChannelMenu("Channel 1", new QColor("#FF7200"));
+	SpectrumAnalyzerChannelMenu* ch2Menu = new SpectrumAnalyzerChannelMenu("Channel 2", new QColor("#9013FE"));
+	SpectrumAnalyzerChannelMenu* ch3Menu = new SpectrumAnalyzerChannelMenu("Math 1", new QColor("green"));
+
+	m_toolView->buildNewChannel(channelManager, ch1Menu, 0, false, false, QColor("#FF7200"), "Channel", "CH");
+	m_toolView->buildNewChannel(channelManager, ch2Menu, 1, false, false, QColor("#9013FE"), "Channel", "CH");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, 0, true, false, QColor("green"), "Math", "M");
+
+	channelManager->insertAddBtn(new SpectrumAnalyzerAddReferenceMenu);
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }

@@ -8,35 +8,24 @@ namespace gui {
 
 struct ToolViewRecipe
 {
-	QString url{""};
+	QString helpBtnUrl{""};
 	bool hasHelpBtn{true};
 	bool hasPrintBtn{false};
 	bool hasGroupBtn{false};
-
-	QWidget* hasExtraWidget{nullptr};
 
 	bool hasRunBtn{false};
 	bool hasSingleBtn{false};
 
 	bool hasPairSettingsBtn{false};
 
-	bool hasCursors{false};
-	bool hasTrigger{false};
-	bool hasMeasure{false};
-	bool hasSweep{false};
-	bool hasMarkers{false};
-	bool hasChannelSettings{false};
-
-	bool hasInstrumentNotes{false};
-
 	bool hasChannels{false};
-	bool hasAddMathBtn{false};
+	ChannelsPositionEnum channelsPosition{ChannelsPositionEnum::HORIZONTAL};
 };
 
 class ToolViewBuilder
 {
 public:
-	ToolViewBuilder(const ToolViewRecipe& recipe);
+	ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager = nullptr);
 
 	ToolView* build();
 
