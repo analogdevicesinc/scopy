@@ -79,6 +79,9 @@ public Q_SLOTS:
 	void triggerRightMenuToggle(bool checked);
 	void configureAddMathBtn(QWidget* menu);
 
+Q_SIGNALS:
+	void changeParent(QWidget* newParent);
+
 private:
 	Ui::ToolView* m_ui;
 
