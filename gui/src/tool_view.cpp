@@ -22,6 +22,7 @@ ToolView::ToolView(QWidget* parent)
 	m_ui->widgetInstrumentNotes->setVisible(false);
 	m_ui->widgetVerticalChannels->setVisible(false);
 	m_ui->widgetFooter->setVisible(false);
+	m_ui->widgetMenuBtns->setVisible(false);
 
 	m_ui->widgetMenuAnim->setMaximumWidth(0);
 
@@ -138,6 +139,26 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 {
 	connect(cm, &ChannelManager::configureAddBtn, this, &ToolView::configureAddMathBtn);
 
+	// Experimental
+	connect(this, &ToolView::changeParent, cm, &ChannelManager::changeParent);
+	connect(cm, &ChannelManager::positionChanged, this, [=](ChannelsPositionEnum position) {
+		if (position == ChannelsPositionEnum::VERTICAL) {
+			m_ui->widgetHorizontalChannelsContainer->setVisible(false);
+			m_ui->widgetVerticalChannels->setVisible(true);
+
+			if (!m_ui->widgetMenuBtns->isVisible()) {
+				m_ui->widgetFooter->setVisible(false);
+			}
+
+			Q_EMIT changeParent(m_ui->widgetVerticalChannelsContainer);
+		} else {
+			m_ui->widgetVerticalChannels->setVisible(false);
+			m_ui->widgetFooter->setVisible(true);
+			m_ui->widgetHorizontalChannelsContainer->setVisible(true);
+			Q_EMIT changeParent(m_ui->widgetHorizontalChannelsContainer);
+		}
+	});
+
 	if (position == ChannelsPositionEnum::HORIZONTAL) {
 		m_ui->widgetFooter->setVisible(true);
 
@@ -208,6 +229,7 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, QWidget
 void ToolView::buildNewInstrumentMenu(QWidget* menu, const QString& name, bool checkBoxVisible, bool checkBoxChecked)
 {
 	m_ui->widgetFooter->setVisible(true);
+	m_ui->widgetMenuBtns->setVisible(true);
 
 	int id = m_ui->stackedWidget->addWidget(menu);
 

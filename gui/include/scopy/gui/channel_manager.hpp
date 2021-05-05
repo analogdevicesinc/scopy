@@ -34,19 +34,26 @@ public:
 	QList<ChannelWidget*> getEnabledChannels();
 
 	CustomPushButton* getAddChannelBtn();
-	QWidget* getChannelsList();
+	QList<ChannelWidget*> getChannelsList();
+
+public Q_SLOTS:
+	void changeParent(QWidget* newParent);
 
 Q_SIGNALS:
 	void configureAddBtn(QWidget* menu);
+	void positionChanged(ChannelsPositionEnum position);
 
 private:
 	QWidget* m_parent;
-	QWidget* m_channelsList;
-
-	ChannelsPositionEnum m_position;
+	QWidget* m_channelsWidget;
+	QPushButton* m_switchBtn;
 
 	bool m_hasAddBtn;
 	CustomPushButton* m_addChannelBtn;
+
+	ChannelsPositionEnum m_position;
+
+	QList<ChannelWidget*> m_channelsList;
 };
 } // namespace gui
 } // namespace scopy
