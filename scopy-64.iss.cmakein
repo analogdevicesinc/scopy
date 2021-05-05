@@ -21,7 +21,7 @@ AllowNoIcons=yes
 Compression=lzma
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
-DefaultDirName={#AppDev}\{#AppName}
+DefaultDirName=\{#AppDev}\{#AppName}
 DefaultGroupName={#AppName}
 AlwaysRestart=yes
 DisableDirPage=no
@@ -113,7 +113,7 @@ begin
     UninstallDriverCheckBox.Left := PageCaption.Left;
     UninstallDriverCheckBox.Width := PageCaption.Width;
     UninstallDriverCheckBox.Height := PageCaption.Height;
-    UninstallDriverCheckBox.Caption := 'Uninstall ADALM2000 drivers.';
+    UninstallDriverCheckBox.Caption := 'Uninstall ADALM2000/ADALM-PLUTO drivers.';
     UninstallProgressForm.InnerNotebook.ActivePage := UninstallPage;
 
     PageNameLabel := UninstallProgressForm.PageNameLabel.Caption;
