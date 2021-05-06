@@ -11,7 +11,7 @@ wget "https://ci.appveyor.com/api/projects/$SCOPY_MINGW_BUILD_DEPS_FORK/scopy-mi
 
 cd /c
 
-pacman -Sy --noconfirm unzip
+pacman -S --noconfirm unzip
 wget https://swdownloads.analog.com/cse/scopydeps/cv2pdb.zip
 unzip cv2pdb.zip
 #/c/cv2pdb/cv2pdb.exe
@@ -36,7 +36,7 @@ PACMAN_REPO_DEPS="
 
 PATH=/c/msys64/$MINGW_VERSION/bin:$PATH
 echo "### Installing the dependencies"
-pacman --noconfirm --needed -Sy $PACMAN_SYNC_DEPS
+pacman --noconfirm --needed -S $PACMAN_SYNC_DEPS
 pacman --noconfirm -U  $PACMAN_REPO_DEPS
 
 # Hack: Qt5Qml CMake script throws errors when loading its plugins. So let's just drop those plugins.

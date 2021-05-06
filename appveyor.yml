@@ -65,8 +65,14 @@ install:
     - cmd: choco install InnoSetup
 
 build_script:
+    # Update MSYS2 - https://www.msys2.org/docs/ci/#appveyor
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Core update (in case any core packages are outdated)
+    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syuu"  # Normal update
+
+    # Then run your code
+    - cmd: set CHERE_INVOKING='yes'  # Preserve the current working directory
+    - cmd: set MSYSTEM='MINGW64'  # Start a 64 bit Mingw environment
     - cmd: C:\msys64\usr\bin\bash -lc "/c/projects/scopy/CI/appveyor/extract_msys_deps.sh"
-    - cmd: C:\msys64\usr\bin\bash -lc "pacman --noconfirm -Syu"
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 6"
     - cmd: "%BUILD_DEPS_CMD%"
 
