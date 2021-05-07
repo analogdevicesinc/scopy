@@ -4,8 +4,8 @@
 
 using namespace scopy::gui;
 
-SpectrumAnalyzerSweepMenu::SpectrumAnalyzerSweepMenu(QWidget* parent)
-	: QWidget(parent)
+SpectrumAnalyzerSweepMenu::SpectrumAnalyzerSweepMenu(GenericMenu* parent)
+	: GenericMenu(parent)
 	, m_ui(new Ui::SpectrumAnalyzerSweepMenu)
 {
 	m_ui->setupUi(this);

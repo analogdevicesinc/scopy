@@ -28,8 +28,8 @@
 
 using namespace scopy::gui;
 
-MeasureSettings::MeasureSettings(QWidget* parent)
-	: QWidget(parent)
+MeasureSettings::MeasureSettings(GenericMenu* parent)
+	: GenericMenu(parent)
 	, m_ui(new Ui::MeasureSettings)
 	, m_channelName("")
 	, m_chnUnderlineColor()
@@ -43,9 +43,18 @@ MeasureSettings::MeasureSettings(QWidget* parent)
 	, m_enableDisplayAll(false)
 	, m_selectedChannel(-1)
 {
+	m_ui->setupUi(this);
+
+	initUi();
+
+	connect(m_ui->widgetMenuHeader->getEnableBtn(), &QPushButton::toggled,
+		[=](bool toggled) { Q_EMIT enableBtnToggled(toggled); });
+}
+
+void MeasureSettings::initUi()
+{
 	QTreeView* treeView;
 
-	m_ui->setupUi(this);
 	m_ui->hLayoutHMeasurements->addWidget(m_horizMeasurements);
 	m_ui->hLayoutVMeasurements->addWidget(m_vertMeasurements);
 
@@ -78,6 +87,8 @@ MeasureSettings::MeasureSettings(QWidget* parent)
 
 	m_ui->widgetCustomSelectionSubsSep->setLabel("CUSTOM SELECTION");
 	m_ui->widgetCustomSelectionSubsSep->setButtonVisible(false);
+
+	m_ui->widgetMenuHeader->setEnableBtnVisible(true);
 }
 
 MeasureSettings::~MeasureSettings() { delete m_ui; }
@@ -87,17 +98,15 @@ QString MeasureSettings::channelName() const { return m_channelName; }
 void MeasureSettings::setChannelName(const QString& name)
 {
 	m_channelName = name;
-	m_ui->lblChanName->setText(name);
+	m_ui->widgetMenuHeader->setLabel("Measure " + name);
 }
 
 QColor MeasureSettings::channelUnderlineColor() const { return m_chnUnderlineColor; }
 
-void MeasureSettings::setChannelUnderlineColor(const QColor& color)
+void MeasureSettings::setChannelUnderlineColor(const QColor* color)
 {
-	m_chnUnderlineColor = color;
-	QString stylesheet = QString("border: 2px solid %1;").arg(color.name());
-
-	m_ui->line->setStyleSheet(stylesheet);
+	m_chnUnderlineColor = color->name();
+	m_ui->widgetMenuHeader->setLineColor(color);
 }
 
 bool MeasureSettings::emitActivated() const { return m_emitActivated; }
@@ -117,5 +126,7 @@ QList<MeasurementItem> MeasureSettings::statisticSelection()
 
 	return statistics;
 }
+
+void MeasureSettings::setMenuButton(bool toggled) { m_ui->widgetMenuHeader->setEnabledBtnState(toggled); }
 
 void MeasureSettings::activateDisplayAll() { m_ui->btnMeasDisplayAll->setChecked(m_enableDisplayAll); }

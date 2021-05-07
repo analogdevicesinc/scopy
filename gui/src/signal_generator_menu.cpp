@@ -5,19 +5,36 @@
 
 using namespace scopy::gui;
 
-SignalGeneratorMenu::SignalGeneratorMenu(QWidget* parent)
-	: QWidget(parent)
+SignalGeneratorMenu::SignalGeneratorMenu(GenericMenu* parent)
+	: GenericMenu(parent)
 	, m_ui(new Ui::SignalGeneratorMenu)
 {
 	m_ui->setupUi(this);
 
 	initUi();
+
+	connect(m_ui->widgetMenuHeader->getEnableBtn(), &QPushButton::toggled,
+		[=](bool toggled) { Q_EMIT enableBtnToggled(toggled); });
+}
+
+SignalGeneratorMenu::SignalGeneratorMenu(const QString& menuTitle, const QColor* lineColor, GenericMenu* parent)
+	: SignalGeneratorMenu(parent)
+{
+	m_ui->widgetMenuHeader->setLabel(menuTitle);
+	m_ui->widgetMenuHeader->setLineColor(lineColor);
+
+	m_ui->tabWidget->setStyleSheet(
+		QString("QTabBar::tab:selected { border-bottom: 2px solid %1; }").arg(lineColor->name()));
 }
 
 SignalGeneratorMenu::~SignalGeneratorMenu() { delete m_ui; }
 
+void SignalGeneratorMenu::setMenuButton(bool toggled) { m_ui->widgetMenuHeader->setEnabledBtnState(toggled); }
+
 void SignalGeneratorMenu::initUi()
 {
+	m_ui->widgetMenuHeader->setEnableBtnVisible(true);
+
 	m_ui->widgetFileSubsSep->setLabel("FILE");
 	m_ui->widgetFileSubsSep->setButtonVisible(false);
 

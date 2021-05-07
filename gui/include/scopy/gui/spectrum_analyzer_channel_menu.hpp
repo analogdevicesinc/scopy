@@ -1,9 +1,8 @@
 #ifndef SPECTRUM_ANALYZER_CHANNEL_MENU_HPP
 #define SPECTRUM_ANALYZER_CHANNEL_MENU_HPP
 
-#include <QWidget>
-
 #include <scopy/gui/fft_display_plot.hpp>
+#include <scopy/gui/generic_menu.hpp>
 
 namespace Ui {
 class SpectrumAnalyzerChannelMenu;
@@ -12,7 +11,7 @@ class SpectrumAnalyzerChannelMenu;
 namespace scopy {
 namespace gui {
 
-class SpectrumAnalyzerChannelMenu : public QWidget
+class SpectrumAnalyzerChannelMenu : public GenericMenu
 {
 	Q_OBJECT
 
@@ -29,8 +28,10 @@ public:
 	};
 
 	explicit SpectrumAnalyzerChannelMenu(const QString& menuTitle = "Channel",
-					     QColor* lineColor = new QColor("#4A64FF"), QWidget* parent = nullptr);
+					     QColor* lineColor = new QColor("#4A64FF"), GenericMenu* parent = nullptr);
 	~SpectrumAnalyzerChannelMenu();
+
+	void setMenuButton(bool toggled) override;
 
 private:
 	void initUi(const QString& menuTitle, QColor* lineColor);

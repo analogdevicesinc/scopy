@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>439</width>
+    <width>410</width>
     <height>630</height>
    </rect>
   </property>
@@ -27,19 +27,19 @@
     <enum>QLayout::SetDefaultConstraint</enum>
    </property>
    <property name="leftMargin">
-    <number>0</number>
+    <number>18</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>20</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <item>
-    <widget class="scopy::gui::MenuAnim" name="menuAnim" native="true">
+    <widget class="QWidget" name="content" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -57,16 +57,16 @@
        <number>0</number>
       </property>
       <property name="leftMargin">
-       <number>20</number>
+       <number>0</number>
       </property>
       <property name="topMargin">
-       <number>25</number>
+       <number>0</number>
       </property>
       <property name="rightMargin">
-       <number>10</number>
+       <number>0</number>
       </property>
       <property name="bottomMargin">
-       <number>20</number>
+       <number>0</number>
       </property>
       <item>
        <widget class="QScrollArea" name="scrollArea">
@@ -106,7 +106,7 @@
            <x>0</x>
            <y>0</y>
            <width>314</width>
-           <height>565</height>
+           <height>580</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -137,6 +137,9 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
+          <item>
+           <widget class="scopy::gui::MenuHeader" name="widgetMenuHeader" native="true"/>
+          </item>
           <item>
            <widget class="QTabWidget" name="tabWidget">
             <property name="sizePolicy">
@@ -1000,9 +1003,9 @@ background-repeat: no-repeat;
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::gui::MenuAnim</class>
+   <class>scopy::gui::MenuHeader</class>
    <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header location="global">scopy/gui/menu_header.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

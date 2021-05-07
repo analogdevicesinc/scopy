@@ -20,9 +20,8 @@
 #ifndef MEASURE_SETTINGS_H
 #define MEASURE_SETTINGS_H
 
-#include <QWidget>
-
 #include <memory>
+#include <scopy/gui/generic_menu.hpp>
 
 namespace Ui {
 class MeasureSettings;
@@ -63,19 +62,19 @@ struct StatisticSelection
 	MeasurementItem measurementItem;
 };
 
-class MeasureSettings : public QWidget
+class MeasureSettings : public GenericMenu
 {
 	Q_OBJECT
 
 public:
-	explicit MeasureSettings(QWidget* parent = 0);
+	explicit MeasureSettings(GenericMenu* parent = 0);
 	~MeasureSettings();
 
 	QString channelName() const;
 	void setChannelName(const QString& name);
 
 	QColor channelUnderlineColor() const;
-	void setChannelUnderlineColor(const QColor& color);
+	void setChannelUnderlineColor(const QColor* color);
 
 	void setHorizMeasurementActive(int idx, bool en);
 	void setVertMeasurementActive(int idx, bool en);
@@ -91,6 +90,11 @@ public:
 
 	QList<MeasurementItem> measurementSelection();
 	QList<MeasurementItem> statisticSelection();
+
+	void setMenuButton(bool toggled) override;
+
+private:
+	void initUi();
 
 private:
 	Ui::MeasureSettings* m_ui;

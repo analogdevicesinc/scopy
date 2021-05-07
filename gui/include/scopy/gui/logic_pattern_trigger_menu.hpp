@@ -1,7 +1,7 @@
 #ifndef LOGIC_PATTERN_TRIGGER_MENU_HPP
 #define LOGIC_PATTERN_TRIGGER_MENU_HPP
 
-#include <QWidget>
+#include <scopy/gui/generic_menu.hpp>
 
 namespace Ui {
 class TriggerMenu;
@@ -10,13 +10,15 @@ class TriggerMenu;
 namespace scopy {
 namespace gui {
 
-class TriggerMenu : public QWidget
+class TriggerMenu : public GenericMenu
 {
 	Q_OBJECT
 
 public:
-	explicit TriggerMenu(QWidget* parent = nullptr);
+	explicit TriggerMenu(GenericMenu* parent = nullptr);
 	~TriggerMenu();
+
+	void setMenuButton(bool toggled) override;
 
 private:
 	void initUi();

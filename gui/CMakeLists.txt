@@ -101,6 +101,7 @@ add_library(
     src/pattern_generator_channel_menu.cpp
     src/pattern_generator_general_menu.cpp
     src/channel_manager.cpp
+    src/generic_menu.cpp
     # ui files
     ui/two_buttons_widget.ui
     ui/run_single_widget.ui
