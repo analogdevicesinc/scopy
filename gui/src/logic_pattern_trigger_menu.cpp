@@ -4,16 +4,21 @@
 
 using namespace scopy::gui;
 
-TriggerMenu::TriggerMenu(QWidget* parent)
-	: QWidget(parent)
+TriggerMenu::TriggerMenu(GenericMenu* parent)
+	: GenericMenu(parent)
 	, m_ui(new Ui::TriggerMenu)
 {
 	m_ui->setupUi(this);
 
 	initUi();
+
+	connect(m_ui->widgetMenuHeader->getEnableBtn(), &QPushButton::toggled,
+		[=](bool toggled) { Q_EMIT enableBtnToggled(toggled); });
 }
 
 TriggerMenu::~TriggerMenu() { delete m_ui; }
+
+void TriggerMenu::setMenuButton(bool toggled) { m_ui->widgetMenuHeader->setEnabledBtnState(toggled); }
 
 void TriggerMenu::initUi()
 {

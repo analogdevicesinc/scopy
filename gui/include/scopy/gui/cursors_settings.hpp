@@ -1,7 +1,7 @@
 #ifndef CURSORSSETTINGS_HPP
 #define CURSORSSETTINGS_HPP
 
-#include <QWidget>
+#include <scopy/gui/generic_menu.hpp>
 
 namespace Ui {
 class CursorsSettings;
@@ -10,18 +10,20 @@ class CursorsSettings;
 namespace scopy {
 namespace gui {
 
-class CursorsSettings : public QWidget
+class CursorsSettings : public GenericMenu
 {
 	Q_OBJECT
 
 public:
-	explicit CursorsSettings(QWidget* parent = nullptr);
+	explicit CursorsSettings(GenericMenu* parent = nullptr);
 	~CursorsSettings();
 
 	void setBtnNormalTrackVisible(bool visible);
 	void setHorizontalVisible(bool visible);
 	void setVerticalVisible(bool visible);
 	void setCursorReadoutsVisible(bool visible);
+
+	void setMenuButton(bool toggled) override;
 
 private:
 	void initUi();

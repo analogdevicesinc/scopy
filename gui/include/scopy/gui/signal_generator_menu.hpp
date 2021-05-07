@@ -1,7 +1,7 @@
 #ifndef SIGNAL_GENERATOR_MENU_HPP
 #define SIGNAL_GENERATOR_MENU_HPP
 
-#include <QWidget>
+#include <scopy/gui/generic_menu.hpp>
 
 namespace Ui {
 class SignalGeneratorMenu;
@@ -14,13 +14,16 @@ class PhaseSpinButton;
 class PositionSpinButton;
 class ScaleSpinButton;
 
-class SignalGeneratorMenu : public QWidget
+class SignalGeneratorMenu : public GenericMenu
 {
 	Q_OBJECT
 
 public:
-	explicit SignalGeneratorMenu(QWidget* parent = nullptr);
+	explicit SignalGeneratorMenu(GenericMenu* parent = nullptr);
+	explicit SignalGeneratorMenu(const QString& menuTitle, const QColor* lineColor, GenericMenu* parent = nullptr);
 	~SignalGeneratorMenu();
+
+	void setMenuButton(bool toggled) override;
 
 private:
 	void initUi();

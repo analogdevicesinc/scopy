@@ -1,9 +1,8 @@
 #ifndef SPECTRUM_ANALYZER_SWEEP_MENU_HPP
 #define SPECTRUM_ANALYZER_SWEEP_MENU_HPP
 
-#include <QWidget>
-
 #include <scopy/gui/fft_display_plot.hpp>
+#include <scopy/gui/generic_menu.hpp>
 #include <scopy/gui/spinbox_a.hpp>
 #include <scopy/gui/start_stop_range_widget.hpp>
 
@@ -14,13 +13,15 @@ class SpectrumAnalyzerSweepMenu;
 namespace scopy {
 namespace gui {
 
-class SpectrumAnalyzerSweepMenu : public QWidget
+class SpectrumAnalyzerSweepMenu : public GenericMenu
 {
 	Q_OBJECT
 
 public:
-	explicit SpectrumAnalyzerSweepMenu(QWidget* parent = nullptr);
+	explicit SpectrumAnalyzerSweepMenu(GenericMenu* parent = nullptr);
 	~SpectrumAnalyzerSweepMenu();
+
+	void setMenuButton(bool toggled) override{};
 
 private:
 	void initUi();

@@ -4,8 +4,8 @@
 
 using namespace scopy::gui;
 
-SpectrumAnalyzerMarkersMenu::SpectrumAnalyzerMarkersMenu(QWidget* parent)
-	: QWidget(parent)
+SpectrumAnalyzerMarkersMenu::SpectrumAnalyzerMarkersMenu(GenericMenu* parent)
+	: GenericMenu(parent)
 	, m_ui(new Ui::SpectrumAnalyzerMarkersMenu)
 	, m_markerSelector(new DbClickButtons(this))
 {
