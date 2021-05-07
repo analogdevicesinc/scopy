@@ -670,6 +670,13 @@ int ScaleSpinButton::getIntegerDivider()
 
 void ScaleSpinButton::setValue(double newVal)
 {
+	if(newVal > m_max_value) {
+		newVal = m_max_value;
+	}
+	if(newVal < m_min_value) {
+		newVal = m_min_value;
+	}
+
 	if(integer_divider)
 	{
 		integer_step = round(integer_divider / newVal);
