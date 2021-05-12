@@ -10,7 +10,7 @@ class GenericMenu : public QWidget
 public:
 	explicit GenericMenu(QWidget* parent = nullptr);
 
-	virtual void setMenuButton(bool toggled) = 0;
+	virtual void setMenuButton(bool toggled){};
 
 Q_SIGNALS:
 	void enableBtnToggled(bool toggled);

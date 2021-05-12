@@ -2,6 +2,7 @@
 #define TOOL_VIEW_HPP
 
 #include <QButtonGroup>
+#include <QDockWidget>
 #include <QMap>
 #include <QQueue>
 #include <QStackedWidget>
@@ -11,6 +12,7 @@
 #include <scopy/gui/channel_widget.hpp>
 #include <scopy/gui/custom_menu_button.hpp>
 #include <scopy/gui/custom_push_button.hpp>
+#include <scopy/gui/generic_menu.hpp>
 #include <scopy/gui/linked_button.hpp>
 
 namespace Ui {
@@ -52,6 +54,7 @@ public:
 	void addBottomExtraWidget(QWidget* widget);
 
 	QWidget* getCentralWidget();
+	QStackedWidget* getStackedWidget();
 
 	CustomPushButton* getGeneralSettingsBtn();
 	QPushButton* getSettingsBtn();
@@ -59,28 +62,31 @@ public:
 
 	void setInstrumentNotesVisible(bool visible);
 
-	void setFixedMenu(QWidget* menu);
-	void setGeneralSettingsMenu(QWidget* menu);
+	void setFixedMenu(QWidget* menu, bool dockable);
+	void setGeneralSettingsMenu(QWidget* menu, bool dockable);
 
-	ChannelWidget* buildNewChannel(ChannelManager* channelManager, QWidget* menu, int chId, bool deletable,
-				       bool simplified, QColor color, const QString& fullName,
+	ChannelWidget* buildNewChannel(ChannelManager* channelManager, GenericMenu* menu, bool dockable, int chId,
+				       bool deletable, bool simplified, QColor color, const QString& fullName,
 				       const QString& shortName);
-	void buildNewInstrumentMenu(QWidget* menu, const QString& name, bool checkBoxVisible = false,
+	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
 
 private:
-	void configurePairSettings();
+	void configureLastOpenedMenu();
 	void buildChannelsContainer(ChannelManager* channelManager, ChannelsPositionEnum position);
 	void toggleRightMenu(CustomPushButton* btn, bool checked);
 	void settingsPanelUpdate(int id);
 	void rightMenuFinished(bool opened);
+	QDockWidget* createDetachableMenu(QWidget* menu, int& id);
 
 public Q_SLOTS:
 	void triggerRightMenuToggle(bool checked);
-	void configureAddMathBtn(QWidget* menu);
+	void configureAddMathBtn(QWidget* menu, bool dockable);
 
 Q_SIGNALS:
 	void changeParent(QWidget* newParent);
+	void channelDisabled(bool disabled);
+	void instrumentMenuDisabled(bool disabled);
 
 private:
 	Ui::ToolView* m_ui;
@@ -90,6 +96,8 @@ private:
 
 	QQueue<QPair<CustomPushButton*, bool>> m_menuButtonActions;
 	QList<CustomPushButton*> m_menuOrder;
+
+	int m_generalSettingsMenuId;
 };
 } // namespace gui
 } // namespace scopy

@@ -26,7 +26,7 @@ public:
 	~ChannelManager();
 
 	void build(QWidget* parent);
-	void insertAddBtn(QWidget* menu);
+	void insertAddBtn(QWidget* menu, bool dockable);
 
 	ChannelWidget* buildNewChannel(int chId, bool deletable, bool simplefied, QColor color, const QString& fullName,
 				       const QString& shortName);
@@ -40,7 +40,7 @@ public Q_SLOTS:
 	void changeParent(QWidget* newParent);
 
 Q_SIGNALS:
-	void configureAddBtn(QWidget* menu);
+	void configureAddBtn(QWidget* menu, bool dockable);
 	void positionChanged(ChannelsPositionEnum position);
 
 private:

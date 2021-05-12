@@ -123,7 +123,7 @@ QList<ChannelWidget*> ChannelManager::getEnabledChannels()
 	return lst;
 }
 
-void ChannelManager::insertAddBtn(QWidget* menu)
+void ChannelManager::insertAddBtn(QWidget* menu, bool dockable)
 {
 	m_hasAddBtn = true;
 
@@ -136,5 +136,5 @@ void ChannelManager::insertAddBtn(QWidget* menu)
 
 	m_parent->layout()->addWidget(m_addChannelBtn);
 
-	Q_EMIT(configureAddBtn(menu));
+	Q_EMIT(configureAddBtn(menu, dockable));
 }
