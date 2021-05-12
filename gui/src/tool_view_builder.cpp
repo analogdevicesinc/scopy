@@ -36,7 +36,7 @@ ToolViewBuilder::ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* c
 
 	if (recipe.hasPairSettingsBtn) {
 		m_toolView->setPairSettingsVisible(true);
-		m_toolView->configurePairSettings();
+		m_toolView->configureLastOpenedMenu();
 	}
 
 	if (recipe.hasChannels) {

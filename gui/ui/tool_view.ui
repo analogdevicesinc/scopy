@@ -378,9 +378,8 @@
                 </size>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>-1</number>
                </property>
-               <widget class="QWidget" name="widgetGeneralMenu"/>
               </widget>
              </item>
             </layout>
@@ -406,7 +405,7 @@
           <widget class="QWidget" name="widgetHorizontalChannelsContainer" native="true">
            <layout class="QHBoxLayout" name="hLayoutChannelList">
             <property name="spacing">
-             <number>0</number>
+             <number>6</number>
             </property>
             <property name="leftMargin">
              <number>0</number>

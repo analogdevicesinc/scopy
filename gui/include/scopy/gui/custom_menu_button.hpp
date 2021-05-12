@@ -31,12 +31,15 @@ public:
 	QCheckBox* getCheckBox();
 	bool getCheckBoxState();
 	void setCheckBoxState(bool checked);
+	void setMenuFloating(bool floating);
 
 public Q_SLOTS:
 	void checkBoxToggled(bool toggled);
 
 private:
 	Ui::CustomMenuButton* m_ui;
+
+	bool m_floatingMenu;
 };
 } // namespace gui
 } // namespace scopy

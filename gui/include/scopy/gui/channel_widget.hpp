@@ -64,8 +64,14 @@ public:
 	bool isReferenceChannel() const;
 	void setReferenceChannel(const bool&);
 
+	void setMenuFloating(bool floating);
+
 protected:
 	bool eventFilter(QObject* object, QEvent* event) override;
+
+private:
+	void init();
+	void setButtonNoGroup(QAbstractButton* btn);
 
 Q_SIGNALS:
 	void enabled(bool en);
@@ -95,8 +101,7 @@ private:
 	bool m_ref;
 	QString m_stylesheet;
 
-	void init();
-	void setButtonNoGroup(QAbstractButton* btn);
+	bool m_floatingMenu;
 };
 
 } // namespace gui

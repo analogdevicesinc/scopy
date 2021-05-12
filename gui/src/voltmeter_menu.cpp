@@ -49,6 +49,8 @@ void VoltmeterMenu::initUi()
 
 	m_dataLoggingTimer->setValue(0);
 	enableDataLogging(false);
+
+	connect(m_ui->btnDataLogging, &CustomSwitch::toggled, [=](bool toggled) { enableDataLogging(toggled); });
 }
 
 void VoltmeterMenu::enableDataLogging(bool en)

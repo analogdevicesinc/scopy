@@ -21,8 +21,6 @@ public:
 	explicit SpectrumAnalyzerMarkersMenu(GenericMenu* parent = nullptr);
 	~SpectrumAnalyzerMarkersMenu();
 
-	void setMenuButton(bool toggled) override{};
-
 private:
 	void initUi();
 

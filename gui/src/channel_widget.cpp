@@ -46,6 +46,7 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor col
 	, m_math(false)
 	, m_function("")
 	, m_ref(false)
+	, m_floatingMenu(false)
 {
 	init();
 	nameButton()->installEventFilter(this);
@@ -148,6 +149,8 @@ bool ChannelWidget::isReferenceChannel() const { return m_ref; }
 
 void ChannelWidget::setReferenceChannel(const bool& ref) { m_ref = ref; }
 
+void ChannelWidget::setMenuFloating(bool floating) { m_floatingMenu = floating; }
+
 bool ChannelWidget::eventFilter(QObject* object, QEvent* event)
 {
 	if (event->type() == QEvent::MouseButtonPress) {
@@ -155,14 +158,20 @@ bool ChannelWidget::eventFilter(QObject* object, QEvent* event)
 			m_ui->checkBox->setChecked(true);
 			m_ui->btnName->setChecked(true);
 		} else if (!m_ui->btn->isChecked() && m_ui->btnName->isChecked()) {
-			m_ui->btn->setChecked(true);
+			// If its menu is floating, keep btn disabled
+			if (!m_floatingMenu) {
+				m_ui->btn->setChecked(true);
+			}
 		}
 	} else if (event->type() == QEvent::MouseButtonDblClick) {
 		if (!m_ui->checkBox->isChecked()) {
 			m_ui->checkBox->setChecked(true);
 			m_ui->btnName->setChecked(true);
 		}
-		m_ui->btn->setChecked(true);
+		// If its menu is floating, keep btn disabled
+		if (!m_floatingMenu) {
+			m_ui->btn->setChecked(true);
+		}
 	}
 
 	return QObject::eventFilter(object, event);
@@ -171,12 +180,18 @@ bool ChannelWidget::eventFilter(QObject* object, QEvent* event)
 void ChannelWidget::on_checkBox_toggled(bool checked)
 {
 	if (checked) {
-		if (!m_simplified)
+		if (!m_simplified) {
 			m_ui->btnName->setEnabled(true);
-		m_ui->btn->setEnabled(true);
-		// When enabling ChannelWidget select it as well
-		if (!m_simplified)
+
+			// When enabling ChannelWidget select it as well
 			m_ui->btnName->setChecked(true);
+		}
+		// If its menu is floating, keep btn disabled
+		if (!m_floatingMenu) {
+			m_ui->btn->setEnabled(true);
+		} else {
+			m_ui->btn->setEnabled(false);
+		}
 
 	} else {
 		// Unselect the ChannelWidget when it's about to be disabled
