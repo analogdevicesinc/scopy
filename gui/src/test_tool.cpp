@@ -63,6 +63,17 @@ TestTool::TestTool()
 	m_toolView->buildNewChannel(channelManager, ch1Menu, true, 0, false, false, QColor("#FF7200"), "Channel", "CH");
 	m_toolView->buildNewChannel(channelManager, ch2Menu, true, 1, false, false, QColor("#9013FE"), "Channel", "CH");
 	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 0, true, false, QColor("green"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 1, true, false, QColor("pink"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 2, true, false, QColor("red"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 3, true, false, QColor("blue"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 4, true, false, QColor("purple"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 5, true, false, QColor("yellow"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 6, true, false, QColor("aqua"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 7, true, false, QColor("orange"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 8, true, false, QColor("white"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 9, true, false, QColor("blue"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 10, true, false, QColor("magenta"), "Math", "M");
+	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 11, true, false, QColor("green"), "Math", "M");
 
 	channelManager->insertAddBtn(new SpectrumAnalyzerAddReferenceMenu, true);
 

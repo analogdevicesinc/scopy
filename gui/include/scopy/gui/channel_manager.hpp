@@ -1,6 +1,7 @@
 #ifndef CHANNEL_MANAGER_HPP
 #define CHANNEL_MANAGER_HPP
 
+#include <QScrollArea>
 #include <QStackedWidget>
 #include <QWidget>
 
@@ -45,6 +46,7 @@ Q_SIGNALS:
 
 private:
 	QWidget* m_parent;
+	QScrollArea* m_scrollArea;
 	QWidget* m_channelsWidget;
 	QPushButton* m_switchBtn;
 
