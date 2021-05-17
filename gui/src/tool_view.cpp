@@ -127,7 +127,7 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 	connect(this, &ToolView::changeParent, cm, &ChannelManager::changeParent);
 	connect(cm, &ChannelManager::positionChanged, this, [=](ChannelsPositionEnum position) {
 		if (position == ChannelsPositionEnum::VERTICAL) {
-			m_ui->widgetHorizontalChannelsContainer->setVisible(false);
+			m_ui->widgetHorizontalChannels->setVisible(false);
 			m_ui->widgetVerticalChannels->setVisible(true);
 
 			if (!m_ui->widgetMenuBtns->isVisible()) {
@@ -138,7 +138,7 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 		} else {
 			m_ui->widgetVerticalChannels->setVisible(false);
 			m_ui->widgetFooter->setVisible(true);
-			m_ui->widgetHorizontalChannelsContainer->setVisible(true);
+			m_ui->widgetHorizontalChannels->setVisible(true);
 
 			Q_EMIT changeParent(m_ui->widgetHorizontalChannelsContainer);
 		}
