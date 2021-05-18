@@ -35,6 +35,8 @@ public:
 
 	void setLabelVisible(bool visible);
 	void setLineVisible(bool visible);
+
+	void setContent(QWidget* content);
 };
 } // namespace gui
 } // namespace scopy

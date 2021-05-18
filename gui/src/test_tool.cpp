@@ -19,6 +19,7 @@
 #include <scopy/gui/spectrum_analyzer_general_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_markers_menu.hpp>
 #include <scopy/gui/spectrum_analyzer_sweep_menu.hpp>
+#include <scopy/gui/test_menu.hpp>
 #include <scopy/gui/test_tool.hpp>
 #include <scopy/gui/voltmeter_menu.hpp>
 
@@ -48,6 +49,8 @@ TestTool::TestTool()
 	m_toolView->buildNewInstrumentMenu(new SpectrumAnalyzerSweepMenu, true, "Sweep");
 	m_toolView->buildNewInstrumentMenu(new SpectrumAnalyzerMarkersMenu, true, "Markers");
 
+	m_toolView->buildNewInstrumentMenu(new TestMenu, true, "Interactive");
+
 	//	MeasureSettings* measureMenu = new MeasureSettings;
 	//	measureMenu->setChannelName("Channel 1");
 	//	measureMenu->setChannelUnderlineColor(new QColor("#FF7200"));
@@ -76,8 +79,6 @@ TestTool::TestTool()
 	m_toolView->buildNewChannel(channelManager, ch3Menu, true, 11, true, false, QColor("green"), "Math", "M");
 
 	channelManager->insertAddBtn(new SpectrumAnalyzerAddReferenceMenu, true);
-
-	//	m_toolView->setFixedMenu(new VoltmeterMenu(m_toolView->getStackedWidget()), true);
 }
 
 ToolView* TestTool::getToolView() { return m_toolView; }

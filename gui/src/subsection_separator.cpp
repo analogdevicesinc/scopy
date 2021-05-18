@@ -12,16 +12,14 @@ SubsectionSeparator::SubsectionSeparator(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
+	m_ui->widgetSubsectionContent->setVisible(false);
 	connect(m_ui->btnSubsectionSeparator, &QPushButton::toggled,
 		[=](bool toggled) { m_ui->widgetSubsectionContent->setVisible(toggled); });
 }
 
 SubsectionSeparator::SubsectionSeparator(const QString& text, const bool buttonVisible, QWidget* parent)
-	: QWidget(parent)
-	, m_ui(new Ui::SubsectionSeparator)
+	: SubsectionSeparator(parent)
 {
-	m_ui->setupUi(this);
-
 	setLabel(text);
 	setButtonVisible(buttonVisible);
 }
@@ -46,3 +44,5 @@ void SubsectionSeparator::setLabel(const QString& text) { m_ui->lblSubsectionSep
 void SubsectionSeparator::setLabelVisible(bool visible) { m_ui->lblSubsectionSeparator->setVisible(visible); }
 
 void SubsectionSeparator::setLineVisible(bool visible) { m_ui->lineSubsectionSeparator->setVisible(visible); }
+
+void SubsectionSeparator::setContent(QWidget* content) { m_ui->vLayoutContent->addWidget(content); }

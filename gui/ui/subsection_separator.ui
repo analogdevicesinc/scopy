@@ -97,7 +97,25 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="widgetSubsectionContent" native="true"/>
+    <widget class="QWidget" name="widgetSubsectionContent" native="true">
+     <layout class="QVBoxLayout" name="vLayoutContent">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
    </item>
   </layout>
  </widget>
