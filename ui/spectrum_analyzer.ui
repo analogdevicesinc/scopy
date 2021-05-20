@@ -1027,7 +1027,7 @@ min-width: 64px;
                     <x>0</x>
                     <y>0</y>
                     <width>298</width>
-                    <height>523</height>
+                    <height>428</height>
                    </rect>
                   </property>
                   <property name="sizePolicy">
@@ -1533,7 +1533,7 @@ color: rgba(255,255,255,51);
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>284</width>
+                    <width>268</width>
                     <height>547</height>
                    </rect>
                   </property>
@@ -2277,23 +2277,7 @@ border-width: 0px;
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-}
-
-QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton {
+           <string notr="true">QPushButton {
   width: 40px;
   height: 20px;
   background-color: transparent;
@@ -2323,6 +2307,22 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
               <bool>true</bool>
              </property>
             </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_15">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>10</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item>
             <widget class="QLabel" name="label_2">
@@ -2392,31 +2392,26 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>linked_button.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -2426,9 +2421,14 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
+   <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
+   <header>customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::MarkerTable</class>
