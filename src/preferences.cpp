@@ -74,6 +74,11 @@ Preferences::Preferences(QWidget *parent) :
 {
 	ui->setupUi(this);
 
+	/** Will still be available to use for development purposes.
+	 *  For now, no longer exposed to the users.**/
+	ui->debugMessagesCheckbox->setVisible(false);
+	ui->debugMessagesLbl->setVisible(false);
+
 	connect(ui->doubleClickCheckBox, &QCheckBox::stateChanged, [=](int state){
 		double_click_to_detach = (!state ? false : true);
 		Q_EMIT notify();
