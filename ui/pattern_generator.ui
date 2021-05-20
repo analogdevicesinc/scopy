@@ -1606,25 +1606,7 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-
-color: rgba(255, 255, 255, 153);
-}
-
-QCheckBox::indicator {
-width: 14px;
-  height: 14px;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
-}
-QCheckBox::indicator:unchecked { background-color: transparent; }
-QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-
-QPushButton {
+           <string notr="true">QPushButton {
 width: 40px;
   height: 20px;
   background-color: transparent;

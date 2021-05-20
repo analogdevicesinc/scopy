@@ -2060,7 +2060,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	resizeTabWidget((int)ptr->type);
 
 	ui->tabWidget->setStyleSheet(QString("QTabBar::tab:selected { border-bottom: 2px solid %1; }")
-				     .arg(plot->getLineColor(chIdx).name()));
+				     .arg(m_plot->getLineColor(chIdx).name()));
 }
 
 void SignalGenerator::updateAndToggleMenu(int chIdx, bool open)
