@@ -1592,40 +1592,6 @@ color: white;
                   </layout>
                  </item>
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_26">
-                   <property name="topMargin">
-                    <number>0</number>
-                   </property>
-                   <item>
-                    <widget class="QCheckBox" name="debugMessagesCheckbox">
-                     <property name="text">
-                      <string/>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <widget class="QLabel" name="label_25">
-                     <property name="text">
-                      <string>Enable Debug Messages (Only for Debugging, Bugreporting)</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item>
-                    <spacer name="horizontalSpacer_20">
-                     <property name="orientation">
-                      <enum>Qt::Horizontal</enum>
-                     </property>
-                     <property name="sizeHint" stdset="0">
-                      <size>
-                       <width>40</width>
-                       <height>20</height>
-                      </size>
-                     </property>
-                    </spacer>
-                   </item>
-                  </layout>
-                 </item>
-                 <item>
                   <layout class="QVBoxLayout" name="verticalLayout_10">
                    <item>
                     <layout class="QHBoxLayout" name="horizontalLayout_34">
@@ -1691,6 +1657,40 @@ color: white;
                    </item>
                    <item>
                     <spacer name="horizontalSpacer_21">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </item>
+                 <item>
+                  <layout class="QHBoxLayout" name="horizontalLayout_26">
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <widget class="QCheckBox" name="debugMessagesCheckbox">
+                     <property name="text">
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="debugMessagesLbl">
+                     <property name="text">
+                      <string>Enable Debug Messages (Only for Debugging, Bugreporting)</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_20">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
                      </property>
