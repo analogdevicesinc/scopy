@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIBIIO_BRANCH=master
+LIBIIO_VERSION=v0.21
 LIBAD9361_BRANCH=master
 LIBM2K_BRANCH=master
 GRIIO_BRANCH=upgrade-3.8
@@ -65,10 +65,12 @@ QMAKE="$(command -v qmake)"
 CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
 
 build_libiio() {
-	echo "### Building libiio - branch $LIBIIO_BRANCH"
+	echo "### Building libiio - version $LIBIIO_VERSION"
 
 	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_BRANCH ${WORKDIR}/libiio
+	git clone https://github.com/analogdevicesinc/libiio.git ${WORKDIR}/libiio
+	cd ${WORKDIR}/libiio
+	git checkout $LIBIIO_VERSION
 
 	mkdir ${WORKDIR}/libiio/build-${ARCH}
 	cd ${WORKDIR}/libiio/build-${ARCH}
