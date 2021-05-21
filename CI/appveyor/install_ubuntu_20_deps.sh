@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIBIIO_BRANCH=master
+LIBIIO_VERSION=v0.21
 LIBAD9361_BRANCH=master
 GLOG_BRANCH=v0.4.0
 LIBM2K_BRANCH=master
@@ -36,10 +36,12 @@ install_apt() {
 }
 
 build_libiio() {
-	echo "### Building libiio - branch $LIBIIO_BRANCH"
+	echo "### Building libiio - version $LIBIIO_VERSION"
 
 	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_BRANCH ${WORKDIR}/libiio
+	git clone https://github.com/analogdevicesinc/libiio.git ${WORKDIR}/libiio
+	cd ${WORKDIR}/libiio
+	git checkout $LIBIIO_VERSION
 
 	mkdir ${WORKDIR}/libiio/build-${ARCH}
 	cd ${WORKDIR}/libiio/build-${ARCH}
