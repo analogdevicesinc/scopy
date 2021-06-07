@@ -79,7 +79,52 @@ else()
 
 endif()
 
+FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/translations/*.ts)
+set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR})
+
+find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
+
+# Generate .qm files from the .ts files
+qt5_add_translation(QM_FILES ${TS_FILES})
+
+set(TRANSLATIONS)
+foreach(file ${TS_FILES})
+	get_filename_component(file_name ${file} NAME_WE)
+	set(TRANSLATIONS "${TRANSLATIONS}\n<file>${file_name}.qm</file>")
+endforeach()
+
+configure_file(${CMAKE_SOURCE_DIR}/gui/resources/translations.qrc
+	${CMAKE_BINARY_DIR}/gui/translations.qrc
+	@ONLY)
+
+qt5_add_resources(TRANSLATION_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
+
 configure_file(
     config.h.cmakein
     ${CMAKE_CURRENT_SOURCE_DIR}/core/include/scopy/core/config.hpp @ONLY
 )
+
+if (WIN32)
+	set(RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resources/properties.rc)
+	configure_file(properties.rc.cmakein ${RESOURCES} @ONLY)
+endif()
+
+# TODO: Pack these in a GLOB and run foreach
+configure_file(gui/resources/html-pages/buildinfo.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/buildinfo.html)
+configure_file(gui/resources/html-pages/scopy_osp.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy_osp.html)
+configure_file(gui/resources/html-pages/credits.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/credits.html)
+configure_file(gui/resources/html-pages/about.html.cmakein ${CMAKE_CURRENT_BINARY_DIR}/about.html)
+
+SET(ABOUT_HTML_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/resources/html-pages/buildinfo.html ${CMAKE_CURRENT_BINARY_DIR}/resources/scopy_osp.html ${CMAKE_CURRENT_BINARY_DIR}/resources/credits.html ${CMAKE_CURRENT_BINARY_DIR}/resources/about.html)
+
+set(ABOUT_HTML_QRC_SOURCES)
+foreach(file ${ABOUT_HTML_SOURCES})
+	get_filename_component(file_name ${file} NAME)
+	set(ABOUT_HTML_QRC_SOURCES "${ABOUT_HTML_QRC_SOURCES}\n<file>${file_name}</file>")
+endforeach()
+
+configure_file(${CMAKE_SOURCE_DIR}/gui/resources/aboutpage.qrc
+	${CMAKE_BINARY_DIR}/aboutpage.qrc
+	@ONLY)
+
+qt5_add_resources(ABOUT_PAGE_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/aboutpage.qrc)
