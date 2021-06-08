@@ -12,7 +12,7 @@ GRM2K_BRANCH=master
 QWT_BRANCH=qwt-6.1-multiaxes
 QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
-LIBSIGROKDECODE_BRANCH=master #not used
+LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
 
 set -e
@@ -199,15 +199,13 @@ build_libsigrok() {
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 
-	mkdir -p ${WORKDIR}/libsigrokdecode/build-${ARCH}
+	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
+
 	cd ${WORKDIR}/libsigrokdecode
 
-	wget http://sigrok.org/download/source/libsigrokdecode/libsigrokdecode-0.5.3.tar.gz -O- \
-		| tar xz --strip-components=1 -C ${WORKDIR}/libsigrokdecode
-
-#	cd build-${ARCH}
-
+	./autogen.sh
 	./configure
+
 	sudo make $JOBS install
 	#DESTDIR=${WORKDIR} make $JOBS install
 }
