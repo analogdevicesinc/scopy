@@ -85,6 +85,7 @@ private:
     std::atomic<bool> m_decodeCanceled;
     std::mutex m_newDataMutex;
     std::condition_variable m_newDataCv;
+    static std::mutex g_sessionMutex;
     std::queue<std::pair<uint64_t, uint64_t>> m_newDataQueue;
     void initDecoderChannels();
 };

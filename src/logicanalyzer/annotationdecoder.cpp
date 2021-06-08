@@ -29,6 +29,8 @@ using namespace adiscope;
 
 constexpr uint64_t MAX_CHUNK_SIZE = 256 * 1024;
 
+std::mutex AnnotationDecoder::g_sessionMutex;
+
 void AnnotationDecoder::initDecoderChannels()
 {
     uint16_t id = 0;
@@ -243,6 +245,8 @@ void AnnotationDecoder::stopDecode()
         m_decodeThread = nullptr;
     }
 
+    std::lock_guard<std::mutex> srd_lock(g_sessionMutex);
+
     if (m_srdSession) {
         srd_session_destroy(m_srdSession);
         m_srdSession = nullptr;
@@ -371,6 +375,8 @@ void AnnotationDecoder::stackChanged()
 {
     stopDecode();
 
+    std::lock_guard<std::mutex> srd_lock(g_sessionMutex);
+
     if (srd_session_new(&m_srdSession) != SRD_OK) {
         qDebug() << "srd_session_new returned error!";
     } else {
@@ -495,6 +501,7 @@ void AnnotationDecoder::decodeProc()
         memcpy(chunk.get(), data + start, chunkSize * sizeof(uint16_t));
 
 //        qDebug() << "send data!";
+        std::lock_guard<std::mutex> srd_lock(g_sessionMutex);
 
         if (srd_session_send(m_srdSession, start, stop, reinterpret_cast<uint8_t*>(
                                  chunk.get()), chunkSize, sizeof(uint16_t)) != SRD_OK) {
