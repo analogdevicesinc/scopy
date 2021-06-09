@@ -37,9 +37,6 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 			io_signature::make(1, 1, sizeof(gr_complex))),
 	d_complex(use_complex)
 {
-	auto s2v = blocks::stream_to_vector::make(
-			use_complex ? sizeof(gr_complex) : sizeof(float),
-			fft_size);
 	auto v2s = blocks::vector_to_stream::make(sizeof(gr_complex), fft_size);
 
 	d_s2v_overlap = adiscope::stream_to_vector_overlap::make(

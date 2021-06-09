@@ -64,10 +64,10 @@ stream_to_vector_overlap_impl::stream_to_vector_overlap_impl(size_t itemsize,
 			 io_signature::make(1, 1, itemsize * nitems_per_block),
 			 nitems_per_block),
 	  m_overlap_factor(overlap_factor),
-	  m_nitems_per_block(nitems_per_block),
-	  m_itemsize(itemsize)
+	  m_itemsize(itemsize),
+	  m_nitems_per_block(nitems_per_block)
 {
-	m_nb_overlapped_items = nitems_per_block * m_overlap_factor;
+	m_nb_overlapped_items = (size_t)(nitems_per_block * m_overlap_factor);
 }
 
 int stream_to_vector_overlap_impl::work(int noutput_items,
@@ -81,8 +81,8 @@ int stream_to_vector_overlap_impl::work(int noutput_items,
 	const char* in = (const char*)input_items[0];
 	char* out = (char*)output_items[0];
 
-	unsigned int src_index = 0;
-	while (src_index + block_size < nb_input_items) {
+	size_t src_index = 0;
+	while (src_index + block_size <= nb_input_items) {
 		memcpy(out + nb_total_copied_items, in + src_index, block_size);
 		nb_total_copied_items += block_size;
 		src_index = src_index + block_size - overlap_size;
