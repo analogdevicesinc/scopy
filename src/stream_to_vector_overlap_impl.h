@@ -60,7 +60,7 @@ public:
 
 private:
 	double m_overlap_factor;
-	unsigned int m_nb_overlapped_items;
+	size_t m_nb_overlapped_items;
 	size_t m_itemsize;
 	size_t m_nitems_per_block;
 };
