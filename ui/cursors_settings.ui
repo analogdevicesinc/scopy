@@ -21,7 +21,7 @@
     <number>18</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>5</number>
    </property>
    <property name="rightMargin">
     <number>18</number>
@@ -55,7 +55,7 @@
         <x>0</x>
         <y>0</y>
         <width>278</width>
-        <height>603</height>
+        <height>598</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -85,7 +85,7 @@
          </property>
          <property name="maximumSize">
           <size>
-           <width>240</width>
+           <width>280</width>
            <height>2</height>
           </size>
          </property>
@@ -124,11 +124,20 @@
          <item>
           <widget class="QWidget" name="widgteBtnNormalTrack" native="true">
            <layout class="QVBoxLayout" name="verticalLayout_6">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
             <property name="topMargin">
-             <number>10</number>
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
             </property>
             <property name="bottomMargin">
-             <number>10</number>
+             <number>0</number>
             </property>
             <item>
              <spacer name="verticalSpacer_3">
@@ -385,7 +394,19 @@ color: rgba(255,255,255,51);
        <item>
         <widget class="QWidget" name="widgetVertical" native="true">
          <layout class="QGridLayout" name="gridLayout_2">
-          <property name="horizontalSpacing">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
            <number>0</number>
           </property>
           <item row="0" column="0" colspan="2">
@@ -466,6 +487,15 @@ color: rgba(255,255,255,51);
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="spacing">
            <number>10</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
           </property>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
