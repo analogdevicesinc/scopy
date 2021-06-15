@@ -229,7 +229,7 @@ EOF
 }
 
 patch_qwtpolar() {
-	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
+	patch -p1 <  ${WORKDIR}/projects/scopy/ci/appveyor/patches/qwtpolar-qwt-qt-compat.patch
 
 	patch -p1 <<-EOF
 --- a/qwtpolarconfig.pri

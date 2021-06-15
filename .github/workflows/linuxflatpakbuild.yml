@@ -16,7 +16,7 @@ jobs:
             docker run --privileged \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
-                adisuciu/scopy-flatpak-ubuntu20:latest /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
+                adisuciu/scopy-flatpak-ubuntu20:latest /bin/bash -xe $GITHUB_WORKSPACE/ci/appveyor/inside_flatpak_docker.sh
     - uses: actions/upload-artifact@v2
       with:
         name: Scopy.flatpak

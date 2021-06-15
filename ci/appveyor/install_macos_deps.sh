@@ -49,7 +49,7 @@ done
 pip3 install mako six
 
 pwd
-source ./projects/scopy/CI/appveyor/before_install_lib.sh
+source ./projects/scopy/ci/appveyor/before_install_lib.sh
 
 QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
 
@@ -144,7 +144,7 @@ build_boost() {
 	wget https://boostorg.jfrog.io/artifactory/main/release/$BOOST_VERSION/source/boost_$BOOST_VERSION_FILE.tar.gz
 	tar -xzf boost_$BOOST_VERSION_FILE.tar.gz
 	cd boost_$BOOST_VERSION_FILE
-	patch -p1 <  ${WORKDIR}/projects/scopy/CI/appveyor/patches/boost-darwin.patch
+	patch -p1 <  ${WORKDIR}/projects/scopy/ci/appveyor/patches/boost-darwin.patch
 	./bootstrap.sh --with-libraries=atomic,date_time,filesystem,program_options,system,chrono,thread,regex,test
 	./b2
 	./b2 install

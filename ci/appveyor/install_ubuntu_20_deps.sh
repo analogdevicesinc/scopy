@@ -30,18 +30,9 @@ cd ~
 WORKDIR=${PWD}
 
 install_apt() {
-	sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
-	sudo apt-get update
 
-	curl -fsSL -o doxygen.tar.gz "https://phoenixnap.dl.sourceforge.net/project/doxygen/rel-1.8.17/doxygen-1.8.17.linux.bin.tar.gz"
-	tar -xzf doxygen.tar.gz
-	sudo cp -a doxygen-1.8.17/bin/doxy* /usr/local/bin
-	doxygen --version
+	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev gnuradio libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev
 
-	sudo apt-get -y install build-essential libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev
-
-	sudo apt-get -y update
-	sudo apt-get -y install gnuradio
 }
 
 build_libiio() {
@@ -238,7 +229,7 @@ build_qwtpolar() {
 		| tar xj --strip-components=1 -C ${WORKDIR}/qwtpolar
 
 	cd ~/qwtpolar
-	wget https://raw.githubusercontent.com/analogdevicesinc/scopy/master/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
+	wget https://raw.githubusercontent.com/analogdevicesinc/scopy/master/ci/appveyor/patches/qwtpolar-qwt-qt-compat.patch
 	patch -p1 < qwtpolar-qwt-qt-compat.patch
 	sed -i 's/\/usr\/local\/qwtpolar-$$QWT_POLAR_VERSION/\/usr\/local/g' qwtpolarconfig.pri
 	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarExamples/ /g' qwtpolarconfig.pri

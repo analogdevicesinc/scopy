@@ -13,22 +13,22 @@ environment:
           ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
+          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash ci\\appveyor\\build_appveyor_mingw.sh"
           DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
 
         - MINGW_VERSION: mingw32
           ARCH: i686
           ARCH_BIT: 32
           APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
+          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash ci\\appveyor\\build_appveyor_mingw.sh"
           DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
 
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
-          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
-          BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
-          PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
+          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/ci/appveyor/install_macos_deps.sh"
+          BUILD_CMD: "/Users/appveyor/projects/scopy/ci/appveyor/build_appveyor_macos.sh"
+          PACKAGE_CMD: "/Users/appveyor/projects/scopy/ci/appveyor/package_darwin.sh"
           DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
           C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
           CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
@@ -37,9 +37,9 @@ environment:
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: macos
-          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
-          BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
-          PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
+          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/ci/appveyor/install_macos_deps.sh"
+          BUILD_CMD: "/Users/appveyor/projects/scopy/ci/appveyor/build_appveyor_macos.sh"
+          PACKAGE_CMD: "/Users/appveyor/projects/scopy/ci/appveyor/package_darwin.sh"
           DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
           C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
           CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
@@ -49,8 +49,8 @@ environment:
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
           PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
-          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_18_deps.sh /home/appveyor/Qt/5.14.2"
-          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
+          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/ci/appveyor/install_ubuntu_18_deps.sh /home/appveyor/Qt/5.14.2"
+          BUILD_CMD: "/home/appveyor/projects/scopy/ci/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
           PACKAGE_CMD: ""
           DEPLOY_FILE: ""
           
@@ -58,15 +58,15 @@ environment:
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
           PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
-          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_20_deps.sh /home/appveyor/Qt/5.14.2"
-          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
+          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/ci/appveyor/install_ubuntu_20_deps.sh /home/appveyor/Qt/5.14.2"
+          BUILD_CMD: "/home/appveyor/projects/scopy/ci/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
           PACKAGE_CMD: ""
           DEPLOY_FILE: ""
 
 #        - ARCH: x86_64
 #          ARCH_BIT: 64
 #          APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
-#          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_flatpak.sh $BRANCH $REPO"
+#          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/ci/appveyor/build_appveyor_flatpak.sh $BRANCH $REPO"
 #          BUILD_CMD: ""
 #          PACKAGE_CMD: ""
 #          DEPLOY_FILE: "/home/appveyor/projects/scopy/Scopy.flatpak"
@@ -83,7 +83,7 @@ build_script:
     # Then run your code
     - cmd: set CHERE_INVOKING='yes'  # Preserve the current working directory
     - cmd: set MSYSTEM='MINGW64'  # Start a 64 bit Mingw environment
-    - cmd: C:\msys64\usr\bin\bash -lc "/c/projects/scopy/CI/appveyor/extract_msys_deps.sh"
+    - cmd: C:\msys64\usr\bin\bash -lc "/c/projects/scopy/ci/appveyor/extract_msys_deps.sh"
     - cmd: set PATH=%PATH%;"C:\Program Files (x86)\Inno Setup 6"
     - cmd: "%BUILD_DEPS_CMD%"
 
