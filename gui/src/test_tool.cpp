@@ -1,6 +1,7 @@
 #include "menu_anim.hpp"
 
 #include <QLayout>
+#include <QDebug>
 
 #include <scopy/gui/FftDisplayPlot.h>
 #include <scopy/gui/HistogramDisplayPlot.h>
@@ -72,14 +73,58 @@ TestTool::TestTool()
 
 	channelManager->insertAddBtn(new SpectrumAnalyzerAddReferenceMenu, true);
 
+
+	CapturePlot* plot = new CapturePlot(this, false, 10, 10, new MetricPrefixFormatter, new MetricPrefixFormatter);
+	plot->disableLegend();
+
+	unsigned int noPoints = 1024;
+	unsigned int sampleRate = 1024;
+
+	QVector<double> data;
+	unsigned int maxValue = 99;
+	for(unsigned int i = 0; i < noPoints; i++) {
+		data.push_back(i % 100);
+	}
+
+	QVector<double> indexes(1024);
+	std::iota(std::begin(indexes), std::end(indexes), 0);
+
+	plot->registerReferenceWaveform("", indexes, data);
+
+	plot->Curve(0)->setAxes(
+			QwtAxisId(QwtPlot::xBottom, 0),
+			QwtAxisId(QwtPlot::yLeft, 0));
+	plot->addZoomer(0);
+	plot->Curve(0)->setTitle("CH " + QString::number(1));
+
+	/* Default plot settings */
+	plot->setZoomerEnabled(true);
+
+	plot->setSampleRate(sampleRate, 1, "");
+
+	plot->setHorizUnitsPerDiv(noPoints/10.0);
+	plot->setVertUnitsPerDiv(maxValue/10.0);
+
+	//	plot->setHorizOffset(noPoints/2.0);
+	//	plot->setVertOffset(maxValue/2.0);
+
+	plot->setYaxis(0, 99);
+	plot->setXaxis(0, 1024);
+
+	plot->setXaxisUnit("Spl");
+	plot->setYaxisUnit("Val");
+
+	m_toolView->addCentralWidget(plot, false, "");
+
+
 	// dockable plots
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "1");
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "2");
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "3");
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "4");
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "5");
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "6");
-	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "7");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "1");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "2");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "3");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "4");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "5");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "6");
+	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), true, "7");
 
 	// fixed plots
 	//	m_toolView->addCentralWidget(new CapturePlot(this, false, 10, 10), false, "");

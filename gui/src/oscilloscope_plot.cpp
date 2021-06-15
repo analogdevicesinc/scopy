@@ -38,11 +38,9 @@ using namespace scopy::gui;
 /*
  * OscilloscopePlot class
  */
-OscilloscopePlot::OscilloscopePlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs)
-	: TimeDomainDisplayPlot(parent, isdBgraph, xNumDivs, yNumDivs)
+OscilloscopePlot::OscilloscopePlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs, PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis)
+	: TimeDomainDisplayPlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis)
 {
-	setYaxisUnit("V");
-
 	setMinXaxisDivision(100E-9); // A minimum division of 100 nano second
 	setMaxXaxisDivision(1E-3);   // A maximum division of 1 milli second - until adding decimation
 	setMinYaxisDivision(1E-6);   // A minimum division of 1 micro Volts
@@ -54,8 +52,8 @@ OscilloscopePlot::~OscilloscopePlot() {}
 /*
  * CapturePlot class
  */
-CapturePlot::CapturePlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs)
-	: OscilloscopePlot(parent, isdBgraph, xNumDivs, yNumDivs)
+CapturePlot::CapturePlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs, PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis)
+	: OscilloscopePlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis)
 	, m_triggerAEnabled(false)
 	, m_triggerBEnabled(false)
 	, m_measurementsEnabled(false)
