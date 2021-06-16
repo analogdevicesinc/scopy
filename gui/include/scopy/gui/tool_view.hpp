@@ -70,6 +70,8 @@ public:
 				       const QString& shortName);
 	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
+	void addCentralWidget(QWidget* widget, bool dockable, const QString& dockerName, int row = -1, int column = -1,
+			      int rowspan = -1, int columnspan = -1);
 
 private:
 	void configureLastOpenedMenu();
@@ -98,6 +100,10 @@ private:
 	QList<CustomPushButton*> m_menuOrder;
 
 	int m_generalSettingsMenuId;
+
+	QMainWindow* m_centralMainWindow;
+	unsigned int m_dockables;
+	std::vector<QDockWidget*> m_firstDocks;
 };
 } // namespace gui
 } // namespace scopy

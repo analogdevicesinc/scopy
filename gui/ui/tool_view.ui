@@ -306,23 +306,44 @@
         </item>
         <item>
          <widget class="QWidget" name="widgetPlotContainer" native="true">
-          <layout class="QGridLayout" name="gridLayout">
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="leftMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
-           <item row="0" column="0">
-            <widget class="QWidget" name="widgetCentral" native="true"/>
+           <item>
+            <widget class="QWidget" name="widgetCentral" native="true">
+             <layout class="QGridLayout" name="gridWidgetCentral">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
+              <property name="spacing">
+               <number>0</number>
+              </property>
+             </layout>
+            </widget>
            </item>
-           <item row="1" column="0">
+           <item>
             <widget class="scopy::gui::InstrumentNotes" name="widgetInstrumentNotes" native="true"/>
            </item>
           </layout>

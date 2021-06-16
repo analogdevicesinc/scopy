@@ -11,8 +11,14 @@ using namespace scopy::gui;
 ToolView::ToolView(QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::ToolView)
+	, m_dockables(0)
 {
 	m_ui->setupUi(this);
+
+	m_centralMainWindow = new QMainWindow(m_ui->widgetCentral);
+	m_centralMainWindow->setCentralWidget(0);
+	m_centralMainWindow->setWindowFlags(Qt::Widget);
+	m_ui->widgetPlotContainer->layout()->addWidget(m_centralMainWindow);
 
 	m_ui->widgetRunSingleBtns->enableRunButton(false);
 	m_ui->widgetRunSingleBtns->enableSingleButton(false);
@@ -312,6 +318,45 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 
 	if ((checkBoxVisible && checkBoxChecked) || !checkBoxVisible) {
 		m_menuOrder.push_back(btn->getBtn());
+	}
+}
+
+void ToolView::addCentralWidget(QWidget* widget, bool dockable, const QString& dockerName, int row, int column,
+				int rowspan, int columnspan)
+{
+	if (dockable) {
+		QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+		docker->setWindowTitle(dockerName);
+		docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+		docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+		docker->setWidget(widget);
+
+		if (m_dockables < 3) {
+			if (m_dockables % 3 == 0) {
+				m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+			} else if (m_dockables % 3 == 1) {
+				m_centralMainWindow->addDockWidget(Qt::RightDockWidgetArea, docker);
+			} else {
+				m_centralMainWindow->addDockWidget(Qt::BottomDockWidgetArea, docker);
+			}
+
+			m_firstDocks.push_back(docker);
+		} else {
+			m_centralMainWindow->tabifyDockWidget(m_firstDocks.at(m_dockables % 3), docker);
+		}
+
+		m_dockables++;
+
+	} else {
+		if (row == -1 || column == -1) {
+			m_ui->gridWidgetCentral->addWidget(widget);
+		} else {
+			if (rowspan == -1 || columnspan == -1) {
+				m_ui->gridWidgetCentral->addWidget(widget, row, column);
+			} else {
+				m_ui->gridWidgetCentral->addWidget(widget, row, column, rowspan, columnspan);
+			}
+		}
 	}
 }
 
