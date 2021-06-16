@@ -20,9 +20,10 @@
 #ifndef SCOPYAPPLICATION_H
 #define SCOPYAPPLICATION_H
 
+#include "config.hpp"
+
 #include <QApplication>
 #include <QtGlobal>
-//#include "config.h"
 
 #define __STDC_FORMAT_MACROS
 

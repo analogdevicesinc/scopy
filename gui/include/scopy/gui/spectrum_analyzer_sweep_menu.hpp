@@ -1,7 +1,7 @@
 #ifndef SPECTRUM_ANALYZER_SWEEP_MENU_HPP
 #define SPECTRUM_ANALYZER_SWEEP_MENU_HPP
 
-#include <scopy/gui/fft_display_plot.hpp>
+#include <scopy/gui/FftDisplayPlot.h>
 #include <scopy/gui/generic_menu.hpp>
 #include <scopy/gui/spinbox_a.hpp>
 #include <scopy/gui/start_stop_range_widget.hpp>

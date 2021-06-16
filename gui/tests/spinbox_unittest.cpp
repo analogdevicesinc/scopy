@@ -13,7 +13,7 @@ private:
 	void testCustomSpinBox(SpinBoxA* spinBox, QString* label, QVector<QString>* cboxData,
 			       QVector<QString>* lineEditData);
 
-private slots:
+private Q_SLOTS:
 	void testSpinBoxButtons();
 };
 

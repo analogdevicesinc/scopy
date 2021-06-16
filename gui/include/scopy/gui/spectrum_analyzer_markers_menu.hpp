@@ -1,8 +1,8 @@
 #ifndef SPECTRUM_ANALYZER_MARKERS_MENU_HPP
 #define SPECTRUM_ANALYZER_MARKERS_MENU_HPP
 
+#include <scopy/gui/FftDisplayPlot.h>
 #include <scopy/gui/db_click_buttons.hpp>
-#include <scopy/gui/fft_display_plot.hpp>
 #include <scopy/gui/generic_menu.hpp>
 #include <scopy/gui/spinbox_a.hpp>
 

@@ -1,7 +1,7 @@
 #ifndef SPECTRUM_ANALYZER_CHANNEL_MENU_HPP
 #define SPECTRUM_ANALYZER_CHANNEL_MENU_HPP
 
-#include <scopy/gui/fft_display_plot.hpp>
+#include <scopy/gui/FftDisplayPlot.h>
 #include <scopy/gui/generic_menu.hpp>
 
 namespace Ui {
