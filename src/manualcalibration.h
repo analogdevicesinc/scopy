@@ -31,7 +31,7 @@
 
 /*Local includes*/
 #include "tool.hpp"
-#include "detachedWindow.hpp"
+#include "gui/detachedWindow.hpp"
 #include "tool_launcher.hpp"
 #include "filter.hpp"
 

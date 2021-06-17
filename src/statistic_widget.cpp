@@ -19,7 +19,7 @@
  */
 
 #include "statistic_widget.h"
-#include "measure.h"
+#include "gui/measure.h"
 #include "plot_utils.hpp"
 #include "ui_statistic.h"
 

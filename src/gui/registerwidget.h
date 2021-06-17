@@ -25,7 +25,7 @@
 #include <QDomDocument>
 
 #include "regmapparser.h"
-#include "bitfieldwidget.h"
+#include "gui/bitfieldwidget.h"
 #include "debug.h"
 
 namespace Ui {

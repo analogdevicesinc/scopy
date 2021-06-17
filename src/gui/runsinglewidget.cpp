@@ -22,8 +22,8 @@
 #include "ui_runsinglewidget.h"
 
 #include "utils.h"
-#include "dynamicWidget.hpp"
-#include "customPushButton.hpp"
+#include "gui/dynamicWidget.hpp"
+#include "gui/customPushButton.hpp"
 
 using namespace adiscope;
 

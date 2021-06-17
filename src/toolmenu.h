@@ -21,7 +21,7 @@
 #ifndef TOOLMENU_H
 #define TOOLMENU_H
 
-#include "basemenu.h"
+#include "gui/basemenu.h"
 #include "filter.hpp"
 #include "toolmenuitem.h"
 #include "preferences.h"

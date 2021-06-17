@@ -20,8 +20,8 @@
 #include "spectrum_analyzer_api.hpp"
 #include "ui_spectrum_analyzer.h"
 #include "ui_cursors_settings.h"
-#include "channel_widget.hpp"
-#include "db_click_buttons.hpp"
+#include "gui/channel_widget.hpp"
+#include "gui/db_click_buttons.hpp"
 
 namespace adiscope {
 int SpectrumChannel_API::type()

@@ -19,7 +19,7 @@
  */
 
 #include "dropdown_switch_list.h"
-#include "checkbox_delegate.h"
+#include "gui/checkbox_delegate.h"
 
 #include <QLineEdit>
 #include <QStandardItemModel>

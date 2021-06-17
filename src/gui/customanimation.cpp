@@ -18,43 +18,42 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MENU_ANIM_HPP
-#define MENU_ANIM_HPP
-
-#include "coloredQWidget.hpp"
-
 #include "customanimation.h"
-#include <QSize>
-#include <QWidget>
+#include <gui/animationmanager.h>
 
-namespace adiscope {
-	class MenuAnim : public ColoredQWidget
-	{
-		Q_OBJECT
+using namespace adiscope;
 
-	public:
-		explicit MenuAnim(QWidget *parent = nullptr);
-		~MenuAnim() {}
-
-		void setMinimumSize(QSize size);
-		bool animInProgress() const;
-
-	Q_SIGNALS:
-		void finished(bool opened);
-
-	public Q_SLOTS:
-		void toggleMenu(bool open);
-
-	private Q_SLOTS:
-		void closeAnimFinished();
-		void openAnimFinished();
-
-	private:
-		CustomAnimation close_anim_max, close_anim_min,
-				   open_anim_max, open_anim_min;
-		int min_width;
-		bool animInProg;
-	};
+CustomAnimation::CustomAnimation(QObject *target):
+	QPropertyAnimation(target),
+	m_enabled(true),
+	m_duration(0)
+{
+	AnimationManager::getInstance().registerAnimation(this);
 }
 
-#endif /* MENU_ANIM_HPP */
+CustomAnimation::CustomAnimation(QObject *target, const QByteArray &propertyName,
+					   QObject *parent):
+	QPropertyAnimation(target, propertyName, parent),
+	m_enabled(true),
+	m_duration(0)
+{
+	AnimationManager::getInstance().registerAnimation(this);
+}
+
+CustomAnimation::~CustomAnimation()
+{
+}
+
+void CustomAnimation::setDuration(int msec)
+{
+	m_duration = msec;
+	if (m_enabled) {
+		QPropertyAnimation::setDuration(msec);
+	}
+}
+
+void CustomAnimation::toggle(bool enabled)
+{
+	m_enabled = enabled;
+	QPropertyAnimation::setDuration(enabled ? m_duration : 0);
+}

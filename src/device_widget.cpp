@@ -19,8 +19,8 @@
  */
 
 #include "device_widget.hpp"
-#include "dynamicWidget.hpp"
-#include "info_page.hpp"
+#include "gui/dynamicWidget.hpp"
+#include "gui/info_page.hpp"
 #include "tool_launcher.hpp"
 #include "ui_device.h"
 

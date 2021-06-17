@@ -19,7 +19,7 @@
  */
 
 #include "dmm.hpp"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include "ui_dmm.h"
 #include <config.h>
 #include "utils.h"

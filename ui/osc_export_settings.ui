@@ -292,7 +292,7 @@
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

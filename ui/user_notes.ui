@@ -519,19 +519,20 @@ border-width: 0px;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::StackedHomepage</class>
-   <extends>QStackedWidget</extends>
-   <header>stacked_homepage.h</header>
+   <class>adiscope::OscCustomScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>gui/osc_custom_scroll.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::OscCustomScrollArea</class>
-   <extends>QScrollArea</extends>
-   <header>osc_custom_scroll.h</header>
+   <class>adiscope::StackedHomepage</class>
+   <extends>QStackedWidget</extends>
+   <header>gui/stacked_homepage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
  <connections/>

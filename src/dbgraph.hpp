@@ -28,7 +28,7 @@
 #include "customFifo.hpp"
 #include "symbol_controller.h"
 #include "plot_line_handle.h"
-#include "cursor_readouts.h"
+#include "gui/cursor_readouts.h"
 #include "DisplayPlot.h"
 
 namespace adiscope {

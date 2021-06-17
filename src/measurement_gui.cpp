@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "measurement_gui.h"
-#include "measure.h"
+#include "gui/measure.h"
 
 #include <QLabel>
 

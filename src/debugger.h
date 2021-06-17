@@ -28,11 +28,11 @@
 
 /* Local includes */
 #include "debug.h"
-#include "bitfieldwidget.h"
-#include "registerwidget.h"
+#include "gui/bitfieldwidget.h"
+#include "gui/registerwidget.h"
 #include "filter.hpp"
 #include "tool.hpp"
-#include "detachedWindow.hpp"
+#include "gui/detachedWindow.hpp"
 #include "tool_launcher.hpp"
 
 class QJSEngine;

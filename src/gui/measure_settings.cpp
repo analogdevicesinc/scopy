@@ -19,7 +19,7 @@
  */
 #include "measure_settings.h"
 #include "oscilloscope_plot.hpp"
-#include "dropdown_switch_list.h"
+#include "gui/dropdown_switch_list.h"
 #include "ui_measure_settings.h"
 
 #include <QStandardItem>

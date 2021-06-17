@@ -26,7 +26,7 @@
 #include <libm2k/contextbuilder.hpp>
 
 #include "trigger_settings.hpp"
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include "scroll_filter.hpp"
 
 #include "ui_trigger_settings.h"

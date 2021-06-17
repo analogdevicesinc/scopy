@@ -1976,24 +1976,24 @@ line-height: 14px;
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
+   <header>gui/instrumentnotes.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>QwtThermo</class>
@@ -2018,9 +2018,6 @@ line-height: 14px;
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
@@ -2059,7 +2056,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>

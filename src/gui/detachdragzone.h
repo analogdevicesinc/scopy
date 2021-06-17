@@ -17,31 +17,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef DETACHDRAGZONE_H
+#define DETACHDRAGZONE_H
 
-#ifndef ANIMATIONMANAGER_H
-#define ANIMATIONMANAGER_H
+#include <QWidget>
+#include <QMouseEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QString>
 
-#include <customanimation.h>
-#include <QObject>
+#include "gui/coloredQWidget.hpp"
 
 namespace adiscope {
-class AnimationManager : public QObject
+class DetachDragZone : public ColoredQWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    static AnimationManager& getInstance();
-    void toggleAnimations(bool on);
+	explicit DetachDragZone(QWidget *parent = 0);
+	~DetachDragZone();
 
-    void registerAnimation(CustomAnimation *animation);
+	bool eventFilter(QObject *watched, QEvent *event);
 
 Q_SIGNALS:
-    void toggle(bool);
+	void detachWidget(int);
+	void changeText(QString);
 
-private:
-	AnimationManager();
-        bool m_animationsEnabled;
+private Q_SLOTS:
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dropEvent(QDropEvent *event);
+
 };
 }
 
-#endif // ANIMATIONMANAGER_H
+#endif // DETACHDRAGZONE_H

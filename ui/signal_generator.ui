@@ -1414,36 +1414,36 @@ background-repeat: no-repeat;
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header>gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
+   <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
+   <header>gui/runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::Math</class>

@@ -145,7 +145,7 @@ width: 1310px;
 }</string>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <widget class="QWidget" name="page">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -441,7 +441,7 @@ QSlider::handle:horizontal:enabled {
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

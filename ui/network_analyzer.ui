@@ -796,7 +796,7 @@ border: 5px solid white;
                 </size>
                </property>
                <property name="currentIndex">
-                <number>2</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="page_3">
                 <layout class="QVBoxLayout" name="verticalLayout_14">
@@ -2055,8 +2055,8 @@ padding-left: 20px;
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>300</width>
-                      <height>531</height>
+                      <width>261</width>
+                      <height>529</height>
                      </rect>
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -3124,43 +3124,43 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MenuAnim</class>
+   <extends>QWidget</extends>
+   <header>gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>linked_button.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::MenuAnim</class>
-   <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
+   <header>gui/runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
+   <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
+   <header>gui/customSwitch.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::dBgraph</class>
@@ -3177,13 +3177,13 @@ QLabel {
   <customwidget>
    <class>adiscope::CustomPlotPositionButton</class>
    <extends>QWidget</extends>
-   <header>customplotpositionbutton.h</header>
+   <header>gui/customplotpositionbutton.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
-   <header>smallOnOffSwitch.hpp</header>
+   <header>gui/smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

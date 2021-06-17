@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>180</width>
-    <height>65</height>
+    <width>274</width>
+    <height>74</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -138,7 +138,7 @@
   <customwidget>
    <class>adiscope::CompletionCircle</class>
    <extends>QDial</extends>
-   <header>completion_circle.h</header>
+   <header>gui/completion_circle.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

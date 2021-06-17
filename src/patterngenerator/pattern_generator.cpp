@@ -24,8 +24,8 @@
 #include <QDebug>
 #include "ui_pattern_generator.h"
 #include "digitalchannel_manager.hpp"
-#include "dynamicWidget.hpp"
-#include "basemenu.h"
+#include "gui/dynamicWidget.hpp"
+#include "gui/basemenu.h"
 #include "../logicanalyzer/logicgroupitem.h"
 
 #include "../logicanalyzer/logicdatacurve.h"

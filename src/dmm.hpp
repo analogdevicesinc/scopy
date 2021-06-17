@@ -32,7 +32,7 @@
 #include "tool.hpp"
 #include "scroll_filter.hpp"
 #include <thread>
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/circular_buffer.hpp>

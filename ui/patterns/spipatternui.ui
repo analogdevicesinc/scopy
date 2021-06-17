@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>262</width>
+    <width>282</width>
     <height>391</height>
    </rect>
   </property>
@@ -283,7 +283,7 @@
   <customwidget>
    <class>adiscope::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
-   <header>smallOnOffSwitch.hpp</header>
+   <header>gui/smallOnOffSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

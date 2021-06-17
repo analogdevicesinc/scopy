@@ -110,7 +110,7 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-18</y>
+        <y>0</y>
         <width>266</width>
         <height>958</height>
        </rect>
@@ -958,7 +958,7 @@ color: rgba(255,255,255,51);
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -32,11 +32,11 @@
 #include "logicanalyzer/annotationcurve.h"
 #include "logicanalyzer/decoder.h"
 
-#include "basemenu.h"
+#include "gui/basemenu.h"
 #include "logicgroupitem.h"
 #include "logicanalyzer_api.h"
 
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 
 #include <QDebug>
 
@@ -50,7 +50,7 @@
 #include <libm2k/m2kexceptions.hpp>
 #include "scopyExceptionHandler.h"
 
-#include "osc_export_settings.h"
+#include "gui/osc_export_settings.h"
 #include "filemanager.h"
 #include "config.h"
 #include "state_updater.h"

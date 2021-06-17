@@ -1,5 +1,5 @@
 #include "linked_button.hpp"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 
 #include <QDesktopServices>
 #include <QUrl>

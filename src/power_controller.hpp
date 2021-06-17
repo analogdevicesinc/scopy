@@ -25,7 +25,7 @@
 #include <QTimer>
 
 #include "apiObject.hpp"
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include "tool.hpp"
 
 extern "C" {

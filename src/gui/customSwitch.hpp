@@ -22,7 +22,7 @@
 #define CUSTOM_SWITCH_HPP
 
 #include <QLabel>
-#include "customanimation.h"
+#include "gui/customanimation.h"
 #include <QPushButton>
 #include <QWidget>
 

@@ -19,10 +19,10 @@
  */
 
 #include "logging_categories.h"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include "network_analyzer.hpp"
 #include "signal_generator.hpp"
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include "hardware_trigger.hpp"
 #include "ui_network_analyzer.h"
 #include "filemanager.h"

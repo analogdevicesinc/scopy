@@ -25,7 +25,7 @@
 #include "logic_tool.h"
 #include "oscilloscope_plot.hpp"
 #include "buffer_previewer.hpp"
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include "scroll_filter.hpp"
 #include "../logicanalyzer/genericlogicplotcurve.h"
 

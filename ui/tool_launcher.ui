@@ -1631,25 +1631,25 @@ border-width: 0px;
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header>gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::OscCustomScrollArea</class>
    <extends>QScrollArea</extends>
-   <header>osc_custom_scroll.h</header>
+   <header>gui/osc_custom_scroll.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::StackedHomepage</class>
    <extends>QStackedWidget</extends>
-   <header>stacked_homepage.h</header>
+   <header>gui/stacked_homepage.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

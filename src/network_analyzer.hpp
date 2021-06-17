@@ -21,7 +21,7 @@
 #ifndef SCOPY_NETWORK_ANALYZER_HPP
 #define SCOPY_NETWORK_ANALYZER_HPP
 
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
@@ -29,7 +29,7 @@
 #include "dbgraph.hpp"
 #include "handles_area.hpp"
 #include <QtConcurrentRun>
-#include "customPushButton.hpp"
+#include "gui/customPushButton.hpp"
 #include "scroll_filter.hpp"
 #include <scopy/goertzel_scopy_fc.h>
 #include <gnuradio/top_block.h>
@@ -58,7 +58,7 @@
 #include "TimeDomainDisplayPlot.h"
 
 #include "networkanalyzerbufferviewer.h"
-#include "startstoprangewidget.h"
+#include "gui/startstoprangewidget.h"
 
 extern "C" {
 	struct iio_context;

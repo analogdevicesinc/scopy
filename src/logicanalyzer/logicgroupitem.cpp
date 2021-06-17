@@ -26,7 +26,7 @@
 #include <QPushButton>
 #include <QDebug>
 
-#include "basemenu.h"
+#include "gui/basemenu.h"
 
 using namespace adiscope;
 

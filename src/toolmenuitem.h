@@ -21,8 +21,8 @@
 #ifndef TOOLMENUITEM_H
 #define TOOLMENUITEM_H
 
-#include "basemenuitem.h"
-#include "customPushButton.hpp"
+#include "gui/basemenuitem.h"
+#include "gui/customPushButton.hpp"
 
 namespace adiscope {
 class ToolMenuItem : public BaseMenuItem
