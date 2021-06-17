@@ -20,11 +20,11 @@
 #include "oscilloscope_api.hpp"
 
 #include "ui_oscilloscope.h"
-#include "measure_settings.h"
+#include "gui/measure_settings.h"
 #include "ui_measure_settings.h"
 #include "ui_cursors_settings.h"
 #include "ui_trigger_settings.h"
-#include "channel_widget.hpp"
+#include "gui/channel_widget.hpp"
 #include "ui_channel_settings.h"
 #include "ui_osc_general_settings.h"
 

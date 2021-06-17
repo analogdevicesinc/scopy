@@ -24,7 +24,7 @@
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
 #include "libm2k/analog/dmm.hpp"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include <QString>
 #include <QTimer>
 #include <QtConcurrentRun>

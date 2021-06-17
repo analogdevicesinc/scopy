@@ -1092,26 +1092,26 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
+   <header>gui/instrumentnotes.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
-   <header>linked_button.hpp</header>
+   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>QwtThermo</class>

@@ -19,7 +19,7 @@
  */
 
 #include "spinbox_a.hpp"
-#include "completion_circle.h"
+#include "gui/completion_circle.h"
 #include "apiobjectmanager.h"
 #include "singletone_wrapper.h"
 

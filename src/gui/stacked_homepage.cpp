@@ -21,7 +21,7 @@
 #include "stacked_homepage.h"
 
 #include <QDebug>
-#include "customanimation.h"
+#include "gui/customanimation.h"
 #include <QParallelAnimationGroup>
 #include <QFileDialog>
 #include <QTextBrowser>

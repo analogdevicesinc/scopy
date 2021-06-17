@@ -22,7 +22,7 @@
 #define CURSOR_READOUTS_H
 
 #include <QWidget>
-#include "customanimation.h"
+#include "gui/customanimation.h"
 #include <QShowEvent>
 #include <qwt_axis_id.h>
 #include "customplotpositionbutton.h"

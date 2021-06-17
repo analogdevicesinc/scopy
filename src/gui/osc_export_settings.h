@@ -28,7 +28,7 @@
 #include <QMap>
 
 /* Local includes */
-#include "dropdown_switch_list.h"
+#include "gui/dropdown_switch_list.h"
 
 namespace Ui {
 class ExportSettings;

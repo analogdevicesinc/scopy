@@ -190,7 +190,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
   <customwidget>
    <class>adiscope::OscCustomScrollArea</class>
    <extends>QScrollArea</extends>
-   <header>osc_custom_scroll.h</header>
+   <header>gui/osc_custom_scroll.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

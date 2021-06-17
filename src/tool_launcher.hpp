@@ -32,7 +32,7 @@
 #include <QMap>
 #include <QStringList>
 #include <QNetworkAccessManager>
-#include <info_widget.h>
+#include <gui/info_widget.h>
 #include <QTextBrowser>
 
 #ifdef __ANDROID__
@@ -53,11 +53,11 @@
 
 #include "network_analyzer.hpp"
 #include "digitalio.hpp"
-#include "detachedWindow.hpp"
+#include "gui/detachedWindow.hpp"
 #include "preferences.h"
-#include "info_page.hpp"
+#include "gui/info_page.hpp"
 #include "device_widget.hpp"
-#include "connectDialog.hpp"
+#include "gui/connectDialog.hpp"
 #include "toolmenu.h"
 #include "session_info.h"
 

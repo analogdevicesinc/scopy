@@ -25,7 +25,7 @@
 #include <QStackedWidget>
 #include <QEasingCurve>
 
-#include "homepage_controls.h"
+#include "gui/homepage_controls.h"
 
 namespace Ui {
 class StackedHomepage;

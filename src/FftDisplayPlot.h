@@ -26,7 +26,7 @@
 #include "symbol_controller.h"
 #include "plot_line_handle.h"
 #include "handles_area.hpp"
-#include "cursor_readouts.h"
+#include "gui/cursor_readouts.h"
 #include <boost/shared_ptr.hpp>
 
 namespace adiscope {

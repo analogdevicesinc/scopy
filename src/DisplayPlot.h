@@ -67,7 +67,7 @@
 #include "printableplot.h"
 #include "symbol_controller.h"
 #include "plot_line_handle.h"
-#include "cursor_readouts.h"
+#include "gui/cursor_readouts.h"
 #include "handles_area.hpp"
 #include "plotpickerwrapper.h"
 #include <QWidget>

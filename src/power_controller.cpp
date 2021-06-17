@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include "power_controller.hpp"
 #include "filter.hpp"
 

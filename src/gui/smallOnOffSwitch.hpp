@@ -22,7 +22,7 @@
 #define SMALL_ON_OFF_SWITCH_HPP
 
 #include <QColor>
-#include "customanimation.h"
+#include "gui/customanimation.h"
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>

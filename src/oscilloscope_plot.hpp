@@ -22,8 +22,8 @@
 #define M2K_OSCILLOSCOPE_PLOT_H
 
 #include "TimeDomainDisplayPlot.h"
-#include "measure.h"
-#include "customplotpositionbutton.h"
+#include "gui/measure.h"
+#include "gui/customplotpositionbutton.h"
 #include "graticule.h"
 
 #include <functional>

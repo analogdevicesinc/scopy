@@ -34,7 +34,7 @@
 #include "../pattern_generator.h"
 #include "../../logicanalyzer/annotationcurve.h"
 #include "../../logicanalyzer/annotationdecoder.h"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 
 #include <math.h>
 

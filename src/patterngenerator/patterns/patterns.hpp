@@ -32,8 +32,8 @@
 #include <deque>
 #include <string>
 #include <memory>
-#include "spinbox_a.hpp"
-#include "osc_import_settings.h"
+#include "gui/spinbox_a.hpp"
+#include "gui/osc_import_settings.h"
 
 // Generated UI
 #include "ui_binarycounterpatternui.h"

@@ -22,7 +22,7 @@
 #include "ui_user_notes.h"
 #include "ui_note.h"
 #include "ui_user_note_page.h"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 
 #include <QFileInfo>
 #include <QFileDialog>

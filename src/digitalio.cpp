@@ -31,7 +31,7 @@
 
 #include "logging_categories.h"
 #include "digitalio.hpp"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include "digitalio_api.hpp"
 
 // Generated UI

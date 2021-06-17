@@ -266,6 +266,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 	src/patterngenerator/*/*.cpp
 	src/logicanalyzer/*.cpp
 	src/logicanalyzer/*/*.cpp
+	src/gui/*.cpp
 )
 
 FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui)

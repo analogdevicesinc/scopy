@@ -20,7 +20,7 @@
 
 #include "preferences.h"
 #include "ui_preferences.h"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 
 #include <QElapsedTimer>
 #include <QDir>

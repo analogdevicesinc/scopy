@@ -17,44 +17,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef CUSTOMPLOTPOSITIONBUTTON_H
-#define CUSTOMPLOTPOSITIONBUTTON_H
 
-#include <QWidget>
-#include "coloredQWidget.hpp"
-#include <QButtonGroup>
+#ifndef ANIMATIONMANAGER_H
+#define ANIMATIONMANAGER_H
 
-namespace Ui {
-class CustomPlotPositionButton;
-}
+#include <gui/customanimation.h>
+#include <QObject>
 
 namespace adiscope {
-class CustomPlotPositionButton : public ColoredQWidget
+class AnimationManager : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
+    static AnimationManager& getInstance();
+    void toggleAnimations(bool on);
 
-	enum ReadoutsPosition {
-		topLeft,
-		topRight,
-		bottomLeft,
-		bottomRight
-	};
-
-	explicit CustomPlotPositionButton(QWidget *parent = 0);
-	~CustomPlotPositionButton();
-	void setPosition(ReadoutsPosition position);
+    void registerAnimation(CustomAnimation *animation);
 
 Q_SIGNALS:
-	void positionChanged(CustomPlotPositionButton::ReadoutsPosition position);
-
+    void toggle(bool);
 
 private:
-	Ui::CustomPlotPositionButton *ui;
-	QButtonGroup *btns;
+	AnimationManager();
+        bool m_animationsEnabled;
 };
 }
 
-
-#endif // CUSTOMPLOTPOSITIONBUTTON_H
+#endif // ANIMATIONMANAGER_H

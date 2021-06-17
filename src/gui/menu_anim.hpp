@@ -17,39 +17,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef DETACHDRAGZONE_H
-#define DETACHDRAGZONE_H
 
+#ifndef MENU_ANIM_HPP
+#define MENU_ANIM_HPP
+
+#include "gui/coloredQWidget.hpp"
+
+#include "gui/customanimation.h"
+#include <QSize>
 #include <QWidget>
-#include <QMouseEvent>
-#include <QDragMoveEvent>
-#include <QDropEvent>
-#include <QString>
-
-#include "coloredQWidget.hpp"
 
 namespace adiscope {
-class DetachDragZone : public ColoredQWidget
-{
-	Q_OBJECT
+	class MenuAnim : public ColoredQWidget
+	{
+		Q_OBJECT
 
-public:
-	explicit DetachDragZone(QWidget *parent = 0);
-	~DetachDragZone();
+	public:
+		explicit MenuAnim(QWidget *parent = nullptr);
+		~MenuAnim() {}
 
-	bool eventFilter(QObject *watched, QEvent *event);
+		void setMinimumSize(QSize size);
+		bool animInProgress() const;
 
-Q_SIGNALS:
-	void detachWidget(int);
-	void changeText(QString);
+	Q_SIGNALS:
+		void finished(bool opened);
 
-private Q_SLOTS:
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dragMoveEvent(QDragMoveEvent *event);
-	void dragLeaveEvent(QDragLeaveEvent *event);
-	void dropEvent(QDropEvent *event);
+	public Q_SLOTS:
+		void toggleMenu(bool open);
 
-};
+	private Q_SLOTS:
+		void closeAnimFinished();
+		void openAnimFinished();
+
+	private:
+		CustomAnimation close_anim_max, close_anim_min,
+				   open_anim_max, open_anim_min;
+		int min_width;
+		bool animInProg;
+	};
 }
 
-#endif // DETACHDRAGZONE_H
+#endif /* MENU_ANIM_HPP */

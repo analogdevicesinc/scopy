@@ -19,11 +19,11 @@
  */
 
 #include "logging_categories.h"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include "signal_generator.hpp"
-#include "spinbox_a.hpp"
+#include "gui/spinbox_a.hpp"
 #include "ui_signal_generator.h"
-#include "channel_widget.hpp"
+#include "gui/channel_widget.hpp"
 
 #include <cmath>
 

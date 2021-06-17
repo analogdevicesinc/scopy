@@ -26,8 +26,7 @@
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOption>
-#include "dynamicWidget.hpp"
-#include "dynamicWidget.hpp"
+#include "gui/dynamicWidget.hpp"
 #include "utils.h"
 
 using namespace adiscope;

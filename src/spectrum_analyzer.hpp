@@ -32,9 +32,9 @@
 #include "FftDisplayPlot.h"
 #include "tool.hpp"
 #include "plot_utils.hpp"
-#include "spinbox_a.hpp"
-#include "customPushButton.hpp"
-#include "startstoprangewidget.h"
+#include "gui/spinbox_a.hpp"
+#include "gui/customPushButton.hpp"
+#include "gui/startstoprangewidget.h"
 
 #include <QWidget>
 #include <QQueue>

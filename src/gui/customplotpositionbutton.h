@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020 Analog Devices Inc.
+ * Copyright (c) 2019 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see http://www.github.com/analogdevicesinc/scopy).
@@ -17,36 +17,44 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef CUSTOMPLOTPOSITIONBUTTON_H
+#define CUSTOMPLOTPOSITIONBUTTON_H
 
+#include <QWidget>
+#include "gui/coloredQWidget.hpp"
+#include <QButtonGroup>
 
-#ifndef LOGICGROUPITEM_H
-#define LOGICGROUPITEM_H
-
-#include "gui/basemenuitem.h"
-
-#include <QLabel>
+namespace Ui {
+class CustomPlotPositionButton;
+}
 
 namespace adiscope {
-class LogicGroupItem : public BaseMenuItem
+class CustomPlotPositionButton : public ColoredQWidget
 {
 	Q_OBJECT
+
 public:
-	LogicGroupItem(const QString &name, QWidget *parent = nullptr);
 
-	QString getName() const;
+	enum ReadoutsPosition {
+		topLeft,
+		topRight,
+		bottomLeft,
+		bottomRight
+	};
 
-public Q_SLOTS:
-	void setName(const QString &name);
+	explicit CustomPlotPositionButton(QWidget *parent = 0);
+	~CustomPlotPositionButton();
+	void setPosition(ReadoutsPosition position);
 
 Q_SIGNALS:
-	void deleteBtnClicked();
+	void positionChanged(CustomPlotPositionButton::ReadoutsPosition position);
+
 
 private:
-	void buildUi();
-
-private:
-	QLabel *m_nameLabel;
+	Ui::CustomPlotPositionButton *ui;
+	QButtonGroup *btns;
 };
 }
 
-#endif // LOGICGROUPITEM_H
+
+#endif // CUSTOMPLOTPOSITIONBUTTON_H

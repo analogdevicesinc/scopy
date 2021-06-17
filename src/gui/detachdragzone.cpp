@@ -21,7 +21,7 @@
 #include "tool_launcher.hpp"
 #include <QMimeData>
 
-#include "basemenuitem.h"
+#include "gui/basemenuitem.h"
 
 using namespace adiscope;
 

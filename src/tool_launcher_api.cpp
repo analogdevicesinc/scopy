@@ -19,7 +19,7 @@
  */
 #include "tool_launcher_api.hpp"
 #include "ui_tool_launcher.h"
-#include "user_notes.hpp"
+#include "gui/user_notes.hpp"
 #include "spectrum_analyzer.hpp"
 #include "apiobjectmanager.h"
 #include "debugger.h"

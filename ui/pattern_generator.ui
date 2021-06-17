@@ -469,7 +469,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>3</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -519,8 +519,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>300</height>
+                      <width>300</width>
+                      <height>474</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1381,8 +1381,8 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>280</width>
-                      <height>474</height>
+                      <width>220</width>
+                      <height>134</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1783,43 +1783,43 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::CustomPushButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/customPushButton.hpp</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>menu_anim.hpp</header>
+   <header>gui/menu_anim.hpp</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomPushButton</class>
-   <extends>QPushButton</extends>
-   <header>customPushButton.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>instrumentnotes.h</header>
+   <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>runsinglewidget.h</header>
+   <header>gui/runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>customSwitch.hpp</header>
+   <header>gui/customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
-   <header>linked_button.hpp</header>
+   <header>gui/linked_button.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

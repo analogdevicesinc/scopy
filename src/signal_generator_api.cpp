@@ -19,8 +19,8 @@
  */
 #include "signal_generator_api.hpp"
 #include "ui_signal_generator.h"
-#include "channel_widget.hpp"
-#include "spinbox_a.hpp"
+#include "gui/channel_widget.hpp"
+#include "gui/spinbox_a.hpp"
 
 namespace adiscope {
 void SignalGenerator_API::show()
