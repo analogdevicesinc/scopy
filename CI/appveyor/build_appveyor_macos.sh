@@ -21,8 +21,13 @@ mkdir -p build
 cd build
 
 if [ "$APPVEYOR" == "true" ] ; then
+	MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
+	if [[ "$MACOS_VERSION" == "10.14."* ]] ; then
+		export MACOSX_DEPLOYMENT_TARGET=10.13
+	fi
 	cmake ..
 	make -j${NUM_JOBS}
+	otool -l ./Scopy.app/Contents/MacOS/Scopy # for debugging
 else
 	cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR;${QT_PATH}/lib/cmake" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
 		-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" ..
