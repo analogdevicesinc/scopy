@@ -198,6 +198,8 @@ void ChannelWidget::setReferenceChannel(const bool &ref)
 	m_ref = ref;
 }
 
+void ChannelWidget::setMenuFloating(bool floating) { m_floatingMenu = floating; }
+
 bool ChannelWidget::eventFilter(QObject *object, QEvent *event)
 {
 	if (event->type() == QEvent::MouseButtonPress) {

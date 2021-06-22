@@ -21,6 +21,7 @@
 #ifndef RUNSINGLEWIDGET_H
 #define RUNSINGLEWIDGET_H
 
+#include <QPushButton>
 #include <QWidget>
 
 namespace Ui {
@@ -44,6 +45,9 @@ public:
 
 	bool singleButtonChecked() const;
 	bool runButtonChecked() const;
+
+	QPushButton* getRunButton();
+	QPushButton* getSingleButton();
 
 public Q_SLOTS:
 	void toggle(bool);

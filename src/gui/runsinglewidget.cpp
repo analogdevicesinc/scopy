@@ -84,6 +84,10 @@ bool RunSingleWidget::runButtonChecked() const
 	return d_ui->runButton->isChecked();
 }
 
+QPushButton* RunSingleWidget::getRunButton() { return d_ui->runButton; }
+
+QPushButton* RunSingleWidget::getSingleButton() { return d_ui->singleButton; }
+
 void RunSingleWidget::toggle(bool checked)
 {
 	if (!checked) {
