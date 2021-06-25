@@ -39,7 +39,7 @@
 #include "gui/dynamicWidget.hpp"
 
 #include <QDebug>
-
+#include <QDockWidget>
 #include <QFileDialog>
 #include <QDateTime>
 
@@ -1292,23 +1292,67 @@ void LogicAnalyzer::setupUi()
 	// Plot positioning and settings
 	m_plot.disableLegend();
 
+
+	// Build central widget
+
+	QWidget* centralWidget = new QWidget(this);
+	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
+	vLayout->setContentsMargins(0, 0, 0, 0);
+	vLayout->setSpacing(0);
+
+	// add the buffer previewer
+	ui->plot_and_buffPreviewer->removeWidget(ui->hLayoutBufferPreview);
+	vLayout->addWidget(ui->hLayoutBufferPreview);
+
+	// add plot elements
+	QWidget* plotWidget = new QWidget(this);
+	plotWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
+	QGridLayout* gridLayout = new QGridLayout(plotWidget);
+	gridLayout->setVerticalSpacing(0);
+	gridLayout->setHorizontalSpacing(0);
+	gridLayout->setContentsMargins(25, 0, 25, 0);
+	plotWidget->setLayout(gridLayout);
+
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-//	ui->gridLayoutPlot->addWidget(measurePanel, 0, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(m_plot.topArea(), 0, 0, 1, 4);
-	ui->gridLayoutPlot->addWidget(m_plot.topHandlesArea(), 1, 0, 1, 4);
+	gridLayout->addWidget(m_plot.topArea(), 0, 0, 1, 4);
+	gridLayout->addWidget(m_plot.topHandlesArea(), 1, 0, 1, 4);
 
-	ui->gridLayoutPlot->addWidget(m_plot.leftHandlesArea(), 0, 0, 4, 1);
-	ui->gridLayoutPlot->addWidget(m_plot.rightHandlesArea(), 0, 3, 4, 1);
+	gridLayout->addWidget(m_plot.leftHandlesArea(), 0, 0, 4, 1);
+	gridLayout->addWidget(m_plot.rightHandlesArea(), 0, 3, 4, 1);
 
+	gridLayout->addWidget(&m_plot, 2, 1, 1, 1);
+	gridLayout->addWidget(m_plotScrollBar, 2, 5, 1, 1);
 
-	ui->gridLayoutPlot->addWidget(&m_plot, 2, 1, 1, 1);
-	ui->gridLayoutPlot->addWidget(m_plotScrollBar, 2, 5, 1, 1);
+	gridLayout->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
+	gridLayout->addItem(plotSpacer, 4, 0, 1, 4);
 
-	ui->gridLayoutPlot->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
-	ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 4);
-//	ui->gridLayoutPlot->addWidget(statisticsPanel, 6, 1, 1, 1);
+	vLayout->addWidget(plotWidget);
+	centralWidget->setLayout(vLayout);
+
+	// Add dockable plot
+
+	QMainWindow* m_centralMainWindow = new QMainWindow(this);
+	m_centralMainWindow->setCentralWidget(0);
+	m_centralMainWindow->setWindowFlags(Qt::Widget);
+	ui->gridLayoutPlot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+
+	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+	docker->setWidget(centralWidget);
+
+	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+		if(topLevel) {
+			docker->setContentsMargins(10, 0, 10, 10);
+		} else {
+			docker->setContentsMargins(0, 0, 0, 0);
+		}
+	});
+
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+
 
 	m_plot.enableAxis(QwtPlot::yLeft, false);
 	m_plot.enableAxis(QwtPlot::xBottom, false);

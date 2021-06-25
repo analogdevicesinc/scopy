@@ -53,6 +53,7 @@
 #include <QDateTime>
 #include <QSignalBlocker>
 #include <QImageWriter>
+#include <QDockWidget>
 
 #include <iio.h>
 #include <network_analyzer_api.hpp>
@@ -422,18 +423,53 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	m_phaseGraph.setVertCursorsHandleEnabled(false);
 
-	ui->gridLayout_plots->addWidget(bufferPreviewer, 0, 1, 1, 1);
-	ui->gridLayout_plots->addWidget(ui->statusWidget, 1, 1, 1, 1);
-	ui->gridLayout_plots->addWidget(m_dBgraph.rightHandlesArea(), 0, 2, 6, 1);
-	ui->gridLayout_plots->addWidget(m_dBgraph.topHandlesArea(), 2, 0, 1, 2);
-	ui->gridLayout_plots->addWidget(m_dBgraph.leftHandlesArea(), 3, 0, 1, 1);
-	ui->gridLayout_plots->addWidget(&m_dBgraph, 3, 1, 1, 1);
+	// Add dockable plot
 
-	ui->gridLayout_plots->addWidget(m_phaseGraph.topHandlesArea(), 4, 0, 1, 2);
-	ui->gridLayout_plots->addWidget(m_phaseGraph.leftHandlesArea(), 5, 0, 1, 1);
-	ui->gridLayout_plots->addWidget(&m_phaseGraph, 5, 1, 1, 1);
+	QWidget* widget = new QWidget(this);
+	QGridLayout* gridLayout = new QGridLayout(widget);
+	gridLayout->setVerticalSpacing(0);
+	gridLayout->setHorizontalSpacing(10);
+	gridLayout->setContentsMargins(0, 0, 0, 0);
 
-	ui->gridLayout_plots->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 3);
+	gridLayout->addWidget(bufferPreviewer, 0, 1, 1, 1);
+	gridLayout->addWidget(ui->statusWidget, 1, 1, 1, 1);
+	gridLayout->addWidget(m_dBgraph.rightHandlesArea(), 0, 2, 6, 1);
+	gridLayout->addWidget(m_dBgraph.topHandlesArea(), 2, 0, 1, 2);
+	gridLayout->addWidget(m_dBgraph.leftHandlesArea(), 3, 0, 1, 1);
+	gridLayout->addWidget(&m_dBgraph, 3, 1, 1, 1);
+
+	gridLayout->addWidget(m_phaseGraph.topHandlesArea(), 4, 0, 1, 2);
+	gridLayout->addWidget(m_phaseGraph.leftHandlesArea(), 5, 0, 1, 1);
+	gridLayout->addWidget(&m_phaseGraph, 5, 1, 1, 1);
+
+	gridLayout->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 3);
+
+	widget->setLayout(gridLayout);
+
+
+	QMainWindow* m_centralMainWindow = new QMainWindow(this);
+	m_centralMainWindow->setCentralWidget(0);
+	m_centralMainWindow->setWindowFlags(Qt::Widget);
+	ui->gridLayout_plots->addWidget(m_centralMainWindow, 0, 0);
+
+	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+	docker->setWidget(widget);
+
+	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+		if(topLevel) {
+			docker->setContentsMargins(10, 0, 10, 10);
+//			ui->stackedWidget->hide();
+		} else {
+			docker->setContentsMargins(0, 0, 0, 0);
+//			ui->stackedWidget->show();
+		}
+	});
+
+
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+
 
 	m_phaseGraph.enableXaxisLabels();
 	m_dBgraph.enableXaxisLabels();

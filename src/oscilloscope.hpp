@@ -312,6 +312,12 @@ namespace adiscope {
 		ExportSettings *exportSettings;
 		CustomPlotPositionButton *cursorsPositionButton;
 
+		QGridLayout* gridPlot;
+		QDockWidget* fftDocker;
+		QDockWidget* xyDocker;
+		QDockWidget* histDocker;
+		QWidget* histWidget;
+
 		MouseWheelWidgetGuard *wheelEventGuard;
 
 		QPair<Ui::MathPanel, Math*> *math_pair;

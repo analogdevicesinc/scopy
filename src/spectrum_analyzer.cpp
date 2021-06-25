@@ -34,6 +34,7 @@
 #include <QFileDialog>
 #include <QCheckBox>
 #include <QTimer>
+#include <QDockWidget>
 
 /* Local includes */
 #include "logging_categories.h"
@@ -220,7 +221,44 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
 	}
 
-	ui->gridLayout_plot->addWidget(fft_plot->getPlotwithElements(), 1, 0, 1, 1);
+	// Add dockable plot
+
+	QWidget* centralWidget = new QWidget(this);
+	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
+	vLayout->setContentsMargins(0, 0, 0, 0);
+	vLayout->setSpacing(6);
+	centralWidget->setLayout(vLayout);
+
+	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
+	vLayout->addWidget(ui->topPlotWidget);
+
+	vLayout->addWidget(fft_plot->getPlotwithElements());
+
+	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
+	vLayout->addWidget(ui->markerTable);
+
+
+	QMainWindow* m_centralMainWindow = new QMainWindow(this);
+	m_centralMainWindow->setCentralWidget(0);
+	m_centralMainWindow->setWindowFlags(Qt::Widget);
+	ui->gridLayout_plot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+
+	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+	docker->setWidget(centralWidget);
+
+	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+		if(topLevel) {
+			docker->setContentsMargins(10, 0, 10, 10);
+		} else {
+			docker->setContentsMargins(0, 0, 0, 0);
+		}
+	});
+
+
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+
 
 	fft_plot->enableXaxisLabels();
 	fft_plot->enableYaxisLabels();
@@ -2320,20 +2358,20 @@ void SpectrumAnalyzer::on_btnMarkerTable_toggled(bool checked)
 	ui->markerTable->setVisible(checked);
 
 	// Set the Plot 3 times taller than the Marker Table (when visible)
-	QGridLayout *layout = static_cast<QGridLayout *>(
-				ui->widgetPlotContainer->layout());
-	int row1 = getGridLayoutPosFromIndex(layout,
-					     layout->indexOf(ui->markerTable)).first;
-	int row2 = getGridLayoutPosFromIndex(layout,
-					     layout->indexOf(ui->gridLayout_plot)).first;
+//	QGridLayout *layout = static_cast<QGridLayout *>(
+//				ui->widgetPlotContainer->layout());
+//	int row1 = getGridLayoutPosFromIndex(layout,
+//					     layout->indexOf(ui->markerTable)).first;
+//	int row2 = getGridLayoutPosFromIndex(layout,
+//					     layout->indexOf(ui->gridLayout_plot)).first;
 
-	if (checked) {
-		layout->setRowStretch(row1, 1);
-		layout->setRowStretch(row2, 3);
-	} else {
-		layout->setRowStretch(row1, 0);
-		layout->setRowStretch(row2, 0);
-	}
+//	if (checked) {
+//		layout->setRowStretch(row1, 1);
+//		layout->setRowStretch(row2, 3);
+//	} else {
+//		layout->setRowStretch(row1, 0);
+//		layout->setRowStretch(row2, 0);
+//	}
 }
 
 QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
