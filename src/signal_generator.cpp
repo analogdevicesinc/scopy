@@ -33,6 +33,7 @@
 #include <QPalette>
 #include <QSharedPointer>
 #include <QElapsedTimer>
+#include <QDockWidget>
 
 #include <gnuradio/analog/sig_source.h>
 #include <gnuradio/analog/sig_source_waveform.h>
@@ -602,11 +603,36 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	m_plot->enableTimeTrigger(false);
 
-	ui->plot->addWidget(m_plot->topArea(), 0, 0, 1, 4);
-	ui->plot->addWidget(m_plot->topHandlesArea(), 1, 0, 1, 4);
+	// Add docking plot
+
+	QWidget* widget = new QWidget();
+	QGridLayout *gridplot = new QGridLayout();
+
+	gridplot->addWidget(m_plot->topArea(), 0, 0);
+	gridplot->addWidget(m_plot->topHandlesArea(), 1, 0);
+	gridplot->addWidget(m_plot, 2, 0);
+
+	gridplot->setVerticalSpacing(0);
+	gridplot->setHorizontalSpacing(0);
+	gridplot->setContentsMargins(0, 0, 0, 0);
+	widget->setLayout(gridplot);
+
 	ui->plot->removeWidget(ui->instrumentNotes);
-	ui->plot->addWidget(ui->instrumentNotes,3,0,1,4);
-	ui->plot->addWidget(m_plot, 2, 1, 1, 1);
+
+	QMainWindow* m_centralMainWindow = new QMainWindow(this);
+	m_centralMainWindow->setCentralWidget(0);
+	m_centralMainWindow->setWindowFlags(Qt::Widget);
+	ui->plot->addWidget(m_centralMainWindow, 0, 0);
+
+	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+	docker->setWidget(widget);
+	docker->setContentsMargins(0, 0, 0, 10);
+
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+
+	ui->plot->addWidget(ui->instrumentNotes, 3, 0);
 }
 
 SignalGenerator::~SignalGenerator()

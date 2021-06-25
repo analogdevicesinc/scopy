@@ -22,6 +22,7 @@
 #include "pattern_generator.h"
 
 #include <QDebug>
+#include <QDockWidget>
 #include "ui_pattern_generator.h"
 #include "digitalchannel_manager.hpp"
 #include "gui/dynamicWidget.hpp"
@@ -228,21 +229,51 @@ void PatternGenerator::setupUi()
 	// set default menu width to 0
 	m_ui->rightMenu->setMaximumWidth(0);
 
+	// Add docking plot
+
+	QWidget* widget = new QWidget(this);
+	QGridLayout* gridLayout = new QGridLayout(widget);
+	gridLayout->setVerticalSpacing(0);
+	gridLayout->setHorizontalSpacing(0);
+	gridLayout->setContentsMargins(0, 0, 0, 0);
+	widget->setLayout(gridLayout);
+
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	m_ui->gridLayoutPlot->addWidget(m_plot.topArea(), 0, 0, 1, 4);
-	m_ui->gridLayoutPlot->addWidget(m_plot.topHandlesArea(), 1, 0, 1, 4);
+	gridLayout->addWidget(m_plot.topArea(), 0, 0, 1, 4);
+	gridLayout->addWidget(m_plot.topHandlesArea(), 1, 0, 1, 4);
 
-	m_ui->gridLayoutPlot->addWidget(m_plot.leftHandlesArea(), 0, 0, 4, 1);
-	m_ui->gridLayoutPlot->addWidget(m_plot.rightHandlesArea(), 0, 3, 4, 1);
+	gridLayout->addWidget(m_plot.leftHandlesArea(), 0, 0, 4, 1);
+	gridLayout->addWidget(m_plot.rightHandlesArea(), 0, 3, 4, 1);
+
+	gridLayout->addWidget(&m_plot, 2, 1, 1, 1);
+	gridLayout->addWidget(m_plotScrollBar, 2, 5, 1, 1);
+
+	gridLayout->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
+	gridLayout->addItem(plotSpacer, 4, 0, 1, 4);
 
 
-	m_ui->gridLayoutPlot->addWidget(&m_plot, 2, 1, 1, 1);
-	m_ui->gridLayoutPlot->addWidget(m_plotScrollBar, 2, 5, 1, 1);
+	QMainWindow* m_centralMainWindow = new QMainWindow(this);
+	m_centralMainWindow->setCentralWidget(0);
+	m_centralMainWindow->setWindowFlags(Qt::Widget);
+	m_ui->gridLayoutPlot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
 
-	m_ui->gridLayoutPlot->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
-	m_ui->gridLayoutPlot->addItem(plotSpacer, 4, 0, 1, 4);
+	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+	docker->setWidget(widget);
+
+	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+		if(topLevel) {
+			docker->setContentsMargins(10, 0, 10, 0);
+		} else {
+			docker->setContentsMargins(0, 0, 0, 0);
+		}
+	});
+
+
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 
 	m_plot.enableAxis(QwtPlot::yLeft, false);

@@ -266,6 +266,9 @@
            <bool>true</bool>
           </property>
           <layout class="QVBoxLayout" name="plot_and_buffPreviewer">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QWidget" name="hLayoutBufferPreview" native="true">
              <layout class="QHBoxLayout" name="hLayout_buffPreview">
@@ -390,13 +393,13 @@
                 <item>
                  <layout class="QGridLayout" name="gridLayoutPlot">
                   <property name="leftMargin">
-                   <number>25</number>
+                   <number>0</number>
                   </property>
                   <property name="topMargin">
                    <number>0</number>
                   </property>
                   <property name="rightMargin">
-                   <number>25</number>
+                   <number>0</number>
                   </property>
                   <property name="bottomMargin">
                    <number>0</number>
