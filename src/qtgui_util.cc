@@ -170,3 +170,24 @@ bool Util::compareNatural(const std::string& a, const std::string& b) {
 	return (compareNatural(a_new, b_new));
 }
 
+void DockerUtils::configureTopBar(QDockWidget *docker)
+{
+	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+		if(topLevel) {
+			docker->setWindowFlags(Qt::CustomizeWindowHint |
+							Qt::Window |
+							Qt::WindowMinimizeButtonHint |
+							Qt::WindowMaximizeButtonHint);
+			docker->show();
+			docker->setStyleSheet("QDockWidget {"
+						"titlebar-normal-icon: url(:/icons/close_hovered.svg);"
+						"}");
+			docker->setContentsMargins(10, 0, 10, 10);
+		} else {
+			docker->setStyleSheet("QDockWidget {"
+						  "titlebar-normal-icon: url();"
+						  "}");
+			docker->setContentsMargins(0, 0, 0, 0);
+		}
+	});
+}

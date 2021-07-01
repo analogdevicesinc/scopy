@@ -261,16 +261,12 @@ void PatternGenerator::setupUi()
 
 	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
 	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
+	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
 	docker->setWidget(widget);
 
-	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
-		if(topLevel) {
-			docker->setContentsMargins(10, 0, 10, 0);
-		} else {
-			docker->setContentsMargins(0, 0, 0, 0);
-		}
-	});
+#ifdef PLOT_MENU_BAR_ENABLED
+	DockerUtils::configureTopBar(docker);
+#endif
 
 
 	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);

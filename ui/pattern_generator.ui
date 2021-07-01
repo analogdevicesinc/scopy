@@ -288,7 +288,7 @@
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>20</height>
+                 <height>10</height>
                 </size>
                </property>
               </spacer>
@@ -337,7 +337,7 @@
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>20</height>
+                 <height>10</height>
                 </size>
                </property>
               </spacer>
@@ -1812,14 +1812,14 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>gui/linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

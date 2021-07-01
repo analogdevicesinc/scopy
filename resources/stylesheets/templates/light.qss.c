@@ -12,6 +12,15 @@ QWidget {
 	font-size: 13px;
 }
 
+QDockWidget {
+	titlebar-normal-icon: url();
+	background-color: #F7F7F7;
+}
+
+QDockWidget::title {
+	background-color: transparent;
+}
+
 QToolTip {
     padding: 6px;
     border: 1px solid rgba(149, 152, 154, 150);

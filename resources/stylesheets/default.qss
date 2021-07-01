@@ -13,7 +13,11 @@ QWidget {
 }
 
 QDockWidget {
-    titlebar-normal-icon: "";
+	titlebar-normal-icon: url();
+}
+
+QDockWidget::title {
+	background-color: transparent;
 }
 
 QToolTip {

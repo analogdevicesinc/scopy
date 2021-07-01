@@ -419,9 +419,6 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true">color: rgba(255, 255, 255, 153);</string>
-        </property>
         <property name="text">
          <string>      ΔV =</string>
         </property>
