@@ -25,6 +25,7 @@
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
 #include <QWidget>
+#include <QDockWidget>
 
 class QwtDblClickPlotPicker: public QwtPlotPicker
 {
@@ -62,6 +63,14 @@ public:
 	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 	static QString loadStylesheetFromFile(const QString &path);
 	static bool compareNatural(const std::string &a, const std::string &b);
+};
+
+#define PLOT_MENU_BAR_ENABLED
+
+class DockerUtils : public QObject
+{
+public:
+	static void configureTopBar(QDockWidget* docker);
 };
 
 #endif /* M2K_UTILS_H */
