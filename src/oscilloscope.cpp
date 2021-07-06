@@ -107,7 +107,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui(new Ui::Oscilloscope),
 	trigger_settings(m_m2k_analogin),
 	measure_settings(nullptr),
-	plot(this, false, 16, 10),
+	plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter),
 	fft_plot(nb_channels, this),
 	xy_plot(nb_channels / 2, this),
 	hist_plot(nb_channels, this),
@@ -170,6 +170,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	fft_size = 1024;
 	fft_plot_size = 1024;
 	fft_plot.setNumPoints(0);
+
+	fft_plot.setBtmHorAxisUnit("Hz");
+	fft_plot.setLeftVertAxisUnit("dB");
 
 	last_set_sample_count = 0;
 	last_set_time_pos = 0;

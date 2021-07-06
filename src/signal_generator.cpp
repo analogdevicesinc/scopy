@@ -143,7 +143,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->run_button->enableSingleButton(false);
 	this->setAttribute(Qt::WA_DeleteOnClose, true);
 
-	this->m_plot = new CapturePlot(this);
+	this->m_plot = new CapturePlot(this, false, 10, 10 , new TimePrefixFormatter, new MetricPrefixFormatter);
 
 	QVector<struct iio_channel *> iio_channels;
 

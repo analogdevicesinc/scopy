@@ -100,7 +100,8 @@ class TimeDomainDisplayPlot: public DisplayPlot
   Q_PROPERTY ( Qt::BrushStyle tag_background_style READ getTagBackgroundStyle WRITE setTagBackgroundStyle )
 
 public:
-  TimeDomainDisplayPlot(QWidget*, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10);
+  TimeDomainDisplayPlot(QWidget*, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10,
+			PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr);
   virtual ~TimeDomainDisplayPlot();
 
   void plotNewData(const std::string &sender,
@@ -119,6 +120,9 @@ public:
 
   void setYaxisUnit(QString unitType);
   QString yAxisUnit(void);
+
+  void setXaxisUnit(QString unitType);
+  QString xAxisUnit(void);
 
   const QColor getTagTextColor();
   const QColor getTagBackgroundColor();
@@ -203,7 +207,7 @@ public Q_SLOTS:
   void updatePreview(double reftimebase, double timebase, double timeposition);
 
 protected:
-  virtual void configureAxis(int axisPos, int axisIdx);
+  virtual void configureAxis(int axisPos, int axisIdx, PrefixFormatter* prefixFormatter);
   virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
 private Q_SLOTS:
@@ -237,8 +241,8 @@ private:
   std::vector< std::vector<QwtPlotMarker*> > d_tag_markers;
   std::vector<bool> d_tag_markers_en;
 
-  MetricPrefixFormatter d_metricFormatter;
-  TimePrefixFormatter d_timeFormatter;
+  PrefixFormatter* d_xAxisFormatter;
+  PrefixFormatter* d_yAxisFormatter;
 
   QColor d_tag_text_color;
   QColor d_tag_background_color;

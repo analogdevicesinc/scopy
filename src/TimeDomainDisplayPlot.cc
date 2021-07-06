@@ -171,7 +171,8 @@ int SinkManager::sinkFirstChannelPos(const std::string& name)
 /***********************************************************************
  * Main Time domain plotter widget
  **********************************************************************/
-TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs)
+TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs,
+					     PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis)
   : DisplayPlot(0, parent, isdBgraph, xNumDivs, yNumDivs)
 {
   d_tag_text_color = Qt::black;
@@ -188,9 +189,10 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
   d_autoscale_state = false;
 
   // Reconfigure the bottom horizontal axis that was created by the base class
-  configureAxis(QwtPlot::xBottom, 0);
-  configureAxis(QwtPlot::yLeft, 0);
+  configureAxis(QwtPlot::xBottom, 0, pfXaxis);
+  configureAxis(QwtPlot::yLeft, 0, pfYaxis);
 
+  d_xAxisUnit = "";
   d_yAxisUnit = "";
 
   //d_zoomer = new TimeDomainDisplayZoomer(canvas());
@@ -217,8 +219,15 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
   d_semilogy = false;
   d_autoscale_shot = false;
 
-  d_metricFormatter.setTwoDecimalMode(true);
-  d_timeFormatter.setTwoDecimalMode(true);
+  if (d_xAxisFormatter) {
+	  d_xAxisFormatter->setTwoDecimalMode(true);
+	  d_xAxisFormatter->setTrimZeroes(true);
+   }
+
+  if (d_yAxisFormatter) {
+	  d_yAxisFormatter->setTwoDecimalMode(true);
+	  d_yAxisFormatter->setTrimZeroes(true);
+  }
 
   d_tag_markers.resize(d_nplots);
   d_tag_markers_en = std::vector<bool>(d_nplots, true);
@@ -302,8 +311,8 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
 
 	_resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
       } else if (reset_x_axis_points) {
-          _resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
-          reset_x_axis_points = false;
+	  _resetXAxisPoints(d_xdata[sinkIndex], numDataPoints, d_sample_rate);
+	  reset_x_axis_points = false;
       }
 
       for(int i = 0; i < sinkNumChannels; i++) {
@@ -514,10 +523,10 @@ TimeDomainDisplayPlot::legendEntryChecked(QwtPlotItem* plotItem, bool on)
   for(int n = 0; n < d_nplots; n++) {
     if(plotItem == d_plot_curve[n]) {
       for(size_t i = 0; i < d_tag_markers[n].size(); i++) {
-        if(!(!on && d_tag_markers_en[n]))
-          d_tag_markers[n][i]->hide();
-        else
-          d_tag_markers[n][i]->show();
+	if(!(!on && d_tag_markers_en[n]))
+	  d_tag_markers[n][i]->hide();
+	else
+	  d_tag_markers[n][i]->show();
       }
     }
   }
@@ -721,8 +730,21 @@ QString TimeDomainDisplayPlot::yAxisUnit(void)
 	return d_yAxisUnit;
 }
 
-void
-TimeDomainDisplayPlot::stemPlot(bool en)
+void TimeDomainDisplayPlot::setXaxisUnit(QString unitType)
+{
+	if (d_xAxisUnit != unitType) {
+		d_xAxisUnit = unitType;
+
+		OscScaleDraw* scaleDraw = static_cast<OscScaleDraw*>(this->axisScaleDraw(QwtPlot::xBottom));
+		if (scaleDraw)
+			scaleDraw->setUnitType(d_xAxisUnit);
+	}
+}
+
+QString TimeDomainDisplayPlot::xAxisUnit() { return d_xAxisUnit; }
+
+
+void TimeDomainDisplayPlot::stemPlot(bool en)
 {
   if(en) {
     for(int i = 0; i < d_nplots; i++) {
@@ -919,32 +941,32 @@ void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
 
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value, int precision) const
 {
-	return d_timeFormatter.format(value, "", precision);
+	return d_yAxisFormatter->format(value, "", precision);
 }
 
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value)
 {
 	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::xBottom));
 
-	return d_timeFormatter.format(value, "", scale->getFloatPrecison());
+	return d_yAxisFormatter->format(value, "", scale->getFloatPrecison());
 }
 
 QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value, int precision) const
 {
 	value *= d_displayScale;
-	return d_metricFormatter.format(value, d_yAxisUnit, precision);
+	return d_xAxisFormatter->format(value, d_yAxisUnit, precision);
 }
 
 QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value)
 {
 	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::yLeft));
 
-	return d_metricFormatter.format(value, d_yAxisUnit, scale->getFloatPrecison());
+	return d_xAxisFormatter->format(value, d_yAxisUnit, scale->getFloatPrecison());
 }
 
 void
 TimeDomainDisplayPlot::setYLabel(const std::string &label,
-                                 const std::string &unit)
+				 const std::string &unit)
 {
   std::string l = label;
   if(unit.length() > 0)
@@ -1351,21 +1373,20 @@ bool TimeDomainDisplayPlot::unregisterSink(std::string sinkName)
 	return ret;
 }
 
-void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx)
+void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx, PrefixFormatter* prefixFormatter)
 {
 	QwtAxisId axis(axisPos, axisIdx);
-	PrefixFormatter *prefixFormatter;
 	QString unit;
 	unsigned int floatPrecision;
 	unsigned int numDivs;
 
 	if (axisPos == QwtPlot::yLeft) {
-		prefixFormatter = &d_metricFormatter;
+		d_xAxisFormatter = prefixFormatter;
 		unit = d_yAxisUnit;
 		floatPrecision = 2;
 		numDivs = yAxisNumDiv();
 	} else {
-		prefixFormatter = &d_timeFormatter;
+		d_yAxisFormatter = prefixFormatter;
 		unit = d_xAxisUnit;
 		floatPrecision = 2;
 		numDivs = xAxisNumDiv();

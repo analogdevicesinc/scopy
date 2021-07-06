@@ -40,9 +40,9 @@ using namespace adiscope;
 /*
  * OscilloscopePlot class
  */
-OscilloscopePlot::OscilloscopePlot(QWidget *parent, bool isdBgraph,
-				   unsigned int xNumDivs, unsigned int yNumDivs):
-	TimeDomainDisplayPlot(parent, isdBgraph, xNumDivs, yNumDivs)
+OscilloscopePlot::OscilloscopePlot(QWidget *parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs
+				   ,PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis):
+	TimeDomainDisplayPlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis)
 {
 	setYaxisUnit("V");
 
@@ -59,9 +59,9 @@ OscilloscopePlot::~OscilloscopePlot()
 /*
  * CapturePlot class
  */
-CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph,
-			 unsigned int xNumDivs, unsigned int yNumDivs):
-	OscilloscopePlot(parent, isdBgraph, xNumDivs, yNumDivs),
+CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs
+			 ,PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis):
+	OscilloscopePlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis),
 	d_triggerAEnabled(false),
 	d_triggerBEnabled(false),
 	d_measurementsEnabled(false),
