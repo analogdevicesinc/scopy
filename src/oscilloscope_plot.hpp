@@ -42,7 +42,7 @@ namespace adiscope {
 
 	public:
 		OscilloscopePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10,
-				 unsigned int yNumDiv = 10);
+				 unsigned int yNumDiv = 10, PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr);
 		~OscilloscopePlot();
 	};
 
@@ -63,8 +63,8 @@ namespace adiscope {
 		};
 
 	public:
-		CapturePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10,
-			    unsigned int yNumDivs = 10);
+		CapturePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10,
+			    PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr);
 		~CapturePlot();
 
 		void replot();

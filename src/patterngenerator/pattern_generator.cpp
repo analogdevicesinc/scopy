@@ -69,7 +69,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 				   DIOManager *diom, ToolLauncher *parent)
 	: LogicTool(nullptr, toolMenuItem, new PatternGenerator_API(this), "Pattern Generator", parent)
 	, m_ui(new Ui::PatternGenerator)
-	, m_plot(this, false, 16, 10)
+	, m_plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter)
 	, m_plotScrollBar(new QScrollBar(Qt::Vertical, this))
 	, m_selectedChannel(-1)
 	, m_nbChannels(DIGITAL_NR_CHANNELS)
