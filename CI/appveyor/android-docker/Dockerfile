@@ -1,6 +1,6 @@
 FROM ubuntu:20.04
 
-ARG USER=docker
+ARG USER=runner
 
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
@@ -81,6 +81,6 @@ RUN git submodule update --init --recursive libzmq/
 RUN git submodule update --init --recursive volk/ 
 
 WORKDIR /home/$USER/src/scopy-android-deps
+ENV ANDROID_TOOLCHAIN_LOCATION=/home/$USER/src/scopy-android-deps
 RUN ./download_deps_src.sh $USER
 RUN ./android_deps_build.sh aarch64 $USER
-ENTRYPOINT ./build_scopy.sh aarch64 $USER
