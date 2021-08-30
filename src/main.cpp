@@ -45,6 +45,12 @@ using namespace adiscope;
 
 int main(int argc, char **argv)
 {
+#ifdef  __ANDROID__
+	qputenv("QT_SCALE_FACTOR", "1.17");
+	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+
+
 	ScopyApplication app(argc, argv);
 #ifdef LIBM2K_ENABLE_LOG
 	enableLogging(true);
