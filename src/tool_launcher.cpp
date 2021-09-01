@@ -1682,15 +1682,17 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 				info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
 				info.exec();
 			} else {
-				//                bool success = loadDecoders("decoders");
+#ifndef __ANDROID__
+						bool success = loadDecoders("decoders");
 
-				//                if (!success) {
-				//                    search_timer->stop();
+						if (!success) {
+						    search_timer->stop();
 
-				//                    QMessageBox error(this);
-				//                    error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
-				//                    error.exec();
-				//                }
+						    QMessageBox error(this);
+						    error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
+						    error.exec();
+						}
+#endif
 			}
 		}
 
