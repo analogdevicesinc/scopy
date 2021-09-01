@@ -56,8 +56,8 @@
 #include <QDesktopServices>
 #include <QSpacerItem>
 #if __ANDROID__
-	#include <QtAndroidExtras/QtAndroid>
-	#include <QAndroidJniEnvironment>
+#include <QtAndroidExtras/QtAndroid>
+#include <QAndroidJniEnvironment>
 #endif
 
 #include <iio.h>
@@ -97,7 +97,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
 	infoWidget(nullptr),
 	calib(nullptr),
-    skip_calibration(false),
+	skip_calibration(false),
 	calibrating(false),
 	debugger_enabled(false),
 	indexFile(""), deviceInfo(""), pathToFile(""),
@@ -113,9 +113,9 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	m_adc_tools_failed(false),
 	m_dac_tools_failed(false),
 	about(nullptr)
-#ifdef __ANDROID__
-	,jnienv(new QAndroidJniEnvironment())
-#endif
+      #ifdef __ANDROID__
+      ,jnienv(new QAndroidJniEnvironment())
+      #endif
 {
 	if (!isatty(STDIN_FILENO))
 		notifier.setEnabled(false);
@@ -170,7 +170,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	connect(ui->btnHomepage, SIGNAL(toggled(bool)), this, SLOT(btnHomepage_toggled(bool)));
 
 	tl_api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_LAUNCHER)));
+							     TOOL_LAUNCHER)));
 
 	//option background
 	connect(ui->btnHome, SIGNAL(toggled(bool)), this,
@@ -192,7 +192,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 #endif
 	QtJs *js_object = new QtJs(&js_engine);
 	js_engine.globalObject().setProperty("fileIO",
-				js_engine.newQObject(new JsFileIo(this)));
+					     js_engine.newQObject(new JsFileIo(this)));
 	tl_api->js_register(&js_engine);
 
 	connect(&notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
@@ -253,7 +253,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		msgBox->show();
 		msgBox->activateWindow();
 		msgBox->move( QPoint( screenRect.x() + screenRect.width()/2 - mSize.width()/2,
-				     screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
+				      screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
 		connect(msgBox->button(QMessageBox::Yes), &QAbstractButton::pressed, [&] () {
 			prefPanel->setAutomatical_version_checking_enabled(true);
 			prefPanel->setFirst_application_run(false);
@@ -274,7 +274,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	setupAddPage();
 	readPreferences();
 	this->installEventFilter(this);
-	ui->btnConnect->hide();	
+	ui->btnConnect->hide();
 
 	_setupToolMenu();
 
@@ -309,35 +309,35 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	}
 #if __ANDROID__
 	auto  result = QtAndroid::checkPermission(QString("android.permission.WRITE_EXTERNAL_STORAGE"));
-	    if(result == QtAndroid::PermissionResult::Denied){
+	if(result == QtAndroid::PermissionResult::Denied){
 		QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.WRITE_EXTERNAL_STORAGE"}));
 		if(resultHash["android.permission.WRITE_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
-		    return;
-	    }
-	result = QtAndroid::checkPermission(QString("android.permission.READ_EXTERNAL_STORAGE"));
-		if(result == QtAndroid::PermissionResult::Denied){
-		    QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.READ_EXTERNAL_STORAGE"}));
-		    if(resultHash["android.permission.READ_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
 			return;
-		}
+	}
+	result = QtAndroid::checkPermission(QString("android.permission.READ_EXTERNAL_STORAGE"));
+	if(result == QtAndroid::PermissionResult::Denied){
+		QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.READ_EXTERNAL_STORAGE"}));
+		if(resultHash["android.permission.READ_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
+			return;
+	}
 
 #endif
-//	    skip_calibration=true;
+	//	    skip_calibration=true;
 
-//	    QFile f("/sdcard/gnuradio/bla.txt");
-//	    f.open(QIODevice::ReadWrite);
-//	    f.write("blabla");
-//	    f.close();
+	//	    QFile f("/sdcard/gnuradio/bla.txt");
+	//	    f.open(QIODevice::ReadWrite);
+	//	    f.write("blabla");
+	//	    f.close();
 
-    // TO DO: Remove temporary spaces
+	// TO DO: Remove temporary spaces
 	// set home icon
 	ui->btnHome->setText("  Home");
 	ui->btnHome->setIcon(QIcon::fromTheme("house"));
 	ui->btnHome->setIconSize(QSize(32,32));
 
-//	f.open(QIODevice::ReadOnly);
-//	qDebug()<<f.readAll();
-//	f.close();
+	//	f.open(QIODevice::ReadOnly);
+	//	qDebug()<<f.readAll();
+	//	f.close();
 }
 
 void ToolLauncher::_setupToolMenu()
@@ -425,7 +425,7 @@ void ToolLauncher::readPreferences()
 	allowExternalScript(prefPanel->getExternal_script_enabled());
 	if (manual_calibration) {
 		manual_calibration->allowManualCalibScript(manual_calibration_enabled,
-				prefPanel->getManual_calib_script_enabled());
+							   prefPanel->getManual_calib_script_enabled());
 	}
 
 	AnimationManager::getInstance().toggleAnimations(prefPanel->getAnimations_enabled());
@@ -474,8 +474,8 @@ void ToolLauncher::saveSession()
 {
 	if (ctx) {
 		QString fileName = QFileDialog::getSaveFileName(this,
-		    tr("Save session"), "", tr("Scopy-Files (*.ini)"),
-		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+								tr("Save session"), "", tr("Scopy-Files (*.ini)"),
+								nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 		if (!fileName.isEmpty()) {
 			this->tl_api->save(fileName);
 		}
@@ -518,8 +518,8 @@ void ToolLauncher::setNativeDialogs(bool nativeDialogs)
 void ToolLauncher::loadSession()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,
-	    tr("Load session"), "", tr("Scopy-Files (*.ini)"),
-	    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+							tr("Load session"), "", tr("Scopy-Files (*.ini)"),
+							nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 	if (!fileName.isEmpty()) {
 		this->tl_api->load(fileName);
 		updateHomepage();
@@ -734,7 +734,7 @@ ToolLauncher::~ToolLauncher()
 	tl_api->ApiObject::save(*settings);
 	m_sessionInfo.save(*settings);
 
-	delete settings;	
+	delete settings;
 	SingleToneWrapper<QSettings *>::getInstance().setWrapped(nullptr);
 
 	delete tl_api;
@@ -803,10 +803,10 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 	DeviceWidget *deviceWidget = nullptr;
 	if (tempFilter->hw_name().compare("M2K") == 0) {
 		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::M2K,
-					       uri, tempFilter->hw_name(), this);
+							uri, tempFilter->hw_name(), this);
 	} else {
 		deviceWidget = DeviceBuilder::newDevice(DeviceBuilder::GENERIC,
-					       uri, tempFilter->hw_name(), this);
+							uri, tempFilter->hw_name(), this);
 	}
 
 	delete tempFilter;
@@ -830,7 +830,7 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 		this, SLOT(stopSearching(bool)));
 
 	ui->devicesList->insertWidget(ui->devicesList->count() - 1,
-				deviceWidget);
+				      deviceWidget);
 	ui->stackedWidget->addWidget(deviceWidget->infoPage());
 	devices_btn_group->addButton(deviceWidget->deviceButton());
 	devices.push_back(deviceWidget);
@@ -916,8 +916,8 @@ void ToolLauncher::setupHomepage()
 			//versionLabel->setText(tr("Unable to check update server!"));
 		} else if (m_phoneHome->getScopyVersion() != QString("v" + QString(PROJECT_VERSION))) {
 			versionLabel->setText(tr("Version ") + m_phoneHome->getScopyVersion() + " of Scopy was released. " +
-								  "<a href=\"" + m_phoneHome->getScopyLink() +
-								  tr("\">Click to update </a>"));
+					      "<a href=\"" + m_phoneHome->getScopyLink() +
+					      tr("\">Click to update </a>"));
 			versionLabel->setTextFormat(Qt::RichText);
 			versionLabel->setTextInteractionFlags(Qt::TextBrowserInteraction);
 			versionLabel->setOpenExternalLinks(true);
@@ -1138,9 +1138,9 @@ void adiscope::ToolLauncher::disconnect()
 	ui->btnHome->click();
 
 	QObject::disconnect(this, SIGNAL(calibrationFailed()),
-		this, SLOT(calibrationFailedCallback()));
+			    this, SLOT(calibrationFailedCallback()));
 	QObject::disconnect(this, SIGNAL(calibrationDone()),
-		this, SLOT(restartToolsAfterCalibration()));
+			    this, SLOT(restartToolsAfterCalibration()));
 
 	if (ctx) {
 		if (calibrating) {
@@ -1203,7 +1203,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 	/* Disconnect connected device, if any */
 	if (ctx) {
 		QObject::disconnect(connectedDev->calibrateButton(),
-			   SIGNAL(clicked()),this, SLOT(requestCalibration()));
+				    SIGNAL(clicked()),this, SLOT(requestCalibration()));
 		QObject::disconnect(&calibration_thread_watcher, SIGNAL(finished()),
 				    this, SLOT(calibrationThreadWatcherFinished()));
 		connectedDev->setConnected(false, false);
@@ -1441,7 +1441,7 @@ void adiscope::ToolLauncher::requestCalibration()
 	stopToolsBeforeCalibration();
 
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::calibrate,
-					       this));
+							 this));
 }
 
 void adiscope::ToolLauncher::requestCalibrationCancel()
@@ -1472,14 +1472,14 @@ QPair<bool, bool> adiscope::ToolLauncher::initialCalibration()
 		initialCalibrationFlag = false;
 	}
 
-//	if (okc.first) {
-//		Q_EMIT adcCalibrationDone();
-//		Q_EMIT dacCalibrationDone();
-//		Q_EMIT calibrationDone();
-//	}
-//	else {
-//		Q_EMIT calibrationFailed();
-//	}
+	//	if (okc.first) {
+	//		Q_EMIT adcCalibrationDone();
+	//		Q_EMIT dacCalibrationDone();
+	//		Q_EMIT calibrationDone();
+	//	}
+	//	else {
+	//		Q_EMIT calibrationFailed();
+	//	}
 
 	return okc;
 }
@@ -1521,14 +1521,14 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 
 	calibrating = false;
 
-    if (ok) {
-        Q_EMIT adcCalibrationDone();
-        Q_EMIT dacCalibrationDone();
-        Q_EMIT calibrationDone();
-    }
-    else {
-        Q_EMIT calibrationFailed();
-    }
+	if (ok) {
+		Q_EMIT adcCalibrationDone();
+		Q_EMIT dacCalibrationDone();
+		Q_EMIT calibrationDone();
+	}
+	else {
+		Q_EMIT calibrationFailed();
+	}
 
 	return { ok, skipCalib };
 }
@@ -1567,12 +1567,12 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 					 &ToolLauncher::addDebugWindow);
 		}
 
-        if (filter->compatible(TOOL_CALIBRATION)) {
-            manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),
-                                   &js_engine, this, calib);
-            adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
-            toolList.push_back(manual_calibration);
-        }
+		if (filter->compatible(TOOL_CALIBRATION)) {
+			manual_calibration = new ManualCalibration(ctx, filter,menu->getToolMenuItemFor(TOOL_CALIBRATION),
+								   &js_engine, this, calib);
+			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_CALIBRATION)->getToolStopBtn());
+			toolList.push_back(manual_calibration);
+		}
 
 		if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 			spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
@@ -1592,7 +1592,7 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 				menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolBtn()->click();
 			});
 			network_analyzer->setOscilloscope(oscilloscope);
-        }
+		}
 
 		m_adc_tools_failed = false;
 		Q_EMIT adcToolsCreated();
@@ -1672,27 +1672,27 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			dioManager = new DIOManager(ctx, filter);
 		}
 
-        if (filter->compatible(TOOL_LOGIC_ANALYZER)
-                || filter->compatible(TOOL_PATTERN_GENERATOR)) {
+		if (filter->compatible(TOOL_LOGIC_ANALYZER)
+				|| filter->compatible(TOOL_PATTERN_GENERATOR)) {
 
-            if (!m_use_decoders) {
-                search_timer->stop();
+			if (!m_use_decoders) {
+				search_timer->stop();
 
-                QMessageBox info(this);
-                info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
-                info.exec();
-            } else {
-//                bool success = loadDecoders("decoders");
+				QMessageBox info(this);
+				info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
+				info.exec();
+			} else {
+				//                bool success = loadDecoders("decoders");
 
-//                if (!success) {
-//                    search_timer->stop();
+				//                if (!success) {
+				//                    search_timer->stop();
 
-//                    QMessageBox error(this);
-//                    error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
-//                    error.exec();
-//                }
-            }
-        }
+				//                    QMessageBox error(this);
+				//                    error.setText(tr("There was a problem initializing libsigrokdecode. Some features may be missing"));
+				//                    error.exec();
+				//                }
+			}
+		}
 
 		if (filter->compatible(TOOL_DIGITALIO)) {
 			dio = new DigitalIO(nullptr, filter, menu->getToolMenuItemFor(TOOL_DIGITALIO),
@@ -1737,8 +1737,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	}
 
 	connect(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn(),
-			&QPushButton::toggled,
-			[=](bool en) {
+		&QPushButton::toggled,
+		[=](bool en) {
 		if(en) {
 			if(!menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolStopBtn()->isChecked())
 				return;
@@ -1746,8 +1746,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		}
 	});
 	connect(menu->getToolMenuItemFor(TOOL_SIGNAL_GENERATOR)->getToolStopBtn(),
-			&QPushButton::toggled,
-			[=](bool en) {
+		&QPushButton::toggled,
+		[=](bool en) {
 		if(en) {
 			if(adc_users_group.checkedId() == adc_users_group.id(menu->getToolMenuItemFor(TOOL_NETWORK_ANALYZER)->getToolStopBtn())){
 				auto btn = dynamic_cast<CustomPushButton*>(
@@ -1781,7 +1781,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	selectedDev->infoPage()->setCalibrationStatusLabel(tr("Calibrating"));
 
 	calibration_thread = QtConcurrent::run(std::bind(&ToolLauncher::initialCalibration,
-					       this));
+							 this));
 
 	calibration_thread_watcher.setFuture(calibration_thread);
 	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
@@ -1792,9 +1792,9 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 void ToolLauncher::calibrationThreadWatcherFinished()
 {
 	QObject::disconnect(this, SIGNAL(adcCalibrationDone()),
-		   this, SLOT(enableAdcBasedTools()));
+			    this, SLOT(enableAdcBasedTools()));
 	QObject::disconnect(this, SIGNAL(dacCalibrationDone()),
-		   this, SLOT(enableDacBasedTools()));
+			    this, SLOT(enableDacBasedTools()));
 
 	auto dev = getConnectedDevice();
 	if (dev) {
@@ -1850,8 +1850,8 @@ void ToolLauncher::checkIp(const QString& ip)
 
 		if (!found)
 			QMetaObject::invokeMethod(this, "addContext",
-						Qt::QueuedConnection,
-						Q_ARG(const QString&, uri));
+						  Qt::QueuedConnection,
+						  Q_ARG(const QString&, uri));
 	} else {
 		previousIp = "";
 	}
@@ -1873,6 +1873,8 @@ void ToolLauncher::toolDetached(bool detached)
 
 	tool->setMinimumSize(910, 490);
 }
+
+
 
 void ToolLauncher::closeEvent(QCloseEvent *event)
 {
