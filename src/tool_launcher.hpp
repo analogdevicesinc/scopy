@@ -62,7 +62,7 @@
 #include "session_info.h"
 
 extern "C" {
-	struct iio_context;
+struct iio_context;
 }
 
 namespace Ui {

@@ -66,13 +66,13 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
 	google_breakpad::ExceptionHandler eh(L"C:/dumps/",
-										NULL,
-										ScopyApplication::dumpCallback,
-										NULL,
-										google_breakpad::ExceptionHandler::HANDLER_ALL,
-										MiniDumpNormal,
-										(wchar_t*)NULL,
-										NULL);
+					     NULL,
+					     ScopyApplication::dumpCallback,
+					     NULL,
+					     google_breakpad::ExceptionHandler::HANDLER_ALL,
+					     MiniDumpNormal,
+					     (wchar_t*)NULL,
+					     NULL);
 #endif
 	app.setExceptionHandler(&eh);
 #endif
@@ -116,11 +116,11 @@ int main(int argc, char **argv)
 	parser.addVersionOption();
 
 	parser.addOptions({
-		{ {"s", "script"}, "Run given script.", "script" },
-		{ {"n", "nogui"}, "Run Scopy without GUI" },
-		{ {"d", "nodecoders"}, "Run Scopy without digital decoders"},
-		{ {"nd", "nonativedialog"}, "Run Scopy without native file dialogs"}
-	});
+				  { {"s", "script"}, "Run given script.", "script" },
+				  { {"n", "nogui"}, "Run Scopy without GUI" },
+				  { {"d", "nodecoders"}, "Run Scopy without digital decoders"},
+				  { {"nd", "nonativedialog"}, "Run Scopy without native file dialogs"}
+			  });
 
 	parser.process(app);
 
@@ -204,10 +204,10 @@ int main(int argc, char **argv)
 		file.close();
 
 		QMetaObject::invokeMethod(&launcher,
-				 "runProgram",
-				 Qt::QueuedConnection,
-				 Q_ARG(QString, contents),
-				 Q_ARG(QString, script));
+					  "runProgram",
+					  Qt::QueuedConnection,
+					  Q_ARG(QString, contents),
+					  Q_ARG(QString, script));
 	}
 	return restarter.restart(app.exec());
 }
