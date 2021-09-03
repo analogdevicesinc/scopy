@@ -70,8 +70,11 @@ public:
 				       const QString& shortName);
 	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
-	void addCentralWidget(QWidget* widget, bool dockable, const QString& dockerName, int row = -1, int column = -1,
-			      int rowspan = -1, int columnspan = -1);
+
+	void addFixedCentralWidget(QWidget* widget, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
+	int addDockableCentralWidget(QWidget* widget, Qt::DockWidgetArea area, const QString& dockerName);
+	void addDockableTabedWidget(QWidget* widget, const QString &dockerName, int plotId);
+	void addFixedTabedWidget(QWidget* widget, int plotId);
 
 private:
 	void configureLastOpenedMenu();
@@ -80,6 +83,7 @@ private:
 	void settingsPanelUpdate(int id);
 	void rightMenuFinished(bool opened);
 	QDockWidget* createDetachableMenu(QWidget* menu, int& id);
+	QDockWidget* createDockableWidget(QWidget* widget, const QString& dockerName);
 
 public Q_SLOTS:
 	void triggerRightMenuToggle(bool checked);
@@ -102,8 +106,7 @@ private:
 	int m_generalSettingsMenuId;
 
 	QMainWindow* m_centralMainWindow;
-	unsigned int m_dockables;
-	std::vector<QDockWidget*> m_firstDocks;
+	QList<QDockWidget*> m_docksList;
 };
 } // namespace gui
 } // namespace scopy
