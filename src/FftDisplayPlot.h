@@ -179,6 +179,16 @@ namespace adiscope {
 		explicit FftDisplayPlot(int nplots, QWidget *parent = nullptr);
 		~FftDisplayPlot();
 
+		void initChannelMeasurement(int nplots);
+		std::vector<double*> getOrginal_data();
+		std::vector<double*> getRef_data();
+		int64_t getYdata_size();
+		std::vector<double> getScaleFactor();
+		int64_t getNumPoints();
+
+		bool isReferenceWaveform(unsigned int chnIdx);
+		size_t getCurveSize(unsigned int chnIdx);
+
 		// Scaling factors for plot samples (one per channel)
 		double channelScaleFactor(int chIdx) const;
 		void setScaleFactor(int chIdx, double scale);
@@ -252,6 +262,7 @@ namespace adiscope {
 		QString formatYValue(double value, int precision) const;
 
 	Q_SIGNALS:
+		void channelAdded(int);
 		void newData();
 		void sampleRateUpdated(double);
 		void sampleCountUpdated(uint);

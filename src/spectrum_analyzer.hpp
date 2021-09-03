@@ -35,6 +35,7 @@
 #include "gui/spinbox_a.hpp"
 #include "gui/customPushButton.hpp"
 #include "gui/startstoprangewidget.h"
+#include "gui/measure.h"
 
 #include <QWidget>
 #include <QQueue>
@@ -56,6 +57,7 @@ namespace Ui {
 class SpectrumAnalyzer;
 class CursorReadouts;
 class CursorsSettings;
+class MeasurementsPanel;
 }
 
 namespace adiscope {
@@ -63,6 +65,8 @@ class SpectrumChannel;
 class Filter;
 class ChannelWidget;
 class DbClickButtons;
+class MeasurementData;
+class MeasurementGui;
 }
 
 class QPushButton;
@@ -73,6 +77,7 @@ namespace adiscope {
 class SpectrumAnalyzer_API;
 class SpectrumChannel_API;
 class SpectrumMarker_API;
+class MeasureSettings;
 
 class SpectrumAnalyzer: public Tool
 {
@@ -114,6 +119,7 @@ Q_SIGNALS:
 	void started(bool);
 	void showTool();
 	void selectedChannelChanged(int);
+	void measurementsAvailable();
 
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
@@ -122,6 +128,18 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
+
+	void on_btnMeasure_toggled(bool);
+	void on_boxMeasure_toggled(bool);
+
+	void onMeasuremetsAvailable();
+	void onMeasurementActivated(int id, int chnIdx);
+	void onMeasurementDeactivated(int id, int chnIdx);
+	void onMeasurementSelectionListChanged();
+
+	void setMeasuremensEnabled(bool en);
+	void onChannelAdded(int);
+	void onNewDataReceived();
 
 	void on_boxCursors_toggled(bool on);
 	void on_btnCursors_toggled(bool);
@@ -208,6 +226,13 @@ private:
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 
+	QWidget *measurePanel;
+	Ui::MeasurementsPanel *measure_panel_ui;
+	adiscope::MeasureSettings *measure_settings;
+	QList<std::shared_ptr<MeasurementData>> measurements_data;
+	QList<std::shared_ptr<MeasurementGui>> measurements_gui;
+	QList<Measure *> d_measureObjs;
+	bool d_measurementsEnabled;
 
 	Ui::CursorReadouts *cursor_readouts_ui;
 	QWidget *cursorReadouts;
@@ -277,6 +302,29 @@ private:
 	void fillCursorReadouts(const struct cursorReadoutsText &);
 
 	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
+
+	//din capture plot
+	QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
+	std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
+	void measure();
+	int activeMeasurementsCount(int chnIdx);
+	Measure* measureOfChannel(int chnIdx) const;
+	bool measurementsEnabled();
+	void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
+
+	void cleanUpMeasurementsBeforeChannelRemoval(int chnIdx);
+
+	//functii normale
+	void settings_panel_update(int id);
+	void settings_panel_size_adjust();
+	void update_measure_for_channel(int ch_idx);
+
+	void measure_panel_init();
+	void measure_settings_init();
+	void init_selected_measurements(int, std::vector<int>);
+	void measureUpdateValues();
+	void measureLabelsRearrange();
+	void measureCreateAndAppendGuiFrom(const MeasurementData&);
 };
 
 class SpectrumChannel: public QObject

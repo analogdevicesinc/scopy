@@ -209,6 +209,10 @@ FftDisplayPlot::~FftDisplayPlot()
 	canvas()->removeEventFilter(d_symbolCtrl);
 }
 
+void FftDisplayPlot::initChannelMeasurement(int nplots) {
+     Q_EMIT channelAdded(nplots);
+}
+
 void FftDisplayPlot::replot()
 {
 	if (!d_leftHandlesArea || !d_bottomHandlesArea) {
@@ -219,6 +223,17 @@ void FftDisplayPlot::replot()
 	d_bottomHandlesArea->repaint();
 
 	QwtPlot::replot();
+}
+
+bool FftDisplayPlot::isReferenceWaveform(unsigned int chnIdx)
+{
+    QwtPlotCurve *curve = Curve(chnIdx);
+    return d_ref_curves.values().contains(curve);
+}
+
+size_t FftDisplayPlot::getCurveSize(unsigned int chnIdx)
+{
+    return Curve(chnIdx)->data()->size();
 }
 
 QString FftDisplayPlot::formatXValue(double value, int precision) const
@@ -474,7 +489,6 @@ void FftDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xDa
 
 	d_ref_curves.insert(name, curve);
 	d_plot_curve.push_back(curve);
-	n_ref_curves++;
 
 	d_num_markers.push_back(0);
 	d_markers.push_back(QList<marker>());
@@ -490,6 +504,9 @@ void FftDisplayPlot::registerReferenceWaveform(QString name, QVector<double> xDa
 	setPeakCount(d_num_markers.size() - 1, 10);
 
 	findPeaks(d_plot_curve.size() - 1);
+
+	Q_EMIT channelAdded(y_data.size() + n_ref_curves);
+	n_ref_curves++;
 
 	replot();
 }
@@ -581,6 +598,27 @@ void FftDisplayPlot::useLogFreq(bool use_log_freq)
 	}
 	d_logScaleEnabled = use_log_freq;
 	replot();
+}
+
+std::vector<double*> FftDisplayPlot::getOrginal_data() {
+    return y_original_data;
+}
+
+int64_t FftDisplayPlot::getYdata_size() {
+    return y_data.size();
+}
+
+std::vector<double*> FftDisplayPlot::getRef_data() {
+    return d_refYdata;
+}
+
+std::vector<double> FftDisplayPlot::getScaleFactor() {
+    return y_scale_factor;
+}
+
+int64_t FftDisplayPlot::getNumPoints()
+{
+    return d_numPoints;
 }
 
 void FftDisplayPlot::plotData(const std::vector<double *> &pts,

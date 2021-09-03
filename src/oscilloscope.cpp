@@ -4296,7 +4296,8 @@ void Oscilloscope::measureUpdateValues()
 
 void Oscilloscope::measure_settings_init()
 {
-	measure_settings = new MeasureSettings(&plot, this);
+	QList<Measure *>* measure_obj = plot.getMeasurements();
+	measure_settings = new MeasureSettings(measure_obj, this);
 
 	int measure_panel = ui->stackedWidget->insertWidget(-1, measure_settings);
 
