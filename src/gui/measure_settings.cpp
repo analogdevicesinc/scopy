@@ -55,25 +55,41 @@ static const std::map<int, QString> icons_lut = {
 	{Measure::N_DUTY, "://icons/measurements/n_duty.svg"},
 };
 
-MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
-	QWidget(parent),
-	m_ui(new Ui::MeasureSettings),
-	m_channelName(""),
-	m_chnUnderlineColor(),
-	m_horizMeasurements(new DropdownSwitchList(2, this)),
-	m_vertMeasurements(new DropdownSwitchList(2, this)),
-	m_emitActivated(true),
-	m_emitStatsChanged(true),
-	m_emitStatsDeleteAll(true),
-	m_emitDeleteAll(true),
-	m_are_dropdowns_filled(false),
-	m_plot(plot),
-	m_selectedChannel(-1),
-	m_enableDisplayAll(false)
-{
-	QTreeView *treeView;
+static const std::map<int, QString> icons_spect = {
+    {Measure::NOISE_FLOOR, "://icons/measurements/period.svg"},
+    {Measure::SINAD, "://icons/measurements/frequency.svg"},
+    {Measure::SNR, "://icons/measurements/frequency.svg"},
+    {Measure::THD, "://icons/measurements/frequency.svg"},
+    {Measure::THDN, "://icons/measurements/frequency.svg"},
+    {Measure::SFDR, "://icons/measurements/frequency.svg"},
+};
 
-	m_ui->setupUi(this);
+MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *parent, bool is_time_domain) :
+    QWidget(parent),
+    m_ui(new Ui::MeasureSettings),
+    m_channelName(""),
+    m_chnUnderlineColor(),
+    m_horizMeasurements(nullptr),
+    m_vertMeasurements(nullptr),
+    m_is_time_domain(is_time_domain),
+    m_emitActivated(true),
+    m_emitStatsChanged(true),
+    m_emitStatsDeleteAll(true),
+    m_emitDeleteAll(true),
+    m_are_dropdowns_filled(false),
+    m_measures_list(measures_list),
+    m_selectedChannel(-1),
+    m_enableDisplayAll(false)
+{
+    QTreeView *treeView;
+
+    m_ui->setupUi(this);
+    hide_measure_settings(m_is_time_domain);
+
+    if(m_is_time_domain)
+    {
+	m_horizMeasurements = new DropdownSwitchList(2, this);
+	m_vertMeasurements = new DropdownSwitchList(2, this);
 	m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
 	m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
 
@@ -87,8 +103,8 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	treeView->setIconSize(QSize(30, 20));
 
 	connect(m_horizMeasurements->model(),
-		SIGNAL(itemChanged(QStandardItem*)),
-		SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+	    SIGNAL(itemChanged(QStandardItem*)),
+	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
 
 	m_vertMeasurements->setTitle(tr("Vertical"));
 	m_vertMeasurements->setColumnTitle(0, tr("Name"));
@@ -100,13 +116,94 @@ MeasureSettings::MeasureSettings(CapturePlot *plot, QWidget *parent) :
 	treeView->setIconSize(QSize(30, 20));
 
 	connect(m_vertMeasurements->model(),
-		SIGNAL(itemChanged(QStandardItem*)),
-		SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+	    SIGNAL(itemChanged(QStandardItem*)),
+	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+    }
+    else
+    {
+	m_horizMeasurements = new DropdownSwitchList(1, this);
+	m_vertMeasurements = new DropdownSwitchList(1, this);
+
+	connect(m_ui->comboBox_harm, SIGNAL(currentIndexChanged(int)),
+	    SLOT(onharmValueChanged(int)));
+
+	m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
+	m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
+
+	m_horizMeasurements->setTitle(tr("Horizontals"));
+	m_horizMeasurements->setColumnTitle(0, tr("Name"));
+	m_horizMeasurements->setColumnTitle(1, tr("Measure"));
+	m_horizMeasurements->setMaxVisibleItems(4);
+	treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
+	treeView->header()->resizeSection(0, 150);
+	treeView->setIconSize(QSize(30, 20));
+
+	connect(m_horizMeasurements->model(),
+	    SIGNAL(itemChanged(QStandardItem*)),
+	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+
+	m_vertMeasurements->setTitle(tr("Verticals"));
+	m_vertMeasurements->setColumnTitle(0, tr("Name"));
+	m_vertMeasurements->setColumnTitle(1, tr("Measure"));
+
+	m_vertMeasurements->setMaxVisibleItems(4);
+	treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
+	treeView->header()->resizeSection(0, 150);
+	treeView->setIconSize(QSize(30, 20));
+
+	connect(m_vertMeasurements->model(),
+	    SIGNAL(itemChanged(QStandardItem*)),
+	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+    }
 }
 
 MeasureSettings::~MeasureSettings()
 {
 	delete m_ui;
+}
+
+void MeasureSettings::onharmValueChanged(int id)
+{
+     Measure *measure = measureOfChannel(m_selectedChannel);
+     measure->setHarmonicNumber(id + 1);
+}
+
+void MeasureSettings::hide_measure_settings(bool is_time_domain) {
+    if(is_time_domain)
+    {
+	m_ui->comboBox_harm->hide();
+	m_ui->label_9->hide();
+	m_ui->line_6->hide();
+	m_ui->label_10->hide();
+    }
+    else
+    {
+	m_ui->label_7->hide();
+	m_ui->line_3->hide();
+	m_ui->verticalSpacer_6->changeSize(0,0);
+	m_ui->verticalSpacer_7->changeSize(0,0);
+
+	m_ui->button_StatisticsEn->hide();
+	m_ui->button_statsDeleteAll->hide();
+	m_ui->button_StatisticsReset->hide();
+
+	m_ui->button_GatingEnable->hide();
+	m_ui->label_4->hide();
+	m_ui->label_5->hide();
+	m_ui->line_5->hide();
+
+	m_ui->comboBox_harm->addItem("1");
+	m_ui->comboBox_harm->addItem("2");
+	m_ui->comboBox_harm->addItem("3");
+	m_ui->comboBox_harm->addItem("4");
+	m_ui->comboBox_harm->addItem("5");
+	m_ui->comboBox_harm->addItem("6");
+	m_ui->comboBox_harm->addItem("7");
+	m_ui->comboBox_harm->addItem("8");
+	m_ui->comboBox_harm->addItem("9");
+
+	m_ui->comboBox_harm->setCurrentIndex(6);
+    }
 }
 
 QString MeasureSettings::channelName() const
@@ -224,34 +321,68 @@ void MeasureSettings::on_button_measDeleteAll_toggled(bool checked)
 	}
 }
 
+Measure* MeasureSettings::measureOfChannel(int chnIdx) const
+{
+    Measure *measure = nullptr;
+
+    auto it = std::find_if(m_measures_list->begin(), m_measures_list->end(),
+	    [&](Measure *m) { return m->channel() == chnIdx; });
+    if (it != m_measures_list->end())
+	measure = *it;
+
+    return measure;
+}
+
 void MeasureSettings::onChannelAdded(int chnIdx)
 {
-	// Use the measurements of the 1st channel to construct the dropdowns.
-	// All channels have the same set of measurements.
-	if (m_are_dropdowns_filled)
-		return;
+    // Use the measurements of the 1st channel to construct the dropdowns.
+    // All channels have the same set of measurements.
+    if (m_are_dropdowns_filled)
+	return;
 
-	auto measurements = m_plot->measurements(chnIdx);
-	int h = 0;
-	int v = 0;
+    Measure *measure = measureOfChannel(chnIdx);
+    auto measurements = QList<std::shared_ptr<MeasurementData>>();
+    if (measure)
+	measurements = measure->measurments();
+    int h = 0;
+    int v = 0;
 
+    if(m_is_time_domain)
+    {
 	for (int i = 0; i < measurements.size(); i++) {
-		enum MeasurementData::axisType axis = measurements[i]->axis();
+	    enum MeasurementData::axisType axis = measurements[i]->axis();
 
-		if (axis == MeasurementData::HORIZONTAL) {
-			m_horizMeasurements->addDropdownElement(
-					QIcon(icons_lut.at(i)),
-					measurements[i]->name(), QVariant(i));
-			m_measurePosInDropdowns.append(h++);
-		} else if (axis == MeasurementData::VERTICAL) {
-			m_vertMeasurements->addDropdownElement(
-					QIcon(icons_lut.at(i)),
-					measurements[i]->name(), QVariant(i));
-			m_measurePosInDropdowns.append(v++);
-		}
+	    if (axis == MeasurementData::HORIZONTAL) {
+		m_horizMeasurements->addDropdownElement(
+			QIcon(icons_lut.at(i)),
+			measurements[i]->name(), QVariant(i));
+		m_measurePosInDropdowns.append(h++);
+	    } else if (axis == MeasurementData::VERTICAL) {
+		m_vertMeasurements->addDropdownElement(
+			QIcon(icons_lut.at(i)),
+			measurements[i]->name(), QVariant(i));
+		m_measurePosInDropdowns.append(v++);
+	    }
 	}
+    }
+    else
+    {
+	for (int i = 0; i < measurements.size(); i++) {
+	    enum MeasurementData::axisType axis = measurements[i]->axis();
 
-	m_are_dropdowns_filled = true;
+	    if (axis == MeasurementData::HORIZONTAL_F) {
+		m_horizMeasurements->addDropdownElement(
+			QIcon(icons_spect.at(i)),
+			measurements[i]->name(), QVariant(i));
+	    } else if (axis == MeasurementData::VERTICAL_F) {
+		m_vertMeasurements->addDropdownElement(
+			QIcon(icons_spect.at(i)),
+			measurements[i]->name(), QVariant(i));
+	    }
+	}
+    }
+
+    m_are_dropdowns_filled = true;
 }
 
 void MeasureSettings::onChannelRemoved(int chnIdx)
@@ -284,31 +415,53 @@ void MeasureSettings::setSelectedChannel(int chnIdx)
 
 void MeasureSettings::loadMeasurementStatesFromData()
 {
-	auto measurements = m_plot->measurements(m_selectedChannel);
-	int h_idx = 0;
-	int v_idx = 0;
+	Measure *measure = measureOfChannel(m_selectedChannel);
+	    auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	    if (measure)
+		measurements = measure->measurments();
 
-	QStandardItemModel *horiz_model =
+	    int h_idx = 0;
+	    int v_idx = 0;
+
+	    QStandardItemModel *horiz_model =
 		static_cast<QStandardItemModel *>(m_horizMeasurements->model());
-	QStandardItemModel *vert_model =
+	    QStandardItemModel *vert_model =
 		static_cast<QStandardItemModel *>(m_vertMeasurements->model());
 
-	setEmitActivated(false);
+	    setEmitActivated(false);
 
-	for (int i = 0; i < measurements.size(); i++) {
-		int axis = measurements[i]->axis();
-		int state = measurements[i]->enabled();
+	    if(m_is_time_domain)
+	    {
+		for (int i = 0; i < measurements.size(); i++) {
+		    int axis = measurements[i]->axis();
+		    int state = measurements[i]->enabled();
 
-		if (axis == MeasurementData::HORIZONTAL) {
+		    if (axis == MeasurementData::HORIZONTAL) {
 			horiz_model->item(h_idx++, 1)->setData(
-					QVariant((int) state), Qt::EditRole);
-		} else if (axis == MeasurementData::VERTICAL) {
+				QVariant((int) state), Qt::EditRole);
+		    } else if (axis == MeasurementData::VERTICAL) {
 			vert_model->item(v_idx++, 1)->setData(
-					QVariant((int) state), Qt::EditRole);
+				QVariant((int) state), Qt::EditRole);
+		    }
 		}
-	}
+	    }
+	    else
+	    {
+		for (int i = 0; i < measurements.size(); i++) {
+		    enum MeasurementData::axisType axis = measurements[i]->axis();
+		    int state = measurements[i]->enabled();
 
-	setEmitActivated(true);
+		    if (axis == MeasurementData::HORIZONTAL_F) {
+			horiz_model->item(h_idx++, 1)->setData(
+				QVariant((int) state), Qt::EditRole);
+		    } else if (axis == MeasurementData::VERTICAL_F) {
+			vert_model->item(v_idx++, 1)->setData(
+				QVariant((int) state), Qt::EditRole);
+		    }
+		}
+	    }
+
+	    setEmitActivated(true);
 }
 
 void MeasureSettings::deleteAllMeasurements()
@@ -331,7 +484,12 @@ void MeasureSettings::displayAllMeasurements()
 {
 	m_displayAllBackup = m_selectedMeasurements;
 	m_selectedMeasurements.clear();
-	auto measurements = m_plot->measurements(m_selectedChannel);
+
+	Measure *measure = measureOfChannel(m_selectedChannel);
+	auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	if (measure)
+		measurements = measure->measurments();
+
 	for (int i = 0; i < measurements.size(); i++) {
 		MeasurementItem item(i, measurements[i]->channel());
 		m_selectedMeasurements.push_back(MeasurementItem(item));
@@ -352,7 +510,11 @@ void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 	if (chnIdx < 0)
 		return;
 
-	auto measurements = m_plot->measurements(chnIdx);
+	Measure *measure = measureOfChannel(chnIdx);
+	auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	if (measure)
+		measurements = measure->measurments();
+
 	MeasurementItem mItem(id, measurements[id]->channel());
 	if (en) {
 		m_selectedMeasurements.push_back(mItem);
@@ -380,28 +542,31 @@ void MeasureSettings::onStatisticActivated(DropdownSwitchList *dropdown,
 
 void MeasureSettings::loadStatisticStatesForChannel(int chnIdx)
 {
-	const int stats_col = 2;
+	// makes sense only for the oscilloscope
+	if (m_is_time_domain) {
+		const int stats_col = 2;
 
-	setEmitStatsChanged(false);
+		setEmitStatsChanged(false);
 
-	// Start with all selections cleared
-	setAllMeasurements(stats_col, false);
+		// Start with all selections cleared
+		setAllMeasurements(stats_col, false);
 
-	// Restore selections that are present in the selected statistics list
-	for (int i = 0; i < m_selectedStatistics.size(); i++) {
-		if (m_selectedStatistics[i].measurementItem.channel_id() !=
-				chnIdx) {
-			continue;
+		// Restore selections that are present in the selected statistics list
+		for (int i = 0; i < m_selectedStatistics.size(); i++) {
+			if (m_selectedStatistics[i].measurementItem.channel_id() !=
+					chnIdx) {
+				continue;
+			}
+			QStandardItemModel *model = static_cast<QStandardItemModel *>
+				(m_selectedStatistics[i].dropdown->model());
+
+			int measId = m_selectedStatistics[i].measurementItem.id();
+
+			model->item(m_measurePosInDropdowns[measId], stats_col)->
+				setData(QVariant(1), Qt::EditRole);
 		}
-		QStandardItemModel *model = static_cast<QStandardItemModel *>
-			(m_selectedStatistics[i].dropdown->model());
-
-		int measId = m_selectedStatistics[i].measurementItem.id();
-
-		model->item(m_measurePosInDropdowns[measId], stats_col)->
-			setData(QVariant(1), Qt::EditRole);
+		setEmitStatsChanged(true);
 	}
-	setEmitStatsChanged(true);
 }
 
 void MeasureSettings::on_button_StatisticsEn_toggled(bool checked)
@@ -544,7 +709,11 @@ void MeasureSettings::recoverAllStatistics()
 
 void MeasureSettings::addStatistic(int measure_id, int ch_id)
 {
-	auto measurements = m_plot->measurements(ch_id);
+	Measure *measure = measureOfChannel(ch_id);
+	auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	if (measure)
+	    measurements = measure->measurments();
+
 	MeasurementData::axisType axis = measurements[measure_id]->axis();
 	struct StatisticSelection selection;
 

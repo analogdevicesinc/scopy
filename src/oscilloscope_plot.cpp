@@ -442,6 +442,11 @@ void CapturePlot::replot()
 	}
 }
 
+QList<Measure *>* CapturePlot::getMeasurements()
+{
+    return &d_measureObjs;
+}
+
 HorizBar *CapturePlot::levelTriggerA()
 {
 	return d_levelTriggerABar;
@@ -2026,5 +2031,3 @@ void CapturePlot::removeLeftVertAxis(unsigned int axis)
 
 	DisplayPlot::removeLeftVertAxis(axis);
 }
-
-

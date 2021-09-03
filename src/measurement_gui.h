@@ -83,6 +83,24 @@ public:
 	virtual void update(const MeasurementData& data, double displayScale);
 };
 
+class DecibelsMeasurementGui: public MeasurementGui
+{
+public:
+    DecibelsMeasurementGui();
+
+    virtual void init(QLabel *name, QLabel *value);
+    virtual void update(const MeasurementData& data, double displayScale);
+};
+
+class DecibelstoCarrierMeasurementGui: public MeasurementGui
+{
+public:
+    DecibelstoCarrierMeasurementGui();
+
+    virtual void init(QLabel *name, QLabel *value);
+    virtual void update(const MeasurementData& data, double displayScale);
+};
+
 class DimensionlessMeasurementGui: public MeasurementGui
 {
 public:

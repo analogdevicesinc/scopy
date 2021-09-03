@@ -86,6 +86,7 @@ namespace adiscope {
 		void removeOffsetWidgets(int chnIdx);
 		void removeLeftVertAxis(unsigned int axis);
 
+		QList<Measure *>* getMeasurements();
 		void measure();
 		int activeMeasurementsCount(int chnIdx);
 		QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);

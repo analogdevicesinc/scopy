@@ -35,6 +35,8 @@
 #include <QCheckBox>
 #include <QTimer>
 #include <QDockWidget>
+#include <QtWidgets/QSpacerItem>
+#include <QtWidgets>
 
 /* Local includes */
 #include "logging_categories.h"
@@ -48,11 +50,16 @@
 #include "filemanager.h"
 #include "spectrum_analyzer_api.hpp"
 #include "stream_to_vector_overlap.h"
+#include "gui/measure.h"
+#include "measurement_gui.h"
+#include "gui/measure_settings.h"
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
 #include "ui_cursors_settings.h"
 #include "ui_cursor_readouts.h"
+#include "ui_measure_panel.h"
+#include "ui_measure_settings.h"
 
 #include <boost/make_shared.hpp>
 #include <iio.h>
@@ -209,7 +216,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->addButton(ui->btnMarkers);
 	settings_group->addButton(ui->btnAddRef);
 	settings_group->addButton(ui->btnCursors);
+	settings_group->addButton(ui->btnMeasure);
 	settings_group->setExclusive(true);
+
+	/* Measure panel */
+	measure_panel_init();
 
 	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
 	fft_plot->disableLegend();
@@ -218,8 +229,15 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setXaxisMouseGesturesEnabled(false);
 
 	for (uint i = 0; i < m_adc_nb_channels; i++) {
+//		ui->gridLayout_plot->addWidget(measurePanel, 0, 1, 1, 1);
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
 	}
+
+	connect(fft_plot, SIGNAL(channelAdded(int)),
+		    SLOT(onChannelAdded(int)));
+
+	/* Measurements Settings */
+	measure_settings_init();
 
 	// Add dockable plot
 
@@ -228,6 +246,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	vLayout->setContentsMargins(0, 0, 0, 0);
 	vLayout->setSpacing(6);
 	centralWidget->setLayout(vLayout);
+
+	vLayout->addWidget(measurePanel);
 
 	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
 	vLayout->addWidget(ui->topPlotWidget);
@@ -475,6 +495,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 	setCurrentAverageIndexLabel(crt_channel_id);
 
+	/* Apply measurements for every new batch of data */
+	connect(fft_plot, SIGNAL(newData()), SLOT(onNewDataReceived()));
+
+	for (int i = 0; i < m_adc_nb_channels; i++) {
+		fft_plot->initChannelMeasurement(i);
+	    }
+
 	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
 	connect(unit_per_div, SIGNAL(valueChanged(double)),
@@ -516,6 +543,14 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	for (auto ch: qAsConst(channels)) {
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
+
+	if (!runButton()->isChecked() && measurementsEnabled()) {
+	       measureUpdateValues();
+	   }
+
+	for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
+	       init_selected_measurements(i, {0, 1, 4, 5});
+	   }
 
 	connect(ui->logBtn, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::useLogFreq);
@@ -660,6 +695,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	readPreferences();
 
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/spectrumanalyzer");
+
+	// TODO: enable measurements
+	ui->boxMeasure->setChecked(false);
+	ui->boxMeasure->setVisible(false);
+	ui->btnMeasure->setVisible(false);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -681,6 +721,10 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	for (auto it = marker_api.begin(); it != marker_api.end(); ++it) {
 		delete *it;
 	}
+
+	for (auto it = d_measureObjs.begin(); it != d_measureObjs.end(); ++it) {
+		delete *it;
+	    }
 
 	if (iio) {
 		bool started = isIioManagerStarted();
@@ -843,8 +887,10 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 			index = 3;
 		} else if (btn == ui->btnAddRef) {
 			index = 4;
-		} else if (btn == ui->btnCursors) {
+		} else if (btn == ui->btnMeasure) {
 			index = 5;
+		} else if (btn == ui->btnCursors) {
+			index = 6;
 		}
 	}
 
@@ -938,6 +984,410 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 
 	triggerRightMenuToggle(
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
+}
+
+void SpectrumAnalyzer::on_btnMeasure_toggled(bool checked) {
+    triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()),
+			   checked);
+}
+
+void SpectrumAnalyzer::measure_settings_init()
+{
+    measure_settings = new MeasureSettings(&d_measureObjs, this, false);
+    int measure_panel = ui->stackedWidget->insertWidget(5, measure_settings);
+
+    ui->btnMeasure->setDisabled(true);
+
+    connect(measure_settings,
+	SIGNAL(measurementActivated(int, int)),
+	SLOT(onMeasurementActivated(int, int)));
+
+    connect(measure_settings,
+	SIGNAL(measurementDeactivated(int, int)),
+	SLOT(onMeasurementDeactivated(int, int)));
+
+    connect(measure_settings,
+	SIGNAL(measurementSelectionListChanged()),
+	SLOT(onMeasurementSelectionListChanged()));
+
+    connect(fft_plot, SIGNAL(channelAdded(int)),
+	measure_settings, SLOT(onChannelAdded(int)));
+
+    connect(this, SIGNAL(selectedChannelChanged(int)),
+	measure_settings, SLOT(setSelectedChannel(int)));
+
+    connect(ui->boxMeasure, SIGNAL(toggled(bool)),
+	 SLOT(setMeasuremensEnabled(bool)));
+
+}
+
+void SpectrumAnalyzer::onChannelAdded(int chnIdx)
+{
+    Measure *measure = nullptr;
+
+    if(fft_plot->isReferenceWaveform(chnIdx))
+    {
+	 int idx = chnIdx - fft_plot->getYdata_size();
+	 size_t curve_size = fft_plot->getCurveSize(chnIdx);
+	 double* data = new double [curve_size]();
+	 measure = new Measure(chnIdx, data, curve_size,
+			       nullptr, false);
+    }
+    else
+    {
+	int64_t numPoints = fft_plot->getNumPoints() / 2;
+	std::vector<double> scale_factor = fft_plot->getScaleFactor();
+
+	//std::vector<double*> data = fft_plot->getOrginal_data();
+	//int count = fft_plot->countReferenceWaveform(chnIdx);
+	double* data = new double [numPoints]();
+	measure = new Measure(chnIdx, data,
+		numPoints, nullptr, false);
+    }
+    measure->setAdcBitCount(12);
+    d_measureObjs.push_back(measure);
+
+}
+
+
+void SpectrumAnalyzer::update_measure_for_channel(int ch_idx) {
+    ChannelWidget *chn_widget = getChannelWidgetAt(ch_idx);
+
+    measure_settings->setChannelName(chn_widget->fullName());
+    measure_settings->setChannelUnderlineColor(chn_widget->color());
+}
+
+
+void SpectrumAnalyzer::measure_panel_init() {
+    measurePanel = new QWidget(this);
+    measure_panel_ui = new Ui::MeasurementsPanel();
+    measure_panel_ui->setupUi(measurePanel);
+
+    connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
+	measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setRange);
+
+    connect(measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::valueChanged,
+	measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::setValue);
+    connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::valueChanged,
+	measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setValue);
+
+    connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
+	[=](double v1, double v2){
+	measure_panel_ui->scrollArea_2->widget()->setFixedWidth(measure_panel_ui->scrollAreaWidgetContents->width());
+    });
+
+    measurePanel->hide();
+
+    connect(this, SIGNAL(measurementsAvailable()),
+	    SLOT(onMeasuremetsAvailable()));
+
+}
+
+void SpectrumAnalyzer::init_selected_measurements(int chnIdx,
+			  std::vector<int> measureIdx)
+{
+    auto measurements_val = measurements(chnIdx);
+    for (int i = 0; i < measureIdx.size(); i++) {
+	measurements_val[measureIdx[i]]->setEnabled(true);
+	measure_settings->onMeasurementActivated(
+		    chnIdx, measureIdx[i], true);
+    }
+    measure_settings->loadMeasurementStatesFromData();
+    onMeasurementSelectionListChanged();
+}
+
+std::shared_ptr<MeasurementData> SpectrumAnalyzer::measurement(int id, int chnIdx)
+{
+    Measure *measure = measureOfChannel(chnIdx);
+    if (measure)
+	return measure->measurement(id);
+    else
+	return std::shared_ptr<MeasurementData>();
+}
+
+void SpectrumAnalyzer::onMeasurementActivated(int id, int chnIdx)
+{
+    int oldActiveMeasCount = activeMeasurementsCount(chnIdx);
+
+    auto mList = measurements(chnIdx);
+    mList[id]->setEnabled(true);
+    measurements_data.push_back(mList[id]);
+    measureCreateAndAppendGuiFrom(*mList[id]);
+
+    if (oldActiveMeasCount == 0) {
+	measure();
+    }
+
+    measureLabelsRearrange();
+}
+
+void SpectrumAnalyzer::onMeasurementDeactivated(int id, int chnIdx)
+{
+    auto mList = measurements(chnIdx);
+    QString name = mList[id]->name();
+
+    mList[id]->setEnabled(false);
+
+    auto it = find_if(measurements_data.begin(), measurements_data.end(),
+	[&](std::shared_ptr<MeasurementData> const& p)
+	{ return  (p->name() == name) && (p->channel() == chnIdx); });
+    if (it != measurements_data.end()) {
+	int i = it - measurements_data.begin();
+	measurements_data.removeAt(i);
+	measurements_gui.removeAt(i);
+	measureLabelsRearrange();
+    }
+}
+
+void SpectrumAnalyzer::onMeasurementSelectionListChanged()
+{
+    // Clear all measurements in list
+    for (int i = 0; i < measurements_data.size(); i++) {
+	measurements_data[i]->setEnabled(false);
+    }
+    measurements_data.clear();
+    measurements_gui.clear();
+
+    // Use the new list from MeasureSettings
+    auto newList = measure_settings->measurementSelection();
+    for (int i = 0; i < newList.size(); i++) {
+	auto pMeasurement = measurement(newList[i].id(),
+	    newList[i].channel_id());
+	if (pMeasurement) {
+	    pMeasurement->setEnabled(true);
+	    measurements_data.push_back(pMeasurement);
+	    measureCreateAndAppendGuiFrom(*pMeasurement);
+	}
+    }
+    measureLabelsRearrange();
+}
+
+void SpectrumAnalyzer::measureCreateAndAppendGuiFrom(const MeasurementData&
+	measurement)
+{
+    std::shared_ptr<MeasurementGui> p;
+
+    switch(measurement.unitType()) {
+
+    case MeasurementData::DECIBELS:
+	p = std::make_shared<DecibelsMeasurementGui>();
+	break;
+    case MeasurementData::DECIBELS_TO_CARRIER:
+	p = std::make_shared<DecibelstoCarrierMeasurementGui>();
+	break;
+    case MeasurementData::DIMENSIONLESS:
+	p = std::make_shared<DimensionlessMeasurementGui>();
+	break;
+    default:
+	break;
+    }
+    if (p)
+	measurements_gui.push_back(p);
+}
+
+void SpectrumAnalyzer::measureLabelsRearrange()
+{
+    QWidget *container = measure_panel_ui->measurements->
+		    findChild<QWidget *>("container");
+
+    if (container) {
+	measure_panel_ui->measurements->layout()->removeWidget(container);
+	delete container;
+    }
+
+    container = new QWidget();
+    container->setObjectName("container");
+    if (!measure_panel_ui->measurements->layout()) {
+	QVBoxLayout *measurementsLayout = new
+		QVBoxLayout(measure_panel_ui->measurements);
+	measurementsLayout->addWidget(container);
+	measurementsLayout->setContentsMargins(0, 0, 0, 0);
+    } else {
+	measure_panel_ui->measurements->layout()->addWidget(container);
+    }
+
+    QGridLayout *gLayout = new QGridLayout(container);
+
+    gLayout->setContentsMargins(0, 0, 0, 0);
+    gLayout->setVerticalSpacing(5);
+    gLayout->setHorizontalSpacing(5);
+    int max_rows = 4;
+    int nb_meas_added = 0;
+
+    for (int i = 0; i < measurements_data.size(); i++) {
+
+	int channel = measurements_data[i]->channel();
+	if (channel >=  m_adc_nb_channels + nb_ref_channels) {
+	    continue;
+	}
+
+	ChannelWidget *chn_widget = getChannelWidgetAt(channel);
+	if (!chn_widget->enableButton()->isChecked()) {
+	    continue;
+	}
+
+	QLabel *name = new QLabel();
+	QLabel *value = new QLabel();
+
+
+	int row = nb_meas_added % max_rows;
+	int col = nb_meas_added / max_rows;
+
+	gLayout->addWidget(name, row, 2 * col);
+
+	QHBoxLayout *value_layout = new QHBoxLayout();
+	value_layout->setContentsMargins(0, 0, 10, 0);
+	value_layout->addWidget(value);
+	gLayout->addLayout(value_layout, row, 2 * col + 1);
+
+	measurements_gui[i]->init(name, value);
+	double pb_atten = 1;
+	measurements_gui[i]->update(*(measurements_data[i]),
+			pb_atten);
+	measurements_gui[i]->setLabelsColor(fft_plot->getLineColor(channel));
+
+	nb_meas_added++;
+    }
+}
+
+QList<std::shared_ptr<MeasurementData>> SpectrumAnalyzer::measurements(int chnIdx)
+{
+    //POATE O SA POT PUNE DIRECT MEASURE OF CHANNALE, IN LOC DE FCT ASTA??
+    Measure *measure = measureOfChannel(chnIdx);
+
+    if (measure)
+	return measure->measurments();
+    else
+	return QList<std::shared_ptr<MeasurementData>>();
+}
+
+Measure* SpectrumAnalyzer::measureOfChannel(int chnIdx) const
+{
+    Measure *measure = nullptr;
+
+    auto it = std::find_if(d_measureObjs.begin(), d_measureObjs.end(),
+	[&](Measure *m) { return m->channel() == chnIdx; });
+    if (it != d_measureObjs.end())
+	measure = *it;
+
+    return measure;
+}
+
+int SpectrumAnalyzer::activeMeasurementsCount(int chnIdx)
+{
+    int count = -1;
+    Measure *measure = measureOfChannel(chnIdx);
+
+    if (measure)
+	count = measure->activeMeasurementsCount();
+
+    return count;
+}
+
+bool SpectrumAnalyzer::measurementsEnabled()
+{
+    return d_measurementsEnabled;
+}
+
+void SpectrumAnalyzer::setMeasuremensEnabled(bool en)
+{
+    d_measurementsEnabled = en;
+
+    if (en) {
+	ui->btnMeasure->setEnabled(true);
+    } else {
+	    if (ui->btnMeasure->isChecked())
+		    ui->btnMeasure->setChecked(false);
+
+	    ui->btnMeasure->setEnabled(false);
+
+	    menuOrder.removeOne(ui->btnMeasure);
+    }
+}
+
+void SpectrumAnalyzer::computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate)
+{
+    if (chnIdx >= d_measureObjs.size()) {
+	return;
+    }
+
+    Measure *measure = d_measureObjs[chnIdx];
+    measure->setSampleRate(sampleRate);
+    measure->measure();
+
+    Q_EMIT measurementsAvailable();
+}
+
+void SpectrumAnalyzer::measure()
+{
+    for (int i = 0; i < d_measureObjs.size(); i++) {
+	Measure *measure = d_measureObjs[i];
+	if (measure->activeMeasurementsCount() > 0) {
+	    measure->setSampleRate(fft_plot->sampleRate());
+	    measure->measure();
+	}
+    }
+}
+
+void SpectrumAnalyzer::onNewDataReceived()
+{
+    int ref_idx = 0;
+    for (int i = 0; i < d_measureObjs.size(); i++) {
+	Measure *measure = d_measureObjs[i];
+	int chn = measure->channel();
+	if (fft_plot->isReferenceWaveform(chn)) {
+	    size_t curve_size = fft_plot->getCurveSize(chn);
+	    measure->setDataSource(fft_plot->getRef_data()[ref_idx],
+			   curve_size / 2);
+	    ref_idx++;
+	}
+	else {
+	    int64_t numPoints = fft_plot->getNumPoints() / 2;
+	    std::vector<double*> data = fft_plot->getOrginal_data();
+	    std::vector<double> scale_factor = fft_plot->getScaleFactor();
+
+	    //int count = fft_plot->countReferenceWaveform(chn);
+	    //chn = chn - count;
+	    for (int s = 0; s < numPoints; s++) {
+		data[chn][s] = sqrt(data[chn][s]) * scale_factor[chn] / numPoints;
+	    }
+	    measure->setDataSource(data[chn], numPoints);
+	}
+	measure->setSampleRate(sample_rate);
+	measure->measure();
+    }
+
+    Q_EMIT measurementsAvailable();
+}
+
+void SpectrumAnalyzer::onMeasuremetsAvailable()
+{
+    measureUpdateValues();
+}
+
+void SpectrumAnalyzer::measureUpdateValues()
+{
+
+    for (int i = 0; i < measurements_data.size(); i++) {
+	int channel = measurements_data[i]->channel();
+	ChannelWidget *chn_widget = getChannelWidgetAt(channel);
+	if (!chn_widget->enableButton()->isChecked()) {
+	    continue;
+	}
+	measurements_gui[i]->update(*(measurements_data[i]),
+			1.0f); // de modificat scale-ul
+    }
+}
+
+void SpectrumAnalyzer::on_boxMeasure_toggled(bool checked) {
+  if (checked) {
+      update_measure_for_channel(crt_channel_id);
+  } else {
+    if (ui->btnMeasure->isChecked())
+      ui->btnMeasure->setChecked(false);
+    menuOrder.removeOne(ui->btnMeasure);
+  }
+  measurePanel->setVisible(checked);
 }
 
 void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked)
@@ -1163,6 +1613,10 @@ void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> y
 	if (nb_ref_channels == MAX_REF_CHANNELS) {
 		ui->btnAddRef->hide();
 	}
+
+	init_selected_measurements(curve_id, {0, 1, 4, 5});
+
+	computeMeasurementsForChannel(curve_id, sample_rate);
 }
 
 void SpectrumAnalyzer::add_ref_waveform(unsigned int chIdx)
@@ -1178,6 +1632,20 @@ void SpectrumAnalyzer::add_ref_waveform(unsigned int chIdx)
 	add_ref_waveform(xData, yData);
 }
 
+void SpectrumAnalyzer::cleanUpMeasurementsBeforeChannelRemoval(int chnIdx)
+{
+    Measure *measure = measureOfChannel(chnIdx);
+    if (measure) {
+	int pos = d_measureObjs.indexOf(measure);
+	for (int i = pos + 1; i < d_measureObjs.size(); i++) {
+	    d_measureObjs[i]->setChannel(
+		d_measureObjs[i]->channel() - 1);
+	}
+	d_measureObjs.removeOne(measure);
+	delete measure;
+    }
+}
+
 void SpectrumAnalyzer::onReferenceChannelDeleted()
 {
 	if (nb_ref_channels - 1 < MAX_REF_CHANNELS) {
@@ -1187,6 +1655,27 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 	ChannelWidget *channelWidget = static_cast<ChannelWidget *>(QObject::sender());
 	QAbstractButton *delBtn = channelWidget->deleteButton();
 	QString qname = delBtn->property("curve_name").toString();
+	int curve_id = channelWidget->id();
+
+	/*If there are no more channels enabled, we should
+	disable the measurements.*/
+	bool shouldDisable = true;
+
+	for (unsigned int i = 0; i < m_adc_nb_channels + nb_ref_channels; i++) {
+		ChannelWidget *cw = static_cast<ChannelWidget *>(
+		    ui->channelsList->itemAt(i)->widget());
+		if (curve_id == cw->id())
+		    continue;
+		if (cw->enableButton()->isChecked())
+		    shouldDisable = false;
+	    }
+
+	if (shouldDisable)
+		measure_settings->disableDisplayAll();
+
+	measure_settings->onChannelRemoved(channelWidget->id());
+
+	cleanUpMeasurementsBeforeChannelRemoval(channelWidget->id());
 
 	fft_plot->unregisterReferenceWaveform(qname);
 	ui->channelsList->removeWidget(channelWidget);
@@ -1210,6 +1699,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 	if (channelWidget->id() < crt_channel_id) {
 		crt_channel_id--;
 		Q_EMIT selectedChannelChanged(crt_channel_id);
+		update_measure_for_channel(crt_channel_id);
 	} else if (channelWidget->id() == crt_channel_id) {
 		for (int i = 0; i < m_adc_nb_channels + nb_ref_channels; ++i) {
 			auto cw = getChannelWidgetAt(i);
@@ -1219,9 +1709,16 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 			if (cw->enableButton()->isChecked()) {
 				channelsEnabled = true;
 				Q_EMIT selectedChannelChanged(0);
+				update_measure_for_channel(0);
 				cw->nameButton()->setChecked(true);
+				Q_EMIT selectedChannelChanged(cw->id());
+				update_measure_for_channel(cw->id());
 				break;
 			}
+		}
+		if (!channelsEnabled) {
+		    crt_channel_id = 0;
+		    Q_EMIT selectedChannelChanged(0);
 		}
 	}
 
@@ -1242,6 +1739,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 		menuOrder.removeAll(static_cast<CustomPushButton *>(channelWidget->menuButton()));
 	}
 
+	onMeasurementSelectionListChanged();
 	delete channelWidget;
 }
 
@@ -1659,6 +2157,10 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 		triggerRightMenuToggle(
 			static_cast<CustomPushButton *>(ui->btnMarkers), en);
 	}
+
+	if (measurementsEnabled()) {
+		update_measure_for_channel(chIdx);
+	}
 }
 
 void SpectrumAnalyzer::updateMarkerMenu(unsigned int id)
@@ -1708,17 +2210,37 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 			ui->btnMarkers->setEnabled(true);
 			ui->btnMarkers->blockSignals(false);
 		}
+
+		bool shouldActivate = true;
+		if (cw->enableButton()->isChecked()) {
+		    shouldActivate = false;
+		}
+
+		if (shouldActivate) {
+		    //nu trebe asta
+		    Q_EMIT selectedChannelChanged(cw->id());
+		    update_measure_for_channel(cw->id());
+		    measure_settings->activateDisplayAll();
+		}
+
 	} else {
 		bool allDisabled = true;
+		bool shouldDisable = true;
 		for (int i = 0; i < channels.size() + nb_ref_channels; i++) {
 			ChannelWidget *cw = getChannelWidgetAt(i);
 
 			if (cw->enableButton()->isChecked()) {
 				cw->nameButton()->setChecked(true);
 				allDisabled = false;
+				shouldDisable = false;
 				break;
 			}
 		}
+
+		if (shouldDisable) {
+		    measure_settings->disableDisplayAll();
+		}
+
 		if (allDisabled) {
 			QSignalBlocker(ui->btnMarkers);
 			if (!ui->btnSweep->isChecked()) {
@@ -1740,6 +2262,7 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 		}
 	}
 
+	measureLabelsRearrange();
 
 	fft_plot->replot();
 	updateRunButton(en);
