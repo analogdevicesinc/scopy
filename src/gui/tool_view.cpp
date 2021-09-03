@@ -1,4 +1,4 @@
-#include "ui_tool_view.h"
+﻿#include "ui_tool_view.h"
 
 #include <QMainWindow>
 
@@ -12,14 +12,13 @@ using namespace scopy::gui;
 ToolView::ToolView(QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::ToolView)
-	, m_dockables(0)
 {
 	m_ui->setupUi(this);
 
 	m_centralMainWindow = new QMainWindow(m_ui->widgetCentral);
 	m_centralMainWindow->setCentralWidget(0);
 	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	m_ui->widgetPlotContainer->layout()->addWidget(m_centralMainWindow);
+	m_ui->widgetCentral->layout()->addWidget(m_centralMainWindow);
 
 	m_ui->widgetRunSingleBtns->enableRunButton(false);
 	m_ui->widgetRunSingleBtns->enableSingleButton(false);
@@ -178,6 +177,20 @@ QDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
 	return docker;
 }
 
+QDockWidget *ToolView::createDockableWidget(QWidget *widget, const QString& dockerName)
+{
+	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
+	docker->setWindowTitle(dockerName);
+	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
+	docker->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
+	docker->setWidget(widget);
+
+#ifdef PLOT_MENU_BAR_ENABLED
+	DockerUtils::configureTopBar(docker);
+#endif
+	return docker;
+}
+
 void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 {
 	ChannelManager* cm = static_cast<ChannelManager*>(QObject::sender());
@@ -326,47 +339,38 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 	}
 }
 
-void ToolView::addCentralWidget(QWidget* widget, bool dockable, const QString& dockerName, int row, int column,
-				int rowspan, int columnspan)
+void ToolView::addFixedCentralWidget(QWidget *widget, int row, int column, int rowspan, int columnspan)
 {
-	if (dockable) {
-		QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-		docker->setWindowTitle(dockerName);
-		docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-		docker->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
-		docker->setWidget(widget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
-#endif
-
-		if (m_dockables < 3) {
-			if (m_dockables % 3 == 0) {
-				m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
-			} else if (m_dockables % 3 == 1) {
-				m_centralMainWindow->addDockWidget(Qt::RightDockWidgetArea, docker);
-			} else {
-				m_centralMainWindow->addDockWidget(Qt::BottomDockWidgetArea, docker);
-			}
-
-			m_firstDocks.push_back(docker);
-		} else {
-			m_centralMainWindow->tabifyDockWidget(m_firstDocks.at(m_dockables % 3), docker);
-		}
-
-		m_dockables++;
-
-	} else {
-		if (row == -1 || column == -1) {
+	if (row == -1 || column == -1) {
 			m_ui->gridWidgetCentral->addWidget(widget);
+	} else {
+		if (rowspan == -1 || columnspan == -1) {
+			m_ui->gridWidgetCentral->addWidget(widget, row, column);
 		} else {
-			if (rowspan == -1 || columnspan == -1) {
-				m_ui->gridWidgetCentral->addWidget(widget, row, column);
-			} else {
-				m_ui->gridWidgetCentral->addWidget(widget, row, column, rowspan, columnspan);
-			}
+			m_ui->gridWidgetCentral->addWidget(widget, row, column, rowspan, columnspan);
 		}
 	}
+}
+
+int ToolView::addDockableCentralWidget(QWidget *widget, Qt::DockWidgetArea area, const QString &dockerName)
+{
+	QDockWidget* docker = this->createDockableWidget(widget, dockerName);
+
+	m_centralMainWindow->addDockWidget(area, docker);
+	m_docksList.append(docker);
+
+	return m_docksList.size() - 1;
+}
+
+void ToolView::addDockableTabedWidget(QWidget *widget, const QString &dockerName, int plotId)
+{
+	QDockWidget* docker = this->createDockableWidget(widget, dockerName);
+	m_centralMainWindow->tabifyDockWidget(m_docksList.at(plotId), docker);
+}
+
+void ToolView::addFixedTabedWidget(QWidget *widget, int plotId)
+{
+	// TODO
 }
 
 void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
