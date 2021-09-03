@@ -167,6 +167,7 @@ find_package(Qt5Xml REQUIRED)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt )
 
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
@@ -183,14 +184,10 @@ if (ENABLE_MATIO)
 	add_definitions(-DMATLAB_SUPPORT_SIGGEN)
 endif()
 
-
-
-
-find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
-set(CMAKE_FIND_DEBUG_MODE OFF)
 if(ANDROID)
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
 else()
+	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
 	find_library(QWTPOLAR_LIBRARIES qwtpolar)
 	find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
 	if (QWTPOLAR_LIBRARIES)
