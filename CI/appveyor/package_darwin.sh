@@ -11,11 +11,6 @@ sudo cp /usr/local/lib/libm2k.* ./Scopy.app/Contents/Frameworks
 sudo install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 sudo install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/MacOS/Scopy
 
-## Handle qwtpolar paths
-qwtpolarpath=/usr/local/lib/libqwtpolar.1.dylib
-sudo install_name_tool -id ${qwtpolarpath} /usr/local/lib/libqwtpolar.dylib
-sudo install_name_tool -change libqwtpolar.1.dylib ${qwtpolarpath} ./Scopy.app/Contents/MacOS/Scopy
-
 export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/lib
 ## Bundle some known dependencies
 sudo echo "/usr/local/lib" | dylibbundler -od -b -x ./Scopy.app/Contents/MacOS/Scopy -d ./Scopy.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ >/dev/null

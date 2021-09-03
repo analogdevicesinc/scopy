@@ -10,7 +10,6 @@ GNURADIO_BRANCH=ming-3.8-clean
 GRSCOPY_BRANCH=master
 GRM2K_BRANCH=master
 QWT_BRANCH=qwt-6.1-multiaxes
-QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
@@ -220,26 +219,6 @@ build_qwt() {
 	sudo make install
 }
 
-build_qwtpolar() {
-	echo "### Building qwtpolar - branch $QWTPOLAR_BRANCH"
-	mkdir -p ${WORKDIR}/qwtpolar
-	cd ${WORKDIR}/qwtpolar
-
-	wget https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2 -O- \
-		| tar xj --strip-components=1 -C ${WORKDIR}/qwtpolar
-
-	cd ~/qwtpolar
-	wget https://raw.githubusercontent.com/analogdevicesinc/scopy/master/CI/appveyor/patches/qwtpolar-qwt-qt-compat.patch
-	patch -p1 < qwtpolar-qwt-qt-compat.patch
-	sed -i 's/\/usr\/local\/qwtpolar-$$QWT_POLAR_VERSION/\/usr\/local/g' qwtpolarconfig.pri
-	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarExamples/ /g' qwtpolarconfig.pri
-	sed -i 's/QWT_POLAR_CONFIG     += QwtPolarDesigner/ /g' qwtpolarconfig.pri
-	$QMAKE qwtpolar.pro
-	make $JOBS
-	sudo make install
-
-}
-
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 
@@ -265,7 +244,5 @@ build_griio
 build_grscopy
 build_grm2k
 build_qwt
-build_qwtpolar
-#build_libsigrok
 build_libsigrokdecode
 build_libtinyiiod

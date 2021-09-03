@@ -9,7 +9,6 @@ GNURADIO_BRANCH=scopy
 GRSCOPY_BRANCH=master
 GRM2K_BRANCH=master
 QWT_BRANCH=qwt-6.1-multiaxes
-QWTPOLAR_BRANCH=master # not used
 LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master
 BOOST_VERSION_FILE=1_73_0
@@ -252,35 +251,10 @@ build_libsigrokdecode() {
 	sudo make $JOBS install
 }
 
-
-patch_qwtpolar_mac() {
-	patch_qwtpolar
-
-	patch -p1 <<-EOF
---- a/qwtpolarconfig.pri
-+++ b/qwtpolarconfig.pri
-@@ -16,7 +16,9 @@ QWT_POLAR_VER_PAT      = 1
- QWT_POLAR_VERSION      = \$\${QWT_POLAR_VER_MAJ}.\$\${QWT_POLAR_VER_MIN}.\$\${QWT_POLAR_VER_PAT}
-
- unix {
--    QWT_POLAR_INSTALL_PREFIX    = /usr/local/qwtpolar-\$\$QWT_POLAR_VERSION
-+    QWT_POLAR_INSTALL_PREFIX    = $STAGINGDIR
-+    QMAKE_CXXFLAGS              = -I${STAGINGDIR}/include
-+    QMAKE_LFLAGS                = ${STAGINGDIR}/lib/libqwt*dylib
- }
-
- win32 {
-EOF
-}
-
 build_qwt() {
 	echo "### Building qwt - branch qwt-6.1-multiaxes"
 	svn checkout https://svn.code.sf.net/p/qwt/code/branches/$QWT_BRANCH ${WORKDIR}/qwt
 	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
-}
-
-build_qwtpolar() {
-	qmake_build_wget "qwtpolar-1.1.1" "https://downloads.sourceforge.net/project/qwtpolar/qwtpolar/1.1.1/qwtpolar-1.1.1.tar.bz2" "qwtpolar.pro" "patch_qwtpolar_mac"
 }
 
 build_libtinyiiod() {
@@ -311,6 +285,5 @@ build_griio
 build_grscopy
 build_grm2k
 build_qwt
-build_qwtpolar
 build_libsigrokdecode
 build_libtinyiiod
