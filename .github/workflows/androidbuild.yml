@@ -16,6 +16,7 @@ jobs:
             docker run --privileged --net=host \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
+                -e "BRANCH=${GITHUB_REF#refs/heads/}" \
                 ioanachelaruu/scopy-android:latest /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
     - uses: actions/upload-artifact@v2
       with:
