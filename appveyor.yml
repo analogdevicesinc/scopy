@@ -9,20 +9,6 @@ environment:
     BRANCH: $(APPVEYOR_REPO_BRANCH)
     REPO: $(APPVEYOR_REPO_NAME)
     matrix:
-        - MINGW_VERSION: mingw64
-          ARCH: x86_64
-          ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
-          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
-
-        - MINGW_VERSION: mingw32
-          ARCH: i686
-          ARCH_BIT: 32
-          APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
-          BUILD_DEPS_CMD: "C:\\msys64\\usr\\bin\\bash CI\\appveyor\\build_appveyor_mingw.sh"
-          DEPLOY_FILE: "C:\\scopy-%ARCH_BIT%-setup.exe"
-
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave

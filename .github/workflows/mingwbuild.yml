@@ -1,0 +1,57 @@
+name: windows-mingw build
+
+on: [push, pull_request]
+
+jobs:
+
+  make-exe-64:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pull the Docker Image
+      run: docker pull analogdevices/scopy-build:mingw64
+      
+    - name: Run Docker Image
+      shell: cmd
+      run: |
+            mkdir %GITHUB_WORKSPACE%\artifacts & echo %GITHUB_WORKSPACE% & docker run -v %cd%:C:\msys64\home\docker\scopy:rw -v %GITHUB_WORKSPACE%\artifacts:C:\msys64\home\docker\artifact_x86_64:rw -e GITHUB_WORKSPACE=%GITHUB_WORKSPACE% analogdevices/scopy-build:mingw64 C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
+    - uses: actions/upload-artifact@v2
+      with:
+        name: scopy-x86_64.zip
+        path: ${{ github.workspace }}\artifacts\scopy-x86_64.zip
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: debug-x86_64.zip
+        path: ${{ github.workspace }}\artifacts\debug-x86_64.zip
+    - uses: actions/upload-artifact@v2
+      with:
+        name: scopy-x86_64-setup.exe
+        path: ${{ github.workspace }}\artifacts\scopy-64-setup.exe
+        
+  make-exe-32:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Pull the Docker Image
+      run: docker pull analogdevices/scopy-build:mingw32
+      
+    - name: Run Docker Image
+      shell: cmd
+      run: |
+            mkdir %GITHUB_WORKSPACE%\artifacts & echo %GITHUB_WORKSPACE% & docker run -v %cd%:C:\msys64\home\docker\scopy:rw -v %GITHUB_WORKSPACE%\artifacts:C:\msys64\home\docker\artifact_i686:rw -e GITHUB_WORKSPACE=%GITHUB_WORKSPACE% analogdevices/scopy-build:mingw32 C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
+    - uses: actions/upload-artifact@v2
+      with:
+        name: scopy-i686.zip
+        path: ${{ github.workspace }}\artifacts\scopy-i686.zip
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: debug-i686.zip
+        path: ${{ github.workspace }}\artifacts\debug-i686.zip
+    - uses: actions/upload-artifact@v2
+      with:
+        name: scopy-i686-setup.exe
+        path: ${{ github.workspace }}\artifacts\scopy-32-setup.exe 
