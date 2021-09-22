@@ -15,8 +15,8 @@ AppUpdatesURL="http://www.analog.com"
 AppCopyright="Copyright 2018 Analog Devices, Inc."
 CreateAppDir=yes
 OutputBaseFilename=scopy-setup
-LicenseFile="C:\projects\scopy\LICENSE"
-OutputDir="C:\"
+LicenseFile="C:\msys64\home\docker\scopy\LICENSE"
+OutputDir="C:\msys64\home\docker\"
 AllowNoIcons=yes
 Compression=lzma
 SolidCompression=yes
@@ -247,8 +247,8 @@ Name: "drivers"; Description: Install drivers for ADALM2000; Check: not isDriver
 Name: "drivers_overwrite"; Description: Install drivers for ADALM2000; Check: isDriverInstalled; Flags: unchecked
 
 [Files]
-Source: "c:\scopy_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "c:\scopy_32\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "c:\msys64\home\docker\scopy_x86_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "c:\msys64\home\docker\scopy_i686\*"; DestDir: "{app}"; Check: not Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
 
 
 [Icons]
