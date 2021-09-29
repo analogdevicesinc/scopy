@@ -128,6 +128,9 @@ void ToolView::settingsPanelUpdate(int id)
 
 void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum position)
 {
+	connect(cm, &ChannelManager::channelManagerToggle, this, [=](bool toggled){
+		m_ui->widgetVerticalChannels->toggleMenu(toggled);
+	});
 	connect(cm, &ChannelManager::configureAddBtn, this, &ToolView::configureAddMathBtn);
 
 	connect(this, &ToolView::changeParent, cm, &ChannelManager::changeParent);
@@ -139,6 +142,9 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 			if (!m_ui->widgetMenuBtns->isVisible()) {
 				m_ui->widgetFooter->setVisible(false);
 			}
+
+			m_ui->widgetHorizontalChannels->layout()->setSpacing(0);
+			m_ui->widgetHorizontalChannels->layout()->setMargin(0);
 
 			Q_EMIT changeParent(m_ui->widgetVerticalChannelsContainer);
 		} else {
@@ -291,10 +297,38 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 	return ch;
 }
 
+adiscope::MenuAnim* ToolView::addMenuToStack()
+{
+	return m_ui->widgetMenuAnim;
+}
+
+void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* mainChannel, std::vector<ChannelWidget*> channelGroup)
+{
+	for (ChannelWidget* ch : channelGroup) {
+		ch->setMenuButtonVisibility(false);
+		ch->setBottomLineVIsibility(false);
+		channelManager->setChannelAlignment(ch,Qt::AlignLeft);
+	}
+	mainChannel->setIsMainChannel(true);
+	mainChannel->setBottomLineVIsibility(false);
+	channelManager->setChannelAlignment(mainChannel,Qt::AlignLeft);
+
+	connect(mainChannel, &ChannelWidget::enabled,this, [=](){
+		for (ChannelWidget* ch : channelGroup) {
+			if (mainChannel->toggleChannelsButton()->isChecked()) {
+				ch->show();
+			} else {
+				ch->hide();
+			}
+		}
+	});
+}
+
 void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible,
 				      bool checkBoxChecked)
 {
 	m_ui->widgetFooter->setVisible(true);
+	m_ui->widgetFooter->setStyleSheet("background:blue;");
 	m_ui->widgetMenuBtns->setVisible(true);
 
 	CustomMenuButton* btn = new CustomMenuButton(name, checkBoxVisible, checkBoxChecked);
@@ -364,6 +398,25 @@ int ToolView::addDockableCentralWidget(QWidget *widget, Qt::DockWidgetArea area,
 	m_docksList.append(docker);
 
 	return m_docksList.size() - 1;
+}
+
+void ToolView::setWidgetVisibility(int widgetId, bool visible)
+{
+	if (visible) {
+		m_docksList.at(widgetId)->show();
+	} else {
+		m_docksList.at(widgetId)->hide();
+	}
+}
+
+bool ToolView::isWidgetHidden(int widgetId)
+{
+	return  m_docksList.at(widgetId)->isHidden();
+}
+
+void ToolView::setHeaderVisibility(bool visible)
+{
+	m_ui->widgetHeader->setVisible(visible);
 }
 
 void ToolView::addDockableTabbedWidget(QWidget *widget, const QString &dockerName, int plotId)
@@ -453,6 +506,11 @@ void ToolView::addBottomExtraWidget(QWidget* widget) { m_ui->widgetBottomExtra->
 QWidget* ToolView::getCentralWidget() { return m_ui->widgetCentral; }
 
 QStackedWidget* ToolView::getStackedWidget() { return m_ui->stackedWidget; }
+
+void ToolView::setStackedWidget(QStackedWidget* sw)
+{
+	m_ui->stackedWidget = sw;
+}
 
 void ToolView::setInstrumentNotesVisible(bool visible) { m_ui->widgetInstrumentNotes->setVisible(visible); }
 
