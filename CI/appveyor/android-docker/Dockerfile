@@ -51,28 +51,25 @@ RUN sudo apt remove qtchooser
 RUN sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
 WORKDIR /home/$USER/src
-RUN git clone https://github.com/ioanachelaru/scopy-android-deps.git --branch docker
+RUN git clone https://github.com/analogdevicesinc/scopy-android-deps.git
 
 WORKDIR /home/$USER/src/scopy-android-deps
 RUN ./move_libs.sh aarch64 $USER
-
-WORKDIR /home/$USER/src/scopy-android-deps
 RUN ./rename_gradle.sh $USER
 
-WORKDIR /home/$USER/src/scopy-android-deps
 RUN git submodule update --init gnuradio-android/
-RUN git submodule update --init libxml2/
-RUN git submodule update --init --recursive libiio/
-RUN git submodule update --init libad9361-iio/
-RUN git submodule update --init libm2k/
-RUN git submodule update --init gr-iio/
 RUN git submodule update --init gr-m2k/
 RUN git submodule update --init gr-scopy/
+RUN git submodule update --init libm2k/
 RUN git submodule update --init libsigrokdecode/
 RUN git submodule update --init --recursive libtinyiiod/
 
 WORKDIR /home/$USER/src/scopy-android-deps/gnuradio-android
 RUN git submodule update --init --recursive Boost-for-Android/
+RUN git submodule update --init libxml2/
+RUN git submodule update --init --recursive libiio/
+RUN git submodule update --init libad9361-iio/
+RUN git submodule update --init gr-iio/
 RUN git submodule update --init --recursive fftw3/
 RUN git submodule update --init --recursive gnuradio/
 RUN git submodule update --init --recursive libgmp/
