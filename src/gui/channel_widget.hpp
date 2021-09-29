@@ -43,6 +43,7 @@ public:
 	QAbstractButton* nameButton() const;
 	QAbstractButton* menuButton() const;
 	QAbstractButton* deleteButton() const;
+	QAbstractButton* toggleChannelsButton() const;
 
 	int id() const;
 	void setId(int);
@@ -65,6 +66,14 @@ public:
 	void setReferenceChannel(const bool&);
 
 	void setMenuFloating(bool floating);
+
+	void setMenuButtonVisibility(bool visible);
+	void setBottomLineVIsibility(bool visible);
+
+	void toggleChannel(bool toggled);
+	void setIsMainChannel(bool mainChannel);
+
+	bool isMainChannel() const;
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;
@@ -101,6 +110,7 @@ private:
 	bool m_ref;
 
 	bool m_floatingMenu;
+	bool m_isMainChannel;
 };
 
 } /* namespace adiscope */

@@ -4,9 +4,9 @@
 
 using namespace adiscope::gui;
 
-ToolViewBuilder::ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager)
+ToolViewBuilder::ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager, adiscope::ToolLauncher* parent)
 {
-	m_toolView = new ToolView();
+	m_toolView = new ToolView(parent);
 
 	if (recipe.hasRunBtn) {
 		m_toolView->setRunBtnVisible(true);

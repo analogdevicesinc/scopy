@@ -42,7 +42,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QWidget" name="widgetMain" native="true">
+    <widget class="adiscope::DetachDragZone" name="widgetMain" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -226,23 +226,29 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QWidget" name="widgetVerticalChannels" native="true">
+         <widget class="adiscope::MenuAnim" name="widgetVerticalChannels" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>190</width>
+            <width>65</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>190</width>
+            <width>16777215</width>
             <height>16777215</height>
+           </size>
+          </property>
+          <property name="baseSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -256,7 +262,7 @@
             <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>0</number>
+            <number>10</number>
            </property>
            <property name="bottomMargin">
             <number>0</number>
@@ -264,12 +270,27 @@
            <item>
             <widget class="QWidget" name="widgetVerticalChannelsContainer" native="true">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>165</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <layout class="QVBoxLayout" name="verticalLayout_4">
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <property name="leftMargin">
                <number>0</number>
               </property>
@@ -284,22 +305,6 @@
               </property>
              </layout>
             </widget>
-           </item>
-           <item>
-            <spacer name="vSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
@@ -409,7 +414,7 @@
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>340</width>
+                 <width>300</width>
                  <height>0</height>
                 </size>
                </property>
@@ -645,6 +650,12 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <class>adiscope::gui::SettingsPairWidget</class>
    <extends>QWidget</extends>
    <header>gui/settings_pair_widget.hpp</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
