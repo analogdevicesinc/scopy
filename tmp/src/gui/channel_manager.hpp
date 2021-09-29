@@ -4,6 +4,7 @@
 #include <QScrollArea>
 #include <QStackedWidget>
 #include <QWidget>
+#include <QLabel>
 
 #include "channel_widget.hpp"
 #include "customPushButton.hpp"
@@ -37,25 +38,32 @@ public:
 	CustomPushButton* getAddChannelBtn();
 	QList<ChannelWidget*> getChannelsList();
 
+	void setChannelAlignment(ChannelWidget* ch,Qt::Alignment alignment);
+	void setChannelIdVisible(bool visible);
+	const QString &getToolStatus() const;
+	void setToolStatus(const QString &newToolStatus);
+
 public Q_SLOTS:
 	void changeParent(QWidget* newParent);
+	void toggleChannelManager(bool toggled);
 
 Q_SIGNALS:
 	void configureAddBtn(QWidget* menu, bool dockable);
 	void positionChanged(ChannelsPositionEnum position);
+	void channelManagerToggle(bool toggled);
 
 private:
 	QWidget* m_parent;
 	QScrollArea* m_scrollArea;
 	QWidget* m_channelsWidget;
-	QPushButton* m_switchBtn;
-
 	bool m_hasAddBtn;
 	CustomPushButton* m_addChannelBtn;
-
 	ChannelsPositionEnum m_position;
-
 	QList<ChannelWidget*> m_channelsList;
+	bool m_channelIdVisible;
+	QPushButton *toggleChannels;
+	bool channelManagerToggled;
+	QLabel *toolStatus;
 };
 } // namespace gui
 } // namespace scopy

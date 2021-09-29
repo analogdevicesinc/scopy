@@ -2,6 +2,7 @@
 #define TOOLBUILDER_HPP
 
 #include "tool_view.hpp"
+#include "tool_launcher.hpp"
 
 namespace adiscope {
 namespace gui {
@@ -20,12 +21,13 @@ struct ToolViewRecipe
 
 	bool hasChannels{false};
 	ChannelsPositionEnum channelsPosition{ChannelsPositionEnum::HORIZONTAL};
+	bool hasHeader{true};
 };
 
 class ToolViewBuilder
 {
 public:
-	ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager = nullptr);
+	ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager = nullptr, adiscope::ToolLauncher* parent = nullptr);
 
 	ToolView* build();
 
