@@ -2,7 +2,7 @@
 #define AppName "Scopy"
 #define AppDev "Analog Devices"
 #define Python "@PYTHON_VERSION@"
-#define DriverVersion "0.7"
+#define DriverVersion "0.8"
 
 [Setup]
 AppId={{02A7A7F9-F068-4B1C-85F6-B6D325938E19}
