@@ -355,6 +355,27 @@ QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 
 QPushButton[blue_button=true]:disabled { background-color: grey; }
 
+/*********************************** SubsectionSeparator ***************************************/
+
+QLabel#lblSubsectionSeparator{
+	font-size: 12px;
+	color: rgba(0, 0, 0, 70);
+}
+
+QFrame#lineSubsectionSeparator{ border: 1px solid rgba(0, 0, 0, 70); }
+
+QPushButton#btnSubsectionSeparator{
+	max-height: 6px;
+	max-width: 10px;
+	border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+}
+
+QPushButton#btnSubsectionSeparator:checked{
+	max-height: 10px;
+	max-width:  6px;
+	border-image: url(:/icons/sba_cmb_box_arrow.svg);
+}
+
 /* Info button for each tool */
 
 QPushButton[info_button=true]{

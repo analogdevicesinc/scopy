@@ -180,7 +180,7 @@ void ChannelManager::insertAddBtn(QWidget* menu, bool dockable)
 	// TO DO: center + btn when position is vertical
 	m_addChannelBtn->setCheckable(true);
 	m_addChannelBtn->setFlat(true);
-	m_addChannelBtn->setIcon(QIcon(":/icons/common/add.svg"));
+	m_addChannelBtn->setIcon(QIcon(":/menu/add.svg"));
 	m_addChannelBtn->setIconSize(QSize(16, 16));
 	m_addChannelBtn->setMaximumSize(25, 25);
 
