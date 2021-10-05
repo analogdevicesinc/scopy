@@ -57,6 +57,11 @@
        <property name="text">
         <string/>
        </property>
+       <property name="icon">
+        <iconset resource="../resources/resources.qrc">
+         <normaloff>:/icons/sba_cmb_box_arrow_right.svg</normaloff>
+         <normalon>:/icons/sba_cmb_box_arrow.svg</normalon>:/icons/sba_cmb_box_arrow_right.svg</iconset>
+       </property>
        <property name="checkable">
         <bool>true</bool>
        </property>
@@ -119,6 +124,12 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
