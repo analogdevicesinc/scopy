@@ -316,19 +316,18 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 
 	}
 #if __ANDROID__
-	auto  result = QtAndroid::checkPermission(QString("android.permission.WRITE_EXTERNAL_STORAGE"));
-	if(result == QtAndroid::PermissionResult::Denied){
-		QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.WRITE_EXTERNAL_STORAGE"}));
-		if(resultHash["android.permission.WRITE_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
-			return;
-	}
-	result = QtAndroid::checkPermission(QString("android.permission.READ_EXTERNAL_STORAGE"));
-	if(result == QtAndroid::PermissionResult::Denied){
-		QtAndroid::PermissionResultMap resultHash = QtAndroid::requestPermissionsSync(QStringList({"android.permission.READ_EXTERNAL_STORAGE"}));
-		if(resultHash["android.permission.READ_EXTERNAL_STORAGE"] == QtAndroid::PermissionResult::Denied)
-			return;
-	}
+	const QVector<QString> permissions({"android.permission.READ_EXTERNAL_STORAGE",
+					    "android.permission.WRITE_EXTERNAL_STORAGE",
+					    "android.permission.INTERNET"});
 
+	for(const QString &permission : permissions) {
+		auto result = QtAndroid::checkPermission(permission);
+		if(result == QtAndroid::PermissionResult::Denied) {
+			auto resultHash = QtAndroid::requestPermissionsSync(QStringList({permission}));
+			if(resultHash[permission] == QtAndroid::PermissionResult::Denied)
+				return;
+		}
+	}
 #endif
 	//	    skip_calibration=true;
 
