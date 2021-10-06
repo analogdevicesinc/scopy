@@ -68,7 +68,7 @@ Preferences::Preferences(QWidget *parent) :
 	m_skipCalIfCalibrated(true),
 	automatical_version_checking_enabled(false),
 	first_application_run(true),
-	check_updates_url("https://swdownloads.analog.com/cse/sw_versions.json"),
+	check_updates_url("http://swdownloads.analog.com/cse/sw_versions.json"),
 	m_colorEditor(nullptr),
 	m_logging_enabled(false)
 {

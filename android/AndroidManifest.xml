@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <manifest package="org.adi.scopy" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.3.1" android:versionCode="013001000" android:installLocation="auto">
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
-	 Remove the comment if you do not require these default permissions. -->
+         Remove the comment if you do not require these default permissions. -->
     <!-- %%INSERT_PERMISSIONS -->
 <uses-permission android:name="android.permission.CLEAR_APP_USER_DATA"/>
     <uses-permission android:name="android.permission.CLEAR_APP_CACHE"/>
@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <!-- The following comment will be replaced upon deployment with default features based on the dependencies of the application.
-	 Remove the comment if you do not require these default features. -->
+         Remove the comment if you do not require these default features. -->
     <!-- %%INSERT_FEATURES -->
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
     <application android:hardwareAccelerated="true" android:name="org.adi.scopy.ScopyApplication" android:label="Scopy" android:extractNativeLibs="true" android:icon="@drawable/icon">
