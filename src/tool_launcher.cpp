@@ -369,8 +369,12 @@ void ToolLauncher::_setupToolMenu()
 	menu->getButtonGroup()->addButton(ui->btnNotes);
 
 	infoWidget = new InfoWidget(this);
+
+#ifndef __ANDROID__
 	connect(ui->homeWidget, &DetachDragZone::changeText,
 		infoWidget, &InfoWidget::setText);
+#endif
+
 	connect(menu, &ToolMenu::enableInfoWidget,
 		infoWidget, &InfoWidget::enable);
 }

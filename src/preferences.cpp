@@ -79,6 +79,9 @@ Preferences::Preferences(QWidget *parent) :
 	ui->debugMessagesCheckbox->setVisible(false);
 	ui->debugMessagesLbl->setVisible(false);
 
+#ifdef __ANDROID__
+	ui->doubleClickToDetachWidget->setDisabled(true);
+#endif
 	connect(ui->doubleClickCheckBox, &QCheckBox::stateChanged, [=](int state){
 		double_click_to_detach = (!state ? false : true);
 		Q_EMIT notify();

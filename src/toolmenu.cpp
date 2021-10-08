@@ -54,11 +54,12 @@ ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
 
 	connect(this, &ToolMenu::itemMovedFromTo,
 		this, &ToolMenu::_updateToolList);
-
+#ifndef __ANDROID__
 	connect(preferences, &Preferences::notify,
 		this, &ToolMenu::_readPreferences);
 
 	_readPreferences();
+#endif
 }
 
 ToolMenu::~ToolMenu()
@@ -197,6 +198,8 @@ void ToolMenu::_loadState()
 	settings.endArray();
 }
 
+
+#ifndef __ANDROID__
 void ToolMenu::_readPreferences()
 {
 	for (int i = 0; i < d_tools.size(); ++i) {
@@ -204,3 +207,4 @@ void ToolMenu::_readPreferences()
 		item->enableDoubleClickToDetach(d_preferences->getDouble_click_to_detach());
 	}
 }
+#endif

@@ -70,13 +70,17 @@ public Q_SLOTS:
 	virtual void stop();
 	virtual void single();
 	virtual bool isRunning();
+#ifndef __ANDROID__
 	virtual void attached();
 	virtual void detached();
+#endif
 	virtual void readPreferences();
 
 private Q_SLOTS:
 	void saveState();
+#ifndef __ANDROID__
 	void loadState();
+#endif
 
 protected:
 	struct iio_context *ctx;

@@ -56,7 +56,10 @@ private:
 	void _buildAllAvailableTools();
 	void _saveState();
 	void _loadState();
+
+#ifndef __ANDROID__
 	void _readPreferences();
+#endif
 private:
 
 	QStringList d_availableTools;
