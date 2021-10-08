@@ -20,6 +20,7 @@
 
 #include "tool.hpp"
 #include "tool_launcher.hpp"
+
 #include "detachedwindowsmanager.h"
 
 #include <QMimeData>
@@ -51,6 +52,7 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 
 	readPreferences();
 
+#ifndef __ANDROID__
 	if (api) {
 		connect(api, &ApiObject::loadingFinished,
 			this, &Tool::loadState);
@@ -58,6 +60,7 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 
 	connect(toolMenuItem, &ToolMenuItem::detach,
 		this, &Tool::detached);
+#endif
 	connect(this, &Tool::detachedState,
 		toolMenuItem, &ToolMenuItem::setDetached);
 }
@@ -123,6 +126,8 @@ void Tool::saveState()
 	settings->sync();
 }
 
+
+#ifndef __ANDROID__
 void Tool::loadState()
 {
 	bool isDetached = settings->value(name + "/detached").toBool();
@@ -160,6 +165,7 @@ void Tool::detached()
 		this->window = window;
 	}
 }
+#endif
 
 void Tool::run()
 {
