@@ -1950,5 +1950,42 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 			return true;
 		}
 	}
+
+#ifdef __ANDROID__
+	else if(event->type() == QEvent::KeyRelease) {
+			QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+			if (ke->key() == Qt::Key_Back) {
+
+				QMessageBox* msgBox = new QMessageBox(this);
+				QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
+				QRect screenRect = QDesktopWidget().screenGeometry();
+
+				msgBox->setText("Are you sure you want to close Scopy?");
+
+				QPushButton* yesButton = new QPushButton("Yes");
+				msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
+
+				QPushButton* noButton = new QPushButton("No");
+				msgBox->addButton(noButton ,QMessageBox::RejectRole);
+
+				msgBox->setModal(false);
+				msgBox->show();
+				msgBox->activateWindow();
+				msgBox->move( QPoint( screenRect.x() + screenRect.width()/2 - mSize.width()/2,
+						      screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
+
+				connect(yesButton, &QAbstractButton::clicked, [&] () {
+					// TODO: call save preferences
+					qApp->exit();
+				});
+
+				connect(noButton, &QAbstractButton::clicked, [&] () {
+					event->ignore();
+				});
+			}
+			return true;
+		}
+#endif
+
 	return QObject::eventFilter(watched, event);
 }
