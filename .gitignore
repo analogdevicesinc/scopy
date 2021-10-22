@@ -14,3 +14,6 @@ android/assets/python3.*/*
 !android/src/org/adi/scopy
 *.swp
 html/
+build_arm64-v8a/
+android_cmake.sh
+android_deploy_qt.sh
