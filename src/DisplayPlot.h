@@ -590,6 +590,10 @@ protected Q_SLOTS:
   void _onXbottomAxisWidgetScaleDivChanged();
   void _onYleftAxisWidgetScaleDivChanged();
 
+#ifdef __ANDROID__
+  void mousePressEvent(QMouseEvent *event);
+#endif
+
 protected:
 
   enum PlotMarker

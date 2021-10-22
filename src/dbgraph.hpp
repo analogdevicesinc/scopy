@@ -110,6 +110,10 @@ Q_SIGNALS:
 	void frequencySelected(double);
 	void frequencyBarPositionChanged(int);
 
+#ifdef __ANDROID__
+	void zoomOut();
+#endif
+
 public Q_SLOTS:
 	void plot(double x, double y);
 	void reset();
@@ -136,6 +140,10 @@ public Q_SLOTS:
 	void scaleDivChanged();
 	void mousePressEvent(QMouseEvent *event);
 	void onResetZoom();
+
+#ifdef __ANDROID__
+	void onZoomOut();
+#endif
 
 	void onFrequencyCursorPositionChanged(int pos);
 	void onFrequencyBarMoved(double frequency);

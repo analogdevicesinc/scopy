@@ -34,7 +34,10 @@ void LimitedPlotZoomer::resetZoom()
 	QwtPlotZoomer::zoom(0);
 }
 
-
+void LimitedPlotZoomer::popZoom()
+{
+	QwtPlotZoomer::zoom(-1);
+}
 
 void LimitedPlotZoomer::setBoundVertical(bool bound)
 {
