@@ -28,6 +28,7 @@ class LimitedPlotZoomer : public QwtPlotZoomer
 public:
 	LimitedPlotZoomer(QWidget*, bool doReplot = false);
 	void resetZoom();
+	void popZoom();
 
 	void setBoundVertical(bool bound);
 

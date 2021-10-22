@@ -1972,6 +1972,18 @@ void DisplayPlot::_onYleftAxisWidgetScaleDivChanged()
 	}
 }
 
+#ifdef __ANDROID__
+void DisplayPlot::mousePressEvent(QMouseEvent *event)
+{
+	if (event->type() == QEvent::MouseButtonDblClick) {
+		for (unsigned int i = 0; i < d_zoomer.size(); ++i) {
+			OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer[i]);
+			zoomer->popZoom();
+		}
+	}
+}
+#endif
+
 QwtPlotZoomer *DisplayPlot::getZoomer() const
 {
 	if (d_zoomer.isEmpty())

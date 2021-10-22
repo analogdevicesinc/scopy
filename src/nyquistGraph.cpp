@@ -256,6 +256,15 @@ void NyquistGraph::mousePressEvent(QMouseEvent *event)
 		return;
 	}
 
+#ifdef __ANDROID__
+	if (event->type() == QEvent::MouseButtonDblClick) {
+		zoomer->cancelZoom();
+		QApplication::setOverrideCursor(Qt::CrossCursor);
+		QwtPolarPlot::mousePressEvent(event);
+		return;
+	}
+#endif
+
 	if (zoomer->isZoomed())
 		QApplication::setOverrideCursor(Qt::ClosedHandCursor);
 

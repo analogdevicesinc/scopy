@@ -560,6 +560,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
 	connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
 
+#ifdef __ANDROID__
+	connect(&m_dBgraph, &dBgraph::zoomOut, &m_phaseGraph, &dBgraph::onZoomOut);
+	connect(&m_phaseGraph, &dBgraph::zoomOut, &m_dBgraph, &dBgraph::onZoomOut);
+#endif
 
 	connect(ui->rightMenu, &MenuAnim::finished, this,
 		&NetworkAnalyzer::rightMenuFinished);
