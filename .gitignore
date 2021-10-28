@@ -6,8 +6,11 @@ Makefile
 moc_*.cpp
 *_automoc.cpp
 ui_*.h
-build
+build*
 deps
 scopy
+android/assets/libsigrokdecode/*
+android/assets/python3.*/*
+!android/src/org/adi/scopy
 *.swp
 html/
