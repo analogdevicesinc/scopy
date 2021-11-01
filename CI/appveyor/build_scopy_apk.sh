@@ -1,16 +1,14 @@
 #!/bin/bash
 set -xe
-source $ANDROID_TOOLCHAIN_LOCATION/android_toolchain.sh $1 $2
+source ./android_toolchain.sh $1 $2
 
 ARTIFACT_LOCATION=$GITHUB_WORKSPACE
 
 build_scopy() {
-	pushd $WORKDIR
-	rm -rf scopy
 
 	git clone https://github.com/analogdevicesinc/scopy.git
+	pushd scopy
 
-	cd ${WORKDIR}/scopy
 	git fetch origin $BRANCH
 	git checkout FETCH_HEAD
 
@@ -23,16 +21,30 @@ build_scopy() {
 
 	cd build_$ABI
 	make -j$JOBS
-	make -j$JOBS install
 	cd ..
 
 	./android_deploy_qt.sh
+	cd build_$ABI
+	make apk
+	make aab
+	cd ..
 	
 	popd
 }
 
 move_artifact() {
-	sudo cp $WORKDIR/scopy/build_$ABI/android-build/build/outputs/apk/debug/android-build-debug.apk $ARTIFACT_LOCATION/
+	pushd scopy
+	sudo cp ./build_$ABI/android-build/build/outputs/apk/debug/android-build-debug.apk $ARTIFACT_LOCATION/
+	sudo cp ./build_$ABI/android-build/build/outputs/bundle/debug/android-build-debug.aab $ARTIFACT_LOCATION/
+	sudo cp ./build_$ABI/android-build/build/outputs/bundle/release/android-build-release.aab $ARTIFACT_LOCATION/
+	pushd $ARTIFACT_LOCATION
+	sudo chmod 644 ./android-build-debug.apk
+	sudo chmod 644 ./android-build-debug.aab
+	sudo chmod 644 ./android-build-release.aab
+	ls -la $ARTIFACT_LOCATION
+	popd
+
+	popd
 }
 
 build_scopy
