@@ -44,6 +44,24 @@ endfunction()
 function(create_build_info_html_pages)
 
 endfunction()
+
+
+function(configure_stylesheets DU_OPTION)
+	file(GLOB_RECURSE STYLESHEETS ${CMAKE_CURRENT_SOURCE_DIR}/resources/stylesheets/templates/*.qss.c)
+
+	foreach(_stylesheet ${STYLESHEETS})
+		string(REPLACE ".c" "" FILE_OUT ${_stylesheet})
+		string(REPLACE "templates/" "" FILE_OUT ${FILE_OUT})
+
+		execute_process (
+			COMMAND ${CMAKE_C_COMPILER} -E -P ${DU_OPTION} ${_stylesheet} -o ${FILE_OUT}
+			)
+
+		message(STATUS "Done preprocessing ${_stylesheet}, file written to: ${FILE_OUT}")
+	endforeach()
+
+endfunction()
+
 # Get the GIT hash of the latest commit
 include(FindGit OPTIONAL)
 if (GIT_FOUND)
@@ -266,6 +284,25 @@ add_definitions(-DQT_NO_KEYWORDS)
 if (APPLE)
 	option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" ON)
 endif(APPLE)
+
+option(CONFIG_STYLESHEETS "Preprocess stylesheets using ${CMAKE_C_COMPILER}" OFF)
+message(STATUS CONFIG_STYLESHEETS - ${CONFIG_STYLESHEETS})
+if (${CONFIG_STYLESHEETS})
+	if (ANDROID)
+		set(PROCESSING_OPTIONS "-D__ANDROID__")
+	endif(ANDROID)
+
+	if (APPLE)
+		set(PROCESSING_OPTIONS "-D__MACOS__")
+	endif(APPLE)
+
+	if (WIN32)
+		set(PROCESSING_OPTIONS "-D__WINDOWS__")
+	endif(WIN32)
+
+	configure_stylesheets("${PROCESSING_OPTIONS}")
+
+endif()
 
 if (ENABLE_APPLICATION_BUNDLE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
