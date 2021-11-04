@@ -103,19 +103,34 @@ void ConnectDialog::enableDemoBtn()
 #if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
 		killProcess.start("taskkill /im iio-emu /f");
 #else
+#ifdef __ANDROID__
+		killProcess.start("killall -9 iio-emu.so");
+#else
 		killProcess.start("pkill iio-emu");
+#endif
 #endif
 		killProcess.waitForFinished();
 
 		// iio-emu found in system
+
+#ifdef __ANDROID__
+		QString dirPath = qgetenv("IIOEMU_BIN");
+		QString program =dirPath;
+#else
 		QString dirPath = QCoreApplication::applicationDirPath();
 		QString program = dirPath + "/iio-emu";
+#endif
 		QStringList arguments;
 		arguments.append(ui->demoDevicesComboBox->currentText());
 		process->setProgram(program);
+		//process->setArguments(QStringList("/"));//dirPath));
 		process->setArguments(arguments);
 		process->start();
+
 		auto started = process->waitForStarted();
+		qDebug()<<"path"<<program;
+		qDebug()<<"stdout:"<<QString(process->readAllStandardOutput());
+		qDebug()<<"stderr:"<<QString(process->readAllStandardError());
 		if (!started) {
 			// retry to start the process
 			// path for iio-emu when Scopy is built manually
@@ -129,6 +144,7 @@ void ConnectDialog::enableDemoBtn()
 				return;
 			}
 		}
+		qDebug()<<"Process " << program << "started";
 
 		ui->enableDemoBtn->setChecked(true);
 		ui->enableDemoBtn->setText("Disable Demo");

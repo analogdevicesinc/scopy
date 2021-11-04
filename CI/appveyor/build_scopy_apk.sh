@@ -8,6 +8,7 @@ build_scopy() {
 
 	git clone https://github.com/analogdevicesinc/scopy.git
 	pushd scopy
+	git submodule update --init --recursive iio-emu
 
 	git fetch origin $BRANCH
 	git checkout FETCH_HEAD
