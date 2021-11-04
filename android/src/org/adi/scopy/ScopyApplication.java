@@ -30,23 +30,29 @@ import android.system.ErrnoException;
 
 public class ScopyApplication extends QtApplication
 {
-        @Override
-        public void onCreate()
-        {
-                String src = getApplicationInfo().sourceDir;
-                System.out.println("sourcedir: "+ getApplicationInfo().sourceDir);
-                System.out.println("public sourcedir: "+ getApplicationInfo().publicSourceDir);
-                System.out.println("Hello application !");
+	@Override
+	public void onCreate()
+	{
+		String apk = getApplicationInfo().sourceDir;
+		System.out.println("sourcedir: "+ getApplicationInfo().sourceDir);
+		System.out.println("public sourcedir: "+ getApplicationInfo().publicSourceDir);
+		String libdir = getApplicationInfo().nativeLibraryDir;
+		System.out.println("native library dir:" + libdir);
+		System.out.println("Hello application !");
 
-                try {
-                    Os.setenv("PYTHONHOME",".",true);
-                    Os.setenv("PYTHONPATH",src + "/assets/python3.8",true);
-                    Os.setenv("SIGROKDECODE_DIR", src + "/assets/libsigrokdecode/decoders",true);
-                }
-                catch(ErrnoException x) {
-                     System.out.println("Cannot set envvars");
-                }
+		try {
+		    Os.setenv("PYTHONHOME",".",true);
+		    Os.setenv("PYTHONPATH",apk + "/assets/python3.8",true);
+		    Os.setenv("SIGROKDECODE_DIR", apk + "/assets/libsigrokdecode/decoders",true);
+		    Os.setenv("LD_LIBRARY_PATH", libdir, true);
+		    Os.setenv("IIOEMU_BIN", libdir+"/iio-emu.so", true);
 
-                super.onCreate();
-        }
+		}
+
+		catch(ErrnoException x) {
+		     System.out.println("Cannot set envvars");
+		}
+
+		super.onCreate();
+	}
 }

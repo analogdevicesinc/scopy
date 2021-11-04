@@ -1520,7 +1520,6 @@ QPair<bool, bool> adiscope::ToolLauncher::calibrate()
 				ok = true;
 			}
 		}
-		ok = calib->calibrateAll();
 	}
 	QMetaObject::invokeMethod(selectedDev->infoPage(),
 				  "setCalibrationStatusLabel",
