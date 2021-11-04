@@ -13,7 +13,6 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	, m_channelsWidget(new QWidget(m_scrollArea))
 	, m_switchBtn(new QPushButton(m_scrollArea))
 	, m_hasAddBtn(false)
-	, m_addChannelBtn(new CustomPushButton(m_scrollArea))
 	, m_position(position)
 {
 	if (m_position == ChannelsPositionEnum::VERTICAL) {
@@ -41,7 +40,11 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 ChannelManager::~ChannelManager()
 {
 	delete m_channelsWidget;
-	delete m_addChannelBtn;
+
+	if (m_addChannelBtn) {
+		delete m_addChannelBtn;
+	}
+
 	delete m_switchBtn;
 	delete m_parent;
 }
@@ -175,7 +178,9 @@ QList<ChannelWidget*> ChannelManager::getEnabledChannels()
 
 void ChannelManager::insertAddBtn(QWidget* menu, bool dockable)
 {
+
 	m_hasAddBtn = true;
+	m_addChannelBtn = new CustomPushButton(m_scrollArea);
 
 	// TO DO: center + btn when position is vertical
 	m_addChannelBtn->setCheckable(true);
