@@ -184,6 +184,7 @@ private:
 	void add_ref_waveform(QVector<double> xData, QVector<double> yData);
 	void add_ref_waveform(unsigned int chIdx);
 	QString getReferenceChannelName() const;
+	void setYAxisUnit(const QString& type);
 
 	QList<SpectrumChannel_API *> ch_api;
 	QList<SpectrumMarker_API *> marker_api;

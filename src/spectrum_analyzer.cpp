@@ -224,6 +224,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	fft_plot->enableXaxisLabels();
 	fft_plot->enableYaxisLabels();
+	setYAxisUnit(ui->cmb_units->currentText());
+	fft_plot->setBtmHorAxisUnit("Hz");
 
 	// Initialize spectrum channels
 	for (int i = 0 ; i < m_adc_nb_channels; i++) {
@@ -475,6 +477,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->lblMagUnit->setText(ui->cmb_units->currentText());
 	ui->markerTable->hide();
+
 
 	for (auto ch: qAsConst(channels)) {
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
@@ -1070,6 +1073,15 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 	}
 
 	return QString("REF %1").arg(current);
+}
+
+void SpectrumAnalyzer::setYAxisUnit(const QString& unit)
+{
+	if (unit == "dBFS" || unit == "dBu" || unit == "dBV") {
+		fft_plot->setLeftVertAxisUnit("db");
+	} else if (unit == "Vpeak" || unit == "Vrms" || unit == "V/√Hz") {
+		fft_plot->setLeftVertAxisUnit("V");
+	}
 }
 
 void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> yData)
@@ -2231,6 +2243,11 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		top_scale->setValue(2.5E1);
 		bottom_scale->setValue(1E-12);
 		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
+
+		fft_plot->replot();
+		fft_plot->setYaxisMajorTicksPos(fft_plot->axisScaleDiv(QwtPlot::yLeft).ticks(2));
+		fft_plot->leftHandlesArea()->repaint();
+
 		break;
 	default:
 		ui->divisionWidget->setVisible(true);
@@ -2242,6 +2259,8 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 	}
 	fft_plot->setMagnitudeType((*it).second);
 	fft_plot->recalculateMagnitudes();
+
+	setYAxisUnit(unit);
 
 	fft_plot->replot();
 	fft_plot->leftHandlesArea()->repaint();
