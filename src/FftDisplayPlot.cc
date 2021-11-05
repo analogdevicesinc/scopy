@@ -223,12 +223,12 @@ void FftDisplayPlot::replot()
 
 QString FftDisplayPlot::formatXValue(double value, int precision) const
 {
-	return d_formatter->format(value, "Hz", precision);
+	return d_formatter->format(value, d_xAxisUnit, precision);
 }
 
 QString FftDisplayPlot::formatYValue(double value, int precision) const
 {
-	return d_formatter->format(value, "dB", precision);
+	return d_formatter->format(value, d_yAxisUnit, precision);
 }
 
 void FftDisplayPlot::setupReadouts()
