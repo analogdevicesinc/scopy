@@ -4,6 +4,10 @@
 #include <QProcess>
 #include <QDir>
 
+#ifdef __ANDROID__
+	#include <QtAndroidExtras/QtAndroid>
+#endif
+
 using namespace adiscope;
 
 ApplicationRestarter::ApplicationRestarter(const QString &executable)
@@ -25,15 +29,20 @@ QStringList ApplicationRestarter::getArguments() const
 
 int ApplicationRestarter::restart(int exitCode)
 {
-        if (qApp->property("restart").toBool()) {
-                QProcess::startDetached(m_executable, m_arguments, m_currentPath);
-        }
+	if (qApp->property("restart").toBool()) {
+#ifdef __ANDROID__
+		QAndroidJniObject activity = QtAndroid::androidActivity();
+		activity.callMethod<void>("restart");
+#else
+		QProcess::startDetached(m_executable, m_arguments, m_currentPath);
+#endif
+	}
 
-        return exitCode;
+	return exitCode;
 }
 
 void ApplicationRestarter::triggerRestart()
 {
-        qApp->setProperty("restart", QVariant(true));
+	qApp->setProperty("restart", QVariant(true));
 	qApp->exit();
 }
