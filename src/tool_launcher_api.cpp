@@ -244,35 +244,44 @@ bool ToolLauncher_API::reset()
 	return did_reconnect;
 }
 
+void ToolLauncher_API::sync() {
+
+	QSettings settings;
+	save(&settings);
+}
+
+void ToolLauncher_API::save(QSettings *settings) {
+	this->ApiObject::save(*settings);
+	this->tl->m_sessionInfo.save(*settings);
+
+	if (tl->notesPanel)
+		tl->notesPanel->api()->save(*settings);
+	if (tl->oscilloscope)
+		tl->oscilloscope->getApi()->save(*settings);
+	if (tl->dmm)
+		tl->dmm->getApi()->save(*settings);
+	if (tl->power_control)
+		tl->power_control->getApi()->save(*settings);
+	if (tl->signal_generator)
+		tl->signal_generator->getApi()->save(*settings);
+	if (tl->logic_analyzer)
+		tl->logic_analyzer->getApi()->save(*settings);
+	if (tl->dio)
+		tl->dio->getApi()->save(*settings);
+	if (tl->pattern_generator)
+		tl->pattern_generator->getApi()->save(*settings);
+	if (tl->network_analyzer)
+		tl->network_analyzer->getApi()->save(*settings);
+	if (tl->spectrum_analyzer)
+		tl->spectrum_analyzer->getApi()->save(*settings);
+
+	ApiObjectManager::getInstance().save(*settings);
+}
+
 void ToolLauncher_API::save(const QString& file)
 {
 	QSettings settings(file, QSettings::IniFormat);
-
-	this->ApiObject::save(settings);
-	this->tl->m_sessionInfo.save(settings);
-
-	if (tl->notesPanel)
-		tl->notesPanel->api()->save(settings);
-	if (tl->oscilloscope)
-		tl->oscilloscope->getApi()->save(settings);
-	if (tl->dmm)
-		tl->dmm->getApi()->save(settings);
-	if (tl->power_control)
-		tl->power_control->getApi()->save(settings);
-	if (tl->signal_generator)
-		tl->signal_generator->getApi()->save(settings);
-	if (tl->logic_analyzer)
-		tl->logic_analyzer->getApi()->save(settings);
-	if (tl->dio)
-		tl->dio->getApi()->save(settings);
-	if (tl->pattern_generator)
-		tl->pattern_generator->getApi()->save(settings);
-	if (tl->network_analyzer)
-		tl->network_analyzer->getApi()->save(settings);
-	if (tl->spectrum_analyzer)
-		tl->spectrum_analyzer->getApi()->save(settings);
-
-	ApiObjectManager::getInstance().save(settings);
+	save(&settings);
 }
 
 void ToolLauncher::addDebugWindow()

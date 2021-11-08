@@ -43,6 +43,11 @@
 
 using namespace adiscope;
 
+ToolLauncher* tl_ptr;
+ToolLauncher* adiscope::getToolLauncherInstance() {
+	return tl_ptr;
+}
+
 int main(int argc, char **argv)
 {
 #ifdef  __ANDROID__
@@ -166,6 +171,7 @@ int main(int argc, char **argv)
 	}
 
 	ToolLauncher launcher(prevCrashDump);
+	tl_ptr = &launcher;
 	launcher.getPrefPanel()->setColorEditor(colorEditor);
 
 	bool nogui = parser.isSet("nogui");
