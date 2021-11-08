@@ -105,6 +105,8 @@ public:
 
 	Q_INVOKABLE void load(const QString& file);
 	Q_INVOKABLE void save(const QString& file);
+	Q_INVOKABLE void save(QSettings *settings);
+	Q_INVOKABLE void sync();
 	Q_INVOKABLE bool reset();
 	Q_INVOKABLE bool enableExtern(bool);
 	Q_INVOKABLE bool enableCalibScript(bool);

@@ -31,10 +31,12 @@ import android.os.Bundle;
 
 public class ScopyActivity extends QtActivity
 {
+	public static native void saveSessionJavaHelper();
+
         @Override
         public void onCreate(Bundle savedInstanceState)
         {
-                super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);		//saveSessionJavaHelper();
         }
 
         @Override
@@ -46,17 +48,27 @@ public class ScopyActivity extends QtActivity
         @Override
         protected void onStop()
         {
-                super.onStop();
+                super.onStop();		
         }
 
+	protected void onPause(){
+		saveSessionJavaHelper();
+		super.onPause();
+	}
+
+	protected void onDestroy(){
+		super.onPause();
+	}
+
 	public void restart() {
-	    System.out.println("-- ScopyActivity: Restarting ");
-	    Context context = getApplicationContext();
-	    PackageManager packageManager = context.getPackageManager();
-	    Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
-	    ComponentName componentName = intent.getComponent();
-	    Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-	    context.startActivity(mainIntent);
-	    Runtime.getRuntime().exit(0);
+		saveSessionJavaHelper();
+		System.out.println("-- ScopyActivity: Restarting ");
+		Context context = getApplicationContext();
+		PackageManager packageManager = context.getPackageManager();
+		Intent intent = packageManager.getLaunchIntentForPackage(context.getPackageName());
+		ComponentName componentName = intent.getComponent();
+		Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+		context.startActivity(mainIntent);
+		Runtime.getRuntime().exit(0);
     }
 }

@@ -77,6 +77,8 @@ class Debugger;
 class ManualCalibration;
 class UserNotes;
 
+ToolLauncher* getToolLauncherInstance();
+
 class ToolLauncher : public QMainWindow
 {
 	friend class ToolLauncher_API;
@@ -194,6 +196,10 @@ private:
 	DeviceWidget* getDevice(QString uri);
 	void setupAddPage();
 	void allowExternalScript(bool);
+#ifdef __ANDROID__
+	void registerNativeMethods();
+	static void saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/);
+#endif
 
 private:
 	Ui::ToolLauncher *ui;
@@ -284,6 +290,7 @@ private:
 	PhoneHome* m_phoneHome;
 
 	SessionInfo m_sessionInfo;
+
 };
 }
 #endif // M2K_TOOL_LAUNCHER_H
