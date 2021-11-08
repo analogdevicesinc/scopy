@@ -28,6 +28,8 @@
 #include <iio.h>
 #include <iostream>
 #include <QCoreApplication>
+#include <QFile>
+#include <QDir>
 
 using namespace adiscope;
 
@@ -112,18 +114,22 @@ void ConnectDialog::enableDemoBtn()
 		killProcess.waitForFinished();
 
 		// iio-emu found in system
+		QString program = qgetenv("IIOEMU_BIN");
+		if(program.isEmpty()) {
+			// Env Var not found, try local folder
+			QString dirPath = QCoreApplication::applicationDirPath();
+			program = dirPath + "/iio-emu";
+			QFileInfo fi(program);
+			if(!fi.exists() || fi.isDir()) {
+				// iio-emu is built in-tree
+				// development build
+				program = dirPath + "/iio-emu/iio-emu";
+			}
+		}
 
-#ifdef __ANDROID__
-		QString dirPath = qgetenv("IIOEMU_BIN");
-		QString program =dirPath;
-#else
-		QString dirPath = QCoreApplication::applicationDirPath();
-		QString program = dirPath + "/iio-emu";
-#endif
 		QStringList arguments;
 		arguments.append(ui->demoDevicesComboBox->currentText());
 		process->setProgram(program);
-		//process->setArguments(QStringList("/"));//dirPath));
 		process->setArguments(arguments);
 		process->start();
 
@@ -131,18 +137,11 @@ void ConnectDialog::enableDemoBtn()
 		qDebug()<<"path"<<program;
 		qDebug()<<"stdout:"<<QString(process->readAllStandardOutput());
 		qDebug()<<"stderr:"<<QString(process->readAllStandardError());
+
 		if (!started) {
-			// retry to start the process
-			// path for iio-emu when Scopy is built manually
-			program = dirPath + "/iio-emu/iio-emu";
-			process->setProgram(program);
-			process->start();
-			started = process->waitForStarted();
-			if (!started) {
 				ui->description->setText("Server failed to start");
 				qDebug() << "Process failed to start";
 				return;
-			}
 		}
 		qDebug()<<"Process " << program << "started";
 
