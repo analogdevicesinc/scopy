@@ -365,7 +365,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->cmbGainMode->setCurrentIndex(0);
 
 	// Initialize vertical axis controls
-	unit_per_div->setMinValue(1);
+	unit_per_div->setMinValue(0.01);
 	unit_per_div->setMaxValue(200/10);
 
 	// Configure plot peak capabilities
