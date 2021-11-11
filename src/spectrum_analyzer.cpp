@@ -366,7 +366,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// Initialize vertical axis controls
 	unit_per_div->setMinValue(0.01);
-	unit_per_div->setMaxValue(200/10);
+	unit_per_div->setMaxValue(500/10);
 
 	// Configure plot peak capabilities
 	for (uint i = 0; i < m_adc_nb_channels; i++) {
@@ -467,8 +467,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->gridSweepControls->addWidget(startStopRange, 0, 0, 2, 2);
 
-	unit_per_div->setValue(20);
 	top->setValue(0);
+	bottom->setValue(-200);
 
 	marker_freq_pos->setMinValue(1);
 	marker_freq_pos->setMaxValue(startStopRange->getStopValue());
@@ -2275,8 +2275,8 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		switch (magType) {
 		case FftDisplayPlot::VPEAK:
 		case FftDisplayPlot::VRMS:
-			unit_per_div->setValue(2);
 			bottom->setValue(-10);
+			unit_per_div->setValue(2);
 			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
 			break;
 		case FftDisplayPlot::VROOTHZ:
@@ -2285,7 +2285,7 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 			fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
 			break;
 		default:
-			unit_per_div->setValue(20);
+			top->setValue(0);
 			bottom->setValue(-200);
 			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
 			break;
@@ -2354,17 +2354,21 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 void SpectrumAnalyzer::onTopValueChanged(double top_value)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
-	double perDiv = unit_per_div->value();
-	double bottomValue = top_value - perDiv * 10;
+	double bottom_value;
 
 	if (!isScaleBtn) {
-		bottom->blockSignals(true);
-		bottom->setValue(bottomValue);
-		bottom->blockSignals(false);
-		fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
+		bottom_value = bottom->value();
+
+		unit_per_div->blockSignals(true);
+		unit_per_div->setValue(abs((top_value - bottom_value)/10));
+		unit_per_div->blockSignals(false);
+
 	} else {
-		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_value);
+		bottom_value = bottom_scale->value();
 	}
+
+	fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_value);
+
 	fft_plot->replot();
 	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
@@ -2374,42 +2378,55 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
-	if (isScaleBtn) {
-		double topValue = bottom_scale->value() + perDiv * 10;
-		top_scale->setValue(topValue);
+	double topValue, bottomValue;
 
-		double bottomValue = top_scale->value() - perDiv * 10;
-		if (bottomValue != bottom_scale->value()) {
-			bottom_scale->setValue(bottomValue);
-		}
+	if (isScaleBtn) {
+
+		bottomValue = bottom_scale->value();
+		topValue = bottomValue + perDiv * 10;
+
+		top_scale->blockSignals(true);
+		top_scale->setValue(topValue);
+		top_scale->blockSignals(false);
+
 	} else {
 		bottom->setMaxValue(m_mag_min_max.second - perDiv * 10);
 		top->setMinValue(m_mag_min_max.first + perDiv * 10);
 
-		double topValue = bottom->value() + perDiv * 10;
-		top->setValue(topValue);
+		bottomValue = bottom->value();
+		topValue = bottomValue + perDiv * 10;
 
-		double bottomValue = top->value() - perDiv * 10;
-		if (bottomValue != bottom->value()) {
-			bottom->setValue(bottomValue);
-		}
+		top->blockSignals(true);
+		top->setValue(topValue);
+		top->blockSignals(false);
 	}
+
+	fft_plot->setAxisScale(QwtPlot::yLeft, bottomValue, topValue);
+
+	fft_plot->replot();
+	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
+	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
+	fft_plot->leftHandlesArea()->repaint();
 }
 
 void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 {
 	bool isScaleBtn = ui->topWidget->currentIndex();
-	double perDiv = unit_per_div->value();
-	double topValue = bottom_value + perDiv * 10;
+	double top_value;
 
 	if (!isScaleBtn) {
-		top->blockSignals(true);
-		top->setValue(topValue);
-		top->blockSignals(false);
-		fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
+		top_value = top->value();
+
+		unit_per_div->blockSignals(true);
+		unit_per_div->setValue(abs((top_value - bottom_value)/10));
+		unit_per_div->blockSignals(false);
+
 	} else {
-		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_scale->value());
+		top_value = top_scale->value();
 	}
+
+	fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_value);
+
 	fft_plot->replot();
 	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
