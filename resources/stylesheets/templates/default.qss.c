@@ -1,3 +1,5 @@
+#include "values.h"
+
 /* Default background color */
 QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
 	background-color: #272730;
@@ -108,8 +110,8 @@ QRadioButton {
 }
 
 QRadioButton::indicator {
-	width: 14px;
-	height: 14px;
+	width: INDICATOR_SIZE;
+	height: INDICATOR_SIZE;
 	border: 2px solid;
 	border-radius: 9px;
 	border-color: #4963FF;
@@ -399,8 +401,8 @@ QCheckBox {
 }
 
 QCheckBox::indicator {
-  width: 14px;
-  height: 14px;
+  width: INDICATOR_SIZE;
+  height: INDICATOR_SIZE;
   border: 2px solid rgb(74,100,255);
   border-radius: 4px;
 }
@@ -650,12 +652,14 @@ adiscope--ChannelWidget QCheckBox#box{
   font-size: 14px;
   font-weight: bold;
 }
+
 adiscope--ChannelWidget QCheckBox#box::indicator {
-  width: 14px;
-  height: 14px;
+  width: INDICATOR_SIZE;
+  height: INDICATOR_SIZE;
   border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
   border-radius: 9px;
 }
+
 adiscope--ChannelWidget QCheckBox#box::indicator:unchecked {
   background-color: transparent;
 }
