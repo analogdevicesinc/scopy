@@ -64,6 +64,9 @@
         <property name="spacing">
          <number>40</number>
         </property>
+        <property name="leftMargin">
+         <number>40</number>
+        </property>
         <property name="topMargin">
          <number>15</number>
         </property>
@@ -73,22 +76,6 @@
         <property name="bottomMargin">
          <number>9</number>
         </property>
-        <item>
-         <spacer name="horizontalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Fixed</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>10</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item>
          <widget class="adiscope::LinkedButton" name="btnHelp">
           <property name="text">
@@ -163,7 +150,7 @@ Signal View</string>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
+            <width>10</width>
             <height>20</height>
            </size>
           </property>
@@ -176,7 +163,7 @@ Signal View</string>
          <widget class="QWidget" name="widget" native="true">
           <property name="minimumSize">
            <size>
-            <width>30</width>
+            <width>95</width>
             <height>0</height>
            </size>
           </property>
@@ -735,6 +722,9 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
