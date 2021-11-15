@@ -70,6 +70,14 @@ InfoPage::InfoPage(QString uri, Preferences *pref, PhoneHome* phoneHome,
 	setStatusLabel(ui->lblCalibrationStatus);
 	setStatusLabel(ui->lblConnectionStatus);
 	setStatusLabel(ui->lblIdentifyStatus);
+
+#ifdef __ANDROID__
+	ui->btnCalibrate->setMinimumWidth(150);
+	ui->btnConnect->setMinimumWidth(150);
+	ui->btnForget->setMinimumWidth(150);
+	ui->btnIdentify->setMinimumWidth(150);
+	ui->btnRegister->setMinimumWidth(150);
+#endif
 }
 
 void InfoPage::readPreferences() {
