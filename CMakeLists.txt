@@ -285,7 +285,7 @@ if (APPLE)
 	option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" ON)
 endif(APPLE)
 
-option(CONFIG_STYLESHEETS "Preprocess stylesheets using ${CMAKE_C_COMPILER}" OFF)
+option(CONFIG_STYLESHEETS "Preprocess stylesheets using ${CMAKE_C_COMPILER}" ON)
 message(STATUS CONFIG_STYLESHEETS - ${CONFIG_STYLESHEETS})
 if (${CONFIG_STYLESHEETS})
 	if (ANDROID)
