@@ -700,6 +700,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->boxMeasure->setChecked(false);
 	ui->boxMeasure->setVisible(false);
 	ui->btnMeasure->setVisible(false);
+
+#ifdef __ANDROID__
+	ui->btnAddRef->setIconSize(QSize(24, 24));
+#endif
+
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
