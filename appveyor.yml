@@ -11,7 +11,7 @@ environment:
     matrix:
         - ARCH: x86_64
           ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: macos-mojave
+          APPVEYOR_BUILD_WORKER_IMAGE: macos-bigsur
           BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
           BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
           PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
