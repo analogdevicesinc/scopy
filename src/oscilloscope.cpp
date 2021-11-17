@@ -929,6 +929,10 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/oscilloscope");
 
+#ifdef __ANDROID__
+	ui->btnAddMath->setIconSize(QSize(24, 24));
+#endif
+
 }
 
 int Oscilloscope::binSearchPointOnXaxis(double time)
