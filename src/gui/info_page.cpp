@@ -23,6 +23,7 @@
 #include "preferences.h"
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
 #include "libm2k/analog/dmm.hpp"
 #include "gui/dynamicWidget.hpp"
 #include <QString>
@@ -494,7 +495,6 @@ void M2kInfoPage::getDeviceInfo()
 
 void M2kInfoPage::refreshTemperature()
 {
-
 	libm2k::context::M2k *temp_m2k = nullptr;
 	if(!m_ctx) {
 		temp_m2k = libm2k::context::m2kOpen(m_uri.toLocal8Bit().constData());
@@ -503,10 +503,15 @@ void M2kInfoPage::refreshTemperature()
 	}
 
 	if(temp_m2k) {
-		auto dmm = temp_m2k->getDMM("ad9963");
-		auto ch = dmm->readChannel("temp0");
-		auto val = ch.value;
-		m_info_params["Temperature"] = QString::number(val);
+		try {
+			auto dmm = temp_m2k->getDMM("ad9963");
+			auto ch = dmm->readChannel("temp0");
+			auto val = ch.value;
+			m_info_params["Temperature"] = QString::number(val);
+
+		}  catch (libm2k::m2k_exception &e) {
+			qDebug() << e.what();
+		}
 	}
 
 	if(!m_ctx) {
