@@ -1185,10 +1185,14 @@ void adiscope::ToolLauncher::disconnect()
 
 void adiscope::ToolLauncher::ping()
 {
-	int ret = iio_context_get_version(ctx, nullptr, nullptr, nullptr);
+	auto dev = iio_context_get_device(ctx, 0);
+	const iio_device* test_device = nullptr;
 
-	if (ret < 0)
+	int ret = iio_device_get_trigger(dev, &test_device);
+
+	if (ret < 0 && ret != -ENOENT) {
 		disconnect();
+	}
 }
 
 void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
