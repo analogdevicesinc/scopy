@@ -1665,6 +1665,8 @@ void NetworkAnalyzer::startStop(bool pressed)
 	}
 
 	m_running = pressed;
+	m_dBgraph.startStop(pressed);
+	m_phaseGraph.startStop(pressed);
 
 	bool shouldClear = false;
 	if (QObject::sender() == ui->runSingleWidget) {

@@ -1728,6 +1728,7 @@ void LogicAnalyzer::startStop(bool start)
 	}
 
 	m_started = start;
+	m_plot.startStop(start);
 
 	m_triggerUpdater->setEnabled(start);
 	if (start) {

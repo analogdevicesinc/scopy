@@ -28,23 +28,24 @@
 
 /*Qt includes*/
 #include <QWidget>
+#include <BasicPlot.h>
 
 namespace adiscope {
-class PrintablePlot : public QwtPlot
+class PrintablePlot : public BasicPlot
 {
-        Q_OBJECT
+	Q_OBJECT
 public:
-        PrintablePlot(QWidget *parent);
+	PrintablePlot(QWidget *parent);
 
-        void dropBackground(bool drop);
+	void dropBackground(bool drop);
 	void setUseNativeDialog(bool nativeDialog);
 
 public Q_SLOTS:
-        void printPlot(const QString& toolName = "");
+	void printPlot(const QString& toolName = "");
 
 private:
-        QwtPlotRenderer d_plotRenderer;
-        QwtLegend *legendDisplay;
+	QwtPlotRenderer d_plotRenderer;
+	QwtLegend *legendDisplay;
 	bool d_useNativeDialog;
 };
 }

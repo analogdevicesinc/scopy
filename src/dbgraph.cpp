@@ -224,7 +224,7 @@ void dBgraph::replot()
 	d_leftHandlesArea->repaint();
 	d_topHandlesArea->repaint();
 
-	QwtPlot::replot();
+	BasicPlot::replot();
 }
 
 void dBgraph::enableXaxisLabels()

@@ -88,6 +88,10 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 
 	for (unsigned int i = 0; i < nplots; i++) {
 		auto plot = new QwtPlotCurve(QString("CH %1").arg(i + 1));
+		plot->setPaintAttribute(QwtPlotCurve::ClipPolygons);
+		plot->setPaintAttribute(QwtPlotCurve::ImageBuffer);
+		plot->setPaintAttribute(QwtPlotCurve::FilterPoints);
+		plot->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive);
 
 		plot->setPen(QPen(d_CurveColors[i]));
 		plot->attach(this);
@@ -222,7 +226,7 @@ void FftDisplayPlot::replot()
 	d_leftHandlesArea->repaint();
 	d_bottomHandlesArea->repaint();
 
-	QwtPlot::replot();
+	BasicPlot::replot();
 }
 
 bool FftDisplayPlot::isReferenceWaveform(unsigned int chnIdx)
