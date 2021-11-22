@@ -1857,28 +1857,30 @@ int CapturePlot::activeMeasurementsCount(int chnIdx)
 void CapturePlot::onNewDataReceived()
 {
 	int ref_idx = 0;
-	for (int i = 0; i < d_measureObjs.size(); i++) {
-		Measure *measure = d_measureObjs[i];
-		int chn = measure->channel();
-		if (isReferenceWaveform(Curve(chn))) {
-			measure->setDataSource(d_ref_ydata[ref_idx],
-					       Curve(chn)->data()->size());
-			ref_idx++;
-		} else {
-			int count = countReferenceWaveform(chn);
-			measure->setDataSource(d_ydata[chn - count],
-					Curve(chn)->data()->size());
+	if(d_measurementsEnabled) {
+		for (int i = 0; i < d_measureObjs.size(); i++) {
+			Measure *measure = d_measureObjs[i];
+			int chn = measure->channel();
+			if (isReferenceWaveform(Curve(chn))) {
+				measure->setDataSource(d_ref_ydata[ref_idx],
+									   Curve(chn)->data()->size());
+				ref_idx++;
+			} else {
+				int count = countReferenceWaveform(chn);
+				measure->setDataSource(d_ydata[chn - count],
+						Curve(chn)->data()->size());
+			}
+
+			if (isMathWaveform(Curve(chn))) {
+				measure->setAdcBitCount(0);
+			}
+
+			measure->setSampleRate(this->sampleRate());
+			measure->measure();
 		}
 
-		if (isMathWaveform(Curve(chn))) {
-			measure->setAdcBitCount(0);
-		}
-
-		measure->setSampleRate(this->sampleRate());
-		measure->measure();
+		Q_EMIT measurementsAvailable();
 	}
-
-	Q_EMIT measurementsAvailable();
 }
 
 QList<std::shared_ptr<MeasurementData>> CapturePlot::measurements(int chnIdx)
