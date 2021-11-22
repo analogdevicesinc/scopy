@@ -192,7 +192,7 @@ ConstellationDisplayPlot::set_pen_size(int size)
 void
 ConstellationDisplayPlot::replot()
 {
-  QwtPlot::replot();
+  BasicPlot::replot();
 }
 
 
