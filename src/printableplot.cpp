@@ -26,16 +26,16 @@
 using namespace adiscope;
 
 PrintablePlot::PrintablePlot(QWidget *parent) :
-        QwtPlot(parent),
+	BasicPlot(parent),
 	d_plotRenderer(new QwtPlotRenderer(this)),
 	d_useNativeDialog(true)
 {
-        dropBackground(true);
+	dropBackground(true);
 }
 
 void PrintablePlot::dropBackground(bool drop)
 {
-        d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, drop);
+	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, drop);
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, drop);
 }
 
@@ -46,15 +46,15 @@ void PrintablePlot::setUseNativeDialog(bool nativeDialog)
 
 void PrintablePlot::printPlot(const QString& toolName)
 {
-        legendDisplay = new QwtLegend(this);
-        legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
-        insertLegend(legendDisplay, QwtPlot::TopLegend);
+	legendDisplay = new QwtLegend(this);
+	legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
+	insertLegend(legendDisplay, QwtPlot::TopLegend);
 
-        updateLegend();
+	updateLegend();
 
-        QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
+	QString date = QDateTime::currentDateTime().toString("yyyy-MM-dd-hh-mm-ss");
 
-        QString fileName = "Scopy-" + toolName + "-" + date;
+	QString fileName = "Scopy-" + toolName + "-" + date;
 
 	// https://github.com/osakared/qwt/blob/qwt-6.1-multiaxes/src/qwt_plot_renderer.cpp#L1023
 	// QwtPlotRenderer does not expose an option to select which file dialog to use
@@ -62,33 +62,33 @@ void PrintablePlot::printPlot(const QString& toolName)
 	// call of QFileDialog::getSaveFileName(...) where we take into account the d_useNativeDialog
 	// boolean
 	const QList<QByteArray> imageFormats =
-		QImageWriter::supportedImageFormats();
+			QImageWriter::supportedImageFormats();
 	QStringList filter;
 	filter += QString( "PDF " ) + tr( "Documents" ) + " (*.pdf)";
 	filter += QString( "SVG " ) + tr( "Documents" ) + " (*.svg)";
 	filter += QString( "Postscript " ) + tr( "Documents" ) + " (*.ps)";
 
 	if ( imageFormats.size() > 0 ) {
-	    for ( int i = 0; i < imageFormats.size(); i++ ) {
-            filter += (imageFormats[i].toUpper() + " "
+		for ( int i = 0; i < imageFormats.size(); i++ ) {
+			filter += (imageFormats[i].toUpper() + " "
                     + tr("Image") + " (*." +  imageFormats[i] + ")");
-	    }
+		}
 
 	}
 
-    QString selectedFilter = QString( "PDF " ) + tr( "Documents" ) + " (*.pdf)";
+	QString selectedFilter = QString( "PDF " ) + tr( "Documents" ) + " (*.pdf)";
 	fileName = QFileDialog::getSaveFileName(
-	    nullptr, tr( "Export File Name" ), fileName,
-        filter.join( ";;" ), &selectedFilter,
-	    (d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+				nullptr, tr( "Export File Name" ), fileName,
+				filter.join( ";;" ), &selectedFilter,
+				(d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-    if (fileName.split(".").size() <= 1) {
-        // file name w/o extension. Let's append it
-        QString ext = selectedFilter.split(".")[1].split(")")[0];
-        fileName += "." + ext;
-    }
+	if (fileName.split(".").size() <= 1) {
+		// file name w/o extension. Let's append it
+		QString ext = selectedFilter.split(".")[1].split(")")[0];
+		fileName += "." + ext;
+	}
 
-    d_plotRenderer.renderDocument(this, fileName, QSizeF( 300, 200 ));
+	d_plotRenderer.renderDocument(this, fileName, QSizeF( 300, 200 ));
 
-        insertLegend(nullptr);
+	insertLegend(nullptr);
 }

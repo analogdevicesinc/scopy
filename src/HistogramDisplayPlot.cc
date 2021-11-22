@@ -471,7 +471,7 @@ void HistogramDisplayPlot::setDataInterval(int min, int max)
 void
 HistogramDisplayPlot::replot()
 {
-  QwtPlot::replot();
+  BasicPlot::replot();
 }
 
 void

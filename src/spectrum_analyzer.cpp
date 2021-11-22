@@ -1834,7 +1834,9 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	if (!checked) {
 		fft_plot->resetAverageHistory();
 	}
+	fft_plot->startStop(checked);
 	m_running = checked;
+	fft_plot->startStop(checked);
 }
 
 void SpectrumAnalyzer::build_gnuradio_block_chain()

@@ -274,7 +274,7 @@ TimeDomainDisplayPlot::~TimeDomainDisplayPlot()
 void
 TimeDomainDisplayPlot::replot()
 {
-  QwtPlot::replot();
+  BasicPlot::replot();
 }
 
 void

@@ -932,7 +932,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 #ifdef __ANDROID__
 	ui->btnAddMath->setIconSize(QSize(24, 24));
 #endif
-
+	plot.replot();
+	plot.zoomBaseUpdate(true);
 }
 
 int Oscilloscope::binSearchPointOnXaxis(double time)
@@ -2883,6 +2884,8 @@ void Oscilloscope::runStopToggled(bool checked)
 
 	// Update trigger status
 	m_running = checked;
+	plot.startStop(checked);
+
 	triggerUpdater->setEnabled(checked);
 }
 
