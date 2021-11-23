@@ -89,6 +89,17 @@ bool ToolLauncher_API::calibration_skipped()
 	return tl->skip_calibration;
 }
 
+int ToolLauncher_API::focused_instrument() {
+	return static_cast<int>(tl->getSelectedToolId());
+}
+
+void ToolLauncher_API::focus_instrument(int inst) {
+	if(inst >= 0 ) {
+		tl->_toolSelected(static_cast<enum tool>(inst));
+	}
+
+}
+
 QList<QString> ToolLauncher_API::usb_uri_list()
 {
 	QList<QString> uri_list;

@@ -31,6 +31,8 @@ class ToolLauncher_API: public ApiObject
 	Q_PROPERTY(bool menu_opened READ menu_opened WRITE open_menu
 		   STORED false);
 
+	Q_PROPERTY(int focused_instrument READ focused_instrument WRITE focus_instrument );
+
 	Q_PROPERTY(bool hidden READ hidden WRITE hide STORED false);
 
 	Q_PROPERTY(QString previous_ip READ getPreviousIp WRITE addIp
@@ -63,6 +65,9 @@ public:
 
 	bool calibration_skipped();
 	void skip_calibration(bool);
+
+	int focused_instrument();
+	void focus_instrument(int);
 
 	bool debugger_enabled();
 	void enable_debugger(bool);
