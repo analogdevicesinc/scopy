@@ -171,6 +171,9 @@ private Q_SLOTS:
 	void resetScopy();
 
 private:
+	void forceSavePreferences();
+
+private:
 	Ui::Preferences *ui;
 	QString preferencesFileName;
 

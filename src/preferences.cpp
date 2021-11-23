@@ -317,6 +317,7 @@ Preferences::Preferences(QWidget *parent) :
 			m_colorEditor->setCurrentStylesheet(filePath);
 		} else {
 			m_colorEditor->setCurrentStylesheet(stylesheet);
+			forceSavePreferences();
 		}
 		requestRestart();
 	});
@@ -511,6 +512,16 @@ bool Preferences::getShow_plot_fps() const
 void Preferences::setShow_plot_fps(bool newShow_plot_fps)
 {
 	m_show_plot_fps = newShow_plot_fps;
+}
+
+void Preferences::forceSavePreferences()
+{
+	// force saving of the ini file as the new Scopy process
+	// when restarted will start before scopy closes. A race condition
+	// will appear on who gets to read/write to the .ini file first
+	QString preference_ini_file = getPreferenceIniFile();
+	QSettings settings(preference_ini_file, QSettings::IniFormat);
+	pref_api->save(settings);
 }
 
 bool Preferences::getDigital_decoders_enabled() const
