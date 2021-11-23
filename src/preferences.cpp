@@ -271,6 +271,9 @@ Preferences::Preferences(QWidget *parent) :
 		} else {
 			language = lang;
 			if (m_initialized) {
+#ifdef __ANDROID__
+				forceSavePreferences();
+#endif
 				requestRestart();
 			}
 
