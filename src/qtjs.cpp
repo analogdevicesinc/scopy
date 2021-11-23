@@ -29,6 +29,8 @@
 #include <thread>
 #include <iostream>
 
+#include <tool_launcher.hpp>
+
 using std::cout;
 using namespace adiscope;
 
@@ -52,6 +54,19 @@ QtJs::QtJs(QJSEngine *engine) : QObject(engine)
 void QtJs::exit()
 {
 	QApplication::closeAllWindows();
+}
+
+void QtJs::returnToApplication()
+{
+	bool done;
+	connect(getToolLauncherInstance(), &ToolLauncher::launcherClosed,[&done](){
+		done=true;
+	});
+
+	while(!done) {
+		QCoreApplication::processEvents();
+		QThread::msleep(1);
+	}
 }
 
 void QtJs::sleep(unsigned long s)
