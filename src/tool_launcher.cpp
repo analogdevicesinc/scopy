@@ -1697,7 +1697,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 				info.exec();
 			} else {
 
-				bool success = loadDecoders("decoders");
+				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
 
 				if (!success) {
 					search_timer->stop();
