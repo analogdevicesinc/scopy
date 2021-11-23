@@ -804,10 +804,9 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		resetHistogramDataPoints();
 	});
 
-	connect(ch_ui->probe_attenuation, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int index){
-		double value = 0.1 * (std::pow(10, index));
 
+	connect(ch_ui->probe_attenuation_value, &QLineEdit::textChanged, this, [=](){
+		double value = ch_ui->probe_attenuation_value->text().toDouble();
 		probe_attenuation[current_ch_widget] = value;
 		if (current_channel == current_ch_widget) {
 			plot.setDisplayScale(probe_attenuation[current_ch_widget]);
@@ -1628,6 +1627,7 @@ void Oscilloscope::init_channel_settings()
 		}
 	});
 }
+
 
 void Oscilloscope::activateAcCoupling(int i)
 {
@@ -4025,21 +4025,15 @@ void Oscilloscope::update_chn_settings_panel(int id)
 	}
 
 	if (chn_widget->isMathChannel() || chn_widget->isReferenceChannel()) {
-		ch_ui->probe_attenuation->setVisible(false);
+		ch_ui->probe_attenuation_value->setVisible(false);
 		ch_ui->probe_label->setVisible(false);
 		ch_ui->label_3->setVisible(false);
 		ch_ui->cmbMemoryDepth->setVisible(false);
 		ch_ui->btnAutoset->setVisible(false);
 	} else {
-		int index = 0;
-		double value = probe_attenuation[id];
 
-		while (value > 0.1) {
-			value /= 10;
-			index++;
-		}
-		ch_ui->probe_attenuation->setCurrentIndex(index);
-		ch_ui->probe_attenuation->setVisible(true);
+		ch_ui->probe_attenuation_value->setText(QString::number(probe_attenuation[current_ch_widget]));
+		ch_ui->probe_attenuation_value->setVisible(true);
 		ch_ui->probe_label->setVisible(true);
 		ch_ui->label_3->setVisible(true);
 		ch_ui->cmbMemoryDepth->setVisible(true);

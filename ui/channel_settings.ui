@@ -815,37 +815,12 @@
               <item>
                <widget class="QLabel" name="probe_label">
                 <property name="text">
-                 <string>Probe
-Attenuation</string>
+                 <string>Probe Attenuation</string>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="probe_attenuation">
-                <property name="currentIndex">
-                 <number>1</number>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>0.1X</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>1X</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>10X</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>100X</string>
-                 </property>
-                </item>
-               </widget>
+               <widget class="QLineEdit" name="probe_attenuation_value"/>
               </item>
              </layout>
             </item>
