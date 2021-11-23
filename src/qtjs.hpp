@@ -40,6 +40,7 @@ public:
 	Q_INVOKABLE void msleep(unsigned long ms);
 	Q_INVOKABLE void printToConsole(const QString& text);
 	Q_INVOKABLE QString readFromConsole(const QString& text);
+	Q_INVOKABLE void returnToApplication();
 
 private:
 	QFutureWatcher<QString> watcher;
