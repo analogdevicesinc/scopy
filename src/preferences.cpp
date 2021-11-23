@@ -208,9 +208,10 @@ Preferences::Preferences(QWidget *parent) :
 		Q_EMIT notify();
 
 		if (m_initialized) {
-			QMessageBox info(this);
-			info.setText(tr("This change will be applied only after a Scopy reset."));
-			info.exec();
+#ifdef __ANDROID__
+			forceSavePreferences();
+#endif
+			requestRestart();
 		}
 	});
 	connect(ui->autoUpdatesCheckBox, &QCheckBox::stateChanged, [=](int state) {
