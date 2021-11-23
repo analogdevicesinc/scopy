@@ -85,6 +85,11 @@ using namespace adiscope;
 using namespace libm2k::context;
 using namespace libm2k::digital;
 
+ToolLauncher* adiscope::tl_ptr;
+ToolLauncher* adiscope::getToolLauncherInstance() {
+	return tl_ptr;
+}
+
 ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::ToolLauncher), ctx(nullptr),
@@ -350,6 +355,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	//	f.open(QIODevice::ReadOnly);
 	//	qDebug()<<f.readAll();
 	//	f.close();
+
+	tl_ptr = this;
 }
 
 void ToolLauncher::_setupToolMenu()
@@ -387,6 +394,7 @@ void ToolLauncher::_setupToolMenu()
 void ToolLauncher::_toolSelected(enum tool tool)
 {
 	Tool *selectedTool = nullptr;
+	selectedToolId = tool;
 	switch(tool) {
 	case TOOL_OSCILLOSCOPE:
 		selectedTool = oscilloscope;
@@ -759,6 +767,7 @@ ToolLauncher::~ToolLauncher()
 	delete ui;
 
 	saveSettings();
+	tl_ptr = nullptr;
 }
 
 void ToolLauncher::forgetDeviceBtn_clicked(QString uri)
