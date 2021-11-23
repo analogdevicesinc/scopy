@@ -799,17 +799,8 @@ double Channel_API::getProbeAttenuation() const
 void Channel_API::setProbeAttenuation(double val)
 {
 	int index = osc->channels_api.indexOf(this);
-
-	int idx = std::log10(val / 0.1);
-	if (idx >= osc->ch_ui->probe_attenuation->count()) {
-		idx = osc->ch_ui->probe_attenuation->count() - 1;
-	} else if (idx <= 0) {
-		idx = 0;
-	}
-	val = std::pow(10, idx) * 0.1;
-
 	if (index == osc->current_ch_widget) {
-		osc->ch_ui->probe_attenuation->setCurrentIndex(idx);
+		osc->ch_ui->probe_attenuation_value->setText(QString::number(val));
 	} else {
 		osc->probe_attenuation[index] = val;
 	}
