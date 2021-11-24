@@ -1200,7 +1200,9 @@ void Measure::measureTimeDomain()
 }
 
 void Measure::measureSpectral() {
-    double spur, harm_dist, noise, average_noise, signal;
+
+    //TODO - reconsider computation of measurements
+    double spur, harm_dist, noise, average_noise = 0, signal;
 
     SpectralDetection detection(m_buffer, m_buf_length, m_harmonics_number);
 
