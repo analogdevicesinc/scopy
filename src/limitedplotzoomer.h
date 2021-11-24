@@ -34,10 +34,12 @@ public:
 
 protected:
 	virtual void zoom(const QRectF &);
+	virtual void axesChanged() override;
 	virtual QSizeF minZoomSize() const override;
 
 private:
 	bool m_boundVertical;
+	bool m_updateBaseNextZoom;
 };
 }
 

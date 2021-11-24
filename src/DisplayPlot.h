@@ -370,7 +370,7 @@ public:
   QwtPlotCurve *Curve(unsigned int curveIdx);
 
 
-  void zoomBaseUpdate();
+  void zoomBaseUpdate(bool force = false);
 
   void setMinXaxisDivision(double minDivison);
   double minXaxisDivision();

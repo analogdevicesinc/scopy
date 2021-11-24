@@ -1661,10 +1661,11 @@ DisplayPlot::onPickerPointSelected6(const QPointF & p)
   Q_EMIT plotPointSelected(point);
 }
 
-void DisplayPlot::zoomBaseUpdate()
+void DisplayPlot::zoomBaseUpdate(bool force)
 {
+	qDebug()<<"ZoomBaseUpdate";
 	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
-		d_zoomer[i]->setZoomBase(true);
+		d_zoomer[i]->setZoomBase(force);
 }
 
 void DisplayPlot::AddAxisOffset(int axisPos, int axisIdx, double offset)

@@ -1040,9 +1040,6 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 		d_hCursorHandle2->triggerMove();
 		d_vCursorHandle1->triggerMove();
 		d_vCursorHandle2->triggerMove();
-		d_timeTriggerHandle->triggerMove();
-		d_levelTriggerAHandle->triggerMove();
-		d_levelTriggerBHandle->triggerMove();
 
 		/* update the size of the gates when the plot canvas is resized */
 		updateGateMargins();
