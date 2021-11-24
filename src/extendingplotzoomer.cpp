@@ -77,7 +77,6 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		cornerMarkers[1]->detach();
 		cornerMarkers[2]->detach();
 		cornerMarkers[3]->detach();
-		static_cast<CapturePlot*>((QwtPlot*)plot())->replot();
 		return points;
 	}
 
