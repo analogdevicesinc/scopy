@@ -271,6 +271,8 @@ void PatternGenerator::setupUi()
 
 	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
+	// TODO: do we want the buffer previewer in this tool?
+	m_ui->hLayoutBufferPreview->hide();
 
 	m_plot.enableAxis(QwtPlot::yLeft, false);
 	m_plot.enableAxis(QwtPlot::xBottom, false);
