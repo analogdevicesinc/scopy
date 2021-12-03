@@ -30,7 +30,7 @@ WORKDIR=${PWD}
 
 install_apt() {
 
-	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev gnuradio libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev
+	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev gnuradio libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool
 
 }
 
@@ -91,7 +91,7 @@ build_libm2k() {
 	cmake	${CMAKE_OPTS} \
 		-DENABLE_PYTHON=OFF\
 		-DENABLE_CSHARP=OFF\
-		-DENABLE_EXAMPLES=OFF\
+		-DBUILD_EXAMPLES=OFF\
 		-DENABLE_TOOLS=OFF\
 		-DINSTALL_UDEV_RULES=OFF\
 		-DENABLE_LOG=ON\
