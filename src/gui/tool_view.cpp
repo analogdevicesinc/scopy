@@ -1,11 +1,14 @@
 ﻿#include "ui_tool_view.h"
 
-#include <QMainWindow>
 #include "channel_widget.hpp"
 #include "menu_header.hpp"
 #include "tool_view.hpp"
 #include "utils.h"
 #include <QTabWidget>
+
+#ifdef ADVANCED_DOCKING
+#include <DockAreaWidget.h>
+#endif
 
 using namespace scopy::gui;
 
@@ -15,10 +18,10 @@ ToolView::ToolView(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
-	m_centralMainWindow = new QMainWindow(m_ui->widgetCentral);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	m_ui->widgetCentral->layout()->addWidget(m_centralMainWindow);
+#ifdef ADVANCED_DOCKING
+	m_dockManager = DockerUtils::createCDockManager(m_ui->widgetCentral);
+	m_ui->widgetCentral->layout()->addWidget(m_dockManager);
+#endif
 
 	m_ui->widgetRunSingleBtns->enableRunButton(false);
 	m_ui->widgetRunSingleBtns->enableSingleButton(false);
@@ -159,48 +162,34 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 	}
 }
 
-QDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
+#ifdef ADVANCED_DOCKING
+ads::CDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
 {
-	QMainWindow* subWindow = new QMainWindow(this);
-	QDockWidget* docker = new QDockWidget(subWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::DockWidgetArea::NoDockWidgetArea);
-	subWindow->addDockWidget(Qt::RightDockWidgetArea, docker);
-	docker->setWidget(menu);
+	ads::CDockManager* dockManager = DockerUtils::createCDockManager(this);
+	ads::CDockWidget* dockWidget = DockerUtils::createCDockWidget(dockManager, menu);
+	dockManager->addDockWidget(ads::CenterDockWidgetArea, dockWidget);
 
-#ifdef SETTINGS_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
-#endif
+	id = m_ui->stackedWidget->addWidget(dockManager);
 
-	id = m_ui->stackedWidget->addWidget(subWindow);
-
-	return docker;
+	return dockWidget;
 }
-
-QDockWidget *ToolView::createDockableWidget(QWidget *widget, const QString& dockerName)
-{
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setWindowTitle(dockerName);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
-	docker->setWidget(widget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
 #endif
-	return docker;
-}
 
 void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 {
 	ChannelManager* cm = static_cast<ChannelManager*>(QObject::sender());
 	CustomPushButton* addBtn = cm->getAddChannelBtn();
-	int id;
+	int id = -1;
+
+#ifndef ADVANCED_DOCKING
+	dockable = false;
+#endif
 
 	if (dockable) {
-		QDockWidget* docker = this->createDetachableMenu(menu, id);
+#ifdef ADVANCED_DOCKING
+		ads::CDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged, addBtn, [=](bool topLevel) {
+		connect(docker, &ads::CDockWidget::topLevelChanged, addBtn, [=](bool topLevel) {
 			addBtn->setChecked(!topLevel);
 			addBtn->setDisabled(topLevel);
 
@@ -208,6 +197,7 @@ void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 				m_menuOrder.removeOne(addBtn);
 			}
 		});
+#endif
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
 	}
@@ -225,12 +215,17 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 					 const QString& shortName)
 {
 	ChannelWidget* ch = channelManager->buildNewChannel(chId, deletable, simplefied, color, fullName, shortName);
-	int id;
+	int id = -1;
+
+#ifndef ADVANCED_DOCKING
+	dockable = false;
+#endif
 
 	if (dockable) {
-		QDockWidget* docker = this->createDetachableMenu(menu, id);
+#ifdef ADVANCED_DOCKING
+		ads::CDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged, ch->menuButton(), [=](bool topLevel) {
+		connect(docker, &ads::CDockWidget::topLevelChanged, ch->menuButton(), [=](bool topLevel) {
 			CustomPushButton* btn = static_cast<CustomPushButton*>(ch->menuButton());
 			btn->setChecked(!topLevel);
 			btn->setDisabled(topLevel);
@@ -245,7 +240,7 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 		if (deletable) {
 			connect(ch, &ChannelWidget::deleteClicked, this, [=]() { docker->close(); });
 		}
-
+#endif
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
 	}
@@ -294,12 +289,17 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 	m_ui->widgetMenuBtns->setVisible(true);
 
 	CustomMenuButton* btn = new CustomMenuButton(name, checkBoxVisible, checkBoxChecked);
-	int id;
+	int id = -1;
+
+#ifndef ADVANCED_DOCKING
+	dockable = false;
+#endif
 
 	if (dockable) {
-		QDockWidget* docker = this->createDetachableMenu(menu, id);
+#ifdef ADVANCED_DOCKING
+		ads::CDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged, btn, [=](bool topLevel) {
+		connect(docker, &ads::CDockWidget::topLevelChanged, btn, [=](bool topLevel) {
 			btn->getBtn()->setChecked(!topLevel);
 			btn->getBtn()->setDisabled(topLevel);
 
@@ -309,7 +309,7 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 				m_menuOrder.removeOne(btn->getBtn());
 			}
 		});
-
+#endif
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
 	}
@@ -352,21 +352,20 @@ void ToolView::addFixedCentralWidget(QWidget *widget, int row, int column, int r
 	}
 }
 
-int ToolView::addDockableCentralWidget(QWidget *widget, Qt::DockWidgetArea area, const QString &dockerName)
+#ifdef ADVANCED_DOCKING
+void ToolView::addDockableCentralWidget(QWidget *widget, ads::DockWidgetArea area, const QString &dockerName)
 {
-	QDockWidget* docker = this->createDockableWidget(widget, dockerName);
-
-	m_centralMainWindow->addDockWidget(area, docker);
-	m_docksList.append(docker);
-
-	return m_docksList.size() - 1;
+	ads::CDockWidget* dockWidget = DockerUtils::createCDockWidget(m_dockManager, widget, dockerName);
+	m_dockManager->addDockWidget(area, dockWidget);
+	m_docksList.append(dockWidget);
 }
 
-void ToolView::addDockableTabbedWidget(QWidget *widget, const QString &dockerName, int plotId)
+void ToolView::addDockableTabbedWidget(QWidget *widget, ads::DockWidgetArea area, const QString &dockerName)
 {
-	QDockWidget* docker = this->createDockableWidget(widget, dockerName);
-	m_centralMainWindow->tabifyDockWidget(m_docksList.at(plotId), docker);
+	auto dockWidget = DockerUtils::createCDockWidget(m_dockManager, widget, dockerName);
+	m_dockManager->addDockWidgetTab(area, dockWidget);
 }
+#endif
 
 int ToolView::addFixedTabbedWidget(QWidget *widget, const QString& title, int plotId, int row, int column, int rowspan, int columnspan)
 {
@@ -395,13 +394,19 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 {
 	CustomPushButton* generalSettingsBtn = m_ui->widgetSettingsPairBtns->getGeneralSettingsBtn();
 
-	if (dockable) {
-		QDockWidget* docker = this->createDetachableMenu(menu, m_generalSettingsMenuId);
+#ifndef ADVANCED_DOCKING
+	dockable = false;
+#endif
 
-		connect(docker, &QDockWidget::topLevelChanged, generalSettingsBtn, [=](bool topLevel) {
+	if (dockable) {
+#ifdef ADVANCED_DOCKING
+		ads::CDockWidget* docker = this->createDetachableMenu(menu, m_generalSettingsMenuId);
+
+		connect(docker, &ads::CDockWidget::topLevelChanged, generalSettingsBtn, [=](bool topLevel) {
 			generalSettingsBtn->setChecked(!topLevel);
 			generalSettingsBtn->setDisabled(topLevel);
 		});
+#endif
 	} else {
 		m_generalSettingsMenuId = m_ui->stackedWidget->addWidget(menu);
 	}
@@ -419,13 +424,19 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 
 void ToolView::setFixedMenu(QWidget* menu, bool dockable)
 {
-	int id;
+	int id = -1;
+
+#ifndef ADVANCED_DOCKING
+	dockable = false;
+#endif
 
 	if (dockable) {
-		QDockWidget* docker = this->createDetachableMenu(menu, id);
+#ifdef ADVANCED_DOCKING
+		ads::CDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged,
+		connect(docker, &ads::CDockWidget::topLevelChanged,
 			[=](bool topLevel) { m_ui->widgetMenuAnim->toggleMenu(!topLevel); });
+#endif
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
 	}

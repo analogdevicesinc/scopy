@@ -33,7 +33,6 @@
 #include <QPalette>
 #include <QSharedPointer>
 #include <QElapsedTimer>
-#include <QDockWidget>
 
 #include <gnuradio/analog/sig_source.h>
 #include <gnuradio/analog/sig_source_waveform.h>
@@ -603,40 +602,33 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	m_plot->enableTimeTrigger(false);
 
-	// Add docking plot
+	// Add the plot
+	QWidget* centralWidget = new QWidget();
+	QGridLayout *gridLayout = new QGridLayout();
+	gridLayout->setVerticalSpacing(0);
+	gridLayout->setHorizontalSpacing(0);
+	gridLayout->setContentsMargins(0, 0, 0, 5);
 
-	QWidget* widget = new QWidget();
-	QGridLayout *gridplot = new QGridLayout();
+	gridLayout->addWidget(m_plot->topArea(), 0, 0);
+	gridLayout->addWidget(m_plot->topHandlesArea(), 1, 0);
+	gridLayout->addWidget(m_plot, 2, 0);
 
-	gridplot->addWidget(m_plot->topArea(), 0, 0);
-	gridplot->addWidget(m_plot->topHandlesArea(), 1, 0);
-	gridplot->addWidget(m_plot, 2, 0);
-
-	gridplot->setVerticalSpacing(0);
-	gridplot->setHorizontalSpacing(0);
-	gridplot->setContentsMargins(0, 0, 0, 0);
-	widget->setLayout(gridplot);
+	centralWidget->setLayout(gridLayout);
 
 	ui->plot->removeWidget(ui->instrumentNotes);
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	ui->plot->addWidget(m_centralMainWindow, 0, 0);
+#ifdef ADVANCED_DOCKING
+	ads::CDockManager* dockManager = DockerUtils::createCDockManager(this);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(widget);
-	docker->setContentsMargins(0, 0, 0, 10);
+	ui->plot->addWidget(dockManager);
 
-#ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+	ads::CDockWidget* dockWidget = DockerUtils::createCDockWidget(dockManager, centralWidget);
+	dockManager->addDockWidget(ads::CenterDockWidgetArea, dockWidget);
+#else
+	ui->plot->addWidget(centralWidget);
 #endif
 
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
-
-	ui->plot->addWidget(ui->instrumentNotes, 3, 0);
+	ui->plot->addWidget(ui->instrumentNotes, 1, 0);
 }
 
 SignalGenerator::~SignalGenerator()

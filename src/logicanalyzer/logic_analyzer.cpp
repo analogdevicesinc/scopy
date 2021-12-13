@@ -39,7 +39,6 @@
 #include "gui/dynamicWidget.hpp"
 
 #include <QDebug>
-#include <QDockWidget>
 #include <QFileDialog>
 #include <QDateTime>
 
@@ -1294,7 +1293,6 @@ void LogicAnalyzer::setupUi()
 
 
 	// Build central widget
-
 	QWidget* centralWidget = new QWidget(this);
 	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
 	vLayout->setContentsMargins(0, 0, 0, 0);
@@ -1310,7 +1308,7 @@ void LogicAnalyzer::setupUi()
 	QGridLayout* gridLayout = new QGridLayout(plotWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
-	gridLayout->setContentsMargins(25, 0, 25, 0);
+	gridLayout->setContentsMargins(15, 0, 15, 0);
 	plotWidget->setLayout(gridLayout);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
@@ -1331,24 +1329,16 @@ void LogicAnalyzer::setupUi()
 	vLayout->addWidget(plotWidget);
 	centralWidget->setLayout(vLayout);
 
-	// Add dockable plot
+#ifdef ADVANCED_DOCKING
+	ads::CDockManager* dockManager = DockerUtils::createCDockManager(this);
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	ui->gridLayoutPlot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+	ui->gridLayoutPlot->addWidget(dockManager, 1, 0, 1, 1);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(centralWidget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+	ads::CDockWidget* dockWidget = DockerUtils::createCDockWidget(dockManager, centralWidget);
+	dockManager->addDockWidget(ads::CenterDockWidgetArea, dockWidget);
+#else
+	ui->gridLayoutPlot->addWidget(centralWidget, 1, 0, 1, 1);
 #endif
-
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
-
 
 	m_plot.enableAxis(QwtPlot::yLeft, false);
 	m_plot.enableAxis(QwtPlot::xBottom, false);

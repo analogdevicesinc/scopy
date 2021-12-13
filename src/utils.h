@@ -25,7 +25,12 @@
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
 #include <QWidget>
-#include <QDockWidget>
+#include "config.h"
+
+#ifdef ADVANCED_DOCKING
+#include <DockWidget.h>
+#include <DockManager.h>
+#endif
 
 class QwtDblClickPlotPicker: public QwtPlotPicker
 {
@@ -65,12 +70,14 @@ public:
 	static bool compareNatural(const std::string &a, const std::string &b);
 };
 
-#define PLOT_MENU_BAR_ENABLED
-
+#ifdef ADVANCED_DOCKING
 class DockerUtils : public QObject
 {
 public:
-	static void configureTopBar(QDockWidget* docker);
+	static ads::CDockManager* createCDockManager(QWidget* parent);
+	static ads::CDockWidget* createCDockWidget(ads::CDockManager* manager, QWidget *widget, const QString &dockerName = "");
+	static void styleDockTabs(QWidget *widget, bool enbled = true);
 };
+#endif
 
 #endif /* M2K_UTILS_H */

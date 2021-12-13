@@ -22,7 +22,6 @@
 #include "pattern_generator.h"
 
 #include <QDebug>
-#include <QDockWidget>
 #include "ui_pattern_generator.h"
 #include "digitalchannel_manager.hpp"
 #include "gui/dynamicWidget.hpp"
@@ -230,13 +229,12 @@ void PatternGenerator::setupUi()
 	m_ui->rightMenu->setMaximumWidth(0);
 
 	// Add docking plot
-
-	QWidget* widget = new QWidget(this);
-	QGridLayout* gridLayout = new QGridLayout(widget);
+	QWidget* centralWidget = new QWidget(this);
+	QGridLayout* gridLayout = new QGridLayout(centralWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
 	gridLayout->setContentsMargins(0, 0, 0, 0);
-	widget->setLayout(gridLayout);
+	centralWidget->setLayout(gridLayout);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -253,23 +251,16 @@ void PatternGenerator::setupUi()
 	gridLayout->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
 	gridLayout->addItem(plotSpacer, 4, 0, 1, 4);
 
+#ifdef ADVANCED_DOCKING
+	ads::CDockManager* dockManager = DockerUtils::createCDockManager(this);
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	m_ui->gridLayoutPlot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+	m_ui->gridLayoutPlot->addWidget(dockManager, 0, 0, 1, 1);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(widget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+	ads::CDockWidget* dockWidget = DockerUtils::createCDockWidget(dockManager, centralWidget);
+	dockManager->addDockWidget(ads::CenterDockWidgetArea, dockWidget);
+#else
+	m_ui->gridLayoutPlot->addWidget(centralWidget, 0, 0, 1, 1);
 #endif
-
-
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 	// TODO: do we want the buffer previewer in this tool?
 	m_ui->hLayoutBufferPreview->hide();

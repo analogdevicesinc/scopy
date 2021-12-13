@@ -170,24 +170,62 @@ bool Util::compareNatural(const std::string& a, const std::string& b) {
 	return (compareNatural(a_new, b_new));
 }
 
-void DockerUtils::configureTopBar(QDockWidget *docker)
+#ifdef ADVANCED_DOCKING
+ads::CDockManager *DockerUtils::createCDockManager(QWidget* parent)
 {
-	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
-		if(topLevel) {
-			docker->setWindowFlags(Qt::CustomizeWindowHint |
-							Qt::Window |
-							Qt::WindowMinimizeButtonHint |
-							Qt::WindowMaximizeButtonHint);
-			docker->show();
-			docker->setStyleSheet("QDockWidget {"
-						"titlebar-normal-icon: url(:/icons/close_hovered.svg);"
-						"}");
-			docker->setContentsMargins(10, 0, 10, 10);
-		} else {
-			docker->setStyleSheet("QDockWidget {"
-						  "titlebar-normal-icon: url();"
-						  "}");
-			docker->setContentsMargins(0, 0, 0, 0);
-		}
-	});
+	ads::CDockManager::setConfigFlag(ads::CDockManager::FocusHighlighting, true);
+
+	ads::CDockManager* dockManager = new ads::CDockManager(parent);
+
+	dockManager->setConfigFlag(ads::CDockManager::AllTabsHaveCloseButton, false);
+	dockManager->setConfigFlag(ads::CDockManager::ActiveTabHasCloseButton, false);
+	dockManager->setConfigFlag(ads::CDockManager::DockAreaHasCloseButton, false);
+	dockManager->setConfigFlag(ads::CDockManager::DockAreaHasUndockButton, false);
+	dockManager->setConfigFlag(ads::CDockManager::DockAreaDynamicTabsMenuButtonVisibility, true);
+
+	dockManager->setStyleSheet("");
+
+	return dockManager;
 }
+
+ads::CDockWidget* DockerUtils::createCDockWidget(ads::CDockManager* manager, QWidget *widget, const QString &dockerName)
+{
+       ads::CDockWidget* cDockWidget = new ads::CDockWidget(dockerName, manager);
+       cDockWidget->setWidget(widget);
+
+       connect(cDockWidget, &ads::CDockWidget::viewToggled, manager, [=](bool opened){
+		if (!opened) {
+			manager->addDockWidgetTab(ads::CenterDockWidgetArea, cDockWidget);
+
+			cDockWidget->blockSignals(true);
+			cDockWidget->toggleView(true);
+			cDockWidget->blockSignals(false);
+		}
+       });
+
+       return cDockWidget;
+}
+
+void DockerUtils::styleDockTabs(QWidget *widget, bool enabled)
+{
+	QString style = "ads--CDockWidgetTab[focused=true]{"
+				"background: %1; "
+				"border-color: %1; } "
+			"ads--CDockWidgetTab[focused=true] QLabel {"
+				"color: %2; }";
+	if(enabled) {
+		QString backgroundColor;
+
+		if (QIcon::themeName() == "scopy-default") {
+			backgroundColor = "#1b1b21";
+		} else {
+			backgroundColor = "rgba(0, 0, 0, 60)";
+		}
+
+		widget->setStyleSheet(style.arg(backgroundColor, "palette(light)"));
+
+	} else {
+		widget->setStyleSheet(style.arg("transparent", "transparent"));
+	}
+}
+#endif

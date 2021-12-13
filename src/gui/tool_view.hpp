@@ -2,11 +2,18 @@
 #define TOOL_VIEW_HPP
 
 #include <QButtonGroup>
-#include <QDockWidget>
 #include <QMap>
 #include <QQueue>
 #include <QStackedWidget>
 #include <QWidget>
+
+#include "config.h"
+
+#ifdef ADVANCED_DOCKING
+#include <DockAreaWidget.h>
+#include <DockWidget.h>
+#include <DockManager.h>
+#endif
 
 #include "channel_manager.hpp"
 #include "channel_widget.hpp"
@@ -70,10 +77,12 @@ public:
 				       const QString& shortName);
 	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
+#ifdef ADVANCED_DOCKING
+	void addDockableCentralWidget(QWidget* widget, ads::DockWidgetArea area, const QString& dockerName);
+	void addDockableTabbedWidget(QWidget* widget, ads::DockWidgetArea area, const QString &dockerName);
+#endif
 
 	void addFixedCentralWidget(QWidget* widget, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
-	int addDockableCentralWidget(QWidget* widget, Qt::DockWidgetArea area, const QString& dockerName);
-	void addDockableTabbedWidget(QWidget* widget, const QString &dockerName, int plotId);
 	int addFixedTabbedWidget(QWidget* widget, const QString& title, int plotId = -1, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
 
 private:
@@ -82,8 +91,10 @@ private:
 	void toggleRightMenu(CustomPushButton* btn, bool checked);
 	void settingsPanelUpdate(int id);
 	void rightMenuFinished(bool opened);
-	QDockWidget* createDetachableMenu(QWidget* menu, int& id);
-	QDockWidget* createDockableWidget(QWidget* widget, const QString& dockerName);
+
+#ifdef ADVANCED_DOCKING
+	ads::CDockWidget* createDetachableMenu(QWidget* menu, int& id);
+#endif
 
 public Q_SLOTS:
 	void triggerRightMenuToggle(bool checked);
@@ -105,8 +116,10 @@ private:
 
 	int m_generalSettingsMenuId;
 
-	QMainWindow* m_centralMainWindow;
-	QList<QDockWidget*> m_docksList;
+#ifdef ADVANCED_DOCKING
+	ads::CDockManager* m_dockManager;
+	QList<ads::CDockWidget*> m_docksList;
+#endif
 	QList<QWidget*> m_centralFixedWidgets;
 };
 } // namespace gui
