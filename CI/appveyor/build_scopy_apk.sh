@@ -18,7 +18,7 @@ build_scopy() {
 	cp $BUILD_ROOT/android_cmake.sh .
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
-	./android_cmake.sh .
+	./android_cmake.sh -DWITH_ADVANCED_DOCKING=OFF .
 
 	cd build_$ABI
 	make -j$JOBS
