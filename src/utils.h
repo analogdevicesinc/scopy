@@ -26,6 +26,7 @@
 #include <qwt_picker_machine.h>
 #include <QWidget>
 #include <QDockWidget>
+#include <QMainWindow>
 
 class QwtDblClickPlotPicker: public QwtPlotPicker
 {
@@ -70,6 +71,7 @@ public:
 class DockerUtils : public QObject
 {
 public:
+	static QDockWidget* createDockWidget(QMainWindow* mainWindow, QWidget* widget, const QString& title = "");
 	static void configureTopBar(QDockWidget* docker);
 };
 

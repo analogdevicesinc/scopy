@@ -150,6 +150,10 @@ public:
 	double getTarget_fps() const;
 	void setTarget_fps(double newTarget_fps);
 
+	bool getDocking_enabled() const;
+	void setDocking_enabled(bool value);
+	bool getCurrent_docking_enabled() const;
+
 Q_SIGNALS:
 
 	void notify();
@@ -203,6 +207,8 @@ private:
 	bool m_show_plot_fps;
 	bool m_use_open_gl;
 	int m_target_fps;
+	bool m_docking_enabled;
+	bool m_current_docking_state;
 
 	Preferences_API *pref_api;
 
@@ -244,6 +250,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool showPlotFps READ getShowPlotFps WRITE setShowPlotFps)
 	Q_PROPERTY(bool useOpenGl READ getUseOpenGl WRITE setUseOpenGl)
 	Q_PROPERTY(double targetFps READ getTargetFps WRITE setTargetFps)
+	Q_PROPERTY(bool docking_enabled READ getDockingEnabled WRITE setDockingEnabled)
 
 
 public:
@@ -341,6 +348,9 @@ public:
 
 	QStringList getUserStylesheets() const;
 	void setUserStylesheets(const QStringList &userStylesheets);
+
+	bool getDockingEnabled() const;
+	void setDockingEnabled(const bool& first);
 
 private:
 	Preferences *preferencePanel;

@@ -31,7 +31,7 @@
 #include <QTextStream>
 #include <scopyApplication.hpp>
 #include "application_restarter.h"
-#include <QDebug>
+#include "utils.h"
 
 
 using namespace adiscope;
@@ -85,7 +85,8 @@ Preferences::Preferences(QWidget *parent) :
 			false
 #endif
 			),
-	m_target_fps(30)
+	m_target_fps(30),
+	m_docking_enabled(false)
 {
 	ui->setupUi(this);
 
@@ -232,6 +233,12 @@ Preferences::Preferences(QWidget *parent) :
 	connect(ui->showPlotFps, &QCheckBox::stateChanged, [=](int state) {
 		m_show_plot_fps = state;
 		Q_EMIT notify();
+	});
+
+	connect(ui->enableDockableWidgetsCheckBox, &QCheckBox::stateChanged, [=](int state){
+		m_docking_enabled = (!state ? false : true);
+
+		requestRestart();
 	});
 
 	QString preference_ini_file = getPreferenceIniFile();
@@ -427,6 +434,12 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->showPlotFps->setChecked(m_show_plot_fps);
 	ui->useOpenGl->setChecked(m_use_open_gl);
 	ui->cmbPlotTargetFps->setCurrentText(QString::number(m_target_fps));
+
+	// requires restart after stateChanged, we avoid that here
+	ui->enableDockableWidgetsCheckBox->blockSignals(true);
+	ui->enableDockableWidgetsCheckBox->setChecked(m_docking_enabled);
+	ui->enableDockableWidgetsCheckBox->blockSignals(false);
+
 	// by this point the preferences menu is initialized
 	m_initialized = true;
 	ui->autoUpdatesCheckBox->setChecked(automatical_version_checking_enabled);
@@ -765,6 +778,21 @@ void Preferences::setLogging_enabled(bool value)
 	m_logging_enabled = value;
 }
 
+bool Preferences::getDocking_enabled() const
+{
+	return m_docking_enabled;
+}
+
+void Preferences::setDocking_enabled(bool value)
+{
+	m_docking_enabled = value;
+}
+
+bool Preferences::getCurrent_docking_enabled() const
+{
+	return m_current_docking_state;
+}
+
 bool Preferences_API::getAnimationsEnabled() const
 {
 	return preferencePanel->animations_enabled;
@@ -976,7 +1004,18 @@ QStringList Preferences_API::getUserStylesheets() const
 
 void Preferences_API::setUserStylesheets(const QStringList &userStylesheets)
 {
-//	preferencePanel->m_colorEditor->setUserStylesheets(userStylesheets);
+	//	preferencePanel->m_colorEditor->setUserStylesheets(userStylesheets);
+}
+
+bool Preferences_API::getDockingEnabled() const
+{
+	return preferencePanel->m_docking_enabled;
+}
+
+void Preferences_API::setDockingEnabled(const bool &first)
+{
+	preferencePanel->m_docking_enabled = first;
+	preferencePanel->m_current_docking_state = first;
 }
 
 bool Preferences::hasNativeDialogs() const

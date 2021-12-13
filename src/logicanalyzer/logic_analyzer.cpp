@@ -1306,7 +1306,7 @@ void LogicAnalyzer::setupUi()
 	QGridLayout* gridLayout = new QGridLayout(plotWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
-	gridLayout->setContentsMargins(25, 0, 25, 0);
+	gridLayout->setContentsMargins(15, 0, 15, 0);
 	plotWidget->setLayout(gridLayout);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
@@ -1327,23 +1327,24 @@ void LogicAnalyzer::setupUi()
 	vLayout->addWidget(plotWidget);
 	centralWidget->setLayout(vLayout);
 
-	// Add dockable plot
+	if(prefPanel->getCurrent_docking_enabled()) {
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	ui->gridLayoutPlot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+		// main window for dock widget
+		QMainWindow* mainWindow = new QMainWindow(this);
+		mainWindow->setCentralWidget(0);
+		mainWindow->setWindowFlags(Qt::Widget);
+		ui->gridLayoutPlot->addWidget(mainWindow, 1, 0, 1, 1);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(centralWidget);
+		QDockWidget* docker = DockerUtils::createDockWidget(mainWindow, centralWidget);
+
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 #ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+		DockerUtils::configureTopBar(docker);
 #endif
-
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+	} else {
+		ui->gridLayoutPlot->addWidget(centralWidget, 1, 0, 1, 1);
+	}
 
 
 	m_plot.setAxisVisible(QwtAxis::YLeft, false);

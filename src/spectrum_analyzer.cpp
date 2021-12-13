@@ -250,12 +250,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	measure_settings_init();
 #endif
 
-	// Add dockable plot
 
+	// plot widget
 	QWidget* centralWidget = new QWidget(this);
 	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
 	vLayout->setContentsMargins(0, 0, 0, 0);
-	vLayout->setSpacing(6);
+	vLayout->setSpacing(10);
 	centralWidget->setLayout(vLayout);
 
 #ifdef SPECTRAL_MSR
@@ -270,23 +270,25 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
 	vLayout->addWidget(ui->markerTable);
 
+	if(prefPanel->getCurrent_docking_enabled()) {
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	ui->gridLayout_plot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+		// main window for dock widget
+		QMainWindow* mainWindow = new QMainWindow(this);
+		mainWindow->setCentralWidget(0);
+		mainWindow->setWindowFlags(Qt::Widget);
+		ui->gridLayout_plot->addWidget(mainWindow, 1, 0, 1, 1);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(centralWidget);
+		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
+
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+		DockerUtils::configureTopBar(dockWidget);
 #endif
 
-
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+	} else {
+		ui->gridLayout_plot->addWidget(centralWidget, 1, 0, 1, 1);
+	}
 
 
 	fft_plot->enableXaxisLabels();

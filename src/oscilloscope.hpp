@@ -314,9 +314,9 @@ namespace adiscope {
 		CustomPlotPositionButton *cursorsPositionButton;
 
 		QGridLayout* gridPlot;
-		QDockWidget* fftDocker;
-		QDockWidget* xyDocker;
-		QDockWidget* histDocker;
+		QDockWidget* fftDockWidget;
+		QDockWidget* xyDockWidget;
+		QDockWidget* histDockWidget;
 		QWidget* histWidget;
 
 		MouseWheelWidgetGuard *wheelEventGuard;

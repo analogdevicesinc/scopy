@@ -231,14 +231,14 @@ void PatternGenerator::setupUi()
 	// set default menu width to 0
 	m_ui->rightMenu->setMaximumWidth(0);
 
-	// Add docking plot
 
-	QWidget* widget = new QWidget(this);
-	QGridLayout* gridLayout = new QGridLayout(widget);
+	// plot widget
+	QWidget* centralWidget = new QWidget(this);
+	QGridLayout* gridLayout = new QGridLayout(centralWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
 	gridLayout->setContentsMargins(0, 0, 0, 0);
-	widget->setLayout(gridLayout);
+	centralWidget->setLayout(gridLayout);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -255,23 +255,25 @@ void PatternGenerator::setupUi()
 	gridLayout->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
 	gridLayout->addItem(plotSpacer, 4, 0, 1, 4);
 
+	if(prefPanel->getCurrent_docking_enabled()) {
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	m_ui->gridLayoutPlot->addWidget(m_centralMainWindow, 1, 0, 1, 1);
+		// main window for dock widget
+		QMainWindow* mainWindow = new QMainWindow(this);
+		mainWindow->setCentralWidget(0);
+		mainWindow->setWindowFlags(Qt::Widget);
+		m_ui->gridLayoutPlot->addWidget(mainWindow, 1, 0, 1, 1);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(widget);
+		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
+
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+		DockerUtils::configureTopBar(dockWidget);
 #endif
+	} else {
+		m_ui->gridLayoutPlot->addWidget(centralWidget, 0, 0, 1, 1);
+	}
 
-
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 	// TODO: do we want the buffer previewer in this tool?
 	m_ui->hLayoutBufferPreview->hide();

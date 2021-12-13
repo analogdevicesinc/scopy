@@ -170,6 +170,16 @@ bool Util::compareNatural(const std::string& a, const std::string& b) {
 	return (compareNatural(a_new, b_new));
 }
 
+QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *widget, const QString &title)
+{
+	QDockWidget* dockWidget = new QDockWidget(title, mainWindow);
+	dockWidget->setFeatures(dockWidget->features() & ~QDockWidget::DockWidgetClosable);
+	dockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
+	dockWidget->setWidget(widget);
+
+	return dockWidget;
+}
+
 void DockerUtils::configureTopBar(QDockWidget *docker)
 {
 	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
