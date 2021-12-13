@@ -601,44 +601,47 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	m_plot->enableTimeTrigger(false);
 
-	// Add docking plot
+	// plot widget
+	QWidget* centralWidget = new QWidget();
+	QGridLayout *gridLayout = new QGridLayout();
+	gridLayout->setVerticalSpacing(0);
+	gridLayout->setHorizontalSpacing(0);
+	gridLayout->setContentsMargins(0, 0, 0, 5);
 
-	QWidget* widget = new QWidget();
-	QGridLayout *gridplot = new QGridLayout();
+	gridLayout->addWidget(m_plot->topArea(), 0, 0);
+	gridLayout->addWidget(m_plot->topHandlesArea(), 1, 0);
+	gridLayout->addWidget(m_plot, 2, 0);
 
-	gridplot->addWidget(m_plot->topArea(), 0, 0);
-	gridplot->addWidget(m_plot->topHandlesArea(), 1, 0);
-	gridplot->addWidget(m_plot, 2, 0);
-
-	gridplot->setVerticalSpacing(0);
-	gridplot->setHorizontalSpacing(0);
-	gridplot->setContentsMargins(0, 0, 0, 0);
-	widget->setLayout(gridplot);
+	centralWidget->setLayout(gridLayout);
 
 	ui->plot->removeWidget(ui->instrumentNotes);
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	ui->plot->addWidget(m_centralMainWindow, 0, 0);
+	if(prefPanel->getCurrent_docking_enabled()) {
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(widget);
-	docker->setContentsMargins(0, 0, 0, 10);
+		// main window for dock widget
+		QMainWindow* mainWindow = new QMainWindow(this);
+		mainWindow->setCentralWidget(0);
+		mainWindow->setWindowFlags(Qt::Widget);
+		ui->plot->addWidget(mainWindow, 0, 0);
+
+		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
+		dockWidget->setContentsMargins(0, 0, 0, 10);
+
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+		DockerUtils::configureTopBar(dockWidget);
 #endif
 
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
-
-	ui->plot->addWidget(ui->instrumentNotes, 3, 0);
+	} else {
+		ui->plot->addWidget(centralWidget);
+	}
 
 	connect(ui->toggleMenuBtn, &QPushButton::toggled, [=](bool toggled){
 		ui->rightMenu->toggleMenu(toggled);
 	});
+
+	ui->plot->addWidget(ui->instrumentNotes, 1, 0);
 }
 
 SignalGenerator::~SignalGenerator()

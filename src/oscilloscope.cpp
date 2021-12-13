@@ -368,38 +368,83 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->plot_and_scales->removeWidget(ui->scalesWidget);
 	vLayout->addWidget(ui->scalesWidget);
 
+	// hide fixed containers
+	ui->container_fft_plot->hide();
+	ui->xy_plot_container->hide();
 
-	// Create main window
-	QMainWindow* centralWindow = new QMainWindow(this);
-	centralWindow->setCentralWidget(0);
-	centralWindow->setWindowFlags(Qt::Widget);
-	ui->gridLayoutPlot->addWidget(centralWindow, 1, 0, 1, 1);
-
-	// Create default plot docker
-	QDockWidget* plotDocker = new QDockWidget(centralWindow);
-	plotDocker->setFeatures(plotDocker->features() & ~QDockWidget::DockWidgetClosable);
-	plotDocker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	plotDocker->setWidget(centralWidget);
-	plotDocker->setWindowTitle("TimeDomain");
-
+	// add space for histogram
 	plot.setBonusWidthForHistogram(25);
 
+	if(prefPanel->getCurrent_docking_enabled()) {
+		ui->histogram_container->hide();
 
-	// setup docker for histogram plot
-	histDocker = new QDockWidget(centralWindow);
-	histDocker->setFeatures(plotDocker->features() & ~QDockWidget::DockWidgetClosable);
-	histDocker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	histDocker->setWindowTitle("Histogram");
+		// main window for all dock widgets
+		QMainWindow* mainWindow = new QMainWindow(this);
+		mainWindow->setCentralWidget(0);
+		mainWindow->setWindowFlags(Qt::Widget);
+		ui->gridLayoutPlot->addWidget(mainWindow, 1, 0, 1, 1);
+
+		// time domain plot dock
+		QDockWidget* plotDockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget, "TimeDomain");
 
 
-	// build histogram widget
-	histWidget = new QWidget(histDocker);
-	QVBoxLayout* histLayout = new QVBoxLayout(histWidget);
-	histWidget->setLayout(histLayout);
-	histDocker->setWidget(histWidget);
+		// histogram widget
+		histWidget = new QWidget(this);
+		QVBoxLayout* histLayout = new QVBoxLayout(histWidget);
+		histWidget->setLayout(histLayout);
 
-	histDocker->hide();
+		// histogram dock
+		histDockWidget = DockerUtils::createDockWidget(mainWindow, histWidget, "Histogram");
+		histDockWidget->hide();
 
+
+		// fft dock
+		fftDockWidget = DockerUtils::createDockWidget(mainWindow, &fft_plot, "FFT");
+		fftDockWidget->hide();
+
+
+		// xy widget
+		QWidget *xyWidget = new QWidget(this);
+		QGridLayout *gridL = new QGridLayout(xyWidget);
+		gridL->setVerticalSpacing(0);
+		gridL->setHorizontalSpacing(0);
+		gridL->setContentsMargins(0, 0, 0, 0);
+
+		gridL->addWidget(&xy_plot, 1, 0);
+		gridL->addWidget(gridL->itemAtPosition(1, 0)->widget(), 2, 0);
+		xyWidget->setLayout(gridL);
+
+		// xy dock
+		xyDockWidget = DockerUtils::createDockWidget(mainWindow, xyWidget, "XY");
+		xyDockWidget->hide();
+
+
+		// arange all dockers
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDockWidget);
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, histDockWidget);
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, plotDockWidget);
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, xyDockWidget);
+
+		mainWindow->tabifyDockWidget(plotDockWidget, histDockWidget);
+		mainWindow->tabifyDockWidget(plotDockWidget, fftDockWidget);
+		mainWindow->tabifyDockWidget(plotDockWidget, xyDockWidget);
+
+#ifdef PLOT_MENU_BAR_ENABLED
+		DockerUtils::configureTopBar(plotDockWidget);
+		DockerUtils::configureTopBar(histDockWidget);
+		DockerUtils::configureTopBar(fftDockWidget);
+		DockerUtils::configureTopBar(xyDockWidget);
+#endif
+
+	} else {
+		ui->gridLayoutPlot->addWidget(centralWidget, 1, 0, 1, 1);
+		ui->hlayout_fft->addWidget(&fft_plot);
+
+		QGridLayout *gridL = static_cast<QGridLayout *>(ui->xy_plot_container->layout());
+		QWidget *w = gridL->itemAtPosition(1, 0)->widget();
+		gridL->addWidget(&xy_plot, 1, 0);
+		gridL->addWidget(w, 2, 0);
+	}
 
 	/* Default plot settings */
 	plot.setSampleRate(active_sample_rate, 1, "");
@@ -461,52 +506,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		xy_plot.setYaxisMouseGesturesEnabled(i, false);
 
 	xy_plot.setLineColor(0, QColor("#4a64ff"));
-
-
-	// Add dockable fft plot
-	fftDocker = new QDockWidget(centralWindow);
-	fftDocker->setFeatures(fftDocker->features() & ~QDockWidget::DockWidgetClosable);
-	fftDocker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	fftDocker->setWindowTitle("FFT");
-	fftDocker->setWidget(&fft_plot);
-
-	fftDocker->hide();
-
-
-	// setup XYPlot docker
-	QWidget *xyWidget = new QWidget(this);
-	QGridLayout *gridL = new QGridLayout(xyWidget);
-	gridL->setVerticalSpacing(0);
-	gridL->setHorizontalSpacing(0);
-	gridL->setContentsMargins(0, 0, 0, 0);
-
-	gridL->addWidget(&xy_plot, 1, 0);
-	gridL->addWidget(gridL->itemAtPosition(1, 0)->widget(), 2, 0);
-	xyWidget->setLayout(gridL);
-
-	xyDocker = new QDockWidget(centralWindow);
-	xyDocker->setFeatures(xyDocker->features() & ~QDockWidget::DockWidgetClosable);
-	xyDocker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	xyDocker->setWindowTitle("XY");
-	xyDocker->setWidget(xyWidget);
-
-	xyDocker->hide();
-
-	// arange all dockers
-	centralWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDocker);
-	centralWindow->addDockWidget(Qt::LeftDockWidgetArea, histDocker);
-	centralWindow->addDockWidget(Qt::LeftDockWidgetArea, plotDocker);
-	centralWindow->addDockWidget(Qt::RightDockWidgetArea, xyDocker);
-
-	centralWindow->tabifyDockWidget(plotDocker, fftDocker);
-	centralWindow->tabifyDockWidget(plotDocker, histDocker);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(plotDocker);
-	DockerUtils::configureTopBar(histDocker);
-	DockerUtils::configureTopBar(fftDocker);
-	DockerUtils::configureTopBar(xyDocker);
-#endif
 
 	ui->rightMenu->setMaximumWidth(0);
 
@@ -3005,10 +3004,19 @@ void Oscilloscope::onFFT_view_toggled(bool visible)
 			iio->connect(ctm_blocks.at(i), 0, qt_fft_block, i);
 		}
 
-		fftDocker->show();
+		if(prefPanel->getCurrent_docking_enabled()) {
+				fftDockWidget->show();
+		} else {
+				ui->container_fft_plot->show();
+		}
 	} else {
-		fftDocker->setFloating(false);
-		fftDocker->hide();
+
+		if(prefPanel->getCurrent_docking_enabled()) {
+				fftDockWidget->setFloating(false);
+				fftDockWidget->hide();
+		} else {
+				ui->container_fft_plot->hide();
+		}
 
 		if (fft_is_visible && (fft_channels.size() > 0)) {
 			for (unsigned int i = 0; i < nb_channels; i++) {
@@ -3033,30 +3041,41 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 {
 	cancelZoom();
 
-	if(!visible){
-		histDocker->setFloating(false);
-		histDocker->hide();
+	if(!visible) {
+		if(prefPanel->getCurrent_docking_enabled()) {
+			histDockWidget->setFloating(false);
+			histDockWidget->hide();
+			histWidget->layout()->removeWidget(&hist_plot);
+		} else {
+			ui->hist_layout->removeWidget(&hist_plot);
+		}
+
+		gridPlot->addWidget(&hist_plot, 3, 2, 1, 1);
+		gridPlot->addWidget(plot.rightHandlesArea(), 1, 3, 4, 1);
 
 		hist_plot.setOrientation(Qt::Horizontal);
 		hist_plot.setMinimumWidth(25);
 		hist_plot.setMaximumWidth(25);
 		hist_plot.setMaximumHeight(1000);
-		histWidget->layout()->removeWidget(&hist_plot);
-		gridPlot->addWidget(&hist_plot, 3, 2, 1, 1);
-		gridPlot->addWidget(plot.rightHandlesArea(), 1, 3, 4, 1);
 		plot.setBonusWidthForHistogram(25);
 		scaleHistogramPlot();
 		toggleMiniHistogramPlotVisible(miniHistogram);
 
 	} else {
-		histDocker->show();
+		gridPlot->removeWidget(&hist_plot);
+		gridPlot->addWidget(plot.rightHandlesArea(), 1, 2, 3, 1);
+
+		if(prefPanel->getCurrent_docking_enabled()) {
+			histWidget->layout()->addWidget(&hist_plot);
+			histDockWidget->show();
+		} else {
+			ui->hist_layout->addWidget(&hist_plot);
+		}
+
 		hist_plot.setOrientation(Qt::Vertical);
 		hist_plot.setMinimumWidth(plot.width());
 		hist_plot.setMaximumHeight(300);
 		hist_plot.setMaximumWidth(2000);
-		gridPlot->removeWidget(&hist_plot);
-		gridPlot->addWidget(plot.rightHandlesArea(), 1, 2, 4, 1);
-		histWidget->layout()->addWidget(&hist_plot);
 		plot.setBonusWidthForHistogram(0);
 		scaleHistogramPlot();
 		hist_plot.setVisible(true);
@@ -3069,7 +3088,9 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 	if (visible) {
 		gsettings_ui->xySettings->show();
 	} else {
-		xyDocker->setFloating(false);
+		if(prefPanel->getCurrent_docking_enabled()) {
+			xyDockWidget->setFloating(false);
+		}
 		gsettings_ui->xySettings->hide();
 	}
 
@@ -3133,9 +3154,19 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 		if(!xy_is_visible)
 			iio->connect(ftc, 0, this->qt_xy_block, 0);
 
-		xyDocker->show();
+		if(prefPanel->getCurrent_docking_enabled()) {
+			xyDockWidget->show();
+		} else {
+			ui->xy_plot_container->show();
+		}
 	} else {
-		xyDocker->hide();
+		if(prefPanel->getCurrent_docking_enabled()) {
+			xyDockWidget->setFloating(false);
+			xyDockWidget->hide();
+		} else {
+			ui->xy_plot_container->hide();
+		}
+
 		// Disconnect the XY section from the running flowgraph
 
 		iio->disconnect(xy_channels.at(index_x).first, xy_channels.at(index_x).second,

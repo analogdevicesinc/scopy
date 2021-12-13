@@ -423,12 +423,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	m_phaseGraph.setVertCursorsHandleEnabled(false);
 
-	// Add dockable plot
-
-	QWidget* widget = new QWidget(this);
-	QGridLayout* gridLayout = new QGridLayout(widget);
-	gridLayout->setVerticalSpacing(0);
-	gridLayout->setHorizontalSpacing(10);
+	// plot widget
+	QWidget* centralWidget = new QWidget(this);
+	QGridLayout* gridLayout = new QGridLayout(centralWidget);
 	gridLayout->setContentsMargins(0, 0, 0, 0);
 
 	gridLayout->addWidget(bufferPreviewer, 0, 1, 1, 1);
@@ -444,24 +441,26 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	gridLayout->addWidget(m_dBgraph.bottomHandlesArea(), 6, 0, 1, 3);
 
-	widget->setLayout(gridLayout);
+	centralWidget->setLayout(gridLayout);
 
+	if(prefPanel->getCurrent_docking_enabled()) {
+		QMainWindow* mainWindow = new QMainWindow(this);
+		mainWindow->setCentralWidget(0);
+		mainWindow->setWindowFlags(Qt::Widget);
+		ui->gridLayout_plots->addWidget(mainWindow, 0, 0);
 
-	QMainWindow* m_centralMainWindow = new QMainWindow(this);
-	m_centralMainWindow->setCentralWidget(0);
-	m_centralMainWindow->setWindowFlags(Qt::Widget);
-	ui->gridLayout_plots->addWidget(m_centralMainWindow, 0, 0);
+		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
 
-	QDockWidget* docker = new QDockWidget(m_centralMainWindow);
-	docker->setFeatures(docker->features() & ~QDockWidget::DockWidgetClosable);
-	docker->setAllowedAreas(Qt::AllDockWidgetAreas);
-	docker->setWidget(widget);
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
-	DockerUtils::configureTopBar(docker);
+		DockerUtils::configureTopBar(dockWidget);
 #endif
-
-	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+	} else {
+		gridLayout->setHorizontalSpacing(0);
+		gridLayout->setVerticalSpacing(6);
+		ui->gridLayout_plots->addWidget(centralWidget);
+	}
 
 
 	m_phaseGraph.enableXaxisLabels();
