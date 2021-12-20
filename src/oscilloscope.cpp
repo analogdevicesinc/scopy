@@ -40,6 +40,8 @@
 #include <QSignalBlocker>
 #include <QComboBox>
 #include <QDockWidget>
+#include <QElapsedTimer>
+#include <QtConcurrent>
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
@@ -3233,7 +3235,7 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 	hist_plot.enableChannel(id, en);
 
 	if (id < nb_channels) {
-		m_m2k_analogin->enableChannel(id, en);
+		runInHwThreadPool( m_m2k_analogin->enableChannel(id, en););
 	}
 
 	if (en) {
@@ -4672,9 +4674,11 @@ void Oscilloscope::setupAutosetFreqSweep()
 	qt_time_block->reset();
 	qt_time_block->clean_buffers();
 	if (m_m2k_analogin) {
+		runInHwThreadPool({
 		high_gain_modes[autosetChannel] = libm2k::analog::PLUS_MINUS_25V;
 		trigger_settings.autoTriggerDisable();
 		trigger_settings.setTriggerEnable(false);
+		});
 	}
 	autosetSampleRateCnt--;
 	active_sample_rate = m_m2k_analogin->getAvailableSampleRates()[autosetSampleRateCnt];
@@ -5102,7 +5106,8 @@ void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 	if (ui->runSingleWidget->runButtonChecked()) {
 		try {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
-			m_m2k_analogin->setRange(chn, gain_mode);
+			runInHwThreadPool( m_m2k_analogin->setRange(chn, gain_mode) );
+
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_OSCILLOSCOPE) << e.what();
@@ -5114,7 +5119,7 @@ void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 	iio->freq_comp_filt[chnIdx][0]->set_high_gain(gain_mode);
 	iio->freq_comp_filt[chnIdx][1]->set_high_gain(gain_mode);
 	update_chn_settings_panel(chnIdx);
-	trigger_settings.updateHwVoltLevels(chnIdx);
+	runInHwThreadPool(trigger_settings.updateHwVoltLevels(chnIdx););
 }
 
 void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
@@ -5123,7 +5128,8 @@ void Oscilloscope::setChannelHwOffset(uint chnIdx, double offset)
 	if (ui->runSingleWidget->runButtonChecked()) {
 		try {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chnIdx);
-			m_m2k_analogin->setVerticalOffset(chn, offset);
+			runInHwThreadPool(m_m2k_analogin->setVerticalOffset(chn, offset); );
+
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_OSCILLOSCOPE) << e.what();
@@ -5163,11 +5169,13 @@ void Oscilloscope::writeAllSettingsToHardware()
 	if (m_m2k_analogin) {
 		for (uint i = 0; i < nb_channels; i++) {
 			try {
-				libm2k::analog::M2K_RANGE mode = high_gain_modes[i] ?
-					libm2k::analog::PLUS_MINUS_2_5V : libm2k::analog::PLUS_MINUS_25V;
-				libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
-				m_m2k_analogin->setRange(chn, mode);
-				m_m2k_analogin->setVerticalOffset(chn, channel_offset[i]);
+				runInHwThreadPool( {
+				   libm2k::analog::M2K_RANGE mode = high_gain_modes[i] ?
+				   libm2k::analog::PLUS_MINUS_2_5V : libm2k::analog::PLUS_MINUS_25V;
+				   libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
+				   m_m2k_analogin->setRange(chn, mode);
+				   m_m2k_analogin->setVerticalOffset(chn, channel_offset[i]);
+								   } );
 			} catch (libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
 				qDebug(CAT_OSCILLOSCOPE) << e.what();
@@ -5182,7 +5190,7 @@ void Oscilloscope::writeAllSettingsToHardware()
 	}
 
 	// Writes all trigger settings to hardware
-	trigger_settings.setAdcRunningState(true);
+	runInHwThreadPool(trigger_settings.setAdcRunningState(true););
 }
 
 void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
@@ -5269,6 +5277,7 @@ void Oscilloscope::setSampleRate(double sample_rate)
 	if (!m_m2k_analogin) {
 		return;
 	}
+	runInHwThreadPool( {
 	try {
 		auto maxSampleRate = m_m2k_analogin->getMaximumSamplerate();
 		if (m_filtering_enabled == false) {
@@ -5282,6 +5291,7 @@ void Oscilloscope::setSampleRate(double sample_rate)
 		HANDLE_EXCEPTION(e)
 		qDebug(CAT_OSCILLOSCOPE) << e.what();
 	}
+	});
 }
 
 
