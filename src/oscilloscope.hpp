@@ -44,6 +44,7 @@
 #include <QButtonGroup>
 #include <QMap>
 #include <QQueue>
+#include <QThreadPool>
 
 /* Local includes */
 #include "apiObject.hpp"
@@ -497,6 +498,10 @@ namespace adiscope {
 		gr::m2k::mixed_signal_source::sptr mixed_source;
 		mixed_signal_sink::sptr mixed_sink;
 		QMetaObject::Connection showLogicAnalyzerTriggerConnection;
+
+		QThreadPool hwSettingsThreadPool;
+		#define runInHwThreadPool(x) QtConcurrent::run(&hwSettingsThreadPool, std::bind([=]() {	x; } ))
+
 	};
 }
 #endif /* M2K_OSCILLOSCOPE_H */
