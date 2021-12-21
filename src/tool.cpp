@@ -62,6 +62,10 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 #endif
 	connect(this, &Tool::detachedState,
 		toolMenuItem, &ToolMenuItem::setDetached);
+
+	// fixes bad ui rendering when dock->minimize->maximize
+	// TODO: may be removed after ToolLauncher refactoring
+	this->setVisible(false);
 }
 
 Tool::~Tool()
