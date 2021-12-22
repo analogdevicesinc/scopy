@@ -14,15 +14,6 @@ QWidget {
 	font-size: 13px;
 }
 
-QDockWidget {
-	titlebar-normal-icon: url();
-	background-color: #F7F7F7;
-}
-
-QDockWidget::title {
-	background-color: transparent;
-}
-
 QToolTip {
     padding: 6px;
     border: 1px solid rgba(149, 152, 154, 150);
@@ -901,3 +892,19 @@ QPushButton[userNote=true]:checked {
 }
 
 /*************************************************************/
+
+/*===========================================================================
+ * QtAdvancedDockingSystem - Overlay
+ *===========================================================================*/
+ads--CDockOverlayCross
+{
+	qproperty-iconFrameColor: #ff7200;
+	qproperty-iconBackgroundColor: rgba(0, 0, 0, 30);
+	qproperty-iconOverlayColor: rgba(0, 0, 0, 30);
+	qproperty-iconArrowColor: #ff7200;
+	qproperty-iconShadowColor: rgba(0, 0, 0, 30);
+}
+
+ads--CFloatingDockContainer { background-color: white; }
+
+ads--CDockWidget > QFrame {border: none;}
