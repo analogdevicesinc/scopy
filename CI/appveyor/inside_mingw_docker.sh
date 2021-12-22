@@ -8,6 +8,39 @@ pushd $TOOLS_FOLDER
 source ./mingw_toolchain.sh $BUILD_TARGET
 popd
 
+echo "### Cloning Qt-Advanced-Docking-System "
+pushd $WORKDIR
+git clone https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/ qadvanceddocking
+cd qadvanceddocking
+git checkout tags/3.8.1
+
+echo "### Building Qt-Advanced-Docking-System "
+CURRENT_BUILD=qadvanceddocking
+INSTALL="install"
+if [ ! -z $NO_INSTALL ]; then
+	INSTALL=""
+fi
+pushd $WORKDIR/$CURRENT_BUILD
+
+git clean -xdf
+rm -rf ${WORKDIR}/$CURRENT_BUILD/build-${ARCH}
+mkdir ${WORKDIR}/$CURRENT_BUILD/build-${ARCH}
+cd ${WORKDIR}/$CURRENT_BUILD/build-${ARCH}
+
+eval $CURRENT_BUILD_POST_CLEAN
+eval $CURRENT_BUILD_PATCHES
+$CMAKE $CURRENT_BUILD_CMAKE_OPTS $WORKDIR/$CURRENT_BUILD
+eval $CURRENT_BUILD_POST_CMAKE
+$MAKE_BIN $JOBS $INSTALL
+eval $CURRENT_BUILD_POST_MAKE
+echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+
+popd
+rm -rf ${WORKDIR}/$CURRENT_BUILD/build-${ARCH}
+
+popd
+
+
 WORKDIR=$HOME
 SRC_FOLDER=$WORKDIR/scopy
 DEST_FOLDER=$WORKDIR/scopy_$ARCH
