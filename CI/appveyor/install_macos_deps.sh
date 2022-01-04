@@ -14,6 +14,7 @@ LIBSIGROKDECODE_BRANCH=master
 BOOST_VERSION_FILE=1_73_0
 BOOST_VERSION=1.73.0
 LIBTINYIIOD_BRANCH=master
+QADVANCEDDOCKING_BRANCH=3.8.1
 
 PYTHON="python3"
 PACKAGES=" ${QT_FORMULAE} pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
@@ -24,7 +25,7 @@ cd ~
 WORKDIR=${PWD}
 NUM_JOBS=4
 
-brew update
+# brew update
 brew search ${QT_FORMULAE}
 brew_install_or_upgrade() {
 	brew install $1 || \
@@ -273,6 +274,22 @@ build_libtinyiiod() {
 	sudo make $JOBS install
 }
 
+build_qadvanceddocking() {
+	echo "### Building Qt-Advanced-Docking-System - branch $QADVANCEDDOCKING_BRANCH"
+
+	cd ~
+	git clone --depth 1 -b $QADVANCEDDOCKING_BRANCH https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System/ qadvanceddocking
+
+	mkdir ${WORKDIR}/qadvanceddocking/build-${ARCH}
+	cd ${WORKDIR}/qadvanceddocking/build-${ARCH}
+
+	cmake ${CMAKE_OPTS} \
+		${WORKDIR}/qadvanceddocking
+
+	make $JOBS
+	sudo make $JOBS install
+}
+
 build_sigcpp
 build_glibmm
 build_libiio
@@ -287,3 +304,4 @@ build_grm2k
 build_qwt
 build_libsigrokdecode
 build_libtinyiiod
+build_qadvanceddocking
