@@ -50,9 +50,12 @@
 #include "filemanager.h"
 #include "spectrum_analyzer_api.hpp"
 #include "stream_to_vector_overlap.h"
+
+#ifdef SPECTRAL_MSR
 #include "gui/measure.h"
 #include "measurement_gui.h"
 #include "gui/measure_settings.h"
+#endif
 
 /* Generated UI */
 #include "ui_spectrum_analyzer.h"
@@ -216,11 +219,16 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->addButton(ui->btnMarkers);
 	settings_group->addButton(ui->btnAddRef);
 	settings_group->addButton(ui->btnCursors);
+
+#ifdef SPECTRAL_MSR
 	settings_group->addButton(ui->btnMeasure);
+#endif
 	settings_group->setExclusive(true);
 
+#ifdef SPECTRAL_MSR
 	/* Measure panel */
 	measure_panel_init();
+#endif
 
 	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
 	fft_plot->disableLegend();
@@ -236,8 +244,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(channelAdded(int)),
 		    SLOT(onChannelAdded(int)));
 
+#ifdef SPECTRAL_MSR
 	/* Measurements Settings */
 	measure_settings_init();
+#endif
 
 	// Add dockable plot
 
@@ -247,7 +257,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	vLayout->setSpacing(6);
 	centralWidget->setLayout(vLayout);
 
+#ifdef SPECTRAL_MSR
 	vLayout->addWidget(measurePanel);
+#endif
 
 	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
 	vLayout->addWidget(ui->topPlotWidget);
@@ -495,12 +507,14 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 	setCurrentAverageIndexLabel(crt_channel_id);
 
+#ifdef SPECTRAL_MSR
 	/* Apply measurements for every new batch of data */
 	connect(fft_plot, SIGNAL(newData()), SLOT(onNewDataReceived()));
 
 	for (int i = 0; i < m_adc_nb_channels; i++) {
 		fft_plot->initChannelMeasurement(i);
 	    }
+#endif
 
 	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
@@ -544,6 +558,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ch->setFftWindow(FftWinType::HAMMING, fft_size);
 	}
 
+#ifdef SPECTRAL_MSR
 	if (!runButton()->isChecked() && measurementsEnabled()) {
 	       measureUpdateValues();
 	   }
@@ -551,6 +566,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 	       init_selected_measurements(i, {0, 1, 4, 5});
 	   }
+#endif
 
 	connect(ui->logBtn, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::useLogFreq);
@@ -696,10 +712,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/spectrumanalyzer");
 
+#ifndef SPECTRAL_MSR
 	// TODO: enable measurements
 	ui->boxMeasure->setChecked(false);
 	ui->boxMeasure->setVisible(false);
 	ui->btnMeasure->setVisible(false);
+#endif
 
 #ifdef __ANDROID__
 	ui->btnAddRef->setIconSize(QSize(24, 24));
@@ -727,9 +745,11 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 		delete *it;
 	}
 
+#ifdef SPECTRAL_MSR
 	for (auto it = d_measureObjs.begin(); it != d_measureObjs.end(); ++it) {
 		delete *it;
 	    }
+#endif
 
 	if (iio) {
 		bool started = isIioManagerStarted();
@@ -892,11 +912,18 @@ void SpectrumAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 			index = 3;
 		} else if (btn == ui->btnAddRef) {
 			index = 4;
+
+#ifdef SPECTRAL_MSR
 		} else if (btn == ui->btnMeasure) {
 			index = 5;
 		} else if (btn == ui->btnCursors) {
 			index = 6;
 		}
+#else
+		} else if (btn == ui->btnCursors) {
+			index = 5;
+		}
+#endif
 	}
 
 	if (id != -1) {
@@ -991,6 +1018,7 @@ void SpectrumAnalyzer::on_btnMarkers_toggled(bool checked)
 		static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
+#ifdef SPECTRAL_MSR
 void SpectrumAnalyzer::on_btnMeasure_toggled(bool checked) {
     triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()),
 			   checked);
@@ -1394,6 +1422,7 @@ void SpectrumAnalyzer::on_boxMeasure_toggled(bool checked) {
   }
   measurePanel->setVisible(checked);
 }
+#endif
 
 void SpectrumAnalyzer::on_btnAddRef_toggled(bool checked)
 {
@@ -1619,9 +1648,11 @@ void SpectrumAnalyzer::add_ref_waveform(QVector<double> xData, QVector<double> y
 		ui->btnAddRef->hide();
 	}
 
+#ifdef SPECTRAL_MSR
 	init_selected_measurements(curve_id, {0, 1, 4, 5});
 
 	computeMeasurementsForChannel(curve_id, sample_rate);
+#endif
 }
 
 void SpectrumAnalyzer::add_ref_waveform(unsigned int chIdx)
@@ -1637,6 +1668,7 @@ void SpectrumAnalyzer::add_ref_waveform(unsigned int chIdx)
 	add_ref_waveform(xData, yData);
 }
 
+#ifdef SPECTRAL_MSR
 void SpectrumAnalyzer::cleanUpMeasurementsBeforeChannelRemoval(int chnIdx)
 {
     Measure *measure = measureOfChannel(chnIdx);
@@ -1650,6 +1682,7 @@ void SpectrumAnalyzer::cleanUpMeasurementsBeforeChannelRemoval(int chnIdx)
 	delete measure;
     }
 }
+#endif
 
 void SpectrumAnalyzer::onReferenceChannelDeleted()
 {
@@ -1675,12 +1708,14 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 		    shouldDisable = false;
 	    }
 
+#ifdef SPECTRAL_MSR
 	if (shouldDisable)
 		measure_settings->disableDisplayAll();
 
 	measure_settings->onChannelRemoved(channelWidget->id());
 
 	cleanUpMeasurementsBeforeChannelRemoval(channelWidget->id());
+#endif
 
 	fft_plot->unregisterReferenceWaveform(qname);
 	ui->channelsList->removeWidget(channelWidget);
@@ -1704,7 +1739,11 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 	if (channelWidget->id() < crt_channel_id) {
 		crt_channel_id--;
 		Q_EMIT selectedChannelChanged(crt_channel_id);
+
+#ifdef SPECTRAL_MSR
 		update_measure_for_channel(crt_channel_id);
+#endif
+
 	} else if (channelWidget->id() == crt_channel_id) {
 		for (int i = 0; i < m_adc_nb_channels + nb_ref_channels; ++i) {
 			auto cw = getChannelWidgetAt(i);
@@ -1714,10 +1753,17 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 			if (cw->enableButton()->isChecked()) {
 				channelsEnabled = true;
 				Q_EMIT selectedChannelChanged(0);
+
+#ifdef SPECTRAL_MSR
 				update_measure_for_channel(0);
+#endif
+
 				cw->nameButton()->setChecked(true);
 				Q_EMIT selectedChannelChanged(cw->id());
+#ifdef SPECTRAL_MSR
 				update_measure_for_channel(cw->id());
+#endif
+
 				break;
 			}
 		}
@@ -1744,7 +1790,9 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 		menuOrder.removeAll(static_cast<CustomPushButton *>(channelWidget->menuButton()));
 	}
 
+#ifdef SPECTRAL_MSR
 	onMeasurementSelectionListChanged();
+#endif
 	delete channelWidget;
 }
 
@@ -2163,9 +2211,11 @@ void SpectrumAnalyzer::onChannelSelected(bool en)
 			static_cast<CustomPushButton *>(ui->btnMarkers), en);
 	}
 
+#ifdef SPECTRAL_MSR
 	if (measurementsEnabled()) {
 		update_measure_for_channel(chIdx);
 	}
+#endif
 }
 
 void SpectrumAnalyzer::updateMarkerMenu(unsigned int id)
@@ -2224,8 +2274,11 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 		if (shouldActivate) {
 		    //nu trebe asta
 		    Q_EMIT selectedChannelChanged(cw->id());
+
+#ifdef SPECTRAL_MSR
 		    update_measure_for_channel(cw->id());
 		    measure_settings->activateDisplayAll();
+#endif
 		}
 
 	} else {
@@ -2242,9 +2295,11 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 			}
 		}
 
+#ifdef SPECTRAL_MSR
 		if (shouldDisable) {
 		    measure_settings->disableDisplayAll();
 		}
+#endif
 
 		if (allDisabled) {
 			QSignalBlocker(ui->btnMarkers);
@@ -2267,7 +2322,9 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 		}
 	}
 
+#ifdef SPECTRAL_MSR
 	measureLabelsRearrange();
+#endif
 
 	fft_plot->replot();
 	updateRunButton(en);

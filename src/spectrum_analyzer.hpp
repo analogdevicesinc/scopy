@@ -35,7 +35,10 @@
 #include "gui/spinbox_a.hpp"
 #include "gui/customPushButton.hpp"
 #include "gui/startstoprangewidget.h"
+
+#ifdef SPECTRAL_MSR
 #include "gui/measure.h"
+#endif
 
 #include <QWidget>
 #include <QQueue>
@@ -57,7 +60,10 @@ namespace Ui {
 class SpectrumAnalyzer;
 class CursorReadouts;
 class CursorsSettings;
+
+#ifdef SPECTRAL_MSR
 class MeasurementsPanel;
+#endif
 }
 
 namespace adiscope {
@@ -65,8 +71,11 @@ class SpectrumChannel;
 class Filter;
 class ChannelWidget;
 class DbClickButtons;
+
+#ifdef SPECTRAL_MSR
 class MeasurementData;
 class MeasurementGui;
+#endif
 }
 
 class QPushButton;
@@ -77,7 +86,10 @@ namespace adiscope {
 class SpectrumAnalyzer_API;
 class SpectrumChannel_API;
 class SpectrumMarker_API;
+
+#ifdef SPECTRAL_MSR
 class MeasureSettings;
+#endif
 
 class SpectrumAnalyzer: public Tool
 {
@@ -119,7 +131,10 @@ Q_SIGNALS:
 	void started(bool);
 	void showTool();
 	void selectedChannelChanged(int);
+
+#ifdef SPECTRAL_MSR
 	void measurementsAvailable();
+#endif
 
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
@@ -129,6 +144,7 @@ private Q_SLOTS:
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
 
+#ifdef SPECTRAL_MSR
 	void on_btnMeasure_toggled(bool);
 	void on_boxMeasure_toggled(bool);
 
@@ -140,6 +156,7 @@ private Q_SLOTS:
 	void setMeasuremensEnabled(bool en);
 	void onChannelAdded(int);
 	void onNewDataReceived();
+#endif
 
 	void on_boxCursors_toggled(bool on);
 	void on_btnCursors_toggled(bool);
@@ -226,6 +243,7 @@ private:
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 
+#ifdef SPECTRAL_MSR
 	QWidget *measurePanel;
 	Ui::MeasurementsPanel *measure_panel_ui;
 	adiscope::MeasureSettings *measure_settings;
@@ -233,6 +251,7 @@ private:
 	QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 	QList<Measure *> d_measureObjs;
 	bool d_measurementsEnabled;
+#endif
 
 	Ui::CursorReadouts *cursor_readouts_ui;
 	QWidget *cursorReadouts;
@@ -303,6 +322,7 @@ private:
 
 	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
 
+#ifdef SPECTRAL_MSR
 	//din capture plot
 	QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
 	std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
@@ -325,6 +345,7 @@ private:
 	void measureUpdateValues();
 	void measureLabelsRearrange();
 	void measureCreateAndAppendGuiFrom(const MeasurementData&);
+#endif
 };
 
 class SpectrumChannel: public QObject
