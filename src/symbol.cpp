@@ -225,7 +225,7 @@ void Symbol::updateSurfacePos()
 	QwtInterval interval = plot()->axisInterval(d_mobileAxis);
 
 	if (d_within_plot) {
-		if (d_mobileAxis.pos == QwtPlot::yLeft) {
+		if (d_mobileAxis.pos == QwtAxis::YLeft) {
 			if (plotCoord.y() < interval.minValue())
 				plotCoord.setY(interval.minValue());
 			else if (plotCoord.y() > interval.maxValue())
@@ -298,7 +298,7 @@ void Symbol::onMobileScaleChanged()
 
 VertDebugSymbol::VertDebugSymbol(QObject *parent, const QSize& size,
 			bool opposedToFixed, bool floats):
-	Symbol(parent, size, QwtPlot::xBottom, QwtPlot::yLeft, opposedToFixed,
+	Symbol(parent, size, QwtAxis::XBottom, QwtAxis::YLeft, opposedToFixed,
 		floats)
 {
 	int x = opposedToFixed ? surface().width() : 0;
@@ -390,7 +390,7 @@ void VertDebugSymbol::onBasePixelPositionChanged(int x, int y)
 
 HorizDebugSymbol::HorizDebugSymbol(QObject *parent, const QSize& size,
 			bool opposedToFixed, bool floats):
-	Symbol(parent, size, QwtPlot::yLeft, QwtPlot::xBottom, opposedToFixed,
+	Symbol(parent, size, QwtAxis::YLeft, QwtAxis::XBottom, opposedToFixed,
 		floats)
 {
 	int y = opposedToFixed ? 0 : surface().height();

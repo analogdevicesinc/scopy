@@ -220,12 +220,12 @@ void NetworkAnalyzerBufferViewer::_setupPlot()
 
 	d_plot->insertLegend(nullptr);
 	d_plot->setUsingLeftAxisScales(false);
-	int nrAxes = d_plot->axesCount(QwtPlot::yLeft);
+	int nrAxes = d_plot->axesCount(QwtAxis::YLeft);
 	for (int i = 0; i < nrAxes; ++i) {
-		d_plot->setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
+		d_plot->setAxisVisible(QwtAxisId(QwtAxis::YLeft, i),
 				false);
 	}
-	d_plot->setAxisVisible(QwtAxisId(QwtPlot::xBottom, 0),
+	d_plot->setAxisVisible(QwtAxisId(QwtAxis::XBottom, 0),
 			false);
 
 	d_plot->plotLayout()->setAlignCanvasToScales(true);

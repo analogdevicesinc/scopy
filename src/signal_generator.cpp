@@ -596,7 +596,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	
 	m_plot->setOffsetHandleVisible(0,false);
 	m_plot->setOffsetHandleVisible(1,false);
-	m_plot->enableAxis(QwtPlot::yLeft, false);
+	m_plot->setAxisVisible(QwtAxis::YLeft, false);
 	m_plot->setActiveVertAxis(0);
 
 	m_plot->enableTimeTrigger(false);

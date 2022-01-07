@@ -49,9 +49,9 @@ OscScaleZoomer::~OscScaleZoomer()
 QwtText OscScaleZoomer::trackerText(const QPoint& pos) const
 {
 	const OscScaleDraw *draw_x = static_cast<const OscScaleDraw *>(
-	                                     plot()->axisScaleDraw(QwtPlot::xTop));
+	                                     plot()->axisScaleDraw(QwtAxis::XTop));
 	const OscScaleDraw *draw_y = static_cast<const OscScaleDraw *>(
-	                                     plot()->axisScaleDraw(QwtPlot::yLeft));
+	                                     plot()->axisScaleDraw(QwtAxis::YLeft));
 	QPointF dp = QwtPlotZoomer::invTransform(pos);
 	QString text;
 

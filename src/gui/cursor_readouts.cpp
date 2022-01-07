@@ -39,8 +39,8 @@ CursorReadouts::CursorReadouts(QwtPlot *plot):
 	freq_delta_visible(true),
 	d_topLeft(QPoint(0, 0)),
     currentPosition(CustomPlotPositionButton::topLeft),
-    hAxis(QwtPlot::xBottom),
-    vAxis(QwtPlot::yLeft)
+    hAxis(QwtAxis::XBottom),
+    vAxis(QwtAxis::YLeft)
 {
 	ui->setupUi(this);
 	ui->TimeCursors->setParent(plot->canvas());

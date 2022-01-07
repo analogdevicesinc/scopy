@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Analog Devices Inc.
+ * CopQwtAxis::YRight (c) 2019 Analog Devices Inc.
  *
  * This file is part of Scopy
  * (see http://www.github.com/analogdevicesinc/scopy).
@@ -189,7 +189,7 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 		[=]() {
 			double pos = d_timeTriggerHandle->position();
 
-			QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
+			QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtAxis::XBottom, 0));
 			double min = -(xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 			double max = (xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 
@@ -361,7 +361,7 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 		this, &CapturePlot::onDigitalChannelAdded);
 
 	installEventFilter(this);
-	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+	QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XBottom);
 	const int fmw = QFontMetrics(scaleWidget->font()).width("-XXX.XXX XX");
 	scaleWidget->setMinBorderDist(fmw / 2 + 30, fmw / 2 + 30);
 
@@ -375,20 +375,20 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 
 	/* configure the measurement gates */
 	leftGate = new QwtPlotShapeItem();
-	leftGate->setAxes(QwtPlot::xBottom,QwtPlot::yRight);
-	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
-	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
-	leftGateRect.setLeft(axisScaleDiv(xBottom).lowerBound());
+	leftGate->setAxes(QwtAxis::XBottom,QwtAxis::YRight);
+	leftGateRect.setTop(axisScaleDiv(QwtAxis::YRight).upperBound());
+	leftGateRect.setBottom(axisScaleDiv(QwtAxis::YRight).lowerBound());
+	leftGateRect.setLeft(axisScaleDiv(QwtAxis::XBottom).lowerBound());
 	leftGateRect.setRight(d_gateBar1->plotCoord().x());
 	leftGate->setRect(leftGateRect);
 	leftGate->setBrush(gateBrush);
 
 	rightGate = new QwtPlotShapeItem();
-	rightGate->setAxes(QwtPlot::xBottom,QwtPlot::yRight);
-	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
-	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	rightGate->setAxes(QwtAxis::XBottom,QwtAxis::YRight);
+	rightGateRect.setTop(axisScaleDiv(QwtAxis::YRight).upperBound());
+	rightGateRect.setBottom(axisScaleDiv(QwtAxis::YRight).lowerBound());
 	rightGateRect.setLeft(d_gateBar2->plotCoord().x());
-	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
+	rightGateRect.setRight(axisScaleDiv(QwtAxis::XBottom).upperBound());
 	rightGate->setRect(rightGateRect);
 	rightGate->setBrush(gateBrush);
 
@@ -431,7 +431,7 @@ void CapturePlot::replot()
 		return;
 	}
 
-	const QwtInterval interval = axisInterval(QwtPlot::xBottom);
+	const QwtInterval interval = axisInterval(QwtAxis::XBottom);
 	if (interval.minValue() != d_xAxisInterval.first
 			|| interval.maxValue() != d_xAxisInterval.second) {
 
@@ -599,9 +599,9 @@ void CapturePlot::onGateBar1Moved(double value)
 	}
 
 	//update gate handle
-	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
-	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
-	leftGateRect.setLeft(axisScaleDiv(xBottom).lowerBound());
+	leftGateRect.setTop(axisScaleDiv(QwtAxis::YRight).upperBound());
+	leftGateRect.setBottom(axisScaleDiv(QwtAxis::YRight).lowerBound());
+	leftGateRect.setLeft(axisScaleDiv(QwtAxis::XBottom).lowerBound());
 	leftGateRect.setRight(value);
 	leftGate->setRect(leftGateRect);
 
@@ -611,8 +611,8 @@ void CapturePlot::onGateBar1Moved(double value)
 	double minTime = 0;
 
 	if (n == 0) {
-		maxTime = axisScaleDiv(xBottom).upperBound();
-		minTime = axisScaleDiv(xBottom).lowerBound();
+		maxTime = axisScaleDiv(QwtAxis::XBottom).upperBound();
+		minTime = axisScaleDiv(QwtAxis::XBottom).lowerBound();
 	} else {
 		maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
 		minTime = Curve(d_selected_channel)->data()->sample(0).x();
@@ -628,7 +628,7 @@ void CapturePlot::onGateBar1Moved(double value)
 
 	value_gateLeft = value;
 	//find the percentage of the gate in relation with plot width
-	double width = (value - axisScaleDiv(xBottom).lowerBound()) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
+	double width = (value - axisScaleDiv(QwtAxis::XBottom).lowerBound()) / (axisScaleDiv(QwtAxis::XBottom).upperBound() - axisScaleDiv(QwtAxis::XBottom).lowerBound());
 	Q_EMIT leftGateChanged(width);
 	d_hGatingHandle1->setTimeValue(d_gateBar1->plotCoord().x());
 
@@ -643,10 +643,10 @@ void CapturePlot::onGateBar2Moved(double value)
 	}
 
 	//update gate handle
-	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
-	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	rightGateRect.setTop(axisScaleDiv(QwtAxis::YRight).upperBound());
+	rightGateRect.setBottom(axisScaleDiv(QwtAxis::YRight).lowerBound());
 	rightGateRect.setLeft(value);
-	rightGateRect.setRight(axisScaleDiv(xBottom).upperBound());
+	rightGateRect.setRight(axisScaleDiv(QwtAxis::XBottom).upperBound());
 	rightGate->setRect(rightGateRect);
 
 	int n = Curve(d_selected_channel)->data()->size();
@@ -655,8 +655,8 @@ void CapturePlot::onGateBar2Moved(double value)
 	double minTime = 0;
 
 	if (n == 0) {
-		maxTime = axisScaleDiv(xBottom).upperBound();
-		minTime = axisScaleDiv(xBottom).lowerBound();
+		maxTime = axisScaleDiv(QwtAxis::XBottom).upperBound();
+		minTime = axisScaleDiv(QwtAxis::XBottom).lowerBound();
 	} else {
 		maxTime = Curve(d_selected_channel)->data()->sample(n-1).x();
 		minTime = Curve(d_selected_channel)->data()->sample(0).x();
@@ -672,7 +672,7 @@ void CapturePlot::onGateBar2Moved(double value)
 
 	value_gateRight = value;
 	//find the percentage of the gate in relation with plot width
-	double width = (axisScaleDiv(xBottom).upperBound() - value) / (axisScaleDiv(xBottom).upperBound() - axisScaleDiv(xBottom).lowerBound());
+	double width = (axisScaleDiv(QwtAxis::XBottom).upperBound() - value) / (axisScaleDiv(QwtAxis::XBottom).upperBound() - axisScaleDiv(QwtAxis::XBottom).lowerBound());
 	Q_EMIT rightGateChanged(width);
 	d_hGatingHandle2->setTimeValue(d_gateBar2->plotCoord().x());
 
@@ -747,7 +747,7 @@ bool CapturePlot::measurementsEnabled()
 
 void CapturePlot::onTimeTriggerHandlePosChanged(int pos)
 {
-	QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtPlot::xBottom, 0));
+	QwtScaleMap xMap = this->canvasMap(QwtAxisId(QwtAxis::XBottom, 0));
 	double min = -(xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 	double max = (xAxisNumDiv() / 2.0) * HorizUnitsPerDiv();
 
@@ -793,12 +793,12 @@ void CapturePlot::showEvent(QShowEvent *event)
 void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleDraw)
 {
 	QwtPlotMarker detailsMarker;
-	detailsMarker.setAxes(QwtPlot::xBottom, QwtPlot::yLeft);
+	detailsMarker.setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
 	detailsMarker.attach(this);
-	double xMarker = axisInterval(QwtPlot::xBottom).maxValue();
-	double length = axisInterval(QwtPlot::xBottom).maxValue() - axisInterval(QwtPlot::xBottom).minValue();
+	double xMarker = axisInterval(QwtAxis::XBottom).maxValue();
+	double length = axisInterval(QwtAxis::XBottom).maxValue() - axisInterval(QwtAxis::XBottom).minValue();
 	xMarker -= (0.2 * length);
-	double yMarker = axisInterval(QwtPlot::yLeft).maxValue();
+	double yMarker = axisInterval(QwtAxis::YLeft).maxValue();
 	yMarker -= (0.1 * yMarker);
 	detailsMarker.setValue(xMarker, yMarker);
 	QwtText text(d_timeBaseLabel->text() + " " + d_sampleRateLabel->text());
@@ -849,11 +849,11 @@ void CapturePlot::enableXaxisLabels()
 
 void CapturePlot::enableAxisLabels(bool enabled)
 {
-	enableAxis(QwtPlot::xBottom, enabled);
+	setAxisVisible(QwtAxis::XBottom, enabled);
 	if (!enabled) {
-		int nrAxes = axesCount(QwtPlot::yLeft);
+		int nrAxes = axesCount(QwtAxis::YLeft);
 		for (int i = 0; i < nrAxes; ++i) {
-			setAxisVisible(QwtAxisId(QwtPlot::yLeft, i),
+			setAxisVisible(QwtAxisId(QwtAxis::YLeft, i),
 					enabled);
 		}
 	}
@@ -935,7 +935,7 @@ void CapturePlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 	DisplayPlot::setActiveVertAxis(axisIdx, selected);
 	updateHandleAreaPadding(d_labelsEnabled);
 	if (d_labelsEnabled) {
-		enableAxis(QwtPlot::xBottom, true);
+		setAxisVisible(QwtAxis::XBottom, true);
 	}
 }
 
@@ -944,21 +944,21 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 	if (!d_labelsEnabled)
 		return;
 
-	setAxisVisible(QwtAxisId(QwtPlot::yLeft, axisIdx),
+	setAxisVisible(QwtAxisId(QwtAxis::YLeft, axisIdx),
 						en);
 
-	int nrAxes = axesCount(QwtPlot::yLeft);
+	int nrAxes = axesCount(QwtAxis::YLeft);
 	bool allAxisDisabled = true;
 	for (int i = 0; i < nrAxes; ++i)
-		if (isAxisVisible(QwtAxisId(QwtPlot::yLeft, i)))
+		if (isAxisVisible(QwtAxisId(QwtAxis::YLeft, i)))
 			allAxisDisabled = false;
 
 	if (allAxisDisabled) {
-		setAxisVisible(QwtPlot::xBottom, false);
+		setAxisVisible(QwtAxis::XBottom, false);
 		updateHandleAreaPadding(false);
 	}
 	if (en) {
-		setAxisVisible(QwtPlot::xBottom, true);
+		setAxisVisible(QwtAxis::XBottom, true);
 	}
 }
 
@@ -966,16 +966,16 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 {
 	double xAxisBonusWidth = 0.0;
 
-	if (axisEnabled(QwtPlot::xBottom)) {
-		if (!axisEnabled(QwtPlot::yLeft)) {
+	if (isAxisVisible(QwtAxis::XBottom)) {
+		if (!isAxisVisible(QwtAxis::YLeft)) {
 			xAxisBonusWidth = 65.0;
 		}
 	}
 
 	if (enabled) {
-		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
-		d_topGateHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtPlot::yLeft, d_activeVertAxis))->width());
-		QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xBottom);
+		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtAxis::YLeft, d_activeVertAxis))->width());
+		d_topGateHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtAxis::YLeft, d_activeVertAxis))->width());
+		QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XBottom);
 		const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
 		const int fmh = QFontMetrics(scaleWidget->font()).height();
 		d_bottomHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
@@ -1018,12 +1018,12 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 
 void CapturePlot::updateGateMargins(){
 	/* update the size of the gates */
-	leftGateRect.setTop(axisScaleDiv(yRight).upperBound());
-	leftGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	leftGateRect.setTop(axisScaleDiv(QwtAxis::YRight).upperBound());
+	leftGateRect.setBottom(axisScaleDiv(QwtAxis::YRight).lowerBound());
 	leftGate->setRect(leftGateRect);
 
-	rightGateRect.setTop(axisScaleDiv(yRight).upperBound());
-	rightGateRect.setBottom(axisScaleDiv(yRight).lowerBound());
+	rightGateRect.setTop(axisScaleDiv(QwtAxis::YRight).upperBound());
+	rightGateRect.setBottom(axisScaleDiv(QwtAxis::YRight).lowerBound());
 	rightGate->setRect(rightGateRect);
 
 	replot();
@@ -1108,7 +1108,7 @@ void CapturePlot::addToGroup(int currentGroup, int toAdd)
 void CapturePlot::onDigitalChannelAdded(int chnIdx)
 {
 	setLeftVertAxesCount(d_ydata.size() + d_ref_ydata.size() + chnIdx + 1);
-	setAxisScale( QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx), -5, 5);
+	setAxisScale( QwtAxisId(QwtAxis::YLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx), -5, 5);
 	replot();
 
 	QColor chnColor;
@@ -1120,14 +1120,14 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
 	GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 
-	curve->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
+	curve->setAxes(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
 
 	/* Channel offset widget */
 	HorizBar *chOffsetBar = new HorizBar(this);
 	d_symbolCtrl->attachSymbol(chOffsetBar);
 	chOffsetBar->setCanLeavePlot(true);
 	chOffsetBar->setVisible(false);
-	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
+	chOffsetBar->setMobileAxis(QwtAxisId(QwtAxis::YLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
 	d_offsetBars.push_back(chOffsetBar);
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
@@ -1189,9 +1189,9 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 
 //			qDebug() << pos;
 
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chn_id));
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, chn_id));
 
-			auto y = axisInterval(QwtAxisId(QwtPlot::yLeft, chn_id));
+			auto y = axisInterval(QwtAxisId(QwtAxis::YLeft, chn_id));
 
 //			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
 //			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
@@ -1355,8 +1355,8 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 
 	for (const auto &group : qAsConst(d_groupHandles)) {
 		// Add group marker
-		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
-		const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+		QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, 0));
+		const QwtInterval y = axisInterval(QwtAxisId(QwtAxis::YLeft, 0));
 		const double min = y.minValue();
 		const double max = y.maxValue();
 		yMap.setScaleInterval(min, max);
@@ -1368,7 +1368,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 
 		QwtPlotZoneItem *groupMarker = new QwtPlotZoneItem();
 		d_groupMarkers.push_back(groupMarker);
-		groupMarker->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, 0));
+		groupMarker->setAxes(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, 0));
 		groupMarker->setPen(QColor(74, 100, 255, 30), 2.0);
 		groupMarker->setBrush(QBrush(QColor(74, 100, 255, 10)));
 		groupMarker->setInterval(y2, y1);
@@ -1606,8 +1606,8 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 	}
 
 	// update plot marker
-	QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, 0));
-	const QwtInterval y = axisInterval(QwtAxisId(QwtPlot::yLeft, 0));
+	QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, 0));
+	const QwtInterval y = axisInterval(QwtAxisId(QwtAxis::YLeft, 0));
 	const double min = y.minValue();
 	const double max = y.maxValue();
 	yMap.setScaleInterval(min, max);
@@ -1645,11 +1645,11 @@ void adiscope::CapturePlot::pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl
 	d_offsetHandles.insert(indexOfNewChannel, chOffsetHdl);
 
 	for (int i = 0; i < d_offsetBars.size(); ++i) {
-		d_offsetBars[i]->setMobileAxis(QwtAxisId(QwtPlot::yLeft, i));
+		d_offsetBars[i]->setMobileAxis(QwtAxisId(QwtAxis::YLeft, i));
 	}
 
 	for (int i = 0; i < d_logic_curves.size(); ++i) {
-		d_logic_curves[i]->setAxes(QwtPlot::xBottom, QwtAxisId(QwtPlot::yLeft, d_ydata.size() + d_ref_ydata.size() + i));
+		d_logic_curves[i]->setAxes(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, d_ydata.size() + d_ref_ydata.size() + i));
 	}
 }
 
@@ -1663,7 +1663,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	d_symbolCtrl->attachSymbol(chOffsetBar);
 	chOffsetBar->setCanLeavePlot(true);
 	chOffsetBar->setVisible(false);
-	chOffsetBar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
+	chOffsetBar->setMobileAxis(QwtAxisId(QwtAxis::YLeft, chnIdx));
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
 				QPixmap(":/icons/handle_right_arrow.svg"),
@@ -1681,7 +1681,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			if (chn_id < 0)
 				return;
 
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtPlot::yLeft, chn_id));
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, chn_id));
 			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 
@@ -1823,7 +1823,7 @@ void CapturePlot::removeOffsetWidgets(int chnIdx)
 		return;
 
 	HorizBar *bar = d_offsetBars.takeAt(chnIdx);
-	bar->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	bar->setMobileAxis(QwtAxisId(QwtAxis::YLeft, 0));
 	d_symbolCtrl->detachSymbol(bar);
 	delete bar;
 	delete(d_offsetHandles.takeAt(chnIdx));

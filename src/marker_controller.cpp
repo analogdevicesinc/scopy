@@ -118,9 +118,9 @@ void MarkerController::onPickerMoved(QPoint p)
 	if (d_picked_mrk) {
 		QPointF val = d_picked_mrk->plotPixelsToValue(p);
 		QwtInterval xItv = plot()->axisScaleDiv(
-			QwtPlot::xBottom).interval();
+			QwtAxis::XBottom).interval();
 		QwtInterval yItv = plot()->axisScaleDiv(
-			QwtPlot::yLeft).interval();
+			QwtAxis::YLeft).interval();
 
 		// Make sure the marker does not leave the plot canvas
 		if (val.x() < xItv.minValue()) {

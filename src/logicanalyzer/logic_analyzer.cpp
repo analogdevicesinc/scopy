@@ -1350,8 +1350,8 @@ void LogicAnalyzer::setupUi()
 	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 
-	m_plot.enableAxis(QwtPlot::yLeft, false);
-	m_plot.enableAxis(QwtPlot::xBottom, false);
+	m_plot.setAxisVisible(QwtAxis::YLeft, false);
+	m_plot.setAxisVisible(QwtAxis::XBottom, false);
 
 	m_plot.setUsingLeftAxisScales(false);
 	m_plot.enableLabels(false);
@@ -1646,7 +1646,7 @@ void LogicAnalyzer::settingsPanelUpdate(int id)
 void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 {
 	// Time interval within the plot canvas
-	QwtInterval plotInterval = m_plot.axisInterval(QwtPlot::xBottom);
+	QwtInterval plotInterval = m_plot.axisInterval(QwtAxis::XBottom);
 
 	// Time interval that represents the captured data
 	QwtInterval dataInterval(0.0, 0.0);
@@ -1696,7 +1696,7 @@ void LogicAnalyzer::initBufferScrolling()
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
 		m_resetHorizAxisOffset = false;
 		double moveTo = 0.0;
-		auto interval = m_plot.axisInterval(QwtPlot::xBottom);
+		auto interval = m_plot.axisInterval(QwtAxis::XBottom);
 		double min = interval.minValue();
 		double max = interval.maxValue();
 		int width = m_bufferPreviewer->width();

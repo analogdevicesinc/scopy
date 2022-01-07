@@ -366,7 +366,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	startStopRange = new StartStopRangeWidget(0);
 	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=](double start, double stop){
 		fft_plot->setStartStop(start, stop);
-		fft_plot->setAxisScale(QwtPlot::xBottom, start, stop);
+		fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		fft_plot->replot();
 		fft_plot->bottomHandlesArea()->repaint();
 
@@ -2864,10 +2864,10 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		ui->divisionWidget->setCurrentIndex(stackedWidgetCurrentIdx);
 		top_scale->setValue(2.5E1);
 		bottom_scale->setValue(1E-12);
-		fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
+		fft_plot->setAxisScale(QwtAxis::YLeft, bottom_scale->value(), top_scale->value());
 
 		fft_plot->replot();
-		fft_plot->setYaxisMajorTicksPos(fft_plot->axisScaleDiv(QwtPlot::yLeft).ticks(2));
+		fft_plot->setYaxisMajorTicksPos(fft_plot->axisScaleDiv(QwtAxis::YLeft).ticks(2));
 		fft_plot->leftHandlesArea()->repaint();
 
 		break;
@@ -2899,17 +2899,17 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
 		case FftDisplayPlot::VRMS:
 			bottom->setValue(-10);
 			unit_per_div->setValue(2);
-			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
+			fft_plot->setAxisScale(QwtAxis::YLeft, bottom->value(), top->value());
 			break;
 		case FftDisplayPlot::VROOTHZ:
 			top_scale->setValue(2.5E1);
 			bottom_scale->setValue(1E-12);
-			fft_plot->setAxisScale(QwtPlot::yLeft, bottom_scale->value(), top_scale->value());
+			fft_plot->setAxisScale(QwtAxis::YLeft, bottom_scale->value(), top_scale->value());
 			break;
 		default:
 			top->setValue(0);
 			bottom->setValue(-200);
-			fft_plot->setAxisScale(QwtPlot::yLeft, bottom->value(), top->value());
+			fft_plot->setAxisScale(QwtAxis::YLeft, bottom->value(), top->value());
 			break;
 		}
 	});
@@ -2989,10 +2989,10 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 		bottom_value = bottom_scale->value();
 	}
 
-	fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_value);
+	fft_plot->setAxisScale(QwtAxis::YLeft, bottom_value, top_value);
 
 	fft_plot->replot();
-	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
+	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
 	fft_plot->leftHandlesArea()->repaint();
 }
@@ -3023,10 +3023,10 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 		top->blockSignals(false);
 	}
 
-	fft_plot->setAxisScale(QwtPlot::yLeft, bottomValue, topValue);
+	fft_plot->setAxisScale(QwtAxis::YLeft, bottomValue, topValue);
 
 	fft_plot->replot();
-	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
+	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
 	fft_plot->leftHandlesArea()->repaint();
 }
@@ -3047,10 +3047,10 @@ void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 		top_value = top_scale->value();
 	}
 
-	fft_plot->setAxisScale(QwtPlot::yLeft, bottom_value, top_value);
+	fft_plot->setAxisScale(QwtAxis::YLeft, bottom_value, top_value);
 
 	fft_plot->replot();
-	auto div = fft_plot->axisScaleDiv(QwtPlot::yLeft);
+	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
 	fft_plot->leftHandlesArea()->repaint();
 }

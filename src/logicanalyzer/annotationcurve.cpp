@@ -325,7 +325,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
     mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
     mapper.setBoundingRect(canvasRect);
 
-    auto interval = plot()->axisInterval(QwtAxis::xBottom);
+    auto interval = plot()->axisInterval(QwtAxis::XBottom);
 
     QStringList titles;
 
@@ -612,7 +612,7 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
     // END DRAW MULTI POINT annotation
 
     // DRAW LABEL
-    QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
+    QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
 
     const double bonus = xMap.invTransform(titleSize.width() + 5) - xMap.invTransform(0);
 
@@ -690,7 +690,7 @@ void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QP
     painter->save();
     painter->setPen(QPen(QBrush(Qt::black), 20));
 
-    QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
+    QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
 
     const double bonus = xMap.invTransform(titleSize.width() + 5) - xMap.invTransform(0);
     const double WidthInPoints = xMap.invTransform(m_traceHeight) - xMap.invTransform(0);

@@ -43,14 +43,14 @@ namespace adiscope {
 		NyquistSamplesArray() : QwtArraySeriesData<QwtPointPolar>() {}
 
 		void addSample(const QwtPointPolar& point) {
-			d_samples.push_back(point);
+			m_samples.push_back(point);
 		}
-		void clear() { d_samples.clear(); }
-		void reserve(unsigned int nb) { d_samples.reserve(nb); }
+		void clear() { m_samples.clear(); }
+		void reserve(unsigned int nb) { m_samples.reserve(nb); }
 		QRectF boundingRect() const;
 
 		QwtPointPolar sample(size_t index) const {
-			return d_samples.at(index);
+			return m_samples.at(index);
 		}
 	};
 }
@@ -65,8 +65,8 @@ QRectF NyquistSamplesArray::boundingRect() const
 {
 	double xmin = 0.0, xmax = 0.0, ymin = 0.0, ymax = 0.0;
 
-	for (auto it = d_samples.begin();
-			it != d_samples.end(); ++it) {
+	for (auto it = m_samples.begin();
+			it != m_samples.end(); ++it) {
 		double point_x = it->radius() * cos(it->azimuth());
 		double point_y = it->radius() * sin(it->azimuth());
 

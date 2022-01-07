@@ -403,8 +403,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		plot.Curve(i)->setAxes(
-				QwtAxisId(QwtPlot::xBottom, 0),
-				QwtAxisId(QwtPlot::yLeft, i));
+				QwtAxisId(QwtAxis::XBottom, 0),
+				QwtAxisId(QwtAxis::YLeft, i));
 		plot.addZoomer(i);
 		probe_attenuation.push_back(1);
 		auto multiply = gr::blocks::multiply_const_ff::make(1);
@@ -420,13 +420,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		iio->unlock();
 
 
-	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, 0));
+	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtAxis::YLeft, 0));
 	plot.setTriggerAEnabled(trigger_settings.analogEnabled());
 	plot.levelTriggerA()->setPosition(trigger_settings.level());
 
 	// TO DO: Give user the option to make these axes visible
-	plot.enableAxis(QwtPlot::yLeft, false);
-	plot.enableAxis(QwtPlot::xBottom, false);
+	plot.setAxisVisible(QwtAxis::YLeft, false);
+	plot.setAxisVisible(QwtAxis::XBottom, false);
 	plot.setUsingLeftAxisScales(false);
 
 	fft_plot.setMinimumHeight(250);
@@ -967,7 +967,7 @@ int Oscilloscope::binSearchPointOnXaxis(double time)
 
 void Oscilloscope::resetHistogramDataPoints()
 {
-	QwtInterval xBot = plot.axisInterval(QwtPlot::xBottom);
+	QwtInterval xBot = plot.axisInterval(QwtAxis::XBottom);
 	double zoomMinTime = xBot.minValue();
 	double zoomMaxTime = xBot.maxValue();
 
@@ -1109,8 +1109,8 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 	probe_attenuation.push_back(1);
 
 	plot.Curve(curve_id)->setAxes(
-		QwtAxisId(QwtPlot::xBottom, 0),
-		QwtAxisId(QwtPlot::yLeft, curve_id));
+		QwtAxisId(QwtAxis::XBottom, 0),
+		QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
@@ -1227,8 +1227,8 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	probe_attenuation.push_back(1);
 
 	plot.Curve(curve_id)->setAxes(
-	        QwtAxisId(QwtPlot::xBottom, 0),
-	        QwtAxisId(QwtPlot::yLeft, curve_id));
+	        QwtAxisId(QwtAxis::XBottom, 0),
+	        QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
@@ -2514,8 +2514,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 		ui->chn_scales->addWidget(label);
 
 	plot.Curve(curve_id)->setAxes(
-			QwtAxisId(QwtPlot::xBottom, 0),
-			QwtAxisId(QwtPlot::yLeft, curve_id));
+			QwtAxisId(QwtAxis::XBottom, 0),
+			QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
 	plot.replot();
@@ -2739,8 +2739,8 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 	     i < nb_channels + nb_math_channels + nb_ref_channels; i++) {
 		/* Update the curve-to-axis map */
 		plot.Curve(i)->setAxes(
-		        QwtAxisId(QwtPlot::xBottom, 0),
-		        QwtAxisId(QwtPlot::yLeft, i));
+		        QwtAxisId(QwtAxis::XBottom, 0),
+		        QwtAxisId(QwtAxis::YLeft, i));
 	}
 
 	onMeasurementSelectionListChanged();
@@ -2902,8 +2902,8 @@ void Oscilloscope::setFFT_params(bool force)
 		fft_plot.setSampleRate(getSampleRate(), 1, "");
 		double start = 0;
 		double stop =  getSampleRate() / 2;
-		fft_plot.setAxisScale(QwtPlot::xBottom, start, stop);
-		fft_plot.setAxisScale(QwtPlot::yLeft, -200, 0, 10);
+		fft_plot.setAxisScale(QwtAxis::XBottom, start, stop);
+		fft_plot.setAxisScale(QwtAxis::YLeft, -200, 0, 10);
 		fft_plot.zoomBaseUpdate();
 	}
 }
@@ -3180,7 +3180,7 @@ void adiscope::Oscilloscope::on_boxMeasure_toggled(bool on)
 
 void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 {
-	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtPlot::yLeft, chnIdx));
+	plot.levelTriggerA()->setMobileAxis(QwtAxisId(QwtAxis::YLeft, chnIdx));
 	trigger_settings.setChannelAttenuation(probe_attenuation[chnIdx]);
 	if (chnAcCoupled.at(chnIdx)) {
 		deactivateAcCouplingTrigger();
@@ -3411,7 +3411,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 		xy_plot.setHorizUnitsPerDiv(value);
 	}
 	if (current_ch_widget == index_y) {
-		xy_plot.setVertUnitsPerDiv(value, QwtPlot::yLeft);
+		xy_plot.setVertUnitsPerDiv(value, QwtAxis::YLeft);
 	}
 	xy_plot.zoomBaseUpdate();
 
@@ -3484,7 +3484,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	plot.cancelZoom();
 
 	if (zoom_level == 0) {
-		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
+		noZoomXAxisWidth = plot.axisInterval(QwtAxis::XBottom).width();
 	}
 
 	setFFT_params(true);
@@ -3595,7 +3595,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	}
 
 	if (zoom_level == 0) {
-		noZoomXAxisWidth = plot.axisInterval(QwtPlot::xBottom).width();
+		noZoomXAxisWidth = plot.axisInterval(QwtAxis::XBottom).width();
 	}
 
 	/* Reconfigure the GNU Radio block to receive a different number of samples  */
@@ -3669,7 +3669,7 @@ bool adiscope::Oscilloscope::gainUpdateNeeded()
 	double offset = plot.VertOffset(current_ch_widget);
 	QwtInterval hw_input_itv(-2.5 + offset, 2.5 + offset);
 	QwtInterval plot_vert_itv = plot.axisScaleDiv(
-		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
+		QwtAxisId(QwtAxis::YLeft, current_ch_widget)).interval();
 
 	if (plot_vert_itv.minValue() < hw_input_itv.minValue() ||
 			plot_vert_itv.maxValue() > hw_input_itv.maxValue() ||
@@ -3690,8 +3690,8 @@ void Oscilloscope::updateXyPlotScales()
 {
 	int x = gsettings_ui->cmb_x_channel->currentIndex();
 	int y = gsettings_ui->cmb_y_channel->currentIndex();
-	auto xInterval = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, x));
-	auto yInterval = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, y));
+	auto xInterval = plot.axisInterval(QwtAxisId(QwtAxis::YLeft, x));
+	auto yInterval = plot.axisInterval(QwtAxisId(QwtAxis::YLeft, y));
 	xy_plot.set_axis(xInterval.minValue(), xInterval.maxValue(),
 			 yInterval.minValue(), yInterval.maxValue());
 }
@@ -4879,8 +4879,8 @@ void Oscilloscope::scaleHistogramPlot(bool newData)
 	}
 
 	for (int i = 0; i < nb_channels; i++) {
-		double min = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i)).minValue();
-		double max = plot.axisInterval(QwtAxisId(QwtPlot::yLeft, i)).maxValue();
+		double min = plot.axisInterval(QwtAxisId(QwtAxis::YLeft, i)).minValue();
+		double max = plot.axisInterval(QwtAxisId(QwtAxis::YLeft, i)).maxValue();
 
 		hist_plot.setYaxisSpan(i, min, max);
 	}
@@ -4994,7 +4994,7 @@ void Oscilloscope::onTriggerModeChanged(int mode)
 void Oscilloscope::updateBufferPreviewer()
 {
 	// Time interval within the plot canvas
-	QwtInterval plotInterval = plot.axisInterval(QwtPlot::xBottom);
+	QwtInterval plotInterval = plot.axisInterval(QwtAxis::XBottom);
 
 	// Time interval that represents the captured data
 	QwtInterval dataInterval(0.0, 0.0);
@@ -5060,7 +5060,7 @@ void Oscilloscope::updateGainMode()
 	double offset = plot.VertOffset(current_ch_widget);
 	QwtInterval hw_input_itv(-2.5 + offset, 2.5 + offset);
 	QwtInterval plot_vert_itv = plot.axisScaleDiv(
-		QwtAxisId(QwtPlot::yLeft, current_ch_widget)).interval();
+		QwtAxisId(QwtAxis::YLeft, current_ch_widget)).interval();
 
 	auto chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(current_ch_widget);
 	// If max signal span that can be captured is smaller than the plot
@@ -5218,10 +5218,10 @@ void Oscilloscope::setup_xy_channels()
 {
 	int x = gsettings_ui->cmb_x_channel->currentIndex();
 	int y = gsettings_ui->cmb_y_channel->currentIndex();
-	QWidget *xsw = xy_plot.axisWidget(QwtPlot::xBottom);
+	QWidget *xsw = xy_plot.axisWidget(QwtAxis::XBottom);
 	xsw->setStyleSheet(
 		QString("color: %1").arg(plot.getLineColor(x).name()));
-	QWidget *ysw = xy_plot.axisWidget(QwtPlot::yLeft);
+	QWidget *ysw = xy_plot.axisWidget(QwtAxis::YLeft);
 	ysw->setStyleSheet(
 		QString("color: %1").arg(plot.getLineColor(y).name()));
 
@@ -5230,7 +5230,7 @@ void Oscilloscope::setup_xy_channels()
 		onXY_view_toggled(true);
 
 	xy_plot.setHorizUnitsPerDiv(plot.VertUnitsPerDiv(x));
-	xy_plot.setVertUnitsPerDiv(plot.VertUnitsPerDiv(y), QwtPlot::yLeft);
+	xy_plot.setVertUnitsPerDiv(plot.VertUnitsPerDiv(y), QwtAxis::YLeft);
 
 	updateXyPlotScales();
 }

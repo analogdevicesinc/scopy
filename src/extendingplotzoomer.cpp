@@ -113,7 +113,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		adjusted += topLeft;
 		adjusted += bottomRight;
 
-		if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
+		if (yAxis() == QwtAxisId(QwtAxis::YLeft, 0)) {
 			cornerMarkers[0]->detach();
 			cornerMarkers[1]->detach();
 			cornerMarkers[2]->detach();
@@ -157,7 +157,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 		adjusted += topLeft;
 		adjusted += bottomRight;
 
-		if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
+		if (yAxis() == QwtAxisId(QwtAxis::YLeft, 0)) {
 			cornerMarkers[0]->detach();
 			cornerMarkers[1]->detach();
 			cornerMarkers[2]->detach();
@@ -196,7 +196,7 @@ QPolygon ExtendingPlotZoomer::adjustedPoints(const QPolygon &points) const
 	}
 
 
-	if (yAxis() == QwtAxisId(QwtPlot::yLeft, 0)) {
+	if (yAxis() == QwtAxisId(QwtAxis::YLeft, 0)) {
 
 		extendMarkers[0]->detach();
 		extendMarkers[1]->detach();

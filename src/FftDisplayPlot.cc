@@ -128,11 +128,11 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	freqFormatter.setTwoDecimalMode(true);
 
 	OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "");
-	setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+	setAxisScaleDraw(QwtAxis::YLeft, yScaleDraw);
 	yScaleDraw->setFloatPrecision(2);
 
 	OscScaleDraw *xScaleDraw = new OscScaleDraw(&freqFormatter, "");
-	setAxisScaleDraw(QwtPlot::xBottom, xScaleDraw);
+	setAxisScaleDraw(QwtAxis::XBottom, xScaleDraw);
 	xScaleDraw->setFloatPrecision(2);
 
 	_resetXAxisPoints();
@@ -175,8 +175,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	d_leftHandlesArea->setBottomPadding(55);
 	d_leftHandlesArea->setMinimumHeight(this->minimumHeight());
 
-	enableAxis(QwtPlot::xBottom, false);
-	enableAxis(QwtPlot::yLeft, false);
+	setAxisVisible(QwtAxis::XBottom, false);
+	setAxisVisible(QwtAxis::YLeft, false);
 	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
 
 	setupReadouts();
@@ -423,8 +423,8 @@ void FftDisplayPlot::setSelectedChannel(int id)
 
 void FftDisplayPlot::setZoomerEnabled()
 {
-	enableAxis(QwtPlot::xBottom, true);
-	enableAxis(QwtPlot::yLeft, true);
+	setAxisVisible(QwtAxis::XBottom, true);
+	setAxisVisible(QwtAxis::YLeft, true);
 	if(!d_zoomer[0]) {
 		d_zoomer[0] = new FftDisplayZoomer(canvas());
 
@@ -561,23 +561,23 @@ void FftDisplayPlot::useLogScaleY(bool log_scale)
 	if (log_scale) {
 		setPlotYLogaritmic(true);
 		QwtLogScaleEngine *scaleEngine = new QwtLogScaleEngine();
-		setAxisScaleEngine(QwtPlot::yLeft,  (QwtScaleEngine *)scaleEngine);
+		setAxisScaleEngine(QwtAxis::YLeft,  (QwtScaleEngine *)scaleEngine);
 //		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "V/√Hz");
 //		yScaleDraw->enableComponent(QwtAbstractScaleDraw::Ticks, true);
 //		yScaleDraw->setFloatPrecision(2);
-//		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+//		setAxisScaleDraw(QwtAxis::YLeft, yScaleDraw);
 		replot();
-		auto div = axisScaleDiv(QwtPlot::yLeft);
+		auto div = axisScaleDiv(QwtAxis::YLeft);
 		setYaxisMajorTicksPos(div.ticks(2));
 	} else {
 		setPlotYLogaritmic(false);
 		OscScaleEngine *scaleEngine = new OscScaleEngine();
-		this->setAxisScaleEngine(QwtPlot::yLeft, (QwtScaleEngine *)scaleEngine);
+		this->setAxisScaleEngine(QwtAxis::YLeft, (QwtScaleEngine *)scaleEngine);
 //		OscScaleDraw *yScaleDraw = new OscScaleDraw(&dBFormatter, "");
 //		yScaleDraw->setFloatPrecision(2);
-//		setAxisScaleDraw(QwtPlot::yLeft, yScaleDraw);
+//		setAxisScaleDraw(QwtAxis::YLeft, yScaleDraw);
 		replot();
-		auto div = axisScaleDiv(QwtPlot::yLeft);
+		auto div = axisScaleDiv(QwtAxis::YLeft);
 		setYaxisNumDiv((div.ticks(2)).size());
 	}
 
@@ -588,16 +588,16 @@ void FftDisplayPlot::useLogFreq(bool use_log_freq)
 {
 	if (use_log_freq) {
 		setPlotLogaritmic(true);
-		setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+		setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
 		replot();
-		auto div = axisScaleDiv(QwtPlot::xBottom);
+		auto div = axisScaleDiv(QwtAxis::XBottom);
 		setXaxisMajorTicksPos(div.ticks(2));
 	} else {
 		setPlotLogaritmic(false);
 		OscScaleEngine *scaleEngine = new OscScaleEngine();
-		this->setAxisScaleEngine(QwtPlot::xBottom, (QwtScaleEngine *)scaleEngine);
+		this->setAxisScaleEngine(QwtAxis::XBottom, (QwtScaleEngine *)scaleEngine);
 		replot();
-		auto div = axisScaleDiv(QwtPlot::xBottom);
+		auto div = axisScaleDiv(QwtAxis::XBottom);
 		setXaxisNumDiv((div.ticks(2)).size() - 1);
 	}
 	d_logScaleEnabled = use_log_freq;
@@ -1043,7 +1043,7 @@ void FftDisplayPlot::setLeftVertAxisUnit(const QString& unit)
 			d_yAxisUnit = unit;
 
 		auto scale_draw = dynamic_cast<OscScaleDraw *>(
-			axisScaleDraw(QwtPlot::yLeft));
+			axisScaleDraw(QwtAxis::YLeft));
 		if (scale_draw) {
 			scale_draw->setUnitType(unit);
 		}
@@ -1057,7 +1057,7 @@ void FftDisplayPlot::setBtmHorAxisUnit(const QString &unit)
 	if (d_xAxisUnit != unit) {
 		d_xAxisUnit = unit;
 
-		auto scale_draw = dynamic_cast<OscScaleDraw*>(axisScaleDraw(QwtPlot::xBottom));
+		auto scale_draw = dynamic_cast<OscScaleDraw*>(axisScaleDraw(QwtAxis::XBottom));
 		if (scale_draw)
 			scale_draw->setUnitType(unit);
 	}
@@ -1355,7 +1355,7 @@ void FftDisplayPlot:: setMarkerEnabled(uint chIdx, uint mkIdx, bool en)
 	if (en) {
 		auto data_sp = std::make_shared<struct marker_data>();
 		data_sp->x = 0;
-		data_sp->y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
+		data_sp->y = axisScaleDiv(QwtAxis::YLeft).lowerBound();
 		data_sp->bin = 0;
 		data_sp->update_ui = true;
 
@@ -1443,7 +1443,7 @@ void FftDisplayPlot::setMarkerAtFreq(uint chIdx, uint mkIdx, double freq)
 	if (ydata) {
 		y = ydata[pos];
 	} else {
-		y = axisScaleDiv(QwtPlot::yLeft).lowerBound();
+		y = axisScaleDiv(QwtAxis::YLeft).lowerBound();
 	}
 
 	if (d_markers[chIdx][mkIdx].data->type != 0) {
@@ -1533,7 +1533,7 @@ void FftDisplayPlot::setStartStop(double start, double stop)
 {
 	m_sweepStart = start;
 	m_sweepStop = stop;
-	auto div = axisScaleDiv(QwtPlot::xBottom);
+	auto div = axisScaleDiv(QwtAxis::XBottom);
 	setXaxisNumDiv((div.ticks(2)).size() - 1);
 	setXaxisMajorTicksPos(div.ticks(2));
 }
@@ -1640,7 +1640,7 @@ void FftDisplayPlot::onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &
 		y = ydata[bin];
 	} else {
 		qDebug() << "problem";
-		y = axisScaleDiv(QwtPlot::yLeft).upperBound();
+		y = axisScaleDiv(QwtAxis::YLeft).upperBound();
 	}
 
 	marker_data->type = 0; // Fixed marker

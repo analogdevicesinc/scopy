@@ -29,19 +29,19 @@ using namespace adiscope;
 Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 	curve("data"), sampleRate(10.0)
 {
-	enableAxis(QwtPlot::xBottom, false);
-	enableAxis(QwtPlot::xTop, true);
+	setAxisVisible(QwtAxis::XBottom, false);
+	setAxisVisible(QwtAxis::XTop, true);
 
-	setAxisTitle(QwtPlot::xTop, tr("Voltage (V)"));
-	setAxisTitle(QwtPlot::yLeft, tr("Time (s)"));
+	setAxisTitle(QwtAxis::XTop, tr("Voltage (V)"));
+	setAxisTitle(QwtAxis::YLeft, tr("Time (s)"));
 
-	setAxisAutoScale(QwtPlot::yLeft, false);
+	setAxisAutoScale(QwtAxis::YLeft, false);
 
-	setAxisAutoScale(QwtPlot::xTop, false);
-	setAxisScale(QwtPlot::xTop, -0.1, +0.1);
+	setAxisAutoScale(QwtAxis::XTop, false);
+	setAxisScale(QwtAxis::XTop, -0.1, +0.1);
 
 	QVector<QwtScaleDiv> divs;
-	QwtScaleEngine *engine = axisScaleEngine(QwtPlot::xTop);
+	QwtScaleEngine *engine = axisScaleEngine(QwtAxis::XTop);
 	divs.push_back(engine->divideScale(-0.1, +0.1, 5, 5));
 	divs.push_back(engine->divideScale(-1.0, +1.0, 5, 5));
 	divs.push_back(engine->divideScale(-5.0, +5.0, 10, 2));
@@ -57,7 +57,7 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 	plotLayout()->setAlignCanvasToScales(true);
 
 	curve.attach(this);
-	curve.setXAxis(QwtPlot::xTop);
+	curve.setXAxis(QwtAxis::XTop);
 }
 
 Sismograph::~Sismograph()
@@ -91,7 +91,7 @@ void Sismograph::setNumSamples(int num)
 	ydata.resize(numSamples + 1);
 	xdata.reserve(numSamples + 1);
 
-	setAxisScale(QwtPlot::yLeft, (double) numSamples / sampleRate, 0.0);
+	setAxisScale(QwtAxis::YLeft, (double) numSamples / sampleRate, 0.0);
 
 	setSampleRate(sampleRate);
 	replot();
@@ -125,7 +125,7 @@ void Sismograph::setColor(const QColor& color)
 
 void Sismograph::updateScale(const QwtScaleDiv div)
 {
-	setAxisScale(QwtPlot::xTop, div.lowerBound(), div.upperBound());
+	setAxisScale(QwtAxis::XTop, div.lowerBound(), div.upperBound());
 }
 
 void Sismograph::setLineWidth(qreal width)
