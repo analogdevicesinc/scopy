@@ -108,13 +108,13 @@ ConstellationDisplayPlot::ConstellationDisplayPlot(int nplots, QWidget* parent)
   d_zoomer[0]->setRubberBandPen(c);
   d_zoomer[0]->setTrackerPen(c);
 
-//  setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
+//  setAxisScaleEngine(QwtAxis::XBottom, new QwtLinearScaleEngine);
 //  set_xaxis(-2.0, 2.0);
-//  setAxisTitle(QwtPlot::xBottom, "In-phase");
+//  setAxisTitle(QwtAxis::XBottom, "In-phase");
 
-//  setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+//  setAxisScaleEngine(QwtAxis::YLeft, new QwtLinearScaleEngine);
 //  set_yaxis(-2.0, 2.0);
-//  setAxisTitle(QwtPlot::yLeft, "Quadrature");
+//  setAxisTitle(QwtAxis::YLeft, "Quadrature");
   updateAxes();
 
   // Setup dataPoints and plot vectors

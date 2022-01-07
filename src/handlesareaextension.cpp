@@ -41,7 +41,7 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 
 		for (int i = 0; i < majorTicks.size(); ++i) {
 			currentValue = majorTicks.at(i);
-			pointVal = plot->transform(QwtPlot::xBottom, currentValue) + leftP;
+			pointVal = plot->transform(QwtAxis::XBottom, currentValue) + leftP;
 
 			const QString text = plot->formatXValue(currentValue, 2);
 
@@ -75,7 +75,7 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 
 		// PainterSaveRestore psr(painter);
 
-		const QwtInterval interval = plot->axisInterval(QwtPlot::xBottom);
+		const QwtInterval interval = plot->axisInterval(QwtAxis::XBottom);
 
 		const int labels = plot->xAxisNumDiv() + 1;
 
@@ -110,7 +110,7 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 		}
 
 		// get nr of major ticks
-		const int nrMajorTicks = plot->axisScaleDiv(QwtPlot::xBottom).ticks(QwtScaleDiv::MajorTick).size();
+		const int nrMajorTicks = plot->axisScaleDiv(QwtAxis::XBottom).ticks(QwtScaleDiv::MajorTick).size();
 		const int midLabelTick = nrMajorTicks / 2;
 
 		if (allLabelsTheSame) {
@@ -240,7 +240,7 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 
 		for (int i = 0; i < majorTicks.size(); ++i) {
 			currentValue = majorTicks.at(i);
-			pointVal = plot->transform(QwtPlot::xTop, currentValue) + leftP;
+			pointVal = plot->transform(QwtAxis::XTop, currentValue) + leftP;
 
 			const QString text = plot->formatXValue(currentValue, 2);
 
@@ -276,7 +276,7 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 
 		// PainterSaveRestore psr(painter);
 
-		const QwtInterval interval = plot->axisInterval(QwtPlot::xTop);
+		const QwtInterval interval = plot->axisInterval(QwtAxis::XTop);
 
 		const int labels = plot->xAxisNumDiv() + 1;
 
@@ -310,7 +310,7 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 		}
 
 		// get nr of major ticks
-		const int nrMajorTicks = plot->axisScaleDiv(QwtPlot::xTop).ticks(QwtScaleDiv::MajorTick).size();
+		const int nrMajorTicks = plot->axisScaleDiv(QwtAxis::XTop).ticks(QwtScaleDiv::MajorTick).size();
 		const int midLabelTick = nrMajorTicks / 2;
 
 		if (allLabelsTheSame) {
@@ -444,7 +444,7 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 
 		for (int i = 0; i < majorTicks.size(); ++i) {
 			currentValue = majorTicks.at(i);
-			pointVal = plot->transform(QwtPlot::yLeft, currentValue) + topP;
+			pointVal = plot->transform(QwtAxis::YLeft, currentValue) + topP;
 
 			const QString text = plot->formatYValue(currentValue, 2);
 
@@ -475,7 +475,7 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 	else
 	{
 
-		const QwtInterval interval = plot->axisInterval(QwtPlot::yLeft);
+		const QwtInterval interval = plot->axisInterval(QwtAxis::YLeft);
 
 		const int labels = plot->yAxisNumDiv();
 
@@ -511,7 +511,7 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 		}
 
 		// get nr of major ticks
-		const int nrMajorTicks = plot->axisScaleDiv(QwtPlot::yLeft).ticks(QwtScaleDiv::MajorTick).size();
+		const int nrMajorTicks = plot->axisScaleDiv(QwtAxis::YLeft).ticks(QwtScaleDiv::MajorTick).size();
 		const int midLabelTick = nrMajorTicks / 2;
 
 		if (allLabelsTheSame) {

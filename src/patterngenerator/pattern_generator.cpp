@@ -274,8 +274,8 @@ void PatternGenerator::setupUi()
 	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 
-	m_plot.enableAxis(QwtPlot::yLeft, false);
-	m_plot.enableAxis(QwtPlot::xBottom, false);
+	m_plot.setAxisVisible(QwtAxis::YLeft, false);
+	m_plot.setAxisVisible(QwtAxis::XBottom, false);
 
 	m_plot.setUsingLeftAxisScales(false);
 	m_plot.enableLabels(false);

@@ -189,8 +189,8 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
   d_autoscale_state = false;
 
   // Reconfigure the bottom horizontal axis that was created by the base class
-  configureAxis(QwtPlot::xBottom, 0, pfXaxis);
-  configureAxis(QwtPlot::yLeft, 0, pfYaxis);
+  configureAxis(QwtAxis::XBottom, 0, pfXaxis);
+  configureAxis(QwtAxis::YLeft, 0, pfYaxis);
 
   d_xAxisUnit = "";
   d_yAxisUnit = "";
@@ -558,11 +558,11 @@ TimeDomainDisplayPlot::_resetXAxisPoints(double*& xAxis, unsigned long long numP
 //  QRectF zbase = d_zoomer->zoomBase();
 
 //  if(d_semilogx) {
-//    setAxisScale(QwtPlot::xBottom, 1e-1, d_numPoints*delt);
+//    setAxisScale(QwtAxis::XBottom, 1e-1, d_numPoints*delt);
 //    zbase.setLeft(1e-1);
 //  }
 //  else {
-//    setAxisScale(QwtPlot::xBottom, 0, d_numPoints*delt);
+//    setAxisScale(QwtAxis::XBottom, 0, d_numPoints*delt);
 //    zbase.setLeft(0);
 //  }
 
@@ -621,7 +621,7 @@ TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 	d_zoomer[zoomerIdx]->setTrackerPen(getLineColor(zoomerIdx));
 
 	d_zoomer[zoomerIdx]->setEnabled(true);
-	d_zoomer[zoomerIdx]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, zoomerIdx));
+	d_zoomer[zoomerIdx]->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, zoomerIdx));
 }
 
 void
@@ -646,7 +646,7 @@ TimeDomainDisplayPlot::removeZoomer(unsigned int zoomerIdx)
 
 	for (int i = 0; i < d_zoomer.size(); ++i) {
 		if (d_zoomer[i]->isEnabled()) {
-			d_zoomer[i]->setAxes(QwtAxisId(QwtPlot::xBottom, 0), QwtAxisId(QwtPlot::yLeft, i));
+			d_zoomer[i]->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, i));
 			d_zoomer[i]->setTrackerPen(getLineColor(i));
 		}
 	}
@@ -719,7 +719,7 @@ void TimeDomainDisplayPlot::setYaxisUnit(QString unitType)
 	if (d_yAxisUnit != unitType) {
 		d_yAxisUnit = unitType;
 
-		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::yLeft));
+		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxis::YLeft));
 		if (scaleDraw)
 			scaleDraw->setUnitType(d_yAxisUnit);
 	}
@@ -735,7 +735,7 @@ void TimeDomainDisplayPlot::setXaxisUnit(QString unitType)
 	if (d_xAxisUnit != unitType) {
 		d_xAxisUnit = unitType;
 
-		OscScaleDraw* scaleDraw = static_cast<OscScaleDraw*>(this->axisScaleDraw(QwtPlot::xBottom));
+		OscScaleDraw* scaleDraw = static_cast<OscScaleDraw*>(this->axisScaleDraw(QwtAxis::XBottom));
 		if (scaleDraw)
 			scaleDraw->setUnitType(d_xAxisUnit);
 	}
@@ -830,13 +830,13 @@ TimeDomainDisplayPlot::setSemilogx(bool en)
 {
   d_semilogx = en;
   if(!d_semilogx) {
-    setAxisScaleEngine(QwtPlot::xBottom, new QwtLinearScaleEngine);
+    setAxisScaleEngine(QwtAxis::XBottom, new QwtLinearScaleEngine);
   }
   else {
 #if QWT_VERSION < 0x060100
-    setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+    setAxisScaleEngine(QwtAxis::XBottom, new QwtLog10ScaleEngine);
 #else /* QWT_VERSION < 0x060100 */
-    setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+    setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
 #endif /*QWT_VERSION < 0x060100 */
   }
   for (unsigned int i = 0; i < d_sinkManager.sinkListLength(); i++)
@@ -850,20 +850,20 @@ TimeDomainDisplayPlot::setSemilogy(bool en)
     d_semilogy = en;
 
 #if QWT_VERSION < 0x060100
-    double max = axisScaleDiv(QwtPlot::yLeft)->upperBound();
+    double max = axisScaleDiv(QwtAxis::YLeft)->upperBound();
 #else /* QWT_VERSION < 0x060100 */
-    double max = axisScaleDiv(QwtPlot::yLeft).upperBound();
+    double max = axisScaleDiv(QwtAxis::YLeft).upperBound();
 #endif /* QWT_VERSION < 0x060100 */
 
     if(!d_semilogy) {
-      setAxisScaleEngine(QwtPlot::yLeft, new QwtLinearScaleEngine);
+      setAxisScaleEngine(QwtAxis::YLeft, new QwtLinearScaleEngine);
       setYaxis(-pow(10.0, max/10.0), pow(10.0, max/10.0));
     }
     else {
 #if QWT_VERSION < 0x060100
-      setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+      setAxisScaleEngine(QwtAxis::YLeft, new QwtLog10ScaleEngine);
 #else /* QWT_VERSION < 0x060100 */
-      setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
+      setAxisScaleEngine(QwtAxis::YLeft, new QwtLogScaleEngine);
 #endif /*QWT_VERSION < 0x060100 */
       setYaxis(1e-10, 10.0*log10(max));
     }
@@ -930,7 +930,7 @@ bool TimeDomainDisplayPlot::isZoomerEnabled()
 
 void TimeDomainDisplayPlot::setZoomerVertAxis(int index)
 {
-	if (index < -1 || index >= axesCount(QwtPlot::yLeft))
+	if (index < -1 || index >= axesCount(QwtAxis::YLeft))
 		return;
 
 	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
@@ -946,7 +946,7 @@ QString TimeDomainDisplayPlot::timeScaleValueFormat(double value, int precision)
 
 QString TimeDomainDisplayPlot::timeScaleValueFormat(double value)
 {
-	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::xBottom));
+	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxis::XBottom));
 
 	return d_yAxisFormatter->format(value, "", scale->getFloatPrecison());
 }
@@ -959,7 +959,7 @@ QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value, int precision
 
 QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value)
 {
-	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtPlot::yLeft));
+	OscScaleDraw *scale = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxis::YLeft));
 
 	return d_xAxisFormatter->format(value, d_yAxisUnit, scale->getFloatPrecison());
 }
@@ -971,7 +971,7 @@ TimeDomainDisplayPlot::setYLabel(const std::string &label,
   std::string l = label;
   if(unit.length() > 0)
     l += " (" + unit + ")";
-  setAxisTitle(QwtPlot::yLeft, QString(l.c_str()));
+  setAxisTitle(QwtAxis::YLeft, QString(l.c_str()));
 }
 
 void
@@ -1380,7 +1380,7 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx, PrefixFormat
 	unsigned int floatPrecision;
 	unsigned int numDivs;
 
-	if (axisPos == QwtPlot::yLeft) {
+	if (axisPos == QwtAxis::YLeft) {
 		d_xAxisFormatter = prefixFormatter;
 		unit = d_yAxisUnit;
 		floatPrecision = 2;
@@ -1401,7 +1401,7 @@ void TimeDomainDisplayPlot::configureAxis(int axisPos, int axisIdx, PrefixFormat
 	OscScaleDraw *scaleDraw = new OscScaleDraw(prefixFormatter, unit);
 	scaleDraw->setFloatPrecision(floatPrecision);
 	this->setAxisScaleDraw(axis, scaleDraw);
-	if (axisPos == QwtPlot::yLeft) {
+	if (axisPos == QwtAxis::YLeft) {
 		//yLeft 0 has a different position than the rest, so we
 		//give it a bigger minimum extent in order to align it with
 		//the other yLeft axes.

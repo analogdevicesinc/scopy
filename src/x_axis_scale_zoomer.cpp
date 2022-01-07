@@ -51,7 +51,7 @@ QwtText XAxisScaleZoomer::trackerText(const QPoint &p) const
 	QPointF dp = QwtPlotZoomer::invTransform(p);
 
 	const dBgraph *plt = dynamic_cast<const dBgraph *>(plot());
-	t.setText(plt->getScaleValueFormat(dp.x(), QwtPlot::xTop, 4) + ", " +
-		  plt->getScaleValueFormat(dp.y(), QwtPlot::yLeft));
+	t.setText(plt->getScaleValueFormat(dp.x(), QwtAxis::XTop, 4) + ", " +
+		  plt->getScaleValueFormat(dp.y(), QwtAxis::YLeft));
 	return t;
 }

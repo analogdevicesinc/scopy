@@ -169,7 +169,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     }
 
     if (edges.back().first + 1 == m_endSample - 1) {
-	    displayedData += QPointF(plot()->axisInterval(QwtAxis::xBottom).maxValue(), displayedData.back().y());
+	    displayedData += QPointF(plot()->axisInterval(QwtAxis::XBottom).maxValue(), displayedData.back().y());
     }
 
     painter->save();
@@ -193,7 +193,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
         return;
     }
 
-    QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
+    QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
 
     int start = fromTimeToSample(interval.minValue());
     int end = fromTimeToSample(interval.maxValue());
@@ -229,7 +229,7 @@ void LogicDataCurve::getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &
 
 	double dist = xMap.transform(fromSampleToTime(1)) - xMap.transform(fromSampleToTime(0));
 
-	QwtInterval interval = plot()->axisInterval(QwtAxis::xBottom);
+	QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
 	uint64_t firstEdge = edgeAtX(fromTimeToSample(interval.minValue()), m_edges);
 	uint64_t lastEdge = edgeAtX(fromTimeToSample(interval.maxValue()), m_edges);
 

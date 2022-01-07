@@ -43,17 +43,17 @@ void dBgraph::setupVerticalBars()
 
 	d_frequencyBar->setPen(frequencyLinePen);
 	d_frequencyBar->setVisible(true);
-	d_frequencyBar->setMobileAxis(QwtPlot::xTop);
+	d_frequencyBar->setMobileAxis(QwtAxis::XTop);
 	d_frequencyBar->setPixelPosition(0);
 
 	d_plotBar->setPen(plotLinePen);
-	d_plotBar->setMobileAxis(QwtPlot::xTop);
+	d_plotBar->setMobileAxis(QwtAxis::XTop);
 
 	connect(d_frequencyBar, &VertBar::pixelPositionChanged,
 		this, &dBgraph::frequencyBarPositionChanged);
 
-	d_vBar1->setMobileAxis(QwtPlot::xTop);
-	d_vBar2->setMobileAxis(QwtPlot::xTop);
+	d_vBar1->setMobileAxis(QwtAxis::XTop);
+	d_vBar2->setMobileAxis(QwtAxis::XTop);
 }
 
 void dBgraph::setupReadouts()
@@ -85,11 +85,11 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	delta_label(false),
 	d_plotBarEnabled(true)
 {
-	enableAxis(QwtPlot::xBottom, false);
-	enableAxis(QwtPlot::xTop, true);
+	setAxisVisible(QwtAxis::XBottom, false);
+	setAxisVisible(QwtAxis::XTop, true);
 
-	setAxisAutoScale(QwtPlot::yLeft, false);
-	setAxisAutoScale(QwtPlot::xTop, false);
+	setAxisAutoScale(QwtAxis::YLeft, false);
+	setAxisAutoScale(QwtAxis::XTop, false);
 
 	QColor plotColor;
 	if (QIcon::themeName() == "scopy-default") {
@@ -101,19 +101,19 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	EdgelessPlotGrid *grid = new EdgelessPlotGrid;
 	grid->setMajorPen(plotColor, 1.0, Qt::DashLine);
 
-	grid->setXAxis(QwtPlot::xTop);
+	grid->setXAxis(QwtAxis::XTop);
 	grid->attach(this);
 
 	plotLayout()->setAlignCanvasToScales(true);
 
 	curve.attach(this);
 	curve.setRenderHint(QwtPlotItem::RenderAntialiased);
-	curve.setXAxis(QwtPlot::xTop);
-	curve.setYAxis(QwtPlot::yLeft);
+	curve.setXAxis(QwtAxis::XTop);
+	curve.setYAxis(QwtAxis::YLeft);
 
 	reference.setRenderHint(QwtPlotItem::RenderAntialiased);
-	reference.setXAxis(QwtPlot::xTop);
-	reference.setYAxis(QwtPlot::yLeft);
+	reference.setXAxis(QwtAxis::XTop);
+	reference.setYAxis(QwtAxis::YLeft);
 	reference.setPen(Qt::red, 1.5);
 
 	thickness = 1;
@@ -123,7 +123,7 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	OscScaleEngine *scaleLeft = new OscScaleEngine;
 	setYaxisNumDiv(7);
 	scaleLeft->setMajorTicksCount(7);
-	this->setAxisScaleEngine(QwtPlot::yLeft,
+	this->setAxisScaleEngine(QwtAxis::YLeft,
 				 static_cast<QwtScaleEngine *>(scaleLeft));
 	/* draw_x / draw_y: Outmost X / Y scales. Only draw the labels */
 
@@ -131,14 +131,14 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	draw_x->setFloatPrecision(2);
 	draw_x->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 	draw_x->enableComponent(QwtAbstractScaleDraw::Backbone, false);
-	setAxisScaleDraw(QwtPlot::xTop, draw_x);
+	setAxisScaleDraw(QwtAxis::XTop, draw_x);
 
 	draw_y = new OscScaleDraw("dB");
 	draw_y->setFloatPrecision(2);
 	draw_y->enableComponent(QwtAbstractScaleDraw::Ticks, false);
 	draw_y->enableComponent(QwtAbstractScaleDraw::Backbone, false);
 	draw_y->setMinimumExtent(50);
-	setAxisScaleDraw(QwtPlot::yLeft, draw_y);
+	setAxisScaleDraw(QwtAxis::YLeft, draw_y);
 
 	d_leftHandlesArea->setMinimumWidth(60);
 	d_leftHandlesArea->setTopPadding(10);
@@ -162,9 +162,9 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 		/* Top/bottom scales must be sync'd to xTop; left/right scales
 	 * must be sync'd to yLeft */
 		if (i < 2) {
-			scaleItem->setXAxis(QwtPlot::xTop);
+			scaleItem->setXAxis(QwtAxis::XTop);
 		} else {
-			scaleItem->setYAxis(QwtPlot::yLeft);
+			scaleItem->setYAxis(QwtAxis::YLeft);
 		}
 
 		scaleItem->scaleDraw()->enableComponent(
@@ -194,18 +194,18 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	margins.setBottom(0);
 	setContentsMargins(margins);
 
-	enableAxis(QwtPlot::yLeft, false);
-	enableAxis(QwtPlot::xTop, false);
+	setAxisVisible(QwtAxis::YLeft, false);
+	setAxisVisible(QwtAxis::XTop, false);
 
-	QwtScaleWidget *scaleWidget = axisWidget(QwtPlot::xTop);
+	QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XTop);
 	const int fmw = QFontMetrics(scaleWidget->font()).width("-XXXX.XX XX");
 	scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
 
 	setupVerticalBars();
 	setupReadouts();
 
-	markerIntersection1->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
-	markerIntersection2->setAxes(QwtPlot::xTop, QwtPlot::yLeft);
+	markerIntersection1->setAxes(QwtAxis::XTop, QwtAxis::YLeft);
+	markerIntersection2->setAxes(QwtAxis::XTop, QwtAxis::YLeft);
 }
 
 dBgraph::~dBgraph()
@@ -249,8 +249,8 @@ void dBgraph::parametersOverrange(bool enable)
 
 void dBgraph::setAxesScales(double xmin, double xmax, double ymin, double ymax)
 {
-	setAxisScale(QwtPlot::xTop, xmin, xmax);
-	setAxisScale(QwtPlot::yLeft, ymin, ymax);
+	setAxisScale(QwtAxis::XTop, xmin, xmax);
+	setAxisScale(QwtAxis::YLeft, ymin, ymax);
 }
 
 void dBgraph::setAxesTitles(const QString& x, const QString& y)
@@ -258,13 +258,13 @@ void dBgraph::setAxesTitles(const QString& x, const QString& y)
 	QwtText xTitle(x);
 	QwtText yTitle(y);
 
-	QFont font = axisTitle(QwtPlot::xTop).font();
+	QFont font = axisTitle(QwtAxis::XTop).font();
 	font.setWeight(QFont::Normal);
 	xTitle.setFont(font);
 	yTitle.setFont(font);
 
-	setAxisTitle(QwtPlot::xTop, xTitle);
-	setAxisTitle(QwtPlot::yLeft, yTitle);
+	setAxisTitle(QwtAxis::XTop, xTitle);
+	setAxisTitle(QwtAxis::YLeft, yTitle);
 }
 
 void dBgraph::plot(double x, double y)
@@ -347,7 +347,7 @@ void dBgraph::setShowZero(bool en)
 	scaleLeft->setMajorTicksCount(7);
 	scaleLeft->showZero(en);
 
-	this->setAxisScaleEngine(QwtPlot::yLeft,
+	this->setAxisScaleEngine(QwtAxis::YLeft,
 				 static_cast<QwtScaleEngine *>(scaleLeft));
 
 	replot();
@@ -404,32 +404,32 @@ double dBgraph::getThickness()
 
 QString dBgraph::xTitle() const
 {
-	return axisTitle(QwtPlot::xTop).text();
+	return axisTitle(QwtAxis::XTop).text();
 }
 
 QString dBgraph::yTitle() const
 {
-	return axisTitle(QwtPlot::yLeft).text();
+	return axisTitle(QwtAxis::YLeft).text();
 }
 
 void dBgraph::setXTitle(const QString& title)
 {
 	QwtText xTitle(title);
-	QFont font = axisTitle(QwtPlot::xTop).font();
+	QFont font = axisTitle(QwtAxis::XTop).font();
 	font.setWeight(QFont::Normal);
 	xTitle.setFont(font);
 
-	setAxisTitle(QwtPlot::xTop, xTitle);
+	setAxisTitle(QwtAxis::XTop, xTitle);
 }
 
 void dBgraph::setYTitle(const QString& title)
 {
 	QwtText yTitle(title);
-	QFont font = axisTitle(QwtPlot::xTop).font();
+	QFont font = axisTitle(QwtAxis::XTop).font();
 	font.setWeight(QFont::Normal);
 	yTitle.setFont(font);
 
-	setAxisTitle(QwtPlot::yLeft, yTitle);
+	setAxisTitle(QwtAxis::YLeft, yTitle);
 	d_cursorReadouts->setVoltageCursor1LabelText(title.mid(0,3)+"1 = ");
 	d_cursorReadouts->setVoltageCursor2LabelText(title.mid(0,3)+"2 = ");
 	d_cursorReadouts->setDeltaVoltageLabelText("Δ"+title.mid(0,3)+" = ");
@@ -438,13 +438,13 @@ void dBgraph::setYTitle(const QString& title)
 void dBgraph::setXMin(double val)
 {
 	zoomer->resetZoom();
-	setAxisScale(QwtPlot::xTop, val, xmax);
+	setAxisScale(QwtAxis::XTop, val, xmax);
 	xmin = val;
 	draw_x->invalidateCache();
 
 	zoomer->setZoomBase();
 	replot();
-	auto div = axisScaleDiv(QwtPlot::xTop);
+	auto div = axisScaleDiv(QwtAxis::XTop);
 	setXaxisNumDiv((div.ticks(2)).size() - 1);
 	setXaxisMajorTicksPos(div.ticks(2));
 }
@@ -452,20 +452,20 @@ void dBgraph::setXMin(double val)
 void dBgraph::setXMax(double val)
 {
 	zoomer->resetZoom();
-	setAxisScale(QwtPlot::xTop, xmin, val);
+	setAxisScale(QwtAxis::XTop, xmin, val);
 	xmax = val;
 	draw_x->invalidateCache();
 
 	zoomer->setZoomBase();
 	replot();
-	auto div = axisScaleDiv(QwtPlot::xTop);
+	auto div = axisScaleDiv(QwtAxis::XTop);
 	setXaxisNumDiv((div.ticks(2)).size() - 1);
 	setXaxisMajorTicksPos(div.ticks(2));
 }
 
 void dBgraph::setYMin(double val)
 {
-	setAxisScale(QwtPlot::yLeft, val, ymax);
+	setAxisScale(QwtAxis::YLeft, val, ymax);
 	ymin = val;
 	replot();
 	d_leftHandlesArea->repaint();
@@ -478,7 +478,7 @@ void dBgraph::setYMin(double val)
 
 void dBgraph::setYMax(double val)
 {
-	setAxisScale(QwtPlot::yLeft, ymin, val);
+	setAxisScale(QwtAxis::YLeft, ymin, val);
 	ymax = val;
 	replot();
 
@@ -511,9 +511,9 @@ void dBgraph::useLogFreq(bool use_log_freq)
 {
 	if (use_log_freq) {
 		setPlotLogaritmic(true);
-		this->setAxisScaleEngine(QwtPlot::xTop, new QwtLogScaleEngine);
+		this->setAxisScaleEngine(QwtAxis::XTop, new QwtLogScaleEngine);
 		replot();
-		auto div = axisScaleDiv(QwtPlot::xTop);
+		auto div = axisScaleDiv(QwtAxis::XTop);
 		setXaxisNumDiv((div.ticks(2)).size() - 1);
 		setXaxisMajorTicksPos(div.ticks(2));
 	} else {
@@ -521,7 +521,7 @@ void dBgraph::useLogFreq(bool use_log_freq)
 		auto scaleTop = new OscScaleEngine;
 		scaleTop->setMajorTicksCount(9);
 		setXaxisNumDiv(8);
-		this->setAxisScaleEngine(QwtPlot::xTop, scaleTop);
+		this->setAxisScaleEngine(QwtAxis::XTop, scaleTop);
 	}
 
 	this->log_freq = use_log_freq;
@@ -533,7 +533,7 @@ void dBgraph::useLogFreq(bool use_log_freq)
 
 	// Use delta only when log scale is disabled and delta
 	// label mode is enabled
-	auto sw = axisWidget(QwtPlot::xTop);
+	auto sw = axisWidget(QwtAxis::XTop);
 	auto *sd = dynamic_cast<OscScaleDraw *>(sw->scaleDraw());
 	sd->enableDeltaLabel(delta_label & (!use_log_freq));
 	sw->repaint();
@@ -547,7 +547,7 @@ void dBgraph::useDeltaLabel(bool use_delta)
 		delta_label = use_delta;
 
 		if (!log_freq) {
-			auto sw = axisWidget(QwtPlot::xTop);
+			auto sw = axisWidget(QwtAxis::XTop);
 			auto *sd = dynamic_cast<OscScaleDraw *>(sw->scaleDraw());
 			sd->enableDeltaLabel(use_delta);
 			sw->repaint();
@@ -752,8 +752,8 @@ void dBgraph::setYAxisInterval(double min, double max, double correction)
 void dBgraph::scaleDivChanged()
 {
 	QwtPlot *plt = static_cast<QwtPlot *>((sender())->parent());
-	QwtInterval intv = plt->axisInterval(QwtPlot::xTop);
-	this->setAxisScale(QwtPlot::xTop, intv.minValue(), intv.maxValue());
+	QwtInterval intv = plt->axisInterval(QwtAxis::XTop);
+	this->setAxisScale(QwtAxis::XTop, intv.minValue(), intv.maxValue());
 	this->replot();
 
 	onVCursor1Moved(d_vBar1->plotCoord().x());
@@ -788,7 +788,7 @@ void dBgraph::showEvent(QShowEvent *event)
 {
 	d_hCursorHandle1->updatePosition();
 	d_hCursorHandle2->updatePosition();
-	auto sw = axisWidget(QwtPlot::xTop);
+	auto sw = axisWidget(QwtAxis::XTop);
 	sw->scaleDraw()->invalidateCache();
 	sw->repaint();
 }

@@ -581,9 +581,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	api->load(*settings);
 	api->js_register(engine);
 
-	connect((m_dBgraph.getAxisWidget(QwtPlot::xTop)), SIGNAL(scaleDivChanged()),
+	connect((m_dBgraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()),
 		&m_phaseGraph, SLOT(scaleDivChanged()));
-	connect((m_phaseGraph.getAxisWidget(QwtPlot::xTop)), SIGNAL(scaleDivChanged()),
+	connect((m_phaseGraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()),
 		&m_dBgraph, SLOT(scaleDivChanged()));
 
 	connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
