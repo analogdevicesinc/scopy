@@ -33,6 +33,7 @@ public class ScopyApplication extends QtApplication
 	@Override
 	public void onCreate()
 	{
+		System.out.println("QtApplication started");
 		String apk = getApplicationInfo().sourceDir;
 		String cache = getApplicationContext().getCacheDir().toString();
 		System.out.println("sourcedir: "+ getApplicationInfo().sourceDir);
@@ -58,4 +59,5 @@ public class ScopyApplication extends QtApplication
 
 		super.onCreate();
 	}
+
 }
