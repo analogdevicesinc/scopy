@@ -40,13 +40,7 @@
 #include "scopy_color_editor.h"
 #include "application_restarter.h"
 
-
 using namespace adiscope;
-
-ToolLauncher* tl_ptr;
-ToolLauncher* adiscope::getToolLauncherInstance() {
-	return tl_ptr;
-}
 
 int main(int argc, char **argv)
 {
@@ -171,7 +165,6 @@ int main(int argc, char **argv)
 	}
 
 	ToolLauncher launcher(prevCrashDump);
-	tl_ptr = &launcher;
 	launcher.getPrefPanel()->setColorEditor(colorEditor);
 
 	bool nogui = parser.isSet("nogui");
