@@ -33,31 +33,36 @@ public class ScopyActivity extends QtActivity
 {
 	public static native void saveSessionJavaHelper();
 
-        @Override
-        public void onCreate(Bundle savedInstanceState)
-        {
-		super.onCreate(savedInstanceState);		//saveSessionJavaHelper();
-        }
+	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		System.out.println("-- ScopyActivity: onCreate");
+		super.onCreate(savedInstanceState);
+	}
 
-        @Override
-        protected void onStart()
-        {
-                super.onStart();
-        }
+	@Override
+	protected void onStart()
+	{
+		System.out.println("-- ScopyActivity: onStart");
+		super.onStart();
+	}
 
-        @Override
-        protected void onStop()
-        {
-                super.onStop();		
-        }
+	@Override
+	protected void onStop()
+	{
+		System.out.println("-- ScopyActivity: onStop");
+		super.onStop();
+	}
 
 	protected void onPause(){
-		saveSessionJavaHelper();
+		System.out.println("-- ScopyActivity: onPause - saving application state to ini file ");
+		saveSessionJavaHelper(); // actually save the data
 		super.onPause();
 	}
 
 	protected void onDestroy(){
-		super.onPause();
+		System.out.println("-- ScopyActivity: onDestroy ");
+		super.onDestroy();
 	}
 
 	public void restart() {

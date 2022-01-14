@@ -2017,8 +2017,12 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 
 void ToolLauncher::saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/) {
 	qDebug()<<"-- Saving session";
-	getToolLauncherInstance()->tl_api->sync();
-	getToolLauncherInstance()->saveSettings();
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		getToolLauncherInstance()->tl_api->sync();
+		getToolLauncherInstance()->saveSettings();
+	}
 }
 
 void ToolLauncher::registerNativeMethods()
