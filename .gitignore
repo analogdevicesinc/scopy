@@ -11,6 +11,8 @@ deps
 scopy
 android/assets/libsigrokdecode/*
 android/assets/python3.*/*
+resources/stylesheets/default.qss
+resources/stylesheets/light.qss
 !android/src/org/adi/scopy
 *.swp
 html/
