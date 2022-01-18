@@ -665,6 +665,8 @@ void SignalGenerator::settingsLoaded()
 
 void SignalGenerator::readPreferences()
 {
+	bool showFps = prefPanel->getShow_plot_fps();
+	m_plot->setVisibleFpsLabel(showFps);
 	double prefered_periods_nr = prefPanel->getSig_gen_periods_nr();
 	if (nr_of_periods != prefered_periods_nr) {
 		nr_of_periods = prefered_periods_nr;
