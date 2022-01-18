@@ -1,6 +1,7 @@
 #include "BasicPlot.h"
 
 #include <QwtPlotOpenGLCanvas>
+#include <QwtPainter>
 #include <QDebug>
 
 #include <logging_categories.h>
@@ -12,14 +13,34 @@ static int staticPlotId = 0;
 
 #define replotFrameDuration 1000.0/replotFrameRate
 
+bool useOpenGlCanvas = 0;
 BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), replotFrameRate(60)
 {
+	auto openGLEnvVar = qgetenv("SCOPY_USE_OPENGL");
+	useOpenGlCanvas = (bool)openGLEnvVar.toInt();
+
 	connect(&replotTimer,SIGNAL(timeout()),this,SLOT(replotNow()));
-	QwtPlotCanvas *plotCanvas = qobject_cast<QwtPlotCanvas *>( canvas() );
-	plotCanvas->setPaintAttribute(QwtPlotCanvas::BackingStore );
+
+	if(useOpenGlCanvas) {
+		QwtPlotOpenGLCanvas* plotCanvas = qobject_cast< QwtPlotOpenGLCanvas* >( canvas() );
+		if ( plotCanvas == NULL )
+		{
+			plotCanvas = new QwtPlotOpenGLCanvas(this);
+			plotCanvas->setPaintAttribute(QwtPlotAbstractGLCanvas::BackingStore );
 #ifdef IMMEDIATE_PAINT
-	plotCanvas->setPaintAttribute(QwtPlotCanvas::ImmediatePaint, true);
+			plotCanvas->setPaintAttribute(QwtPlotAbstractGLCanvas::ImmediatePaint, true);
 #endif
+			setCanvas( plotCanvas );
+		} else {
+			;
+		}
+	} else {
+		QwtPlotCanvas *plotCanvas = qobject_cast<QwtPlotCanvas *>( canvas() );
+#ifdef IMMEDIATE_PAINT
+		plotCanvas->setPaintAttribute(QwtPlotCanvas::ImmediatePaint, true);
+#endif
+	}
+
 	qDebug(CAT_PLOT)<<QString::number(id)<<"Created plot";
 	id = staticPlotId;
 	staticPlotId++; // for debug
