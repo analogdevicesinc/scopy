@@ -2447,7 +2447,9 @@ void LogicAnalyzer::restoreTriggerState()
 
 void LogicAnalyzer::readPreferences()
 {
-	qDebug() << "reading preferences!!!!";
+	bool showFps = prefPanel->getShow_plot_fps();
+	m_plot.setVisibleFpsLabel(showFps);
+
 	for (GenericLogicPlotCurve *curve : qAsConst(m_plotCurves)) {
 		if (curve->getType() == LogicPlotCurveType::Data) {
 			LogicDataCurve *ldc = dynamic_cast<LogicDataCurve*>(curve);

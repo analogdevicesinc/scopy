@@ -156,6 +156,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 void PatternGenerator::readPreferences()
 {
+	bool showFps = prefPanel->getShow_plot_fps();
+	m_plot.setVisibleFpsLabel(showFps);
 	m_ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 

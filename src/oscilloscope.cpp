@@ -1349,6 +1349,11 @@ void Oscilloscope::settingsLoaded()
 
 void Oscilloscope::readPreferences()
 {
+	bool showFps = prefPanel->getShow_plot_fps();
+	plot.setVisibleFpsLabel(showFps);
+	xy_plot.setVisibleFpsLabel(showFps);
+	fft_plot.setVisibleFpsLabel(showFps);
+	hist_plot.setVisibleFpsLabel(showFps);
 	plot.setGraticuleEnabled(prefPanel->getOsc_graticule_enabled());
 	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 

@@ -1812,6 +1812,9 @@ void NetworkAnalyzer::toggleCursors(bool en)
 
 void NetworkAnalyzer::readPreferences()
 {
+	bool showFps = prefPanel->getShow_plot_fps();
+	m_dBgraph.setVisibleFpsLabel(showFps);
+	m_phaseGraph.setVisibleFpsLabel(showFps);
 	m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
 	m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
 	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
