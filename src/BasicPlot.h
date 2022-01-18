@@ -49,6 +49,7 @@ protected:
 private:
 	bool started;
 	bool debug;
+	bool useOpenGlCanvas;
 	double replotFrameRate;
 	int id = 0;
 	MovingAverage pfps, pms;
