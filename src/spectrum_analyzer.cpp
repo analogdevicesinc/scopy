@@ -779,6 +779,8 @@ void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs)
 }
 
 void SpectrumAnalyzer::readPreferences() {
+	bool showFps = prefPanel->getShow_plot_fps();
+	fft_plot->setVisibleFpsLabel(showFps);
 	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
 	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }

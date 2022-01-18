@@ -70,7 +70,8 @@ Preferences::Preferences(QWidget *parent) :
 	first_application_run(true),
 	check_updates_url("http://swdownloads.analog.com/cse/sw_versions.json"),
 	m_colorEditor(nullptr),
-	m_logging_enabled(false)
+	m_logging_enabled(false),
+	m_show_plot_fps(false)
 {
 	ui->setupUi(this);
 
@@ -211,6 +212,11 @@ Preferences::Preferences(QWidget *parent) :
 
 	connect(ui->tempLutCalibCheckbox, &QCheckBox::stateChanged, [=](int state) {
 		m_attemptTempLutCalib = state;
+		Q_EMIT notify();
+	});
+
+	connect(ui->showPlotFps, &QCheckBox::stateChanged, [=](int state) {
+		m_show_plot_fps = state;
 		Q_EMIT notify();
 	});
 
@@ -394,6 +400,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
 	ui->tempLutCalibCheckbox->setChecked(m_attemptTempLutCalib);
 	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
+	ui->showPlotFps->setChecked(m_show_plot_fps);
 	// by this point the preferences menu is initialized
 	m_initialized = true;
 	ui->autoUpdatesCheckBox->setChecked(automatical_version_checking_enabled);
@@ -429,6 +436,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+bool Preferences::getShow_plot_fps() const
+{
+	return m_show_plot_fps;
+}
+
+void Preferences::setShow_plot_fps(bool newShow_plot_fps)
+{
+	m_show_plot_fps = newShow_plot_fps;
 }
 
 bool Preferences::getDigital_decoders_enabled() const
@@ -680,7 +697,6 @@ void Preferences::setFirst_application_run(bool value)
 {
 	first_application_run = value;
 }
-
 
 void Preferences::setColorEditor(ScopyColorEditor *colorEditor)
 {
@@ -994,4 +1010,13 @@ bool Preferences_API::getFirstApplicationRun() const
 void Preferences_API::setFirstApplicationRun(const bool &first)
 {
 	preferencePanel->first_application_run = first;
+}
+
+
+bool Preferences_API::getShowPlotFps() const {
+	return preferencePanel->m_show_plot_fps;
+}
+void Preferences_API::setShowPlotFps(const bool& fps) {
+	preferencePanel->m_show_plot_fps = fps;
+
 }

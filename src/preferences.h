@@ -141,6 +141,9 @@ public:
 	bool getLogging_enabled() const;
 	void setLogging_enabled(bool value);
 
+	bool getShow_plot_fps() const;
+	void setShow_plot_fps(bool newShow_plot_fps);
+
 Q_SIGNALS:
 
 	void notify();
@@ -190,6 +193,7 @@ private:
 	bool m_attemptTempLutCalib;
 	bool m_skipCalIfCalibrated;
 	bool m_logging_enabled;
+	bool m_show_plot_fps;
 
 	Preferences_API *pref_api;
 
@@ -228,6 +232,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool first_application_run READ getFirstApplicationRun WRITE setFirstApplicationRun)
 	Q_PROPERTY(QString currentStylesheet READ getCurrentStylesheet WRITE setCurrentStylesheet)
 	Q_PROPERTY(QStringList userStylesheets READ getUserStylesheets WRITE setUserStylesheets)
+	Q_PROPERTY(bool showPlotFps READ getShowPlotFps WRITE setShowPlotFps)
 
 
 public:
@@ -310,6 +315,9 @@ public:
 
 	bool getFirstApplicationRun() const;
 	void setFirstApplicationRun(const bool& first);
+
+	bool getShowPlotFps() const;
+	void setShowPlotFps(const bool& first);
 
 	QString getCurrentStylesheet() const;
 	void setCurrentStylesheet(const QString &currentStylesheet);
