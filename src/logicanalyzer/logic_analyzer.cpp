@@ -1960,7 +1960,7 @@ void LogicAnalyzer::startStop(bool start)
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
 
-					std::this_thread::sleep_for(std::chrono::milliseconds(100));
+					std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
 				}
 			} while (totalSamples && !m_stopRequested);
 

@@ -66,6 +66,8 @@ mixed_signal_sink_impl::mixed_signal_sink_impl(adiscope::logic::LogicAnalyzer *l
 					static_cast<double*>(volk_malloc(d_buffer_size * sizeof(double), volk_get_alignment())));
 		memset(d_analog_plot_buffers[i], 0, d_buffer_size * sizeof(double));
 	}
+
+	set_update_time(1/60.0);
 }
 
 int mixed_signal_sink_impl::work(int noutput_items,
@@ -189,6 +191,14 @@ void mixed_signal_sink_impl::set_nsamps(int newsize)
 
 		_reset();
 	}
+}
+
+void mixed_signal_sink_impl::set_update_time(double t)
+{
+  //convert update time to ticks
+  gr::high_res_timer_type tps = gr::high_res_timer_tps();
+  d_update_time = t * tps;
+  d_last_time = 0;
 }
 
 void mixed_signal_sink_impl::set_displayOneBuffer(bool display)
