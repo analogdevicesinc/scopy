@@ -118,8 +118,7 @@ namespace adiscope {
 	d_qApplication = qApp;
       }
 
-      // initialize update time to 10 times a second
-      set_update_time(0.1);
+	  set_update_time(1/60.0);
     }
 
     void

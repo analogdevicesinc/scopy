@@ -584,8 +584,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	connect(ui->refreshBtn, SIGNAL(clicked()),
 		this, SLOT(loadFileCurrentChannelData()));
 
-	time_block_data->time_block->set_update_time(0.001);
-
 	m_plot->addZoomer(0);
 	resetZoom();
 

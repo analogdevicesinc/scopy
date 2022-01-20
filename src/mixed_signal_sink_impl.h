@@ -36,6 +36,7 @@ public:
 	void clean_buffers() override;
 	void set_nsamps(int newsize) override;
 	void set_displayOneBuffer(bool display) override;
+	void set_update_time(double t) override;
 
 private:
 	void _adjust_tags(int adj);

@@ -94,7 +94,7 @@ namespace adiscope {
       set_alignment(std::max(1,alignment_multiple));
 
       this->plot = (HistogramDisplayPlot*)plot;
-      initialize();
+	  initialize();
     }
 
     histogram_sink_f_impl::~histogram_sink_f_impl()
@@ -117,12 +117,11 @@ namespace adiscope {
       if(qApp != NULL) {
 	d_qApplication = qApp;
       }
+	  set_update_time(1/60.0);
 
       plot->setNumBins(d_bins);
       plot->setXaxis(d_xmin, d_xmax);
 
-      // initialize update time to 10 times a second
-      set_update_time(0.1);
     }
 
     void
