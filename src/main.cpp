@@ -124,10 +124,12 @@ int main(int argc, char **argv)
 	parser.addVersionOption();
 
 	parser.addOptions({
-				  { {"s", "script"}, "Run given script.", "script" },
-				  { {"n", "nogui"}, "Run Scopy without GUI" },
-				  { {"d", "nodecoders"}, "Run Scopy without digital decoders"},
-				  { {"nd", "nonativedialog"}, "Run Scopy without native file dialogs"}
+					{ {"s", "script"}, "Run given script.", "script" },
+					{ {"n", "nogui"}, "Run Scopy without GUI" },
+					{ {"d", "nodecoders"}, "Run Scopy without digital decoders"},
+					{ {"nd", "nonativedialog"}, "Run Scopy without native file dialogs"},
+					{ {"og", "opengl"}, "Force use OpenGL for plots"} ,
+					{ {"nog", "noopengl"}, "Force software rendering for plots"} ,
 			  });
 
 	parser.process(app);
@@ -171,6 +173,19 @@ int main(int argc, char **argv)
 
 	if (app.styleSheet().isEmpty()) {
 		app.setStyleSheet(colorEditor->getStyleSheet());
+	}
+
+	bool openGl = parser.isSet("opengl");
+	bool noOpenGl = parser.isSet("noopengl");
+	if(openGl && noOpenGl) {
+		qDebug()<<"Ambigous openGL parameters";
+		return -1;
+	}
+	if(openGl) {
+		qputenv("SCOPY_USE_OPENGL","1");
+	}
+	if(noOpenGl) {
+		qputenv("SCOPY_USE_OPENGL","0");
 	}
 
 	ToolLauncher launcher(prevCrashDump);

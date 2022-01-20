@@ -31,6 +31,7 @@
 #include <QTextStream>
 #include <scopyApplication.hpp>
 #include "application_restarter.h"
+#include <QDebug>
 
 
 using namespace adiscope;
@@ -71,7 +72,8 @@ Preferences::Preferences(QWidget *parent) :
 	check_updates_url("http://swdownloads.analog.com/cse/sw_versions.json"),
 	m_colorEditor(nullptr),
 	m_logging_enabled(false),
-	m_show_plot_fps(false)
+	m_show_plot_fps(false),
+	m_use_open_gl(false)
 {
 	ui->setupUi(this);
 
@@ -261,6 +263,16 @@ Preferences::Preferences(QWidget *parent) :
 		Q_EMIT notify();
 	});
 
+	connect(ui->useOpenGl, &QCheckBox::stateChanged, [=](int state){
+		m_use_open_gl = state;
+
+		qputenv("SCOPY_USE_OPENGL",QByteArray::number(state));
+		if (m_initialized) {
+			requestRestart();
+		}
+		Q_EMIT notify();
+	});
+
 	ui->comboBoxTheme->addItem("default");
 	ui->comboBoxTheme->addItem("light");
 	ui->comboBoxTheme->addItem("browse");
@@ -296,6 +308,8 @@ Preferences::Preferences(QWidget *parent) :
 		}
 	});
 }
+
+
 
 void Preferences::requestRestart()
 {
@@ -401,6 +415,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->tempLutCalibCheckbox->setChecked(m_attemptTempLutCalib);
 	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
 	ui->showPlotFps->setChecked(m_show_plot_fps);
+	ui->useOpenGl->setChecked(m_use_open_gl);
 	// by this point the preferences menu is initialized
 	m_initialized = true;
 	ui->autoUpdatesCheckBox->setChecked(automatical_version_checking_enabled);
@@ -436,6 +451,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+bool Preferences::getUse_open_gl() const
+{
+	return m_use_open_gl;
+}
+
+void Preferences::setUse_open_gl(bool newUse_open_gl)
+{
+	m_use_open_gl = newUse_open_gl;
 }
 
 bool Preferences::getShow_plot_fps() const
@@ -1012,11 +1037,23 @@ void Preferences_API::setFirstApplicationRun(const bool &first)
 	preferencePanel->first_application_run = first;
 }
 
-
-bool Preferences_API::getShowPlotFps() const {
+bool Preferences_API::getShowPlotFps() const
+{
 	return preferencePanel->m_show_plot_fps;
 }
-void Preferences_API::setShowPlotFps(const bool& fps) {
-	preferencePanel->m_show_plot_fps = fps;
 
+void Preferences_API::setShowPlotFps(const bool& fps)
+{
+	preferencePanel->m_show_plot_fps = fps;
+}
+
+bool Preferences_API::getUseOpenGl() const
+{
+	return preferencePanel->m_use_open_gl;
+}
+
+void Preferences_API::setUseOpenGl(const bool& val)
+{
+	preferencePanel->m_use_open_gl = val;
+	qputenv("SCOPY_USE_OPENGL",QByteArray::number(val));
 }
