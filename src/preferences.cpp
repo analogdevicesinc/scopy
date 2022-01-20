@@ -265,8 +265,8 @@ Preferences::Preferences(QWidget *parent) :
 
 	connect(ui->useOpenGl, &QCheckBox::stateChanged, [=](int state){
 		m_use_open_gl = state;
-
 		qputenv("SCOPY_USE_OPENGL",QByteArray::number(state));
+
 		if (m_initialized) {
 			requestRestart();
 		}
@@ -290,26 +290,18 @@ Preferences::Preferences(QWidget *parent) :
 
 			m_colorEditor->setUserStylesheets({filePath});
 			m_colorEditor->setCurrentStylesheet(filePath);
-
-			requestRestart();
-
-
 		} else {
 			m_colorEditor->setCurrentStylesheet(stylesheet);
-
-			// force saving of the ini file as the new Scopy process
-			// when restarted will start before scopy closes. A race condition
-			// will appear on who gets to read/write to the .ini file first
-			QString preference_ini_file = getPreferenceIniFile();
-			QSettings settings(preference_ini_file, QSettings::IniFormat);
-			pref_api->save(settings);
-
-			requestRestart();
 		}
+		requestRestart();
 	});
 }
 
-
+void Preferences::save() {
+	QString preference_ini_file = getPreferenceIniFile();
+	QSettings settings(preference_ini_file, QSettings::IniFormat);
+	pref_api->save(settings);
+}
 
 void Preferences::requestRestart()
 {
@@ -324,7 +316,7 @@ void Preferences::requestRestart()
 	int ret = msgBox.exec();
 
 	if (ret == QMessageBox::Ok) {
-		// restart:
+		save(); // save before restarting
 		adiscope::ApplicationRestarter::triggerRestart();
 	}
 }

@@ -55,6 +55,7 @@
 #include <QJsonDocument>
 #include <QDesktopServices>
 #include <QSpacerItem>
+#include <QOpenGLWidget>
 #if __ANDROID__
 #include <QtAndroidExtras/QtAndroid>
 #include <QAndroidJniEnvironment>
@@ -117,7 +118,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	skip_calibration_if_already_calibrated(true),
 	m_adc_tools_failed(false),
 	m_dac_tools_failed(false),
-	about(nullptr)
+	about(nullptr),
+	openGlLoaded(false)
       #ifdef __ANDROID__
       ,jnienv(new QAndroidJniEnvironment())
       #endif
@@ -126,8 +128,6 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 		notifier.setEnabled(false);
 
 	ui->setupUi(this);
-
-
 #ifdef __ANDROID__ // LIBUSB WEAK_AUTHORITY
 	libusb_set_option(NULL,LIBUSB_OPTION_ANDROID_JAVAVM,jnienv->javaVM());
 	libusb_set_option(NULL,LIBUSB_OPTION_WEAK_AUTHORITY,NULL);
@@ -293,6 +293,11 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	readPreferences();
 	this->installEventFilter(this);
 	ui->btnConnect->hide();
+	// Read preferences and then decide if we load OpenGL
+	auto openGLEnvVar = qgetenv("SCOPY_USE_OPENGL");
+	if( (bool)openGLEnvVar.toInt()) {
+		loadOpenGL();
+	}
 
 	_setupToolMenu();
 
@@ -1206,7 +1211,7 @@ void adiscope::ToolLauncher::ping()
 
 	int ret = iio_device_get_trigger(dev, &test_device);
 
-	if (ret < 0 && ret != -ENOENT) {
+	if (ret < 0 && ret != -ENOENT && ret!=-19) {
 		disconnect();
 	}
 }
@@ -1441,6 +1446,7 @@ void adiscope::ToolLauncher::stopToolsBeforeCalibration()
 	for(Tool* tool : qAsConst(calibration_saved_tools))
 		tool->stop();
 }
+
 void adiscope::ToolLauncher::restartToolsAfterCalibration()
 {
 	menu->getToolMenuItemFor(TOOL_DMM)->setCalibrating(false);
@@ -1701,7 +1707,6 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 				|| filter->compatible(TOOL_DIGITALIO)) {
 			dioManager = new DIOManager(ctx, filter);
 		}
-
 		if (filter->compatible(TOOL_LOGIC_ANALYZER)
 				|| filter->compatible(TOOL_PATTERN_GENERATOR)) {
 
@@ -2039,3 +2044,22 @@ void ToolLauncher::registerNativeMethods()
 	env->DeleteLocalRef(objectClass);
 }
 #endif
+
+bool ToolLauncher::isOpenGlLoaded() const {
+	return openGlLoaded;
+}
+
+void ToolLauncher::loadOpenGL() {
+	// set surfaceFormat as in Qt example: HelloGL2 - https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/hellogl2/main.cpp?h=5.15#n81
+	QSurfaceFormat fmt;
+	fmt.setDepthBufferSize(24);
+	QSurfaceFormat::setDefaultFormat(fmt);
+
+	// This acts as a loader for the OpenGL context, our plots load and draw in the OpenGL context
+	// at the same time which causes some race condition and causes the app to hang
+	// with this workaround, the app loads the OpenGL context before any plots are created
+	// Probably there's a better way to do this
+	auto a = new QOpenGLWidget(this);
+	delete a;
+	openGlLoaded = true;
+}

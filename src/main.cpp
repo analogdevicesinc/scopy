@@ -57,6 +57,7 @@ int main(int argc, char **argv)
 
 	QApplication::setAttribute(Qt::AA_CompressHighFrequencyEvents, true);
 	QApplication::setAttribute(Qt::AA_CompressTabletEvents, true);
+	qputenv("SCOPY_USE_OPEN_GL", "1");
 #endif
 
 	ScopyApplication app(argc, argv);

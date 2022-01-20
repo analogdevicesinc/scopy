@@ -47,6 +47,7 @@ public Q_SLOTS:
 protected:
 	QTimer replotTimer;
 private:
+	static int staticPlotId;
 	bool started;
 	bool debug;
 	bool useOpenGlCanvas;
@@ -60,6 +61,7 @@ private:
 	QwtText fpsTxt;
 	QElapsedTimer fpsTimer;
 	QElapsedTimer fpsLabelTimer;
+
 
 };
 
