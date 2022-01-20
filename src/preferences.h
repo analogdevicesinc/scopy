@@ -144,6 +144,9 @@ public:
 	bool getShow_plot_fps() const;
 	void setShow_plot_fps(bool newShow_plot_fps);
 
+	bool getUse_open_gl() const;
+	void setUse_open_gl(bool newUse_open_gl);
+
 Q_SIGNALS:
 
 	void notify();
@@ -194,6 +197,7 @@ private:
 	bool m_skipCalIfCalibrated;
 	bool m_logging_enabled;
 	bool m_show_plot_fps;
+	bool m_use_open_gl;
 
 	Preferences_API *pref_api;
 
@@ -233,6 +237,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(QString currentStylesheet READ getCurrentStylesheet WRITE setCurrentStylesheet)
 	Q_PROPERTY(QStringList userStylesheets READ getUserStylesheets WRITE setUserStylesheets)
 	Q_PROPERTY(bool showPlotFps READ getShowPlotFps WRITE setShowPlotFps)
+	Q_PROPERTY(bool useOpenGl READ getUseOpenGl WRITE setUseOpenGl)
 
 
 public:
@@ -318,6 +323,10 @@ public:
 
 	bool getShowPlotFps() const;
 	void setShowPlotFps(const bool& first);
+
+	bool getUseOpenGl() const;
+	void setUseOpenGl(const bool& first);
+
 
 	QString getCurrentStylesheet() const;
 	void setCurrentStylesheet(const QString &currentStylesheet);
