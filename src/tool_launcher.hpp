@@ -32,7 +32,6 @@
 #include <QMap>
 #include <QStringList>
 #include <QNetworkAccessManager>
-#include <gui/info_widget.h>
 #include <QTextBrowser>
 
 #ifdef __ANDROID__
@@ -56,6 +55,7 @@
 #include "gui/detachedWindow.hpp"
 #include "preferences.h"
 #include "gui/info_page.hpp"
+#include <gui/info_widget.h>
 #include "device_widget.hpp"
 #include "gui/connectDialog.hpp"
 #include "toolmenu.h"
@@ -105,6 +105,8 @@ public:
 
 	PhoneHome *getPhoneHome() const;
 	enum tool getSelectedToolId() const;
+
+	bool isOpenGlLoaded() const;
 
 Q_SIGNALS:
 	void connectionDone(bool success);
@@ -198,6 +200,7 @@ private:
 	DeviceWidget* getDevice(QString uri);
 	void setupAddPage();
 	void allowExternalScript(bool);
+	void loadOpenGL();
 #ifdef __ANDROID__
 	void registerNativeMethods();
 	static void saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/);
@@ -293,6 +296,8 @@ private:
 
 	SessionInfo m_sessionInfo;
 	enum tool selectedToolId;
+
+	bool openGlLoaded;
 
 };
 }

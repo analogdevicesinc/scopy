@@ -3,22 +3,17 @@
 #include <QwtPlotOpenGLCanvas>
 #include <QwtPainter>
 #include <QDebug>
+#include <tool_launcher.hpp>
 
 #include <logging_categories.h>
 #include <tool_launcher.hpp>
 
 namespace adiscope {
 
-static int staticPlotId = 0;
-
-#define replotFrameDuration 1000.0/replotFrameRate
-
-bool useOpenGlCanvas = 0;
+int BasicPlot::staticPlotId = 0;
 BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), replotFrameRate(60)
 {
-	auto openGLEnvVar = qgetenv("SCOPY_USE_OPENGL");
-	useOpenGlCanvas = (bool)openGLEnvVar.toInt();
-
+	useOpenGlCanvas = getToolLauncherInstance()->isOpenGlLoaded();
 	connect(&replotTimer,SIGNAL(timeout()),this,SLOT(replotNow()));
 
 	if(useOpenGlCanvas) {
@@ -36,6 +31,7 @@ BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), replotF
 		}
 	} else {
 		QwtPlotCanvas *plotCanvas = qobject_cast<QwtPlotCanvas *>( canvas() );
+		plotCanvas->setPaintAttribute(QwtPlotCanvas::BackingStore, true);
 #ifdef IMMEDIATE_PAINT
 		plotCanvas->setPaintAttribute(QwtPlotCanvas::ImmediatePaint, true);
 #endif
@@ -45,8 +41,11 @@ BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), replotF
 	id = staticPlotId;
 	staticPlotId++; // for debug
 	pfps.setCapacity(fpsHistoryCount);
+	pms.setCapacity(fpsHistoryCount);
 	ifps.setCapacity(fpsHistoryCount);
+	ims.setCapacity(fpsHistoryCount);
 	fpsLabel.attach(this);
+	fpsLabel.hide();
 	QFont font;
 	font.setBold( true );
 	fpsTxt.setFont( font );
@@ -92,12 +91,14 @@ void BasicPlot::setRefreshRate(double hz) {
 
 void BasicPlot::setVisibleFpsLabel(bool vis) {
 	fpsLabel.setVisible(vis);
+	debug = vis;
 }
 
 void BasicPlot::hideFpsLabel() {
 	fpsLabel.hide();
 	debug = false;
 }
+
 void BasicPlot::showFpsLabel() {
 	fpsLabel.show();
 	debug = true;
@@ -150,11 +151,9 @@ void BasicPlot::replotNow() {
 	}
 }
 
-
 void BasicPlot::replot() {
 #ifdef IMMEDIATE_PAINT
 		if(!replotTimer.isActive()) {
-			//qDebug(CAT_PLOT)<<QString::number(id)<<"FreeRunningPlot - freerunning replot - schedule next frame";
 			replotTimer.setSingleShot(true);
 			replotTimer.start(1000.0/replotFrameRate);
 		}

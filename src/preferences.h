@@ -155,6 +155,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	
+	void save();
 	QString loadLanguage();
 
 
