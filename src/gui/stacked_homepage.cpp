@@ -36,7 +36,7 @@ StackedHomepage::StackedHomepage(QWidget *parent) :
 	connect(s_hc, &HomepageControls::goRight, this, &StackedHomepage::moveRight);
 	connect(s_hc, &HomepageControls::openFile, this, &StackedHomepage::openFile);
 
-	s_speed = 500;
+	s_speed = 200;
 	s_animationType = QEasingCurve::InOutCubic;
 	s_wrap = false;
 	s_active = false;

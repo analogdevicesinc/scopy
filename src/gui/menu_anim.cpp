@@ -31,18 +31,19 @@ MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
 	close_anim_max(this, "maximumWidth"),
 	close_anim_min(this, "minimumWidth"),
 	min_width(-1),
-	animInProg(false)
+	animInProg(false),
+	animationDuration(200)
 {
-	open_anim_max.setDuration(500);
+	open_anim_max.setDuration(animationDuration);
 	open_anim_max.setEasingCurve(QEasingCurve::InOutExpo);
 
-	open_anim_min.setDuration(500);
+	open_anim_min.setDuration(animationDuration);
 	open_anim_min.setEasingCurve(QEasingCurve::InOutExpo);
 
-	close_anim_max.setDuration(500);
+	close_anim_max.setDuration(animationDuration);
 	close_anim_max.setEasingCurve(QEasingCurve::InOutExpo);
 
-	close_anim_min.setDuration(500);
+	close_anim_min.setDuration(animationDuration);
 	close_anim_min.setEasingCurve(QEasingCurve::InOutExpo);
 
 	connect(&open_anim_max, SIGNAL(finished()),
@@ -115,4 +116,18 @@ void MenuAnim::openAnimFinished()
 {
 	animInProg = false;
 	Q_EMIT finished(true);
+}
+
+int MenuAnim::getAnimationDuration() const
+{
+	return animationDuration;
+}
+
+void MenuAnim::setAnimationDuration(int newAnimationDuration)
+{
+	animationDuration = newAnimationDuration;
+	open_anim_max.setDuration(animationDuration);
+	open_anim_min.setDuration(animationDuration);
+	close_anim_max.setDuration(animationDuration);
+	close_anim_min.setDuration(animationDuration);
 }

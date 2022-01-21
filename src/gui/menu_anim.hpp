@@ -39,6 +39,9 @@ namespace adiscope {
 		void setMinimumSize(QSize size);
 		bool animInProgress() const;
 
+		int getAnimationDuration() const;
+		void setAnimationDuration(int newAnimationDuration);
+
 	Q_SIGNALS:
 		void finished(bool opened);
 
@@ -53,6 +56,7 @@ namespace adiscope {
 		CustomAnimation close_anim_max, close_anim_min,
 				   open_anim_max, open_anim_min;
 		int min_width;
+		int animationDuration;
 		bool animInProg;
 	};
 }
