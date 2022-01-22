@@ -1810,17 +1810,9 @@ void SpectrumAnalyzer::stop()
 
 void SpectrumAnalyzer::runStopToggled(bool checked)
 {
-	ui->comboBox_line_thickness->setEnabled(!checked);
-	ui->comboBox_line_thickness->setCurrentIndex(1);
-
 	if (checked) {
 		if (iio) {
 			writeAllSettingsToHardware();
-		}
-
-		for(int i = 0;i < channels.size();i++)
-		{
-			fft_plot->setLineWidth(i, 1);
 		}
 
 		fft_plot->presetSampleRate(sample_rate);
@@ -2017,22 +2009,20 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
 
 void SpectrumAnalyzer::on_comboBox_line_thickness_currentIndexChanged(int index)
 {
-    int crt_channel = channelIdOfOpenedSettings();
+	int crt_channel = channelIdOfOpenedSettings();
 
-    if (crt_channel < 0) {
-        qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
-        return;
-    }
+	if (crt_channel < 0) {
+		qDebug(CAT_SPECTRUM_ANALYZER) << "invalid channel ID for the opened Settings menu";
+		return;
+	}
 
-    qreal width = 0.5 * (index + 1);
+	qreal width = 0.5 * (index + 1);
 
-    if (width != channels[crt_channel]->lineWidth()) {
-        channels[crt_channel]->setLinewidth(width);
-	if(!isRunning()) {
+	if (width != channels[crt_channel]->lineWidth()) {
+		channels[crt_channel]->setLinewidth(width);
 		fft_plot->setLineWidth(crt_channel, width);
 		fft_plot->replot();
 	}
-    }
 }
 
 void SpectrumAnalyzer::on_spinBox_averaging_valueChanged(int n)
