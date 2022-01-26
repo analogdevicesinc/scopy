@@ -98,7 +98,6 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	d_topGateHandlesArea = new GateHandlesArea(this->canvas());
 
 	d_topWidget->setStyleSheet("QWidget {background-color: transparent}");
-	d_topWidget->setMinimumHeight(50);
 	d_topGateHandlesArea->setMinimumHeight(20);
 	d_topGateHandlesArea->setLargestChildWidth(80);
 	d_leftHandlesArea->setMinimumWidth(50);
