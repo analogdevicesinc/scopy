@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.ComponentName;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 
 public class ScopyActivity extends QtActivity
 {
@@ -75,5 +76,19 @@ public class ScopyActivity extends QtActivity
 		Intent mainIntent = Intent.makeRestartActivityTask(componentName);
 		context.startActivity(mainIntent);
 		Runtime.getRuntime().exit(0);
-    }
+	}
+
+	public String getScaleFactor() {
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+
+		double scaleFactor = ((double)displayMetrics.widthPixels/displayMetrics.heightPixels)
+								/displayMetrics.scaledDensity;
+		String formattedScaleFactor = String.format("%.02f", scaleFactor);
+		System.out.println("-- ScopyActivity: scale factor is: " + formattedScaleFactor);
+
+
+		return formattedScaleFactor.replace(",",".");
+	}
+	}
 }

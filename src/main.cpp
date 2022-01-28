@@ -40,17 +40,24 @@
 #include "scopy_color_editor.h"
 #include "application_restarter.h"
 
+#ifdef __ANDROID__
+	#include <QtAndroidExtras/QtAndroid>
+#endif
+
 using namespace adiscope;
 
 int main(int argc, char **argv)
 {
 #ifdef  __ANDROID__
-	qputenv("QT_SCALE_FACTOR", "1.17");
+	QAndroidJniObject jniObject = QtAndroid::androidActivity().callObjectMethod("getScaleFactor", "()Ljava/lang/String;");
+	QString scaleFactor = jniObject.toString();
+
+	qputenv("QT_SCALE_FACTOR", scaleFactor.toUtf8());
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 
-
 	ScopyApplication app(argc, argv);
+
 #ifdef LIBM2K_ENABLE_LOG
 	enableLogging(true);
 	google::InitGoogleLogging(argv[0]);
