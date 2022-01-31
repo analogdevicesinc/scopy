@@ -342,7 +342,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gridPlot = new QGridLayout(plotWidget);
 	gridPlot->setVerticalSpacing(0);
 	gridPlot->setHorizontalSpacing(0);
-	gridPlot->setContentsMargins(0, 0, 0, 0);
+	gridPlot->setContentsMargins(9, 0, 9, 0);
 	plotWidget->setLayout(gridPlot);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
@@ -382,7 +382,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		QMainWindow* mainWindow = new QMainWindow(this);
 		mainWindow->setCentralWidget(0);
 		mainWindow->setWindowFlags(Qt::Widget);
-		ui->gridLayoutPlot->addWidget(mainWindow, 1, 0, 1, 1);
+		ui->gridLayoutPlot->addWidget(mainWindow, 0, 0, 1, 1);
 
 		// time domain plot dock
 		QDockWidget* plotDockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget, "TimeDomain");

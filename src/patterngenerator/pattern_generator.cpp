@@ -237,7 +237,7 @@ void PatternGenerator::setupUi()
 	QGridLayout* gridLayout = new QGridLayout(centralWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
-	gridLayout->setContentsMargins(0, 0, 0, 0);
+	gridLayout->setContentsMargins(25, 0, 25, 0);
 	centralWidget->setLayout(gridLayout);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,

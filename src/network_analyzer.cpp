@@ -426,7 +426,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	// plot widget
 	QWidget* centralWidget = new QWidget(this);
 	QGridLayout* gridLayout = new QGridLayout(centralWidget);
-	gridLayout->setContentsMargins(0, 0, 0, 0);
+	gridLayout->setContentsMargins(9, 0, 0, 9);
+	gridLayout->setHorizontalSpacing(10);
+	gridLayout->setVerticalSpacing(0);
 
 	gridLayout->addWidget(bufferPreviewer, 0, 1, 1, 1);
 	gridLayout->addWidget(ui->statusWidget, 1, 1, 1, 1);
