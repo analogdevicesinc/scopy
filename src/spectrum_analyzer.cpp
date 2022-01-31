@@ -254,7 +254,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// plot widget
 	QWidget* centralWidget = new QWidget(this);
 	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
-	vLayout->setContentsMargins(0, 0, 0, 0);
+	vLayout->setContentsMargins(20, 0, 20, 20);
 	vLayout->setSpacing(10);
 	centralWidget->setLayout(vLayout);
 
