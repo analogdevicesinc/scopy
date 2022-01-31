@@ -52,6 +52,10 @@ ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent):
 			setDynamicProperty(this, "selected", on);
 		}
 	});
+
+#ifdef __ANDROID__
+	setDynamicProperty(this, "allowHover", false);
+#endif
 }
 
 ToolMenuItem::~ToolMenuItem()
@@ -144,32 +148,42 @@ void ToolMenuItem::setDisabled(bool disabled)
 
 void ToolMenuItem::mouseMoveEvent(QMouseEvent *event)
 {
+#ifndef __ANDROID__
 	BaseMenuItem::mouseMoveEvent(event);
 	setDynamicProperty(this, "allowHover", false);
+#endif
 }
 
 void ToolMenuItem::enterEvent(QEvent *event)
 {
+#ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", true);
 	event->accept();
+#endif
 }
 
 void ToolMenuItem::leaveEvent(QEvent *event)
 {
+#ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 	event->accept();
+#endif
 }
 
 void ToolMenuItem::dragMoveEvent(QDragMoveEvent *event)
 {
+#ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 	BaseMenuItem::dragMoveEvent(event);
+#endif
 }
 
 void ToolMenuItem::dragLeaveEvent(QDragLeaveEvent *event)
 {
+#ifndef __ANDROID__
 	setDynamicProperty(this, "allowHover", true);
 	BaseMenuItem::dragLeaveEvent(event);
+#endif
 }
 
 void ToolMenuItem::_buildUI()
