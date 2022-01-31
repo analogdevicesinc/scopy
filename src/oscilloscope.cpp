@@ -331,7 +331,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gridPlot = new QGridLayout(plotWidget);
 	gridPlot->setVerticalSpacing(0);
 	gridPlot->setHorizontalSpacing(0);
-	gridPlot->setContentsMargins(0, 0, 0, 0);
+	gridPlot->setContentsMargins(9, 0, 9, 0);
 	plotWidget->setLayout(gridPlot);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
@@ -360,6 +360,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	// hide fixed containers
 	ui->container_fft_plot->hide();
 	ui->xy_plot_container->hide();
+	ui->histogram_container->hide();
 
 #ifdef ADVANCED_DOCKING
 	ui->hist_widget->hide();
@@ -371,7 +372,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	// time domain plot docker
 	m_dockManager = DockerUtils::createCDockManager(this);
-	ui->gridLayoutPlot->addWidget(m_dockManager, 1, 0, 1, 1);
+	ui->gridLayoutPlot->addWidget(m_dockManager, 0, 0, 1, 1);
 
 	ads::CDockWidget* plotDocker = DockerUtils::createCDockWidget(m_dockManager, centralWidget, "Time Domain");
 
