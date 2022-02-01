@@ -123,71 +123,33 @@
         </property>
         <item>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="4">
-           <widget class="QLabel" name="label_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>220</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>220</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>30</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
+          <item row="1" column="2">
+           <widget class="QLabel" name="label_8">
             <property name="styleSheet">
-             <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold; }</string>
+             <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold;  }</string>
             </property>
             <property name="text">
-             <string>Set</string>
+             <string>VDC</string>
             </property>
            </widget>
-          </item>
-          <item row="0" column="0">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>42</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
           <item row="1" column="4">
            <widget class="QLabel" name="label_6">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>220</width>
+              <width>0</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>220</width>
+              <width>16777215</width>
               <height>16777215</height>
              </size>
             </property>
@@ -203,6 +165,37 @@
             </property>
             <property name="text">
              <string>Measure</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="adiscope::LcdNumber" name="lcd1_set">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>210</width>
+              <height>80</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLCDNumber {
+background-color: transparent;
+color: #ff7200;
+}</string>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="digitCount">
+             <number>5</number>
+            </property>
+            <property name="segmentStyle">
+             <enum>QLCDNumber::Flat</enum>
             </property>
            </widget>
           </item>
@@ -244,49 +237,8 @@ color: #ff7200;
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="adiscope::LcdNumber" name="lcd1_set">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>210</width>
-              <height>80</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">QLCDNumber {
-background-color: transparent;
-color: #ff7200;
-}</string>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::NoFrame</enum>
-            </property>
-            <property name="digitCount">
-             <number>5</number>
-            </property>
-            <property name="segmentStyle">
-             <enum>QLCDNumber::Flat</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QLabel" name="label_8">
-            <property name="styleSheet">
-             <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold;  }</string>
-            </property>
-            <property name="text">
-             <string>VDC</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <spacer name="horizontalSpacer_3">
+          <item row="1" column="3">
+           <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -301,8 +253,56 @@ color: #ff7200;
             </property>
            </spacer>
           </item>
-          <item row="1" column="3">
-           <spacer name="horizontalSpacer_4">
+          <item row="0" column="4">
+           <widget class="QLabel" name="label_5">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <pointsize>30</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QLabel { color: #444444; qproperty-alignment: 'AlignBottom | AlignLeft'; font-size: 30pt; font-weight: bold; }</string>
+            </property>
+            <property name="text">
+             <string>Set</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>42</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="3">
+           <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -335,25 +335,25 @@ color: #ff7200;
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <property name="horizontalSpacing">
-           <number>7</number>
+           <number>6</number>
           </property>
           <item row="1" column="4">
            <widget class="QLabel" name="label_2">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>220</width>
+              <width>0</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>220</width>
+              <width>16777215</width>
               <height>16777215</height>
              </size>
             </property>
@@ -382,7 +382,7 @@ color: #ff7200;
             </property>
             <property name="minimumSize">
              <size>
-              <width>252</width>
+              <width>210</width>
               <height>80</height>
              </size>
             </property>
@@ -396,7 +396,7 @@ color: #9013fe;
              <enum>QFrame::NoFrame</enum>
             </property>
             <property name="digitCount">
-             <number>6</number>
+             <number>5</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -406,20 +406,20 @@ color: #9013fe;
           <item row="0" column="4">
            <widget class="QLabel" name="label">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
             <property name="minimumSize">
              <size>
-              <width>220</width>
+              <width>0</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>220</width>
+              <width>16777215</width>
               <height>16777215</height>
              </size>
             </property>
@@ -445,7 +445,7 @@ color: #9013fe;
             </property>
             <property name="sizeHint" stdset="0">
              <size>
-              <width>0</width>
+              <width>42</width>
               <height>20</height>
              </size>
             </property>
@@ -461,7 +461,7 @@ color: #9013fe;
             </property>
             <property name="minimumSize">
              <size>
-              <width>252</width>
+              <width>210</width>
               <height>80</height>
              </size>
             </property>
@@ -475,7 +475,7 @@ color: #9013fe;
              <enum>QFrame::NoFrame</enum>
             </property>
             <property name="digitCount">
-             <number>6</number>
+             <number>5</number>
             </property>
             <property name="segmentStyle">
              <enum>QLCDNumber::Flat</enum>
@@ -1125,6 +1125,9 @@ QPushButton:disabled {
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
