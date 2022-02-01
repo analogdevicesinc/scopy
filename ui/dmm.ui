@@ -351,16 +351,19 @@ text-align:center;</string>
                  <item row="2" column="2">
                   <widget class="QLabel" name="label_9">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>130</width>
+                     <width>0</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size:35pt;</string>
                    </property>
                    <property name="text">
                     <string>MAX</string>
@@ -370,16 +373,19 @@ text-align:center;</string>
                  <item row="1" column="2">
                   <widget class="QLabel" name="label_8">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>130</width>
+                     <width>0</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size:35pt;</string>
                    </property>
                    <property name="text">
                     <string>MIN</string>
@@ -467,20 +473,21 @@ text-align:center;</string>
                 <item>
                  <widget class="QLabel" name="labelCh1">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>130</width>
-                    <height>105</height>
+                    <width>0</width>
+                    <height>0</height>
                    </size>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QLabel[ac=false] { qproperty-text: &quot;VDC&quot;; }
-QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
+QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }
+QLabel{font-size:35pt;}</string>
                   </property>
                   <property name="text">
                    <string>VDC</string>
@@ -631,16 +638,19 @@ text-align:center;</string>
                  <item row="1" column="2">
                   <widget class="QLabel" name="label_10">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>130</width>
+                     <width>0</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size:35pt;</string>
                    </property>
                    <property name="text">
                     <string>MIN</string>
@@ -719,16 +729,19 @@ text-align:center;</string>
                  <item row="2" column="2">
                   <widget class="QLabel" name="label_11">
                    <property name="sizePolicy">
-                    <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
                    <property name="minimumSize">
                     <size>
-                     <width>130</width>
+                     <width>0</width>
                      <height>0</height>
                     </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">font-size:35pt;</string>
                    </property>
                    <property name="text">
                     <string>MAX</string>
@@ -803,20 +816,21 @@ text-align:center;</string>
                 <item>
                  <widget class="QLabel" name="labelCh2">
                   <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
                   </property>
                   <property name="minimumSize">
                    <size>
-                    <width>130</width>
-                    <height>105</height>
+                    <width>0</width>
+                    <height>0</height>
                    </size>
                   </property>
                   <property name="styleSheet">
                    <string notr="true">QLabel[ac=false] { qproperty-text: &quot;VDC&quot;; }
-QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }</string>
+QLabel[ac=true] { qproperty-text: &quot;VRMS&quot;; }
+QLabel{font-size:35pt;}</string>
                   </property>
                   <property name="text">
                    <string>VDC</string>
@@ -2020,6 +2034,9 @@ line-height: 14px;
  <resources>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
+  <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2056,7 +2073,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
   <buttongroup name="buttonGroup_2"/>
+  <buttongroup name="buttonGroup"/>
  </buttongroups>
 </ui>
