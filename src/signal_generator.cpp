@@ -637,6 +637,10 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 
 	ui->plot->addWidget(ui->instrumentNotes, 3, 0);
+
+	connect(ui->toggleMenuBtn, &QPushButton::toggled, [=](bool toggled){
+		ui->rightMenu->toggleMenu(toggled);
+	});
 }
 
 SignalGenerator::~SignalGenerator()
