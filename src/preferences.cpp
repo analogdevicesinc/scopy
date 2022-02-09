@@ -36,6 +36,10 @@
 
 using namespace adiscope;
 
+Preferences* adiscope::pref_ptr;
+Preferences* adiscope::getScopyPreferences() {
+	return pref_ptr;
+}
 
 Preferences::Preferences(QWidget *parent) :
 	QWidget(parent),
@@ -73,7 +77,8 @@ Preferences::Preferences(QWidget *parent) :
 	m_colorEditor(nullptr),
 	m_logging_enabled(false),
 	m_show_plot_fps(false),
-	m_use_open_gl(false)
+	m_use_open_gl(false),
+	m_target_fps(60)
 {
 	ui->setupUi(this);
 
@@ -273,6 +278,11 @@ Preferences::Preferences(QWidget *parent) :
 		Q_EMIT notify();
 	});
 
+	connect(ui->cmbPlotTargetFps, &QComboBox::currentTextChanged, [=](QString fps){
+		m_target_fps = fps.toDouble();
+		Q_EMIT notify();
+	});
+
 	ui->comboBoxTheme->addItem("default");
 	ui->comboBoxTheme->addItem("light");
 	ui->comboBoxTheme->addItem("browse");
@@ -295,6 +305,7 @@ Preferences::Preferences(QWidget *parent) :
 		}
 		requestRestart();
 	});
+	pref_ptr = this;
 }
 
 void Preferences::save() {
@@ -408,6 +419,7 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->skipCalCheckbox->setChecked(m_skipCalIfCalibrated);
 	ui->showPlotFps->setChecked(m_show_plot_fps);
 	ui->useOpenGl->setChecked(m_use_open_gl);
+	ui->cmbPlotTargetFps->setCurrentText(QString::number(m_target_fps));
 	// by this point the preferences menu is initialized
 	m_initialized = true;
 	ui->autoUpdatesCheckBox->setChecked(automatical_version_checking_enabled);
@@ -443,6 +455,16 @@ void Preferences::resetScopy()
 	if (ret == QMessageBox::Ok) {
 		Q_EMIT reset();
 	}
+}
+
+double Preferences::getTarget_fps() const
+{
+	return m_target_fps;
+}
+
+void Preferences::setTarget_fps(double newTarget_fps)
+{
+	m_target_fps = newTarget_fps;
 }
 
 bool Preferences::getUse_open_gl() const
@@ -1048,4 +1070,14 @@ void Preferences_API::setUseOpenGl(const bool& val)
 {
 	preferencePanel->m_use_open_gl = val;
 	qputenv("SCOPY_USE_OPENGL",QByteArray::number(val));
+}
+
+double Preferences_API::getTargetFps() const
+{
+	return preferencePanel->m_target_fps;
+}
+
+void Preferences_API::setTargetFps(const double &val)
+{
+	preferencePanel->m_target_fps = val;
 }

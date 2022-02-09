@@ -28,6 +28,7 @@
 #include <gnuradio/blocks/short_to_float.h>
 
 #include <iio.h>
+#include <tool_launcher.hpp>
 using namespace adiscope;
 using namespace gr;
 
@@ -54,9 +55,11 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	nb_channels = iio_device_get_channels_count(dev);
 
+	// get target fps from preferences
+	double targetFps = getScopyPreferences()->getTarget_fps();
 	iio_block = gr::m2k::analog_in_source::make_from(m_context, _buffer_size, {1, 1}, {0, 0}, 10000, 1,
 							 KERNEL_BUFFERS_DEFAULT, false, false, {0, 0}, {0, 0}, 0, 0, {0, 0},
-							 false, false, 60.0);
+							 false, false, targetFps);
 
 	/* Avoid unconnected channel errors by connecting a dummy sink */
 	auto dummy_copy = blocks::copy::make(sizeof(short));
@@ -356,6 +359,10 @@ void iio_manager::set_device_timeout(unsigned int mseconds)
 	if (m_mixed_source) {
 		m_mixed_source->set_timeout_ms(mseconds);
 	}
+}
+
+void iio_manager::set_data_rate(double rate) {
+	iio_block->set_data_rate(rate);
 }
 
 void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)

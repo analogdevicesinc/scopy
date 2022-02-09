@@ -55,7 +55,7 @@ private:
 	int id = 0;
 	MovingAverage pfps, pms;
 	MovingAverage ifps, ims;
-	const int fpsHistoryCount = 60;
+	const int fpsHistoryCount = 30;
 	const int fpsLabelRefreshTime = 500;
 	QwtPlotTextLabel fpsLabel;
 	QwtText fpsTxt;
