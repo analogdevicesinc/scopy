@@ -1956,7 +1956,8 @@ void LogicAnalyzer::startStop(bool start)
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
 
-					std::this_thread::sleep_for(std::chrono::milliseconds(1000/60));
+					int ms = (int)(1000.0 / getScopyPreferences()->getTarget_fps());
+					std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 				}
 			} while (totalSamples && !m_stopRequested);
 

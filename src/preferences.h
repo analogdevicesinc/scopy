@@ -147,6 +147,9 @@ public:
 	bool getUse_open_gl() const;
 	void setUse_open_gl(bool newUse_open_gl);
 
+	double getTarget_fps() const;
+	void setTarget_fps(double newTarget_fps);
+
 Q_SIGNALS:
 
 	void notify();
@@ -199,6 +202,7 @@ private:
 	bool m_logging_enabled;
 	bool m_show_plot_fps;
 	bool m_use_open_gl;
+	int m_target_fps;
 
 	Preferences_API *pref_api;
 
@@ -239,6 +243,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(QStringList userStylesheets READ getUserStylesheets WRITE setUserStylesheets)
 	Q_PROPERTY(bool showPlotFps READ getShowPlotFps WRITE setShowPlotFps)
 	Q_PROPERTY(bool useOpenGl READ getUseOpenGl WRITE setUseOpenGl)
+	Q_PROPERTY(double targetFps READ getTargetFps WRITE setTargetFps)
 
 
 public:
@@ -328,6 +333,8 @@ public:
 	bool getUseOpenGl() const;
 	void setUseOpenGl(const bool& first);
 
+	double getTargetFps() const;
+	void setTargetFps(const double& val);
 
 	QString getCurrentStylesheet() const;
 	void setCurrentStylesheet(const QString &currentStylesheet);
@@ -339,6 +346,10 @@ private:
 	Preferences *preferencePanel;
 
 };
+
+extern Preferences* pref_ptr;
+Preferences* getScopyPreferences();
+
 }
 
 #endif // PREFERENCE_PANEL_H

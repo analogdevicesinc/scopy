@@ -50,6 +50,7 @@
 #include "filemanager.h"
 #include "spectrum_analyzer_api.hpp"
 #include "stream_to_vector_overlap.h"
+#include "tool_launcher.hpp"
 
 #ifdef SPECTRAL_MSR
 #include "gui/measure.h"
@@ -1839,6 +1840,9 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 	                                        (QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
+	double targetFps = getScopyPreferences()->getTarget_fps();
+	fft_sink->set_update_time(1.0/targetFps);
+
 	bool started = isIioManagerStarted();
 
 	if (started) {
@@ -1880,6 +1884,9 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
 	                                        (QObject *)fft_plot);
+
+	double targetFps = getScopyPreferences()->getTarget_fps();
+	fft_sink->set_update_time(1.0/targetFps);
 
 	top_block = gr::make_top_block("spectrum_analyzer");
 

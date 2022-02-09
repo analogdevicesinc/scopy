@@ -67,6 +67,7 @@
 #include "scopyExceptionHandler.h"
 #include "oscilloscope_api.hpp"
 #include "mixed_signal_sink.h"
+#include <tool_launcher.hpp>
 
 #include "gui/runsinglewidget.h"
 
@@ -195,6 +196,13 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			400, "Osc XY", nb_channels / 2, (QObject*)&xy_plot);
 
 	this->qt_time_block->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
+
+	// get target fps from preferences
+	double targetFps = getScopyPreferences()->getTarget_fps();
+	qt_time_block->set_update_time(1.0/targetFps);
+	qt_fft_block->set_update_time(1.0/targetFps);
+	qt_hist_block->set_update_time(1.0/targetFps);
+	qt_xy_block->set_update_time(1.0/targetFps);
 
 	// Prevent the application from hanging while waiting for a trigger condition
 	m_m2k_context->setTimeout(UINT_MAX);
@@ -1382,6 +1390,12 @@ void Oscilloscope::readPreferences()
 
 	update_chn_settings_panel(current_ch_widget);
 	setFilteringEnabled(prefPanel->getOsc_filtering_enabled());
+	double fps = prefPanel->getTarget_fps();
+	iio->set_data_rate(std::max(fps, 15.0)); // minimum 15 buffers/second
+	qt_time_block->set_update_time(1.0/fps);
+	qt_fft_block->set_update_time(1.0/fps);;
+	qt_xy_block->set_update_time(1.0/fps);;
+	qt_hist_block->set_update_time(1.0/fps);;
 
 }
 
@@ -1420,7 +1434,8 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 
 	mixed_sink = mixed_signal_sink::make(m_logicAnalyzer, &this->plot, active_sample_count);
 
-	mixed_source = gr::m2k::mixed_signal_source::make_from(m_m2k_context, active_sample_count, 60.0);
+	double targetFps = getScopyPreferences()->getTarget_fps();
+	mixed_source = gr::m2k::mixed_signal_source::make_from(m_m2k_context, active_sample_count, targetFps);
 
 	if (iioStarted) {
 		// enable the mixed_source in the iio_manager
@@ -2440,6 +2455,8 @@ void Oscilloscope::add_math_channel(const std::string& function)
 			noZoomXAxisWidth * getSampleRate() / m_m2k_analogin->getOversamplingRatio(),
 			getSampleRate() / m_m2k_analogin->getOversamplingRatio(), name, 1, (QObject *)&plot);
 
+	double targetFps = getScopyPreferences()->getTarget_fps();
+	math_sink->set_update_time(1.0/targetFps);
 	/* Add the math block and the math scope sink into a container, so that
 	 * we can disconnect them when removing the math channel later */
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(
