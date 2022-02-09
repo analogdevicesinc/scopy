@@ -1420,7 +1420,7 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 
 	mixed_sink = mixed_signal_sink::make(m_logicAnalyzer, &this->plot, active_sample_count);
 
-	mixed_source = gr::m2k::mixed_signal_source::make_from(m_m2k_context, active_sample_count);
+	mixed_source = gr::m2k::mixed_signal_source::make_from(m_m2k_context, active_sample_count, 60.0);
 
 	if (iioStarted) {
 		// enable the mixed_source in the iio_manager

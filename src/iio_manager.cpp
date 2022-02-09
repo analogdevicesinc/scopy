@@ -54,22 +54,9 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	nb_channels = iio_device_get_channels_count(dev);
 
-	iio_block = gr::m2k::analog_in_source::make_from(m_context,
-							     _buffer_size,
-							     {1, 1},
-							     {0, 0},
-							     10000,
-							     1,
-							     KERNEL_BUFFERS_DEFAULT,
-							     false,
-							     false,
-							     {0, 0},
-							     {0, 0},
-							     0,
-							     0,
-							     {0, 0},
-							     false,
-							     false);
+	iio_block = gr::m2k::analog_in_source::make_from(m_context, _buffer_size, {1, 1}, {0, 0}, 10000, 1,
+							 KERNEL_BUFFERS_DEFAULT, false, false, {0, 0}, {0, 0}, 0, 0, {0, 0},
+							 false, false, 60.0);
 
 	/* Avoid unconnected channel errors by connecting a dummy sink */
 	auto dummy_copy = blocks::copy::make(sizeof(short));
