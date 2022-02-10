@@ -849,7 +849,7 @@ QPushButton *ToolLauncher::addContext(const QString& uri)
 
 	if (connectBtn) {
 		connect(connectBtn, SIGNAL(clicked(bool)),
-			this, SLOT(connectBtn_clicked(bool)));
+			this, SLOT(connectBtn_clicked(bool)), Qt::QueuedConnection);
 	}
 
 	connect(deviceWidget, SIGNAL(forgetDevice(QString)),
