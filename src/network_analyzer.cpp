@@ -446,17 +446,43 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	centralWidget->setLayout(gridLayout);
 
 	if(prefPanel->getCurrent_docking_enabled()) {
-		QMainWindow* mainWindow = new QMainWindow(this);
-		mainWindow->setCentralWidget(0);
-		mainWindow->setWindowFlags(Qt::Widget);
-		ui->gridLayout_plots->addWidget(mainWindow, 0, 0);
+		// bode graph
+		QMainWindow* bodeWindow = new QMainWindow(this);
+		bodeWindow->setCentralWidget(0);
+		bodeWindow->setWindowFlags(Qt::Widget);
+		ui->gridLayout_plots->addWidget(bodeWindow, 0, 0);
 
-		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
+		QDockWidget* bodeDockWidget = DockerUtils::createDockWidget(bodeWindow, centralWidget);
+		bodeWindow->addDockWidget(Qt::LeftDockWidgetArea, bodeDockWidget);
 
-		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
+
+		// nyquist graph
+		QMainWindow* nyquistWindow = new QMainWindow(this);
+		nyquistWindow->setCentralWidget(0);
+		nyquistWindow->setWindowFlags(Qt::Widget);
+
+		ui->stackedWidgetPage2->layout()->removeWidget(ui->xygraph);
+		ui->stackedWidgetPage2->layout()->addWidget(nyquistWindow);
+
+		QDockWidget* nyquistDockWidget = DockerUtils::createDockWidget(nyquistWindow, ui->xygraph);
+		nyquistWindow->addDockWidget(Qt::LeftDockWidgetArea, nyquistDockWidget);
+
+
+		// nichols graph
+		QMainWindow* nicholsWindow = new QMainWindow(this);
+		nicholsWindow->setCentralWidget(0);
+		nicholsWindow->setWindowFlags(Qt::Widget);
+
+		ui->stackedWidgetPage3->layout()->removeWidget(ui->nicholsgraph);
+		ui->stackedWidgetPage3->layout()->addWidget(nicholsWindow);
+
+		QDockWidget* nicholsDockWidget = DockerUtils::createDockWidget(nicholsWindow, ui->nicholsgraph);
+		nicholsWindow->addDockWidget(Qt::LeftDockWidgetArea, nicholsDockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
-		DockerUtils::configureTopBar(dockWidget);
+		DockerUtils::configureTopBar(bodeDockWidget);
+		DockerUtils::configureTopBar(nyquistDockWidget);
+		DockerUtils::configureTopBar(nicholsDockWidget);
 #endif
 	} else {
 		gridLayout->setHorizontalSpacing(0);
