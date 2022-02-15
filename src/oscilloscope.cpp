@@ -1435,7 +1435,11 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 	mixed_sink = mixed_signal_sink::make(m_logicAnalyzer, &this->plot, active_sample_count);
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
-	mixed_source = gr::m2k::mixed_signal_source::make_from(m_m2k_context, active_sample_count, targetFps);
+
+	// this was buggy from the beginning - when using autotriggering, mixed signal acquisition restarts
+	// with wrong trigger settings because autotriggering switches inbetween always and actual trigger mode
+	// workaround consists in using 2 kernel buffers before restarting the acquisition
+	mixed_source = gr::m2k::mixed_signal_source::make_from(m_m2k_context, active_sample_count, targetFps, 2);
 
 	if (iioStarted) {
 		// enable the mixed_source in the iio_manager
