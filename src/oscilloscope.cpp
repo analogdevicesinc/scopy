@@ -388,6 +388,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		QDockWidget* plotDockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget, "TimeDomain");
 
 
+		// necessary to move around the dockWidgets
+		centralWidget->setMinimumHeight(50);
+		centralWidget->setMinimumWidth(50);
+
+		fft_plot.setMinimumHeight(50);
+		fft_plot.setMinimumWidth(50);
+
+		xy_plot.setMinimumHeight(50);
+		xy_plot.setMinimumWidth(50);
+
+
 		// histogram widget
 		histWidget = new QWidget(this);
 		QVBoxLayout* histLayout = new QVBoxLayout(histWidget);
@@ -420,6 +431,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 
 		// arange all dockers
+#ifdef __ANDROID__
 		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDockWidget);
 		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, histDockWidget);
 		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, plotDockWidget);
@@ -428,6 +440,15 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		mainWindow->tabifyDockWidget(plotDockWidget, histDockWidget);
 		mainWindow->tabifyDockWidget(plotDockWidget, fftDockWidget);
 		mainWindow->tabifyDockWidget(plotDockWidget, xyDockWidget);
+#else
+		mainWindow->addDockWidget(Qt::RightDockWidgetArea, fftDockWidget);
+		mainWindow->addDockWidget(Qt::RightDockWidgetArea, xyDockWidget);
+		mainWindow->tabifyDockWidget(fftDockWidget, xyDockWidget);
+
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, histDockWidget);
+		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, plotDockWidget);
+		mainWindow->tabifyDockWidget(plotDockWidget, histDockWidget);
+#endif
 
 #ifdef PLOT_MENU_BAR_ENABLED
 		DockerUtils::configureTopBar(plotDockWidget);
@@ -444,7 +465,17 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		QWidget *w = gridL->itemAtPosition(1, 0)->widget();
 		gridL->addWidget(&xy_plot, 1, 0);
 		gridL->addWidget(w, 2, 0);
+
+		fft_plot.setMinimumHeight(250);
+		fft_plot.setMinimumWidth(500);
 	}
+
+		hist_plot.setMinimumHeight(60);
+		hist_plot.setMinimumWidth(25);
+		hist_plot.setMaximumWidth(25);
+
+	//	xy_plot.setMinimumHeight(50);
+	//	xy_plot.setMinimumWidth(50);
 
 	/* Default plot settings */
 	plot.setSampleRate(active_sample_rate, 1, "");
@@ -481,16 +512,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	plot.setAxisVisible(QwtAxis::YLeft, false);
 	plot.setAxisVisible(QwtAxis::XBottom, false);
 	plot.setUsingLeftAxisScales(false);
-
-	fft_plot.setMinimumHeight(250);
-	fft_plot.setMinimumWidth(500);
-
-	hist_plot.setMinimumHeight(60);
-	hist_plot.setMinimumWidth(25);
-	hist_plot.setMaximumWidth(25);
-
-//	xy_plot.setMinimumHeight(50);
-//	xy_plot.setMinimumWidth(50);
 
 	xy_plot.setVertUnitsPerDiv(5);
 	xy_plot.setHorizUnitsPerDiv(5);

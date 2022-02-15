@@ -185,6 +185,10 @@ QDockWidget *ToolView::createDockableWidget(QWidget *widget, const QString& dock
 	docker->setAllowedAreas(Qt::DockWidgetArea::AllDockWidgetAreas);
 	docker->setWidget(widget);
 
+	// workaround, allows dockWidgets movement
+	widget->setMinimumHeight(50);
+	widget->setMinimumWidth(50);
+
 #ifdef PLOT_MENU_BAR_ENABLED
 	DockerUtils::configureTopBar(docker);
 #endif
