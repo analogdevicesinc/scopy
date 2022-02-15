@@ -2439,6 +2439,19 @@ void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 
 void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 {
+	double update_time = 1.0/getScopyPreferences()->getTarget_fps();
+	switch(bin_sizes[index]) {
+	case 1<<17:
+		fft_sink->set_update_time(update_time * 2);
+	break;
+	case 1<<18:
+		fft_sink->set_update_time(update_time * 4);
+	break;
+	default:
+		fft_sink->set_update_time(update_time);
+		break;
+	}
+
 	uint new_fft_size = bin_sizes[index];
 
 	if (new_fft_size != fft_size) {
