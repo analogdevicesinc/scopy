@@ -32,7 +32,7 @@
 using namespace adiscope;
 using namespace gr;
 
-static const int KERNEL_BUFFERS_DEFAULT = 4;
+static const int KERNEL_BUFFERS_DEFAULT = 1;
 std::map<const std::string, iio_manager::map_entry> iio_manager::dev_map;
 unsigned iio_manager::_id = 0;
 
