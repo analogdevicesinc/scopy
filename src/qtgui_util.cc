@@ -177,6 +177,11 @@ QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *wid
 	dockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
 	dockWidget->setWidget(widget);
 
+#ifdef __ANDROID__
+	dockWidget->setFeatures(dockWidget->features() & ~QDockWidget::DockWidgetClosable
+				& ~QDockWidget::DockWidgetFloatable);
+#endif
+
 	return dockWidget;
 }
 
