@@ -188,19 +188,28 @@ QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *wid
 void DockerUtils::configureTopBar(QDockWidget *docker)
 {
 	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+		QString icon_path = "";
+
+		if (QIcon::themeName() == "scopy-default") {
+			icon_path +=":/icons";
+		} else {
+			icon_path +=":/icons/scopy-light/icons";
+		}
+
 		if(topLevel) {
 			docker->setWindowFlags(Qt::CustomizeWindowHint |
 							Qt::Window |
 							Qt::WindowMinimizeButtonHint |
 							Qt::WindowMaximizeButtonHint);
 			docker->show();
+
 			docker->setStyleSheet("QDockWidget {"
-						"titlebar-normal-icon: url(:/icons/close_hovered.svg);"
+						"titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow.svg);"
 						"}");
 			docker->setContentsMargins(10, 0, 10, 10);
 		} else {
 			docker->setStyleSheet("QDockWidget {"
-						  "titlebar-normal-icon: url();"
+						  "titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow_right.svg);"
 						  "}");
 			docker->setContentsMargins(0, 0, 0, 0);
 		}
