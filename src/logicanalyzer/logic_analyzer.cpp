@@ -155,7 +155,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 		channelBox->setChecked(true);
 
-		triggerBox->setStyleSheet("QComboBox QAbstractItemView { min-width: 130px; }");
+		triggerBox->setStyleSheet("QComboBox { max-width: 60px; } QComboBox QAbstractItemView { min-width: 130px; }");
 
 		triggerBox->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
 		for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
