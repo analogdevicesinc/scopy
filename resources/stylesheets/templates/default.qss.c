@@ -15,11 +15,25 @@ QWidget {
 }
 
 QDockWidget {
-	titlebar-normal-icon: url();
+	titlebar-normal-icon: url(:/icons/sba_cmb_box_arrow_right.svg);
 }
 
 QDockWidget::title {
 	background-color: transparent;
+}
+
+QDockWidget::float-button {
+	background-color: transparent;
+	border: none;
+}
+
+QDockWidget::float-button:hover {
+	background-color: rgba(255, 255, 255, 30);
+	padding: 2px;
+}
+
+QDockWidget::float-button:hover {
+	background-color: rgba(0, 0, 0, 60);
 }
 
 QToolTip {
