@@ -2,7 +2,8 @@ variables:
     QT_FORMULAE: qt@5
     REPO_SLUG: $(Build.Repository.Name)
     CURRENT_COMMIT: $(Build.SourceVersion)
-
+    ARTIFACTS_DIR: "$(Agent.BuildDirectory)/s/artifacts"
+    TARGET_BRANCH: "$(System.PullRequest.TargetBranch)"
 trigger:
   branches:
     include:
@@ -16,10 +17,8 @@ trigger:
 
 pr:
   branches:
-    include:
-    - main
-    - master
-    - 20*
+    exclude:
+    - no_ci_*
 
 stages:
 - stage: Builds
@@ -90,3 +89,47 @@ stages:
       inputs:
         targetPath: '$(Build.ArtifactStagingDirectory)'
         artifactName: '$(artifactName)'
+
+  - job: ClangFormat
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    strategy:
+      matrix:
+
+        clang_format:
+          imageName: 'ubuntu-20.04'
+          BUILD_TYPE: "clang_format"
+
+        cmake_format:
+          imageName: 'ubuntu-20.04'
+          BUILD_TYPE: "cmake_format"
+    pool:
+      vmImage: $(imageName)
+    steps:
+      - checkout: self
+        clean: true
+        persistCredentials: true
+
+      - script: ./CI/azure/deps.sh
+        displayName: Install Dependencies
+
+      - script: ./CI/azure/run_build.sh
+        displayName: Run Build
+
+      - bash: |
+          if [ -d $(Agent.BuildDirectory)/s/artifacts ]; then
+            echo "##vso[task.setVariable variable=patchexists]true"
+          fi
+        condition: or(
+          eq(variables['BUILD_TYPE'], 'clang_format'),
+          eq(variables['BUILD_TYPE'], 'cmake_format')
+          )
+
+      - task: PublishBuildArtifacts@1
+        condition: and(
+          or(eq(variables['BUILD_TYPE'], 'clang_format'),
+          eq(variables['BUILD_TYPE'], 'cmake_format')),
+          eq(variables.patchexists, 'true')
+          )
+        inputs:
+          pathToPublish: '$(Agent.BuildDirectory)/s/artifacts'
+          artifactName: format-patch
