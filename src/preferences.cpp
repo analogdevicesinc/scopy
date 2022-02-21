@@ -77,8 +77,15 @@ Preferences::Preferences(QWidget *parent) :
 	m_colorEditor(nullptr),
 	m_logging_enabled(false),
 	m_show_plot_fps(false),
-	m_use_open_gl(false),
-	m_target_fps(60)
+	m_use_open_gl(
+// Android/macOS/Windows use OpenGL by default
+#if defined __ANDROID__  || defined __APPLE__ || defined __MINGW32__
+			true
+#else
+			false
+#endif
+			),
+	m_target_fps(30)
 {
 	ui->setupUi(this);
 
