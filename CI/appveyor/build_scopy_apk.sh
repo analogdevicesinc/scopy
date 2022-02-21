@@ -3,6 +3,7 @@ set -xe
 source ./android_toolchain.sh $1 $2
 
 ARTIFACT_LOCATION=$GITHUB_WORKSPACE
+BUILD_FOLDER=build_${ABI}_${BUILD_TYPE}
 
 build_scopy() {
 
@@ -20,12 +21,12 @@ build_scopy() {
 
 	./android_cmake.sh .
 
-	cd build_$ABI
+	cd $BUILD_FOLDER
 	make -j$JOBS
 	cd ..
 
 	./android_deploy_qt.sh
-	cd build_$ABI
+	cd $BUILD_FOLDER
 	make apk
 	make aab
 	cd ..
@@ -35,9 +36,9 @@ build_scopy() {
 
 move_artifact() {
 	pushd scopy
-	sudo cp ./build_$ABI/android-build/build/outputs/apk/debug/android-build-debug.apk $ARTIFACT_LOCATION/
-	sudo cp ./build_$ABI/android-build/build/outputs/bundle/debug/android-build-debug.aab $ARTIFACT_LOCATION/
-	sudo cp ./build_$ABI/android-build/build/outputs/bundle/release/android-build-release.aab $ARTIFACT_LOCATION/
+	sudo cp ./$BUILD_FOLDER/android-build/build/outputs/apk/debug/android-build-debug.apk $ARTIFACT_LOCATION/
+	sudo cp ./$BUILD_FOLDER/android-build/build/outputs/bundle/debug/android-build-debug.aab $ARTIFACT_LOCATION/
+	sudo cp ./$BUILD_FOLDER/android-build/build/outputs/bundle/release/android-build-release.aab $ARTIFACT_LOCATION/
 	pushd $ARTIFACT_LOCATION
 	sudo chmod 644 ./android-build-debug.apk
 	sudo chmod 644 ./android-build-debug.aab
