@@ -20,6 +20,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(scopy LANGUAGES C CXX VERSION 1.4.0)
 
+# allow cmake-format analysis
+include(cmake/codeStyle.cmake)
+
 set(Python_ADDITIONAL_VERSIONS 3)
 FIND_PACKAGE(PythonInterp REQUIRED)
 set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
