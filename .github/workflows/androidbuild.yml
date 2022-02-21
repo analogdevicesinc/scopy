@@ -17,7 +17,7 @@ jobs:
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
                 -e "BRANCH=${GITHUB_REF#refs/heads/}" \
-                analogdevices/scopy-build:android /bin/bash -xe /home/runner/src/scopy-android-deps/clone_and_build.sh
+                analogdevices/scopy-build:android /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
     - uses: actions/upload-artifact@v2
       with:
         name: scopy-android
