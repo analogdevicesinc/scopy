@@ -20,6 +20,9 @@
 cmake_minimum_required(VERSION 3.5)
 project(scopy LANGUAGES C CXX VERSION 1.4.0)
 
+# allow static analysis
+include(cmake/staticAnalyzers.cmake)
+
 # allow cmake-format analysis
 include(cmake/codeStyle.cmake)
 
