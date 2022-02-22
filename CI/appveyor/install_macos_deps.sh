@@ -5,7 +5,7 @@ LIBAD9361_BRANCH=master
 LIBM2K_BRANCH=master
 GRIIO_BRANCH=upgrade-3.8
 GNURADIO_FORK=analogdevicesinc
-GNURADIO_BRANCH=scopy-android-2
+GNURADIO_BRANCH=scopy
 GRSCOPY_BRANCH=master
 GRM2K_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
@@ -261,9 +261,9 @@ build_libsigrokdecode() {
 }
 
 build_qwt() {
-	echo "### Building qwt - branch qwt-6.1-multiaxes"
-	svn checkout https://svn.code.sf.net/p/qwt/code/branches/$QWT_BRANCH ${WORKDIR}/qwt
-	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
+	echo "### Building qwt - branch $QWT_BRANCH"
+	git clone --depth 1 https://github.com/cseci/qwt --branch $QWT_BRANCH $WORKDIR/qwt
+	qmake_build_local "qwt" "qwt.pro" 
 }
 
 build_libtinyiiod() {
