@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -ex
+
+STAGINGDIR="${GITHUB_WORKSPACE}/deps/staging_dir"
+
+mkdir ${GITHUB_WORKSPACE}/build
+cd ${GITHUB_WORKSPACE}/build
+
+cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+     -DCMAKE_INSTALL_PREFIX:PATH=/app \
+     -DCMAKE_PREFIX_PATH="${STAGINGDIR}/lib/pkgconfig;${STAGINGDIR}/lib/cmake;${GITHUB_WORKSPACE}/Qt/5.14.2/gcc_64/lib/cmake;${STAGINGDIR}/lib/x86_64-linux-gnu/pkgconfig;${STAGINGDIR}" \
+     -DWITH_DOC=OFF -DCMAKE_BUILD_TYPE=Release \
+     -DBREAKPAD_HANDLER=OFF \
+     -DWITH_NATIVEDIALOGS=OFF \
+     -DCLONE_IIO_EMU=OFF \
+     -DCMAKE_STAGING_PREFIX="${STAGINGDIR}" \
+     -DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib"
+make -j4

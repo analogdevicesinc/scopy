@@ -1,15 +1,19 @@
 clone_depth: 1
-#init:
+init:
+    - sh: export APPVEYOR_SSH_BLOCK=true
 #    - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
 
 image: Visual Studio 2019
 
 environment:
+    APPVEYOR_SSH_KEY: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC7Ht1omER47GnJUbeMEXsJShyZeiJfRIahS3xQwKCg6G9YMae402TYdt8IKYKjPwaUtnI2h0+D1Fa9i/N1WMkf+cO4oMvXP3sS5x3BGDv/OW/3jZrA5qNSQGDYdntOPd9KQGyQ0sH/M4z9VCXlo7QomWgAM8sL9aL3yKlfCNxx0wNw2VnRSBiTu5zQTJ4WmoEWuoMnn8a2Nhgt9QSw+oaLnblWMIrU8hSmY23W45SF0Lh64IslrgD+pUmmrCzR7uL9+nQWr3ApbyZQOSYfQB+HxjuPo9hH2i7mFjWTiZI3oQhXn/0TyazF5ShT3Ee6CAkI2QBflKYaXQ9JBCCtNx3XWwLt7S3l5OSRrS0KZhX+haToAPtCYd2YMi4G/ebA11jH4dSSFiX3+3TfmA/l4Yf+fNWBf0AaiddCs7CnjdRt5vzRAyZ9W9xF8Ldf1nOd7ae9MBtI0jn+nZ2ieFKOZ85j3S9e4y6Yk7sirHxdUib8z5KUsgYWsnuEqDwlLzsyBZk=
+
     BUILD_NO: $(APPVEYOR_BUILD_NUMBER)
     BRANCH: $(APPVEYOR_REPO_BRANCH)
     REPO: $(APPVEYOR_REPO_NAME)
     CI_BUILD: 1
     matrix:
+
         - ARCH: x86_64
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
@@ -46,6 +50,9 @@ build_script:
     - sh: $PKG_MANAGER_UPDATE_CMD
     - sh: echo $BUILD_DEPS_CMD
     - sh: $BUILD_DEPS_CMD
+
+    - sh: curl -sflL 'https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-ssh.sh' | bash -e -
+
     - sh: $BUILD_CMD
     - sh: $PACKAGE_CMD
 

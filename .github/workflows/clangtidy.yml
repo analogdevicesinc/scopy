@@ -1,0 +1,122 @@
+name: ubuntu-20 build
+
+on: [push, pull_request]
+
+env:
+  GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+  REVIEW_FILE: clang_tidy_review.yaml
+
+jobs:
+  build-scopy-ubuntu:
+    name: ${{ matrix.buildname }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            buildname: 'ubuntu-build'
+            triplet: x64-linux
+            compiler: clang_64
+            qt: '5.14.2'
+
+    steps:
+
+    - name: Checkout Scopy source code
+      uses: actions/checkout@v2
+
+    - name: Restore Qt cache
+      uses: actions/cache@v2.1.7
+      id: cache-qt
+      with:
+        path: ${{ github.workspace }}/Qt/${{ matrix.qt }}
+        key: ${{ matrix.os }}-qt-${{ matrix.qt }}-cache
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: ${{ matrix.qt }}
+        dir: ${{ github.workspace }}
+        cached: ${{ steps.cache-qt.outputs.cache-hit }}
+        aqtversion: '==1.1.2'
+
+    - name: Install dependencies
+      run: |
+            chmod +x ${GITHUB_WORKSPACE}/CI/appveyor/install_ubuntu_20_deps.sh
+            ${GITHUB_WORKSPACE}/CI/appveyor/install_ubuntu_20_deps.sh ${GITHUB_WORKSPACE}/Qt/5.14.2
+
+    - name: Build Scopy
+      run: |
+            chmod +x ${GITHUB_WORKSPACE}/CI/github-actions/build_scopy.sh
+            ${GITHUB_WORKSPACE}/CI/github-actions/build_scopy.sh
+
+    - name: Save build cache
+      uses: actions/cache@v2.1.7
+      id: cache-build
+      with:
+        path: |
+          ${{ github.workspace }}/build
+          ${{ github.workspace }}/deps
+        key: ${{ matrix.os }}-build-cache
+
+
+  run-check:
+    if: ${{ github.event_name == 'pull_request' }}
+    needs: build-scopy-ubuntu
+    name: ${{ matrix.buildname }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-20.04
+            buildname: 'clang-tidy'
+            triplet: x64-linux
+            compiler: clang_64
+            qt: '5.14.2'
+
+    steps:
+    - name: Checkout Scopy source code
+      uses: actions/checkout@v2
+
+    - name: Restore Qt cache
+      uses: actions/cache@v2.1.7
+      id: cache-qt
+      with:
+        path: ${{ github.workspace }}/Qt/${{ matrix.qt }}
+        key: ${{ matrix.os }}-qt-${{ matrix.qt }}-cache
+
+    - name: Restore build cache
+      uses: actions/cache@v2.1.7
+      id: cache-build
+      with:
+        path: |
+          ${{ github.workspace }}/build
+          ${{ github.workspace }}/deps
+        key: ${{ matrix.os }}-build-cache
+
+    # Debug session
+    # - name: Setup upterm session
+    #   uses: lhotari/action-upterm@v1
+
+    - name: Check C++ changes against style guide
+      run: |
+            chmod +x ${GITHUB_WORKSPACE}/CI/github-actions/clang-tidy.sh
+            ${GITHUB_WORKSPACE}/CI/github-actions/clang-tidy.sh
+
+            if [ -f "$REVIEW_FILE" ]; then
+              echo "::set-output name=STATUS::1"
+            else
+              echo "::set-output name=STATUS::0"
+            fi
+      id: status
+
+    - name: Passed C++ style guide checks
+      run: exit ${{ steps.status.outputs.STATUS }}
+
+    - name: Upload clang_tidy_review file
+      uses: actions/upload-artifact@v3
+      if: failure()
+      with:
+        name: ${{ env.REVIEW_FILE }}
+        path: ${{ github.workspace }}/${{ env.REVIEW_FILE }}

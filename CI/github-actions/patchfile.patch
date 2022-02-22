@@ -1,0 +1,454 @@
+diff --git a/review.py b/review.py
+index 63e9efe..b343d9f 100755
+--- a/review.py
++++ b/review.py
+@@ -21,9 +21,6 @@ import subprocess
+ import textwrap
+ import unidiff
+ import yaml
+-from github import Github
+-from github.Requester import Requester
+-from github.PaginatedList import PaginatedList
+ from typing import List
+ 
+ BAD_CHARS_APT_PACKAGES_PATTERN = "[;&|($]"
+@@ -32,38 +29,27 @@ FIXES_FILE = "clang_tidy_review.yaml"
+ 
+ 
+ class PullRequest:
+-    """Add some convenience functions not in PyGithub"""
+ 
+-    def __init__(self, repo: str, pr_number: int, token: str):
++    def __init__(self, repo: str, pr_number: int):
+         self.repo = repo
+         self.pr_number = pr_number
+-        self.token = token
+ 
+-        github = Github(token)
+-        repo_object = github.get_repo(f"{repo}")
+-        self._pull_request = repo_object.get_pull(pr_number)
+-
+-    def headers(self, media_type: str):
+-        return {
+-            "Accept": f"application/vnd.github.{media_type}",
+-            "Authorization": f"token {self.token}",
+-        }
+ 
+     @property
+     def base_url(self):
+-        return f"https://api.github.com/repos/{self.repo}/pulls/{self.pr_number}"
++        return f"https://github.com/{self.repo}/pull/{self.pr_number}.diff"
+ 
+-    def get(self, media_type: str, extra: str = "") -> str:
+-        url = f"{self.base_url}{extra}"
+-        response = requests.get(url, headers=self.headers(media_type))
++    def get_raw_diff(self) -> str:
++        url = f"{self.base_url}"
++        response = requests.get(url)
+         response.raise_for_status()
+         return response.text
+ 
+     def get_pr_diff(self) -> List[unidiff.PatchSet]:
+         """Download the PR diff, return a list of PatchedFile"""
+-
+-        diffs = self.get("v3.diff")
+-
++        
++        diffs = self.get_raw_diff()
++        
+         # PatchSet is the easiest way to construct what we want, but the
+         # diff_line_no property on lines is counted from the top of the
+         # whole PatchSet, whereas GitHub is expecting the "position"
+@@ -73,47 +59,6 @@ class PullRequest:
+         diff = [unidiff.PatchSet(str(file))[0] for file in unidiff.PatchSet(diffs)]
+         return diff
+ 
+-    def get_pr_comments(self):
+-        """Download the PR review comments using the comfort-fade preview headers"""
+-
+-        def get_element(
+-            requester: Requester, headers: dict, element: dict, completed: bool
+-        ):
+-            return element
+-
+-        return PaginatedList(
+-            get_element,
+-            self._pull_request._requester,
+-            f"{self.base_url}/comments",
+-            None,
+-        )
+-
+-    def post_lgtm_comment(self):
+-        """Post a "LGTM" comment if everything's clean, making sure not to spam"""
+-
+-        BODY = 'clang-tidy review says "All clean, LGTM! :+1:"'
+-
+-        comments = self.get_pr_comments()
+-
+-        for comment in comments:
+-            if comment["body"] == BODY:
+-                print("Already posted, no need to update")
+-                return
+-
+-        self._pull_request.create_issue_comment(BODY)
+-
+-    def post_review(self, review):
+-        """Submit a completed review"""
+-        headers = {
+-            "Accept": "application/vnd.github.comfort-fade-preview+json",
+-            "Authorization": f"token {self.token}",
+-        }
+-        url = f"{self.base_url}/reviews"
+-
+-        post_review_response = requests.post(url, json=review, headers=headers)
+-        print(post_review_response.text)
+-        post_review_response.raise_for_status()
+-
+ 
+ @contextlib.contextmanager
+ def message_group(title: str):
+@@ -124,26 +69,6 @@ def message_group(title: str):
+         print("::endgroup::", flush=True)
+ 
+ 
+-def make_file_line_lookup(diff):
+-    """Get a lookup table for each file in diff, to convert between source
+-    line number to line number in the diff
+-
+-    """
+-    lookup = {}
+-    for file in diff:
+-        filename = file.target_file[2:]
+-        lookup[filename] = {}
+-        for hunk in file:
+-            for line in hunk:
+-                if line.diff_line_no is None:
+-                    continue
+-                if not line.is_removed:
+-                    lookup[filename][line.target_line_no] = (
+-                        line.diff_line_no - DIFF_HEADER_LINE_LENGTH
+-                    )
+-    return lookup
+-
+-
+ def make_file_offset_lookup(filenames):
+     """Create a lookup table to convert between character offset and line
+     number for the list of files in `filenames`.
+@@ -357,7 +282,6 @@ def try_relative(path):
+     except ValueError:
+         return pathlib.Path(path).resolve()
+ 
+-
+ def format_notes(notes, offset_lookup):
+     """Format an array of notes into a single string"""
+ 
+@@ -428,67 +352,6 @@ def make_comment_from_diagnostic(diagnostic_name, diagnostic, offset_lookup, not
+     return comment_body, end_line + 1
+ 
+ 
+-def make_review(diagnostics, diff_lookup, offset_lookup):
+-    """Create a Github review from a set of clang-tidy diagnostics"""
+-
+-    comments = []
+-
+-    for diagnostic in diagnostics:
+-        try:
+-            diagnostic_message = diagnostic["DiagnosticMessage"]
+-        except KeyError:
+-            # Pre-clang-tidy-9 format
+-            diagnostic_message = diagnostic
+-
+-        if diagnostic_message["FilePath"] == "":
+-            continue
+-
+-        comment_body, end_line = make_comment_from_diagnostic(
+-            diagnostic["DiagnosticName"],
+-            diagnostic_message,
+-            offset_lookup,
+-            notes=diagnostic.get("Notes", []),
+-        )
+-
+-        rel_path = str(try_relative(diagnostic_message["FilePath"]))
+-        # diff lines are 1-indexed
+-        source_line = 1 + find_line_number_from_offset(
+-            offset_lookup,
+-            diagnostic_message["FilePath"],
+-            diagnostic_message["FileOffset"],
+-        )
+-
+-        if rel_path not in diff_lookup or end_line not in diff_lookup[rel_path]:
+-            print(
+-                f"WARNING: Skipping comment for file '{rel_path}' not in PR changeset. Comment body is:\n{comment_body}"
+-            )
+-            continue
+-
+-        comments.append(
+-            {
+-                "path": rel_path,
+-                "body": comment_body,
+-                "side": "RIGHT",
+-                "line": end_line,
+-            }
+-        )
+-        # If this is a multiline comment, we need a couple more bits:
+-        if end_line != source_line:
+-            comments[-1].update(
+-                {
+-                    "start_side": "RIGHT",
+-                    "start_line": source_line,
+-                }
+-            )
+-
+-    review = {
+-        "body": "clang-tidy made some suggestions",
+-        "event": "COMMENT",
+-        "comments": comments,
+-    }
+-    return review
+-
+-
+ def get_line_ranges(diff, files):
+     """Return the line ranges of added lines in diff, suitable for the
+     line-filter argument of clang-tidy
+@@ -548,42 +411,8 @@ def get_clang_tidy_warnings(
+ 
+     print(f"Took: {end - start}")
+ 
+-    try:
+-        with open(FIXES_FILE, "r") as fixes_file:
+-            return yaml.safe_load(fixes_file)
+-    except FileNotFoundError:
+-        return {}
+-
+-
+-def cull_comments(pull_request: PullRequest, review, max_comments):
+-    """Remove comments from review that have already been posted, and keep
+-    only the first max_comments
+-
+-    """
+-
+-    comments = pull_request.get_pr_comments()
+-
+-    for comment in comments:
+-        review["comments"] = list(
+-            filter(
+-                lambda review_comment: not (
+-                    review_comment["path"] == comment["path"]
+-                    and review_comment["line"] == comment["line"]
+-                    and review_comment["body"] == comment["body"]
+-                ),
+-                review["comments"],
+-            )
+-        )
+-
+-    if len(review["comments"]) > max_comments:
+-        review["body"] += (
+-            "\n\nThere were too many comments to post at once. "
+-            f"Showing the first {max_comments} out of {len(review['comments'])}. "
+-            "Check the log or trigger a new build to see more."
+-        )
+-        review["comments"] = review["comments"][:max_comments]
++    return output.stdout
+ 
+-    return review
+ 
+ 
+ def main(
+@@ -593,14 +422,11 @@ def main(
+     clang_tidy_checks,
+     clang_tidy_binary,
+     config_file,
+-    token,
+     include,
+-    exclude,
+-    max_comments,
+-    dry_run: bool = False,
++    exclude
+ ):
+ 
+-    pull_request = PullRequest(repo, pr_number, token)
++    pull_request = PullRequest(repo, pr_number)
+     diff = pull_request.get_pr_diff()
+     print(f"\nDiff from GitHub PR:\n{diff}\n")
+ 
+@@ -608,16 +434,16 @@ def main(
+     files = []
+     for pattern in include:
+         files.extend(fnmatch.filter(changed_files, pattern))
+-        print(f"include: {pattern}, file list now: {files}")
++        print(f"include: {pattern}, file list now: {files}\n")
+     for pattern in exclude:
+         files = [f for f in files if not fnmatch.fnmatch(f, pattern)]
+-        print(f"exclude: {pattern}, file list now: {files}")
++        print(f"exclude: {pattern}, file list now: {files}\n")
+ 
+     if files == []:
+         print("No files to check!")
+         return
+ 
+-    print(f"Checking these files: {files}", flush=True)
++    print(f"Checking these files: {files}\n", flush=True)
+ 
+     line_ranges = get_line_ranges(diff, files)
+     if line_ranges == "[]":
+@@ -638,43 +464,8 @@ def main(
+ 
+     if clang_tidy_warnings == {}:
+         print("No warnings, LGTM!")
+-        if not dry_run:
+-            pull_request.post_lgtm_comment()
+-        return
+-
+-    diff_lookup = make_file_line_lookup(diff)
+-    offset_lookup = make_file_offset_lookup(files)
+-
+-    with message_group("Creating review from warnings"):
+-        review = make_review(
+-            clang_tidy_warnings["Diagnostics"], diff_lookup, offset_lookup
+-        )
+-
+-    print(
+-        "Created the following review:\n", pprint.pformat(review, width=130), flush=True
+-    )
+-
+-    if review["comments"] == []:
+-        print("No warnings to report, LGTM!")
+-        if not dry_run:
+-            pull_request.post_lgtm_comment()
+-        return
+-
+-    print("Removing already posted or extra comments", flush=True)
+-    trimmed_review = cull_comments(pull_request, review, max_comments)
+-
+-    print(f"::set-output name=total_comments::{len(review['comments'])}")
+-
+-    if trimmed_review["comments"] == []:
+-        print("Everything already posted!")
+-        return review
+-
+-    if dry_run:
+-        pprint.pprint(review, width=130)
+-        return
+ 
+-    print("Posting the review:\n", pprint.pformat(trimmed_review), flush=True)
+-    pull_request.post_review(trimmed_review)
++    return
+ 
+ 
+ def strip_enclosing_quotes(string: str) -> str:
+@@ -689,33 +480,6 @@ def strip_enclosing_quotes(string: str) -> str:
+     return stripped
+ 
+ 
+-def fix_absolute_paths(build_compile_commands, base_dir):
+-    """Update absolute paths in compile_commands.json to new location, if
+-    compile_commands.json was created outside the Actions container
+-    """
+-
+-    basedir = pathlib.Path(base_dir).resolve()
+-    newbasedir = pathlib.Path(".").resolve()
+-
+-    if basedir == newbasedir:
+-        return
+-
+-    print(f"Found '{build_compile_commands}', updating absolute paths")
+-    # We might need to change some absolute paths if we're inside
+-    # a docker container
+-    with open(build_compile_commands, "r") as f:
+-        compile_commands = json.load(f)
+-
+-    print(f"Replacing '{basedir}' with '{newbasedir}'", flush=True)
+-
+-    modified_compile_commands = json.dumps(compile_commands).replace(
+-        str(basedir), str(newbasedir)
+-    )
+-
+-    with open(build_compile_commands, "w") as f:
+-        f.write(modified_compile_commands)
+-
+-
+ if __name__ == "__main__":
+     parser = argparse.ArgumentParser(
+         description="Create a review from clang-tidy warnings"
+@@ -728,11 +492,6 @@ if __name__ == "__main__":
+     parser.add_argument(
+         "--build_dir", help="Directory with compile_commands.json", default="."
+     )
+-    parser.add_argument(
+-        "--base_dir",
+-        help="Absolute path of initial working directory if compile_commands.json generated outside of Action",
+-        default=".",
+-    )
+     parser.add_argument(
+         "--clang_tidy_checks",
+         help="checks argument",
+@@ -756,28 +515,6 @@ if __name__ == "__main__":
+         nargs="?",
+         default="",
+     )
+-    parser.add_argument(
+-        "--apt-packages",
+-        help="Comma-separated list of apt packages to install",
+-        type=str,
+-        default="",
+-    )
+-    parser.add_argument(
+-        "--cmake-command",
+-        help="If set, run CMake as part of the action with this command",
+-        type=str,
+-        default="",
+-    )
+-    parser.add_argument(
+-        "--max-comments",
+-        help="Maximum number of comments to post at once",
+-        type=int,
+-        default=25,
+-    )
+-    parser.add_argument("--token", help="github auth token")
+-    parser.add_argument(
+-        "--dry-run", help="Run and generate review, but don't post", action="store_true"
+-    )
+ 
+     args = parser.parse_args()
+ 
+@@ -785,29 +522,8 @@ if __name__ == "__main__":
+     exclude = strip_enclosing_quotes(args.exclude).split(",")
+     include = strip_enclosing_quotes(args.include).split(",")
+ 
+-    if args.apt_packages:
+-        # Try to make sure only 'apt install' is run
+-        apt_packages = re.split(BAD_CHARS_APT_PACKAGES_PATTERN, args.apt_packages)[
+-            0
+-        ].split(",")
+-        with message_group(f"Installing additional packages: {apt_packages}"):
+-            subprocess.run(
+-                ["apt", "install", "-y", "--no-install-recommends"] + apt_packages
+-            )
+-
+     build_compile_commands = f"{args.build_dir}/compile_commands.json"
+ 
+-    cmake_command = strip_enclosing_quotes(args.cmake_command)
+-
+-    # If we run CMake as part of the action, then we know the paths in
+-    # the compile_commands.json file are going to be correct
+-    if cmake_command:
+-        with message_group(f"Running cmake: {cmake_command}"):
+-            subprocess.run(cmake_command, shell=True, check=True)
+-
+-    elif os.path.exists(build_compile_commands):
+-        fix_absolute_paths(build_compile_commands, args.base_dir)
+-
+     main(
+         repo=args.repo,
+         pr_number=args.pr,
+@@ -815,9 +531,6 @@ if __name__ == "__main__":
+         clang_tidy_checks=args.clang_tidy_checks,
+         clang_tidy_binary=args.clang_tidy_binary,
+         config_file=args.config_file,
+-        token=args.token,
+         include=include,
+-        exclude=exclude,
+-        max_comments=args.max_comments,
+-        dry_run=args.dry_run,
++        exclude=exclude
+     )
