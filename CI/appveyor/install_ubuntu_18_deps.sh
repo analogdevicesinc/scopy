@@ -25,8 +25,17 @@ else
 
 fi
 
-cd ~
-WORKDIR=${PWD}
+WORKDIR=${PWD}/deps
+mkdir ${WORKDIR}
+
+STAGING_DIR=${WORKDIR}/staging_dir
+mkdir ${STAGING_DIR}
+
+CMAKE_OPTS="
+	-DCMAKE_INSTALL_PREFIX:PATH=${STAGING_DIR} \
+	-DCMAKE_PREFIX_PATH=${STAGING_DIR}
+	"
+
 
 install_apt() {
 	sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
@@ -37,7 +46,7 @@ install_apt() {
 	sudo cp -a doxygen-1.8.17/bin/doxy* /usr/local/bin
 	doxygen --version
 
-	sudo apt-get -y install build-essential libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libaio-dev
+	sudo apt-get -y install build-essential libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libaio-dev libavahi-client-dev
 
 	sudo apt-get -y update
 	sudo apt-get -y install gnuradio
@@ -46,7 +55,6 @@ install_apt() {
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
 
-	cd ~
 	git clone https://github.com/analogdevicesinc/libiio.git ${WORKDIR}/libiio
 	cd ${WORKDIR}/libiio
 	git checkout $LIBIIO_VERSION
@@ -73,7 +81,6 @@ build_glog() {
 
 	echo "### Building glog - branch $GLOG_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/google/glog.git -b $GLOG_BRANCH ${WORKDIR}/glog
 
 	mkdir ${WORKDIR}/glog/build-${ARCH}
@@ -92,7 +99,6 @@ build_libm2k() {
 
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH ${WORKDIR}/libm2k
 
 	mkdir ${WORKDIR}/libm2k/build-${ARCH}
@@ -114,7 +120,6 @@ build_libm2k() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH ${WORKDIR}/libad9361
 
 	mkdir ${WORKDIR}/libad9361/build-${ARCH}
@@ -147,7 +152,6 @@ build_griio() {
 build_grm2k() {
 	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH ${WORKDIR}/gr-m2k
 	mkdir ${WORKDIR}/gr-m2k/build-${ARCH}
 	cd ${WORKDIR}/gr-m2k/build-${ARCH}
@@ -164,7 +168,6 @@ build_grm2k() {
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH ${WORKDIR}/gr-scopy
 	mkdir ${WORKDIR}/gr-scopy/build-${ARCH}
 	cd ${WORKDIR}/gr-scopy/build-${ARCH}
@@ -186,7 +189,7 @@ build_libsigrok() {
 	cd ${WORKDIR}/libsigrok
 
 	./autogen.sh
-	./configure --disable-all-drivers --enable-bindings --enable-cxx
+	./configure --disable-all-drivers --enable-bindings --enable-cxx --prefix=${STAGING_DIR}
 
 	sudo make $JOBS install
 	#DESTDIR=${WORKDIR} make $JOBS install
@@ -204,7 +207,7 @@ build_libsigrokdecode() {
 	cd ${WORKDIR}/libsigrokdecode
 
 	./autogen.sh
-	./configure
+	./configure --prefix=${STAGING_DIR}
 
 	sudo make $JOBS install
 	#DESTDIR=${WORKDIR} make $JOBS install
@@ -214,6 +217,7 @@ build_qwt() {
 	echo "### Building qwt - branch $QWT_BRANCH"
 
 	git clone https://github.com/cseci/qwt --branch $QWT_BRANCH ${WORKDIR}/qwt
+
 	cd ${WORKDIR}/qwt
 
 	$QMAKE qwt.pro

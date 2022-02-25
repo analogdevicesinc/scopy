@@ -15,6 +15,7 @@ LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
 
 set -e
+
 if [ $# -eq 0 ]; then
 	echo "Using default qmake"
 	QMAKE=qmake
@@ -25,19 +26,26 @@ else
 
 fi
 
-cd ~
-WORKDIR=${PWD}
+
+WORKDIR=${PWD}/deps
+mkdir ${WORKDIR}
+
+STAGING_DIR=${WORKDIR}/staging_dir
+mkdir ${STAGING_DIR}
+
+CMAKE_OPTS="
+	-DCMAKE_INSTALL_PREFIX:PATH=${STAGING_DIR} \
+	-DCMAKE_PREFIX_PATH=${STAGING_DIR}
+	"
+
 
 install_apt() {
-
-	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev gnuradio libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev
-
+	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev gnuradio libserialport0 libserialport-dev libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev libavahi-client-dev
 }
 
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
 
-	cd ~
 	git clone https://github.com/analogdevicesinc/libiio.git ${WORKDIR}/libiio
 	cd ${WORKDIR}/libiio
 	git checkout $LIBIIO_VERSION
@@ -64,7 +72,6 @@ build_glog() {
 
 	echo "### Building glog - branch $GLOG_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/google/glog.git -b $GLOG_BRANCH ${WORKDIR}/glog
 
 	mkdir ${WORKDIR}/glog/build-${ARCH}
@@ -83,7 +90,6 @@ build_libm2k() {
 
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH ${WORKDIR}/libm2k
 
 	mkdir ${WORKDIR}/libm2k/build-${ARCH}
@@ -105,7 +111,6 @@ build_libm2k() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH ${WORKDIR}/libad9361
 
 	mkdir ${WORKDIR}/libad9361/build-${ARCH}
@@ -122,7 +127,6 @@ build_libad9361() {
 build_griio() {
 	echo "### Building gr-iio - branch $GRIIO_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-iio.git -b $GRIIO_BRANCH ${WORKDIR}/gr-iio
 	mkdir ${WORKDIR}/gr-iio/build-${ARCH}
 	cd ${WORKDIR}/gr-iio/build-${ARCH}
@@ -138,7 +142,6 @@ build_griio() {
 build_grm2k() {
 	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH ${WORKDIR}/gr-m2k
 	mkdir ${WORKDIR}/gr-m2k/build-${ARCH}
 	cd ${WORKDIR}/gr-m2k/build-${ARCH}
@@ -155,7 +158,6 @@ build_grm2k() {
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH ${WORKDIR}/gr-scopy
 	mkdir ${WORKDIR}/gr-scopy/build-${ARCH}
 	cd ${WORKDIR}/gr-scopy/build-${ARCH}
@@ -177,7 +179,7 @@ build_libsigrok() {
 	cd ${WORKDIR}/libsigrok
 
 	./autogen.sh
-	./configure --disable-all-drivers --enable-bindings --enable-cxx
+	./configure --disable-all-drivers --enable-bindings --enable-cxx --prefix=${STAGING_DIR}
 
 	sudo make $JOBS install
 	#DESTDIR=${WORKDIR} make $JOBS install
@@ -195,7 +197,7 @@ build_libsigrokdecode() {
 	cd ${WORKDIR}/libsigrokdecode
 
 	./autogen.sh
-	./configure
+	./configure --prefix=${STAGING_DIR}
 
 	sudo make $JOBS install
 	#DESTDIR=${WORKDIR} make $JOBS install
@@ -206,16 +208,17 @@ build_qwt() {
 
 	git clone https://github.com/cseci/qwt --branch $QWT_BRANCH ${WORKDIR}/qwt
 	cd ${WORKDIR}/qwt
-
+	
 	$QMAKE qwt.pro
 	make $JOBS
-	sudo make install
+	sudo make INSTALL_ROOT=$STAGING_DIR install
+	
+	sudo cp -R $STAGING_DIR/usr/local/* $STAGING_DIR/
 }
 
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
 
-	cd ~
 	git clone --depth 1 https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH ${WORKDIR}/libtinyiiod
 	mkdir ${WORKDIR}/libtinyiiod/build-${ARCH}
 	cd ${WORKDIR}/libtinyiiod/build-${ARCH}
