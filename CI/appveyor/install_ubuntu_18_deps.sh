@@ -37,7 +37,7 @@ install_apt() {
 	sudo cp -a doxygen-1.8.17/bin/doxy* /usr/local/bin
 	doxygen --version
 
-	sudo apt-get -y install build-essential libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev
+	sudo apt-get -y install build-essential libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev libboost1.65-dev libboost1.65 g++ git cmake autoconf libzip4 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev curl libvolk1-bin libvolk1-dev libvolk1.3 libgmp-dev libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libaio-dev
 
 	sudo apt-get -y update
 	sudo apt-get -y install gnuradio
@@ -213,16 +213,8 @@ build_libsigrokdecode() {
 build_qwt() {
 	echo "### Building qwt - branch $QWT_BRANCH"
 
-	svn checkout https://svn.code.sf.net/p/qwt/code/branches/$QWT_BRANCH ${WORKDIR}/qwt
+	git clone https://github.com/cseci/qwt --branch $QWT_BRANCH ${WORKDIR}/qwt
 	cd ${WORKDIR}/qwt
-
-	# Disable components that we won't build
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtTests$/#/g" qwtconfig.pri
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtDesigner$/#/g" qwtconfig.pri
-	sed -i "s/^QWT_CONFIG\\s*+=\\s*QwtExamples$/#/g" qwtconfig.pri
-
-	# Fix prefix
-	sed -i 's/\/usr\/local\/qwt-$$QWT_VERSION-svn/\/usr\/local/g' qwtconfig.pri
 
 	$QMAKE qwt.pro
 	make $JOBS
