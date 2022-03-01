@@ -206,19 +206,6 @@ if(ANDROID)
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
 else()
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
-	find_library(QWTPOLAR_LIBRARIES qwtpolar)
-	find_path(QWTPOLAR_INCLUDE_DIRS qwt_polar_plot.h PATH_SUFFIXES qwt)
-	if (QWTPOLAR_LIBRARIES)
-		message(STATUS "QwtPolar libraries found - ${QWTPOLAR_LIBRARIES}")
-	else()
-		message(STATUS "QwtPolar libraries not found - assuming they are built in Qwt")
-		set(QWTPOLAR_LIBRARIES "")
-	endif()
-	if (NOT QWTPOLAR_INCLUDE_DIRS)
-		message(SEND_ERROR "QwtPolar includes not found")
-	else()
-		message(STATUS "Found QwtPolar include files - ${QWTPOLAR_INCLUDE_DIRS}/qwt_polar_plot.h")
-	endif()
 endif()
 
 find_package(PkgConfig)
@@ -238,7 +225,6 @@ include_directories(
 	${Qt5Qml_INCLUDE_DIRS}
 	${Qt5UiTools_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
-	${QWTPOLAR_INCLUDE_DIRS}
 	${Qt5Svg_INCLUDE_DIRS}
 	${Qt5Xml_INCLUDE_DIRS}
 	${SCOPY_INCLUDE_DIRS}
@@ -457,7 +443,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		gnuradio::gnuradio-m2k
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
-		${QWTPOLAR_LIBRARIES}
 		${Qt5Svg_LIBRARIES}
 		${Qt5Xml_LIBRARIES}
 		${MATIO_LIBRARIES}
