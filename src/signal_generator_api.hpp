@@ -94,6 +94,7 @@ class SignalGenerator_API : public ApiObject
                    READ getLineThickness WRITE setLineThickness)
 
 	Q_PROPERTY(bool autoscale READ getAutoscale WRITE setAutoscale);
+	Q_PROPERTY(QList<double> load READ getLoad WRITE setLoad);
 
 
 public:
@@ -172,6 +173,9 @@ public:
 
 	QList<int> getLineThickness() const;
 	void setLineThickness(const QList<int>& list);
+
+	QList<double> getLoad() const;
+	void setLoad(const QList<double>& list);
 
 	bool getAutoscale() const;
 	void setAutoscale(bool checked);

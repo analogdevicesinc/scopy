@@ -231,7 +231,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>314</width>
-                <height>604</height>
+                <height>592</height>
                </rect>
               </property>
               <property name="sizePolicy">
@@ -274,7 +274,7 @@
                   <string notr="true"/>
                  </property>
                  <property name="currentIndex">
-                  <number>0</number>
+                  <number>3</number>
                  </property>
                  <property name="usesScrollButtons">
                   <bool>false</bool>
@@ -996,19 +996,19 @@ background-repeat: no-repeat;
                 <widget class="QWidget" name="wNoiseContainer" native="true">
                  <layout class="QVBoxLayout" name="verticalLayout_14">
                   <property name="spacing">
-                   <number>6</number>
+                   <number>10</number>
                   </property>
                   <property name="leftMargin">
-                   <number>9</number>
+                   <number>0</number>
                   </property>
                   <property name="topMargin">
-                   <number>9</number>
+                   <number>0</number>
                   </property>
                   <property name="rightMargin">
-                   <number>9</number>
+                   <number>0</number>
                   </property>
                   <property name="bottomMargin">
-                   <number>9</number>
+                   <number>0</number>
                   </property>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -1159,6 +1159,21 @@ background-repeat: no-repeat;
                <item>
                 <widget class="QWidget" name="wAppearanceContainer" native="true">
                  <layout class="QVBoxLayout" name="verticalLayout_13">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_11">
                     <property name="topMargin">
@@ -1236,7 +1251,7 @@ background-repeat: no-repeat;
                    <widget class="QWidget" name="wAppearance" native="true">
                     <layout class="QVBoxLayout" name="verticalLayout_6">
                      <property name="spacing">
-                      <number>0</number>
+                      <number>10</number>
                      </property>
                      <property name="leftMargin">
                       <number>0</number>
@@ -1247,33 +1262,59 @@ background-repeat: no-repeat;
                      <property name="rightMargin">
                       <number>0</number>
                      </property>
+                     <property name="bottomMargin">
+                      <number>0</number>
+                     </property>
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_15">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <widget class="QLabel" name="label_11">
+                         <property name="text">
+                          <string>Load (Ohm)</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_7">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>90</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item>
+                        <widget class="ExternalLoadLineEdit" name="externalLoad"/>
+                       </item>
+                      </layout>
+                     </item>
                      <item>
                       <layout class="QHBoxLayout" name="horizontalLayout_13">
                        <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
                         <number>0</number>
                        </property>
                        <property name="bottomMargin">
                         <number>0</number>
                        </property>
                        <item>
-                        <layout class="QVBoxLayout" name="verticalLayout_12">
-                         <property name="spacing">
-                          <number>0</number>
+                        <widget class="QLabel" name="label_10">
+                         <property name="text">
+                          <string>Line thickness</string>
                          </property>
-                         <property name="rightMargin">
-                          <number>0</number>
-                         </property>
-                         <property name="bottomMargin">
-                          <number>0</number>
-                         </property>
-                         <item>
-                          <widget class="QLabel" name="label_10">
-                           <property name="text">
-                            <string>Line thickness</string>
-                           </property>
-                          </widget>
-                         </item>
-                        </layout>
+                        </widget>
                        </item>
                        <item>
                         <widget class="QComboBox" name="cbLineThickness">
@@ -1341,20 +1382,13 @@ background-repeat: no-repeat;
                       </layout>
                      </item>
                      <item>
-                      <spacer name="horizontalSpacer_7">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
-                       </property>
-                       <property name="sizeHint" stdset="0">
-                        <size>
-                         <width>40</width>
-                         <height>20</height>
-                        </size>
-                       </property>
-                      </spacer>
-                     </item>
-                     <item>
                       <layout class="QHBoxLayout" name="horizontalLayout_16">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="topMargin">
+                        <number>0</number>
+                       </property>
                        <item>
                         <widget class="QLabel" name="label_3">
                          <property name="text">
@@ -1472,6 +1506,11 @@ background-repeat: no-repeat;
    <extends>QWidget</extends>
    <header>math.hpp</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ExternalLoadLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>gui/externalloadlineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

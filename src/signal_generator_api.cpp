@@ -841,6 +841,40 @@ void SignalGenerator_API::setLineThickness(const QList<int>& list)
 	gen->ui->cbLineThickness->setCurrentIndex(index);
 }
 
+
+
+QList<double> SignalGenerator_API::getLoad() const
+{
+	QList<double> list;
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+	    auto ptr = gen->getData(gen->channels[i]);
+
+	    list.append(ptr->load);
+	}
+
+	return list;
+}
+
+void SignalGenerator_API::setLoad(const QList<double>& list)
+{
+	if (list.size() != gen->channels.size()) {
+	    return;
+	}
+
+	for (int i = 0; i < gen->channels.size(); i++) {
+	    auto ptr = gen->getData(gen->channels[i]);
+
+	    ptr->load = list.at(i);
+	    if(i == gen->currentChannel){
+		gen->resetZoom();
+		gen->load->setValue(gen->getCurrentData()->load);
+	    }
+	}
+
+}
+
+
 bool SignalGenerator_API::getAutoscale() const
 {
 	return gen->ui->btnSigGenAutoscale->isChecked();

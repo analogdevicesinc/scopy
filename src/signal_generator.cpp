@@ -63,6 +63,7 @@
 #include <scopy/math.h>
 #include <scopy/trapezoidal.h>
 #include "scopyExceptionHandler.h"
+#include "gnuradio/blocks/multiply_const.h"
 
 #ifdef MATLAB_SUPPORT_SIGGEN
 #include <matio.h>
@@ -83,6 +84,7 @@
 #define AMPLITUDE_VOLTS	5.0
 #define MULTIPLY_CT	4
 #define FREQUENCY_CT	40
+
 
 using namespace adiscope;
 using namespace gr;
@@ -291,6 +293,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		{"%",1e0}
 	}, tr("Duty Cycle"), -5, 100, true, false, this);
 
+	load = ui->externalLoad;
+
 	ui->waveformGrid->addWidget(amplitude, 0, 0, 1, 1);
 	ui->waveformGrid->addWidget(offset, 0, 1, 1, 1);
 	ui->waveformGrid->addWidget(frequency, 1, 0, 1, 1);
@@ -413,6 +417,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		ptr->file_nr_of_channels=0;
 		ptr->file_channel=0;
 		ptr->lineThickness = 1.0;
+		ptr->load = ExternalLoadLineEdit::MAX_EXTERNAL_LOAD;
 
 		ptr->type = SIGNAL_TYPE_CONSTANT;
 		ptr->id = i;
@@ -567,6 +572,9 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
         connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)),
                 this, SLOT(lineThicknessChanged(int)));
 
+	connect(load, SIGNAL(valueChanged(double)),
+		this, SLOT(externalLoadChanged(double)));
+
 	connect(ui->tabWidget, SIGNAL(currentChanged(int)),
 	        this, SLOT(tabChanged(int)));
 
@@ -643,6 +651,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	ui->plot->addWidget(ui->instrumentNotes, 1, 0);
 }
+
 
 SignalGenerator::~SignalGenerator()
 {
@@ -923,6 +932,7 @@ void SignalGenerator::mathSampleRateChanged(double value)
 
 void SignalGenerator::noiseTypeChanged(int index)
 {
+
 	auto ptr = getCurrentData();
 
 	gr::analog::noise_type_t value = qvariant_cast<gr::analog::noise_type_t>(ui->cbNoiseType->itemData(index));
@@ -941,6 +951,17 @@ void SignalGenerator::noiseAmplitudeChanged(double value)
 		ptr->noiseAmplitude = value;
 		resetZoom();
 	}
+}
+
+void SignalGenerator::externalLoadChanged(double value) {
+
+	auto ptr = getCurrentData();
+
+	if (ptr->load != value) {
+		ptr->load = value;
+		resetZoom();
+	}
+
 }
 
 void SignalGenerator::lineThicknessChanged(int index)
@@ -1493,9 +1514,15 @@ void SignalGenerator::start()
 		auto source = getSource(w, best_rate, top_block);
 		auto head = blocks::head::make(sizeof(float), samples_count);
 		auto vector = blocks::vector_sink_f::make();
+
+		auto load = getData(w)->load;
+		auto scaling_factor = ((load + ExternalLoadLineEdit::OUTPUT_AWG_RESISTANCE) / load);
+		auto load_scaling = blocks::multiply_const_ff::make(scaling_factor);
+
 		auto clamp = analog::rail_ff::make(-AMPLITUDE_VOLTS, AMPLITUDE_VOLTS);
 
-		top_block->connect(source, 0, clamp, 0);
+		top_block->connect(source, 0, load_scaling, 0);
+		top_block->connect(load_scaling, 0,clamp,0);
 		top_block->connect(clamp,0, head,0);
 		top_block->connect(head, 0, vector, 0);
 		top_block->run();
@@ -2066,6 +2093,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 
 	int lineThicknessIndex = (int)(ptr->lineThickness / 0.5) - 1;
 	ui->cbLineThickness->setCurrentIndex(lineThicknessIndex);
+	load->setValue(ptr->load);
 
 	fallTime->setValue(ptr->fall);
 	riseTime->setValue(ptr->rise);
@@ -2465,5 +2493,4 @@ out_cleanup:
 
 	return size;
 }
-
 
