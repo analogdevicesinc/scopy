@@ -90,5 +90,4 @@ public class ScopyActivity extends QtActivity
 
 		return formattedScaleFactor.replace(",",".");
 	}
-	}
 }
