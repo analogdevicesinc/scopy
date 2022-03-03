@@ -46,6 +46,9 @@
 #include <libm2k/analog/m2kanalogout.hpp>
 #include <libm2k/m2k.hpp>
 
+#include <gui/externalloadlineedit.h>
+
+
 extern "C" {
 	struct iio_context;
 }
@@ -162,6 +165,7 @@ private:
 	ScaleSpinButton *holdHighTime, *holdLowTime;
 	ScaleSpinButton *fileSampleRate, *fileAmplitude;
 	ScaleSpinButton *mathRecordLength, *noiseAmplitude, *mathSampleRate;
+	ExternalLoadLineEdit *load;
 
 	FileManager *fileManager;
 
@@ -258,6 +262,7 @@ private Q_SLOTS:
 	void noiseAmplitudeChanged(double val);
 	void noiseTypeChanged(int val);
 	void lineThicknessChanged(int index);
+	void externalLoadChanged(double val);
 	void trapezoidalComputeFrequency();
 	void riseChanged(double value);
 	void fallChanged(double value);
@@ -343,6 +348,7 @@ struct signal_generator_data {
 	gr::analog::noise_type_t noiseType;
 	float noiseAmplitude;
 	float lineThickness;
+	double load;
 };
 
 struct time_block_data {
