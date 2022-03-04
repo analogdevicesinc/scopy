@@ -1,0 +1,74 @@
+variables:
+    QT_FORMULAE: qt@5
+    REPO_SLUG: $(Build.Repository.Name)
+    CURRENT_COMMIT: $(Build.SourceVersion)
+trigger:
+  branches:
+    include:
+    - main
+    - master
+    - staging/*
+    - ci-*
+  tags:
+    include:
+    - v*
+
+pr:
+  branches:
+    include:
+    - main
+    - master
+    - 20*
+
+stages:
+- stage: Builds
+  jobs:
+  - job: macOSBuilds
+    strategy:
+      matrix:
+        macOS_10_15:
+          vmImage: 'macOS-10.15'
+          artifactName: 'macOS-10.15'
+        macOS_11:
+          vmImage: 'macOS-11'
+          artifactName: 'macOS-11'
+    pool:
+      vmImage: $[ variables['vmImage'] ]
+    steps:
+    - checkout: self
+      fetchDepth: 1
+      clean: true
+    - script: ./CI/appveyor/install_macos_deps.sh
+      displayName: 'Dependencies'
+      workingDirectory: $(Build.Repository.LocalPath)
+    - script: ./CI/appveyor/build_appveyor_macos.sh
+      displayName: 'Build'
+      workingDirectory: $(Build.Repository.LocalPath)
+    - script: ./CI/appveyor/package_darwin.sh
+      displayName: 'Create Scopy.dmg'
+      workingDirectory: $(Build.Repository.LocalPath)
+    - script: cp -R staging ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+      displayName: 'Copy staging dir'
+      workingDirectory: $(Build.Repository.LocalPath)
+    - script: cp build/Scopy.dmg ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+      displayName: 'Copy Scopy.dmg'
+      workingDirectory: $(Build.Repository.LocalPath)
+    - script: |
+            ACCOUNT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $1}'`
+            PROJECT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $2}'`
+            echo "ACCOUNT_NAME = " ${ACCOUNT_NAME}
+            echo "PROJECT_NAME = " ${PROJECT_NAME}
+            MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
+            DEPLOY_FILE=Scopy-macos${MACOS_VERSION}-${CURRENT_COMMIT:0:7}.dmg
+            cp build/Scopy.dmg ${DEPLOY_FILE}
+            ls -la
+            # TODO: Add GH_TOKEN for github cont release upload
+            #ghr -u $ACCOUNT_NAME -r $PROJECT_NAME -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous ${DEPLOY_FILE}
+      displayName: 'Push to github continuous release'
+      workingDirectory: $(Build.Repository.LocalPath)
+      condition: and(succeeded(), and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')))
+    - task: PublishPipelineArtifact@1
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      inputs:
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifactName: '$(artifactName)'

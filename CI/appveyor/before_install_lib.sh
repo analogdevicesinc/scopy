@@ -16,45 +16,26 @@ __cmake() {
 	mkdir -p build
 	pushd build # build
 
-	if [ "$APPVEYOR" == "true" ] ; then
-		cmake $args ..
-		make -j${NUM_JOBS}
-		sudo make install
-	else
-		cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
-			-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" \
-			$args .. $SILENCED
-		CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS} $SILENCED
-		make install
-	fi
-
+	cmake -DCMAKE_PREFIX_PATH="$STAGINGDIR" -DCMAKE_INSTALL_PREFIX="$STAGINGDIR" \
+		-DCMAKE_EXE_LINKER_FLAGS="-L${STAGINGDIR}/lib" \
+		$args .. $SILENCED
+	CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib make -j${NUM_JOBS} $SILENCED
+	make -j${NUM_JOBS}
+	sudo make install
 	popd
 }
 
 __make() {
 	$preconfigure
-	if [ "$APPVEYOR" == "true" ] ; then
-		$configure
-		$make -j${NUM_JOBS}
-		sudo $make install
-	else
-		$configure --prefix="$STAGINGDIR" $SILENCED
-		CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib $make -j${NUM_JOBS} $SILENCED
-		$SUDO $make install
-	fi
+	$configure --prefix="$STAGINGDIR"
+	$make -j${NUM_JOBS}
+	sudo $make install
 }
 
 __qmake() {
-	if [ "$APPVEYOR" == "true" ] ; then
-		$QMAKE $qtarget
-		make -j${NUM_JOBS}
-		sudo make install
-	else
-		$QMAKE "$qtarget" $SILENCED
-		QMAKE=$QMAKE CFLAGS=-I${STAGINGDIR}/include LDFLAGS=-L${STAGINGDIR}/lib \
-			make -j${NUM_JOBS} $SILENCED
-		$SUDO make install
-	fi
+	$QMAKE $qtarget
+	make -j${NUM_JOBS}
+	sudo make install
 }
 
 __build_common() {
@@ -161,6 +142,56 @@ qmake_build_git() {
 qmake_build_local() {
 	local dir="$1"
 	local qtarget="$2"
+	local patchfunc="$3"
+	[ ! -d "$WORKDIR/$dir" ] || {
+		[ -z "$patchfunc" ] || {
+			pushd $WORKDIR/$dir
+			$patchfunc
+			popd
+		}
+	}
 	__build_common "$dir" "__qmake"
+}
+
+patch_qwt() {
+	patch -p1 <<-EOF
+--- a/qwtconfig.pri
++++ b/qwtconfig.pri
+@@ -19,7 +19,7 @@
+ QWT_INSTALL_PREFIX = \$\$[QT_INSTALL_PREFIX]
+ 
+ unix {
+-    QWT_INSTALL_PREFIX    = /usr/local
++    QWT_INSTALL_PREFIX    = $STAGINGDIR
+     # QWT_INSTALL_PREFIX = /usr/local/qwt-\$\$QWT_VERSION-ma-qt-\$\$QT_VERSION
+ }
+
+@@ -42,7 +42,7 @@ QWT_INSTALL_LIBS      = \$\${QWT_INSTALL_PREFIX}/lib
+ # runtime environment of designer/creator.
+ ######################################################################
+ 
+-QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
++#QWT_INSTALL_PLUGINS   = \$\${QWT_INSTALL_PREFIX}/plugins/designer
+ 
+ # linux distributors often organize the Qt installation
+ # their way and QT_INSTALL_PREFIX doesn't offer a good
+@@ -163,7 +163,7 @@ QWT_CONFIG     += QwtOpenGL
+ 
+ macx:!static:CONFIG(qt_framework, qt_framework|qt_no_framework) {
+ 
+-    QWT_CONFIG += QwtFramework
++#    QWT_CONFIG += QwtFramework
+ }
+ 
+ ######################################################################
+--- a/src/src.pro
++++ b/src/src.pro
+@@ -36,6 +36,7 @@ contains(QWT_CONFIG, QwtDll) {
+             QMAKE_LFLAGS_SONAME=
+         }
+     }
++    macx: QWT_SONAME=\$\${QWT_INSTALL_LIBS}/libqwt.dylib
+ }
+EOF
 }
 

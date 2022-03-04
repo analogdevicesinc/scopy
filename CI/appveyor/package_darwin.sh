@@ -1,19 +1,26 @@
 #!/bin/bash
 set -e
+STAGINGDIR="${PWD}/staging"
 cd build
 mkdir -p ./Scopy.app/Contents/Frameworks
 
 ## Handle libm2k paths
-m2kpath=/usr/local/lib/libm2k.dylib
+m2kpath=${STAGINGDIR}/lib/libm2k.dylib
 m2krpath="$(otool -D ${m2kpath} | grep @rpath)"
 m2kid=${m2krpath#"@rpath/"}
-sudo cp /usr/local/lib/libm2k.* ./Scopy.app/Contents/Frameworks
+sudo cp ${STAGINGDIR}/lib/libm2k.* ./Scopy.app/Contents/Frameworks
 sudo install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/${m2kid}
 sudo install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/MacOS/Scopy
 
-export DYLD_FALLBACK_LIBRARY_PATH=/usr/local/lib
+export DYLD_FALLBACK_LIBRARY_PATH=${STAGINGDIR}/lib
+
+# Copy the iio and ad9361 to the stagingdir path
+sudo cp -R /Library/Frameworks/iio.framework ${STAGINGDIR}/lib
+sudo cp -R /Library/Frameworks/ad9361.framework ${STAGINGDIR}/lib
+
 ## Bundle some known dependencies
-sudo echo "/usr/local/lib" | dylibbundler -od -b -x ./Scopy.app/Contents/MacOS/Scopy -d ./Scopy.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ >/dev/null
+# -ns == no signing
+sudo echo "${STAGINGDIR}/lib" | dylibbundler -ns -od -b -x ./Scopy.app/Contents/MacOS/Scopy -d ./Scopy.app/Contents/Frameworks/ -p @executable_path/../Frameworks/ >/dev/null
 
 ## Copy the frameworks dylibbundler failed to copy
 sudo cp -R /usr/local/opt/python/Frameworks/Python.framework Scopy.app/Contents/Frameworks/
@@ -82,10 +89,10 @@ fi
 
 ## Handle iio-emu + libtinyiiod
 sudo cp ./iio-emu/iio-emu ./Scopy.app/Contents/MacOS/
-tinypath=/usr/local/lib/tinyiiod.dylib
+tinypath=${STAGINGDIR}/lib/tinyiiod.dylib
 tinyrpath="$(otool -D ${tinypath} | grep @rpath)"
 tinyid=${tinyrpath#"@rpath/"}
-sudo cp /usr/local/lib/tinyiiod.* ./Scopy.app/Contents/Frameworks
+sudo cp ${STAGINGDIR}/lib/tinyiiod.* ./Scopy.app/Contents/Frameworks
 sudo install_name_tool -id @executable_path/../Frameworks/${tinyid} ./Scopy.app/Contents/Frameworks/${tinyid}
 sudo install_name_tool -change ${tinyrpath} @executable_path/../Frameworks/${tinyid} ./Scopy.app/Contents/MacOS/iio-emu
 
@@ -93,20 +100,9 @@ sudo install_name_tool -change ${tinyrpath} @executable_path/../Frameworks/${tin
 sudo macdeployqt Scopy.app
 
 curl -o /tmp/macdeployqtfix.py https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
-sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy /usr/local/opt/qt/
-sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/iio-emu /usr/local/opt/qt/
+sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ${QT_PATH}
+sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/iio-emu ${QT_PATH}
 sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ./Scopy.app/Contents/Frameworks/
 
 sudo macdeployqt Scopy.app -dmg
-ls
-
-UPLOAD_TOOL=ghr
-
-if [ "$APPVEYOR_REPO_BRANCH" = "master" ]; then
-	echo Identified master branch
-	if [ -z "$APPVEYOR_PULL_REQUEST_NUMBER" ]; then
-		echo Not a pull request
-		$UPLOAD_TOOL -u $APPVEYOR_ACCOUNT_NAME -r $APPVEYOR_PROJECT_NAME -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous $DEPLOY_FILE
-	fi
-fi
 
