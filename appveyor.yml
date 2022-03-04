@@ -11,28 +11,6 @@ environment:
     matrix:
         - ARCH: x86_64
           ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: macos-bigsur
-          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
-          BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
-          PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
-          DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
-          C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
-          CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
-          QT_FORMULAE: "qt5"
-
-        - ARCH: x86_64
-          ARCH_BIT: 64
-          APPVEYOR_BUILD_WORKER_IMAGE: macos
-          BUILD_DEPS_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/install_macos_deps.sh"
-          BUILD_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/build_appveyor_macos.sh"
-          PACKAGE_CMD: "/Users/appveyor/projects/scopy/CI/appveyor/package_darwin.sh"
-          DEPLOY_FILE: "/Users/appveyor/projects/scopy/build/Scopy.dmg"
-          C_COMPILER: -DCMAKE_C_COMPILER=/usr/bin/gcc
-          CXX_COMPILER: -DCMAKE_CXX_COMPILER=/usr/bin/g++
-          QT_FORMULAE: "qt5"
-
-        - ARCH: x86_64
-          ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu1804
           PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
           BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_18_deps.sh /home/appveyor/Qt/5.14.2"
