@@ -223,8 +223,8 @@ void FftDisplayPlot::replot()
 		return;
 	}
 
-	d_leftHandlesArea->repaint();
-	d_bottomHandlesArea->repaint();
+	d_leftHandlesArea->update();
+	d_bottomHandlesArea->update();
 
 	BasicPlot::replot();
 }
@@ -268,7 +268,7 @@ void FftDisplayPlot::setupReadouts()
 
 void FftDisplayPlot::updateHandleAreaPadding()
 {
-	d_leftHandlesArea->repaint();
+	d_leftHandlesArea->update();
 	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
 	d_bottomHandlesArea->setRightPadding(50);
 
