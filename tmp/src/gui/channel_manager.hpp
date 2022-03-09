@@ -64,6 +64,8 @@ private:
 	QPushButton *toggleChannels;
 	bool channelManagerToggled;
 	QLabel *toolStatus;
+	int m_maxChannelWidth;
+	int m_minChannelWidth;
 };
 } // namespace gui
 } // namespace scopy

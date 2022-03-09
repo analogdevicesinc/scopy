@@ -37,6 +37,7 @@
 #include "gui/animationmanager.h"
 #include "singletone_wrapper.h"
 #include "phonehome.h"
+#include "datalogger/datalogger.hpp"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -97,7 +98,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	power_control(nullptr), dmm(nullptr), signal_generator(nullptr),
 	oscilloscope(nullptr), current(nullptr), filter(nullptr),
 	logic_analyzer(nullptr), pattern_generator(nullptr), dio(nullptr),
-	network_analyzer(nullptr), spectrum_analyzer(nullptr), debugger(nullptr),
+	network_analyzer(nullptr), spectrum_analyzer(nullptr),data_logger(nullptr), debugger(nullptr),
 	manual_calibration(nullptr), tl_api(new ToolLauncher_API(this)),
 	dioManager(nullptr),
 	notifier(STDIN_FILENO, QSocketNotifier::Read),
@@ -473,6 +474,13 @@ void ToolLauncher::_toolSelected(enum tool tool)
 		break;
 	case TOOL_CALIBRATION:
 		selectedTool = manual_calibration;
+		break;
+	case TOOL_DATALOGGER:
+		if (data_logger) {
+			selectedTool = data_logger->getToolView();
+		} else {
+			selectedTool = nullptr;
+		}
 		break;
 	case TOOL_LAUNCHER:
 		break;
@@ -1363,6 +1371,10 @@ void adiscope::ToolLauncher::destroyContext()
 		dmm = nullptr;
 	}
 
+	if (data_logger) {
+		delete data_logger;
+		data_logger = nullptr;
+	}
 
 	if (power_control) {
 		delete power_control;
@@ -1787,7 +1799,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 	m_m2k = m2kOpen(ctx, "");
 #ifdef LIBM2K_ENABLE_LOG
 	if (m_m2k) {
-		m_m2k->logAllAttributes();
+	    m_m2k->logAllAttributes();
 	}
 #endif
 	filter = new Filter(ctx);
@@ -1850,6 +1862,12 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
 					 &ToolLauncher::addDebugWindow);
 		}
+
+		if (filter->compatible(TOOL_DATALOGGER)) {
+			 data_logger = new DataLogger(ctx, filter, menu->getToolMenuItemFor(TOOL_DATALOGGER),&js_engine, this);
+			 toolList.push_back(data_logger);
+		}
+
 
 		if (filter->compatible(TOOL_POWER_CONTROLLER)) {
 			power_control = new PowerController(ctx, menu->getToolMenuItemFor(TOOL_POWER_CONTROLLER),
