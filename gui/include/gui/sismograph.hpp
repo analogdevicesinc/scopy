@@ -23,6 +23,7 @@
 
 #include <QVector>
 #include <QWidget>
+#include <QMap>
 
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
@@ -30,6 +31,7 @@
 #include "autoScaler.hpp"
 #include "customFifo.hpp"
 #include "scopygui_export.h"
+#include "gui/customqwtscaledraw.hpp"
 
 namespace scopy {
 	class SCOPYGUI_EXPORT Sismograph : public QwtPlot
@@ -52,25 +54,47 @@ namespace scopy {
 
 		int getNumSamples() const;
 		void setNumSamples(int num);
-
 		double getSampleRate() const;
 		void setSampleRate(double rate);
+
+		void setUnitOfMeasure(QString unitOfMeasureName,QString unitOfMeasureSymbol);
+		void setPlotAxisXTitle(QString title);
+
+		bool getAutoscale() const;
+		void setAutoscale(bool newAutoscale);
+		void addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize = 0.0 );
 
 	public Q_SLOTS:
 		void plot(double sample);
 		void reset();
 		void setColor(const QColor& color);
 		void updateScale(const QwtScaleDiv);
-                void setLineWidth(qreal width);
+		void updateYScale(double max, double min);
+		void setLineWidth(qreal width);
+		void setLineStyle(Qt::PenStyle lineStyle);
+		void setHistoryDuration(double time);
 
-        private:
+	private:
 		QwtPlotCurve curve;
 		unsigned int numSamples;
 		double sampleRate;
+		double interval;
 		AutoScaler *scaler;
+		double m_currentScale;
+		QString m_unitOfMeasureName;
+		QString m_unitOfMeasureSymbol;
+		CustomQwtScaleDraw* scaleLabel;
+		double m_currentMaxValue;
 
 		QVector<double> ydata;
-		CustomFifo<double> xdata;
+		QVector<double> xdata;
+
+		void updateScale();
+		double findMaxInFifo();
+		bool autoscale;
+
+	Q_SIGNALS:
+		void dataChanged(std::vector<double> data);
 	};
 }
 

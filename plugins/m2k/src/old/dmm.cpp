@@ -84,11 +84,28 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 	ui->sismograph_ch1->setColor(QColor("#ff7200"));
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
 
+	ui->sismograph_ch1->setAutoscale(false);
+	ui->sismograph_ch1->addScale(-1.0, 1.0, 5, 5);
+	ui->sismograph_ch1->addScale(-5.0, 5.0, 10, 2);
+	ui->sismograph_ch1->addScale(-25.0, 25.0, 10, 5);
+
+	ui->sismograph_ch2->setAutoscale(false);
+	ui->sismograph_ch2->addScale(-1.0, 1.0, 5, 5);
+	ui->sismograph_ch2->addScale(-5.0, 5.0, 10, 2);
+	ui->sismograph_ch2->addScale(-25.0, 25.0, 10, 5);
+
+	ui->sismograph_ch1->setUnitOfMeasure("Voltage", "V");
+	ui->sismograph_ch2->setUnitOfMeasure("Voltage", "V");
+
 	std::vector<scopy::CustomScale *> scales {ui->scaleCh1, ui->scaleCh2};
 	for (auto scale : scales) {
 		scale->setOrientation(Qt::Horizontal);
 		scale->setScalePosition(QwtThermo::LeadingScale);
 		scale->setOriginMode(QwtThermo::OriginCustom);
+		scale->setAutoScaler(false);
+		scale->addScale(-1.0, 1.0, 5, 5);
+		scale->addScale(-5.0, 5.0, 10, 2);
+		scale->addScale(-25.0, 25.0, 10, 5);
 	}
 
 	data_logging_timer = new PositionSpinButton({
