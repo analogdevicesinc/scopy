@@ -438,7 +438,7 @@ void ToolLauncher::_setupToolMenu()
 
 void ToolLauncher::_toolSelected(enum tool tool)
 {
-	Tool *selectedTool = nullptr;
+	QWidget *selectedTool = nullptr;
 	selectedToolId = tool;
 	switch(tool) {
 	case TOOL_OSCILLOSCOPE:
@@ -1363,6 +1363,7 @@ void adiscope::ToolLauncher::destroyContext()
 		dmm = nullptr;
 	}
 
+
 	if (power_control) {
 		delete power_control;
 		power_control = nullptr;
@@ -2009,15 +2010,15 @@ void ToolLauncher::toolDetached(bool detached)
 
 	if (detached) {
 		/* Switch back to the home screen */
-		if (current == static_cast<QWidget *>(tool))
+		if (current == static_cast<QWidget *>(tool->getCentralWidget()))
 			ui->btnHome->click();
 
 		setDynamicProperty(tool->runButton()->parentWidget(), "selected", false);
 	}
 
-	tool->setVisible(detached);
+	tool->getCentralWidget()->setVisible(detached);
 
-	tool->setMinimumSize(910, 490);
+	tool->getCentralWidget()->setMinimumSize(910, 490);
 }
 
 enum tool ToolLauncher::getSelectedToolId() const {

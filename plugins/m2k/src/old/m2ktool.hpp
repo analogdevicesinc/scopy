@@ -85,6 +85,7 @@ protected:
 	ToolMenuEntry *tme;
 	Preferences *p;
 	bool m_useNativeDialogs;
+	QWidget *m_centralWidget;
 };
 }
 }
