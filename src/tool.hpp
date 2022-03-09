@@ -62,6 +62,8 @@ public:
 
 	ApiObject* getApi();
 
+	QWidget *getCentralWidget();
+	void setCentralWidget(QWidget *centralWidget);
 Q_SIGNALS:
 	void detachedState(bool detached);
 
@@ -95,6 +97,7 @@ protected:
 	QMainWindow *window;
 	ToolMenuItem *toolMenuItem;
 	bool m_useNativeDialogs;
+	QWidget *m_centralWidget;
 };
 }
 #endif /* SCOPY_TOOL_HPP */
