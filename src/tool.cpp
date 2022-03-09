@@ -33,7 +33,8 @@ Tool::Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
 	QWidget(static_cast<QWidget *>(parent)),
 	ctx(ctx), run_button(toolMenuItem->getToolStopBtn()), api(api),
 	name(name), saveOnExit(true), isDetached(false), m_running(false),
-	window(nullptr), toolMenuItem(toolMenuItem)
+	window(nullptr), toolMenuItem(toolMenuItem),
+	m_centralWidget(this)
 {
 	toolMenuItem->setDisabled(false);
 
@@ -72,7 +73,9 @@ Tool::~Tool()
 {
 	disconnect(prefPanel, &Preferences::notify, this, &Tool::readPreferences);
 
-	run_button->setChecked(false);
+	if (run_button) {
+		run_button->setChecked(false);
+	}
 	toolMenuItem->setDisabled(true);
 
 	delete settings;
@@ -155,12 +158,12 @@ void Tool::detached()
 {
 	if (isDetached) {
 		// If it is already detached force it in the foreground
-		static_cast<DetachedWindow*>(parent())->showWindow();
+		static_cast<DetachedWindow*>(m_centralWidget)->showWindow();
 	} else {
 		Q_EMIT detachedState(true);
 		isDetached = true;
 		auto window = DetachedWindowsManager::getInstance().getWindow();
-		window->setCentralWidget(this);
+		window->setCentralWidget(m_centralWidget);
 		window->setWindowTitle("Scopy - " + name);
 		window->show();
 		connect(window, &DetachedWindow::closed,
@@ -187,5 +190,14 @@ bool Tool::isRunning()
 	return m_running;
 }
 
+QWidget* Tool::getCentralWidget()
+{
+	return m_centralWidget;
+}
+
+void Tool::setCentralWidget(QWidget* centralWidget)
+{
+	m_centralWidget = centralWidget;
+}
 
 
