@@ -35,6 +35,8 @@ namespace adiscope {
 
 		public Q_SLOTS:
 			void display(double num);
+			void setPrecision(unsigned precision);
+			unsigned getPrecision();
 
 		private:
 			unsigned precision;

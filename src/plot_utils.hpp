@@ -35,6 +35,9 @@ namespace adiscope {
 		virtual QString format(double value, QString unitType, int precision) const;
 		void getFormatAttributes(double value, QString& prefix, double& scale) const;
 
+		QString getFormatedMeasureUnit(double value);
+		double getFormatedValue(double value);
+
 		bool getTrimZeroes() const;
 		void setTrimZeroes(bool trimZeroes);
 

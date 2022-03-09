@@ -108,3 +108,8 @@ void AutoScaler::setTimeout(int timeout_ms)
 	if (timer.isActive())
 		timer.start();
 }
+
+void AutoScaler::addScaleDivs(QwtScaleDiv div)
+{
+	divs.push_back(div);
+}
