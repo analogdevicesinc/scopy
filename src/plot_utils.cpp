@@ -111,6 +111,19 @@ void PrefixFormatter::getFormatAttributes(double value, QString& prefix, double&
 	scale = m_prefixes[index].second;
 }
 
+QString PrefixFormatter::getFormatedMeasureUnit(double value)
+{
+	int index = findPrefixIndex(value);
+
+	return m_prefixes[index].first;
+}
+double PrefixFormatter::getFormatedValue(double value)
+{
+	int index = findPrefixIndex(value);
+
+	return value/m_prefixes[index].second;
+}
+
 /*
  * MetricPrefixFormatter class implementation
  */
