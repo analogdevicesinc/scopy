@@ -28,6 +28,7 @@
 #include <QStringList>
 
 #include <iio.h>
+#include <QDebug>
 
 using namespace scopy::m2k;
 
@@ -43,6 +44,7 @@ static const QStringList tool_names = {
 	"power",
 	"debugger",
 	"calibration",
+	"datalogger",
 	"launcher"
 };
 
@@ -132,7 +134,7 @@ const QString Filter::device_name(enum tool tool, int idx) const
 {
 	auto hdl = root[tool_names[tool] + "-devices"];
 	if (hdl.isNull() || !hdl.isArray())
-		throw std::runtime_error("Tool not compatible");
+		return "";
 
 	auto array = hdl.toArray();
 	if (idx >= array.size())
