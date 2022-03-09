@@ -129,7 +129,7 @@
             <string>Print</string>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/resources.qrc">
              <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
            </property>
            <property name="iconSize">
@@ -235,13 +235,13 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>65</width>
+            <width>75</width>
             <height>0</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>16777215</width>
+            <width>230</width>
             <height>16777215</height>
            </size>
           </property>
@@ -283,7 +283,7 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>165</width>
+               <width>16777215</width>
                <height>16777215</height>
               </size>
              </property>
@@ -624,27 +624,33 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
  </widget>
  <customwidgets>
   <customwidget>
+   <class>adiscope::DetachDragZone</class>
+   <extends>QWidget</extends>
+   <header location="global">gui/detachdragzone.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>gui/menu_anim.hpp</header>
+   <header location="global">gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
+   <header location="global">gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>gui/runsinglewidget.h</header>
+   <header location="global">gui/runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
+   <header location="global">gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::gui::SettingsPairWidget</class>
@@ -652,13 +658,9 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <header>gui/settings_pair_widget.hpp</header>
    <container>1</container>
   </customwidget>
-  <customwidget>
-   <class>adiscope::DetachDragZone</class>
-   <extends>QWidget</extends>
-   <header>gui/detachdragzone.h</header>
-   <container>1</container>
-  </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

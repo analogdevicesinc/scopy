@@ -22,6 +22,7 @@
 #include "dynamicWidget.hpp"
 
 #include <QButtonGroup>
+#include <utils.h>
 
 using namespace adiscope;
 
@@ -48,6 +49,7 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 {
 	init();
 	nameButton()->installEventFilter(this);
+	m_channelWSpacer = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed);
 }
 
 ChannelWidget::~ChannelWidget()
@@ -56,6 +58,7 @@ ChannelWidget::~ChannelWidget()
 	setButtonNoGroup(m_ui->name);
 	setButtonNoGroup(m_ui->btn);
 
+	delete m_channelWSpacer;
 	delete m_ui;
 }
 
@@ -63,6 +66,7 @@ void ChannelWidget::init()
 {
 	m_ui->setupUi(this);
 	m_ui->toggleChannels->hide();
+	m_ui->toggleChannels->setChecked(true);
 	setId(m_id);
 	m_ui->delBtn->setVisible(m_deletable);
 	setColor(m_color);
@@ -229,6 +233,16 @@ bool ChannelWidget::eventFilter(QObject *object, QEvent *event)
 	return QObject::eventFilter(object, event);
 }
 
+void ChannelWidget::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	if (!m_ui->box->isChecked()) {
+		m_ui->box->setChecked(true);
+		m_ui->name->setChecked(true);
+	}
+	m_ui->btn->setChecked(true);
+
+}
+
 void ChannelWidget::on_box_toggled(bool checked)
 {
 	if (checked) {
@@ -304,6 +318,7 @@ void ChannelWidget::setMenuButtonVisibility(bool visible)
 {
 	if (visible) {
 		m_ui->btn->show();
+
 	} else {
 		m_ui->btn->hide();
 	}
@@ -333,9 +348,8 @@ void ChannelWidget::setIsMainChannel(bool mainChannel)
 		m_isMainChannel = true;
 		m_ui->box->hide();
 		m_ui->toggleChannels->show();
-		connect(m_ui->toggleChannels, &QPushButton::clicked, this, [=](bool toggled){
+		connect(m_ui->toggleChannels, &QPushButton::toggled, this, [=](bool toggled){
 			Q_EMIT enabled(toggled);
 		});
-
 	}
 }

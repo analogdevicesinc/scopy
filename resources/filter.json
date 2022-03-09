@@ -1,6 +1,6 @@
 {
 	"generic": {
-		"compatible": [ "siggen", "dmm" ]
+	    "compatible": [ "debugger", "datalogger" ]
 	},
 
 	"FMComms2-4": {
