@@ -24,27 +24,35 @@
 #include <qwt_thermo.h>
 
 #include "autoScaler.hpp"
+#include "plot_utils.hpp"
 
 namespace adiscope {
-	class CustomScale : public QwtThermo
-	{
-		Q_OBJECT
+class CustomScale : public QwtThermo
+{
+	Q_OBJECT
 
-		public:
-			explicit CustomScale(QWidget *parent = nullptr);
-			~CustomScale();
+public:
+	explicit CustomScale(QWidget *parent = nullptr);
+	~CustomScale();
 
-		public Q_SLOTS:
-			void setValue(double);
-			void start();
-			void stop();
+	void setScaleForTemp(bool temp);
+	void addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize = 0.0 );
 
-		private Q_SLOTS:
-			void updateScale(const QwtScaleDiv);
+	bool getAutoScaler() const;
+	void setAutoScaler(bool newAutoScaler);
 
-		private:
-			AutoScaler *scaler;
-	};
+public Q_SLOTS:
+	void setValue(double);
+	void start();
+	void stop();
+
+private Q_SLOTS:
+	void updateScale(const QwtScaleDiv);
+
+private:
+	AutoScaler *scaler;
+	int m_currentScale;
+	bool autoScale;
+};
 }
-
 #endif /* CUSTOM_SCALE_HPP */
