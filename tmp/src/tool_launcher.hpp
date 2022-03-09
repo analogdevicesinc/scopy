@@ -73,6 +73,7 @@ class Device;
 namespace adiscope {
 class ToolLauncher_API;
 class SpectrumAnalyzer;
+class DataLogger;
 class Debugger;
 class ManualCalibration;
 class UserNotes;
@@ -240,6 +241,7 @@ private:
 	QFutureWatcher<QPair<bool, bool>> calibration_thread_watcher;
 
 	DMM *dmm;
+	DataLogger *data_logger;
 	PowerController *power_control;
 	SignalGenerator *signal_generator;
 	Oscilloscope *oscilloscope;

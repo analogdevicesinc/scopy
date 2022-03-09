@@ -7,6 +7,7 @@ DataLoggerView::DataLoggerView(bool lastValue, bool average, bool all, QWidget *
 {
 	dataLoggingWidget = new QWidget(this);
 	dataLoggingLayout = new QVBoxLayout(dataLoggingWidget);
+	dataLoggingLayout->layout()->setSpacing(10);
 
 	dataLoggerFilter = new QComboBox(dataLoggingWidget);
 	if (lastValue) {
