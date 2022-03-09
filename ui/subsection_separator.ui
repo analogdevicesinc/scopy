@@ -33,7 +33,7 @@
     <number>0</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>10</number>
    </property>
    <item>
     <layout class="QHBoxLayout" name="hLayoutSubsectionSeparator">
@@ -47,10 +47,10 @@
       <number>0</number>
      </property>
      <property name="topMargin">
-      <number>25</number>
+      <number>10</number>
      </property>
      <property name="bottomMargin">
-      <number>15</number>
+      <number>0</number>
      </property>
      <item>
       <widget class="QPushButton" name="btnSubsectionSeparator">

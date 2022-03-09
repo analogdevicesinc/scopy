@@ -23,6 +23,7 @@
 #include <QWidget>
 #include <QString>
 #include <QAbstractButton>
+#include <QSpacerItem>
 
 namespace Ui {
 class Channel;
@@ -77,6 +78,7 @@ public:
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
 
 private:
 	void init();
@@ -111,6 +113,7 @@ private:
 
 	bool m_floatingMenu;
 	bool m_isMainChannel;
+	QSpacerItem *m_channelWSpacer;
 };
 
 } /* namespace adiscope */
