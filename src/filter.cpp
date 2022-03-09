@@ -28,6 +28,7 @@
 #include <QStringList>
 
 #include <iio.h>
+#include <QDebug>
 
 using namespace adiscope;
 
@@ -43,6 +44,7 @@ static const std::string tool_names[] = {
 	"power",
 	"debugger",
 	"calibration",
+	"datalogger",
 	"launcher"
 };
 
@@ -133,7 +135,7 @@ const std::string Filter::device_name(enum tool tool, int idx) const
 {
 	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
 	if (hdl.isNull() || !hdl.isArray())
-		throw std::runtime_error("Tool not compatible");
+		return "";
 
 	auto array = hdl.toArray();
 	if (idx >= array.size())
