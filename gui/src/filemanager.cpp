@@ -417,6 +417,55 @@ void FileManager::setFormat(const FileManager::FileFormat &value)
 	format = value;
 }
 
+void FileManager::writeToFile(bool overwrite,QMap<QString,QVector<QString>> data)
+{
+	QFile file(filename);
+	QTextStream exportStream(&file);
+	if (!file.isOpen()) {
+		if (overwrite) {
+
+			file.open(QIODevice::WriteOnly);
+			QStringList header = ScopyFileHeader::getHeader();
+			//prepare header
+			exportStream << header[0] << separator << QString(SCOPY_VERSION_GIT) << "\n";
+			exportStream << header[1] << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
+			exportStream << header[2] << separator << "M2K" << "\n";
+			exportStream << header[5] << separator << toolName << "\n";
+
+			//add columns
+			QString columns = "";
+			for (auto ch : data.keys()) {
+				columns+= ch + separator;
+			}
+			exportStream << columns << "\n";
+
+		} else {
+
+			file.open(QIODevice::Append);
+			QString dataToWrite = "";
+			for (auto ch : data.keys()) {
+				if (!data[ch].empty()) {
+					for (auto d : data[ch]) {
+						dataToWrite += d + " ";
+					}
+					dataToWrite += separator;
+				} else {
+					dataToWrite += ",";
+				}
+			}
+			exportStream << dataToWrite << "" << "\n";
+
+		}
+	} else {
+		qDebug() << "File already opened!";
+		return;
+	}
+
+	if (file.isOpen()) {
+		file.close();
+	}
+}
+
 bool ScopyFileHeader::hasValidHeader(QVector<QVector<QString>> data)
 {
 
