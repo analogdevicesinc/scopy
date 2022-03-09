@@ -80,6 +80,8 @@ public:
 	FileFormat getFormat() const;
 	void setFormat(const FileFormat &value);
 
+	void writeToFile(bool overwrite, QMap<QString,QVector<QString>> data);
+
 private:
 
 	QVector<QVector<double>> data;
