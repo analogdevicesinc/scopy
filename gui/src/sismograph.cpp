@@ -23,11 +23,18 @@
 #include <QPen>
 #include <qwt_plot_layout.h>
 #include <qwt_scale_engine.h>
+#include "plot_utils.hpp"
+#include <math.h>
+#include <cstdlib>
 
 using namespace scopy;
 
-Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
-	curve("data"), sampleRate(10.0)
+Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent)
+      , curve("data"), sampleRate(10)
+      , m_currentScale(-Q_INFINITY)
+      , m_currentMaxValue(-Q_INFINITY)
+      , interval(10)
+      , autoscale(true)
 {
 	setAxisVisible(QwtAxis::XBottom, false);
 	setAxisVisible(QwtAxis::XTop, true);
@@ -43,19 +50,20 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 	QVector<QwtScaleDiv> divs;
 	QwtScaleEngine *engine = axisScaleEngine(QwtAxis::XTop);
 	divs.push_back(engine->divideScale(-0.1, +0.1, 5, 5));
-	divs.push_back(engine->divideScale(-1.0, +1.0, 5, 5));
-	divs.push_back(engine->divideScale(-5.0, +5.0, 10, 2));
-	divs.push_back(engine->divideScale(-25.0, +25.0, 10, 5));
 
 	scaler = new AutoScaler(this, divs);
-
-	connect(scaler, SIGNAL(updateScale(const QwtScaleDiv)),
-			this, SLOT(updateScale(const QwtScaleDiv)));
-
-	setNumSamples(100);
+	connect(scaler, &AutoScaler::updateScale, this, [=](QwtScaleDiv div){
+		if (autoscale) {
+			updateScale();
+		} else {
+			updateScale(div);
+		}
+	});
 
 	plotLayout()->setAlignCanvasToScales(true);
-
+	scaleLabel = new CustomQwtScaleDraw();
+	scaleLabel->setUnitOfMeasure(m_unitOfMeasureSymbol);
+	this->setAxisScaleDraw(QwtAxis::XTop,scaleLabel);
 	curve.attach(this);
 	curve.setXAxis(QwtAxis::XTop);
 }
@@ -67,15 +75,80 @@ Sismograph::~Sismograph()
 
 void Sismograph::plot(double sample)
 {
-	if (xdata.size() == numSamples + 1)
-		xdata.pop();
+	xdata.push_back(sample);
 
-	xdata.push(sample);
+	if (xdata.size() == numSamples + 2){
+		xdata.pop_front();
+	}
+
+	if (sample > m_currentMaxValue && autoscale) {
+		updateScale();
+	}
+
 	scaler->setValue(sample);
-
-	curve.setRawSamples(xdata.data(), ydata.data() + (ydata.size() -
-				xdata.size()), xdata.size());
+	curve.setRawSamples(xdata.data(), ydata.data() + (ydata.size() - xdata.size()), xdata.size());
 	replot();
+}
+
+double Sismograph::findMaxInFifo()
+{
+	double max = -Q_INFINITY;
+	for (int i = 0 ; i < xdata.size(); i++) {
+		if (abs(xdata.at(i)) > max) {
+			max = abs(xdata.at(i));
+		}
+	}
+	return max;
+}
+
+bool Sismograph::getAutoscale() const
+{
+	return autoscale;
+}
+
+void Sismograph::setAutoscale(bool newAutoscale)
+{
+	autoscale = newAutoscale;
+}
+
+void Sismograph::addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize)
+{
+	QwtScaleEngine *scaleEngine = axisScaleEngine(QwtAxis::XTop);
+	scaler->addScaleDivs(scaleEngine->divideScale(x1, x2, maxMajorSteps, maxMinorSteps,stepSize));
+}
+
+void Sismograph::updateScale()
+{
+	double sample = findMaxInFifo();
+	/// compute scale
+	int digits = 0;
+	double num = sample;
+	if (num != 0) {
+		if (int(num) == 0) {
+			while ((int)num*10 == 0) {
+				num *= 10;
+				digits++;
+			}
+			digits = -1 * (digits - 1);
+		} else {
+
+			while ((int)num) {
+				num /= 10;
+				digits++;
+			}
+		}
+	}
+	double scale = pow(10 , digits);
+
+	////update scale
+	MetricPrefixFormatter m_prefixFormater;
+	QString formatedPrefix = m_prefixFormater.getFormatedMeasureUnit(sample);
+	setPlotAxisXTitle(formatedPrefix + m_unitOfMeasureName + "(" + formatedPrefix + m_unitOfMeasureSymbol + ")");
+	scaleLabel->setUnitOfMeasure(m_unitOfMeasureSymbol);
+
+	QwtScaleEngine *scaleEngine = axisScaleEngine(QwtAxis::XTop);
+	updateScale(scaleEngine->divideScale((-1*scale),scale,5,10));
+	m_currentScale = scale;
 }
 
 int Sismograph::getNumSamples() const
@@ -86,17 +159,31 @@ int Sismograph::getNumSamples() const
 void Sismograph::setNumSamples(int num)
 {
 	numSamples = (unsigned int) num;
-
 	reset();
 	ydata.resize(numSamples + 1);
 	xdata.reserve(numSamples + 1);
-
 	setAxisScale(QwtAxis::YLeft, (double) numSamples / sampleRate, 0.0);
-
-	setSampleRate(sampleRate);
 	replot();
-
 	scaler->setTimeout((double) numSamples * 1000.0 / sampleRate);
+
+	for (unsigned int i = 0; i <= numSamples; i++)
+		ydata[i] = (double)(numSamples - i) / sampleRate;
+}
+
+void Sismograph::updateYScale(double max, double min)
+{
+	reset();
+	ydata.resize(numSamples + 1);
+	xdata.reserve(numSamples + 1);
+	setSampleRate(sampleRate);
+	setAxisScale(QwtAxis::YLeft, min,max);
+	replot();
+}
+
+void Sismograph::setHistoryDuration(double time)
+{
+	interval = time;
+	setNumSamples(interval * sampleRate);
 }
 
 double Sismograph::getSampleRate() const
@@ -107,9 +194,7 @@ double Sismograph::getSampleRate() const
 void Sismograph::setSampleRate(double rate)
 {
 	sampleRate = rate;
-
-	for (unsigned int i = 0; i <= numSamples; i++)
-		ydata[i] = (double)(numSamples - i) / sampleRate;
+	setNumSamples(interval * sampleRate);
 }
 
 void Sismograph::reset()
@@ -120,12 +205,16 @@ void Sismograph::reset()
 
 void Sismograph::setColor(const QColor& color)
 {
-	curve.setPen(QPen(color));
+	QPen pen(curve.pen());
+	pen.setColor(color);
+	curve.setPen(pen);
+	replot();
 }
 
 void Sismograph::updateScale(const QwtScaleDiv div)
 {
 	setAxisScale(QwtAxis::XTop, div.lowerBound(), div.upperBound());
+	setAxisScaleDraw(QwtAxis::XTop,scaleLabel);
 }
 
 void Sismograph::setLineWidth(qreal width)
@@ -135,4 +224,22 @@ void Sismograph::setLineWidth(qreal width)
         curve.setPen(QPen(pen));
 }
 
+void Sismograph::setLineStyle(Qt::PenStyle lineStyle)
+{
+	QPen pen(curve.pen());
+	pen.setStyle(lineStyle);
+	curve.setPen(QPen(pen));
+	replot();
+}
+
+void Sismograph::setUnitOfMeasure(QString unitOfMeasureName,QString unitOfMeasureSymbol)
+{
+	m_unitOfMeasureName = unitOfMeasureName;
+	m_unitOfMeasureSymbol = unitOfMeasureSymbol;
+}
+
+void Sismograph::setPlotAxisXTitle(QString title)
+{
+	setAxisTitle(QwtAxis::XTop, title);
+}
 #include "moc_sismograph.cpp"
