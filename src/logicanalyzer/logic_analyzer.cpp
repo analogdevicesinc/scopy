@@ -142,7 +142,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	for (uint8_t i = 0; i < m_nbChannels; ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 
-		QHBoxLayout *hBoxLayout = new QHBoxLayout(this);
+		QHBoxLayout *hBoxLayout = new QHBoxLayout();
 
 		ui->channelEnumeratorLayout->addLayout(hBoxLayout, i % 8, i / 8);
 

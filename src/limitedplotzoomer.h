@@ -34,7 +34,6 @@ public:
 
 protected:
 	virtual void zoom(const QRectF &);
-	virtual void axesChanged() override;
 	virtual QSizeF minZoomSize() const override;
 
 private:
