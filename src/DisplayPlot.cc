@@ -1663,7 +1663,6 @@ DisplayPlot::onPickerPointSelected6(const QPointF & p)
 
 void DisplayPlot::zoomBaseUpdate(bool force)
 {
-	qDebug()<<"ZoomBaseUpdate";
 	for (unsigned int i = 0; i < d_zoomer.size(); ++i)
 		d_zoomer[i]->setZoomBase(force);
 }

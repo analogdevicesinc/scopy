@@ -64,11 +64,6 @@ void LimitedPlotZoomer::zoom(const QRectF &rect)
 	QwtPlotZoomer::zoom(boundedRect);
 }
 
-
-
-void LimitedPlotZoomer::axesChanged() {
-	qDebug()<<"Axes changed";
-}
 QSizeF LimitedPlotZoomer::minZoomSize() const
 {
 	const double eps = 10e12;

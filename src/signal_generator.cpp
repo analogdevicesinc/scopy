@@ -1188,7 +1188,6 @@ void SignalGenerator::updatePreview()
 	timer.start();
 
 	top->run();
-	qDebug(CAT_SIGNAL_GENERATOR) << "The slow operation took" << timer.elapsed() << "milliseconds";
 	top->disconnect_all();
 
 	if (ui->run_button->runButtonChecked()) {

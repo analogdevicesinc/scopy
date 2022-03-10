@@ -1791,7 +1791,7 @@ void CapturePlot::setOffsetWidgetVisible(int chnIdx, bool visible)
 
 	// if no group return
 	if (hdlGroup == d_groupHandles.end()) {
-		qDebug() << "This handle is not in a group!";
+		//qDebug() << "This handle is not in a group!";
 		return;
 	}
 
