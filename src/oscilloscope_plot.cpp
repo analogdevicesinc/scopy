@@ -1044,10 +1044,6 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 		/* update the size of the gates when the plot canvas is resized */
 		updateGateMargins();
 
-		for (int i = 0; i < d_offsetHandles.size(); ++i) {
-			d_offsetHandles[i]->triggerMove();
-		}
-
 		Q_EMIT canvasSizeChanged();
 
 	}
