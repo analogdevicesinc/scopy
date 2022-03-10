@@ -4,8 +4,8 @@
 
 #include "channel_manager.hpp"
 
-using namespace scopy::gui;
 using namespace adiscope;
+using namespace adiscope::gui;
 
 ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	: QWidget(parent)

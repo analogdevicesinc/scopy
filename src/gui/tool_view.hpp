@@ -19,7 +19,7 @@ namespace Ui {
 class ToolView;
 }
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 class ToolView : public QWidget

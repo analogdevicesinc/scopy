@@ -3,7 +3,7 @@
 
 #include "tool_view.hpp"
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 struct ToolViewRecipe

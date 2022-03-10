@@ -2,7 +2,7 @@
 
 #include "custom_menu_button.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 CustomMenuButton::CustomMenuButton(QString labelText, bool checkboxVisible, bool checkBoxChecked, QWidget* parent)
 	: CustomMenuButton(parent)

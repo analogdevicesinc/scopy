@@ -4,7 +4,7 @@
 #include "theme_manager.hpp"
 #include "utils.h"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 ThemeManager::ThemeManager()
 	: m_app(nullptr)

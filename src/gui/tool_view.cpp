@@ -7,7 +7,7 @@
 #include "utils.h"
 #include <QTabWidget>
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 ToolView::ToolView(QWidget* parent)
 	: QWidget(parent)

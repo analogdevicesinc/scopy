@@ -5,7 +5,7 @@
 
 #include "menu_header.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 MenuHeader::MenuHeader(QWidget* parent)
 	: QWidget(parent)

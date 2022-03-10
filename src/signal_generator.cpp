@@ -1630,7 +1630,7 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 
 	}
 	else
-		src = scopy::trapezoidal::make(samp_rate, data.frequency, amplitude,
+		src = gr::scopy::trapezoidal::make(samp_rate, data.frequency, amplitude,
 					       rise, holdh, fall, holdl, offset,
 					       phase*0.01745329);
 
@@ -1912,19 +1912,19 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 
 				if(ptr->math_sr < samp_rate)
 				{
-					auto src = scopy::iio_math_gen::make(ptr->math_sr, str, (uint64_t)ptr->math_sr * ptr->math_record_length);
+					auto src = gr::scopy::iio_math_gen::make(ptr->math_sr, str, (uint64_t)ptr->math_sr * ptr->math_record_length);
 					auto resamp = displayResampler(samp_rate, ptr->math_sr, top, src, noiseSrc, noiseAdd);
 					top->connect(resamp, 0, skip_head, 0);
 					return skip_head;
 				}
 				else
 				{
-					auto src = scopy::iio_math_gen::make(samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
+					auto src = gr::scopy::iio_math_gen::make(samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
 					top->connect(src, 0, skip_head, 0);
 					generated_wave = skip_head;
 				}
 			} else {
-				generated_wave = scopy::iio_math_gen::make(samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
+				generated_wave = gr::scopy::iio_math_gen::make(samp_rate, str, (uint64_t)samp_rate * ptr->math_record_length);
 			}
 			break;
 		}

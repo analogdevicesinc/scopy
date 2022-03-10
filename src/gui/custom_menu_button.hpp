@@ -13,7 +13,7 @@ namespace Ui {
 class CustomMenuButton;
 }
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 class CustomMenuButton : public QWidget

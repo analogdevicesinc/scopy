@@ -212,7 +212,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="scopy::gui::SettingsPairWidget" name="widgetSettingsPairBtns" native="true"/>
+          <widget class="adiscope::gui::SettingsPairWidget" name="widgetSettingsPairBtns" native="true"/>
          </item>
         </layout>
        </widget>
@@ -642,7 +642,7 @@ QPushButton:checked { border-image: url(:/icons/common/setup_btn_checked.svg); }
    <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
-   <class>scopy::gui::SettingsPairWidget</class>
+   <class>adiscope::gui::SettingsPairWidget</class>
    <extends>QWidget</extends>
    <header>gui/settings_pair_widget.hpp</header>
    <container>1</container>

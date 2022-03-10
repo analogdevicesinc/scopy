@@ -9,7 +9,7 @@
 
 using namespace adiscope;
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 class GenericMenu : public QWidget
