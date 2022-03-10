@@ -106,6 +106,7 @@ namespace adiscope {
 		void set_buffer_size(port_id id, unsigned long size);
 		void set_filter_parameters(int channel, int index, bool enable, float TC, float gain, float sample_rate );
 		void set_data_rate(double rate);
+		void set_kernel_buffer_count(int kb = 0);
 
 		/* VERY ugly hack. The reconfiguration that happens after
 		 * locking/unlocking the flowgraph is sort of broken; the tags
