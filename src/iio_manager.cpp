@@ -365,6 +365,14 @@ void iio_manager::set_data_rate(double rate) {
 	iio_block->set_data_rate(rate);
 }
 
+void iio_manager::set_kernel_buffer_count(int kb) {
+	if(kb) {
+		m_analogin->setKernelBuffersCount(kb);
+	} else {
+		m_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
+	}
+}
+
 void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
 {
 	for (int i = 0; i < nb_channels; ++i) {
