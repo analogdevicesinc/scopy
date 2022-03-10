@@ -2465,7 +2465,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	}
 
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
-	auto math = scopy::iio_math::make(function, nb_channels);
+	auto math = gr::scopy::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
 	unsigned int curve_number = find_curve_number();
 
@@ -4161,7 +4161,7 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string& new_functi
 	std::string name = qname.toStdString();
 
 	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
-	auto math = scopy::iio_math::make(new_function, nb_channels);
+	auto math = gr::scopy::iio_math::make(new_function, nb_channels);
 
 	bool started = isIioManagerStarted();
 	if (started)

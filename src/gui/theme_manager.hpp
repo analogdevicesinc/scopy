@@ -3,7 +3,7 @@
 
 #include <QApplication>
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 class ThemeManager

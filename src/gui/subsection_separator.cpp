@@ -4,7 +4,7 @@
 
 #include "subsection_separator.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 SubsectionSeparator::SubsectionSeparator(QWidget* parent)
 	: QWidget(parent)

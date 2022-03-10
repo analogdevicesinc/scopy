@@ -8,7 +8,7 @@ namespace Ui {
 class MenuHeader;
 }
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 class MenuHeader : public QWidget

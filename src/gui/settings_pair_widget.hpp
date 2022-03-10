@@ -12,7 +12,7 @@ namespace Ui {
 class SettingsPairWidget;
 }
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 class SettingsPairWidget : public QWidget
 {

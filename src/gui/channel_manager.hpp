@@ -8,9 +8,7 @@
 #include "channel_widget.hpp"
 #include "customPushButton.hpp"
 
-using namespace adiscope;
-
-namespace scopy {
+namespace adiscope {
 namespace gui {
 
 enum class ChannelsPositionEnum

@@ -2,7 +2,7 @@
 
 #include "generic_menu.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 GenericMenu::GenericMenu(QWidget* parent)
 	: QWidget(parent)

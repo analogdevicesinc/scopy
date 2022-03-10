@@ -2,7 +2,7 @@
 
 #include "settings_pair_widget.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 SettingsPairWidget::SettingsPairWidget(QWidget* parent)
 	: QWidget(parent)

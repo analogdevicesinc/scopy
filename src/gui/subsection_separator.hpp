@@ -9,7 +9,7 @@ namespace Ui {
 class SubsectionSeparator;
 }
 
-namespace scopy {
+namespace adiscope {
 namespace gui {
 class SubsectionSeparator : public QWidget
 {

@@ -2,7 +2,7 @@
 
 #include "tool_view_builder.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 ToolViewBuilder::ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager)
 {
