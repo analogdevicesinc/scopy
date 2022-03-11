@@ -8,9 +8,7 @@
 
 namespace adiscope {
 class CustomSwitch;
-}
 
-namespace scopy {
 namespace gui {
 class GenericMenu;
 

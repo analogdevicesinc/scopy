@@ -27,20 +27,20 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 				QColor(Qt::yellow), QColor(Qt::gray), QColor(Qt::darkRed), QColor(Qt::darkGreen),
 				QColor(Qt::darkBlue), QColor(Qt::darkGray),QColor(Qt::black)};
 
-	scopy::gui::ToolViewRecipe recepie;
+	adiscope::gui::ToolViewRecipe recepie;
 	recepie.helpBtnUrl = "";
 	recepie.hasRunBtn = true;
 	recepie.hasSingleBtn = true;
 	recepie.hasPairSettingsBtn = true;
 	recepie.hasPrintBtn = false;
 	recepie.hasChannels = true;
-	recepie.channelsPosition = scopy::gui::ChannelsPositionEnum::VERTICAL;
+	recepie.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
 
-	m_monitorChannelManager = new scopy::gui::ChannelManager(recepie.channelsPosition);
+	m_monitorChannelManager = new adiscope::gui::ChannelManager(recepie.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 	m_monitorChannelManager->setToolStatus("Stopped");
 
-	m_toolView = scopy::gui::ToolViewBuilder(recepie,m_monitorChannelManager,parent).build();
+	m_toolView = adiscope::gui::ToolViewBuilder(recepie,m_monitorChannelManager,parent).build();
 
 	m_generalSettingsMenu = generateMenu("General settings", new QColor("#4a64ff"));
 	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu,true);
@@ -316,7 +316,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 	menu->initInteractiveMenu();
 	menu->setMenuHeader(title,color,false);
 
-	auto *showAllSection = new scopy::gui::SubsectionSeparator("Show all", false, this);
+	auto *showAllSection = new adiscope::gui::SubsectionSeparator("Show all", false, this);
 
 	QWidget *showAllWidget = new QWidget(this);
 	auto *showAllLayout = new QHBoxLayout(showAllWidget);
@@ -332,7 +332,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 		Q_EMIT DataLogger::toggleAll(toggled);
 	});
 
-	auto *precisionSection = new scopy::gui::SubsectionSeparator("Precision", false,this);
+	auto *precisionSection = new adiscope::gui::SubsectionSeparator("Precision", false,this);
 
 	QWidget *precisionWidget = new QWidget(this);
 	auto *precisionLayout = new QHBoxLayout(precisionWidget);
@@ -361,7 +361,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	precisionSection->setContent(precisionWidget);
 
-	auto *recordingIntervalSection = new scopy::gui::SubsectionSeparator("Recording interval", false, this);
+	auto *recordingIntervalSection = new adiscope::gui::SubsectionSeparator("Recording interval", false, this);
 	auto recordingIntervalWidget = new QWidget(this);
 	auto *recordingIntevlaLayout = new QVBoxLayout(recordingIntervalWidget);
 
@@ -386,7 +386,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	recordingIntervalSection->setContent(recordingIntervalWidget);
 
-	auto dataLoggingSection = new scopy::gui::SubsectionSeparator("Data Logging",true,this);
+	auto dataLoggingSection = new adiscope::gui::SubsectionSeparator("Data Logging",true,this);
 
 	dataLogger = new DataLoggerController(true,true,false);
 	dataLogger->setWarningMessage("* While data logging you won't be able to add/remove channels");
