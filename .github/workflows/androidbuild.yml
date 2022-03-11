@@ -25,3 +25,24 @@ jobs:
          ${{ github.workspace }}/android-build-debug.apk
          ${{ github.workspace }}/android-build-debug.aab
          ${{ github.workspace }}/android-build-release.aab
+
+    - name: Upload master apk and aab builds to continous prerelease
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: |
+        DEPLOY_APK_DEBUG=Scopy-android-debug-${GITHUB_SHA::7}.apk
+        DEPLOY_AAB_DEBUG=Scopy-android-debug-${GITHUB_SHA::7}.aab
+        DEPLOY_AAB_RELEASE=Scopy-android-release-${GITHUB_SHA::7}.aab
+        ARTIFACTS_ARCHIVE=Scopy-android.zip
+
+        cp ${{ github.workspace }}/android-build-debug.apk ${DEPLOY_APK_DEBUG}
+        cp ${{ github.workspace }}/android-build-debug.aab ${DEPLOY_AAB_DEBUG}
+        cp ${{ github.workspace }}/android-build-release.aab ${DEPLOY_AAB_RELEASE}
+
+        zip ${ARTIFACTS_ARCHIVE} ${DEPLOY_APK_DEBUG} ${DEPLOY_AAB_DEBUG} ${DEPLOY_AAB_RELEASE}
+
+        wget https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz
+        tar xvf ghr_v0.13.0_linux_amd64.tar.gz
+
+        ghr_v0.13.0_linux_amd64/ghr -u ${{ github.repository_owner }} -r scopy -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous ${ARTIFACTS_ARCHIVE}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
