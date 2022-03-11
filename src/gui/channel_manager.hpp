@@ -68,6 +68,6 @@ private:
 	int m_minChannelWidth;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // CHANNEL_MANAGER_HPP
