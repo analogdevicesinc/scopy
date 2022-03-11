@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include "gui/customSwitch.hpp"
 
-using namespace scopy::gui;
+using namespace adiscope::gui;
 
 DataLoggerGenericMenu::DataLoggerGenericMenu(QWidget *parent):
 	GenericMenu(parent)

@@ -20,16 +20,14 @@
 #include <scopyExceptionHandler.h>
 #include <libm2k/m2kexceptions.hpp>
 
-namespace scopy{
+namespace adiscope {
 namespace gui {
 class GenericMenu;
 class ChannelManager;
 
 class DataLoggerGenericMenu;
 }
-}
 
-namespace adiscope {
 class ChannelWidget;
 class CustomColQGridLayout;
 class ChannelMonitorComponent;
@@ -57,7 +55,7 @@ public:
 							QJSEngine *engine, ToolLauncher *parent);
 	~DataLogger();
 
-    scopy::gui::ToolView* getToolView();
+	adiscope::gui::ToolView* getToolView();
 
 	CustomSwitch* showAllSWitch;
 	int getPrecision();
@@ -74,21 +72,21 @@ private:
 	DataLoggerController *dataLogger;
 	QList<QColor> m_colors;
 	QMap<int,QColor> m_color;
-	scopy::gui::ToolView* m_toolView;
+	adiscope::gui::ToolView* m_toolView;
 	CustomColQGridLayout* m_customColGrid;
 	libm2k::context::Context* m_context;
-	scopy::gui::ToolView* m_monitorToolView;
+	adiscope::gui::ToolView* m_monitorToolView;
 	std::vector<ChannelWidget*> m_channelList;
 	std::vector<libm2k::analog::DMM*> m_dmmList;
-	scopy::gui::GenericMenu* m_generalSettingsMenu;
-	scopy::gui::ChannelManager* m_monitorChannelManager;
+	adiscope::gui::GenericMenu* m_generalSettingsMenu;
+	adiscope::gui::ChannelManager* m_monitorChannelManager;
 	QMap<int,QPair<activeChannel,ChannelMonitorComponent*>> m_activeChannels;
 
 	QColor generateColor();
 	void initMonitorToolView();
 	QColor getChannelColor(int chId);
 	void updateChannelWidget(int ch);
-	scopy::gui::GenericMenu* generateMenu(QString title, QColor* color);
+	adiscope::gui::GenericMenu* generateMenu(QString title, QColor* color);
 	std::vector<libm2k::analog::DMM*> getDmmList(libm2k::context::Context* m2k_context);
 	void createConnections(adiscope::gui::DataLoggerGenericMenu* mainMenu,adiscope::gui::DataLoggerGenericMenu* menu,adiscope::ChannelMonitorComponent* monitor);
 
