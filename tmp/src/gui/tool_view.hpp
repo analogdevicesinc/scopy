@@ -122,6 +122,6 @@ private:
 	QMap<int,GenericMenu*> m_menuList;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // TOOL_VIEW_HPP

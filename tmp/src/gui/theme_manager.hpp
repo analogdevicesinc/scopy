@@ -28,6 +28,6 @@ private:
 	QStringList m_availableThemes;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // THEMEMANAGER_HPP

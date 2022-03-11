@@ -38,6 +38,6 @@ public:
 	QPushButton* getEnableBtn();
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // MENU_HEADER_HPP

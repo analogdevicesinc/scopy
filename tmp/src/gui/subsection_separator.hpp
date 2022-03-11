@@ -41,6 +41,6 @@ public:
 
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // SUBSECTIONSEPARATOR_H
