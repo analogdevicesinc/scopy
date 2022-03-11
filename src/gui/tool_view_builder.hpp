@@ -35,6 +35,6 @@ private:
 	ToolView* m_toolView;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // TOOLVIEWBUILDER_HPP

@@ -44,6 +44,6 @@ private:
 	bool m_floatingMenu;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // CUSTOMMENUBUTTON_H
