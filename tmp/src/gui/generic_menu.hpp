@@ -36,6 +36,6 @@ private:
 	int m_lastOpenPosition;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // GENERICMENU_HPP
