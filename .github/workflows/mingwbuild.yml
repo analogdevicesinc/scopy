@@ -29,6 +29,33 @@ jobs:
       with:
         name: scopy-x86_64-setup.exe
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.exe
+
+    # Debug session
+    # - name: Start SSH session
+    #   uses: luchihoratiu/debug-via-ssh@main
+    #   with:
+    #     NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+    #     SSH_PASS: ${{ secrets.SSH_PASS }}
+    #     NGROK_REGION: 'eu'
+
+    - name: Upload master executable to continous prerelease
+      if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+      run: |
+        export SHORT_SHA=${{ github.sha }}
+        export DEPLOY_FILE=Scopy-64-setup-${SHORT_SHA::7}.exe
+        export ARTIFACT_ARCHIVE=Scopy-64-setup.zip
+
+        cp "${{ github.workspace }}\artifacts\scopy-64-setup.exe" $DEPLOY_FILE
+        tar.exe -a -c -f $ARTIFACT_ARCHIVE $DEPLOY_FILE
+
+        choco install wget
+        wget https://github.com/tcnksm/ghr/releases/download/v0.14.0/ghr_v0.14.0_windows_amd64.zip
+        unzip ghr_v0.14.0_windows_amd64.zip
+
+        "ghr_v0.14.0_windows_amd64\ghr.exe" -u ${{ github.repository_owner }} -r scopy -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous $ARTIFACT_ARCHIVE
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
 #  make-exe-32:
 #    runs-on: windows-latest

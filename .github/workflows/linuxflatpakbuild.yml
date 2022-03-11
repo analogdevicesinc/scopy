@@ -11,21 +11,31 @@ jobs:
     - uses: actions/checkout@v2
     - name: Pull the Docker Image
       run: docker pull analogdevices/scopy-build:flatpak
+
     - name: Run Docker Image
       run: |
             docker run --privileged \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
                 analogdevices/scopy-build:flatpak /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
+
     - uses: actions/upload-artifact@v2
       with:
         name: Scopy.flatpak
         path: ${{ github.workspace }}/Scopy.flatpak
+
     - name: Upload master flatpak build to continous prerelease
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
       run: |
+        DEPLOY_FILE=Scopy-${GITHUB_SHA::7}.flatpak
+        ARTIFACT_ARCHIVE=Scopy-flatpak.tar.gz
+
+        cp ${{ github.workspace }}/Scopy.flatpak ${DEPLOY_FILE}
+        tar -czvf ${ARTIFACT_ARCHIVE} ${DEPLOY_FILE}
+
         wget https://github.com/tcnksm/ghr/releases/download/v0.13.0/ghr_v0.13.0_linux_amd64.tar.gz 
         tar xvf ghr_v0.13.0_linux_amd64.tar.gz
-        ghr_v0.13.0_linux_amd64/ghr -u ${{ github.repository_owner }} -r scopy -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous ${{ github.workspace }}/Scopy.flatpak
+
+        ghr_v0.13.0_linux_amd64/ghr -u ${{ github.repository_owner }} -r scopy -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous ${ARTIFACT_ARCHIVE}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
