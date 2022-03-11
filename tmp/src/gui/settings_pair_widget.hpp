@@ -29,6 +29,6 @@ private:
 	Ui::SettingsPairWidget* m_ui;
 };
 } // namespace gui
-} // namespace scopy
+} // namespace adiscope
 
 #endif // SETTINGSPAIRWIDGET_H
