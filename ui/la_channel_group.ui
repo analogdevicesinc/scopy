@@ -906,10 +906,10 @@ border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }
 
 QPushButton:checked {
-  border-image: url(:/icons/redX.svg);
+  border-image: url(:/icons/red_x.svg);
 }
 QPushButton:!checked {
-  border-image: url(:/icons/redX.svg);
+  border-image: url(:/icons/red_x.svg);
 
 }
 </string>

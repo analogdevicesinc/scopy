@@ -12,7 +12,7 @@ LinkedButton::LinkedButton(QWidget* parent)
 {
 	setDynamicProperty(this,"info_button", true);
 
-	this->setIcon(QIcon::fromTheme("ico info"));
+	this->setIcon(QIcon::fromTheme("info"));
 	this->setIconSize(QSize(32, 32));
 
 	this->setToolTip("See more info");

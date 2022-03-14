@@ -447,7 +447,7 @@ border-right:0px solid transparent;</string>
   min-width: 14px;
   max-width: 14px;
   max-height: 14px;
-  border-image: url(:/icons/redX.svg);
+  border-image: url(:/icons/red_x.svg);
 }
 
 </string>

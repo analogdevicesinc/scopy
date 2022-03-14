@@ -88,7 +88,7 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 
 			QPushButton *help_btn = new QPushButton();
 			help_btn->setFlat(true);
-			help_btn->setIcon(QIcon::fromTheme("ico info"));
+			help_btn->setIcon(QIcon::fromTheme("info"));
 			help_btn->setToolTip(p->desc());
 			connect(help_btn, SIGNAL(clicked(bool)),
 				this, SLOT(on_help_clicked()));

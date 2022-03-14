@@ -114,7 +114,7 @@
           </property>
           <property name="icon">
            <iconset resource="../resources/resources.qrc">
-            <normaloff>:/icons/ic printer.svg</normaloff>:/icons/ic printer.svg</iconset>
+            <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -1794,7 +1794,7 @@ text-align: left;
                          </property>
                          <property name="icon">
                           <iconset resource="../resources/resources.qrc">
-                           <normaloff>:/icons/ic arrow right.svg</normaloff>:/icons/ic arrow right.svg</iconset>
+                           <normaloff>:/icons/arrow_right.svg</normaloff>:/icons/arrow_right.svg</iconset>
                          </property>
                          <property name="iconSize">
                           <size>
@@ -1828,7 +1828,7 @@ padding-left: 5px;
                          </property>
                          <property name="icon">
                           <iconset resource="../resources/resources.qrc">
-                           <normaloff>:/icons/ic arrow left.svg</normaloff>:/icons/ic arrow left.svg</iconset>
+                           <normaloff>:/icons/arrow_left.svg</normaloff>:/icons/arrow_left.svg</iconset>
                          </property>
                          <property name="iconSize">
                           <size>
@@ -1860,7 +1860,7 @@ width: 60px;
                          </property>
                          <property name="icon">
                           <iconset resource="../resources/resources.qrc">
-                           <normaloff>:/icons/ic arrow up.svg</normaloff>:/icons/ic arrow up.svg</iconset>
+                           <normaloff>:/icons/arrow_up.svg</normaloff>:/icons/arrow_up.svg</iconset>
                          </property>
                          <property name="iconSize">
                           <size>
@@ -1892,7 +1892,7 @@ width: 60px;
                          </property>
                          <property name="icon">
                           <iconset resource="../resources/resources.qrc">
-                           <normaloff>:/icons/ic arrow down.svg</normaloff>:/icons/ic arrow down.svg</iconset>
+                           <normaloff>:/icons/arrow_down.svg</normaloff>:/icons/arrow_down.svg</iconset>
                          </property>
                          <property name="iconSize">
                           <size>

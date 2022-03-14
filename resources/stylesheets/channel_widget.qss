@@ -48,10 +48,10 @@ QPushButton#delBtn {
   background-color: transparent;
   background-position: center center;
   background-repeat: no-repeat;
-  background-image: url(:/icons/redX.svg);
+  background-image: url(:/icons/red_x.svg);
 }
 QPushButton#delBtn::hover {
-   background-image: url(:/icons/redX.svg);
+   background-image: url(:/icons/red_x.svg);
 }
 
 /* Menu button */
