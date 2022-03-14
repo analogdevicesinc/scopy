@@ -43,7 +43,7 @@ def generate():
     for g in ['icons/**/*.png', 'icons/**/*.svg']:
         for fn in glob.glob(os.path.join(base, g), recursive=True):
             if os.path.relpath(fn, base) not in icons:
-                os.remove(fn)
+                # os.remove(fn)
                 unneeded.append(os.path.relpath(fn, root))
     for fn in sorted(unneeded):
         print('!! unneeded', fn)
