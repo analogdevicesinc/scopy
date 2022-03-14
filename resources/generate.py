@@ -9,7 +9,8 @@ def generate():
     gr = [
         ('**/*.qss;**/*.qss.c', r'(?<=url\(:/).*?(?=\))'),
         ('**/*.html*',          r'(?<=src="qrc:/).*?(?=")'),
-        ('**/*.ui',             r'(?<=>:/).*?(?=<)|(?<=url\(:/).*?(?=\))'),
+        ('**/*.ui',             r'(?<=>:/).*?(?=<)'),
+        ('**/*.ui',             r'(?<=url\(:/).*?(?=\))'),
         ('**/*.cpp;**/*.cc',    r'(?<=":/).*?\.(?:svg|png)(?=")'),
         ('**/*.cpp;**/*.cc',    r'(?<=QIcon::fromTheme\(").*?(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),
         ('src/toolmenu.cpp',    r'(?<=<< ").*(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),

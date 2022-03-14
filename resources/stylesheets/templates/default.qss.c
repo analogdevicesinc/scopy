@@ -585,22 +585,19 @@ QWidget[adi_logo=true]{
 }
 
 QPushButton[save_logo=true]{
-	background-image: url(:/icons/scopy-default/icons/save.svg);
-	background-repeat: no-repeat;
+	icon: url(:/icons/scopy-default/icons/save.svg);
+	text-align: right;
 }
 
 QPushButton[load_logo=true]{
-	background-image: url(:/icons/scopy-default/icons/load.svg);
-	background-repeat: no-repeat;
-	background-position: left center;
+	icon: url(:/icons/scopy-default/icons/load.svg);
+	text-align: left;
 }
 
 QPushButton[preferences_icon=true]{
-	background-image: url(:/icons/scopy-default/icons/gear_wheel.svg);
-	background-repeat: no-repeat;
-	background-position: left center;
-	qproperty-text: "Preferences";
+	icon: url(:/icons/scopy-default/icons/preferences.svg);
 	text-align: center;
+	qproperty-text: "Preferences";
 }
 
 QPushButton[general_settings_icon=true]:checked {
