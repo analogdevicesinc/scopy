@@ -129,9 +129,6 @@
         <file>icons/gate_handle.svg</file>
         <file>icons/refresh.svg</file>
         <file>open-sans-regular.ttf</file>
-        <file>icons/dio101.svg1</file>
-        <file>icons/setup3_checked.xcf-setup3_checked.svg.svg</file>
-        <file>icons/setup3_checked.xcf.svg</file>
         <file>stylesheets/bigCustomSwitch.qss</file>
         <file>stylesheets/browser.qss</file>
         <file>stylesheets/channel_widget.qss</file>
