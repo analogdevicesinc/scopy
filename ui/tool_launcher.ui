@@ -1456,7 +1456,7 @@ border-width: 0px;
                         </property>
                         <property name="icon">
                          <iconset>
-                          <normalon>:/icons/scopy-default/icons/house.svg</normalon>
+                          <normalon>:/icons/scopy-default/icons/tool_home.svg</normalon>
                          </iconset>
                         </property>
                         <property name="checkable">

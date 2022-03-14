@@ -353,7 +353,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 
 	// set home icon
 	ui->btnHome->setText("Home");
-	ui->btnHome->setIcon(QIcon::fromTheme("house"));
+	ui->btnHome->setIcon(QIcon::fromTheme("tool_home"));
 	ui->btnHome->setIconSize(QSize(20, 20));
 
 	//	f.open(QIODevice::ReadOnly);

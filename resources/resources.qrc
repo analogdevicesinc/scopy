@@ -59,12 +59,9 @@
         <file>icons/sba_up_btn.svg</file> <!-- resources/stylesheets/spinbox_type_a.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/network_analyzer.ui -->
         <file>icons/sba_up_btn_hover.svg</file> <!-- resources/stylesheets/spinbox_type_a.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/network_analyzer.ui -->
         <file>icons/sba_up_btn_pressed.svg</file> <!-- resources/stylesheets/spinbox_type_a.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/homepage_controls.ui, ui/homepage_controls.ui -->
-        <file>icons/scopy-default/icons/calibration.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/debugger.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-default/icons/gear_wheel.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/gear_wheel_hover.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/gear_wheel_pressed.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c -->
-        <file>icons/scopy-default/icons/house.svg</file> <!-- ui/tool_launcher.ui, src/tool_launcher.cpp -->
         <file>icons/scopy-default/icons/ic load.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/ic locked.svg</file> <!-- src/gui/smallOnOffSwitch.cpp -->
         <file>icons/scopy-default/icons/ic save.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
@@ -73,29 +70,29 @@
         <file>icons/scopy-default/icons/ic_note_unchecked.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/ico info.svg</file> <!-- src/gui/linked_button.cpp, src/logicanalyzer/binding/binding.cpp -->
         <file>icons/scopy-default/icons/ico-stop.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/stopButton.qss, resources/stylesheets/stopButton.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/digitalio.ui, ui/powercontrol.ui, ui/powercontrol.ui, ui/runsinglewidget.ui, ui/runsinglewidget.ui, ui/runsinglewidget.ui, ui/dmm.ui -->
-        <file>icons/scopy-default/icons/io.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/logic_analyzer.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-default/icons/logo analog.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/logo.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/menu.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
-        <file>icons/scopy-default/icons/network_analyzer.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/oscilloscope.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/pattern_generator.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/power_supply.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-default/icons/sba_cmb_box_arrow.svg</file> <!-- resources/stylesheets/dropdown_switch_list.qss, resources/stylesheets/spinbox_type_a.qss, resources/stylesheets/spinbox_type_a.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/subsection_separator.ui, ui/pg_channel_group.ui, ui/la_channel_group.ui -->
         <file>icons/scopy-default/icons/sba_cmb_box_arrow_right.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/subsection_separator.ui, ui/subsection_separator.ui, ui/pg_channel_group.ui, ui/la_channel_group.ui -->
         <file>icons/scopy-default/icons/setup3_checked_hover.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/setup3_unchecked.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/setup3_unchecked_hover.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
-        <file>icons/scopy-default/icons/signal_generator.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/spectrum_analyzer.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-default/icons/voltmeter.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/calibration.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/debugger.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_calibration.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_debugger.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_home.svg</file> <!-- ui/tool_launcher.ui, src/tool_launcher.cpp -->
+        <file>icons/scopy-default/icons/tool_io.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_logic_analyzer.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_network_analyzer.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_oscilloscope.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_pattern_generator.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_power_supply.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_signal_generator.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_spectrum_analyzer.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-default/icons/tool_voltmeter.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-light/icons/gear_wheel.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/gear_wheel_hover.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/gear_wheel_pressed.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
-        <file>icons/scopy-light/icons/house.svg</file> <!-- src/tool_launcher.cpp -->
         <file>icons/scopy-light/icons/ic load.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/ic locked.svg</file> <!-- src/gui/smallOnOffSwitch.cpp -->
         <file>icons/scopy-light/icons/ic save.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
@@ -104,23 +101,26 @@
         <file>icons/scopy-light/icons/ic_note_unchecked.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/ico info.svg</file> <!-- src/gui/linked_button.cpp, src/logicanalyzer/binding/binding.cpp -->
         <file>icons/scopy-light/icons/ico-stop.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
-        <file>icons/scopy-light/icons/io.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/logic_analyzer.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-light/icons/logo analog.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/logo.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/menu.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
-        <file>icons/scopy-light/icons/network_analyzer.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/oscilloscope.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/pattern_generator.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/power_supply.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-light/icons/sba_cmb_box_arrow.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/sba_cmb_box_arrow_right.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/setup3_checked_hover.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/setup3_unchecked.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/setup3_unchecked_hover.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
-        <file>icons/scopy-light/icons/signal_generator.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/spectrum_analyzer.svg</file> <!-- src/toolmenu.cpp -->
-        <file>icons/scopy-light/icons/voltmeter.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_calibration.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_debugger.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_home.svg</file> <!-- src/tool_launcher.cpp -->
+        <file>icons/scopy-light/icons/tool_io.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_logic_analyzer.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_network_analyzer.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_oscilloscope.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_pattern_generator.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_power_supply.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_signal_generator.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_spectrum_analyzer.svg</file> <!-- src/toolmenu.cpp -->
+        <file>icons/scopy-light/icons/tool_voltmeter.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/setup_btn_checked.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/channel_widget.qss, resources/stylesheets/channel_widget.qss, resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/pattern_generator.ui, ui/pattern_generator.ui, ui/pattern_generator.ui, ui/pattern_generator.ui, ui/pg_channel.ui, ui/tool_view.ui, ui/tool_view.ui, ui/logic_analyzer.ui, ui/logic_analyzer.ui, ui/spectrum_analyzer.ui, ui/spectrum_analyzer.ui, ui/oscilloscope.ui, ui/oscilloscope.ui, ui/network_analyzer.ui, ui/network_analyzer.ui -->
         <file>icons/setup_btn_checked_hover.svg</file> <!-- ui/pg_channel.ui -->
         <file>icons/setup_btn_hover.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/channel_widget.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/default.qss.c, ui/pattern_generator.ui, ui/pattern_generator.ui, ui/pg_channel.ui, ui/tool_view.ui, ui/logic_analyzer.ui, ui/spectrum_analyzer.ui, ui/oscilloscope.ui, ui/network_analyzer.ui -->
