@@ -117,7 +117,7 @@
           </property>
           <property name="icon">
            <iconset resource="../resources/resources.qrc">
-            <normaloff>:/icons/ic printer.svg</normaloff>:/icons/ic printer.svg</iconset>
+            <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
            <size>

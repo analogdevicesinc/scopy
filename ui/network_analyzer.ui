@@ -98,7 +98,7 @@
           </property>
           <property name="icon">
            <iconset resource="../resources/resources.qrc">
-            <normaloff>:/icons/ic printer.svg</normaloff>:/icons/ic printer.svg</iconset>
+            <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
            <size>
@@ -1942,7 +1942,7 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
                            </property>
                            <property name="icon">
                             <iconset resource="../resources/resources.qrc">
-                             <normaloff>:/icons/ic arrow left.svg</normaloff>:/icons/ic arrow left.svg</iconset>
+                             <normaloff>:/icons/arrow_left.svg</normaloff>:/icons/arrow_left.svg</iconset>
                            </property>
                            <property name="iconSize">
                             <size>
@@ -1998,7 +1998,7 @@ padding-left: 20px;
                            </property>
                            <property name="icon">
                             <iconset resource="../resources/resources.qrc">
-                             <normaloff>:/icons/ic arrow right.svg</normaloff>:/icons/ic arrow right.svg</iconset>
+                             <normaloff>:/icons/arrow_right.svg</normaloff>:/icons/arrow_right.svg</iconset>
                            </property>
                            <property name="iconSize">
                             <size>

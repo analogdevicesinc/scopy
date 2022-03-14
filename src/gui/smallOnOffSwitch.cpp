@@ -131,8 +131,8 @@ void SmallOnOffSwitch::paintEvent(QPaintEvent *e)
                 return;
         }
 
-        QIcon locked = QIcon::fromTheme("ic locked");
-        QIcon unlocked = QIcon::fromTheme("ic unlocked");
+        QIcon locked = QIcon::fromTheme("locked");
+        QIcon unlocked = QIcon::fromTheme("unlocked");
         QPixmap pixmap;
 
         QStylePainter p(this);

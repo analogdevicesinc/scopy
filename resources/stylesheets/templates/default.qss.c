@@ -577,7 +577,7 @@ QPushButton[menu_icon=true]{
 }
 
 QWidget[adi_logo=true]{
-	background-image: url(:/icons/scopy-default/icons/logo analog.svg);
+	background-image: url(:/icons/scopy-default/icons/logo_analog.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 	min-width: 104px;
@@ -585,12 +585,12 @@ QWidget[adi_logo=true]{
 }
 
 QPushButton[save_logo=true]{
-	background-image: url(:/icons/scopy-default/icons/ic save.svg);
+	background-image: url(:/icons/scopy-default/icons/save.svg);
 	background-repeat: no-repeat;
 }
 
 QPushButton[load_logo=true]{
-	background-image: url(:/icons/scopy-default/icons/ic load.svg);
+	background-image: url(:/icons/scopy-default/icons/load.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 }
@@ -703,10 +703,10 @@ adiscope--ChannelWidget QPushButton#delBtn {
 	background-color: transparent;
 	background-position: center center;
 	background-repeat: no-repeat;
-	background-image: url(:/icons/redX.svg);
+	background-image: url(:/icons/red_x.svg);
 }
 adiscope--ChannelWidget QPushButton#delBtn::hover {
-	background-image: url(:/icons/redX.svg);
+	background-image: url(:/icons/red_x.svg);
 }
 
 /* Menu button */
@@ -899,15 +899,15 @@ QPushButton[stopButton=true] {
 }
 
 QPushButton[stopButton=true]:enabled {
-	background-image: url(:/icons/scopy-default/icons/ico-stop.svg);
+	background-image: url(:/icons/scopy-default/icons/play_stop.svg);
 }
 
 QPushButton[stopButton=true][disabled=true][enabled=false] {
-	background-image: url(:/icons/scopy-default/icons/ico-stop.svg);
+	background-image: url(:/icons/scopy-default/icons/play_stop.svg);
 }
 
 QPushButton[stopButton=true]:checked {
-	background-image: url(:/icons/ico-play-green.svg);
+	background-image: url(:/icons/play_green.svg);
 }
 
 /*************************************************************/
@@ -915,11 +915,11 @@ QPushButton[stopButton=true]:checked {
 /******************** User Notes *************************/
 
 QPushButton[userNote=true] {
-	background-image: url(:/icons/scopy-default/icons/ic_note_unchecked.svg);
+	background-image: url(:/icons/scopy-default/icons/note_unchecked.svg);
 }
 
 QPushButton[userNote=true]:checked {
-	background-image: url(:/icons/scopy-default/icons/ic_note_checked.svg);
+	background-image: url(:/icons/scopy-default/icons/note_checked.svg);
 }
 
 /*************************************************************/

@@ -182,7 +182,7 @@ QPushButton:!checked {
   min-width: 14px;
   max-width: 14px;
   max-height: 14px;
-  border-image: url(:/icons/redX.svg);
+  border-image: url(:/icons/red_x.svg);
 }</string>
      </property>
      <property name="text">

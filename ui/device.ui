@@ -135,7 +135,7 @@ qproperty-alignment: AlignCenter;
         </property>
         <property name="icon">
          <iconset resource="../resources/resources.qrc">
-          <normaloff>:/icons/ic adalm.svg</normaloff>:/icons/ic adalm.svg</iconset>
+          <normaloff>:/icons/adalm.svg</normaloff>:/icons/adalm.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
