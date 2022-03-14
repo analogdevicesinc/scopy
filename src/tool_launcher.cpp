@@ -137,8 +137,10 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	registerNativeMethods();
 #endif
 
+#ifndef __APPLE__
 	setWindowIcon(QIcon(":/icon.ico"));
 	QApplication::setWindowIcon(QIcon(":/icon.ico"));
+#endif
 
 	// TO DO: remove this when the About menu becomes available
 	setWindowTitle(QString("Scopy - ") + QString("v"+QString(PROJECT_VERSION)) + " - " + QString(SCOPY_VERSION_GIT));
