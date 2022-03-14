@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="40px" height="36px" viewBox="0 0 40 36" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: sketchtool 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
-    <title>DC6DF08B-A28D-4962-A0CB-9C15F196A791</title>
-    <desc>Created with sketchtool.</desc>
-    <defs></defs>
-    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.700000006">
-        <g id="notes" transform="translate(-649.000000, -160.000000)" fill="#000000">
-            <path d="M649,160 L669,160 L669,164 L649,164 L649,160 Z M649,168 L689,168 L689,172 L649,172 L649,168 Z M649,176 L689,176 L689,180 L649,180 L649,176 Z M649,184 L689,184 L689,188 L649,188 L649,184 Z M649,192 L689,192 L689,196 L649,196 L649,192 Z" id="ic-note-copy"></path>
-        </g>
-    </g>
+<svg width="40px" height="36px" version="1.1" viewBox="0 0 40 36" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#000" opacity=".6"> fill-rule="evenodd"
+  <g transform="translate(-649 -160)">
+   <path d="m649 160h20v4h-20v-4zm0 8h40v4h-40v-4zm0 8h40v4h-40v-4zm0 8h40v4h-40v-4zm0 8h40v4h-40v-4z"/>
+  </g>
+ </g>
 </svg>

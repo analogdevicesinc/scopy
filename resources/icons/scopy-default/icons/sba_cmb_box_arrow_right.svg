@@ -1,1 +1,8 @@
-<svg height="6" viewBox="0 0 10 6" width="10" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><image height="10" width="7" x="1" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAcAAAAKCAYAAAB4zEQNAAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlvRkZzAAAAAf////4AMbBcyAAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+ALHBEJC+x7w5IAAABiSURBVBjTfY1BCsJAEASrlzwosJL/XxUN5kGhvGxCHMS+zKFqulFRF7VT0sbdgV6FCSDJS2UIJllPWISbSpJ1utZUofEnX5/qAszAPcnWfoBnkg0gY+MAjyTvaxVqV+e6+QEdwT3PeA9ZagAAAABJRU5ErkJggg==" y="-2"/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="6px" height="10px" version="1.1" viewBox="0 0 6 10" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#fff" opacity=".6" fill-rule="evenodd">
+  <g transform="translate(-418 -105)">
+   <polygon transform="translate(421.02 110.02) rotate(-90) translate(-421.02 -110.02)" points="426.03 108 421.01 113.02 416 108 417 107 421.01 111.02 425.03 107"/>
+  </g>
+ </g>
+</svg>

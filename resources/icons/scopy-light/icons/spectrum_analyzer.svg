@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="16px" viewBox="0 0 20 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>spectrumD</title>
-    <g id="spectrumD" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <path d="M5,16 L3,16 L3,8 L5,8 L5,16 L5,16 Z M11,16 L9,16 L9,0 L11,0 L11,16 L11,16 Z M14,16 L12,16 L12,2 L14,2 L14,16 L14,16 Z M17,16 L15,16 L15,6 L17,6 L17,16 L17,16 Z M2,16 L0,16 L0,12 L2,12 L2,16 L2,16 Z M20,16 L18,16 L18,10 L20,10 L20,16 L20,16 Z M8,16 L6,16 L6,4 L8,4 L8,16 L8,16 Z" id="spectrum" fill="#000000"></path>
-    </g>
+<svg width="20px" height="16px" version="1.1" viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#000" opacity=".6" fill-rule="evenodd">
+  <path d="m5 16h-2v-8h2v8zm6 0h-2v-16h2v16zm3 0h-2v-14h2v14zm3 0h-2v-10h2v10zm-15 0h-2v-4h2v4zm18 0h-2v-6h2v6zm-12 0h-2v-12h2v12z"/>
+ </g>
 </svg>

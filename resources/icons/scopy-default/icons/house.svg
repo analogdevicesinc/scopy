@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="16px" viewBox="0 0 20 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <title>house</title>
-    <g id="house" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="0.400000006">
-        <path d="M11,0 L9,0 L0,10 L0,11 L4,11 L4,16 L16,16 L16,11 L20,11 L20,10 L11,0 Z M14,9 L14,14 L12,14 L12,11 L8,11 L8,14 L6,14 L6,9 L4,9 L10,2 L16,9 L14,9 L14,9 Z" fill="#FFFFFF"></path>
-    </g>
+<svg width="20px" height="16px" version="1.1" viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#fff" fill-opacity=".6" fill-rule="evenodd">
+  <path d="m11 0h-2l-9 10v1h4v5h12v-5h4v-1l-9-10zm3 9v5h-2v-3h-4v3h-2v-5h-2l6-7 6 7h-2z"/>
+ </g>
 </svg>

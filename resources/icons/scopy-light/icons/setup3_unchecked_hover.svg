@@ -1,8 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with PhotoLine 22.52 (www.pl32.com) -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="20" height="16" viewBox="0 0 20 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <g transform="matrix(1 0 0 1 -20 -12)">
-    <path fill-rule="evenodd" d="M20 19 L40 19 L40 21 L20 21 Z M29 18 L31 18 L31 22 L29 22 Z M20 25 L40 25 L40 27 L20 27 Z M24 24 L26 24 L26 28 L24 28 Z M20 13 L40 13 L40 15 L20 15 Z M34 12 L36 12 L36 16 L34 16 Z"/>
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60" height="40" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#000" fill-rule="evenodd">
+  <path d="m20 19h20v2h-20zm9-1h2v4h-2zm-9 7h20v2h-20zm4-1h2v4h-2zm-4-11h20v2h-20zm14-1h2v4h-2z"/>
+ </g>
 </svg>

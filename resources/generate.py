@@ -2,7 +2,8 @@ def generate():
     import glob
     import re
     import os.path
-    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    base = os.path.dirname(os.path.abspath(__file__))
+    root = os.path.dirname(base)
     icons = {}
     missing = {}
     gr = [
@@ -10,7 +11,7 @@ def generate():
         ('**/*.html*',          r'(?<=src="qrc:/).*?(?=")'),
         ('**/*.ui',             r'(?<=>:/).*?(?=<)|(?<=url\(:/).*?(?=\))'),
         ('**/*.cpp;**/*.cc',    r'(?<=":/).*?\.(?:svg|png)(?=")'),
-        ('**/*.cpp;**/*.cc',    r'(?<=QIcon::fromTheme\(").*?\.(?:svg|png)(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),
+        ('**/*.cpp;**/*.cc',    r'(?<=QIcon::fromTheme\(").*?(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),
         ('src/toolmenu.cpp',    r'(?<=<< ").*(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),
     ]
     for gs, rs in gr:
@@ -34,9 +35,17 @@ def generate():
         if not os.path.exists(os.path.join(root, 'resources', ic)):
             missing[ic] = icons[ic]
     for ic, srcs in missing.items():
-        print('missing', ic, ':', ', '.join(srcs))
+        print('!! missing', ic, ':', ', '.join(srcs))
     if len(missing) == 0:
         for ic in sorted(icons.keys()):
             print('        <file>%s</file> <!-- %s -->' % (ic, ', '.join(icons[ic])))
+    unneeded = []
+    for g in ['icons/**/*.png', 'icons/**/*.svg']:
+        for fn in glob.glob(os.path.join(base, g), recursive=True):
+            if os.path.relpath(fn, base) not in icons:
+                os.remove(fn)
+                unneeded.append(os.path.relpath(fn, root))
+    for fn in sorted(unneeded):
+        print('!! unneeded', fn)
 
 generate()

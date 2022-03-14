@@ -64,11 +64,14 @@
         <file>icons/scopy-default/icons/gear_wheel.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/gear_wheel_hover.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/gear_wheel_pressed.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c -->
-        <file>icons/scopy-default/icons/house.svg</file> <!-- ui/tool_launcher.ui -->
+        <file>icons/scopy-default/icons/house.svg</file> <!-- ui/tool_launcher.ui, src/tool_launcher.cpp -->
         <file>icons/scopy-default/icons/ic load.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
+        <file>icons/scopy-default/icons/ic locked.svg</file> <!-- src/gui/smallOnOffSwitch.cpp -->
         <file>icons/scopy-default/icons/ic save.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
+        <file>icons/scopy-default/icons/ic unlocked.svg</file> <!-- src/gui/smallOnOffSwitch.cpp -->
         <file>icons/scopy-default/icons/ic_note_checked.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
         <file>icons/scopy-default/icons/ic_note_unchecked.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/templates/default.qss.c -->
+        <file>icons/scopy-default/icons/ico info.svg</file> <!-- src/gui/linked_button.cpp, src/logicanalyzer/binding/binding.cpp -->
         <file>icons/scopy-default/icons/ico-stop.svg</file> <!-- resources/stylesheets/default.qss, resources/stylesheets/default.qss, resources/stylesheets/stopButton.qss, resources/stylesheets/stopButton.qss, resources/stylesheets/templates/default.qss.c, resources/stylesheets/templates/default.qss.c, ui/digitalio.ui, ui/powercontrol.ui, ui/powercontrol.ui, ui/runsinglewidget.ui, ui/runsinglewidget.ui, ui/runsinglewidget.ui, ui/dmm.ui -->
         <file>icons/scopy-default/icons/io.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-default/icons/logic_analyzer.svg</file> <!-- src/toolmenu.cpp -->
@@ -92,10 +95,14 @@
         <file>icons/scopy-light/icons/gear_wheel.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/gear_wheel_hover.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/gear_wheel_pressed.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
+        <file>icons/scopy-light/icons/house.svg</file> <!-- src/tool_launcher.cpp -->
         <file>icons/scopy-light/icons/ic load.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
+        <file>icons/scopy-light/icons/ic locked.svg</file> <!-- src/gui/smallOnOffSwitch.cpp -->
         <file>icons/scopy-light/icons/ic save.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
+        <file>icons/scopy-light/icons/ic unlocked.svg</file> <!-- src/gui/smallOnOffSwitch.cpp -->
         <file>icons/scopy-light/icons/ic_note_checked.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/ic_note_unchecked.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c -->
+        <file>icons/scopy-light/icons/ico info.svg</file> <!-- src/gui/linked_button.cpp, src/logicanalyzer/binding/binding.cpp -->
         <file>icons/scopy-light/icons/ico-stop.svg</file> <!-- resources/stylesheets/light.qss, resources/stylesheets/light.qss, resources/stylesheets/templates/light.qss.c, resources/stylesheets/templates/light.qss.c -->
         <file>icons/scopy-light/icons/io.svg</file> <!-- src/toolmenu.cpp -->
         <file>icons/scopy-light/icons/logic_analyzer.svg</file> <!-- src/toolmenu.cpp -->
