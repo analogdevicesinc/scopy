@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="16px" version="1.1" viewBox="0 0 20 16" xmlns="http://www.w3.org/2000/svg">
- <g fill="#000" fill-opacity=".6" fill-rule="evenodd">
-  <path d="m11 0h-2l-9 10v1h4v5h12v-5h4v-1l-9-10zm3 9v5h-2v-3h-4v3h-2v-5h-2l6-7 6 7h-2z"/>
+<svg width="32" height="32" version="1.1" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#000" opacity=".6" transform="translate(6 8)">
+  <path d="m11 0h-2l-9 10v1h4v5h12v-5h4v-1zm3 9v5h-2v-3h-4v3h-2v-5h-2l6-7 6 7z" fill-rule="evenodd"/>
  </g>
 </svg>
