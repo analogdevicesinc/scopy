@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="10px" height="10px" viewBox="0 0 10 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: sketchtool 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-    <title>47D1C452-412E-4AC3-9CBB-7B0DAEB0FE56</title>
-    <desc>Created with sketchtool.</desc>
-    <defs></defs>
-    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="states" transform="translate(-1690.000000, -445.000000)" fill="#FFFFFF">
-            <path d="M1692,447 L1692,445 L1698,445 L1698,447 L1700,447 L1700,452 L1699,452 L1699,450 L1691,450 L1691,452 L1690,452 L1690,447 L1692,447 Z M1692,451 L1698,451 L1698,455 L1692,455 L1692,451 Z" id="ic-printer"></path>
-        </g>
-    </g>
+<svg width="10px" height="10px" version="1.1" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+ <g fill="none" fill-rule="evenodd">
+  <g transform="translate(-1690 -445)" fill="#fff">
+   <path d="m1692 447v-2h6v2h2v5h-1v-2h-8v2h-1v-5h2zm0 4h6v4h-6v-4z"/>
+  </g>
+ </g>
 </svg>

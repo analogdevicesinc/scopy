@@ -1,1 +1,6 @@
-<svg height="40" viewBox="0 0 60 40" width="60" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><image height="40" width="60" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAYAAACiu5n/AAAABGdBTUEAALGPC/xhBQAAAAZiS0dEAP8A/wD/oL2nkwAAAAlwSFlzAAAN1wAADdcBQiibeAAAAAd0SU1FB+ALGQ82D5KuU/8AAADtSURBVGje7Zo7DsIwEAVnbSzo0vA5ImfiiEmqFJFALpYC6AABUiDYb8vIq2S0z6NItgE0TUNKS9wNM6ekcjfAiRG6rsNusOWXkfORUAcsgJPSinAZeSXIDqG0Pfs01OYEKisBC1jAAhawgF+ovm8Pfd8epn7PYooP/6Rvs9nt7/XfnivSn/5trdfb2UR6ionOFliWLgn4W0aejaUfGfnZWkX6n6T1LSPL0rJ0YUb+iaXfMbIs/Y/S+qWRZWlZWsACFrCABTwz4LoOxI0ANR2IQ4gRoI4p53wkjuNISgtiTNdrS+XF2MzI+cQwDJwBjzBh0wHGYuUAAAAASUVORK5CYII="/></svg>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="60" height="40" viewBox="0 0 60 40" xmlns="http://www.w3.org/2000/svg">
+ <g fill="#fff" fill-rule="evenodd">
+  <path d="m20 19h20v2h-20zm9-1h2v4h-2zm-9 7h20v2h-20zm4-1h2v4h-2zm-4-11h20v2h-20zm14-1h2v4h-2z"/>
+ </g>
+</svg>
