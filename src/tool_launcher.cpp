@@ -327,11 +327,10 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	//	    f.write("blabla");
 	//	    f.close();
 
-	// TO DO: Remove temporary spaces
 	// set home icon
-	ui->btnHome->setText("  Home");
+	ui->btnHome->setText("Home");
 	ui->btnHome->setIcon(QIcon::fromTheme("house"));
-	ui->btnHome->setIconSize(QSize(32,32));
+	ui->btnHome->setIconSize(QSize(20, 20));
 
 	//	f.open(QIODevice::ReadOnly);
 	//	qDebug()<<f.readAll();

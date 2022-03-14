@@ -279,14 +279,14 @@ border:1px solid #4a64ff;
                <string notr="true">QPushButton {
   max-height: 6px;
   max-width: 10px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 QPushButton:checked
 {
   max-height: 10px;
   max-width:  6px;
-border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }
 
 

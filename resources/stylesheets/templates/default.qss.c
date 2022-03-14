@@ -15,7 +15,7 @@ QWidget {
 }
 
 QDockWidget {
-	titlebar-normal-icon: url(:/icons/sba_cmb_box_arrow_right.svg);
+	titlebar-normal-icon: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }
 
 QDockWidget::title {
@@ -37,9 +37,9 @@ QDockWidget::float-button:hover {
 }
 
 QToolTip {
-    padding: 6px;
-    border: 1px solid rgba(149, 152, 154, 150);
-    color: white;
+	padding: 6px;
+	border: 1px solid rgba(149, 152, 154, 150);
+	color: white;
 }
 
 QLabel {
@@ -93,8 +93,8 @@ adiscope--BufferPreviewer {
 }
 
 QDial {
-  background-color: black;
-  color: #4963ff;
+	background-color: black;
+	color: #4963ff;
 }
 
 QTabWidget::tab-bar { left: 0; }
@@ -191,7 +191,7 @@ QComboBox::item:selected {
 
 QComboBox::drop-down {
 	subcontrol-position: center right;
-	border-image: url(:/icons/sba_cmb_box_arrow.svg);
+	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 	width: 10px;
 	height: 6px;
 	font-size: 16px;
@@ -268,44 +268,44 @@ QGroupBox::title {
 QScrollArea { border: 0px;}
 
 QScrollBar:vertical {
-  background: #262628;
-  max-width: 8px;
+	background: #262628;
+	max-width: 8px;
 }
 
 QScrollBar::handle:vertical {
-  background: #404040;
-  border: 0;
-  border-radius: 3px;
+	background: #404040;
+	border: 0;
+	border-radius: 3px;
 }
 QScrollBar::handle:vertical:hover {
-  background: #4a4a4b;
-  border: 0;
-  border-radius: 3px;
+	background: #4a4a4b;
+	border: 0;
+	border-radius: 3px;
 }
 
 QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
 
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-  border: none;
-  background: none;
+	border: none;
+	background: none;
 }
 
 QScrollBar:horizontal {
-  background: #262628;
-  max-height: 6px;
-  border-radius: 3px;
+	background: #262628;
+	max-height: 6px;
+	border-radius: 3px;
 }
 
 QScrollBar::handle:horizontal {
-  background: #404040;
-  border: 0;
-  border-radius: 3px;
+	background: #404040;
+	border: 0;
+	border-radius: 3px;
 }
 
 QScrollBar::handle:horizontal:hover {
-  background: #4a4a4b;
-  border: 0;
-  border-radius: 3px;
+	background: #4a4a4b;
+	border: 0;
+	border-radius: 3px;
 }
 
 QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal { background: none; }
@@ -341,13 +341,13 @@ QFrame[subsection_line=true]{ border: 1px solid rgba(255, 255, 255, 70); }
 QPushButton[subsection_arrow_button=true]{
 	max-height: 6px;
 	max-width: 10px;
-	border-image: url(:/icons/sba_cmb_box_arrow.svg);
+	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 QPushButton[subsection_arrow_button=true]:checked{
 	max-height: 10px;
 	max-width:  6px;
-	border-image: url(:/icons/sba_cmb_box_arrow_right.svg);
+	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }
 
 
@@ -384,12 +384,12 @@ QPushButton[blue_button=true]:disabled { background-color: grey; }
 /* Info button for each tool */
 
 QPushButton[info_button=true]{
-	 min-height: 40px;
-	 max-height: 40px;
-	 min-width: 40px;
-	 max-width: 40px;
-	 background-color: transparent;
-	 border-radius: 4px;
+	min-height: 40px;
+	max-height: 40px;
+	min-width: 40px;
+	max-width: 40px;
+	background-color: transparent;
+	border-radius: 4px;
 }
 
 #ifndef __ANDROID__
@@ -415,18 +415,18 @@ QSpinBox{
 
 
 QCheckBox {
-  spacing: 8px;
-  background-color: transparent;
-  font-size: 14px;
-  font-weight: bold;
-  color: rgba(255, 255, 255, 153);
+	spacing: 8px;
+	background-color: transparent;
+	font-size: 14px;
+	font-weight: bold;
+	color: rgba(255, 255, 255, 153);
 }
 
 QCheckBox::indicator {
-  width: INDICATOR_SIZE;
-  height: INDICATOR_SIZE;
-  border: 2px solid rgb(74,100,255);
-  border-radius: 4px;
+	width: INDICATOR_SIZE;
+	height: INDICATOR_SIZE;
+	border: 2px solid rgb(74,100,255);
+	border-radius: 4px;
 }
 
 QCheckBox::indicator:unchecked { background-color: transparent; }
@@ -457,11 +457,11 @@ QSlider::sub-page:horizontal { background: #4A64FF; }
 /* Style for settings and general settings buttons from all menus */
 
 QPushButton[menu_icon_button=true] {
-	 min-height: 40px;
-	 max-height: 40px;
-	 min-width: 60px;
-	 max-width: 60px;
-	 padding-top:5px
+	min-height: 40px;
+	max-height: 40px;
+	min-width: 60px;
+	max-width: 60px;
+	padding-top:5px
 }
 
 QPushButton[menu_icon_button=true]:checked { border-top: 1px solid rgba(255,255,255,150); }
@@ -561,23 +561,23 @@ QFrame[line_separator=true]{ background-color: rgba(255, 255, 255, 16); }
 }
 
 adiscope--CursorReadouts {
-  background-color: black;
+	background-color: black;
 }
 
 QWidget[scopy_logo=true]{
-	background-image: url(:/menu/scopy_title.png);
+	background-image: url(:/icons/scopy-default/icons/logo.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 }
 
 QPushButton[menu_icon=true]{
-	background-image: url(:/menu/menu_button.png);
+	background-image: url(:/icons/scopy-default/icons/menu.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 }
 
 QWidget[adi_logo=true]{
-	background-image: url(:/menu/adi.png);
+	background-image: url(:/icons/scopy-default/icons/logo analog.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 	min-width: 104px;
@@ -585,18 +585,18 @@ QWidget[adi_logo=true]{
 }
 
 QPushButton[save_logo=true]{
-	background-image: url(:/icons/ic save.svg);
+	background-image: url(:/icons/scopy-default/icons/ic save.svg);
 	background-repeat: no-repeat;
 }
 
 QPushButton[load_logo=true]{
-	background-image: url(:/icons/ic load.svg);
+	background-image: url(:/icons/scopy-default/icons/ic load.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 }
 
 QPushButton[preferences_icon=true]{
-	background-image: url(:/menu/debugger.png);
+	background-image: url(:/icons/scopy-default/icons/gear_wheel.svg);
 	background-repeat: no-repeat;
 	background-position: left center;
 	qproperty-text: "Preferences";
@@ -604,44 +604,44 @@ QPushButton[preferences_icon=true]{
 }
 
 QPushButton[general_settings_icon=true]:checked {
-  image: url(:/icons/gear_wheel_pressed.svg);
+	image: url(:/icons/scopy-default/icons/gear_wheel_pressed.svg);
 }
 
 QPushButton[general_settings_icon=true]:!checked {
-  image: url(:/icons/gear_wheel.svg);
+	image: url(:/icons/scopy-default/icons/gear_wheel.svg);
 }
 
 
 QPushButton[general_settings_icon=true]:!checked:hover {
-  image: url(:/icons/gear_wheel_hover.svg);
+	image: url(:/icons/scopy-default/icons/gear_wheel_hover.svg);
 }
 
 QPushButton[general_settings_icon=true]:checked:hover {
-  image: url(:/icons/gear_wheel_pressed.svg);
+	image: url(:/icons/scopy-default/icons/gear_wheel_pressed.svg);
 }
 
 QPushButton[settings_icon=true]:checked {
-  image: url(:/icons/setup3_checked_hover.svg);
+	image: url(:/icons/scopy-default/icons/setup3_checked_hover.svg);
 }
 
 QPushButton[settings_icon=true]:!checked {
-  image: url(:/icons/setup3_unchecked.svg);
+	image: url(:/icons/scopy-default/icons/setup3_unchecked.svg);
 }
 
 QPushButton[settings_icon=true]:!checked:hover {
-  image: url(:/icons/setup3_unchecked_hover.svg);
+	image: url(:/icons/scopy-default/icons/setup3_unchecked_hover.svg);
 }
 
 QPushButton[settings_icon=true]:checked:hover {
-  image: url(:/icons/setup3_checked_hover.svg);
+	image: url(:/icons/scopy-default/icons/setup3_checked_hover.svg);
 }
 
 QHeaderView::section {
-  background-color: transparent;
+	background-color: transparent;
 }
 
 QHeaderView::section:checked {
-  background-color: transparent;
+	background-color: transparent;
 }
 
 /*************************************************************/
@@ -651,39 +651,39 @@ QHeaderView::section:checked {
 /************************** Channel widget **************************/
 
 adiscope--ChannelWidget QWidget {
-  color: rgba(255, 255, 255, 153);
+	color: rgba(255, 255, 255, 153);
 
-  border-width: 0px;
-  border-radius: 6px;
+	border-width: 0px;
+	border-radius: 6px;
 }
 
 /* Widget containing box, name, btn */
 
 adiscope--ChannelWidget QWidget#widget {
-  background-color: transparent;
-  border-radius: 4px;
+	background-color: transparent;
+	border-radius: 4px;
 }
 adiscope--ChannelWidget QWidget#widget[selected=true] {
-  background-color: rbga(20, 20, 22, 153);
+	background-color: rbga(20, 20, 22, 153);
 }
 
 /* Round check box */
 adiscope--ChannelWidget QCheckBox#box{
-  spacing: 0px;
-  background-color: none;
-  font-size: 14px;
-  font-weight: bold;
+	spacing: 0px;
+	background-color: none;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 adiscope--ChannelWidget QCheckBox#box::indicator {
-  width: INDICATOR_SIZE;
-  height: INDICATOR_SIZE;
+	width: INDICATOR_SIZE;
+	height: INDICATOR_SIZE;
   border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
-  border-radius: 9px;
+	border-radius: 9px;
 }
 
 adiscope--ChannelWidget QCheckBox#box::indicator:unchecked {
-  background-color: transparent;
+	background-color: transparent;
 }
 adiscope--ChannelWidget QCheckBox#box::indicator:checked {
   background-color: #000000; /* Will be overwritted in the ChannelWidget constructor */
@@ -691,46 +691,46 @@ adiscope--ChannelWidget QCheckBox#box::indicator:checked {
 
 /* Name */
 adiscope--ChannelWidget QPushButton#name {
-  font-size: 14px;
-  font-weight: bold;
-  background-color: none;
+	font-size: 14px;
+	font-weight: bold;
+	background-color: none;
 }
 
 /* Delete Button */
 adiscope--ChannelWidget QPushButton#delBtn {
-  width: 24px;
-  height: 24px;
-  background-color: transparent;
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-image: url(:/icons/redX.svg);
+	width: 24px;
+	height: 24px;
+	background-color: transparent;
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-image: url(:/icons/redX.svg);
 }
 adiscope--ChannelWidget QPushButton#delBtn::hover {
-   background-image: url(:/icons/redX.svg);
+	background-image: url(:/icons/redX.svg);
 }
 
 /* Menu button */
 adiscope--ChannelWidget QPushButton#btn {
-  width: 40px;
-  height: 20px;
-  background-color: transparent;
+	width: 40px;
+	height: 20px;
+	background-color: transparent;
 }
 adiscope--ChannelWidget QPushButton#btn:pressed {
-  border-image: url(:/icons/setup_btn_checked.svg)
+	border-image: url(:/icons/setup_btn_checked.svg)
 }
 adiscope--ChannelWidget QPushButton#btn:!pressed {
-  border-image: url(:/icons/setup_btn_unchecked.svg)
+	border-image: url(:/icons/setup_btn_unchecked.svg)
 }
 adiscope--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
-  border-image: url(:/icons/setup_btn_hover.svg)
+	border-image: url(:/icons/setup_btn_hover.svg)
 }
 adiscope--ChannelWidget QPushButton#btn:checked {
-  border-image: url(:/icons/setup_btn_checked.svg)
+	border-image: url(:/icons/setup_btn_checked.svg)
 }
 
 /* Underline */
 adiscope--ChannelWidget QFrame#line {
-  border: 2px solid transparent;
+	border: 2px solid transparent;
 }
 adiscope--ChannelWidget QFrame#line[selected=true] {
   border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
@@ -743,59 +743,59 @@ adiscope--ChannelWidget QFrame#line[selected=true] {
 /******************** Dropdown switch list ************************/
 
 adiscope--DropdownSwitchList {
-  height: 30px;
-  border: 0px;
-  font-size: 18px;
-  border-radius: 4px;
-  padding-left: 20px;
+	height: 30px;
+	border: 0px;
+	font-size: 18px;
+	border-radius: 4px;
+	padding-left: 20px;
 }
 
 adiscope--DropdownSwitchList:editable{
-  background-color: #141416;
-  color: white;
+	background-color: #141416;
+	color: white;
 }
 
 adiscope--DropdownSwitchList::drop-down {
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
-  margin-right: 20px;
+	subcontrol-position: center right;
+	width: 10px;
+	height: 6px;
+	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+	margin-right: 20px;
 }
 
 adiscope--DropdownSwitchList QAbstractItemView {
-  border: 0px;
-  background-color: #141416;
-  font-size: 18px;
-  outline: 0px;
+	border: 0px;
+	background-color: #141416;
+	font-size: 18px;
+	outline: 0px;
 
   /* Add left space. Color should match background-color*/
   border-left: 0px solid #141416; /* setting to 0 for now */
 }
 
 adiscope--DropdownSwitchList QAbstractItemView::item {
-  color: #ffffff;
-  height: 60px;
+	color: #ffffff;
+	height: 60px;
 }
 
 adiscope--DropdownSwitchList QAbstractItemView::item:hover {
-  background-color: #141416;
-  font-weight: bold;
-  border-bottom: 0px solid none;
+	background-color: #141416;
+	font-weight: bold;
+	border-bottom: 0px solid none;
 }
 
 adiscope--DropdownSwitchList QHeaderView {
   /* Cancel the effect of the QAbstractItemView border-left property. It's
   necessary because the border (or padding) of the QAbstractItemView applies to
   this element as well. */
-  padding-left: -0px;
+	padding-left: -0px;
 }
 
 adiscope--DropdownSwitchList QHeaderView:section {
-  color: rgba(255, 255, 255, 153);
-  background-color: #141416;
-  border: 0px;
-  font: 14px;
+	color: rgba(255, 255, 255, 153);
+	background-color: #141416;
+	border: 0px;
+	font: 14px;
 }
 
 adiscope--DropdownSwitchList QCheckBox {
@@ -803,9 +803,9 @@ adiscope--DropdownSwitchList QCheckBox {
 }
 
 adiscope--DropdownSwitchList QCheckBox::indicator {
-  width: 16px;
-  height: 16px;
-  subcontrol-position: center;
+	width: 16px;
+	height: 16px;
+	subcontrol-position: center;
 }
 
 /*************************************************************/
@@ -815,78 +815,78 @@ adiscope--DropdownSwitchList QCheckBox::indicator {
 /************************* SpinBoxes *************************/
 
 adiscope--SpinBoxA QPushButton#SBA_UpButton {
-  width: 30px;
-  height: 30px;
-  border-image: url(:/icons/sba_up_btn.svg);
-  border: 0px;
+	width: 30px;
+	height: 30px;
+	border-image: url(:/icons/sba_up_btn.svg);
+	border: 0px;
 }
 
 adiscope--SpinBoxA QPushButton#SBA_UpButton:pressed {
-  border-image: url(:/icons/sba_up_btn_pressed.svg);
+	border-image: url(:/icons/sba_up_btn_pressed.svg);
 }
 adiscope--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
-  border-image: url(:/icons/sba_up_btn_hover.svg);
+	border-image: url(:/icons/sba_up_btn_hover.svg);
 }
 
 adiscope--SpinBoxA QPushButton#SBA_DownButton {
-  width: 30px;
-  height: 30px;
-  border-image: url(:/icons/sba_dn_btn.svg);
-  border: 0px;
+	width: 30px;
+	height: 30px;
+	border-image: url(:/icons/sba_dn_btn.svg);
+	border: 0px;
 }
 adiscope--SpinBoxA QPushButton#SBA_DownButton:pressed {
-  border-image: url(:/icons/sba_dn_btn_pressed.svg);
+	border-image: url(:/icons/sba_dn_btn_pressed.svg);
 }
 adiscope--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
-  border-image: url(:/icons/sba_dn_btn_hover.svg);
+	border-image: url(:/icons/sba_dn_btn_hover.svg);
 }
 
 adiscope--SpinBoxA QLabel#SBA_Label {
-  color: rgba(255, 255, 255, 102);
-  font-size: 14px;
+	color: rgba(255, 255, 255, 102);
+	font-size: 14px;
 }
 
 adiscope--SpinBoxA QLineEdit#SBA_LineEdit {
-  height: 20px;
-  width: 75px;
-  font-size: 18px;
-  border: 0px;
-  bottom: 10px;
+	height: 20px;
+	width: 75px;
+	font-size: 18px;
+	border: 0px;
+	bottom: 10px;
 }
 
 adiscope--SpinBoxA QFrame#SBA_Line {
-  color: #4a64ff;
+	color: #4a64ff;
 }
 
 adiscope--SpinBoxA QFrame#SBA_Line:disabled {
-  color: #555555;
+	color: #555555;
 }
 
 adiscope--SpinBoxA QComboBox#SBA_Combobox {
-  height: 20px;
-  font-size: 12px;
-  font-weight: normal;
-  border-bottom: 0px;
-  padding-bottom: 0px;
+	height: 20px;
+	font-size: 12px;
+	font-weight: normal;
+	border-bottom: 0px;
+	padding-bottom: 0px;
 }
 
 adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down {
-  subcontrol-position: center right;
-  width: 10px;
-  height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+	subcontrol-position: center right;
+	width: 10px;
+	height: 6px;
+	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
-  subcontrol-position: center right;
-  width: 0px;
-  height: 0px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+	subcontrol-position: center right;
+	width: 0px;
+	height: 0px;
+	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 adiscope--SpinBoxA QDial#SBA_CompletionCircle {
-  background-color: black;
-  color: #4963ff;
+	background-color: black;
+	color: #4963ff;
 }
 /*************************************************************/
 
@@ -894,20 +894,20 @@ adiscope--SpinBoxA QDial#SBA_CompletionCircle {
 /******************** Stop buttons *************************/
 
 QPushButton[stopButton=true] {
-    background-repeat: no-repeat;
-    background-position: center center;
+	background-repeat: no-repeat;
+	background-position: center center;
 }
 
 QPushButton[stopButton=true]:enabled {
-    background-image: url(:/icons/ico-stop.svg);
+	background-image: url(:/icons/scopy-default/icons/ico-stop.svg);
 }
 
 QPushButton[stopButton=true][disabled=true][enabled=false] {
-    background-image: url(:/icons/ico-stop.svg);
+	background-image: url(:/icons/scopy-default/icons/ico-stop.svg);
 }
 
 QPushButton[stopButton=true]:checked {
-    background-image: url(:/icons/ico-play-green.svg);
+	background-image: url(:/icons/ico-play-green.svg);
 }
 
 /*************************************************************/
@@ -915,11 +915,11 @@ QPushButton[stopButton=true]:checked {
 /******************** User Notes *************************/
 
 QPushButton[userNote=true] {
-        background-image: url(:/icons/ic_note_unchecked.svg);
+	background-image: url(:/icons/scopy-default/icons/ic_note_unchecked.svg);
 }
 
 QPushButton[userNote=true]:checked {
-        background-image: url(:/icons/ic_note_checked.svg);
+	background-image: url(:/icons/scopy-default/icons/ic_note_checked.svg);
 }
 
 /*************************************************************/

@@ -441,7 +441,7 @@ border-width: 0px;
           </property>
           <property name="icon">
            <iconset resource="../resources/resources.qrc">
-            <normaloff>:/menu/add.svg</normaloff>:/menu/add.svg</iconset>
+            <normaloff>:/icons/add.svg</normaloff>:/icons/add.svg</iconset>
           </property>
           <property name="iconSize">
            <size>

@@ -210,7 +210,7 @@ void ToolMenuItem::_buildUI()
 
 	d_toolBtn->setIcon(QIcon::fromTheme(d_iconPath));
 	d_toolBtn->setCheckable(true);
-	d_toolBtn->setIconSize(QSize(32, 32));
+	d_toolBtn->setIconSize(QSize(20, 20));
 
 	d_toolStopBtn->setCheckable(true);
 

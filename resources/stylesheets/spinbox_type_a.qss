@@ -57,14 +57,14 @@ QComboBox#SBA_Combobox::drop-down {
   subcontrol-position: center right;
   width: 10px;
   height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 QComboBox#SBA_Combobox::drop-down:disabled {
   subcontrol-position: center right;
   width: 0px;
   height: 0px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 QDial#SBA_CompletionCircle {

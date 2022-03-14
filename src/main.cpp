@@ -113,6 +113,7 @@ int main(int argc, char **argv)
 	QCoreApplication::setApplicationName("Scopy");
 	QCoreApplication::setApplicationVersion(SCOPY_VERSION_GIT);
 	QSettings::setDefaultFormat(QSettings::IniFormat);
+	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 #if BREAKPAD_HANDLER
 	QSettings test;
