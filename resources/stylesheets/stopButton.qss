@@ -4,11 +4,11 @@ QPushButton {
 }
 
 QPushButton:enabled {
-    background-image: url(:/icons/ico-stop.svg);
+    background-image: url(:/icons/scopy-default/icons/ico-stop.svg);
 }
 
 QPushButton[disabled=true][enabled=false] {
-    background-image: url(:/icons/ico-stop.svg);
+    background-image: url(:/icons/scopy-default/icons/ico-stop.svg);
 }
 
 QPushButton:checked {

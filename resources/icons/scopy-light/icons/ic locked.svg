@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="8px" height="12px" viewBox="0 0 8 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ic locked</title>
+    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="states" transform="translate(-1765.000000, -864.000000)" fill="#FFFFFF" fill-rule="nonzero">
+            <g id="toggle-locked" transform="translate(1759.000000, 860.000000)">
+                <path d="M10,4 C11.6568542,4 13,5.34314575 13,7 L13,10 L14,10 L14,16 L6,16 L6,10 L7,10 L7,7 C7,5.34314575 8.34314575,4 10,4 Z M10,6 C9.44771525,6 9,6.44771525 9,7 L9,10 L11,10 L11,7 C11,6.44771525 10.5522847,6 10,6 Z" id="ic-locked"></path>
+            </g>
+        </g>
+    </g>
+</svg>

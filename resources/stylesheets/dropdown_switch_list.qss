@@ -15,7 +15,7 @@ adiscope--DropdownSwitchList::drop-down {
   subcontrol-position: center right;
   width: 10px;
   height: 6px;
-  border-image: url(:/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
   margin-right: 20px;
 }
 
