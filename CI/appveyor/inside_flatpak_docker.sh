@@ -14,6 +14,13 @@ cd "$REPO_LOCAL"
 # the cache should be updated from time to time locally
 git fetch && git reset origin/master --hard
 
+# Run the preprocess step to generate org.adi.Scopy.json
+make preprocess
+
+# Disable the preprocess step; The Json file will now be modified and
+# we don't want to re-generate it at the build step
+export EN_PREPROCESS=false
+
 # check the number of elements in the json file in order to get the last element, which is Scopy
 cnt=$( echo `jq '.modules | length' org.adi.Scopy.json` )
 cnt=$(($cnt-1))
