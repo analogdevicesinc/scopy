@@ -50,9 +50,6 @@ stages:
     - script: cp -R staging ${BUILD_ARTIFACTSTAGINGDIRECTORY}
       displayName: 'Copy staging dir'
       workingDirectory: $(Build.Repository.LocalPath)
-    - script: cp build/Scopy.dmg ${BUILD_ARTIFACTSTAGINGDIRECTORY}
-      displayName: 'Copy Scopy.dmg'
-      workingDirectory: $(Build.Repository.LocalPath)
     - script: |
             ACCOUNT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $1}'`
             PROJECT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $2}'`
@@ -60,13 +57,24 @@ stages:
             echo "PROJECT_NAME = " ${PROJECT_NAME}
             MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
             DEPLOY_FILE=Scopy-macos${MACOS_VERSION}-${CURRENT_COMMIT:0:7}.dmg
-            cp build/Scopy.dmg ${DEPLOY_FILE}
+            cp build/Scopy.dmg ${BUILD_ARTIFACTSTAGINGDIRECTORY}/${DEPLOY_FILE}
+            cd ${BUILD_ARTIFACTSTAGINGDIRECTORY}
+            tar czvf Scopy-macos${MACOS_VERSION}.tar.gz ${DEPLOY_FILE}
             ls -la
-            # TODO: Add GH_TOKEN for github cont release upload
-            #ghr -u $ACCOUNT_NAME -r $PROJECT_NAME -name "Continuous build" -b "Latest succesful master build " -prerelease -debug -replace continous ${DEPLOY_FILE}
-      displayName: 'Push to github continuous release'
+      displayName: 'Rename and copy artifact'
       workingDirectory: $(Build.Repository.LocalPath)
+    - task: GithubRelease@0
+      displayName: 'Push to continuous release'
       condition: and(succeeded(), and(ne(variables['Build.Reason'], 'PullRequest'), eq(variables['Build.SourceBranch'], 'refs/heads/master')))
+      inputs:
+        githubConnection: scopy_continuous_release
+        repositoryName: $(Build.Repository.Name)
+        action: edit
+        tag: continous
+        assets: $(Build.ArtifactStagingDirectory)/Scopy*.tar.gz
+        assetUploadMode: replace
+        isPreRelease: true
+        addChangeLog: false
     - task: PublishPipelineArtifact@1
       condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
       inputs:
