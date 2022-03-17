@@ -320,6 +320,7 @@ Preferences::Preferences(QWidget *parent) :
 		requestRestart();
 	});
 	pref_ptr = this;
+	initializePreferences();
 }
 
 void Preferences::save() {
@@ -403,7 +404,7 @@ void Preferences::notifyChange()
 	Q_EMIT notify();
 }
 
-void Preferences::showEvent(QShowEvent *event)
+void Preferences::initializePreferences()
 {
 
 	setDynamicProperty(ui->sigGenNrPeriods, "invalid", false);
@@ -452,7 +453,11 @@ void Preferences::showEvent(QShowEvent *event)
 	ui->loggingUnavailableLabel->setVisible(true);
 	m_logging_enabled = false;
 #endif
+}
 
+void Preferences::showEvent(QShowEvent *event)
+{
+	initializePreferences();
 	QWidget::showEvent(event);
 }
 
