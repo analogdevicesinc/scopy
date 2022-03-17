@@ -213,6 +213,7 @@ private:
 	Preferences_API *pref_api;
 
 	ScopyColorEditor *m_colorEditor;
+	void initializePreferences();
 };
 
 class Preferences_API : public ApiObject
