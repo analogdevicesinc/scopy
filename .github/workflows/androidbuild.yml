@@ -10,14 +10,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Pull the Docker Image
-      run: docker pull analogdevices/scopy-build:android
+      run: docker pull ioanachelaruu/scopy-android:debug
     - name: Run Docker Image
       run: |
             docker run --privileged --net=host \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
                 -e "BRANCH=${GITHUB_REF#refs/heads/}" \
-                analogdevices/scopy-build:android /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
+                ioanachelaruu/scopy-android:debug /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
     - uses: actions/upload-artifact@v2
       with:
         name: scopy-android
