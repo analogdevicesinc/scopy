@@ -3473,6 +3473,7 @@ void adiscope::Oscilloscope::onVertScaleValueChanged(double value)
 	cancelZoom();
 	if (value != plot.VertUnitsPerDiv(current_ch_widget)) {
 		plot.setVertUnitsPerDiv(value, current_ch_widget);
+		plot.replot();
 	}
 	voltsPosition->setStep(value / 10);
 
