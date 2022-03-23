@@ -331,27 +331,35 @@ QTextBrowser#aboutTextBrowser{
 
 /* Label, line and arrow button dividers between sections */
 
-QLabel[subsection_label=true]{
+QLabel[subsection_label=true], QLabel#lblSubsectionSeparator {
 	font-size: 12px;
 	color: rgba(0, 0, 0, 70);
 }
 
-QFrame[subsection_line=true]{ border: 1px solid rgba(0, 0, 0, 50); }
+QFrame[subsection_line=true], QFrame#lineSubsectionSeparator { border: 1px solid rgba(0, 0, 0, 50); }
 
 QPushButton[subsection_arrow_button=true]{
-	max-height: 12px;
+	max-height: 8px;
 	max-width: 12px;
-	border: none;
-	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
-
-QPushButton[subsection_arrow_button=true]:checked{
+QPushButton#btnSubsectionSeparator:checked {
 	max-height: 12px;
-	max-width:  12px;
-	border: none;
-	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+	max-width: 8px;
+	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 
+QPushButton[subsection_arrow_button=true]:checked {
+	max-height: 12px;
+	max-width:  8px;
+	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+}
+
+QPushButton#btnSubsectionSeparator {
+	max-height: 8px;
+	max-width:  12px;
+	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+}
 
 /* Label associated with settings menu, right above a blue line divider */
 
