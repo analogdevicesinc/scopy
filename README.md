@@ -1,12 +1,19 @@
-[![appveyor status](https://ci.appveyor.com/api/projects/status/61orx0yhjipv9i7l/branch/master?svg=true)](https://ci.appveyor.com/project/analogdevicesinc/scopy/branch/master)
+[![Mingw build](https://github.com/analogdevicesinc/scopy/actions/workflows/mingwbuild.yml/badge.svg?branch=master)](https://github.com/analogdevicesinc/scopy/actions/workflows/mingwbuild.yml?query=branch%3Amaster+)
+[![Flatpak build](https://github.com/analogdevicesinc/scopy/actions/workflows/linuxflatpakbuild.yml/badge.svg?branch=master)](https://github.com/analogdevicesinc/scopy/actions/workflows/linuxflatpakbuild.yml?query=branch%3Amaster+)
+[![MacOs status](https://dev.azure.com/AnalogDevices/M2k/_apis/build/status/analogdevicesinc.scopy?branchName=master)](https://dev.azure.com/AnalogDevices/M2k/_build/latest?definitionId=25&branchName=master)
+[![Android build](https://github.com/analogdevicesinc/scopy/actions/workflows/androidbuild.yml/badge.svg?branch=master)](https://github.com/analogdevicesinc/scopy/actions/workflows/androidbuild.yml?query=branch%3Amaster+)
+[![Ubuntu build](https://github.com/analogdevicesinc/scopy/actions/workflows/clangtidy.yml/badge.svg?branch=master)](https://github.com/analogdevicesinc/scopy/actions/workflows/clangtidy.yml?query=branch%3Amaster+)
 
-# Scopy
+# Scopy [![GitHub Release](https://img.shields.io/github/release/analogdevicesinc/scopy.svg)](https://github.com/analogdevicesinc/scopy/releases/latest)  [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-yellow.svg)](https://github.com/analogdevicesinc/scopy/blob/update-readme/LICENSE)
 Scopy is a software oscilloscope and signal analysis toolset.
 
-## Appveyor Builds 
-Nightly builds for Windows are available at: https://ci.appveyor.com/project/analogdevicesinc/scopy/build/artifacts
+## Builds
+Nightly builds are available under the [Continuous build](https://github.com/analogdevicesinc/scopy/releases/tag/continous) tag.
 
-Each build contains files that allow two types of installations:
-- System install:  The scopy-setup.exe installs Scopy and all required dependencies. Recommended for a quick and easy installation.
-- Local install: To install, extract scopy.zip which contains Scopy dependencies and copy scopy.exe next to the extracted files.
-Local installs can be used when there is a need for multiple versions of Scopy to exist simultaneously on a system or when new changes are made only to the scopy.exe file and there is no need for the scopy.zip to be downloaded again.
+### Supported platforms
+- Windows (x86-64)
+- Linux flatpak (x86-64, arm32)
+- MacOs (x86-64)
+- Android (aarch64)
+
+Complete instalation and usage instructions can be found on our [Wiki](https://wiki.analog.com/university/tools/m2k/scopy) page.
