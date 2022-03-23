@@ -12,7 +12,7 @@ SubsectionSeparator::SubsectionSeparator(QWidget* parent)
 {
 	m_ui->setupUi(this);
 
-	m_ui->widgetSubsectionContent->setVisible(false);
+	m_ui->btnSubsectionSeparator->setChecked(true);
 	connect(m_ui->btnSubsectionSeparator, &QPushButton::toggled,
 		[=](bool toggled) { m_ui->widgetSubsectionContent->setVisible(toggled); });
 }
