@@ -1213,7 +1213,7 @@ void adiscope::ToolLauncher::ping()
 
 	int ret = iio_device_get_trigger(dev, &test_device);
 
-	if (ret < 0 && ret != -ENOENT && ret!=-19) {
+	if (ret < 0 && ret != -ENOENT) {
 		disconnect();
 	}
 }
