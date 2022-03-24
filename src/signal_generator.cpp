@@ -1146,7 +1146,7 @@ void SignalGenerator::tabChanged(int index)
 		{
 			loadFileCurrentChannelData();
 		}
-		resizeTabWidget(index); // causes small glitch on windows, to be investigated
+//		resizeTabWidget(index); // causes small glitch on windows, to be investigated
 		resetZoom();
 	}
 }
