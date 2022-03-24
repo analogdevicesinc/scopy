@@ -645,10 +645,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		ui->plot->addWidget(centralWidget);
 	}
 
-	connect(ui->toggleMenuBtn, &QPushButton::toggled, [=](bool toggled){
-		ui->rightMenu->toggleMenu(toggled);
-	});
-
 	ui->plot->addWidget(ui->instrumentNotes, 1, 0);
 }
 
@@ -1150,7 +1146,7 @@ void SignalGenerator::tabChanged(int index)
 		{
 			loadFileCurrentChannelData();
 		}
-		resizeTabWidget(index);
+		resizeTabWidget(index); // causes small glitch on windows, to be investigated
 		resetZoom();
 	}
 }
