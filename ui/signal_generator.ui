@@ -109,25 +109,6 @@
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="toggleMenuBtn">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-          <property name="menu_icon_button" stdset="0">
-           <bool>true</bool>
-          </property>
-          <property name="settings_icon" stdset="0">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
        </layout>
       </item>
       <item>
@@ -1470,36 +1451,36 @@ background-repeat: no-repeat;
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>gui/detachdragzone.h</header>
+   <header location="global">gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header>gui/menu_anim.hpp</header>
+   <header location="global">gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header>gui/instrumentnotes.h</header>
+   <header location="global">gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header>gui/runsinglewidget.h</header>
+   <header location="global">gui/runsinglewidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.hpp</header>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::Math</class>
