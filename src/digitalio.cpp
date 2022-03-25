@@ -80,6 +80,8 @@ DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
 	auto max = (1<<nr_of_channels) -1;
 	ui->lineEdit->setText(QString::number(max/2));
 	ui->horizontalSlider->setValue(max/2);	
+	ui->comboBox->setCurrentIndex(0);
+	ui->stackedWidget->setCurrentIndex(0);
 }
 DigitalIoGroup::~DigitalIoGroup()
 {
