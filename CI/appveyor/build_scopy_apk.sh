@@ -7,7 +7,7 @@ BUILD_FOLDER=build_${ABI}_${BUILD_TYPE}
 
 build_scopy() {
 
-	git clone https://github.com/analogdevicesinc/scopy.git
+	git clone $REPO
 	pushd scopy
 	git submodule update --init --recursive iio-emu
 
