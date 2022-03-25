@@ -44,7 +44,7 @@ cp -r -n $DLL_DEPS $DEST_FOLDER/
 cd $STAGING/$MINGW_VERSION/bin 
 cp -r $DLL_DEPS $DEST_FOLDER/
 cp -r $PYTHON_FILES $DEST_FOLDER
-
+cp $BUILD_FOLDER/scopy-$ARCH_BIT.iss $DEST_FOLDER
 
 echo "### Extracting debug symbols ..."
 mkdir -p $DEST_FOLDER/.debug
