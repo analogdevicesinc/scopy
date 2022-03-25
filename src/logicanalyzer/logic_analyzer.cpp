@@ -214,7 +214,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	initBufferScrolling();
 
-	m_plotScrollBar->setRange(0, 100);
+	m_plotScrollBar->setRange(0, 140);
 
 	// setup decoders
 	setupDecoders();
