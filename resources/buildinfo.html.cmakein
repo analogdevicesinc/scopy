@@ -1,13 +1,13 @@
 <body>
 <pre>Scopy version: ${scopy_VERSION}-${SCOPY_VERSION_GIT}
 This Scopy version was built on ${TODAY} ${NOW} 
-on machine: ${BUILD_HOST} by user: $ENV{USERNAME}
+on machine: $ENV{BUILD_HOST}, $ENV{RUNNER_ARCH} by user: $ENV{USERNAME}
 
 Build machine is ${CMAKE_HOST_SYSTEM}
 Built using ${CMAKE_CXX_COMPILER} - ${CMAKE_CXX_COMPILER_VERSION}
 Compiler library architecture: ${CMAKE_CXX_LIBRARY_ARCHITECTURE}
 
-${APPVEYOR_INFO}
+${BUILD_INFO}
 
 This Scopy version uses the following library/tools versions:
 libboost: ${Boost_VERSION}
@@ -21,6 +21,6 @@ libsigrokdecode: ${LIBSIGROK_DECODE_VERSION}
 libm2k: ${libm2k_VERSION}-${libm2k_VERSION_GIT}
 
 Scopy dependencies info:
-${SCOPY_MINGW_BUILD_STATUS_INFO}
+${SCOPY_BUILD_STATUS_INFO}
 </pre>
 </body>

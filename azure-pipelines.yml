@@ -2,7 +2,6 @@ variables:
     QT_FORMULAE: qt@5
     REPO_SLUG: $(Build.Repository.Name)
     CURRENT_COMMIT: $(Build.SourceVersion)
-    CI_BUILD: 1
 
 trigger:
   branches:
@@ -43,7 +42,18 @@ stages:
     - script: ./CI/appveyor/install_macos_deps.sh
       displayName: 'Dependencies'
       workingDirectory: $(Build.Repository.LocalPath)
-    - script: ./CI/appveyor/build_appveyor_macos.sh
+    - script: |
+            export BUILD_HOST="$(vmImage)"
+            export ACCOUNT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $1}'`
+            export PROJECT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $2}'`
+            export USERNAME="azure-pipelines"
+            export BUILD_REPO_URL=$(Build.Repository.Uri)
+            export RUN_ID=$(Build.BuildId)
+            export RUN_NUMBER=$(Build.BuildNumber)
+            export JOB_ID=$(System.JobId)
+            export JOB_NAME=$(System.JobName)
+            export RUNNER_ARCH=$(Agent.OSArchitecture)
+            ./CI/appveyor/build_appveyor_macos.sh
       displayName: 'Build'
       workingDirectory: $(Build.Repository.LocalPath)
     - script: ./CI/appveyor/package_darwin.sh
@@ -53,8 +63,6 @@ stages:
       displayName: 'Copy staging dir'
       workingDirectory: $(Build.Repository.LocalPath)
     - script: |
-            ACCOUNT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $1}'`
-            PROJECT_NAME=`echo $REPO_SLUG | awk -F "/" '{print $2}'`
             echo "ACCOUNT_NAME = " ${ACCOUNT_NAME}
             echo "PROJECT_NAME = " ${PROJECT_NAME}
             MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
