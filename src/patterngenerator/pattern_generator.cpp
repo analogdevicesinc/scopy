@@ -827,7 +827,7 @@ void PatternGenerator::generateBuffer()
 	m_plot.setHorizUnitsPerDiv(1.0 / m_sampleRate * m_bufferSize / 16.0);
 	m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0);
 	m_plot.cancelZoom();
-	m_plot.zoomBaseUpdate();
+	m_plot.zoomBaseUpdate(true);
 
 	for (QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
 		pattern.second->get_pattern()->generate_pattern(sr, bufferSize, pattern.first.size());
