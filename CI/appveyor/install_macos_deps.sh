@@ -30,7 +30,10 @@ done
 
 pip3 install mako six
 
-pwd
+# Generate build status info for the about page
+BUILD_STATUS_FILE=${REPO_SRC}/build-status
+brew list --versions $PACKAGES > $BUILD_STATUS_FILE
+
 source ${REPO_SRC}/CI/appveyor/before_install_lib.sh
 
 QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
@@ -47,6 +50,10 @@ QMAKE="$(command -v qmake)"
 
 CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
 
+save_version_info() {
+	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
+}
+
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
 
@@ -56,6 +63,8 @@ build_libiio() {
 
 	mkdir ${WORKDIR}/libiio/build-${ARCH}
 	cd ${WORKDIR}/libiio/build-${ARCH}
+	CURRENT_BUILD=libiio
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DWITH_TESTS:BOOL=OFF \
@@ -79,6 +88,8 @@ build_libm2k() {
 
 	mkdir ${WORKDIR}/libm2k/build-${ARCH}
 	cd ${WORKDIR}/libm2k/build-${ARCH}
+	CURRENT_BUILD=libm2k
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DENABLE_PYTHON=OFF \
@@ -100,6 +111,8 @@ build_libad9361() {
 
 	mkdir ${WORKDIR}/libad9361/build-${ARCH}
 	cd ${WORKDIR}/libad9361/build-${ARCH}
+	CURRENT_BUILD=libad9361-iio
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		${WORKDIR}/libad9361
@@ -113,6 +126,7 @@ build_log4cpp() {
 	wget https://sourceforge.net/projects/log4cpp/files/latest/log4cpp-1.1.3.tar.gz
 	tar xvzf log4cpp-1.1.3.tar.gz
 	cd log4cpp
+	echo "liblog4cpp - v1.1.3" >> $BUILD_STATUS_FILE
 	./configure --prefix=/usr/local/
 	make -j $JOBS
 	sudo make -j ${JOBS} install
@@ -124,6 +138,8 @@ build_gnuradio() {
 	git clone --recurse-submodules https://github.com/$GNURADIO_FORK/gnuradio -b $GNURADIO_BRANCH ${WORKDIR}/gnuradio
 	mkdir ${WORKDIR}/gnuradio/build-${ARCH}
 	cd ${WORKDIR}/gnuradio/build-${ARCH}
+	CURRENT_BUILD=gnuradio
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DENABLE_GR_DIGITAL:BOOL=OFF \
@@ -157,6 +173,8 @@ build_griio() {
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-iio.git -b $GRIIO_BRANCH ${WORKDIR}/gr-iio
 	mkdir ${WORKDIR}/gr-iio/build-${ARCH}
 	cd ${WORKDIR}/gr-iio/build-${ARCH}
+	CURRENT_BUILD=gr-iio
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DWITH_PYTHON=OFF \
@@ -172,6 +190,8 @@ build_grm2k() {
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH ${WORKDIR}/gr-m2k
 	mkdir ${WORKDIR}/gr-m2k/build-${ARCH}
 	cd ${WORKDIR}/gr-m2k/build-${ARCH}
+	CURRENT_BUILD=gr-m2k
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DWITH_PYTHON=OFF \
@@ -187,6 +207,8 @@ build_grscopy() {
 	git clone --depth 1 https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH ${WORKDIR}/gr-scopy
 	mkdir ${WORKDIR}/gr-scopy/build-${ARCH}
 	cd ${WORKDIR}/gr-scopy/build-${ARCH}
+	CURRENT_BUILD=gr-scopy
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DWITH_PYTHON=OFF \
@@ -201,6 +223,7 @@ build_glibmm() {
 	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
 	tar xzvf glibmm-2.64.0.tar.xz
 	cd glibmm-2.64.0
+	echo "libglibmm - v2.64.0" >> $BUILD_STATUS_FILE
 	./configure --prefix=$STAGINGDIR
 	make -j $JOBS
 	sudo make -j $JOBS install
@@ -212,6 +235,7 @@ build_sigcpp() {
 	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
 	tar xvzf libsigc++-2.10.0.tar.xz
 	cd libsigc++-2.10.0
+	echo "libsigc++ - v2.10.0" >> $BUILD_STATUS_FILE
 	./configure --prefix=$STAGINGDIR
 	make -j $JOBS
 	sudo make -j $JOBS install
@@ -222,6 +246,8 @@ build_libsigrokdecode() {
 
 	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
 	cd ${WORKDIR}/libsigrokdecode
+	CURRENT_BUILD=libsigrokdecode
+	save_version_info
 
 	./autogen.sh
 	./configure --prefix=$STAGINGDIR
@@ -232,6 +258,8 @@ build_libsigrokdecode() {
 build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
 	git clone --depth 1 https://github.com/cseci/qwt -b $QWT_BRANCH ${WORKDIR}/qwt
+	CURRENT_BUILD=qwt
+	save_version_info
 	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
 }
 
@@ -241,6 +269,8 @@ build_libtinyiiod() {
 	git clone --depth 1 https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH ${WORKDIR}/libtinyiiod
 	mkdir ${WORKDIR}/libtinyiiod/build-${ARCH}
 	cd ${WORKDIR}/libtinyiiod/build-${ARCH}
+	CURRENT_BUILD=libtinyiiod
+	save_version_info
 
 	cmake ${CMAKE_OPTS} \
 		-DBUILD_EXAMPLES=OFF \

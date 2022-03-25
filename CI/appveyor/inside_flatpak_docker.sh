@@ -46,6 +46,16 @@ fi
 cp tmp.json org.adi.Scopy.json
 rm tmp.json
 
+# Generate build status info for the about page
+echo "Details about the versions of dependencies can be found <a href="https://github.com/analogdevicesinc/scopy-flatpak/blob/master/org.adi.Scopy.json.c">here</a>" > build-status
+cp build-status $GITHUB_WORKSPACE/build-status
+
+# Insert env vars in the sandboxed flatpak build
+CI_ENVS=`jq -R -n -c '[inputs|split("=")|{(.[0]):.[1]}] | add' $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs`
+echo "CI_ENVS= $CI_ENVS"
+cat org.adi.Scopy.json | jq --tab '."build-options".env += ('$CI_ENVS')' > tmp.json
+cp tmp.json org.adi.Scopy.json
+
 make clean
 make -j4
 

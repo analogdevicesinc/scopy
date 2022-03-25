@@ -2,6 +2,10 @@ name: android-apk build
 
 on: [push, pull_request]
 
+env:
+  BUILD_HOST: ubuntu-latest
+  USERNAME: github-actions
+
 jobs:
 
   make-apk:
@@ -10,15 +14,15 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Pull the Docker Image
-      run: docker pull ioanachelaruu/scopy-android:debug
+      run: docker pull analogdevices/scopy-build:android
     - name: Run Docker Image
       run: |
+            $GITHUB_WORKSPACE/CI/appveyor/gen_ci_envs.sh > $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs
             docker run --privileged --net=host \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
-                -e "GITHUB_WORKSPACE=$GITHUB_WORKSPACE" \
                 -e "BRANCH=${GITHUB_REF#refs/heads/}" \
-                -e "REPO=${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" \
-                ioanachelaruu/scopy-android:debug /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
+                --env-file $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs \
+                analogdevices/scopy-build:android /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/build_scopy_apk.sh
     - uses: actions/upload-artifact@v2
       with:
         name: scopy-android
