@@ -134,7 +134,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	m_plot.zoomBaseUpdate();
 
 	m_plot.enableXaxisLabels();
-	m_plotScrollBar->setRange(0, 100);
+	m_plotScrollBar->setRange(0, 140);
 
 	setupPatterns();
 
