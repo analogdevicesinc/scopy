@@ -1601,7 +1601,7 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 void SpectrumAnalyzer::setYAxisUnit(const QString& unit)
 {
 	if (unit == "dBFS" || unit == "dBu" || unit == "dBV") {
-		fft_plot->setLeftVertAxisUnit("db");
+		fft_plot->setLeftVertAxisUnit("dB");
 	} else if (unit == "Vpeak" || unit == "Vrms" || unit == "V/√Hz") {
 		fft_plot->setLeftVertAxisUnit("V");
 	}
