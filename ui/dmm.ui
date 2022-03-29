@@ -155,11 +155,7 @@ QPushButton:disabled {
      <item>
       <widget class="adiscope::DetachDragZone" name="leftPanel" native="true">
        <property name="styleSheet">
-        <string notr="true">QLabel { 
-	 font-size: 51px; 
-	font-weight: bold; 
-	qproperty-alignment: 'AlignBottom | AlignLeft';
- }</string>
+        <string notr="true"/>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <property name="leftMargin">
@@ -863,7 +859,11 @@ QLabel{font-size:35pt;}</string>
            </layout>
           </item>
           <item>
-           <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
+           <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
+            <property name="styleSheet">
+             <string notr="true"> </string>
+            </property>
+           </widget>
           </item>
           <item>
            <spacer name="verticalSpacer_4">
@@ -2034,9 +2034,6 @@ line-height: 14px;
  <resources>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -2073,7 +2070,7 @@ line-height: 14px;
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup_2"/>
   <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup_2"/>
  </buttongroups>
 </ui>
