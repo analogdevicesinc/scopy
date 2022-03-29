@@ -8,6 +8,7 @@ environment:
     BUILD_NO: $(APPVEYOR_BUILD_NUMBER)
     BRANCH: $(APPVEYOR_REPO_BRANCH)
     REPO: $(APPVEYOR_REPO_NAME)
+    CI_BUILD: 1
     matrix:
         - ARCH: x86_64
           ARCH_BIT: 64

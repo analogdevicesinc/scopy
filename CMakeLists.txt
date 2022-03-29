@@ -159,6 +159,13 @@ if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
 	add_definitions(-DHAS_CONSTEXPR=1)
 endif()
 
+if ($ENV{CI_BUILD})
+	message("-- Building in CI")
+	set(CI_BUILD_BOOL 1)
+else()
+	message("-- Building locally; development build")
+	set(CI_BUILD_BOOL 0)
+endif()
 
 option(BREAKPAD_HANDLER "Build with breakpad exception handler " OFF)
 message(STATUS BREAKPAD_HANDLER - ${BREAKPAD_HANDLER})

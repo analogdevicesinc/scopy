@@ -1719,8 +1719,11 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 				info.setText(tr("Digital decoders support is disabled. Some features may be missing"));
 				info.exec();
 			} else {
-
+#if CI_BUILD
+				bool success = loadDecoders("decoders");
+#else
 				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
+#endif
 
 				if (!success) {
 					search_timer->stop();

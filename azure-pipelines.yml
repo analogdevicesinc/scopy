@@ -2,6 +2,8 @@ variables:
     QT_FORMULAE: qt@5
     REPO_SLUG: $(Build.Repository.Name)
     CURRENT_COMMIT: $(Build.SourceVersion)
+    CI_BUILD: 1
+
 trigger:
   branches:
     include:
