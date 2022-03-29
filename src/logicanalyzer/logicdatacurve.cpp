@@ -164,11 +164,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 	displayedData += QPointF(t2, y2);
     }
 
-    if (edges.back().first + 1 < m_endSample - 1) {
-	displayedData += QPointF(fromSampleToTime(m_endSample - 1), (!edges.back().second) * heightInPoints + m_pixelOffset);
-    }
-
-    if (edges.back().first + 1 == m_endSample - 1) {
+    if (edges.back().first + 1 < m_endSample) {
 	    displayedData += QPointF(plot()->axisInterval(QwtAxis::XBottom).maxValue(), displayedData.back().y());
     }
 
