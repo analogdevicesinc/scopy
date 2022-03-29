@@ -603,6 +603,9 @@ void ToolLauncher::resetSession()
 	pathToFile = "";
 	indexFile = "";
 	deviceInfo = "";
+	if(!ui->btnMenu->isChecked()){
+		ui->btnMenu->setChecked(true);
+	}
 	updateHomepage();
 	setupHomepage();
 
