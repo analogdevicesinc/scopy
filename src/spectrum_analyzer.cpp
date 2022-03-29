@@ -270,6 +270,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
 	vLayout->addWidget(ui->markerTable);
 
+	fft_plot->setZoomerEnabled();
+	fft_plot->setAxisVisible(QwtAxis::XBottom, false);
+	fft_plot->setAxisVisible(QwtAxis::YLeft, false);
+	fft_plot->setUsingLeftAxisScales(false);
+
 	if(prefPanel->getCurrent_docking_enabled()) {
 
 		// main window for dock widget
