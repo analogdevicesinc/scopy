@@ -370,15 +370,16 @@ libm2k::analog::M2K_RANGE DMM::suggestRange(double volt_max, double volt_min)
 		} else if (volt_max <= hi_lo) {
 			gain = libm2k::analog::PLUS_MINUS_2_5V;
 		}
+	}
 
-		if (volt_min <= 0.0) {
-			if (volt_min >= lo_hi ) {
-				gain = libm2k::analog::PLUS_MINUS_2_5V;
-			} else if (volt_min <= lo_lo) {
-				gain = libm2k::analog::PLUS_MINUS_25V;
-			}
+	if (volt_min <= 0.0) {
+		if (volt_min >= lo_hi ) {
+			gain = libm2k::analog::PLUS_MINUS_2_5V;
+		} else if (volt_min <= lo_lo) {
+			gain = libm2k::analog::PLUS_MINUS_25V;
 		}
 	}
+
 	return gain;
 }
 
