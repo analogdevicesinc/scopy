@@ -586,7 +586,7 @@ void FreePlotLineHandleV::moveWithinParent(int x, int y)
 	int centerPos = originPosToCenter(y);
 	int oldCenterPos = m_current_pos;
 
-	if (centerPos != oldCenterPos) {
+	if (centerPos != oldCenterPos || !m_isBeyondTop || !m_isBeyondBottom) {
 		m_isBeyondTop = false;
 		m_isBeyondBottom = false;
 		if (y < lower_limit) {
