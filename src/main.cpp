@@ -22,6 +22,7 @@
 #include <QCommandLineParser>
 #include <QSettings>
 #include <QtGlobal>
+#include <QStyleFactory>
 #include <QProcess>
 #include <QDir>
 #include <QDateTime>
@@ -62,6 +63,8 @@ int main(int argc, char **argv)
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts,true);
 
 	ScopyApplication app(argc, argv);
+	app.setStyle(QStyleFactory::create("Fusion"));
+
 #ifdef LIBM2K_ENABLE_LOG
 	enableLogging(true);
 	google::InitGoogleLogging(argv[0]);
