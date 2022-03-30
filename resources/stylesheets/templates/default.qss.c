@@ -118,6 +118,10 @@ QTabBar::tab:!selected {
 	border-bottom: 2px solid #373740;
 }
 
+QTabBar::scroller {
+	width: 25px;
+}
+
 QRadioButton {
 	color: white;
 	spacing: 12px;
