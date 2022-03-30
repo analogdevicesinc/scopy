@@ -1172,6 +1172,10 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	});
 
 	/* When bar position changes due to plot resizes update the handle */
+	connect(d_leftHandlesArea, &HandlesArea::sizeChanged, chOffsetHdl, [=](){
+			chOffsetHdl->updatePosition();
+		});
+
 	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
 		[=](int pos) {
 			chOffsetHdl->setPositionSilenty(pos);
@@ -1689,6 +1693,10 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			Q_EMIT channelOffsetChanged(chn_id, -offset);
 		});
 	/* When bar position changes due to plot resizes update the handle */
+	connect(d_leftHandlesArea, &HandlesArea::sizeChanged, chOffsetHdl, [=](){
+			chOffsetHdl->updatePosition();
+		});
+
 	connect(chOffsetBar, &HorizBar::pixelPositionChanged,
 		[=](int pos) {
 			chOffsetHdl->setPositionSilenty(pos);
