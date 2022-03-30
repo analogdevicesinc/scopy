@@ -66,6 +66,7 @@ public:
 				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
 				  DIOManager *diom, ToolLauncher *parent);
 	~PatternGenerator();
+	void setNativeDialogs(bool nativeDialogs) override;
 
 Q_SIGNALS:
 	void showTool();
