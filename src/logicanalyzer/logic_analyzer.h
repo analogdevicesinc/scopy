@@ -74,6 +74,7 @@ public:
 			 ToolMenuItem *toolMenuItem, QJSEngine *engine,
 			 ToolLauncher *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
+	void setNativeDialogs(bool nativeDialogs) override;
 
 public: // Mixed Signal View Interface
 

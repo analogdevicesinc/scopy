@@ -284,6 +284,12 @@ LogicAnalyzer::~LogicAnalyzer()
 	delete ui;
 }
 
+void LogicAnalyzer::setNativeDialogs(bool nativeDialogs)
+{
+	Tool::setNativeDialogs(nativeDialogs);
+	m_plot.setUseNativeDialog(nativeDialogs);
+}
+
 void LogicAnalyzer::setData(const uint16_t * const data, int size)
 {
 
