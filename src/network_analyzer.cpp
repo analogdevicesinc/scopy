@@ -258,8 +258,12 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		m_phaseGraph.setXMin(start);
 		m_phaseGraph.setXMax(stop);
 
-		computeIterations();
-		updateNumSamples(true);
+		QMetaObject::invokeMethod(this,
+		    [=](){
+			    computeIterations();
+			    updateNumSamples(true);
+		    },
+		    Qt::QueuedConnection);
 	});
 
 
