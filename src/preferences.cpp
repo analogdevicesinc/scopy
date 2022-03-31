@@ -200,6 +200,7 @@ Preferences::Preferences(QWidget *parent) :
 	connect(ui->debugInstrumentCheckbox, &QCheckBox::stateChanged, [=](int state){
 		debugger_enabled = (!state ? false : true);
 		Q_EMIT notify();
+		requestRestart();
 	});
 
 	connect(ui->decodersCheckBox, &QCheckBox::stateChanged, [=](int state){
