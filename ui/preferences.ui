@@ -1473,6 +1473,9 @@ color: white;
                <item row="0" column="1">
                 <widget class="QWidget" name="doubleClickToDetachWidget" native="true">
                  <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
                   <property name="leftMargin">
                    <number>0</number>
                   </property>
