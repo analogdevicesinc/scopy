@@ -638,7 +638,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	}
 	gsettings_ui->cmb_x_channel->setCurrentIndex(0);
 	gsettings_ui->cmb_y_channel->setCurrentIndex(1);
-	setup_xy_channels();
 
 	connect(gsettings_ui->cmb_x_channel, SIGNAL(currentIndexChanged(int)),
 		this, SLOT(setup_xy_channels()));
@@ -962,6 +961,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	ui->btnAddMath->setIconSize(QSize(24, 24));
 #endif
 
+	setup_xy_channels();
 	plot.replot();
 	plot.zoomBaseUpdate(true);
 }
