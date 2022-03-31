@@ -102,6 +102,8 @@ QTabWidget::tab-bar { left: 0; }
 
 QTabWidget::pane { border-top: 0px; }
 
+QTabBar { qproperty-drawBase: 0; }
+
 QTabBar::tab {
 	min-width: 100px;
 	min-height: 32px;
@@ -258,6 +260,8 @@ QGroupBox::title {
 	subcontrol-origin: margin;
 	subcontrol-position: top left; /* position at the top center */
 }
+
+QScrollArea { border: 0px;}
 
 QScrollBar:vertical {
   background: #F7F7F7;
