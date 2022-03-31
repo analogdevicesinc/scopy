@@ -897,6 +897,9 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	tabWidget->addTab(generalScrollArea, "General");
 	tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
+	MouseWheelWidgetGuard* m_wheelEventGuard1 = new MouseWheelWidgetGuard(generalScrollArea);
+	m_wheelEventGuard1->installEventRecursively(generalScrollArea);
+
 	return {tabWidget, generalScrollArea};
 }
 
