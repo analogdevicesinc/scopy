@@ -3207,7 +3207,7 @@ p, li { white-space: pre-wrap; }
     <message>
         <location filename="../../ui/runsinglewidget.ui" line="132"/>
         <source>Single</source>
-        <translation>RULEAZA 1</translation>
+	<translation>Odata</translation>
     </message>
 </context>
 <context>
