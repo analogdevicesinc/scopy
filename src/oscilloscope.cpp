@@ -1380,7 +1380,9 @@ void Oscilloscope::readPreferences()
 	plot.setVisibleFpsLabel(showFps);
 	xy_plot.setVisibleFpsLabel(showFps);
 	fft_plot.setVisibleFpsLabel(showFps);
-	hist_plot.setVisibleFpsLabel(showFps);
+	if (!miniHistogram) {
+		hist_plot.setVisibleFpsLabel(showFps);
+	}
 	plot.setGraticuleEnabled(prefPanel->getOsc_graticule_enabled());
 	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 
