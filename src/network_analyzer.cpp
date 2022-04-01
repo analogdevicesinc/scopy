@@ -452,7 +452,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		bodeWindow->setWindowFlags(Qt::Widget);
 		ui->gridLayout_plots->addWidget(bodeWindow, 0, 0);
 
-		QDockWidget* bodeDockWidget = DockerUtils::createDockWidget(bodeWindow, centralWidget);
+		QDockWidget* bodeDockWidget = DockerUtils::createDockWidget(bodeWindow, centralWidget, "Bode");
 		bodeWindow->addDockWidget(Qt::LeftDockWidgetArea, bodeDockWidget);
 
 
@@ -464,7 +464,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->stackedWidgetPage2->layout()->removeWidget(ui->xygraph);
 		ui->stackedWidgetPage2->layout()->addWidget(nyquistWindow);
 
-		QDockWidget* nyquistDockWidget = DockerUtils::createDockWidget(nyquistWindow, ui->xygraph);
+		QDockWidget* nyquistDockWidget = DockerUtils::createDockWidget(nyquistWindow, ui->xygraph, "Nyquist");
 		nyquistWindow->addDockWidget(Qt::LeftDockWidgetArea, nyquistDockWidget);
 
 
@@ -476,7 +476,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->stackedWidgetPage3->layout()->removeWidget(ui->nicholsgraph);
 		ui->stackedWidgetPage3->layout()->addWidget(nicholsWindow);
 
-		QDockWidget* nicholsDockWidget = DockerUtils::createDockWidget(nicholsWindow, ui->nicholsgraph);
+		QDockWidget* nicholsDockWidget = DockerUtils::createDockWidget(nicholsWindow, ui->nicholsgraph, "Nichols");
 		nicholsWindow->addDockWidget(Qt::LeftDockWidgetArea, nicholsDockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
