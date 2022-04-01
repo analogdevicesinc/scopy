@@ -458,7 +458,7 @@ Signal View</string>
                 <property name="maximumSize">
                  <size>
                   <width>16777215</width>
-                  <height>100</height>
+                  <height>16777215</height>
                  </size>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -507,7 +507,7 @@ Signal View</string>
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
-                     <height>70</height>
+                     <height>16777215</height>
                     </size>
                    </property>
                    <layout class="QHBoxLayout" name="hist_layout">
