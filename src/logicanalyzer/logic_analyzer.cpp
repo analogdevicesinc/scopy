@@ -1336,25 +1336,7 @@ void LogicAnalyzer::setupUi()
 	vLayout->addWidget(plotWidget);
 	centralWidget->setLayout(vLayout);
 
-	if(prefPanel->getCurrent_docking_enabled()) {
-
-		// main window for dock widget
-		QMainWindow* mainWindow = new QMainWindow(this);
-		mainWindow->setCentralWidget(0);
-		mainWindow->setWindowFlags(Qt::Widget);
-		ui->gridLayoutPlot->addWidget(mainWindow, 1, 0, 1, 1);
-
-		QDockWidget* docker = DockerUtils::createDockWidget(mainWindow, centralWidget);
-
-		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-		DockerUtils::configureTopBar(docker);
-#endif
-	} else {
-		ui->gridLayoutPlot->addWidget(centralWidget, 1, 0, 1, 1);
-	}
-
+	ui->gridLayoutPlot->addWidget(centralWidget, 1, 0, 1, 1);
 
 	m_plot.setAxisVisible(QwtAxis::YLeft, false);
 	m_plot.setAxisVisible(QwtAxis::XBottom, false);

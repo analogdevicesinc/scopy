@@ -624,26 +624,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	ui->plot->removeWidget(ui->instrumentNotes);
 
-	if(prefPanel->getCurrent_docking_enabled()) {
-
-		// main window for dock widget
-		QMainWindow* mainWindow = new QMainWindow(this);
-		mainWindow->setCentralWidget(0);
-		mainWindow->setWindowFlags(Qt::Widget);
-		ui->plot->addWidget(mainWindow, 0, 0);
-
-		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
-		dockWidget->setContentsMargins(0, 0, 0, 10);
-
-		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-		DockerUtils::configureTopBar(dockWidget);
-#endif
-
-	} else {
-		ui->plot->addWidget(centralWidget);
-	}
+	ui->plot->addWidget(centralWidget);
 
 	ui->plot->addWidget(ui->instrumentNotes, 1, 0);
 }
