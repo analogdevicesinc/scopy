@@ -3094,8 +3094,6 @@ void Oscilloscope::onHistogram_view_toggled(bool visible)
 		}
 
 		hist_plot.setOrientation(Qt::Vertical);
-		hist_plot.setMinimumWidth(plot.width());
-		hist_plot.setMaximumHeight(300);
 		hist_plot.setMaximumWidth(2000);
 		plot.setBonusWidthForHistogram(0);
 		scaleHistogramPlot();
