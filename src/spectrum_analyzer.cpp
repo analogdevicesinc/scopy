@@ -275,26 +275,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setAxisVisible(QwtAxis::YLeft, false);
 	fft_plot->setUsingLeftAxisScales(false);
 
-	if(prefPanel->getCurrent_docking_enabled()) {
-
-		// main window for dock widget
-		QMainWindow* mainWindow = new QMainWindow(this);
-		mainWindow->setCentralWidget(0);
-		mainWindow->setWindowFlags(Qt::Widget);
-		ui->gridLayout_plot->addWidget(mainWindow, 1, 0, 1, 1);
-
-		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
-
-		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-		DockerUtils::configureTopBar(dockWidget);
-#endif
-
-	} else {
-		ui->gridLayout_plot->addWidget(centralWidget, 1, 0, 1, 1);
-	}
-
+	ui->gridLayout_plot->addWidget(centralWidget, 1, 0, 1, 1);
 
 	fft_plot->enableXaxisLabels();
 	fft_plot->enableYaxisLabels();

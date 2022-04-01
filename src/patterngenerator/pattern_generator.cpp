@@ -261,24 +261,7 @@ void PatternGenerator::setupUi()
 	gridLayout->addWidget(m_plot.bottomHandlesArea(), 3, 0, 1, 4);
 	gridLayout->addItem(plotSpacer, 4, 0, 1, 4);
 
-	if(prefPanel->getCurrent_docking_enabled()) {
-
-		// main window for dock widget
-		QMainWindow* mainWindow = new QMainWindow(this);
-		mainWindow->setCentralWidget(0);
-		mainWindow->setWindowFlags(Qt::Widget);
-		m_ui->gridLayoutPlot->addWidget(mainWindow, 1, 0, 1, 1);
-
-		QDockWidget* dockWidget = DockerUtils::createDockWidget(mainWindow, centralWidget);
-
-		mainWindow->addDockWidget(Qt::LeftDockWidgetArea, dockWidget);
-
-#ifdef PLOT_MENU_BAR_ENABLED
-		DockerUtils::configureTopBar(dockWidget);
-#endif
-	} else {
-		m_ui->gridLayoutPlot->addWidget(centralWidget, 0, 0, 1, 1);
-	}
+	m_ui->gridLayoutPlot->addWidget(centralWidget, 0, 0, 1, 1);
 
 
 	// TODO: do we want the buffer previewer in this tool?
