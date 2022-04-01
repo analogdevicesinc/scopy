@@ -119,6 +119,10 @@ void ConnectDialog::enableDemoBtn()
 			// Env Var not found, try local folder
 			QString dirPath = QCoreApplication::applicationDirPath();
 			program = dirPath + "/iio-emu";
+
+#if defined(_WIN32) || defined(__CYGWIN__) || defined(__MINGW32__)
+			program += ".exe";
+#endif
 			QFileInfo fi(program);
 			if(!fi.exists() || fi.isDir()) {
 				// iio-emu is built in-tree
