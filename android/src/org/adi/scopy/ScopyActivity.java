@@ -33,12 +33,14 @@ import android.util.DisplayMetrics;
 public class ScopyActivity extends QtActivity
 {
 	public static native void saveSessionJavaHelper();
+	boolean initialized;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		System.out.println("-- ScopyActivity: onCreate");
 		super.onCreate(savedInstanceState);
+		initialized = false;
 	}
 
 	@Override
@@ -57,7 +59,10 @@ public class ScopyActivity extends QtActivity
 
 	protected void onPause(){
 		System.out.println("-- ScopyActivity: onPause - saving application state to ini file ");
-		saveSessionJavaHelper(); // actually save the data
+		if (initialized) {
+			saveSessionJavaHelper(); // actually save the data
+		}
+
 		super.onPause();
 	}
 
@@ -79,6 +84,7 @@ public class ScopyActivity extends QtActivity
 	}
 
 	public String getScaleFactor() {
+		initialized = true;
 		DisplayMetrics displayMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
