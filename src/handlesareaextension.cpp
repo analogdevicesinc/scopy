@@ -484,22 +484,26 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 		const double valueBetween2Labels = (interval.maxValue() - interval.minValue()) / (labels - 1);
 
 		double midPoint = topP;
-		double currentValue = interval.maxValue();
 
-		for (int i = 0; i < labels; ++i) {
+		QList<double> majorTicks = plot->axisScaleDiv(QwtAxis::YLeft).ticks(QwtScaleDiv::MajorTick);
+
+		double pointVal, currentValue;
+		for (int i = 0; i < majorTicks.size(); ++i) {
+			// this is the same way ticks are parsed in logarithmic mode too
+			// this whole function may need refactoring soon ...
+
+			currentValue = majorTicks.at(i);
+			pointVal = plot->transform(QwtAxis::YLeft, currentValue) + topP;
+
 			const QString text = plot->formatYValue(currentValue, 2);
-			QSizeF textSize = QwtText(text).textSize(painter->font());
-			textSize.setWidth(textSize.width() + 20);
 
+			const QSizeF textSize = QwtText(text).textSize(painter->font());
 			QRectF textRect(QPointF(0.0, 0.0), textSize);
 
-			textRect.moveCenter(QPointF(textSize.width() / 2.0, midPoint));
+			textRect.moveCenter(QPointF(textSize.width() / 2.0, pointVal));
 
 			labelRectangles.push_back(textRect);
 			labelTexts.push_back(text);
-
-			midPoint += distBetween2Labels;
-			currentValue -= valueBetween2Labels;
 		}
 
 		bool allLabelsTheSame = true;
