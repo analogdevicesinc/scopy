@@ -201,6 +201,8 @@ private:
 	void setupAddPage();
 	void allowExternalScript(bool);
 	void loadOpenGL();
+	void createPhoneHomeMessageBox();
+	void createLicenseMessageBox();
 #ifdef __ANDROID__
 	void registerNativeMethods();
 	static void saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/);

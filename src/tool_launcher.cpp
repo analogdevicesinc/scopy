@@ -253,34 +253,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	networkAccessManager = new QNetworkAccessManager(this);
 	m_phoneHome = new PhoneHome(settings, prefPanel, networkAccessManager);
 	if (prefPanel->getFirst_application_run()) {
-		QMessageBox* msgBox = new QMessageBox(this);
-
-		QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
-		QRect screenRect = QDesktopWidget().screenGeometry();
-
-		msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
-		msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
-
-		QPushButton* yesButton = new QPushButton("Yes");
-		msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
-
-		QPushButton* noButton = new QPushButton("No");
-		msgBox->addButton(noButton ,QMessageBox::RejectRole);
-
-		msgBox->setModal(false);
-		msgBox->show();
-		msgBox->activateWindow();
-		msgBox->move( QPoint( screenRect.x() + screenRect.width()/2 - mSize.width()/2,
-				      screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
-
-		connect(yesButton, &QAbstractButton::clicked, [&] () {
-			prefPanel->setAutomatical_version_checking_enabled(true);
-			prefPanel->setFirst_application_run(false);
-		});
-		connect(noButton, &QAbstractButton::clicked, [&] () {
-			prefPanel->setFirst_application_run(false);
-		});
-
+		createPhoneHomeMessageBox();
+		createLicenseMessageBox();
 	}
 	connect(prefPanel, &Preferences::requestUpdateCheck, [=]() { m_phoneHome->versionsRequest(true);});
 	connect(about, &ScopyAboutDialog::forceCheckForUpdates,[=](){
@@ -364,6 +338,66 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	//	f.close();
 
 	tl_ptr = this;
+}
+
+void ToolLauncher::createPhoneHomeMessageBox() {
+	QMessageBox* msgBox = new QMessageBox(this);
+
+	QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
+	QRect screenRect = QDesktopWidget().screenGeometry();
+
+	msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
+	msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
+
+	QPushButton* yesButton = new QPushButton("Yes");
+	msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
+
+	QPushButton* noButton = new QPushButton("No");
+	msgBox->addButton(noButton ,QMessageBox::RejectRole);
+
+	msgBox->setModal(false);
+	msgBox->show();
+	msgBox->activateWindow();
+	msgBox->move( QPoint( screenRect.x() + screenRect.width()/2 - mSize.width()/2,
+			      screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
+
+	connect(yesButton, &QAbstractButton::clicked, [&] () {
+		prefPanel->setAutomatical_version_checking_enabled(true);
+		prefPanel->setFirst_application_run(false);
+	});
+	connect(noButton, &QAbstractButton::clicked, [&] () {
+		prefPanel->setFirst_application_run(false);
+	});
+}
+
+void ToolLauncher::createLicenseMessageBox() {
+	QMessageBox* msgBox = new QMessageBox(this);
+
+	QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
+	QRect screenRect = QDesktopWidget().screenGeometry();
+
+	msgBox->setTextFormat(Qt::RichText);
+	msgBox->setText("Scopy is distributed under the GNU <a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a>, and is copyright Analog Devices. Inc and others. There are no restrictions or obligations on its use, except that you (the user) agree there is no warranty (per the GPLv3). If you don't agree to this - do not use this software.");
+	msgBox->setInformativeText("There are obligations and restrictions on distribution of the source or binary of this application (and the libraries which it is built with) which are detailed in the <a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a> license. More details of additional licenses for 3rd party libraries can be found in the \"About\" box. ");
+
+	QPushButton* yesButton = new QPushButton("Yes");
+	msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
+
+	QPushButton* noButton = new QPushButton("No");
+	msgBox->addButton(noButton ,QMessageBox::RejectRole);
+
+	msgBox->setModal(true);
+	msgBox->show();
+	msgBox->activateWindow();
+	msgBox->move( QPoint( screenRect.x() + screenRect.width()/2 - mSize.width()/2,
+			      screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
+
+	connect(yesButton, &QAbstractButton::clicked, [&] () {
+
+	});
+	connect(noButton, &QAbstractButton::clicked, [&] () {
+		QCoreApplication::quit();
+	});
 }
 
 void ToolLauncher::_setupToolMenu()
