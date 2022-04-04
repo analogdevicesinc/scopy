@@ -804,9 +804,32 @@ void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleD
 	QwtText text(d_timeBaseLabel->text() + " " + d_sampleRateLabel->text());
 	text.setColor(QColor(0, 0, 0));
 	detailsMarker.setLabel(text);
-	replot();
 
+	QVector<QwtPlotMarker*> markers;
+
+	for(int i = 0; i < plot_logic_curves.size(); i++){
+		if(plot_logic_curves.at(i)->plot() != NULL){
+			double yCoord = plot_logic_curves.at(i)->getPixelOffset();
+			double xCoord = axisInterval(QwtAxis::XBottom).minValue();
+
+			markers.push_back(new QwtPlotMarker());
+			markers.last()->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
+			markers.last()->attach(this);
+			markers.last()->setValue(xCoord, yCoord);
+
+			QwtText text1(plot_logic_curves.at(i)->getName());
+			text1.setColor(QColor(0, 0, 0));
+			markers.last()->setLabel(text1);
+			markers.last()->setLabelAlignment(Qt::AlignRight);
+		}
+	}
+	replot();
 	DisplayPlot::printWithNoBackground(toolName, editScaleDraw);
+
+	for(auto marker: markers){
+		marker->detach();
+		delete marker;
+	}
 }
 
 int CapturePlot::getAnalogChannels() const
@@ -1115,6 +1138,8 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 
 	QwtPlotCurve *curve = getDigitalPlotCurve(chnIdx);
 	GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
+	logicCurve->setTitle(QString::number(chnIdx));
+	plot_logic_curves.push_back(logicCurve);
 
 	curve->setAxes(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, d_ydata.size() + d_ref_ydata.size() + chnIdx));
 
