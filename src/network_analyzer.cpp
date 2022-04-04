@@ -405,6 +405,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	});
 
 	ui->nicholsgraph->setPlotBarEnabled(false);
+	ui->nicholsgraph->setAxisVisible(QwtAxis::XTop, true);
+	ui->nicholsgraph->setAxisVisible(QwtAxis::YLeft, true);
 
 	connect(phaseMin, &PositionSpinButton::valueChanged,
 		this, &NetworkAnalyzer::onMinMaxPhaseChanged);
