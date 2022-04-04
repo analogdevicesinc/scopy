@@ -183,9 +183,11 @@ int NyquistGraph::getNumSamples() const
 
 void NyquistGraph::setNumSamples(int num)
 {
-	numSamples = (unsigned int) num;
 
-	reset();
+	if (numSamples == num) {
+		return;
+	}
+	numSamples = (unsigned int) num;
 	samples->reserve(numSamples + 1);
 
 	replot();
