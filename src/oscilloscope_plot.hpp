@@ -30,6 +30,8 @@
 
 #include <qwt_plot_zoneitem.h>
 
+#include <logicanalyzer/genericlogicplotcurve.h>
+
 class QLabel;
 
 namespace adiscope {
@@ -272,6 +274,8 @@ namespace adiscope {
 		QPair<double, double> d_xAxisInterval;
 		int d_currentHandleInitPx;
 		void pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar);
+
+		QVector<GenericLogicPlotCurve *> plot_logic_curves;
 	};
 }
 
