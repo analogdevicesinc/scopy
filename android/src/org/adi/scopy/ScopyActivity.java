@@ -29,6 +29,7 @@ import android.content.Context;
 import android.content.ComponentName;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 public class ScopyActivity extends QtActivity
 {
@@ -39,8 +40,9 @@ public class ScopyActivity extends QtActivity
 	public void onCreate(Bundle savedInstanceState)
 	{
 		System.out.println("-- ScopyActivity: onCreate");
-		super.onCreate(savedInstanceState);
 		initialized = false;
+		super.onCreate(savedInstanceState);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 	}
 
 	@Override
