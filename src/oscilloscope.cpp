@@ -562,7 +562,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				}, tr("Position"),
 				-25, 25, true, false, this);
 
-	plot.setOffsetInterval(-25, 25);
+	plot.setOffsetInterval(-DBL_MAX, DBL_MAX);
 	plot.setTimeTriggerInterval(-timeBase->maxValue() * 5,
 				     timeBase->maxValue() * 5);
 
