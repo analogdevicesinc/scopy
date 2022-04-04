@@ -17,7 +17,7 @@
     <supports-screens android:largeScreens="true" android:normalScreens="true" android:anyDensity="true" android:smallScreens="true"/>
     <application android:hardwareAccelerated="true" android:name="org.adi.scopy.ScopyApplication" android:label="Scopy" android:extractNativeLibs="true" android:icon="@drawable/icon">
 	<receiver android:name="libusb.android.USB_PERMISSION"/>
-	<activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.adi.scopy.ScopyActivity" android:label="Scopy" android:screenOrientation="landscape" tools:ignore="LockedOrientationActivity" android:launchMode="singleTop" android:theme="@style/splashScreenTheme">
+	<activity android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:name="org.adi.scopy.ScopyActivity" android:label="Scopy" android:screenOrientation="userLandscape" tools:ignore="LockedOrientationActivity" android:launchMode="singleTop" android:theme="@style/splashScreenTheme">
 	    <intent-filter>
 		<action android:name="libusb.android.USB_PERMISSION"/>
 		<action android:name="android.intent.action.MAIN"/>
