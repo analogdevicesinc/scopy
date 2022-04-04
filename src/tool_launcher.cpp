@@ -1460,6 +1460,29 @@ bool ToolLauncher::loadDecoders(QString path)
 	return true;
 }
 
+void adiscope::ToolLauncher::saveRunningTools() {
+	for(auto &tool : toolList) {
+		if(tool->isRunning()) {
+			running_tools.push_back(tool);
+		}
+	}
+}
+
+void adiscope::ToolLauncher::stopRunningTools() {
+	for(auto &tool : running_tools) {
+		tool->stop();
+	}
+}
+
+void adiscope::ToolLauncher::restoreRunningTools() {
+	while(!running_tools.empty())
+	{
+		Tool* tool = running_tools.back();
+		running_tools.pop_back();
+		tool->run();
+	}
+}
+
 
 void adiscope::ToolLauncher::saveRunningToolsBeforeCalibration()
 {
@@ -2063,7 +2086,7 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 #ifdef __ANDROID__
 
 void ToolLauncher::saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/) {
-	qDebug()<<"-- Saving session";
+	qDebug()<<"-- Saving session JNI";
 	ToolLauncher* tl = getToolLauncherInstance();
 	if(tl)
 	{
@@ -2072,9 +2095,32 @@ void ToolLauncher::saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/) {
 	}
 }
 
+
+void ToolLauncher::saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
+	qDebug()<<"-- Saving and stopping tools JNI";
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		getToolLauncherInstance()->saveRunningTools();
+		getToolLauncherInstance()->stopRunningTools();
+	}
+}
+
+void ToolLauncher::restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
+	qDebug()<<"-- Saving and stopping tools JNI";
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		getToolLauncherInstance()->restoreRunningTools();
+	}
+}
+
+
 void ToolLauncher::registerNativeMethods()
 {
-	JNINativeMethod methods[] = {{"saveSessionJavaHelper", "()V", reinterpret_cast<void*>(saveSessionJavaHelper) }};
+	JNINativeMethod methods[] = {{"saveSessionJavaHelper", "()V", reinterpret_cast<void*>(saveSessionJavaHelper) },
+				     {"saveAndStopRunningToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningToolsJNI) },
+				     {"restoreRunningToolsJNI", "()V", reinterpret_cast<void*>(restoreRunningToolsJNI) }};
 
 	QAndroidJniObject activity = QtAndroid::androidActivity();
 	QAndroidJniEnvironment env;

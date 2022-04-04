@@ -173,6 +173,7 @@ private Q_SLOTS:
 	void calibrationSuccessCallback();
 	void calibrationThreadWatcherFinished();
 private:
+	QList<Tool*> running_tools;
 	QList<Tool*> calibration_saved_tools;
 	void loadToolTips(bool connected);
 	QVector<QString> searchDevices();
@@ -206,6 +207,8 @@ private:
 #ifdef __ANDROID__
 	void registerNativeMethods();
 	static void saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/);
+	static void saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
+	static void restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
 #endif
 
 private:
@@ -292,6 +295,10 @@ private:
 	void _setupToolMenu();
 	void saveRunningToolsBeforeCalibration();
 	void stopToolsBeforeCalibration();
+
+	void saveRunningTools();
+	void restoreRunningTools();
+	void stopRunningTools();
 
 	QNetworkAccessManager* networkAccessManager;
 	PhoneHome* m_phoneHome;

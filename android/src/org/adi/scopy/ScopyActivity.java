@@ -34,6 +34,8 @@ import android.view.WindowManager;
 public class ScopyActivity extends QtActivity
 {
 	public static native void saveSessionJavaHelper();
+	public static native void saveAndStopRunningToolsJNI();
+	public static native void restoreRunningToolsJNI();
 	boolean initialized;
 
 	@Override
@@ -50,6 +52,9 @@ public class ScopyActivity extends QtActivity
 	{
 		System.out.println("-- ScopyActivity: onStart");
 		super.onStart();
+		if(initialized) {
+			restoreRunningToolsJNI();
+		}
 	}
 
 	@Override
@@ -57,6 +62,9 @@ public class ScopyActivity extends QtActivity
 	{
 		System.out.println("-- ScopyActivity: onStop");
 		super.onStop();
+		if(initialized) {
+			saveAndStopRunningToolsJNI();
+		}
 	}
 
 	protected void onPause(){
