@@ -68,7 +68,7 @@
          <number>15</number>
         </property>
         <property name="rightMargin">
-         <number>40</number>
+         <number>15</number>
         </property>
         <property name="bottomMargin">
          <number>9</number>
@@ -159,24 +159,37 @@ Signal View</string>
            <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
+           <enum>QSizePolicy::Minimum</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
+            <width>0</width>
             <height>20</height>
            </size>
           </property>
          </spacer>
         </item>
         <item>
-         <widget class="adiscope::RunSingleWidget" name="runSingleWidget" native="true"/>
+         <widget class="adiscope::RunSingleWidget" name="runSingleWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QWidget" name="widget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
-            <width>30</width>
+            <width>90</width>
             <height>0</height>
            </size>
           </property>
@@ -198,6 +211,12 @@ Signal View</string>
            </property>
            <item>
             <widget class="adiscope::CustomPushButton" name="btnGeneralSettings">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="styleSheet">
               <string notr="true"/>
              </property>
@@ -220,6 +239,12 @@ Signal View</string>
            </item>
            <item>
             <widget class="QPushButton" name="btnSettings">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
              <property name="styleSheet">
               <string notr="true"/>
              </property>
@@ -1063,9 +1088,6 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
   <include location="../resources/resources.qrc"/>
  </resources>
