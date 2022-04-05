@@ -115,6 +115,11 @@ int main(int argc, char **argv)
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
+#if defined(Q_OS_LINUX) and not defined(__ANDROID__)
+	// Needed for icons to work on Wayland
+	QGuiApplication::setDesktopFileName("scopy");
+#endif
+
 #if BREAKPAD_HANDLER
 	QSettings test;
 	QString path = test.fileName();
