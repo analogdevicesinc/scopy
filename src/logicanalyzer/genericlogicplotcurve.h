@@ -24,6 +24,7 @@
 
 #include <qwt_plot_curve.h>
 
+#include <QColor>
 #include <QObject>
 
 enum class LogicPlotCurveType : int {
@@ -41,6 +42,7 @@ public:
 
 	QString getName() const;
 	QString getId() const;
+	QColor getTraceColor() const;
 	double getPixelOffset() const;
 	double getTraceHeight() const;
 	double getSampleRate() const;
@@ -53,6 +55,7 @@ public:
 	void setId(const QString &id);
 	void setPixelOffset(double pixelOffset);
 	void setTraceHeight(double traceHeight);
+	void setTraceColor(const QColor traceColor);
 	void setSampleRate(double sampleRate);
 	void setTimeTriggerOffset(double timeTriggerOffset);
 	void setBufferSize(uint64_t bufferSize);
@@ -73,6 +76,7 @@ protected:
 protected:
 	QString m_name;
 	QString m_id;
+	QColor m_traceColor;
 	double m_pixelOffset;
 	double m_traceHeight;
 	double m_sampleRate;

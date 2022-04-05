@@ -31,6 +31,7 @@ GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, const QString 
 	m_id(id),
 	m_pixelOffset(pixelOffset),
 	m_traceHeight(traceHeight),
+	m_traceColor("dodgerblue"),
 	m_sampleRate(sampleRate),
 	m_timeTriggerOffset(timeTriggerOffset),
 	m_bufferSize(bufferSize),
@@ -47,6 +48,12 @@ QString GenericLogicPlotCurve::getId() const
 {
 	return m_id;
 }
+
+QColor GenericLogicPlotCurve::getTraceColor() const
+{
+	return m_traceColor;
+}
+
 
 double GenericLogicPlotCurve::getPixelOffset() const
 {
@@ -111,6 +118,11 @@ void GenericLogicPlotCurve::setTraceHeight(double traceHeight)
 
 		setBaseline(m_pixelOffset + m_traceHeight);
 	}
+}
+
+void GenericLogicPlotCurve::setTraceColor(const QColor traceColor)
+{
+	m_traceColor = traceColor;
 }
 
 void GenericLogicPlotCurve::setSampleRate(double sampleRate)

@@ -670,6 +670,17 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	traceHeightLineEdit->setAlignment(Qt::AlignCenter);
 	traceHeightLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+	QComboBox *traceColorComboBox = new QComboBox();
+	traceColorComboBox->setObjectName("traceColorComboBox");
+	for (auto name : QColor::colorNames()) {
+		QPixmap pixmap(100,100);
+		QColor color(name);
+		pixmap.fill(color);
+		QIcon colorIcon(pixmap);
+		// Note: color.name() is the hex variant eg #AABBCC
+		ui->traceColorComboBox->addItem(colorIcon, name, color.name());
+	}
+
 	QComboBox *currentChannelTriggerComboBox = new QComboBox();
 	currentChannelTriggerComboBox->addItem("-");
 	for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
@@ -679,6 +690,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	currentChannelMenuLayout->addWidget(nameLineEdit);
 	currentChannelMenuLayout->addWidget(traceHeightLineEdit);
+	currentChannelMenuLayout->addWidget(traceColorComboBox);
 	currentChannelMenuLayout->addWidget(currentChannelTriggerComboBox);
 
 	currentChannelMenuLayout->addLayout(decoderSettingsLayout);
@@ -772,6 +784,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
 			traceHeightLineEdit->setEnabled(true);
 			traceHeightLineEdit->setText(QString::number(m_oscPlotCurves[chIdx]->getTraceHeight()));
+			traceColorComboBox->setEnabled(true);
 
 			if (m_oscChannelSelected < m_nbChannels) {
 				currentChannelTriggerComboBox->setEnabled(true);
@@ -827,6 +840,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		m_oscPlotCurves[m_oscChannelSelected]->setTraceHeight(value);
 		m_oscPlot->replot();
 		m_oscPlot->positionInGroupChanged(m_oscChannelSelected, 0, 0);
+	});
+
+	connect(traceColorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		QColor color(traceColorComboBox->currentText());
+		m_oscPlotCurves[m_oscChannelSelected]->setTraceColor(color);
+		m_oscPlot->replot();
 	});
 
 	connect(currentChannelTriggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
@@ -1187,6 +1206,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 {
 	QSignalBlocker nameLineEditBlocker(ui->nameLineEdit);
 	QSignalBlocker traceHeightLineEditBlocker(ui->traceHeightLineEdit);
+	QSignalBlocker traceColorComboBoxBlocker(ui->traceColorComboBox);
 	QSignalBlocker triggerComboBoxBlocker(ui->triggerComboBox);
 	if (m_selectedChannel != chIdx && selected) {
 
@@ -1209,6 +1229,15 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		ui->traceHeightLineEdit->setEnabled(true);
 		ui->traceHeightLineEdit->setText(
 					QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
+
+		// Sync color
+		ui->traceColorComboBox->setEnabled(true);
+		const auto traceColorindex = ui->traceColorComboBox->findData(
+			m_plotCurves[m_selectedChannel]->getTraceColor().name());
+		if (traceColorindex >= 0) {
+			ui->traceColorComboBox->setCurrentIndex(traceColorindex);
+		}
+
 		ui->triggerComboBox->setEnabled(true);
 
 		qDebug() << "SIze of group for this channel is: " << m_plot.getGroupOfChannel(m_selectedChannel).size();
@@ -1368,6 +1397,14 @@ void LogicAnalyzer::setupUi()
 
 	// Setup channel / decoder menu
 
+	for (auto name : QColor::colorNames()) {
+		QPixmap pixmap(100,100);
+		QColor color(name);
+		pixmap.fill(color);
+		QIcon colorIcon(pixmap);
+		// Note: color.name() is the hex variant eg #AABBCC
+		ui->traceColorComboBox->addItem(colorIcon, name, color.name());
+	}
 
 	// Setup cursors menu
 
@@ -1515,6 +1552,12 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
 		m_plot.replot();
 		m_plot.positionInGroupChanged(m_selectedChannel, 0, 0);
+	});
+
+	connect(ui->traceColorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		QColor color(ui->traceColorComboBox->currentText());
+		m_plotCurves[m_selectedChannel]->setTraceColor(color);
+		m_plot.replot();
 	});
 
 	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
