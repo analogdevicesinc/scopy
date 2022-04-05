@@ -126,7 +126,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
 		displayedData += QPointF(fromSampleToTime(m_endSample), logicLevel * heightInPoints + m_pixelOffset);
 
 		painter->save();
-		painter->setPen(QColor(74, 100, 255));
+		painter->setPen(m_traceColor);
 
 		QwtPointSeriesData *d = new QwtPointSeriesData(displayedData);
 		QPolygonF polyline = mapper.toPolygonF(xMap, yMap, d, 0, displayedData.size() - 1);
@@ -173,7 +173,7 @@ void LogicDataCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap,
     }
 
     painter->save();
-    painter->setPen(QColor(74, 100, 255)); //4a64ff
+    painter->setPen(m_traceColor);
 
     QwtPointSeriesData *d = new QwtPointSeriesData(displayedData);
     QPolygonF polyline = mapper.toPolygonF(xMap, yMap, d, 0, displayedData.size() - 1);

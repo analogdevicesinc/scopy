@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>654</height>
+    <height>694</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -476,7 +476,7 @@
                 <string notr="true"/>
                </property>
                <property name="currentIndex">
-                <number>3</number>
+                <number>0</number>
                </property>
                <widget class="QWidget" name="channelSettings">
                 <property name="minimumSize">
@@ -526,8 +526,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>400</width>
-                      <height>474</height>
+                      <width>373</width>
+                      <height>512</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -630,47 +630,6 @@
                         <property name="bottomMargin">
                          <number>0</number>
                         </property>
-                        <item row="2" column="1">
-                         <widget class="QComboBox" name="triggerComboBox">
-                          <item>
-                           <property name="text">
-                            <string>-</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>Rising Edge</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>Falling Edge</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>Low</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>High</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>Any Edge</string>
-                           </property>
-                          </item>
-                         </widget>
-                        </item>
-                        <item row="2" column="0">
-                         <widget class="QLabel" name="labelTrigger">
-                          <property name="text">
-                           <string>Trigger</string>
-                          </property>
-                         </widget>
-                        </item>
                         <item row="0" column="0">
                          <widget class="QLabel" name="labelName">
                           <property name="sizePolicy">
@@ -706,6 +665,47 @@ border-color: grey;
                           </property>
                          </widget>
                         </item>
+                        <item row="3" column="1">
+                         <widget class="QComboBox" name="triggerComboBox">
+                          <item>
+                           <property name="text">
+                            <string>-</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Rising Edge</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Falling Edge</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Low</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>High</string>
+                           </property>
+                          </item>
+                          <item>
+                           <property name="text">
+                            <string>Any Edge</string>
+                           </property>
+                          </item>
+                         </widget>
+                        </item>
+                        <item row="3" column="0">
+                         <widget class="QLabel" name="labelTrigger">
+                          <property name="text">
+                           <string>Trigger</string>
+                          </property>
+                         </widget>
+                        </item>
                         <item row="0" column="1">
                          <widget class="QLineEdit" name="nameLineEdit"/>
                         </item>
@@ -713,6 +713,16 @@ border-color: grey;
                          <widget class="QLabel" name="labelTraceHeight">
                           <property name="text">
                            <string>Trace Height</string>
+                          </property>
+                         </widget>
+                        </item>
+                        <item row="2" column="1">
+                         <widget class="QComboBox" name="traceColorComboBox"/>
+                        </item>
+                        <item row="2" column="0">
+                         <widget class="QLabel" name="labelTraceColor">
+                          <property name="text">
+                           <string>Color</string>
                           </property>
                          </widget>
                         </item>
@@ -1382,8 +1392,8 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>420</width>
-                      <height>474</height>
+                      <width>363</width>
+                      <height>512</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
