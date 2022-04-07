@@ -1,3 +1,13 @@
+"""
+This script supervises resources/ sub-folder ensuring that all icon files
+referenced in the source code are present and also checks if there are
+no stray .png and .svg files in resources/icons/.
+It uses glob patterns and regular expressions to find icon names.
+If all files are present then script will generate partial XML to be pasted
+into resources.qrc.
+"""
+
+
 def generate():
     import glob
     import re
@@ -6,7 +16,8 @@ def generate():
     root = os.path.dirname(base)
     icons = {}
     missing = {}
-    gr = [
+    rules = [
+        # ( ';-separated file patterns', ';-separated regexps')
         ('**/*.qss;**/*.qss.c', r'(?<=url\(:/).*?(?=\))'),
         ('**/*.html*',          r'(?<=src="qrc:/).*?(?=")'),
         ('**/*.ui',             r'(?<=>:/).*?(?=<)'),
@@ -14,8 +25,9 @@ def generate():
         ('**/*.cpp;**/*.cc',    r'(?<=":/).*?\.(?:svg|png)(?=")'),
         ('**/*.cpp;**/*.cc',    r'(?<=QIcon::fromTheme\(").*?(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),
         ('src/toolmenu.cpp',    r'(?<=<< ").*(?=");icons/scopy-default/icons/%s.svg;icons/scopy-light/icons/%s.svg'),
+        ('CMakeLists.txt',      r'(?<=resources/).*?\.svg'),
     ]
-    for gs, rs in gr:
+    for gs, rs in rules:
         gs, rs = gs.split(';'), rs.split(';')
         r, fmts = rs[0], rs[1:] if len(rs) > 1 else ['%s']
         for g in gs:
@@ -48,5 +60,6 @@ def generate():
                 unneeded.append(os.path.relpath(fn, root))
     for fn in sorted(unneeded):
         print('!! unneeded', fn)
+
 
 generate()
