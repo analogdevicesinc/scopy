@@ -1054,23 +1054,41 @@ void CapturePlot::updateGateMargins(){
 
 bool CapturePlot::eventFilter(QObject *object, QEvent *event)
 {
-	if (object == canvas() && event->type() == QEvent::Resize) {
-		updateHandleAreaPadding(d_labelsEnabled);
+    if (object == canvas()) {
+        switch (event->type()) {
+            case QEvent::MouseMove: {
+                Q_EMIT mouseMove(static_cast< QMouseEvent* >( event ));
+                break;
+            }
+            case QEvent::MouseButtonPress: {
+                Q_EMIT mouseButtonPress(static_cast< QMouseEvent* >( event ));
+                break;
+            }
+            case QEvent::MouseButtonRelease: {
+                Q_EMIT mouseButtonRelease(static_cast< QMouseEvent* >( event ));
+                break;
+            }
+            case QEvent::Resize: {
+                updateHandleAreaPadding(d_labelsEnabled);
 
-		//force cursor handles to emit position changed
-		//when the plot canvas is being resized
-		d_hCursorHandle1->triggerMove();
-		d_hCursorHandle2->triggerMove();
-		d_vCursorHandle1->triggerMove();
-		d_vCursorHandle2->triggerMove();
+                //force cursor handles to emit position changed
+                //when the plot canvas is being resized
+                d_hCursorHandle1->triggerMove();
+                d_hCursorHandle2->triggerMove();
+                d_vCursorHandle1->triggerMove();
+                d_vCursorHandle2->triggerMove();
 
-		/* update the size of the gates when the plot canvas is resized */
-		updateGateMargins();
+                /* update the size of the gates when the plot canvas is resized */
+                updateGateMargins();
 
-		Q_EMIT canvasSizeChanged();
-
-	}
-	return QObject::eventFilter(object, event);
+                Q_EMIT canvasSizeChanged();
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    return QObject::eventFilter(object, event);
 }
 
 QString CapturePlot::getChannelName(int chIdx) const {
@@ -2058,4 +2076,27 @@ void CapturePlot::removeLeftVertAxis(unsigned int axis)
 	}
 
 	DisplayPlot::removeLeftVertAxis(axis);
+}
+
+GenericLogicPlotCurve* CapturePlot::curveAt( const QPoint& pos ) const
+{
+
+    using namespace QwtAxis;
+
+    double coords[ AxisPositions ];
+
+    coords[ XBottom ] = canvasMap( XBottom ).invTransform( pos.x() );
+    coords[ XTop ] = canvasMap( XTop ).invTransform( pos.x() );
+    coords[ YLeft ] = canvasMap( YLeft ).invTransform( pos.y() );
+    coords[ YRight ] = canvasMap( YRight ).invTransform( pos.y() );
+
+    for (const auto &curve: plot_logic_curves) {
+        if (curve->isVisible()) {
+            const QPointF p( coords[ curve->xAxis().pos ], coords[ curve->yAxis().pos ] );
+            if ( curve->testHit( p )) {
+                return curve;
+            }
+        }
+    }
+    return nullptr;
 }

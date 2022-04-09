@@ -131,6 +131,9 @@ namespace adiscope {
 
 		CursorReadouts * getCursorReadouts() const;
 
+		// Get the curve at the given point. May return nullptr.
+		GenericLogicPlotCurve* curveAt(const QPoint& pos) const;
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);
@@ -139,6 +142,11 @@ namespace adiscope {
 		void leftGateChanged(double);
 		void rightGateChanged(double);
 		void channelSelected(int, bool);
+
+		// These are only emitted if you set setMouseTracking(true) (not done by default)
+		void mouseButtonPress(const QMouseEvent *event);
+		void mouseButtonRelease(const QMouseEvent *event);
+		void mouseMove(const QMouseEvent *event);
 
 	public Q_SLOTS:
 		void setTriggerAEnabled(bool en);
