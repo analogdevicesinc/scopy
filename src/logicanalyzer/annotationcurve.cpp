@@ -61,6 +61,13 @@ AnnotationCurve::AnnotationCurve(logic::LogicTool *logic, std::shared_ptr<logic:
     m_annotationDecoder = new AnnotationDecoder(this, initialDecoder, logic);
 
     m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, initialDecoder));
+
+    connect(this, &AnnotationCurve::clicked, [=](const QPointF&p) {
+        const auto result = annotationAt(p);
+        if (result.isValid()) {
+            Q_EMIT annotationClicked(result);
+        }
+    });
 }
 
 AnnotationCurve::~AnnotationCurve()
@@ -154,9 +161,9 @@ void AnnotationCurve::setAnnotationRows(const std::map<Row, RowData> &annotation
     m_annotationRows = annotationRows;
 }
 
-std::map<Row, RowData> AnnotationCurve::getAnnotationRows()
+const std::map<Row, RowData> & AnnotationCurve::getAnnotationRows() const
 {
-    return this->m_annotationRows;
+    return m_annotationRows;
 }
 
 void AnnotationCurve::sort_rows()
@@ -169,6 +176,7 @@ void AnnotationCurve::sort_rows()
 void AnnotationCurve::newAnnotations()
 {
     QMetaObject::invokeMethod(plot(), "replot");
+    Q_EMIT annotationsChanged();
 }
 
 void AnnotationCurve::reset()
@@ -179,6 +187,7 @@ void AnnotationCurve::reset()
     m_annotationRows.clear();
 	m_annotationDecoder->reset();
 	m_visibleRows = 0;
+    Q_EMIT annotationsChanged();
 }
 
 QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
@@ -398,7 +407,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
             if (qAbs(delta) > 1.5 || shouldDraw) {
                 if (annotations_in_block == 1) {
                     drawAnnotation(currentRowOnPlot, prev_ann, painter,
-				   xMap, yMap, canvasRect, mapper, size);
+				   xMap, yMap, canvasRect, mapper, interval, size);
                 } else if (annotations_in_block > 0) {
                     drawBlock(currentRowOnPlot, block_start, previous_end, painter,
                               xMap, yMap, canvasRect, mapper);
@@ -409,7 +418,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
 
             if (shouldDraw) {
                 drawAnnotation(currentRowOnPlot, ann, painter,
-			       xMap, yMap, canvasRect, mapper, size);
+			       xMap, yMap, canvasRect, mapper, interval, size);
                 previous_end = -1;
                 annotations_in_block = 0;
             } else {
@@ -429,7 +438,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
             if (start == stop) {
                 if (annotations_in_block == 1) {
                     drawAnnotation(currentRowOnPlot, prev_ann, painter,
-				   xMap, yMap, canvasRect, mapper, size);
+				   xMap, yMap, canvasRect, mapper, interval, size);
                 } else if (annotations_in_block > 0) {
                     drawBlock(currentRowOnPlot, block_start, previous_end, painter,
                               xMap, yMap, canvasRect, mapper);
@@ -502,18 +511,19 @@ void AnnotationCurve::drawBlock(int row, uint64_t start, uint64_t end, QPainter 
 
 void AnnotationCurve::drawAnnotation(int row, const Annotation &ann, QPainter *painter,
 				     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-				     const QRectF &canvasRect, const QwtPointMapper &mapper, const QSizeF &titleSize) const {
+				     const QRectF &canvasRect, const QwtPointMapper &mapper,
+                     const QwtInterval &interval, const QSizeF &titleSize) const {
 //    qDebug() << "Drawing annotation for row: " << row << " having the text " << ann.annotations().back();
     if (ann.start_sample() != ann.end_sample()) {
         drawTwoSampleAnnotation(row, ann, painter,
-				xMap, yMap, canvasRect, mapper, titleSize);
+				xMap, yMap, canvasRect, mapper, interval, titleSize);
     } else {
         drawOneSampleAnnotation(row, ann, painter,
-				xMap, yMap, canvasRect, mapper, titleSize);
+				xMap, yMap, canvasRect, mapper, interval, titleSize);
     }
 }
 
-void AnnotationCurve::fillCurve(int row, uint32_t annClass, QPainter *painter,
+void AnnotationCurve::fillAnnotationCurve(int row, uint32_t annClass, QPainter *painter,
     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
     const QRectF &canvasRect, QPolygonF &polygon ) const
 {
@@ -581,9 +591,27 @@ void AnnotationCurve::closePolyline(int row, uint32_t annClass, QPainter *painte
     }
 }
 
+uint64_t AnnotationCurve::getMaxAnnotationCount(int index)
+{
+	std::map<Row, RowData>::iterator it;
+	uint64_t count = 0;
+	std::map<Row, RowData> decoder(getAnnotationRows());
+
+	for (it = m_annotationRows.begin(); it != m_annotationRows.end(); it++) {
+		auto temp_annotations = it->second.get_annotations();
+		if (it->first.index() == index) {
+			return temp_annotations.size();
+		}
+		count = std::max(count, temp_annotations.size());
+		}
+
+	return count;
+}
+
 void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
 					      const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-					      const QRectF &canvasRect, const QwtPointMapper &mapper, const QSizeF &titleSize) const
+					      const QRectF &canvasRect, const QwtPointMapper &mapper,
+                          const QwtInterval &interval, const QSizeF &titleSize) const
 {
     // DRAW MULTI POINT ANNOTATION
 
@@ -610,23 +638,26 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
 
     delete d;
 
-    fillCurve(row, ann.ann_class(), painter, xMap, yMap, canvasRect, polyline);
+    fillAnnotationCurve(row, ann.ann_class(), painter, xMap, yMap, canvasRect, polyline);
 
     QwtPainter::drawPolyline(painter, polyline);
 
     // END DRAW MULTI POINT annotation
 
     // DRAW LABEL
-    QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
-
     const double bonus = xMap.invTransform(titleSize.width() + 5) - xMap.invTransform(0);
 
     if (interval.minValue() + bonus > displayedData[0].x()) {
-	displayedData[0].setX(interval.minValue() + bonus);
+        displayedData[0].setX(interval.minValue() + bonus);
     }
 
     if (interval.maxValue() < displayedData[3].x()) {
         displayedData[3].setX(interval.maxValue());
+    }
+
+    const double maxWidth = xMap.transform(displayedData[3].x()) - xMap.transform(displayedData[0].x());
+    if (maxWidth <= 0) {
+        return; // There is no room to draw text
     }
 
     QPointF drawTextPoint = (displayedData[3] + displayedData[0]) / 2.0;
@@ -643,12 +674,10 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
     // from center)
     QSizeF size = QwtText("").textSize(painter->font());
     QString text = "";
-
-    const double maxWidth = xMap.transform(displayedData[3].x()) - xMap.transform(displayedData[0].x());
     for (auto it = ann.annotations().begin(); it != ann.annotations().end(); ++it) {
         QString str = *it;
         QSizeF sz = QwtText(str).textSize(painter->font());
-	if (sz.width() < maxWidth) {
+        if (sz.width() < maxWidth) {
             text = str;
             size = sz;
             break; // found something
@@ -669,7 +698,8 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
 
 void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
 					      const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-					      const QRectF &canvasRect, const QwtPointMapper &mapper, const QSizeF &titleSize) const {
+					      const QRectF &canvasRect, const QwtPointMapper &mapper,
+                          const QwtInterval &interval, const QSizeF &titleSize) const {
     double xx = xMap.transform(fromSampleToTime(ann.start_sample()));
     // 20 px
     double HeightInPoints = yMap.invTransform(m_traceHeight) - yMap.invTransform(0);
@@ -694,8 +724,6 @@ void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QP
 
     painter->save();
     painter->setPen(QPen(QBrush(Qt::black), 20));
-
-    QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
 
     const double bonus = xMap.invTransform(titleSize.width() + 5) - xMap.invTransform(0);
     const double WidthInPoints = xMap.invTransform(m_traceHeight) - xMap.invTransform(0);
@@ -733,4 +761,41 @@ void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QP
 
     painter->restore();
 
+}
+
+AnnotationQueryResult AnnotationCurve::annotationAt(const QPointF& p) const
+{
+    if (m_visibleRows == 0) return {0, nullptr};
+
+    const auto plt = plot();
+    if (plt == nullptr) return {0, nullptr};
+    const uint64_t sample = fromTimeToSample(p.x());
+
+    const auto &ymap = plt->canvasMap(yAxis().pos);
+    // NOTE: Row height is negative
+    const double rowHeight = ymap.invTransform(m_traceHeight) - ymap.invTransform(0);
+
+    for (const auto &entry: m_annotationRows) {
+        const Row &row = entry.first;
+        const RowData &data = entry.second;
+        if (data.size() == 0) continue; // No data
+
+        const auto maxY = m_pixelOffset + row.index() * rowHeight;
+        const auto minY = maxY + rowHeight;
+
+        const auto y = p.y();
+        if (y < minY or y > maxY) continue; // Wrong row
+        for (uint64_t i = 0; i < data.size(); i++) {
+            const Annotation *ann = data.annAt(i);
+            if (sample >= ann->start_sample() and sample <= ann->end_sample()) {
+                return {i, ann};
+            }
+        }
+    }
+    return {0, nullptr};
+}
+
+bool AnnotationCurve::testHit(const QPointF& p) const
+{
+    return annotationAt(p).isValid();
 }

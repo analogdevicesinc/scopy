@@ -54,6 +54,13 @@ namespace adiscope {
 
 class AnnotationDecoder;
 
+
+struct AnnotationQueryResult {
+    uint64_t index;
+    const Annotation* ann;
+    inline bool isValid() const { return ann != nullptr; }
+};
+
 class AnnotationCurve : public GenericLogicPlotCurve
 {
 	Q_OBJECT
@@ -64,6 +71,12 @@ public:
 Q_SIGNALS:
 	void decoderMenuChanged();
 
+    // Emitted when new annotations are decoded from the decoder thread
+    void annotationsChanged();
+
+    // Emitted when an annotation is clicked
+    void annotationClicked(AnnotationQueryResult result);
+
 public:
     static void annotationCallback(srd_proto_data *pdata, void *annotationCurve);
 
@@ -71,14 +84,16 @@ public:
 
     void setClassRows(const std::map<std::pair<const srd_decoder*, int>, Row> &classRows);
     void setAnnotationRows(const std::map<Row, RowData> &annotationRows);
+    const std::map<Row, RowData>& getAnnotationRows() const;
 
     void sort_rows();
+
+    uint64_t getMaxAnnotationCount(int index = -1);
 
     void newAnnotations();
 
     virtual void reset() override;
 
-    std::map<Row, RowData> getAnnotationRows();
     QWidget * getCurrentDecoderStackMenu();
 	void stackDecoder(std::shared_ptr<adiscope::logic::Decoder> decoder);
 	std::vector<std::shared_ptr<adiscope::logic::Decoder>> getDecoderStack();
@@ -88,15 +103,28 @@ public:
 	AnnotationDecoder *getAnnotationDecoder();
 	std::vector<std::shared_ptr<adiscope::bind::Decoder>> getDecoderBindings();
 
+    // Get the annotation at the given point
+    AnnotationQueryResult annotationAt(const QPointF& p) const;
+    bool testHit(const QPointF& p) const override;
+
+    void drawAnnotation(int row, const Annotation &ann, QPainter *painter,
+                        const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+			const QRectF &canvasRect, const QwtPointMapper &mapper,
+			const QwtInterval &interval, const QSizeF &titleSize) const;
+
+    void drawBlock(int row, uint64_t start, uint64_t end, QPainter *painter,
+                   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+                   const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+
 protected:
     void drawLines( QPainter *painter,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
         const QRectF &canvasRect, int from, int to ) const override;
 
 private:
-    void fillCurve(int row, uint32_t annClass, QPainter *painter, const QwtScaleMap &xMap,
-                   const QwtScaleMap &yMap, const QRectF &canvasRect,
-                   QPolygonF &polygon) const;
+    void fillAnnotationCurve(int row, uint32_t annClass, QPainter *painter,
+                             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+                             const QRectF &canvasRect, QPolygonF &polygon) const;
 
     void closePolyline(int row, uint32_t annClass, QPainter *painter,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
@@ -105,21 +133,13 @@ private:
     void drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
                                  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
 				 const QRectF &canvasRect, const QwtPointMapper &mapper,
-				 const QSizeF &titleSize) const;
+				 const QwtInterval &interval, const QSizeF &titleSize) const;
 
     void drawOneSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
                                  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
 				 const QRectF &canvasRect, const QwtPointMapper &mapper,
-				 const QSizeF &titleSize) const;
+				 const QwtInterval &interval, const QSizeF &titleSize) const;
 
-    void drawAnnotation(int row, const Annotation &ann, QPainter *painter,
-                        const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-			const QRectF &canvasRect, const QwtPointMapper &mapper,
-			const QSizeF &titleSize) const;
-
-    void drawBlock(int row, uint64_t start, uint64_t end, QPainter *painter,
-                   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                   const QRectF &canvasRect, const QwtPointMapper &mapper) const;
 
 
 private:

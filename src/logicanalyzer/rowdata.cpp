@@ -59,9 +59,18 @@ void RowData::get_annotation_subset(
             dest.push_back(annotation);
 }
 
+vector<Annotation> RowData::get_annotations() const {
+	return annotations_;
+}
+
 Annotation RowData::getAnnAt(uint64_t index) const {
 
     return annotations_[index];
+}
+
+const Annotation* RowData::annAt(uint64_t index) const
+{
+    return &annotations_[index];
 }
 
 void RowData::sort_annotations() {

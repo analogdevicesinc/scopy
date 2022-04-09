@@ -71,12 +71,15 @@ public:
         vector<Annotation> &dest,
         uint64_t start_sample, uint64_t end_sample) const;
 
+    vector<Annotation> get_annotations() const;
+
     void emplace_annotation(srd_proto_data *pdata, const Row *row);
 
     std::pair<uint64_t, uint64_t> get_annotation_subset(uint64_t start_sample,
                                                         uint64_t end_sample) const;
 
     Annotation getAnnAt(uint64_t index) const;
+    const Annotation* annAt(uint64_t index) const;
 
     void sort_annotations();
 

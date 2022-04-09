@@ -55,6 +55,7 @@ public:
 	~Tool();
 
 	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
+	QPushButton *singleButton() { return toolMenuItem->getToolBtn(); }
 	const QString& getName();
 	void setName(const QString& name);
 	virtual void settingsLoaded();

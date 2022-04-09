@@ -65,13 +65,20 @@ public:
 	virtual void dataAvailable(uint64_t from, uint64_t to) {}
 	virtual void reset() {}
 
+	uint64_t fromTimeToSample(double time) const;
+	double fromSampleToTime(uint64_t sample) const;
+
+	// Check if the point is on the curve. When invoked by the CapturePlot
+	// this point is already mapped to the plot's bounds.
+	virtual bool testHit(const QPointF& p) const { return false; }
+
+	// Map screen point to curve point
+	QPointF screenPosToCurvePoint(const QPoint& pos) const;
+
 Q_SIGNALS:
 	void nameChanged(QString);
 	void pixelOffsetChanged(double);
-
-protected:
-	uint64_t fromTimeToSample(double time) const;
-	double fromSampleToTime(uint64_t sample) const;
+	void clicked(const QPointF& p);
 
 protected:
 	QString m_name;
