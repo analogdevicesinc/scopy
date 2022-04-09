@@ -31,6 +31,7 @@
 #include "logicanalyzer/logicdatacurve.h"
 #include "logicanalyzer/annotationcurve.h"
 #include "logicanalyzer/decoder.h"
+#include "logicanalyzer/decoder_table_model.hpp"
 
 #include "gui/basemenu.h"
 #include "logicgroupitem.h"
@@ -62,7 +63,6 @@ constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024 * 1024; // 1Gb
 constexpr int MAX_SR_STREAM = 5e6; // 10M
 constexpr int MAX_KERNEL_BUFFERS = 64;
-constexpr int DIGITAL_NR_CHANNELS = 16;
 
 /* helper method to sort srd_decoder objects based on ids(name) */
 static gint sort_pds(gconstpointer a, gconstpointer b)
@@ -310,6 +310,16 @@ void LogicAnalyzer::setData(const uint16_t * const data, int size)
 //			m_oscPlot->replot();
 //		}, Qt::QueuedConnection);
 //	}
+
+}
+
+QVector<GenericLogicPlotCurve*> LogicAnalyzer::getPlotCurves(bool logic) const
+{
+	if (logic) {
+		return m_plotCurves;
+	} else {
+		return m_oscPlotCurves;
+	}
 
 }
 
@@ -1318,6 +1328,9 @@ void LogicAnalyzer::setupUi()
 	int channelSettings_panel = ui->stackedWidget->indexOf(ui->channelSettings);
 	ui->btnChannelSettings->setProperty("id", QVariant(-channelSettings_panel));
 
+	const int decoderTable_panel = ui->stackedWidget->indexOf(ui->decoderTablePage);
+	ui->btnDecoderTable->setProperty("id", QVariant(-decoderTable_panel));
+
 	// default trigger menu?
 	m_menuOrder.push_back(ui->btnTrigger);
 
@@ -1407,6 +1420,10 @@ void LogicAnalyzer::setupUi()
 		ui->traceColorComboBox->addItem(colorIcon, name, color.name());
 	}
 
+	// Decoder table
+
+	ui->decoderTableView->setLogicAnalyzer(this);
+
 	// Setup cursors menu
 
 	cr_ui = new Ui::CursorsSettings;
@@ -1451,6 +1468,16 @@ void LogicAnalyzer::setupUi()
 	m_exportSettings->disableUIMargins();
 	connect(m_exportSettings->getExportButton(), &QPushButton::clicked,
 		this, &LogicAnalyzer::exportData);
+}
+
+void LogicAnalyzer::enableRunButton(bool flag)
+{
+	ui->runSingleWidget->getRunButton()->setEnabled(flag);
+}
+
+void LogicAnalyzer::enableSingleButton(bool flag)
+{
+	ui->runSingleWidget->getSingleButton()->setEnabled(flag);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -1617,6 +1644,30 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->printBtn, &QPushButton::clicked, [=](){
 		m_plot.printWithNoBackground("Logic Analyzer");
 	});
+
+	// Decoder table
+	connect(ui->btnDecoderTable, &CustomPushButton::toggled, [=](bool checked){
+		// When the bottom decoder button is clicked show/hide the right menu
+		// and ativate or deactivate the decoder table.
+		triggerRightMenuToggle(ui->btnDecoderTable, checked);
+		if (checked) {
+			ui->decoderTableView->activate(true);
+		} else {
+			ui->decoderTableView->deactivate();
+		}
+	});
+
+	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex& index) {
+		// When a row is clicked in the decoder table, update the plot
+		// to zoom into the sample area that was clicked.
+		// qDebug() << "Decoder item clicked " << index << Qt::endl;
+		if (index.data().canConvert<DecoderTableItem>()) {
+			DecoderTableItem item = qvariant_cast<DecoderTableItem>(index.data());
+			if (item.curve != nullptr) {
+				fitViewport(item.startTime(), item.endTime());
+			}
+		}
+	});
 }
 
 void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
@@ -1751,7 +1802,47 @@ void LogicAnalyzer::initBufferScrolling()
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 +
 				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
 	});
+
+	// When the plot is clicked emit the clicked signal on the curve
+	m_plot.setMouseTracking(true);
+	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=](const QMouseEvent *event) {
+		if (event == nullptr) return;
+
+		if (event->button() == Qt::LeftButton) {
+			// qDebug() << "Plot clicked" << Qt::endl;
+			if (const auto curve = m_plot.curveAt(event->pos())) {
+				const QPointF p = curve->screenPosToCurvePoint(event->pos());
+				Q_EMIT curve->clicked(p);
+			}
+		}
+	});
 }
+
+void LogicAnalyzer::fitViewport(double min, double max)
+{
+	if (min > max) {
+		return;
+	}
+
+	// Center between min and max
+	auto dx = max - min;
+
+	// for 1 sample long annotations
+	if (min == max) {
+		dx = 0.0001;
+		min -= 0.00005;
+	}
+
+	const auto padding = dx * 0.25;
+	QwtPlotZoomer *z = m_plot.getZoomer();
+	auto yMax = m_plot.axisScaleDiv(QwtAxis::YLeft).interval().maxValue();
+
+	QRectF r(min - padding, 0, dx + 2 * padding, yMax);
+	z->zoom(0); // reset zoom stack to base
+	z->zoom(r); // add r to the zoom stack
+
+	m_plot.replot();
+};
 
 void LogicAnalyzer::startStop(bool start)
 {
@@ -2200,6 +2291,14 @@ void LogicAnalyzer::setupDecoders()
 			ui->decoderSettingsLayout->addWidget(m_decoderMenu);
 
 			updateStackDecoderButton();
+		});
+
+		connect(curve, &AnnotationCurve::annotationClicked, [=](AnnotationQueryResult result) {
+			if (!result.isValid() or !ui->decoderTableView->isActive()) return;
+			const auto model = ui->decoderTableView->decoderModel();
+			const auto col = model->indexOfCurve(curve);
+			const auto index = model->index(result.index, col);
+			ui->decoderTableView->scrollTo(index, QAbstractItemView::PositionAtTop);
 		});
 	});
 
