@@ -523,7 +523,7 @@ if (NOT ENABLE_APPLICATION_BUNDLE)
 	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION share/applications)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icons/icon_small.svg DESTINATION share/icons/hicolor/scalable/apps RENAME scopy.svg)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/resources/icon_small.svg DESTINATION share/icons/hicolor/scalable/apps RENAME scopy.svg)
 endif()
 
 configure_file(qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf @ONLY)
