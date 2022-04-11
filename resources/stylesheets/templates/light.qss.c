@@ -339,26 +339,30 @@ QLabel[subsection_label=true], QLabel#lblSubsectionSeparator {
 QFrame[subsection_line=true], QFrame#lineSubsectionSeparator { border: 1px solid rgba(0, 0, 0, 50); }
 
 QPushButton[subsection_arrow_button=true]{
-	max-height: 8px;
+	max-height: 12px;
 	max-width: 12px;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	border: none;
+	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 QPushButton#btnSubsectionSeparator:checked, QPushButton#toggleChannels:checked {
 	max-height: 12px;
-	max-width: 8px;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	max-width: 12px;
+	border: none;
+	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 
 QPushButton[subsection_arrow_button=true]:checked {
 	max-height: 12px;
-	max-width:  8px;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+	max-width: 12px;
+	border: none;
+	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
 }
 
 QPushButton#btnSubsectionSeparator, QPushButton#toggleChannels {
-	max-height: 8px;
-	max-width:  12px;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+	max-height: 12px;
+	max-width: 12px;
+	border: none;
+	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
 }
 
 /* Label associated with settings menu, right above a blue line divider */
