@@ -54,13 +54,14 @@
      </property>
      <item>
       <widget class="QPushButton" name="btnSubsectionSeparator">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="text">
         <string/>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/resources.qrc">
-         <normaloff>:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg</normaloff>
-         <normalon>:/icons/scopy-default/icons/sba_cmb_box_arrow.svg</normalon>:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg</iconset>
        </property>
        <property name="checkable">
         <bool>true</bool>
