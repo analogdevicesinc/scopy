@@ -33,7 +33,7 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 		toolStatus = new QLabel("");
 		channelManagerToggled = false;
 
-		QStringList icons = QStringList() << ":/menu/menu_button.png";
+		QStringList icons = QStringList() << ":/icons/scopy-default/icons/menu.svg";
 
 		QIcon my_icon;
 		my_icon.addFile(icons[0],QSize(), QIcon::Normal);
