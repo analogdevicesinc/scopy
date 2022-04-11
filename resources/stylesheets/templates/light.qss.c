@@ -339,15 +339,17 @@ QLabel[subsection_label=true]{
 QFrame[subsection_line=true]{ border: 1px solid rgba(0, 0, 0, 50); }
 
 QPushButton[subsection_arrow_button=true]{
-	max-height: 6px;
-	max-width: 10px;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+	max-height: 12px;
+	max-width: 12px;
+	border: none;
+	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 
 QPushButton[subsection_arrow_button=true]:checked{
-	max-height: 10px;
-	max-width:  6px;
-	border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+	max-height: 12px;
+	max-width:  12px;
+	border: none;
+	image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
 }
 
 
