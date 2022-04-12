@@ -31,12 +31,56 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.NotificationChannel;
+import android.app.PendingIntent;
+
+import android.widget.RemoteViews;
+import android.widget.Toast;
+
+//import androidx.core.app.NotificationCompat;
+
+
 public class ScopyActivity extends QtActivity
 {
 	public static native void saveSessionJavaHelper();
 	public static native void saveAndStopRunningToolsJNI();
+	public static native void saveAndStopRunningInputToolsJNI();
 	public static native void restoreRunningToolsJNI();
+	public static native int nrOfToolsSaved();
+	public static native int nrOfToolsRunning();
 	boolean initialized;
+
+
+	private void createNotificationChannel() {
+	    // Create the NotificationChannel, but only on API 26+ because
+	    // the NotificationChannel class is new and not in the support library
+
+		CharSequence name = "R.string.channel_name";
+		String description = "R.string.channel_description";
+		int importance = NotificationManager.IMPORTANCE_DEFAULT;
+		NotificationChannel channel = new NotificationChannel("1234", name, importance);
+		channel.setDescription("description");
+		// Register the channel with the system; you can't change the importance
+		// or other notification behaviors after this
+		NotificationManager notificationManager = getSystemService(NotificationManager.class);
+		notificationManager.createNotificationChannel(channel);
+
+	}
+
+	public void createNotification() {
+		NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
+		createNotificationChannel();
+		Notification notif = new Notification.Builder(this,"1234")
+			.setSmallIcon(R.drawable.icon)
+			.setContentTitle("Scopy")
+			.setContentText("Scopy still running in the background ")
+			.setPriority(Notification.PRIORITY_DEFAULT)
+			.setOngoing(true)
+			.build();
+		notificationManager.notify(1234567, notif);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -61,10 +105,19 @@ public class ScopyActivity extends QtActivity
 	protected void onStop()
 	{
 		System.out.println("-- ScopyActivity: onStop");
-		super.onStop();
 		if(initialized) {
-			saveAndStopRunningToolsJNI();
+			saveAndStopRunningInputToolsJNI();
+			if(nrOfToolsRunning() != 0) {
+				System.out.println("-- Creating Notification");
+				createNotification();
+				/*NotificationCompat.Builder builder = new NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
+					.setContentTitle("Scopy")
+					.setContentText("Input instruments paused. Output instruments still running ... ")
+					.setPriority(NotificationCompat.PRIORITY_DEFAULT);*/
+					;
+			}
 		}
+		super.onStop();
 	}
 
 	protected void onPause(){
@@ -78,6 +131,9 @@ public class ScopyActivity extends QtActivity
 
 	protected void onDestroy(){
 		System.out.println("-- ScopyActivity: onDestroy ");
+		if(initialized) {
+			saveAndStopRunningToolsJNI();
+		}
 		super.onDestroy();
 	}
 

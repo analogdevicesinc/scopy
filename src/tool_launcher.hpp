@@ -208,7 +208,10 @@ private:
 	void registerNativeMethods();
 	static void saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/);
 	static void saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
+	static void saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thiz*/);
 	static void restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
+	static int  nrOfToolsSaved(JNIEnv *env, jobject /*thiz*/);
+	static int  nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/);
 #endif
 
 private:
@@ -296,9 +299,11 @@ private:
 	void saveRunningToolsBeforeCalibration();
 	void stopToolsBeforeCalibration();
 
+	void saveRunningInputTools();
 	void saveRunningTools();
 	void restoreRunningTools();
 	void stopRunningTools();
+	int  getRunningToolsCount();
 
 	QNetworkAccessManager* networkAccessManager;
 	PhoneHome* m_phoneHome;
