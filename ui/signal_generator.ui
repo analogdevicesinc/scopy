@@ -993,9 +993,6 @@ background-repeat: no-repeat;
                   </property>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
-                    <property name="spacing">
-                     <number>0</number>
-                    </property>
                     <property name="topMargin">
                      <number>0</number>
                     </property>
@@ -1027,7 +1024,7 @@ background-repeat: no-repeat;
                        </sizepolicy>
                       </property>
                       <property name="text">
-                       <string> NOISE </string>
+                       <string>NOISE </string>
                       </property>
                       <property name="subsection_label" stdset="0">
                        <bool>true</bool>
@@ -1141,7 +1138,7 @@ background-repeat: no-repeat;
                 <widget class="QWidget" name="wAppearanceContainer" native="true">
                  <layout class="QVBoxLayout" name="verticalLayout_13">
                   <property name="spacing">
-                   <number>0</number>
+                   <number>10</number>
                   </property>
                   <property name="leftMargin">
                    <number>0</number>
