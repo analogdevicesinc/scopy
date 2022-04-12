@@ -1459,12 +1459,33 @@ bool ToolLauncher::loadDecoders(QString path)
 	return true;
 }
 
+void adiscope::ToolLauncher::saveRunningInputTools() {
+	if (dmm->isRunning())
+		running_tools.push_back(dmm);
+	if (oscilloscope->isRunning())
+		running_tools.push_back(oscilloscope);
+	if (logic_analyzer->isRunning())
+		running_tools.push_back(logic_analyzer);
+	if (spectrum_analyzer->isRunning())
+		running_tools.push_back(spectrum_analyzer);
+}
+
 void adiscope::ToolLauncher::saveRunningTools() {
 	for(auto &tool : toolList) {
 		if(tool->isRunning()) {
 			running_tools.push_back(tool);
 		}
 	}
+}
+
+int adiscope::ToolLauncher::getRunningToolsCount() {
+	int i = 0;
+	for(auto &tool : toolList) {
+		if(tool->isRunning()) {
+			i++;
+		}
+	}
+	return i;
 }
 
 void adiscope::ToolLauncher::stopRunningTools() {
@@ -2095,6 +2116,16 @@ void ToolLauncher::saveSessionJavaHelper(JNIEnv *env, jobject /*thiz*/) {
 }
 
 
+void ToolLauncher::saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thiz*/) {
+	qDebug()<<"-- Saving and stopping input tools JNI";
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		getToolLauncherInstance()->saveRunningInputTools();
+		getToolLauncherInstance()->stopRunningTools();
+	}
+}
+
 void ToolLauncher::saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
 	qDebug()<<"-- Saving and stopping tools JNI";
 	ToolLauncher* tl = getToolLauncherInstance();
@@ -2114,12 +2145,40 @@ void ToolLauncher::restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
 	}
 }
 
+int ToolLauncher::nrOfToolsSaved(JNIEnv *env, jobject /*thiz*/) {
+	qDebug()<<"-- Getting number of stopped tools JNI";
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		int val = getToolLauncherInstance()->running_tools.size();
+		qDebug()<<"saved: "<<val;
+		return val;
+	}
+	return 0;
+}
+
+int ToolLauncher::nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/) {
+	qDebug()<<"-- Getting number of stopped tools JNI";
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		int val = getToolLauncherInstance()->getRunningToolsCount();
+		qDebug()<<"saved: "<<val;
+		return val;
+	}
+	return 0;
+}
+
 
 void ToolLauncher::registerNativeMethods()
 {
 	JNINativeMethod methods[] = {{"saveSessionJavaHelper", "()V", reinterpret_cast<void*>(saveSessionJavaHelper) },
 				     {"saveAndStopRunningToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningToolsJNI) },
-				     {"restoreRunningToolsJNI", "()V", reinterpret_cast<void*>(restoreRunningToolsJNI) }};
+				     {"saveAndStopRunningInputToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningInputToolsJNI) },
+				     {"restoreRunningToolsJNI", "()V", reinterpret_cast<void*>(restoreRunningToolsJNI) },
+				     {"nrOfToolsSaved", "()I", reinterpret_cast<void*>(nrOfToolsSaved) },
+				     {"nrOfToolsRunning", "()I", reinterpret_cast<void*>(nrOfToolsRunning) },
+				    };
 
 	QAndroidJniObject activity = QtAndroid::androidActivity();
 	QAndroidJniEnvironment env;
