@@ -1492,6 +1492,11 @@ int adiscope::ToolLauncher::getRunningToolsCount() {
 	return i;
 }
 
+bool adiscope::ToolLauncher::getCtx()
+{
+	return ctx;
+}
+
 void adiscope::ToolLauncher::stopRunningTools() {
 	for(auto &tool : running_tools) {
 		tool->stop();
@@ -2180,6 +2185,19 @@ int ToolLauncher::nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/) {
 	return 0;
 }
 
+bool ToolLauncher::hasCtx(JNIEnv *env, jobject /*thiz*/)
+{
+	qDebug()<<"-- Getting number of stopped tools JNI";
+	ToolLauncher* tl = getToolLauncherInstance();
+	if(tl)
+	{
+		bool val = getToolLauncherInstance()->getCtx();
+		qDebug()<<"has Ctx : "<<val;
+		return val;
+	}
+	return false;
+}
+
 
 void ToolLauncher::registerNativeMethods()
 {
@@ -2189,6 +2207,7 @@ void ToolLauncher::registerNativeMethods()
 				     {"restoreRunningToolsJNI", "()V", reinterpret_cast<void*>(restoreRunningToolsJNI) },
 				     {"nrOfToolsSaved", "()I", reinterpret_cast<void*>(nrOfToolsSaved) },
 				     {"nrOfToolsRunning", "()I", reinterpret_cast<void*>(nrOfToolsRunning) },
+				     {"hasCtx", "()Z", reinterpret_cast<void*>(hasCtx) },
 				    };
 
 	QAndroidJniObject activity = QtAndroid::androidActivity();
