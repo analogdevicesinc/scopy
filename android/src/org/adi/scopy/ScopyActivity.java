@@ -39,6 +39,10 @@ import android.app.PendingIntent;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
+
+
 //import androidx.core.app.NotificationCompat;
 
 
@@ -50,7 +54,10 @@ public class ScopyActivity extends QtActivity
 	public static native void restoreRunningToolsJNI();
 	public static native int nrOfToolsSaved();
 	public static native int nrOfToolsRunning();
+	public static native boolean hasCtx();
+	private static final int NOTIFICATION_ID = 1234567;
 	boolean initialized;
+	WakeLock wakeLock;
 
 
 	private void createNotificationChannel() {
@@ -69,17 +76,29 @@ public class ScopyActivity extends QtActivity
 
 	}
 
-	public void createNotification() {
+        public void createNotification(String message)
+	{
+
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
 		createNotificationChannel();
+
+		Intent notificationIntent = new Intent(this, ScopyActivity.class);
+		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+		PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+
 		Notification notif = new Notification.Builder(this,"1234")
 			.setSmallIcon(R.drawable.icon)
 			.setContentTitle("Scopy")
-			.setContentText("Scopy still running in the background ")
+			.setContentText(message)
 			.setPriority(Notification.PRIORITY_DEFAULT)
+			.setContentIntent(intent)
 			.setOngoing(true)
 			.build();
-		notificationManager.notify(1234567, notif);
+
+
+
+		notificationManager.notify(NOTIFICATION_ID, notif);
 	}
 
 	@Override
@@ -89,6 +108,11 @@ public class ScopyActivity extends QtActivity
 		initialized = false;
 		super.onCreate(savedInstanceState);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+		PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+		wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
+		        "Scopy::ScopyWakelockTag");
+
 	}
 
 	@Override
@@ -105,19 +129,28 @@ public class ScopyActivity extends QtActivity
 	protected void onStop()
 	{
 		System.out.println("-- ScopyActivity: onStop");
-		if(initialized) {
-			saveAndStopRunningInputToolsJNI();
-			if(nrOfToolsRunning() != 0) {
-				System.out.println("-- Creating Notification");
-				createNotification();
-				/*NotificationCompat.Builder builder = new NotificationCompat.Builder(this, DEFAULT_CHANNEL_ID)
-					.setContentTitle("Scopy")
-					.setContentText("Input instruments paused. Output instruments still running ... ")
-					.setPriority(NotificationCompat.PRIORITY_DEFAULT);*/
-					;
+		if (initialized) {
+			if (hasCtx()) {
+				saveAndStopRunningInputToolsJNI();
+				if (nrOfToolsRunning() != 0) {
+					System.out.println("-- Creating Notification");
+					wakeLock.acquire();
+					createNotification("Scopy still running in the background.Device outputs enabled");
+				}
 			}
 		}
 		super.onStop();
+	}
+
+        @Override
+	protected void onResume()
+	{
+		cancelNotification(NOTIFICATION_ID);
+		if (wakeLock.isHeld()) {
+			wakeLock.release();
+		}
+
+		super.onResume();
 	}
 
 	protected void onPause(){
@@ -131,9 +164,14 @@ public class ScopyActivity extends QtActivity
 
 	protected void onDestroy(){
 		System.out.println("-- ScopyActivity: onDestroy ");
+		cancelNotification(NOTIFICATION_ID);
+		if (wakeLock.isHeld()) {
+			wakeLock.release();
+		}
 		if(initialized) {
 			saveAndStopRunningToolsJNI();
 		}
+
 		super.onDestroy();
 	}
 
@@ -161,5 +199,10 @@ public class ScopyActivity extends QtActivity
 
 
 		return formattedScaleFactor.replace(",",".");
+	}
+
+        private void cancelNotification(int id){
+		NotificationManager nMgr = (NotificationManager) this.getSystemService(NotificationManager.class);
+		nMgr.cancel(id);
 	}
 }

@@ -212,6 +212,7 @@ private:
 	static void restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
 	static int  nrOfToolsSaved(JNIEnv *env, jobject /*thiz*/);
 	static int  nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/);
+	static bool hasCtx(JNIEnv *env, jobject /*thiz*/);
 #endif
 
 private:
@@ -304,6 +305,7 @@ private:
 	void restoreRunningTools();
 	void stopRunningTools();
 	int  getRunningToolsCount();
+	bool getCtx();
 
 	QNetworkAccessManager* networkAccessManager;
 	PhoneHome* m_phoneHome;
