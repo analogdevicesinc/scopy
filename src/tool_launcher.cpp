@@ -1750,7 +1750,9 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	m_m2k = m2kOpen(ctx, "");
 #ifdef LIBM2K_ENABLE_LOG
-	m_m2k->logAllAttributes();
+	if (m_m2k) {
+		m_m2k->logAllAttributes();
+	}
 #endif
 
 	filter = new Filter(ctx);
