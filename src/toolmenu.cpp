@@ -98,9 +98,8 @@ void ToolMenu::loadToolsFromFilter(Filter *filter)
 	}
 	if (notCompatibleTools.size() && d_items) {
 		removeMenuItem(notCompatibleTools);
-	} else {
-		insertMenuItem(d_compatibleTools, compatiblePositions);
 	}
+	insertMenuItem(d_compatibleTools, compatiblePositions);
 }
 
 ToolMenuItem *ToolMenu::getToolMenuItemFor(enum tool tool)
