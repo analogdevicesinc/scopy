@@ -1426,6 +1426,7 @@ void adiscope::ToolLauncher::destroyContext()
 			libm2k::context::contextCloseAll();
 		}
 		iio_context_destroy(ctx);
+
 		ctx = nullptr;
 	}
 
@@ -1754,8 +1755,8 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 		m_m2k->logAllAttributes();
 	}
 #endif
-
 	filter = new Filter(ctx);
+	menu->loadToolsFromFilter(filter);
 	if (filter->hw_name().compare("M2K") != 0) {
 		menu->getToolMenuItemFor(TOOL_DEBUGGER)->setToolDisabled(false);
 	} else {
