@@ -1423,8 +1423,9 @@ void adiscope::ToolLauncher::destroyContext()
 			}
 			m_m2k = nullptr;
 		} else {
-			iio_context_destroy(ctx);
+			libm2k::context::contextCloseAll();
 		}
+		iio_context_destroy(ctx);
 		ctx = nullptr;
 	}
 
