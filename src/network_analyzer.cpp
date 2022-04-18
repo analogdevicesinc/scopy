@@ -238,7 +238,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(this, &NetworkAnalyzer::sweepDone,
 	[=]() {
 		if (ui->runSingleWidget->runButtonChecked()) {
-			thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
+			thd = QtConcurrent::run(std::bind(&NetworkAnalyzer::goertzel, this));
 			return;
 		}
 
@@ -1734,7 +1734,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		bufferPreviewer->clear();
 		configHwForNetworkAnalyzing();
 		m_stop = false;
-		thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
+		thd = QtConcurrent::run(std::bind(&NetworkAnalyzer::goertzel, this));
 		ui->statusLabel->setText(tr("Running"));
 	} else {
 		ui->statusLabel->setText(tr("Stopping..."));

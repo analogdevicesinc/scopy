@@ -156,7 +156,6 @@
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -276,7 +275,6 @@ color: #ff7200;
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -360,7 +358,6 @@ color: #ff7200;
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -426,7 +423,6 @@ color: #9013fe;
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -1126,10 +1122,6 @@ QPushButton:disabled {
  </customwidgets>
  <resources>
   <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -1145,22 +1137,6 @@ QPushButton:disabled {
     <hint type="destinationlabel">
      <x>947</x>
      <y>158</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>trackingRatio</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>trackingRatioLbl</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>844</x>
-     <y>151</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>903</x>
-     <y>115</y>
     </hint>
    </hints>
   </connection>

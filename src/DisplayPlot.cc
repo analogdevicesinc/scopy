@@ -52,6 +52,7 @@
 #include <QStack>
 #include <QPainter>
 #include <QColor>
+#include <QLocale>
 #include <cmath>
 #include <iostream>
 #include <stdexcept>
@@ -417,7 +418,7 @@ PlotAxisConfiguration::PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPl
 	if (axisPos == QwtAxis::YLeft) {
 		const QFontMetrics fm(d_plot->axisWidget(d_axis)->font());
 		QwtScaleDraw *scaleDraw = d_plot->axisScaleDraw(d_axis);
-		scaleDraw->setMinimumExtent( fm.width("100.00") );
+		scaleDraw->setMinimumExtent( fm.horizontalAdvance("100.00") );
 	}
 
 	// TO DO: Move this to a stylesheet file.
@@ -560,7 +561,7 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 
 	d_panner = new QwtPlotPanner(canvas());
 	d_panner->setAxisEnabled(QwtAxis::YRight, false);
-	d_panner->setMouseButton(Qt::MidButton, Qt::ControlModifier);
+	d_panner->setMouseButton(Qt::MiddleButton, Qt::ControlModifier);
 
 	// emit the position of clicks on widget
 	d_picker = new QwtDblClickPlotPicker(canvas());
@@ -667,7 +668,7 @@ void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph) {
 		  scaleItem->setFont(this->axisWidget(QwtAxis::YLeft)->font());
 
           QPalette palette = scaleItem->palette();
-          palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
+	  palette.setBrush(QPalette::WindowText, QColor("#6E6E6F"));
           palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
           scaleItem->setPalette(palette);
           scaleItem->setBorderDistance(0);

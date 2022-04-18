@@ -52,7 +52,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QDir>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QJsonDocument>
 #include <QDesktopServices>
 #include <QSpacerItem>
@@ -344,7 +344,7 @@ void ToolLauncher::createPhoneHomeMessageBox() {
 	QMessageBox* msgBox = new QMessageBox(this);
 
 	QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
-	QRect screenRect = QDesktopWidget().screenGeometry();
+	QRect screenRect = QGuiApplication::screens()[0]->geometry();
 
 	msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
 	msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
@@ -374,7 +374,7 @@ void ToolLauncher::createLicenseMessageBox() {
 	QMessageBox* msgBox = new QMessageBox(this);
 
 	QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
-	QRect screenRect = QDesktopWidget().screenGeometry();
+	QRect screenRect = QGuiApplication::screens()[0]->geometry();
 
 	msgBox->setTextFormat(Qt::RichText);
 	msgBox->setText("Scopy is distributed under the GNU <a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a>, and is copyright Analog Devices. Inc and others. There are no restrictions or obligations on its use, except that you (the user) agree there is no warranty (per the GPLv3). If you don't agree to this - do not use this software.");
@@ -690,7 +690,7 @@ void ToolLauncher::runProgram(const QString& program, const QString& fn)
 void ToolLauncher::search()
 {
 	search_timer->stop();
-	future = QtConcurrent::run(this, &ToolLauncher::searchDevices);
+	future = QtConcurrent::run(std::bind(&ToolLauncher::searchDevices, this));
 	watcher.setFuture(future);
 }
 
@@ -1313,7 +1313,7 @@ void adiscope::ToolLauncher::connectBtn_clicked(bool pressed)
 				fileBuildInfo.open(QIODevice::ReadOnly | QIODevice::Text);
 				auto buildInfo = QString(fileBuildInfo.readAll());
 				fileBuildInfo.close();
-				buildInfo = buildInfo.remove(QRegExp("<(/?)(body|pre)>"));
+				buildInfo = buildInfo.remove(QRegularExpression("<(/?)(body|pre)>"));
 				LOG(INFO) << buildInfo.toLocal8Bit().toStdString();
 			} else {
 				// logging disabled
@@ -1974,9 +1974,9 @@ void ToolLauncher::hasText()
 		QJSValue val = js_engine.evaluate(js_cmd);
 
 		if (val.isError()) {
-			out << "Exception:" << val.toString() << endl;
+			out << "Exception:" << val.toString() << Qt::endl;
 		} else if (!val.isUndefined()) {
-			out << val.toString() << endl;
+			out << val.toString() << Qt::endl;
 		}
 
 		js_cmd.clear();

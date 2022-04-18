@@ -54,15 +54,17 @@ public:
 	        : ApiObject()
 		, m_pattern(pattern) {
 		qRegisterMetaType<QVector<int>>("vector(int)");
-		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
 		qRegisterMetaType<QVector<QVector<int>>>("vector(vector(int))");
-		qRegisterMetaTypeStreamOperators<QVector<QVector<int>>>("vector(vector(int))");
-
 		qRegisterMetaType<QPair<QVector<int>, QString>>("pair(vector(int), string)");
-		qRegisterMetaTypeStreamOperators<QPair<QVector<int>, QString>>("pair(vector(int), string)");
 		qRegisterMetaType<QVector<QPair<QVector<int>, QString>>>("vector(pair(vector(int), string))");
+#if QT_VERSION < 0x060000
+		// RegisterMetaTypeStreamOperators was removed in Qt6;
+		// The metatype system will instead know about those automatically;
+		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
+		qRegisterMetaTypeStreamOperators<QVector<QVector<int>>>("vector(vector(int))");
+		qRegisterMetaTypeStreamOperators<QPair<QVector<int>, QString>>("pair(vector(int), string)");
 		qRegisterMetaTypeStreamOperators<QVector<QPair<QVector<int>, QString>>>("vector(pair(vector(int), string))");
-
+#endif
 	}
 	~PatternGenerator_API() {}
 

@@ -21,6 +21,7 @@
 #include "smallOnOffSwitch.hpp"
 #include "gui/dynamicWidget.hpp"
 
+#include <QFile>
 #include <QDebug>
 #include <QResizeEvent>
 #include <QStylePainter>

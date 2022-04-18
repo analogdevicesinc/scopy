@@ -100,7 +100,7 @@ QString QtJs::readFromConsole(const QString& request)
 		input = watcher.result();
 		done = true;
 	});
-	future = QtConcurrent::run(this, &QtJs::readInput);
+	future = QtConcurrent::run(std::bind(&QtJs::readInput, this));
 	watcher.setFuture(future);
 
 	do {

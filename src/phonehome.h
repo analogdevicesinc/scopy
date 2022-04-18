@@ -24,7 +24,6 @@
 #include "preferences.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
-#include <QTextCodec>
 #include <QJsonDocument>
 #include <QJsonObject>
 

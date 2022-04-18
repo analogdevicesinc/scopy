@@ -63,7 +63,7 @@ const QPen& PlotLineHandle::pen()
 	return m_pen;
 }
 
-void PlotLineHandle::enterEvent(QEvent *event)
+void PlotLineHandle::enterEvent(QEnterEvent *event)
 {
 	setCursor(Qt::OpenHandCursor);
 	QWidget::enterEvent(event);
@@ -247,7 +247,7 @@ void PlotGateHandle::paintEvent(QPaintEvent *event)
 	QString handleText = d_timeFormatter.format(m_timeValue,"",2);
 
 	QFontMetrics fm = p.fontMetrics();
-	int textWidth = fm.width(handleText);
+	int textWidth = fm.horizontalAdvance(handleText);
 	int textHeight = fm.height();
 
 	p.drawText(QPoint((width()-textWidth)/2,height()-textHeight/2),handleText);

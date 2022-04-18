@@ -36,7 +36,7 @@ class QLabel;
 class QLineEdit;
 class QFrame;
 class QComboBox;
-class QRegExpValidator;
+class QRegularExpressionValidator;
 
 namespace Ui {
 class SpinBoxA;
@@ -150,7 +150,7 @@ protected:
 	double m_max_value;
 	int m_decimal_count;
 	std::vector<std::pair<QString, double> > m_units;
-	QRegExpValidator *m_validator;
+	QRegularExpressionValidator *m_validator;
 	double m_displayScale;
 	SpinBoxA_API *m_sba_api;
 	unsigned int m_id;

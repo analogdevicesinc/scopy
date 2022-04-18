@@ -1569,8 +1569,8 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 	for (; current <= MAX_REF_CHANNELS; ++current) {
 		bool isOk = true;
 		for (const auto &ref_channel : referenceChannels) {
-			QString shortName = ref_channel->shortName();
-			int channel_counter = shortName.midRef(shortName.size() - 1).toInt();
+			std::string shortName = ref_channel->shortName().toStdString();
+			int channel_counter = QString::fromStdString(shortName.substr(shortName.size() - 1)).toInt();
 			if (current == channel_counter) {
 				isOk = false;
 				break;

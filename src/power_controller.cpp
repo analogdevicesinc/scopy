@@ -95,6 +95,8 @@ PowerController::PowerController(struct iio_context *ctx,
 			SLOT(dac2_set_value(double)));
 	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
 			SLOT(ratioChanged(int)));
+	connect(ui->trackingRatio, SIGNAL(valueChanged(int)),
+		ui->trackingRatioLbl, SLOT(setNum(int)));
 
 	connect(runButton(), SIGNAL(clicked(bool)), this, SLOT(startStop(bool)));
 

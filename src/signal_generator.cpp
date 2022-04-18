@@ -438,7 +438,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		cw->setProperty("signal_generator_data",
 		                QVariant::fromValue(ptr));
 		cw->setProperty("channel",
-				qVariantFromValue(i));
+				QVariant::fromValue(i));
 		channels.append(cw);
 
 		ui->channelsList->addWidget(cw);
@@ -2174,7 +2174,7 @@ double SignalGenerator::get_best_sample_rate(unsigned int chnIdx)
 	}
 
 	if (use_oversampling(chnIdx)) {
-		qSort(values.begin(), values.end(), qLess<double>());
+		std::sort(values.begin(), values.end(), std::less<double>());
 	}
 
 	/* Return the best sample rate that we can create a buffer for */
@@ -2190,7 +2190,7 @@ double SignalGenerator::get_best_sample_rate(unsigned int chnIdx)
 
 	/* If we can't find a perfect sample rate, use the highest one */
 	if (use_oversampling(chnIdx)) {
-		qSort(values.begin(), values.end(), qGreater<double>());
+		std::sort(values.begin(), values.end(), std::greater<double>());
 	}
 
 

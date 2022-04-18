@@ -27,7 +27,7 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 		auto header = new QWidget();
 		auto headerLayout = new QHBoxLayout(header);
 		header->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
-		headerLayout->setMargin(10);
+		headerLayout->setContentsMargins(10, 10, 10, 10);
 		headerLayout->setSpacing(15);
 
 		toolStatus = new QLabel("");
@@ -62,7 +62,6 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	}
 
 	m_channelsWidget->layout()->setSpacing(0);
-	m_channelsWidget->layout()->setMargin(0);
 	m_channelsWidget->layout()->setContentsMargins(QMargins(0,0,0,0));
 	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	m_channelsWidget->setStyleSheet("border: 0px;");
@@ -89,15 +88,15 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 					       const QString& fullName, const QString& shortName)
 {
 	ChannelWidget* ch = new ChannelWidget(chId, deletable, simplefied, color);
-	m_channelsWidget->layout()->setMargin(0);
-    m_channelsWidget->layout()->addWidget(ch);
+	m_channelsWidget->layout()->setContentsMargins(0, 0, 0, 0);
+	m_channelsWidget->layout()->addWidget(ch);
 	if (m_channelIdVisible) {
-        ch->setFullName(fullName + QString(" %1").arg(chId + 1));
-        ch->setShortName(shortName + QString(" %1").arg(chId + 1));
+		ch->setFullName(fullName + QString(" %1").arg(chId + 1));
+		ch->setShortName(shortName + QString(" %1").arg(chId + 1));
 	} else {
-        ch->setFullName(fullName);
-        ch->setShortName(shortName);
-    }
+		ch->setFullName(fullName);
+		ch->setShortName(shortName);
+	}
 	ch->nameButton()->setText(ch->shortName());
 
 	m_channelsList.append(ch);
@@ -165,7 +164,7 @@ void ChannelManager::changeParent(QWidget* newParent)
 
 	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	m_channelsWidget->layout()->setSpacing(0);
-	m_channelsWidget->layout()->setMargin(0);
+//	m_channelsWidget->layout()->setContentsMargins(0, 0, 0, 0);
 
 	for (ChannelWidget* channel : m_channelsList) {
 		m_channelsWidget->layout()->addWidget(channel);

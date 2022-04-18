@@ -430,7 +430,7 @@ void FftDisplayPlot::setZoomerEnabled()
 
                 QFont font;
                 font.setPointSize(10);
-                font.setWeight(75);
+		font.setWeight(QFont::Bold);
 		d_zoomer[0]->setTrackerFont(font);
 
 #if QWT_VERSION < 0x060000

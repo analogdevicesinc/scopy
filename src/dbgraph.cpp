@@ -173,7 +173,7 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 					QwtAbstractScaleDraw::Labels, false);
 
 		QPalette palette = scaleItem->palette();
-		palette.setBrush(QPalette::Foreground, QColor(plotColor));
+		palette.setBrush(QPalette::WindowText, QColor(plotColor));
 		palette.setBrush(QPalette::Text, QColor(plotColor));
 		scaleItem->setPalette(palette);
 		scaleItem->setBorderDistance(0);
@@ -198,7 +198,7 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	setAxisVisible(QwtAxis::XTop, false);
 
 	QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XTop);
-	const int fmw = QFontMetrics(scaleWidget->font()).width("-XXXX.XX XX");
+	const int fmw = QFontMetrics(scaleWidget->font()).horizontalAdvance("-XXXX.XX XX");
 	scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
 
 	setupVerticalBars();

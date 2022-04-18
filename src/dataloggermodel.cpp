@@ -7,7 +7,7 @@ DataLoggerModel::DataLoggerModel():
 	m_timer(new QTimer())
 {
 	QObject::connect(m_timer, &QTimer::timeout , this, [=](){
-		QtConcurrent::run(this, &DataLoggerModel::logData);
+		QtConcurrent::run(std::bind(&DataLoggerModel::logData, this));
 	});
 }
 
@@ -135,7 +135,7 @@ double DataLoggerModel::computeAvg(QVector<QString> values)
 bool DataLoggerModel::isNumber(const QString& str)
 {
 	for (QChar const &c : str) {
-		if (!( c.isDigit() || c == ".")) return false;
+		if (!( c.isDigit() || c == '.')) return false;
 	}
 	return true;
 }
