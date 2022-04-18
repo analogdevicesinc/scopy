@@ -1115,10 +1115,10 @@ void Measure::measureTimeDomain()
 			if ((p1.m_bufIdx == p0.m_bufIdx) && (p1.m_onRising == p0.m_onRising)) {
 				if ((p0.m_name == "MR" && p1.m_name == "LR") ||
 						(p0.m_name == "HR" && p1.m_name == "MR"))
-					crossSequence.swap(i, i - 1);
+					crossSequence.swapItemsAt(i, i - 1);
 				else if ((p0.m_name == "MF" && p1.m_name == "HF") ||
 						(p0.m_name == "LF" && p1.m_name == "MF"))
-					crossSequence.swap(i, i - 1);
+					crossSequence.swapItemsAt(i, i - 1);
 			}
 		}
 

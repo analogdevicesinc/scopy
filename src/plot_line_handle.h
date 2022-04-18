@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <QPen>
+#include <QEnterEvent>
 #include <plot_utils.hpp>
 
 class HandlesArea;
@@ -51,7 +52,7 @@ Q_SIGNALS:
 	void reset();
 
 protected:
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 

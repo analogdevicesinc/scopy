@@ -87,7 +87,7 @@ void FileManager::open(QString fileName,
 		while (!in.atEnd()) {
 			QVector<QString> line_data;
 			QString line = in.readLine();
-			QStringList list = line.split(separator, QString::SkipEmptyParts);
+			QStringList list = line.split(separator, Qt::SkipEmptyParts);
 			for (const QString &list_item : qAsConst(list)) {
 				line_data.push_back(list_item);
 			}

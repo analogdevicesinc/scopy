@@ -32,7 +32,7 @@ Graticule::Graticule(QwtPlot *plot):
 	horizScale2 = new GraticulePlotScaleItem(QwtScaleDraw::TopScale,-1);
 
 	QPalette palette = vertScale->palette();
-	palette.setBrush(QPalette::Foreground, QColor("#6E6E6F"));
+	palette.setBrush(QPalette::WindowText, QColor("#6E6E6F"));
 	palette.setBrush(QPalette::Text, QColor("#6E6E6F"));
 
 	double minTick = vertScale->scaleDraw()->tickLength(QwtScaleDiv::MinorTick);

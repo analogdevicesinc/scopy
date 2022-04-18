@@ -21,6 +21,7 @@
 #include "customSwitch.hpp"
 
 #include <QDebug>
+#include <QFile>
 #include <QResizeEvent>
 
 using namespace adiscope;

@@ -11,7 +11,7 @@ ${BUILD_INFO}
 
 This Scopy version uses the following library/tools versions:
 libboost: ${Boost_VERSION}
-libqt5: ${Qt5_VERSION}
+libqt${QT_MAJOR_VERSION}: ${Qt${QT_MAJOR_VERSION}_VERSION}
 volk: ${Volk_VERSION}
 cmake: ${CMAKE_VERSION}
 gnuradio: ${Gnuradio_VERSION}

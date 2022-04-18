@@ -24,6 +24,7 @@
 
 #include "logic_analyzer.h"
 #include "apiObject.hpp"
+#include <QtGlobal>
 
 namespace adiscope {
 namespace logic {
@@ -71,19 +72,21 @@ public:
 		// Register type. TODO: maybe a cleaner way of doing this
 		// QVariant needs qRegisterMetaTypeStreamOperators for serialization/deserialization
 		qRegisterMetaType<QPair<int, int>>("pair");
-		qRegisterMetaTypeStreamOperators<QPair<int, int>>("pair");
 		qRegisterMetaType<QList<QPair<int, int>>>("list(pair)");
-		qRegisterMetaTypeStreamOperators<QList<QPair<int, int>>>("list(pair)");
 		qRegisterMetaType<QList<QList<QPair<int, int>>>>("list(list(pair))");
-		qRegisterMetaTypeStreamOperators<QList<QList<QPair<int, int>>>>("list(list(pair))");
-
 		qRegisterMetaType<QList<QStringList>>("list(stringlist)");
-		qRegisterMetaTypeStreamOperators<QList<QStringList>>("list(stringlist)");
-
 		qRegisterMetaType<QVector<int>>("vector(int)");
-		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
 		qRegisterMetaType<QVector<QVector<int>>>("vector(vector(int))");
+#if QT_VERSION < 0x060000
+		// RegisterMetaTypeStreamOperators was removed in Qt6;
+		// The metatype system will instead know about those automatically;
+		qRegisterMetaTypeStreamOperators<QPair<int, int>>("pair");
+		qRegisterMetaTypeStreamOperators<QList<QPair<int, int>>>("list(pair)");
+		qRegisterMetaTypeStreamOperators<QList<QList<QPair<int, int>>>>("list(list(pair))");
+		qRegisterMetaTypeStreamOperators<QList<QStringList>>("list(stringlist)");
+		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
 		qRegisterMetaTypeStreamOperators<QVector<QVector<int>>>("vector(vector(int))");
+#endif
 	}
 	~LogicAnalyzer_API() {}
 

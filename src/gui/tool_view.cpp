@@ -145,7 +145,7 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 			}
 
 			m_ui->widgetHorizontalChannels->layout()->setSpacing(0);
-			m_ui->widgetHorizontalChannels->layout()->setMargin(0);
+			m_ui->widgetHorizontalChannels->layout()->setContentsMargins(0, 0, 0, 0);
 
 			Q_EMIT changeParent(m_ui->widgetVerticalChannelsContainer);
 		} else {

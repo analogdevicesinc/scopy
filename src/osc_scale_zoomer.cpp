@@ -36,7 +36,7 @@ OscScaleZoomer::OscScaleZoomer(QWidget *parent) :
 
 	QFont font;
 	font.setPointSize(10);
-	font.setWeight(75);
+	font.setWeight(QFont::Bold);
 
 	setTrackerFont(font);
 	setZoomBase();

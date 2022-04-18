@@ -102,22 +102,32 @@ if(ANDROID)
     set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
 endif()
 
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5 COMPONENTS LinguistTools REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
-find_package(Qt5Network REQUIRED)
-if(ANDROID)
-	find_package(Qt5AndroidExtras REQUIRED)
-endif()
-
 FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/translations/*.ts)
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR})
 
-# Creates translation .ts files from ${CMAKE_SOURCE_DIR}
-#qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+set(QT_MAJOR_VERSION 6)
+#See if the environment var is set
+if(DEFINED ENV{Qt${QT_MAJOR_VERSION}_HOME})
+    message(STATUS "Looking for Qt in: " $ENV{Qt${QT_MAJOR_VERSION}_HOME})
+else()
+    message(STATUS "Qt${QT_MAJOR_VERSION}_HOME environment variable not set. Checking default paths.")
+endif()
 
-# Generate .qm files from the .ts files
-qt5_add_translation(QM_FILES ${TS_FILES})
+find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Core Widgets Gui Concurrent Network Qml Svg UiTools Xml LinguistTools OpenGL REQUIRED PATHS $ENV{Qt${QT_MAJOR_VERSION}_HOME})
+if(ANDROID)
+	find_package(Qt${QT_MAJOR_VERSION} COMPONENTS AndroidExtras REQUIRED PATHS $ENV{Qt${QT_MAJOR_VERSION}_HOME})
+endif()
+if ("${QT_MAJOR_VERSION}" STREQUAL "6")
+	find_package(Qt${QT_MAJOR_VERSION} REQUIRED COMPONENTS StateMachine)
+	# Generate .qm files from the .ts files
+	qt6_add_translation(QM_FILES ${TS_FILES})
+else()
+	# Creates translation .ts files from ${CMAKE_SOURCE_DIR}
+	qt5_create_translation(QM_FILES ${CMAKE_SOURCE_DIR} ${TS_FILES})
+
+	# Generate .qm files from the .ts files
+	qt5_add_translation(QM_FILES ${TS_FILES})
+endif()
 
 set(TRANSLATIONS)
 foreach(file ${TS_FILES})
@@ -129,7 +139,7 @@ configure_file(${CMAKE_SOURCE_DIR}/resources/translations.qrc
 	${CMAKE_BINARY_DIR}/translations.qrc
 	@ONLY)
 
-qt5_add_resources(TRANSLATION_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
+qt_add_resources(TRANSLATION_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -171,11 +181,6 @@ else()
 
 endif()
 
-find_package(Qt5Qml REQUIRED)
-find_package(Qt5Svg REQUIRED)
-find_package(Qt5UiTools REQUIRED)
-find_package(Qt5Xml REQUIRED)
-
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt )
 
@@ -213,14 +218,7 @@ pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
 
 include_directories(
 	${Boost_INCLUDE_DIRS}
-	${Qt5Widgets_INCLUDE_DIRS}
-	${Qt5Concurrent_INCLUDE_DIRS}
-	${Qt5AndroidExtras_INCLUDE_DIRS}
-	${Qt5Qml_INCLUDE_DIRS}
-	${Qt5UiTools_INCLUDE_DIRS}
 	${QWT_INCLUDE_DIRS}
-	${Qt5Svg_INCLUDE_DIRS}
-	${Qt5Xml_INCLUDE_DIRS}
 	${SCOPY_INCLUDE_DIRS}
 	${LIBSIGROK_DECODE_INCLUDE_DIRS}
 	${GLIB_INCLUDE_DIRS}
@@ -251,10 +249,10 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 )
 
 FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui)
-qt5_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
+qt_wrap_ui (m2kscope_FORMS_HEADERS ${M2KSCOPE_UIS})
 
 FILE(GLOB M2KSCOPE_RESOURCES resources/resources.qrc)
-qt5_add_resources(m2kscope_RESOURCES ${M2KSCOPE_RESOURCES})
+qt_add_resources(m2kscope_RESOURCES ${M2KSCOPE_RESOURCES})
 
 if (WIN32)
         set(RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resources/properties.rc)
@@ -302,7 +300,7 @@ if (ENABLE_APPLICATION_BUNDLE)
 
 	set(CMAKE_EXE_LINKER_FLAGS "-Wl,-headerpad_max_install_names -Wl,-search_paths_first ${CMAKE_EXE_LINKER_FLAGS}")
 
-	foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
+	foreach(plugin ${Qt${QT_MAJOR_VERSION}Gui_PLUGINS} ${Qt${QT_MAJOR_VERSION}Svg_PLUGINS})
 		get_target_property(_loc ${plugin} LOCATION)
 		get_filename_component(_name ${_loc} NAME)
 		get_filename_component(_dir ${_loc} DIRECTORY)
@@ -400,7 +398,7 @@ configure_file(${CMAKE_SOURCE_DIR}/resources/aboutpage.qrc
 	${CMAKE_BINARY_DIR}/aboutpage.qrc
 	@ONLY)
 
-qt5_add_resources(ABOUT_PAGE_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/aboutpage.qrc)
+qt_add_resources(ABOUT_PAGE_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/aboutpage.qrc)
 
 option(CLONE_IIO_EMU "Clone iio-emu" ON)
 if (CLONE_IIO_EMU)
@@ -444,12 +442,15 @@ endif()
 target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${BREAKPAD_LIBRARIES}
 		${BREAKPADCLIENT_LIBRARIES}
-		${Qt5Widgets_LIBRARIES}
-		${Qt5Concurrent_LIBRARIES}
-		${Qt5Qml_LIBRARIES}
-		${Qt5UiTools_LIBRARIES}
-		${Qt5Network_LIBRARIES}
-		${Qt5AndroidExtras_LIBRARIES}
+		Qt${QT_MAJOR_VERSION}::Widgets
+		Qt${QT_MAJOR_VERSION}::Gui
+		Qt${QT_MAJOR_VERSION}::Concurrent
+		Qt${QT_MAJOR_VERSION}::Qml
+		Qt${QT_MAJOR_VERSION}::UiTools
+		Qt${QT_MAJOR_VERSION}::Network
+		Qt${QT_MAJOR_VERSION}::Svg
+		Qt${QT_MAJOR_VERSION}::Xml
+		Qt${QT_MAJOR_VERSION}::OpenGL
 		${LIBUSB_LIBRARIES}
 		gnuradio::gnuradio-runtime
 		gnuradio::gnuradio-analog
@@ -462,8 +463,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		gnuradio::gnuradio-m2k
 		${Boost_LIBRARIES}
 		${QWT_LIBRARIES}
-		${Qt5Svg_LIBRARIES}
-		${Qt5Xml_LIBRARIES}
 		${MATIO_LIBRARIES}
 		${LIBSIGROK_DECODE_LIBRARIES}
 		${GLIBMM_LIBRARIES}
@@ -471,6 +470,13 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		${GLIB_LIBRARIES}
 		libm2k::libm2k
 )
+
+if ("${QT_MAJOR_VERSION}" STREQUAL "6")
+	target_link_libraries(${PROJECT_NAME} LINK_PRIVATE Qt${QT_MAJOR_VERSION}::StateMachine)
+endif()
+if (ANDROID)
+	target_link_libraries(${PROJECT_NAME} LINK_PRIVATE Qt${QT_MAJOR_VERSION}::AndroidExtras)
+endif()
 
 if (NOT WIN32)
 	find_library(PTHREAD_LIBRARIES pthread)

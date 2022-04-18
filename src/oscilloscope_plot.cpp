@@ -117,7 +117,7 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	// stylesheet will be ignored when calculating width using FontMetrics
 	int width = d_timeBaseLabel->minimumSizeHint().width();
 	QFontMetrics fm = d_timeBaseLabel->fontMetrics();
-	width = fm.width("999.999 ms/div");
+	width = fm.horizontalAdvance("999.999 ms/div");
 	d_timeBaseLabel->setMinimumWidth(width);
 
 	// Sample Rate and Buffer Size
@@ -362,7 +362,7 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 
 	installEventFilter(this);
 	QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XBottom);
-	const int fmw = QFontMetrics(scaleWidget->font()).width("-XXX.XXX XX");
+	const int fmw = QFontMetrics(scaleWidget->font()).horizontalAdvance("-XXX.XXX XX");
 	scaleWidget->setMinBorderDist(fmw / 2 + 30, fmw / 2 + 30);
 
 	displayGraticule = false;
@@ -999,7 +999,7 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtAxis::YLeft, d_activeVertAxis))->width());
 		d_topGateHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtAxis::YLeft, d_activeVertAxis))->width());
 		QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XBottom);
-		const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
+		const int fmw = QFontMetrics(scaleWidget->font()).horizontalAdvance("-XX.XX XX");
 		const int fmh = QFontMetrics(scaleWidget->font()).height();
 		d_bottomHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);
 		d_topGateHandlesArea->setRightPadding(50 + fmw/2 + d_bonusWidth);

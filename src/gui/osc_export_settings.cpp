@@ -173,7 +173,7 @@ void ExportSettings::enableExportButton(bool on)
 
 void ExportSettings::disableUIMargins()
 {
-	ui->verticalLayout_3->setMargin(0);
+	ui->verticalLayout_3->setContentsMargins(0, 0, 0, 0);
 }
 
 void ExportSettings::setTitleLabelVisible(bool enabled)

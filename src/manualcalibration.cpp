@@ -574,11 +574,11 @@ void ManualCalibration::on_saveButton_clicked()
 		       << QTime::currentTime().toString()
 		       << "\n#ad9963 temperature: " << temp_ad9963
 		       << tr(" °C") << "\n#FPGA temperature: "<< temp_fpga
-		       << tr(" °C") << endl;
+		       << tr(" °C") << Qt::endl;
 
 		for (int i = 0; i < paramTable->rowCount(); i++)
 			stream << "cal," << paramTable->item(i,0)->text() << "="
-			       << paramTable->item(i,1)->text() << endl;
+			       << paramTable->item(i,1)->text() << Qt::endl;
 	}
 
 	file.close();

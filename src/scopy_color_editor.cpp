@@ -253,7 +253,7 @@ bool ScopyColorEditor::handleRgbaColor(const QString &key, const QString &line, 
 {
 	int endIndex = -1;
 	for (int i = index; i < line.size(); ++i) {
-		if (line[i] == ")") {
+		if (line[i] == ')') {
 			endIndex = i;
 		}
 	}
@@ -313,7 +313,7 @@ bool ScopyColorEditor::handleHexColor(const QString &key, const QString &line, i
 {
 	int endIndex = -1;
 	for (int i = index; i < line.size(); ++i) {
-		if (line[i] == " " || line[i] == ";") {
+		if (line[i] == ' ' || line[i] == ';') {
 			endIndex = i;
 		}
 	}
@@ -396,9 +396,9 @@ void ScopyColorEditor::changeColor()
 	int index = btn->property("index").toInt();
 
 	bool changed = false;
-	if (line[index] == "r") {
+	if (line[index] == 'r') {
 		changed = handleRgbaColor(key, line, index, btn);
-	} else if (line[index] == "#") {
+	} else if (line[index] == '#') {
 		changed = handleHexColor(key, line, index, btn);
 	}
 

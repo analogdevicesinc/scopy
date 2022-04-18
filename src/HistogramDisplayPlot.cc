@@ -259,7 +259,7 @@ HistogramDisplayPlot::HistogramDisplayPlot(int nplots, QWidget* parent)
 	  osd->setUnitType("V");
 	  osd->setFloatPrecision(2);
 	  osd->setColor(d_CurveColors[i]);
-	  const int fmw = QFontMetrics(scaleWidget->font()).width("-XX.XX XX");
+	  const int fmw = QFontMetrics(scaleWidget->font()).horizontalAdvance("-XX.XX XX");
 	  scaleWidget->setMinBorderDist(fmw / 2, fmw / 2);
   }
   for (int i = 0; i < 2; ++i) {

@@ -184,10 +184,10 @@ Pattern *Pattern_API::fromString(QString str)
 		if (doc.isObject()) {
 			obj = doc.object();
 		} else {
-			qDebug() << "Document is not an object" << endl;
+			qDebug() << "Document is not an object" << Qt::endl;
 		}
 	} else {
-		qDebug() << "Invalid JSON...\n" << str << endl;
+		qDebug() << "Invalid JSON...\n" << str << Qt::endl;
 	}
 
 	return fromJson(obj);
@@ -2004,7 +2004,7 @@ void I2CPatternUI::parse_ui()
 
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
 	pattern->setWrite(ui->PB_readWrite->isChecked());
-	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
+	QStringList strList = ui->LE_toSend->text().split(' ', Qt::SkipEmptyParts);
 	pattern->v.clear();
 
 	bool fail = false;
@@ -2407,7 +2407,7 @@ void SPIPatternUI::parse_ui()
 	pattern->setCPOL(ui->PB_CPOL->isChecked());
 	pattern->setCSPol(ui->PB_CS->isChecked());
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
-	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
+	QStringList strList = ui->LE_toSend->text().split(' ', Qt::SkipEmptyParts);
 	pattern->v.clear();
 	bool fail = false;
 

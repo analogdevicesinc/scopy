@@ -1,6 +1,6 @@
 #include "BasicPlot.h"
 
-#include <QwtPlotOpenGLCanvas>
+#include <qwt_plot_opengl_canvas.h>
 #include <QwtPainter>
 #include <QDebug>
 #include <tool_launcher.hpp>

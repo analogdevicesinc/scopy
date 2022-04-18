@@ -149,7 +149,7 @@ void RegisterWidget::checkRegisterMap(void)
 	int bit = 0;
 
 	/*sort vector using bit number*/
-	qSort(bitfieldsVector.begin(), bitfieldsVector.end(), lessThan);
+	std::sort(bitfieldsVector.begin(), bitfieldsVector.end(), lessThan);
 
 	for (auto iterator = bitfieldsVector.begin(); iterator != bitfieldsVector.end();
 	     ++iterator) {

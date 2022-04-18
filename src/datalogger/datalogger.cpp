@@ -223,7 +223,7 @@ void DataLogger::readChannelValues()
 {
 	if (!m_activeChannels.empty()) {
 		for (auto ch : m_activeChannels.keys()) {
-			QtConcurrent::run(this,&DataLogger::updateChannelWidget,ch);
+			QtConcurrent::run(std::bind(&DataLogger::updateChannelWidget, this, ch));
 		}
 	}
 }
