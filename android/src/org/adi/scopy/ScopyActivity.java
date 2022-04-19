@@ -52,53 +52,50 @@ public class ScopyActivity extends QtActivity
 	public static native void saveAndStopRunningToolsJNI();
 	public static native void saveAndStopRunningInputToolsJNI();
 	public static native void restoreRunningToolsJNI();
-	public static native int nrOfToolsSaved();
-	public static native int nrOfToolsRunning();
-	public static native boolean hasCtx();
-	private static final int NOTIFICATION_ID = 1234567;
+	public static native int nrOfToolsSavedJNI();
+	public static native int nrOfToolsRunningJNI();
+	public static native boolean hasCtxJNI();
+	private static final int SCOPY_WAKELOCK_NOTIFICATION_ID = 1;
+	private static final String SCOPY_NOTIFICATION_CHANNEL_ID = "scopy";
 	boolean initialized;
-	WakeLock wakeLock;
+	private WakeLock wakeLock;
 
 
 	private void createNotificationChannel() {
 	    // Create the NotificationChannel, but only on API 26+ because
 	    // the NotificationChannel class is new and not in the support library
 
-		CharSequence name = "R.string.channel_name";
-		String description = "R.string.channel_description";
+	        CharSequence name = "Scopy notifications";
+		String description = "Various messages from Scopy";
 		int importance = NotificationManager.IMPORTANCE_DEFAULT;
-		NotificationChannel channel = new NotificationChannel("1234", name, importance);
-		channel.setDescription("description");
+		NotificationChannel scopyNotificationChannel = new NotificationChannel(SCOPY_NOTIFICATION_CHANNEL_ID, name, importance);
+		scopyNotificationChannel.setDescription(description);
 		// Register the channel with the system; you can't change the importance
 		// or other notification behaviors after this
 		NotificationManager notificationManager = getSystemService(NotificationManager.class);
-		notificationManager.createNotificationChannel(channel);
+		notificationManager.createNotificationChannel(scopyNotificationChannel);
 
 	}
 
         public void createNotification(String message)
 	{
-
 		NotificationManager notificationManager = (NotificationManager) getSystemService(NotificationManager.class);
 		createNotificationChannel();
 
 		Intent notificationIntent = new Intent(this, ScopyActivity.class);
 		notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-		PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		PendingIntent openAppOnTapIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
 
-		Notification notif = new Notification.Builder(this,"1234")
-			.setSmallIcon(R.drawable.icon)
-			.setContentTitle("Scopy")
+		Notification notification = new Notification.Builder(this,SCOPY_NOTIFICATION_CHANNEL_ID)
+		        .setSmallIcon(R.drawable.icon)
 			.setContentText(message)
 			.setPriority(Notification.PRIORITY_DEFAULT)
-			.setContentIntent(intent)
+			.setContentIntent(openAppOnTapIntent)
 			.setOngoing(true)
 			.build();
 
-
-
-		notificationManager.notify(NOTIFICATION_ID, notif);
+		notificationManager.notify(SCOPY_WAKELOCK_NOTIFICATION_ID, notification);
 	}
 
 	@Override
@@ -129,13 +126,14 @@ public class ScopyActivity extends QtActivity
 	protected void onStop()
 	{
 		System.out.println("-- ScopyActivity: onStop");
+		System.out.println(nrOfToolsSavedJNI());
 		if (initialized) {
-			if (hasCtx()) {
+			if (hasCtxJNI()) {
 				saveAndStopRunningInputToolsJNI();
-				if (nrOfToolsRunning() != 0) {
+				if (nrOfToolsRunningJNI() != 0) {
 					System.out.println("-- Creating Notification");
 					wakeLock.acquire();
-					createNotification("Scopy still running in the background.Device outputs enabled");
+					createNotification("Scopy is still running in the background. Device outputs are still enabled.");
 				}
 			}
 		}
@@ -145,7 +143,7 @@ public class ScopyActivity extends QtActivity
         @Override
 	protected void onResume()
 	{
-		cancelNotification(NOTIFICATION_ID);
+		cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
 		if (wakeLock.isHeld()) {
 			wakeLock.release();
 		}
@@ -164,7 +162,7 @@ public class ScopyActivity extends QtActivity
 
 	protected void onDestroy(){
 		System.out.println("-- ScopyActivity: onDestroy ");
-		cancelNotification(NOTIFICATION_ID);
+		cancelNotification(SCOPY_WAKELOCK_NOTIFICATION_ID);
 		if (wakeLock.isHeld()) {
 			wakeLock.release();
 		}

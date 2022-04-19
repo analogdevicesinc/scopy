@@ -210,9 +210,9 @@ private:
 	static void saveAndStopRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
 	static void saveAndStopRunningInputToolsJNI(JNIEnv *env, jobject /*thiz*/);
 	static void restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/);
-	static int  nrOfToolsSaved(JNIEnv *env, jobject /*thiz*/);
-	static int  nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/);
-	static bool hasCtx(JNIEnv *env, jobject /*thiz*/);
+	static int  nrOfToolsSavedJNI(JNIEnv *env, jobject /*thiz*/);
+	static int  nrOfToolsRunningJNI(JNIEnv *env, jobject /*thiz*/);
+	static bool hasCtxJNI(JNIEnv *env, jobject /*thiz*/);
 #endif
 
 private:
