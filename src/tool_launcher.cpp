@@ -2150,7 +2150,7 @@ void ToolLauncher::restoreRunningToolsJNI(JNIEnv *env, jobject /*thiz*/) {
 	}
 }
 
-int ToolLauncher::nrOfToolsSaved(JNIEnv *env, jobject /*thiz*/) {
+int ToolLauncher::nrOfToolsSavedJNI(JNIEnv *env, jobject /*thiz*/) {
 	qDebug()<<"-- Getting number of stopped tools JNI";
 	ToolLauncher* tl = getToolLauncherInstance();
 	if(tl)
@@ -2162,7 +2162,7 @@ int ToolLauncher::nrOfToolsSaved(JNIEnv *env, jobject /*thiz*/) {
 	return 0;
 }
 
-int ToolLauncher::nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/) {
+int ToolLauncher::nrOfToolsRunningJNI(JNIEnv *env, jobject /*thiz*/) {
 	qDebug()<<"-- Getting number of stopped tools JNI";
 	ToolLauncher* tl = getToolLauncherInstance();
 	if(tl)
@@ -2174,7 +2174,7 @@ int ToolLauncher::nrOfToolsRunning(JNIEnv *env, jobject /*thiz*/) {
 	return 0;
 }
 
-bool ToolLauncher::hasCtx(JNIEnv *env, jobject /*thiz*/)
+bool ToolLauncher::hasCtxJNI(JNIEnv *env, jobject /*thiz*/)
 {
 	qDebug()<<"-- Getting number of stopped tools JNI";
 	ToolLauncher* tl = getToolLauncherInstance();
@@ -2194,9 +2194,9 @@ void ToolLauncher::registerNativeMethods()
 				     {"saveAndStopRunningToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningToolsJNI) },
 				     {"saveAndStopRunningInputToolsJNI", "()V", reinterpret_cast<void*>(saveAndStopRunningInputToolsJNI) },
 				     {"restoreRunningToolsJNI", "()V", reinterpret_cast<void*>(restoreRunningToolsJNI) },
-				     {"nrOfToolsSaved", "()I", reinterpret_cast<void*>(nrOfToolsSaved) },
-				     {"nrOfToolsRunning", "()I", reinterpret_cast<void*>(nrOfToolsRunning) },
-				     {"hasCtx", "()Z", reinterpret_cast<void*>(hasCtx) },
+				     {"nrOfToolsSavedJNI", "()I", reinterpret_cast<void*>(nrOfToolsSavedJNI) },
+				     {"nrOfToolsRunningJNI", "()I", reinterpret_cast<void*>(nrOfToolsRunningJNI) },
+				     {"hasCtxJNI", "()Z", reinterpret_cast<void*>(hasCtxJNI) },
 				    };
 
 	QAndroidJniObject activity = QtAndroid::androidActivity();
