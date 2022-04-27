@@ -507,6 +507,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	};
 
 	connect(decoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+		decoderComboBox->clearFocus();
 		if (!decoderComboBox->currentIndex()) {
 			return;
 		}
@@ -2075,6 +2076,7 @@ void LogicAnalyzer::setupDecoders()
 	g_slist_free(decoderList);
 
 	connect(ui->addDecoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+		ui->addDecoderComboBox->clearFocus();
 		if (!ui->addDecoderComboBox->currentIndex()) {
 			return;
 		}
