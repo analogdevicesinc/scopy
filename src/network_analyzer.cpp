@@ -44,7 +44,7 @@
 #include <boost/make_shared.hpp>
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/blocks/vector_to_stream.h>
-#include <scopy/goertzel_scopy_fc.h>
+#include <gnuradio/scopy/goertzel_scopy_fc.h>
 
 #include <algorithm>
 
@@ -122,7 +122,7 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		c2m2 = gr::blocks::complex_to_mag_squared::make();
 		conj = gr::blocks::multiply_conjugate_cc::make();
 		c2a = gr::blocks::complex_to_arg::make();
-		signal = boost::make_shared<signal_sample>();
+		signal = std::make_shared<signal_sample>();
 		adc_conv1 = gr::blocks::multiply_const_ff::make(
 			m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(0)));
 		adc_conv2 = gr::blocks::multiply_const_ff::make(

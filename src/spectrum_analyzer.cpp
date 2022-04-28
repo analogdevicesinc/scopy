@@ -22,7 +22,7 @@
 #include <gnuradio/blocks/float_to_complex.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/blocks/add_blk.h>
-#include <scopy/math.h>
+#include <gnuradio/scopy/math.h>
 #include <gnuradio/analog/sig_source.h>
 #include <gnuradio/analog/fastnoise_source.h>
 
@@ -284,7 +284,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// Initialize spectrum channels
 	for (int i = 0 ; i < m_adc_nb_channels; i++) {
-		channel_sptr channel = boost::make_shared<SpectrumChannel>(i,
+		channel_sptr channel = std::make_shared<SpectrumChannel>(i,
 		                       channel_names[i], fft_plot);
 		channel->setColor(fft_plot->getLineColor(i));
 		ui->channelsList->addWidget(channel->widget());

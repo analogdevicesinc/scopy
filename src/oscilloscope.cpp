@@ -23,7 +23,7 @@
 
 /* GNU Radio includes */
 #include <gnuradio/blocks/float_to_complex.h>
-#include <scopy/math.h>
+#include <gnuradio/scopy/math.h>
 #include <gnuradio/blocks/sub.h>
 #include <gnuradio/filter/iir_filter_ffd.h>
 #include <gnuradio/blocks/nlog10_ff.h>
@@ -84,7 +84,7 @@
 
 #include <functional>
 
-#include <m2k/mixed_signal_source.h>
+#include <gnuradio/m2k/mixed_signal_source.h>
 
 #define MAX_MATH_CHANNELS 4
 #define MAX_MATH_RANGE SHRT_MAX
@@ -257,7 +257,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 		channels_api.append(new Channel_API(this));
 	}
-	triggerLevelSink = QPair<boost::shared_ptr<signal_sample>, int>(
+	triggerLevelSink = QPair<std::shared_ptr<signal_sample>, int>(
 				nullptr, -1);
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,
@@ -1466,7 +1466,7 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 		// enable the mixed_source in the iio_manager
 		iio->enableMixedSignal(mixed_source);
 
-		boost::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+		std::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 		// connect analog
 		for (int i = 0; i < nb_channels; ++i) {
@@ -1514,7 +1514,7 @@ void Oscilloscope::disableMixedSignalView()
 		// disable the mixed_source in the iio_manager
 		iio->disableMixedSignal(mixed_source);
 
-		boost::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+		std::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 		// disconnect analog
 		for (int i = 0; i < nb_channels; ++i) {
@@ -1665,7 +1665,7 @@ void Oscilloscope::activateAcCoupling(int i)
 		iio->lock();
 	}
 
-	boost::shared_ptr<adc_sample_conv> block =
+	std::shared_ptr<adc_sample_conv> block =
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 
@@ -1680,7 +1680,7 @@ void Oscilloscope::activateAcCoupling(int i)
 	iio->connect(dc_cancel.at(i), 0, qt_hist_block, i);
 
 	if (trigger && !triggerLevelSink.first) {
-		triggerLevelSink.first = boost::make_shared<signal_sample>();
+		triggerLevelSink.first = std::make_shared<signal_sample>();
 		triggerLevelSink.second = i;
 		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), active_sample_count);
 		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
@@ -1759,7 +1759,7 @@ void Oscilloscope::deactivateAcCoupling(int i)
 		iio->lock();
 	}
 
-	boost::shared_ptr<adc_sample_conv> block =
+	std::shared_ptr<adc_sample_conv> block =
 	dynamic_pointer_cast<adc_sample_conv>(
 					adc_samp_conv_block);
 
@@ -1863,7 +1863,7 @@ void Oscilloscope::activateAcCouplingTrigger(int chIdx)
 		if (started) {
 			iio->lock();
 		}
-		triggerLevelSink.first = boost::make_shared<signal_sample>();
+		triggerLevelSink.first = std::make_shared<signal_sample>();
 		triggerLevelSink.second = chIdx;
 		keep_one = gr::blocks::keep_one_in_n::make(sizeof(float), 100);
 		connect(&*triggerLevelSink.first, SIGNAL(triggered(std::vector<float>)),
@@ -2818,7 +2818,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 			// enable the mixed_source in the iio_manager
 			iio->enableMixedSignal(mixed_source);
 
-			boost::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+			std::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 			// connect analog
 			for (int i = 0; i < nb_channels; ++i) {
@@ -2857,7 +2857,7 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 		if (m_mixedSignalViewEnabled) {
 			iio->disableMixedSignal(mixed_source);
 
-			boost::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+			std::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 			// disconnect analog
 			for (int i = 0; i < nb_channels; ++i) {
@@ -3130,7 +3130,7 @@ void Oscilloscope::onXY_view_toggled(bool visible)
 			return;
 		}
 
-		boost::shared_ptr<adc_sample_conv> block =
+		std::shared_ptr<adc_sample_conv> block =
 		dynamic_pointer_cast<adc_sample_conv>(
 						adc_samp_conv_block);
 
@@ -5187,7 +5187,7 @@ void Oscilloscope::setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode)
 		}
 	}
 
-	boost::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
+	std::shared_ptr<adc_sample_conv> block = dynamic_pointer_cast<adc_sample_conv>(adc_samp_conv_block);
 
 	iio->freq_comp_filt[chnIdx][0]->set_high_gain(gain_mode);
 	iio->freq_comp_filt[chnIdx][1]->set_high_gain(gain_mode);

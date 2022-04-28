@@ -24,18 +24,19 @@
 #include <QObject>
 
 #include <gnuradio/top_block.h>
-#include <iio/device_source.h>
+#include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/float_to_complex.h>
+#include <gnuradio/m2k/analog_in_source.h>
+
 #include <frequency_compensation_filter.h>
 
-#include <m2k/analog_in_source.h>
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2k.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 
-#include <m2k/mixed_signal_source.h>
+#include <gnuradio/m2k/mixed_signal_source.h>
 
 #include <mutex>
 
@@ -50,7 +51,7 @@ namespace adiscope {
 		Q_OBJECT
 
 	public:
-		typedef boost::weak_ptr<iio_manager> map_entry;
+        typedef std::weak_ptr<iio_manager> map_entry;
 		typedef gr::blocks::copy::sptr port_id;
 
 		const unsigned id;
@@ -59,11 +60,11 @@ namespace adiscope {
 		 * manages the requested device if there is one.
 		 * Return a NULL pointer if there is no instance yet.
 		 */
-		static boost::shared_ptr<iio_manager> has_instance(const std::string &_dev);
+        static std::shared_ptr<iio_manager> has_instance(const std::string &_dev);
 
 		/* Get a shared pointer to the instance of iio_manager that
 		 * manages the requested device */
-		static boost::shared_ptr<iio_manager> get_instance(
+        static std::shared_ptr<iio_manager> get_instance(
 				struct iio_context *ctx,
 				const std::string &dev,
 				unsigned long buffer_size = IIO_BUFFER_SIZE);
@@ -159,7 +160,7 @@ namespace adiscope {
 		gr::m2k::analog_in_source::sptr iio_block;
 		unsigned int nb_channels;
 
-		boost::shared_ptr<timeout_block> timeout_b;
+        std::shared_ptr<timeout_block> timeout_b;
 		gr::m2k::mixed_signal_source::sptr m_mixed_source;
 
 		struct connection {

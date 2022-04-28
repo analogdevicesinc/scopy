@@ -86,7 +86,7 @@ namespace adiscope {
 			FIXED = 3,
 		};
 
-	typedef boost::shared_ptr<SpectrumAverage> average_sptr;
+	typedef std::shared_ptr<SpectrumAverage> average_sptr;
 
 	private:
 		QList<QList<marker>> d_markers;
