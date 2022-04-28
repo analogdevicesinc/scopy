@@ -63,19 +63,19 @@ using namespace libm2k::context;
 DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
 	 QJSEngine *engine, ToolLauncher *parent)
 	: Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent),
-	  ui(new Ui::DMM), signal(boost::make_shared<signal_sample>()),
+	  ui(new Ui::DMM), signal(std::make_shared<signal_sample>()),
 	  manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	  m_m2k_context(m2kOpen(ctx, "")),
-	m_m2k_analogin(m_m2k_context->getAnalogIn()),
-	m_adc_nb_channels(m_m2k_analogin->getNbChannels()),
-	interrupt_data_logging(false),
-	data_logging(false),
-	filename(""),
-	use_timer(false),
-	logging_refresh_rate(0),
-	wheelEventGuard(nullptr),
-	m_autoGainEnabled({true, true}),
-	m_gainHistorySize(25)
+	  m_m2k_analogin(m_m2k_context->getAnalogIn()),
+	  m_adc_nb_channels(m_m2k_analogin->getNbChannels()),
+	  interrupt_data_logging(false),
+	  data_logging(false),
+	  filename(""),
+	  use_timer(false),
+	  logging_refresh_rate(0),
+	  wheelEventGuard(nullptr),
+	  m_autoGainEnabled({true, true}),
+	  m_gainHistorySize(25)
 {
 	ui->setupUi(this);
 

@@ -31,7 +31,7 @@
 #include <QtConcurrentRun>
 #include "gui/customPushButton.hpp"
 #include "scroll_filter.hpp"
-#include <scopy/goertzel_scopy_fc.h>
+#include <gnuradio/scopy/goertzel_scopy_fc.h>
 #include <gnuradio/top_block.h>
 #include <gnuradio/blocks/head.h>
 #include <gnuradio/blocks/vector_sink.h>
@@ -96,7 +96,7 @@ private:
 	libm2k::analog::M2kAnalogOut* m_m2k_analogout;
 	libm2k::analog::M2kAnalogIn* m_m2k_analogin;
 	unsigned int m_adc_nb_channels, m_dac_nb_channels;
-	boost::shared_ptr<iio_manager> iio;
+	std::shared_ptr<iio_manager> iio;
 	bool m_initFlowgraph;
 
 	// Sine generation blocks
@@ -177,10 +177,10 @@ private:
 	gr::filter::dc_blocker_ff::sptr dcBlocker1;
 	gr::filter::dc_blocker_ff::sptr dcBlocker2;
 	gr::blocks::complex_to_arg::sptr c2a;
-	boost::shared_ptr<signal_sample> signal;
+	std::shared_ptr<signal_sample> signal;
 	gr::blocks::multiply_const_ff::sptr adc_conv1, adc_conv2;
-	boost::shared_ptr<cancel_dc_offset_block> dc_cancel1;
-	boost::shared_ptr<cancel_dc_offset_block> dc_cancel2;
+	std::shared_ptr<cancel_dc_offset_block> dc_cancel1;
+	std::shared_ptr<cancel_dc_offset_block> dc_cancel2;
 	float mag1, mag2, phase;
 	bool captureDone;
 	bool filterDc;

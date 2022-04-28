@@ -59,9 +59,9 @@
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink.h>
 #include <gnuradio/blocks/null_source.h>
-#include <iio/device_sink.h>
-#include <scopy/math.h>
-#include <scopy/trapezoidal.h>
+#include <gnuradio/iio/device_sink.h>
+#include <gnuradio/scopy/math.h>
+#include <gnuradio/scopy/trapezoidal.h>
 #include "scopyExceptionHandler.h"
 #include "gnuradio/blocks/multiply_const.h"
 
@@ -1830,7 +1830,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 	case SIGNAL_TYPE_BUFFER:
         if (!ptr->file.isNull() && ptr->file_type != FORMAT_NO_FILE) {
 			auto str = ptr->file.toStdString();
-			boost::shared_ptr<basic_block> fs;
+            std::shared_ptr<basic_block> fs;
 
 			auto null = blocks::null_sink::make(sizeof(float));
 			auto buffer=blocks::head::make(sizeof(float),(4*1024*1024));

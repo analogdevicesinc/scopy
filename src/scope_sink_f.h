@@ -56,7 +56,7 @@ namespace adiscope {
     {
     public:
       // adiscope::scope_sink_f::sptr
-      typedef boost::shared_ptr<scope_sink_f> sptr;
+      typedef std::shared_ptr<scope_sink_f> sptr;
 
       static sptr make(int size, double samp_rate,
 		       const std::string &name,

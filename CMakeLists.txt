@@ -181,10 +181,9 @@ else()
 endif()
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-find_package(Gnuradio "3.8" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt )
+find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt iio)
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
-find_package(gnuradio-iio REQUIRED PATH_SUFFIXES iio)
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 

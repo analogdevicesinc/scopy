@@ -8,7 +8,7 @@
 class logic_analyzer_sink : virtual public gr::sync_block
 {
 public:
-	typedef boost::shared_ptr<logic_analyzer_sink> sptr;
+	typedef std::shared_ptr<logic_analyzer_sink> sptr;
 
 	static sptr make(adiscope::logic::LogicAnalyzer *logicAnalyzer, int bufferSize);
 
