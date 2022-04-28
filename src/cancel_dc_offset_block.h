@@ -41,7 +41,7 @@ private:
         bool d_enabled;
         size_t d_buffer_size;
 	float d_dc_offset;
-	boost::shared_ptr<signal_sample> d_signal;
+	std::shared_ptr<signal_sample> d_signal;
 
         void _build_and_connect_blocks();
 

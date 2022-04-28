@@ -30,7 +30,7 @@ class frequency_compensation_filter : virtual public gr::sync_block
 {
 public:
 	// gr::blocks::streams_to_vector::sptr
-	typedef boost::shared_ptr<frequency_compensation_filter> sptr;
+	typedef std::shared_ptr<frequency_compensation_filter> sptr;
 
 	/*!
 	 * Make a frequency_compensation_filter block
