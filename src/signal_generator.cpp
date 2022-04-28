@@ -623,9 +623,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	centralWidget->setLayout(gridLayout);
 
 	ui->plot->removeWidget(ui->instrumentNotes);
-
-	ui->plot->addWidget(centralWidget);
-
+	ui->plot->addWidget(centralWidget,0,0);
 	ui->plot->addWidget(ui->instrumentNotes, 1, 0);
 }
 

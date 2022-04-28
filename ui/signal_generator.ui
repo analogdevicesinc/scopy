@@ -118,6 +118,12 @@
         </property>
         <item>
          <widget class="QWidget" name="plot_and_notes" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="plot_container" stdset="0">
            <bool>true</bool>
           </property>
@@ -212,7 +218,7 @@
                 <x>0</x>
                 <y>0</y>
                 <width>314</width>
-                <height>592</height>
+                <height>594</height>
                </rect>
               </property>
               <property name="sizePolicy">
