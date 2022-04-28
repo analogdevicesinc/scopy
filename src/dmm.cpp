@@ -353,29 +353,20 @@ libm2k::analog::M2K_RANGE DMM::suggestRange(double volt_max, double volt_min)
 	double lo = 0.0;
 	std::tie(lo, hi) = m_m2k_analogin->getRangeLimits(libm2k::analog::PLUS_MINUS_2_5V);
 
-	// hist interval 10% from range of High gain ~ 250 mV
-	const double percent = 0.1; // 10%
-	const double half_hist_interval = (hi * percent) / 2.0;
-
-	const double hi_hi = hi + half_hist_interval;
-	const double hi_lo = hi - half_hist_interval;
-	const double lo_hi = lo + half_hist_interval;
-	const double lo_lo = lo - half_hist_interval;
-
 	libm2k::analog::M2K_RANGE gain = libm2k::analog::PLUS_MINUS_25V;
 
 	if (volt_max > 0.0) {
-		if (volt_max >= hi_hi) {
+		if (volt_max >= hi) {
 			gain = libm2k::analog::PLUS_MINUS_25V;
-		} else if (volt_max <= hi_lo) {
+		} else {
 			gain = libm2k::analog::PLUS_MINUS_2_5V;
 		}
 	}
 
 	if (volt_min <= 0.0) {
-		if (volt_min >= lo_hi ) {
+		if (volt_min >= lo ) {
 			gain = libm2k::analog::PLUS_MINUS_2_5V;
-		} else if (volt_min <= lo_lo) {
+		} else {
 			gain = libm2k::analog::PLUS_MINUS_25V;
 		}
 	}
