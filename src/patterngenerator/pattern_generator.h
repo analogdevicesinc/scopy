@@ -136,8 +136,6 @@ private:
 	DIOManager *m_diom;
 	uint16_t m_outputMode;
 
-	bool m_isRunning;
-
 	QTimer *m_singleTimer;
 
 	QMap<PatternUI*, QPair<GenericLogicPlotCurve*, QMetaObject::Connection>> m_annotationCurvePatternUiMap;
