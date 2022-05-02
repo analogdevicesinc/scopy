@@ -81,7 +81,6 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	, m_sampleRate(1)
 	, m_diom(diom)
 	, m_outputMode(0)
-	, m_isRunning(false)
 	, m_singleTimer(new QTimer(this))
 {
 	setupUi();
@@ -120,7 +119,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 			checkEnabledChannels();
 
-			if (m_isRunning) {
+			if (m_running) {
 				startStop(false);
 				startStop(true);
 			}
@@ -171,7 +170,7 @@ PatternGenerator::~PatternGenerator()
 
 	disconnect(prefPanel, &Preferences::notify, this, &PatternGenerator::readPreferences);
 
-	if (m_isRunning) {
+	if (m_running) {
 		run_button->setChecked(false);
 	}
 
@@ -703,7 +702,7 @@ void PatternGenerator::checkEnabledChannels()
 
 void PatternGenerator::regenerate()
 {
-	if (m_isRunning) {
+	if (m_running) {
 		startStop(false);
 		startStop(true);
 	}
@@ -773,7 +772,7 @@ void PatternGenerator::startStop(bool start)
 		}
 	}
 
-	m_isRunning = start;
+	m_running = start;
 }
 
 void PatternGenerator::generateBuffer()
