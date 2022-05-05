@@ -64,9 +64,9 @@ SpinBoxA::SpinBoxA(QWidget *parent) : QWidget(parent),
 	        SLOT(onComboboxIndexChanged(int)));
 	connect(ui->SBA_LineEdit, SIGNAL(editingFinished()),
 	        SLOT(onLineEditTextEdited()));
-	connect(ui->SBA_UpButton, SIGNAL(pressed()),
+	connect(ui->SBA_UpButton, SIGNAL(clicked()),
 	        SLOT(onUpButtonPressed()));
-	connect(ui->SBA_DownButton, SIGNAL(pressed()),
+	connect(ui->SBA_DownButton, SIGNAL(clicked()),
 	        SLOT(onDownButtonPressed()));
 
 	connect(this, SIGNAL(valueChanged(double)),
