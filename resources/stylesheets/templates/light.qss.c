@@ -365,6 +365,9 @@ QLabel[general_settings_label=true]{
 
 QFrame[blue_line=true]{ border: 2px solid #4A64FF; }
 
+/* Drag widget 3 vertical lines */
+
+QFrame[drag_widget=true] { border-image:url(:/icons/scopy-light/icons/menu.svg); }
 
 /* General style for blue buttons */
 

@@ -78,22 +78,9 @@ void LogicGroupItem::buildUi()
 	dragWidget->setMaximumSize(QSize(16, 16));
 	dragWidget->setMinimumSize(QSize(16, 16));
 
-	// add 3 lines one on top of the other like ||| but flipped vertically
-	QString color = "";
-	if (QIcon::themeName() == "scopy-default") {
-		color +="border: 2px solid rgba(20, 20, 22, 70);";
-	} else {
-		color +="border: 2px solid rgb(197, 197, 197);";
-	}
-	for (int i = 0; i < 3; ++i) {
-		QFrame *frame = new QFrame(dragWidget);
-		frame->setMaximumSize(QSize(16, 2));
-		frame->setStyleSheet(color);
-		frame->setFrameShadow(QFrame::Plain);
-		frame->setLineWidth(2);
-		frame->setFrameShape(QFrame::HLine);
-		layoutDragWidget->addWidget(frame);
-	}
+	QFrame *frame = new QFrame(dragWidget);
+	frame->setProperty("drag_widget",true);
+	layoutDragWidget->addWidget(frame);
 
 	QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
