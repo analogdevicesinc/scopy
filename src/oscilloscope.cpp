@@ -98,6 +98,9 @@ using namespace libm2k;
 using namespace libm2k::context;
 using namespace std::placeholders;
 
+constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024;
+constexpr int MAX_KERNEL_BUFFERS = 64;
+
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			   ToolMenuItem *toolMenuItem,
 			   QJSEngine *engine, ToolLauncher *parent) :
@@ -159,7 +162,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	if (m_m2k_analogin) {
 		symmBufferMode = make_shared<SymmetricBufferMode>();
 		symmBufferMode->setSampleRates(m_m2k_analogin->getAvailableSampleRates());
-		symmBufferMode->setEntireBufferMaxSize(64000);
+		symmBufferMode->setEntireBufferMaxSize(MAX_BUFFER_SIZE_STREAM);
 		symmBufferMode->setTriggerBufferMaxSize(8192); // 8192 is what hardware supports
 		symmBufferMode->setTimeDivisionCount(plot.xAxisNumDiv());
 	}
@@ -547,7 +550,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				{"h", 36E2}
 				}, tr("Position"),
 				-timeBase->maxValue() * 5,
-				36E2,
+				36E3,
 				true, false, this);
 	voltsPerDiv = new ScaleSpinButton({
 //				{"μVolts", 1E-6},
@@ -563,8 +566,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 				-25, 25, true, false, this);
 
 	plot.setOffsetInterval(-DBL_MAX, DBL_MAX);
-	plot.setTimeTriggerInterval(-timeBase->maxValue() * 5,
-				     timeBase->maxValue() * 5);
+	plot.setTimeTriggerInterval(-36E2,
+				    timeBase->maxValue() * 5);
 
 	ch_ui = new Ui::ChannelSettings();
 	ch_ui->setupUi(ui->channelSettings);
@@ -3594,7 +3597,7 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 		power = ceil(log2(active_plot_sample_count));
 	}
 	fft_plot_size = pow(2, power);
-	fft_size = active_sample_count;
+	fft_size = active_plot_sample_count;
 	onFFT_view_toggled(fft_is_visible);
 
 	updateBufferPreviewer();
@@ -3603,6 +3606,8 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 		toggle_blockchain_flow(true);
 	}
 	resetStreamingFlag(true);
+	double maxT = (1 << 13) * (1.0 / active_sample_rate) - 1.0 / active_sample_rate * active_plot_sample_count / 2.0;
+	plot.setTimeTriggerInterval(-36E2, maxT);
 }
 
 void Oscilloscope::setSinksDisplayOneBuffer(bool val)
@@ -3654,14 +3659,52 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 
 	ch_ui->cmbMemoryDepth->setCurrentIndex(0);
 	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
-		plot_samples_sequentially = true;
-		if (active_sample_count != -active_trig_sample_count) {
-			active_sample_count = ((-active_trig_sample_count + 3) / 4) * 4;
-			setSinksDisplayOneBuffer(false);
-			plot.setXAxisNumPoints(active_plot_sample_count);
-			resetStreamingFlag(true);
+		plot_samples_sequentially = true;	// streaming
+		const int minKernelBuffers = 4;
+		const int oneBufferMaxSize = 2 * 1024 * 1024; // 2M
+		int m_currentKernelBuffers = minKernelBuffers;
+		if (active_trig_sample_count < 0) {
+			active_sample_count = -active_trig_sample_count;
+			m_currentKernelBuffers = (active_plot_sample_count / active_sample_count) + 1;
+			active_sample_count = (( active_sample_count + 3) / 4) * 4;
+			m_currentKernelBuffers = (m_currentKernelBuffers > MAX_KERNEL_BUFFERS) ? MAX_KERNEL_BUFFERS : m_currentKernelBuffers;
+			m_currentKernelBuffers = (m_currentKernelBuffers < minKernelBuffers) ? minKernelBuffers : m_currentKernelBuffers;
+		} else {			// still streaming but without trigger contraints
+			/* ensure we have the minimum amount of kernel buffers to fit the buffer */
+			while (active_plot_sample_count > (m_currentKernelBuffers * oneBufferMaxSize)
+					&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+				m_currentKernelBuffers++;
+			}
+
+			/* ensure we don't spend more than 100ms on a acquiring a buffer if we can
+			 * further divide it into smaller buffers */
+			const double maxCaptureDuration = 0.1;
+			while (((static_cast<double>(active_plot_sample_count) / active_sample_rate)
+					/ static_cast<double>(m_currentKernelBuffers)) > maxCaptureDuration
+					&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+				m_currentKernelBuffers++;
+			}
+			uint64_t chunk_size = active_plot_sample_count / m_currentKernelBuffers;
+			uint64_t chunkSizeBeforeAdjust = chunk_size;
+			chunk_size = 4 * (chunk_size / 4);
+
+			/* If the chunk_size was not divisible by 4 in the first place we would get a smaller value for it. */
+			if (chunk_size + 4 <= oneBufferMaxSize && chunkSizeBeforeAdjust != chunk_size) {
+				chunk_size += 4;
+			}
+
+			// If the buffer size is > 64 * 4M we need to cap the chunk_size to 4M
+			if (chunk_size > oneBufferMaxSize) {
+				chunk_size = oneBufferMaxSize;
+			}
+			active_sample_count = chunk_size;
 		}
+		setSinksDisplayOneBuffer(false);
+		plot.setXAxisNumPoints(active_plot_sample_count);
+		resetStreamingFlag(true);
+		iio->set_kernel_buffer_count(m_currentKernelBuffers);
 	} else {
+		iio->set_kernel_buffer_count();
 		plot_samples_sequentially = false;
 		setSinksDisplayOneBuffer(true);
 		plot.setXAxisNumPoints(0);
@@ -3698,6 +3741,8 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 			timePosition->setValue(-params.timePos);
 	}
 
+	iio->set_device_timeout((active_sample_count / active_sample_rate) * 1000 + 100);
+
 	for (unsigned int i = 0; i < nb_channels; i++) {
 		iio->set_buffer_size(ids[i], active_sample_count);
 		dc_cancel.at(i)->set_buffer_size(active_sample_count);
@@ -3707,10 +3752,6 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		mixed_source->set_buffer_size(active_sample_count);
 		setDigitalPlotCurvesParams();
 	}
-
-
-	iio->set_device_timeout((active_sample_count / active_sample_rate) * 1000 + 100);
-
 
 	if (started) {
 		iio->unlock();
@@ -3729,13 +3770,16 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		power = ceil(log2(active_plot_sample_count));
 	}
 	fft_plot_size = pow(2, power);
-	fft_size = active_sample_count;
+	fft_size = active_plot_sample_count;
 	onFFT_view_toggled(fft_is_visible);
 
 	// Change the sensitivity of time position control
 	timePosition->setStep(value / 10);
 
 	updateBufferPreviewer();
+
+	double maxT = (1 << 13) * (1.0 / active_sample_rate) - 1.0 / active_sample_rate * active_plot_sample_count / 2.0;
+	plot.setTimeTriggerInterval(-36E2, maxT);
 }
 
 bool adiscope::Oscilloscope::gainUpdateNeeded()
