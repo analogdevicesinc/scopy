@@ -119,6 +119,7 @@ private:
 	QMainWindow* m_centralMainWindow;
 	QList<QDockWidget*> m_docksList;
 	QList<QWidget*> m_centralFixedWidgets;
+	QMap<int,GenericMenu*> m_menuList;
 };
 } // namespace gui
 } // namespace scopy
