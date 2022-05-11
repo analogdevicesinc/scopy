@@ -18,7 +18,7 @@ jobs:
             buildname: 'ubuntu-build'
             triplet: x64-linux
             compiler: clang_64
-            qt: '5.14.2'
+            qt: '5.15.2'
 
     steps:
 
@@ -43,7 +43,7 @@ jobs:
     - name: Install dependencies
       run: |
             chmod +x ${GITHUB_WORKSPACE}/CI/appveyor/install_ubuntu_20_deps.sh
-            ${GITHUB_WORKSPACE}/CI/appveyor/install_ubuntu_20_deps.sh ${GITHUB_WORKSPACE}/Qt/5.14.2
+            ${GITHUB_WORKSPACE}/CI/appveyor/install_ubuntu_20_deps.sh ${GITHUB_WORKSPACE}/Qt/5.15.2
 
     - name: Build Scopy
       run: |
@@ -73,7 +73,7 @@ jobs:
             buildname: 'clang-tidy'
             triplet: x64-linux
             compiler: clang_64
-            qt: '5.14.2'
+            qt: '5.15.2'
 
     steps:
     - name: Checkout Scopy source code
