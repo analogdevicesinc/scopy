@@ -37,6 +37,8 @@ public:
 	void setLineVisible(bool visible);
 
 	void setContent(QWidget* content);
+	QWidget* getContentWidget();
+
 };
 } // namespace gui
 } // namespace scopy
