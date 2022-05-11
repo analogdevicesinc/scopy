@@ -92,6 +92,7 @@ void ToolView::toggleRightMenu(CustomPushButton* btn, bool checked)
 
 	if (id != -m_generalSettingsMenuId) {
 		if (!m_menuOrder.contains(btn)) {
+			m_ui->stackedWidget->addWidget(m_menuList[-id]);
 			m_menuOrder.push_back(btn);
 		} else {
 			m_menuOrder.removeOne(btn);
@@ -111,7 +112,7 @@ void ToolView::settingsPanelUpdate(int id)
 	if (id >= 0) {
 		m_ui->stackedWidget->setCurrentIndex(0);
 	} else {
-		m_ui->stackedWidget->setCurrentIndex(-id);
+		m_ui->stackedWidget->setCurrentWidget(m_menuList[-id]);
 	}
 
 	for (int i = 0; i < m_ui->stackedWidget->count(); i++) {
@@ -257,7 +258,8 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 		}
 
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		id = chId;
+		m_menuList[chId] = menu;
 	}
 
 	m_group.addButton(ch->menuButton());
