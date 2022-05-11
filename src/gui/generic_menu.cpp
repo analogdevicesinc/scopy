@@ -40,10 +40,11 @@ void GenericMenu::setMenuHeader(const QString& title, const QColor* lineColor, b
 
 void GenericMenu::insertSection(SubsectionSeparator* section)
 {
-	BaseMenuItem* item = new BaseMenuItem(this);
+	BaseMenuItem* item = new BaseMenuItem(m_menu);
 	item->setWidget(section);
 
 	m_menu->insertMenuItem(item, m_lastOpenPosition);
 
 	m_lastOpenPosition++;
 }
+
