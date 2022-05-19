@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Pull the Docker Image
-      run: docker pull analogdevices/scopy-build:mingw64
+      run: docker pull analogdevices/scopy-build:mingw64-qt6
       
     - name: Run Docker Image
       shell: cmd
@@ -43,7 +43,7 @@ jobs:
                 -e GITHUB_RUN_ID=%GITHUB_RUN_ID% ^
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
-                analogdevices/scopy-build:mingw64 C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
+                analogdevices/scopy-build:mingw64-qt6 C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
 
     - uses: actions/upload-artifact@v2
       with:
