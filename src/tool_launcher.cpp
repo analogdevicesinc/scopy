@@ -44,7 +44,6 @@
 
 #include <QDebug>
 #include <QtConcurrentRun>
-#include <QSignalTransition>
 #include <QMessageBox>
 #include <QTimer>
 #include <QSettings>

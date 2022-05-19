@@ -118,7 +118,6 @@ if(ANDROID)
 	find_package(Qt${QT_MAJOR_VERSION} COMPONENTS AndroidExtras REQUIRED PATHS $ENV{Qt${QT_MAJOR_VERSION}_HOME})
 endif()
 if ("${QT_MAJOR_VERSION}" STREQUAL "6")
-	find_package(Qt${QT_MAJOR_VERSION} REQUIRED COMPONENTS StateMachine)
 	# Generate .qm files from the .ts files
 	qt6_add_translation(QM_FILES ${TS_FILES})
 else()
@@ -210,8 +209,6 @@ endif()
 find_package(PkgConfig)
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 pkg_check_modules(GLIB REQUIRED glib-2.0)
-pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
-pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
@@ -471,9 +468,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		libm2k::libm2k
 )
 
-if ("${QT_MAJOR_VERSION}" STREQUAL "6")
-	target_link_libraries(${PROJECT_NAME} LINK_PRIVATE Qt${QT_MAJOR_VERSION}::StateMachine)
-endif()
 if (ANDROID)
 	target_link_libraries(${PROJECT_NAME} LINK_PRIVATE Qt${QT_MAJOR_VERSION}::AndroidExtras)
 endif()
