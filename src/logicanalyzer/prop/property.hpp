@@ -41,16 +41,11 @@
 #ifndef PULSEVIEW_PV_PROP_PROPERTY_HPP
 #define PULSEVIEW_PV_PROP_PROPERTY_HPP
 
-#include <glib.h>
-// Suppress warnings due to use of deprecated std::auto_ptr<> by glibmm.
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-#include <glibmm.h>
-G_GNUC_END_IGNORE_DEPRECATIONS
-
 #include <functional>
 
 #include <QString>
 #include <QWidget>
+#include <QVariant>
 
 using std::function;
 
@@ -64,8 +59,8 @@ class Property : public QObject
 	Q_OBJECT;
 
 public:
-	typedef function<Glib::VariantBase ()> Getter;
-	typedef function<void (Glib::VariantBase)> Setter;
+	typedef function<QVariant ()> Getter;
+	typedef function<void (QVariant)> Setter;
 
 protected:
 	Property(QString name, QString desc, Getter getter, Setter setter);
@@ -74,8 +69,8 @@ public:
 	const QString& name() const;
 	const QString& desc() const;
 
-	Glib::VariantBase get() const;
-	void set(Glib::VariantBase val);
+	QVariant get() const;
+	void set(QVariant val);
 
 	virtual QWidget* get_widget(QWidget *parent, bool auto_commit = false) = 0;
 	virtual bool labeled_widget() const;

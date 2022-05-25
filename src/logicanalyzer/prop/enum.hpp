@@ -51,8 +51,6 @@
 using std::pair;
 using std::vector;
 
-Q_DECLARE_METATYPE(Glib::VariantBase);
-
 class QComboBox;
 class QLabel;
 class QSlider;
@@ -66,7 +64,7 @@ class Enum : public Property
 
 public:
 	Enum(QString name, QString desc,
-		vector<pair<Glib::VariantBase, QString> > values,
+		vector<pair<QVariant, QString> > values,
 		Getter getter, Setter setter);
 
 	virtual ~Enum() = default;
@@ -81,7 +79,7 @@ private Q_SLOTS:
 	void on_value_changed(int);
 
 private:
-	const vector< pair<Glib::VariantBase, QString> > values_;
+	const vector< pair<QVariant, QString> > values_;
 	bool is_range_;
 
 	QComboBox *selector_;

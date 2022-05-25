@@ -138,19 +138,13 @@ void Binding::update_property_widgets()
 	}
 }
 
-QString Binding::print_gvariant(Glib::VariantBase gvar)
+QString Binding::print_variant(QVariant qvar)
 {
-	QString s;
-
-	if (!gvar.gobj())
-		s = QString::fromStdString("(null)");
-	else if (gvar.is_of_type(Glib::VariantType("s")))
-		s = QString::fromStdString(
-			Glib::VariantBase::cast_dynamic<Glib::Variant<string>>(gvar).get());
-	else
-		s = QString::fromStdString(gvar.print());
-
-	return s;
+	if (!qvar.isValid()) {
+		return QString::fromStdString("(null)");
+	} else {
+		return qvar.toString();
+	}
 }
 
 void Binding::on_help_clicked()
