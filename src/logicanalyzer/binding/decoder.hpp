@@ -67,14 +67,15 @@ public:
 	Decoder(adiscope::AnnotationDecoder *annDec,
 	shared_ptr<adiscope::logic::Decoder> decoder);
 
+	static QVariant gVariantToQVariant(GVariant *value);
 private:
 	static shared_ptr<adiscope::prop::Property> bind_enum(const QString &name,
 		const QString &desc, const srd_decoder_option *option,
 		prop::Property::Getter getter, prop::Property::Setter setter);
 
-	Glib::VariantBase getter(const char *id);
+	QVariant getter(const char *id);
 
-	void setter(const char *id, Glib::VariantBase value);
+	void setter(const char *id, QVariant value);
 
 private:
 	adiscope::AnnotationDecoder *m_annDecoder;

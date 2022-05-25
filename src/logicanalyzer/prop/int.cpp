@@ -60,11 +60,13 @@ Int::Int(QString name,
 	QString suffix,
 	optional< pair<int64_t, int64_t> > range,
 	Getter getter,
-	Setter setter) :
+	Setter setter,
+	GVariantClass gvarClass) :
 	Property(name, desc, getter, setter),
 	suffix_(suffix),
 	range_(range),
-	spin_box_(nullptr)
+	spin_box_(nullptr),
+	gvar_class_type_(gvarClass)
 {
 }
 
@@ -86,32 +88,31 @@ QWidget* Int::get_widget(QWidget *parent, bool auto_commit)
 		return nullptr;
 	}
 
-	GVariant *value = value_.gobj();
-	if (!value)
+	QVariant variant = value_;
+	if (!variant.isValid())
 		return nullptr;
 
 	spin_box_ = new QSpinBox(parent);
 	spin_box_->setSuffix(suffix_);
 
-	const GVariantType *const type = g_variant_get_type(value);
+	QVariant::Type type = variant.type();
 	assert(type);
 
-	if (g_variant_type_equal(type, G_VARIANT_TYPE_BYTE)) {
+	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
 		range_min = 0, range_max = UINT8_MAX;
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT16)) {
-		range_min = INT16_MIN, range_max = INT16_MAX;
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT16)) {
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT16) {
+		range_min = 0, range_max = INT16_MAX;
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
 		range_min = 0, range_max = UINT16_MAX;
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT32)) {
-		range_min = INT32_MIN, range_max = INT32_MAX;
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT32)) {
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT32) {
+		range_min = 0, range_max = INT32_MAX;
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
 		range_min = 0, range_max = UINT32_MAX;
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT64)) {
-		range_min = INT64_MIN, range_max = INT64_MAX;
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT64)) {
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT64) {
+		range_min = 0, range_max = INT64_MAX;
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
 		range_min = 0, range_max = UINT64_MAX;
 	} else {
-		// Unexpected value type.
 		assert(false);
 	}
 
@@ -149,30 +150,29 @@ void Int::update_widget()
 		return;
 	}
 
-	GVariant *value = value_.gobj();
-	assert(value);
+	QVariant variant = value_;
+	assert(variant.isValid());
 
-	const GVariantType *const type = g_variant_get_type(value);
+	QVariant::Type type = variant.type();
 	assert(type);
 
 	int64_t int_val = 0;
 
-	if (g_variant_type_equal(type, G_VARIANT_TYPE_BYTE)) {
-		int_val = g_variant_get_byte(value);
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT16)) {
-		int_val = g_variant_get_int16(value);
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT16)) {
-		int_val = g_variant_get_uint16(value);
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT32)) {
-		int_val = g_variant_get_int32(value);
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT32)) {
-		int_val = g_variant_get_uint32(value);
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT64)) {
-		int_val = g_variant_get_int64(value);
-	} else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT64)) {
-		int_val = g_variant_get_uint64(value);
+	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
+		int_val = variant.value<uint8_t>();
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT16) {
+		int_val = variant.value<int16_t>();
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
+		int_val = variant.value<uint16_t>();
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT32) {
+		int_val = variant.value<int32_t>();
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
+		int_val = variant.value<uint32_t>();
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT64) {
+		int_val = variant.value<int64_t>();
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
+		int_val = variant.value<uint64_t>();
 	} else {
-		// Unexpected value type.
 		assert(false);
 	}
 
@@ -186,32 +186,31 @@ void Int::commit()
 	if (!spin_box_)
 		return;
 
-	GVariant *new_value = nullptr;
-	const GVariantType *const type = g_variant_get_type(value_.gobj());
+	QVariant variant = value_;
+	assert(variant.isValid());
+
+	QVariant::Type type = variant.type();
 	assert(type);
 
-	if (g_variant_type_equal(type, G_VARIANT_TYPE_BYTE))
-		new_value = g_variant_new_byte(spin_box_->value());
-	else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT16))
-		new_value = g_variant_new_int16(spin_box_->value());
-	else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT16))
-		new_value = g_variant_new_uint16(spin_box_->value());
-	else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT32))
-		new_value = g_variant_new_int32(spin_box_->value());
-	else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT32))
-		new_value = g_variant_new_uint32(spin_box_->value());
-	else if (g_variant_type_equal(type, G_VARIANT_TYPE_INT64))
-		new_value = g_variant_new_int64(spin_box_->value());
-	else if (g_variant_type_equal(type, G_VARIANT_TYPE_UINT64))
-		new_value = g_variant_new_uint64(spin_box_->value());
-	else {
-		// Unexpected value type.
+	auto spin_val = spin_box_->value();
+
+	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
+		value_ = QVariant::fromValue<uint8_t>(spin_val);
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT16) {
+		value_ = QVariant::fromValue<int16_t>(spin_val);
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
+		value_ = QVariant::fromValue<uint16_t>(spin_val);
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT32) {
+		value_ = QVariant::fromValue<int32_t>(spin_val);
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
+		value_ = QVariant::fromValue<uint32_t>(spin_val);
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT64) {
+		value_ = QVariant::fromValue<int64_t>(spin_val);
+	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
+		value_ = QVariant::fromValue<uint64_t>(spin_val);
+	} else {
 		assert(false);
 	}
-
-	assert(new_value);
-
-	value_ = Glib::VariantBase(new_value);
 
 	setter_(value_);
 }

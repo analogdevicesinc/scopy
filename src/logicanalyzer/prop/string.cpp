@@ -48,8 +48,6 @@
 
 using std::string;
 
-using Glib::ustring;
-
 namespace adiscope {
 namespace prop {
 
@@ -71,8 +69,8 @@ QWidget* String::get_widget(QWidget *parent, bool auto_commit)
 		return nullptr;
 
 	try {
-		Glib::VariantBase variant = getter_();
-		if (!variant.gobj())
+		QVariant variant = getter_();
+		if (!variant.isValid())
 			return nullptr;
     } catch (const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
@@ -95,7 +93,7 @@ void String::update_widget()
 	if (!line_edit_)
 		return;
 
-	Glib::VariantBase variant;
+	QVariant variant;
 
 	try {
 		variant = getter_();
@@ -104,12 +102,10 @@ void String::update_widget()
 		return;
 	}
 
-	assert(variant.gobj());
+	assert(variant.isValid());
 
-	string value = Glib::VariantBase::cast_dynamic<Glib::Variant<ustring>>(
-		variant).get();
-
-	line_edit_->setText(QString::fromStdString(value));
+	QString value = variant.toString();
+	line_edit_->setText(value);
 }
 
 void String::commit()
@@ -119,8 +115,8 @@ void String::commit()
 	if (!line_edit_)
 		return;
 
-	QByteArray ba = line_edit_->text().toLocal8Bit();
-	setter_(Glib::Variant<ustring>::create(ba.data()));
+	QString ba = line_edit_->text();
+	setter_(QVariant(ba));
 }
 
 void String::on_text_edited(const QString&)

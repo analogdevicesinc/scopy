@@ -77,8 +77,8 @@ QWidget* Double::get_widget(QWidget *parent, bool auto_commit)
 		return nullptr;
 
 	try {
-		Glib::VariantBase variant = getter_();
-		if (!variant.gobj())
+		QVariant variant = getter_();
+		if (!variant.isValid())
 			return nullptr;
     } catch (const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
@@ -107,7 +107,7 @@ void Double::update_widget()
 	if (!spin_box_)
 		return;
 
-	Glib::VariantBase variant;
+	QVariant variant;
 
 	try {
 		variant = getter_();
@@ -116,10 +116,9 @@ void Double::update_widget()
 		return;
 	}
 
-	assert(variant.gobj());
+	assert(variant.isValid());
 
-	double value = Glib::VariantBase::cast_dynamic<Glib::Variant<double>>(
-		variant).get();
+	double value = variant.toDouble();
 	spin_box_->setValue(value);
 }
 
@@ -130,7 +129,7 @@ void Double::commit()
 	if (!spin_box_)
 		return;
 
-	setter_(Glib::Variant<double>::create(spin_box_->value()));
+	setter_(QVariant(spin_box_->value()));
 }
 
 void Double::on_value_changed(double)

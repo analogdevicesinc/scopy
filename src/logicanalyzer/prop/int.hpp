@@ -46,6 +46,7 @@
 #include <boost/optional.hpp>
 
 #include "property.hpp"
+#include <glib.h>
 
 using std::pair;
 
@@ -61,7 +62,7 @@ class Int : public Property
 public:
 	Int(QString name, QString desc, QString suffix,
 		boost::optional< pair<int64_t, int64_t> > range,
-		Getter getter, Setter setter);
+		Getter getter, Setter setter, GVariantClass gvarClass);
 
 	virtual ~Int() = default;
 
@@ -77,8 +78,9 @@ private:
 	const QString suffix_;
 	const boost::optional< pair<int64_t, int64_t> > range_;
 
-	Glib::VariantBase value_;
+	QVariant value_;
 	QSpinBox *spin_box_;
+	GVariantClass gvar_class_type_;
 };
 
 }  // namespace prop
