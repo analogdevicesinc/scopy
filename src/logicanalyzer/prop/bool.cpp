@@ -63,8 +63,8 @@ QWidget* Bool::get_widget(QWidget *parent, bool auto_commit)
 		return nullptr;
 
 	try {
-		Glib::VariantBase variant = getter_();
-		if (!variant.gobj())
+		QVariant variant = getter_();
+		if (!variant.isValid())
 			return nullptr;
     } catch (const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
@@ -93,7 +93,7 @@ void Bool::update_widget()
 	if (!check_box_)
 		return;
 
-	Glib::VariantBase variant;
+	QVariant variant;
 
 	try {
 		variant = getter_();
@@ -102,10 +102,8 @@ void Bool::update_widget()
 		return;
 	}
 
-	assert(variant.gobj());
-	bool value = Glib::VariantBase::cast_dynamic<Glib::Variant<bool>>(
-		variant).get();
-
+	assert(variant.isValid());
+	bool value = variant.toBool();
 	check_box_->setCheckState(value ? Qt::Checked : Qt::Unchecked);
 }
 
@@ -116,7 +114,7 @@ void Bool::commit()
 	if (!check_box_)
 		return;
 
-	setter_(Glib::Variant<bool>::create(check_box_->checkState() == Qt::Checked));
+	setter_(QVariant(check_box_->checkState() == Qt::Checked));
 }
 
 void Bool::on_state_changed(int)

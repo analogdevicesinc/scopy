@@ -42,11 +42,6 @@
 #define PULSEVIEW_PV_BINDING_BINDING_HPP
 
 #include <glib.h>
-// Suppress warnings due to use of deprecated std::auto_ptr<> by glibmm.
-G_GNUC_BEGIN_IGNORE_DEPRECATIONS
-#include <glibmm.h>
-G_GNUC_END_IGNORE_DEPRECATIONS
-
 #include <map>
 #include <memory>
 #include <vector>
@@ -85,7 +80,7 @@ public:
 
 	void update_property_widgets();
 
-	static QString print_gvariant(Glib::VariantBase gvar);
+	static QString print_variant(QVariant gvar);
 
 protected Q_SLOTS:
 	void on_help_clicked();
