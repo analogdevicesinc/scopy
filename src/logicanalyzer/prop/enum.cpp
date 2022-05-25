@@ -63,7 +63,7 @@ namespace adiscope {
 namespace prop {
 
 Enum::Enum(QString name, QString desc,
-	vector<pair<Glib::VariantBase, QString> > values,
+	vector<pair<QVariant, QString> > values,
 	Getter getter, Setter setter) :
 	Property(name, desc, getter, setter),
 	values_(values),
@@ -79,15 +79,20 @@ Enum::Enum(QString name, QString desc,
 	vector<double> deltas;
 	double prev_value = 0;
 
-	for (const pair<Glib::VariantBase, QString> &v : values_) {
-		gdouble value;
-		if (v.first.is_of_type(Glib::VariantType("d"))) {
-			g_variant_get((GVariant*)(v.first.gobj()), "d", &value);
-		} else if (v.first.is_of_type(Glib::VariantType("(dd)"))) {
-			gdouble dummy;
-			g_variant_get((GVariant*)(v.first.gobj()), "(dd)", &value, &dummy);
-		} else
-			break; // Type not d or (dd), so not a range that we can handle
+	for (const pair<QVariant, QString> &v : values_) {
+		double value;
+		auto type = v.first.type();
+		if (type == QMetaType::Double) {
+			value = v.first.toDouble();
+		} else {
+			bool pairDD = v.first.canConvert<std::pair<double, double>>();
+			if (pairDD) {
+				auto pair = v.first.value<std::pair<double, double>>();
+				value = pair.first;
+			} else {
+				break; // Type not d or (dd), so not a range that we can handle
+			}
+		}
 		deltas.push_back(value - prev_value);
 		prev_value = value;
 	}
@@ -124,16 +129,16 @@ QWidget* Enum::get_widget(QWidget *parent, bool auto_commit)
 	if (!getter_)
 		return nullptr;
 
-	Glib::VariantBase variant;
+	QVariant variant;
 
 	try {
 		 variant = getter_();
-    } catch (const std::exception &e) {
+	} catch (const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return nullptr;
 	}
 
-	if (!variant.gobj())
+	if (!variant.isValid())
 		return nullptr;
 
 	if (is_range_) {
@@ -171,8 +176,8 @@ QWidget* Enum::get_widget(QWidget *parent, bool auto_commit)
 
 		selector_ = new QComboBox(parent);
 		for (unsigned int i = 0; i < values_.size(); i++) {
-			const pair<Glib::VariantBase, QString> &v = values_[i];
-			selector_->addItem(v.second, qVariantFromValue(v.first));
+			const pair<QVariant, QString> &v = values_[i];
+			selector_->addItem(v.second, v.first);
 		}
 
 		update_widget();
@@ -187,16 +192,16 @@ QWidget* Enum::get_widget(QWidget *parent, bool auto_commit)
 
 void Enum::update_widget()
 {
-	Glib::VariantBase variant;
+	QVariant variant;
 
 	try {
 		variant = getter_();
-    } catch (const std::exception &e) {
+	} catch (const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return;
 	}
 
-	assert(variant.gobj());
+	assert(variant.isValid());
 
 	if (is_range_) {
 
@@ -205,31 +210,30 @@ void Enum::update_widget()
 			return;
 
 		for (unsigned int i = 0; i < values_.size(); i++) {
-			const pair<Glib::VariantBase, QString> &v = values_[i];
-
-			// g_variant_equal() doesn't handle floating point properly
-			if (v.first.is_of_type(Glib::VariantType("d"))) {
-				gdouble a, b;
-				g_variant_get(variant.gobj(), "d", &a);
-				g_variant_get((GVariant*)(v.first.gobj()), "d", &b);
+			const pair<QVariant, QString> &v = values_[i];
+			if (v.first.type() == QMetaType::Double) {
+				double a = variant.toDouble();
+				double b = v.first.toDouble();
 
 				if (abs(a - b) <= 2 * DBL_EPSILON) {
 					slider_->setValue(i);
 					slider_label_->setText(v.second);
 				}
 			} else {
-				// Check for "(dd)" type and handle it if it's found
-				if (v.first.is_of_type(Glib::VariantType("(dd)"))) {
-					gdouble a1, a2, b1, b2;
-					g_variant_get(variant.gobj(), "(dd)", &a1, &a2);
-					g_variant_get((GVariant*)(v.first.gobj()), "(dd)", &b1, &b2);
-
-					if ((abs(a1 - b1) <= 2 * DBL_EPSILON) && \
-						(abs(a2 - b2) <= 2 * DBL_EPSILON)) {
+				bool pairDD = v.first.canConvert<std::pair<double, double>>();
+				if (pairDD) {
+					double a1, a2, b1, b2;
+					auto pair_old = variant.value<std::pair<double, double>>();
+					a1 = pair_old.first;
+					a2 = pair_old.second;
+					auto pair_new = v.first.value<std::pair<double, double>>();
+					b1 = pair_new.first;
+					b2 = pair_new.second;
+					if ((abs(a1 - b1) <= 2 * DBL_EPSILON) &&
+							(abs(a2 - b2) <= 2 * DBL_EPSILON)) {
 						slider_->setValue(i);
 						slider_label_->setText(v.second);
 					}
-
 				} else {
 					qWarning() << "Enum property" << name() << "encountered unsupported type";
 					return;
@@ -243,29 +247,33 @@ void Enum::update_widget()
 			return;
 
 		for (unsigned int i = 0; i < values_.size(); i++) {
-			const pair<Glib::VariantBase, QString> &v = values_[i];
-
-			// g_variant_equal() doesn't handle floating point properly
-			if (v.first.is_of_type(Glib::VariantType("d"))) {
-				gdouble a, b;
-				g_variant_get(variant.gobj(), "d", &a);
-				g_variant_get((GVariant*)(v.first.gobj()), "d", &b);
-				if (abs(a - b) <= 2 * DBL_EPSILON)
+			const pair<QVariant, QString> &v = values_[i];
+			if (v.first.type() == QMetaType::Double) {
+				double a = variant.toDouble();
+				double b = v.first.toDouble();
+				if (abs(a - b) <= 2 * DBL_EPSILON) {
 					selector_->setCurrentIndex(i);
+				}
 			} else {
-				// Check for "(dd)" type and handle it if it's found
-				if (v.first.is_of_type(Glib::VariantType("(dd)"))) {
-					gdouble a1, a2, b1, b2;
-					g_variant_get(variant.gobj(), "(dd)", &a1, &a2);
-					g_variant_get((GVariant*)(v.first.gobj()), "(dd)", &b1, &b2);
-					if ((abs(a1 - b1) <= 2 * DBL_EPSILON) && \
-						(abs(a2 - b2) <= 2 * DBL_EPSILON))
+				bool pairDD = v.first.canConvert<std::pair<double, double>>();
+				if (pairDD) {
+					double a1, a2, b1, b2;
+					auto pair_old = variant.value<std::pair<double, double>>();
+					a1 = pair_old.first;
+					a2 = pair_old.second;
+					auto pair_new = v.first.value<std::pair<double, double>>();
+					b1 = pair_new.first;
+					b2 = pair_new.second;
+					if ((abs(a1 - b1) <= 2 * DBL_EPSILON) &&
+						(abs(a2 - b2) <= 2 * DBL_EPSILON)) {
 						selector_->setCurrentIndex(i);
-
-				} else
-					// Handle all other types
-					if (v.first.equal(variant))
+					}
+				} else {
+//					Handle all other types
+					if (v.first == variant) {
 						selector_->setCurrentIndex(i);
+					}
+				}
 			}
 		}
 	}
@@ -292,7 +300,7 @@ void Enum::commit()
 		if (index < 0)
 			return;
 
-		setter_(selector_->itemData(index).value<Glib::VariantBase>());
+		setter_(selector_->itemData(index).value<QVariant>());
 
 		// The combo box needs no update, it already shows the current value
 		// by definition: the user picked it

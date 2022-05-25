@@ -61,12 +61,12 @@ const QString& Property::desc() const
 	return desc_;
 }
 
-Glib::VariantBase Property::get() const
+QVariant Property::get() const
 {
 	return getter_();
 }
 
-void Property::set(Glib::VariantBase val)
+void Property::set(QVariant val)
 {
 	return setter_(val);
 }
