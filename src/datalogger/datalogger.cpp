@@ -19,6 +19,8 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 							   ToolMenuItem *toolMenuItem,	QJSEngine *engine, ToolLauncher *parent):
 	Tool(ctx, toolMenuItem, new DataLogger_API(this), "DataLogger", parent),
 	m_timer(new QTimer(this)),
+	m_elapsed(new QElapsedTimer()),
+	readerThread(new DataLoggerReaderThread()),
 	m_context(contextOpen(ctx, ""))
 {
 	run_button = nullptr;
@@ -42,50 +44,83 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 
 	m_toolView = adiscope::gui::ToolViewBuilder(recepie,m_monitorChannelManager,parent).build();
 
+	m_timer->setSingleShot(true);
+	//on timeout read on thread
+	connect(m_timer, &QTimer::timeout, this, [=]() {
+		if ( !m_elapsed->isValid() ){
+			m_elapsed->start();
+		}
+		readerThread->start();
+	});
+
+	connect(readerThread, &DataLoggerReaderThread::finished, this, [=]() {
+		//after read is done check if another read is needed
+		if (m_toolView->getRunBtn()->isChecked()) {
+			int newInterval = VALUE_READING_TIME_INTERVAL - m_elapsed->elapsed();
+			m_elapsed->invalidate();
+			if (newInterval < 0) {
+				newInterval = 0;
+			}
+			m_timer->start(newInterval);
+		}
+
+		if (m_toolView->getSingleBtn()->isChecked()) {
+			m_toolView->getSingleBtn()->setChecked(false);
+		}
+	});
+
 	m_generalSettingsMenu = generateMenu("General settings", new QColor("#4a64ff"));
 	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu,true);
 
 	m_dmmList = getDmmList(m_context);
 
-	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=](bool toggled){
-		toggleTimer(toggled);
+	connect(this, &DataLogger::recordingIntervalChanged, this , [=](double interval){
+		VALUE_READING_TIME_INTERVAL = interval;
+		recording_timer->setValue(interval/1000);
+	});
 
+	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=](bool toggled){
 		dataLogger->setIsRunningOn(m_toolView->getRunBtn()->isChecked());
+
 
 		//update status and if needed start data logging
 		if (!m_toolView->getRunBtn()->isChecked()) {
 			m_monitorChannelManager->setToolStatus("Stopped");
 			showAllSWitch->setEnabled(true);
+			readerThread->setDataLoggerStatus(false);
 
 		} else {
 			if (dataLogger->isDataLoggerOn()) {
 				m_monitorChannelManager->setToolStatus("Data Logging");
+				readerThread->setDataLoggerStatus(true);
 			} else {
 				m_monitorChannelManager->setToolStatus("Running");
 			}
 		}
+
+		if (toggled) {
+			m_timer->start(VALUE_READING_TIME_INTERVAL);
+		} else {
+			//if thread is running after current action on thread is done stop thread
+			if (readerThread->isRunning()) {
+				readerThread->quit();
+				readerThread->wait();
+			}
+		}
 	});
 
-	connect(m_toolView->getRunBtn(), SIGNAL(toggled(bool)),runButton(), SLOT(setChecked(bool)));
-	connect(runButton(), SIGNAL(toggled(bool)), m_toolView->getRunBtn(),SLOT(setChecked(bool)));
-	connect(m_toolView->getSingleBtn(), &QPushButton::toggled,this, &DataLogger::readChannelValues);
-	connect(m_toolView->getSingleBtn(), &QPushButton::clicked,this, [=](bool checked){
-		m_toolView->getSingleBtn()->setChecked(!checked);
-		m_toolView->getRunBtn()->toggled(false);
-	});
+	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, [=](bool toggled){
+		if (toggled) {
+			if (m_toolView->getRunBtn()->isChecked()) {
+				m_toolView->getRunBtn()->toggled(false);
+			}
 
+			m_timer->start(0);
+		}
+	});
 
 	m_customColGrid = new CustomColQGridLayout(100,this);
-
 	m_toolView->addFixedCentralWidget(m_customColGrid,0,0,0,0);
-
-	connect(m_timer, &QTimer::timeout, this, &DataLogger::readChannelValues);
-	connect(this, &DataLogger::recordingIntervalChanged, this , [=](double interval){
-		VALUE_READING_TIME_INTERVAL = interval;
-		m_timer->setInterval(interval);
-		recording_timer->setValue(interval/1000);
-	});
-
 	setCentralWidget(getToolView());
 
 	initMonitorToolView();
@@ -139,7 +174,7 @@ void DataLogger::initMonitorToolView()
 			monitor->setRecordingInterval(VALUE_READING_TIME_INTERVAL/1000);
 			monitor->setHistoryDuration(10);
 
-			connect(this, &DataLogger::channelValueUpdated, monitor, [=](int chId, double value,QString nameOfUnitOfMeasure,QString symbolOfUnitOfMeasure){
+			connect(readerThread, &DataLoggerReaderThread::updateChannelData, monitor, [=](int chId, double value,QString nameOfUnitOfMeasure,QString symbolOfUnitOfMeasure){
 				if (chId == monitor->getID()) {
 					monitor->updateValue(value, nameOfUnitOfMeasure, symbolOfUnitOfMeasure);
 				}
@@ -173,17 +208,21 @@ void DataLogger::initMonitorToolView()
 
 			int widgetId = m_customColGrid->addQWidgetToList(monitor);
 
+			readerThread->addChannel(chId, channel.id,dmm);
+
 			// logic for enable/disable channels
 			connect(ch_widget, &ChannelWidget::enabled,this, [=](bool enabled){
+
+				readerThread->channelToggled(chId,enabled);
 				if (enabled) {
 					m_customColGrid->addWidget(widgetId);
-					m_activeChannels[chId].first.dmmId = channel.id;
-					m_activeChannels[chId].first.dmm = dmm;
-					m_activeChannels[chId].second = monitor;
+					m_activeChannels[chId] = monitor;
 
 				} else {
 					m_activeChannels.remove(chId);
 					m_customColGrid->removeWidget(widgetId);
+
+
 				}
 			});
 			ch_widget->enableButton()->click();
@@ -192,63 +231,6 @@ void DataLogger::initMonitorToolView()
 		m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget,channelList);
 	}
 	setUpdatesEnabled(true);
-}
-
-adiscope::gui::ToolView* DataLogger::getToolView()
-{
-	return m_toolView;
-}
-
-int DataLogger::getPrecision()
-{
-	return precisionValue->text().toInt();
-}
-
-void DataLogger::setPrecision(int precision)
-{
-	precisionValue->setText(QString::number(precision));
-}
-
-int DataLogger::getValueReadingTimeInterval()
-{
-	return VALUE_READING_TIME_INTERVAL;
-}
-
-std::vector<libm2k::analog::DMM*> DataLogger::getDmmList(libm2k::context::Context* context)
-{
-	return context->getAllDmm() ;
-}
-
-void DataLogger::readChannelValues()
-{
-	if (!m_activeChannels.empty()) {
-		for (auto ch : m_activeChannels.keys()) {
-			QtConcurrent::run(this,&DataLogger::updateChannelWidget,ch);
-		}
-	}
-}
-
-void DataLogger::updateChannelWidget(int ch)
-{
-	//check if channel was closed before reading
-	if (m_activeChannels.contains(ch)) {
-		auto updatedRead = m_activeChannels[ch].first.dmm->readChannel(m_activeChannels[ch].first.dmmId);
-		Q_EMIT channelValueUpdated(ch, updatedRead.value,QString::fromStdString(updatedRead.unit_name),
-					   QString::fromStdString(updatedRead.unit_symbol));
-		if (dataLogger->isDataLoggerOn()) {
-			Q_EMIT updateValue(QString::fromStdString(m_activeChannels[ch].first.dmm->getName() + ":" + m_activeChannels[ch].first.dmmId),
-					   QString::number(updatedRead.value));
-		}
-	}
-}
-
-void DataLogger::toggleTimer(bool enabled)
-{
-	if (enabled) {
-		m_timer->start(VALUE_READING_TIME_INTERVAL);
-	} else {
-		m_timer->stop();
-	}
 }
 
 void DataLogger::createConnections(adiscope::gui::DataLoggerGenericMenu* mainMenu,adiscope::gui::DataLoggerGenericMenu* menu,adiscope::ChannelMonitorComponent* monitor)
@@ -272,6 +254,32 @@ void DataLogger::createConnections(adiscope::gui::DataLoggerGenericMenu* mainMen
 	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::lineStyleIndexChanged, menu, &adiscope::gui::DataLoggerGenericMenu::changeLineStyle);
 
 	connect(menu, &adiscope::gui::DataLoggerGenericMenu::monitorColorChanged, monitor, &ChannelMonitorComponent::setMonitorColor);
+}
+
+adiscope::gui::ToolView* DataLogger::getToolView()
+{
+	return m_toolView;
+}
+
+int DataLogger::getPrecision()
+{
+	return precisionValue->text().toInt();
+}
+
+void DataLogger::setPrecision(int precision)
+{
+	precisionValue->setText(QString::number(precision));
+}
+
+int DataLogger::getValueReadingTimeInterval()
+{
+	return VALUE_READING_TIME_INTERVAL;
+}
+
+
+std::vector<libm2k::analog::DMM*> DataLogger::getDmmList(libm2k::context::Context* context)
+{
+	return context->getAllDmm() ;
 }
 
 QColor DataLogger::generateColor()
@@ -392,7 +400,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 	dataLogger->setWarningMessage("* While data logging you won't be able to add/remove channels");
 	dataLoggingSection->setContent(dataLogger->getWidget());
 
-	connect(this, &DataLogger::updateValue, this , [=](QString name, QString value){
+	connect(readerThread, &DataLoggerReaderThread::updateDataLoggerValue, this , [=](QString name, QString value){
 		dataLogger->receiveValue(name,value);
 	});
 
@@ -404,8 +412,8 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 		if (toggled) {
 			if (!m_activeChannels.empty()) {
-				for (auto ch : m_activeChannels.keys()) {
-					QString name = QString::fromStdString(m_activeChannels[ch].first.dmm->getName() + ":" + m_activeChannels[ch].first.dmmId);
+				for (int ch : m_activeChannels.keys()) {
+					QString name = m_activeChannels[ch]->getTitle();
 					dataLogger->createChannel(name, adiscope::CHANNEL_DATA_TYPE::DOUBLE);
 				}
 			}
@@ -421,13 +429,30 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 	return menu;
 }
 
-
 DataLogger::~DataLogger()
 {
+
+	if (m_toolView->getRunBtn()->isChecked()) {
+		m_toolView->getRunBtn()->setChecked(false);
+	}
+	if (readerThread->isRunning()) {
+		readerThread->quit();
+		readerThread->wait();
+	}
+	if (readerThread) {
+		delete readerThread;
+	}
 	if (saveOnExit) {
 		api->save(*settings);
 	}
-	if (m_timer) { delete m_timer; }
-	if (m_toolView) { delete m_toolView; }
+	if (m_timer) {
+		delete m_timer;
+	}
+	if (m_elapsed) {
+		delete m_elapsed;
+	}
+	if (m_toolView) {
+		delete m_toolView;
+	}
 	delete api;
 }
