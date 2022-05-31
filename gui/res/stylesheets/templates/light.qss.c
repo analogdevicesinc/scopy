@@ -688,7 +688,13 @@ scopy--ChannelWidget QWidget#widget {
 	border-radius: 4px;
 }
 scopy--ChannelWidget QWidget#widget[selected=true] {
-	background-color: rbga(0, 0, 0, 40);
+	background-color: rgba(0, 0, 0, 60);
+}
+
+.scopy--ChannelWidget QWidget#widget::hover {
+ background-color: rgba(0, 0, 0, 60);
+ font-weight: bold;
+ border-bottom: 0px solid none;
 }
 
 /* Round check box */
