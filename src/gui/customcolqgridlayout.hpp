@@ -42,6 +42,7 @@ private:
 	int col;
 	int row;
 	double colWidth;
+	double availableWidth;
 	std::vector<QWidget*> m_widgetList;
 	QVector<int> m_activeWidgetList;
 	QGridLayout *m_gridLayout;
