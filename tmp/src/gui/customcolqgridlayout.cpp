@@ -168,7 +168,13 @@ void CustomColQGridLayout::itemSizeChanged()
 
 void CustomColQGridLayout::updateLayout()
 {
-	recomputeColCount();
+	if (availableWidth != this->width()) {
+		if (m_activeWidgetList.size() > 0) {
+			computeCols(m_widgetList.at(m_activeWidgetList.at(0))->frameSize().width());
+		}
+	} else {
+		recomputeColCount();
+	}
 	updatePending = false;
 }
 
@@ -192,7 +198,7 @@ void CustomColQGridLayout::recomputeColCount()
 void CustomColQGridLayout::computeCols(double width)
 {
 	int colCount = currentNumberOfCols;
-	auto availableWidth = this->width();
+	availableWidth = this->width();
 
 	if (width != 0) {
 		colCount = (availableWidth / width) - 1;
