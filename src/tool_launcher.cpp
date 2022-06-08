@@ -87,6 +87,10 @@ using namespace adiscope;
 using namespace libm2k::context;
 using namespace libm2k::digital;
 
+Q_DECLARE_OPAQUE_POINTER(struct iio_context *);
+Q_DECLARE_METATYPE(struct iio_context * )
+
+
 ToolLauncher* adiscope::tl_ptr;
 ToolLauncher* adiscope::getToolLauncherInstance() {
 	return tl_ptr;
@@ -1056,6 +1060,7 @@ void ToolLauncher::setupHomepage()
 
 void ToolLauncher::setupAddPage()
 {
+	qRegisterMetaType<struct iio_context*>("struct iio_context*");
 	connectWidget = new ConnectDialog(ui->stackedWidget);
 	connect(connectWidget, &ConnectDialog::newContext,
 		[=](const QString& uri) {
