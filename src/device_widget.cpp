@@ -40,6 +40,9 @@ DeviceWidget::DeviceWidget(QString uri, QString name,
 	m_ui->description->setText(uri);
 	m_ui->name->setText(name);
 
+	m_ui->description->setAlignment(Qt::AlignCenter);
+	m_ui->name->setAlignment(Qt::AlignCenter);
+
 	if (name.compare("M2K") != 0) {
 		m_infoPage = InfoPageBuilder::newPage(InfoPageBuilder::GENERIC,
 						      m_uri,

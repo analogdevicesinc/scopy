@@ -105,9 +105,6 @@ qproperty-alignment: AlignCenter;
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="styleSheet">
-         <string notr="true"/>
-        </property>
         <property name="text">
          <string/>
         </property>
@@ -134,7 +131,7 @@ qproperty-alignment: AlignCenter;
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../../scopy/resources/resources.qrc">
           <normaloff>:/icons/adalm.svg</normaloff>:/icons/adalm.svg</iconset>
         </property>
         <property name="iconSize">
@@ -293,8 +290,6 @@ QFrame#line[failed=true] {
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

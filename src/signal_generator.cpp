@@ -306,6 +306,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->gridLayout_2->addWidget(fallTime, 1, 0, 1, 1);
 	ui->gridLayout_2->addWidget(holdLowTime, 1, 1, 1, 1);
 
+	ui->gridLayout_2->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
+
 	ui->waveformGrid->addWidget(stepsUp,2,0,1,1);
 	ui->waveformGrid->addWidget(stepsDown,2,1,1,1);
 	ui->waveformGrid->addWidget(stairPhase,1,1,1,1);
@@ -619,6 +621,8 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	gridLayout->addWidget(m_plot->topArea(), 0, 0);
 	gridLayout->addWidget(m_plot->topHandlesArea(), 1, 0);
 	gridLayout->addWidget(m_plot, 2, 0);
+
+	gridLayout->setAlignment(Qt::AlignBottom | Qt::AlignLeft);
 
 	centralWidget->setLayout(gridLayout);
 
