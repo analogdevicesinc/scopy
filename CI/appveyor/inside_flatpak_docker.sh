@@ -12,7 +12,8 @@ REPO_LOCAL=/home/docker/scopy-flatpak
 cd "$REPO_LOCAL"
 # this ensures that latest master is pulled from origin while keeping file cache
 # the cache should be updated from time to time locally
-git fetch && git reset origin/master --hard
+flatpak_branch=$(git symbolic-ref --short HEAD)
+git fetch && git reset origin/${flatpak_branch} --hard
 
 # Run the preprocess step to generate org.adi.Scopy.json
 make preprocess
@@ -56,7 +57,7 @@ echo "CI_ENVS= $CI_ENVS"
 cat org.adi.Scopy.json | jq --tab '."build-options".env += ('$CI_ENVS')' > tmp.json
 cp tmp.json org.adi.Scopy.json
 
-make clean
+#make clean
 make -j4
 
 # Copy the Scopy.flatpak file in $GITHUB_WORKSPACE (which is the external location, mount when docker starts)
