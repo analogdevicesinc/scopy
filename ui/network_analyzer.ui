@@ -979,70 +979,6 @@ border: 5px solid white;
                      </item>
                      <item>
                       <widget class="adiscope::CustomSwitch" name="btnRefChn">
-                       <property name="styleSheet">
-                        <string notr="true">QPushButton {
-min-height: 30px;
-max-height: 30px;
-min-width: 280px;
-max-width: 280px;
-background-color: black;
-border-radius: 4px;
-}
-
-QPushButton:disabled {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
-}
-
-QWidget#handle {
-min-height: 30px;
-max-height: 30px;
-min-width: 142px;
-max-width: 142px;
-background-color: #4a64ff;
-border-radius: 2px;
-}
-
-QWidget#handle:disabled {
-background-color: #aaaaaa;
-}
-
-QLabel {
-margin-top: 6px;
-background-color: transparent;
-line-height: 19px;
-}
-
-QLabel#on {
-margin-top: 0px;
-min-height:30px;
-max-height:30px;
-min-width:140px;
-max-width:140px;
-qproperty-alignment: AlignCenter AlignCenter;
-margin-left: 0px;
-color: white;
-}
-
-QLabel#on:disabled {
-color: rgba(255,255,255,102);
-}
-
-QLabel#off {
-margin-top: 0px;
-min-height:30px;
-max-height:30px;
-min-width:140px;
-max-width:140px;
-margin-left: 140px;
-color: white;
-qproperty-alignment: AlignCenter AlignCenter;
-}
-
-QLabel#off:disabled {
-color: rgba(255,255,255,51);
-}
-</string>
-                       </property>
                        <property name="text">
                         <string/>
                        </property>
@@ -1059,7 +995,13 @@ color: rgba(255,255,255,51);
                         <string>Channel 2</string>
                        </property>
                        <property name="duration_ms" stdset="0">
-                        <string>0</string>
+                        <string notr="true">0</string>
+                       </property>
+                       <property name="duration" stdset="0">
+                        <number>100</number>
+                       </property>
+                       <property name="bigBtn" stdset="0">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
@@ -1364,70 +1306,6 @@ color: rgba(255,255,255,51);
                        </item>
                        <item row="1" column="0" colspan="2">
                         <widget class="adiscope::CustomSwitch" name="btnIsLog">
-                         <property name="styleSheet">
-                          <string notr="true">QPushButton {
-min-height: 30px;
-max-height: 30px;
-min-width: 280px;
-max-width: 280px;
-background-color: black;
-border-radius: 4px;
-}
-
-QPushButton:disabled {
-background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
-}
-
-QWidget#handle {
-min-height: 30px;
-max-height: 30px;
-min-width: 142px;
-max-width: 142px;
-background-color: #4a64ff;
-border-radius: 2px;
-}
-
-QWidget#handle:disabled {
-background-color: #aaaaaa;
-}
-
-QLabel {
-margin-top: 6px;
-background-color: transparent;
-line-height: 19px;
-}
-
-QLabel#on {
-margin-top: 0px;
-min-height:30px;
-max-height:30px;
-min-width:140px;
-max-width:140px;
-qproperty-alignment: AlignCenter AlignCenter;
-margin-left: 0px;
-color: white;
-}
-
-QLabel#on:disabled {
-color: rgba(255,255,255,102);
-}
-
-QLabel#off {
-margin-top: 0px;
-min-height:30px;
-max-height:30px;
-min-width:140px;
-max-width:140px;
-margin-left: 140px;
-color: white;
-qproperty-alignment: AlignCenter AlignCenter;
-}
-
-QLabel#off:disabled {
-color: rgba(255,255,255,51);
-}
-</string>
-                         </property>
                          <property name="text">
                           <string/>
                          </property>
@@ -1445,6 +1323,9 @@ color: rgba(255,255,255,51);
                          </property>
                          <property name="duration_ms" stdset="0">
                           <number>0</number>
+                         </property>
+                         <property name="duration" stdset="0">
+                          <number>100</number>
                          </property>
                         </widget>
                        </item>

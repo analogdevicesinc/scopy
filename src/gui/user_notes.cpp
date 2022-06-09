@@ -274,17 +274,18 @@ void UserNotes::clearAllNotes()
  */
 
 Note::Note(QString name, QString path, QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::Note),
-        m_selected(false),
-        m_name(name),
-        m_path(path),
-        m_page(nullptr)
+	QWidget(parent),
+	ui(new Ui::Note),
+	m_selected(false),
+	m_name(name),
+	m_path(path),
+	m_page(nullptr)
 {
-        ui->setupUi(this);
-        ui->name->setText(name);
-        connect(ui->btn, SIGNAL(toggled(bool)),
-                this, SLOT(setSelected(bool)));
+	ui->setupUi(this);
+	ui->name->setText(name);
+	ui->name->setAlignment(Qt::AlignCenter);
+	connect(ui->btn, SIGNAL(toggled(bool)),
+		this, SLOT(setSelected(bool)));
 
 	pageUi = new Ui::UserNotePage();
 	m_page = new QWidget(this);
