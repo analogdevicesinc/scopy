@@ -49,6 +49,9 @@ CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 	on.setText(tr("on"));
 	off.setText(tr("off"));
 	updateOnOffLabels();
+
+	on.setAlignment(Qt::AlignCenter);
+	off.setAlignment(Qt::AlignCenter);
 }
 
 void CustomSwitch::updateOnOffLabels()
