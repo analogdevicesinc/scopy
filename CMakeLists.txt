@@ -98,10 +98,6 @@ if (MSVC)
 	add_definitions(-DQWT_DLL)
 endif (MSVC)
 
-if(ANDROID)
-    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-endif()
-
 FILE(GLOB TS_FILES ${CMAKE_SOURCE_DIR}/resources/translations/*.ts)
 set_source_files_properties(${TS_FILES} PROPERTIES OUTPUT_LOCATION ${CMAKE_CURRENT_BINARY_DIR})
 
@@ -114,9 +110,7 @@ else()
 endif()
 
 find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Core Widgets Gui Concurrent Network Qml Svg UiTools Xml LinguistTools OpenGL REQUIRED PATHS $ENV{Qt${QT_MAJOR_VERSION}_HOME})
-if(ANDROID)
-	find_package(Qt${QT_MAJOR_VERSION} COMPONENTS AndroidExtras REQUIRED PATHS $ENV{Qt${QT_MAJOR_VERSION}_HOME})
-endif()
+
 if ("${QT_MAJOR_VERSION}" STREQUAL "6")
 	# Generate .qm files from the .ts files
 	qt6_add_translation(QM_FILES ${TS_FILES})
@@ -404,8 +398,9 @@ if (CLONE_IIO_EMU)
 	add_subdirectory(iio-emu)
 endif()
 
-if(ANDROID)
-	add_library(${PROJECT_NAME} SHARED
+if(QT_MAJOR_VERSION GREATER_EQUAL 6)
+	qt_add_executable(${PROJECT_NAME}
+		MANUAL_FINALIZATION
 		${SRC_LIST}
 		${RESOURCES}
 		${m2kscope_RESOURCES}
@@ -414,16 +409,36 @@ if(ANDROID)
 		${TRANSLATION_RESOURCES}
 		${ABOUT_PAGE_RESOURCES}
 		)
-    else()
-	add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
-		${SRC_LIST}
-		${RESOURCES}
-		${m2kscope_RESOURCES}
-		${m2kscope_FORMS_HEADERS}
-		${EXTRA_BUNDLE_FILES}
-		${TRANSLATION_RESOURCES}
-		${ABOUT_PAGE_RESOURCES}
-        )
+
+else()
+	if(ANDROID)
+		add_library(${PROJECT_NAME} SHARED
+			${SRC_LIST}
+			${RESOURCES}
+			${m2kscope_RESOURCES}
+			${m2kscope_FORMS_HEADERS}
+			${EXTRA_BUNDLE_FILES}
+			${TRANSLATION_RESOURCES}
+			${ABOUT_PAGE_RESOURCES}
+			)
+	else()
+		add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
+			${SRC_LIST}
+			${RESOURCES}
+			${m2kscope_RESOURCES}
+			${m2kscope_FORMS_HEADERS}
+			${EXTRA_BUNDLE_FILES}
+			${TRANSLATION_RESOURCES}
+			${ABOUT_PAGE_RESOURCES}
+			)
+	endif()
+endif()
+
+if(ANDROID)
+	set_property(TARGET ${PROJECT_NAME} PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+		${CMAKE_SOURCE_DIR}/android)
+	get_target_property(tmp ${PROJECT_NAME} QT_ANDROID_PACKAGE_SOURCE_DIR)
+	message(ANDROID_PACKAGE_SOURCE_DIR - ${tmp})
 endif()
 
 
@@ -461,9 +476,6 @@ target_link_libraries(${PROJECT_NAME} LINK_PRIVATE
 		libm2k::libm2k
 )
 
-if (ANDROID)
-	target_link_libraries(${PROJECT_NAME} LINK_PRIVATE Qt${QT_MAJOR_VERSION}::AndroidExtras)
-endif()
 
 if (NOT WIN32)
 	find_library(PTHREAD_LIBRARIES pthread)
@@ -498,7 +510,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 		MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
 )
 
-
+if(QT_MAJOR_VERSION EQUAL 6)
+	qt_finalize_executable(${PROJECT_NAME})
+endif()
 
 set(CMAKE_INSTALL_DOCDIR "${CMAKE_CURRENT_BINARY_DIR}/doc")
 find_package(Doxygen)
@@ -529,7 +543,7 @@ configure_file(scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy-32.iss @ON
 configure_file(scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy-64.iss @ONLY)
 configure_file(config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
-if (NOT ENABLE_APPLICATION_BUNDLE)
+if (NOT ENABLE_APPLICATION_BUNDLE AND NOT ANDROID)
 	install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION share/applications)

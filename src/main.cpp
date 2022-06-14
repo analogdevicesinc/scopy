@@ -40,22 +40,18 @@
 //#include "coloreditor.h"
 #include "scopy_color_editor.h"
 #include "application_restarter.h"
-
-#ifdef __ANDROID__
-	#include <QtAndroidExtras/QtAndroid>
-#endif
+#include <QJniObject>
 
 using namespace adiscope;
 
 int main(int argc, char **argv)
 {
 #ifdef  __ANDROID__
-	QAndroidJniObject jniObject = QtAndroid::androidActivity().callObjectMethod("getScaleFactor", "()Ljava/lang/String;");
+	QJniObject activity = QNativeInterface::QAndroidApplication::context();
+	QJniObject jniObject = activity.callObjectMethod("getScaleFactor", "()Ljava/lang/String;");
 	QString scaleFactor = jniObject.toString();
 
 	qputenv("QT_SCALE_FACTOR", scaleFactor.toUtf8());
-	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
 	qputenv("QT_USE_ANDROID_NATIVE_DIALOGS", "1");
 
 	QApplication::setAttribute(Qt::AA_CompressHighFrequencyEvents, true);

@@ -3,10 +3,7 @@
 #include <QApplication>
 #include <QProcess>
 #include <QDir>
-
-#ifdef __ANDROID__
-	#include <QtAndroidExtras/QtAndroid>
-#endif
+#include <QJniObject>
 
 using namespace adiscope;
 
@@ -31,7 +28,7 @@ int ApplicationRestarter::restart(int exitCode)
 {
 	if (qApp->property("restart").toBool()) {
 #ifdef __ANDROID__
-		QAndroidJniObject activity = QtAndroid::androidActivity();
+		QJniObject activity = qApp->nativeInterface<QNativeInterface::QAndroidApplication>()->context();
 		activity.callMethod<void>("restart");
 #else
 		QProcess::startDetached(m_executable, m_arguments, m_currentPath);

@@ -20,7 +20,7 @@
 
 package org.adi.scopy;
 
-import org.qtproject.qt5.android.bindings.QtApplication;
+import org.qtproject.qt.android.bindings.QtApplication;
 
 import java.io.File;
 import java.io.IOException;

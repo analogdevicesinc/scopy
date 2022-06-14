@@ -57,8 +57,8 @@
 #include <QSpacerItem>
 #include <QOpenGLWidget>
 #if __ANDROID__
-#include <QtAndroidExtras/QtAndroid>
-#include <QAndroidJniEnvironment>
+#include <QJniEnvironment>
+#include <QJniObject>
 #endif
 
 #include <iio.h>
@@ -125,7 +125,7 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	about(nullptr),
 	openGlLoaded(false)
       #ifdef __ANDROID__
-      ,jnienv(new QAndroidJniEnvironment())
+      ,jnienv(new QJniEnvironment())
       #endif
 {
 	if (!isatty(STDIN_FILENO))
@@ -257,8 +257,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	networkAccessManager = new QNetworkAccessManager(this);
 	m_phoneHome = new PhoneHome(settings, prefPanel, networkAccessManager);
 	if (prefPanel->getFirst_application_run()) {
-		createPhoneHomeMessageBox();
-		createLicenseMessageBox();
+		//createPhoneHomeMessageBox();
+		//createLicenseMessageBox();
 	}
 	connect(prefPanel, &Preferences::requestUpdateCheck, [=]() { m_phoneHome->versionsRequest(true);});
 	connect(about, &ScopyAboutDialog::forceCheckForUpdates,[=](){
@@ -310,7 +310,8 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 	} else {
 
 	}
-#if __ANDROID__
+#if 0
+//#if __ANDROID__
 	const QVector<QString> permissions({"android.permission.READ_EXTERNAL_STORAGE",
 					    "android.permission.WRITE_EXTERNAL_STORAGE",
 					    "android.permission.INTERNET"});
@@ -396,7 +397,7 @@ void ToolLauncher::createLicenseMessageBox() {
 			      screenRect.y() + screenRect.height()/2 - mSize.height()/2 ) );
 
 	connect(yesButton, &QAbstractButton::clicked, [&] () {
-
+		msgBox->accept();
 	});
 	connect(noButton, &QAbstractButton::clicked, [&] () {
 		QCoreApplication::quit();
@@ -2110,7 +2111,7 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 
 				QMessageBox* msgBox = new QMessageBox(this);
 				QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
-				QRect screenRect = QDesktopWidget().screenGeometry();
+				QRect screenRect = QApplication::primaryScreen()->geometry();
 
 				msgBox->setText("Are you sure you want to close Scopy?");
 
@@ -2233,8 +2234,8 @@ void ToolLauncher::registerNativeMethods()
 				     {"hasCtxJNI", "()Z", reinterpret_cast<void*>(hasCtxJNI) },
 				    };
 
-	QAndroidJniObject activity = QtAndroid::androidActivity();
-	QAndroidJniEnvironment env;
+	QJniObject activity = QNativeInterface::QAndroidApplication::context();
+	QJniEnvironment env;
 	jclass objectClass = env->GetObjectClass(activity.object<jobject>());
 
 	env->RegisterNatives(objectClass,

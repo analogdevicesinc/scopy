@@ -22,7 +22,7 @@ package org.adi.scopy;
 
 import java.io.File;
 import java.io.IOException;
-import org.qtproject.qt5.android.bindings.QtActivity;
+import org.qtproject.qt.android.bindings.QtActivity;
 import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.content.Context;
@@ -126,7 +126,6 @@ public class ScopyActivity extends QtActivity
 	protected void onStop()
 	{
 		System.out.println("-- ScopyActivity: onStop");
-		System.out.println(nrOfToolsSavedJNI());
 		if (initialized) {
 			if (hasCtxJNI()) {
 				saveAndStopRunningInputToolsJNI();

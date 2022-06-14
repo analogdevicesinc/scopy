@@ -1,5 +1,6 @@
 #!/bin/bash
 set -xe
+
 source ./android_toolchain.sh $1 $2
 
 ARTIFACT_LOCATION=$GITHUB_WORKSPACE
@@ -16,21 +17,26 @@ build_scopy() {
 	rm -rf build*
 
 	cp $BUILD_STATUS_FILE .
-	cp $BUILD_ROOT/android_cmake.sh .
+	cp $SCRIPT_HOME_DIR/android_cmake_scopy.sh ./android_cmake.sh
 	cp $SCRIPT_HOME_DIR/android_deploy_qt.sh .
 
 	./android_cmake.sh .
-
 	cd $BUILDDIR
-	make -j$JOBS
+	make -j$JOBS iio-emu
 	cd ..
 
 	./android_deploy_qt.sh
+
+	cd $BUILDDIR
+	make -j$JOBS scopy
+	cd ..
+
+#	./android_deploy_qt.sh
 	cd $BUILDDIR
 	make apk
 	make aab
 	cd ..
-	
+
 	popd
 }
 

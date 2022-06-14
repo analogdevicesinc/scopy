@@ -35,7 +35,7 @@
 #include <QTextBrowser>
 
 #ifdef __ANDROID__
-#include <QAndroidJniEnvironment>
+#include <QJniEnvironment>
 #endif
 
 #include "apiObject.hpp"
@@ -228,7 +228,7 @@ private:
 	QVector<Debugger*> debugInstances;
 	QVector<DetachedWindow *> debugWindows;
 #if __ANDROID__
-	QAndroidJniEnvironment *jnienv;
+	QJniEnvironment *jnienv;
 #endif
 
 	std::vector<DeviceWidget *> devices;
