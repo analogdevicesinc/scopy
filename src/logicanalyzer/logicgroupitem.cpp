@@ -105,8 +105,8 @@ void LogicGroupItem::buildUi()
 
 	m_nameLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-	layout->insertWidget(1, m_nameLabel);
 	layout->insertWidget(0, deleteBtn);
+	layout->insertWidget(1, m_nameLabel);
 	layout->insertSpacerItem(2, spacer);
 	layout->insertWidget(3, dragWidget);
 
