@@ -1368,6 +1368,7 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 		}
 	}
 
+	group.first()->selected(false);
 	group.first()->setSelected(true);
 	group.first()->selected(true);
 
