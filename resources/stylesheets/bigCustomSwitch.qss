@@ -1,8 +1,8 @@
 QPushButton {
 min-height: 30px;
 max-height: 30px;
-min-width: 240px;
-max-width: 240px;
+min-width: 300px;
+max-width: 300px;
 background-color: black;
 border-radius: 4px;
 }
@@ -14,8 +14,8 @@ background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop
 QWidget#handle {
 min-height: 30px;
 max-height: 30px;
-min-width: 120px;
-max-width: 120px;
+min-width: 150px;
+max-width: 150px;
 background-color: #4a64ff;
 border-radius: 2px;
 }
@@ -34,8 +34,8 @@ QLabel#on {
 margin-top: 0px;
 min-height:30px;
 max-height:30px;
-min-width:120px;
-max-width:120px;
+min-width:150px;
+max-width:150px;
 qproperty-alignment: AlignCenter AlignCenter;
 margin-left: 0px;
 color: white;
@@ -49,9 +49,9 @@ QLabel#off {
 margin-top: 0px;
 min-height:30px;
 max-height:30px;
-min-width:120px;
-max-width:120px;
-margin-left: 120px;
+min-width:150px;
+max-width:150px;
+margin-left: 150px;
 color: white;
 qproperty-alignment: AlignCenter AlignCenter;
 }
