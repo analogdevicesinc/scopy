@@ -154,6 +154,11 @@ void AnnotationCurve::setAnnotationRows(const std::map<Row, RowData> &annotation
     m_annotationRows = annotationRows;
 }
 
+std::map<Row, RowData> AnnotationCurve::getAnnotationRows()
+{
+    return this->m_annotationRows;
+}
+
 void AnnotationCurve::sort_rows()
 {
     for (auto it = m_annotationRows.begin(); it != m_annotationRows.end(); ++it) {
