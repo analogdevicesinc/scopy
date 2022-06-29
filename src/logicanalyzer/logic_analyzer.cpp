@@ -2483,6 +2483,7 @@ void LogicAnalyzer::restoreTriggerState()
 void LogicAnalyzer::readPreferences()
 {
 	bool showFps = prefPanel->getShow_plot_fps();
+	m_separateAnnotations = prefPanel->getSeparateAnnotations();
 	m_plot.setVisibleFpsLabel(showFps);
 
 	for (GenericLogicPlotCurve *curve : qAsConst(m_plotCurves)) {
@@ -2592,6 +2593,18 @@ bool LogicAnalyzer::exportTabCsv(const QString &separator, const QString &fileNa
 			chNames.push_back("Channel " + QString::number(ch));
 		}
 	}
+	for (unsigned int ch = DIGITAL_NR_CHANNELS; ch < m_plotCurves.size(); ch++){
+		auto *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[ch]);
+		auto rows = curve->getAnnotationRows();
+
+		for (const auto& [key, value] : rows) {
+			vector<Annotation> dest;
+			value.get_annotation_subset(dest, 0, m_lastCapturedSample);
+			if (!dest.empty()) {
+				chNames.push_back(key.title());
+			}
+		}
+	}
 
 	QVector<QVector<double>> data;
 
@@ -2613,11 +2626,78 @@ bool LogicAnalyzer::exportTabCsv(const QString &separator, const QString &fileNa
 
 	fm.setSampleRate(m_sampleRate);
 
-	fm.save(data, chNames);
+	fm.save(data, createDecoderData(m_separateAnnotations), chNames);
 
 	fm.performWrite();
 
 	return true;
+}
+
+QVector<QVector<QString>> LogicAnalyzer::createDecoderData(bool separate_annotations)
+{
+	QVector<QVector<QString>> decoder_data;
+	QVector<vector<Annotation>> rows;
+	QVector<QString> decoder_line;
+	QString new_value;
+	uint64_t start_sample = 0;
+	uint64_t end_sample = 0;
+	bool colum_is_visible = false;
+
+	QString start_separator = "< ";
+	QString end_separator = " />";
+	QString repeated_value = "...";
+	QString empty_value = "";
+
+	for (int ch=DIGITAL_NR_CHANNELS; ch < m_plotCurves.size(); ch++) {
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[ch]);
+		std::map<Row, RowData> decoder(curve->getAnnotationRows());
+		std::map<Row, RowData>::iterator it;
+
+		for (it = decoder.begin(); it != decoder.end(); it++) {
+			vector<Annotation> row;
+			it->second.get_annotation_subset(row, 0, m_lastCapturedSample);
+
+			if (!row.empty()) {
+				rows.push_back(row);
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i < m_lastCapturedSample; ++i) {
+		decoder_line.clear();
+
+		for (unsigned int row_index = 0; row_index < rows.size(); row_index++) {
+			colum_is_visible = false;
+
+			for(int col=0; col < rows[row_index].size(); col++){
+				start_sample = rows[row_index][col].start_sample();
+				end_sample = rows[row_index][col].end_sample();
+				new_value = "";
+
+				if (separate_annotations) {
+					new_value = (start_sample == i && end_sample == i) ? start_separator + rows[row_index][col].annotations()[0] + end_separator
+							: (start_sample == i && end_sample > i) ? start_separator + rows[row_index][col].annotations()[0]
+							: (end_sample == i + 1 && start_sample < i) ? rows[row_index][col].annotations()[0] + end_separator
+							: (start_sample < i && end_sample > i + 1) ? repeated_value
+												   : "";
+				} else if ((start_sample <= i && end_sample > i) || (start_sample == i && end_sample == i)) {
+					new_value = rows[row_index][col].annotations()[0];
+				}
+				if (!new_value.isEmpty()) {
+					decoder_line.push_back(new_value);
+					colum_is_visible = true;
+					break;
+				}
+
+			}
+			if (!colum_is_visible) {
+				decoder_line.push_back(empty_value);
+			}
+		}
+		decoder_data.push_back(decoder_line);
+	}
+
+	return decoder_data;
 }
 
 bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, const QString &endSep)

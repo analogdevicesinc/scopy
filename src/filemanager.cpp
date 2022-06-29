@@ -65,6 +65,7 @@ void FileManager::open(QString fileName,
 
 	//clear previous data if the manager was used for other exports
 	data.clear();
+	decoder_data.clear();
 	columnNames.clear();
 	this->filename = fileName;
 
@@ -174,6 +175,22 @@ void FileManager::save(QVector<double> data, QString name)
 
 	for (int i = 0; i < data.size(); ++i) {
 		this->data[i].push_back(data[i]);
+	}
+}
+
+void FileManager::save(QVector<QVector<double>> data, QVector<QVector<QString>> decoder_data, QStringList columnNames)
+{
+	for (auto &column : data) {
+		this->data.push_back(column);
+	}
+
+	this->decoder_data.clear();
+	for (auto &column : decoder_data) {
+		this->decoder_data.push_back(column);
+	}
+
+	for (auto &column_name : columnNames) {
+		this->columnNames.push_back(column_name);
 	}
 }
 
@@ -306,6 +323,16 @@ void FileManager::performWrite()
 			exportStream << data[i][j];
 			skipFirstSeparator = false;
 		}
+
+		if (!decoder_data.isEmpty()) {
+			for (int j = 0; j < decoder_data[i].size(); ++j) {
+				if(!skipFirstSeparator)
+					exportStream << separator;
+				if (!decoder_data[i][j].isEmpty()) {
+					exportStream << "\"" << decoder_data[i][j] << "\"";
+				}
+				skipFirstSeparator = false;
+			}}
 		exportStream << "\n";
 	}
 

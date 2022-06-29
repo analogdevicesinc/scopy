@@ -55,6 +55,7 @@ public:
 	void open(QString fileName, FileManager::FilePurpose filepurpose = EXPORT);
 
 	void save(QVector<double> data, QString name);
+	void save(QVector<QVector<double>> data, QVector<QVector<QString>> decoder_data, QStringList column_names);
 	void save(QVector<QVector<double>> data, QStringList column_names);
 
 	QVector<double> read(int index);
@@ -82,6 +83,7 @@ public:
 private:
 
 	QVector<QVector<double>> data;
+	QVector<QVector<QString>> decoder_data;
 	QStringList columnNames;
 	QString filename;
 	bool hasHeader;

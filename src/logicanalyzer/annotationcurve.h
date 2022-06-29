@@ -78,6 +78,7 @@ public:
 
     virtual void reset() override;
 
+    std::map<Row, RowData> getAnnotationRows();
     QWidget * getCurrentDecoderStackMenu();
 	void stackDecoder(std::shared_ptr<adiscope::logic::Decoder> decoder);
 	std::vector<std::shared_ptr<adiscope::logic::Decoder>> getDecoderStack();

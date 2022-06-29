@@ -146,6 +146,8 @@ private:
 
 	void setupTriggerMenu();
 
+	QVector<QVector<QString>> createDecoderData(bool separate_annotations);
+
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
 	Ui::LogicAnalyzer *ui;
@@ -175,6 +177,7 @@ private:
 	double m_horizOffset;
 	double m_timeTriggerOffset;
 	bool m_resetHorizAxisOffset;
+	bool m_separateAnnotations;
 
 	// capture
 	std::thread *m_captureThread;
