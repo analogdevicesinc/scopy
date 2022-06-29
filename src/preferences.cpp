@@ -67,6 +67,7 @@ Preferences::Preferences(QWidget *parent) :
 	m_useNativeDialogs(true),
 	language("auto"),
 	m_displaySamplingPoints(false),
+	m_separateAnnotations(false),
 	m_instrument_notes_active(false),
 	m_debug_messages_active(false),
 	m_attemptTempLutCalib(false),
@@ -287,6 +288,11 @@ Preferences::Preferences(QWidget *parent) :
 		Q_EMIT notify();
 	});
 
+	connect(ui->logicAnalyzerSeparateAnnotations, &QCheckBox::stateChanged, [=](int state){
+		m_separateAnnotations = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->useOpenGl, &QCheckBox::stateChanged, [=](int state){
 		m_use_open_gl = state;
 		qputenv("SCOPY_USE_OPENGL",QByteArray::number(state));
@@ -387,6 +393,16 @@ void Preferences::setDisplaySamplingPoints(bool display)
 	m_displaySamplingPoints = display;
 }
 
+bool Preferences::getSeparateAnnotations() const
+{
+	return m_separateAnnotations;
+}
+
+void Preferences::setSeparateAnnotations(bool flag)
+{
+	m_separateAnnotations = flag;
+}
+
 bool Preferences::getInstrumentNotesActive() const
 {
 	return m_instrument_notes_active;
@@ -433,6 +449,7 @@ void Preferences::initializePreferences()
 	ui->oscADCFiltersCheckBox->setChecked(show_ADC_digital_filters);
 	ui->languageCombo->setCurrentText(language);
 	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
+	ui->logicAnalyzerSeparateAnnotations->setChecked(m_separateAnnotations);
 	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
 	ui->debugMessagesCheckbox->setChecked(m_debug_messages_active);
 	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
@@ -998,6 +1015,15 @@ bool Preferences_API::getSkipCalIfCalibrated() const
 void Preferences_API::setSkipCalIfCalibrated(bool val)
 {
 	preferencePanel->m_skipCalIfCalibrated = val;
+}
+
+bool Preferences_API::getSeparateAnnotations() const
+{
+	return preferencePanel->m_separateAnnotations;
+}
+void Preferences_API::setSeparateAnnotations(bool val)
+{
+	preferencePanel->m_separateAnnotations = val;
 }
 
 QString Preferences_API::getCurrentStylesheet() const

@@ -114,6 +114,9 @@ public:
 	bool getDisplaySamplingPoints() const;
 	void setDisplaySamplingPoints(bool display);
 
+	bool getSeparateAnnotations() const;
+	void setSeparateAnnotations(bool display);
+
 	bool getInstrumentNotesActive() const;
 	void setInstrumentNotesActive(bool display);
 
@@ -203,6 +206,7 @@ private:
 	QString language;
 	bool m_instrument_notes_active;
 	bool m_displaySamplingPoints;
+	bool m_separateAnnotations;
 	bool m_debug_messages_active;
 	bool m_attemptTempLutCalib;
 	bool m_skipCalIfCalibrated;
@@ -246,6 +250,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool debug_messages_active READ getDebugMessagesActive WRITE setDebugMessagesActive)
 	Q_PROPERTY(bool attemptTempLutCalib READ getAttemptTempLutCalib WRITE setAttemptTempLutCalib)
 	Q_PROPERTY(bool skipCalIfCalibrated READ getSkipCalIfCalibrated WRITE setSkipCalIfCalibrated)
+	Q_PROPERTY(bool separateAnnotations READ getSeparateAnnotations WRITE setSeparateAnnotations)
 	Q_PROPERTY(bool automatical_version_checking_enabled READ getAutomaticalVersionCheckingEnabled WRITE setAutomaticalVersionCheckingEnabled)
 	Q_PROPERTY(QString check_updates_url READ getCheckUpdatesUrl WRITE setCheckUpdatesUrl)
 	Q_PROPERTY(bool first_application_run READ getFirstApplicationRun WRITE setFirstApplicationRun)
@@ -328,6 +333,9 @@ public:
 
 	bool getSkipCalIfCalibrated() const;
 	void setSkipCalIfCalibrated(bool val);
+
+	bool getSeparateAnnotations() const;
+	void setSeparateAnnotations(bool val);
 
 	bool getAutomaticalVersionCheckingEnabled() const;
 	void setAutomaticalVersionCheckingEnabled(const bool& enabled);
