@@ -126,7 +126,6 @@ public class ScopyActivity extends QtActivity
 	protected void onStop()
 	{
 		System.out.println("-- ScopyActivity: onStop");
-		System.out.println(nrOfToolsSavedJNI());
 		if (initialized) {
 			if (hasCtxJNI()) {
 				saveAndStopRunningInputToolsJNI();
