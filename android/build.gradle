@@ -72,6 +72,13 @@ android {
     defaultConfig {
         resConfig "en"
         minSdkVersion = qtMinSdkVersion
-        targetSdkVersion = qtTargetSdkVersion
+        targetSdkVersion = 30
     }
+    buildTypes {
+	release {
+		signingConfig
+		debuggable = false
+		minifyEnabled = false
+		}
+	}
 }
