@@ -15,7 +15,10 @@ resources/stylesheets/default.qss
 resources/stylesheets/light.qss
 !android/src/org/adi/scopy
 *.swp
+android-build
+android*.sh
+*.apk
+*.aab
+!CI/android/*
 html/
 build_arm64-v8a/
-android_cmake.sh
-android_deploy_qt.sh
