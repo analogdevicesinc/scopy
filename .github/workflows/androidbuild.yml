@@ -29,6 +29,8 @@ jobs:
         path: |
          ${{ github.workspace }}/*.apk
          ${{ github.workspace }}/*.aab
+         ${{ github.workspace }}/scopy*android-native-symbols.zip
+
 
     - name: Upload master apk and aab builds to continous prerelease
       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}

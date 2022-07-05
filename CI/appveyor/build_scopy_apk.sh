@@ -51,6 +51,7 @@ make_apk_aab() {
 	./android_deploy_qt.sh apk #sign
 
 	./android_deploy_qt.sh aab #sign
+	./android_get_symbols.sh
 	popd
 }
 
@@ -60,10 +61,12 @@ move_artifact() {
 	pushd scopy
 	sudo cp *.apk $ARTIFACT_LOCATION
 	sudo cp *.aab $ARTIFACT_LOCATION
+	sudo cp scopy*android-native-symbols.zip $ARTIFACT_LOCATION
 
 	pushd $ARTIFACT_LOCATION
 	sudo chmod 644 *.apk
 	sudo chmod 644 *.aab
+	sudo chmod 644 *.zip
 
 	ls -la $ARTIFACT_LOCATION
 	popd
