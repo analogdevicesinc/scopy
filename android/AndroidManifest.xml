@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
-<manifest package="org.adi.scopy" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionName="1.4.0" android:versionCode="014000000" android:installLocation="auto">
-    <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
+<manifest package="org.adi.scopy" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:versionName="1.4.0" android:versionCode="0104000003" android:installLocation="auto">
+<!-- 01.04.00.0003-->
+<!-- versioning: major.minor.patch.build -->
+     
+	<!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
 	 Remove the comment if you do not require these default permissions. -->
     <!-- %%INSERT_PERMISSIONS -->
 <uses-permission android:name="android.permission.CLEAR_APP_USER_DATA"/>
