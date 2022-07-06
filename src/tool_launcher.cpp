@@ -345,8 +345,10 @@ void ToolLauncher::createPhoneHomeMessageBox() {
 	QSize mSize = msgBox->sizeHint(); // here's what you want, not m.width()/height()
 	QRect screenRect = QDesktopWidget().screenGeometry();
 
-	msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?");
-	msgBox->setInformativeText("You can change this anytime from the Preferences menu.");
+	msgBox->setText("Do you want to automatically check for newer Scopy and m2k-firmware versions?<br><br>You can change this anytime from the Preferences menu.");
+	//msgBox->setInformativeText("");
+	msgBox->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+
 
 	QPushButton* yesButton = new QPushButton("Yes");
 	msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
@@ -376,8 +378,16 @@ void ToolLauncher::createLicenseMessageBox() {
 	QRect screenRect = QDesktopWidget().screenGeometry();
 
 	msgBox->setTextFormat(Qt::RichText);
-	msgBox->setText("Scopy is distributed under the GNU <a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a>, and is copyright Analog Devices. Inc and others. There are no restrictions or obligations on its use, except that you (the user) agree there is no warranty (per the GPLv3). If you don't agree to this - do not use this software.");
-	msgBox->setInformativeText("There are obligations and restrictions on distribution of the source or binary of this application (and the libraries which it is built with) which are detailed in the <a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a> license. More details of additional licenses for 3rd party libraries can be found in the \"About\" box. ");
+	msgBox->setText("Scopy is distributed under the GNU <a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a>, and is copyright Analog Devices. Inc and others. "
+			"There are no restrictions or obligations on its use, except that you (the user) agree there is no warranty (per the GPLv3). "
+			"If you don't agree to this - do not use this software.<br><br>There are obligations and restrictions on distribution of the "
+			"source or binary of this application (and the libraries which it is built with) which are detailed in the "
+			"<a href='https://github.com/analogdevicesinc/scopy/blob/master/LICENSE'>GPLv3</a> license. More details of additional licenses "
+			"for 3rd party libraries can be found in the \"About\" box. ");
+
+	//msgBox->setInformativeText("");
+	msgBox->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+
 
 	QPushButton* yesButton = new QPushButton("Yes");
 	msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
@@ -2090,6 +2100,7 @@ bool ToolLauncher::eventFilter(QObject *watched, QEvent *event)
 				QRect screenRect = QDesktopWidget().screenGeometry();
 
 				msgBox->setText("Are you sure you want to close Scopy?");
+				msgBox->setTextInteractionFlags(Qt::NoTextInteraction);
 
 				QPushButton* yesButton = new QPushButton("Yes");
 				msgBox->addButton(yesButton ,QMessageBox::AcceptRole);
