@@ -24,6 +24,8 @@
 #include <qmath.h>
 #include <QDebug>
 #include <QObject>
+#include <string>
+#include <fstream>
 
 using namespace adiscope;
 
