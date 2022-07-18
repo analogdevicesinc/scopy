@@ -1829,14 +1829,11 @@ void LogicAnalyzer::startStop(bool start)
 			m_plot.setMaxBufferSizeErrorLabel(false);
 
 			if (oneShotOrStream) { // oneshot
-				do {
-					try {
-						m_m2kDigital->setKernelBuffersCountIn(1);
-						break;
-					} catch (libm2k::m2k_exception &e) {
-						qDebug() << e.what();
-					}
-				} while (true);
+				try {
+					m_m2kDigital->setKernelBuffersCountIn(1);
+				} catch (libm2k::m2k_exception &e) {
+					qDebug() << e.what();
+				}
 
 				chunk_size = bufferSizeAdjusted;
 
@@ -1894,14 +1891,11 @@ void LogicAnalyzer::startStop(bool start)
 					}
 				}
 
-				do {
-					try {
-						m_m2kDigital->setKernelBuffersCountIn(m_currentKernelBuffers);
-						break;
-					} catch (libm2k::m2k_exception &e) {
-						qDebug() << e.what();
-					}
-				} while (true);
+				try {
+					m_m2kDigital->setKernelBuffersCountIn(m_currentKernelBuffers);
+				} catch (libm2k::m2k_exception &e) {
+					qDebug() << e.what();
+				}
 
 				// time for one kernel buffer + 100ms for the transfer
 				oneBufferTimeout = ((oneBufferTimeout - 100) / m_currentKernelBuffers) + 100;

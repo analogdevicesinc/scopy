@@ -3658,11 +3658,12 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	hist_plot.replot();
 
 	ch_ui->cmbMemoryDepth->setCurrentIndex(0);
+	int m_currentKernelBuffers;
 	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
 		plot_samples_sequentially = true;	// streaming
 		const int minKernelBuffers = 4;
 		const int oneBufferMaxSize = 2 * 1024 * 1024; // 2M
-		int m_currentKernelBuffers = minKernelBuffers;
+		m_currentKernelBuffers = minKernelBuffers;
 		if (active_trig_sample_count < 0) {
 			active_sample_count = -active_trig_sample_count;
 			m_currentKernelBuffers = (active_plot_sample_count / active_sample_count) + 1;
@@ -3702,9 +3703,7 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 		setSinksDisplayOneBuffer(false);
 		plot.setXAxisNumPoints(active_plot_sample_count);
 		resetStreamingFlag(true);
-		iio->set_kernel_buffer_count(m_currentKernelBuffers);
 	} else {
-		iio->set_kernel_buffer_count();
 		plot_samples_sequentially = false;
 		setSinksDisplayOneBuffer(true);
 		plot.setXAxisNumPoints(0);
@@ -3720,6 +3719,12 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	if (started)
 		iio->lock();
 	setAllSinksSampleCount(active_plot_sample_count);
+
+	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
+		iio->set_kernel_buffer_count(m_currentKernelBuffers);
+	} else {
+		iio->set_kernel_buffer_count();
+	}
 
 	if (started) {
 		plot.setSampleRate(active_sample_rate, 1, "");
