@@ -56,6 +56,8 @@ public:
     // Get index of the curve
     int indexOfCurve(const AnnotationCurve* curve) const;
 
+    void setPrimaryAnnotation(int index);
+
 public Q_SLOTS:
 
     // This slot should be used when any of the decoders / annotation curves
@@ -76,6 +78,7 @@ protected:
     QVector<GenericLogicPlotCurve*> m_plotCurves;
     bool m_active = false;
     QMap<int, int> *m_primary_annoations;
+    mutable int m_current_column;
 };
 
 } // namespace logic

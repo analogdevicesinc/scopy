@@ -197,6 +197,13 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 		channelBox->setChecked(false);
 	}
 
+	// decoder table dropdown menu
+	connect(ui->btnCollapseSettings,&QPushButton::clicked,
+		[=](bool check) {
+			ui->wDecoderSettings_2->setVisible(check);
+		});
+	ui->btnCollapseSettings->click();
+
 	// Add propper zoomer
 	m_plot.addZoomer(0);
 
@@ -1470,6 +1477,42 @@ void LogicAnalyzer::setupUi()
 		this, &LogicAnalyzer::exportData);
 }
 
+bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
+{
+	bool changed = false;
+	ui->primaryAnnotationComboBox->clear();
+	auto curve = dynamic_cast<AnnotationCurve *>(getPlotCurves(true)[DIGITAL_NR_CHANNELS + column]);
+	std::map<Row, RowData> decoder(curve->getAnnotationRows());
+
+	for (auto it = decoder.begin(); it != decoder.end(); it++) {
+		if (!it->second.get_annotations().empty()) {
+			auto title = it->first.title().toStdString();
+			if (title.find(":")) {
+				ui->primaryAnnotationComboBox->addItem(QString::fromStdString(title.substr(title.find(':') + 1)), it->first.index());
+			}
+			else {
+				ui->primaryAnnotationComboBox->addItem(QString::fromStdString(title), it->first.index());
+			}
+		}
+
+	}
+
+	if (index != ui->primaryAnnotationComboBox->currentData().toInt()) {
+		changed = true;
+	}
+
+	if (index != -1) {
+		ui->primaryAnnotationComboBox->setCurrentIndex(ui->primaryAnnotationComboBox->findData(index));
+	}
+
+	return changed;
+}
+
+void LogicAnalyzer::setSelectedPrimaryAnnotation(int index)
+{
+	ui->primaryAnnotationComboBox->setCurrentIndex(ui->primaryAnnotationComboBox->findData(index));
+}
+
 void LogicAnalyzer::enableRunButton(bool flag)
 {
 	ui->runSingleWidget->getRunButton()->setEnabled(flag);
@@ -1480,9 +1523,15 @@ void LogicAnalyzer::enableSingleButton(bool flag)
 	ui->runSingleWidget->getSingleButton()->setEnabled(flag);
 }
 
+void LogicAnalyzer::PrimaryAnnotationChanged(int index){
+	ui->decoderTableView->setPrimaryAnnotation(ui->primaryAnnotationComboBox->currentData().toInt());
+}
+
 void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
+
+	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){

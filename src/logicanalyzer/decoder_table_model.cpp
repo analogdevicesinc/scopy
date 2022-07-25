@@ -35,6 +35,7 @@ DecoderTableModel::DecoderTableModel(DecoderTable *decoderTable, LogicAnalyzer *
 	m_plotCurves = m_logic->getPlotCurves(true);
 	m_decoderTable->verticalHeader()->setMinimumSectionSize(1);
 	m_primary_annoations = new QMap<int, int>();
+	m_current_column = 1;
 }
 
 void DecoderTableModel::setDefaultPrimaryAnnotations()
@@ -91,6 +92,13 @@ int DecoderTableModel::indexOfCurve(const AnnotationCurve *curve) const
         if (m_curves[i] == curve) return i;
     }
     return -1;
+}
+
+void DecoderTableModel::setPrimaryAnnotation(int index)
+{
+	m_primary_annoations->remove(m_current_column);
+	m_primary_annoations->insert(m_current_column, index);
+	m_decoderTable->reset();
 }
 
 void DecoderTableModel::activate()
@@ -168,20 +176,26 @@ void DecoderTableModel::refreshColumn(double column) const
 		return;
 	}
 
-	for (int row = 0; row < m_decoderTable->size().height(); row++) {
-		if (row < curve->getMaxAnnotationCount(m_primary_annoations->value((int) column))) {
-			m_decoderTable->showRow(row);
+	int index = curve->getMaxAnnotationCount(m_primary_annoations->value((int) column));
+	if (m_decoderTable->isRowHidden(index - 1) || !m_decoderTable->isRowHidden(index)) {
+		for (int row = 0; row < m_decoderTable->size().height(); row++) {
+			if (row < curve->getMaxAnnotationCount(m_primary_annoations->value((int) column))) {
+				m_decoderTable->showRow(row);
+			}
+			else {
+				m_decoderTable->hideRow(row);
+			}
 		}
-		else {
-			m_decoderTable->hideRow(row);
-		}
+
 	}
 
 	// resize rows
 	const int spacing = 10;
 	int rowHeight = 20;
-	rowHeight = std::max(rowHeight, static_cast<int>(curve->getTraceHeight()));
-	verticalHeader->setDefaultSectionSize(rowHeight * curve->getVisibleRows() + spacing);
+	if (verticalHeader->defaultSectionSize() != rowHeight * curve->getVisibleRows() + spacing) {
+		rowHeight = std::max(rowHeight, static_cast<int>(curve->getTraceHeight()));
+		verticalHeader->setDefaultSectionSize(rowHeight * curve->getVisibleRows() + spacing);
+	}
 }
 
 void DecoderTableModel::annotationsChanged()
@@ -223,19 +237,13 @@ QVariant DecoderTableModel::headerData(int section, Qt::Orientation orientation,
             return QVariant();
         }
 	if (m_plotCurves.size() > section) {
-		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[section]);
-		std::map<Row, RowData> decoder(curve->getAnnotationRows());
-		std::map<Row, RowData>::iterator it;
-
-		for (it = decoder.begin(); it != decoder.end(); it++) {
-			if (it->first.index() == m_primary_annoations->value(section)) {
-				return it->first.title();
-			}
-		}
 		return m_plotCurves.at(section)->getName();
 	}
 	return QVariant();
    }
+    m_current_column = section;
+    bool changed = m_logic->setPrimaryAnntations(section, m_primary_annoations->value(section));
+
     return QAbstractTableModel::headerData(section, orientation, role);
 }
 

@@ -103,8 +103,11 @@ public: // Mixed Signal View Interface
 
 	// Update the viewport to fit the min and max time
 	void fitViewport(double min, double max);
+	void resetViewport();
+	bool setPrimaryAnntations(int column, int index = -1);
 	void enableRunButton(bool flag);
 	void enableSingleButton(bool flag);
+	void setSelectedPrimaryAnnotation(int index);
 
 Q_SIGNALS:
 	void showTool();
@@ -139,6 +142,8 @@ private Q_SLOTS:
 	void exportData();
 	bool exportTabCsv(const QString &separator, const QString &fileName);
 	bool exportVcd(const QString &fileName, const QString &startSep, const QString &endSep);
+
+	void PrimaryAnnotationChanged(int index);
 
 private:
 	void setupUi();
