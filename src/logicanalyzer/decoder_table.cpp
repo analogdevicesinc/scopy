@@ -66,6 +66,11 @@ DecoderTableModel* DecoderTable::decoderModel() const
     return dynamic_cast<DecoderTableModel*>(model());
 }
 
+void DecoderTable::setPrimaryAnnotation(int index)
+{
+	decoderModel()->setPrimaryAnnotation(index);
+}
+
 void DecoderTable::activate(bool logic)
 {
     setLogicAnalyzer(m_logicAnalyzer);
