@@ -2668,6 +2668,11 @@ QVector<QVector<QString>> LogicAnalyzer::createDecoderData(bool separate_annotat
 				new_value = "";
 
 				if (separate_annotations) {
+					// overlapping annotations
+					if (end_sample == rows[row_index][col + 1].start_sample()) {
+						end_sample --;
+					}
+
 					new_value = (start_sample == i && end_sample == i) ? start_separator + rows[row_index][col].annotations()[0] + end_separator
 							: (start_sample == i && end_sample > i) ? start_separator + rows[row_index][col].annotations()[0]
 							: (end_sample == i + 1 && start_sample < i) ? rows[row_index][col].annotations()[0] + end_separator
