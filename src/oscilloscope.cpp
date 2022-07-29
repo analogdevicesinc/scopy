@@ -3658,10 +3658,10 @@ void adiscope::Oscilloscope::onHorizScaleValueChanged(double value)
 	hist_plot.replot();
 
 	ch_ui->cmbMemoryDepth->setCurrentIndex(0);
-	int m_currentKernelBuffers;
+	const int minKernelBuffers = 4;
+	int m_currentKernelBuffers = minKernelBuffers;
 	if (timeBase->value() >= TIMEBASE_THRESHOLD) {
 		plot_samples_sequentially = true;	// streaming
-		const int minKernelBuffers = 4;
 		const int oneBufferMaxSize = 2 * 1024 * 1024; // 2M
 		m_currentKernelBuffers = minKernelBuffers;
 		if (active_trig_sample_count < 0) {
