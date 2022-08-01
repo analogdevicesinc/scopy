@@ -2662,21 +2662,23 @@ QVector<QVector<QString>> LogicAnalyzer::createDecoderData(bool separate_annotat
 		for (unsigned int row_index = 0; row_index < rows.size(); row_index++) {
 			colum_is_visible = false;
 
-			for(int col=0; col < rows[row_index].size(); col++){
+			for(unsigned int col=0; col < rows[row_index].size(); col++){
 				start_sample = rows[row_index][col].start_sample();
 				end_sample = rows[row_index][col].end_sample();
 				new_value = "";
 
 				if (separate_annotations) {
 					// overlapping annotations
-					if (end_sample == rows[row_index][col + 1].start_sample()) {
-						end_sample --;
+					if ((col + 1) < rows[row_index].size()) {
+						if(end_sample == rows[row_index][col + 1].start_sample()) {
+							end_sample --;
+						}
 					}
 
 					new_value = (start_sample == i && end_sample == i) ? start_separator + rows[row_index][col].annotations()[0] + end_separator
 							: (start_sample == i && end_sample > i) ? start_separator + rows[row_index][col].annotations()[0]
-							: (end_sample == i + 1 && start_sample < i) ? rows[row_index][col].annotations()[0] + end_separator
-							: (start_sample < i && end_sample > i + 1) ? repeated_value
+							: (end_sample == i && start_sample < i) ? rows[row_index][col].annotations()[0] + end_separator
+							: (start_sample < i && end_sample > i) ? repeated_value
 												   : "";
 				} else if ((start_sample <= i && end_sample > i) || (start_sample == i && end_sample == i)) {
 					new_value = rows[row_index][col].annotations()[0];
