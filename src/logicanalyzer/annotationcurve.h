@@ -150,10 +150,9 @@ private:
     std::map<std::pair<const srd_decoder*, int>, Row> m_classRows;
     std::map<Row, RowData> m_annotationRows;
 
-	std::vector<std::shared_ptr<adiscope::bind::Decoder>> m_bindings;
+    std::vector<std::shared_ptr<adiscope::bind::Decoder>> m_bindings;
 
-	mutable int m_visibleRows;
-
+    mutable int m_visibleRows;
 };
 }
 
