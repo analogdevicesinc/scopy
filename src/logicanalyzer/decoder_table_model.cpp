@@ -37,6 +37,7 @@ DecoderTableModel::DecoderTableModel(DecoderTable *decoderTable, LogicAnalyzer *
 	m_decoderTable->verticalHeader()->setMinimumSectionSize(1);
 	m_primary_annoations = new QMap<int, int>();
 	m_current_column = 0;
+	to_be_refreshed = false;
 }
 
 void DecoderTableModel::setDefaultPrimaryAnnotations()
@@ -60,23 +61,14 @@ void DecoderTableModel::setDefaultPrimaryAnnotations()
 int DecoderTableModel::rowCount(const QModelIndex &parent) const
 {
 	// Return max of all packets
-	if (m_decoderTable->signalsBlocked()) {
-		return max_row_count;
-	}
 	size_t count = 0;
 	if (!m_active) {
-		max_row_count = 0;
 		return 0;
 	}
 
-	std::map<Row, RowData> decoder;
-	for (const auto &entry: m_decoderTable->getDecoderCruves()) {
-		const auto &curve = dynamic_cast<AnnotationCurve *>(entry);
-		count = std::max(count, curve->getMaxAnnotationCount());
-	}
-	max_row_count = count;
-	return count;
+	return max_row_count;
 }
+
 int DecoderTableModel::columnCount(const QModelIndex &parent) const
 {
 	// One column per curve
@@ -106,7 +98,7 @@ void DecoderTableModel::setPrimaryAnnotation(int index)
 	}
 }
 
-void DecoderTableModel::populateDecoderComboBox()
+void DecoderTableModel::populateDecoderComboBox() const
 {
 	auto decoderComboBox = m_logic->getDecoderComboBox();
 
@@ -126,6 +118,36 @@ int DecoderTableModel::getCurrentColumn()
 QMap<int, QVector<QString>>& DecoderTableModel::getFiltered()
 {
 	return m_filteredMessages;
+}
+
+void DecoderTableModel::setCurrentRow(int index)
+{
+	auto curve = dynamic_cast<AnnotationCurve *> (m_plotCurves.at(m_current_column));
+	if (index >= curve->getMaxAnnotationCount(m_primary_annoations->value((int) m_current_column))) return;
+
+	m_decoderTable->scrollTo(this->index(index, m_current_column));
+	m_decoderTable->selectRow(index);
+}
+
+void DecoderTableModel::setMaxRowCount()
+{
+	uint64_t count = 0;
+	std::map<Row, RowData> decoder;
+	for (const auto &entry: m_decoderTable->getDecoderCruves()) {
+		const auto &curve = dynamic_cast<AnnotationCurve *>(entry);
+		count = std::max(count, curve->getMaxAnnotationCount());
+	}
+	max_row_count = count;
+}
+
+void DecoderTableModel::refreshSettings(int column) const
+{
+	if (column == -1) {
+		column = m_current_column;
+	}
+
+	populateDecoderComboBox();
+	populateFilter(column);
 }
 
 void DecoderTableModel::activate()
@@ -157,7 +179,8 @@ void DecoderTableModel::activate()
 	populateDecoderComboBox();
 	populateFilter(0);
 	//    setDefaultPrimaryAnnotations();
-	refreshColumn(0);
+	setMaxRowCount();
+	to_be_refreshed = true;
 }
 
 void DecoderTableModel::deactivate()
@@ -202,6 +225,12 @@ void DecoderTableModel::reloadDecoders(bool logic)
 
 void DecoderTableModel::refreshColumn(double column) const
 {
+	if (m_plotCurves.empty()) return;
+
+	if (column == -1) {
+		column = m_current_column;
+	}
+
 	// hide/show rows
 	auto curve = dynamic_cast<AnnotationCurve *> (m_plotCurves.at(column));
 	const auto verticalHeader = m_decoderTable->verticalHeader();
@@ -252,7 +281,7 @@ void DecoderTableModel::annotationsChanged()
 	endResetModel();
 }
 
-void DecoderTableModel::selectedDecoderChanged(int index)
+void DecoderTableModel::selectedDecoderChanged(int index) const
 {
 	if (index >= 0) {
 		m_decoderTable->scrollTo(QAbstractTableModel::index(0, index));
@@ -265,8 +294,9 @@ void DecoderTableModel::selectedDecoderChanged(int index)
 	}
 }
 
-void DecoderTableModel::populateFilter(int index)
+void DecoderTableModel::populateFilter(int index) const
 {
+	if (index < 0 || m_plotCurves.empty()) return;
 	auto temp_curve = dynamic_cast<AnnotationCurve *>(m_plotCurves.at(index));
 	std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
 	m_logic->clearFilter();
@@ -288,7 +318,7 @@ void DecoderTableModel::populateFilter(int index)
 
 QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 {
-	if (!index.isValid()) return QVariant();
+	if (!index.isValid() || m_decoderTable->signalsBlocked() || m_plotCurves.empty()) return QVariant();
 
 	const size_t col = index.column();
 	if ( col >= m_curves.size() ) return QVariant();
@@ -316,6 +346,12 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 
 	if (row.empty()) {
 		return QVariant();
+	}
+
+	if (to_be_refreshed) {
+		refreshColumn(col);
+		selectedDecoderChanged(col);
+		to_be_refreshed = false;
 	}
 
 	return QVariant::fromValue(DecoderTableItem(

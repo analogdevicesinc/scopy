@@ -99,7 +99,7 @@ void DecoderTableItem::paint(
 
 	QwtScaleMap xmap, ymap;
 	xmap.setPaintInterval(0, rect.width());
-	ymap.setPaintInterval(0, rect.height());
+	ymap.setPaintInterval(4, rect.height());
 	// qDebug() << "rect: " << rect << Qt::endl;
 
 	QwtPointMapper mapper;

@@ -45,7 +45,7 @@ public:
     void setDefaultPrimaryAnnotations();
 
     // resize table cells and hide/show rows
-    void refreshColumn(double column) const;
+    void refreshColumn(double column = -1) const;
 
     // activate connects signals to listen for new decoded messages
     // deactivate disconnects them.
@@ -56,11 +56,15 @@ public:
     int indexOfCurve(const AnnotationCurve* curve) const;
 
     void setPrimaryAnnotation(int index);
-    void selectedDecoderChanged(int index);
+    void selectedDecoderChanged(int index) const;
 
-    void populateFilter(int index);
+    void populateFilter(int index) const;
     QMap<int, QVector<QString>>& getFiltered();
     int getCurrentColumn();
+    void setCurrentRow(int index);
+    void setMaxRowCount();
+    mutable bool to_be_refreshed;
+    void refreshSettings(int column = -1) const;
 
 public Q_SLOTS:
 
@@ -82,7 +86,7 @@ protected:
     QVector<GenericLogicPlotCurve*> m_plotCurves;
     bool m_active = false;
     QMap<int, int> *m_primary_annoations;
-    void populateDecoderComboBox();
+    void populateDecoderComboBox() const;
     mutable int m_current_column;
     QMap<int, QVector<QString>> m_filteredMessages;
     mutable int max_row_count = 0;

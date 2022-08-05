@@ -602,8 +602,10 @@ uint64_t AnnotationCurve::getMaxAnnotationCount(int index)
 		if (it->first.index() == index) {
 			return temp_annotations.size();
 		}
-		count = std::max(count, temp_annotations.size());
+		if (count < temp_annotations.size()) {
+			count = temp_annotations.size();
 		}
+	}
 
 	return count;
 }
@@ -775,22 +777,37 @@ AnnotationQueryResult AnnotationCurve::annotationAt(const QPointF& p) const
     // NOTE: Row height is negative
     const double rowHeight = ymap.invTransform(m_traceHeight) - ymap.invTransform(0);
 
-    for (const auto &entry: m_annotationRows) {
-        const Row &row = entry.first;
-        const RowData &data = entry.second;
-        if (data.size() == 0) continue; // No data
+    int empty_ann_count = 0;
+    for (int index = 0; index <= m_annotationRows.size(); index ++) {
+	    for (const auto &entry: m_annotationRows) {
+		    if (entry.first.index() != index) continue;
+		    const Row &row = entry.first;
+		    const RowData &data = entry.second;
 
-        const auto maxY = m_pixelOffset + row.index() * rowHeight;
-        const auto minY = maxY + rowHeight;
+		    const auto maxY = m_pixelOffset + (row.index() - empty_ann_count) * rowHeight;
+		    const auto minY = maxY + rowHeight;
 
-        const auto y = p.y();
-        if (y < minY or y > maxY) continue; // Wrong row
-        for (uint64_t i = 0; i < data.size(); i++) {
-            const Annotation *ann = data.annAt(i);
-            if (sample >= ann->start_sample() and sample <= ann->end_sample()) {
-                return {i, ann};
-            }
-        }
+		    const auto y = p.y();
+		    if (data.size() == 0) {
+			    empty_ann_count ++;
+			    continue;
+		    }
+		    if (y < minY or y > maxY) continue;
+		    uint64_t prev_end_sample = 0, next_start_sample = 0;
+		    for (uint64_t i = 0; i < data.size(); i++) {
+			    const Annotation *ann = data.annAt(i);
+			    next_start_sample = (i + 1 == data.size()) ? sample + (sample - prev_end_sample)/2
+								       : data.annAt(i + 1)->start_sample();
+			    if (ann->end_sample() - ann->start_sample() < 2 &&
+					    sample + (sample - prev_end_sample)/2 >= ann->start_sample() and sample - (next_start_sample - sample)/2 <= ann->end_sample()) {
+				    return {i, ann};
+			    }
+			    if (sample >= ann->start_sample() and sample <= ann->end_sample()) {
+				    return {i, ann};
+			    }
+			    prev_end_sample = ann->end_sample();
+		    }
+	    }
     }
     return {0, nullptr};
 }
