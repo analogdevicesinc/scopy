@@ -1620,6 +1620,14 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		[=](bool checked){
 		if (!checked) {
 			ui->decoderTableView->blockSignals(false);
+			if (ui->decoderTableView->isActive()) {
+				ui->decoderTableView->decoderModel()->setMaxRowCount();
+				if (ui->PrimaryAnnotationComboBox->count() == 0) {
+					ui->decoderTableView->decoderModel()->refreshColumn();
+				} else {
+					ui->decoderTableView->decoderModel()->to_be_refreshed = true;
+				}
+			}
 		}
 	});
 
@@ -2425,6 +2433,15 @@ void LogicAnalyzer::setupDecoders()
 			const auto model = ui->decoderTableView->decoderModel();
 			const auto col = model->indexOfCurve(curve);
 			ui->DecoderComboBox->setCurrentIndex(col);
+
+			std::string title = result.ann->row()->title().toStdString();
+			title = title.erase(0, title.find(':') + 1);
+
+			int row_index = ui->PrimaryAnnotationComboBox->findText(QString::fromStdString(title));
+			if (row_index != -1) {
+				ui->PrimaryAnnotationComboBox->setCurrentIndex(row_index);
+				ui->decoderTableView->decoderModel()->setCurrentRow(result.index);
+			}
 		});
 	});
 
