@@ -116,6 +116,12 @@ public:
                    const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                    const QRectF &canvasRect, const QwtPointMapper &mapper) const;
 
+    void drawAnnotationInfo(int row, uint64_t start, uint64_t end, QPainter *painter,
+		   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+		   const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+
+    const double m_infoHeight = 17 * 2;
+
 protected:
     void drawLines( QPainter *painter,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
@@ -139,6 +145,8 @@ private:
                                  const QwtScaleMap &xMap, const QwtScaleMap &yMap,
 				 const QRectF &canvasRect, const QwtPointMapper &mapper,
 				 const QwtInterval &interval, const QSizeF &titleSize) const;
+
+    QString formatSeconds(double time) const;
 
 
 
