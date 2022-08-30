@@ -99,7 +99,7 @@ void DecoderTableItem::paint(
 
 	QwtScaleMap xmap, ymap;
 	xmap.setPaintInterval(0, rect.width());
-	ymap.setPaintInterval(4, rect.height());
+	ymap.setPaintInterval(4 + curve->m_infoHeight, rect.height());
 	// qDebug() << "rect: " << rect << Qt::endl;
 
 	QwtPointMapper mapper;
@@ -135,6 +135,7 @@ void DecoderTableItem::paint(
 		return;
 	}
 
+	curve->drawAnnotationInfo(offset, startSample, endSample, painter, xmap, ymap, rect, mapper);
 	for (const auto &entry: curve->getAnnotationRows()) {
 		const RowData &data = entry.second;
 

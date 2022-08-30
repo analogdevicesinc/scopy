@@ -509,6 +509,69 @@ void AnnotationCurve::drawBlock(int row, uint64_t start, uint64_t end, QPainter 
     painter->restore();
 }
 
+QString AnnotationCurve::formatSeconds(double sec) const
+{
+	QString string;
+	auto time = abs(sec);
+	if (time > 1) {
+		string = QString("%1 s").arg(sec);
+	}
+	else if (time > 0.001) {
+		string = QString("%1 ms").arg(sec * 10E+2);
+	}
+	else if (time > 0.000001) {
+		string = QString("%1 μs").arg(sec * 10E+5);
+	}
+	else {
+		string = QString("%1 ns").arg(sec * 10E+8);
+	}
+
+	return string;
+}
+
+void AnnotationCurve::drawAnnotationInfo(int row, uint64_t start, uint64_t end, QPainter *painter,
+					 const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+					 const QRectF &canvasRect, const QwtPointMapper &mapper) const {
+
+	const double infoHeightInPoints = yMap.invTransform(m_infoHeight) - yMap.invTransform(0);
+	const double infoWidthRatio = 0.09;
+	double HeightInPoints = yMap.invTransform(m_traceHeight) - yMap.invTransform(0);
+	double offset = m_pixelOffset + (row) * (HeightInPoints) - infoHeightInPoints;
+
+	double width = xMap.transform(fromSampleToTime(end)) - xMap.transform(fromSampleToTime(start));
+
+	QRectF rect;
+	if (start != end) {
+		rect = QRectF(QPointF(xMap.transform(fromSampleToTime(start)), yMap.transform(offset)), QSizeF(width, m_infoHeight));
+	} else {
+		rect = QRectF(QPointF(canvasRect.x() + canvasRect.width() * infoWidthRatio, yMap.transform(offset)), QSizeF(canvasRect.width() * (1 - infoWidthRatio), m_infoHeight));
+	}
+
+	painter->save();
+
+	painter->setPen(Qt::transparent);
+	painter->setBrush(QBrush(QColor::fromRgb(0, 0, 20, 150)));
+
+	painter->drawRoundedRect(rect, 5, 5);
+
+	painter->setPen(QPen(QBrush(Qt::white), 1));
+
+	QString info_time = "  start: " + formatSeconds(fromSampleToTime(start));
+	QString info_delta_time = "  duration: " + formatSeconds(fromSampleToTime(end) - fromSampleToTime(start));
+
+	painter->drawText(rect, Qt::AlignLeft|Qt::AlignTop, info_time);
+	painter->drawText(rect, Qt::AlignLeft|Qt::AlignBottom, info_delta_time);
+
+	QString info_sample = QString("start sample: %1  ").arg(QString::fromStdString(std::to_string(start)));
+	QString info_delta_sample = QString("sample count: %1  ").arg(QString::fromStdString(std::to_string(end - start)));
+
+	painter->drawText(rect, Qt::AlignRight|Qt::AlignTop, info_sample);
+	painter->drawText(rect, Qt::AlignRight|Qt::AlignBottom, info_delta_sample);
+	painter->setPen(QPen(QBrush(Qt::black), 1));
+
+	painter->restore();
+}
+
 void AnnotationCurve::drawAnnotation(int row, const Annotation &ann, QPainter *painter,
 				     const QwtScaleMap &xMap, const QwtScaleMap &yMap,
 				     const QRectF &canvasRect, const QwtPointMapper &mapper,
