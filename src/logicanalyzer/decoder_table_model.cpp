@@ -254,7 +254,7 @@ void DecoderTableModel::refreshColumn(double column) const
 	}
 
 	// resize rows
-	const int spacing = 10;
+	const int spacing = 10 + curve->m_infoHeight;
 	int rowHeight = 25;
 
 	int row_count = 0;
