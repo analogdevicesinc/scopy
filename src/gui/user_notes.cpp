@@ -154,7 +154,7 @@ int UserNotes::getNoteIndex(Note *note)
 {
         if (!note)
                 return -1;
-        for (int i = 0; i < m_notes.size(); i++) {
+        for (size_t i = 0; i < m_notes.size(); i++) {
                 if (m_notes.at(i) == note) {
                         return i;
                 }

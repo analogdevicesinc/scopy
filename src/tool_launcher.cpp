@@ -610,7 +610,7 @@ DeviceWidget* ToolLauncher::getConnectedDevice()
 
 DeviceWidget* ToolLauncher::getSelectedDevice()
 {
-	for (int i = 0; i < devices.size(); i++) {
+	for (size_t i = 0; i < devices.size(); i++) {
 		auto dev = devices.at(i);
 		if (dev->isChecked()) {
 			return dev;
@@ -621,7 +621,7 @@ DeviceWidget* ToolLauncher::getSelectedDevice()
 
 int ToolLauncher::getDeviceIndex(DeviceWidget *device)
 {
-	for (int i = 0; i < devices.size(); i++) {
+	for (size_t i = 0; i < devices.size(); i++) {
 		if (devices.at(i) == device) {
 			return i;
 		}
@@ -1082,8 +1082,6 @@ void ToolLauncher::updateHomepage()
 
 void ToolLauncher::swapMenu(QWidget *menu)
 {
-	Tool *tl = dynamic_cast<Tool* >(menu);
-
 	if (current) {
 		current->setVisible(false);
 		ui->centralLayout->removeWidget(current);
@@ -1965,9 +1963,9 @@ void ToolLauncher::hasText()
 		QJSValue val = js_engine.evaluate(js_cmd);
 
 		if (val.isError()) {
-			out << "Exception:" << val.toString() << endl;
+			out << "Exception:" << val.toString() << Qt::endl;
 		} else if (!val.isUndefined()) {
-			out << val.toString() << endl;
+			out << val.toString() << Qt::endl;
 		}
 
 		js_cmd.clear();

@@ -31,9 +31,9 @@ GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, const QString 
 	QwtPlotCurve(),
 	m_name(name),
 	m_id(id),
+	m_traceColor("dodgerblue"),
 	m_pixelOffset(pixelOffset),
 	m_traceHeight(traceHeight),
-	m_traceColor("dodgerblue"),
 	m_sampleRate(sampleRate),
 	m_timeTriggerOffset(timeTriggerOffset),
 	m_bufferSize(bufferSize),
@@ -71,6 +71,13 @@ double GenericLogicPlotCurve::getSampleRate() const
 {
 	return m_sampleRate;
 }
+
+double GenericLogicPlotCurve::getTotalTime() const
+{
+	if (m_bufferSize == 0) return 0;
+	return static_cast<double>(m_bufferSize) / m_sampleRate;
+}
+
 
 double GenericLogicPlotCurve::getTimeTriggerOffset() const
 {
@@ -150,7 +157,7 @@ void GenericLogicPlotCurve::setBufferSize(uint64_t bufferSize)
 
 uint64_t GenericLogicPlotCurve::fromTimeToSample(double time) const
 {
-	const double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
+	const double totalTime = getTotalTime();
 	const double tmin = (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	const double tmax = totalTime + (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	const double smin = 0;
@@ -169,7 +176,7 @@ uint64_t GenericLogicPlotCurve::fromTimeToSample(double time) const
 
 double GenericLogicPlotCurve::fromSampleToTime(uint64_t sample) const
 {
-	const double totalTime = static_cast<double>(m_bufferSize) / m_sampleRate;
+	const double totalTime = getTotalTime();
 	const double tmin = (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	const double tmax = totalTime + (m_timeTriggerOffset * (1.0 / m_sampleRate));
 	const double smin = 0;

@@ -283,7 +283,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setBtmHorAxisUnit("Hz");
 
 	// Initialize spectrum channels
-	for (int i = 0 ; i < m_adc_nb_channels; i++) {
+	for (size_t i = 0 ; i < m_adc_nb_channels; i++) {
 		channel_sptr channel = boost::make_shared<SpectrumChannel>(i,
 		                       channel_names[i], fft_plot);
 		channel->setColor(fft_plot->getLineColor(i));
@@ -429,7 +429,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	}
 
 	// Configure markers
-	for (int i = 0; i < m_adc_nb_channels; i++) {
+	for (size_t i = 0; i < m_adc_nb_channels; i++) {
 		fft_plot->setMarkerCount(i, 5);
 
 		for (int m = 0; m < 5; m++) {
@@ -1736,7 +1736,7 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 #endif
 
 	} else if (channelWidget->id() == crt_channel_id) {
-		for (int i = 0; i < m_adc_nb_channels + nb_ref_channels; ++i) {
+		for (size_t i = 0; i < m_adc_nb_channels + nb_ref_channels; ++i) {
 			auto cw = getChannelWidgetAt(i);
 			if (cw == channelWidget) {
 				continue;
@@ -1840,7 +1840,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 	bool canConvRawToVolts = m_m2k_analogin ? true : false;
 
 	if (canConvRawToVolts) {
-		for (int i = 0; i < m_adc_nb_channels; i++) {
+		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(i);
 			fft_plot->setScaleFactor(i, m_m2k_analogin->getScalingFactor(chn));
 		}
@@ -1848,7 +1848,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 	fft_ids = new iio_manager::port_id[m_adc_nb_channels];
 
-	for (int i = 0; i < m_adc_nb_channels; i++) {
+	for (size_t i = 0; i < m_adc_nb_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
 		                   new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
@@ -1878,7 +1878,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 
 	top_block = gr::make_top_block("spectrum_analyzer");
 
-	for (int i = 0; i < m_adc_nb_channels; i++) {
+	for (size_t i = 0; i < m_adc_nb_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
 		                   new fft_block(false, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
@@ -1905,7 +1905,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 void SpectrumAnalyzer::start_blockchain_flow()
 {
 	if (iio) {
-		for (int i = 0; i < m_adc_nb_channels; i++) {
+		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->start(fft_ids[i]);
 		}
 	} else {
@@ -1917,7 +1917,7 @@ void SpectrumAnalyzer::start_blockchain_flow()
 void SpectrumAnalyzer::stop_blockchain_flow()
 {
 	if (iio) {
-		for (int i = 0; i < m_adc_nb_channels; i++) {
+		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->stop(fft_ids[i]);
 		}
 	} else {
@@ -2225,7 +2225,7 @@ void SpectrumAnalyzer::updateMarkerMenu(unsigned int id)
 
 		marker_selector->blockSignals(true);
 
-		for (int i = 0; i < fft_plot->markerCount(id); i++) {
+		for (size_t i = 0; i < fft_plot->markerCount(id); i++) {
 			marker_selector->setButtonChecked(i,
 							  fft_plot->markerEnabled(id, i));
 		}
@@ -2272,7 +2272,7 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 	} else {
 		bool allDisabled = true;
 		bool shouldDisable = true;
-		for (int i = 0; i < channels.size() + nb_ref_channels; i++) {
+		for (size_t i = 0; i < channels.size() + nb_ref_channels; i++) {
 			ChannelWidget *cw = getChannelWidgetAt(i);
 
 			if (cw->enableButton()->isChecked()) {
@@ -2304,7 +2304,7 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 		fft_plot->DetachCurve(cw->id());
 	}
 
-	for (int i = 0; i < fft_plot->markerCount(cw->id()); i++) {
+	for (size_t i = 0; i < fft_plot->markerCount(cw->id()); i++) {
 		if (fft_plot->markerEnabled(cw->id(), i)) {
 			fft_plot->setMarkerVisible(cw->id(), i, en);
 		}
@@ -2720,8 +2720,8 @@ void SpectrumAnalyzer::onPlotNewMarkerData()
 	}
 
 	// Update the markers in the marker table
-	for (int c = 0; c < m_adc_nb_channels; c++) {
-		for (int m = 0; m < fft_plot->markerCount(c); m++) {
+	for (size_t c = 0; c < m_adc_nb_channels; c++) {
+		for (size_t m = 0; m < fft_plot->markerCount(c); m++) {
 			if (fft_plot->markerEnabled(c, m)) {
 				int mkType = fft_plot->markerType(c, m);
 				ui->markerTable->updateMarker(m, c,
@@ -3291,7 +3291,7 @@ SpectrumChannel::calcCoherentPowerGain(const std::vector<float>& win) const
 {
 	float sum = 0;
 
-	for (int i = 0; i < win.size(); i++) {
+	for (size_t i = 0; i < win.size(); i++) {
 		sum += win[i];
 	}
 
@@ -3300,7 +3300,7 @@ SpectrumChannel::calcCoherentPowerGain(const std::vector<float>& win) const
 
 void SpectrumChannel::scaletFftWindow(std::vector<float>& win, float gain)
 {
-	for (int i = 0; i < win.size(); i++) {
+	for (size_t i = 0; i < win.size(); i++) {
 		win[i] *= gain;
 	}
 }

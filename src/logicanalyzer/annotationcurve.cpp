@@ -27,6 +27,7 @@
 
 #include "logic_tool.h"
 
+#include <iostream>
 #include <qwt_plot.h>
 #include <qwt_painter.h>
 #include <qwt_painter.h>
@@ -339,7 +340,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
     mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
     mapper.setBoundingRect(canvasRect);
 
-    auto interval = plot()->axisInterval(QwtAxis::XBottom);
+    const QwtInterval interval = plot()->axisInterval(QwtAxis::XBottom);
 
     QStringList titles;
 
@@ -349,7 +350,7 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
 
 
     int currentRowOnPlot = 0;
-    for (int row = 0; row < m_annotationRows.size(); ++row) {
+    for (size_t row = 0; row < m_annotationRows.size(); ++row) {
         auto it = std::find_if(m_annotationRows.begin(), m_annotationRows.end(),
                                [row](const std::pair<const Row, RowData> &t) -> bool{
             return t.first.index() == row;

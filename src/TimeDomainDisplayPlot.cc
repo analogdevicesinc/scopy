@@ -155,7 +155,7 @@ int SinkManager::indexOfSink(const std::string& name)
 
 int SinkManager::sinkFirstChannelPos(const std::string& name)
 {
-	int i, index = 0;
+	size_t i, index = 0;
 
 	for (i = 0; i < d_sinkList.size(); ++i) {
 		if (d_sinkList[i].name() == name)
@@ -325,7 +325,7 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
 	}
       }
 
-      for (int i = 0; i < d_plot_curve.size(); i++)
+      for (size_t i = 0; i < d_plot_curve.size(); i++)
 		d_plot_curve.at(i)->show();
       d_curves_hidden = false;
 
@@ -1038,7 +1038,7 @@ int TimeDomainDisplayPlot::countReferenceWaveform(int position)
 	QwtPlotCurve *curve = Curve(curveIdx);
 
 	int count = 0;
-	for (int i = 0; i < d_plot_curve.size(); ++i)
+	for (size_t i = 0; i < d_plot_curve.size(); ++i)
 		if (d_plot_curve[i] == curve) {
 			return count;
 		} else if (isReferenceWaveform(d_plot_curve[i])) {
@@ -1092,7 +1092,7 @@ void TimeDomainDisplayPlot::unregisterReferenceWaveform(QString name)
 	QwtPlotCurve *curve = d_ref_curves[name];
 	d_ref_curves.remove(name);
 	int pos = 0;
-	int i = 0;
+	size_t i = 0;
 	for (i = 0; i < d_plot_curve.size(); i++) {
 		if (isReferenceWaveform(Curve(i))) {
 			if (Curve(i)->title().text() == name) {
@@ -1280,7 +1280,7 @@ bool TimeDomainDisplayPlot::registerSink(std::string sinkUniqueNme, unsigned int
 		int sinkIndex = d_sinkManager.indexOfSink(sinkUniqueNme);
 		d_xdata.push_back(new double[channelsDataLength]);
 
-		for (int i = 0; i < numChannels; i++) {
+		for (size_t i = 0; i < numChannels; i++) {
 			int n = i + numCurves;
 			d_ydata.push_back(new double[channelsDataLength]);
 			memset(d_ydata[n], 0x0, channelsDataLength * sizeof(double));
@@ -1431,7 +1431,7 @@ long TimeDomainDisplayPlot::dataStartingPoint() const
 
 void TimeDomainDisplayPlot::resetXaxisOnNextReceivedData()
 {
-	for (int i = 0; i < d_sink_reset_x_axis_pts.size(); i++)
+	for (size_t i = 0; i < d_sink_reset_x_axis_pts.size(); i++)
 		d_sink_reset_x_axis_pts[i] = true;
 }
 
@@ -1459,7 +1459,7 @@ qreal TimeDomainDisplayPlot::getLineWidthF(int which) const
 
 void TimeDomainDisplayPlot::hideCurvesUntilNewData()
 {
-	for (int i = 0; i < d_plot_curve.size(); i++)
+	for (size_t i = 0; i < d_plot_curve.size(); i++)
 		d_plot_curve.at(i)->hide();
 	d_curves_hidden = true;
 }

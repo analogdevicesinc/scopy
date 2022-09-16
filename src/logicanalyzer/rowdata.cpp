@@ -90,7 +90,7 @@ std::pair<uint64_t, uint64_t> RowData::get_annotation_subset(uint64_t start_samp
     uint64_t first = 0, last = 0;
 
     bool found = false;
-    for (int i = 0; i < annotations_.size(); ++i) {
+    for (size_t i = 0; i < annotations_.size(); ++i) {
         if (annotations_[i].end_sample() > start_sample &&
             annotations_[i].start_sample() <= end_sample) {
             if (!found) {

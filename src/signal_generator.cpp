@@ -150,7 +150,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	QVector<struct iio_channel *> iio_channels;
 
-	for (int i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
+	for (size_t i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
 
 		unsigned long dev_sample_rate = m_m2k_analogout->getMaximumSamplerate(i);
 
@@ -472,7 +472,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	m_plot->registerSink(time_block_data->time_block->name(),
 	                   nb_channels, nb_points);
 
-	for(auto i = 0; i < nb_channels; i++) {
+	for(size_t i = 0; i < nb_channels; i++) {
 		m_plot->Curve(i)->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
 		m_plot->Curve(i)->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive, true);
 	}
@@ -849,8 +849,8 @@ void SignalGenerator::fileChannelChanged(int value)
 {
 	auto ptr = getCurrentData();
 
-	if (ptr->file_channel != (int) value) {
-		ptr->file_channel = (int) value;
+	if (ptr->file_channel != (size_t) value) {
+		ptr->file_channel = (size_t) value;
 		loadFileChannelData(currentChannel);
 		this->ui->label_size->setText(QString::number(
 						      ptr->file_nr_of_samples[ptr->file_channel]) +
@@ -1274,7 +1274,7 @@ bool SignalGenerator::loadParametersFromFile(
 			f.seek(f.pos()+chunk.size);
 		}
 
-		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+		for (size_t i=0; i<ptr->file_nr_of_channels; i++) {
 			ptr->file_channel_names.push_back("Channel " + QString::number(i));
 			ptr->file_nr_of_samples.push_back(nr_of_samples);
 		}
@@ -1300,7 +1300,7 @@ bool SignalGenerator::loadParametersFromFile(
 			ptr->file_sr = fileManager->getSampleRate();
 
 		ptr->file_channel=0; // autoselect channel 0
-		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+		for (size_t i=0; i<ptr->file_nr_of_channels; i++) {
 			ptr->file_channel_names.push_back("Column " + QString::number(i));
 			ptr->file_nr_of_samples.push_back(fileManager->getNrOfSamples());
 		}
@@ -1354,7 +1354,7 @@ bool SignalGenerator::loadParametersFromFile(
 
 	ui->fileChannel->setEnabled(ptr->file_nr_of_channels > 1);
 
-	for(auto i = 0; i < ptr->file_nr_of_samples.size(); i++)
+	for(size_t i = 0; i < ptr->file_nr_of_samples.size(); i++)
 	{
 		if(ptr->file_nr_of_samples[i] > m_maxNbOfSamples)
 		{
@@ -1404,7 +1404,7 @@ void SignalGenerator::loadFileFromPath(QString filename){
     ui->label_format->setText(ptr->file_message);
 
     if (ptr->file_channel_names.isEmpty()) {
-        for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+        for (size_t i=0; i<ptr->file_nr_of_channels; i++) {
             ui->fileChannel->addItem(QString::number(i));
         }
     } else {
@@ -1466,7 +1466,7 @@ void SignalGenerator::start()
 	unsigned long final_rate;
 	unsigned long oversampling;
 
-	for (int i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
+	for (size_t i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
 		buffers.push_back({});
 		if (!m_m2k_analogout->isChannelEnabled(i)) {
 			continue;
@@ -1563,7 +1563,6 @@ basic_block_sptr SignalGenerator::getSignalSource(gr::top_block_sptr top,
 		double samp_rate, struct signal_generator_data& data,
                 double phase_correction)
 {
-	analog::gr_waveform_t waveform;
 	double phase;
 	double amplitude;
 	double rise=0.5,fall=0.5;
@@ -1845,7 +1844,7 @@ gr::basic_block_sptr SignalGenerator::getSource(QWidget *obj,
 					ptr->file_message=QString::fromLocal8Bit(e.what());
 					fs=blocks::null_source::make(sizeof(float));
 				}
-				for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+				for (size_t i=0; i<ptr->file_nr_of_channels; i++) {
 					if (i==ptr->file_channel) {
 						top->connect(fs,i,buffer,0);
 					} else {
@@ -2046,7 +2045,7 @@ void SignalGenerator::updateRightMenuForChn(int chIdx)
 	ui->fileChannel->clear();
 
 	if (ptr->file_channel_names.isEmpty()) {
-		for (auto i=0; i<ptr->file_nr_of_channels; i++) {
+		for (size_t i=0; i<ptr->file_nr_of_channels; i++) {
 			ui->fileChannel->addItem(QString::number(i));
 		}
 	} else {

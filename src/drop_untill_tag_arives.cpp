@@ -62,7 +62,7 @@ int drop_untill_tag_arives::general_work(int noutput_items,
 
 	int processed_items = 0;
 
-	for (int i = 0; i < ninput_items_.size(); ++i) {
+	for (size_t i = 0; i < ninput_items_.size(); ++i) {
 //		std::cout << "Channel : " << i << std::endl;
 
 		const float *in = static_cast<const float*>(input_items[i]);

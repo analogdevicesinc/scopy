@@ -46,6 +46,7 @@ public:
 	double getPixelOffset() const;
 	double getTraceHeight() const;
 	double getSampleRate() const;
+	double getTotalTime() const;
 	double getTimeTriggerOffset() const;
 	uint64_t getBufferSize() const;
 
