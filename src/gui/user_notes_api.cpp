@@ -59,7 +59,7 @@ void UserNotes_API::set_notes_list_size(int size)
 {
 	notesPanel->clearAllNotes();
 	for (int i = 0; i < size; i++){
-		auto n = notesPanel->addNote("", "");
+		notesPanel->addNote("", "");
 	}
 }
 

@@ -11,7 +11,7 @@
 namespace adiscope {
 
 int BasicPlot::staticPlotId = 0;
-BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), replotFrameRate(60), debug(false)
+BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), debug(false), replotFrameRate(60)
 {
 	useOpenGlCanvas = getToolLauncherInstance()->isOpenGlLoaded();
 	connect(&replotTimer,SIGNAL(timeout()),this,SLOT(replotNow()));

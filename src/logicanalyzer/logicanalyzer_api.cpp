@@ -210,7 +210,7 @@ QList<QStringList> LogicAnalyzer_API::getDecoderStack() const
 		}
 		QStringList decStack;
 		auto stack = annCurve->getDecoderStack();
-		for (int i = 1; i < stack.size(); ++i) {
+		for (size_t i = 1; i < stack.size(); ++i) {
 			decStack.push_back(stack[i]->decoder()->id);
 		}
 
@@ -255,7 +255,7 @@ QList<QStringList> LogicAnalyzer_API::getDecoderSettings() const
 		}
 		QStringList decSetting;
 		auto bindings = annCurve->getDecoderBindings();
-		for (int i = 0; i < bindings.size(); ++i) {
+		for (size_t i = 0; i < bindings.size(); ++i) {
 			QString settings;
 
 			QJsonObject obj;

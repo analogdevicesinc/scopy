@@ -223,7 +223,7 @@ void SpinBoxA::onLineEditTextEdited()
 
 bool SpinBoxA::isUnitMatched(const QString& unit, double value)
 {
-	int i = find_if(m_units.begin(), m_units.end(),
+	size_t i = find_if(m_units.begin(), m_units.end(),
 	[=](const pair<QString, double> pair) {
 		return pair.first.at(0) == unit.at(0);
 	}) - m_units.begin();

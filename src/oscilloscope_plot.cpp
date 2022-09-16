@@ -2069,7 +2069,7 @@ void CapturePlot::removeLeftVertAxis(unsigned int axis)
 		return;
 
 	// Update the mobile axis ID of all symbols
-	for (int i = axis; i < numAxis - 1; i++) {
+	for (size_t i = axis; i < numAxis - 1; i++) {
 		QwtAxisId axisId = d_offsetBars.at(i)->mobileAxis();
 		--axisId.id;
 		d_offsetBars.at(i)->setMobileAxis(axisId);
