@@ -184,10 +184,10 @@ Pattern *Pattern_API::fromString(QString str)
 		if (doc.isObject()) {
 			obj = doc.object();
 		} else {
-			qDebug() << "Document is not an object" << endl;
+			qDebug() << "Document is not an object" << Qt::endl;
 		}
 	} else {
-		qDebug() << "Invalid JSON...\n" << str << endl;
+		qDebug() << "Invalid JSON...\n" << str << Qt::endl;
 	}
 
 	return fromJson(obj);
@@ -724,7 +724,7 @@ uint8_t NumberPattern::generate_pattern(uint32_t sample_rate,
 	delete_buffer();
 	buffer = new short[number_of_samples];
 
-	for (auto i=0; i<number_of_samples; i++) {
+	for (size_t i=0; i<number_of_samples; i++) {
 		buffer[i] = nr;
 	}
 
@@ -835,7 +835,7 @@ uint8_t RandomPattern::generate_pattern(uint32_t sample_rate,
 	delete_buffer();
 	buffer = new short[number_of_samples];
 	auto samples_per_count = (int)round(((float)sample_rate/(float)frequency));
-	int j=0;
+	size_t j=0;
 
 	while (j<number_of_samples) {
 		uint16_t random_value = rand() % (1<<number_of_channels);
@@ -994,7 +994,7 @@ uint8_t BinaryCounterPattern::generate_pattern(uint32_t sample_rate,
 	auto increment = 1;
 	auto start_value = 0;
 	auto end_value = (1<<number_of_channels)-1;
-	auto j=0;
+	size_t j=0;
 
 	while (j<number_of_samples) {
 		for (auto k=0; k<samples_per_count; k++,j++) {
@@ -1131,7 +1131,7 @@ uint8_t GrayCounterPattern::generate_pattern(uint32_t sample_rate,
 	increment = 1;
 	start_value = 0;
 	auto i=init_value;
-	auto j=0;
+	size_t j=0;
 
 	while (j<number_of_samples) {
 		for (auto k=0; k<samples_per_count; k++,j++) {
@@ -1350,7 +1350,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame)
 		parity_bit_value = 1;
 		parity_bit_available = true;
 
-		for (auto i=0; i<data_bits; i++) {
+		for (size_t i=0; i<data_bits; i++) {
 			parity_bit_value = parity_bit_value ^ (chr_to_test & 0x01);
 			chr_to_test = chr_to_test>>1;
 		}
@@ -1361,7 +1361,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame)
 		parity_bit_value = 0;
 		parity_bit_available = true;
 
-		for (auto i=0; i<data_bits; i++) {
+		for (size_t i=0; i<data_bits; i++) {
 			parity_bit_value = parity_bit_value ^ (chr_to_test & 0x01);
 			chr_to_test = chr_to_test>>1;
 		}
@@ -1407,7 +1407,7 @@ uint16_t UARTPattern::encapsulateUartFrame(char chr, uint16_t *bits_per_frame)
 			ret = (ret << 1) | parity_bit_value;
 		}
 
-		for (auto i=0; i<stop_bits; i++) {
+		for (size_t i=0; i<stop_bits; i++) {
 			ret = (ret << 1) | 0x01;
 		}
 	}
@@ -1450,7 +1450,7 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 	short *buf_ptr = buffer;
 	short *buf_ptr_end = buffer + number_of_samples;
 	const char *str_ptr = str.c_str();
-	int i;
+	size_t i;
 
 	for (i=0; i<samples_per_frame/2 && buf_ptr < buf_ptr_end; i++, buf_ptr++) { // pad with half a frame
 		*buf_ptr = 1;
@@ -1459,7 +1459,7 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 	for (i=0; i<str.length(); i++,str_ptr++) {
 		auto frame_to_send = encapsulateUartFrame(*str_ptr, &bits_per_frame);
 
-		for (auto j=0; j<bits_per_frame; j++) {
+		for (size_t j=0; j<bits_per_frame; j++) {
 			short bit_to_send;
 
 			if (!msb_first) {
@@ -1471,7 +1471,7 @@ uint8_t UARTPattern::generate_pattern(uint32_t sample_rate,
 				frame_to_send = frame_to_send << 1;
 			}
 
-			for (auto k=0; k<samples_per_bit && buf_ptr < buf_ptr_end; k++,buf_ptr++) {
+			for (size_t k=0; k<samples_per_bit && buf_ptr < buf_ptr_end; k++,buf_ptr++) {
 				*buf_ptr =  bit_to_send;// set bit here
 			}
 		}
@@ -1732,19 +1732,19 @@ void I2CPattern::sample_bit(bool bit)
 {
 	// SDA Transitions must occur when SCL is LOW (unless starting or stopping)
 	// Set SDA whilst SCL is low from previous bit
-	for (auto i=0; i<samples_per_bit/4 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/4 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
 
 	// Sample SDA by clocking SCL
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
 	// Leave SCL low for next bit
-	for (auto i=0; i<samples_per_bit/4 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/4 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,bit);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
@@ -1753,22 +1753,22 @@ void I2CPattern::sample_bit(bool bit)
 void I2CPattern::sample_start_bit()
 {
 	// Explicitly set start condition, consume 2 bits
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,1);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
 
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
@@ -1839,22 +1839,22 @@ void I2CPattern::sample_payload()
 void I2CPattern::sample_stop()
 {
 	// Explicitly set stop condition, consume 2 bits
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,0);
 	}
 
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,0);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,1);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
 
-	for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+	for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 		*buf_ptr = changeBit(*buf_ptr,SDA,1);
 		*buf_ptr = changeBit(*buf_ptr,SCL,1);
 	}
@@ -2164,7 +2164,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate,
 				val = val >> 1;
 			}
 
-			for (auto i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
+			for (size_t i=0; i<samples_per_bit/2 && buf_ptr < buf_ptr_end; i++,buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr,csBit,CSPOL);
 				*buf_ptr = changeBit(*buf_ptr,clkActiveBit,CPOL);
 
@@ -4011,7 +4011,6 @@ uint8_t PulsePattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_
 
 	delete_buffer();
 	buffer = new short[number_of_samples];
-	int i = 0;
 
 	uint16_t buffer_val = (start) ? 0xffff : 0x0000;
 
@@ -4029,14 +4028,14 @@ uint8_t PulsePattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_
 
 	while (buffer_ptr < buffer_stop)
 	{
-		for(auto j = 0; j < delay; j++, buffer_ptr++)
+		for(size_t j = 0; j < delay; j++, buffer_ptr++)
 		{
 			*buffer_ptr = buffer_val;
 		}
-		for(auto j = 0; j < no_pulses; j++)
+		for(size_t j = 0; j < no_pulses; j++)
 		{
 			auto cnt = counter_init % (low_number_of_samples + high_number_of_samples);
-			for(auto k = 0; k < low_number_of_samples + high_number_of_samples; k++, buffer_ptr++) {
+			for(size_t k = 0; k < low_number_of_samples + high_number_of_samples; k++, buffer_ptr++) {
 				if(cnt >= high_number_of_samples + low_number_of_samples)
 					cnt=0;
 				if(cnt < low_number_of_samples) {

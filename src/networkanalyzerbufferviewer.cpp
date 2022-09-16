@@ -95,7 +95,7 @@ void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index, bool moveHandl
 	double min = 0.0;
 
 	QVector<double> yData1, yData2;
-	for (int i = 0; i < d_data[index].first.buffer.size(); ++i) {
+	for (size_t i = 0; i < d_data[index].first.buffer.size(); ++i) {
 		if (d_data[index].first.buffer[i] > max) {
 			max = d_data[index].first.buffer[i];
 		} else if (d_data[index].first.buffer[i] < min) {
@@ -103,7 +103,7 @@ void NetworkAnalyzerBufferViewer::selectBuffersAtIndex(int index, bool moveHandl
 		}
 		yData1.push_back(d_data[index].first.buffer[i]);
 	}
-	for (int i = 0; i < d_data[index].second.buffer.size(); ++i) {
+	for (size_t i = 0; i < d_data[index].second.buffer.size(); ++i) {
 		if (d_data[index].second.buffer[i] > max) {
 			max = d_data[index].second.buffer[i];
 		} else if (d_data[index].second.buffer[i] < min) {
@@ -185,10 +185,10 @@ void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope()
 
 	QVector<double> yData1, yData2;
 	auto index = d_selectedBuffersIndex;
-	for (int i = 0; i < d_data[index].first.buffer.size(); ++i) {
+	for (size_t i = 0; i < d_data[index].first.buffer.size(); ++i) {
 		yData1.push_back(d_data[index].first.buffer[i]);
 	}
-	for (int i = 0; i < d_data[index].second.buffer.size(); ++i) {
+	for (size_t i = 0; i < d_data[index].second.buffer.size(); ++i) {
 		yData2.push_back(d_data[index].second.buffer[i]);
 	}
 	d_osc->add_ref_waveform("NA1", d_currentXdata, yData1, d_data[index].first.sampleRate);

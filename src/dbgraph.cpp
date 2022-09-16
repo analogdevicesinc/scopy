@@ -704,7 +704,7 @@ QVector<double> dBgraph::getXAxisData()
 {
 	QVector<double> data;
 
-	for (int i = 0; i < curve.data()->size(); ++i) {
+	for (size_t i = 0; i < curve.data()->size(); ++i) {
 		data.push_back(curve.data()->sample(i).x());
 	}
 
@@ -715,7 +715,7 @@ QVector<double> dBgraph::getYAxisData()
 {
 	QVector<double> data;
 
-	for (int i = 0; i < curve.data()->size(); ++i) {
+	for (size_t i = 0; i < curve.data()->size(); ++i) {
 		data.push_back(curve.data()->sample(i).y());
 	}
 

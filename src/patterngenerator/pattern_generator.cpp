@@ -679,7 +679,7 @@ void PatternGenerator::commitBuffer(const QPair<QVector<int>, PatternUI *> &patt
 		chgMask = chgMask | (1 << pattern.first[i]);
 	}
 
-	for (int i = 0; i < bufferSize; ++i) {
+	for (size_t i = 0; i < bufferSize; ++i) {
 		auto val = (bufferPtr[i] & bufferChannelMask);
 		buffer[i] = (buffer[i] & ~(chgMask)) | remapBuffer(channelMapping, val);
 	}

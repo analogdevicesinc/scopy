@@ -40,7 +40,7 @@ QtJs::QtJs(QJSEngine *engine) : QObject(engine)
 	auto meta = metaObject();
 	input = "";
 
-	for (unsigned int i = meta->methodOffset();
+	for (int i = meta->methodOffset();
 			i < meta->methodCount(); i++) {
 		QString name(meta->method(i).name());
 

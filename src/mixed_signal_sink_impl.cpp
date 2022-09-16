@@ -237,7 +237,7 @@ void mixed_signal_sink_impl::_test_trigger_tags(int nitems)
 
 void mixed_signal_sink_impl::_reset()
 {
-	for (int i = 0; i < d_tags.size(); ++i) {
+	for (size_t i = 0; i < d_tags.size(); ++i) {
 		d_tags[i].clear();
 	}
 

@@ -399,8 +399,6 @@ libm2k::M2K_TRIGGER_MODE TriggerSettings::determineTriggerMode(bool intern_check
 
 void TriggerSettings::enableExternalTriggerOut(bool enabled)
 {
-	const int TRIGGER_OUT_PIN = 1;
-
 	if(m_has_external_trigger_out) {
 		try {
 			if(enabled) {

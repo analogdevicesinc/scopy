@@ -66,6 +66,7 @@ private:
     int index_;
     const srd_decoder *decoder_;
     const srd_decoder_annotation_row *row_;
+
 };
 
 #endif // ROW_H

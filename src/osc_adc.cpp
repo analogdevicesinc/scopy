@@ -456,7 +456,7 @@ GenericAdc::settings_uptr M2kAdc::getCurrentHwSettings()
 	M2KSettings *m2k_settings = new M2KSettings;
 	*(Settings *)m2k_settings = *gsettings_uptr;
 
-	for (int i = 0; i < numAdcChannels(); i++) {
+	for (size_t i = 0; i < numAdcChannels(); i++) {
 		m2k_settings->channel_hw_gain_mode.push_back(chnHwGainMode(i));
 		m2k_settings->channel_hw_offset.push_back(chnHwOffset(i));
 	}
@@ -470,7 +470,7 @@ void M2kAdc::setHwSettings(GenericAdc::Settings *settings)
 
 	M2KSettings *m2k_settings = dynamic_cast<M2KSettings *>(settings);
 	if (m2k_settings) {
-		for (int i = 0; i < numAdcChannels(); i++) {
+		for (size_t i = 0; i < numAdcChannels(); i++) {
 			setChnHwGainMode(i,
 				m2k_settings->channel_hw_gain_mode[i]);
 			setChnHwOffset(i, m2k_settings->channel_hw_offset[i]);

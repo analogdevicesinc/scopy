@@ -465,7 +465,7 @@ QList<int> Oscilloscope_API::statisticEn() const
 	QList<int> list;
 	auto statistics = osc->measure_settings->statisticSelection();
 
-	for (int i = 0; i < osc->nb_channels; i++) {
+	for (size_t i = 0; i < osc->nb_channels; i++) {
 		int mask = 0;
 		list.append(mask);
 	}
@@ -907,8 +907,8 @@ QList<double> Channel_API::data() const
 	/*if(osc->ui->pushButtonRunStop->isChecked() ||
 	   osc->ui->pushButtonSingle->isChecked())
 		return list;*/
-	auto num_of_samples = osc->plot.Curve(index)->data()->size();
-	for(auto i=0; i<num_of_samples;i++)
+	size_t num_of_samples = osc->plot.Curve(index)->data()->size();
+	for(size_t i=0; i<num_of_samples;i++)
 	{
 		double d =  osc->plot.Curve(index)->data()->sample(i).y();
 		list.append(d);

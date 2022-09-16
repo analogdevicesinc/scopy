@@ -375,7 +375,7 @@ void iio_manager::set_kernel_buffer_count(int kb) {
 
 void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
 {
-	for (int i = 0; i < nb_channels; ++i) {
+	for (size_t i = 0; i < nb_channels; ++i) {
 		hier_block2::disconnect(iio_block, i, freq_comp_filt[i][0], 0);
 		hier_block2::connect(mixed_source, i, freq_comp_filt[i][0], 0);
 	}
@@ -388,7 +388,7 @@ void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
 
 void iio_manager::disableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
 {
-	for (int i = 0; i < nb_channels; ++i) {
+	for (size_t i = 0; i < nb_channels; ++i) {
 		hier_block2::disconnect(mixed_source, i, freq_comp_filt[i][0], 0);
 		hier_block2::connect(iio_block, i, freq_comp_filt[i][0], 0);
 	}

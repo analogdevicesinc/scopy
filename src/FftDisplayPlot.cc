@@ -682,7 +682,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 		}
 
 		// Resize the average objects to the new number of points
-		for (int i = 0; i < d_ch_avg_obj.size(); i++) {
+		for (size_t i = 0; i < d_ch_avg_obj.size(); i++) {
 			if (!d_ch_avg_obj[i])
 				continue;
 
@@ -980,11 +980,11 @@ void FftDisplayPlot::setAverage(uint chIdx, enum AverageType avg_type,
 
 void FftDisplayPlot::resetAverageHistory()
 {
-	for (int i = 0; i < d_ch_avg_obj.size(); i++)
+	for (size_t i = 0; i < d_ch_avg_obj.size(); i++)
 		if (d_ch_avg_obj[i])
 			d_ch_avg_obj[i]->reset();
 
-	for (int i = 0; i < d_current_avg_index.size(); i++) {
+	for (size_t i = 0; i < d_current_avg_index.size(); i++) {
 		d_current_avg_index[i] = 0;
 		Q_EMIT currentAverageIndex(i, d_current_avg_index[i]);
 	}
