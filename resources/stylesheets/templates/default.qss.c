@@ -342,14 +342,14 @@ QPushButton[subsection_arrow_button=true]{
 	max-height: 12px;
 	max-width: 12px;
 	border: none;
-	image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+	image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }
 
 QPushButton[subsection_arrow_button=true]:checked{
 	max-height: 12px;
 	max-width:  12px;
 	border: none;
-	image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+	image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 
