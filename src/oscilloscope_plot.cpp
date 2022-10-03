@@ -79,7 +79,7 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	d_maxBufferError(nullptr)
 {
 	setMinimumHeight(200);
-	setMinimumWidth(450);
+	setMinimumWidth(200);
 
 	/* Initial colors scheme */
 	d_trigAactiveLinePen = QPen(QColor(255, 255, 255), 2, Qt::SolidLine);

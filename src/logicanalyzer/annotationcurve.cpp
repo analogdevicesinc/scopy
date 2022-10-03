@@ -176,7 +176,7 @@ void AnnotationCurve::sort_rows()
 void AnnotationCurve::newAnnotations()
 {
     QMetaObject::invokeMethod(plot(), "replot");
-    Q_EMIT annotationsChanged();
+    state = 1;
 }
 
 void AnnotationCurve::reset()
@@ -187,7 +187,7 @@ void AnnotationCurve::reset()
     m_annotationRows.clear();
 	m_annotationDecoder->reset();
 	m_visibleRows = 0;
-    Q_EMIT annotationsChanged();
+	state = 0;
 }
 
 QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
@@ -450,6 +450,9 @@ void AnnotationCurve::drawLines(QPainter *painter, const QwtScaleMap &xMap, cons
         // if no annotations are generated for it
         currentRowOnPlot++;
     }
+    if (state == 1) {
+	    state = 2;
+    }
 
     m_visibleRows = currentRowOnPlot;
 
@@ -570,6 +573,27 @@ void AnnotationCurve::drawAnnotationInfo(int row, uint64_t start, uint64_t end, 
 	painter->setPen(QPen(QBrush(Qt::black), 1));
 
 	painter->restore();
+}
+
+void  AnnotationCurve::setState(int st)
+{
+	state = st;
+}
+
+int AnnotationCurve::getState()
+{
+	// -2: decoding failed
+	// -1: empty curve
+	//  0: started decoding
+	//  1: finished decoding
+	//  2: finished painting
+	return state;
+}
+
+QString AnnotationCurve::fromTitleToRowType(QString title) const
+{
+	return (title.indexOf(':')) ? title.mid(title.indexOf(':') + 1)
+				    : title;
 }
 
 void AnnotationCurve::drawAnnotation(int row, const Annotation &ann, QPainter *painter,

@@ -64,8 +64,8 @@ public:
     void setCurrentRow(int index);
     void setMaxRowCount();
     mutable int to_be_refreshed;
-    void refreshSettings(int column = -1) const;
-    void setSearchString(QString str);
+    void refreshSettings(int column = -1);
+    void setSearchString(QString str) const;
 
 public Q_SLOTS:
 
@@ -74,10 +74,7 @@ public Q_SLOTS:
     // the curves vecotr reconnects up signals to watch for annotation changes.
     void reloadDecoders(bool logic);
 
-    // Slot that should be invoked when new annotations are decoded
-    void annotationsChanged();
-
-    void searchBoxSignal(QString text);
+    void searchBoxSlot(QString text);
 
 protected:
 
@@ -95,6 +92,8 @@ protected:
     mutable int max_row_count = 0;
     mutable QString searchString;
     QVector<int> searchMask;
+private:
+    void searchTable(QString text);
 };
 
 } // namespace logic

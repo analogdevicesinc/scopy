@@ -20,7 +20,10 @@
 #include "decoder_table_model.hpp"
 #include "logic_analyzer.h"
 #include "qcombobox.h"
+#include "qtconcurrentrun.h"
 #include <QDebug>
+#include <QFuture>
+#include <QFutureWatcher>
 #include <QHeaderView>
 #include <QRegExp>
 
@@ -62,7 +65,6 @@ void DecoderTableModel::setDefaultPrimaryAnnotations()
 int DecoderTableModel::rowCount(const QModelIndex &parent) const
 {
 	// Return max of all packets
-	size_t count = 0;
 	if (!m_active) {
 		return 0;
 	}
@@ -126,7 +128,8 @@ void DecoderTableModel::setCurrentRow(int index)
 	auto curve = dynamic_cast<AnnotationCurve *> (m_plotCurves.at(m_current_column));
 	if (index >= curve->getMaxAnnotationCount(m_primary_annoations->value((int) m_current_column))) return;
 
-	m_decoderTable->scrollTo(this->index(index, m_current_column));
+	m_decoderTable->scrollTo(this->index(index, m_current_column), QAbstractItemView::PositionAtCenter);
+
 	m_decoderTable->selectRow(index);
 }
 
@@ -141,17 +144,27 @@ void DecoderTableModel::setMaxRowCount()
 	max_row_count = count;
 }
 
-void DecoderTableModel::refreshSettings(int column) const
+void DecoderTableModel::refreshSettings(int column)
 {
 	if (column == -1) {
 		column = m_current_column;
 	}
+	beginResetModel();
+
+	m_plotCurves = m_logic->getPlotCurves(true);
+	m_plotCurves.remove(0, DIGITAL_NR_CHANNELS);
 
 	populateDecoderComboBox();
 	populateFilter(column);
+	searchBoxSlot(searchString);
+
+	setMaxRowCount();
+	to_be_refreshed = true;
+
+	endResetModel();
 }
 
-void DecoderTableModel::setSearchString(QString str)
+void DecoderTableModel::setSearchString(QString str) const
 {
 	searchString = str;
 }
@@ -165,28 +178,14 @@ void DecoderTableModel::activate()
 	m_logic->runButton()->setEnabled(false);
 	//    m_logic->enableSingleButton(false);
 
-	for (const auto &curve: m_curves) {
-		if (curve.isNull()) continue;
-		QObject::connect(
-					curve,
-					&AnnotationCurve::annotationsChanged,
-					this,
-					&DecoderTableModel::annotationsChanged
-					);
-	}
-	m_active = true;
-
 	m_filteredMessages.clear();
 	for (int i=0; i<m_curves.size(); i++) {
 		m_filteredMessages.insert(i, QVector<QString>());
 	}
 
-	m_plotCurves.remove(0, DIGITAL_NR_CHANNELS);
-	populateDecoderComboBox();
-	populateFilter(0);
-	//    setDefaultPrimaryAnnotations();
-	setMaxRowCount();
-	to_be_refreshed = true;
+	m_active = true;
+
+	refreshSettings();
 }
 
 void DecoderTableModel::deactivate()
@@ -195,16 +194,6 @@ void DecoderTableModel::deactivate()
 	m_logic->runButton()->setEnabled(true);
 	//    m_logic->enableSingleButton(true);
 
-	// Disconnect signals
-	for (const auto &curve: m_curves) {
-		if (curve.isNull()) continue;
-		QObject::disconnect(
-					curve,
-					&AnnotationCurve::annotationsChanged,
-					this,
-					&DecoderTableModel::annotationsChanged
-					);
-	}
 	m_active = false;
 }
 
@@ -224,9 +213,6 @@ void DecoderTableModel::reloadDecoders(bool logic)
 
 	// Reconnect signals
 	activate();
-
-	// Recompute samples
-	annotationsChanged();
 }
 
 void DecoderTableModel::refreshColumn(double column) const
@@ -269,7 +255,7 @@ void DecoderTableModel::refreshColumn(double column) const
 
 	// hide/show rows
 	bool no_rows = true;
-	for (int row = 0; row < m_decoderTable->decoderModel()->rowCount(); row++) {
+	for (int row = 0; row < rowCount(); row++) {
 		if (row < index && !searchMask.contains(row)) {
 			m_decoderTable->showRow(row);
 			no_rows = false;
@@ -285,16 +271,11 @@ void DecoderTableModel::refreshColumn(double column) const
 	}
 }
 
-void DecoderTableModel::annotationsChanged()
-{
-	beginResetModel();
-	endResetModel();
-}
-
 void DecoderTableModel::selectedDecoderChanged(int index) const
 {
 	if (index >= 0) {
 		m_decoderTable->scrollTo(QAbstractTableModel::index(0, index));
+
 		m_current_column = index;
 		m_logic->setPrimaryAnntations(index, m_primary_annoations->value(index));
 		if (m_decoderTable->isActive()) {
@@ -312,16 +293,14 @@ void DecoderTableModel::populateFilter(int index) const
 	m_logic->clearFilter();
 
 	int count = 0;
-	for (auto row_map: decoder) {
+	for (int row = 0; row < temp_curve->getAnnotationRows().size(); ++row) {
+		auto row_map = *std::find_if(temp_curve->getAnnotationRows().begin(), temp_curve->getAnnotationRows().end(),
+					     [row](const std::pair<const Row, RowData> &t) -> bool{
+			return t.first.index() == row;
+		});
 		if (!row_map.second.get_annotations().empty()) {
 			count ++;
-			auto title = row_map.first.title();
-			if (title.indexOf(':')) {
-				m_logic->addFilterRow(QIcon(), title.mid(title.indexOf(':') + 1));
-			}
-			else {
-				m_logic->addFilterRow(QIcon(), title);
-			}
+			m_logic->addFilterRow(QIcon(), temp_curve->fromTitleToRowType(row_map.first.title()));
 		}
 	}
 }
@@ -338,10 +317,10 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 	if (curve->getAnnotationRows().size() == 0) {
 		return QVariant();
 	}
-
 	if (index.row() < m_decoderTable->rowAt(m_decoderTable->rect().top()) ||
 			(m_decoderTable->rowAt(m_decoderTable->rect().bottom()) < index.row() &&
-			 m_decoderTable->rowAt(m_decoderTable->rect().bottom()) != -1)) return QVariant();
+			 m_decoderTable->rowAt(m_decoderTable->rect().bottom()) != -1) ||
+			!m_decoderTable->isVisible()) return QVariant();
 
 	auto temp_curve = dynamic_cast<AnnotationCurve *>(m_plotCurves.at(index.column()));
 	std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
@@ -377,7 +356,21 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 			));
 }
 
-void DecoderTableModel::searchBoxSignal(QString text)
+void DecoderTableModel::searchBoxSlot(QString text)
+{
+	m_decoderTable->blockSignals(true);
+
+	QFuture<void> future = QtConcurrent::run(this, &DecoderTableModel::searchTable, text);
+	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+
+	connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+		m_decoderTable->blockSignals(false);
+	});
+	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
+	watcher->setFuture(future);
+}
+
+void DecoderTableModel::searchTable(QString text)
 {
 	setSearchString(text);
 	searchMask.clear();
@@ -394,8 +387,8 @@ void DecoderTableModel::searchBoxSignal(QString text)
 		// get primary annotation
 		for (auto row_map: decoder) {
 			row = row_map.second.get_annotations();
-			primary_title = (row_map.first.title().indexOf(':')) ? row_map.first.title().mid(row_map.first.title().indexOf(':') + 1)
-									     : row_map.first.title();
+			primary_title = temp_curve->fromTitleToRowType(row_map.first.title());
+
 			if (!row.empty() && row_map.first.index() == m_primary_annoations->value(m_current_column)) {
 				break;
 			}
@@ -407,16 +400,21 @@ void DecoderTableModel::searchBoxSignal(QString text)
 			row_index++;
 
 			for (auto row_map: decoder) {
-				QString title = (row_map.first.title().indexOf(':')) ? row_map.first.title().mid(row_map.first.title().indexOf(':') + 1)
-										     : row_map.first.title();
+				if (row_map.second.size() == 0) continue;
+				QString title = temp_curve->fromTitleToRowType(row_map.first.title());
 				if (m_filteredMessages.value(m_current_column).contains(title)) continue;
 
-				for (auto ann: row_map.second.get_annotations()) {
+				auto index_range = row_map.second.get_annotation_subset(start_sample, end_sample);
+				uint64_t i = index_range.first;
+
+				while (i < row_map.second.size()) {
+					loop_start:
+					auto ann = row_map.second.getAnnAt(i);
 
 					if ((title != primary_title &&
-					     ((unsigned)(ann.end_sample()-start_sample-1) <= (end_sample-start_sample-1) ||
+					     (((unsigned)(ann.end_sample()-start_sample-1) <= (end_sample-start_sample-1) ||
 					      (unsigned)(ann.start_sample()-start_sample) < (end_sample-start_sample)) ||
-					     ann.start_sample() <= start_sample && ann.end_sample() >= end_sample) ||
+					     (ann.start_sample() <= start_sample && ann.end_sample() >= end_sample))) ||
 							(start_sample <= ann.start_sample() && ann.end_sample() <= end_sample)) {
 
 						for (auto value: ann.annotations()) {
@@ -424,6 +422,23 @@ void DecoderTableModel::searchBoxSignal(QString text)
 								goto skip_loop;
 							}
 						}
+					} else {
+						if (i <= index_range.first) {
+							i = index_range.first + 1;
+							goto loop_start;
+						} else {
+							break;
+						}
+					}
+
+					if (i == 0) {
+						i = index_range.first + 1;
+					}
+
+					if (i <= index_range.first) {
+						i--;
+					} else {
+						i++;
 					}
 				}
 			}
