@@ -22,6 +22,7 @@
 #include "qcombobox.h"
 #include <QDebug>
 #include <QHeaderView>
+#include <QRegExp>
 
 namespace adiscope {
 
@@ -150,6 +151,11 @@ void DecoderTableModel::refreshSettings(int column) const
 	populateFilter(column);
 }
 
+void DecoderTableModel::setSearchString(QString str)
+{
+	searchString = str;
+}
+
 void DecoderTableModel::activate()
 {
 	if (m_logic->runButton()->isChecked()) {
@@ -231,27 +237,9 @@ void DecoderTableModel::refreshColumn(double column) const
 		column = m_current_column;
 	}
 
-	// hide/show rows
 	auto curve = dynamic_cast<AnnotationCurve *> (m_plotCurves.at(column));
 	const auto verticalHeader = m_decoderTable->verticalHeader();
-
-	if (curve->getMaxAnnotationCount() == 0) {
-		verticalHeader->setDefaultSectionSize(1);
-		return;
-	}
-
 	int index = curve->getMaxAnnotationCount(m_primary_annoations->value((int) column));
-	if (m_decoderTable->isRowHidden(index - 1) || !m_decoderTable->isRowHidden(index)) {
-		for (int row = 0; row < m_decoderTable->decoderModel()->rowCount(); row++) {
-			if (row < index) {
-				m_decoderTable->showRow(row);
-			}
-			else {
-				m_decoderTable->hideRow(row);
-			}
-		}
-
-	}
 
 	// resize rows
 	int spacing;
@@ -277,6 +265,23 @@ void DecoderTableModel::refreshColumn(double column) const
 		verticalHeader->setMinimumSectionSize(new_height);
 		verticalHeader->setDefaultSectionSize(new_height);
 		verticalHeader->setMaximumSectionSize(new_height);
+	}
+
+	// hide/show rows
+	bool no_rows = true;
+	for (int row = 0; row < m_decoderTable->decoderModel()->rowCount(); row++) {
+		if (row < index && !searchMask.contains(row)) {
+			m_decoderTable->showRow(row);
+			no_rows = false;
+		} else {
+			m_decoderTable->hideRow(row);
+		}
+	}
+	if (no_rows) {
+		m_decoderTable->showRow(0);
+		verticalHeader->setMinimumSectionSize(1);
+		verticalHeader->setDefaultSectionSize(1);
+		verticalHeader->setMaximumSectionSize(1);
 	}
 }
 
@@ -330,13 +335,13 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 	const auto &curve = m_curves.at(col);
 	if (curve.isNull()) return QVariant();
 
-	//	if (index.row() >= curve->getMaxAnnotationCount(m_primary_annoations->value(index.column()))) {
-	//		return QVariant();
-	//	}
-
 	if (curve->getAnnotationRows().size() == 0) {
 		return QVariant();
 	}
+
+	if (index.row() < m_decoderTable->rowAt(m_decoderTable->rect().top()) ||
+			(m_decoderTable->rowAt(m_decoderTable->rect().bottom()) < index.row() &&
+			 m_decoderTable->rowAt(m_decoderTable->rect().bottom()) != -1)) return QVariant();
 
 	auto temp_curve = dynamic_cast<AnnotationCurve *>(m_plotCurves.at(index.column()));
 	std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
@@ -355,8 +360,12 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 
 	if (to_be_refreshed) {
 		refreshColumn(col);
-		selectedDecoderChanged(col);
 		to_be_refreshed = false;
+		if (to_be_refreshed == 2) selectedDecoderChanged(col);
+	}
+
+	if (searchMask.count() == curve->getMaxAnnotationCount(m_primary_annoations->value(index.column()))) {
+		return QVariant();
 	}
 
 	return QVariant::fromValue(DecoderTableItem(
@@ -366,6 +375,66 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 			m_filteredMessages.value(index.column()),
 			m_logic->getTableInfo()
 			));
+}
+
+void DecoderTableModel::searchBoxSignal(QString text)
+{
+	setSearchString(text);
+	searchMask.clear();
+
+	if (!searchString.isEmpty()) {
+		QRegExp rx =  QRegExp(searchString, Qt::CaseInsensitive);
+
+		auto temp_curve = dynamic_cast<AnnotationCurve *>(m_plotCurves.at(m_current_column));
+		std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
+		vector<Annotation> row;
+		int row_index = -1;
+		QString primary_title;
+
+		// get primary annotation
+		for (auto row_map: decoder) {
+			row = row_map.second.get_annotations();
+			primary_title = (row_map.first.title().indexOf(':')) ? row_map.first.title().mid(row_map.first.title().indexOf(':') + 1)
+									     : row_map.first.title();
+			if (!row.empty() && row_map.first.index() == m_primary_annoations->value(m_current_column)) {
+				break;
+			}
+		}
+
+		for (auto sample_area: row) {
+			auto start_sample = sample_area.start_sample();
+			auto end_sample = sample_area.end_sample();
+			row_index++;
+
+			for (auto row_map: decoder) {
+				QString title = (row_map.first.title().indexOf(':')) ? row_map.first.title().mid(row_map.first.title().indexOf(':') + 1)
+										     : row_map.first.title();
+				if (m_filteredMessages.value(m_current_column).contains(title)) continue;
+
+				for (auto ann: row_map.second.get_annotations()) {
+
+					if ((title != primary_title &&
+					     ((unsigned)(ann.end_sample()-start_sample-1) <= (end_sample-start_sample-1) ||
+					      (unsigned)(ann.start_sample()-start_sample) < (end_sample-start_sample)) ||
+					     ann.start_sample() <= start_sample && ann.end_sample() >= end_sample) ||
+							(start_sample <= ann.start_sample() && ann.end_sample() <= end_sample)) {
+
+						for (auto value: ann.annotations()) {
+							if (rx.indexIn(value) != -1) {
+								goto skip_loop;
+							}
+						}
+					}
+				}
+			}
+			// add to mask if not found
+			searchMask.append(row_index);
+skip_loop:
+			continue;
+		}
+	}
+	m_decoderTable->reset();
+	to_be_refreshed = true;
 }
 
 } // namespace logic

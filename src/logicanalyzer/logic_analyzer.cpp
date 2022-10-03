@@ -1593,6 +1593,19 @@ void LogicAnalyzer::enableSingleButton(bool flag)
 	ui->runSingleWidget->getSingleButton()->setEnabled(flag);
 }
 
+void LogicAnalyzer::emitSearchSignal(int index)
+{
+	QString text = ui->searchBox->text();
+	ui->decoderTableView->decoderModel()->searchBoxSignal(text);
+}
+
+void LogicAnalyzer::clearSearchSignal(int index)
+{
+	ui->searchBox->clear();
+	ui->decoderTableView->decoderModel()->searchBoxSignal("");
+	ui->decoderTableView->decoderModel()->selectedDecoderChanged(index);
+}
+
 void LogicAnalyzer::PrimaryAnnotationChanged(int index){
 	if (index == -1) {
 		index = 0;
@@ -1613,8 +1626,10 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->decoderTableView, SIGNAL(show()), this, SLOT(PrimaryAnnotationChanged(int)));
 
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
+	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSearchSignal(int)));
 
 	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
+	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(clearSearchSignal(int)));
 
 	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled,
 		[=](bool checked){
@@ -1628,14 +1643,22 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		if (!checked) {
 			ui->decoderTableView->blockSignals(false);
 			if (ui->decoderTableView->isActive()) {
-				ui->decoderTableView->decoderModel()->setMaxRowCount();
+
+				Q_EMIT ui->searchBox->editingFinished();
+
 				if (ui->primaryAnnotationComboBox->count() == 0) {
 					ui->decoderTableView->decoderModel()->refreshColumn();
 				} else {
-					ui->decoderTableView->decoderModel()->to_be_refreshed = true;
+					ui->decoderTableView->decoderModel()->to_be_refreshed = 2;
 				}
 			}
 		}
+	});
+
+	connect(ui->searchBox, &QLineEdit::editingFinished,
+		[=](){
+		QString text = ui->searchBox->text();
+		ui->decoderTableView->decoderModel()->searchBoxSignal(text);
 	});
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
