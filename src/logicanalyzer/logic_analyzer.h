@@ -107,7 +107,7 @@ public: // Mixed Signal View Interface
 	bool setPrimaryAnntations(int column, int index = -1);
 	void enableRunButton(bool flag);
 	void enableSingleButton(bool flag);
-	void setSelectedPrimaryAnnotation(int index);
+	QComboBox *getDecoderComboBox();
 
 Q_SIGNALS:
 	void showTool();
@@ -144,6 +144,7 @@ private Q_SLOTS:
 	bool exportVcd(const QString &fileName, const QString &startSep, const QString &endSep);
 
 	void PrimaryAnnotationChanged(int index);
+	void selectedDecoderChanged(int index);
 
 private:
 	void setupUi();

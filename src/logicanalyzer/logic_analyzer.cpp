@@ -1430,6 +1430,8 @@ void LogicAnalyzer::setupUi()
 	// Decoder table
 
 	ui->decoderTableView->setLogicAnalyzer(this);
+	ui->decoderTableView->horizontalHeader()->hide();
+	ui->decoderTableView->horizontalScrollBar()->hide();
 
 	// Setup cursors menu
 
@@ -1508,9 +1510,9 @@ bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
 	return changed;
 }
 
-void LogicAnalyzer::setSelectedPrimaryAnnotation(int index)
+QComboBox* LogicAnalyzer::getDecoderComboBox()
 {
-	ui->primaryAnnotationComboBox->setCurrentIndex(ui->primaryAnnotationComboBox->findData(index));
+	return ui->DecoderComboBox;
 }
 
 void LogicAnalyzer::enableRunButton(bool flag)
@@ -1524,7 +1526,16 @@ void LogicAnalyzer::enableSingleButton(bool flag)
 }
 
 void LogicAnalyzer::PrimaryAnnotationChanged(int index){
+	if (index == -1) {
+		index = 0;
+		ui->primaryAnnotationComboBox->setCurrentIndex(index);
+	}
 	ui->decoderTableView->setPrimaryAnnotation(ui->primaryAnnotationComboBox->currentData().toInt());
+}
+
+void LogicAnalyzer::selectedDecoderChanged(int index)
+{
+	ui->decoderTableView->decoderModel()->selectedDecoderChanged(index);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -1532,6 +1543,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	// connect all the signals and slots here
 
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
+
+	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
