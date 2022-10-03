@@ -54,6 +54,9 @@ private:
     DecoderTableModel* tableModel;
     LogicAnalyzer* m_logicAnalyzer;
     QVector<GenericLogicPlotCurve *> *temp_curves;
+
+protected:
+    void showEvent(QShowEvent *event);
 };
 } // namespace logic
 } // namespace adiscope

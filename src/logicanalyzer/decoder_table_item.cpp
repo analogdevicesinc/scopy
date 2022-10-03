@@ -57,11 +57,12 @@ QSize DecoderTableItemDelegate::sizeHint(
 }
 
 
-DecoderTableItem::DecoderTableItem(AnnotationCurve *curve, uint64_t start, uint64_t end, QVector<QString> filter):
+DecoderTableItem::DecoderTableItem(AnnotationCurve *curve, uint64_t start, uint64_t end, QVector<QString> filter, bool flag):
 	curve(curve),
 	startSample(start),
 	endSample(end),
-	filteredMessages(filter)
+	filteredMessages(filter),
+	tableInfoFlag(flag)
 {
 
 }
@@ -99,7 +100,11 @@ void DecoderTableItem::paint(
 
 	QwtScaleMap xmap, ymap;
 	xmap.setPaintInterval(0, rect.width());
-	ymap.setPaintInterval(4 + curve->m_infoHeight, rect.height());
+	if (tableInfoFlag) {
+		ymap.setPaintInterval(4 + curve->m_infoHeight, rect.height());
+	} else {
+		ymap.setPaintInterval(4, rect.height());
+	}
 	// qDebug() << "rect: " << rect << Qt::endl;
 
 	QwtPointMapper mapper;
@@ -135,7 +140,9 @@ void DecoderTableItem::paint(
 		return;
 	}
 
-	curve->drawAnnotationInfo(offset, startSample, endSample, painter, xmap, ymap, rect, mapper);
+	if (tableInfoFlag) {
+		curve->drawAnnotationInfo(offset, startSample, endSample, painter, xmap, ymap, rect);
+	}
 	for (const auto &entry: curve->getAnnotationRows()) {
 		const RowData &data = entry.second;
 

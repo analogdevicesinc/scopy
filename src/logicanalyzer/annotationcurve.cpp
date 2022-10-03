@@ -531,7 +531,7 @@ QString AnnotationCurve::formatSeconds(double sec) const
 
 void AnnotationCurve::drawAnnotationInfo(int row, uint64_t start, uint64_t end, QPainter *painter,
 					 const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-					 const QRectF &canvasRect, const QwtPointMapper &mapper) const {
+					 const QRectF &canvasRect) const {
 
 	const double infoHeightInPoints = yMap.invTransform(m_infoHeight) - yMap.invTransform(0);
 	const double infoWidthRatio = 0.09;

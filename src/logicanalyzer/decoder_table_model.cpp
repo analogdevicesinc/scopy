@@ -254,7 +254,12 @@ void DecoderTableModel::refreshColumn(double column) const
 	}
 
 	// resize rows
-	const int spacing = 10 + curve->m_infoHeight;
+	int spacing;
+	if (m_logic->getTableInfo()) {
+		spacing = 10 + curve->m_infoHeight;
+	} else {
+		spacing = 10;
+	}
 	int rowHeight = 25;
 
 	int row_count = 0;
@@ -358,7 +363,8 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 					   temp_curve,
 					   row[index.row()].start_sample(),
 				   row[index.row()].end_sample(),
-			m_filteredMessages.value(index.column())
+			m_filteredMessages.value(index.column()),
+			m_logic->getTableInfo()
 			));
 }
 
