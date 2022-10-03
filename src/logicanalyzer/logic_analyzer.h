@@ -29,6 +29,7 @@
 #include <QList>
 #include <QQueue>
 #include <QScrollBar>
+#include <QStandardItem>
 #include <QTimer>
 
 #include "logic_tool.h"
@@ -44,6 +45,7 @@
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/enums.hpp>
+#include <gui/dropdown_switch_list.h>
 
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
@@ -108,6 +110,8 @@ public: // Mixed Signal View Interface
 	void enableRunButton(bool flag);
 	void enableSingleButton(bool flag);
 	QComboBox *getDecoderComboBox();
+	void addFilterRow(QIcon icon, QString name);
+	void clearFilter();
 
 Q_SIGNALS:
 	void showTool();
@@ -122,6 +126,7 @@ private Q_SLOTS:
 
 	void on_btnSettings_clicked(bool checked);
 	void on_btnGeneralSettings_toggled(bool);
+	void on_btnDecoderTable_toggled(bool);
 	void rightMenuFinished(bool opened);
 
 	void onTimeTriggerValueChanged(double value);
@@ -145,6 +150,8 @@ private Q_SLOTS:
 
 	void PrimaryAnnotationChanged(int index);
 	void selectedDecoderChanged(int index);
+
+	void onFilterChanged(QStandardItem *item);
 
 private:
 	void setupUi();
@@ -235,6 +242,9 @@ private:
 	int m_currentKernelBuffers;
 
 	StateUpdater *m_triggerUpdater;
+
+	DropdownSwitchList* filterMessages;
+	int filterCount = 0;
 
 
 };

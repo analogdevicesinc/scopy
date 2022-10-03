@@ -1037,6 +1037,21 @@ void LogicAnalyzer::on_btnGeneralSettings_toggled(bool checked)
 		ui->btnSettings->setChecked(!checked);
 }
 
+void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
+{
+	triggerRightMenuToggle(
+		static_cast<CustomPushButton *>(QObject::sender()), checked);
+
+	// When the bottom decoder button is clicked show/hide the right menu
+	// and ativate or deactivate the decoder table.
+	if (checked) {
+		ui->decoderTableView->activate(true);
+
+	} else {
+		ui->decoderTableView->deactivate();
+	}
+}
+
 void LogicAnalyzer::rightMenuFinished(bool opened)
 {
 	Q_UNUSED(opened)
@@ -1335,7 +1350,8 @@ void LogicAnalyzer::setupUi()
 	int channelSettings_panel = ui->stackedWidget->indexOf(ui->channelSettings);
 	ui->btnChannelSettings->setProperty("id", QVariant(-channelSettings_panel));
 
-	const int decoderTable_panel = ui->stackedWidget->indexOf(ui->decoderTablePage);
+	/* Decoder Table */
+	int decoderTable_panel = ui->stackedWidget->indexOf(ui->decoderTablePage);
 	ui->btnDecoderTable->setProperty("id", QVariant(-decoderTable_panel));
 
 	// default trigger menu?
@@ -1477,6 +1493,53 @@ void LogicAnalyzer::setupUi()
 	m_exportSettings->disableUIMargins();
 	connect(m_exportSettings->getExportButton(), &QPushButton::clicked,
 		this, &LogicAnalyzer::exportData);
+
+
+	// Filter in decoder table
+	filterMessages = new DropdownSwitchList(1, this);
+	filterMessages->setTitle(tr("Enabled messages"));
+	filterMessages->setColumnTitle(0, tr("Type"));
+	filterMessages->setColumnTitle(1, tr("Visible"));
+
+	connect(filterMessages->model(),
+			SIGNAL(itemChanged(QStandardItem*)),
+			SLOT(onFilterChanged(QStandardItem*)));
+
+	ui->filterLayout->addWidget(filterMessages);
+}
+
+void LogicAnalyzer::onFilterChanged(QStandardItem *item)
+{
+	auto name = item->model()->item(item->index().row(), 0)->text();
+	int column = ui->decoderTableView->decoderModel()->getCurrentColumn();
+	auto filtered = ui->decoderTableView->decoderModel()->getFiltered()[column];
+
+	if (item->data(Qt::EditRole).toBool() && filtered.contains(name)) {
+		for (int i=0; i<filtered.size(); i++) {
+			if (filtered[i] == name) {
+				ui->decoderTableView->decoderModel()->getFiltered()[column].remove(i); ;
+			}
+		}
+	} else if (!item->data(Qt::EditRole).toBool() && !filtered.contains(name)) {
+		ui->decoderTableView->decoderModel()->getFiltered()[column].append(name);
+	}
+
+	ui->decoderTableView->reset();
+	ui->decoderTableView->decoderModel()->refreshColumn(ui->decoderTableView->decoderModel()->getCurrentColumn());
+}
+
+void LogicAnalyzer::addFilterRow(QIcon icon, QString name)
+{
+	filterMessages->addDropdownElement(icon, name);
+	filterCount ++;
+}
+
+void LogicAnalyzer::clearFilter()
+{
+	for (int i = 0; i< filterCount; i++) {
+		filterMessages->removeItem(0);
+	}
+	filterCount = 0;
 }
 
 bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
@@ -1530,7 +1593,7 @@ void LogicAnalyzer::PrimaryAnnotationChanged(int index){
 		index = 0;
 		ui->primaryAnnotationComboBox->setCurrentIndex(index);
 	}
-	ui->decoderTableView->setPrimaryAnnotation(ui->primaryAnnotationComboBox->currentData().toInt());
+	ui->decoderTableView->decoderModel()->setPrimaryAnnotation(ui->primaryAnnotationComboBox->currentData().toInt());
 }
 
 void LogicAnalyzer::selectedDecoderChanged(int index)
@@ -1545,6 +1608,20 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
 
 	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
+
+	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled,
+		[=](bool checked){
+		if (checked) {
+			ui->decoderTableView->blockSignals(true);
+		}
+	});
+
+	connect(runButton(), &QPushButton::toggled,
+		[=](bool checked){
+		if (!checked) {
+			ui->decoderTableView->blockSignals(false);
+		}
+	});
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
@@ -1705,18 +1782,6 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 	connect(ui->printBtn, &QPushButton::clicked, [=](){
 		m_plot.printWithNoBackground("Logic Analyzer");
-	});
-
-	// Decoder table
-	connect(ui->btnDecoderTable, &CustomPushButton::toggled, [=](bool checked){
-		// When the bottom decoder button is clicked show/hide the right menu
-		// and ativate or deactivate the decoder table.
-		triggerRightMenuToggle(ui->btnDecoderTable, checked);
-		if (checked) {
-			ui->decoderTableView->activate(true);
-		} else {
-			ui->decoderTableView->deactivate();
-		}
 	});
 
 	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex& index) {
@@ -2359,8 +2424,7 @@ void LogicAnalyzer::setupDecoders()
 			if (!result.isValid() or !ui->decoderTableView->isActive()) return;
 			const auto model = ui->decoderTableView->decoderModel();
 			const auto col = model->indexOfCurve(curve);
-			const auto index = model->index(result.index, col);
-			ui->decoderTableView->scrollTo(index, QAbstractItemView::PositionAtTop);
+			ui->DecoderComboBox->setCurrentIndex(col);
 		});
 	});
 
