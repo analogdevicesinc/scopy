@@ -60,12 +60,15 @@ public:
 
     void populateFilter(int index) const;
     QMap<int, QVector<QString>>& getFiltered();
-    int getCurrentColumn();
+    int getCurrentColumn() const;
     void setCurrentRow(int index);
     void setMaxRowCount();
     mutable int to_be_refreshed;
     void refreshSettings(int column = -1);
     void setSearchString(QString str) const;
+    QVector<int> getSearchMask();
+    QString getsearchString();
+    int getPrimaryAnnotationIndex() const;
 
 public Q_SLOTS:
 

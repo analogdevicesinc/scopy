@@ -116,6 +116,7 @@ public: // Mixed Signal View Interface
 	void clearSearch(int index = -1);
 	int getGroupSize();
 	void setMaxGroupValues(int value);
+	void setStatusLabel(QString text);
 
 	int getGroupOffset();
 Q_SIGNALS:

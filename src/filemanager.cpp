@@ -339,6 +339,64 @@ void FileManager::performWrite()
 	exportFile.close();
 }
 
+void FileManager::performDecoderWrite(bool skip_empty_lines)
+{
+	// write decoder data
+	if (openedFor == IMPORT) {
+		qDebug() << "Can't write when opened for import!";
+		return;
+	}
+
+	QFile exportFile(filename);
+	exportFile.open(QIODevice::WriteOnly);
+	QTextStream exportStream(&exportFile);
+
+	//column names row
+	bool skipFirstSeparator=true;
+
+	for (auto column: columnNames) {
+		if (!skipFirstSeparator) {
+			exportStream << separator;
+		}
+		skipFirstSeparator = false;
+		exportStream << column;
+	}
+
+	if (!columnNames.empty()) {
+		exportStream << "\n";
+	}
+
+	QString line;
+	bool empty_line;
+	if (!decoder_data.isEmpty()) {
+		for (int i = 0; i < decoder_data.size(); ++i) {
+			skipFirstSeparator = true;
+			line = QString();
+			empty_line = true;
+
+			for (int j = 0; j < decoder_data[i].size(); ++j) {
+				if (!skipFirstSeparator)
+					line += separator;
+				if (!decoder_data[i][j].isEmpty()) {
+					line += decoder_data[i][j].replace(separator, " ");
+				}
+				skipFirstSeparator = false;
+
+
+				if (j != 0 && decoder_data[i][j] != "") {
+					empty_line = false;
+				}
+			}
+
+			line += '\n';
+			if (skip_empty_lines && empty_line) continue;
+			exportStream << line;
+		}
+	}
+
+	exportFile.close();
+}
+
 QStringList FileManager::getAdditionalInformation() const
 {
 	return additionalInformation;

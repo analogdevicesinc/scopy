@@ -115,7 +115,7 @@ void DecoderTableModel::populateDecoderComboBox() const
 }
 
 
-int DecoderTableModel::getCurrentColumn()
+int DecoderTableModel::getCurrentColumn() const
 {
 	return m_current_column;
 }
@@ -170,6 +170,16 @@ void DecoderTableModel::refreshSettings(int column)
 void DecoderTableModel::setSearchString(QString str) const
 {
 	searchString = str;
+}
+
+QVector<int> DecoderTableModel::getSearchMask()
+{
+	return searchMask;
+}
+
+QString DecoderTableModel::getsearchString()
+{
+	return searchString;
 }
 
 void DecoderTableModel::activate()
@@ -313,6 +323,11 @@ void DecoderTableModel::populateFilter(int index) const
 	}
 }
 
+int DecoderTableModel::getPrimaryAnnotationIndex() const
+{
+	 return m_primary_annoations->value(getCurrentColumn());
+}
+
 QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid() || m_decoderTable->signalsBlocked() || m_plotCurves.empty()) return QVariant();
@@ -336,7 +351,7 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 
 	for (auto row_map: decoder) {
 		row = row_map.second.get_annotations();
-		if (!row.empty() && row_map.first.index() == m_primary_annoations->value(index.column())) {
+		if (!row.empty() && row_map.first.index() == getPrimaryAnnotationIndex()) {
 			break;
 		}
 	}
@@ -384,6 +399,7 @@ void DecoderTableModel::searchBoxSlot(QString text)
 	if (m_decoderTable->signalsBlocked()) return;
 	m_decoderTable->blockSignals(true);
 
+	m_logic->setStatusLabel("Searching ...");
 	QFuture<void> future = QtConcurrent::run(this, &DecoderTableModel::searchTable, text);
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
@@ -394,6 +410,7 @@ void DecoderTableModel::searchBoxSlot(QString text)
 		m_decoderTable->reset();
 		to_be_refreshed = true;
 		endResetModel();
+		m_logic->setStatusLabel("");
 	});
 	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
 	watcher->setFuture(future);

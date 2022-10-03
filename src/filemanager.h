@@ -71,6 +71,7 @@ public:
 	int getNrOfChannels() const;
 
 	void performWrite();
+	void performDecoderWrite(bool skip_empty_lines = false);
 
 	QStringList getAdditionalInformation() const;
 	void setAdditionalInformation(const QString& value);
