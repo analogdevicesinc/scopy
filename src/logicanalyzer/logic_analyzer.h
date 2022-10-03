@@ -114,7 +114,10 @@ public: // Mixed Signal View Interface
 	void clearFilter();
 	bool getTableInfo();
 	void clearSearch(int index = -1);
+	int getGroupSize();
+	void setMaxGroupValues(int value);
 
+	int getGroupOffset();
 Q_SIGNALS:
 	void showTool();
 

@@ -526,8 +526,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>200</width>
-                      <height>360</height>
+                      <width>358</width>
+                      <height>542</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1778,8 +1778,14 @@ color: rgba(255,255,255,51);
                  </size>
                 </property>
                 <layout class="QVBoxLayout" name="verticalLayout_12">
+                 <property name="spacing">
+                  <number>0</number>
+                 </property>
                  <property name="leftMargin">
                   <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>10</number>
                  </property>
                  <property name="rightMargin">
                   <number>0</number>
@@ -1790,10 +1796,10 @@ color: rgba(255,255,255,51);
                  <item>
                   <layout class="QVBoxLayout" name="wDecoderSettingsContainer">
                    <property name="leftMargin">
-                    <number>10</number>
+                    <number>0</number>
                    </property>
                    <property name="rightMargin">
-                    <number>10</number>
+                    <number>0</number>
                    </property>
                    <property name="bottomMargin">
                     <number>0</number>
@@ -1802,6 +1808,12 @@ color: rgba(255,255,255,51);
                     <layout class="QHBoxLayout" name="wDecoderSettingsCollapse">
                      <property name="spacing">
                       <number>6</number>
+                     </property>
+                     <property name="leftMargin">
+                      <number>10</number>
+                     </property>
+                     <property name="rightMargin">
+                      <number>10</number>
                      </property>
                      <item>
                       <widget class="QPushButton" name="btnCollapseSettings">
@@ -1873,25 +1885,23 @@ color: rgba(255,255,255,51);
                    </item>
                    <item>
                     <widget class="QWidget" name="wDecoderSettings_2" native="true">
-                     <layout class="QGridLayout" name="wDecoderSettings" columnstretch="0,0" columnminimumwidth="200,0">
+                     <layout class="QGridLayout" name="wDecoderSettings" columnstretch="0,0" columnminimumwidth="150,0">
                       <property name="sizeConstraint">
                        <enum>QLayout::SetMinimumSize</enum>
                       </property>
-                      <item row="2" column="1">
-                       <widget class="QComboBox" name="DecoderComboBox">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="minimumSize">
-                         <size>
-                          <width>0</width>
-                          <height>0</height>
-                         </size>
+                      <item row="6" column="0">
+                       <widget class="QLabel" name="label_22">
+                        <property name="text">
+                         <string>Group offset</string>
                         </property>
                        </widget>
+                      </item>
+                      <item row="9" column="1">
+                       <layout class="QVBoxLayout" name="filterLayout">
+                        <property name="spacing">
+                         <number>0</number>
+                        </property>
+                       </layout>
                       </item>
                       <item row="3" column="1">
                        <widget class="QComboBox" name="primaryAnnotationComboBox">
@@ -1909,22 +1919,6 @@ color: rgba(255,255,255,51);
                         </property>
                        </widget>
                       </item>
-                      <item row="6" column="0">
-                       <widget class="QLabel" name="label_19">
-                        <property name="sizePolicy">
-                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                          <horstretch>0</horstretch>
-                          <verstretch>0</verstretch>
-                         </sizepolicy>
-                        </property>
-                        <property name="text">
-                         <string>Filter</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="6" column="1">
-                       <layout class="QVBoxLayout" name="filterLayout"/>
-                      </item>
                       <item row="2" column="0">
                        <widget class="QLabel" name="label_18">
                         <property name="sizePolicy">
@@ -1935,6 +1929,36 @@ color: rgba(255,255,255,51);
                         </property>
                         <property name="text">
                          <string>Decoder</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="1">
+                       <widget class="QComboBox" name="DecoderComboBox">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>0</height>
+                         </size>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="8" column="0">
+                       <widget class="QLabel" name="label_20">
+                        <property name="text">
+                         <string>Regex search</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="5" column="0">
+                       <widget class="QLabel" name="label_21">
+                        <property name="text">
+                         <string>Group size</string>
                         </property>
                        </widget>
                       </item>
@@ -1951,15 +1975,94 @@ color: rgba(255,255,255,51);
                         </property>
                        </widget>
                       </item>
-                      <item row="5" column="0">
-                       <widget class="QLabel" name="label_20">
+                      <item row="8" column="1">
+                       <widget class="QLineEdit" name="searchBox">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="9" column="0">
+                       <widget class="QLabel" name="label_19">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
                         <property name="text">
-                         <string>Regex search</string>
+                         <string>Filter</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="7" column="0" colspan="2">
+                       <widget class="Line" name="line_10">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="minimumSize">
+                         <size>
+                          <width>0</width>
+                          <height>1</height>
+                         </size>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>1</height>
+                         </size>
+                        </property>
+                        <property name="orientation">
+                         <enum>Qt::Horizontal</enum>
+                        </property>
+                        <property name="blue_line" stdset="0">
+                         <bool>true</bool>
                         </property>
                        </widget>
                       </item>
                       <item row="5" column="1">
-                       <widget class="QLineEdit" name="searchBox"/>
+                       <widget class="QSpinBox" name="groupSizeSpinBox">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                        <property name="minimum">
+                         <number>1</number>
+                        </property>
+                        <property name="value">
+                         <number>1</number>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="6" column="1">
+                       <widget class="QSpinBox" name="groupOffsetSpinBox">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="maximumSize">
+                         <size>
+                          <width>16777215</width>
+                          <height>40</height>
+                         </size>
+                        </property>
+                       </widget>
                       </item>
                      </layout>
                     </widget>
@@ -1969,16 +2072,16 @@ color: rgba(255,255,255,51);
                  <item>
                   <layout class="QVBoxLayout" name="verticalLayout_15">
                    <property name="leftMargin">
-                    <number>6</number>
+                    <number>10</number>
                    </property>
                    <property name="topMargin">
                     <number>6</number>
                    </property>
                    <property name="rightMargin">
-                    <number>6</number>
+                    <number>10</number>
                    </property>
                    <property name="bottomMargin">
-                    <number>6</number>
+                    <number>0</number>
                    </property>
                    <item>
                     <widget class="Line" name="line_8">

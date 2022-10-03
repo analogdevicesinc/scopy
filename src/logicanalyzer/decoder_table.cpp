@@ -106,6 +106,11 @@ void DecoderTable::showEvent(QShowEvent *event)
     tableModel->to_be_refreshed = true;
 }
 
+void DecoderTable::groupValuesChanged(int value)
+{
+	reset();
+	tableModel->to_be_refreshed = true;
+}
 } // namespace logic
 } // namespace adiscope
 
