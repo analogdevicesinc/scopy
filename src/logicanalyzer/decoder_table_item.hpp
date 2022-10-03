@@ -53,7 +53,8 @@ public:
         AnnotationCurve* curve=nullptr,
         uint64_t start=0,
 	uint64_t end=0,
-	QVector<QString> filter= QVector<QString>()
+	QVector<QString> filter= QVector<QString>(),
+	bool flag=true
     );
 
     void paint(QPainter *painter, const QRect &rect, const QPalette &palette) const;
@@ -67,6 +68,8 @@ public:
     uint64_t endSample;
     QSize itemSize = QSize(300, 40);
     QVector<QString> filteredMessages;
+
+    bool tableInfoFlag;
 
 };
 

@@ -117,6 +117,9 @@ public:
 	bool getSeparateAnnotations() const;
 	void setSeparateAnnotations(bool display);
 
+	bool getTableInfo() const;
+	void setTableInfo(bool display);
+
 	bool getInstrumentNotesActive() const;
 	void setInstrumentNotesActive(bool display);
 
@@ -207,6 +210,7 @@ private:
 	bool m_instrument_notes_active;
 	bool m_displaySamplingPoints;
 	bool m_separateAnnotations;
+	bool m_tableInfo;
 	bool m_debug_messages_active;
 	bool m_attemptTempLutCalib;
 	bool m_skipCalIfCalibrated;
@@ -251,6 +255,7 @@ class Preferences_API : public ApiObject
 	Q_PROPERTY(bool attemptTempLutCalib READ getAttemptTempLutCalib WRITE setAttemptTempLutCalib)
 	Q_PROPERTY(bool skipCalIfCalibrated READ getSkipCalIfCalibrated WRITE setSkipCalIfCalibrated)
 	Q_PROPERTY(bool separateAnnotations READ getSeparateAnnotations WRITE setSeparateAnnotations)
+	Q_PROPERTY(bool TableInfo READ getTableInfo WRITE setTableInfo)
 	Q_PROPERTY(bool automatical_version_checking_enabled READ getAutomaticalVersionCheckingEnabled WRITE setAutomaticalVersionCheckingEnabled)
 	Q_PROPERTY(QString check_updates_url READ getCheckUpdatesUrl WRITE setCheckUpdatesUrl)
 	Q_PROPERTY(bool first_application_run READ getFirstApplicationRun WRITE setFirstApplicationRun)
@@ -336,6 +341,9 @@ public:
 
 	bool getSeparateAnnotations() const;
 	void setSeparateAnnotations(bool val);
+
+	bool getTableInfo() const;
+	void setTableInfo(bool val);
 
 	bool getAutomaticalVersionCheckingEnabled() const;
 	void setAutomaticalVersionCheckingEnabled(const bool& enabled);

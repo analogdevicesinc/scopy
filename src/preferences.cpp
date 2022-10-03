@@ -68,6 +68,7 @@ Preferences::Preferences(QWidget *parent) :
 	language("auto"),
 	m_displaySamplingPoints(false),
 	m_separateAnnotations(false),
+	m_tableInfo(true),
 	m_instrument_notes_active(false),
 	m_debug_messages_active(false),
 	m_attemptTempLutCalib(false),
@@ -293,6 +294,11 @@ Preferences::Preferences(QWidget *parent) :
 		Q_EMIT notify();
 	});
 
+	connect(ui->logicAnalyzerTableInfo, &QCheckBox::stateChanged, [=](int state){
+		m_tableInfo = (!state ? false : true);
+		Q_EMIT notify();
+	});
+
 	connect(ui->useOpenGl, &QCheckBox::stateChanged, [=](int state){
 		m_use_open_gl = state;
 		qputenv("SCOPY_USE_OPENGL",QByteArray::number(state));
@@ -393,6 +399,16 @@ void Preferences::setDisplaySamplingPoints(bool display)
 	m_displaySamplingPoints = display;
 }
 
+bool Preferences::getTableInfo() const
+{
+	return m_tableInfo;
+}
+
+void Preferences::setTableInfo(bool flag)
+{
+	m_tableInfo = flag;
+}
+
 bool Preferences::getSeparateAnnotations() const
 {
 	return m_separateAnnotations;
@@ -450,6 +466,7 @@ void Preferences::initializePreferences()
 	ui->languageCombo->setCurrentText(language);
 	ui->logicAnalyzerDisplaySamplingPoints->setChecked(m_displaySamplingPoints);
 	ui->logicAnalyzerSeparateAnnotations->setChecked(m_separateAnnotations);
+	ui->logicAnalyzerTableInfo->setChecked(m_tableInfo);
 	ui->instrumentNotesCheckbox->setChecked(m_instrument_notes_active);
 	ui->debugMessagesCheckbox->setChecked(m_debug_messages_active);
 	ui->debugInstrumentCheckbox->setChecked(debugger_enabled);
@@ -1025,6 +1042,16 @@ void Preferences_API::setSeparateAnnotations(bool val)
 {
 	preferencePanel->m_separateAnnotations = val;
 }
+
+bool Preferences_API::getTableInfo() const
+{
+	return preferencePanel->m_tableInfo;
+}
+void Preferences_API::setTableInfo(bool val)
+{
+	preferencePanel->m_tableInfo = val;
+}
+
 
 QString Preferences_API::getCurrentStylesheet() const
 {
