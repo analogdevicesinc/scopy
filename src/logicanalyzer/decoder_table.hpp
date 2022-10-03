@@ -52,12 +52,16 @@ public:
 
 public Q_SLOTS:
     void groupValuesChanged(int value);
+    void exportData();
 
 private:
     bool m_active;
     DecoderTableModel* tableModel;
     LogicAnalyzer* m_logicAnalyzer;
     QVector<GenericLogicPlotCurve *> *temp_curves;
+    bool exportCsv(QString fileName);
+    bool exportTxt(QString fileName);
+    QVector<QPair<uint64_t, uint64_t> > getSearchSampleMask();
 
 protected:
     void showEvent(QShowEvent *event);
