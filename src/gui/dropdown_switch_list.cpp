@@ -87,7 +87,7 @@ DropdownSwitchList::DropdownSwitchList(int switchColCount, QWidget *parent):
 	m_treeView->setAllColumnsShowFocus(false);
 	m_treeView->setRootIsDecorated(false);
 	m_treeView->setUniformRowHeights(true);
-	m_treeView->header()->setSectionResizeMode(0, QHeaderView::Fixed);
+	m_treeView->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 	m_treeView->header()->setDefaultAlignment(Qt::AlignCenter);
 }
 

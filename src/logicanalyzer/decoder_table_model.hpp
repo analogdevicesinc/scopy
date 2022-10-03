@@ -41,7 +41,6 @@ public:
     DecoderTableModel(DecoderTable *decoderTable, LogicAnalyzer *logicAnalyzer);
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     void setDefaultPrimaryAnnotations();
 
@@ -58,6 +57,10 @@ public:
 
     void setPrimaryAnnotation(int index);
     void selectedDecoderChanged(int index);
+
+    void populateFilter(int index);
+    QMap<int, QVector<QString>>& getFiltered();
+    int getCurrentColumn();
 
 public Q_SLOTS:
 
@@ -81,6 +84,8 @@ protected:
     QMap<int, int> *m_primary_annoations;
     void populateDecoderComboBox();
     mutable int m_current_column;
+    QMap<int, QVector<QString>> m_filteredMessages;
+    mutable int max_row_count = 0;
 };
 
 } // namespace logic

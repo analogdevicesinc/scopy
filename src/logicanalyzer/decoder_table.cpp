@@ -31,27 +31,27 @@ namespace logic {
 
 DecoderTable::DecoderTable(QWidget *parent) : QTableView(parent)
 {
-    horizontalHeader()->setStretchLastSection(true);
-    verticalHeader()->hide();
-    setItemDelegate(new DecoderTableItemDelegate);
-    setMinimumWidth(500);
-    horizontalHeader()->setMinimumSectionSize(500);
-    horizontalHeader()->sectionResizeMode(QHeaderView::Interactive);
+	horizontalHeader()->setStretchLastSection(true);
+	verticalHeader()->hide();
+	setItemDelegate(new DecoderTableItemDelegate);
+	setMinimumWidth(500);
+	horizontalHeader()->setMinimumSectionSize(500);
+	horizontalHeader()->sectionResizeMode(QHeaderView::Interactive);
 }
 
 void DecoderTable::setLogicAnalyzer(LogicAnalyzer *logicAnalyzer)
 {
-    if (logicAnalyzer != nullptr) {
-        if (const auto oldDecoderModel = dynamic_cast<DecoderTableModel*>(model())) {
-            if (oldDecoderModel != nullptr) {
-                delete oldDecoderModel;
-            }
-        }
-	tableModel = new DecoderTableModel(this, logicAnalyzer);
-	setModel(tableModel);
-    }
+	if (logicAnalyzer != nullptr) {
+		if (const auto oldDecoderModel = dynamic_cast<DecoderTableModel*>(model())) {
+			if (oldDecoderModel != nullptr) {
+				delete oldDecoderModel;
+			}
+		}
+		tableModel = new DecoderTableModel(this, logicAnalyzer);
+		setModel(tableModel);
+	}
 
-    m_logicAnalyzer = logicAnalyzer;
+	m_logicAnalyzer = logicAnalyzer;
 }
 
 QVector<GenericLogicPlotCurve *> DecoderTable::getDecoderCruves()
@@ -63,29 +63,24 @@ QVector<GenericLogicPlotCurve *> DecoderTable::getDecoderCruves()
 
 DecoderTableModel* DecoderTable::decoderModel() const
 {
-    return dynamic_cast<DecoderTableModel*>(model());
-}
-
-void DecoderTable::setPrimaryAnnotation(int index)
-{
-	decoderModel()->setPrimaryAnnotation(index);
+	return dynamic_cast<DecoderTableModel*>(model());
 }
 
 void DecoderTable::activate(bool logic)
 {
-    setLogicAnalyzer(m_logicAnalyzer);
-    if (const auto m = decoderModel()) {
-        m->reloadDecoders(logic);
-        m_active = true;
-    }
+	setLogicAnalyzer(m_logicAnalyzer);
+	if (const auto m = decoderModel()) {
+		m->reloadDecoders(logic);
+		m_active = true;
+	}
 }
 
 void DecoderTable::deactivate()
 {
-    if (const auto m = decoderModel()) {
-        m->deactivate();
-    }
-    m_active = false;
+	if (const auto m = decoderModel()) {
+		m->deactivate();
+	}
+	m_active = false;
 }
 
 } // namespace logic
