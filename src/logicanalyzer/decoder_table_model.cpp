@@ -99,6 +99,9 @@ void DecoderTableModel::setPrimaryAnnotation(int index)
 	if(m_decoderTable->isActive() && m_curves.at(m_current_column)->getMaxAnnotationCount(index) != m_curves.at(m_current_column)->getMaxAnnotationCount(prev_index)) {
 		refreshColumn(m_current_column);
 	}
+
+	int max_value = m_curves.at(m_current_column)->getMaxAnnotationCount(m_primary_annoations->value(m_current_column));
+	m_logic->setMaxGroupValues(max_value);
 }
 
 void DecoderTableModel::populateDecoderComboBox() const
@@ -255,8 +258,13 @@ void DecoderTableModel::refreshColumn(double column) const
 
 	// hide/show rows
 	bool no_rows = true;
+	int grouped_rows = (index - m_logic->getGroupOffset()) / m_logic->getGroupSize() + (m_logic->getGroupOffset() != 0);
+	if ((index - m_logic->getGroupOffset()) % m_logic->getGroupSize() != 0) {
+		grouped_rows++;
+	}
+
 	for (int row = 0; row < rowCount(); row++) {
-		if (row < index && !searchMask.contains(row)) {
+		if (row < index && !searchMask.contains(row) && row < grouped_rows) {
 			m_decoderTable->showRow(row);
 			no_rows = false;
 		} else {
@@ -343,21 +351,37 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 		if (to_be_refreshed == 2) selectedDecoderChanged(col);
 	}
 
-	if (searchMask.count() == curve->getMaxAnnotationCount(m_primary_annoations->value(index.column()))) {
+	int64_t total_rows = (m_logic->getGroupOffset() == 0) ? (row.size() - m_logic->getGroupOffset()) / m_logic->getGroupSize()
+							      : (row.size() - m_logic->getGroupOffset()) / m_logic->getGroupSize() + 1;
+	if ((row.size() - m_logic->getGroupOffset()) % m_logic->getGroupSize() != 0) {
+		total_rows++;
+	}
+	if (searchMask.count() == total_rows) {
 		return QVariant();
 	}
 
+	int size = m_logic->getGroupSize();
+	int off = (m_logic->getGroupOffset() == 0) ? size : m_logic->getGroupOffset();
+
+	int start_ann = (index.row() == 0) ? 0 : off + size * (index.row() - 1);
+	int end_ann = std::min(uint64_t(off + size * (index.row())) - 1, uint64_t(row.size() - 1));
+
+	if (off == 0) {
+		start_ann--;
+		end_ann--;
+	}
 	return QVariant::fromValue(DecoderTableItem(
 					   temp_curve,
-					   row[index.row()].start_sample(),
-				   row[index.row()].end_sample(),
-			m_filteredMessages.value(index.column()),
-			m_logic->getTableInfo()
-			));
+					   row[start_ann].start_sample(),
+					   row[end_ann].end_sample(),
+					   m_filteredMessages.value(index.column()),
+					   m_logic->getTableInfo()
+					   ));
 }
 
 void DecoderTableModel::searchBoxSlot(QString text)
 {
+	if (m_decoderTable->signalsBlocked()) return;
 	m_decoderTable->blockSignals(true);
 
 	QFuture<void> future = QtConcurrent::run(this, &DecoderTableModel::searchTable, text);
@@ -365,6 +389,11 @@ void DecoderTableModel::searchBoxSlot(QString text)
 
 	connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
 		m_decoderTable->blockSignals(false);
+
+		beginResetModel();
+		m_decoderTable->reset();
+		to_be_refreshed = true;
+		endResetModel();
 	});
 	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
 	watcher->setFuture(future);
@@ -394,22 +423,29 @@ void DecoderTableModel::searchTable(QString text)
 			}
 		}
 
-		for (auto sample_area: row) {
-			auto start_sample = sample_area.start_sample();
-			auto end_sample = sample_area.end_sample();
+		uint64_t i = 0;
+		uint64_t end_sample;
+		uint64_t start_sample;
+		while(i < row.size()) {
+			start_sample = row[i].start_sample();
+
+			if (i == 0 && m_logic->getGroupOffset() != 0) {
+				end_sample = row[m_logic->getGroupOffset() - 1].end_sample();
+			} else {
+				end_sample = row[std::min(uint64_t(i + m_logic->getGroupSize() - 1), uint64_t(row.size() - 1))].end_sample();
+			}
 			row_index++;
 
 			for (auto row_map: decoder) {
-				if (row_map.second.size() == 0) continue;
+				if (row_map.second.get_annotations().empty()) continue;
 				QString title = temp_curve->fromTitleToRowType(row_map.first.title());
 				if (m_filteredMessages.value(m_current_column).contains(title)) continue;
 
 				auto index_range = row_map.second.get_annotation_subset(start_sample, end_sample);
-				uint64_t i = index_range.first;
+				uint64_t j = index_range.first;
 
-				while (i < row_map.second.size()) {
-					loop_start:
-					auto ann = row_map.second.getAnnAt(i);
+				while (j <= index_range.second && j < row_map.second.size()) {
+					auto ann = row_map.second.getAnnAt(j);
 
 					if ((title != primary_title &&
 					     (((unsigned)(ann.end_sample()-start_sample-1) <= (end_sample-start_sample-1) ||
@@ -422,34 +458,20 @@ void DecoderTableModel::searchTable(QString text)
 								goto skip_loop;
 							}
 						}
-					} else {
-						if (i <= index_range.first) {
-							i = index_range.first + 1;
-							goto loop_start;
-						} else {
-							break;
-						}
 					}
-
-					if (i == 0) {
-						i = index_range.first + 1;
-					}
-
-					if (i <= index_range.first) {
-						i--;
-					} else {
-						i++;
-					}
+					j++;
 				}
 			}
 			// add to mask if not found
 			searchMask.append(row_index);
 skip_loop:
-			continue;
+			if (i == 0 && m_logic->getGroupOffset() != 0) {
+				i = m_logic->getGroupOffset();
+			} else {
+				i += m_logic->getGroupSize();
+			}
 		}
 	}
-	m_decoderTable->reset();
-	to_be_refreshed = true;
 }
 
 } // namespace logic

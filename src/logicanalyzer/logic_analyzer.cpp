@@ -1671,6 +1671,25 @@ void LogicAnalyzer::waitForDecoders()
 	ui->wDecoderSettings_2->setDisabled(false);
 }
 
+int LogicAnalyzer::getGroupSize()
+{
+	return (ui->groupSizeSpinBox->value() != 0) ? ui->groupSizeSpinBox->value() : 1;
+}
+
+int LogicAnalyzer::getGroupOffset()
+{
+	return ui->groupOffsetSpinBox->value();
+}
+
+void LogicAnalyzer::setMaxGroupValues(int value)
+{
+	ui->groupSizeSpinBox->setMaximum(value);
+	ui->groupSizeSpinBox->setMinimum(1);
+
+	ui->groupOffsetSpinBox->setMaximum(value);
+	ui->groupOffsetSpinBox->setMinimum(0);
+}
+
 void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
@@ -1705,6 +1724,10 @@ void LogicAnalyzer::connectSignalsAndSlots()
 			}
 		}
 	});
+
+	connect(ui->groupSizeSpinBox, SIGNAL(valueChanged(int)), ui->decoderTableView, SLOT(groupValuesChanged(int)));
+
+	connect(ui->groupOffsetSpinBox, SIGNAL(valueChanged(int)), ui->decoderTableView, SLOT(groupValuesChanged(int)));
 
 	connect(ui->searchBox, &QLineEdit::returnPressed,
 		[=](){
@@ -2520,8 +2543,12 @@ void LogicAnalyzer::setupDecoders()
 
 			int row_index = ui->primaryAnnotationComboBox->findText(QString::fromStdString(title));
 			if (row_index != -1) {
+				int row = 0;
+				if (getGroupOffset() < result.index) {
+					row = result.index / getGroupSize();
+				}
 				ui->primaryAnnotationComboBox->setCurrentIndex(row_index);
-				ui->decoderTableView->decoderModel()->setCurrentRow(result.index);
+				ui->decoderTableView->decoderModel()->setCurrentRow(row);
 			}
 		});
 	});

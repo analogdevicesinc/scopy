@@ -50,6 +50,9 @@ public:
     DecoderTableModel* decoderModel() const;
     bool eventFilter(QObject *object, QEvent *event);
 
+public Q_SLOTS:
+    void groupValuesChanged(int value);
+
 private:
     bool m_active;
     DecoderTableModel* tableModel;
