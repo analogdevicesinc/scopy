@@ -48,6 +48,7 @@ public:
 
     // Shortcut to get a reference to the model.
     DecoderTableModel* decoderModel() const;
+    bool eventFilter(QObject *object, QEvent *event);
 
 private:
     bool m_active;

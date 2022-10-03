@@ -113,6 +113,7 @@ public: // Mixed Signal View Interface
 	void addFilterRow(QIcon icon, QString name);
 	void clearFilter();
 	bool getTableInfo();
+	void clearSearch(int index = -1);
 
 Q_SIGNALS:
 	void showTool();
@@ -152,7 +153,6 @@ private Q_SLOTS:
 	void PrimaryAnnotationChanged(int index);
 	void selectedDecoderChanged(int index);
 	void emitSearchSignal(int index = -1);
-	void clearSearchSignal(int index = -1);
 
 	void onFilterChanged(QStandardItem *item);
 
@@ -174,6 +174,8 @@ private:
 	void setupTriggerMenu();
 
 	QVector<QVector<QString>> createDecoderData(bool separate_annotations);
+
+	void waitForDecoders();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)

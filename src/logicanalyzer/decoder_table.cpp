@@ -31,12 +31,30 @@ namespace logic {
 
 DecoderTable::DecoderTable(QWidget *parent) : QTableView(parent)
 {
-	horizontalHeader()->setStretchLastSection(true);
-	verticalHeader()->hide();
 	setItemDelegate(new DecoderTableItemDelegate);
-	setMinimumWidth(500);
+
+	horizontalHeader()->setStretchLastSection(true);
 	horizontalHeader()->setMinimumSectionSize(500);
 	horizontalHeader()->sectionResizeMode(QHeaderView::Interactive);
+	horizontalScrollBar()->setEnabled(false);
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	verticalHeader()->hide();
+	setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+	setAutoScroll(false);
+	installEventFilter(this);
+}
+
+bool DecoderTable::eventFilter(QObject* object, QEvent* event)
+{
+	// prevent user from swiping through columns using touchscreen
+
+	if (event->type() == QEvent::Paint && tableModel->getCurrentColumn() != horizontalScrollBar()->value()) {
+		horizontalScrollBar()->setValue(tableModel->getCurrentColumn());
+		return true;
+	}
+	return false;
 }
 
 void DecoderTable::setLogicAnalyzer(LogicAnalyzer *logicAnalyzer)

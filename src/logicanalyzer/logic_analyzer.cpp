@@ -43,6 +43,8 @@
 #include <QDockWidget>
 #include <QFileDialog>
 #include <QDateTime>
+#include <QFutureWatcher>
+#include <QtConcurrentRun>
 
 #include <QTabWidget>
 
@@ -1045,7 +1047,23 @@ void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 	// When the bottom decoder button is clicked show/hide the right menu
 	// and ativate or deactivate the decoder table.
 	if (checked) {
-		ui->decoderTableView->activate(true);
+		if (!ui->btnStreamOneShot->isChecked()) {
+			ui->btnStreamOneShot->click();
+		}
+
+		ui->decoderTableView->blockSignals(true);
+		QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
+		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
+		connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+			if (ui->btnDecoderTable->isChecked()) {
+				ui->decoderTableView->blockSignals(false);
+				ui->decoderTableView->activate(true);
+			}
+
+		});
+		// delete the watcher when finished too
+		connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
+		watcher->setFuture(future);
 
 	} else {
 		ui->decoderTableView->deactivate();
@@ -1383,6 +1401,7 @@ void LogicAnalyzer::setupUi()
 	gridLayout->setHorizontalSpacing(0);
 	gridLayout->setContentsMargins(15, 0, 15, 0);
 	plotWidget->setLayout(gridLayout);
+	plotWidget->setMinimumWidth(200);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 		QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -1415,7 +1434,7 @@ void LogicAnalyzer::setupUi()
 	m_bufferPreviewer->setVerticalSpacing(6);
 	m_bufferPreviewer->setMinimumHeight(20);
 	m_bufferPreviewer->setMaximumHeight(20);
-	m_bufferPreviewer->setMinimumWidth(375);
+	m_bufferPreviewer->setMinimumWidth(200);
 //	m_bufferPreviewer->setMaximumWidth(375);
 	m_bufferPreviewer->setCursorPos(0.5);
 
@@ -1510,6 +1529,8 @@ void LogicAnalyzer::setupUi()
 
 void LogicAnalyzer::onFilterChanged(QStandardItem *item)
 {
+	if (!ui->decoderTableView->decoderModel())
+		return;
 	auto name = item->model()->item(item->index().row(), 0)->text();
 	int column = ui->decoderTableView->decoderModel()->getCurrentColumn();
 	auto filtered = ui->decoderTableView->decoderModel()->getFiltered()[column];
@@ -1554,15 +1575,15 @@ bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
 	auto curve = dynamic_cast<AnnotationCurve *>(getPlotCurves(true)[DIGITAL_NR_CHANNELS + column]);
 	std::map<Row, RowData> decoder(curve->getAnnotationRows());
 
-	for (auto it = decoder.begin(); it != decoder.end(); it++) {
+	for (int row = 0; row < curve->getAnnotationRows().size(); ++row) {
+		auto it = std::find_if(curve->getAnnotationRows().begin(), curve->getAnnotationRows().end(),
+				       [row](const std::pair<const Row, RowData> &t) -> bool{
+			return t.first.index() == row;
+		});
+
 		if (!it->second.get_annotations().empty()) {
-			auto title = it->first.title().toStdString();
-			if (title.find(":")) {
-				ui->primaryAnnotationComboBox->addItem(QString::fromStdString(title.substr(title.find(':') + 1)), it->first.index());
-			}
-			else {
-				ui->primaryAnnotationComboBox->addItem(QString::fromStdString(title), it->first.index());
-			}
+			auto title = curve->fromTitleToRowType(it->first.title());
+			ui->primaryAnnotationComboBox->addItem(title, it->first.index());
 		}
 
 	}
@@ -1596,17 +1617,22 @@ void LogicAnalyzer::enableSingleButton(bool flag)
 void LogicAnalyzer::emitSearchSignal(int index)
 {
 	QString text = ui->searchBox->text();
-	ui->decoderTableView->decoderModel()->searchBoxSignal(text);
+	ui->decoderTableView->decoderModel()->searchBoxSlot(text);
 }
 
-void LogicAnalyzer::clearSearchSignal(int index)
+void LogicAnalyzer::clearSearch(int index)
 {
+	if (!ui->decoderTableView->decoderModel())
+		return;
+
 	ui->searchBox->clear();
-	ui->decoderTableView->decoderModel()->searchBoxSignal("");
-	ui->decoderTableView->decoderModel()->selectedDecoderChanged(index);
+	ui->decoderTableView->decoderModel()->searchBoxSlot("");
 }
 
-void LogicAnalyzer::PrimaryAnnotationChanged(int index){
+void LogicAnalyzer::PrimaryAnnotationChanged(int index)
+{
+	clearSearch();
+
 	if (index == -1) {
 		index = 0;
 		ui->primaryAnnotationComboBox->setCurrentIndex(index);
@@ -1616,7 +1642,33 @@ void LogicAnalyzer::PrimaryAnnotationChanged(int index){
 
 void LogicAnalyzer::selectedDecoderChanged(int index)
 {
-	ui->decoderTableView->decoderModel()->selectedDecoderChanged(index);
+	if (ui->decoderTableView->decoderModel()) {
+		ui->decoderTableView->decoderModel()->selectedDecoderChanged(index);
+	}
+}
+
+void LogicAnalyzer::waitForDecoders()
+{
+	// waits for LA to stop decoding
+	ui->wDecoderSettings_2->setDisabled(true);
+
+	bool all_finished;
+	while(this->isVisible()) {
+		usleep(100);
+		all_finished = true;
+		for (int row = DIGITAL_NR_CHANNELS; row < m_plotCurves.size(); row++) {
+			auto curve = dynamic_cast<AnnotationCurve*>(m_plotCurves[row]);
+			if (abs(curve->getState()) != 2) {
+				all_finished = false;
+				break;
+			}
+		}
+		if (all_finished) {
+			break;
+		}
+	}
+
+	ui->wDecoderSettings_2->setDisabled(false);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -1626,39 +1678,38 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->decoderTableView, SIGNAL(show()), this, SLOT(PrimaryAnnotationChanged(int)));
 
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
-	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSearchSignal(int)));
+//	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSearchSignal(int)));
 
 	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
-	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(clearSearchSignal(int)));
+//	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(clearSearch(int)));
 
-	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled,
+	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled, this,
 		[=](bool checked){
 		if (checked) {
-			ui->decoderTableView->blockSignals(true);
-		}
-	});
-
-	connect(runButton(), &QPushButton::toggled,
-		[=](bool checked){
-		if (!checked) {
-			ui->decoderTableView->blockSignals(false);
 			if (ui->decoderTableView->isActive()) {
+				ui->decoderTableView->blockSignals(true);
 
-				Q_EMIT ui->searchBox->editingFinished();
+				QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
+				QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
-				if (ui->primaryAnnotationComboBox->count() == 0) {
-					ui->decoderTableView->decoderModel()->refreshColumn();
-				} else {
-					ui->decoderTableView->decoderModel()->to_be_refreshed = 2;
-				}
+				connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+					ui->decoderTableView->blockSignals(false);
+					int currentCol = ui->decoderTableView->decoderModel()->getCurrentColumn();
+
+					ui->decoderTableView->decoderModel()->refreshSettings(currentCol);
+					ui->DecoderComboBox->setCurrentIndex(currentCol);
+
+				});
+				connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
+				watcher->setFuture(future);
 			}
 		}
 	});
 
-	connect(ui->searchBox, &QLineEdit::editingFinished,
+	connect(ui->searchBox, &QLineEdit::returnPressed,
 		[=](){
 		QString text = ui->searchBox->text();
-		ui->decoderTableView->decoderModel()->searchBoxSignal(text);
+		ui->decoderTableView->decoderModel()->searchBoxSlot(text);
 	});
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,

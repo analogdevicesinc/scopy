@@ -71,9 +71,6 @@ public:
 Q_SIGNALS:
 	void decoderMenuChanged();
 
-    // Emitted when new annotations are decoded from the decoder thread
-    void annotationsChanged();
-
     // Emitted when an annotation is clicked
     void annotationClicked(AnnotationQueryResult result);
 
@@ -122,6 +119,12 @@ public:
 
     const double m_infoHeight = 17 * 2;
 
+    int getState();
+
+    QString fromTitleToRowType(QString title) const;
+
+    void setState(int st);
+
 protected:
     void drawLines( QPainter *painter,
         const QwtScaleMap &xMap, const QwtScaleMap &yMap,
@@ -161,6 +164,7 @@ private:
     std::vector<std::shared_ptr<adiscope::bind::Decoder>> m_bindings;
 
     mutable int m_visibleRows;
+    mutable int state = -1;
 };
 }
 

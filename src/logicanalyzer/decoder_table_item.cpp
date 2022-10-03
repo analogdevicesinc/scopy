@@ -35,8 +35,9 @@ void DecoderTableItemDelegate::paint(
 		const QStyleOptionViewItem &option,
 		const QModelIndex &index
 		) const {
-	if (index.data().canConvert<DecoderTableItem>()) {
-		DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(index.data());
+	auto data = index.data();
+	if (data.canConvert<DecoderTableItem>()) {
+		DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(data);
 		decoderItem.paint(painter, option.rect, option.palette);
 	} else {
 		QStyledItemDelegate::paint(painter, option, index);
@@ -143,15 +144,21 @@ void DecoderTableItem::paint(
 	if (tableInfoFlag) {
 		curve->drawAnnotationInfo(offset, startSample, endSample, painter, xmap, ymap, rect);
 	}
-	for (const auto &entry: curve->getAnnotationRows()) {
+	for (int row = 0; row < curve->getAnnotationRows().size(); ++row) {
+		auto entry = *std::find_if(curve->getAnnotationRows().begin(), curve->getAnnotationRows().end(),
+				       [row](const std::pair<const Row, RowData> &t) -> bool{
+			return t.first.index() == row;
+		});
 		const RowData &data = entry.second;
 
-		QString title = (entry.first.title().indexOf(':')) ? entry.first.title().mid(entry.first.title().indexOf(':') + 1)
-								   : entry.first.title();
-
-		if (filteredMessages.contains(title)) continue;
+		if (filteredMessages.contains(curve->fromTitleToRowType(entry.first.title()))) continue;
 		if (data.size() == 0) continue;
-		const auto range = data.get_annotations();
+		vector<Annotation> range;
+		if (startSample == 0) {
+			data.get_annotation_subset(range, startSample, endSample);
+		} else {
+			data.get_annotation_subset(range, startSample - 1, endSample);
+		}
 
 		for (auto ann: range) {
 			curve->drawAnnotation(
