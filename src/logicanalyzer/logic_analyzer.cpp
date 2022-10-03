@@ -1542,6 +1542,11 @@ void LogicAnalyzer::clearFilter()
 	filterCount = 0;
 }
 
+bool LogicAnalyzer::getTableInfo()
+{
+	return m_tableInfo;
+}
+
 bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
 {
 	bool changed = false;
@@ -1605,6 +1610,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
 
+	connect(ui->decoderTableView, SIGNAL(show()), this, SLOT(PrimaryAnnotationChanged(int)));
+
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
 
 	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
@@ -1622,7 +1629,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 			ui->decoderTableView->blockSignals(false);
 			if (ui->decoderTableView->isActive()) {
 				ui->decoderTableView->decoderModel()->setMaxRowCount();
-				if (ui->PrimaryAnnotationComboBox->count() == 0) {
+				if (ui->primaryAnnotationComboBox->count() == 0) {
 					ui->decoderTableView->decoderModel()->refreshColumn();
 				} else {
 					ui->decoderTableView->decoderModel()->to_be_refreshed = true;
@@ -2437,9 +2444,9 @@ void LogicAnalyzer::setupDecoders()
 			std::string title = result.ann->row()->title().toStdString();
 			title = title.erase(0, title.find(':') + 1);
 
-			int row_index = ui->PrimaryAnnotationComboBox->findText(QString::fromStdString(title));
+			int row_index = ui->primaryAnnotationComboBox->findText(QString::fromStdString(title));
 			if (row_index != -1) {
-				ui->PrimaryAnnotationComboBox->setCurrentIndex(row_index);
+				ui->primaryAnnotationComboBox->setCurrentIndex(row_index);
 				ui->decoderTableView->decoderModel()->setCurrentRow(result.index);
 			}
 		});
@@ -2718,6 +2725,7 @@ void LogicAnalyzer::restoreTriggerState()
 void LogicAnalyzer::readPreferences()
 {
 	bool showFps = prefPanel->getShow_plot_fps();
+	m_tableInfo = prefPanel->getTableInfo();
 	m_separateAnnotations = prefPanel->getSeparateAnnotations();
 	m_plot.setVisibleFpsLabel(showFps);
 

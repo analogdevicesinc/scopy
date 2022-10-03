@@ -118,7 +118,7 @@ public:
 
     void drawAnnotationInfo(int row, uint64_t start, uint64_t end, QPainter *painter,
 		   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-		   const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+		   const QRectF &canvasRect) const;
 
     const double m_infoHeight = 17 * 2;
 

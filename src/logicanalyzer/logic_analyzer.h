@@ -112,6 +112,7 @@ public: // Mixed Signal View Interface
 	QComboBox *getDecoderComboBox();
 	void addFilterRow(QIcon icon, QString name);
 	void clearFilter();
+	bool getTableInfo();
 
 Q_SIGNALS:
 	void showTool();
@@ -202,6 +203,7 @@ private:
 	double m_timeTriggerOffset;
 	bool m_resetHorizAxisOffset;
 	bool m_separateAnnotations;
+	bool m_tableInfo;
 
 	// capture
 	std::thread *m_captureThread;

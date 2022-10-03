@@ -83,6 +83,11 @@ void DecoderTable::deactivate()
 	m_active = false;
 }
 
+void DecoderTable::showEvent(QShowEvent *event)
+{
+    tableModel->to_be_refreshed = true;
+}
+
 } // namespace logic
 } // namespace adiscope
 
