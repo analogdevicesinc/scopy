@@ -151,6 +151,8 @@ private Q_SLOTS:
 
 	void PrimaryAnnotationChanged(int index);
 	void selectedDecoderChanged(int index);
+	void emitSearchSignal(int index = -1);
+	void clearSearchSignal(int index = -1);
 
 	void onFilterChanged(QStandardItem *item);
 
