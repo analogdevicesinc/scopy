@@ -2003,6 +2003,12 @@ color: rgba(255,255,255,51);
                  </item>
                  <item>
                   <widget class="adiscope::logic::DecoderTable" name="decoderTableView">
+                   <property name="minimumSize">
+                    <size>
+                     <width>500</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <property name="frameShadow">
                     <enum>QFrame::Plain</enum>
                    </property>
@@ -2416,6 +2422,22 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
     <hint type="destinationlabel">
      <x>1185</x>
      <y>427</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnDecoderTable</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSettings</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1243</x>
+     <y>677</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1233</x>
+     <y>35</y>
     </hint>
    </hints>
   </connection>

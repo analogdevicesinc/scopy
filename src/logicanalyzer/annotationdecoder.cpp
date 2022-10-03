@@ -476,6 +476,8 @@ void AnnotationDecoder::decodeProc()
             if (!dec->have_required_channels()) {
 //                qDebug() << "not having required channels!";
                 // TODO: SET ERROR MESSAGE
+		m_annotationCurve->setState(-2);
+
                 return;
             }
         }
