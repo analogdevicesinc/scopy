@@ -63,8 +63,9 @@ public:
     int getCurrentColumn();
     void setCurrentRow(int index);
     void setMaxRowCount();
-    mutable bool to_be_refreshed;
+    mutable int to_be_refreshed;
     void refreshSettings(int column = -1) const;
+    void setSearchString(QString str);
 
 public Q_SLOTS:
 
@@ -75,6 +76,8 @@ public Q_SLOTS:
 
     // Slot that should be invoked when new annotations are decoded
     void annotationsChanged();
+
+    void searchBoxSignal(QString text);
 
 protected:
 
@@ -90,6 +93,8 @@ protected:
     mutable int m_current_column;
     QMap<int, QVector<QString>> m_filteredMessages;
     mutable int max_row_count = 0;
+    mutable QString searchString;
+    QVector<int> searchMask;
 };
 
 } // namespace logic

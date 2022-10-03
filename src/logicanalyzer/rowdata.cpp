@@ -102,8 +102,9 @@ std::pair<uint64_t, uint64_t> RowData::get_annotation_subset(uint64_t start_samp
         }
     }
 
-    if (!last && first > 0 && first < annotations_.size() - 1) {
-        last = first + 1;
+    if (!last && first > 0) {
+	    last = (first < annotations_.size() - 1) ? first + 1
+			    : first;
     }
 
     // let s adjust the edges a bit

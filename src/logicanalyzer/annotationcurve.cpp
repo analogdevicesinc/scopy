@@ -544,7 +544,7 @@ void AnnotationCurve::drawAnnotationInfo(int row, uint64_t start, uint64_t end, 
 	if (start != end) {
 		rect = QRectF(QPointF(xMap.transform(fromSampleToTime(start)), yMap.transform(offset)), QSizeF(width, m_infoHeight));
 	} else {
-		rect = QRectF(QPointF(canvasRect.x() + canvasRect.width() * infoWidthRatio, yMap.transform(offset)), QSizeF(canvasRect.width() * (1 - infoWidthRatio), m_infoHeight));
+		rect = QRectF(QPointF(canvasRect.x() + canvasRect.width() * infoWidthRatio, yMap.transform(offset)), QSizeF(canvasRect.width() * (1 - infoWidthRatio * 2), m_infoHeight));
 	}
 
 	painter->save();
