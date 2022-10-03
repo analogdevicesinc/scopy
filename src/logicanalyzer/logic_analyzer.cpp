@@ -205,6 +205,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 			ui->wDecoderSettings_2->setVisible(check);
 		});
 	ui->btnCollapseSettings->click();
+	ui->statusLabel->setStyleSheet("QLabel { color : #4A64FF; }");
 
 	// Add propper zoomer
 	m_plot.addZoomer(0);
@@ -1525,6 +1526,9 @@ void LogicAnalyzer::setupUi()
 			SLOT(onFilterChanged(QStandardItem*)));
 
 	ui->filterLayout->addWidget(filterMessages);
+
+	connect(ui->btnTableExport, &QPushButton::clicked,
+		ui->decoderTableView, &DecoderTable::exportData);
 }
 
 void LogicAnalyzer::onFilterChanged(QStandardItem *item)
@@ -1649,9 +1653,10 @@ void LogicAnalyzer::selectedDecoderChanged(int index)
 
 void LogicAnalyzer::waitForDecoders()
 {
-	// waits for LA to stop decoding
+	setStatusLabel("Waiting for plot ...");
 	ui->wDecoderSettings_2->setDisabled(true);
 
+	// waits for LA to stop decoding
 	bool all_finished;
 	while(this->isVisible()) {
 		usleep(100);
@@ -1669,6 +1674,7 @@ void LogicAnalyzer::waitForDecoders()
 	}
 
 	ui->wDecoderSettings_2->setDisabled(false);
+	setStatusLabel("");
 }
 
 int LogicAnalyzer::getGroupSize()
@@ -1688,6 +1694,11 @@ void LogicAnalyzer::setMaxGroupValues(int value)
 
 	ui->groupOffsetSpinBox->setMaximum(value);
 	ui->groupOffsetSpinBox->setMinimum(0);
+}
+
+void LogicAnalyzer::setStatusLabel(QString text)
+{
+	ui->statusLabel->setText(text);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
