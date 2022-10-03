@@ -49,8 +49,6 @@ public:
     // Shortcut to get a reference to the model.
     DecoderTableModel* decoderModel() const;
 
-    void setPrimaryAnnotation(int index);
-
 private:
     bool m_active;
     DecoderTableModel* tableModel;

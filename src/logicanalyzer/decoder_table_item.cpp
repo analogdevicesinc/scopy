@@ -31,132 +31,137 @@ namespace logic {
 
 
 void DecoderTableItemDelegate::paint(
-    QPainter *painter,
-    const QStyleOptionViewItem &option,
-    const QModelIndex &index
-) const {
-    if (index.data().canConvert<DecoderTableItem>()) {
-        DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(index.data());
-        decoderItem.paint(painter, option.rect, option.palette);
-    } else {
-        QStyledItemDelegate::paint(painter, option, index);
-    }
+		QPainter *painter,
+		const QStyleOptionViewItem &option,
+		const QModelIndex &index
+		) const {
+	if (index.data().canConvert<DecoderTableItem>()) {
+		DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(index.data());
+		decoderItem.paint(painter, option.rect, option.palette);
+	} else {
+		QStyledItemDelegate::paint(painter, option, index);
+	}
 }
 
 
 
 QSize DecoderTableItemDelegate::sizeHint(
-    const QStyleOptionViewItem &option,
-    const QModelIndex &index
-) const {
-    if (index.data().canConvert<DecoderTableItem>()) {
-        DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(index.data());
-        return decoderItem.sizeHint();
-    }
-    return QStyledItemDelegate::sizeHint(option, index);
+		const QStyleOptionViewItem &option,
+		const QModelIndex &index
+		) const {
+	if (index.data().canConvert<DecoderTableItem>()) {
+		DecoderTableItem decoderItem = qvariant_cast<DecoderTableItem>(index.data());
+		return decoderItem.sizeHint();
+	}
+	return QStyledItemDelegate::sizeHint(option, index);
 }
 
 
-DecoderTableItem::DecoderTableItem(AnnotationCurve *curve, uint64_t start, uint64_t end):
-    curve(curve),
-    startSample(start),
-    endSample(end)
+DecoderTableItem::DecoderTableItem(AnnotationCurve *curve, uint64_t start, uint64_t end, QVector<QString> filter):
+	curve(curve),
+	startSample(start),
+	endSample(end),
+	filteredMessages(filter)
 {
 
 }
 
 double DecoderTableItem::startTime() const
 {
-    if (curve != nullptr)
-        return curve->fromSampleToTime(startSample);
-    return 0;
+	if (curve != nullptr)
+		return curve->fromSampleToTime(startSample);
+	return 0;
 }
 
 double DecoderTableItem::endTime() const
 {
-    if (curve != nullptr)
-        return curve->fromSampleToTime(endSample);
-    return 0;
+	if (curve != nullptr)
+		return curve->fromSampleToTime(endSample);
+	return 0;
 }
 
 void DecoderTableItem::paint(
-    QPainter *painter,
-    const QRect &rect,
-    const QPalette &palette
-) const {
+		QPainter *painter,
+		const QRect &rect,
+		const QPalette &palette
+		) const {
 
-    if (curve == nullptr){
-	    return;
-    }
-    painter->save();
-
-    // Shift to start of table
-    painter->translate(rect.x(), rect.y());
-
-    // Set border color
-    painter->setPen(QPen(QBrush(Qt::black), 1));
-
-    QwtScaleMap xmap, ymap;
-    xmap.setPaintInterval(0, rect.width());
-    ymap.setPaintInterval(0, rect.height());
-    // qDebug() << "rect: " << rect << Qt::endl;
-
-    QwtPointMapper mapper;
-    mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
-    // mapper.setBoundingRect(rect);  // Seems to have no effect?
-
-    // Scale the annotation to fit in the column
-    const double lower = startTime();
-    const double upper = endTime();
-    double padding = (upper - lower) * 0.05;
-    if (padding == 0) {
-	    padding = 0.0001;
-    }
-
-    const QwtInterval interval = QwtInterval(lower-padding, upper+padding);
-    xmap.setScaleInterval(interval.minValue(), interval.maxValue());
-
-    // Shift curve offset to 0 and block any signals while doing it since the
-    // changes are restored after drawing. Without this the rows are shifted out
-    // of place.
-    QSignalBlocker signalBlocker(curve);
-    const auto originalPixelOffset = curve->getPixelOffset();
-    curve->setPixelOffset(0);
-
-    // The title size is reserved for the titles in the normal plot
-    // this is unused here.
-    const QSize titleSize = QSize(0, 0);
-
-    // Draw all annotations in the sample range
-    int offset = 0; // TODO: This does not retain the original order
-
-    if (curve->getAnnotationRows().size() == 0) {
-	    return;
-    }
-
-    for (const auto &entry: curve->getAnnotationRows()) {
-	const RowData &data = entry.second;
-
-	if (data.size() == 0) continue;
-	const auto range = data.get_annotations();
-
-	for (auto ann: range) {
-		curve->drawAnnotation(
-		    offset, ann, painter, xmap, ymap, rect, mapper,
-		    interval, titleSize);
+	if (curve == nullptr){
+		return;
 	}
-	offset += 1;
-    }
+	painter->save();
 
-    // Restore
-    curve->setPixelOffset(originalPixelOffset);
+	// Shift to start of table
+	painter->translate(rect.x(), rect.y());
 
-    painter->restore();
+	// Set border color
+	painter->setPen(QPen(QBrush(Qt::black), 1));
+
+	QwtScaleMap xmap, ymap;
+	xmap.setPaintInterval(0, rect.width());
+	ymap.setPaintInterval(0, rect.height());
+	// qDebug() << "rect: " << rect << Qt::endl;
+
+	QwtPointMapper mapper;
+	mapper.setFlag( QwtPointMapper::RoundPoints, QwtPainter::roundingAlignment( painter ) );
+	// mapper.setBoundingRect(rect);  // Seems to have no effect?
+
+	// Scale the annotation to fit in the column
+	const double lower = startTime();
+	const double upper = endTime();
+	double padding = (upper - lower) * 0.05;
+	if (padding == 0) {
+		padding = 0.0001;
+	}
+
+	const QwtInterval interval = QwtInterval(lower-padding, upper+padding);
+	xmap.setScaleInterval(interval.minValue(), interval.maxValue());
+
+	// Shift curve offset to 0 and block any signals while doing it since the
+	// changes are restored after drawing. Without this the rows are shifted out
+	// of place.
+	QSignalBlocker signalBlocker(curve);
+	const auto originalPixelOffset = curve->getPixelOffset();
+	curve->setPixelOffset(0);
+
+	// The title size is reserved for the titles in the normal plot
+	// this is unused here.
+	const QSize titleSize = QSize(0, 0);
+
+	// Draw all annotations in the sample range
+	int offset = 0; // TODO: This does not retain the original order
+
+	if (curve->getAnnotationRows().size() == 0) {
+		return;
+	}
+
+	for (const auto &entry: curve->getAnnotationRows()) {
+		const RowData &data = entry.second;
+
+		QString title = (entry.first.title().indexOf(':')) ? entry.first.title().mid(entry.first.title().indexOf(':') + 1)
+								   : entry.first.title();
+
+		if (filteredMessages.contains(title)) continue;
+		if (data.size() == 0) continue;
+		const auto range = data.get_annotations();
+
+		for (auto ann: range) {
+			curve->drawAnnotation(
+						offset, ann, painter, xmap, ymap, rect, mapper,
+						interval, titleSize);
+		}
+		offset += 1;
+	}
+
+	// Restore
+	curve->setPixelOffset(originalPixelOffset);
+
+	painter->restore();
 }
 
 QSize DecoderTableItem::sizeHint() const
 {
-    return itemSize;
+	return itemSize;
 }
 
 
