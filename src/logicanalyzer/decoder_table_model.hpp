@@ -57,6 +57,7 @@ public:
     int indexOfCurve(const AnnotationCurve* curve) const;
 
     void setPrimaryAnnotation(int index);
+    void selectedDecoderChanged(int index);
 
 public Q_SLOTS:
 
@@ -78,6 +79,7 @@ protected:
     QVector<GenericLogicPlotCurve*> m_plotCurves;
     bool m_active = false;
     QMap<int, int> *m_primary_annoations;
+    void populateDecoderComboBox();
     mutable int m_current_column;
 };
 

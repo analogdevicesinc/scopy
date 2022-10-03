@@ -19,6 +19,7 @@
  */
 #include "decoder_table_model.hpp"
 #include "logic_analyzer.h"
+#include "qcombobox.h"
 #include <QDebug>
 #include <QHeaderView>
 
@@ -60,7 +61,6 @@ void DecoderTableModel::setDefaultPrimaryAnnotations()
 int DecoderTableModel::rowCount(const QModelIndex &parent) const
 {
     // Return max of all packets
-	return 100;
     size_t count = 0;
     if (!m_active) {
 	    return 0;
@@ -96,9 +96,24 @@ int DecoderTableModel::indexOfCurve(const AnnotationCurve *curve) const
 
 void DecoderTableModel::setPrimaryAnnotation(int index)
 {
+	auto prev_index = m_primary_annoations->value(m_current_column);
 	m_primary_annoations->remove(m_current_column);
 	m_primary_annoations->insert(m_current_column, index);
 	m_decoderTable->reset();
+
+	if(m_decoderTable->isActive() && m_curves.at(m_current_column)->getMaxAnnotationCount(index) != m_curves.at(m_current_column)->getMaxAnnotationCount(prev_index)) {
+		refreshColumn(m_current_column);
+	}
+}
+
+void DecoderTableModel::populateDecoderComboBox()
+{
+	auto decoderComboBox = m_logic->getDecoderComboBox();
+
+	decoderComboBox->clear();
+	for (const auto &curve: m_curves) {
+	    decoderComboBox->addItem(curve->getName());
+	}
 }
 
 void DecoderTableModel::activate()
@@ -121,8 +136,10 @@ void DecoderTableModel::activate()
     }
     m_active = true;
 
-    setDefaultPrimaryAnnotations();
     m_plotCurves.remove(0, DIGITAL_NR_CHANNELS);
+    populateDecoderComboBox();
+//    setDefaultPrimaryAnnotations();
+    refreshColumn(0);
 }
 
 void DecoderTableModel::deactivate()
@@ -178,8 +195,8 @@ void DecoderTableModel::refreshColumn(double column) const
 
 	int index = curve->getMaxAnnotationCount(m_primary_annoations->value((int) column));
 	if (m_decoderTable->isRowHidden(index - 1) || !m_decoderTable->isRowHidden(index)) {
-		for (int row = 0; row < m_decoderTable->size().height(); row++) {
-			if (row < curve->getMaxAnnotationCount(m_primary_annoations->value((int) column))) {
+		for (int row = 0; row < m_decoderTable->decoderModel()->rowCount(); row++) {
+			if (row < index) {
 				m_decoderTable->showRow(row);
 			}
 			else {
@@ -192,9 +209,20 @@ void DecoderTableModel::refreshColumn(double column) const
 	// resize rows
 	const int spacing = 10;
 	int rowHeight = 20;
-	if (verticalHeader->defaultSectionSize() != rowHeight * curve->getVisibleRows() + spacing) {
+
+	int row_count = 0;
+	std::map<Row, RowData>::iterator it;
+	std::map<Row, RowData> decoder(curve->getAnnotationRows());
+
+	for (it = decoder.begin(); it != decoder.end(); it++) {
+		if (!it->second.get_annotations().empty()) {
+			row_count ++;
+		}
+	}
+
+	if (verticalHeader->defaultSectionSize() != rowHeight * row_count + spacing) {
 		rowHeight = std::max(rowHeight, static_cast<int>(curve->getTraceHeight()));
-		verticalHeader->setDefaultSectionSize(rowHeight * curve->getVisibleRows() + spacing);
+		verticalHeader->setDefaultSectionSize(rowHeight * row_count + spacing);
 	}
 }
 
@@ -230,6 +258,18 @@ void DecoderTableModel::annotationsChanged()
     verticalHeader->sectionResizeMode(QHeaderView::Fixed);*/
 }
 
+void DecoderTableModel::selectedDecoderChanged(int index)
+{
+	if (index >= 0) {
+		m_decoderTable->scrollTo(QAbstractTableModel::index(0, index));
+		m_current_column = index;
+		bool changed = m_logic->setPrimaryAnntations(index, m_primary_annoations->value(index));
+		if (m_decoderTable->isActive()) {
+			refreshColumn(index);
+		}
+	}
+}
+
 QVariant DecoderTableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role == Qt::DisplayRole and orientation == Qt::Horizontal) {
@@ -256,12 +296,11 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 	const auto &curve = m_curves.at(col);
 	if (curve.isNull()) return QVariant();
 
-//	if (index.row() >= curve->getMaxAnnotationCount(m_primary_annoations->value(index.column()))) {
-//		return QVariant();
-//	}
+	if (index.row() >= curve->getMaxAnnotationCount(m_primary_annoations->value(index.column()))) {
+		return QVariant();
+	}
 
 	const size_t row = index.row();
-	refreshColumn(index.column());
 
 	if (curve->getAnnotationRows().size() == 0) {
 		return QVariant();
