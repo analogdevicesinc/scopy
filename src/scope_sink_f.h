@@ -61,7 +61,8 @@ namespace adiscope {
       static sptr make(int size, double samp_rate,
 		       const std::string &name,
 		       int nconnections=1,
-		       QObject *plot=NULL);
+		       QObject *plot=NULL,
+		       QObject *waterfall_plot = NULL);
 
       virtual void exec_() = 0;
 

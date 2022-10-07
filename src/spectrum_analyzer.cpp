@@ -39,6 +39,7 @@
 #include <QtWidgets>
 
 /* Local includes */
+#include "WaterfallDisplayPlot.h"
 #include "logging_categories.h"
 #include "spectrum_analyzer.hpp"
 #include "filter.hpp"
@@ -136,6 +137,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_generic_analogin(nullptr),
 	marker_selector(new DbClickButtons(this)),
 	fft_plot(nullptr),
+	waterfall_plot(nullptr),
 	settings_group(new QButtonGroup(this)),
 	channels_group(new QButtonGroup(this)),
 	adc_name(ctx ? filt->device_name(TOOL_SPECTRUM_ANALYZER) : ""),
@@ -250,10 +252,43 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	measure_settings_init();
 #endif
 
+	// waterfall plot
+
+	waterfall_plot = new WaterfallDisplayPlot(m_adc_nb_channels, this);
+	waterfall_plot->disableLegend();
+
+//	waterfall_plot->setAxisVisible(QwtAxis::XBottom, false);
+//	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
+//	waterfall_plot->setUsingLeftAxisScales(false);
+
+//	waterfall_plot->setFrequencyRange(-10, 10);
+//	waterfall_plot->setIntensityRange(-112000, -10000);
+//	waterfall_plot->setXaxisMouseGesturesEnabled(false);
+//	waterfall_plot->heightForWidth(25);
+//	waterfall_plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+//	waterfall_plot->setAutoFillBackground(false);
+	waterfall_plot->setPlotPosHalf(true);
+	waterfall_plot->setAxisVisible(QwtAxis::XBottom, false);
+	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
+	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
+	waterfall_plot->setAxisVisible(QwtAxis::YRight, false);
+	waterfall_plot->setVisibleSampleCount(100);
+	waterfall_plot->replot();
+
+//	for (uint i = 0; i < m_adc_nb_channels; i++) {
+////		ui->gridLayout_plot->addWidget(measurePanel, 0, 1, 1, 1);
+//		waterfall_plot->setYaxisMouseGesturesEnabled(i, false);
+//	}
+
+//	connect(waterfall_plot, SIGNAL(channelAdded(int)),
+//		    SLOT(onChannelAdded(int)));
+
 
 	// plot widget
 	QWidget* centralWidget = new QWidget(this);
 	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
+	QVBoxLayout* vPlotsLayout = new QVBoxLayout(centralWidget);
+	QHBoxLayout* waterfallLayout = new QHBoxLayout(centralWidget);
 	vLayout->setContentsMargins(20, 0, 20, 20);
 	vLayout->setSpacing(10);
 	centralWidget->setLayout(vLayout);
@@ -265,7 +300,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
 	vLayout->addWidget(ui->topPlotWidget);
 
-	vLayout->addWidget(fft_plot->getPlotwithElements());
+	vPlotsLayout->addLayout(waterfallLayout);
+	vPlotsLayout->setSpacing(0);
+	vPlotsLayout->setContentsMargins(0, 0, 0, 0);
+	waterfallLayout->addSpacerItem(new QSpacerItem(60, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	waterfallLayout->addWidget(waterfall_plot->getPlotwithElements());
+	vPlotsLayout->addWidget(fft_plot->getPlotwithElements());
+	vLayout->addLayout(vPlotsLayout);
 
 	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
 	vLayout->addWidget(ui->markerTable);
@@ -273,6 +314,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setZoomerEnabled();
 	fft_plot->setAxisVisible(QwtAxis::XBottom, false);
 	fft_plot->setAxisVisible(QwtAxis::YLeft, false);
+	fft_plot->setAxisVisible(QwtAxis::YRight, false);
+	fft_plot->setAxisVisible(QwtAxis::XTop, false);
 	fft_plot->setUsingLeftAxisScales(false);
 
 	ui->gridLayout_plot->addWidget(centralWidget, 1, 0, 1, 1);
@@ -300,6 +343,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		connect(channel.get()->widget(), SIGNAL(enabled(bool)),
 		        SLOT(onChannelEnabled(bool)));
 
+		waterfall_plot->enableChannel(channel.get()->widget()->enableButton()->isChecked(), channel->id());
 		ch_api.append(new SpectrumChannel_API(this,channel));
 	}
 
@@ -358,6 +402,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		fft_plot->replot();
 		fft_plot->bottomHandlesArea()->repaint();
+
+		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
+		waterfall_plot->bottomHandlesArea()->repaint();
+		waterfall_plot->setFrequencyRange(start, stop);
+//		waterfall_plot->setCenterFrequency(startStopRange->getCenterValue());
+		waterfall_plot->replot();
+
 
 		setSampleRate(2 * stop);
 
@@ -454,7 +505,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(fft_plot, SIGNAL(newMarkerData()),
 	        this, SLOT(onPlotNewMarkerData()));
 	connect(fft_plot, SIGNAL(markerSelected(uint, uint)),
-	        this, SLOT(onPlotMarkerSelected(uint, uint)));
+		this, SLOT(onPlotMarkerSelected(uint, uint)));
 
 	connect(marker_freq_pos, SIGNAL(valueChanged(double)),
 	        this, SLOT(onMarkerFreqPosChanged(double)));
@@ -493,6 +544,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(fft_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
 		SLOT(onCurrentAverageIndexChanged(unsigned int, unsigned int)));
+
+	connect(waterfall_plot, SIGNAL(newData()),
+		SLOT(singleCaptureDone()));
+
+	connect(waterfall_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
+		SLOT(onCurrentAverageIndexChanged(unsigned int, unsigned int)));
 	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 	setCurrentAverageIndexLabel(crt_channel_id);
 
@@ -519,6 +576,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	cursor_panel_init();
 
 	connect(fft_plot,
+		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
+		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
+
+	connect(waterfall_plot,
 		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
 		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
 
@@ -765,12 +826,14 @@ void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs)
 {
 	Tool::setNativeDialogs(nativeDialogs);
 	fft_plot->setUseNativeDialog(nativeDialogs);
+//	waterfall_plot->setUseNativeDialog(nativeDialogs);
 }
 
 void SpectrumAnalyzer::readPreferences() {
 	bool showFps = prefPanel->getShow_plot_fps();
 	fft_plot->setVisibleFpsLabel(showFps);
 	fft_plot->setVisiblePeakSearch(prefPanel->getSpectrum_visible_peak_search());
+	waterfall_plot->setVisibleFpsLabel(showFps);
 	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
 }
 
@@ -1818,6 +1881,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 		fft_plot->resetAverageHistory();
 	}
 	fft_plot->startStop(checked);
+	waterfall_plot->startStop(checked);
 	m_running = checked;
 }
 
@@ -1825,7 +1889,8 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
-	                                        (QObject *)fft_plot);
+						(QObject *)fft_plot,
+						(QObject *)waterfall_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
@@ -1871,7 +1936,8 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
-	                                        (QObject *)fft_plot);
+						(QObject *)fft_plot,
+						(QObject *)waterfall_plot);
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
 	fft_sink->set_update_time(1.0/targetFps);
@@ -2016,7 +2082,9 @@ void SpectrumAnalyzer::on_comboBox_line_thickness_currentIndexChanged(int index)
 	if (width != channels[crt_channel]->lineWidth()) {
 		channels[crt_channel]->setLinewidth(width);
 		fft_plot->setLineWidth(crt_channel, width);
+		waterfall_plot->setLineWidth(crt_channel, width);
 		fft_plot->replot();
+		waterfall_plot->replot();
 	}
 }
 
@@ -2246,6 +2314,7 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
+	waterfall_plot->enableChannel(en, cw->id());
 	if (en) {
 		fft_plot->AttachCurve(cw->id());
 		if (!ui->btnMarkers->isEnabled()) {
