@@ -32,6 +32,7 @@
 #include "FftDisplayPlot.h"
 #include "tool.hpp"
 #include "plot_utils.hpp"
+#include "WaterfallDisplayPlot.h"
 #include "gui/spinbox_a.hpp"
 #include "gui/customPushButton.hpp"
 #include "gui/startstoprangewidget.h"
@@ -266,6 +267,7 @@ private:
 	QButtonGroup *settings_group;
 	QButtonGroup *channels_group;
 	FftDisplayPlot *fft_plot;
+	WaterfallDisplayPlot *waterfall_plot;
 
 	ScaleSpinButton *top_scale;
 	ScaleSpinButton *bottom_scale;
