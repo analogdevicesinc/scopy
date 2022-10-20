@@ -112,7 +112,7 @@ public:
 		KAISER = 6,
 	};
 
-	typedef boost::shared_ptr<SpectrumChannel> channel_sptr;
+	typedef std::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
 				  ToolMenuItem *toolMenuItem,
@@ -283,7 +283,7 @@ private:
 	adiscope::scope_sink_f::sptr fft_sink;
 	iio_manager::port_id *fft_ids;
 
-	boost::shared_ptr<iio_manager> iio;
+	std::shared_ptr<iio_manager> iio;
 	const std::string adc_name;
 	unsigned int m_adc_nb_channels;
 	int adc_bits_count;
@@ -354,7 +354,7 @@ class SpectrumChannel: public QObject
 	friend class SpectrumChannel_API;
 
 public:
-	boost::shared_ptr<adiscope::fft_block> fft_block;
+	std::shared_ptr<adiscope::fft_block> fft_block;
 	gr::blocks::complex_to_mag_squared::sptr ctm_block;
 
 	SpectrumChannel(int id, const QString& name, FftDisplayPlot *plot);
