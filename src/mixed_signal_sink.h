@@ -29,7 +29,7 @@
 class mixed_signal_sink : virtual public gr::sync_block
 {
 public:
-	typedef boost::shared_ptr<mixed_signal_sink> sptr;
+	typedef std::shared_ptr<mixed_signal_sink> sptr;
 
 	static sptr make(adiscope::logic::LogicAnalyzer *logicAnalyzer,
 	                 adiscope::TimeDomainDisplayPlot *oscPlot,

@@ -40,7 +40,7 @@ private:
 	bool high_gain;
 
 public:
-	typedef boost::shared_ptr<frequency_compensation_filter> sptr;
+	typedef std::shared_ptr<frequency_compensation_filter> sptr;
 	frequency_compensation_filter_impl(bool enable, float TC, float gain,
 					   float sample_rate);
 	int work(int noutput_items,

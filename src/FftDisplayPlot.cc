@@ -998,37 +998,37 @@ FftDisplayPlot::average_sptr FftDisplayPlot::getNewAvgObject(
 			return nullptr;
 
 		case PEAK_HOLD:
-			return boost::make_shared<PeakHold>(data_width,
+			return std::make_shared<PeakHold>(data_width,
 				history);
 		case PEAK_HOLD_CONTINUOUS:
-			return boost::make_shared<PeakHoldContinuous>(
+			return std::make_shared<PeakHoldContinuous>(
 				data_width, history);
 		case MIN_HOLD:
-			return boost::make_shared<MinHold>(data_width, history);
+			return std::make_shared<MinHold>(data_width, history);
 		case MIN_HOLD_CONTINUOUS:
-			return boost::make_shared<MinHoldContinuous>(data_width,
+			return std::make_shared<MinHoldContinuous>(data_width,
 				history);
 		case LINEAR_RMS:
 		if (history_en) {
-			return boost::make_shared<LinearRMS>(data_width,
+			return std::make_shared<LinearRMS>(data_width,
 				history);
 		} else {
-			return boost::make_shared<LinearRMSOne>(data_width,
+			return std::make_shared<LinearRMSOne>(data_width,
 				history);
 		}
 		case LINEAR_DB:
 		if (history_en) {
-			return boost::make_shared<LinearAverage>(data_width,
+			return std::make_shared<LinearAverage>(data_width,
 				history);
 		} else {
-			return boost::make_shared<LinearAverageOne>(data_width,
+			return std::make_shared<LinearAverageOne>(data_width,
 				history);
 		}
 		case EXPONENTIAL_RMS:
-			return boost::make_shared<ExponentialAverage>(
+			return std::make_shared<ExponentialAverage>(
 				data_width, history);
 		case EXPONENTIAL_DB:
-			return boost::make_shared<ExponentialAverage>(
+			return std::make_shared<ExponentialAverage>(
 				data_width, history);
 		default:
 			return nullptr;

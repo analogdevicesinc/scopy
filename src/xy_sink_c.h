@@ -56,7 +56,7 @@ namespace adiscope {
     {
     public:
       // gr::qtgui::xy_sink_c::sptr
-      typedef boost::shared_ptr<xy_sink_c> sptr;
+      typedef std::shared_ptr<xy_sink_c> sptr;
 
       static sptr make(int size,
 		       const std::string &name,
