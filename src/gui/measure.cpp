@@ -19,6 +19,7 @@
  */
 
 #include "measure.h"
+#include <fstream>
 #include <cmath>
 #include "adc_sample_conv.hpp"
 #include <qmath.h>

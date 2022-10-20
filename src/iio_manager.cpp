@@ -95,7 +95,7 @@ iio_manager::~iio_manager()
 {
 }
 
-boost::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
+std::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
 {
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
@@ -114,7 +114,7 @@ boost::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev
 	return nullptr;
 }
 
-boost::shared_ptr<iio_manager> iio_manager::get_instance(
+std::shared_ptr<iio_manager> iio_manager::get_instance(
 		struct iio_context *ctx, const std::string &_dev,
 		unsigned long buffer_size)
 {
@@ -125,7 +125,7 @@ boost::shared_ptr<iio_manager> iio_manager::get_instance(
 
 	/* No manager found - create a new one */
 	auto manager = new iio_manager(_id++, ctx, _dev, buffer_size);
-	boost::shared_ptr<iio_manager> shared_manager(manager);
+    std::shared_ptr<iio_manager> shared_manager(manager);
 
 	/* Add it to the map */
 	auto it = dev_map.insert(std::pair<const std::string, map_entry>(
