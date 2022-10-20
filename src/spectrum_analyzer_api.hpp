@@ -136,7 +136,7 @@ class SpectrumChannel_API : public ApiObject
 
 public:
 	explicit SpectrumChannel_API(SpectrumAnalyzer *sp,
-				     boost::shared_ptr<SpectrumChannel> spch) :
+				     std::shared_ptr<SpectrumChannel> spch) :
 		ApiObject(), spch(spch),sp(sp) {}
 	~SpectrumChannel_API() {}
 
@@ -157,7 +157,7 @@ public:
 
 private:
 	SpectrumAnalyzer *sp;
-	boost::shared_ptr<SpectrumChannel> spch;
+	std::shared_ptr<SpectrumChannel> spch;
 };
 
 class SpectrumMarker_API :public ApiObject

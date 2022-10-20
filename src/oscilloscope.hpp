@@ -25,7 +25,7 @@
 
 /* GNU Radio includes */
 #include <gnuradio/blocks/short_to_float.h>
-#include <iio/device_source.h>
+#include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/complex_to_mag_squared.h>
 #include <gnuradio/analog/rail_ff.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
@@ -76,7 +76,7 @@
 #include <libm2k/m2k.hpp>
 
 /* gr-m2k includes */
-#include <m2k/digital_in_source.h>
+#include <gnuradio/m2k/digital_in_source.h>
 #include "logic_analyzer_sink.h"
 #include "mixed_signal_sink.h"
 
@@ -339,13 +339,13 @@ namespace adiscope {
 		adiscope::scope_sink_f::sptr qt_fft_block;
 		adiscope::xy_sink_c::sptr qt_xy_block;
 		adiscope::histogram_sink_f::sptr qt_hist_block;
-		boost::shared_ptr<iio_manager> iio;
+        std::shared_ptr<iio_manager> iio;
 		gr::basic_block_sptr adc_samp_conv_block;
 
 		QMap<QString, QPair<gr::basic_block_sptr,
 		gr::basic_block_sptr>> math_sinks;
-		QMap<QString, boost::shared_ptr<gr::analog::rail_ff>> math_rails;
-		std::vector<boost::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
+        QMap<QString, std::shared_ptr<gr::analog::rail_ff>> math_rails;
+        std::vector<std::shared_ptr<gr::blocks::multiply_const_ff>> math_probe_atten;
 
 		iio_manager::port_id *ids;
 		iio_manager::port_id *hist_ids;
@@ -369,9 +369,9 @@ namespace adiscope {
 
 		std::vector<bool> chnAcCoupled;
 		bool triggerAcCoupled;
-		QPair<boost::shared_ptr<signal_sample>, int> triggerLevelSink;
-		boost::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
-		boost::shared_ptr<gr::blocks::vector_sink_f> autosetFFTSink;
+        QPair<std::shared_ptr<signal_sample>, int> triggerLevelSink;
+        std::shared_ptr<gr::blocks::keep_one_in_n> keep_one;
+        std::shared_ptr<gr::blocks::vector_sink_f> autosetFFTSink;
 
 		bool trigger_is_forced;
 		bool new_data_is_triggered;
@@ -455,12 +455,12 @@ namespace adiscope {
 		void init_channel_settings();
 		void editMathChannelFunction(int id, const std::string &new_function);
 
-		std::vector<boost::shared_ptr<cancel_dc_offset_block>> dc_cancel;
+        std::vector<std::shared_ptr<cancel_dc_offset_block>> dc_cancel;
 		std::vector<QPair<gr::basic_block_sptr, int> > xy_channels;
 		std::vector<QPair<gr::basic_block_sptr, int> > fft_channels;
 		int index_x, index_y;
 		bool locked;
-		boost::shared_ptr<gr::blocks::float_to_complex> ftc;
+        std::shared_ptr<gr::blocks::float_to_complex> ftc;
 		std::vector<gr::basic_block_sptr> fft_blocks;
 		std::vector<gr::basic_block_sptr> ctm_blocks;
 

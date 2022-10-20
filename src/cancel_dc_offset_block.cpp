@@ -36,7 +36,7 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 	d_enabled(enabled),
 	d_buffer_size(buffer_size),
 	d_dc_offset(0.0),
-	d_signal(boost::make_shared<signal_sample>())
+	d_signal(std::make_shared<signal_sample>())
 {
 	_build_and_connect_blocks();
 
