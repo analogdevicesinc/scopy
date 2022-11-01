@@ -28,6 +28,7 @@
 #include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "scope_sink_f.h"
+#include "waterfall_sink_f.h"
 #include "fft_block.hpp"
 #include "FftDisplayPlot.h"
 #include "tool.hpp"
@@ -283,7 +284,9 @@ private:
 	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
 	adiscope::scope_sink_f::sptr fft_sink;
+	adiscope::waterfall_sink_f::sptr waterfall_sink;
 	iio_manager::port_id *fft_ids;
+	iio_manager::port_id *waterfall_ids;
 
 	std::shared_ptr<iio_manager> iio;
 	const std::string adc_name;

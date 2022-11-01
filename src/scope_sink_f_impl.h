@@ -66,7 +66,6 @@ namespace adiscope {
       std::vector< std::vector<gr::tag_t> > d_tags;
 
       QObject *plot;
-      QObject *waterfall_plot;
 
       gr::high_res_timer_type d_update_time;
       gr::high_res_timer_type d_last_time;
@@ -89,8 +88,7 @@ namespace adiscope {
       scope_sink_f_impl(int size, double samp_rate,
 		       const std::string &name,
 		       int nconnections,
-		       QObject *plot = NULL,
-		       QObject *waterfall_plot = NULL);
+		       QObject *plot = NULL);
       ~scope_sink_f_impl();
 
       bool check_topology(int ninputs, int noutputs);
