@@ -255,33 +255,19 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	// waterfall plot
 
 	waterfall_plot = new WaterfallDisplayPlot(m_adc_nb_channels, this);
-	waterfall_plot->disableLegend();
-
-//	waterfall_plot->setAxisVisible(QwtAxis::XBottom, false);
-//	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
-//	waterfall_plot->setUsingLeftAxisScales(false);
-
-//	waterfall_plot->setFrequencyRange(-10, 10);
-//	waterfall_plot->setIntensityRange(-112000, -10000);
-//	waterfall_plot->setXaxisMouseGesturesEnabled(false);
-//	waterfall_plot->heightForWidth(25);
-//	waterfall_plot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-//	waterfall_plot->setAutoFillBackground(false);
 	waterfall_plot->setPlotPosHalf(true);
 	waterfall_plot->setAxisVisible(QwtAxis::XBottom, false);
 	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
-	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
+	waterfall_plot->setAxisVisible(QwtAxis::YLeft, true);
 	waterfall_plot->setAxisVisible(QwtAxis::YRight, false);
-	waterfall_plot->setVisibleSampleCount(100);
+	waterfall_plot->setVisibleSampleCount(200);
+	waterfall_plot->setFlowDirection(WaterfallFlowDirection::DOWN);
 	waterfall_plot->replot();
 
 //	for (uint i = 0; i < m_adc_nb_channels; i++) {
 ////		ui->gridLayout_plot->addWidget(measurePanel, 0, 1, 1, 1);
 //		waterfall_plot->setYaxisMouseGesturesEnabled(i, false);
 //	}
-
-//	connect(waterfall_plot, SIGNAL(channelAdded(int)),
-//		    SLOT(onChannelAdded(int)));
 
 
 	// plot widget
@@ -300,12 +286,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
 	vLayout->addWidget(ui->topPlotWidget);
 
+	vPlotsLayout->addWidget(fft_plot->getPlotwithElements());
+
 	vPlotsLayout->addLayout(waterfallLayout);
 	vPlotsLayout->setSpacing(0);
 	vPlotsLayout->setContentsMargins(0, 0, 0, 0);
-	waterfallLayout->addSpacerItem(new QSpacerItem(60, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
+//	waterfallLayout->addSpacerItem(new QSpacerItem(60, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
 	waterfallLayout->addWidget(waterfall_plot->getPlotwithElements());
-	vPlotsLayout->addWidget(fft_plot->getPlotwithElements());
 	vLayout->addLayout(vPlotsLayout);
 
 	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
@@ -405,8 +392,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		waterfall_plot->bottomHandlesArea()->repaint();
-		waterfall_plot->setFrequencyRange(start, stop);
+		waterfall_sink->set_frequency_range(0, stop);
+		waterfall_plot->setFrequencyRange(start, stop * 2 - start * 2);
 //		waterfall_plot->setCenterFrequency(startStopRange->getCenterValue());
+
 		waterfall_plot->replot();
 
 
@@ -810,6 +799,7 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 
 		for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 			iio->disconnect(fft_ids[i]);
+			iio->disconnect(waterfall_ids[i]);
 		}
 
 		if (started) {
@@ -1887,14 +1877,27 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 
 void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
+	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
+							  gr::fft::window::WIN_HANN,
+							  0,
+							  m_max_sample_rate,
+							  "Waterfall Plot",
+							  m_adc_nb_channels,
+							  waterfall_plot);
+//						"Osc Frequency", m_adc_nb_channels,
+//						(QObject *)fft_plot,
+//						(QObject *)waterfall_plot);
+	//      (1024, fft::window::WIN_HANN, 0, rate, "", 1);
+
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
-						(QObject *)fft_plot,
-						(QObject *)waterfall_plot);
+						(QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
+//	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
 	fft_sink->set_update_time(1.0/targetFps);
+	waterfall_sink->set_update_time(1.0/targetFps);
 
 	bool started = isIioManagerStarted();
 
@@ -1911,6 +1914,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		}
 	}
 
+	waterfall_ids = new iio_manager::port_id[m_adc_nb_channels];
 	fft_ids = new iio_manager::port_id[m_adc_nb_channels];
 
 	for (size_t i = 0; i < m_adc_nb_channels; i++) {
@@ -1923,9 +1927,25 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		iio->connect(fft, 0, ctm, 0);
 		iio->connect(ctm, 0, fft_sink, i);
 
+		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size);
+//		iio->connect(ctm, 0, waterfall_sink, i);
+
 		channels[i]->fft_block = fft;
 		channels[i]->ctm_block = ctm;
 	}
+
+//	for (size_t i = 0; i < 1; i++) {
+//		auto waterfall = gnuradio::get_initial_sptr(
+//				   new fft_block(false, fft_size));
+//		auto waterfall_ctm = gr::blocks::complex_to_mag_squared::make(1);
+
+//		waterfall_ids[i] = iio->connect(waterfall, i, 0, true, fft_size);
+//		iio->connect(waterfall, 0, waterfall_ctm, 0);
+//		iio->connect(waterfall_ctm, 0, waterfall_sink, i);
+
+////		channels[i]->fft_block = waterfall;
+////		channels[i]->ctm_block = ctm;
+//	}
 
 	if (started) {
 		iio->unlock();
@@ -1934,13 +1954,21 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
+	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
+							  gr::fft::window::WIN_HANN,
+							  0,
+							  m_max_sample_rate,
+							  "Waterfall Plot",
+							  m_adc_nb_channels,
+							  waterfall_plot);
+
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
-						(QObject *)fft_plot,
-						(QObject *)waterfall_plot);
+						(QObject *)fft_plot);
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
 	fft_sink->set_update_time(1.0/targetFps);
+	waterfall_sink->set_update_time(1.0/targetFps);
 
 	top_block = gr::make_top_block("spectrum_analyzer");
 
@@ -1963,6 +1991,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 		top_block->connect(add, 0, fft, 0);
 		top_block->connect(fft, 0, ctm, 0);
 		top_block->connect(ctm, 0, fft_sink, i);
+		top_block->connect(fft, 0, waterfall_sink, i);
 
 		channels[i]->fft_block = fft;
 	}
@@ -1973,6 +2002,7 @@ void SpectrumAnalyzer::start_blockchain_flow()
 	if (iio) {
 		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->start(fft_ids[i]);
+			iio->start(waterfall_ids[i]);
 		}
 	} else {
 		fft_sink->reset();
@@ -1985,6 +2015,7 @@ void SpectrumAnalyzer::stop_blockchain_flow()
 	if (iio) {
 		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->stop(fft_ids[i]);
+			iio->stop(waterfall_ids[i]);
 		}
 	} else {
 		top_block->stop();
@@ -2500,12 +2531,15 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 	switch(bin_sizes[index]) {
 	case 1<<17:
 		fft_sink->set_update_time(update_time * 2);
+		waterfall_sink->set_update_time(update_time * 2);
 	break;
 	case 1<<18:
 		fft_sink->set_update_time(update_time * 4);
+		waterfall_sink->set_update_time(update_time * 4);
 	break;
 	default:
 		fft_sink->set_update_time(update_time);
+		waterfall_sink->set_update_time(update_time);
 		break;
 	}
 
@@ -2525,6 +2559,8 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 {
 	sample_rate_divider = (int)(m_max_sample_rate / sr);
 	double new_sr = m_max_sample_rate / sample_rate_divider;
+
+	ui->lbl_sampleRate->setText("Sample rate: " + QString::number(new_sr));
 
 	if (new_sr == sample_rate) {
 		return;
@@ -2578,6 +2614,7 @@ void SpectrumAnalyzer::setFftSize(uint size)
 
 	fft_size = size;
 	fft_sink->set_nsamps(size);
+	waterfall_sink->set_fft_size(size);
 
 	if (fft_plot->magnitudeType() == FftDisplayPlot::VROOTHZ) {
 		fft_plot->setNbOverlappingAverages(m_nb_overlapping_avg);
@@ -2588,20 +2625,26 @@ void SpectrumAnalyzer::setFftSize(uint size)
 		                   new fft_block(false, size));
 
 		iio->disconnect(fft_ids[i]);
+		iio->disconnect(waterfall_ids[i]);
 
 		fft_ids[i] = iio->connect(fft, i, 0, true, fft_size * m_nb_overlapping_avg);
 
 		iio->connect(fft, 0, channels[i]->ctm_block, 0);
 		iio->connect(channels[i]->ctm_block, 0, fft_sink, i);
 
+		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size * m_nb_overlapping_avg);
+//		iio->connect(channels[i]->ctm_block, 0, waterfall_sink, i);
+
 		if (started) {
 			iio->start(fft_ids[i]);
+			iio->start(waterfall_ids[i]);
 		}
 
 		channels[i]->fft_block = fft;
 		channels[i]->setFftWindow(channels[i]->fftWindow(), size);
 
 		iio->set_buffer_size(fft_ids[i], size * m_nb_overlapping_avg);
+		iio->set_buffer_size(waterfall_ids[i], size * m_nb_overlapping_avg);
 	}
 
 	if (started) {
@@ -3057,6 +3100,7 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 	}
 
 	fft_plot->setAxisScale(QwtAxis::YLeft, bottom_value, top_value);
+	waterfall_plot->setIntensityRange(bottom_value, top_value);
 
 	fft_plot->replot();
 	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
@@ -3091,6 +3135,7 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 	}
 
 	fft_plot->setAxisScale(QwtAxis::YLeft, bottomValue, topValue);
+	waterfall_plot->setIntensityRange(bottomValue, topValue);
 
 	fft_plot->replot();
 	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
@@ -3115,6 +3160,7 @@ void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 	}
 
 	fft_plot->setAxisScale(QwtAxis::YLeft, bottom_value, top_value);
+	waterfall_plot->setIntensityRange(bottom_value, top_value);
 
 	fft_plot->replot();
 	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);

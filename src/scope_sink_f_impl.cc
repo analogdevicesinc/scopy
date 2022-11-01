@@ -63,18 +63,16 @@ scope_sink_f::sptr
 scope_sink_f::make(int size, double samp_rate,
 		   const std::string &name,
 		   int nconnections,
-		   QObject *plot,
-		   QObject *waterfall_plot)
+		   QObject *plot)
 {
 	return gnuradio::get_initial_sptr
-			(new scope_sink_f_impl(size, samp_rate, name, nconnections, plot, waterfall_plot));
+			(new scope_sink_f_impl(size, samp_rate, name, nconnections, plot));
 }
 
 scope_sink_f_impl::scope_sink_f_impl(int size, double samp_rate,
 				     const std::string &name,
 				     int nconnections,
-				     QObject *plot,
-				     QObject *waterfall_plot)
+				     QObject *plot)
 	: sync_block("scope_sink_f",
 		     io_signature::make(nconnections, nconnections, sizeof(float)),
 		     io_signature::make(0, 0, 0)),
@@ -105,7 +103,6 @@ scope_sink_f_impl::scope_sink_f_impl(int size, double samp_rate,
 
 	initialize();
 	this->plot = plot;
-	this->waterfall_plot = waterfall_plot;
 
 	auto time_plot = dynamic_cast<TimeDomainDisplayPlot *>(plot);
 	if (time_plot)
@@ -349,8 +346,8 @@ scope_sink_f_impl::work(int noutput_items,
 	for(n = 0; n < d_nconnections; n++) {
 		in = (const float*)input_items[idx];
 		memcpy(&d_fbuffers[n][d_index], &in[0], nitems*sizeof(float));
-		//volk_32f_convert_64f(&d_buffers[n][d_index],
-		//                     &in[1], nitems);
+		volk_32f_convert_64f(&d_buffers[n][d_index],
+				     &in[1], nitems);
 
 		uint64_t nr = nitems_read(idx);
 		std::vector<gr::tag_t> tags;
@@ -392,11 +389,6 @@ scope_sink_f_impl::work(int noutput_items,
 											  nItemsToSend,
 											  d_tags,
 											  d_name));
-				//			      qDebug() << waterfall_plot;
-				d_qApplication->postEvent(this->waterfall_plot,
-							  new WaterfallUpdateEvent(d_buffers,
-										   nItemsToSend,
-										   d_update_time));
 			}
 		}
 
