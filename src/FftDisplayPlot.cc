@@ -629,6 +629,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 		uint64_t num_points)
 {
 	uint64_t halfNumPoints = num_points / 2;
+//	uint64_t halfNumPoints = num_points;
 	bool numPointsChanged = false;
 	bool samplRateChanged = false;
 	bool magTypeChanged = false;

@@ -28,6 +28,7 @@
 #include <vector>
 #include <gnuradio/high_res_timer.h>
 #include <gnuradio/tags.h>
+#include <volk/volk_alloc.hh>
 
 static const int SpectrumUpdateEventType = 10005;
 static const int SpectrumWindowCaptionEventType = 10008;
@@ -243,35 +244,32 @@ private:
 /********************************************************************/
 
 
-class WaterfallUpdateEvent: public QEvent
+class WaterfallUpdateEvent : public QEvent
 {
 public:
-  WaterfallUpdateEvent(const std::vector<double*> &dataPoints,
-		       const uint64_t numDataPoints,
-		       const gr::high_res_timer_type dataTimestamp);
+    WaterfallUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
+			 const uint64_t numDataPoints,
+			 const gr::high_res_timer_type dataTimestamp);
 
-  ~WaterfallUpdateEvent();
+    ~WaterfallUpdateEvent() override;
 
-  int which() const;
-  const std::vector<double*> getPoints() const;
-  uint64_t getNumDataPoints() const;
-  bool getRepeatDataFlag() const;
+    int which() const;
+    const std::vector<double*> getPoints() const;
+    uint64_t getNumDataPoints() const;
+    bool getRepeatDataFlag() const;
 
-  gr::high_res_timer_type getDataTimestamp() const;
+    gr::high_res_timer_type getDataTimestamp() const;
 
-  static QEvent::Type Type()
-  { return QEvent::Type(SpectrumUpdateEventType); }
+    static QEvent::Type Type() { return QEvent::Type(SpectrumUpdateEventType); }
 
 protected:
-
 private:
-  size_t _nplots;
-  std::vector<double*> _dataPoints;
-  uint64_t _numDataPoints;
+    size_t _nplots;
+    std::vector<double*> _dataPoints;
+    uint64_t _numDataPoints;
 
-  gr::high_res_timer_type _dataTimestamp;
+    gr::high_res_timer_type _dataTimestamp;
 };
-
 
 /********************************************************************/
 
