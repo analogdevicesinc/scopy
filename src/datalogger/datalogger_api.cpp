@@ -36,46 +36,46 @@ void DataLogger_API::set_recording_interval(int interval)
 }
 
 bool DataLogger_API::get_data_logging_on(){
-	return dataLogger->dataLogger->isDataLoggerOn();
+	return dataLogger->dataLoggerController->isDataLoggerOn();
 }
 void DataLogger_API::set_data_logging_on(bool en){
-	dataLogger->dataLogger->dataLoggerToggled(en);
+	dataLogger->dataLoggerController->dataLoggerToggled(en);
 }
 
 QString DataLogger_API::get_data_logging_path()
 {
-	return dataLogger->dataLogger->getPath();
+	return dataLogger->dataLoggerController->getPath();
 }
 
 void DataLogger_API::set_data_logging_path(QString path)
 {
-	if (dataLogger->dataLogger->isDataLoggerOn()) {
-		dataLogger->dataLogger->setPath(path);
+	if (dataLogger->dataLoggerController->isDataLoggerOn()) {
+		dataLogger->dataLoggerController->setPath(path);
 	} else {
-		dataLogger->dataLogger->setPath("");
+		dataLogger->dataLoggerController->setPath("");
 	}
 }
 
 bool DataLogger_API::get_data_logger_overwrite_append()
 {
-	return dataLogger->dataLogger->isOverwrite();
+	return dataLogger->dataLoggerController->isOverwrite();
 }
 
 void DataLogger_API::set_data_logger_overwrite_append(bool en)
 {
-	if (dataLogger->dataLogger->isDataLoggerOn()) {
-		dataLogger->dataLogger->setOverwrite(en);
+	if (dataLogger->dataLoggerController->isDataLoggerOn()) {
+		dataLogger->dataLoggerController->setOverwrite(en);
 	}
 }
 
 int DataLogger_API::get_data_logger_recording_interval()
 {
-	return dataLogger->dataLogger->getRecordingTimeInterval();
+	return dataLogger->dataLoggerController->getRecordingTimeInterval();
 }
 
 void DataLogger_API::set_data_logger_recording_interval(int interval)
 {
-	if (dataLogger->dataLogger->isDataLoggerOn()) {
-		dataLogger->dataLogger->setRecodingTimeInterval(interval);
+	if (dataLogger->dataLoggerController->isDataLoggerOn()) {
+		dataLogger->dataLoggerController->setRecodingTimeInterval(interval);
 	}
 }

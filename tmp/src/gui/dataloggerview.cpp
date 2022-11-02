@@ -83,7 +83,13 @@ void DataLoggerView::init()
 	data_logging_timer->setDisabled(true);
 
 	connect(data_logging_timer, &PositionSpinButton::valueChanged, this, [=](){
-		Q_EMIT timeIntervalChanged(data_logging_timer->value() * 1000); //converts to seconds before emiting value
+		double interval = data_logging_timer->value() * 1000; //converts to seconds before emiting value
+		if (interval < 100) {
+			interval = 100;
+			data_logging_timer->setValue(interval/1000);
+
+		}
+		Q_EMIT timeIntervalChanged(interval);
 	});
 
 	dataLoggingLayout->addWidget(data_logging_timer);
@@ -104,22 +110,25 @@ void DataLoggerView::init()
 
 }
 
+void DataLoggerView::setUseNativeDialog(bool nativeDialog)
+{
+	useNativeDialog = nativeDialog;
+}
+
 void DataLoggerView::chooseFile()
 {
 	QString selectedFilter;
-
-	filename = QFileDialog::getSaveFileName(this,
-											tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),
-											&selectedFilter, QFileDialog::Options());
+	if(!useNativeDialog)
+		filename = QFileDialog::getSaveFileName(this,tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),&selectedFilter, QFileDialog::Options(QFileDialog::DontUseNativeDialog));
+	else
+		filename = QFileDialog::getSaveFileName(this,tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),&selectedFilter, QFileDialog::Options());
 	dataLoggingFilePath->setText(filename);
 }
-
 
 QWidget* DataLoggerView::getDataLoggerViewWidget()
 {
 	return dataLoggingWidget;
 }
-
 
 bool DataLoggerView::isDataLoggingOn()
 {
