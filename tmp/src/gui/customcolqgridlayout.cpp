@@ -170,7 +170,7 @@ void CustomColQGridLayout::updateLayout()
 {
 	if (availableWidth != this->width()) {
 		if (m_activeWidgetList.size() > 0) {
-			computeCols(m_widgetList.at(m_activeWidgetList.at(0))->frameSize().width());
+			computeCols(m_widgetList.at(m_activeWidgetList.at(0))->minimumSizeHint().width());
 		}
 	} else {
 		recomputeColCount();
@@ -181,10 +181,10 @@ void CustomColQGridLayout::updateLayout()
 void CustomColQGridLayout::recomputeColCount()
 {
 	if (m_activeWidgetList.size() > 0) {
-		auto maxWidth = m_widgetList.at(m_activeWidgetList.at(0))->frameSize().width();
+		auto maxWidth = m_widgetList.at(m_activeWidgetList.at(0))->minimumSizeHint().width();
 		for (int i = 1; i < m_activeWidgetList.size(); i++ ) {
-			if (m_widgetList.at(m_activeWidgetList.at(i))->frameSize().width() > maxWidth){
-				maxWidth = m_widgetList.at(m_activeWidgetList.at(i))->frameSize().width();
+			if (m_widgetList.at(m_activeWidgetList.at(i))->minimumSizeHint().width()> maxWidth){
+				maxWidth = m_widgetList.at(m_activeWidgetList.at(i))->minimumSizeHint().width();
 			}
 		}
 		if (colWidth != maxWidth) {
@@ -201,8 +201,10 @@ void CustomColQGridLayout::computeCols(double width)
 	availableWidth = this->width();
 
 	if (width != 0) {
-		colCount = (availableWidth / width) - 1;
-		colWidth = width;
+		colCount = (availableWidth / width) - 1; //index starts at 0
+		int width_extra = availableWidth - (colCount+1) * width;
+		colWidth = width + (width_extra/(colCount+1));
+
 	} else {
 		if (m_widgetList.size() > 0) {
 			if (m_widgetList.at(0)->width() > 0) {
@@ -213,7 +215,6 @@ void CustomColQGridLayout::computeCols(double width)
 	}
 
 	if (colCount != currentNumberOfCols) {
-
 		currentNumberOfCols = colCount;
 
 		if (m_activeWidgetList.size() > 1) {
