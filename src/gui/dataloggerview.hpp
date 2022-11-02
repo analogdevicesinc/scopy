@@ -38,6 +38,9 @@ public:
 	void enableDataLoggerFields(bool en);
 	void disableDataLogging(bool en);
 
+	void setUseNativeDialog(bool nativeDialog);
+	bool useNativeDialog;
+
 private:
 	PositionSpinButton *data_logging_timer;
 	QWidget *dataLoggingWidget;
