@@ -24,6 +24,8 @@ public:
 
 	void setIsRunningOn(bool newIsRunningOn);
 
+	void setUseNativeDialog(bool nativeDialog);
+
 public Q_SLOTS:
 	void receiveValue(QString name, QString value);
 	void stopLogger();

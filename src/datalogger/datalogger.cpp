@@ -29,20 +29,20 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 				QColor(Qt::yellow), QColor(Qt::gray), QColor(Qt::darkRed), QColor(Qt::darkGreen),
 				QColor(Qt::darkBlue), QColor(Qt::darkGray),QColor(Qt::black)};
 
-	adiscope::gui::ToolViewRecipe recepie;
-	recepie.helpBtnUrl = "";
-	recepie.hasRunBtn = true;
-	recepie.hasSingleBtn = true;
-	recepie.hasPairSettingsBtn = true;
-	recepie.hasPrintBtn = false;
-	recepie.hasChannels = true;
-	recepie.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
+	adiscope::gui::ToolViewRecipe recipe;
+	recipe.helpBtnUrl = "";
+	recipe.hasRunBtn = true;
+	recipe.hasSingleBtn = true;
+	recipe.hasPairSettingsBtn = true;
+	recipe.hasPrintBtn = false;
+	recipe.hasChannels = true;
+	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
 
-	m_monitorChannelManager = new adiscope::gui::ChannelManager(recepie.channelsPosition);
+	m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 	m_monitorChannelManager->setToolStatus("Stopped");
 
-	m_toolView = adiscope::gui::ToolViewBuilder(recepie,m_monitorChannelManager,parent).build();
+	m_toolView = adiscope::gui::ToolViewBuilder(recipe,m_monitorChannelManager,parent).build();
 
 	m_timer->setSingleShot(true);
 	//on timeout read on thread
@@ -80,7 +80,7 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 	});
 
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=](bool toggled){
-		dataLogger->setIsRunningOn(m_toolView->getRunBtn()->isChecked());
+		dataLoggerController->setIsRunningOn(m_toolView->getRunBtn()->isChecked());
 
 
 		//update status and if needed start data logging
@@ -88,9 +88,9 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 			m_monitorChannelManager->setToolStatus("Stopped");
 			showAllSWitch->setEnabled(true);
 			readerThread->setDataLoggerStatus(false);
-
+			dataLoggerController->stopLogger();
 		} else {
-			if (dataLogger->isDataLoggerOn()) {
+			if (dataLoggerController->isDataLoggerOn()) {
 				m_monitorChannelManager->setToolStatus("Data Logging");
 				readerThread->setDataLoggerStatus(true);
 			} else {
@@ -159,8 +159,7 @@ void DataLogger::initMonitorToolView()
 			adiscope::gui::DataLoggerGenericMenu *channelMenu = new adiscope::gui::DataLoggerGenericMenu(this);
 			channelMenu->init(QString::fromStdString(dmmName + ": " + channel.id),new QColor(channelColor));
 
-			ChannelWidget *ch_widget =
-					m_toolView->buildNewChannel(m_monitorChannelManager, channelMenu , false, chId, false, false,
+			ChannelWidget *ch_widget = m_toolView->buildNewChannel(m_monitorChannelManager, channelMenu , false, chId, false, false,
 								    channelColor, QString::fromStdString(channel.id), QString::fromStdString(channel.id));
 
 			channelList.push_back(ch_widget);
@@ -170,6 +169,7 @@ void DataLogger::initMonitorToolView()
 			monitor->setID(chId);
 			monitor->init(0,QString::fromStdString(channel.unit_name),QString::fromStdString(channel.unit_symbol),
 				      QString::fromStdString(dmmName + ": " + channel.id),channelColor );
+
 			monitor->setChannelId(channel.id);
 			monitor->setRecordingInterval(VALUE_READING_TIME_INTERVAL/1000);
 			monitor->setHistoryDuration(10);
@@ -203,7 +203,11 @@ void DataLogger::initMonitorToolView()
 			});
 
 			connect(this, &DataLogger::disableActivateChannel,this, [=](bool toggled){
-				ch_widget->enableButton()->setDisabled(toggled);
+				if(m_toolView->getRunBtn()->isChecked() && toggled)
+					ch_widget->enableButton()->setDisabled(true);
+				else
+					ch_widget->enableButton()->setDisabled(false);
+
 			});
 
 			int widgetId = m_customColGrid->addQWidgetToList(monitor);
@@ -259,6 +263,11 @@ void DataLogger::createConnections(adiscope::gui::DataLoggerGenericMenu* mainMen
 adiscope::gui::ToolView* DataLogger::getToolView()
 {
 	return m_toolView;
+}
+void DataLogger::setNativeDialogs(bool nativeDialogs)
+{
+	Tool::setNativeDialogs(nativeDialogs);
+	dataLoggerController->setUseNativeDialog(nativeDialogs);
 }
 
 int DataLogger::getPrecision()
@@ -350,6 +359,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 	precisionBtn->setProperty("blue_button",true);
 
 	precisionValue = new QLineEdit(precisionWidget);
+	precisionValue->setValidator( new QIntValidator(this) );
 	precisionValue->setText("3");
 	precisionLayout->addWidget(precisionBtn);
 	precisionLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed));
@@ -360,7 +370,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 		if (value < 0) {
 			precisionValue->setText("0");
 		}
-		if (value > 10) {
+		if (value >= 10) {
 			precisionValue->setText("9");
 		}
 
@@ -396,15 +406,15 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	auto dataLoggingSection = new adiscope::gui::SubsectionSeparator("Data Logging",true,this);
 
-	dataLogger = new DataLoggerController(true,true,false);
-	dataLogger->setWarningMessage("* While data logging you won't be able to add/remove channels");
-	dataLoggingSection->setContent(dataLogger->getWidget());
+	dataLoggerController = new DataLoggerController(true,true,false);
+	dataLoggerController->setWarningMessage("* While data logging you won't be able to add/remove channels");
+	dataLoggingSection->setContent(dataLoggerController->getWidget());
 
 	connect(readerThread, &DataLoggerReaderThread::updateDataLoggerValue, this , [=](QString name, QString value){
-		dataLogger->receiveValue(name,value);
+		dataLoggerController->receiveValue(name,value);
 	});
 
-	connect(dataLogger, &DataLoggerController::isDataLogging, this, [=](bool toggled){
+	connect(dataLoggerController, &DataLoggerController::isDataLogging, this, [=](bool toggled){
 
 		if (m_toolView->getRunBtn()->isChecked()) {
 			showAllSWitch->setEnabled(!toggled);
@@ -414,10 +424,11 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 			if (!m_activeChannels.empty()) {
 				for (int ch : m_activeChannels.keys()) {
 					QString name = m_activeChannels[ch]->getTitle();
-					dataLogger->createChannel(name, adiscope::CHANNEL_DATA_TYPE::DOUBLE);
+					dataLoggerController->createChannel(name, adiscope::CHANNEL_DATA_TYPE::DOUBLE);
 				}
 			}
 		}
+
 		Q_EMIT disableActivateChannel(toggled);
 	});
 
