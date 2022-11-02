@@ -25,9 +25,14 @@ void DataLoggerController::stopLogger()
 	dataLoggerModel->stopLogger();
 }
 
+void DataLoggerController::setUseNativeDialog(bool nativeDialog)
+{
+	dataLoggerView->setUseNativeDialog(nativeDialog);
+}
+
 void DataLoggerController::createChannel(QString name, CHANNEL_DATA_TYPE type)
 {
-	CHANNEL_FILTER filter =CHANNEL_FILTER::LAST_VALUE ;
+	CHANNEL_FILTER filter = CHANNEL_FILTER::LAST_VALUE ;
 	QString uiFilter = dataLoggerView->getFilter();
 	if (uiFilter == "Average") {
 		filter = CHANNEL_FILTER::AVERAGE;
@@ -74,6 +79,7 @@ void DataLoggerController::setIsRunningOn(bool newIsRunningOn)
 	if (isRunningOn) {
 		attemptDataLogging();
 	} else {
+		Q_EMIT isDataLogging(false);
 		dataLoggerView->disableDataLogging(false);
 	}
 }
@@ -83,13 +89,16 @@ void DataLoggerController::dataLoggerToggled(bool toggled)
 	dataLoggerView->toggleDataLoggerSwitch(toggled);
 	if (isRunningOn && !toggled) {
 		dataLoggerView->disableDataLogging(true);
+		stopLogger();
 		Q_EMIT isDataLogging(false);
 	}
+
 }
 
 void DataLoggerController::attemptDataLogging(){
 	if (dataLoggerView->isDataLoggingOn() && !dataLoggerView->getDataLoggerPath().isEmpty()) {
 		startLogger();
+		dataLoggerView->disableDataLogging(false);
 		Q_EMIT isDataLogging(true);
 	} else {
 		stopLogger();

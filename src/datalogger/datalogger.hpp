@@ -54,6 +54,7 @@ public:
 	int getPrecision();
 	void setPrecision(int precision);
 	int getValueReadingTimeInterval();
+	void setNativeDialogs(bool nativeDialogs);
 
 private:
 	int VALUE_READING_TIME_INTERVAL = 1000;
@@ -66,7 +67,7 @@ private:
 
 	QList<QColor> m_colors;
 	QMap<int,QColor> m_color;
-	DataLoggerController *dataLogger;
+	DataLoggerController *dataLoggerController;
 	adiscope::gui::ToolView* m_toolView;
 	CustomColQGridLayout* m_customColGrid;
 	libm2k::context::Context* m_context;
