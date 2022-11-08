@@ -51,7 +51,6 @@ private:
     int d_fftsize;
     gr::fft::fft_shift<float> d_fft_shift;
     float d_fftavg;
-    gr::fft::window::win_type d_wintype;
     std::vector<float> d_window;
     double d_center_freq;
     double d_bandwidth;
@@ -84,8 +83,6 @@ private:
     gr::high_res_timer_type d_update_time;
     gr::high_res_timer_type d_last_time;
 
-    void windowreset();
-    void buildwindow();
     void fftresize();
     void resize_bufs(int size);
     void check_clicked();
@@ -104,7 +101,7 @@ private:
 
 public:
     waterfall_sink_f_impl(int size,
-			  int wintype,
+			  std::vector<float> win,
 			  double fc,
 			  double bw,
 			  const std::string& name,
@@ -121,27 +118,19 @@ public:
 
     void set_fft_size(const int fftsize) override;
     int fft_size() const override;
-    void set_fft_average(const float fftavg) override;
     float fft_average() const override;
-//    void set_fft_window(const gr::fft::window::win_type win) override;
-//    gr::fft::window::win_type fft_window() override;
+    void set_fft_window(const std::vector<float> window) override;
 
     void set_frequency_range(const double centerfreq, const double bandwidth) override;
     void set_intensity_range(const double min, const double max) override;
 
     void set_update_time(double t) override;
     void set_time_per_fft(double t) override;
-//    void set_title(const std::string& title) override;
-//    void set_time_title(const std::string& title) override;
     void set_line_label(unsigned int which, const std::string& label) override;
     void set_line_alpha(unsigned int which, double alpha) override;
-//    void set_color_map(unsigned int which, const int color) override;
     void set_plot_pos_half(bool half) override;
 
-//    std::string title() override;
-//    std::string line_label(unsigned int which) override;
     double line_alpha(unsigned int which) override;
-//    int color_map(unsigned int which) override;
 
     void set_size(int width, int height) override;
 
@@ -149,10 +138,7 @@ public:
     double min_intensity(unsigned int which) override;
     double max_intensity(unsigned int which) override;
 
-//    void enable_menu(bool en) override;
-//    void enable_grid(bool en) override;
     void disable_legend() override;
-//    void enable_axis_labels(bool en) override;
 
     int work(int noutput_items,
 	     gr_vector_const_void_star& input_items,
