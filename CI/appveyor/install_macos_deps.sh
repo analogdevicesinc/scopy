@@ -188,30 +188,6 @@ build_grscopy() {
 	make -j $JOBS
 	sudo make -j $JOBS install
 }
-build_glibmm() {
-	echo "### Building glibmm - 2.64.0"
-	cd ${WORKDIR}
-	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
-	tar xzvf glibmm-2.64.0.tar.xz
-	cd glibmm-2.64.0
-	echo "libglibmm - v2.64.0" >> $BUILD_STATUS_FILE
-	./configure --prefix=$STAGINGDIR
-	make -j $JOBS
-	sudo make -j $JOBS install
-}
-
-build_sigcpp() {
-	echo "### Building libsigc++ -2.10.0"
-	cd ${WORKDIR}
-	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
-	tar xvzf libsigc++-2.10.0.tar.xz
-	cd libsigc++-2.10.0
-	echo "libsigc++ - v2.10.0" >> $BUILD_STATUS_FILE
-	./configure --prefix=$STAGINGDIR
-	make -j $JOBS
-	sudo make -j $JOBS install
-}
-
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
 
@@ -251,8 +227,6 @@ build_libtinyiiod() {
 	sudo make -j $JOBS install
 }
 
-build_sigcpp
-build_glibmm
 build_libiio
 build_libad9361
 build_libm2k
