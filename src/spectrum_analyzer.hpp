@@ -128,6 +128,7 @@ public Q_SLOTS:
 	void readPreferences();	
 	void run() override;
 	void stop() override;
+	void setWaterfallWindow(std::vector<float> window, int channel_id);
 
 Q_SIGNALS:
 	void started(bool);
@@ -405,6 +406,15 @@ public:
 	void setGainMode(int index);
 	libm2k::analog::M2K_RANGE getGainMode();
 	static double win_overlap_factor(SpectrumAnalyzer::FftWinType type);
+
+	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
+					    int ntaps);
+
+	std::vector<float> getWindow();
+
+Q_SIGNALS:
+	void FftWindowChanged(std::vector<float> window, int channel_id);
+
 private:
 	int m_id;
 	QString m_name;
@@ -418,12 +428,10 @@ private:
 	SpectrumAnalyzer::FftWinType m_fft_win;
 	FftDisplayPlot *m_plot;
 	ChannelWidget *m_widget;
+	std::vector<float> d_window;
 
 	float calcCoherentPowerGain(const std::vector<float>& win) const;
 	void scaletFftWindow(std::vector<float>& win, float gain);
-
-	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
-	                                    int ntaps);
 };
 } // namespace adiscope
 
