@@ -329,8 +329,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		        SLOT(onChannelSelected(bool)));
 		connect(channel.get()->widget(), SIGNAL(enabled(bool)),
 		        SLOT(onChannelEnabled(bool)));
+		connect(channel.get(), SIGNAL(FftWindowChanged(std::vector<float>, int)),
+			SLOT(setWaterfallWindow(std::vector<float>, int)));
 
-		waterfall_plot->enableChannel(channel.get()->widget()->enableButton()->isChecked(), channel->id());
 		ch_api.append(new SpectrumChannel_API(this,channel));
 	}
 
@@ -507,6 +508,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(this, SIGNAL(selectedChannelChanged(int)),
 		fft_plot, SLOT(setSelectedChannel(int)));
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		waterfall_plot, SLOT(enableChannel(int)));
+	connect(this, &SpectrumAnalyzer::selectedChannelChanged, this,
+		[=](int id){
+		setWaterfallWindow(channels.at(id)->getWindow(), id);
+	});
 
 	if (ctx) {
 		build_gnuradio_block_chain();
@@ -1877,23 +1884,19 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 
 void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
+	auto window = SpectrumChannel::build_win(FftWinType::HAMMING, fft_size);
 	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
-							  gr::fft::window::WIN_HANN,
+							  window,
 							  0,
 							  m_max_sample_rate,
 							  "Waterfall Plot",
 							  m_adc_nb_channels,
 							  waterfall_plot);
-//						"Osc Frequency", m_adc_nb_channels,
-//						(QObject *)fft_plot,
-//						(QObject *)waterfall_plot);
-	//      (1024, fft::window::WIN_HANN, 0, rate, "", 1);
 
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
 						(QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
-//	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
 	fft_sink->set_update_time(1.0/targetFps);
@@ -1928,24 +1931,10 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		iio->connect(ctm, 0, fft_sink, i);
 
 		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size);
-//		iio->connect(ctm, 0, waterfall_sink, i);
 
 		channels[i]->fft_block = fft;
 		channels[i]->ctm_block = ctm;
 	}
-
-//	for (size_t i = 0; i < 1; i++) {
-//		auto waterfall = gnuradio::get_initial_sptr(
-//				   new fft_block(false, fft_size));
-//		auto waterfall_ctm = gr::blocks::complex_to_mag_squared::make(1);
-
-//		waterfall_ids[i] = iio->connect(waterfall, i, 0, true, fft_size);
-//		iio->connect(waterfall, 0, waterfall_ctm, 0);
-//		iio->connect(waterfall_ctm, 0, waterfall_sink, i);
-
-////		channels[i]->fft_block = waterfall;
-////		channels[i]->ctm_block = ctm;
-//	}
 
 	if (started) {
 		iio->unlock();
@@ -1954,8 +1943,9 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
+	auto window = SpectrumChannel::build_win(FftWinType::HAMMING, fft_size);
 	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
-							  gr::fft::window::WIN_HANN,
+							  window,
 							  0,
 							  m_max_sample_rate,
 							  "Waterfall Plot",
@@ -2096,6 +2086,13 @@ void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
 
 	if (win_type != channels[crt_channel]->fftWindow()) {
 		channels[crt_channel]->setFftWindow((*it).second, fft_size);
+	}
+}
+
+void SpectrumAnalyzer::setWaterfallWindow(std::vector<float> win, int channel_id)
+{
+	if (channel_id == waterfall_plot->getEnabledChannelID()) {
+		waterfall_sink->set_fft_window(win);
 	}
 }
 
@@ -2345,7 +2342,6 @@ void SpectrumAnalyzer::onChannelEnabled(bool en)
 {
 	ChannelWidget *cw = static_cast<ChannelWidget *>(QObject::sender());
 
-	waterfall_plot->enableChannel(en, cw->id());
 	if (en) {
 		fft_plot->AttachCurve(cw->id());
 		if (!ui->btnMarkers->isEnabled()) {
@@ -3338,6 +3334,8 @@ void SpectrumChannel::setFftWindow(SpectrumAnalyzer::FftWinType win, int taps)
 	scaletFftWindow(window, 1 / gain);
 
 	fft_block->set_window(window);
+	d_window = window;
+	Q_EMIT FftWindowChanged(window, id());
 }
 
 SpectrumAnalyzer::FftWinType SpectrumChannel::fftWindow() const
@@ -3374,6 +3372,11 @@ std::vector<float> SpectrumChannel::build_win(SpectrumAnalyzer::FftWinType type,
 		std::vector<float> v(ntaps, 1.0);
 		return v;
 	}
+}
+
+std::vector<float> SpectrumChannel::getWindow()
+{
+	return d_window;
 }
 
 double SpectrumChannel::win_overlap_factor(SpectrumAnalyzer::FftWinType type)

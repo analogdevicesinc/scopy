@@ -143,7 +143,7 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 	d_zoomer.push_back(nullptr); // need this for proper init
 	d_start_frequency = -1;
 	d_stop_frequency = 1;
-
+	enabledChannelID = -1;
 	resize(parent->width(), parent->height());
 	d_numPoints = 0;
 	d_half_freq = false;
@@ -185,12 +185,8 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 		setIntensityColorMapType(
 					i, d_intensity_color_map_type[i], QColor("black"), QColor("white"));
 
-		//		setAlpha(i, 255 / d_nplots);
-		setAlpha(i, 0);
+		setAlpha(i, 255);
 	}
-
-	// Set bottom plot with no transparency as a base
-	setAlpha(0, 255);
 
 	// LeftButton for the zooming
 	// MiddleButton for the panning
@@ -314,6 +310,11 @@ WaterfallFlowDirection WaterfallDisplayPlot::getFlowDirection()
 	return direction;
 }
 
+int WaterfallDisplayPlot::getEnabledChannelID()
+{
+	return enabledChannelID;
+}
+
 void WaterfallDisplayPlot::setFlowDirection(WaterfallFlowDirection direction)
 {
 	for (unsigned int i = 0; i < d_nplots; ++i) {
@@ -396,11 +397,12 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 			((WaterfallZoomer*)d_zoomer[0])->setZeroTime(timestamp);
 
 
-			for (auto ch: channel_status.toStdMap()) {
-				int i = ch.first;
-				if (!ch.second) {
-					d_data[i]->reset();
+			for (int i = 0; i<d_nplots; i++) {
+				if (enabledChannelID != i) {
+					setAlpha(i, 0);
 					continue;
+				} else {
+					setAlpha(i, 255);
 				}
 
 				d_data[i]->addFFTData(&(dataPoints[i][_in_index]), _npoints_in, droppedFrames);
@@ -661,13 +663,9 @@ void WaterfallDisplayPlot::setAlpha(unsigned int which, int alpha)
 
 int WaterfallDisplayPlot::getNumRows() const { return d_nrows; }
 
-void WaterfallDisplayPlot::enableChannel(bool en, int id)
+void WaterfallDisplayPlot::enableChannel(int id)
 {
-	if (channel_status.contains(id)) {
-		channel_status[id] = en;
-	} else {
-		channel_status.insert(id, en);
-	}
+	enabledChannelID = id;
 }
 
 void WaterfallDisplayPlot::_updateIntensityRangeDisplay()
@@ -772,19 +770,18 @@ void WaterfallDisplayPlot::customEvent(QEvent *e)
 		const uint64_t numDataPoints = event->getNumDataPoints();
 		const gr::high_res_timer_type dataTimestamp = event->getDataTimestamp();
 
-		for (auto ch: channel_status.toStdMap()) {
-			int i = ch.first;
+		for (unsigned int i = 0; i < d_nplots; ++i) {
 			const double* min_val =
 					std::min_element(&dataPoints[i][0], &dataPoints[i][numDataPoints - 1]);
 			const double* max_val =
 					std::max_element(&dataPoints[i][0], &dataPoints[i][numDataPoints - 1]);
 			if (*min_val < d_min_val || i == 0)
 				d_min_val = *min_val;
-			if (*max_val > d_max_val || i == 0) // || i == 0
+			if (*max_val > d_max_val || i == 0)
 				d_max_val = *max_val;
 		}
 		//		autoScale();
-//		qDebug() << d_min_val << d_max_val;
+		//		qDebug() << d_min_val << d_max_val;
 
 		plotNewData(dataPoints, numDataPoints, d_time_per_fft, dataTimestamp, 0);
 	}
