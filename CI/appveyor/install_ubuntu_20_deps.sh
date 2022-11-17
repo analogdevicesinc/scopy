@@ -4,10 +4,10 @@ LIBIIO_VERSION=0ed18cd8f6b2fac5204a99e38922bea73f1f778c
 LIBAD9361_BRANCH=master
 GLOG_BRANCH=v0.4.0
 LIBM2K_BRANCH=master
-GRIIO_BRANCH=upgrade-3.8
-GNURADIO_FORK=analogdevicesinc
-GNURADIO_BRANCH=scopy
-GRSCOPY_BRANCH=master
+#GRIIO_BRANCH=upgrade-3.8
+#GNURADIO_FORK=analogdevicesinc
+#GNURADIO_BRANCH=scopy
+GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
 LIBSIGROK_BRANCH=master
@@ -29,9 +29,12 @@ cd ~
 WORKDIR=${PWD}
 
 install_apt() {
-
-	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev gnuradio libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev
-
+	sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
+	sudo apt-get -y update
+	
+	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev
+	
+	sudo apt-get -y install gnuradio python3-packaging
 }
 
 build_libiio() {
@@ -144,6 +147,8 @@ build_grm2k() {
 	cd ${WORKDIR}/gr-m2k/build-${ARCH}
 
 	cmake ${CMAKE_OPTS} \
+		-DENABLE_PYTHON=OFF \
+		-DDIGITAL=OFF \
 		${WORKDIR}/gr-m2k
 
 	make $JOBS
@@ -233,7 +238,7 @@ build_libiio
 build_libad9361
 build_glog
 build_libm2k
-build_griio
+#build_griio
 build_grscopy
 build_grm2k
 build_qwt
