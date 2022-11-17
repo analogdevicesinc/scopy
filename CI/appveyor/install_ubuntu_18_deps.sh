@@ -5,9 +5,9 @@ LIBAD9361_BRANCH=master
 GLOG_BRANCH=v0.4.0
 LIBM2K_BRANCH=master
 GRIIO_BRANCH=upgrade-3.8
-GNURADIO_FORK=analogdevicesinc
-GNURADIO_BRANCH=scopy
-GRSCOPY_BRANCH=master
+#GNURADIO_FORK=analogdevicesinc
+#GNURADIO_BRANCH=scopy
+GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
 LIBSIGROK_BRANCH=master
@@ -153,6 +153,8 @@ build_grm2k() {
 	cd ${WORKDIR}/gr-m2k/build-${ARCH}
 
 	cmake ${CMAKE_OPTS} \
+		-DENABLE_PYTHON=OFF \
+		-DDIGITAL=OFF \
 		${WORKDIR}/gr-m2k
 
 	make $JOBS
@@ -242,7 +244,7 @@ build_libiio
 build_libad9361
 build_glog
 build_libm2k
-build_griio
+#build_griio
 build_grscopy
 build_grm2k
 build_qwt
