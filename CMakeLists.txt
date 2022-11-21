@@ -205,7 +205,7 @@ find_package(PkgConfig)
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 #pkg_check_modules(GLIB REQUIRED glib-2.0)
 #pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
-pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
+#pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
