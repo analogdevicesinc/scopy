@@ -142,6 +142,8 @@ Q_SIGNALS:
 
 protected:
 	void connectCursorHandles();
+	void connectZoomers();
+
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
 	void onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx);

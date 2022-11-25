@@ -107,6 +107,8 @@ namespace adiscope {
 		double m_sweepStop;
 		bool m_visiblePeakSearch;
 		bool d_logScaleEnabled;
+		double m_top;
+		double m_bottom;
 
 		MetricPrefixFormatter dBFormatter;
 		MetricPrefixFormatter freqFormatter;
@@ -260,6 +262,8 @@ namespace adiscope {
 		void enableYaxisLabels();
 		QString formatXValue(double value, int precision) const;
 		QString formatYValue(double value, int precision) const;
+		void resetZoomerStack();
+		void setAmplitude(double top, double bottom);
 	Q_SIGNALS:
 		void channelAdded(int);
 		void newFFTData();
