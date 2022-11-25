@@ -202,6 +202,7 @@ private Q_SLOTS:
 	void onReferenceChannelDeleted();
 	void refreshCurrentSampleLabel();
 	void validateSpinboxAveraging();
+	void onWaterfallSizeChanged(double);
 
 private:
 	void initInstrumentStrings();
@@ -274,6 +275,7 @@ private:
 	ScaleSpinButton *top_scale;
 	ScaleSpinButton *bottom_scale;
 	PositionSpinButton *unit_per_div;
+	PositionSpinButton *waterfall_size;
 	PositionSpinButton *top;
 	PositionSpinButton *bottom;
 	PositionSpinButton *marker_freq_pos;
