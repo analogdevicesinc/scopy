@@ -397,7 +397,7 @@ void WaterfallDisplayPlot::setVisibleSampleCount(int count)
 	setYaxis(0, d_visible_samples);
 	setNumRows(d_visible_samples);
 
-	resetAxis();
+	resetAxis(false);
 }
 
 void WaterfallDisplayPlot::enableYaxisLabels()
@@ -410,11 +410,13 @@ void WaterfallDisplayPlot::enableXaxisLabels()
 	d_bottomHandlesArea->installExtension(std::unique_ptr<HandlesAreaExtension>(new XBottomRuller(this)));
 }
 
-void WaterfallDisplayPlot::resetAxis()
+void WaterfallDisplayPlot::resetAxis(bool resetData)
 {
 	for (unsigned int i = 0; i < d_nplots; ++i) {
 		d_data[i]->resizeData(d_start_frequency, d_stop_frequency, d_numPoints, d_nrows);
-		d_data[i]->reset();
+		if (resetData) {
+			d_data[i]->reset();
+		}
 	}
 
 	setAxisScale(QwtAxis::XBottom, d_start_frequency, d_stop_frequency);
@@ -532,6 +534,7 @@ void WaterfallDisplayPlot::setFlowDirection(WaterfallFlowDirection direction)
 {
 	for (unsigned int i = 0; i < d_nplots; ++i) {
 		d_data[i]->setFlowDirection(direction);
+		d_data[i]->reset();
 	}
 }
 
