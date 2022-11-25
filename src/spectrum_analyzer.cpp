@@ -260,15 +260,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YLeft, true);
 	waterfall_plot->setAxisVisible(QwtAxis::YRight, false);
-	waterfall_plot->setVisibleSampleCount(200);
+//	waterfall_plot->setVisibleSampleCount(200);
 	waterfall_plot->setFlowDirection(WaterfallFlowDirection::DOWN);
 	waterfall_plot->replot();
-
-//	for (uint i = 0; i < m_adc_nb_channels; i++) {
-////		ui->gridLayout_plot->addWidget(measurePanel, 0, 1, 1, 1);
-//		waterfall_plot->setYaxisMouseGesturesEnabled(i, false);
-//	}
-
 
 	// plot widget
 	QWidget* centralWidget = new QWidget(this);
@@ -381,6 +375,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->markerFreqPosLayout->addWidget(marker_freq_pos);
 	marker_freq_pos->setFineModeAvailable(false);
 
+	waterfall_size = new PositionSpinButton({
+		{" ",1e0},
+	}, tr("Waterfall Size"), 10, 5000, false, false, this);
+	ui->vLayout_waterfall->addWidget(waterfall_size);
+
 	sample_timer = new QTimer();
 	connect(sample_timer, SIGNAL(timeout()), this, SLOT(refreshCurrentSampleLabel()));
 
@@ -393,10 +392,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		waterfall_plot->bottomHandlesArea()->repaint();
-		waterfall_sink->set_frequency_range(0, stop);
-		waterfall_plot->setFrequencyRange(start, stop * 2 - start * 2);
-//		waterfall_plot->setCenterFrequency(startStopRange->getCenterValue());
-
+		waterfall_sink->set_frequency_range(start, stop * 2 - start * 2);
 		waterfall_plot->replot();
 
 
@@ -544,8 +540,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(waterfall_plot, SIGNAL(newData()),
 		SLOT(singleCaptureDone()));
 
-	connect(waterfall_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
-		SLOT(onCurrentAverageIndexChanged(unsigned int, unsigned int)));
 	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 	setCurrentAverageIndexLabel(crt_channel_id);
 
@@ -558,6 +552,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	    }
 #endif
 
+	connect(waterfall_size, SIGNAL(valueChanged(double)),
+		SLOT(onWaterfallSizeChanged(double)));
 	connect(top, SIGNAL(valueChanged(double)),
 	        SLOT(onTopValueChanged(double)));
 	connect(unit_per_div, SIGNAL(valueChanged(double)),
@@ -580,6 +576,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
 
 	// UI default
+	waterfall_size->setValue(200);
+
 	ui->comboBox_window->setCurrentText("Hamming");
 	ui->comboBox_line_thickness->setCurrentText("1");
 
@@ -823,7 +821,7 @@ void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs)
 {
 	Tool::setNativeDialogs(nativeDialogs);
 	fft_plot->setUseNativeDialog(nativeDialogs);
-//	waterfall_plot->setUseNativeDialog(nativeDialogs);
+	waterfall_plot->setUseNativeDialog(nativeDialogs);
 }
 
 void SpectrumAnalyzer::readPreferences() {
@@ -1899,8 +1897,10 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
+	double samplingTime = sample_rate * fft_size;
+
 	fft_sink->set_update_time(1.0/targetFps);
-	waterfall_sink->set_update_time(1.0/targetFps);
+	waterfall_sink->set_update_time(std::max(1/samplingTime, 1/targetFps));
 
 	bool started = isIioManagerStarted();
 
@@ -1957,8 +1957,10 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 						(QObject *)fft_plot);
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
+	double samplingTime = sample_rate * fft_size;
+
 	fft_sink->set_update_time(1.0/targetFps);
-	waterfall_sink->set_update_time(1.0/targetFps);
+	waterfall_sink->set_update_time(std::max(1/samplingTime, 1/targetFps));
 
 	top_block = gr::make_top_block("spectrum_analyzer");
 
@@ -2110,9 +2112,7 @@ void SpectrumAnalyzer::on_comboBox_line_thickness_currentIndexChanged(int index)
 	if (width != channels[crt_channel]->lineWidth()) {
 		channels[crt_channel]->setLinewidth(width);
 		fft_plot->setLineWidth(crt_channel, width);
-		waterfall_plot->setLineWidth(crt_channel, width);
 		fft_plot->replot();
-		waterfall_plot->replot();
 	}
 }
 
@@ -2524,18 +2524,20 @@ void SpectrumAnalyzer::on_btnMaxPeak_clicked()
 void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 {
 	double update_time = 1.0/getScopyPreferences()->getTarget_fps();
+	double samplingTime = sample_rate * fft_size;
+
 	switch(bin_sizes[index]) {
 	case 1<<17:
 		fft_sink->set_update_time(update_time * 2);
-		waterfall_sink->set_update_time(update_time * 2);
+		waterfall_sink->set_update_time(std::max(1/samplingTime, update_time * 2));
 	break;
 	case 1<<18:
 		fft_sink->set_update_time(update_time * 4);
-		waterfall_sink->set_update_time(update_time * 4);
+		waterfall_sink->set_update_time(std::max(1/samplingTime, update_time * 4));
 	break;
 	default:
 		fft_sink->set_update_time(update_time);
-		waterfall_sink->set_update_time(update_time);
+		waterfall_sink->set_update_time(std::max(1/samplingTime, update_time));
 		break;
 	}
 
@@ -3077,6 +3079,12 @@ QPair<int, int> SpectrumAnalyzer::getGridLayoutPosFromIndex(QGridLayout *layout,
 	}
 
 	return pos;
+}
+
+void SpectrumAnalyzer::onWaterfallSizeChanged(double value)
+{
+	waterfall_plot->setVisibleSampleCount((int) value);
+	waterfall_plot->replot();
 }
 
 void SpectrumAnalyzer::onTopValueChanged(double top_value)
