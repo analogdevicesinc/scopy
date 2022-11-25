@@ -45,6 +45,7 @@
 #if QWT_VERSION < 0x060100
 #include <qwt_legend_item.h>
 #else /* QWT_VERSION < 0x060100 */
+#include <QStack>
 #include <qwt_legend_data.h>
 #include <qwt_legend_label.h>
 #endif /* QWT_VERSION < 0x060100 */
@@ -111,7 +112,7 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 	d_zoomer.push_back(nullptr); // need this for proper init
 	d_start_frequency = -1;
 	d_stop_frequency = 1;
-	enabledChannelID = -1;
+	enabledChannelID = 0;
 	resize(parent->width(), parent->height());
 	d_numPoints = 0;
 	d_half_freq = false;
@@ -983,6 +984,23 @@ void WaterfallDisplayPlot::customEvent(QEvent *e)
 		//		qDebug() << d_min_val << d_max_val;
 
 		plotNewData(dataPoints, numDataPoints, dataTimestamp, 0);
+
+		// reset zoomer base if plot axis changed
+		if (getZoomer()->zoomBase().left() != d_start_frequency || getZoomer()->zoomBase().width() != d_stop_frequency - d_start_frequency) {
+			getZoomer()->blockSignals(true);
+
+			auto vert_interval = axisInterval(QwtAxis::YLeft);
+			auto rect = QRectF(d_start_frequency, vert_interval.minValue(), d_stop_frequency - d_start_frequency, vert_interval.maxValue() - vert_interval.minValue());
+			getZoomer()->zoom(rect);
+			getZoomer()->setZoomBase(rect);
+			getZoomer()->zoom(0);
+
+			auto stack = QStack<QRectF>();
+			stack.push(getZoomer()->zoomStack().first());
+			getZoomer()->setZoomStack(stack, 0);
+
+			getZoomer()->blockSignals(false);
+		}
 	}
 }
 

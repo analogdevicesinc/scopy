@@ -387,6 +387,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		fft_plot->replot();
 		fft_plot->bottomHandlesArea()->repaint();
+		fft_plot->resetZoomerStack();
 
 		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		waterfall_sink->set_frequency_range(start, stop * 2 - start * 2);
@@ -1638,6 +1639,68 @@ void SpectrumAnalyzer::cursor_panel_init()
 	horizontalLockLayout->addWidget(btnLockHPlots);
 
 	connectCursorHandles();
+	connectZoomers();
+}
+
+void SpectrumAnalyzer::connectZoomers()
+{
+	connect(fft_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
+		auto waterfall_zoomer = waterfall_plot->getZoomer();
+		auto const new_rect = QRectF(rect.left(), waterfall_zoomer->zoomBase().top(), rect.width(), waterfall_zoomer->zoomBase().height());
+
+		waterfall_zoomer->blockSignals(true);
+		fft_plot->getZoomer()->blockSignals(true);
+
+		// if fft was zoomed out
+		if (waterfall_zoomer->zoomRectIndex() > fft_plot->getZoomer()->zoomRectIndex()) {
+			auto wf_stack = waterfall_zoomer->zoomStack();
+			auto fft_stack = fft_plot->getZoomer()->zoomStack();
+
+			fft_stack.pop();
+			wf_stack.pop();
+			waterfall_zoomer->setZoomStack(wf_stack, waterfall_zoomer->zoomRectIndex() - 1);
+			fft_plot->getZoomer()->setZoomStack(fft_stack, fft_plot->getZoomer()->zoomRectIndex());
+
+			// if fft was zoomed in
+		} else if (waterfall_zoomer->zoomRectIndex() < fft_plot->getZoomer()->zoomRectIndex()) {
+			auto wf_stack = waterfall_zoomer->zoomStack();
+
+			wf_stack.push(new_rect);
+			waterfall_zoomer->setZoomStack(wf_stack, waterfall_zoomer->zoomRectIndex() + 1);
+		}
+
+		waterfall_zoomer->blockSignals(false);
+		fft_plot->getZoomer()->blockSignals(false);
+	});
+
+	connect(waterfall_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
+		auto fft_zoomer = fft_plot->getZoomer();
+		auto const new_rect = QRectF(rect.left(), fft_zoomer->zoomBase().top(), rect.width(), fft_zoomer->zoomBase().height());
+
+		fft_zoomer->blockSignals(true);
+		waterfall_plot->getZoomer()->blockSignals(true);
+
+
+		// if fft was zoomed out
+		if (fft_zoomer->zoomRectIndex() > waterfall_plot->getZoomer()->zoomRectIndex()) {
+			auto fft_stack = fft_zoomer->zoomStack();
+			auto wf_stack = waterfall_plot->getZoomer()->zoomStack();
+
+			fft_stack.pop();
+			wf_stack.pop();
+			fft_zoomer->setZoomStack(fft_stack, fft_zoomer->zoomRectIndex() - 1);
+			waterfall_plot->getZoomer()->setZoomStack(wf_stack, waterfall_plot->getZoomer()->zoomRectIndex());
+
+			// if fft was zoomed in
+		} else if (fft_zoomer->zoomRectIndex() < waterfall_plot->getZoomer()->zoomRectIndex()){
+			auto fft_stack = fft_zoomer->zoomStack();
+			fft_stack.push(new_rect);
+			fft_zoomer->setZoomStack(fft_stack, fft_zoomer->zoomRectIndex() + 1);
+		}
+
+		fft_zoomer->blockSignals(false);
+		waterfall_plot->getZoomer()->blockSignals(false);
+	});
 }
 
 void SpectrumAnalyzer::connectCursorHandles()
@@ -3169,6 +3232,8 @@ void SpectrumAnalyzer::onWaterfallSizeChanged(double value)
 {
 	waterfall_plot->setVisibleSampleCount((int) value);
 	waterfall_plot->replot();
+
+	fft_plot->resetZoomerStack();
 }
 
 void SpectrumAnalyzer::onTopValueChanged(double top_value)
@@ -3194,6 +3259,8 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
 	fft_plot->leftHandlesArea()->repaint();
+
+	fft_plot->setAmplitude(top_value, bottom_value);
 }
 
 void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
@@ -3229,6 +3296,8 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
 	fft_plot->leftHandlesArea()->repaint();
+
+	fft_plot->setAmplitude(topValue, bottomValue);
 }
 
 void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
@@ -3254,6 +3323,8 @@ void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 	auto div = fft_plot->axisScaleDiv(QwtAxis::YLeft);
 	fft_plot->setYaxisMajorTicksPos(div.ticks(2));
 	fft_plot->leftHandlesArea()->repaint();
+
+	fft_plot->setAmplitude(top_value, bottom_value);
 }
 
 void SpectrumAnalyzer::onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx)
