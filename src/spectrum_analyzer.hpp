@@ -340,6 +340,11 @@ private:
 	bool receivedFFTData;
 	bool receivedWaterfallData;
 
+	// dockers
+	QMainWindow *mainWindow;
+	QDockWidget *fftDocker;
+	QDockWidget *waterfallDocker;
+
 #ifdef SPECTRAL_MSR
 	//din capture plot
 	QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);

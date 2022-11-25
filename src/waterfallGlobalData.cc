@@ -132,8 +132,6 @@ void WaterfallData::resizeData(const double startFreq,
 		_spectrumData.resize(_fftPoints * _historyLength);
 	}
 #endif
-
-	reset();
 }
 
 QwtRasterData* WaterfallData::copy() const
