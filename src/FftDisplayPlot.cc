@@ -28,6 +28,7 @@
 #include "osc_scale_engine.h"
 
 #include <QDebug>
+#include <QStack>
 #include <qwt_symbol.h>
 #include <boost/make_shared.hpp>
 
@@ -883,6 +884,11 @@ void FftDisplayPlot::_resetXAxisPoints()
 	}
 }
 
+void FftDisplayPlot::resetZoomerStack()
+{
+	getZoomer()->setZoomStack(getZoomer()->zoomStack(), 0);
+}
+
 int64_t FftDisplayPlot::posAtFrequency(double freq, int chIdx) const
 {
 	int64_t pos = 0;
@@ -905,13 +911,35 @@ int64_t FftDisplayPlot::posAtFrequency(double freq, int chIdx) const
 	return pos;
 }
 
+void FftDisplayPlot::setAmplitude(double top, double bottom)
+{
+	m_top = top;
+	m_bottom = bottom;
+}
+
 void FftDisplayPlot::customEvent(QEvent *e)
 {
 	if (e->type() == TimeUpdateEvent::Type()) {
 		TimeUpdateEvent *ev = static_cast<TimeUpdateEvent *>(e);
 
 		this->plotData(ev->getTimeDomainPoints(),
-				ev->getNumTimeDomainDataPoints());
+			       ev->getNumTimeDomainDataPoints());
+
+		// reset zoomer base if plot horizontal axis changed
+		if (getZoomer()->zoomBase().left() != m_sweepStart || getZoomer()->zoomBase().width() != m_sweepStop - m_sweepStart) {
+			getZoomer()->blockSignals(true);
+
+			auto rect = QRectF(m_sweepStart, m_top, m_sweepStop - m_sweepStart, m_bottom - m_top);
+			getZoomer()->zoom(rect);
+			getZoomer()->setZoomBase(rect);
+			getZoomer()->zoom(0);
+
+			auto stack = QStack<QRectF>();
+			stack.push(getZoomer()->zoomStack().first());
+			getZoomer()->setZoomStack(stack, 0);
+
+			getZoomer()->blockSignals(false);
+		}
 	}
 }
 
