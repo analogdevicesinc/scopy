@@ -281,11 +281,31 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	vLayout->addWidget(measurePanel);
 #endif
 
+	// main window for all dock widgets
+	mainWindow = new QMainWindow(this);
+	mainWindow->setCentralWidget(0);
+	mainWindow->setWindowFlags(Qt::Widget);
+
+	// create dockers
+	fftDocker = DockerUtils::createDockWidget(mainWindow, fft_plot->getPlotwithElements(), "FFT");
+	waterfallDocker = DockerUtils::createDockWidget(mainWindow, waterfall_plot->getPlotwithElements(), "Waterfall");
+
+
+	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDocker);
+	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, waterfallDocker);
+	//		mainWindow->tabifyDockWidget(fftDocker, waterfallDocker);
+
+#ifdef PLOT_MENU_BAR_ENABLED
+	DockerUtils::configureTopBar(fftDocker);
+	DockerUtils::configureTopBar(waterfallDocker);
+#endif
+
+
+	// init layouts
 	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
 	vLayout->addWidget(ui->topPlotWidget);
 
-	vLayout->addWidget(fft_plot->getPlotwithElements());
-	vLayout->addWidget(waterfall_plot->getPlotwithElements());
+	vLayout->addWidget(mainWindow);
 
 	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
 	vLayout->addWidget(ui->markerTable);
@@ -589,6 +609,25 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(waterfall_plot,
 		SIGNAL(cursorReadoutsChanged(struct cursorReadoutsText)),
 		SLOT(onCursorReadoutsChanged(struct cursorReadoutsText)));
+
+	// change waterfall direction based on docker position
+	connect(waterfallDocker, &QDockWidget::topLevelChanged, this, [=](bool floating){
+		if (!floating) {
+			auto flow = waterfallDocker->pos().y() == 0 ? WaterfallFlowDirection::UP :
+								     WaterfallFlowDirection::DOWN;
+
+			if (flow != waterfall_plot->getFlowDirection()) waterfall_plot->setFlowDirection(flow);
+		}
+	});
+
+	connect(fftDocker, &QDockWidget::topLevelChanged, this, [=](bool floating){
+		if (!floating) {
+			auto flow = waterfallDocker->pos().y() == 0 ? WaterfallFlowDirection::UP :
+								     WaterfallFlowDirection::DOWN;
+
+			if (flow != waterfall_plot->getFlowDirection()) waterfall_plot->setFlowDirection(flow);
+		}
+	});
 
 	// UI default
 	waterfall_size->setValue(200);

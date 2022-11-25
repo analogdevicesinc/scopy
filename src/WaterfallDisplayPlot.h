@@ -92,7 +92,7 @@ public:
 	WaterfallDisplayPlot(int nplots, QWidget*);
 	~WaterfallDisplayPlot() override;
 
-	void resetAxis();
+	void resetAxis(bool resetData = true);
 
 	void setFrequencyRange(const double,
 			       const double,
