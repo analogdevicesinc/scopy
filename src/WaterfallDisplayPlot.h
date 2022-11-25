@@ -159,6 +159,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void updatedLowerIntensityLevel(const double);
 	void updatedUpperIntensityLevel(const double);
+	void newData();
 
 private:
 	void _updateIntensityRangeDisplay();

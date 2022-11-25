@@ -105,10 +105,6 @@ void WaterfallData::resizeData(const double startFreq,
 			       const uint64_t fftPoints,
 			       const int history)
 {
-	if (history > 0) {
-		_historyLength = history;
-	}
-
 #if QWT_VERSION < 0x060000
 	if ((fftPoints != getNumFFTPoints()) ||
 			(boundingRect().width() != (stopFreq - startFreq)) ||
@@ -123,7 +119,11 @@ void WaterfallData::resizeData(const double startFreq,
 #else
 	if ((fftPoints != getNumFFTPoints()) ||
 			(interval(Qt::XAxis).width() != (stopFreq - startFreq)) ||
-			(interval(Qt::XAxis).minValue() != startFreq)) {
+			(interval(Qt::XAxis).minValue() != startFreq) ||
+			(_historyLength != history)) {
+		if (history > 0) {
+			_historyLength = history;
+		}
 
 		setInterval(Qt::XAxis, QwtInterval(startFreq, stopFreq));
 		setInterval(Qt::YAxis, QwtInterval(0, _historyLength));
