@@ -50,6 +50,7 @@
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2k.hpp>
 #include <libm2k/generic.hpp>
+#include <gui/smallOnOffSwitch.hpp>
 
 extern "C" {
 	struct iio_buffer;
@@ -139,6 +140,8 @@ Q_SIGNALS:
 	void measurementsAvailable();
 #endif
 
+protected:
+	void connectCursorHandles();
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
 	void onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx);
@@ -246,6 +249,8 @@ private:
 	libm2k::context::Generic* m_generic_context;
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
+	adiscope::SmallOnOffSwitch *btnLockHPlots;
+	QHBoxLayout *horizontalLockLayout;
 
 #ifdef SPECTRAL_MSR
 	QWidget *measurePanel;
@@ -329,6 +334,9 @@ private:
 	void fillCursorReadouts(const struct cursorReadoutsText &);
 
 	bool canSwitchAverageHistory(FftDisplayPlot::AverageType avg_type);
+
+	bool receivedFFTData;
+	bool receivedWaterfallData;
 
 #ifdef SPECTRAL_MSR
 	//din capture plot

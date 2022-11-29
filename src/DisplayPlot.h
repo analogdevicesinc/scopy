@@ -594,6 +594,12 @@ protected Q_SLOTS:
   void mousePressEvent(QMouseEvent *event);
 #endif
 
+public:
+  PlotLineHandleV *d_vCursorHandle1;
+  PlotLineHandleV *d_vCursorHandle2;
+  PlotLineHandleH *d_hCursorHandle1;
+  PlotLineHandleH *d_hCursorHandle2;
+
 protected:
 
   enum PlotMarker
@@ -661,11 +667,6 @@ protected:
   HorizBar *d_hBar1;
   HorizBar *d_hBar2;
   SymbolController *d_symbolCtrl;
-
-  PlotLineHandleV *d_vCursorHandle1;
-  PlotLineHandleV *d_vCursorHandle2;
-  PlotLineHandleH *d_hCursorHandle1;
-  PlotLineHandleH *d_hCursorHandle2;
 
   struct cursorReadoutsText d_cursorReadoutsText;
   CursorReadouts *d_cursorReadouts;

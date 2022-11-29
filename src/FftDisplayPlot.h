@@ -260,10 +260,9 @@ namespace adiscope {
 		void enableYaxisLabels();
 		QString formatXValue(double value, int precision) const;
 		QString formatYValue(double value, int precision) const;
-
 	Q_SIGNALS:
 		void channelAdded(int);
-		void newData();
+		void newFFTData();
 		void sampleRateUpdated(double);
 		void sampleCountUpdated(uint);
 		void newMarkerData();

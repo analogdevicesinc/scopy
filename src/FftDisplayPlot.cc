@@ -755,7 +755,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 	_editFirstPoint();
 	replot();
 
-	Q_EMIT newData();
+	Q_EMIT newFFTData();
 }
 
 void FftDisplayPlot::_editFirstPoint()
@@ -1752,7 +1752,7 @@ void FftDisplayPlot::recalculateMagnitudes()
 	averageDataAndComputeMagnitude(y_original_data, y_data, d_numPoints);
 	detectMarkers();
 
-	Q_EMIT newData();
+	Q_EMIT newFFTData();
 }
 
 /*
