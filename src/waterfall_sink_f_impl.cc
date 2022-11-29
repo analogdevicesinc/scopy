@@ -144,6 +144,7 @@ void waterfall_sink_f_impl::clear_data() { d_main_gui->clearData(); }
 
 void waterfall_sink_f_impl::set_fft_size(const int fftsize)
 {
+	d_main_gui->resetAvgAcquisitionTime();
 	d_fftsize = fftsize;
 	fftresize();
 }
@@ -162,7 +163,7 @@ void waterfall_sink_f_impl::set_frequency_range(const double centerfreq,
 {
 	d_center_freq = centerfreq;
 	d_bandwidth = bandwidth;
-	d_main_gui->setFrequencyRange(d_center_freq, d_bandwidth);
+	d_main_gui->setFrequencyRange(d_center_freq, d_bandwidth, 1., "Hz");
 }
 
 void waterfall_sink_f_impl::set_intensity_range(const double min, const double max)
@@ -339,7 +340,7 @@ int waterfall_sink_f_impl::work(int noutput_items,
 				d_last_time = gr::high_res_timer_now();
 				d_qApplication->postEvent(
 							d_main_gui,
-							new WaterfallUpdateEvent(d_magbufs, d_fftsize, d_last_time));
+							new WaterfallUpdateEvent(d_magbufs, d_fftsize, gr::high_res_timer_now() - d_last_time));
 
 //								qDebug() << *std::max_element(d_magbufs[0].begin(), d_magbufs[0].end())
 //										<< *std::min_element(d_magbufs[0].begin(), d_magbufs[0].end()) << '\n';

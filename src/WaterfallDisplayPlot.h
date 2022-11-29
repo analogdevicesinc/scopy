@@ -58,7 +58,7 @@ public:
 	ColorMap_DefaultDark() : QwtLinearColorMap(Qt::black, Qt::white)
 	{
 		addColorStop(0.16, Qt::black);
-		addColorStop(0.33, QColor(29, 32, 48));
+		addColorStop(0.33, QColor(58, 36, 59)); // deep purple
 		addColorStop(0.5, QColor(74, 100, 255)); // scopy blue
 		addColorStop(0.66, QColor(255, 144, 0)); // scopy orange
 		addColorStop(0.83, Qt::white);
@@ -73,7 +73,7 @@ enum {
  * \ingroup qtgui_blk
  */
 namespace adiscope {
-class WaterfallDisplayPlot : public adiscope::DisplayPlot
+class WaterfallDisplayPlot : public DisplayPlot
 {
 	friend class SpectrumAnalyzer_API;
 	Q_OBJECT
@@ -103,15 +103,7 @@ public:
 
 	void plotNewData(const std::vector<double*> dataPoints,
 			 const int64_t numDataPoints,
-			 double timePerFFT,
-			 gr::high_res_timer_type timestamp,
-			 const int droppedFrames);
-
-	// to be removed
-	void plotNewData(const double* dataPoints,
-			 const int64_t numDataPoints,
-			 double timePerFFT,
-			 gr::high_res_timer_type timestamp,
+			 gr::high_res_timer_type acquisitionTime,
 			 const int droppedFrames);
 
 	void setIntensityRange(double minIntensity, double maxIntensity);
@@ -138,8 +130,23 @@ public:
 	void setCenterFrequency(const double freq);
 	void setUpdateTime(double t);
 	void setFlowDirection(WaterfallFlowDirection direction);
-	WaterfallFlowDirection getFlowDirection();
+	WaterfallFlowDirection getFlowDirection() const;
 	int getEnabledChannelID();
+
+	double getResolutionBW() const;
+	void setResolutionBW(double values);
+	void enableYaxisLabels();
+	void enableXaxisLabels();
+	QString formatXValue(double value, int precision) const;
+
+	void setBtmHorAxisUnit(const QString &unit);
+	void setLeftVertAxisUnit(const QString &unit);
+	QString formatYValue(double value, int precision) const;
+	void updateHandleAreaPadding();
+
+	bool eventFilter(QObject *, QEvent *);
+	void setupReadouts();
+	void updateCursorsData();
 
 public Q_SLOTS:
 	void
@@ -155,11 +162,18 @@ public Q_SLOTS:
 	void setNumRows(int nrows);
 	void customEvent(QEvent *e);
 	void enableChannel(int id);
+	void resetAvgAcquisitionTime();
+
+private Q_SLOTS:
+	void onHCursor1Moved(double value);
+	void onHCursor2Moved(double value);
+	void onVCursor1Moved(double value);
+	void onVCursor2Moved(double value);
 
 Q_SIGNALS:
 	void updatedLowerIntensityLevel(const double);
 	void updatedUpperIntensityLevel(const double);
-	void newData();
+	void newWaterfallData();
 
 private:
 	void _updateIntensityRangeDisplay();
@@ -178,8 +192,16 @@ private:
 	double d_max_val;
 	double d_time_per_fft;
 	int d_intensity_offset;
+	double d_avg_acquisition_time;
+	int d_visible_line_count;
+	double d_resolution_bw;
+	double d_last_draw_time;
+	double d_center_plot_time;
 
 	std::vector<WaterfallData*> d_data;
+	TimePrefixFormatter d_TimeFormatter;
+	MetricPrefixFormatter freqFormatter;
+	PrefixFormatter *d_formatter;
 
 #if QWT_VERSION < 0x060000
 	std::vector<PlotWaterfall*> d_spectrogram;

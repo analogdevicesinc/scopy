@@ -31,6 +31,7 @@
 #define WATERFALL_DISPLAY_PLOT_C
 
 #include "WaterfallDisplayPlot.h"
+#include "osc_scale_engine.h"
 #include "spectrumUpdateEvents.h"
 
 #include <gnuradio/qtgui/qtgui_types.h>
@@ -49,6 +50,9 @@
 #endif /* QWT_VERSION < 0x060100 */
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+
+#define ERROR_VALUE -10000000
+
 using QwtAxis::XBottom;
 
 namespace pt = boost::posix_time;
@@ -56,57 +60,18 @@ using namespace adiscope;
 #include <QDebug>
 
 /***********************************************************************
- * Text scale widget to provide Y (time) axis text
- **********************************************************************/
-class QwtTimeScaleDraw : public QwtScaleDraw, public TimeScaleData
-{
-public:
-	QwtTimeScaleDraw() : QwtScaleDraw(), TimeScaleData() {}
-
-	~QwtTimeScaleDraw() override {}
-
-	void setCenterTime(double value)
-	{
-		_centerTime = value;
-	}
-
-	QwtText label(double value) const override
-	{
-		double secs = double(_centerTime + value * getSecondsPerLine());
-		return QwtText(QString::number(secs, 'e', 2));
-	}
-
-	virtual void initiateUpdate()
-	{
-		// Do this in one call rather than when zeroTime and secondsPerLine
-		// updates is to prevent the display from being updated too often...
-		invalidateCache();
-	}
-
-protected:
-private:
-	double _centerTime = 0;
-};typedef QPointF QwtDoublePoint;
-typedef QRectF QwtDoubleRect;
-
-typedef QwtInterval QwtDoubleInterval;
-
-/***********************************************************************
  * Widget to provide mouse pointer coordinate text
  **********************************************************************/
-class WaterfallZoomer : public QwtPlotZoomer,
-		public TimeScaleData,
-		public FreqOffsetAndPrecisionClass
+class WaterfallZoomer : public LimitedPlotZoomer,
+		public TimeScaleData
 {
 public:
 #if QWT_VERSION < 0x060100
 	WaterfallZoomer(QwtPlotCanvas* canvas, const unsigned int freqPrecision)
 #else  /* QWT_VERSION < 0x060100 */
-	WaterfallZoomer(QWidget* canvas, const unsigned int freqPrecision)
+	WaterfallZoomer(QWidget* canvas)
 #endif /* QWT_VERSION < 0x060100 */
-		: QwtPlotZoomer(canvas),
-		  TimeScaleData(),
-		  FreqOffsetAndPrecisionClass(freqPrecision)
+		: LimitedPlotZoomer(canvas)
 	{
 		setTrackerMode(QwtPicker::AlwaysOn);
 	}
@@ -117,20 +82,23 @@ public:
 
 	void setUnitType(const std::string& type) { d_unitType = type; }
 
+	void setCenterTime(double value) { centerTime = value; }
+
 protected:
 	using QwtPlotZoomer::trackerText;
 	QwtText trackerText(QPoint const& p) const override
 	{
 		QwtDoublePoint dp = QwtPlotZoomer::invTransform(p);
-		double secs = double(dp.y() * getSecondsPerLine());
-		QwtText t(QString("%1 %2, %3 s")
-			  .arg(dp.x(), 0, 'f', getFrequencyPrecision())
+		double secs = double(centerTime + dp.y() * getSecondsPerLine());
+		QwtText t(QString("(%1 %2, %3 s)")
+			  .arg(dp.x(), 0, 'f', 4)
 			  .arg(d_unitType.c_str())
-			  .arg(secs, 0, 'e', 2));
+			  .arg(secs, 0, 'f', 4));
 		return t;
 	}
 
 private:
+	double centerTime = 0;
 	std::string d_unitType;
 };
 
@@ -151,12 +119,8 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 	d_nrows = 200;
 	d_color_bar_title_font_size = 18;
 	d_time_per_fft = 0;
-
-	//	setAxisTitle(QwtAxis::XBottom, "Frequency (Hz)");
-	setAxisScaleDraw(QwtAxis::XBottom, new FreqDisplayScaleDraw(0));
-
-	//	setAxisTitle(QwtAxis::YLeft, "Time (s)");
-	setAxisScaleDraw(QwtAxis::YLeft, new QwtTimeScaleDraw());
+	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
+	resetAvgAcquisitionTime();
 
 	for (unsigned int i = 0; i < d_nplots; ++i) {
 		d_data.push_back(
@@ -192,7 +156,8 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 	// MiddleButton for the panning
 	// RightButton: zoom out by 1
 	// Ctrl+RighButton: zoom out to full size
-	d_zoomer[0] = new WaterfallZoomer(canvas(), 0);
+	d_zoomer[0] = new WaterfallZoomer(canvas());
+
 #if QWT_VERSION < 0x060000
 	d_zoomer[0]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
 #endif
@@ -200,9 +165,14 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 				QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
 	d_zoomer[0]->setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 
-	const QColor c(Qt::white);
+	const QColor c("#999999");
 	d_zoomer[0]->setRubberBandPen(c);
 	d_zoomer[0]->setTrackerPen(c);
+
+	QFont font;
+	font.setPointSize(10);
+	font.setWeight(75);
+	d_zoomer[0]->setTrackerFont(font);
 
 	_updateIntensityRangeDisplay();
 
@@ -215,9 +185,209 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 	setVisibleSampleCount(150);
 	d_grid->enableX(false);
 	d_grid->enableY(false);
+
+	freqFormatter.setTwoDecimalMode(true);
+
+	OscScaleDraw *xScaleDraw = new OscScaleDraw(&freqFormatter, "");
+	setAxisScaleDraw(QwtAxis::XBottom, xScaleDraw);
+	xScaleDraw->setFloatPrecision(2);
+
+	OscScaleEngine *scaleEngine = new OscScaleEngine();
+	this->setAxisScaleEngine(QwtAxis::XBottom, (QwtScaleEngine *)scaleEngine);
+	replot();
+	auto div = axisScaleDiv(QwtAxis::XBottom);
+	setXaxisNumDiv((div.ticks(2)).size() - 1);
+
+	d_leftHandlesArea->setMinimumWidth(50);
+	d_leftHandlesArea->setTopPadding(50);
+	d_leftHandlesArea->setBottomPadding(55);
+	d_leftHandlesArea->setMinimumHeight(this->minimumHeight());
+
+	d_topHandlesArea->setMinimumHeight(50);
+	d_topHandlesArea->setLargestChildWidth(50);
+
+	d_TimeFormatter.setTwoDecimalMode(false);
+	d_TimeFormatter.format(5, "h", 3);
+	OscScaleDraw *yScaleDraw = new OscScaleDraw(&d_TimeFormatter, "");
+	setAxisScaleDraw(QwtAxis::YLeft, yScaleDraw);
+	yScaleDraw->setFloatPrecision(2);
+
+	setLeftVertAxisUnit("s");
+	setBtmHorAxisUnit("Hz");
+
+	replot();
+
+	connect(this, SIGNAL(resetWaterfallData), SLOT(resetAvgAcquisitionTime));
+
+	setupReadouts();
+	installEventFilter(this);
 }
 
-WaterfallDisplayPlot::~WaterfallDisplayPlot() {}
+WaterfallDisplayPlot::~WaterfallDisplayPlot() {
+	removeEventFilter(this);
+	canvas()->removeEventFilter(d_cursorReadouts);
+	canvas()->removeEventFilter(d_symbolCtrl);
+}
+
+void WaterfallDisplayPlot::setupReadouts()
+{
+	d_cursorReadouts->setTimeReadoutVisible(false);
+	d_cursorReadouts->setVoltageReadoutVisible(false);
+
+	d_cursorReadouts->setTimeCursor1LabelText("F1 = ");
+	d_cursorReadouts->setTimeCursor2LabelText("F2 = ");
+	d_cursorReadouts->setTimeDeltaLabelText("ΔF = ");
+	d_cursorReadouts->setVoltageCursor1LabelText("Time1 = ");
+	d_cursorReadouts->setVoltageCursor2LabelText("Time2 = ");
+	d_cursorReadouts->setDeltaVoltageLabelText("ΔTime = ");
+
+	d_cursorReadouts->setFrequencyDeltaVisible(false);
+	d_cursorReadouts->setTransparency(0);
+}
+
+void WaterfallDisplayPlot::onHCursor1Moved(double value)
+{
+	QString text;
+	bool error = false;
+	if (d_trackMode) {
+		if (value == ERROR_VALUE) {
+			error = true;
+		}
+	}
+
+	value *= d_displayScale;
+	value = getFlowDirection() == WaterfallFlowDirection::UP ? value * d_avg_acquisition_time:
+								value * d_avg_acquisition_time * -1 + d_center_plot_time;
+	text = d_formatter->format(value, d_yAxisUnit, 3);
+	d_cursorReadouts->setVoltageCursor1Text(error ? "-" : text);
+	d_cursorReadoutsText.t1 = error ? "-" : text;
+
+	double valueCursor2;
+	if (d_trackMode) {
+		valueCursor2 = getHorizontalCursorIntersection(d_vBar2->plotCoord().x());
+	} else {
+		valueCursor2 = d_hBar2->plotCoord().y();
+	}
+	valueCursor2 = getFlowDirection() == WaterfallFlowDirection::UP ? valueCursor2 * d_avg_acquisition_time:
+									valueCursor2 * d_avg_acquisition_time * -1 + d_center_plot_time;
+
+	double diff = value - (valueCursor2 * d_displayScale);
+	text = d_formatter->format(diff, d_yAxisUnit, 3);
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.tDelta = error ? "-" : text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void WaterfallDisplayPlot::onHCursor2Moved(double value)
+{
+	QString text;
+	bool error = false;
+	if (d_trackMode) {
+		if (value == ERROR_VALUE) {
+			error = true;
+		}
+	}
+
+	value *= d_displayScale;
+	value = getFlowDirection() == WaterfallFlowDirection::UP ? value * d_avg_acquisition_time:
+								value * d_avg_acquisition_time * -1 + d_center_plot_time;
+
+	text = d_formatter->format(value, d_yAxisUnit, 3);
+	d_cursorReadouts->setVoltageCursor2Text(error ? "-" : text);
+	d_cursorReadoutsText.t2 = error ? "-" : text;
+
+	double valueCursor1;
+	if (d_trackMode) {
+		valueCursor1 = getHorizontalCursorIntersection(d_vBar1->plotCoord().x());
+	} else {
+		valueCursor1 = d_hBar1->plotCoord().y();
+	}
+	valueCursor1 = getFlowDirection() == WaterfallFlowDirection::UP ? valueCursor1 * d_avg_acquisition_time:
+									valueCursor1 * d_avg_acquisition_time * -1 + d_center_plot_time;
+
+	double diff = (valueCursor1 * d_displayScale) - value;
+	text = d_formatter->format(diff, d_yAxisUnit, 3);
+	d_cursorReadouts->setVoltageDeltaText(error ? "-" : text);
+	d_cursorReadoutsText.tDelta = error ? "-" : text;
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void WaterfallDisplayPlot::onVCursor1Moved(double value)
+{
+	QString text;
+	text = d_formatter->format(value, d_xAxisUnit, 3);
+	d_cursorReadouts->setTimeCursor1Text(text);
+	d_cursorReadoutsText.v1 = text;
+
+	double diff = value - d_vBar2->plotCoord().x();
+	text = d_formatter->format(diff, d_xAxisUnit, 3);
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.vDelta = text;
+
+	if (d_trackMode) {
+		onHCursor1Moved(getHorizontalCursorIntersection(d_vBar1->plotCoord().x()));
+	}
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void WaterfallDisplayPlot::onVCursor2Moved(double value)
+{
+	QString text;
+	text = d_formatter->format(value, d_xAxisUnit, 3);
+	d_cursorReadouts->setTimeCursor2Text(text);
+	d_cursorReadoutsText.v2 = text;
+
+	double diff = d_vBar1->plotCoord().x() - value;
+	text = d_formatter->format(diff, d_xAxisUnit, 3);
+	d_cursorReadouts->setTimeDeltaText(text);
+	d_cursorReadoutsText.vDelta = text;
+
+	if (d_trackMode) {
+		onHCursor2Moved(getHorizontalCursorIntersection(d_vBar2->plotCoord().x()));
+	}
+
+	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void WaterfallDisplayPlot::updateCursorsData()
+{
+	onHCursor1Moved(d_hBar1->plotCoord().y());
+	onHCursor2Moved(d_hBar2->plotCoord().y());
+}
+
+bool WaterfallDisplayPlot::eventFilter(QObject *object, QEvent *event)
+{
+	if (object == canvas() && event->type() == QEvent::Resize) {
+		updateHandleAreaPadding();
+
+		//force cursor handles to emit position changed
+		//when the plot canvas is being resized
+		d_hCursorHandle1->triggerMove();
+		d_hCursorHandle2->triggerMove();
+		d_vCursorHandle1->triggerMove();
+		d_vCursorHandle2->triggerMove();
+	}
+	return QObject::eventFilter(object, event);
+}
+
+void WaterfallDisplayPlot::updateHandleAreaPadding()
+{
+	d_leftHandlesArea->update();
+	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
+	d_bottomHandlesArea->setRightPadding(50);
+
+	d_rightHandlesArea->setTopPadding(50);
+	d_rightHandlesArea->setBottomPadding(50);
+
+	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
+	d_hCursorHandle1->updatePosition();
+	d_hCursorHandle2->updatePosition();
+	d_vCursorHandle1->updatePosition();
+	d_vCursorHandle2->updatePosition();
+}
 
 void WaterfallDisplayPlot::setVisibleSampleCount(int count)
 {
@@ -225,6 +395,18 @@ void WaterfallDisplayPlot::setVisibleSampleCount(int count)
 
 	setYaxis(0, d_visible_samples);
 	setNumRows(d_visible_samples);
+
+	resetAxis();
+}
+
+void WaterfallDisplayPlot::enableYaxisLabels()
+{
+	d_leftHandlesArea->installExtension(std::unique_ptr<HandlesAreaExtension>(new YLeftRuller(this)));
+}
+
+void WaterfallDisplayPlot::enableXaxisLabels()
+{
+	d_bottomHandlesArea->installExtension(std::unique_ptr<HandlesAreaExtension>(new XBottomRuller(this)));
 }
 
 void WaterfallDisplayPlot::resetAxis()
@@ -244,8 +426,43 @@ void WaterfallDisplayPlot::resetAxis()
 	d_zoomer[0]->zoom(0);
 }
 
-void WaterfallDisplayPlot::autoScale()
+void WaterfallDisplayPlot::setLeftVertAxisUnit(const QString &unit)
 {
+	if (d_yAxisUnit != unit) {
+		d_yAxisUnit = unit;
+
+		auto scale_draw = dynamic_cast<OscScaleDraw*>(axisScaleDraw(QwtAxis::YLeft));
+		if (scale_draw)
+			scale_draw->setUnitType(unit);
+	}
+}
+
+void WaterfallDisplayPlot::setBtmHorAxisUnit(const QString &unit)
+{
+	if (d_xAxisUnit != unit) {
+		d_xAxisUnit = unit;
+
+		auto scale_draw = dynamic_cast<OscScaleDraw*>(axisScaleDraw(QwtAxis::XBottom));
+		if (scale_draw)
+			scale_draw->setUnitType(unit);
+	}
+}
+
+QString WaterfallDisplayPlot::formatXValue(double value, int precision) const
+{
+	return d_formatter->format(value, d_xAxisUnit, precision);
+}
+
+QString WaterfallDisplayPlot::formatYValue(double value, int precision) const
+{
+	value = getFlowDirection() == WaterfallFlowDirection::UP ? value * d_avg_acquisition_time:
+								value * d_avg_acquisition_time * -1 + d_center_plot_time;
+
+	return d_formatter->format(value, d_yAxisUnit, precision);
+}
+
+void WaterfallDisplayPlot::autoScale()
+{	
 	qDebug() << d_min_val << d_max_val;
 
 	setIntensityRange(d_min_val, d_max_val);
@@ -282,21 +499,16 @@ void WaterfallDisplayPlot::setFrequencyRange(const double centerfreq,
 
 		if ((axisScaleDraw(QwtAxis::XBottom) != NULL) && (d_zoomer[0] != NULL)) {
 			double display_units = ceil(log10(units) / 2.0);
-			setAxisScaleDraw(QwtAxis::XBottom, new FreqDisplayScaleDraw(display_units));
-			setAxisTitle(QwtAxis::XBottom,
-				     QString("Frequency (%1)").arg(strunits.c_str()));
-
 			if (reset) {
 				resetAxis();
 			}
 
-			((WaterfallZoomer*)d_zoomer[0])->setFrequencyPrecision(display_units);
 			((WaterfallZoomer*)d_zoomer[0])->setUnitType(strunits);
 		}
 	}
 }
 
-WaterfallFlowDirection WaterfallDisplayPlot::getFlowDirection()
+WaterfallFlowDirection WaterfallDisplayPlot::getFlowDirection() const
 {
 	auto direction = WaterfallFlowDirection::UP;
 	for (unsigned int i = 0; i < d_nplots; ++i) {
@@ -322,56 +534,52 @@ void WaterfallDisplayPlot::setFlowDirection(WaterfallFlowDirection direction)
 	}
 }
 
+void WaterfallDisplayPlot::setResolutionBW(double value)
+{
+	d_resolution_bw = value;
+}
+
 double WaterfallDisplayPlot::getStartFrequency() const { return d_start_frequency; }
+
+double WaterfallDisplayPlot::getResolutionBW() const { return d_resolution_bw; }
 
 double WaterfallDisplayPlot::getStopFrequency() const { return d_stop_frequency; }
 
 void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 				       const int64_t numDataPoints,
-				       double timePerFFT,
-				       gr::high_res_timer_type timestamp,
+				       gr::high_res_timer_type acquisitionTime,
 				       const int droppedFrames)
 {
 	// Display first half of the plot if d_half_freq is true
-	int64_t _npoints_in = d_half_freq ? numDataPoints / 2 : numDataPoints;
-	int64_t _in_index = d_half_freq ? (getStartFrequency() / getStopFrequency()) * _npoints_in / 2 : 0;
-	_npoints_in -= _in_index;
+	int64_t _npoints_in = d_half_freq ? (getStopFrequency() - getStartFrequency()) / getResolutionBW() : numDataPoints;
+	int64_t _in_index = d_half_freq ? getStartFrequency() / getResolutionBW() : 0;
+	double current_time = gr::high_res_timer_now();
 
-	//		_npoints_in = d_center_frequency * numDataPoints / getStopFrequency();
+	// convert to seconds
+	double seconds_per_line = (current_time - d_last_draw_time) / 1000000000.;
 
-	//	qDebug() << "CENTERFREQ:" << _npoints_in << _in_index << d_center_frequency;
+	// compute avg acquisition time
+	if (d_avg_acquisition_time == -1) {
+		// avg time was reset
+		d_avg_acquisition_time = seconds_per_line;
 
-	double centerTime = 0;
-	if (getFlowDirection() == WaterfallFlowDirection::DOWN) {
-		timePerFFT *= -1;
-		centerTime = -getNumRows() * timePerFFT;
+	} else {
+		d_avg_acquisition_time = (d_avg_acquisition_time * (d_visible_line_count - 1) + seconds_per_line) / d_visible_line_count;
 	}
 
-	if (!d_stop) {
-		if (_npoints_in > 0 && timestamp == 0) {
-			d_numPoints = _npoints_in / d_nrows;
-			resetAxis();
+	d_last_draw_time = current_time;
+	double time_per_line = d_avg_acquisition_time;
+	double centerTime = 0;
 
-			for (unsigned int i = 0; i < d_nplots; ++i) {
-				d_data[i]->setSpectrumDataBuffer(dataPoints[i]);
-				d_data[i]->setNumLinesToUpdate(0);
-				d_spectrogram[i]->invalidateCache();
-				d_spectrogram[i]->itemChanged();
-			}
+	if (getFlowDirection() == WaterfallFlowDirection::DOWN) {
+		time_per_line *= -1;
+		centerTime = -getNumRows() * time_per_line;
+	}
 
-			QwtTimeScaleDraw* timeScale =
-					(QwtTimeScaleDraw*)axisScaleDraw(QwtAxis::YLeft);
-			timeScale->setSecondsPerLine(timePerFFT);
-			timeScale->setZeroTime(timestamp);
-			timeScale->setCenterTime(centerTime);
-			timeScale->initiateUpdate();
+	d_center_plot_time = centerTime;
+	updateCursorsData();
 
-			((WaterfallZoomer*)d_zoomer[0])->setSecondsPerLine(timePerFFT);
-			((WaterfallZoomer*)d_zoomer[0])->setZeroTime(timestamp);
-			replot();
-		}
-
-		else if (_npoints_in > 0) {
+	if (!d_stop && _npoints_in > 0) {
 			if (_npoints_in != d_numPoints) {
 				d_numPoints = _npoints_in;
 				resetAxis();
@@ -386,16 +594,11 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 				}
 			}
 
-			QwtTimeScaleDraw* timeScale =
-					(QwtTimeScaleDraw*)axisScaleDraw(QwtAxis::YLeft);
-			timeScale->setSecondsPerLine(timePerFFT);
-			timeScale->setZeroTime(timestamp);
-			timeScale->setCenterTime(centerTime);
-			timeScale->initiateUpdate();
+			d_leftHandlesArea->update();
+			d_bottomHandlesArea->update();
 
-			((WaterfallZoomer*)d_zoomer[0])->setSecondsPerLine(timePerFFT);
-			((WaterfallZoomer*)d_zoomer[0])->setZeroTime(timestamp);
-
+			((WaterfallZoomer*)d_zoomer[0])->setSecondsPerLine(time_per_line);
+			((WaterfallZoomer*)d_zoomer[0])->setCenterTime(centerTime);
 
 			for (int i = 0; i<d_nplots; i++) {
 				if (enabledChannelID != i) {
@@ -412,19 +615,10 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 			}
 
 			replot();
+			d_visible_line_count = std::min(d_visible_line_count + 1, d_nrows);
 		}
-	}
-}
 
-void WaterfallDisplayPlot::plotNewData(const double* dataPoints,
-				       const int64_t numDataPoints,
-				       double timePerFFT,
-				       gr::high_res_timer_type timestamp,
-				       const int droppedFrames)
-{
-	std::vector<double*> vecDataPoints;
-	vecDataPoints.push_back((double*)dataPoints);
-	plotNewData(vecDataPoints, numDataPoints, timePerFFT, timestamp, droppedFrames);
+	Q_EMIT newWaterfallData();
 }
 
 void WaterfallDisplayPlot::setIntensityRange(double minIntensity,
@@ -481,12 +675,12 @@ void WaterfallDisplayPlot::setColorMapTitleFontSize(int tfs)
 
 void WaterfallDisplayPlot::replot()
 {
-	QwtTimeScaleDraw* timeScale = (QwtTimeScaleDraw*)axisScaleDraw(QwtAxis::YLeft);
-	timeScale->initiateUpdate();
+	d_leftHandlesArea->update();
+	d_bottomHandlesArea->update();
 
 	FreqDisplayScaleDraw* freqScale =
 			(FreqDisplayScaleDraw*)axisScaleDraw(QwtAxis::XBottom);
-	freqScale->initiateUpdate();
+//	freqScale->initiateUpdate();
 
 	// Update the time axis display
 	if (axisWidget(QwtAxis::YLeft) != NULL) {
@@ -734,14 +928,12 @@ void WaterfallDisplayPlot::_updateIntensityRangeDisplay()
 void WaterfallDisplayPlot::disableLegend()
 {
 	d_legend_enabled = false;
-	//    enableAxis(QwtAxis::YRight, false);
 	setAxisAutoScale(QwtAxis::YRight, false);
 }
 
 void WaterfallDisplayPlot::enableLegend()
 {
 	d_legend_enabled = true;
-	//    enableAxis(QwtAxis::YRight, true);
 	setAxisAutoScale(QwtAxis::YRight, true);
 }
 
@@ -749,16 +941,23 @@ void WaterfallDisplayPlot::enableLegend(bool en)
 {
 	d_legend_enabled = en;
 	setAxisAutoScale(QwtAxis::YRight, en);
-	//    enableAxis(QwtAxis::YRight, en);
 }
 
-void WaterfallDisplayPlot::setNumRows(int nrows) { d_nrows = nrows; }
+void WaterfallDisplayPlot::setNumRows(int nrows)
+{
+	d_nrows = nrows;
+}
+
+void WaterfallDisplayPlot::resetAvgAcquisitionTime()
+{
+	d_avg_acquisition_time = -1;
+	d_visible_line_count = 0;
+}
 
 void WaterfallDisplayPlot::setUpdateTime(double t)
 {
-	//    d_update_time = t;
-	// Assume times are equal unless explicitly told by setTimePerFFT()
-	// This is the case when plotting using gr_spectrogram_plot
+	resetAvgAcquisitionTime();
+
 	d_time_per_fft = t;
 }
 
@@ -783,7 +982,7 @@ void WaterfallDisplayPlot::customEvent(QEvent *e)
 		//		autoScale();
 		//		qDebug() << d_min_val << d_max_val;
 
-		plotNewData(dataPoints, numDataPoints, d_time_per_fft, dataTimestamp, 0);
+		plotNewData(dataPoints, numDataPoints, dataTimestamp, 0);
 	}
 }
 
