@@ -233,6 +233,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	measure_panel_init();
 #endif
 
+	receivedFFTData = false;
 	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
 	fft_plot->disableLegend();
 
@@ -254,21 +255,24 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// waterfall plot
 
+	receivedWaterfallData = false;
 	waterfall_plot = new WaterfallDisplayPlot(m_adc_nb_channels, this);
+	waterfall_plot->setBtmHorAxisUnit("Hz");
+	waterfall_plot->setLeftVertAxisUnit("s");
 	waterfall_plot->setPlotPosHalf(true);
 	waterfall_plot->setAxisVisible(QwtAxis::XBottom, false);
 	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
-	waterfall_plot->setAxisVisible(QwtAxis::YLeft, true);
+	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YRight, false);
 //	waterfall_plot->setVisibleSampleCount(200);
 	waterfall_plot->setFlowDirection(WaterfallFlowDirection::DOWN);
+	waterfall_plot->enableYaxisLabels();
+	waterfall_plot->enableXaxisLabels();
 	waterfall_plot->replot();
 
 	// plot widget
 	QWidget* centralWidget = new QWidget(this);
 	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
-	QVBoxLayout* vPlotsLayout = new QVBoxLayout(centralWidget);
-	QHBoxLayout* waterfallLayout = new QHBoxLayout(centralWidget);
 	vLayout->setContentsMargins(20, 0, 20, 20);
 	vLayout->setSpacing(10);
 	centralWidget->setLayout(vLayout);
@@ -280,14 +284,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->widgetPlotContainer->layout()->removeWidget(ui->topPlotWidget);
 	vLayout->addWidget(ui->topPlotWidget);
 
-	vPlotsLayout->addWidget(fft_plot->getPlotwithElements());
-
-	vPlotsLayout->addLayout(waterfallLayout);
-	vPlotsLayout->setSpacing(0);
-	vPlotsLayout->setContentsMargins(0, 0, 0, 0);
-//	waterfallLayout->addSpacerItem(new QSpacerItem(60, 0, QSizePolicy::Fixed, QSizePolicy::Fixed));
-	waterfallLayout->addWidget(waterfall_plot->getPlotwithElements());
-	vLayout->addLayout(vPlotsLayout);
+	vLayout->addWidget(fft_plot->getPlotwithElements());
+	vLayout->addWidget(waterfall_plot->getPlotwithElements());
 
 	ui->widgetPlotContainer->layout()->removeWidget(ui->markerTable);
 	vLayout->addWidget(ui->markerTable);
@@ -391,10 +389,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->bottomHandlesArea()->repaint();
 
 		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
-		waterfall_plot->bottomHandlesArea()->repaint();
 		waterfall_sink->set_frequency_range(start, stop * 2 - start * 2);
 		waterfall_plot->replot();
-
+		waterfall_plot->bottomHandlesArea()->repaint();
 
 		setSampleRate(2 * stop);
 
@@ -420,6 +417,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->cmb_rbw, QOverload<int>::of(&QComboBox::currentIndexChanged),
 		[=](int index){
 		startStopRange->setMinimumSpanValue(10 * sample_rate / bin_sizes[index]);
+
+		// set waterfall resolutionBW in kHz
+		waterfall_plot->setResolutionBW((sample_rate / bin_sizes[index]));
 	});
 
 	connect(ui->cmbGainMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -531,14 +531,28 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 
 
-	connect(fft_plot, SIGNAL(newData()),
-	        SLOT(singleCaptureDone()));
+	connect(fft_plot, &FftDisplayPlot::newFFTData, this, [=](){
+		receivedFFTData = true;
+		if (receivedWaterfallData) {
+			singleCaptureDone();
+
+			receivedWaterfallData = false;
+			receivedFFTData = false;
+		}
+	});
+
+	connect(waterfall_plot, &WaterfallDisplayPlot::newWaterfallData, this, [=](){
+		receivedWaterfallData = true;
+		if (receivedFFTData) {
+			singleCaptureDone();
+
+			receivedWaterfallData = false;
+			receivedFFTData = false;
+		}
+	});
 
 	connect(fft_plot, SIGNAL(currentAverageIndex(unsigned int, unsigned int)),
 		SLOT(onCurrentAverageIndexChanged(unsigned int, unsigned int)));
-
-	connect(waterfall_plot, SIGNAL(newData()),
-		SLOT(singleCaptureDone()));
 
 	const bool visible = (channels[crt_channel_id]->averageType() != FftDisplayPlot::AverageType::SAMPLE);
 	setCurrentAverageIndexLabel(crt_channel_id);
@@ -1013,8 +1027,16 @@ void SpectrumAnalyzer::on_boxCursors_toggled(bool on)
 
 	fft_plot->trackModeEnabled(on ? cr_ui->btnNormalTrack->isChecked() : true);
 
+	waterfall_plot->setHorizCursorsEnabled(
+				on ? cr_ui->vCursorsEnable->isChecked() : false);
+	waterfall_plot->setVertCursorsEnabled(
+				on ? cr_ui->hCursorsEnable->isChecked() : false);
+
+	waterfall_plot->trackModeEnabled(on ? cr_ui->btnNormalTrack->isChecked() : true);
+
 	if (on) {
 		fft_plot->setCursorReadoutsVisible(on);
+		waterfall_plot->setCursorReadoutsVisible(on);
 	} else {
 		if (ui->btnCursors->isChecked())
 			ui->btnCursors->setChecked(false);
@@ -1554,12 +1576,22 @@ void SpectrumAnalyzer::cursor_panel_init()
 	connect(cr_ui->btnLockVertical, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::setVertCursorsLocked);
 
+	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled,
+		waterfall_plot, &WaterfallDisplayPlot::setHorizCursorsLocked);
+	connect(cr_ui->btnLockVertical, &QPushButton::toggled,
+		waterfall_plot, &WaterfallDisplayPlot::setVertCursorsLocked);
+
 	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 
 	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
 		fft_plot, SLOT(setVertCursorsEnabled(bool)));
 	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
 		fft_plot, SLOT(setHorizCursorsEnabled(bool)));
+	connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)),
+		waterfall_plot, SLOT(setVertCursorsEnabled(bool)));
+	connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)),
+		waterfall_plot, SLOT(setHorizCursorsEnabled(bool)));
+
 	connect(cr_ui->btnNormalTrack, &QPushButton::toggled,
 		this, &SpectrumAnalyzer::toggleCursorsMode);
 
@@ -1570,16 +1602,68 @@ void SpectrumAnalyzer::cursor_panel_init()
 	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		fft_plot->setCursorReadoutsTransparency(value);
+		waterfall_plot->setCursorReadoutsTransparency(value);
 	});
 	cr_ui->horizontalSlider->setSliderPosition(0);
 
 	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
 		[=](CustomPlotPositionButton::ReadoutsPosition position){
 		fft_plot->moveCursorReadouts(position);
+		waterfall_plot->moveCursorReadouts(position);
 	});
 
+	// add cursor lock botween waterfall and fft plot
+
+	btnLockHPlots = new adiscope::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
+	btnLockHPlots->setObjectName(QString::fromUtf8("btnLockHPlots"));
+	btnLockHPlots->setStyleSheet(QString::fromUtf8("QPushButton[use_icon=true]"));
+	btnLockHPlots->setCheckable(true);
+	setDynamicProperty(btnLockHPlots, "use_icon", true);
+
+	auto lock_line = new QFrame(this);
+	lock_line->setObjectName(QString::fromUtf8("lock_line"));
+	lock_line->setMinimumSize(QSize(0, 1));
+	lock_line->setMaximumSize(QSize(16777215, 1));
+	lock_line->setFrameShape(QFrame::HLine);
+	lock_line->setFrameShadow(QFrame::Sunken);
+	lock_line->setProperty("subsection_line", QVariant(true));
+
+	horizontalLockLayout = new QHBoxLayout(this);
+	cr_ui->verticalLayout_2->addWidget(lock_line);
+	cr_ui->verticalLayout_2->addSpacing(10);
+	cr_ui->verticalLayout_2->addItem(horizontalLockLayout);
+
+	horizontalLockLayout->addWidget(new QLabel(tr("Lock plots cursors"), cr_ui->scrollAreaWidgetContents));
+	horizontalLockLayout->addSpacerItem(new QSpacerItem(0,0, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	horizontalLockLayout->addWidget(btnLockHPlots);
+
+	connectCursorHandles();
 }
 
+void SpectrumAnalyzer::connectCursorHandles()
+{
+	if (!btnLockHPlots) return;
+
+	connect(fft_plot->d_hCursorHandle1, &PlotLineHandleH::positionChanged, this, [=](int pos){
+		if (btnLockHPlots->isChecked())
+			waterfall_plot->d_hCursorHandle1->setPosition(pos);
+	});
+
+	connect(fft_plot->d_hCursorHandle2, &PlotLineHandleH::positionChanged, this, [=](int pos){
+		if (btnLockHPlots->isChecked())
+			waterfall_plot->d_hCursorHandle2->setPosition(pos);
+	});
+
+	connect(waterfall_plot->d_hCursorHandle1, &PlotLineHandleH::positionChanged, this, [=](int pos){
+		if (btnLockHPlots->isChecked())
+			fft_plot->d_hCursorHandle1->setPosition(pos);
+	});
+
+	connect(waterfall_plot->d_hCursorHandle2, &PlotLineHandleH::positionChanged, this, [=](int pos){
+		if (btnLockHPlots->isChecked())
+			fft_plot->d_hCursorHandle2->setPosition(pos);
+	});
+}
 
 void SpectrumAnalyzer::toggleCursorsMode(bool toggled)
 {
@@ -2558,7 +2642,7 @@ void SpectrumAnalyzer::setSampleRate(double sr)
 	sample_rate_divider = (int)(m_max_sample_rate / sr);
 	double new_sr = m_max_sample_rate / sample_rate_divider;
 
-	ui->lbl_sampleRate->setText("Sample rate: " + QString::number(new_sr));
+	ui->lbl_sampleRate->setText("Sample rate: " + QString::number(new_sr, 'f', 0));
 
 	if (new_sr == sample_rate) {
 		return;
