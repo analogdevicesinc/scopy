@@ -172,7 +172,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		} else {
 			m_generic_context = libm2k_ctx->toGeneric();
 			m_generic_analogin = m_generic_context->getAnalogIn(0);
-			m_adc_nb_channels = m_generic_analogin->getNbChannels();
+			m_adc_nb_channels = 1;//m_generic_analogin->getNbChannels();
 		}
 		iio = iio_manager::get_instance(ctx, adc_name);
 
@@ -259,7 +259,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	waterfall_plot = new WaterfallDisplayPlot(m_adc_nb_channels, this);
 	waterfall_plot->setBtmHorAxisUnit("Hz");
 	waterfall_plot->setLeftVertAxisUnit("s");
-	waterfall_plot->setPlotPosHalf(true);
+	waterfall_plot->setPlotPosHalf(false);
 	waterfall_plot->setAxisVisible(QwtAxis::XBottom, false);
 	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
@@ -858,7 +858,7 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 
 		for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 			iio->disconnect(fft_ids[i]);
-			iio->disconnect(waterfall_ids[i]);
+//			iio->disconnect(waterfall_ids[i]);
 		}
 
 		if (started) {
@@ -2080,7 +2080,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
 						(QObject *)fft_plot);
-	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
+//	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
 	double samplingTime = sample_rate * fft_size;
@@ -2108,7 +2108,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 	for (size_t i = 0; i < m_adc_nb_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
-		                   new fft_block(false, fft_size));
+				   new fft_block(true, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
 		// iio(i)->fft->ctm->fft_sink
@@ -2116,7 +2116,10 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 		iio->connect(fft, 0, ctm, 0);
 		iio->connect(ctm, 0, fft_sink, i);
 
-		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size);
+		auto complexToFloat = gr::blocks::complex_to_mag_squared::make(1);
+
+		waterfall_ids[i] = iio->connect(complexToFloat, 0, 0, true, fft_size);
+		iio->connect(complexToFloat, 0, waterfall_sink, 0);
 
 		channels[i]->fft_block = fft;
 		channels[i]->ctm_block = ctm;
@@ -2806,7 +2809,7 @@ void SpectrumAnalyzer::setFftSize(uint size)
 
 	for (int i = 0; i < channels.size(); i++) {
 		auto fft = gnuradio::get_initial_sptr(
-		                   new fft_block(false, size));
+				   new fft_block(true, size));
 
 		iio->disconnect(fft_ids[i]);
 		iio->disconnect(waterfall_ids[i]);
@@ -2816,8 +2819,14 @@ void SpectrumAnalyzer::setFftSize(uint size)
 		iio->connect(fft, 0, channels[i]->ctm_block, 0);
 		iio->connect(channels[i]->ctm_block, 0, fft_sink, i);
 
-		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size * m_nb_overlapping_avg);
+//		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size * m_nb_overlapping_avg);
 //		iio->connect(channels[i]->ctm_block, 0, waterfall_sink, i);
+
+		auto complexToFloat = gr::blocks::complex_to_arg::make();
+		waterfall_ids[i] = iio->connect(complexToFloat, 0, 0, true, fft_size);
+
+		iio->connect(complexToFloat, 0, waterfall_sink, 0);
+
 
 		if (started) {
 			iio->start(fft_ids[i]);

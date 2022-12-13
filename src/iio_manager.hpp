@@ -33,6 +33,7 @@
 
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2k.hpp>
+#include <libm2k/analog/genericanalogin.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 
@@ -145,7 +146,9 @@ namespace adiscope {
 
 	private:
 		libm2k::analog::M2kAnalogIn *m_analogin;
+//		libm2k::analog::GenericAnalogIn *m_analogin;
 		libm2k::context::M2k *m_context;
+//		libm2k::context::Context *m_context;
 
 		static std::map<const std::string, map_entry> dev_map;
 		static unsigned _id;
@@ -157,7 +160,9 @@ namespace adiscope {
 
 		std::vector<std::pair<port_id, unsigned long> > copy_blocks;
 
-		gr::m2k::analog_in_source::sptr iio_block;
+//		gr::m2k::analog_in_source::sptr iio_block;
+		gr::iio::device_source::sptr iio_block;
+		gr::blocks::float_to_complex::sptr f2c;
 		unsigned int nb_channels;
 
         std::shared_ptr<timeout_block> timeout_b;

@@ -20,6 +20,7 @@
 
 #include "logging_categories.h"
 #include "iio_manager.hpp"
+#include <gnuradio/gr_complex.h>
 
 #include <QDebug>
 #include "scopyExceptionHandler.h"
@@ -44,8 +45,10 @@ iio_manager::iio_manager(unsigned int block_id,
 	id(block_id), _started(false), buffer_size(_buffer_size),
 	m_mixed_source(nullptr)
 {
-	m_context = libm2k::context::m2kOpen(ctx, "");
+	/*m_context = libm2k::context::m2kOpen(ctx, "");
+//	m_context = libm2k::context::contextOpen(ctx, "");
 	m_analogin = m_context->getAnalogIn();
+//	m_analogin = m_context->get();*/
 	if (!ctx)
 		throw std::runtime_error("IIO context not created");
 
@@ -57,22 +60,62 @@ iio_manager::iio_manager(unsigned int block_id,
 
 	// get target fps from preferences
 	double targetFps = getScopyPreferences()->getTarget_fps();
-	iio_block = gr::m2k::analog_in_source::make_from(m_context, _buffer_size, {1, 1}, {0, 0}, 10000, 1,
+	/*iio_block = gr::m2k::analog_in_source::make_from(m_context, _buffer_size, {1, 1}, {0, 0}, 10000, 1,
 							 KERNEL_BUFFERS_DEFAULT, false, false, {0, 0}, {0, 0}, 0, 0, {0, 0},
-							 false, false, targetFps);
+							 false, false, targetFps);*/
+
+//				libm2k::context::M2k *context,
+			//	int buffer_size,
+			//	const std::vector<int> &channels,
+			//	std::vector<int> ranges,
+			//	double sampling_frequency,
+			//	int oversampling_ratio,
+			//	int kernel_buffers,
+			//	bool calibrate_ADC,
+			//	bool stream_voltage_values,
+			//	std::vector<int> trigger_condition,
+			//	std::vector<int> trigger_mode,
+			//	int trigger_source,
+			//	int trigger_delay,
+			//	std::vector<double> trigger_level,
+			//	bool streaming,
+			//	bool deinit = true,
+			//	double data_rate = 0);
+
+//				iio_context* ctx,
+//				  const std::string& device,
+//				  const std::vector<std::string>& channels,
+//				  const std::string& device_phy,
+//				  const iio_param_vec_t& params,
+//				  unsigned int buffer_size = DEFAULT_BUFFER_SIZE,
+//				  unsigned int decimation = 0);
+
+	iio_block = gr::iio::device_source::make_from(ctx, "cf-ad9361-lpc", {"voltage0", "voltage1"}, "ad9361-phy", {}, _buffer_size, 0);
+
+	auto s2f1 = gr::blocks::short_to_float::make();
+	auto s2f2 = gr::blocks::short_to_float::make();
+	f2c = gr::blocks::float_to_complex::make();
+
+	hier_block2::connect(iio_block,0,s2f1,0);
+	hier_block2::connect(iio_block,1,s2f2,0);
+	hier_block2::connect(s2f1,0,f2c,0);
+	hier_block2::connect(s2f2,0,f2c,1);
+
 
 	/* Avoid unconnected channel errors by connecting a dummy sink */
-	auto dummy_copy = blocks::copy::make(sizeof(short));
-	auto dummy = blocks::null_sink::make(sizeof(short));
+	auto dummy_copy = blocks::copy::make(4*sizeof(short));
+	auto dummy = blocks::null_sink::make(4*sizeof(short));
 
+	hier_block2::connect(f2c,0,dummy_copy,0);
+	hier_block2::connect(dummy_copy,0,dummy,0);
 
 	//TODO - make dynamic
-	freq_comp_filt[0][0] = adiscope::frequency_compensation_filter::make(false);
+	/*freq_comp_filt[0][0] = adiscope::frequency_compensation_filter::make(false);
 	freq_comp_filt[0][1] = adiscope::frequency_compensation_filter::make(false);
 	freq_comp_filt[1][0] = adiscope::frequency_compensation_filter::make(false);
-	freq_comp_filt[1][1] = adiscope::frequency_compensation_filter::make(false);
+	freq_comp_filt[1][1] = adiscope::frequency_compensation_filter::make(false);*/
 
-	for (unsigned i = 0; i < nb_channels; i++) {
+	/*for (unsigned i = 0; i < nb_channels; i++) {
 		hier_block2::connect(iio_block,i,freq_comp_filt[i][0],0);
 		hier_block2::connect(freq_comp_filt[i][0],0,freq_comp_filt[i][1],0);
 
@@ -80,10 +123,11 @@ iio_manager::iio_manager(unsigned int block_id,
 
 		hier_block2::connect(dummy_copy, i, dummy, i);
 
-	}
+	}*/
 
 	dummy_copy->set_enabled(true);
 
+	nb_channels = 1;
 	timeout_b = gnuradio::get_initial_sptr(new timeout_block("msg"));
 	hier_block2::msg_connect(iio_block, "msg", timeout_b, "msg");
 
@@ -144,7 +188,7 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst,
 
 	/* The copy block is used as a valve to turn on/off this
 	 * specific channel. */
-	auto copy = blocks::copy::make(sizeof(short));
+	auto copy = blocks::copy::make(4*sizeof(short));
 	copy_blocks.push_back(std::make_pair(copy, _buffer_size));
 
 	/* Disable the valve by default. */
@@ -152,17 +196,18 @@ iio_manager::port_id iio_manager::connect(basic_block_sptr dst,
 
 	/* Connect the IIO block to the valve, and the valve to the
 	 * destination block */
-	iio_manager::connect(freq_comp_filt[src_port][1], 0, copy, 0);
+	iio_manager::connect(f2c, 0, copy, 0);
 
 	/* TODO: Find a way to share one short_to_float block per channel,
 	 * instead of having each client instanciate its own */
-	if (use_float) {
+	/*if (use_float) {
 		auto s2f = blocks::short_to_float::make();
 		iio_manager::connect(copy, 0, s2f, 0);
 		iio_manager::connect(s2f, 0, dst, dst_port);
 	} else {
 		iio_manager::connect(copy, 0, dst, dst_port);
-	}
+	}*/
+	iio_manager::connect(copy, 0, dst, dst_port);
 
 	/* Returns an ID that identifies the connection to the port,
 	 * as there can be multiple blocks connected to one port */
@@ -362,7 +407,7 @@ void iio_manager::set_device_timeout(unsigned int mseconds)
 }
 
 void iio_manager::set_data_rate(double rate) {
-	iio_block->set_data_rate(rate);
+//	iio_block->set_data_rate(rate);
 }
 
 void iio_manager::set_kernel_buffer_count(int kb) {

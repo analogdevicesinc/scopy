@@ -1701,14 +1701,14 @@ void adiscope::ToolLauncher::enableAdcBasedTools()
 			toolList.push_back(manual_calibration);
 		}
 
-		if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
+		/*if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
 			spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
 			toolList.push_back(spectrum_analyzer);
 			adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
 			connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
 				menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->click();
 			});
-		}
+		}*/
 
 		if (filter->compatible((TOOL_NETWORK_ANALYZER))) {
 
@@ -1791,6 +1791,16 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 #endif
 	filter = new Filter(ctx);
 	menu->loadToolsFromFilter(filter);
+
+	if (filter->compatible(TOOL_SPECTRUM_ANALYZER)) {
+		spectrum_analyzer = new SpectrumAnalyzer(ctx, filter, menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER),&js_engine, this);
+		toolList.push_back(spectrum_analyzer);
+		adc_users_group.addButton(menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolStopBtn());
+		connect(spectrum_analyzer, &SpectrumAnalyzer::showTool, [=]() {
+			menu->getToolMenuItemFor(TOOL_SPECTRUM_ANALYZER)->getToolBtn()->click();
+		});
+	}
+#if 0
 	if (filter->hw_name().compare("M2K") != 0) {
 		menu->getToolMenuItemFor(TOOL_DEBUGGER)->setToolDisabled(false);
 	} else {
@@ -1931,7 +1941,7 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 
 	calibration_thread_watcher.setFuture(calibration_thread);
 	connect(&calibration_thread_watcher, SIGNAL(finished()), this, SLOT(calibrationThreadWatcherFinished()));
-
+#endif
 	return true;
 }
 

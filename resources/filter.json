@@ -4,10 +4,11 @@
 	},
 
 	"FMComms2-4": {
-		"compatible": [ "debugger" ],
+                "compatible": [ "debugger","spectrum" ],
 		"compatible-devices": [ "cf-ad9361-lpc", "cf-ad9361-dds-core-lpc", "ad9361-phy" ],
 		"osc-devices": [ "cf-ad9361-lpc" ],
 		"dmm-devices": [ "cf-ad9361-lpc" ],
+                "spectrum-devices": [ "cf-ad9361-lpc" ],
 		"siggen-devices": [ "cf-ad9361-dds-core-lpc" ]
 	},
 
