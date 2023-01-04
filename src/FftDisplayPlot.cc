@@ -753,23 +753,9 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 
 	detectMarkers();
 
-	_editFirstPoint();
 	replot();
 
 	Q_EMIT newFFTData();
-}
-
-void FftDisplayPlot::_editFirstPoint()
-{
-	// Set first point on the xAxis to 1 in order for it to
-	// be plotted and make the y_data[i][0] values equal to the ones
-	// of the next point to draw a straight line from the start of
-	// the plot to the start of the sweep
-	x_data[0] = d_logScaleEnabled;
-	for (size_t i = 0; i < y_data.size(); ++i) {
-		y_data[i][0] = y_data[i][1];
-	}
-
 }
 
 void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
