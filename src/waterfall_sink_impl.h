@@ -27,11 +27,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDED_QTGUI_WATERFALL_SINK_F_IMPL_H
-#define INCLUDED_QTGUI_WATERFALL_SINK_F_IMPL_H
+#ifndef INCLUDED_QTGUI_WATERFALL_SINK_IMPL_H
+#define INCLUDED_QTGUI_WATERFALL_SINK_IMPL_H
 
 #include "WaterfallDisplayPlot.h"
-#include "waterfall_sink_f.h"
+#include "waterfall_sink.h"
 
 #include <gnuradio/fft/fft.h>
 #include <gnuradio/fft/fft_shift.h>
@@ -41,7 +41,7 @@
 using namespace gr;
 namespace adiscope {
 
-class waterfall_sink_f_impl : public waterfall_sink_f
+class waterfall_sink_impl : public waterfall_sink
 {
 private:
     void forecast(int noutput_items, gr_vector_int& ninput_items_required) override;
@@ -66,7 +66,7 @@ private:
     std::unique_ptr<gr::fft::fft_complex_fwd> d_fft;
 
     int d_index = 0;
-    std::vector<volk::vector<float>> d_residbufs;
+    std::vector<volk::vector<gr_complex>> d_residbufs;
     std::vector<volk::vector<double>> d_magbufs;
     double* d_pdu_magbuf;
     volk::vector<float> d_fbuf;
@@ -82,11 +82,12 @@ private:
 
     gr::high_res_timer_type d_update_time;
     gr::high_res_timer_type d_last_time;
+    bool do_shift;
 
     void fftresize();
     void resize_bufs(int size);
     void check_clicked();
-    void fft(float* data_out, const float* data_in, int size);
+    void fft(float* data_out, const gr_complex* data_in, int size);
 
     // Handles message input port for setting new bandwidth
     // The message is a PMT pair (intern('bw'), double(bw))
@@ -100,14 +101,15 @@ private:
     void handle_pdus(pmt::pmt_t msg);
 
 public:
-    waterfall_sink_f_impl(int size,
+    waterfall_sink_impl(int size,
 			  std::vector<float> win,
 			  double fc,
 			  double bw,
 			  const std::string& name,
 			  int nconnections,
-			  WaterfallDisplayPlot* plot = NULL);
-    ~waterfall_sink_f_impl();
+			  WaterfallDisplayPlot* plot = NULL,
+			  bool fft_shift = false);
+    ~waterfall_sink_impl();
 
     bool check_topology(int ninputs, int noutputs) override;
 
@@ -147,4 +149,4 @@ public:
 
 } /* namespace adiscope */
 
-#endif /* INCLUDED_QTGUI_WATERFALL_SINK_F_IMPL_H */
+#endif /* INCLUDED_QTGUI_waterfall_sink_IMPL_H */

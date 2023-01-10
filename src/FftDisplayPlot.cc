@@ -180,6 +180,8 @@ FftDisplayPlot::FftDisplayPlot(int nplots, QWidget *parent) :
 	setAxisVisible(QwtAxis::YLeft, false);
 	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
 
+	d_half_freq = true;
+
 	setupReadouts();
 
 	installEventFilter(this);
@@ -212,6 +214,11 @@ FftDisplayPlot::~FftDisplayPlot()
 	removeEventFilter(this);
 	canvas()->removeEventFilter(d_cursorReadouts);
 	canvas()->removeEventFilter(d_symbolCtrl);
+}
+
+void FftDisplayPlot::setPlotPosHalf(bool half)
+{
+	d_half_freq = half;
 }
 
 void FftDisplayPlot::initChannelMeasurement(int nplots) {
@@ -629,8 +636,7 @@ int64_t FftDisplayPlot::getNumPoints()
 void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 		uint64_t num_points)
 {
-//	uint64_t halfNumPoints = num_points / 2;
-	uint64_t halfNumPoints = num_points;
+	uint64_t numPoints = d_half_freq ? num_points / 2 : num_points;
 	bool numPointsChanged = false;
 	bool samplRateChanged = false;
 	bool magTypeChanged = false;
@@ -638,24 +644,28 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 	// Update sample rate if required
 	if (d_sampl_rate != d_preset_sampl_rate) {
 		d_sampl_rate = d_preset_sampl_rate;
-		d_start_frequency = 0;
+		d_start_frequency = d_half_freq ? 0 : - d_sampl_rate / 2;
 		d_stop_frequency = d_sampl_rate / 2;
 		samplRateChanged = true;
 
 		Q_EMIT sampleRateUpdated(d_sampl_rate);
 	}
 
+//	for (unsigned int i = 0; i < d_nplots; i++) {
+//		memmove(&pts[0], &pts[-d_start_frequency], (numPoints + d_start_frequency) * sizeof(double));
+//	}
+
 	if (d_magType != d_presetMagType) {
 		d_magType = d_presetMagType;
 		magTypeChanged = true;
 	}
 
-	if (d_stop || halfNumPoints == 0)
+	if (d_stop || numPoints == 0)
 		return;
 
-	if (halfNumPoints != d_numPoints || d_firstInit) {
+	if (numPoints != d_numPoints || d_firstInit) {
 		d_firstInit = false;
-		d_numPoints = halfNumPoints;
+		d_numPoints = numPoints;
 		numPointsChanged = true;
 
 		Q_EMIT sampleCountUpdated(d_numPoints);
@@ -663,7 +673,7 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 		if (x_data)
 			delete []x_data;
 
-		x_data = new double[halfNumPoints];
+		x_data = new double[numPoints];
 
 		for (unsigned int i = 0; i < d_nplots; i++) {
 			if (y_data[i])
@@ -671,15 +681,15 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 			if (y_original_data[i])
 				delete[] y_original_data[i];
 
-			y_data[i] = new double[halfNumPoints];
-			y_original_data[i] = new double[halfNumPoints];
+			y_data[i] = new double[numPoints];
+			y_original_data[i] = new double[numPoints];
 
 #if QWT_VERSION < 0x060000
 			d_plot_curve[i]->setRawData(x_data,
 					y_data[i], halfNumPoints);
 #else
 			d_plot_curve[i]->setRawSamples(x_data,
-					y_data[i], halfNumPoints);
+					y_data[i], numPoints);
 #endif
 		}
 
@@ -689,20 +699,20 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 				continue;
 
 			uint size = d_ch_avg_obj[i]->dataWidth();
-			if (size == halfNumPoints)
+			if (size == numPoints)
 				continue;
 
 			uint h = d_ch_avg_obj[i]->history();
 			bool h_en = d_ch_avg_obj[i]->historyEnabled();
 			d_ch_avg_obj[i] = getNewAvgObject(
-				d_ch_average_type[i], halfNumPoints, h, h_en);
+				d_ch_average_type[i], numPoints, h, h_en);
 		}
 	}
 
 	// We store the received data before touching it
 	for (unsigned int i = 0; i < d_nplots; i++) {
 		memcpy(y_original_data[i], pts[i],
-				halfNumPoints * sizeof(double));
+				numPoints * sizeof(double));
 	}
 
 	// When the magnitude type changes, we reset the data that is
@@ -711,12 +721,12 @@ void FftDisplayPlot::plotData(const std::vector<double *> &pts,
 		resetAverageHistory();
 	}
 
-	averageDataAndComputeMagnitude(y_original_data, y_data, halfNumPoints);
+	averageDataAndComputeMagnitude(y_original_data, y_data, numPoints);
 
 	_resetXAxisPoints();
 
 	if (numPointsChanged) {
-		// When the number of points change but the start and stop freq
+		// When tcustomhe number of points change but the start and stop freq
 		// stay the same, we need to update the position of fixed markers
 		for (int c = 0; c < d_nplots; c++) {
 			for (int m = 0; m < d_markers[c].size(); m++) {
@@ -937,8 +947,8 @@ bool FftDisplayPlot::getLogScale() const
 void FftDisplayPlot::setSampleRate(double sr, double units,
 	const std::string &strunits)
 {
-	d_start_frequency = 0;
 	d_stop_frequency = sr / 2;
+	d_start_frequency = d_half_freq ? 0 : -d_stop_frequency;
 	d_sampl_rate = sr;
 	d_preset_sampl_rate = sr;
 
@@ -1546,8 +1556,9 @@ void FftDisplayPlot::marker_to_next_higher_mag_peak(uint chIdx, uint mkIdx)
 
 void FftDisplayPlot::setStartStop(double start, double stop)
 {
-	m_sweepStart = start;
 	m_sweepStop = stop;
+	m_sweepStart = d_half_freq ? start : -stop;
+	setAxisScale(QwtAxis::XBottom, m_sweepStart, m_sweepStop);
 	auto div = axisScaleDiv(QwtAxis::XBottom);
 	setXaxisNumDiv((div.ticks(2)).size() - 1);
 	setXaxisMajorTicksPos(div.ticks(2));

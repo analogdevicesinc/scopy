@@ -40,36 +40,38 @@
 #include <volk/volk.h>
 
 #include <cstring>
-#include "waterfall_sink_f_impl.h"
+#include "waterfall_sink_impl.h"
 
 //using namespace gr;
 
 namespace adiscope {
 
-waterfall_sink_f::sptr
-waterfall_sink_f::make(int fftsize,
+waterfall_sink::sptr
+waterfall_sink::make(int fftsize,
 		       std::vector<float> win,
 		       double fc,
 		       double bw,
 		       const std::string& name,
 		       int nconnections,
-		       WaterfallDisplayPlot* plot)
+		       WaterfallDisplayPlot* plot,
+		       bool fft_shift)
 {
-	//	    return gnuradio::make_block_sptr<waterfall_sink_f_impl>(
+	//	    return gnuradio::make_block_sptr<waterfall_sink_impl>(
 	//	fftsize, wintype, fc, bw, name, nconnections, parent);
 	return gnuradio::get_initial_sptr
-			(new waterfall_sink_f_impl(fftsize, win, fc, bw, name, nconnections, plot));
+			(new waterfall_sink_impl(fftsize, win, fc, bw, name, nconnections, plot, fft_shift));
 }
 
-waterfall_sink_f_impl::waterfall_sink_f_impl(int fftsize,
+waterfall_sink_impl::waterfall_sink_impl(int fftsize,
 					     std::vector<float> win,
 					     double fc,
 					     double bw,
 					     const std::string& name,
 					     int nconnections,
-					     WaterfallDisplayPlot* plot)
-	: sync_block("waterfall_sink_f",
-		     gr::io_signature::make(0, nconnections, sizeof(float)),
+					     WaterfallDisplayPlot* plot,
+					     bool fft_shift)
+	: sync_block("waterfall_sink",
+		     gr::io_signature::make(0, nconnections, sizeof(gr_complex)),
 		     gr::io_signature::make(0, 0, 0)),
 	  d_fftsize(fftsize),
 	  d_fft_shift(fftsize),
@@ -86,7 +88,8 @@ waterfall_sink_f_impl::waterfall_sink_f_impl(int fftsize,
 	  d_residbufs(d_nconnections + 1), // One extra "connection" for the PDU memory.
 	  d_magbufs(d_nconnections + 1),   // One extra "connection" for the PDU memory.
 	  d_fbuf(fftsize),
-	  d_main_gui(plot)
+	  d_main_gui(plot),
+	  do_shift(fft_shift)
 {
 	resize_bufs(d_fftsize);
 
@@ -107,17 +110,17 @@ waterfall_sink_f_impl::waterfall_sink_f_impl(int fftsize,
 	set_msg_handler(pmt::mp("in"), [this](pmt::pmt_t msg) { this->handle_pdus(msg); });
 }
 
-waterfall_sink_f_impl::~waterfall_sink_f_impl()
+waterfall_sink_impl::~waterfall_sink_impl()
 {
 	delete d_main_gui;
 }
 
-bool waterfall_sink_f_impl::check_topology(int ninputs, int noutputs)
+bool waterfall_sink_impl::check_topology(int ninputs, int noutputs)
 {
 	return ninputs == d_nconnections;
 }
 
-void waterfall_sink_f_impl::forecast(int noutput_items,
+void waterfall_sink_impl::forecast(int noutput_items,
 				     gr_vector_int& ninput_items_required)
 {
 	unsigned int ninputs = ninput_items_required.size();
@@ -126,7 +129,7 @@ void waterfall_sink_f_impl::forecast(int noutput_items,
 	}
 }
 
-void waterfall_sink_f_impl::initialize()
+void waterfall_sink_impl::initialize()
 {
 	int numplots = (d_nconnections > 0) ? d_nconnections : 1;
 	set_fft_size(d_fftsize);
@@ -136,29 +139,29 @@ void waterfall_sink_f_impl::initialize()
 	set_update_time(0.1);
 }
 
-void waterfall_sink_f_impl::exec_() { d_qApplication->exec(); }
+void waterfall_sink_impl::exec_() { d_qApplication->exec(); }
 
-QWidget* waterfall_sink_f_impl::qwidget() { return d_main_gui; }
+QWidget* waterfall_sink_impl::qwidget() { return d_main_gui; }
 
-void waterfall_sink_f_impl::clear_data() { d_main_gui->clearData(); }
+void waterfall_sink_impl::clear_data() { d_main_gui->clearData(); }
 
-void waterfall_sink_f_impl::set_fft_size(const int fftsize)
+void waterfall_sink_impl::set_fft_size(const int fftsize)
 {
 	d_main_gui->resetAvgAcquisitionTime();
 	d_fftsize = fftsize;
 	fftresize();
 }
 
-void waterfall_sink_f_impl::set_fft_window(const std::vector<float> window)
+void waterfall_sink_impl::set_fft_window(const std::vector<float> window)
 {
     d_window = window;
 }
 
-int waterfall_sink_f_impl::fft_size() const { return d_fftsize; }
+int waterfall_sink_impl::fft_size() const { return d_fftsize; }
 
-float waterfall_sink_f_impl::fft_average() const { return d_fftavg; }
+float waterfall_sink_impl::fft_average() const { return d_fftavg; }
 
-void waterfall_sink_f_impl::set_frequency_range(const double centerfreq,
+void waterfall_sink_impl::set_frequency_range(const double centerfreq,
 						const double bandwidth)
 {
 	d_center_freq = centerfreq;
@@ -166,12 +169,12 @@ void waterfall_sink_f_impl::set_frequency_range(const double centerfreq,
 	d_main_gui->setFrequencyRange(d_center_freq, d_bandwidth, 1., "Hz");
 }
 
-void waterfall_sink_f_impl::set_intensity_range(const double min, const double max)
+void waterfall_sink_impl::set_intensity_range(const double min, const double max)
 {
 	d_main_gui->setIntensityRange(min, max);
 }
 
-void waterfall_sink_f_impl::set_update_time(double t)
+void waterfall_sink_impl::set_update_time(double t)
 {
 	// convert update time to ticks
 	gr::high_res_timer_type tps = gr::high_res_timer_tps();
@@ -180,54 +183,56 @@ void waterfall_sink_f_impl::set_update_time(double t)
 	d_last_time = 0;
 }
 
-void waterfall_sink_f_impl::set_line_label(unsigned int which, const std::string& label)
+void waterfall_sink_impl::set_line_label(unsigned int which, const std::string& label)
 {
 	d_main_gui->setLineLabel(which, label.c_str());
 }
 
-void waterfall_sink_f_impl::set_line_alpha(unsigned int which, double alpha)
+void waterfall_sink_impl::set_line_alpha(unsigned int which, double alpha)
 {
 	d_main_gui->setAlpha(which, (int)(255.0 * alpha));
 }
 
-void waterfall_sink_f_impl::set_size(int width, int height)
+void waterfall_sink_impl::set_size(int width, int height)
 {
 	d_main_gui->resize(QSize(width, height));
 }
 
-void waterfall_sink_f_impl::set_plot_pos_half(bool half)
+void waterfall_sink_impl::set_plot_pos_half(bool half)
 {
 	d_main_gui->setPlotPosHalf(half);
 }
 
-double waterfall_sink_f_impl::line_alpha(unsigned int which)
+double waterfall_sink_impl::line_alpha(unsigned int which)
 {
 	return (double)(d_main_gui->getAlpha(which)) / 255.0;
 }
 
-void waterfall_sink_f_impl::auto_scale() { d_main_gui->autoScale(); }
+void waterfall_sink_impl::auto_scale() { d_main_gui->autoScale(); }
 
-double waterfall_sink_f_impl::min_intensity(unsigned int which)
+double waterfall_sink_impl::min_intensity(unsigned int which)
 {
 	return d_main_gui->getMinIntensity(which);
 }
 
-double waterfall_sink_f_impl::max_intensity(unsigned int which)
+double waterfall_sink_impl::max_intensity(unsigned int which)
 {
 	return d_main_gui->getMaxIntensity(which);
 }
 
-void waterfall_sink_f_impl::disable_legend() { d_main_gui->disableLegend(); }
+void waterfall_sink_impl::disable_legend() { d_main_gui->disableLegend(); }
 
-void waterfall_sink_f_impl::fft(float* data_out, const float* data_in, int size)
+void waterfall_sink_impl::fft(float* data_out, const gr_complex* data_in, int size)
 {
 	// float to complex conversion
-	gr_complex* dst = d_fft->get_inbuf();
-	for (int i = 0; i < size; i++)
-		dst[i] = data_in[i];
+//	gr_complex* dst = d_fft->get_inbuf();
+//	for (int i = 0; i < size; i++)
+//		dst[i] = data_in[i];
 
 	if (!d_window.empty()) {
-		volk_32fc_32f_multiply_32fc(d_fft->get_inbuf(), dst, &d_window.front(), size);
+	    volk_32fc_32f_multiply_32fc(d_fft->get_inbuf(), data_in, &d_window.front(), size);
+	} else {
+	    memcpy(d_fft->get_inbuf(), data_in, sizeof(gr_complex) * size);
 	}
 
 	d_fft->execute(); // compute the fft
@@ -235,10 +240,12 @@ void waterfall_sink_f_impl::fft(float* data_out, const float* data_in, int size)
 	volk_32fc_s32f_x2_power_spectral_density_32f(
 				data_out, d_fft->get_outbuf(), size, 1.0, size);
 
-//	d_fft_shift.shift(data_out, size);
+	if (do_shift) {
+		d_fft_shift.shift(data_out, size);
+	}
 }
 
-void waterfall_sink_f_impl::resize_bufs(int size)
+void waterfall_sink_impl::resize_bufs(int size)
 {
 	// Resize residbuf and replace data.
 	for (auto& buf : d_residbufs) {
@@ -256,7 +263,7 @@ void waterfall_sink_f_impl::resize_bufs(int size)
 	d_pdu_magbuf = last_magbuf.data();
 }
 
-void waterfall_sink_f_impl::fftresize()
+void waterfall_sink_impl::fftresize()
 {
 	gr::thread::scoped_lock lock(d_setlock);
 
@@ -280,7 +287,7 @@ void waterfall_sink_f_impl::fftresize()
 	d_last_time = 0;
 }
 
-void waterfall_sink_f_impl::handle_set_freq(pmt::pmt_t msg)
+void waterfall_sink_impl::handle_set_freq(pmt::pmt_t msg)
 {
 	if (pmt::is_pair(msg)) {
 		pmt::pmt_t x = pmt::cdr(msg);
@@ -292,7 +299,7 @@ void waterfall_sink_f_impl::handle_set_freq(pmt::pmt_t msg)
 	}
 }
 
-void waterfall_sink_f_impl::handle_set_bw(pmt::pmt_t msg)
+void waterfall_sink_impl::handle_set_bw(pmt::pmt_t msg)
 {
 	if (pmt::is_pair(msg)) {
 		pmt::pmt_t x = pmt::cdr(msg);
@@ -304,14 +311,14 @@ void waterfall_sink_f_impl::handle_set_bw(pmt::pmt_t msg)
 	}
 }
 
-void waterfall_sink_f_impl::set_time_per_fft(double t) { d_main_gui->setUpdateTime(t); }
+void waterfall_sink_impl::set_time_per_fft(double t) { d_main_gui->setUpdateTime(t); }
 
-int waterfall_sink_f_impl::work(int noutput_items,
+int waterfall_sink_impl::work(int noutput_items,
 				gr_vector_const_void_star& input_items,
 				gr_vector_void_star& output_items)
 {
 	int j = 0;
-	const float* in = (const float*)input_items[0];
+	const gr_complex* in = (const gr_complex*)input_items[0];
 
 	//	check_clicked();
 
@@ -325,9 +332,10 @@ int waterfall_sink_f_impl::work(int noutput_items,
 			if (gr::high_res_timer_now() - d_last_time > d_update_time) {
 				for (int n = 0; n < d_nconnections; n++) {
 					// Fill up residbuf with d_fftsize number of items
-					in = (const float*)input_items[n];
-					memcpy(
-								d_residbufs[n].data() + d_index, &in[j], sizeof(float) * resid);
+					in = (const gr_complex*)input_items[n];
+					memcpy(d_residbufs[n].data() + d_index,
+					       &in[j],
+					       sizeof(gr_complex) * resid);
 
 					fft(d_fbuf.data(), d_residbufs[n].data(), d_fftsize);
 					for (int x = 0; x < d_fftsize; x++) {
@@ -352,8 +360,10 @@ int waterfall_sink_f_impl::work(int noutput_items,
 		// Otherwise, copy what we received into the residbuf for next time
 		else {
 			for (int n = 0; n < d_nconnections; n++) {
-				in = (const float*)input_items[n];
-				memcpy(d_residbufs[n].data() + d_index, &in[j], sizeof(float) * datasize);
+				in = (const gr_complex*)input_items[n];
+				memcpy(d_residbufs[n].data() + d_index,
+				       &in[j],
+				       sizeof(gr_complex) * datasize);
 			}
 			d_index += datasize;
 			j += datasize;
@@ -363,7 +373,7 @@ int waterfall_sink_f_impl::work(int noutput_items,
 	return j;
 }
 
-void waterfall_sink_f_impl::handle_pdus(pmt::pmt_t msg)
+void waterfall_sink_impl::handle_pdus(pmt::pmt_t msg)
 {
 	size_t len;
 	size_t start = 0;
@@ -389,12 +399,12 @@ void waterfall_sink_f_impl::handle_pdus(pmt::pmt_t msg)
 
 	len = pmt::length(samples);
 
-	const float* in;
-	if (pmt::is_f32vector(samples)) {
-		in = (const float*)pmt::f32vector_elements(samples, len);
+	const gr_complex* in;
+	if (pmt::is_c32vector(samples)) {
+	    in = (const gr_complex*)pmt::c32vector_elements(samples, len);
 	} else {
-		throw std::runtime_error("waterfall sink: unknown data type "
-					 "of samples; must be float.");
+	    throw std::runtime_error("waterfall_sink_c: unknown data type "
+				     "of samples; must be complex.");
 	}
 
 	// Plot if we're past the last update time
@@ -415,12 +425,11 @@ void waterfall_sink_f_impl::handle_pdus(pmt::pmt_t msg)
 		size_t max = std::min(d_fftsize, static_cast<int>(len));
 		for (size_t i = 0; j < d_nrows; i += stride) {
 			// Clear residbufs if len < d_fftsize
-			memset(d_residbufs[d_nconnections].data(), 0x00, sizeof(float) * d_fftsize);
-
+			std::fill_n(d_residbufs[d_nconnections].data(), d_fftsize, 0x00);
 			// Copy in as much of the input samples as we can
 			memcpy(d_residbufs[d_nconnections].data(),
 			       &in[min],
-			       sizeof(float) * (max - min));
+			       sizeof(gr_complex) * (max - min));
 
 			// Apply the window and FFT; copy data into the PDU
 			// magnitude buffer.

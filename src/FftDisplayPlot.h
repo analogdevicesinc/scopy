@@ -167,6 +167,8 @@ namespace adiscope {
 
 		QColor getChannelColor();
 
+		bool d_half_freq;
+
 	private Q_SLOTS:
 		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker> &);
 		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);
@@ -263,6 +265,7 @@ namespace adiscope {
 		QString formatYValue(double value, int precision) const;
 		void resetZoomerStack();
 		void setAmplitude(double top, double bottom);
+		void setPlotPosHalf(bool half);
 	Q_SIGNALS:
 		void channelAdded(int);
 		void newFFTData();

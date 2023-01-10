@@ -39,8 +39,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDED_QTGUI_WATERFALL_SINK_F_H
-#define INCLUDED_QTGUI_WATERFALL_SINK_F_H
+#ifndef INCLUDED_QTGUI_waterfall_sink_H
+#define INCLUDED_QTGUI_waterfall_sink_H
 
 #ifdef ENABLE_PYTHON
 #include <Python.h>
@@ -55,14 +55,14 @@
 
 namespace adiscope {
 
-class waterfall_sink_f : virtual public gr::sync_block
+class waterfall_sink : virtual public gr::sync_block
 {
 public:
-//	 adiscope::waterfall_sink_f::sptr
-	typedef std::shared_ptr<waterfall_sink_f> sptr;
+//	 adiscope::waterfall_sink::sptr
+	typedef std::shared_ptr<waterfall_sink> sptr;
 
 	/*!
-     * \brief Build a floating point waterfall sink.
+     * \brief Build a complex number waterfall sink.
      *
      * \param size size of the FFT to compute and display. If using
      *        the PDU message port to plot samples, the length of
@@ -83,7 +83,8 @@ public:
 			 double bw,
 			 const std::string& name,
 			 int nconnections = 1,
-			 WaterfallDisplayPlot* plot = NULL);
+			 WaterfallDisplayPlot* plot = NULL,
+			 bool fft_shift = false);
 
 	virtual void exec_() = 0;
 	virtual QWidget* qwidget() = 0;
@@ -124,4 +125,4 @@ public:
 
 } /* namespace adiscope */
 
-#endif /* WATERFALL_SINK_F_H */
+#endif /* waterfall_sink_H */

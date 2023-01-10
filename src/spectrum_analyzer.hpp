@@ -28,7 +28,7 @@
 #include "apiObject.hpp"
 #include "iio_manager.hpp"
 #include "scope_sink_f.h"
-#include "waterfall_sink_f.h"
+#include "waterfall_sink.h"
 #include "fft_block.hpp"
 #include "FftDisplayPlot.h"
 #include "tool.hpp"
@@ -135,6 +135,7 @@ Q_SIGNALS:
 	void started(bool);
 	void showTool();
 	void selectedChannelChanged(int);
+	void sampleRateChanged(double);
 
 #ifdef SPECTRAL_MSR
 	void measurementsAvailable();
@@ -151,6 +152,7 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
+	void on_sampleRate_changed(double sampleRate);
 
 #ifdef SPECTRAL_MSR
 	void on_btnMeasure_toggled(bool);
@@ -294,7 +296,7 @@ private:
 	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
 	adiscope::scope_sink_f::sptr fft_sink;
-	adiscope::waterfall_sink_f::sptr waterfall_sink;
+	adiscope::waterfall_sink::sptr waterfall_sink;
 	iio_manager::port_id *fft_ids;
 	iio_manager::port_id *waterfall_ids;
 
@@ -339,6 +341,8 @@ private:
 
 	bool receivedFFTData;
 	bool receivedWaterfallData;
+
+	bool use_float;
 
 	// dockers
 	QMainWindow *mainWindow;

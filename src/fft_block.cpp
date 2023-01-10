@@ -48,7 +48,7 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 	//basic_block_sptr fft;
 	if (use_complex)
 		d_fft = fft::fft_v<gr_complex, true>::make(fft_size,
-							   window, false, nbthreads);
+							   window, true, nbthreads);
 	else
 		d_fft = fft::fft_v<float, true>::make(fft_size,
 						      window, false, nbthreads);

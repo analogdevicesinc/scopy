@@ -556,7 +556,8 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 {
 	// Display first half of the plot if d_half_freq is true
 	int64_t _npoints_in = d_half_freq ? (getStopFrequency() - getStartFrequency()) / getResolutionBW() : numDataPoints;
-	int64_t _in_index = d_half_freq ? getStartFrequency() / getResolutionBW() : 0;
+	_npoints_in = (getStopFrequency() - getStartFrequency()) / getResolutionBW();
+	int64_t _in_index = d_half_freq ? getStartFrequency() / getResolutionBW() : (numDataPoints - _npoints_in) / 2;
 	double current_time = gr::high_res_timer_now();
 
 	// convert to seconds

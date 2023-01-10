@@ -35,7 +35,7 @@ class StartStopRangeWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit StartStopRangeWidget(double min = 1.0, double max = 5e07,
+	explicit StartStopRangeWidget(double min = 1.0, double max = 10000000000,
 				      double minSpan = 1000,
 				      bool hasProgressWidget = false,
 				      QWidget *parent = nullptr);
