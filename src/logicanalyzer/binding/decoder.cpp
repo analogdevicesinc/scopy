@@ -251,7 +251,11 @@ void Decoder::setter(const char *id, QVariant value)
 		variant = g_variant_new_uint32(value.value<uint32_t>());
 	} else if (type == QMetaType::Long) {
 		variant = g_variant_new_int64(value.value<int64_t>());
+	} else if (type == QMetaType::LongLong) {
+		variant = g_variant_new_int64(value.value<int64_t>());
 	} else if (type == QMetaType::ULong) {
+		variant = g_variant_new_uint64(value.value<uint64_t>());
+	} else if (type == QMetaType::ULongLong) {
 		variant = g_variant_new_uint64(value.value<uint64_t>());
 	} else if (type == QMetaType::Double) {
 		variant = g_variant_new_double(value.toDouble());
