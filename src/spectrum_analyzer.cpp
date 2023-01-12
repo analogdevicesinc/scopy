@@ -226,6 +226,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	settings_group->addButton(ui->btnAddRef);
 	settings_group->addButton(ui->btnCursors);
 
+	ui->sampleRate_edit->setValidator( new QDoubleValidator(0, m_max_sample_rate, 0, this) );
+
 #ifdef SPECTRAL_MSR
 	settings_group->addButton(ui->btnMeasure);
 #endif
@@ -250,8 +252,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(fft_plot, SIGNAL(channelAdded(int)),
 		    SLOT(onChannelAdded(int)));
-
 	connect(this, SIGNAL(sampleRateChanged(double)), SLOT(on_sampleRate_changed(double)));
+
+	connect(ui->sampleRate_edit, &QLineEdit::editingFinished, this, [=]{
+		Q_EMIT sampleRateChanged(ui->sampleRate_edit->text().toDouble());
+	});
 
 #ifdef SPECTRAL_MSR
 	/* Measurements Settings */
@@ -641,7 +646,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	startStopRange->setStartValue(0);
 	startStopRange->setStopValue(50e6);
 
-	ui->gridSweepControls->addWidget(startStopRange, 0, 0, 2, 2);
+	ui->gridSweepControls->addWidget(startStopRange, 1, 0, 2, 2);
 
 	top->setValue(0);
 	bottom->setValue(-200);
@@ -824,10 +829,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnAddRef->setIconSize(QSize(24, 24));
 #endif
 
-//	startStopRange->setDisabled(true);
-//	startStopRange->blockSignals(true);
 	Q_EMIT sampleRateChanged(30720000);
-//	Q_EMIT sampleRateChanged(50000000);
 }
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
@@ -976,10 +978,12 @@ void SpectrumAnalyzer::on_sampleRate_changed(double sampleRate)
 //	sample_rate = sampleRate;
 	m_max_sample_rate = sampleRate;
 
-	startStopRange->blockSignals(false);
+//	startStopRange->blockSignals(false);
 	startStopRange->setStartValue(0);
 	startStopRange->setStopValue(sampleRate / 2);
 	Q_EMIT startStopRange->rangeChanged(0, sampleRate / 2);
+	ui->sampleRate_edit->setText(QString::number(sampleRate, 'f', 0));
+
 //	startStopRange->blockSignals(true);
 //	Q_EMIT fft_plot->sampleRateUpdated(sample_rate);
 }
@@ -1707,6 +1711,8 @@ void SpectrumAnalyzer::connectZoomers()
 		auto waterfall_zoomer = waterfall_plot->getZoomer();
 		auto const new_rect = QRectF(rect.left(), waterfall_zoomer->zoomBase().top(), rect.width(), waterfall_zoomer->zoomBase().height());
 
+//		if (fft_plot->isLogaritmicPlot()) return;
+
 		waterfall_zoomer->blockSignals(true);
 		fft_plot->getZoomer()->blockSignals(true);
 
@@ -1735,6 +1741,8 @@ void SpectrumAnalyzer::connectZoomers()
 	connect(waterfall_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
 		auto fft_zoomer = fft_plot->getZoomer();
 		auto const new_rect = QRectF(rect.left(), fft_zoomer->zoomBase().top(), rect.width(), fft_zoomer->zoomBase().height());
+
+//		if (fft_plot->isLogaritmicPlot()) return;
 
 		fft_zoomer->blockSignals(true);
 		waterfall_plot->getZoomer()->blockSignals(true);
@@ -2148,6 +2156,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 			iio->connect(floatToComplex, i, waterfall_sink, i);
 		} else {
 			waterfall_ids[i] = iio->connect(waterfall_sink, i, i, use_float, fft_size);
+			startStopRange->setDisabled(true);
 		}
 
 		channels[i]->fft_block = fft;

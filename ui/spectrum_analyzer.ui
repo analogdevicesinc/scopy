@@ -1044,7 +1044,7 @@ min-width: 64px;
                    <rect>
                     <x>0</x>
                     <y>0</y>
-                    <width>298</width>
+                    <width>307</width>
                     <height>523</height>
                    </rect>
                   </property>
@@ -1274,6 +1274,113 @@ color: rgba(255,255,255,51);
                      <property name="spacing">
                       <number>15</number>
                      </property>
+                     <item row="0" column="0">
+                      <layout class="QHBoxLayout" name="horizontalLayout_8">
+                       <property name="spacing">
+                        <number>0</number>
+                       </property>
+                       <property name="sizeConstraint">
+                        <enum>QLayout::SetDefaultConstraint</enum>
+                       </property>
+                       <item>
+                        <widget class="QWidget" name="widget3" native="true">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <layout class="QVBoxLayout" name="widget2_2">
+                          <property name="spacing">
+                           <number>2</number>
+                          </property>
+                          <property name="leftMargin">
+                           <number>9</number>
+                          </property>
+                          <property name="topMargin">
+                           <number>9</number>
+                          </property>
+                          <property name="rightMargin">
+                           <number>9</number>
+                          </property>
+                          <property name="bottomMargin">
+                           <number>9</number>
+                          </property>
+                          <item>
+                           <widget class="QLabel" name="label_12">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>Sample Rate</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QLineEdit" name="sampleRate_edit">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="minimumSize">
+                             <size>
+                              <width>0</width>
+                              <height>0</height>
+                             </size>
+                            </property>
+                            <property name="maxLength">
+                             <number>20</number>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QWidget" name="widget1" native="true">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <layout class="QVBoxLayout" name="verticalLayout_9">
+                          <property name="spacing">
+                           <number>2</number>
+                          </property>
+                          <item>
+                           <widget class="QLabel" name="lbl_rbw">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                            <property name="text">
+                             <string>Resolution BW</string>
+                            </property>
+                           </widget>
+                          </item>
+                          <item>
+                           <widget class="QComboBox" name="cmb_rbw">
+                            <property name="sizePolicy">
+                             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                              <horstretch>0</horstretch>
+                              <verstretch>0</verstretch>
+                             </sizepolicy>
+                            </property>
+                           </widget>
+                          </item>
+                         </layout>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
                     </layout>
                    </item>
                    <item>
@@ -1338,68 +1445,6 @@ color: rgba(255,255,255,51);
                      <property name="spacing">
                       <number>15</number>
                      </property>
-                     <item row="1" column="0">
-                      <widget class="QWidget" name="widget2" native="true">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <layout class="QVBoxLayout" name="verticalLayout_5">
-                        <property name="spacing">
-                         <number>2</number>
-                        </property>
-                        <item>
-                         <widget class="QLabel" name="lbl_units">
-                          <property name="text">
-                           <string>Units</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="cmb_units">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <item>
-                           <property name="text">
-                            <string>dBFS</string>
-                           </property>
-                          </item>
-                         </widget>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item row="1" column="1">
-                      <widget class="QWidget" name="widget1" native="true">
-                       <property name="sizePolicy">
-                        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                         <horstretch>0</horstretch>
-                         <verstretch>0</verstretch>
-                        </sizepolicy>
-                       </property>
-                       <layout class="QVBoxLayout" name="verticalLayout_9">
-                        <property name="spacing">
-                         <number>2</number>
-                        </property>
-                        <item>
-                         <widget class="QLabel" name="lbl_rbw">
-                          <property name="text">
-                           <string>Resolution BW</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="cmb_rbw"/>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
                      <item row="0" column="0">
                       <widget class="QWidget" name="verticalWidget" native="true">
                        <property name="sizePolicy">
@@ -1476,20 +1521,41 @@ color: rgba(255,255,255,51);
                          </widget>
                         </item>
                         <item>
-                         <spacer name="verticalSpacer_7">
-                          <property name="orientation">
-                           <enum>Qt::Vertical</enum>
+                         <widget class="QWidget" name="widget2" native="true">
+                          <property name="sizePolicy">
+                           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                           </sizepolicy>
                           </property>
-                          <property name="sizeType">
-                           <enum>QSizePolicy::Expanding</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>0</width>
-                            <height>72</height>
-                           </size>
-                          </property>
-                         </spacer>
+                          <layout class="QVBoxLayout" name="verticalLayout_5">
+                           <property name="spacing">
+                            <number>2</number>
+                           </property>
+                           <item>
+                            <widget class="QLabel" name="lbl_units">
+                             <property name="text">
+                              <string>Units</string>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QComboBox" name="cmb_units">
+                             <property name="sizePolicy">
+                              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                               <horstretch>0</horstretch>
+                               <verstretch>0</verstretch>
+                              </sizepolicy>
+                             </property>
+                             <item>
+                              <property name="text">
+                               <string>dBFS</string>
+                              </property>
+                             </item>
+                            </widget>
+                           </item>
+                          </layout>
+                         </widget>
                         </item>
                        </layout>
                       </widget>
