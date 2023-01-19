@@ -1,4 +1,5 @@
-﻿#include "ui_tool_view.h"
+﻿#include "custom_menu_button.hpp"
+#include "ui_tool_view.h"
 
 #include <QMainWindow>
 #include "channel_widget.hpp"
@@ -221,6 +222,7 @@ void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 		});
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
+		m_menuList[id] = dynamic_cast<gui::GenericMenu *>(menu);
 	}
 
 	m_group.addButton(addBtn);
@@ -235,6 +237,10 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 					 bool deletable, bool simplefied, QColor color, const QString& fullName,
 					 const QString& shortName)
 {
+	if (chId == -1) {
+		chId = getNewID();
+	}
+
 	ChannelWidget* ch = channelManager->buildNewChannel(chId, deletable, simplefied, color, fullName, shortName);
 	int id;
 
@@ -323,14 +329,19 @@ void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* 
 				ch->hide();
 			}
 		}
-	});
+	});	
+}
+
+int ToolView::getNewID()
+{
+	// only use for channels
+	return INT_MAX - m_channelsGroup.buttons().size();
 }
 
 void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible,
 				      bool checkBoxChecked)
 {
 	m_ui->widgetFooter->setVisible(true);
-	m_ui->widgetFooter->setStyleSheet("background:blue;");
 	m_ui->widgetMenuBtns->setVisible(true);
 
 	CustomMenuButton* btn = new CustomMenuButton(name, checkBoxVisible, checkBoxChecked);
@@ -352,6 +363,7 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
+		m_menuList[id] = menu;
 	}
 
 	m_ui->hLayoutMenuBtnsContainer->addWidget(btn);

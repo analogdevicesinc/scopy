@@ -42,6 +42,7 @@ public:
 	void setChannelIdVisible(bool visible);
 	const QString &getToolStatus() const;
 	void setToolStatus(const QString &newToolStatus);
+	void enableSwitchButton(bool en);
 
 public Q_SLOTS:
 	void changeParent(QWidget* newParent);
@@ -54,9 +55,11 @@ Q_SIGNALS:
 
 private:
 	QWidget* m_parent;
+	QWidget* header;
 	QScrollArea* m_scrollArea;
 	QWidget* m_channelsWidget;
 	bool m_hasAddBtn;
+	QPushButton *m_switchBtn;
 	CustomPushButton* m_addChannelBtn;
 	ChannelsPositionEnum m_position;
 	QList<ChannelWidget*> m_channelsList;

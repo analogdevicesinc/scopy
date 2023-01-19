@@ -10,7 +10,6 @@
 
 #include "channel_manager.hpp"
 #include "channel_widget.hpp"
-#include "custom_menu_button.hpp"
 #include "customPushButton.hpp"
 #include "generic_menu.hpp"
 #include "linked_button.hpp"
@@ -69,7 +68,6 @@ public:
 	ChannelWidget* buildNewChannel(ChannelManager* channelManager, GenericMenu* menu, bool dockable, int chId,
 				       bool deletable, bool simplified, QColor color, const QString& fullName,
 				       const QString& shortName);
-
 	void buildChannelGroup(ChannelManager* channelManager,ChannelWidget* mainChannal, std::vector<ChannelWidget*> channelGroup);
 	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
@@ -87,6 +85,7 @@ public:
 	adiscope::MenuAnim* addMenuToStack();
 	void setStackedWidget(QStackedWidget* sw);
 
+	int getNewID();
 private:
 	void configureLastOpenedMenu();
 	void buildChannelsContainer(ChannelManager* channelManager, ChannelsPositionEnum position);

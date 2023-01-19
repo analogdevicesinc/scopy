@@ -34,7 +34,7 @@ ToolMenu::ToolMenu(Preferences *preferences, QWidget *parent):
 								     << tr("Network Analyzer") << tr("Signal Generator")
 								     << tr("Logic Analyzer") << tr("Pattern Generator")
 								     << tr("Digital IO") << tr("Voltmeter")
-								     << tr("Power Supply") << tr("Debugger") << tr("Calibration") << tr("NewInstrument") << tr("Data Logger");
+								     << tr("Power Supply") << tr("Debugger") << tr("Calibration") << tr("Data Logger") << tr("NewInstrument") ;
 
 	d_availableIcons = QStringList() << "tool_oscilloscope"
 								     << "tool_spectrum_analyzer"

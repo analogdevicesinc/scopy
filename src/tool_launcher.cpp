@@ -1419,6 +1419,11 @@ void adiscope::ToolLauncher::destroyContext()
 		debugger = nullptr;
 	}
 
+	if (newInstrument) {
+		delete newInstrument;
+		newInstrument = nullptr;
+	}
+
 	if (manual_calibration) {
 		delete manual_calibration;
 		manual_calibration = nullptr;
@@ -1869,13 +1874,6 @@ bool adiscope::ToolLauncher::switchContext(const QString& uri)
 			connect(dio, &DigitalIO::showTool, [=]() {
 				menu->getToolMenuItemFor(TOOL_DIGITALIO)->getToolBtn()->click();
 			});
-		}
-
-		if (filter->compatible(TOOL_DEBUGGER)) {
-			debugger = new Debugger(ctx, filter,menu->getToolMenuItemFor(TOOL_DEBUGGER),
-						&js_engine, this);
-			QObject::connect(debugger, &Debugger::newDebuggerInstance, this,
-					 &ToolLauncher::addDebugWindow);
 		}
 
 		if (filter->compatible(TOOL_DATALOGGER)) {

@@ -45,7 +45,8 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 	m_math(false),
 	m_function(""),
 	m_ref(false),
-	m_isMainChannel(false)
+	m_isMainChannel(false),
+	m_isPhysicalChannel(false)
 {
 	init();
 	nameButton()->installEventFilter(this);
@@ -90,6 +91,8 @@ void ChannelWidget::init()
 	m_ui->horizontalLayout->setAlignment(Qt::AlignLeft);
 	m_ui->horizontalLayout->setAlignment(m_ui->btn,Qt::AlignRight);
 	Util::setWidgetNrOfChars(m_ui->name,6,15);
+//	m_ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Fixed,
+//		QSizePolicy::Fixed);
 }
 
 QAbstractButton* ChannelWidget::enableButton() const
@@ -306,6 +309,11 @@ bool ChannelWidget::isMainChannel() const
 	return m_isMainChannel;
 }
 
+bool ChannelWidget::isPhysicalChannel() const
+{
+	return m_isPhysicalChannel;
+}
+
 void ChannelWidget::setButtonNoGroup(QAbstractButton *btn)
 {
 	QButtonGroup *group = btn->group();
@@ -352,4 +360,9 @@ void ChannelWidget::setIsMainChannel(bool mainChannel)
 			Q_EMIT enabled(toggled);
 		});
 	}
+}
+
+void ChannelWidget::setIsPhysicalChannel(bool physChannel)
+{
+	m_isPhysicalChannel = physChannel;
 }

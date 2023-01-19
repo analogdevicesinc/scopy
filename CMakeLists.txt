@@ -243,6 +243,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc
 	src/logicanalyzer/*/*.cpp
 	src/datalogger/*.cpp
 	src/gui/*.cpp
+        src/plugin/*.cpp
 )
 
 FILE(GLOB M2KSCOPE_UIS ui/patterns/*.ui ui/*.ui)
