@@ -1,0 +1,83 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(tool_launcher VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+
+
+function(configure_stylesheets DU_OPTION)
+        file(GLOB_RECURSE STYLESHEETS ${CMAKE_CURRENT_SOURCE_DIR}/resources/stylesheets/templates/*.qss.c)
+
+        foreach(_stylesheet ${STYLESHEETS})
+                string(REPLACE ".c" "" FILE_OUT ${_stylesheet})
+                string(REPLACE "templates/" "" FILE_OUT ${FILE_OUT})
+
+                execute_process (
+                        COMMAND ${CMAKE_C_COMPILER} -E -P ${DU_OPTION} ${_stylesheet} -o ${FILE_OUT}
+                        )
+
+                message(STATUS "Done preprocessing ${_stylesheet}, file written to: ${FILE_OUT}")
+        endforeach()
+
+endfunction()
+
+
+FILE(GLOB SRC_LIST  *.cpp *.cc
+                gui/*.cpp gui/*.cc *.ui gui/*.ui
+)
+
+FILE(GLOB HEADER_LIST *.h *.hpp gui/*.h gui/*.hpp)
+
+set(PROJECT_SOURCES
+        ${SRC_LIST}
+        ${HEADER_LIST}
+)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(tool_launcher
+        MANUAL_FINALIZATION
+        ${PROJECT_SOURCES}
+    )
+# Define target properties for Android with Qt 6 as:
+#    set_property(TARGET tool_launcher APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
+#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
+# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
+else()
+    if(ANDROID)
+        add_library(tool_launcher SHARED
+            ${PROJECT_SOURCES}
+        )
+# Define properties for Android with Qt 5 after find_package() calls as:
+#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
+    else()
+        add_executable(tool_launcher
+            ${PROJECT_SOURCES}
+        )
+    endif()
+endif()
+
+target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+
+set_target_properties(tool_launcher PROPERTIES
+    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
+    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+)
+
+install(TARGETS tool_launcher BUNDLE DESTINATION .)
+
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(tool_launcher)
+endif()

@@ -1,0 +1,65 @@
+adiscope--DropdownSwitchList {
+  height: 30px;
+  border: 0px;
+  font-size: 18px;
+  border-radius: 4px;
+  padding-left: 20px;
+}
+
+adiscope--DropdownSwitchList:editable{
+  background-color: white;
+  color: rgba(0, 0, 0, 200);
+}
+
+adiscope--DropdownSwitchList::drop-down {
+  subcontrol-position: center right;
+  width: 10px;
+  height: 6px;
+  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+  margin-right: 20px;
+}
+
+adiscope--DropdownSwitchList QAbstractItemView {
+  border: 0px;
+  background-color: white;
+  font-size: 18px;
+  outline: 0px;
+
+  /* Add left space. Color should match background-color*/
+  border-left: 0px solid white; /* setting to 0 for now */
+}
+
+adiscope--DropdownSwitchList QAbstractItemView::item {
+  color: rgba(0, 0, 0, 200);
+  height: 60px;
+}
+
+adiscope--DropdownSwitchList QAbstractItemView::item:hover {
+  background-color: #EDEDED;
+  font-weight: bold;
+  border-bottom: 0px solid none;
+}
+
+QHeaderView {
+  /* Cancel the effect of the QAbstractItemView border-left property. It's
+  necessary because the border (or padding) of the QAbstractItemView applies to
+  this element as well. */
+  padding-left: -0px;
+}
+
+QHeaderView:section {
+  color: rgba(0, 0, 0, 200);
+  background-color: white;
+  border: 0px;
+  font: 14px;
+}
+
+QCheckBox {
+	background-color: white;
+}
+
+QCheckBox::indicator {
+  width: 16px;
+  height: 16px;
+  subcontrol-position: center;
+}

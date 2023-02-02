@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="20px" version="1.1" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+ <g fill="none" fill-rule="evenodd">
+  <g transform="translate(-1690 -230)">
+   <g transform="translate(1690 231)">
+    <path transform="translate(15 9) rotate(180) translate(-15 -9)" d="m1 18h2c3 0 4-2.3123 4-4v-10c0-2 1-4 4-4 3-2.4514e-13 4 2 4 4s-0.13601 10 0 10c0 2 1 4 4 4s4-3 4-4v-10c0-4 4-4 4-4l2 1.6342e-13" stroke="#6D6D6E" stroke-linecap="square" stroke-width="2"/>
+    <rect x="5" y="8" width="4" height="3" fill="#4A64FF"/>
+    <rect x="21" y="8" width="4" height="3" fill="#4A64FF"/>
+    <rect y="3" width="30" height="1" fill="#4A64FF"/>
+   </g>
+  </g>
+ </g>
+</svg>
