@@ -15,7 +15,7 @@ public:
     explicit ContextManagerMenu(QWidget *parent = nullptr);
     ~ContextManagerMenu();
 
-private:
+public: // !!!!!!!!!!!!!1
     Ui::ContextManagerMenu *ui;
 };
 

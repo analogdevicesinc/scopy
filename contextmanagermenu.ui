@@ -38,23 +38,34 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="btnHome">
        <property name="text">
         <string>Home</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton_2">
+      <widget class="QPushButton" name="btnAdd">
        <property name="text">
         <string>Add</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="ContextBrowser" native="true"/>
+    <widget class="QWidget" name="ContextBrowser" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+    </widget>
    </item>
    <item>
     <widget class="Line" name="line">

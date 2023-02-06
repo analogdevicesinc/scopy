@@ -18,9 +18,12 @@ ContextScanner::~ContextScanner() {
 	qDebug(CAT_CTXSCANNER)<< "dtor ";
 }
 
-void ContextScanner::startScan(int period)
+void ContextScanner::startScan(int period, bool now)
 {
-	scan();
+	if(now)
+	{
+		scan();
+	}
 	// move to thread
 	t->start(period);
 }
@@ -55,18 +58,19 @@ void ContextScanner::scan()
 	}
 
 	if (!scan_ctx) {
-		qDebug(CAT_CTXSCANNER)<< "no scan context - "  << errno << " " <<strerror(errno);
+		qWarning(CAT_CTXSCANNER)<< "no scan context - "  << errno << " " <<strerror(errno);
 		return ;
 	}
 	ret = iio_scan_context_get_info_list(scan_ctx, &info);
 	if (ret < 0) {
-		qDebug(CAT_CTXSCANNER)<< "iio_scan_context_get_info_list error - " << errno << " " <<strerror(errno);
-		return ;;
+		qWarning(CAT_CTXSCANNER)<< "iio_scan_context_get_info_list error - " << errno << " " <<strerror(errno);
+		goto scan_err;
+		return ;
 	}
 
 	num_contexts = ret;
 
-	qInfo(CAT_CTXSCANNER)<< "found " << num_contexts << "contexts in " << et.elapsed() << "miliseconds ";
+	qDebug(CAT_CTXSCANNER)<< "found " << num_contexts << "contexts in " << et.elapsed() << "miliseconds ";
 	for (i = 0; i < num_contexts; i++) {
 		ctxs.append(QString(iio_context_info_get_uri(info[i])));
 	}
@@ -81,3 +85,10 @@ scan_err:
 
 }
 
+/*
+	auto cm = ContextManager::GetInstance();
+	ContextScanner *cs = new ContextScanner(this);
+	ScannedContextCollector *scc = new ScannedContextCollector(this);
+	connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
+	cs->startScan(2000);
+*/

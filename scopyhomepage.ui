@@ -39,7 +39,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="wInfoPageStack"/>
+    <widget class="adiscope::MapStackedWidget" name="wInfoPageStack"/>
    </item>
   </layout>
  </widget>
@@ -48,6 +48,12 @@
    <class>ContextManagerMenu</class>
    <extends>QWidget</extends>
    <header>contextmanagermenu.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::MapStackedWidget</class>
+   <extends>QStackedWidget</extends>
+   <header>mapstackedwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

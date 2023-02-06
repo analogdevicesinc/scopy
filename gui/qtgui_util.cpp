@@ -58,11 +58,11 @@ void Util::setWidgetNrOfChars(QWidget *w,
 {
 	QFontMetrics labelm(w->font());
 
-	auto label_min_width = labelm.width(QString(minNrOfChars,'X'));
+	auto label_min_width = labelm.horizontalAdvance(QString(minNrOfChars,'X'));
 	w->setMinimumWidth(label_min_width);
 
 	if (maxNrOfChars!=0) {
-		auto label_max_width = labelm.width(QString(maxNrOfChars,'X'));
+		auto label_max_width = labelm.horizontalAdvance(QString(maxNrOfChars,'X'));
 		w->setMaximumWidth(label_max_width);
 	}
 }

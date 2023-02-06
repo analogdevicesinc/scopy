@@ -42,6 +42,7 @@ void SetScopyQDebugMessagePattern() {
 		"[ "
 		#ifdef QDEBUG_LOG_MSG_TYPE
 			QDEBUG_LOG_MSG_TYPE_STR " "
+			QDEBUG_CATEGORY_STR " "
 		#endif
 		#ifdef QDEBUG_LOG_TIME
 			QDEBUG_LOG_TIME_STR
@@ -56,8 +57,8 @@ void SetScopyQDebugMessagePattern() {
 		#ifdef QDEBUG_LOG_FILE
 		QDEBUG_LOG_FILE_STR
 		#endif
-		" [" QDEBUG_CATEGORY_STR "]"
-		" "
+
+		" - "
 		"%{message}"
 		);
 }

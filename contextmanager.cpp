@@ -70,5 +70,16 @@ void ContextManager::close(QString uri)
 		}
 	}
 }
+/*
+auto cm = ContextManager::GetInstance();
+ContextScanner *cs = new ContextScanner(this);
+cs->startScan(5000);
+cm->open("ip:192.168.2.1");
+cm->open("ip:192.168.2.1");
+cm->open("ip:192.168.2.1");
+cm->close("ip:192.168.2.1");
+auto cd = ContextManager::GetInstance();
+cd->close("ip:192.168.2.1");
+cd->close("ip:192.168.2.1");*/
 
 

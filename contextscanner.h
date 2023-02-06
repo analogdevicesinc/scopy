@@ -13,7 +13,7 @@ class ContextScanner : public QObject
 public:
 	ContextScanner(QObject *parent = nullptr);
 	~ContextScanner();
-	void startScan(int period = 5000);
+	void startScan(int period = 5000, bool now = true);
 	void stopScan();
 	void setScanParams(QString s);
 

@@ -11,13 +11,7 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ToolMenu *tm = ui->wToolMenu;
-    tm->addTool("home1","Home12","");
-    tm->addTool("home2","Home2","");
-    tm->addTool("home3","Home3","");
-    tm->getToolMenuItemFor("home1")->setToolEnabled(true);
-    tm->getToolMenuItemFor("home2")->setToolEnabled(true);
-    tm->getToolMenuItemFor("home3")->setToolEnabled(true);
+    ToolMenu *tm = ui->wToolMenu;   
 
     tm->getButtonGroup()->addButton(ui->btnHome);
     tm->getButtonGroup()->addButton(ui->btnPreferences);
@@ -27,6 +21,7 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
     connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT toolSelected("preferences");});
     connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT toolSelected("about");});
     connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(toolSelected(QString)));
+
 
 }
 
@@ -40,22 +35,17 @@ ToolBrowser::~ToolBrowser()
 }
 
 //TEST
-/*  ui->setupUi(this);
-  auto tb = ui->wToolBrowser;
-  auto ts = ui->wsToolStack;
-  auto tm = tb->getToolMenu();
+/*         
+ ts->detachTool("home");
+ tm->addTool("home1","Home12","");
+ tm->addTool("home2","Home2","");
+ tm->addTool("home3","Home3","");
+ tm->getToolMenuItemFor("home1")->setToolEnabled(true);
+ tm->getToolMenuItemFor("home2")->setToolEnabled(true);
+ tm->getToolMenuItemFor("home3")->setToolEnabled(true);
 
-  connect(tm,&ToolMenu::requestAttach,ts,&ToolStack::attachTool);
-  connect(tm,&ToolMenu::requestDetach,ts,&ToolStack::detachTool);
-  connect(ts,&ToolStack::attachSuccesful,tm,&ToolMenu::attachSuccesful);
-  connect(ts,&ToolStack::detachSuccesful,tm,&ToolMenu::detachSuccesful);
+ ts->addTool("home1", new QLabel("home1"));
+ ts->addTool("home2", new QLabel("home2"));
+ ts->addTool("home3", new QLabel("home3"));
+*/
 
-  connect(tb,&ToolBrowser::toolSelected,ts, &ToolStack::showTool);
-//    connect(tb,&ToolBrowser::detach,ts, &ToolStack::showTool);
-  ts->addTool("home", new ScopyHomePage());
-//    ts->detachTool("home");
-
-  ts->addTool("home1", new QLabel("home1"));
-  ts->addTool("home2", new QLabel("home2"));
-  ts->addTool("home3", new QLabel("home3"));
- */

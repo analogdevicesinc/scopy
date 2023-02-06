@@ -80,6 +80,18 @@ endif()
 
 target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES})
 
+# Compiler options
+target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
+
+#List of warnings to be treated as errors
+target_compile_options(${PROJECT_NAME} PUBLIC
+        -Werror=return-type
+        -Werror=uninitialized
+        -Werror=init-self
+        -Werror=switch
+)
+
+
 set_target_properties(tool_launcher PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}

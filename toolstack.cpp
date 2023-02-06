@@ -1,54 +1,47 @@
 #include "toolstack.h"
 #include <QDebug>
+#include <QLoggingCategory>
 
 using namespace adiscope;
+
+Q_LOGGING_CATEGORY(CAT_TOOLSTACK, "ToolStack")
+
 ToolStack::ToolStack(QWidget *parent) :
-	QStackedWidget(parent)
+	MapStackedWidget(parent)
 {
-
 }
 
-void ToolStack::addTool(QString tool, QWidget* w) {
-	map[tool] = w;
-	addWidget(w);
-}
-void ToolStack::showTool(QString tool)
+ToolStack::~ToolStack()
 {
-	QWidget *w = map[tool];
-	if(w)	{
-		if(indexOf(map[tool]) != -1) {
-			setCurrentWidget(w);
-		} else {
-			w->show();
-			w->raise();
-		}
-
-	} else {
-		qDebug()<<"WARNING"<<tool<<" not found in ToolStack";
-	}
-
 }
 
-void ToolStack::removeTool(QString tool)
-{
-	if(indexOf(map[tool]) != -1) { // widget is in stack
-		removeWidget(map[tool]);
-	}
-	map.remove(tool);
-
-}
 void ToolStack::detachTool(QString tool) {
 	map[tool]->setParent(nullptr);
-	showTool(tool);
+	show(tool);
 	Q_EMIT detachSuccesful(tool);
 }
 void ToolStack::attachTool(QString tool) {
 	map[tool]->setParent(this);
 	addWidget(map[tool]);
-	showTool(tool);
+	show(tool);
 	Q_EMIT attachSuccesful(tool);
 }
 
-ToolStack::~ToolStack()
+bool ToolStack::show(QString key)
 {
+	QWidget *w = map[key];
+	if(w)	{
+		if(indexOf(map[key]) != -1) {
+			setCurrentWidget(w);
+			qDebug(CAT_TOOLSTACK)<<key<<" found - showing";
+		} else {
+			w->show();
+			w->raise();
+			qDebug(CAT_TOOLSTACK)<<key<<" found in floating stack - showing";
+		}
+		return true;
+	}
+
+	qWarning(CAT_TOOLSTACK)<<key<<"not found in MapStackWidget";
+	return false;
 }
