@@ -22,9 +22,12 @@
 #define TOOLMENUITEM_H
 
 #include "gui/basemenuitem.h"
-#include "gui/customPushButton.hpp"
+#include "gui/customPushButton.h"
 
 namespace adiscope {
+/**
+ * @brief The ToolMenuItem class
+ */
 class ToolMenuItem : public BaseMenuItem
 {
 	Q_OBJECT
@@ -36,9 +39,7 @@ public:
 	QPushButton *getToolRunBtn() const;
 
 	void setToolEnabled(bool disabled);
-	bool isDetached() const;
-
-	void enableDoubleClickToDetach(bool enable);
+	void enableDoubleClick(bool enable);
 
 	bool eventFilter(QObject *watched, QEvent *event);
 
@@ -49,12 +50,11 @@ public:
 	const QString &getId() const;
 
 Q_SIGNALS:
-	void detach();
-	void toggleButtonGroup(bool);
+	void doubleclick();
+
 
 public Q_SLOTS:
 	void setDisabled(bool disabled);
-	void setDetached(bool detached);
 
 protected:
 	void enterEvent(QEvent *event);
@@ -71,7 +71,6 @@ private:
 	QString id;
 	QString name;
 	QString iconPath;
-	bool detached;
 
 private:
 	void _buildUI();

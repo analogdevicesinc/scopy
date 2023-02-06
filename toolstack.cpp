@@ -1,6 +1,7 @@
 #include "toolstack.h"
 #include <QDebug>
 
+using namespace adiscope;
 ToolStack::ToolStack(QWidget *parent) :
 	QStackedWidget(parent)
 {
@@ -39,11 +40,13 @@ void ToolStack::removeTool(QString tool)
 void ToolStack::detachTool(QString tool) {
 	map[tool]->setParent(nullptr);
 	showTool(tool);
+	Q_EMIT detachSuccesful(tool);
 }
 void ToolStack::attachTool(QString tool) {
 	map[tool]->setParent(this);
 	addWidget(map[tool]);
 	showTool(tool);
+	Q_EMIT attachSuccesful(tool);
 }
 
 ToolStack::~ToolStack()

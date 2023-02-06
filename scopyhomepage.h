@@ -1,5 +1,5 @@
-#ifndef HOMEPAGE_H
-#define HOMEPAGE_H
+#ifndef SCOPYHOMEPAGE_H
+#define SCOPYHOMEPAGE_H
 
 #include <QWidget>
 
@@ -19,4 +19,4 @@ private:
     Ui::ScopyHomePage *ui;
 };
 
-#endif // HOMEPAGE_H
+#endif // SCOPYHOMEPAGE_H

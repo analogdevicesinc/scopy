@@ -29,6 +29,9 @@
 #include <QButtonGroup>
 
 namespace adiscope {
+/**
+ * @brief The ToolMenu class
+ */
 class ToolMenu : public BaseMenu
 {
 	Q_OBJECT
@@ -47,13 +50,17 @@ public:
 	QButtonGroup *getButtonGroup() const;
 
 Q_SIGNALS:
-	void detach(QString);
-	void toolSelected(QString);
+	void requestDetach(QString);
+	void requestAttach(QString);
+	void requestToolSelect(QString);
+
+public Q_SLOTS:
+	void detachSuccesful(QString);
+	void attachSuccesful(QString);
 
 private:
 	QVector<ToolMenuItem*> tools;
 	QButtonGroup *buttonGroup;
-
 
 
 private Q_SLOTS:
@@ -62,40 +69,6 @@ private Q_SLOTS:
 private:
 	void _saveState();
 	void _loadState();
-
-////	void loadToolsFromFilter(Filter *filter);
-////	ToolMenuItem *getToolMenuItemFor(enum tool tool);
-
-//	QButtonGroup *getButtonGroup();
-
-//	void hideMenuText(bool hidden);
-
-//Q_SIGNALS:
-////	void toolSelected(tool);
-//	void enableInfoWidget(bool);
-
-//private Q_SLOTS:
-//	void _updateToolList(short from, short to);
-
-//private:
-//	void _buildAllAvailableTools();
-//	void _saveState();
-//	void _loadState();
-
-//#ifndef __ANDROID__
-//	void _readPreferences();
-//#endif
-//private:
-
-//	QStringList d_availableTools;
-//	QStringList d_availableIcons;
-
-//	QVector<QPair<BaseMenuItem *, tool>> d_tools;
-//	QVector<int> d_positions;
-//	QVector<BaseMenuItem *> d_compatibleTools;
-//	QString d_current_hw_name;
-//	QButtonGroup *d_buttonGroup;
-//	Preferences *d_preferences;
 };
 }
 

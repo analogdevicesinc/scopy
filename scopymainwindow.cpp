@@ -2,24 +2,28 @@
 #include "ui_scopymainwindow.h"
 #include "scopyhomepage.h"
 #include <QLabel>
+#include "logging_categories.h"
+#include <contextscanner.h>
+#include <contextmanager.h>
 
+using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::ScopyMainWindow)
 {
-    ui->setupUi(this);
-    auto tb = ui->wToolBrowser;
-    auto ts = ui->wsToolStack;
-    ts->addTool("home", new ScopyHomePage());
-    ts->detachTool("home");
 
-    ts->addTool("home1", new QLabel("home1"));
-    ts->addTool("home2", new QLabel("home2"));
-    ts->addTool("home3", new QLabel("home3"));
+	auto cm = ContextManager::GetInstance();
+	ContextScanner *cs = new ContextScanner(this);
+	cs->startScan(5000);
+	cm->open("ip:192.168.2.1");
+	cm->open("ip:192.168.2.1");
+	cm->open("ip:192.168.2.1");
+	cm->close("ip:192.168.2.1");
+	auto cd = ContextManager::GetInstance();
+	cd->close("ip:192.168.2.1");
+	cd->close("ip:192.168.2.1");
 
-    connect(tb,&ToolBrowser::toolSelected,ts, &ToolStack::showTool);
-//    connect(tb,&ToolBrowser::detach,ts, &ToolStack::showTool);
-    ts->attachTool("home");
+
 
 
 }

@@ -43,6 +43,14 @@ set(PROJECT_SOURCES
         ${HEADER_LIST}
 )
 
+FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc)
+qt5_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
+find_library(IIO_LIBRARIES NAMES iio libiio)
+find_path(IIO_INCLUDE_DIRS iio.h)
+
+set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
+message(${SCOPY_RESOURCES})
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(tool_launcher
         MANUAL_FINALIZATION
@@ -56,17 +64,21 @@ else()
     if(ANDROID)
         add_library(tool_launcher SHARED
             ${PROJECT_SOURCES}
+            ${SCOPY_RESOURCES}
+            ${SCOPY_DEPENDENCIES}
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
         add_executable(tool_launcher
             ${PROJECT_SOURCES}
+            ${SCOPY_RESOURCES}
+            ${SCOPY_DEPENDENCIES}
         )
     endif()
 endif()
 
-target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES})
 
 set_target_properties(tool_launcher PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

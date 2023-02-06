@@ -26,7 +26,7 @@
 #include <QPainter>
 #include <QStyle>
 #include <QStyleOption>
-#include "gui/dynamicWidget.hpp"
+#include "gui/dynamicWidget.h"
 #include "qdebug.h"
 #include "utils.h"
 
@@ -38,26 +38,18 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 	toolRunBtn(nullptr),
 	id(id),
 	name(name),
-	iconPath(iconPath),
-	detached(false)
+	iconPath(iconPath)
 {
 	_buildUI();
 
 	// Load stylesheets
-	this->setStyleSheet(Util::loadStylesheetFromFile(":stylesheets/stylesheets/toolMenuItem.qss"));
-
-	setDynamicProperty(this, "allowHover", true);
-
-	connect(toolBtn, &QPushButton::toggled, this, [=](bool on){
-		if (!detached) {
-			setDynamicProperty(this, "selected", on);
-		}
-	});
+	this->setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/toolMenuItem.qss"));
 
 #ifdef __ANDROID__
 	setDynamicProperty(this, "allowHover", false);
 #else
-	enableDoubleClickToDetach(true);
+	setDynamicProperty(this, "allowHover", true);
+	enableDoubleClick(true);
 #endif
 }
 
@@ -83,18 +75,7 @@ void ToolMenuItem::setToolEnabled(bool enabled)
 	setEnabled(enabled);
 }
 
-void ToolMenuItem::setDetached(bool detached)
-{
-	detached = detached;
-	Q_EMIT toggleButtonGroup(detached);
-}
-
-bool ToolMenuItem::isDetached() const
-{
-	return  detached;
-}
-
-void ToolMenuItem::enableDoubleClickToDetach(bool enable)
+void ToolMenuItem::enableDoubleClick(bool enable)
 {
 	if (enable) {
 		toolBtn->installEventFilter(this);
@@ -110,7 +91,7 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
 		if (mouseEvent->button() == Qt::LeftButton) {
 			if (isEnabled()) {
-				Q_EMIT detach();
+				Q_EMIT doubleclick();
 				return true;
 			}
 		}

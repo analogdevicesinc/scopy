@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "customSwitch.hpp"
+#include "customSwitch.h"
 
 #include <QDebug>
 #include <QResizeEvent>

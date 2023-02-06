@@ -7,7 +7,10 @@
 namespace Ui {
 class ToolStack;
 }
-
+/**
+ * @brief The ToolStack class
+ */
+namespace adiscope {
 class ToolStack : public QStackedWidget
 {
 	Q_OBJECT
@@ -24,9 +27,14 @@ public Q_SLOTS:
 	void detachTool(QString tool);
 	void attachTool(QString tool);
 
+Q_SIGNALS:
+	void detachSuccesful(QString tool);
+	void attachSuccesful(QString tool);
+
 private:
 	QMap<QString, QWidget*> map;
 
 };
+}
 
 #endif // TOOLSTACK_H

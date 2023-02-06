@@ -2,18 +2,21 @@
 #define TOOLBROWSER_H
 
 #include <QWidget>
+#include <toolmenu.h>
 
 namespace Ui {
 class ToolBrowser;
 }
 
+namespace adiscope {
 class ToolBrowser : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit ToolBrowser(QWidget *parent = nullptr);
-    ~ToolBrowser();
+	explicit ToolBrowser(QWidget *parent = nullptr);
+	~ToolBrowser();
+	ToolMenu* getToolMenu();
 
 Q_SIGNALS:
 	void toolSelected(QString);
@@ -21,5 +24,6 @@ Q_SIGNALS:
 private:
     Ui::ToolBrowser *ui;
 };
+}
 
 #endif // TOOLBROWSER_H

@@ -21,7 +21,7 @@
 #ifndef BASEMENUITEM_H
 #define BASEMENUITEM_H
 
-#include "coloredQWidget.hpp"
+#include "coloredQWidget.h"
 
 #include <QFrame>
 #include <QMouseEvent>

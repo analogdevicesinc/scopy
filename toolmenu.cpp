@@ -19,6 +19,7 @@
  */
 
 #include "toolmenu.h"
+#include "gui/dynamicWidget.h"
 
 #include <QDebug>
 
@@ -54,23 +55,36 @@ ToolMenuItem* ToolMenu::addTool(QString id, QString name, QString icon, int posi
 	buttonGroup->addButton(t->getToolBtn());
 
 	connect(t->getToolBtn(), &QPushButton::clicked, this, [=](){
-		Q_EMIT toolSelected(t->getId());
+		Q_EMIT requestToolSelect(t->getId());
 	});
 
-	connect(t, &ToolMenuItem::detach, this, [=](){
-		Q_EMIT detach(t->getId());
+	connect(t, &ToolMenuItem::doubleclick, this, [=](){
+		Q_EMIT requestDetach(t->getId());
 	});
 
-
-	connect(t, &ToolMenuItem::toggleButtonGroup, this, [=](bool detached) {
-		if (detached) {
-			buttonGroup->removeButton(t->getToolBtn());
-		} else {
-			buttonGroup->addButton(t->getToolBtn());
+	connect(t->getToolBtn(), &QPushButton::toggled, this, [=](bool on){
+		if (buttonGroup->id(t->getToolBtn()) != -1) {
+			setDynamicProperty(t, "selected", on);
 		}
 	});
 
+
 	return t;
+}
+
+void ToolMenu::detachSuccesful(QString tool) {
+	auto &&t = getToolMenuItemFor(tool);
+	if(t) {
+		setDynamicProperty(t, "selected", false);
+		buttonGroup->removeButton(t->getToolBtn());
+	}
+}
+
+void ToolMenu::attachSuccesful(QString tool) {
+	auto &&t = getToolMenuItemFor(tool);
+	if(t) {
+		buttonGroup->addButton(t->getToolBtn());
+	}
 }
 
 bool ToolMenu::removeTool(QString id)

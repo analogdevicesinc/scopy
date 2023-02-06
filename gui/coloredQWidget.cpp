@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "coloredQWidget.hpp"
+#include "coloredQWidget.h"
 
 using namespace adiscope;
 
