@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 					 );
 
 	QApplication a(argc, argv);
-	a.setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/default.qss"));
+//	a.setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/default.qss"));
 	adiscope::ScopyMainWindow w;
 	w.show();
 	return a.exec();
