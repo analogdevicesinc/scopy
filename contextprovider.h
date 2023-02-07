@@ -1,5 +1,5 @@
-#ifndef CONTEXTMANAGER_H
-#define CONTEXTMANAGER_H
+#ifndef CONTEXTPROVIDER_H
+#define CONTEXTPROVIDER_H
 
 #include <QObject>
 #include <QMap>
@@ -16,27 +16,27 @@ public:
 	int refcnt = 0;
 };
 
-class ContextManager : public QObject
+class ContextProvider : public QObject
 {
 Q_OBJECT
 protected:
-	ContextManager(QObject *parent = nullptr);
-	~ContextManager();
+	ContextProvider(QObject *parent = nullptr);
+	~ContextProvider();
 	QString name;
 public:
 
-	ContextManager(ContextManager &other) = delete;
-	void operator=(const ContextManager &) = delete;
+	ContextProvider(ContextProvider &other) = delete;
+	void operator=(const ContextProvider &) = delete;
 
-	static ContextManager *GetInstance();
+	static ContextProvider *GetInstance();
 	struct iio_context* open(QString uri);
 	void close(QString uri);
 
 private:
-	static ContextManager * pinstance_;
+	static ContextProvider * pinstance_;
 	static std::mutex mutex_;
 	QMap<QString, ContextRefCounter*> map;
 
 };
 
-#endif // CONTEXTMANAGER_H
+#endif // CONTEXTPROVIDER_H

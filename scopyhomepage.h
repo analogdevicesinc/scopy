@@ -2,12 +2,12 @@
 #define SCOPYHOMEPAGE_H
 
 #include <QWidget>
-#include <gui/homepage_controls.h>
 
 namespace Ui {
 class ScopyHomePage;
 }
 
+namespace adiscope {
 class ScopyHomePage : public QWidget
 {
     Q_OBJECT
@@ -18,7 +18,7 @@ public:
 
 private:
     Ui::ScopyHomePage *ui;
-//    HomepageControls *hc;
 };
+}
 
 #endif // SCOPYHOMEPAGE_H

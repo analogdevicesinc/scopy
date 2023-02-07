@@ -1,42 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ContextManagerMenu</class>
- <widget class="QWidget" name="ContextManagerMenu">
+ <class>DeviceBrowser</class>
+ <widget class="QWidget" name="DeviceBrowser">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>541</width>
-    <height>81</height>
+    <width>400</width>
+    <height>90</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
-   <property name="spacing">
-    <number>0</number>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
-   </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <property name="rightMargin">
-      <number>0</number>
-     </property>
      <item>
       <widget class="QPushButton" name="btnHome">
        <property name="text">
@@ -46,7 +25,7 @@
         <bool>true</bool>
        </property>
        <property name="checked">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -63,16 +42,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="ContextBrowser" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_2"/>
-    </widget>
-   </item>
-   <item>
-    <widget class="Line" name="line">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
+    <widget class="QWidget" name="wDeviceBrowserMenu" native="true"/>
    </item>
    <item>
     <spacer name="horizontalSpacer">

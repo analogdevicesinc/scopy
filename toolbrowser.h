@@ -19,7 +19,7 @@ public:
 	ToolMenu* getToolMenu();
 
 Q_SIGNALS:
-	void toolSelected(QString);
+	void requestTool(QString);
 
 private:
     Ui::ToolBrowser *ui;

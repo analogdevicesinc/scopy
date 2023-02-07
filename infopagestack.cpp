@@ -3,6 +3,8 @@
 #include <QParallelAnimationGroup>
 
 using namespace adiscope;
+
+
 InfoPageStack::InfoPageStack(QWidget *parent)
 	: MapStackedWidget(parent)
 {
@@ -18,8 +20,6 @@ InfoPageStack::InfoPageStack(QWidget *parent)
 	hc->setVisible(true);
 	hc->raise();
 }
-
-
 
 InfoPageStack::~InfoPageStack()
 {

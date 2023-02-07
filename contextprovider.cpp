@@ -1,9 +1,9 @@
-#include "contextmanager.h"
+#include "contextprovider.h"
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QApplication>
 
-Q_LOGGING_CATEGORY(CAT_CTXMGR, "ContextManager")
+Q_LOGGING_CATEGORY(CAT_CTXMGR, "ContextProvider")
 
 ContextRefCounter::ContextRefCounter(QString uri)
 {
@@ -17,32 +17,32 @@ ContextRefCounter::~ContextRefCounter() {
 }
 
 
-ContextManager* ContextManager::pinstance_{nullptr};
-std::mutex ContextManager::mutex_;
+ContextProvider* ContextProvider::pinstance_{nullptr};
+std::mutex ContextProvider::mutex_;
 
-ContextManager::ContextManager(QObject *parent) : QObject(parent)
+ContextProvider::ContextProvider(QObject *parent) : QObject(parent)
 {
 	qDebug(CAT_CTXMGR)<<"ctor";
 }
 
-ContextManager::~ContextManager()
+ContextProvider::~ContextProvider()
 {
 	qDebug(CAT_CTXMGR)<<"dtor";
 }
 
-ContextManager *ContextManager::GetInstance()
+ContextProvider *ContextProvider::GetInstance()
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	if (pinstance_ == nullptr)
 	{
-		pinstance_ = new ContextManager(QApplication::instance()); // singleton has the app as parent
+		pinstance_ = new ContextProvider(QApplication::instance()); // singleton has the app as parent
 	} else {
 		qDebug(CAT_CTXMGR)<<"got instance from singleton";
 	}
 	return pinstance_;
 }
 
-iio_context *ContextManager::open(QString uri)
+iio_context *ContextProvider::open(QString uri)
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	iio_context *ctx;	
@@ -58,7 +58,7 @@ iio_context *ContextManager::open(QString uri)
 	return ctx;
 }
 
-void ContextManager::close(QString uri)
+void ContextProvider::close(QString uri)
 {
 	std::lock_guard<std::mutex> lock(mutex_);
 	if(map.contains(uri)) {
@@ -70,6 +70,7 @@ void ContextManager::close(QString uri)
 		}
 	}
 }
+
 /*
 auto cm = ContextManager::GetInstance();
 ContextScanner *cs = new ContextScanner(this);

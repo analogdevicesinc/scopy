@@ -17,10 +17,10 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
     tm->getButtonGroup()->addButton(ui->btnPreferences);
     tm->getButtonGroup()->addButton(ui->btnAbout);
 
-    connect(ui->btnHome,&QPushButton::clicked,this,[=](){Q_EMIT toolSelected("home");});
-    connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT toolSelected("preferences");});
-    connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT toolSelected("about");});
-    connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(toolSelected(QString)));
+    connect(ui->btnHome,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("home");});
+    connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
+    connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
+    connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(requestTool(QString)));
 
 
 }

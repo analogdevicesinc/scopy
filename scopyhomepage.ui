@@ -29,7 +29,7 @@
     </widget>
    </item>
    <item>
-    <widget class="ContextManagerMenu" name="wDeviceManager" native="true"/>
+    <widget class="adiscope::DeviceBrowser" name="wDeviceBrowser" native="true"/>
    </item>
    <item>
     <widget class="Line" name="line_2">
@@ -45,9 +45,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>ContextManagerMenu</class>
+   <class>adiscope::DeviceBrowser</class>
    <extends>QWidget</extends>
-   <header>contextmanagermenu.h</header>
+   <header>devicebrowser.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -2,9 +2,10 @@
 #include "ui_scopyhomepage.h"
 #include "scopyhomeinfopage.h"
 #include "addcontextordemoinfopage.h"
+#include <QPushButton>
 
-#include "ui_contextmanagermenu.h"
 
+using namespace adiscope;
 ScopyHomePage::ScopyHomePage(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ScopyHomePage)
@@ -12,19 +13,17 @@ ScopyHomePage::ScopyHomePage(QWidget *parent) :
     ui->setupUi(this);
     auto &&is = ui->wInfoPageStack;
 
-//    HomepageControls *hc;
     is->add("home",new ScopyHomeInfoPage());
     is->add("add", new AddContextOrDemoInfoPage());
     is->add("dev1", new QLabel("dev1"));
 
-    auto &&dm = ui->wDeviceManager->ui;
+    auto &&db = ui->wDeviceBrowser;
     QPushButton *w1 = new QPushButton("dev1");
-// HACKZ!
-    dm->ContextBrowser->layout()->addWidget(w1);
-    connect(dm->btnHome,&QPushButton::clicked,this,[=]{is->slideInKey("home");});
-    connect(dm->btnAdd,&QPushButton::clicked,this,[=]{is->slideInKey("add");});
-    connect(w1,&QPushButton::clicked,this,[=]{is->slideInKey("dev1");});
+    w1->setCheckable(true);
+    db->addDevice("dev1",w1);
 
+
+    connect(db,&DeviceBrowser::requestDevice,this,[=](QString k){is->slideInKey(k,true);});
 
 }
 
