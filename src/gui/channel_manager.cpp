@@ -106,6 +106,11 @@ void ChannelManager::build(QWidget* parent)
 	m_parent->layout()->addWidget(m_scrollArea);
 }
 
+int ChannelManager::getChannelID(ChannelWidget *ch)
+{
+	return m_channelsList.indexOf(ch);
+}
+
 ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool simplefied, QColor color,
 					       const QString& fullName, const QString& shortName)
 {
@@ -123,6 +128,10 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 
 	m_channelsList.append(ch);
 
+	connect(ch, &ChannelWidget::selected, this, &ChannelManager::onChannelSelected);
+	connect(ch, &ChannelWidget::enabled, this, &ChannelManager::onChannelEnabled);
+	connect(ch, &ChannelWidget::deleteClicked, this, &ChannelManager::onChannelDeleted);
+
 	if (m_position == ChannelsPositionEnum::VERTICAL) {
 		m_channelsWidget->setMinimumHeight(m_channelsList.size() * m_channelsList.first()->height());
 		m_channelsWidget->setMaximumHeight(m_channelsList.size() * m_channelsList.first()->height());
@@ -130,7 +139,7 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 			m_minChannelWidth = ch->minimumWidth();
 			m_maxChannelWidth = ch->sizeHint().width();
 			m_channelsWidget->setMinimumWidth(ch->sizeHint().width());
-			m_channelsWidget->setMaximumWidth(ch->width());
+			m_channelsWidget->setMaximumWidth(m_maxChannelWidth);
 		}
 		else {
 			//RESIZE CHANNELS
@@ -146,6 +155,8 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 		m_channelsWidget->setMinimumHeight(m_channelsList.first()->height());
 		m_channelsWidget->setMaximumHeight(m_channelsList.first()->height());
 	}
+
+	ch->enableButton()->setChecked(true);
 
 	return ch;
 }
@@ -232,7 +243,7 @@ void ChannelManager::changeParent(QWidget* newParent)
 		m_parent->setMaximumHeight(INT_MAX);
 
 		m_parent->setMaximumWidth(m_maxChannelWidth);
-		m_parent->setMinimumWidth(header->width());
+		m_parent->setMinimumWidth(m_maxChannelWidth);
 
 	} else {
 		m_parent->setMinimumHeight(ch_height + 8);
@@ -319,6 +330,36 @@ void ChannelManager::toggleChannelManager(bool toggled)
 		c->setMinimumWidth(currentWidth);
 	}
 }
+
+void ChannelManager::onChannelSelected(bool toggled)
+{
+	ChannelWidget* ch = dynamic_cast<ChannelWidget *>(sender());
+	if (ch != nullptr) {
+		int id = m_channelsList.indexOf(ch);
+
+		Q_EMIT selectedChannel(id);
+	}
+}
+
+void ChannelManager::onChannelEnabled(bool enabled)
+{
+	ChannelWidget* ch = dynamic_cast<ChannelWidget *>(sender());
+	if (ch != nullptr) {
+		int id = m_channelsList.indexOf(ch);
+
+		Q_EMIT enabledChannel(id, enabled);
+	}
+}
+
+void ChannelManager::onChannelDeleted()
+{
+	ChannelWidget* ch = dynamic_cast<ChannelWidget *>(sender());
+	if (ch != nullptr) {
+
+		Q_EMIT deletedChannel(ch->shortName());
+	}
+}
+
 
 const QString &ChannelManager::getToolStatus() const
 {

@@ -1,9 +1,11 @@
 #include "newinstrument.hpp"
 #include <gui/tool_view_builder.hpp>
+#include "gui/dynamicWidget.hpp"
 #include "plugin/ichannelplugin.h"
 #include "plugin/irightmenuplugin.h"
 #include "plugin/physical_channelplugin.cpp"
-#include <plugin/add_channelplugin/cpp.cpp>
+#include <plugin/add_channelplugin.cpp>
+#include <plugin/cursors_rightmenuplugin.cpp>
 
 
 using namespace adiscope;
@@ -39,48 +41,13 @@ NewInstrument::NewInstrument(struct iio_context *ctx, Filter *filt,
 	this->setLayout(new QVBoxLayout(this));
 	this->layout()->addWidget(m_toolView);
 
-	run_button = m_toolView->getRunBtn();
+	initPlot();
 
 	initGeneralSettings();
 	addPlugins();
-}
 
-void NewInstrument::initGeneralSettings()
-{
-	m_generalSettingsMenu = new GenericMenu(this);
-	m_generalSettingsMenu->initInteractiveMenu();
-	m_generalSettingsMenu->setMenuHeader("General Settings", new QColor("grey"), false);
-	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu, false);
-}
 
-void NewInstrument::addPlugins()
-{
-	if (m_recipe.hasChannels) {
-		// add plugins
-		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-		m_channelPluginList.push_back(new AddChannelPlugin(this, m_toolView, m_channelManager));
-
-		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView));
-		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView));
-		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView));
-
-		// init plugins
-		for (auto ch: m_channelPluginList) {
-			ch->init();
-		}
-
-		for (auto ch: m_rightMenuPluginList) {
-			ch->init();
-		}
-	}
+	connectSignals();
 }
 
 NewInstrument::~NewInstrument()
@@ -102,5 +69,128 @@ NewInstrument::~NewInstrument()
 		delete m_toolView;
 		run_button = nullptr;
 		m_toolView = nullptr;
+	}
+}
+
+void NewInstrument::initPlot()
+{
+	double start = 0, stop = 50000000;
+
+	m_toolView->getCentralWidget()->setStyleSheet("background-color: black;");
+
+	fft_plot = new FftDisplayPlot(m_channelPluginList.size(), this);
+//	fft_plot->disableLegend();
+	fft_plot->setXaxisMouseGesturesEnabled(false);
+
+	fft_plot->setZoomerEnabled();
+	fft_plot->setAxisVisible(QwtAxis::XBottom, false);
+	fft_plot->setAxisVisible(QwtAxis::YLeft, false);
+	fft_plot->setUsingLeftAxisScales(false);
+	fft_plot->enableXaxisLabels();
+	fft_plot->enableYaxisLabels();
+//	setYAxisUnit(ui->cmb_units->currentText());
+	fft_plot->setBtmHorAxisUnit("Hz");
+
+//	fft_plot->setStartStop(start, stop);
+	fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
+	fft_plot->replot();
+	fft_plot->bottomHandlesArea()->repaint();
+
+	m_toolView->addFixedCentralWidget(fft_plot->getPlotwithElements(), 0, 0, 1, 1);
+}
+
+FftDisplayPlot *NewInstrument::getPlot()
+{
+	return fft_plot;
+}
+
+void NewInstrument::initGeneralSettings()
+{
+	m_generalSettingsMenu = new GenericMenu(this);
+	m_generalSettingsMenu->initInteractiveMenu();
+	m_generalSettingsMenu->setMenuHeader("General Settings", new QColor("grey"), false);
+	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu, false);
+}
+
+void NewInstrument::connectSignals()
+{
+	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=](bool toggled){
+		toolMenuItem->getToolStopBtn()->setChecked(toggled);
+		startStop(toggled);
+	});
+
+	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, [=](bool toggled){
+		toolMenuItem->getToolStopBtn()->setChecked(toggled);
+		startStop(toggled);
+	});
+
+	connect(toolMenuItem->getToolStopBtn(), &QPushButton::toggled, this, [=](bool toggled){
+		m_toolView->getRunBtn()->setChecked(toggled);
+		startStop(toggled);
+	});
+
+	connect(this, SIGNAL(selectedChannelChanged(int)),
+		fft_plot, SLOT(setSelectedChannel(int)));
+
+	connect(m_channelManager, &ChannelManager::selectedChannel, this, &NewInstrument::onChannelSelected);
+	connect(m_channelManager, &ChannelManager::enabledChannel, this, &NewInstrument::onChannelEnabled);
+	connect(m_channelManager, &ChannelManager::deletedChannel, this, &NewInstrument::onChannelDeleted);
+}
+
+void NewInstrument::onChannelSelected(int id)
+{
+	fft_plot->bringCurveToFront(id);
+	fft_plot->setSelectedChannel(id);
+	fft_plot->replot();
+}
+
+void NewInstrument::onChannelEnabled(int id, bool enabled)
+{
+	fft_plot->Curve(id)->setVisible(enabled);
+	fft_plot->replot();
+}
+
+void NewInstrument::onChannelDeleted(QString name)
+{
+	fft_plot->unregisterReferenceWaveform(name);
+}
+
+void NewInstrument::start()
+{
+}
+
+void NewInstrument::stop()
+{
+}
+
+void NewInstrument::startStop(bool pressed)
+{
+	if (pressed) {
+		start();
+	} else {
+		stop();
+	}
+
+//	setDynamicProperty(run_button, "running", pressed);
+}
+
+void NewInstrument::addPlugins()
+{
+	if (m_recipe.hasChannels) {
+		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager));
+//		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
+//		m_channelPluginList.push_back(new AddChannelPlugin(this, m_toolView, m_channelManager));
+
+		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView));
+		m_rightMenuPluginList.push_back(new CursorsRightMenuPlugin(this, m_toolView, true, true, m_channelManager, getPlot()));
+
+		// init plugins
+		for (int i=0; i<m_channelPluginList.size(); i++) {
+			m_channelPluginList[i]->init();
+		}
+
+		for (auto ch: m_rightMenuPluginList) {
+			ch->init();
+		}
 	}
 }

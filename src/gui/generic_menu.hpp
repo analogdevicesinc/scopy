@@ -26,6 +26,7 @@ public:
 	void setMenuHeader(const QString& title, const QColor* lineColor, bool hasEnableBtn);
 	void insertSection(SubsectionSeparator* section);
 
+	void setMenuWidget(QWidget *widget);
 Q_SIGNALS:
 	void enableBtnToggled(bool toggled);
 

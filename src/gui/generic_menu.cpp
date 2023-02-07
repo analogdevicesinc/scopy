@@ -13,8 +13,8 @@ GenericMenu::GenericMenu(QWidget* parent)
 
 GenericMenu::~GenericMenu()
 {
-	delete m_menuHeader;
-	delete m_menu;
+//	delete m_menuHeader;
+//	delete m_menu;
 }
 
 void GenericMenu::initInteractiveMenu()
@@ -48,3 +48,17 @@ void GenericMenu::insertSection(SubsectionSeparator* section)
 	m_lastOpenPosition++;
 }
 
+void GenericMenu::setMenuWidget(QWidget *widget)
+{
+	this->setStyleSheet(".QWidget { background-color: transparent; }");
+
+	delete m_menuHeader;
+	delete m_menu;
+
+	this->layout()->removeWidget(m_menuHeader);
+	this->layout()->removeWidget(m_menu);
+	this->layout()->setSpacing(0);
+	this->layout()->setContentsMargins(0, 0, 0, 0);
+
+	this->layout()->addWidget(widget);
+}

@@ -1,5 +1,4 @@
-﻿#include "custom_menu_button.hpp"
-#include "ui_tool_view.h"
+﻿#include "ui_tool_view.h"
 
 #include <QMainWindow>
 #include "channel_widget.hpp"
@@ -13,6 +12,7 @@ using namespace adiscope::gui;
 ToolView::ToolView(QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::ToolView)
+	, m_nextMenuIndex(0)
 {
 	m_ui->setupUi(this);
 
@@ -221,7 +221,8 @@ void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 			}
 		});
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		id = getNewID();
 		m_menuList[id] = dynamic_cast<gui::GenericMenu *>(menu);
 	}
 
@@ -334,11 +335,10 @@ void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* 
 
 int ToolView::getNewID()
 {
-	// only use for channels
-	return INT_MAX - m_channelsGroup.buttons().size();
+	return m_nextMenuIndex++;
 }
 
-void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible,
+CustomMenuButton *ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible,
 				      bool checkBoxChecked)
 {
 	m_ui->widgetFooter->setVisible(true);
@@ -362,7 +362,8 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 		});
 
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		id = getNewID();
 		m_menuList[id] = menu;
 	}
 
@@ -389,6 +390,8 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 	if ((checkBoxVisible && checkBoxChecked) || !checkBoxVisible) {
 		m_menuOrder.push_back(btn->getBtn());
 	}
+
+	return btn;
 }
 
 void ToolView::addFixedCentralWidget(QWidget *widget, int row, int column, int rowspan, int columnspan)
@@ -474,7 +477,9 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 			generalSettingsBtn->setDisabled(topLevel);
 		});
 	} else {
-		m_generalSettingsMenuId = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		m_generalSettingsMenuId = getNewID();
+
 	}
 
 	generalSettingsBtn->setProperty("id", QVariant(-m_generalSettingsMenuId));
@@ -498,7 +503,8 @@ void ToolView::setFixedMenu(QWidget* menu, bool dockable)
 		connect(docker, &QDockWidget::topLevelChanged,
 			[=](bool topLevel) { m_ui->widgetMenuAnim->toggleMenu(!topLevel); });
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		id = getNewID();
 	}
 
 	settingsPanelUpdate(-id);

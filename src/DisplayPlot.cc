@@ -1201,8 +1201,18 @@ void DisplayPlot::displayIntersection()
 	replot();
 }
 
+void DisplayPlot::setSelectedChannel(int id)
+{
+	if (d_selected_channel != id)  {
+		d_selected_channel = id;
+	}
+}
+
 double DisplayPlot::getHorizontalCursorIntersection(double time)
 {
+	if (Curve(d_selected_channel) == nullptr) {
+		return -1;
+	}
 	int n = Curve(d_selected_channel)->data()->size();
 
 	if (n == 0) {

@@ -44,14 +44,24 @@ public:
 	void setToolStatus(const QString &newToolStatus);
 	void enableSwitchButton(bool en);
 
+	int getChannelID(ChannelWidget *ch);
+
 public Q_SLOTS:
 	void changeParent(QWidget* newParent);
 	void toggleChannelManager(bool toggled);
+
+	void onChannelSelected(bool toggled);
+	void onChannelEnabled(bool toggled);
+	void onChannelDeleted();
 
 Q_SIGNALS:
 	void configureAddBtn(QWidget* menu, bool dockable);
 	void positionChanged(ChannelsPositionEnum position);
 	void channelManagerToggle(bool toggled);
+
+	void selectedChannel(int id);
+	void enabledChannel(int id, bool toggled);
+	void deletedChannel(QString name);
 
 private:
 	QWidget* m_parent;

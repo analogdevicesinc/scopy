@@ -16,14 +16,17 @@ public:
 	~IChannelPlugin();
 
 	virtual void init();
+	virtual void setColor(QColor color);
+	virtual std::vector<ChannelWidget*> getChannelList();
 
 	QWidget *parent;
 	gui::ToolView* toolView;
 	gui::ChannelManager* chManager;
 	gui::GenericMenu* menu;
+	ChannelWidget *ch;
+	std::vector<ChannelWidget*> channelList;
 
-Q_SIGNALS:
-
+public Q_SLOTS:
 };
 }
 //}

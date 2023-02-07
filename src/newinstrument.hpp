@@ -10,6 +10,8 @@
 
 namespace adiscope {
 
+class FftDisplayPlot;
+
 class IRightMenuPlugin;
 class IChannelPlugin;
 
@@ -34,6 +36,19 @@ public:
 
 	void initGeneralSettings();
 	void addPlugins();
+
+	FftDisplayPlot *getPlot();
+public:
+//	std::vector<ChannelWidget *> chanWidgetList;
+
+private Q_SLOT:
+	void startStop(bool pressed);
+
+public Q_SLOT:
+	void onChannelSelected(int id);
+	void onChannelEnabled(int id, bool enabled);
+	void onChannelDeleted(QString name);
+
 private:
 	ToolLauncher *m_parent;
 	gui::ToolViewRecipe m_recipe;
@@ -42,6 +57,13 @@ private:
 	gui::ChannelManager* m_channelManager;
 	std::vector<IChannelPlugin *> m_channelPluginList;
 	std::vector<IRightMenuPlugin *> m_rightMenuPluginList;
+
+	FftDisplayPlot *fft_plot;
+
+	void connectSignals();
+	void start();
+	void stop();
+	void initPlot();
 };
 }
 #endif // NEWINSTRUMENT_HPP

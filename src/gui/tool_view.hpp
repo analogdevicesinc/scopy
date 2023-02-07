@@ -11,6 +11,7 @@
 #include "channel_manager.hpp"
 #include "channel_widget.hpp"
 #include "customPushButton.hpp"
+#include "custom_menu_button.hpp"
 #include "generic_menu.hpp"
 #include "linked_button.hpp"
 #include "menu_anim.hpp"
@@ -69,7 +70,7 @@ public:
 				       bool deletable, bool simplified, QColor color, const QString& fullName,
 				       const QString& shortName);
 	void buildChannelGroup(ChannelManager* channelManager,ChannelWidget* mainChannal, std::vector<ChannelWidget*> channelGroup);
-	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
+	CustomMenuButton *buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
 
 	void addFixedCentralWidget(QWidget* widget, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
@@ -119,6 +120,8 @@ private:
 	QList<QDockWidget*> m_docksList;
 	QList<QWidget*> m_centralFixedWidgets;
 	QMap<int,GenericMenu*> m_menuList;
+
+	int m_nextMenuIndex;
 };
 } // namespace gui
 } // namespace adiscope

@@ -261,6 +261,7 @@ namespace adiscope {
 		QString formatXValue(double value, int precision) const;
 		QString formatYValue(double value, int precision) const;
 
+		void addChannel();
 	Q_SIGNALS:
 		void channelAdded(int);
 		void newData();

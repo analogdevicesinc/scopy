@@ -428,6 +428,7 @@ public:
   virtual QString formatXValue(double value, int precision) const;
   virtual QString formatYValue(double value, int precision) const;
 
+  void setSelectedChannel(int id);
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);

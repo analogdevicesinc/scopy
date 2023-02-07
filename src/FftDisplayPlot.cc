@@ -213,6 +213,39 @@ FftDisplayPlot::~FftDisplayPlot()
 	canvas()->removeEventFilter(d_symbolCtrl);
 }
 
+void FftDisplayPlot::addChannel()
+{
+	auto plot = new QwtPlotCurve(QString("CH %1").arg(d_nplots + 1));
+	plot->setPaintAttribute(QwtPlotCurve::ClipPolygons);
+	plot->setPaintAttribute(QwtPlotCurve::ImageBuffer);
+	plot->setPaintAttribute(QwtPlotCurve::FilterPoints);
+	plot->setPaintAttribute(QwtPlotCurve::FilterPointsAggressive);
+
+	plot->setPen(QPen(d_CurveColors[d_nplots]));
+	plot->attach(this);
+
+	d_plot_curve.push_back(plot);
+	y_data.push_back(nullptr);
+	y_original_data.push_back(nullptr);
+
+	d_ch_average_type.push_back(AverageType::SAMPLE);
+
+	d_num_markers.push_back(0);
+	d_markers.push_back(QList<marker>());
+	d_peaks.push_back(
+		QList<std::shared_ptr<marker_data>>());
+	d_freq_asc_sorted_peaks.push_back(
+		QList<std::shared_ptr<marker_data>>());
+	d_current_avg_index.push_back(0);
+
+	d_nplots++;
+
+	y_scale_factor.resize(d_nplots);
+	d_ch_avg_obj.resize(d_nplots);
+	d_win_coefficient_sum_sqr.resize(d_nplots);
+	d_win_coefficient_sum.resize(d_nplots);
+}
+
 void FftDisplayPlot::initChannelMeasurement(int nplots) {
      Q_EMIT channelAdded(nplots);
 }
