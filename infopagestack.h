@@ -23,7 +23,7 @@ public:
 
 public Q_SLOTS:
 	bool show(QString key) override;
-	bool slideInKey(QString key, bool left2right = false);
+	bool slideInKey(QString key, int direction);
 
 protected Q_SLOTS:
 	void animationDone();
@@ -33,7 +33,7 @@ private:
 		LEFT2RIGHT,
 		RIGHT2LEFT
 	};
-	void slideInWidget(QWidget *newWidget, InfoPageStack::direction direction);
+	void slideInWidget(QWidget *newWidget, int direction);
 
 	HomepageControls *hc;
 

@@ -25,3 +25,7 @@ html/
 build_arm64-v8a/
 doc/*
 doc/!Doxyfile*
+.cache/*
+build/*
+.vscode/*
+CMakeLists.txt.user

@@ -24,16 +24,19 @@ public:
 	void removeDevice(QString id);
 
 Q_SIGNALS:
-	void requestDevice(QString id);
+	void requestDevice(QString id, int direction);	
 
-//public Q_SLOTS:
-//	void nextDevice();
-//	void prevDevice();
+public Q_SLOTS:	
+
+	void nextDevice();
+	void prevDevice();	
 
 private Q_SLOTS:
 	void updateSelectedDeviceIdx(QString);
+	void forwardRequestDeviceWithDirection();
 
 private:
+	void initBtns();
 	Ui::DeviceBrowser *ui;
 	QButtonGroup *bg;
 	QHBoxLayout *layout;

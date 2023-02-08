@@ -1,7 +1,6 @@
 #include "toolbrowser.h"
 #include "ui_toolbrowser.h"
 #include <QDebug>
-#include "toolmenuitem.h"
 
 using namespace adiscope;
 
@@ -21,8 +20,6 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
     connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
     connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
     connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(requestTool(QString)));
-
-
 }
 
 ToolMenu* ToolBrowser::getToolMenu() {

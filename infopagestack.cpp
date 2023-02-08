@@ -1,9 +1,12 @@
 #include "infopagestack.h"
 #include "gui/customanimation.h"
 #include <QParallelAnimationGroup>
+#include <QLoggingCategory>
+#include <QDebug>
 
 using namespace adiscope;
 
+Q_LOGGING_CATEGORY(CAT_INFOPAGESTACK, "InfoPageStack")
 
 InfoPageStack::InfoPageStack(QWidget *parent)
 	: MapStackedWidget(parent)
@@ -19,11 +22,13 @@ InfoPageStack::InfoPageStack(QWidget *parent)
 	next = 0;
 	hc->setVisible(true);
 	hc->raise();
+	qDebug(CAT_INFOPAGESTACK)<<"ctor";
 }
 
 InfoPageStack::~InfoPageStack()
 {
 	this->removeEventFilter(hc);
+	qDebug(CAT_INFOPAGESTACK)<<"dtor";
 }
 
 void InfoPageStack::add(QString key, QWidget *w)
@@ -44,11 +49,11 @@ bool InfoPageStack::show(QString key)
 	return ret;
 }
 
-bool InfoPageStack::slideInKey(QString key, bool left2right) {
+bool InfoPageStack::slideInKey(QString key, int direction) {
 	QWidget *w = map.value(key);
 	if(!w)
 		return false;
-	slideInWidget(w, static_cast<direction>(left2right));
+	slideInWidget(w, direction);
 	return true;
 }
 
@@ -61,7 +66,7 @@ void InfoPageStack::animationDone()
 	hc->raise();
 }
 
-void InfoPageStack::slideInWidget(QWidget *newWidget, InfoPageStack::direction direction)
+void InfoPageStack::slideInWidget(QWidget *newWidget, int direction)
 {
 	if (active) {
 		if (this->next != indexOf(newWidget)) {
@@ -83,7 +88,7 @@ void InfoPageStack::slideInWidget(QWidget *newWidget, InfoPageStack::direction d
 	int offsety = frameRect().height();
 	widget(next)->setGeometry(0, 0, offsetx, offsety);
 
-	if (direction == RIGHT2LEFT) {
+	if (direction < 0) {
 		offsetx = - offsetx;
 		offsety = 0;
 	} else {
