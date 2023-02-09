@@ -24,6 +24,7 @@ ScopyHomePage::ScopyHomePage(QWidget *parent) :
 	connect(hc,SIGNAL(goLeft()),db,SLOT(prevDevice()));
 	connect(hc,SIGNAL(goRight()),db,SLOT(nextDevice()));
 	connect(db,SIGNAL(requestDevice(QString,int)),is,SLOT(slideInKey(QString,int)));
+	connect(db,SIGNAL(requestDevice(QString,int)),this,SIGNAL(requestDevice(QString)));
 }
 
 ScopyHomePage::~ScopyHomePage()

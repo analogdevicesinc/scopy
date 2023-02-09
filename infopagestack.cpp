@@ -60,8 +60,8 @@ bool InfoPageStack::slideInKey(QString key, int direction) {
 void InfoPageStack::animationDone()
 {
 	setCurrentIndex(next);
-	widget(current)->hide();
-	widget(current)->move(now);
+//	widget(current)->hide();
+//	widget(current)->move(now);
 	active = false;
 	hc->raise();
 }

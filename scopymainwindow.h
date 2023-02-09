@@ -20,6 +20,7 @@ public:
     ScopyMainWindow(QWidget *parent = nullptr);
     ~ScopyMainWindow();
 public Q_SLOTS:
+    void addToolsToUi(QString id);
     void addDeviceToUi(QString id, Device *d);
     void removeDeviceFromUi(QString);
 

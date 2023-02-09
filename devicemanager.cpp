@@ -11,6 +11,15 @@ DeviceManager::DeviceManager(QObject *parent)
 
 }
 
+Device* DeviceManager::getDevice(QString uri) {
+
+	Device *d = nullptr;
+	if(map.contains(uri)) {
+		d = map.value(uri, nullptr);
+	}
+	return d;
+}
+
 void DeviceManager::addDevice(QString uri)
 {	
 	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "added";
@@ -37,7 +46,7 @@ void DeviceManager::removeDevice(QString uri)
 {	
 	Device *d = nullptr;
 	if(map.contains(uri)) {
-		d = map.value(uri,nullptr);
+		d = map.take(uri);
 		delete(d);
 	}
 	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "removed";

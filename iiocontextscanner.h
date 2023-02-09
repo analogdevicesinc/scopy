@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTimer>
 #include <iio.h>
+#include "iiocontextscannerthread.h"
 
 namespace adiscope {
 
@@ -13,18 +14,21 @@ class IIOContextScanner : public QObject
 public:
 	IIOContextScanner(QObject *parent = nullptr);
 	~IIOContextScanner();
-	void startScan(int period = 5000, bool now = true);
+	void startScan(int period = 5000, QString scanParams = "");
 	void stopScan();
-	void setScanParams(QString s);
+	static int scan(QStringList *ctxs, QString scanParams);
 
 Q_SIGNALS:
 	void scanFinished(QStringList);
 
-public Q_SLOTS:
-	void scan();
+private Q_SLOTS:
+	void startScanThread();
 private:
+
 	QTimer *t;
+	IIOContextScannerThread* scannerThread;
 	QString scanParams;
+	const int THREAD_FINISH_TIMEOUT = 30000;
 };
 }
 #endif // IIOCONTEXTSCANNER_H

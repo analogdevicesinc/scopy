@@ -76,9 +76,16 @@ void DeviceBrowser::removeDevice(QString id)
 	QAbstractButton *w = getDeviceWidgetFor(id);
 	layout->removeWidget(w);
 	bg->removeButton(w);
-	list.removeAt(getIndexOfId(id));
+	int idx = getIndexOfId(id);
+	list.removeAt(idx);
 	disconnect(w, &QAbstractButton::clicked, this, nullptr); // disconnect all signals connected to this instance
 	delete(w);
+
+	if(currentIdx == idx) // removed currently selected device
+	{
+		currentIdx = 0;
+		Q_EMIT requestDevice("home",-1);
+	}
 }
 
 

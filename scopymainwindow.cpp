@@ -29,19 +29,36 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 ts->add("about", new QLabel("about scopy ... "));
 
 	 connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
+
 	 connect(scc,SIGNAL(foundDevice(QString)),dm,SLOT(addDevice(QString)));
 	 connect(scc,SIGNAL(lostDevice(QString)),dm,SLOT(removeDevice(QString)));
 
 	 connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
 	 connect(dm,SIGNAL(deviceRemoved(QString)),this,SLOT(removeDeviceFromUi(QString)));
-
-//	 connect(hp,SIGNAL())
+	 connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(addToolsToUi(QString)));
 
 	 cs->startScan(2000);
 }
 
+///// DRAFT - ToolManagerHere
+void ScopyMainWindow::addToolsToUi(QString id) {
+	auto tb = ui->wToolBrowser;
+	auto ts = ui->wsToolStack;
+	auto tm = tb->getToolMenu();
+	Device* d = dm->getDevice(id);
+	for(auto &&tool : tm->getTools()) {
+		tm->removeTool(tool);
+	}
+
+	for(auto &&tool: d->toolList()) {
+		tm -> addTool(tool + id, tool,"");
+	}
+
+}
+
 ScopyMainWindow::~ScopyMainWindow()
 {
+	cs->stopScan();
 	delete ui;
 }
 

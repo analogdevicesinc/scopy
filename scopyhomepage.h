@@ -18,6 +18,7 @@ public:
 Q_SIGNALS:
 
 	void requestAddDevice(QString id);
+	void requestDevice(QString id);
 
 public Q_SLOTS:
 	void addDevice(QString id, QString name, QString description, QWidget *icon, QWidget *page);

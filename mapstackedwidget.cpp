@@ -26,10 +26,11 @@ void MapStackedWidget::add(QString key, QWidget *w)
 
 bool MapStackedWidget::remove(QString key)
 {
-	QWidget *w = map[key];
-	if(w) {
-		removeWidget(map[key]);
-		map.remove(key);
+	QWidget *w = map.take(key);
+	if(w) {		
+//		if(indexOf(w) == currentIndex())
+//			setCurrentIndex(0);
+		removeWidget(w);
 	} else {
 		qWarning(CAT_MAPSTACKWIDGET)<<key<< "not found in MapStackWidget. cannot remove";
 		return false;

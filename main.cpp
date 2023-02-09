@@ -16,5 +16,7 @@ int main(int argc, char *argv[])
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/default.qss"));
 	adiscope::ScopyMainWindow w;
 	w.show();
-	return a.exec();
+	int ret = a.exec();
+	printf("Scopy finished gracefully\n");
+	return ret;
 }
