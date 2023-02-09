@@ -1,5 +1,5 @@
-#ifndef CONTEXTSCANNER_H
-#define CONTEXTSCANNER_H
+#ifndef IIOCONTEXTSCANNER_H
+#define IIOCONTEXTSCANNER_H
 
 #include <QObject>
 #include <QTimer>
@@ -7,12 +7,12 @@
 
 namespace adiscope {
 
-class ContextScanner : public QObject
+class IIOContextScanner : public QObject
 {
 	Q_OBJECT
 public:
-	ContextScanner(QObject *parent = nullptr);
-	~ContextScanner();
+	IIOContextScanner(QObject *parent = nullptr);
+	~IIOContextScanner();
 	void startScan(int period = 5000, bool now = true);
 	void stopScan();
 	void setScanParams(QString s);
@@ -27,4 +27,4 @@ private:
 	QString scanParams;
 };
 }
-#endif // CONTEXTSCANNER_H
+#endif // IIOCONTEXTSCANNER_H

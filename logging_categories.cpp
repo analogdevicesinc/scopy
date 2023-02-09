@@ -39,7 +39,7 @@ Q_LOGGING_CATEGORY(CAT_PLOT, "plot")
 void SetScopyQDebugMessagePattern() {
 
 	qSetMessagePattern(
-		"[ "
+		"Ionut [ "
 		#ifdef QDEBUG_LOG_MSG_TYPE
 			QDEBUG_LOG_MSG_TYPE_STR " "
 			QDEBUG_CATEGORY_STR " "

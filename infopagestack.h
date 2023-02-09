@@ -29,12 +29,7 @@ protected Q_SLOTS:
 	void animationDone();
 
 private:
-	enum direction {
-		LEFT2RIGHT,
-		RIGHT2LEFT
-	};
 	void slideInWidget(QWidget *newWidget, int direction);
-
 	HomepageControls *hc;
 
 	enum QEasingCurve::Type animationType;

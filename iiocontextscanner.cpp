@@ -1,24 +1,24 @@
-#include "contextscanner.h"
+#include "iiocontextscanner.h"
 
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QElapsedTimer>
 
-Q_LOGGING_CATEGORY(CAT_CTXSCANNER, "ContextScanner")
+Q_LOGGING_CATEGORY(CAT_CTXSCANNER, "IIOContextScanner")
 
 using namespace adiscope;
-ContextScanner::ContextScanner(QObject *parent) : QObject(parent)
+IIOContextScanner::IIOContextScanner(QObject *parent) : QObject(parent)
 {
 	qDebug(CAT_CTXSCANNER)<< "ctor ";
 	t = new QTimer(this);
-	connect(t, &QTimer::timeout,this,&ContextScanner::scan);
+	connect(t, &QTimer::timeout,this,&IIOContextScanner::scan);
 }
 
-ContextScanner::~ContextScanner() {
+IIOContextScanner::~IIOContextScanner() {
 	qDebug(CAT_CTXSCANNER)<< "dtor ";
 }
 
-void ContextScanner::startScan(int period, bool now)
+void IIOContextScanner::startScan(int period, bool now)
 {
 	if(now)
 	{
@@ -28,18 +28,18 @@ void ContextScanner::startScan(int period, bool now)
 	t->start(period);
 }
 
-void ContextScanner::stopScan()
+void IIOContextScanner::stopScan()
 {
 	t->stop();
 }
 
-void ContextScanner::setScanParams(QString s)
+void IIOContextScanner::setScanParams(QString s)
 {
 	// mutex (?)
 	scanParams = s;
 }
 
-void ContextScanner::scan()
+void IIOContextScanner::scan()
 {
 	qDebug(CAT_CTXSCANNER)<< "start scanning";
 	struct iio_scan_context *scan_ctx = NULL;
@@ -86,7 +86,6 @@ scan_err:
 }
 
 /*
-	auto cm = ContextManager::GetInstance();
 	ContextScanner *cs = new ContextScanner(this);
 	ScannedContextCollector *scc = new ScannedContextCollector(this);
 	connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));

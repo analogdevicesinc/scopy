@@ -3,6 +3,11 @@
 
 #include <QMainWindow>
 
+#include "scopyhomepage.h"
+#include "devicemanager.h"
+#include "iiocontextscanner.h"
+#include "scannediiocontextcollector.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
 QT_END_NAMESPACE
@@ -14,8 +19,16 @@ class ScopyMainWindow : public QMainWindow
 public:
     ScopyMainWindow(QWidget *parent = nullptr);
     ~ScopyMainWindow();
+public Q_SLOTS:
+    void addDeviceToUi(QString id, Device *d);
+    void removeDeviceFromUi(QString);
 
 private:
+    ScopyHomePage *hp;
+    DeviceManager *dm;
+    IIOContextScanner *cs;
+    ScannedIIOContextCollector *scc;
+
     Ui::ScopyMainWindow *ui;
 };
 }

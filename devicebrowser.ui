@@ -10,16 +10,57 @@
     <height>90</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QPushButton" name="btnHome">
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {height: 40px;width: 40px;border-width: 0px;}</string>
+       </property>
        <property name="text">
-        <string>Home</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/launcher_home.svg</normalon>
+        </iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
        </property>
        <property name="checkable">
         <bool>true</bool>
@@ -27,14 +68,40 @@
        <property name="checked">
         <bool>false</bool>
        </property>
+       <property name="blue_button" stdset="0">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnAdd">
+       <property name="maximumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">QPushButton {height: 40px;width: 40px;border-width: 0px;}</string>
+       </property>
        <property name="text">
-        <string>Add</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset>
+         <normalon>:/icons/launcher_add.svg</normalon>
+        </iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
        </property>
        <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="blue_button" stdset="0">
         <bool>true</bool>
        </property>
       </widget>
@@ -42,7 +109,14 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="wDeviceBrowserMenu" native="true"/>
+    <widget class="QWidget" name="wDeviceBrowserMenu" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item>
     <spacer name="horizontalSpacer">

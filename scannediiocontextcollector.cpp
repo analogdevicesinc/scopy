@@ -1,21 +1,21 @@
-#include "scannedcontextcollector.h"
+#include "scannediiocontextcollector.h"
 #include <QDebug>
 #include <QLoggingCategory>
 
-Q_LOGGING_CATEGORY(CAT_SCANCTXCOLLECTOR, "ScanContextCollector")
+Q_LOGGING_CATEGORY(CAT_SCANCTXCOLLECTOR, "ScannedIIOContextCollector")
 
-ScannedContextCollector::ScannedContextCollector(QObject *parent)
+ScannedIIOContextCollector::ScannedIIOContextCollector(QObject *parent)
 	: QObject{parent}
 {
 	qDebug(CAT_SCANCTXCOLLECTOR) << "ctor";
 }
 
-ScannedContextCollector::~ScannedContextCollector()
+ScannedIIOContextCollector::~ScannedIIOContextCollector()
 {
 	qDebug(CAT_SCANCTXCOLLECTOR) << "dtor";
 }
 
-void ScannedContextCollector::update(QStringList list)
+void ScannedIIOContextCollector::update(QStringList list)
 {
 	QSet<QString> updatedUris = QSet<QString>(list.begin(),list.end());
 	auto newUris = updatedUris - uris;
@@ -24,13 +24,13 @@ void ScannedContextCollector::update(QStringList list)
 	qDebug(CAT_SCANCTXCOLLECTOR) << "cached uris:" << uris;
 	for (const auto &uri : newUris) {
 		qInfo(CAT_SCANCTXCOLLECTOR) << "new device found: " << uri;
-		Q_EMIT newDevice(uri);
+		Q_EMIT foundDevice(uri);
 
 	}
 
 	for (const auto &uri : deletedUris) {
 		qInfo(CAT_SCANCTXCOLLECTOR) << "to delete device: " << uri;
-		Q_EMIT deleteDevice(uri);
+		Q_EMIT lostDevice(uri);
 
 	}
 
@@ -39,7 +39,7 @@ void ScannedContextCollector::update(QStringList list)
 
 }
 
-void ScannedContextCollector::clearCache()
+void ScannedIIOContextCollector::clearCache()
 {
 	uris.clear();
 }

@@ -20,11 +20,11 @@ public:
 	explicit DeviceBrowser(QWidget *parent = nullptr);
 	~DeviceBrowser();
 	QAbstractButton *getDeviceWidgetFor(QString id);
-	void addDevice(QString id, QAbstractButton *w, int position = -1);
-	void removeDevice(QString id);
+	void addDevice(QString id, QString name, QString description, QWidget *icon, int position = -1);
+	void removeDevice(QString id);	
 
 Q_SIGNALS:
-	void requestDevice(QString id, int direction);	
+	void requestDevice(QString id, int direction);
 
 public Q_SLOTS:	
 
@@ -37,6 +37,7 @@ private Q_SLOTS:
 
 private:
 	void initBtns();
+	QAbstractButton* buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent = nullptr);
 	Ui::DeviceBrowser *ui;
 	QButtonGroup *bg;
 	QHBoxLayout *layout;

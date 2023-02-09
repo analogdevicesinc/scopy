@@ -19,9 +19,8 @@ public:
 	explicit ToolStack(QWidget *parent = nullptr);
 	~ToolStack();
 
-	bool show(QString key) override;
-
 public Q_SLOTS:
+	bool show(QString key) override;
 	void detachTool(QString tool);
 	void attachTool(QString tool);
 

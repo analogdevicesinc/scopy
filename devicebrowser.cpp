@@ -2,6 +2,7 @@
 #include "ui_devicebrowser.h"
 #include <QLoggingCategory>
 #include <QDebug>
+#include "deviceicon.h"
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
 
@@ -16,7 +17,7 @@ DeviceBrowser::DeviceBrowser(QWidget *parent) :
 	auto dbm = ui->wDeviceBrowserMenu;
 	layout = new QHBoxLayout(dbm);
 
-	initBtns();	
+	initBtns();
 
 	connect(ui->btnHome, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
 	connect(ui->btnAdd, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
@@ -54,9 +55,10 @@ QAbstractButton *DeviceBrowser::getDeviceWidgetFor(QString id)
 	return nullptr;
 }
 
-void DeviceBrowser::addDevice(QString id, QAbstractButton *w, int position)
+void DeviceBrowser::addDevice(QString id, QString name, QString description, QWidget *icon, int position)
 {
 	qInfo(CAT_DEVBROWSER)<<"adding device " << id;
+	auto w = buildDeviceIcon(name, description, icon, this);
 	w->setProperty(devBrowserId,id);
 	layout->insertWidget(position,w);
 	bg->addButton(w);
@@ -76,6 +78,7 @@ void DeviceBrowser::removeDevice(QString id)
 	bg->removeButton(w);
 	list.removeAt(getIndexOfId(id));
 	disconnect(w, &QAbstractButton::clicked, this, nullptr); // disconnect all signals connected to this instance
+	delete(w);
 }
 
 
@@ -141,6 +144,9 @@ void DeviceBrowser::updateSelectedDeviceIdx(QString k)
 			     << getIdOfIndex(currentIdx);
 }
 
+QAbstractButton* DeviceBrowser::buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent) {
+	return new DeviceIcon(name, description, icon, parent);
+}
 
 /*
    auto &&is = ui->wInfoPageStack;
@@ -161,4 +167,24 @@ void DeviceBrowser::updateSelectedDeviceIdx(QString k)
     w1->setVisible(false);
     */
 
+
+/*
+	ui->setupUi(this);
+	auto &&is = ui->wInfoPageStack;
+	auto &&hc = is->getHomepageControls();
+
+	is->add("home",new ScopyHomeInfoPage());
+	is->add("add", new AddContextOrDemoInfoPage());
+	is->add("dev1", new QLabel("dev1"));
+	is->add("dev2", new QLabel("dev2"));
+
+	auto &&db = ui->wDeviceBrowser;
+	DeviceIcon *w1 = new DeviceIcon("dev1","uri",this);
+	DeviceIcon *w2 = new DeviceIcon("dev2","uri2",this);
+	w1->setCheckable(true);
+	w2->setCheckable(true);
+	db->addDevice("dev1",w1);
+	db->addDevice("dev2",w2);
+	w1->setVisible(false);
+	*/
 
