@@ -138,8 +138,11 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 		if (m_maxChannelWidth < ch->sizeHint().width()) {
 			m_minChannelWidth = ch->minimumWidth();
 			m_maxChannelWidth = ch->sizeHint().width();
-			m_channelsWidget->setMinimumWidth(ch->sizeHint().width());
+			m_channelsWidget->setMinimumWidth(m_minChannelWidth);
 			m_channelsWidget->setMaximumWidth(m_maxChannelWidth);
+
+			m_parent->setMinimumWidth(m_maxChannelWidth);
+			m_parent->setMaximumWidth(m_maxChannelWidth);
 		}
 		else {
 			//RESIZE CHANNELS
@@ -188,8 +191,10 @@ void ChannelManager::changeParent(QWidget* newParent)
 		ch_width = header->width();
 		ch_height = header->height();
 	} else {
-		ch_width = m_channelsList.first()->width();
-		ch_height = m_channelsList.first()->height();
+		for (auto ch: m_channelsList) {
+			ch_width = std::max(ch_width, ch->width());
+			ch_height = std::max(ch_height, ch->height());
+		}
 	}
 
 	if (m_position == ChannelsPositionEnum::VERTICAL) {
@@ -206,9 +211,11 @@ void ChannelManager::changeParent(QWidget* newParent)
 		m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 	}
 
-	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	m_channelsWidget->layout()->setSpacing(0);
 	m_channelsWidget->layout()->setMargin(0);
+	m_channelsWidget->layout()->setContentsMargins(QMargins(0,0,0,0));
+	m_channelsWidget->layout()->setSizeConstraint(QLayout::SetMinAndMaxSize);
+	m_channelsWidget->setStyleSheet("border: 0px;");
 
 	for (ChannelWidget* channel : m_channelsList) {
 		m_channelsWidget->layout()->addWidget(channel);
@@ -221,8 +228,8 @@ void ChannelManager::changeParent(QWidget* newParent)
 		m_channelsWidget->setMinimumWidth(ch_width + 25);
 		m_channelsWidget->setMaximumWidth(ch_width + 25);
 	} else {
-		m_channelsWidget->setMinimumWidth(m_channelsList.size() * ch_width);
-		m_channelsWidget->setMaximumWidth(m_channelsList.size() * ch_width);
+		m_channelsWidget->setMinimumWidth(m_channelsList.size() * ch_width + 25);
+		m_channelsWidget->setMaximumWidth(m_channelsList.size() * ch_width + 25);
 
 		m_channelsWidget->setMinimumHeight(ch_height);
 		m_channelsWidget->setMaximumHeight(ch_height);
@@ -243,14 +250,13 @@ void ChannelManager::changeParent(QWidget* newParent)
 		m_parent->setMaximumHeight(INT_MAX);
 
 		m_parent->setMaximumWidth(m_maxChannelWidth);
-		m_parent->setMinimumWidth(m_maxChannelWidth);
-
+//		m_parent->setMinimumWidth(m_maxChannelWidth);
 	} else {
 		m_parent->setMinimumHeight(ch_height + 8);
 		m_parent->setMaximumHeight(ch_height + 8);
 
 		m_parent->setMaximumWidth(INT_MAX);
-		m_parent->setMinimumWidth(ch_width);
+//		m_parent->setMinimumWidth(ch_width);
 	}
 
 }

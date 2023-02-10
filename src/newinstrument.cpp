@@ -42,10 +42,18 @@ NewInstrument::NewInstrument(struct iio_context *ctx, Filter *filt,
 	this->layout()->addWidget(m_toolView);
 
 	initPlot();
+	readPreferences();
+
+	// add plot
+	if (dockable_menus) {
+		m_toolView->addDockableTabbedWidget(fft_plot->getPlotwithElements(), "FFT Plot");
+	}
+	else {
+		m_toolView->addFixedCentralWidget(fft_plot->getPlotwithElements(), 0, 0, 1, 1);
+	}
 
 	initGeneralSettings();
 	addPlugins();
-
 
 	connectSignals();
 }
@@ -95,8 +103,6 @@ void NewInstrument::initPlot()
 	fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 	fft_plot->replot();
 	fft_plot->bottomHandlesArea()->repaint();
-
-	m_toolView->addFixedCentralWidget(fft_plot->getPlotwithElements(), 0, 0, 1, 1);
 }
 
 FftDisplayPlot *NewInstrument::getPlot()
@@ -109,7 +115,7 @@ void NewInstrument::initGeneralSettings()
 	m_generalSettingsMenu = new GenericMenu(this);
 	m_generalSettingsMenu->initInteractiveMenu();
 	m_generalSettingsMenu->setMenuHeader("General Settings", new QColor("grey"), false);
-	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu, false);
+	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu, dockable_menus);
 }
 
 void NewInstrument::connectSignals()
@@ -174,15 +180,25 @@ void NewInstrument::startStop(bool pressed)
 //	setDynamicProperty(run_button, "running", pressed);
 }
 
+void NewInstrument::addChannelPlugin(IChannelPlugin *plugin)
+{
+	if (m_recipe.hasChannels) {
+		m_channelPluginList.push_back(plugin);
+
+		plugin->init();
+	}
+}
+
 void NewInstrument::addPlugins()
 {
 	if (m_recipe.hasChannels) {
-		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager));
-//		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager));
-//		m_channelPluginList.push_back(new AddChannelPlugin(this, m_toolView, m_channelManager));
+		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+//		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+//		m_channelPluginList.push_back(new AddChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
 
-		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView));
-		m_rightMenuPluginList.push_back(new CursorsRightMenuPlugin(this, m_toolView, true, true, m_channelManager, getPlot()));
+		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView, dockable_menus));
+		m_rightMenuPluginList.push_back(new CursorsRightMenuPlugin(this, m_toolView, dockable_menus, true, true, m_channelManager, getPlot()));
 
 		// init plugins
 		for (int i=0; i<m_channelPluginList.size(); i++) {
@@ -193,4 +209,10 @@ void NewInstrument::addPlugins()
 			ch->init();
 		}
 	}
+}
+
+void NewInstrument::readPreferences() {
+	bool showFps = prefPanel->getShow_plot_fps();
+	dockable_menus = prefPanel->getCurrent_docking_enabled();
+	fft_plot->setVisibleFpsLabel(showFps);
 }

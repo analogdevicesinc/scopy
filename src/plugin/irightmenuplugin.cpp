@@ -2,7 +2,7 @@
 
 using namespace adiscope;
 using namespace gui;
-IRightMenuPlugin::IRightMenuPlugin(QWidget *parent, ToolView* toolView) : parent(parent), toolView(toolView), menu(nullptr)
+IRightMenuPlugin::IRightMenuPlugin(QWidget *parent, ToolView* toolView, bool dockable) : parent(parent), toolView(toolView), menu(nullptr), dockable(dockable)
 {
 
 }
@@ -18,5 +18,5 @@ void IRightMenuPlugin::init()
 	menu->initInteractiveMenu();
 	menu->setMenuHeader("RightMenu", new QColor('gray'), true);
 
-	toolView->buildNewInstrumentMenu(menu, false, "RightMenu", true, true);
+	toolView->buildNewInstrumentMenu(menu, dockable, "RightMenu", false, false);
 }

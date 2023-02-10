@@ -12,7 +12,7 @@ class IChannelPlugin : public QObject
 {
 	Q_OBJECT
 public:
-	explicit IChannelPlugin(QWidget *parent = nullptr, gui::ToolView* toolView = nullptr, gui::ChannelManager *chManager = nullptr);
+	explicit IChannelPlugin(QWidget *parent = nullptr, gui::ToolView* toolView = nullptr, gui::ChannelManager *chManager = nullptr, bool dockable = false);
 	~IChannelPlugin();
 
 	virtual void init();
@@ -25,6 +25,7 @@ public:
 	gui::GenericMenu* menu;
 	ChannelWidget *ch;
 	std::vector<ChannelWidget*> channelList;
+	bool dockable;
 
 public Q_SLOTS:
 };

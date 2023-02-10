@@ -1,4 +1,5 @@
-﻿#include "ui_tool_view.h"
+﻿#include "qdebug.h"
+#include "ui_tool_view.h"
 
 #include <QMainWindow>
 #include "channel_widget.hpp"
@@ -110,7 +111,7 @@ void ToolView::toggleRightMenu(CustomPushButton* btn, bool checked)
 
 void ToolView::settingsPanelUpdate(int id)
 {
-	if (id >= 0) {
+	if (id > 0) {
 		m_ui->stackedWidget->setCurrentIndex(0);
 	} else {
 		m_ui->stackedWidget->setCurrentWidget(m_menuList[-id]);
@@ -180,7 +181,10 @@ QDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
 	DockerUtils::configureTopBar(docker);
 #endif
 
-	id = m_ui->stackedWidget->addWidget(subWindow);
+	m_ui->stackedWidget->addWidget(subWindow);
+
+	id = getNewID();
+	m_menuList[id] = subWindow;
 
 	return docker;
 }
@@ -436,10 +440,10 @@ void ToolView::setHeaderVisibility(bool visible)
 	m_ui->widgetHeader->setVisible(visible);
 }
 
-void ToolView::addDockableTabbedWidget(QWidget *widget, const QString &dockerName, int plotId)
+void ToolView::addDockableTabbedWidget(QWidget* plot, const QString &dockerName)
 {
-	QDockWidget* docker = this->createDockableWidget(widget, dockerName);
-	m_centralMainWindow->tabifyDockWidget(m_docksList.at(plotId), docker);
+	QDockWidget* docker = DockerUtils::createDockWidget(m_centralMainWindow, plot, dockerName);
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
 }
 
 int ToolView::addFixedTabbedWidget(QWidget *widget, const QString& title, int plotId, int row, int column, int rowspan, int columnspan)
@@ -479,7 +483,7 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 	} else {
 		m_ui->stackedWidget->addWidget(menu);
 		m_generalSettingsMenuId = getNewID();
-
+		m_menuList[m_generalSettingsMenuId] = menu;
 	}
 
 	generalSettingsBtn->setProperty("id", QVariant(-m_generalSettingsMenuId));

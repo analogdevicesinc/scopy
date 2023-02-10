@@ -12,7 +12,7 @@ class IRightMenuPlugin : public QObject
 {
 	Q_OBJECT
 public:
-	explicit IRightMenuPlugin(QWidget *parent = nullptr, gui::ToolView* toolView = nullptr);
+	explicit IRightMenuPlugin(QWidget *parent = nullptr, gui::ToolView* toolView = nullptr, bool dockable = false);
 	~IRightMenuPlugin();
 
 	virtual void init();
@@ -20,6 +20,7 @@ public:
 	QWidget *parent;
 	gui::ToolView* toolView;
 	gui::GenericMenu* menu;
+	bool dockable;
 
 Q_SIGNALS:
 

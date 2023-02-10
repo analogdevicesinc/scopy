@@ -18,7 +18,8 @@ private:
 	bool hasVertical;
 
 public:
-	CursorsRightMenuPlugin(QWidget *parent, ToolView* toolView, bool enableHorizontal = true, bool enableVertical = true, ChannelManager *channelManager = nullptr, DisplayPlot *plot = nullptr) : IRightMenuPlugin(parent, toolView),
+	CursorsRightMenuPlugin(QWidget *parent, ToolView* toolView, bool dockable, bool enableHorizontal = true, bool enableVertical = true, ChannelManager *channelManager = nullptr, DisplayPlot *plot = nullptr) :
+		IRightMenuPlugin(parent, toolView, dockable),
 		plot(plot),
 		chManager(channelManager),
 		hasHorizontal(enableHorizontal),
@@ -31,10 +32,9 @@ public:
 		menu = new GenericMenu(new QWidget());
 		menu->initInteractiveMenu();
 
-		menuBtn = toolView->buildNewInstrumentMenu(menu, false, "Cursors", true, false);
+		menuBtn = toolView->buildNewInstrumentMenu(menu, dockable, "Cursors", true, false);
 
 		initCursors();
-
 		menu->setMenuWidget(cr_ui->scrollArea);
 	}
 

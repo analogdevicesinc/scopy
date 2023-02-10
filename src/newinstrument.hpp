@@ -39,9 +39,10 @@ public:
 
 	FftDisplayPlot *getPlot();
 public:
-//	std::vector<ChannelWidget *> chanWidgetList;
+	void addChannelPlugin(IChannelPlugin *plugin);
 
 private Q_SLOT:
+	void readPreferences();
 	void startStop(bool pressed);
 
 public Q_SLOT:
@@ -57,6 +58,7 @@ private:
 	gui::ChannelManager* m_channelManager;
 	std::vector<IChannelPlugin *> m_channelPluginList;
 	std::vector<IRightMenuPlugin *> m_rightMenuPluginList;
+	bool dockable_menus;
 
 	FftDisplayPlot *fft_plot;
 

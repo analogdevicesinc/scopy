@@ -11,7 +11,7 @@ private:
 	FftDisplayPlot *plot;
 
 public:
-	PhysicalChannelPlugin(QWidget *parent, ToolView* toolView, ChannelManager *chManager) : IChannelPlugin(parent, toolView, chManager),
+	PhysicalChannelPlugin(QWidget *parent, ToolView* toolView, ChannelManager *chManager, bool dockable) : IChannelPlugin(parent, toolView, chManager, dockable),
 		instrument(dynamic_cast<NewInstrument *>(parent)),
 		plot(instrument->getPlot()) {
 	}
@@ -22,7 +22,7 @@ public:
 		menu->initInteractiveMenu();
 		menu->setMenuHeader("Phys CH", new QColor('gray'), true);
 
-		channelList.push_back(toolView->buildNewChannel(chManager, menu , false, -1, false, false, QColor(), "channel", "Phys CH"));
+		channelList.push_back(toolView->buildNewChannel(chManager, menu , dockable, -1, false, false, QColor(), "channel", "Phys CH"));
 
 		for (auto ch: channelList) {
 			ch->setIsPhysicalChannel(true);

@@ -324,30 +324,18 @@ void ChannelWidget::setButtonNoGroup(QAbstractButton *btn)
 
 void ChannelWidget::setMenuButtonVisibility(bool visible)
 {
-	if (visible) {
-		m_ui->btn->show();
-
-	} else {
-		m_ui->btn->hide();
-	}
+	m_ui->btn->setVisible(visible);
 }
 
 void ChannelWidget::setBottomLineVIsibility(bool visible)
 {
-	if (visible) {
-		m_ui->line->show();
-	} else {
-		m_ui->line->hide();
-	}
+	m_ui->line->setVisible(visible);
 }
 
 void ChannelWidget::toggleChannel(bool toggled)
 {
-	if (toggled) {
-		m_ui->name->hide();
-	} else {
-		m_ui->name->show();
-	}
+	m_ui->name->setVisible(!toggled);
+	m_ui->delBtn->setVisible(!toggled && m_deletable);
 }
 
 void ChannelWidget::setIsMainChannel(bool mainChannel)
