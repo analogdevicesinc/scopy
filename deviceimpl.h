@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <device.h>
+#include <QPushButton>
+#include <QCheckBox>
 
 class DeviceImpl : public QObject, public Device
 {
@@ -19,11 +21,23 @@ public:
 	QString uri() override;
 	QWidget *icon() override;
 	QWidget *page() override;
-	QStringList toolList() override;
+	QList<ToolMenuEntry> toolList() override;
+
+
+public Q_SLOTS:
+	void connectDev() override;
+	void disconnectDev() override;
+Q_SIGNALS:
+	void toolListChanged() override;
+	void connected() override;
+	void disconnected() override;
 private:
 	QString m_uri;
 	QWidget *m_icon;
 	QWidget *m_page;
+	QPushButton *connbtn;
+	QPushButton *discbtn;
+	QCheckBox *extraToolchkbox;
 };
 
 #endif // DEVICEIMPL_H

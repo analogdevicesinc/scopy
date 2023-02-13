@@ -13,11 +13,14 @@ public:
 public Q_SLOTS:
 	void update(QStringList uris);
 	void clearCache();
+	void lock(QString);
+	void unlock(QString);
 Q_SIGNALS:
 	void foundDevice(QString uri);
 	void lostDevice(QString uri);
 private:
 	QSet<QString> uris;
+	QSet<QString> lockedUris;
 
 };
 

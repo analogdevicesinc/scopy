@@ -17,6 +17,10 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 cs = new IIOContextScanner(this);
 	 scc = new ScannedIIOContextCollector(this);
 	 dm = new DeviceManager(this);
+	 dm->setExclusive(true);
+	 toolman = new ToolManager(tm,this);
+	 toolman->addToolList("home",{});
+	 toolman->addToolList("add",{});
 
 	 connect(tm,&ToolMenu::requestAttach,ts,&ToolStack::attachTool);
 	 connect(tm,&ToolMenu::requestDetach,ts,&ToolStack::detachTool);
@@ -35,25 +39,29 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	 connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
 	 connect(dm,SIGNAL(deviceRemoved(QString)),this,SLOT(removeDeviceFromUi(QString)));
-	 connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(addToolsToUi(QString)));
+	 connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
+	 connect(hp,SIGNAL(requestAddDevice(QString)),dm,SLOT(addDevice(QString)));
+
+	 if(dm->getExclusive()) {
+		 // only for device manager exclusive mode - stop scan on connect
+		 connect(dm,&DeviceManager::deviceConnected,this,[=](QString){cs->stopScan();});
+		 connect(dm,&DeviceManager::deviceDisconnected,this,[=](QString){cs->startScan(2000);});
+	 }
+
+	 connect(dm,SIGNAL(deviceConnected(QString)),scc,SLOT(lock(QString)));
+	 connect(dm,SIGNAL(deviceConnected(QString)),toolman,SLOT(lockToolList(QString)));
+	 connect(dm,SIGNAL(deviceConnected(QString)),hp,SLOT(connectDevice(QString)));	 
+	 connect(dm,SIGNAL(deviceDisconnected(QString)),scc,SLOT(unlock(QString)));
+	 connect(dm,SIGNAL(deviceDisconnected(QString)),toolman,SLOT(unlockToolList(QString)));
+	 connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
+
+	 connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry>)));
 
 	 cs->startScan(2000);
 }
 
-///// DRAFT - ToolManagerHere
-void ScopyMainWindow::addToolsToUi(QString id) {
-	auto tb = ui->wToolBrowser;
-	auto ts = ui->wsToolStack;
-	auto tm = tb->getToolMenu();
-	Device* d = dm->getDevice(id);
-	for(auto &&tool : tm->getTools()) {
-		tm->removeTool(tool);
-	}
-
-	for(auto &&tool: d->toolList()) {
-		tm -> addTool(tool + id, tool,"");
-	}
-
+void ScopyMainWindow::requestTools(QString id) {
+	toolman->showToolList(id);
 }
 
 ScopyMainWindow::~ScopyMainWindow()
@@ -65,11 +73,13 @@ ScopyMainWindow::~ScopyMainWindow()
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
 	hp->addDevice(id,d->name(),d->uri(),d->icon(),d->page());
+	toolman->addToolList(id,d->toolList());
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
 	hp->removeDevice(id);
+	toolman->removeToolList(id);
 
 }
 

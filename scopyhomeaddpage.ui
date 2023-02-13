@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>AddContextOrDemoInfoPage</class>
- <widget class="QWidget" name="AddContextOrDemoInfoPage">
+ <class>ScopyHomeAddPage</class>
+ <widget class="QWidget" name="ScopyHomeAddPage">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -18,9 +18,16 @@
     <widget class="QLineEdit" name="editUri"/>
    </item>
    <item>
-    <widget class="QPushButton" name="btnConnect">
+    <widget class="QPushButton" name="btnVerify">
      <property name="text">
-      <string>Connect</string>
+      <string>Verify</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="btnAdd">
+     <property name="text">
+      <string>Add</string>
      </property>
     </widget>
    </item>

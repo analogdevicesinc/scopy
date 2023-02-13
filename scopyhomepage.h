@@ -1,6 +1,7 @@
 #ifndef SCOPYHOMEPAGE_H
 #define SCOPYHOMEPAGE_H
 
+#include "scopyhomeaddpage.h"
 #include <QWidget>
 
 namespace Ui {
@@ -23,10 +24,13 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void addDevice(QString id, QString name, QString description, QWidget *icon, QWidget *page);
 	void removeDevice(QString id);
+	void connectDevice(QString);
+	void disconnectDevice(QString);
 
 
 private:
 	Ui::ScopyHomePage *ui;
+	ScopyHomeAddPage *add;
 };
 }
 

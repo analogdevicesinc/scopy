@@ -1,6 +1,7 @@
 #include "deviceiconbuilder.h"
 #include "deviceicon.h"
 
+using namespace adiscope;
 DeviceIconBuilder::DeviceIconBuilder(QObject *parent) // creates name, uri , icon, forgetbtn, connection icon, etc
 	: QObject{parent}
 {

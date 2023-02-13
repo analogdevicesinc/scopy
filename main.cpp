@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 	SetScopyQDebugMessagePattern();
 	QLoggingCategory::setFilterRules(""
 //					 "*.debug=false\n"
-//					  "ScanContextCollector.debug=true"
+//					  "ToolManager.debug=true"
 					 );
 
 	QApplication a(argc, argv);

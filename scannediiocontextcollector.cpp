@@ -18,25 +18,36 @@ ScannedIIOContextCollector::~ScannedIIOContextCollector()
 void ScannedIIOContextCollector::update(QStringList list)
 {
 	QSet<QString> updatedUris = QSet<QString>(list.begin(),list.end());
+	updatedUris = updatedUris + lockedUris;
+
 	auto newUris = updatedUris - uris;
 	auto deletedUris = uris - updatedUris;
 
 	qDebug(CAT_SCANCTXCOLLECTOR) << "cached uris:" << uris;
 	for (const auto &uri : newUris) {
 		qInfo(CAT_SCANCTXCOLLECTOR) << "new device found: " << uri;
-		Q_EMIT foundDevice(uri);
+//		if(!lockedUris.contains(uri))
+			Q_EMIT foundDevice(uri);
 
 	}
 
 	for (const auto &uri : deletedUris) {
 		qInfo(CAT_SCANCTXCOLLECTOR) << "to delete device: " << uri;
-		Q_EMIT lostDevice(uri);
+//		if(!lockedUris.contains(uri))
+			Q_EMIT lostDevice(uri);
 
 	}
-
 	uris = updatedUris;
+}
 
+void ScannedIIOContextCollector::lock(QString uri) {
+	if(uris.contains(uri))
+		lockedUris.insert(uri);
+}
 
+void ScannedIIOContextCollector::unlock(QString uri) {
+	if(uris.contains(uri))
+		lockedUris.remove(uri);
 }
 
 void ScannedIIOContextCollector::clearCache()

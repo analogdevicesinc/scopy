@@ -21,7 +21,9 @@ public:
 	~DeviceBrowser();
 	QAbstractButton *getDeviceWidgetFor(QString id);
 	void addDevice(QString id, QString name, QString description, QWidget *icon, int position = -1);
-	void removeDevice(QString id);	
+	void removeDevice(QString id);
+	void connectDevice(QString id);
+	void disconnectDevice(QString id);
 
 Q_SIGNALS:
 	void requestDevice(QString id, int direction);
@@ -29,7 +31,7 @@ Q_SIGNALS:
 public Q_SLOTS:	
 
 	void nextDevice();
-	void prevDevice();	
+	void prevDevice();
 
 private Q_SLOTS:
 	void updateSelectedDeviceIdx(QString);

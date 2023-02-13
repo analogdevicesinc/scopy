@@ -3,8 +3,10 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QPushButton>
+#include "gui/dynamicWidget.h"
 #include "ui_devicebutton.h"
 
+using namespace adiscope;
 DeviceIcon::DeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent)
 	: QAbstractButton{parent}
 {
@@ -14,6 +16,10 @@ DeviceIcon::DeviceIcon(QString name, QString description, QWidget *icon, QWidget
 	ui->name->setText(name);
 	ui->iconPlaceHolder->layout()->addWidget(icon);
 	setCheckable(true);
+}
+
+void DeviceIcon::setConnected(bool val) {
+	setDynamicProperty(ui->line, "connected", val);
 }
 
 

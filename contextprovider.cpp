@@ -13,7 +13,8 @@ ContextRefCounter::ContextRefCounter(QString uri)
 }
 
 ContextRefCounter::~ContextRefCounter() {
-	iio_context_destroy(this->ctx);
+	if(this->ctx)
+		iio_context_destroy(this->ctx);
 }
 
 
@@ -50,7 +51,13 @@ iio_context *ContextProvider::open(QString uri)
 		map.value(uri)->refcnt++;
 		qDebug(CAT_CTXMGR)<< uri << "opening - found - refcnt++ = " << map.value(uri)->refcnt;
 	} else {
-		map.insert(uri, new ContextRefCounter(uri));
+		ContextRefCounter* ctxref = new ContextRefCounter(uri);
+		if(ctxref->ctx==nullptr) {
+			qInfo(CAT_CTXMGR) << uri << "not a valid context";
+			delete ctxref;
+			return nullptr;
+		}
+		map.insert(uri, ctxref);
 		qDebug(CAT_CTXMGR)<< uri << "opening  - created in map - refcnt = "<< map.value(uri)->refcnt;
 	}
 
@@ -68,6 +75,8 @@ void ContextProvider::close(QString uri)
 			map.remove(uri);
 			qDebug(CAT_CTXMGR)<< uri << "removed from map";
 		}
+	} else {
+		qInfo(CAT_CTXMGR) << uri << "not found in map. nop";
 	}
 }
 

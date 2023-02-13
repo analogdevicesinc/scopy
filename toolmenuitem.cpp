@@ -29,8 +29,10 @@
 #include "gui/dynamicWidget.h"
 #include "qdebug.h"
 #include "utils.h"
+#include <QLoggingCategory>
 
 using namespace adiscope;
+Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
 ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *parent):
 	BaseMenuItem(parent),
@@ -200,7 +202,7 @@ void ToolMenuItem::_buildUI()
 
 	toolBtn->setFlat(true);
 	toolRunBtn->setFlat(true);
-	qDebug()<<toolRunBtn;
+	qDebug(CAT_TOOLMENUITEM)<<toolRunBtn;
 
 	mainLayout->addWidget(toolOption);
 

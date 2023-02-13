@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QAbstractButton>
 
+namespace adiscope {
 class DeviceIconBuilder : public QObject
 {
 	Q_OBJECT
@@ -15,5 +16,5 @@ public:
 signals:
 
 };
-
+}
 #endif // DEVICEICONBUILDER_H

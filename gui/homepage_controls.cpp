@@ -30,13 +30,13 @@ HomepageControls::HomepageControls(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	connect(ui->leftBtn, &QPushButton::clicked, [=](){
+	connect(ui->leftBtn, &QPushButton::clicked, this, [=](){
 		Q_EMIT goLeft();
 	});
-	connect(ui->rightBtn, &QPushButton::clicked, [=](){
+	connect(ui->rightBtn, &QPushButton::clicked, this, [=](){
 		Q_EMIT goRight();
 	});
-	connect(ui->openBtn, &QPushButton::clicked, [=](){
+	connect(ui->openBtn, &QPushButton::clicked, this, [=](){
 		Q_EMIT openFile();
 	});
 

@@ -1,4 +1,5 @@
 #include "devicebrowser.h"
+#include "gui/dynamicWidget.h"
 #include "ui_devicebrowser.h"
 #include <QLoggingCategory>
 #include <QDebug>
@@ -81,10 +82,11 @@ void DeviceBrowser::removeDevice(QString id)
 	disconnect(w, &QAbstractButton::clicked, this, nullptr); // disconnect all signals connected to this instance
 	delete(w);
 
-	if(currentIdx == idx) // removed currently selected device
-	{
+	if(currentIdx == idx) { // removed currently selected device
 		currentIdx = 0;
 		Q_EMIT requestDevice("home",-1);
+	} else if(currentIdx>idx) {
+		currentIdx--;
 	}
 }
 
@@ -151,6 +153,16 @@ void DeviceBrowser::updateSelectedDeviceIdx(QString k)
 			     << getIdOfIndex(currentIdx);
 }
 
+void DeviceBrowser::connectDevice(QString id) {
+	auto w = dynamic_cast<DeviceIcon*>(getDeviceWidgetFor(id));
+	w->setConnected(true);
+}
+
+void DeviceBrowser::disconnectDevice(QString id) {
+	auto w = dynamic_cast<DeviceIcon*>(getDeviceWidgetFor(id));
+	w->setConnected(false);
+}
+
 QAbstractButton* DeviceBrowser::buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent) {
 	return new DeviceIcon(name, description, icon, parent);
 }
@@ -160,7 +172,7 @@ QAbstractButton* DeviceBrowser::buildDeviceIcon(QString name, QString descriptio
     auto &&hc = is->getHomepageControls();
 
     is->add("home",new ScopyHomeInfoPage());
-    is->add("add", new AddContextOrDemoInfoPage());
+    is->add("add", new ScopyHomeAddPage());
     is->add("dev1", new QLabel("dev1"));
     is->add("dev2", new QLabel("dev2"));
 
@@ -181,7 +193,7 @@ QAbstractButton* DeviceBrowser::buildDeviceIcon(QString name, QString descriptio
 	auto &&hc = is->getHomepageControls();
 
 	is->add("home",new ScopyHomeInfoPage());
-	is->add("add", new AddContextOrDemoInfoPage());
+	is->add("add", new ScopyHomeAddPage());
 	is->add("dev1", new QLabel("dev1"));
 	is->add("dev2", new QLabel("dev2"));
 

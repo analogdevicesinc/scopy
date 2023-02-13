@@ -115,7 +115,7 @@
                          </base-DElement>
                          <object>{4adea8b3-f07c-4731-9092-f050e7182002}</object>
                          <name>singleton ContextProvider</name>
-                         <pos>x:965;y:1010</pos>
+                         <pos>x:755;y:830</pos>
                          <rect>x:-105;y:-55;w:210;h:110</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -306,7 +306,7 @@
                          </base-DElement>
                          <object>{107011b1-ab5c-41df-ae4c-d3217e9c4cd6}</object>
                          <name>ToolStack</name>
-                         <pos>x:25;y:610</pos>
+                         <pos>x:-340;y:565</pos>
                          <rect>x:-65;y:-55;w:130;h:110</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -329,7 +329,7 @@
                          <object>{29d6cc8f-575c-475d-8969-1a12f0c53306}</object>
                          <name>ScopyHomePage</name>
                          <pos>x:385;y:555</pos>
-                         <rect>x:-100;y:-70;w:200;h:140</rect>
+                         <rect>x:-100;y:-75;w:200;h:150</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -422,7 +422,7 @@
                          </base-DElement>
                          <object>{3493fdef-b41d-4918-8149-080a80848873}</object>
                          <name>ScopyHomeInfoPage</name>
-                         <pos>x:660;y:480</pos>
+                         <pos>x:760;y:470</pos>
                          <rect>x:-60;y:-30;w:120;h:60</rect>
                          <visual-role>0</visual-role>
                         </DObject>
@@ -443,8 +443,8 @@
                          </base-DElement>
                          <object>{a37e8d5a-2c78-4159-af53-b3d1f513d9ee}</object>
                          <name>ScopyHomeAddPage</name>
-                         <pos>x:640;y:615</pos>
-                         <rect>x:-100;y:-55;w:200;h:110</rect>
+                         <pos>x:745;y:640</pos>
+                         <rect>x:-95;y:-45;w:190;h:90</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -619,7 +619,7 @@
                          </base-DElement>
                          <object>{192a9656-2796-478a-a40b-5619baa8acc9}</object>
                          <name>ScopyMainWindow</name>
-                         <pos>x:-230;y:740</pos>
+                         <pos>x:-310;y:750</pos>
                          <rect>x:-60;y:-30;w:120;h:60</rect>
                          <visual-role>8</visual-role>
                         </DObject>
@@ -697,8 +697,8 @@
                          </base-DElement>
                          <object>{dff7f0d9-f6de-4896-af57-6cd0209daa56}</object>
                          <name>DeviceManager</name>
-                         <pos>x:385;y:770</pos>
-                         <rect>x:-90;y:-60;w:180;h:120</rect>
+                         <pos>x:440;y:765</pos>
+                         <rect>x:-105;y:-80;w:210;h:160</rect>
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
@@ -818,12 +818,19 @@
                           </DElement>
                          </base-DElement>
                          <object>{702be005-47af-4698-ada9-d7b835e35d12}</object>
+                         <stereotypes>
+                          <qlist>
+                           <item>interface</item>
+                          </qlist>
+                         </stereotypes>
                          <name>Device</name>
-                         <pos>x:385;y:965</pos>
-                         <rect>x:-65;y:-55;w:130;h:110</rect>
-                         <visual-role>0</visual-role>
+                         <pos>x:455;y:995</pos>
+                         <rect>x:-110;y:-105;w:220;h:210</rect>
+                         <visual-role>5</visual-role>
+                         <stereotype-display>1</stereotype-display>
                         </DObject>
                        </base-DObject>
+                       <namespace>adiscope</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -865,7 +872,7 @@
                          </base-DElement>
                          <object>{ac3c9c31-229f-40fb-a01c-7cb74c329e3c}</object>
                          <name>ScopyHomeInfoPage</name>
-                         <pos>x:820;y:475</pos>
+                         <pos>x:950;y:475</pos>
                          <rect>x:-60;y:-30;w:120;h:60</rect>
                          <visual-role>8</visual-role>
                         </DObject>
@@ -886,7 +893,7 @@
                          </base-DElement>
                          <object>{bd470a57-63dc-4d8a-8ed3-80f16bf2eaae}</object>
                          <name>ScopyHomeAddPage</name>
-                         <pos>x:860;y:595</pos>
+                         <pos>x:1060;y:610</pos>
                          <rect>x:-60;y:-30;w:120;h:60</rect>
                          <visual-role>8</visual-role>
                         </DObject>
@@ -970,9 +977,97 @@
                       </DAssociation>
                      </instance>
                     </item>
+                    <item>
+                     <instance type="DClass">
+                      <DClass>
+                       <base-DObject>
+                        <DObject>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{d5152f58-1810-475d-83a4-d9ce3465511b}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{d47f0fa8-cf3f-4c10-9b02-f80af3d57baa}</object>
+                         <name>ToolManager</name>
+                         <pos>x:45;y:605</pos>
+                         <rect>x:-150;y:-80;w:300;h:160</rect>
+                         <visual-role>0</visual-role>
+                        </DObject>
+                       </base-DObject>
+                       <namespace>adiscope</namespace>
+                       <show-all-members>true</show-all-members>
+                      </DClass>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{cbd0db94-432f-4015-b9d6-9c96d2d028e5}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{153d8a14-7f4c-4bff-b84d-43e9fe9899dc}</object>
+                         <a>{e6ed922c-ecdc-42c9-b27e-5504f1061806}</a>
+                         <b>{d5152f58-1810-475d-83a4-d9ce3465511b}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <cradinality>1</cradinality>
+                         <navigable>true</navigable>
+                         <kind>2</kind>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DAssociation">
+                      <DAssociation>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{63c95c20-64f2-4942-b244-ef718096e1ea}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{64a0db56-30d7-4da2-8563-1dbc182717ec}</object>
+                         <a>{d5152f58-1810-475d-83a4-d9ce3465511b}</a>
+                         <b>{f3fb892a-efcc-4cc7-bc8d-d8c4f2ae5478}</b>
+                        </DRelation>
+                       </base-DRelation>
+                       <a>
+                        <DAssociationEnd>
+                         <navigable>true</navigable>
+                        </DAssociationEnd>
+                       </a>
+                      </DAssociation>
+                     </instance>
+                    </item>
+                    <item>
+                     <instance type="DDependency">
+                      <DDependency>
+                       <base-DRelation>
+                        <DRelation>
+                         <base-DElement>
+                          <DElement>
+                           <uid>{87f6ba05-edb6-46f1-a6c6-835469ab281b}</uid>
+                          </DElement>
+                         </base-DElement>
+                         <object>{d2eea9a3-73e3-42e6-927f-509b7ffd899e}</object>
+                         <a>{9aab6c21-876c-4ccc-be96-850665f9faf1}</a>
+                         <b>{2358ec04-d8eb-4c0f-8714-c1fa621cb6fb}</b>
+                        </DRelation>
+                       </base-DRelation>
+                      </DDependency>
+                     </instance>
+                    </item>
                    </qlist>
                   </elements>
-                  <last-modified>1675946231732</last-modified>
+                  <last-modified>1676309129075</last-modified>
                   <toolbarid>General</toolbarid>
                  </MDiagram>
                 </base-MDiagram>
@@ -1044,7 +1139,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{fc308b25-eaf4-4d02-b080-0f4c97834fd8}</uid>
+                    <uid>{5cfbadff-34d0-4861-98ed-8033a921b74f}</uid>
                     <type>2</type>
                     <properties>4</properties>
                     <declaration>QPushButton *getToolBtn()</declaration>
@@ -1052,7 +1147,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{2b9a8739-5590-4de4-968a-b37716f98e10}</uid>
+                    <uid>{0c2df01d-dbad-4c11-8b41-c2b65f7d9932}</uid>
                     <type>2</type>
                     <properties>4</properties>
                     <declaration>QPushButton *getToolRunBtn()</declaration>
@@ -1126,35 +1221,35 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{16a062d0-b310-4bd7-80f3-0f03d8ca4f1b}</uid>
+                    <uid>{b935530d-587b-487b-9922-3d048ecc175e}</uid>
                     <type>1</type>
                     <declaration>QVector&lt;ToolMenuItem*&gt; tools</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{b338e5c2-a489-4801-8fe8-8701b0cca7e7}</uid>
+                    <uid>{fbba951c-9ac8-4f83-819e-2dc673a7ccc3}</uid>
                     <type>2</type>
                     <declaration>ToolMenuItem* getToolMenuItem(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{631cca05-b1a1-4ae4-a55e-352c06831ae1}</uid>
+                    <uid>{61d04155-ebf7-432e-b37c-c3c1fe7c5dcc}</uid>
                     <type>2</type>
                     <declaration>ToolMenuItem* addTool(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{801a4b65-e619-45ce-89cb-5ce18d55f38c}</uid>
+                    <uid>{a5c3c0f5-752b-43ee-94ae-a298914a167f}</uid>
                     <type>2</type>
                     <declaration>bool removeTool(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{61eebb6d-69e9-4047-b1fb-d56765770e12}</uid>
+                    <uid>{c2971d6d-6dd7-4e8d-8cbf-41fbc2841069}</uid>
                     <type>2</type>
                     <properties>256</properties>
                     <declaration>void requestTool(QString)</declaration>
@@ -1261,14 +1356,14 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{9850b46e-780e-42dd-82be-b378a37d4951}</uid>
+                    <uid>{88154ab2-37b2-4329-b24b-b4b83456cc2a}</uid>
                     <type>2</type>
                     <declaration>ToolMenu* getToolMenu()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d45a4a2f-a289-4cf5-a7c2-d13f848a6dfc}</uid>
+                    <uid>{f6c61293-9acf-4e52-9fbf-8137df28c73a}</uid>
                     <type>2</type>
                     <properties>512</properties>
                     <declaration>void requestTool(QString)</declaration>
@@ -1295,6 +1390,36 @@
                    </MElement>
                   </base-MElement>
                   <name>singleton ContextProvider</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{d2eea9a3-73e3-42e6-927f-509b7ffd899e}</uid>
+                        <target>
+                         <instance type="MDependency">
+                          <MDependency>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{d2eea9a3-73e3-42e6-927f-509b7ffd899e}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{4adea8b3-f07c-4731-9092-f050e7182002}</a>
+                             <b>{a37e8d5a-2c78-4159-af53-b3d1f513d9ee}</b>
+                            </MRelation>
+                           </base-MRelation>
+                          </MDependency>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
                  </MObject>
                 </base-MObject>
                 <namespace>adiscope</namespace>
@@ -1302,7 +1427,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{8d55a30a-e0cd-494f-9268-ea8571dcc4e4}</uid>
+                    <uid>{d2cf6a8e-8d8b-4589-b2a6-092714b3fad4}</uid>
                     <type>2</type>
                     <properties>64</properties>
                     <declaration>ContextProvider *GetInstance()</declaration>
@@ -1310,14 +1435,14 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{8b95c6d7-32d8-46c3-95d5-1b827b171e6f}</uid>
+                    <uid>{351d3c24-1f5d-4231-b069-792a88ebb58c}</uid>
                     <type>2</type>
                     <declaration>struct iio_context* open(QString uri)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{dd43e786-e9fb-4051-987c-9799f26df16d}</uid>
+                    <uid>{c6331bec-11f5-4aa9-9323-5a7d0e510f2b}</uid>
                     <type>2</type>
                     <declaration>void close(QString uri)</declaration>
                    </MClassMember>
@@ -1539,23 +1664,23 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{9de5e4e5-3b1e-4069-bd16-ca48859d57fa}</uid>
-                    <visibility>5</visibility>
+                    <uid>{81c6cfb0-0026-4239-927b-1a7cb7f5ff50}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
                     <declaration>void update(QStringList)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d84d0fbc-c4c0-4b2c-bd4f-d178729b236f}</uid>
-                    <visibility>5</visibility>
+                    <uid>{4029397f-6f5d-46ee-8b73-773641bcdd0b}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
                     <declaration>void clearCache()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{87ed9e91-76d3-4b04-a0bb-db527e90c4a2}</uid>
+                    <uid>{5cf679de-4fa1-4632-a0e4-855cfcb9aaef}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void newDevice(QString)</declaration>
@@ -1563,7 +1688,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{4008eae7-78d2-4b37-b4fc-67993a5c3072}</uid>
+                    <uid>{0853c710-ec44-4bc7-a82d-d1700cf1a8ae}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void deleteDevice(QString)</declaration>
@@ -1663,22 +1788,22 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{547ab6d2-3435-42e2-8bd0-c8c4e3f7a220}</uid>
+                    <uid>{d4d42696-dcb5-4d80-b171-f7a223c920f3}</uid>
                     <type>2</type>
                     <declaration>void add(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c7804835-3b1b-48a8-ab5f-c67f6b27c7fc}</uid>
+                    <uid>{66259c08-dbc2-405d-b528-dcfbf2d3f40e}</uid>
                     <type>2</type>
                     <declaration>void remove(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{3294f16c-e063-40d2-b7a6-466dd75e4716}</uid>
-                    <visibility>5</visibility>
+                    <uid>{fddeb510-223a-4376-9e2b-375d2bb3697b}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
                     <declaration>bool show(QString)</declaration>
                    </MClassMember>
@@ -1777,35 +1902,35 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{1b5515ca-0256-403f-9c62-c7302f5ba4a3}</uid>
+                    <uid>{37b233f6-ea54-49c7-ae30-951a6072cf56}</uid>
                     <type>2</type>
                     <declaration>QAbstractButton *getDeviceWidgetFor(QString id)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{03222ff4-6a47-4571-9f4d-3af2852fb991}</uid>
+                    <uid>{4d3fa79b-b3ec-4216-bb11-e666444900f4}</uid>
                     <type>2</type>
                     <declaration>QAbstractButton* buildDeviceIcon(QString name, QString description ...)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{5e7327b9-e0b1-491c-b9bd-0908a973351f}</uid>
+                    <uid>{f5cc7ba6-f28a-4daf-9b1f-8a63542ec599}</uid>
                     <type>2</type>
                     <declaration>void addDevice(QString, QAbstractButton*)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{15a5da5d-d931-4b65-b567-de7f2832b005}</uid>
+                    <uid>{8e2019b8-a5de-4496-8ab0-998b9ff61b16}</uid>
                     <type>2</type>
                     <declaration>void removeDevice(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{66764e87-bf65-4b77-b384-6e5e9e192361}</uid>
+                    <uid>{1ef0c948-5fa1-4fcc-b2a5-aa831109cab5}</uid>
                     <type>2</type>
                     <properties>256</properties>
                     <declaration>void requestDevice(QString)</declaration>
@@ -1839,22 +1964,22 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{d1341c07-1501-4c39-9a62-b592e81c594d}</uid>
+                    <uid>{3318aa8e-1700-4e15-a59a-5e3700343b63}</uid>
                     <type>2</type>
                     <declaration>void add(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1679ed10-2c36-4b6f-b42d-9d628ce79ad3}</uid>
+                    <uid>{0696de70-49bb-4c84-a3c0-028a3b1b7c73}</uid>
                     <type>2</type>
                     <declaration>void remove(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{fa7e730e-73a6-4f7c-83de-8aad5eb151b4}</uid>
-                    <visibility>5</visibility>
+                    <uid>{e55e59b0-0a2a-4867-a7a3-35643f7859e5}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
                     <declaration>bool show(QString)</declaration>
                    </MClassMember>
@@ -2004,40 +2129,48 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{07f50d68-60ae-470b-9a6f-2bceaff15152}</uid>
+                    <uid>{81b632c1-1d03-4468-9cfc-dd8cfdb130ff}</uid>
                     <type>1</type>
                     <declaration>InfoPageStack* is</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a4da9b09-82f3-480b-bb6b-471dc5011b3e}</uid>
+                    <uid>{e2b346c9-246a-4850-b5cb-91cbbafd03ae}</uid>
                     <type>1</type>
                     <declaration>DeviceBrowser* db</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ca3312e3-c124-4793-a592-6cd821b027da}</uid>
+                    <uid>{6918228a-504d-4252-b08e-2b940856ae73}</uid>
+                    <visibility>4</visibility>
                     <type>2</type>
-                    <properties>256</properties>
-                    <declaration>void requestAddDevice(QString)</declaration>
+                    <declaration>void requestAddDevice(QString id)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a5de86ee-47f4-49c4-ab8f-9afd54467023}</uid>
+                    <uid>{48635c16-3eea-472f-b935-0504e61e5918}</uid>
+                    <visibility>4</visibility>
                     <type>2</type>
-                    <properties>512</properties>
-                    <declaration>void addDeviceSuccesful(QString)</declaration>
+                    <declaration>void requestDevice(QString id)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{355aaf63-2ddd-4cd3-bffa-91492cbd1c48}</uid>
+                    <uid>{3245e138-5a60-40d2-9ea6-d17d4045e7f6}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
-                    <properties>512</properties>
-                    <declaration>void addDeviceFailed(QString)</declaration>
+                    <declaration>void addDevice(QString id,  ...)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{734e8d2a-ed85-4ea8-a492-6b0636b5622b}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void removeDevice(QString id)</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2328,26 +2461,18 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{71ed4302-4f00-45c5-864c-a8bb62e65416}</uid>
+                    <uid>{f31409ec-4b56-4fa4-aa71-399bf85ac651}</uid>
+                    <visibility>4</visibility>
                     <type>2</type>
-                    <properties>256</properties>
                     <declaration>void requestAddDevice(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{5e53ff57-d314-4438-b08a-93d081c92686}</uid>
+                    <uid>{6c1157a9-504b-4dfb-8ebf-fae86a2cf56d}</uid>
+                    <visibility>4</visibility>
                     <type>2</type>
-                    <properties>512</properties>
-                    <declaration>void addDeviceSuccesful(QString)</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{322aa8f1-39ec-445a-b0bd-cee11fa9cca5}</uid>
-                    <type>2</type>
-                    <properties>512</properties>
-                    <declaration>void addDeviceFailed(QString)</declaration>
+                    <declaration>void requestDevice(QString)</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2594,6 +2719,35 @@
                         </target>
                        </handle>
                       </item>
+                      <item>
+                       <handle>
+                        <uid>{153d8a14-7f4c-4bff-b84d-43e9fe9899dc}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{153d8a14-7f4c-4bff-b84d-43e9fe9899dc}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{20440a58-5e88-4172-971b-4184419b0636}</a>
+                             <b>{d47f0fa8-cf3f-4c10-9b02-f80af3d57baa}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
                      </qlist>
                     </handles>
                    </handles>
@@ -2664,23 +2818,31 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{124fee14-4007-464d-884e-f249961a1aee}</uid>
-                    <visibility>5</visibility>
+                    <uid>{7bdb66ed-cb34-4f34-9c75-6aba57eb4e33}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
                     <declaration>void addDevice(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{70b2bdbc-1493-40f5-95f5-2199a3017ce1}</uid>
-                    <visibility>5</visibility>
+                    <uid>{89d4fd1f-785d-4969-952e-40ff1580831f}</uid>
+                    <visibility>7</visibility>
                     <type>2</type>
                     <declaration>void removeDevice(QString)</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{63276e1a-92c4-4137-a10f-2f2b802c7dc1}</uid>
+                    <uid>{acb1bf72-cc88-491c-b2e7-9a841356db6b}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void setExclusive(bool)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8092c246-5c68-42dc-b887-e3c5f7268822}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void deviceAdded(QString)</declaration>
@@ -2688,10 +2850,26 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{e21891fe-ebd4-4dae-a2c2-2cda6efb0b07}</uid>
+                    <uid>{119f7702-04f4-4331-83f9-30e6b034baea}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <declaration>void deviceRemoved(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{8e5b43ae-2056-4a92-bffb-2816037c429a}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void deviceConnected(QString uri)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{3184f220-c390-435e-a25f-2eb3b2abb365}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <declaration>void deviceDisconnected(QString uri)</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2712,6 +2890,11 @@
                   <base-MElement>
                    <MElement>
                     <uid>{702be005-47af-4698-ada9-d7b835e35d12}</uid>
+                    <stereotypes>
+                     <qlist>
+                      <item>interface</item>
+                     </qlist>
+                    </stereotypes>
                    </MElement>
                   </base-MElement>
                   <name>Device</name>
@@ -2754,34 +2937,92 @@
                   </relations>
                  </MObject>
                 </base-MObject>
+                <namespace>adiscope</namespace>
                 <members>
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{62c019a8-dee1-417c-8e66-6cdbddb7576a}</uid>
-                    <type>1</type>
-                    <declaration>QString name</declaration>
+                    <uid>{deba930b-c101-43d0-875c-432a72f49d52}</uid>
+                    <type>2</type>
+                    <properties>1</properties>
+                    <declaration>QString uri()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{e704d97b-6da8-4f60-ad78-b741afe67afe}</uid>
-                    <type>1</type>
-                    <declaration>QWidget *deviceIcon</declaration>
+                    <uid>{ea4bdb12-5b09-4cd0-a052-e38ec170f89a}</uid>
+                    <type>2</type>
+                    <properties>1</properties>
+                    <declaration>QString name()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{3b8f7277-9504-4f2f-a065-373e59bffa0f}</uid>
-                    <type>1</type>
-                    <declaration>QWidget *devicePage</declaration>
+                    <uid>{0bd580f5-eadc-483a-8bf4-0d2f9e219659}</uid>
+                    <type>2</type>
+                    <properties>1</properties>
+                    <declaration>QWidget *icon()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{de07df9f-bfc4-46e8-a612-cc748a6b5950}</uid>
-                    <type>1</type>
-                    <declaration>QStringList *toolList</declaration>
+                    <uid>{f7cd1275-3fe4-4fd0-9a1c-5cc50f6729b4}</uid>
+                    <type>2</type>
+                    <properties>1</properties>
+                    <declaration>QWidget *page()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{50732db9-12e0-4c39-adeb-a06c042ac92a}</uid>
+                    <type>2</type>
+                    <properties>1</properties>
+                    <declaration>QList&lt;ToolMenuEntry&gt; toolList()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{80ae6052-b674-43ae-afec-84e2034a3ef3}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void connectDev()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{57414e66-acaa-4689-aa96-66a56a7539fd}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void disconnectDev()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d9e9b20d-8799-41c3-98c5-c7ef3e7d0d12}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void toolListChanged()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c2472128-2fe9-4ed7-918b-5e3ac636930d}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void connected()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{c40d4e00-a5d3-4507-b074-04cf983cac78}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void disconnected()</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2904,6 +3145,152 @@
                  </MObject>
                 </base-MObject>
                 <namespace>Ui</namespace>
+               </MClass>
+              </instance>
+             </target>
+            </handle>
+           </item>
+           <item>
+            <handle>
+             <uid>{d47f0fa8-cf3f-4c10-9b02-f80af3d57baa}</uid>
+             <target>
+              <instance type="MClass">
+               <MClass>
+                <base-MObject>
+                 <MObject>
+                  <base-MElement>
+                   <MElement>
+                    <uid>{d47f0fa8-cf3f-4c10-9b02-f80af3d57baa}</uid>
+                   </MElement>
+                  </base-MElement>
+                  <name>ToolManager</name>
+                  <relations>
+                   <handles>
+                    <handles>
+                     <qlist>
+                      <item>
+                       <handle>
+                        <uid>{70700dc0-3301-40e5-8ac4-bf4a120916b9}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{70700dc0-3301-40e5-8ac4-bf4a120916b9}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{d47f0fa8-cf3f-4c10-9b02-f80af3d57baa}</a>
+                             <b>{0bc900fd-1c09-48dc-a03b-394f7e17a68f}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <cardinality>1</cardinality>
+                             <navigable>true</navigable>
+                             <kind>2</kind>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                      <item>
+                       <handle>
+                        <uid>{64a0db56-30d7-4da2-8563-1dbc182717ec}</uid>
+                        <target>
+                         <instance type="MAssociation">
+                          <MAssociation>
+                           <base-MRelation>
+                            <MRelation>
+                             <base-MElement>
+                              <MElement>
+                               <uid>{64a0db56-30d7-4da2-8563-1dbc182717ec}</uid>
+                              </MElement>
+                             </base-MElement>
+                             <a>{d47f0fa8-cf3f-4c10-9b02-f80af3d57baa}</a>
+                             <b>{0bc900fd-1c09-48dc-a03b-394f7e17a68f}</b>
+                            </MRelation>
+                           </base-MRelation>
+                           <a>
+                            <MAssociationEnd>
+                             <navigable>true</navigable>
+                            </MAssociationEnd>
+                           </a>
+                          </MAssociation>
+                         </instance>
+                        </target>
+                       </handle>
+                      </item>
+                     </qlist>
+                    </handles>
+                   </handles>
+                  </relations>
+                 </MObject>
+                </base-MObject>
+                <namespace>adiscope</namespace>
+                <members>
+                 <qlist>
+                  <item>
+                   <MClassMember>
+                    <uid>{3c1c8cfc-2f8f-447f-95cf-e006c2de0b57}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void addToolList(QString, QList&lt;ToolMenuEntry&gt;)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{39c90d49-4240-4290-b9b7-00b1cb1aed93}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void removeToolList(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{98906fb9-6d89-415f-9a35-30d02d9c0293}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void changeToolList(QString, QList&lt;ToolMenuEntry&gt;)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{1592b34c-2b1c-457c-87e7-b2607de6445b}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void showToolList(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{fbedb104-f170-4f79-8ea2-46160feb4e51}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void hideToolList(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{2b17b5bc-26c1-461f-b0ef-a4190f150e40}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void lockToolList(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{b4fbd118-e16f-47b8-9ae0-3fae40ca3ace}</uid>
+                    <visibility>7</visibility>
+                    <type>2</type>
+                    <declaration>void unlockToolList(QString)</declaration>
+                   </MClassMember>
+                  </item>
+                 </qlist>
+                </members>
                </MClass>
               </instance>
              </target>

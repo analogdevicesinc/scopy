@@ -7,6 +7,7 @@
 #include "devicemanager.h"
 #include "iiocontextscanner.h"
 #include "scannediiocontextcollector.h"
+#include "toolmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
@@ -20,7 +21,7 @@ public:
     ScopyMainWindow(QWidget *parent = nullptr);
     ~ScopyMainWindow();
 public Q_SLOTS:
-    void addToolsToUi(QString id);
+    void requestTools(QString id);
     void addDeviceToUi(QString id, Device *d);
     void removeDeviceFromUi(QString);
 
@@ -29,6 +30,7 @@ private:
     DeviceManager *dm;
     IIOContextScanner *cs;
     ScannedIIOContextCollector *scc;
+    ToolManager *toolman;
 
     Ui::ScopyMainWindow *ui;
 };
