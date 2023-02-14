@@ -24,10 +24,11 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void startScanThread();
 private:
-
 	QTimer *t;
+	bool enabled = false;
 	IIOContextScannerThread* scannerThread;
 	QString scanParams;
+	QMetaObject::Connection scanFinishedSignal;
 	const int THREAD_FINISH_TIMEOUT = 30000;
 };
 }

@@ -3,6 +3,7 @@
 
 #include "scopyhomeaddpage.h"
 #include <QWidget>
+#include <QPushButton>
 
 namespace Ui {
 class ScopyHomePage;
@@ -16,6 +17,7 @@ class ScopyHomePage : public QWidget
 public:
 	explicit ScopyHomePage(QWidget *parent = nullptr);
 	~ScopyHomePage();
+	QPushButton* scanControlBtn();
 Q_SIGNALS:
 
 	void requestAddDevice(QString id);
@@ -27,7 +29,6 @@ public Q_SLOTS:
 	void removeDevice(QString id);
 	void connectDevice(QString);
 	void disconnectDevice(QString);
-
 
 private:
 	Ui::ScopyHomePage *ui;

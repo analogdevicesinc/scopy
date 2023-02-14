@@ -27,15 +27,18 @@ IIOContextScanner::~IIOContextScanner() {
 
 void IIOContextScanner::startScan(int period, QString scanParams)
 {
-	connect(scannerThread,SIGNAL(scanFinished(QStringList)),this,SIGNAL(scanFinished(QStringList)));
-	scannerThread->setScanParams(scanParams);
-	scannerThread->start();
-	t->start(period);
+	if(!enabled) {
+		scanFinishedSignal = connect(scannerThread,SIGNAL(scanFinished(QStringList)),this,SIGNAL(scanFinished(QStringList)));
+		scannerThread->setScanParams(scanParams);
+		scannerThread->start();
+		t->start(period);
+		enabled = true;
+	}
 
 }
 
 void IIOContextScanner::startScanThread() {
-	qDebug()<<"Attempting to start scanner thread";
+	qDebug(CAT_CTXSCANNER)<<"Attempting to start scanner thread";
 	if(scannerThread->isFinished()) {
 		scannerThread->start();
 	}
@@ -44,7 +47,12 @@ void IIOContextScanner::startScanThread() {
 
 void IIOContextScanner::stopScan()
 {
-	t->stop();
+	if(enabled) {
+		qDebug(CAT_CTXSCANNER)<<"Stopping scanner thread";
+		disconnect(scanFinishedSignal);
+		t->stop();
+		enabled = false;
+	}
 }
 
  int IIOContextScanner::scan(QStringList *ctxs, QString scanParams) {

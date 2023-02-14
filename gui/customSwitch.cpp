@@ -37,7 +37,7 @@ CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 	setCheckable(true);
 	setDuration(100);
 
-	QFile file(":stylesheets/stylesheets/customSwitch.qss");
+	QFile file(":stylesheets/customSwitch.qss");
 	file.open(QFile::ReadOnly);
 	QString styleSheet = QString::fromLatin1(file.readAll());
 	this->setStyleSheet(styleSheet);

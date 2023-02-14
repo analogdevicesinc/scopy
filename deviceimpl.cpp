@@ -5,6 +5,7 @@
 #include <QTextBrowser>
 #include <QLoggingCategory>
 #include <QDebug>
+#include <QPicture>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "DeviceImplementation")
 
@@ -13,13 +14,17 @@ DeviceImpl::DeviceImpl(QString uri, QObject *parent)
 	: QObject{parent},
 	  m_uri(uri)
 {
-	m_icon = new QLabel("ICON");
+	m_icon = new QLabel("");
+	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
+//	m_icon->setFixedHeight(100);
+//	m_icon->setFixedWidth(100);
+
 	m_page = new QWidget();
 	connbtn = new QPushButton("connect", m_page);
+	connbtn->setProperty("blue_button",true);
 	discbtn = new QPushButton("disconnect", m_page);
+	discbtn->setProperty("blue_button",true);
 //	extraToolchkbox = new QCheckBox("extra tool",m_page);
-	connbtn->setCheckable(true);
-	discbtn->setCheckable(true);
 	discbtn->setVisible(false);
 
 	auto layout = new QHBoxLayout(m_page);

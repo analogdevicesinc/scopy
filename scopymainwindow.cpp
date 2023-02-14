@@ -1,4 +1,5 @@
 #include "scopymainwindow.h"
+#include "scanbuttoncontroller.h"
 #include "ui_scopymainwindow.h"
 #include "scopyhomepage.h"
 #include <QLabel>
@@ -17,6 +18,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 cs = new IIOContextScanner(this);
 	 scc = new ScannedIIOContextCollector(this);
 	 dm = new DeviceManager(this);
+
+	 ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
+
 	 dm->setExclusive(true);
 	 toolman = new ToolManager(tm,this);
 	 toolman->addToolList("home",{});
@@ -45,8 +49,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	 if(dm->getExclusive()) {
 		 // only for device manager exclusive mode - stop scan on connect
-		 connect(dm,&DeviceManager::deviceConnected,this,[=](QString){cs->stopScan();});
-		 connect(dm,&DeviceManager::deviceDisconnected,this,[=](QString){cs->startScan(2000);});
+		 connect(dm,SIGNAL(deviceConnected(QString)),sbc,SLOT(stopScan()));
+		 connect(dm,SIGNAL(deviceDisconnected(QString)),sbc,SLOT(startScan()));
 	 }
 
 	 connect(dm,SIGNAL(deviceConnected(QString)),scc,SLOT(lock(QString)));
@@ -57,8 +61,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
 
 	 connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry>)));
+	 sbc->startScan();
 
-	 cs->startScan(2000);
+
 }
 
 void ScopyMainWindow::requestTools(QString id) {
@@ -70,6 +75,7 @@ ScopyMainWindow::~ScopyMainWindow()
 	cs->stopScan();
 	delete ui;
 }
+
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {

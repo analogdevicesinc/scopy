@@ -58,3 +58,7 @@ void ScopyHomePage::disconnectDevice(QString id) {
 	auto &&db = ui->wDeviceBrowser;
 	db->disconnectDevice(id);
 }
+
+QPushButton* ScopyHomePage::scanControlBtn() {
+	return ui->btnScan;
+}

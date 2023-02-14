@@ -19,6 +19,7 @@ public:
 public Q_SLOTS:
 	void addDevice(QString uri);
 	void removeDevice(QString uri);
+//	void updateScan(QStringList ls);
 
 private Q_SLOTS:
 	void changeToolListDevice();
@@ -27,7 +28,7 @@ private Q_SLOTS:
 
 Q_SIGNALS:
 	void deviceChangedToolList(QString, QList<ToolMenuEntry>);
-	void deviceAdded(QString, Device*);
+	void deviceAdded(QString,Device*);
 	void deviceRemoved(QString);
 	void deviceConnected(QString uri);
 	void deviceDisconnected(QString uri);
@@ -35,7 +36,8 @@ Q_SIGNALS:
 
 private:
 	bool exclusive = false;
-	QList<QString> connectedDev;
+	QStringList scannedDev;
+	QStringList connectedDev;
 	QMap<QString,Device*> map;
 
 };
