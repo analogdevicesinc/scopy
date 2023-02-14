@@ -1,3 +1,4 @@
+#include "logging_categories.h"
 #include "plugin/ichannelplugin.h"
 
 #include <FftDisplayPlot.h>
@@ -20,6 +21,8 @@ public:
 
 	void init() override
 	{
+		qDebug(CAT_REFCHANNEL_PLUGIN) << "init()";
+
 		instrument = dynamic_cast<NewInstrument *>(parent);
 		fft_plot = instrument->getPlot();
 

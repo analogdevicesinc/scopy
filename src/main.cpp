@@ -40,6 +40,7 @@
 //#include "coloreditor.h"
 #include "scopy_color_editor.h"
 #include "application_restarter.h"
+#include "logging_categories.h"
 
 #ifdef __ANDROID__
 	#include <QtAndroidExtras/QtAndroid>
@@ -62,6 +63,13 @@ int main(int argc, char **argv)
 	QApplication::setAttribute(Qt::AA_CompressTabletEvents, true);
 	qputenv("SCOPY_USE_OPEN_GL", "1");
 #endif
+	SetScopyQDebugMessagePattern();
+	QLoggingCategory::setFilterRules(""
+//					 "*.debug=false\n"
+//					  "ScanContextCollector.debug=true"
+					 "default=false"
+					 );
+
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts,true);
 
 	ScopyApplication app(argc, argv);

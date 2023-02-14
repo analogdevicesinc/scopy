@@ -1,5 +1,5 @@
 #include "plugin/ichannelplugin.h"
-#include "qlayout.h"
+#include "logging_categories.h"
 
 using namespace adiscope;
 using namespace gui;
@@ -15,6 +15,8 @@ IChannelPlugin::~IChannelPlugin()
 
 void IChannelPlugin::init()
 {
+	qDebug(CAT_ICHANNEL_PLUGIN) << "init()";
+
 	menu = new GenericMenu(parent);
 	menu->initInteractiveMenu();
 	menu->setMenuHeader("CH", new QColor('gray'), true);

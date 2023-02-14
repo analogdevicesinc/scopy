@@ -1,4 +1,5 @@
 #include <FftDisplayPlot.h>
+#include "logging_categories.h"
 #include "plugin/ichannelplugin.h"
 #include <newinstrument.hpp>
 
@@ -18,6 +19,8 @@ public:
 
 	void init() override
 	{
+		qDebug(CAT_PHYSICALCHANNEL_PLUGIN) << "init()";
+
 		menu = new GenericMenu(parent);
 		menu->initInteractiveMenu();
 		menu->setMenuHeader("Phys CH", new QColor('gray'), true);

@@ -1,4 +1,5 @@
 #include "gui/dynamicWidget.hpp"
+#include "logging_categories.h"
 #include "plugin/irightmenuplugin.h"
 #include <FftDisplayPlot.h>
 #include <newinstrument.hpp>
@@ -29,6 +30,8 @@ public:
 
 	void init() override
 	{
+		qDebug(CAT_CURSOR_RIGHTMENU_PLUGIN) << "init()";
+
 		menu = new GenericMenu(new QWidget());
 		menu->initInteractiveMenu();
 

@@ -34,4 +34,39 @@ Q_LOGGING_CATEGORY(CAT_CALIBRATION, "calibration")
 Q_LOGGING_CATEGORY(CAT_CALIBRATION_MANUAL, "calibration.manual")
 Q_LOGGING_CATEGORY(CAT_IIO_MANAGER, "iioManager")
 Q_LOGGING_CATEGORY(CAT_PLOT, "plot")
+Q_LOGGING_CATEGORY(CAT_CURSOR_RIGHTMENU_PLUGIN, "CursorsRightMenuPlugin")
+Q_LOGGING_CATEGORY(CAT_IRIGHTMENU_PLUGIN, "IRightMenuPlugin")
+Q_LOGGING_CATEGORY(CAT_ICHANNEL_PLUGIN, "IChannelPlugin")
+Q_LOGGING_CATEGORY(CAT_ADDCHANNEL_PLUGIN, "AddChannelPlugin")
+Q_LOGGING_CATEGORY(CAT_PHYSICALCHANNEL_PLUGIN, "PhysicalChannelPlugin")
+Q_LOGGING_CATEGORY(CAT_REFCHANNEL_PLUGIN, "RefChannelPlugin")
+
+
 #endif
+
+void SetScopyQDebugMessagePattern() {
+
+	qSetMessagePattern(
+		"[ "
+		#ifdef QDEBUG_LOG_MSG_TYPE
+			QDEBUG_LOG_MSG_TYPE_STR " "
+			QDEBUG_CATEGORY_STR " "
+		#endif
+		#ifdef QDEBUG_LOG_TIME
+			QDEBUG_LOG_TIME_STR
+		#endif
+		#ifdef QDEBUG_LOG_DATE
+			QDEBUG_LOG_DATE_STR
+		#endif
+		#ifdef QDEBUG_LOG_CATEGORY
+		QDEBUG_CATEGORY_STR
+		#endif
+		" ] "
+		#ifdef QDEBUG_LOG_FILE
+		QDEBUG_LOG_FILE_STR
+		#endif
+
+		" - "
+		"%{message}"
+		);
+}
