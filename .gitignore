@@ -24,7 +24,7 @@ android*.sh
 html/
 build_arm64-v8a/
 doc/*
-doc/!Doxyfile*
+!doc/Doxyfile
 .cache/*
 build/*
 .vscode/*
