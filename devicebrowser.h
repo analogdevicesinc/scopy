@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QButtonGroup>
 #include <QMap>
+#include <deviceicon.h>
 
 
 namespace Ui {
@@ -27,6 +28,7 @@ public:
 
 Q_SIGNALS:
 	void requestDevice(QString id, int direction);
+	void requestRemoveDevice(QString id);
 
 public Q_SLOTS:	
 
@@ -36,10 +38,11 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void updateSelectedDeviceIdx(QString);
 	void forwardRequestDeviceWithDirection();
+	void forwardRequestRemoveDevice();
 
 private:
 	void initBtns();
-	QAbstractButton* buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent = nullptr);
+	DeviceIcon* buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent = nullptr);
 	Ui::DeviceBrowser *ui;
 	QButtonGroup *bg;
 	QHBoxLayout *layout;

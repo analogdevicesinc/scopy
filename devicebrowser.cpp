@@ -1,4 +1,5 @@
 #include "devicebrowser.h"
+#include "deviceiconimpl.h"
 #include "gui/dynamicWidget.h"
 #include "ui_devicebrowser.h"
 #include <QLoggingCategory>
@@ -59,7 +60,7 @@ QAbstractButton *DeviceBrowser::getDeviceWidgetFor(QString id)
 void DeviceBrowser::addDevice(QString id, QString name, QString description, QWidget *icon, int position)
 {
 	qInfo(CAT_DEVBROWSER)<<"adding device " << id;
-	auto w = buildDeviceIcon(name, description, icon, this);
+	auto w = dynamic_cast<QAbstractButton*>(buildDeviceIcon(name, description, icon, this));
 	w->setProperty(devBrowserId,id);
 	layout->insertWidget(position,w);
 	bg->addButton(w);
@@ -69,6 +70,7 @@ void DeviceBrowser::addDevice(QString id, QString name, QString description, QWi
 		list.insert(position,w);
 
 	connect(w, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
+	connect(w, SIGNAL(forget()), this, SLOT(forwardRequestRemoveDevice()));
 }
 
 void DeviceBrowser::removeDevice(QString id)
@@ -134,6 +136,11 @@ void DeviceBrowser::prevDevice()
 	list[nextIdx]->setChecked(true);  // set checked afterwards
 }
 
+void DeviceBrowser::forwardRequestRemoveDevice() {
+	QString id = QObject::sender()->property(devBrowserId).toString();
+	Q_EMIT requestRemoveDevice(id);
+}
+
 void DeviceBrowser::forwardRequestDeviceWithDirection()
 {
     QString id = QObject::sender()->property(devBrowserId).toString();
@@ -163,8 +170,8 @@ void DeviceBrowser::disconnectDevice(QString id) {
 	w->setConnected(false);
 }
 
-QAbstractButton* DeviceBrowser::buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent) {
-	return new DeviceIcon(name, description, icon, parent);
+DeviceIcon* DeviceBrowser::buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent) {
+	return new DeviceIconImpl(name, description, icon, parent);
 }
 
 /*

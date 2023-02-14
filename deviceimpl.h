@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QCheckBox>
 
+namespace adiscope {
+
 class DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
@@ -27,6 +29,7 @@ public:
 public Q_SLOTS:
 	void connectDev() override;
 	void disconnectDev() override;
+//	void forgetDev() override;
 Q_SIGNALS:
 	void toolListChanged() override;
 	void connected() override;
@@ -39,5 +42,6 @@ private:
 	QPushButton *discbtn;
 	QCheckBox *extraToolchkbox;
 };
+}
 
 #endif // DEVICEIMPL_H

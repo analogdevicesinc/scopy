@@ -19,6 +19,7 @@ public:
 Q_SIGNALS:
 
 	void requestAddDevice(QString id);
+	void requestRemoveDevice(QString id);
 	void requestDevice(QString id);
 
 public Q_SLOTS:

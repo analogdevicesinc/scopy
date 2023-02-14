@@ -8,6 +8,7 @@
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "DeviceImplementation")
 
+namespace adiscope {
 DeviceImpl::DeviceImpl(QString uri, QObject *parent)
 	: QObject{parent},
 	  m_uri(uri)
@@ -84,4 +85,5 @@ QList<ToolMenuEntry> DeviceImpl::toolList()
 
 
 	return ret;
+}
 }

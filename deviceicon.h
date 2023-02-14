@@ -1,25 +1,21 @@
 #ifndef DEVICEICON_H
 #define DEVICEICON_H
-
-#include <QWidget>
 #include <QAbstractButton>
+#include <device.h>
 
-namespace Ui {
-	class DeviceButton;
-};
 
 namespace adiscope {
-class DeviceIcon : public QAbstractButton
-{
+class DeviceIcon : public QAbstractButton {
 	Q_OBJECT
 public:
-	explicit DeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent);
-	~DeviceIcon();
-	void setConnected(bool);
-	virtual void paintEvent(QPaintEvent *e) override;
-private:
-	Ui::DeviceButton *ui;
-
+	DeviceIcon(QWidget *parent = nullptr) : QAbstractButton(parent) {};
+	virtual ~DeviceIcon() {};
+public Q_SLOTS:
+//	virtual Device* device() = 0;
+	virtual void setConnected(bool) = 0;
+Q_SIGNALS:
+	void refresh();
+	void forget();
 };
 }
 

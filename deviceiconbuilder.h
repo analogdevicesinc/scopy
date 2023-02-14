@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QAbstractButton>
+#include <deviceicon.h>
 
 namespace adiscope {
 class DeviceIconBuilder : public QObject
@@ -11,7 +12,7 @@ class DeviceIconBuilder : public QObject
 public:
 	explicit DeviceIconBuilder(QObject *parent = nullptr);
 	~DeviceIconBuilder();
-	QAbstractButton* build(QString name, QString id, QWidget *icon, QWidget *parent);
+	DeviceIcon* build(QString name, QString id, QWidget *icon, QWidget *parent);
 
 signals:
 

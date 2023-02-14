@@ -4,6 +4,7 @@
 #include <QObject>
 #include "toolmenuentry.h"
 
+namespace adiscope {
 class Device {
 public:
 	virtual ~Device(){};
@@ -23,5 +24,6 @@ Q_SIGNALS:
 	virtual void disconnected()  = 0;
 
 };
+}
 
 #endif // DEVICE_H

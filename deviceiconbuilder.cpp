@@ -1,5 +1,5 @@
 #include "deviceiconbuilder.h"
-#include "deviceicon.h"
+#include "deviceiconimpl.h"
 
 using namespace adiscope;
 DeviceIconBuilder::DeviceIconBuilder(QObject *parent) // creates name, uri , icon, forgetbtn, connection icon, etc
@@ -11,7 +11,7 @@ DeviceIconBuilder::~DeviceIconBuilder()
 {
 
 }
-QAbstractButton* DeviceIconBuilder::build(QString name, QString id, QWidget *icon, QWidget *parent)
+DeviceIcon* DeviceIconBuilder::build(QString name, QString id, QWidget *icon, QWidget *parent)
 {
-	return new DeviceIcon(name, id, icon, parent);
+	return new DeviceIconImpl(name, id, icon, parent);
 }

@@ -41,6 +41,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 connect(dm,SIGNAL(deviceRemoved(QString)),this,SLOT(removeDeviceFromUi(QString)));
 	 connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
 	 connect(hp,SIGNAL(requestAddDevice(QString)),dm,SLOT(addDevice(QString)));
+	 connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDevice(QString)));
 
 	 if(dm->getExclusive()) {
 		 // only for device manager exclusive mode - stop scan on connect
