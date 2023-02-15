@@ -1,4 +1,5 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.9)
+enable_testing()
 
 project(tool_launcher VERSION 0.1 LANGUAGES CXX)
 
@@ -31,12 +32,10 @@ function(configure_stylesheets DU_OPTION)
 
 endfunction()
 
+add_subdirectory(gui)
 
-FILE(GLOB SRC_LIST  *.cpp *.cc
-                gui/*.cpp gui/*.cc *.ui gui/*.ui
-)
-
-FILE(GLOB HEADER_LIST *.h *.hpp gui/*.h gui/*.hpp)
+FILE(GLOB SRC_LIST  *.cpp *.cc)
+FILE(GLOB HEADER_LIST *.h *.hpp)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
@@ -45,11 +44,17 @@ set(PROJECT_SOURCES
 
 FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc)
 qt5_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
+
 find_library(IIO_LIBRARIES NAMES iio libiio)
 find_path(IIO_INCLUDE_DIRS iio.h)
-
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
-message(${SCOPY_RESOURCES})
+
+
+option(ENABLE_TESTING "Enables QtTests" ON)
+if(ENABLE_TESTING)
+    message("-- Tests enabled")
+    add_subdirectory(tests)
+endif()
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(tool_launcher
@@ -78,7 +83,8 @@ else()
     endif()
 endif()
 
-target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES})
+target_include_directories(tool_launcher PUBLIC gui)
+target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopygui)
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)

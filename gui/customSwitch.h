@@ -22,14 +22,15 @@
 #define CUSTOM_SWITCH_HPP
 
 #include <QLabel>
-#include "gui/customanimation.h"
+#include "customanimation.h"
 #include <QPushButton>
 #include <QWidget>
+#include "scopygui_export.h"
 
 class QShowEvent;
 
 namespace adiscope {
-	class CustomSwitch : public QPushButton
+	class SCOPYGUI_EXPORT CustomSwitch : public QPushButton
 	{
 		Q_OBJECT
 

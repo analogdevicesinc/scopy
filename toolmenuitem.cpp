@@ -28,7 +28,7 @@
 #include <QStyleOption>
 #include "gui/dynamicWidget.h"
 #include "qdebug.h"
-#include "utils.h"
+#include "gui/utils.h"
 #include <QLoggingCategory>
 
 using namespace adiscope;
