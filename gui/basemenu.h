@@ -22,7 +22,7 @@
 #define BASEMENU_H
 
 #include <QWidget>
-
+#include "scopygui_export.h"
 #include "basemenuitem.h"
 
 namespace Ui {
@@ -30,7 +30,7 @@ class BaseMenu;
 }
 
 namespace adiscope {
-class BaseMenu : public QWidget
+class SCOPYGUI_EXPORT BaseMenu : public QWidget
 {
 	Q_OBJECT
 

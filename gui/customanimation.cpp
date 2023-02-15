@@ -19,7 +19,7 @@
  */
 
 #include "customanimation.h"
-#include <gui/animationmanager.h>
+#include <animationmanager.h>
 
 using namespace adiscope;
 

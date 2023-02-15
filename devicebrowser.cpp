@@ -1,6 +1,5 @@
 #include "devicebrowser.h"
 #include "deviceiconimpl.h"
-#include "gui/dynamicWidget.h"
 #include "ui_devicebrowser.h"
 #include <QLoggingCategory>
 #include <QDebug>
