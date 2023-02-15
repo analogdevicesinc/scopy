@@ -22,6 +22,7 @@
 #define SCOPY_CUSTOM_PUSH_BUTTON_HPP
 
 #include <QPushButton>
+#include <scopygui_export.h>
 
 class QMouseEvent;
 
@@ -30,7 +31,7 @@ namespace adiscope {
 	 * difference is, when it's part of a button group and is the active
 	 * button, it is possible to disactivate it by clicking on it. */
 
-	class CustomPushButton : public QPushButton
+	class SCOPYGUI_EXPORT CustomPushButton : public QPushButton
 	{
 		Q_OBJECT
 

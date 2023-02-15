@@ -22,7 +22,7 @@
 #define BASEMENUITEM_H
 
 #include "coloredQWidget.h"
-
+#include <scopygui_export.h>
 #include <QFrame>
 #include <QMouseEvent>
 #include <QDragMoveEvent>
@@ -37,7 +37,7 @@ class BaseMenu;
 }
 
 namespace adiscope {
-class BaseMenuItem : public ColoredQWidget
+class SCOPYGUI_EXPORT BaseMenuItem : public ColoredQWidget
 {
 	Q_OBJECT
 

@@ -21,12 +21,14 @@
 #ifndef DYNAMIC_WIDGET_HPP
 #define DYNAMIC_WIDGET_HPP
 
+#include <scopygui_export.h>
+
 class QWidget;
 
 namespace adiscope {
-	void setDynamicProperty(QWidget *widget,
+	void SCOPYGUI_EXPORT setDynamicProperty(QWidget *widget,
 			const char *property, bool set);
-	bool getDynamicProperty(QWidget *widget,
+	bool SCOPYGUI_EXPORT getDynamicProperty(QWidget *widget,
 				const char *property);
 }
 
