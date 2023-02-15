@@ -22,9 +22,10 @@
 #define COLORED_QWIDGET_HPP
 
 #include <QWidget>
+#include <scopygui_export.h>
 
 namespace adiscope {
-	class ColoredQWidget : public QWidget
+	class SCOPYGUI_EXPORT ColoredQWidget : public QWidget
 	{
 	public:
 		explicit ColoredQWidget(QWidget *parent = nullptr);

@@ -23,13 +23,14 @@
 
 #include <QWidget>
 #include <QString>
+#include "scopygui_export.h"
 
 namespace Ui {
 class HomepageControls;
 }
 
 namespace adiscope {
-class HomepageControls : public QWidget
+class SCOPYGUI_EXPORT HomepageControls : public QWidget
 {
 	Q_OBJECT
 

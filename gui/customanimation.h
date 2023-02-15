@@ -22,9 +22,10 @@
 #define CUSTOMANIMATION_H
 
 #include <QPropertyAnimation>
+#include <scopygui_export.h>
 
 namespace adiscope {
-class CustomAnimation : public QPropertyAnimation
+class SCOPYGUI_EXPORT CustomAnimation : public QPropertyAnimation
 {
 public:
 	CustomAnimation(QObject *target = nullptr);

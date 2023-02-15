@@ -21,11 +21,12 @@
 #ifndef ANIMATIONMANAGER_H
 #define ANIMATIONMANAGER_H
 
-#include <gui/customanimation.h>
+#include "scopygui_export.h"
+#include <customanimation.h>
 #include <QObject>
 
 namespace adiscope {
-class AnimationManager : public QObject
+class SCOPYGUI_EXPORT AnimationManager : public QObject
 {
     Q_OBJECT
 

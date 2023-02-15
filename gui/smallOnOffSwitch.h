@@ -22,15 +22,16 @@
 #define SMALL_ON_OFF_SWITCH_HPP
 
 #include <QColor>
-#include "gui/customanimation.h"
+#include "customanimation.h"
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>
+#include <scopygui_export.h>
 
 class QShowEvent;
 
 namespace adiscope {
-	class SmallOnOffSwitch : public QPushButton
+	class SCOPYGUI_EXPORT SmallOnOffSwitch : public QPushButton
 	{
 		Q_OBJECT
 

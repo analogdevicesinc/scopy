@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef M2K_UTILS_H
-#define M2K_UTILS_H
+#ifndef GUI_UTILS_H
+#define GUI_UTILS_H
 
 #include <qevent.h>
 #include <qwt_plot_picker.h>
@@ -27,6 +27,13 @@
 #include <QWidget>
 #include <QDockWidget>
 #include <QMainWindow>
+
+#include <sstream>
+#include <string>
+#include <algorithm>
+#include <QDebug>
+#include <QSizePolicy>
+#include <scopygui_export.h>
 
 class QwtDblClickPlotPicker: public QwtPlotPicker
 {
@@ -57,7 +64,7 @@ public:
 				  const QEvent *e);
 };
 
-class Util
+class SCOPYGUI_EXPORT Util
 {
 public:
 	static void retainWidgetSizeWhenHidden(QWidget *w, bool retain = true);
@@ -68,7 +75,7 @@ public:
 
 #define PLOT_MENU_BAR_ENABLED
 
-class DockerUtils : public QObject
+class SCOPYGUI_EXPORT DockerUtils : public QObject
 {
 public:
 	static QDockWidget* createDockWidget(QMainWindow* mainWindow, QWidget* widget, const QString& title = "");
