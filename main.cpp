@@ -2,7 +2,7 @@
 #include "logging_categories.h"
 
 #include <QApplication>
-#include <utils.h>
+#include <gui/utils.h>
 
 int main(int argc, char *argv[])
 {

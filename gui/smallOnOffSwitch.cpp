@@ -19,7 +19,7 @@
  */
 
 #include "smallOnOffSwitch.h"
-#include "gui/dynamicWidget.h"
+#include "dynamicWidget.h"
 
 #include <QDebug>
 #include <QResizeEvent>
