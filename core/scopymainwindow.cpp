@@ -79,7 +79,7 @@ ScopyMainWindow::~ScopyMainWindow()
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	hp->addDevice(id,d->name(),d->uri(),d->icon(),d->page());
+	hp->addDevice(id,d);
 	toolman->addToolList(id,d->toolList());
 }
 

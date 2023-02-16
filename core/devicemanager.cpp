@@ -31,6 +31,7 @@ void DeviceManager::addDevice(QString uri)
 	}
 
 	d = new DeviceImpl(uri, this);//DeviceFactory::newDevice(uri);
+	d->loadPlugins();
 
 	connect(dynamic_cast<QObject*>(d),SIGNAL(connected()),this,SLOT(connectDevice()));
 	connect(dynamic_cast<QObject*>(d),SIGNAL(disconnected()),this,SLOT(disconnectDevice()));

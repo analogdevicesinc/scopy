@@ -3,6 +3,7 @@
 #include <QParallelAnimationGroup>
 #include <QLoggingCategory>
 #include <QDebug>
+#include <device.h>
 
 using namespace adiscope;
 
@@ -31,26 +32,53 @@ InfoPageStack::~InfoPageStack()
 	qDebug(CAT_INFOPAGESTACK)<<"dtor";
 }
 
-void InfoPageStack::add(QString key, QWidget *w)
-{
+void InfoPageStack::add(QString key, QWidget *w) {
 	MapStackedWidget::add(key,w);
 	if(count() == 1) {
 		hc->raise();
 	}
 	hc->setVisible(count() > 1);
+}
 
+void InfoPageStack::add(QString key, Device* d)
+{
+	QWidget *w = d->page();
+	add(key, w);
+	idDevMap.insert(key,d);
+
+}
+
+bool InfoPageStack::remove(QString key) {
+	bool ret = MapStackedWidget::remove(key);
+	idDevMap.take(key);
+	return ret;
 }
 
 bool InfoPageStack::show(QString key)
 {
+	QString oldKey = getKey(currentWidget());
+
+	if(idDevMap.contains(oldKey))
+		idDevMap[oldKey]->hidePage();
 	auto ret = MapStackedWidget::show(key);
+	if(idDevMap.contains(key))
+		idDevMap[key]->showPage();
 	hc->raise();
 	hc->setVisible(count() > 1);
 	return ret;
 }
 
 bool InfoPageStack::slideInKey(QString key, int direction) {
+	QString oldKey = getKey(currentWidget());
+
+	if(idDevMap.contains(oldKey))
+		idDevMap[oldKey]->hidePage();
+
 	QWidget *w = map.value(key);
+
+	if(idDevMap.contains(key))
+		idDevMap[key]->showPage();
+
 	if(!w)
 		return false;
 	slideInWidget(w, direction);

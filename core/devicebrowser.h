@@ -21,7 +21,7 @@ public:
 	explicit DeviceBrowser(QWidget *parent = nullptr);
 	~DeviceBrowser();
 	QAbstractButton *getDeviceWidgetFor(QString id);
-	void addDevice(QString id, QString name, QString description, QWidget *icon, int position = -1);
+	void addDevice(QString id, Device *d, int position = -1);
 	void removeDevice(QString id);
 	void connectDevice(QString id);
 	void disconnectDevice(QString id);

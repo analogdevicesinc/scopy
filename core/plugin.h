@@ -1,0 +1,36 @@
+#ifndef PLUGIN_H
+#define PLUGIN_H
+
+#include <QString>
+#include <QWidget>
+#include <toolmenuentry.h>
+
+namespace adiscope {
+class SCOPYCORE_EXPORT Plugin {
+public:
+	virtual ~Plugin() {};
+
+	virtual bool load(QString uri) = 0;
+	virtual bool compatible(QString uri) = 0;
+
+	virtual QString uri();
+	virtual QString name();
+	virtual QWidget* icon();
+	virtual QWidget* page();
+	virtual QList<ToolMenuEntry> toolList();
+public Q_SLOTS:
+	virtual bool connectDev() = 0;
+	virtual bool disconnectDev() = 0;
+	virtual void showPageCallback();
+	virtual void hidePageCallback();
+
+protected:
+	QString m_uri;
+	QString m_name;
+	QWidget *m_page;
+	QWidget *m_icon;
+	QList<ToolMenuEntry> m_toolList;
+};
+}
+
+#endif // PLUGIN_H
