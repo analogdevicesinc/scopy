@@ -1,54 +1,119 @@
 #include "deviceimpl.h"
 #include "qboxlayout.h"
 #include "qpushbutton.h"
+#include "testplugin.h"
+#include "testpluginip.h"
 #include <QLabel>
 #include <QTextBrowser>
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QPicture>
 
-Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "DeviceImplementation")
+Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace adiscope {
 DeviceImpl::DeviceImpl(QString uri, QObject *parent)
 	: QObject{parent},
 	  m_uri(uri)
 {
-	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
-//	m_icon->setFixedHeight(100);
-//	m_icon->setFixedWidth(100);
+	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";	
+}
 
+
+void DeviceImpl::loadPlugins() {
+	Plugin *p;
+	Plugin *p1;
+
+	// loop through the plugins - somehow
+
+	p1 = new TestPluginIp(this);
+	if(p1->compatible(uri())) {
+		p1->load(uri());
+		plugins.append(p1);
+
+	} else {
+		delete p1;
+	}
+
+	p = new TestPlugin(this);
+	if(p->compatible(uri())) {
+		p->load(uri());
+		plugins.append(p);
+
+	} else {
+		delete p;
+	}
+
+	loadName();
+	loadIcons();
+	loadPages();
+}
+
+void DeviceImpl::loadName() {
+	if(plugins.count())
+		m_name = plugins[0]->name();
+	else
+		m_name = "NO_PLUGIN";
+}
+
+void DeviceImpl::loadIcons() {
+	m_icon = new QWidget();
+	m_icon->setFixedHeight(100);
+	m_icon->setFixedWidth(100);
+	new QHBoxLayout(m_icon);
+
+	if(plugins.count())
+		m_icon->layout()->addWidget(plugins[0]->icon());
+	else {
+		new QLabel("No PLUGIN",m_icon);
+	}
+
+}
+
+void DeviceImpl::loadPages() {
 	m_page = new QWidget();
+	auto m_pagelayout = new QVBoxLayout(m_page);
 	connbtn = new QPushButton("connect", m_page);
 	connbtn->setProperty("blue_button",true);
+	m_pagelayout->addWidget(connbtn);
 	discbtn = new QPushButton("disconnect", m_page);
 	discbtn->setProperty("blue_button",true);
-//	extraToolchkbox = new QCheckBox("extra tool",m_page);
+	m_pagelayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
-	auto layout = new QHBoxLayout(m_page);
-	layout->addWidget(connbtn);
-	layout->addWidget(discbtn);
 	connect(connbtn,SIGNAL(clicked()),this,SLOT(connectDev()));
 	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));
 
-	// this is a little wonky but could prove useful ...
-//	connect(extraToolchkbox,SIGNAL(stateChanged(int)),this,SIGNAL(toolListChanged()));
+	for(auto &&p : plugins)
+		m_page->layout()->addWidget(p->page());
+}
 
 
-	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";
+void DeviceImpl::showPage() {
+	for(auto &&p : plugins)
+		p->showPageCallback();
+
+}
+
+void DeviceImpl::hidePage() {
+	for(auto &&p : plugins)
+		p->hidePageCallback();
+
 }
 
 void DeviceImpl::connectDev() {
 	discbtn->show();
 	connbtn->hide();
+	for(auto &&p : plugins)
+		p->connectDev();
 	Q_EMIT connected();
 }
 
 void DeviceImpl::disconnectDev() {
 	discbtn->hide();
 	connbtn->show();
+	for(auto &&p : plugins)
+		p->disconnectDev();
 	Q_EMIT disconnected();
 }
 
@@ -58,7 +123,7 @@ DeviceImpl::~DeviceImpl() {
 
 QString DeviceImpl::name()
 {
-	return "name";
+	return m_name;
 }
 
 QString DeviceImpl::uri()
@@ -80,14 +145,9 @@ QList<ToolMenuEntry> DeviceImpl::toolList()
 {
 	static int i;
 	QList<ToolMenuEntry> ret;
-	ret.append({"tool1"+uri(),"tool1Name"+QString::number(i),""});
-	ret.append({"tool2"+uri(),"tool2Name"+QString::number(i),""});
-	ret.append({"tool3"+uri(),"tool3Name"+QString::number(i),""});
-//	if(extraToolchkbox->isChecked()) {
-//		ret.append({"extratool"+uri(),"extraTool"+QString::number(i),""});
-//	}
-	i++;
 
+	for(auto &&p : plugins)
+		ret.append(p->toolList());
 
 	return ret;
 }

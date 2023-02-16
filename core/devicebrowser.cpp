@@ -56,8 +56,13 @@ QAbstractButton *DeviceBrowser::getDeviceWidgetFor(QString id)
 	return nullptr;
 }
 
-void DeviceBrowser::addDevice(QString id, QString name, QString description, QWidget *icon, int position)
+void DeviceBrowser::addDevice(QString id, Device *d,int position)
 {
+	QString name = d->name();
+	QString description = d->uri();
+	QWidget* icon = d->icon();
+
+
 	qInfo(CAT_DEVBROWSER)<<"adding device " << id;
 	auto w = dynamic_cast<QAbstractButton*>(buildDeviceIcon(name, description, icon, this));
 	w->setProperty(devBrowserId,id);

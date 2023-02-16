@@ -5,6 +5,7 @@
 #include <QWidget>
 #include <QPushButton>
 #include <scopycore_export.h>
+#include <device.h>
 
 namespace Ui {
 class ScopyHomePage;
@@ -26,7 +27,7 @@ Q_SIGNALS:
 	void requestDevice(QString id);
 
 public Q_SLOTS:
-	void addDevice(QString id, QString name, QString description, QWidget *icon, QWidget *page);
+	void addDevice(QString id, Device*);
 	void removeDevice(QString id);
 	void connectDevice(QString);
 	void disconnectDevice(QString);
