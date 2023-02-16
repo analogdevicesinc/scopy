@@ -15,6 +15,7 @@ public:
 
 	virtual void add(QString key, QWidget *w);
 	virtual bool remove(QString key);
+	virtual QString getKey(QWidget *w);
 public Q_SLOTS:
 	virtual bool show(QString key);
 protected:
