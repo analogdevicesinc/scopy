@@ -35,30 +35,3 @@ Q_LOGGING_CATEGORY(CAT_CALIBRATION_MANUAL, "calibration.manual")
 Q_LOGGING_CATEGORY(CAT_IIO_MANAGER, "iioManager")
 Q_LOGGING_CATEGORY(CAT_PLOT, "plot")
 #endif
-
-void SetScopyQDebugMessagePattern() {
-
-	qSetMessagePattern(
-		"[ "
-		#ifdef QDEBUG_LOG_MSG_TYPE
-			QDEBUG_LOG_MSG_TYPE_STR " "
-			QDEBUG_CATEGORY_STR " "
-		#endif
-		#ifdef QDEBUG_LOG_TIME
-			QDEBUG_LOG_TIME_STR
-		#endif
-		#ifdef QDEBUG_LOG_DATE
-			QDEBUG_LOG_DATE_STR
-		#endif
-		#ifdef QDEBUG_LOG_CATEGORY
-		QDEBUG_CATEGORY_STR
-		#endif
-		" ] "
-		#ifdef QDEBUG_LOG_FILE
-		QDEBUG_LOG_FILE_STR
-		#endif
-
-		" - "
-		"%{message}"
-		);
-}

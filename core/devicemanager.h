@@ -5,9 +5,10 @@
 #include <QMap>
 #include <QSet>
 #include "device.h"
+#include <scopycore_export.h>
 
 namespace adiscope {
-class DeviceManager : public QObject
+class SCOPYCORE_EXPORT DeviceManager : public QObject
 {
 	Q_OBJECT
 public:

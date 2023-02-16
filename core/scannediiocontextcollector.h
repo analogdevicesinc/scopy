@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <QSet>
-class ScannedIIOContextCollector : public QObject
+#include <scopycore_export.h>
+
+class SCOPYCORE_EXPORT ScannedIIOContextCollector : public QObject
 {
 	Q_OBJECT
 public:

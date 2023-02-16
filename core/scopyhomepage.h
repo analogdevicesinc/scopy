@@ -4,13 +4,14 @@
 #include "scopyhomeaddpage.h"
 #include <QWidget>
 #include <QPushButton>
+#include <scopycore_export.h>
 
 namespace Ui {
 class ScopyHomePage;
 }
 
 namespace adiscope {
-class ScopyHomePage : public QWidget
+class SCOPYCORE_EXPORT ScopyHomePage : public QWidget
 {
 	Q_OBJECT
 

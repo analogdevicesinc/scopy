@@ -23,12 +23,13 @@
 
 #include "gui/basemenuitem.h"
 #include "gui/customPushButton.h"
+#include <scopycore_export.h>
 
 namespace adiscope {
 /**
  * @brief The ToolMenuItem class
  */
-class ToolMenuItem : public BaseMenuItem
+class SCOPYCORE_EXPORT ToolMenuItem : public BaseMenuItem
 {
 	Q_OBJECT
 public:

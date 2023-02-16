@@ -3,13 +3,14 @@
 
 #include <QWidget>
 #include <toolmenu.h>
+#include <scopycore_export.h>
 
 namespace Ui {
 class ToolBrowser;
 }
 
 namespace adiscope {
-class ToolBrowser : public QWidget
+class SCOPYCORE_EXPORT ToolBrowser : public QWidget
 {
     Q_OBJECT
 

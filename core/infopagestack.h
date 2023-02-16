@@ -4,12 +4,13 @@
 #include "mapstackedwidget.h"
 #include <QEasingCurve>
 #include "gui/homepage_controls.h"
+#include <scopycore_export.h>
 
 namespace adiscope {
 
 // implement slide to-from  next/prev page - emits to button selection group
 
-class InfoPageStack : public MapStackedWidget
+class SCOPYCORE_EXPORT InfoPageStack : public MapStackedWidget
 {
 	Q_OBJECT
 public:

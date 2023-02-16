@@ -21,6 +21,7 @@
 #define LOGGING_CATEGORIES_H
 
 #include <QLoggingCategory>
+#include <scopycore_export.h>
 
 #define QDEBUG_LOG_TIME
 //#define QDEBUG_LOG_DATE

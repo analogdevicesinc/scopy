@@ -3,9 +3,10 @@
 
 #include <QStackedWidget>
 #include <QMap>
+#include <scopycore_export.h>
 
 namespace adiscope {
-class MapStackedWidget : public QStackedWidget
+class SCOPYCORE_EXPORT MapStackedWidget : public QStackedWidget
 {
 	Q_OBJECT
 public:
