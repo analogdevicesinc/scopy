@@ -4,13 +4,14 @@
 #include <QWidget>
 #include <QAbstractButton>
 #include <deviceicon.h>
+#include <scopycore_export.h>
 
 namespace Ui {
 	class DeviceButton;
 };
 
 namespace adiscope {
-class DeviceIconImpl : public DeviceIcon
+class SCOPYCORE_EXPORT DeviceIconImpl : public DeviceIcon
 {
 	Q_OBJECT
 public:

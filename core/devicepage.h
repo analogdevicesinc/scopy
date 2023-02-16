@@ -2,12 +2,13 @@
 #define DEVICEPAGE_H
 
 #include <QWidget>
+#include <scopycore_export.h>
 
 namespace Ui {
 class DevicePage;
 }
 
-class DevicePage : public QWidget
+class SCOPYCORE_EXPORT DevicePage : public QWidget
 {
 	Q_OBJECT
 
