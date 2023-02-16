@@ -34,12 +34,12 @@ ScopyHomePage::~ScopyHomePage()
 	delete ui;
 }
 
-void ScopyHomePage::addDevice(QString id, QString name, QString description, QWidget *icon, QWidget *page)
+void ScopyHomePage::addDevice(QString id, Device *d)
 {
 	auto &&is = ui->wInfoPageStack;
 	auto &&db = ui->wDeviceBrowser;
-	db->addDevice(id, name, description, icon);
-	is->add(id,page);
+	db->addDevice(id, d);
+	is->add(id, d);
 }
 
 void ScopyHomePage::removeDevice(QString id) {

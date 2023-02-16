@@ -1,6 +1,7 @@
 #ifndef DEVICEIMPL_H
 #define DEVICEIMPL_H
 
+#include "plugin.h"
 #include <QObject>
 #include <device.h>
 #include <QPushButton>
@@ -16,8 +17,6 @@ public:
 	explicit DeviceImpl(QString uri,QObject *parent = nullptr);
 	~DeviceImpl();
 
-
-
 	// Device interface
 public:
 	QString name() override;
@@ -25,18 +24,28 @@ public:
 	QWidget *icon() override;
 	QWidget *page() override;
 	QList<ToolMenuEntry> toolList() override;
+	void loadPlugins() override;
 
 
 public Q_SLOTS:
 	void connectDev() override;
 	void disconnectDev() override;
+	void showPage() override;
+	void hidePage() override;
 //	void forgetDev() override;
 Q_SIGNALS:
 	void toolListChanged() override;
 	void connected() override;
 	void disconnected() override;
 private:
+	void loadName();
+	void loadIcons();
+	void loadPages();
+
+private:
+	QList<Plugin*> plugins;
 	QString m_uri;
+	QString m_name;
 	QWidget *m_icon;
 	QWidget *m_page;
 	QPushButton *connbtn;

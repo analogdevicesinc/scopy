@@ -17,6 +17,11 @@ MapStackedWidget::~MapStackedWidget()
 
 }
 
+QString MapStackedWidget::getKey(QWidget *w) {
+	QString key = map.key(w,nullptr);
+	return key;
+}
+
 void MapStackedWidget::add(QString key, QWidget *w)
 {
 	map[key] = w;
