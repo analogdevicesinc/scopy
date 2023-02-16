@@ -3,11 +3,12 @@
 
 #include <QObject>
 #include <QThread>
+#include <scopycore_export.h>
 
 
 namespace adiscope {
 
-class IIOContextScannerThread : public QThread
+class SCOPYCORE_EXPORT IIOContextScannerThread : public QThread
 {
 	Q_OBJECT
 public:

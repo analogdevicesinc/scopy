@@ -8,12 +8,13 @@
 #include "iiocontextscanner.h"
 #include "scannediiocontextcollector.h"
 #include "toolmanager.h"
+#include <scopycore_export.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
 QT_END_NAMESPACE
 namespace adiscope {
-class ScopyMainWindow : public QMainWindow
+class SCOPYCORE_EXPORT ScopyMainWindow : public QMainWindow
 {
     Q_OBJECT
 

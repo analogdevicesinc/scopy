@@ -1,13 +1,14 @@
 #ifndef CONTEXTPROVIDER_H
 #define CONTEXTPROVIDER_H
 
+#include <scopycore_export.h>
 #include <QObject>
 #include <QMap>
 #include <memory>
 #include <iio.h>
 #include <mutex>
 
-class ContextRefCounter {
+class SCOPYCORE_EXPORT ContextRefCounter {
 public:
 	ContextRefCounter(QString uri);
 	~ContextRefCounter();
@@ -16,7 +17,7 @@ public:
 	int refcnt = 0;
 };
 
-class ContextProvider : public QObject
+class SCOPYCORE_EXPORT ContextProvider : public QObject
 {
 Q_OBJECT
 protected:

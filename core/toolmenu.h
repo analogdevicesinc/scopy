@@ -27,12 +27,13 @@
 #include <QString>
 #include <QLabel>
 #include <QButtonGroup>
+#include <scopycore_export.h>
 
 namespace adiscope {
 /**
  * @brief The ToolMenu class
  */
-class ToolMenu : public BaseMenu
+class SCOPYCORE_EXPORT ToolMenu : public BaseMenu
 {
 	Q_OBJECT
 public:

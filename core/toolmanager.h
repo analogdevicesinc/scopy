@@ -5,9 +5,10 @@
 #include <QMap>
 #include "toolmenu.h"
 #include "toolmenuentry.h"
+#include <scopycore_export.h>
 
 namespace adiscope {
-class ToolManager : public QObject
+class SCOPYCORE_EXPORT ToolManager : public QObject
 {
 	Q_OBJECT
 
