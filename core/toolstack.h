@@ -3,9 +3,10 @@
 
 #include "mapstackedwidget.h"
 #include <QMap>
+#include <scopycore_export.h>
 
 namespace Ui {
-class ToolStack;
+class SCOPYCORE_EXPORT ToolStack;
 }
 /**
  * @brief The ToolStack class

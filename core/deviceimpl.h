@@ -5,10 +5,11 @@
 #include <device.h>
 #include <QPushButton>
 #include <QCheckBox>
+#include <scopycore_export.h>
 
 namespace adiscope {
 
-class DeviceImpl : public QObject, public Device
+class SCOPYCORE_EXPORT DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
 public:

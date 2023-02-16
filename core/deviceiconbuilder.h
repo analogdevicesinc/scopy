@@ -4,9 +4,10 @@
 #include <QObject>
 #include <QAbstractButton>
 #include <deviceicon.h>
+#include <scopycore_export.h>
 
 namespace adiscope {
-class DeviceIconBuilder : public QObject
+class SCOPYCORE_EXPORT DeviceIconBuilder : public QObject
 {
 	Q_OBJECT
 public:

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(scopygui VERSION 0.1 LANGUAGES CXX)
+project(scopycore VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -33,14 +33,17 @@ set(PROJECT_SOURCES
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-add_library(scopygui SHARED
+add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
 )
 
-generate_export_header(scopygui EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/scopygui_export.h)
-target_include_directories(scopygui PUBLIC include)
-target_include_directories(scopygui PUBLIC ui)
+generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/${PROJECT_NAME}_export.h)
 
-target_link_libraries(scopygui PUBLIC Qt5::Widgets)
+target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher)
+target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher/gui)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+target_include_directories(${PROJECT_NAME} PUBLIC ui)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopygui iio)
 
 

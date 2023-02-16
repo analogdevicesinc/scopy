@@ -3,9 +3,10 @@
 
 #include <QObject>
 #include "toolmenuentry.h"
+#include <scopycore_export.h>
 
 namespace adiscope {
-class Device {
+class SCOPYCORE_EXPORT Device {
 public:
 	virtual ~Device(){};
 	virtual QString name() = 0;

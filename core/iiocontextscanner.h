@@ -5,10 +5,11 @@
 #include <QTimer>
 #include <iio.h>
 #include "iiocontextscannerthread.h"
+#include <scopycore_export.h>
 
 namespace adiscope {
 
-class IIOContextScanner : public QObject
+class SCOPYCORE_EXPORT IIOContextScanner : public QObject
 {
 	Q_OBJECT
 public:
