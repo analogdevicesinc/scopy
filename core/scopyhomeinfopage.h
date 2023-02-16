@@ -2,12 +2,13 @@
 #define SCOPYHOMEINFOPAGE_H
 
 #include <QWidget>
+#include <scopycore_export.h>
 
 namespace Ui {
 class ScopyHomeInfoPage;
 }
 
-class ScopyHomeInfoPage : public QWidget
+class SCOPYCORE_EXPORT ScopyHomeInfoPage : public QWidget
 {
     Q_OBJECT
 

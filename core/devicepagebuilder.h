@@ -2,8 +2,9 @@
 #define DEVICEPAGEBUILDER_H
 
 #include <QObject>
+#include <scopycore_export.h>
 
-class DevicePageBuilder : public QObject
+class SCOPYCORE_EXPORT DevicePageBuilder : public QObject
 {
 	Q_OBJECT
 public:

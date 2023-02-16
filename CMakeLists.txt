@@ -33,13 +33,16 @@ function(configure_stylesheets DU_OPTION)
 endfunction()
 
 add_subdirectory(gui)
+add_subdirectory(core)
 
 FILE(GLOB SRC_LIST  *.cpp *.cc)
 FILE(GLOB HEADER_LIST *.h *.hpp)
+FILE(GLOB UI_LIST *.ui)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
         ${HEADER_LIST}
+        ${UI_LIST}
 )
 
 FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc)
@@ -83,8 +86,8 @@ else()
     endif()
 endif()
 
-target_include_directories(tool_launcher PUBLIC gui)
-target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopygui)
+target_include_directories(tool_launcher PUBLIC gui core)
+target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopygui scopycore)
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)

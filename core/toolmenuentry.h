@@ -2,6 +2,7 @@
 #define TOOLMENUENTRY_H
 
 #include <QString>
+#include <scopycore_export.h>
 
 typedef struct  {
 	QString id;

@@ -4,9 +4,10 @@
 #include <QObject>
 #include <iiocontextscanner.h>
 #include <QPushButton>
+#include <scopycore_export.h>
 
 namespace adiscope {
-class ScanButtonController : public QObject
+class SCOPYCORE_EXPORT ScanButtonController : public QObject
 {
 	Q_OBJECT
 public:
