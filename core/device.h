@@ -14,10 +14,13 @@ public:
 	virtual QWidget *icon() = 0;;
 	virtual QWidget *page() = 0;;
 	virtual QList<ToolMenuEntry> toolList() = 0;
+	virtual void loadPlugins() = 0;
 
 public Q_SLOTS:
 	virtual void connectDev() = 0;
 	virtual void disconnectDev() = 0;
+	virtual void showPage() = 0;
+	virtual void hidePage() = 0;
 
 Q_SIGNALS:
 	virtual void toolListChanged() = 0;

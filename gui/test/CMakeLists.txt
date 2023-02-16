@@ -20,6 +20,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(Qt5Test REQUIRED)
 
 SETUP_TESTS(
-    basics
+    tst_test1
 )
 
