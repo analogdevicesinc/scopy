@@ -13,7 +13,7 @@ public:
 	virtual QString uri() = 0;;
 	virtual QWidget *icon() = 0;;
 	virtual QWidget *page() = 0;;
-	virtual QList<ToolMenuEntry> toolList() = 0;
+	virtual QList<ToolMenuEntry*> toolList() = 0;
 	virtual void loadPlugins() = 0;
 
 public Q_SLOTS:

@@ -5,7 +5,7 @@
 #include <plugin.h>
 
 namespace adiscope {
-class TestPlugin : public QObject, public Plugin
+class TestPlugin : public Plugin
 {
 	Q_OBJECT
 public:

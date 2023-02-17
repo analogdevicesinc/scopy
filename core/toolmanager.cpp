@@ -4,10 +4,11 @@
 
 Q_LOGGING_CATEGORY(CAT_TOOLMANAGER, "ToolManager")
 using namespace adiscope;
-ToolManager::ToolManager(ToolMenu *tm, QObject *parent ) : QObject(parent)
+ToolManager::ToolManager(ToolMenu *tm, ToolStack *ts, QObject *parent ) : QObject(parent)
 {
 	currentKey = "";
 	this->tm = tm;
+	this->ts = ts;
 	qDebug(CAT_TOOLMANAGER) << "ctor";
 }
 
@@ -15,13 +16,17 @@ ToolManager::~ToolManager() {
 	qDebug(CAT_TOOLMANAGER) << "dtor";
 }
 
-void ToolManager::addToolList(QString s, QList<ToolMenuEntry> sl) {
+void ToolManager::addToolList(QString s, QList<ToolMenuEntry*> sl) {
 	qDebug(CAT_TOOLMANAGER) << "added" << s << "with " << sl.length() << "entries";
 	map[s] = {s,sl,false};
 	if(map.count() == 1) {
 		qDebug(CAT_TOOLMANAGER) << "first item, currentkey = " << s;
 		currentKey = s;
 		showToolList(s);
+	}
+	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
+	{
+		connect(tme,SIGNAL(updateTool()),this,SLOT(updateTool()));
 	}
 }
 
@@ -30,10 +35,15 @@ void ToolManager::removeToolList(QString s) {
 	if(currentKey == s) {
 		hideToolList(s);
 	}
+
+	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
+	{
+		disconnect(tme,SIGNAL(updateTool()),this,SLOT(updateTool()));
+	}
 	map.take(s);
 }
 
-void ToolManager::changeToolListContents(QString s, QList<ToolMenuEntry> sl) {
+void ToolManager::changeToolListContents(QString s, QList<ToolMenuEntry*> sl) {
 	bool prev = map[s].lock;
 	qInfo(CAT_TOOLMANAGER) << "changing" << s;
 	removeToolList(s);
@@ -49,25 +59,35 @@ void ToolManager::showToolList(QString s) {
 	currentKey = s;
 
 	qDebug(CAT_TOOLMANAGER) << "showing" << s;
-	for(ToolMenuEntry &s : map[s].tools)
+	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
-		if(tm->getToolMenuItemFor(s.id) == nullptr)
-			tm->addTool(s.id,s.name,s.icon);
+		ToolMenuItem *m = tm->getToolMenuItemFor(tme->id());
+		if( m == nullptr) {
+			m = tm->addTool(tme->id(),tme->name(),tme->icon());
+			connect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateToolEntry()));
+		}
+		m->setEnabled(tme->enabled());
+		m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
+		m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
+		m->getToolRunBtn()->setChecked(tme->running());
+
 	}
 
 }
 
 void ToolManager::hideToolList(QString s) {
 	qDebug(CAT_TOOLMANAGER) << "hiding" << s;
-	for(ToolMenuEntry &s : map[s].tools)
+	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
-		if(tm->getToolMenuItemFor(s.id) != nullptr)
-			tm->removeTool(s.id);
+		if(tm->getToolMenuItemFor(tme->id()) != nullptr)
+			tm->removeTool(tme->id());
+			disconnect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateTool()));			
 	}
 }
 
 void ToolManager::lockToolList(QString s) {
 	map[s].lock = true;
+	lockedToolLists.append(s);
 	qDebug(CAT_TOOLMANAGER) << "locking" << s;
 	if(currentKey != s) {
 		showToolList(s);
@@ -77,10 +97,47 @@ void ToolManager::lockToolList(QString s) {
 
 void ToolManager::unlockToolList(QString s){
 	map[s].lock = false;
+	lockedToolLists.removeOne(s);
 	qDebug(CAT_TOOLMANAGER) << "unlocking" << s;
 	if(currentKey != s) {
 		hideToolList(s);
 	}
 }
+
+void ToolManager::updateToolEntry(ToolMenuEntry *tme, QString s) {
+	auto m = tm->getToolMenuItemFor(s);
+	m->setEnabled(tme->enabled());
+	m->setName(tme->name());
+	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
+	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
+	m->getToolRunBtn()->setChecked(tme->running());
+	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() <<" - "<< tme->id();
+}
+
+void ToolManager::updateToolEntry() {
+	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
+	if(tme)
+		updateToolEntry(tme,tme->id());
+	else
+		qWarning(CAT_TOOLMANAGER())<<"wrong QObject::sender() for updateToolEntry()";
+
+}
+
+void ToolManager::updateTool() {
+
+	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
+	QString id = tme->id();
+	QString name = tme->name();
+	QWidget* tool = tme->tool();
+	if(tme) {
+		if(ts->contains(id))
+			ts->remove(id);
+		ts->add(id,tool);
+		qDebug(CAT_TOOLMANAGER) << "updating tool for " << tme->name() <<" - "<< id;
+	} else {
+		qWarning(CAT_TOOLMANAGER()) << "Id not tracked by toolmanager - cannot add tool" << id;
+	}
+}
+
 
 
