@@ -30,6 +30,7 @@ void DeviceImpl::loadPlugins() {
 	if(p1->compatible(uri())) {
 		p1->load(uri());
 		plugins.append(p1);
+		connect(p1,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
 
 	} else {
 		delete p1;
@@ -39,6 +40,7 @@ void DeviceImpl::loadPlugins() {
 	if(p->compatible(uri())) {
 		p->load(uri());
 		plugins.append(p);
+		connect(p,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
 
 	} else {
 		delete p;
@@ -82,7 +84,7 @@ void DeviceImpl::loadPages() {
 	discbtn->setVisible(false);
 
 	connect(connbtn,SIGNAL(clicked()),this,SLOT(connectDev()));
-	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));
+	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));	
 
 	for(auto &&p : plugins)
 		m_page->layout()->addWidget(p->page());
@@ -141,13 +143,15 @@ QWidget *DeviceImpl::page()
 	return m_page;
 }
 
-QList<ToolMenuEntry> DeviceImpl::toolList()
+QList<ToolMenuEntry*> DeviceImpl::toolList()
 {
 	static int i;
-	QList<ToolMenuEntry> ret;
+	QList<ToolMenuEntry*> ret;
 
-	for(auto &&p : plugins)
-		ret.append(p->toolList());
+	for(auto &&p : plugins) {
+		ret.append(p->toolList());		
+	}
+
 
 	return ret;
 }

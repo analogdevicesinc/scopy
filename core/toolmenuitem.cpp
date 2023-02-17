@@ -70,12 +70,12 @@ QPushButton *ToolMenuItem::getToolRunBtn() const
 	return toolRunBtn;
 }
 
-void ToolMenuItem::setToolEnabled(bool enabled)
-{
-	BaseMenuItem::setVisible(enabled);
-	Util::retainWidgetSizeWhenHidden(this, enabled);
-	setEnabled(enabled);
-}
+//void ToolMenuItem::setToolEnabled(bool enabled)
+//{
+//	BaseMenuItem::setVisible(enabled);
+//	Util::retainWidgetSizeWhenHidden(this, enabled);
+//	setEnabled(enabled);
+//}
 
 void ToolMenuItem::enableDoubleClick(bool enable)
 {
@@ -100,6 +100,11 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 	}
 
 	return QObject::event(event);
+}
+
+void ToolMenuItem::setName(QString str) {
+	this->name = str;
+	toolBtn->setText(name);
 }
 
 void ToolMenuItem::setTemporaryName(QString str)

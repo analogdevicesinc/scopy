@@ -23,7 +23,7 @@ public:
 	QString uri() override;
 	QWidget *icon() override;
 	QWidget *page() override;
-	QList<ToolMenuEntry> toolList() override;
+	QList<ToolMenuEntry*> toolList() override;
 	void loadPlugins() override;
 
 

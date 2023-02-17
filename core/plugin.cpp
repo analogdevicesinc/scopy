@@ -16,7 +16,7 @@ QWidget* Plugin::icon() {
 QWidget* Plugin::page() {
 	return m_page;
 }
-QList<ToolMenuEntry> Plugin::toolList() {
+QList<ToolMenuEntry*> Plugin::toolList() {
 	return m_toolList;
 }
 void Plugin::showPageCallback() {
