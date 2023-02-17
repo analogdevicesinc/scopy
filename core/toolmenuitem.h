@@ -46,6 +46,7 @@ public:
 
 	void setTemporaryName(QString str);
 	void clearTemporaryName();
+	void setName(QString str);
 	void hideText(bool hidden);
 
 	const QString &getId() const;

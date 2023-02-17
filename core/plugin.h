@@ -6,8 +6,10 @@
 #include <toolmenuentry.h>
 
 namespace adiscope {
-class SCOPYCORE_EXPORT Plugin {
+class SCOPYCORE_EXPORT Plugin : public QObject {
+	Q_OBJECT
 public:
+	Plugin(QObject *parent = nullptr) : QObject(parent) { }
 	virtual ~Plugin() {};
 
 	virtual bool load(QString uri) = 0;
@@ -17,19 +19,22 @@ public:
 	virtual QString name();
 	virtual QWidget* icon();
 	virtual QWidget* page();
-	virtual QList<ToolMenuEntry> toolList();
+	virtual QList<ToolMenuEntry*> toolList();
 public Q_SLOTS:
 	virtual bool connectDev() = 0;
 	virtual bool disconnectDev() = 0;
 	virtual void showPageCallback();
 	virtual void hidePageCallback();
+Q_SIGNALS:
+	void toolListChanged();
+
 
 protected:
 	QString m_uri;
 	QString m_name;
 	QWidget *m_page;
 	QWidget *m_icon;
-	QList<ToolMenuEntry> m_toolList;
+	QList<ToolMenuEntry*> m_toolList;
 };
 }
 
