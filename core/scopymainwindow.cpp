@@ -22,7 +22,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
 
 	 dm->setExclusive(true);
-	 toolman = new ToolManager(tm,this);
+	 toolman = new ToolManager(tm,ts,this);
 	 toolman->addToolList("home",{});
 	 toolman->addToolList("add",{});
 
@@ -60,7 +60,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 connect(dm,SIGNAL(deviceDisconnected(QString)),toolman,SLOT(unlockToolList(QString)));
 	 connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
 
-	 connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry>)));
+	 connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	 sbc->startScan();
 
 

@@ -5,7 +5,7 @@
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace adiscope;
-TestPlugin::TestPlugin(QObject *parent) : QObject(parent)
+TestPlugin::TestPlugin(QObject *parent) : Plugin(parent)
 {
 	m_name = "TestPlugin";
 	qDebug(CAT_TESTPLUGIN)<<"ctor";
@@ -26,7 +26,7 @@ bool TestPlugin::load(QString uri) {
 	m_icon = new QLabel("");
 	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
 	m_page = new QLabel("TestPage");	
-	m_toolList.append({QUuid::createUuid().toString(),"2",""});
+	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"2","",this));
 	return true;
 }
 
@@ -34,7 +34,7 @@ bool TestPlugin::connectDev()
 {
 	qDebug(CAT_TESTPLUGIN)<<"connect";
 	for(auto &&tool:m_toolList) {
-	qDebug(CAT_TESTPLUGIN)<<tool.id<<tool.name;
+	qDebug(CAT_TESTPLUGIN)<<tool->id()<<tool->name();
 	}
 	return true;
 }
