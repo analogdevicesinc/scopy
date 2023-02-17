@@ -28,7 +28,7 @@ private Q_SLOTS:
 	void disconnectDevice();
 
 Q_SIGNALS:
-	void deviceChangedToolList(QString, QList<ToolMenuEntry>);
+	void deviceChangedToolList(QString, QList<ToolMenuEntry*>);
 	void deviceAdded(QString,Device*);
 	void deviceRemoved(QString);
 	void deviceConnected(QString uri);
