@@ -32,7 +32,9 @@ function(configure_stylesheets DU_OPTION)
 
 endfunction()
 
+add_subdirectory(pluginbase)
 add_subdirectory(gui)
+add_subdirectory(plugins)
 add_subdirectory(core)
 
 FILE(GLOB SRC_LIST  *.cpp *.cc)

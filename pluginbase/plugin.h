@@ -4,9 +4,10 @@
 #include <QString>
 #include <QWidget>
 #include <toolmenuentry.h>
+#include <scopypluginbase_export.h>
 
 namespace adiscope {
-class SCOPYCORE_EXPORT Plugin : public QObject {
+class SCOPYPLUGINBASE_EXPORT Plugin : public QObject {
 	Q_OBJECT
 public:
 	Plugin(QObject *parent = nullptr) : QObject(parent) { }
