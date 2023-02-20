@@ -1,0 +1,42 @@
+
+#ifndef SCOPYTESTPLUGIN2_EXPORT_H
+#define SCOPYTESTPLUGIN2_EXPORT_H
+
+#ifdef SCOPYTESTPLUGIN2_STATIC_DEFINE
+#  define SCOPYTESTPLUGIN2_EXPORT
+#  define SCOPYTESTPLUGIN2_NO_EXPORT
+#else
+#  ifndef SCOPYTESTPLUGIN2_EXPORT
+#    ifdef scopytestplugin2_EXPORTS
+        /* We are building this library */
+#      define SCOPYTESTPLUGIN2_EXPORT __attribute__((visibility("default")))
+#    else
+        /* We are using this library */
+#      define SCOPYTESTPLUGIN2_EXPORT __attribute__((visibility("default")))
+#    endif
+#  endif
+
+#  ifndef SCOPYTESTPLUGIN2_NO_EXPORT
+#    define SCOPYTESTPLUGIN2_NO_EXPORT __attribute__((visibility("hidden")))
+#  endif
+#endif
+
+#ifndef SCOPYTESTPLUGIN2_DEPRECATED
+#  define SCOPYTESTPLUGIN2_DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#ifndef SCOPYTESTPLUGIN2_DEPRECATED_EXPORT
+#  define SCOPYTESTPLUGIN2_DEPRECATED_EXPORT SCOPYTESTPLUGIN2_EXPORT SCOPYTESTPLUGIN2_DEPRECATED
+#endif
+
+#ifndef SCOPYTESTPLUGIN2_DEPRECATED_NO_EXPORT
+#  define SCOPYTESTPLUGIN2_DEPRECATED_NO_EXPORT SCOPYTESTPLUGIN2_NO_EXPORT SCOPYTESTPLUGIN2_DEPRECATED
+#endif
+
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef SCOPYTESTPLUGIN2_NO_DEPRECATED
+#    define SCOPYTESTPLUGIN2_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* SCOPYTESTPLUGIN2_EXPORT_H */
