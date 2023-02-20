@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 {
 	SetScopyQDebugMessagePattern();
 	QLoggingCategory::setFilterRules(""
-					 "*.debug=false\n"
+//					 "*.debug=false\n"
 					 "DeviceManager.debug=true\n"
 					 "Device.debug=true\n"
 					 "TestPlugin.debug=true\n"

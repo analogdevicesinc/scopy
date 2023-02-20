@@ -3,9 +3,10 @@
 
 #include <QObject>
 #include <plugin.h>
+#include <testplugin2_export.h>
 
 namespace adiscope {
-class TestPluginIp : public Plugin
+class TESTPLUGIN2_EXPORT TestPluginIp : public Plugin
 {
 	Q_OBJECT
 public:
