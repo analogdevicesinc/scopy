@@ -1,5 +1,5 @@
-#include "scopymainwindow.h"
-#include "logging_categories.h"
+#include "core/scopymainwindow.h"
+#include "core/logging_categories.h"
 
 #include <QApplication>
 #include <gui/utils.h>

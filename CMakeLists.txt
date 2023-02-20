@@ -52,6 +52,8 @@ qt5_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 find_library(IIO_LIBRARIES NAMES iio libiio)
 find_path(IIO_INCLUDE_DIRS iio.h)
+
+
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 
 
@@ -76,6 +78,8 @@ else()
             ${PROJECT_SOURCES}
             ${SCOPY_RESOURCES}
             ${SCOPY_DEPENDENCIES}
+            scopygui
+            scopycore
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
@@ -88,8 +92,9 @@ else()
     endif()
 endif()
 
-target_include_directories(tool_launcher PUBLIC gui core)
-target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopygui scopycore)
+set(CMAKE_VERBOSE_MAKEFILE ON)
+target_include_directories(tool_launcher PUBLIC scopygui scopycore)
+target_link_libraries(tool_launcher PRIVATE Qt5::Widgets ${SCOPY_DEPENDENCIES} scopycore scopygui)
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
