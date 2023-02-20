@@ -17,11 +17,13 @@ public:
 public:
 	bool compatible(QString uri) override;
 	bool load(QString uri) override;
+	void unload() override;
 
 	bool connectDev() override;
 	bool disconnectDev() override;
 
-
+private:
+	QWidget *m_tool;
 
 };
 }

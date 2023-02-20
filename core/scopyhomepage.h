@@ -29,6 +29,7 @@ Q_SIGNALS:
 public Q_SLOTS:
 	void addDevice(QString id, Device*);
 	void removeDevice(QString id);
+	void viewDevice(QString id);
 	void connectDevice(QString);
 	void disconnectDevice(QString);
 

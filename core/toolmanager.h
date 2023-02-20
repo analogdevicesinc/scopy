@@ -30,6 +30,7 @@ public Q_SLOTS:
 	void updateToolEntry(ToolMenuEntry *tme, QString s);
 	void updateToolEntry();
 	void updateTool();
+	void showTool(QString id);
 
 private:
 	typedef struct {

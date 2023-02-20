@@ -25,6 +25,8 @@ public:
 	QWidget *page() override;
 	QList<ToolMenuEntry*> toolList() override;
 	void loadPlugins() override;
+	void unloadPlugins() override;
+	void getPlugins();
 
 
 public Q_SLOTS:
@@ -37,6 +39,8 @@ Q_SIGNALS:
 	void toolListChanged() override;
 	void connected() override;
 	void disconnected() override;
+	void requestedRestart() override;
+	void requestTool(QString) override;
 private:
 	void loadName();
 	void loadIcons();

@@ -15,6 +15,7 @@ public:
 	virtual QWidget *page() = 0;;
 	virtual QList<ToolMenuEntry*> toolList() = 0;
 	virtual void loadPlugins() = 0;
+	virtual void unloadPlugins() = 0;
 
 public Q_SLOTS:
 	virtual void connectDev() = 0;
@@ -26,6 +27,8 @@ Q_SIGNALS:
 	virtual void toolListChanged() = 0;
 	virtual void connected() = 0;
 	virtual void disconnected()  = 0;
+	virtual void requestedRestart() = 0;
+	virtual void requestTool(QString) = 0;
 
 };
 }

@@ -80,8 +80,8 @@ void ToolManager::hideToolList(QString s) {
 	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
 		if(tm->getToolMenuItemFor(tme->id()) != nullptr)
+			disconnect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateTool()));
 			tm->removeTool(tme->id());
-			disconnect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateTool()));			
 	}
 }
 
@@ -132,11 +132,17 @@ void ToolManager::updateTool() {
 	if(tme) {
 		if(ts->contains(id))
 			ts->remove(id);
-		ts->add(id,tool);
+		if(tool != nullptr)
+			ts->add(id,tool);
 		qDebug(CAT_TOOLMANAGER) << "updating tool for " << tme->name() <<" - "<< id;
 	} else {
 		qWarning(CAT_TOOLMANAGER()) << "Id not tracked by toolmanager - cannot add tool" << id;
 	}
+}
+
+void ToolManager::showTool(QString s) {
+	tm->getToolMenuItemFor(s)->getToolBtn()->setChecked(true);
+	Q_EMIT tm->requestToolSelect(s);
 }
 
 
