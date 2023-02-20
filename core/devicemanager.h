@@ -20,19 +20,25 @@ public:
 public Q_SLOTS:
 	void addDevice(QString uri);
 	void removeDevice(QString uri);
+	void restartDevice(QString uri);
 //	void updateScan(QStringList ls);
 
 private Q_SLOTS:
 	void changeToolListDevice();
 	void connectDevice();
 	void disconnectDevice();
+	void restartDevice();
 
 Q_SIGNALS:
 	void deviceChangedToolList(QString, QList<ToolMenuEntry*>);
+	void deviceAddStarted(QString);
 	void deviceAdded(QString,Device*);
+	void deviceRemoveStarted(QString, Device*);
 	void deviceRemoved(QString);
 	void deviceConnected(QString uri);
 	void deviceDisconnected(QString uri);
+	void requestDevice(QString uri);
+	void requestTool(QString id);
 
 
 private:
