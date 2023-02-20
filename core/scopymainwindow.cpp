@@ -41,10 +41,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 connect(scc,SIGNAL(foundDevice(QString)),dm,SLOT(addDevice(QString)));
 	 connect(scc,SIGNAL(lostDevice(QString)),dm,SLOT(removeDevice(QString)));
 
-	 connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
-	 connect(dm,SIGNAL(deviceRemoved(QString)),this,SLOT(removeDeviceFromUi(QString)));
 	 connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
+
 	 connect(hp,SIGNAL(requestAddDevice(QString)),dm,SLOT(addDevice(QString)));
+	 connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
+
+	 connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),this,SLOT(removeDeviceFromUi(QString)));
 	 connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDevice(QString)));
 
 	 if(dm->getExclusive()) {
@@ -60,10 +62,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 connect(dm,SIGNAL(deviceDisconnected(QString)),toolman,SLOT(unlockToolList(QString)));
 	 connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
 
+	 connect(dm,SIGNAL(requestDevice(QString)),hp,SLOT(viewDevice(QString)));
+	 connect(dm,SIGNAL(requestTool(QString)),toolman,SLOT(showTool(QString)));
+
 	 connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	 sbc->startScan();
-
-
 }
 
 void ScopyMainWindow::requestTools(QString id) {
@@ -85,8 +88,8 @@ void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
-	hp->removeDevice(id);
 	toolman->removeToolList(id);
+	hp->removeDevice(id);
 
 }
 
