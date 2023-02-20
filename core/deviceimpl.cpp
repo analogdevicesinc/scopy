@@ -16,7 +16,7 @@ DeviceImpl::DeviceImpl(QString uri, QObject *parent)
 	: QObject{parent},
 	  m_uri(uri)
 {
-	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";	
+	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";
 }
 
 
@@ -31,6 +31,8 @@ void DeviceImpl::loadPlugins() {
 		p1->load(uri());
 		plugins.append(p1);
 		connect(p1,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
+		connect(p1,&Plugin::restartDevice,this,&DeviceImpl::requestedRestart);
+		connect(p1,&Plugin::requestTool,this,&DeviceImpl::requestTool);
 
 	} else {
 		delete p1;
@@ -41,6 +43,7 @@ void DeviceImpl::loadPlugins() {
 		p->load(uri());
 		plugins.append(p);
 		connect(p,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
+		connect(p,&Plugin::restartDevice,this,&DeviceImpl::requestedRestart);
 
 	} else {
 		delete p;
@@ -49,6 +52,19 @@ void DeviceImpl::loadPlugins() {
 	loadName();
 	loadIcons();
 	loadPages();
+}
+
+void DeviceImpl::unloadPlugins() {
+	QList<Plugin*>::const_iterator pI = plugins.constEnd();
+
+	while(pI != plugins.constBegin()) {
+		--pI;
+		disconnect(*pI,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
+		disconnect(*pI,&Plugin::restartDevice,this,&DeviceImpl::requestedRestart);
+		(*pI)->unload();
+		delete (*pI);
+	}
+	plugins.clear();
 }
 
 void DeviceImpl::loadName() {
@@ -84,7 +100,7 @@ void DeviceImpl::loadPages() {
 	discbtn->setVisible(false);
 
 	connect(connbtn,SIGNAL(clicked()),this,SLOT(connectDev()));
-	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));	
+	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));
 
 	for(auto &&p : plugins)
 		m_page->layout()->addWidget(p->page());
@@ -149,10 +165,8 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 	QList<ToolMenuEntry*> ret;
 
 	for(auto &&p : plugins) {
-		ret.append(p->toolList());		
+		ret.append(p->toolList());
 	}
-
-
 	return ret;
 }
 }
