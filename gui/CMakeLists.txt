@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
-project(scopygui VERSION 0.1 LANGUAGES CXX)
+set(SCOPY_MODULE gui)
+project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -19,9 +20,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-FILE(GLOB SRC_LIST  *.cpp *.cc)
-FILE(GLOB HEADER_LIST *.h i*.hpp)
-FILE(GLOB UI_LIST *.ui)
+FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
+FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+FILE(GLOB UI_LIST ui/*.ui)
 
 add_subdirectory(test)
 
@@ -33,14 +34,14 @@ set(PROJECT_SOURCES
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
-add_library(scopygui SHARED
+add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
 )
 
-generate_export_header(scopygui EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/scopygui_export.h)
-target_include_directories(scopygui PUBLIC include)
-target_include_directories(scopygui PUBLIC ui)
+generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
 
-target_link_libraries(scopygui PUBLIC Qt5::Widgets)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets)
 
 
