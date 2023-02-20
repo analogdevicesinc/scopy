@@ -3,10 +3,10 @@
 
 #include <QObject>
 #include <QString>
-#include <scopycore_export.h>
+#include <scopypluginbase_export.h>
 
 namespace adiscope {
-class  ToolMenuEntry : public QObject {
+class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QObject *parent = nullptr) :

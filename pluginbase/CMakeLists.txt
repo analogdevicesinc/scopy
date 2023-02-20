@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(scopycore VERSION 0.1 LANGUAGES CXX)
+project(scopypluginbase VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -41,12 +41,10 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 
 target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher)
 target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher/gui)
-target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher/pluginbase)
-target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher/plugins/testplugin)
-target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher/plugins/testplugin2)
+target_include_directories(${PROJECT_NAME} PUBLIC /home/adi/tmp/tool_launcher/plugin)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 target_include_directories(${PROJECT_NAME} PUBLIC ui)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopygui scopypluginbase iio testplugin testplugin2)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets)
 
 
