@@ -13,6 +13,8 @@ public:
 	virtual ~Plugin() {};
 
 	virtual bool load(QString uri) = 0;
+	virtual void unload() = 0;
+
 	virtual bool compatible(QString uri) = 0;
 
 	virtual QString uri();
@@ -26,7 +28,9 @@ public Q_SLOTS:
 	virtual void showPageCallback();
 	virtual void hidePageCallback();
 Q_SIGNALS:
+	void restartDevice();
 	void toolListChanged();
+	void requestTool(QString);
 
 
 protected:
