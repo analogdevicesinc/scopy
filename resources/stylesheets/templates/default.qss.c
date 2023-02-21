@@ -16,6 +16,7 @@ QWidget {
 
 QDockWidget {
 	titlebar-normal-icon: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+	background-color: #272730;
 }
 
 QDockWidget::title {

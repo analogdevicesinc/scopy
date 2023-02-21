@@ -311,6 +311,9 @@
         </item>
         <item>
          <widget class="QWidget" name="widgetPlotContainer" native="true">
+          <property name="plot_container" stdset="0">
+           <bool>true</bool>
+          </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <property name="spacing">
             <number>6</number>
