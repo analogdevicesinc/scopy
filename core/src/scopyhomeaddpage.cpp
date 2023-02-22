@@ -1,6 +1,6 @@
 #include "scopyhomeaddpage.h"
 #include "ui_scopyhomeaddpage.h"
-#include "contextprovider.h"
+#include "pluginbase/contextprovider.h"
 
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent) :
 	QWidget(parent),
