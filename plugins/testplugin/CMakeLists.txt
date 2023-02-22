@@ -25,7 +25,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
-#add_subdirectory(test)
+add_subdirectory(test)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
@@ -35,6 +35,8 @@ set(PROJECT_SOURCES
 message(${PROJECT_SOURCES})
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+ADD_DEFINITIONS(-DQT_PLUGIN)
+ADD_DEFINITIONS(-DQT_SHARED)
 
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
@@ -45,6 +47,7 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
+target_include_directories(${PROJECT_NAME} PUBLIC scopypluginbase)
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase)
 
 

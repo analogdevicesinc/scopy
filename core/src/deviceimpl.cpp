@@ -1,8 +1,10 @@
 #include "deviceimpl.h"
 #include "qboxlayout.h"
+#include "qpluginloader.h"
 #include "qpushbutton.h"
-#include "testplugin/testplugin.h"
-#include "testplugin2/testpluginip.h"
+//#include "testplugin/testplugin.h"
+//#include "testplugin2/testpluginip.h"
+//#include "swiot/swiotplugin.h"
 #include <QLabel>
 #include <QTextBrowser>
 #include <QLoggingCategory>
@@ -19,35 +21,31 @@ DeviceImpl::DeviceImpl(QString uri, QObject *parent)
 	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";
 }
 
+#define FILENAME "/home/adi/tmp/build-tool_launcher-Desktop_Qt_5_15_2_GCC_64bit-Debug/plugins/testplugin/libscopytestplugin.so"
+
+
 
 void DeviceImpl::loadPlugins() {
-	Plugin *p;
-	Plugin *p1;
 
-	// loop through the plugins - somehow
+	QPluginLoader qp(FILENAME,this);
 
-	p1 = new TestPluginIp(this);
+	Plugin *p1 = nullptr;
+	auto original = qobject_cast<Plugin*>(qp.instance());
+	p1 = original->clone();
+
 	if(p1->compatible(uri())) {
 		p1->load(uri());
+		connect(dynamic_cast<QObject*>(p1),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
+		connect(dynamic_cast<QObject*>(p1),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
+		connect(dynamic_cast<QObject*>(p1),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+
 		plugins.append(p1);
-		connect(p1,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
-		connect(p1,&Plugin::restartDevice,this,&DeviceImpl::requestedRestart);
-		connect(p1,&Plugin::requestTool,this,&DeviceImpl::requestTool);
 
 	} else {
 		delete p1;
 	}
 
-	p = new TestPlugin(this);
-	if(p->compatible(uri())) {
-		p->load(uri());
-		plugins.append(p);
-		connect(p,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
-		connect(p,&Plugin::restartDevice,this,&DeviceImpl::requestedRestart);
 
-	} else {
-		delete p;
-	}
 
 	loadName();
 	loadIcons();
@@ -56,11 +54,13 @@ void DeviceImpl::loadPlugins() {
 
 void DeviceImpl::unloadPlugins() {
 	QList<Plugin*>::const_iterator pI = plugins.constEnd();
-
 	while(pI != plugins.constBegin()) {
 		--pI;
-		disconnect(*pI,&Plugin::toolListChanged,this,&DeviceImpl::toolListChanged);
-		disconnect(*pI,&Plugin::restartDevice,this,&DeviceImpl::requestedRestart);
+
+		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
+		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
+		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+
 		(*pI)->unload();
 		delete (*pI);
 	}
