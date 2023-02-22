@@ -5,42 +5,40 @@
 #include <QWidget>
 #include "toolmenuentry.h"
 #include "scopypluginbase_export.h"
+#include <QtPlugin>
 
 namespace adiscope {
-class SCOPYPLUGINBASE_EXPORT Plugin : public QObject {
-	Q_OBJECT
+class SCOPYPLUGINBASE_EXPORT Plugin {
 public:
-	Plugin(QObject *parent = nullptr) : QObject(parent) { }
-	virtual ~Plugin() {};
+	virtual ~Plugin() {}
 
 	virtual bool load(QString uri) = 0;
 	virtual void unload() = 0;
-
 	virtual bool compatible(QString uri) = 0;
 
-	virtual QString uri();
-	virtual QString name();
-	virtual QWidget* icon();
-	virtual QWidget* page();
-	virtual QList<ToolMenuEntry*> toolList();
+	virtual Plugin* clone() = 0;
+	virtual QString uri() = 0;
+	virtual QString name() = 0;
+	virtual QWidget* icon() = 0;
+	virtual QWidget* page() = 0;
+	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
+	virtual int priority() = 0;
+
 public Q_SLOTS:
 	virtual bool connectDev() = 0;
 	virtual bool disconnectDev() = 0;
-	virtual void showPageCallback();
-	virtual void hidePageCallback();
+	virtual void showPageCallback() = 0;
+	virtual void hidePageCallback() = 0;
 Q_SIGNALS:
-	void restartDevice();
-	void toolListChanged();
-	void requestTool(QString);
+	virtual void restartDevice() = 0;
+	virtual void toolListChanged() = 0;
+	virtual void requestTool(QString) = 0;
 
 
-protected:
-	QString m_uri;
-	QString m_name;
-	QWidget *m_page;
-	QWidget *m_icon;
-	QList<ToolMenuEntry*> m_toolList;
 };
 }
+
+#define ScopyPlugin_iid "org.adi.Scopy.Plugins.Pluginbase/0.1"
+Q_DECLARE_INTERFACE(adiscope::Plugin, ScopyPlugin_iid)
 
 #endif // PLUGIN_H

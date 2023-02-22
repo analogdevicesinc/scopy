@@ -6,16 +6,6 @@
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
 using namespace adiscope;
-TestPluginIp::TestPluginIp(QObject *parent) : Plugin(parent)
-{
-	m_name = "TestPluginIp";
-	qDebug(CAT_TESTPLUGINIP)<<"ctor";
-}
-
-TestPluginIp::~TestPluginIp()
-{
-	qDebug(CAT_TESTPLUGINIP)<<"dtor";
-}
 
 bool TestPluginIp::compatible(QString uri) {
 	qDebug(CAT_TESTPLUGINIP)<<"compatible";
@@ -29,7 +19,7 @@ bool TestPluginIp::load(QString uri) {
 	count++;
 	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
 	m_page = new QLabel("TestPageIP");
-	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"IP","", this));
+	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"SecondPlugin","", this));
 	return true;
 }
 

@@ -203,7 +203,7 @@ void ToolMenuItem::_buildUI()
 	toolBtn->setIconSize(QSize(32, 32));
 
 	toolRunBtn->setCheckable(true);
-	toolRunBtn->setText("r");
+	toolRunBtn->setText("");
 
 	toolBtn->setFlat(true);
 	toolRunBtn->setFlat(true);
