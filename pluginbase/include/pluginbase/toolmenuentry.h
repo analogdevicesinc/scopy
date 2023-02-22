@@ -10,13 +10,14 @@ class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QObject *parent = nullptr) :
-		QObject(parent), m_id(id), m_name(name), m_icon(icon),
+		QObject(parent), m_id(id), m_name(name), m_icon(icon), m_visible(true),
 		m_enabled(false), m_running(false), m_runBtnVisible(false), m_tool(nullptr) {}
 
 	~ToolMenuEntry() {}
 	QString id() { return m_id; }
 	QString name() { return m_name; }
 	QString icon() { return m_icon; }
+	bool visible() { return m_visible; }
 	bool enabled() { return m_enabled; }
 	bool running() { return m_running; }
 	bool runBtnVisible() { return m_runBtnVisible; }
@@ -24,6 +25,7 @@ public:
 
 	void setName(const QString &newName);
 	void setIcon(const QString &newIcon);
+	void setVisible(bool newVisible);
 	void setEnabled(bool newEnabled);
 	void setRunning(bool newRunning);
 	void setRunBtnVisible(bool newRunBtnVisible);
@@ -37,6 +39,7 @@ private:
 	QString m_id;
 	QString m_name;
 	QString m_icon;
+	bool m_visible;
 	bool m_enabled;
 	bool m_running;
 	bool m_runBtnVisible;
@@ -52,6 +55,12 @@ inline void ToolMenuEntry::setName(const QString &newName)
 inline void ToolMenuEntry::setIcon(const QString &newIcon)
 {
 	m_icon = newIcon;
+	Q_EMIT updateToolEntry();
+}
+
+inline void ToolMenuEntry::setVisible(bool newVisible)
+{
+	m_visible = newVisible;
 	Q_EMIT updateToolEntry();
 }
 
