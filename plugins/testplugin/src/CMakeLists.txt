@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE pluginbase)
+set(SCOPY_MODULE testplugin)
 project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
@@ -32,6 +32,7 @@ set(PROJECT_SOURCES
         ${HEADER_LIST}
         ${UI_LIST}
 )
+message(${PROJECT_SOURCES})
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
@@ -44,6 +45,6 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase)
 
 

@@ -66,11 +66,7 @@ void ToolManager::showToolList(QString s) {
 			m = tm->addTool(tme->id(),tme->name(),tme->icon());
 			connect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateToolEntry()));
 		}
-		m->setEnabled(tme->enabled());
-		m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
-		m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
-		m->getToolRunBtn()->setChecked(tme->running());
-
+		updateToolEntry(tme, tme->id());
 	}
 
 }
@@ -106,9 +102,9 @@ void ToolManager::unlockToolList(QString s){
 
 void ToolManager::updateToolEntry(ToolMenuEntry *tme, QString s) {
 	auto m = tm->getToolMenuItemFor(s);
+	m->setVisible(tme->visible());
 	m->setEnabled(tme->enabled());
 	m->setName(tme->name());
-	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
 	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
 	m->getToolRunBtn()->setChecked(tme->running());
 	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() <<" - "<< tme->id();

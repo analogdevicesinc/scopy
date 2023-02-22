@@ -7,16 +7,6 @@
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace adiscope;
-TestPlugin::TestPlugin(QObject *parent) : Plugin(parent)
-{
-	m_name = "TestPlugin";
-	qDebug(CAT_TESTPLUGIN)<<"ctor";
-}
-
-TestPlugin::~TestPlugin()
-{
-	qDebug(CAT_TESTPLUGIN)<<"dtor";
-}
 
 bool TestPlugin::compatible(QString uri) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";
@@ -24,19 +14,19 @@ bool TestPlugin::compatible(QString uri) {
 }
 
 bool TestPlugin::load(QString uri) {
+	qDebug(CAT_TESTPLUGIN)<<"Loaded plugin";
 	m_uri = uri;
-	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
-
+	SCOPY_PLUGIN_ICON(":/icons/adalm.svg");
 
 	m_page = new QWidget();
-	QHBoxLayout *lay = new QHBoxLayout(m_page);
+	QVBoxLayout *lay = new QVBoxLayout(m_page);
 	lay->addWidget(new QLabel("TestPage",m_page));
 	QPushButton* restartBtn = new QPushButton("restartPlugin",m_page);
 	lay->addWidget(restartBtn);
 	connect(restartBtn,SIGNAL(clicked()),this,SIGNAL(restartDevice()));
 
-	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"2","",this));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("FirstPlugin",":/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
 	return true;
 }
 

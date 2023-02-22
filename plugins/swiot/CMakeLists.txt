@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE pluginbase)
+set(SCOPY_MODULE swiot)
 project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
@@ -25,13 +25,14 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
-#add_subdirectory(test)
+add_subdirectory(test)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
         ${HEADER_LIST}
         ${UI_LIST}
 )
+message(${PROJECT_SOURCES})
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 
@@ -44,6 +45,6 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase)
 
 
