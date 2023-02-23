@@ -166,6 +166,8 @@ namespace adiscope {
 		void _editFirstPoint();
 		QColor getChannelColor();
 
+		double resolutionbw;
+
 	private Q_SLOTS:
 		void onMrkCtrlMarkerSelected(std::shared_ptr<SpectrumMarker> &);
 		void onMrkCtrlMarkerPosChanged(std::shared_ptr<SpectrumMarker> &);
@@ -262,6 +264,10 @@ namespace adiscope {
 		QString formatYValue(double value, int precision) const;
 
 		void addChannel();
+		double getStartFrequency();
+		double getStopFrequency();
+		void setResolutionBW(double res);
+		double getResolutionBW();
 	Q_SIGNALS:
 		void channelAdded(int);
 		void newData();

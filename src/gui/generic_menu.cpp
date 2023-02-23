@@ -1,6 +1,7 @@
 #include <QVBoxLayout>
 
 #include "generic_menu.hpp"
+#include "logging_categories.h"
 
 using namespace adiscope::gui;
 
@@ -61,4 +62,14 @@ void GenericMenu::setMenuWidget(QWidget *widget)
 	this->layout()->setContentsMargins(0, 0, 0, 0);
 
 	this->layout()->addWidget(widget);
+}
+
+void GenericMenu::hideEvent(QHideEvent *)
+{
+    Q_EMIT menuVisibilityChanged(false);
+}
+
+void GenericMenu::showEvent(QShowEvent *)
+{
+    Q_EMIT menuVisibilityChanged(true);
 }

@@ -15,8 +15,10 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	, m_switchBtn(new QPushButton(m_scrollArea))
 	, m_addChannelBtn(new CustomPushButton()) //check if parent removed
 	, m_position(position)
+	, m_channelsList(QList<ChannelWidget *>())
 	, m_channelIdVisible(true)
 	, m_maxChannelWidth(-Q_INFINITY)
+	, m_selectedChannel(-1)
 {
 	if (m_position == ChannelsPositionEnum::VERTICAL) {
 		m_channelsWidget->setLayout(new QVBoxLayout(m_channelsWidget));
@@ -182,6 +184,11 @@ CustomPushButton* ChannelManager::getAddChannelBtn()
 
 QList<ChannelWidget*> ChannelManager::getChannelsList() { return m_channelsList; }
 
+int ChannelManager::getChannelsCount()
+{
+	return m_channelsList.size();
+}
+
 void ChannelManager::changeParent(QWidget* newParent)
 {
 	delete m_channelsWidget->layout();
@@ -337,11 +344,17 @@ void ChannelManager::toggleChannelManager(bool toggled)
 	}
 }
 
+int ChannelManager::getSelectedChannel()
+{
+	return m_selectedChannel;
+}
+
 void ChannelManager::onChannelSelected(bool toggled)
 {
 	ChannelWidget* ch = dynamic_cast<ChannelWidget *>(sender());
 	if (ch != nullptr) {
 		int id = m_channelsList.indexOf(ch);
+		m_selectedChannel = id;
 
 		Q_EMIT selectedChannel(id);
 	}
@@ -366,6 +379,10 @@ void ChannelManager::onChannelDeleted()
 	}
 }
 
+const ChannelWidget* ChannelManager::getChannelAt(int id)
+{
+	return m_channelsList.at(id);
+}
 
 const QString &ChannelManager::getToolStatus() const
 {

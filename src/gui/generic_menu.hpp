@@ -27,8 +27,12 @@ public:
 	void insertSection(SubsectionSeparator* section);
 
 	void setMenuWidget(QWidget *widget);
+	void hideEvent(QHideEvent *) override;
+	void showEvent(QShowEvent *) override;
+
 Q_SIGNALS:
 	void enableBtnToggled(bool toggled);
+	void menuVisibilityChanged(bool toggled);
 
 private:
 	MenuHeader* m_menuHeader;

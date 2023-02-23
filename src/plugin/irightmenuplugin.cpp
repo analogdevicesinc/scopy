@@ -3,9 +3,8 @@
 
 using namespace adiscope;
 using namespace gui;
-IRightMenuPlugin::IRightMenuPlugin(QWidget *parent, ToolView* toolView, bool dockable) : parent(parent), toolView(toolView), menu(nullptr), dockable(dockable)
+IRightMenuPlugin::IRightMenuPlugin(QWidget *parent, ToolView* toolView, bool dockable) : BasePlugin(parent, dockable), toolView(toolView), menu(nullptr)
 {
-
 }
 
 IRightMenuPlugin::~IRightMenuPlugin()

@@ -37,15 +37,16 @@ public:
 
 	CustomPushButton* getAddChannelBtn();
 	QList<ChannelWidget*> getChannelsList();
+	int getChannelsCount();
 
 	void setChannelAlignment(ChannelWidget* ch,Qt::Alignment alignment);
 	void setChannelIdVisible(bool visible);
 	const QString &getToolStatus() const;
 	void setToolStatus(const QString &newToolStatus);
 	void enableSwitchButton(bool en);
-
 	int getChannelID(ChannelWidget *ch);
-
+	int getSelectedChannel();
+	const ChannelWidget *getChannelAt(int id);
 public Q_SLOTS:
 	void changeParent(QWidget* newParent);
 	void toggleChannelManager(bool toggled);
@@ -79,6 +80,7 @@ private:
 	QLabel *toolStatus;
 	int m_maxChannelWidth;
 	int m_minChannelWidth;
+	int m_selectedChannel;
 };
 } // namespace gui
 } // namespace adiscope

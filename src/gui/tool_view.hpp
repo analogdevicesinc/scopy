@@ -75,7 +75,7 @@ public:
 
 	void addFixedCentralWidget(QWidget* widget, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
 	int addDockableCentralWidget(QWidget* widget, Qt::DockWidgetArea area, const QString& dockerName);
-	void addDockableTabbedWidget(QWidget* plot, const QString &dockerName);
+	QDockWidget *addDockableTabbedWidget(QWidget* plot, const QString &dockerName);
 	int addFixedTabbedWidget(QWidget* widget, const QString& title, int plotId = -1, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
 
 	void setWidgetVisibility(int widgetId, bool visible);
@@ -87,6 +87,8 @@ public:
 	void setStackedWidget(QStackedWidget* sw);
 
 	int getNewID();
+	void addPlotInfoWidget(QWidget *widget);
+	QWidget *getPlotInfoWidget();
 private:
 	void configureLastOpenedMenu();
 	void buildChannelsContainer(ChannelManager* channelManager, ChannelsPositionEnum position);
@@ -122,6 +124,7 @@ private:
 	QMap<int,QWidget*> m_menuList;
 
 	int m_nextMenuIndex;
+	void initPlotInfoWidget();
 };
 } // namespace gui
 } // namespace adiscope

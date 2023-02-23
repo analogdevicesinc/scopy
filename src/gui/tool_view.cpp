@@ -1,4 +1,5 @@
-﻿#include "qdebug.h"
+﻿#include "logging_categories.h"
+#include "qdebug.h"
 #include "ui_tool_view.h"
 
 #include <QMainWindow>
@@ -119,12 +120,15 @@ void ToolView::settingsPanelUpdate(int id)
 
 	for (int i = 0; i < m_ui->stackedWidget->count(); i++) {
 		QSizePolicy::Policy policy = QSizePolicy::Ignored;
+		bool visible = false;
 
 		if (i == m_ui->stackedWidget->currentIndex()) {
 			policy = QSizePolicy::Expanding;
+			visible = true;
 		}
 		QWidget* widget = m_ui->stackedWidget->widget(i);
 		widget->setSizePolicy(policy, policy);
+		widget->setVisible(visible);
 	}
 	m_ui->stackedWidget->adjustSize();
 }
@@ -389,6 +393,7 @@ CustomMenuButton *ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool docka
 		menu->setMenuButton(toggled);
 	});
 
+	// what is this for?
 	connect(menu, &GenericMenu::enableBtnToggled, [=](bool toggled) { btn->getCheckBox()->setChecked(toggled); });
 
 	if ((checkBoxVisible && checkBoxChecked) || !checkBoxVisible) {
@@ -421,6 +426,11 @@ int ToolView::addDockableCentralWidget(QWidget *widget, Qt::DockWidgetArea area,
 	return m_docksList.size() - 1;
 }
 
+void ToolView::addPlotInfoWidget(QWidget *widget)
+{
+	m_ui->widgetPlotInfo->layout()->addWidget(widget);
+}
+
 void ToolView::setWidgetVisibility(int widgetId, bool visible)
 {
 	if (visible) {
@@ -440,10 +450,12 @@ void ToolView::setHeaderVisibility(bool visible)
 	m_ui->widgetHeader->setVisible(visible);
 }
 
-void ToolView::addDockableTabbedWidget(QWidget* plot, const QString &dockerName)
+QDockWidget *ToolView::addDockableTabbedWidget(QWidget* plot, const QString &dockerName)
 {
 	QDockWidget* docker = DockerUtils::createDockWidget(m_centralMainWindow, plot, dockerName);
 	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+
+	return docker;
 }
 
 int ToolView::addFixedTabbedWidget(QWidget *widget, const QString& title, int plotId, int row, int column, int rowspan, int columnspan)

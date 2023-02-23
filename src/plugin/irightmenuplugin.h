@@ -5,25 +5,22 @@
 #include <QWidget>
 
 #include "gui/tool_view.hpp"
+#include "baseplugin.h"
 
 namespace adiscope {
 //namespace gui {
-class IRightMenuPlugin : public QObject
+class IRightMenuPlugin : public BasePlugin
 {
 	Q_OBJECT
+protected:
+	gui::ToolView* toolView;
+	gui::GenericMenu* menu;
+
 public:
 	explicit IRightMenuPlugin(QWidget *parent = nullptr, gui::ToolView* toolView = nullptr, bool dockable = false);
 	~IRightMenuPlugin();
 
-	virtual void init();
-
-	QWidget *parent;
-	gui::ToolView* toolView;
-	gui::GenericMenu* menu;
-	bool dockable;
-
-Q_SIGNALS:
-
+	void init() override;
 };
 }
 //}

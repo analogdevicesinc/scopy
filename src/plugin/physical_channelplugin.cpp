@@ -9,12 +9,19 @@ class PhysicalChannelPlugin : public IChannelPlugin
 {
 private:
 	NewInstrument *instrument;
-	FftDisplayPlot *plot;
+	std::vector<DisplayPlot*> *plotList;
 
 public:
 	PhysicalChannelPlugin(QWidget *parent, ToolView* toolView, ChannelManager *chManager, bool dockable) : IChannelPlugin(parent, toolView, chManager, dockable),
 		instrument(dynamic_cast<NewInstrument *>(parent)),
-		plot(instrument->getPlot()) {
+		plotList(instrument->getPlotList())
+	{
+		init();
+	}
+
+	~PhysicalChannelPlugin()
+	{
+
 	}
 
 	void init() override
@@ -25,13 +32,20 @@ public:
 		menu->initInteractiveMenu();
 		menu->setMenuHeader("Phys CH", new QColor('gray'), true);
 
-		channelList.push_back(toolView->buildNewChannel(chManager, menu , dockable, -1, false, false, QColor(), "channel", "Phys CH"));
+		channelList.push_back(toolView->buildNewChannel(chManager, menu , dockable, -1, false, false, QColor(), "Physical channel", "Phys CH"));
 
 		for (auto ch: channelList) {
 			ch->setIsPhysicalChannel(true);
 
-			plot->addChannel();
-			ch->setColor(plot->getLineColor(chManager->getChannelID(ch)));
+			for (auto plot: *plotList) {
+				auto fft_plot = dynamic_cast<FftDisplayPlot*>(plot);
+				if (fft_plot != nullptr) {
+					fft_plot->addChannel();
+					ch->setColor(fft_plot->getLineColor(chManager->getChannelID(ch)));
+
+					Q_EMIT ch->selected(true);
+				}
+			}
 		}
 	}
 };

@@ -653,6 +653,16 @@ std::vector<double> FftDisplayPlot::getScaleFactor() {
     return y_scale_factor;
 }
 
+double FftDisplayPlot::getStartFrequency()
+{
+	return d_start_frequency;
+}
+
+double FftDisplayPlot::getStopFrequency()
+{
+	return d_stop_frequency;
+}
+
 int64_t FftDisplayPlot::getNumPoints()
 {
     return d_numPoints;
@@ -801,6 +811,16 @@ void FftDisplayPlot::_editFirstPoint()
 		y_data[i][0] = y_data[i][1];
 	}
 
+}
+
+void FftDisplayPlot::setResolutionBW(double res)
+{
+	resolutionbw = res;
+}
+
+double FftDisplayPlot::getResolutionBW()
+{
+	return resolutionbw;
 }
 
 void FftDisplayPlot::averageDataAndComputeMagnitude(std::vector<double *>
@@ -1405,7 +1425,7 @@ void FftDisplayPlot:: setMarkerEnabled(uint chIdx, uint mkIdx, bool en)
 	d_markers[chIdx][mkIdx].ui->setVisible(en);
 
 	int en_markers = 0;
-	for (int c = 0;  c < d_nplots; c++)
+	for (int c = 0;  c < d_nplots + n_ref_curves; c++)
 		for (int m = 0; m < d_markers[c].size(); m++)
 			if (!!d_markers[c][m].data)
 				en_markers++;

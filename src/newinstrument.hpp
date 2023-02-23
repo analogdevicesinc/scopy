@@ -1,11 +1,13 @@
 #ifndef NEWINSTRUMENT_HPP
 #define NEWINSTRUMENT_HPP
 
+#include <DisplayPlot.h>
 #include <filter.hpp>
 #include "ui_newinstrument.h"
 #include <tool.hpp>
 #include <gui/tool_view.hpp>
 #include <gui/tool_view_recipie.hpp>
+#include <plugin/baseplugin.h>
 
 
 namespace adiscope {
@@ -37,9 +39,10 @@ public:
 	void initGeneralSettings();
 	void addPlugins();
 
-	FftDisplayPlot *getPlot();
+	std::vector<DisplayPlot*> *getPlotList();
 public:
-	void addChannelPlugin(IChannelPlugin *plugin);
+	void addPlugin(BasePlugin *plugin);
+	void addPlot(DisplayPlot *plot);
 
 private Q_SLOT:
 	void readPreferences();
@@ -56,11 +59,9 @@ private:
 	gui::ToolView* m_toolView;
 	gui::GenericMenu* m_generalSettingsMenu;
 	gui::ChannelManager* m_channelManager;
-	std::vector<IChannelPlugin *> m_channelPluginList;
-	std::vector<IRightMenuPlugin *> m_rightMenuPluginList;
+	std::vector<BasePlugin *> m_pluginList;
 	bool dockable_menus;
-
-	FftDisplayPlot *fft_plot;
+	std::vector<DisplayPlot*> m_plotList;
 
 	void connectSignals();
 	void start();

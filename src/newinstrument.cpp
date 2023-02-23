@@ -1,11 +1,11 @@
 #include "newinstrument.hpp"
 #include <gui/tool_view_builder.hpp>
-#include "gui/dynamicWidget.hpp"
-#include "plugin/ichannelplugin.h"
 #include "plugin/irightmenuplugin.h"
 #include "plugin/physical_channelplugin.cpp"
 #include <plugin/add_channelplugin.cpp>
 #include <plugin/cursors_rightmenuplugin.cpp>
+#include <plugin/fftplotplugin.h>
+#include <plugin/marker_rightmenuplugin.hpp>
 
 
 using namespace adiscope;
@@ -41,16 +41,7 @@ NewInstrument::NewInstrument(struct iio_context *ctx, Filter *filt,
 	this->setLayout(new QVBoxLayout(this));
 	this->layout()->addWidget(m_toolView);
 
-	initPlot();
 	readPreferences();
-
-	// add plot
-	if (dockable_menus) {
-		m_toolView->addDockableTabbedWidget(fft_plot->getPlotwithElements(), "FFT Plot");
-	}
-	else {
-		m_toolView->addFixedCentralWidget(fft_plot->getPlotwithElements(), 0, 0, 1, 1);
-	}
 
 	initGeneralSettings();
 	addPlugins();
@@ -60,17 +51,13 @@ NewInstrument::NewInstrument(struct iio_context *ctx, Filter *filt,
 
 NewInstrument::~NewInstrument()
 {
-	for (auto ch : m_channelPluginList) {
-		delete ch;
+	for (auto plugin : m_pluginList) {
+		delete plugin;
 	}
-	for (auto rm : m_rightMenuPluginList) {
-		delete rm;
-	}
-	m_channelPluginList.clear();
-	m_rightMenuPluginList.clear();
+	m_pluginList.clear();
 
 	if (m_toolView->getRunBtn()->isChecked()) {
-			m_toolView->getRunBtn()->setChecked(false);
+		m_toolView->getRunBtn()->setChecked(false);
 	}
 
 	if (m_toolView) {
@@ -80,34 +67,9 @@ NewInstrument::~NewInstrument()
 	}
 }
 
-void NewInstrument::initPlot()
+std::vector<DisplayPlot*> *NewInstrument::getPlotList()
 {
-	double start = 0, stop = 50000000;
-
-	m_toolView->getCentralWidget()->setStyleSheet("background-color: black;");
-
-	fft_plot = new FftDisplayPlot(m_channelPluginList.size(), this);
-//	fft_plot->disableLegend();
-	fft_plot->setXaxisMouseGesturesEnabled(false);
-
-	fft_plot->setZoomerEnabled();
-	fft_plot->setAxisVisible(QwtAxis::XBottom, false);
-	fft_plot->setAxisVisible(QwtAxis::YLeft, false);
-	fft_plot->setUsingLeftAxisScales(false);
-	fft_plot->enableXaxisLabels();
-	fft_plot->enableYaxisLabels();
-//	setYAxisUnit(ui->cmb_units->currentText());
-	fft_plot->setBtmHorAxisUnit("Hz");
-
-//	fft_plot->setStartStop(start, stop);
-	fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
-	fft_plot->replot();
-	fft_plot->bottomHandlesArea()->repaint();
-}
-
-FftDisplayPlot *NewInstrument::getPlot()
-{
-	return fft_plot;
+	return &m_plotList;
 }
 
 void NewInstrument::initGeneralSettings()
@@ -135,9 +97,6 @@ void NewInstrument::connectSignals()
 		startStop(toggled);
 	});
 
-	connect(this, SIGNAL(selectedChannelChanged(int)),
-		fft_plot, SLOT(setSelectedChannel(int)));
-
 	connect(m_channelManager, &ChannelManager::selectedChannel, this, &NewInstrument::onChannelSelected);
 	connect(m_channelManager, &ChannelManager::enabledChannel, this, &NewInstrument::onChannelEnabled);
 	connect(m_channelManager, &ChannelManager::deletedChannel, this, &NewInstrument::onChannelDeleted);
@@ -145,20 +104,29 @@ void NewInstrument::connectSignals()
 
 void NewInstrument::onChannelSelected(int id)
 {
-	fft_plot->bringCurveToFront(id);
-	fft_plot->setSelectedChannel(id);
-	fft_plot->replot();
+	for (auto plot: m_plotList) {
+		plot->bringCurveToFront(id);
+		plot->setSelectedChannel(id);
+		plot->replot();
+	}
 }
 
 void NewInstrument::onChannelEnabled(int id, bool enabled)
 {
-	fft_plot->Curve(id)->setVisible(enabled);
-	fft_plot->replot();
+	for (auto plot: m_plotList) {
+		plot->Curve(id)->setVisible(enabled);
+		plot->replot();
+	}
 }
 
 void NewInstrument::onChannelDeleted(QString name)
 {
-	fft_plot->unregisterReferenceWaveform(name);
+	for (auto plot: m_plotList) {
+		auto fft_plot = dynamic_cast<FftDisplayPlot*>(plot);
+		if (fft_plot != nullptr) {
+			fft_plot->unregisterReferenceWaveform(name);
+		}
+	}
 }
 
 void NewInstrument::start()
@@ -176,43 +144,39 @@ void NewInstrument::startStop(bool pressed)
 	} else {
 		stop();
 	}
-
-//	setDynamicProperty(run_button, "running", pressed);
 }
 
-void NewInstrument::addChannelPlugin(IChannelPlugin *plugin)
+void NewInstrument::addPlugin(BasePlugin *plugin)
 {
-	if (m_recipe.hasChannels) {
-		m_channelPluginList.push_back(plugin);
+	m_pluginList.push_back(plugin);
+}
 
-		plugin->init();
-	}
+void NewInstrument::addPlot(DisplayPlot *plot)
+{
+	m_plotList.push_back(plot);
 }
 
 void NewInstrument::addPlugins()
 {
-	if (m_recipe.hasChannels) {
-		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
-		m_channelPluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
-//		m_channelPluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
-//		m_channelPluginList.push_back(new AddChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+//	m_pluginList.push_back(new FftPlotPlugin(this, m_toolView, m_channelManager, dockable_menus));
+	auto fftPlugin = new FftPlotPlugin(this, m_toolView, m_channelManager, dockable_menus);
+	m_pluginList.push_back(fftPlugin);
 
-		m_rightMenuPluginList.push_back(new IRightMenuPlugin(this, m_toolView, dockable_menus));
-		m_rightMenuPluginList.push_back(new CursorsRightMenuPlugin(this, m_toolView, dockable_menus, true, true, m_channelManager, getPlot()));
+	m_pluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+	m_pluginList.push_back(new PhysicalChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+	//		m_pluginList.push_back(new IChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
+	m_pluginList.push_back(new AddChannelPlugin(this, m_toolView, m_channelManager, dockable_menus));
 
-		// init plugins
-		for (int i=0; i<m_channelPluginList.size(); i++) {
-			m_channelPluginList[i]->init();
-		}
-
-		for (auto ch: m_rightMenuPluginList) {
-			ch->init();
-		}
-	}
+	m_pluginList.push_back(new IRightMenuPlugin(this, m_toolView, dockable_menus));
+	m_pluginList.push_back(new CursorsRightMenuPlugin(this, m_toolView, dockable_menus, true, true));
+	m_pluginList.push_back(new MarkerRightMenuPlugin(this, m_toolView, dockable_menus, m_channelManager, fftPlugin->getPlot()));
 }
 
 void NewInstrument::readPreferences() {
 	bool showFps = prefPanel->getShow_plot_fps();
 	dockable_menus = prefPanel->getCurrent_docking_enabled();
-	fft_plot->setVisibleFpsLabel(showFps);
+
+	for (auto plot: m_plotList) {
+		plot->setVisibleFpsLabel(showFps);
+	}
 }

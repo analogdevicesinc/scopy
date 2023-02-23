@@ -3,9 +3,8 @@
 
 using namespace adiscope;
 using namespace gui;
-IChannelPlugin::IChannelPlugin(QWidget *parent, ToolView* toolView, gui::ChannelManager *chManager, bool dockable) : parent(parent), toolView(toolView), chManager(chManager), menu(nullptr), ch(nullptr), dockable(dockable)
+IChannelPlugin::IChannelPlugin(QWidget *parent, ToolView* toolView, gui::ChannelManager *chManager, bool dockable) : BasePlugin(parent, dockable), toolView(toolView), chManager(chManager), menu(nullptr), ch(nullptr)
 {
-
 }
 
 IChannelPlugin::~IChannelPlugin()

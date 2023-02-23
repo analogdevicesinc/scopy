@@ -383,6 +383,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->cmb_rbw, QOverload<int>::of(&QComboBox::currentIndexChanged),
 		[=](int index){
 		startStopRange->setMinimumSpanValue(10 * sample_rate / bin_sizes[index]);
+
+		fft_plot->setResolutionBW(sample_rate / bin_sizes[index]);
 	});
 
 	connect(ui->cmbGainMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
