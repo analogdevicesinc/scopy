@@ -1,12 +1,13 @@
 #include "devicemanager.h"
 #include "deviceimpl.h"
+#include "iiodeviceimpl.h"
 #include <QLoggingCategory>
 #include <QDebug>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace adiscope;
-DeviceManager::DeviceManager(QObject *parent)
-	: QObject{parent}
+DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
+	: QObject{parent}, pm(pm)
 {
 
 }
@@ -32,7 +33,11 @@ void DeviceManager::addDevice(QString uri)
 		removeDevice(uri);
 	}
 
-	d = new DeviceImpl(uri, this);//DeviceFactory::newDevice(uri);
+//		d = new DeviceImpl(uri, pm, this);//DeviceFactory::newDevice(uri);
+		d = new IIODeviceImpl(uri, pm, this);
+
+
+
 	d->loadPlugins();
 
 	connect(dynamic_cast<DeviceImpl*>(d),SIGNAL(connected()),this,SLOT(connectDevice()));

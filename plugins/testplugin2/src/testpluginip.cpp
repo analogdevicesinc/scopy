@@ -12,18 +12,6 @@ bool TestPluginIp::compatible(QString uri) {
 	return uri.startsWith("ip:");
 }
 
-bool TestPluginIp::load(QString uri) {
-	static int count = 0;
-	m_uri = uri;
-	m_icon = new QLabel(QString::number(count));
-	count++;
-	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
-	m_page = new QLabel("TestPageIP");
-	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"SecondPlugin","", this));
-	return true;
-}
-
-
 void TestPluginIp::unload() {
 	for(auto &tool : m_toolList) {
 		delete tool;
@@ -70,4 +58,42 @@ bool TestPluginIp::disconnectDev()
 
 	qDebug(CAT_TESTPLUGINIP)<<"disconnect";
 	return true;
+}
+
+void TestPluginIp::postload()
+{
+
+}
+
+bool TestPluginIp::loadIcon()
+{
+	static int count = 0;
+	m_icon = new QLabel(QString::number(count));
+	count++;
+	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
+	return true;
+}
+
+bool TestPluginIp::loadPage()
+{
+	m_page = new QLabel("TestPageIP");
+	return true;
+}
+
+void TestPluginIp::loadToolList()
+{
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SecondPlugin",""));
+}
+
+void TestPluginIp::initMetadata()
+{
+	loadMetadata(
+R"plugin(
+	{
+	   "priority":2,
+	   "category":[
+	      "test"
+	   ]
+	}
+)plugin");
 }

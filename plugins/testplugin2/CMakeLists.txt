@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE testplugin2)
+
+message(STATUS "building plugin: " ${SCOPY_MODULE})
 project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
@@ -25,16 +27,21 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
-add_subdirectory(test)
+if(ENABLE_TESTING)
+    add_subdirectory(test)
+endif()
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
         ${HEADER_LIST}
         ${UI_LIST}
 )
-message(${PROJECT_SOURCES})
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
+
+if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
+endif()
 
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
@@ -47,4 +54,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase)
 
+set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME
+    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})

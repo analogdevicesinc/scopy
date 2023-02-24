@@ -2,7 +2,7 @@
 #define SWIOTPLUGIN_H
 
 #define SCOPY_PLUGIN_NAME SWIOTPlugin
-#define SCOPY_PLUGIN_PRIO 1
+#define SCOPY_PLUGIN_PRIO 100
 
 #include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"
@@ -19,11 +19,16 @@ namespace adiscope {
 class SCOPYSWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
-	SCOPY_PLUGIN
-	bool load(QString uri) override;
+	SCOPY_PLUGIN;
+
+public:
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
 	void unload() override;
 	bool compatible(QString uri) override;
 
+	void initMetadata() override;
 public Q_SLOTS:
 	bool connectDev() override;
 	bool disconnectDev() override;

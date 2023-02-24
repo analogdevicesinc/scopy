@@ -15,6 +15,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+# Make sure our local CMake Modules path comes first
+list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 function(configure_stylesheets DU_OPTION)
         file(GLOB_RECURSE STYLESHEETS ${CMAKE_CURRENT_SOURCE_DIR}/resources/stylesheets/templates/*.qss.c)
