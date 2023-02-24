@@ -8,6 +8,7 @@
 #include "iiocontextscanner.h"
 #include "scannediiocontextcollector.h"
 #include "toolmanager.h"
+#include "pluginrepository.h"
 #include "scopycore_export.h"
 
 QT_BEGIN_NAMESPACE
@@ -27,6 +28,7 @@ public Q_SLOTS:
     void removeDeviceFromUi(QString);
 
 private:
+    PluginRepository *pr;
     ScopyHomePage *hp;
     DeviceManager *dm;
     IIOContextScanner *cs;

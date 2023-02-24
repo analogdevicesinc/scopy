@@ -5,13 +5,12 @@
 
 using namespace adiscope;
 
-class TST_TestPlugin : public QObject
+class TST_TestPluginIp : public QObject
 {
 	Q_OBJECT
 private Q_SLOTS:
 	void fileExists();
 	void isLibrary();
-	void fileName();	
 	void loaded();
 	void className();
 	void instanceNotNull();
@@ -20,12 +19,14 @@ private Q_SLOTS:
 	void clone();
 	void name();
 
+	void metadata();
 };
 
-#define FILENAME "/home/adi/tmp/build-tool_launcher-Desktop_Qt_5_15_2_GCC_64bit-Debug/plugins/testplugin2/libscopytestplugin2.so"
+#define PLUGIN_LOCATION "../../plugins"
+#define FILENAME PLUGIN_LOCATION "/libscopytestplugin2.so"
 
 
-void TST_TestPlugin::fileExists()
+void TST_TestPluginIp::fileExists()
 {
 	QFile f(FILENAME);
 	bool ret;
@@ -35,37 +36,31 @@ void TST_TestPlugin::fileExists()
 	QVERIFY(ret);
 }
 
-void TST_TestPlugin::isLibrary()
+void TST_TestPluginIp::isLibrary()
 {
 	QVERIFY(QLibrary::isLibrary(FILENAME));
 }
 
-void TST_TestPlugin::fileName()
-{
-	QPluginLoader qp(FILENAME,this);
-	QVERIFY(qp.fileName()==FILENAME);
-}
-
-void TST_TestPlugin::className()
+void TST_TestPluginIp::className()
 {
 	QPluginLoader qp(FILENAME,this);
 	QVERIFY(qp.metaData().value("className") == "TestPluginIp");
 }
 
-void TST_TestPlugin::loaded()
+void TST_TestPluginIp::loaded()
 {
 	QPluginLoader qp(FILENAME,this);
 	qp.load();
 	QVERIFY(qp.isLoaded());
 }
 
-void TST_TestPlugin::instanceNotNull()
+void TST_TestPluginIp::instanceNotNull()
 {
 	QPluginLoader qp(FILENAME,this);
 	QVERIFY(qp.instance() != nullptr);
 }
 
-void TST_TestPlugin::multipleInstances()
+void TST_TestPluginIp::multipleInstances()
 {
 	QPluginLoader qp1(FILENAME,this);
 	QPluginLoader qp2(FILENAME,this);
@@ -74,7 +69,7 @@ void TST_TestPlugin::multipleInstances()
 }
 
 
-void TST_TestPlugin::qobjectcast_to_plugin()
+void TST_TestPluginIp::qobjectcast_to_plugin()
 {
 	QPluginLoader qp(FILENAME,this);
 	auto instance = qobject_cast<Plugin*>(qp.instance());
@@ -82,7 +77,7 @@ void TST_TestPlugin::qobjectcast_to_plugin()
 }
 
 
-void TST_TestPlugin::clone()
+void TST_TestPluginIp::clone()
 {
 	QPluginLoader qp(FILENAME,this);
 
@@ -95,7 +90,7 @@ void TST_TestPlugin::clone()
 	QVERIFY(p1 != p2);
 }
 
-void TST_TestPlugin::name() {
+void TST_TestPluginIp::name() {
 	QPluginLoader qp(FILENAME,this);
 
 	Plugin *p1 = nullptr, *p2 = nullptr;
@@ -104,7 +99,18 @@ void TST_TestPlugin::name() {
 	qDebug()<<p1->name();
 }
 
+void TST_TestPluginIp::metadata()
+{
+	QPluginLoader qp(FILENAME,this);
 
-QTEST_MAIN(TST_TestPlugin)
+	Plugin *p1 = nullptr, *p2 = nullptr;
+	auto original = qobject_cast<Plugin*>(qp.instance());
+	original->initMetadata();
+	p1 = original->clone();
+	qDebug()<<p1->metadata();
+	QVERIFY(!p1->metadata().isEmpty());
+}
+
+QTEST_MAIN(TST_TestPluginIp)
 
 #include "tst_pluginloader.moc"

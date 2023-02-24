@@ -1,9 +1,32 @@
 #include "pluginbase.h"
 #include <QLoggingCategory>
+#include <QJsonDocument>
 
 Q_LOGGING_CATEGORY(CAT_PLUGIN,"Plugin");
 
 using namespace adiscope;
+
+void PluginBase::setUri(QString uri) {
+	m_uri = uri;
+}
+
+void PluginBase::preload() {
+}
+
+void PluginBase::postload() {
+}
+
+bool PluginBase::loadIcon() {
+	return false;
+}
+
+bool PluginBase::loadPage(){
+	return false;
+}
+
+void PluginBase::loadToolList()	{
+}
+
 QString PluginBase::uri() {
 	return m_uri;
 }
@@ -26,6 +49,33 @@ void PluginBase::hidePageCallback() {
 	qDebug(CAT_PLUGIN)<<m_uri<<"hidepage callback";
 }
 
-int PluginBase::priority() {
-	return 0;
+QJsonObject PluginBase::metadata() {
+	return m_metadata;
+}
+
+void PluginBase::setMetadata(QJsonObject obj)
+{
+	m_metadata = obj;
+}
+
+void PluginBase::initMetadata() {
+	loadMetadata(
+
+R"plugin(
+{
+   "priority":1,
+}
+)plugin");
+
+}
+
+void PluginBase::loadMetadata(QString data) {
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(data.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical(CAT_PLUGIN) << m_name <<" plugin - JSON Parse error !" << err.errorString();
+		qCritical(CAT_PLUGIN) << data;
+		qCritical(CAT_PLUGIN) << QString(" ").repeated(err.offset)+"^";
+	}
+	m_metadata = doc.object();
 }
