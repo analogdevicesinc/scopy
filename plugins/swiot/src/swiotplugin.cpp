@@ -10,27 +10,32 @@
 
 using namespace adiscope;
 
-bool SWIOTPlugin::load(QString uri)
+bool SWIOTPlugin::loadPage()
 {
-	m_uri = uri;
-	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/icons/scopy-light/icons/locked.svg);");
-
-
 	infoui = new Ui::SWIOTInfoPage();
-
 	m_page = new QWidget();
 	infoui->setupUi(m_page);
 	connect(infoui->pushButton,&QPushButton::clicked,this,[=](){
 		auto &&cp = ContextProvider::GetInstance();
-		iio_context* ctx = cp->open(uri);
+		iio_context* ctx = cp->open(m_uri);
 		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
-
-		cp->close(uri);
+		cp->close(m_uri);
 		infoui->textBrowser->setText(hw_serial);
 	});
-	QVBoxLayout *lay = new QVBoxLayout(m_page);
 	return true;
+}
+
+bool SWIOTPlugin::loadIcon()
+{
+	m_icon = new QLabel("");
+	m_icon->setStyleSheet("border-image: url(:/icons/scopy-light/icons/locked.svg);");
+	return true;
+}
+
+void SWIOTPlugin::loadToolList()
+{
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Runtime",""));
 }
 
 void SWIOTPlugin::unload()
@@ -49,14 +54,15 @@ bool SWIOTPlugin::compatible(QString uri)
 	QString hw_serial;
 	iio_context* ctx = cp->open(uri);
 
+	if(!ctx)
+		return false;
+
 	hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
 	if(hw_serial == "104473b04a060009f8ff2000da6084d36f")
 		ret = true;
 
 	cp->close(uri);
 
-	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"SWIOT Config","",this));
-	m_toolList.append(new ToolMenuEntry(QUuid::createUuid().toString(),"SWIOT Runtime","",this));
 	return ret;
 }
 
@@ -104,6 +110,19 @@ bool SWIOTPlugin::disconnectDev()
 	delete runtime;
 
 	return true;
+}
+
+void SWIOTPlugin::initMetadata()
+{
+	loadMetadata(
+R"plugin(
+	{
+	   "priority":3,
+	   "category":[
+	      "iio"
+	   ]
+	}
+)plugin");
 }
 
 

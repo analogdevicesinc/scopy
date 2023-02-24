@@ -17,7 +17,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	 hp = new ScopyHomePage(this);
 	 cs = new IIOContextScanner(this);
 	 scc = new ScannedIIOContextCollector(this);
-	 dm = new DeviceManager(this);
+	 pr = new PluginRepository(this);
+
+	 pr->init("plugins/plugins");
+	 PluginManager *pm = pr->getPluginManager();
+
+	 dm = new DeviceManager(pm, this);
 
 	 ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
 

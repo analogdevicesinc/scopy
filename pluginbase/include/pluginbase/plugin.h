@@ -12,7 +12,15 @@ class SCOPYPLUGINBASE_EXPORT Plugin {
 public:
 	virtual ~Plugin() {}
 
-	virtual bool load(QString uri) = 0;
+	virtual void setUri(QString) = 0;
+	virtual void preload() = 0;
+	virtual void postload() = 0;
+	virtual bool loadIcon() = 0;
+	virtual bool loadPage() = 0;
+	virtual void loadToolList() = 0;
+	virtual void initMetadata() = 0;
+	virtual void setMetadata(QJsonObject obj) = 0;
+
 	virtual void unload() = 0;
 	virtual bool compatible(QString uri) = 0;
 
@@ -22,7 +30,7 @@ public:
 	virtual QWidget* icon() = 0;
 	virtual QWidget* page() = 0;
 	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
-	virtual int priority() = 0;
+	virtual QJsonObject metadata() = 0;
 
 public Q_SLOTS:
 	virtual bool connectDev() = 0;
@@ -33,8 +41,6 @@ Q_SIGNALS:
 	virtual void restartDevice() = 0;
 	virtual void toolListChanged() = 0;
 	virtual void requestTool(QString) = 0;
-
-
 };
 }
 

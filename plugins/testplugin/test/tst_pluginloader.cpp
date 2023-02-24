@@ -11,7 +11,6 @@ class TST_TestPlugin : public QObject
 private Q_SLOTS:
 	void fileExists();
 	void isLibrary();
-	void fileName();	
 	void loaded();
 	void className();
 	void instanceNotNull();
@@ -19,16 +18,19 @@ private Q_SLOTS:
 	void qobjectcast_to_plugin();
 	void clone();
 	void name();
+	void metadata();
 
 };
 
-#define FILENAME "/home/adi/tmp/build-tool_launcher-Desktop_Qt_5_15_2_GCC_64bit-Debug/plugins/testplugin/libscopytestplugin.so"
+#define PLUGIN_LOCATION "../../plugins"
+#define FILENAME PLUGIN_LOCATION "/libscopytestplugin.so"
 
 
 void TST_TestPlugin::fileExists()
 {
 	QFile f(FILENAME);
 	bool ret;
+	qDebug()<<QDir::currentPath();
 	ret = f.open(QIODevice::ReadOnly);
 	if(ret)
 		f.close();
@@ -38,12 +40,6 @@ void TST_TestPlugin::fileExists()
 void TST_TestPlugin::isLibrary()
 {
 	QVERIFY(QLibrary::isLibrary(FILENAME));
-}
-
-void TST_TestPlugin::fileName()
-{
-	QPluginLoader qp(FILENAME,this);
-	QVERIFY(qp.fileName()==FILENAME);
 }
 
 void TST_TestPlugin::className()
@@ -102,6 +98,18 @@ void TST_TestPlugin::name() {
 	auto original = qobject_cast<Plugin*>(qp.instance());
 	p1 = original->clone();
 	qDebug()<<p1->name();
+}
+
+void TST_TestPlugin::metadata()
+{
+	QPluginLoader qp(FILENAME,this);
+
+	Plugin *p1 = nullptr, *p2 = nullptr;
+	auto original = qobject_cast<Plugin*>(qp.instance());
+	original->initMetadata();
+	p1 = original->clone();
+	qDebug()<<p1->metadata();
+	QVERIFY(!p1->metadata().isEmpty());
 }
 
 

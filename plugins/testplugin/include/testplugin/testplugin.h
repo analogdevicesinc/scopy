@@ -13,14 +13,20 @@ namespace adiscope {
 class SCOPYTESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
-	SCOPY_PLUGIN
+	SCOPY_PLUGIN;
 public:
-	bool compatible(QString uri) override;	
-	bool load(QString uri) override;
+	void initMetadata() override;
+	bool compatible(QString uri) override;
+	void postload() override;
+	bool loadPage() override;
+	bool loadIcon() override;
+	void loadToolList() override;
 	void unload() override;
 
 	bool connectDev() override;
 	bool disconnectDev() override;
+
+	// Plugin interface
 };
 }
 
