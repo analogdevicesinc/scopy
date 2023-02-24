@@ -2,9 +2,6 @@
 #include "qboxlayout.h"
 #include "qpluginloader.h"
 #include "qpushbutton.h"
-//#include "testplugin/testplugin.h"
-//#include "testplugin2/testpluginip.h"
-//#include "swiot/swiotplugin.h"
 #include <QLabel>
 #include <QTextBrowser>
 #include <QLoggingCategory>
@@ -14,9 +11,10 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace adiscope {
-DeviceImpl::DeviceImpl(QString uri, QObject *parent)
+DeviceImpl::DeviceImpl(QString uri, PluginManager *p, QObject *parent)
 	: QObject{parent},
-	  m_uri(uri)
+	  m_uri(uri),
+	  p(p)
 {
 	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";
 }
@@ -24,39 +22,36 @@ DeviceImpl::DeviceImpl(QString uri, QObject *parent)
 #define FILENAME "/home/adi/tmp/build-tool_launcher-Desktop_Qt_5_15_2_GCC_64bit-Debug/plugins/testplugin/libscopytestplugin.so"
 
 
+void DeviceImpl::loadCompatiblePlugins()
+{
+	plugins = p->getCompatiblePlugins(m_uri);
+}
+
 
 void DeviceImpl::loadPlugins() {
 
-	QPluginLoader qp(FILENAME,this);
-
-	Plugin *p1 = nullptr;
-	auto original = qobject_cast<Plugin*>(qp.instance());
-	p1 = original->clone();
-
-	if(p1->compatible(uri())) {
-		p1->load(uri());
-		connect(dynamic_cast<QObject*>(p1),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
-		connect(dynamic_cast<QObject*>(p1),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
-		connect(dynamic_cast<QObject*>(p1),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
-
-		plugins.append(p1);
-
-	} else {
-		delete p1;
+	loadCompatiblePlugins();
+	for(auto &p : plugins) {
+		p->preload();
 	}
-
-
 
 	loadName();
 	loadIcons();
 	loadPages();
+	loadToolList();
+
+	for(auto &p : plugins) {
+		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
+		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
+		connect(dynamic_cast<QObject*>(p),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+		p->postload();
+	}
 }
 
 void DeviceImpl::unloadPlugins() {
 	QList<Plugin*>::const_iterator pI = plugins.constEnd();
 	while(pI != plugins.constBegin()) {
 		--pI;
-
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
@@ -80,12 +75,14 @@ void DeviceImpl::loadIcons() {
 	m_icon->setFixedWidth(100);
 	new QHBoxLayout(m_icon);
 
-	if(plugins.count())
-		m_icon->layout()->addWidget(plugins[0]->icon());
-	else {
-		new QLabel("No PLUGIN",m_icon);
+	for( auto &p : plugins) {
+		if(p->loadIcon()) {
+			m_icon->layout()->addWidget(p->icon());
+			return;
+		}
 	}
 
+	new QLabel("No PLUGIN",m_icon);
 }
 
 void DeviceImpl::loadPages() {
@@ -102,8 +99,17 @@ void DeviceImpl::loadPages() {
 	connect(connbtn,SIGNAL(clicked()),this,SLOT(connectDev()));
 	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));
 
-	for(auto &&p : plugins)
-		m_page->layout()->addWidget(p->page());
+	for(auto &&p : plugins) {
+		if(p->loadPage()) {
+			m_page->layout()->addWidget(p->page());
+		}
+	}
+}
+
+void DeviceImpl::loadToolList() {
+	for(auto &&p : plugins) {
+		p->loadToolList();
+	}
 }
 
 
@@ -169,4 +175,8 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 	}
 	return ret;
 }
+
+
+
+
 }

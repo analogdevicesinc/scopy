@@ -1,7 +1,8 @@
 #include "testplugin.h"
-#include "qboxlayout.h"
-#include "qlabel.h"
-#include "qpushbutton.h"
+#include <QBoxLayout>
+#include <QJsonDocument>
+#include <QLabel>
+#include <QPushButton>
 #include <QLoggingCategory>
 #include <QUuid>
 
@@ -13,21 +14,32 @@ bool TestPlugin::compatible(QString uri) {
 	return true;
 }
 
-bool TestPlugin::load(QString uri) {
-	qDebug(CAT_TESTPLUGIN)<<"Loaded plugin";
-	m_uri = uri;
+bool TestPlugin::loadIcon()
+{
 	SCOPY_PLUGIN_ICON(":/icons/adalm.svg");
+	return true;
+}
 
+void TestPlugin::postload() {
+	qDebug(CAT_TESTPLUGIN)<<"Loaded plugin";
+}
+
+bool TestPlugin::loadPage()
+{
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
 	lay->addWidget(new QLabel("TestPage",m_page));
 	QPushButton* restartBtn = new QPushButton("restartPlugin",m_page);
 	lay->addWidget(restartBtn);
 	connect(restartBtn,SIGNAL(clicked()),this,SIGNAL(restartDevice()));
+	return true;
 
+}
+
+void TestPlugin::loadToolList()
+{
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("FirstPlugin",":/icons/scopy-default/icons/tool_home.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
-	return true;
 }
 
 void TestPlugin::unload() {
@@ -60,4 +72,17 @@ bool TestPlugin::disconnectDev()
 		}
 	}
 	return true;
+}
+
+void TestPlugin::initMetadata()
+{
+	loadMetadata(
+R"plugin(
+	{
+	   "priority":2,
+	   "category":[
+	      "test"
+	   ]
+	}
+)plugin");
 }

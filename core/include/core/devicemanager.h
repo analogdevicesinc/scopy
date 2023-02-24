@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QSet>
 #include "device.h"
+#include "pluginmanager.h"
 #include "scopycore_export.h"
 
 namespace adiscope {
@@ -12,10 +13,11 @@ class SCOPYCORE_EXPORT DeviceManager : public QObject
 {
 	Q_OBJECT
 public:
-	explicit DeviceManager(QObject *parent = nullptr);
+	explicit DeviceManager(PluginManager *pm, QObject *parent = nullptr);
 	Device* getDevice(QString uri);
 	void setExclusive(bool);
 	bool getExclusive() const;
+
 
 public Q_SLOTS:
 	void addDevice(QString uri);
@@ -46,6 +48,7 @@ private:
 	QStringList scannedDev;
 	QStringList connectedDev;
 	QMap<QString,Device*> map;
+	PluginManager *pm;
 
 };
 }
