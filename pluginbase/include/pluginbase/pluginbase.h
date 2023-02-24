@@ -11,15 +11,27 @@ class SCOPYPLUGINBASE_EXPORT PluginBase : public Plugin {
 public:
 	virtual ~PluginBase() {}
 
-	virtual QString uri();
-	virtual QString name();
-	virtual QWidget* icon();
-	virtual QWidget* page();
-	virtual QList<ToolMenuEntry*> toolList();
-	virtual int priority();
+	virtual void setUri(QString uri) override;
+	virtual void initMetadata() override;
+	virtual void setMetadata(QJsonObject obj) override;
+	virtual void preload() override;
+	virtual void postload() override;
+	virtual bool loadIcon() override;
+	virtual bool loadPage() override;
+	virtual void loadToolList() override;
 
-	virtual void showPageCallback();
-	virtual void hidePageCallback();
+	virtual QString uri() override;
+	virtual QString name() override;
+	virtual QWidget* icon() override;
+	virtual QWidget* page() override;
+	virtual QList<ToolMenuEntry*> toolList() override;
+	virtual QJsonObject metadata() override;
+
+	virtual void showPageCallback() override;
+	virtual void hidePageCallback() override;
+
+	virtual void loadMetadata(QString data);
+
 
 protected:
 	QString m_uri;
@@ -27,6 +39,7 @@ protected:
 	QWidget *m_page;
 	QWidget *m_icon;
 	QList<ToolMenuEntry*> m_toolList;
+	QJsonObject m_metadata;
 };
 }
 
@@ -38,9 +51,14 @@ protected:
 	Q_INTERFACES(adiscope::Plugin)\
 public:\
 	virtual ~SCOPY_PLUGIN_NAME () override {}\
-	SCOPY_PLUGIN_NAME* clone() override { return new SCOPY_PLUGIN_NAME();}\
-	QString name() override { return xstr(SCOPY_PLUGIN_NAME) ;}\
-	int priority() override { return SCOPY_PLUGIN_PRIO;}\
+	SCOPY_PLUGIN_NAME* clone() override { \
+		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
+		/* copy metadata from this object to the next one */\
+		ret->m_name = xstr(SCOPY_PLUGIN_NAME);\
+		ret->setMetadata(metadata()); \
+		return ret;\
+	} \
+	QString name() override { return  m_name;}\
 \
 Q_SIGNALS:\
 	virtual void restartDevice() override;\

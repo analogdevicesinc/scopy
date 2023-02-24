@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
 
-message("Testing!!")
-
 function(SETUP_TESTS)
     foreach(_testname ${ARGS})
         add_executable(_testname ${ARGS})

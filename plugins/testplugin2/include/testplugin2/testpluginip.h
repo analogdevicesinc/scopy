@@ -3,7 +3,7 @@
 
 
 #define SCOPY_PLUGIN_NAME TestPluginIp
-#define SCOPY_PLUGIN_PRIO 1
+#define SCOPY_PLUGIN_PRIO 2
 
 #include <QObject>
 #include <pluginbase/plugin.h>
@@ -17,13 +17,15 @@ class SCOPYTESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
 	SCOPY_PLUGIN
 
 public:
+	void postload() override;
+	bool loadIcon() override;
+	bool loadPage() override;
+	void loadToolList() override;
 	bool compatible(QString uri) override;
-	bool load(QString uri) override;
 	void unload() override;
-
 	bool connectDev() override;
 	bool disconnectDev() override;
-
+	void initMetadata() override;
 private:
 	QWidget *m_tool;
 
