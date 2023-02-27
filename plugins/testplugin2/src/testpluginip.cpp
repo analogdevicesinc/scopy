@@ -1,6 +1,7 @@
 #include "testpluginip.h"
 #include "qlabel.h"
 #include "qpushbutton.h"
+#include <QVBoxLayout>
 #include <QLoggingCategory>
 #include <QUuid>
 
@@ -19,7 +20,7 @@ void TestPluginIp::unload() {
 
 }
 
-bool TestPluginIp::connectDev()
+bool TestPluginIp::onConnect()
 {
 	qDebug(CAT_TESTPLUGINIP)<<"connect";
 	qDebug(CAT_TESTPLUGINIP)<<m_toolList[0]->id()<<m_toolList[0]->name();
@@ -31,10 +32,15 @@ bool TestPluginIp::connectDev()
 
 	m_toolList.append(new ToolMenuEntry(iptool2UUID,"IP tool2","", this));
 	m_toolList[1]->setEnabled(true);
+	m_tool = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_tool);
+	QPushButton *disc = new QPushButton("Disconnect");
+	lay->addWidget(disc);
 	QPushButton *btn = new QPushButton("LASTTOOOL testpage");
-	m_tool = btn;
+	lay->addWidget(btn);
 
 	connect(btn,&QPushButton::clicked,this,[=]() { Q_EMIT requestTool(m_toolList[0]->id());});
+	connect(disc,&QPushButton::clicked,this,[=]() { Q_EMIT disconnectDevice();});
 
 	Q_EMIT toolListChanged();
 	m_toolList[1]->setTool(m_tool);
@@ -42,7 +48,7 @@ bool TestPluginIp::connectDev()
 	return true;
 }
 
-bool TestPluginIp::disconnectDev()
+bool TestPluginIp::onDisconnect()
 {
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);

@@ -33,11 +33,12 @@ public:
 	virtual QJsonObject metadata() = 0;
 
 public Q_SLOTS:
-	virtual bool connectDev() = 0;
-	virtual bool disconnectDev() = 0;
+	virtual bool onConnect() = 0;
+	virtual bool onDisconnect() = 0;
 	virtual void showPageCallback() = 0;
 	virtual void hidePageCallback() = 0;
 Q_SIGNALS:
+	virtual void disconnectDevice() = 0;
 	virtual void restartDevice() = 0;
 	virtual void toolListChanged() = 0;
 	virtual void requestTool(QString) = 0;

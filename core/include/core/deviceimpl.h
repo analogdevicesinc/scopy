@@ -33,10 +33,10 @@ public:
 
 
 public Q_SLOTS:
-	void connectDev() override;
-	void disconnectDev() override;
-	void showPage() override;
-	void hidePage() override;
+	virtual void connectDev() override;
+	virtual void disconnectDev() override;
+	virtual void showPage() override;
+	virtual void hidePage() override;
 //	void forgetDev() override;
 Q_SIGNALS:
 	void toolListChanged() override;
