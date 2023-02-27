@@ -37,6 +37,8 @@ public Q_SLOTS:
 	virtual void disconnectDev() override;
 	virtual void showPage() override;
 	virtual void hidePage() override;
+	virtual void save(QSettings &) override;
+	virtual void load(QSettings &) override;
 //	void forgetDev() override;
 Q_SIGNALS:
 	void toolListChanged() override;

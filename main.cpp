@@ -35,12 +35,16 @@ int main(int argc, char *argv[])
 {
 	SetScopyQDebugMessagePattern();
 	QLoggingCategory::setFilterRules(""
-//					 "*.debug=false\n"
+					 "*.debug=false\n"
 					 "DeviceManager.debug=true\n"
 					 "Device.debug=true\n"
 					 "TestPlugin.debug=true\n"
 					 "Plugin.debug=true"
 					 );
+
+	QCoreApplication::setOrganizationName("ADI");
+	QCoreApplication::setOrganizationDomain("analog.com");
+	QCoreApplication::setApplicationName("Scopy-v2");
 
 	QApplication a(argc, argv);
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/default.qss"));

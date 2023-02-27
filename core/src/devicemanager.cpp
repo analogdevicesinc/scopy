@@ -28,15 +28,13 @@ void DeviceManager::addDevice(QString uri)
 
 	Device *d = nullptr;
 	if(map.contains(uri)) {
-//		d = map.value(uri,nullptr);
 		qWarning(CAT_DEVICEMANAGER)<<"Duplicate" << uri <<" in device manager, removing old value";
 		removeDevice(uri);
 	}
 
-//		d = new DeviceImpl(uri, pm, this);//DeviceFactory::newDevice(uri);
-		d = new IIODeviceImpl(uri, pm, this);
-
-
+	d = new DeviceImpl(uri, pm, this);
+	//DeviceFactory::newDevice(uri);
+	//d = new IIODeviceImpl(uri, pm, this);
 
 	d->loadPlugins();
 
@@ -83,6 +81,20 @@ void DeviceManager::restartDevice(QString uri)
 {
 	removeDevice(uri);
 	addDevice(uri);
+}
+
+void DeviceManager::save(QSettings &s)
+{
+	for(const QString &d : qAsConst(connectedDev)) {
+		map[d]->save(s);
+	}
+}
+
+void DeviceManager::load(QSettings &s)
+{
+	for(const QString &d : qAsConst(connectedDev)) {
+		map[d]->load(s);
+	}
 }
 
 void DeviceManager::changeToolListDevice() {

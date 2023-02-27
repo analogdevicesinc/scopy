@@ -28,6 +28,10 @@ public Q_SLOTS:
     void requestTools(QString id);
     void addDeviceToUi(QString id, Device *d);
     void removeDeviceFromUi(QString);
+    void save();
+    void load();
+    void save(QString file);
+    void load(QString file);
 
 private:
     ScopyAboutPage* about;

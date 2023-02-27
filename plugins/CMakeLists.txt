@@ -10,5 +10,3 @@ add_subdirectory(testplugin2)
 list(APPEND PLUGINS ${PLUGIN_NAME})
 add_subdirectory(swiot)
 list(APPEND PLUGINS ${PLUGIN_NAME})
-
-message(${PLUGINS})
