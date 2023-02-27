@@ -16,6 +16,15 @@ void PluginBase::preload() {
 void PluginBase::postload() {
 }
 
+void PluginBase::unload() {
+
+}
+
+void PluginBase::loadApi()
+{
+
+}
+
 bool PluginBase::loadIcon() {
 	return false;
 }
@@ -25,6 +34,35 @@ bool PluginBase::loadPage(){
 }
 
 void PluginBase::loadToolList()	{
+}
+
+void PluginBase::saveSettings()
+{
+	if(pluginApi)
+		pluginApi->save();
+}
+
+void PluginBase::loadSettings()
+{
+	if(pluginApi)
+		pluginApi->load();
+}
+
+void PluginBase::saveSettings(QSettings& s)
+{
+	if(pluginApi)
+		pluginApi->save(s);
+}
+
+void PluginBase::loadSettings(QSettings& s)
+{
+	if(pluginApi)
+		pluginApi->load(s);
+}
+
+ApiObject *PluginBase::api()
+{
+	return pluginApi;
 }
 
 QString PluginBase::uri() {

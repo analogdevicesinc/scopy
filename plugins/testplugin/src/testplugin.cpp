@@ -21,10 +21,6 @@ bool TestPlugin::loadIcon()
 	return true;
 }
 
-void TestPlugin::postload() {
-	qDebug(CAT_TESTPLUGIN)<<"Loaded plugin";
-}
-
 bool TestPlugin::loadPage()
 {
 	m_page = new QWidget();
@@ -43,18 +39,6 @@ void TestPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
 }
 
-void TestPlugin::unload() {
-}
-
-QString TestPlugin::about()
-{
-	QFile f(":/about.md");
-	f.open(QFile::ReadOnly);
-	QString content = f.readAll();
-	return content;
-}
-
-
 bool TestPlugin::onConnect()
 {
 	qDebug(CAT_TESTPLUGIN)<<"connect";
@@ -68,9 +52,11 @@ bool TestPlugin::onConnect()
 	QVBoxLayout *lay = new QVBoxLayout(tool);
 	QLabel *lbl = new QLabel("TestPlugin", tool);
 	QLabel *pic = new QLabel("Picture",tool);
+	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testImage.png\") ");
 	lay->addWidget(lbl);
 	lay->addWidget(pic);
+	lay->addWidget(edit);
 	m_toolList[0]->setTool(tool);
 
 	return true;
@@ -87,8 +73,15 @@ bool TestPlugin::onDisconnect()
 			tool->setTool(nullptr);
 		}
 	}
-	delete tool;
 	return true;
+}
+
+QString TestPlugin::about()
+{
+	QFile f(":/about.md");
+	f.open(QFile::ReadOnly);
+	QString content = f.readAll();
+	return content;
 }
 
 void TestPlugin::initMetadata()
@@ -102,4 +95,21 @@ R"plugin(
 	   ]
 	}
 )plugin");
+}
+
+void TestPlugin::loadApi(){
+	pluginApi = new TestPlugin_API(this);
+	pluginApi->setObjectName(m_name);
+}
+
+// --------------------
+
+QString TestPlugin_API::testText() const
+{
+	return p->edit->text();
+}
+
+void TestPlugin_API::setTestText(const QString &newTestText)
+{
+	p->edit->setText(newTestText);
 }

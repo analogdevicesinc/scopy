@@ -21,6 +21,8 @@ public:
 
 Q_SIGNALS:
 	void requestTool(QString);
+	void requestSave();
+	void requestLoad();
 
 private:
     Ui::ToolBrowser *ui;

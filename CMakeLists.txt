@@ -37,7 +37,6 @@ set(PROJECT_SOURCES
 include(ScopyAbout)
 configure_about(./resources/about)
 FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc resources/aboutpage.qrc)
-message(${SCOPY_RESOURCE_FILES})
 qt5_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 find_library(IIO_LIBRARIES NAMES iio libiio)
@@ -46,10 +45,9 @@ find_path(IIO_INCLUDE_DIRS iio.h)
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 
-
-option(ENABLE_TESTING "Enables QtTests" ON)
+option(ENABLE_TESTING "Enable building unit tests" ON)
 if(ENABLE_TESTING)
-    message("-- Tests enabled")
+    message(STATUS "Unit tests enabled")
     add_subdirectory(tests)
 endif()
 
