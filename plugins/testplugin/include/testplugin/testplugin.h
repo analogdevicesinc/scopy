@@ -8,32 +8,48 @@
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
 #include "scopytestplugin_export.h"
+#include <QLineEdit>
 
 namespace adiscope {
+
 class SCOPYTESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
 public:
+	friend class TestPlugin_API;
+	void loadApi() override;
 	void initMetadata() override;
 	bool compatible(QString uri) override;
-	void postload() override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
-	void unload() override;
 	QString about() override;
 
 	bool onConnect() override;
 	bool onDisconnect() override;
 
-	// Plugin interface
 private:
 	QWidget *tool;
-
-	// Plugin interface
+	QLineEdit *edit;
 
 };
+
+class SCOPYTESTPLUGIN_EXPORT TestPlugin_API : public ApiObject {
+	Q_OBJECT
+public:
+	explicit TestPlugin_API(TestPlugin *p) : ApiObject(p),p(p) {}
+	~TestPlugin_API() {}
+	TestPlugin* p;
+
+	Q_PROPERTY(QString testText READ testText WRITE setTestText);
+	QString testText() const;
+	void setTestText(const QString &newTestText);
+private:
+	QString m_testText;
+};
+
 }
+
 
 #endif // TESTPLUGIN_H

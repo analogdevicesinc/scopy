@@ -4,6 +4,7 @@
 #include <QObject>
 #include "pluginbase/toolmenuentry.h"
 #include "scopycore_export.h"
+#include <QSettings>
 
 namespace adiscope {
 class SCOPYCORE_EXPORT Device {
@@ -23,6 +24,8 @@ public Q_SLOTS:
 	virtual void disconnectDev() = 0;
 	virtual void showPage() = 0;
 	virtual void hidePage() = 0;
+	virtual void save(QSettings &) = 0;
+	virtual void load(QSettings &) = 0;
 
 Q_SIGNALS:
 	virtual void toolListChanged() = 0;

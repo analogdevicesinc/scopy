@@ -6,6 +6,8 @@
 #include "toolmenuentry.h"
 #include "scopypluginbase_export.h"
 #include <QtPlugin>
+#include <QSettings>
+#include "apiobject.h"
 
 namespace adiscope {
 class SCOPYPLUGINBASE_EXPORT Plugin {
@@ -15,11 +17,18 @@ public:
 	virtual void setUri(QString) = 0;
 	virtual void preload() = 0;
 	virtual void postload() = 0;
+	virtual void loadApi() = 0;
 	virtual bool loadIcon() = 0;
 	virtual bool loadPage() = 0;
 	virtual void loadToolList() = 0;
 	virtual void initMetadata() = 0;
 	virtual void setMetadata(QJsonObject obj) = 0;
+
+	virtual void saveSettings() = 0;
+	virtual void loadSettings() = 0;
+	virtual void saveSettings(QSettings&) = 0;
+	virtual void loadSettings(QSettings&) = 0;
+	virtual ApiObject* api() = 0;
 
 	virtual void unload() = 0;
 	virtual bool compatible(QString uri) = 0;
