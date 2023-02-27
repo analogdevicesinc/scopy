@@ -30,8 +30,8 @@ public:
 
 	void initMetadata() override;
 public Q_SLOTS:
-	bool connectDev() override;
-	bool disconnectDev() override;
+	bool onConnect() override;
+	bool onDisconnect() override;
 
 private:
 	Ui::SWIOTInfoPage *infoui;

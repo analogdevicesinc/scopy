@@ -73,7 +73,7 @@ protected:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 
-private:
+protected:
 
 	void _enableBotSeparator(bool enable);
 	void _enableTopSeparator(bool enable);

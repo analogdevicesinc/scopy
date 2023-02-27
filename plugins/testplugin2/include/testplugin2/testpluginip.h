@@ -23,8 +23,8 @@ public:
 	void loadToolList() override;
 	bool compatible(QString uri) override;
 	void unload() override;
-	bool connectDev() override;
-	bool disconnectDev() override;
+	bool onConnect() override;
+	bool onDisconnect() override;
 	void initMetadata() override;
 private:
 	QWidget *m_tool;
