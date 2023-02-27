@@ -37,19 +37,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnHome">
-     <property name="text">
-      <string>Home</string>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="adiscope::ToolMenu" name="wToolMenu" native="true"/>
    </item>
    <item>

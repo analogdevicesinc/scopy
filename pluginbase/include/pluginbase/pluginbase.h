@@ -61,6 +61,7 @@ public:\
 	QString name() override { return  m_name;}\
 \
 Q_SIGNALS:\
+	virtual void disconnectDevice() override;\
 	virtual void restartDevice() override;\
 	virtual void toolListChanged() override;\
 	virtual void requestTool(QString) override;\
