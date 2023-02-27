@@ -5,6 +5,7 @@
 #include <QPushButton>
 #include <QLoggingCategory>
 #include <QUuid>
+#include <QFile>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace adiscope;
@@ -45,6 +46,14 @@ void TestPlugin::loadToolList()
 void TestPlugin::unload() {
 }
 
+QString TestPlugin::about()
+{
+	QFile f(":/about.md");
+	f.open(QFile::ReadOnly);
+	QString content = f.readAll();
+	return content;
+}
+
 
 bool TestPlugin::onConnect()
 {
@@ -54,8 +63,15 @@ bool TestPlugin::onConnect()
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setName("TestPlugin");
 	m_toolList[0]->setRunBtnVisible(true);
-	QLabel *lbl = new QLabel("TestPlugin");
-	m_toolList[0]->setTool(lbl);
+
+	tool = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(tool);
+	QLabel *lbl = new QLabel("TestPlugin", tool);
+	QLabel *pic = new QLabel("Picture",tool);
+	pic->setStyleSheet("border-image: url(\":/testImage.png\") ");
+	lay->addWidget(lbl);
+	lay->addWidget(pic);
+	m_toolList[0]->setTool(tool);
 
 	return true;
 }
@@ -71,6 +87,7 @@ bool TestPlugin::onDisconnect()
 			tool->setTool(nullptr);
 		}
 	}
+	delete tool;
 	return true;
 }
 
