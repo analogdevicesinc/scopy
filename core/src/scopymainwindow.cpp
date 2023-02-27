@@ -2,76 +2,81 @@
 #include "scanbuttoncontroller.h"
 #include "ui_scopymainwindow.h"
 #include "scopyhomepage.h"
+#include <scopyaboutpage.h>
 #include <QLabel>
 #include <device.h>
 
 using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
-    : QMainWindow(parent)
-    , ui(new Ui::ScopyMainWindow)
+	: QMainWindow(parent)
+	, ui(new Ui::ScopyMainWindow)
 {	
 	ui->setupUi(this);
-	 auto tb = ui->wToolBrowser;
-	 auto ts = ui->wsToolStack;
-	 auto tm = tb->getToolMenu();
-	 hp = new ScopyHomePage(this);
-	 cs = new IIOContextScanner(this);
-	 scc = new ScannedIIOContextCollector(this);
-	 pr = new PluginRepository(this);
+	auto tb = ui->wToolBrowser;
+	auto ts = ui->wsToolStack;
+	auto tm = tb->getToolMenu();
+	hp = new ScopyHomePage(this);
+	cs = new IIOContextScanner(this);
+	scc = new ScannedIIOContextCollector(this);
+	pr = new PluginRepository(this);
 
-	 pr->init("plugins/plugins");
-	 PluginManager *pm = pr->getPluginManager();
 
-	 dm = new DeviceManager(pm, this);
+	pr->init("plugins/plugins");
+	PluginManager *pm = pr->getPluginManager();
 
-	 ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
+	initAboutPage(pm);
 
-	 dm->setExclusive(true);
-	 toolman = new ToolManager(tm,ts,this);
-	 toolman->addToolList("home",{});
-	 toolman->addToolList("add",{});
+	dm = new DeviceManager(pm, this);
+	ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
 
-	 connect(tm,&ToolMenu::requestAttach,ts,&ToolStack::attachTool);
-	 connect(tm,&ToolMenu::requestDetach,ts,&ToolStack::detachTool);
-	 connect(ts,&ToolStack::attachSuccesful,tm,&ToolMenu::attachSuccesful);
-	 connect(ts,&ToolStack::detachSuccesful,tm,&ToolMenu::detachSuccesful);
+	dm->setExclusive(true);
+	toolman = new ToolManager(tm,ts,this);
+	toolman->addToolList("home",{});
+	toolman->addToolList("add",{});
 
-	 connect(tb,&ToolBrowser::requestTool,ts, &ToolStack::show);
-//	 connect(tb,&ToolBrowser::detach,ts, &ToolStack::showTool);
-	 ts->add("home", hp);
-	 ts->add("about", new QLabel("about scopy ... "));
+	connect(tm,&ToolMenu::requestAttach,ts,&ToolStack::attachTool);
+	connect(tm,&ToolMenu::requestDetach,ts,&ToolStack::detachTool);
+	connect(ts,&ToolStack::attachSuccesful,tm,&ToolMenu::attachSuccesful);
+	connect(ts,&ToolStack::detachSuccesful,tm,&ToolMenu::detachSuccesful);
 
-	 connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
+	connect(tb,&ToolBrowser::requestTool,ts, &ToolStack::show);
+	//	 connect(tb,&ToolBrowser::detach,ts, &ToolStack::showTool);
+	ts->add("home", hp);
+	ts->add("about", about);
 
-	 connect(scc,SIGNAL(foundDevice(QString)),dm,SLOT(addDevice(QString)));
-	 connect(scc,SIGNAL(lostDevice(QString)),dm,SLOT(removeDevice(QString)));
+	connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 
-	 connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
+	connect(scc,SIGNAL(foundDevice(QString)),dm,SLOT(addDevice(QString)));
+	connect(scc,SIGNAL(lostDevice(QString)),dm,SLOT(removeDevice(QString)));
 
-	 connect(hp,SIGNAL(requestAddDevice(QString)),dm,SLOT(addDevice(QString)));
-	 connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
+	connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
 
-	 connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),this,SLOT(removeDeviceFromUi(QString)));
-	 connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDevice(QString)));
+	connect(hp,SIGNAL(requestAddDevice(QString)),dm,SLOT(addDevice(QString)));
+	connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
 
-	 if(dm->getExclusive()) {
-		 // only for device manager exclusive mode - stop scan on connect
-		 connect(dm,SIGNAL(deviceConnected(QString)),sbc,SLOT(stopScan()));
-		 connect(dm,SIGNAL(deviceDisconnected(QString)),sbc,SLOT(startScan()));
-	 }
+	connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),this,SLOT(removeDeviceFromUi(QString)));
+	connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDevice(QString)));
 
-	 connect(dm,SIGNAL(deviceConnected(QString)),scc,SLOT(lock(QString)));
-	 connect(dm,SIGNAL(deviceConnected(QString)),toolman,SLOT(lockToolList(QString)));
-	 connect(dm,SIGNAL(deviceConnected(QString)),hp,SLOT(connectDevice(QString)));	 
-	 connect(dm,SIGNAL(deviceDisconnected(QString)),scc,SLOT(unlock(QString)));
-	 connect(dm,SIGNAL(deviceDisconnected(QString)),toolman,SLOT(unlockToolList(QString)));
-	 connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
+	if(dm->getExclusive()) {
+		// only for device manager exclusive mode - stop scan on connect
+		connect(dm,SIGNAL(deviceConnected(QString)),sbc,SLOT(stopScan()));
+		connect(dm,SIGNAL(deviceDisconnected(QString)),sbc,SLOT(startScan()));
+	}
 
-	 connect(dm,SIGNAL(requestDevice(QString)),hp,SLOT(viewDevice(QString)));
-	 connect(dm,SIGNAL(requestTool(QString)),toolman,SLOT(showTool(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString)),scc,SLOT(lock(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString)),toolman,SLOT(lockToolList(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString)),hp,SLOT(connectDevice(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString)),scc,SLOT(unlock(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString)),toolman,SLOT(unlockToolList(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
 
-	 connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
-	 sbc->startScan();
+	connect(dm,SIGNAL(requestDevice(QString)),hp,SLOT(viewDevice(QString)));
+	connect(dm,SIGNAL(requestTool(QString)),toolman,SLOT(showTool(QString)));
+
+	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
+	sbc->startScan();
+
+	dm->addDevice("ip:");
 }
 
 void ScopyMainWindow::requestTools(QString id) {
@@ -82,6 +87,20 @@ ScopyMainWindow::~ScopyMainWindow()
 {
 	cs->stopScan();
 	delete ui;
+}
+
+void ScopyMainWindow::initAboutPage(PluginManager *pm)
+{
+	about = new ScopyAboutPage(this);
+	if(pm) {
+		QList<Plugin*> plugin = pm->getPlugins("",this);
+		for(Plugin* p : plugin) {
+			QString content = p->about();
+			if(!content.isEmpty()) {
+				about->addHorizontalTab(about->buildPage(content),p->name());
+			}
+		}
+	}
 }
 
 
@@ -95,6 +114,5 @@ void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
 	toolman->removeToolList(id);
 	hp->removeDevice(id);
-
 }
 

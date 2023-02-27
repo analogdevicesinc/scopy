@@ -26,11 +26,14 @@ public:
 	virtual QWidget* page() override;
 	virtual QList<ToolMenuEntry*> toolList() override;
 	virtual QJsonObject metadata() override;
+	virtual QString about() override;
 
 	virtual void showPageCallback() override;
 	virtual void hidePageCallback() override;
 
+
 	virtual void loadMetadata(QString data);
+
 
 
 protected:
@@ -50,7 +53,7 @@ protected:
 	Q_PLUGIN_METADATA(IID ScopyPlugin_iid)\
 	Q_INTERFACES(adiscope::Plugin)\
 public:\
-	virtual ~SCOPY_PLUGIN_NAME () override {}\
+	virtual ~SCOPY_PLUGIN_NAME () override {qDebug()<<"dtor";}\
 	SCOPY_PLUGIN_NAME* clone() override { \
 		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
 		/* copy metadata from this object to the next one */\
