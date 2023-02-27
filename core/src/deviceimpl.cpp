@@ -7,6 +7,11 @@
 #include <QDebug>
 #include <QPicture>
 
+#include "scopycore_config.h"
+#ifdef ENABLE_SCOPYJS
+#include "scopyjs/scopyjs.h"
+#endif
+
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace adiscope {
@@ -20,7 +25,7 @@ DeviceImpl::DeviceImpl(QString uri, PluginManager *p, QObject *parent)
 
 void DeviceImpl::loadCompatiblePlugins()
 {
-	plugins = p->getCompatiblePlugins(m_uri,"",this);
+	plugins = p->getCompatiblePlugins(m_uri,"test",this);
 }
 
 
@@ -41,6 +46,7 @@ void DeviceImpl::loadPlugins() {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+		p->loadApi();
 		p->postload();
 	}
 }
@@ -49,11 +55,10 @@ void DeviceImpl::unloadPlugins() {
 	QList<Plugin*>::const_iterator pI = plugins.constEnd();
 	while(pI != plugins.constBegin()) {
 		--pI;
-		disconnect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
+		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
-
 		(*pI)->unload();
 		delete (*pI);
 	}
@@ -110,7 +115,6 @@ void DeviceImpl::loadToolList() {
 	}
 }
 
-
 void DeviceImpl::showPage() {
 	for(auto &&p : plugins)
 		p->showPageCallback();
@@ -123,19 +127,44 @@ void DeviceImpl::hidePage() {
 
 }
 
+void DeviceImpl::save(QSettings &s) {
+	for(Plugin* p : qAsConst(plugins)) {
+		p->saveSettings(s);
+	}
+}
+
+void DeviceImpl::load(QSettings &s) {
+	for(Plugin* p : qAsConst(plugins)) {
+		p->loadSettings(s);
+	}
+}
+
 void DeviceImpl::connectDev() {
 	discbtn->show();
 	connbtn->hide();
-	for(auto &&p : plugins)
+	for(auto &&p : plugins) {
 		p->onConnect();
+		p->loadSettings();
+#ifdef ENABLE_SCOPYJS
+		if(p->api())
+			ScopyJS::GetInstance()->registerApi(p->api());
+#endif
+	}
 	Q_EMIT connected();
 }
 
 void DeviceImpl::disconnectDev() {
 	discbtn->hide();
 	connbtn->show();
-	for(auto &&p : plugins)
+	for(auto &&p : plugins) {
+
+#ifdef ENABLE_SCOPYJS
+		if(p->api())
+			ScopyJS::GetInstance()->unregisterApi(p->api());
+#endif
+		p->saveSettings();
 		p->onDisconnect();
+	}
 	Q_EMIT disconnected();
 }
 
@@ -174,8 +203,4 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 	}
 	return ret;
 }
-
-
-
-
 }
