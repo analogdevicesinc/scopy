@@ -1,6 +1,5 @@
 #include "deviceimpl.h"
 #include "qboxlayout.h"
-#include "qpluginloader.h"
 #include "qpushbutton.h"
 #include <QLabel>
 #include <QTextBrowser>
@@ -18,9 +17,6 @@ DeviceImpl::DeviceImpl(QString uri, PluginManager *p, QObject *parent)
 {
 	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";
 }
-
-#define FILENAME "/home/adi/tmp/build-tool_launcher-Desktop_Qt_5_15_2_GCC_64bit-Debug/plugins/testplugin/libscopytestplugin.so"
-
 
 void DeviceImpl::loadCompatiblePlugins()
 {
@@ -41,6 +37,7 @@ void DeviceImpl::loadPlugins() {
 	loadToolList();
 
 	for(auto &p : plugins) {
+		connect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
@@ -52,6 +49,7 @@ void DeviceImpl::unloadPlugins() {
 	QList<Plugin*>::const_iterator pI = plugins.constEnd();
 	while(pI != plugins.constBegin()) {
 		--pI;
+		disconnect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
@@ -129,7 +127,7 @@ void DeviceImpl::connectDev() {
 	discbtn->show();
 	connbtn->hide();
 	for(auto &&p : plugins)
-		p->connectDev();
+		p->onConnect();
 	Q_EMIT connected();
 }
 
@@ -137,7 +135,7 @@ void DeviceImpl::disconnectDev() {
 	discbtn->hide();
 	connbtn->show();
 	for(auto &&p : plugins)
-		p->disconnectDev();
+		p->onDisconnect();
 	Q_EMIT disconnected();
 }
 

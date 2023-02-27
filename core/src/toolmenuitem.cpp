@@ -87,6 +87,12 @@ void ToolMenuItem::enableDoubleClick(bool enable)
 	}
 }
 
+void ToolMenuItem::setSeparator(bool top, bool bot)
+{
+	_enableBotSeparator(bot);
+	_enableTopSeparator(top);
+}
+
 bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 {
 	if (event->type() == QEvent::MouseButtonDblClick) {

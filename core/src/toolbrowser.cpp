@@ -12,11 +12,16 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
 
     ToolMenu *tm = ui->wToolMenu;   
 
-    tm->getButtonGroup()->addButton(ui->btnHome);
     tm->getButtonGroup()->addButton(ui->btnPreferences);
     tm->getButtonGroup()->addButton(ui->btnAbout);
 
-    connect(ui->btnHome,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("home");});
+    ToolMenuItem* homeTme = tm->addTool("home","Home",":/icons/scopy-default/icons/tool_home.svg");
+    homeTme->setSeparator(false,true);
+    homeTme->getToolRunBtn()->setVisible(false);
+    homeTme->setEnabled(true);
+
+
+
     connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
     connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
     connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(requestTool(QString)));

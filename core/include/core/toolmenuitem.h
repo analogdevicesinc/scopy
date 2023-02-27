@@ -41,6 +41,7 @@ public:
 
 	void setToolEnabled(bool disabled);
 	void enableDoubleClick(bool enable);
+	void setSeparator(bool top, bool bot);
 
 	bool eventFilter(QObject *watched, QEvent *event);
 

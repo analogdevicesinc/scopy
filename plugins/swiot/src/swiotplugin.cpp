@@ -66,7 +66,7 @@ bool SWIOTPlugin::compatible(QString uri)
 	return ret;
 }
 
-bool SWIOTPlugin::connectDev()
+bool SWIOTPlugin::onConnect()
 {
 
 	config = new QWidget();
@@ -96,7 +96,7 @@ bool SWIOTPlugin::connectDev()
 	return false;
 }
 
-bool SWIOTPlugin::disconnectDev()
+bool SWIOTPlugin::onDisconnect()
 {
 	m_toolList[0]->setEnabled(false);
 	m_toolList[0]->setTool(nullptr);
