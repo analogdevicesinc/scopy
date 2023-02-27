@@ -1,5 +1,9 @@
 <RCC>
     <qresource prefix="/">
-	@ABOUT_HTML_QRC_SOURCES@
+	
+<file>buildinfo.html</file>
+<file>scopy_osp.html</file>
+<file>credits.html</file>
+<file>about.html</file>
     </qresource>
 </RCC>

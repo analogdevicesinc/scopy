@@ -9,7 +9,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
@@ -18,21 +18,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 # Make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
-function(configure_stylesheets DU_OPTION)
-        file(GLOB_RECURSE STYLESHEETS ${CMAKE_CURRENT_SOURCE_DIR}/resources/stylesheets/templates/*.qss.c)
-
-        foreach(_stylesheet ${STYLESHEETS})
-                string(REPLACE ".c" "" FILE_OUT ${_stylesheet})
-                string(REPLACE "templates/" "" FILE_OUT ${FILE_OUT})
-
-                execute_process (
-                        COMMAND ${CMAKE_C_COMPILER} -E -P ${DU_OPTION} ${_stylesheet} -o ${FILE_OUT}
-                        )
-
-                message(STATUS "Done preprocessing ${_stylesheet}, file written to: ${FILE_OUT}")
-        endforeach()
-
-endfunction()
 
 add_subdirectory(pluginbase)
 add_subdirectory(gui)
@@ -49,7 +34,10 @@ set(PROJECT_SOURCES
         ${UI_LIST}
 )
 
-FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc)
+include(ScopyAbout)
+configure_about(./resources/about)
+FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc resources/aboutpage.qrc)
+message(${SCOPY_RESOURCE_FILES})
 qt5_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 find_library(IIO_LIBRARIES NAMES iio libiio)

@@ -53,6 +53,11 @@ QJsonObject PluginBase::metadata() {
 	return m_metadata;
 }
 
+QString PluginBase::about()
+{
+	return "";
+}
+
 void PluginBase::setMetadata(QJsonObject obj)
 {
 	m_metadata = obj;

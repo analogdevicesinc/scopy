@@ -31,6 +31,7 @@ public:
 	virtual QWidget* page() = 0;
 	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
 	virtual QJsonObject metadata() = 0;
+	virtual QString about() = 0;
 
 public Q_SLOTS:
 	virtual bool onConnect() = 0;

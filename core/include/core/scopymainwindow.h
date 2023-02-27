@@ -10,6 +10,7 @@
 #include "toolmanager.h"
 #include "pluginrepository.h"
 #include "scopycore_export.h"
+#include "scopyaboutpage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
@@ -22,12 +23,14 @@ class SCOPYCORE_EXPORT ScopyMainWindow : public QMainWindow
 public:
     ScopyMainWindow(QWidget *parent = nullptr);
     ~ScopyMainWindow();
+    void initAboutPage(PluginManager *pm = nullptr);
 public Q_SLOTS:
     void requestTools(QString id);
     void addDeviceToUi(QString id, Device *d);
     void removeDeviceFromUi(QString);
 
 private:
+    ScopyAboutPage* about;
     PluginRepository *pr;
     ScopyHomePage *hp;
     DeviceManager *dm;
