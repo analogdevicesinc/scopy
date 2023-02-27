@@ -113,6 +113,7 @@ void DeviceManager::disconnectDevice() {
 	QString uri = dynamic_cast<Device*>(QObject::sender())->uri();
 	qDebug(CAT_DEVICEMANAGER)<<"disconnecting "<< uri << "...";
 	connectedDev.removeOne(uri);
+	Q_EMIT requestTool("home");
 	Q_EMIT deviceDisconnected(uri);
 }
 

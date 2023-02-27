@@ -23,8 +23,8 @@ public:
 	void loadToolList() override;
 	void unload() override;
 
-	bool connectDev() override;
-	bool disconnectDev() override;
+	bool onConnect() override;
+	bool onDisconnect() override;
 
 	// Plugin interface
 };

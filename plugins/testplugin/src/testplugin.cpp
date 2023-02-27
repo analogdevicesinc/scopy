@@ -46,7 +46,7 @@ void TestPlugin::unload() {
 }
 
 
-bool TestPlugin::connectDev()
+bool TestPlugin::onConnect()
 {
 	qDebug(CAT_TESTPLUGIN)<<"connect";
 	qDebug(CAT_TESTPLUGIN)<<m_toolList[0]->id()<<m_toolList[0]->name();
@@ -60,7 +60,7 @@ bool TestPlugin::connectDev()
 	return true;
 }
 
-bool TestPlugin::disconnectDev()
+bool TestPlugin::onDisconnect()
 {
 	qDebug(CAT_TESTPLUGIN)<<"disconnect";
 	for(auto &tool : m_toolList) {
