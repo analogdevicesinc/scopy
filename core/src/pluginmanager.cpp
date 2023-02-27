@@ -4,6 +4,7 @@
 #include <QFile>
 #include <algorithm>
 #include <QJsonArray>
+#include "pluginfilter.h"
 
 Q_LOGGING_CATEGORY(CAT_PLUGINMANAGER, "PluginManager")
 using namespace adiscope;
@@ -80,7 +81,7 @@ QList<Plugin *> PluginManager::getPlugins(QString category)
 {
 	QList<Plugin *> newlist;
 	for(Plugin* plugin : qAsConst(list)) {
-		if(!pluginInCategory(plugin,category))
+		if(!PluginFilter::pluginInCategory(plugin,category))
 			continue;
 		newlist.append(plugin->clone());
 	}
@@ -91,7 +92,9 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString uri, QString categor
 {
 	QList<Plugin *> comp;
 	for(Plugin* plugin : qAsConst(list)) {
-		if(!pluginInCategory(plugin,category))
+		if(!PluginFilter::pluginInCategory(plugin,category))
+			continue;
+		if(!PluginFilter::pluginInExclusionList(comp,plugin))
 			continue;
 		if(plugin->compatible(uri)) {
 			Plugin* p = plugin->clone();
@@ -105,29 +108,6 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString uri, QString categor
 void PluginManager::setMetadata(QJsonObject metadata)
 {
 	m_metadata = metadata;
-}
-
-bool PluginManager::pluginInCategory(Plugin* p, QString category) { // PluginFilter class (?)
-	if(category.isEmpty()) // no category selected
-		return true;
-	if(!p->metadata().contains("category")) // plugin metadata does not have category
-		return true;
-	QJsonValue categoryVal = p->metadata().value("category");
-	if(categoryVal.isString()) // single category
-		return category == p->metadata().value("category").toString();
-	if(categoryVal.isArray()) { // list category
-		for(auto v : categoryVal.toArray()) {
-			if(!v.isString()) {
-				continue;
-			}
-			if(v.toString() == category) {
-				return true;
-			}
-
-		}
-	}
-	return false;
-
 }
 
 Plugin* PluginManager::loadPlugin(QString file)
