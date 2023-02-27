@@ -23,6 +23,9 @@ public Q_SLOTS:
 	void addDevice(QString uri);
 	void removeDevice(QString uri);
 	void restartDevice(QString uri);
+
+	void save(QSettings &s);
+	void load(QSettings &s);
 //	void updateScan(QStringList ls);
 
 private Q_SLOTS:
@@ -41,7 +44,6 @@ Q_SIGNALS:
 	void deviceDisconnected(QString uri);
 	void requestDevice(QString uri);
 	void requestTool(QString id);
-
 
 private:
 	bool exclusive = false;

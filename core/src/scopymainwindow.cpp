@@ -5,6 +5,11 @@
 #include <scopyaboutpage.h>
 #include <QLabel>
 #include <device.h>
+#include <QFileDialog>
+#include "scopycore_config.h"
+#ifdef ENABLE_SCOPYJS
+#include "scopyjs/scopyjs.h"
+#endif
 
 using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
@@ -26,10 +31,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	initAboutPage(pm);
 
-	dm = new DeviceManager(pm, this);
 	ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
 
+	dm = new DeviceManager(pm, this);
 	dm->setExclusive(true);
+
 	toolman = new ToolManager(tm,ts,this);
 	toolman->addToolList("home",{});
 	toolman->addToolList("add",{});
@@ -77,6 +83,40 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	sbc->startScan();
 
 	dm->addDevice("ip:");
+	dm->addDevice("usb:");
+
+	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
+	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
+
+#ifdef ENABLE_SCOPYJS
+	ScopyJS::GetInstance();
+#endif
+
+}
+
+void ScopyMainWindow::save() {
+	QString selectedFilter;
+	QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), "", "", &selectedFilter);
+	save(fileName);
+
+}
+
+void ScopyMainWindow::load() {
+	QString selectedFilter;
+	QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), "", "", &selectedFilter);
+	load(fileName);
+}
+
+void ScopyMainWindow::save(QString file)
+{
+	QSettings s(file, QSettings::Format::IniFormat);
+	dm->save(s);
+}
+
+void ScopyMainWindow::load(QString file)
+{
+	QSettings s(file, QSettings::Format::IniFormat);
+	dm->load(s);
 }
 
 void ScopyMainWindow::requestTools(QString id) {

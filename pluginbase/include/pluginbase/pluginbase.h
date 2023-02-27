@@ -3,6 +3,7 @@
 #include "plugin.h"
 #include "scopypluginbase_export.h"
 #include <QObject>
+#include "apiobject.h"
 
 
 namespace adiscope {
@@ -16,10 +17,21 @@ public:
 	virtual void setMetadata(QJsonObject obj) override;
 	virtual void preload() override;
 	virtual void postload() override;
+
+
+	virtual void loadApi() override;
 	virtual bool loadIcon() override;
 	virtual bool loadPage() override;
 	virtual void loadToolList() override;
 
+	virtual void saveSettings() override;
+	virtual void loadSettings() override;
+	virtual void saveSettings(QSettings&) override;
+	virtual void loadSettings(QSettings&) override;
+
+	virtual void unload() override;
+
+	virtual ApiObject* api() override;
 	virtual QString uri() override;
 	virtual QString name() override;
 	virtual QWidget* icon() override;
@@ -31,10 +43,7 @@ public:
 	virtual void showPageCallback() override;
 	virtual void hidePageCallback() override;
 
-
 	virtual void loadMetadata(QString data);
-
-
 
 protected:
 	QString m_uri;
@@ -43,6 +52,7 @@ protected:
 	QWidget *m_icon;
 	QList<ToolMenuEntry*> m_toolList;
 	QJsonObject m_metadata;
+	ApiObject* pluginApi = nullptr;
 };
 }
 
@@ -53,7 +63,7 @@ protected:
 	Q_PLUGIN_METADATA(IID ScopyPlugin_iid)\
 	Q_INTERFACES(adiscope::Plugin)\
 public:\
-	virtual ~SCOPY_PLUGIN_NAME () override {qDebug()<<"dtor";}\
+	virtual ~SCOPY_PLUGIN_NAME () override {}\
 	SCOPY_PLUGIN_NAME* clone() override { \
 		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
 		/* copy metadata from this object to the next one */\

@@ -52,10 +52,10 @@ if(DEFINED ENV{BUILD_HOST})
 		FILE(READ ${CMAKE_SOURCE_DIR}/build-status SCOPY_BUILD_STATUS_INFO)
 	endif()
 else()
-	set(BUILD_INFO ${BUILD_INFO}Built\ locally\n)
+	set(BUILD_INFO ${BUILD_INFO} "Built locally")
 endif()
 
-message(${BUILD_INFO})
+message(STATUS "AboutPage Info: " ${BUILD_INFO})
 # TODO: Pack these in a GLOB and run foreach
 
 set(ABOUT_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${ABOUT_RESOURCES_DIR})
