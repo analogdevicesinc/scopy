@@ -19,8 +19,8 @@ public:
 	int count();
 	void sort();
 	void clear();
-	QList<Plugin*> getPlugins(QString category = "");
-	QList<Plugin*> getCompatiblePlugins(QString uri, QString category = "");
+	QList<Plugin*> getPlugins(QString category = "", QObject *parent = nullptr);
+	QList<Plugin*> getCompatiblePlugins(QString uri, QString category = "", QObject *parent = nullptr);
 	void setMetadata(QJsonObject metadata);
 	QJsonObject metadata() const;
 

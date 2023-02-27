@@ -20,7 +20,7 @@ DeviceImpl::DeviceImpl(QString uri, PluginManager *p, QObject *parent)
 
 void DeviceImpl::loadCompatiblePlugins()
 {
-	plugins = p->getCompatiblePlugins(m_uri);
+	plugins = p->getCompatiblePlugins(m_uri,"",this);
 }
 
 
@@ -140,6 +140,7 @@ void DeviceImpl::disconnectDev() {
 }
 
 DeviceImpl::~DeviceImpl() {
+
 	qDebug(CAT_DEVICEIMPL)<< m_uri <<"dtor";
 }
 

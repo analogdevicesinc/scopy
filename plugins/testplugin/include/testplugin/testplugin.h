@@ -22,11 +22,17 @@ public:
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
+	QString about() override;
 
 	bool onConnect() override;
 	bool onDisconnect() override;
 
 	// Plugin interface
+private:
+	QWidget *tool;
+
+	// Plugin interface
+
 };
 }
 

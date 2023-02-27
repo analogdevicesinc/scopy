@@ -33,7 +33,7 @@
     <widget class="QTextBrowser" name="textBrowser">
      <property name="source">
       <url>
-       <string>file:///home/adi/tmp/tool_launcher/scopy.html</string>
+       <string>file:///home/adi/tmp/tool_launcher/resources/scopy.html</string>
       </url>
      </property>
     </widget>

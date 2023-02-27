@@ -12,3 +12,4 @@ void IIODeviceImpl::loadCompatiblePlugins()
 	DeviceImpl::loadCompatiblePlugins();
 	cp->close(m_uri);
 }
+
