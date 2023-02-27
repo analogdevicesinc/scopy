@@ -1,0 +1,14 @@
+(R"plugin(
+{
+"TestPlugin" : {
+  "priority":2,
+  "category" : ["test", "unittest"]
+},
+"TestPluginIp" : {
+  "priority":1000,
+  "category" : ["test", "unittest"],
+  "exclude" : "*"
+}
+}
+)plugin")
+
