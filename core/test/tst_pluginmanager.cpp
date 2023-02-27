@@ -3,6 +3,7 @@
 #include "core/pluginmanager.h"
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QJsonArray>
 #include <QLibrary>
 
 using namespace adiscope;
@@ -14,6 +15,8 @@ private Q_SLOTS:
 	void libsFound();
 	void loadLibs();
 	void metadataOps();
+	void exclusion();
+	void exclusionExcept();
 private:
 
 	void initFileList();
@@ -120,6 +123,69 @@ void TST_PluginManager::metadataOps()
 
 	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not loaded with highest priority");
 	QVERIFY2(plugins[0]->metadata()["priority"]==1000, "TestPluginIp priority not overridden");
+}
+
+void TST_PluginManager::exclusion()
+{
+	PluginManager *p = new PluginManager(this);
+	p->add(libs);
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	QString json = QString(
+			#include "testpluginexclude.json"
+				);
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical() << "JSON Parse error !" << err.errorString();
+		qCritical() << json;
+		qCritical() << QString(" ").repeated(err.offset)+"^";
+	}
+	QJsonObject obj = doc.object();
+	p->clear();
+	p->setMetadata(obj);
+	p->add(libs);
+	p->sort();
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
+	QVERIFY2(plugins.count() == 1,"Exactly 1 unit tests not found");
+	qDebug()<<plugins[0]->name();
+
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not the first plugin");
+	QVERIFY2(plugins[0]->metadata()["exclude"]=="*", "TestPluginIp excludes everything");
+}
+
+void TST_PluginManager::exclusionExcept()
+{
+	PluginManager *p = new PluginManager(this);
+	p->add(libs);
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	QString json = QString(
+			#include "testpluginexclude2.json"
+				);
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical() << "JSON Parse error !" << err.errorString();
+		qCritical() << json;
+		qCritical() << QString(" ").repeated(err.offset)+"^";
+	}
+	QJsonObject obj = doc.object();
+	p->clear();
+	p->setMetadata(obj);
+	p->add(libs);
+	p->sort();
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
+	QVERIFY2(plugins.count() == 2,"Exactly 1 unit tests not found");
+	qDebug()<<plugins[0]->name();
+
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not loaded");
+	QVERIFY2(plugins[0]->metadata()["exclude"].toArray()[0] == "*" && plugins[0]->metadata()["exclude"].toArray()[1]=="!TestPlugin", "TestPluginIP ");
+	QVERIFY2(plugins[1]->name()=="TestPlugin", "Second TestPlugin is not loaded");
 }
 
 void TST_PluginManager::initFileList()
