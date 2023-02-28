@@ -13,6 +13,53 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">#btnSave,#btnLoad,#btnPreferences,#btnAbout {
+ text-align:center;
+ height: 25px;
+ background-color: none;
+ border:none;
+}
+
+#btnSave:hover,
+#btnLoad:hover,
+#btnPreferences:hover,
+#btnAbout:hover,
+#btnCollapse:hover{
+ background-color: rgba(0, 0, 0, 60);
+ border: 1px solid rgba(0, 0, 0, 30);
+ border-radius:5px;
+}
+
+#btnSave {
+ qproperty-icon: url(&quot;:/icons/scopy-default/icons/save.svg&quot;);
+}
+#btnLoad {
+ qproperty-icon: url(&quot;:/icons/scopy-default/icons/load.svg&quot;);
+}
+#btnPreferences {
+ qproperty-icon: url(&quot;:/icons/scopy-default/icons/preferences.svg&quot;);
+}
+#btnAbout {
+ qproperty-icon: url(&quot;:/icons/scopy-default/icons/info.svg&quot;);
+}
+#logo {
+background-image: url(:/icons/scopy-default/icons/logo_analog.svg);
+background-repeat: no-repeat;
+background-position: center center;
+background-repeat: no-repeat;
+min-height:48px;
+}
+
+#btnCollapse {
+ height:40px;
+ background-image: url(:/icons/scopy-default/icons/logo.svg);
+ background-repeat: no-repeat;
+ background-position: center center;
+}
+
+</string>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
     <number>0</number>
@@ -32,7 +79,7 @@
    <item>
     <widget class="QPushButton" name="btnCollapse">
      <property name="text">
-      <string>Scopy Logo - Collapse</string>
+      <string/>
      </property>
     </widget>
    </item>
@@ -51,6 +98,13 @@
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QWidget" name="saveLoadGroup" native="true">
@@ -111,9 +165,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Analog Devices Logo</string>
+    <widget class="QLabel" name="logo">
+     <property name="enabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
