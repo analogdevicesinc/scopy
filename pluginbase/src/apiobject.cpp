@@ -25,6 +25,8 @@
 #include <QMetaProperty>
 #include <QSettings>
 #include <QLoggingCategory>
+#include <QStandardPaths>
+
 Q_LOGGING_CATEGORY(CAT_APIOBJECT,"ApiObject");
 using namespace adiscope;
 
@@ -144,6 +146,11 @@ void ApiObject::load_nogroup(ApiObject *obj, QSettings& settings)
 void ApiObject::save_nogroup(ApiObject *obj, QSettings& settings)
 {
 	auto meta = obj->metaObject();
+
+	for(int i=0;i<meta->propertyCount();i++) {
+		qDebug()<<i<<" "<<meta->property(i).name();
+	}
+
 	for (int i = meta->propertyOffset();
 			i < meta->propertyCount(); i++) {
 		auto prop = meta->property(i);
@@ -189,6 +196,7 @@ void ApiObject::save_nogroup(ApiObject *obj, QSettings& settings)
 
 void ApiObject::load(QSettings& settings)
 {
+	qInfo(CAT_APIOBJECT)<<"Saving "<<objectName()<<"to: "<<settings.fileName();
 	settings.beginGroup(objectName());
 
 	load_nogroup(this, settings);
@@ -200,6 +208,7 @@ void ApiObject::load(QSettings& settings)
 
 void ApiObject::save(QSettings& settings)
 {
+	qInfo(CAT_APIOBJECT)<<"Saving "<<objectName()<<"to: "<<settings.fileName();
 	settings.beginGroup(objectName());
 
 	save_nogroup(this, settings);
@@ -209,15 +218,13 @@ void ApiObject::save(QSettings& settings)
 
 void ApiObject::load()
 {
-	QSettings settings;
-
+	QSettings settings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/scopy.ini", QSettings::IniFormat);
 	load(settings);
 }
 
 
 void ApiObject::save()
 {
-	QSettings settings;
-
+	QSettings settings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/scopy.ini", QSettings::IniFormat);
 	save(settings);
 }
