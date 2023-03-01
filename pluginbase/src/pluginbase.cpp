@@ -109,6 +109,11 @@ QString PluginBase::about()
 	return "";
 }
 
+QString PluginBase::version()
+{
+	return "";
+}
+
 void PluginBase::setMetadata(QJsonObject obj)
 {
 	m_metadata = obj;
