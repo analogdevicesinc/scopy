@@ -19,8 +19,10 @@ class SCOPYTESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 public:
 	friend class TestPlugin_API;
 	void loadApi() override;
+	void initPreferences() override;
 	void initMetadata() override;
 	bool compatible(QString uri) override;
+	bool loadPreferencesPage() override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
