@@ -41,6 +41,7 @@ public:
 	virtual QList<ToolMenuEntry*> toolList() override;
 	virtual QJsonObject metadata() override;
 	virtual QString about() override;
+	virtual QString version() override;
 
 	virtual void showPageCallback() override;
 	virtual void hidePageCallback() override;

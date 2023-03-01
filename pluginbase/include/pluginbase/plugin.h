@@ -44,6 +44,7 @@ public:
 	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
 	virtual QJsonObject metadata() = 0;
 	virtual QString about() = 0;
+	virtual QString version() = 0;
 
 public Q_SLOTS:
 	virtual bool onConnect() = 0;

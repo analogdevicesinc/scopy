@@ -136,6 +136,10 @@ void TestPlugin::loadApi(){
 	pluginApi->setObjectName(m_name);
 }
 
+QString TestPlugin::version() {
+	return "0.1";
+}
+
 // --------------------
 
 QString TestPlugin_API::testText() const

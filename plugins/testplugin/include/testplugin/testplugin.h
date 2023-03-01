@@ -27,6 +27,7 @@ public:
 	bool loadIcon() override;
 	void loadToolList() override;
 	QString about() override;
+	QString version() override;
 
 	bool onConnect() override;
 	bool onDisconnect() override;
