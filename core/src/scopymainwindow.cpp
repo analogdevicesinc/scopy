@@ -3,9 +3,12 @@
 #include "ui_scopymainwindow.h"
 #include "scopyhomepage.h"
 #include <scopyaboutpage.h>
+#include <scopypreferencespage.h>
 #include <QLabel>
 #include <device.h>
 #include <QFileDialog>
+#include <QStandardPaths>
+#include "pluginbase/preferences.h"
 #include "scopycore_config.h"
 #ifdef ENABLE_SCOPYJS
 #include "scopyjs/scopyjs.h"
@@ -17,6 +20,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, ui(new Ui::ScopyMainWindow)
 {	
 	ui->setupUi(this);
+	initPreferences();
+
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
 	auto tm = tb->getToolMenu();
@@ -30,6 +35,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	PluginManager *pm = pr->getPluginManager();
 
 	initAboutPage(pm);
+	initPreferencesPage(pm);
 
 	ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
 
@@ -49,6 +55,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	//	 connect(tb,&ToolBrowser::detach,ts, &ToolStack::showTool);
 	ts->add("home", hp);
 	ts->add("about", about);
+	ts->add("preferences", prefPage);
 
 	connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 
@@ -123,8 +130,8 @@ void ScopyMainWindow::requestTools(QString id) {
 	toolman->showToolList(id);
 }
 
-ScopyMainWindow::~ScopyMainWindow()
-{
+ScopyMainWindow::~ScopyMainWindow(){
+
 	cs->stopScan();
 	delete ui;
 }
@@ -132,15 +139,41 @@ ScopyMainWindow::~ScopyMainWindow()
 void ScopyMainWindow::initAboutPage(PluginManager *pm)
 {
 	about = new ScopyAboutPage(this);
-	if(pm) {
-		QList<Plugin*> plugin = pm->getPlugins("",this);
-		for(Plugin* p : plugin) {
-			QString content = p->about();
-			if(!content.isEmpty()) {
-				about->addHorizontalTab(about->buildPage(content),p->name());
-			}
+	if(!pm)
+		return;
+	QList<Plugin*> plugin = pm->getPlugins("",this);
+	for(Plugin* p : plugin) {
+		QString content = p->about();
+		if(!content.isEmpty()) {
+			about->addHorizontalTab(about->buildPage(content),p->name());
 		}
 	}
+}
+
+
+void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
+{
+	prefPage = new ScopyPreferencesPage(this);
+	if(!pm)
+		return;
+
+	QList<Plugin*> plugin = pm->getPlugins("",this);
+	for(Plugin* p : plugin) {
+		p->initPreferences();
+		if(p->loadPreferencesPage()) {
+			prefPage->addHorizontalTab(p->preferencesPage(),p->name());
+		}
+	}
+}
+
+
+void ScopyMainWindow::initPreferences()
+{
+	QString preferencesPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/preferences.ini";
+	Preferences *p = Preferences::GetInstance();
+	p->setPreferencesFilename(preferencesPath);
+	p->load();
+	p->init("a","true");
 }
 
 

@@ -14,15 +14,16 @@ class SCOPYCORE_EXPORT DeviceManager : public QObject
 	Q_OBJECT
 public:
 	explicit DeviceManager(PluginManager *pm, QObject *parent = nullptr);
+	~DeviceManager();
 	Device* getDevice(QString uri);
 	void setExclusive(bool);
 	bool getExclusive() const;
-
 
 public Q_SLOTS:
 	void addDevice(QString uri);
 	void removeDevice(QString uri);
 	void restartDevice(QString uri);
+	void disconnectAll();
 
 	void save(QSettings &s);
 	void load(QSettings &s);

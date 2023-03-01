@@ -11,6 +11,8 @@
 #include "pluginrepository.h"
 #include "scopycore_export.h"
 #include "scopyaboutpage.h"
+#include "scopypreferencespage.h"
+#include "pluginbase/preferences.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
@@ -24,6 +26,9 @@ public:
     ScopyMainWindow(QWidget *parent = nullptr);
     ~ScopyMainWindow();
     void initAboutPage(PluginManager *pm = nullptr);
+    void initPreferencesPage(PluginManager *pm = nullptr);
+    void initPreferences();
+
 public Q_SLOTS:
     void requestTools(QString id);
     void addDeviceToUi(QString id, Device *d);
@@ -35,9 +40,11 @@ public Q_SLOTS:
 
 private:
     ScopyAboutPage* about;
+    ScopyPreferencesPage* prefPage;
     PluginRepository *pr;
     ScopyHomePage *hp;
     DeviceManager *dm;
+    Preferences *pref;
     IIOContextScanner *cs;
     ScannedIIOContextCollector *scc;
     ToolManager *toolman;

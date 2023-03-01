@@ -40,8 +40,8 @@ namespace adiscope {
 		ApiObject(QObject *parent = nullptr);
 		~ApiObject();
 
-		void load();
-		void save();
+		virtual void load();
+		virtual void save();
 
 		virtual void load(QSettings& settings);
 		virtual void save(QSettings& settings);
