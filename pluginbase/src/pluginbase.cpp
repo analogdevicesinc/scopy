@@ -26,14 +26,22 @@ void PluginBase::loadApi()
 }
 
 bool PluginBase::loadIcon() {
+	m_icon = nullptr;
 	return false;
 }
 
 bool PluginBase::loadPage(){
+	m_page = nullptr;
 	return false;
 }
 
 void PluginBase::loadToolList()	{
+}
+
+bool PluginBase::loadPreferencesPage()
+{
+	m_preferencesPage = nullptr;
+	return false;
 }
 
 void PluginBase::saveSettings()
@@ -77,6 +85,11 @@ QWidget* PluginBase::icon() {
 QWidget* PluginBase::page() {
 	return m_page;
 }
+
+QWidget *PluginBase::preferencesPage()
+{
+	return m_preferencesPage;
+}
 QList<ToolMenuEntry*> PluginBase::toolList() {
 	return m_toolList;
 }
@@ -99,6 +112,11 @@ QString PluginBase::about()
 void PluginBase::setMetadata(QJsonObject obj)
 {
 	m_metadata = obj;
+}
+
+void PluginBase::initPreferences()
+{
+
 }
 
 void PluginBase::initMetadata() {

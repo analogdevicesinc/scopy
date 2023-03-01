@@ -15,14 +15,15 @@ public:
 	virtual void setUri(QString uri) override;
 	virtual void initMetadata() override;
 	virtual void setMetadata(QJsonObject obj) override;
+	virtual void initPreferences() override;
 	virtual void preload() override;
 	virtual void postload() override;
-
 
 	virtual void loadApi() override;
 	virtual bool loadIcon() override;
 	virtual bool loadPage() override;
 	virtual void loadToolList() override;
+	virtual bool loadPreferencesPage() override;
 
 	virtual void saveSettings() override;
 	virtual void loadSettings() override;
@@ -36,6 +37,7 @@ public:
 	virtual QString name() override;
 	virtual QWidget* icon() override;
 	virtual QWidget* page() override;
+	virtual QWidget* preferencesPage() override;
 	virtual QList<ToolMenuEntry*> toolList() override;
 	virtual QJsonObject metadata() override;
 	virtual QString about() override;
@@ -49,6 +51,7 @@ protected:
 	QString m_uri;
 	QString m_name;
 	QWidget *m_page;
+	QWidget *m_preferencesPage;
 	QWidget *m_icon;
 	QList<ToolMenuEntry*> m_toolList;
 	QJsonObject m_metadata;

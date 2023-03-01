@@ -16,11 +16,13 @@ public:
 
 	virtual void setUri(QString) = 0;
 	virtual void preload() = 0;
+	virtual void initPreferences() = 0;
 	virtual void postload() = 0;
 	virtual void loadApi() = 0;
 	virtual bool loadIcon() = 0;
 	virtual bool loadPage() = 0;
 	virtual void loadToolList() = 0;
+	virtual bool loadPreferencesPage() = 0;
 	virtual void initMetadata() = 0;
 	virtual void setMetadata(QJsonObject obj) = 0;
 
@@ -38,6 +40,7 @@ public:
 	virtual QString name() = 0;
 	virtual QWidget* icon() = 0;
 	virtual QWidget* page() = 0;
+	virtual QWidget* preferencesPage() = 0;
 	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
 	virtual QJsonObject metadata() = 0;
 	virtual QString about() = 0;

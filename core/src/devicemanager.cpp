@@ -1,6 +1,7 @@
 #include "devicemanager.h"
 #include "deviceimpl.h"
 #include "iiodeviceimpl.h"
+#include "QCoreApplication"
 #include <QLoggingCategory>
 #include <QDebug>
 
@@ -10,6 +11,11 @@ DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
 	: QObject{parent}, pm(pm)
 {
 
+	connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),this,SLOT(disconnectAll()));
+}
+
+DeviceManager::~DeviceManager()
+{
 }
 
 Device* DeviceManager::getDevice(QString uri) {
@@ -81,6 +87,13 @@ void DeviceManager::restartDevice(QString uri)
 {
 	removeDevice(uri);
 	addDevice(uri);
+}
+
+void DeviceManager::disconnectAll()
+{
+	for(const QString &d : qAsConst(connectedDev)) {
+		map[d]->disconnectDev();
+	}
 }
 
 void DeviceManager::save(QSettings &s)

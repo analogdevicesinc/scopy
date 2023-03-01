@@ -6,12 +6,46 @@
 #include <QLoggingCategory>
 #include <QUuid>
 #include <QFile>
+#include <QCheckBox>
+#include <QSpacerItem>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace adiscope;
 
 bool TestPlugin::compatible(QString uri) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";
+	return true;
+}
+
+void TestPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("pref1",false);
+	p->init("pref2",true);
+}
+
+bool TestPlugin::loadPreferencesPage()
+{
+
+	Preferences *p = Preferences::GetInstance();
+
+	bool pref1Val = p->get("pref1").toBool();
+	bool pref2Val = p->get("pref2").toBool();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+	QCheckBox *pref1 = new QCheckBox("First option",m_preferencesPage);
+	QCheckBox *pref2 = new QCheckBox("Second preference",m_preferencesPage);
+	lay->addWidget(pref1);
+	lay->addWidget(pref2);
+
+	pref1->setChecked(pref1Val);
+	pref2->setChecked(pref2Val);
+
+	connect(pref1,&QCheckBox::toggled,this,[=](bool b) { p->set("pref1",b);});
+	connect(pref2,&QCheckBox::toggled,this,[=](bool b) { p->set("pref2",b);});
+
 	return true;
 }
 
