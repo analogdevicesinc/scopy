@@ -8,7 +8,11 @@
 #include "ui_swiotruntime.h"
 #include <QUuid>
 
+#include "iioutil/contextprovider.h"
+
 using namespace adiscope;
+
+Q_LOGGING_CATEGORY(CAT_SWIOT,"SWIOTPlugin");
 
 bool SWIOTPlugin::loadPage()
 {
@@ -58,7 +62,7 @@ bool SWIOTPlugin::compatible(QString uri)
 		return false;
 
 	hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
-	if(hw_serial == "104473b04a060009f8ff2000da6084d36f")
+	if(!hw_serial.isEmpty())
 		ret = true;
 
 	cp->close(uri);
@@ -68,6 +72,15 @@ bool SWIOTPlugin::compatible(QString uri)
 
 bool SWIOTPlugin::onConnect()
 {
+	auto &&cp = ContextProvider::GetInstance();
+	iio_context* ctx = cp->open(m_uri);
+
+	ping = new IIOPingTask(ctx);
+	cs = new CyclicalTask(ping,this);
+	cs->start(2000);
+
+	connect(ping, &IIOPingTask::pingFailed, this, [=](){Q_EMIT disconnectDevice();} );
+	connect(ping, &IIOPingTask::pingSuccess, this, [=](){qDebug(CAT_SWIOT)<<"Ping Success";} );
 
 	config = new QWidget();
 	configui = new Ui::SWIOTConfigTool();
@@ -98,6 +111,11 @@ bool SWIOTPlugin::onConnect()
 
 bool SWIOTPlugin::onDisconnect()
 {
+	cs->stop();
+	auto &&cp = ContextProvider::GetInstance();
+	cp->close(m_uri);
+
+
 	m_toolList[0]->setEnabled(false);
 	m_toolList[0]->setTool(nullptr);
 

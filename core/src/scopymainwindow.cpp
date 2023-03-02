@@ -25,8 +25,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
 	auto tm = tb->getToolMenu();
+
+
+
 	hp = new ScopyHomePage(this);
-	cs = new IIOContextScanner(this);
+	scanTask = new IIOScanTask(this);
+	scanTask->setScanParams("usb");
+	scanCycle = new CyclicalTask(scanTask,this);
 	scc = new ScannedIIOContextCollector(this);
 	pr = new PluginRepository(this);
 
@@ -37,7 +42,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initAboutPage(pm);
 	initPreferencesPage(pm);
 
-	ScanButtonController *sbc = new ScanButtonController(cs,hp->scanControlBtn(),this);
+	ScanButtonController *sbc = new ScanButtonController(scanCycle,hp->scanControlBtn(),this);
 
 	dm = new DeviceManager(pm, this);
 	dm->setExclusive(true);
@@ -57,7 +62,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
 
-	connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
+	connect(scanTask,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 
 	connect(scc,SIGNAL(foundDevice(QString)),dm,SLOT(addDevice(QString)));
 	connect(scc,SIGNAL(lostDevice(QString)),dm,SLOT(removeDevice(QString)));
@@ -89,8 +94,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	sbc->startScan();
 
-	dm->addDevice("ip:");
-	dm->addDevice("usb:");
+//	dm->addDevice("ip:");
+//	dm->addDevice("usb:");
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
@@ -132,7 +137,7 @@ void ScopyMainWindow::requestTools(QString id) {
 
 ScopyMainWindow::~ScopyMainWindow(){
 
-	cs->stopScan();
+	scanCycle->stop();
 	delete ui;
 }
 
