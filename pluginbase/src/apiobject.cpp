@@ -196,7 +196,7 @@ void ApiObject::save_nogroup(ApiObject *obj, QSettings& settings)
 
 void ApiObject::load(QSettings& settings)
 {
-	qInfo(CAT_APIOBJECT)<<"Saving "<<objectName()<<"to: "<<settings.fileName();
+	qInfo(CAT_APIOBJECT)<<"Loading "<<objectName()<<"from: "<<settings.fileName();
 	settings.beginGroup(objectName());
 
 	load_nogroup(this, settings);

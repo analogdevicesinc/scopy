@@ -1,5 +1,5 @@
 #include "iiodeviceimpl.h"
-#include "pluginbase/contextprovider.h"
+#include "iioutil/contextprovider.h"
 
 using namespace adiscope;
 void IIODeviceImpl::loadCompatiblePlugins()

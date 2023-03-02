@@ -1,14 +1,15 @@
 #ifndef CONTEXTPROVIDER_H
 #define CONTEXTPROVIDER_H
 
-#include "scopypluginbase_export.h"
+#include "scopyiioutil_export.h"
 #include <QObject>
 #include <QMap>
 #include <memory>
 #include <iio.h>
 #include <mutex>
 
-class SCOPYPLUGINBASE_EXPORT ContextRefCounter {
+namespace adiscope {
+class SCOPYIIOUTIL_EXPORT ContextRefCounter {
 public:
 	ContextRefCounter(QString uri);
 	~ContextRefCounter();
@@ -17,7 +18,7 @@ public:
 	int refcnt = 0;
 };
 
-class SCOPYPLUGINBASE_EXPORT ContextProvider : public QObject
+class SCOPYIIOUTIL_EXPORT ContextProvider : public QObject
 {
 Q_OBJECT
 protected:
@@ -39,5 +40,6 @@ private:
 	QMap<QString, ContextRefCounter*> map;
 
 };
+}
 
 #endif // CONTEXTPROVIDER_H
