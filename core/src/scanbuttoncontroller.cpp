@@ -2,7 +2,7 @@
 
 using namespace adiscope;
 
-ScanButtonController::ScanButtonController(IIOContextScanner *cs , QPushButton *btn, QObject *parent)
+ScanButtonController::ScanButtonController(CyclicalTask *cs , QPushButton *btn, QObject *parent)
 	: QObject{parent}
 {
 	this->cs = cs;
@@ -21,11 +21,11 @@ void ScanButtonController::enableScan(bool b) {
 }
 
 void ScanButtonController::startScan() {
-	cs->startScan(2000);
+	cs->start(2000);
 	btn->setChecked(true);
 }
 
 void ScanButtonController::stopScan() {
-	cs->stopScan();
+	cs->stop();
 	btn->setChecked(false);
 }

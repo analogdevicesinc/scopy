@@ -2,16 +2,16 @@
 #define SCANBUTTONCONTROLLER_H
 
 #include <QObject>
-#include <iiocontextscanner.h>
 #include <QPushButton>
 #include "scopycore_export.h"
+#include "iioutil/cyclicaltask.h"
 
 namespace adiscope {
 class SCOPYCORE_EXPORT ScanButtonController : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ScanButtonController(IIOContextScanner *cs , QPushButton *btn, QObject *parent);
+	explicit ScanButtonController(CyclicalTask *cs , QPushButton *btn, QObject *parent);
 	~ScanButtonController();
 
 public Q_SLOTS:
@@ -20,7 +20,7 @@ public Q_SLOTS:
 	void stopScan();
 private:
 	QPushButton *btn;
-	IIOContextScanner *cs;
+	CyclicalTask *cs;
 	QMetaObject::Connection conn;
 
 };

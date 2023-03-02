@@ -19,6 +19,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 
+add_subdirectory(iioutil)
 add_subdirectory(pluginbase)
 add_subdirectory(gui)
 add_subdirectory(plugins)

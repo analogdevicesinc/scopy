@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE swiot)
-
-message(STATUS "building plugin: " ${SCOPY_MODULE})
-
+set(SCOPY_MODULE iioutil)
 project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
@@ -39,9 +36,6 @@ set(PROJECT_SOURCES
 )
 
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
-endif()
 
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
@@ -52,11 +46,6 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets iio)
 
-set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME
-    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
 

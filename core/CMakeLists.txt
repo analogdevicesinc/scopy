@@ -63,13 +63,13 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} )
-target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopypluginbase )
+target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopypluginbase scopyiioutil)
 
 foreach(comp ${SCOPY_QT5_COMPONENTS})
     set(SCOPY_QT5_LIBRARIES ${SCOPY_QT5_LIBRARIES} Qt5::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT5_LIBRARIES} scopygui scopypluginbase iio )
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT5_LIBRARIES} scopygui scopypluginbase scopyiioutil )
 
 
 
