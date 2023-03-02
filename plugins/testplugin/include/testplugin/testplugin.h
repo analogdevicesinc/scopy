@@ -33,6 +33,9 @@ public:
 	bool onConnect() override;
 	bool onDisconnect() override;
 
+public Q_SLOTS:
+	void messageCallback(QString topic, QString message) override;
+
 private:
 	QWidget *tool;
 	QLineEdit *edit;

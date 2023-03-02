@@ -4,6 +4,7 @@
 #include <QVBoxLayout>
 #include <QLoggingCategory>
 #include <QUuid>
+#include <pluginbase/messagebroker.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
 using namespace adiscope;
@@ -39,7 +40,15 @@ bool TestPluginIp::onConnect()
 	QPushButton *btn = new QPushButton("LASTTOOOL testpage");
 	lay->addWidget(btn);
 
+	QPushButton *sendMessage = new QPushButton("SendMessage");
+	lay->addWidget(sendMessage);
+
 	connect(btn,&QPushButton::clicked,this,[=]() { Q_EMIT requestTool(m_toolList[0]->id());});
+	connect(sendMessage,&QPushButton::clicked,this,[=]() {
+		MessageBroker::GetInstance()->publish("TestPlugin","testMessage");
+		MessageBroker::GetInstance()->publish("broadcast","testMessage");
+		MessageBroker::GetInstance()->publish("TestPlugin2","testMessage");
+	});
 	connect(disc,&QPushButton::clicked,this,[=]() { Q_EMIT disconnectDevice();});
 
 	Q_EMIT toolListChanged();
