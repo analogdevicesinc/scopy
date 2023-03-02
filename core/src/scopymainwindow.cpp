@@ -13,6 +13,8 @@
 #ifdef ENABLE_SCOPYJS
 #include "scopyjs/scopyjs.h"
 #endif
+#include "iioutil/contextprovider.h"
+#include "pluginbase/messagebroker.h"
 
 using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
@@ -21,6 +23,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 {	
 	ui->setupUi(this);
 	initPreferences();
+
+#ifdef ENABLE_SCOPYJS
+	ScopyJS::GetInstance();
+#endif
+	ContextProvider::GetInstance();
+	MessageBroker::GetInstance();
 
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
@@ -97,10 +105,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
-
-#ifdef ENABLE_SCOPYJS
-	ScopyJS::GetInstance();
-#endif
 
 }
 

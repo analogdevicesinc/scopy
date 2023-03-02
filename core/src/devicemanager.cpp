@@ -1,9 +1,10 @@
 #include "devicemanager.h"
 #include "deviceimpl.h"
 #include "iiodeviceimpl.h"
-#include "QCoreApplication"
+#include "QApplication"
 #include <QLoggingCategory>
 #include <QDebug>
+#include <QThread>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace adiscope;
@@ -29,31 +30,42 @@ Device* DeviceManager::getDevice(QString uri) {
 
 void DeviceManager::addDevice(QString uri)
 {	
+	static bool threaded = false;
+
 	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "added";
 	Q_EMIT deviceAddStarted(uri);
 
-	Device *d = nullptr;
+	DeviceImpl *d = nullptr;
 	if(map.contains(uri)) {
 		qWarning(CAT_DEVICEMANAGER)<<"Duplicate" << uri <<" in device manager, removing old value";
 		removeDevice(uri);
 	}
 
-	d = new DeviceImpl(uri, pm, this);
-	//DeviceFactory::newDevice(uri);
-	//d = new IIODeviceImpl(uri, pm, this);
-
-	d->loadPlugins();
-
-	connect(dynamic_cast<DeviceImpl*>(d),SIGNAL(connected()),this,SLOT(connectDevice()));
-	connect(dynamic_cast<DeviceImpl*>(d),SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
-	connect(dynamic_cast<DeviceImpl*>(d),SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
-	connect(dynamic_cast<DeviceImpl*>(d),SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
-	connect(dynamic_cast<DeviceImpl*>(d),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
-
+	d = new DeviceImpl(uri, pm);
 	map[uri] = d;
 
-	if(d)
-		Q_EMIT deviceAdded(uri, d);
+	if(threaded) {
+		QThread *th = QThread::create([=]{
+			d->loadCompatiblePlugins();
+			d->compatiblePreload();
+		});
+		dynamic_cast<QObject*>(d)->moveToThread(th);
+
+		connect(th,&QThread::destroyed, this,[=]() {
+			d->moveToThread(QThread::currentThread());
+			d->setParent(this);
+			d->loadPlugins();
+			connectDeviceToManager(d);
+		}, Qt::QueuedConnection);
+		connect(th,&QThread::finished, th, &QThread::deleteLater);
+		th->start();
+	} else {
+		d->loadCompatiblePlugins();
+		d->compatiblePreload();
+		d->setParent(this);
+		d->loadPlugins();
+		connectDeviceToManager(d);
+	}
 }
 
 
@@ -71,16 +83,33 @@ void DeviceManager::removeDevice(QString uri)
 	}
 	d = map.take(uri);
 	Q_EMIT deviceRemoveStarted(uri, d);
-	disconnect(dynamic_cast<QObject*>(d),SIGNAL(connected()),this,SLOT(connectDevice()));
-	disconnect(dynamic_cast<QObject*>(d),SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
-	disconnect(dynamic_cast<QObject*>(d),SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 
+	disconnectDeviceFromManager(dynamic_cast<DeviceImpl*>(d));
 	d->unloadPlugins();
 	delete(d);
 
 	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "removed";
 
 	Q_EMIT deviceRemoved(uri);
+}
+
+void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
+	if(!d)
+		return;
+
+	connect(d,SIGNAL(connected()),this,SLOT(connectDevice()));
+	connect(d,SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
+	connect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
+	connect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
+	connect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+	Q_EMIT deviceAdded(d->uri(), d);
+}
+void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
+	disconnect(d,SIGNAL(connected()),this,SLOT(connectDevice()));
+	disconnect(d,SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
+	disconnect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
+	disconnect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
+	disconnect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
 }
 
 void DeviceManager::restartDevice(QString uri)
