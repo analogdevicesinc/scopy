@@ -153,6 +153,11 @@ Plugin* PluginManager::loadPlugin(QString file)
 	return clone;
 }
 
+QList<Plugin *> PluginManager::getOriginalPlugins() const
+{
+	return list;
+}
+
 QJsonObject PluginManager::metadata() const
 {
 	return m_metadata;
