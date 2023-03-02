@@ -44,11 +44,14 @@ public:
 	virtual QJsonObject metadata() override;
 	virtual QString about() override;
 	virtual QString version() override;
+	virtual void loadMetadata(QString data);
 
+public Q_SLOTS:
 	virtual void showPageCallback() override;
 	virtual void hidePageCallback() override;
+	virtual void messageCallback(QString topic, QString message) override;
 
-	virtual void loadMetadata(QString data);
+
 
 protected:
 	QString m_uri;
