@@ -26,8 +26,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	auto ts = ui->wsToolStack;
 	auto tm = tb->getToolMenu();
 
-
-
 	hp = new ScopyHomePage(this);
 	scanTask = new IIOScanTask(this);
 	scanTask->setScanParams("usb");
@@ -146,7 +144,7 @@ void ScopyMainWindow::initAboutPage(PluginManager *pm)
 	about = new ScopyAboutPage(this);
 	if(!pm)
 		return;
-	QList<Plugin*> plugin = pm->getPlugins("",this);
+	QList<Plugin*> plugin = pm->getOriginalPlugins();
 	for(Plugin* p : plugin) {
 		QString content = p->about();
 		if(!content.isEmpty()) {
@@ -162,7 +160,7 @@ void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
 	if(!pm)
 		return;
 
-	QList<Plugin*> plugin = pm->getPlugins("",this);
+	QList<Plugin*> plugin = pm->getOriginalPlugins();
 	for(Plugin* p : plugin) {
 		p->initPreferences();
 		if(p->loadPreferencesPage()) {
