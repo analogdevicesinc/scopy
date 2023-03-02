@@ -8,6 +8,7 @@ namespace Ui {
 class ScopyHomeAddPage;
 }
 
+namespace adiscope {
 class SCOPYCORE_EXPORT ScopyHomeAddPage : public QWidget
 {
 	Q_OBJECT
@@ -27,5 +28,5 @@ private Q_SLOTS:
 private:
 	Ui::ScopyHomeAddPage *ui;
 };
-
+}
 #endif // SCOPYHOMEADDPAGE_H

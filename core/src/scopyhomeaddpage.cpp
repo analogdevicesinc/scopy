@@ -1,7 +1,8 @@
 #include "scopyhomeaddpage.h"
 #include "ui_scopyhomeaddpage.h"
-#include "pluginbase/contextprovider.h"
+#include "iioutil/contextprovider.h"
 
+using namespace adiscope;
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::ScopyHomeAddPage)

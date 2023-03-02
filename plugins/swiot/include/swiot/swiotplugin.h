@@ -7,7 +7,10 @@
 #include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"
 #include "scopyswiot_export.h"
-#include <pluginbase/contextprovider.h>
+#include "QLabel"
+#include "iioutil/cyclicaltask.h"
+#include "iioutil/iiopingtask.h"
+
 
 namespace Ui {
 class SWIOTInfoPage;
@@ -39,6 +42,9 @@ private:
 	Ui::SWIOTRuntime *rungui;
 	QWidget *config ;
 	QWidget *runtime;
+
+	IIOPingTask *ping;
+	CyclicalTask *cs;
 
 };
 }
