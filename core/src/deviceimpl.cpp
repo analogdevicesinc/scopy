@@ -90,21 +90,32 @@ void DeviceImpl::loadIcons() {
 
 void DeviceImpl::loadPages() {
 	m_page = new QWidget();
+	auto m_buttonLayout = new QHBoxLayout();
 	auto m_pagelayout = new QVBoxLayout(m_page);
 	connbtn = new QPushButton("connect", m_page);
 	connbtn->setProperty("blue_button",true);
-	m_pagelayout->addWidget(connbtn);
+	m_buttonLayout->addWidget(connbtn);
 	discbtn = new QPushButton("disconnect", m_page);
 	discbtn->setProperty("blue_button",true);
-	m_pagelayout->addWidget(discbtn);
+	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
 	connect(connbtn,SIGNAL(clicked()),this,SLOT(connectDev()));
 	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));
+	m_pagelayout->addLayout(m_buttonLayout);
+
+	for(auto &&p : plugins) {
+		if(p->loadExtraButtons()) {
+			for(auto &&b : p->extraButtons()) {
+				b->setProperty("blue_button", true);
+				m_buttonLayout->addWidget(b);
+			}
+		}
+	}
 
 	for(auto &&p : plugins) {
 		if(p->loadPage()) {
-			m_page->layout()->addWidget(p->page());
+			m_pagelayout->addWidget(p->page());
 		}
 	}
 }

@@ -44,6 +44,11 @@ bool PluginBase::loadPreferencesPage()
 	return false;
 }
 
+bool PluginBase::loadExtraButtons()
+{
+	return false;
+}
+
 void PluginBase::saveSettings()
 {
 	if(pluginApi)
@@ -90,6 +95,12 @@ QWidget *PluginBase::preferencesPage()
 {
 	return m_preferencesPage;
 }
+
+QList<QAbstractButton *> PluginBase::extraButtons()
+{
+	return m_extraButtons;
+}
+
 QList<ToolMenuEntry*> PluginBase::toolList() {
 	return m_toolList;
 }
