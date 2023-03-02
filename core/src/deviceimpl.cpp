@@ -5,7 +5,7 @@
 #include <QTextBrowser>
 #include <QLoggingCategory>
 #include <QDebug>
-#include <QPicture>
+#include <QThread>
 
 #include "scopycore_config.h"
 #ifdef ENABLE_SCOPYJS
@@ -25,16 +25,17 @@ DeviceImpl::DeviceImpl(QString uri, PluginManager *p, QObject *parent)
 
 void DeviceImpl::loadCompatiblePlugins()
 {
-	plugins = p->getCompatiblePlugins(m_uri,"test",this);
+	plugins = p->getCompatiblePlugins(m_uri,"",this);
+}
+
+void DeviceImpl::compatiblePreload() {
+	for(auto &p : plugins) {
+		p->preload();
+	}
 }
 
 
 void DeviceImpl::loadPlugins() {
-
-	loadCompatiblePlugins();
-	for(auto &p : plugins) {
-		p->preload();
-	}
 
 	loadName();
 	loadIcons();

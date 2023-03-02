@@ -14,7 +14,7 @@ ContextRefCounter::ContextRefCounter(QString uri)
 	QElapsedTimer t;
 	t.start();
 	this->ctx = iio_create_context_from_uri(uri.toStdString().c_str());
-	qWarning()<<"ContextRefCnt: Creating context! "<<this->ctx<<" "<<t.elapsed();
+	qInfo(CAT_CTXMGR) << "Acquiring context "<< uri <<"took "<<t.elapsed();
 }
 
 ContextRefCounter::~ContextRefCounter() {
@@ -59,7 +59,7 @@ iio_context *ContextProvider::open(QString uri)
 	} else {
 		ContextRefCounter* ctxref = new ContextRefCounter(uri);
 		if(ctxref->ctx==nullptr) {
-			qInfo(CAT_CTXMGR) << uri << "not a valid context";
+			qWarning(CAT_CTXMGR) << uri << "not a valid context";
 			delete ctxref;
 			return nullptr;
 		}

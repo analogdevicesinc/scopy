@@ -3,11 +3,11 @@
 
 #include "pluginbase/plugin.h"
 #include <QObject>
-#include <device.h>
+#include "device.h"
 #include <QPushButton>
 #include <QCheckBox>
 #include "scopycore_export.h"
-#include <pluginmanager.h>
+#include "pluginmanager.h"
 
 namespace adiscope {
 
@@ -27,10 +27,10 @@ public:
 	QWidget *page() override;
 	QList<ToolMenuEntry*> toolList() override;
 	virtual void loadCompatiblePlugins() override;
+	virtual void compatiblePreload() override;
 	virtual void loadPlugins() override;
 	virtual void unloadPlugins() override;
 	void getPlugins();
-
 
 public Q_SLOTS:
 	virtual void connectDev() override;

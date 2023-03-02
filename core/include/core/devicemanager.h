@@ -5,6 +5,7 @@
 #include <QMap>
 #include <QSet>
 #include "device.h"
+#include "deviceimpl.h"
 #include "pluginmanager.h"
 #include "scopycore_export.h"
 
@@ -45,7 +46,9 @@ Q_SIGNALS:
 	void deviceDisconnected(QString uri);
 	void requestDevice(QString uri);
 	void requestTool(QString id);
-
+private:
+	void connectDeviceToManager(DeviceImpl *d);
+	void disconnectDeviceFromManager(DeviceImpl *d);
 private:
 	bool exclusive = false;
 	QStringList scannedDev;
