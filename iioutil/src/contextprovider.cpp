@@ -2,19 +2,25 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QApplication>
+#include <QElapsedTimer>
 
 Q_LOGGING_CATEGORY(CAT_CTXMGR, "ContextProvider")
 
+using namespace adiscope;
 ContextRefCounter::ContextRefCounter(QString uri)
 {
 	this->uri = uri;
 	this->refcnt++;
+	QElapsedTimer t;
+	t.start();
 	this->ctx = iio_create_context_from_uri(uri.toStdString().c_str());
+	qWarning()<<"ContextRefCnt: Creating context! "<<this->ctx<<" "<<t.elapsed();
 }
 
 ContextRefCounter::~ContextRefCounter() {
-	if(this->ctx)
+	if(this->ctx) {
 		iio_context_destroy(this->ctx);
+	}
 }
 
 
@@ -72,6 +78,7 @@ void ContextProvider::close(QString uri)
 		map.value(uri)->refcnt--;
 		qDebug(CAT_CTXMGR)<< uri << "closing - found in map - refcnt-- = " << map.value(uri)->refcnt;
 		if(map[uri]->refcnt == 0) {
+			delete map[uri];
 			map.remove(uri);
 			qDebug(CAT_CTXMGR)<< uri << "removed from map";
 		}

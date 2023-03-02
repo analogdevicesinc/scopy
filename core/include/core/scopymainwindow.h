@@ -5,7 +5,6 @@
 
 #include "scopyhomepage.h"
 #include "devicemanager.h"
-#include "iiocontextscanner.h"
 #include "scannediiocontextcollector.h"
 #include "toolmanager.h"
 #include "pluginrepository.h"
@@ -13,6 +12,8 @@
 #include "scopyaboutpage.h"
 #include "scopypreferencespage.h"
 #include "pluginbase/preferences.h"
+#include "iioutil/cyclicaltask.h"
+#include "iioutil/iioscantask.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
@@ -45,7 +46,9 @@ private:
     ScopyHomePage *hp;
     DeviceManager *dm;
     Preferences *pref;
-    IIOContextScanner *cs;
+
+    CyclicalTask *scanCycle;
+    IIOScanTask *scanTask;
     ScannedIIOContextCollector *scc;
     ToolManager *toolman;
 
