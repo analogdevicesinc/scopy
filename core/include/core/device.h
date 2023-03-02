@@ -16,6 +16,7 @@ public:
 	virtual QWidget *page() = 0;;
 	virtual QList<ToolMenuEntry*> toolList() = 0;
 	virtual void loadCompatiblePlugins() = 0;
+	virtual void compatiblePreload() = 0;
 	virtual void loadPlugins() = 0;
 	virtual void unloadPlugins() = 0;
 
