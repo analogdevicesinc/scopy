@@ -73,6 +73,11 @@ void PluginBase::loadSettings(QSettings& s)
 		pluginApi->load(s);
 }
 
+void PluginBase::messageCallback(QString topic, QString message)
+{
+
+}
+
 ApiObject *PluginBase::api()
 {
 	return pluginApi;

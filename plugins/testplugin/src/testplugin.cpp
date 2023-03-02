@@ -9,6 +9,7 @@
 #include <QCheckBox>
 #include <QSpacerItem>
 #include <pluginbase/preferences.h>
+#include <pluginbase/messagebroker.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace adiscope;
@@ -84,6 +85,7 @@ bool TestPlugin::loadExtraButtons()
 
 bool TestPlugin::onConnect()
 {
+	MessageBroker::GetInstance()->subscribe(this, "TestPlugin");
 	qDebug(CAT_TESTPLUGIN)<<"connect";
 	qDebug(CAT_TESTPLUGIN)<<m_toolList[0]->id()<<m_toolList[0]->name();
 
@@ -117,6 +119,11 @@ bool TestPlugin::onDisconnect()
 		}
 	}
 	return true;
+}
+
+void TestPlugin::messageCallback(QString topic, QString message)
+{
+	qInfo(CAT_TESTPLUGIN) << topic <<": "<<message;
 }
 
 QString TestPlugin::about()
