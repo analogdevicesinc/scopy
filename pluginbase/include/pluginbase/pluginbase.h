@@ -24,6 +24,7 @@ public:
 	virtual bool loadPage() override;
 	virtual void loadToolList() override;
 	virtual bool loadPreferencesPage() override;
+	virtual bool loadExtraButtons() override;
 
 	virtual void saveSettings() override;
 	virtual void loadSettings() override;
@@ -38,6 +39,7 @@ public:
 	virtual QWidget* icon() override;
 	virtual QWidget* page() override;
 	virtual QWidget* preferencesPage() override;
+	virtual QList<QAbstractButton*> extraButtons() override;
 	virtual QList<ToolMenuEntry*> toolList() override;
 	virtual QJsonObject metadata() override;
 	virtual QString about() override;
@@ -55,6 +57,7 @@ protected:
 	QWidget *m_preferencesPage;
 	QWidget *m_icon;
 	QList<ToolMenuEntry*> m_toolList;
+	QList<QAbstractButton*> m_extraButtons;
 	QJsonObject m_metadata;
 	ApiObject* pluginApi = nullptr;
 };
