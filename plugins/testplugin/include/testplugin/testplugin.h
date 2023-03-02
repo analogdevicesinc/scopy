@@ -26,6 +26,7 @@ public:
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
+	bool loadExtraButtons() override;
 	QString about() override;
 	QString version() override;
 

@@ -7,6 +7,7 @@
 #include "scopypluginbase_export.h"
 #include <QtPlugin>
 #include <QSettings>
+#include <QAbstractButton>
 #include "apiobject.h"
 
 namespace adiscope {
@@ -23,6 +24,7 @@ public:
 	virtual bool loadPage() = 0;
 	virtual void loadToolList() = 0;
 	virtual bool loadPreferencesPage() = 0;
+	virtual bool loadExtraButtons() = 0;
 	virtual void initMetadata() = 0;
 	virtual void setMetadata(QJsonObject obj) = 0;
 
@@ -41,6 +43,7 @@ public:
 	virtual QWidget* icon() = 0;
 	virtual QWidget* page() = 0;
 	virtual QWidget* preferencesPage() = 0;
+	virtual QList<QAbstractButton*> extraButtons() = 0;
 	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
 	virtual QJsonObject metadata() = 0;
 	virtual QString about() = 0;

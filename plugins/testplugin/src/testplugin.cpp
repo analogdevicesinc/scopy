@@ -73,6 +73,15 @@ void TestPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
 }
 
+bool TestPlugin::loadExtraButtons()
+{
+	m_extraButtons.append(new QPushButton("Calibrate"));
+	m_extraButtons.append(new QPushButton("Register"));
+	connect(m_extraButtons[0],&QAbstractButton::clicked,this,[=](){edit->setText("Calibrating");});
+	connect(m_extraButtons[1],&QAbstractButton::clicked,this,[=](){edit->setText("Registering");});
+	return true;
+}
+
 bool TestPlugin::onConnect()
 {
 	qDebug(CAT_TESTPLUGIN)<<"connect";
