@@ -54,6 +54,7 @@ public Q_SLOTS:
 	virtual bool onDisconnect() = 0;
 	virtual void showPageCallback() = 0;
 	virtual void hidePageCallback() = 0;
+	virtual void messageCallback(QString topic, QString message) = 0;
 Q_SIGNALS:
 	virtual void disconnectDevice() = 0;
 	virtual void restartDevice() = 0;
