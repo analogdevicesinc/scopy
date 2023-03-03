@@ -25,6 +25,7 @@ Q_SIGNALS:
 	void requestAddDevice(QString id);
 	void requestRemoveDevice(QString id);
 	void requestDevice(QString id);
+	void deviceAddedToUi(QString id);
 
 public Q_SLOTS:
 	void addDevice(QString id, Device*);
