@@ -24,9 +24,11 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void add();
 	void verify();
+	void deviceAddedToUi(QString);
 
 private:
 	Ui::ScopyHomeAddPage *ui;
+	QString pendingUri;
 };
 }
 #endif // SCOPYHOMEADDPAGE_H

@@ -24,6 +24,7 @@ ScopyHomePage::ScopyHomePage(QWidget *parent) :
 	connect(hc,SIGNAL(goRight()),db,SLOT(nextDevice()));
 	connect(db,SIGNAL(requestDevice(QString,int)),is,SLOT(slideInKey(QString,int)));
 	connect(db,SIGNAL(requestDevice(QString,int)),this,SIGNAL(requestDevice(QString)));
+	connect(this,SIGNAL(deviceAddedToUi(QString)),add,SLOT(deviceAddedToUi(QString)));
 
 	connect(db,SIGNAL(requestRemoveDevice(QString)),this,SIGNAL(requestRemoveDevice(QString)));
 	connect(add,SIGNAL(requestAddDevice(QString)),this,SIGNAL(requestAddDevice(QString)));
@@ -41,6 +42,7 @@ void ScopyHomePage::addDevice(QString id, Device *d)
 	auto &&db = ui->wDeviceBrowser;
 	db->addDevice(id, d);
 	is->add(id, d);
+	Q_EMIT deviceAddedToUi(id);
 }
 
 void ScopyHomePage::removeDevice(QString id) {
