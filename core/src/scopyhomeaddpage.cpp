@@ -11,13 +11,9 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent) :
 	connect(ui->btnVerify,SIGNAL(clicked()),this,SLOT(verify()));
 	connect(ui->btnAdd,SIGNAL(clicked()),this,SLOT(add()));
 	ui->btnAdd->setVisible(false);
+	pendingUri = "";
 }
 
-void ScopyHomeAddPage::add() {
-	QString uri = ui->editUri->text();
-	Q_EMIT requestAddDevice(uri);
-	Q_EMIT requestDevice(uri);
-}
 
 void ScopyHomeAddPage::verify() {
 	QString uri = ui->editUri->text();
@@ -29,6 +25,21 @@ void ScopyHomeAddPage::verify() {
 		ui->btnAdd->setVisible(true);
 	}
 
+}
+
+void ScopyHomeAddPage::add() {
+	QString uri = ui->editUri->text();
+	pendingUri = uri;
+	Q_EMIT requestAddDevice(uri);
+
+}
+
+void ScopyHomeAddPage::deviceAddedToUi(QString)
+{
+	if(!pendingUri.isEmpty()) {
+		Q_EMIT requestDevice(pendingUri);
+		pendingUri = "";
+	}
 }
 
 ScopyHomeAddPage::~ScopyHomeAddPage()
