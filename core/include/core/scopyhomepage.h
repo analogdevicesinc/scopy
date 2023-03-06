@@ -22,7 +22,7 @@ public:
 	QPushButton* scanControlBtn();
 Q_SIGNALS:
 
-	void requestAddDevice(QString id);
+	void requestAddDevice(QString cat, QString id);
 	void requestRemoveDevice(QString id);
 	void requestDevice(QString id);
 	void deviceAddedToUi(QString id);

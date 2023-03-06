@@ -8,7 +8,7 @@ namespace adiscope {
 class SCOPYCORE_EXPORT IIODeviceImpl : public DeviceImpl
 {
 public:
-	explicit IIODeviceImpl(QString uri, PluginManager *p ,QObject *parent = nullptr) : DeviceImpl(uri, p, parent) {}
+	explicit IIODeviceImpl(QString uri, PluginManager *p ,QObject *parent = nullptr) : DeviceImpl(uri, p, "iio", parent) {}
 	~IIODeviceImpl() {}
 
 	virtual void loadCompatiblePlugins() override;

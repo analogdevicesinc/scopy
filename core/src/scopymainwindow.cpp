@@ -70,29 +70,29 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(scanTask,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 
-	connect(scc,SIGNAL(foundDevice(QString)),dm,SLOT(addDevice(QString)));
-	connect(scc,SIGNAL(lostDevice(QString)),dm,SLOT(removeDevice(QString)));
+	connect(scc,SIGNAL(foundDevice(QString, QString)),dm,SLOT(addDevice(QString, QString)));
+	connect(scc,SIGNAL(lostDevice(QString, QString)),dm,SLOT(removeDevice(QString, QString)));
 
 	connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
 
-	connect(hp,SIGNAL(requestAddDevice(QString)),dm,SLOT(addDevice(QString)));
+	connect(hp,SIGNAL(requestAddDevice(QString, QString)),dm,SLOT(addDevice(QString, QString)));
 	connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
 
 	connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),this,SLOT(removeDeviceFromUi(QString)));
-	connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDevice(QString)));
+	connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDeviceById(QString)));
 
 	if(dm->getExclusive()) {
 		// only for device manager exclusive mode - stop scan on connect
-		connect(dm,SIGNAL(deviceConnected(QString)),sbc,SLOT(stopScan()));
-		connect(dm,SIGNAL(deviceDisconnected(QString)),sbc,SLOT(startScan()));
+		connect(dm,SIGNAL(deviceConnected(QString, Device*)),sbc,SLOT(stopScan()));
+		connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),sbc,SLOT(startScan()));
 	}
 
-	connect(dm,SIGNAL(deviceConnected(QString)),scc,SLOT(lock(QString)));
-	connect(dm,SIGNAL(deviceConnected(QString)),toolman,SLOT(lockToolList(QString)));
-	connect(dm,SIGNAL(deviceConnected(QString)),hp,SLOT(connectDevice(QString)));
-	connect(dm,SIGNAL(deviceDisconnected(QString)),scc,SLOT(unlock(QString)));
-	connect(dm,SIGNAL(deviceDisconnected(QString)),toolman,SLOT(unlockToolList(QString)));
-	connect(dm,SIGNAL(deviceDisconnected(QString)),hp,SLOT(disconnectDevice(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString, Device*)),scc,SLOT(lock(QString, Device*)));
+	connect(dm,SIGNAL(deviceConnected(QString, Device*)),toolman,SLOT(lockToolList(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString, Device*)),hp,SLOT(connectDevice(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),scc,SLOT(unlock(QString, Device*)));
+	connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),toolman,SLOT(unlockToolList(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),hp,SLOT(disconnectDevice(QString)));
 
 	connect(dm,SIGNAL(requestDevice(QString)),hp,SLOT(viewDevice(QString)));
 	connect(dm,SIGNAL(requestTool(QString)),toolman,SLOT(showTool(QString)));
@@ -100,12 +100,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	sbc->startScan();
 
-//	dm->addDevice("ip:");
+	dm->addDevice("","ip:127.0.0.1");
 //	dm->addDevice("usb:");
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
-
 }
 
 void ScopyMainWindow::save() {

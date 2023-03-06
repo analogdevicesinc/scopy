@@ -4,6 +4,7 @@
 
 Q_LOGGING_CATEGORY(CAT_SCANCTXCOLLECTOR, "ScannedIIOContextCollector")
 
+using namespace adiscope;
 ScannedIIOContextCollector::ScannedIIOContextCollector(QObject *parent)
 	: QObject{parent}
 {
@@ -17,6 +18,8 @@ ScannedIIOContextCollector::~ScannedIIOContextCollector()
 
 void ScannedIIOContextCollector::update(QStringList list)
 {
+	// Do we need to map Device* to uri in this class ?
+
 	QSet<QString> updatedUris = QSet<QString>(list.begin(),list.end());
 	updatedUris = updatedUris + lockedUris;
 
@@ -27,27 +30,28 @@ void ScannedIIOContextCollector::update(QStringList list)
 	for (const auto &uri : newUris) {
 		qInfo(CAT_SCANCTXCOLLECTOR) << "new device found: " << uri;
 //		if(!lockedUris.contains(uri))
-			Q_EMIT foundDevice(uri);
+			Q_EMIT foundDevice("iio",uri);
 
 	}
 
 	for (const auto &uri : deletedUris) {
 		qInfo(CAT_SCANCTXCOLLECTOR) << "to delete device: " << uri;
 //		if(!lockedUris.contains(uri))
-			Q_EMIT lostDevice(uri);
+			Q_EMIT lostDevice("iio",uri);
 
 	}
 	uris = updatedUris;
 }
 
-void ScannedIIOContextCollector::lock(QString uri) {
-	if(uris.contains(uri))
-		lockedUris.insert(uri);
+void ScannedIIOContextCollector::lock(QString uri, Device* d) {
+
+	if(uris.contains(d->param()))
+		lockedUris.insert(d->param());
 }
 
-void ScannedIIOContextCollector::unlock(QString uri) {
-	if(uris.contains(uri))
-		lockedUris.remove(uri);
+void ScannedIIOContextCollector::unlock(QString uri, Device *d) {
+	if(uris.contains(d->param()))
+		lockedUris.remove(d->param());
 }
 
 void ScannedIIOContextCollector::clearCache()

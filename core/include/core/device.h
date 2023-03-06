@@ -10,8 +10,11 @@ namespace adiscope {
 class SCOPYCORE_EXPORT Device {
 public:
 	virtual ~Device(){};
+	virtual QString id() = 0;
+	virtual QString category() = 0;
 	virtual QString name() = 0;
-	virtual QString uri() = 0;;
+	virtual QString param() = 0;
+	virtual QString description() = 0;
 	virtual QWidget *icon() = 0;;
 	virtual QWidget *page() = 0;;
 	virtual QList<ToolMenuEntry*> toolList() = 0;

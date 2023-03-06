@@ -19,30 +19,27 @@ DeviceManager::~DeviceManager()
 {
 }
 
-Device* DeviceManager::getDevice(QString uri) {
+Device* DeviceManager::getDevice(QString id) {
 
 	Device *d = nullptr;
-	if(map.contains(uri)) {
-		d = map.value(uri, nullptr);
+	if(map.contains(id)) {
+		d = map.value(id, nullptr);
 	}
 	return d;
 }
 
-void DeviceManager::addDevice(QString uri)
+QString DeviceManager::addDevice(QString category, QString uri)
 {	
-	static bool threaded = false;
+	static bool threaded = true;
 
 	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "added";
 	Q_EMIT deviceAddStarted(uri);
 
 	DeviceImpl *d = nullptr;
-	if(map.contains(uri)) {
-		qWarning(CAT_DEVICEMANAGER)<<"Duplicate" << uri <<" in device manager, removing old value";
-		removeDevice(uri);
-	}
 
-	d = new DeviceImpl(uri, pm);
-	map[uri] = d;
+	d = new DeviceImpl(uri, pm, category);
+	QString id = d->id();
+	map[id] = d;
 
 	if(threaded) {
 		QThread *th = QThread::create([=]{
@@ -56,6 +53,7 @@ void DeviceManager::addDevice(QString uri)
 			d->setParent(this);
 			d->loadPlugins();
 			connectDeviceToManager(d);
+			Q_EMIT deviceAdded(d->id(), d);
 		}, Qt::QueuedConnection);
 		connect(th,&QThread::finished, th, &QThread::deleteLater);
 		th->start();
@@ -65,44 +63,56 @@ void DeviceManager::addDevice(QString uri)
 		d->setParent(this);
 		d->loadPlugins();
 		connectDeviceToManager(d);
+		Q_EMIT deviceAdded(d->id(), d);
 	}
+	return d->id();
 }
 
 
-void DeviceManager::removeDevice(QString uri)
+// This is only used by scan context collector - should I rethink this ?
+// Map all devices to uris in scan context collector
+void DeviceManager::removeDevice(QString category, QString param) {
+
+	for(Device* d : qAsConst(map)) {
+		if(d->category() == category && d->param() == param) {
+			removeDeviceById(d->id());
+			return;
+		}
+
+	}
+}
+
+void DeviceManager::removeDeviceById(QString id)
 {
 	Device *d = nullptr;
 
-	if(connectedDev.contains(uri)) {
-		getDevice(uri)->disconnectDev();
+	if(connectedDev.contains(id)) {
+		getDevice(id)->disconnectDev();
 	}
 
-	if(!map.contains(uri)) {
-		qWarning(CAT_DEVICEMANAGER) << uri <<"Device does not exist";
+	if(!map.contains(id)) {
+		qWarning(CAT_DEVICEMANAGER) << id <<"Device does not exist";
 		return;
 	}
-	d = map.take(uri);
-	Q_EMIT deviceRemoveStarted(uri, d);
+	d = map.take(id);
+	Q_EMIT deviceRemoveStarted(id, d);
 
 	disconnectDeviceFromManager(dynamic_cast<DeviceImpl*>(d));
 	d->unloadPlugins();
 	delete(d);
 
-	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "removed";
+	qInfo(CAT_DEVICEMANAGER) << "device" << id << "removed";
 
-	Q_EMIT deviceRemoved(uri);
+	Q_EMIT deviceRemoved(id);
 }
 
 void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
-	if(!d)
-		return;
-
 	connect(d,SIGNAL(connected()),this,SLOT(connectDevice()));
 	connect(d,SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
 	connect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	connect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	connect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
-	Q_EMIT deviceAdded(d->uri(), d);
+
 }
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
 	disconnect(d,SIGNAL(connected()),this,SLOT(connectDevice()));
@@ -112,10 +122,13 @@ void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
 	disconnect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
 }
 
-void DeviceManager::restartDevice(QString uri)
+QString DeviceManager::restartDevice(QString id)
 {
-	removeDevice(uri);
-	addDevice(uri);
+	QString cat = map[id]->category();
+	QString params = map[id]->param();
+	removeDeviceById(id);
+	QString newId = addDevice(cat, params);
+	return newId;
 }
 
 void DeviceManager::disconnectAll()
@@ -140,16 +153,16 @@ void DeviceManager::load(QSettings &s)
 }
 
 void DeviceManager::changeToolListDevice() {
-	QString uri = dynamic_cast<Device*>(QObject::sender())->uri();
-	Q_EMIT deviceChangedToolList(uri, map[uri]->toolList());
+	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+	Q_EMIT deviceChangedToolList(id, map[id]->toolList());
 }
 
 void DeviceManager::connectDevice() {
-	QString uri = dynamic_cast<Device*>(QObject::sender())->uri();
-	qDebug(CAT_DEVICEMANAGER)<<"connecting " << uri << "...";
-	if(connectedDev.contains(uri)) {
+	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+	qDebug(CAT_DEVICEMANAGER)<<"connecting " << id << "...";
+	if(connectedDev.contains(id)) {
 		qDebug(CAT_DEVICEMANAGER)<<"connecting to the same device, disconnecting first .. ";
-		map[uri]->disconnectDev();
+		map[id]->disconnectDev();
 	}
 	if(exclusive) {
 		if(connectedDev.size() > 0) {
@@ -159,16 +172,16 @@ void DeviceManager::connectDevice() {
 		}
 	}
 
-	connectedDev.append(uri);
-	Q_EMIT deviceConnected(uri);
+	connectedDev.append(id);
+	Q_EMIT deviceConnected(id, map[id]);
 }
 
 void DeviceManager::disconnectDevice() {
-	QString uri = dynamic_cast<Device*>(QObject::sender())->uri();
-	qDebug(CAT_DEVICEMANAGER)<<"disconnecting "<< uri << "...";
-	connectedDev.removeOne(uri);
+	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+	qDebug(CAT_DEVICEMANAGER)<<"disconnecting "<< id << "...";
+	connectedDev.removeOne(id);
 	Q_EMIT requestTool("home");
-	Q_EMIT deviceDisconnected(uri);
+	Q_EMIT deviceDisconnected(id, map[id]);
 }
 
 void DeviceManager::setExclusive(bool val) {
@@ -179,9 +192,10 @@ bool DeviceManager::getExclusive() const {
 }
 
 void DeviceManager::restartDevice() {
-	QString uri = dynamic_cast<Device*>(QObject::sender())->uri();
-	qDebug(CAT_DEVICEMANAGER)<<"restarting "<< uri << "...";
-	restartDevice(uri);
-	Q_EMIT requestDevice(uri);
+	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+	qDebug(CAT_DEVICEMANAGER)<<"restarting "<< id << "...";
+	QString newId = restartDevice(id);
+//	connect(this,SIGNAL(deviceAdded(QString,Device*)),this,SIGNAL(requestDevice(QString)));
+//	Q_EMIT requestDevice(newId);
 }
 
