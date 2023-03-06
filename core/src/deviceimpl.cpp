@@ -70,8 +70,8 @@ void DeviceImpl::unloadPlugins() {
 
 void DeviceImpl::loadName() {
 	if(plugins.count()) {
-		m_name = plugins[0]->name();
-		m_description = plugins[0]->uri();
+		m_name = plugins[0]->displayName();
+		m_description = plugins[0]->displayDescription();
 	} else {
 		m_name = "NO_PLUGIN";
 	}

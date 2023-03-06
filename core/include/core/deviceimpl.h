@@ -16,7 +16,7 @@ class SCOPYCORE_EXPORT DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
 public:
-	explicit DeviceImpl(QString uri, PluginManager *p, QString category = "",QObject *parent = nullptr);
+	explicit DeviceImpl(QString param, PluginManager *p, QString category = "",QObject *parent = nullptr);
 	virtual ~DeviceImpl();
 
 	// Device interface

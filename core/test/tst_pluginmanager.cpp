@@ -70,7 +70,7 @@ void TST_PluginManager::loadLibs()
 
 	QList<Plugin*> usbPlugins = p->getCompatiblePlugins("usb:","test",this);
 	for(auto &&p : usbPlugins) {
-		QVERIFY2(p->uri() == "usb:", "uri not set to plugin");
+		QVERIFY2(p->param() == "usb:", "param not set to plugin");
 	}
 
 	QList<Plugin*> ipPlugins = p->getCompatiblePlugins("ip:","test", this);
@@ -88,7 +88,7 @@ void TST_PluginManager::loadLibs()
 	usbPlugins.clear();
 	usbPlugins = p->getCompatiblePlugins("usb:","test", this);
 	for(auto &&p : usbPlugins) {
-		QVERIFY2(p->uri() == "usb:", "uri not set to plugin");
+		QVERIFY2(p->param() == "usb:", "param not set to plugin");
 	}
 
 	delete p;
