@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "scopycore_export.h"
+#include <QFuture>
 
 namespace Ui {
 class ScopyHomeAddPage;
@@ -23,12 +24,14 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void add();
-	void verify();
+	void futureverify();
+	bool verify();
 	void deviceAddedToUi(QString);
 
 private:
 	Ui::ScopyHomeAddPage *ui;
 	QString pendingUri;
+	QFutureWatcher<bool> *fw;
 };
 }
 #endif // SCOPYHOMEADDPAGE_H
