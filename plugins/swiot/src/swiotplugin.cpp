@@ -21,9 +21,9 @@ bool SWIOTPlugin::loadPage()
 	infoui->setupUi(m_page);
 	connect(infoui->pushButton,&QPushButton::clicked,this,[=](){
 		auto &&cp = ContextProvider::GetInstance();
-		iio_context* ctx = cp->open(m_uri);
+		iio_context* ctx = cp->open(m_param);
 		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
-		cp->close(m_uri);
+		cp->close(m_param);
 		infoui->textBrowser->setText(hw_serial);
 	});
 	return true;
@@ -48,15 +48,14 @@ void SWIOTPlugin::unload()
 	delete infoui;
 }
 
-bool SWIOTPlugin::compatible(QString uri)
+bool SWIOTPlugin::compatible(QString m_param)
 {
-	m_name="SWIOT";
-	m_uri = uri;
+	m_name = "abcd";
 	bool ret = false;
 	auto &&cp = ContextProvider::GetInstance();
 
 	QString hw_serial;
-	iio_context* ctx = cp->open(uri);
+	iio_context* ctx = cp->open(m_param);
 
 	if(!ctx)
 		return false;
@@ -65,7 +64,7 @@ bool SWIOTPlugin::compatible(QString uri)
 	if(!hw_serial.isEmpty())
 		ret = true;
 
-	cp->close(uri);
+	cp->close(m_param);
 
 	return ret;
 }
@@ -73,7 +72,7 @@ bool SWIOTPlugin::compatible(QString uri)
 bool SWIOTPlugin::onConnect()
 {
 	auto &&cp = ContextProvider::GetInstance();
-	iio_context* ctx = cp->open(m_uri);
+	iio_context* ctx = cp->open(m_param);
 
 	ping = new IIOPingTask(ctx);
 	cs = new CyclicalTask(ping,this);
@@ -113,7 +112,7 @@ bool SWIOTPlugin::onDisconnect()
 {
 	cs->stop();
 	auto &&cp = ContextProvider::GetInstance();
-	cp->close(m_uri);
+	cp->close(m_param);
 
 
 	m_toolList[0]->setEnabled(false);

@@ -15,7 +15,7 @@ class SCOPYPLUGINBASE_EXPORT Plugin {
 public:
 	virtual ~Plugin() {}
 
-	virtual void setUri(QString) = 0;
+	virtual void setParam(QString) = 0;
 	virtual void preload() = 0;
 	virtual void initPreferences() = 0;
 	virtual void postload() = 0;
@@ -35,11 +35,13 @@ public:
 	virtual ApiObject* api() = 0;
 
 	virtual void unload() = 0;
-	virtual bool compatible(QString uri) = 0;
+	virtual bool compatible(QString param) = 0;
 
 	virtual Plugin* clone() = 0;
-	virtual QString uri() = 0;
+	virtual QString param() = 0;
 	virtual QString name() = 0;
+	virtual QString displayName() = 0;
+	virtual QString displayDescription() = 0;
 	virtual QWidget* icon() = 0;
 	virtual QWidget* page() = 0;
 	virtual QWidget* preferencesPage() = 0;

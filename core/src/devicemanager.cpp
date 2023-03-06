@@ -28,16 +28,16 @@ Device* DeviceManager::getDevice(QString id) {
 	return d;
 }
 
-QString DeviceManager::addDevice(QString category, QString uri)
+QString DeviceManager::addDevice(QString category, QString param)
 {	
 	static bool threaded = true;
 
-	qInfo(CAT_DEVICEMANAGER) << "device" << uri << "added";
-	Q_EMIT deviceAddStarted(uri);
+	qInfo(CAT_DEVICEMANAGER) <<category<< "device with params" << param << "added";
+	Q_EMIT deviceAddStarted(param);
 
 	DeviceImpl *d = nullptr;
 
-	d = new DeviceImpl(uri, pm, category);
+	d = new DeviceImpl(param, pm, category);
 	QString id = d->id();
 	map[id] = d;
 

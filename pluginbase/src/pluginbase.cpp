@@ -6,8 +6,9 @@ Q_LOGGING_CATEGORY(CAT_PLUGIN,"Plugin");
 
 using namespace adiscope;
 
-void PluginBase::setUri(QString uri) {
-	m_uri = uri;
+void PluginBase::setParam(QString param) {
+	m_param = param;
+	m_displayDescription = param;
 }
 
 void PluginBase::preload() {
@@ -83,12 +84,24 @@ ApiObject *PluginBase::api()
 	return pluginApi;
 }
 
-QString PluginBase::uri() {
-	return m_uri;
+QString PluginBase::param() {
+	return m_param;
 }
 QString PluginBase::name() {
 	return m_name;
 }
+
+QString PluginBase::displayName()
+{
+	return m_displayName;
+}
+
+QString PluginBase::displayDescription()
+{
+	return m_displayDescription;
+}
+
+
 QWidget* PluginBase::icon() {
 	return m_icon;
 }
@@ -110,10 +123,10 @@ QList<ToolMenuEntry*> PluginBase::toolList() {
 	return m_toolList;
 }
 void PluginBase::showPageCallback() {
-	qDebug(CAT_PLUGIN)<<m_uri<<"showpage callback";
+	qDebug(CAT_PLUGIN)<<m_name<<"showpage callback";
 }
 void PluginBase::hidePageCallback() {
-	qDebug(CAT_PLUGIN)<<m_uri<<"hidepage callback";
+	qDebug(CAT_PLUGIN)<<m_name<<"hidepage callback";
 }
 
 QJsonObject PluginBase::metadata() {
