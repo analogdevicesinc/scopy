@@ -91,7 +91,7 @@ QList<Plugin *> PluginManager::getPlugins(QString category, QObject *parent)
 	return newlist;
 }
 
-QList<Plugin *> PluginManager::getCompatiblePlugins(QString uri, QString category, QObject *parent)
+QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString category, QObject *parent)
 {
 	QList<Plugin *> comp;
 	for(Plugin* plugin : qAsConst(list)) {
@@ -99,11 +99,11 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString uri, QString categor
 			continue;
 		if(!PluginFilter::pluginInExclusionList(comp,plugin))
 			continue;
-		if(plugin->compatible(uri)) {
+		if(plugin->compatible(param)) {
 			Plugin* p = plugin->clone();
 			if(parent)
 				dynamic_cast<QObject*>(p)->setParent(parent);
-			p->setUri(uri);
+			p->setParam(param);
 			comp.append(p);
 		}
 	}

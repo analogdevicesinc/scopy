@@ -21,7 +21,7 @@ public:
 	void clear();
 	QList<Plugin*> getOriginalPlugins() const;
 	QList<Plugin*> getPlugins(QString category = "", QObject *parent = nullptr);
-	QList<Plugin*> getCompatiblePlugins(QString uri, QString category = "", QObject *parent = nullptr);
+	QList<Plugin*> getCompatiblePlugins(QString param, QString category = "", QObject *parent = nullptr);
 	void setMetadata(QJsonObject metadata);
 	QJsonObject metadata() const;
 
