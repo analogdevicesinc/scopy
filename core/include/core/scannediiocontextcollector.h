@@ -3,8 +3,10 @@
 
 #include <QObject>
 #include <QSet>
+#include "device.h"
 #include "scopycore_export.h"
 
+namespace adiscope {
 class SCOPYCORE_EXPORT ScannedIIOContextCollector : public QObject
 {
 	Q_OBJECT
@@ -15,15 +17,16 @@ public:
 public Q_SLOTS:
 	void update(QStringList uris);
 	void clearCache();
-	void lock(QString);
-	void unlock(QString);
+	void lock(QString, Device*);
+	void unlock(QString, Device*);
 Q_SIGNALS:
-	void foundDevice(QString uri);
-	void lostDevice(QString uri);
+	void foundDevice(QString cat, QString uri);
+	void lostDevice(QString cat, QString uri);
 private:
 	QSet<QString> uris;
 	QSet<QString> lockedUris;
 
 };
+}
 
 #endif // SCANNEDIIOCONTEXTCOLLECTOR_H

@@ -52,7 +52,7 @@ ContextProvider *ContextProvider::GetInstance()
 iio_context *ContextProvider::open(QString uri)
 {
 	std::lock_guard<std::mutex> lock(mutex_);
-	iio_context *ctx;	
+	iio_context *ctx = nullptr;
 	if(map.contains(uri)) {
 		map.value(uri)->refcnt++;
 		qDebug(CAT_CTXMGR)<< uri << "opening - found - refcnt++ = " << map.value(uri)->refcnt;
