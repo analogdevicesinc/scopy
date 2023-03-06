@@ -59,7 +59,7 @@ QAbstractButton *DeviceBrowser::getDeviceWidgetFor(QString id)
 void DeviceBrowser::addDevice(QString id, Device *d,int position)
 {
 	QString name = d->name();
-	QString description = d->uri();
+	QString description = d->description();
 	QWidget* icon = d->icon();
 
 

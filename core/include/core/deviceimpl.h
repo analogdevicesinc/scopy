@@ -16,13 +16,16 @@ class SCOPYCORE_EXPORT DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
 public:
-	explicit DeviceImpl(QString uri, PluginManager *p, QObject *parent = nullptr);
+	explicit DeviceImpl(QString uri, PluginManager *p, QString category = "",QObject *parent = nullptr);
 	virtual ~DeviceImpl();
 
 	// Device interface
 public:
+	QString id() override;
 	QString name() override;
-	QString uri() override;
+	QString category() override;
+	QString param() override;
+	QString description() override;
 	QWidget *icon() override;
 	QWidget *page() override;
 	QList<ToolMenuEntry*> toolList() override;
@@ -55,13 +58,15 @@ protected:
 protected:
 	PluginManager *p;
 	QList<Plugin*> plugins;
-	QString m_uri;
+	QString m_id;
+	QString m_category;
+	QString m_description;
+	QString m_param;
 	QString m_name;
 	QWidget *m_icon;
 	QWidget *m_page;
 	QPushButton *connbtn;
 	QPushButton *discbtn;
-	QCheckBox *extraToolchkbox;
 
 };
 }

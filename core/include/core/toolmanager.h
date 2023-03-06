@@ -34,7 +34,7 @@ public Q_SLOTS:
 
 private:
 	typedef struct {
-		QString uri;
+		QString id;
 		QList<ToolMenuEntry*> tools;
 		bool lock;
 

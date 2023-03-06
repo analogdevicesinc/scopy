@@ -16,14 +16,18 @@ class SCOPYCORE_EXPORT DeviceManager : public QObject
 public:
 	explicit DeviceManager(PluginManager *pm, QObject *parent = nullptr);
 	~DeviceManager();
-	Device* getDevice(QString uri);
+	Device* getDevice(QString id);
 	void setExclusive(bool);
 	bool getExclusive() const;
 
 public Q_SLOTS:
-	void addDevice(QString uri);
-	void removeDevice(QString uri);
-	void restartDevice(QString uri);
+
+	QString addDevice(QString category, QString uri);
+	void removeDevice(QString category, QString id);
+
+//	QString addDevice(QString uri);
+	void removeDeviceById(QString id);
+	QString restartDevice(QString id);
 	void disconnectAll();
 
 	void save(QSettings &s);
@@ -39,12 +43,12 @@ private Q_SLOTS:
 Q_SIGNALS:
 	void deviceChangedToolList(QString, QList<ToolMenuEntry*>);
 	void deviceAddStarted(QString);
-	void deviceAdded(QString,Device*);
+	void deviceAdded(QString, Device*);
 	void deviceRemoveStarted(QString, Device*);
 	void deviceRemoved(QString);
-	void deviceConnected(QString uri);
-	void deviceDisconnected(QString uri);
-	void requestDevice(QString uri);
+	void deviceConnected(QString uri, Device*);
+	void deviceDisconnected(QString id, Device*);
+	void requestDevice(QString id);
 	void requestTool(QString id);
 private:
 	void connectDeviceToManager(DeviceImpl *d);
