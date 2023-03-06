@@ -30,14 +30,14 @@ void ScopyHomeAddPage::verify() {
 void ScopyHomeAddPage::add() {
 	QString uri = ui->editUri->text();
 	pendingUri = uri;
-	Q_EMIT requestAddDevice(uri);
+	Q_EMIT requestAddDevice("iio",uri);
 
 }
 
-void ScopyHomeAddPage::deviceAddedToUi(QString)
+void ScopyHomeAddPage::deviceAddedToUi(QString id)
 {
 	if(!pendingUri.isEmpty()) {
-		Q_EMIT requestDevice(pendingUri);
+		Q_EMIT requestDevice(id);
 		pendingUri = "";
 	}
 }

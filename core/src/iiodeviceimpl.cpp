@@ -8,8 +8,8 @@ void IIODeviceImpl::loadCompatiblePlugins()
 
 	// Optimization for iio plugins - keep context open while running compatible
 
-	cp->open(m_uri);
+	cp->open(m_param);
 	DeviceImpl::loadCompatiblePlugins();
-	cp->close(m_uri);
+	cp->close(m_param);
 }
 

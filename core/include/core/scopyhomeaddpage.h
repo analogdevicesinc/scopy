@@ -18,7 +18,7 @@ public:
 	~ScopyHomeAddPage();
 
 Q_SIGNALS:
-	void requestAddDevice(QString);
+	void requestAddDevice(QString, QString);
 	void requestDevice(QString);
 
 private Q_SLOTS:

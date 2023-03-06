@@ -15,17 +15,19 @@
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
 namespace adiscope {
-DeviceImpl::DeviceImpl(QString uri, PluginManager *p, QObject *parent)
+DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObject *parent)
 	: QObject{parent},
-	  m_uri(uri),
+	  m_param(param),
+	  m_category(category),
 	  p(p)
 {
-	qDebug(CAT_DEVICEIMPL)<< m_uri <<"ctor";
+	m_id = QUuid::createUuid().toString();
+	qDebug(CAT_DEVICEIMPL)<< m_param <<"ctor";
 }
 
 void DeviceImpl::loadCompatiblePlugins()
 {
-	plugins = p->getCompatiblePlugins(m_uri,"",this);
+	plugins = p->getCompatiblePlugins(m_param,m_category,this);
 }
 
 void DeviceImpl::compatiblePreload() {
@@ -67,10 +69,12 @@ void DeviceImpl::unloadPlugins() {
 }
 
 void DeviceImpl::loadName() {
-	if(plugins.count())
+	if(plugins.count()) {
 		m_name = plugins[0]->name();
-	else
+		m_description = plugins[0]->uri();
+	} else {
 		m_name = "NO_PLUGIN";
+	}
 }
 
 void DeviceImpl::loadIcons() {
@@ -182,7 +186,12 @@ void DeviceImpl::disconnectDev() {
 
 DeviceImpl::~DeviceImpl() {
 
-	qDebug(CAT_DEVICEIMPL)<< m_uri <<"dtor";
+	qDebug(CAT_DEVICEIMPL)<< m_id <<"dtor";
+}
+
+QString DeviceImpl::id()
+{
+	return m_id;
 }
 
 QString DeviceImpl::name()
@@ -190,9 +199,20 @@ QString DeviceImpl::name()
 	return m_name;
 }
 
-QString DeviceImpl::uri()
+QString DeviceImpl::category()
 {
-	return m_uri;
+	return m_category;
+}
+
+QString DeviceImpl::description()
+{
+	return m_description;
+}
+
+
+QString DeviceImpl::param()
+{
+	return m_param;
 }
 
 QWidget *DeviceImpl::icon()
