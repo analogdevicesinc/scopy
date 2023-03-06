@@ -9,9 +9,9 @@
 Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
 using namespace adiscope;
 
-bool TestPluginIp::compatible(QString uri) {
+bool TestPluginIp::compatible(QString m_param) {
 	qDebug(CAT_TESTPLUGINIP)<<"compatible";
-	return uri.startsWith("ip:");
+	return m_param.startsWith("ip:");
 }
 
 void TestPluginIp::unload() {

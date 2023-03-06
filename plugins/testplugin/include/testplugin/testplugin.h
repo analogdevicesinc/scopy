@@ -21,7 +21,7 @@ public:
 	void loadApi() override;
 	void initPreferences() override;
 	void initMetadata() override;
-	bool compatible(QString uri) override;
+	bool compatible(QString m_param) override;
 	bool loadPreferencesPage() override;
 	bool loadPage() override;
 	bool loadIcon() override;

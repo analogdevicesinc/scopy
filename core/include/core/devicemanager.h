@@ -22,10 +22,9 @@ public:
 
 public Q_SLOTS:
 
-	QString addDevice(QString category, QString uri);
+	QString addDevice(QString category, QString param);
 	void removeDevice(QString category, QString id);
 
-//	QString addDevice(QString uri);
 	void removeDeviceById(QString id);
 	QString restartDevice(QString id);
 	void disconnectAll();
@@ -46,7 +45,7 @@ Q_SIGNALS:
 	void deviceAdded(QString, Device*);
 	void deviceRemoveStarted(QString, Device*);
 	void deviceRemoved(QString);
-	void deviceConnected(QString uri, Device*);
+	void deviceConnected(QString id, Device*);
 	void deviceDisconnected(QString id, Device*);
 	void requestDevice(QString id);
 	void requestTool(QString id);
