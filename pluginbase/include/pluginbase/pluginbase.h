@@ -12,7 +12,7 @@ class SCOPYPLUGINBASE_EXPORT PluginBase : public Plugin {
 public:
 	virtual ~PluginBase() {}
 
-	virtual void setUri(QString uri) override;
+	virtual void setParam(QString param) override;
 	virtual void initMetadata() override;
 	virtual void setMetadata(QJsonObject obj) override;
 	virtual void initPreferences() override;
@@ -34,8 +34,10 @@ public:
 	virtual void unload() override;
 
 	virtual ApiObject* api() override;
-	virtual QString uri() override;
+	virtual QString param() override;
 	virtual QString name() override;
+	virtual QString displayName() override;
+	virtual QString displayDescription() override;
 	virtual QWidget* icon() override;
 	virtual QWidget* page() override;
 	virtual QWidget* preferencesPage() override;
@@ -54,8 +56,10 @@ public Q_SLOTS:
 
 
 protected:
-	QString m_uri;
+	QString m_param;
 	QString m_name;
+	QString m_displayName;
+	QString m_displayDescription;
 	QWidget *m_page;
 	QWidget *m_preferencesPage;
 	QWidget *m_icon;
@@ -78,10 +82,10 @@ public:\
 		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
 		/* copy metadata from this object to the next one */\
 		ret->m_name = xstr(SCOPY_PLUGIN_NAME);\
+		ret->m_displayName = ret->m_name;\
 		ret->setMetadata(metadata()); \
 		return ret;\
-	} \
-	QString name() override { return  m_name;}\
+	}\
 \
 Q_SIGNALS:\
 	virtual void disconnectDevice() override;\
