@@ -8,19 +8,16 @@ IIOPingTask::~IIOPingTask() {}
 
 void IIOPingTask::run() {
 
+	enabled = true;
 	bool ret = ping(c);
 
-	if(!enabled)
+	if(isInterruptionRequested())
 		return;
 	if(ret)
 		Q_EMIT pingSuccess();
 	else
 		Q_EMIT pingFailed();
 }
-
-void IIOPingTask::start(QThread::Priority p) { enabled = true; QThread::start(p);}
-
-void IIOPingTask::stop() { enabled = false; }
 
 bool IIOPingTask::ping(iio_context *ctx) {
 	auto dev = iio_context_get_device(ctx, 0);
