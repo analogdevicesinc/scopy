@@ -58,3 +58,5 @@ void ScannedIIOContextCollector::clearCache()
 {
 	uris.clear();
 }
+
+#include "moc_scannediiocontextcollector.cpp"

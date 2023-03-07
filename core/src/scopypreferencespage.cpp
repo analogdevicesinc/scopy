@@ -24,3 +24,5 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
 ScopyPreferencesPage::~ScopyPreferencesPage() {
 
 }
+
+#include "moc_scopypreferencespage.cpp"

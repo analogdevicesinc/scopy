@@ -60,3 +60,5 @@ void CyclicalTask::stop()
 	connect(cs,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 	cs->startScan(2000);
 */
+
+#include "moc_cyclicaltask.cpp"

@@ -179,3 +179,5 @@ void SmallOnOffSwitch::updateOnOffLabels()
 		off.setEnabled(!isChecked());
 	}
 }
+
+#include "moc_smallOnOffSwitch.cpp"

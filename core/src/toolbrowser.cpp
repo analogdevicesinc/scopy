@@ -55,3 +55,5 @@ ToolBrowser::~ToolBrowser()
  ts->addTool("home3", new QLabel("home3"));
 */
 
+
+#include "moc_toolbrowser.cpp"

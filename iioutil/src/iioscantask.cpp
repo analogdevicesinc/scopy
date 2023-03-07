@@ -65,3 +65,5 @@ scan_err:
 void IIOScanTask::start(Priority) { enabled = true; QThread::start();}
 
 void IIOScanTask::stop() { enabled = false;}
+
+#include "moc_iioscantask.cpp"

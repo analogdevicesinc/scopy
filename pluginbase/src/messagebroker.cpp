@@ -60,3 +60,5 @@ void MessageBroker::publish(QString topic, QString message)
 	}
 }
 
+
+#include "moc_messagebroker.cpp"

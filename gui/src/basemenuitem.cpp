@@ -251,3 +251,5 @@ void BaseMenuItem::_enableTopSeparator(bool enable)
 {
 	d_ui->topSep->setVisible(enable);
 }
+
+#include "moc_basemenuitem.cpp"

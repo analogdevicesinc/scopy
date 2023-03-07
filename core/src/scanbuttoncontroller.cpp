@@ -29,3 +29,5 @@ void ScanButtonController::stopScan() {
 	cs->stop();
 	btn->setChecked(false);
 }
+
+#include "moc_scanbuttoncontroller.cpp"

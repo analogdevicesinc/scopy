@@ -128,3 +128,5 @@ void CustomSwitch::showEvent(QShowEvent *event)
 	}
 
 }
+
+#include "moc_customSwitch.cpp"

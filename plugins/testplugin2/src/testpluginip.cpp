@@ -112,3 +112,5 @@ R"plugin(
 	}
 )plugin");
 }
+
+#include "moc_testpluginip.cpp"

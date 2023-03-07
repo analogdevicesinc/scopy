@@ -218,3 +218,5 @@ DeviceIcon* DeviceBrowser::buildDeviceIcon(QString name, QString description, QW
 	w1->setVisible(false);
 	*/
 
+
+#include "moc_devicebrowser.cpp"

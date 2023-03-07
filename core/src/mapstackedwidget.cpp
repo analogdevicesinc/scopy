@@ -64,3 +64,5 @@ bool MapStackedWidget::show(QString key)
 	}
 	return false;
 }
+
+#include "moc_mapstackedwidget.cpp"

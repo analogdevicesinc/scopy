@@ -46,3 +46,5 @@ AnimationManager::AnimationManager():
 	m_animationsEnabled(true)
 {
 }
+
+#include "moc_animationmanager.cpp"

@@ -12,3 +12,5 @@ DevicePage::~DevicePage()
 {
 	delete ui;
 }
+
+#include "moc_devicepage.cpp"

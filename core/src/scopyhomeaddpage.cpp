@@ -64,3 +64,5 @@ ScopyHomeAddPage::~ScopyHomeAddPage()
 {
 	delete ui;
 }
+
+#include "moc_scopyhomeaddpage.cpp"

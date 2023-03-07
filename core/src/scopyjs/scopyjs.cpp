@@ -205,3 +205,5 @@ void ScopyJS::hasText()
 
 	out.flush();
 }
+
+#include "scopyjs/moc_scopyjs.cpp"
