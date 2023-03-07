@@ -236,3 +236,5 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 	return ret;
 }
 }
+
+#include "moc_deviceimpl.cpp"

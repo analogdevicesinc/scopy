@@ -97,3 +97,5 @@ Preferences *Preferences::GetInstance()
 
 
 
+
+#include "moc_preferences.cpp"

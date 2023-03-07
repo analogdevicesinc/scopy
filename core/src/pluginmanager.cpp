@@ -162,3 +162,5 @@ QJsonObject PluginManager::metadata() const
 {
 	return m_metadata;
 }
+
+#include "moc_pluginmanager.cpp"

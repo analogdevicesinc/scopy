@@ -167,3 +167,5 @@ void TestPlugin_API::setTestText(const QString &newTestText)
 {
 	p->edit->setText(newTestText);
 }
+
+#include "moc_testplugin.cpp"

@@ -161,3 +161,5 @@ void ToolMenu::_loadState()
 
 
 
+
+#include "moc_toolmenu.cpp"

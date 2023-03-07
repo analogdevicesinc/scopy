@@ -46,3 +46,5 @@ void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) {
 ScopyAboutPage::~ScopyAboutPage() {
 
 }
+
+#include "moc_scopyaboutpage.cpp"
