@@ -13,9 +13,10 @@ Q_LOGGING_CATEGORY(CAT_IIOSCANCTX, "IIOScanTask");
 void IIOScanTask::run() {
 	QStringList ctxs;
 	int ret = IIOScanTask::scan(&ctxs,scanParams);
+	if(isInterruptionRequested())
+		return;
 	if( ret >= 0 )
-		if(enabled)
-			Q_EMIT scanFinished(ctxs);
+		Q_EMIT scanFinished(ctxs);
 }
 
 void IIOScanTask::setScanParams(QString s) {
@@ -61,9 +62,5 @@ scan_err:
 	iio_scan_context_destroy(scan_ctx);
 	return ret;
 }
-
-void IIOScanTask::start(Priority) { enabled = true; QThread::start();}
-
-void IIOScanTask::stop() { enabled = false;}
 
 #include "moc_iioscantask.cpp"
