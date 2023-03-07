@@ -50,6 +50,7 @@ void PluginManager::add(QString pluginFileName)
 		list.append(p);
 		p->initMetadata();
 		applyMetadata(p, &m_metadata);
+		p->init();
 	}
 }
 
