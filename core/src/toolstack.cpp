@@ -45,3 +45,5 @@ bool ToolStack::show(QString key)
 	qWarning(CAT_TOOLSTACK)<<key<<"not found in MapStackWidget";
 	return false;
 }
+
+#include "moc_toolstack.cpp"

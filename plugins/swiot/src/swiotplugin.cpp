@@ -143,3 +143,5 @@ R"plugin(
 }
 
 
+
+#include "moc_swiotplugin.cpp"

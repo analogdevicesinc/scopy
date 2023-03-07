@@ -70,3 +70,5 @@ void ScopyHomePage::disconnectDevice(QString id) {
 QPushButton* ScopyHomePage::scanControlBtn() {
 	return ui->btnScan;
 }
+
+#include "moc_scopyhomepage.cpp"

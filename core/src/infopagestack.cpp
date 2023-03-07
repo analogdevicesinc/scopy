@@ -158,3 +158,5 @@ HomepageControls *InfoPageStack::getHomepageControls() const
 {
 	return hc;
 }
+
+#include "moc_infopagestack.cpp"

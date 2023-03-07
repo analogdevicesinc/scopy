@@ -5,3 +5,5 @@ InfoPage::InfoPage(QWidget *parent)
 {
 
 }
+
+#include "moc_infopage.cpp"

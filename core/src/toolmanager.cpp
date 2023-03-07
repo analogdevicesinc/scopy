@@ -143,3 +143,5 @@ void ToolManager::showTool(QString s) {
 
 
 
+
+#include "moc_toolmanager.cpp"

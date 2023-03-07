@@ -195,3 +195,5 @@ void ScopyMainWindow::removeDeviceFromUi(QString id)
 	hp->removeDevice(id);
 }
 
+
+#include "moc_scopymainwindow.cpp"

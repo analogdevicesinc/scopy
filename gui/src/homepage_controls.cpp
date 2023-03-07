@@ -74,3 +74,5 @@ void HomepageControls::enableRight(bool en)
 {
 	ui->rightBtn->setEnabled(en);
 }
+
+#include "moc_homepage_controls.cpp"

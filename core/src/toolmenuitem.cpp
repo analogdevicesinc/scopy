@@ -224,3 +224,5 @@ void ToolMenuItem::_buildUI()
 
 	setWidget(main);
 }
+
+#include "moc_toolmenuitem.cpp"
