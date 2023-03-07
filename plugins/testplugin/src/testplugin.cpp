@@ -28,8 +28,6 @@ void TestPlugin::initPreferences()
 	p->init("pref4","english");
 }
 
-
-
 bool TestPlugin::loadPreferencesPage()
 {
 
@@ -97,11 +95,13 @@ bool TestPlugin::onConnect()
 	QVBoxLayout *lay = new QVBoxLayout(tool);
 	QLabel *lbl = new QLabel("TestPlugin", tool);
 	QLabel *pic = new QLabel("Picture",tool);
+	QLabel *lbl2 = new QLabel("m_initText->"+m_initText,tool);
 	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testImage.png\") ");
 	lay->addWidget(lbl);
 	lay->addWidget(pic);
 	lay->addWidget(edit);
+	lay->addWidget(lbl2);
 	m_toolList[0]->setTool(tool);
 
 	return true;
@@ -119,6 +119,14 @@ bool TestPlugin::onDisconnect()
 		}
 	}
 	return true;
+}
+
+void TestPlugin::cloneExtra(Plugin *p)
+{
+	static int i = 0;
+	m_initText = dynamic_cast<TestPlugin*>(p)->m_initText;
+	m_initText += " Cloned from original " +QString::number(i)+" times";
+	i++;
 }
 
 void TestPlugin::messageCallback(QString topic, QString message)
@@ -145,6 +153,11 @@ R"plugin(
 	   ]
 	}
 )plugin");
+}
+
+void TestPlugin::init()
+{
+	m_initText = "This text was initialized";
 }
 
 void TestPlugin::loadApi(){
