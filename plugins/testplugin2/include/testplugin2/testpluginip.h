@@ -3,7 +3,6 @@
 
 
 #define SCOPY_PLUGIN_NAME TestPluginIp
-#define SCOPY_PLUGIN_PRIO 2
 
 #include <QObject>
 #include <pluginbase/plugin.h>
