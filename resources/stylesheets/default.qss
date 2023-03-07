@@ -273,6 +273,18 @@ QLabel[general_settings_label=true]{
 }
 QFrame[blue_line=true]{ border: 2px solid #4A64FF; }
 QFrame[drag_widget=true] { border-image:url(:/icons/scopy-default/icons/menu.svg); }
+
+
+QWidget[device_page="true"] {
+background-color: rgba(0, 0, 0, 150);
+}
+QWidget[device_page="true"] QPushButton[device_page="true"] {
+min-height: 30px;
+max-height: 30px;
+min-width: 80px;
+max-width: 80px;
+}
+
 QPushButton[blue_button=true]{
  background-color: #4a64ff;
  color: #ffffff;
@@ -282,6 +294,7 @@ QPushButton[blue_button=true]{
 QPushButton[blue_button=true]:pressed{ background-color: #2a44df; }
 QPushButton[blue_button=true]:hover{ background-color: #4a34ff; }
 QPushButton[blue_button=true]:disabled { background-color: grey; }
+
 QPushButton[info_button=true]{
  min-height: 40px;
  max-height: 40px;
@@ -290,6 +303,8 @@ QPushButton[info_button=true]{
  background-color: transparent;
  border-radius: 4px;
 }
+
+
 QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
 QLabel[menu_title_label=true]{
  color: white;
