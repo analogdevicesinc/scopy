@@ -11,9 +11,6 @@ public:
 	Task(QObject *parent = nullptr) : QThread(parent) {}
 	virtual ~Task() {};
 	virtual void run() override = 0;
-	virtual void start(QThread::Priority = QThread::InheritPriority) = 0;
-	virtual void stop() = 0;
-
 };
 
 

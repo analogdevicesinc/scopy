@@ -15,9 +15,6 @@ public:
 	~IIOPingTask();
 	virtual void run() override;
 
-	virtual void start(QThread::Priority = QThread::InheritPriority) override;
-	virtual void stop() override;
-
 	static bool ping(iio_context *ctx);
 
 Q_SIGNALS:

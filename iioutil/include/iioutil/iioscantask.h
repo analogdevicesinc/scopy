@@ -16,11 +16,6 @@ public:
 	void setScanParams(QString s);
 	static int scan(QStringList *ctxs, QString scanParams);
 
-
-public Q_SLOT:
-	virtual void start(QThread::Priority = QThread::InheritPriority) override;
-	virtual void stop() override;
-
 Q_SIGNALS:
 	void scanFinished(QStringList);
 
