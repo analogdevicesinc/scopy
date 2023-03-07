@@ -401,6 +401,18 @@ QPushButton[info_button=true]{
 QPushButton[info_button=true]:hover { background-color: rgba(0, 0, 0, 60); }
 #endif
 
+/* Device page specific stylesheets */
+
+QWidget[device_page="true"] {
+	background-color: rgba(0, 0, 0, 150);
+}
+QWidget[device_page="true"] QPushButton[device_page="true"] {
+	min-height: 30px;
+	max-height: 30px;
+	min-width: 80px;
+	max-width: 80px;
+}
+
 /* Menu title label */
 
 QLabel[menu_title_label=true]{

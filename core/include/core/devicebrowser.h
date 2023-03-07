@@ -42,7 +42,7 @@ private Q_SLOTS:
 
 private:
 	void initBtns();
-	DeviceIcon* buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent = nullptr);
+	DeviceIcon* buildDeviceIcon(Device *d, QWidget *parent = nullptr);
 	Ui::DeviceBrowser *ui;
 	QButtonGroup *bg;
 	QHBoxLayout *layout;
