@@ -15,6 +15,7 @@
 #endif
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
+#include "versionchecker.h"
 
 using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
@@ -29,6 +30,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 #endif
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
+//	auto vc = VersionCache::GetInstance();
+//	if(vc->cacheOutdated()) {
+//		vc->updateCache();
+//		connect(vc,&VersionCache::cacheUpdated,this,[=](){
+//			qInfo()<<vc->cache();
+//		});
+//	}
 
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
