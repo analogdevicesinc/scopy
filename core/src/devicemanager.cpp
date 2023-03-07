@@ -199,3 +199,5 @@ void DeviceManager::restartDevice() {
 //	Q_EMIT requestDevice(newId);
 }
 
+
+#include "moc_devicemanager.cpp"

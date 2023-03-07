@@ -41,3 +41,5 @@ DeviceIconImpl::~DeviceIconImpl() {}
 void DeviceIconImpl::paintEvent(QPaintEvent *e) {
 	QWidget::paintEvent(e);
 }
+
+#include "moc_deviceiconimpl.cpp"

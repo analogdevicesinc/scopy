@@ -176,3 +176,5 @@ void BaseMenu::moveItem(short from, short to)
 
 	Q_EMIT itemMovedFromTo(from, to);
 }
+
+#include "moc_basemenu.cpp"

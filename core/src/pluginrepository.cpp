@@ -60,3 +60,5 @@ void PluginRepository::init(QString location)
 
 
 
+
+#include "moc_pluginrepository.cpp"

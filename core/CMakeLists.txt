@@ -35,8 +35,10 @@ endif()
 
 if(ENABLE_SCOPYJS)
     set(SCOPY_QT5_COMPONENTS ${SCOPY_QT5_COMPONENTS} Qml)
-    FILE(GLOB JS_SRC_LIST src/scopyjs/*.cpp src/scopyjs/*.h)
+    set(SCOPY_JS_INCLUDE_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopyjs)
+    FILE(GLOB JS_SRC_LIST src/scopyjs/*.cpp src/scopyjs/*.h)    
     FILE(GLOB JS_HEADER_LIST include/${SCOPY_MODULE}/scopyjs/*.h include/scopyjs/${SCOPY_MODULE}/*.hpp)
+
     message(STATUS "CORE: scopy-js enabled")
     set(SRC_LIST ${SRC_LIST} ${JS_SRC_LIST})
     set(HEADER_LIST ${HEADER_LIST} ${JS_HEADER_LIST})
@@ -62,7 +64,7 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} )
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${SCOPY_JS_INCLUDE_LOCATION})
 target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopypluginbase scopyiioutil)
 
 foreach(comp ${SCOPY_QT5_COMPONENTS})

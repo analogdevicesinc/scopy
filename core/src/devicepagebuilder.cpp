@@ -5,3 +5,5 @@ DevicePageBuilder::DevicePageBuilder(QObject *parent) // creates buttons and sub
 {
 
 }
+
+#include "moc_devicepagebuilder.cpp"
