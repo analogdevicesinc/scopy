@@ -27,11 +27,11 @@ DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObjec
 
 void DeviceImpl::loadCompatiblePlugins()
 {
-	plugins = p->getCompatiblePlugins(m_param,m_category,this);
+	m_plugins = p->getCompatiblePlugins(m_param,m_category,this);
 }
 
 void DeviceImpl::compatiblePreload() {
-	for(auto &p : plugins) {
+	for(auto &p : m_plugins) {
 		p->preload();
 	}
 }
@@ -44,7 +44,7 @@ void DeviceImpl::loadPlugins() {
 	loadPages();
 	loadToolList();
 
-	for(auto &p : plugins) {
+	for(auto &p : m_plugins) {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
@@ -55,8 +55,8 @@ void DeviceImpl::loadPlugins() {
 }
 
 void DeviceImpl::unloadPlugins() {
-	QList<Plugin*>::const_iterator pI = plugins.constEnd();
-	while(pI != plugins.constBegin()) {
+	QList<Plugin*>::const_iterator pI = m_plugins.constEnd();
+	while(pI != m_plugins.constBegin()) {
 		--pI;
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
@@ -65,13 +65,13 @@ void DeviceImpl::unloadPlugins() {
 		(*pI)->unload();
 		delete (*pI);
 	}
-	plugins.clear();
+	m_plugins.clear();
 }
 
 void DeviceImpl::loadName() {
-	if(plugins.count()) {
-		m_name = plugins[0]->displayName();
-		m_description = plugins[0]->displayDescription();
+	if(m_plugins.count()) {
+		m_name = m_plugins[0]->displayName();
+		m_description = m_plugins[0]->displayDescription();
 	} else {
 		m_name = "NO_PLUGIN";
 	}
@@ -83,7 +83,7 @@ void DeviceImpl::loadIcons() {
 	m_icon->setFixedWidth(100);
 	new QHBoxLayout(m_icon);
 
-	for( auto &p : plugins) {
+	for( auto &p : m_plugins) {
 		if(p->loadIcon()) {
 			m_icon->layout()->addWidget(p->icon());
 			return;
@@ -95,30 +95,37 @@ void DeviceImpl::loadIcons() {
 
 void DeviceImpl::loadPages() {
 	m_page = new QWidget();
+	m_page->setProperty("device_page", true);
+	connbtn = new QPushButton("Connect", m_page);
+	discbtn = new QPushButton("Disconnect", m_page);
 	auto m_buttonLayout = new QHBoxLayout();
 	auto m_pagelayout = new QVBoxLayout(m_page);
-	connbtn = new QPushButton("connect", m_page);
+	connbtn->setProperty("device_page",true);
 	connbtn->setProperty("blue_button",true);
 	m_buttonLayout->addWidget(connbtn);
-	discbtn = new QPushButton("disconnect", m_page);
+
+	discbtn->setProperty("device_page",true);
 	discbtn->setProperty("blue_button",true);
 	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
-	connect(connbtn,SIGNAL(clicked()),this,SLOT(connectDev()));
-	connect(discbtn,SIGNAL(clicked()),this,SLOT(disconnectDev()));
+	connect(connbtn,&QPushButton::clicked,this,&DeviceImpl::connectDev);
+	connect(discbtn,&QPushButton::clicked,this,&DeviceImpl::disconnectDev);
+
 	m_pagelayout->addLayout(m_buttonLayout);
 
-	for(auto &&p : plugins) {
+	for(auto &&p : plugins()) {
 		if(p->loadExtraButtons()) {
 			for(auto &&b : p->extraButtons()) {
 				b->setProperty("blue_button", true);
+				b->setProperty("device_page",true);
 				m_buttonLayout->addWidget(b);
 			}
 		}
 	}
+	m_buttonLayout->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding));
 
-	for(auto &&p : plugins) {
+	for(auto &&p : plugins()) {
 		if(p->loadPage()) {
 			m_pagelayout->addWidget(p->page());
 		}
@@ -126,39 +133,45 @@ void DeviceImpl::loadPages() {
 }
 
 void DeviceImpl::loadToolList() {
-	for(auto &&p : plugins) {
+	for(auto &&p : m_plugins) {
 		p->loadToolList();
 	}
 }
 
+QList<Plugin *> DeviceImpl::plugins() const
+{
+	return m_plugins;
+}
+
 void DeviceImpl::showPage() {
-	for(auto &&p : plugins)
+	for(auto &&p : m_plugins)
 		p->showPageCallback();
 
 }
 
 void DeviceImpl::hidePage() {
-	for(auto &&p : plugins)
+	for(auto &&p : m_plugins)
 		p->hidePageCallback();
 
 }
 
 void DeviceImpl::save(QSettings &s) {
-	for(Plugin* p : qAsConst(plugins)) {
+	for(Plugin* p : qAsConst(m_plugins)) {
 		p->saveSettings(s);
 	}
 }
 
 void DeviceImpl::load(QSettings &s) {
-	for(Plugin* p : qAsConst(plugins)) {
+	for(Plugin* p : qAsConst(m_plugins)) {
 		p->loadSettings(s);
 	}
 }
 
 void DeviceImpl::connectDev() {
-	discbtn->show();
 	connbtn->hide();
-	for(auto &&p : plugins) {
+	discbtn->show();
+
+	for(auto &&p : m_plugins) {
 		p->onConnect();
 		p->loadSettings();
 #ifdef ENABLE_SCOPYJS
@@ -170,9 +183,10 @@ void DeviceImpl::connectDev() {
 }
 
 void DeviceImpl::disconnectDev() {
-	discbtn->hide();
 	connbtn->show();
-	for(auto &&p : plugins) {
+	discbtn->hide();
+
+	for(auto &&p : m_plugins) {
 
 #ifdef ENABLE_SCOPYJS
 		if(p->api())
@@ -230,7 +244,7 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 	static int i;
 	QList<ToolMenuEntry*> ret;
 
-	for(auto &&p : plugins) {
+	for(auto &&p : m_plugins) {
 		ret.append(p->toolList());
 	}
 	return ret;
