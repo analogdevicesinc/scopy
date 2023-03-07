@@ -100,3 +100,5 @@ cd->close("ip:192.168.2.1");
 cd->close("ip:192.168.2.1");*/
 
 
+
+#include "moc_contextprovider.cpp"

@@ -64,3 +64,5 @@ void CustomPushButton::setChecked(bool checked)
 		btnGroup->setExclusive(true);
 	}
 }
+
+#include "moc_customPushButton.cpp"

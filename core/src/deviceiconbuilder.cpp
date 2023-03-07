@@ -15,3 +15,5 @@ DeviceIcon* DeviceIconBuilder::build(QString name, QString id, QWidget *icon, QW
 {
 	return new DeviceIconImpl(name, id, icon, parent);
 }
+
+#include "moc_deviceiconbuilder.cpp"

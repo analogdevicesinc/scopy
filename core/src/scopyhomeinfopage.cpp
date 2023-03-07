@@ -12,3 +12,5 @@ ScopyHomeInfoPage::~ScopyHomeInfoPage()
 {
     delete ui;
 }
+
+#include "moc_scopyhomeinfopage.cpp"

@@ -33,3 +33,5 @@ bool IIOPingTask::ping(iio_context *ctx) {
 	}
 	return true;
 }
+
+#include "moc_iiopingtask.cpp"

@@ -77,3 +77,5 @@ QString JsFileIo::readLine(const QString& path, const int lineNumber)
 	}
 	return data;
 }
+
+#include "moc_jsfileio.cpp"
