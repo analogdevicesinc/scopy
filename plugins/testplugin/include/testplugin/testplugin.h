@@ -21,6 +21,7 @@ public:
 	void loadApi() override;
 	void initPreferences() override;
 	void initMetadata() override;
+	void init() override;
 	bool compatible(QString m_param) override;
 	bool loadPreferencesPage() override;
 	bool loadPage() override;
@@ -32,11 +33,13 @@ public:
 
 	bool onConnect() override;
 	bool onDisconnect() override;
+	void cloneExtra(Plugin*) override;
 
 public Q_SLOTS:
 	void messageCallback(QString topic, QString message) override;
 
 private:
+	QString m_initText;
 	QWidget *tool;
 	QLineEdit *edit;
 

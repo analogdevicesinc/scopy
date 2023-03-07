@@ -16,6 +16,7 @@ public:
 	virtual void initMetadata() override;
 	virtual void setMetadata(QJsonObject obj) override;
 	virtual void initPreferences() override;
+	virtual void init() override;
 	virtual void preload() override;
 	virtual void postload() override;
 
@@ -47,6 +48,7 @@ public:
 	virtual QString about() override;
 	virtual QString version() override;
 	virtual void loadMetadata(QString data);
+	virtual void cloneExtra(Plugin*) override;
 
 public Q_SLOTS:
 	virtual void showPageCallback() override;
@@ -84,6 +86,7 @@ public:\
 		ret->m_name = xstr(SCOPY_PLUGIN_NAME);\
 		ret->m_displayName = ret->m_name;\
 		ret->setMetadata(metadata()); \
+		ret->cloneExtra(this);\
 		return ret;\
 	}\
 \

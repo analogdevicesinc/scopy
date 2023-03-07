@@ -153,6 +153,16 @@ void PluginBase::initPreferences()
 
 }
 
+void PluginBase::init()
+{
+
+}
+
+void PluginBase::cloneExtra(Plugin *)
+{
+
+}
+
 void PluginBase::initMetadata() {
 	loadMetadata(
 
