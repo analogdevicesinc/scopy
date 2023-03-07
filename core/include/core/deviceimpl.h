@@ -33,7 +33,8 @@ public:
 	virtual void compatiblePreload() override;
 	virtual void loadPlugins() override;
 	virtual void unloadPlugins() override;
-	void getPlugins();
+
+	QList<Plugin *> plugins() const;
 
 public Q_SLOTS:
 	virtual void connectDev() override;
@@ -57,7 +58,7 @@ protected:
 
 protected:
 	PluginManager *p;
-	QList<Plugin*> plugins;
+	QList<Plugin*> m_plugins;
 	QString m_id;
 	QString m_category;
 	QString m_description;
@@ -65,8 +66,7 @@ protected:
 	QString m_name;
 	QWidget *m_icon;
 	QWidget *m_page;
-	QPushButton *connbtn;
-	QPushButton *discbtn;
+	QPushButton *connbtn,*discbtn;
 
 };
 }

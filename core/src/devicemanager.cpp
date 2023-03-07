@@ -30,7 +30,7 @@ Device* DeviceManager::getDevice(QString id) {
 
 QString DeviceManager::addDevice(QString category, QString param)
 {	
-	static bool threaded = true;
+	static bool threaded = false;
 
 	qInfo(CAT_DEVICEMANAGER) <<category<< "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
