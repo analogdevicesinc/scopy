@@ -41,6 +41,22 @@ ScopyJS* ScopyJS::pinstance_{nullptr};
 ScopyJS::ScopyJS(QObject *parent) : QObject(parent) {
 }
 
+ScopyJS::~ScopyJS()
+{
+
+}
+
+ScopyJS *ScopyJS::GetInstance()
+{
+	if (pinstance_ == nullptr)
+	{
+		pinstance_ = new ScopyJS(QApplication::instance()); // singleton has the app as parent
+		pinstance_->init();
+	}
+	return pinstance_;
+}
+
+
 void ScopyJS::init() {
 	QJSValue js_obj = m_engine.newQObject(this);
 	auto meta = metaObject();
@@ -65,21 +81,6 @@ void ScopyJS::init() {
 		notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
 		connect(notifier, SIGNAL(activated(int)), this, SLOT(hasText()));
 	}
-}
-
-ScopyJS::~ScopyJS()
-{
-
-}
-
-ScopyJS *ScopyJS::GetInstance()
-{
-	if (pinstance_ == nullptr)
-	{
-		pinstance_ = new ScopyJS(QApplication::instance()); // singleton has the app as parent
-		pinstance_->init();
-	}
-	return pinstance_;
 }
 
 void ScopyJS::exit()
