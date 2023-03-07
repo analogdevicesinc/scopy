@@ -64,7 +64,7 @@ void DeviceBrowser::addDevice(QString id, Device *d,int position)
 
 
 	qInfo(CAT_DEVBROWSER)<<"adding device " << id;
-	auto w = dynamic_cast<QAbstractButton*>(buildDeviceIcon(name, description, icon, this));
+	auto w = dynamic_cast<QAbstractButton*>(buildDeviceIcon(d, this));
 	w->setProperty(devBrowserId,id);
 	layout->insertWidget(position,w);
 	bg->addButton(w);
@@ -174,8 +174,8 @@ void DeviceBrowser::disconnectDevice(QString id) {
 	w->setConnected(false);
 }
 
-DeviceIcon* DeviceBrowser::buildDeviceIcon(QString name, QString description, QWidget *icon, QWidget *parent) {
-	return new DeviceIconImpl(name, description, icon, parent);
+DeviceIcon* DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent) {
+	return new DeviceIconImpl(d, parent);
 }
 
 /*

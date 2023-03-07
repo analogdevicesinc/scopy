@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QAbstractButton>
 #include <deviceicon.h>
+#include "device.h"
 #include "scopycore_export.h"
 
 namespace Ui {
@@ -15,7 +16,7 @@ class SCOPYCORE_EXPORT DeviceIconImpl : public DeviceIcon
 {
 	Q_OBJECT
 public:
-	explicit DeviceIconImpl(QString name, QString description, QWidget *icon, QWidget *parent);
+	explicit DeviceIconImpl(Device *d, QWidget *parent);
 	~DeviceIconImpl();
 	virtual void paintEvent(QPaintEvent *e) override;
 public Q_SLOTS:
