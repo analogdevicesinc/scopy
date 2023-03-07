@@ -2,7 +2,6 @@
 #define SWIOTPLUGIN_H
 
 #define SCOPY_PLUGIN_NAME SWIOTPlugin
-#define SCOPY_PLUGIN_PRIO 100
 
 #include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"

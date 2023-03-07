@@ -2,7 +2,6 @@
 #define TESTPLUGIN_H
 
 #define SCOPY_PLUGIN_NAME TestPlugin
-#define SCOPY_PLUGIN_PRIO 1
 
 #include <QObject>
 #include <pluginbase/plugin.h>

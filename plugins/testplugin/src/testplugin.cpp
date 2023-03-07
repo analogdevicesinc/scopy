@@ -124,7 +124,9 @@ bool TestPlugin::onDisconnect()
 void TestPlugin::cloneExtra(Plugin *p)
 {
 	static int i = 0;
+
 	m_initText = dynamic_cast<TestPlugin*>(p)->m_initText;
+
 	m_initText += " Cloned from original " +QString::number(i)+" times";
 	i++;
 }
