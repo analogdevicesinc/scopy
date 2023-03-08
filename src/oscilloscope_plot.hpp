@@ -134,6 +134,7 @@ namespace adiscope {
 		// Get the curve at the given point. May return nullptr.
 		GenericLogicPlotCurve* curveAt(const QPoint& pos) const;
 
+		void setAllAxes(int ch_id);
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);

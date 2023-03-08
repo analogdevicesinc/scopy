@@ -463,6 +463,14 @@ void CapturePlot::enableTimeTrigger(bool enable)
 	d_timeTriggerHandle->setVisible(enable);
 }
 
+void CapturePlot::setAllAxes(int ch_id)
+{
+	QwtAxisId fixed_axis = d_offsetBars.at(ch_id)->fixedAxis();
+	QwtAxisId mobile_axis = d_offsetBars.at(ch_id)->mobileAxis();
+
+	DisplayPlot::setCursorAxes(fixed_axis, mobile_axis);
+}
+
 void CapturePlot::onVCursor1Moved(double value)
 {
 	QString text;
@@ -524,6 +532,8 @@ void CapturePlot::onHCursor1Moved(double value)
 		if (value == ERROR_VALUE) {
 			error = true;
 		}
+
+		if (dynamic_cast<HorizBar*>(sender()) != nullptr) return;
 	}
 
 	value *= d_displayScale;
@@ -556,6 +566,8 @@ void CapturePlot::onHCursor2Moved(double value)
 		if (value == ERROR_VALUE) {
 			error = true;
 		}
+
+		if (dynamic_cast<HorizBar*>(sender()) != nullptr) return;
 	}
 
 	value *= d_displayScale;
@@ -1763,6 +1775,13 @@ void CapturePlot::onChannelAdded(int chnIdx)
 
 				Q_EMIT channelOffsetChanged(chn_id, offset);
 			}
+	});
+
+	connect(chOffsetHdl, &RoundedHandleV::grabbedChanged, [=](bool selected){
+		if (selected) {
+			Q_EMIT channelSelected(d_offsetHandles.indexOf(chOffsetHdl), selected);
+
+		}
 	});
 
 	connect(chOffsetHdl, &RoundedHandleV::reset, [=](){

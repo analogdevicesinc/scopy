@@ -730,6 +730,20 @@ QWidget* DisplayPlot::getPlotwithElements()
 	return widget;
 }
 
+void DisplayPlot::setCursorAxes(QwtAxisId fixed_axis, QwtAxisId mobile_axis)
+{
+	d_vBar1->setMobileAxis(fixed_axis);
+	d_vBar1->setFixedAxis(mobile_axis);
+
+	d_vBar2->setMobileAxis(fixed_axis);
+	d_vBar2->setFixedAxis(mobile_axis);
+
+	d_hBar1->setMobileAxis(mobile_axis);
+	d_hBar1->setFixedAxis(fixed_axis);
+
+	d_hBar2->setMobileAxis(mobile_axis);
+	d_hBar2->setFixedAxis(fixed_axis);
+}
 
 void DisplayPlot::setupCursors() {
 
