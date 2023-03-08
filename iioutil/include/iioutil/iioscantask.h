@@ -3,10 +3,13 @@
 
 #include <QThread>
 #include "scopyiioutil_export.h"
-#include "task.h"
 
 namespace adiscope {
-class SCOPYIIOUTIL_EXPORT IIOScanTask : public Task {
+/**
+ * @brief The IIOScanTask class
+ * IIOScanTask - scans for IIO context and emits a scanFinished signal
+ */
+class SCOPYIIOUTIL_EXPORT IIOScanTask : public QThread {
 	Q_OBJECT
 public:
 	IIOScanTask(QObject *parent);

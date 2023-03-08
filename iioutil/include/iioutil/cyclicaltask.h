@@ -5,17 +5,19 @@
 #include <QTimer>
 #include <QThread>
 #include <iio.h>
-#include "task.h"
 #include "scopyiioutil_export.h"
 #include <QLoggingCategory>
 
 namespace adiscope {
-
+/**
+ * @brief The CyclicalTask class
+ * Implements a way to cyclically call QThreads
+ */
 class SCOPYIIOUTIL_EXPORT CyclicalTask : public QObject
 {
 	Q_OBJECT
 public:
-	CyclicalTask(Task *task, QObject *parent = nullptr);
+	CyclicalTask(QThread *task, QObject *parent = nullptr);
 	~CyclicalTask();
 	void start(int period = 5000);
 	void stop();
@@ -25,7 +27,7 @@ private Q_SLOTS:
 private:
 	QTimer *t;
 	bool enabled = false;
-	Task* task;
+	QThread* task;
 	const int THREAD_FINISH_TIMEOUT = 30000;
 };
 }

@@ -6,6 +6,11 @@
 #include "scopypluginbase_export.h"
 
 namespace adiscope {
+/**
+ * @brief The ToolMenuEntry class
+ * Class used by plugin and scopy to populate the tool menu
+ * SCOPY_NEW_TOOLMENUENTRY macro can be used to instantiate ToolMenuEntry objects
+ */
 class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
@@ -23,16 +28,60 @@ public:
 	bool runBtnVisible() { return m_runBtnVisible; }
 	QWidget *tool() { return m_tool; }
 
+	/**
+	 * @brief setName
+	 * @param newName
+	 * Set tool menu entry name
+	 */
 	void setName(const QString &newName);
+	/**
+	 * @brief setIcon
+	 * @param newIcon
+	 * Set tool menu entry icon
+	 */
 	void setIcon(const QString &newIcon);
+	/**
+	 * @brief setVisible
+	 * @param newVisible
+	 * Makes the menu entry visible
+	 */
 	void setVisible(bool newVisible);
+	/**
+	 * @brief setEnabled
+	 * @param newEnabled
+	 * Enables the toolmenuentry - makes the menu entry clickable
+	 */
 	void setEnabled(bool newEnabled);
+	/**
+	 * @brief setRunning
+	 * @param newRunning
+	 * Sets the tool in run state
+	 */
 	void setRunning(bool newRunning);
+	/**
+	 * @brief setRunBtnVisible
+	 * @param newRunBtnVisible
+	 * Set run button visible on/off
+	 */
 	void setRunBtnVisible(bool newRunBtnVisible);
+
+	/**
+	 * @brief setTool
+	 * @param newTool
+	 * links a widget to the tool menu entry. Remove tool from the menu entry by setting newtool to nullptr
+	 */
 	void setTool(QWidget *newTool);
 
 Q_SIGNALS:
+	/**
+	 * @brief updateToolEntry
+	 * signal is emitted automatically when modifying anything about the tool entry
+	 */
 	void updateToolEntry();
+	/**
+	 * @brief updateTool
+	 * signal is emitted automatically when changing a tool linked to the tool entry
+	 */
 	void updateTool();
 
 private:
