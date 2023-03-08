@@ -26,6 +26,7 @@ public:
 	virtual bool loadPreferencesPage() = 0;
 	virtual bool loadExtraButtons() = 0;
 	virtual void init() = 0;
+	virtual void deinit() = 0;
 	virtual void initMetadata() = 0;
 	virtual void setMetadata(QJsonObject obj) = 0;
 
