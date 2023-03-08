@@ -8,7 +8,7 @@
 using namespace adiscope;
 ScopyAboutPage::ScopyAboutPage(QWidget *parent) : QTabWidget(parent)
 {
-	setTabPosition(TabPosition::West);
+	setTabPosition(TabPosition::East);
 	addHorizontalTab(buildPage(QUrl("qrc:/about.html")),"Scopy");
 }
 
@@ -39,7 +39,7 @@ void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) {
 	QLabel *lbl1 = new QLabel();
 	lbl1->setText(text);
 	QTabBar *tabbar = tabBar();
-	tabbar->setTabButton(tabbar->count() - 1, QTabBar::LeftSide, lbl1);
+	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
 
 }
 
