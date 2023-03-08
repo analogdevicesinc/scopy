@@ -248,6 +248,7 @@ namespace adiscope {
 		void disableMixedSignalView();
 		void setDigitalPlotCurvesParams();
 
+		void selectChannel(int index, bool checked);
 	public Q_SLOTS:
 		void requestAutoset();
 		void enableLabels(bool);

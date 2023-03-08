@@ -237,6 +237,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 			SLOT(onChannelWidgetEnabled(bool)));
 		connect(ch_widget, SIGNAL(selected(bool)),
 			SLOT(onChannelWidgetSelected(bool)));
+		connect(&plot, SIGNAL(channelSelected(int, bool)),
+			this, SLOT(selectChannel(int, bool)));
 		connect(ch_widget, SIGNAL(menuToggled(bool)),
 			SLOT(onChannelWidgetMenuToggled(bool)));
 
@@ -3398,6 +3400,16 @@ void adiscope::Oscilloscope::onChannelWidgetEnabled(bool en)
 	}
 }
 
+void adiscope::Oscilloscope::selectChannel(int index, bool checked)
+{
+	for (int i = 0; i < ui->channelsList->count(); i++) {
+		auto cw = dynamic_cast<ChannelWidget*>(ui->channelsList->itemAt(i)->widget());
+		if (cw != nullptr) {
+			cw->nameButton()->setChecked(i == index);
+		}
+	}
+}
+
 void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 {
 	if (!checked) {
@@ -3417,6 +3429,7 @@ void adiscope::Oscilloscope::onChannelWidgetSelected(bool checked)
 		plot.bringCurveToFront(id);
 		plot.setActiveVertAxis(id);
 		plot.setDisplayScale(probe_attenuation[id]);
+		plot.setAllAxes(current_channel);
 	}
 
 	if (plot.measurementsEnabled()) {

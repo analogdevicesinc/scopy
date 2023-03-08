@@ -143,6 +143,21 @@ void Symbol::setMobileAxis(QwtAxisId newAxis)
 	}
 }
 
+void Symbol::setFixedAxis(QwtAxisId newAxis)
+{
+	if (d_fixedAxis != newAxis) {
+		const QwtScaleWidget *fAxis = plot()->axisWidget(d_fixedAxis);
+		disconnect((const QObject *)fAxis, SIGNAL(scaleDivChanged()),
+			this, SLOT(onFixedScaleChanged()));
+
+		d_fixedAxis = newAxis;
+		fAxis = plot()->axisWidget(newAxis);
+		connect((const QObject *)fAxis, SIGNAL(scaleDivChanged()),
+			this, SLOT(onFixedScaleChanged()));
+		onFixedScaleChanged();
+	}
+}
+
 void Symbol::setStepSize(double step)
 {
 	d_stepSize = step;

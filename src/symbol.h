@@ -80,6 +80,7 @@ public:
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY) = 0;
 
 	void triggerMove();
+	void setFixedAxis(QwtAxisId newAxis);
 Q_SIGNALS:
 	void positionChanged(double x, double y);
 	void pixelPositionChanged(int x, int y);
