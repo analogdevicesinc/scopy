@@ -158,6 +158,11 @@ void PluginBase::init()
 
 }
 
+void PluginBase::deinit()
+{
+
+}
+
 void PluginBase::cloneExtra(Plugin *)
 {
 
