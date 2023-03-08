@@ -3,7 +3,7 @@
 #include <QLoggingCategory>
 
 using namespace adiscope;
-IIOScanTask::IIOScanTask(QObject *parent) : Task(parent) {}
+IIOScanTask::IIOScanTask(QObject *parent) : QThread(parent) {}
 
 IIOScanTask::~IIOScanTask() {}
 

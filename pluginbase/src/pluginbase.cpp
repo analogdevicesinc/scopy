@@ -52,26 +52,26 @@ bool PluginBase::loadExtraButtons()
 
 void PluginBase::saveSettings()
 {
-	if(pluginApi)
-		pluginApi->save();
+	if(m_pluginApi)
+		m_pluginApi->save();
 }
 
 void PluginBase::loadSettings()
 {
-	if(pluginApi)
-		pluginApi->load();
+	if(m_pluginApi)
+		m_pluginApi->load();
 }
 
 void PluginBase::saveSettings(QSettings& s)
 {
-	if(pluginApi)
-		pluginApi->save(s);
+	if(m_pluginApi)
+		m_pluginApi->save(s);
 }
 
 void PluginBase::loadSettings(QSettings& s)
 {
-	if(pluginApi)
-		pluginApi->load(s);
+	if(m_pluginApi)
+		m_pluginApi->load(s);
 }
 
 void PluginBase::messageCallback(QString topic, QString message)
@@ -81,7 +81,7 @@ void PluginBase::messageCallback(QString topic, QString message)
 
 ApiObject *PluginBase::api()
 {
-	return pluginApi;
+	return m_pluginApi;
 }
 
 QString PluginBase::param() {
