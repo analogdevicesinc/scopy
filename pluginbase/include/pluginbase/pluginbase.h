@@ -17,6 +17,7 @@ public:
 	virtual void setMetadata(QJsonObject obj) override;
 	virtual void initPreferences() override;
 	virtual void init() override;
+	virtual void deinit() override;
 	virtual void preload() override;
 	virtual void postload() override;
 
