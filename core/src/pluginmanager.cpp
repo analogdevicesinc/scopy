@@ -32,7 +32,11 @@ PluginManager::PluginManager(QObject *parent) : QObject(parent)
 
 }
 
-PluginManager::~PluginManager() {}
+PluginManager::~PluginManager() {
+	for(Plugin *p : qAsConst(list)) {
+		p->deinit();
+	}
+}
 
 void PluginManager::add(QStringList pluginFileList)
 {
@@ -51,6 +55,9 @@ void PluginManager::add(QString pluginFileName)
 		p->initMetadata();
 		applyMetadata(p, &m_metadata);
 		p->init();
+		QObject *obj = dynamic_cast<QObject*>(p);
+		if(obj)
+			obj->setParent(this);
 	}
 }
 
