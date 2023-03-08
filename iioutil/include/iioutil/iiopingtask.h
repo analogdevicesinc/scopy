@@ -4,11 +4,13 @@
 #include <QThread>
 #include <iio.h>
 #include "scopyiioutil_export.h"
-#include "task.h"
 
 namespace adiscope {
-
-class SCOPYIIOUTIL_EXPORT IIOPingTask : public Task {
+/**
+ * @brief The IIOPingTask class
+ * IIOPingTask verifies IIO connection and emits pingSuccess/pingFailed
+ */
+class SCOPYIIOUTIL_EXPORT IIOPingTask : public QThread {
 	Q_OBJECT
 public:
 	IIOPingTask(iio_context *c, QObject *parent = nullptr);

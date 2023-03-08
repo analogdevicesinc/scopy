@@ -7,6 +7,10 @@
 
 
 namespace adiscope {
+/**
+ * @brief The PluginBase class
+ * PluginBase is used to provide default implementation to the plugin interface
+ */
 class SCOPYPLUGINBASE_EXPORT PluginBase : public Plugin {
 
 public:
@@ -56,8 +60,6 @@ public Q_SLOTS:
 	virtual void hidePageCallback() override;
 	virtual void messageCallback(QString topic, QString message) override;
 
-
-
 protected:
 	QString m_param;
 	QString m_name;
@@ -69,7 +71,7 @@ protected:
 	QList<ToolMenuEntry*> m_toolList;
 	QList<QAbstractButton*> m_extraButtons;
 	QJsonObject m_metadata;
-	ApiObject* pluginApi = nullptr;
+	ApiObject* m_pluginApi = nullptr;
 };
 }
 

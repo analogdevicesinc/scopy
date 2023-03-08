@@ -2,7 +2,7 @@
 #include <QDebug>
 
 using namespace adiscope;
-IIOPingTask::IIOPingTask(iio_context *c ,QObject *parent) : Task(parent), c(c) {}
+IIOPingTask::IIOPingTask(iio_context *c ,QObject *parent) : QThread(parent), c(c) {}
 
 IIOPingTask::~IIOPingTask() {}
 

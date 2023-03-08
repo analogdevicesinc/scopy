@@ -1,6 +1,4 @@
 #include "cyclicaltask.h"
-#include "task.h"
-
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QElapsedTimer>
@@ -9,7 +7,7 @@
 Q_LOGGING_CATEGORY(CAT_CYCLICALTASK, "CyclicalTask")
 
 using namespace adiscope;
-CyclicalTask::CyclicalTask(Task *task, QObject *parent) : QObject(parent)
+CyclicalTask::CyclicalTask(QThread *task, QObject *parent) : QObject(parent)
 {
 	qDebug(CAT_CYCLICALTASK)<< "ctor ";
 	t = new QTimer(this);
