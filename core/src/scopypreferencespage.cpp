@@ -8,7 +8,7 @@
 using namespace adiscope;
 ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent) : QTabWidget(parent)
 {
-	setTabPosition(TabPosition::West);
+	setTabPosition(TabPosition::East);
 }
 
 void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
@@ -17,7 +17,7 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
 	QLabel *lbl1 = new QLabel();
 	lbl1->setText(text);
 	QTabBar *tabbar = tabBar();
-	tabbar->setTabButton(tabbar->count() - 1, QTabBar::LeftSide, lbl1);
+	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
 
 }
 

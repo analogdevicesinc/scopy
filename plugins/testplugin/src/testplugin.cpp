@@ -44,6 +44,7 @@ bool TestPlugin::loadPreferencesPage()
 	lay->addWidget(pref2);
 	lay->addWidget(pref3);
 	lay->addWidget(pref4);
+	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
 	return true;
 }
@@ -163,8 +164,8 @@ void TestPlugin::init()
 }
 
 void TestPlugin::loadApi(){
-	pluginApi = new TestPlugin_API(this);
-	pluginApi->setObjectName(m_name);
+	m_pluginApi = new TestPlugin_API(this);
+	m_pluginApi->setObjectName(m_name);
 }
 
 QString TestPlugin::version() {
