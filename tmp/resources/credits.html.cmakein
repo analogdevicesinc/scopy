@@ -1,0 +1,234 @@
+<body>
+<p>Scopy includes or is linked to a number of open source libraries, released under their own licenses.</p>
+
+<p>
+<style>
+table, th, td {
+  border: 1px solid white;
+  border-collapse: collapse;
+  padding: 6px; 
+  text-align:center; 
+}
+</style>
+
+<p>&nbsp;</p>
+<table>
+<tbody>
+<tr>
+<th>Project</th>
+<th>License</th>
+<th>Homepage</th>
+</tr>
+<tr>
+<td>Boost</td>
+<td><a href="https://www.boost.org/users/license.html">License</a></td>
+<td><a href="https://www.boost.org">Homepage</a></td>
+</tr>
+<tr>
+<td>Qt</td>
+<td><a href="https://doc.qt.io/qt-5/licensing.html">License</a></td>
+<td><a href="https://www.qt.io">Homepage</a></td>
+</tr>
+<tr>
+<td>Qwt</td>
+<td><a href="https://qwt.sourceforge.io/qwtlicense.html">License</a></td>
+<td><a href="https://qwt.sourceforge.io">Homepage</a></td>
+</tr>
+<tr>
+<td>QwtPolar</td>
+<td><a href="https://qwtpolar.sourceforge.io/qwtlicense.html">License</a></td>
+<td><a href="https://qwtpolar.sourceforge.io">Homepage</a></td>
+</tr>
+<tr>
+<td>GNURadio</td>
+<td><a href="https://github.com/gnuradio/gnuradio/blob/master/COPYING">License</a></td>
+<td><a href="https://www.gnuradio.org">Homepage</a></td>
+</tr>
+<tr>
+<td>libsigrokdecode</td>
+<td><a href="https://github.com/sigrokproject/libsigrokdecode/blob/master/COPYING">License</a></td>
+<td><a href="https://sigrok.org">Homepage</a></td>
+</tr>
+<tr>
+<td>PulseView</td>
+<td><a href="https://github.com/sigrokproject/pulseview/blob/master/COPYING">License</a></td>
+<td><a href="https://sigrok.org">Homepage</a></td>
+</tr>
+<tr>
+<td>glib</td>
+<td><a href="https://github.com/GNOME/glib/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/GNOME/glib">Homepage</a></td>
+</tr>
+<tr>
+<td>glibmm</td>
+<td><a href="https://github.com/GNOME/glibmm/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/GNOME/glibmm">Homepage</a></td>
+</tr>
+<tr>
+<td>libsigc++</td>
+<td><a href="https://github.com/libsigcplusplus/libsigcplusplus/blob/master/COPYING">License</a></td>
+<td><a href="https://libsigcplusplus.github.io/libsigcplusplus">Homepage</a></td>
+</tr>
+<tr>
+<td>matio</td>
+<td><a href="https://github.com/telehan/libmatio/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/telehan/libmatio">Homepage</a></td>
+</tr>
+<tr>
+<td>Python</td>
+<td><a href="https://docs.python.org/3/license.html">License</a></td>
+<td><a href="https://www.python.org">Homepage</a></td>
+</tr>
+<tr>
+<td>flatpak</td>
+<td><a href="https://github.com/flatpak/flatpak/blob/master/COPYING">License</a></td>
+<td><a href="https://flatpak.org">Homepage</a></td>
+</tr>
+<tr>
+<td>InnoSetup</td>
+<td><a href="https://jrsoftware.org/files/is/license.txt">License</a></td>
+<td><a href="https://jrsoftware.org/isinfo.php">Homepage</a></td>
+</tr>
+<tr>
+<td>log4cpp</td>
+<td><a href="http://log4cpp.sourceforge.net/#license">License</a></td>
+<td>&nbsp;<a href="http://log4cpp.sourceforge.net">Homepage</a></td>
+</tr>
+<tr>
+<td>libvolk</td>
+<td><a href="https://github.com/gnuradio/volk/blob/master/COPYING">License</a></td>
+<td><a href="https://www.libvolk.org">Homepage</a></td>
+</tr>
+<tr>
+<td>fftw</td>
+<td><a href="http://www.fftw.org/doc/License-and-Copyright.html">License</a></td>
+<td><a href="http://www.fftw.org">Homepage</a></td>
+</tr>
+<tr>
+<td>gmplib</td>
+<td><a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html">License</a></td>
+<td><a href="https://gmplib.org">Homepage</a></td>
+</tr>
+<tr>
+<td>gettext</td>
+<td><a href="https://www.gnu.org/software/gettext/manual/html_node/Licenses.html">License</a></td>
+<td><a href="https://www.gnu.org/software/gettext/gettext.html">Homepage</a></td>
+</tr>
+<tr>
+<td>pcre</td>
+<td><a href="https://www.pcre.org/licence.txt">License</a></td>
+<td><a href="https://www.pcre.org">Homepage</a></td>
+</tr>
+<tr>
+<td>libiconv</td>
+<td><a>License</a></td>
+<td><a href="https://www.gnu.org/software/libiconv">Homepage</a></td>
+</tr>
+<tr>
+<td>icu</td>
+<td><a href="http://www.unicode.org/copyright.html#License">License</a></td>
+<td><a href="http://site.icu-project.org/home">Homepage</a></td>
+</tr>
+<tr>
+<td>zlib</td>
+<td><a href="https://zlib.net/zlib_license.html">License</a></td>
+<td><a href="https://zlib.net">Homepage</a></td>
+</tr>
+<tr>
+<td>zstd</td>
+<td><a href="https://github.com/facebook/zstd/blob/dev/COPYING">License</a></td>
+<td><a href="https://facebook.github.io/zstd">Homepage</a></td>
+</tr>
+<tr>
+<td>harfbuzz</td>
+<td><a href="https://github.com/harfbuzz/harfbuzz/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/harfbuzz/harfbuzz">Homepage</a></td>
+</tr>
+<tr>
+<td>libpng</td>
+<td><a href="http://www.libpng.org/pub/png/src/libpng-LICENSE.txt">License</a></td>
+<td><a href="http://www.libpng.org/pub/png/libpng.html">Homepage</a></td>
+</tr>
+<tr>
+<td>liborc</td>
+<td><a href="https://cgit.freedesktop.org/gstreamer/orc/tree/COPYING">License</a></td>
+<td><a href="https://cgit.freedesktop.org/gstreamer/orc">Homepage</a></td>
+</tr>
+<tr>
+<td>freetype</td>
+<td><a href="https://git.savannah.gnu.org/cgit/freetype/freetype2.git/tree/docs/FTL.TXT">License</a></td>
+<td><a href="https://www.freetype.org">Homepage</a></td>
+</tr>
+<tr>
+<td>graphite</td>
+<td><a href="https://github.com/silnrsi/graphite/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/silnrsi/graphite">Homepage</a></td>
+</tr>
+<tr>
+<td>brotli</td>
+<td><a href="https://github.com/google/brotli/blob/master/LICENSE">License</a></td>
+<td><a href="https://github.com/google/brotli">Homepage</a></td>
+</tr>
+<tr>
+<td>libbz2</td>
+<td><a>License</a></td>
+<td><a href="http://www.bzip.org">Homepage</a></td>
+</tr>
+<tr>
+<td>Breakpad</td>
+<td><a href="https://github.com/google/breakpad/blob/master/LICENSE">License</a></td>
+<td><a href="https://github.com/google/breakpad">Homepage</a></td>
+</tr>
+<tr>
+<td>doxygen</td>
+<td><a href="https://github.com/doxygen/doxygen/blob/master/LICENSE">License</a></td>
+<td><a href="https://www.doxygen.nl/index.html">Homepage</a></td>
+</tr>
+<tr>
+<td>libiio&nbsp;</td>
+<td><a href="https://github.com/analogdevicesinc/libiio/blob/master/COPYING.txt">License</a></td>
+<td><a href="https://github.com/analogdevicesinc/libiio">Homepage</a></td>
+</tr>
+<tr>
+<td>gtk</td>
+<td><a href="https://gitlab.gnome.org/GNOME/gtk/-/blob/master/COPYING">License</td>
+<td><a href="https://www.gtk.org/">Homepage</td>
+</tr>
+<tr>
+<td>avahi</td>
+<td><a href="https://github.com/lathiat/avahi/blob/master/LICENSE">License</td>
+<td><a href="http://avahi.org/">Homepage</td>
+</tr>
+<tr>
+<td>libusb</td>
+<td><a href="https://github.com/libusb/libusb/blob/master/COPYING">License</a></td>
+<td><a href="https://libusb.info">Homepage</a></td>
+</tr>
+<tr>
+<td>libxml2</td>
+<td><a href="https://opensource.org/licenses/mit-license.html">License</a></td>
+<td><a href="http://www.xmlsoft.org">Homepage</a></td>
+</tr>
+<tr>
+<td>libm2k</td>
+<td><a href="https://github.com/analogdevicesinc/libm2k/blob/master/LICENSE">License</a></td>
+<td><a href="https://github.com/analogdevicesinc/libm2k">Homepage</a></td>
+</tr>
+<tr>
+<td>gr-iio</td>
+<td><a href="https://github.com/analogdevicesinc/gr-iio/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/analogdevicesinc/gr-iio">Homepage</a></td>
+</tr>
+<tr>
+<td>gr-m2k</td>
+<td><a href="https://github.com/analogdevicesinc/gr-m2k/blob/master/COPYING">License</a></td>
+<td><a href="https://github.com/analogdevicesinc/gr-m2k">Homepage</a></td>
+</tr>
+<tr>
+<td>sshpass</td>
+<td><a href="https://sourceforge.net/p/sshpass/code/HEAD/tree/trunk/COPYING">License</a></td>
+<td><a href="http://sshpass.sourceforge.net">Homepage</a></td>
+</tr>
+</tbody>
+</table>
+</body>
