@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QLoggingCategory>
 #include <QElapsedTimer>
-#include <QtConcurrent/QtConcurrent>
 
 Q_LOGGING_CATEGORY(CAT_CYCLICALTASK, "CyclicalTask")
 

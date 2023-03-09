@@ -4,7 +4,7 @@ function(SETUP_TESTS)
     foreach(_testname ${ARGS})
         add_executable(_testname ${ARGS})
         add_test(NAME ${_testname} COMMAND ${_testname})
-        target_link_libraries(${_testname} Qt5::Test QWAMLib)
+	target_link_libraries(${_testname} Qt${QT_VERSION_MAJOR}::Test)
     endforeach()
 endfunction()
 
@@ -15,7 +15,7 @@ set(CMAKE_AUTOMOC ON)
 # to always look for includes there:
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt5Test REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR}Test REQUIRED)
 
 SETUP_TESTS(
     tst_test1
