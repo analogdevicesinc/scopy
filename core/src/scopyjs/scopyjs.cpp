@@ -20,7 +20,6 @@
 
 #include "scopyjs/scopyjs.h"
 #include "scopyjs/jsfileio.h"
-#include "QtConcurrent/qtconcurrentrun.h"
 #include <unistd.h>
 
 #include <QApplication>
@@ -157,7 +156,7 @@ QString ScopyJS::readFromConsole(const QString& request)
 		input = watcher.result();
 		done = true;
 	});
-	future = QtConcurrent::run(this, &ScopyJS::readInput);
+	future = QtConcurrent::run(std::bind(&ScopyJS::readInput,this));
 	watcher.setFuture(future);
 
 	do {

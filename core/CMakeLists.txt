@@ -21,7 +21,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-set(SCOPY_QT5_COMPONENTS Core Widgets Concurrent)
+set(SCOPY_QT_COMPONENTS Core Widgets Concurrent)
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
@@ -34,7 +34,7 @@ if(ENABLE_TESTING)
 endif()
 
 if(ENABLE_SCOPYJS)
-    set(SCOPY_QT5_COMPONENTS ${SCOPY_QT5_COMPONENTS} Qml)
+    set(SCOPY_QT_COMPONENTS ${SCOPY_QT_COMPONENTS} Qml)
     set(SCOPY_JS_INCLUDE_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopyjs)
     FILE(GLOB JS_SRC_LIST src/scopyjs/*.cpp src/scopyjs/*.h)    
     FILE(GLOB JS_HEADER_LIST include/${SCOPY_MODULE}/scopyjs/*.h include/scopyjs/${SCOPY_MODULE}/*.hpp)
@@ -54,7 +54,7 @@ set(PROJECT_SOURCES
         ${UI_LIST}
 )
 
-find_package(Qt5 COMPONENTS ${SCOPY_QT5_COMPONENTS} REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
@@ -67,11 +67,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${SCOPY_JS_INCLUDE_LOCATION})
 target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopypluginbase scopyiioutil)
 
-foreach(comp ${SCOPY_QT5_COMPONENTS})
-    set(SCOPY_QT5_LIBRARIES ${SCOPY_QT5_LIBRARIES} Qt5::${comp})
+foreach(comp ${SCOPY_QT_COMPONENTS})
+    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT5_LIBRARIES} scopygui scopypluginbase scopyiioutil )
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopygui scopypluginbase scopyiioutil )
 
 
 

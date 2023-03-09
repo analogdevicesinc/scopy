@@ -45,6 +45,7 @@
 #include <algorithm>
 #include <QDebug>
 #include <QSizePolicy>
+#include <QFile>
 
 void Util::retainWidgetSizeWhenHidden(QWidget *w, bool retain)
 {

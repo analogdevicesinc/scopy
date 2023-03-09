@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.9)
-set(SCOPY_MODULE gui)
+
+set(SCOPY_MODULE m2kplugin)
+
+message(STATUS "building plugin: " ${SCOPY_MODULE})
+
 project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
@@ -24,6 +28,7 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
+set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
@@ -34,15 +39,28 @@ set(PROJECT_SOURCES
         ${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_MAJOR_VERSION}  COMPONENTS Widgets Core REQUIRED)
 
-message(STATUS "Building scopy-gui")
+
+if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
+endif()
+
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
+    ${PROJECT_RESOURCES}
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets)
+
+target_include_directories(${PROJECT_NAME} PUBLIC scopypluginbase)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopypluginbase)
+
+set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
+
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME
+    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
