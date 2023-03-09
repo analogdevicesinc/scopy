@@ -1,0 +1,28 @@
+{
+	"generic": {
+		"compatible": [ "siggen", "dmm" ]
+	},
+
+	"FMComms2-4": {
+		"compatible": [ "debugger" ],
+		"compatible-devices": [ "cf-ad9361-lpc", "cf-ad9361-dds-core-lpc", "ad9361-phy" ],
+		"osc-devices": [ "cf-ad9361-lpc" ],
+		"dmm-devices": [ "cf-ad9361-lpc" ],
+		"siggen-devices": [ "cf-ad9361-dds-core-lpc" ]
+	},
+
+	"M2K": {
+		"compatible": ["dio", "siggen", "dmm", "power", "osc", "logic", "pattern", "network", "spectrum" , "debugger", "calibration"],
+		"compatible-devices": [ "m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer" ],
+		"dio-devices": ["m2k-logic-analyzer"],
+		"osc-devices": [ "m2k-adc" ],
+		"dmm-devices": [ "m2k-adc" ],
+		"siggen-devices": [ "m2k-dac-a", "m2k-dac-b" ],
+		"logic-devices": [ "m2k-logic-analyzer-rx" ],
+		"pattern-devices": [ "m2k-logic-analyzer-tx" ],
+		"network-devices": [ "m2k-dac-a:voltage0", "m2k-dac-b:voltage0", "m2k-adc" ],
+		"spectrum-devices": [ "m2k-adc" ],
+		"debugger": ["m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer"],
+		"calibration": ["m2k-adc", "m2k-dac-a", "m2k-dac-b", "m2k-logic-analyzer-rx", "m2k-logic-analyzer-tx", "m2k-logic-analyzer"]
+	}
+}

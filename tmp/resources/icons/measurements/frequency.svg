@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="20px" version="1.1" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+ <g fill="none" fill-rule="evenodd">
+  <g transform="translate(-1790 -470)">
+   <g transform="translate(1791 471)">
+    <polyline points="0 18 4 18 4 0 10 0 10 18 20 18 20 0 28 0" stroke="#727273" stroke-linecap="square" stroke-width="2"/>
+    <rect x="17" y="8" width="6" height="2" fill="#4A64FF"/>
+    <rect x="1" y="8" width="6" height="2" fill="#4A64FF"/>
+   </g>
+  </g>
+ </g>
+</svg>
