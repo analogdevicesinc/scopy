@@ -1,0 +1,15 @@
+QPushButton {
+    text-align:left;
+    border: none;
+    background-color: none;
+}
+QWidget[allowHover=true]:hover {
+    background-color: rgba(0, 0, 0, 60);
+    border: 1px solid rgba(0, 0, 0, 30);
+    border-radius: 5px;
+}
+QWidget[selected=true] { 
+    background-color: rgba(0, 0, 0, 60);
+    border: 1px solid rgba(0, 0, 0, 30);
+    border-radius:5px;
+}

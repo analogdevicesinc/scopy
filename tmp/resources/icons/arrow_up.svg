@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="10px" height="10px" version="1.1" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+ <g fill="none" fill-rule="evenodd">
+  <g transform="translate(-1755 -510)" fill="#fff">
+   <g transform="translate(1743 510)">
+    <polygon transform="translate(17 5) scale(-1) rotate(90) translate(-17 -5)" points="17.01 0 22 5 17.01 10 16.01 9 19.011 5.9993 12 5.9993 12 4.0513 19.061 4.0513 16.01 1"/>
+   </g>
+  </g>
+ </g>
+</svg>
