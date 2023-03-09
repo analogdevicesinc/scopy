@@ -48,7 +48,7 @@ void ScopyHomeAddPage::add() {
 
 void ScopyHomeAddPage::futureverify()
 {
-	QFuture<bool> f = QtConcurrent::run(this,&ScopyHomeAddPage::verify);
+	QFuture<bool> f = QtConcurrent::run(std::bind(&ScopyHomeAddPage::verify,this));
 	fw->setFuture(f);
 }
 

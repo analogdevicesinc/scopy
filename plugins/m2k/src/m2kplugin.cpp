@@ -1,4 +1,4 @@
-#include "bareminimum.h"
+#include "m2kplugin.h"
 #include <QBoxLayout>
 #include <QJsonDocument>
 #include <QLabel>
@@ -13,25 +13,25 @@
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"BareMinimum");
 using namespace adiscope;
 
-bool BareMinimum::compatible(QString m_param) {
+bool M2kPlugin::compatible(QString m_param) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";
 	return true;
 }
 
 
-void BareMinimum::loadToolList()
+void M2kPlugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("MinimumTool",":/icons/scopy-default/icons/tool_home.svg"));
 }
 
-bool BareMinimum::onConnect()
+bool M2kPlugin::onConnect()
 {
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(new QLabel("Minimum"));
 	return true;
 }
 
-bool BareMinimum::onDisconnect()
+bool M2kPlugin::onDisconnect()
 {
 	m_toolList[0]->setEnabled(false);
 	m_toolList[0]->setTool(nullptr);
@@ -40,14 +40,14 @@ bool BareMinimum::onDisconnect()
 
 
 
-void BareMinimum::initMetadata() // not actually needed - putting it here to set priority
+void M2kPlugin::initMetadata() // not actually needed - putting it here to set priority
 {
 	loadMetadata(
 R"plugin(
 	{
-	   "priority":-255,
+	   "priority":100,
 	   "category":[
-	      "test"
+	      "iio"
 	   ]
 	}
 )plugin");
@@ -55,4 +55,4 @@ R"plugin(
 
 
 
-#include "moc_bareminimum.cpp"
+#include "moc_m2kplugin.cpp"
