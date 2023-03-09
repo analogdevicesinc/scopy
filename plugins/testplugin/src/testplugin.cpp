@@ -5,11 +5,11 @@
 #include <QPushButton>
 #include <QLoggingCategory>
 #include <QUuid>
-#include <QFile>
 #include <QSpacerItem>
 #include <pluginbase/preferences.h>
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferenceshelper.h>
+#include <QFile>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace adiscope;

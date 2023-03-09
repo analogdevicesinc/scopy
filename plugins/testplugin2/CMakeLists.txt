@@ -37,7 +37,7 @@ set(PROJECT_SOURCES
         ${UI_LIST}
 )
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_MAJOR_VERSION}  COMPONENTS Widgets REQUIRED)
 
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
@@ -52,7 +52,7 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets scopypluginbase)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

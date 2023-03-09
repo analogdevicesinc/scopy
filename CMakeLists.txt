@@ -12,8 +12,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+
+find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+message(QtVersion: ${QT_VERSION_MAJOR})
 
 # Make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
@@ -38,7 +40,8 @@ set(PROJECT_SOURCES
 include(ScopyAbout)
 configure_about(./resources/about)
 FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc resources/aboutpage.qrc)
-qt5_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
+message(${SCOPY_RESOURCE_FILES})
+qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 find_library(IIO_LIBRARIES NAMES iio libiio)
 find_path(IIO_INCLUDE_DIRS iio.h)
@@ -55,7 +58,9 @@ endif()
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(tool_launcher
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+	${PROJECT_SOURCES}
+	${SCOPY_RESOURCES}
+	${SCOPY_DEPENDENCIES}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET tool_launcher APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -67,8 +72,6 @@ else()
             ${PROJECT_SOURCES}
             ${SCOPY_RESOURCES}
             ${SCOPY_DEPENDENCIES}
-            scopygui
-            scopycore
         )
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
@@ -83,7 +86,7 @@ endif()
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 target_include_directories(tool_launcher PUBLIC scopygui scopycore)
-target_link_libraries(tool_launcher PRIVATE Qt5::Widgets ${SCOPY_DEPENDENCIES} scopycore scopygui)
+target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopycore scopygui)
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
