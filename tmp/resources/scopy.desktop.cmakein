@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Icon=@CMAKE_INSTALL_PREFIX@/share/icons/hicolor/scalable/apps/scopy.svg
+Exec=@CMAKE_INSTALL_PREFIX@/bin/scopy
+Terminal=false
+Type=Application
+Categories=Science;
+Name=Scopy
+GenericName=Oscilloscope
+Comment=A software oscilloscope

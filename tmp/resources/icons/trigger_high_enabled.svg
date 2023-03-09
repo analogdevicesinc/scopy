@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30" height="20" viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+ <g transform="matrix(1 0 0 -1 1 20)" fill="none" fill-rule="evenodd">
+  <path d="m0 19h28" stroke="#fff" stroke-linecap="square" stroke-width="2"/>
+  <path d="m8 14v-14h2v5.7551h8v-5.7551h2v14h-2v-6.0607h-8v6.0607z" fill="#fff"/>
+ </g>
+</svg>

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/translations">
+        @TRANSLATIONS@
+    </qresource>
+</RCC>

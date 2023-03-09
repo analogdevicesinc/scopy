@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ScopyMainWindow</class>
+ <widget class="QMainWindow" name="ScopyMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,4">
+    <item>
+     <widget class="adiscope::ToolBrowser" name="wToolBrowser" native="true"/>
+    </item>
+    <item>
+     <widget class="adiscope::ToolStack" name="wsToolStack"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>adiscope::ToolBrowser</class>
+   <extends>QWidget</extends>
+   <header>toolbrowser.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::ToolStack</class>
+   <extends>QStackedWidget</extends>
+   <header>toolstack.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
