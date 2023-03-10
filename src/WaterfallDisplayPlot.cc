@@ -33,8 +33,8 @@
 #include "WaterfallDisplayPlot.h"
 #include "osc_scale_engine.h"
 #include "spectrumUpdateEvents.h"
+#include "qtgui_types.h"
 
-#include <gnuradio/qtgui/qtgui_types.h>
 #include <qwt_color_map.h>
 #include <qwt_legend.h>
 #include <qwt_plot_layout.h>
