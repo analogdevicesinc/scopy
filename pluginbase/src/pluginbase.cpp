@@ -79,6 +79,11 @@ void PluginBase::messageCallback(QString topic, QString message)
 
 }
 
+void PluginBase::requestTool(QString id)
+{
+	Q_EMIT requestToolByUuid(ToolMenuEntry::findToolMenuEntryById(m_toolList,id)->uuid());
+}
+
 ApiObject *PluginBase::api()
 {
 	return m_pluginApi;

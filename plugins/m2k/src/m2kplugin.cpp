@@ -51,16 +51,16 @@ void M2kPlugin::preload()
 
 void M2kPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Oscilloscope",":/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Spectrum Analyzer",":/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Network Analyzer",":/icons/scopy-default/icons/tool_network_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Signal Generator",":/icons/scopy-default/icons/tool_signal_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Logic Analyzer",":/icons/scopy-default/icons/tool_logic_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Pattern Generator",":/icons/scopy-default/icons/tool_pattern_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Digital I/O",":/icons/scopy-default/icons/tool_io.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Voltmeter",":/icons/scopy-default/icons/tool_voltmeter.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Power Supply",":/icons/scopy-default/icons/tool_power_supply.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Calibration",":/icons/scopy-default/icons/tool_calibration.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc","Oscilloscope",":/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec","Spectrum Analyzer",":/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet","Network Analyzer",":/icons/scopy-default/icons/tool_network_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kawg","Signal Generator",":/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic","Logic Analyzer",":/icons/scopy-default/icons/tool_logic_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern","Pattern Generator",":/icons/scopy-default/icons/tool_pattern_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio","Digital I/O",":/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm","Voltmeter",":/icons/scopy-default/icons/tool_voltmeter.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower","Power Supply",":/icons/scopy-default/icons/tool_power_supply.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal","Calibration",":/icons/scopy-default/icons/tool_calibration.svg"));
 
 }
 
