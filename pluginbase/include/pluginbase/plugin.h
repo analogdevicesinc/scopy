@@ -343,7 +343,7 @@ public Q_SLOTS:
 	 * Default implementation in PluginBase - can be overriden
 	 */
 	virtual void messageCallback(QString topic, QString message) = 0;
-Q_SIGNALS:
+//Q_SIGNALS:
 
 	/**
 	 * @brief disconnectDevice

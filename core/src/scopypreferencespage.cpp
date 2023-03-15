@@ -4,11 +4,13 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QTabBar>
+#include "pluginbase/preferenceshelper.h"
 
 using namespace adiscope;
 ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent) : QTabWidget(parent)
 {
 	setTabPosition(TabPosition::East);
+	addHorizontalTab(buildGeneralPreferencesPage(),"General");
 }
 
 void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
@@ -23,6 +25,17 @@ void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
 
 ScopyPreferencesPage::~ScopyPreferencesPage() {
 
+}
+
+QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
+{
+	QWidget *page = new QWidget(this);
+	QVBoxLayout *lay = new QVBoxLayout(page);
+
+	Preferences *p = Preferences::GetInstance();
+	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_plot_target_fps", "Plot target FPS", {"15","20","30","60"}, this));
+	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding,QSizePolicy::Expanding));
+	return page;
 }
 
 #include "moc_scopypreferencespage.cpp"

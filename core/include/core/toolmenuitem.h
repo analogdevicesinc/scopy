@@ -45,8 +45,6 @@ public:
 
 	bool eventFilter(QObject *watched, QEvent *event);
 
-	void setTemporaryName(QString str);
-	void clearTemporaryName();
 	void setName(QString str);
 	void hideText(bool hidden);
 

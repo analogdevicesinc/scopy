@@ -14,8 +14,7 @@ public:
 	ScopyAboutPage(QWidget *parent = nullptr);
 	~ScopyAboutPage();
 	void addHorizontalTab(QWidget *w, QString text);
-	QWidget *buildPage(QUrl src, QTextDocument::ResourceType r = QTextDocument::UnknownResource);
-	QWidget *buildPage(QString src);
+	QWidget *buildPage(QString src, QTextDocument::ResourceType r = QTextDocument::MarkdownResource);
 };
 }
 

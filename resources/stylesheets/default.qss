@@ -276,13 +276,14 @@ QFrame[drag_widget=true] { border-image:url(:/icons/scopy-default/icons/menu.svg
 
 
 QWidget[device_page="true"] {
-background-color: rgba(0, 0, 0, 150);
+background-color: black;
+/*#background-color: rgba(0, 0, 0, 150);*/
 }
 QWidget[device_page="true"] QPushButton[device_page="true"] {
 min-height: 30px;
 max-height: 30px;
-min-width: 80px;
-max-width: 80px;
+min-width: 150px;
+max-width: 240px;
 }
 
 QPushButton[blue_button=true]{
