@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/m2k">
+        <file>filter.json</file>
+    </qresource>
+</RCC>
