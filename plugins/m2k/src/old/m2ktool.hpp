@@ -43,6 +43,7 @@ namespace adiscope {
 class ApiObject;
 class ToolLauncher;
 
+namespace m2k {
 class M2kTool : public QWidget
 {
 	Q_OBJECT
@@ -81,8 +82,7 @@ private Q_SLOTS:
 #endif
 
 protected:
-	struct iio_context *ctx;
-	QPushButton *run_button;
+	struct iio_context *ctx;	
 	ApiObject *api;
 	QString name;
 	bool saveOnExit;
@@ -93,5 +93,6 @@ protected:
 	Preferences *p;
 	bool m_useNativeDialogs;
 };
+}
 }
 #endif /* SCOPY_TOOL_HPP */
