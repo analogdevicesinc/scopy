@@ -18,6 +18,17 @@ public:
 		QObject(parent), m_id(id), m_name(name), m_icon(icon), m_visible(true),
 		m_enabled(false), m_running(false), m_runBtnVisible(false), m_tool(nullptr) {}
 
+	ToolMenuEntry(const ToolMenuEntry &other) {
+		m_id = other.m_id;
+		m_name = other.m_name;
+		m_icon = other.m_icon;
+		m_visible = other.m_visible;
+		m_enabled = other.m_enabled;
+		m_running = other.m_running;
+		m_runBtnVisible = other.m_runBtnVisible;
+		m_tool = other.m_tool;
+	}
+
 	~ToolMenuEntry() {}
 	QString id() { return m_id; }
 	QString name() { return m_name; }
@@ -28,6 +39,8 @@ public:
 	bool runBtnVisible() { return m_runBtnVisible; }
 	QWidget *tool() { return m_tool; }
 
+	static ToolMenuEntry *findToolMenuEntryByName(QList<ToolMenuEntry*> list, QString id);
+	static ToolMenuEntry *findToolMenuEntryById(QList<ToolMenuEntry*> list, QString id);
 	/**
 	 * @brief setName
 	 * @param newName
@@ -40,6 +53,8 @@ public:
 	 * Set tool menu entry icon
 	 */
 	void setIcon(const QString &newIcon);
+
+public Q_SLOTS:
 	/**
 	 * @brief setVisible
 	 * @param newVisible
@@ -84,6 +99,12 @@ Q_SIGNALS:
 	 */
 	void updateTool();
 
+	/**
+	 * @brief requestRun
+	 * Signal is emitted when the run button is clicked from Scopy UI
+	 */
+	void toggled(bool);
+
 private:
 	QString m_id;
 	QString m_name;
@@ -94,6 +115,26 @@ private:
 	bool m_runBtnVisible;
 	QWidget* m_tool;
 };
+
+inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryByName(QList<ToolMenuEntry *> list, QString name)
+{
+	for(auto &&tme : list) {
+		if(tme->name()==name) {
+			return tme;
+		}
+	}
+	return nullptr;
+}
+
+inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryById(QList<ToolMenuEntry *> list, QString id)
+{
+	for(auto &&tme : list) {
+		if(tme->id()==id) {
+			return tme;
+		}
+	}
+	return nullptr;
+}
 
 inline void ToolMenuEntry::setName(const QString &newName)
 {

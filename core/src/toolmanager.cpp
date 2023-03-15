@@ -65,6 +65,7 @@ void ToolManager::showToolList(QString s) {
 		if( m == nullptr) {
 			m = tm->addTool(tme->id(),tme->name(),tme->icon());
 			connect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateToolEntry()));
+			connect(m->getToolRunBtn(),SIGNAL(toggled(bool)),tme,SIGNAL(toggled(bool)));
 		}
 		updateToolEntry(tme, tme->id());
 	}

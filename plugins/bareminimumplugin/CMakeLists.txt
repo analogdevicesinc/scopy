@@ -39,7 +39,7 @@ set(PROJECT_SOURCES
         ${UI_LIST}
 )
 
-find_package(Qt${QT_MAJOR_VERSION} COMPONENTS Widgets Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core )
 
 
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
