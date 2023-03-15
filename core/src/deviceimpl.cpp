@@ -45,7 +45,7 @@ void DeviceImpl::loadPlugins() {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
-		connect(dynamic_cast<QObject*>(p),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+		connect(dynamic_cast<QObject*>(p),SIGNAL(requestToolByUuid(QString)),this,SIGNAL(requestTool(QString)));
 		p->loadApi();
 		p->postload();
 	}

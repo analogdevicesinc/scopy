@@ -61,13 +61,13 @@ void ToolManager::showToolList(QString s) {
 	qDebug(CAT_TOOLMANAGER) << "showing" << s;
 	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
-		ToolMenuItem *m = tm->getToolMenuItemFor(tme->id());
+		ToolMenuItem *m = tm->getToolMenuItemFor(tme->uuid());
 		if( m == nullptr) {
-			m = tm->addTool(tme->id(),tme->name(),tme->icon());
+			m = tm->addTool(tme->uuid(),tme->name(),tme->icon());
 			connect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateToolEntry()));
-			connect(m->getToolRunBtn(),SIGNAL(toggled(bool)),tme,SIGNAL(toggled(bool)));
+			connect(m->getToolRunBtn(),SIGNAL(toggled(bool)),tme,SIGNAL(runToggled(bool)));
 		}
-		updateToolEntry(tme, tme->id());
+		updateToolEntry(tme, tme->uuid());
 	}
 
 }
@@ -76,9 +76,9 @@ void ToolManager::hideToolList(QString s) {
 	qDebug(CAT_TOOLMANAGER) << "hiding" << s;
 	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
-		if(tm->getToolMenuItemFor(tme->id()) != nullptr)
+		if(tm->getToolMenuItemFor(tme->uuid()) != nullptr)
 			disconnect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateTool()));
-			tm->removeTool(tme->id());
+			tm->removeTool(tme->uuid());
 	}
 }
 
@@ -108,13 +108,13 @@ void ToolManager::updateToolEntry(ToolMenuEntry *tme, QString s) {
 	m->setName(tme->name());
 	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
 	m->getToolRunBtn()->setChecked(tme->running());
-	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() <<" - "<< tme->id();
+	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() <<" - "<< tme->uuid();
 }
 
 void ToolManager::updateToolEntry() {
 	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
 	if(tme)
-		updateToolEntry(tme,tme->id());
+		updateToolEntry(tme,tme->uuid());
 	else
 		qWarning(CAT_TOOLMANAGER())<<"wrong QObject::sender() for updateToolEntry()";
 
@@ -123,7 +123,7 @@ void ToolManager::updateToolEntry() {
 void ToolManager::updateTool() {
 
 	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
-	QString id = tme->id();
+	QString id = tme->uuid();
 	QString name = tme->name();
 	QWidget* tool = tme->tool();
 	if(tme) {
