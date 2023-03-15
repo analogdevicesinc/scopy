@@ -1,0 +1,7 @@
+#ifndef M2KCOMMON_H
+#define M2KCOMMON_H
+#include <QLoggingCategory>
+
+Q_DECLARE_LOGGING_CATEGORY(CAT_M2KPLUGIN);
+
+#endif // M2KCOMMON_H

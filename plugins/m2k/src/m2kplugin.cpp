@@ -1,4 +1,5 @@
 #include "m2kplugin.h"
+#include "m2kcommon.h"
 #include <QBoxLayout>
 #include <QJsonDocument>
 #include <QLabel>
@@ -6,49 +7,267 @@
 #include <QLoggingCategory>
 #include <QUuid>
 #include <QSpacerItem>
+#include <QTimer>
 #include <pluginbase/preferences.h>
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferenceshelper.h>
+#include "iioutil/contextprovider.h"
+#include <iio.h>
 
-Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"BareMinimum");
+#include "filter.hpp"
+#include "dmm.hpp"
+
 using namespace adiscope;
+using namespace adiscope::m2k;
+
+Q_LOGGING_CATEGORY(CAT_M2KPLUGIN,"M2KPLUGIN");
 
 bool M2kPlugin::compatible(QString m_param) {
-	qDebug(CAT_TESTPLUGIN)<<"compatible";
-	return true;
+	qDebug(CAT_M2KPLUGIN)<<"compatible";
+	bool ret = false;
+	ContextProvider *c = ContextProvider::GetInstance();
+	iio_context *ctx = c->open(m_param);
+
+	if(!ctx)
+		return false;
+
+//	ret = !!iio_context_find_device(ctx,"m2k-adc");
+//	ret = ret && !!iio_context_find_device(ctx,"m2k-dac-a");
+//	ret = ret && !!iio_context_find_device(ctx,"m2k-dac-b");
+
+	Filter *f = new Filter(ctx);
+	ret = (f->hw_name().compare("M2K") == 0);
+	delete(f);
+
+	c->close(m_param);
+	return ret;
+}
+
+void M2kPlugin::preload()
+{
+	m_m2kController = new M2kController(m_param,this);
 }
 
 
 void M2kPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("MinimumTool",":/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Oscilloscope",":/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Spectrum Analyzer",":/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Network Analyzer",":/icons/scopy-default/icons/tool_network_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Signal Generator",":/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Logic Analyzer",":/icons/scopy-default/icons/tool_logic_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Pattern Generator",":/icons/scopy-default/icons/tool_pattern_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Digital I/O",":/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Voltmeter",":/icons/scopy-default/icons/tool_voltmeter.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Power Supply",":/icons/scopy-default/icons/tool_power_supply.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Calibration",":/icons/scopy-default/icons/tool_calibration.svg"));
+
 }
+
+bool M2kPlugin::loadPage()
+{
+	m_infoPageTimer = new QTimer(this);
+	m_infoPageTimer->setInterval(infoPageTimerTimeout);	
+	connect(m_m2kController,SIGNAL(newTemperature(double)),this, SLOT(updateTemperature(double)));
+	m_page = new QWidget();
+	m_page->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	m_m2kInfoPage = new InfoPage(m_page);
+	m_m2kInfoPage->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	ContextProvider *c = ContextProvider::GetInstance();
+	iio_context *ctx = c->open(m_param);
+	for(int i=0;i<iio_context_get_attrs_count(ctx);i++) {
+		const char *name;
+		const char *value;
+		int ret = iio_context_get_attr(ctx,i,&name,&value);
+		if(ret != 0)
+			continue;
+
+		m_m2kInfoPage->update(name,value);
+
+	}
+	c->close(m_param);
+
+
+	return true;
+}
+
+bool M2kPlugin::loadExtraButtons()
+{
+
+	m_btnIdentify = new QPushButton("Identify"); m_extraButtons.append(m_btnIdentify);
+	m_btnCalibrate = new QPushButton("Calibrate"); m_extraButtons.append(m_btnCalibrate);
+	m_btnRegister = new QPushButton("Register"); m_extraButtons.append(m_btnRegister);
+
+	m_btnCalibrate->setDisabled(true);
+
+	connect(m_btnIdentify,SIGNAL(clicked()),m_m2kController,SLOT(identify()));
+	connect(m_btnCalibrate,SIGNAL(clicked()),m_m2kController,SLOT(calibrate()));
+	connect(m_btnRegister,&QPushButton::clicked,this,[=](){
+		;
+//		QString versionString = QString(m_info_params["Model"].split("Rev")[1][1]);
+//		QString url = "https://my.analog.com/en/app/registration/hardware/ADALM2000?sn="+QString(getSerialNumber())+"&v=Rev."+versionString;
+//		QDesktopServices::openUrl(QUrl(url));
+	});
+
+
+	return true;
+}
+
+bool M2kPlugin::loadIcon()
+{
+	SCOPY_PLUGIN_ICON(":/icons/adalm.svg");
+	return true;
+}
+
+void M2kPlugin::showPageCallback()
+{
+	m_m2kController->startTemperatureTask();
+}
+
+void M2kPlugin::hidePageCallback()
+{
+	m_m2kController->stopTemperatureTask();
+}
+
+void M2kPlugin::calibrationStarted()
+{
+	storeToolState(calibrationToolNames);
+	for(const QString &tool : calibrationToolNames) {
+		auto tme = ToolMenuEntry::findToolMenuEntryByName(m_toolList,tool);
+		tme->setName("Calibrating ... ");
+		tme->setEnabled(false);
+		tme->setRunning(false);
+		tme->setRunBtnVisible(false);
+	}
+}
+
+void M2kPlugin::calibrationSuccess()
+{
+	restoreToolState(calibrationToolNames);
+}
+
+void M2kPlugin::calibrationFinished()
+{
+	restoreToolState(calibrationToolNames);
+}
+
+void M2kPlugin::updateTemperature(double val)
+{
+	m_m2kInfoPage->update("Temperature", QString::number(val));
+}
+
+void M2kPlugin::storeToolState(QStringList tools) {
+	for(const QString &tool : calibrationToolNames) {
+		auto tme = ToolMenuEntry::findToolMenuEntryByName(m_toolList,tool);
+		toolMenuEntryCalibrationCache[tool] = new ToolMenuEntry(*tme); // save tool state
+	}
+}
+
+void M2kPlugin::restoreToolState(QStringList tools) {
+	for(const QString &tool : calibrationToolNames) {
+		if(!toolMenuEntryCalibrationCache.contains(tool))
+			continue;
+		ToolMenuEntry* cachedTme = toolMenuEntryCalibrationCache[tool];
+		auto id = toolMenuEntryCalibrationCache[tool]->id();
+		auto tme = ToolMenuEntry::findToolMenuEntryById(m_toolList,id);
+		tme->setName(cachedTme->name());
+		tme->setEnabled(cachedTme->enabled());
+		tme->setRunning(cachedTme->running());
+		tme->setRunBtnVisible(cachedTme->runBtnVisible());
+		delete cachedTme;
+	}
+}
+
+void M2kPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("M2k_instrument_notes_active",false);
+}
+
+bool M2kPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+	QCheckBox *pref1 = PreferencesHelper::addPreferenceCheckBox(p,"M2k_instrument_notes_active","Instrument Notes",this);
+
+	lay->addWidget(pref1);
+	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+	return true;
+}
+
+
+
+
 
 bool M2kPlugin::onConnect()
 {
-	m_toolList[0]->setEnabled(true);
-	m_toolList[0]->setTool(new QLabel("Minimum"));
+	ContextProvider *c = ContextProvider::GetInstance();
+	iio_context *ctx = c->open(m_param);
+	m_btnCalibrate->setDisabled(false);
+
+	m_m2kController->connectM2k(ctx);
+	m_m2kController->startPingTask();
+
+	Filter *f = new Filter(ctx);
+
+	auto dmmTme = ToolMenuEntry::findToolMenuEntryByName(m_toolList,"Voltmeter");
+	dmmTme->setTool(new DMM(ctx, f, dmmTme));
+
+	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
+	connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
+	connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
+	connect(m_m2kController, SIGNAL(calibrationFailed()) , this, SLOT(calibrationFinished()));
+
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(true);
+		tme->setRunBtnVisible(true);
+		tme->setRunning(false);
+	}
+
+	m_m2kController->initialCalibration();
 	return true;
 }
 
 bool M2kPlugin::onDisconnect()
-{
-	m_toolList[0]->setEnabled(false);
-	m_toolList[0]->setTool(nullptr);
+{	
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(false);
+		tme->setRunBtnVisible(false);
+		tme->setRunning(false);
+	}
+
+	disconnect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);
+	disconnect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
+	disconnect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
+	disconnect(m_m2kController, SIGNAL(calibrationFailed()) , this, SLOT(calibrationFinished()));
+
+
+	m_m2kController->stopPingTask();
+	m_m2kController->disconnectM2k();
+	m_btnCalibrate->setDisabled(true);
+
+
+	ContextProvider *c = ContextProvider::GetInstance();
+	c->close(m_param);
 	return true;
 }
 
 
 
-void M2kPlugin::initMetadata() // not actually needed - putting it here to set priority
+void M2kPlugin::initMetadata()
 {
 	loadMetadata(
 R"plugin(
 	{
 	   "priority":100,
 	   "category":[
-	      "iio"
-	   ]
+	      "iio",
+		"m2k"
+	   ],
+	   "exclude":["*"]
 	}
 )plugin");
 }
