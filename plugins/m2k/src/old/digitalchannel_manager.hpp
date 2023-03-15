@@ -33,8 +33,6 @@
 #include "filter.hpp"
 
 //#include "pg_patterns.hpp"
-#include "digitalchannel_manager.hpp"
-
 
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
@@ -43,7 +41,7 @@
 using namespace libm2k::context;
 using namespace libm2k::digital;
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 class DIOManager : public QObject
 {
