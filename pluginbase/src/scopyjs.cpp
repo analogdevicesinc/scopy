@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "scopyjs/scopyjs.h"
-#include "scopyjs/jsfileio.h"
+#include "scopyjs.h"
+#include "jsfileio.h"
 #include <unistd.h>
 
 #include <QApplication>
@@ -55,6 +55,10 @@ ScopyJS *ScopyJS::GetInstance()
 	return pinstance_;
 }
 
+void ScopyJS::exit()
+{
+	QApplication::closeAllWindows();
+}
 
 void ScopyJS::init() {
 	QJSValue js_obj = m_engine.newQObject(this);
@@ -82,10 +86,6 @@ void ScopyJS::init() {
 	}
 }
 
-void ScopyJS::exit()
-{
-	QApplication::closeAllWindows();
-}
 
 void ScopyJS::returnToApplication()
 {
@@ -117,7 +117,26 @@ void ScopyJS::unregisterApi(ApiObject *obj)
 
 void ScopyJS::registerApi(ApiObject *obj, QJSValue parentObj)
 {
-	parentObj.setProperty(obj->objectName(), m_engine.newQObject(obj));
+	auto newjsobj = m_engine.newQObject(obj);
+	parentObj.setProperty(obj->objectName(), newjsobj);
+
+//	auto meta = obj->metaObject();
+
+//	for (int i = meta->propertyOffset();
+//			i < meta->propertyCount(); i++) {
+//		auto prop = meta->property(i);
+
+//		auto data = prop.read(obj);
+//		if (data.canConvert<ApiObject *>()) {
+//			registerApi(data.value<ApiObject*>(),newjsobj);
+//		}
+//	}
+
+//	QList<ApiObject*> list = obj->findChildren<ApiObject*>(QString(),Qt::FindDirectChildrenOnly);
+//	for(auto &&apiobj : list) {
+//		registerApi(apiobj,newjsobj);
+//	}
+
 }
 
 void ScopyJS::unregisterApi(ApiObject *obj, QJSValue parentObj)
@@ -206,4 +225,5 @@ void ScopyJS::hasText()
 	out.flush();
 }
 
-#include "scopyjs/moc_scopyjs.cpp"
+
+#include "moc_scopyjs.cpp"
