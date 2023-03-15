@@ -59,6 +59,7 @@ public Q_SLOTS:
 	virtual void showPageCallback() override;
 	virtual void hidePageCallback() override;
 	virtual void messageCallback(QString topic, QString message) override;
+	virtual void requestTool(QString);
 
 protected:
 	QString m_param;
@@ -97,11 +98,11 @@ Q_SIGNALS:\
 	void disconnectDevice() override;\
 	void restartDevice() override;\
 	void toolListChanged() override;\
-	void requestTool(QString) override;\
+	void requestToolByUuid(QString) override;\
 private:\
 
 #define SCOPY_PLUGIN_ICON(x) m_icon = new QLabel(""); m_icon->setStyleSheet("border-image: url(" x ");")
-#define SCOPY_NEW_TOOLMENUENTRY(x, y) new ToolMenuEntry(QUuid::createUuid().toString(),x,y,this)
+#define SCOPY_NEW_TOOLMENUENTRY(id, x, y) new ToolMenuEntry(id,x,y,this)
 
 
 #endif // PLUGINBASE_H

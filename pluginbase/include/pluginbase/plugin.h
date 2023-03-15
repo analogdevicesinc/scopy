@@ -355,8 +355,9 @@ public Q_SLOTS:
 	/**
 	 * @brief requestTool
 	 * Plugin can emit this signal if it requests bringing a tool in the foreground	 *
+	 * Not usually called directly but rather through PluginBase::requestTool(QString)
 	 */
-	virtual void requestTool(QString) = 0;
+	virtual void requestToolByUuid(QString) = 0;
 
 	/**
 	 * @brief toolListChanged
