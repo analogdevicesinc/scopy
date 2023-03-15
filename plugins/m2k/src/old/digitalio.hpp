@@ -32,8 +32,8 @@
 #include "filter.hpp"
 #include "digitalchannel_manager.hpp"
 
-#include "apiObject.hpp"
-#include "tool.hpp"
+#include "pluginbase/apiobject.h"
+#include "m2ktool.hpp"
 
 
 extern "C" {
@@ -51,7 +51,7 @@ class dioGroup;
 class dioChannel;
 }
 
-namespace adiscope {
+namespace adiscope::m2k {
 class DigitalIO;
 class DigitalIO_API;
 
@@ -81,7 +81,7 @@ private Q_SLOTS:
 	void changeDirection();
 };
 
-class DigitalIO : public Tool
+class DigitalIO : public M2kTool
 {
 	friend class DigitalIO_API;
 	friend class ToolLauncher_API;
@@ -100,16 +100,16 @@ private:
 	QPair<QWidget *,Ui::dioChannel *>  *findIndividualUi(int ch);
 
 private Q_SLOTS:
-	void readPreferences();
+	void readPreferences() override;
 
 public:
-	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
+	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem,
 	                   DIOManager *diom, QJSEngine *engine,
-	                   ToolLauncher *parent, bool offline_mode = 0);
+			   QWidget *parent, bool offline_mode = 0);
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);
-	void setVisible(bool visible);
+	void setVisible(bool visible) override;
 
 public Q_SLOTS:
 	void run() override;

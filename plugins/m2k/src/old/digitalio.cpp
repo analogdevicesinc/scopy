@@ -29,19 +29,21 @@
 #include <QtQml/QJSEngine>
 #include <QtQml/QQmlEngine>
 
-#include "logging_categories.h"
 #include "digitalio.hpp"
-#include "gui/dynamicWidget.hpp"
+#include "gui/dynamicWidget.h"
 #include "digitalio_api.hpp"
 
 // Generated UI
 #include "ui_digitalio.h"
 #include "ui_digitalIoElement.h"
 #include "ui_digitalIoChannel.h"
-#include "ui_digitaliomenu.h"
+#include "pluginbase/scopyjs.h"
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_M2K_DIGITAL_IO,"M2kDigitalIo")
 
 using namespace std;
-using namespace adiscope;
+using namespace adiscope::m2k;
 
 namespace adiscope {
 
@@ -121,7 +123,7 @@ void DigitalIO::setVisible(bool visible)
 		poll->start(polling_rate);
 	else
 		poll->stop();
-	Tool::setVisible(visible);
+	M2kTool::setVisible(visible);
 }
 
 void DigitalIO::setSlider(int val)
@@ -149,10 +151,10 @@ void DigitalIO::setOutput()
 	}
 }
 
-DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMenuItem,
+DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem,
                      DIOManager *diom, QJSEngine *engine,
-                     ToolLauncher *parent, bool offline_mode) :
-	Tool(ctx, toolMenuItem, new DigitalIO_API(this), "Digital IO", parent),
+		     QWidget *parent, bool offline_mode) :
+	M2kTool(ctx, toolMenuItem, new DigitalIO_API(this), "Digital IO", parent),
 	ui(new Ui::DigitalIO),
 	offline_mode(offline_mode),
 	diom(diom)
@@ -167,8 +169,8 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 	ui->containerLayout->addWidget(groups.last());
 
 	connect(ui->btnRunStop, SIGNAL(toggled(bool)), this, SLOT(startStop(bool)));
-	connect(runButton(), SIGNAL(toggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
-	connect(ui->btnRunStop, SIGNAL(toggled(bool)), runButton(), SLOT(setChecked(bool)));
+	connect(tme, SIGNAL(runToggled(bool)), ui->btnRunStop, SLOT(setChecked(bool)));
+	connect(ui->btnRunStop, SIGNAL(toggled(bool)), tme, SLOT(setRunning(bool)));
 
 	if (!offline_mode) {
 		connect(diom,SIGNAL(locked()),this,SLOT(lockUi()));
@@ -180,8 +182,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 	                               TOOL_DIGITALIO)));
-	api->load(*settings);
-	api->js_register(engine);
+	ScopyJS::GetInstance()->registerApi(api);
 	updateUi();
 	readPreferences();
 
@@ -191,20 +192,12 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuItem *toolMe
 
 void DigitalIO::readPreferences()
 {
-	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
+	Preferences *p = Preferences::GetInstance();
+	ui->instrumentNotes->setVisible(p->get("M2k_instrument_notes_active").toBool());
 }
 
 DigitalIO::~DigitalIO()
 {
-	disconnect(prefPanel, &Preferences::notify, this, &DigitalIO::readPreferences);
-
-	if (!offline_mode) {
-	}
-
-	if (saveOnExit) {
-		api->save(*settings);
-	}
-
 	delete api;
 	delete ui;
 }
@@ -265,9 +258,9 @@ void DigitalIO::updateUi()
 	}
 }
 
-void adiscope::DigitalIoGroup::changeDirection()
+void DigitalIoGroup::changeDirection()
 {
-	qDebug(CAT_DIGITAL_IO)<<"PB";
+	qDebug(CAT_M2K_DIGITAL_IO)<<"PB";
 	auto chk = ui->inout->isChecked();
 
 	ui->lineEdit->setEnabled(!chk);
@@ -291,9 +284,9 @@ void adiscope::DigitalIoGroup::changeDirection()
 	}
 }
 
-void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
+void DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
 {
-	qDebug(CAT_DIGITAL_IO)<<"horizontalSlider";
+	qDebug(CAT_M2K_DIGITAL_IO)<<"horizontalSlider";
 
 	if (ui->horizontalSlider->hasTracking()) {
 		ui->lineEdit->setText(QString::number(value));
@@ -306,9 +299,9 @@ void adiscope::DigitalIoGroup::on_horizontalSlider_valueChanged(int value)
 	}
 }
 
-void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
+void DigitalIoGroup::on_lineEdit_editingFinished()
 {
-	qDebug(CAT_DIGITAL_IO)<<"lineedit";
+	qDebug(CAT_M2K_DIGITAL_IO)<<"lineedit";
 	auto max = (1<<nr_of_channels) -1;
 	auto nr = ui->lineEdit->text().toInt();
 	if(nr > max)
@@ -318,13 +311,13 @@ void adiscope::DigitalIoGroup::on_lineEdit_editingFinished()
 	ui->horizontalSlider->setValue(nr);
 }
 
-void adiscope::DigitalIoGroup::on_comboBox_activated(int index)
+void DigitalIoGroup::on_comboBox_activated(int index)
 {
 	ui->stackedWidget->setCurrentIndex(index);
 	changeDirection();
 }
 
-void adiscope::DigitalIO::lockUi()
+void DigitalIO::lockUi()
 {
 	auto lockmask = diom->getLockMask();
 	bool g0Lock = false;
@@ -357,16 +350,16 @@ void adiscope::DigitalIO::lockUi()
 
 }
 
-void adiscope::DigitalIO::run()
+void DigitalIO::run()
 {
 	startStop(true);
 }
-void adiscope::DigitalIO::stop()
+void DigitalIO::stop()
 {
 	startStop(false);
 }
 
-void adiscope::DigitalIO::startStop(bool checked)
+void DigitalIO::startStop(bool checked)
 {
 	if (checked) {
 		ui->btnRunStop->setText(tr("Stop"));

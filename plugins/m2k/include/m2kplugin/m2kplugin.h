@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include "m2kcontroller.h"
 #include <gui/infopage.h>
+#include <calibration.hpp>
 
 
 namespace adiscope {
@@ -50,6 +51,8 @@ private:
 	QPushButton *m_btnIdentify;
 	QPushButton *m_btnCalibrate;
 	QPushButton *m_btnRegister;
+
+	Calibration *calib;
 
 	M2kController *m_m2kController;
 	InfoPage *m_m2kInfoPage;

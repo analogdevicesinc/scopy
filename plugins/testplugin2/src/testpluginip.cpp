@@ -43,7 +43,7 @@ bool TestPluginIp::onConnect()
 	QPushButton *sendMessage = new QPushButton("SendMessage");
 	lay->addWidget(sendMessage);
 
-	connect(btn,&QPushButton::clicked,this,[=]() { Q_EMIT requestTool(m_toolList[0]->id());});
+	connect(btn,&QPushButton::clicked,this,[=]() { requestTool(m_toolList[0]->id());});
 	connect(sendMessage,&QPushButton::clicked,this,[=]() {
 		MessageBroker::GetInstance()->publish("TestPlugin","testMessage");
 		MessageBroker::GetInstance()->publish("broadcast","testMessage");
@@ -97,7 +97,7 @@ bool TestPluginIp::loadPage()
 
 void TestPluginIp::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SecondPlugin",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test2","SecondPlugin",""));
 }
 
 void TestPluginIp::initMetadata()
