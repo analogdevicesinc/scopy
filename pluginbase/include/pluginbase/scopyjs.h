@@ -25,15 +25,16 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QJSEngine>
-#include "pluginbase/apiobject.h"
-#include "scopycore_export.h"
+#include "apiobject.h"
+#include "scopypluginbase_export.h"
+#include "scopypluginbase_config.h"
 #include <QSocketNotifier>
 
 class QJSEngine;
 
 namespace adiscope {
 
-class SCOPYCORE_EXPORT ScopyJS : public QObject
+class SCOPYPLUGINBASE_EXPORT ScopyJS : public QObject
 {
 	Q_OBJECT
 
@@ -71,7 +72,9 @@ private:
 	QString input;
 	QString js_cmd;
 	QString readInput();
+#ifdef ENABLE_SCOPYJS
 	QJSEngine m_engine;
+#endif
 	QSocketNotifier *notifier;
 	static ScopyJS * pinstance_;
 };
