@@ -69,8 +69,8 @@ bool TestPlugin::loadPage()
 
 void TestPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("FirstPlugin",":/icons/scopy-default/icons/tool_home.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first","FirstPlugin",":/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()
