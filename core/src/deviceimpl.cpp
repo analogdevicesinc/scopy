@@ -7,10 +7,7 @@
 #include <QDebug>
 #include <QThread>
 
-#include "scopycore_config.h"
-#ifdef ENABLE_SCOPYJS
-#include "scopyjs/scopyjs.h"
-#endif
+#include "pluginbase/scopyjs.h"
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
@@ -174,10 +171,8 @@ void DeviceImpl::connectDev() {
 	for(auto &&p : m_plugins) {
 		p->onConnect();
 		p->loadSettings();
-#ifdef ENABLE_SCOPYJS
 		if(p->api())
 			ScopyJS::GetInstance()->registerApi(p->api());
-#endif
 	}
 	Q_EMIT connected();
 }
@@ -187,11 +182,8 @@ void DeviceImpl::disconnectDev() {
 	discbtn->hide();
 
 	for(auto &&p : m_plugins) {
-
-#ifdef ENABLE_SCOPYJS
 		if(p->api())
 			ScopyJS::GetInstance()->unregisterApi(p->api());
-#endif
 		p->saveSettings();
 		p->onDisconnect();
 	}

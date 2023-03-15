@@ -27,24 +27,11 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
-option(ENABLE_SCOPYJS "Enable plugin scripting via JSEngine - requires QML" ON)
-
 if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
 
-if(ENABLE_SCOPYJS)
-    set(SCOPY_QT_COMPONENTS ${SCOPY_QT_COMPONENTS} Qml)
-    set(SCOPY_JS_INCLUDE_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopyjs)
-    FILE(GLOB JS_SRC_LIST src/scopyjs/*.cpp src/scopyjs/*.h)    
-    FILE(GLOB JS_HEADER_LIST include/${SCOPY_MODULE}/scopyjs/*.h include/scopyjs/${SCOPY_MODULE}/*.hpp)
-
-    message(STATUS "CORE: scopy-js enabled")
-    set(SRC_LIST ${SRC_LIST} ${JS_SRC_LIST})
-    set(HEADER_LIST ${HEADER_LIST} ${JS_HEADER_LIST})
-endif()
-
-configure_file(include/core/scopy${SCOPY_MODULE}_config.h.cmakein
+configure_file(include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h.cmakein
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h @ONLY)
 set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h)
 
@@ -64,7 +51,7 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${SCOPY_JS_INCLUDE_LOCATION})
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopypluginbase scopyiioutil)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})

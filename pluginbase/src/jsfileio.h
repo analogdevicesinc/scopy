@@ -22,6 +22,7 @@
 
 #include <QObject>
 
+/* Private header */
 namespace adiscope {
 class JsFileIo: public QObject
 {
