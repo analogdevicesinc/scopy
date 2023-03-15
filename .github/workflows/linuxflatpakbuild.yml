@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Pull the Docker Image
-      run: docker pull analogdevices/scopy-build:flatpak
+      run: docker pull cristianbindea/scopy-flatpak
 
     - name: Run Docker Image
       run: |
@@ -22,7 +22,7 @@ jobs:
             docker run --privileged \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
                 --env-file $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs \
-                analogdevices/scopy-build:flatpak /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
+                cristianbindea/scopy-flatpak /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
 
     - uses: actions/upload-artifact@v2
       with:
