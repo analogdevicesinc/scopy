@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 enable_testing()
 
-project(tool_launcher VERSION 0.1 LANGUAGES CXX)
+project(scopy VERSION 0.1 LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -9,7 +9,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 
@@ -56,7 +56,7 @@ if(ENABLE_TESTING)
 endif()
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(tool_launcher
+    qt_add_executable(${PROJECT_NAME}
         MANUAL_FINALIZATION
 	${PROJECT_SOURCES}
 	${SCOPY_RESOURCES}
@@ -68,7 +68,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
     if(ANDROID)
-        add_library(tool_launcher SHARED
+	add_library(${PROJECT_NAME} SHARED
             ${PROJECT_SOURCES}
             ${SCOPY_RESOURCES}
             ${SCOPY_DEPENDENCIES}
@@ -76,7 +76,7 @@ else()
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-        add_executable(tool_launcher
+	add_executable(${PROJECT_NAME}
             ${PROJECT_SOURCES}
             ${SCOPY_RESOURCES}
             ${SCOPY_DEPENDENCIES}
@@ -84,9 +84,15 @@ else()
     endif()
 endif()
 
+list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
+if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
+	add_definitions(-DHAS_CONSTEXPR=1)
+endif()
+add_definitions(-DQT_NO_KEYWORDS)
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
-target_include_directories(tool_launcher PUBLIC scopygui scopycore)
-target_link_libraries(tool_launcher PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopycore scopygui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopycore)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopycore scopygui)
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)
@@ -100,7 +106,7 @@ target_compile_options(${PROJECT_NAME} PUBLIC
 )
 
 
-set_target_properties(tool_launcher PROPERTIES
+set_target_properties(${PROJECT_NAME}  PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -108,8 +114,8 @@ set_target_properties(tool_launcher PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-install(TARGETS tool_launcher BUNDLE DESTINATION .)
+install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(tool_launcher)
+    qt_finalize_executable(${PROJECT_NAME})
 endif()
