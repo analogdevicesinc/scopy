@@ -156,7 +156,6 @@
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -276,7 +275,6 @@ color: #ff7200;
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -360,7 +358,6 @@ color: #ff7200;
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -426,7 +423,6 @@ color: #9013fe;
             <property name="font">
              <font>
               <pointsize>30</pointsize>
-              <weight>75</weight>
               <bold>true</bold>
              </font>
             </property>
@@ -926,7 +922,7 @@ QPushButton:disabled {
                <string>Enable</string>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../../../resources/resources.qrc">
                 <normaloff>:/icons/play.svg</normaloff>
                 <normalon>:/icons/scopy-default/icons/play_stop.svg</normalon>:/icons/play.svg</iconset>
               </property>
@@ -1051,7 +1047,7 @@ QPushButton:disabled {
                <string>Enable</string>
               </property>
               <property name="icon">
-               <iconset resource="../resources/resources.qrc">
+               <iconset resource="../../../resources/resources.qrc">
                 <normaloff>:/icons/play.svg</normaloff>
                 <normalon>:/icons/scopy-default/icons/play_stop.svg</normalon>:/icons/play.svg</iconset>
               </property>
@@ -1098,15 +1094,15 @@ QPushButton:disabled {
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.h</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>gui/instrumentnotes.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::LinkedButton</class>
@@ -1121,15 +1117,11 @@ QPushButton:disabled {
   <customwidget>
    <class>adiscope::LcdNumber</class>
    <extends>QLCDNumber</extends>
-   <header>lcdNumber.hpp</header>
+   <header>gui/lcdNumber.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
+  <include location="../../../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>
