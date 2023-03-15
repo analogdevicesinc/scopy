@@ -20,6 +20,7 @@
 #include "dmm.hpp"
 #include "manualcalibration.h"
 #include "digitalchannel_manager.hpp"
+#include "power_controller.hpp"
 
 using namespace adiscope;
 using namespace adiscope::m2k;
@@ -219,11 +220,12 @@ bool M2kPlugin::onConnect()
 	auto dmmTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdmm");
 	auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal");
 	auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
+	auto pwrTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpower");
 
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
 	dioTme->setTool( new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
-
+	pwrTme->setTool (new PowerController(ctx,pwrTme,js,nullptr));
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
 	connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
 	connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
