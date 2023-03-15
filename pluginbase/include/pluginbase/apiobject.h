@@ -46,8 +46,6 @@ namespace adiscope {
 		virtual void load(QSettings& settings);
 		virtual void save(QSettings& settings);
 
-		void js_register(QJSEngine *engine);
-
 	private:
 		template <typename T> void save(QSettings& settings,
 				const QString& prop, const QList<T>& list);
