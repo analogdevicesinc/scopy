@@ -113,15 +113,6 @@ void ToolMenuItem::setName(QString str) {
 	toolBtn->setText(name);
 }
 
-void ToolMenuItem::setTemporaryName(QString str)
-{
-	toolBtn->setText(str);
-}
-
-void ToolMenuItem::clearTemporaryName()
-{
-	toolBtn->setText(name);
-}
 
 void ToolMenuItem::hideText(bool hidden)
 {	

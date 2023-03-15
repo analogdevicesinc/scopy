@@ -108,8 +108,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	sbc->startScan();
 
-	dm->addDevice("","ip:127.0.0.1");
-//	dm->addDevice("usb:");
+	dm->addDevice("m2k","ip:127.0.0.1");
+//	dm->addDevice("","ip:test");
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
@@ -187,6 +187,8 @@ void ScopyMainWindow::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
 	p->load();
+	p->init("general_plot_target_fps", "60");
+	p->init("general_use_native_dialogs", true);
 	p->init("a","true");
 }
 

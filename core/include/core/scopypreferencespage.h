@@ -11,6 +11,7 @@ class SCOPYCORE_EXPORT ScopyPreferencesPage : public QTabWidget
 public:
 	ScopyPreferencesPage(QWidget *parent = nullptr);
 	~ScopyPreferencesPage();
+	QWidget* buildGeneralPreferencesPage();
 	void addHorizontalTab(QWidget *w, QString text);
 };
 }

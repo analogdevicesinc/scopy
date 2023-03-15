@@ -9,23 +9,25 @@ using namespace adiscope;
 ScopyAboutPage::ScopyAboutPage(QWidget *parent) : QTabWidget(parent)
 {
 	setTabPosition(TabPosition::East);
-	addHorizontalTab(buildPage(QUrl("qrc:/about.html")),"Scopy");
+	addHorizontalTab(buildPage(QString("qrc:/about.html"), QTextDocument::HtmlResource),"Scopy");
 }
 
-QWidget* ScopyAboutPage::buildPage(QString src) {
-	QTextBrowser *browser = new QTextBrowser(this);
-	browser->setMarkdown(src);
-	return browser;
-
-}
-
-QWidget* ScopyAboutPage::buildPage(QUrl src, QTextDocument::ResourceType r) {
+QWidget* ScopyAboutPage::buildPage(QString src, QTextDocument::ResourceType r) {
 	QWidget *page = new QWidget(this);
 	QVBoxLayout *lay = new QVBoxLayout(page);
 
 	QTextBrowser *browser = new QTextBrowser(page);
-	lay->addWidget(browser, r);
-	browser->setSource(src);	
+	lay->addWidget(browser);
+	switch(r) {
+	case QTextDocument::MarkdownResource:
+		browser->setMarkdown(src);
+		break;
+	case QTextDocument::UnknownResource:
+	case QTextDocument::HtmlResource:
+	default:
+		browser->setSource(src,r);
+		break;
+	}
 	QPushButton *backButton = new QPushButton("Back",page);
 	backButton->setProperty("blue_button",true);
 	lay->addWidget(backButton);

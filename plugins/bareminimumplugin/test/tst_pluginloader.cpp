@@ -45,7 +45,7 @@ void TST_BareMinimum::isLibrary()
 void TST_BareMinimum::className()
 {
 	QPluginLoader qp(FILENAME,this);
-	QVERIFY(qp.metaData().value("className") == "TestPlugin");
+	QVERIFY(qp.metaData().value("className") == "BareMinimum");
 }
 
 void TST_BareMinimum::loaded()

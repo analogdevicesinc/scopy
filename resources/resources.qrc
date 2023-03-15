@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>filter.json</file>
         <file>icon.ico</file>
         <file>m2k.html</file>
         <file>open-sans-regular.ttf</file>

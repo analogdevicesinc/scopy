@@ -75,8 +75,8 @@ protected:
 };
 }
 
-#define xstr(a) str(a)
-#define str(a) #a
+#define scopyxstr(a) scopystr(a)
+#define scopystr(a) #a
 
 #define SCOPY_PLUGIN \
 	Q_PLUGIN_METADATA(IID ScopyPlugin_iid)\
@@ -86,7 +86,7 @@ public:\
 	SCOPY_PLUGIN_NAME* clone() override { \
 		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
 		/* copy metadata from this object to the next one */\
-		ret->m_name = xstr(SCOPY_PLUGIN_NAME);\
+		ret->m_name = scopyxstr(SCOPY_PLUGIN_NAME);\
 		ret->m_displayName = ret->m_name;\
 		ret->setMetadata(metadata()); \
 		ret->cloneExtra(this);\
@@ -94,10 +94,10 @@ public:\
 	}\
 \
 Q_SIGNALS:\
-	virtual void disconnectDevice() override;\
-	virtual void restartDevice() override;\
-	virtual void toolListChanged() override;\
-	virtual void requestTool(QString) override;\
+	void disconnectDevice() override;\
+	void restartDevice() override;\
+	void toolListChanged() override;\
+	void requestTool(QString) override;\
 private:\
 
 #define SCOPY_PLUGIN_ICON(x) m_icon = new QLabel(""); m_icon->setStyleSheet("border-image: url(" x ");")
