@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef SCOPY_TOOL_HPP
-#define SCOPY_TOOL_HPP
+#ifndef M2K_TOOL_HPP
+#define M2K_TOOL_HPP
 
 #include <QWidget>
 #include <QSettings>
@@ -28,10 +28,9 @@
 #include <QDropEvent>
 #include <QString>
 #include <QMainWindow>
+#include "pluginbase/toolmenuentry.h"
+#include <pluginbase/preferences.h>
 
-#include "preferences.h"
-
-#include "toolmenuitem.h"
 
 class QJSEngine;
 class QPushButton;
@@ -44,18 +43,16 @@ namespace adiscope {
 class ApiObject;
 class ToolLauncher;
 
-class Tool : public QWidget
+class M2kTool : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit Tool(struct iio_context *ctx, ToolMenuItem *toolMenuItem,
+	explicit M2kTool(struct iio_context *ctx, ToolMenuEntry *tme,
 		      ApiObject *api, const QString& name,
-		      ToolLauncher *parent);
-	~Tool();
+		      QWidget *parent);
+	~M2kTool();
 
-	QPushButton *runButton() { return toolMenuItem->getToolStopBtn(); }
-	QPushButton *singleButton() { return toolMenuItem->getToolBtn(); }
 	const QString& getName();
 	void setName(const QString& name);
 	virtual void settingsLoaded();
@@ -87,14 +84,13 @@ protected:
 	struct iio_context *ctx;
 	QPushButton *run_button;
 	ApiObject *api;
-	QSettings *settings;
 	QString name;
-	Preferences *prefPanel;
 	bool saveOnExit;
 	bool isDetached;
 	bool m_running;
 	QMainWindow *window;
-	ToolMenuItem *toolMenuItem;
+	ToolMenuEntry *tme;
+	Preferences *p;
 	bool m_useNativeDialogs;
 };
 }

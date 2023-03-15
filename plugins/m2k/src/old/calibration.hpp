@@ -21,7 +21,7 @@
 #ifndef CALIBRATION_HPP
 #define CALIBRATION_HPP
 
-#include "apiObject.hpp"
+#include "pluginbase/apiobject.h"
 
 #include <cstdint>
 #include <cstdlib>
@@ -61,7 +61,7 @@ public:
                 HIGH
         };
 
-	Calibration(struct iio_context *ctx, QJSEngine *engine);
+	Calibration(struct iio_context *ctx);
 	~Calibration();
 
 	bool initialize();

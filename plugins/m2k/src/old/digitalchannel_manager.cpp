@@ -44,7 +44,7 @@
 #include "digitalchannel_manager.hpp"
 
 using namespace std;
-using namespace adiscope;
+using namespace adiscope::m2k;
 
 constexpr int DIGITAL_NR_CHANNELS = 16;
 

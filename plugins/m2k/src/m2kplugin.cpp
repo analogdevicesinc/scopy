@@ -1,4 +1,5 @@
 #include "m2kplugin.h"
+#include "digitalio.hpp"
 #include "m2kcommon.h"
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -11,11 +12,14 @@
 #include <pluginbase/preferences.h>
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferenceshelper.h>
+#include <pluginbase/scopyjs.h>
 #include "iioutil/contextprovider.h"
 #include <iio.h>
 
 #include "filter.hpp"
 #include "dmm.hpp"
+#include "manualcalibration.h"
+#include "digitalchannel_manager.hpp"
 
 using namespace adiscope;
 using namespace adiscope::m2k;
@@ -198,10 +202,6 @@ bool M2kPlugin::loadPreferencesPage()
 	return true;
 }
 
-
-
-
-
 bool M2kPlugin::onConnect()
 {
 	ContextProvider *c = ContextProvider::GetInstance();
@@ -212,9 +212,17 @@ bool M2kPlugin::onConnect()
 	m_m2kController->startPingTask();
 
 	Filter *f = new Filter(ctx);
+	QJSEngine *js = ScopyJS::GetInstance()->engine();
 
-	auto dmmTme = ToolMenuEntry::findToolMenuEntryByName(m_toolList,"Voltmeter");
+	auto calib = new Calibration(ctx);
+	auto diom = new DIOManager(ctx,f);
+	auto dmmTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdmm");
+	auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal");
+	auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
+
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
+	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
+	dioTme->setTool( new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
 
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
 	connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
@@ -233,10 +241,13 @@ bool M2kPlugin::onConnect()
 
 bool M2kPlugin::onDisconnect()
 {	
+	delete calib;
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		tme->setRunning(false);
+		delete tme->tool();
+		tme->setTool(nullptr);
 	}
 
 	disconnect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);

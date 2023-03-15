@@ -62,7 +62,7 @@ using namespace libm2k::context;
 
 DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
 	 QWidget *parent)
-	: QWidget(parent),/*Tool(ctx, toolMenuItem, new DMM_API(this), "Voltmeter", parent),*/
+	: M2kTool(ctx, tme, new DMM_API(this), "Voltmeter", parent),
 	  ui(new Ui::DMM), signal(std::make_shared<signal_sample>()),
 	  manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
 	  m_m2k_context(m2kOpen(ctx, "")),
@@ -111,7 +111,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
 			this, SLOT(toggleTimer(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 			tme, SLOT(setRunning(bool)));
-	connect(tme, SIGNAL(toggled(bool)), ui->run_button,
+	connect(tme, SIGNAL(runToggled(bool)), ui->run_button,
 			SLOT(setChecked(bool)));
 	connect(ui->run_button, SIGNAL(toggled(bool)),
 		this, SLOT(startDataLogging(bool)));

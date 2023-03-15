@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logging_categories.h"
 #include "calibration.hpp"
 #include <libm2k/m2kexceptions.hpp>
 
@@ -29,17 +28,21 @@
 #include <QThread>
 
 #include "calibration_api.hpp"
+#include <QLoggingCategory>
+#include "pluginbase/scopyjs.h"
+
+Q_LOGGING_CATEGORY(CAT_M2K_CALIBRATION,"M2KCalibration");
 
 using namespace adiscope;
 
-Calibration::Calibration(struct iio_context *ctx, QJSEngine *engine):
+Calibration::Calibration(struct iio_context *ctx):
 	m_api(new Calibration_API(this)),
 	m_cancel(false),
 	m_ctx(ctx),
 	m_initialized(false)
 {
 	m_api->setObjectName("calib");
-	m_api->js_register(engine);
+	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
 Calibration::~Calibration()
@@ -79,7 +82,7 @@ bool Calibration::isCalibrated()
 bool Calibration::resetCalibration()
 {
 	if (!m_initialized) {
-		qDebug(CAT_CALIBRATION) << "Rx path is not initialized for calibration.";
+		qDebug(CAT_M2K_CALIBRATION) << "Rx path is not initialized for calibration.";
 		return false;
 	}
 
@@ -98,7 +101,7 @@ bool Calibration::calibrateAll()
 	try {
 		ok = m_m2k->calibrateADC();
 	} catch (libm2k::m2k_exception &e) {
-		qDebug(CAT_CALIBRATION) << e.what();
+		qDebug(CAT_M2K_CALIBRATION) << e.what();
 		ok = false;
 	}
 	if(!ok || m_cancel)
@@ -107,7 +110,7 @@ bool Calibration::calibrateAll()
 	try {
 		ok = m_m2k->calibrateDAC();
 	} catch (libm2k::m2k_exception &e) {
-		qDebug(CAT_CALIBRATION) << e.what();
+		qDebug(CAT_M2K_CALIBRATION) << e.what();
 		ok = false;
 	}
 	if(!ok || m_cancel)

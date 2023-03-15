@@ -441,7 +441,7 @@ QSlider::handle:horizontal:enabled {
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
+   <header>gui/customSwitch.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

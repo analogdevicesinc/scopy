@@ -40,6 +40,8 @@
 /* libm2k includes */
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2k.hpp>
+#include "m2ktool.hpp"
+
 
 namespace Ui {
 	class DMM;
@@ -50,7 +52,7 @@ class QJSEngine;
 namespace adiscope::m2k {
 	class DMM_API;
 
-	class DMM : public QWidget
+	class DMM : public M2kTool
 	{
 		friend class DMM_API;
 		friend class ToolLauncher_API;

@@ -364,12 +364,12 @@ background-color: red;
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>adiscope::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/smallOnOffSwitch.hpp</header>
+   <header>gui/smallOnOffSwitch.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
