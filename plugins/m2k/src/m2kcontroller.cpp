@@ -3,6 +3,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <iioutil/contextprovider.h>
+#include <libm2k/m2kexceptions.hpp>
 
 using namespace libm2k;
 using namespace libm2k::analog;
@@ -99,7 +100,9 @@ void M2kController::calibrate()
 
 	QFutureWatcher<bool> *fw = new QFutureWatcher<bool>(this);
 	QFuture<bool> f = QtConcurrent::run(std::bind(&libm2k::context::M2k::calibrate,m_m2k));
+
 	connect(fw,&QFutureWatcher<bool>::finished,this,[=](){
+
 		if(fw->result()) {
 			Q_EMIT calibrationSuccess();
 		} else  {

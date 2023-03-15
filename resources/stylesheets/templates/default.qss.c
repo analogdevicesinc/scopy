@@ -1,7 +1,7 @@
 #include "values.h"
 
 /* Default background color */
-QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
+QMainWindow > .QWidget, adiscope--m2k--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
 	background-color: #272730;
 }
 
@@ -59,19 +59,19 @@ QLabel[valid=true] { color: rgba(255, 255, 255, 150) }
 QTextBrowser { background-color: rgba(0, 0, 0, 150); }
 
 /* Apply a gradient to the MenuAnim widgets */
-adiscope--MenuAnim, adiscope--DMM #widget_2, .adiscope--PowerController #rightMenu {
+adiscope--m2k--MenuAnim, adiscope--m2k--DMM #widget_2, .adiscope--m2k--PowerController #rightMenu {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
 }
 
 /* Except for the tool launcher's MenuAnim */
-QMainWindow > .QWidget > .adiscope--MenuAnim { background-color: none; }
+QMainWindow > .QWidget > .adiscope--m2k--MenuAnim { background-color: none; }
 
 QwtPlot, QwtPolarPlot, pv--view--Viewport, QWidget[plot_container=true]{
 	background-color: black;
 }
 
 /* QwtPlot should have a black background, except the sismographs */
-adiscope--Sismograph { background-color: transparent; }
+adiscope--m2k--Sismograph { background-color: transparent; }
 
 QwtPlotCanvas { background-color: #141416; }
 
@@ -84,7 +84,7 @@ QwtThermo {
 	font-size: 26px;
 }
 
-adiscope--BufferPreviewer {
+adiscope--m2k--BufferPreviewer {
 	border: 1px solid #7092be;
 	alternate-background-color: #4a64ff;
 	selection-background-color: #141416;
@@ -547,7 +547,7 @@ QWidget#stackedWidgetPage1 {
 
 /* Background color for info page */
 
-.adiscope--StackedHomepage#stackedWidget{ background-color: black; }
+.adiscope--m2k--StackedHomepage#stackedWidget{ background-color: black; }
 
 
 /* Style for all line separators */
@@ -557,27 +557,27 @@ QFrame[line_separator=true]{ background-color: rgba(255, 255, 255, 16); }
 
 /* Background color for Voltmeter and Power Supply */
 
-.adiscope--PowerController #leftPanel, .adiscope--DMM #leftPanel{
+.adiscope--m2k--PowerController #leftPanel, .adiscope--m2k--DMM #leftPanel{
 	background-color: rgba(0, 0, 0, 40);
 }
 
 
 /* Gradient background for all instruments */
 
-.adiscope--Oscilloscope #mainWidget, .adiscope--SpectrumAnalyzer #mainWidget,
-.adiscope--NetworkAnalyzer #mainWidget, .adiscope--SignalGenerator #mainWidget,
-.adiscope--logic--LogicAnalyzer #mainWidget, .adiscope--logic--PatternGenerator #mainWidget,
-.adiscope--DigitalIO #widget, .adiscope--DMM #hLayout_top_btn_area_voltmeter, .adiscope--PowerController #hWidget_top_area {
+.adiscope--m2k--Oscilloscope #mainWidget, .adiscope--m2k--SpectrumAnalyzer #mainWidget,
+.adiscope--m2k--NetworkAnalyzer #mainWidget, .adiscope--m2k--SignalGenerator #mainWidget,
+.adiscope--m2k--logic--LogicAnalyzer #mainWidget, .adiscope--m2k--logic--PatternGenerator #mainWidget,
+.adiscope--m2k--DigitalIO #widget, .adiscope--m2k--DMM #hLayout_top_btn_area_voltmeter, .adiscope--m2k--PowerController #hWidget_top_area {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 rgba(0, 0, 0, 40), stop: 0.1 transparent, stop: 1.0 transparent);
 }
 
 /* Remove inherited gradient from the export setting of the Oscilloscope */
 
-.adiscope--ExportSettings #mainWidget, .adiscope--ImportSettings #mainWidget {
+.adiscope--m2k--ExportSettings #mainWidget, .adiscope--m2k--ImportSettings #mainWidget {
 	background-color: none;
 }
 
-adiscope--CursorReadouts {
+adiscope--m2k--CursorReadouts {
 	background-color: black;
 }
 
@@ -664,7 +664,7 @@ QHeaderView::section:checked {
 
 /************************** Channel widget **************************/
 
-adiscope--ChannelWidget QWidget {
+adiscope--m2k--ChannelWidget QWidget {
 	color: rgba(255, 255, 255, 153);
 
 	border-width: 0px;
@@ -673,45 +673,45 @@ adiscope--ChannelWidget QWidget {
 
 /* Widget containing box, name, btn */
 
-adiscope--ChannelWidget QWidget#widget {
+adiscope--m2k--ChannelWidget QWidget#widget {
 	background-color: transparent;
 	border-radius: 4px;
 }
-adiscope--ChannelWidget QWidget#widget[selected=true] {
+adiscope--m2k--ChannelWidget QWidget#widget[selected=true] {
 	background-color: rbga(20, 20, 22, 153);
 }
 
 /* Round check box */
-adiscope--ChannelWidget QCheckBox#box{
+adiscope--m2k--ChannelWidget QCheckBox#box{
 	spacing: 0px;
 	background-color: none;
 	font-size: 14px;
 	font-weight: bold;
 }
 
-adiscope--ChannelWidget QCheckBox#box::indicator {
+adiscope--m2k--ChannelWidget QCheckBox#box::indicator {
 	width: INDICATOR_SIZE;
 	height: INDICATOR_SIZE;
   border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
 	border-radius: 9px;
 }
 
-adiscope--ChannelWidget QCheckBox#box::indicator:unchecked {
+adiscope--m2k--ChannelWidget QCheckBox#box::indicator:unchecked {
 	background-color: transparent;
 }
-adiscope--ChannelWidget QCheckBox#box::indicator:checked {
+adiscope--m2k--ChannelWidget QCheckBox#box::indicator:checked {
   background-color: #000000; /* Will be overwritted in the ChannelWidget constructor */
 }
 
 /* Name */
-adiscope--ChannelWidget QPushButton#name {
+adiscope--m2k--ChannelWidget QPushButton#name {
 	font-size: 14px;
 	font-weight: bold;
 	background-color: none;
 }
 
 /* Delete Button */
-adiscope--ChannelWidget QPushButton#delBtn {
+adiscope--m2k--ChannelWidget QPushButton#delBtn {
 	width: 24px;
 	height: 24px;
 	background-color: transparent;
@@ -719,34 +719,34 @@ adiscope--ChannelWidget QPushButton#delBtn {
 	background-repeat: no-repeat;
 	background-image: url(:/icons/red_x.svg);
 }
-adiscope--ChannelWidget QPushButton#delBtn::hover {
+adiscope--m2k--ChannelWidget QPushButton#delBtn::hover {
 	background-image: url(:/icons/red_x.svg);
 }
 
 /* Menu button */
-adiscope--ChannelWidget QPushButton#btn {
+adiscope--m2k--ChannelWidget QPushButton#btn {
 	width: 40px;
 	height: 20px;
 	background-color: transparent;
 }
-adiscope--ChannelWidget QPushButton#btn:pressed {
+adiscope--m2k--ChannelWidget QPushButton#btn:pressed {
 	border-image: url(:/icons/setup_btn_checked.svg)
 }
-adiscope--ChannelWidget QPushButton#btn:!pressed {
+adiscope--m2k--ChannelWidget QPushButton#btn:!pressed {
 	border-image: url(:/icons/setup_btn_unchecked.svg)
 }
-adiscope--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
+adiscope--m2k--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
 	border-image: url(:/icons/setup_btn_hover.svg)
 }
-adiscope--ChannelWidget QPushButton#btn:checked {
+adiscope--m2k--ChannelWidget QPushButton#btn:checked {
 	border-image: url(:/icons/setup_btn_checked.svg)
 }
 
 /* Underline */
-adiscope--ChannelWidget QFrame#line {
+adiscope--m2k--ChannelWidget QFrame#line {
 	border: 2px solid transparent;
 }
-adiscope--ChannelWidget QFrame#line[selected=true] {
+adiscope--m2k--ChannelWidget QFrame#line[selected=true] {
   border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
 }
 
@@ -756,7 +756,7 @@ adiscope--ChannelWidget QFrame#line[selected=true] {
 
 /******************** Dropdown switch list ************************/
 
-adiscope--DropdownSwitchList {
+adiscope--m2k--DropdownSwitchList {
 	height: 30px;
 	border: 0px;
 	font-size: 18px;
@@ -764,12 +764,12 @@ adiscope--DropdownSwitchList {
 	padding-left: 20px;
 }
 
-adiscope--DropdownSwitchList:editable{
+adiscope--m2k--DropdownSwitchList:editable{
 	background-color: #141416;
 	color: white;
 }
 
-adiscope--DropdownSwitchList::drop-down {
+adiscope--m2k--DropdownSwitchList::drop-down {
 	subcontrol-position: center right;
 	width: 10px;
 	height: 6px;
@@ -777,7 +777,7 @@ adiscope--DropdownSwitchList::drop-down {
 	margin-right: 20px;
 }
 
-adiscope--DropdownSwitchList QAbstractItemView {
+adiscope--m2k--DropdownSwitchList QAbstractItemView {
 	border: 0px;
 	background-color: #141416;
 	font-size: 18px;
@@ -787,36 +787,36 @@ adiscope--DropdownSwitchList QAbstractItemView {
   border-left: 0px solid #141416; /* setting to 0 for now */
 }
 
-adiscope--DropdownSwitchList QAbstractItemView::item {
+adiscope--m2k--DropdownSwitchList QAbstractItemView::item {
 	color: #ffffff;
 	height: 60px;
 }
 
-adiscope--DropdownSwitchList QAbstractItemView::item:hover {
+adiscope--m2k--DropdownSwitchList QAbstractItemView::item:hover {
 	background-color: #141416;
 	font-weight: bold;
 	border-bottom: 0px solid none;
 }
 
-adiscope--DropdownSwitchList QHeaderView {
+adiscope--m2k--DropdownSwitchList QHeaderView {
   /* Cancel the effect of the QAbstractItemView border-left property. It's
   necessary because the border (or padding) of the QAbstractItemView applies to
   this element as well. */
 	padding-left: -0px;
 }
 
-adiscope--DropdownSwitchList QHeaderView:section {
+adiscope--m2k--DropdownSwitchList QHeaderView:section {
 	color: rgba(255, 255, 255, 153);
 	background-color: #141416;
 	border: 0px;
 	font: 14px;
 }
 
-adiscope--DropdownSwitchList QCheckBox {
+adiscope--m2k--DropdownSwitchList QCheckBox {
 	background-color: #141416;
 }
 
-adiscope--DropdownSwitchList QCheckBox::indicator {
+adiscope--m2k--DropdownSwitchList QCheckBox::indicator {
 	width: 16px;
 	height: 16px;
 	subcontrol-position: center;
@@ -828,39 +828,39 @@ adiscope--DropdownSwitchList QCheckBox::indicator {
 
 /************************* SpinBoxes *************************/
 
-adiscope--SpinBoxA QPushButton#SBA_UpButton {
+adiscope--m2k--SpinBoxA QPushButton#SBA_UpButton {
 	width: 30px;
 	height: 30px;
 	border-image: url(:/icons/sba_up_btn.svg);
 	border: 0px;
 }
 
-adiscope--SpinBoxA QPushButton#SBA_UpButton:pressed {
+adiscope--m2k--SpinBoxA QPushButton#SBA_UpButton:pressed {
 	border-image: url(:/icons/sba_up_btn_pressed.svg);
 }
-adiscope--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
+adiscope--m2k--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
 	border-image: url(:/icons/sba_up_btn_hover.svg);
 }
 
-adiscope--SpinBoxA QPushButton#SBA_DownButton {
+adiscope--m2k--SpinBoxA QPushButton#SBA_DownButton {
 	width: 30px;
 	height: 30px;
 	border-image: url(:/icons/sba_dn_btn.svg);
 	border: 0px;
 }
-adiscope--SpinBoxA QPushButton#SBA_DownButton:pressed {
+adiscope--m2k--SpinBoxA QPushButton#SBA_DownButton:pressed {
 	border-image: url(:/icons/sba_dn_btn_pressed.svg);
 }
-adiscope--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
+adiscope--m2k--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
 	border-image: url(:/icons/sba_dn_btn_hover.svg);
 }
 
-adiscope--SpinBoxA QLabel#SBA_Label {
+adiscope--m2k--SpinBoxA QLabel#SBA_Label {
 	color: rgba(255, 255, 255, 102);
 	font-size: 14px;
 }
 
-adiscope--SpinBoxA QLineEdit#SBA_LineEdit {
+adiscope--m2k--SpinBoxA QLineEdit#SBA_LineEdit {
 	height: 20px;
 	width: 75px;
 	font-size: 18px;
@@ -868,15 +868,15 @@ adiscope--SpinBoxA QLineEdit#SBA_LineEdit {
 	bottom: 10px;
 }
 
-adiscope--SpinBoxA QFrame#SBA_Line {
+adiscope--m2k--SpinBoxA QFrame#SBA_Line {
 	color: #4a64ff;
 }
 
-adiscope--SpinBoxA QFrame#SBA_Line:disabled {
+adiscope--m2k--SpinBoxA QFrame#SBA_Line:disabled {
 	color: #555555;
 }
 
-adiscope--SpinBoxA QComboBox#SBA_Combobox {
+adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox {
 	height: 20px;
 	font-size: 12px;
 	font-weight: normal;
@@ -884,21 +884,21 @@ adiscope--SpinBoxA QComboBox#SBA_Combobox {
 	padding-bottom: 0px;
 }
 
-adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down {
+adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox::drop-down {
 	subcontrol-position: center right;
 	width: 10px;
 	height: 6px;
 	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
-adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
+adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
 	subcontrol-position: center right;
 	width: 0px;
 	height: 0px;
 	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
-adiscope--SpinBoxA QDial#SBA_CompletionCircle {
+adiscope--m2k--SpinBoxA QDial#SBA_CompletionCircle {
 	background-color: black;
 	color: #4963ff;
 }

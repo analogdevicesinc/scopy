@@ -38,8 +38,8 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config",""));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Runtime",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOTConfig","SWIOT Config",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOTRuntime","SWIOT Runtime",""));
 }
 
 void SWIOTPlugin::unload()
@@ -97,12 +97,12 @@ bool SWIOTPlugin::onConnect()
 	connect(configui->pushButton,&QPushButton::clicked,this,[=](){
 		m_toolList[0]->setEnabled(false);
 		m_toolList[1]->setEnabled(true);
-		Q_EMIT requestTool(m_toolList[1]->id());
+		requestTool("SWIOTRuntime");
 	});
 	connect(rungui->pushButton,&QPushButton::clicked,this,[=](){
 		m_toolList[0]->setEnabled(true);
 		m_toolList[1]->setEnabled(false);
-		Q_EMIT requestTool(m_toolList[0]->id());
+		requestTool("SWIOTConfig");
 	});
 
 	return false;
