@@ -9,10 +9,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include "pluginbase/preferences.h"
-#include "scopycore_config.h"
-#ifdef ENABLE_SCOPYJS
-#include "scopyjs/scopyjs.h"
-#endif
+#include "pluginbase/scopyjs.h"
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "versionchecker.h"
@@ -25,9 +22,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ui->setupUi(this);
 	initPreferences();
 
-#ifdef ENABLE_SCOPYJS
 	ScopyJS::GetInstance();
-#endif
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
 //	auto vc = VersionCache::GetInstance();
