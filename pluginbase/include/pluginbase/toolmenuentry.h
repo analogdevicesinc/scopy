@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QUuid>
 #include "scopypluginbase_export.h"
 
 namespace adiscope {
@@ -15,11 +16,12 @@ class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QObject *parent = nullptr) :
-		QObject(parent), m_id(id), m_name(name), m_icon(icon), m_visible(true),
+		QObject(parent), m_uuid(QUuid::createUuid().toString()), m_id(id), m_name(name), m_icon(icon), m_visible(true),
 		m_enabled(false), m_running(false), m_runBtnVisible(false), m_tool(nullptr) {}
 
 	ToolMenuEntry(const ToolMenuEntry &other) {
 		m_id = other.m_id;
+		m_uuid = other.m_uuid;
 		m_name = other.m_name;
 		m_icon = other.m_icon;
 		m_visible = other.m_visible;
@@ -31,6 +33,7 @@ public:
 
 	~ToolMenuEntry() {}
 	QString id() { return m_id; }
+	QString uuid() { return m_uuid; }
 	QString name() { return m_name; }
 	QString icon() { return m_icon; }
 	bool visible() { return m_visible; }
@@ -103,10 +106,11 @@ Q_SIGNALS:
 	 * @brief requestRun
 	 * Signal is emitted when the run button is clicked from Scopy UI
 	 */
-	void toggled(bool);
+	void runToggled(bool);
 
 private:
 	QString m_id;
+	QString m_uuid;
 	QString m_name;
 	QString m_icon;
 	bool m_visible;
