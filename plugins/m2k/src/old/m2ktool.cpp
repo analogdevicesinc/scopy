@@ -23,6 +23,7 @@
 
 
 using namespace adiscope;
+using namespace adiscope::m2k;
 
 M2kTool::M2kTool(struct iio_context *ctx, ToolMenuEntry *tme,
 		ApiObject *api, const QString& name,

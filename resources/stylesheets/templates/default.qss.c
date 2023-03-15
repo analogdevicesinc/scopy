@@ -828,39 +828,39 @@ adiscope--m2k--DropdownSwitchList QCheckBox::indicator {
 
 /************************* SpinBoxes *************************/
 
-adiscope--m2k--SpinBoxA QPushButton#SBA_UpButton {
+adiscope--SpinBoxA QPushButton#SBA_UpButton {
 	width: 30px;
 	height: 30px;
 	border-image: url(:/icons/sba_up_btn.svg);
 	border: 0px;
 }
 
-adiscope--m2k--SpinBoxA QPushButton#SBA_UpButton:pressed {
+adiscope--SpinBoxA QPushButton#SBA_UpButton:pressed {
 	border-image: url(:/icons/sba_up_btn_pressed.svg);
 }
-adiscope--m2k--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
+adiscope--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
 	border-image: url(:/icons/sba_up_btn_hover.svg);
 }
 
-adiscope--m2k--SpinBoxA QPushButton#SBA_DownButton {
+adiscope--SpinBoxA QPushButton#SBA_DownButton {
 	width: 30px;
 	height: 30px;
 	border-image: url(:/icons/sba_dn_btn.svg);
 	border: 0px;
 }
-adiscope--m2k--SpinBoxA QPushButton#SBA_DownButton:pressed {
+adiscope--SpinBoxA QPushButton#SBA_DownButton:pressed {
 	border-image: url(:/icons/sba_dn_btn_pressed.svg);
 }
-adiscope--m2k--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
+adiscope--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
 	border-image: url(:/icons/sba_dn_btn_hover.svg);
 }
 
-adiscope--m2k--SpinBoxA QLabel#SBA_Label {
+adiscope--SpinBoxA QLabel#SBA_Label {
 	color: rgba(255, 255, 255, 102);
 	font-size: 14px;
 }
 
-adiscope--m2k--SpinBoxA QLineEdit#SBA_LineEdit {
+adiscope--SpinBoxA QLineEdit#SBA_LineEdit {
 	height: 20px;
 	width: 75px;
 	font-size: 18px;
@@ -868,15 +868,15 @@ adiscope--m2k--SpinBoxA QLineEdit#SBA_LineEdit {
 	bottom: 10px;
 }
 
-adiscope--m2k--SpinBoxA QFrame#SBA_Line {
+adiscope--SpinBoxA QFrame#SBA_Line {
 	color: #4a64ff;
 }
 
-adiscope--m2k--SpinBoxA QFrame#SBA_Line:disabled {
+adiscope--SpinBoxA QFrame#SBA_Line:disabled {
 	color: #555555;
 }
 
-adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox {
+adiscope--SpinBoxA QComboBox#SBA_Combobox {
 	height: 20px;
 	font-size: 12px;
 	font-weight: normal;
@@ -884,21 +884,21 @@ adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox {
 	padding-bottom: 0px;
 }
 
-adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox::drop-down {
+adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down {
 	subcontrol-position: center right;
 	width: 10px;
 	height: 6px;
 	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
-adiscope--m2k--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
+adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
 	subcontrol-position: center right;
 	width: 0px;
 	height: 0px;
 	border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
-adiscope--m2k--SpinBoxA QDial#SBA_CompletionCircle {
+adiscope--SpinBoxA QDial#SBA_CompletionCircle {
 	background-color: black;
 	color: #4963ff;
 }
