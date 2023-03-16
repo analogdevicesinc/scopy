@@ -36,3 +36,5 @@ ScopyEnvironment *ScopyEnvironment::GetInstance()
 	}
 	return pinstance_;
 }
+
+#include "moc_scopyenvironment.cpp"
