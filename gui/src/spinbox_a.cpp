@@ -1247,3 +1247,5 @@ void SpinBoxA_API::setName(const QString &name)
 	sba->setName(name);
 }
 #endif
+
+#include "moc_spinbox_a.cpp"

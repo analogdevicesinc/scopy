@@ -31,7 +31,7 @@ using namespace adiscope;
 using namespace gr;
 
 static const int KERNEL_BUFFERS_DEFAULT = 1;
-std::map<const std::string, iio_manager::map_entry> iio_manager::dev_map;
+std::map<const std::string, iio_manager::map_entry> *iio_manager::dev_map = nullptr;
 unsigned iio_manager::_id = 0;
 
 Q_LOGGING_CATEGORY(CAT_M2K_IIO_MANAGER, "M2kIIOManager");
@@ -101,8 +101,11 @@ std::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
 {
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
-	if (!dev_map.empty()) {
-		for (auto it = dev_map.begin(); it != dev_map.end(); ++it) {
+	if(dev_map == nullptr) {
+		dev_map = new std::map<const std::string, iio_manager::map_entry>();
+	}
+	if (!dev_map->empty()) {
+		for (auto it = dev_map->begin(); it != dev_map->end(); ++it) {
 			if (it->first.compare(_dev) != 0)
 				continue;
 
@@ -125,12 +128,12 @@ std::shared_ptr<iio_manager> iio_manager::get_instance(
 		return instance;
 	}
 
-	/* No manager found - create a new one */
+	/* No manager found - create a new one */	
 	auto manager = new iio_manager(_id++, ctx, _dev, buffer_size);
-    std::shared_ptr<iio_manager> shared_manager(manager);
+	std::shared_ptr<iio_manager> shared_manager(manager);
 
 	/* Add it to the map */
-	auto it = dev_map.insert(std::pair<const std::string, map_entry>(
+	auto it = dev_map->insert(std::pair<const std::string, map_entry>(
 				_dev, shared_manager));
 	if (it.second == false)
 		it.first->second = shared_manager;
