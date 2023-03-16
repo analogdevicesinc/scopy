@@ -44,3 +44,5 @@ void LcdNumber::display(double num)
 
 	QLCDNumber::display(QString(str.str().c_str()));
 }
+
+#include "moc_lcdNumber.cpp"

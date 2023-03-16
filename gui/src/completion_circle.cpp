@@ -247,3 +247,5 @@ void CompletionCircle::setIsLogScale(bool state)
 {
 	m_log_scale = state;
 }
+
+#include "moc_completion_circle.cpp"

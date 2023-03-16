@@ -21,9 +21,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
+set(SCOPY_QT_COMPONENTS Core Widgets)
+
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB OLD_SCOPY_FILES src/old/*.cpp src/old/*.hpp src/old/*.cc src/old/*.hh src/old/*.c src/old/*.h)
-
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
@@ -41,8 +42,8 @@ set(PROJECT_SOURCES
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core )
-find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
+#find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
 find_package(libm2k REQUIRED)
 
 find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt iio)
@@ -70,8 +71,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	)
 target_include_directories(${PROJECT_NAME} PUBLIC scopypluginbase)
 
+foreach(comp ${SCOPY_QT_COMPONENTS})
+    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
+endforeach()
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    Qt::Widgets Qt::Core
+    ${SCOPY_QT_LIBRARIES}
     scopypluginbase
     scopyiioutil
     scopygui

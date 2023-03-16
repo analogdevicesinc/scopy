@@ -134,3 +134,5 @@ void Sismograph::setLineWidth(qreal width)
         pen.setWidthF(width);
         curve.setPen(QPen(pen));
 }
+
+#include "moc_sismograph.cpp"

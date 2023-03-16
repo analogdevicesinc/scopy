@@ -60,12 +60,12 @@ QLabel[valid=true] { color: rgba(0, 0, 0, 200); }
 QTextBrowser { background-color: #EDEDED; }
 
 /* Apply a gradient to the MenuAnim widgets */
-adiscope--m2k--MenuAnim, adiscope--m2k--DMM #widget_2, .adiscope--m2k--PowerController #rightMenu  {
+adiscope--MenuAnim, adiscope--m2k--DMM #widget_2, .adiscope--m2k--PowerController #rightMenu  {
 	background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #EDEDED, stop: 0.15 #F7F7F7, stop: 0.85 #F7F7F7, stop: 1.0 #EDEDED);
 }
 
 /* Except for the tool launcher's MenuAnim */
-QMainWindow > .QWidget > .adiscope--m2k--MenuAnim { background-color: none; }
+QMainWindow > .QWidget > .adiscope--MenuAnim { background-color: none; }
 
 QwtPlot, QwtPolarPlot, pv--view--Viewport, QWidget[plot_container=true] {
 	background-color: white;
@@ -576,7 +576,7 @@ QFrame[line_separator=true]{ background-color: rgba(0, 0, 0, 20); }
 	background-color: none;
 }
 
-adiscope--m2k--CursorReadouts {
+adiscope--CursorReadouts {
 	background-color: white;
 }
 
@@ -663,7 +663,7 @@ QHeaderView::section:checked {
 
 /*********************** Channel widget *******************/
 
-adiscope--m2k--ChannelWidget QWidget {
+adiscope--ChannelWidget QWidget {
 	color: rgba(0, 0, 0, 170);
 
 	border-width: 0px;
@@ -671,45 +671,45 @@ adiscope--m2k--ChannelWidget QWidget {
 }
 
 /* Widget containing box, name, btn */
-adiscope--m2k--ChannelWidget QWidget#widget {
+adiscope--ChannelWidget QWidget#widget {
 	background-color: transparent;
 	border-radius: 4px;
 }
-adiscope--m2k--ChannelWidget QWidget#widget[selected=true] {
+adiscope--ChannelWidget QWidget#widget[selected=true] {
 	background-color: rbga(0, 0, 0, 40);
 }
 
 /* Round check box */
-adiscope--m2k--ChannelWidget QCheckBox#box{
+adiscope--ChannelWidget QCheckBox#box{
 	spacing: 0px;
 	background-color: none;
 	font-size: 14px;
 	font-weight: bold;
 }
 
-adiscope--m2k--ChannelWidget QCheckBox#box::indicator {
+adiscope--ChannelWidget QCheckBox#box::indicator {
 	width: INDICATOR_SIZE;
 	height: INDICATOR_SIZE;
 	border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
 	border-radius: 9px;
 }
 
-adiscope--m2k--ChannelWidget QCheckBox#box::indicator:unchecked {
+adiscope--ChannelWidget QCheckBox#box::indicator:unchecked {
 	background-color: transparent;
 }
-adiscope--m2k--ChannelWidget QCheckBox#box::indicator:checked {
+adiscope--ChannelWidget QCheckBox#box::indicator:checked {
 	background-color: #000000; /* Will be overwritted in the ChannelWidget constructor */
 }
 
 /* Name */
-adiscope--m2k--ChannelWidget QPushButton#name {
+adiscope--ChannelWidget QPushButton#name {
 	font-size: 14px;
 	font-weight: bold;
 	background-color: none;
 }
 
 /* Delete Button */
-adiscope--m2k--ChannelWidget QPushButton#delBtn {
+adiscope--ChannelWidget QPushButton#delBtn {
 	width: 24px;
 	height: 24px;
 	background-color: transparent;
@@ -717,34 +717,34 @@ adiscope--m2k--ChannelWidget QPushButton#delBtn {
 	background-repeat: no-repeat;
 	background-image: url(:/icons/red_x.svg);
 }
-adiscope--m2k--ChannelWidget QPushButton#delBtn::hover {
+adiscope--ChannelWidget QPushButton#delBtn::hover {
 	background-image: url(:/icons/red_x.svg);
 }
 
 /* Menu button */
-adiscope--m2k--ChannelWidget QPushButton#btn {
+adiscope--ChannelWidget QPushButton#btn {
 	width: 40px;
 	height: 20px;
 	background-color: transparent;
 }
-adiscope--m2k--ChannelWidget QPushButton#btn:pressed {
+adiscope--ChannelWidget QPushButton#btn:pressed {
 	border-image: url(:/icons/setup_btn_checked.svg)
 }
-adiscope--m2k--ChannelWidget QPushButton#btn:!pressed {
+adiscope--ChannelWidget QPushButton#btn:!pressed {
 	border-image: url(:/icons/setup_btn_unchecked.svg)
 }
-adiscope--m2k--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
+adiscope--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
 	border-image: url(:/icons/setup_btn_hover.svg)
 }
-adiscope--m2k--ChannelWidget QPushButton#btn:checked {
+adiscope--ChannelWidget QPushButton#btn:checked {
 	border-image: url(:/icons/setup_btn_checked.svg)
 }
 
 /* Underline */
-adiscope--m2k--ChannelWidget QFrame#line {
+adiscope--ChannelWidget QFrame#line {
 	border: 2px solid transparent;
 }
-adiscope--m2k--ChannelWidget QFrame#line[selected=true] {
+adiscope--ChannelWidget QFrame#line[selected=true] {
 	border: 2px solid #000000; /* Will be overwritted in the ChannelWidget constructor */
 }
 

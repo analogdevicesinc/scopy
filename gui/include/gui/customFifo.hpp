@@ -25,7 +25,7 @@
 #include <QVector>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace SCOPYGUI_EXPORT adiscope {
 	template <typename T>
 	class SCOPYGUI_EXPORT CustomFifo
 	{

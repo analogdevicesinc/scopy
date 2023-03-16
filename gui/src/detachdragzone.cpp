@@ -82,3 +82,5 @@ void DetachDragZone::dropEvent(QDropEvent *event)
 //		}
 	}
 }
+
+#include "moc_detachdragzone.cpp"

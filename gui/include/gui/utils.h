@@ -35,35 +35,6 @@
 #include <QSizePolicy>
 #include "scopygui_export.h"
 
-class QwtDblClickPlotPicker: public QwtPlotPicker
-{
-public:
-#if QWT_VERSION < 0x060100
-    QwtDblClickPlotPicker(QwtPlotCanvas *);
-#else /* QWT_VERSION < 0x060100 */
-    QwtDblClickPlotPicker(QWidget *);
-#endif /* QWT_VERSION < 0x060100 */
-
-    ~QwtDblClickPlotPicker();
-
-    virtual QwtPickerMachine * stateMachine(int) const;
-};
-
-class QwtPickerDblClickPointMachine: public QwtPickerMachine
-{
-public:
-  QwtPickerDblClickPointMachine();
-  ~QwtPickerDblClickPointMachine();
-
-#if QWT_VERSION < 0x060000
-  virtual CommandList
-#else
-  virtual QList<QwtPickerMachine::Command>
-#endif
-    transition( const QwtEventPattern &eventPattern,
-				  const QEvent *e);
-};
-
 class SCOPYGUI_EXPORT Util
 {
 public:

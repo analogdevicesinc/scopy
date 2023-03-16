@@ -65,3 +65,5 @@ void CustomScale::setValue(double value)
 	scaler->setValue(value);
 	QwtThermo::setValue(value);
 }
+
+#include "moc_customScale.cpp"
