@@ -75,7 +75,7 @@ namespace adiscope {
 		enum axisType m_axis;
 	};
 
-	class Measure
+	class SCOPYGUI_EXPORT Measure
 	{
 	public:
 		enum defaultMeasurements {

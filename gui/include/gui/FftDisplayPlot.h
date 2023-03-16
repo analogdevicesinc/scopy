@@ -54,7 +54,6 @@ namespace adiscope {
 
 	class SCOPYGUI_EXPORT FftDisplayPlot : public DisplayPlot
 	{
-		friend class SpectrumAnalyzer_API;
 		Q_OBJECT
 
 	public:

@@ -28,11 +28,11 @@
 
 class QJSEngine;
 
+using namespace adiscope;
 namespace adiscope::m2k {
 
-class ApiObject;
 class ManualCalibration;
-class ManualCalibration_API : public adiscope::ApiObject
+class ManualCalibration_API : public ApiObject
 {
 	Q_OBJECT
 
