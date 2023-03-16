@@ -137,6 +137,11 @@ namespace adiscope {
 		GenericLogicPlotCurve* curveAt(const QPoint& pos) const;
 
 		void setAllAxes(int ch_id);
+		VertBar* getMeasurementGateBar1();
+		VertBar* getMeasurementGateBar2();
+
+		QList<RoundedHandleV *> getOffsetHandles() const;
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);

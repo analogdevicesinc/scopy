@@ -430,6 +430,13 @@ public:
   virtual QString formatYValue(double value, int precision) const;
 
   void setCursorAxes(QwtAxisId fixed_axis, QwtAxisId mobile_axis);
+  CursorReadouts *getCursorReadouts() const;
+
+  VertBar *getVBar1() const;
+  VertBar *getVBar2() const;
+  HorizBar *getHBar1() const;
+  HorizBar *getHBar2() const;
+
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);

@@ -221,7 +221,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
 void DMM::readPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	ui->instrumentNotes->setVisible(p->get("M2k_instrument_notes_active").toBool());
+	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 }
 
 void DMM::gainModeChanged(int idx)

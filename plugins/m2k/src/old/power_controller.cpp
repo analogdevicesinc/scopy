@@ -146,7 +146,7 @@ PowerController::~PowerController()
 void PowerController::readPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	ui->instrumentNotes->setVisible(p->get("M2k_instrument_notes_active").toBool());
+	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 }
 
 void PowerController::toggleRunButton(bool enabled)

@@ -20,8 +20,10 @@
 #include "dmm.hpp"
 #include "manualcalibration.h"
 #include "digitalchannel_manager.hpp"
+#include "oscilloscope.hpp"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
+#include "spectrum_analyzer.hpp"
 
 using namespace adiscope;
 using namespace adiscope::m2k;
@@ -187,7 +189,7 @@ void M2kPlugin::restoreToolState(QStringList tools) {
 void M2kPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	p->init("M2k_instrument_notes_active",false);
+	p->init("m2k_instrument_notes_active",false);
 }
 
 bool M2kPlugin::loadPreferencesPage()
@@ -196,7 +198,7 @@ bool M2kPlugin::loadPreferencesPage()
 
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
-	QCheckBox *pref1 = PreferencesHelper::addPreferenceCheckBox(p,"M2k_instrument_notes_active","Instrument Notes",this);
+	QCheckBox *pref1 = PreferencesHelper::addPreferenceCheckBox(p,"m2k_instrument_notes_active","Instrument Notes",this);
 
 	lay->addWidget(pref1);
 	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
@@ -223,12 +225,16 @@ bool M2kPlugin::onConnect()
 	auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
 	auto pwrTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpower");
 	auto siggenTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2ksiggen");
+	auto specTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kspec");
+	auto oscTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kosc");
 
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
-	dioTme->setTool( new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
-	pwrTme->setTool (new PowerController(ctx,pwrTme,js,nullptr));
-	siggenTme->setTool (new SignalGenerator(ctx,f,pwrTme,js,nullptr));
+	dioTme->setTool(new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
+	pwrTme->setTool(new PowerController(ctx,pwrTme,js,nullptr));
+	siggenTme->setTool(new SignalGenerator(ctx,f,pwrTme,js,nullptr));
+	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,js,nullptr));
+	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,js,nullptr));
 
 
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	

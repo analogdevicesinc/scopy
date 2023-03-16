@@ -2153,6 +2153,29 @@ void DisplayPlot::resizeEvent(QResizeEvent *event)
 	Q_EMIT plotSizeChanged();
 }
 
+VertBar *DisplayPlot::getVBar1() const
+{
+	return d_vBar1;
+}
+
+VertBar *DisplayPlot::getVBar2() const
+{
+	return d_vBar2;
+}
+HorizBar *DisplayPlot::getHBar1() const
+{
+	return d_hBar1;
+}
+HorizBar *DisplayPlot::getHBar2() const
+{
+	return d_hBar2;
+}
+
+CursorReadouts *DisplayPlot::getCursorReadouts() const
+{
+	return d_cursorReadouts;
+}
+
 void DisplayPlot::bottomHorizAxisInit()
 {
 	horizAxis = new PlotAxisConfiguration(QwtAxis::XBottom, 0, this);
