@@ -108,3 +108,5 @@ void AutoScaler::setTimeout(int timeout_ms)
 	if (timer.isActive())
 		timer.start();
 }
+
+#include "moc_autoScaler.cpp"

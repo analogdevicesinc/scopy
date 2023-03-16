@@ -21,6 +21,7 @@
 #include "manualcalibration.h"
 #include "digitalchannel_manager.hpp"
 #include "power_controller.hpp"
+#include "signal_generator.hpp"
 
 using namespace adiscope;
 using namespace adiscope::m2k;
@@ -59,7 +60,7 @@ void M2kPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc","Oscilloscope",":/icons/scopy-default/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec","Spectrum Analyzer",":/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet","Network Analyzer",":/icons/scopy-default/icons/tool_network_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kawg","Signal Generator",":/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen","Signal Generator",":/icons/scopy-default/icons/tool_signal_generator.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic","Logic Analyzer",":/icons/scopy-default/icons/tool_logic_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern","Pattern Generator",":/icons/scopy-default/icons/tool_pattern_generator.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio","Digital I/O",":/icons/scopy-default/icons/tool_io.svg"));
@@ -221,11 +222,15 @@ bool M2kPlugin::onConnect()
 	auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal");
 	auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
 	auto pwrTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpower");
+	auto siggenTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2ksiggen");
 
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
 	dioTme->setTool( new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
 	pwrTme->setTool (new PowerController(ctx,pwrTme,js,nullptr));
+	siggenTme->setTool (new SignalGenerator(ctx,f,pwrTme,js,nullptr));
+
+
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
 	connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
 	connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));

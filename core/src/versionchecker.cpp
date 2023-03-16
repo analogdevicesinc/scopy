@@ -96,3 +96,5 @@ void VersionCache::updateCache() {
 		read();
 	});
 }
+
+#include "moc_versionchecker.cpp"
