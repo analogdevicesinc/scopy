@@ -37,7 +37,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 
-#include <boost/math/common_factor.hpp>
+#include <boost/integer/common_factor_ct.hpp>
 
 //#include "pattern_generator.hpp"
 

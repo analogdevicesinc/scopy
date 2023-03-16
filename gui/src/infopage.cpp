@@ -29,3 +29,5 @@ void InfoPage::update(QString key, QString value)
 	}
 }
 
+
+#include "moc_infopage.cpp"

@@ -16,7 +16,7 @@ class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QObject *parent = nullptr) :
-		QObject(parent), m_uuid(QUuid::createUuid().toString()), m_id(id), m_name(name), m_icon(icon), m_visible(true),
+		QObject(parent), m_id(id), m_uuid(QUuid::createUuid().toString()),  m_name(name), m_icon(icon), m_visible(true),
 		m_enabled(false), m_running(false), m_runBtnVisible(false), m_tool(nullptr) {}
 
 	ToolMenuEntry(const ToolMenuEntry &other) {

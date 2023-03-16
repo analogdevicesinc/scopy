@@ -25,3 +25,5 @@ void InstrumentNotes::setNotes(QString str)
 }
 
 }
+
+#include "moc_instrumentnotes.cpp"

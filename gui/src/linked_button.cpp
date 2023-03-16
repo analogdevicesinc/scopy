@@ -27,3 +27,5 @@ void LinkedButton::openUrl() {
 void LinkedButton::setUrl(QString url) {
 	this->url = url;
 }
+
+#include "moc_linked_button.cpp"

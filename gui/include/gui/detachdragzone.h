@@ -27,6 +27,7 @@
 #include <QString>
 
 #include "coloredQWidget.h"
+#include "scopygui_export.h"
 
 namespace adiscope {
 class SCOPYGUI_EXPORT DetachDragZone : public ColoredQWidget
