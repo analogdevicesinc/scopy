@@ -368,6 +368,12 @@ bool VertDebugSymbol::moveWith(double plotDeltaX, double plotDeltaY)
 	return canMove;
 }
 
+double VertDebugSymbol::getPosition()
+{
+	QPointF p = plotCoord();
+	return p.y();
+}
+
 void VertDebugSymbol::setPosition(double vertPos)
 {
 	QPointF p = plotCoord();
@@ -457,6 +463,12 @@ bool HorizDebugSymbol::moveWith(double plotDeltaX, double plotDeltaY)
 		Q_EMIT positionChanged(deltaPoint.x());
 
 	return canMove;
+}
+
+double HorizDebugSymbol::getPosition()
+{
+	QPointF p = plotCoord();
+	return p.x();
 }
 
 void HorizDebugSymbol::setPosition(double horizPos)

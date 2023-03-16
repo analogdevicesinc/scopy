@@ -233,7 +233,7 @@ void Decoder::setter(const char *id, QVariant value)
 	GVariant *variant;
 
 	QString prop_val = "";
-	auto type = value.type();
+	QMetaType::Type type = static_cast<QMetaType::Type>(value.type());
 	if (type == QMetaType::QString) {
 		variant = g_variant_new_string(value.toString().toUtf8().constData());
 	} else if (type == QMetaType::Bool) {

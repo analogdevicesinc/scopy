@@ -122,6 +122,7 @@ public:
 	void draw(QPainter *painter) const;
 
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY);
+	double getPosition();
 
 Q_SIGNALS:
 	void positionChanged(double);
@@ -148,10 +149,11 @@ public:
 	void draw(QPainter *painter) const;
 
 	virtual bool moveWith(double plotDeltaX, double plotDeltaY);
+	double getPosition();
 
 Q_SIGNALS:
 	void positionChanged(double);
-	void pixelPositionChanged(int);
+	void pixelPositionChanged(int);	
 
 public Q_SLOTS:
 	void setPosition(double horizPos);

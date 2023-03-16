@@ -34,6 +34,8 @@ QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
 
 	Preferences *p = Preferences::GetInstance();
 	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_plot_target_fps", "Plot target FPS", {"15","20","30","60"}, this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_show_plot_fps","Show plot FPS", this));
+
 	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding,QSizePolicy::Expanding));
 	return page;
 }

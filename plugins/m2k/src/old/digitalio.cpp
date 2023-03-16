@@ -193,7 +193,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolM
 void DigitalIO::readPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	ui->instrumentNotes->setVisible(p->get("M2k_instrument_notes_active").toBool());
+	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 }
 
 DigitalIO::~DigitalIO()

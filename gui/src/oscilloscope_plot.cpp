@@ -471,6 +471,15 @@ void CapturePlot::setAllAxes(int ch_id)
 	DisplayPlot::setCursorAxes(fixed_axis, mobile_axis);
 }
 
+VertBar *CapturePlot::getMeasurementGateBar1()
+{
+	return d_gateBar1;
+}
+
+VertBar *CapturePlot::getMeasurementGateBar2() {
+	return d_gateBar2;
+}
+
 void CapturePlot::onVCursor1Moved(double value)
 {
 	QString text;
@@ -521,6 +530,11 @@ void CapturePlot::onVCursor2Moved(double value)
 
 	value_v2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+QList<RoundedHandleV *> CapturePlot::getOffsetHandles() const
+{
+	return d_offsetHandles;
 }
 
 void CapturePlot::onHCursor1Moved(double value)
