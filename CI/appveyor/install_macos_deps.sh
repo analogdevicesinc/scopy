@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -xe
+
 LIBIIO_VERSION=0ed18cd8f6b2fac5204a99e38922bea73f1f778c
 LIBAD9361_BRANCH=master
 LIBM2K_BRANCH=master
@@ -14,7 +16,6 @@ PYTHON="python3"
 PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr"
 
-set -e
 REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 WORKDIR=${PWD}
 JOBS=4
@@ -42,11 +43,13 @@ export PATH="${QT_PATH}:$PATH"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
 export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGINGDIR/lib/pkgconfig"
+export PKG_CONFIG_PATH="$(brew --prefix python3)/lib/pkgconfig:$PKG_CONFIG_PATH"
+export PATH="$(brew --prefix python3)/bin:$PATH"
 
-echo $PKG_CONFIG_PATH
 QMAKE="$(command -v qmake)"
-
 CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
+
+export 
 
 save_version_info() {
 	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
@@ -196,6 +199,7 @@ build_libsigrokdecode() {
 	CURRENT_BUILD=libsigrokdecode
 	save_version_info
 
+	patch -p1 < $REPO_SRC/CI/appveyor/patches/libsigrokdecode_macOS.patch
 	./autogen.sh
 	./configure --prefix=$STAGINGDIR
 

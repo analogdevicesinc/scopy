@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -xe
 STAGINGDIR="${PWD}/staging"
 cd build
 mkdir -p ./Scopy.app/Contents/Frameworks
