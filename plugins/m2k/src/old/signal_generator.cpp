@@ -655,10 +655,9 @@ void SignalGenerator::settingsLoaded()
 
 void SignalGenerator::readPreferences()
 {
-//	bool showFps = prefPanel->getShow_plot_fps();
-//	m_plot->setVisibleFpsLabel(showFps);
-
 	Preferences *p = Preferences::GetInstance();
+	bool showFps = p->get("general_show_plot_fps").toBool();
+	m_plot->setVisibleFpsLabel(showFps);
 	double prefered_periods_nr = 2;//p->get("M2k_siggen_periods").toBool());
 
 
@@ -666,7 +665,7 @@ void SignalGenerator::readPreferences()
 		nr_of_periods = prefered_periods_nr;
 		resetZoom();
 	}
-	ui->instrumentNotes->setVisible(p->get("M2k_instrument_notes_active").toBool());
+	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 }
 
 void SignalGenerator::resetZoom()

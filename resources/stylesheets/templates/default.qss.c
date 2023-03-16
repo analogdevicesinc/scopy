@@ -84,7 +84,7 @@ QwtThermo {
 	font-size: 26px;
 }
 
-adiscope--m2k--BufferPreviewer {
+adiscope--BufferPreviewer {
 	border: 1px solid #7092be;
 	alternate-background-color: #4a64ff;
 	selection-background-color: #141416;
