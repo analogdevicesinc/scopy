@@ -34,7 +34,7 @@ ToolView::ToolView(QWidget* parent)
 
 	m_ui->widgetMenuAnim->setMaximumWidth(0);
 
-//	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
+	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
 }
 
 ToolView::~ToolView() { delete m_ui; }
