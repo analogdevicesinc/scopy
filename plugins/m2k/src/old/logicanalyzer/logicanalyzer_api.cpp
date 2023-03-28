@@ -35,7 +35,9 @@
 
 #include "binding/decoder.hpp"
 
+using namespace adiscope;
 using namespace adiscope::logic;
+using namespace adiscope::m2k::logic;
 
 double LogicAnalyzer_API::getSampleRate() const
 {
@@ -227,13 +229,13 @@ void LogicAnalyzer_API::setDecoderStack(const QList<QStringList> &decoderStack)
 		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
 		for (const auto &decoder : stack) {
 
-			std::shared_ptr<logic::Decoder> dec = nullptr;
+			std::shared_ptr<Decoder> dec = nullptr;
 
 			GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 			for (const GSList *sl = decoderList; sl; sl = sl->next) {
 			    srd_decoder *srd_dec = (struct srd_decoder *)sl->data;
 			    if (QString::fromUtf8(srd_dec->id) == decoder) {
-				dec = std::make_shared<logic::Decoder>(srd_dec);
+				dec = std::make_shared<Decoder>(srd_dec);
 			    }
 			}
 
