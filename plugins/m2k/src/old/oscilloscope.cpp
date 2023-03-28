@@ -191,7 +191,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	/* Gnuradio Blocks */
 
-	this->qt_time_block = adiscope::scope_sink_f::make(0, active_sample_rate,
+	this->qt_time_block = adiscope::scope_sink_f::make(1024, active_sample_rate,
 		"Osc Time", nb_channels, (QObject *)&plot);
 
 	this->qt_fft_block = adiscope::scope_sink_f::make(fft_plot_size, active_sample_rate,
@@ -691,7 +691,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 
 	connect(gsettings_ui->xyPlotLineType, SIGNAL(toggled(bool)),
-		this, SLOT(on_xyPlotLineType_toggled(bool)));
+		this, SLOT(xyPlotLineType_toggled(bool)));
 
 	// Signal-Slot Connections
 
@@ -915,7 +915,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	gsettings_ui->xySettings->hide();
 	timePosition->setValue(0);
 
-	connect(gsettings_ui->xyLineThickness,SIGNAL(currentIndexChanged(int)),this, SLOT(on_xyLineThickness_currentIndexChanged(int)));
+	connect(gsettings_ui->xyLineThickness,SIGNAL(currentIndexChanged(int)),this, SLOT(xyLineThickness_currentIndexChanged(int)));
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 			TOOL_OSCILLOSCOPE)));
@@ -5355,7 +5355,7 @@ void Oscilloscope::writeAllSettingsToHardware()
 	runInHwThreadPool(trigger_settings.setAdcRunningState(true););
 }
 
-void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
+void Oscilloscope::xyPlotLineType_toggled(bool checked)
 {
 	if (checked) {
 		xy_plot.setLineStyle(0, Qt::DotLine);
@@ -5366,7 +5366,7 @@ void Oscilloscope::on_xyPlotLineType_toggled(bool checked)
 }
 
 
-void Oscilloscope::on_xyLineThickness_currentIndexChanged(int idx)
+void Oscilloscope::xyLineThickness_currentIndexChanged(int idx)
 {
 	 xy_plot.setLineWidth(0,idx);
 }

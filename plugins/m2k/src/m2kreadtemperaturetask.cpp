@@ -38,7 +38,7 @@ void M2kReadTemperatureTask::run()
 		goto finish;
 
 	temperature = (val + offset) * scale / 1000;
-	qInfo(CAT_M2KPLUGIN)<<"Read temperature"<< temperature;
+	qDebug(CAT_M2KPLUGIN)<<"Read temperature"<< temperature;
 
 	Q_EMIT newTemperature(temperature);
 

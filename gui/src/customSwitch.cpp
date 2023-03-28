@@ -73,7 +73,7 @@ bool CustomSwitch::event(QEvent *e)
 			setDuration(property("duration").toInt());
 		if(propName=="bigBtn" && property("bigBtn").isValid()) {
 			if (property("bigBtn").toBool()) {
-				QFile file(":stylesheets/stylesheets/bigCustomSwitch.qss");
+				QFile file(":/stylesheets/bigCustomSwitch.qss");
 				file.open(QFile::ReadOnly);
 				QString styleSheet = QString::fromLatin1(file.readAll());
 				this->setStyleSheet(styleSheet);
