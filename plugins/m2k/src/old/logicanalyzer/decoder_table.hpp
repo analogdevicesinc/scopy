@@ -27,7 +27,7 @@
 #include "decoder_table_item.hpp"
 #include "logic_analyzer.h"
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 
 namespace logic {

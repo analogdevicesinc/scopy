@@ -32,9 +32,9 @@ endif()
 
 find_package(PkgConfig)
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
-#pkg_check_modules(GLIB REQUIRED glib-2.0)
 #pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
 #pkg_check_modules(SIGCPP REQUIRED sigc++-2.0)
+pkg_check_modules(GLIB REQUIRED glib-2.0)
 pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
 
 pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
@@ -67,7 +67,7 @@ add_library(${PROJECT_NAME} SHARED
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
 
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${LIBSIGROK_DECODE_INCLUDE_DIRS})
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/binding

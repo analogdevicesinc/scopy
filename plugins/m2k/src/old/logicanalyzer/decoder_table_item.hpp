@@ -26,7 +26,7 @@
 #include <QStyledItemDelegate>
 
 
-namespace adiscope {
+namespace adiscope::m2k {
 namespace logic {
 
 
@@ -78,7 +78,7 @@ public:
 
 
 // This is needed so it can be stored as a QVariant
-Q_DECLARE_METATYPE(adiscope::logic::DecoderTableItem)
+Q_DECLARE_METATYPE(adiscope::m2k::logic::DecoderTableItem)
 
 
 
