@@ -180,7 +180,7 @@ namespace adiscope::m2k {
 
 		void onChannelCouplingChanged(bool en);
 		void onChannelOffsetChanged(unsigned int chnIdx, double value);
-		void on_xyLineThickness_currentIndexChanged(int idx);
+		void xyLineThickness_currentIndexChanged(int idx);
 
 		void onChannelWidgetEnabled(bool);
 		void onChannelWidgetSelected(bool);
@@ -228,7 +228,7 @@ namespace adiscope::m2k {
 		void setGainMode(uint chnIdx, libm2k::analog::M2K_RANGE gain_mode);
 		void setChannelHwOffset(uint chnIdx, double offset);
 
-		void on_xyPlotLineType_toggled(bool checked);
+		void xyPlotLineType_toggled(bool checked);
 		void setup_xy_channels();
 
 		void openEditMathPanel(bool on);
