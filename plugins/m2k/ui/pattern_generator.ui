@@ -115,7 +115,7 @@
            <string>Print</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset resource="../../../resources/resources.qrc">
             <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
@@ -1785,7 +1785,7 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
   <customwidget>
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
-   <header>gui/customPushButton.hpp</header>
+   <header>gui/customPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
@@ -1812,19 +1812,18 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
    <container>1</container>
   </customwidget>
   <customwidget>
+   <class>adiscope::CustomSwitch</class>
+   <extends>QPushButton</extends>
+   <header>gui/customSwitch.h</header>
+  </customwidget>
+  <customwidget>
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>gui/linked_button.hpp</header>
   </customwidget>
-  <customwidget>
-   <class>adiscope::CustomSwitch</class>
-   <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
-  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
-  <include location="../resources/resources.qrc"/>
+  <include location="../../../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>

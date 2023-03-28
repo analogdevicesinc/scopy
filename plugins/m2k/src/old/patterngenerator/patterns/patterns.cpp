@@ -29,21 +29,19 @@
 #include <QMap>
 
 #include <errno.h>
-#include "boost/math/common_factor.hpp"
 #include "patterns.hpp"
-#include "../pattern_generator.h"
-#include "../../logicanalyzer/annotationcurve.h"
-#include "../../logicanalyzer/annotationdecoder.h"
-#include "gui/dynamicWidget.hpp"
+#include "gui/annotationcurve.h"
+#include "gui/annotationdecoder.h"
+#include "gui/dynamicWidget.h"
 
 #include <math.h>
 
 using namespace std;
-using namespace adiscope;
+using namespace adiscope::m2k;
 
 constexpr int PG_MAX_SAMPLERATE = 100000000; // 100MHz
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 JSConsole::JSConsole(QObject *parent) :
 	QObject(parent)
@@ -400,7 +398,7 @@ void PatternUI::destroy_ui() {}
 
 uint32_t ClockPattern::get_min_sampling_freq()
 {
-	return frequency * boost::math::lcm(duty_cycle_granularity,phase_granularity);
+	return frequency * std::lcm(duty_cycle_granularity,phase_granularity);
 }
 
 uint32_t ClockPattern::get_required_nr_of_samples(uint32_t sample_rate,
@@ -424,7 +422,7 @@ void ClockPattern::set_duty_cycle(float value)
 
 	duty_cycle = value;
 	auto max = 100;
-	duty_cycle_granularity = 100/boost::math::gcd((int)value, max);
+	duty_cycle_granularity = 100/std::gcd((int)value, max);
 }
 
 float ClockPattern::get_frequency() const
@@ -456,7 +454,7 @@ void ClockPattern::set_phase(int value)
 	}
 
 	auto max=360;
-	phase_granularity=360/boost::math::gcd((int)phase,max);
+	phase_granularity=360/std::gcd((int)phase,max);
 
 }
 
@@ -1033,7 +1031,7 @@ BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "parallel") {
-		m_decoder = std::make_shared<logic::Decoder>(dec);
+		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
 	    }
 	}
 
@@ -1071,7 +1069,7 @@ GenericLogicPlotCurve *BinaryCounterPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<logic::Decoder> BinaryCounterPatternUI::getDecoder()
+std::shared_ptr<adiscope::logic::Decoder> BinaryCounterPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -1501,7 +1499,7 @@ UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "uart") {
-		m_decoder = std::make_shared<logic::Decoder>(dec);
+		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
 	    }
 	}
 
@@ -1587,7 +1585,7 @@ GenericLogicPlotCurve *UARTPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<logic::Decoder> UARTPatternUI::getDecoder()
+std::shared_ptr<adiscope::logic::Decoder> UARTPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -1904,7 +1902,7 @@ I2CPatternUI::I2CPatternUI(I2CPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "i2c") {
-		m_decoder = std::make_shared<logic::Decoder>(dec);
+		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
 	    }
 	}
 
@@ -1969,7 +1967,7 @@ GenericLogicPlotCurve *I2CPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<logic::Decoder> I2CPatternUI::getDecoder()
+std::shared_ptr<adiscope::logic::Decoder> I2CPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -2004,7 +2002,7 @@ void I2CPatternUI::parse_ui()
 
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
 	pattern->setWrite(ui->PB_readWrite->isChecked());
-	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
+	QStringList strList = ui->LE_toSend->text().split(' ',Qt::SkipEmptyParts);
 	pattern->v.clear();
 
 	bool fail = false;
@@ -2269,7 +2267,7 @@ SPIPatternUI::SPIPatternUI(SPIPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "spi") {
-		m_decoder = std::make_shared<logic::Decoder>(dec);
+		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
 	    }
 	}
 
@@ -2356,7 +2354,7 @@ GenericLogicPlotCurve *SPIPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<logic::Decoder> SPIPatternUI::getDecoder()
+std::shared_ptr<adiscope::logic::Decoder> SPIPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -2407,7 +2405,7 @@ void SPIPatternUI::parse_ui()
 	pattern->setCPOL(ui->PB_CPOL->isChecked());
 	pattern->setCSPol(ui->PB_CS->isChecked());
 	pattern->setMsbFirst(ui->PB_MSB->isChecked());
-	QStringList strList = ui->LE_toSend->text().split(' ',QString::SkipEmptyParts);
+	QStringList strList = ui->LE_toSend->text().split(' ',Qt::SkipEmptyParts);
 	pattern->v.clear();
 	bool fail = false;
 

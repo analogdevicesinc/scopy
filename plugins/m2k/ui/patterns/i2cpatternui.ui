@@ -176,7 +176,7 @@
   <customwidget>
    <class>adiscope::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/smallOnOffSwitch.hpp</header>
+   <header>gui/smallOnOffSwitch.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

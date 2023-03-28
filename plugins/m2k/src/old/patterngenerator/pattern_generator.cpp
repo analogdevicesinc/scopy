@@ -25,21 +25,24 @@
 #include <QDockWidget>
 #include "ui_pattern_generator.h"
 #include "digitalchannel_manager.hpp"
-#include "gui/dynamicWidget.hpp"
+#include "gui/dynamicWidget.h"
 #include "gui/basemenu.h"
 #include "../logicanalyzer/logicgroupitem.h"
 
-#include "../logicanalyzer/logicdatacurve.h"
+#include "gui/logicdatacurve.h"
 #include "patterns/patterns.hpp"
-#include "../logicanalyzer/annotationcurve.h"
-#include "../logicanalyzer/annotationdecoder.h"
+#include "gui/annotationcurve.h"
+#include "gui/annotationdecoder.h"
 #include "pattern_generator_api.h"
 
 #include <libm2k/m2kexceptions.hpp>
-#include "scopyExceptionHandler.h"
+#include "m2kpluginExceptionHandler.h"
+#include <pluginbase/scopyjs.h>
 
 using namespace adiscope;
+using namespace adiscope::m2k;
 using namespace adiscope::logic;
+using namespace adiscope::m2k::logic;
 
 constexpr int MAX_BUFFER_SIZE = 1024 * 1024; // 1M
 constexpr int DIGITAL_NR_CHANNELS = 16;
@@ -66,9 +69,9 @@ int lcm(int a, int b)
 } // namespace detail
 
 PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
-				   ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				   DIOManager *diom, ToolLauncher *parent)
-	: LogicTool(nullptr, toolMenuItem, new PatternGenerator_API(this), "Pattern Generator", parent)
+				   ToolMenuEntry *tme, QJSEngine *engine,
+				   DIOManager *diom, QWidget *parent)
+	: M2kTool(nullptr, tme, new PatternGenerator_API(this), "Pattern Generator", parent)
 	, m_ui(new Ui::PatternGenerator)
 	, m_plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter)
 	, m_plotScrollBar(new QScrollBar(Qt::Vertical, this))
@@ -82,6 +85,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	, m_diom(diom)
 	, m_outputMode(0)
 	, m_singleTimer(new QTimer(this))
+	, m_buffer(nullptr)
+
 {
 	setupUi();
 
@@ -97,7 +102,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 		// 1 for each channel
 		// m_plot.addGenericPlotCurve()
-		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
+		LogicDataCurve *curve = new LogicDataCurve(nullptr, i);
 		curve->setTraceHeight(25);
 		m_plot.addDigitalPlotCurve(curve, true);
 		curve->setDisplaySampling(true);
@@ -105,8 +110,8 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
 		connect(this, &PatternGenerator::dataAvailable, this,
-			[=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			[=](uint64_t from, uint64_t to, uint16_t *buffer){
+			curve->dataAvailable(from, to, buffer);
 		}, Qt::DirectConnection);
 
 		m_plotCurves.push_back(curve);
@@ -147,31 +152,31 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	// API load
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_PATTERN_GENERATOR)));
-	api->load(*settings);
-	api->js_register(engine);
+//	api->load(*settings);
+	ScopyJS::GetInstance()->registerApi(api);
 
 	m_ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/pattgen");
 }
 
 void PatternGenerator::readPreferences()
 {
-	bool showFps = prefPanel->getShow_plot_fps();
+	bool showFps = p->get("general_show_plot_fps").toBool();
 	m_plot.setVisibleFpsLabel(showFps);
-	m_ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
+	m_ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 }
 
 PatternGenerator::~PatternGenerator()
 {
-	if (saveOnExit) {
-		api->save(*settings);
-	}
+//	if (saveOnExit) {
+//		api->save(*settings);
+//	}
 
 	delete api;
 
-	disconnect(prefPanel, &Preferences::notify, this, &PatternGenerator::readPreferences);
+//	disconnect(prefPanel, &Preferences::notify, this, &PatternGenerator::readPreferences);
 
 	if (m_running) {
-		run_button->setChecked(false);
+		tme->setRunning(false);
 	}
 
 	for (auto &curve : m_plotCurves) {
@@ -196,7 +201,7 @@ PatternGenerator::~PatternGenerator()
 
 void PatternGenerator::setNativeDialogs(bool nativeDialogs)
 {
-	Tool::setNativeDialogs(nativeDialogs);
+	M2kTool::setNativeDialogs(nativeDialogs);
 	m_plot.setUseNativeDialog(nativeDialogs);
 }
 
@@ -468,7 +473,7 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 				if (patternUi->getDecoder()) {
 					qDebug() << "This pattern has a decoder!";
 
-					AnnotationCurve *curve = new AnnotationCurve(this, patternUi->getDecoder());
+					AnnotationCurve *curve = new AnnotationCurve(patternUi->getDecoder());
 					curve->setTraceHeight(25);
 					m_plot.addDigitalPlotCurve(curve, true);
 
@@ -477,8 +482,8 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 					// use direct connection we want the processing
 					// of the available data to be done in the capture thread
 					QMetaObject::Connection connectionHandle = connect(this, &PatternGenerator::dataAvailable,
-						this, [=](uint64_t from, uint64_t to){
-						curve->dataAvailable(from, to);
+						this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
+						curve->dataAvailable(from, to, buffer);
 					}, Qt::DirectConnection);
 
 					m_plotCurves.push_back(curve);
@@ -519,7 +524,7 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 			if (patternUi->getDecoder()) {
 				qDebug() << "This pattern has a decoder!";
 
-				AnnotationCurve *curve = new AnnotationCurve(this, patternUi->getDecoder());
+				AnnotationCurve *curve = new AnnotationCurve(patternUi->getDecoder());
 				curve->setTraceHeight(25);
 				m_plot.addDigitalPlotCurve(curve, true);
 
@@ -528,8 +533,8 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 				// use direct connection we want the processing
 				// of the available data to be done in the capture thread
 				QMetaObject::Connection connectionHandle = connect(this, &PatternGenerator::dataAvailable,
-					this, [=](uint64_t from, uint64_t to){
-					curve->dataAvailable(from, to);
+					this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
+					curve->dataAvailable(from, to, buffer);
 				}, Qt::DirectConnection);
 
 				m_plotCurves.push_back(curve);
@@ -697,7 +702,7 @@ void PatternGenerator::checkEnabledChannels()
 	}
 
 	m_ui->runSingleWidget->setEnabled(foundOneEnabled);
-	runButton()->setEnabled(foundOneEnabled);
+	tme->setRunEnabled(foundOneEnabled);
 }
 
 void PatternGenerator::regenerate()
@@ -825,7 +830,7 @@ void PatternGenerator::generateBuffer()
 		pattern.second->get_pattern()->setNrOfChannels(pattern.first.size());
 	}
 
-	Q_EMIT dataAvailable(0, bufferSize);
+	Q_EMIT dataAvailable(0, bufferSize,m_buffer);
 }
 
 void PatternGenerator::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
@@ -886,11 +891,10 @@ void PatternGenerator::connectSignalsAndSlots()
 
 	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
-		disconnect(run_button, &QPushButton::toggled,
+		disconnect(tme, &ToolMenuEntry::runToggled,
 			m_ui->runSingleWidget, &RunSingleWidget::toggle);
-		auto btn = dynamic_cast<CustomPushButton *>(run_button);
-		btn->setChecked(checked);
-		connect(run_button, &QPushButton::toggled,
+		tme->setRunning(checked);
+		connect(tme, &ToolMenuEntry::runToggled,
 			m_ui->runSingleWidget, &RunSingleWidget::toggle);
 		// TODO: play with the trigger state when the pattern generator will support
 		// trigger features, till then do not show any trigger state on the plot
@@ -898,7 +902,7 @@ void PatternGenerator::connectSignalsAndSlots()
 //			m_plot.setTriggerState(CapturePlot::Stop);
 //		}
 	});
-	connect(run_button, &QPushButton::toggled,
+	connect(tme, &ToolMenuEntry::runToggled,
 		m_ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &PatternGenerator::startStop);
