@@ -124,16 +124,16 @@ private:
 private Q_SLOTS:
 	void on_calibList_itemClicked(QListWidgetItem *item);
 
-	void on_nextButton_clicked();
+	void nextButton_clicked();
 	void nextStep();
 
 	void on_loadButton_clicked();
 
 	void on_saveButton_clicked();
 
-	void on_restartButton_clicked();
+	void restartButton_clicked();
 
-	void on_finishButton_clicked();
+	void finishButton_clicked();
 
 	void on_autoButton_clicked();
 

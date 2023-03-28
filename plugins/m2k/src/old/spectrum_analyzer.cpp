@@ -245,11 +245,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 //		ui->gridLayout_plot->addWidget(measurePanel, 0, 1, 1, 1);
 		fft_plot->setYaxisMouseGesturesEnabled(i, false);
 	}
-
-	connect(fft_plot, SIGNAL(channelAdded(int)),
-		    SLOT(onChannelAdded(int)));
-
 #ifdef SPECTRAL_MSR
+	connect(fft_plot, SIGNAL(channelAdded(int)), this,
+		    SLOT(onChannelAdded(int)));
 	/* Measurements Settings */
 	measure_settings_init();
 #endif

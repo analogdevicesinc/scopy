@@ -111,11 +111,11 @@ ManualCalibration::ManualCalibration(struct iio_context *ctx, Filter *filt,
 	TempUi->inputTableWidget->setEnabled(false);
 
 	connect(TempUi->nextButton, &QPushButton::clicked, this,
-		&ManualCalibration::on_nextButton_clicked);
+		&ManualCalibration::nextButton_clicked);
 	connect(TempUi->restartButton, &QPushButton::clicked, this,
-		&ManualCalibration::on_restartButton_clicked);
+		&ManualCalibration::restartButton_clicked);
 	connect(TempUi->finishButton, &QPushButton::clicked, this,
-		&ManualCalibration::on_finishButton_clicked);
+		&ManualCalibration::finishButton_clicked);
 
 	ui->calibList->setCurrentRow(3); //set to autocalibration parameters
 	on_calibList_itemClicked(ui->calibList->currentItem());
@@ -450,7 +450,7 @@ void ManualCalibration::setNegativeValue(double value)
 	}
 }
 
-void ManualCalibration::on_nextButton_clicked()
+void ManualCalibration::nextButton_clicked()
 {
 	startCalibration();
 }
@@ -593,7 +593,7 @@ void ManualCalibration::on_saveButton_clicked()
 	}
 }
 
-void ManualCalibration::on_restartButton_clicked()
+void ManualCalibration::restartButton_clicked()
 {
 	switch (stCalibrationStory.calibProcedure) {
 	case POSITIVE_OFFSET:
@@ -608,7 +608,7 @@ void ManualCalibration::on_restartButton_clicked()
 	TempUi->inputTableWidget->clearContents();
 }
 
-void ManualCalibration::on_finishButton_clicked()
+void ManualCalibration::finishButton_clicked()
 {
 	ui->storyWidget->layout()->removeWidget(TempWidget);
 
