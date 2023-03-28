@@ -23,9 +23,9 @@
 #define LOGICANALYZER_API_H
 
 #include "logic_analyzer.h"
-#include "apiObject.hpp"
+#include "pluginbase/apiobject.h"
 
-namespace adiscope {
+namespace adiscope::m2k {
 namespace logic {
 class LogicAnalyzer_API : public ApiObject
 {

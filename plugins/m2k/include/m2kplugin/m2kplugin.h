@@ -26,6 +26,7 @@ public:
 	void initMetadata() override;
 	bool compatible(QString m_param) override;
 
+
 	void preload() override;
 	void loadToolList() override;
 	bool loadPage() override;
@@ -64,12 +65,17 @@ private:
 	QMap<QString,ToolMenuEntry*> toolMenuEntryCalibrationCache;
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
+	bool loadDecoders(QString path);
 
 
 	// Plugin interface
 public:
 	void initPreferences() override;
 	bool loadPreferencesPage() override;
+
+	// Plugin interface
+public:
+	void init() override;
 };
 }
 }
