@@ -43,6 +43,12 @@ public Q_SLOTS:
 	void onChannelWidgetSelected(bool checked);
 	void onRunBtnPressed();
 	void onBufferRefilled(QVector<QVector<double>>);
+	void onReaderThreadFinished();
+private:
+	void createMonitorChannelMenu();
+	void connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList);
+	void drawCurves(std::vector<double*> dataPoints, int numberOfPoints);
+	void resetPlot();
 private:
 	struct iio_device* m_iioDev;
 	int m_enabledChnlsNo = 0;
@@ -65,12 +71,7 @@ private:
 
 	QGridLayout* m_gridPlot;
 
-	SwiotAdReaderThread* m_readerThread;
-private:
-	void createMonitorChannelMenu();
-	void connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList);
-	void drawCurves(std::vector<double*> dataPoints, int numberOfPoints);
-	void resetPlot();
+	SwiotAdReaderThread *m_readerThread;
 };
 }
 #endif // SWIOTAD_HPP

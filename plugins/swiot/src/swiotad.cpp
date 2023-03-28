@@ -14,10 +14,9 @@ SwiotAd::SwiotAd(QWidget* parent, struct iio_device* iioDev, QVector<QString> ch
 {
 	m_chnlsFunction = chnlsFunc;
 	m_enabledChannels = std::vector<bool>(m_chnlsFunction.size(), false);
-	qDebug(CAT_SWIOT_RUNTIME) << m_enabledChannels;
 	if (m_iioDev) {
 		m_swiotAdLogic = new SwiotAdLogic(m_iioDev);
-		m_readerThread = new SwiotAdReaderThread();
+		m_readerThread = new SwiotAdReaderThread(m_iioDev);
 
 		adiscope::gui::ToolViewRecipe recipe;
 		recipe.helpBtnUrl = "";
@@ -40,9 +39,9 @@ SwiotAd::SwiotAd(QWidget* parent, struct iio_device* iioDev, QVector<QString> ch
 		initMonitorToolView();
 
 		connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &SwiotAd::onRunBtnPressed);
+		connect(m_swiotAdLogic, &SwiotAdLogic::chnlsChanged, m_readerThread, &SwiotAdReaderThread::onChnlsChange);
 		connect(m_readerThread, &SwiotAdReaderThread::bufferRefilled, this, &SwiotAd::onBufferRefilled, Qt::QueuedConnection);
-		connect(m_swiotAdLogic, &SwiotAdLogic::bufferCreated, m_readerThread, &SwiotAdReaderThread::onBufferCreated);
-		connect(m_swiotAdLogic, &SwiotAdLogic::bufferDestroyed, m_readerThread, &SwiotAdReaderThread::onBufferDestroyed);
+		connect(m_readerThread, &SwiotAdReaderThread::finished, this, &SwiotAd::onReaderThreadFinished, Qt::QueuedConnection);
 	}
 }
 
@@ -56,7 +55,9 @@ SwiotAd::~SwiotAd()
 	if (m_readerThread) {
 		delete m_readerThread;
 	}
-
+	if (m_controllers.size() > 0) {
+		m_controllers.clear();
+	}
 }
 
 void SwiotAd::initPlot()
@@ -118,7 +119,6 @@ void SwiotAd::initMonitorToolView()
 			m_toolView->buildNewChannel(m_monitorChannelManager, nullptr, false, mainChId, false, false,
 						    QColor("green"), deviceName, deviceName);
 	std::vector<ChannelWidget*> channelWidgetList;
-	//chId starts from 0
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
 			adiscope::gui::SwiotGenericMenu *menu = new adiscope::gui::SwiotGenericMenu(m_widget);
@@ -193,6 +193,10 @@ void SwiotAd::onRunBtnPressed()
 {
 	if (m_toolView->getRunBtn()->isChecked()) {
 		verifyChnlsChanges();
+		if (!m_readerThread->isRunning()) {
+			resetPlot();
+			m_readerThread->start();
+		}
 	} else {
 		m_readerThread->requestInterruption();
 	}
@@ -209,17 +213,7 @@ void SwiotAd::verifyChnlsChanges()
 	bool changes = m_swiotAdLogic->verifyEnableChanges(m_enabledChannels);
 	if (changes) {
 		m_readerThread->requestInterruption();
-		m_readerThread->exit();
-		m_swiotAdLogic->destroyIioBuffer();
-		m_swiotAdLogic->enableIioChnls(changes);
-		m_swiotAdLogic->createIioBuffer(m_sampleRate, m_timespan);
-		resetPlot();
 	}
-	if (m_toolView->getRunBtn()->isChecked()) {
-		qDebug(CAT_SWIOT_RUNTIME) << "Start";
-		m_readerThread->start();
-	}
-
 }
 
 void SwiotAd::onBufferRefilled(QVector<QVector<double>> bufferData)
@@ -268,3 +262,11 @@ void SwiotAd::setChannelsFunction(QVector<QString> chnlsFunction)
 	m_chnlsFunction = chnlsFunction;
 }
 
+void SwiotAd::onReaderThreadFinished()
+{
+	qDebug() << "reader thread finished";
+	if (m_toolView->getRunBtn()->isChecked()) {
+		resetPlot();
+		m_readerThread->start();
+	}
+}

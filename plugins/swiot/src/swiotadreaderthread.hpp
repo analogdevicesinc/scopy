@@ -6,6 +6,8 @@
 #include <qthread.h>
 #include <iio.h>
 #include <errno.h>
+#include <QVector>
+#include "swiotadlogic.hpp"
 
 extern "C" {
 	struct iio_device;
@@ -16,20 +18,34 @@ class SwiotAdReaderThread: public QThread
 {
 	Q_OBJECT
 public:
-	SwiotAdReaderThread();
+	SwiotAdReaderThread(struct iio_device *iioDev);
 	double convertData(unsigned int data, int idx);
 public Q_SLOTS:
-	void onBufferCreated(struct iio_buffer* iioBuff, int enableChnlsNo, std::vector<std::pair<double, double>> offsetScaleValues);
-	void onBufferDestroyed();
+	void onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo);
 Q_SIGNALS:
 	void bufferRefilled(QVector<QVector<double>> bufferData);
 private:
 	void run() override;
 
-	struct iio_buffer* m_iioBuff;
-	QVector<QVector<double>> m_bufferData;
-	std::vector<std::pair<double, double>> m_offsetScaleValues;
+	void createIioBuffer();
+	void destroyIioBuffer();
+
+	void enableIioChnls();
+	int getEnabledChnls();
+
+	QVector<std::pair<double, double>> getOffsetScaleVector();
+private:
+	int m_sampleRate = 4800;
+	double m_timespan = 1;
 	int m_enabledChnlsNo;
+	bool m_activeChanges = false;
+
+	struct iio_device *m_iioDev;
+	struct iio_buffer *m_iioBuff;
+	QMap<int, struct chnlInfo*> m_chnlsInfo;
+	QVector<QVector<double>> m_bufferData;
+	QVector<std::pair<double, double>> m_offsetScaleValues;
+
 };
 
 #endif // SWIOTADREADERTHREAD_HPP

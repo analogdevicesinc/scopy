@@ -2,10 +2,11 @@
 #include "qdebug.h"
 #include <core/logging_categories.h>
 
-SwiotAdReaderThread::SwiotAdReaderThread() :
-	m_iioBuff(nullptr)
+SwiotAdReaderThread::SwiotAdReaderThread(struct iio_device *iioDev) :
+	m_enabledChnlsNo(0)
+      ,m_iioDev(iioDev)
+      ,m_iioBuff(nullptr)
       ,m_offsetScaleValues()
-      ,m_enabledChnlsNo(0)
 {}
 
 double SwiotAdReaderThread::convertData(unsigned int data, int idx)
@@ -19,32 +20,100 @@ double SwiotAdReaderThread::convertData(unsigned int data, int idx)
 	return data;
 }
 
-void SwiotAdReaderThread::onBufferCreated(struct iio_buffer* iioBuff, int enabledChnlsNo, std::vector<std::pair<double, double>> offsetScaleValues)
+void SwiotAdReaderThread::enableIioChnls()
 {
-	m_iioBuff = iioBuff;
-	m_enabledChnlsNo = enabledChnlsNo;
-	m_offsetScaleValues = offsetScaleValues;
+	if (m_iioDev) {
+		for(const auto &key : m_chnlsInfo.keys()) {
+			struct iio_channel* iioChnl = m_chnlsInfo[key]->iioChnl;
+			bool isEnabled = iio_channel_is_enabled(iioChnl);
+			if (m_chnlsInfo[key]->isEnabled) {
+				if (!isEnabled) {
+					iio_channel_enable(iioChnl);
+				}
+				qDebug(CAT_SWIOT_RUNTIME) << "Chanel en " << key;
+			} else {
+				if (isEnabled) {
+					iio_channel_disable(iioChnl);
+				}
+				qDebug(CAT_SWIOT_RUNTIME) << "Chanel dis " << key;
+			}
+		}
+	}
 }
 
-void SwiotAdReaderThread::onBufferDestroyed()
+QVector<std::pair<double, double>> SwiotAdReaderThread::getOffsetScaleVector()
 {
-	m_iioBuff = nullptr;
+	QVector<std::pair<double, double>> offsetScalePairs = {};
+
+	for (const auto &key : m_chnlsInfo.keys()) {
+		if (m_chnlsInfo[key]->isEnabled) {
+			offsetScalePairs.push_back(m_chnlsInfo[key]->offsetScalePair);
+		}
+	}
+	return offsetScalePairs;
+}
+
+int SwiotAdReaderThread::getEnabledChnls()
+{
+	int enChnls = 0;
+	for (const auto &key : m_chnlsInfo.keys()) {
+		if (iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl)) {
+			enChnls++;
+		}
+	}
+
+	return enChnls;
+}
+
+void SwiotAdReaderThread::createIioBuffer()
+{
+	m_enabledChnlsNo = getEnabledChnls();
+	int possibleBufferSize = m_sampleRate * m_timespan;
+	m_offsetScaleValues = getOffsetScaleVector();
+	qInfo(CAT_SWIOT_RUNTIME) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
+	if (m_iioDev) {
+		if(possibleBufferSize >= MAX_BUFFER_SIZE) {
+			m_iioBuff = iio_device_create_buffer(m_iioDev, MAX_BUFFER_SIZE, false);
+		} else {
+			m_iioBuff = iio_device_create_buffer(m_iioDev, MIN_BUFFER_SIZE, false);
+		}
+		if (m_iioBuff) {
+			qDebug(CAT_SWIOT_RUNTIME) << "Buffer created";
+		} else {
+			qDebug(CAT_SWIOT_RUNTIME) << "Buffer wasn't created: " + QString(strerror(errno));
+		}
+	}
+}
+
+void SwiotAdReaderThread::destroyIioBuffer()
+{
+	if (m_iioBuff) {
+		qDebug(CAT_SWIOT_RUNTIME) << "Buffer destroyed";
+		iio_buffer_destroy(m_iioBuff);
+		m_iioBuff = nullptr;
+	}
+}
+
+void SwiotAdReaderThread::onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo)
+{
+	m_chnlsInfo = chnlsInfo;
+//	m_activeChanges = true;
 }
 
 void SwiotAdReaderThread::run()
 {
+	qDebug(CAT_SWIOT_RUNTIME) << "Thread";
+	enableIioChnls();
+	createIioBuffer();
 	while (!isInterruptionRequested()) {
 //		qDebug(CAT_SWIOT_RUNTIME) << "Thread ";
-//		sleep(1000);
 		if (m_iioBuff) {
 			int refillBytes = iio_buffer_refill(m_iioBuff);
 			if (refillBytes > 0) {
 				int i = 0;
 				int idx = 0;
 				double data = 0.0;
-				if (!m_iioBuff) {
-					break;
-				}
+
 				u_int32_t* startAdr = (uint32_t*)iio_buffer_start(m_iioBuff);
 				u_int32_t* endAdr = (uint32_t*)iio_buffer_end(m_iioBuff);
 				m_bufferData.clear();
@@ -56,6 +125,10 @@ void SwiotAdReaderThread::run()
 					data = convertData(*ptr, idx);
 					m_bufferData[idx].push_back(data);
 					i++;
+//					if (m_activeChanges) {
+//						m_activeChanges = false;
+//						break;
+//					}
 				}
 				Q_EMIT bufferRefilled(m_bufferData);
 			} else {
@@ -64,4 +137,5 @@ void SwiotAdReaderThread::run()
 			}
 		}
 	}
+	destroyIioBuffer();
 }

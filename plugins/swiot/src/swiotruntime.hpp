@@ -25,9 +25,11 @@ public:
 
 	void setToolView(adiscope::gui::ToolView* toolView);
 	void initAdToolView();
+//	void triggerPing();
 public Q_SLOTS:
 	void onBackBtnPressed();
-	void triggerPing();
+//	void onTriggerTimeout();
+
 Q_SIGNALS:
 	void backBtnPressed();
 private:

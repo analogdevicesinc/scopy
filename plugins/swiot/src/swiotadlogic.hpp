@@ -22,7 +22,6 @@ extern "C" {
 	struct iio_context;
 	struct iio_device;
 	struct iio_channel;
-	struct iio_buffer;
 }
 Q_DECLARE_OPAQUE_POINTER(struct iio_buffer*)
 namespace adiscope {
@@ -34,28 +33,20 @@ public:
 		~SwiotAdLogic();
 
 		struct iio_channel* getIioChnl(int chnlIdx, bool outputPriotity);
-		int getEnabledChnls();
-		int getPlotChnlsNo();
-
-		void createIioBuffer(int sampleRate, double timestamp);
-		void destroyIioBuffer();
-		void enableIioChnls(bool changes);
-
 		bool verifyEnableChanges(std::vector<bool> enabledChnls);
+		int getPlotChnlsNo();
 Q_SIGNALS:
-		void bufferCreated(struct iio_buffer* iioBuff, int enabledChnlsNo, std::vector<std::pair<double, double>> offsetScaleValues);
-		void bufferDestroyed();
-
+		void chnlsChanged(QMap<int, struct chnlInfo*> chnlsInfo);
+private:
+		void createChannels();
 private:
 		int m_plotChnlsNo;
 		int m_chnlsNumber;
 
 		QMap<int, struct chnlInfo*> m_chnlsInfo;
 		struct iio_device* m_iioDev;
-		struct iio_buffer* m_iioBuff;
 
-		void createChannels();
-		std::vector<std::pair<double, double>> getOffsetScaleVector();
+
 	};
 }
 
