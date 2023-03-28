@@ -28,7 +28,7 @@
 #include "filemanager.h"
 #include "qtconcurrentrun.h"
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 
 namespace logic {

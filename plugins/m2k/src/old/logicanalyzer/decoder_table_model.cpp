@@ -27,7 +27,7 @@
 #include <QHeaderView>
 #include <QRegExp>
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 
 namespace logic {
@@ -184,11 +184,12 @@ QString DecoderTableModel::getsearchString()
 
 void DecoderTableModel::activate()
 {
-	if (m_logic->runButton()->isChecked()) {
-		m_logic->runButton()->click();
-	}
-	m_logic->enableRunButton(false);
-	m_logic->runButton()->setEnabled(false);
+	// TODO: REFACTOR THIS ??
+//	if (m_logic->getTme()->isRunning()) {
+//		m_logic->runButton()->click();
+//	}
+//	m_logic->enableRunButton(false);
+//	m_logic->runButton()->setEnabled(false);
 	//    m_logic->enableSingleButton(false);
 
 	m_filteredMessages.clear();
@@ -204,7 +205,7 @@ void DecoderTableModel::activate()
 void DecoderTableModel::deactivate()
 {
 	m_logic->enableRunButton(true);
-	m_logic->runButton()->setEnabled(true);
+//	m_logic->runButton()->setEnabled(true);
 	//    m_logic->enableSingleButton(true);
 
 	m_active = false;
