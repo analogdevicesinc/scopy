@@ -27,9 +27,12 @@
 #include <QCheckBox>
 
 using namespace adiscope;
+using namespace adiscope::m2k;
 using namespace adiscope::logic;
+using namespace adiscope::m2k::logic;
 
-QList<int> logic::PatternGenerator_API::getEnabledChannels() const
+
+QList<int> PatternGenerator_API::getEnabledChannels() const
 {
 	QList<int> enabledChannels;
 	for (int i = 0; i < 16; ++i) {
@@ -43,7 +46,7 @@ QList<int> logic::PatternGenerator_API::getEnabledChannels() const
 	return enabledChannels;
 }
 
-void logic::PatternGenerator_API::setEnabledChannels(const QList<int> &enabledChannels)
+void PatternGenerator_API::setEnabledChannels(const QList<int> &enabledChannels)
 {
 	for (const auto &channel : enabledChannels) {
 		QWidget *widgetInLayout = m_pattern->m_ui->channelEnumeratorLayout->itemAtPosition(channel % 8,
@@ -53,7 +56,7 @@ void logic::PatternGenerator_API::setEnabledChannels(const QList<int> &enabledCh
 	}
 }
 
-QStringList logic::PatternGenerator_API::getChannelNames() const
+QStringList PatternGenerator_API::getChannelNames() const
 {
 	QStringList names;
 	for (int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
@@ -62,7 +65,7 @@ QStringList logic::PatternGenerator_API::getChannelNames() const
 	return names;
 }
 
-void logic::PatternGenerator_API::setChannelNames(const QStringList &channelNames)
+void PatternGenerator_API::setChannelNames(const QStringList &channelNames)
 {
 	for (int i = 0; i < channelNames.size(); ++i) {
 		if (i >= m_pattern->m_plotCurves.size()) { break; }
@@ -70,7 +73,7 @@ void logic::PatternGenerator_API::setChannelNames(const QStringList &channelName
 	}
 }
 
-QList<double> logic::PatternGenerator_API::getChannelHeights() const
+QList<double> PatternGenerator_API::getChannelHeights() const
 {
 	QList<double> heights;
 	for (int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
@@ -79,7 +82,7 @@ QList<double> logic::PatternGenerator_API::getChannelHeights() const
 	return heights;
 }
 
-void logic::PatternGenerator_API::setChannelHeights(const QList<double> &channelHeights)
+void PatternGenerator_API::setChannelHeights(const QList<double> &channelHeights)
 {
 	for (int i = 0; i < channelHeights.size(); ++i) {
 		if (i >= m_pattern->m_plotCurves.size()) { break; }
@@ -87,7 +90,7 @@ void logic::PatternGenerator_API::setChannelHeights(const QList<double> &channel
 	}
 }
 
-QList<double> logic::PatternGenerator_API::getChannelPosition() const
+QList<double> PatternGenerator_API::getChannelPosition() const
 {
 	QList<double> channelPosition;
 	for (int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
@@ -96,7 +99,7 @@ QList<double> logic::PatternGenerator_API::getChannelPosition() const
 	return channelPosition;
 }
 
-void logic::PatternGenerator_API::setChannelPosition(const QList<double> &channelPosition)
+void PatternGenerator_API::setChannelPosition(const QList<double> &channelPosition)
 {
 	for (int i = 0; i < channelPosition.size(); ++i) {
 		if (i >= m_pattern->m_plotCurves.size()) { break; }
@@ -104,7 +107,7 @@ void logic::PatternGenerator_API::setChannelPosition(const QList<double> &channe
 	}
 }
 
-QVector<QVector<int> > logic::PatternGenerator_API::getCurrentGroups() const
+QVector<QVector<int> > PatternGenerator_API::getCurrentGroups() const
 {
 	QVector<QVector<int> > groups = m_pattern->m_plot.getAllGroups();
 	for (auto &group : groups) {
@@ -117,12 +120,12 @@ QVector<QVector<int> > logic::PatternGenerator_API::getCurrentGroups() const
 	return groups;
 }
 
-void logic::PatternGenerator_API::setCurrentGroups(const QVector<QVector<int> > &groups)
+void PatternGenerator_API::setCurrentGroups(const QVector<QVector<int> > &groups)
 {
 	m_pattern->m_plot.setGroups(groups);
 }
 
-QVector<QPair<QVector<int>, QString> > logic::PatternGenerator_API::getEnabledPatterns() const
+QVector<QPair<QVector<int>, QString> > PatternGenerator_API::getEnabledPatterns() const
 {
 	QVector<QPair<QVector<int>, QString> > enabledPatterns;
 	for (const QPair<QVector<int>, PatternUI *> &pattern : qAsConst(m_pattern->m_enabledPatterns)) {
@@ -133,18 +136,18 @@ QVector<QPair<QVector<int>, QString> > logic::PatternGenerator_API::getEnabledPa
 	return enabledPatterns;
 }
 
-void logic::PatternGenerator_API::setEnabledPatterns(const QVector<QPair<QVector<int>, QString> > &enabledPatterns)
+void PatternGenerator_API::setEnabledPatterns(const QVector<QPair<QVector<int>, QString> > &enabledPatterns)
 {
 	for (const QPair<QVector<int>, QString> &pattern : enabledPatterns) {
 		m_pattern->patternSelected("", pattern.first.first(), pattern.second);
 	}
 }
 
-QString logic::PatternGenerator_API::getNotes()
+QString PatternGenerator_API::getNotes()
 {
 	return m_pattern->m_ui->instrumentNotes->getNotes();
 }
-void logic::PatternGenerator_API::setNotes(QString str)
+void PatternGenerator_API::setNotes(QString str)
 {
 	m_pattern->m_ui->instrumentNotes->setNotes(str);
 }
