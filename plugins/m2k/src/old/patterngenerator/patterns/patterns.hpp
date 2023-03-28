@@ -50,8 +50,8 @@
 #include "ui_i2cpatternui.h"
 #include "filemanager.h"
 
-#include "../../logicanalyzer/genericlogicplotcurve.h"
-#include "../../logicanalyzer/decoder.h"
+#include "gui/genericlogicplotcurve.h"
+#include "gui/decoder.h"
 
 
 namespace Ui {
@@ -69,7 +69,7 @@ class SPIPatternUI;
 class I2CPatternUI;
 }
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 
 constexpr char ConstantPatternName[] = "Constant";
@@ -190,7 +190,7 @@ public:
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() { return nullptr; }
-	virtual std::shared_ptr<logic::Decoder> getDecoder() { return nullptr; }
+	virtual std::shared_ptr<adiscope::logic::Decoder> getDecoder() { return nullptr; }
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) {}
 	virtual QVector<int> getChannelsToAssign() { return {}; }
 
@@ -321,7 +321,7 @@ class BinaryCounterPatternUI : public PatternUI
 	BinaryCounterPattern *pattern;
 	ScaleSpinButton *frequencySpinButton;
 	GenericLogicPlotCurve *m_annotationCurve;
-	std::shared_ptr<logic::Decoder> m_decoder;
+	std::shared_ptr<adiscope::logic::Decoder> m_decoder;
 
 public:
 	BinaryCounterPatternUI(BinaryCounterPattern *pattern, QWidget *parent = 0);
@@ -332,7 +332,7 @@ public:
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
-	virtual std::shared_ptr<logic::Decoder> getDecoder() override;
+	virtual std::shared_ptr<adiscope::logic::Decoder> getDecoder() override;
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
 	virtual QVector<int> getChannelsToAssign() override;
 
@@ -427,7 +427,7 @@ class UARTPatternUI : public PatternUI
 	QWidget *parent_;
 	UARTPattern *pattern;
 	GenericLogicPlotCurve *m_annotationCurve;
-	std::shared_ptr<logic::Decoder> m_decoder;
+	std::shared_ptr<adiscope::logic::Decoder> m_decoder;
 
 public:
 	UARTPatternUI(UARTPattern *pattern, QWidget *parent = 0);
@@ -438,7 +438,7 @@ public:
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
-	virtual std::shared_ptr<logic::Decoder> getDecoder() override;
+	virtual std::shared_ptr<adiscope::logic::Decoder> getDecoder() override;
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
 
 private Q_SLOTS:
@@ -503,7 +503,7 @@ class I2CPatternUI : public PatternUI
 	I2CPattern *pattern;
 	ScaleSpinButton *frequencySpinButton;
 	GenericLogicPlotCurve *m_annotationCurve;
-	std::shared_ptr<logic::Decoder> m_decoder;
+	std::shared_ptr<adiscope::logic::Decoder> m_decoder;
 public:
 	I2CPatternUI(I2CPattern *pattern, QWidget *parent = 0);
 	~I2CPatternUI();
@@ -513,7 +513,7 @@ public:
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
-	virtual std::shared_ptr<logic::Decoder> getDecoder() override;
+	virtual std::shared_ptr<adiscope::logic::Decoder> getDecoder() override;
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
 
 private Q_SLOTS:
@@ -568,7 +568,7 @@ class SPIPatternUI : public PatternUI
 	SPIPattern *pattern;
 	ScaleSpinButton *frequencySpinButton;
 	GenericLogicPlotCurve *m_annotationCurve;
-	std::shared_ptr<logic::Decoder> m_decoder;
+	std::shared_ptr<adiscope::logic::Decoder> m_decoder;
 public:
 	SPIPatternUI(SPIPattern *pattern, QWidget *parent = 0);
 	~SPIPatternUI();
@@ -578,7 +578,7 @@ public:
 
 public: // Decoder related
 	virtual GenericLogicPlotCurve *getAnnotationCurve() override;
-	virtual std::shared_ptr<logic::Decoder> getDecoder() override;
+	virtual std::shared_ptr<adiscope::logic::Decoder> getDecoder() override;
 	virtual void setAnnotationCurve(GenericLogicPlotCurve *curve) override;
 	virtual QVector<int> getChannelsToAssign() override;
 

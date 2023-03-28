@@ -32,15 +32,16 @@ public:
 	}
 
 	~ToolMenuEntry() {}
-	QString id() { return m_id; }
-	QString uuid() { return m_uuid; }
-	QString name() { return m_name; }
-	QString icon() { return m_icon; }
-	bool visible() { return m_visible; }
-	bool enabled() { return m_enabled; }
-	bool running() { return m_running; }
-	bool runBtnVisible() { return m_runBtnVisible; }
-	QWidget *tool() { return m_tool; }
+	inline QString id() const { return m_id; }
+	inline QString uuid() const { return m_uuid; }
+	inline QString name() const { return m_name; }
+	inline QString icon() const { return m_icon; }
+	inline bool visible() const { return m_visible; }
+	inline bool enabled() const { return m_enabled; }
+	inline bool running() const { return m_running; }
+	inline bool runEnabled() const 	{ return m_runEnabled;	}
+	inline bool runBtnVisible() const { return m_runBtnVisible; }
+	inline QWidget *tool() const { return m_tool; }
 
 	static ToolMenuEntry *findToolMenuEntryByName(QList<ToolMenuEntry*> list, QString id);
 	static ToolMenuEntry *findToolMenuEntryById(QList<ToolMenuEntry*> list, QString id);
@@ -74,8 +75,16 @@ public Q_SLOTS:
 	 * @brief setRunning
 	 * @param newRunning
 	 * Sets the tool in run state
-	 */
+	 */	
 	void setRunning(bool newRunning);
+
+	/**
+	 * @brief setRunEnabled
+	 * @param newRunEnabled
+	 * Set tool run button state
+	 */
+	void setRunEnabled(bool newRunEnabled);
+
 	/**
 	 * @brief setRunBtnVisible
 	 * @param newRunBtnVisible
@@ -116,6 +125,7 @@ private:
 	bool m_visible;
 	bool m_enabled;
 	bool m_running;
+	bool m_runEnabled;
 	bool m_runBtnVisible;
 	QWidget* m_tool;
 };
@@ -180,6 +190,12 @@ inline void ToolMenuEntry::setTool(QWidget *newTool)
 {
 	m_tool = newTool;
 	Q_EMIT updateTool();
+}
+
+inline void ToolMenuEntry::setRunEnabled(bool newRunEnabled)
+{
+	m_runEnabled = newRunEnabled;
+	Q_EMIT updateToolEntry();
 }
 
 }

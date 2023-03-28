@@ -22,12 +22,12 @@
 #ifndef PATTERNGENERATOR_H
 #define PATTERNGENERATOR_H
 
-#include "logic_tool.h"
+#include "m2ktool.hpp"
 #include "oscilloscope_plot.hpp"
 #include "buffer_previewer.hpp"
 #include "gui/spinbox_a.hpp"
-#include "scroll_filter.hpp"
-#include "../logicanalyzer/genericlogicplotcurve.h"
+#include "mousewheelwidgetguard.h"
+#include "gui/genericlogicplotcurve.h"
 
 #include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
@@ -48,27 +48,32 @@ class PatternGenerator;
 }
 
 namespace adiscope {
-class Filter;
 class BaseMenu;
+class CustomPushButton;
+}
+
+namespace adiscope::m2k {
+class Filter;
 class DIOManager;
 class PatternUI;
-class PatternGenerator_API;
 
 namespace logic {
 
-class PatternGenerator : public LogicTool
+class PatternGenerator_API;
+class PatternGenerator : public M2kTool
 {
 	Q_OBJECT
 
 	friend class PatternGenerator_API;
 public:
 	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-				  ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				  DIOManager *diom, ToolLauncher *parent);
+				  ToolMenuEntry *tme, QJSEngine *engine,
+				  DIOManager *diom, QWidget *parent);
 	~PatternGenerator();
 	void setNativeDialogs(bool nativeDialogs) override;
 
 Q_SIGNALS:
+	void dataAvailable(uint64_t, uint64_t, uint16_t *data);
 	void showTool();
 
 private Q_SLOTS:
@@ -85,6 +90,9 @@ private Q_SLOTS:
 	void on_btnOutputMode_toggled(bool);
 	void regenerate();
 	void readPreferences();
+
+protected:
+	uint16_t *m_buffer;
 
 private:
 	void setupUi();

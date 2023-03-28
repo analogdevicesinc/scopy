@@ -23,6 +23,7 @@
 #include "digitalchannel_manager.hpp"
 #include "network_analyzer.hpp"
 #include "oscilloscope.hpp"
+#include "patterngenerator/pattern_generator.h"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
 #include "spectrum_analyzer.hpp"
@@ -277,6 +278,7 @@ bool M2kPlugin::onConnect()
 	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,js,nullptr));
 	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,js,nullptr));
 	laTme->setTool(new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));
+	pgTme->setTool(new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));
 
 
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	

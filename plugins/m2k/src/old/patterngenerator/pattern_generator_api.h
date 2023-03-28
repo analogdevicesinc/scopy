@@ -23,10 +23,9 @@
 #define PATTERNGENERATOR_API_H
 
 #include "pattern_generator.h"
-#include "apiObject.hpp"
+#include "pluginbase/apiobject.h"
 
-namespace adiscope {
-namespace logic {
+namespace adiscope::m2k::logic {
 class PatternGenerator_API : public ApiObject
 {
 	Q_OBJECT
@@ -51,7 +50,7 @@ class PatternGenerator_API : public ApiObject
 
 public:
 	explicit PatternGenerator_API(logic::PatternGenerator *pattern)
-	        : ApiObject()
+		: ApiObject()
 		, m_pattern(pattern) {
 		qRegisterMetaType<QVector<int>>("vector(int)");
 		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
@@ -91,5 +90,5 @@ private:
 	logic::PatternGenerator *m_pattern;
 };
 } // namespace logic
-} // namespace adiscope
+
 #endif // PATTERNGENERATOR_API_H
