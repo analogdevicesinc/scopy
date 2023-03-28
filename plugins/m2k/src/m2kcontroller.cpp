@@ -26,7 +26,7 @@ void M2kController::startPingTask()
 {
 	pingTask = new IIOPingTask(m_iioctx);
 	pingTimer = new CyclicalTask(pingTask, this);
-	connect(pingTask,SIGNAL(pingSuccess()),this,SIGNAL(pingSucces()));
+	connect(pingTask,SIGNAL(pingSuccess()),this,SIGNAL(pingSuccess()));
 	connect(pingTask,SIGNAL(pingFailed()),this,SIGNAL(pingFailed()));
 	pingTimer->start();
 }
