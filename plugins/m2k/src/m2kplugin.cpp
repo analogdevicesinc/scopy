@@ -20,6 +20,7 @@
 #include "dmm.hpp"
 #include "manualcalibration.h"
 #include "digitalchannel_manager.hpp"
+#include "network_analyzer.hpp"
 #include "oscilloscope.hpp"
 #include "power_controller.hpp"
 #include "signal_generator.hpp"
@@ -227,6 +228,7 @@ bool M2kPlugin::onConnect()
 	auto siggenTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2ksiggen");
 	auto specTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kspec");
 	auto oscTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kosc");
+	auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2knet");
 
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
@@ -235,6 +237,7 @@ bool M2kPlugin::onConnect()
 	siggenTme->setTool(new SignalGenerator(ctx,f,pwrTme,js,nullptr));
 	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,js,nullptr));
 	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,js,nullptr));
+	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,js,nullptr));
 
 
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
