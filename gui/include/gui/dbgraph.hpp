@@ -30,13 +30,14 @@
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
 #include "DisplayPlot.h"
+#include "scopygui_export.h"
 
 namespace adiscope {
 class OscScaleDraw;
 class PrefixFormatter;
 class OscScaleZoomer;
 
-class dBgraph : public DisplayPlot
+class SCOPYGUI_EXPORT dBgraph : public DisplayPlot
 {
 	friend class NetworkAnalyzer_API;
 	Q_OBJECT

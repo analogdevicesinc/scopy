@@ -24,6 +24,7 @@
 #include <qwt_plot_layout.h>
 
 using namespace adiscope;
+using namespace adiscope::m2k;
 
 NetworkAnalyzerBufferViewer::NetworkAnalyzerBufferViewer(QWidget *parent) :
 	QWidget(parent),

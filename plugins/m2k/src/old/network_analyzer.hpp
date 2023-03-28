@@ -22,15 +22,15 @@
 #define SCOPY_NETWORK_ANALYZER_HPP
 
 #include "gui/spinbox_a.hpp"
-#include "apiObject.hpp"
+#include "pluginbase/apiobject.h"
 #include "iio_manager.hpp"
 #include "signal_sample.hpp"
-#include "tool.hpp"
+#include "m2ktool.hpp"
 #include "dbgraph.hpp"
 #include "handles_area.hpp"
 #include <QtConcurrentRun>
-#include "gui/customPushButton.hpp"
-#include "scroll_filter.hpp"
+#include "gui/customPushButton.h"
+#include "gui/mousewheelwidgetguard.h"
 #include <gnuradio/scopy/goertzel_scopy_fc.h>
 #include <gnuradio/top_block.h>
 #include <gnuradio/blocks/head.h>
@@ -71,11 +71,11 @@ class NetworkAnalyzer;
 class QPushButton;
 class QJSEngine;
 
-namespace adiscope {
+namespace adiscope::m2k {
 class NetworkAnalyzer_API;
 class Filter;
 
-class NetworkAnalyzer : public Tool
+class NetworkAnalyzer : public M2kTool
 {
 	friend class NetworkAnalyzer_API;
 	friend class ToolLauncher_API;
@@ -84,8 +84,8 @@ class NetworkAnalyzer : public Tool
 
 public:
 	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				 ToolLauncher *parent);
+				 ToolMenuEntry *toolMenuItem, QJSEngine *engine,
+				 QWidget *parent = nullptr);
 	~NetworkAnalyzer();
 
 	void setOscilloscope(Oscilloscope *osc);
@@ -267,7 +267,7 @@ private Q_SLOTS:
 	void _saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2);
 
 	void toggleCursors(bool en);
-	void readPreferences();
+	void readPreferences() override;
 	void onGraphIndexChanged(int);
 	void on_btnExport_clicked();
 	void rightMenuFinished(bool opened);
@@ -281,7 +281,7 @@ private Q_SLOTS:
 	void validateSpinboxPeriods();
 public Q_SLOTS:
 
-	void showEvent(QShowEvent *event);
+	void showEvent(QShowEvent *event) override;
 	void run() override;
 	void stop() override;
 

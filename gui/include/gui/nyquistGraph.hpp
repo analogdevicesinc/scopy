@@ -31,13 +31,14 @@
 
 #include <QPushButton>
 #include <QMouseEvent>
+#include "scopygui_export.h"
 
 class QwtPolarGrid;
 
 namespace adiscope {
 	class NyquistSamplesArray;
 
-	class NyquistGraph : public QwtPolarPlot
+	class SCOPYGUI_EXPORT NyquistGraph : public QwtPolarPlot
 	{
 		Q_OBJECT
 

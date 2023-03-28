@@ -20,7 +20,7 @@
 #include "network_analyzer_api.hpp"
 #include "ui_network_analyzer.h"
 
-namespace adiscope {
+namespace adiscope::m2k {
 void NetworkAnalyzer_API::show()
 {
         Q_EMIT net->showTool();
@@ -181,7 +181,7 @@ int NetworkAnalyzer_API::getCursorsPosition() const
 	if (!net->ui->boxCursors->isChecked()) {
 		return 0;
 	}
-	auto currentPos = net->m_dBgraph.d_cursorReadouts->getCurrentPosition();
+	auto currentPos = net->m_dBgraph.getCursorReadouts()->getCurrentPosition();
 	switch (currentPos) {
 	case CustomPlotPositionButton::ReadoutsPosition::topLeft:
 	default:
