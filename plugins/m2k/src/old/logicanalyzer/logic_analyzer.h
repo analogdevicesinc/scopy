@@ -62,11 +62,11 @@ class CursorsSettings;
 
 namespace adiscope {
 	class ExportSettings;
+	class BaseMenu;
 }
 namespace adiscope::m2k {
 
 class Filter;
-class BaseMenu;
 class LogicAnalyzer_API;
 class StateUpdater;
 
@@ -123,6 +123,7 @@ public: // Mixed Signal View Interface
 
 	int getGroupOffset();
 Q_SIGNALS:
+	void dataAvailable(uint64_t, uint64_t, uint16_t *data);
 	void showTool();
 
 private Q_SLOTS:
@@ -162,6 +163,8 @@ private Q_SLOTS:
 	void emitSearchSignal(int index = -1);
 
 	void onFilterChanged(QStandardItem *item);
+protected:
+	uint16_t *m_buffer;
 
 private:
 	void setupUi();

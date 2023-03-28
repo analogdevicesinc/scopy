@@ -24,7 +24,7 @@
 #include <QDebug>
 #include <qwt_text.h>
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 
 namespace logic {

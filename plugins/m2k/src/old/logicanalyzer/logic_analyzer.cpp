@@ -28,9 +28,9 @@
 
 #include <libsigrokdecode/libsigrokdecode.h>
 
-#include "logicanalyzer/logicdatacurve.h"
-#include "logicanalyzer/annotationcurve.h"
-#include "logicanalyzer/decoder.h"
+#include "gui/logicdatacurve.h"
+#include "gui/annotationcurve.h"
+#include "gui/decoder.h"
 #include "logicanalyzer/decoder_table_model.hpp"
 
 #include "gui/basemenu.h"
@@ -38,7 +38,7 @@
 
 #include "logicanalyzer_api.h"
 
-#include "gui/dynamicWidget.hpp"
+#include "gui/dynamicWidget.h"
 
 #include <QDebug>
 #include <QDockWidget>
@@ -52,13 +52,15 @@
 #include "filter.hpp"
 
 #include <libm2k/m2kexceptions.hpp>
-#include "scopyExceptionHandler.h"
+#include "m2kpluginExceptionHandler.h"
+#include <pluginbase/scopyjs.h>
 
 #include "gui/osc_export_settings.h"
 #include "filemanager.h"
-#include "config.h"
 #include "state_updater.h"
 
+using namespace adiscope;
+using namespace adiscope::logic;
 using namespace adiscope::m2k;
 using namespace adiscope::m2k::logic;
 
@@ -77,7 +79,7 @@ static gint sort_pds(gconstpointer a, gconstpointer b)
     return strcmp(sda->id, sdb->id);
 }
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
+LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 			     ToolMenuEntry *tme,
 			     QJSEngine *engine, QWidget *parent,
 			     bool offline_mode_):
@@ -132,7 +134,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 	m_oscChannelSelected(-1),
 	m_oscDecoderMenu(nullptr),
 	m_currentKernelBuffers(4),
-	m_triggerUpdater(new StateUpdater(250, this))
+	m_triggerUpdater(new StateUpdater(250, this)),
+	m_buffer(nullptr)
 {
 	// setup ui
 	setupUi();
@@ -176,16 +179,16 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 		// 1 for each channel
 		// m_plot.addGenericPlotCurve()
-		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
+		LogicDataCurve *curve = new LogicDataCurve(nullptr, i);
 		curve->setTraceHeight(25);
 		m_plot.addDigitalPlotCurve(curve, true);
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
 		connect(this, &LogicAnalyzer::dataAvailable, this,
-			[=](uint64_t from, uint64_t to){
+			[=](uint64_t from, uint64_t to, uint16_t* m_buffer){
 			if (!m_oscPlot) {
-				curve->dataAvailable(from, to);
+				curve->dataAvailable(from, to, m_buffer);
 			}
 		}, Qt::DirectConnection);
 
@@ -253,8 +256,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 	api->setObjectName(QString::fromStdString(Filter::tool_name(
 							  TOOL_LOGIC_ANALYZER)));
-	api->load(*settings);
-	api->js_register(engine);
+//	api->load(*settings);
+	ScopyJS::GetInstance()->registerApi(api);
 
 	// Scroll wheel event filter
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
@@ -265,13 +268,13 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, adiscope::Filter *filt,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-	if (saveOnExit) {
-		api->save(*settings);
-	}
+//	if (saveOnExit) {
+//		api->save(*settings);
+//	}
 
 	delete api;
 
-	disconnect(prefPanel, &Preferences::notify, this, &LogicAnalyzer::readPreferences);
+//	disconnect(prefPanel, &Preferences::notify, this, &LogicAnalyzer::readPreferences);
 
 	if (m_captureThread) {
 		m_stopRequested = true;
@@ -297,7 +300,7 @@ LogicAnalyzer::~LogicAnalyzer()
 
 void LogicAnalyzer::setNativeDialogs(bool nativeDialogs)
 {
-	Tool::setNativeDialogs(nativeDialogs);
+	M2kTool::setNativeDialogs(nativeDialogs);
 	m_plot.setUseNativeDialog(nativeDialogs);
 }
 
@@ -314,7 +317,7 @@ void LogicAnalyzer::setData(const uint16_t * const data, int size)
 	m_buffer = new uint16_t[size];
 
 	memcpy(m_buffer, data, size * sizeof(uint16_t));
-	Q_EMIT dataAvailable(0, size);
+	Q_EMIT dataAvailable(0, size, m_buffer);
 
 //	if (m_oscPlot) {
 //		QMetaObject::invokeMethod(this, [=](){
@@ -339,15 +342,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	// save the state of the tool
 	m_saveRestoreSettings = std::unique_ptr<SaveRestoreToolSettings>(new SaveRestoreToolSettings(this));
 
-	if (m_started) {
-		auto btn = dynamic_cast<CustomPushButton *>(run_button);
-		if (btn) {
-			btn->setChecked(false);
-		}
+	if (m_started) {		
+			tme->setRunning(false);
 	}
 
 	// disable the menu item for the logic analyzer when mixed signal view is enabled
-	toolMenuItem->setDisabled(true);
+	tme->setEnabled(false);
 
 	m_oscPlot = osc;
 
@@ -374,15 +374,15 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	// move plot curves (logic + decoder) to osc plot
 	for (uint8_t i = 0; i < m_nbChannels; ++i) {
 
-		LogicDataCurve *curve = new LogicDataCurve(nullptr, i, this);
+		LogicDataCurve *curve = new LogicDataCurve(nullptr, i);
 		curve->setTraceHeight(25);
 		m_oscPlot->addDigitalPlotCurve(curve, false);
 
 		m_oscPlotCurves.push_back(curve);
 
 		auto handle = connect(this, &LogicAnalyzer::dataAvailable, this,
-			[=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			[=](uint64_t from, uint64_t to, uint16_t *buffer){
+			curve->dataAvailable(from, to, buffer);
 		}, Qt::DirectConnection);
 
 		connect(curve, &GenericLogicPlotCurve::destroyed, [=](){
@@ -532,17 +532,17 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			return;
 		}
 
-		std::shared_ptr<logic::Decoder> initialDecoder = nullptr;
+		std::shared_ptr<adiscope::logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		for (const GSList *sl = decoderList; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == decoder) {
-			initialDecoder = std::make_shared<logic::Decoder>(dec);
+			initialDecoder = std::make_shared<adiscope::logic::Decoder>(dec);
 		    }
 		}
 
-		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
+		AnnotationCurve *curve = new AnnotationCurve(initialDecoder);
 		curve->setTraceHeight(25);
 		m_oscPlot->addDigitalPlotCurve(curve, true);
 
@@ -561,8 +561,8 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
 		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
-			this, [=](uint64_t from, uint64_t to){
-			curve->dataAvailable(from, to);
+			this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
+			curve->dataAvailable(from, to, buffer);
 		}, Qt::DirectConnection);
 
 		connect(curve, &QObject::destroyed, [=](){
@@ -911,7 +911,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		for (const GSList *sl = dl; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == text) {
-			curve->stackDecoder(std::make_shared<logic::Decoder>(dec));
+			curve->stackDecoder(std::make_shared<adiscope::logic::Decoder>(dec));
 			break;
 		    }
 		}
@@ -946,7 +946,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 void LogicAnalyzer::disableMixedSignalView()
 {
 	// restore the menu item availability
-	toolMenuItem->setEnabled(true);
+	tme->setEnabled(true);
 
 	// restore the state of the tool
 	m_saveRestoreSettings.reset(nullptr);
@@ -1693,13 +1693,12 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
-		auto btn = dynamic_cast<CustomPushButton *>(run_button);
-		btn->setChecked(checked);
+		tme->setRunning(checked);
 //		if (!checked) {
 //			m_plot.setTriggerState(CapturePlot::Stop);
 //		}
 	});
-	connect(run_button, &QPushButton::toggled,
+	connect(tme, &ToolMenuEntry::runToggled,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &LogicAnalyzer::startStop);
@@ -1828,7 +1827,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		for (const GSList *sl = dl; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == text) {
-			curve->stackDecoder(std::make_shared<logic::Decoder>(dec));
+			curve->stackDecoder(std::make_shared<adiscope::logic::Decoder>(dec));
 			break;
 		    }
 		}
@@ -2272,7 +2271,7 @@ void LogicAnalyzer::startStop(bool start)
 					break;
 				}
 
-				Q_EMIT dataAvailable(absIndex - captureSize, absIndex);
+				Q_EMIT dataAvailable(absIndex - captureSize, absIndex, m_buffer);
 
 				QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
 							  "replot",
@@ -2304,7 +2303,8 @@ void LogicAnalyzer::startStop(bool start)
 					totalSamples = bufferSizeAdjusted;
 					absIndex = 0;
 
-					int ms = (int)(1000.0 / getScopyPreferences()->getTarget_fps());
+					double fps = p->get("general_plot_target_fps").toDouble();
+					int ms = (int)(1000.0 / fps);
 					std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 				}
 			} while (totalSamples && !m_stopRequested);
@@ -2393,28 +2393,28 @@ void LogicAnalyzer::setupDecoders()
 			return;
 		}
 
-		std::shared_ptr<logic::Decoder> initialDecoder = nullptr;
+		std::shared_ptr<adiscope::logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		for (const GSList *sl = decoderList; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == decoder) {
-			initialDecoder = std::make_shared<logic::Decoder>(dec);
+			initialDecoder = std::make_shared<adiscope::logic::Decoder>(dec);
 		    }
 		}
 
 		g_slist_free(decoderList);
 
-		AnnotationCurve *curve = new AnnotationCurve(this, initialDecoder);
+		AnnotationCurve *curve = new AnnotationCurve(initialDecoder);
 		curve->setTraceHeight(25);
 		m_plot.addDigitalPlotCurve(curve, true);
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
 		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
-			this, [=](uint64_t from, uint64_t to){
+			this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
 			if (!m_oscPlot) {
-				curve->dataAvailable(from, to);
+				curve->dataAvailable(from, to, buffer);
 			}
 		}, Qt::DirectConnection);
 
@@ -2425,7 +2425,7 @@ void LogicAnalyzer::setupDecoders()
 					       : 0;
 		curve->setTimeTriggerOffset(delay);
 
-		curve->dataAvailable(0, m_lastCapturedSample);
+		curve->dataAvailable(0, m_lastCapturedSample, m_buffer);
 
 		m_plotCurves.push_back(curve);
 		int chId = m_plotCurves.size() - 1;
@@ -2813,9 +2813,10 @@ void LogicAnalyzer::restoreTriggerState()
 
 void LogicAnalyzer::readPreferences()
 {
-	bool showFps = prefPanel->getShow_plot_fps();
-	m_tableInfo = prefPanel->getTableInfo();
-	m_separateAnnotations = prefPanel->getSeparateAnnotations();
+
+	bool showFps = p->get("general_show_plot_fps").toBool();
+	m_tableInfo =  p->get("m2k_logic_table_info").toBool(); //prefPanel->getTableInfo();
+	m_separateAnnotations =  p->get("m2k_logic_separate_annotations").toBool(); //prefPanel->getSeparateAnnotations();
 	m_plot.setVisibleFpsLabel(showFps);
 
 	for (GenericLogicPlotCurve *curve : qAsConst(m_plotCurves)) {
@@ -2825,10 +2826,10 @@ void LogicAnalyzer::readPreferences()
 				continue;
 			}
 
-			ldc->setDisplaySampling(prefPanel->getDisplaySamplingPoints());
+			ldc->setDisplaySampling(p->get("m2k_logic_display_sampling_points").toBool()/*prefPanel->getDisplaySamplingPoints()*/);
 		}
 	}
-	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
+	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 
 	m_plot.replot();
 }
@@ -2902,7 +2903,7 @@ void LogicAnalyzer::exportData()
 
 		/* Write the general information */
 		out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
-		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
+//		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
 		out << startRow << "comment " << QString::number(m_bufferSize) <<
 		       " samples acquired at " << QString::number(m_sampleRate) <<
 		       " Hz " << endRow;

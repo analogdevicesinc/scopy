@@ -9,6 +9,7 @@
 #include <QUuid>
 #include <QSpacerItem>
 #include <QTimer>
+#include <libsigrokdecode/libsigrokdecode.h>
 #include <pluginbase/preferences.h>
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferenceshelper.h>
@@ -207,6 +208,41 @@ bool M2kPlugin::loadPreferencesPage()
 	return true;
 }
 
+void M2kPlugin::init()
+{
+#if defined __APPLE__
+				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
+#else
+				bool success = loadDecoders("decoders");
+#endif
+				qInfo(CAT_M2KPLUGIN)<<"loadDecoders " << success;
+}
+
+bool M2kPlugin::loadDecoders(QString path)
+{
+	static bool srd_loaded = false;
+
+	if (srd_loaded) {
+		srd_exit();
+	}
+
+	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
+		qDebug(CAT_M2KPLUGIN) << "ERROR: libsigrokdecode init failed.";
+		return false;
+	} else {
+		srd_loaded = true;
+		/* Load the protocol decoders */
+		srd_decoder_load_all();
+		auto decoder = srd_decoder_get_by_id("parallel");
+
+		if (decoder == nullptr) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool M2kPlugin::onConnect()
 {
 	ContextProvider *c = ContextProvider::GetInstance();
@@ -229,6 +265,8 @@ bool M2kPlugin::onConnect()
 	auto specTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kspec");
 	auto oscTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kosc");
 	auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2knet");
+	auto laTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2klogic");
+	auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
 
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
@@ -238,6 +276,7 @@ bool M2kPlugin::onConnect()
 	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,js,nullptr));
 	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,js,nullptr));
 	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,js,nullptr));
+	laTme->setTool(new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));
 
 
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	

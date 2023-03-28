@@ -24,7 +24,15 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 set(SCOPY_QT_COMPONENTS Core Widgets)
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
-FILE(GLOB OLD_SCOPY_FILES src/old/*.cpp src/old/*.hpp src/old/*.cc src/old/*.hh src/old/*.c src/old/*.h)
+FILE(GLOB OLD_SCOPY_FILES
+    src/old/*.cpp
+    src/old/logicanalyzer/*.cpp
+    src/old/logicanalyzer/*.hpp
+    src/old/*.hpp
+    src/old/*.cc
+    src/old/*.hh
+    src/old/*.c
+    src/old/*.h)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 

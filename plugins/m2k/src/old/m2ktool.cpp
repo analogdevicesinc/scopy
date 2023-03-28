@@ -122,7 +122,12 @@ void M2kTool::loadState()
 //	if (isDetached) {
 //		detached();
 //		window->restoreGeometry(settings->value(name + "/geometry").toByteArray());
-//	}
+	//	}
+}
+
+ToolMenuEntry *M2kTool::getTme() const
+{
+	return tme;
 }
 
 void M2kTool::attached()

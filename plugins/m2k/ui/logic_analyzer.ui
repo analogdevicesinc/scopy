@@ -115,7 +115,7 @@
            <string>Print</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset resource="../../../resources/resources.qrc">
             <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
@@ -316,6 +316,9 @@
                <spacer name="horizontalSpacer_4">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeType">
+                 <enum>QSizePolicy::Expanding</enum>
                 </property>
                 <property name="sizeHint" stdset="0">
                  <size>
@@ -526,8 +529,8 @@
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>400</width>
-                      <height>542</height>
+                      <width>200</width>
+                      <height>360</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -1392,8 +1395,8 @@ color: rgba(255,255,255,51);
                      <rect>
                       <x>0</x>
                       <y>0</y>
-                      <width>472</width>
-                      <height>542</height>
+                      <width>320</width>
+                      <height>304</height>
                      </rect>
                     </property>
                     <property name="sizePolicy">
@@ -2157,7 +2160,7 @@ color: rgba(255,255,255,51);
                     <number>6</number>
                    </property>
                    <item>
-                    <widget class="adiscope::logic::DecoderTable" name="decoderTableView">
+                    <widget class="adiscope::m2k::logic::DecoderTable" name="decoderTableView">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
                        <horstretch>0</horstretch>
@@ -2446,50 +2449,50 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
   <customwidget>
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
-   <header location="global">gui/customPushButton.hpp</header>
+   <header>gui/customPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header location="global">gui/detachdragzone.h</header>
+   <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header location="global">gui/menu_anim.hpp</header>
+   <header>gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header location="global">gui/instrumentnotes.h</header>
+   <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">gui/runsinglewidget.h</header>
+   <header>gui/runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>adiscope::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header location="global">gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::logic::DecoderTable</class>
+   <class>adiscope::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/linked_button.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>adiscope::m2k::logic::DecoderTable</class>
    <extends>QTableView</extends>
    <header>logicanalyzer/decoder_table.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../../../resources/resources.qrc"/>
  </resources>
  <connections>
   <connection>

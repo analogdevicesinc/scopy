@@ -29,7 +29,7 @@
 #include "decoder_table_item.hpp"
 
 
-namespace adiscope {
+namespace adiscope::m2k {
 
 
 namespace logic {

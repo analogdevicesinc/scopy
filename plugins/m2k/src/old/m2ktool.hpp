@@ -61,6 +61,8 @@ public:
 
 	ApiObject* getApi();
 
+	ToolMenuEntry *getTme() const;
+
 Q_SIGNALS:
 	void detachedState(bool detached);
 
