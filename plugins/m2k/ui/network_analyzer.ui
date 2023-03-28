@@ -97,7 +97,7 @@
            <string>Print</string>
           </property>
           <property name="icon">
-           <iconset resource="../resources/resources.qrc">
+           <iconset>
             <normaloff>:/icons/printer.svg</normaloff>:/icons/printer.svg</iconset>
           </property>
           <property name="iconSize">
@@ -507,7 +507,6 @@ color:  red;</string>
                 <property name="font_azimuth" stdset="0">
                  <font>
                   <pointsize>16</pointsize>
-                  <weight>75</weight>
                   <bold>true</bold>
                  </font>
                 </property>
@@ -1941,7 +1940,7 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
                             <string>Previous</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="../resources/resources.qrc">
+                            <iconset>
                              <normaloff>:/icons/arrow_left.svg</normaloff>:/icons/arrow_left.svg</iconset>
                            </property>
                            <property name="iconSize">
@@ -1997,7 +1996,7 @@ padding-left: 20px;
                             <string>     Next</string>
                            </property>
                            <property name="icon">
-                            <iconset resource="../resources/resources.qrc">
+                            <iconset>
                              <normaloff>:/icons/arrow_right.svg</normaloff>:/icons/arrow_right.svg</iconset>
                            </property>
                            <property name="iconSize">
@@ -3138,7 +3137,7 @@ QLabel {
   <customwidget>
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
-   <header>gui/customPushButton.hpp</header>
+   <header>gui/customPushButton.h</header>
   </customwidget>
   <customwidget>
    <class>adiscope::DetachDragZone</class>
@@ -3167,7 +3166,7 @@ QLabel {
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/customSwitch.hpp</header>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>adiscope::LinkedButton</class>
@@ -3195,7 +3194,7 @@ QLabel {
   <customwidget>
    <class>adiscope::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
-   <header>gui/smallOnOffSwitch.hpp</header>
+   <header>gui/smallOnOffSwitch.h</header>
   </customwidget>
  </customwidgets>
  <resources>

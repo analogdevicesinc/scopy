@@ -18,12 +18,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "logging_categories.h"
-#include "gui/dynamicWidget.hpp"
+#include "gui/dynamicWidget.h"
 #include "network_analyzer.hpp"
 #include "signal_generator.hpp"
 #include "gui/spinbox_a.hpp"
 #include "hardware_trigger.hpp"
+#include "gui/utils.h"
 #include "ui_network_analyzer.h"
 #include "filemanager.h"
 
@@ -63,11 +63,17 @@
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/m2kexceptions.hpp>
-#include "scopyExceptionHandler.h"
+#include "m2kpluginExceptionHandler.h"
+#include <pluginbase/scopyjs.h>
+
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_M2K_NETWORK_ANALYZER, "M2kNetworkAnalyzer")
 
 static const int KERNEL_BUFFERS_DEFAULT = 4;
 
 using namespace adiscope;
+using namespace adiscope::m2k;
 using namespace gr;
 using namespace libm2k::context;
 using namespace libm2k::analog;
@@ -171,9 +177,9 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 }
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 ToolMenuItem *toolMenuItem, QJSEngine *engine,
-				 ToolLauncher *parent) :
-	Tool(ctx, toolMenuItem, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
+				 ToolMenuEntry *tme, QJSEngine *engine,
+				 QWidget *parent) :
+	M2kTool(ctx, tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
 	m_m2k_context(nullptr),
 	m_m2k_analogin(nullptr),
@@ -227,10 +233,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		[=](bool checked){
-		auto btn = dynamic_cast<CustomPushButton *>(runButton());
-		btn->setChecked(checked);
+		tme->setRunning(checked);
 	});
-	connect(runButton(), &QPushButton::toggled,
+	connect(tme, &ToolMenuEntry::runToggled,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &NetworkAnalyzer::startStop);
@@ -242,7 +247,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			return;
 		}
 
-		dynamic_cast<CustomPushButton *>(this->runButton())->setChecked(false);
+		tme->setRunning(false);
 	});
 
 
@@ -451,7 +456,10 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	centralWidget->setLayout(gridLayout);
 
-	if(prefPanel->getCurrent_docking_enabled()) {
+	Preferences *pref = Preferences::GetInstance();
+	bool dockingEnabled = pref->get("general_dockingenabled").toBool();
+
+	if(dockingEnabled) {
 		// bode graph
 		QMainWindow* bodeWindow = new QMainWindow(this);
 		bodeWindow->setCentralWidget(0);
@@ -611,8 +619,8 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->xygraph->enableZooming(ui->btnZoomIn, ui->btnZoomOut);
 
-	api->load(*settings);
-	api->js_register(engine);
+//	api->load(*settings);
+	ScopyJS::GetInstance()->registerApi(api);
 
 	connect((m_dBgraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()),
 		&m_phaseGraph, SLOT(scaleDivChanged()));
@@ -804,14 +812,14 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 NetworkAnalyzer::~NetworkAnalyzer()
 {
-	disconnect(prefPanel,&Preferences::notify,this,
-		   &NetworkAnalyzer::readPreferences);
+//	disconnect(prefPanel,&Preferences::notify,this,
+//		   &NetworkAnalyzer::readPreferences);
 	startStop(false);
 	ui->runSingleWidget->toggle(false);
 
-	if (saveOnExit) {
-		api->save(*settings);
-	}
+//	if (saveOnExit) {
+//		api->save(*settings);
+//	}
 
 	top_block->disconnect_all();
 
@@ -932,7 +940,7 @@ void NetworkAnalyzer::rightMenuFinished(bool opened)
 
 void NetworkAnalyzer::showEvent(QShowEvent *event)
 {
-	Tool::showEvent(event);
+	M2kTool::showEvent(event);
 }
 
 void NetworkAnalyzer::on_btnExport_clicked()
@@ -1229,7 +1237,7 @@ void NetworkAnalyzer::setFilterParameters()
 			f22->set_high_gain(range1);
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
-			qDebug(CAT_NETWORK_ANALYZER) << e.what();
+			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
 	}
 }
@@ -1303,7 +1311,7 @@ void NetworkAnalyzer::goertzel()
 		computeCaptureParams(frequency, buffer_size, adc_rate);
 
 		if (buffer_size == 0) {
-			qDebug(CAT_NETWORK_ANALYZER) << "buffer size 0";
+			qDebug(CAT_M2K_NETWORK_ANALYZER) << "buffer size 0";
 			return;
 		}
 
@@ -1324,7 +1332,7 @@ void NetworkAnalyzer::goertzel()
 				m_m2k_analogin->setSampleRate(adc_rate);
 			} catch (libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
-				qDebug(CAT_NETWORK_ANALYZER) << e.what();
+				qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 			}
 		}
 
@@ -1341,7 +1349,7 @@ void NetworkAnalyzer::goertzel()
 					buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
 				} catch (libm2k::m2k_exception &e) {
 					HANDLE_EXCEPTION(e)
-					qDebug(CAT_NETWORK_ANALYZER) << e.what();
+					qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 					return;
 				}
 				if (m_stop) {
@@ -1586,7 +1594,7 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
 	} catch (libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e)
-		qDebug(CAT_NETWORK_ANALYZER) << e.what();
+		qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		return false;
 	}
 
@@ -1748,7 +1756,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			m_m2k_analogout->stop();
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
-			qDebug(CAT_NETWORK_ANALYZER) << e.what();
+			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
 		m_dBgraph.sweepDone();
 		m_phaseGraph.sweepDone();
@@ -1776,7 +1784,7 @@ std::vector<double> NetworkAnalyzer::generateSinWave(
 			}
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
-			qDebug(CAT_NETWORK_ANALYZER) << e.what();
+			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
 	}
 
@@ -1820,7 +1828,7 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 
 		} catch (libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
-			qDebug(CAT_NETWORK_ANALYZER) << e.what();
+			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
 	}
 }
@@ -1841,12 +1849,16 @@ void NetworkAnalyzer::toggleCursors(bool en)
 
 void NetworkAnalyzer::readPreferences()
 {
-	bool showFps = prefPanel->getShow_plot_fps();
+	Preferences *p = Preferences::GetInstance();
+	bool showFps = p->get("general_show_plot_fps").toBool();
 	m_dBgraph.setVisibleFpsLabel(showFps);
 	m_phaseGraph.setVisibleFpsLabel(showFps);
-	m_dBgraph.setShowZero(prefPanel->getNa_show_zero());
-	m_phaseGraph.setShowZero(prefPanel->getNa_show_zero());
-	ui->instrumentNotes->setVisible(prefPanel->getInstrumentNotesActive());
+
+	bool naShowZero = p->get("m2k_na_show_zero").toBool();
+	m_dBgraph.setShowZero(naShowZero);
+	m_phaseGraph.setShowZero(naShowZero);
+
+	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 
 //	autoAdjustGain = prefPanel->getNaGainUpdateEnabled();
 }

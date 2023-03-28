@@ -44,7 +44,7 @@ struct Buffer {
 	std::vector<float> buffer;
 };
 
-namespace adiscope {
+namespace adiscope::m2k {
 class NetworkAnalyzerBufferViewer : public QWidget
 {
 	Q_OBJECT
