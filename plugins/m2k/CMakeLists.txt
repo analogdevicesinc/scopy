@@ -11,7 +11,7 @@ include(GenerateExportHeader)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
+set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui ${CMAKE_CURRENT_SOURCE_DIR}/ui/patterns)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -28,13 +28,17 @@ FILE(GLOB OLD_SCOPY_FILES
     src/old/*.cpp
     src/old/logicanalyzer/*.cpp
     src/old/logicanalyzer/*.hpp
+    src/old/patterngenerator/*.cpp
+    src/old/patterngenerator/*.hpp
+    src/old/patterngenerator/patterns/*.cpp
+    src/old/patterngenerator/patterns/*.hpp
     src/old/*.hpp
     src/old/*.cc
     src/old/*.hh
     src/old/*.c
     src/old/*.h)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
-FILE(GLOB UI_LIST ui/*.ui)
+FILE(GLOB UI_LIST ui/*.ui ui/patterns/*.ui)
 
 set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)

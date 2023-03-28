@@ -106,6 +106,7 @@ void ToolManager::updateToolEntry(ToolMenuEntry *tme, QString s) {
 	m->setVisible(tme->visible());
 	m->setEnabled(tme->enabled());
 	m->setName(tme->name());
+	m->getToolRunBtn()->setEnabled(tme->runEnabled());
 	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
 	m->getToolRunBtn()->setChecked(tme->running());
 	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() <<" - "<< tme->uuid();

@@ -42,7 +42,7 @@ QStringList IioUtils::available_options_list(struct iio_device *dev,
 	ret = iio_device_attr_read(dev, attr_name, buffer, sizeof(buffer));
 	if (ret >= 0) {
 		QString s(buffer);
-		list = s.split(" ", QString::SkipEmptyParts);
+		list = s.split(" ", Qt::SkipEmptyParts);
 	}
 
 	return list;
