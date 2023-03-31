@@ -272,7 +272,7 @@ QList<QStringList> LogicAnalyzer_API::getDecoderSettings() const
 				double d_val;
 
 				QVariant p_val = p->get();
-				auto type = p_val.type();
+				auto type = QMetaType::Type(p_val.type());
 				std::string type_name(p_val.typeName());
 				prop_type = QString::fromStdString(type_name);
 				if (type == QMetaType::QString) {

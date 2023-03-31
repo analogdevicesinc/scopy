@@ -99,7 +99,7 @@ PowerController::PowerController(struct iio_context *ctx,
 	connect(ui->trackingRatio, SIGNAL(valueChanged(int)), this,
 			SLOT(ratioChanged(int)));
 
-	connect(tme, SIGNAL(runToggled(bool)), this, SLOT(startStop(bool)));
+	connect(tme, SIGNAL(runClicked(bool)), this, SLOT(startStop(bool)));
 
 	valuePos->setValue(0);
 	valueNeg->setValue(0);
@@ -152,12 +152,12 @@ void PowerController::readPreferences()
 void PowerController::toggleRunButton(bool enabled)
 {
 	bool dac1Enabled = ui->dac1->isChecked();
-	bool dac2Enabled = ui->dac2->isChecked();
+	bool dac2Enabled = ui->dac2->isChecked();	
 	if (enabled) {
 		tme->setRunning(enabled);
 	} else {
 		tme->setRunning(dac1Enabled | dac2Enabled);
-	}
+	}	
 }
 
 void PowerController::showEvent(QShowEvent *event)
@@ -296,12 +296,12 @@ void PowerController::stop()
 }
 
 void PowerController::startStop(bool start)
-{
+{	
 	dac1_set_enabled(start);
 	ui->dac1->setChecked(start);
 
 	dac2_set_enabled(start);
 	ui->dac2->setChecked(start);
-	m_running = start;
+	m_running = start;	
 }
 
