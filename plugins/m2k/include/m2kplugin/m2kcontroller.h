@@ -42,6 +42,7 @@ Q_SIGNALS:
 	void calibrationStarted();
 	void calibrationSuccess();
 	void calibrationFailed();
+	void calibrationFinished();
 
 
 private:

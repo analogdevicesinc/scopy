@@ -869,6 +869,11 @@ SpectrumAnalyzer::~SpectrumAnalyzer()
 	delete ui;
 }
 
+QPushButton *SpectrumAnalyzer::getRunButton()
+{
+	return ui->runSingleWidget->getRunButton();
+}
+
 void SpectrumAnalyzer::setNativeDialogs(bool nativeDialogs)
 {
 	M2kTool::setNativeDialogs(nativeDialogs);
