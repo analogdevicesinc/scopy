@@ -53,6 +53,7 @@
 #include "dmm_api.hpp"
 #include <pluginbase/scopyenvironment.h>
 #include <pluginbase/preferences.h>
+#include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_VOLTMETER,"M2kDMM");
 
@@ -200,10 +201,10 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
 	if (started)
 		manager->unlock();
 
-//	api->setObjectName(QString::fromStdString(Filter::tool_name(
-//			TOOL_DMM)));
+	api->setObjectName(QString::fromStdString(Filter::tool_name(
+			TOOL_DMM)));
 //	api->load(*settings);
-//	api->js_register(engine);
+	ScopyJS::GetInstance()->registerApi(api);
 
 	if(!wheelEventGuard)
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->widget_2);
@@ -216,6 +217,11 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
 	{
 		m_gainHistory.push_back(boost::circular_buffer<libm2k::analog::M2K_RANGE>(m_gainHistorySize));
 	}
+}
+
+QPushButton *DMM::getRunButton()
+{
+	return ui->run_button;
 }
 
 void DMM::readPreferences()

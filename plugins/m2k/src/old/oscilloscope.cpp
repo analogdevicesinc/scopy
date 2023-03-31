@@ -1375,6 +1375,11 @@ Oscilloscope::~Oscilloscope()
 	delete ui;
 }
 
+QPushButton *Oscilloscope::getRunButton()
+{
+	return ui->runSingleWidget->getRunButton();
+}
+
 void Oscilloscope::settingsLoaded()
 {
 	for (size_t i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i)

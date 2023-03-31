@@ -108,6 +108,7 @@ void M2kController::calibrate()
 		} else  {
 			Q_EMIT calibrationFailed();
 		}
+		Q_EMIT calibrationFinished();
 		fw->deleteLater();
 	});
 	fw->setFuture(f);

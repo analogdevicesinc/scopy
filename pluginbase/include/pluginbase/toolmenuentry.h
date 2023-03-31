@@ -113,9 +113,15 @@ Q_SIGNALS:
 
 	/**
 	 * @brief requestRun
-	 * Signal is emitted when the run button is clicked from Scopy UI
+	 * Signal is emitted when the run button is toggled
 	 */
 	void runToggled(bool);
+
+	/**
+	 * @brief requestRun
+	 * Signal is emitted when the run button is clicked from Scopy UI
+	 */
+	void runClicked(bool);
 
 private:
 	QString m_id;
