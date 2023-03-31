@@ -30,7 +30,7 @@ bool SWIOTPlugin::loadPage()
 	infoui = new Ui::SWIOTInfoPage();
 	m_page = new QWidget();
 	infoui->setupUi(m_page);
-	connect(infoui->pushButton,&QPushButton::clicked,this,[=](){
+	connect(infoui->pushButton,&QPushButton::clicked, this, [this] (){
 		auto &&cp = ContextProvider::GetInstance();
 		iio_context* ctx = cp->open(m_param);
 		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
@@ -49,7 +49,7 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config", ":/icons/scopy-default/icons/tool_debugger.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Runtime",""));
         m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT MAX14906", ""));
         m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Faults", ""));
@@ -92,8 +92,8 @@ bool SWIOTPlugin::onConnect()
 	cs = new CyclicalTask(ping,this);
 	cs->start(2000);
 
-	connect(ping, &IIOPingTask::pingFailed, this, [=](){Q_EMIT disconnectDevice();} );
-	connect(ping, &IIOPingTask::pingSuccess, this, [=](){qDebug(CAT_SWIOT)<<"Ping Success";} );
+	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
+	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_SWIOT)<<"Ping Success";} );
 
 	config = new SwiotConfig(ctx);
 

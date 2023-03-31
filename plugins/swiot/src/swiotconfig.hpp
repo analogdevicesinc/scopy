@@ -8,6 +8,9 @@
 #include "src/refactoring/tool/tool_view.hpp"
 #include <QPushButton>
 #include <QMap>
+#include <QScrollArea>
+
+#include "src/drawarea.h"
 
 extern "C"{
 	struct iio_context;
@@ -33,6 +36,12 @@ private:
 	QPushButton* m_configBtn;
 	SwiotConfigMenu* m_configMenu;
         adiscope::gui::ToolView* m_toolView;
+
+        DrawArea* m_drawArea;
+        QScrollArea* m_scrollArea;
+
+protected:
+        bool eventFilter(QObject *object, QEvent * event) override;
 
 private:
 	void init();

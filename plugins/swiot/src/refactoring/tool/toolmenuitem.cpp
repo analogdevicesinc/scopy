@@ -47,7 +47,7 @@ ToolMenuItem::ToolMenuItem(QString name, QString iconPath, QWidget *parent):
 
 	setDynamicProperty(this, "allowHover", true);
 
-	connect(d_toolBtn, &QPushButton::toggled, [=](bool on){
+	connect(d_toolBtn, &QPushButton::toggled, [this] (bool on){
 		if (!d_detached) {
 			setDynamicProperty(this, "selected", on);
 		}

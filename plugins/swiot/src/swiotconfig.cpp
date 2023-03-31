@@ -7,16 +7,22 @@
 #include <iio.h>
 #include <core/logging_categories.h>
 #include <QVBoxLayout>
+#include <core/logging_categories.h>
 
 using namespace adiscope;
 
 SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent):
+//        m_drawArea(new DrawArea(this)),
+//        m_scrollArea(new QScrollArea(this)),
         QWidget(parent)
 {
+        this->installEventFilter(this);
+
 	m_funcAvailable.push_back(new QStringList());
 	m_funcAvailable.push_back(new QStringList());
 	m_configBtn = createConfigBtn();
 	this->setLayout(new QVBoxLayout);
+//        this->m_scrollArea->setStyleSheet("background-color: red;");
 	this->layout()->addWidget(m_configBtn);
 	setDevices(ctx);
 	bool isConfig = isConfigCtx();
@@ -32,13 +38,50 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent):
                 recipe.hasHelpBtn = true;
 
                 m_toolView = adiscope::gui::ToolViewBuilder(recipe, nullptr, parent).build();
+
                 m_configMenu = new SwiotConfigMenu();
-                m_toolView->addFixedCentralWidget(m_configMenu,0,0,0,0);
-                m_toolView->addTopExtraWidget(m_configBtn);
-                this->layout()->addWidget(m_toolView);
+//                this->m_configMenu->setFixedSize(640, 480);
+                this->m_configMenu->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+                m_drawArea = new DrawArea(this);
+                m_scrollArea = new QScrollArea(this);
+//                m_drawArea->setMaximumSize(400, 400);
+
+                m_toolView->addFixedCentralWidget(m_scrollArea,0,0,0,0);
+                m_scrollArea->setLayout(new QVBoxLayout(this));
+                m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
+                m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAsNeeded);
+
                 init();
+                m_configMenu->setMinimumSize(m_configMenu->size());
+                auto scrollWidget = new QWidget(this);
+                scrollWidget->setLayout(new QVBoxLayout(this));
+                scrollWidget->layout()->addWidget(m_configMenu);
+                scrollWidget->layout()->addWidget(m_drawArea);
+                m_scrollArea->setWidget(scrollWidget);
+                m_scrollArea->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+//                m_scrollArea->setStyleSheet("background-color: green");
+//                m_configMenu->setStyleSheet("background-color: red;");
+//                m_configMenu->setFixedSize(400, 400);
+//                m_drawArea->setStyleSheet("background-color: blue");
+                m_toolView->addTopExtraWidget(m_configBtn);
+
+                this->layout()->addWidget(m_toolView);
                 connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::configBtnPressed);
+                qDebug(CAT_SWIOT_CONFIG) << this->size() << this->sizeHint();
+                qDebug(CAT_SWIOT_CONFIG) << this->m_drawArea->size() << this->m_drawArea->sizeHint();
+                qDebug(CAT_SWIOT_CONFIG) << this->m_configMenu->size() << this->m_configMenu->sizeHint();
         }
+        this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+//        this->setStyleSheet("background-color: blue;");
+//        auto idk = new QFrame(this);
+//        idk->setFixedSize(200, 200);
+//        idk->setStyleSheet("background-color: green;");
+//        idk->setLayout(new QVBoxLayout(idk));
+//        idk->layout()->addWidget(new DrawArea(idk));
+//        this->layout()->addWidget(idk);
+//        m_drawArea->setStyleSheet("background-color: green;");
+//        m_drawArea->setMaximumSize(500, 500);
+//        this->layout()->addWidget(m_drawArea);
 }
 
 SwiotConfig::~SwiotConfig()
@@ -131,4 +174,14 @@ void SwiotConfig::configBtnPressed()
 	for(int i = 0; i < m_funcAvailable.size(); i++) {
 		qDebug(CAT_SWIOT_CONFIG) << m_funcAvailable[i]->toVector();
 	}
+}
+
+bool SwiotConfig::eventFilter(QObject *object, QEvent *event) { // FIXME: delete this and uninstall event filter
+        if (event->type() == QEvent::Resize) {
+                qDebug(CAT_SWIOT_CONFIG) << "this:" << this->size() << this->sizeHint();
+                qDebug(CAT_SWIOT_CONFIG) << "scroll: " << m_scrollArea->size() << m_scrollArea->sizeHint();
+                qDebug(CAT_SWIOT_CONFIG) << "draw:" << this->m_drawArea->size() << this->m_drawArea->sizeHint();
+                qDebug(CAT_SWIOT_CONFIG) << "menu:" << this->m_configMenu->size() << this->m_configMenu->sizeHint();
+        }
+        return QObject::eventFilter(object, event);
 }

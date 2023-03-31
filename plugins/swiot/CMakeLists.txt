@@ -89,6 +89,8 @@ FILE(GLOB SRC_LIST
 	src/refactoring/maingui/*.h
 
 	src/captureplot/*
+
+	src/drawarea.*
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
