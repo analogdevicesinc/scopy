@@ -113,6 +113,8 @@ bool M2kPlugin::loadExtraButtons()
 
 	connect(m_btnIdentify,SIGNAL(clicked()),m_m2kController,SLOT(identify()));
 	connect(m_btnCalibrate,SIGNAL(clicked()),m_m2kController,SLOT(calibrate()));
+	connect(m_m2kController,&M2kController::calibrationStarted, this, [=](){m_btnCalibrate->setEnabled(false);});
+	connect(m_m2kController,&M2kController::calibrationFinished, this, [=](){m_btnCalibrate->setEnabled(true);});
 	connect(m_btnRegister,&QPushButton::clicked,this,[=](){
 		;
 //		QString versionString = QString(m_info_params["Model"].split("Rev")[1][1]);
@@ -268,18 +270,40 @@ bool M2kPlugin::onConnect()
 	auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2knet");
 	auto laTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2klogic");
 	auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
+	m_adcBtnGrp = new QButtonGroup(this);	
 
 	dmmTme->setTool(new DMM(ctx, f, dmmTme));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
 	dioTme->setTool(new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
 	pwrTme->setTool(new PowerController(ctx,pwrTme,js,nullptr));
-	siggenTme->setTool(new SignalGenerator(ctx,f,pwrTme,js,nullptr));
+	siggenTme->setTool(new SignalGenerator(ctx,f,siggenTme,js,nullptr));
 	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,js,nullptr));
 	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,js,nullptr));
 	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,js,nullptr));
 	laTme->setTool(new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));
 	pgTme->setTool(new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));
+	m_adcBtnGrp->addButton(dynamic_cast<Oscilloscope*>(oscTme->tool())->getRunButton());
+	m_adcBtnGrp->addButton(dynamic_cast<SpectrumAnalyzer*>(specTme->tool())->getRunButton());
+	m_adcBtnGrp->addButton(dynamic_cast<DMM*>(dmmTme->tool())->getRunButton());
+	m_adcBtnGrp->addButton(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton());
 
+
+	connect(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
+		if(en) {
+			if(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton()->isChecked())
+				dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton()->setChecked(false);
+		}
+	});
+
+	connect(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
+		if(en) {
+			if(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton()->isChecked())
+				dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton()->setChecked(false);
+		}
+	});
+
+//	m_dacBtnGrp->addButton(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton());
+//	m_dacBtnGrp->addButton(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton());
 
 	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
 	connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));

@@ -2331,6 +2331,11 @@ double SignalGenerator::get_best_ratio(double ratio, double max, double *fract)
 	return best_ratio;
 }
 
+QPushButton *SignalGenerator::getRunButton()
+{
+	return ui->run_button->getRunButton();
+}
+
 std::vector<float> SignalGenerator::get_stairstep(int rise, int fall,
 		float amplitude, float offset, int phase)
 {

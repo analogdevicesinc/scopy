@@ -146,7 +146,7 @@ public:
 	static constexpr float max_frequency = 30000000;
 
 	static double get_best_ratio(double ratio, double max, double *fract);
-
+	QPushButton* getRunButton();
 	void settingsLoaded();
 
 private:

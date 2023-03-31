@@ -52,7 +52,6 @@
 #include "filter.hpp"
 
 #include <libm2k/m2kexceptions.hpp>
-#include "m2kpluginExceptionHandler.h"
 #include <pluginbase/scopyjs.h>
 
 #include "gui/osc_export_settings.h"
@@ -526,7 +525,8 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		stackDecoderComboBox->setVisible(shouldBeVisible);
 	};
 
-	connect(decoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+	connect(decoderComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this ,[=](int index) {
+		const QString &decoder = decoderComboBox->itemText(index);
 		decoderComboBox->clearFocus();
 		if (!decoderComboBox->currentIndex()) {
 			return;
@@ -2262,7 +2262,6 @@ void LogicAnalyzer::startStop(bool start)
 					}
 
 				} catch (libm2k::m2k_exception &e) {
-//					HANDLE_EXCEPTION(e)
 					qDebug() << e.what() << " code: " << e.iioCode();
 					break;
 				}
@@ -2387,7 +2386,8 @@ void LogicAnalyzer::setupDecoders()
 
 	g_slist_free(decoderList);
 
-	connect(ui->addDecoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+	connect(ui->addDecoderComboBox,  qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) {
+		const QString &decoder = ui->addDecoderComboBox->itemText(index);
 		ui->addDecoderComboBox->clearFocus();
 		if (!ui->addDecoderComboBox->currentIndex()) {
 			return;

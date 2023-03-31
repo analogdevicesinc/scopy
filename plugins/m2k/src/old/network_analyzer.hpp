@@ -87,7 +87,7 @@ public:
 				 ToolMenuEntry *toolMenuItem, QJSEngine *engine,
 				 QWidget *parent = nullptr);
 	~NetworkAnalyzer();
-
+	QPushButton* getRunButton();
 	void setOscilloscope(Oscilloscope *osc);
 
 private:
