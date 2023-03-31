@@ -129,6 +129,7 @@ namespace adiscope::m2k {
 				QWidget *parent = 0);
 		~Oscilloscope();
 
+		QPushButton* getRunButton();
 		void settingsLoaded();
 
 		bool getTrigger_input() const;

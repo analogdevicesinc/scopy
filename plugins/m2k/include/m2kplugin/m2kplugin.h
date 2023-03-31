@@ -52,6 +52,8 @@ private:
 	QPushButton *m_btnIdentify;
 	QPushButton *m_btnCalibrate;
 	QPushButton *m_btnRegister;
+	QButtonGroup *m_adcBtnGrp;
+	QButtonGroup *m_dacBtnGrp;
 
 	Calibration *calib;
 

@@ -66,6 +66,7 @@ void ToolManager::showToolList(QString s) {
 			m = tm->addTool(tme->uuid(),tme->name(),tme->icon());
 			connect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateToolEntry()));
 			connect(m->getToolRunBtn(),SIGNAL(toggled(bool)),tme,SIGNAL(runToggled(bool)));
+			connect(m->getToolRunBtn(),SIGNAL(clicked(bool)),tme,SIGNAL(runClicked(bool)));
 		}
 		updateToolEntry(tme, tme->uuid());
 	}

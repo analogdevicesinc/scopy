@@ -123,9 +123,8 @@ public:
 				  ToolMenuEntry *tme,
 				  QJSEngine *engine, QWidget *parent);
 	~SpectrumAnalyzer();
-
-	void setNativeDialogs(bool nativeDialogs) override;
-
+	QPushButton* getRunButton();
+	void setNativeDialogs(bool nativeDialogs) override;	
 	void setCurrentAverageIndexLabel(uint chnIdx);
 public Q_SLOTS:
 	void readPreferences();	

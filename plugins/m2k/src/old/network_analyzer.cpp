@@ -235,7 +235,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		[=](bool checked){
 		tme->setRunning(checked);
 	});
-	connect(tme, &ToolMenuEntry::runToggled,
+	connect(tme, &ToolMenuEntry::runClicked,
 		ui->runSingleWidget, &RunSingleWidget::toggle);
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
 		this, &NetworkAnalyzer::startStop);
@@ -836,6 +836,11 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete api;
 
 	delete ui;
+}
+
+QPushButton *NetworkAnalyzer::getRunButton()
+{
+	return ui->runSingleWidget->getRunButton();
 }
 
 void NetworkAnalyzer::setOscilloscope(Oscilloscope *osc)
