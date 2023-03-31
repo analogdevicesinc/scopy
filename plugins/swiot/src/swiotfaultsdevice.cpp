@@ -73,7 +73,7 @@ void FaultsDevice::resetStored() {
 	for (auto fault : this->m_faultsGroup->getFaults()) {
 		fault->setStored(false);
 	}
-	this->m_faults_explanation->clear();
+	this->updateExplanations();
 }
 
 void FaultsDevice::update(uint32_t faults_numeric) {

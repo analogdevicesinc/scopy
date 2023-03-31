@@ -124,13 +124,13 @@ QString adiscope::gui::FaultsGroup::getExplanations() {
 	QString res = "";
 	if (!m_currentlySelected.empty()) {
 		for (unsigned int i : m_currentlySelected) {
-			if (m_faults.at(i)->isStored()) {
+			if (m_faults.at(i)->isActive()) {
 				res += QString("Bit%1 (%2): %3<br>").arg(QString::number(i), m_faults.at(i)->getName(), m_faults.at(i)->getFaultExplanation());
 			}
 		}
 	} else {
 		for (auto fault : m_faults) {
-			if (fault->isStored()) {
+			if (fault->isActive()) {
 				res += QString("Bit%1 (%2): %3<br>").arg(QString::number(fault->getId()), fault->getName(), fault->getFaultExplanation());
 			} else {
                                 res += QString("<font color=\"#5c5c5c\">Bit%1 (%2): %3</font><br>").arg(QString::number(fault->getId()), fault->getName(), fault->getFaultExplanation());
