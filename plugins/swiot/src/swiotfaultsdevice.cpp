@@ -19,6 +19,37 @@ FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
         m_faults_explanation->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
         m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
+
+        // TODO: redo this -- only for the demo version
+        setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
+        qDebug() << m_subsectionSeparator->getButton()->styleSheet();
+        m_subsectionSeparator->getButton()->setStyleSheet("QComboBox::drop-down {\n"
+                                                          " subcontrol-position: center right;\n"
+                                                          " border-image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
+                                                          " width: 10px;\n"
+                                                          " height: 6px;\n"
+                                                          " font-size: 16px;\n"
+                                                          " text-align: left;\n"
+                                                          "}\n"
+                                                          "QComboBox::indicator {\n"
+                                                          " background-color: transparent;\n"
+                                                          " selection-background-color: transparent;\n"
+                                                          " color: transparent;\n"
+                                                          " selection-color: transparent;\n"
+                                                          "}"
+                                                          "QPushButton[subsection_arrow_button=true]{\n"
+                                                          " max-height: 12px;\n"
+                                                          " max-width: 12px;\n"
+                                                          " border: none;\n"
+                                                          " image: url(:/swiot/sba_cmb_box_arrow_right.svg);\n"
+                                                          "}\n"
+                                                          "QPushButton[subsection_arrow_button=true]:checked{\n"
+                                                          " max-height: 12px;\n"
+                                                          " max-width: 12px;\n"
+                                                          " border: none;\n"
+                                                          " image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
+                                                          "}");
+
         m_subsectionSeparator->setContent(m_faults_explanation);
 
         this->ui->label_name->setText(m_name);
@@ -29,7 +60,7 @@ FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	connect(this->ui->reset_button, &QPushButton::clicked, this, &adiscope::gui::FaultsDevice::resetStored);
 	connect(m_faultsGroup, &FaultsGroup::selectionUpdated, this, &FaultsDevice::updateExplanations);
 	connect(m_faultsGroup, &FaultsGroup::minimumSizeChanged, this, &FaultsDevice::updateMinimumHeight);
-	connect(m_faults_explanation, &QTextEdit::textChanged, this, [=](){ // TODO: make this a separate slot
+	connect(m_faults_explanation, &QTextEdit::textChanged, this, [this](){ // TODO: make this a separate slot
 		m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
 	});
 }

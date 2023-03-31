@@ -12,13 +12,14 @@
 
 namespace adiscope {
 //#define POLLING_INTERVAL_MAX 1000
-//class DigitalChannel;
-//class Max14906ToolController;
+class DigitalChannel;
+class Max14906ToolController;
+class MaxReaderThread;
 
 class Max14906Tool : public QWidget {
 	Q_OBJECT
 public:
-	Max14906Tool(struct iio_context *ctx, QWidget *parent = nullptr);
+	explicit Max14906Tool(struct iio_context *ctx, QWidget *parent = nullptr);
 	~Max14906Tool() override;
 
 private Q_SLOTS:

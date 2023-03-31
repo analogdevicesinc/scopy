@@ -1,4 +1,5 @@
 #include "swiotdigitalchannel.h"
+#include <QPixmap>
 
 adiscope::DigitalChannel::DigitalChannel(const QString& deviceName, const QString& deviceType, QWidget *parent) :
 	ui(new Ui::DigitalChannel()),
@@ -10,8 +11,8 @@ adiscope::DigitalChannel::DigitalChannel(const QString& deviceName, const QStrin
 	this->ui->m_channelName->setText(deviceName);
 	this->ui->m_channelType->setText(deviceType);
 
-	this->ui->customSwitch->setOn(QLabel("high"));
-	this->ui->customSwitch->setOff(QLabel("low"));
+	this->ui->customSwitch->setOn(QPixmap(":/swiot/ic_hi_snow.svg"));
+	this->ui->customSwitch->setOff(QPixmap(":/swiot/ic_lo_snow.svg"));
 
 	if (deviceType == "input") {
 		this->ui->customSwitch->setVisible(false);
@@ -34,7 +35,7 @@ adiscope::DigitalChannel::DigitalChannel(const QString& deviceName, const QStrin
 	this->ui->sismograph->setAxisScale(0, 0, 1, 1); // y axis
 	this->ui->sismograph->setAutoscale(false);
 	this->ui->sismograph->setColor(Qt::red);
-	this->ui->sismograph->updateYScale(30, 0);
+	this->ui->sismograph->updateYScale(10, 0);
 
 	this->connectSignalsAndSlots();
 	this->ui->lcdNumber->setPrecision(0);
@@ -45,7 +46,9 @@ adiscope::DigitalChannel::~DigitalChannel() {
 }
 
 void adiscope::DigitalChannel::connectSignalsAndSlots() {
-
+        connect(this->ui->customSwitch, &CustomSwitch::toggled, this, [this] (){
+                Q_EMIT this->outputValueChanged(this->ui->customSwitch->isChecked());
+        });
 }
 
 Ui::DigitalChannel *adiscope::DigitalChannel::getUi() const {
@@ -90,3 +93,9 @@ void DigitalChannel::setSelectedConfigMode(const QString &selectedConfigMode) {
 	this->ui->configModes->setCurrentIndex(idx);
 	qDebug() << "The channel " << this->m_deviceName << " read selected config mode " << selectedConfigMode;
 }
+
+void DigitalChannel::resetSismograph() {
+        this->ui->sismograph->reset();
+}
+
+#include "moc_swiotdigitalchannel.cpp"

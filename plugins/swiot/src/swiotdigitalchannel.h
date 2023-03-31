@@ -6,7 +6,6 @@
 #include "src/refactoring/maingui/generic_menu.hpp"
 #include <core/logging_categories.h>
 
-
 namespace adiscope {
 class DigitalChannel : public gui::GenericMenu {
 	Q_OBJECT
@@ -28,6 +27,8 @@ public:
 
 	void setSelectedConfigMode(const QString &selectedConfigMode);
 
+        void resetSismograph();
+
 private:
 	void connectSignalsAndSlots();
 
@@ -38,6 +39,9 @@ private:
 	std::vector<std::string> m_configModes;
 
 	QString m_selectedConfigMode;
+
+Q_SIGNALS:
+        void outputValueChanged(bool value);
 };
 }
 

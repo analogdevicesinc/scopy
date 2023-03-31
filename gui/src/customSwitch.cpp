@@ -146,4 +146,12 @@ void CustomSwitch::setOff(const QLabel &off_) {
         this->off.setText(off_.text());
 }
 
+void CustomSwitch::setOn(const QPixmap &pixmap) {
+        this->on.setPixmap(pixmap);
+}
+
+void CustomSwitch::setOff(const QPixmap &pixmap) {
+        this->off.setPixmap(pixmap);
+}
+
 #include "moc_customSwitch.cpp"

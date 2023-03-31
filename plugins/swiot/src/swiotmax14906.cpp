@@ -18,17 +18,8 @@ Max14906Tool::Max14906Tool(struct iio_context *ctx, QWidget *parent) :
 	this->m_qTimer->setSingleShot(true);
 
 	this->initChannels();
-
         this->initMonitorToolView();
-
-//        this->m_runButton = new QPushButton("Run", this);
-//        m_runButton->setCheckable(true);
-//        this->m_singleButton = new QPushButton("Single", this);
-//        this->ui->mainLayout->addWidget(this->m_runButton);
-//        this->ui->mainLayout->addWidget(this->m_singleButton);
-//        this->ui->mainLayout->addWidget(this->m_customColGrid);
         this->ui->mainLayout->addWidget(m_toolView);
-
 	this->connectSignalsAndSlots();
 }
 
@@ -103,6 +94,9 @@ void Max14906Tool::runButtonToggled() {
 	qDebug(CAT_MAX14906) << "Run button clicked";
 	this->m_toolView->getSingleBtn()->setChecked(false);
 	if (this->m_toolView->getRunBtn()->isChecked()) {
+                for (auto & channel : this->m_channelControls) {
+                        channel->getDigitalChannel()->resetSismograph();
+                }
 		qDebug(CAT_MAX14906) << "Reader thread started";
 		this->m_readerThread->start();
 	} else {
@@ -154,15 +148,21 @@ void Max14906Tool::initChannels() {
 					this
 					);
 
-//		channel_control->getDigitalChannel()->updateTimeScale(0, this->m_max14906SettingsTab->getTimeValue());
 		this->m_channelControls.insert(i, channel_control);
 		this->m_readerThread->addChannel(i, channel);
+                if (this->max14906ToolController->getChannelType(i) == "output") {
+                        m_readerThread->setOutputValue(i, true); // by default the button is set to high 
+                }
 		this->m_readerThread->toggleChannel(i, true);
 		connect(this->m_readerThread, &MaxReaderThread::channelDataChanged, channel_control,
-			[=] (int index, double value){
+			[this, i] (int index, double value){
 			if (i == index) {
 				this->m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);
 			}
 		});
+                connect(channel_control->getDigitalChannel(), &DigitalChannel::outputValueChanged, this,
+                        [this, i] (bool value) {
+                        m_readerThread->setOutputValue(i, value);
+                });
 	}
 }

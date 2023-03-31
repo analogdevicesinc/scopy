@@ -18,6 +18,11 @@ void MaxReaderThread::run() {
 		if (!this->m_channels.empty()) {
 			for (int index: this->m_channels.keys()) {
 				if (this->m_channels[index].first) {
+					bool isOutput = iio_channel_is_output(m_channels[index].second);
+					if (isOutput) {
+						bool value = outputValues[index];
+						iio_channel_attr_write_bool(m_channels[index].second, "raw", value);
+					}
 					double raw = -1;
 					iio_channel_attr_read_double(this->m_channels[index].second, "raw", &raw);
 					qDebug(CAT_MAX14906) << "Channel with index " << index << " read raw value: " << raw;
@@ -53,4 +58,14 @@ bool MaxReaderThread::isChannelToggled(int index) {
 
 void MaxReaderThread::singleRun() {
 	this->run();
+}
+
+void MaxReaderThread::setOutputValue(int index, bool value) {
+	bool isOutput = iio_channel_is_output(this->m_channels[index].second);
+	QString s = iio_channel_get_id(this->m_channels[index].second);
+	if (isOutput) {
+		this->outputValues[index] = value;
+	} else {
+		qWarning(CAT_MAX14906) << "The selected channel is not configured as output";
+	}
 }
