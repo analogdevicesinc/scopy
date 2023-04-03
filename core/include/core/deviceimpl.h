@@ -29,12 +29,13 @@ public:
 	QWidget *icon() override;
 	QWidget *page() override;
 	QList<ToolMenuEntry*> toolList() override;
-	virtual void loadCompatiblePlugins() override;
-	virtual void compatiblePreload() override;
+	virtual void init() override;
+	virtual void preload() override;
 	virtual void loadPlugins() override;
 	virtual void unloadPlugins() override;
 
 	QList<Plugin *> plugins() const;
+
 
 public Q_SLOTS:
 	virtual void connectDev() override;

@@ -84,10 +84,11 @@ protected:
 	Q_INTERFACES(adiscope::Plugin)\
 public:\
 	virtual ~SCOPY_PLUGIN_NAME () override {}\
-	SCOPY_PLUGIN_NAME* clone() override { \
+	SCOPY_PLUGIN_NAME* clone(QObject *parent) override { \
 		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
 		/* copy metadata from this object to the next one */\
 		ret->m_name = scopyxstr(SCOPY_PLUGIN_NAME);\
+		ret->setParent(parent);\
 		ret->m_displayName = ret->m_name;\
 		ret->setMetadata(metadata()); \
 		ret->cloneExtra(this);\

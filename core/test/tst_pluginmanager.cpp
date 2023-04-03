@@ -49,12 +49,12 @@ void TST_PluginManager::loadLibs()
 
 	QList<Plugin*> plugins;
 	QList<Plugin*> sortedplugins;
-	plugins = p->getPlugins("",this);
+	plugins = p->getPlugins("");
 
 	QVERIFY2(plugins.count() == p->count(),"Plugin clone failed");
 
 	p->sort();
-	sortedplugins = p->getPlugins("",this);
+	sortedplugins = p->getPlugins("");
 	for(auto p : plugins) {
 		for(auto q : sortedplugins) {
 			if(p==q)
@@ -68,12 +68,12 @@ void TST_PluginManager::loadLibs()
 			QFAIL("Sort by priority failed");
 	}
 
-	QList<Plugin*> usbPlugins = p->getCompatiblePlugins("usb:","test",this);
+	QList<Plugin*> usbPlugins = p->getCompatiblePlugins("usb:","test");
 	for(auto &&p : usbPlugins) {
 		QVERIFY2(p->param() == "usb:", "param not set to plugin");
 	}
 
-	QList<Plugin*> ipPlugins = p->getCompatiblePlugins("ip:","test", this);
+	QList<Plugin*> ipPlugins = p->getCompatiblePlugins("ip:","test");
 	bool found = false;
 	QVERIFY2(ipPlugins.count() > 0, "No ip: plugins found");
 	for(auto &&p : ipPlugins) {
@@ -86,7 +86,7 @@ void TST_PluginManager::loadLibs()
 	QVERIFY2(p->count() == plugins.count(),"Added nonplugin library to manager");
 
 	usbPlugins.clear();
-	usbPlugins = p->getCompatiblePlugins("usb:","test", this);
+	usbPlugins = p->getCompatiblePlugins("usb:","test");
 	for(auto &&p : usbPlugins) {
 		QVERIFY2(p->param() == "usb:", "param not set to plugin");
 	}
@@ -117,7 +117,7 @@ void TST_PluginManager::metadataOps()
 	p->sort();
 	QVERIFY2(p->count() > 0,"Load libs failed");
 
-	auto plugins = p->getPlugins("unittest",this);
+	auto plugins = p->getPlugins("unittest");
 	QVERIFY2(plugins.count() == 2,"Exactly 2 unit tests not found");
 	qDebug()<<plugins[0]->name();
 
@@ -148,7 +148,7 @@ void TST_PluginManager::exclusion()
 	p->sort();
 	QVERIFY2(p->count() > 0,"Load libs failed");
 
-	auto plugins = p->getCompatiblePlugins("ip:","unittest",this);
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
 	QVERIFY2(plugins.count() == 1,"Exactly 1 unit tests not found");
 	qDebug()<<plugins[0]->name();
 
@@ -179,7 +179,7 @@ void TST_PluginManager::exclusionExcept()
 	p->sort();
 	QVERIFY2(p->count() > 0,"Load libs failed");
 
-	auto plugins = p->getCompatiblePlugins("ip:","unittest",this);
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
 	QVERIFY2(plugins.count() == 2,"Exactly 1 unit tests not found");
 	qDebug()<<plugins[0]->name();
 
