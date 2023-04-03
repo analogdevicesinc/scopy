@@ -123,7 +123,7 @@ public:
 	 * @return
 	 * Default implementation in SCOPY_PLUGIN macro - override not recomended
 	 */
-	virtual Plugin* clone() = 0;
+	virtual Plugin* clone(QObject *parent = nullptr) = 0;
 
 	/**
 	 * @brief cloneExtra
