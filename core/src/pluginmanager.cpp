@@ -85,7 +85,7 @@ void PluginManager::clear() {
 	list.clear();
 }
 
-QList<Plugin *> PluginManager::getPlugins(QString category, QObject *parent)
+QList<Plugin *> PluginManager::getPlugins(QString category)
 {
 	QList<Plugin *> newlist;
 	for(Plugin* plugin : qAsConst(list)) {
@@ -93,13 +93,11 @@ QList<Plugin *> PluginManager::getPlugins(QString category, QObject *parent)
 			continue;
 		Plugin *p = plugin->clone();
 		newlist.append(p);
-		if(parent)
-			dynamic_cast<QObject*>(p)->setParent(parent);
 	}
 	return newlist;
 }
 
-QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString category, QObject *parent)
+QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString category)
 {
 	QList<Plugin *> comp;
 	for(Plugin* plugin : qAsConst(list)) {
@@ -109,8 +107,6 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString categ
 			continue;
 		if(plugin->compatible(param)) {
 			Plugin* p = plugin->clone();
-			if(parent)
-				dynamic_cast<QObject*>(p)->setParent(parent);
 			p->setParam(param);
 			comp.append(p);
 		}
@@ -148,7 +144,7 @@ Plugin* PluginManager::loadPlugin(QString file)
 	if(!original)
 		return nullptr;
 
-	clone = original->clone();
+	clone = original->clone(this);
 	if(!clone)
 		return nullptr;
 
