@@ -11,7 +11,7 @@ public:
 	explicit IIODeviceImpl(QString param, PluginManager *p ,QObject *parent = nullptr) : DeviceImpl(param, p, "iio", parent) {}
 	~IIODeviceImpl() {}
 
-	virtual void loadCompatiblePlugins() override;
+	virtual void init() override;
 };
 
 }

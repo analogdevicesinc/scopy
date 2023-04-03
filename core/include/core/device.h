@@ -18,8 +18,8 @@ public:
 	virtual QWidget *icon() = 0;;
 	virtual QWidget *page() = 0;;
 	virtual QList<ToolMenuEntry*> toolList() = 0;
-	virtual void loadCompatiblePlugins() = 0;
-	virtual void compatiblePreload() = 0;
+	virtual void init() = 0;
+	virtual void preload() = 0;
 	virtual void loadPlugins() = 0;
 	virtual void unloadPlugins() = 0;
 

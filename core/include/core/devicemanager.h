@@ -22,7 +22,8 @@ public:
 
 public Q_SLOTS:
 
-	QString addDevice(QString category, QString param);
+	void addDevice(Device *d);
+	QString createDevice(QString category, QString param);
 	void removeDevice(QString category, QString id);
 
 	void removeDeviceById(QString id);
@@ -32,6 +33,7 @@ public Q_SLOTS:
 	void save(QSettings &s);
 	void load(QSettings &s);
 //	void updateScan(QStringList ls);
+
 
 private Q_SLOTS:
 	void changeToolListDevice();

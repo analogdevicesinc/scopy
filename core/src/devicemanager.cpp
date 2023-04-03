@@ -1,6 +1,9 @@
 #include "devicemanager.h"
 #include "deviceimpl.h"
+#include "deviceloader.h"
 #include "iiodeviceimpl.h"
+#include <QtConcurrent>
+#include "devicefactory.h"
 #include "QApplication"
 #include <QLoggingCategory>
 #include <QDebug>
@@ -28,43 +31,29 @@ Device* DeviceManager::getDevice(QString id) {
 	return d;
 }
 
-QString DeviceManager::addDevice(QString category, QString param)
-{	
-	static bool threaded = false;
+void DeviceManager::addDevice(Device* d) {
 
+	DeviceImpl* di = dynamic_cast<DeviceImpl*>(d);
+	QString id = d->id();
+	map[id] = d;
+	di->setParent(this);
+	di->loadPlugins();
+	connectDeviceToManager(di);
+	Q_EMIT deviceAdded(id, d);
+}
+
+QString DeviceManager::createDevice(QString category, QString param)
+{
 	qInfo(CAT_DEVICEMANAGER) <<category<< "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
 
-	DeviceImpl *d = nullptr;
+	DeviceImpl *d = DeviceFactory::build(param, pm, category);
+	DeviceLoader* dl = new DeviceLoader(d,this);
 
-	d = new DeviceImpl(param, pm, category);
-	QString id = d->id();
-	map[id] = d;
+	connect(dl, &DeviceLoader::initialized, this, [=](){addDevice(d);}); // add device to manager once it is initialized
+	connect(dl, &DeviceLoader::initialized, dl, &QObject::deleteLater); // don't forget to delete loader once we're done
+	dl->init();
 
-	if(threaded) {
-		QThread *th = QThread::create([=]{
-			d->loadCompatiblePlugins();
-			d->compatiblePreload();
-		});
-		dynamic_cast<QObject*>(d)->moveToThread(th);
-
-		connect(th,&QThread::destroyed, this,[=]() {
-			d->moveToThread(QThread::currentThread());
-			d->setParent(this);
-			d->loadPlugins();
-			connectDeviceToManager(d);
-			Q_EMIT deviceAdded(d->id(), d);
-		}, Qt::QueuedConnection);
-		connect(th,&QThread::finished, th, &QThread::deleteLater);
-		th->start();
-	} else {
-		d->loadCompatiblePlugins();
-		d->compatiblePreload();
-		d->setParent(this);
-		d->loadPlugins();
-		connectDeviceToManager(d);
-		Q_EMIT deviceAdded(d->id(), d);
-	}
 	return d->id();
 }
 
@@ -127,7 +116,7 @@ QString DeviceManager::restartDevice(QString id)
 	QString cat = map[id]->category();
 	QString params = map[id]->param();
 	removeDeviceById(id);
-	QString newId = addDevice(cat, params);
+	QString newId = createDevice(cat, params);
 	return newId;
 }
 

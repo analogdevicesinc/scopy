@@ -20,8 +20,8 @@ public:
 	void sort();
 	void clear();
 	QList<Plugin*> getOriginalPlugins() const;
-	QList<Plugin*> getPlugins(QString category = "", QObject *parent = nullptr);
-	QList<Plugin*> getCompatiblePlugins(QString param, QString category = "", QObject *parent = nullptr);
+	QList<Plugin*> getPlugins(QString category = "");
+	QList<Plugin*> getCompatiblePlugins(QString param, QString category = "");
 	void setMetadata(QJsonObject metadata);
 	QJsonObject metadata() const;
 

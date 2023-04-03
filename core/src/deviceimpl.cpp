@@ -22,12 +22,20 @@ DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObjec
 	qDebug(CAT_DEVICEIMPL)<< m_param <<"ctor";
 }
 
-void DeviceImpl::loadCompatiblePlugins()
+void DeviceImpl::init()
 {
-	m_plugins = p->getCompatiblePlugins(m_param,m_category,this);
+	m_plugins = p->getCompatiblePlugins(m_param,m_category);
+	for( Plugin *p : m_plugins) {
+		QObject* obj = dynamic_cast<QObject*>(p);
+		if(obj) {
+			obj->setParent(this);
+		} else {
+			qWarning(CAT_DEVICEIMPL, "Plugin not a QObject");
+		}
+	}
 }
 
-void DeviceImpl::compatiblePreload() {
+void DeviceImpl::preload() {
 	for(auto &p : m_plugins) {
 		p->preload();
 	}
@@ -36,6 +44,7 @@ void DeviceImpl::compatiblePreload() {
 
 void DeviceImpl::loadPlugins() {
 
+	preload();
 	loadName();
 	loadIcons();
 	loadPages();

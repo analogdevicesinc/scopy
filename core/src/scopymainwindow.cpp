@@ -73,12 +73,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(scanTask,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 
-	connect(scc,SIGNAL(foundDevice(QString, QString)),dm,SLOT(addDevice(QString, QString)));
+	connect(scc,SIGNAL(foundDevice(QString, QString)),dm,SLOT(createDevice(QString, QString)));
 	connect(scc,SIGNAL(lostDevice(QString, QString)),dm,SLOT(removeDevice(QString, QString)));
 
 	connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
 
-	connect(hp,SIGNAL(requestAddDevice(QString, QString)),dm,SLOT(addDevice(QString, QString)));
+	connect(hp,SIGNAL(requestAddDevice(QString, QString)),dm,SLOT(createDevice(QString, QString)));
 	connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
 
 	connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),this,SLOT(removeDeviceFromUi(QString)));
@@ -103,7 +103,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	sbc->startScan();
 
-	dm->addDevice("m2k","ip:127.0.0.1");
+//	dm->createDevice("m2k","ip:127.0.0.1");
 //	dm->addDevice("","ip:test");
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
