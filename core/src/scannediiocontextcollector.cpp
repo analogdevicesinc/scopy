@@ -43,6 +43,10 @@ void ScannedIIOContextCollector::update(QStringList list)
 	uris = updatedUris;
 }
 
+void ScannedIIOContextCollector::removeDevice(QString id, Device*d) {
+	uris.remove(d->param());
+}
+
 void ScannedIIOContextCollector::lock(QString uri, Device* d) {
 
 	if(uris.contains(d->param()))

@@ -19,6 +19,7 @@ public Q_SLOTS:
 	void clearCache();
 	void lock(QString, Device*);
 	void unlock(QString, Device*);
+	void removeDevice(QString id, Device *d);
 Q_SIGNALS:
 	void foundDevice(QString cat, QString uri);
 	void lostDevice(QString cat, QString uri);
