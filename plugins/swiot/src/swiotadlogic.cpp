@@ -1,4 +1,5 @@
 #include "swiotadlogic.hpp"
+#include "core/logging_categories.h"
 
 using namespace adiscope;
 
@@ -10,6 +11,7 @@ SwiotAdLogic::SwiotAdLogic(struct iio_device* iioDev) :
 		iio_device_set_kernel_buffers_count(m_iioDev, MAX_KERNEL_BUFFER);
 		m_chnlsNumber = iio_device_get_channels_count(m_iioDev);
 		createChannels();
+		m_samplingFreqAvailable = readChnlsFrequencyAttr("sampling_frequency_available");
 	}
 }
 
@@ -94,6 +96,45 @@ bool SwiotAdLogic::verifyEnableChanges(std::vector<bool> enabledChnls)
 		Q_EMIT chnlsChanged(m_chnlsInfo);
 	}
 	return changes;
+}
+
+void SwiotAdLogic::onSamplingFreqChanged(int idx)
+{
+	std::string newSamplingFreq = m_samplingFreqAvailable[idx].toStdString();
+
+	for (int key : m_chnlsInfo.keys()) {
+		if (key > 0 && !m_chnlsInfo[key]->isOutput) {
+			int returnCode = iio_channel_attr_write(m_chnlsInfo[key]->iioChnl, SAMPLING_FREQ_ATTR_NAME, newSamplingFreq.c_str());
+			if (returnCode < 0) {
+				qDebug(CAT_SWIOT_RUNTIME) << "Chnl attribute write error " + QString::number(returnCode);
+			} else {
+				break;
+			}
+		}
+	}
+}
+
+QStringList SwiotAdLogic::readChnlsFrequencyAttr(QString attrName)
+{
+	QStringList attrValues;
+	char* buffer = new char[200];
+	std::string s_attrName = attrName.toStdString();
+
+	for (int key : m_chnlsInfo.keys()) {
+		if (key > 0 && !m_chnlsInfo[key]->isOutput) {
+			int returnCode = iio_channel_attr_read(m_chnlsInfo[key]->iioChnl, s_attrName.c_str(), buffer, 199);
+			if (returnCode > 0) {
+				QString bufferValues(buffer);
+				attrValues = bufferValues.split(" ");
+				break;
+			} else {
+				qDebug(CAT_SWIOT_RUNTIME) << "Chnl attribute read error " + QString::number(returnCode);
+			}
+		}
+	}
+	attrValues.removeAll("");
+	delete[] buffer;
+	return attrValues;
 }
 
 int SwiotAdLogic::getPlotChnlsNo()

@@ -46,6 +46,7 @@ QStringList SwiotAdModel::readChnlAttr(struct iio_channel* iio_chnl, QString att
 		attrValues = bufferValues.split(" ");
 	}
 
+	attrValues.removeAll("");
 	delete[] buffer;
 	return attrValues;
 }

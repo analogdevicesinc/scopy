@@ -67,6 +67,7 @@ FILE(GLOB SRC_LIST
 	src/swiotcontroller.*
 	src/swiotgenericmenu.*
 	src/swiotadreaderthread.*
+	src/swiotplothandler.*
 
 	src/gui/channel_widget.*
 	src/gui/channel_manager.*

@@ -6,9 +6,10 @@
 #include <iio.h>
 #include <errno.h>
 
-#define MAX_BUFFER_SIZE 144
+#define MAX_BUFFER_SIZE 160
 #define MIN_BUFFER_SIZE 20
 #define MAX_KERNEL_BUFFER 64
+#define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 
 struct chnlInfo{
 	QString chnlId;
@@ -35,6 +36,10 @@ public:
 		struct iio_channel* getIioChnl(int chnlIdx, bool outputPriotity);
 		bool verifyEnableChanges(std::vector<bool> enabledChnls);
 		int getPlotChnlsNo();
+
+		QStringList readChnlsFrequencyAttr(QString attrName);
+public Q_SLOTS:
+		void onSamplingFreqChanged(int idx);
 Q_SIGNALS:
 		void chnlsChanged(QMap<int, struct chnlInfo*> chnlsInfo);
 private:
@@ -42,6 +47,7 @@ private:
 private:
 		int m_plotChnlsNo;
 		int m_chnlsNumber;
+		QStringList m_samplingFreqAvailable;
 
 		QMap<int, struct chnlInfo*> m_chnlsInfo;
 		struct iio_device* m_iioDev;

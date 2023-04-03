@@ -18,6 +18,9 @@ SwiotAd::SwiotAd(QWidget* parent, struct iio_device* iioDev, QVector<QString> ch
 		m_swiotAdLogic = new SwiotAdLogic(m_iioDev);
 		m_readerThread = new SwiotAdReaderThread(m_iioDev);
 
+		m_plotHandler = new SwiotPlotHandler(parent, m_swiotAdLogic->getPlotChnlsNo());
+		m_enabledPlots = std::vector<bool>(m_swiotAdLogic->getPlotChnlsNo(), false);
+
 		adiscope::gui::ToolViewRecipe recipe;
 		recipe.helpBtnUrl = "";
 		recipe.hasRunBtn = true;
@@ -31,17 +34,25 @@ SwiotAd::SwiotAd(QWidget* parent, struct iio_device* iioDev, QVector<QString> ch
 		m_monitorChannelManager->setChannelIdVisible(false);
 		m_monitorChannelManager->setToolStatus("Channels");
 
-		m_plot = new CapturePlot(m_widget, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
-		initPlot();
-
 		m_toolView = adiscope::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
-		m_toolView->addFixedCentralWidget(m_plotWidget, 0, 0, 0, 0);
+
+		gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor("Red"));
+		m_toolView->setGeneralSettingsMenu(settingsMenu, true);
+
+		m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
 		initMonitorToolView();
 
 		connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &SwiotAd::onRunBtnPressed);
 		connect(m_swiotAdLogic, &SwiotAdLogic::chnlsChanged, m_readerThread, &SwiotAdReaderThread::onChnlsChange);
-		connect(m_readerThread, &SwiotAdReaderThread::bufferRefilled, this, &SwiotAd::onBufferRefilled, Qt::QueuedConnection);
+		connect(this, &SwiotAd::plotChnlsChanges, m_plotHandler, &SwiotPlotHandler::onPlotChnlsChanges);
+		connect(m_readerThread, &SwiotAdReaderThread::bufferRefilled, m_plotHandler, &SwiotPlotHandler::onBufferRefilled, Qt::QueuedConnection);
 		connect(m_readerThread, &SwiotAdReaderThread::finished, this, &SwiotAd::onReaderThreadFinished, Qt::QueuedConnection);
+
+		//general settings connections
+
+		connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &SwiotPlotHandler::onTimespanChanged);
+		connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &SwiotAdLogic::onSamplingFreqChanged);
+
 	}
 }
 
@@ -60,54 +71,6 @@ SwiotAd::~SwiotAd()
 	}
 }
 
-void SwiotAd::initPlot()
-{
-	//the last 4 channels are for diagnostic
-	int plotChnlsNo = m_swiotAdLogic->getPlotChnlsNo();
-	int configuredChnlsNo = plotChnlsNo / 2;
-
-	m_enabledPlots = std::vector<bool>(plotChnlsNo, false);
-
-	m_plot->registerSink("Active Channels", plotChnlsNo, 0);
-	m_plot->disableLegend();
-
-	m_plotWidget = new QWidget(this);
-	m_gridPlot = new QGridLayout(m_plotWidget);
-	m_gridPlot->setVerticalSpacing(0);
-	m_gridPlot->setHorizontalSpacing(0);
-	m_gridPlot->setContentsMargins(9, 0, 9, 0);
-	m_plotWidget->setLayout(m_gridPlot);
-
-	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-	m_gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
-	m_gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
-	m_gridPlot->addWidget(m_plot, 3, 1, 1, 1);
-	m_gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
-
-	m_plot->setSampleRate(m_sampleRate, m_timespan, "");
-	m_plot->enableTimeTrigger(false);
-	m_plot->setActiveVertAxis(0, true);
-	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
-
-	for (unsigned int i = 0; i < plotChnlsNo; i++) {
-		m_plot->Curve(i)->setAxes(
-					QwtAxisId(QwtAxis::XBottom, 0),
-					QwtAxisId(QwtAxis::YLeft, i));
-		if (i < configuredChnlsNo) {
-			m_plot->Curve(i)->setTitle("CH " + QString::number(i+1));
-		} else {
-			m_plot->Curve(i)->setTitle("DIAG " + QString::number(i+1));
-		}
-
-		m_plot->DetachCurve(i);
-
-	}
-	m_plot->setAllYAxis(0, 20000);
-	m_plot->setOffsetInterval(__DBL_MIN__, __DBL_MAX__);
-}
-
 void SwiotAd::initMonitorToolView()
 {
 	int mainChId = m_chnlsFunction.size();
@@ -123,7 +86,7 @@ void SwiotAd::initMonitorToolView()
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
 			adiscope::gui::SwiotGenericMenu *menu = new adiscope::gui::SwiotGenericMenu(m_widget);
 			menu->init(((deviceName + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i])
-				   , m_chnlsFunction[i], new QColor(m_plot->getLineColor(chId)));
+				   , m_chnlsFunction[i], new QColor(m_plotHandler->getCurveColor(chId)));
 
 			struct iio_channel* iioChnl = m_swiotAdLogic->getIioChnl(i, true);
 			SwiotAdModel* swiotModel = new SwiotAdModel(iioChnl);
@@ -135,7 +98,7 @@ void SwiotAd::initMonitorToolView()
 			}
 			ChannelWidget *chWidget =
 					m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, chId, false, false,
-								    m_plot->getLineColor(chId),QString::fromStdString("channel"),
+								    m_plotHandler->getCurveColor(chId),QString::fromStdString("channel"),
 								    m_chnlsFunction[i] +" "+QString::number(i+1));
 			if (first) {
 				chWidget->menuButton()->click();
@@ -149,6 +112,78 @@ void SwiotAd::initMonitorToolView()
 
 	m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget, channelWidgetList);
 	connectChnlsWidgesToPlot(channelWidgetList);
+}
+
+void SwiotAd::initExportSettings(QWidget *parent)
+{
+	int plotChnlsNo = m_swiotAdLogic->getPlotChnlsNo();
+	m_exportSettings = new ExportSettings(parent);
+	m_exportSettings->enableExportButton(false);
+
+	for (int i = 0; i < plotChnlsNo; i++){
+		m_exportSettings->addChannel(i, QString("Channel") +
+					   QString::number(i+1));
+	}
+
+	connect(m_exportSettings->getExportButton(), &QPushButton::clicked, this, [=](){
+		Q_EMIT exportBtnClicked(m_exportSettings->getExportConfig());
+	});
+	connect(this, &SwiotAd::exportBtnClicked, m_plotHandler, &SwiotPlotHandler::onBtnExportClicked);
+	connect(this, &SwiotAd::activateExportButton,
+		[=](){
+		m_exportSettings->enableExportButton(true);
+	});
+}
+
+adiscope::gui::GenericMenu* SwiotAd::createSettingsMenu(QString title, QColor* color)
+{
+	adiscope::gui::GenericMenu *menu = new adiscope::gui::GenericMenu(this);
+	menu->initInteractiveMenu();
+	menu->setMenuHeader(title,color,false);
+
+	auto *generalSubsection = new adiscope::gui::SubsectionSeparator("Acquisition settings", false, this);
+	generalSubsection->getContentWidget()->layout()->setSpacing(10);
+
+	//channels sampling freq
+	auto *samplingFreqLayout = new QHBoxLayout();
+	m_samplingFreqOptions = new QComboBox(generalSubsection->getContentWidget());
+
+	QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsFrequencyAttr("sampling_frequency");
+	QStringList samplingFreqValues = m_swiotAdLogic->readChnlsFrequencyAttr("sampling_frequency_available");
+	int actualSamplingFreqIdx = 0;
+	int valuesIdx = 0;
+	for (QString val : samplingFreqValues) {
+		m_samplingFreqOptions->addItem(val);
+		if (val.compare(actualSamplingFreq[0]) == 0) {
+			actualSamplingFreqIdx = valuesIdx;
+		}
+		valuesIdx++;
+	}
+	m_samplingFreqOptions->setCurrentIndex(actualSamplingFreqIdx);
+	samplingFreqLayout->addWidget(new QLabel("Sampling frequency",generalSubsection->getContentWidget()));
+	samplingFreqLayout->addWidget(m_samplingFreqOptions);
+
+	//plot timespan
+	auto *timespanLayout = new QHBoxLayout();
+	m_timespanSpin = new PositionSpinButton({
+							{"ms",1E-3},
+							{"s", 1E0}},
+							"Timespan",0,10,
+							true, false, generalSubsection->getContentWidget());
+	timespanLayout->addWidget(m_timespanSpin);
+
+	//export section
+	auto *exportLayout = new QHBoxLayout();
+
+	initExportSettings(generalSubsection->getContentWidget());
+	exportLayout->addWidget(m_exportSettings);
+	generalSubsection->getContentWidget()->layout()->addItem(samplingFreqLayout);
+	generalSubsection->getContentWidget()->layout()->addItem(timespanLayout);
+	generalSubsection->getContentWidget()->layout()->addItem(exportLayout);
+
+	menu->insertSection(generalSubsection);
+
+	return menu;
 }
 
 void SwiotAd::connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList)
@@ -168,44 +203,40 @@ void SwiotAd::onChannelWidgetEnabled(bool en)
 	int chnlIdx = m_controllers[id]->getChnlIdx();
 
 	if (en) {
-		m_plot->AttachCurve(id);
 		m_enabledPlots[id] = true;
 		m_enabledChannels[chnlIdx] = true;
 		verifyChnlsChanges();
 	}
 	else {
-		m_plot->DetachCurve(id);
 		m_enabledPlots[id] = false;
 		m_enabledChannels[chnlIdx] = false;
 		verifyChnlsChanges();
 	}
+	Q_EMIT plotChnlsChanges(m_enabledPlots);
 }
 
 void SwiotAd::onChannelWidgetSelected(bool checked)
 {
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
 	int id = w->id();
-	m_plot->setActiveVertAxis(id, true);
+	m_plotHandler->setPlotActiveAxis(id);
 
 }
 
 void SwiotAd::onRunBtnPressed()
 {
+	Q_EMIT activateExportButton();
 	if (m_toolView->getRunBtn()->isChecked()) {
+		m_samplingFreqOptions->setEnabled(false);
 		verifyChnlsChanges();
 		if (!m_readerThread->isRunning()) {
-			resetPlot();
+			m_plotHandler->resetPlot();
 			m_readerThread->start();
 		}
 	} else {
+		m_samplingFreqOptions->setEnabled(true);
 		m_readerThread->requestInterruption();
 	}
-}
-
-void SwiotAd::drawCurves(std::vector<double*> dataPoints, int numberOfPoints)
-{
-	//1 is time interval; that variable is never used in plotNewData method
-	m_plot->plotNewData("Active Channels", dataPoints, numberOfPoints, 1);
 }
 
 void SwiotAd::verifyChnlsChanges()
@@ -214,42 +245,6 @@ void SwiotAd::verifyChnlsChanges()
 	if (changes) {
 		m_readerThread->requestInterruption();
 	}
-}
-
-void SwiotAd::onBufferRefilled(QVector<QVector<double>> bufferData)
-{
-	std::vector<double*> dataPoints;
-	int bufferDataSize = bufferData.size();
-	int j = 0;
-
-	qDebug(CAT_SWIOT_RUNTIME) << "Samples per buffer: " + QString::number(bufferData[0].size());
-
-	if (bufferDataSize > 0) {
-		for (int i = 0; i < m_enabledPlots.size(); i++) {
-			if (m_enabledPlots[i]) {
-				if (j < bufferDataSize) {
-					dataPoints.push_back(&bufferData[j][0]);
-					j++;
-				} else {
-					dataPoints.push_back(&bufferData[0][0]);
-				}
-
-			} else {
-				dataPoints.push_back(&bufferData[0][0]);
-			}
-		}
-	}
-	drawCurves(dataPoints, bufferData[0].size());
-}
-
-//must be called when the sample rate or timespan are changed
-void SwiotAd::resetPlot()
-{
-	int sampleRate = 0;
-	sampleRate = m_timespan * m_sampleRate;
-	m_plot->setSampleRate(MAX_BUFFER_SIZE, 1, "");
-
-//	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timestamp);
 }
 
 adiscope::gui::ToolView* SwiotAd::getToolView()
@@ -264,9 +259,9 @@ void SwiotAd::setChannelsFunction(QVector<QString> chnlsFunction)
 
 void SwiotAd::onReaderThreadFinished()
 {
-	qDebug() << "reader thread finished";
+	qDebug(CAT_SWIOT_RUNTIME) << "reader thread finished";
 	if (m_toolView->getRunBtn()->isChecked()) {
-		resetPlot();
+		m_plotHandler->resetPlot();
 		m_readerThread->start();
 	}
 }

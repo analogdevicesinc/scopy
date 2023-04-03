@@ -7,7 +7,9 @@ SwiotAdReaderThread::SwiotAdReaderThread(struct iio_device *iioDev) :
       ,m_iioDev(iioDev)
       ,m_iioBuff(nullptr)
       ,m_offsetScaleValues()
-{}
+{
+	lock = new QMutex();
+}
 
 double SwiotAdReaderThread::convertData(unsigned int data, int idx)
 {
@@ -97,7 +99,6 @@ void SwiotAdReaderThread::destroyIioBuffer()
 void SwiotAdReaderThread::onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo)
 {
 	m_chnlsInfo = chnlsInfo;
-//	m_activeChanges = true;
 }
 
 void SwiotAdReaderThread::run()
@@ -106,9 +107,12 @@ void SwiotAdReaderThread::run()
 	enableIioChnls();
 	createIioBuffer();
 	while (!isInterruptionRequested()) {
-//		qDebug(CAT_SWIOT_RUNTIME) << "Thread ";
 		if (m_iioBuff) {
+			bufferCounter++;
+			lock->lock();
+//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before refill" ;
 			int refillBytes = iio_buffer_refill(m_iioBuff);
+//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After refill";
 			if (refillBytes > 0) {
 				int i = 0;
 				int idx = 0;
@@ -125,16 +129,13 @@ void SwiotAdReaderThread::run()
 					data = convertData(*ptr, idx);
 					m_bufferData[idx].push_back(data);
 					i++;
-//					if (m_activeChanges) {
-//						m_activeChanges = false;
-//						break;
-//					}
 				}
-				Q_EMIT bufferRefilled(m_bufferData);
+				Q_EMIT bufferRefilled(m_bufferData, bufferCounter);
 			} else {
 				qDebug(CAT_SWIOT_RUNTIME) << "Refill error " << QString(strerror(-refillBytes));
 
 			}
+			lock->unlock();
 		}
 	}
 	destroyIioBuffer();
