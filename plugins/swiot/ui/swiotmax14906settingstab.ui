@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Max14906SettingsTab</class>
- <widget class="QWidget" name="Max14906SettingsTab">
+ <class>DioSettingsTab</class>
+ <widget class="QWidget" name="DioSettingsTab">
   <property name="geometry">
    <rect>
     <x>0</x>

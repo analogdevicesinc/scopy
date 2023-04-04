@@ -19,7 +19,7 @@ SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QWidget *parent):
 			qDebug(CAT_SWIOT_RUNTIME) <<"Trigger has been set: " + QString::number(retCode);
 		}
 
-		m_swiotRuntimeAd = new SwiotAd(this, m_iioDevices[AD_NAME], channel_function);
+		m_swiotRuntimeAd = new swiot::Ad74413r(this, m_iioDevices[AD_NAME], channel_function);
 		initAdToolView();
 
 //		m_triggerTimer = new QTimer();

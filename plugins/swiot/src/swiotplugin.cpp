@@ -5,9 +5,9 @@
 #include <QDebug>
 #include <QUuid>
 
-#include "swiotfaults.hpp"
-#include "swiotmax14906.hpp"
-#include "swiotconfig.hpp"
+#include "src/faults/faults.hpp"
+#include "src/max14906/max14906.hpp"
+#include "src/config/swiotconfig.hpp"
 #include "swiotruntime.hpp"
 #include <iioutil/contextprovider.h>
 
@@ -95,15 +95,15 @@ bool SWIOTPlugin::onConnect()
 	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
 	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_SWIOT)<<"Ping Success";} );
 
-	config = new SwiotConfig(ctx);
+	config = new swiot::SwiotConfig(ctx);
 
 	runtime = new SwiotRuntime(ctx);
 //	rungui = new Ui::SwiotRuntimeUI();
 //	rungui->setupUi(runtime);
 
-	faults = new SwiotFaults(ctx);
+	faults = new swiot::Faults(ctx);
 
-	maxtool = new Max14906Tool(ctx);
+	maxtool = new swiot::Max14906(ctx);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(config);

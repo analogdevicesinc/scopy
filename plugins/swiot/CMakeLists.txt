@@ -90,7 +90,12 @@ FILE(GLOB SRC_LIST
 
 	src/captureplot/*
 
-	src/drawarea.*
+#	src/drawarea.*
+
+	src/ad74413r/*
+	src/config/*
+	src/faults/*
+	src/max14906/*
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
@@ -131,9 +136,9 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-include_directories(${Qt5Concurrent_INCLUDE_DIRS})
+include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

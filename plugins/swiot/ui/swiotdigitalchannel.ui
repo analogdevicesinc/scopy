@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>DigitalChannel</class>
- <widget class="QWidget" name="DigitalChannel">
+ <class>DioDigitalChannel</class>
+ <widget class="QWidget" name="DioDigitalChannel">
   <property name="geometry">
    <rect>
     <x>0</x>

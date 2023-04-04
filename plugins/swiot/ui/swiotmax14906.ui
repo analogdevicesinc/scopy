@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Max14906Tool</class>
- <widget class="QWidget" name="Max14906Tool">
+ <class>Max14906</class>
+ <widget class="QWidget" name="Max14906">
   <property name="geometry">
    <rect>
     <x>0</x>

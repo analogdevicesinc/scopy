@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>SwiotFaults</class>
- <widget class="QWidget" name="SwiotFaults">
+ <class>Faults</class>
+ <widget class="QWidget" name="Faults">
   <property name="geometry">
    <rect>
     <x>0</x>

@@ -42,7 +42,7 @@ public Q_SLOTS:
 
 private:
 	Ui::SWIOTInfoPage *infoui;
-	Ui::SwiotConfigMenu *configui;
+	Ui::ConfigMenu *configui;
 	Ui::SwiotRuntimeUI *rungui;
         Ui::SwiotFaults *faultsgui;
         Ui::Max14906Tool *maxgui;
