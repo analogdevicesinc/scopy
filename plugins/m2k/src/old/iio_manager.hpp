@@ -45,7 +45,9 @@
 /* 1k samples by default */
 #define IIO_BUFFER_SIZE 0x400
 
-namespace adiscope {
+namespace adiscope::m2k {
+
+
 class iio_manager : public QObject, public gr::top_block
 {
 	Q_OBJECT
@@ -55,20 +57,9 @@ public:
 	typedef gr::blocks::copy::sptr port_id;
 
 	const unsigned id;
-
-	/* Get a shared pointer to the instance of iio_manager that
-	 * manages the requested device if there is one.
-	 * Return a NULL pointer if there is no instance yet.
-	 */
-	static std::shared_ptr<iio_manager> has_instance(const std::string &_dev);
-
-	/* Get a shared pointer to the instance of iio_manager that
-	 * manages the requested device */
-	static std::shared_ptr<iio_manager> get_instance(
-			struct iio_context *ctx,
-			const std::string &dev,
-			unsigned long buffer_size = IIO_BUFFER_SIZE);
-
+	iio_manager(unsigned int id, struct iio_context *ctx,
+		    QString dev,
+		    unsigned long buffer_size);
 	~iio_manager();
 
 	/* Connect a block to one of the channels of the IIO source.
@@ -110,10 +101,10 @@ public:
 	void set_kernel_buffer_count(int kb = 0);
 
 	/* VERY ugly hack. The reconfiguration that happens after
-		 * locking/unlocking the flowgraph is sort of broken; the tags
-		 * are not properly routed to the blocks connected during the
-		 * reconfiguration. So until GNU Radio gets fixed, we just force
-		 * the whole flowgraph to stop when connecting new blocks. */
+	 * locking/unlocking the flowgraph is sort of broken; the tags
+	 * are not properly routed to the blocks connected during the
+	 * reconfiguration. So until GNU Radio gets fixed, we just force
+	 * the whole flowgraph to stop when connecting new blocks. */
 	void lock() {
 		gr::top_block::stop();
 		// cancel acquisition, work might be blocked waiting for a trigger
@@ -147,8 +138,7 @@ private:
 	libm2k::analog::M2kAnalogIn *m_analogin;
 	libm2k::context::M2k *m_context;
 
-	static std::map<const std::string, map_entry> *dev_map;
-	static unsigned _id;
+	unsigned _id;
 	std::mutex copy_mutex;
 	bool _started;
 
@@ -170,11 +160,6 @@ private:
 	};
 
 	std::vector<connection> connections;
-
-	iio_manager(unsigned int id, struct iio_context *ctx,
-		    const std::string &dev,
-		    unsigned long buffer_size);
-
 	void del_connection(gr::basic_block_sptr block, bool reverse);
 
 	void update_buffer_size_unlocked();
@@ -185,6 +170,32 @@ private Q_SLOTS:
 Q_SIGNALS:
 	void timeout();
 };
+
+
+class m2k_iio_manager  {
+public:
+	m2k_iio_manager() {}
+	~m2k_iio_manager() {}
+
+	/* Get a shared pointer to the instance of iio_manager that
+	 * manages the requested device if there is one.
+	 * Return a NULL pointer if there is no instance yet.
+	 */
+	std::shared_ptr<iio_manager> has_instance(QString dev);
+
+	/* Get a shared pointer to the instance of iio_manager that
+	 * manages the requested device */
+	std::shared_ptr<iio_manager> get_instance(
+			struct iio_context *ctx,
+			QString dev,
+			unsigned long buffer_size = IIO_BUFFER_SIZE);
+
+private:
+	std::map<QString, iio_manager::map_entry> dev_map;
+	unsigned _id;
+};
+
+
 }
 
 #endif /* IIO_MANAGER_HPP */
