@@ -250,6 +250,7 @@ bool M2kPlugin::onConnect()
 {
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
+	m2k_man = new m2k_iio_manager();
 	m_btnCalibrate->setDisabled(false);
 
 	m_m2kController->connectM2k(ctx);
@@ -272,20 +273,16 @@ bool M2kPlugin::onConnect()
 	auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
 	m_adcBtnGrp = new QButtonGroup(this);	
 
-	dmmTme->setTool(new DMM(ctx, f, dmmTme));
+	dmmTme->setTool(new DMM(ctx, f, dmmTme, m2k_man));
 	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
 	dioTme->setTool(new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
 	pwrTme->setTool(new PowerController(ctx,pwrTme,js,nullptr));
 	siggenTme->setTool(new SignalGenerator(ctx,f,siggenTme,js,nullptr));
-	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,js,nullptr));
-	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,js,nullptr));
-	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,js,nullptr));
+	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,m2k_man,js,nullptr));
+	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,m2k_man,js,nullptr));
+	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,m2k_man,js,nullptr));
 	laTme->setTool(new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));
 	pgTme->setTool(new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));
-	m_adcBtnGrp->addButton(dynamic_cast<Oscilloscope*>(oscTme->tool())->getRunButton());
-	m_adcBtnGrp->addButton(dynamic_cast<SpectrumAnalyzer*>(specTme->tool())->getRunButton());
-	m_adcBtnGrp->addButton(dynamic_cast<DMM*>(dmmTme->tool())->getRunButton());
-	m_adcBtnGrp->addButton(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton());
 
 
 	connect(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
@@ -322,6 +319,7 @@ bool M2kPlugin::onConnect()
 
 bool M2kPlugin::onDisconnect()
 {	
+	delete m2k_man;
 	delete calib;
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(false);

@@ -61,7 +61,7 @@ namespace adiscope::m2k {
 
 	public:
 		explicit DMM(struct iio_context *ctx, Filter *filt,
-				ToolMenuEntry *toolMenuItem,
+				ToolMenuEntry *toolMenuItem, m2k_iio_manager* m2k_man,
 				QWidget *parent = nullptr);
 		QPushButton* getRunButton();
 		~DMM();

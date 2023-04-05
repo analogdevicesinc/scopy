@@ -27,17 +27,15 @@
 #include <QLoggingCategory>
 #include <QDebug>
 
-using namespace adiscope;
+using namespace adiscope::m2k;
 using namespace gr;
 
-static const int KERNEL_BUFFERS_DEFAULT = 1;
-std::map<const std::string, iio_manager::map_entry> *iio_manager::dev_map = nullptr;
-unsigned iio_manager::_id = 0;
+static constexpr int KERNEL_BUFFERS_DEFAULT = 1;
 
 Q_LOGGING_CATEGORY(CAT_M2K_IIO_MANAGER, "M2kIIOManager");
 
 iio_manager::iio_manager(unsigned int block_id,
-		struct iio_context *ctx, const std::string &_dev,
+		struct iio_context *ctx, QString _dev,
 		unsigned long _buffer_size) :
 	QObject(nullptr),
 	top_block("IIO Manager " + std::to_string(block_id)),
@@ -49,7 +47,7 @@ iio_manager::iio_manager(unsigned int block_id,
 	if (!ctx)
 		throw std::runtime_error("IIO context not created");
 
-	struct iio_device *dev = iio_context_find_device(ctx, _dev.c_str());
+	struct iio_device *dev = iio_context_find_device(ctx, _dev.toStdString().c_str());
 	if (!dev)
 		throw std::runtime_error("Device not found");
 
@@ -97,15 +95,12 @@ iio_manager::~iio_manager()
 {
 }
 
-std::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
+std::shared_ptr<iio_manager> m2k_iio_manager::has_instance(QString _dev)
 {
 	/* Search the dev_map if we already have a manager for the
 	 * given device */
-	if(dev_map == nullptr) {
-		dev_map = new std::map<const std::string, iio_manager::map_entry>();
-	}
-	if (!dev_map->empty()) {
-		for (auto it = dev_map->begin(); it != dev_map->end(); ++it) {
+	if (!dev_map.empty()) {
+		for (auto it = dev_map.begin(); it != dev_map.end(); ++it) {
 			if (it->first.compare(_dev) != 0)
 				continue;
 
@@ -119,8 +114,8 @@ std::shared_ptr<iio_manager> iio_manager::has_instance(const std::string &_dev)
 	return nullptr;
 }
 
-std::shared_ptr<iio_manager> iio_manager::get_instance(
-		struct iio_context *ctx, const std::string &_dev,
+std::shared_ptr<iio_manager> m2k_iio_manager::get_instance(
+		struct iio_context *ctx, QString _dev,
 		unsigned long buffer_size)
 {
 	auto instance = has_instance(_dev);
@@ -133,8 +128,8 @@ std::shared_ptr<iio_manager> iio_manager::get_instance(
 	std::shared_ptr<iio_manager> shared_manager(manager);
 
 	/* Add it to the map */
-	auto it = dev_map->insert(std::pair<const std::string, map_entry>(
-				_dev, shared_manager));
+	auto p = std::pair<QString, iio_manager::map_entry>( _dev, shared_manager);
+	auto it = dev_map.insert(p);
 	if (it.second == false)
 		it.first->second = shared_manager;
 
@@ -378,7 +373,7 @@ void iio_manager::set_kernel_buffer_count(int kb) {
 	}
 }
 
-void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
+void iio_manager::enableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source)
 {
 	for (size_t i = 0; i < nb_channels; ++i) {
 		hier_block2::disconnect(iio_block, i, freq_comp_filt[i][0], 0);
@@ -391,7 +386,7 @@ void iio_manager::enableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
 	m_mixed_source = mixed_source;
 }
 
-void iio_manager::disableMixedSignal(m2k::mixed_signal_source::sptr mixed_source)
+void iio_manager::disableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source)
 {
 	for (size_t i = 0; i < nb_channels; ++i) {
 		hier_block2::disconnect(mixed_source, i, freq_comp_filt[i][0], 0);

@@ -180,8 +180,7 @@ DigitalIO::DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolM
 	poll = new QTimer(this);
 	connect(poll,SIGNAL(timeout()),this,SLOT(updateUi()));
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-	                               TOOL_DIGITALIO)));
+	api->setObjectName(Filter::tool_name(TOOL_DIGITALIO));
 	ScopyJS::GetInstance()->registerApi(api);
 	updateUi();
 	readPreferences();
