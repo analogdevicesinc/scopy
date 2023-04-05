@@ -30,6 +30,7 @@
 #include <QMainWindow>
 #include "pluginbase/toolmenuentry.h"
 #include <pluginbase/preferences.h>
+#include <pluginbase/resourcemanager.h>
 
 
 class QJSEngine;
@@ -44,7 +45,7 @@ class ApiObject;
 class ToolLauncher;
 
 namespace m2k {
-class M2kTool : public QWidget
+class M2kTool : public QWidget, public ResourceUser
 {
 	Q_OBJECT
 
