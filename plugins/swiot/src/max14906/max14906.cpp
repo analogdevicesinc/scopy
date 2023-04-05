@@ -83,10 +83,8 @@ Max14906::~Max14906() {
 		this->m_readerThread->quit();
 		this->m_readerThread->wait();
 	}
-//	if (m_toolView) {
+
         delete m_toolView;
-//	}
-//        delete settingsWidgetSeparator;
 	delete ui;
 }
 
@@ -112,13 +110,10 @@ void Max14906::runButtonToggled() {
 void Max14906::singleButtonToggled() {
 	if (m_toolView->getRunBtn()->isChecked()) {
 		this->m_toolView->getRunBtn()->setChecked(false);
-//		this->max14906ToolController->stopRead();
 	}
 	this->m_qTimer->stop();
 	this->m_readerThread->singleRun();
 	this->m_toolView->getSingleBtn()->setChecked(false);
-
-//	 this->max14906ToolController->singleRead();
 }
 
 void Max14906::timerChanged(double value) {
@@ -150,19 +145,11 @@ void Max14906::initChannels() {
 
 		this->m_channelControls.insert(i, channel_control);
 		this->m_readerThread->addChannel(i, channel);
-                if (this->max14906ToolController->getChannelType(i) == "output") {
-                        m_readerThread->setOutputValue(i, true); // by default the button is set to high 
-                }
-		this->m_readerThread->toggleChannel(i, true);
 		connect(this->m_readerThread, &DioReaderThread::channelDataChanged, channel_control,
                         [this, i] (int index, double value){
 			if (i == index) {
 				this->m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);
 			}
 		});
-                connect(channel_control->getDigitalChannel(), &DioDigitalChannel::outputValueChanged, this,
-                        [this, i] (bool value) {
-                        m_readerThread->setOutputValue(i, value);
-                });
 	}
 }
