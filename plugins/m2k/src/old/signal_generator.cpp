@@ -505,8 +505,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	fileManager = new FileManager("Signal Generator");
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-	                           TOOL_SIGNAL_GENERATOR)));
+	api->setObjectName(Filter::tool_name(TOOL_SIGNAL_GENERATOR));
 	ScopyJS::GetInstance()->registerApi(api);
 
 	connect(ui->rightMenu, SIGNAL(finished(bool)), this,

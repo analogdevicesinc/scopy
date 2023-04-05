@@ -84,7 +84,8 @@ class NetworkAnalyzer : public M2kTool
 
 public:
 	explicit NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 ToolMenuEntry *toolMenuItem, QJSEngine *engine,
+				 ToolMenuEntry *toolMenuItem, m2k_iio_manager* m2k_man,
+				 QJSEngine *engine,
 				 QWidget *parent = nullptr);
 	~NetworkAnalyzer();
 	QPushButton* getRunButton();

@@ -114,8 +114,7 @@ PowerController::PowerController(struct iio_context *ctx,
 		scale->setOriginMode(QwtThermo::OriginCustom);
 	}
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-							  TOOL_POWER_CONTROLLER)));
+	api->setObjectName(Filter::tool_name(TOOL_POWER_CONTROLLER));
 //	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 

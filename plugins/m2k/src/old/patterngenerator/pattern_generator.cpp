@@ -150,8 +150,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 	m_ui->btnGeneralSettings->setChecked(true);
 
 	// API load
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-							  TOOL_PATTERN_GENERATOR)));
+	api->setObjectName(Filter::tool_name(TOOL_PATTERN_GENERATOR));
 //	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 

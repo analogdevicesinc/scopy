@@ -31,7 +31,7 @@
 
 using namespace adiscope::m2k;
 
-static const std::string tool_names[] = {
+static const QStringList tool_names = {
 	"osc",
 	"spectrum",
 	"network",
@@ -103,7 +103,7 @@ QString& Filter::hw_name()
 	return hwname;
 }
 
-const std::string& Filter::tool_name(enum tool tool)
+const QString Filter::tool_name(enum tool tool)
 {
 	return tool_names[tool];
 }
@@ -114,24 +114,23 @@ bool Filter::compatible(enum tool tool) const
 	if (!hdl.isArray())
 		return false;
 	else
-		return hdl.toArray().contains(
-				QString::fromStdString((tool_names[tool])));
+		return hdl.toArray().contains(tool_names[tool]);
 }
 
-bool Filter::usable(enum tool tool, const std::string &dev) const
+bool Filter::usable(enum tool tool, QString dev) const
 {
-	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
+	auto hdl = root[tool_names[tool] + "-devices"];
 	if (hdl.isNull())
 		return true;
 	if (!hdl.isArray())
 		return false;
 
-	return hdl.toArray().contains(QString::fromStdString(dev));
+	return hdl.toArray().contains(dev);
 }
 
-const std::string Filter::device_name(enum tool tool, int idx) const
+const QString Filter::device_name(enum tool tool, int idx) const
 {
-	auto hdl = root[QString::fromStdString(tool_names[tool] + "-devices")];
+	auto hdl = root[tool_names[tool] + "-devices"];
 	if (hdl.isNull() || !hdl.isArray())
 		throw std::runtime_error("Tool not compatible");
 
@@ -139,19 +138,19 @@ const std::string Filter::device_name(enum tool tool, int idx) const
 	if (idx >= array.size())
 		throw std::runtime_error("Invalid IDX");
 
-	return array[idx].toString().toStdString();
+	return array[idx].toString();
 }
 
 struct iio_device * Filter::find_device(const struct iio_context *ctx,
 		enum tool tool, int idx) const
 {
-	return iio_context_find_device(ctx, device_name(tool, idx).c_str());
+	return iio_context_find_device(ctx, device_name(tool, idx).toStdString().c_str());
 }
 
 struct iio_channel * Filter::find_channel(const struct iio_context *ctx,
 		enum tool tool, int idx, bool output) const
 {
-	QString name = QString::fromStdString(device_name(tool, idx));
+	QString name = device_name(tool, idx);
 
 	if (!name.contains(':'))
 		throw std::runtime_error("Filter entry not iio_channel");
