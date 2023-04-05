@@ -2918,6 +2918,7 @@ void Oscilloscope::runStopToggled(bool checked)
 	Q_EMIT activateExportButton();
 
 	if (checked) {
+		ResourceManager::open("m2k-adc",this);
 		periodicFlowRestart(true);
 		if (symmBufferMode->isEnhancedMemDepth()) {
 			onCmbMemoryDepthChanged(ch_ui->cmbMemoryDepth->currentText());
@@ -2958,6 +2959,7 @@ void Oscilloscope::runStopToggled(bool checked)
 		resetStreamingFlag(symmBufferMode->isEnhancedMemDepth()
 				   || plot_samples_sequentially);
 		trigger_settings.setAdcRunningState(false);
+		ResourceManager::close("m2k-adc");
 	}
 
 	// Update trigger status
