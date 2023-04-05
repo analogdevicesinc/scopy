@@ -12,6 +12,7 @@
 #include "m2kcontroller.h"
 #include <gui/infopage.h>
 #include <calibration.hpp>
+#include "iio_manager.hpp"
 
 
 namespace adiscope {
@@ -58,6 +59,7 @@ private:
 	Calibration *calib;
 
 	M2kController *m_m2kController;
+	m2k_iio_manager *m2k_man;
 	InfoPage *m_m2kInfoPage;
 
 	const int infoPageTimerTimeout = 1000;

@@ -516,6 +516,7 @@ void DMM::toggleTimer(bool start)
 {
 	enableDataLogging(start);
 	if (start) {
+		ResourceManager::open("m2k-adc",this);
 		manager->set_kernel_buffer_count(4);
 		writeAllSettingsToHardware();
 		manager->start(id_ch1);
@@ -530,6 +531,7 @@ void DMM::toggleTimer(bool start)
 		manager->stop(id_ch1);
 		manager->stop(id_ch2);
 		manager->set_kernel_buffer_count();
+		ResourceManager::close("m2k-adc");
 	}
 
 	setDynamicProperty(ui->run_button, "running", start);
