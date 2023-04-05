@@ -27,7 +27,7 @@ protected Q_SLOTS:
 	void singleButtonClicked();
 
 private:
-        struct iio_context* ctx;
+	struct iio_context* ctx;
 
 	Ui::Faults *ui;
 	QTimer *timer;

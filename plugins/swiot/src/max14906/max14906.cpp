@@ -4,62 +4,62 @@
 using namespace adiscope::swiot;
 
 Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
-        QWidget(parent),
+	QWidget(parent),
 	max14906ToolController(new DioController(ctx)),
 	ui(new Ui::Max14906),
 	m_qTimer(new QTimer(this)),
 	m_readerThread(new DioReaderThread()),
-        m_customColGrid(new CustomColQGridLayout(4, true, this))
+	m_customColGrid(new CustomColQGridLayout(4, true, this))
 {
-        this->ui->setupUi(this);
-        this->setupDynamicUi(this);
+	this->ui->setupUi(this);
+	this->setupDynamicUi(this);
 
 	this->m_qTimer->setInterval(1000); // poll once every second
 	this->m_qTimer->setSingleShot(true);
 
 	this->initChannels();
-        this->initMonitorToolView();
-        this->ui->mainLayout->addWidget(m_toolView);
+	this->initMonitorToolView();
+	this->ui->mainLayout->addWidget(m_toolView);
 	this->connectSignalsAndSlots();
 }
 
 void Max14906::setupDynamicUi(QWidget *parent) {
-        adiscope::gui::ToolViewRecipe recipe;
-        recipe.helpBtnUrl = "";
-        recipe.hasRunBtn = true;
-        recipe.hasSingleBtn = true;
-        recipe.hasPairSettingsBtn = true;
-        recipe.hasPrintBtn = false;
-        recipe.hasChannels = false;
-        recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::HORIZONTAL;
+	adiscope::gui::ToolViewRecipe recipe;
+	recipe.helpBtnUrl = "";
+	recipe.hasRunBtn = true;
+	recipe.hasSingleBtn = true;
+	recipe.hasPairSettingsBtn = true;
+	recipe.hasPrintBtn = false;
+	recipe.hasChannels = false;
+	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::HORIZONTAL;
 
-        this->m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
-        m_monitorChannelManager->setChannelIdVisible(false);
+	this->m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager->setChannelIdVisible(false);
 
-        m_toolView = adiscope::gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
+	m_toolView = adiscope::gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
 
-        this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor("#4a64ff"));
-        this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
+	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor("#4a64ff"));
+	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-        this->m_customColGrid = new CustomColQGridLayout(4, true, this); // 4 max channels
+	this->m_customColGrid = new CustomColQGridLayout(4, true, this); // 4 max channels
 
-        this->m_toolView->addFixedCentralWidget(m_customColGrid, 0, 0, 0, 0);
+	this->m_toolView->addFixedCentralWidget(m_customColGrid, 0, 0, 0, 0);
 
-        this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
+	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 }
 
 adiscope::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, QColor* color) {
-        auto generalSettingsMenu = new adiscope::gui::GenericMenu(this);
-        generalSettingsMenu->initInteractiveMenu();
-        generalSettingsMenu->setMenuHeader(title, color, false);
+	auto generalSettingsMenu = new adiscope::gui::GenericMenu(this);
+	generalSettingsMenu->initInteractiveMenu();
+	generalSettingsMenu->setMenuHeader(title, color, false);
 
-        settingsWidgetSeparator = new adiscope::gui::SubsectionSeparator("MAX14906", false, this);
-        this->m_max14906SettingsTab = new DioSettingsTab(settingsWidgetSeparator);
-        settingsWidgetSeparator->setContent(this->m_max14906SettingsTab);
-        generalSettingsMenu->insertSection(settingsWidgetSeparator);
+	settingsWidgetSeparator = new adiscope::gui::SubsectionSeparator("MAX14906", false, this);
+	this->m_max14906SettingsTab = new DioSettingsTab(settingsWidgetSeparator);
+	settingsWidgetSeparator->setContent(this->m_max14906SettingsTab);
+	generalSettingsMenu->insertSection(settingsWidgetSeparator);
 
 
-        return generalSettingsMenu;
+	return generalSettingsMenu;
 }
 
 void Max14906::connectSignalsAndSlots() {
@@ -77,14 +77,14 @@ void Max14906::connectSignalsAndSlots() {
 
 Max14906::~Max14906() {
 	if (this->m_toolView->getRunBtn()->isChecked()) {
-                this->m_toolView->getRunBtn()->setChecked(false);
+		this->m_toolView->getRunBtn()->setChecked(false);
 	}
 	if (this->m_readerThread->isRunning()) {
 		this->m_readerThread->quit();
 		this->m_readerThread->wait();
 	}
 
-        delete m_toolView;
+	delete m_toolView;
 	delete ui;
 }
 
@@ -92,9 +92,9 @@ void Max14906::runButtonToggled() {
 	qDebug(CAT_MAX14906) << "Run button clicked";
 	this->m_toolView->getSingleBtn()->setChecked(false);
 	if (this->m_toolView->getRunBtn()->isChecked()) {
-                for (auto & channel : this->m_channelControls) {
-                        channel->getDigitalChannel()->resetSismograph();
-                }
+		for (auto & channel : this->m_channelControls) {
+			channel->getDigitalChannel()->resetSismograph();
+		}
 		qDebug(CAT_MAX14906) << "Reader thread started";
 		this->m_readerThread->start();
 	} else {
@@ -146,7 +146,7 @@ void Max14906::initChannels() {
 		this->m_channelControls.insert(i, channel_control);
 		this->m_readerThread->addChannel(i, channel);
 		connect(this->m_readerThread, &DioReaderThread::channelDataChanged, channel_control,
-                        [this, i] (int index, double value){
+			[this, i] (int index, double value){
 			if (i == index) {
 				this->m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);
 			}

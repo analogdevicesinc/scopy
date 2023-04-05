@@ -4,7 +4,7 @@
 using namespace adiscope::swiot;
 
 ConfigController::ConfigController(ConfigChannelView* chnlsView,
-                                   ConfigModel* model):
+				   ConfigModel* model):
 	m_chnlsView(chnlsView)
       ,m_model(model)
 {

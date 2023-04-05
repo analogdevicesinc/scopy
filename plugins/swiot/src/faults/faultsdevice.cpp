@@ -16,46 +16,46 @@ FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	ui->setupUi(this);
 
 	m_faults_explanation->setReadOnly(true);
-        m_faults_explanation->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        m_faults_explanation->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-        m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
-        m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
+	m_faults_explanation->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_faults_explanation->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
+	m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
 
-        // TODO: redo this -- only for the demo version
-        setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
-        qDebug() << m_subsectionSeparator->getButton()->styleSheet();
-        m_subsectionSeparator->getButton()->setStyleSheet("QComboBox::drop-down {\n"
-                                                          " subcontrol-position: center right;\n"
-                                                          " border-image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
-                                                          " width: 10px;\n"
-                                                          " height: 6px;\n"
-                                                          " font-size: 16px;\n"
-                                                          " text-align: left;\n"
-                                                          "}\n"
-                                                          "QComboBox::indicator {\n"
-                                                          " background-color: transparent;\n"
-                                                          " selection-background-color: transparent;\n"
-                                                          " color: transparent;\n"
-                                                          " selection-color: transparent;\n"
-                                                          "}"
-                                                          "QPushButton[subsection_arrow_button=true]{\n"
-                                                          " max-height: 12px;\n"
-                                                          " max-width: 12px;\n"
-                                                          " border: none;\n"
-                                                          " image: url(:/swiot/sba_cmb_box_arrow_right.svg);\n"
-                                                          "}\n"
-                                                          "QPushButton[subsection_arrow_button=true]:checked{\n"
-                                                          " max-height: 12px;\n"
-                                                          " max-width: 12px;\n"
-                                                          " border: none;\n"
-                                                          " image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
-                                                          "}");
+	// TODO: redo this -- only for the demo version
+	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
+	qDebug() << m_subsectionSeparator->getButton()->styleSheet();
+	m_subsectionSeparator->getButton()->setStyleSheet("QComboBox::drop-down {\n"
+							  " subcontrol-position: center right;\n"
+							  " border-image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
+							  " width: 10px;\n"
+							  " height: 6px;\n"
+							  " font-size: 16px;\n"
+							  " text-align: left;\n"
+							  "}\n"
+							  "QComboBox::indicator {\n"
+							  " background-color: transparent;\n"
+							  " selection-background-color: transparent;\n"
+							  " color: transparent;\n"
+							  " selection-color: transparent;\n"
+							  "}"
+							  "QPushButton[subsection_arrow_button=true]{\n"
+							  " max-height: 12px;\n"
+							  " max-width: 12px;\n"
+							  " border: none;\n"
+							  " image: url(:/swiot/sba_cmb_box_arrow_right.svg);\n"
+							  "}\n"
+							  "QPushButton[subsection_arrow_button=true]:checked{\n"
+							  " max-height: 12px;\n"
+							  " max-width: 12px;\n"
+							  " border: none;\n"
+							  " image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
+							  "}");
 
-        m_subsectionSeparator->setContent(m_faults_explanation);
+	m_subsectionSeparator->setContent(m_faults_explanation);
 
-        this->ui->label_name->setText(m_name);
-        this->ui->faults_layout->addWidget(this->m_faultsGroup);
-        this->ui->faults_explanation->layout()->addWidget(m_subsectionSeparator);
+	this->ui->label_name->setText(m_name);
+	this->ui->faults_layout->addWidget(this->m_faultsGroup);
+	this->ui->faults_explanation->layout()->addWidget(m_subsectionSeparator);
 
 	connect(this->ui->clear_selection_button, &QPushButton::clicked, this->m_faultsGroup, &FaultsGroup::clearSelection);
 	connect(this->ui->reset_button, &QPushButton::clicked, this, &FaultsDevice::resetStored);

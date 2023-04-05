@@ -38,7 +38,7 @@ void ConfigChannelView::setChnlsAttr(QVector<QMap<QString, QStringList>> values)
 }
 
 void ConfigChannelView::setAvailableOptions(QComboBox* list, QString attrName,
-                                                 QMap<QString, QStringList> chnlAttr)
+					    QMap<QString, QStringList> chnlAttr)
 {
 	QStringList availableValues = chnlAttr[attrName];
 	for (const auto& value : availableValues) {

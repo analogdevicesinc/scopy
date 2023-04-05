@@ -9,22 +9,22 @@ class DioSettingsTab;
 }
 
 namespace adiscope::swiot {
-    class DioSettingsTab : public QWidget {
-    Q_OBJECT
-    public:
-        explicit DioSettingsTab(QWidget *parent = nullptr);
+class DioSettingsTab : public QWidget {
+	Q_OBJECT
+public:
+	explicit DioSettingsTab(QWidget *parent = nullptr);
 
-        ~DioSettingsTab() override;
+	~DioSettingsTab() override;
 
-        double getTimeValue() const;
+	double getTimeValue() const;
 
-    Q_SIGNALS:
+Q_SIGNALS:
 
-        void timeValueChanged(double value);
+	void timeValueChanged(double value);
 
-    private:
+private:
 	Ui::DioSettingsTab *ui;
-        PositionSpinButton *m_max_spin_button;
-    };
+	PositionSpinButton *m_max_spin_button;
+};
 }
 #endif // DIOSETTINGSTAB_H

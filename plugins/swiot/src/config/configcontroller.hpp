@@ -12,7 +12,7 @@ class ConfigController: public QObject
 	Q_OBJECT
 public:
 	explicit ConfigController(ConfigChannelView* chnlsView = nullptr,
-                                  ConfigModel* model = nullptr);
+				  ConfigModel* model = nullptr);
 	~ConfigController();
 
 	void addMenuAttrValues();

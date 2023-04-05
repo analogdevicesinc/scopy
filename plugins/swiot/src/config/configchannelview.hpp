@@ -14,9 +14,9 @@
 namespace adiscope::swiot {
 class ConfigChannelView: public QWidget
 {
-//#ifdef ENABLE_TESTS
-//	friend class adiscope::TestSwiotChnlView;
-//#endif
+	//#ifdef ENABLE_TESTS
+	//	friend class adiscope::TestSwiotChnlView;
+	//#endif
 	Q_OBJECT
 public:
 	explicit ConfigChannelView(int chnlIdx = 0, QWidget *parent = nullptr);

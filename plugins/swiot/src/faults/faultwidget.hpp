@@ -12,55 +12,55 @@ namespace Ui { class FaultWidget; }
 QT_END_NAMESPACE
 
 namespace adiscope::swiot {
-    class FaultWidget : public QWidget {
-    Q_OBJECT
+class FaultWidget : public QWidget {
+	Q_OBJECT
 
-    public:
-        explicit FaultWidget(unsigned int id, QString name, QString faultExplanation, QWidget *parent = nullptr);
+public:
+	explicit FaultWidget(unsigned int id, QString name, QString faultExplanation, QWidget *parent = nullptr);
 
-        ~FaultWidget() override;
+	~FaultWidget() override;
 
-        unsigned int getId() const;
+	unsigned int getId() const;
 
-        void setId(unsigned int id);
+	void setId(unsigned int id);
 
-        bool isStored() const;
+	bool isStored() const;
 
-        void setStored(bool stored);
+	void setStored(bool stored);
 
-        bool isActive() const;
+	bool isActive() const;
 
-        void setActive(bool active);
+	void setActive(bool active);
 
-        const QString &getName() const;
+	const QString &getName() const;
 
-        void setName(const QString &name);
+	void setName(const QString &name);
 
-        const QString &getFaultExplanation() const;
+	const QString &getFaultExplanation() const;
 
-        void setFaultExplanation(const QString &faultExplanation);
+	void setFaultExplanation(const QString &faultExplanation);
 
-        bool isPressed() const;
+	bool isPressed() const;
 
-        void setPressed(bool pressed);
+	void setPressed(bool pressed);
 
-    Q_SIGNALS:
+Q_SIGNALS:
 
-        void faultSelected(unsigned int id);
+	void faultSelected(unsigned int id);
 
-    protected:
-        bool eventFilter(QObject *object, QEvent *event) override;
+protected:
+	bool eventFilter(QObject *object, QEvent *event) override;
 
-    private:
-        Ui::FaultWidget *ui;
+private:
+	Ui::FaultWidget *ui;
 
-        bool stored;
-        bool active;
-        bool pressed{};
-        unsigned int id{};
-        QString name;
-        QString faultExplanation;
-    };
+	bool stored;
+	bool active;
+	bool pressed{};
+	unsigned int id{};
+	QString name;
+	QString faultExplanation;
+};
 }
 
 #endif //SCOPY_FAULTWIDGET_HPP

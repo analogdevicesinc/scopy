@@ -122,7 +122,7 @@ void Ad74413r::initExportSettings(QWidget *parent)
 
 	for (int i = 0; i < plotChnlsNo; i++){
 		m_exportSettings->addChannel(i, QString("Channel") +
-					   QString::number(i+1));
+					     QString::number(i+1));
 	}
 
 	connect(m_exportSettings->getExportButton(), &QPushButton::clicked, this, [=](){
@@ -168,8 +168,8 @@ adiscope::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* 
 	m_timespanSpin = new PositionSpinButton({
 							{"ms",1E-3},
 							{"s", 1E0}},
-							"Timespan",0,10,
-							true, false, generalSubsection->getContentWidget());
+						"Timespan",0,10,
+						true, false, generalSubsection->getContentWidget());
 	timespanLayout->addWidget(m_timespanSpin);
 
 	//export section
@@ -190,9 +190,9 @@ void Ad74413r::connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList)
 {
 	for (int i = 0; i < channelList.size(); i++) {
 		connect(channelList[i], SIGNAL(enabled(bool)),
-					SLOT(onChannelWidgetEnabled(bool)));
+			SLOT(onChannelWidgetEnabled(bool)));
 		connect(channelList[i], SIGNAL(selected(bool)),
-					SLOT(onChannelWidgetSelected(bool)));
+			SLOT(onChannelWidgetSelected(bool)));
 	}
 }
 

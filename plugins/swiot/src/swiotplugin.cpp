@@ -51,8 +51,8 @@ void SWIOTPlugin::loadToolList()
 {
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config", ":/icons/scopy-default/icons/tool_debugger.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Runtime",""));
-        m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT MAX14906", ""));
-        m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Faults", ""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT MAX14906", ""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Faults", ""));
 }
 
 void SWIOTPlugin::unload()
@@ -98,8 +98,8 @@ bool SWIOTPlugin::onConnect()
 	config = new swiot::SwiotConfig(ctx);
 
 	runtime = new SwiotRuntime(ctx);
-//	rungui = new Ui::SwiotRuntimeUI();
-//	rungui->setupUi(runtime);
+	//	rungui = new Ui::SwiotRuntimeUI();
+	//	rungui->setupUi(runtime);
 
 	faults = new swiot::Faults(ctx);
 
@@ -111,24 +111,24 @@ bool SWIOTPlugin::onConnect()
 	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setTool(runtime);
 
-        m_toolList[2]->setEnabled(true);
-        m_toolList[2]->setTool(maxtool);
+	m_toolList[2]->setEnabled(true);
+	m_toolList[2]->setTool(maxtool);
 
-        m_toolList[3]->setEnabled(true);
-        m_toolList[3]->setTool(faults);
+	m_toolList[3]->setEnabled(true);
+	m_toolList[3]->setTool(faults);
 
 
 
-//	connect(configui->pushButton,&QPushButton::clicked,this,[=](){
-//		m_toolList[0]->setEnabled(false);
-//		m_toolList[1]->setEnabled(true);
-//		Q_EMIT requestTool(m_toolList[1]->id());
-//	});
-//	connect(rungui->pushButton,&QPushButton::clicked,this,[=](){
-//		m_toolList[0]->setEnabled(true);
-//		m_toolList[1]->setEnabled(false);
-//		Q_EMIT requestTool(m_toolList[0]->id());
-//	});
+	//	connect(configui->pushButton,&QPushButton::clicked,this,[=](){
+	//		m_toolList[0]->setEnabled(false);
+	//		m_toolList[1]->setEnabled(true);
+	//		Q_EMIT requestTool(m_toolList[1]->id());
+	//	});
+	//	connect(rungui->pushButton,&QPushButton::clicked,this,[=](){
+	//		m_toolList[0]->setEnabled(true);
+	//		m_toolList[1]->setEnabled(false);
+	//		Q_EMIT requestTool(m_toolList[0]->id());
+	//	});
 
 	return true;
 }
@@ -139,19 +139,19 @@ bool SWIOTPlugin::onDisconnect()
 	auto &&cp = ContextProvider::GetInstance();
 	cp->close(m_param);
 
-        for (auto & tool : m_toolList) {
-                tool->setEnabled(false);
-                tool->setTool(nullptr);
-        }
+	for (auto & tool : m_toolList) {
+		tool->setEnabled(false);
+		tool->setTool(nullptr);
+	}
 
 	delete configui;
 	delete rungui;
 	delete config;
 	delete runtime;
-        delete faultsgui;
-        delete faults;
-        delete maxtool;
-        delete maxgui;
+	delete faultsgui;
+	delete faults;
+	delete maxtool;
+	delete maxgui;
 
 	return true;
 }
@@ -159,7 +159,7 @@ bool SWIOTPlugin::onDisconnect()
 void SWIOTPlugin::initMetadata()
 {
 	loadMetadata(
-R"plugin(
+				R"plugin(
 	{
 	   "priority":3,
 	   "category":[

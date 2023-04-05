@@ -13,9 +13,9 @@
 #include "src/config/drawarea.h"
 
 extern "C"{
-	struct iio_context;
-	struct iio_device;
-	struct iio_channel;
+struct iio_context;
+struct iio_device;
+struct iio_channel;
 }
 
 namespace adiscope::swiot {
@@ -35,13 +35,13 @@ private:
 	QVector<QStringList*> m_funcAvailable;
 	QPushButton* m_configBtn;
 	ConfigMenu* m_configMenu;
-        adiscope::gui::ToolView* m_toolView;
+	adiscope::gui::ToolView* m_toolView;
 
-        DrawArea* m_drawArea;
-        QScrollArea* m_scrollArea;
+	DrawArea* m_drawArea;
+	QScrollArea* m_scrollArea;
 
 protected:
-        bool eventFilter(QObject *object, QEvent * event) override;
+	bool eventFilter(QObject *object, QEvent * event) override;
 
 private:
 	void init();

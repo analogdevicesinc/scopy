@@ -27,7 +27,7 @@ public:
 
 	void setSelectedConfigMode(const QString &selectedConfigMode);
 
-        void resetSismograph();
+	void resetSismograph();
 
 private:
 	void connectSignalsAndSlots();
@@ -41,7 +41,7 @@ private:
 	QString m_selectedConfigMode;
 
 Q_SIGNALS:
-        void outputValueChanged(bool value);
+	void outputValueChanged(bool value);
 };
 }
 

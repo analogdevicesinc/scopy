@@ -5,7 +5,7 @@
 #include <QMap>
 
 extern "C"{
-	struct iio_channel;
+struct iio_channel;
 }
 
 namespace adiscope::swiot {

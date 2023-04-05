@@ -12,23 +12,23 @@ class CustomSwitch;
 class GenericMenu;
 
 namespace swiot {
-    class BufferMenuView : public gui::GenericMenu {
-    Q_OBJECT
-    public:
-        explicit BufferMenuView(QWidget *parent = nullptr);
+class BufferMenuView : public gui::GenericMenu {
+	Q_OBJECT
+public:
+	explicit BufferMenuView(QWidget *parent = nullptr);
 
-        ~BufferMenuView();
+	~BufferMenuView();
 
-        void init(QString title, QString function, QColor *color);
+	void init(QString title, QString function, QColor *color);
 
-        void initAdvMenu(QMap<QString, QStringList> values);
+	void initAdvMenu(QMap<QString, QStringList> values);
 
-        BufferMenu *getAdvMenu();
+	BufferMenu *getAdvMenu();
 
-    private:
-        BufferMenu *m_swiotAdvMenu;
-        adiscope::gui::SubsectionSeparator *m_advanceSettingsSection;
-    };
+private:
+	BufferMenu *m_swiotAdvMenu;
+	adiscope::gui::SubsectionSeparator *m_advanceSettingsSection;
+};
 }
 }
 

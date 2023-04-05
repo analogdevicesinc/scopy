@@ -22,11 +22,11 @@ SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QWidget *parent):
 		m_swiotRuntimeAd = new swiot::Ad74413r(this, m_iioDevices[AD_NAME], channel_function);
 		initAdToolView();
 
-//		m_triggerTimer = new QTimer();
-//		m_triggerTimer->start(TRIGGER_TIMER_MS);
+		//		m_triggerTimer = new QTimer();
+		//		m_triggerTimer->start(TRIGGER_TIMER_MS);
 
 		connect(m_backBtn, &QPushButton::pressed, this, &SwiotRuntime::onBackBtnPressed);
-//		connect(m_triggerTimer, SIGNAL(timeout()), this, SLOT(onTriggerTimeout()));
+		//		connect(m_triggerTimer, SIGNAL(timeout()), this, SLOT(onTriggerTimeout()));
 	} else {
 		qDebug(CAT_SWIOT_RUNTIME) <<"isn't runtime context";
 	}
@@ -57,7 +57,7 @@ void SwiotRuntime::initAdToolView()
 {
 	setToolView(m_swiotRuntimeAd->getToolView());
 	m_toolView->addTopExtraWidget(m_backBtn);
-//	setCentralWidget(m_toolView);
+	//	setCentralWidget(m_toolView);
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
 	qInfo(CAT_SWIOT_RUNTIME) << "Ad initialized";
@@ -90,15 +90,15 @@ QPushButton* SwiotRuntime::createBackBtn()
 	QPushButton* backBtn = new QPushButton();
 	backBtn->setObjectName(QString::fromUtf8("backBtn"));
 	backBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-"  width: 95px;\n"
-"  height: 40px;\n"
-"\n"
-"  font-size: 12px;\n"
-"  text-align: center;\n"
-"  font-weight: bold;\n"
-"  padding-left: 15px;\n"
-"  padding-right: 15px;\n"
-"}"));
+						 "  width: 95px;\n"
+						 "  height: 40px;\n"
+						 "\n"
+						 "  font-size: 12px;\n"
+						 "  text-align: center;\n"
+						 "  font-weight: bold;\n"
+						 "  padding-left: 15px;\n"
+						 "  padding-right: 15px;\n"
+						 "}"));
 	backBtn->setProperty("blue_button", QVariant(true));
 	backBtn->setText("Back");
 	return backBtn;

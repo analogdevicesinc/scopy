@@ -19,51 +19,51 @@ namespace adiscope::swiot {
 #define MAX_KERNEL_BUFFER 64
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 
-    struct chnlInfo {
-        QString chnlId;
-        bool isOutput;
-        bool isEnabled;
-        std::pair<double, double> offsetScalePair;
-        struct iio_channel *iioChnl;
-    };
+struct chnlInfo {
+	QString chnlId;
+	bool isOutput;
+	bool isEnabled;
+	std::pair<double, double> offsetScalePair;
+	struct iio_channel *iioChnl;
+};
 
 
-    class BufferLogic : public QObject {
-    Q_OBJECT
-    public:
-        explicit BufferLogic(struct iio_device *iioDev = nullptr);
+class BufferLogic : public QObject {
+	Q_OBJECT
+public:
+	explicit BufferLogic(struct iio_device *iioDev = nullptr);
 
-        ~BufferLogic();
+	~BufferLogic();
 
-        struct iio_channel *getIioChnl(int chnlIdx, bool outputPriotity);
+	struct iio_channel *getIioChnl(int chnlIdx, bool outputPriotity);
 
-        bool verifyEnableChanges(std::vector<bool> enabledChnls);
+	bool verifyEnableChanges(std::vector<bool> enabledChnls);
 
-        int getPlotChnlsNo();
+	int getPlotChnlsNo();
 
-        QStringList readChnlsFrequencyAttr(QString attrName);
+	QStringList readChnlsFrequencyAttr(QString attrName);
 
-    public Q_SLOTS:
+public Q_SLOTS:
 
-        void onSamplingFreqChanged(int idx);
+	void onSamplingFreqChanged(int idx);
 
-    Q_SIGNALS:
+Q_SIGNALS:
 
-        void chnlsChanged(QMap<int, struct chnlInfo *> chnlsInfo);
+	void chnlsChanged(QMap<int, struct chnlInfo *> chnlsInfo);
 
-    private:
-        void createChannels();
+private:
+	void createChannels();
 
-    private:
-        int m_plotChnlsNo;
-        int m_chnlsNumber;
-        QStringList m_samplingFreqAvailable;
+private:
+	int m_plotChnlsNo;
+	int m_chnlsNumber;
+	QStringList m_samplingFreqAvailable;
 
-        QMap<int, struct chnlInfo *> m_chnlsInfo;
-        struct iio_device *m_iioDev;
+	QMap<int, struct chnlInfo *> m_chnlsInfo;
+	struct iio_device *m_iioDev;
 
 
-    };
+};
 }
 
 

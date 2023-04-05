@@ -47,7 +47,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	m_plotWidget->setLayout(gridPlot);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
+						  QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
 	gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
@@ -83,7 +83,7 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 	bool rolling = false;
 
 	m_lock->lock();
-//	qDebug(CAT_SWIOT_RUNTIME) <<QString::number(bufferCounter)+" Before Copy";
+	//	qDebug(CAT_SWIOT_RUNTIME) <<QString::number(bufferCounter)+" Before Copy";
 	if (bufferDataSize > 0) {
 		for (int i = 0; i < m_dataPoints.size(); i++) {
 			if (m_bufferIndex == (m_buffersNumber - 1))
@@ -111,12 +111,12 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 		if (m_plotDataIndex >= m_plotSampleNumber - 1) {
 			m_plotDataIndex-=MAX_BUFFER_SIZE;
 		}
-//		qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Copy";
+		//		qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Copy";
 
 	}
-//	qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before Drawing";
+	//	qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before Drawing";
 	m_plot->plotNewData("Active Channels", m_dataPoints, m_plotSampleNumber, 1);
-//	qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Drawing";
+	//	qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Drawing";
 	m_lock->unlock();
 }
 
@@ -135,7 +135,7 @@ void BufferPlotHandler::onPlotChnlsChanges(std::vector<bool> enabledPlots)
 
 void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 {
-//	pause(true);
+	//	pause(true);
 	QStringList filter;
 	bool useNativeDialogs = false;
 	filter += QString(tr("Comma-separated values files (*.csv)"));
@@ -145,8 +145,8 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 	QString selectedFilter = filter[0];
 
 	QString fileName = QFileDialog::getSaveFileName(this,
-	    tr("Export"), "", filter.join(";;"),
-	    &selectedFilter, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+							tr("Export"), "", filter.join(";;"),
+							&selectedFilter, (useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 	if (fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it
@@ -192,7 +192,7 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 		fm.setSampleRate(m_plotSampleNumber);
 		fm.performWrite();
 	}
-//	pause(false);
+	//	pause(false);
 }
 
 void BufferPlotHandler::setPlotActiveAxis(int id) {

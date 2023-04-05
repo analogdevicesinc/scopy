@@ -11,54 +11,54 @@
 #include "src/ad74413r/bufferlogic.hpp"
 
 extern "C" {
-	struct iio_device;
-	struct iio_buffer;
+struct iio_device;
+struct iio_buffer;
 }
 
 namespace adiscope::swiot {
-    class BufferReaderThread : public QThread {
-    Q_OBJECT
-    public:
-        explicit BufferReaderThread(struct iio_device *iioDev);
+class BufferReaderThread : public QThread {
+	Q_OBJECT
+public:
+	explicit BufferReaderThread(struct iio_device *iioDev);
 
-        double convertData(unsigned int data, int idx);
+	double convertData(unsigned int data, int idx);
 
-    public Q_SLOTS:
+public Q_SLOTS:
 
-        void onChnlsChange(QMap<int, struct chnlInfo *> chnlsInfo);
+	void onChnlsChange(QMap<int, struct chnlInfo *> chnlsInfo);
 
-    Q_SIGNALS:
+Q_SIGNALS:
 
-        void bufferRefilled(QVector<QVector<double>> bufferData, int bufferCounter);
+	void bufferRefilled(QVector<QVector<double>> bufferData, int bufferCounter);
 
-    private:
-        void run() override;
+private:
+	void run() override;
 
-        void createIioBuffer();
+	void createIioBuffer();
 
-        void destroyIioBuffer();
+	void destroyIioBuffer();
 
-        void enableIioChnls();
+	void enableIioChnls();
 
-        int getEnabledChnls();
+	int getEnabledChnls();
 
-        QVector<std::pair<double, double>> getOffsetScaleVector();
+	QVector<std::pair<double, double>> getOffsetScaleVector();
 
-    private:
-        int m_sampleRate = 4800;
-        double m_timespan = 1;
-        int m_enabledChnlsNo;
-        int bufferCounter = 0;
+private:
+	int m_sampleRate = 4800;
+	double m_timespan = 1;
+	int m_enabledChnlsNo;
+	int bufferCounter = 0;
 
-        struct iio_device *m_iioDev;
-        struct iio_buffer *m_iioBuff;
-        QMap<int, struct chnlInfo *> m_chnlsInfo;
-        QVector<QVector<double>> m_bufferData;
-        QVector<std::pair<double, double>> m_offsetScaleValues;
+	struct iio_device *m_iioDev;
+	struct iio_buffer *m_iioBuff;
+	QMap<int, struct chnlInfo *> m_chnlsInfo;
+	QVector<QVector<double>> m_bufferData;
+	QVector<std::pair<double, double>> m_offsetScaleValues;
 
-        QMutex *lock;
+	QMutex *lock;
 
-    };
+};
 }
 
 #endif // SWIOTADREADERTHREAD_HPP

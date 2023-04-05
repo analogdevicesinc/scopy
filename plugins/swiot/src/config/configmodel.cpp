@@ -54,7 +54,7 @@ QStringList ConfigModel::readChnlAttr(struct iio_channel* iio_chnl, QString attr
 }
 
 void ConfigModel::updateChnlAttributes(QVector<QMap<QString,QStringList>> newValues, QString attrName,
-                                       int deviceIdx)
+				       int deviceIdx)
 {
 	QStringList value = newValues[deviceIdx].value(attrName);
 	if (value.size() == 1) {

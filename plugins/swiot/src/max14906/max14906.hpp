@@ -30,19 +30,19 @@ private Q_SLOTS:
 
 private:
 	void initChannels();
-        void setupDynamicUi(QWidget *parent);
+	void setupDynamicUi(QWidget *parent);
 	void initMonitorToolView();
-        adiscope::gui::GenericMenu* createGeneralSettings(const QString& title, QColor* color);
+	adiscope::gui::GenericMenu* createGeneralSettings(const QString& title, QColor* color);
 	void connectSignalsAndSlots();
 
 	DioController *max14906ToolController;
 	Ui::Max14906 *ui;
-        DioSettingsTab *m_max14906SettingsTab;
-        adiscope::gui::ToolView *m_toolView;
+	DioSettingsTab *m_max14906SettingsTab;
+	adiscope::gui::ToolView *m_toolView;
 	CustomColQGridLayout* m_customColGrid;
-        adiscope::gui::GenericMenu* m_generalSettingsMenu;
-        adiscope::gui::ChannelManager* m_monitorChannelManager;
-        adiscope::gui::SubsectionSeparator *settingsWidgetSeparator;
+	adiscope::gui::GenericMenu* m_generalSettingsMenu;
+	adiscope::gui::ChannelManager* m_monitorChannelManager;
+	adiscope::gui::SubsectionSeparator *settingsWidgetSeparator;
 	QTimer *m_qTimer;
 
 	DioReaderThread *m_readerThread;

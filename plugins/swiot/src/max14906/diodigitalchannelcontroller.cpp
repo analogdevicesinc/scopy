@@ -4,7 +4,7 @@
 using namespace adiscope::swiot;
 
 DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* channel, const QString &deviceName, const QString &deviceType, QWidget *parent) :
-        QWidget(parent),
+	QWidget(parent),
 	m_digitalChannel(new DioDigitalChannel(deviceName, deviceType, this)),
 	m_channelName(deviceName),
 	m_channelType(deviceType),
@@ -33,13 +33,13 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			 [&](int index){
 		this->writeType();
 	});
-        QObject::connect(m_digitalChannel, &DioDigitalChannel::outputValueChanged, this,
-                [this] (bool value) {
-                ssize_t res = iio_channel_attr_write_bool(m_channel, "raw", value);
-                if (res < 0) {
-                        qCritical(CAT_MAX14906) << "Could not write value" << value << "to channel" << this->m_channelName << ", error code " << res;
-                }
-        });
+	QObject::connect(m_digitalChannel, &DioDigitalChannel::outputValueChanged, this,
+			 [this] (bool value) {
+		ssize_t res = iio_channel_attr_write_bool(m_channel, "raw", value);
+		if (res < 0) {
+			qCritical(CAT_MAX14906) << "Could not write value" << value << "to channel" << this->m_channelName << ", error code " << res;
+		}
+	});
 }
 
 DioDigitalChannelController::~DioDigitalChannelController() {

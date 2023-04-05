@@ -17,10 +17,10 @@ void DioReaderThread::run() {
 	try {
 		if (!this->m_channels.empty()) {
 			for (int index: this->m_channels.keys()) {
-                                double raw = -1;
-                                iio_channel_attr_read_double(this->m_channels[index], "raw", &raw);
-                                qDebug(CAT_MAX14906) << "Channel with index " << index << " read raw value: " << raw;
-                                Q_EMIT channelDataChanged(index, raw);
+				double raw = -1;
+				iio_channel_attr_read_double(this->m_channels[index], "raw", &raw);
+				qDebug(CAT_MAX14906) << "Channel with index " << index << " read raw value: " << raw;
+				Q_EMIT channelDataChanged(index, raw);
 			}
 		}
 	} catch (...) {

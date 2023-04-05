@@ -14,8 +14,8 @@ public:
 	~DioReaderThread() override;
 
 	void addChannel(int index, struct iio_channel* channel);
-//	void toggleChannel(int index, bool toggled = true);
-//	bool isChannelToggled(int index);
+	//	void toggleChannel(int index, bool toggled = true);
+	//	bool isChannelToggled(int index);
 	void singleRun();
 
 Q_SIGNALS:

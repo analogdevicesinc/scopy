@@ -19,7 +19,7 @@ double BufferReaderThread::convertData(unsigned int data, int idx)
 	data <<= 8;
 	data = SWAP_UINT32(data);
 	data &= 0x0000FFFF;
-//	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second;
+	//	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second;
 	convertedData = data;
 	return data;
 }
@@ -112,9 +112,9 @@ void BufferReaderThread::run()
 		if (m_iioBuff) {
 			bufferCounter++;
 			lock->lock();
-//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before refill" ;
+			//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before refill" ;
 			int refillBytes = iio_buffer_refill(m_iioBuff);
-//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After refill";
+			//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After refill";
 			if (refillBytes > 0) {
 				int i = 0;
 				int idx = 0;

@@ -14,7 +14,7 @@ using namespace adiscope::swiot;
 
 Faults::Faults(struct iio_context *ctx, QWidget *parent) :
 	QWidget(parent),
-        ctx(ctx),
+	ctx(ctx),
 	ui(new Ui::Faults),
 	timer(new QTimer()),
 	thread(new QThread(this)),
@@ -24,7 +24,7 @@ Faults::Faults(struct iio_context *ctx, QWidget *parent) :
 	ui->setupUi(this);
 
 	this->setupDynamicUi(parent);
-        this->connectSignalsAndSlots();
+	this->connectSignalsAndSlots();
 }
 
 Faults::~Faults() {
@@ -56,7 +56,7 @@ void Faults::setupDynamicUi(QWidget *parent) {
 
 	this->m_toolView->addFixedCentralWidget(this->faultsPage,0,0,-1,-1);
 
-        this->ui->mainLayout->addWidget(m_toolView);
+	this->ui->mainLayout->addWidget(m_toolView);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 }
 
@@ -148,32 +148,32 @@ void Faults::getMax14906FaultsNumeric() {
 }
 
 void Faults::runButtonClicked() {
-        qDebug(CAT_SWIOT_FAULTS) << "Run button clicked";
-        this->m_toolView->getSingleBtn()->setChecked(false);
-        if (this->m_toolView->getRunBtn()->isChecked()) {
-                qWarning() << "thread started";
-                this->thread->start();
-        } else {
-                if (this->thread->isRunning()) {
-                        qWarning() << "thread stopped";
-                        this->thread->quit();
-                        this->thread->wait();
-                }
-                this->timer->stop();
-        }
+	qDebug(CAT_SWIOT_FAULTS) << "Run button clicked";
+	this->m_toolView->getSingleBtn()->setChecked(false);
+	if (this->m_toolView->getRunBtn()->isChecked()) {
+		qWarning() << "thread started";
+		this->thread->start();
+	} else {
+		if (this->thread->isRunning()) {
+			qWarning() << "thread stopped";
+			this->thread->quit();
+			this->thread->wait();
+		}
+		this->timer->stop();
+	}
 }
 
 void Faults::singleButtonClicked() {
-        qDebug(CAT_SWIOT_FAULTS) << "Single button clicked";
-        this->m_toolView->getRunBtn()->setChecked(false);
-        this->timer->stop();
-        this->pollFaults();
-        this->m_toolView->getSingleBtn()->setChecked(false);
+	qDebug(CAT_SWIOT_FAULTS) << "Single button clicked";
+	this->m_toolView->getRunBtn()->setChecked(false);
+	this->timer->stop();
+	this->pollFaults();
+	this->m_toolView->getSingleBtn()->setChecked(false);
 }
 
 void Faults::pollFaults() {
-        qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
-        this->getAd74413rFaultsNumeric();
-        this->getMax14906FaultsNumeric();
-        this->faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
+	qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
+	this->getAd74413rFaultsNumeric();
+	this->getMax14906FaultsNumeric();
+	this->faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
 }

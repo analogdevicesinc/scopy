@@ -135,8 +135,8 @@ QString FaultsGroup::getExplanations() {
 			if (fault->isActive()) {
 				res += QString("Bit%1 (%2): %3<br>").arg(QString::number(fault->getId()), fault->getName(), fault->getFaultExplanation());
 			} else {
-                                res += QString("<font color=\"#5c5c5c\">Bit%1 (%2): %3</font><br>").arg(QString::number(fault->getId()), fault->getName(), fault->getFaultExplanation());
-                        }
+				res += QString("<font color=\"#5c5c5c\">Bit%1 (%2): %3</font><br>").arg(QString::number(fault->getId()), fault->getName(), fault->getFaultExplanation());
+			}
 		}
 	}
 

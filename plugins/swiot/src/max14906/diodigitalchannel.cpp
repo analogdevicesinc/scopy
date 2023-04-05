@@ -48,9 +48,9 @@ DioDigitalChannel::~DioDigitalChannel() {
 }
 
 void DioDigitalChannel::connectSignalsAndSlots() {
-        connect(this->ui->customSwitch, &CustomSwitch::toggled, this, [this] (){
-                Q_EMIT this->outputValueChanged(this->ui->customSwitch->isChecked());
-        });
+	connect(this->ui->customSwitch, &CustomSwitch::toggled, this, [this] (){
+		Q_EMIT this->outputValueChanged(this->ui->customSwitch->isChecked());
+	});
 }
 
 Ui::DioDigitalChannel *DioDigitalChannel::getUi() const {
@@ -97,7 +97,7 @@ void DioDigitalChannel::setSelectedConfigMode(const QString &selectedConfigMode)
 }
 
 void DioDigitalChannel::resetSismograph() {
-        this->ui->sismograph->reset();
+	this->ui->sismograph->reset();
 }
 
 #include "moc_diodigitalchannel.cpp"

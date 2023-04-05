@@ -46,7 +46,7 @@ double BufferMenu::convertFromRaw(int rawValue)
 }
 
 CurrentInLoopMenu::CurrentInLoopMenu(QWidget* parent):
-        BufferMenu(parent)
+	BufferMenu(parent)
 {
 }
 
@@ -59,10 +59,10 @@ void CurrentInLoopMenu::init()
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
 
 	m_dacCodeSpinButton = new PositionSpinButton({
-					{"value", 1E0}
-					}, "DAC Code", 0,
-					8191,
-					true, false, m_widget);
+							     {"value", 1E0}
+						     }, "DAC Code", 0,
+						     8191,
+						     true, false, m_widget);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 
 	addMenuLayout(dacCodeLayout);
@@ -85,19 +85,19 @@ void CurrentInLoopMenu::connectSignalsToSlots()
 
 void CurrentInLoopMenu::dacCodeChanged(double value)
 {
-//	QString attrName("raw");
-//	m_attrValues[attrName].clear();
-//	m_attrValues[attrName].push_back(QString::number(value));
+	//	QString attrName("raw");
+	//	m_attrValues[attrName].clear();
+	//	m_attrValues[attrName].push_back(QString::number(value));
 
 	double val = convertFromRaw(value);
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val)+" mA");
 
-//	Q_EMIT attrValuesChanged(attrName);
+	//	Q_EMIT attrValuesChanged(attrName);
 }
 
 DigitalInMenu::DigitalInMenu(QWidget* parent):
-        BufferMenu(parent)
+	BufferMenu(parent)
 {}
 
 DigitalInMenu::~DigitalInMenu()
@@ -122,9 +122,9 @@ void DigitalInMenu::init()
 	QHBoxLayout *comparatorLayout = new QHBoxLayout();
 
 	m_comparatorThresholdSpinButton = new PositionSpinButton({
-							    {"V",1E0}},
-							    "Comparator Threshold",0.0,16,
-							    true, false, m_widget);
+									 {"V",1E0}},
+								 "Comparator Threshold",0.0,16,
+								 true, false, m_widget);
 
 	comparatorLayout->addWidget(m_comparatorThresholdSpinButton);
 
@@ -151,7 +151,7 @@ void DigitalInMenu::thresholdOptionIndexChanged()
 }
 
 DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent):
-        BufferMenu(parent)
+	BufferMenu(parent)
 {}
 
 DigitalInLoopMenu::~DigitalInLoopMenu()
@@ -176,9 +176,9 @@ void DigitalInLoopMenu::init()
 	QHBoxLayout *comparatorLayout = new QHBoxLayout();
 
 	m_comparatorThresholdSpinButton = new PositionSpinButton({
-							    {"V",1E0}},
-							    "Comparator Threshold",0.0,16,
-							    true, false, m_widget);
+									 {"V",1E0}},
+								 "Comparator Threshold",0.0,16,
+								 true, false, m_widget);
 
 	comparatorLayout->addWidget(m_comparatorThresholdSpinButton);
 
@@ -188,10 +188,10 @@ void DigitalInLoopMenu::init()
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
 
 	m_dacCodeSpinButton = new PositionSpinButton({
-					{"value", 1E0}
-					}, "DAC Code", 0,
-					8191,
-					true, false, m_widget);
+							     {"value", 1E0}
+						     }, "DAC Code", 0,
+						     8191,
+						     true, false, m_widget);
 
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 
@@ -217,15 +217,15 @@ void DigitalInLoopMenu::connectSignalsToSlots()
 
 void DigitalInLoopMenu::dacCodeChanged(double value)
 {
-//	QString attrName("raw");
-//	m_attrValues[attrName].clear();
-//	m_attrValues[attrName].push_back(QString::number(value));
+	//	QString attrName("raw");
+	//	m_attrValues[attrName].clear();
+	//	m_attrValues[attrName].push_back(QString::number(value));
 
 	double val = convertFromRaw(value);
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val) + " mA");
 
-//	Q_EMIT attrValuesChanged(attrName);
+	//	Q_EMIT attrValuesChanged(attrName);
 }
 
 void DigitalInLoopMenu::thresholdOptionIndexChanged()
@@ -252,10 +252,10 @@ void VoltageOutMenu::init()
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
 
 	m_dacCodeSpinButton = new PositionSpinButton({
-					{"value", 1E0}
-					}, "DAC Code", 0,
-					8191,
-					true, false, m_widget);
+							     {"value", 1E0}
+						     }, "DAC Code", 0,
+						     8191,
+						     true, false, m_widget);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 
 	addMenuLayout(dacCodeLayout);
@@ -392,10 +392,10 @@ void CurrentOutMenu::init()
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
 
 	m_dacCodeSpinButton = new PositionSpinButton({
-					{"value", 1E0}
-					}, "DAC Code", 0,
-					8196,
-					true, false, m_widget);
+							     {"value", 1E0}
+						     }, "DAC Code", 0,
+						     8196,
+						     true, false, m_widget);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 
 	addMenuLayout(dacCodeLayout);
@@ -519,7 +519,7 @@ void CurrentOutMenu::slewIndexChanged(int idx)
 }
 
 DiagnosticMenu::DiagnosticMenu(QWidget* parent):
-        BufferMenu(parent)
+	BufferMenu(parent)
 {}
 
 DiagnosticMenu::~DiagnosticMenu()
@@ -566,7 +566,7 @@ void DiagnosticMenu::diagIndextChanged(int idx)
 }
 
 WithoutAdvSettings::WithoutAdvSettings(QWidget* parent):
-        BufferMenu(parent)
+	BufferMenu(parent)
 {}
 
 WithoutAdvSettings::~WithoutAdvSettings()

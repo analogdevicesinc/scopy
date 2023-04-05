@@ -228,20 +228,20 @@ public:
 	{
 		int menu_type = decodeFunctionName(function);
 		switch (menu_type) {
-			case CURRENT_IN_LOOP:
-				return new CurrentInLoopMenu(widget);
-			case DIGITAL_IN:
-				return new DigitalInMenu(widget);
-			case DIGITAL_IN_LOOP:
-				return new DigitalInLoopMenu(widget);
-			case VOLTAGE_OUT:
-				return new VoltageOutMenu(widget);
-			case CURRENT_OUT:
-				return new CurrentOutMenu(widget);
-			case DIAGNOSTIC:
-				return new DiagnosticMenu(widget);
-			default:
-				return new WithoutAdvSettings(widget);
+		case CURRENT_IN_LOOP:
+			return new CurrentInLoopMenu(widget);
+		case DIGITAL_IN:
+			return new DigitalInMenu(widget);
+		case DIGITAL_IN_LOOP:
+			return new DigitalInLoopMenu(widget);
+		case VOLTAGE_OUT:
+			return new VoltageOutMenu(widget);
+		case CURRENT_OUT:
+			return new CurrentOutMenu(widget);
+		case DIAGNOSTIC:
+			return new DiagnosticMenu(widget);
+		default:
+			return new WithoutAdvSettings(widget);
 		}
 	}
 
