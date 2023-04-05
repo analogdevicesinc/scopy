@@ -1810,6 +1810,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 			writeAllSettingsToHardware();
 		}
 
+		ResourceManager::open("m2k-adc",this);
 		fft_plot->presetSampleRate(sample_rate);
 		fft_sink->set_samp_rate(sample_rate);
 		m_time_start = std::chrono::system_clock::now();
@@ -1818,6 +1819,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 	} else {
 		stop_blockchain_flow();
 		sample_timer->stop();
+		ResourceManager::close("m2k-adc");
 	}
 
 	if (!checked) {
