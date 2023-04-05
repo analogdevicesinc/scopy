@@ -139,12 +139,12 @@ private:
 
 	uint m_num_channels;
 
-	static QVector<QString> lut_analog_trigg_cond;
-	static QVector<QString> lut_digital_trigg_cond;
-	static QVector<QString> lut_digital_out_direction;
-	static QVector<QString> lut_digital_out_select;
-	static QVector<QString> lut_trigg_mode;
-	static QVector<QString> lut_trigg_source;
+	const static QVector<QString> lut_analog_trigg_cond;
+	const static QVector<QString> lut_digital_trigg_cond;
+	const static QVector<QString> lut_digital_out_direction;
+	const static QVector<QString> lut_digital_out_select;
+	const static QVector<QString> lut_trigg_mode;
+	const static QVector<QString> lut_trigg_source;
 };
 
 } /* namespace adiscope */

@@ -253,8 +253,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->btnGeneralSettings->setChecked(true);
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-							  TOOL_LOGIC_ANALYZER)));
+	api->setObjectName(Filter::tool_name(TOOL_LOGIC_ANALYZER));
 //	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 

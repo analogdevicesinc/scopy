@@ -177,7 +177,8 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 }
 
 NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 ToolMenuEntry *tme, QJSEngine *engine,
+				 ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
+				 QJSEngine *engine,
 				 QWidget *parent) :
 	M2kTool(ctx, tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
 	ui(new Ui::NetworkAnalyzer),
@@ -200,7 +201,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_nb_periods(2)
 {
 	if (ctx) {
-		iio = iio_manager::get_instance(ctx,
+		iio = m2k_man->get_instance(ctx,
 						filt->device_name(TOOL_NETWORK_ANALYZER, 2));
 
 		m_m2k_context = m2kOpen(ctx, "");
@@ -614,8 +615,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	readPreferences();
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-				   TOOL_NETWORK_ANALYZER)));
+	api->setObjectName(Filter::tool_name(TOOL_NETWORK_ANALYZER));
 
 	ui->xygraph->enableZooming(ui->btnZoomIn, ui->btnZoomOut);
 

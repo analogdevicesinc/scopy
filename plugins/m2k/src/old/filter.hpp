@@ -62,8 +62,8 @@ namespace adiscope::m2k{
 		QString& hw_name();
 
 		bool compatible(enum tool tool) const;
-		bool usable(enum tool tool, const std::string &dev) const;
-		const std::string device_name(enum tool tool,
+		bool usable(enum tool tool, const QString dev) const;
+		const QString device_name(enum tool tool,
 				int idx = 0) const;
 
 		struct iio_device * find_device(const struct iio_context *ctx,
@@ -72,7 +72,7 @@ namespace adiscope::m2k{
 				enum tool tool, int idx = 0,
 				bool output = false) const;
 
-		static const std::string& tool_name(enum tool tool);
+		static const QString tool_name(enum tool tool);
 	};
 }
 
