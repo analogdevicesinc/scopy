@@ -107,7 +107,7 @@ constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024;
 constexpr int MAX_KERNEL_BUFFERS = 64;
 
 Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
-			   ToolMenuEntry *tme,
+			   ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
 			   QJSEngine *engine, QWidget *parent) :
 	M2kTool(ctx, tme, new Oscilloscope_API(this), "Oscilloscope", parent),
 	m_m2k_context(m2kOpen(ctx, "")),
@@ -226,7 +226,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	for (uint i = 0; i < nb_channels; i++)
 		fft_plot.setYaxisMouseGesturesEnabled(i, false);
 
-	iio = iio_manager::get_instance(ctx,
+	iio = m2k_man->get_instance(ctx,
 			filt->device_name(TOOL_OSCILLOSCOPE));
 	gr::hier_block2_sptr hier = iio->to_hier_block2();
 	qDebug(CAT_M2K_OSCILLOSCOPE) << "Manager created:\n" << gr::dot_graph(hier).c_str();
@@ -917,8 +917,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	connect(gsettings_ui->xyLineThickness,SIGNAL(currentIndexChanged(int)),this, SLOT(xyLineThickness_currentIndexChanged(int)));
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_OSCILLOSCOPE)));
+	api->setObjectName(Filter::tool_name(TOOL_OSCILLOSCOPE));
 	//api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 

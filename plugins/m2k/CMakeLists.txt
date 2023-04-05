@@ -55,7 +55,6 @@ set(PROJECT_SOURCES
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
-#find_package(Boost REQUIRED COMPONENTS system filesystem thread chrono)
 find_package(libm2k REQUIRED)
 
 find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt iio)

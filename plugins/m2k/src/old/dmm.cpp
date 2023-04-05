@@ -61,11 +61,11 @@ using namespace adiscope::m2k;
 using namespace libm2k;
 using namespace libm2k::context;
 
-DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
+DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
 	 QWidget *parent)
 	: M2kTool(ctx, tme, new DMM_API(this), "Voltmeter", parent),
 	  ui(new Ui::DMM), signal(std::make_shared<signal_sample>()),
-	  manager(iio_manager::get_instance(ctx, filt->device_name(TOOL_DMM))),
+	  manager(m2k_man->get_instance(ctx, filt->device_name(TOOL_DMM))),
 	  m_m2k_context(m2kOpen(ctx, "")),
 	  m_m2k_analogin(m_m2k_context->getAnalogIn()),
 	  m_adc_nb_channels(m_m2k_analogin->getNbChannels()),
@@ -201,8 +201,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme,
 	if (started)
 		manager->unlock();
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-			TOOL_DMM)));
+	api->setObjectName(Filter::tool_name(TOOL_DMM));
 //	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 

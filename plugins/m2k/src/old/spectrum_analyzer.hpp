@@ -120,7 +120,7 @@ public:
 	typedef std::shared_ptr<SpectrumChannel> channel_sptr;
 
 	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-				  ToolMenuEntry *tme,
+				  ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
 				  QJSEngine *engine, QWidget *parent);
 	~SpectrumAnalyzer();
 	QPushButton* getRunButton();
@@ -300,7 +300,7 @@ private:
 	iio_manager::port_id *waterfall_ids;
 
 	std::shared_ptr<iio_manager> iio;
-	const std::string adc_name;
+	QString adc_name;
 	unsigned int m_adc_nb_channels;
 	int adc_bits_count;
 	int crt_channel_id;

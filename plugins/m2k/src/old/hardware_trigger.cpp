@@ -24,14 +24,14 @@
 
 using namespace adiscope;
 
-QVector<QString> HardwareTrigger::lut_analog_trigg_cond = {
+const QVector<QString> HardwareTrigger::lut_analog_trigg_cond = {
 	"edge-rising",
 	"edge-falling",
 	"level-low",
 	"level-high",
 };
 
-QVector<QString> HardwareTrigger::lut_digital_trigg_cond = {
+const QVector<QString> HardwareTrigger::lut_digital_trigg_cond = {
 	"edge-rising",
 	"edge-falling",
 	"level-low",
@@ -39,7 +39,7 @@ QVector<QString> HardwareTrigger::lut_digital_trigg_cond = {
 	"edge-any",
 };
 
-QVector<QString> HardwareTrigger::lut_trigg_mode = {
+const QVector<QString> HardwareTrigger::lut_trigg_mode = {
 	"always",
 	"analog",
 	"digital",
@@ -51,12 +51,12 @@ QVector<QString> HardwareTrigger::lut_trigg_mode = {
 	"!digital_XOR_analog",
 };
 
-QVector<QString> HardwareTrigger::lut_digital_out_direction = {
+const QVector<QString> HardwareTrigger::lut_digital_out_direction = {
 	"in",
 	"out"
 };
 
-QVector<QString> HardwareTrigger::lut_digital_out_select= {
+const QVector<QString> HardwareTrigger::lut_digital_out_select= {
 	"sw-trigger",
 	"trigger-i-same-chn",
 	"trigger-i-swap-chn",
@@ -65,7 +65,7 @@ QVector<QString> HardwareTrigger::lut_digital_out_select= {
 };
 
 // This is still not generic. It is specific to only 2 channels!
-QVector<QString> HardwareTrigger::lut_trigg_source = {
+const QVector<QString> HardwareTrigger::lut_trigg_source = {
 	"a",
 	"b",
 	"a_OR_b",

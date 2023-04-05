@@ -19,6 +19,7 @@ private Q_SLOTS:
 	void clone();
 	void name();
 	void metadata();
+	void unload();
 
 };
 
@@ -85,9 +86,9 @@ void TST_M2k::clone()
 
 	Plugin *p1 = nullptr, *p2 = nullptr;
 	auto original = qobject_cast<Plugin*>(qp.instance());
-	p1 = original->clone();
+	p1 = original->clone(this);
 	QVERIFY(p1 != nullptr);
-	p2 = original->clone();
+	p2 = original->clone(this);
 	QVERIFY(p2 != nullptr);
 	QVERIFY(p1 != p2);
 }
@@ -97,7 +98,7 @@ void TST_M2k::name() {
 
 	Plugin *p1 = nullptr, *p2 = nullptr;
 	auto original = qobject_cast<Plugin*>(qp.instance());
-	p1 = original->clone();
+	p1 = original->clone(this);
 	qDebug()<<p1->name();
 }
 
@@ -108,9 +109,19 @@ void TST_M2k::metadata()
 	Plugin *p1 = nullptr, *p2 = nullptr;
 	auto original = qobject_cast<Plugin*>(qp.instance());
 	original->initMetadata();
-	p1 = original->clone();
+	p1 = original->clone(this);
 	qDebug()<<p1->metadata();
 	QVERIFY(!p1->metadata().isEmpty());
+}
+
+void TST_M2k::unload()
+{
+	QPluginLoader qp(FILENAME,this);
+	auto original = qobject_cast<Plugin*>(qp.instance());
+
+//	qp.unload();
+	QVERIFY(!qp.isLoaded() == false);
+
 }
 
 

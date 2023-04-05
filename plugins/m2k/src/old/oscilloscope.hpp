@@ -125,7 +125,7 @@ namespace adiscope::m2k {
 
 	public:
 		explicit Oscilloscope(struct iio_context *ctx, Filter *filt,
-				ToolMenuEntry *tme, QJSEngine *engine,
+				ToolMenuEntry *tme, m2k_iio_manager* m2k_man, QJSEngine *engine,
 				QWidget *parent = 0);
 		~Oscilloscope();
 

@@ -127,7 +127,7 @@ void SpectrumAnalyzer::initInstrumentStrings() {
 }
 
 SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
-				   ToolMenuEntry *tme,
+				   ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
 				   QJSEngine *engine, QWidget *parent):
 	M2kTool(ctx, tme, new SpectrumAnalyzer_API(this), "Spectrum Analyzer",
 	     parent),
@@ -175,7 +175,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 			m_generic_analogin = m_generic_context->getAnalogIn(0);
 			m_adc_nb_channels = m_generic_analogin->getNbChannels();
 		}
-		iio = iio_manager::get_instance(ctx, adc_name);
+		iio = m2k_man->get_instance(ctx, adc_name);
 
 		for (unsigned int i = 0; i < m_adc_nb_channels; i++) {
 			channel_names.push_back(
@@ -675,8 +675,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnHistory->setChecked(true);
 	ui->btnHistory->setVisible(false);
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(
-	                           TOOL_SPECTRUM_ANALYZER)));
+	api->setObjectName(Filter::tool_name(TOOL_SPECTRUM_ANALYZER));
 //	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
