@@ -11,7 +11,7 @@ include(GenerateExportHeader)
 # TODO: split stylesheet/resources and add here
 # TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -24,28 +24,61 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
+FILE(GLOB SRC_LIST
+	src/config/*.cpp
+	src/config/*.cc
+
+#	some of these will eventually be moved to the core/gui directories
+	src/refactoring/maincore/*
+	src/refactoring/maingui/*
+	src/refactoring/tool/*
+
+	src/runtime/ad74413r/*.cpp
+	src/runtime/ad74413r/*.cc
+
+	src/runtime/max14906/*.cpp
+	src/runtime/max14906/*.cc
+
+	src/runtime/faults/*.cpp
+	src/runtime/faults/*.cc
+
+	src/runtime/*.cpp
+
+	src/*.cpp
+	model/*
+)
+
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
 if(ENABLE_TESTING)
-    add_subdirectory(test)
+	add_subdirectory(test)
 endif()
 
 set(PROJECT_SOURCES
-        ${SRC_LIST}
-        ${HEADER_LIST}
-        ${UI_LIST}
+	${SRC_LIST}
+	${HEADER_LIST}
+	${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core )
-
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR}Concurrent REQUIRED)
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
 endif()
 
+if(ANDROID)
+	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
+else()
+	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
+endif()
+
+
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
+
 add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
+	${PROJECT_SOURCES}
+	${PROJECT_RESOURCES}
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
@@ -53,11 +86,13 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopypluginbase scopyiioutil)
+include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
 install(TARGETS ${PROJECT_NAME}
-    RUNTIME
-    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
+	RUNTIME
+	DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
 

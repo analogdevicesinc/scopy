@@ -41,6 +41,14 @@ namespace scopy {
 		explicit CustomSwitch(QWidget *parent = nullptr);
 		~CustomSwitch();
 
+                const QLabel &getOn() const;
+                void setOnText(const QString &on_);
+                void setOn(const QPixmap &pixmap);
+
+                const QLabel &getOff() const;
+                void setOffText(const QString &off_);
+                void setOff(const QPixmap &pixmap);
+
 	private:
 		QLabel on, off;
 		QWidget handle;
