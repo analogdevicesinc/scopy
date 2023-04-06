@@ -25,7 +25,10 @@ bool IIOPingTask::ping(iio_context *ctx) {
 
 	int ret = iio_device_get_trigger(dev, &test_device);
 
-	if (ret < 0 && ret != -ENOENT) {
+	//we accept ret to be EINVAL just for swiot plugin development process
+	//iio_device_get_trigger returns EINVAL which leads to a plugin disconnection
+	//after the problem is solved, "ret != -EINVAL" will be deleted
+	if (ret < 0 && ret != -ENOENT && ret != -EINVAL) {
 		return false;
 	}
 	return true;

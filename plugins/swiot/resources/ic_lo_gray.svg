@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="20px" viewBox="0 0 30 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs></defs>
+    <g id="main" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gating-icons" transform="translate(-820.000000, -500.000000)">
+            <g id="ic-lo-gray" transform="translate(835.000000, 509.500000) scale(1, -1) translate(-835.000000, -509.500000) translate(821.000000, 500.000000)">
+                <polyline id="Line-Copy-13" stroke="#4D4D54" stroke-width="2" stroke-linecap="square" points="0 0 14 0 28 0"></polyline>
+                <polygon id="H" fill="#4D4D54" points="8 19 8 5 20 5 20 7 10 6.93929059 10 19"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>
