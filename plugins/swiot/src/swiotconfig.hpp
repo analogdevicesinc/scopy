@@ -5,7 +5,7 @@
 
 #include "swiotconfigcontroller.hpp"
 #include "swiotconfigmenu.hpp"
-#include "src/tool/tool_view.hpp"
+#include "src/refactoring/tool/tool_view.hpp"
 #include <QPushButton>
 #include <QMap>
 

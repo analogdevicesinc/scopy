@@ -5,7 +5,7 @@
 #include "qcombobox.h"
 #include "qlabel.h"
 
-#include "gui/spinbox_a.hpp"
+#include "src/refactoring/maingui/spinbox_a.hpp"
 
 #include<QWidget>
 #include<string>

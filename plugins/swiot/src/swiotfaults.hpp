@@ -4,9 +4,9 @@
 #include "ui_swiotfaults.h"
 
 #include "faultspage.hpp"
-#include "src/tool/tool_view.hpp"
-#include "src/gui/generic_menu.hpp"
-#include "src/gui/channel_manager.hpp"
+#include "src/refactoring/tool/tool_view.hpp"
+#include "src/refactoring/maingui/generic_menu.hpp"
+#include "src/refactoring/maingui/channel_manager.hpp"
 
 #include <iio.h>
 

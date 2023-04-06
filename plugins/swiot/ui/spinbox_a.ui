@@ -138,7 +138,7 @@
   <customwidget>
    <class>adiscope::CompletionCircle</class>
    <extends>QDial</extends>
-   <header>src/gui/completion_circle.h</header>
+   <header>src/refactoring/maingui/completion_circle.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

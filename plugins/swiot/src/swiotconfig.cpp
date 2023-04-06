@@ -1,5 +1,5 @@
 #include "swiotconfig.hpp"
-#include "src/tool/tool_view_builder.hpp"
+#include "src/refactoring/tool/tool_view_builder.hpp"
 #include "swiotconfigcontroller.hpp"
 #include "swiotconfigmenu.hpp"
 #include "swiotconfigmodel.hpp"
@@ -67,11 +67,14 @@ void SwiotConfig::init()
 
 bool SwiotConfig::isConfigCtx()
 {
-	if (iio_device_find_attr(m_iioDevices[AD_NAME], "apply")
-			&& iio_device_find_attr(m_iioDevices[MAX_NAME], "apply")) {
-		return true;
+	bool config = false;
+	for (const auto &key : m_iioDevices.keys()) {
+		if (iio_device_find_attr(m_iioDevices[key], "apply")) {
+			config = true;
+			break;
+		}
 	}
-	return false;
+	return config;
 }
 
 void SwiotConfig::setDevices(iio_context* ctx)

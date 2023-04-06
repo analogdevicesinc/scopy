@@ -11,7 +11,7 @@ include(GenerateExportHeader)
 # TODO: split stylesheet/resources and add here
 # TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -58,15 +58,36 @@ FILE(GLOB SRC_LIST
 	src/swiotconfigmenu.*
 	src/swiotconfigmodel.*
 
+	src/swiotruntime.*
+	src/swiotad.*
+	src/swiotmodel.*
+	src/swiotadlogic.*
+	src/swiotadreaderthread.*
+	src/swiotadvmenu.*
+	src/swiotcontroller.*
+	src/swiotgenericmenu.*
+	src/swiotadreaderthread.*
+
 	src/gui/channel_widget.*
 	src/gui/channel_manager.*
 	src/gui/linked_button.*
 	src/gui/menu_anim.*
+	src/gui/measure.*
 	src/gui/apiobjectmanager.*
 
-	src/tool/*.cpp
-	src/tool/*.hpp
-	src/tool/*.h
+	src/refactoring/tool/*.cpp
+	src/refactoring/tool/*.hpp
+	src/refactoring/tool/*.h
+
+	src/refactoring/maincore/*.cpp
+	src/refactoring/maincore/*.hpp
+	src/refactoring/maincore/*.h
+
+	src/refactoring/maingui/*.cpp
+	src/refactoring/maingui/*.hpp
+	src/refactoring/maingui/*.h
+
+	src/captureplot/*
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
@@ -82,8 +103,8 @@ set(PROJECT_SOURCES
 	${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core )
-
+find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5Concurrent REQUIRED)
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
 endif()
@@ -95,7 +116,7 @@ else()
 endif()
 
 
-qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED
 	${PROJECT_SOURCES}
@@ -107,7 +128,9 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES})
+include_directories(${Qt5Concurrent_INCLUDE_DIRS})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

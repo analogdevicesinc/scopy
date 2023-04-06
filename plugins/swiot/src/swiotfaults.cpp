@@ -1,11 +1,11 @@
 #include "swiotfaults.hpp"
-#include "src/tool/tool_view_builder.hpp"
+#include "src/refactoring/tool/tool_view_builder.hpp"
 
 #include <QTimer>
 #include <QThread>
 
 #include <core/logging_categories.h>
-#include "src/gui/channel_manager.hpp"
+#include "src/refactoring/maingui/channel_manager.hpp"
 
 #define POLLING_INTERVAL 1000
 #define FAULT_CHANNEL_NAME "voltage"

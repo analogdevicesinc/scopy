@@ -5,18 +5,22 @@ using namespace adiscope;
 
 SwiotAdLogic::SwiotAdLogic(struct iio_device* iioDev) :
 	m_plotChnlsNo(0)
-      ,m_offset(0)
-      ,m_scale(0)
       ,m_iioDev(iioDev)
       ,m_iioBuff(nullptr)
 {
 	if (m_iioDev) {
+		iio_device_set_kernel_buffers_count(m_iioDev, MAX_KERNEL_BUFFER);
+		m_chnlsNumber = iio_device_get_channels_count(m_iioDev);
 		createChannels();
 	}
 }
 
 SwiotAdLogic::~SwiotAdLogic()
 {
+	if (m_chnlsInfo.size() > 0) {
+		qDeleteAll(m_chnlsInfo);
+		m_chnlsInfo.clear();
+	}
 }
 
 void SwiotAdLogic::createChannels()
@@ -25,83 +29,86 @@ void SwiotAdLogic::createChannels()
 		int chnlsNumber = iio_device_get_channels_count(m_iioDev);
 		int plotChnlsNo = 0;
 		bool isOutput = false;
-		bool first = true;
+		const QRegExp rx("[^0-9]+");
 		for (int i = 0; i < chnlsNumber; i++) {
 			struct iio_channel* iioChnl = iio_device_get_channel(m_iioDev, i);
+			struct chnlInfo* chnlInfo = new struct chnlInfo;
+			int chnlIdx = -1;
 			QString chnlId(iio_channel_get_id(iioChnl));
-			isOutput = iio_channel_is_output(iioChnl);
-			iio_channel_disable(iioChnl);
-			m_channels.insert(chnlId, iioChnl);
+			double offset = 0.0;
+			double scale = 0.0;
+			int erno = 0;
+			const auto&& parts = chnlId.split(rx);
 
-			plotChnlsNo = (!isOutput) ? plotChnlsNo + 1 : plotChnlsNo;
-			if (first && !isOutput) {
-				iio_channel_attr_read_double(iioChnl, "offset", &m_offset);
-				iio_channel_attr_read_double(iioChnl, "scale", &m_scale);
-				first = false;
+			iio_channel_disable(iioChnl);
+			isOutput = iio_channel_is_output(iioChnl);
+			erno = iio_channel_attr_read_double(iioChnl, "offset", &offset);
+			iio_channel_attr_read_double(iioChnl, "scale", &scale);
+			if (erno < 0) {
+				scale = -1;
+				offset = -1;
+			} else {
+				plotChnlsNo = (!isOutput) ? (plotChnlsNo + 1) : plotChnlsNo;
 			}
+			chnlInfo->chnlId = chnlId;
+			chnlInfo->iioChnl = iioChnl;
+			chnlInfo->isEnabled = false;
+			chnlInfo->isOutput = isOutput;
+			chnlInfo->offsetScalePair = {offset, scale};
+			if (parts.size() > 1) {
+				if(parts[1].compare("")){
+					chnlIdx = parts[1].toInt();
+					chnlIdx = (isOutput) ? (chnlIdx + m_chnlsNumber) : chnlIdx;
+				}
+			}
+			m_chnlsInfo[chnlIdx] = chnlInfo;
 		}
-//1 is the input channel used for FAULTS
-		m_plotChnlsNo = plotChnlsNo - 1;
+		m_plotChnlsNo = plotChnlsNo;
 	}
 
 }
 
-std::vector<struct iio_channel*> SwiotAdLogic::getChnlsByIndex(int chnlIdx)
+std::vector<std::pair<double, double>> SwiotAdLogic::getOffsetScaleVector()
 {
-	QString voltage("voltage" +QString::number(chnlIdx));
-	QString current("current" +QString::number(chnlIdx));
-	QString resistence("resistence" +QString::number(chnlIdx));
-	std::vector<struct iio_channel*> iioChnls;
+	std::vector<std::pair<double, double>> offsetScalePairs = {};
 
-	if (m_channels.contains(voltage)) {
-		iioChnls.push_back(m_channels[voltage]);
+	for (const auto &key : m_chnlsInfo.keys()) {
+		if (m_chnlsInfo[key]->isEnabled) {
+			offsetScalePairs.push_back(m_chnlsInfo[key]->offsetScalePair);
+		}
 	}
-	if (m_channels.contains(current)) {
-		iioChnls.push_back(m_channels[current]);
-	}
-	if (m_channels.contains(resistence)) {
-		iioChnls.push_back(m_channels[resistence]);
-	}
-
-	return iioChnls;
-
+	return offsetScalePairs;
 }
 
 struct iio_channel* SwiotAdLogic::getIioChnl(int chnlIdx, bool outputPriority)
 {
-	std::vector<struct iio_channel*> chnls = getChnlsByIndex(chnlIdx);
 	struct iio_channel* iioChnl = nullptr;
-	int chnlsNumber = chnls.size();
-	switch (chnlsNumber) {
-		case 1:
-			iioChnl = chnls.back();
-			break;
-		case 2:
-			if (outputPriority) {
-				iioChnl = (iio_channel_is_output(chnls.front())) ? chnls.front() : chnls.back();
-			} else {
-				iioChnl = (iio_channel_is_output(chnls.front())) ? chnls.back() : chnls.front();
-			}
-
-			break;
+	if (outputPriority) {
+		iioChnl = (m_chnlsInfo.contains(chnlIdx + m_chnlsNumber)) ?
+					m_chnlsInfo[chnlIdx + m_chnlsNumber]->iioChnl : m_chnlsInfo[chnlIdx]->iioChnl;
+	} else {
+		iioChnl = m_chnlsInfo[chnlIdx]->iioChnl;
 	}
+
 	return iioChnl;
 }
 
 void SwiotAdLogic::enableIioChnls(bool changes)
 {
-	if (changes && m_channels.size() > 0 && m_enabledChannels.size() > 0) {
-		for(int i = 0; i < m_enabledChannels.size(); i++) {
-			struct iio_channel* iioChnl = getIioChnl(i, false);
-			if (iioChnl) {
-				if (m_enabledChannels[i]) {
+	if (changes && m_chnlsInfo.size() > 0) {
+		for(const auto &key : m_chnlsInfo.keys()) {
+			struct iio_channel* iioChnl = m_chnlsInfo[key]->iioChnl;
+			bool isEnabled = iio_channel_is_enabled(iioChnl);
+			if (m_chnlsInfo[key]->isEnabled) {
+				if (!isEnabled) {
 					iio_channel_enable(iioChnl);
-					qDebug(CAT_SWIOT_RUNTIME) << "Chanel en " << i;
-
-				} else {
-					iio_channel_disable(iioChnl);
-					qDebug(CAT_SWIOT_RUNTIME) << "Chanel dis " << i;
 				}
+				qDebug(CAT_SWIOT_RUNTIME) << "Chanel en " << key;
+			} else {
+				if (isEnabled) {
+					iio_channel_disable(iioChnl);
+				}
+				qDebug(CAT_SWIOT_RUNTIME) << "Chanel dis " << key;
 			}
 		}
 	}
@@ -111,30 +118,37 @@ void SwiotAdLogic::enableIioChnls(bool changes)
 bool SwiotAdLogic::verifyEnableChanges(std::vector<bool> enabledChnls)
 {
 	bool changes = false;
-	if (m_enabledChannels.size() == 0) {
-		m_enabledChannels = enabledChnls;
-		changes = true;
-	} else {
-		changes = (m_enabledChannels == enabledChnls) ? false : true;
-		m_enabledChannels = enabledChnls;
+	for (int i = 0; i < enabledChnls.size(); i++) {
+		if (m_chnlsInfo.contains(i)) {
+			if (enabledChnls[i] != m_chnlsInfo[i]->isEnabled) {
+				m_chnlsInfo[i]->isEnabled = enabledChnls[i] ;
+				changes = true;
+			}
+		}
 	}
 	return changes;
 }
 
-void SwiotAdLogic::createIioBuffer(int bufferSize)
+void SwiotAdLogic::createIioBuffer(int sampleRate, double timespan)
 {
 	int enabledChnlsNo = getEnabledChnls();
+	int possibleBufferSize = sampleRate * timespan;
+	std::vector<std::pair<double, double>> offsetScaleValues = getOffsetScaleVector();
 	qInfo(CAT_SWIOT_RUNTIME) << "Enabled channels number: " + QString::number(enabledChnlsNo);
 	if (m_iioDev) {
-		m_iioBuff = iio_device_create_buffer(m_iioDev, bufferSize, false);
+		if(possibleBufferSize >= MAX_BUFFER_SIZE) {
+			m_iioBuff = iio_device_create_buffer(m_iioDev, MAX_BUFFER_SIZE, false);
+		} else {
+			m_iioBuff = iio_device_create_buffer(m_iioDev, MIN_BUFFER_SIZE, false);
+		}
 		if (m_iioBuff) {
 			qDebug(CAT_SWIOT_RUNTIME) << "Buffer created";
 		} else {
-			qDebug(CAT_SWIOT_RUNTIME) << "Buffer wasn't created";
+			qDebug(CAT_SWIOT_RUNTIME) << "Buffer wasn't created: " + QString(strerror(errno));
 		}
 	}
 
-	Q_EMIT bufferCreated(m_iioBuff, enabledChnlsNo, m_scale, m_offset);
+	Q_EMIT bufferCreated(m_iioBuff, enabledChnlsNo, offsetScaleValues);
 
 }
 
@@ -150,23 +164,11 @@ void SwiotAdLogic::destroyIioBuffer()
 int SwiotAdLogic::getEnabledChnls()
 {
 	int enChnls = 0;
-
-	for (const QString &key : m_channels.keys()) {
-		if (iio_channel_is_enabled(m_channels[key])) {
+	for (const auto &key : m_chnlsInfo.keys()) {
+		if (iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl)) {
 			enChnls++;
 		}
 	}
-
-	//to be deleted----------
-//	int verifyEnChannels = 0;
-//	if (m_enabledChannels.size() > 0) {
-//		verifyEnChannels = std::count(m_enabledChannels.begin(), m_enabledChannels.end(), true);
-//	}
-
-//	if (enChnls != verifyEnChannels) {
-//		qDebug(CAT_SWIOT_RUNTIME) << "Something went wrong";
-//	}
-	//------------------------
 
 	return enChnls;
 }

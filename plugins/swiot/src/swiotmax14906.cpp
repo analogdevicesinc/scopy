@@ -1,5 +1,5 @@
 #include "swiotmax14906.hpp"
-#include "src/tool/tool_view_builder.hpp"
+#include "src/refactoring/tool/tool_view_builder.hpp"
 
 using namespace adiscope;
 

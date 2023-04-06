@@ -8,6 +8,7 @@
 #include "swiotfaults.hpp"
 #include "swiotmax14906.hpp"
 #include "swiotconfig.hpp"
+#include "swiotruntime.hpp"
 #include <iioutil/contextprovider.h>
 
 using namespace adiscope;
@@ -69,9 +70,9 @@ bool SWIOTPlugin::compatible(QString m_param)
 	iio_context* ctx = cp->open(m_param);
 
 	if(!ctx) {
-                qWarning(CAT_SWIOT) << "No context available for swiot";
-                return false;
-        }
+		qWarning(CAT_SWIOT) << "No context available for swiot";
+		return false;
+	}
 
 	hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
 	if(!hw_serial.isEmpty())
@@ -96,9 +97,9 @@ bool SWIOTPlugin::onConnect()
 
 	config = new SwiotConfig(ctx);
 
-	runtime = new QWidget();
-	rungui = new Ui::SwiotRuntimeUI();
-	rungui->setupUi(runtime);
+	runtime = new SwiotRuntime(ctx);
+//	rungui = new Ui::SwiotRuntimeUI();
+//	rungui->setupUi(runtime);
 
 	faults = new SwiotFaults(ctx);
 
@@ -129,7 +130,7 @@ bool SWIOTPlugin::onConnect()
 //		Q_EMIT requestTool(m_toolList[0]->id());
 //	});
 
-	return false;
+	return true;
 }
 
 bool SWIOTPlugin::onDisconnect()

@@ -5,7 +5,7 @@
 #include <QTextEdit>
 #include "ui_faultsdevice.h"
 #include "faultsgroup.hpp"
-#include "gui/subsection_separator.hpp"
+#include "src/refactoring/maingui/subsection_separator.hpp"
 
 
 namespace adiscope::gui {

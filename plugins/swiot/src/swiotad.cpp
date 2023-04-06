@@ -1,5 +1,5 @@
 #include "swiotad.hpp"
-#include "src/tool/tool_view_builder.hpp"
+#include "src/refactoring/tool/tool_view_builder.hpp"
 #include "swiotgenericmenu.hpp"
 #include "swiotmodel.hpp"
 #include <iio.h>
@@ -7,10 +7,10 @@
 
 using namespace adiscope;
 
-SwiotAd::SwiotAd(QWidget* parent, ToolLauncher *toolLauncher, struct iio_device* iioDev, QVector<QString> chnlsFunc):
+SwiotAd::SwiotAd(QWidget* parent, struct iio_device* iioDev, QVector<QString> chnlsFunc):
 	m_iioDev(iioDev)
+      ,m_swiotAdLogic(nullptr)
       ,m_widget(parent)
-      ,m_testToggle(true)
 {
 	m_chnlsFunction = chnlsFunc;
 	m_enabledChannels = std::vector<bool>(m_chnlsFunction.size(), false);
@@ -32,18 +32,17 @@ SwiotAd::SwiotAd(QWidget* parent, ToolLauncher *toolLauncher, struct iio_device*
 		m_monitorChannelManager->setChannelIdVisible(false);
 		m_monitorChannelManager->setToolStatus("Channels");
 
-		m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
+		m_plot = new CapturePlot(m_widget, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
 		initPlot();
 
-		m_toolView = adiscope::gui::ToolViewBuilder(recipe, m_monitorChannelManager, toolLauncher).build();
+		m_toolView = adiscope::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
 		m_toolView->addFixedCentralWidget(m_plotWidget, 0, 0, 0, 0);
 		initMonitorToolView();
 
 		connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &SwiotAd::onRunBtnPressed);
-		connect(m_readerThread, &SwiotAdReaderThread::bufferRefilled, this, &SwiotAd::onBufferRefilled, Qt::DirectConnection);
+		connect(m_readerThread, &SwiotAdReaderThread::bufferRefilled, this, &SwiotAd::onBufferRefilled, Qt::QueuedConnection);
 		connect(m_swiotAdLogic, &SwiotAdLogic::bufferCreated, m_readerThread, &SwiotAdReaderThread::onBufferCreated);
 		connect(m_swiotAdLogic, &SwiotAdLogic::bufferDestroyed, m_readerThread, &SwiotAdReaderThread::onBufferDestroyed);
-		connect(this, &SwiotAd::chnlsStatusChanged, m_readerThread, &SwiotAdReaderThread::onChnlsStatusChanged, Qt::DirectConnection);
 	}
 }
 
@@ -64,8 +63,10 @@ void SwiotAd::initPlot()
 {
 	//the last 4 channels are for diagnostic
 	int plotChnlsNo = m_swiotAdLogic->getPlotChnlsNo();
-	qDebug(CAT_SWIOT_RUNTIME) << plotChnlsNo;
 	int configuredChnlsNo = plotChnlsNo / 2;
+
+	m_enabledPlots = std::vector<bool>(plotChnlsNo, false);
+
 	m_plot->registerSink("Active Channels", plotChnlsNo, 0);
 	m_plot->disableLegend();
 
@@ -84,13 +85,10 @@ void SwiotAd::initPlot()
 	m_gridPlot->addWidget(m_plot, 3, 1, 1, 1);
 	m_gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 
-	m_plot->setSampleRate(20, 1, "");
-	//number of curves; For TimeDomainDisplayPlot only
-//	m_plot->setLeftVertAxesCount(m_chnlsFunction.size());
+	m_plot->setSampleRate(m_sampleRate, m_timespan, "");
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
-	// by default is in us; in this way we set the x axis values between -5 and 5 seconds
-	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), -5.0, 5.0);
+	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
 
 	for (unsigned int i = 0; i < plotChnlsNo; i++) {
 		m_plot->Curve(i)->setAxes(
@@ -105,7 +103,8 @@ void SwiotAd::initPlot()
 		m_plot->DetachCurve(i);
 
 	}
-	m_plot->setOffsetInterval(-DBL_MAX, DBL_MAX);
+	m_plot->setAllYAxis(0, 20000);
+	m_plot->setOffsetInterval(__DBL_MIN__, __DBL_MAX__);
 }
 
 void SwiotAd::initMonitorToolView()
@@ -118,6 +117,7 @@ void SwiotAd::initMonitorToolView()
 	ChannelWidget *mainCh_widget =
 			m_toolView->buildNewChannel(m_monitorChannelManager, nullptr, false, mainChId, false, false,
 						    QColor("green"), deviceName, deviceName);
+	std::vector<ChannelWidget*> channelWidgetList;
 	//chId starts from 0
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
@@ -127,7 +127,7 @@ void SwiotAd::initMonitorToolView()
 
 			struct iio_channel* iioChnl = m_swiotAdLogic->getIioChnl(i, true);
 			SwiotAdModel* swiotModel = new SwiotAdModel(iioChnl);
-			SwiotController* controller = new SwiotController(menu, swiotModel);
+			SwiotController* controller = new SwiotController(menu, swiotModel, i);
 
 			controller->addMenuAttrValues();
 			if (controller) {
@@ -142,13 +142,13 @@ void SwiotAd::initMonitorToolView()
 				first = false;
 			}
 			controller->createConnections();
-			m_channelWidgetList.push_back(chWidget);
+			channelWidgetList.push_back(chWidget);
 			chId++;
 		}
 	}
 
-	m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget, m_channelWidgetList);
-	connectChnlsWidgesToPlot(m_channelWidgetList);
+	m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget, channelWidgetList);
+	connectChnlsWidgesToPlot(channelWidgetList);
 }
 
 void SwiotAd::connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList)
@@ -165,26 +165,24 @@ void SwiotAd::onChannelWidgetEnabled(bool en)
 {
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
 	int id = w->id();
-
+	int chnlIdx = m_controllers[id]->getChnlIdx();
 
 	if (en) {
 		m_plot->AttachCurve(id);
-		m_enabledChannels[id] = true;
+		m_enabledPlots[id] = true;
+		m_enabledChannels[chnlIdx] = true;
 		verifyChnlsChanges();
 	}
 	else {
 		m_plot->DetachCurve(id);
-		m_enabledChannels[id] = false;
+		m_enabledPlots[id] = false;
+		m_enabledChannels[chnlIdx] = false;
 		verifyChnlsChanges();
 	}
-	m_plot->replot();
 }
 
 void SwiotAd::onChannelWidgetSelected(bool checked)
 {
-//	if (!checked) {
-//		return;
-//	}
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
 	int id = w->id();
 	m_plot->setActiveVertAxis(id, true);
@@ -194,46 +192,31 @@ void SwiotAd::onChannelWidgetSelected(bool checked)
 void SwiotAd::onRunBtnPressed()
 {
 	if (m_toolView->getRunBtn()->isChecked()) {
-		double values[] =  {0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1,1.1,1.2,1.3,1.4,1.5,1.6,1.7,1.8,1.9,2};
-		double values1[] = {-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9,-1,-1.1,-1.2,-1.3,-1.4,-1.5,-1.6,-1.7,-1.8,-1.9,-2};
-		double values2[] = {2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8,2.9,3,3.1,3.2,3.3,3.4,3.5,3.6,3.7,3.8,3.9,4};
-		double values3[] = {-2.1,-2.2,-2.3,-2.4,-2.5,-2.6,-2.7,-2.8,-2.9,-3,-3.1,-3.2,-3.3,-3.4,-3.5,-3.6,-3.7,-3.8,-3.9,-4};
-		double values4[] = {};
-		std::vector<double*> dataPoints;
-		if (m_testToggle) {
-			dataPoints = {values, values1, values2, values3, values4, values4, values4, values4};
-		}
-		else{
-			dataPoints = {values1, values, values2, values3, values4, values4, values4, values4};
-		}
-
-		m_plot->plotNewData("Active Channels", dataPoints, 20, 1);
-		m_plot->replot();
 		verifyChnlsChanges();
-
 	} else {
 		m_readerThread->requestInterruption();
-		m_testToggle = !m_testToggle;
 	}
 }
 
-void SwiotAd::drawCurves(std::vector<double*> dataPoints)
+void SwiotAd::drawCurves(std::vector<double*> dataPoints, int numberOfPoints)
 {
-	int sampleRate = 60;
-	m_plot->plotNewData("Active Channels", dataPoints, sampleRate, 1);
-	m_plot->replot();
+	//1 is time interval; that variable is never used in plotNewData method
+	m_plot->plotNewData("Active Channels", dataPoints, numberOfPoints, 1);
 }
 
 void SwiotAd::verifyChnlsChanges()
 {
 	bool changes = m_swiotAdLogic->verifyEnableChanges(m_enabledChannels);
 	if (changes) {
-		Q_EMIT chnlsStatusChanged();
+		m_readerThread->requestInterruption();
+		m_readerThread->exit();
 		m_swiotAdLogic->destroyIioBuffer();
 		m_swiotAdLogic->enableIioChnls(changes);
-		m_swiotAdLogic->createIioBuffer(64);
+		m_swiotAdLogic->createIioBuffer(m_sampleRate, m_timespan);
+		resetPlot();
 	}
 	if (m_toolView->getRunBtn()->isChecked()) {
+		qDebug(CAT_SWIOT_RUNTIME) << "Start";
 		m_readerThread->start();
 	}
 
@@ -242,20 +225,37 @@ void SwiotAd::verifyChnlsChanges()
 void SwiotAd::onBufferRefilled(QVector<QVector<double>> bufferData)
 {
 	std::vector<double*> dataPoints;
+	int bufferDataSize = bufferData.size();
 	int j = 0;
-	double values[] = {};
 
-	for (int i = 0; i < m_channelWidgetList.size(); i++) {
-		qDebug(CAT_SWIOT_RUNTIME) << bufferData[i];
-		if (m_channelWidgetList[j]->isEnabled()) {
-			dataPoints.push_back(&bufferData[j][0]);
-			j++;
-		} else {
-			dataPoints.push_back(values);
+	qDebug(CAT_SWIOT_RUNTIME) << "Samples per buffer: " + QString::number(bufferData[0].size());
+
+	if (bufferDataSize > 0) {
+		for (int i = 0; i < m_enabledPlots.size(); i++) {
+			if (m_enabledPlots[i]) {
+				if (j < bufferDataSize) {
+					dataPoints.push_back(&bufferData[j][0]);
+					j++;
+				} else {
+					dataPoints.push_back(&bufferData[0][0]);
+				}
+
+			} else {
+				dataPoints.push_back(&bufferData[0][0]);
+			}
 		}
-
 	}
-	drawCurves(dataPoints);
+	drawCurves(dataPoints, bufferData[0].size());
+}
+
+//must be called when the sample rate or timespan are changed
+void SwiotAd::resetPlot()
+{
+	int sampleRate = 0;
+	sampleRate = m_timespan * m_sampleRate;
+	m_plot->setSampleRate(MAX_BUFFER_SIZE, 1, "");
+
+//	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timestamp);
 }
 
 adiscope::gui::ToolView* SwiotAd::getToolView()

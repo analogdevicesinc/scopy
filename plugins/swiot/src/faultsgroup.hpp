@@ -11,7 +11,7 @@
 #include <set>
 
 #include "src/faultwidget.hpp"
-#include "src/customcolqgridlayout.hpp"
+#include "src/refactoring/maincore/customcolqgridlayout.hpp"
 #include <core/logging_categories.h>
 #include "ui_faultsgroup.h"
 

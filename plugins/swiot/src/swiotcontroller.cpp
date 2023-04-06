@@ -3,8 +3,9 @@
 
 using namespace adiscope;
 
-SwiotController::SwiotController(adiscope::gui::SwiotGenericMenu* genericMenu, SwiotAdModel* model):
-	m_genericMenu(genericMenu)
+SwiotController::SwiotController(adiscope::gui::SwiotGenericMenu* genericMenu, SwiotAdModel* model, int chnlIdx):
+	m_chnlIdx(chnlIdx)
+      ,m_genericMenu(genericMenu)
       ,m_model(model)
 {}
 
@@ -34,4 +35,8 @@ void SwiotController::attributesChanged(QString attrName)
 
 }
 
+int SwiotController::getChnlIdx()
+{
+	return m_chnlIdx;
+}
 

@@ -2,7 +2,7 @@
 #define MAX14906SETTINGSTAB_H
 
 #include <QWidget>
-#include "gui/spinbox_a.hpp"
+#include "src/refactoring/maingui/spinbox_a.hpp"
 
 using namespace adiscope;
 

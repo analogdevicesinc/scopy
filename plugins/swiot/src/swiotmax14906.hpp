@@ -2,13 +2,13 @@
 #define MAX14906TOOL_HPP
 
 #include "ui_swiotmax14906.h"
-#include "customcolqgridlayout.hpp"
+#include "src/refactoring/maincore/customcolqgridlayout.hpp"
 #include "swiotmax14906controller.hpp"
 #include <core/logging_categories.h>
 #include "swiotdigitalchannelcontroller.h"
 #include "swiotmax14906readerthread.h"
 #include "swiotmax14906settingstab.h"
-#include "src/tool/tool_view.hpp"
+#include "src/refactoring/tool/tool_view.hpp"
 
 namespace adiscope {
 //#define POLLING_INTERVAL_MAX 1000

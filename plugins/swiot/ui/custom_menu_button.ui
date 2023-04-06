@@ -44,7 +44,7 @@
   <customwidget>
    <class>adiscope::CustomPushButton</class>
    <extends>QPushButton</extends>
-   <header>gui/customPushButton.hpp</header>
+   <header>gui/customPushButton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

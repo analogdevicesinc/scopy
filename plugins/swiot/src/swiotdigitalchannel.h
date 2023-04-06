@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include "ui_swiotdigitalchannel.h"
-#include "gui/generic_menu.hpp"
+#include "src/refactoring/maingui/generic_menu.hpp"
 #include <core/logging_categories.h>
 
 

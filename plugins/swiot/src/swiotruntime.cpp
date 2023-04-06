@@ -1,34 +1,31 @@
 #include "swiotruntime.hpp"
-#include <QtConcurrent>
-#include <QFuture>
 #include <string>
 #include <core/logging_categories.h>
 
 using namespace adiscope;
 
-SwiotRuntime::SwiotRuntime(struct iio_context *ctx, Filter *filt,
-			     ToolMenuItem *toolMenuItem,
-			     QJSEngine *engine, ToolLauncher *parent):
-	Tool(ctx, toolMenuItem, nullptr, "SwiotRuntime",parent),
-	m_toolView(nullptr)
+SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QWidget *parent):
+	QWidget(parent),
+	m_swiotRuntimeAd(nullptr), m_toolView(nullptr), m_triggerTimer(nullptr)
 {
-	run_button=nullptr;
-	int devicesNumber = iio_context_get_devices_count(ctx);
 	m_backBtn = createBackBtn();
-	for (int i = 0; i < devicesNumber; i++) {
-		struct iio_device* iioDev = iio_context_get_device(ctx, i);
-		if (iioDev) {
-			QString deviceName = QString(iio_device_get_name(iioDev));
-			m_iioDevices[deviceName] = iioDev;
-		}
-	}
+	createDevicesMap(ctx);
 
 	bool isRuntime = isRuntimeCtx();
 	if (isRuntime) {
 		qInfo(CAT_SWIOT_RUNTIME) <<"runtime context";
-		m_swiotRuntimeAd = new SwiotAd(this, parent, m_iioDevices[AD_NAME], channel_function);
+		if (m_iioDevices[AD_TRIGGER_NAME]) {
+			int retCode = iio_device_set_trigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME]);
+			qDebug(CAT_SWIOT_RUNTIME) <<"Trigger has been set: " + QString::number(retCode);
+		}
+
+		m_swiotRuntimeAd = new SwiotAd(this, m_iioDevices[AD_NAME], channel_function);
 		initAdToolView();
-		connect(m_backBtn, &QPushButton::pressed, this, &SwiotRuntime::backBtnPressed);
+
+		m_triggerTimer = new QTimer();
+		m_triggerTimer->start(TRIGGER_TIMER_MS);
+		connect(m_backBtn, &QPushButton::pressed, this, &SwiotRuntime::onBackBtnPressed);
+		connect(m_triggerTimer, SIGNAL(timeout()), this, SLOT(triggerPing()));
 	} else {
 		qDebug(CAT_SWIOT_RUNTIME) <<"isn't runtime context";
 	}
@@ -47,6 +44,11 @@ SwiotRuntime::~SwiotRuntime()
 		delete m_swiotRuntimeAd;
 		m_swiotRuntimeAd = nullptr;
 	}
+	if (m_triggerTimer) {
+		m_triggerTimer->stop();
+		delete m_triggerTimer;
+		m_triggerTimer = nullptr;
+	}
 
 }
 
@@ -54,7 +56,9 @@ void SwiotRuntime::initAdToolView()
 {
 	setToolView(m_swiotRuntimeAd->getToolView());
 	m_toolView->addTopExtraWidget(m_backBtn);
-	setCentralWidget(m_toolView);
+//	setCentralWidget(m_toolView);
+	this->setLayout(new QVBoxLayout());
+	this->layout()->addWidget(m_toolView);
 	qInfo(CAT_SWIOT_RUNTIME) << "Ad initialized";
 }
 
@@ -99,11 +103,42 @@ QPushButton* SwiotRuntime::createBackBtn()
 	return backBtn;
 }
 
-void SwiotRuntime::backBtnPressed()
+void SwiotRuntime::onBackBtnPressed()
 {
 	for (const auto &key : m_iioDevices.keys()) {
 		if (iio_device_find_attr(m_iioDevices[key], "back")) {
 			iio_device_attr_write_bool(m_iioDevices[key], "back", 1);
+		}
+	}
+
+	Q_EMIT backBtnPressed();
+}
+
+void SwiotRuntime::triggerPing()
+{
+	if (m_iioDevices[AD_NAME]) {
+		const iio_device* triggerDevice = nullptr;
+		int ret = iio_device_get_trigger(m_iioDevices[AD_NAME], &triggerDevice);
+
+		if (ret < 0 && m_iioDevices.contains(AD_TRIGGER_NAME)) {
+			iio_device_set_trigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME]);
+			qDebug(CAT_SWIOT_RUNTIME) << "Trigger has been set";
+		} else {
+			qDebug(CAT_SWIOT_RUNTIME) << QString::number(ret) +" returned";
+		}
+	}
+}
+
+void SwiotRuntime::createDevicesMap(struct iio_context *ctx)
+{
+	if (ctx) {
+		int devicesNumber = iio_context_get_devices_count(ctx);
+		for (int i = 0; i < devicesNumber; i++) {
+			struct iio_device* iioDev = iio_context_get_device(ctx, i);
+			if (iioDev) {
+				QString deviceName = QString(iio_device_get_name(iioDev));
+				m_iioDevices[deviceName] = iioDev;
+			}
 		}
 	}
 }

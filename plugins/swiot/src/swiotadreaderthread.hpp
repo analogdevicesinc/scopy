@@ -5,8 +5,7 @@
 #include <QObject>
 #include <qthread.h>
 #include <iio.h>
-
-
+#include <errno.h>
 
 extern "C" {
 	struct iio_device;
@@ -18,25 +17,19 @@ class SwiotAdReaderThread: public QThread
 	Q_OBJECT
 public:
 	SwiotAdReaderThread();
-	double convertData(unsigned int data);
+	double convertData(unsigned int data, int idx);
 public Q_SLOTS:
-	void onBufferCreated(struct iio_buffer* iioBuff, int enableChnlsNo, double scale, double offset);
+	void onBufferCreated(struct iio_buffer* iioBuff, int enableChnlsNo, std::vector<std::pair<double, double>> offsetScaleValues);
 	void onBufferDestroyed();
-	void onChnlsStatusChanged();
-
 Q_SIGNALS:
 	void bufferRefilled(QVector<QVector<double>> bufferData);
-
-
 private:
 	void run() override;
 
 	struct iio_buffer* m_iioBuff;
 	QVector<QVector<double>> m_bufferData;
+	std::vector<std::pair<double, double>> m_offsetScaleValues;
 	int m_enabledChnlsNo;
-	double m_scale;
-	double m_offset;
-	bool m_chnlsChanged;
 };
 
 #endif // SWIOTADREADERTHREAD_HPP

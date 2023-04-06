@@ -4,6 +4,19 @@
 #include <QObject>
 #include <QMap>
 #include <iio.h>
+#include <errno.h>
+
+#define MAX_BUFFER_SIZE 144
+#define MIN_BUFFER_SIZE 20
+#define MAX_KERNEL_BUFFER 64
+
+struct chnlInfo{
+	QString chnlId;
+	bool isOutput;
+	bool isEnabled;
+	std::pair<double, double> offsetScalePair;
+	struct iio_channel* iioChnl;
+};
 
 extern "C" {
 	struct iio_context;
@@ -21,31 +34,28 @@ public:
 		~SwiotAdLogic();
 
 		struct iio_channel* getIioChnl(int chnlIdx, bool outputPriotity);
-		void createIioBuffer(int bufferSize);
-		void enableIioChnls(bool changes);
-		void destroyIioBuffer();
-		bool verifyEnableChanges(std::vector<bool> enabledChnls);
 		int getEnabledChnls();
 		int getPlotChnlsNo();
 
+		void createIioBuffer(int sampleRate, double timestamp);
+		void destroyIioBuffer();
+		void enableIioChnls(bool changes);
+
+		bool verifyEnableChanges(std::vector<bool> enabledChnls);
 Q_SIGNALS:
-		void bufferCreated(struct iio_buffer* iioBuff, int enabledChnlsNo, double scale, double offset);
+		void bufferCreated(struct iio_buffer* iioBuff, int enabledChnlsNo, std::vector<std::pair<double, double>> offsetScaleValues);
 		void bufferDestroyed();
 
 private:
 		int m_plotChnlsNo;
-		double m_offset;
-		double m_scale;
+		int m_chnlsNumber;
 
+		QMap<int, struct chnlInfo*> m_chnlsInfo;
 		struct iio_device* m_iioDev;
 		struct iio_buffer* m_iioBuff;
 
-		QMap<QString, struct iio_channel*> m_channels;
-		std::vector<bool> m_enabledChannels;
-
 		void createChannels();
-		std::vector<struct iio_channel*> getChnlsByIndex(int chnlIdx);
-
+		std::vector<std::pair<double, double>> getOffsetScaleVector();
 	};
 }
 

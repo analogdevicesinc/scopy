@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 					 "Device.debug=true\n"
 					 "TestPlugin.debug=true\n"
 					 "Plugin.debug=true"
+                                         "swiotRuntime.debug=true"
 					 );
 
 	QCoreApplication::setOrganizationName("ADI");

@@ -2,7 +2,7 @@
 #define SWIOTGENERICMENU_H
 
 #include <QWidget>
-#include "gui/generic_menu.hpp"
+#include "src/refactoring/maingui/generic_menu.hpp"
 #include "swiotadvmenu.hpp"
 #include <QMap>
 #include <QObject>

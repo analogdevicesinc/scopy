@@ -626,30 +626,30 @@ QPushButton:checked { border-image: url(:/icons/setup_btn_checked.svg); }</strin
   <customwidget>
    <class>adiscope::MenuAnim</class>
    <extends>QWidget</extends>
-   <header location="global">src/gui/menu_anim.hpp</header>
+   <header location="global">src/refactoring/maingui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::InstrumentNotes</class>
    <extends>QWidget</extends>
-   <header location="global">src/tool/instrumentnotes.h</header>
+   <header location="global">src/refactoring/tool/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::RunSingleWidget</class>
    <extends>QWidget</extends>
-   <header location="global">src/tool/runsinglewidget.h</header>
+   <header location="global">src/refactoring/tool/runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::LinkedButton</class>
    <extends>QPushButton</extends>
-   <header location="global">src/gui/linked_button.hpp</header>
+   <header location="global">src/refactoring/maingui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::gui::SettingsPairWidget</class>
    <extends>QWidget</extends>
-   <header>src/tool/settings_pair_widget.hpp</header>
+   <header>src/refactoring/tool/settings_pair_widget.hpp</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

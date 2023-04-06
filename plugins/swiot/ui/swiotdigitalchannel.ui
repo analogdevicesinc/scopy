@@ -274,7 +274,7 @@
   <customwidget>
    <class>adiscope::CustomSwitch</class>
    <extends>QPushButton</extends>
-   <header>src/gui/customSwitch.hpp</header>
+   <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
    <class>QwtThermo</class>
@@ -284,18 +284,18 @@
   <customwidget>
    <class>adiscope::LcdNumber</class>
    <extends>QLCDNumber</extends>
-   <header>src/gui/lcdNumber.hpp</header>
+   <header>src/refactoring/maingui/lcdNumber.hpp</header>
   </customwidget>
   <customwidget>
    <class>adiscope::Sismograph</class>
    <extends>QFrame</extends>
-   <header>src/gui/sismograph.hpp</header>
+   <header>src/refactoring/maingui/sismograph.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>adiscope::CustomScale</class>
    <extends>QwtThermo</extends>
-   <header>src/gui/customScale.hpp</header>
+   <header>src/refactoring/maincore/customScale.hpp</header>
   </customwidget>
  </customwidgets>
  <resources/>
