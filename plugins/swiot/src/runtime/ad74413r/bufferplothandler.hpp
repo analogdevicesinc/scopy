@@ -3,7 +3,7 @@
 
 #include "src/captureplot/oscilloscope_plot.hpp"
 #include<qobject.h>
-#include "src/ad74413r/bufferlogic.hpp"
+#include "bufferlogic.hpp"
 #include <qmutex.h>
 #include <QWidget>
 

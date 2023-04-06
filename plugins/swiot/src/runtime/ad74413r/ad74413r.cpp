@@ -16,7 +16,8 @@ Ad74413r::Ad74413r(QWidget* parent, struct iio_device* iioDev, QVector<QString> 
 	m_enabledChannels = std::vector<bool>(m_chnlsFunction.size(), false);
 	if (m_iioDev) {
 		m_swiotAdLogic = new BufferLogic(m_iioDev);
-		m_readerThread = new BufferReaderThread(m_iioDev);
+		m_readerThread = new ReaderThread(true);
+                m_readerThread->addBufferedDevice(m_iioDev);
 
 		m_plotHandler = new BufferPlotHandler(parent, m_swiotAdLogic->getPlotChnlsNo());
 		m_enabledPlots = std::vector<bool>(m_swiotAdLogic->getPlotChnlsNo(), false);
@@ -43,10 +44,10 @@ Ad74413r::Ad74413r(QWidget* parent, struct iio_device* iioDev, QVector<QString> 
 		initMonitorToolView();
 
 		connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
-		connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &BufferReaderThread::onChnlsChange);
+		connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
 		connect(this, &Ad74413r::plotChnlsChanges, m_plotHandler, &BufferPlotHandler::onPlotChnlsChanges);
-		connect(m_readerThread, &BufferReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
-		connect(m_readerThread, &BufferReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
+		connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
+		connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
 
 		//general settings connections
 

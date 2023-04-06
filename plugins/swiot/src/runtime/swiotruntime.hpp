@@ -1,7 +1,7 @@
 #ifndef SWIOTRUNTIME_HPP
 #define SWIOTRUNTIME_HPP
 
-#include "src/ad74413r/ad74413r.hpp"
+#include "src/runtime/ad74413r/ad74413r.hpp"
 
 namespace adiscope {
 namespace gui {

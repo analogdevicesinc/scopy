@@ -92,10 +92,12 @@ FILE(GLOB SRC_LIST
 
 #	src/drawarea.*
 
-	src/ad74413r/*
+        src/runtime/ad74413r/*
 	src/config/*
-	src/faults/*
-	src/max14906/*
+        src/runtime/faults/*
+        src/runtime/max14906/*
+
+	src/runtime/*
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)

@@ -5,10 +5,10 @@
 #include <QDebug>
 #include <QUuid>
 
-#include "src/faults/faults.hpp"
-#include "src/max14906/max14906.hpp"
+#include "src/runtime/faults/faults.hpp"
+#include "src/runtime/max14906/max14906.hpp"
 #include "src/config/swiotconfig.hpp"
-#include "swiotruntime.hpp"
+#include "src/runtime/swiotruntime.hpp"
 #include <iioutil/contextprovider.h>
 
 using namespace adiscope;

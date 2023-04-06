@@ -5,7 +5,7 @@
 #include "src/refactoring/tool/tool_view.hpp"
 #include <qwidget.h>
 #include "bufferlogic.hpp"
-#include "bufferreaderthread.hpp"
+#include "src/runtime/readerthread.h"
 #include "buffermenucontroller.hpp"
 #include "src/refactoring/maingui/channel_manager.hpp"
 #include "src/captureplot/osc_export_settings.h"
@@ -86,7 +86,7 @@ private:
 	std::vector<bool> m_enabledPlots;
 
 	BufferLogic *m_swiotAdLogic;
-	BufferReaderThread *m_readerThread;
+	ReaderThread *m_readerThread;
 	BufferPlotHandler *m_plotHandler;
 
 	//--------GENERAL SETTINGS

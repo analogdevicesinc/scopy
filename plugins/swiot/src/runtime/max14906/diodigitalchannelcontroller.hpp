@@ -1,7 +1,7 @@
 #ifndef SCOPY_DIODIGITALCHANNELCONTROLLER_H
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
-#include "src/max14906/diodigitalchannel.hpp"
+#include "diodigitalchannel.hpp"
 #include "core/logging_categories.h"
 
 

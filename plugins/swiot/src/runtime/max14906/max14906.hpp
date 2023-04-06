@@ -5,8 +5,8 @@
 #include "src/refactoring/maincore/customcolqgridlayout.hpp"
 #include "diocontroller.hpp"
 #include "core/logging_categories.h"
-#include "src/max14906/diodigitalchannelcontroller.hpp"
-#include "dioreaderthread.h"
+#include "diodigitalchannelcontroller.hpp"
+#include "src/runtime/readerthread.h"
 #include "diosettingstab.h"
 #include "src/refactoring/tool/tool_view.hpp"
 
@@ -14,7 +14,6 @@ namespace adiscope::swiot {
 //#define POLLING_INTERVAL_MAX 1000
 class DioDigitalChannel;
 class DioController;
-class DioReaderThread;
 
 class Max14906 : public QWidget {
 	Q_OBJECT
@@ -45,7 +44,7 @@ private:
 	adiscope::gui::SubsectionSeparator *settingsWidgetSeparator;
 	QTimer *m_qTimer;
 
-	DioReaderThread *m_readerThread;
+	ReaderThread *m_readerThread;
 	QMap<int, DioDigitalChannelController*> m_channelControls;
 };
 }

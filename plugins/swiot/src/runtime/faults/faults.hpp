@@ -3,7 +3,7 @@
 
 #include "ui_swiotfaults.h"
 
-#include "src/faults/faultspage.hpp"
+#include "faultspage.hpp"
 #include "src/refactoring/tool/tool_view.hpp"
 #include "src/refactoring/maingui/generic_menu.hpp"
 #include "src/refactoring/maingui/channel_manager.hpp"

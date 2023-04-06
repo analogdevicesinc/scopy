@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QTextEdit>
 #include "ui_faultsdevice.h"
-#include "src/faults/faultsgroup.hpp"
+#include "faultsgroup.hpp"
 #include "src/refactoring/maingui/subsection_separator.hpp"
 
 

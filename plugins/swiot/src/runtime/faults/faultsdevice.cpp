@@ -1,7 +1,7 @@
 #include "faultsdevice.hpp"
 #include "core/logging_categories.h"
 #include <utility>
-#include "src/faults/faultsgroup.hpp"
+#include "faultsgroup.hpp"
 
 namespace adiscope::swiot {
 FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)

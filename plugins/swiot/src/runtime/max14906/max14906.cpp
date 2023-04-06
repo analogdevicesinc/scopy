@@ -8,7 +8,7 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	max14906ToolController(new DioController(ctx)),
 	ui(new Ui::Max14906),
 	m_qTimer(new QTimer(this)),
-	m_readerThread(new DioReaderThread()),
+	m_readerThread(new ReaderThread(false)),
 	m_customColGrid(new CustomColQGridLayout(4, true, this))
 {
 	this->ui->setupUi(this);
@@ -70,7 +70,7 @@ void Max14906::connectSignalsAndSlots() {
 	connect(this->m_qTimer, &QTimer::timeout, this, [&](){
 		this->m_readerThread->start();
 	});
-	connect(m_readerThread, &DioReaderThread::started, this, [&](){
+	connect(m_readerThread, &ReaderThread::started, this, [&](){
 		this->m_qTimer->start(1000);
 	});
 }
@@ -112,7 +112,7 @@ void Max14906::singleButtonToggled() {
 		this->m_toolView->getRunBtn()->setChecked(false);
 	}
 	this->m_qTimer->stop();
-	this->m_readerThread->singleRun();
+	this->m_readerThread->singleDio();
 	this->m_toolView->getSingleBtn()->setChecked(false);
 }
 
@@ -144,8 +144,8 @@ void Max14906::initChannels() {
 					);
 
 		this->m_channelControls.insert(i, channel_control);
-		this->m_readerThread->addChannel(i, channel);
-		connect(this->m_readerThread, &DioReaderThread::channelDataChanged, channel_control,
+		this->m_readerThread->addDioChannel(i, channel);
+		connect(this->m_readerThread, &ReaderThread::channelDataChanged, channel_control,
 			[this, i] (int index, double value){
 			if (i == index) {
 				this->m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);
