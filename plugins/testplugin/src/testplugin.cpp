@@ -103,7 +103,7 @@ bool TestPlugin::onConnect()
 	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
 	connect(btn2,&QPushButton::clicked,this,[=](){m_toolList[0]->setName("TestPlugin"+QString::number(renameCnt++));});
 	edit = new QLineEdit(tool);
-	pic->setStyleSheet("border-image: url(\":/testImage.png\") ");
+	pic->setStyleSheet("border-image: url(\":/testplugin/testImage.png\") ");
 	lay->addWidget(lbl);
 	lay->addWidget(pic);
 	lay->addWidget(edit);
@@ -161,7 +161,7 @@ void TestPlugin::loadSettings(QSettings &s)
 
 QString TestPlugin::about()
 {
-	QFile f(":/about.md");
+	QFile f(":/testplugin/about.md");
 	f.open(QFile::ReadOnly);
 	QString content = f.readAll();
 	return content;
