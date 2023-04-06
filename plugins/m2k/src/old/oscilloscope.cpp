@@ -2901,10 +2901,12 @@ void Oscilloscope::toggle_blockchain_flow(bool en)
 
 void Oscilloscope::run()
 {
+	ui->runSingleWidget->toggle(true);
 	runStopToggled(true);
 }
 void Oscilloscope::stop()
 {
+	ui->runSingleWidget->toggle(false);
 	runStopToggled(false);
 }
 
