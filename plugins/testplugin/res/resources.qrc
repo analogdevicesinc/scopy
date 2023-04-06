@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/">
+    <qresource prefix="/testplugin">
         <file>testImage.png</file>
         <file>about.md</file>
     </qresource>

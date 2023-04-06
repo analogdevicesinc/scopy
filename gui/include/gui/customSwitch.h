@@ -41,6 +41,11 @@ namespace adiscope {
 		explicit CustomSwitch(QWidget *parent = nullptr);
 		~CustomSwitch();
 
+                const QLabel &getOn() const;
+                void setOn(const QLabel &on_);
+                const QLabel &getOff() const;
+                void setOff(const QLabel &off_);
+
 	private:
 		QLabel on, off;
 		QWidget handle;

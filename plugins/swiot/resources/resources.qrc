@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/swiot">
+        <file>swiot_faults.json</file>
+    </qresource>
+</RCC>

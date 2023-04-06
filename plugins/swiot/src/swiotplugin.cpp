@@ -3,16 +3,26 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
-#include "ui_swiotInfoPage.h"
-#include "ui_swiotconfigui.h"
-#include "ui_swiotruntime.h"
 #include <QUuid>
 
-#include "iioutil/contextprovider.h"
+#include "swiotfaults.hpp"
+#include "swiotmax14906.hpp"
+#include "swiotconfig.hpp"
+#include <iioutil/contextprovider.h>
 
 using namespace adiscope;
 
 Q_LOGGING_CATEGORY(CAT_SWIOT,"SWIOTPlugin");
+
+Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_CONFIG)
+Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_RUNTIME)
+Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_FAULTS)
+Q_DECLARE_LOGGING_CATEGORY(CAT_MAX14906)
+
+Q_LOGGING_CATEGORY(CAT_SWIOT_CONFIG, "swiotConfig")
+Q_LOGGING_CATEGORY(CAT_SWIOT_RUNTIME, "swiotRuntime")
+Q_LOGGING_CATEGORY(CAT_SWIOT_FAULTS, "swiotFaults")
+Q_LOGGING_CATEGORY(CAT_MAX14906, "max14906tool")
 
 bool SWIOTPlugin::loadPage()
 {
@@ -38,27 +48,30 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOTConfig","SWIOT Config",""));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOTRuntime","SWIOT Runtime",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Runtime",""));
+        m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT MAX14906", ""));
+        m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Faults", ""));
 }
 
 void SWIOTPlugin::unload()
 {
-
 	delete infoui;
 }
 
 bool SWIOTPlugin::compatible(QString m_param)
 {
-	m_name = "abcd";
-	bool ret = false;
+	m_name = "SWIOT";
+	bool ret = true;
 	auto &&cp = ContextProvider::GetInstance();
 
 	QString hw_serial;
 	iio_context* ctx = cp->open(m_param);
 
-	if(!ctx)
-		return false;
+	if(!ctx) {
+                qWarning(CAT_SWIOT) << "No context available for swiot";
+                return false;
+        }
 
 	hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
 	if(!hw_serial.isEmpty())
@@ -81,29 +94,40 @@ bool SWIOTPlugin::onConnect()
 	connect(ping, &IIOPingTask::pingFailed, this, [=](){Q_EMIT disconnectDevice();} );
 	connect(ping, &IIOPingTask::pingSuccess, this, [=](){qDebug(CAT_SWIOT)<<"Ping Success";} );
 
-	config = new QWidget();
-	configui = new Ui::SWIOTConfigTool();
-	configui->setupUi(config);
+	config = new SwiotConfig(ctx);
+
 	runtime = new QWidget();
-	rungui = new Ui::SWIOTRuntime();
+	rungui = new Ui::SwiotRuntimeUI();
 	rungui->setupUi(runtime);
+
+	faults = new SwiotFaults(ctx);
+
+	maxtool = new Max14906Tool(ctx);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(config);
 
-//	m_toolList[1]->setEnabled(true);
+	m_toolList[1]->setEnabled(true);
 	m_toolList[1]->setTool(runtime);
 
-	connect(configui->pushButton,&QPushButton::clicked,this,[=](){
-		m_toolList[0]->setEnabled(false);
-		m_toolList[1]->setEnabled(true);
-		requestTool("SWIOTRuntime");
-	});
-	connect(rungui->pushButton,&QPushButton::clicked,this,[=](){
-		m_toolList[0]->setEnabled(true);
-		m_toolList[1]->setEnabled(false);
-		requestTool("SWIOTConfig");
-	});
+        m_toolList[2]->setEnabled(true);
+        m_toolList[2]->setTool(maxtool);
+
+        m_toolList[3]->setEnabled(true);
+        m_toolList[3]->setTool(faults);
+
+
+
+//	connect(configui->pushButton,&QPushButton::clicked,this,[=](){
+//		m_toolList[0]->setEnabled(false);
+//		m_toolList[1]->setEnabled(true);
+//		Q_EMIT requestTool(m_toolList[1]->id());
+//	});
+//	connect(rungui->pushButton,&QPushButton::clicked,this,[=](){
+//		m_toolList[0]->setEnabled(true);
+//		m_toolList[1]->setEnabled(false);
+//		Q_EMIT requestTool(m_toolList[0]->id());
+//	});
 
 	return false;
 }
@@ -114,17 +138,19 @@ bool SWIOTPlugin::onDisconnect()
 	auto &&cp = ContextProvider::GetInstance();
 	cp->close(m_param);
 
-
-	m_toolList[0]->setEnabled(false);
-	m_toolList[0]->setTool(nullptr);
-
-	m_toolList[1]->setEnabled(false);
-	m_toolList[1]->setTool(nullptr);
+        for (auto & tool : m_toolList) {
+                tool->setEnabled(false);
+                tool->setTool(nullptr);
+        }
 
 	delete configui;
 	delete rungui;
 	delete config;
 	delete runtime;
+        delete faultsgui;
+        delete faults;
+        delete maxtool;
+        delete maxgui;
 
 	return true;
 }

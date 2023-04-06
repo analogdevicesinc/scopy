@@ -1,0 +1,179 @@
+#include "swiotfaults.hpp"
+#include "src/tool/tool_view_builder.hpp"
+
+#include <QTimer>
+#include <QThread>
+
+#include <core/logging_categories.h>
+#include "src/gui/channel_manager.hpp"
+
+#define POLLING_INTERVAL 1000
+#define FAULT_CHANNEL_NAME "voltage"
+
+using namespace adiscope;
+
+SwiotFaults::SwiotFaults(struct iio_context *ctx, QWidget *parent) :
+	QWidget(parent),
+        ctx(ctx),
+	ui(new Ui::SwiotFaults),
+	timer(new QTimer()),
+	thread(new QThread(this)),
+	faultsPage(new adiscope::gui::FaultsPage(this)) {
+	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page";
+
+	ui->setupUi(this);
+
+	this->setupDynamicUi(parent);
+        this->connectSignalsAndSlots();
+}
+
+SwiotFaults::~SwiotFaults() {
+	if (this->thread->isRunning()) {
+		this->thread->quit();
+		this->thread->wait();
+	}
+	delete thread;
+	delete ui;
+}
+
+void SwiotFaults::setupDynamicUi(QWidget *parent) {
+	adiscope::gui::ToolViewRecipe recipe;
+	recipe.helpBtnUrl = "";
+	recipe.hasRunBtn = true;
+	recipe.hasSingleBtn = true;
+	recipe.hasPairSettingsBtn = true;
+	recipe.hasPrintBtn = false;
+	recipe.hasChannels = false;
+	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::HORIZONTAL;
+
+	this->m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager->setChannelIdVisible(false);
+
+	this->m_toolView = gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
+
+	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
+	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
+
+	this->m_toolView->addFixedCentralWidget(this->faultsPage,0,0,-1,-1);
+
+        this->ui->mainLayout->addWidget(m_toolView);
+	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
+}
+
+adiscope::gui::GenericMenu *SwiotFaults::createGeneralSettings(const QString &title, QColor *color) {
+	auto generalSettingsMenu = new adiscope::gui::GenericMenu(this);
+	generalSettingsMenu->initInteractiveMenu();
+	generalSettingsMenu->setMenuHeader(title, color, false);
+
+	auto *testLabel = new QLabel("coming soon");
+	auto *settingsWidgetSeparator = new adiscope::gui::SubsectionSeparator("MAX14906", false, this);
+	settingsWidgetSeparator->setContent(testLabel);
+	generalSettingsMenu->insertSection(settingsWidgetSeparator);
+
+	return generalSettingsMenu;
+}
+
+void SwiotFaults::connectSignalsAndSlots() {
+	QObject::connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this,
+			 &SwiotFaults::runButtonClicked);
+	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this,
+			 &SwiotFaults::singleButtonClicked);
+
+	QObject::connect(this->timer, &QTimer::timeout, this, &SwiotFaults::pollFaults);
+	QObject::connect(this->thread, &QThread::started, this, [&](){
+		qDebug(CAT_SWIOT_FAULTS) << "Faults reader thread started";
+		this->timer->start(POLLING_INTERVAL);
+	});
+}
+
+void SwiotFaults::getAd74413rFaultsNumeric()
+{
+	iio_device *dev = nullptr;
+	unsigned int devCount = iio_context_get_devices_count(ctx);
+	for (int i = 0; i < devCount; ++i) {
+		iio_device *aux = iio_context_get_device(ctx, i);
+		std::string name = iio_device_get_name(aux);
+		if (name == "ad74413r") {
+			dev = aux;
+			break;
+		}
+	}
+
+	if (dev == nullptr) {
+		qCritical(CAT_SWIOT_FAULTS) << "No device was found";
+		return;
+	}
+
+	iio_channel *chn = iio_device_find_channel(dev, FAULT_CHANNEL_NAME, false);
+	if (chn == nullptr) {
+		qCritical(CAT_SWIOT_FAULTS) << "Device is not found";
+		return;
+	}
+
+	char fau[100];
+	iio_channel_attr_read(chn, "raw", fau, 100);
+
+	qDebug(CAT_SWIOT_FAULTS) << "ad74413r_numeric: " << fau;
+	this->ad74413r_numeric = std::stoi(fau);
+}
+
+void SwiotFaults::getMax14906FaultsNumeric() {
+	iio_device *dev = nullptr;
+	unsigned int devCount = iio_context_get_devices_count(this->ctx);
+	for (int i = 0; i < devCount; ++i) {
+		iio_device *aux = iio_context_get_device(this->ctx, i);
+		std::string name = iio_device_get_name(aux);
+		if (name == "max14906") {
+			dev = aux;
+			break;
+		}
+	}
+
+	if (dev == nullptr) {
+		qCritical(CAT_SWIOT_FAULTS) << "No device was found";
+		return;
+	}
+
+	iio_channel *chn = iio_device_find_channel(dev, FAULT_CHANNEL_NAME, false);
+	if (chn == nullptr) {
+		qCritical(CAT_SWIOT_FAULTS) << "Device is not found";
+		return;
+	}
+
+	char fau[100];
+	iio_channel_attr_read(chn, "raw", fau, 100);
+
+	qDebug(CAT_SWIOT_FAULTS) << "max14906_numeric: " << fau;
+	this->max14906_numeric = std::stoi(fau);
+}
+
+void SwiotFaults::runButtonClicked() {
+        qDebug(CAT_SWIOT_FAULTS) << "Run button clicked";
+        this->m_toolView->getSingleBtn()->setChecked(false);
+        if (this->m_toolView->getRunBtn()->isChecked()) {
+                qWarning() << "thread started";
+                this->thread->start();
+        } else {
+                if (this->thread->isRunning()) {
+                        qWarning() << "thread stopped";
+                        this->thread->quit();
+                        this->thread->wait();
+                }
+                this->timer->stop();
+        }
+}
+
+void SwiotFaults::singleButtonClicked() {
+        qDebug(CAT_SWIOT_FAULTS) << "Single button clicked";
+        this->m_toolView->getRunBtn()->setChecked(false);
+        this->timer->stop();
+        this->pollFaults();
+        this->m_toolView->getSingleBtn()->setChecked(false);
+}
+
+void SwiotFaults::pollFaults() {
+        qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
+        this->getAd74413rFaultsNumeric();
+        this->getMax14906FaultsNumeric();
+        this->faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
+}
