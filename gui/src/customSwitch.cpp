@@ -130,4 +130,28 @@ void CustomSwitch::showEvent(QShowEvent *event)
 
 }
 
+const QLabel &CustomSwitch::getOn() const {
+        return on;
+}
+
+void CustomSwitch::setOnText(const QString &on_) {
+        this->on.setText(on_);
+}
+
+const QLabel &CustomSwitch::getOff() const {
+        return off;
+}
+
+void CustomSwitch::setOffText(const QString &off_) {
+        this->off.setText(off_);
+}
+
+void CustomSwitch::setOn(const QPixmap &pixmap) {
+        this->on.setPixmap(pixmap);
+}
+
+void CustomSwitch::setOff(const QPixmap &pixmap) {
+        this->off.setPixmap(pixmap);
+}
+
 #include "moc_customSwitch.cpp"
