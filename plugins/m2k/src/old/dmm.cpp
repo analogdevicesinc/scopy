@@ -892,12 +892,12 @@ void DMM::writeAllSettingsToHardware()
 
 void DMM::run()
 {
-	//ui->run_button->setChecked(true);
+	ui->run_button->setChecked(true);
 	toggleTimer(true);
 }
 
 void DMM::stop()
 {
-	//ui->run_button->setChecked(false);
+	ui->run_button->setChecked(false);
 	toggleTimer(false);
 }

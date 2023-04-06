@@ -1794,11 +1794,13 @@ void SpectrumAnalyzer::onReferenceChannelDeleted()
 
 void SpectrumAnalyzer::run()
 {
+	ui->runSingleWidget->toggle(true);
 	runStopToggled(true);
 }
 
 void SpectrumAnalyzer::stop()
 {
+	ui->runSingleWidget->toggle(false);
 	runStopToggled(false);
 }
 

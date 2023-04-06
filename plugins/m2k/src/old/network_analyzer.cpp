@@ -1695,10 +1695,12 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 
 void NetworkAnalyzer::run()
 {
+	ui->runSingleWidget->toggle(true);
 	startStop(true);
 }
 void NetworkAnalyzer::stop()
 {
+	ui->runSingleWidget->toggle(false);
 	startStop(false);
 }
 
