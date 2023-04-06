@@ -1445,6 +1445,7 @@ void SignalGenerator::loadFile()
 
 void SignalGenerator::start()
 {
+	ui->run_button->toggle(true);
 	m_running = true;
 
 	/* Avoid from being started twice */
@@ -1533,6 +1534,7 @@ void SignalGenerator::run()
 void SignalGenerator::stop()
 {
 	try {
+		ui->run_button->toggle(false);
 		buffers.clear();
 		m_running = false;
 		m_m2k_analogout->stop();
