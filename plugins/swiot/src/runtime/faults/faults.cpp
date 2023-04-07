@@ -41,7 +41,7 @@ void Faults::setupDynamicUi(QWidget *parent) {
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
-	recipe.hasPairSettingsBtn = true;
+	recipe.hasPairSettingsBtn = false;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = false;
 	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::HORIZONTAL;
@@ -51,8 +51,8 @@ void Faults::setupDynamicUi(QWidget *parent) {
 
 	this->m_toolView = gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
 
-	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
-	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
+//	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
+//	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
 	this->m_toolView->addFixedCentralWidget(this->faultsPage,0,0,-1,-1);
 
