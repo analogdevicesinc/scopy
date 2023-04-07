@@ -352,7 +352,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(sample_timer, SIGNAL(timeout()), this, SLOT(refreshCurrentSampleLabel()));
 
 	startStopRange = new StartStopRangeWidget(0);
-	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=](double start, double stop){
+	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=, this](double start, double stop){
 		fft_plot->setStartStop(start, stop);
 		fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		fft_plot->replot();
@@ -380,12 +380,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	});
 
 	connect(ui->cmb_rbw, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int index){
+		[=, this](int index){
 		startStopRange->setMinimumSpanValue(10 * sample_rate / bin_sizes[index]);
 	});
 
 	connect(ui->cmbGainMode, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int index){
+		[=, this](int index){
 
 		int crt_channel = channelIdOfOpenedSettings();
 		if (crt_channel >= m_adc_nb_channels || crt_channel < 0) {
@@ -475,7 +475,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->btnApply, SIGNAL(clicked()), this, SLOT(validateSpinboxAveraging()));
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
+		[=, this](bool checked){
 		tme->setRunning(checked);
 	});
 	connect(tme, &ToolMenuEntry::runToggled,
@@ -558,7 +558,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->logBtn, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::useLogFreq);
 	connect(ui->logBtn, &QPushButton::toggled,
-		[=](bool use_log_freq){
+		[=, this](bool use_log_freq){
 		startStopRange->setMinimumValue(use_log_freq);
 	});
 
@@ -575,11 +575,11 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	menuOrder.push_back(ui->btnSweep);
 
 
-	connect(ui->btnPrint, &QPushButton::clicked, [=](){
+	connect(ui->btnPrint, &QPushButton::clicked, [=, this](){
 		fft_plot->printWithNoBackground(api->objectName(), false);
 	});
 
-	connect(ui->btnSnapshot, &QPushButton::clicked, [=](){
+	connect(ui->btnSnapshot, &QPushButton::clicked, [=, this](){
 		QwtPlotCurve *curve = fft_plot->Curve(selected_ch_settings);
 		if (selected_ch_settings < 2) {
 			if (nb_ref_channels == MAX_REF_CHANNELS) {
@@ -1097,7 +1097,7 @@ void SpectrumAnalyzer::measure_panel_init() {
 	measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setValue);
 
     connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
-	[=](double v1, double v2){
+	[=, this](double v1, double v2){
 	measure_panel_ui->scrollArea_2->widget()->setFixedWidth(measure_panel_ui->scrollAreaWidgetContents->width());
     });
 
@@ -1510,14 +1510,14 @@ void SpectrumAnalyzer::cursor_panel_init()
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
 
-	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=, this](int value){
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		fft_plot->setCursorReadoutsTransparency(value);
 	});
 	cr_ui->horizontalSlider->setSliderPosition(0);
 
 	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
-		[=](CustomPlotPositionButton::ReadoutsPosition position){
+		[=, this](CustomPlotPositionButton::ReadoutsPosition position){
 		fft_plot->moveCursorReadouts(position);
 	});
 
@@ -2898,7 +2898,7 @@ void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(int index)
 	// The QwtPlot and ticks are not correctly repainted.
 	// This seems to be a timing issue.
 	// Need more investigation, this is a temporary hack.
-	QTimer::singleShot(20, [=](){
+	QTimer::singleShot(20, [=, this](){
 		switch (magType) {
 		case FftDisplayPlot::VPEAK:
 		case FftDisplayPlot::VRMS:

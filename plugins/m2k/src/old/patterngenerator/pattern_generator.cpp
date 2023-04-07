@@ -116,7 +116,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 		m_plotCurves.push_back(curve);
 
-		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(channelBox, &QCheckBox::toggled, [=, this](bool toggled){
 			m_plot.enableDigitalPlotCurve(i, toggled);
 			m_plot.setOffsetWidgetVisible(i, toggled);
 			m_plot.positionInGroupChanged(i, 0, 0);
@@ -890,7 +890,7 @@ void PatternGenerator::connectSignalsAndSlots()
 {
 
 	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
+		[=, this](bool checked){
 		disconnect(tme, &ToolMenuEntry::runToggled,
 			m_ui->runSingleWidget, &RunSingleWidget::toggle);
 		tme->setRunning(checked);
@@ -915,12 +915,12 @@ void PatternGenerator::connectSignalsAndSlots()
 		this, &PatternGenerator::channelSelectedChanged);
 
 
-	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
+	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=, this](double value) {
 		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
 
-	connect(m_ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(m_ui->traceHeightLineEdit, &QLineEdit::textChanged, [=, this](const QString &text){
 		auto validator = m_ui->traceHeightLineEdit->validator();
 		QString toCheck = text;
 		int pos;
@@ -930,23 +930,23 @@ void PatternGenerator::connectSignalsAndSlots()
 				   validator->validate(toCheck, pos) == QIntValidator::Intermediate);
 	});
 
-	connect(m_ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+	connect(m_ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=, this](){
 		int value = m_ui->traceHeightLineEdit->text().toInt();
 		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
 		m_plot.replot();
 		m_plot.positionInGroupChanged(m_selectedChannel, 0, 0);
 	});
 
-	connect(m_ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(m_ui->nameLineEdit, &QLineEdit::textChanged, [=, this](const QString &text){
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
 	});
 
-	connect(m_ui->printBtn, &QPushButton::clicked, [=](){
+	connect(m_ui->printBtn, &QPushButton::clicked, [=, this](){
 		m_plot.printWithNoBackground("Pattern Generator");
 	});
 
-	connect(m_singleTimer, &QTimer::timeout, [=](){
+	connect(m_singleTimer, &QTimer::timeout, [=, this](){
 		if (m_ui->runSingleWidget->singleButtonChecked()) {
 			m_ui->runSingleWidget->toggle(false);
 		}
@@ -986,7 +986,7 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 	m_currentGroupMenu = new BaseMenu(m_ui->groupWidget);
 	m_ui->groupWidgetLayout->addWidget(m_currentGroupMenu);
 
-	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
+	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=, this](short from, short to){
 		m_plot.positionInGroupChanged(m_selectedChannel, from, to);
 		channelInGroupChangedPosition(from, to);
 	});
@@ -1000,7 +1000,7 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
 		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged,
 				item, &LogicGroupItem::setName);
-		connect(item, &LogicGroupItem::deleteBtnClicked, [=](){
+		connect(item, &LogicGroupItem::deleteBtnClicked, [=, this](){
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
 
@@ -1032,7 +1032,7 @@ void PatternGenerator::setupPatterns()
 	m_ui->patternComboBox->addItems(PatternFactory::get_ui_list());
 
 	connect(m_ui->patternComboBox, &QComboBox::currentTextChanged,
-		[=](const QString &pattern){
+		[=, this](const QString &pattern){
 		patternSelected(pattern);
 	});
 }

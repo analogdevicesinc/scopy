@@ -43,7 +43,7 @@ OscCustomScrollArea::OscCustomScrollArea(QWidget *parent):
 
 	QScroller::scroller(this->viewport())->setScrollerProperties(properties);
 
-	connect(scroll, &QScroller::stateChanged, [=](QScroller::State newstate){
+	connect(scroll, &QScroller::stateChanged, [=, this](QScroller::State newstate){
 		if (disableCursor)
 				return;
 		switch (newstate) {
@@ -67,7 +67,7 @@ OscCustomScrollArea::OscCustomScrollArea(QWidget *parent):
 		}
 	});
 
-	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, [=](int v1, int v2){
+	connect(horizontalScrollBar(), &QScrollBar::rangeChanged, [=, this](int v1, int v2){
 		if (v2 - v1 == 0)
 			disableCursor = true;
 		else

@@ -232,7 +232,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		bufferPreviewer, &NetworkAnalyzerBufferViewer::sendBufferToOscilloscope);
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
+		[=, this](bool checked){
 		tme->setRunning(checked);
 	});
 	connect(tme, &ToolMenuEntry::runToggled,
@@ -241,7 +241,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		this, &NetworkAnalyzer::startStop);
 
 	connect(this, &NetworkAnalyzer::sweepDone,
-	[=]() {
+		[=, this]() {
 		if (ui->runSingleWidget->runButtonChecked()) {
 			thd = QtConcurrent::run(std::bind(&NetworkAnalyzer::goertzel, this));
 			return;
@@ -256,7 +256,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->rightMenu->setMaximumWidth(0);
 
 	connect(startStopRange, &StartStopRangeWidget::rangeChanged,
-		[=](double start, double stop){
+		[=, this](double start, double stop){
 		// Update plot settings
 		m_dBgraph.setXMin(start);
 		m_dBgraph.setXMax(stop);
@@ -264,7 +264,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		m_phaseGraph.setXMax(stop);
 
 		QMetaObject::invokeMethod(this,
-		    [=](){
+		    [=, this](){
 			    computeIterations();
 			    updateNumSamples(true);
 		    },
@@ -408,7 +408,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		&m_phaseGraph, SLOT(setYMax(double)));
 	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
 		&m_phaseGraph, SLOT(useLogFreq(bool)));
-	connect(ui->btnIsLog, &CustomSwitch::toggled, [=](bool value) {
+	connect(ui->btnIsLog, &CustomSwitch::toggled, [=, this](bool value) {
 		sampleStackedWidget->setCurrentIndex(value);
 		computeIterations();
 	});
@@ -512,26 +512,26 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_dBgraph.enableYaxisLabels();
 
 	connect(m_dBgraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
+		[=, this](double x)
 	{
 		m_phaseGraph.vBar1()->setPosition(x);
 	});
 
 	connect(m_dBgraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
+		[=, this](double x)
 	{
 		m_phaseGraph.vBar2()->setPosition(x);
 	});
 
 	//The inverse connection is neccesary for the change of the boundaries for sweep
 	connect(m_phaseGraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
+		[=, this](double x)
 	{
 		m_dBgraph.vBar1()->setPosition(x);
 	});
 
 	connect(m_phaseGraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
+		[=, this](double x)
 	{
 		m_dBgraph.vBar2()->setPosition(x);
 	});
@@ -566,7 +566,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::moveHandleAt,
 		&m_phaseGraph, &dBgraph::onFrequencyBarMoved);
 	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::indexChanged,
-		[=](int value) {
+		[=, this](int value) {
 		ui->currentFrequencyLabel->setVisible(true);
 		ui->currentSampleLabel->setVisible(true);
 		ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + value)
@@ -638,13 +638,13 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(ui->rightMenu, &MenuAnim::finished, this,
 		&NetworkAnalyzer::rightMenuFinished);
 
-	connect(ui->btnSettings, &CustomPushButton::toggled, [=](bool checked) {
+	connect(ui->btnSettings, &CustomPushButton::toggled, [=, this](bool checked) {
 		triggerRightMenuToggle(ui->btnSettings, checked);
 	});
-	connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=](bool checked) {
+	connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=, this](bool checked) {
 		triggerRightMenuToggle(ui->btnGeneralSettings, checked);
 	});
-	connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked) {
+	connect(ui->btnCursors, &CustomPushButton::toggled, [=, this](bool checked) {
 		triggerRightMenuToggle(ui->btnCursors, checked);
 	});
 	connect(ui->btnApplyAverage, SIGNAL(clicked()), this, SLOT(validateSpinboxAveraging()));
@@ -655,7 +655,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnCursors->setProperty("id",QVariant(-3));
 
 
-	connect(ui->horizontalSlider, &QSlider::valueChanged, [=](int value) {
+	connect(ui->horizontalSlider, &QSlider::valueChanged, [=, this](int value) {
 		ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		m_dBgraph.setCursorReadoutsTransparency(value);
 		m_phaseGraph.setCursorReadoutsTransparency(value);
@@ -676,7 +676,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		&m_phaseGraph,  &dBgraph::toggleCursors);
 
 	connect(ui->posSelect, &CustomPlotPositionButton::positionChanged,
-	[=](CustomPlotPositionButton::ReadoutsPosition position) {
+	[=, this](CustomPlotPositionButton::ReadoutsPosition position) {
 		m_dBgraph.moveCursorReadouts(position);
 		m_phaseGraph.moveCursorReadouts(position);
 	});
@@ -687,7 +687,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	wheelEventGuard->installEventRecursively(ui->mainWidget);
 
-	connect(ui->btnPrint, &QPushButton::clicked, [=]() {
+	connect(ui->btnPrint, &QPushButton::clicked, [=, this]() {
 		QWidget *widget = ui->stackedWidget->currentWidget();
 		QImage img(widget->width(), widget->height(), QImage::Format_ARGB32);
 		QPainter painter(&img);
@@ -729,7 +729,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		&m_dBgraph, &dBgraph::useDeltaLabel);
 	connect(ui->deltaBtn, &QPushButton::toggled,
 		&m_phaseGraph, &dBgraph::useDeltaLabel);
-	connect(ui->btnIsLog, &QPushButton::toggled, [=](bool checked) {
+	connect(ui->btnIsLog, &QPushButton::toggled, [=, this](bool checked) {
 		ui->deltaBtn->setDisabled(checked);
 
 		if (checked) {
@@ -739,7 +739,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 			ui->deltaBtn->setChecked(wasChecked);
 		}
 	});
-	connect(ui->dcFilterBtn, &QPushButton::toggled, [=](bool checked){
+	connect(ui->dcFilterBtn, &QPushButton::toggled, [=, this](bool checked){
 		if (checked != filterDc) {
 			filterDc = checked;
 			dc_cancel1->set_enabled(filterDc);
@@ -748,11 +748,11 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	});
 
 	connect(ui->responseGainCmb, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int value) {
+		[=, this](int value) {
 		autoAdjustGain = (value == 0);
 	});
 
-	connect(ui->snapshotBtn, &QCheckBox::clicked, [=](){
+	connect(ui->snapshotBtn, &QCheckBox::clicked, [=, this](){
 		m_hasReference = true;
 		bool didAddDbgraph = m_dBgraph.addReferenceWaveformFromPlot();
 		bool didAddPhasegraph = m_phaseGraph.addReferenceWaveformFromPlot();
@@ -762,13 +762,13 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 	});
 
-	connect(ui->removeReferenceBtn, &QPushButton::clicked, [=]() {
+	connect(ui->removeReferenceBtn, &QPushButton::clicked, [=, this]() {
 		m_dBgraph.removeReferenceWaveform();
 		m_phaseGraph.removeReferenceWaveform();
 		ui->removeReferenceBtn->setDisabled(true);
 	});
 
-	connect(ui->importBtn, &QPushButton::clicked, [=](){
+	connect(ui->importBtn, &QPushButton::clicked, [=, this](){
 		QString fileName = QFileDialog::getOpenFileName(this,
 		    tr("Import"), "", tr("Comma-separated values files (*.csv);;"
 					       "Tab-delimited values files (*.txt)"),
@@ -896,11 +896,11 @@ void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
 		double distance)
 {
 
-	connect(max, &SpinBoxA::valueChanged, [=](double value) {
+	connect(max, &SpinBoxA::valueChanged, [=, this](double value) {
 		min->setMaxValue(value - distance);
 //		min->setValue(min->value());
 	});
-	connect(min, &SpinBoxA::valueChanged, [=](double value) {
+	connect(min, &SpinBoxA::valueChanged, [=, this](double value) {
 		max->setMinValue(value + distance);
 //		max->setValue(max->value());
 	});

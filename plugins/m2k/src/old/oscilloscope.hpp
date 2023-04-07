@@ -505,7 +505,7 @@ namespace adiscope::m2k {
 		QMetaObject::Connection showLogicAnalyzerTriggerConnection;
 
 		QThreadPool hwSettingsThreadPool;
-		#define runInHwThreadPool(x) QtConcurrent::run(&hwSettingsThreadPool, std::bind([=]() {	x; } ))
+		#define runInHwThreadPool(x) QtConcurrent::run(&hwSettingsThreadPool, std::bind([=, this]() {	x; } ))
 
 	};
 }

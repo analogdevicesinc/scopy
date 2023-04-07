@@ -62,7 +62,7 @@ AnnotationCurve::AnnotationCurve(std::shared_ptr<logic::Decoder> initialDecoder)
 
     m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, initialDecoder));
 
-    connect(this, &AnnotationCurve::clicked, [=](const QPointF&p) {
+    connect(this, &AnnotationCurve::clicked, [=, this](const QPointF&p) {
         const auto result = annotationAt(p);
         if (result.isValid()) {
             Q_EMIT annotationClicked(result);
@@ -251,7 +251,7 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
 		box->setCurrentIndex(ch->bit_id + 1);
 	}
 
-        QObject::connect(box, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+	QObject::connect(box, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index){
            if (index == 0) {
                m_annotationDecoder->unassignChannel(ch->id);
            } else {
@@ -280,7 +280,7 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
 		qvbl->addWidget(getSubTitleFrame());
 		layout->addRow(qvbl);
 
-		connect(deleteBtn, &QPushButton::clicked, [=](){
+		connect(deleteBtn, &QPushButton::clicked, [=, this](){
 			m_classRows.clear();
 			m_annotationRows.clear();
 			m_annotationDecoder->unstackDecoder(dec);

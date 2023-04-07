@@ -386,7 +386,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 	ui->cbNoiseType->setItemData(SG_IMPULSE_NOISE, analog::GR_IMPULSE);
 
 	connect(ui->btnNoiseCollapse,&QPushButton::clicked,
-		[=](bool check) {
+		[=, this](bool check) {
 			ui->wNoise->setVisible(check);
 		});
 
@@ -499,7 +499,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	connect(ui->btnAppearanceCollapse, SIGNAL(toggled(bool)),ui->wAppearance, SLOT(setVisible(bool)));
 
-	connect(ui->btnSigGenAutoscale, &QPushButton::toggled, [=](bool checked){
+	connect(ui->btnSigGenAutoscale, &QPushButton::toggled, [=, this](bool checked){
 		m_plot->setAutoScale(checked);
 	});
 

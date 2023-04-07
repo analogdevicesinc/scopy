@@ -125,14 +125,14 @@ NyquistGraph::~NyquistGraph()
 
 void NyquistGraph::enableZooming(QPushButton *btnZoomIn, QPushButton *btnZoomOut)
 {
-	connect(btnZoomIn, &QPushButton::clicked, [=](){
+	connect(btnZoomIn, &QPushButton::clicked, [=, this](){
 		zoomer->zoomIn();
 		if (zoomer->isZoomed())
 			QApplication::setOverrideCursor(Qt::OpenHandCursor);
 		else
 			QApplication::setOverrideCursor(Qt::CrossCursor);
 	});
-	connect(btnZoomOut, &QPushButton::clicked, [=](){
+	connect(btnZoomOut, &QPushButton::clicked, [=, this](){
 		zoomer->zoomOut();
 		if (zoomer->isZoomed())
 			QApplication::setOverrideCursor(Qt::OpenHandCursor);

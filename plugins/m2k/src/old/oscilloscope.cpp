@@ -808,16 +808,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 		current_ch_widget = crt_chn_w_copy;
 	}
 
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=](){
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomIn, [=, this](){
 		zoom_level++;
 		plot.setTimeBaseZoomed(true);
 	});
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=](){
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomOut, [=, this](){
 		if (zoom_level != 0) zoom_level--;
 		if (zoom_level == 0)
 			plot.setTimeBaseZoomed(false);
 	});
-	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut) {
+	connect(plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=, this](bool isZoomOut) {
 		plot.setTimeBaseLabelValue(plot.HorizUnitsPerDiv());
 
 		for (size_t i = 0; i < nb_channels + nb_math_channels + nb_ref_channels; ++i) {
@@ -842,7 +842,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	});
 
 
-	connect(ch_ui->probe_attenuation_value, &QLineEdit::textChanged, this, [=](){
+	connect(ch_ui->probe_attenuation_value, &QLineEdit::textChanged, this, [=, this](){
 		double value = ch_ui->probe_attenuation_value->text().toDouble();
 		probe_attenuation[current_ch_widget] = value;
 		if (current_channel == current_ch_widget) {
@@ -946,7 +946,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	readPreferences();
 
 	connect(ui->printBtn, &QPushButton::clicked,
-		[=]() {
+		[=, this]() {
 		plot.printWithNoBackground(api->objectName());
 	});
 
@@ -1030,10 +1030,10 @@ bool Oscilloscope::isIioManagerStarted() const
 
 void Oscilloscope::init_buffer_scrolling()
 {
-	connect(&plot, &CapturePlot::canvasSizeChanged, [=](){
+	connect(&plot, &CapturePlot::canvasSizeChanged, [=, this](){
 		buffer_previewer->setFixedWidth(plot.width());
 	});
-	connect(buffer_previewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
+	connect(buffer_previewer, &BufferPreviewer::bufferMovedBy, [=, this](int value) {
 		reset_horiz_offset = false;
 		double moveTo = 0.0;
 		double min = plot.Curve(0)->sample(0).x();
@@ -1047,11 +1047,11 @@ void Oscilloscope::init_buffer_scrolling()
 		updateBufferPreviewer();
 		resetHistogramDataPoints();
 	});
-	connect(buffer_previewer, &BufferPreviewer::bufferStopDrag, [=](){
+	connect(buffer_previewer, &BufferPreviewer::bufferStopDrag, [=, this](){
 		horiz_offset = plot.HorizOffset();
 		reset_horiz_offset = true;
 	});
-	connect(buffer_previewer, &BufferPreviewer::bufferResetPosition, [=](){
+	connect(buffer_previewer, &BufferPreviewer::bufferResetPosition, [=, this](){
 		plot.setHorizOffset(time_trigger_offset);
 		plot.replot();
 		updateBufferPreviewer();
@@ -1131,7 +1131,7 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 	connect(channel_widget, SIGNAL(deleteClicked()),
 		SLOT(onChannelWidgetDeleteClicked()));
 	connect(channel_widget, &ChannelWidget::menuToggled,
-	[=](bool on) {
+	[=, this](bool on) {
 		if (!on) {
 			ch_ui->btnEditMath->setChecked(false);
 		}
@@ -1249,7 +1249,7 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	connect(channel_widget, SIGNAL(deleteClicked()),
 	        SLOT(onChannelWidgetDeleteClicked()));
 	connect(channel_widget, &ChannelWidget::menuToggled,
-	[=](bool on) {
+	[=, this](bool on) {
 		if (!on) {
 			ch_ui->btnEditMath->setChecked(false);
 		}
@@ -1473,7 +1473,7 @@ void Oscilloscope::enableMixedSignalView(ChannelWidget *cw)
 
 	QTabWidget *tb = qobject_cast<QTabWidget *>(m_mixedSignalViewMenu[0]);
 	showLogicAnalyzerTriggerConnection = connect(&trigger_settings, &TriggerSettings::showLogicAnalyzerTriggerSettings,
-						     this, [=](){
+						     this, [=, this](){
 		cw->menuButton()->setChecked(true);
 		tb->setCurrentIndex(tb->indexOf(m_mixedSignalViewMenu[1]));
 	});
@@ -1596,7 +1596,7 @@ void Oscilloscope::init_channel_settings()
 	connect(ch_ui->btnAutoset, &QPushButton::clicked, this,
 		&Oscilloscope::requestAutoset);
 
-	connect(ui->btnAddMath, &QPushButton::toggled, [=](bool on){
+	connect(ui->btnAddMath, &QPushButton::toggled, [=, this](bool on){
 		if (on && !addChannel) {
 			addChannel = true;
 			math_pair->first.btnAddChannel->setText(tr("Add Channel"));
@@ -1604,11 +1604,11 @@ void Oscilloscope::init_channel_settings()
 			ch_ui->btnAutoset->setVisible(autosetEnabled);
 		}
 	});
-	connect(ch_ui->lineStyle, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+	connect(ch_ui->lineStyle, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		plot.setPlotLineStyle(current_ch_widget, index);
 	});
 
-	connect(ch_ui->snapshotBtn, &QPushButton::clicked, [=](){
+	connect(ch_ui->snapshotBtn, &QPushButton::clicked, [=, this](){
 		ChannelWidget *cw = channelWidgetAtId(current_ch_widget);
 		if (current_ch_widget > 1 && cw->isReferenceChannel()) {
 			// export
@@ -2010,14 +2010,14 @@ void Oscilloscope::cursor_panel_init()
 	cr_ui->horizontalSlider->setMaximum(100);
 	cr_ui->horizontalSlider->setMinimum(0);
 	cr_ui->horizontalSlider->setSingleStep(1);
-	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=, this](int value){
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		plot.setCursorReadoutsTransparency(value);
 	});
 	cr_ui->horizontalSlider->setSliderPosition(0);
 
 	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
-		[=](CustomPlotPositionButton::ReadoutsPosition position){
+		[=, this](CustomPlotPositionButton::ReadoutsPosition position){
 		plot.moveCursorReadouts(position);
 	});
 }
@@ -2081,7 +2081,7 @@ void Oscilloscope::export_settings_init()
 	connect(exportSettings->getExportButton(), SIGNAL(clicked()), this,
 		SLOT(btnExport_clicked()));
 	connect(this, &Oscilloscope::activateExportButton,
-		[=](){
+		[=, this](){
 		exportSettings->enableExportButton(true);
 	});
 }
@@ -2190,14 +2190,14 @@ void Oscilloscope::create_add_channel_panel()
 	math_pair = new QPair<Ui::MathPanel, Math *>(math_ui, math);
 
 	connect(math, &Math::functionValid,
-	[=](const QString &function) {
+	[=, this](const QString &function) {
 		btn->setEnabled(true);
 		btn->setProperty("function",
 		                 QVariant(function));
 		lastFunctionValid = true;
 	});
 
-	connect(math, &Math::stateReseted, [=]() {
+	connect(math, &Math::stateReseted, [=, this]() {
 		btn->setEnabled(false);
 		lastFunctionValid = false;
 	});
@@ -2247,7 +2247,7 @@ void Oscilloscope::create_add_channel_panel()
 	refChannelTimeBase->setValue(1e-3);
 	refChannelTimeBase->setDisabled(true);
 
-	connect(refChannelTimeBase, &ScaleSpinButton::valueChanged, [=](double value){
+	connect(refChannelTimeBase, &ScaleSpinButton::valueChanged, [=, this](double value){
 		plot.updatePreview(value, timeBase->value(), timePosition->value());
 	});
 
@@ -2266,7 +2266,7 @@ void Oscilloscope::create_add_channel_panel()
 
 	tabWidget->addTab(logic, tr("Logic"));
 
-	connect(ui->mixedSignalBtn, &QPushButton::clicked, [=](){
+	connect(ui->mixedSignalBtn, &QPushButton::clicked, [=, this](){
 		if (!m_mixedSignalViewEnabled) {
 			ui->btnAddMath->click();
 			tabWidget->setCurrentIndex(tabWidget->indexOf(logic));
@@ -2284,7 +2284,7 @@ void Oscilloscope::create_add_channel_panel()
 
 	connect(btnOpenFile, &QPushButton::clicked, this, &Oscilloscope::import);
 
-	connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
+	connect(tabWidget, &QTabWidget::currentChanged, [=, this](int index) {
 		btn->setVisible(true);
         if (index == 0) {
             btn->setText(tr("Add channel"));
@@ -2306,7 +2306,7 @@ void Oscilloscope::create_add_channel_panel()
 	});
 
 	connect(btn, &QPushButton::clicked,
-	[=]() {
+	[=, this]() {
 
 		if (tabWidget->currentIndex() == 2) {
 
@@ -2328,7 +2328,7 @@ void Oscilloscope::create_add_channel_panel()
 			const int logicId = ui->stackedWidget->indexOf(ui->logicSettings);
 			logicAnalyzerChannelWidget->menuButton()->setProperty("id", QVariant(-logicId));
 
-			connect(logicAnalyzerChannelWidget->menuButton(), &QAbstractButton::toggled, [=](bool toggled){
+			connect(logicAnalyzerChannelWidget->menuButton(), &QAbstractButton::toggled, [=, this](bool toggled){
 				triggerRightMenuToggle(
 					static_cast<CustomPushButton *>(logicAnalyzerChannelWidget->menuButton()), toggled);
 			});
@@ -2337,7 +2337,7 @@ void Oscilloscope::create_add_channel_panel()
 
 			tabWidget->setTabEnabled(logicTab, false);
 
-			connect(logicAnalyzerChannelWidget->deleteButton(), &QAbstractButton::clicked, [=](){
+			connect(logicAnalyzerChannelWidget->deleteButton(), &QAbstractButton::clicked, [=, this](){
 
 				if (logicAnalyzerChannelWidget->menuButton()->isChecked()) {
 					menuButtonActions.removeAll(QPair<CustomPushButton*, bool>
@@ -2395,7 +2395,7 @@ void Oscilloscope::create_add_channel_panel()
 		}
 	});
 
-	connect(this, &Oscilloscope::importFileLoaded, [=](bool loaded) {
+	connect(this, &Oscilloscope::importFileLoaded, [=, this](bool loaded) {
 			btn->setEnabled(loaded);
 			importSettings->setEnabled(loaded);
 			fileLineEdit->setText(import_error);
@@ -2560,7 +2560,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	connect(channel_widget, SIGNAL(deleteClicked()),
 		SLOT(onChannelWidgetDeleteClicked()));
 	connect(channel_widget, &ChannelWidget::menuToggled,
-		[=](bool on){
+		[=, this](bool on){
 		if (!on)
 			ch_ui->btnEditMath->setChecked(false);
 	});
@@ -4502,7 +4502,7 @@ void Oscilloscope::measure_settings_init()
 
 	connect(ui->boxMeasure, SIGNAL(toggled(bool)),
 		&plot, SLOT(setMeasuremensEnabled(bool)));
-	connect(ui->boxMeasure, &QCheckBox::toggled, [=](bool on){
+	connect(ui->boxMeasure, &QCheckBox::toggled, [=, this](bool on){
 		cr_ui->readoutsWidget->setVisible(!on);
 	});
 }
@@ -4597,7 +4597,7 @@ void Oscilloscope::measure_panel_init()
 		measure_panel_ui->scrollArea_2->horizontalScrollBar(), &QScrollBar::setValue);
 
 	connect(measure_panel_ui->scrollArea->horizontalScrollBar(), &QScrollBar::rangeChanged,
-		[=](double v1, double v2){
+		[=, this](double v1, double v2){
 		measure_panel_ui->scrollArea_2->widget()->setFixedWidth(measure_panel_ui->scrollAreaWidgetContents->width());
 	});
 

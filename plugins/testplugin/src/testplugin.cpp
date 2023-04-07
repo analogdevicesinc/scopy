@@ -77,8 +77,8 @@ bool TestPlugin::loadExtraButtons()
 {
 	m_extraButtons.append(new QPushButton("Calibrate"));
 	m_extraButtons.append(new QPushButton("Register"));
-	connect(m_extraButtons[0],&QAbstractButton::clicked,this,[=](){edit->setText("Calibrating");});
-	connect(m_extraButtons[1],&QAbstractButton::clicked,this,[=](){edit->setText("Registering");});
+	connect(m_extraButtons[0],&QAbstractButton::clicked,this,[=, this](){edit->setText("Calibrating");});
+	connect(m_extraButtons[1],&QAbstractButton::clicked,this,[=, this](){edit->setText("Registering");});
 	return true;
 }
 

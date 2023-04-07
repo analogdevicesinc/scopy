@@ -54,15 +54,15 @@ ToolMenuItem* ToolMenu::addTool(QString id, QString name, QString icon, int posi
 	}
 	buttonGroup->addButton(t->getToolBtn());
 
-	connect(t->getToolBtn(), &QPushButton::clicked, this, [=](){
+	connect(t->getToolBtn(), &QPushButton::clicked, [=, this](){
 		Q_EMIT requestToolSelect(t->getId());
 	});
 
-	connect(t, &ToolMenuItem::doubleclick, this, [=](){
+	connect(t, &ToolMenuItem::doubleclick, [=, this](){
 		Q_EMIT requestDetach(t->getId());
 	});
 
-	connect(t->getToolBtn(), &QPushButton::toggled, this, [=](bool on){
+	connect(t->getToolBtn(), &QPushButton::toggled, [=, this](bool on){
 		if (buttonGroup->id(t->getToolBtn()) != -1) {
 			setDynamicProperty(t, "selected", on);
 		}

@@ -43,13 +43,13 @@ bool TestPluginIp::onConnect()
 	QPushButton *sendMessage = new QPushButton("SendMessage");
 	lay->addWidget(sendMessage);
 
-	connect(btn,&QPushButton::clicked,this,[=]() { requestTool(m_toolList[0]->id());});
+	connect(btn,&QPushButton::clicked,this,[=, this]() { requestTool(m_toolList[0]->id());});
 	connect(sendMessage,&QPushButton::clicked,this,[=]() {
 		MessageBroker::GetInstance()->publish("TestPlugin","testMessage");
 		MessageBroker::GetInstance()->publish("broadcast","testMessage");
 		MessageBroker::GetInstance()->publish("TestPlugin2","testMessage");
 	});
-	connect(disc,&QPushButton::clicked,this,[=]() { Q_EMIT disconnectDevice();});
+	connect(disc,&QPushButton::clicked,this,[=, this]() { Q_EMIT disconnectDevice();});
 
 	Q_EMIT toolListChanged();
 	m_toolList[1]->setTool(m_tool);

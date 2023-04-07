@@ -172,7 +172,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 					m_m2kDigital->getTrigger()->getDigitalCondition(i));
 		triggerBox->setCurrentIndex((condition + 1) % 6);
 
-		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 			m_m2kDigital->getTrigger()->setDigitalCondition(i,
 					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 		});
@@ -186,7 +186,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
 		connect(this, &LogicAnalyzer::dataAvailable, this,
-			[=](uint64_t from, uint64_t to, uint16_t* m_buffer){
+			[=, this](uint64_t from, uint64_t to, uint16_t* m_buffer){
 			if (!m_oscPlot) {
 				curve->dataAvailable(from, to, m_buffer);
 			}
@@ -194,7 +194,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		m_plotCurves.push_back(curve);
 
-		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(channelBox, &QCheckBox::toggled, [=, this](bool toggled){
 			m_plot.enableDigitalPlotCurve(i, toggled);
 			m_plot.setOffsetWidgetVisible(i, toggled);
 			m_plot.positionInGroupChanged(i, 0, 0);
@@ -205,7 +205,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	// decoder table dropdown menu
 	connect(ui->btnCollapseSettings,&QPushButton::clicked,
-		[=](bool check) {
+		[=, this](bool check) {
 			ui->wDecoderSettings_2->setVisible(check);
 		});
 	ui->btnCollapseSettings->click();
@@ -218,7 +218,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	m_plot.zoomBaseUpdate();
 
-	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=, this](double value){
 		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
 		onTimeTriggerValueChanged(static_cast<int>(delay));
 	});
@@ -320,7 +320,7 @@ void LogicAnalyzer::setData(const uint16_t * const data, int size)
 	Q_EMIT dataAvailable(0, size, m_buffer);
 
 //	if (m_oscPlot) {
-//		QMetaObject::invokeMethod(this, [=](){
+//		QMetaObject::invokeMethod(this, [=, this](){
 //			m_oscPlot->replot();
 //		}, Qt::QueuedConnection);
 //	}
@@ -414,12 +414,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 					m_m2kDigital->getTrigger()->getDigitalCondition(i));
 		triggerBox->setCurrentIndex((condition + 1) % 6);
 
-		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 			m_m2kDigital->getTrigger()->setDigitalCondition(i,
 					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 		});
 
-		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(channelBox, &QCheckBox::toggled, [=, this](bool toggled){
 			const int oscAnalogChannels = m_oscPlot->getAnalogChannels();
 			m_oscPlot->enableDigitalPlotCurve(i, toggled);
 			m_oscPlot->setOffsetWidgetVisible(i + oscAnalogChannels, toggled);
@@ -471,7 +471,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	QComboBox *stackDecoderComboBox = new QComboBox();
 	stackDecoderComboBox->setVisible(false);
-	auto updateButtonStackedDecoder = [=](){
+	auto updateButtonStackedDecoder = [=, this](){
 		if (m_oscChannelSelected < m_nbChannels) {
 			stackDecoderComboBox->setVisible(false);
 			return;
@@ -561,8 +561,8 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
-			this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
+		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable, this,
+			[=, this](uint64_t from, uint64_t to, uint16_t *buffer){
 			curve->dataAvailable(from, to, buffer);
 		}, Qt::DirectConnection);
 
@@ -591,7 +591,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		decoderBox->setVisible(true);
 		deleteBtn->setVisible(true);
 
-		connect(deleteBtn, &QPushButton::clicked, [=](){
+		connect(deleteBtn, &QPushButton::clicked, [=, this](){
 			decoderMenuItem->deleteLater();
 
 			int chIdx = m_oscPlotCurves.indexOf(curve);
@@ -638,7 +638,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		decoderComboBox->setCurrentIndex(0);
 
-		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(decoderBox, &QCheckBox::toggled, [=, this](bool toggled){
 			const int analogChannels = m_oscPlot->getAnalogChannels();
 			m_oscPlot->enableDigitalPlotCurve(analogChannels + m_nbChannels + itemsInLayout, toggled);
 			m_oscPlot->setOffsetWidgetVisible(analogChannels + m_nbChannels + itemsInLayout, toggled);
@@ -648,7 +648,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		int chId = m_oscPlotCurves.size() - 1;
 
-		connect(curve, &AnnotationCurve::decoderMenuChanged, [=](){
+		connect(curve, &AnnotationCurve::decoderMenuChanged, [=, this](){
 			if (m_oscChannelSelected != chId) {
 				return;
 			}
@@ -766,7 +766,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	comboBoxCondition->setDisabled(true);
 
-	connect(externalOnOff, &CustomSwitch::toggled, [=](bool on){
+	connect(externalOnOff, &CustomSwitch::toggled, [=, this](bool on){
 		if (on) {
 			comboBoxCondition->setEnabled(true);
 			m_m2kDigital->getTrigger()->setDigitalSource(SRC_TRIGGER_IN);
@@ -785,7 +785,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 				    ui->triggerComboBox->itemText(i));
 	}
 
-	connect(comboBoxCondition, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+	connect(comboBoxCondition, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index){
 		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
 					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 	});
@@ -798,7 +798,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	tabWidget->addTab(channelEnumerator, "General");
 	const int channelMenuTabId = tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
-	m_oscChannelSelectedConnection = connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
+	m_oscChannelSelectedConnection = connect(m_oscPlot, &CapturePlot::channelSelected, [=, this](int chIdx, bool selected){
 		chIdx -= m_oscAnalogChannels;
 		if (m_oscChannelSelected != chIdx && selected) {
 			m_oscChannelSelected = chIdx;
@@ -857,20 +857,20 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		updateButtonStackedDecoder();
 	});
 
-	connect(traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+	connect(traceHeightLineEdit, &QLineEdit::editingFinished, [=, this](){
 		int value = traceHeightLineEdit->text().toInt();
 		m_oscPlotCurves[m_oscChannelSelected]->setTraceHeight(value);
 		m_oscPlot->replot();
 		m_oscPlot->positionInGroupChanged(m_oscChannelSelected, 0, 0);
 	});
 
-	connect(traceColorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+	connect(traceColorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		QColor color(traceColorComboBox->currentText());
 		m_oscPlotCurves[m_oscChannelSelected]->setTraceColor(color);
 		m_oscPlot->replot();
 	});
 
-	connect(currentChannelTriggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+	connect(currentChannelTriggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		if (m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
 			QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
 													    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
@@ -878,7 +878,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		}
 	});
 
-	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
+	connect(tabWidget, &QTabWidget::currentChanged, [=, this](int index){
 		if (index == tabWidget->indexOf(currentChannelMenuScrollArea)) {
 			if (m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
 				currentChannelTriggerComboBox->setEnabled(true);
@@ -889,7 +889,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		}
 	});
 
-	connect(stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
+	connect(stackDecoderComboBox, &QComboBox::currentTextChanged, [=, this](const QString &text) {
 		if (m_oscChannelSelected < m_nbChannels) {
 			return;
 		}
@@ -1056,7 +1056,7 @@ void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 		ui->decoderTableView->blockSignals(true);
 		QFuture<void> future = QtConcurrent::run(std::bind(&LogicAnalyzer::waitForDecoders, this));
 		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-		connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+		connect(watcher, &QFutureWatcher<void>::finished, [=, this](){
 			if (ui->btnDecoderTable->isChecked()) {
 				ui->decoderTableView->blockSignals(false);
 				ui->decoderTableView->activate(true);
@@ -1424,7 +1424,7 @@ void LogicAnalyzer::setupUi()
 
 	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
-		[=](CustomPlotPositionButton::ReadoutsPosition position){
+		[=, this](CustomPlotPositionButton::ReadoutsPosition position){
 		m_plot.moveCursorReadouts(position);
 	});
 
@@ -1657,8 +1657,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
 //	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(clearSearch(int)));
 
-	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled, this,
-		[=](bool checked){
+	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled,
+		[=, this](bool checked){
 		if (checked) {
 			if (ui->decoderTableView->isActive()) {
 				ui->decoderTableView->blockSignals(true);
@@ -1666,7 +1666,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 				QFuture<void> future = QtConcurrent::run(std::bind(&LogicAnalyzer::waitForDecoders, this));
 				QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
-				connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+				connect(watcher, &QFutureWatcher<void>::finished, [=, this](){
 					ui->decoderTableView->blockSignals(false);
 					int currentCol = ui->decoderTableView->decoderModel()->getCurrentColumn();
 
@@ -1685,13 +1685,13 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(ui->groupOffsetSpinBox, SIGNAL(valueChanged(int)), ui->decoderTableView, SLOT(groupValuesChanged(int)));
 
 	connect(ui->searchBox, &QLineEdit::returnPressed,
-		[=](){
+		[=, this](){
 		QString text = ui->searchBox->text();
 		ui->decoderTableView->decoderModel()->searchBoxSlot(text);
 	});
 
 	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
+		[=, this](bool checked){
 		tme->setRunning(checked);
 //		if (!checked) {
 //			m_plot.setTriggerState(CapturePlot::Stop);
@@ -1708,7 +1708,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 
 	// TODO: can be moved away from here into on_cursorsBox_toggled
-	connect(ui->cursorsBox, &QCheckBox::toggled, [=](bool toggled){
+	connect(ui->cursorsBox, &QCheckBox::toggled, [=, this](bool toggled){
 		if (!toggled) {
 			// make sure to deselect the cursors button if
 			// the cursors are disabled
@@ -1721,7 +1721,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		}
 	});
 
-	connect(&m_plot, &CapturePlot::plotSizeChanged, [=](){
+	connect(&m_plot, &CapturePlot::plotSizeChanged, [=, this](){
 		m_bufferPreviewer->setFixedWidth(m_plot.canvas()->size().width());
 		m_plotScrollBar->setFixedHeight(m_plot.canvas()->size().height());
 	});
@@ -1732,14 +1732,14 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled,
 		&m_plot, &CapturePlot::setHorizCursorsLocked);
 
-	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=, this](int value){
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		m_plot.setCursorReadoutsTransparency(value);
 	});
 	// default: full transparency
 	cr_ui->horizontalSlider->setSliderPosition(100);
 
-	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
+	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=, this](bool isZoomOut){
 		updateBufferPreviewer(0, m_lastCapturedSample);
 	});
 
@@ -1748,7 +1748,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(m_bufferSizeButton, &ScaleSpinButton::valueChanged,
 		this, &LogicAnalyzer::onBufferSizeChanged);
 
-	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=, this](double value){
 		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
 		m_timePositionButton->setValue(static_cast<int>(delay));
 	});
@@ -1757,7 +1757,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		this, &LogicAnalyzer::onTimeTriggerValueChanged);
 
 
-	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
+	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=, this](double value) {
 		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
@@ -1765,12 +1765,12 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	connect(&m_plot, &CapturePlot::channelSelected,
 		this, &LogicAnalyzer::channelSelectedChanged);
 
-	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=, this](const QString &text){
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
 	});
 
-	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=, this](const QString &text){
 		auto validator = ui->traceHeightLineEdit->validator();
 		QString toCheck = text;
 		int pos;
@@ -1780,20 +1780,20 @@ void LogicAnalyzer::connectSignalsAndSlots()
 				   validator->validate(toCheck, pos) == QIntValidator::Intermediate);
 	});
 
-	connect(ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+	connect(ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=, this](){
 		int value = ui->traceHeightLineEdit->text().toInt();
 		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
 		m_plot.replot();
 		m_plot.positionInGroupChanged(m_selectedChannel, 0, 0);
 	});
 
-	connect(ui->traceColorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+	connect(ui->traceColorComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		QColor color(ui->traceColorComboBox->currentText());
 		m_plotCurves[m_selectedChannel]->setTraceColor(color);
 		m_plot.replot();
 	});
 
-	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		m_m2kDigital->getTrigger()->setDigitalCondition(m_selectedChannel,
 								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 		QLayout *widgetInLayout = ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8,
@@ -1803,7 +1803,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		triggerBox->setCurrentIndex(index);
 	});
 
-	connect(ui->stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
+	connect(ui->stackDecoderComboBox, &QComboBox::currentTextChanged, [=, this](const QString &text) {
 		if (m_selectedChannel < m_nbChannels) {
 			return;
 		}
@@ -1846,11 +1846,11 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		updateStackDecoderButton();
 	});
 
-	connect(ui->printBtn, &QPushButton::clicked, [=](){
+	connect(ui->printBtn, &QPushButton::clicked, [=, this](){
 		m_plot.printWithNoBackground("Logic Analyzer");
 	});
 
-	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex& index) {
+	connect(ui->decoderTableView, &DecoderTable::clicked, [=, this](const QModelIndex& index) {
 		// When a row is clicked in the decoder table, update the plot
 		// to zoom into the sample area that was clicked.
 		// qDebug() << "Decoder item clicked " << index << Qt::endl;
@@ -1965,11 +1965,11 @@ void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 
 void LogicAnalyzer::initBufferScrolling()
 {
-	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
+	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=, this](bool isZoomOut){
 		m_horizOffset = m_plot.HorizOffset();
 	});
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=, this](int value) {
 		m_resetHorizAxisOffset = false;
 		double moveTo = 0.0;
 		auto interval = m_plot.axisInterval(QwtAxis::XBottom);
@@ -1983,11 +1983,11 @@ void LogicAnalyzer::initBufferScrolling()
 		m_plot.replot();
 		updateBufferPreviewer(0, m_lastCapturedSample);
 	});
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, [=](){
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, [=, this](){
 		m_horizOffset = m_plot.HorizOffset();
 		m_resetHorizAxisOffset = true;
 	});
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=](){
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=, this](){
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 +
 				      (ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate));
 		m_plot.replot();
@@ -1998,7 +1998,7 @@ void LogicAnalyzer::initBufferScrolling()
 
 	// When the plot is clicked emit the clicked signal on the curve
 	m_plot.setMouseTracking(true);
-	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=](const QMouseEvent *event) {
+	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=, this](const QMouseEvent *event) {
 		if (event == nullptr) return;
 
 		if (event->button() == Qt::LeftButton) {
@@ -2124,7 +2124,7 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_lastCapturedSample = 0;
 
-		m_captureThread = new std::thread([=](){
+		m_captureThread = new std::thread([=, this](){
 
 			if (m_buffer) {
 				delete[] m_buffer;
@@ -2132,7 +2132,7 @@ void LogicAnalyzer::startStop(bool start)
 			}
 
 			m_buffer = new uint16_t[bufferSizeAdjusted];
-			QMetaObject::invokeMethod(this, [=](){
+			QMetaObject::invokeMethod(this, [=, this](){
 				m_exportSettings->enableExportButton(true);
 			}, Qt::DirectConnection);
 
@@ -2233,7 +2233,7 @@ void LogicAnalyzer::startStop(bool start)
 
 				try {
 					if (m_autoMode) {
-						QMetaObject::invokeMethod(this, [=](){
+						QMetaObject::invokeMethod(this, [=, this](){
 							m_timer->start(oneBufferTimeout);
 						});
 					}
@@ -2245,17 +2245,17 @@ void LogicAnalyzer::startStop(bool start)
 					totalSamples -= captureSize;
 
 					if (m_autoMode) {
-						QMetaObject::invokeMethod(this, [=](){
+						QMetaObject::invokeMethod(this, [=, this](){
 							m_timer->stop();
 						});
 					}
 
 					if (m_triggerState.empty()) {
-						QMetaObject::invokeMethod(this, [=](){
+						QMetaObject::invokeMethod(this, [=, this](){
 							m_triggerUpdater->setInput(CapturePlot::Triggered);
 						}, Qt::QueuedConnection);
 					} else {
-						QMetaObject::invokeMethod(this, [=](){
+						QMetaObject::invokeMethod(this, [=, this](){
 							m_triggerUpdater->setInput(CapturePlot::Auto);
 						}, Qt::QueuedConnection);
 					}
@@ -2322,7 +2322,7 @@ void LogicAnalyzer::startStop(bool start)
 			QMetaObject::invokeMethod(&m_plot,
 						  "replot");
 
-			QMetaObject::invokeMethod(this, [=](){
+			QMetaObject::invokeMethod(this, [=, this](){
 				m_exportSettings->enableExportButton(true);
 			}, Qt::DirectConnection);
 
@@ -2335,7 +2335,7 @@ void LogicAnalyzer::startStop(bool start)
 			// this issue we wait for acquisition to be started
 			{
 				std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
-				m_acquisitionStartedCv.wait(lock, [=]{ return m_acquisitionStarted; });
+				m_acquisitionStartedCv.wait(lock, [=, this]{ return m_acquisitionStarted; });
 			}
 
 			m_stopRequested = true;
@@ -2411,8 +2411,8 @@ void LogicAnalyzer::setupDecoders()
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
-			this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
+		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable, this,
+			[=, this](uint64_t from, uint64_t to, uint16_t *buffer){
 			if (!m_oscPlot) {
 				curve->dataAvailable(from, to, buffer);
 			}
@@ -2449,7 +2449,7 @@ void LogicAnalyzer::setupDecoders()
 		decoderBox->setVisible(true);
 		deleteBtn->setVisible(true);
 
-		connect(deleteBtn, &QPushButton::clicked, [=](){
+		connect(deleteBtn, &QPushButton::clicked, [=, this](){
 			decoderMenuItem->deleteLater();
 
 			int chIdx = m_plotCurves.indexOf(curve);
@@ -2495,7 +2495,7 @@ void LogicAnalyzer::setupDecoders()
 
 		ui->addDecoderComboBox->setCurrentIndex(0);
 
-		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(decoderBox, &QCheckBox::toggled, [=, this](bool toggled){
 			m_plot.enableDigitalPlotCurve(m_nbChannels + itemsInLayout, toggled);
 			m_plot.setOffsetWidgetVisible(m_nbChannels + itemsInLayout, toggled);
 			m_plot.positionInGroupChanged(m_nbChannels + itemsInLayout, 0, 0);
@@ -2504,7 +2504,7 @@ void LogicAnalyzer::setupDecoders()
 
 		decoderBox->setChecked(true);
 
-		connect(curve, &AnnotationCurve::decoderMenuChanged, [=](){
+		connect(curve, &AnnotationCurve::decoderMenuChanged, [=, this](){
 			if (m_selectedChannel != chId) {
 				return;
 			}
@@ -2520,7 +2520,7 @@ void LogicAnalyzer::setupDecoders()
 			updateStackDecoderButton();
 		});
 
-		connect(curve, &AnnotationCurve::annotationClicked, [=](AnnotationQueryResult result) {
+		connect(curve, &AnnotationCurve::annotationClicked, [=, this](AnnotationQueryResult result) {
 			if (!result.isValid() or !ui->decoderTableView->isActive()) return;
 			const auto model = ui->decoderTableView->decoderModel();
 			const auto col = model->indexOfCurve(curve);
@@ -2632,7 +2632,7 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 	m_currentGroupMenu = new BaseMenu(ui->groupWidget);
 	ui->groupWidgetLayout->addWidget(m_currentGroupMenu);
 
-	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
+	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=, this](short from, short to){
 		m_plot.positionInGroupChanged(m_selectedChannel, from, to);
 	});
 
@@ -2641,7 +2641,7 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
 		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged,
 				item, &LogicGroupItem::setName);
-		connect(item, &LogicGroupItem::deleteBtnClicked, [=](){
+		connect(item, &LogicGroupItem::deleteBtnClicked, [=, this](){
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
 
@@ -2668,7 +2668,7 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 
 void LogicAnalyzer::setupTriggerMenu()
 {
-	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
+	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=, this](bool toggled){
 		m_autoMode = toggled;
 		if (m_autoMode && m_started) {
 
@@ -2711,7 +2711,7 @@ void LogicAnalyzer::setupTriggerMenu()
 		ui->externalTriggerSourceComboBox->addItem(tr("External Trigger In"));
 		ui->externalTriggerSourceComboBox->addItem(tr("Oscilloscope"));
 
-		connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+		connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index){
 			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
 			if (index) { // oscilloscope
 			/* set external trigger condition to none if the source is
@@ -2727,13 +2727,13 @@ void LogicAnalyzer::setupTriggerMenu()
 			ui->externalTriggerConditionComboBox->setDisabled(index);
 		});
 
-		connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
+		connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
 						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 		});
 
 
-		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
+		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=, this](bool on){
 			if (on) {
 				const int source = ui->externalTriggerSourceComboBox->currentIndex();
 				const int condition = ui->externalTriggerConditionComboBox->currentIndex();

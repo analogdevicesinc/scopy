@@ -38,22 +38,22 @@ CustomPlotPositionButton::CustomPlotPositionButton(QWidget *parent) :
 
 	btns = new QButtonGroup(this);
 
-	connect(ui->leftTop, &QPushButton::toggled, [=](bool on){
+	connect(ui->leftTop, &QPushButton::toggled, [=, this](bool on){
 		setDynamicProperty(ui->leftTop, "selected" , on);
 		if (on)
 			Q_EMIT positionChanged(topLeft);
 	});
-	connect(ui->rightTop, &QPushButton::toggled, [=](bool on){
+	connect(ui->rightTop, &QPushButton::toggled, [=, this](bool on){
 		setDynamicProperty(ui->rightTop, "selected" , on);
 		if (on)
 			Q_EMIT positionChanged(topRight);
 	});
-	connect(ui->rightBot, &QPushButton::toggled, [=](bool on){
+	connect(ui->rightBot, &QPushButton::toggled, [=, this](bool on){
 		setDynamicProperty(ui->rightBot, "selected" , on);
 		if (on)
 			Q_EMIT positionChanged(bottomRight);
 	});
-	connect(ui->leftBot, &QPushButton::toggled, [=](bool on){
+	connect(ui->leftBot, &QPushButton::toggled, [=, this](bool on){
 		setDynamicProperty(ui->leftBot, "selected" , on);
 		if (on)
 			Q_EMIT positionChanged(bottomLeft);

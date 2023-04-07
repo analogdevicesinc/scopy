@@ -404,7 +404,7 @@ void DecoderTableModel::searchBoxSlot(QString text)
 	QFuture<void> future = QtConcurrent::run(std::bind(&DecoderTableModel::searchTable, this, text));
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
-	connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+	connect(watcher, &QFutureWatcher<void>::finished, [=, this](){
 		m_decoderTable->blockSignals(false);
 
 		beginResetModel();

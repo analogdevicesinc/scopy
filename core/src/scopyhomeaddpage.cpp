@@ -14,7 +14,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent) :
 
 
 	fw = new QFutureWatcher<bool>(this);
-	connect(fw,&QFutureWatcher<bool>::finished,this,[=](){
+	connect(fw,&QFutureWatcher<bool>::finished, this, [=, this](){
 //		ui->ctxInfoBrowser->setText(QString::fromLocal8Bit(iio_context_get_name(ctx)));
 		if(fw->result()==true) {
 			ui->btnVerify->setVisible(false);

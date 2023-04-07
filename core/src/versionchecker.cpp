@@ -70,7 +70,7 @@ void VersionCache::updateCache() {
 		m_nam = new QNetworkAccessManager(this);
 	QNetworkReply *reply = m_nam->get(QNetworkRequest(QString(url)));
 
-	connect(m_nam,&QNetworkAccessManager::finished,this,[=](QNetworkReply *r){
+	connect(m_nam,&QNetworkAccessManager::finished, [=, this](QNetworkReply *r){
 
 		QByteArray bytes = reply->readAll();
 		QString str = QString::fromUtf8(bytes.data(), bytes.size());

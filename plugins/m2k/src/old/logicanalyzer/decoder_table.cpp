@@ -131,7 +131,7 @@ void DecoderTable::exportData()
 	}
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
-	connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+	connect(watcher, &QFutureWatcher<void>::finished, [=, this](){
 		m_logicAnalyzer->setStatusLabel("");
 	});
 	connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));

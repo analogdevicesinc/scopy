@@ -40,7 +40,7 @@ cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
 {
 	_build_and_connect_blocks();
 
-	QObject::connect(&*d_signal, &signal_sample::triggered, [=](std::vector<float> samples){
+	QObject::connect(&*d_signal, &signal_sample::triggered, [=, this](std::vector<float> samples){
 		d_dc_offset = samples[0];
 	});
 }

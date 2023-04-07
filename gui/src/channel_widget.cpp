@@ -75,7 +75,7 @@ void ChannelWidget::init()
 		setStyleSheet(stylesheet);
 	} else {
 		connect(m_ui->name, &QPushButton::toggled,
-			[=] (bool checked) {
+			[=, this] (bool checked) {
 				setDynamicProperty(m_ui->widget, "selected",
 					checked);
 				setDynamicProperty(m_ui->line, "selected",

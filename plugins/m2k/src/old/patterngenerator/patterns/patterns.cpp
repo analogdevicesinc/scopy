@@ -1505,7 +1505,7 @@ UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
 
 	g_slist_free(decoderList);
 
-	connect(this, &UARTPatternUI::patternParamsChanged, [=](){
+	connect(this, &UARTPatternUI::patternParamsChanged, [=, this](){
 //		m_decoder->set_option();
 		qDebug() << "Update decoder params uart!";
 
@@ -2274,7 +2274,7 @@ SPIPatternUI::SPIPatternUI(SPIPattern *pattern,
 	g_slist_free(decoderList);
 
 
-	connect(this, &SPIPatternUI::patternParamsChanged, [=](){
+	connect(this, &SPIPatternUI::patternParamsChanged, [=, this](){
 //		m_decoder->set_option();
 		qDebug() << "Spi decoder params!";
 
@@ -3624,7 +3624,7 @@ void ImportPatternUI::build_ui(QWidget *parent,uint16_t number_of_channels)
 		importBtn->setDisabled(true);
 	}
 
-	connect(openFileBtn, &QPushButton::clicked, [=](){
+	connect(openFileBtn, &QPushButton::clicked, [=, this](){
 		QString fileName = QFileDialog::getOpenFileName(this,
 		    tr("Export"), "", tr("Comma-separated values files (*.csv);;"
 					       "Tab-delimited values files (*.txt)"),

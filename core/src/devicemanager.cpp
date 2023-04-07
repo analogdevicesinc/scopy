@@ -48,7 +48,7 @@ QString DeviceManager::addDevice(QString category, QString param)
 		});
 		dynamic_cast<QObject*>(d)->moveToThread(th);
 
-		connect(th,&QThread::destroyed, this,[=]() {
+		connect(th,&QThread::destroyed, this, [=, this]() {
 			d->moveToThread(QThread::currentThread());
 			d->setParent(this);
 			d->loadPlugins();

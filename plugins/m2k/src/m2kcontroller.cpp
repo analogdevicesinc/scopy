@@ -79,7 +79,7 @@ void M2kController::identify()
 	if(!identifyTask) {
 		identifyTask = new M2kIdentifyTask(uri);
 		identifyTask->start();
-		connect(identifyTask,&QThread::finished,this,[=](){
+		connect(identifyTask,&QThread::finished, this, [=, this](){
 			delete identifyTask;
 			identifyTask = nullptr;
 		});
@@ -101,7 +101,7 @@ void M2kController::calibrate()
 	QFutureWatcher<bool> *fw = new QFutureWatcher<bool>(this);
 	QFuture<bool> f = QtConcurrent::run(std::bind(&libm2k::context::M2k::calibrate,m_m2k));
 
-	connect(fw,&QFutureWatcher<bool>::finished,this,[=](){
+	connect(fw,&QFutureWatcher<bool>::finished, this, [=, this](){
 
 		if(fw->result()) {
 			Q_EMIT calibrationSuccess();

@@ -90,7 +90,7 @@ void LogicGroupItem::buildUi()
 	deleteBtn->setMaximumSize(QSize(16, 16));
 	connect(deleteBtn, &QPushButton::clicked,
 		this, &LogicGroupItem::deleteBtnClicked);
-	connect(deleteBtn, &QPushButton::clicked, [=](){
+	connect(deleteBtn, &QPushButton::clicked, [=, this](){
 		BaseMenu *menu = getOwner();
 
 		if (!menu) {

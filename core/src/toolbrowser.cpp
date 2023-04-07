@@ -22,11 +22,11 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
 
 
 
-    connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
-    connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
+    connect(ui->btnPreferences,&QPushButton::clicked,this,[=, this](){Q_EMIT requestTool("preferences");});
+    connect(ui->btnAbout,&QPushButton::clicked,this,[=, this](){Q_EMIT requestTool("about");});
 
-    connect(ui->btnSave,&QPushButton::clicked,this,[=](){Q_EMIT requestSave();});
-    connect(ui->btnLoad,&QPushButton::clicked,this,[=](){Q_EMIT requestLoad();});
+    connect(ui->btnSave,&QPushButton::clicked,this,[=, this](){Q_EMIT requestSave();});
+    connect(ui->btnLoad,&QPushButton::clicked,this,[=, this](){Q_EMIT requestLoad();});
 
     connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(requestTool(QString)));
 }
