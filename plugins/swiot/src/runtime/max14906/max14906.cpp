@@ -11,16 +11,23 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	m_readerThread(new ReaderThread(false)),
 	m_customColGrid(new CustomColQGridLayout(4, true, this))
 {
-	this->ui->setupUi(this);
-	this->setupDynamicUi(this);
+        iio_device* device0 = iio_context_get_device(ctx, 0);
+        if (iio_device_find_attr(device0, "back")) {
+                qInfo(CAT_SWIOT_RUNTIME) << "Initialising SWIOT MAX14906.";
 
-	this->m_qTimer->setInterval(1000); // poll once every second
-	this->m_qTimer->setSingleShot(true);
+                this->ui->setupUi(this);
+                this->setupDynamicUi(this);
 
-	this->initChannels();
-	this->initMonitorToolView();
-	this->ui->mainLayout->addWidget(m_toolView);
-	this->connectSignalsAndSlots();
+                this->m_qTimer->setInterval(1000); // poll once every second
+                this->m_qTimer->setSingleShot(true);
+
+                this->initChannels();
+                this->initMonitorToolView();
+                this->ui->mainLayout->addWidget(m_toolView);
+                this->connectSignalsAndSlots();
+        } else {
+                qInfo(CAT_SWIOT_RUNTIME) << "Could not initialize SWIOT MAX14906, the device seems to be in config mode.";
+        }
 }
 
 void Max14906::setupDynamicUi(QWidget *parent) {

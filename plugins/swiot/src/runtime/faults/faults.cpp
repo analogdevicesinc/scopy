@@ -17,14 +17,21 @@ Faults::Faults(struct iio_context *ctx, QWidget *parent) :
 	ctx(ctx),
 	ui(new Ui::Faults),
 	timer(new QTimer()),
-	thread(new QThread(this)),
-	faultsPage(new FaultsPage(this)) {
-	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page";
+	thread(new QThread(this)) {
 
-	ui->setupUi(this);
+        iio_device* device0 = iio_context_get_device(ctx, 0);
+        if (iio_device_find_attr(device0, "back")) {
+                m_faultsPage = new FaultsPage(this);
 
-	this->setupDynamicUi(parent);
-	this->connectSignalsAndSlots();
+                qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
+
+                ui->setupUi(this);
+
+                this->setupDynamicUi(parent);
+                this->connectSignalsAndSlots();
+        } else {
+                qInfo(CAT_SWIOT_FAULTS) << "Could not initialize SWIOT faults page, the device seems to be in config mode.";
+        }
 }
 
 Faults::~Faults() {
@@ -54,7 +61,7 @@ void Faults::setupDynamicUi(QWidget *parent) {
 //	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 //	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-	this->m_toolView->addFixedCentralWidget(this->faultsPage,0,0,-1,-1);
+	this->m_toolView->addFixedCentralWidget(m_faultsPage,0,0,-1,-1);
 
 	this->ui->mainLayout->addWidget(m_toolView);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
@@ -175,5 +182,5 @@ void Faults::pollFaults() {
 	qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
 	this->getAd74413rFaultsNumeric();
 	this->getMax14906FaultsNumeric();
-	this->faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
+	this->m_faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
 }

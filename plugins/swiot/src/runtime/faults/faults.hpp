@@ -37,9 +37,9 @@ private:
 	uint32_t max14906_numeric = 0;
 
 	adiscope::gui::ToolView *m_toolView{};
-	adiscope::gui::GenericMenu *m_generalSettingsMenu{};
+//	adiscope::gui::GenericMenu *m_generalSettingsMenu{};
 	adiscope::gui::ChannelManager *m_monitorChannelManager{};
-	FaultsPage *faultsPage{};
+	FaultsPage *m_faultsPage{};
 	void connectSignalsAndSlots();
 	void setupDynamicUi(QWidget *parent);
 
