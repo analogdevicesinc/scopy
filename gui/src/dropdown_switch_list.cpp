@@ -135,8 +135,6 @@ void DropdownSwitchList::addDropdownElement(const QIcon& icon,
 		m_model->setData(index, QVariant(1));
 		QStandardItem *item = m_model->item(m_rows, col);
 		item->setFlags(item->flags() & ~Qt::ItemIsSelectable);
-
-		m_treeView->openPersistentEditor(index);
 	}
 
 	m_rows++;

@@ -34,7 +34,7 @@ ExportSettings::ExportSettings(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	exportChannels = new DropdownSwitchList();
+	exportChannels = new DropdownSwitchList(1, this);
 	exportChannels->setTitle(tr("Channels"));
 	exportChannels->setColumnTitle(0, tr("Name"));
 	exportChannels->setColumnTitle(1, tr("Export"));

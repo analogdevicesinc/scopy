@@ -20,8 +20,8 @@
 
 #include "checkbox_delegate.h"
 
-#include <QApplication>
 #include <QCheckBox>
+#include <QAbstractItemView>
 
 using namespace adiscope;
 
@@ -63,6 +63,15 @@ void CheckboxDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 		val = 0;
 
 	model->setData(index, val, Qt::EditRole);
+}
+
+void CheckboxDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	QAbstractItemView *parentView = qobject_cast<QAbstractItemView*>(parent());
+	if (parentView) {
+		parentView->openPersistentEditor(index);
+	}
+	QStyledItemDelegate::paint(painter, option, index);
 }
 
 void CheckboxDelegate::commitDataToModel()
