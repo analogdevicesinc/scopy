@@ -9,11 +9,10 @@
 #include "scopycore_export.h"
 
 namespace adiscope {
+
 class SCOPYCORE_EXPORT ToolManager : public QObject
 {
 	Q_OBJECT
-
-
 public:
 	ToolManager(ToolMenu* tm, ToolStack *ts, QObject *parent = nullptr);
 	~ToolManager();
@@ -27,12 +26,18 @@ public Q_SLOTS:
 	void lockToolList(QString);
 	void unlockToolList(QString);
 
-	void updateToolEntry(ToolMenuEntry *tme, QString s);
+	void updateToolEntry(ToolMenuEntry *tme);
 	void updateToolEntry();
+	void updateToolAttached();
+
 	void updateTool();
 	void showTool(QString id);
+	void toggleAttach(QString id);
 
 private:
+	void saveToolGeometry(ToolMenuEntry *tme, QWidget *w);
+	void loadToolGeometry(ToolMenuEntry *tme, QWidget *w);
+
 	typedef struct {
 		QString id;
 		QList<ToolMenuEntry*> tools;

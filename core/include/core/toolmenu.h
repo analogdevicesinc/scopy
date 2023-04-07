@@ -51,8 +51,7 @@ public:
 	QButtonGroup *getButtonGroup() const;
 
 Q_SIGNALS:
-	void requestDetach(QString);
-	void requestAttach(QString);
+	void toggleAttach(QString);
 	void requestToolSelect(QString);
 
 public Q_SLOTS:
