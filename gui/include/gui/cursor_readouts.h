@@ -34,8 +34,8 @@ namespace Ui {
 	class CursorReadouts;
 }
 
-namespace SCOPYGUI_EXPORT adiscope {
-	class CursorReadouts: public QWidget
+namespace adiscope {
+	class SCOPYGUI_EXPORT CursorReadouts: public QWidget
 	{
 	public:
 		CursorReadouts(QwtPlot *plot);
