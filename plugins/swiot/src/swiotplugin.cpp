@@ -69,7 +69,7 @@ void SWIOTPlugin::unload()
 bool SWIOTPlugin::compatible(QString m_param)
 {
 	m_name = "SWIOT";
-	bool ret = true;
+	bool ret = false;
 	auto &&cp = ContextProvider::GetInstance();
 
 	QString hw_serial;
@@ -83,6 +83,23 @@ bool SWIOTPlugin::compatible(QString m_param)
 	hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
 	if(!hw_serial.isEmpty())
 		ret = true;
+
+
+	unsigned int devices_count = iio_context_get_devices_count(ctx);
+	if (devices_count == 2) {
+		iio_device* device0 = iio_context_get_device(ctx, 0);
+		iio_device* device1 = iio_context_get_device(ctx, 1);
+
+		std::string device0_name = iio_device_get_name(device0);
+		std::string device1_name = iio_device_get_name(device1);
+
+		if ((device0_name == "ad74413r" && device1_name == "max14906") || (device0_name == "max14906" && device1_name == "ad74413r")) {
+			ret = true;
+		}
+	} else {
+		ret = false;
+	}
+
 
 	cp->close(m_param);
 
