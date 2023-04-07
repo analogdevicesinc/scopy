@@ -13,6 +13,7 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "versionchecker.h"
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
@@ -108,6 +109,23 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
+	loadOpenGL();
+}
+
+void ScopyMainWindow::loadOpenGL() {
+	// https://bugreports.qt.io/browse/QTBUG-109462
+	// set surfaceFormat as in Qt example: HelloGL2 - https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/hellogl2/main.cpp?h=5.15#n81
+	QSurfaceFormat fmt;
+	fmt.setDepthBufferSize(24);
+
+	QSurfaceFormat::setDefaultFormat(fmt);
+
+	// This acts as a loader for the OpenGL context, our plots load and draw in the OpenGL context
+	// at the same time which causes some race condition and causes the app to hang
+	// with this workaround, the app loads the OpenGL context before any plots are created
+	// Probably there's a better way to do this
+	auto a = new QOpenGLWidget(this);
+	a->deleteLater();
 }
 
 void ScopyMainWindow::save() {

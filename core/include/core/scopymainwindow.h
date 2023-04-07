@@ -53,6 +53,8 @@ private:
     ToolManager *toolman;
 
     Ui::ScopyMainWindow *ui;
+
+    void loadOpenGL();
 };
 }
 #endif // SCOPYMAINWINDOW_H

@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
 	QCoreApplication::setApplicationName("Scopy-v2");
+	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts,true);
 
 	QApplication a(argc, argv);
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/default.qss"));
