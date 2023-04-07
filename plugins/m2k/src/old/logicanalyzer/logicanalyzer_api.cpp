@@ -272,9 +272,8 @@ QList<QStringList> LogicAnalyzer_API::getDecoderSettings() const
 				double d_val;
 
 				QVariant p_val = p->get();
-				auto type = p_val.type();
-				std::string type_name(p_val.typeName());
-				prop_type = QString::fromStdString(type_name);
+				int type = p_val.typeId();
+				prop_type = QString::number(type);
 				if (type == QMetaType::QString) {
 					prop_val = p_val.toString();
 					qDebug() << "Property string: " << prop_name;
@@ -365,47 +364,47 @@ void LogicAnalyzer_API::setDecoderSettings(const QList<QStringList> &decoderSett
 						QByteArray ba;
 						QVariant value_;
 
-						QString type = prop["type"].toString();
+						int type = prop["type"].toInt();
 						QString prop_name = prop["name"].toString();
 						QString prop_val = prop["val"].toString();
 
-						if (type == QMetaType::typeName(QMetaType::QString)) {
+						if (type == QMetaType::QString) {
 							ba = prop_val.toUtf8();
 							p->set(QVariant::fromValue(ba));
 							qDebug() << "Property string: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::Bool)) {
+						} else if (type == QMetaType::Bool) {
 							value_ = QVariant::fromValue(bool(prop_val.toInt()));
 							p->set(value_);
 							qDebug() << "Property boolean: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::Char)) {
+						} else if (type == QMetaType::Char) {
 							value_ = QVariant::fromValue(prop_val.toLatin1());
 							p->set(value_);
 							qDebug() << "Property char: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::Short)) {
+						} else if (type == QMetaType::Short) {
 							value_ = QVariant::fromValue<int16_t>(prop_val.toInt());
 							p->set(value_);
 							qDebug() << "Property int16: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::UShort)) {
+						} else if (type == QMetaType::UShort) {
 							value_ = QVariant::fromValue<uint16_t>(prop_val.toUInt());
 							p->set(value_);
 							qDebug() << "Property uint16: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::Int)) {
+						} else if (type == QMetaType::Int) {
 							value_ = QVariant::fromValue<int32_t>(prop_val.toInt());
 							p->set(value_);
 							qDebug() << "Property int32: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::UInt)) {
+						} else if (type == QMetaType::UInt) {
 							value_ = QVariant::fromValue<uint32_t>(prop_val.toUInt());
 							p->set(value_);
 							qDebug() << "Property uint32: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::Long)) {
+						} else if (type == QMetaType::Long) {
 							value_ = QVariant::fromValue<int64_t>(prop_val.toLong());
 							p->set(value_);
 							qDebug() << "Property int64: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::ULong)) {
+						} else if (type == QMetaType::ULong) {
 							value_ = QVariant::fromValue<uint64_t>(prop_val.toULong());
 							p->set(value_);
 							qDebug() << "Property uint64: " << prop_name;
-						} else if (type == QMetaType::typeName(QMetaType::Double)) {
+						} else if (type == QMetaType::Double) {
 							value_ = QVariant::fromValue(prop_val.toDouble());
 							p->set(value_);
 							qDebug() << "Property double: " << prop_name;

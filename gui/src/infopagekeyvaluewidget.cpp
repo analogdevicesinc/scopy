@@ -7,7 +7,6 @@ InfoPageKeyValueWidget::InfoPageKeyValueWidget(QString key, QString value, QWidg
 	QHBoxLayout *lay = new QHBoxLayout(this);
 
 	lay->setContentsMargins(0,0,0,0);
-	lay->setMargin(0);
 	lay->setSpacing(0);
 
 	keyWidget = new QLabel(key, this);

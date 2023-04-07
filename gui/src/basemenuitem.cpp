@@ -190,7 +190,7 @@ void BaseMenuItem::dropEvent(QDropEvent *event)
 		return;
 	}
 
-	bool dropAfter = d_botDragbox.contains(event->pos());
+	bool dropAfter = d_botDragbox.contains(event->position().toPoint());
 
 	if (event->mimeData()->hasFormat(menuItemMimeDataType)) {
 		short from = (short)event->mimeData()->data(menuItemMimeDataType)[1];

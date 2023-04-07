@@ -93,7 +93,7 @@ QWidget* Int::get_widget(QWidget *parent, bool auto_commit)
 	spin_box_ = new QSpinBox(parent);
 	spin_box_->setSuffix(suffix_);
 
-	QVariant::Type type = variant.type();
+	QMetaType::Type type = static_cast<QMetaType::Type>(variant.typeId());
 	assert(type);
 
 	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
@@ -151,7 +151,7 @@ void Int::update_widget()
 	QVariant variant = value_;
 	assert(variant.isValid());
 
-	QVariant::Type type = variant.type();
+	QMetaType::Type type = static_cast<QMetaType::Type>(variant.typeId());
 	assert(type);
 
 	int64_t int_val = 0;
@@ -187,7 +187,7 @@ void Int::commit()
 	QVariant variant = value_;
 	assert(variant.isValid());
 
-	QVariant::Type type = variant.type();
+	QMetaType::Type type = static_cast<QMetaType::Type>(variant.typeId());
 	assert(type);
 
 	auto spin_val = spin_box_->value();

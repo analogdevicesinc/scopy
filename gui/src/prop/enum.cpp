@@ -81,7 +81,7 @@ Enum::Enum(QString name, QString desc,
 
 	for (const pair<QVariant, QString> &v : values_) {
 		double value;
-		QMetaType::Type type = static_cast<QMetaType::Type>(v.first.type());
+		QMetaType::Type type = static_cast<QMetaType::Type>(v.first.typeId());
 		if (type == QMetaType::Double) {
 			value = v.first.toDouble();
 		} else {
@@ -211,7 +211,7 @@ void Enum::update_widget()
 
 		for (unsigned int i = 0; i < values_.size(); i++) {
 			const pair<QVariant, QString> &v = values_[i];
-			if (v.first.type() == QVariant::Double) {
+			if (v.first.typeId() == QVariant::Double) {
 				double a = variant.toDouble();
 				double b = v.first.toDouble();
 
@@ -248,7 +248,7 @@ void Enum::update_widget()
 
 		for (unsigned int i = 0; i < values_.size(); i++) {
 			const pair<QVariant, QString> &v = values_[i];
-			if (static_cast<QMetaType::Type>(v.first.type()) == QMetaType::Double) {
+			if (static_cast<QMetaType::Type>(v.first.typeId()) == QMetaType::Double) {
 				double a = variant.toDouble();
 				double b = v.first.toDouble();
 				if (abs(a - b) <= 2 * DBL_EPSILON) {

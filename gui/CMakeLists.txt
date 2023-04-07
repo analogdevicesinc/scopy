@@ -58,7 +58,7 @@ set(PROJECT_SOURCES
         ${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets OpenGL Svg REQUIRED)
 
 message(STATUS "Building scopy-gui")
 add_library(${PROJECT_NAME} SHARED
@@ -77,6 +77,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::OpenGL
+    Qt${QT_VERSION_MAJOR}::Svg
     ${QWT_LIBRARIES}
     gnuradio::gnuradio-runtime
     gnuradio::gnuradio-analog

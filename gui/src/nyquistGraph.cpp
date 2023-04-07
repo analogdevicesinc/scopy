@@ -280,7 +280,7 @@ void NyquistGraph::mouseReleaseEvent(QMouseEvent *event)
 	QwtPolarPlot::mouseReleaseEvent(event);
 }
 
-void NyquistGraph::enterEvent(QEvent *event)
+void NyquistGraph::enterEvent(QEnterEvent *event)
 {
 	if (zoomer->isZoomed())
 		QApplication::setOverrideCursor(Qt::OpenHandCursor);

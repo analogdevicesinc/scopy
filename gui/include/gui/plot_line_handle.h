@@ -52,7 +52,7 @@ Q_SIGNALS:
 	void reset();
 
 protected:
-	void enterEvent(QEvent *event);
+	void enterEvent(QEnterEvent *event);
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 

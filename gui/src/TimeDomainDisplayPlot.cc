@@ -199,7 +199,7 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
 
   QFont font;
   font.setPointSize(10);
-  font.setWeight(75);
+  font.setWeight(QFont::Bold);
   //d_zoomer->setTrackerFont(font);
 
 #if QWT_VERSION < 0x060000
@@ -620,7 +620,7 @@ TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 {
     QFont font;
     font.setPointSize(10);
-    font.setWeight(75);
+    font.setWeight(QFont::Bold);
 	d_zoomer[zoomerIdx]->setTrackerFont(font);
 
 	#if QWT_VERSION < 0x060000

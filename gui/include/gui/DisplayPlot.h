@@ -72,6 +72,7 @@
 #include "plotpickerwrapper.h"
 #include <QWidget>
 #include "scopygui_export.h"
+#include <qwt_plot_opengl_canvas.h>
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )

@@ -1571,7 +1571,8 @@ QString SpectrumAnalyzer::getReferenceChannelName() const
 		bool isOk = true;
 		for (const auto &ref_channel : referenceChannels) {
 			QString shortName = ref_channel->shortName();
-			int channel_counter = shortName.midRef(shortName.size() - 1).toInt();
+			QStringView mid = QStringView{shortName}.mid(shortName.size() - 1);
+			int channel_counter = mid.toInt();
 			if (current == channel_counter) {
 				isOk = false;
 				break;
@@ -1928,8 +1929,9 @@ void SpectrumAnalyzer::stop_blockchain_flow()
 	}
 }
 
-void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
+void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(int index)
 {
+	const QString s = ui->comboBox_type->itemText(index);
 	auto it = std::find_if(avg_types.begin(), avg_types.end(),
 	[&](const std::pair<QString, FftDisplayPlot::AverageType>& p) {
 		return p.first == s;
@@ -1976,8 +1978,9 @@ void SpectrumAnalyzer::on_comboBox_type_currentIndexChanged(const QString& s)
 	}
 }
 
-void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(const QString& s)
+void SpectrumAnalyzer::on_comboBox_window_currentIndexChanged(int index)
 {
+	const QString s = ui->comboBox_window->itemText(index);
 	auto it = std::find_if(win_types.begin(), win_types.end(),
 	[&](const std::pair<QString, FftWinType>& p) {
 		return p.first == s;
@@ -2815,8 +2818,9 @@ void SpectrumAnalyzer::singleCaptureDone()
 	}
 }
 
-void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(const QString& unit)
+void SpectrumAnalyzer::on_cmb_units_currentIndexChanged(int index)
 {
+	const QString unit = ui->cmb_units->itemText(index);
 	auto it = std::find_if(mag_types.begin(), mag_types.end(),
 	[&](const std::pair<QString, FftDisplayPlot::MagnitudeType>& p) {
 		return p.first == unit;

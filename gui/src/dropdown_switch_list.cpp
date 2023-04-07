@@ -177,7 +177,7 @@ void DropdownSwitchList::mousePressEvent(QMouseEvent *event)
 
 void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (!rect().contains(event->localPos().toPoint())) {
+	if (!rect().contains(event->position().toPoint())) {
 		return;
 	}
 
@@ -191,7 +191,7 @@ void DropdownSwitchList::mouseReleaseEvent(QMouseEvent *event)
 	}
 }
 
-void DropdownSwitchList::enterEvent(QEvent *event)
+void DropdownSwitchList::enterEvent(QEnterEvent *event)
 {
 	m_mouseInside = true;
 }

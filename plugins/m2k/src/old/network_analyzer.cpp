@@ -243,7 +243,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(this, &NetworkAnalyzer::sweepDone,
 	[=]() {
 		if (ui->runSingleWidget->runButtonChecked()) {
-			thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
+			thd = QtConcurrent::run(std::bind(&NetworkAnalyzer::goertzel, this));
 			return;
 		}
 
@@ -1397,7 +1397,7 @@ void NetworkAnalyzer::goertzel()
 				dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
 
 				QMetaObject::invokeMethod(this,
-							  "_saveChannelBuffers",
+							  (const char*)"_saveChannelBuffers",
 							  Qt::QueuedConnection,
 							  Q_ARG(double, frequency),
 							  Q_ARG(double, adc_rate),
@@ -1742,7 +1742,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 		bufferPreviewer->clear();
 		configHwForNetworkAnalyzing();
 		m_stop = false;
-		thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
+		thd = QtConcurrent::run(std::bind(&NetworkAnalyzer::goertzel, this));
 		ui->statusLabel->setText(tr("Running"));
 	} else {
 		ui->statusLabel->setText(tr("Stopping..."));

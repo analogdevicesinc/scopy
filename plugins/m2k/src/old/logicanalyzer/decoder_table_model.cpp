@@ -25,7 +25,7 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QHeaderView>
-#include <QRegExp>
+#include <QRegularExpression>
 
 namespace adiscope::m2k {
 
@@ -401,7 +401,7 @@ void DecoderTableModel::searchBoxSlot(QString text)
 	m_decoderTable->blockSignals(true);
 
 	m_logic->setStatusLabel("Searching ...");
-	QFuture<void> future = QtConcurrent::run(this, &DecoderTableModel::searchTable, text);
+	QFuture<void> future = QtConcurrent::run(std::bind(&DecoderTableModel::searchTable, this, text));
 	QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
 	connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
@@ -423,7 +423,7 @@ void DecoderTableModel::searchTable(QString text)
 	searchMask.clear();
 
 	if (!searchString.isEmpty()) {
-		QRegExp rx =  QRegExp(searchString, Qt::CaseInsensitive);
+		QRegularExpression rx =  QRegularExpression(searchString, QRegularExpression::CaseInsensitiveOption);
 
 		auto temp_curve = dynamic_cast<AnnotationCurve *>(m_plotCurves.at(m_current_column));
 		std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
@@ -472,7 +472,8 @@ void DecoderTableModel::searchTable(QString text)
 							(start_sample <= ann.start_sample() && ann.end_sample() <= end_sample)) {
 
 						for (auto value: ann.annotations()) {
-							if (rx.indexIn(value) != -1) {
+							auto regExpMatch = rx.match(text);
+							if (regExpMatch.lastCapturedIndex() != -1) {
 								goto skip_loop;
 							}
 						}

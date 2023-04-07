@@ -16,6 +16,7 @@
 #include <pluginbase/scopyjs.h>
 #include "iioutil/contextprovider.h"
 #include <iio.h>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include "filter.hpp"
 #include "dmm.hpp"

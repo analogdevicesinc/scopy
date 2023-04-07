@@ -83,7 +83,7 @@ QWidget* String::get_widget(QWidget *parent, bool auto_commit)
 
 	if (auto_commit)
 		connect(line_edit_, SIGNAL(textEdited(const QString&)),
-			this, SLOT(on_text_edited(const QString&)));
+			this, SLOT(onTextEdited(const QString&)));
 
 	return line_edit_;
 }

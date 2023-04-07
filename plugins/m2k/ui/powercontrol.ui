@@ -1141,22 +1141,6 @@ QPushButton:disabled {
    </hints>
   </connection>
   <connection>
-   <sender>trackingRatio</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>trackingRatioLbl</receiver>
-   <slot>setNum(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>844</x>
-     <y>151</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>903</x>
-     <y>115</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>btnSync</sender>
    <signal>toggled(bool)</signal>
    <receiver>trackingRatio</receiver>

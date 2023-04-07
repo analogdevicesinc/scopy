@@ -526,7 +526,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		stackDecoderComboBox->setVisible(shouldBeVisible);
 	};
 
-	connect(decoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+	connect(decoderComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		decoderComboBox->clearFocus();
 		if (!decoderComboBox->currentIndex()) {
 			return;
@@ -534,6 +534,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		std::shared_ptr<adiscope::logic::Decoder> initialDecoder = nullptr;
 
+		QString decoder = ui->addDecoderComboBox->itemText(index);
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		for (const GSList *sl = decoderList; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
@@ -1053,7 +1054,7 @@ void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 		}
 
 		ui->decoderTableView->blockSignals(true);
-		QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
+		QFuture<void> future = QtConcurrent::run(std::bind(&LogicAnalyzer::waitForDecoders, this));
 		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 		connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
 			if (ui->btnDecoderTable->isChecked()) {
@@ -1650,8 +1651,6 @@ void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
 
-	connect(ui->decoderTableView, SIGNAL(show()), this, SLOT(PrimaryAnnotationChanged(int)));
-
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
 //	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSearchSignal(int)));
 
@@ -1664,7 +1663,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 			if (ui->decoderTableView->isActive()) {
 				ui->decoderTableView->blockSignals(true);
 
-				QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
+				QFuture<void> future = QtConcurrent::run(std::bind(&LogicAnalyzer::waitForDecoders, this));
 				QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
 				connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
@@ -2387,7 +2386,7 @@ void LogicAnalyzer::setupDecoders()
 
 	g_slist_free(decoderList);
 
-	connect(ui->addDecoderComboBox, QOverload<const QString &>::of(&QComboBox::currentIndexChanged), [=](const QString &decoder) {
+	connect(ui->addDecoderComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index) {
 		ui->addDecoderComboBox->clearFocus();
 		if (!ui->addDecoderComboBox->currentIndex()) {
 			return;
@@ -2395,6 +2394,7 @@ void LogicAnalyzer::setupDecoders()
 
 		std::shared_ptr<adiscope::logic::Decoder> initialDecoder = nullptr;
 
+		QString decoder = ui->addDecoderComboBox->itemText(index);
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		for (const GSList *sl = decoderList; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
@@ -2700,7 +2700,7 @@ void LogicAnalyzer::setupTriggerMenu()
 	ui->triggerLogicComboBox->addItem("OR");
 	ui->triggerLogicComboBox->addItem("AND");
 
-	connect(ui->triggerLogicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+	connect(ui->triggerLogicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=, this](int index){
 		m_m2kDigital->getTrigger()->setDigitalMode(static_cast<libm2k::digital::DIO_TRIGGER_MODE>(index));
 	});
 

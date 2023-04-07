@@ -58,6 +58,7 @@
 #include <QDebug>
 #include <QIcon>
 #include <QGridLayout>
+#include <QLocale>
 #include <qwt_plot_opengl_canvas.h>
 
 using namespace adiscope;
