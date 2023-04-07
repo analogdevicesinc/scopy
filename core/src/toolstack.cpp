@@ -1,6 +1,7 @@
 #include "toolstack.h"
 #include <QDebug>
 #include <QLoggingCategory>
+#include <QEvent>
 
 using namespace adiscope;
 
@@ -15,16 +16,33 @@ ToolStack::~ToolStack()
 {
 }
 
-void ToolStack::detachTool(QString tool) {
-	map[tool]->setParent(nullptr);
-	show(tool);
-	Q_EMIT detachSuccesful(tool);
+
+void ToolStack::detachTool(QString key) {
+	if(isAttached(key)) {
+		map[key]->setParent(nullptr);
+		show(key);
+		Q_EMIT detachSuccesful(key);
+	}
 }
-void ToolStack::attachTool(QString tool) {
-	map[tool]->setParent(this);
-	addWidget(map[tool]);
-	show(tool);
-	Q_EMIT attachSuccesful(tool);
+void ToolStack::attachTool(QString key) {
+	if(!isAttached(key)) {
+		map[key]->setParent(this);
+		addWidget(map[key]);
+		show(key);
+		Q_EMIT attachSuccesful(key);
+	}
+}
+
+bool ToolStack::isAttached(QString key) {
+	return map[key]->parent()==this;
+}
+
+void ToolStack::setAttached(QString key, bool b)
+{
+	if(b)
+		attachTool(key);
+	else
+		detachTool(key);
 }
 
 bool ToolStack::show(QString key)

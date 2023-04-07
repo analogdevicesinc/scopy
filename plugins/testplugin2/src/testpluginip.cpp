@@ -31,7 +31,7 @@ bool TestPluginIp::onConnect()
 	m_toolList[0]->setTool(new QLabel("TestPage IP Renamed"));
 	QString iptool2UUID = QUuid::createUuid().toString();
 
-	m_toolList.append(new ToolMenuEntry(iptool2UUID,"IP tool2","", this));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IP tool2","IP tool2", ""));
 	m_toolList[1]->setEnabled(true);
 	m_tool = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_tool);

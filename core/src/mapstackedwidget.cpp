@@ -48,6 +48,13 @@ bool MapStackedWidget::contains(QString key) {
 	return map.contains(key);
 }
 
+QWidget *MapStackedWidget::get(QString key)
+{
+	if(map.contains(key))
+		return map[key];
+	return nullptr;
+}
+
 bool MapStackedWidget::show(QString key)
 {
 	QWidget *w = map[key];

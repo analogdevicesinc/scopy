@@ -17,6 +17,7 @@ public:
 	virtual bool remove(QString key);
 	virtual QString getKey(QWidget *w);
 	virtual bool contains(QString key);
+	virtual QWidget* get(QString key);
 public Q_SLOTS:
 	virtual bool show(QString key);
 protected:
