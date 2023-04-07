@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QJsonDocument>
-#include <QNetworkAccessManager>
+#include <QtNetwork/QNetworkAccessManager>
 #include "scopycore_export.h"
 
 namespace adiscope {

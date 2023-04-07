@@ -23,7 +23,7 @@
 #include "ui_calibratetemplate.h"
 
 #include <QApplication>
-#include <QJSEngine>
+#include <QtQml/QJSEngine>
 #include <QMetaProperty>
 #include <QThread>
 #include <QElapsedTimer>

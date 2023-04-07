@@ -3,7 +3,7 @@
 #include <QStandardPaths>
 #include <QFile>
 #include <QFileInfo>
-#include <QNetworkReply>
+#include <QtNetwork/QNetworkReply>
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_VERSION,"VersionCache");

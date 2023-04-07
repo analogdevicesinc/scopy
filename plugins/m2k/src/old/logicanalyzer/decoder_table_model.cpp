@@ -20,7 +20,7 @@
 #include "decoder_table_model.hpp"
 #include "logic_analyzer.h"
 #include "qcombobox.h"
-#include "qtconcurrentrun.h"
+#include <QtConcurrent/QtConcurrentRun>
 #include <QDebug>
 #include <QFuture>
 #include <QFutureWatcher>

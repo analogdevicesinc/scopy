@@ -24,9 +24,9 @@
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QHeaderView>
+#include <QtConcurrent/QtConcurrentRun>
 #include "logic_analyzer.h"
 #include "filemanager.h"
-#include "qtconcurrentrun.h"
 
 namespace adiscope::m2k {
 

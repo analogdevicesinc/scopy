@@ -28,7 +28,7 @@
 #include "m2ktool.hpp"
 #include "dbgraph.hpp"
 #include "handles_area.hpp"
-#include <QtConcurrentRun>
+#include <QtConcurrent/QtConcurrentRun>
 #include "gui/customPushButton.h"
 #include "gui/mousewheelwidgetguard.h"
 #include <gnuradio/scopy/goertzel_scopy_fc.h>

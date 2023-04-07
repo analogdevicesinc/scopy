@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QFuture>
 #include <QFutureWatcher>
-#include <QJSEngine>
+#include <QtQml/QJSEngine>
 #include "apiobject.h"
 #include "scopypluginbase_export.h"
 #include "scopypluginbase_config.h"

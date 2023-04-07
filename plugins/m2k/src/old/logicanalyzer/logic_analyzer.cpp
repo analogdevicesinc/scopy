@@ -45,8 +45,7 @@
 #include <QFileDialog>
 #include <QDateTime>
 #include <QFutureWatcher>
-#include <QtConcurrentRun>
-
+#include <QtConcurrent/QtConcurrentRun>
 #include <QTabWidget>
 
 #include "filter.hpp"

@@ -39,7 +39,7 @@
 #include <QComboBox>
 #include <QDockWidget>
 #include <QElapsedTimer>
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 /* libm2k includes */
 #include <libm2k/contextbuilder.hpp>
