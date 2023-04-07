@@ -41,6 +41,7 @@ private:
 	QString m_initText;
 	QWidget *tool;
 	QLineEdit *edit;
+	int renameCnt;
 
 };
 

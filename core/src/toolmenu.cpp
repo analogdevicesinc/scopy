@@ -59,7 +59,7 @@ ToolMenuItem* ToolMenu::addTool(QString id, QString name, QString icon, int posi
 	});
 
 	connect(t, &ToolMenuItem::doubleclick, this, [=](){
-		Q_EMIT requestDetach(t->getId());
+		Q_EMIT toggleAttach(t->getId());
 	});
 
 	connect(t->getToolBtn(), &QPushButton::toggled, this, [=](bool on){
