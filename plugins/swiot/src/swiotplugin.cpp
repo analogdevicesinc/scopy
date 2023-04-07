@@ -12,6 +12,7 @@
 #include <iioutil/contextprovider.h>
 
 using namespace adiscope;
+using namespace adiscope::swiot;
 
 Q_LOGGING_CATEGORY(CAT_SWIOT,"SWIOTPlugin");
 
@@ -24,6 +25,11 @@ Q_LOGGING_CATEGORY(CAT_SWIOT_CONFIG, "swiotConfig")
 Q_LOGGING_CATEGORY(CAT_SWIOT_RUNTIME, "swiotRuntime")
 Q_LOGGING_CATEGORY(CAT_SWIOT_FAULTS, "swiotFaults")
 Q_LOGGING_CATEGORY(CAT_MAX14906, "max14906tool")
+
+void SWIOTPlugin::preload()
+{
+	m_swiotController = new SwiotController(m_param, this);
+}
 
 bool SWIOTPlugin::loadPage()
 {
@@ -88,21 +94,19 @@ bool SWIOTPlugin::onConnect()
 	auto &&cp = ContextProvider::GetInstance();
 	iio_context* ctx = cp->open(m_param);
 
-	ping = new IIOPingTask(ctx);
-	cs = new CyclicalTask(ping,this);
-	cs->start(2000);
+	m_swiotController->connectSwiot(ctx);
+//	m_swiotController->startPingTask();
 
-	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
-	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_SWIOT)<<"Ping Success";} );
+//	ping = new IIOPingTask(ctx);
+//	cs = new CyclicalTask(ping,this);
+//	cs->start(2000);
+
+//	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
+//	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_SWIOT)<<"Ping Success";} );
 
 	config = new swiot::SwiotConfig(ctx);
-
 	runtime = new SwiotRuntime(ctx);
-	//	rungui = new Ui::SwiotRuntimeUI();
-	//	rungui->setupUi(runtime);
-
 	faults = new swiot::Faults(ctx);
-
 	maxtool = new swiot::Max14906(ctx);
 
 	m_toolList[0]->setEnabled(true);
@@ -119,39 +123,57 @@ bool SWIOTPlugin::onConnect()
 
 
 
-	//	connect(configui->pushButton,&QPushButton::clicked,this,[=](){
-	//		m_toolList[0]->setEnabled(false);
-	//		m_toolList[1]->setEnabled(true);
-	//		Q_EMIT requestTool(m_toolList[1]->id());
-	//	});
-	//	connect(rungui->pushButton,&QPushButton::clicked,this,[=](){
-	//		m_toolList[0]->setEnabled(true);
-	//		m_toolList[1]->setEnabled(false);
-	//		Q_EMIT requestTool(m_toolList[0]->id());
-	//	});
+	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
+	connect(m_swiotController, &SwiotController::pingSuccess, this, [=](){
+		qDebug(CAT_SWIOT_CONFIG)<<"Ping Success";
+//		m_swiotController->stopPingTask();
+	} );
 
+	connect(m_swiotController, &SwiotController::contextSwitched, this,[=](){
+		delete config;
+		delete runtime;
+		delete faults;
+		delete maxtool;
+		cp->close(m_param);
+		onConnect();
+
+	});
+	connect(dynamic_cast<SwiotConfig*> (config), &SwiotConfig::configBtn, this, [=](QVector<QStringList*> funcAvailable) {
+		for(int i = 0; i < funcAvailable.size(); i++) {
+			qDebug(CAT_SWIOT_CONFIG) << funcAvailable[i]->toVector();
+		}
+//		m_swiotController->startSwitchContextTask();
+		Q_EMIT requestTool(m_toolList[1]->id());
+	});
+	connect(dynamic_cast<SwiotRuntime*> (runtime), &SwiotRuntime::backBtnPressed, this, [=]() {
+//		m_swiotController->startSwitchContextTask();
+		Q_EMIT requestTool(m_toolList[0]->id());
+	});
 	return true;
 }
 
 bool SWIOTPlugin::onDisconnect()
 {
-	cs->stop();
-	auto &&cp = ContextProvider::GetInstance();
-	cp->close(m_param);
+//	cs->stop();
 
-	for (auto & tool : m_toolList) {
-		tool->setEnabled(false);
-		tool->setTool(nullptr);
-	}
+        for (auto & tool : m_toolList) {
+                tool->setEnabled(false);
+                tool->setTool(nullptr);
+        }
 
-	delete configui;
-	delete rungui;
+	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
+	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onConnect);
+
+//	m_swiotController->stopPingTask();
+	m_swiotController->disconnectSwiot();
+
 	delete config;
 	delete runtime;
-	delete faultsgui;
-	delete faults;
+        delete faults;
 	delete maxtool;
-	delete maxgui;
+
+	auto &&cp = ContextProvider::GetInstance();
+	cp->close(m_param);
 
 	return true;
 }

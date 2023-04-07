@@ -22,13 +22,15 @@ namespace adiscope::swiot {
 
 class SwiotConfig: public QWidget
 {
+	Q_OBJECT
 public:
 	explicit SwiotConfig(struct iio_context *ctx, QWidget *parent = nullptr);
 	~SwiotConfig();
 
 public Q_SLOTS:
 	void configBtnPressed();
-
+Q_SIGNALS:
+	void configBtn(QVector<QStringList*> funcAvailable);
 private:
 	QMap<QString, struct iio_device*> m_iioDevices;
 	QVector<ConfigController*> m_controllers;
@@ -37,8 +39,8 @@ private:
 	ConfigMenu* m_configMenu;
 	adiscope::gui::ToolView* m_toolView;
 
-	DrawArea* m_drawArea;
-	QScrollArea* m_scrollArea;
+//	DrawArea* m_drawArea;
+//	QScrollArea* m_scrollArea;
 
 //protected:
 //	bool eventFilter(QObject *object, QEvent * event) override;

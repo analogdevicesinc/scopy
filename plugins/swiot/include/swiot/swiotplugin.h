@@ -9,6 +9,8 @@
 #include "QLabel"
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iiopingtask.h"
+#include "src/swiotcontroller.h"
+
 
 #include "ui_swiotInfoPage.h"
 #include "ui_swiotconfig.h"
@@ -24,12 +26,14 @@ class Max14906Tool; // TODO: rename this class
 }
 
 namespace adiscope {
+namespace swiot {
 class SCOPYSWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
 
 public:
+	void preload() override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;
@@ -42,20 +46,19 @@ public Q_SLOTS:
 
 private:
 	Ui::SWIOTInfoPage *infoui;
-	Ui::ConfigMenu *configui;
-	Ui::SwiotRuntimeUI *rungui;
-        Ui::SwiotFaults *faultsgui;
-        Ui::Max14906Tool *maxgui;
 
 	QWidget *config ;
 	QWidget *runtime;
         QWidget *faults;
         QWidget *maxtool;
 
-	IIOPingTask *ping;
-	CyclicalTask *cs;
+//	IIOPingTask *ping;
+//	CyclicalTask *cs;
+
+	SwiotController *m_swiotController;
 
 };
+}
 }
 
 #endif // SWIOTPLUGIN_H
