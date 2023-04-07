@@ -45,6 +45,7 @@
 #include <algorithm>
 #include <QDebug>
 #include <QSizePolicy>
+#include <gui/qwt_utils.h>
 
 QwtPickerDblClickPointMachine::QwtPickerDblClickPointMachine()
 #if QWT_VERSION < 0x060000

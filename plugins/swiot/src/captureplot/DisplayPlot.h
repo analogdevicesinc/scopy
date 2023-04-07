@@ -71,6 +71,7 @@
 #include "handles_area.hpp"
 #include "plotpickerwrapper.h"
 #include <QWidget>
+#include <gui/qwt_utils.h>
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )

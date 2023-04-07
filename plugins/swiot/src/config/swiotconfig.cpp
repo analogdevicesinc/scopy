@@ -16,7 +16,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent):
 	//        m_scrollArea(new QScrollArea(this)),
 	QWidget(parent)
 {
-	this->installEventFilter(this);
+//	this->installEventFilter(this);
 
 	m_funcAvailable.push_back(new QStringList());
 	m_funcAvailable.push_back(new QStringList());
@@ -176,12 +176,12 @@ void SwiotConfig::configBtnPressed()
 	}
 }
 
-bool SwiotConfig::eventFilter(QObject *object, QEvent *event) { // FIXME: delete this and uninstall event filter
-	if (event->type() == QEvent::Resize) {
-		qDebug(CAT_SWIOT_CONFIG) << "this:" << this->size() << this->sizeHint();
-		qDebug(CAT_SWIOT_CONFIG) << "scroll: " << m_scrollArea->size() << m_scrollArea->sizeHint();
-		qDebug(CAT_SWIOT_CONFIG) << "draw:" << this->m_drawArea->size() << this->m_drawArea->sizeHint();
-		qDebug(CAT_SWIOT_CONFIG) << "menu:" << this->m_configMenu->size() << this->m_configMenu->sizeHint();
-	}
-	return QObject::eventFilter(object, event);
-}
+//bool SwiotConfig::eventFilter(QObject *object, QEvent *event) { // FIXME: delete this and uninstall event filter
+//	if (event->type() == QEvent::Resize) {
+//		qDebug(CAT_SWIOT_CONFIG) << "this:" << this->size() << this->sizeHint();
+//		qDebug(CAT_SWIOT_CONFIG) << "scroll: " << m_scrollArea->size() << m_scrollArea->sizeHint();
+//		qDebug(CAT_SWIOT_CONFIG) << "draw:" << this->m_drawArea->size() << this->m_drawArea->sizeHint();
+//		qDebug(CAT_SWIOT_CONFIG) << "menu:" << this->m_configMenu->size() << this->m_configMenu->sizeHint();
+//	}
+//	return QObject::eventFilter(object, event);
+//}

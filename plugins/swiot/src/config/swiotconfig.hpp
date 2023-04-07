@@ -40,8 +40,8 @@ private:
 	DrawArea* m_drawArea;
 	QScrollArea* m_scrollArea;
 
-protected:
-	bool eventFilter(QObject *object, QEvent * event) override;
+//protected:
+//	bool eventFilter(QObject *object, QEvent * event) override;
 
 private:
 	void init();

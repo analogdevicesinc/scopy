@@ -49,10 +49,10 @@ bool SWIOTPlugin::loadIcon()
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Config", ":/icons/scopy-default/icons/tool_debugger.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Runtime",""));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT MAX14906", ""));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("SWIOT Faults", ""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("0", "SWIOT Config", ":/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("1", "SWIOT Runtime",""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("2", "SWIOT MAX14906", ""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("3", "SWIOT Faults", ""));
 }
 
 void SWIOTPlugin::unload()
