@@ -17,7 +17,7 @@ class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QObject *parent = nullptr) :
 		QObject(parent), m_id(id), m_uuid(QUuid::createUuid().toString()),  m_name(name), m_icon(icon), m_visible(true),
-		m_enabled(false), m_running(false), m_runBtnVisible(false), m_tool(nullptr) {}
+		m_enabled(false), m_running(false), m_runBtnVisible(false), m_attached(true), m_tool(nullptr) {}
 
 	ToolMenuEntry(const ToolMenuEntry &other) {
 		m_id = other.m_id;
@@ -28,6 +28,7 @@ public:
 		m_enabled = other.m_enabled;
 		m_running = other.m_running;
 		m_runBtnVisible = other.m_runBtnVisible;
+		m_attached = other.m_attached;
 		m_tool = other.m_tool;
 	}
 
@@ -39,6 +40,7 @@ public:
 	inline bool visible() const { return m_visible; }
 	inline bool enabled() const { return m_enabled; }
 	inline bool running() const { return m_running; }
+	inline bool attached() const { return m_attached; }
 	inline bool runEnabled() const 	{ return m_runEnabled;	}
 	inline bool runBtnVisible() const { return m_runBtnVisible; }
 	inline QWidget *tool() const { return m_tool; }
@@ -77,6 +79,13 @@ public Q_SLOTS:
 	 * Sets the tool in run state
 	 */	
 	void setRunning(bool newRunning);
+
+	/**
+	 * @brief setAttached
+	 * @param attach
+	 * Attaches the tool to the main window
+	 */
+	void setAttached(bool attach);
 
 	/**
 	 * @brief setRunEnabled
@@ -133,6 +142,7 @@ private:
 	bool m_running;
 	bool m_runEnabled;
 	bool m_runBtnVisible;
+	bool m_attached;
 	QWidget* m_tool;
 };
 
@@ -197,6 +207,14 @@ inline void ToolMenuEntry::setTool(QWidget *newTool)
 	m_tool = newTool;
 	Q_EMIT updateTool();
 }
+
+
+inline void ToolMenuEntry::setAttached(bool attach)
+{
+	m_attached = attach;
+	Q_EMIT updateTool();
+}
+
 
 inline void ToolMenuEntry::setRunEnabled(bool newRunEnabled)
 {
