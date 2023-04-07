@@ -20,6 +20,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, ui(new Ui::ScopyMainWindow)
 {	
 	ui->setupUi(this);
+
+	setAttribute(Qt::WA_QuitOnClose, true);
 	initPreferences();
 
 	ScopyJS::GetInstance();
@@ -60,13 +62,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	toolman->addToolList("home",{});
 	toolman->addToolList("add",{});
 
-	connect(tm,&ToolMenu::requestAttach,ts,&ToolStack::attachTool);
-	connect(tm,&ToolMenu::requestDetach,ts,&ToolStack::detachTool);
+	connect(tm,&ToolMenu::toggleAttach,toolman,&ToolManager::toggleAttach);
 	connect(ts,&ToolStack::attachSuccesful,tm,&ToolMenu::attachSuccesful);
 	connect(ts,&ToolStack::detachSuccesful,tm,&ToolMenu::detachSuccesful);
 
 	connect(tb,&ToolBrowser::requestTool,ts, &ToolStack::show);
-	//	 connect(tb,&ToolBrowser::detach,ts, &ToolStack::showTool);
+
 	ts->add("home", hp);
 	ts->add("about", about);
 	ts->add("preferences", prefPage);
@@ -105,7 +106,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	sbc->startScan();
 
 //	dm->createDevice("m2k","ip:127.0.0.1");
-//	dm->addDevice("","ip:test");
+	dm->createDevice("","ip:test");
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));

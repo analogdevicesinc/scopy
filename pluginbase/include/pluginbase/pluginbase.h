@@ -103,7 +103,7 @@ Q_SIGNALS:\
 private:\
 
 #define SCOPY_PLUGIN_ICON(x) m_icon = new QLabel(""); m_icon->setStyleSheet("border-image: url(" x ");")
-#define SCOPY_NEW_TOOLMENUENTRY(id, x, y) new ToolMenuEntry(id,x,y,this)
+#define SCOPY_NEW_TOOLMENUENTRY(id, name, icon) new ToolMenuEntry(id,name,icon,this)
 
 
 #endif // PLUGINBASE_H

@@ -69,6 +69,7 @@ bool TestPlugin::loadPage()
 
 void TestPlugin::loadToolList()
 {
+	renameCnt = 0;
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first","FirstPlugin",":/icons/scopy-default/icons/tool_home.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
 }
@@ -97,13 +98,20 @@ bool TestPlugin::onConnect()
 	QLabel *lbl = new QLabel("TestPlugin", tool);
 	QLabel *pic = new QLabel("Picture",tool);
 	QLabel *lbl2 = new QLabel("m_initText->"+m_initText,tool);
+	QPushButton *btn = new QPushButton("detach");
+	QPushButton *btn2 = new QPushButton("renameTool");
+	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
+	connect(btn2,&QPushButton::clicked,this,[=](){m_toolList[0]->setName("TestPlugin"+QString::number(renameCnt++));});
 	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testImage.png\") ");
 	lay->addWidget(lbl);
 	lay->addWidget(pic);
 	lay->addWidget(edit);
 	lay->addWidget(lbl2);
+	lay->addWidget(btn);
+	lay->addWidget(btn2);
 	m_toolList[0]->setTool(tool);
+
 
 	return true;
 }
