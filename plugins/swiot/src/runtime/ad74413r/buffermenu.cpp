@@ -321,10 +321,8 @@ void VoltageOutMenu::connectSignalsToSlots()
 void VoltageOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
 	QStringList availableValues = m_attrValues[attrName];
-	QString unitMeasure = availableValues.takeLast();
-
 	for (const auto& slewValue : availableValues) {
-		list->addItem(slewValue + unitMeasure);
+		list->addItem(slewValue);
 	}
 }
 
@@ -461,10 +459,8 @@ void CurrentOutMenu::connectSignalsToSlots()
 void CurrentOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
 	QStringList availableValues = m_attrValues[attrName];
-	QString unitMeasure = availableValues.takeLast();
-
 	for (const auto& slewValue : availableValues) {
-		list->addItem(slewValue + unitMeasure);
+		list->addItem(slewValue);
 	}
 }
 

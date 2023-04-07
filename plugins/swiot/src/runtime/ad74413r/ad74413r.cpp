@@ -22,38 +22,9 @@ Ad74413r::Ad74413r(QWidget* parent, struct iio_device* iioDev, QVector<QString> 
 		m_plotHandler = new BufferPlotHandler(parent, m_swiotAdLogic->getPlotChnlsNo());
 		m_enabledPlots = std::vector<bool>(m_swiotAdLogic->getPlotChnlsNo(), false);
 
-		adiscope::gui::ToolViewRecipe recipe;
-		recipe.helpBtnUrl = "";
-		recipe.hasRunBtn = true;
-		recipe.hasSingleBtn = true;
-		recipe.hasPairSettingsBtn = true;
-		recipe.hasPrintBtn = false;
-		recipe.hasChannels = true;
-		recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
-
-		m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
-		m_monitorChannelManager->setChannelIdVisible(false);
-		m_monitorChannelManager->setToolStatus("Channels");
-
-		m_toolView = adiscope::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
-
-		gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor("Red"));
-		m_toolView->setGeneralSettingsMenu(settingsMenu, true);
-
-		m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
+		setupToolView();
 		initMonitorToolView();
-
-		connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
-		connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
-		connect(this, &Ad74413r::plotChnlsChanges, m_plotHandler, &BufferPlotHandler::onPlotChnlsChanges);
-		connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
-		connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
-
-		//general settings connections
-
-		connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
-		connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
-
+		setupConnections();
 	}
 }
 
@@ -70,6 +41,41 @@ Ad74413r::~Ad74413r()
 	if (m_controllers.size() > 0) {
 		m_controllers.clear();
 	}
+}
+
+void Ad74413r::setupToolView()
+{
+	adiscope::gui::ToolViewRecipe recipe;
+	recipe.helpBtnUrl = "";
+	recipe.hasRunBtn = true;
+	recipe.hasSingleBtn = true;
+	recipe.hasPairSettingsBtn = true;
+	recipe.hasPrintBtn = false;
+	recipe.hasChannels = true;
+	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
+
+	m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager->setChannelIdVisible(false);
+	m_monitorChannelManager->setToolStatus("Channels");
+
+	m_toolView = adiscope::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
+
+	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor("Red"));
+	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
+
+	m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
+}
+
+void Ad74413r::setupConnections()
+{
+	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
+	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
+	connect(this, &Ad74413r::plotChnlsChanges, m_plotHandler, &BufferPlotHandler::onPlotChnlsChanges);
+	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
+	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
+	//general settings connections
+	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
+	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
 }
 
 void Ad74413r::initMonitorToolView()

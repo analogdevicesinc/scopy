@@ -67,8 +67,11 @@ Q_SIGNALS:
 	void activateExportButton();
 
 private:
+	void setupToolView();
+
 	void createMonitorChannelMenu();
 
+	void setupConnections();
 	void connectChnlsWidgesToPlot(std::vector<ChannelWidget *> channelList);
 
 private:
