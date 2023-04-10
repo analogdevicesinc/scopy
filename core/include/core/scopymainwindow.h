@@ -53,6 +53,10 @@ private:
     ToolManager *toolman;
 
     Ui::ScopyMainWindow *ui;
+
+    // QWidget interface
+protected:
+    void closeEvent(QCloseEvent *event) override;
 };
 }
 #endif // SCOPYMAINWINDOW_H

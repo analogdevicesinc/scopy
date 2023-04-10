@@ -47,6 +47,7 @@ public:
 
 	static ToolMenuEntry *findToolMenuEntryByName(QList<ToolMenuEntry*> list, QString id);
 	static ToolMenuEntry *findToolMenuEntryById(QList<ToolMenuEntry*> list, QString id);
+	static ToolMenuEntry *findToolMenuEntryByTool(QList<ToolMenuEntry*> list, QWidget *w);
 	/**
 	 * @brief setName
 	 * @param newName
@@ -160,6 +161,16 @@ inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryById(QList<ToolMenuEntry *
 {
 	for(auto &&tme : list) {
 		if(tme->id()==id) {
+			return tme;
+		}
+	}
+	return nullptr;
+}
+
+inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryByTool(QList<ToolMenuEntry *> list, QWidget *w)
+{
+	for(auto &&tme : list) {
+		if(tme->tool()==w) {
 			return tme;
 		}
 	}
