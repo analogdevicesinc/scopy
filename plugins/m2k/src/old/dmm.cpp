@@ -202,7 +202,6 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 		manager->unlock();
 
 	api->setObjectName(Filter::tool_name(TOOL_DMM));
-//	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	if(!wheelEventGuard)
@@ -290,14 +289,8 @@ void DMM::disconnectAll()
 
 DMM::~DMM()
 {
-//	disconnect(prefPanel, &Preferences::notify, this, &DMM::readPreferences);
 	ui->run_button->setChecked(false);
 	disconnectAll();
-
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
-//	delete api;
 
 	delete ui;
 }

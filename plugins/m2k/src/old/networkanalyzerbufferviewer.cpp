@@ -196,7 +196,7 @@ void NetworkAnalyzerBufferViewer::sendBufferToOscilloscope()
 	d_osc->add_ref_waveform("NA2", d_currentXdata, yData2, d_data[index].second.sampleRate);
 
 #ifndef __ANDROID__
-	d_osc->detached();
+	d_osc->getTme()->setAttached(false);
 #endif
 }
 

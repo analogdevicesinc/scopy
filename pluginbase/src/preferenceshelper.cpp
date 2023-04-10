@@ -1,5 +1,8 @@
 #include "preferenceshelper.h"
 
+#include <QHBoxLayout>
+#include <QLabel>
+
 using namespace adiscope;
 QCheckBox* PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent) {
 	bool pref1Val = p->get(id).toBool();
@@ -17,11 +20,22 @@ QLineEdit* PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStr
 	return pref;
 }
 
-QComboBox* PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options, QObject *parent) {
+QWidget* PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options, QObject *parent) {
+	QWidget *w = new QWidget();
+	QHBoxLayout *lay = new QHBoxLayout();
+	lay->setSpacing(0);
+	lay->setMargin(0);
+	w->setLayout(lay);
+	QLabel *lab = new QLabel(description);
+	QSpacerItem *space = new QSpacerItem(20,20,QSizePolicy::Preferred,QSizePolicy::Preferred);
 	QString pref1Val = p->get(id).toString();
 	QComboBox *pref = new QComboBox();
 	pref->addItems(options);
 	pref->setCurrentText(pref1Val);
+	lay->addWidget(lab,1);
+	lay->addSpacerItem(space);
+	lay->addWidget(pref,1);
+
 	parent->connect(pref,&QComboBox::currentTextChanged,parent,[p,id](QString b) { p->set(id,b);});
-	return pref;
+	return w;
 }

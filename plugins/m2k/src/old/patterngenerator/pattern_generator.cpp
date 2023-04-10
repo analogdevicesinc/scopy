@@ -151,7 +151,6 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	// API load
 	api->setObjectName(Filter::tool_name(TOOL_PATTERN_GENERATOR));
-//	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	m_ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/pattgen");
@@ -166,13 +165,7 @@ void PatternGenerator::readPreferences()
 
 PatternGenerator::~PatternGenerator()
 {
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
-
 	delete api;
-
-//	disconnect(prefPanel, &Preferences::notify, this, &PatternGenerator::readPreferences);
 
 	if (m_running) {
 		tme->setRunning(false);

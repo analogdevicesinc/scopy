@@ -632,13 +632,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 SignalGenerator::~SignalGenerator()
 {
-//	disconnect(prefPanel, &Preferences::notify, this, &SignalGenerator::readPreferences);
 	ui->run_button->toggle(false);	
-//	setDynamicProperty(runButton(), "disabled", false);
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
-	delete api;
 
 	delete fileManager;
 

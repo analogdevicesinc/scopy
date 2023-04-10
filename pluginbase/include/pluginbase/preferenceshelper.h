@@ -16,7 +16,7 @@ class SCOPYPLUGINBASE_EXPORT PreferencesHelper {
 public:
 	static QCheckBox *addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent = nullptr);
 	static QLineEdit *addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent = nullptr);
-	static QComboBox *addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options, QObject *parent = nullptr);
+	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options, QObject *parent = nullptr);
 };
 }
 #endif // PREFERENCESHELPER_H
