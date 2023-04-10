@@ -13,8 +13,16 @@ DioDigitalChannel::DioDigitalChannel(const QString& deviceName, const QString& d
 	this->ui->m_channelName->setText(deviceName);
 	this->ui->m_channelType->setText(deviceType);
 
-	this->ui->customSwitch->setOn(QPixmap(":/swiot/ic_hi_snow.svg"));
-	this->ui->customSwitch->setOff(QPixmap(":/swiot/ic_lo_snow.svg"));
+        // shrink pixmap for better looks
+        m_pixmapSize = QPixmap(":/swiot/ic_hi_snow.svg").size() - QSize(2, 2);
+
+        m_highSnow = QPixmap(":/swiot/ic_hi_snow.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
+        m_highGray = QPixmap(":/swiot/ic_hi_gray.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
+        m_lowSnow = QPixmap(":/swiot/ic_lo_snow.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
+        m_lowGray = QPixmap(":/swiot/ic_lo_gray.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
+
+	this->ui->customSwitch->setOn(m_highSnow);
+	this->ui->customSwitch->setOff(m_lowGray);
 
 	if (deviceType == "input") {
 		this->ui->customSwitch->setVisible(false);
@@ -51,7 +59,16 @@ DioDigitalChannel::~DioDigitalChannel() {
 
 void DioDigitalChannel::connectSignalsAndSlots() {
 	connect(this->ui->customSwitch, &CustomSwitch::toggled, this, [this] (){
-		Q_EMIT this->outputValueChanged(this->ui->customSwitch->isChecked());
+                bool isChecked = this->ui->customSwitch->isChecked();
+                if (isChecked) { // swap the icons
+                        this->ui->customSwitch->setOn(m_highSnow);
+                        this->ui->customSwitch->setOff(m_lowGray);
+                } else {
+                        this->ui->customSwitch->setOn(m_highGray);
+                        this->ui->customSwitch->setOff(m_lowSnow);
+                }
+
+		Q_EMIT this->outputValueChanged(isChecked);
 	});
 }
 

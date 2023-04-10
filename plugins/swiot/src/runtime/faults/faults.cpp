@@ -192,3 +192,5 @@ QPushButton *Faults::createBackButton() {
         backButton->setText("Back");
         return backButton;
 }
+
+#include "moc_faults.cpp"

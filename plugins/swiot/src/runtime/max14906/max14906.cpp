@@ -186,3 +186,5 @@ QPushButton *Max14906::createBackButton() {
         backButton->setText("Back");
         return backButton;
 }
+
+#include "moc_max14906.cpp"

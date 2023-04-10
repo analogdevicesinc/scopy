@@ -36,6 +36,9 @@ private:
 	QString m_deviceName;
 	QString m_deviceType;
 
+        QPixmap m_highSnow, m_highGray, m_lowSnow, m_lowGray;
+        QSize m_pixmapSize;
+
 	std::vector<std::string> m_configModes;
 
 	QString m_selectedConfigMode;
