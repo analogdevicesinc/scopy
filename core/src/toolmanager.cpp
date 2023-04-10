@@ -79,7 +79,7 @@ void ToolManager::hideToolList(QString s) {
 	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
 		if(tm->getToolMenuItemFor(tme->uuid()) != nullptr) {
-			disconnect(tme,SIGNAL(updateTool()),this,SLOT(updateTool()));
+			disconnect(tme,SIGNAL(updateToolEntry()),this,SLOT(updateToolEntry()));
 			tm->removeTool(tme->uuid());
 		}
 	}
