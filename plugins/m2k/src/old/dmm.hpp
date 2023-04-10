@@ -24,8 +24,7 @@
 #include <QPushButton>
 #include <QWidget>
 #include <atomic>
-
-#include "pluginbase/apiobject.h"
+#include <condition_variable>
 #include "pluginbase/toolmenuentry.h"
 #include "filter.hpp"
 #include "iio_manager.hpp"
@@ -33,8 +32,6 @@
 #include "gui/mousewheelwidgetguard.h"
 #include <thread>
 #include "gui/spinbox_a.hpp"
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition_variable.hpp>
 #include <boost/circular_buffer.hpp>
 
 /* libm2k includes */
@@ -85,8 +82,8 @@ namespace adiscope::m2k {
 		unsigned long logging_refresh_rate;
 		PositionSpinButton *data_logging_timer;
 
-		boost::mutex data_mutex;
-		boost::condition_variable data_cond;
+		std::mutex data_mutex;
+		std::condition_variable data_cond;
 		MouseWheelWidgetGuard *wheelEventGuard;
 
 		std::vector<double> m_min, m_max;

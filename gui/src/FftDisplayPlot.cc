@@ -29,7 +29,6 @@
 #include <QDebug>
 #include <QStack>
 #include <qwt_symbol.h>
-#include <boost/make_shared.hpp>
 
 #define ERROR_VALUE -10000000
 

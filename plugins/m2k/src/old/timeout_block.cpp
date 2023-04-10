@@ -31,8 +31,8 @@ timeout_block::timeout_block(const std::string &pmt_name, QObject *parent) :
 
 	message_port_register_in(port_id);
 
-	set_msg_handler(port_id, boost::bind(
-				&timeout_block::pmt_received, this, boost::placeholders::_1));
+	set_msg_handler(port_id, std::bind(
+				&timeout_block::pmt_received, this, std::placeholders::_1));
 }
 
 timeout_block::~timeout_block()
