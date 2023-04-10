@@ -25,7 +25,7 @@ bool IIOPingTask::ping(iio_context *ctx) {
 
 	int ret = iio_device_get_trigger(dev, &test_device);
 
-	if (ret < 0 && ret != -ENOENT) {
+	if (ret < 0 && ret != -ENOENT && ret != -EINVAL) {
 		return false;
 	}
 	return true;

@@ -7,19 +7,21 @@
 
 using namespace adiscope::swiot;
 
-Ad74413r::Ad74413r(QWidget* parent, struct iio_device* iioDev, QVector<QString> chnlsFunc):
-	m_iioDev(iioDev)
-      ,m_swiotAdLogic(nullptr)
-      ,m_widget(parent)
+Ad74413r::Ad74413r(iio_context *ctx, QVector<QString> chnlsFunc, QWidget* parent):
+	QWidget(parent)
+      ,m_swiotAdLogic(nullptr), m_iioDev(nullptr)
+      ,m_widget(parent), m_readerThread(nullptr)
 {
+	m_iioDev = iio_context_find_device(ctx, AD_NAME);
 	m_chnlsFunction = chnlsFunc;
 	m_enabledChannels = std::vector<bool>(m_chnlsFunction.size(), false);
-	if (m_iioDev) {
+	m_backBtn = createBackBtn();
+	if (iio_device_find_attr(m_iioDev, "back")) {
 		m_swiotAdLogic = new BufferLogic(m_iioDev);
 		m_readerThread = new ReaderThread(true);
                 m_readerThread->addBufferedDevice(m_iioDev);
 
-		m_plotHandler = new BufferPlotHandler(parent, m_swiotAdLogic->getPlotChnlsNo());
+		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo());
 		m_enabledPlots = std::vector<bool>(m_swiotAdLogic->getPlotChnlsNo(), false);
 
 		setupToolView();
@@ -30,12 +32,12 @@ Ad74413r::Ad74413r(QWidget* parent, struct iio_device* iioDev, QVector<QString> 
 
 Ad74413r::~Ad74413r()
 {
-	if (m_readerThread->isRunning()) {
-		m_readerThread->requestInterruption();
-		m_readerThread->quit();
-		m_readerThread->wait();
-	}
 	if (m_readerThread) {
+		if (m_readerThread->isRunning()) {
+			m_readerThread->requestInterruption();
+			m_readerThread->quit();
+			m_readerThread->wait();
+		}
 		delete m_readerThread;
 	}
 	if (m_controllers.size() > 0) {
@@ -62,12 +64,15 @@ void Ad74413r::setupToolView()
 
 	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor("Red"));
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
-
+	m_toolView->addTopExtraWidget(m_backBtn);
 	m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
+	this->setLayout(new QVBoxLayout());
+	this->layout()->addWidget(m_toolView);
 }
 
 void Ad74413r::setupConnections()
 {
+	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::backBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
 	connect(this, &Ad74413r::plotChnlsChanges, m_plotHandler, &BufferPlotHandler::onPlotChnlsChanges);
@@ -254,14 +259,23 @@ void Ad74413r::verifyChnlsChanges()
 	}
 }
 
-adiscope::gui::ToolView* Ad74413r::getToolView()
+QPushButton* Ad74413r::createBackBtn()
 {
-	return m_toolView;
-}
-
-void Ad74413r::setChannelsFunction(QVector<QString> chnlsFunction)
-{
-	m_chnlsFunction = chnlsFunction;
+	QPushButton* backBtn = new QPushButton();
+	backBtn->setObjectName(QString::fromUtf8("backBtn"));
+	backBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+						 "  width: 95px;\n"
+						 "  height: 40px;\n"
+						 "\n"
+						 "  font-size: 12px;\n"
+						 "  text-align: center;\n"
+						 "  font-weight: bold;\n"
+						 "  padding-left: 15px;\n"
+						 "  padding-right: 15px;\n"
+						 "}"));
+	backBtn->setProperty("blue_button", QVariant(true));
+	backBtn->setText("Back");
+	return backBtn;
 }
 
 void Ad74413r::onReaderThreadFinished()

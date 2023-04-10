@@ -20,7 +20,7 @@ void SwiotController::startPingTask()
 	pingTimer = new CyclicalTask(pingTask, this);
 	connect(pingTask,SIGNAL(pingSuccess()),this,SIGNAL(pingSuccess()));
 	connect(pingTask,SIGNAL(pingFailed()),this,SIGNAL(pingFailed()));
-	pingTimer->start(10000);
+	pingTimer->start(5000);
 }
 
 void SwiotController::stopPingTask()
@@ -35,13 +35,12 @@ void SwiotController::startSwitchContextTask()
 	if (pingTask) {
 //		stopPingTask();
 	}
-
 	switchCtxTask = new SwiotSwitchCtxTask(uri);
 	switchCtxTimer = new CyclicalTask(switchCtxTask, this);
 	switchCtxTimer->start(5000);
 	connect(switchCtxTask,&SwiotSwitchCtxTask::contextSwitched,this,[=]() {
-		stopSwitchContextTask();
 		Q_EMIT contextSwitched();
+		stopSwitchContextTask();
 	});
 }
 

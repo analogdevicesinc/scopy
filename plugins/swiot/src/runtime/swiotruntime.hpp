@@ -13,47 +13,27 @@ class ChannelManager;
 #define AD_TRIGGER_NAME "ad74413r-dev0"
 #define TRIGGER_TIMER_MS 1000
 
-class SwiotRuntime : public QWidget
+class SwiotRuntime : public QObject
 {
 	Q_OBJECT
 public:
-	explicit SwiotRuntime(struct iio_context *ctx = nullptr, QWidget *parent = nullptr);
+	SwiotRuntime();
 	~SwiotRuntime();
 
-	adiscope::gui::ToolView* getToolView();
 	bool isRuntimeCtx();
-
-	void setToolView(adiscope::gui::ToolView* toolView);
-	void initAdToolView();
+	void setContext(iio_context *ctx);
 //	void triggerPing();
 public Q_SLOTS:
-	void onBackBtnPressed();
 //	void onTriggerTimeout();
-
+	void onBackBtnPressed();
 Q_SIGNALS:
 	void backBtnPressed();
 private:
-	swiot::Ad74413r* m_swiotRuntimeAd;
-	adiscope::gui::ToolView* m_toolView;
-	QPushButton* m_backBtn;
-	QMap<QString, struct iio_device*> m_iioDevices;
-	QTimer *m_triggerTimer;
+	void createDevicesMap();
 private:
-	QPushButton* createBackBtn();
-	void createDevicesMap(struct iio_context *ctx);
-
-	//	//Runtime A
-//	const QVector<QString> channel_function{"digital_input", "voltage_out", "current_out", "voltage_in",
-//							"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-	//	//Runtime B
-//		const QVector<QString> channel_function{"current_in_ext", "current_in_loop", "resistance", "digital_input",
-//		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-	//	//Runtime C
-//		const QVector<QString> channel_function{"digital_input_loop", "current_in_ext_hart", "current_in_ext_hart", "high_z",
-//		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-	//	//Runtime D
-		const QVector<QString> channel_function{"current_out", "high_z", "high_z", "high_z",
-		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
+	iio_context *m_iioCtx;
+	QTimer *m_triggerTimer;
+	QMap<QString, struct iio_device*> m_iioDevices;
 };
 }
 

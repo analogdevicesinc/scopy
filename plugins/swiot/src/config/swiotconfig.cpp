@@ -19,6 +19,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent):
 //        this->installEventFilter(this);
 
 	m_funcAvailable.push_back(new QStringList());
+	m_funcAvailable.push_back(new QStringList());
 	m_configBtn = createConfigBtn();
 //	this->setLayout(new QVBoxLayout);
 //        this->m_scrollArea->setStyleSheet("background-color: red;");
@@ -157,9 +158,9 @@ void SwiotConfig::configBtnPressed()
 	}
 	for (int i = 0; i < m_controllers.size(); i++) {
 		QStringList func = m_controllers[i]->getActiveFunctions();
-		if (func.size()>0) {
-			for(int i = 0; i < m_funcAvailable.size(); i++) {
-				m_funcAvailable[i]->push_back(func[i]);
+		if (func.size() == m_funcAvailable.size()) {
+			for(int j = 0; j < m_funcAvailable.size(); j++) {
+				m_funcAvailable[j]->push_back(func[j]);
 			}
 		}
 	}

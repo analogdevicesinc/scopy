@@ -29,6 +29,7 @@ Q_LOGGING_CATEGORY(CAT_MAX14906, "max14906tool")
 void SWIOTPlugin::preload()
 {
 	m_swiotController = new SwiotController(m_param, this);
+	m_runtime = new SwiotRuntime();
 }
 
 bool SWIOTPlugin::loadPage()
@@ -121,8 +122,10 @@ bool SWIOTPlugin::onConnect()
 //	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
 //	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_SWIOT)<<"Ping Success";} );
 
+	m_runtime->setContext(ctx);
+
 	config = new swiot::SwiotConfig(ctx);
-	runtime = new SwiotRuntime(ctx);
+	adtool = new swiot::Ad74413r(ctx, channel_function);
 	faults = new swiot::Faults(ctx);
 	maxtool = new swiot::Max14906(ctx);
 
@@ -130,7 +133,7 @@ bool SWIOTPlugin::onConnect()
 	m_toolList[0]->setTool(config);
 
 	m_toolList[1]->setEnabled(true);
-	m_toolList[1]->setTool(runtime);
+	m_toolList[1]->setTool(adtool);
 
 	m_toolList[2]->setEnabled(true);
 	m_toolList[2]->setTool(maxtool);
@@ -138,7 +141,13 @@ bool SWIOTPlugin::onConnect()
 	m_toolList[3]->setEnabled(true);
 	m_toolList[3]->setTool(faults);
 
-
+	if (!m_runtime->isRuntimeCtx()) {
+		m_toolList[1]->setEnabled(false);
+		m_toolList[2]->setEnabled(false);
+		m_toolList[3]->setEnabled(false);
+	} else {
+		m_toolList[0]->setEnabled(false);
+	}
 
 	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
 	connect(m_swiotController, &SwiotController::pingSuccess, this, [=](){
@@ -148,21 +157,36 @@ bool SWIOTPlugin::onConnect()
 
 	connect(m_swiotController, &SwiotController::contextSwitched, this,[=](){
 		delete config;
-		delete runtime;
+		delete adtool;
 		delete faults;
 		delete maxtool;
 		cp->close(m_param);
 		onConnect();
 
 	});
+	connect(dynamic_cast<Ad74413r*> (adtool), &Ad74413r::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
+	connect(dynamic_cast<Max14906*> (maxtool), &Max14906::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
+	connect(dynamic_cast<Faults*> (faults), &Faults::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
+
+//	connect(dynamic_cast<Ad74413r*> (adtool), &Ad74413r::backBtnPressed, this, [](){
+//		qDebug(CAT_SWIOT_CONFIG) << "Back from ad";
+//	});
+//	connect(dynamic_cast<Max14906*> (maxtool), &Max14906::backBtnPressed, this, [](){
+//		qDebug(CAT_SWIOT_CONFIG) << "Back from max";
+//	});
+//	connect(dynamic_cast<Faults*> (faults), &Faults::backBtnPressed, this, [](){
+//		qDebug(CAT_SWIOT_CONFIG) << "Back from faults";
+//	});
+
 	connect(dynamic_cast<SwiotConfig*> (config), &SwiotConfig::configBtn, this, [=](QVector<QStringList*> funcAvailable) {
-		for(int i = 0; i < funcAvailable.size(); i++) {
-			qDebug(CAT_SWIOT_CONFIG) << funcAvailable[i]->toVector();
+		QVector<QString> adConfigFunc = funcAvailable[0]->toVector();
+		for (int i = 0; i < adConfigFunc.size(); i++){
+			m_chnlsFunction[i] = adConfigFunc[i];
 		}
 //		m_swiotController->startSwitchContextTask();
 		Q_EMIT requestTool(m_toolList[1]->id());
 	});
-	connect(dynamic_cast<SwiotRuntime*> (runtime), &SwiotRuntime::backBtnPressed, this, [=]() {
+	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, [=]() {
 //		m_swiotController->startSwitchContextTask();
 		Q_EMIT requestTool(m_toolList[0]->id());
 	});
@@ -182,10 +206,11 @@ bool SWIOTPlugin::onDisconnect()
 	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onConnect);
 
 //	m_swiotController->stopPingTask();
+//	m_swiotController->stopSwitchContextTask();
 	m_swiotController->disconnectSwiot();
 
 	delete config;
-	delete runtime;
+	delete adtool;
         delete faults;
 	delete maxtool;
 

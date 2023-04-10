@@ -15,6 +15,7 @@
 #include <iio.h>
 
 #define MAX_CURVES_NUMBER 8
+#define AD_NAME "ad74413r"
 
 extern "C"{
 struct iio_device;
@@ -31,8 +32,8 @@ namespace swiot {
 class Ad74413r : public QWidget {
 	Q_OBJECT
 public:
-	explicit Ad74413r(QWidget *parent = nullptr, struct iio_device *iioDev = nullptr,
-			  QVector<QString> chnlsFunc = {});
+	explicit Ad74413r(iio_context *ctx = nullptr, QVector<QString> chnlsFunc = {},
+			  QWidget *parent = nullptr);
 
 	~Ad74413r();
 
@@ -40,14 +41,9 @@ public:
 
 	void initExportSettings(QWidget *parent);
 
-	void setChannelsFunction(QVector<QString> chnlsFunction);
-
 	void verifyChnlsChanges();
 
 	adiscope::gui::GenericMenu *createSettingsMenu(QString title, QColor *color);
-
-	adiscope::gui::ToolView *getToolView();
-
 public Q_SLOTS:
 
 	void onChannelWidgetEnabled(bool en);
@@ -66,6 +62,7 @@ Q_SIGNALS:
 
 	void activateExportButton();
 
+	void backBtnPressed();
 private:
 	void setupToolView();
 
@@ -74,6 +71,8 @@ private:
 	void setupConnections();
 	void connectChnlsWidgesToPlot(std::vector<ChannelWidget *> channelList);
 
+	QPushButton* createBackBtn();
+
 private:
 	struct iio_device *m_iioDev;
 	int m_enabledChnlsNo = 0;
@@ -81,6 +80,7 @@ private:
 	adiscope::gui::ChannelManager *m_monitorChannelManager;
 	adiscope::gui::ToolView *m_toolView;
 	QWidget *m_widget;
+	QPushButton* m_backBtn;
 
 	QVector<BufferMenuController *> m_controllers;
 	QVector<QString> m_chnlsFunction;

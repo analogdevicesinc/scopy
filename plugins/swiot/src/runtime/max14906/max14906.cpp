@@ -9,6 +9,7 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	ui(new Ui::Max14906),
         m_backButton(Max14906::createBackButton()),
 	m_qTimer(new QTimer(this)),
+	m_toolView(nullptr),
 	m_readerThread(new ReaderThread(false)),
 	m_customColGrid(new CustomColQGridLayout(4, true, this))
 {
@@ -89,14 +90,15 @@ void Max14906::connectSignalsAndSlots() {
 }
 
 Max14906::~Max14906() {
-	if (this->m_toolView->getRunBtn()->isChecked()) {
-		this->m_toolView->getRunBtn()->setChecked(false);
+	if (this->m_toolView) {
+		if (this->m_toolView->getRunBtn()->isChecked()) {
+			this->m_toolView->getRunBtn()->setChecked(false);
+		}
+		if (this->m_readerThread->isRunning()) {
+			this->m_readerThread->quit();
+			this->m_readerThread->wait();
+		}
 	}
-	if (this->m_readerThread->isRunning()) {
-		this->m_readerThread->quit();
-		this->m_readerThread->wait();
-	}
-
 	delete m_toolView;
 	delete ui;
 }

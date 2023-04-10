@@ -64,8 +64,8 @@ void ConfigModel::updateChnlAttributes(QVector<QMap<QString,QStringList>> newVal
 
 		if (m_channels[deviceIdx]) {
 			qDebug(CAT_SWIOT_CONFIG) <<QString::number(deviceIdx) + attrName + " before:" + readChnlAttr(m_channels[deviceIdx],attrName).front();
-			int retCode = iio_channel_attr_write(m_channels[deviceIdx],s_attrName.c_str(),s_attrValue.c_str());
-			if (retCode > 0) {
+			ssize_t retCode = iio_channel_attr_write(m_channels[deviceIdx],s_attrName.c_str(),s_attrValue.c_str());
+			if (retCode >= 0) {
 				m_attrValues[deviceIdx] = newValues[deviceIdx];
 			}
 			qDebug(CAT_SWIOT_CONFIG) << QString::number(deviceIdx) + attrName + " after:" + readChnlAttr(m_channels[deviceIdx],attrName).front();
