@@ -619,7 +619,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->xygraph->enableZooming(ui->btnZoomIn, ui->btnZoomOut);
 
-//	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	connect((m_dBgraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()),

@@ -38,6 +38,7 @@ public Q_SLOTS:
     void load();
     void save(QString file);
     void load(QString file);
+    void handlePreferences(QString, QVariant);
 
 private:
     ScopyAboutPage* about;
@@ -54,7 +55,7 @@ private:
 
     Ui::ScopyMainWindow *ui;
 
-    // QWidget interface
+    void loadOpenGL();
 protected:
     void closeEvent(QCloseEvent *event) override;
 };
