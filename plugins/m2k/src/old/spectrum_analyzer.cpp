@@ -676,7 +676,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnHistory->setVisible(false);
 
 	api->setObjectName(Filter::tool_name(TOOL_SPECTRUM_ANALYZER));
-//	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	connect(ui->rightMenu, &MenuAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
@@ -822,14 +821,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 SpectrumAnalyzer::~SpectrumAnalyzer()
 {
-//	disconnect(prefPanel, &Preferences::notify, this, &SpectrumAnalyzer::readPreferences);
 	ui->runSingleWidget->toggle(false);
-//	setDynamicProperty(runButton(), "disabled", false);
-
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
-
 	delete sample_timer;
 
 	delete api;
@@ -2055,7 +2047,6 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 			writeAllSettingsToHardware();
 		}
 
-		ResourceManager::open("m2k-adc",this);
 		fft_plot->presetSampleRate(sample_rate);
 		fft_sink->set_samp_rate(sample_rate);
 		m_time_start = std::chrono::system_clock::now();

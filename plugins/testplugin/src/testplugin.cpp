@@ -38,7 +38,7 @@ bool TestPlugin::loadPreferencesPage()
 	QCheckBox *pref1 = PreferencesHelper::addPreferenceCheckBox(p,"pref1","First Option",this);
 	QCheckBox *pref2 = PreferencesHelper::addPreferenceCheckBox(p,"pref2","Second Option",this);
 	QLineEdit *pref3 = PreferencesHelper::addPreferenceEdit(p,"prefstr","PreferenceString",this);
-	QComboBox *pref4 = PreferencesHelper::addPreferenceCombo(p,"pref4","languages",{"english","french","italian"},this);
+	QWidget *pref4 = PreferencesHelper::addPreferenceCombo(p,"pref4","languages",{"english","french","italian"},this);
 
 	lay->addWidget(pref1);
 	lay->addWidget(pref2);
