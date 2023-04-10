@@ -21,6 +21,7 @@
 #define DMM_API_HPP
 
 #include "dmm.hpp"
+#include "pluginbase/apiobject.h"
 
 namespace adiscope::m2k {
 class DMM_API : public ApiObject

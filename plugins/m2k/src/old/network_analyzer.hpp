@@ -186,9 +186,9 @@ private:
 	bool captureDone;
 	bool filterDc;
 
-	boost::mutex iterationsReadyMutex;
-	boost::condition_variable iterationsReadyCv;
-	boost::mutex bufferMutex;
+	std::mutex iterationsReadyMutex;
+	std::condition_variable iterationsReadyCv;
+	std::mutex bufferMutex;
 
 	NetworkAnalyzerBufferViewer *bufferPreviewer;
 	QVector<Buffer> capturedData;
