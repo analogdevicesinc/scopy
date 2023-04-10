@@ -49,7 +49,6 @@
 #include <iostream>
 #include <volk/volk.h>
 #include <gnuradio/math.h>
-#include <boost/math/special_functions/round.hpp>
 #include <QLocale>
 #include <QDebug>
 #include "HistogramDisplayPlot.h"
@@ -521,7 +520,7 @@ HistogramDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
         if(!d_accum)
 	  memset(d_ydata[n], 0, d_bins*sizeof(double));
 	for(int64_t point = d_minPos; point < d_maxPos; point++) {
-          index = boost::math::iround(1e-20 + (dataPoints[n][point] - d_left)/d_width);
+	  index = round(1e-20 + (dataPoints[n][point] - d_left)/d_width);
           if((index >= 0) && (index < d_bins))
 	    d_ydata[n][index] += 1;
         }

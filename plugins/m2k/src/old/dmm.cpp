@@ -36,8 +36,6 @@
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/blocks/vector_to_stream.h>
 
-#include <boost/make_shared.hpp>
-
 #include <memory>
 #include <QDateTime>
 #include <QFile>
@@ -298,7 +296,7 @@ DMM::~DMM()
 void DMM::updateValuesList(std::vector<float> values)
 {
 	if(!use_timer)
-		boost::unique_lock<boost::mutex> lock(data_mutex);
+		std::unique_lock<std::mutex> lock(data_mutex);
 
 	const double volts_ch1 = m_m2k_analogin->convertRawToVolts(0, static_cast<int>(values[0]));
 	const double volts_ch2 = m_m2k_analogin->convertRawToVolts(1, static_cast<int>(values[1]));
@@ -760,7 +758,7 @@ void DMM::dataLoggingThread()
 		out << QDateTime::currentDateTime().time().toString() << separator;
 
 		if(!use_timer) {
-			boost::unique_lock<boost::mutex> lock(data_mutex);
+			std::unique_lock<std::mutex> lock(data_mutex);
 			data_cond.wait(lock);
 		}
 

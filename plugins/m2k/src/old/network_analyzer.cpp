@@ -41,7 +41,6 @@
 #include <gnuradio/blocks/skiphead.h>
 #include <gnuradio/blocks/vector_sink.h>
 #include <gnuradio/top_block.h>
-#include <boost/make_shared.hpp>
 #include <gnuradio/blocks/stream_to_vector.h>
 #include <gnuradio/blocks/vector_to_stream.h>
 #include <gnuradio/scopy/goertzel_scopy_fc.h>
@@ -893,7 +892,7 @@ void NetworkAnalyzer::computeIterations()
 	// it is safe to modify without using a lock
 	iterationsThreadCanceled = false;
 	iterationsThreadReady = false;
-	iterationsThread = new std::thread(boost::bind(&NetworkAnalyzer::computeFrequencyArray, this));
+	iterationsThread = new std::thread(std::bind(&NetworkAnalyzer::computeFrequencyArray, this));
 }
 
 void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
@@ -1157,7 +1156,7 @@ size_t NetworkAnalyzer::_getSamplesCount(double frequency, unsigned long rate, b
 
 void NetworkAnalyzer::computeFrequencyArray()
 {
-	boost::unique_lock<boost::mutex> lock(iterationsReadyMutex);
+	std::unique_lock<std::mutex> lock(iterationsReadyMutex);
 
 	iterations.clear();
 
@@ -1259,8 +1258,8 @@ void NetworkAnalyzer::goertzel()
 	setFilterParameters();
 
 	// Wait for the iterations thread to finish
-	boost::unique_lock<boost::mutex> lock(iterationsReadyMutex);
-	iterationsReadyCv.wait(lock, boost::bind(&NetworkAnalyzer::isIterationsThreadReady, this));
+	std::unique_lock<std::mutex> lock(iterationsReadyMutex);
+	iterationsReadyCv.wait(lock, std::bind(&NetworkAnalyzer::isIterationsThreadReady, this));
 	if (iterationsThread) {
 		iterationsThread->join();
 		delete iterationsThread;
@@ -1373,7 +1372,7 @@ void NetworkAnalyzer::goertzel()
 			capture2->rewind();
 			capture2->set_data(data1);
 			{
-				boost::unique_lock<boost::mutex> lock(bufferMutex);
+				std::unique_lock<std::mutex> lock(bufferMutex);
 				sink1->reset();
 				sink2->reset();
 			}
@@ -1452,7 +1451,7 @@ void NetworkAnalyzer::toggleBufferPreview(bool toggle)
 
 void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2)
 {
-	boost::unique_lock<boost::mutex> lock(bufferMutex);
+	std::unique_lock<std::mutex> lock(bufferMutex);
 
 	Buffer buffer1 = Buffer(frequency, sample_rate, data1.size(), data1);
 	Buffer buffer2 = Buffer(frequency, sample_rate, data2.size(), data2);
