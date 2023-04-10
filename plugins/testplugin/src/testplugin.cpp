@@ -122,9 +122,10 @@ bool TestPlugin::onDisconnect()
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunBtnVisible(false);
-		if(tool->tool()) {
-			delete tool->tool();
+		QWidget *w = tool->tool();
+		if(w) {
 			tool->setTool(nullptr);
+			delete(w);
 		}
 	}
 	return true;
