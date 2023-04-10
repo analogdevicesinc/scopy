@@ -1,4 +1,7 @@
 #include "scopymainwindow.h"
+#include "animationmanager.h"
+#include "qopenglwidget.h"
+#include "qsurfaceformat.h"
 #include "scanbuttoncontroller.h"
 #include "ui_scopymainwindow.h"
 #include "scopyhomepage.h"
@@ -13,6 +16,10 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "versionchecker.h"
+#include "application_restarter.h"
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_SCOPY,"Scopy")
 
 using namespace adiscope;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
@@ -189,9 +196,57 @@ void ScopyMainWindow::initPreferences()
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
 	p->load();
+	p->init("general_first_run", true);
+	p->init("general_save_session", true);
+	p->init("general_save_attached", true);
+	p->init("general_doubleclick_attach", true);
+	p->init("general_use_opengl", true);
+	p->init("general_use_animations", true);
+	p->init("general_theme", "dark");
+	p->init("general_language", "english");
 	p->init("general_plot_target_fps", "60");
+	p->init("general_show_plot_fps", true);
 	p->init("general_use_native_dialogs", true);
-	p->init("a","true");
+
+	connect(p,SIGNAL(preferenceChanged(QString,QVariant)),this,SLOT(handlePreferences(QString,QVariant)));
+
+	if(p->get("general_use_opengl").toBool())
+		loadOpenGL();
+}
+
+void ScopyMainWindow::loadOpenGL() {
+
+	// this should be part of scopygui
+	// set surfaceFormat as in Qt example: HelloGL2 - https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/hellogl2/main.cpp?h=5.15#n81
+	QSurfaceFormat fmt;
+	fmt.setDepthBufferSize(24);
+	QSurfaceFormat::setDefaultFormat(fmt);
+
+	// This acts as a loader for the OpenGL context, our plots load and draw in the OpenGL context
+	// at the same time which causes some race condition and causes the app to hang
+	// with this workaround, the app loads the OpenGL context before any plots are created
+	// Probably there's a better way to do this
+	auto a = new QOpenGLWidget(this);
+	qInfo(CAT_SCOPY, "OpenGL loaded");
+	a->deleteLater();
+}
+
+
+void ScopyMainWindow::handlePreferences(QString str,QVariant val) {
+
+	if(str == "general_use_opengl") {
+		prefPage->showRestartWidget();
+	} else if(str == "general_use_animations") {
+		AnimationManager::getInstance().toggleAnimations(val.toBool());
+
+	} else if(str == "general_theme") {
+		prefPage->showRestartWidget();
+
+	} else if(str == "general_language") {
+		prefPage->showRestartWidget();
+
+	}
+
 }
 
 

@@ -918,7 +918,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	connect(gsettings_ui->xyLineThickness,SIGNAL(currentIndexChanged(int)),this, SLOT(xyLineThickness_currentIndexChanged(int)));
 
 	api->setObjectName(Filter::tool_name(TOOL_OSCILLOSCOPE));
-	//api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	plot.setDisplayScale(probe_attenuation[current_channel]);
@@ -1324,9 +1323,6 @@ Oscilloscope::~Oscilloscope()
 		disableMixedSignalView();
 	}
 
-//	disconnect(prefPanel, &Preferences::notify, this, &Oscilloscope::readPreferences);
-
-
 	ui->runSingleWidget->toggle(false);
 //	setDynamicProperty(runButton(), "disabled", false);
 
@@ -1417,6 +1413,7 @@ void Oscilloscope::readPreferences()
 	toggleMiniHistogramPlotVisible(miniHist);
 
 	bool foundChannel = false;
+	bool oscLabels = p->get("m2k_osc_label").toBool();
 	for (unsigned int i = 0; i < nb_channels + nb_math_channels + nb_ref_channels;
 	     i++) {
 		ChannelWidget *cw = static_cast<ChannelWidget *>(
@@ -1425,7 +1422,7 @@ void Oscilloscope::readPreferences()
 		if (cw->enableButton()->isChecked()) {
 			/* At least one channel is enabled,
 			 * so we can enable/disable labels */
-			enableLabels(showGraticule);
+			enableLabels(oscLabels);
 			foundChannel = true;
 			break;
 		}

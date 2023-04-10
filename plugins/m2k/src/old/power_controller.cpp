@@ -115,7 +115,6 @@ PowerController::PowerController(struct iio_context *ctx,
 	}
 
 	api->setObjectName(Filter::tool_name(TOOL_POWER_CONTROLLER));
-//	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	readPreferences();
@@ -126,7 +125,6 @@ PowerController::PowerController(struct iio_context *ctx,
 
 PowerController::~PowerController()
 {
-//	disconnect(prefPanel, &Preferences::notify, this, &PowerController::readPreferences);
 	ui->dac1->setChecked(false);
 	ui->dac2->setChecked(false);
 
