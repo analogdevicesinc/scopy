@@ -22,14 +22,23 @@ public:
 
 	void pollFaults();
 
+Q_SIGNALS:
+        void backBtnPressed();
+
 protected Q_SLOTS:
 	void runButtonClicked();
 	void singleButtonClicked();
 
 private:
+        void connectSignalsAndSlots();
+        void setupDynamicUi(QWidget *parent);
+        static QPushButton* createBackButton();
+
 	struct iio_context* ctx;
 
 	Ui::Faults *ui;
+        QPushButton *m_backButton;
+
 	QTimer *timer;
 	QThread *thread;
 
@@ -37,13 +46,8 @@ private:
 	uint32_t max14906_numeric = 0;
 
 	adiscope::gui::ToolView *m_toolView{};
-//	adiscope::gui::GenericMenu *m_generalSettingsMenu{};
 	adiscope::gui::ChannelManager *m_monitorChannelManager{};
 	FaultsPage *m_faultsPage{};
-	void connectSignalsAndSlots();
-	void setupDynamicUi(QWidget *parent);
-
-	gui::GenericMenu *createGeneralSettings(const QString &title, QColor *color);
 };
 }
 #endif // SWIOTFAULTS_HPP

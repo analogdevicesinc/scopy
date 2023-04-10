@@ -17,6 +17,7 @@ Faults::Faults(struct iio_context *ctx, QWidget *parent) :
 	ctx(ctx),
 	ui(new Ui::Faults),
 	timer(new QTimer()),
+        m_backButton(Faults::createBackButton()),
 	thread(new QThread(this)) {
 
         iio_device* device0 = iio_context_get_device(ctx, 0);
@@ -58,26 +59,12 @@ void Faults::setupDynamicUi(QWidget *parent) {
 
 	this->m_toolView = gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
 
-//	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
-//	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
-
 	this->m_toolView->addFixedCentralWidget(m_faultsPage,0,0,-1,-1);
 
 	this->ui->mainLayout->addWidget(m_toolView);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
-}
 
-adiscope::gui::GenericMenu *Faults::createGeneralSettings(const QString &title, QColor *color) {
-	auto generalSettingsMenu = new adiscope::gui::GenericMenu(this);
-	generalSettingsMenu->initInteractiveMenu();
-	generalSettingsMenu->setMenuHeader(title, color, false);
-
-	auto *testLabel = new QLabel("coming soon");
-	auto *settingsWidgetSeparator = new adiscope::gui::SubsectionSeparator("MAX14906", false, this);
-	settingsWidgetSeparator->setContent(testLabel);
-	generalSettingsMenu->insertSection(settingsWidgetSeparator);
-
-	return generalSettingsMenu;
+        this->m_toolView->addTopExtraWidget(m_backButton);
 }
 
 void Faults::connectSignalsAndSlots() {
@@ -85,6 +72,9 @@ void Faults::connectSignalsAndSlots() {
 			 &Faults::runButtonClicked);
 	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this,
 			 &Faults::singleButtonClicked);
+        QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
+                Q_EMIT backBtnPressed();
+        });
 
 	QObject::connect(this->timer, &QTimer::timeout, this, &Faults::pollFaults);
 	QObject::connect(this->thread, &QThread::started, this, [&](){
@@ -183,4 +173,22 @@ void Faults::pollFaults() {
 	this->getAd74413rFaultsNumeric();
 	this->getMax14906FaultsNumeric();
 	this->m_faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
+}
+
+QPushButton *Faults::createBackButton() {
+        auto* backButton = new QPushButton();
+        backButton->setObjectName(QString::fromUtf8("backButton"));
+        backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+                                                    "  width: 95px;\n"
+                                                    "  height: 40px;\n"
+                                                    "\n"
+                                                    "  font-size: 12px;\n"
+                                                    "  text-align: center;\n"
+                                                    "  font-weight: bold;\n"
+                                                    "  padding-left: 15px;\n"
+                                                    "  padding-right: 15px;\n"
+                                                    "}"));
+        backButton->setProperty("blue_button", QVariant(true));
+        backButton->setText("Back");
+        return backButton;
 }

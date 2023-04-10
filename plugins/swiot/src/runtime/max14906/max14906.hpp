@@ -21,6 +21,9 @@ public:
 	explicit Max14906(struct iio_context *ctx, QWidget *parent = nullptr);
 	~Max14906() override;
 
+Q_SIGNALS:
+        void backBtnPressed();
+
 private Q_SLOTS:
 	void runButtonToggled();
 	void singleButtonToggled();
@@ -28,12 +31,14 @@ private Q_SLOTS:
 	void timerChanged(double value);
 
 private:
+        static QPushButton* createBackButton();
 	void initChannels();
 	void setupDynamicUi(QWidget *parent);
 	void initMonitorToolView();
 	adiscope::gui::GenericMenu* createGeneralSettings(const QString& title, QColor* color);
 	void connectSignalsAndSlots();
 
+        QPushButton *m_backButton;
 	DioController *max14906ToolController;
 	Ui::Max14906 *ui;
 	DioSettingsTab *m_max14906SettingsTab;
