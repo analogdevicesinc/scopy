@@ -62,7 +62,6 @@
 #include "ui_measure_panel.h"
 #include "ui_measure_settings.h"
 
-#include <boost/make_shared.hpp>
 #include <iio.h>
 #include <iostream>
 
