@@ -102,7 +102,7 @@ void Sismograph::plot(double sample)
 
 	scaler->setValue(sample);
 	//curve.setRawSamples(xdata.data(), ydata.data() + (ydata.size() - xdata.size()), xdata.size());
-	// depends on what is the main axix of the curve
+	// depends on what is the main axis of the curve
 	curve.setRawSamples(ydata.data() + (ydata.size() - xdata.size()), xdata.data(), xdata.size());
 	replot();
 }
@@ -195,6 +195,7 @@ void Sismograph::updateYScale(double max, double min)
 	reset();
 	ydata.resize(numSamples + 1);
 	xdata.reserve(numSamples + 1);
+        curve.setSamples(QVector<double>());
 	setSampleRate(sampleRate);
 	//setAxisScale(QwtAxis::YLeft, min,max);
 	setAxisScale(QwtAxis::XBottom, min,max);

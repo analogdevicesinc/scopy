@@ -37,7 +37,9 @@ DioDigitalChannel::DioDigitalChannel(const QString& deviceName, const QString& d
 	this->ui->sismograph->setAxisScale(0, 0, 1, 1); // y axis
 	this->ui->sismograph->setAutoscale(false);
 	this->ui->sismograph->setColor(Qt::red);
+        this->ui->sismograph->setNumSamples(0);
 	this->ui->sismograph->updateYScale(10, 0);
+        this->ui->sismograph->setUpdatesEnabled(true);
 
 	this->connectSignalsAndSlots();
 	this->ui->lcdNumber->setPrecision(0);
@@ -58,7 +60,7 @@ Ui::DioDigitalChannel *DioDigitalChannel::getUi() const {
 }
 
 void DioDigitalChannel::updateTimeScale(double newMin, double newMax) {
-	this->ui->sismograph->updateYScale(newMax, newMin);
+        this->ui->sismograph->updateYScale(newMax, newMin);
 }
 
 void DioDigitalChannel::addDataSample(double value) {
