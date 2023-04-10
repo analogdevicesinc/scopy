@@ -1798,7 +1798,13 @@ void SpectrumAnalyzer::stop()
 
 void SpectrumAnalyzer::runStopToggled(bool checked)
 {
+	if (m_running == checked) {
+		return;
+	}
+
 	if (checked) {
+		ResourceManager::open("m2k-adc",this);
+
 		if (iio) {
 			writeAllSettingsToHardware();
 		}
