@@ -1,6 +1,7 @@
 #ifndef M2KPLUGIN_H
 #define M2KPLUGIN_H
 
+#include "m2ktool.hpp"
 #define SCOPY_PLUGIN_NAME M2kPlugin
 
 #include <QObject>
@@ -37,6 +38,12 @@ public:
 	bool onDisconnect() override;
 	bool loadIcon() override;
 
+	void initPreferences() override;
+	bool loadPreferencesPage() override;
+	void init() override;
+	void saveSettings() override;
+	void loadSettings() override;
+
 
 public Q_SLOTS:
 	void showPageCallback() override;
@@ -65,21 +72,13 @@ private:
 	const int infoPageTimerTimeout = 1000;
 	const QStringList calibrationToolNames = {"Oscilloscope", "Spectrum Analyzer", "Network Analyzer", "Signal Generator", "Voltmeter", "Calibration"};
 
-
+	QMap<QString, M2kTool*> tools;
 	QMap<QString,ToolMenuEntry*> toolMenuEntryCalibrationCache;
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
 	bool loadDecoders(QString path);
 
 
-	// Plugin interface
-public:
-	void initPreferences() override;
-	bool loadPreferencesPage() override;
-
-	// Plugin interface
-public:
-	void init() override;
 };
 }
 }

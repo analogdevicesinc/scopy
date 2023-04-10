@@ -203,6 +203,9 @@ void ToolManager::showTool(QString s) {
 
 void ToolManager::toggleAttach(QString id)
 {
+	Preferences *p = Preferences::GetInstance();
+	if(!p->get("general_doubleclick_attach").toBool())
+		return;
 	for(auto &&toolist : map) {
 		for( auto &&tme : toolist.tools) {
 			if(tme->uuid() == id) {
@@ -215,6 +218,8 @@ void ToolManager::toggleAttach(QString id)
 void ToolManager::saveToolAttachedState(ToolMenuEntry *tme)
 {
 	Preferences *p = Preferences::GetInstance();
+	if(!p->get("general_save_attached").toBool())
+		return;
 	QString prefId;
 	prefId = tme->id()+"_attached";
 	bool attach = tme->attached();
@@ -226,6 +231,8 @@ void ToolManager::loadToolAttachedState(ToolMenuEntry *tme)
 {
 	Preferences *p = Preferences::GetInstance();
 	QString prefId;
+	if(!p->get("general_save_attached").toBool())
+		return;
 //	QString prefGrp = m_name;
 
 	prefId = tme->id()+"_attached";
@@ -237,6 +244,8 @@ void ToolManager::loadToolAttachedState(ToolMenuEntry *tme)
 
 void ToolManager::saveToolGeometry(ToolMenuEntry *tme, QWidget *w) {
 	Preferences *p = Preferences::GetInstance();
+	if(!p->get("general_save_attached").toBool())
+		return;
 	QString prefId;
 	if(w) {
 		prefId = tme->id()+"_geometry";
@@ -248,6 +257,8 @@ void ToolManager::saveToolGeometry(ToolMenuEntry *tme, QWidget *w) {
 
 void ToolManager::loadToolGeometry(ToolMenuEntry *tme, QWidget *w) {
 	Preferences *p = Preferences::GetInstance();
+	if(!p->get("general_save_attached").toBool())
+		return;
 	QString prefId;
 
 	if(w && !tme->attached()) {

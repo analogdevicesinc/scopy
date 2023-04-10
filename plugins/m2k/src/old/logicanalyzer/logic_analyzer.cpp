@@ -254,7 +254,6 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->btnGeneralSettings->setChecked(true);
 
 	api->setObjectName(Filter::tool_name(TOOL_LOGIC_ANALYZER));
-//	api->load(*settings);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	// Scroll wheel event filter
@@ -266,13 +265,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 LogicAnalyzer::~LogicAnalyzer()
 {
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
-
 	delete api;
-
-//	disconnect(prefPanel, &Preferences::notify, this, &LogicAnalyzer::readPreferences);
 
 	if (m_captureThread) {
 		m_stopRequested = true;

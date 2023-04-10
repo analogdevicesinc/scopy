@@ -34,28 +34,9 @@ M2kTool::M2kTool(struct iio_context *ctx, ToolMenuEntry *tme,
 	window(nullptr), tme(tme)
 {
 	tme->setEnabled(true);
-
-//	connect(this, &Tool::detachedState,
-//		parent, &ToolLauncher::toolDetached);
-//	connect(parent, &ToolLauncher::launcherClosed,
-//		this, &Tool::saveState);
-
 	p = Preferences::GetInstance();
 	connect(p, &Preferences::preferenceChanged, this, &M2kTool::readPreferences);
 	M2kTool::readPreferences();
-//#ifndef __ANDROID__
-//	if (api) {
-//		connect(api, &ApiObject::loadingFinished,
-//			this, &Tool::loadState);
-//	}
-
-//	connect(toolMenuItem, &ToolMenuItem::detach,
-//		this, &Tool::detached);
-//#endif
-//	connect(this, &Tool::detachedState,
-//		toolMenuItem, &ToolMenuItem::setDetached);
-
-
 }
 
 M2kTool::~M2kTool()
@@ -101,64 +82,10 @@ void M2kTool::readPreferences()
 	m_useNativeDialogs = p->get("general_native_dialogs").toBool();;
 }
 
-void M2kTool::saveState()
-{
-//	if (!window) {
-//		settings->setValue(name + "/detached", isDetached);
-//		return;
-//	}
-
-//	settings->setValue(name + "/detached", isDetached);
-//	settings->setValue(name + "/geometry", window->saveGeometry());
-
-//	settings->sync();
-}
-
-
-#ifndef __ANDROID__
-void M2kTool::loadState()
-{
-//	bool isDetached = settings->value(name + "/detached").toBool();
-//	if (isDetached) {
-//		detached();
-//		window->restoreGeometry(settings->value(name + "/geometry").toByteArray());
-	//	}
-}
-
 ToolMenuEntry *M2kTool::getTme() const
 {
 	return tme;
 }
-
-void M2kTool::attached()
-{
-//	Q_EMIT detachedState(false);
-//	isDetached = false;
-//	auto window = static_cast<DetachedWindow*>(this->window);
-//	disconnect(window, &DetachedWindow::closed,
-//		   this, &Tool::attached);
-//	DetachedWindowsManager::getInstance().returnWindow(window);
-//	this->window = nullptr;
-}
-
-void M2kTool::detached()
-{
-//	if (isDetached) {
-//		// If it is already detached force it in the foreground
-//		static_cast<DetachedWindow*>(parent())->showWindow();
-//	} else {
-//		Q_EMIT detachedState(true);
-//		isDetached = true;
-//		auto window = DetachedWindowsManager::getInstance().getWindow();
-//		window->setCentralWidget(this);
-//		window->setWindowTitle("Scopy - " + name);
-//		window->show();
-//		connect(window, &DetachedWindow::closed,
-//			this, &Tool::attached);
-//		this->window = window;
-//	}
-}
-#endif
 
 void M2kTool::run()
 {

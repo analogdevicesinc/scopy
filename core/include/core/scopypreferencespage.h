@@ -13,6 +13,11 @@ public:
 	~ScopyPreferencesPage();
 	QWidget* buildGeneralPreferencesPage();
 	void addHorizontalTab(QWidget *w, QString text);
+public Q_SLOTS:
+	void showRestartWidget();
+private:
+	QWidget *createRestartWidget();
+	QWidget *restartWidget;
 };
 }
 #endif // SCOPYPREFERENCESPAGE_H

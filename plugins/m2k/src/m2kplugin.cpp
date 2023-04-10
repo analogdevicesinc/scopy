@@ -195,6 +195,20 @@ void M2kPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("m2k_instrument_notes_active",false);
+
+	p->init("m2k_show_adc_filters",false);
+	p->init("m2k_show_graticule",false);
+	p->init("m2k_mini_histogram",false);
+	p->init("m2k_osc_filtering",true);
+	p->init("m2k_osc_label",false);
+	p->init("m2k_siggen_periods",2);
+	p->init("m2k_spectrum_visible_peak_search",true);
+	p->init("m2k_na_show_zero",false);
+
+	p->init("m2k_logic_separate_annotations",false);
+	p->init("m2k_logic_display_sampling_points",false);
+	p->init("m2k_logic_display_sample_time",true);
+
 }
 
 bool M2kPlugin::loadPreferencesPage()
@@ -203,9 +217,22 @@ bool M2kPlugin::loadPreferencesPage()
 
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
-	QCheckBox *pref1 = PreferencesHelper::addPreferenceCheckBox(p,"m2k_instrument_notes_active","Instrument Notes",this);
+	lay->addWidget(new QLabel("-- General --"));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_instrument_notes_active","Instrument Notes",this));
+	lay->addWidget(new QLabel("-- Analog tools --"));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_show_adc_filters","Show ADC digital filter config",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_show_graticule","Enable graticule",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_mini_histogram","Enable mini histogram",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_osc_filtering","Enable sample rate filters",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_osc_label","Enable labels on the plot",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_spectrum_visible_peak_search","Only search marker peaks in visible domain",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_na_show_zero","Always display 0db value on the graph",this));
+	lay->addWidget(PreferencesHelper::addPreferenceEdit(p,"m2k_siggen_periods","Number of displayed periods",this));
+	lay->addWidget(new QLabel("-- Logic tools --"));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_logic_separate_annotations","Separate decoder annotaions when exporting",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_logic_display_sampling_points","Display sampling points when zoomed",this));
+	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"m2k_logic_display_sample_time","Show sample and time info in decoder table",this));
 
-	lay->addWidget(pref1);
 	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
 	return true;
@@ -219,6 +246,26 @@ void M2kPlugin::init()
 				bool success = loadDecoders("decoders");
 #endif
 				qInfo(CAT_M2KPLUGIN)<<"loadDecoders " << success;
+}
+
+void M2kPlugin::saveSettings()
+{
+	for(auto &&tool : tools) {
+		ApiObject *api = tool->getApi();
+		if(api) {
+			api->save();
+		}
+	}
+}
+
+void M2kPlugin::loadSettings()
+{
+	for(auto &&tool : tools) {
+		ApiObject *api = tool->getApi();
+		if(api) {
+			api->load();
+		}
+	}
 }
 
 bool M2kPlugin::loadDecoders(QString path)
@@ -261,6 +308,7 @@ bool M2kPlugin::onConnect()
 
 	auto calib = new Calibration(ctx);
 	auto diom = new DIOManager(ctx,f);
+
 	auto dmmTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdmm");
 	auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal");
 	auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
@@ -273,17 +321,16 @@ bool M2kPlugin::onConnect()
 	auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
 	m_adcBtnGrp = new QButtonGroup(this);	
 
-	dmmTme->setTool(new DMM(ctx, f, dmmTme, m2k_man));
-	mancalTme->setTool(new ManualCalibration(ctx,f,mancalTme,nullptr,calib));
-	dioTme->setTool(new DigitalIO(ctx,f,dioTme,diom,js,nullptr));
-	pwrTme->setTool(new PowerController(ctx,pwrTme,js,nullptr));
-	siggenTme->setTool(new SignalGenerator(ctx,f,siggenTme,js,nullptr));
-	specTme->setTool(new SpectrumAnalyzer(ctx,f,specTme,m2k_man,js,nullptr));
-	oscTme->setTool(new Oscilloscope(ctx,f,oscTme,m2k_man,js,nullptr));
-	netTme->setTool(new NetworkAnalyzer(ctx,f,netTme,m2k_man,js,nullptr));
-	laTme->setTool(new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));
-	pgTme->setTool(new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));
-
+	tools.insert("m2kdmm",new DMM(ctx, f, dmmTme, m2k_man)); dmmTme->setTool(tools["m2kdmm"]);
+	tools.insert("m2kcal",new ManualCalibration(ctx,f,mancalTme,nullptr,calib)); mancalTme->setTool(tools["m2kcal"]);
+	tools.insert("m2kdio",new DigitalIO(ctx,f,dioTme,diom,js,nullptr));dioTme->setTool(tools["m2kdio"]);
+	tools.insert("m2kpower",new PowerController(ctx,pwrTme,js,nullptr));pwrTme->setTool(tools["m2kpower"]);
+	tools.insert("m2ksiggen",new SignalGenerator(ctx,f,siggenTme,js,nullptr));siggenTme->setTool(tools["m2ksiggen"]);
+	tools.insert("m2kspec",new SpectrumAnalyzer(ctx,f,specTme,m2k_man,js,nullptr));specTme->setTool(tools["m2kspec"]);
+	tools.insert("m2kosc",new Oscilloscope(ctx,f,oscTme,m2k_man,js,nullptr));oscTme->setTool(tools["m2kosc"]);
+	tools.insert("m2knet",new NetworkAnalyzer(ctx,f,netTme,m2k_man,js,nullptr));netTme->setTool(tools["m2knet"]);
+	tools.insert("m2klogic",new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));laTme->setTool(tools["m2klogic"]);
+	tools.insert("m2kpattern",new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));pgTme->setTool(tools["m2kpattern"]);
 
 	connect(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
 		if(en) {

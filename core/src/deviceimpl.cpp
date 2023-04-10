@@ -1,4 +1,5 @@
 #include "deviceimpl.h"
+#include "pluginbase/preferences.h"
 #include "qboxlayout.h"
 #include "qpushbutton.h"
 #include <QLabel>
@@ -43,7 +44,6 @@ void DeviceImpl::preload() {
 
 
 void DeviceImpl::loadPlugins() {
-
 	preload();
 	loadName();
 	loadIcons();
@@ -176,12 +176,16 @@ void DeviceImpl::load(QSettings &s) {
 void DeviceImpl::connectDev() {
 	connbtn->hide();
 	discbtn->show();
+	Preferences *pref = Preferences::GetInstance();
 
 	for(auto &&p : m_plugins) {
 		p->onConnect();
-		p->loadSettings();
-		if(p->api())
+		if(pref->get("general_save_session").toBool()) {
+			p->loadSettings();
+		}
+		if(p->api()) {
 			ScopyJS::GetInstance()->registerApi(p->api());
+		}
 	}
 	Q_EMIT connected();
 }
@@ -189,11 +193,14 @@ void DeviceImpl::connectDev() {
 void DeviceImpl::disconnectDev() {
 	connbtn->show();
 	discbtn->hide();
-
+	Preferences *pref = Preferences::GetInstance();
 	for(auto &&p : m_plugins) {
-		if(p->api())
+		if(p->api()) {
 			ScopyJS::GetInstance()->unregisterApi(p->api());
-		p->saveSettings();
+		}
+		if(pref->get("general_save_session").toBool()) {
+			p->saveSettings();
+		}
 		p->onDisconnect();
 	}
 	Q_EMIT disconnected();
