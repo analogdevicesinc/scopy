@@ -30,11 +30,18 @@ public Q_SLOTS:
 	void updateToolEntry();
 	void updateToolAttached();
 
+	bool eventFilter(QObject *object, QEvent *event) override;
+
+
 	void updateTool();
 	void showTool(QString id);
 	void toggleAttach(QString id);
 
 private:
+
+	void saveToolAttachedState(ToolMenuEntry *tme);
+	void loadToolAttachedState(ToolMenuEntry *tme);
+
 	void saveToolGeometry(ToolMenuEntry *tme, QWidget *w);
 	void loadToolGeometry(ToolMenuEntry *tme, QWidget *w);
 
