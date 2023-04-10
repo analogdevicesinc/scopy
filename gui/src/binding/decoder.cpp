@@ -40,9 +40,6 @@
 
 #include <libsigrokdecode/libsigrokdecode.h>
 
-#include <boost/none_t.hpp>
-
-//#include <adiscope/data/decodesignal.hpp>
 #include "prop/double.hpp"
 #include "prop/enum.hpp"
 #include "prop/int.hpp"
