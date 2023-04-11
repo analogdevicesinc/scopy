@@ -15,9 +15,11 @@ namespace adiscope {
 class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
-	ToolMenuEntry(QString id, QString name, QString icon, QObject *parent = nullptr) :
-		QObject(parent), m_id(id), m_uuid(QUuid::createUuid().toString()),  m_name(name), m_icon(icon), m_visible(true),
-		m_enabled(false), m_running(false), m_runBtnVisible(false), m_attached(true), m_tool(nullptr) {}
+	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr) :
+		QObject(parent), m_id(id), m_uuid(QUuid::createUuid().toString()),
+		m_name(name), m_icon(icon), m_pluginName(pluginName), m_visible(true),
+		m_enabled(false), m_running(false), m_runBtnVisible(false),
+		m_attached(true), m_tool(nullptr) {}
 
 	ToolMenuEntry(const ToolMenuEntry &other) {
 		m_id = other.m_id;
@@ -29,6 +31,7 @@ public:
 		m_running = other.m_running;
 		m_runBtnVisible = other.m_runBtnVisible;
 		m_attached = other.m_attached;
+		m_pluginName = other.m_pluginName;
 		m_tool = other.m_tool;
 	}
 
@@ -37,6 +40,7 @@ public:
 	inline QString uuid() const { return m_uuid; }
 	inline QString name() const { return m_name; }
 	inline QString icon() const { return m_icon; }
+	inline QString pluginName() const { return m_pluginName; }
 	inline bool visible() const { return m_visible; }
 	inline bool enabled() const { return m_enabled; }
 	inline bool running() const { return m_running; }
@@ -107,7 +111,7 @@ public Q_SLOTS:
 	 * @param newTool
 	 * links a widget to the tool menu entry. Remove tool from the menu entry by setting newtool to nullptr
 	 */
-	void setTool(QWidget *newTool);
+	QWidget* setTool(QWidget *newTool);
 
 Q_SIGNALS:
 	/**
@@ -119,7 +123,8 @@ Q_SIGNALS:
 	 * @brief updateTool
 	 * signal is emitted automatically when changing a tool linked to the tool entry
 	 */
-	void updateTool();
+	void updateToolAttached(bool);
+	void updateTool(QWidget*);
 
 	/**
 	 * @brief requestRun
@@ -138,6 +143,7 @@ private:
 	QString m_uuid;
 	QString m_name;
 	QString m_icon;
+	QString m_pluginName;
 	bool m_visible;
 	bool m_enabled;
 	bool m_running;
@@ -213,17 +219,25 @@ inline void ToolMenuEntry::setRunBtnVisible(bool newRunBtnVisible)
 	Q_EMIT updateToolEntry();
 }
 
-inline void ToolMenuEntry::setTool(QWidget *newTool)
+inline QWidget* ToolMenuEntry::setTool(QWidget *newTool)
 {
+	QWidget* oldTool;
+	oldTool = m_tool;
 	m_tool = newTool;
-	Q_EMIT updateTool();
+	if(oldTool != m_tool) {
+		Q_EMIT updateTool(oldTool);
+	}
+	return oldTool;
 }
 
 
 inline void ToolMenuEntry::setAttached(bool attach)
 {
+	bool oldAttach = m_attached;
 	m_attached = attach;
-	Q_EMIT updateTool();
+	if(oldAttach != m_attached && m_tool) {
+		Q_EMIT updateToolAttached(oldAttach);
+	}
 }
 
 

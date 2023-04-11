@@ -69,7 +69,6 @@ bool TestPluginIp::onDisconnect()
 		}
 	}
 	m_toolList.removeLast();
-	Q_EMIT toolListChanged();
 	m_toolList[0]->setName("IP");
 
 	qDebug(CAT_TESTPLUGINIP)<<"disconnect";
