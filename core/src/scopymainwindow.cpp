@@ -65,15 +65,14 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	dm = new DeviceManager(pm, this);
 	dm->setExclusive(true);
 
-	toolman = new ToolManager(tm,ts,this);
+	dtm = new DetachedToolWindowManager(this);
+	toolman = new ToolManager(tm,ts,dtm,this);
 	toolman->addToolList("home",{});
 	toolman->addToolList("add",{});
 
 	connect(tm,&ToolMenu::toggleAttach,toolman,&ToolManager::toggleAttach);
-	connect(ts,&ToolStack::attachSuccesful,tm,&ToolMenu::attachSuccesful);
-	connect(ts,&ToolStack::detachSuccesful,tm,&ToolMenu::detachSuccesful);
-
 	connect(tb,&ToolBrowser::requestTool,ts, &ToolStack::show);
+	connect(tb,&ToolBrowser::requestTool,dtm, &DetachedToolWindowManager::show);
 
 	ts->add("home", hp);
 	ts->add("about", about);
