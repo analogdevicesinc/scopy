@@ -6,6 +6,7 @@ message(STATUS "plugins to " ${SCOPY_PLUGIN_INSTALL_PATH})
 option(ENABLE_PLUGIN_TEST ON)
 option(ENABLE_PLUGIN_M2K ON)
 option(ENABLE_PLUGIN_SWIOT ON)
+option(ENABLE_PLUGIN_DATALOGGER ON)
 
 if(ENABLE_PLUGIN_TEST)
     add_subdirectory(testplugin)
@@ -23,6 +24,11 @@ endif()
 
 if(ENABLE_PLUGIN_M2K)
     add_subdirectory(m2k)
+    list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DATALOGGER)
+    add_subdirectory(datalogger)
     list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
