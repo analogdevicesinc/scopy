@@ -61,6 +61,8 @@ private:
 	QMap<QString,Device*> map;
 	PluginManager *pm;
 
+	void disconnectDevice(QString id);
+	void connectDevice(QString id);
 };
 }
 

@@ -4,13 +4,16 @@
 #include <QDebug>
 #include <QEvent>
 
+
 Q_LOGGING_CATEGORY(CAT_TOOLMANAGER, "ToolManager")
 using namespace adiscope;
-ToolManager::ToolManager(ToolMenu *tm, ToolStack *ts, QObject *parent ) : QObject(parent)
+
+ToolManager::ToolManager(ToolMenu *tm, ToolStack *ts, DetachedToolWindowManager *dwm, QObject *parent ) : QObject(parent)
 {
 	currentKey = "";
 	this->tm = tm;
 	this->ts = ts;
+	this->dwm = dwm;
 	qDebug(CAT_TOOLMANAGER) << "ctor";
 }
 
@@ -27,7 +30,8 @@ void ToolManager::addToolList(QString s, QList<ToolMenuEntry*> sl) {
 		showToolList(s);
 	}
 	for(ToolMenuEntry *tme : qAsConst(map[s].tools)) {
-		connect(tme,SIGNAL(updateTool()),this,SLOT(updateTool()));
+		connect(tme,SIGNAL(updateToolAttached(bool)),this,SLOT(updateToolAttached(bool)));
+		connect(tme,SIGNAL(updateTool(QWidget*)),this,SLOT(updateTool(QWidget*)));
 	}
 }
 
@@ -39,7 +43,8 @@ void ToolManager::removeToolList(QString s) {
 
 	for(ToolMenuEntry *tme : qAsConst(map[s].tools))
 	{
-		disconnect(tme,SIGNAL(updateTool()),this,SLOT(updateTool()));
+		disconnect(tme,SIGNAL(updateToolAttached(bool)),this,SLOT(updateToolAttached(bool)));
+		disconnect(tme,SIGNAL(updateTool(QWidget*)),this,SLOT(updateTool(QWidget*)));
 	}
 	map.take(s);
 }
@@ -121,7 +126,7 @@ void ToolManager::updateToolEntry() {
 	updateToolEntry(tme);
 }
 
-void ToolManager::updateTool() {
+void ToolManager::updateTool(QWidget* old) {
 
 	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
 	Q_ASSERT(tme);
@@ -129,75 +134,55 @@ void ToolManager::updateTool() {
 	QString name = tme->name();
 	QWidget* tool = tme->tool();
 
-	if(ts->get(id) != tool) {
+	if(old != nullptr) { // we had a widget
+		saveToolAttachedState(tme);
 		if(ts->contains(id)) {
-			saveToolAttachedState(tme);
-			if(!tme->attached())
-				saveToolGeometry(tme,ts->get(id));
 			ts->remove(id);
 		}
-		if(tool != nullptr) {
-			ts->add(id,tool);
-			loadToolAttachedState(tme);
+		if(dwm->contains(id)) {
+			dwm->remove(id);
 		}
 	}
+	if(tool != nullptr) { // we have a new widget
+		if(tme->attached()) {
+			ts->add(id,tool);
+		} else {
+			dwm->add(id,tme);
+		}
+		loadToolAttachedState(tme);
+	}
 
-	updateToolAttached();
 	qDebug(CAT_TOOLMANAGER) << "updating tool for " << tme->name() <<" - "<< id;
 }
 
-void ToolManager::updateToolAttached() {
+void ToolManager::updateToolAttached(bool oldAttach) {
 	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
 	Q_ASSERT(tme);
 	QWidget* tool = tme->tool();
 	QString id = tme->uuid();
 	QString name = tme->name();
 
-	if(ts->contains(id)) {
-		saveToolAttachedState(tme);
-
-		ts->setAttached(id,tme->attached());
-		tool->setAttribute(Qt::WA_QuitOnClose, tme->attached());
-
-		if(!tme->attached()) {
-			tool->installEventFilter(this);
-			loadToolGeometry(tme,tool);
-		} else {
-			tool->removeEventFilter(this);
+	if(tme->attached()) {
+		if(dwm->contains(id)) {
+			dwm->remove(id);
 		}
+		ts->add(id,tool);
+		tm->attachSuccesful(id);
+	} else {
+		if(ts->contains(id)) {
+			ts->remove(id);
+		}
+		dwm->add(id, tme);
+		tm->detachSuccesful(id);
 	}
-}
-
-bool ToolManager::eventFilter(QObject *object, QEvent *event)
-{
-	ToolMenuEntry *tme = nullptr;
-	bool handled = false;
-	if(event->type() == QEvent::ParentAboutToChange || event->type() == QEvent::Close || event->type() == QEvent::Hide) {
-		handled = true;
-		QWidget *w = dynamic_cast<QWidget*>(object);
-		if(!w)
-			return false;
-		for(auto &&st : map) {
-			tme = ToolMenuEntry::findToolMenuEntryByTool(st.tools,w);
-			if(tme)
-				break;
-		}
-		if(!tme)
-			return false;
-
-		saveToolGeometry(tme, w);
-		if(event->type() == QEvent::Close) {
-			tme->setAttached(true);
-
-		}
-		showTool(tme->uuid());
-	}
-
-	return handled;
+	saveToolAttachedState(tme);
+	showTool(id);
 }
 
 void ToolManager::showTool(QString s) {
-	tm->getToolMenuItemFor(s)->getToolBtn()->setChecked(true);
+	auto toolmenuitem = tm->getToolMenuItemFor(s);
+	if(toolmenuitem)
+		toolmenuitem->getToolBtn()->setChecked(true);
 	Q_EMIT tm->requestToolSelect(s);
 }
 
@@ -241,34 +226,5 @@ void ToolManager::loadToolAttachedState(ToolMenuEntry *tme)
 	tme->setAttached(attach);
 	qDebug(CAT_TOOLMANAGER)<<"Loading " << prefId << " " << attach;
 }
-
-void ToolManager::saveToolGeometry(ToolMenuEntry *tme, QWidget *w) {
-	Preferences *p = Preferences::GetInstance();
-	if(!p->get("general_save_attached").toBool())
-		return;
-	QString prefId;
-	if(w) {
-		prefId = tme->id()+"_geometry";
-		QRect geometry = w->geometry();
-		p->set(prefId, geometry);
-		qDebug(CAT_TOOLMANAGER)<<"Saving " << prefId << " " << geometry;
-	}
-}
-
-void ToolManager::loadToolGeometry(ToolMenuEntry *tme, QWidget *w) {
-	Preferences *p = Preferences::GetInstance();
-	if(!p->get("general_save_attached").toBool())
-		return;
-	QString prefId;
-
-	if(w && !tme->attached()) {
-		prefId = tme->id()+"_geometry";
-		p->init(prefId, tme->tool()->geometry());
-		QRect geometry = p->get(prefId).toRect();
-		w->setGeometry(geometry);
-		qDebug(CAT_TOOLMANAGER)<<"Loading " <<prefId<<tme->tool()->geometry();
-	}
-}
-
 
 #include "moc_toolmanager.cpp"
