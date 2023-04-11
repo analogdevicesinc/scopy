@@ -39,14 +39,13 @@ private:
 	ConfigMenu* m_configMenu;
 	adiscope::gui::ToolView* m_toolView;
 
-//	DrawArea* m_drawArea;
-//	QScrollArea* m_scrollArea;
-
-//protected:
-//	bool eventFilter(QObject *object, QEvent * event) override;
+	DrawArea* m_drawArea;
+	QScrollArea* m_scrollArea;
 
 private:
+        void setupToolView(QWidget* parent);
 	void init();
+        void createPageLayout();
 	bool isConfigCtx();
 	void setDevices(struct iio_context* ctx);
 	static QPushButton* createConfigBtn();
