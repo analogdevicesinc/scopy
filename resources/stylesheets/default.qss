@@ -1,6 +1,3 @@
-QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
- background-color: #272730;
-}
 QWidget {
  background-color: transparent;
  color: #bebebe;
@@ -8,6 +5,11 @@ QWidget {
  font-weight: normal;
  font-size: 13px;
 }
+
+adiscope--DetachedToolWindow, QMainWindow > .QWidget, adiscope--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
+ background-color: #272730;
+}
+
 QDockWidget {
  titlebar-normal-icon: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }

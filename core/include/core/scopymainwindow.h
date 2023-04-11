@@ -7,6 +7,7 @@
 #include "devicemanager.h"
 #include "scannediiocontextcollector.h"
 #include "toolmanager.h"
+#include "detachedtoolwindowmanager.h"
 #include "pluginrepository.h"
 #include "scopycore_export.h"
 #include "scopyaboutpage.h"
@@ -52,6 +53,7 @@ private:
     IIOScanTask *scanTask;
     ScannedIIOContextCollector *scc;
     ToolManager *toolman;
+    DetachedToolWindowManager *dtm;
 
     Ui::ScopyMainWindow *ui;
 

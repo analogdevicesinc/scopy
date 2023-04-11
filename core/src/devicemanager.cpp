@@ -96,16 +96,16 @@ void DeviceManager::removeDeviceById(QString id)
 }
 
 void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
-	connect(d,SIGNAL(connected()),this,SLOT(connectDevice()));
-	connect(d,SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
+	connect(d,&DeviceImpl::connected,this,[=](){connectDevice(d->id());});
+	connect(d,&DeviceImpl::disconnected,this,[=](){disconnectDevice(d->id());});
 	connect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	connect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	connect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
 
 }
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
-	disconnect(d,SIGNAL(connected()),this,SLOT(connectDevice()));
-	disconnect(d,SIGNAL(disconnected()),this,SLOT(disconnectDevice()));
+	disconnect(d,SIGNAL(connected()));
+	disconnect(d,SIGNAL(disconnected()));
 	disconnect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	disconnect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	disconnect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
@@ -148,6 +148,10 @@ void DeviceManager::changeToolListDevice() {
 
 void DeviceManager::connectDevice() {
 	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+	connectDevice(id);
+}
+
+void DeviceManager::connectDevice(QString id) {
 	qDebug(CAT_DEVICEMANAGER)<<"connecting " << id << "...";
 	if(connectedDev.contains(id)) {
 		qDebug(CAT_DEVICEMANAGER)<<"connecting to the same device, disconnecting first .. ";
@@ -165,8 +169,14 @@ void DeviceManager::connectDevice() {
 	Q_EMIT deviceConnected(id, map[id]);
 }
 
+
+
 void DeviceManager::disconnectDevice() {
 	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+	disconnectDevice(id);
+}
+
+void DeviceManager::disconnectDevice(QString id) {
 	qDebug(CAT_DEVICEMANAGER)<<"disconnecting "<< id << "...";
 	connectedDev.removeOne(id);
 	Q_EMIT requestTool("home");
