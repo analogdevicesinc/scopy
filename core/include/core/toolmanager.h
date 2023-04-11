@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include "toolmenu.h"
+#include "detachedtoolwindowmanager.h"
 #include "pluginbase/toolmenuentry.h"
 #include "toolstack.h"
 #include "scopycore_export.h"
@@ -14,7 +15,7 @@ class SCOPYCORE_EXPORT ToolManager : public QObject
 {
 	Q_OBJECT
 public:
-	ToolManager(ToolMenu* tm, ToolStack *ts, QObject *parent = nullptr);
+	ToolManager(ToolMenu* tm, ToolStack *ts, DetachedToolWindowManager *dwm,QObject *parent = nullptr);
 	~ToolManager();
 
 public Q_SLOTS:
@@ -28,22 +29,19 @@ public Q_SLOTS:
 
 	void updateToolEntry(ToolMenuEntry *tme);
 	void updateToolEntry();
-	void updateToolAttached();
+	void updateToolAttached(bool old);
 
-	bool eventFilter(QObject *object, QEvent *event) override;
-
-
-	void updateTool();
+	void updateTool(QWidget* old);
 	void showTool(QString id);
 	void toggleAttach(QString id);
+
+Q_SIGNALS:
+	void requestTool(QString id);
 
 private:
 
 	void saveToolAttachedState(ToolMenuEntry *tme);
 	void loadToolAttachedState(ToolMenuEntry *tme);
-
-	void saveToolGeometry(ToolMenuEntry *tme, QWidget *w);
-	void loadToolGeometry(ToolMenuEntry *tme, QWidget *w);
 
 	typedef struct {
 		QString id;
@@ -56,6 +54,7 @@ private:
 	QStringList lockedToolLists;
 	ToolMenu *tm;
 	ToolStack *ts;
+	DetachedToolWindowManager *dwm;
 };
 }
 
