@@ -3,6 +3,7 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QEvent>
+#include <gui/utils.h>
 
 
 Q_LOGGING_CATEGORY(CAT_TOOLMANAGER, "ToolManager")
@@ -117,6 +118,7 @@ void ToolManager::updateToolEntry(ToolMenuEntry *tme) {
 	m->getToolRunBtn()->setEnabled(tme->runEnabled());
 	m->getToolRunBtn()->setEnabled(tme->runBtnVisible());
 	m->getToolRunBtn()->setChecked(tme->running());
+	Util::retainWidgetSizeWhenHidden(m, tme->visible());
 	qDebug(CAT_TOOLMANAGER) << "updating toolmenuentry for " << tme->name() <<" - "<< tme->uuid();
 }
 
