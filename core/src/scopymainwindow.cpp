@@ -188,10 +188,10 @@ void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
 	}
 }
 
-
 void ScopyMainWindow::initPreferences()
 {
-	QString preferencesPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/preferences.ini";
+	QString preferencesPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)
+							  + "/preferences.ini";
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
 	p->load();
@@ -201,16 +201,19 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_doubleclick_attach", true);
 	p->init("general_use_opengl", true);
 	p->init("general_use_animations", true);
-	p->init("general_theme", "dark");
+	p->init("general_theme", "default");
 	p->init("general_language", "english");
 	p->init("general_plot_target_fps", "60");
 	p->init("general_show_plot_fps", true);
 	p->init("general_use_native_dialogs", true);
 
-	connect(p,SIGNAL(preferenceChanged(QString,QVariant)),this,SLOT(handlePreferences(QString,QVariant)));
+	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
-	if(p->get("general_use_opengl").toBool())
+	if (p->get("general_use_opengl").toBool()) {
 		loadOpenGL();
+	}
+	QString theme = p->get("general_theme").toString();
+	QIcon::setThemeName("scopy-" + theme);
 }
 
 void ScopyMainWindow::loadOpenGL() {
@@ -243,9 +246,7 @@ void ScopyMainWindow::handlePreferences(QString str,QVariant val) {
 
 	} else if(str == "general_language") {
 		prefPage->showRestartWidget();
-
 	}
-
 }
 
 
