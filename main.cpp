@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
 					 "TestPlugin.debug=true\n"
 					 "Plugin.debug=true\n"
 					 "swiotConfig.debug=true\n"
+					 "CyclicalTask.debug=false\n"
+					 "SWIOTPlugin.debug=true\n"
 					 );
 
 	QCoreApplication::setOrganizationName("ADI");

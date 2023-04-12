@@ -41,11 +41,15 @@ public:
 	void unload() override;
 	bool compatible(QString param) override;
 	void initMetadata() override;
+
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
 
 private:
+	void cleanAfterLastContext();
+	void setupToolList();
+
 	Ui::SWIOTInfoPage *infoui;
 
 	QWidget *config ;

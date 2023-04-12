@@ -7,48 +7,42 @@ SwiotController::SwiotController(QString uri, QObject *parent)
 	: QObject(parent), uri(uri)
 {
 	pingTask = nullptr;
+	pingTimer = nullptr;
 }
 
 SwiotController::~SwiotController()
-{
-
-}
+{}
 
 void SwiotController::startPingTask()
 {
 	pingTask = new IIOPingTask(m_iioCtx);
-	pingTimer = new CyclicalTask(pingTask, this);
+	pingTimer = new CyclicalTask(pingTask);
 	connect(pingTask,SIGNAL(pingSuccess()),this,SIGNAL(pingSuccess()));
 	connect(pingTask,SIGNAL(pingFailed()),this,SIGNAL(pingFailed()));
-	pingTimer->start(5000);
+	pingTimer->start(2000);
 }
 
 void SwiotController::stopPingTask()
 {
+	pingTimer->stop();
 	pingTask->requestInterruption();
-	pingTask->deleteLater();
-	pingTimer->deleteLater();
+	disconnect(pingTask, SIGNAL(pingSuccess()), this, SIGNAL(pingSuccess()));
+	disconnect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
 }
 
 void SwiotController::startSwitchContextTask()
 {
-	if (pingTask) {
-//		stopPingTask();
-	}
 	switchCtxTask = new SwiotSwitchCtxTask(uri);
 	switchCtxTimer = new CyclicalTask(switchCtxTask, this);
-	switchCtxTimer->start(5000);
-	connect(switchCtxTask,&SwiotSwitchCtxTask::contextSwitched,this,[=]() {
-		Q_EMIT contextSwitched();
-		stopSwitchContextTask();
-	});
+	switchCtxTimer->start(3000);
+	connect(switchCtxTask, &SwiotSwitchCtxTask::contextSwitched, this, &SwiotController::contextSwitched);
 }
 
 void SwiotController::stopSwitchContextTask()
 {
+	switchCtxTimer->stop();
 	switchCtxTask->requestInterruption();
-	switchCtxTask->deleteLater();
-	switchCtxTimer->deleteLater();
+	disconnect(switchCtxTask, &SwiotSwitchCtxTask::contextSwitched, this, &SwiotController::contextSwitched);
 }
 
 void SwiotController::connectSwiot(iio_context *ctx)
