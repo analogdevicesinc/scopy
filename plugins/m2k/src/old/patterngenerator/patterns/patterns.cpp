@@ -349,7 +349,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		sp->setMsbFirst(params["MSB"].toBool());
 
 		auto paramsContainer = params["v"].toArray();
-		for (auto val : qAsConst(paramsContainer)) {
+		for (const auto &val : qAsConst(paramsContainer)) {
 			sp->v.push_back(val.toInt());
 		}
 	} else if (ip) {
@@ -361,7 +361,7 @@ Pattern *Pattern_API::fromJson(QJsonObject obj)
 		ip->setWrite(params["write"].toBool());
 
 		auto paramsContainer = params["v"].toArray();
-		for (auto val : qAsConst(paramsContainer)) {
+		for (const auto &val : qAsConst(paramsContainer)) {
 			ip->v.push_back(val.toInt());
 		}
 	} else if (imp) {

@@ -26,7 +26,7 @@ DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObjec
 void DeviceImpl::init()
 {
 	m_plugins = p->getCompatiblePlugins(m_param,m_category);
-	for( Plugin *p : m_plugins) {
+	for (Plugin *p : qAsConst(m_plugins)) {
 		QObject* obj = dynamic_cast<QObject*>(p);
 		if(obj) {
 			obj->setParent(this);

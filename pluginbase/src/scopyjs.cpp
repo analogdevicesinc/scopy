@@ -167,11 +167,11 @@ void ScopyJS::printToConsole(const QString& text)
 
 QString ScopyJS::readFromConsole(const QString& request)
 {
-	bool done = false;
+	done = false;
 	input = "";
 
 	std::cout << request.toStdString() << std::endl;
-	connect(&watcher, &QFutureWatcher<QString>::finished, [&]() {
+	connect(&watcher, &QFutureWatcher<QString>::finished, this, [&]() {
 		input = watcher.result();
 		done = true;
 	});

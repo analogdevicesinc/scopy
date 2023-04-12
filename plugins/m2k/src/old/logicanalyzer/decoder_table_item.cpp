@@ -160,7 +160,7 @@ void DecoderTableItem::paint(
 			data.get_annotation_subset(range, startSample - 1, endSample);
 		}
 
-		for (auto ann: range) {
+		for (const auto &ann : range) {
 			curve->drawAnnotation(
 						offset, ann, painter, xmap, ymap, rect, mapper,
 						interval, titleSize);

@@ -219,7 +219,7 @@ void DecoderTableModel::reloadDecoders(bool logic)
 	m_curves.clear();
 
 	// Reconnect signals for all the annotation curves
-	for (const auto &curve: m_plotCurves) {
+	for (const auto &curve : qAsConst(m_plotCurves)) {
 		if (const auto annCurve = dynamic_cast<AnnotationCurve *>(curve)) {
 			m_curves.emplace_back(annCurve);
 		}
@@ -350,7 +350,7 @@ QVariant DecoderTableModel::data(const QModelIndex &index, int role) const
 	std::map<Row, RowData> decoder(temp_curve->getAnnotationRows());
 	vector<Annotation> row;
 
-	for (auto row_map: decoder) {
+	for (const auto &row_map : decoder) {
 		row = row_map.second.get_annotations();
 		if (!row.empty() && row_map.first.index() == getPrimaryAnnotationIndex()) {
 			break;
@@ -432,7 +432,7 @@ void DecoderTableModel::searchTable(QString text)
 		QString primary_title;
 
 		// get primary annotation
-		for (auto row_map: decoder) {
+		for (const auto &row_map : decoder) {
 			row = row_map.second.get_annotations();
 			primary_title = temp_curve->fromTitleToRowType(row_map.first.title());
 
@@ -454,7 +454,7 @@ void DecoderTableModel::searchTable(QString text)
 			}
 			row_index++;
 
-			for (auto row_map: decoder) {
+			for (const auto &row_map : decoder) {
 				if (row_map.second.get_annotations().empty()) continue;
 				QString title = temp_curve->fromTitleToRowType(row_map.first.title());
 				if (m_filteredMessages.value(m_current_column).contains(title)) continue;
@@ -470,8 +470,7 @@ void DecoderTableModel::searchTable(QString text)
 					      (unsigned)(ann.start_sample()-start_sample) < (end_sample-start_sample)) ||
 					     (ann.start_sample() <= start_sample && ann.end_sample() >= end_sample))) ||
 							(start_sample <= ann.start_sample() && ann.end_sample() <= end_sample)) {
-
-						for (auto value: ann.annotations()) {
+						for (const auto &value : ann.annotations()) {
 							if (rx.indexIn(value) != -1) {
 								goto skip_loop;
 							}
