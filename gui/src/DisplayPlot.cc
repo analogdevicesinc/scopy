@@ -753,16 +753,16 @@ void DisplayPlot::setupCursors() {
 	d_hBar2 = new HorizBar(this, true);
 
 	d_vCursorHandle1 = new PlotLineHandleV(
-				QPixmap(":/icons/v_cursor_handle.svg"),
+				QPixmap(":/gui/icons/v_cursor_handle.svg"),
 				d_rightHandlesArea);
 	d_vCursorHandle2 = new PlotLineHandleV(
-				QPixmap(":/icons/v_cursor_handle.svg"),
+				QPixmap(":/gui/icons/v_cursor_handle.svg"),
 				d_rightHandlesArea);
 	d_hCursorHandle1 = new PlotLineHandleH(
-				QPixmap(":/icons/h_cursor_handle.svg"),
+				QPixmap(":/gui/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 	d_hCursorHandle2 = new PlotLineHandleH(
-				QPixmap(":/icons/h_cursor_handle.svg"),
+				QPixmap(":/gui/icons/h_cursor_handle.svg"),
 				d_bottomHandlesArea);
 
 	d_vertCursorsHandleEnabled = true;

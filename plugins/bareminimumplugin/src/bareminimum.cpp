@@ -21,7 +21,7 @@ bool BareMinimum::compatible(QString m_param) {
 
 void BareMinimum::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("bareminimum_tool","MinimumTool",":/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("bareminimum_tool","MinimumTool",":/gui/icons/scopy-default/icons/tool_home.svg"));
 }
 
 bool BareMinimum::onConnect()

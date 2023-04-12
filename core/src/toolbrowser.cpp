@@ -15,7 +15,7 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
     tm->getButtonGroup()->addButton(ui->btnPreferences);
     tm->getButtonGroup()->addButton(ui->btnAbout);
 
-    ToolMenuItem* homeTme = tm->addTool("home","Home",":/icons/scopy-default/icons/tool_home.svg");
+    ToolMenuItem* homeTme = tm->addTool("home","Home",":/gui/icons/scopy-default/icons/tool_home.svg");
     homeTme->setSeparator(false,true);
     homeTme->getToolRunBtn()->setVisible(false);
     homeTme->setEnabled(true);

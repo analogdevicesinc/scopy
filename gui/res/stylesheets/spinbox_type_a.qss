@@ -1,27 +1,27 @@
 QPushButton#SBA_UpButton {
   width: 30px;
   height: 30px;
-  border-image: url(:/icons/sba_up_btn.svg);
+  border-image: url(:/gui/icons/sba_up_btn.svg);
   border: 0px;
 }
 QPushButton#SBA_UpButton:pressed {
-  border-image: url(:/icons/sba_up_btn_pressed.svg);
+  border-image: url(:/gui/icons/sba_up_btn_pressed.svg);
 }
 QPushButton#SBA_UpButton:hover:!pressed {
-  border-image: url(:/icons/sba_up_btn_hover.svg);
+  border-image: url(:/gui/icons/sba_up_btn_hover.svg);
 }
 
 QPushButton#SBA_DownButton {
   width: 30px;
   height: 30px;
-  border-image: url(:/icons/sba_dn_btn.svg);
+  border-image: url(:/gui/icons/sba_dn_btn.svg);
   border: 0px;
 }
 QPushButton#SBA_DownButton:pressed {
-  border-image: url(:/icons/sba_dn_btn_pressed.svg);
+  border-image: url(:/gui/icons/sba_dn_btn_pressed.svg);
 }
 QPushButton#SBA_DownButton:hover:!pressed {
-  border-image: url(:/icons/sba_dn_btn_hover.svg);
+  border-image: url(:/gui/icons/sba_dn_btn_hover.svg);
 }
 
 QLabel#SBA_Label {
@@ -57,14 +57,14 @@ QComboBox#SBA_Combobox::drop-down {
   subcontrol-position: center right;
   width: 10px;
   height: 6px;
-  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 QComboBox#SBA_Combobox::drop-down:disabled {
   subcontrol-position: center right;
   width: 0px;
   height: 0px;
-  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
 }
 
 QDial#SBA_CompletionCircle {
