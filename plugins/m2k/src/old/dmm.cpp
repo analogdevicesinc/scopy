@@ -186,7 +186,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 	setLineThicknessCh1(ui->cbLineThicknessCh1->currentIndex());
         setLineThicknessCh2(ui->cbLineThicknessCh2->currentIndex());
 
-        /* Lock the flowgraph if we are already started */
+	/* Lock the flowgraph if we are already started */
 	bool started = isIioManagerStarted();
 	if (started)
 		manager->lock();
@@ -211,7 +211,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 
 	for(unsigned int i=0;i < m_adc_nb_channels;i++)
 	{
-		m_gainHistory.push_back(boost::circular_buffer<libm2k::analog::M2K_RANGE>(m_gainHistorySize));
+		m_gainHistory.push_back(std::deque<libm2k::analog::M2K_RANGE>(m_gainHistorySize));
 	}
 }
 
@@ -392,6 +392,9 @@ void DMM::checkAndUpdateGainMode(const std::vector<double> &volts)
 
 		// add all gains to circular buffer
 		auto suggested_range = suggestRange (volts[m_adc_nb_channels * i], volts[(m_adc_nb_channels * i) + 1]);
+		if(m_gainHistory[i].size() == m_gainHistorySize) {
+			m_gainHistory[i].pop_front();
+		}
 		m_gainHistory[i].push_back(suggested_range);
 
 
