@@ -76,6 +76,7 @@ private:
 	QJSEngine m_engine;
 #endif
 	QSocketNotifier *notifier;
+	bool done;
 	static ScopyJS * pinstance_;
 };
 

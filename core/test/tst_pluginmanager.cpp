@@ -55,8 +55,8 @@ void TST_PluginManager::loadLibs()
 
 	p->sort();
 	sortedplugins = p->getPlugins("");
-	for(auto p : plugins) {
-		for(auto q : sortedplugins) {
+	for(auto p : qAsConst(plugins)) {
+		for(auto q : qAsConst(sortedplugins)) {
 			if(p==q)
 				QFAIL("duplicates found in sortedplugins vs plugins");
 		}
