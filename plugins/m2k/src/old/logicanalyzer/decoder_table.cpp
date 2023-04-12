@@ -147,7 +147,7 @@ QVector<QPair<uint64_t, uint64_t>> DecoderTable::getSearchSampleMask()
 	vector<Annotation> row;
 	QVector<QPair<uint64_t, uint64_t>> sampleMask;
 
-	for (auto row_map: decoder) {
+	for (const auto &row_map : decoder) {
 		if (row_map.first.index() == tableModel->getPrimaryAnnotationIndex()) {
 			row = row_map.second.get_annotations();
 			break;
@@ -188,7 +188,7 @@ bool DecoderTable::exportTxt(QString fileName)
 		QString title = curve->fromTitleToRowType(it->first.title());
 		if (tableModel->getFiltered().value(tableModel->getCurrentColumn()).contains(title)) continue;
 
-		for (auto ann: annotations) {
+		for (const auto &ann : annotations) {
 			QVector<QString> str = {QString::number(ann.start_sample()) + "-" + QString::number(ann.end_sample()), ann.row()->title(), ann.annotations()[0]};
 			decoder_data.append(str);
 		}

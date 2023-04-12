@@ -131,8 +131,7 @@ void ToolManager::updateTool(QWidget* old) {
 	ToolMenuEntry* tme = dynamic_cast<ToolMenuEntry*>(QObject::sender());
 	Q_ASSERT(tme);
 	QString id = tme->uuid();
-	QString name = tme->name();
-	QWidget* tool = tme->tool();
+	QWidget *tool = tme->tool();
 
 	if(old != nullptr) { // we had a widget
 		saveToolAttachedState(tme);
@@ -160,7 +159,6 @@ void ToolManager::updateToolAttached(bool oldAttach) {
 	Q_ASSERT(tme);
 	QWidget* tool = tme->tool();
 	QString id = tme->uuid();
-	QString name = tme->name();
 
 	if(tme->attached()) {
 		if(dwm->contains(id)) {
