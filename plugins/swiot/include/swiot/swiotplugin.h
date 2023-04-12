@@ -8,15 +8,8 @@
 #include <pluginbase/pluginbase.h>
 #include "scopyswiot_export.h"
 #include "QLabel"
-#include "iioutil/cyclicaltask.h"
-#include "iioutil/iiopingtask.h"
 #include "src/swiotcontroller.h"
-
 #include "ui_swiotInfoPage.h"
-#include "ui_swiotconfig.h"
-#include "ui_swiotruntime.h"
-#include "ui_swiotmax14906.h"
-#include "ui_swiotfaults.h"
 
 namespace adiscope::swiot {
 class SCOPYSWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
@@ -47,9 +40,6 @@ private:
 	QWidget *adtool;
         QWidget *faults;
         QWidget *maxtool;
-
-//	IIOPingTask *ping;
-//	CyclicalTask *cs;
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
