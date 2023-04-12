@@ -8,7 +8,6 @@ BufferLogic::BufferLogic(struct iio_device* iioDev) :
       ,m_iioDev(iioDev)
 {
 	if (m_iioDev) {
-		iio_device_set_kernel_buffers_count(m_iioDev, MAX_KERNEL_BUFFER);
 		createChannels();
 		m_samplingFreqAvailable = readChnlsFrequencyAttr("sampling_frequency_available");
 	}

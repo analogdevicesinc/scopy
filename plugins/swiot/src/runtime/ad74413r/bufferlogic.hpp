@@ -16,7 +16,6 @@ Q_DECLARE_OPAQUE_POINTER(struct iio_buffer*)
 namespace adiscope::swiot {
 #define MAX_BUFFER_SIZE 160
 #define MIN_BUFFER_SIZE 20
-#define MAX_KERNEL_BUFFER 64
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 #define MAX_INPUT_CHNLS_NO 8
 
@@ -36,7 +35,7 @@ public:
 
 	~BufferLogic();
 
-	struct iio_channel *getIioChnl(int chnlIdx, bool outputPriotity);
+	struct iio_channel *getIioChnl(int chnlIdx, bool outputPriority);
 
 	bool verifyEnableChanges(std::vector<bool> enabledChnls);
 
@@ -45,7 +44,6 @@ public:
 	QStringList readChnlsFrequencyAttr(QString attrName);
 
 public Q_SLOTS:
-
 	void onSamplingFreqChanged(int idx);
 
 Q_SIGNALS:
@@ -60,8 +58,6 @@ private:
 
 	QMap<int, struct chnlInfo *> m_chnlsInfo;
 	struct iio_device *m_iioDev;
-
-
 };
 }
 

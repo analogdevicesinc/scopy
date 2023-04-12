@@ -1,5 +1,4 @@
 #include "configchannelview.hpp"
-#include "qdebug.h"
 
 using namespace adiscope::swiot;
 

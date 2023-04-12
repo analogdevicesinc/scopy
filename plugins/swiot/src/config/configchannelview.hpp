@@ -8,15 +8,11 @@
 
 #include "qwidget.h"
 #include "ui_swiotconfigchnlview.h"
-//#include "swiot/test/testchnlview.hpp"
 #include <QObject>
 
 namespace adiscope::swiot {
 class ConfigChannelView: public QWidget
 {
-	//#ifdef ENABLE_TESTS
-	//	friend class adiscope::TestSwiotChnlView;
-	//#endif
 	Q_OBJECT
 public:
 	explicit ConfigChannelView(int chnlIdx = 0, QWidget *parent = nullptr);
@@ -26,7 +22,6 @@ public:
 	void setAvailableOptions(QComboBox* list, QString attrName,
 				 QMap<QString, QStringList> chnlAttr);
 	void connectSignalsToSlots();
-
 	QVector<QMap<QString, QStringList>> getChnlsAttr();
 public Q_SLOTS:
 	void adIndexChanged(int idx);
