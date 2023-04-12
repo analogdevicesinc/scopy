@@ -32,7 +32,7 @@
 #include "gui/mousewheelwidgetguard.h"
 #include <thread>
 #include "gui/spinbox_a.hpp"
-#include <boost/circular_buffer.hpp>
+#include <deque>
 
 /* libm2k includes */
 #include <libm2k/analog/m2kanalogin.hpp>
@@ -89,7 +89,7 @@ namespace adiscope::m2k {
 		std::vector<double> m_min, m_max;
 
 		std::vector<bool> m_autoGainEnabled;
-		std::vector<boost::circular_buffer<libm2k::analog::M2K_RANGE>> m_gainHistory;
+		std::vector<std::deque<libm2k::analog::M2K_RANGE>> m_gainHistory;
 		int m_gainHistorySize;
 
 		void disconnectAll();
