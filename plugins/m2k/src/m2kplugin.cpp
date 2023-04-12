@@ -62,6 +62,7 @@ void M2kPlugin::preload()
 
 void M2kPlugin::loadToolList()
 {
+	Preferences *p = Preferences::GetInstance();
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc","Oscilloscope",":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec","Spectrum Analyzer",":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet","Network Analyzer",":/gui/icons/scopy-default/icons/tool_network_analyzer.svg"));
@@ -72,6 +73,7 @@ void M2kPlugin::loadToolList()
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm","Voltmeter",":/gui/icons/scopy-default/icons/tool_voltmeter.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower","Power Supply",":/gui/icons/scopy-default/icons/tool_power_supply.svg"));
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal","Calibration",":/gui/icons/scopy-default/icons/tool_calibration.svg"));
+	ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal")->setVisible(p->get("m2k_manual_calibration_enable").toBool());
 
 }
 
@@ -195,6 +197,7 @@ void M2kPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->init("m2k_instrument_notes_active",false);
+	p->init("m2k_manual_calibration_enable",false);
 
 	p->init("m2k_show_adc_filters",false);
 	p->init("m2k_show_graticule",false);
@@ -319,7 +322,7 @@ bool M2kPlugin::onConnect()
 	auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2knet");
 	auto laTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2klogic");
 	auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
-	m_adcBtnGrp = new QButtonGroup(this);	
+	m_adcBtnGrp = new QButtonGroup(this);
 
 	tools.insert("m2kdmm",new DMM(ctx, f, dmmTme, m2k_man)); dmmTme->setTool(tools["m2kdmm"]);
 	tools.insert("m2kcal",new ManualCalibration(ctx,f,mancalTme,nullptr,calib)); mancalTme->setTool(tools["m2kcal"]);
