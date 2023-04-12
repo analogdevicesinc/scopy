@@ -62,16 +62,16 @@ void M2kPlugin::preload()
 
 void M2kPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc","Oscilloscope",":/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec","Spectrum Analyzer",":/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet","Network Analyzer",":/icons/scopy-default/icons/tool_network_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen","Signal Generator",":/icons/scopy-default/icons/tool_signal_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic","Logic Analyzer",":/icons/scopy-default/icons/tool_logic_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern","Pattern Generator",":/icons/scopy-default/icons/tool_pattern_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio","Digital I/O",":/icons/scopy-default/icons/tool_io.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm","Voltmeter",":/icons/scopy-default/icons/tool_voltmeter.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower","Power Supply",":/icons/scopy-default/icons/tool_power_supply.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal","Calibration",":/icons/scopy-default/icons/tool_calibration.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc","Oscilloscope",":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec","Spectrum Analyzer",":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet","Network Analyzer",":/gui/icons/scopy-default/icons/tool_network_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen","Signal Generator",":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic","Logic Analyzer",":/gui/icons/scopy-default/icons/tool_logic_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern","Pattern Generator",":/gui/icons/scopy-default/icons/tool_pattern_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio","Digital I/O",":/gui/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm","Voltmeter",":/gui/icons/scopy-default/icons/tool_voltmeter.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower","Power Supply",":/gui/icons/scopy-default/icons/tool_power_supply.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal","Calibration",":/gui/icons/scopy-default/icons/tool_calibration.svg"));
 
 }
 
@@ -128,7 +128,7 @@ bool M2kPlugin::loadExtraButtons()
 
 bool M2kPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/icons/adalm.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
 	return true;
 }
 

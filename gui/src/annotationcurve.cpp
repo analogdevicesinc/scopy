@@ -273,7 +273,7 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
 		qhbl->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 		QPushButton *deleteBtn = new QPushButton();
 		deleteBtn->setFlat(true);
-		deleteBtn->setIcon(QIcon(":/icons/close_hovered.svg"));
+		deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
 		deleteBtn->setMaximumSize(QSize(16, 16));
 		qhbl->addWidget(deleteBtn);
 		qvbl->addLayout(qhbl);

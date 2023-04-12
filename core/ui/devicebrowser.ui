@@ -53,7 +53,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normalon>:/icons/launcher_home.svg</normalon>
+         <normalon>:/gui/icons/launcher_home.svg</normalon>
         </iconset>
        </property>
        <property name="iconSize">
@@ -89,7 +89,7 @@
        </property>
        <property name="icon">
         <iconset>
-         <normalon>:/icons/launcher_add.svg</normalon>
+         <normalon>:/gui/icons/launcher_add.svg</normalon>
         </iconset>
        </property>
        <property name="iconSize">

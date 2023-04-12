@@ -1,4 +1,4 @@
-adiscope--m2k--DropdownSwitchList {
+adiscope--DropdownSwitchList {
   height: 30px;
   border: 0px;
   font-size: 18px;
@@ -6,20 +6,20 @@ adiscope--m2k--DropdownSwitchList {
   padding-left: 20px;
 }
 
-adiscope--m2k--DropdownSwitchList:editable{
+adiscope--DropdownSwitchList:editable{
   background-color: white;
   color: rgba(0, 0, 0, 200);
 }
 
-adiscope--m2k--DropdownSwitchList::drop-down {
+adiscope--DropdownSwitchList::drop-down {
   subcontrol-position: center right;
   width: 10px;
   height: 6px;
-  border-image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+  border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
   margin-right: 20px;
 }
 
-adiscope--m2k--DropdownSwitchList QAbstractItemView {
+adiscope--DropdownSwitchList QAbstractItemView {
   border: 0px;
   background-color: white;
   font-size: 18px;
@@ -29,12 +29,12 @@ adiscope--m2k--DropdownSwitchList QAbstractItemView {
   border-left: 0px solid white; /* setting to 0 for now */
 }
 
-adiscope--m2k--DropdownSwitchList QAbstractItemView::item {
+adiscope--DropdownSwitchList QAbstractItemView::item {
   color: rgba(0, 0, 0, 200);
   height: 60px;
 }
 
-adiscope--m2k--DropdownSwitchList QAbstractItemView::item:hover {
+adiscope--DropdownSwitchList QAbstractItemView::item:hover {
   background-color: #EDEDED;
   font-weight: bold;
   border-bottom: 0px solid none;

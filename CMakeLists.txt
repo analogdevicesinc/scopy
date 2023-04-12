@@ -39,7 +39,7 @@ set(PROJECT_SOURCES
 
 include(ScopyAbout)
 configure_about(./resources/about)
-FILE(GLOB SCOPY_RESOURCE_FILES resources/resources.qrc resources/aboutpage.qrc)
+FILE(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
 message(${SCOPY_RESOURCE_FILES})
 qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 

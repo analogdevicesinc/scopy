@@ -573,7 +573,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		QPushButton *deleteBtn = new QPushButton(this);
 		deleteBtn->setFlat(true);
-		deleteBtn->setIcon(QIcon(":/icons/close_hovered.svg"));
+		deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
 		deleteBtn->setMaximumSize(QSize(16, 16));
 
 		layout->addWidget(deleteBtn);
@@ -2432,7 +2432,7 @@ void LogicAnalyzer::setupDecoders()
 
 		QPushButton *deleteBtn = new QPushButton(this);
 		deleteBtn->setFlat(true);
-		deleteBtn->setIcon(QIcon(":/icons/close_hovered.svg"));
+		deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
 		deleteBtn->setMaximumSize(QSize(16, 16));
 
 		layout->addWidget(deleteBtn);

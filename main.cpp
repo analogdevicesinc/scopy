@@ -1,9 +1,9 @@
 #include "core/scopymainwindow.h"
 #include "core/logging_categories.h"
-
 #include <QApplication>
 #include <core/application_restarter.h>
 #include <gui/utils.h>
+
 
 void SetScopyQDebugMessagePattern() {
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	adiscope::ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
-	a.setStyleSheet(Util::loadStylesheetFromFile(":/stylesheets/default.qss"));
+	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
 	adiscope::ScopyMainWindow w;
 	w.show();
 	int ret = a.exec();

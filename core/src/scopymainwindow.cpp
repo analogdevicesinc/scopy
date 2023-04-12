@@ -213,7 +213,9 @@ void ScopyMainWindow::initPreferences()
 		loadOpenGL();
 	}
 	QString theme = p->get("general_theme").toString();
-	QIcon::setThemeName("scopy-" + theme);
+	QString themeName = "scopy-" + theme;
+	QIcon::setThemeName(themeName);
+	QIcon::setThemeSearchPaths({":/gui/icons/"+themeName});
 }
 
 void ScopyMainWindow::loadOpenGL() {
@@ -221,8 +223,8 @@ void ScopyMainWindow::loadOpenGL() {
 	// this should be part of scopygui
 	// set surfaceFormat as in Qt example: HelloGL2 - https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/hellogl2/main.cpp?h=5.15#n81
 	QSurfaceFormat fmt;
-	fmt.setDepthBufferSize(24);
-	QSurfaceFormat::setDefaultFormat(fmt);
+//	fmt.setDepthBufferSize(24);
+//	QSurfaceFormat::setDefaultFormat(fmt);
 
 	// This acts as a loader for the OpenGL context, our plots load and draw in the OpenGL context
 	// at the same time which causes some race condition and causes the app to hang
