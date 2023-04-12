@@ -21,7 +21,10 @@ Ad74413r::Ad74413r(iio_context *ctx, QVector<QString> chnlsFunc, QWidget* parent
 		m_readerThread = new ReaderThread(true);
                 m_readerThread->addBufferedDevice(m_iioDev);
 
-		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo());
+		QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsFrequencyAttr("sampling_frequency");
+		int samplingFreq = actualSamplingFreq[0].toInt();
+
+		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
 		m_enabledPlots = std::vector<bool>(m_swiotAdLogic->getPlotChnlsNo(), false);
 
 		setupToolView();
@@ -78,6 +81,9 @@ void Ad74413r::setupConnections()
 	connect(this, &Ad74413r::plotChnlsChanges, m_plotHandler, &BufferPlotHandler::onPlotChnlsChanges);
 	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
 	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
+
+	connect(m_swiotAdLogic, &BufferLogic::sampleRateWritten, m_plotHandler, &BufferPlotHandler::onSampleRateWritten);
+	connect(m_swiotAdLogic, &BufferLogic::sampleRateWritten, m_readerThread, &ReaderThread::onSampleRateWritten);
 	//general settings connections
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
@@ -180,8 +186,10 @@ adiscope::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* 
 	m_timespanSpin = new PositionSpinButton({
 							{"ms",1E-3},
 							{"s", 1E0}},
-						"Timespan",0,10,
-						true, false, generalSubsection->getContentWidget());
+							"Timespan",0.1,10,
+							true, false, generalSubsection->getContentWidget());
+	m_timespanSpin->setStep(0.1);
+	m_timespanSpin->setValue(1);
 	timespanLayout->addWidget(m_timespanSpin);
 
 	//export section
@@ -242,7 +250,7 @@ void Ad74413r::onRunBtnPressed()
 		m_samplingFreqOptions->setEnabled(false);
 		verifyChnlsChanges();
 		if (!m_readerThread->isRunning()) {
-			m_plotHandler->resetPlot();
+			m_plotHandler->resetPlotParameters();
 			m_readerThread->start();
 		}
 	} else {
@@ -282,7 +290,7 @@ void Ad74413r::onReaderThreadFinished()
 {
 	qDebug(CAT_SWIOT_AD74413R) << "reader thread finished";
 	if (m_toolView->getRunBtn()->isChecked()) {
-		m_plotHandler->resetPlot();
+		m_plotHandler->resetPlotParameters();
 		m_readerThread->start();
 	}
 }

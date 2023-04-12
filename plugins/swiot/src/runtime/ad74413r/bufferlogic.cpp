@@ -9,7 +9,6 @@ BufferLogic::BufferLogic(struct iio_device* iioDev) :
 {
 	if (m_iioDev) {
 		iio_device_set_kernel_buffers_count(m_iioDev, MAX_KERNEL_BUFFER);
-		m_chnlsNumber = iio_device_get_channels_count(m_iioDev);
 		createChannels();
 		m_samplingFreqAvailable = readChnlsFrequencyAttr("sampling_frequency_available");
 	}
@@ -58,7 +57,7 @@ void BufferLogic::createChannels()
 			if (parts.size() > 1) {
 				if(parts[1].compare("")){
 					chnlIdx = parts[1].toInt();
-					chnlIdx = (isOutput) ? (chnlIdx + m_chnlsNumber) : chnlIdx;
+					chnlIdx = (isOutput) ? (chnlIdx + MAX_INPUT_CHNLS_NO) : chnlIdx;
 				}
 			}
 			m_chnlsInfo[chnlIdx] = chnlInfo;
@@ -72,8 +71,8 @@ struct iio_channel* BufferLogic::getIioChnl(int chnlIdx, bool outputPriority)
 {
 	struct iio_channel* iioChnl = nullptr;
 	if (outputPriority) {
-		iioChnl = (m_chnlsInfo.contains(chnlIdx + m_chnlsNumber)) ?
-					m_chnlsInfo[chnlIdx + m_chnlsNumber]->iioChnl : m_chnlsInfo[chnlIdx]->iioChnl;
+		iioChnl = (m_chnlsInfo.contains(chnlIdx + MAX_INPUT_CHNLS_NO)) ?
+					m_chnlsInfo[chnlIdx + MAX_INPUT_CHNLS_NO]->iioChnl : m_chnlsInfo[chnlIdx]->iioChnl;
 	} else {
 		iioChnl = m_chnlsInfo[chnlIdx]->iioChnl;
 	}
@@ -108,6 +107,9 @@ void BufferLogic::onSamplingFreqChanged(int idx)
 			if (returnCode < 0) {
 				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute write error " + QString::number(returnCode);
 			} else {
+				QStringList newSamplingFreq = readChnlsFrequencyAttr(SAMPLING_FREQ_ATTR_NAME);
+				int samplingFreq = newSamplingFreq[0].toInt();
+				Q_EMIT sampleRateWritten(samplingFreq);
 				break;
 			}
 		}

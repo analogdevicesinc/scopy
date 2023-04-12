@@ -98,22 +98,21 @@ int ReaderThread::getEnabledChnls()
 
 void ReaderThread::createIioBuffer()
 {
-        m_enabledChnlsNo = getEnabledChnls();
-        int possibleBufferSize = m_sampleRate * m_timespan;
-        m_offsetScaleValues = getOffsetScaleVector();
+	m_enabledChnlsNo = getEnabledChnls();
+	m_offsetScaleValues = getOffsetScaleVector();
 	qInfo(CAT_SWIOT_AD74413R) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
-        if (m_iioDev) {
-                if(possibleBufferSize >= MAX_BUFFER_SIZE) {
-                        m_iioBuff = iio_device_create_buffer(m_iioDev, MAX_BUFFER_SIZE, false);
-                } else {
-                        m_iioBuff = iio_device_create_buffer(m_iioDev, MIN_BUFFER_SIZE, false);
-                }
-                if (m_iioBuff) {
+	if (m_iioDev) {
+		if(m_samplingFreq >= MAX_BUFFER_SIZE) {
+			m_iioBuff = iio_device_create_buffer(m_iioDev, MAX_BUFFER_SIZE, false);
+		} else {
+			m_iioBuff = iio_device_create_buffer(m_iioDev, MIN_BUFFER_SIZE, false);
+		}
+		if (m_iioBuff) {
 			qDebug(CAT_SWIOT_AD74413R) << "Buffer created";
-                } else {
+		} else {
 			qDebug(CAT_SWIOT_AD74413R) << "Buffer wasn't created: " + QString(strerror(errno));
-                }
-        }
+		}
+	}
 }
 
 void ReaderThread::destroyIioBuffer()
@@ -128,6 +127,11 @@ void ReaderThread::destroyIioBuffer()
 void ReaderThread::onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo)
 {
         m_chnlsInfo = chnlsInfo;
+}
+
+void ReaderThread::onSampleRateWritten(int samplingFreq)
+{
+	m_samplingFreq = samplingFreq;
 }
 
 void ReaderThread::runBuffered() {

@@ -12,14 +12,14 @@ class BufferPlotHandler : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit BufferPlotHandler(QWidget *parent = nullptr, int plotChnlsNo = 0);
+	explicit BufferPlotHandler(QWidget *parent = nullptr, int plotChnlsNo = 0, int sampleRate = 0);
 	~BufferPlotHandler();
 
 	QColor getCurveColor(int id) const;
 
 	void setPlotActiveAxis(int id);
 	void deleteResidualPlotData();
-	void resetPlot();
+	void resetPlotParameters();
 	QWidget *getPlotWidget() const;
 
 public Q_SLOTS:
@@ -27,6 +27,7 @@ public Q_SLOTS:
 	void onBufferRefilled(QVector<QVector<double>>, int bufferCounter);
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
 	void onTimespanChanged(double value);
+	void onSampleRateWritten(int samplingFreq);
 private:
 	void initPlot(int plotChnlsNo);
 	void resetDataPoints();
@@ -34,15 +35,16 @@ private:
 	CapturePlot *m_plot;
 	QWidget *m_plotWidget;
 
-	int m_sampleRate = 4800;
+	int m_samplingFreq = 4800;
 	double m_timespan = 1;
 	int m_plotChnlsNo;
 
 	//all of these will be calculated in functions; for example we will have a spinbox for timespan,
 	//and in a slot we will set its value and we will calculate plotSampleRate and the number of necessary buffers
-	int m_plotSampleNumber = m_sampleRate * m_timespan;
+	int m_plotSampleNumber = m_samplingFreq * m_timespan;
 	int m_buffersNumber = m_plotSampleNumber / MAX_BUFFER_SIZE;
 	int m_bufferIndex = 0;
+	int m_bufferSize = 0;
 	int m_plotDataIndex = 0;
 
 	std::vector<double*> m_dataPoints;

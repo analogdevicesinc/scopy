@@ -36,6 +36,7 @@ public:
 public Q_SLOTS:
 
 	void onChnlsChange(QMap<int, struct chnlInfo *> chnlsInfo);
+	void onSampleRateWritten(int samplingFreq);
 
 Q_SIGNALS:
 
@@ -49,8 +50,7 @@ private:
 	bool isBuffered;
 	QMap<int, struct iio_channel *> m_dioChannels;
 
-	int m_sampleRate = 4800;
-	double m_timespan = 1;
+	int m_samplingFreq = 4800;
 	int m_enabledChnlsNo;
 	int bufferCounter = 0;
 

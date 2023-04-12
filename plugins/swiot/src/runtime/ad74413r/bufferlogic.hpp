@@ -18,6 +18,7 @@ namespace adiscope::swiot {
 #define MIN_BUFFER_SIZE 20
 #define MAX_KERNEL_BUFFER 64
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
+#define MAX_INPUT_CHNLS_NO 8
 
 struct chnlInfo {
 	QString chnlId;
@@ -48,15 +49,13 @@ public Q_SLOTS:
 	void onSamplingFreqChanged(int idx);
 
 Q_SIGNALS:
-
-	void chnlsChanged(QMap<int, struct chnlInfo *> chnlsInfo);
-
+		void chnlsChanged(QMap<int, struct chnlInfo*> chnlsInfo);
+		void sampleRateWritten(int samplingFreq);
 private:
 	void createChannels();
 
 private:
 	int m_plotChnlsNo;
-	int m_chnlsNumber;
 	QStringList m_samplingFreqAvailable;
 
 	QMap<int, struct chnlInfo *> m_chnlsInfo;

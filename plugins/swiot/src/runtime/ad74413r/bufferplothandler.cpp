@@ -7,16 +7,16 @@
 
 using namespace adiscope::swiot;
 
-BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo) :
+BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int samplingFreq) :
 	QWidget(parent)
 {
 	m_lock = new QMutex();
 	m_plotChnlsNo = plotChnlsNo;
-	for (int i = 0; i < plotChnlsNo; i++) {
-		m_dataPoints.push_back(new double[m_plotSampleNumber]);
-	}
+	m_samplingFreq = samplingFreq;
+	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
 	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
 	initPlot(plotChnlsNo);
+	resetPlotParameters();
 }
 BufferPlotHandler::~BufferPlotHandler()
 {
@@ -54,7 +54,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 
-	m_plot->setSampleRate(m_sampleRate, 1, "");
+	m_plot->setSampleRate(m_samplingFreq, 1, "");
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
@@ -81,35 +81,36 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 	int bufferDataSize = bufferData.size();
 	int j = 0;
 	bool rolling = false;
+	int dataPointsNumber = m_buffersNumber * m_bufferSize;
 
 	m_lock->lock();
 	//	qDebug(CAT_SWIOT_RUNTIME) <<QString::number(bufferCounter)+" Before Copy";
 	if (bufferDataSize > 0) {
 		for (int i = 0; i < m_dataPoints.size(); i++) {
-			if (m_bufferIndex == (m_buffersNumber - 1))
+			if (m_bufferIndex == m_buffersNumber)
 			{
-				memmove(m_dataPoints[i], m_dataPoints[i] + MAX_BUFFER_SIZE, (m_plotSampleNumber - MAX_BUFFER_SIZE) * sizeof(double));
+				memmove(m_dataPoints[i], m_dataPoints[i] + m_bufferSize, (dataPointsNumber - m_bufferSize) * sizeof(double));
 				rolling = true;
 			}
 			if (m_enabledPlots[i]) {
 				if (j < bufferDataSize) {
-					memmove(m_dataPoints[i]+m_plotDataIndex, &bufferData[j][0], (bufferData[j].size() * sizeof(double)));
+					memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[j][0], (bufferData[j].size() * sizeof(double)));
 					j++;
 				} else {
-					memmove(m_dataPoints[i]+m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
+					memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
 				}
 
 			} else {
-				memmove(m_dataPoints[i]+m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
+				memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
 			}
 
 		}
 		if (!rolling) {
 			m_bufferIndex++;
-			m_plotDataIndex+=MAX_BUFFER_SIZE;
+			m_plotDataIndex+=m_bufferSize;
 		}
-		if (m_plotDataIndex >= m_plotSampleNumber - 1) {
-			m_plotDataIndex-=MAX_BUFFER_SIZE;
+		if (m_plotDataIndex >= dataPointsNumber - 1) {
+			m_plotDataIndex-=m_bufferSize;
 		}
 		//		qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Copy";
 
@@ -123,19 +124,11 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 void BufferPlotHandler::onPlotChnlsChanges(std::vector<bool> enabledPlots)
 {
 	m_enabledPlots = enabledPlots;
-	for (int i = 0; i < m_enabledPlots.size(); i++) {
-		if (m_enabledPlots[i]) {
-			m_plot->AttachCurve(i);
-		} else {
-			m_plot->DetachCurve(i);
-		}
-	}
 	qDebug(CAT_SWIOT_AD74413R) << "Sample number on chnl changes:" << QString::number(m_plotSampleNumber);
 }
 
 void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 {
-	//	pause(true);
 	QStringList filter;
 	bool useNativeDialogs = false;
 	filter += QString(tr("Comma-separated values files (*.csv)"));
@@ -192,10 +185,21 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 		fm.setSampleRate(m_plotSampleNumber);
 		fm.performWrite();
 	}
-	//	pause(false);
 }
 
-void BufferPlotHandler::setPlotActiveAxis(int id) {
+void BufferPlotHandler::onTimespanChanged(double value)
+{
+	m_timespan = value;
+	resetPlotParameters();
+}
+
+void BufferPlotHandler::onSampleRateWritten(int samplingFreq)
+{
+	m_samplingFreq = samplingFreq;
+}
+
+void BufferPlotHandler::setPlotActiveAxis(int id) 
+{
 	m_plot->setActiveVertAxis(id, true);
 }
 
@@ -209,14 +213,23 @@ QWidget *BufferPlotHandler::getPlotWidget() const
 	return m_plotWidget;
 }
 
-void BufferPlotHandler::resetPlot()
+void BufferPlotHandler::resetPlotParameters()
 {
 	int enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
+	for (int i = 0; i < m_enabledPlots.size(); i++) {
+		if (m_enabledPlots[i]) {
+			m_plot->AttachCurve(i);
+		} else {
+			m_plot->DetachCurve(i);
+		}
+	}
 	m_bufferIndex = 0;
 	m_plotDataIndex = 0;
-	m_plotSampleNumber = m_sampleRate * m_timespan;
+	m_plotSampleNumber = m_samplingFreq * m_timespan;
 	m_plotSampleNumber = (enabledPlotsNo > 0) ? (m_plotSampleNumber / enabledPlotsNo) : m_plotSampleNumber;
-	m_buffersNumber = (m_plotSampleNumber / MAX_BUFFER_SIZE) + 1;
+
+	m_buffersNumber = ((m_plotSampleNumber % m_bufferSize) == 0) ?
+				(m_plotSampleNumber / m_bufferSize) : ((m_plotSampleNumber / m_bufferSize) + 1);
 
 	resetDataPoints();
 
@@ -227,22 +240,17 @@ void BufferPlotHandler::resetPlot()
 
 }
 
-void BufferPlotHandler::onTimespanChanged(double value)
-{
-	m_timespan = value;
-	resetPlot();
-}
-
 void BufferPlotHandler::resetDataPoints()
 {
+	int dataPointsNumber = m_buffersNumber * m_bufferSize;
 	if (m_dataPoints.size() > 0) {
 		for (int i = 0; i < m_dataPoints.size(); i++) {
 			delete[] m_dataPoints[i];
 			m_dataPoints[i] = nullptr;
 		}
 		m_dataPoints.clear();
-		for (int i = 0; i < m_plotChnlsNo; i++) {
-			m_dataPoints.push_back(new double[m_plotSampleNumber]);
-		}
+	}
+	for (int i = 0; i < m_plotChnlsNo; i++) {
+		m_dataPoints.push_back(new double[dataPointsNumber]);
 	}
 }

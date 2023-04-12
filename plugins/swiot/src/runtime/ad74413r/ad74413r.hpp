@@ -80,7 +80,7 @@ private:
 	adiscope::gui::ChannelManager *m_monitorChannelManager;
 	adiscope::gui::ToolView *m_toolView;
 	QWidget *m_widget;
-	QPushButton* m_backBtn;
+	QPushButton *m_backBtn;
 
 	QVector<BufferMenuController *> m_controllers;
 	QVector<QString> m_chnlsFunction;
