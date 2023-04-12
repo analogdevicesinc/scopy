@@ -330,6 +330,14 @@ bool M2kPlugin::onConnect()
 	tools.insert("m2kosc",new Oscilloscope(ctx,f,oscTme,m2k_man,js,nullptr));oscTme->setTool(tools["m2kosc"]);
 	tools.insert("m2knet",new NetworkAnalyzer(ctx,f,netTme,m2k_man,js,nullptr));netTme->setTool(tools["m2knet"]);
 	tools.insert("m2klogic",new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));laTme->setTool(tools["m2klogic"]);
+
+	logic::LogicAnalyzer* logic_analyzer = dynamic_cast<logic::LogicAnalyzer*>(tools["m2klogic"]);
+	Oscilloscope* oscilloscope = dynamic_cast<Oscilloscope*>(tools["m2kosc"]);
+	NetworkAnalyzer* network_analyzer = dynamic_cast<NetworkAnalyzer*>(tools["m2knet"]);
+
+	oscilloscope->setLogicAnalyzer(logic_analyzer);
+	network_analyzer->setOscilloscope(oscilloscope);
+
 	tools.insert("m2kpattern",new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));pgTme->setTool(tools["m2kpattern"]);
 
 	connect(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
