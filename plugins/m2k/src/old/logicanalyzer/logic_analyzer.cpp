@@ -588,7 +588,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			int chIdx = m_oscPlotCurves.indexOf(curve);
 
 			if (chIdx == m_oscChannelSelected) {
-				m_oscPlot->channelSelected(chIdx + m_oscAnalogChannels, false);
+				Q_EMIT m_oscPlot->channelSelected(chIdx + m_oscAnalogChannels, false);
 			} else if (chIdx < m_oscChannelSelected) {
 				m_oscChannelSelected--;
 			}
@@ -685,7 +685,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	QComboBox *traceColorComboBox = new QComboBox();
 	traceColorComboBox->setObjectName("traceColorComboBox");
-	for (auto name : QColor::colorNames()) {
+	for (const auto &name : QColor::colorNames()) {
 		QPixmap pixmap(100,100);
 		QColor color(name);
 		pixmap.fill(color);
@@ -1391,7 +1391,7 @@ void LogicAnalyzer::setupUi()
 
 	// Setup channel / decoder menu
 
-	for (auto name : QColor::colorNames()) {
+	for (const auto &name : QColor::colorNames()) {
 		QPixmap pixmap(100,100);
 		QColor color(name);
 		pixmap.fill(color);

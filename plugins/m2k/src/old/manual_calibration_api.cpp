@@ -54,7 +54,7 @@ int ManualCalibration_API::start(int story)
 		return -1;
 	}
 	calib->ui->calibList->setCurrentRow(story);
-	calib->ui->calibList->itemClicked(
+	Q_EMIT calib->ui->calibList->itemClicked(
 				calib->ui->calibList->item(story));
 	int nb_steps = calib->stCalibrationStory.story.count();
 	if (nb_steps > 0) {

@@ -73,7 +73,6 @@ void VersionCache::updateCache() {
 	connect(m_nam,&QNetworkAccessManager::finished,this,[=](QNetworkReply *r){
 
 		QByteArray bytes = reply->readAll();
-		QString str = QString::fromUtf8(bytes.data(), bytes.size());
 		int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		qDebug(CAT_VERSION) << QVariant(statusCode).toString();
 		if(statusCode == 301)

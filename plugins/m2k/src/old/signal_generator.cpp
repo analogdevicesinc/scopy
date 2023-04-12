@@ -152,8 +152,6 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 
 	this->m_plot = new CapturePlot(this, false, 10, 10 , new TimePrefixFormatter, new MetricPrefixFormatter);
 
-	QVector<struct iio_channel *> iio_channels;
-
 	for (size_t i = 0; i < m_m2k_analogout->getNbChannels(); i++) {
 
 		unsigned long dev_sample_rate = m_m2k_analogout->getMaximumSamplerate(i);
@@ -1243,7 +1241,6 @@ bool SignalGenerator::loadParametersFromFile(
 		chunk_header_t chunk;
 		uint32_t nr_of_samples;
 		QFile f;
-		QByteArray val;
 
 		f.setFileName(ptr->file);
 		f.open(QIODevice::ReadOnly);
