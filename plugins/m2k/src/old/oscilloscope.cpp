@@ -542,7 +542,7 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 	for (uint i = 0; i < nb_channels; i++)
 		xy_plot.setYaxisMouseGesturesEnabled(i, false);
 
-	xy_plot.setLineColor(0, QColor("#4a64ff"));
+	xy_plot.setLineColor(0, QColor(0x4a64ff));
 
 	ui->rightMenu->setMaximumWidth(0);
 

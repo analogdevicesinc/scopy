@@ -356,7 +356,7 @@ void TriggerSettings::on_intern_en_toggled(bool checked)
 
 	ui_reconf_on_intern_toggled(checked);
 
-	Q_EMIT(analogTriggerEnabled(checked));
+	Q_EMIT analogTriggerEnabled(checked);
 }
 
 void TriggerSettings::on_extern_en_toggled(bool checked)

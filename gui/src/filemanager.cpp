@@ -353,7 +353,7 @@ void FileManager::performDecoderWrite(bool skip_empty_lines)
 	//column names row
 	bool skipFirstSeparator=true;
 
-	for (auto column: columnNames) {
+	for (const auto &column : qAsConst(columnNames)) {
 		if (!skipFirstSeparator) {
 			exportStream << separator;
 		}

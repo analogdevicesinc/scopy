@@ -276,7 +276,7 @@ int SpectrumAnalyzer_API::currentChannel()
 void SpectrumAnalyzer_API::setCurrentChannel(int ch)
 {
 	sp->channels[ch]->widget()->nameButton()->setChecked(true);
-	sp->channels[ch]->widget()->selected(true);
+	Q_EMIT sp->channels[ch]->widget()->selected(true);
 }
 
 double SpectrumAnalyzer_API::startFreq()
