@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/m2k">
         <file>filter.json</file>
+        <file>m2k.html</file>
+        <file>images/ADALM2000.png</file>
+        <file>images/ADALM2000Pinout.png</file>
     </qresource>
 </RCC>

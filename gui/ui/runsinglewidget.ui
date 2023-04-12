@@ -73,10 +73,10 @@ QPushButton:disabled {
       <string>Run</string>
      </property>
      <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/icons/play.svg</normaloff>
-       <normalon>:/icons/scopy-default/icons/play_stop.svg</normalon>
-       <selectedon>:/icons/scopy-default/icons/play_stop.svg</selectedon>:/icons/play.svg</iconset>
+      <iconset resource="../gui/res/resources.qrc">
+       <normaloff>:/gui/icons/play.svg</normaloff>
+       <normalon>:/gui/icons/scopy-default/icons/play_stop.svg</normalon>
+       <selectedon>:/gui/icons/scopy-default/icons/play_stop.svg</selectedon>:/gui/icons/play.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -134,9 +134,9 @@ QPushButton:disabled {
       <string>Single</string>
      </property>
      <property name="icon">
-      <iconset resource="../resources/resources.qrc">
-       <normaloff>:/icons/play_oneshot.svg</normaloff>
-       <normalon>:/icons/scopy-default/icons/play_stop.svg</normalon>:/icons/play_oneshot.svg</iconset>
+      <iconset resource="../gui/res/resources.qrc">
+       <normaloff>:/gui/icons/play_oneshot.svg</normaloff>
+       <normalon>:/gui/icons/scopy-default/icons/play_stop.svg</normalon>:/gui/icons/play_oneshot.svg</iconset>
      </property>
      <property name="iconSize">
       <size>
@@ -152,7 +152,7 @@ QPushButton:disabled {
   </layout>
  </widget>
  <resources>
-  <include location="../resources/resources.qrc"/>
+  <include location="../gui/res/resources.qrc"/>
  </resources>
  <connections/>
 </ui>

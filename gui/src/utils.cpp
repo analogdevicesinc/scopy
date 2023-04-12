@@ -132,9 +132,9 @@ void DockerUtils::configureTopBar(QDockWidget *docker)
 		QString icon_path = "";
 
 		if (QIcon::themeName() == "scopy-default") {
-			icon_path +=":/icons/scopy-default/icons";
+			icon_path +=":/gui/icons/scopy-default/icons";
 		} else {
-			icon_path +=":/icons/scopy-light/icons";
+			icon_path +=":/gui/icons/scopy-light/icons";
 		}
 
 		if(topLevel) {
