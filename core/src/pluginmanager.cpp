@@ -133,20 +133,28 @@ Plugin* PluginManager::loadPlugin(QString file)
 
 	QPluginLoader qp(file);
 	ret = qp.load();
-	if(!ret)
+	if(!ret) {
+		qWarning(CAT_PLUGINMANAGER) << "Cannot load library - " + qp.errorString();
 		return nullptr;
+	}
 
 	QObject *inst = qp.instance();
-	if(!inst)
+	if(!inst) {
+		qWarning(CAT_PLUGINMANAGER) << "Cannot create QObject instance from loaded library";
 		return nullptr;
+	}
 
 	original = qobject_cast<Plugin*>(qp.instance());
-	if(!original)
+	if(!original) {
+		qWarning(CAT_PLUGINMANAGER) << "Loaded library instance is not a Plugin*";
 		return nullptr;
+	}
 
 	clone = original->clone(this);
-	if(!clone)
+	if(!clone) {
+		qWarning(CAT_PLUGINMANAGER) << "clone method does not clone the object";
 		return nullptr;
+	}
 
 	QString cloneName;
 	cloneName = clone->name();
