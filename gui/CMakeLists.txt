@@ -30,6 +30,8 @@ if(${Gnuradio_FOUND})
     set(SCOPYGUI_HAVE_GNURADIO ON)
 endif()
 
+qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
+
 find_package(PkgConfig)
 set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
 #pkg_check_modules(GLIBMM REQUIRED glibmm-2.4)
@@ -63,6 +65,7 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 message(STATUS "Building scopy-gui")
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
+    ${PROJECT_RESOURCES}
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
