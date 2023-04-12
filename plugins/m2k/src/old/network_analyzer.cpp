@@ -542,9 +542,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->currentAverageLabel->setVisible(false);
 
 	d_frequencyHandle = new FreePlotLineHandleH(
-				QPixmap(":/icons/time_trigger_handle.svg"),
-				QPixmap(":/icons/time_trigger_left.svg"),
-				QPixmap(":/icons/time_trigger_right.svg"),
+				QPixmap(":/gui/icons/time_trigger_handle.svg"),
+				QPixmap(":/gui/icons/time_trigger_left.svg"),
+				QPixmap(":/gui/icons/time_trigger_right.svg"),
 				m_dBgraph.bottomHandlesArea());
 	d_frequencyHandle->setPen(QPen(QColor(74, 100, 255), 2, Qt::SolidLine));
 	d_frequencyHandle->setVisible(true);

@@ -51,7 +51,7 @@ bool TestPlugin::loadPreferencesPage()
 
 bool TestPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/icons/adalm.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
 	return true;
 }
 
@@ -70,8 +70,8 @@ bool TestPlugin::loadPage()
 void TestPlugin::loadToolList()
 {
 	renameCnt = 0;
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first","FirstPlugin",":/icons/scopy-default/icons/tool_home.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Alexandra",":/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first","FirstPlugin",":/gui/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Alexandra",":/gui/icons/scopy-default/icons/tool_io.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()

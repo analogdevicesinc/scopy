@@ -1,0 +1,16 @@
+QPushButton {
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+QPushButton:enabled {
+    background-image: url(:/gui/icons/scopy-default/icons/play_stop.svg);
+}
+
+QPushButton[disabled=true][enabled=false] {
+    background-image: url(:/gui/icons/scopy-default/icons/play_stop.svg);
+}
+
+QPushButton:checked {
+    background-image: url(:/gui/icons/play_green.svg);
+}

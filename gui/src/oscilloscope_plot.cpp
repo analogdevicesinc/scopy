@@ -163,9 +163,9 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	d_timeTriggerBar->setCanLeavePlot(true);
 
 	d_timeTriggerHandle = new FreePlotLineHandleH(
-					QPixmap(":/icons/time_trigger_handle.svg"),
-					QPixmap(":/icons/time_trigger_left.svg"),
-					QPixmap(":/icons/time_trigger_right.svg"),
+					QPixmap(":/gui/icons/time_trigger_handle.svg"),
+					QPixmap(":/gui/icons/time_trigger_left.svg"),
+					QPixmap(":/gui/icons/time_trigger_right.svg"),
 					d_bottomHandlesArea);
 	d_timeTriggerHandle->setPen(d_timeTriggerActiveLinePen);
 
@@ -214,9 +214,9 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	d_levelTriggerABar->setCanLeavePlot(true);
 
 	d_levelTriggerAHandle = new FreePlotLineHandleV(
-					QPixmap(":/icons/level_trigger_handle.svg"),
-					QPixmap(":/icons/level_trigger_up.svg"),
-					QPixmap(":/icons/level_trigger_down.svg"),
+					QPixmap(":/gui/icons/level_trigger_handle.svg"),
+					QPixmap(":/gui/icons/level_trigger_up.svg"),
+					QPixmap(":/gui/icons/level_trigger_down.svg"),
 					d_rightHandlesArea);
 	d_levelTriggerAHandle->setPen(d_timeTriggerActiveLinePen);
 
@@ -242,9 +242,9 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	d_levelTriggerBBar->setCanLeavePlot(true);
 
 	d_levelTriggerBHandle = new FreePlotLineHandleV(
-					QPixmap(":/icons/level_trigger_handle.svg"),
-					QPixmap(":/icons/level_trigger_up.svg"),
-					QPixmap(":/icons/level_trigger_down.svg"),
+					QPixmap(":/gui/icons/level_trigger_handle.svg"),
+					QPixmap(":/gui/icons/level_trigger_up.svg"),
+					QPixmap(":/gui/icons/level_trigger_down.svg"),
 					d_rightHandlesArea);
 	d_levelTriggerBHandle->setPen(d_trigBactiveLinePen);
 
@@ -265,11 +265,11 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 
 	/* Measurement gate cursors */
 	d_hGatingHandle1 = new PlotGateHandle(
-				QPixmap(":/icons/gate_handle.svg"),
+				QPixmap(":/gui/icons/gate_handle.svg"),
 				d_topGateHandlesArea);
 
 	d_hGatingHandle2 = new PlotGateHandle(
-				QPixmap(":/icons/gate_handle.svg"),
+				QPixmap(":/gui/icons/gate_handle.svg"),
 				d_topGateHandlesArea);
 
 	d_hGatingHandle1->setCenterLeft(false);
@@ -1196,9 +1196,9 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 	d_offsetBars.push_back(chOffsetBar);
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
-				QPixmap(":/icons/handle_right_arrow.svg"),
-				QPixmap(":/icons/handle_up_arrow.svg"),
-				QPixmap(":/icons/handle_down_arrow.svg"),
+				QPixmap(":/gui/icons/handle_right_arrow.svg"),
+				QPixmap(":/gui/icons/handle_up_arrow.svg"),
+				QPixmap(":/gui/icons/handle_down_arrow.svg"),
 				d_leftHandlesArea, true, logicCurve->getName(), true); // TODO: add name
 	chOffsetHdl->setRoundRectColor(chnColor);
 	chOffsetHdl->setPen(QPen(chnColor, 2, Qt::SolidLine));
@@ -1735,9 +1735,9 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	chOffsetBar->setMobileAxis(QwtAxisId(QwtAxis::YLeft, chnIdx));
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
-				QPixmap(":/icons/handle_right_arrow.svg"),
-				QPixmap(":/icons/handle_up_arrow.svg"),
-				QPixmap(":/icons/handle_down_arrow.svg"),
+				QPixmap(":/gui/icons/handle_right_arrow.svg"),
+				QPixmap(":/gui/icons/handle_up_arrow.svg"),
+				QPixmap(":/gui/icons/handle_down_arrow.svg"),
 				d_leftHandlesArea, true);
 	chOffsetHdl->setRoundRectColor(chnColor);
 	chOffsetHdl->setPen(QPen(chnColor, 2, Qt::SolidLine));

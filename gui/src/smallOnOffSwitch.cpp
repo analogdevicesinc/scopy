@@ -41,7 +41,7 @@ SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent) : QPushButton(parent),
 	setCheckable(true);
 	setDuration(100);
 
-	QFile file(":stylesheets/smallOnOffSwitch.qss");
+	QFile file(":/gui/stylesheets/smallOnOffSwitch.qss");
 	file.open(QFile::ReadOnly);
 	stylesheet = QString::fromLatin1(file.readAll());
 	this->setStyleSheet(stylesheet);

@@ -786,7 +786,7 @@ background-repeat: no-repeat;
                             <property name="styleSheet">
                              <string notr="true">QPushButton{
 
-image: url(:/icons/refresh.svg);
+image: url(:/gui/icons/refresh.svg);
 
 background-position: center center;
 background-repeat: no-repeat;

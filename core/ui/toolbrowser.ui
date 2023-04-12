@@ -32,19 +32,19 @@
 }
 
 #btnSave {
- qproperty-icon: url(&quot;:/icons/scopy-default/icons/save.svg&quot;);
+ qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/save.svg&quot;);
 }
 #btnLoad {
- qproperty-icon: url(&quot;:/icons/scopy-default/icons/load.svg&quot;);
+ qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/load.svg&quot;);
 }
 #btnPreferences {
- qproperty-icon: url(&quot;:/icons/scopy-default/icons/preferences.svg&quot;);
+ qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/preferences.svg&quot;);
 }
 #btnAbout {
- qproperty-icon: url(&quot;:/icons/scopy-default/icons/info.svg&quot;);
+ qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/info.svg&quot;);
 }
 #logo {
-background-image: url(:/icons/scopy-default/icons/logo_analog.svg);
+background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
 background-repeat: no-repeat;
 background-position: center center;
 background-repeat: no-repeat;
@@ -53,7 +53,7 @@ min-height:48px;
 
 #btnCollapse {
  height:40px;
- background-image: url(:/icons/scopy-default/icons/logo.svg);
+ background-image: url(:/gui/icons/scopy-default/icons/logo.svg);
  background-repeat: no-repeat;
  background-position: center center;
 }

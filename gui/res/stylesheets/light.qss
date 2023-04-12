@@ -9,7 +9,7 @@ QWidget {
  font-size: 13px;
 }
 QDockWidget {
- titlebar-normal-icon: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+ titlebar-normal-icon: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
  background-color: #F7F7F7;
 }
 QDockWidget::title {
@@ -138,7 +138,7 @@ QComboBox::item:selected {
 }
 QComboBox::drop-down {
  subcontrol-position: center right;
- border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+ border-image: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
  width: 10px;
  height: 6px;
  font-size: 16px;
@@ -179,12 +179,12 @@ QAbstractSpinBox::up-button, QAbstractSpinBox::down-button {
  height: 20px;
  width: 20px;
 }
-QAbstractSpinBox::up-button { border-image: url(:/icons/sba_up_btn.svg); }
-QAbstractSpinBox::up-button:hover { border-image: url(:/icons/sba_up_btn_hover.svg); }
-QAbstractSpinBox::up-button:pressed { border-image: url(:/icons/sba_up_btn_pressed.svg); }
-QAbstractSpinBox::down-button { border-image: url(:/icons/sba_dn_btn.svg); }
-QAbstractSpinBox::down-button:hover { border-image: url(:/icons/sba_dn_btn_hover.svg); }
-QAbstractSpinBox::down-button:pressed { border-image: url(:/icons/sba_dn_btn_pressed.svg); }
+QAbstractSpinBox::up-button { border-image: url(:/gui/icons/sba_up_btn.svg); }
+QAbstractSpinBox::up-button:hover { border-image: url(:/gui/icons/sba_up_btn_hover.svg); }
+QAbstractSpinBox::up-button:pressed { border-image: url(:/gui/icons/sba_up_btn_pressed.svg); }
+QAbstractSpinBox::down-button { border-image: url(:/gui/icons/sba_dn_btn.svg); }
+QAbstractSpinBox::down-button:hover { border-image: url(:/gui/icons/sba_dn_btn_hover.svg); }
+QAbstractSpinBox::down-button:pressed { border-image: url(:/gui/icons/sba_dn_btn_pressed.svg); }
 QGroupBox {
  border: 2px solid rgba(255, 255, 255, 40);
  border-radius: 8px;
@@ -258,13 +258,13 @@ QPushButton[subsection_arrow_button=true]{
  max-height: 12px;
  max-width: 12px;
  border: none;
- image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
+ image: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow_right.svg);
 }
 QPushButton[subsection_arrow_button=true]:checked{
  max-height: 12px;
  max-width: 12px;
  border: none;
- image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+ image: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 QLabel[general_settings_label=true]{
  color: rgba(0, 0, 0, 200);
@@ -272,7 +272,7 @@ QLabel[general_settings_label=true]{
  font-weight: normal;
 }
 QFrame[blue_line=true]{ border: 2px solid #4A64FF; }
-QFrame[drag_widget=true] { border-image:url(:/icons/scopy-light/icons/menu.svg); }
+QFrame[drag_widget=true] { border-image:url(:/gui/icons/scopy-light/icons/menu.svg); }
 QPushButton[blue_button=true]{
  background-color: #4a64ff;
  color: #ffffff;
@@ -390,58 +390,58 @@ adiscope--CursorReadouts {
  background-color: white;
 }
 QWidget[scopy_logo=true]{
- background-image: url(:/icons/scopy-light/icons/logo.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/logo.svg);
  background-repeat: no-repeat;
  background-position: left center;
 }
 QPushButton[menu_icon=true]{
- background-image: url(:/icons/scopy-light/icons/menu.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/menu.svg);
  background-repeat: no-repeat;
  background-position: left center;
 }
 QWidget[adi_logo=true]{
- background-image: url(:/icons/scopy-light/icons/logo_analog.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/logo_analog.svg);
  background-repeat: no-repeat;
  background-position: left center;
  min-width: 104px;
  min-height: 30px;
 }
 QPushButton[save_logo=true]{
- icon: url(:/icons/scopy-light/icons/save.svg);
+ icon: url(:/gui/icons/scopy-light/icons/save.svg);
  text-align: right;
 }
 QPushButton[load_logo=true]{
- icon: url(:/icons/scopy-light/icons/load.svg);
+ icon: url(:/gui/icons/scopy-light/icons/load.svg);
  text-align: left;
 }
 QPushButton[preferences_icon=true]{
- icon: url(:/icons/scopy-light/icons/preferences.svg);
+ icon: url(:/gui/icons/scopy-light/icons/preferences.svg);
  text-align: center;
  qproperty-text: "Preferences";
 }
 QPushButton[general_settings_icon=true]:checked {
- image: url(:/icons/scopy-light/icons/gear_wheel_pressed.svg);
+ image: url(:/gui/icons/scopy-light/icons/gear_wheel_pressed.svg);
 }
 QPushButton[general_settings_icon=true]:!checked {
- image: url(:/icons/scopy-light/icons/gear_wheel.svg);
+ image: url(:/gui/icons/scopy-light/icons/gear_wheel.svg);
 }
 QPushButton[general_settings_icon=true]:!checked:hover {
- image: url(:/icons/scopy-light/icons/gear_wheel_hover.svg);
+ image: url(:/gui/icons/scopy-light/icons/gear_wheel_hover.svg);
 }
 QPushButton[general_settings_icon=true]:checked:hover {
- image: url(:/icons/scopy-light/icons/gear_wheel_pressed.svg);
+ image: url(:/gui/icons/scopy-light/icons/gear_wheel_pressed.svg);
 }
 QPushButton[settings_icon=true]:checked {
- image: url(:/icons/scopy-light/icons/setup3_checked_hover.svg);
+ image: url(:/gui/icons/scopy-light/icons/setup3_checked_hover.svg);
 }
 QPushButton[settings_icon=true]:!checked {
- image: url(:/icons/scopy-light/icons/setup3_unchecked.svg);
+ image: url(:/gui/icons/scopy-light/icons/setup3_unchecked.svg);
 }
 QPushButton[settings_icon=true]:!checked:hover {
- image: url(:/icons/scopy-light/icons/setup3_unchecked_hover.svg);
+ image: url(:/gui/icons/scopy-light/icons/setup3_unchecked_hover.svg);
 }
 QPushButton[settings_icon=true]:checked:hover {
- image: url(:/icons/scopy-light/icons/setup3_checked_hover.svg);
+ image: url(:/gui/icons/scopy-light/icons/setup3_checked_hover.svg);
 }
 QHeaderView::section {
  background-color: #D3D3D3;
@@ -490,10 +490,10 @@ adiscope--ChannelWidget QPushButton#delBtn {
  background-color: transparent;
  background-position: center center;
  background-repeat: no-repeat;
- background-image: url(:/icons/red_x.svg);
+ background-image: url(:/gui/icons/red_x.svg);
 }
 adiscope--ChannelWidget QPushButton#delBtn::hover {
- background-image: url(:/icons/red_x.svg);
+ background-image: url(:/gui/icons/red_x.svg);
 }
 adiscope--ChannelWidget QPushButton#btn {
  width: 40px;
@@ -501,16 +501,16 @@ adiscope--ChannelWidget QPushButton#btn {
  background-color: transparent;
 }
 adiscope--ChannelWidget QPushButton#btn:pressed {
- border-image: url(:/icons/setup_btn_checked.svg)
+ border-image: url(:/gui/icons/setup_btn_checked.svg)
 }
 adiscope--ChannelWidget QPushButton#btn:!pressed {
- border-image: url(:/icons/setup_btn_unchecked.svg)
+ border-image: url(:/gui/icons/setup_btn_unchecked.svg)
 }
 adiscope--ChannelWidget QPushButton#btn:hover:!pressed:!checked {
- border-image: url(:/icons/setup_btn_hover.svg)
+ border-image: url(:/gui/icons/setup_btn_hover.svg)
 }
 adiscope--ChannelWidget QPushButton#btn:checked {
- border-image: url(:/icons/setup_btn_checked.svg)
+ border-image: url(:/gui/icons/setup_btn_checked.svg)
 }
 adiscope--ChannelWidget QFrame#line {
  border: 2px solid transparent;
@@ -518,53 +518,53 @@ adiscope--ChannelWidget QFrame#line {
 adiscope--ChannelWidget QFrame#line[selected=true] {
  border: 2px solid #000000;
 }
-adiscope--m2k--DropdownSwitchList {
+adiscope--DropdownSwitchList {
  height: 30px;
  border: 0px;
  font-size: 18px;
  border-radius: 4px;
  padding-left: 20px;
 }
-adiscope--m2k--DropdownSwitchList:editable{
+adiscope--DropdownSwitchList:editable{
  background-color: white;
  color: rgba(0, 0, 0, 200);
 }
-adiscope--m2k--DropdownSwitchList::drop-down {
+adiscope--DropdownSwitchList::drop-down {
  subcontrol-position: center right;
  width: 10px;
  height: 6px;
- border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+ border-image: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
  margin-right: 20px;
 }
-adiscope--m2k--DropdownSwitchList QAbstractItemView {
+adiscope--DropdownSwitchList QAbstractItemView {
  border: 0px;
  background-color: white;
  font-size: 18px;
  outline: 0px;
  border-left: 0px solid white;
 }
-adiscope--m2k--DropdownSwitchList QAbstractItemView::item {
+adiscope--DropdownSwitchList QAbstractItemView::item {
  color: rgba(0, 0, 0, 200);
  height: 60px;
 }
-adiscope--m2k--DropdownSwitchList QAbstractItemView::item:hover {
+adiscope--DropdownSwitchList QAbstractItemView::item:hover {
  background-color: #EDEDED;
  font-weight: bold;
  border-bottom: 0px solid none;
 }
-adiscope--m2k--DropdownSwitchList QHeaderView {
+adiscope--DropdownSwitchList QHeaderView {
   padding-left: -0px;
 }
-adiscope--m2k--DropdownSwitchList QHeaderView:section {
+adiscope--DropdownSwitchList QHeaderView:section {
  color: rgba(0, 0, 0, 200);
  background-color: white;
  border: 0px;
  font: 14px;
 }
-adiscope--m2k--DropdownSwitchList QCheckBox {
+adiscope--DropdownSwitchList QCheckBox {
  background-color: white;
 }
-adiscope--m2k--DropdownSwitchList QCheckBox::indicator {
+adiscope--DropdownSwitchList QCheckBox::indicator {
  width: 16px;
  height: 16px;
  subcontrol-position: center;
@@ -572,26 +572,26 @@ adiscope--m2k--DropdownSwitchList QCheckBox::indicator {
 adiscope--SpinBoxA QPushButton#SBA_UpButton {
  width: 30px;
  height: 30px;
- border-image: url(:/icons/sba_up_btn.svg);
+ border-image: url(:/gui/icons/sba_up_btn.svg);
  border: 0px;
 }
 adiscope--SpinBoxA QPushButton#SBA_UpButton:pressed {
- border-image: url(:/icons/sba_up_btn_pressed.svg);
+ border-image: url(:/gui/icons/sba_up_btn_pressed.svg);
 }
 adiscope--SpinBoxA QPushButton#SBA_UpButton:hover:!pressed {
- border-image: url(:/icons/sba_up_btn_hover.svg);
+ border-image: url(:/gui/icons/sba_up_btn_hover.svg);
 }
 adiscope--SpinBoxA QPushButton#SBA_DownButton {
  width: 30px;
  height: 30px;
- border-image: url(:/icons/sba_dn_btn.svg);
+ border-image: url(:/gui/icons/sba_dn_btn.svg);
  border: 0px;
 }
 adiscope--SpinBoxA QPushButton#SBA_DownButton:pressed {
- border-image: url(:/icons/sba_dn_btn_pressed.svg);
+ border-image: url(:/gui/icons/sba_dn_btn_pressed.svg);
 }
 adiscope--SpinBoxA QPushButton#SBA_DownButton:hover:!pressed {
- border-image: url(:/icons/sba_dn_btn_hover.svg);
+ border-image: url(:/gui/icons/sba_dn_btn_hover.svg);
 }
 adiscope--SpinBoxA QLabel#SBA_Label {
  color: rgba(0, 0, 0, 200);
@@ -621,13 +621,13 @@ adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down {
  subcontrol-position: center right;
  width: 10px;
  height: 6px;
- border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+ border-image: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 adiscope--SpinBoxA QComboBox#SBA_Combobox::drop-down:disabled {
  subcontrol-position: center right;
  width: 0px;
  height: 0px;
- border-image: url(:/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
+ border-image: url(:/gui/icons/scopy-light/icons/sba_cmb_box_arrow.svg);
 }
 adiscope--SpinBoxA QDial#SBA_CompletionCircle {
  background-color: #C5C5C5;
@@ -638,17 +638,17 @@ QPushButton[stopButton=true] {
  background-position: center center;
 }
 QPushButton[stopButton=true]:enabled {
- background-image: url(:/icons/scopy-light/icons/play_stop.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/play_stop.svg);
 }
 QPushButton[stopButton=true][disabled=true][enabled=false] {
- background-image: url(:/icons/scopy-light/icons/play_stop.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/play_stop.svg);
 }
 QPushButton[stopButton=true]:checked {
- background-image: url(:/icons/play_green.svg);
+ background-image: url(:/gui/icons/play_green.svg);
 }
 QPushButton[userNote=true] {
- background-image: url(:/icons/scopy-light/icons/note_unchecked.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/note_unchecked.svg);
 }
 QPushButton[userNote=true]:checked {
- background-image: url(:/icons/scopy-light/icons/note_checked.svg);
+ background-image: url(:/gui/icons/scopy-light/icons/note_checked.svg);
 }

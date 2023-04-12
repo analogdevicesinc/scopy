@@ -321,7 +321,7 @@ QSlider::groove:horizontal {
 }
 
 QSlider::handle:horizontal:enabled {
- border-image:url(&quot;:/icons/time_trigger_handle.svg&quot;); 
+ border-image:url(&quot;:/gui/icons/time_trigger_handle.svg&quot;); 
  height: 30px;	
  width: 40px;	
  border-radius: 4px;

@@ -85,7 +85,7 @@ bool TestPluginIp::loadIcon()
 	static int count = 0;
 	m_icon = new QLabel(QString::number(count));
 	count++;
-	m_icon->setStyleSheet("border-image: url(:/icons/adalm.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/adalm.svg);");
 	return true;
 }
 
