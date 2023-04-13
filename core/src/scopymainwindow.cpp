@@ -80,30 +80,30 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(scanTask,SIGNAL(scanFinished(QStringList)),scc,SLOT(update(QStringList)));
 
-	connect(scc,SIGNAL(foundDevice(QString, QString)),dm,SLOT(createDevice(QString, QString)));
-	connect(scc,SIGNAL(lostDevice(QString, QString)),dm,SLOT(removeDevice(QString, QString)));
+	connect(scc,SIGNAL(foundDevice(QString,QString)),dm,SLOT(createDevice(QString,QString)));
+	connect(scc,SIGNAL(lostDevice(QString,QString)),dm,SLOT(removeDevice(QString,QString)));
 
 	connect(hp,SIGNAL(requestDevice(QString)),this,SLOT(requestTools(QString)));
 
-	connect(hp,SIGNAL(requestAddDevice(QString, QString)),dm,SLOT(createDevice(QString, QString)));
+	connect(hp,SIGNAL(requestAddDevice(QString,QString)),dm,SLOT(createDevice(QString,QString)));
 	connect(dm,SIGNAL(deviceAdded(QString,Device*)),this,SLOT(addDeviceToUi(QString,Device*)));
 
-	connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),scc,SLOT(removeDevice(QString, Device*)));
-	connect(dm,SIGNAL(deviceRemoveStarted(QString, Device*)),this,SLOT(removeDeviceFromUi(QString)));
+	connect(dm,SIGNAL(deviceRemoveStarted(QString,Device*)),scc,SLOT(removeDevice(QString,Device*)));
+	connect(dm,SIGNAL(deviceRemoveStarted(QString,Device*)),this,SLOT(removeDeviceFromUi(QString)));
 	connect(hp,SIGNAL(requestRemoveDevice(QString)),dm,SLOT(removeDeviceById(QString)));
 
 	if(dm->getExclusive()) {
 		// only for device manager exclusive mode - stop scan on connect
-		connect(dm,SIGNAL(deviceConnected(QString, Device*)),sbc,SLOT(stopScan()));
-		connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),sbc,SLOT(startScan()));
+		connect(dm,SIGNAL(deviceConnected(QString,Device*)),sbc,SLOT(stopScan()));
+		connect(dm,SIGNAL(deviceDisconnected(QString,Device*)),sbc,SLOT(startScan()));
 	}
 
-	connect(dm,SIGNAL(deviceConnected(QString, Device*)),scc,SLOT(lock(QString, Device*)));
-	connect(dm,SIGNAL(deviceConnected(QString, Device*)),toolman,SLOT(lockToolList(QString)));
-	connect(dm,SIGNAL(deviceConnected(QString, Device*)),hp,SLOT(connectDevice(QString)));
-	connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),scc,SLOT(unlock(QString, Device*)));
-	connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),toolman,SLOT(unlockToolList(QString)));
-	connect(dm,SIGNAL(deviceDisconnected(QString, Device*)),hp,SLOT(disconnectDevice(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString,Device*)),scc,SLOT(lock(QString,Device*)));
+	connect(dm,SIGNAL(deviceConnected(QString,Device*)),toolman,SLOT(lockToolList(QString)));
+	connect(dm,SIGNAL(deviceConnected(QString,Device*)),hp,SLOT(connectDevice(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString,Device*)),scc,SLOT(unlock(QString,Device*)));
+	connect(dm,SIGNAL(deviceDisconnected(QString,Device*)),toolman,SLOT(unlockToolList(QString)));
+	connect(dm,SIGNAL(deviceDisconnected(QString,Device*)),hp,SLOT(disconnectDevice(QString)));
 
 	connect(dm,SIGNAL(requestDevice(QString)),hp,SLOT(viewDevice(QString)));
 	connect(dm,SIGNAL(requestTool(QString)),toolman,SLOT(showTool(QString)));
@@ -207,7 +207,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_show_plot_fps", true);
 	p->init("general_use_native_dialogs", true);
 
-	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
+	connect(p, SIGNAL(preferenceChanged(QString,QVariant)), this, SLOT(handlePreferences(QString,QVariant)));
 
 	if (p->get("general_use_opengl").toBool()) {
 		loadOpenGL();
