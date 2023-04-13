@@ -262,22 +262,22 @@ void M2kPlugin::init()
 				qInfo(CAT_M2KPLUGIN)<<"loadDecoders " << success;
 }
 
-void M2kPlugin::saveSettings()
+void M2kPlugin::saveSettings(QSettings &s)
 {
 	for(auto &&tool : tools) {
 		ApiObject *api = tool->getApi();
 		if(api) {
-			api->save();
+			api->save(s);
 		}
 	}
 }
 
-void M2kPlugin::loadSettings()
+void M2kPlugin::loadSettings(QSettings &s)
 {
 	for(auto &&tool : tools) {
 		ApiObject *api = tool->getApi();
 		if(api) {
-			api->load();
+			api->load(s);
 		}
 	}
 }

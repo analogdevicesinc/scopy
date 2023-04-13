@@ -7,8 +7,8 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QThread>
+#include <QStandardPaths>
 
-#include "pluginbase/scopyjs.h"
 #include "qscrollarea.h"
 #include "ui_devicepage.h"
 
@@ -57,7 +57,6 @@ void DeviceImpl::loadPlugins() {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(requestToolByUuid(QString)),this,SIGNAL(requestTool(QString)));
-		p->loadApi();
 		p->postload();
 	}
 }
@@ -169,13 +168,17 @@ void DeviceImpl::hidePage() {
 
 void DeviceImpl::save(QSettings &s) {
 	for(Plugin* p : qAsConst(m_plugins)) {
+		s.beginGroup(p->name());
 		p->saveSettings(s);
+		s.endGroup();
 	}
 }
 
 void DeviceImpl::load(QSettings &s) {
 	for(Plugin* p : qAsConst(m_plugins)) {
+		s.beginGroup(p->name());
 		p->loadSettings(s);
+		s.endGroup();
 	}
 }
 
@@ -187,10 +190,8 @@ void DeviceImpl::connectDev() {
 	for(auto &&p : m_plugins) {
 		p->onConnect();
 		if(pref->get("general_save_session").toBool()) {
-			p->loadSettings();
-		}
-		if(p->api()) {
-			ScopyJS::GetInstance()->registerApi(p->api());
+			QSettings s = QSettings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/" +p->name() +".ini", QSettings::IniFormat);
+			p->loadSettings(s);
 		}
 	}
 	Q_EMIT connected();
@@ -201,11 +202,9 @@ void DeviceImpl::disconnectDev() {
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
 	for(auto &&p : m_plugins) {
-		if(p->api()) {
-			ScopyJS::GetInstance()->unregisterApi(p->api());
-		}
 		if(pref->get("general_save_session").toBool()) {
-			p->saveSettings();
+			QSettings s = QSettings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/" +p->name() +".ini", QSettings::IniFormat);
+			p->saveSettings(s);
 		}
 		p->onDisconnect();
 	}
