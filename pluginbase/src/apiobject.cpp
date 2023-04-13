@@ -215,18 +215,4 @@ void ApiObject::save(QSettings& settings)
 
 	settings.endGroup();
 }
-
-void ApiObject::load()
-{
-	QSettings settings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/scopy.ini", QSettings::IniFormat);
-	load(settings);
-}
-
-
-void ApiObject::save()
-{
-	QSettings settings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/scopy.ini", QSettings::IniFormat);
-	save(settings);
-}
-
 #include "moc_apiobject.cpp"

@@ -15,6 +15,7 @@ class SCOPYTESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
 	Q_OBJECT
 	SCOPY_PLUGIN
 
+// Plugin interface
 public:
 	void postload() override;
 	bool loadIcon() override;
@@ -25,8 +26,13 @@ public:
 	bool onConnect() override;
 	bool onDisconnect() override;
 	void initMetadata() override;
+	void saveSettings(QSettings &) override;
+	void loadSettings(QSettings &) override;
+
 private:
 	QWidget *m_tool;
+
+
 
 };
 }

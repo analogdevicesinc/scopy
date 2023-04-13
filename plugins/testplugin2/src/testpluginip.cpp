@@ -109,7 +109,17 @@ R"plugin(
 	      "test"
 	   ]
 	}
-)plugin");
+		)plugin");
+}
+
+void TestPluginIp::saveSettings(QSettings &s)
+{
+	s.setValue("ip",m_param);
+}
+
+void TestPluginIp::loadSettings(QSettings &s)
+{
+	qInfo(CAT_TESTPLUGINIP)<<s.value("ip");
 }
 
 #include "moc_testpluginip.cpp"

@@ -112,9 +112,12 @@ bool TestPlugin::onConnect()
 	lay->addWidget(btn2);
 	m_toolList[0]->setTool(tool);
 
+	m_pluginApi = new TestPlugin_API(this);
+	m_pluginApi->setObjectName(m_name);
 
 	return true;
 }
+
 
 bool TestPlugin::onDisconnect()
 {
@@ -146,6 +149,16 @@ void TestPlugin::messageCallback(QString topic, QString message)
 	qInfo(CAT_TESTPLUGIN) << topic <<": "<<message;
 }
 
+void TestPlugin::saveSettings(QSettings &s)
+{
+	m_pluginApi->save(s);
+}
+
+void TestPlugin::loadSettings(QSettings &s)
+{
+	m_pluginApi->load(s);
+}
+
 QString TestPlugin::about()
 {
 	QFile f(":/about.md");
@@ -170,11 +183,6 @@ R"plugin(
 void TestPlugin::init()
 {
 	m_initText = "This text was initialized";
-}
-
-void TestPlugin::loadApi(){
-	m_pluginApi = new TestPlugin_API(this);
-	m_pluginApi->setObjectName(m_name);
 }
 
 QString TestPlugin::version() {

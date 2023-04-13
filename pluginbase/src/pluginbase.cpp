@@ -21,11 +21,6 @@ void PluginBase::unload() {
 
 }
 
-void PluginBase::loadApi()
-{
-
-}
-
 bool PluginBase::loadIcon() {
 	m_icon = nullptr;
 	return false;
@@ -50,28 +45,12 @@ bool PluginBase::loadExtraButtons()
 	return false;
 }
 
-void PluginBase::saveSettings()
-{
-	if(m_pluginApi)
-		m_pluginApi->save();
+void PluginBase::saveSettings(QSettings &s) {
+
 }
 
-void PluginBase::loadSettings()
-{
-	if(m_pluginApi)
-		m_pluginApi->load();
-}
+void PluginBase::loadSettings(QSettings &s) {
 
-void PluginBase::saveSettings(QSettings& s)
-{
-	if(m_pluginApi)
-		m_pluginApi->save(s);
-}
-
-void PluginBase::loadSettings(QSettings& s)
-{
-	if(m_pluginApi)
-		m_pluginApi->load(s);
 }
 
 void PluginBase::messageCallback(QString topic, QString message)
@@ -82,11 +61,6 @@ void PluginBase::messageCallback(QString topic, QString message)
 void PluginBase::requestTool(QString id)
 {
 	Q_EMIT requestToolByUuid(ToolMenuEntry::findToolMenuEntryById(m_toolList,id)->uuid());
-}
-
-ApiObject *PluginBase::api()
-{
-	return m_pluginApi;
 }
 
 QString PluginBase::param() {
@@ -105,7 +79,6 @@ QString PluginBase::displayDescription()
 {
 	return m_displayDescription;
 }
-
 
 QWidget* PluginBase::icon() {
 	return m_icon;

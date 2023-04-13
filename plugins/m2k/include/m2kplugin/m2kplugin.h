@@ -41,8 +41,8 @@ public:
 	void initPreferences() override;
 	bool loadPreferencesPage() override;
 	void init() override;
-	void saveSettings() override;
-	void loadSettings() override;
+	void saveSettings(QSettings &s) override;
+	void loadSettings(QSettings &s) override;
 
 
 public Q_SLOTS:
@@ -77,7 +77,6 @@ private:
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
 	bool loadDecoders(QString path);
-
 
 };
 }
