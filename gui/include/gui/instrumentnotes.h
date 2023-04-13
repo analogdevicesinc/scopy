@@ -7,7 +7,7 @@
 namespace Ui {
 class InstrumentNotes;
 }
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT InstrumentNotes : public QWidget
 {
 	Q_OBJECT

@@ -32,7 +32,7 @@
 #include "DisplayPlot.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class OscScaleDraw;
 class PrefixFormatter;
 class OscScaleZoomer;

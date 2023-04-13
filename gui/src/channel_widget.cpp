@@ -23,7 +23,7 @@
 
 #include <QButtonGroup>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * Class ChannelWidget - is a composite widget that contains a button with the

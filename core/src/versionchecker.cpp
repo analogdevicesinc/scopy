@@ -8,7 +8,7 @@
 
 Q_LOGGING_CATEGORY(CAT_VERSION,"VersionCache");
 
-using namespace adiscope;
+using namespace scopy;
 VersionCache* VersionCache::pinstance_{nullptr};
 VersionCache::VersionCache(QObject *parent) : QObject(parent) {
 }

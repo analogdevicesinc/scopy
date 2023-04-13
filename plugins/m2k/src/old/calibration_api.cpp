@@ -19,7 +19,7 @@
  */
 #include "calibration_api.hpp"
 
-namespace adiscope {
+namespace scopy {
 
 Calibration_API::Calibration_API(Calibration *calib) : ApiObject(),
 	calib(calib)

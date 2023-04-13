@@ -19,7 +19,7 @@
  */
 #include "ComboBoxLineEdit.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 ComboBoxLineEdit::ComboBoxLineEdit(QWidget *parent):
 	QLineEdit(parent)

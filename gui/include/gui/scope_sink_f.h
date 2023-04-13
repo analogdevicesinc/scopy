@@ -51,12 +51,12 @@
 #include <qapplication.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
     class SCOPYGUI_EXPORT scope_sink_f : virtual public gr::sync_block
     {
     public:
-      // adiscope::scope_sink_f::sptr
+      // scopy::scope_sink_f::sptr
       typedef std::shared_ptr<scope_sink_f> sptr;
 
       static sptr make(int size, double samp_rate,
@@ -82,6 +82,6 @@ namespace adiscope {
       QApplication *d_qApplication;
     };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_SCOPE_SINK_F_H */

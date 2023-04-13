@@ -26,7 +26,7 @@
 
 #include "fft_block.hpp"
 
-using namespace adiscope;
+using namespace scopy;
 using namespace gr;
 
 fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
@@ -38,7 +38,7 @@ fft_block::fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads)
 {
 	auto v2s = blocks::vector_to_stream::make(sizeof(gr_complex), fft_size);
 
-	d_s2v_overlap = adiscope::stream_to_vector_overlap::make(
+	d_s2v_overlap = scopy::stream_to_vector_overlap::make(
 				use_complex ? sizeof(gr_complex) : sizeof(float),
 				fft_size, 0.0);
 
@@ -66,7 +66,7 @@ fft_block::~fft_block()
 
 void fft_block::set_overlap_factor(double overlap_factor)
 {
-	std::dynamic_pointer_cast<adiscope::stream_to_vector_overlap>(
+	std::dynamic_pointer_cast<scopy::stream_to_vector_overlap>(
 				d_s2v_overlap)->set_overlap_factor(overlap_factor);
 }
 

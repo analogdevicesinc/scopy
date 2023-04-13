@@ -25,7 +25,7 @@
 #include <QPainter>
 #include <QPointF>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * Class BufferPreviewer implementation

@@ -24,7 +24,7 @@
 #include <QDial>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT CompletionCircle : public QDial
 {
 	Q_OBJECT

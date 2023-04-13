@@ -24,7 +24,7 @@
 #include <mutex>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 
 class SCOPYGUI_EXPORT SpectrumAverage {
@@ -177,6 +177,6 @@ private:
 	double *m_sums;
 };
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif // AVERAGE_H

@@ -12,7 +12,7 @@
 #include <libm2k/contextbuilder.hpp>
 
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class M2kController : public QObject
 {
 	Q_OBJECT

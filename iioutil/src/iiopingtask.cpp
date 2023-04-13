@@ -1,7 +1,7 @@
 #include "iiopingtask.h"
 #include <QDebug>
 
-using namespace adiscope;
+using namespace scopy;
 IIOPingTask::IIOPingTask(iio_context *c ,QObject *parent) : QThread(parent), c(c) {}
 
 IIOPingTask::~IIOPingTask() {}

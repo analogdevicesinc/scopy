@@ -9,7 +9,7 @@
 #include "pluginmanager.h"
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT DeviceManager : public QObject
 {
 	Q_OBJECT

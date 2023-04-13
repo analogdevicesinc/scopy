@@ -42,11 +42,11 @@
 #include "digitalchannel_manager.hpp"
 
 using namespace std;
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
-namespace adiscope {
+namespace scopy {
 
 void DIOManager::init()
 {

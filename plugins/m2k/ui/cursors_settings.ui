@@ -156,7 +156,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="adiscope::CustomSwitch" name="btnNormalTrack">
+             <widget class="scopy::CustomSwitch" name="btnNormalTrack">
               <property name="enabled">
                <bool>true</bool>
               </property>
@@ -352,7 +352,7 @@ color: rgba(255,255,255,51);
             <number>0</number>
            </property>
            <item>
-            <widget class="adiscope::CustomSwitch" name="hCursorsEnable">
+            <widget class="scopy::CustomSwitch" name="hCursorsEnable">
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -375,7 +375,7 @@ color: rgba(255,255,255,51);
             </spacer>
            </item>
            <item>
-            <widget class="adiscope::SmallOnOffSwitch" name="btnLockHorizontal">
+            <widget class="scopy::SmallOnOffSwitch" name="btnLockHorizontal">
              <property name="styleSheet">
               <string notr="true">QPushButton[use_icon=true]</string>
              </property>
@@ -503,7 +503,7 @@ color: rgba(255,255,255,51);
              <number>0</number>
             </property>
             <item>
-             <widget class="adiscope::CustomSwitch" name="vCursorsEnable">
+             <widget class="scopy::CustomSwitch" name="vCursorsEnable">
               <property name="checkable">
                <bool>true</bool>
               </property>
@@ -526,7 +526,7 @@ color: rgba(255,255,255,51);
              </spacer>
             </item>
             <item>
-             <widget class="adiscope::SmallOnOffSwitch" name="btnLockVertical">
+             <widget class="scopy::SmallOnOffSwitch" name="btnLockVertical">
               <property name="styleSheet">
                <string notr="true">QPushButton[use_icon=true]</string>
               </property>
@@ -774,12 +774,12 @@ color: rgba(255,255,255,51);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
+   <class>scopy::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/smallOnOffSwitch.h</header>
   </customwidget>

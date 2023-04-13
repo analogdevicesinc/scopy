@@ -28,8 +28,8 @@
 #include "ui_channel_settings.h"
 #include "ui_osc_general_settings.h"
 
-using namespace adiscope;
-namespace adiscope::m2k
+using namespace scopy;
+namespace scopy::m2k
 {
 /*
  * class Oscilloscope_API

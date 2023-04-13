@@ -71,8 +71,8 @@ Q_LOGGING_CATEGORY(CAT_M2K_NETWORK_ANALYZER, "M2kNetworkAnalyzer")
 
 static const int KERNEL_BUFFERS_DEFAULT = 4;
 
-using namespace adiscope;
-using namespace adiscope::m2k;
+using namespace scopy;
+using namespace scopy::m2k;
 using namespace gr;
 using namespace libm2k::context;
 using namespace libm2k::analog;
@@ -109,10 +109,10 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 
 		capture1 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
 		capture2 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
-		f11 = adiscope::frequency_compensation_filter::make(false);
-		f12 = adiscope::frequency_compensation_filter::make(false);
-		f21 = adiscope::frequency_compensation_filter::make(false);
-		f22 = adiscope::frequency_compensation_filter::make(false);
+		f11 = frequency_compensation_filter::make(false);
+		f12 = frequency_compensation_filter::make(false);
+		f21 = frequency_compensation_filter::make(false);
+		f22 = frequency_compensation_filter::make(false);
 		s2f1 = gr::blocks::short_to_float::make();
 		s2f2 = gr::blocks::short_to_float::make();
 		goertzel1 = gr::scopy::goertzel_scopy_fc::make(1, 1, 1);

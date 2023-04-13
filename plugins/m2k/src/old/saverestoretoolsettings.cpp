@@ -2,7 +2,7 @@
 #include <pluginbase/apiobject.h>
 #include <QSettings>
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 SaveRestoreToolSettings::SaveRestoreToolSettings(M2kTool *tool)
         : m_tool(tool)

@@ -52,7 +52,7 @@ using std::pair;
 
 class QDoubleSpinBox;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 class SCOPYGUI_EXPORT Double : public Property

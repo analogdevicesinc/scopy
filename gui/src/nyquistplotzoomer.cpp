@@ -20,7 +20,7 @@
 #include "nyquistplotzoomer.h"
 
 
-using namespace adiscope;
+using namespace scopy;
 
 NyquistPlotZoomer::NyquistPlotZoomer(QwtPolarCanvas* parent):
     QwtPolarMagnifier(parent), zoom_count(0)

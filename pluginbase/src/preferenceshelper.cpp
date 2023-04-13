@@ -3,7 +3,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-using namespace adiscope;
+using namespace scopy;
 QCheckBox* PreferencesHelper::addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent) {
 	bool pref1Val = p->get(id).toBool();
 	QCheckBox *pref = new QCheckBox(description);

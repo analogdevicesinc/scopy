@@ -27,7 +27,7 @@
 #include <QHeaderView>
 #include <QRegExp>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 
 namespace logic {
@@ -492,4 +492,4 @@ skip_loop:
 }
 
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy

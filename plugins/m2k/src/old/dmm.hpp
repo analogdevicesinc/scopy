@@ -46,7 +46,7 @@ namespace Ui {
 
 class QJSEngine;
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 	class DMM_API;
 
 	class DMM : public M2kTool

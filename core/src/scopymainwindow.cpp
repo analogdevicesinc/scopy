@@ -21,7 +21,7 @@
 
 Q_LOGGING_CATEGORY(CAT_SCOPY,"Scopy")
 
-using namespace adiscope;
+using namespace scopy;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ScopyMainWindow)

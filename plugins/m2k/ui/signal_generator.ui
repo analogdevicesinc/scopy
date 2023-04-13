@@ -36,7 +36,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
+    <widget class="scopy::DetachDragZone" name="mainWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
        <number>0</number>
@@ -84,7 +84,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="adiscope::LinkedButton" name="btnHelp"/>
+         <widget class="scopy::LinkedButton" name="btnHelp"/>
         </item>
         <item>
          <spacer name="horizontalSpacer_3">
@@ -100,7 +100,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="adiscope::RunSingleWidget" name="run_button" native="true">
+         <widget class="scopy::RunSingleWidget" name="run_button" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -144,7 +144,7 @@
             <number>0</number>
            </property>
            <item row="0" column="0">
-            <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
+            <widget class="scopy::InstrumentNotes" name="instrumentNotes" native="true">
              <property name="styleSheet">
               <string notr="true"/>
              </property>
@@ -154,7 +154,7 @@
          </widget>
         </item>
         <item>
-         <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
+         <widget class="scopy::MenuAnim" name="rightMenu" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -953,7 +953,7 @@ background-repeat: no-repeat;
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="adiscope::Math" name="mathWidget" native="true">
+                    <widget class="scopy::Math" name="mathWidget" native="true">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
                        <horstretch>0</horstretch>
@@ -1278,7 +1278,7 @@ background-repeat: no-repeat;
                         </spacer>
                        </item>
                        <item>
-                        <widget class="adiscope::m2k::ExternalLoadLineEdit" name="externalLoad"/>
+                        <widget class="scopy::m2k::ExternalLoadLineEdit" name="externalLoad"/>
                        </item>
                       </layout>
                      </item>
@@ -1381,7 +1381,7 @@ background-repeat: no-repeat;
                         </widget>
                        </item>
                        <item>
-                        <widget class="adiscope::CustomSwitch" name="btnSigGenAutoscale">
+                        <widget class="scopy::CustomSwitch" name="btnSigGenAutoscale">
                          <property name="text">
                           <string/>
                          </property>
@@ -1452,47 +1452,47 @@ background-repeat: no-repeat;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header location="global">gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
+   <class>scopy::MenuAnim</class>
    <extends>QWidget</extends>
    <header location="global">gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
+   <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header location="global">gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::RunSingleWidget</class>
+   <class>scopy::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header location="global">gui/runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::LinkedButton</class>
+   <class>scopy::LinkedButton</class>
    <extends>QPushButton</extends>
    <header location="global">linked_button.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::Math</class>
+   <class>scopy::Math</class>
    <extends>QWidget</extends>
    <header>gui/math.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::m2k::ExternalLoadLineEdit</class>
+   <class>scopy::m2k::ExternalLoadLineEdit</class>
    <extends>QLineEdit</extends>
    <header>externalloadlineedit.h</header>
   </customwidget>

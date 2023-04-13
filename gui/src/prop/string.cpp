@@ -48,7 +48,7 @@
 
 using std::string;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 String::String(QString name,

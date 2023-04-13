@@ -35,7 +35,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="adiscope::DeviceBrowser" name="wDeviceBrowser" native="true">
+      <widget class="scopy::DeviceBrowser" name="wDeviceBrowser" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -63,7 +63,7 @@
         </widget>
        </item>
        <item>
-        <widget class="adiscope::SmallOnOffSwitch" name="btnScan">
+        <widget class="scopy::SmallOnOffSwitch" name="btnScan">
          <property name="text">
           <string/>
          </property>
@@ -93,7 +93,7 @@
     </layout>
    </item>
    <item>
-    <widget class="adiscope::InfoPageStack" name="wInfoPageStack">
+    <widget class="scopy::InfoPageStack" name="wInfoPageStack">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -106,19 +106,19 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DeviceBrowser</class>
+   <class>scopy::DeviceBrowser</class>
    <extends>QWidget</extends>
    <header>devicebrowser.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InfoPageStack</class>
+   <class>scopy::InfoPageStack</class>
    <extends>QStackedWidget</extends>
    <header>infopagestack.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
+   <class>scopy::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/smallOnOffSwitch.h</header>
   </customwidget>

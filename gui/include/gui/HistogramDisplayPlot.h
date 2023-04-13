@@ -51,7 +51,7 @@
 
 #include <qwt_plot_histogram.h>
 
-namespace adiscope {
+namespace scopy {
 
 
 class SCOPYGUI_EXPORT HistogramScaleDraw: public QwtScaleDraw
@@ -158,6 +158,6 @@ private:
   std::vector<PlotAxisConfiguration *> horizAxes;
   unsigned int d_selected_channel;
 };
-} //adiscope
+} //scopy
 
 #endif /* M2K_HISTOGRAM_DISPLAY_PLOT_H */

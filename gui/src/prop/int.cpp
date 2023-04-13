@@ -50,7 +50,7 @@ using std::max;
 using std::min;
 using std::pair;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 Int::Int(QString name,

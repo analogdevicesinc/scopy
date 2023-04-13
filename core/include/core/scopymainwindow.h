@@ -19,7 +19,7 @@
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
 QT_END_NAMESPACE
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ScopyMainWindow : public QMainWindow
 {
     Q_OBJECT

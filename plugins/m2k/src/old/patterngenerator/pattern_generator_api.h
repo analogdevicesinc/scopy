@@ -25,7 +25,7 @@
 #include "pattern_generator.h"
 #include "pluginbase/apiobject.h"
 
-namespace adiscope::m2k::logic {
+namespace scopy::m2k::logic {
 class PatternGenerator_API : public ApiObject
 {
 	Q_OBJECT

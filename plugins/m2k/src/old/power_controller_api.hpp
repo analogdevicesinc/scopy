@@ -22,10 +22,10 @@
 
 #include "power_controller.hpp"
 
-using namespace adiscope;
-namespace adiscope::m2k {
+using namespace scopy;
+namespace scopy::m2k {
 
-class PowerController_API : public adiscope::ApiObject
+class PowerController_API : public scopy::ApiObject
 {
 	Q_OBJECT
 

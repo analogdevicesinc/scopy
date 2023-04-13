@@ -24,7 +24,7 @@
 #include <QObject>
 #include <QTimer>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 class StateUpdater: public QObject
 {
@@ -64,6 +64,6 @@ private:
 	QTimer m_timer;
 };
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif // STATE_UPDATER_H

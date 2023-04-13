@@ -24,7 +24,7 @@
 #include <QFile>
 #include <QDate>
 
-using namespace adiscope;
+using namespace scopy;
 
 FileManager::FileManager(QString toolName) :
 	hasHeader(false),

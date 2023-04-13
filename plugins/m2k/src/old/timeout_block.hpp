@@ -25,7 +25,7 @@
 
 #include <gnuradio/block.h>
 
-namespace adiscope {
+namespace scopy {
 	class timeout_block : public QObject, public gr::block
 	{
 		Q_OBJECT

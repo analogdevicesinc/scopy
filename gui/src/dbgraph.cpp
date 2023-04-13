@@ -27,7 +27,7 @@
 #include <qwt_plot_layout.h>
 #include <QIcon>
 
-using namespace adiscope;
+using namespace scopy;
 
 void dBgraph::setupVerticalBars()
 {

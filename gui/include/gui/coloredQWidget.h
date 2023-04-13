@@ -24,7 +24,7 @@
 #include <QWidget>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT ColoredQWidget : public QWidget
 	{
 	public:

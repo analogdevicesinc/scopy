@@ -20,7 +20,7 @@
 
 #include "coloredQWidget.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 ColoredQWidget::ColoredQWidget(QWidget *parent) : QWidget(parent)
 {

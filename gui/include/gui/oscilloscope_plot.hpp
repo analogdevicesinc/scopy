@@ -36,7 +36,7 @@
 
 class QLabel;
 
-namespace adiscope {
+namespace scopy {
 	class Oscilloscope_API;
 	class PlotWidget;
 

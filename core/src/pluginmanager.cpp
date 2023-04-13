@@ -7,7 +7,7 @@
 #include "pluginfilter.h"
 
 Q_LOGGING_CATEGORY(CAT_PLUGINMANAGER, "PluginManager")
-using namespace adiscope;
+using namespace scopy;
 
 
 struct less_than_key

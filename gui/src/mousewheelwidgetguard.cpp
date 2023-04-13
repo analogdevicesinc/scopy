@@ -26,7 +26,7 @@
 #include <QDoubleSpinBox>
 #include <QLineEdit>
 
-using namespace adiscope;
+using namespace scopy;
 
 MouseWheelWidgetGuard::MouseWheelWidgetGuard(QObject *parent):
 	QObject(parent)

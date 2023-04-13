@@ -32,10 +32,10 @@ namespace Ui {
 	class TriggerSettings;
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 	class Oscilloscope_API;	
 }
-namespace adiscope {
+namespace scopy {
 	class PositionSpinButton;
 }
 
@@ -45,7 +45,7 @@ namespace libm2k {
 		class M2kAnalogIn;
 	}
 }
-namespace adiscope::m2k {
+namespace scopy::m2k {
 	class TriggerSettings : public QWidget
 	{
 		friend class Oscilloscope_API;

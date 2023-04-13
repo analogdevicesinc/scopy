@@ -47,7 +47,7 @@
 #include "histogram_sink_f.h"
 #include "HistogramDisplayPlot.h"
 
-namespace adiscope {
+namespace scopy {
 
     class histogram_sink_f_impl : public histogram_sink_f
     {
@@ -93,6 +93,6 @@ namespace adiscope {
 	       gr_vector_void_star &output_items);
     };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_HISTOGRAM_SINK_F_IMPL_H */

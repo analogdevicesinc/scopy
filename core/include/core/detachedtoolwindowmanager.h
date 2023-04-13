@@ -7,7 +7,7 @@
 #include "scopycore_export.h"
 #include "detachedtoolwindow.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYCORE_EXPORT DetachedToolWindowManager : public QObject {
 	Q_OBJECT

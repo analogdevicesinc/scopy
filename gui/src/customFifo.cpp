@@ -20,7 +20,7 @@
 
 #include "customFifo.hpp"
 
-using namespace adiscope;
+using namespace scopy;
 
 template <typename T>
 CustomFifo<T>::CustomFifo()
@@ -102,6 +102,6 @@ T * CustomFifo<T>::data()
 		return vector->data();
 }
 
-namespace adiscope {
+namespace scopy {
 	template class CustomFifo<double>;
 }

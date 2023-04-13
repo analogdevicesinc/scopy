@@ -58,7 +58,7 @@ class QFormLayout;
 class QLabel;
 class QWidget;
 
-namespace adiscope {
+namespace scopy {
 
 namespace prop {
 class Property;

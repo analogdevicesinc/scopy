@@ -1,7 +1,7 @@
 #include "scopyenvironment.h"
 #include <QApplication>
 
-using namespace adiscope;
+using namespace scopy;
 ScopyEnvironment* ScopyEnvironment::pinstance_{nullptr};
 
 ScopyEnvironment::ScopyEnvironment(QObject *parent) : QObject(parent)

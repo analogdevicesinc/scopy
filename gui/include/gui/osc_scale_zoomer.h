@@ -25,7 +25,7 @@
 #include "limitedplotzoomer.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT OscScaleZoomer : public LimitedPlotZoomer
 	{
 		Q_OBJECT

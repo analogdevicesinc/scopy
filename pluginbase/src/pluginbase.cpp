@@ -4,7 +4,7 @@
 
 Q_LOGGING_CATEGORY(CAT_PLUGIN,"Plugin");
 
-using namespace adiscope;
+using namespace scopy;
 
 void PluginBase::setParam(QString param) {
 	m_param = param;

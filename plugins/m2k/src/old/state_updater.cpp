@@ -20,7 +20,7 @@
 
 #include "state_updater.h"
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 StateUpdater::StateUpdater(int msecTimeout, QObject *parent):
 	QObject(parent),

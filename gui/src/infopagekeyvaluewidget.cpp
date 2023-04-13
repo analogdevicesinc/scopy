@@ -1,6 +1,6 @@
 #include "infopagekeyvaluewidget.h"
 
-using namespace adiscope;
+using namespace scopy;
 InfoPageKeyValueWidget::InfoPageKeyValueWidget(QString key, QString value, QWidget *parent) :
 
 	QWidget(parent) {

@@ -22,7 +22,7 @@
 
 #include <qwt_polar_magnifier.h>
 
-namespace adiscope {
+namespace scopy {
 class NyquistPlotZoomer : public QwtPolarMagnifier
 {
 public:

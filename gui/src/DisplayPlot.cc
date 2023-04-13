@@ -60,7 +60,7 @@
 #include <QGridLayout>
 #include <qwt_plot_opengl_canvas.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 static QwtScaleDiv getEdgelessScaleDiv(const QwtScaleDiv& from_scaleDiv);
 

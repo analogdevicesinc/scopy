@@ -3,7 +3,7 @@
 #include "m2kcommon.h"
 #include <QDebug>
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 M2kReadTemperatureTask::M2kReadTemperatureTask(QString uri) : QThread()
 {

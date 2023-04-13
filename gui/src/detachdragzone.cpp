@@ -22,7 +22,7 @@
 
 #include "basemenuitem.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 DetachDragZone::DetachDragZone(QWidget *parent) :
 	ColoredQWidget(parent)

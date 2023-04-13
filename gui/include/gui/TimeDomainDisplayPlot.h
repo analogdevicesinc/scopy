@@ -51,7 +51,7 @@
 #include "scopygui_export.h"
 
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT Sink{
 public:
@@ -268,6 +268,6 @@ private:
   int d_nb_ref_curves;
   int getCurveNextTo(int pos);
 };
-} //adiscope
+} //scopy
 
 #endif /* M2K_TIME_DOMAIN_DISPLAY_PLOT_H */

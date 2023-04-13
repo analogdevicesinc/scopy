@@ -1,7 +1,7 @@
 #include "iiodeviceimpl.h"
 #include "iioutil/contextprovider.h"
 
-using namespace adiscope;
+using namespace scopy;
 void IIODeviceImpl::init()
 {
 	auto cp = ContextProvider::GetInstance();

@@ -7,7 +7,7 @@
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
 
-using namespace adiscope;
+using namespace scopy;
 DeviceBrowser::DeviceBrowser(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::DeviceBrowser)

@@ -70,7 +70,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="adiscope::LinkedButton" name="btnHelp">
+       <widget class="scopy::LinkedButton" name="btnHelp">
         <property name="text">
          <string/>
         </property>
@@ -98,7 +98,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="adiscope::DetachDragZone" name="leftPanel" native="true">
+      <widget class="scopy::DetachDragZone" name="leftPanel" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -168,7 +168,7 @@
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="adiscope::LcdNumber" name="lcd1_set">
+           <widget class="scopy::LcdNumber" name="lcd1_set">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -209,7 +209,7 @@ color: #ff7200;
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="adiscope::LcdNumber" name="lcd1">
+           <widget class="scopy::LcdNumber" name="lcd1">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -370,7 +370,7 @@ color: #ff7200;
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="adiscope::LcdNumber" name="lcd2">
+           <widget class="scopy::LcdNumber" name="lcd2">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -448,7 +448,7 @@ color: #9013fe;
            </spacer>
           </item>
           <item row="0" column="1">
-           <widget class="adiscope::LcdNumber" name="lcd2_set">
+           <widget class="scopy::LcdNumber" name="lcd2_set">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -549,13 +549,13 @@ color: #9013fe;
          </widget>
         </item>
         <item>
-         <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
+         <widget class="scopy::InstrumentNotes" name="instrumentNotes" native="true"/>
         </item>
        </layout>
       </widget>
      </item>
      <item>
-      <widget class="adiscope::DetachDragZone" name="rightMenu" native="true">
+      <widget class="scopy::DetachDragZone" name="rightMenu" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -648,7 +648,7 @@ color: #9013fe;
              </widget>
             </item>
             <item>
-             <widget class="adiscope::CustomSwitch" name="btnSync">
+             <widget class="scopy::CustomSwitch" name="btnSync">
               <property name="styleSheet">
                <string notr="true">QPushButton {
 min-height: 30px;
@@ -1088,24 +1088,24 @@ QPushButton:disabled {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
+   <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::LinkedButton</class>
+   <class>scopy::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>gui/linked_button.hpp</header>
   </customwidget>
@@ -1115,7 +1115,7 @@ QPushButton:disabled {
    <header>qwt_thermo.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::LcdNumber</class>
+   <class>scopy::LcdNumber</class>
    <extends>QLCDNumber</extends>
    <header>gui/lcdNumber.hpp</header>
   </customwidget>

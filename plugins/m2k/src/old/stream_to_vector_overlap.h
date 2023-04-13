@@ -44,7 +44,7 @@
 
 #include <gnuradio/sync_decimator.h>
 
-namespace adiscope {
+namespace scopy {
 
 class stream_to_vector_overlap : virtual public gr::sync_decimator
 {
@@ -53,6 +53,6 @@ public:
 	static sptr make(size_t itemsize, size_t nitems_per_block, double overlap_factor);
 	virtual void set_overlap_factor(double) = 0;
 };
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_STREAM_TO_VECTOR_OVERLAP_H */

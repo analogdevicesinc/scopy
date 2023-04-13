@@ -55,7 +55,7 @@
 
 Q_LOGGING_CATEGORY(CAT_VOLTMETER,"M2kDMM");
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace libm2k;
 using namespace libm2k::context;
 
@@ -84,7 +84,7 @@ DMM::DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_mana
 	ui->sismograph_ch1->setColor(QColor("#ff7200"));
 	ui->sismograph_ch2->setColor(QColor("#9013fe"));
 
-	std::vector<adiscope::CustomScale *> scales {ui->scaleCh1, ui->scaleCh2};
+	std::vector<scopy::CustomScale *> scales {ui->scaleCh1, ui->scaleCh2};
 	for (auto scale : scales) {
 		scale->setOrientation(Qt::Horizontal);
 		scale->setScalePosition(QwtThermo::LeadingScale);

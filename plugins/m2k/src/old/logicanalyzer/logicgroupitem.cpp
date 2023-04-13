@@ -28,7 +28,7 @@
 
 #include "gui/basemenu.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 LogicGroupItem::LogicGroupItem(const QString &name, QWidget *parent):
 	BaseMenuItem(parent),

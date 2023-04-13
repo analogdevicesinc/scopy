@@ -30,7 +30,7 @@ namespace Ui {
 class StartStopRangeWidget;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT StartStopRangeWidget : public QWidget
 {
 	Q_OBJECT

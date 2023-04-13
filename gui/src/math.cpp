@@ -28,7 +28,7 @@
 
 #include <gnuradio/scopy/math.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent),
 	num_inputs(num_inputs), ui(new Ui::Math)

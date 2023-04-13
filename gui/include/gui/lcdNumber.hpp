@@ -24,7 +24,7 @@
 #include <QLCDNumber>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT LcdNumber : public QLCDNumber
 	{
 		Q_OBJECT

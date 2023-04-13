@@ -10,7 +10,7 @@
 #include <QThread>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
-using namespace adiscope;
+using namespace scopy;
 DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
 	: QObject{parent}, pm(pm)
 {

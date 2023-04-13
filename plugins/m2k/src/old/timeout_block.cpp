@@ -20,7 +20,7 @@
 
 #include "timeout_block.hpp"
 
-using namespace adiscope;
+using namespace scopy;
 
 timeout_block::timeout_block(const std::string &pmt_name, QObject *parent) :
 	QObject(parent), gr::block("timeout_block",

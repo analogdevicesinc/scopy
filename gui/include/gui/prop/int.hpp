@@ -53,7 +53,7 @@ using std::pair;
 
 class QSpinBox;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 class SCOPYGUI_EXPORT Int : public Property

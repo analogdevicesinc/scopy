@@ -6,7 +6,7 @@
 class logic_analyzer_sink_impl : public logic_analyzer_sink
 {
 public:
-	logic_analyzer_sink_impl(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize);
+	logic_analyzer_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize);
 
 	int work(int noutput_items,
 	         gr_vector_const_void_star &input_items,
@@ -21,7 +21,7 @@ private:
 	void _reset();
 
 private:
-	adiscope::m2k::logic::LogicAnalyzer *d_logic_analyzer;
+	scopy::m2k::logic::LogicAnalyzer *d_logic_analyzer;
 	uint16_t *d_buffer;
 	uint16_t *d_buffer_temp;
 	int d_size;

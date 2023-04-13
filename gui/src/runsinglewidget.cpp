@@ -25,7 +25,7 @@
 #include "dynamicWidget.h"
 #include "customPushButton.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 RunSingleWidget::RunSingleWidget(QWidget *parent) :
 	QWidget(parent),

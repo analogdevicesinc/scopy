@@ -35,7 +35,7 @@
 
 class QwtPolarGrid;
 
-namespace adiscope {
+namespace scopy {
 	class NyquistSamplesArray;
 
 	class SCOPYGUI_EXPORT NyquistGraph : public QwtPolarPlot

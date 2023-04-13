@@ -23,7 +23,7 @@
 #include <QApplication>
 #include <QCheckBox>
 
-using namespace adiscope;
+using namespace scopy;
 
 CheckboxDelegate::CheckboxDelegate(QObject *parent):
 	QStyledItemDelegate(parent)

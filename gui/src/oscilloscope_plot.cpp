@@ -35,7 +35,7 @@
 
 #define ERROR_VALUE -10000000
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * OscilloscopePlot class
@@ -1707,7 +1707,7 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 	replot();
 }
 
-void adiscope::CapturePlot::pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar)
+void scopy::CapturePlot::pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar)
 {
 	const int indexOfNewChannel = (d_ydata.size() + d_ref_ydata.size()) - 1;
 	d_offsetBars.insert(indexOfNewChannel, chOffsetBar);

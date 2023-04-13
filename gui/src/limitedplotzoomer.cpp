@@ -21,7 +21,7 @@
 #include <qwt_plot.h>
 #include <QtDebug>
 
-using namespace adiscope;
+using namespace scopy;
 
 LimitedPlotZoomer::LimitedPlotZoomer(QWidget *parent, bool doReplot):
 	QwtPlotZoomer(parent, doReplot),

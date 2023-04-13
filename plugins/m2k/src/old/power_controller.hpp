@@ -48,7 +48,7 @@ class QJSEngine;
 class QShowEvent;
 class QHideEvent;
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 	class PowerController_API;
 
 	class PowerController : public M2kTool

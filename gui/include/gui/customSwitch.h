@@ -29,7 +29,7 @@
 
 class QShowEvent;
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT CustomSwitch : public QPushButton
 	{
 		Q_OBJECT

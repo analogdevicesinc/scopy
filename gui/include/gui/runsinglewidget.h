@@ -29,7 +29,7 @@ namespace Ui {
 class RunSingleWidget;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT RunSingleWidget : public QWidget
 {
 	Q_OBJECT

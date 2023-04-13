@@ -42,7 +42,7 @@
 #include <QLoggingCategory>
 Q_LOGGING_CATEGORY(CAT_M2K_CALIBRATION_MANUAL,"M2kCalibrationManual")
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace libm2k::context;
 using namespace libm2k::analog;
 

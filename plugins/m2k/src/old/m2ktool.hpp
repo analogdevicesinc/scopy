@@ -40,7 +40,7 @@ extern "C" {
 struct iio_context;
 }
 
-namespace adiscope {
+namespace scopy {
 class ApiObject;
 class ToolLauncher;
 

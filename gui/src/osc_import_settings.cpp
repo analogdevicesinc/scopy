@@ -20,7 +20,7 @@
 
 #include "osc_import_settings.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 ImportSettings::ImportSettings(QWidget *parent) :
         ExportSettings(parent)

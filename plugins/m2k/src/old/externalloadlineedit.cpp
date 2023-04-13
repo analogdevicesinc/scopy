@@ -1,7 +1,7 @@
 #include <externalloadlineedit.h>
 
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 constexpr double ExternalLoadLineEdit::MAX_EXTERNAL_LOAD;
 constexpr double ExternalLoadLineEdit::MIN_EXTERNAL_LOAD;
 constexpr double ExternalLoadLineEdit::OUTPUT_AWG_RESISTANCE;

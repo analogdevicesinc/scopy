@@ -22,7 +22,7 @@
 
 #include <stdexcept>
 
-using namespace adiscope;
+using namespace scopy;
 
 const QVector<QString> HardwareTrigger::lut_analog_trigg_cond = {
 	"edge-rising",

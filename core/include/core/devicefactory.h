@@ -4,7 +4,7 @@
 #include <QObject>
 #include "deviceimpl.h"
 
-namespace adiscope {
+namespace scopy {
 
 
 class DeviceFactory : public QObject {

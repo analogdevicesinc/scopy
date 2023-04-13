@@ -60,11 +60,11 @@ class LogicAnalyzer;
 class CursorsSettings;
 } // namespace Ui
 
-namespace adiscope {
+namespace scopy {
 	class ExportSettings;
 	class BaseMenu;
 }
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 class Filter;
 class LogicAnalyzer_API;
@@ -265,6 +265,6 @@ private:
 
 };
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy
 
 #endif // LOGIC_ANALYZER_H

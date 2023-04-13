@@ -23,7 +23,7 @@
 
 #include <QString>
 
-using namespace adiscope;
+using namespace scopy;
 
 OscScaleZoomer::OscScaleZoomer(QWidget *parent) :
 	LimitedPlotZoomer(parent)

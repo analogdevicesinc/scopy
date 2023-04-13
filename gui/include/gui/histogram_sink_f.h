@@ -46,7 +46,7 @@
 #include <qapplication.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
     /*!
      * \brief A graphical sink to display a histogram.
@@ -78,7 +78,7 @@ namespace adiscope {
     class SCOPYGUI_EXPORT histogram_sink_f : virtual public gr::sync_block
     {
     public:
-      // adiscope::histogram_sink_f::sptr
+      // scopy::histogram_sink_f::sptr
       typedef std::shared_ptr<histogram_sink_f> sptr;
 
       /*!
@@ -113,6 +113,6 @@ namespace adiscope {
       virtual void set_bins(const int bins) = 0;
     };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_HISTOGRAM_SINK_F_H */

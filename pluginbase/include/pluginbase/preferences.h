@@ -6,7 +6,7 @@
 #include <QSettings>
 #include "scopypluginbase_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The Preferences class
  * Singleton preferences class. Maps QString keys to QVariant values.

@@ -68,12 +68,12 @@ class MeasurementsPanel;
 #endif
 }
 
-namespace adiscope {
+namespace scopy {
 class DbClickButtons;
 class ChannelWidget;
 class ApiObject;
 }
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class SpectrumChannel;
 class Filter;
 
@@ -87,7 +87,7 @@ class QPushButton;
 class QButtonGroup;
 class QGridLayout;
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class SpectrumAnalyzer_API;
 class SpectrumChannel_API;
 class SpectrumMarker_API;
@@ -258,7 +258,7 @@ private:
 #ifdef SPECTRAL_MSR
 	QWidget *measurePanel;
 	Ui::MeasurementsPanel *measure_panel_ui;
-	adiscope::MeasureSettings *measure_settings;
+	scopy::MeasureSettings *measure_settings;
 	QList<std::shared_ptr<MeasurementData>> measurements_data;
 	QList<std::shared_ptr<MeasurementGui>> measurements_gui;
 	QList<Measure *> d_measureObjs;
@@ -272,7 +272,7 @@ private:
 	bool hCursorsEnabled;
 	bool vCursorsEnabled;
 
-	adiscope::DbClickButtons *marker_selector;
+	scopy::DbClickButtons *marker_selector;
 	unsigned int m_nb_overlapping_avg;
 
 	QButtonGroup *settings_group;
@@ -294,7 +294,7 @@ private:
 	QTimer *sample_timer;
 	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
-	adiscope::scope_sink_f::sptr fft_sink;
+	scopy::scope_sink_f::sptr fft_sink;
 	adiscope::waterfall_sink_f::sptr waterfall_sink;
 	iio_manager::port_id *fft_ids;
 	iio_manager::port_id *waterfall_ids;
@@ -378,7 +378,7 @@ class SpectrumChannel: public QObject
 	friend class SpectrumChannel_API;
 
 public:
-	std::shared_ptr<adiscope::fft_block> fft_block;
+	std::shared_ptr<scopy::fft_block> fft_block;
 	gr::blocks::complex_to_mag_squared::sptr ctm_block;
 
 	SpectrumChannel(int id, const QString& name, FftDisplayPlot *plot);
@@ -451,6 +451,6 @@ private:
 	float calcCoherentPowerGain(const std::vector<float>& win) const;
 	void scaletFftWindow(std::vector<float>& win, float gain);
 };
-} // namespace adiscope
+} // namespace scopy
 
 #endif // SPECTRUM_ANALYZER_HPP

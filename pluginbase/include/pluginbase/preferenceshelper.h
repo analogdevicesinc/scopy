@@ -6,7 +6,7 @@
 #include "preferences.h"
 #include "scopypluginbase_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The PreferencesHelper class
  * PreferencesHelper class used to create widgets and connect the widgets to the Preferences singleton

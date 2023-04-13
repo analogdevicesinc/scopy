@@ -6,7 +6,7 @@
 #include <QNetworkAccessManager>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT VersionCache : public QObject
 {
 	Q_OBJECT

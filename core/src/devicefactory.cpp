@@ -1,6 +1,6 @@
 #include "devicefactory.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 
 DeviceImpl *DeviceFactory::build(QString param, PluginManager *pm, QString category, QObject *parent)

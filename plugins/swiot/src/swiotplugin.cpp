@@ -10,7 +10,7 @@
 
 #include "iioutil/contextprovider.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SWIOT,"SWIOTPlugin");
 

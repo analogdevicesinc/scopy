@@ -2,7 +2,7 @@
 #include <QApplication>
 
 
-using namespace adiscope;
+using namespace scopy;
 
 MessageBroker* MessageBroker::pinstance_{nullptr};
 

@@ -23,7 +23,7 @@
 #include "plot_utils.hpp"
 #include "ui_statistic.h"
 
-namespace adiscope {
+namespace scopy {
 class Formatter
 {
 public:
@@ -115,7 +115,7 @@ public:
 
 }
 
-using namespace adiscope;
+using namespace scopy;
 
 StatisticWidget::StatisticWidget(QWidget *parent):
 	QWidget(parent),

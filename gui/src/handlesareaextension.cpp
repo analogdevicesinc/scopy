@@ -7,7 +7,7 @@
 #include "handles_area.hpp"
 #include "DisplayPlot.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 HandlesAreaExtension::HandlesAreaExtension(QwtPlot* plot)
 	: m_plot(plot) {}

@@ -26,7 +26,7 @@
 #include <qwt_plot_scaleitem.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT Graticule : public QObject
 {

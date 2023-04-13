@@ -22,7 +22,7 @@
 #include "gui/channel_widget.hpp"
 #include "gui/spinbox_a.hpp"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 void SignalGenerator_API::show()
 {
 	Q_EMIT gen->showTool();

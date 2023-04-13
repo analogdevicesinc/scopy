@@ -32,7 +32,7 @@ extern "C" {
 	struct iio_channel;
 }
 
-namespace adiscope {
+namespace scopy {
 
 class HardwareTrigger;
 
@@ -185,6 +185,6 @@ public:
 	}
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // OSC_ADC_H

@@ -6,7 +6,7 @@
 #include <QUuid>
 #include "scopypluginbase_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The ToolMenuEntry class
  * Class used by plugin and scopy to populate the tool menu

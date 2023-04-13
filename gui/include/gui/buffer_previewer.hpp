@@ -25,7 +25,7 @@
 #include <QFrame>
 #include "scopygui_export.h"
 
-namespace adiscope{
+namespace scopy{
 
 class SCOPYGUI_EXPORT BufferPreviewer: public QFrame
 {
@@ -126,6 +126,6 @@ private:
 	double m_noOfSteps;
 };
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif // BUFFER_PREVIEWER_H

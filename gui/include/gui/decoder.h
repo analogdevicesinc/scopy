@@ -65,7 +65,7 @@ struct srd_decoder_inst;
 struct srd_channel;
 struct srd_session;
 
-namespace adiscope {
+namespace scopy {
 namespace logic {
 class Decoder;
 }
@@ -79,7 +79,7 @@ struct SCOPYGUI_EXPORT DecodeChannel
     bool assigned_signal;
     const QString name, desc;
     int initial_pin_state;
-	const shared_ptr<adiscope::logic::Decoder> decoder_;
+	const shared_ptr<scopy::logic::Decoder> decoder_;
     const srd_channel *pdch_;
 };
 
@@ -91,7 +91,7 @@ struct SCOPYGUI_EXPORT DecodeSegment
     int64_t samples_decoded_incl, samples_decoded_excl;
 };
 
-namespace adiscope {
+namespace scopy {
 namespace logic {
 
 class SCOPYGUI_EXPORT Decoder

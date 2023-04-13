@@ -24,7 +24,7 @@
 #include <math.h>
 #include <memory>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * class SpectrumAverage

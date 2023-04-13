@@ -7,7 +7,7 @@
 
 Q_LOGGING_CATEGORY(CAT_DETACHEDTOOL,"DetachedToolWindow")
 
-using namespace adiscope;
+using namespace scopy;
 DetachedToolWindow::DetachedToolWindow(QWidget *parent, ToolMenuEntry *tme) : QWidget(parent) {
 
 	this->tme = tme;

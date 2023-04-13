@@ -28,7 +28,7 @@
 class QStandardItemModel;
 class QTreeView;
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT DropdownSwitchList: public QComboBox
 	{
 		Q_OBJECT

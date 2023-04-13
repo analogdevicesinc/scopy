@@ -5,7 +5,7 @@
 #include <QUrl>
 #include <QFile>
 
-using namespace adiscope;
+using namespace scopy;
 
 LinkedButton::LinkedButton(QWidget* parent)
 	: QPushButton(parent)

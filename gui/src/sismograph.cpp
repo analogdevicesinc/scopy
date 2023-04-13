@@ -24,7 +24,7 @@
 #include <qwt_plot_layout.h>
 #include <qwt_scale_engine.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent),
 	curve("data"), sampleRate(10.0)

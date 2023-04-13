@@ -239,14 +239,14 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="adiscope::CustomSwitch" name="XY_view">
+            <widget class="scopy::CustomSwitch" name="XY_view">
              <property name="text">
               <string/>
              </property>
             </widget>
            </item>
            <item row="3" column="1">
-            <widget class="adiscope::CustomSwitch" name="Histogram_view">
+            <widget class="scopy::CustomSwitch" name="Histogram_view">
              <property name="text">
               <string/>
              </property>
@@ -260,7 +260,7 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="adiscope::CustomSwitch" name="FFT_view">
+            <widget class="scopy::CustomSwitch" name="FFT_view">
              <property name="text">
               <string/>
              </property>
@@ -381,7 +381,7 @@
              </layout>
             </item>
             <item>
-             <widget class="adiscope::CustomSwitch" name="xyPlotLineType">
+             <widget class="scopy::CustomSwitch" name="xyPlotLineType">
               <property name="text">
                <string/>
               </property>
@@ -502,7 +502,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>

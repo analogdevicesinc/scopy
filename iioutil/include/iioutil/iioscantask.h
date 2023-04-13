@@ -4,7 +4,7 @@
 #include <QThread>
 #include "scopyiioutil_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The IIOScanTask class
  * IIOScanTask - scans for IIO context and emits a scanFinished signal

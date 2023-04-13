@@ -21,7 +21,7 @@
 #include "customanimation.h"
 #include <animationmanager.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomAnimation::CustomAnimation(QObject *target):
 	QPropertyAnimation(target),

@@ -3,7 +3,7 @@
 #include <pluginbase/preferences.h>
 #include <QDir>
 
-using namespace adiscope;
+using namespace scopy;
 
 class TST_Preferences : public QObject
 {

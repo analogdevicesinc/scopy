@@ -47,7 +47,7 @@
 #include "xy_sink_c.h"
 #include "ConstellationDisplayPlot.h"
 
-namespace adiscope {
+namespace scopy {
 
     class xy_sink_c_impl : public xy_sink_c
     {
@@ -92,6 +92,6 @@ namespace adiscope {
 	       gr_vector_void_star &output_items);
     };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_XY_SINK_C_IMPL_H */

@@ -2,7 +2,7 @@
 #define M2KIDENTIFYTASK_H
 
 #include <QThread>
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class M2kIdentifyTask : public QThread {
 public:
 	M2kIdentifyTask(QString uri, QObject *parent = nullptr);

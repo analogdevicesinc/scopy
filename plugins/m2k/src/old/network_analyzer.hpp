@@ -71,7 +71,7 @@ class NetworkAnalyzer;
 class QPushButton;
 class QJSEngine;
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class NetworkAnalyzer_API;
 class Filter;
 
@@ -159,7 +159,7 @@ private:
 	gr::top_block_sptr capture_top_block;
 	gr::blocks::vector_source_s::sptr capture1;
 	gr::blocks::vector_source_s::sptr capture2;
-	adiscope::frequency_compensation_filter::sptr f11,f12,f21,f22;
+	scopy::frequency_compensation_filter::sptr f11,f12,f21,f22;
 	gr::blocks::short_to_float::sptr s2f1;
 	gr::blocks::short_to_float::sptr s2f2;
 	gr::scopy::goertzel_scopy_fc::sptr goertzel1;
@@ -291,6 +291,6 @@ Q_SIGNALS:
 	void sweepStart();
 	void showTool();
 };
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* SCOPY_NETWORK_ANALYZER_HPP */

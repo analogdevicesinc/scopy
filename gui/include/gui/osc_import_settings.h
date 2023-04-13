@@ -28,7 +28,7 @@ namespace Ui {
 class ExportSettings;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT ImportSettings : public ExportSettings
 {
         Q_OBJECT

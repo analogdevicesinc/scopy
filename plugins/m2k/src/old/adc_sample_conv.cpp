@@ -28,7 +28,7 @@
 #include "m2kpluginExceptionHandler.h"
 
 using namespace gr;
-using namespace adiscope;
+using namespace scopy;
 using namespace libm2k::analog;
 
 adc_sample_conv::adc_sample_conv(int nconnections,

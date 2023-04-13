@@ -49,7 +49,7 @@
 #include "FftDisplayPlot.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
     class scope_sink_f_impl : public scope_sink_f
     {
@@ -115,6 +115,6 @@ namespace adiscope {
 	       gr_vector_void_star &output_items);
     };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_SCOPE_SINK_F_IMPL_H */

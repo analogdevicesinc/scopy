@@ -27,7 +27,7 @@
 #include "decoder_table_item.hpp"
 #include "logic_analyzer.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 
 namespace logic {
@@ -67,6 +67,6 @@ protected:
     void showEvent(QShowEvent *event);
 };
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy
 
 #endif // DECODER_TABLE_H

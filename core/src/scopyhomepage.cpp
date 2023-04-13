@@ -5,7 +5,7 @@
 #include <deviceicon.h>
 
 
-using namespace adiscope;
+using namespace scopy;
 ScopyHomePage::ScopyHomePage(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::ScopyHomePage)

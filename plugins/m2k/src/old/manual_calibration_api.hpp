@@ -28,8 +28,8 @@
 
 class QJSEngine;
 
-using namespace adiscope;
-namespace adiscope::m2k {
+using namespace scopy;
+namespace scopy::m2k {
 
 class ManualCalibration;
 class ManualCalibration_API : public ApiObject

@@ -98,7 +98,7 @@ namespace Ui {
 	class CursorsSettings;
 }
 
-namespace adiscope {
+namespace scopy {
 	class ChannelWidget;
 	class AnalogBufferPreviewer;
 	class MeasurementData;
@@ -107,7 +107,7 @@ namespace adiscope {
 
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 	class Oscilloscope_API;
 	class Channel_API;
 	class MeasureSettings;
@@ -302,8 +302,8 @@ namespace adiscope::m2k {
 		Ui::Oscilloscope *ui;
 		Ui::OscGeneralSettings *gsettings_ui;
 		Ui::ChannelSettings *ch_ui;
-		adiscope::m2k::TriggerSettings trigger_settings;
-		adiscope::m2k::MeasureSettings *measure_settings;
+		scopy::m2k::TriggerSettings trigger_settings;
+		scopy::m2k::MeasureSettings *measure_settings;
 		CapturePlot plot;
 		FftDisplayPlot fft_plot;
 		ConstellationDisplayPlot xy_plot;
@@ -341,10 +341,10 @@ namespace adiscope::m2k {
 
 		std::shared_ptr<SymmetricBufferMode> symmBufferMode;
 
-		adiscope::scope_sink_f::sptr qt_time_block;
-		adiscope::scope_sink_f::sptr qt_fft_block;
-		adiscope::xy_sink_c::sptr qt_xy_block;
-		adiscope::histogram_sink_f::sptr qt_hist_block;
+		scopy::scope_sink_f::sptr qt_time_block;
+		scopy::scope_sink_f::sptr qt_fft_block;
+		scopy::xy_sink_c::sptr qt_xy_block;
+		scopy::histogram_sink_f::sptr qt_hist_block;
         std::shared_ptr<iio_manager> iio;
 		gr::basic_block_sptr adc_samp_conv_block;
 

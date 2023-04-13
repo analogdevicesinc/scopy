@@ -4,7 +4,7 @@
 #include <device.h>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT DeviceIcon : public QAbstractButton {
 	Q_OBJECT
 public:

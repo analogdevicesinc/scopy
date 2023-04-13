@@ -9,8 +9,8 @@ using namespace libm2k;
 using namespace libm2k::analog;
 using namespace libm2k::context;
 
-using namespace adiscope;
-using namespace adiscope::m2k;
+using namespace scopy;
+using namespace scopy::m2k;
 
 M2kController::M2kController(QString uri, QObject *parent) : QObject(parent), uri(uri)
 {	

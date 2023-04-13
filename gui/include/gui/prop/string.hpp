@@ -46,7 +46,7 @@
 
 class QLineEdit;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 class SCOPYGUI_EXPORT String : public Property

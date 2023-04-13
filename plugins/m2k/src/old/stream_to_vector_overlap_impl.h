@@ -44,7 +44,7 @@
 
 #include "stream_to_vector_overlap.h"
 
-namespace adiscope {
+namespace scopy {
 
 class stream_to_vector_overlap_impl : public stream_to_vector_overlap
 {
@@ -64,6 +64,6 @@ private:
 	size_t m_itemsize;
 	size_t m_nitems_per_block;
 };
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_STREAM_TO_VECTOR_OVERLAP_IMPL_H */

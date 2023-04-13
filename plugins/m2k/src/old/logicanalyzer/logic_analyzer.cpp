@@ -58,10 +58,10 @@
 #include "filemanager.h"
 #include "state_updater.h"
 
-using namespace adiscope;
-using namespace adiscope::logic;
-using namespace adiscope::m2k;
-using namespace adiscope::m2k::logic;
+using namespace scopy;
+using namespace scopy::logic;
+using namespace scopy::m2k;
+using namespace scopy::m2k::logic;
 
 constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024 * 1024; // 1Gb
@@ -524,13 +524,13 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			return;
 		}
 
-		std::shared_ptr<adiscope::logic::Decoder> initialDecoder = nullptr;
+		std::shared_ptr<scopy::logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		for (const GSList *sl = decoderList; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == decoder) {
-			initialDecoder = std::make_shared<adiscope::logic::Decoder>(dec);
+			initialDecoder = std::make_shared<scopy::logic::Decoder>(dec);
 		    }
 		}
 
@@ -742,7 +742,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	externalTriggerLayout->addLayout(externalSubTitle);
 
 	QGridLayout *externalGridLayout = new QGridLayout();
-	auto externalOnOff = new adiscope::CustomSwitch();
+	auto externalOnOff = new scopy::CustomSwitch();
 	externalGridLayout->addWidget(externalOnOff, 0, 0);
 	auto labelCondition = new QLabel("Condition");
 	externalGridLayout->addWidget(labelCondition, 1, 0);
@@ -903,7 +903,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		for (const GSList *sl = dl; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == text) {
-			curve->stackDecoder(std::make_shared<adiscope::logic::Decoder>(dec));
+			curve->stackDecoder(std::make_shared<scopy::logic::Decoder>(dec));
 			break;
 		    }
 		}
@@ -1819,7 +1819,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		for (const GSList *sl = dl; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == text) {
-			curve->stackDecoder(std::make_shared<adiscope::logic::Decoder>(dec));
+			curve->stackDecoder(std::make_shared<scopy::logic::Decoder>(dec));
 			break;
 		    }
 		}
@@ -2385,13 +2385,13 @@ void LogicAnalyzer::setupDecoders()
 			return;
 		}
 
-		std::shared_ptr<adiscope::logic::Decoder> initialDecoder = nullptr;
+		std::shared_ptr<scopy::logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		for (const GSList *sl = decoderList; sl; sl = sl->next) {
 		    srd_decoder *dec = (struct srd_decoder *)sl->data;
 		    if (QString::fromUtf8(dec->id) == decoder) {
-			initialDecoder = std::make_shared<adiscope::logic::Decoder>(dec);
+			initialDecoder = std::make_shared<scopy::logic::Decoder>(dec);
 		    }
 		}
 

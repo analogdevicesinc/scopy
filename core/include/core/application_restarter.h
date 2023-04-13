@@ -5,7 +5,7 @@
 #include <QStringList>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ApplicationRestarter
 {
 public:
@@ -22,5 +22,5 @@ private:
 	QStringList m_arguments;
 	QString m_currentPath;
 };
-} // namespace adiscope
+} // namespace scopy
 #endif // APPLICATIONRESTARTER_H

@@ -11,7 +11,7 @@ class SCOPYCORE_EXPORT ToolStack;
 /**
  * @brief The ToolStack class
  */
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ToolStack : public MapStackedWidget
 {
 	Q_OBJECT

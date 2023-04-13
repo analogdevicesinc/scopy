@@ -26,7 +26,7 @@
 #include <QScroller>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT OscCustomScrollArea : public QScrollArea
 {
 	Q_OBJECT

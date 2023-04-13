@@ -46,7 +46,7 @@
 
 class QCheckBox;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 class SCOPYGUI_EXPORT Bool : public Property

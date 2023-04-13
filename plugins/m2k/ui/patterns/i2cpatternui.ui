@@ -44,7 +44,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="PB_readWrite">
+      <widget class="scopy::SmallOnOffSwitch" name="PB_readWrite">
        <property name="text">
         <string/>
        </property>
@@ -73,7 +73,7 @@
       </widget>
      </item>
      <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="PB_MSB">
+      <widget class="scopy::SmallOnOffSwitch" name="PB_MSB">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -174,7 +174,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
+   <class>scopy::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/smallOnOffSwitch.h</header>
   </customwidget>

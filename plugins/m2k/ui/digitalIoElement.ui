@@ -261,7 +261,7 @@ border:1px solid red;
             </spacer>
            </item>
            <item>
-            <widget class="adiscope::CustomSwitch" name="inout">
+            <widget class="scopy::CustomSwitch" name="inout">
              <property name="text">
               <string/>
              </property>
@@ -439,7 +439,7 @@ QSlider::handle:horizontal:enabled {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>

@@ -11,7 +11,7 @@ namespace Ui {
 	class DeviceButton;
 };
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT DeviceIconImpl : public DeviceIcon
 {
 	Q_OBJECT

@@ -21,7 +21,7 @@
 #include "startstoprangewidget.h"
 #include "ui_startstoprangewidget.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 StartStopRangeWidget::StartStopRangeWidget(double min, double max, double minSpan,
 		bool hasProgressWidget,

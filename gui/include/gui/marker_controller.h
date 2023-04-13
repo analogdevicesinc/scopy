@@ -28,7 +28,7 @@
 
 class QwtPlotPicker;
 
-namespace adiscope {
+namespace scopy {
 
 class SpectrumMarker;
 
@@ -79,6 +79,6 @@ private:
 	double d_mrks_default_z;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // MARKER_CONTROLLER_H

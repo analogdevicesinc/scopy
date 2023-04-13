@@ -23,7 +23,7 @@
 #include "gui/channel_widget.hpp"
 #include "gui/db_click_buttons.hpp"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 int SpectrumChannel_API::type()
 {
 	return	spch->averageType();
@@ -56,7 +56,7 @@ void SpectrumChannel_API::enable(bool en)
 
 void SpectrumChannel_API::setType(int type)
 {
-	spch->setAverageType((adiscope::FftDisplayPlot::AverageType)type);
+	spch->setAverageType((scopy::FftDisplayPlot::AverageType)type);
 }
 
 void SpectrumChannel_API::setWindow(int win)
