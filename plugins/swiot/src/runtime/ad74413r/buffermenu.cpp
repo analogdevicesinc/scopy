@@ -94,21 +94,12 @@ DigitalInMenu::~DigitalInMenu()
 
 void DigitalInMenu::init()
 {
-	//Threshold Mode
-	QHBoxLayout *thresholdLayout = new QHBoxLayout();
-	m_thresholdOptions = new QComboBox(m_widget);
-	m_thresholdOptions->addItem(QString("Set between GND and 16V"));
-	m_thresholdOptions->addItem(QString("Set between GND and AVDD"));
-	m_thresholdOptions->setCurrentIndex(0);
-	thresholdLayout->addWidget(new QLabel("Threshold Mode ",m_widget));
-	thresholdLayout->addWidget(m_thresholdOptions);
-	addMenuLayout(thresholdLayout);
 	//Comparator Threshold
 	QHBoxLayout *comparatorLayout = new QHBoxLayout();
 	m_comparatorThresholdSpinButton = new PositionSpinButton({
 									{"V",1E0}
 								 },
-								 "Comparator Threshold",0.0,16,
+								 "Comparator Threshold",0.0,31,
 								 true, false, m_widget);
 	comparatorLayout->addWidget(m_comparatorThresholdSpinButton);
 	addMenuLayout(comparatorLayout);
@@ -117,20 +108,7 @@ void DigitalInMenu::init()
 }
 
 void DigitalInMenu::connectSignalsToSlots()
-{
-	connect(m_thresholdOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DigitalInMenu::thresholdOptionIndexChanged);
-}
-
-void DigitalInMenu::thresholdOptionIndexChanged()
-{
-	auto value = m_thresholdOptions->currentIndex();
-	if (value == 0) {
-		m_comparatorThresholdSpinButton->setMaxValue(16);
-	}
-	if (value == 1) {
-		m_comparatorThresholdSpinButton->setMaxValue(31);
-	}
-}
+{}
 
 DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent):
 	BufferMenu(parent)
@@ -141,21 +119,12 @@ DigitalInLoopMenu::~DigitalInLoopMenu()
 
 void DigitalInLoopMenu::init()
 {
-	//Threshold Mode
-	QHBoxLayout *thresholdLayout = new QHBoxLayout();
-	m_thresholdOptions = new QComboBox(m_widget);
-	m_thresholdOptions->addItem(QString("Set between GND and 16V"));
-	m_thresholdOptions->addItem(QString("Set between GND and AVDD"));
-	m_thresholdOptions->setCurrentIndex(0);
-	thresholdLayout->addWidget(new QLabel("Threshold Mode ", m_widget), 1);
-	thresholdLayout->addWidget(m_thresholdOptions,1);
-	addMenuLayout(thresholdLayout);
 	//Comparator Threshold
 	QHBoxLayout *comparatorLayout = new QHBoxLayout();
 	m_comparatorThresholdSpinButton = new PositionSpinButton({
 									{"V",1E0}
 								 },
-								 "Comparator Threshold",0.0,16,
+								 "Comparator Threshold",0.0,31,
 								 true, false, m_widget);
 	comparatorLayout->addWidget(m_comparatorThresholdSpinButton);
 	addMenuLayout(comparatorLayout);
@@ -181,7 +150,6 @@ void DigitalInLoopMenu::init()
 
 void DigitalInLoopMenu::connectSignalsToSlots()
 {
-	connect(m_thresholdOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DigitalInLoopMenu::thresholdOptionIndexChanged);
 	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInLoopMenu::dacCodeChanged);
 }
 
@@ -195,17 +163,6 @@ void DigitalInLoopMenu::dacCodeChanged(double value)
 	m_dacLabel->setText(QString::number(val) + " mA");
 
 	Q_EMIT attrValuesChanged(attrName);
-}
-
-void DigitalInLoopMenu::thresholdOptionIndexChanged()
-{
-	auto value = m_thresholdOptions->currentIndex();
-	if (value == 0) {
-		m_comparatorThresholdSpinButton->setMaxValue(16);
-	}
-	if (value == 1) {
-		m_comparatorThresholdSpinButton->setMaxValue(31);
-	}
 }
 
 VoltageOutMenu::VoltageOutMenu(QWidget* parent): BufferMenu(parent)
@@ -313,7 +270,7 @@ void VoltageOutMenu::slewIndexChanged(int idx)
 {
 	QString attrName = "slew_en";
 	m_attrValues[attrName].clear();
-	if (idx==0) {
+	if (idx == SLEW_DISABLE_IDX) {
 		m_attrValues[attrName].push_back(QString("0"));
 	}
 	else {
@@ -428,7 +385,7 @@ void CurrentOutMenu::slewIndexChanged(int idx)
 {
 	QString attrName = "slew_en";
 	m_attrValues[attrName].clear();
-	if (idx == 0) {
+	if (idx == SLEW_DISABLE_IDX) {
 		m_attrValues[attrName].push_back(QString("0"));
 	}
 	else {

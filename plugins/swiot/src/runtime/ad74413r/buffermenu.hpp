@@ -15,6 +15,8 @@ class CustomSwitch;
 
 namespace swiot {
 
+#define SLEW_DISABLE_IDX 0
+
 class BufferMenu: public QWidget
 {
 	Q_OBJECT
@@ -65,11 +67,7 @@ public:
 	void init();
 	void connectSignalsToSlots();
 private:
-	QComboBox *m_thresholdOptions;
 	PositionSpinButton *m_comparatorThresholdSpinButton;
-public Q_SLOTS:
-	void thresholdOptionIndexChanged();
-
 };
 
 class DigitalInLoopMenu: public BufferMenu
@@ -83,13 +81,9 @@ public:
 public Q_SLOTS:
 	void dacCodeChanged(double value);
 private:
-	QComboBox *m_thresholdOptions;
 	PositionSpinButton *m_comparatorThresholdSpinButton;
 	PositionSpinButton *m_dacCodeSpinButton;
 	QLabel *m_dacLabel;
-
-public Q_SLOTS:
-	void thresholdOptionIndexChanged();
 };
 
 class VoltageOutMenu: public BufferMenu
