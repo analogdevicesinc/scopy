@@ -1,6 +1,6 @@
 #include "dataloggerplugin.hpp"
 #include "qloggingcategory.h"
-#include "src/tool/datalogger_tool.hpp"
+#include "src/tool/datalogger.hpp"
 #include <iio.h>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -10,7 +10,7 @@
 
 
 using namespace adiscope;
-using namespace datalogger;
+
 Q_LOGGING_CATEGORY(CAT_DATALOGGER,"DataLoggerPlugin");
 Q_LOGGING_CATEGORY(CAT_DATALOGGER_TOOL,"dataloggerTool");
 
@@ -19,7 +19,7 @@ bool DataLoggerPlugin::loadPage()
 	infoui = new Ui::DataLoggerInfoPage();
 	m_page = new QWidget();
 	infoui->setupUi(m_page);
-	connect(infoui->pushButton,&QPushButton::clicked, this, [this] (){
+	connect(infoui->pushButton,&QPushButton::clicked, this, [=] (){
 		auto &&cp = ContextProvider::GetInstance();
 		iio_context* ctx = cp->open(m_param);
 		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
@@ -38,7 +38,7 @@ bool DataLoggerPlugin::loadIcon()
 
 void DataLoggerPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(0, "Datalogger", ":/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("datalogger", "Datalogger", ":/icons/scopy-default/icons/tool_debugger.svg"));
 }
 
 void DataLoggerPlugin::unload()
@@ -75,7 +75,7 @@ bool DataLoggerPlugin::onConnect()
 	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
 	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_DATALOGGER)<<"Ping Success";} );
 
-	tool = new DataloggerTool(ctx);
+	tool = new DataLogger(ctx);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(tool);
@@ -94,15 +94,7 @@ bool DataLoggerPlugin::onDisconnect()
 		tool->setTool(nullptr);
 	}
 
-	delete tool;
-	//	delete configui;
-	//	delete rungui;
-	//	delete config;
-	//	delete runtime;
-	//	delete faultsgui;
-	//	delete faults;
-	//	delete maxtool;
-	//	delete maxgui;
+//	delete tool;
 
 	return true;
 }
@@ -125,4 +117,4 @@ void DataLoggerPlugin::initMetadata()
 #include "moc_dataloggerplugin.cpp"
 #include <iioutil/contextprovider.h>
 #include <iioutil/iiopingtask.h>
-#include <src/tool/datalogger_tool.hpp>
+#include <src/tool/datalogger.hpp>

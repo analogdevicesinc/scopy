@@ -260,6 +260,18 @@ QPushButton[subsection_arrow_button=true]{
  border: none;
  image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
 }
+QPushButton#btnSubsectionSeparator:checked, QPushButton#toggleChannels:checked {
+ max-height: 12px;
+ max-width: 12px;
+ border: none;
+ image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+}
+QPushButton#btnSubsectionSeparator, QPushButton#toggleChannels {
+ max-height: 12px;
+ max-width: 12px;
+ border: none;
+ image: url(:/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+}
 QPushButton[subsection_arrow_button=true]:checked{
  max-height: 12px;
  max-width: 12px;

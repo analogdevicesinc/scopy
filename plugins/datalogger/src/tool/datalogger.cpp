@@ -1,4 +1,5 @@
 #include "datalogger.hpp"
+#include "dataloggerplugin.hpp"
 #include "src/gui/dataloggercontroller.hpp"
 //#include "gui/generic_menu.hpp"
 //#include "gui/customSwitch.hpp"
@@ -28,6 +29,7 @@
 using namespace adiscope;
 
 DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
+	QWidget(parent),
 //	Tool(ctx, toolMenuItem, new DataLogger_API(this), "DataLogger", parent),
 	m_timer(new QTimer(this)),
 	m_elapsed(new QElapsedTimer()),
@@ -134,12 +136,18 @@ DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
 	m_customColGrid = new CustomColQGridLayout(100,this);
 	m_toolView->addFixedCentralWidget(m_customColGrid,0,0,0,0);
 //	setCentralWidget(getToolView());
+	this->setLayout(new QVBoxLayout());
+	this->layout()->addWidget(m_toolView);
 
 	initMonitorToolView();
 
 //	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_DATALOGGER)));
 //	api->load(*settings);
 //	api->js_register(engine);
+
+
+	qInfo(CAT_DATALOGGER_TOOL) << "Initialized";
+//	Q_EMIT DataLogger::toggleAll(true);
 }
 
 
@@ -477,7 +485,7 @@ DataLogger::~DataLogger()
 		delete m_elapsed;
 	}
 	if (m_toolView) {
-		delete m_toolView;
+//		delete m_toolView;
 	}
 //	delete api;
 }

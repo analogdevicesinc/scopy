@@ -52,7 +52,7 @@ class DataLogger : public QWidget
 	Q_OBJECT
 
 public:
-	explicit DataLogger(struct iio_context *ctx, QWidget *parent);
+	explicit DataLogger(struct iio_context *ctx, QWidget *parent = nullptr);
 	~DataLogger();
 
 	adiscope::gui::ToolView* getToolView();
@@ -66,6 +66,7 @@ public:
 private:
 	int VALUE_READING_TIME_INTERVAL = 1000;
 
+	QWidget* parent;
 	QTimer *m_timer;
 	QElapsedTimer *m_elapsed;
 
