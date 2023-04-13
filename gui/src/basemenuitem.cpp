@@ -43,7 +43,8 @@ BaseMenuItem::BaseMenuItem(QWidget *parent) :
 	d_centerDragBox(QRect()),
 	d_botDragbox(QRect()),
 	d_dragWidget(nullptr),
-	d_allowDrag(false)
+	d_allowDrag(false),
+	d_draggable(true)
 {
         d_ui->setupUi(this);
 
@@ -90,6 +91,8 @@ void BaseMenuItem::mousePressEvent(QMouseEvent *event)
 
 void BaseMenuItem::mouseMoveEvent(QMouseEvent *event)
 {
+	if(!d_draggable)
+		return;
 	if (!(event->buttons() & Qt::LeftButton)) {
 		return;
 	}
@@ -250,6 +253,16 @@ void BaseMenuItem::_enableBotSeparator(bool enable)
 void BaseMenuItem::_enableTopSeparator(bool enable)
 {
 	d_ui->topSep->setVisible(enable);
+}
+
+bool BaseMenuItem::draggable() const
+{
+	return d_draggable;
+}
+
+void BaseMenuItem::setDraggable(bool newDraggable)
+{
+	d_draggable = newDraggable;
 }
 
 #include "moc_basemenuitem.cpp"

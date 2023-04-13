@@ -53,6 +53,9 @@ void BaseMenu::insertMenuItem(BaseMenuItem *menuItem, int position)
 		}
 	}
 
+	if(position == -1 )
+		position = d_ui->mainLayout->count() - 2;
+
 	d_ui->mainLayout->insertWidget(position, menuItem);
 	d_items = d_ui->mainLayout->count();
 
@@ -130,7 +133,7 @@ void BaseMenu::dragEnterEvent(QDragEnterEvent *event)
 		return;
 	}
 
-	if (!d_ui->widget->geometry().contains(event->pos())
+	if (!d_ui->verticalSpacer->geometry().contains(event->pos())
 			|| !event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)) {
 		event->ignore();
 		return;

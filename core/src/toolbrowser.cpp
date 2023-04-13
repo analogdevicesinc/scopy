@@ -6,7 +6,8 @@ using namespace adiscope;
 
 ToolBrowser::ToolBrowser(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::ToolBrowser)
+	ui(new Ui::ToolBrowser),
+	collapsed(false)
 {
     ui->setupUi(this);
 
@@ -15,13 +16,15 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
     tm->getButtonGroup()->addButton(ui->btnPreferences);
     tm->getButtonGroup()->addButton(ui->btnAbout);
 
-    ToolMenuItem* homeTme = tm->addTool("home","Home",":/gui/icons/scopy-default/icons/tool_home.svg");
-    homeTme->setSeparator(false,true);
-    homeTme->getToolRunBtn()->setVisible(false);
-    homeTme->setEnabled(true);
+	ToolMenuItem* homeTmi = tm->createTool("home","Home",":/gui/icons/scopy-default/icons/tool_home.svg");
+	homeTmi->setSeparator(true,true);
+	homeTmi->getToolRunBtn()->setVisible(false);
+	homeTmi->setEnabled(true);
+	ui->homePlaceholder->layout()->addWidget(homeTmi);
+	homeTmi->setDraggable(false);
 
 
-
+//	connect(ui->btnCollapse, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
     connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
     connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
 
@@ -33,6 +36,13 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
 
 ToolMenu* ToolBrowser::getToolMenu() {
 	return ui->wToolMenu;
+}
+
+void ToolBrowser::toggleCollapse()
+{
+	 ToolMenu *tm = ui->wToolMenu;
+	collapsed = !collapsed;
+	tm->hideMenuText(collapsed);
 }
 
 ToolBrowser::~ToolBrowser()
