@@ -25,7 +25,7 @@
 #include <QColor>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT SpectrumMarker: public QwtPlotMarker
 {
@@ -57,6 +57,6 @@ private:
 	QColor m_default_color;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* SPECTRUM_MARKER_H */

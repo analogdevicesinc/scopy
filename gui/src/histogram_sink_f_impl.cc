@@ -55,7 +55,7 @@
 
 using namespace gr;
 
-namespace adiscope {
+namespace scopy {
 
     histogram_sink_f::sptr
     histogram_sink_f::make(int size, int bins,
@@ -239,4 +239,4 @@ namespace adiscope {
       return j;
     }
 
-} /* namespace adiscope */
+} /* namespace scopy */

@@ -8,7 +8,7 @@
 #include <QThread>
 #include <QDebug>
 
-//using namespace adiscope::m2k;
+//using namespace scopy::m2k;
 
 // Debug messages are currently disabled for users, can be used for development.
 // The message box was removed because exceptions might occur both from the control flow

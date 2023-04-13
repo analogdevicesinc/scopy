@@ -26,7 +26,7 @@
 #include <libm2k/m2kexceptions.hpp>
 #include "m2kpluginExceptionHandler.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * class IioUtils

@@ -21,7 +21,7 @@
 #include "ui_customplotpositionbutton.h"
 #include "dynamicWidget.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomPlotPositionButton::CustomPlotPositionButton(QWidget *parent) :
 	ColoredQWidget(parent),

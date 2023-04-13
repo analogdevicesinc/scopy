@@ -23,8 +23,8 @@
 #include <oscilloscope.hpp>
 #include <pluginbase/apiobject.h>
 
-using namespace adiscope;
-namespace adiscope::m2k {
+using namespace scopy;
+namespace scopy::m2k {
 
 class Oscilloscope;
 class Channel_API;

@@ -29,7 +29,7 @@ namespace Ui {
 	class Math;
 }
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT Math : public QWidget
 	{
 		Q_OBJECT

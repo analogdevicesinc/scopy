@@ -51,7 +51,7 @@
 #include <gnuradio/filter/firdes.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
     class SCOPYGUI_EXPORT xy_sink_c : virtual public gr::sync_block
     {
@@ -75,6 +75,6 @@ namespace adiscope {
       QApplication *d_qApplication;
     };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* M2K_XY_SINK_C_H */

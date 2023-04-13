@@ -6,7 +6,7 @@
 #include <QLabel>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT InfoPageKeyValueWidget : public QWidget {
 public:
 	InfoPageKeyValueWidget(QString key, QString value, QWidget *parent = nullptr );

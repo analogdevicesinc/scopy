@@ -34,7 +34,7 @@ namespace Ui {
 	class CursorReadouts;
 }
 
-namespace SCOPYGUI_EXPORT adiscope {
+namespace SCOPYGUI_EXPORT scopy {
 	class CursorReadouts: public QWidget
 	{
 	public:

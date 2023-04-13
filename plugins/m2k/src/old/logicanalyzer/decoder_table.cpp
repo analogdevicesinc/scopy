@@ -28,7 +28,7 @@
 #include "filemanager.h"
 #include "qtconcurrentrun.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 
 namespace logic {
@@ -311,5 +311,5 @@ void DecoderTable::groupValuesChanged(int value)
 	tableModel->to_be_refreshed = true;
 }
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy
 

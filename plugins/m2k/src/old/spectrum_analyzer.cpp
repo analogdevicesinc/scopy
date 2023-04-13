@@ -78,8 +78,8 @@ Q_LOGGING_CATEGORY(CAT_M2K_SPECTRUM_ANALYZER,"M2kSpectrumAnalyzer");
 
 static const int MAX_REF_CHANNELS = 4;
 
-using namespace adiscope;
-using namespace adiscope::m2k;
+using namespace scopy;
+using namespace scopy::m2k;
 using namespace std;
 using namespace libm2k;
 using namespace libm2k::context;
@@ -2082,7 +2082,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 							  m_adc_nb_channels,
 							  waterfall_plot);
 
-	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
+	fft_sink = scopy::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
 						(QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
@@ -2143,7 +2143,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 							  m_adc_nb_channels,
 							  waterfall_plot);
 
-	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
+	fft_sink = scopy::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
 						(QObject *)fft_plot);
 

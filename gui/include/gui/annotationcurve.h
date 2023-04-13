@@ -37,20 +37,20 @@
 #include "genericlogicplotcurve.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 namespace logic {
 class Decoder;
 }
 }
 
 
-namespace adiscope {
+namespace scopy {
 namespace bind {
 class Decoder;
 }
 }
 
-namespace adiscope {
+namespace scopy {
 
 class AnnotationDecoder;
 
@@ -92,13 +92,13 @@ public:
     virtual void reset() override;
 
     QWidget * getCurrentDecoderStackMenu();
-	void stackDecoder(std::shared_ptr<adiscope::logic::Decoder> decoder);
-	std::vector<std::shared_ptr<adiscope::logic::Decoder>> getDecoderStack();
+	void stackDecoder(std::shared_ptr<scopy::logic::Decoder> decoder);
+	std::vector<std::shared_ptr<scopy::logic::Decoder>> getDecoderStack();
 
 	int getVisibleRows() const;
 
 	AnnotationDecoder *getAnnotationDecoder();
-	std::vector<std::shared_ptr<adiscope::bind::Decoder>> getDecoderBindings();
+	std::vector<std::shared_ptr<scopy::bind::Decoder>> getDecoderBindings();
 
     // Get the annotation at the given point
     AnnotationQueryResult annotationAt(const QPointF& p) const;
@@ -161,7 +161,7 @@ private:
     std::map<std::pair<const srd_decoder*, int>, Row> m_classRows;
     std::map<Row, RowData> m_annotationRows;
 
-    std::vector<std::shared_ptr<adiscope::bind::Decoder>> m_bindings;
+    std::vector<std::shared_ptr<scopy::bind::Decoder>> m_bindings;
 
     mutable int m_visibleRows;
     mutable int state = -1;

@@ -11,7 +11,7 @@
 #include <pluginbase/preferenceshelper.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"BareMinimum");
-using namespace adiscope;
+using namespace scopy;
 
 bool BareMinimum::compatible(QString m_param) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";

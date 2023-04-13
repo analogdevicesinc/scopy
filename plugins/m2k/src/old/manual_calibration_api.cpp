@@ -28,7 +28,7 @@
 #include <QThread>
 #include <QElapsedTimer>
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 ManualCalibration_API::ManualCalibration_API(ManualCalibration *m_calib) :
 		ApiObject(),

@@ -26,8 +26,8 @@
 #include <QTreeView>
 #include <QHeaderView>
 
-using namespace adiscope;
-using namespace adiscope::m2k;
+using namespace scopy;
+using namespace scopy::m2k;
 
 static const std::map<int, QString> icons_lut = {
 	{Measure::PERIOD, ":/gui/icons/measurements/period.svg"},

@@ -97,7 +97,7 @@ private:
 	bool m_reachLimit;
 	bool m_alignLeft;
 	double m_timeValue;
-	adiscope::TimePrefixFormatter d_timeFormatter;
+	scopy::TimePrefixFormatter d_timeFormatter;
 };
 
 class SCOPYGUI_EXPORT PlotLineHandleH: public PlotLineHandle

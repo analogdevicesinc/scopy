@@ -23,7 +23,7 @@
 #include "dmm.hpp"
 #include "pluginbase/apiobject.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class DMM_API : public ApiObject
 {
 	friend class ToolLauncher_API;

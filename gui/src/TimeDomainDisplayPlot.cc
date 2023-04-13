@@ -55,7 +55,7 @@
 
 #include "smoothcurvefitter.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 class TimeDomainDisplayZoomer: public OscPlotZoomer
 {

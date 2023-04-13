@@ -3,7 +3,7 @@
 
 #include "deviceimpl.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYCORE_EXPORT IIODeviceImpl : public DeviceImpl
 {

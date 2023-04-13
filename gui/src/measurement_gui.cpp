@@ -22,7 +22,7 @@
 
 #include <QLabel>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * Class MeasurementGui implementation

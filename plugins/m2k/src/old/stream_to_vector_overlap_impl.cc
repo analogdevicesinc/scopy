@@ -43,7 +43,7 @@
 #include <gnuradio/sync_decimator.h>
 
 using namespace gr;
-namespace adiscope {
+namespace scopy {
 
 stream_to_vector_overlap::sptr
 stream_to_vector_overlap::make(size_t itemsize,

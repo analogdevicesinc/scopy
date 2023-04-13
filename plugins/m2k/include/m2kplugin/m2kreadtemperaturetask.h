@@ -5,7 +5,7 @@
 #include <QThread>
 #include <iio.h>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class M2kReadTemperatureTask : public QThread
 {
 	Q_OBJECT

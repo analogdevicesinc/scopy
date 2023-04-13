@@ -8,7 +8,7 @@
 #include <iio.h>
 #include <mutex>
 
-namespace adiscope {
+namespace scopy {
 class SCOPYIIOUTIL_EXPORT ContextRefCounter {
 public:
 	ContextRefCounter(QString uri);

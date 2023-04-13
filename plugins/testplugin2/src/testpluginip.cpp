@@ -7,7 +7,7 @@
 #include <pluginbase/messagebroker.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
-using namespace adiscope;
+using namespace scopy;
 
 bool TestPluginIp::compatible(QString m_param) {
 	qDebug(CAT_TESTPLUGINIP)<<"compatible";

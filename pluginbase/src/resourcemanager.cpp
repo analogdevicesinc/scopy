@@ -3,7 +3,7 @@
 #include <QLoggingCategory>
 Q_LOGGING_CATEGORY(CAT_RESOURCEMANAGER,"ResourceManager");
 
-using namespace adiscope;
+using namespace scopy;
 
 
 ResourceManager* ResourceManager::pinstance_{nullptr};

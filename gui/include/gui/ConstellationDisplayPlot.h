@@ -50,7 +50,7 @@
 #include "spectrumUpdateEvents.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 /*!
  * \brief QWidget for displaying constellaton (I&Q) plots.
  * \ingroup qtgui_blk
@@ -98,6 +98,6 @@ private:
 
   int64_t d_pen_size;
 };
-} //adiscope
+} //scopy
 
 #endif /* M2K_CONSTELLATION_DISPLAY_PLOT_H */

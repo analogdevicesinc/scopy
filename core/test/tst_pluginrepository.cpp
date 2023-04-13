@@ -3,7 +3,7 @@
 #include "core/pluginrepository.h"
 #include <QLibrary>
 
-using namespace adiscope;
+using namespace scopy;
 
 class TST_PluginRepository : public QObject
 {

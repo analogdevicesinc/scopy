@@ -20,7 +20,7 @@
 
 #include "graticule.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 Graticule::Graticule(QwtPlot *plot):
 	enabled(false),

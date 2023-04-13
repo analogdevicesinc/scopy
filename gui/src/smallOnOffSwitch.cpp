@@ -26,7 +26,7 @@
 #include <QStylePainter>
 #include <QFile>
 
-using namespace adiscope;
+using namespace scopy;
 
 SmallOnOffSwitch::SmallOnOffSwitch(QWidget *parent) : QPushButton(parent),
 	color_start("grey"), color_end("blue"), on(this), off(this),

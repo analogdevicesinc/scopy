@@ -23,7 +23,7 @@
 
 #include <gnuradio/hier_block2.h>
 
-namespace adiscope {
+namespace scopy {
 	class fft_block : public gr::hier_block2
 	{
 	public:

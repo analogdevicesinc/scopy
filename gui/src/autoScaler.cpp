@@ -24,7 +24,7 @@
 
 #include <cstdio>
 
-using namespace adiscope;
+using namespace scopy;
 
 AutoScaler::AutoScaler(QObject *parent,
 		const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms) :

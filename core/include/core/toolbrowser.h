@@ -9,7 +9,7 @@ namespace Ui {
 class ToolBrowser;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ToolBrowser : public QWidget
 {
     Q_OBJECT

@@ -2,7 +2,7 @@
 #include <iio.h>
 #include "iioutil/contextprovider.h"
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 M2kIdentifyTask::M2kIdentifyTask(QString uri, QObject *parent) : QThread(parent), m_uri(uri) {}
 
 M2kIdentifyTask::~M2kIdentifyTask() {}

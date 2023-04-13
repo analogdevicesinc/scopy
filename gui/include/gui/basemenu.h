@@ -29,7 +29,7 @@ namespace Ui {
 class BaseMenu;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT BaseMenu : public QWidget
 {
 	Q_OBJECT

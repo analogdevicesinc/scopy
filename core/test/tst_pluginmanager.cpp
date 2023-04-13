@@ -6,7 +6,7 @@
 #include <QJsonArray>
 #include <QLibrary>
 
-using namespace adiscope;
+using namespace scopy;
 
 class TST_PluginManager : public QObject
 {

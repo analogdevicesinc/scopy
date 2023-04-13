@@ -30,7 +30,7 @@
 
 class QShowEvent;
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT SmallOnOffSwitch : public QPushButton
 	{
 		Q_OBJECT

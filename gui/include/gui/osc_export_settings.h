@@ -35,7 +35,7 @@ namespace Ui {
 class ExportSettings;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT ExportSettings : public QWidget
 {
 	Q_OBJECT

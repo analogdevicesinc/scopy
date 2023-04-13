@@ -1,7 +1,7 @@
 #include "deviceloader.h"
 #include <QThread>
 
-using namespace adiscope;
+using namespace scopy;
 
 DeviceLoader::DeviceLoader(DeviceImpl* d, QObject *parent) : d(d), QObject(parent)
 {

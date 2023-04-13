@@ -20,7 +20,7 @@
 #include "network_analyzer_api.hpp"
 #include "ui_network_analyzer.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 void NetworkAnalyzer_API::show()
 {
         Q_EMIT net->showTool();

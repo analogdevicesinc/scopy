@@ -24,7 +24,7 @@
 #include <locale>
 #include <sstream>
 
-using namespace adiscope;
+using namespace scopy;
 
 LcdNumber::LcdNumber(QWidget *parent, unsigned precision) :
 	QLCDNumber(parent), precision(precision)

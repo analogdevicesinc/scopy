@@ -86,7 +86,7 @@
     </widget>
    </item>
    <item>
-    <widget class="adiscope::OscCustomScrollArea" name="scrollArea">
+    <widget class="scopy::OscCustomScrollArea" name="scrollArea">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -257,7 +257,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::OscCustomScrollArea</class>
+   <class>scopy::OscCustomScrollArea</class>
    <extends>QScrollArea</extends>
    <header>gui/osc_custom_scroll.h</header>
    <container>1</container>

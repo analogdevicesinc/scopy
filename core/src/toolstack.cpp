@@ -3,7 +3,7 @@
 #include <QLoggingCategory>
 #include <QEvent>
 
-using namespace adiscope;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_TOOLSTACK, "ToolStack")
 

@@ -7,7 +7,7 @@
 #include <QLoggingCategory>
 Q_LOGGING_CATEGORY(CAT_GUI_PLOT,"Plot")
 
-namespace adiscope {
+namespace scopy {
 
 int BasicPlot::staticPlotId = 0;
 BasicPlot::BasicPlot(QWidget* parent) : QwtPlot(parent), started(false), debug(false), replotFrameRate(60)
@@ -165,6 +165,6 @@ void BasicPlot::replot() {
 #endif
 }
 
-} // adiscope
+} // scopy
 
 #include "moc_BasicPlot.cpp"

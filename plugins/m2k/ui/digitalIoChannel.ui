@@ -215,7 +215,7 @@ background-color: red;
       </spacer>
      </item>
      <item>
-      <widget class="adiscope::CustomSwitch" name="inout">
+      <widget class="scopy::CustomSwitch" name="inout">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -310,7 +310,7 @@ background-color: red;
       </spacer>
      </item>
      <item>
-      <widget class="adiscope::SmallOnOffSwitch" name="output">
+      <widget class="scopy::SmallOnOffSwitch" name="output">
        <property name="enabled">
         <bool>true</bool>
        </property>
@@ -362,12 +362,12 @@ background-color: red;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
+   <class>scopy::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/smallOnOffSwitch.h</header>
   </customwidget>

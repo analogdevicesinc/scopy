@@ -26,7 +26,7 @@
 
 class QMouseEvent;
 
-namespace adiscope {
+namespace scopy {
 	/* The CustomPushButton class behaves exactly like QPushButton. The only
 	 * difference is, when it's part of a button group and is the active
 	 * button, it is possible to disactivate it by clicking on it. */

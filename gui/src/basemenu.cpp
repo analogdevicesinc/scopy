@@ -24,7 +24,7 @@
 
 #include <QMimeData>
 
-using namespace adiscope;
+using namespace scopy;
 
 BaseMenu::BaseMenu(QWidget *parent) :
 	QWidget(parent),

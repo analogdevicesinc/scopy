@@ -23,7 +23,7 @@
 #include <QSignalTransition>
 #include <QSizePolicy>
 
-using namespace adiscope;
+using namespace scopy;
 
 MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
 	open_anim_max(this, "maximumWidth"),

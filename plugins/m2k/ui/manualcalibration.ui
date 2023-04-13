@@ -139,7 +139,7 @@ QListWidget{
     <number>0</number>
    </property>
    <item>
-    <widget class="adiscope::DetachDragZone" name="TopWidget" native="true">
+    <widget class="scopy::DetachDragZone" name="TopWidget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
@@ -289,7 +289,7 @@ QListWidget{
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>gui/detachdragzone.h</header>
    <container>1</container>

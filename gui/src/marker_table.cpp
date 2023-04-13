@@ -24,7 +24,7 @@
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * Class FrequencyDelegate
@@ -44,7 +44,7 @@ public:
 		return formatter.format(freq, "Hz", 3);
 	}
 private:
-	adiscope::MetricPrefixFormatter formatter;
+	scopy::MetricPrefixFormatter formatter;
 };
 
 /*

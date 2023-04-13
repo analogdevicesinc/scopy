@@ -6,7 +6,7 @@
 #include "gui/dynamicWidget.h"
 #include "ui_devicebutton.h"
 
-using namespace adiscope;
+using namespace scopy;
 DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 	: DeviceIcon{parent}
 {

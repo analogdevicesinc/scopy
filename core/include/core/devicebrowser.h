@@ -12,7 +12,7 @@ namespace Ui {
 class DeviceBrowser;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT DeviceBrowser : public QWidget
 {
 	Q_OBJECT

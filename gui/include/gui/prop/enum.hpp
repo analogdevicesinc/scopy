@@ -56,7 +56,7 @@ class QComboBox;
 class QLabel;
 class QSlider;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 class SCOPYGUI_EXPORT Enum : public Property

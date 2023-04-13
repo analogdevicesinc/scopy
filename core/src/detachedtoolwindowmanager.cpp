@@ -1,6 +1,6 @@
 #include "detachedtoolwindowmanager.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 DetachedToolWindowManager::DetachedToolWindowManager(QObject *parent) : QObject(parent) {}
 

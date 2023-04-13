@@ -4,7 +4,7 @@
 #include <QTabWidget>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ScopyPreferencesPage : public QTabWidget
 {
 	Q_OBJECT
