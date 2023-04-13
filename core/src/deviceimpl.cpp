@@ -9,6 +9,8 @@
 #include <QThread>
 
 #include "pluginbase/scopyjs.h"
+#include "qscrollarea.h"
+#include "ui_devicepage.h"
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
@@ -101,11 +103,17 @@ void DeviceImpl::loadIcons() {
 
 void DeviceImpl::loadPages() {
 	m_page = new QWidget();
+	Ui::DevicePage *ui = new Ui::DevicePage();
+	ui->setupUi(m_page);
+
 	m_page->setProperty("device_page", true);
 	connbtn = new QPushButton("Connect", m_page);
 	discbtn = new QPushButton("Disconnect", m_page);
-	auto m_buttonLayout = new QHBoxLayout();
-	auto m_pagelayout = new QVBoxLayout(m_page);
+	auto m_buttonLayout = ui->m_buttonLayout;
+	auto m_scrollArea = ui->m_scrollArea;
+	auto m_scrollAreaContents = ui->m_scrollAreaContents;
+	auto m_scrollAreaLayout = ui->m_scrollAreaLayout;
+
 	connbtn->setProperty("device_page",true);
 	connbtn->setProperty("blue_button",true);
 	m_buttonLayout->addWidget(connbtn);
@@ -117,8 +125,6 @@ void DeviceImpl::loadPages() {
 
 	connect(connbtn,&QPushButton::clicked,this,&DeviceImpl::connectDev);
 	connect(discbtn,&QPushButton::clicked,this,&DeviceImpl::disconnectDev);
-
-	m_pagelayout->addLayout(m_buttonLayout);
 
 	for(auto &&p : plugins()) {
 		if(p->loadExtraButtons()) {
@@ -133,7 +139,7 @@ void DeviceImpl::loadPages() {
 
 	for(auto &&p : plugins()) {
 		if(p->loadPage()) {
-			m_pagelayout->addWidget(p->page());
+			m_scrollAreaLayout->addWidget(p->page());
 		}
 	}
 }
