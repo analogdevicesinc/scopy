@@ -8,7 +8,7 @@
 #include "scopyiioutil_export.h"
 #include <QLoggingCategory>
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The CyclicalTask class
  * Implements a way to cyclically call QThreads

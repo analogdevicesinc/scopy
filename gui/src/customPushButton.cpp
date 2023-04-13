@@ -22,7 +22,7 @@
 
 #include <QButtonGroup>
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomPushButton::CustomPushButton(QWidget *parent) : QPushButton(parent)
 {

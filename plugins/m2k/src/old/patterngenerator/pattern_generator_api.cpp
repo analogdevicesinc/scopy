@@ -26,10 +26,10 @@
 
 #include <QCheckBox>
 
-using namespace adiscope;
-using namespace adiscope::m2k;
-using namespace adiscope::logic;
-using namespace adiscope::m2k::logic;
+using namespace scopy;
+using namespace scopy::m2k;
+using namespace scopy::logic;
+using namespace scopy::m2k::logic;
 
 
 QList<int> PatternGenerator_API::getEnabledChannels() const

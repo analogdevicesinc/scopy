@@ -23,7 +23,7 @@
 
 #include <QGridLayout>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * The DbClickButtons class is intended to be a UI menu that contains a

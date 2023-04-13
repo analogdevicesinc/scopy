@@ -54,7 +54,7 @@
 
 using namespace gr;
 
-namespace adiscope {
+namespace scopy {
 
     xy_sink_c::sptr
     xy_sink_c::make(int size,
@@ -245,4 +245,4 @@ namespace adiscope {
       return nitems;
     }
 
-} /* namespace adiscope */
+} /* namespace scopy */

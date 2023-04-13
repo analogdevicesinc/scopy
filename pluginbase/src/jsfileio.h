@@ -23,7 +23,7 @@
 #include <QObject>
 
 /* Private header */
-namespace adiscope {
+namespace scopy {
 class JsFileIo: public QObject
 {
 	Q_OBJECT
@@ -37,6 +37,6 @@ public:
 	Q_INVOKABLE QString readLine(const QString& path, const int lineNumber);
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // JSFILEIO_H

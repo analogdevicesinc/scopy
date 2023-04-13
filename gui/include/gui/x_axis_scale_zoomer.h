@@ -24,7 +24,7 @@
 #include <qwt_plot_zoomer.h>
 #include "osc_scale_zoomer.h"
 
-namespace adiscope {
+namespace scopy {
 class XAxisScaleZoomer : public OscScaleZoomer
 {
 	Q_OBJECT

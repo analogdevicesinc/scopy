@@ -7,7 +7,7 @@
 
 Q_LOGGING_CATEGORY(CAT_PLUGINREPOSTIORY,"PluginRepository");
 
-using namespace adiscope;
+using namespace scopy;
 PluginRepository::PluginRepository(QObject *parent) : QObject(parent)
 {
 	pm = new PluginManager(this);

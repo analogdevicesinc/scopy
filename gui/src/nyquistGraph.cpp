@@ -36,7 +36,7 @@
 #include <qwt_polar_grid.h>
 #include <qwt_polar_marker.h>
 
-namespace adiscope {
+namespace scopy {
 	class NyquistSamplesArray : public QwtArraySeriesData<QwtPointPolar>
 	{
 	public:
@@ -56,7 +56,7 @@ namespace adiscope {
 }
 
 
-using namespace adiscope;
+using namespace scopy;
 
 const QwtInterval radialInterval( 0.0, 10.0 );
 const QwtInterval azimuthInterval( 0.0, 360.0 );

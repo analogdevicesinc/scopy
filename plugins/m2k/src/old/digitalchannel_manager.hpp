@@ -41,7 +41,7 @@
 using namespace libm2k::context;
 using namespace libm2k::digital;
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 class DIOManager : public QObject
 {

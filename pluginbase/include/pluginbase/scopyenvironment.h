@@ -6,7 +6,7 @@
 #include <QVariant>
 #include "scopypluginbase_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYPLUGINBASE_EXPORT ScopyEnvironment: public QObject
 {

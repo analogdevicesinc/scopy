@@ -24,7 +24,7 @@
 #include <gnuradio/blocks/api.h>
 #include <gnuradio/sync_block.h>
 
-namespace adiscope {
+namespace scopy {
 
 class frequency_compensation_filter : virtual public gr::sync_block
 {
@@ -54,5 +54,5 @@ public:
 	virtual void set_high_gain(bool en) = 0;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 #endif /* INCLUDED_BLOCKS_STREAMS_TO_SHORT_H */

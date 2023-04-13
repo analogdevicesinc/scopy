@@ -24,7 +24,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="adiscope::DetachDragZone" name="mainWidget" native="true">
+    <widget class="scopy::DetachDragZone" name="mainWidget" native="true">
      <property name="styleSheet">
       <string notr="true"/>
      </property>
@@ -75,7 +75,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="adiscope::LinkedButton" name="btnHelp"/>
+         <widget class="scopy::LinkedButton" name="btnHelp"/>
         </item>
         <item>
          <widget class="QPushButton" name="btnPrint">
@@ -128,7 +128,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="adiscope::RunSingleWidget" name="runSingleWidget" native="true"/>
+         <widget class="scopy::RunSingleWidget" name="runSingleWidget" native="true"/>
         </item>
         <item>
          <widget class="QWidget" name="menuButtonsWidget" native="true">
@@ -155,7 +155,7 @@
             <number>0</number>
            </property>
            <item>
-            <widget class="adiscope::CustomPushButton" name="btnGeneralSettings">
+            <widget class="scopy::CustomPushButton" name="btnGeneralSettings">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -186,7 +186,7 @@
             </widget>
            </item>
            <item>
-            <widget class="adiscope::CustomPushButton" name="btnSettings">
+            <widget class="scopy::CustomPushButton" name="btnSettings">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -455,7 +455,7 @@ color:  red;</string>
                   <layout class="QGridLayout" name="gridLayout_plots"/>
                  </item>
                  <item>
-                  <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true"/>
+                  <widget class="scopy::InstrumentNotes" name="instrumentNotes" native="true"/>
                  </item>
                 </layout>
                </widget>
@@ -477,7 +477,7 @@ color:  red;</string>
                <number>0</number>
               </property>
               <item>
-               <widget class="adiscope::NyquistGraph" name="xygraph">
+               <widget class="scopy::NyquistGraph" name="xygraph">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
                 </property>
@@ -702,7 +702,7 @@ border: 5px solid white;
                <number>0</number>
               </property>
               <item>
-               <widget class="adiscope::dBgraph" name="nicholsgraph">
+               <widget class="scopy::dBgraph" name="nicholsgraph">
                 <property name="frameShape">
                  <enum>QFrame::StyledPanel</enum>
                 </property>
@@ -763,7 +763,7 @@ border: 5px solid white;
            <number>0</number>
           </property>
           <item>
-           <widget class="adiscope::MenuAnim" name="rightMenu" native="true">
+           <widget class="scopy::MenuAnim" name="rightMenu" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -977,7 +977,7 @@ border: 5px solid white;
                       </layout>
                      </item>
                      <item>
-                      <widget class="adiscope::CustomSwitch" name="btnRefChn">
+                      <widget class="scopy::CustomSwitch" name="btnRefChn">
                        <property name="styleSheet">
                         <string notr="true">QPushButton {
 min-height: 30px;
@@ -1219,7 +1219,7 @@ color: rgba(255,255,255,51);
                           </widget>
                          </item>
                          <item>
-                          <widget class="adiscope::CustomSwitch" name="dcFilterBtn">
+                          <widget class="scopy::CustomSwitch" name="dcFilterBtn">
                            <property name="sizePolicy">
                             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                              <horstretch>0</horstretch>
@@ -1362,7 +1362,7 @@ color: rgba(255,255,255,51);
                         </spacer>
                        </item>
                        <item row="1" column="0" colspan="2">
-                        <widget class="adiscope::CustomSwitch" name="btnIsLog">
+                        <widget class="scopy::CustomSwitch" name="btnIsLog">
                          <property name="styleSheet">
                           <string notr="true">QPushButton {
 min-height: 30px;
@@ -1749,7 +1749,7 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
                         </widget>
                        </item>
                        <item row="4" column="1">
-                        <widget class="adiscope::CustomSwitch" name="deltaBtn">
+                        <widget class="scopy::CustomSwitch" name="deltaBtn">
                          <property name="text">
                           <string/>
                          </property>
@@ -1851,7 +1851,7 @@ QPushButton[invalid=true]:enabled:!pressed { background-color: #4a64ff; }
                           <number>0</number>
                          </property>
                          <item>
-                          <widget class="adiscope::CustomSwitch" name="bufferPreviewSwitch">
+                          <widget class="scopy::CustomSwitch" name="bufferPreviewSwitch">
                            <property name="sizePolicy">
                             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
                              <horstretch>0</horstretch>
@@ -2830,7 +2830,7 @@ padding-left: 20px;
                         <number>0</number>
                        </property>
                        <item>
-                        <widget class="adiscope::CustomSwitch" name="hCursorsEnable">
+                        <widget class="scopy::CustomSwitch" name="hCursorsEnable">
                          <property name="text">
                           <string/>
                          </property>
@@ -2856,7 +2856,7 @@ padding-left: 20px;
                         </spacer>
                        </item>
                        <item>
-                        <widget class="adiscope::SmallOnOffSwitch" name="btnLockHorizontal">
+                        <widget class="scopy::SmallOnOffSwitch" name="btnLockHorizontal">
                          <property name="text">
                           <string/>
                          </property>
@@ -2981,7 +2981,7 @@ padding-left: 20px;
                     <number>0</number>
                    </property>
                    <item>
-                    <widget class="adiscope::CustomPlotPositionButton" name="posSelect" native="true">
+                    <widget class="scopy::CustomPlotPositionButton" name="posSelect" native="true">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -3093,7 +3093,7 @@ padding-left: 20px;
            </widget>
           </item>
           <item>
-           <widget class="adiscope::CustomPushButton" name="btnCursors">
+           <widget class="scopy::CustomPushButton" name="btnCursors">
             <property name="enabled">
              <bool>false</bool>
             </property>
@@ -3135,64 +3135,64 @@ QLabel {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
+   <class>scopy::CustomPushButton</class>
    <extends>QPushButton</extends>
    <header>gui/customPushButton.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::MenuAnim</class>
+   <class>scopy::MenuAnim</class>
    <extends>QWidget</extends>
    <header>gui/menu_anim.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
+   <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::RunSingleWidget</class>
+   <class>scopy::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header>gui/runsinglewidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::LinkedButton</class>
+   <class>scopy::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::dBgraph</class>
+   <class>scopy::dBgraph</class>
    <extends>QFrame</extends>
    <header>dbgraph.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::NyquistGraph</class>
+   <class>scopy::NyquistGraph</class>
    <extends>QFrame</extends>
    <header>nyquistGraph.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomPlotPositionButton</class>
+   <class>scopy::CustomPlotPositionButton</class>
    <extends>QWidget</extends>
    <header>gui/customplotpositionbutton.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::SmallOnOffSwitch</class>
+   <class>scopy::SmallOnOffSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/smallOnOffSwitch.h</header>
   </customwidget>

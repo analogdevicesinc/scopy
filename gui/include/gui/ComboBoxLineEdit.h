@@ -23,7 +23,7 @@
 #include <QLineEdit>
 #include <QMouseEvent>
 
-namespace adiscope {
+namespace scopy {
 class ComboBoxLineEdit : public QLineEdit
 {
 	Q_OBJECT

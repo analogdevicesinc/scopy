@@ -28,7 +28,7 @@ namespace analog {
 class M2kAnalogIn;
 }
 }
-namespace adiscope {
+namespace scopy {
 	class adc_sample_conv : public gr::sync_block
 	{
 	private:

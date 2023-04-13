@@ -23,7 +23,7 @@
 
 #include <QStyledItemDelegate>
 
-namespace adiscope {
+namespace scopy {
 	class CheckboxDelegate : public QStyledItemDelegate
 	{
 	    Q_OBJECT

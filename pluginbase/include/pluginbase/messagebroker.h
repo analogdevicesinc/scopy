@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QSet>
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The MessageBroker class
  * MessageBroker is a singleton class to implement a publisher-subscriber message exchange

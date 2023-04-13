@@ -23,7 +23,7 @@
 #include "spectrum_analyzer.hpp"
 #include <pluginbase/apiobject.h>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class SpectrumAnalyzer_API : public ApiObject
 {
 	Q_OBJECT

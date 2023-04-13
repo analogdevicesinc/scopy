@@ -12,7 +12,7 @@
 #include <QFile>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
-using namespace adiscope;
+using namespace scopy;
 
 bool TestPlugin::compatible(QString m_param) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";

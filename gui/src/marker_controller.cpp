@@ -25,7 +25,7 @@
 #include <qwt_scale_div.h>
 #include <qwt_interval.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * Class MarkerController has the purpose to control SpectrumMarker objects. The

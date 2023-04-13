@@ -29,7 +29,7 @@
 #include "decoder_table_item.hpp"
 
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 
 namespace logic {
@@ -100,7 +100,7 @@ private:
 };
 
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy
 
 #endif // DECODER_TABLE_MODEL_H
 

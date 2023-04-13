@@ -28,7 +28,7 @@
 #include <QHeaderView>
 #include <QFile>
 
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * Class DropdownSwitchList: Resembles to a QCombobox by displaying a list of

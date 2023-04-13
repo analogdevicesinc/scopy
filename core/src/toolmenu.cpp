@@ -23,7 +23,7 @@
 
 #include <QDebug>
 
-using namespace adiscope;
+using namespace scopy;
 
 ToolMenu::ToolMenu(QWidget *parent):
 	BaseMenu(parent)

@@ -29,7 +29,7 @@ namespace Ui {
 class HomepageControls;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT HomepageControls : public QWidget
 {
 	Q_OBJECT

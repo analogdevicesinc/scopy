@@ -52,7 +52,7 @@ class ManualCalibration;
 class CalibrationTemplate;
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 struct stCalibStory {
 	int calibProcedure;

@@ -9,7 +9,7 @@
 #include "pluginbase/pluginbase.h"
 #include "scopytestplugin2_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYTESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
 {
 	Q_OBJECT

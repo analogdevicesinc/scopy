@@ -23,7 +23,7 @@
 #include <QFileDialog>
 #include <QImageWriter>
 
-using namespace adiscope;
+using namespace scopy;
 
 PrintablePlot::PrintablePlot(QWidget *parent) :
 	BasicPlot(parent),

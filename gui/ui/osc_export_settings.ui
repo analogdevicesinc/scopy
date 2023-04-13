@@ -188,7 +188,7 @@
            </spacer>
           </item>
           <item>
-           <widget class="adiscope::CustomSwitch" name="btnExportAll">
+           <widget class="scopy::CustomSwitch" name="btnExportAll">
             <property name="text">
              <string/>
             </property>
@@ -290,7 +290,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>customSwitch.h</header>
   </customwidget>

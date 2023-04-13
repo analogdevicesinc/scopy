@@ -22,7 +22,7 @@
 #include "ui_homepage_controls.h"
 #include <QDebug>
 
-using namespace adiscope;
+using namespace scopy;
 
 HomepageControls::HomepageControls(QWidget *parent) :
 	QWidget(parent),

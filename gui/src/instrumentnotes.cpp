@@ -1,7 +1,7 @@
 #include "instrumentnotes.h"
 #include "ui_instrumentnotes.h"
 
-namespace adiscope {
+namespace scopy {
 InstrumentNotes::InstrumentNotes(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::InstrumentNotes)

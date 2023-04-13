@@ -27,7 +27,7 @@
 #include <QLoggingCategory>
 #include <QDebug>
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace gr;
 
 static constexpr int KERNEL_BUFFERS_DEFAULT = 1;
@@ -67,10 +67,10 @@ iio_manager::iio_manager(unsigned int block_id,
 
 
 	//TODO - make dynamic
-	freq_comp_filt[0][0] = adiscope::frequency_compensation_filter::make(false);
-	freq_comp_filt[0][1] = adiscope::frequency_compensation_filter::make(false);
-	freq_comp_filt[1][0] = adiscope::frequency_compensation_filter::make(false);
-	freq_comp_filt[1][1] = adiscope::frequency_compensation_filter::make(false);
+	freq_comp_filt[0][0] = scopy::frequency_compensation_filter::make(false);
+	freq_comp_filt[0][1] = scopy::frequency_compensation_filter::make(false);
+	freq_comp_filt[1][0] = scopy::frequency_compensation_filter::make(false);
+	freq_comp_filt[1][1] = scopy::frequency_compensation_filter::make(false);
 
 	for (unsigned i = 0; i < nb_channels; i++) {
 		hier_block2::connect(iio_block,i,freq_comp_filt[i][0],0);

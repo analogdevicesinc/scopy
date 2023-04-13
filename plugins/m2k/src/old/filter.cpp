@@ -29,7 +29,7 @@
 
 #include <iio.h>
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 static const QStringList tool_names = {
 	"osc",

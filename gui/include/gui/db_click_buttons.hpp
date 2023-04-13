@@ -30,7 +30,7 @@ namespace Ui {
 class DbClickButtons;
 }
 
-namespace SCOPYGUI_EXPORT adiscope {
+namespace SCOPYGUI_EXPORT scopy {
 
 class DbClickButtons: public QWidget
 {
@@ -68,6 +68,6 @@ private:
 	QList<QString> color_codes;
 };
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif // DB_CLICK_BUTTONS_HPP

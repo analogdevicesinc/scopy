@@ -22,7 +22,7 @@
 #include "ui_digitalio.h"
 #include "ui_digitalIoElement.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 void DigitalIO_API::show()
 {
 	Q_EMIT dio->showTool();

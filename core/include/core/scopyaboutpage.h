@@ -6,7 +6,7 @@
 
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ScopyAboutPage : public QTabWidget
 {
 	Q_OBJECT

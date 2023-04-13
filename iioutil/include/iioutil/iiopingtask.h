@@ -5,7 +5,7 @@
 #include <iio.h>
 #include "scopyiioutil_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The IIOPingTask class
  * IIOPingTask verifies IIO connection and emits pingSuccess/pingFailed

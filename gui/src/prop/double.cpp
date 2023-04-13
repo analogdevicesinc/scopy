@@ -48,7 +48,7 @@
 using std::optional;
 using std::pair;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 Double::Double(QString name,

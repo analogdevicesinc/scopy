@@ -7,7 +7,7 @@
 
 
 Q_LOGGING_CATEGORY(CAT_TOOLMANAGER, "ToolManager")
-using namespace adiscope;
+using namespace scopy;
 
 ToolManager::ToolManager(ToolMenu *tm, ToolStack *ts, DetachedToolWindowManager *dwm, QObject *parent ) : QObject(parent)
 {

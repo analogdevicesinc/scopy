@@ -115,7 +115,7 @@ min-height:48px;
      <property name="widgetResizable">
       <bool>true</bool>
      </property>
-     <widget class="adiscope::ToolMenu" name="wToolMenu">
+     <widget class="scopy::ToolMenu" name="wToolMenu">
       <property name="geometry">
        <rect>
         <x>0</x>
@@ -212,7 +212,7 @@ min-height:48px;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::ToolMenu</class>
+   <class>scopy::ToolMenu</class>
    <extends>QWidget</extends>
    <header>toolmenu.h</header>
    <container>1</container>

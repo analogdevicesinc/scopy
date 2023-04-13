@@ -14,7 +14,7 @@
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
-namespace adiscope {
+namespace scopy {
 DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObject *parent)
 	: QObject{parent},
 	  m_param(param),

@@ -4,7 +4,7 @@
 #include <QtConcurrent>
 #include <QFuture>
 
-using namespace adiscope;
+using namespace scopy;
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::ScopyHomeAddPage)

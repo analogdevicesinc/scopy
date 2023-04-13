@@ -31,7 +31,7 @@ extern "C" {
 	struct iio_channel;
 }
 
-namespace adiscope {
+namespace scopy {
 
 class HardwareTrigger
 {
@@ -147,6 +147,6 @@ private:
 	const static QVector<QString> lut_trigg_source;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // HARDWARE_TRIGGER_H

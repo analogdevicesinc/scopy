@@ -1,6 +1,6 @@
 #include "infopage.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 InfoPage::InfoPage(QWidget *parent) :
 	QWidget(parent)

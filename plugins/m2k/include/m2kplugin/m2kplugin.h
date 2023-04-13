@@ -16,7 +16,7 @@
 #include "iio_manager.hpp"
 
 
-namespace adiscope {
+namespace scopy {
 
 namespace m2k {
 class SCOPYM2KPLUGIN_EXPORT M2kPlugin : public QObject, public PluginBase

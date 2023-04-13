@@ -29,7 +29,7 @@ namespace Ui {
 class MarkerTable;
 }
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT MarkerTable : public QWidget
 {
@@ -63,6 +63,6 @@ private:
 	int rowOfMarker(int mkIdx, int chIdx) const;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // MARKER_TABLE_HPP

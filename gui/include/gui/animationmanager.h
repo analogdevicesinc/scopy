@@ -25,7 +25,7 @@
 #include <customanimation.h>
 #include <QObject>
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT AnimationManager : public QObject
 {
     Q_OBJECT

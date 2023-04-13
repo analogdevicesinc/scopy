@@ -34,7 +34,7 @@
 
 
 using std::cout;
-using namespace adiscope;
+using namespace scopy;
 
 ScopyJS* ScopyJS::pinstance_{nullptr};
 ScopyJS::ScopyJS(QObject *parent) : QObject(parent) {

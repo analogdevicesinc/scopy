@@ -57,7 +57,7 @@
 
 using namespace gr;
 
-namespace adiscope {
+namespace scopy {
 
 scope_sink_f::sptr
 scope_sink_f::make(int size, double samp_rate,

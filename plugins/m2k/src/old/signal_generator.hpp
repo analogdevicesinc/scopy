@@ -59,7 +59,7 @@ class SignalGenerator;
 
 class QJSEngine;
 
-namespace adiscope {
+namespace scopy {
 class ChannelWidget;
 class PhaseSpinButton;
 class PositionSpinButton;
@@ -67,7 +67,7 @@ class ScaleSpinButton;
 
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 struct signal_generator_data;
 struct time_block_data;
 class SignalGenerator_API;

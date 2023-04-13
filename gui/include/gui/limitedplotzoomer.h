@@ -23,7 +23,7 @@
 #include <qwt_plot_zoomer.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT LimitedPlotZoomer : public QwtPlotZoomer
 {
 public:

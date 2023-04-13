@@ -32,7 +32,7 @@
 
 #define ERROR_VALUE -10000000
 
-using namespace adiscope;
+using namespace scopy;
 
 class FftDisplayZoomer: public LimitedPlotZoomer
 {

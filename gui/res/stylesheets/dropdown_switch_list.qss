@@ -1,4 +1,4 @@
-adiscope--DropdownSwitchList {
+scopy--DropdownSwitchList {
   height: 30px;
   border: 0px;
   font-size: 18px;
@@ -6,12 +6,12 @@ adiscope--DropdownSwitchList {
   padding-left: 20px;
 }
 
-adiscope--DropdownSwitchList:editable{
+scopy--DropdownSwitchList:editable{
   background-color: white;
   color: rgba(0, 0, 0, 200);
 }
 
-adiscope--DropdownSwitchList::drop-down {
+scopy--DropdownSwitchList::drop-down {
   subcontrol-position: center right;
   width: 10px;
   height: 6px;
@@ -19,7 +19,7 @@ adiscope--DropdownSwitchList::drop-down {
   margin-right: 20px;
 }
 
-adiscope--DropdownSwitchList QAbstractItemView {
+scopy--DropdownSwitchList QAbstractItemView {
   border: 0px;
   background-color: white;
   font-size: 18px;
@@ -29,12 +29,12 @@ adiscope--DropdownSwitchList QAbstractItemView {
   border-left: 0px solid white; /* setting to 0 for now */
 }
 
-adiscope--DropdownSwitchList QAbstractItemView::item {
+scopy--DropdownSwitchList QAbstractItemView::item {
   color: rgba(0, 0, 0, 200);
   height: 60px;
 }
 
-adiscope--DropdownSwitchList QAbstractItemView::item:hover {
+scopy--DropdownSwitchList QAbstractItemView::item:hover {
   background-color: #EDEDED;
   font-weight: bold;
   border-bottom: 0px solid none;

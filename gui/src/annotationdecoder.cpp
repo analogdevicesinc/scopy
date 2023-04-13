@@ -24,7 +24,7 @@
 #include <QDebug>
 #include <algorithm>
 
-using namespace adiscope;
+using namespace scopy;
 
 constexpr uint64_t MAX_CHUNK_SIZE = 256 * 1024;
 

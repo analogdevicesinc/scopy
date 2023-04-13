@@ -20,7 +20,7 @@
 
 #include "signal_sample.hpp"
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 signal_sample::signal_sample() :
 	gr::sync_block("signal_sample",

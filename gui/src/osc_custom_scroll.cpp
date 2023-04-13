@@ -25,7 +25,7 @@
 #include <QScrollBar>
 #include <QPointF>
 
-using namespace adiscope;
+using namespace scopy;
 
 OscCustomScrollArea::OscCustomScrollArea(QWidget *parent):
 	QScrollArea(parent),

@@ -29,7 +29,7 @@
 #include <QButtonGroup>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The ToolMenu class
  */

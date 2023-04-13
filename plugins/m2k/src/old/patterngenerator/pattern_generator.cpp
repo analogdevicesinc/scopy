@@ -39,10 +39,10 @@
 #include "m2kpluginExceptionHandler.h"
 #include <pluginbase/scopyjs.h>
 
-using namespace adiscope;
-using namespace adiscope::m2k;
-using namespace adiscope::logic;
-using namespace adiscope::m2k::logic;
+using namespace scopy;
+using namespace scopy::m2k;
+using namespace scopy::logic;
+using namespace scopy::m2k::logic;
 
 constexpr int MAX_BUFFER_SIZE = 1024 * 1024; // 1M
 constexpr int DIGITAL_NR_CHANNELS = 16;

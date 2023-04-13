@@ -29,7 +29,7 @@
 
 Q_DECLARE_METATYPE(std::vector<float>);
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 	class signal_sample : public QObject, public gr::sync_block
 	{
 		Q_OBJECT

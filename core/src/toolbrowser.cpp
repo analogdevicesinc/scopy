@@ -2,7 +2,7 @@
 #include "ui_toolbrowser.h"
 #include <QDebug>
 
-using namespace adiscope;
+using namespace scopy;
 
 ToolBrowser::ToolBrowser(QWidget *parent) :
     QWidget(parent),
