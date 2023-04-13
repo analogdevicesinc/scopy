@@ -5,7 +5,6 @@ using namespace adiscope;
 InfoPage::InfoPage(QWidget *parent) :
 	QWidget(parent)
 {
-	scroll = new QScrollArea(this);
 	lay = new QVBoxLayout(this);
 }
 
