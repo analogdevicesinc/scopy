@@ -43,8 +43,8 @@ ToolMenuItem* ToolMenu::getToolMenuItemFor(QString toolId)
 	}
 	return nullptr;
 }
-ToolMenuItem* ToolMenu::addTool(QString id, QString name, QString icon, int position)
-{
+
+ToolMenuItem *ToolMenu::createTool(QString id, QString name, QString icon, int position) {
 	ToolMenuItem *t = new ToolMenuItem(id,name,icon,this);
 	insertMenuItem(t,position);
 	if(position == -1) {
@@ -67,6 +67,14 @@ ToolMenuItem* ToolMenu::addTool(QString id, QString name, QString icon, int posi
 			setDynamicProperty(t, "selected", on);
 		}
 	});
+
+
+	return t;
+}
+ToolMenuItem* ToolMenu::addTool(QString id, QString name, QString icon, int position)
+{
+	ToolMenuItem *t = createTool(id,name,icon,position);
+	insertMenuItem(t,position);
 
 
 	return t;
@@ -133,6 +141,13 @@ void ToolMenu::_updateToolList(short from, short to)
 ToolMenu::~ToolMenu()
 {
 	_saveState();
+}
+
+void ToolMenu::hideMenuText(bool val) {
+	for(auto &&tool: tools) {
+		tool->hideText(val);
+	}
+
 }
 
 void ToolMenu::_saveState()
