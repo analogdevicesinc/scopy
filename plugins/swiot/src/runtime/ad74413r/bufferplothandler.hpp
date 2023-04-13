@@ -1,7 +1,7 @@
 #ifndef SWIOTPLOTHANDLER_HPP
 #define SWIOTPLOTHANDLER_HPP
 
-#include "src/captureplot/oscilloscope_plot.hpp"
+#include <gui/oscilloscope_plot.hpp>
 #include<qobject.h>
 #include "bufferlogic.hpp"
 #include <qmutex.h>

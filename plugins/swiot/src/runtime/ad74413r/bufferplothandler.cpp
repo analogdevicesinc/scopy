@@ -1,6 +1,6 @@
 #include "bufferplothandler.hpp"
 #include <QGridLayout>
-#include "src/captureplot/filemanager.h"
+#include <gui/filemanager.h>
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>

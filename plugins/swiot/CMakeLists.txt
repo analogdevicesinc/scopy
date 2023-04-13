@@ -25,9 +25,6 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 FILE(GLOB SRC_LIST
-	src/captureplot/*.cpp
-	src/captureplot/*.cc
-
 	src/config/*.cpp
 	src/config/*.cc
 

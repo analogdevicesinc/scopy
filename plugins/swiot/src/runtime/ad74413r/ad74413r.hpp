@@ -1,16 +1,14 @@
 #ifndef SWIOTAD_HPP
 #define SWIOTAD_HPP
 
-#include "src/refactoring/maincore/customcolqgridlayout.hpp"
 #include "src/refactoring/tool/tool_view.hpp"
 #include <qwidget.h>
 #include "bufferlogic.hpp"
 #include "src/runtime/readerthread.h"
 #include "buffermenucontroller.hpp"
 #include "src/refactoring/maingui/channel_manager.hpp"
-#include "src/captureplot/osc_export_settings.h"
+#include <gui/osc_export_settings.h>
 #include <QVector>
-#include "src/refactoring/tool/tool_view_builder.hpp"
 #include "bufferplothandler.hpp"
 #include <iio.h>
 
