@@ -21,7 +21,7 @@ Ad74413r::Ad74413r(iio_context *ctx, QVector<QString> chnlsFunc, QWidget* parent
 		m_readerThread = new ReaderThread(true);
                 m_readerThread->addBufferedDevice(m_iioDev);
 
-		QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsFrequencyAttr("sampling_frequency");
+		QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
 		int samplingFreq = actualSamplingFreq[0].toInt();
 
 		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
@@ -82,8 +82,8 @@ void Ad74413r::setupConnections()
 	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
 	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
 
-	connect(m_swiotAdLogic, &BufferLogic::sampleRateWritten, m_plotHandler, &BufferPlotHandler::onSampleRateWritten);
-	connect(m_swiotAdLogic, &BufferLogic::sampleRateWritten, m_readerThread, &ReaderThread::onSampleRateWritten);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_plotHandler, &BufferPlotHandler::onSamplingFreqWritten);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_readerThread, &ReaderThread::onSamplingFreqWritten);
 	//general settings connections
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
@@ -166,8 +166,8 @@ adiscope::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* 
 	auto *samplingFreqLayout = new QHBoxLayout();
 	m_samplingFreqOptions = new QComboBox(generalSubsection->getContentWidget());
 
-	QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsFrequencyAttr("sampling_frequency");
-	QStringList samplingFreqValues = m_swiotAdLogic->readChnlsFrequencyAttr("sampling_frequency_available");
+	QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
+	QStringList samplingFreqValues = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency_available");
 	int actualSamplingFreqIdx = 0;
 	int valuesIdx = 0;
 	for (QString val : samplingFreqValues) {

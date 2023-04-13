@@ -193,7 +193,7 @@ void BufferPlotHandler::onTimespanChanged(double value)
 	resetPlotParameters();
 }
 
-void BufferPlotHandler::onSampleRateWritten(int samplingFreq)
+void BufferPlotHandler::onSamplingFreqWritten(int samplingFreq)
 {
 	m_samplingFreq = samplingFreq;
 }

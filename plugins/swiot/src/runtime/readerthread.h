@@ -36,7 +36,7 @@ public:
 public Q_SLOTS:
 
 	void onChnlsChange(QMap<int, struct chnlInfo *> chnlsInfo);
-	void onSampleRateWritten(int samplingFreq);
+	void onSamplingFreqWritten(int samplingFreq);
 
 Q_SIGNALS:
 

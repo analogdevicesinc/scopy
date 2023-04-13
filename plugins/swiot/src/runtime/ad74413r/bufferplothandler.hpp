@@ -27,7 +27,7 @@ public Q_SLOTS:
 	void onBufferRefilled(QVector<QVector<double>>, int bufferCounter);
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
 	void onTimespanChanged(double value);
-	void onSampleRateWritten(int samplingFreq);
+	void onSamplingFreqWritten(int samplingFreq);
 private:
 	void initPlot(int plotChnlsNo);
 	void resetDataPoints();

@@ -129,7 +129,7 @@ void ReaderThread::onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo)
         m_chnlsInfo = chnlsInfo;
 }
 
-void ReaderThread::onSampleRateWritten(int samplingFreq)
+void ReaderThread::onSamplingFreqWritten(int samplingFreq)
 {
 	m_samplingFreq = samplingFreq;
 }

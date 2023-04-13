@@ -9,7 +9,7 @@ BufferLogic::BufferLogic(struct iio_device* iioDev) :
 {
 	if (m_iioDev) {
 		createChannels();
-		m_samplingFreqAvailable = readChnlsFrequencyAttr("sampling_frequency_available");
+		m_samplingFreqAvailable = readChnlsSamplingFreqAttr("sampling_frequency_available");
 	}
 }
 
@@ -106,16 +106,16 @@ void BufferLogic::onSamplingFreqChanged(int idx)
 			if (returnCode < 0) {
 				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute write error " + QString::number(returnCode);
 			} else {
-				QStringList newSamplingFreq = readChnlsFrequencyAttr(SAMPLING_FREQ_ATTR_NAME);
+				QStringList newSamplingFreq = readChnlsSamplingFreqAttr(SAMPLING_FREQ_ATTR_NAME);
 				int samplingFreq = newSamplingFreq[0].toInt();
-				Q_EMIT sampleRateWritten(samplingFreq);
+				Q_EMIT samplingFreqWritten(samplingFreq);
 				break;
 			}
 		}
 	}
 }
 
-QStringList BufferLogic::readChnlsFrequencyAttr(QString attrName)
+QStringList BufferLogic::readChnlsSamplingFreqAttr(QString attrName)
 {
 	QStringList attrValues;
 	char* buffer = new char[200];

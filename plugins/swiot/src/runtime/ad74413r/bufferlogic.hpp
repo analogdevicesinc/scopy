@@ -41,14 +41,14 @@ public:
 
 	int getPlotChnlsNo();
 
-	QStringList readChnlsFrequencyAttr(QString attrName);
+	QStringList readChnlsSamplingFreqAttr(QString attrName);
 
 public Q_SLOTS:
 	void onSamplingFreqChanged(int idx);
 
 Q_SIGNALS:
 		void chnlsChanged(QMap<int, struct chnlInfo*> chnlsInfo);
-		void sampleRateWritten(int samplingFreq);
+		void samplingFreqWritten(int samplingFreq);
 private:
 	void createChannels();
 
