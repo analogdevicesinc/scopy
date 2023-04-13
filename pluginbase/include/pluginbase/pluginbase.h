@@ -25,21 +25,17 @@ public:
 	virtual void preload() override;
 	virtual void postload() override;
 
-	virtual void loadApi() override;
 	virtual bool loadIcon() override;
 	virtual bool loadPage() override;
 	virtual void loadToolList() override;
 	virtual bool loadPreferencesPage() override;
 	virtual bool loadExtraButtons() override;
 
-	virtual void saveSettings() override;
-	virtual void loadSettings() override;
-	virtual void saveSettings(QSettings&) override;
-	virtual void loadSettings(QSettings&) override;
+	virtual void saveSettings(QSettings &) override;
+	virtual void loadSettings(QSettings &) override;
 
 	virtual void unload() override;
 
-	virtual ApiObject* api() override;
 	virtual QString param() override;
 	virtual QString name() override;
 	virtual QString displayName() override;
@@ -72,7 +68,6 @@ protected:
 	QList<ToolMenuEntry*> m_toolList;
 	QList<QAbstractButton*> m_extraButtons;
 	QJsonObject m_metadata;
-	ApiObject* m_pluginApi = nullptr;
 };
 }
 
