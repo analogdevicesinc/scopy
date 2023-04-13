@@ -142,13 +142,6 @@ public:
 	virtual void preload() = 0;
 
 	/**
-	 * @brief loadApi
-	 * is called postcompatible. initialize m_pluginApi to have save/load/js in your plugin
-	 * Default implementation in PluginBase - can be overriden
-	 */
-	virtual void loadApi() = 0;
-
-	/**
 	 * @brief loadIcon
 	 * is called postcompatible. initialize m_icon widget. This widget is considered as a device icon.
 	 * @return bool if icon is loaded
@@ -187,38 +180,17 @@ public:
 
 	/**
 	 * @brief saveSettings
-	 * can be called postconnect, on device disconnect. Saves m_pluginApi to the default location
-	 * Default implementation in PluginBase - override not recommended
-	 */
-	virtual void saveSettings() = 0;
-	/**
-	 * @brief loadSettings
-	 * can be called postconnect, on device connect. Loads m_pluginApi from the default location
-	 * Default implementation in PluginBase - override not recommended
-	 */
-	virtual void loadSettings() = 0;
-
-	/**
-	 * @brief saveSettings
 	 * can be called postconnect, when user requests save. Saves m_plugin to QSettings
-	 * Default implementation in PluginBase - override not recommended
+	 * Default implementation in PluginBase - can be overriden
 	 */
-	virtual void saveSettings(QSettings&) = 0;
+	virtual void saveSettings(QSettings &) = 0;
 
 	/**
 	 * @brief loadSettings
 	 * can be called postconnect, when user requests load. Loads m_plugin from QSettings
-	 * Default implementation in PluginBase - override not recommended
+	 * Default implementation in PluginBase - can be overriden
 	 */
-	virtual void loadSettings(QSettings&) = 0;
-
-	/**
-	 * @brief api
-	 * @return
-	 * getter for m_pluginApi
-	 * Default implementation in PluginBase - override not recommended
-	 */
-	virtual ApiObject* api() = 0;
+	virtual void loadSettings(QSettings &) = 0;
 
 	/**
 	 * @brief unload
@@ -235,7 +207,7 @@ public:
 	virtual QString param() = 0;
 
 	/**
-	 * @brief nam
+	 * @brief name
 	 * @return plugin m_name getter
 	 * Default implementation in PluginBase - override not recommended
 	 */

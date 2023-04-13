@@ -15,9 +15,10 @@ class SCOPYTESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
+
+	// Plugin interface
 public:
 	friend class TestPlugin_API;
-	void loadApi() override;
 	void initPreferences() override;
 	void initMetadata() override;
 	void init() override;
@@ -29,10 +30,11 @@ public:
 	bool loadExtraButtons() override;
 	QString about() override;
 	QString version() override;
-
 	bool onConnect() override;
 	bool onDisconnect() override;
 	void cloneExtra(Plugin*) override;
+	void saveSettings(QSettings &) override;
+	void loadSettings(QSettings &) override;
 
 public Q_SLOTS:
 	void messageCallback(QString topic, QString message) override;
@@ -42,7 +44,7 @@ private:
 	QWidget *tool;
 	QLineEdit *edit;
 	int renameCnt;
-
+	ApiObject* m_pluginApi;
 };
 
 class SCOPYTESTPLUGIN_EXPORT TestPlugin_API : public ApiObject {
