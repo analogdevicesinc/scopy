@@ -200,6 +200,7 @@ QGroupBox::title {
  subcontrol-origin: margin;
  subcontrol-position: top left;
 }
+
 QScrollArea { border: 0px;}
 QScrollBar:vertical {
  background: #262628;
@@ -255,7 +256,8 @@ QLabel[subsection_label=true]{
  font-size: 12px;
  color: rgba(255, 255, 255, 70);
 }
-QFrame[subsection_line=true]{ border: 1px solid rgba(255, 255, 255, 70); }
+QFrame[subsection_line=true]{
+color: rgba(255, 255, 255, 70); }
 QPushButton[subsection_arrow_button=true]{
  max-height: 12px;
  max-width: 12px;

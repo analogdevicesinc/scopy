@@ -42,6 +42,7 @@ public:
 
 	ToolMenuItem *getToolMenuItemFor(QString toolId);
 	ToolMenuItem *addTool(QString id, QString name, QString icon, int position = -1);
+	ToolMenuItem *createTool(QString id, QString name, QString icon, int position = -1);
 	bool removeTool(QString id);
 	bool removeTool(ToolMenuItem *tmi);
 
