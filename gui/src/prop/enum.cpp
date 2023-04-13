@@ -59,7 +59,7 @@ using std::numeric_limits;
 using std::pair;
 using std::vector;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 Enum::Enum(QString name, QString desc,

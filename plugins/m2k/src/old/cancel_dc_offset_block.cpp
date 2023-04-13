@@ -25,7 +25,7 @@
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/keep_one_in_n.h>
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace gr;
 
 cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled):

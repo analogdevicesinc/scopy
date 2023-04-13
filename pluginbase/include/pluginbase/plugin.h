@@ -10,7 +10,7 @@
 #include <QAbstractButton>
 #include "apiobject.h"
 
-namespace adiscope {
+namespace scopy {
 
 /**
  * @brief The Plugin interface
@@ -260,7 +260,7 @@ public:
 	 * @return plugin m_toolList getter - list of tools used to populate device toolmenu
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QList<adiscope::ToolMenuEntry*> toolList() = 0;
+	virtual QList<scopy::ToolMenuEntry*> toolList() = 0;
 
 	/**
 	 * @brief metadata
@@ -344,6 +344,6 @@ public Q_SLOTS:
 }
 
 #define ScopyPlugin_iid "org.adi.Scopy.Plugins.Pluginbase/0.1"
-Q_DECLARE_INTERFACE(adiscope::Plugin, ScopyPlugin_iid)
+Q_DECLARE_INTERFACE(scopy::Plugin, ScopyPlugin_iid)
 
 #endif // PLUGIN_H

@@ -35,9 +35,9 @@
 
 #include "binding/decoder.hpp"
 
-using namespace adiscope;
-using namespace adiscope::logic;
-using namespace adiscope::m2k::logic;
+using namespace scopy;
+using namespace scopy::logic;
+using namespace scopy::m2k::logic;
 
 double LogicAnalyzer_API::getSampleRate() const
 {
@@ -171,7 +171,7 @@ QList<QList<QPair<int, int>>> LogicAnalyzer_API::getAssignedDecoderChannels() co
 {
 	QList<QList<QPair<int, int> > > assignedCh;
 	for (int i = 16; i < m_logic->m_plotCurves.size(); ++i) {
-		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[i]);
+		auto annCurve = dynamic_cast<scopy::AnnotationCurve *>(m_logic->m_plotCurves[i]);
 		if (!annCurve) {
 			continue;
 		}
@@ -193,7 +193,7 @@ void LogicAnalyzer_API::setAssignedDecoderChannels(const QList<QList<QPair<int, 
 {
 	int currentDecoder = 16;
 	for (const auto &chls : assignedDecoderChannels) {
-		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
+		auto annCurve = dynamic_cast<scopy::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
 		auto dec = annCurve->getAnnotationDecoder();
 		for (const auto &chbitid : chls) {
 			dec->assignChannel(chbitid.first, chbitid.second);
@@ -206,7 +206,7 @@ QList<QStringList> LogicAnalyzer_API::getDecoderStack() const
 {
 	QList<QStringList> decoderStack;
 	for (int i = 16; i < m_logic->m_plotCurves.size(); ++i) {
-		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[i]);
+		auto annCurve = dynamic_cast<scopy::AnnotationCurve *>(m_logic->m_plotCurves[i]);
 		if (!annCurve) {
 			continue;
 		}
@@ -226,7 +226,7 @@ void LogicAnalyzer_API::setDecoderStack(const QList<QStringList> &decoderStack)
 {
 	int currentDecoder = 16;
 	for (const auto &stack : decoderStack) {
-		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
+		auto annCurve = dynamic_cast<scopy::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
 		for (const auto &decoder : stack) {
 
 			std::shared_ptr<Decoder> dec = nullptr;
@@ -251,7 +251,7 @@ QList<QStringList> LogicAnalyzer_API::getDecoderSettings() const
 {
 	QList<QStringList> decoderSettings;
 	for (int i = 16; i < m_logic->m_plotCurves.size(); ++i) {
-		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[i]);
+		auto annCurve = dynamic_cast<scopy::AnnotationCurve *>(m_logic->m_plotCurves[i]);
 		if (!annCurve) {
 			continue;
 		}
@@ -334,7 +334,7 @@ void LogicAnalyzer_API::setDecoderSettings(const QList<QStringList> &decoderSett
 {
 	int currentDecoder = 16;
 	for (const auto &setting : decoderSettings) {
-		auto annCurve = dynamic_cast<adiscope::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
+		auto annCurve = dynamic_cast<scopy::AnnotationCurve *>(m_logic->m_plotCurves[currentDecoder]);
 		auto bindings = annCurve->getDecoderBindings();
 		int currentBinding = 0;
 		for (const auto &sett : setting) {

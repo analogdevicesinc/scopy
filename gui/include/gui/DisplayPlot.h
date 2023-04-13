@@ -83,7 +83,7 @@ Q_DECLARE_METATYPE ( QColorList )
 #include <qwt_legend_label.h>
 #endif /* QWT_VERSION < 0x060100 */
 
-namespace adiscope {
+namespace scopy {
 
 class PlotAxisConfiguration;
 
@@ -832,6 +832,6 @@ public:
 	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
 };
 
-} // adiscope
+} // scopy
 
 #endif /* M2K_DISPLAY_PLOT_H */

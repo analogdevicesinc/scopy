@@ -26,7 +26,7 @@
 
 using namespace gr;
 
-namespace adiscope {
+namespace scopy {
 class frequency_compensation_filter_impl : public frequency_compensation_filter
 {
 private:

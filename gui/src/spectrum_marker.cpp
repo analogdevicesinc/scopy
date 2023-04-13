@@ -24,7 +24,7 @@
 #include <qwt_symbol.h>
 #include <qwt_scale_map.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 SpectrumMarker::SpectrumMarker(const QString &title, bool movable) :
 	QwtPlotMarker(title), m_xAxis(QwtAxis::XBottom),

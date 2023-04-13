@@ -45,7 +45,7 @@
 /* 1k samples by default */
 #define IIO_BUFFER_SIZE 0x400
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 
 class iio_manager : public QObject, public gr::top_block
@@ -132,7 +132,7 @@ public:
 	/* Bring back the data from the iio_block source */
 	void disableMixedSignal(gr::m2k::mixed_signal_source::sptr mixed_source);
 
-	adiscope::frequency_compensation_filter::sptr freq_comp_filt[2][2];
+	scopy::frequency_compensation_filter::sptr freq_comp_filt[2][2];
 
 private:
 	libm2k::analog::M2kAnalogIn *m_analogin;

@@ -57,7 +57,7 @@
 #define copysign _copysign
 #endif
 
-using namespace adiscope;
+using namespace scopy;
 
 class TimePrecisionClass
 {

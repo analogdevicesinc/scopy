@@ -20,7 +20,7 @@
 
 #include "animationmanager.h"
 
-using namespace adiscope;
+using namespace scopy;
 AnimationManager &AnimationManager::getInstance()
 {
 	static AnimationManager INSTANCE;

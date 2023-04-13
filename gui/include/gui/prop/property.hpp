@@ -52,7 +52,7 @@ using std::function;
 
 class QWidget;
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 class SCOPYGUI_EXPORT Property : public QObject

@@ -37,7 +37,7 @@
 #include <QDebug>
 
 using namespace std;
-using namespace adiscope;
+using namespace scopy;
 
 /*
  * SpinBoxA class implementation

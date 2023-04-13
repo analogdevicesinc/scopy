@@ -46,8 +46,8 @@
 
 #include <QApplication>
 
-using namespace adiscope;
-using namespace adiscope::logic;
+using namespace scopy;
+using namespace scopy::logic;
 
 AnnotationCurve::AnnotationCurve(std::shared_ptr<logic::Decoder> initialDecoder)
 	: GenericLogicPlotCurve(initialDecoder->decoder()->name, initialDecoder->decoder()->id, LogicPlotCurveType::Annotations)
@@ -60,7 +60,7 @@ AnnotationCurve::AnnotationCurve(std::shared_ptr<logic::Decoder> initialDecoder)
 
     m_annotationDecoder = new AnnotationDecoder(this, initialDecoder);
 
-    m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, initialDecoder));
+    m_bindings.emplace_back(std::make_shared<scopy::bind::Decoder>(m_annotationDecoder, initialDecoder));
 
     connect(this, &AnnotationCurve::clicked, [=](const QPointF&p) {
         const auto result = annotationAt(p);
@@ -288,7 +288,7 @@ QWidget *AnnotationCurve::getCurrentDecoderStackMenu()
 		});
         }
 
-	m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, dec));
+	m_bindings.emplace_back(std::make_shared<scopy::bind::Decoder>(m_annotationDecoder, dec));
 	m_bindings.back()->add_properties_to_form(layout, true);
     }
 
@@ -302,11 +302,11 @@ void AnnotationCurve::stackDecoder(std::shared_ptr<logic::Decoder> decoder)
     m_bindings.clear();
     std::vector<std::shared_ptr<logic::Decoder>> stack = m_annotationDecoder->getDecoderStack();
     for (const auto &dec : stack) {
-	    m_bindings.emplace_back(std::make_shared<adiscope::bind::Decoder>(m_annotationDecoder, dec));
+	    m_bindings.emplace_back(std::make_shared<scopy::bind::Decoder>(m_annotationDecoder, dec));
     }
 }
 
-std::vector<std::shared_ptr<adiscope::logic::Decoder> > AnnotationCurve::getDecoderStack()
+std::vector<std::shared_ptr<scopy::logic::Decoder> > AnnotationCurve::getDecoderStack()
 {
 	return m_annotationDecoder->getDecoderStack();
 }

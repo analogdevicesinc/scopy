@@ -22,7 +22,7 @@
 
 #include <network_analyzer.hpp>
 
-namespace adiscope::m2k
+namespace scopy::m2k
 {
 
 class NetworkAnalyzer_API : public ApiObject

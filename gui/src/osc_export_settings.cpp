@@ -24,7 +24,7 @@
 #include <QStandardItem>
 #include <QHeaderView>
 
-using namespace adiscope;
+using namespace scopy;
 
 ExportSettings::ExportSettings(QWidget *parent) :
 	QWidget(parent),

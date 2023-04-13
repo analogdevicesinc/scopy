@@ -32,7 +32,7 @@
 
 class QJSEngine;
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYPLUGINBASE_EXPORT ScopyJS : public QObject
 {

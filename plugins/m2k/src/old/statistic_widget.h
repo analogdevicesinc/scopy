@@ -27,7 +27,7 @@ namespace Ui {
 	class Statistic;
 }
 
-namespace adiscope {
+namespace scopy {
 
 class MeasurementData;
 class Statistic;
@@ -58,6 +58,6 @@ private:
 	int m_valueLabelWidth;
 };
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif // STATISTIC_WIDGET_H

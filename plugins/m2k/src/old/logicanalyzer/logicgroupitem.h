@@ -26,7 +26,7 @@
 
 #include <QLabel>
 
-namespace adiscope {
+namespace scopy {
 class LogicGroupItem : public BaseMenuItem
 {
 	Q_OBJECT

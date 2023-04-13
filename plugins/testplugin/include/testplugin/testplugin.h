@@ -9,7 +9,7 @@
 #include "scopytestplugin_export.h"
 #include <QLineEdit>
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYTESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 {

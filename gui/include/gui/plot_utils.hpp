@@ -25,7 +25,7 @@
 #include <qstring.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT PrefixFormatter
 	{
 	public:

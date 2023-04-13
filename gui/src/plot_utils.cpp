@@ -23,7 +23,7 @@
 
 #include <cmath>
 
-using namespace adiscope;
+using namespace scopy;
 using namespace std;
 
 /*

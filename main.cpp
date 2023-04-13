@@ -55,9 +55,9 @@ int main(int argc, char *argv[])
 
 	QApplication a(argc, argv);
 
-	adiscope::ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
+	scopy::ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
-	adiscope::ScopyMainWindow w;
+	scopy::ScopyMainWindow w;
 	w.show();
 	int ret = a.exec();
 	restarter.restart(ret);

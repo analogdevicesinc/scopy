@@ -1,7 +1,7 @@
 #include "pluginfilter.h"
 #include <QJsonArray>
 
-namespace adiscope {
+namespace scopy {
 bool PluginFilter::pluginInCategory(Plugin* p, QString category) { // PluginFilter class (?)
 	if(category.isEmpty()) // no category selected
 		return true;

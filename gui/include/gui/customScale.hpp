@@ -26,7 +26,7 @@
 #include "autoScaler.hpp"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYGUI_EXPORT CustomScale : public QwtThermo
 	{
 		Q_OBJECT

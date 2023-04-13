@@ -52,7 +52,7 @@
 #include "ConstellationDisplayPlot.h"
 #include "scopygui_export.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 class SCOPYGUI_EXPORT ConstellationDisplayZoomer: public QwtPlotZoomer
 {

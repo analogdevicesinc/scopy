@@ -29,13 +29,13 @@
 #include "cursor_readouts.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class SpectrumAverage;
 	class SpectrumMarker;
 	class MarkerController;
 }
 
-namespace adiscope {
+namespace scopy {
 
 	struct marker {
 		std::shared_ptr<struct marker_data> data;

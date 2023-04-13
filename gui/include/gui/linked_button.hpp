@@ -4,7 +4,7 @@
 #include <QPushButton>
 #include <scopygui_export.h>
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT LinkedButton : public QPushButton
 {

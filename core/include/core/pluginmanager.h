@@ -6,7 +6,7 @@
 #include <pluginbase/plugin.h>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT PluginManager : public QObject
 {
 

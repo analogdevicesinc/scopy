@@ -8,7 +8,7 @@
 	#include <QtAndroidExtras/QtAndroid>
 #endif
 
-using namespace adiscope;
+using namespace scopy;
 
 ApplicationRestarter::ApplicationRestarter(const QString &executable)
         : m_executable(executable)

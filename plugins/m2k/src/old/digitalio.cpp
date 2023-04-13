@@ -43,9 +43,9 @@
 Q_LOGGING_CATEGORY(CAT_M2K_DIGITAL_IO,"M2kDigitalIo")
 
 using namespace std;
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
-namespace adiscope {
+namespace scopy {
 
 DigitalIoGroup::DigitalIoGroup(QString label, int ch_mask,int io_mask,
                                DigitalIO *dio, QWidget *parent) : QWidget(parent), ch_mask(ch_mask),

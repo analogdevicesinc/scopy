@@ -25,7 +25,7 @@
 #include <qwt_plot_shapeitem.h>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT ExtendingPlotZoomer : public LimitedPlotZoomer
 {
 public:

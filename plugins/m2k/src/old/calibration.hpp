@@ -37,7 +37,7 @@ extern "C" {
 	struct iio_buffer;
 }
 
-namespace adiscope {
+namespace scopy {
 
 class M2kAdc;
 class M2kDac;
@@ -91,6 +91,6 @@ private:
 };
 
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif /* CALIBRATION_HPP */

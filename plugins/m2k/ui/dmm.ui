@@ -67,7 +67,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="adiscope::LinkedButton" name="btnHelp"/>
+       <widget class="scopy::LinkedButton" name="btnHelp"/>
       </item>
       <item>
        <spacer name="horizontalSpacer_3">
@@ -153,7 +153,7 @@ QPushButton:disabled {
       <number>0</number>
      </property>
      <item>
-      <widget class="adiscope::DetachDragZone" name="leftPanel" native="true">
+      <widget class="scopy::DetachDragZone" name="leftPanel" native="true">
        <property name="styleSheet">
         <string notr="true"/>
        </property>
@@ -205,7 +205,7 @@ QPushButton:disabled {
                <number>0</number>
               </property>
               <item>
-               <widget class="adiscope::Sismograph" name="sismograph_ch1">
+               <widget class="scopy::Sismograph" name="sismograph_ch1">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -289,7 +289,7 @@ text-align:center;</string>
                   <number>0</number>
                  </property>
                  <item row="1" column="1">
-                  <widget class="adiscope::LcdNumber" name="minCh1">
+                  <widget class="scopy::LcdNumber" name="minCh1">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                      <horstretch>0</horstretch>
@@ -317,7 +317,7 @@ text-align:center;</string>
                   </widget>
                  </item>
                  <item row="2" column="1">
-                  <widget class="adiscope::LcdNumber" name="maxCh1">
+                  <widget class="scopy::LcdNumber" name="maxCh1">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                      <horstretch>0</horstretch>
@@ -439,7 +439,7 @@ text-align:center;</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="adiscope::LcdNumber" name="lcdCh1">
+                 <widget class="scopy::LcdNumber" name="lcdCh1">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -493,7 +493,7 @@ QLabel{font-size:35pt;}</string>
                </layout>
               </item>
               <item>
-               <widget class="adiscope::CustomScale" name="scaleCh1" native="true">
+               <widget class="scopy::CustomScale" name="scaleCh1" native="true">
                 <property name="lowerBound" stdset="0">
                  <double>-0.100000000000000</double>
                 </property>
@@ -545,7 +545,7 @@ QLabel{font-size:35pt;}</string>
                <number>0</number>
               </property>
               <item>
-               <widget class="adiscope::Sismograph" name="sismograph_ch2">
+               <widget class="scopy::Sismograph" name="sismograph_ch2">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -654,7 +654,7 @@ text-align:center;</string>
                   </widget>
                  </item>
                  <item row="1" column="1">
-                  <widget class="adiscope::LcdNumber" name="minCh2">
+                  <widget class="scopy::LcdNumber" name="minCh2">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                      <horstretch>0</horstretch>
@@ -695,7 +695,7 @@ text-align:center;</string>
                   </spacer>
                  </item>
                  <item row="2" column="1">
-                  <widget class="adiscope::LcdNumber" name="maxCh2">
+                  <widget class="scopy::LcdNumber" name="maxCh2">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
                      <horstretch>0</horstretch>
@@ -782,7 +782,7 @@ text-align:center;</string>
                  </spacer>
                 </item>
                 <item>
-                 <widget class="adiscope::LcdNumber" name="lcdCh2">
+                 <widget class="scopy::LcdNumber" name="lcdCh2">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                     <horstretch>0</horstretch>
@@ -836,7 +836,7 @@ QLabel{font-size:35pt;}</string>
                </layout>
               </item>
               <item>
-               <widget class="adiscope::CustomScale" name="scaleCh2" native="true">
+               <widget class="scopy::CustomScale" name="scaleCh2" native="true">
                 <property name="lowerBound" stdset="0">
                  <double>-0.100000000000000</double>
                 </property>
@@ -859,7 +859,7 @@ QLabel{font-size:35pt;}</string>
            </layout>
           </item>
           <item>
-           <widget class="adiscope::InstrumentNotes" name="instrumentNotes" native="true">
+           <widget class="scopy::InstrumentNotes" name="instrumentNotes" native="true">
             <property name="styleSheet">
              <string notr="true"/>
             </property>
@@ -887,7 +887,7 @@ QLabel{font-size:35pt;}</string>
       </widget>
      </item>
      <item>
-      <widget class="adiscope::DetachDragZone" name="widget_2" native="true">
+      <widget class="scopy::DetachDragZone" name="widget_2" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -1120,7 +1120,7 @@ QLabel{font-size:35pt;}</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="adiscope::CustomSwitch" name="histogramCh1">
+                 <widget class="scopy::CustomSwitch" name="histogramCh1">
                   <property name="checkable">
                    <bool>true</bool>
                   </property>
@@ -1398,7 +1398,7 @@ QLabel{font-size:35pt;}</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="adiscope::CustomSwitch" name="histogramCh2">
+                 <widget class="scopy::CustomSwitch" name="histogramCh2">
                   <property name="checkable">
                    <bool>true</bool>
                   </property>
@@ -1630,7 +1630,7 @@ QLabel{font-size:35pt;}</string>
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="adiscope::CustomSwitch" name="btnDisplayPeakHold">
+                  <widget class="scopy::CustomSwitch" name="btnDisplayPeakHold">
                    <property name="text">
                     <string/>
                    </property>
@@ -1795,7 +1795,7 @@ line-height: 14px;
                 <number>0</number>
                </property>
                <item row="0" column="0">
-                <widget class="adiscope::CustomSwitch" name="btnDataLogging">
+                <widget class="scopy::CustomSwitch" name="btnDataLogging">
                  <property name="text">
                   <string/>
                  </property>
@@ -1988,24 +1988,24 @@ line-height: 14px;
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::DetachDragZone</class>
+   <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
    <header>gui/detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::InstrumentNotes</class>
+   <class>scopy::InstrumentNotes</class>
    <extends>QWidget</extends>
    <header>gui/instrumentnotes.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::LinkedButton</class>
+   <class>scopy::LinkedButton</class>
    <extends>QPushButton</extends>
    <header>gui/linked_button.hpp</header>
   </customwidget>
@@ -2015,18 +2015,18 @@ line-height: 14px;
    <header>qwt_thermo.h</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::LcdNumber</class>
+   <class>scopy::LcdNumber</class>
    <extends>QLCDNumber</extends>
    <header>lcdNumber.hpp</header>
   </customwidget>
   <customwidget>
-   <class>adiscope::Sismograph</class>
+   <class>scopy::Sismograph</class>
    <extends>QFrame</extends>
    <header>sismograph.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>adiscope::CustomScale</class>
+   <class>scopy::CustomScale</class>
    <extends>QwtThermo</extends>
    <header>gui/customScale.hpp</header>
   </customwidget>

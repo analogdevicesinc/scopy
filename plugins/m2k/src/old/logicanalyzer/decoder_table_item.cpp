@@ -24,7 +24,7 @@
 #include <QDebug>
 #include <qwt_text.h>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 
 namespace logic {
@@ -182,5 +182,5 @@ QSize DecoderTableItem::sizeHint() const
 
 
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy
 

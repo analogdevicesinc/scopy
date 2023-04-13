@@ -28,7 +28,7 @@
 #include <QStandardPaths>
 
 Q_LOGGING_CATEGORY(CAT_APIOBJECT,"ApiObject");
-using namespace adiscope;
+using namespace scopy;
 
 ApiObject::ApiObject(QObject *parent) : QObject(parent)
 {

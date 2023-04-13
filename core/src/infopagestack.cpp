@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <device.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_INFOPAGESTACK, "InfoPageStack")
 

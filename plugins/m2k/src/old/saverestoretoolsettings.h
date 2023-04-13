@@ -6,7 +6,7 @@
 #include <QTemporaryFile>
 #include <QtGlobal>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class SaveRestoreToolSettings
 {
 	SaveRestoreToolSettings(const SaveRestoreToolSettings &) = delete;
@@ -22,6 +22,6 @@ private:
 	QTemporaryFile m_temp;
 	M2kTool *m_tool;
 };
-} // namespace adiscope
+} // namespace scopy
 
 #endif // SAVERESTORETOOLSETTINGS_H

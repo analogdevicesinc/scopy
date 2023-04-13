@@ -3,7 +3,7 @@
 #include <pluginbase/plugin.h>
 
 
-namespace adiscope {
+namespace scopy {
 class PluginFilter
 {
 

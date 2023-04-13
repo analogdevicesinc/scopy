@@ -24,7 +24,7 @@
 
 using namespace gr;
 
-namespace adiscope {
+namespace scopy {
 frequency_compensation_filter_impl::frequency_compensation_filter_impl(
 	bool enable, float TC, float gain,
 	float sample_rate)

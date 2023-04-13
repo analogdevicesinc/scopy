@@ -45,7 +45,7 @@
 
 #include "prop/bool.hpp"
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 Bool::Bool(QString name, QString desc, Getter getter, Setter setter) :

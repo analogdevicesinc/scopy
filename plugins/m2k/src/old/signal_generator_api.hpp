@@ -23,11 +23,11 @@
 #include "signal_generator.hpp"
 #include "pluginbase/apiobject.h"
 
-namespace adiscope::m2k {
-using namespace adiscope;
+namespace scopy::m2k {
+using namespace scopy;
 
 struct signal_generator_data;
-class SignalGenerator_API : public adiscope::ApiObject
+class SignalGenerator_API : public scopy::ApiObject
 {
 	Q_OBJECT
 

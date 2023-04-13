@@ -26,16 +26,16 @@
 using namespace gr;
 
 
-mixed_signal_sink::sptr mixed_signal_sink::make(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer,
-						adiscope::TimeDomainDisplayPlot *oscPlot,
+mixed_signal_sink::sptr mixed_signal_sink::make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
+						scopy::TimeDomainDisplayPlot *oscPlot,
 						int bufferSize)
 {
 	return gnuradio::get_initial_sptr(
 				new mixed_signal_sink_impl(logicAnalyzer, oscPlot, bufferSize));
 }
 
-mixed_signal_sink_impl::mixed_signal_sink_impl(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer,
-					       adiscope::TimeDomainDisplayPlot *oscPlot,
+mixed_signal_sink_impl::mixed_signal_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
+					       scopy::TimeDomainDisplayPlot *oscPlot,
 					       int bufferSize)
 	: sync_block("mixed_signal_sink",
 		     io_signature::make3(3, 3, sizeof(float), sizeof(float), sizeof(unsigned short)),

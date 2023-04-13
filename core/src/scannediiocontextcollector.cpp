@@ -4,7 +4,7 @@
 
 Q_LOGGING_CATEGORY(CAT_SCANCTXCOLLECTOR, "ScannedIIOContextCollector")
 
-using namespace adiscope;
+using namespace scopy;
 ScannedIIOContextCollector::ScannedIIOContextCollector(QObject *parent)
 	: QObject{parent}
 {

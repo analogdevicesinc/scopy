@@ -29,7 +29,7 @@
 #include <QDrag>
 #include <QMimeData>
 
-using namespace adiscope;
+using namespace scopy;
 
 const char *BaseMenuItem::menuItemMimeDataType = "menuItem";
 

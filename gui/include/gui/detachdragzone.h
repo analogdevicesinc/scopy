@@ -29,7 +29,7 @@
 #include "coloredQWidget.h"
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT DetachDragZone : public ColoredQWidget
 {
 	Q_OBJECT

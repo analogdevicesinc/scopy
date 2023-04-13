@@ -26,8 +26,8 @@
 class mixed_signal_sink_impl : public mixed_signal_sink
 {
 public:
-	mixed_signal_sink_impl(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer,
-			       adiscope::TimeDomainDisplayPlot *oscPlot,
+	mixed_signal_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
+			       scopy::TimeDomainDisplayPlot *oscPlot,
 			       int bufferSize);
 
 	int work(int noutput_items,
@@ -44,8 +44,8 @@ private:
 	void _reset();
 
 private:
-	adiscope::m2k::logic::LogicAnalyzer *d_logic_analyzer;
-	adiscope::TimeDomainDisplayPlot *d_osc_plot;
+	scopy::m2k::logic::LogicAnalyzer *d_logic_analyzer;
+	scopy::TimeDomainDisplayPlot *d_osc_plot;
 
 	std::vector<float*> d_analog_buffer;
 	std::vector<double*> d_analog_plot_buffers;

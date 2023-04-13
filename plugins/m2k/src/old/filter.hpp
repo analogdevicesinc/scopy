@@ -32,7 +32,7 @@ extern "C" {
 	struct iio_device;
 }
 
-namespace adiscope::m2k{
+namespace scopy::m2k{
 
 	enum tool {
 		TOOL_OSCILLOSCOPE = 0,

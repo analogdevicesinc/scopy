@@ -20,7 +20,7 @@
 #include "power_controller_api.hpp"
 #include "ui_powercontrol.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 void PowerController_API::show()
 {
 	Q_EMIT pw->showTool();

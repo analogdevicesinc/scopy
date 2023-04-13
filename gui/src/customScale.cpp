@@ -22,7 +22,7 @@
 
 #include <qwt_scale_engine.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomScale::CustomScale(QWidget *parent) :
 	QwtThermo(parent)

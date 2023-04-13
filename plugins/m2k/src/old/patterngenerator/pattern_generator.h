@@ -47,12 +47,12 @@ namespace Ui {
 class PatternGenerator;
 }
 
-namespace adiscope {
+namespace scopy {
 class BaseMenu;
 class CustomPushButton;
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class Filter;
 class DIOManager;
 class PatternUI;
@@ -150,5 +150,5 @@ private:
 };
 
 } // namespace logic
-} // namespace adiscope
+} // namespace scopy
 #endif // PATTERNGENERATOR_H

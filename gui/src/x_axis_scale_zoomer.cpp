@@ -23,7 +23,7 @@
 
 #include <dbgraph.hpp>
 
-using namespace adiscope;
+using namespace scopy;
 
 XAxisScaleZoomer::XAxisScaleZoomer(QWidget *parent):
 	OscScaleZoomer(parent)

@@ -27,9 +27,9 @@
 #include <string>
 #include <fstream>
 
-using namespace adiscope;
+using namespace scopy;
 
-namespace adiscope {
+namespace scopy {
 	class CrossPoint
 	{
 		public:

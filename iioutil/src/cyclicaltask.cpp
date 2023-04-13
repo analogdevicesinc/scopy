@@ -5,7 +5,7 @@
 
 Q_LOGGING_CATEGORY(CAT_CYCLICALTASK, "CyclicalTask")
 
-using namespace adiscope;
+using namespace scopy;
 CyclicalTask::CyclicalTask(QThread *task, QObject *parent) : QObject(parent)
 {
 	qDebug(CAT_CYCLICALTASK)<< "ctor ";

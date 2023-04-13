@@ -51,7 +51,7 @@ class dioGroup;
 class dioChannel;
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class DigitalIO;
 class DigitalIO_API;
 
@@ -123,7 +123,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void showTool();
 };
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // DIGITAL_IO_H
 

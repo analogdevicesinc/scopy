@@ -31,8 +31,8 @@ class mixed_signal_sink : virtual public gr::sync_block
 public:
 	typedef std::shared_ptr<mixed_signal_sink> sptr;
 
-	static sptr make(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer,
-	                 adiscope::TimeDomainDisplayPlot *oscPlot,
+	static sptr make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
+	                 scopy::TimeDomainDisplayPlot *oscPlot,
 	                 int bufferSize);
 
 	virtual void clean_buffers() = 0;

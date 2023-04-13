@@ -31,7 +31,7 @@
 #include "gui/utils.h"
 #include <QLoggingCategory>
 
-using namespace adiscope;
+using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
 ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *parent):

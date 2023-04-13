@@ -29,7 +29,7 @@ namespace Ui {
 class CustomPlotPositionButton;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT CustomPlotPositionButton : public ColoredQWidget
 {
 	Q_OBJECT

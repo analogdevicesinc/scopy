@@ -37,7 +37,7 @@
 #include "m2kpluginExceptionHandler.h"
 
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace std;
 using namespace libm2k;
 using namespace libm2k::context;

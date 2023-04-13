@@ -40,7 +40,7 @@
 
 #include "prop/property.hpp"
 
-namespace adiscope {
+namespace scopy {
 namespace prop {
 
 Property::Property(QString name, QString desc, Getter getter, Setter setter) :

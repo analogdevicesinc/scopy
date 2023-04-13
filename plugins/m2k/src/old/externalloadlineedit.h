@@ -3,7 +3,7 @@
 
 #include <QLineEdit>
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class ExternalLoadLineEdit : public QLineEdit
 {
 	Q_OBJECT

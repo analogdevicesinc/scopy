@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item row="2" column="0" colspan="3">
-    <widget class="adiscope::OscCustomScrollArea" name="scrollArea">
+    <widget class="scopy::OscCustomScrollArea" name="scrollArea">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
@@ -188,7 +188,7 @@ QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::OscCustomScrollArea</class>
+   <class>scopy::OscCustomScrollArea</class>
    <extends>QScrollArea</extends>
    <header>gui/osc_custom_scroll.h</header>
    <container>1</container>

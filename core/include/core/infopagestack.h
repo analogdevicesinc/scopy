@@ -7,7 +7,7 @@
 #include "gui/homepage_controls.h"
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 // implement slide to-from  next/prev page - emits to button selection group
 

@@ -865,7 +865,7 @@ AC Coupling</string>
            </widget>
           </item>
           <item>
-           <widget class="adiscope::CustomSwitch " name="btnCoupled">
+           <widget class="scopy::CustomSwitch " name="btnCoupled">
             <property name="text">
              <string/>
             </property>
@@ -1294,7 +1294,7 @@ AC Coupling</string>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch </class>
+   <class>scopy::CustomSwitch </class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>

@@ -9,7 +9,7 @@
 #include "scopybareminimumplugin_export.h"
 #include <QLineEdit>
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYBAREMINIMUMPLUGIN_EXPORT BareMinimum : public QObject, public PluginBase
 {

@@ -20,7 +20,7 @@
 #include "dmm_api.hpp"
 #include "ui_dmm.h"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 void DMM_API::show()
 {

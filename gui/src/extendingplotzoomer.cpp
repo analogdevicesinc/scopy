@@ -21,7 +21,7 @@
 #include "oscilloscope_plot.hpp"
 #include <QPainterPath>
 
-using namespace adiscope;
+using namespace scopy;
 
 ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot):
     LimitedPlotZoomer(parent, doReplot),

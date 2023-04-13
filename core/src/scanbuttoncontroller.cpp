@@ -1,6 +1,6 @@
 #include "scanbuttoncontroller.h"
 
-using namespace adiscope;
+using namespace scopy;
 
 ScanButtonController::ScanButtonController(CyclicalTask *cs , QPushButton *btn, QObject *parent)
 	: QObject{parent}

@@ -88,8 +88,8 @@
 #define FREQUENCY_CT	40
 
 
-using namespace adiscope;
-using namespace adiscope::m2k;
+using namespace scopy;
+using namespace scopy::m2k;
 using namespace gr;
 using namespace libm2k::context;
 using namespace libm2k::analog;

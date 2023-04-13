@@ -52,25 +52,25 @@ using std::shared_ptr;
 
 struct srd_decoder_option;
 
-namespace adiscope {
+namespace scopy {
 namespace logic {
 class Decoder;
 }
 }
 
-namespace adiscope {
+namespace scopy {
 
 namespace bind {
 
 class SCOPYGUI_EXPORT Decoder : public Binding
 {
 public:
-	Decoder(adiscope::AnnotationDecoder *annDec,
-	shared_ptr<adiscope::logic::Decoder> decoder);
+	Decoder(scopy::AnnotationDecoder *annDec,
+	shared_ptr<scopy::logic::Decoder> decoder);
 
 	static QVariant gVariantToQVariant(GVariant *value);
 private:
-	static shared_ptr<adiscope::prop::Property> bind_enum(const QString &name,
+	static shared_ptr<scopy::prop::Property> bind_enum(const QString &name,
 		const QString &desc, const srd_decoder_option *option,
 		prop::Property::Getter getter, prop::Property::Setter setter);
 
@@ -79,7 +79,7 @@ private:
 	void setter(const char *id, QVariant value);
 
 private:
-	adiscope::AnnotationDecoder *m_annDecoder;
+	scopy::AnnotationDecoder *m_annDecoder;
     shared_ptr<logic::Decoder> decoder_;
 };
 

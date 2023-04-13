@@ -6,7 +6,7 @@
 #include "scopycore_export.h"
 #include <QSettings>
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT Device {
 public:
 	virtual ~Device(){};

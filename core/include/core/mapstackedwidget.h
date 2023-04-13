@@ -5,7 +5,7 @@
 #include <QMap>
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT MapStackedWidget : public QStackedWidget
 {
 	Q_OBJECT

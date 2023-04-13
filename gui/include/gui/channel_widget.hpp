@@ -29,7 +29,7 @@ namespace Ui {
 class Channel;
 }
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT ChannelWidget: public QWidget
 {
@@ -104,6 +104,6 @@ private:
 	bool m_floatingMenu;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif // CHANNEL_WIDGET_HPP

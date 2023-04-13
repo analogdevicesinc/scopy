@@ -10,7 +10,7 @@ class logic_analyzer_sink : virtual public gr::sync_block
 public:
 	typedef std::shared_ptr<logic_analyzer_sink> sptr;
 
-	static sptr make(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize);
+	static sptr make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize);
 
 	virtual void clean_buffers() = 0;
 	virtual void set_nsamps(int newsize) = 0;

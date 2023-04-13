@@ -25,7 +25,7 @@
 #include "gui/customPushButton.h"
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The ToolMenuItem class
  */

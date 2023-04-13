@@ -6,7 +6,7 @@
 #include "apiobject.h"
 
 
-namespace adiscope {
+namespace scopy {
 /**
  * @brief The PluginBase class
  * PluginBase is used to provide default implementation to the plugin interface
@@ -76,7 +76,7 @@ protected:
 
 #define SCOPY_PLUGIN \
 	Q_PLUGIN_METADATA(IID ScopyPlugin_iid)\
-	Q_INTERFACES(adiscope::Plugin)\
+	Q_INTERFACES(scopy::Plugin)\
 public:\
 	virtual ~SCOPY_PLUGIN_NAME () override {}\
 	SCOPY_PLUGIN_NAME* clone(QObject *parent) override { \

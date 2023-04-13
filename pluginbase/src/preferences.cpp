@@ -5,7 +5,7 @@
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCES,"Preferences");
 
-using namespace adiscope;
+using namespace scopy;
 
 Preferences* Preferences::pinstance_{nullptr};
 

@@ -28,7 +28,7 @@ class QJSEngine;
 class QSettings;
 template <typename T> class QList;
 
-namespace adiscope {
+namespace scopy {
 	class SCOPYPLUGINBASE_EXPORT ApiObject : public QObject
 	{
 		Q_OBJECT
@@ -59,6 +59,6 @@ namespace adiscope {
 	};
 }
 
-Q_DECLARE_METATYPE(adiscope::ApiObject *)
+Q_DECLARE_METATYPE(scopy::ApiObject *)
 
 #endif /* APIOBJECT_HPP */

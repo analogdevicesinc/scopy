@@ -6,7 +6,7 @@
 #include "scopycore_export.h"
 #include "iioutil/cyclicaltask.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ScanButtonController : public QObject
 {
 	Q_OBJECT

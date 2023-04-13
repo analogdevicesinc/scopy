@@ -3,7 +3,7 @@
 #include <QList>
 #include <pluginbase/plugin.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 class TST_M2k : public QObject
 {

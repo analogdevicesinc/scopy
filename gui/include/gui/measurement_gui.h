@@ -26,7 +26,7 @@
 class QLabel;
 class QColor;
 
-namespace adiscope {
+namespace scopy {
 
 class MeasurementData;
 
@@ -109,6 +109,6 @@ public:
 	virtual void update(const MeasurementData& data, double displayScale);
 };
 
-} // namespace adiscope
+} // namespace scopy
 
 #endif // MEASUREMENT_GUI_H

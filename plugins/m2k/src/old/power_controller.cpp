@@ -37,7 +37,7 @@
 
 #define TIMER_TIMEOUT_MS	200
 
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace libm2k::context;
 using namespace libm2k::analog;
 

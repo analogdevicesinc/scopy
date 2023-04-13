@@ -29,7 +29,7 @@
 #include <qwt_scale_div.h>
 #include <qwt_scale_map.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 CursorReadouts::CursorReadouts(QwtPlot *plot):
 	QWidget(plot),

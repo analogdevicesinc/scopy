@@ -54,7 +54,7 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
-namespace adiscope {
+namespace scopy {
 namespace bind {
 
 const vector< shared_ptr<prop::Property> >& Binding::properties()
@@ -64,7 +64,7 @@ const vector< shared_ptr<prop::Property> >& Binding::properties()
 
 void Binding::commit()
 {
-	for (shared_ptr<adiscope::prop::Property> p : properties_) {
+	for (shared_ptr<scopy::prop::Property> p : properties_) {
 		assert(p);
 		p->commit();
 	}
@@ -76,7 +76,7 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 
 	help_labels_.clear();
 
-	for (shared_ptr<adiscope::prop::Property> p : properties_) {
+	for (shared_ptr<scopy::prop::Property> p : properties_) {
 		assert(p);
 
 		QWidget *widget;
@@ -132,7 +132,7 @@ QWidget* Binding::get_property_form(QWidget *parent, bool auto_commit)
 
 void Binding::update_property_widgets()
 {
-	for (shared_ptr<adiscope::prop::Property> p : properties_) {
+	for (shared_ptr<scopy::prop::Property> p : properties_) {
 		assert(p);
 		p->update_widget();
 	}
@@ -157,6 +157,6 @@ void Binding::on_help_clicked()
 }
 
 }  // namespace binding
-}  // namespace adiscope
+}  // namespace scopy
 
 #include "binding/moc_binding.cpp"

@@ -56,19 +56,19 @@ using std::shared_ptr;
 using std::string;
 using std::vector;
 
-using adiscope::prop::Double;
-using adiscope::prop::Enum;
-using adiscope::prop::Int;
-using adiscope::prop::Property;
-using adiscope::prop::String;
+using scopy::prop::Double;
+using scopy::prop::Enum;
+using scopy::prop::Int;
+using scopy::prop::Property;
+using scopy::prop::String;
 
 
-namespace adiscope {
+namespace scopy {
 namespace bind {
 
 Decoder::Decoder(
-    adiscope::AnnotationDecoder *annDecoder,
-    shared_ptr<adiscope::logic::Decoder> decoder) :
+    scopy::AnnotationDecoder *annDecoder,
+    shared_ptr<scopy::logic::Decoder> decoder) :
     m_annDecoder(annDecoder),
 	decoder_(decoder)
 {
@@ -276,4 +276,4 @@ void Decoder::setter(const char *id, QVariant value)
 }
 
 }  // namespace binding
-}  // namespace adiscope
+}  // namespace scopy

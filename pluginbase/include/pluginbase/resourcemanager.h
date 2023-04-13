@@ -5,7 +5,7 @@
 #include <QMap>
 #include "scopypluginbase_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYPLUGINBASE_EXPORT ResourceUser {
 public:

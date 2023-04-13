@@ -32,13 +32,13 @@ class QStandardItem;
 class QStandardItemModel;
 
 
-namespace adiscope {
+namespace scopy {
 class CapturePlot;
 class DropdownSwitchList;
 class MeasurementData;
 }
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class MeasurementItem
 {
 public:
@@ -181,6 +181,6 @@ private:
 	QList<struct StatisticSelection> m_selectedStatistics;
 	QList<struct StatisticSelection> m_statsDeleteAllBackup;
 };
-} // namespace adiscope
+} // namespace scopy
 
 #endif // MEASURE_SETTINGS_H

@@ -24,7 +24,7 @@
 
 #include "signal_sample.hpp"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class cancel_dc_offset_block : public gr::hier_block2, public QObject
 {
 public:

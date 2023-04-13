@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QTabBar>
 
-using namespace adiscope;
+using namespace scopy;
 ScopyAboutPage::ScopyAboutPage(QWidget *parent) : QTabWidget(parent)
 {
 	setTabPosition(TabPosition::East);

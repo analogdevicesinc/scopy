@@ -25,7 +25,7 @@
 
 class QWidget;
 
-namespace adiscope {
+namespace scopy {
 	void SCOPYGUI_EXPORT setDynamicProperty(QWidget *widget,
 			const char *property, bool set);
 	bool SCOPYGUI_EXPORT getDynamicProperty(QWidget *widget,

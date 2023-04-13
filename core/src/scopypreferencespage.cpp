@@ -7,7 +7,7 @@
 #include "pluginbase/preferenceshelper.h"
 #include "application_restarter.h"
 
-using namespace adiscope;
+using namespace scopy;
 ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent) : QTabWidget(parent)
 {
 	setTabPosition(TabPosition::East);

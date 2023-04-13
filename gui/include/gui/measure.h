@@ -26,7 +26,7 @@
 #include <memory>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 	class CrossingDetection;
 
 	class SCOPYGUI_EXPORT MeasurementData

@@ -92,11 +92,11 @@ Q_LOGGING_CATEGORY(CAT_M2K_OSCILLOSCOPE,"M2kOscilloscope");
 #define MIN_MATH_RANGE SHRT_MIN
 #define MAX_AMPL 25
 
-namespace adiscope {
+namespace scopy {
 
 class AnalogBufferPreviewer;
 }
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 using namespace gr;
 using namespace std;
 using namespace libm2k;
@@ -191,16 +191,16 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt,
 
 	/* Gnuradio Blocks */
 
-	this->qt_time_block = adiscope::scope_sink_f::make(1024, active_sample_rate,
+	this->qt_time_block = scope_sink_f::make(1024, active_sample_rate,
 		"Osc Time", nb_channels, (QObject *)&plot);
 
-	this->qt_fft_block = adiscope::scope_sink_f::make(fft_plot_size, active_sample_rate,
+	this->qt_fft_block = scope_sink_f::make(fft_plot_size, active_sample_rate,
 			"Osc Frequency", nb_channels, (QObject *)&fft_plot);
 
-	this->qt_hist_block = adiscope::histogram_sink_f::make(1024, 250, 0, 20,
+	this->qt_hist_block = histogram_sink_f::make(1024, 250, 0, 20,
 			"Osc Histogram", nb_channels, (QObject *)&hist_plot);
 
-	this->qt_xy_block = adiscope::xy_sink_c::make(
+	this->qt_xy_block = xy_sink_c::make(
 			400, "Osc XY", nb_channels / 2, (QObject*)&xy_plot);
 
 	this->qt_time_block->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
@@ -2502,7 +2502,7 @@ void Oscilloscope::add_math_channel(const std::string& function)
 	QString qname = QString("Math %1").arg(math_chn_counter++);
 	std::string name = qname.toStdString();
 
-	auto math_sink = adiscope::scope_sink_f::make(
+	auto math_sink = scope_sink_f::make(
 			noZoomXAxisWidth * getSampleRate() / m_m2k_analogin->getOversamplingRatio(),
 			getSampleRate() / m_m2k_analogin->getOversamplingRatio(), name, 1, (QObject *)&plot);
 

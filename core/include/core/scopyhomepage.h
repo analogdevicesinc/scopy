@@ -11,7 +11,7 @@ namespace Ui {
 class ScopyHomePage;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ScopyHomePage : public QWidget
 {
 	Q_OBJECT

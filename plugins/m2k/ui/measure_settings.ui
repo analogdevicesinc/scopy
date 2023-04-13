@@ -284,14 +284,14 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="adiscope::CustomSwitch" name="button_Counter">
+            <widget class="scopy::CustomSwitch" name="button_Counter">
              <property name="checkable">
               <bool>true</bool>
              </property>
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="adiscope::CustomSwitch" name="button_measDisplayAll">
+            <widget class="scopy::CustomSwitch" name="button_measDisplayAll">
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -429,7 +429,7 @@
             <number>16</number>
            </property>
            <item row="0" column="0">
-            <widget class="adiscope::CustomSwitch" name="button_StatisticsEn">
+            <widget class="scopy::CustomSwitch" name="button_StatisticsEn">
              <property name="checkable">
               <bool>true</bool>
              </property>
@@ -636,7 +636,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="adiscope::CustomSwitch" name="button_GatingEnable">
+            <widget class="scopy::CustomSwitch" name="button_GatingEnable">
              <property name="text">
               <string/>
              </property>
@@ -741,7 +741,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>

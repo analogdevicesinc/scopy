@@ -42,7 +42,7 @@ namespace Ui {
 class SpinBoxA;
 }
 
-namespace adiscope {
+namespace scopy {
 /*
  * SpinBoxA - Is a composite widget which contains the following:
  *   - a QLineEdit (displays the value of SpinBoxA)
@@ -235,7 +235,7 @@ public Q_SLOTS:
 	void enableNumberSeriesRebuild(bool enable);
 
 protected:
-	adiscope::NumberSeries m_steps;
+	scopy::NumberSeries m_steps;
 	double m_fine_increment;
 	bool m_numberSeriesRebuild;
 	int integer_divider;

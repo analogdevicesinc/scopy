@@ -24,7 +24,7 @@
 #include <QObject>
 #include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
 class SCOPYGUI_EXPORT MouseWheelWidgetGuard : public QObject
 {

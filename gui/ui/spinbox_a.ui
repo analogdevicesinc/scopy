@@ -130,13 +130,13 @@
     </layout>
    </item>
    <item>
-    <widget class="adiscope::CompletionCircle" name="SBA_CompletionCircle"/>
+    <widget class="scopy::CompletionCircle" name="SBA_CompletionCircle"/>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CompletionCircle</class>
+   <class>scopy::CompletionCircle</class>
    <extends>QDial</extends>
    <header>completion_circle.h</header>
   </customwidget>

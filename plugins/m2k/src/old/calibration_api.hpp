@@ -22,7 +22,7 @@
 
 #include "calibration.hpp"
 
-namespace adiscope {
+namespace scopy {
 
 class Calibration_API: public ApiObject
 {

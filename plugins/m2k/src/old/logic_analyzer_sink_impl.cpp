@@ -6,14 +6,14 @@
 
 using namespace gr;
 
-logic_analyzer_sink::sptr logic_analyzer_sink::make(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer,
+logic_analyzer_sink::sptr logic_analyzer_sink::make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
 						    int bufferSize)
 {
 	return gnuradio::get_initial_sptr(
 				new logic_analyzer_sink_impl(logicAnalyzer, bufferSize));
 }
 
-logic_analyzer_sink_impl::logic_analyzer_sink_impl(adiscope::m2k::logic::LogicAnalyzer *logicAnalyzer,
+logic_analyzer_sink_impl::logic_analyzer_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
 						   int bufferSize)
 	: sync_block("logic_analyzer_sync",
 		     io_signature::make(1, 1, sizeof(uint16_t)),

@@ -6,7 +6,7 @@
 
 Q_LOGGING_CATEGORY(CAT_CTXMGR, "ContextProvider")
 
-using namespace adiscope;
+using namespace scopy;
 ContextRefCounter::ContextRefCounter(QString uri)
 {
 	this->uri = uri;

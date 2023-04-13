@@ -32,11 +32,11 @@ namespace Ui {
 class BaseMenuItem;
 }
 
-namespace adiscope {
+namespace scopy {
 class BaseMenu;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYGUI_EXPORT BaseMenuItem : public ColoredQWidget
 {
 	Q_OBJECT

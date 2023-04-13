@@ -17,7 +17,7 @@ class SWIOTConfigTool;
 class SWIOTRuntime;
 }
 
-namespace adiscope {
+namespace scopy {
 class SCOPYSWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT

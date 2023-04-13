@@ -29,8 +29,8 @@
 #include "signal_generator.hpp"
 #include "spectrum_analyzer.hpp"
 
-using namespace adiscope;
-using namespace adiscope::m2k;
+using namespace scopy;
+using namespace scopy::m2k;
 
 Q_LOGGING_CATEGORY(CAT_M2KPLUGIN,"M2KPLUGIN");
 

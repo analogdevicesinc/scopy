@@ -2,7 +2,7 @@
 #include <iio.h>
 #include <QLoggingCategory>
 
-using namespace adiscope;
+using namespace scopy;
 IIOScanTask::IIOScanTask(QObject *parent) : QThread(parent) {}
 
 IIOScanTask::~IIOScanTask() {}

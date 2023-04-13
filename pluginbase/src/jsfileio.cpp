@@ -21,7 +21,7 @@
 #include <QFile>
 #include <QTextStream>
 
-using namespace adiscope;
+using namespace scopy;
 
 JsFileIo::JsFileIo(QObject *parent): QObject(parent)
 {

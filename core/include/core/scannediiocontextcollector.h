@@ -6,7 +6,7 @@
 #include "device.h"
 #include "scopycore_export.h"
 
-namespace adiscope {
+namespace scopy {
 class SCOPYCORE_EXPORT ScannedIIOContextCollector : public QObject
 {
 	Q_OBJECT

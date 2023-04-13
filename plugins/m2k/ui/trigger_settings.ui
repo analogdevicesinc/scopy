@@ -158,7 +158,7 @@
             <number>10</number>
            </property>
            <item>
-            <widget class="adiscope::CustomSwitch" name="btnTrigger">
+            <widget class="scopy::CustomSwitch" name="btnTrigger">
              <property name="styleSheet">
               <string notr="true">QPushButton {
 min-height: 30px;
@@ -329,7 +329,7 @@ color: rgba(255,255,255,51);
           </layout>
          </item>
          <item>
-          <widget class="adiscope::CustomSwitch" name="intern_en">
+          <widget class="scopy::CustomSwitch" name="intern_en">
            <property name="text">
             <string/>
            </property>
@@ -552,7 +552,7 @@ color: rgba(255,255,255,51);
           </widget>
          </item>
          <item>
-          <widget class="adiscope::CustomSwitch" name="extern_en">
+          <widget class="scopy::CustomSwitch" name="extern_en">
            <property name="text">
             <string/>
            </property>
@@ -875,7 +875,7 @@ color: rgba(255,255,255,51);
           </layout>
          </item>
          <item>
-          <widget class="adiscope::CustomSwitch" name="extern_to_en">
+          <widget class="scopy::CustomSwitch" name="extern_to_en">
            <property name="text">
             <string/>
            </property>
@@ -959,7 +959,7 @@ color: rgba(255,255,255,51);
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomSwitch</class>
+   <class>scopy::CustomSwitch</class>
    <extends>QPushButton</extends>
    <header>gui/customSwitch.h</header>
   </customwidget>

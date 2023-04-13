@@ -22,7 +22,7 @@
 
 #include "digitalio.hpp"
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 class DigitalIO_API : public ApiObject
 {
 	Q_OBJECT

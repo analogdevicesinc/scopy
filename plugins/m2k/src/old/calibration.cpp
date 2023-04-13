@@ -33,7 +33,7 @@
 
 Q_LOGGING_CATEGORY(CAT_M2K_CALIBRATION,"M2KCalibration");
 
-using namespace adiscope;
+using namespace scopy;
 
 Calibration::Calibration(struct iio_context *ctx):
 	m_api(new Calibration_API(this)),

@@ -25,7 +25,7 @@
 #include <qwt_spline_cubic.h>
 #include <qwt_spline_parametrization.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 SmoothCurveFitter::SmoothCurveFitter():
         QwtCurveFitter(QwtCurveFitter::Path),

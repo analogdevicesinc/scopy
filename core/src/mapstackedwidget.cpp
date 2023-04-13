@@ -4,7 +4,7 @@
 
 Q_LOGGING_CATEGORY(CAT_MAPSTACKWIDGET, "MapStackedWidget")
 
-using namespace adiscope;
+using namespace scopy;
 
 MapStackedWidget::MapStackedWidget(QWidget *parent) :
 	QStackedWidget(parent)

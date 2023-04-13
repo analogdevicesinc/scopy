@@ -47,8 +47,8 @@
 using std::map;
 using std::string;
 
-using namespace adiscope;
-using namespace adiscope::logic;
+using namespace scopy;
+using namespace scopy::logic;
 
 Decoder::Decoder(const srd_decoder *const dec) :
     decoder_(dec),

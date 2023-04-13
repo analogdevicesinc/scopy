@@ -24,7 +24,7 @@
 #include <QResizeEvent>
 #include <QFile>
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
 	on(this), off(this), handle(this), anim(&handle, "geometry"),

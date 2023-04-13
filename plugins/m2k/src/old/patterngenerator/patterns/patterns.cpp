@@ -37,11 +37,11 @@
 #include <math.h>
 
 using namespace std;
-using namespace adiscope::m2k;
+using namespace scopy::m2k;
 
 constexpr int PG_MAX_SAMPLERATE = 100000000; // 100MHz
 
-namespace adiscope::m2k {
+namespace scopy::m2k {
 
 JSConsole::JSConsole(QObject *parent) :
 	QObject(parent)
@@ -1031,7 +1031,7 @@ BinaryCounterPatternUI::BinaryCounterPatternUI(BinaryCounterPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "parallel") {
-		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
+		m_decoder = std::make_shared<scopy::logic::Decoder>(dec);
 	    }
 	}
 
@@ -1069,7 +1069,7 @@ GenericLogicPlotCurve *BinaryCounterPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<adiscope::logic::Decoder> BinaryCounterPatternUI::getDecoder()
+std::shared_ptr<scopy::logic::Decoder> BinaryCounterPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -1499,7 +1499,7 @@ UARTPatternUI::UARTPatternUI(UARTPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "uart") {
-		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
+		m_decoder = std::make_shared<scopy::logic::Decoder>(dec);
 	    }
 	}
 
@@ -1585,7 +1585,7 @@ GenericLogicPlotCurve *UARTPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<adiscope::logic::Decoder> UARTPatternUI::getDecoder()
+std::shared_ptr<scopy::logic::Decoder> UARTPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -1902,7 +1902,7 @@ I2CPatternUI::I2CPatternUI(I2CPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "i2c") {
-		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
+		m_decoder = std::make_shared<scopy::logic::Decoder>(dec);
 	    }
 	}
 
@@ -1967,7 +1967,7 @@ GenericLogicPlotCurve *I2CPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<adiscope::logic::Decoder> I2CPatternUI::getDecoder()
+std::shared_ptr<scopy::logic::Decoder> I2CPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -2267,7 +2267,7 @@ SPIPatternUI::SPIPatternUI(SPIPattern *pattern,
 	for (const GSList *sl = decoderList; sl; sl = sl->next) {
 	    srd_decoder *dec = (struct srd_decoder *)sl->data;
 	    if (QString::fromUtf8(dec->id) == "spi") {
-		m_decoder = std::make_shared<adiscope::logic::Decoder>(dec);
+		m_decoder = std::make_shared<scopy::logic::Decoder>(dec);
 	    }
 	}
 
@@ -2354,7 +2354,7 @@ GenericLogicPlotCurve *SPIPatternUI::getAnnotationCurve()
 	return m_annotationCurve;
 }
 
-std::shared_ptr<adiscope::logic::Decoder> SPIPatternUI::getDecoder()
+std::shared_ptr<scopy::logic::Decoder> SPIPatternUI::getDecoder()
 {
 	return m_decoder;
 }
@@ -4211,5 +4211,5 @@ void PulsePatternUI::destroy_ui()
 	parent_->layout()->removeWidget(this);
 }
 
-} // namespace adiscope
+} // namespace scopy
 
