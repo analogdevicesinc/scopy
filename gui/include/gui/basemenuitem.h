@@ -59,6 +59,9 @@ public:
 	BaseMenu *getOwner() const;
 	void setOwner(BaseMenu *menu);
 
+	bool draggable() const;
+	void setDraggable(bool newDraggable);
+
 Q_SIGNALS:
 	void moveItem(short from, short to);
 	void itemSelected();
@@ -91,6 +94,7 @@ private:
 
 	QWidget *d_dragWidget;
 	bool d_allowDrag;
+	bool d_draggable;
 };
 }
 

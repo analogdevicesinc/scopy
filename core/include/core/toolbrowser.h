@@ -19,12 +19,15 @@ public:
 	~ToolBrowser();
 	ToolMenu* getToolMenu();
 
+public Q_SLOTS:
+	void toggleCollapse();
 Q_SIGNALS:
 	void requestTool(QString);
 	void requestSave();
 	void requestLoad();
 
 private:
+	bool collapsed;
     Ui::ToolBrowser *ui;
 };
 }
