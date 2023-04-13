@@ -25,6 +25,7 @@
 #include "oscilloscope.hpp"
 #include "patterngenerator/pattern_generator.h"
 #include "power_controller.hpp"
+#include "qtextbrowser.h"
 #include "signal_generator.hpp"
 #include "spectrum_analyzer.hpp"
 
@@ -83,9 +84,19 @@ bool M2kPlugin::loadPage()
 	m_infoPageTimer->setInterval(infoPageTimerTimeout);	
 	connect(m_m2kController,SIGNAL(newTemperature(double)),this, SLOT(updateTemperature(double)));
 	m_page = new QWidget();
-	m_page->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	QVBoxLayout *lay = new QVBoxLayout(m_page);
+	m_page->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	m_m2kInfoPage = new InfoPage(m_page);
-	m_m2kInfoPage->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+	lay->addWidget(m_m2kInfoPage);
+
+	QTextBrowser *textBrowser = new QTextBrowser(m_page);
+	QFile f(":/m2k/m2k.html");
+	f.open(QFile::ReadOnly);
+	textBrowser->setText(f.readAll());
+	textBrowser->setFixedHeight(800);
+	lay->addWidget(textBrowser);
+
+	m_m2kInfoPage->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
 	for(int i=0;i<iio_context_get_attrs_count(ctx);i++) {

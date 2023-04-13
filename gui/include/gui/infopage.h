@@ -22,7 +22,6 @@ public:
 
 private:
 
-	QScrollArea *scroll;
 	QVBoxLayout *lay;
 	QMap<QString,QString> map;
 	QMap<QString, InfoPageKeyValueWidget*> wmap;
