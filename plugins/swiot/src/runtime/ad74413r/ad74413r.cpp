@@ -91,20 +91,22 @@ void Ad74413r::setupConnections()
 
 void Ad74413r::initMonitorToolView()
 {
-	int mainChId = m_chnlsFunction.size();
 	int chId = 0;
 	bool first = true;
 
 	QString deviceName(iio_device_get_name(m_iioDev));
 	ChannelWidget *mainCh_widget =
-			m_toolView->buildNewChannel(m_monitorChannelManager, nullptr, false, mainChId, false, false,
+			m_toolView->buildNewChannel(m_monitorChannelManager, nullptr, false, chId, false, false,
 						    QColor("green"), deviceName, deviceName);
+	chId++;
 	std::vector<ChannelWidget*> channelWidgetList;
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
+			QString menuTitle(((deviceName + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
 			BufferMenuView *menu = new BufferMenuView(m_widget);
-			menu->init(((deviceName + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i])
-				   , m_chnlsFunction[i], new QColor(m_plotHandler->getCurveColor(chId)));
+			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
+			//that's why we have to decrease by 1
+			menu->init(menuTitle, m_chnlsFunction[i], new QColor(m_plotHandler->getCurveColor(chId - 1)));
 
 			struct iio_channel* iioChnl = m_swiotAdLogic->getIioChnl(i, true);
 			BufferMenuModel* swiotModel = new BufferMenuModel(iioChnl);
@@ -114,10 +116,12 @@ void Ad74413r::initMonitorToolView()
 			if (controller) {
 				m_controllers.push_back(controller);
 			}
+			QString chnlWidgetName(m_chnlsFunction[i] +" "+QString::number(i+1));
+			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
+			//that's why we have to decrease by 1
 			ChannelWidget *chWidget =
 					m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, chId, false, false,
-								    m_plotHandler->getCurveColor(chId),QString::fromStdString("channel"),
-								    m_chnlsFunction[i] +" "+QString::number(i+1));
+								    m_plotHandler->getCurveColor(chId - 1), chnlWidgetName, chnlWidgetName);
 			if (first) {
 				chWidget->menuButton()->click();
 				first = false;
@@ -219,7 +223,9 @@ void Ad74413r::connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList)
 void Ad74413r::onChannelWidgetEnabled(bool en)
 {
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
-	int id = w->id();
+	//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
+	//that's why we have to decrease by 1
+	int id = w->id() - 1;
 	int chnlIdx = m_controllers[id]->getChnlIdx();
 
 	if (en) {
@@ -238,7 +244,9 @@ void Ad74413r::onChannelWidgetEnabled(bool en)
 void Ad74413r::onChannelWidgetSelected(bool checked)
 {
 	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
-	int id = w->id();
+	//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
+	//that's why we have to decrease by 1
+	int id = w->id() - 1;
 	m_plotHandler->setPlotActiveAxis(id);
 
 }
