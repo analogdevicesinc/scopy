@@ -5,7 +5,7 @@
         <file>ic_hi_snow.svg</file>
         <file>ic_lo_gray.svg</file>
         <file>ic_lo_snow.svg</file>
-        <file>1_adobe_express.svg</file>
+        <file>swiot_board.svg</file>
         <file>sba_cmb_box_arrow.svg</file>  <!-- only for the demo, TODO: link faults to the core resources -->
         <file>sba_cmb_box_arrow_right.svg</file>  <!-- only for the demo, TODO: link faults to the core resources -->
     </qresource>

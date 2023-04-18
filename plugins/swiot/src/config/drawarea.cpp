@@ -11,6 +11,8 @@ using namespace adiscope::swiot;
 
 DrawArea::DrawArea(QWidget *parent) :
 	QWidget(parent),
+        filePath(":/swiot/swiot_board.svg"),
+        redLine(R"(<line x1="10" y1="10" x2="100" y2="100" stroke="red" stroke-width="10" />)"),
 	svgWidget(new QSvgWidget(filePath, this))
 {
 	this->setLayout(new QVBoxLayout(this));

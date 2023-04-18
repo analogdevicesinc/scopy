@@ -12,22 +12,13 @@
 #include "iioutil/iiopingtask.h"
 #include "src/swiotcontroller.h"
 
-
 #include "ui_swiotInfoPage.h"
 #include "ui_swiotconfig.h"
 #include "ui_swiotruntime.h"
 #include "ui_swiotmax14906.h"
 #include "ui_swiotfaults.h"
 
-namespace Ui {
-class SWIOTInfoPage;
-class SwiotRuntimeUI;
-class SwiotFaults;
-class Max14906Tool; // TODO: rename this class
-}
-
-namespace adiscope {
-namespace swiot {
+namespace adiscope::swiot {
 class SCOPYSWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
@@ -67,8 +58,8 @@ private:
 					 "diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 
 	//	//Runtime A
-	const QVector<QString> channel_function{"digital_input", "voltage_out", "current_out", "voltage_in",
-							"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
+//	const QVector<QString> channel_function{"digital_input", "voltage_out", "current_out", "voltage_in",
+//							"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 	//	//Runtime B
 //		const QVector<QString> channel_function{"current_in_ext", "current_in_loop", "resistance", "digital_input",
 //		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
@@ -76,11 +67,10 @@ private:
 //		const QVector<QString> channel_function{"digital_input_loop", "current_in_ext_hart", "current_in_ext_hart", "high_z",
 //		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 	//	//Runtime D
-//		const QVector<QString> channel_function{"current_out", "high_z", "high_z", "high_z",
-//		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
+		const QVector<QString> channel_function{"current_out", "high_z", "high_z", "high_z",
+		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 
 };
-}
 }
 
 #endif // SWIOTPLUGIN_H

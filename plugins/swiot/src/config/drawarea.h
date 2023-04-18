@@ -25,8 +25,8 @@ public:
 	void setSize(QSize newSize);
 
 private:
-	QString filePath = ":/swiot/1_adobe_express.svg";
-	QString redLine = R"(<line x1="10" y1="10" x2="100" y2="100" stroke="red" stroke-width="10" />)";
+	QString filePath;
+	QString redLine;
 
 	std::vector<QLine *> lines;
 	QSvgWidget *svgWidget;

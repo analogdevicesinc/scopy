@@ -28,7 +28,6 @@
 #include <QDockWidget>
 #include <QMainWindow>
 
-//#include <sstream>
 #include <string>
 #include <algorithm>
 #include <QDebug>
