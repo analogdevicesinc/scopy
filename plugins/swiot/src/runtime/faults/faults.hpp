@@ -42,8 +42,8 @@ private:
 	QTimer *timer;
 	QThread *thread;
 
-	uint32_t ad74413r_numeric = 0;
-	uint32_t max14906_numeric = 0;
+	uint32_t ad74413r_numeric;
+	uint32_t max14906_numeric;
 
 	adiscope::gui::ToolView *m_toolView{};
 	adiscope::gui::ChannelManager *m_monitorChannelManager{};

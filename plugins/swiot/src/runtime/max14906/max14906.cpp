@@ -1,5 +1,6 @@
 #include "max14906.hpp"
 #include "src/refactoring/tool/tool_view_builder.hpp"
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope::swiot;
 
@@ -15,7 +16,7 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 {
         iio_device* device0 = iio_context_get_device(ctx, 0);
         if (iio_device_find_attr(device0, "back")) {
-                qInfo(CAT_SWIOT_RUNTIME) << "Initialising SWIOT MAX14906.";
+		qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
 
                 this->ui->setupUi(this);
                 this->setupDynamicUi(this);
@@ -28,7 +29,7 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
                 this->ui->mainLayout->addWidget(m_toolView);
                 this->connectSignalsAndSlots();
         } else {
-                qInfo(CAT_SWIOT_RUNTIME) << "Could not initialize SWIOT MAX14906, the device seems to be in config mode.";
+		qInfo(CAT_SWIOT_MAX14906) << "Could not initialize SWIOT MAX14906, the device seems to be in config mode.";
         }
 }
 
@@ -104,17 +105,17 @@ Max14906::~Max14906() {
 }
 
 void Max14906::runButtonToggled() {
-	qDebug(CAT_MAX14906) << "Run button clicked";
+	qDebug(CAT_SWIOT_MAX14906) << "Run button clicked";
 	this->m_toolView->getSingleBtn()->setChecked(false);
 	if (this->m_toolView->getRunBtn()->isChecked()) {
 		for (auto & channel : this->m_channelControls) {
 			channel->getDigitalChannel()->resetSismograph();
 		}
-		qDebug(CAT_MAX14906) << "Reader thread started";
+		qDebug(CAT_SWIOT_MAX14906) << "Reader thread started";
 		this->m_readerThread->start();
 	} else {
 		if (this->m_readerThread->isRunning()) {
-			qDebug(CAT_MAX14906) << "Reader thread stopped";
+			qDebug(CAT_SWIOT_MAX14906) << "Reader thread stopped";
 			this->m_readerThread->quit();
 			this->m_readerThread->wait();
 		}

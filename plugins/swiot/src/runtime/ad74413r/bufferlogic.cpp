@@ -1,5 +1,5 @@
 #include "bufferlogic.hpp"
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope::swiot;
 
@@ -106,7 +106,7 @@ void BufferLogic::onSamplingFreqChanged(int idx)
 		if (key > 0 && !m_chnlsInfo[key]->isOutput) {
 			int returnCode = iio_channel_attr_write(m_chnlsInfo[key]->iioChnl, SAMPLING_FREQ_ATTR_NAME, newSamplingFreq.c_str());
 			if (returnCode < 0) {
-				qDebug(CAT_SWIOT_RUNTIME) << "Chnl attribute write error " + QString::number(returnCode);
+				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute write error " + QString::number(returnCode);
 			} else {
 				break;
 			}
@@ -128,7 +128,7 @@ QStringList BufferLogic::readChnlsFrequencyAttr(QString attrName)
 				attrValues = bufferValues.split(" ");
 				break;
 			} else {
-				qDebug(CAT_SWIOT_RUNTIME) << "Chnl attribute read error " + QString::number(returnCode);
+				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error " + QString::number(returnCode);
 			}
 		}
 	}

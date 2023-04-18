@@ -1,4 +1,5 @@
 #include "diodigitalchannelcontroller.hpp"
+#include "src/swiot_logging_categories.h"
 #include <sstream>
 
 using namespace adiscope::swiot;
@@ -37,7 +38,7 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			 [this] (bool value) {
 		ssize_t res = iio_channel_attr_write_bool(m_channel, "raw", value);
 		if (res < 0) {
-			qCritical(CAT_MAX14906) << "Could not write value" << value << "to channel" << this->m_channelName << ", error code " << res;
+			qCritical(CAT_SWIOT_MAX14906) << "Could not write value" << value << "to channel" << this->m_channelName << ", error code " << res;
 		}
 	});
 }
@@ -53,10 +54,10 @@ DioDigitalChannel *DioDigitalChannelController::getDigitalChannel() const {
 void DioDigitalChannelController::writeType() {
 	QString s = this->m_digitalChannel->getUi()->configModes->currentText();
 	this->m_type = s.toStdString();
-	qDebug(CAT_MAX14906) << "Writing <" << s << "> to channel <" << this->m_channelName << "> ";
+	qDebug(CAT_SWIOT_MAX14906) << "Writing <" << s << "> to channel <" << this->m_channelName << "> ";
 
 	ssize_t res = iio_channel_attr_write(this->m_channel, this->m_iioAttrType.c_str(), s.toStdString().c_str());
 	if (res < 0) {
-		qCritical(CAT_MAX14906) << "Could not write attr to channel " << this->m_channelName << ", error code " << res;
+		qCritical(CAT_SWIOT_MAX14906) << "Could not write attr to channel " << this->m_channelName << ", error code " << res;
 	}
 }

@@ -1,7 +1,7 @@
 #include "bufferplothandler.hpp"
 #include <QGridLayout>
 #include "src/captureplot/filemanager.h"
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>
 
@@ -130,7 +130,7 @@ void BufferPlotHandler::onPlotChnlsChanges(std::vector<bool> enabledPlots)
 			m_plot->DetachCurve(i);
 		}
 	}
-	qDebug(CAT_SWIOT_RUNTIME) << "Sample number on chnl changes:" << QString::number(m_plotSampleNumber);
+	qDebug(CAT_SWIOT_AD74413R) << "Sample number on chnl changes:" << QString::number(m_plotSampleNumber);
 }
 
 void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
@@ -223,7 +223,7 @@ void BufferPlotHandler::resetPlot()
 	m_plot->setSampleRate(m_plotSampleNumber, 1, "");
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
 	m_plot->replot();
-	qDebug(CAT_SWIOT_RUNTIME) << "Plot samples number: " << QString::number(m_plotSampleNumber);
+	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(m_plotSampleNumber);
 
 }
 

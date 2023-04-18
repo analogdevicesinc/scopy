@@ -1,6 +1,6 @@
 #include "swiotruntime.hpp"
 #include <string>
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope;
 
@@ -36,16 +36,16 @@ void SwiotRuntime::setContext(iio_context *ctx)
 	createDevicesMap();
 	bool isRuntime = isRuntimeCtx();
 	if (isRuntime) {
-		qInfo(CAT_SWIOT_RUNTIME) <<"runtime context";
+		qInfo(CAT_SWIOT) <<"runtime context";
 		if (m_iioDevices.contains(AD_TRIGGER_NAME)) {
 			int retCode = iio_device_set_trigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME]);
-			qDebug(CAT_SWIOT_RUNTIME) <<"Trigger has been set: " + QString::number(retCode);
+			qDebug(CAT_SWIOT) <<"Trigger has been set: " + QString::number(retCode);
 		}
 		//		m_triggerTimer = new QTimer();
 		//		m_triggerTimer->start(TRIGGER_TIMER_MS);
 		//		connect(m_triggerTimer, SIGNAL(timeout()), this, SLOT(onTriggerTimeout()));
 	} else {
-		qDebug(CAT_SWIOT_RUNTIME) <<"isn't runtime context";
+		qDebug(CAT_SWIOT) << "isn't runtime context";
 	}
 }
 

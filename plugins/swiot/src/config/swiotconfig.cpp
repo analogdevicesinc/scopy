@@ -5,9 +5,8 @@
 #include "configmodel.hpp"
 #include "core/toolmenuitem.h"
 #include <iio.h>
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 #include <QVBoxLayout>
-#include "core/logging_categories.h"
 
 using namespace adiscope::swiot;
 

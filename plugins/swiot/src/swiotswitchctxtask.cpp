@@ -1,6 +1,6 @@
 #include "swiotswitchctxtask.h"
 #include <iioutil/contextprovider.h>
-#include <core/logging_categories.h>
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope::swiot;
 
@@ -15,7 +15,7 @@ void SwiotSwitchCtxTask::run()
 	if(!ctx)
 		goto finish;
 	//need to be changed to CAT_SWIOTPLUGIN
-	qDebug(CAT_SWIOT_RUNTIME)<<"Context has been changed";
+	qDebug(CAT_SWIOT_AD74413R)<<"Context has been changed";
 
 	Q_EMIT contextSwitched();
 finish:

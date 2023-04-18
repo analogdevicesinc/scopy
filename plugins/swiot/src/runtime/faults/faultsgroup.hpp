@@ -1,18 +1,10 @@
 #ifndef FAULTSGROUP_HPP
 #define FAULTSGROUP_HPP
 
-#include <QWidget>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-
-#include <utility>
 #include <set>
 
 #include "faultwidget.hpp"
 #include "src/refactoring/maincore/customcolqgridlayout.hpp"
-#include "core/logging_categories.h"
 #include "ui_faultsgroup.h"
 
 QT_BEGIN_NAMESPACE

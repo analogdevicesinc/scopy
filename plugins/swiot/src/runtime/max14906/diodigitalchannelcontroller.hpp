@@ -2,10 +2,7 @@
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
 #include "diodigitalchannel.hpp"
-#include "core/logging_categories.h"
 
-
-#include <QObject>
 #include <string>
 #include <iio.h>
 

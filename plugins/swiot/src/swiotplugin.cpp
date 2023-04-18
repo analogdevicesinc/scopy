@@ -9,22 +9,10 @@
 #include "src/runtime/max14906/max14906.hpp"
 #include "src/config/swiotconfig.hpp"
 #include "src/runtime/swiotruntime.hpp"
+#include "src/swiot_logging_categories.h"
 #include <iioutil/contextprovider.h>
 
-using namespace adiscope;
 using namespace adiscope::swiot;
-
-Q_LOGGING_CATEGORY(CAT_SWIOT,"SWIOTPlugin");
-
-Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_CONFIG)
-Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_RUNTIME)
-Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_FAULTS)
-Q_DECLARE_LOGGING_CATEGORY(CAT_MAX14906)
-
-Q_LOGGING_CATEGORY(CAT_SWIOT_CONFIG, "swiotConfig")
-Q_LOGGING_CATEGORY(CAT_SWIOT_RUNTIME, "swiotRuntime")
-Q_LOGGING_CATEGORY(CAT_SWIOT_FAULTS, "swiotFaults")
-Q_LOGGING_CATEGORY(CAT_MAX14906, "max14906tool")
 
 void SWIOTPlugin::preload()
 {

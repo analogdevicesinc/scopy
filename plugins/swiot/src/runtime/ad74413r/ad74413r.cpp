@@ -3,7 +3,7 @@
 #include "buffermenuview.hpp"
 #include "buffermenumodel.hpp"
 #include <iio.h>
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope::swiot;
 
@@ -280,7 +280,7 @@ QPushButton* Ad74413r::createBackBtn()
 
 void Ad74413r::onReaderThreadFinished()
 {
-	qDebug(CAT_SWIOT_RUNTIME) << "reader thread finished";
+	qDebug(CAT_SWIOT_AD74413R) << "reader thread finished";
 	if (m_toolView->getRunBtn()->isChecked()) {
 		m_plotHandler->resetPlot();
 		m_readerThread->start();

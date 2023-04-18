@@ -1,4 +1,14 @@
+#include <QWidget>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
+#include <utility>
+
 #include "faultsgroup.hpp"
+#include "src/swiot_logging_categories.h"
+
 
 using namespace adiscope::swiot;
 

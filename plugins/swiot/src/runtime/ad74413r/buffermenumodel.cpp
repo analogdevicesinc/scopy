@@ -1,7 +1,7 @@
 #include <iio.h>
 #include "qdebug.h"
 #include "buffermenumodel.hpp"
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope::swiot;
 
@@ -61,12 +61,12 @@ void BufferMenuModel::updateChnlAttributes(QMap<QString,QStringList> newValues, 
 		std::string s_attrName = attrName.toStdString();
 
 		if (m_iioChnl != nullptr) {
-			qDebug(CAT_SWIOT_RUNTIME) << attrName + " before:" + readChnlAttr(m_iioChnl,attrName).front();
+			qDebug(CAT_SWIOT_AD74413R) << attrName + " before:" + readChnlAttr(m_iioChnl,attrName).front();
 			int retCode = iio_channel_attr_write(m_iioChnl,s_attrName.c_str(),s_attrValue.c_str());
 			if (retCode > 0) {
 				m_chnlAttributes = newValues;
 			}
-			qDebug(CAT_SWIOT_RUNTIME) << attrName + " after:" + readChnlAttr(m_iioChnl,attrName).front();
+			qDebug(CAT_SWIOT_AD74413R) << attrName + " after:" + readChnlAttr(m_iioChnl,attrName).front();
 		}
 	}
 

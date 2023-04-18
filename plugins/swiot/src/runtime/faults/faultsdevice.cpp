@@ -1,9 +1,9 @@
 #include "faultsdevice.hpp"
-#include "core/logging_categories.h"
 #include <utility>
 #include "faultsgroup.hpp"
 
-namespace adiscope::swiot {
+using namespace adiscope::swiot;
+
 FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	: ui(new Ui::FaultsDevice),
 	  QWidget(parent),
@@ -21,9 +21,8 @@ FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
 	m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
 
-	// TODO: redo this -- only for the demo version
+	// TODO: remove this once the style is applies by default to SubsectionSeparator class
 	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
-	qDebug() << m_subsectionSeparator->getButton()->styleSheet();
 	m_subsectionSeparator->getButton()->setStyleSheet("QComboBox::drop-down {\n"
 							  " subcontrol-position: center right;\n"
 							  " border-image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
@@ -79,9 +78,7 @@ void FaultsDevice::resetStored() {
 
 void FaultsDevice::update(uint32_t faults_numeric) {
 	this->ui->lineEdit_numeric->setText(QString("0x%1").arg(faults_numeric, 8, 16, QLatin1Char('0')));
-
 	this->m_faultsGroup->update(faults_numeric);
-
 	this->updateExplanations();
 }
 
@@ -100,4 +97,3 @@ void FaultsDevice::resizeEvent(QResizeEvent *event) {
 
 	QWidget::resizeEvent(event);
 }
-} // adiscope::gui

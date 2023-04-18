@@ -4,7 +4,6 @@
 #include "ui_swiotmax14906.h"
 #include "src/refactoring/maincore/customcolqgridlayout.hpp"
 #include "diocontroller.hpp"
-#include "core/logging_categories.h"
 #include "diodigitalchannelcontroller.hpp"
 #include "src/runtime/readerthread.h"
 #include "diosettingstab.h"

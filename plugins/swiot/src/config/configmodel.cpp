@@ -2,7 +2,7 @@
 #include "qdebug.h"
 #include <iio.h>
 #include <QMap>
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace adiscope::swiot;
 

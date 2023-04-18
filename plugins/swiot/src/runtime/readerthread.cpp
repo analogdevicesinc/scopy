@@ -1,5 +1,5 @@
 #include "readerthread.h"
-#include "core/logging_categories.h"
+#include "src/swiot_logging_categories.h"
 #include <iio.h>
 #include "src/runtime/ad74413r/bufferlogic.hpp"
 
@@ -21,18 +21,18 @@ void ReaderThread::addDioChannel(int index, struct iio_channel *channel) {
 }
 
 void ReaderThread::runDio() {
-        qDebug(CAT_MAX14906) << "DioReaderThread started";
+	qDebug(CAT_SWIOT_MAX14906) << "DioReaderThread started";
         try {
                 if (!this->m_dioChannels.empty()) {
                         for (int index: this->m_dioChannels.keys()) {
                                 double raw = -1;
                                 iio_channel_attr_read_double(this->m_dioChannels[index], "raw", &raw);
-                                qDebug(CAT_MAX14906) << "Channel with index " << index << " read raw value: " << raw;
+				qDebug(CAT_SWIOT_MAX14906) << "Channel with index " << index << " read raw value: " << raw;
                                 Q_EMIT channelDataChanged(index, raw);
                         }
                 }
         } catch (...) {
-                qCritical(CAT_MAX14906) << "Failed to acquire data on DioReaderThread";
+		qCritical(CAT_SWIOT_MAX14906) << "Failed to acquire data on DioReaderThread";
         }
 }
 
@@ -61,12 +61,12 @@ void ReaderThread::enableIioChnls()
                                 if (!isEnabled) {
                                         iio_channel_enable(iioChnl);
                                 }
-                                qDebug(CAT_SWIOT_RUNTIME) << "Chanel en " << key;
+				qDebug(CAT_SWIOT_AD74413R) << "Chanel en " << key;
                         } else {
                                 if (isEnabled) {
                                         iio_channel_disable(iioChnl);
                                 }
-                                qDebug(CAT_SWIOT_RUNTIME) << "Chanel dis " << key;
+				qDebug(CAT_SWIOT_AD74413R) << "Chanel dis " << key;
                         }
                 }
         }
@@ -101,7 +101,7 @@ void ReaderThread::createIioBuffer()
         m_enabledChnlsNo = getEnabledChnls();
         int possibleBufferSize = m_sampleRate * m_timespan;
         m_offsetScaleValues = getOffsetScaleVector();
-        qInfo(CAT_SWIOT_RUNTIME) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
+	qInfo(CAT_SWIOT_AD74413R) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
         if (m_iioDev) {
                 if(possibleBufferSize >= MAX_BUFFER_SIZE) {
                         m_iioBuff = iio_device_create_buffer(m_iioDev, MAX_BUFFER_SIZE, false);
@@ -109,9 +109,9 @@ void ReaderThread::createIioBuffer()
                         m_iioBuff = iio_device_create_buffer(m_iioDev, MIN_BUFFER_SIZE, false);
                 }
                 if (m_iioBuff) {
-                        qDebug(CAT_SWIOT_RUNTIME) << "Buffer created";
+			qDebug(CAT_SWIOT_AD74413R) << "Buffer created";
                 } else {
-                        qDebug(CAT_SWIOT_RUNTIME) << "Buffer wasn't created: " + QString(strerror(errno));
+			qDebug(CAT_SWIOT_AD74413R) << "Buffer wasn't created: " + QString(strerror(errno));
                 }
         }
 }
@@ -119,7 +119,7 @@ void ReaderThread::createIioBuffer()
 void ReaderThread::destroyIioBuffer()
 {
         if (m_iioBuff) {
-                qDebug(CAT_SWIOT_RUNTIME) << "Buffer destroyed";
+		qDebug(CAT_SWIOT_AD74413R) << "Buffer destroyed";
                 iio_buffer_destroy(m_iioBuff);
                 m_iioBuff = nullptr;
         }
@@ -131,7 +131,7 @@ void ReaderThread::onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo)
 }
 
 void ReaderThread::runBuffered() {
-        qDebug(CAT_SWIOT_RUNTIME) << "Thread";
+	qDebug(CAT_SWIOT_AD74413R) << "Thread";
         enableIioChnls();
         createIioBuffer();
         while (!isInterruptionRequested()) {
@@ -160,7 +160,7 @@ void ReaderThread::runBuffered() {
                                 }
                                 Q_EMIT bufferRefilled(m_bufferData, bufferCounter);
                         } else {
-                                qDebug(CAT_SWIOT_RUNTIME) << "Refill error " << QString(strerror(-refillBytes));
+				qDebug(CAT_SWIOT_AD74413R) << "Refill error " << QString(strerror(-refillBytes));
 
                         }
                         lock->unlock();
