@@ -25,81 +25,29 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 FILE(GLOB SRC_LIST
-	src/swiotplugin.*
-	src/customcolqgridlayout.*
-	src/faultsgroup.*
-	src/faultspage.*
-	src/faultwidget.*
-	src/swiotfaults.*
-	src/swiotfaultsdevice.*
-	src/gui/subsection_separator.*
+	src/captureplot/*.cpp
+	src/captureplot/*.cc
 
-	src/swiotmax14906.*
-	src/swiotmax14906controller.*
-	src/swiotmax14906readerthread.*
-	src/swiotmax14906settingstab.*
-	src/swiotdigitalchannel.*
-	src/swiotdigitalchannelcontroller.*
-	src/gui/customScale.*
-	src/gui/autoScaler.*
-	src/gui/lcdNumber.*
-	src/gui/customFifo.*
-	src/gui/sismograph.*
-	src/gui/customqwtscaledraw.*
-	src/gui/plot_utils.*
-	src/gui/generic_menu.*
-	src/gui/spinbox_a.*
-	src/gui/completion_circle.*
-	src/gui/menu_header.*
+	src/config/*.cpp
+	src/config/*.cc
 
-	src/swiotconfig.*
-	src/swiotconfigchnlview.*
-	src/swiotconfigcontroller.*
-	src/swiotconfigmenu.*
-	src/swiotconfigmodel.*
+#	some of these will eventually be moved to the core/gui directories
+	src/refactoring/maincore/*
+	src/refactoring/maingui/*
+	src/refactoring/tool/*
 
-	src/swiotruntime.*
-	src/swiotad.*
-	src/swiotmodel.*
-	src/swiotadlogic.*
-	src/swiotadreaderthread.*
-	src/swiotadvmenu.*
-	src/swiotcontroller.*
-	src/swiotgenericmenu.*
-	src/swiotadreaderthread.*
-	src/swiotplothandler.*
+	src/runtime/ad74413r/*.cpp
+	src/runtime/ad74413r/*.cc
 
-	src/gui/channel_widget.*
-	src/gui/channel_manager.*
-	src/gui/linked_button.*
-	src/gui/menu_anim.*
-	src/gui/measure.*
-	src/gui/apiobjectmanager.*
+	src/runtime/max14906/*.cpp
+	src/runtime/max14906/*.cc
 
-	src/refactoring/tool/*.cpp
-	src/refactoring/tool/*.hpp
-	src/refactoring/tool/*.h
+	src/runtime/faults/*.cpp
+	src/runtime/faults/*.cc
 
-	src/refactoring/maincore/*.cpp
-	src/refactoring/maincore/*.hpp
-	src/refactoring/maincore/*.h
+	src/runtime/*.cpp
 
-	src/refactoring/maingui/*.cpp
-	src/refactoring/maingui/*.hpp
-	src/refactoring/maingui/*.h
-
-	src/captureplot/*
-
-#	src/drawarea.*
-
-        src/runtime/ad74413r/*
-	src/config/*
-        src/runtime/faults/*
-        src/runtime/max14906/*
-
-	src/runtime/*
-	src/swiotcontroller.*
-	src/swiotswitchctxtask.*
+	src/*.cpp
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
@@ -115,8 +63,8 @@ set(PROJECT_SOURCES
 	${UI_LIST}
 )
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR}Concurrent REQUIRED)
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
 endif()
@@ -140,9 +88,9 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
+include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS} ${GLIBCONFIG_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
