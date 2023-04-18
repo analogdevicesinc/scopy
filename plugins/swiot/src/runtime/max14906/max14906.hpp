@@ -10,7 +10,6 @@
 #include "src/refactoring/tool/tool_view.hpp"
 
 namespace adiscope::swiot {
-//#define POLLING_INTERVAL_MAX 1000
 class DioDigitalChannel;
 class DioController;
 

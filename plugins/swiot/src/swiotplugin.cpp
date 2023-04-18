@@ -42,16 +42,16 @@ bool SWIOTPlugin::loadPage()
 bool SWIOTPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/icons/scopy-light/icons/locked.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-light/icons/locked.svg);");
 	return true;
 }
 
 void SWIOTPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("0", "Config", ":/icons/scopy-default/icons/tool_debugger.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("1", "AD74413R",":/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("2", "MAX14906", ":/icons/scopy-default/icons/tool_io.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("3", "Faults", ":/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("swiotconfig", "Config", ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("swiotad74413r", "AD74413R",":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("swiotmax14906", "MAX14906", ":/gui/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("swiotfaults", "Faults", ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
 }
 
 void SWIOTPlugin::unload()

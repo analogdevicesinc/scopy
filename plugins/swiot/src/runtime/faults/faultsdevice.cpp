@@ -21,35 +21,7 @@ FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
 	m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
 
-	// TODO: remove this once the style is applies by default to SubsectionSeparator class
 	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
-	m_subsectionSeparator->getButton()->setStyleSheet("QComboBox::drop-down {\n"
-							  " subcontrol-position: center right;\n"
-							  " border-image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
-							  " width: 10px;\n"
-							  " height: 6px;\n"
-							  " font-size: 16px;\n"
-							  " text-align: left;\n"
-							  "}\n"
-							  "QComboBox::indicator {\n"
-							  " background-color: transparent;\n"
-							  " selection-background-color: transparent;\n"
-							  " color: transparent;\n"
-							  " selection-color: transparent;\n"
-							  "}"
-							  "QPushButton[subsection_arrow_button=true]{\n"
-							  " max-height: 12px;\n"
-							  " max-width: 12px;\n"
-							  " border: none;\n"
-							  " image: url(:/swiot/sba_cmb_box_arrow_right.svg);\n"
-							  "}\n"
-							  "QPushButton[subsection_arrow_button=true]:checked{\n"
-							  " max-height: 12px;\n"
-							  " max-width: 12px;\n"
-							  " border: none;\n"
-							  " image: url(:/swiot/sba_cmb_box_arrow.svg);\n"
-							  "}");
-
 	m_subsectionSeparator->setContent(m_faults_explanation);
 
 	this->ui->label_name->setText(m_name);
