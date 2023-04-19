@@ -11,7 +11,7 @@ include(GenerateExportHeader)
 # TODO: split stylesheet/resources and add here
 # TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -59,8 +59,8 @@ set(PROJECT_SOURCES
 )
 
 find_package(libm2k REQUIRED)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt5Concurrent REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets StateMachine REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR}Concurrent REQUIRED)
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
 endif()
@@ -84,9 +84,9 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
+include_directories(${Qt6Concurrent_INCLUDE_DIRS} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt6Concurrent_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets libm2k::libm2k scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::StateMachine libm2k::libm2k scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

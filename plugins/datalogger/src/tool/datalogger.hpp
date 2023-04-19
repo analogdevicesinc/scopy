@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QFileDialog>
 #include <QRadioButton>
-#include <QJSEngine>
+//#include <QJSEngine>
 #include <spinbox_a.hpp>
 #include <QElapsedTimer>
 
