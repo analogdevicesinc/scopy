@@ -45,6 +45,7 @@ FILE(GLOB SRC_LIST
 	src/runtime/*.cpp
 
 	src/*.cpp
+	model/*
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
