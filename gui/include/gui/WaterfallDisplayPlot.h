@@ -39,6 +39,7 @@
 #include <cstdio>
 #include <vector>
 #include <qwt_interval.h>
+#include "scopygui_export.h"
 
 #if QWT_VERSION < 0x060000
 #include <gnuradio/qtgui/plot_waterfall.h>
@@ -52,7 +53,7 @@ typedef QwtInterval QwtDoubleInterval;
 
 #endif
 
-class ColorMap_DefaultDark : public QwtLinearColorMap
+class SCOPYGUI_EXPORT ColorMap_DefaultDark : public QwtLinearColorMap
 {
 public:
 	ColorMap_DefaultDark() : QwtLinearColorMap(Qt::black, Qt::white)
@@ -72,8 +73,8 @@ enum {
  * \brief QWidget for displaying waterfall (spectrogram) plots.
  * \ingroup qtgui_blk
  */
-namespace adiscope {
-class WaterfallDisplayPlot : public DisplayPlot
+namespace scopy {
+class SCOPYGUI_EXPORT WaterfallDisplayPlot : public DisplayPlot
 {
 	friend class SpectrumAnalyzer_API;
 	Q_OBJECT
