@@ -42,11 +42,11 @@ namespace adiscope {
 		~CustomSwitch();
 
                 const QLabel &getOn() const;
-                void setOn(const QLabel &on_);
+                void setOnText(const QString &on_);
                 void setOn(const QPixmap &pixmap);
 
                 const QLabel &getOff() const;
-                void setOff(const QLabel &off_);
+                void setOffText(const QString &off_);
                 void setOff(const QPixmap &pixmap);
 
 	private:

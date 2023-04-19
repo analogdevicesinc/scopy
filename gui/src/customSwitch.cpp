@@ -134,16 +134,16 @@ const QLabel &CustomSwitch::getOn() const {
         return on;
 }
 
-void CustomSwitch::setOn(const QLabel &on_) {
-        this->on.setText(on_.text());
+void CustomSwitch::setOnText(const QString &on_) {
+        this->on.setText(on_);
 }
 
 const QLabel &CustomSwitch::getOff() const {
         return off;
 }
 
-void CustomSwitch::setOff(const QLabel &off_) {
-        this->off.setText(off_.text());
+void CustomSwitch::setOffText(const QString &off_) {
+        this->off.setText(off_);
 }
 
 void CustomSwitch::setOn(const QPixmap &pixmap) {
