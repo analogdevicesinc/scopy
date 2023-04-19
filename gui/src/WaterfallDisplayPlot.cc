@@ -56,8 +56,7 @@
 
 using QwtAxis::XBottom;
 
-namespace pt = boost::posix_time;
-using namespace adiscope;
+using namespace scopy;
 #include <QDebug>
 
 /***********************************************************************

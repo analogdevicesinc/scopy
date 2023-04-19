@@ -72,6 +72,7 @@
 #include "m2kpluginExceptionHandler.h"
 #include <pluginbase/scopyjs.h>
 #include <QLoggingCategory>
+#include "gui/utils.h"
 Q_LOGGING_CATEGORY(CAT_M2K_SPECTRUM_ANALYZER,"M2kSpectrumAnalyzer");
 
 #define TIMER_TIMEOUT_MS 100
@@ -1650,7 +1651,7 @@ void SpectrumAnalyzer::cursor_panel_init()
 
 	// add cursor lock botween waterfall and fft plot
 
-	btnLockHPlots = new adiscope::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
+	btnLockHPlots = new scopy::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
 	btnLockHPlots->setObjectName(QString::fromUtf8("btnLockHPlots"));
 	btnLockHPlots->setStyleSheet(QString::fromUtf8("QPushButton[use_icon=true]"));
 	btnLockHPlots->setCheckable(true);
@@ -2074,7 +2075,7 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
 	auto window = SpectrumChannel::build_win(FftWinType::HAMMING, fft_size);
-	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
+	waterfall_sink = scopy::waterfall_sink_f::make(fft_size,
 							  window,
 							  0,
 							  m_max_sample_rate,
@@ -2135,7 +2136,7 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
 	auto window = SpectrumChannel::build_win(FftWinType::HAMMING, fft_size);
-	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
+	waterfall_sink = scopy::waterfall_sink_f::make(fft_size,
 							  window,
 							  0,
 							  m_max_sample_rate,

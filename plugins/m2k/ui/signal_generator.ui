@@ -1454,8 +1454,19 @@ background-repeat: no-repeat;
   <customwidget>
    <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header location="global">gui/detachdragzone.h</header>
+   <header>detachdragzone.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::InstrumentNotes</class>
+   <extends>QWidget</extends>
+   <header>gui/instrumentnotes.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>scopy::LinkedButton</class>
+   <extends>QPushButton</extends>
+   <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>scopy::MenuAnim</class>
@@ -1464,21 +1475,10 @@ background-repeat: no-repeat;
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::InstrumentNotes</class>
-   <extends>QWidget</extends>
-   <header location="global">gui/instrumentnotes.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>scopy::RunSingleWidget</class>
    <extends>QWidget</extends>
    <header location="global">gui/runsinglewidget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>scopy::LinkedButton</class>
-   <extends>QPushButton</extends>
-   <header location="global">linked_button.hpp</header>
   </customwidget>
   <customwidget>
    <class>scopy::CustomSwitch</class>

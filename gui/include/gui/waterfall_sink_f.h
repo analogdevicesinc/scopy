@@ -52,13 +52,14 @@
 //#include <gnuradio/qtgui/api.h>
 #include <gnuradio/sync_block.h>
 #include <qapplication.h>
+#include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
-class waterfall_sink_f : virtual public gr::sync_block
+class SCOPYGUI_EXPORT waterfall_sink_f : virtual public gr::sync_block
 {
 public:
-//	 adiscope::waterfall_sink_f::sptr
+//	 scopy::waterfall_sink_f::sptr
 	typedef std::shared_ptr<waterfall_sink_f> sptr;
 
 	/*!
@@ -122,6 +123,6 @@ public:
 	QApplication* d_qApplication;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* WATERFALL_SINK_F_H */

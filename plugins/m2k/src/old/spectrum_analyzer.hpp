@@ -49,7 +49,7 @@
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2k.hpp>
 #include <libm2k/generic.hpp>
-#include <gui/smallOnOffSwitch.hpp>
+#include "gui/smallOnOffSwitch.h"
 
 extern "C" {
 	struct iio_buffer;
@@ -252,7 +252,7 @@ private:
 	libm2k::context::Generic* m_generic_context;
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
-	adiscope::SmallOnOffSwitch *btnLockHPlots;
+	scopy::SmallOnOffSwitch *btnLockHPlots;
 	QHBoxLayout *horizontalLockLayout;
 
 #ifdef SPECTRAL_MSR
@@ -295,7 +295,7 @@ private:
 	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
 	scopy::scope_sink_f::sptr fft_sink;
-	adiscope::waterfall_sink_f::sptr waterfall_sink;
+	scopy::waterfall_sink_f::sptr waterfall_sink;
 	iio_manager::port_id *fft_ids;
 	iio_manager::port_id *waterfall_ids;
 
