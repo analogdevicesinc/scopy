@@ -1,6 +1,6 @@
 #include "customqwtscaledraw.hpp"
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomQwtScaleDraw::CustomQwtScaleDraw()
 {}

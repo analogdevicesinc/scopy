@@ -6,10 +6,11 @@
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
 #include "plot_utils.hpp"
+#include "scopygui_export.h"
 
-namespace adiscope {
+namespace scopy {
 
-class CustomQwtScaleDraw : public QwtScaleDraw
+class SCOPYGUI_EXPORT CustomQwtScaleDraw : public QwtScaleDraw
 {
 public:
 	CustomQwtScaleDraw();
