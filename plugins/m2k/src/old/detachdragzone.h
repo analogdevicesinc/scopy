@@ -17,17 +17,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef DETACHDRAGZONE_H
+#define DETACHDRAGZONE_H
 
-#include "coloredQWidget.h"
+#include <QWidget>
+#include <QMouseEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QString>
 
-using namespace scopy;
+#include "scopygui_export.h"
 
-ColoredQWidget::ColoredQWidget(QWidget *parent) : QWidget(parent)
+namespace scopy {
+class SCOPYGUI_EXPORT DetachDragZone : public QWidget
 {
-	/* Permits the QWidget to have a visible background */
-	setAttribute(Qt::WA_StyledBackground, true);
+	Q_OBJECT
+
+public:
+	explicit DetachDragZone(QWidget *parent = 0);
+	~DetachDragZone();
+
+	bool eventFilter(QObject *watched, QEvent *event);
+
+Q_SIGNALS:
+	void detachWidget(int);
+	void changeText(QString);
+
+private Q_SLOTS:
+	void dragEnterEvent(QDragEnterEvent *event);
+	void dragMoveEvent(QDragMoveEvent *event);
+	void dragLeaveEvent(QDragLeaveEvent *event);
+	void dropEvent(QDropEvent *event);
+
+};
 }
 
-ColoredQWidget::~ColoredQWidget()
-{
-}
+#endif // DETACHDRAGZONE_H

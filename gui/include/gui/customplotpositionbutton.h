@@ -21,7 +21,6 @@
 #define CUSTOMPLOTPOSITIONBUTTON_H
 
 #include <QWidget>
-#include "coloredQWidget.h"
 #include <QButtonGroup>
 #include "scopygui_export.h"
 
@@ -30,7 +29,7 @@ class CustomPlotPositionButton;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT CustomPlotPositionButton : public ColoredQWidget
+class SCOPYGUI_EXPORT CustomPlotPositionButton : public QWidget
 {
 	Q_OBJECT
 

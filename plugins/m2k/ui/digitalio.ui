@@ -260,7 +260,7 @@ background-color: grey;
   <customwidget>
    <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>gui/detachdragzone.h</header>
+   <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

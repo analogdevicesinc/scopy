@@ -25,7 +25,7 @@
 
 using namespace scopy;
 
-MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
+MenuAnim::MenuAnim(QWidget *parent) : QWidget(parent),
 	open_anim_max(this, "maximumWidth"),
 	open_anim_min(this, "minimumWidth"),
 	close_anim_max(this, "maximumWidth"),
@@ -34,6 +34,7 @@ MenuAnim::MenuAnim(QWidget *parent) : ColoredQWidget(parent),
 	animInProg(false),
 	animationDuration(200)
 {
+	setAttribute(Qt::WA_StyledBackground, true);
 	open_anim_max.setDuration(animationDuration);
 	open_anim_max.setEasingCurve(QEasingCurve::InOutExpo);
 
