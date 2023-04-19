@@ -44,7 +44,7 @@
 
 //using namespace gr;
 
-namespace adiscope {
+namespace scopy {
 
 waterfall_sink_f::sptr
 waterfall_sink_f::make(int fftsize,
