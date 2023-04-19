@@ -39,7 +39,7 @@
 #include <gnuradio/high_res_timer.h>
 
 using namespace gr;
-namespace adiscope {
+namespace scopy {
 
 class waterfall_sink_f_impl : public waterfall_sink_f
 {
@@ -145,6 +145,6 @@ public:
 	     gr_vector_void_star& output_items) override;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
 #endif /* INCLUDED_QTGUI_WATERFALL_SINK_F_IMPL_H */
