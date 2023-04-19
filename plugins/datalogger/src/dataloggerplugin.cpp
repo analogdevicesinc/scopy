@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QUuid>
+#include <libm2k/contextbuilder.hpp>
 #include <ui_dataloggerInfoPage.h>
 
 
@@ -67,7 +68,7 @@ bool DataLoggerPlugin::onConnect()
 {
 	auto &&cp = ContextProvider::GetInstance();
 	iio_context* ctx = cp->open(m_param);
-
+	libm2k_context = libm2k::context::contextOpen(ctx, "");
 	ping = new IIOPingTask(ctx);
 	cs = new CyclicalTask(ping,this);
 	cs->start(2000);
@@ -75,7 +76,7 @@ bool DataLoggerPlugin::onConnect()
 	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
 	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_DATALOGGER)<<"Ping Success";} );
 
-	tool = new DataLogger(ctx);
+	tool = new DataLogger(libm2k_context);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(tool);
@@ -87,6 +88,7 @@ bool DataLoggerPlugin::onDisconnect()
 {
 	cs->stop();
 	auto &&cp = ContextProvider::GetInstance();
+	libm2k::context::contextClose(libm2k_context);
 	cp->close(m_param);
 
 	for (auto & tool : m_toolList) {
@@ -94,7 +96,7 @@ bool DataLoggerPlugin::onDisconnect()
 		tool->setTool(nullptr);
 	}
 
-//	delete tool;
+	delete tool;
 
 	return true;
 }
@@ -104,7 +106,7 @@ void DataLoggerPlugin::initMetadata()
 	loadMetadata(
 				R"plugin(
 	{
-	   "priority":3,
+	   "priority":16,
 	   "category":[
 	      "iio"
 	   ]
