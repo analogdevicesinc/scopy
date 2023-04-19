@@ -58,18 +58,6 @@ private:
 	QLabel *m_dacLabel;
 };
 
-class DigitalInMenu: public BufferMenu
-{
-	Q_OBJECT
-public:
-	explicit DigitalInMenu(QWidget* parent = nullptr);
-	~DigitalInMenu();
-	void init();
-	void connectSignalsToSlots();
-private:
-	PositionSpinButton *m_comparatorThresholdSpinButton;
-};
-
 class DigitalInLoopMenu: public BufferMenu
 {
 	Q_OBJECT
@@ -81,7 +69,6 @@ public:
 public Q_SLOTS:
 	void dacCodeChanged(double value);
 private:
-	PositionSpinButton *m_comparatorThresholdSpinButton;
 	PositionSpinButton *m_dacCodeSpinButton;
 	QLabel *m_dacLabel;
 };
@@ -159,7 +146,7 @@ public:
 	void connectSignalsToSlots();
 };
 
-class AdvancedMenuBuilder
+class BufferMenuBuilder
 {
 
 public:
@@ -224,8 +211,6 @@ public:
 		switch (menu_type) {
 		case CURRENT_IN_LOOP:
 			return new CurrentInLoopMenu(widget);
-		case DIGITAL_IN:
-			return new DigitalInMenu(widget);
 		case DIGITAL_IN_LOOP:
 			return new DigitalInLoopMenu(widget);
 		case VOLTAGE_OUT:

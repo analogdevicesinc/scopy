@@ -85,31 +85,6 @@ void CurrentInLoopMenu::dacCodeChanged(double value)
 	Q_EMIT attrValuesChanged(attrName);
 }
 
-DigitalInMenu::DigitalInMenu(QWidget* parent):
-	BufferMenu(parent)
-{}
-
-DigitalInMenu::~DigitalInMenu()
-{}
-
-void DigitalInMenu::init()
-{
-	//Comparator Threshold
-	QHBoxLayout *comparatorLayout = new QHBoxLayout();
-	m_comparatorThresholdSpinButton = new PositionSpinButton({
-									{"V",1E0}
-								 },
-								 "Comparator Threshold",0.0,31,
-								 true, false, m_widget);
-	comparatorLayout->addWidget(m_comparatorThresholdSpinButton);
-	addMenuLayout(comparatorLayout);
-
-	connectSignalsToSlots();
-}
-
-void DigitalInMenu::connectSignalsToSlots()
-{}
-
 DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent):
 	BufferMenu(parent)
 {}
@@ -119,15 +94,6 @@ DigitalInLoopMenu::~DigitalInLoopMenu()
 
 void DigitalInLoopMenu::init()
 {
-	//Comparator Threshold
-	QHBoxLayout *comparatorLayout = new QHBoxLayout();
-	m_comparatorThresholdSpinButton = new PositionSpinButton({
-									{"V",1E0}
-								 },
-								 "Comparator Threshold",0.0,31,
-								 true, false, m_widget);
-	comparatorLayout->addWidget(m_comparatorThresholdSpinButton);
-	addMenuLayout(comparatorLayout);
 	//dac code
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
 	m_dacCodeSpinButton = new PositionSpinButton({

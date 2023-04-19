@@ -19,7 +19,7 @@ void swiot::BufferMenuView::init(QString title, QString function, QColor* color)
 	m_advanceSettingsSection = new gui::SubsectionSeparator("Advance settings", false);
 	insertSection(m_advanceSettingsSection);
 
-	m_swiotAdvMenu = swiot::AdvancedMenuBuilder::newAdvMenu(m_advanceSettingsSection->getContentWidget(), function);
+	m_swiotAdvMenu = swiot::BufferMenuBuilder::newAdvMenu(m_advanceSettingsSection->getContentWidget(), function);
 
 }
 
