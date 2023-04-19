@@ -34,7 +34,7 @@ using namespace scopy;
 const char *BaseMenuItem::menuItemMimeDataType = "menuItem";
 
 BaseMenuItem::BaseMenuItem(QWidget *parent) :
-	ColoredQWidget(parent),
+	QWidget(parent),
 	d_ui(new Ui::BaseMenuItem),
 	d_menu(nullptr),
 	d_position(0),

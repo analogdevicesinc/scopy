@@ -21,15 +21,13 @@
 #ifndef MENU_ANIM_HPP
 #define MENU_ANIM_HPP
 
-#include "coloredQWidget.h"
-
 #include "customanimation.h"
 #include <QSize>
 #include <QWidget>
 #include "scopygui_export.h"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT MenuAnim : public ColoredQWidget
+	class SCOPYGUI_EXPORT MenuAnim : public QWidget
 	{
 		Q_OBJECT
 

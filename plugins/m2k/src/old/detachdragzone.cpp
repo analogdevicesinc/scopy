@@ -25,8 +25,9 @@
 using namespace scopy;
 
 DetachDragZone::DetachDragZone(QWidget *parent) :
-	ColoredQWidget(parent)
+	QWidget(parent)
 {
+	setAttribute(Qt::WA_StyledBackground, true);
 	setAcceptDrops(true);
 	this->installEventFilter(this);
 }
