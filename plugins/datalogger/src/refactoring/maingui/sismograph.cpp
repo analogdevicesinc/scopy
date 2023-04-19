@@ -65,7 +65,7 @@ Sismograph::Sismograph(QWidget *parent) : QwtPlot(parent)
 	divs.push_back(engine->divideScale(-0.1, +0.1, 5, 5));
 
 	scaler = new AutoScaler(this, divs);
-	connect(scaler, &AutoScaler::updateScale, this, [=](QwtScaleDiv div){
+	connect(scaler, &AutoScaler::updateScale, this, [=, this](QwtScaleDiv div){
 		if (autoscale) {
 			updateScale();
 		} else {

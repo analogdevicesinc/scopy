@@ -19,7 +19,7 @@ bool DataLoggerPlugin::loadPage()
 	infoui = new Ui::DataLoggerInfoPage();
 	m_page = new QWidget();
 	infoui->setupUi(m_page);
-	connect(infoui->pushButton,&QPushButton::clicked, this, [=] (){
+	connect(infoui->pushButton,&QPushButton::clicked, this, [=, this] (){
 		auto &&cp = ContextProvider::GetInstance();
 		iio_context* ctx = cp->open(m_param);
 		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));

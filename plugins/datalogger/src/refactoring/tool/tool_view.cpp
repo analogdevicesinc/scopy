@@ -43,7 +43,7 @@ void ToolView::configureLastOpenedMenu()
 {
 	QPushButton* settingsBtn = m_ui->widgetSettingsPairBtns->getSettingsBtn();
 
-	connect(settingsBtn, &QPushButton::clicked, this, [=](bool checked) {
+	connect(settingsBtn, &QPushButton::clicked, this, [=, this](bool checked) {
 		if (!m_menuOrder.isEmpty()) {
 			CustomPushButton* btn = nullptr;
 
@@ -130,13 +130,13 @@ void ToolView::settingsPanelUpdate(int id)
 
 void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum position)
 {
-	connect(cm, &ChannelManager::channelManagerToggle, this, [=](bool toggled){
+	connect(cm, &ChannelManager::channelManagerToggle, this, [=, this](bool toggled){
 		m_ui->widgetVerticalChannels->toggleMenu(toggled);
 	});
 	connect(cm, &ChannelManager::configureAddBtn, this, &ToolView::configureAddMathBtn);
 
 	connect(this, &ToolView::changeParent, cm, &ChannelManager::changeParent);
-	connect(cm, &ChannelManager::positionChanged, this, [=](ChannelsPositionEnum position) {
+	connect(cm, &ChannelManager::positionChanged, this, [=, this](ChannelsPositionEnum position) {
 		if (position == ChannelsPositionEnum::VERTICAL) {
 			m_ui->widgetHorizontalChannels->setVisible(false);
 			m_ui->widgetVerticalChannels->setVisible(true);
@@ -212,7 +212,7 @@ void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 	if (dockable) {
 		QDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged, addBtn, [=](bool topLevel) {
+		connect(docker, &QDockWidget::topLevelChanged, addBtn, [=, this](bool topLevel) {
 			addBtn->setChecked(!topLevel);
 			addBtn->setDisabled(topLevel);
 
@@ -242,7 +242,7 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 	if (dockable) {
 		QDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged, ch->menuButton(), [=](bool topLevel) {
+		connect(docker, &QDockWidget::topLevelChanged, ch->menuButton(), [=, this](bool topLevel) {
 			CustomPushButton* btn = static_cast<CustomPushButton*>(ch->menuButton());
 			btn->setChecked(!topLevel);
 			btn->setDisabled(topLevel);
@@ -270,7 +270,7 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 	connect(ch->menuButton(), &CustomPushButton::toggled, this, &ToolView::triggerRightMenuToggle);
 	connect(ch->menuButton(), &CustomPushButton::toggled, m_ui->widgetSettingsPairBtns->getSettingsBtn(),
 		&QPushButton::setChecked);
-	connect(ch->enableButton(), &QAbstractButton::toggled, [=](bool toggled) {
+	connect(ch->enableButton(), &QAbstractButton::toggled, [=, this](bool toggled) {
 		if (!toggled) {
 			// we also remove the button from the history
 			// so that the last menu opened button on top
@@ -285,7 +285,7 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 	connect(menu, &GenericMenu::enableBtnToggled, [=](bool toggled) { ch->enableButton()->setChecked(toggled); });
 
 	if (deletable) {
-		connect(ch, &ChannelWidget::deleteClicked, this, [=]() {
+		connect(ch, &ChannelWidget::deleteClicked, this, [=, this]() {
 			if (ch->menuButton()->isChecked()) {
 				m_menuButtonActions.removeAll(QPair<CustomPushButton*, bool>(
 					qobject_cast<CustomPushButton*>(ch->menuButton()), true));
@@ -340,7 +340,7 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 	if (dockable) {
 		QDockWidget* docker = this->createDetachableMenu(menu, id);
 
-		connect(docker, &QDockWidget::topLevelChanged, btn, [=](bool topLevel) {
+		connect(docker, &QDockWidget::topLevelChanged, btn, [=, this](bool topLevel) {
 			btn->getBtn()->setChecked(!topLevel);
 			btn->getBtn()->setDisabled(topLevel);
 
@@ -362,7 +362,7 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 	connect(btn->getBtn(), &CustomPushButton::toggled, this, &ToolView::triggerRightMenuToggle);
 	connect(btn->getBtn(), &CustomPushButton::toggled, m_ui->widgetSettingsPairBtns->getSettingsBtn(),
 		&QPushButton::setChecked);
-	connect(btn->getCheckBox(), &QCheckBox::toggled, [=](bool toggled) {
+	connect(btn->getCheckBox(), &QCheckBox::toggled, [=, this](bool toggled) {
 		if (!toggled) {
 			// we also remove the button from the history
 			// so that the last menu opened button on top
@@ -469,7 +469,7 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 	generalSettingsBtn->setProperty("id", QVariant(-m_generalSettingsMenuId));
 	m_group.addButton(generalSettingsBtn);
 
-	connect(generalSettingsBtn, &CustomPushButton::toggled, this, [=](bool toggled) {
+	connect(generalSettingsBtn, &CustomPushButton::toggled, this, [=, this](bool toggled) {
 		triggerRightMenuToggle(toggled);
 		if (toggled) {
 			m_ui->widgetSettingsPairBtns->getSettingsBtn()->setChecked(!toggled);
@@ -485,7 +485,7 @@ void ToolView::setFixedMenu(QWidget* menu, bool dockable)
 		QDockWidget* docker = this->createDetachableMenu(menu, id);
 
 		connect(docker, &QDockWidget::topLevelChanged,
-			[=](bool topLevel) { m_ui->widgetMenuAnim->toggleMenu(!topLevel); });
+			[=, this](bool topLevel) { m_ui->widgetMenuAnim->toggleMenu(!topLevel); });
 	} else {
 		id = m_ui->stackedWidget->addWidget(menu);
 	}

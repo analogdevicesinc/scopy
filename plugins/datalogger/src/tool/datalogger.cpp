@@ -60,14 +60,14 @@ DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
 
 	m_timer->setSingleShot(true);
 	//on timeout read on thread
-	connect(m_timer, &QTimer::timeout, this, [=]() {
+	connect(m_timer, &QTimer::timeout, this, [=, this]() {
 		if ( !m_elapsed->isValid() ){
 			m_elapsed->start();
 		}
 		readerThread->start();
 	});
 
-	connect(readerThread, &DataLoggerReaderThread::finished, this, [=]() {
+	connect(readerThread, &DataLoggerReaderThread::finished, this, [=, this]() {
 		//after read is done check if another read is needed
 		if (m_toolView->getRunBtn()->isChecked()) {
 			int newInterval = VALUE_READING_TIME_INTERVAL - m_elapsed->elapsed();
@@ -88,12 +88,12 @@ DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
 
 	m_dmmList = getDmmList(m_context);
 
-	connect(this, &DataLogger::recordingIntervalChanged, this , [=](double interval){
+	connect(this, &DataLogger::recordingIntervalChanged, this , [=, this](double interval){
 		VALUE_READING_TIME_INTERVAL = interval;
 		recording_timer->setValue(interval/1000);
 	});
 
-	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=](bool toggled){
+	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=, this](bool toggled){
 		dataLoggerController->setIsRunningOn(m_toolView->getRunBtn()->isChecked());
 
 
@@ -123,7 +123,7 @@ DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
 		}
 	});
 
-	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, [=](bool toggled){
+	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, [=, this](bool toggled){
 		if (toggled) {
 			if (m_toolView->getRunBtn()->isChecked()) {
 				m_toolView->getRunBtn()->toggled(false);
@@ -202,11 +202,11 @@ void DataLogger::initMonitorToolView()
 				}
 			});
 
-			connect(monitor, &adiscope::ChannelMonitorComponent::contentChanged, m_customColGrid, [=](){
+			connect(monitor, &adiscope::ChannelMonitorComponent::contentChanged, m_customColGrid, [=, this](){
 				m_customColGrid->itemSizeChanged();
 			}, Qt::QueuedConnection);
 
-			connect(this, &DataLogger::recordingIntervalChanged, monitor , [=](double interval){
+			connect(this, &DataLogger::recordingIntervalChanged, monitor , [=, this](double interval){
 				monitor->setRecordingInterval(interval/1000);
 			});
 
@@ -224,7 +224,7 @@ void DataLogger::initMonitorToolView()
 				monitor->updateLcdNumberPrecision(precision);
 			});
 
-			connect(this, &DataLogger::disableActivateChannel,this, [=](bool toggled){
+			connect(this, &DataLogger::disableActivateChannel,this, [=, this](bool toggled){
 				if(m_toolView->getRunBtn()->isChecked() && toggled)
 					ch_widget->enableButton()->setDisabled(true);
 				else
@@ -237,7 +237,7 @@ void DataLogger::initMonitorToolView()
 			readerThread->addChannel(chId, channel.id,dmm);
 
 			// logic for enable/disable channels
-			connect(ch_widget, &ChannelWidget::enabled,this, [=](bool enabled){
+			connect(ch_widget, &ChannelWidget::enabled,this, [=, this](bool enabled){
 
 				readerThread->channelToggled(chId,enabled);
 				if (enabled) {
@@ -367,7 +367,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	showAllSection->setContent(showAllWidget);
 
-	connect(showAllSWitch, &CustomSwitch::toggled, this, [=](bool toggled){
+	connect(showAllSWitch, &CustomSwitch::toggled, this, [=, this](bool toggled){
 		Q_EMIT DataLogger::toggleAll(toggled);
 	});
 
@@ -387,7 +387,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 	precisionLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed));
 	precisionLayout->addWidget(precisionValue);
 
-	connect(precisionBtn, &QPushButton::clicked,this, [=](){
+	connect(precisionBtn, &QPushButton::clicked,this, [=, this](){
 		auto value = precisionValue->text().toInt();
 		if (value < 0) {
 			precisionValue->setText("0");
@@ -414,7 +414,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	recording_timer->setValue(1);
 	recordingIntevlaLayout->addWidget(recording_timer);
-	connect(recording_timer, &PositionSpinButton::valueChanged, this, [=](){
+	connect(recording_timer, &PositionSpinButton::valueChanged, this, [=, this](){
 		double interval = recording_timer->value() * 1000;
 		if (interval < 100) {
 			interval = 100;
@@ -432,11 +432,11 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 	dataLoggerController->setWarningMessage("* While data logging you won't be able to add/remove channels");
 	dataLoggingSection->setContent(dataLoggerController->getWidget());
 
-	connect(readerThread, &DataLoggerReaderThread::updateDataLoggerValue, this , [=](QString name, QString value){
+	connect(readerThread, &DataLoggerReaderThread::updateDataLoggerValue, this , [=, this](QString name, QString value){
 		dataLoggerController->receiveValue(name,value);
 	});
 
-	connect(dataLoggerController, &DataLoggerController::isDataLogging, this, [=](bool toggled){
+	connect(dataLoggerController, &DataLoggerController::isDataLogging, this, [=, this](bool toggled){
 
 		if (m_toolView->getRunBtn()->isChecked()) {
 			showAllSWitch->setEnabled(!toggled);

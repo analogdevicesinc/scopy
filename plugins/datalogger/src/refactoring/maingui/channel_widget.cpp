@@ -79,7 +79,7 @@ void ChannelWidget::init()
 		setStyleSheet(stylesheet);
 	} else {
 		connect(m_ui->name, &QPushButton::toggled,
-			[=] (bool checked) {
+			[=, this] (bool checked) {
 				setDynamicProperty(m_ui->widget, "selected",
 					checked);
 				setDynamicProperty(m_ui->line, "selected",
@@ -348,7 +348,7 @@ void ChannelWidget::setIsMainChannel(bool mainChannel)
 		m_isMainChannel = true;
 		m_ui->box->hide();
 		m_ui->toggleChannels->show();
-		connect(m_ui->toggleChannels, &QPushButton::toggled, this, [=](bool toggled){
+		connect(m_ui->toggleChannels, &QPushButton::toggled, this, [=, this](bool toggled){
 			Q_EMIT enabled(toggled);
 		});
 	}

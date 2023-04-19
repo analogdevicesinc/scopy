@@ -7,7 +7,7 @@ DataLoggerModel::DataLoggerModel():
 	m_timer(new QTimer())
 {
 	QObject::connect(m_timer, &QTimer::timeout, [=, this](){
-		QtConcurrent::run(std::bind(&DataLoggerModel::logData, this));
+		auto future = QtConcurrent::run(std::bind(&DataLoggerModel::logData, this));
 	});
 }
 

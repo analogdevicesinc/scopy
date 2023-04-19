@@ -37,7 +37,7 @@ void DataLoggerView::init()
 	dataLoggingFilePath->setReadOnly(true);
 	dataLoggingFilePath->setDisabled(true);
 
-	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=](QString path){
+	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=, this](QString path){
 		if (filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
 			dataLoggingFilePath->setText(tr("No file selected"));
 			dataLoggingFilePath->setStyleSheet("color:red");
@@ -64,11 +64,11 @@ void DataLoggerView::init()
 	dataLoggingLayout->addWidget(appendRadio);
 	appendRadio->setDisabled(true);
 
-	connect(overwriteRadio, &QRadioButton::toggled, [=](bool en) {
+	connect(overwriteRadio, &QRadioButton::toggled, [=, this](bool en) {
 		appendRadio->setChecked(!en);
 	});
 
-	connect(appendRadio, &QRadioButton::toggled, [=](bool en) {
+	connect(appendRadio, &QRadioButton::toggled, [=, this](bool en) {
 		overwriteRadio->setChecked(!en);
 	});
 
@@ -82,7 +82,7 @@ void DataLoggerView::init()
 	data_logging_timer->setValue(5);
 	data_logging_timer->setDisabled(true);
 
-	connect(data_logging_timer, &PositionSpinButton::valueChanged, this, [=](){
+	connect(data_logging_timer, &PositionSpinButton::valueChanged, this, [=, this](){
 		double interval = data_logging_timer->value() * 1000; //converts to seconds before emiting value
 		if (interval < 100) {
 			interval = 100;
@@ -103,7 +103,7 @@ void DataLoggerView::init()
 	dataLoggingLayout->addWidget(warningMessage);
 
 	//on data logging switch pressed enable/disable data logging section and emit data loggin toggled
-	connect(dataLoggingSwitch,  &CustomSwitch::toggled, this, [=](bool toggled){
+	connect(dataLoggingSwitch,  &CustomSwitch::toggled, this, [=, this](bool toggled){
 		Q_EMIT toggleDataLogger(toggled);
 		enableDataLoggerFields(toggled);
 	});
