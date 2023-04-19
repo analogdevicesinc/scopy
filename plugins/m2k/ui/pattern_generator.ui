@@ -1790,7 +1790,7 @@ QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</s
   <customwidget>
    <class>scopy::DetachDragZone</class>
    <extends>QWidget</extends>
-   <header>gui/detachdragzone.h</header>
+   <header>detachdragzone.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
