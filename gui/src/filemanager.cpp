@@ -427,7 +427,7 @@ void FileManager::writeToFile(bool overwrite,QMap<QString,QVector<QString>> data
 			file.open(QIODevice::WriteOnly);
 			QStringList header = ScopyFileHeader::getHeader();
 			//prepare header
-			exportStream << header[0] << separator << QString(SCOPY_VERSION_GIT) << "\n";
+			exportStream << header[0] << separator << "git"/*QString(SCOPY_VERSION_GIT)*/ << "\n";
 			exportStream << header[1] << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
 			exportStream << header[2] << separator << "M2K" << "\n";
 			exportStream << header[5] << separator << toolName << "\n";

@@ -31,7 +31,7 @@
 #include "autoScaler.hpp"
 #include "customFifo.hpp"
 #include "scopygui_export.h"
-#include "gui/customqwtscaledraw.hpp"
+#include "customqwtscaledraw.hpp"
 
 namespace scopy {
 	class SCOPYGUI_EXPORT Sismograph : public QwtPlot

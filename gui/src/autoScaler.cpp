@@ -109,4 +109,8 @@ void AutoScaler::setTimeout(int timeout_ms)
 		timer.start();
 }
 
+void AutoScaler::addScaleDivs(QwtScaleDiv div)
+{
+	divs.push_back(div);
+}
 #include "moc_autoScaler.cpp"
