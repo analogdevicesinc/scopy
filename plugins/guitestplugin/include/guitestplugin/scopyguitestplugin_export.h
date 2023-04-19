@@ -1,0 +1,42 @@
+
+#ifndef SCOPYGUITESTPLUGIN_EXPORT_H
+#define SCOPYGUITESTPLUGIN_EXPORT_H
+
+#ifdef SCOPYGUITESTPLUGIN_STATIC_DEFINE
+#  define SCOPYGUITESTPLUGIN_EXPORT
+#  define SCOPYGUITESTPLUGIN_NO_EXPORT
+#else
+#  ifndef SCOPYGUITESTPLUGIN_EXPORT
+#    ifdef scopyguitestplugin_EXPORTS
+        /* We are building this library */
+#      define SCOPYGUITESTPLUGIN_EXPORT __attribute__((visibility("default")))
+#    else
+        /* We are using this library */
+#      define SCOPYGUITESTPLUGIN_EXPORT __attribute__((visibility("default")))
+#    endif
+#  endif
+
+#  ifndef SCOPYGUITESTPLUGIN_NO_EXPORT
+#    define SCOPYGUITESTPLUGIN_NO_EXPORT __attribute__((visibility("hidden")))
+#  endif
+#endif
+
+#ifndef SCOPYGUITESTPLUGIN_DEPRECATED
+#  define SCOPYGUITESTPLUGIN_DEPRECATED __attribute__ ((__deprecated__))
+#endif
+
+#ifndef SCOPYGUITESTPLUGIN_DEPRECATED_EXPORT
+#  define SCOPYGUITESTPLUGIN_DEPRECATED_EXPORT SCOPYGUITESTPLUGIN_EXPORT SCOPYGUITESTPLUGIN_DEPRECATED
+#endif
+
+#ifndef SCOPYGUITESTPLUGIN_DEPRECATED_NO_EXPORT
+#  define SCOPYGUITESTPLUGIN_DEPRECATED_NO_EXPORT SCOPYGUITESTPLUGIN_NO_EXPORT SCOPYGUITESTPLUGIN_DEPRECATED
+#endif
+
+#if 0 /* DEFINE_NO_DEPRECATED */
+#  ifndef SCOPYGUITESTPLUGIN_NO_DEPRECATED
+#    define SCOPYGUITESTPLUGIN_NO_DEPRECATED
+#  endif
+#endif
+
+#endif /* SCOPYGUITESTPLUGIN_EXPORT_H */

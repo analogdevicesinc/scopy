@@ -21,7 +21,6 @@
 #ifndef BASEMENUITEM_H
 #define BASEMENUITEM_H
 
-#include "coloredQWidget.h"
 #include "scopygui_export.h"
 #include <QFrame>
 #include <QMouseEvent>
@@ -37,7 +36,7 @@ class BaseMenu;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT BaseMenuItem : public ColoredQWidget
+class SCOPYGUI_EXPORT BaseMenuItem : public QWidget
 {
 	Q_OBJECT
 
@@ -82,7 +81,7 @@ protected:
 	void _enableTopSeparator(bool enable);
 
 private:
-        Ui::BaseMenuItem *d_ui;
+	Ui::BaseMenuItem *d_ui;
 	BaseMenu *d_menu;
 
 	int d_position;

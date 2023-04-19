@@ -24,10 +24,11 @@
 using namespace scopy;
 
 CustomPlotPositionButton::CustomPlotPositionButton(QWidget *parent) :
-	ColoredQWidget(parent),
+	QWidget(parent),
 	ui(new Ui::CustomPlotPositionButton)
 {
 	ui->setupUi(this);
+	setAttribute(Qt::WA_StyledBackground,true);
 
 	setDynamicProperty(ui->leftTop, "selected" , true);
 	setDynamicProperty(ui->rightTop, "selected" , false);

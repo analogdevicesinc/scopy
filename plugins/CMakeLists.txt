@@ -8,6 +8,8 @@ option(ENABLE_PLUGIN_M2K ON)
 option(ENABLE_PLUGIN_SWIOT ON)
 
 if(ENABLE_PLUGIN_TEST)
+    add_subdirectory(guitestplugin)
+    list(APPEND PLUGINS ${PLUGIN_NAME})
     add_subdirectory(testplugin)
     list(APPEND PLUGINS ${PLUGIN_NAME})
     add_subdirectory(testplugin2)

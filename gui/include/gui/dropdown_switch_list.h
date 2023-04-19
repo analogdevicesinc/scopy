@@ -53,10 +53,10 @@ namespace scopy {
 		void hidePopup() override;
 
 	protected Q_SLOTS:
-		void mousePressEvent(QMouseEvent *event);
-		void mouseReleaseEvent(QMouseEvent *event);
-		void enterEvent(QEvent *event);
-		void leaveEvent(QEvent *event);
+		void mousePressEvent(QMouseEvent *event) override;
+		void mouseReleaseEvent(QMouseEvent *event) override;
+		void enterEvent(QEvent *event) override;
+		void leaveEvent(QEvent *event) override;
 
 	private Q_SLOTS:
 		void resetIndex(int);
