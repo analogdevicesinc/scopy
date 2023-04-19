@@ -46,6 +46,7 @@ namespace scopy {
 		void startTimer();
 		void stopTimer();
 		void setTimeout(int timeout_ms);
+		void addScaleDivs(QwtScaleDiv div);
 
 	private Q_SLOTS:
 		void timeout();
