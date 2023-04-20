@@ -5,7 +5,7 @@
 #include <QtDebug>
 #include <iostream>
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomColQGridLayout::CustomColQGridLayout(int maxCols, bool hasScrollArea, QWidget *parent) :
 	QWidget(parent),

@@ -2,13 +2,13 @@
 #define DIOSETTINGSTAB_H
 
 #include <QWidget>
-#include "src/refactoring/maingui/spinbox_a.hpp"
+#include <gui/spinbox_a.hpp>
 
 namespace Ui {
 class DioSettingsTab;
 }
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class DioSettingsTab : public QWidget {
 	Q_OBJECT
 public:

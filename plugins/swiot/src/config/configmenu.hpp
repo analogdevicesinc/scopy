@@ -4,7 +4,7 @@
 #include <QObject>
 #include "ui_swiotconfig.h"
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class ConfigMenu: public QWidget
 {
 	Q_OBJECT

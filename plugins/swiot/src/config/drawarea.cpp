@@ -7,7 +7,7 @@
 #include <QtSvg/QSvgRenderer>
 #include <QVBoxLayout>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 DrawArea::DrawArea(QWidget *parent) :
 	QWidget(parent),

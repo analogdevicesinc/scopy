@@ -5,12 +5,11 @@
 #include "qcombobox.h"
 #include "qlabel.h"
 
-#include "src/refactoring/maingui/spinbox_a.hpp"
+#include <gui/spinbox_a.hpp>
+#include <QWidget>
+#include <string>
 
-#include<QWidget>
-#include<string>
-
-namespace adiscope {
+namespace scopy {
 class CustomSwitch;
 
 namespace swiot {

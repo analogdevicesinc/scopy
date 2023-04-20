@@ -1,7 +1,7 @@
 #include "faultspage.hpp"
 #include "ui_faultspage.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 FaultsPage::FaultsPage(QWidget *parent) :
 	QWidget(parent),

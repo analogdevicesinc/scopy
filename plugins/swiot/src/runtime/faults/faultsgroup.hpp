@@ -11,7 +11,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class FaultsGroup; }
 QT_END_NAMESPACE
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class FaultsGroup : public QWidget {
 	Q_OBJECT
 public:

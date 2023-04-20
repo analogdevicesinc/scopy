@@ -2,13 +2,13 @@
 #include <utility>
 #include "faultsgroup.hpp"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	: ui(new Ui::FaultsDevice),
 	  QWidget(parent),
 	  m_faults_explanation(new QTextEdit(this)),
-	  m_subsectionSeparator(new adiscope::gui::SubsectionSeparator("Faults Explanation", true, this)),
+	  m_subsectionSeparator(new scopy::gui::SubsectionSeparator("Faults Explanation", true, this)),
 	  m_faultsGroup(new FaultsGroup(name, path, this)),
 	  m_name(std::move(name)),
 	  m_path(std::move(path)) {

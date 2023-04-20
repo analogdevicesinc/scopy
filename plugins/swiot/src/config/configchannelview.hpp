@@ -10,7 +10,7 @@
 #include "ui_swiotconfigchnlview.h"
 #include <QObject>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class ConfigChannelView: public QWidget
 {
 	Q_OBJECT

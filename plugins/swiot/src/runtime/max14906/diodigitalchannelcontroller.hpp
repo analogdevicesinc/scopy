@@ -8,7 +8,7 @@
 
 #define ATTR_BUFFER_LEN 200
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class DioDigitalChannelController : public QWidget {
 	Q_OBJECT
 public:
@@ -35,6 +35,6 @@ private:
 	struct iio_channel* m_channel;
 };
 
-} // adiscope
+} // scopy
 
 #endif //SCOPY_DIODIGITALCHANNELCONTROLLER_H

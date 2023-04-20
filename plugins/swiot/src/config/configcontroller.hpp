@@ -5,7 +5,7 @@
 #include "src/config/configchannelview.hpp"
 #include "configmodel.hpp"
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 
 class ConfigController: public QObject
 {
