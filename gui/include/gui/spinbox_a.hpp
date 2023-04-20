@@ -235,7 +235,7 @@ public Q_SLOTS:
 	void enableNumberSeriesRebuild(bool enable);
 
 protected:
-	scopy::NumberSeries m_steps;
+	NumberSeries m_steps;
 	double m_fine_increment;
 	bool m_numberSeriesRebuild;
 	int integer_divider;
