@@ -36,9 +36,9 @@ FILE(GLOB SRC_LIST
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
-#if(ENABLE_TESTING)
-#	add_subdirectory(test)
-#endif()
+if(ENABLE_TESTING)
+    add_subdirectory(test)
+endif()
 
 set(PROJECT_SOURCES
 	${SRC_LIST}
