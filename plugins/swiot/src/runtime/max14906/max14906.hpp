@@ -2,12 +2,12 @@
 #define MAX14906TOOL_HPP
 
 #include "ui_swiotmax14906.h"
-#include "src/refactoring/maincore/customcolqgridlayout.hpp"
 #include "diocontroller.hpp"
 #include "diodigitalchannelcontroller.hpp"
 #include "src/runtime/readerthread.h"
 #include "diosettingstab.h"
 #include <gui/tool_view.hpp>
+#include <gui/flexgridlayout.hpp>
 
 namespace scopy::swiot {
 class DioDigitalChannel;
@@ -41,7 +41,7 @@ private:
 	Ui::Max14906 *ui;
 	DioSettingsTab *m_max14906SettingsTab;
 	scopy::gui::ToolView *m_toolView;
-	CustomColQGridLayout* m_customColGrid;
+	FlexGridLayout* m_customColGrid;
 	scopy::gui::GenericMenu* m_generalSettingsMenu;
 	scopy::gui::ChannelManager* m_monitorChannelManager;
 	scopy::gui::SubsectionSeparator *settingsWidgetSeparator;
