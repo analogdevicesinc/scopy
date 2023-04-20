@@ -3,7 +3,7 @@
 
 #include "src/runtime/ad74413r/ad74413r.hpp"
 
-namespace adiscope {
+namespace scopy {
 namespace gui {
 class GenericMenu;
 class ChannelManager;

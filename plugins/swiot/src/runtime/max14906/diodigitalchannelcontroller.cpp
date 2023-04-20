@@ -2,7 +2,7 @@
 #include "src/swiot_logging_categories.h"
 #include <sstream>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* channel, const QString &deviceName, const QString &deviceType, QWidget *parent) :
 	QWidget(parent),

@@ -1,11 +1,12 @@
 #include "ad74413r.hpp"
-#include "src/refactoring/tool/tool_view_builder.hpp"
+#include <gui/tool_view_builder.hpp>
+#include <gui/generic_menu.hpp>
 #include "buffermenuview.hpp"
 #include "buffermenumodel.hpp"
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 Ad74413r::Ad74413r(iio_context *ctx, QVector<QString> chnlsFunc, QWidget* parent):
 	QWidget(parent)
@@ -50,20 +51,20 @@ Ad74413r::~Ad74413r()
 
 void Ad74413r::setupToolView()
 {
-	adiscope::gui::ToolViewRecipe recipe;
+	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPairSettingsBtn = true;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = true;
-	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
+	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::VERTICAL;
 
-	m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 	m_monitorChannelManager->setToolStatus("Channels");
 
-	m_toolView = adiscope::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
+	m_toolView = scopy::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
 
 	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor("Red"));
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
@@ -157,13 +158,13 @@ void Ad74413r::initExportSettings(QWidget *parent)
 	});
 }
 
-adiscope::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* color)
+scopy::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* color)
 {
-	adiscope::gui::GenericMenu *menu = new adiscope::gui::GenericMenu(this);
+	scopy::gui::GenericMenu *menu = new scopy::gui::GenericMenu(this);
 	menu->initInteractiveMenu();
 	menu->setMenuHeader(title,color,false);
 
-	auto *generalSubsection = new adiscope::gui::SubsectionSeparator("Acquisition settings", false, this);
+	auto *generalSubsection = new scopy::gui::SubsectionSeparator("Acquisition settings", false, this);
 	generalSubsection->getContentWidget()->layout()->setSpacing(10);
 
 	//channels sampling freq

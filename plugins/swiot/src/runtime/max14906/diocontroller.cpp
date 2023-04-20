@@ -1,6 +1,6 @@
 #include "diocontroller.hpp"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 DioController::DioController(struct iio_context* context_, QString deviceName) :
 	m_deviceName(std::move(deviceName)),

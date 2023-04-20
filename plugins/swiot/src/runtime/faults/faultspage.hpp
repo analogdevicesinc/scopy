@@ -10,7 +10,7 @@
 
 namespace Ui { class FaultsPage; }
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class FaultsDevice;
 
 class FaultsPage : public QWidget {

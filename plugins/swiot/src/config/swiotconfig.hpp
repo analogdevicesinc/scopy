@@ -5,7 +5,7 @@
 
 #include "configcontroller.hpp"
 #include "configmenu.hpp"
-#include "src/refactoring/tool/tool_view.hpp"
+#include <gui/tool_view.hpp>
 #include <QPushButton>
 #include <QMap>
 #include <QScrollArea>
@@ -18,7 +18,7 @@ struct iio_device;
 struct iio_channel;
 }
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 
 class SwiotConfig: public QWidget
 {
@@ -37,7 +37,7 @@ private:
 	QVector<QStringList*> m_funcAvailable;
 	QPushButton* m_configBtn;
 	ConfigMenu* m_configMenu;
-	adiscope::gui::ToolView* m_toolView;
+	scopy::gui::ToolView* m_toolView;
 
 	DrawArea* m_drawArea;
 	QScrollArea* m_scrollArea;

@@ -1,6 +1,6 @@
 #include "configchannelview.hpp"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 ConfigChannelView::ConfigChannelView(int chnlIdx, QWidget *parent) :
 	QWidget(parent),

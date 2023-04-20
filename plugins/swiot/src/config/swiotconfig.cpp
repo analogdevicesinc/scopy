@@ -1,5 +1,5 @@
 #include "swiotconfig.hpp"
-#include "src/refactoring/tool/tool_view_builder.hpp"
+#include <gui/tool_view_builder.hpp>
 #include "configcontroller.hpp"
 #include "configmenu.hpp"
 #include "configmodel.hpp"
@@ -8,7 +8,7 @@
 #include "src/swiot_logging_categories.h"
 #include <QVBoxLayout>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent):
         QWidget(parent)
@@ -121,7 +121,7 @@ void SwiotConfig::configBtnPressed()
 }
 
 void SwiotConfig::setupToolView(QWidget* parent) {
-        adiscope::gui::ToolViewRecipe recipe;
+        scopy::gui::ToolViewRecipe recipe;
         recipe.helpBtnUrl = "";
         recipe.hasRunBtn = false;
         recipe.hasSingleBtn = false;
@@ -130,7 +130,7 @@ void SwiotConfig::setupToolView(QWidget* parent) {
         recipe.hasChannels = false;
         recipe.hasHelpBtn = true;
 
-        m_toolView = adiscope::gui::ToolViewBuilder(recipe, nullptr, parent).build();
+        m_toolView = scopy::gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
         m_configMenu = new ConfigMenu();
         m_drawArea = new DrawArea(this);

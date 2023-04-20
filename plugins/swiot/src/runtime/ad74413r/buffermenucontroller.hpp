@@ -5,7 +5,7 @@
 #include "buffermenuview.hpp"
 #include "buffermenumodel.hpp"
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class BufferMenuController : public QObject {
 	Q_OBJECT
 public:

@@ -1,7 +1,7 @@
 #include "diosettingstab.h"
 #include "ui_swiotmax14906settingstab.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 DioSettingsTab::DioSettingsTab(QWidget *parent) :
 	QWidget(parent),

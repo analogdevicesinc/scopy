@@ -5,7 +5,7 @@
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 ReaderThread::ReaderThread(bool isBuffered, QObject *parent)
 	: QThread{parent}

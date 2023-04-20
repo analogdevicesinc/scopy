@@ -4,13 +4,13 @@
 #include "ui_swiotfaults.h"
 
 #include "faultspage.hpp"
-#include "src/refactoring/tool/tool_view.hpp"
-#include "src/refactoring/maingui/generic_menu.hpp"
-#include "src/refactoring/maingui/channel_manager.hpp"
+#include <gui/tool_view.hpp>
+#include <gui/generic_menu.hpp>
+#include <gui/channel_manager.hpp>
 
 #include <iio.h>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class Faults : public QWidget {
 	Q_OBJECT
 public:
@@ -45,8 +45,8 @@ private:
 	uint32_t ad74413r_numeric;
 	uint32_t max14906_numeric;
 
-	adiscope::gui::ToolView *m_toolView{};
-	adiscope::gui::ChannelManager *m_monitorChannelManager{};
+	scopy::gui::ToolView *m_toolView{};
+	scopy::gui::ChannelManager *m_monitorChannelManager{};
 	FaultsPage *m_faultsPage{};
 };
 }

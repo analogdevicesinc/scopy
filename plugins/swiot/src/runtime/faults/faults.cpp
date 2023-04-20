@@ -1,13 +1,13 @@
 #include "faults.hpp"
-#include "src/refactoring/tool/tool_view_builder.hpp"
+#include <gui/tool_view_builder.hpp>
 
 #include <QTimer>
 #include <QThread>
 
 #include "src/swiot_logging_categories.h"
-#include "src/refactoring/maingui/channel_manager.hpp"
+#include <gui/channel_manager.hpp>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 #define POLLING_INTERVAL 1000
 #define FAULT_CHANNEL_NAME "voltage"
@@ -48,16 +48,16 @@ Faults::~Faults() {
 }
 
 void Faults::setupDynamicUi(QWidget *parent) {
-	adiscope::gui::ToolViewRecipe recipe;
+	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPairSettingsBtn = false;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = false;
-	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::HORIZONTAL;
+	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::HORIZONTAL;
 
-	this->m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	this->m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 
 	this->m_toolView = gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();

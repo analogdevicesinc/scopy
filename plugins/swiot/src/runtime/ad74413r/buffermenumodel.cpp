@@ -3,7 +3,7 @@
 #include "buffermenumodel.hpp"
 #include "src/swiot_logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 BufferMenuModel::BufferMenuModel(struct iio_channel* iioChnl):
 	m_iioChnl(iioChnl)

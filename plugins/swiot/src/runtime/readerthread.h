@@ -6,7 +6,7 @@
 #include <iio.h>
 #include <QMutex>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class ReaderThread : public QThread {
 	Q_OBJECT
 public:

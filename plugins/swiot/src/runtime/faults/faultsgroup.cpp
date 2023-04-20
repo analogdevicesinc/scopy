@@ -10,7 +10,7 @@
 #include "src/swiot_logging_categories.h"
 
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 #define MAX_COLS_IN_GRID 100
 
