@@ -15,13 +15,15 @@
 #include "pluginbase/scopyjs.h"
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
+#include "scopycore_config.h"
 #include "versionchecker.h"
 #include "application_restarter.h"
 #include <QLoggingCategory>
 
+using namespace scopy;
+
 Q_LOGGING_CATEGORY(CAT_SCOPY,"Scopy")
 
-using namespace scopy;
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	: QMainWindow(parent)
 	, ui(new Ui::ScopyMainWindow)
@@ -30,6 +32,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPreferences();
+	initPythonWIN32();
 
 	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
@@ -251,6 +254,18 @@ void ScopyMainWindow::handlePreferences(QString str,QVariant val) {
 	}
 }
 
+void ScopyMainWindow::initPythonWIN32(){
+	#ifdef WIN32
+		auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
+		auto path_str = QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
+		path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
+		path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
+		path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
+		path_str += QString::fromLocal8Bit(pythonpath);
+
+		qputenv("PYTHONPATH", path_str.toLocal8Bit());
+	#endif
+}
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
