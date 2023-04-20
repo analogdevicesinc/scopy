@@ -2,6 +2,7 @@
 #define TOOLBUILDER_HPP
 
 #include "tool_view.hpp"
+#include "scopygui_export.h"
 
 namespace scopy {
 namespace gui {
@@ -23,7 +24,7 @@ struct ToolViewRecipe
 	bool hasHeader{true};
 };
 
-class ToolViewBuilder
+class SCOPYGUI_EXPORT ToolViewBuilder
 {
 public:
 	ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager = nullptr, QWidget* parent = nullptr);
