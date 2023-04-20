@@ -21,11 +21,6 @@ message(QtVersion: ${QT_VERSION_MAJOR})
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 
-add_subdirectory(iioutil)
-add_subdirectory(pluginbase)
-add_subdirectory(gui)
-add_subdirectory(plugins)
-add_subdirectory(core)
 
 FILE(GLOB SRC_LIST  *.cpp *.cc)
 FILE(GLOB HEADER_LIST *.h *.hpp)
@@ -46,6 +41,11 @@ qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 find_library(IIO_LIBRARIES NAMES iio libiio)
 find_path(IIO_INCLUDE_DIRS iio.h)
 
+add_subdirectory(gui)
+add_subdirectory(iioutil)
+add_subdirectory(pluginbase)
+add_subdirectory(plugins)
+add_subdirectory(core)
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 

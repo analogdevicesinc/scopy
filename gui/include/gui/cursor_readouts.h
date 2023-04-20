@@ -34,8 +34,9 @@ namespace Ui {
 	class CursorReadouts;
 }
 
-namespace SCOPYGUI_EXPORT scopy {
-	class CursorReadouts: public QWidget
+
+namespace scopy {
+	class SCOPYGUI_EXPORT CursorReadouts: public QWidget
 	{
 	public:
 		CursorReadouts(QwtPlot *plot);
