@@ -1,42 +1,25 @@
-#include "customcolqgridlayout.hpp"
-#include "ui_customcolqgridlayout.h"
+#include "flexgridlayout.hpp"
 #include "QScrollArea"
 #include <QSpacerItem>
 #include <QtDebug>
-#include <iostream>
 
 using namespace scopy;
 
-CustomColQGridLayout::CustomColQGridLayout(int maxCols, bool hasScrollArea, QWidget *parent) :
+FlexGridLayout::FlexGridLayout(int maxCols, QWidget *parent) :
 	QWidget(parent),
-	hasScrollArea(hasScrollArea),
 	m_maxCols(maxCols-1),
 	currentNumberOfCols(m_maxCols),
-        col(0),
+	col(0),
 	row(0),
-	updatePending(false),
-	ui(new Ui::CustomColQGridLayout)
+	updatePending(false)
 {
-	ui->setupUi(this);
-
-        m_mainWidget = new QWidget(this);
-
-        this->ui->scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
-        if (hasScrollArea) { // default
-                ui->scrollArea->setWidgetResizable(true);
-                ui->scrollArea->setWidget(m_mainWidget);
-        } else {
-                ui->gridLayout_2->addWidget(m_mainWidget);
-                this->ui->scrollArea->hide();
-        }
-
-        m_gridLayout = new QGridLayout;
+	m_gridLayout = new QGridLayout(this);
 	m_gridLayout->setHorizontalSpacing(0);
 	m_gridLayout->setVerticalSpacing(0);
 	m_gridLayout->setContentsMargins(0, 0, 0, 0);
 	m_gridLayout->setSpacing(0);
 	m_gridLayout->setMargin(0);
-	m_mainWidget->setLayout(m_gridLayout);
+	setLayout(m_gridLayout);
 
 	m_hspacer = new QSpacerItem(1,1, QSizePolicy::Expanding, QSizePolicy::Fixed);
 	m_vspacer = new QSpacerItem(1,1, QSizePolicy::Fixed, QSizePolicy::Expanding);
@@ -44,18 +27,18 @@ CustomColQGridLayout::CustomColQGridLayout(int maxCols, bool hasScrollArea, QWid
 	m_gridLayout->addItem(m_hspacer,0, m_maxCols + 1);
 	m_gridLayout->addItem(m_vspacer,10, 0);
 
-	connect(this, &CustomColQGridLayout::reqestLayoutUpdate, this, &CustomColQGridLayout::updateLayout, Qt::QueuedConnection);
+	connect(this, &FlexGridLayout::reqestLayoutUpdate, this, &FlexGridLayout::updateLayout, Qt::QueuedConnection);
 }
 
 // adds widget to internal widget list and return the index of the added widget
-int CustomColQGridLayout::addQWidgetToList(QWidget *widget)
+int FlexGridLayout::addQWidgetToList(QWidget *widget)
 {
 	m_widgetList.push_back(widget);
 	return  m_widgetList.size() -1;
 }
 
 // adds a widget at index to the layout and it's index to the active widget list
-void CustomColQGridLayout::addWidget(int index)
+void FlexGridLayout::addWidget(int index)
 {
 	m_gridLayout->addWidget(m_widgetList.at(index),row,col);
 	m_widgetList.at(index)->show();
@@ -71,7 +54,7 @@ void CustomColQGridLayout::addWidget(int index)
 }
 
 // remove widget at index from layout
-void CustomColQGridLayout::removeWidget(int index)
+void FlexGridLayout::removeWidget(int index)
 {
 	//get index, row and column of item that will be removed
 	int indexOfGrid = m_gridLayout->indexOf(m_widgetList.at(index));
@@ -114,19 +97,19 @@ void CustomColQGridLayout::removeWidget(int index)
 
 // move a widget to specified row and column
 // moving the widget will replace the current widget at that position
-void CustomColQGridLayout::repositionWidgets(int index, int row, int col)
+void FlexGridLayout::repositionWidgets(int index, int row, int col)
 {
 	m_gridLayout->addWidget(m_widgetList.at(index),row,col);
 }
 
 // returns widget at index
-QWidget* CustomColQGridLayout::getWidget(int index)
+QWidget* FlexGridLayout::getWidget(int index)
 {
 	return m_widgetList.at(index);
 }
 
 // check if widget is active on layout
-bool CustomColQGridLayout::isWidgetActive(int index)
+bool FlexGridLayout::isWidgetActive(int index)
 {
 	for (int i = 0 ; i < m_activeWidgetList.size(); i++) {
 		if (m_activeWidgetList.at(i) == index) {
@@ -137,7 +120,7 @@ bool CustomColQGridLayout::isWidgetActive(int index)
 }
 
 //toggle all widgets
-void CustomColQGridLayout::toggleAll(bool toggled)
+void FlexGridLayout::toggleAll(bool toggled)
 {
 	for (int i=0; i< m_widgetList.size(); i++) {
 		if (toggled) {
@@ -149,49 +132,49 @@ void CustomColQGridLayout::toggleAll(bool toggled)
 }
 
 //set the maximum number of columns
-void CustomColQGridLayout::setMaxColumnNumber(int maxColumns)
+void FlexGridLayout::setMaxColumnNumber(int maxColumns)
 {
 	m_maxCols = maxColumns - 1;
 }
 
 //returns the maximum number of columns
-int CustomColQGridLayout::getMaxColumnNumber()
+int FlexGridLayout::getMaxColumnNumber()
 {
 	return  m_maxCols;
 }
 
 //returns the number of rows that contain the maximum number of cols/elements that could fit on a row
-int CustomColQGridLayout::fullRows() const
+int FlexGridLayout::fullRows() const
 {
-        return row;
+	return row;
 }
 
 //returns the number of rows, including the last row that might not be full
-int CustomColQGridLayout::rows() const
+int FlexGridLayout::rows() const
 {
-        return row + (col != 0);
+	return row + (col != 0);
 }
 
 //returns the maximum number of cols/elements that are currently on a row
-int CustomColQGridLayout::columns() const
+int FlexGridLayout::columns() const
 {
-        if (row == 0) return 0;
-        return ((int) (m_widgetList.size() - col)) / row;
+	if (row == 0) return 0;
+	return ((int) (m_widgetList.size() - col)) / row;
 }
 
 //returns the number of cols/elements that are on the last row
-int CustomColQGridLayout::columnsOnLastRow() const
+int FlexGridLayout::columnsOnLastRow() const
 {
-        return col;
+	return col;
 }
 
 // returns the number of widgets in the grid
-int CustomColQGridLayout::count() const
+int FlexGridLayout::count() const
 {
 	return this->m_widgetList.size();
 }
 
-void CustomColQGridLayout::resizeEvent(QResizeEvent *event)
+void FlexGridLayout::resizeEvent(QResizeEvent *event)
 {
 	if (!updatePending) {
 		updatePending = true;
@@ -199,7 +182,7 @@ void CustomColQGridLayout::resizeEvent(QResizeEvent *event)
 	}
 }
 
-void CustomColQGridLayout::itemSizeChanged()
+void FlexGridLayout::itemSizeChanged()
 {
 	if (!updatePending) {
 		updatePending = true;
@@ -207,7 +190,7 @@ void CustomColQGridLayout::itemSizeChanged()
 	}
 }
 
-void CustomColQGridLayout::updateLayout()
+void FlexGridLayout::updateLayout()
 {
 	if (availableWidth != this->width()) {
 		if (m_activeWidgetList.size() > 0) {
@@ -219,7 +202,7 @@ void CustomColQGridLayout::updateLayout()
 	updatePending = false;
 }
 
-void CustomColQGridLayout::recomputeColCount()
+void FlexGridLayout::recomputeColCount()
 {
 	if (m_activeWidgetList.size() > 0) {
 		auto maxWidth = m_widgetList.at(m_activeWidgetList.at(0))->minimumSizeHint().width();
@@ -236,7 +219,7 @@ void CustomColQGridLayout::recomputeColCount()
 	}
 }
 
-void CustomColQGridLayout::computeCols(double width) // width of the first active widget
+void FlexGridLayout::computeCols(double width) // width of the first active widget
 {
 	int colCount = currentNumberOfCols;
 	availableWidth = this->width();
@@ -265,7 +248,7 @@ void CustomColQGridLayout::computeCols(double width) // width of the first activ
 }
 
 // redraw all active widgets
-void CustomColQGridLayout::redrawWidgets()
+void FlexGridLayout::redrawWidgets()
 {
 	row = 0;
 	col = 0;
@@ -287,15 +270,9 @@ void CustomColQGridLayout::redrawWidgets()
 			}
 		}
 	}
-
-        if (!hasScrollArea) {
-                m_gridLayout->setRowMinimumHeight(0, this->m_widgetList.at(0)->height());
-                this->setMinimumHeight(this->rows() * this->m_widgetList.at(0)->height());
-                Q_EMIT reqestLayoutUpdate();
-        }
 }
 
-CustomColQGridLayout::~CustomColQGridLayout()
+FlexGridLayout::~FlexGridLayout()
 {
 	for (auto widget: m_widgetList) {
 		delete widget;
@@ -305,5 +282,4 @@ CustomColQGridLayout::~CustomColQGridLayout()
 		m_gridLayout->removeItem(m_hspacer);
 		delete m_gridLayout;
 	}
-	delete ui;
 }

@@ -5,19 +5,16 @@
 #include <QVBoxLayout>
 #include <QResizeEvent>
 #include <QTimer>
-
-namespace Ui {
-class CustomColQGridLayout;
-}
+#include "scopygui_export.h"
 
 namespace scopy {
-class CustomColQGridLayout : public QWidget
+class SCOPYGUI_EXPORT FlexGridLayout : public QWidget
 {
 	Q_OBJECT
 
 public:
-	explicit CustomColQGridLayout(int maxCols, bool hasScrollArea = true, QWidget *parent = nullptr);
-	~CustomColQGridLayout() override;
+	explicit FlexGridLayout(int maxCols, QWidget *parent = nullptr);
+	~FlexGridLayout() override;
 
 	void toggleAll(bool toggled);
 	void addWidget(int index);
@@ -29,10 +26,10 @@ public:
 	void setMaxColumnNumber(int maxColumns);
 	int getMaxColumnNumber();
 
-        int fullRows() const;
-        int rows() const;
-        int columns() const;
-        int columnsOnLastRow() const;
+	int fullRows() const;
+	int rows() const;
+	int columns() const;
+	int columnsOnLastRow() const;
 
 	int count() const;
 
@@ -44,7 +41,6 @@ public Q_SLOTS:
 	void itemSizeChanged();
 
 private:
-        bool hasScrollArea;
 	int m_maxCols;
 	int currentNumberOfCols;
 	int col;
@@ -54,7 +50,6 @@ private:
 	std::vector<QWidget*> m_widgetList;
 	QVector<int> m_activeWidgetList;
 	QGridLayout *m_gridLayout;
-	QWidget *m_mainWidget;
 	QSpacerItem *m_hspacer;
 	QSpacerItem *m_vspacer;
 
@@ -63,10 +58,8 @@ private:
 	void redrawWidgets();
 	void recomputeColCount();
 	void computeCols(double width);
-	void resizeEvent(QResizeEvent *event);
+	void resizeEvent(QResizeEvent *event) override;
 	void repositionWidgets(int index, int row, int col);
-
-	Ui::CustomColQGridLayout *ui;
 };
 }
 #endif // CUSOTMCOLQGRIDLAYOUT_HPP
