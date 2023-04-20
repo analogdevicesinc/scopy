@@ -21,7 +21,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-set(SCOPY_QT_COMPONENTS Core Widgets)
+set(SCOPY_QT_COMPONENTS Core Widgets UiTools)
 
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
 FILE(GLOB OLD_SCOPY_FILES
@@ -76,7 +76,9 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
-	Qt::Widgets Qt::Core
+	Qt::Widgets
+	Qt::Core
+	scopygui
 	scopypluginbase
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/src/old
 	)

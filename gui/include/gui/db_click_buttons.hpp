@@ -30,9 +30,9 @@ namespace Ui {
 class DbClickButtons;
 }
 
-namespace SCOPYGUI_EXPORT scopy {
+namespace scopy {
 
-class DbClickButtons: public QWidget
+class SCOPYGUI_EXPORT DbClickButtons: public QWidget
 {
 	Q_OBJECT
 
