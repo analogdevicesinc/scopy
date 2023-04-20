@@ -255,11 +255,10 @@ bool M2kPlugin::loadPreferencesPage()
 void M2kPlugin::init()
 {
 #if defined __APPLE__
-				bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
+	bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
 #else
-				bool success = loadDecoders("decoders");
+	bool success = loadDecoders("decoders");
 #endif
-				qInfo(CAT_M2KPLUGIN)<<"loadDecoders " << success;
 }
 
 void M2kPlugin::saveSettings(QSettings &s)
