@@ -5,7 +5,7 @@
 #include <QObject>
 #include <iio.h>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class SwiotSwitchCtxTask : public QThread
 {
 	Q_OBJECT

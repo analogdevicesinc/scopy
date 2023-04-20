@@ -3,11 +3,11 @@
 
 #include <QWidget>
 #include "ui_swiotdigitalchannel.h"
-#include "src/refactoring/maingui/generic_menu.hpp"
+#include <gui/generic_menu.hpp>
 #include "core/logging_categories.h"
 
-namespace adiscope::swiot {
-class DioDigitalChannel : public adiscope::gui::GenericMenu {
+namespace scopy::swiot {
+class DioDigitalChannel : public scopy::gui::GenericMenu {
 	Q_OBJECT
 public:
 	explicit DioDigitalChannel(const QString &deviceName, const QString &deviceType, QWidget *parent = nullptr);

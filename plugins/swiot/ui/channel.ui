@@ -180,7 +180,7 @@
          </spacer>
         </item>
         <item>
-         <widget class="adiscope::CustomPushButton" name="btn">
+         <widget class="scopy::CustomPushButton" name="btn">
           <property name="maximumSize">
            <size>
             <width>40</width>
@@ -239,7 +239,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>adiscope::CustomPushButton</class>
+   <class>scopy::CustomPushButton</class>
    <extends>QPushButton</extends>
    <header>gui/customPushButton.h</header>
   </customwidget>

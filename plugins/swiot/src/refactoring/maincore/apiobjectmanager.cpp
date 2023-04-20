@@ -21,7 +21,7 @@
 #include "apiobjectmanager.h"
 #include <algorithm>
 
-using namespace adiscope;
+using namespace scopy;
 
 ApiObjectManager::ApiObjectManager()
 {

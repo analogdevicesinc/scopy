@@ -13,7 +13,7 @@ struct iio_channel;
 }
 Q_DECLARE_OPAQUE_POINTER(struct iio_buffer*)
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 #define MAX_BUFFER_SIZE 160
 #define MIN_BUFFER_SIZE 20
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"

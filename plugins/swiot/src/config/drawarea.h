@@ -5,7 +5,7 @@
 #include <QtSvg/QSvgWidget>
 
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class DrawArea : public QWidget {
 	Q_OBJECT
 

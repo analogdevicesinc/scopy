@@ -5,10 +5,10 @@
 #include <QTextEdit>
 #include "ui_faultsdevice.h"
 #include "faultsgroup.hpp"
-#include "src/refactoring/maingui/subsection_separator.hpp"
+#include <gui/subsection_separator.hpp>
 
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class FaultsGroup;
 
 class FaultsDevice : public QWidget {
@@ -26,7 +26,7 @@ public Q_SLOTS:
 private:
 	Ui::FaultsDevice *ui;
 	QTextEdit *m_faults_explanation;
-	adiscope::gui::SubsectionSeparator *m_subsectionSeparator;
+	scopy::gui::SubsectionSeparator *m_subsectionSeparator;
 
 	FaultsGroup* m_faultsGroup;
 
@@ -39,6 +39,6 @@ private Q_SLOTS:
 	void updateMinimumHeight();
 };
 
-} // adiscope::gui
+} // scopy::gui
 
 #endif //SCOPY_SWIOTFAULTSDEVICE_HPP

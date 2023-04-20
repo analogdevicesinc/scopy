@@ -1,8 +1,8 @@
 #include "max14906.hpp"
-#include "src/refactoring/tool/tool_view_builder.hpp"
+#include <gui/tool_view_builder.hpp>
 #include "src/swiot_logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	QWidget(parent),
@@ -34,19 +34,19 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 }
 
 void Max14906::setupDynamicUi(QWidget *parent) {
-	adiscope::gui::ToolViewRecipe recipe;
+	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPairSettingsBtn = true;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = false;
-	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::HORIZONTAL;
+	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::HORIZONTAL;
 
-	this->m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	this->m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 
-	m_toolView = adiscope::gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
+	m_toolView = scopy::gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
 
 	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
@@ -60,12 +60,12 @@ void Max14906::setupDynamicUi(QWidget *parent) {
         this->m_toolView->addTopExtraWidget(m_backButton);
 }
 
-adiscope::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, QColor* color) {
-	auto generalSettingsMenu = new adiscope::gui::GenericMenu(this);
+scopy::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, QColor* color) {
+	auto generalSettingsMenu = new scopy::gui::GenericMenu(this);
 	generalSettingsMenu->initInteractiveMenu();
 	generalSettingsMenu->setMenuHeader(title, color, false);
 
-	settingsWidgetSeparator = new adiscope::gui::SubsectionSeparator("MAX14906", false, this);
+	settingsWidgetSeparator = new scopy::gui::SubsectionSeparator("MAX14906", false, this);
 	this->m_max14906SettingsTab = new DioSettingsTab(settingsWidgetSeparator);
 	settingsWidgetSeparator->setContent(this->m_max14906SettingsTab);
 	generalSettingsMenu->insertSection(settingsWidgetSeparator);

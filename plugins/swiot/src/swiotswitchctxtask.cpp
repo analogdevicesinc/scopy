@@ -2,7 +2,7 @@
 #include <iioutil/contextprovider.h>
 #include "src/swiot_logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 SwiotSwitchCtxTask::SwiotSwitchCtxTask(QString uri) : QThread()
 {

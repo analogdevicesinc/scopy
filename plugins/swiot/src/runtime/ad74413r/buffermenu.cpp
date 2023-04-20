@@ -1,6 +1,6 @@
 #include "buffermenu.hpp"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 BufferMenu::BufferMenu(QWidget *parent)
 	: QWidget(parent),
 	  m_widget(parent)

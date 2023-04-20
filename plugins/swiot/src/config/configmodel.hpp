@@ -8,7 +8,7 @@ struct iio_channel;
 struct iio_device;
 }
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class ConfigModel : public QObject {
 	Q_OBJECT
 public:

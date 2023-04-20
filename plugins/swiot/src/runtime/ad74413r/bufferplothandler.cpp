@@ -5,7 +5,7 @@
 #include <QFileDialog>
 #include <unistd.h>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int samplingFreq) :
 	QWidget(parent)

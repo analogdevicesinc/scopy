@@ -4,7 +4,7 @@
 #include <QMap>
 #include "src/swiot_logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 ConfigModel::ConfigModel(struct iio_channel* adChannel, struct iio_channel* maxChannel)
 {

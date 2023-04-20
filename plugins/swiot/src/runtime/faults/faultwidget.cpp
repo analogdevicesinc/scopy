@@ -4,7 +4,7 @@
 #include "ui_faultwidget.h"
 #include "core/logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 FaultWidget::FaultWidget(unsigned int id, QString name, QString faultExplanation, QWidget *parent) :
 	QWidget(parent),
@@ -78,12 +78,12 @@ bool FaultWidget::isPressed() const {
 
 void FaultWidget::setPressed(bool pressed_) {
 	FaultWidget::pressed = pressed_;
-	adiscope::setDynamicProperty(this->ui->mainFrame, "pressed", pressed_);
+	scopy::setDynamicProperty(this->ui->mainFrame, "pressed", pressed_);
 }
 
 bool FaultWidget::eventFilter(QObject *object, QEvent *event) {
 	if (event->type() == QEvent::MouseButtonPress) {
-		this->setPressed( !adiscope::getDynamicProperty(this->ui->mainFrame, "pressed") );
+		this->setPressed( !scopy::getDynamicProperty(this->ui->mainFrame, "pressed") );
 
 		Q_EMIT faultSelected(this->id);
 	}
