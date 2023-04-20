@@ -18,7 +18,7 @@ FaultsGroup::FaultsGroup(QString name, const QString& path, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultsGroup),
 	m_name(std::move(name)),
-	m_customColGrid(new CustomColQGridLayout(MAX_COLS_IN_GRID, false, this))
+	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
 {
 	ui->setupUi(this);
 
@@ -71,7 +71,7 @@ FaultsGroup::FaultsGroup(QString name, const QString& path, QWidget *parent) :
 
 	m_customColGrid->itemSizeChanged();
 	this->ui->horizontalLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Minimum));
-	connect(m_customColGrid, &CustomColQGridLayout::reqestLayoutUpdate, this, [this] (){
+	connect(m_customColGrid, &FlexGridLayout::reqestLayoutUpdate, this, [this] (){
 		if (this->ui->activeStoredLayout->count() != m_customColGrid->rows()) {
 			while (this->ui->activeStoredLayout->count() < m_customColGrid->rows()) {
 				this->ui->activeStoredLayout->addWidget(this->buildActiveStoredWidget());
