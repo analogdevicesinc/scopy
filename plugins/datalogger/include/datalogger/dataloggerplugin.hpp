@@ -27,6 +27,10 @@ class DataLoggerInfoPage;
 //class Max14906Tool; // TODO: rename this class
 }
 
+namespace libm2k::context {
+class Context;
+}
+
 namespace scopy {
 namespace datalogger {
 class SCOPYDATALOGGER_EXPORT DataLoggerPlugin : public QObject, public PluginBase
@@ -61,6 +65,8 @@ private:
 
 	IIOPingTask *ping;
 	CyclicalTask *cs;
+
+	libm2k::context::Context *libm2k_context;
 
 };
 }
