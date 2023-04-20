@@ -52,7 +52,7 @@ class DataLogger : public QWidget
 	Q_OBJECT
 
 public:
-	explicit DataLogger(struct iio_context *ctx, QWidget *parent = nullptr);
+	explicit DataLogger(libm2k::context::Context *ctx, QWidget *parent = nullptr);
 	~DataLogger();
 
 	gui::ToolView* getToolView();
