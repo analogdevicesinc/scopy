@@ -15,6 +15,7 @@
 #include "generic_menu.hpp"
 #include "linked_button.hpp"
 #include "menu_anim.hpp"
+#include "scopygui_export.h"
 
 namespace Ui {
 class ToolView;
@@ -23,7 +24,7 @@ class ToolView;
 namespace scopy {
 namespace gui {
 
-class ToolView : public QWidget
+class SCOPYGUI_EXPORT ToolView : public QWidget
 {
 	friend class ToolViewBuilder;
 
@@ -82,7 +83,7 @@ public:
 
 	void setHeaderVisibility(bool visible);
 
-	scopy::MenuAnim* addMenuToStack();
+	MenuAnim* addMenuToStack();
 	void setStackedWidget(QStackedWidget* sw);
 
 private:

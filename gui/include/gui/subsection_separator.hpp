@@ -4,14 +4,15 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QWidget>
+#include "scopygui_export.h"
 
 namespace Ui {
-class SubsectionSeparator;
+class SCOPYGUI_EXPORT SubsectionSeparator;
 }
 
 namespace scopy {
 namespace gui {
-class SubsectionSeparator : public QWidget
+class SCOPYGUI_EXPORT SubsectionSeparator : public QWidget
 {
 	Q_OBJECT
 
