@@ -2,7 +2,7 @@
 #include <string>
 #include "src/swiot_logging_categories.h"
 
-using namespace scopy;
+using namespace scopy::swiot;
 
 SwiotRuntime::SwiotRuntime():
 	m_iioCtx(nullptr)
