@@ -28,3 +28,4 @@ doc/*
 build/*
 .vscode/*
 CMakeLists.txt.user
+resources/scopy_osp.html
