@@ -2,12 +2,12 @@
 #define SWIOTGENERICMENU_H
 
 #include <QWidget>
-#include "src/refactoring/maingui/generic_menu.hpp"
+#include <gui/generic_menu.hpp>
 #include "buffermenu.hpp"
 #include <QMap>
 #include <QObject>
 
-namespace adiscope {
+namespace scopy {
 class CustomSwitch;
 class GenericMenu;
 
@@ -27,7 +27,7 @@ public:
 
 private:
 	BufferMenu *m_swiotAdvMenu;
-	adiscope::gui::SubsectionSeparator *m_advanceSettingsSection;
+	scopy::gui::SubsectionSeparator *m_advanceSettingsSection;
 };
 }
 }

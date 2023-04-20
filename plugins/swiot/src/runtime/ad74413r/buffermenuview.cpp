@@ -1,7 +1,7 @@
 #include "buffermenuview.hpp"
 #include <QHBoxLayout>
 
-using namespace adiscope;
+using namespace scopy;
 
 swiot::BufferMenuView::BufferMenuView(QWidget *parent):
 	GenericMenu(parent)

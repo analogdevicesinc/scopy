@@ -7,9 +7,9 @@
 #include "diodigitalchannelcontroller.hpp"
 #include "src/runtime/readerthread.h"
 #include "diosettingstab.h"
-#include "src/refactoring/tool/tool_view.hpp"
+#include <gui/tool_view.hpp>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class DioDigitalChannel;
 class DioController;
 
@@ -33,18 +33,18 @@ private:
 	void initChannels();
 	void setupDynamicUi(QWidget *parent);
 	void initMonitorToolView();
-	adiscope::gui::GenericMenu* createGeneralSettings(const QString& title, QColor* color);
+	scopy::gui::GenericMenu* createGeneralSettings(const QString& title, QColor* color);
 	void connectSignalsAndSlots();
 
         QPushButton *m_backButton;
 	DioController *max14906ToolController;
 	Ui::Max14906 *ui;
 	DioSettingsTab *m_max14906SettingsTab;
-	adiscope::gui::ToolView *m_toolView;
+	scopy::gui::ToolView *m_toolView;
 	CustomColQGridLayout* m_customColGrid;
-	adiscope::gui::GenericMenu* m_generalSettingsMenu;
-	adiscope::gui::ChannelManager* m_monitorChannelManager;
-	adiscope::gui::SubsectionSeparator *settingsWidgetSeparator;
+	scopy::gui::GenericMenu* m_generalSettingsMenu;
+	scopy::gui::ChannelManager* m_monitorChannelManager;
+	scopy::gui::SubsectionSeparator *settingsWidgetSeparator;
 	QTimer *m_qTimer;
 
 	ReaderThread *m_readerThread;

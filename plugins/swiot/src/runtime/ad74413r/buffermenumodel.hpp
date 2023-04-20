@@ -8,7 +8,7 @@ extern "C"{
 struct iio_channel;
 }
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class BufferMenuModel: public QObject{
 	Q_OBJECT
 public:

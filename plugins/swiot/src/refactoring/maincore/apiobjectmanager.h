@@ -24,7 +24,7 @@
 #include <pluginbase/apiobject.h>
 #include <vector>
 
-namespace adiscope {
+namespace scopy {
 class ApiObjectManager
 {
 public:

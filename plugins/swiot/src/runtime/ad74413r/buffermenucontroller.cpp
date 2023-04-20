@@ -1,7 +1,7 @@
 #include "buffermenucontroller.hpp"
 #include "qdebug.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 BufferMenuController::BufferMenuController(BufferMenuView* genericMenu, BufferMenuModel* model, int chnlIdx):
 	m_chnlIdx(chnlIdx)

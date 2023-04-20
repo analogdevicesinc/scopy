@@ -1,7 +1,7 @@
 #include "swiotcontroller.h"
 
-using namespace adiscope;
-using namespace adiscope::swiot;
+using namespace scopy;
+using namespace scopy::swiot;
 
 SwiotController::SwiotController(QString uri, QObject *parent)
 	: QObject(parent), uri(uri)

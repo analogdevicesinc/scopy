@@ -7,7 +7,7 @@
 #include <QThread>
 #include <QTimer>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class DioController : public QObject {
 	Q_OBJECT
 public:

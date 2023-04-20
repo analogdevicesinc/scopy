@@ -8,7 +8,7 @@
 #include "src/swiotswitchctxtask.h"
 
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class SwiotController : public QObject
 {
 	Q_OBJECT

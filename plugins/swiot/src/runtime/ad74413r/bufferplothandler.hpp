@@ -2,12 +2,12 @@
 #define SWIOTPLOTHANDLER_HPP
 
 #include <gui/oscilloscope_plot.hpp>
-#include<qobject.h>
+#include <qobject.h>
 #include "bufferlogic.hpp"
 #include <qmutex.h>
 #include <QWidget>
 
-namespace adiscope::swiot {
+namespace scopy::swiot {
 class BufferPlotHandler : public QWidget
 {
 	Q_OBJECT

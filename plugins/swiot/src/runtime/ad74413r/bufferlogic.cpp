@@ -1,7 +1,7 @@
 #include "bufferlogic.hpp"
 #include "src/swiot_logging_categories.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 BufferLogic::BufferLogic(struct iio_device* iioDev) :
 	m_plotChnlsNo(0)

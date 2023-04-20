@@ -3,7 +3,7 @@
 #include <QMap>
 #include <QObject>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 ConfigMenu::ConfigMenu(QWidget* parent) :
 	QWidget(parent)

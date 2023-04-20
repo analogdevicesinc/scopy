@@ -1,7 +1,7 @@
 #include "configcontroller.hpp"
 #include "qdebug.h"
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 ConfigController::ConfigController(ConfigChannelView* chnlsView,
 				   ConfigModel* model):
@@ -36,7 +36,7 @@ void ConfigController::addMenuAttrValues()
 
 void ConfigController::createConnections()
 {
-	connect(m_chnlsView, &adiscope::swiot::ConfigChannelView::attrValueChanged, this, &ConfigController::attrChanged);
+	connect(m_chnlsView, &scopy::swiot::ConfigChannelView::attrValueChanged, this, &ConfigController::attrChanged);
 }
 
 void ConfigController::attrChanged(QString attrName, int deviceIdx)

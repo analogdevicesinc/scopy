@@ -1,12 +1,12 @@
 #ifndef SWIOTAD_HPP
 #define SWIOTAD_HPP
 
-#include "src/refactoring/tool/tool_view.hpp"
+#include <gui/tool_view.hpp>
 #include <qwidget.h>
 #include "bufferlogic.hpp"
 #include "src/runtime/readerthread.h"
 #include "buffermenucontroller.hpp"
-#include "src/refactoring/maingui/channel_manager.hpp"
+#include <gui/channel_manager.hpp>
 #include <gui/osc_export_settings.h>
 #include <QVector>
 #include "bufferplothandler.hpp"
@@ -21,7 +21,7 @@ struct iio_channel;
 struct iio_buffer;
 }
 
-namespace adiscope {
+namespace scopy {
 namespace gui {
 class GenericMenu;
 }
@@ -41,7 +41,7 @@ public:
 
 	void verifyChnlsChanges();
 
-	adiscope::gui::GenericMenu *createSettingsMenu(QString title, QColor *color);
+	scopy::gui::GenericMenu *createSettingsMenu(QString title, QColor *color);
 public Q_SLOTS:
 
 	void onChannelWidgetEnabled(bool en);
@@ -75,8 +75,8 @@ private:
 	struct iio_device *m_iioDev;
 	int m_enabledChnlsNo = 0;
 
-	adiscope::gui::ChannelManager *m_monitorChannelManager;
-	adiscope::gui::ToolView *m_toolView;
+	scopy::gui::ChannelManager *m_monitorChannelManager;
+	scopy::gui::ToolView *m_toolView;
 	QWidget *m_widget;
 	QPushButton *m_backBtn;
 

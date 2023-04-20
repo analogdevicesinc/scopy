@@ -54,7 +54,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -76,7 +76,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -116,7 +116,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -138,7 +138,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -160,7 +160,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -182,7 +182,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -205,7 +205,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -227,7 +227,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -339,7 +339,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -379,7 +379,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -444,7 +444,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -491,7 +491,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -538,7 +538,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -585,7 +585,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -632,7 +632,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -679,7 +679,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope</namespace>
+                       <namespace>scopy</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -726,7 +726,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -773,7 +773,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -820,7 +820,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -867,7 +867,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -914,7 +914,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -961,7 +961,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope</namespace>
+                       <namespace>scopy</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1033,7 +1033,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1080,7 +1080,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1127,7 +1127,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1174,7 +1174,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1221,7 +1221,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1268,7 +1268,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1290,7 +1290,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1312,7 +1312,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1409,7 +1409,7 @@
                          <visual-role>0</visual-role>
                         </DObject>
                        </base-DObject>
-                       <namespace>adiscope::swiot</namespace>
+                       <namespace>scopy::swiot</namespace>
                        <show-all-members>true</show-all-members>
                       </DClass>
                      </instance>
@@ -1496,7 +1496,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -1658,7 +1658,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -1754,7 +1754,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -1874,7 +1874,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2042,7 +2042,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2210,7 +2210,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2322,7 +2322,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2380,7 +2380,7 @@
                   <name>BufferMenuBuilder</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2462,7 +2462,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2603,7 +2603,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2659,7 +2659,7 @@
                     <uid>{0b007e12-02e4-445c-a747-47f4554d83d3}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::SubsectionSeparator *m_advanceSettingsSection</declaration>
+                    <declaration>scopy::gui::SubsectionSeparator *m_advanceSettingsSection</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2751,7 +2751,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -2849,7 +2849,7 @@
                   <name>BufferMenuModel</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -3063,7 +3063,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -3111,7 +3111,7 @@
                     <uid>{a7b44d81-987b-4bb1-8cf8-76687207c52f}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>adiscope::gui::GenericMenu *createSettingsMenu(QString title, QColor *color)</declaration>
+                    <declaration>scopy::gui::GenericMenu *createSettingsMenu(QString title, QColor *color)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -3239,7 +3239,7 @@
                     <uid>{f4d8ee43-fe94-4b04-ada9-11a47145a2cd}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ChannelManager *m_monitorChannelManager</declaration>
+                    <declaration>scopy::gui::ChannelManager *m_monitorChannelManager</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -3247,7 +3247,7 @@
                     <uid>{cb5a5c55-d3d0-4a3a-8db0-2b3d77a44e72}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ToolView *m_toolView</declaration>
+                    <declaration>scopy::gui::ToolView *m_toolView</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -3369,7 +3369,7 @@
                   <name>BufferPlotHandler</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -3613,7 +3613,7 @@
                   <name>BufferLogic</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -3904,7 +3904,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope</namespace>
+                <namespace>scopy</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -4091,7 +4091,7 @@
                   <name>ReaderThread</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -4466,7 +4466,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -4556,7 +4556,7 @@
                     <uid>{90bb47ea-fe01-4004-b7c2-a343c2de62b7}</uid>
                     <visibility>3</visibility>
                     <type>2</type>
-                    <declaration>adiscope::gui::GenericMenu* createGeneralSettings(const QString&amp; title, QColor* color)</declaration>
+                    <declaration>scopy::gui::GenericMenu* createGeneralSettings(const QString&amp; title, QColor* color)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -4604,7 +4604,7 @@
                     <uid>{e5f0641c-ced4-4363-bd3b-d6e81f338f8f}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ToolView *m_toolView</declaration>
+                    <declaration>scopy::gui::ToolView *m_toolView</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -4620,7 +4620,7 @@
                     <uid>{9e6575d0-53a1-4ff6-813b-40b516cc2def}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::GenericMenu* m_generalSettingsMenu</declaration>
+                    <declaration>scopy::gui::GenericMenu* m_generalSettingsMenu</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -4628,7 +4628,7 @@
                     <uid>{f1de8a15-d298-4de1-9afa-c503f5cb548a}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ChannelManager* m_monitorChannelManager</declaration>
+                    <declaration>scopy::gui::ChannelManager* m_monitorChannelManager</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -4636,7 +4636,7 @@
                     <uid>{99c966a7-c66d-4ef7-a115-d19d3454e9d2}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::SubsectionSeparator *settingsWidgetSeparator</declaration>
+                    <declaration>scopy::gui::SubsectionSeparator *settingsWidgetSeparator</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -4686,7 +4686,7 @@
                   <name>SwiotRuntime</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -4874,7 +4874,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5052,7 +5052,7 @@
                   <name>SwiotSwitchCtxTask</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5111,7 +5111,7 @@
                   <name>IIOPingTask</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope</namespace>
+                <namespace>scopy</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5240,7 +5240,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5394,7 +5394,7 @@
                     <uid>{5de099af-d502-4f11-a151-57f4b7c669bc}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ToolView *m_toolView{}</declaration>
+                    <declaration>scopy::gui::ToolView *m_toolView{}</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -5402,7 +5402,7 @@
                     <uid>{8d2abae5-cdf9-447b-a232-e7811269f3cb}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ChannelManager *m_monitorChannelManager{}</declaration>
+                    <declaration>scopy::gui::ChannelManager *m_monitorChannelManager{}</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -5473,7 +5473,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5585,7 +5585,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5650,7 +5650,7 @@
                     <uid>{6ca7790c-e627-440a-9016-0759aac82494}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::SubsectionSeparator *m_subsectionSeparator</declaration>
+                    <declaration>scopy::gui::SubsectionSeparator *m_subsectionSeparator</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -5754,7 +5754,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -5927,7 +5927,7 @@
                   <name>FaultWidget</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -6145,7 +6145,7 @@
                   <name>DioController</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -6245,7 +6245,7 @@
                   <name>DioSettingsTab</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -6358,7 +6358,7 @@
                   </relations>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>
@@ -6482,7 +6482,7 @@
                   <name>DioDigitalChannel</name>
                  </MObject>
                 </base-MObject>
-                <namespace>adiscope::swiot</namespace>
+                <namespace>scopy::swiot</namespace>
                 <members>
                  <qlist>
                   <item>

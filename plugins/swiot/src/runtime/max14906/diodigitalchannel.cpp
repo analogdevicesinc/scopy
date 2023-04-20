@@ -1,7 +1,7 @@
 #include "diodigitalchannel.hpp"
 #include <QPixmap>
 
-using namespace adiscope::swiot;
+using namespace scopy::swiot;
 
 DioDigitalChannel::DioDigitalChannel(const QString& deviceName, const QString& deviceType, QWidget *parent) :
 	ui(new Ui::DioDigitalChannel()),
