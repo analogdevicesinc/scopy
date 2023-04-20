@@ -61,8 +61,8 @@ set(PROJECT_SOURCES
 	${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR}Concurrent REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Concurrent Svg REQUIRED)
+
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
 endif()
@@ -88,7 +88,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Concurrent
+	scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
