@@ -30,21 +30,20 @@
 
 using gui::ToolViewBuilder;
 
-DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
+DataLogger::DataLogger(libm2k::context::Context *ctx, QWidget *parent):
 	QWidget(parent),
 //	Tool(ctx, toolMenuItem, new DataLogger_API(this), "DataLogger", parent),
 	m_timer(new QTimer(this)),
 	m_elapsed(new QElapsedTimer()),
-	readerThread(new DataLoggerReaderThread())
-//	m_context(libm2k::context::contextOpen(ctx, ""))
+	readerThread(new DataLoggerReaderThread()),
+	m_context(ctx)
 {
 	//	run_button = nullptr;
 
-	m_context = libm2k::context::contextOpen(ctx, "");
-	m_colors = {QColor("#ff7200"),    QColor("#9013fe"),    QColor(Qt::green),
-		    QColor(Qt::cyan),     QColor(Qt::magenta),  QColor(Qt::yellow),
-		    QColor(Qt::gray),     QColor(Qt::darkRed),  QColor(Qt::darkGreen),
-		    QColor(Qt::darkBlue), QColor(Qt::darkGray), QColor(Qt::black)};
+
+	m_colors = {QColor("#ff7200"),QColor("#9013fe"), QColor(Qt::green),QColor(Qt::cyan), QColor(Qt::magenta),
+				QColor(Qt::yellow), QColor(Qt::gray), QColor(Qt::darkRed), QColor(Qt::darkGreen),
+				QColor(Qt::darkBlue), QColor(Qt::darkGray),QColor(Qt::black)};
 
 	gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
@@ -491,7 +490,7 @@ DataLogger::~DataLogger()
 		delete m_elapsed;
 	}
 	if (m_toolView) {
-//		delete m_toolView;
+		delete m_toolView;
 	}
 //	delete api;
 }
