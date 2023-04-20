@@ -8,29 +8,29 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	QWidget(parent),
 	max14906ToolController(new DioController(ctx)),
 	ui(new Ui::Max14906),
-        m_backButton(Max14906::createBackButton()),
+	m_backButton(Max14906::createBackButton()),
 	m_qTimer(new QTimer(this)),
 	m_toolView(nullptr),
 	m_readerThread(new ReaderThread(false)),
-	m_customColGrid(new CustomColQGridLayout(4, true, this))
+	m_customColGrid(new FlexGridLayout(4, this))
 {
-        iio_device* device0 = iio_context_get_device(ctx, 0);
-        if (iio_device_find_attr(device0, "back")) {
+	iio_device* device0 = iio_context_get_device(ctx, 0);
+	if (iio_device_find_attr(device0, "back")) {
 		qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
 
-                this->ui->setupUi(this);
-                this->setupDynamicUi(this);
+		this->ui->setupUi(this);
+		this->setupDynamicUi(this);
 
-                this->m_qTimer->setInterval(1000); // poll once every second
-                this->m_qTimer->setSingleShot(true);
+		this->m_qTimer->setInterval(1000); // poll once every second
+		this->m_qTimer->setSingleShot(true);
 
-                this->initChannels();
-                this->initMonitorToolView();
-                this->ui->mainLayout->addWidget(m_toolView);
-                this->connectSignalsAndSlots();
-        } else {
+		this->initChannels();
+		this->initMonitorToolView();
+		this->ui->mainLayout->addWidget(m_toolView);
+		this->connectSignalsAndSlots();
+	} else {
 		qInfo(CAT_SWIOT_MAX14906) << "Could not initialize SWIOT MAX14906, the device seems to be in config mode.";
-        }
+	}
 }
 
 void Max14906::setupDynamicUi(QWidget *parent) {
@@ -51,13 +51,13 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-	this->m_customColGrid = new CustomColQGridLayout(4, true, this); // 4 max channels
+	this->m_customColGrid = new FlexGridLayout(4, this); // 4 max channels
 
 	this->m_toolView->addFixedCentralWidget(m_customColGrid, 0, 0, 0, 0);
 
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 
-        this->m_toolView->addTopExtraWidget(m_backButton);
+	this->m_toolView->addTopExtraWidget(m_backButton);
 }
 
 scopy::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, QColor* color) {
@@ -77,9 +77,9 @@ scopy::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, Q
 void Max14906::connectSignalsAndSlots() {
 	connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this, &Max14906::runButtonToggled);
 	connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Max14906::singleButtonToggled);
-        QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
-            Q_EMIT backBtnPressed();
-        });
+	QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
+		Q_EMIT backBtnPressed();
+	});
 
 	connect(this->m_max14906SettingsTab, &DioSettingsTab::timeValueChanged, this, &Max14906::timerChanged);
 	connect(this->m_qTimer, &QTimer::timeout, this, [&](){
@@ -171,21 +171,21 @@ void Max14906::initChannels() {
 }
 
 QPushButton *Max14906::createBackButton() {
-        auto* backButton = new QPushButton();
-        backButton->setObjectName(QString::fromUtf8("backButton"));
-        backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                 "  width: 95px;\n"
-                                                 "  height: 40px;\n"
-                                                 "\n"
-                                                 "  font-size: 12px;\n"
-                                                 "  text-align: center;\n"
-                                                 "  font-weight: bold;\n"
-                                                 "  padding-left: 15px;\n"
-                                                 "  padding-right: 15px;\n"
-                                                 "}"));
-        backButton->setProperty("blue_button", QVariant(true));
-        backButton->setText("Back");
-        return backButton;
+	auto* backButton = new QPushButton();
+	backButton->setObjectName(QString::fromUtf8("backButton"));
+	backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+						    "  width: 95px;\n"
+						    "  height: 40px;\n"
+						    "\n"
+						    "  font-size: 12px;\n"
+						    "  text-align: center;\n"
+						    "  font-weight: bold;\n"
+						    "  padding-left: 15px;\n"
+						    "  padding-right: 15px;\n"
+						    "}"));
+	backButton->setProperty("blue_button", QVariant(true));
+	backButton->setText("Back");
+	return backButton;
 }
 
 #include "moc_max14906.cpp"

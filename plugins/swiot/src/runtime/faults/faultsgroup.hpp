@@ -4,7 +4,7 @@
 #include <set>
 
 #include "faultwidget.hpp"
-#include "src/refactoring/maincore/customcolqgridlayout.hpp"
+#include <gui/flexgridlayout.hpp>
 #include "ui_faultsgroup.h"
 
 QT_BEGIN_NAMESPACE
@@ -37,7 +37,7 @@ private:
 	std::vector<FaultWidget *> m_faults;
 	std::set<unsigned int> m_currentlySelected;
 	int m_max_faults;
-	CustomColQGridLayout* m_customColGrid;
+	FlexGridLayout* m_customColGrid;
 
 protected:
 	void setupDynamicUi();
