@@ -37,7 +37,7 @@ bool REGMAPPlugin::loadIcon()
 
 void REGMAPPlugin::loadToolList()
 {
-    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Regmap",""));
+    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(0,"Regmap",""));
 }
 
 void REGMAPPlugin::unload()
