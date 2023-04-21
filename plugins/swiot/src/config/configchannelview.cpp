@@ -1,4 +1,4 @@
-#include "configchannelview.hpp"
+#include "configchannelview.h"
 
 using namespace scopy::swiot;
 

@@ -5,10 +5,10 @@
 #include <QDebug>
 #include <QUuid>
 
-#include "src/runtime/faults/faults.hpp"
-#include "src/runtime/max14906/max14906.hpp"
-#include "src/config/swiotconfig.hpp"
-#include "src/runtime/swiotruntime.hpp"
+#include "src/runtime/faults/faults.h"
+#include "src/runtime/max14906/max14906.h"
+#include "src/config/swiotconfig.h"
+#include "src/runtime/swiotruntime.h"
 #include "src/swiot_logging_categories.h"
 #include <iioutil/contextprovider.h>
 

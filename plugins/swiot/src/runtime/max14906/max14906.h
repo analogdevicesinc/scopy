@@ -1,9 +1,9 @@
-#ifndef MAX14906TOOL_HPP
-#define MAX14906TOOL_HPP
+#ifndef MAX14906TOOL_H
+#define MAX14906TOOL_H
 
 #include "ui_swiotmax14906.h"
-#include "diocontroller.hpp"
-#include "diodigitalchannelcontroller.hpp"
+#include "diocontroller.h"
+#include "diodigitalchannelcontroller.h"
 #include "src/runtime/readerthread.h"
 #include "diosettingstab.h"
 #include <gui/tool_view.hpp>
@@ -51,4 +51,4 @@ private:
 	QMap<int, DioDigitalChannelController*> m_channelControls;
 };
 }
-#endif // MAX14906TOOL_HPP
+#endif // MAX14906TOOL_H

@@ -1,5 +1,5 @@
-#ifndef SWIOTCONFIGCHNLVIEW_HPP
-#define SWIOTCONFIGCHNLVIEW_HPP
+#ifndef CONFIGCHANNELVIEW_H
+#define CONFIGCHANNELVIEW_H
 #define AD_INDEX  0
 #define MAX_INDEX 1
 #define AD_FUNC_ATTR_NAME  "function_cfg"
@@ -44,4 +44,4 @@ private:
 }
 
 
-#endif // SWIOTCONFIGCHNLVIEW_HPP
+#endif // CONFIGCHANNELVIEW_H

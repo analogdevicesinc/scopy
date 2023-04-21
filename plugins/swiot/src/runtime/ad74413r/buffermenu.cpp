@@ -1,4 +1,4 @@
-#include "buffermenu.hpp"
+#include "buffermenu.h"
 
 using namespace scopy::swiot;
 BufferMenu::BufferMenu(QWidget *parent)

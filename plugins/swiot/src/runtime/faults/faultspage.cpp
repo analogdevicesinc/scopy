@@ -1,4 +1,4 @@
-#include "faultspage.hpp"
+#include "faultspage.h"
 #include "ui_faultspage.h"
 
 using namespace scopy::swiot;

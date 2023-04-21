@@ -1,4 +1,4 @@
-#include "swiotruntime.hpp"
+#include "swiotruntime.h"
 #include <string>
 #include "src/swiot_logging_categories.h"
 

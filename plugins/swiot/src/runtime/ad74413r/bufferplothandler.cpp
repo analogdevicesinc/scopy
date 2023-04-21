@@ -1,4 +1,4 @@
-#include "bufferplothandler.hpp"
+#include "bufferplothandler.h"
 #include <QGridLayout>
 #include <gui/filemanager.h>
 #include "src/swiot_logging_categories.h"
