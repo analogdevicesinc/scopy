@@ -16,7 +16,6 @@
 #include <libm2k/contextbuilder.hpp>
 
 #include <src/gui/channelmonitorcomponent.hpp>
-#include <src/gui/customcolqgridlayout.hpp>
 //#include <libm2k/contextbuilder.hpp>
 
 //#include "gui/dataloggercontroller.hpp"
@@ -140,8 +139,12 @@ DataLogger::DataLogger(libm2k::context::Context *ctx, QWidget *parent):
 		}
 	});
 
-	m_customColGrid = new CustomColQGridLayout(100,this);
-	m_toolView->addFixedCentralWidget(m_customColGrid,0,0,0,0);
+	m_scrollArea = new QScrollArea(this);
+	m_scrollArea->setWidgetResizable(true);
+	m_flexGridLayout = new FlexGridLayout(100,this);
+	m_scrollArea->setWidget(m_flexGridLayout);
+
+	m_toolView->addFixedCentralWidget(m_scrollArea,0,0,0,0);
 //	setCentralWidget(getToolView());
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
@@ -207,8 +210,8 @@ void DataLogger::initMonitorToolView()
 				}
 			});
 
-			connect(monitor, &scopy::ChannelMonitorComponent::contentChanged, m_customColGrid, [=](){
-				m_customColGrid->itemSizeChanged();
+			connect(monitor, &scopy::ChannelMonitorComponent::contentChanged, m_flexGridLayout, [=](){
+				m_flexGridLayout->itemSizeChanged();
 			}, Qt::QueuedConnection);
 
 			connect(this, &DataLogger::recordingIntervalChanged, monitor , [=](double interval){
@@ -237,7 +240,7 @@ void DataLogger::initMonitorToolView()
 
 			});
 
-			int widgetId = m_customColGrid->addQWidgetToList(monitor);
+			int widgetId = m_flexGridLayout->addQWidgetToList(monitor);
 
 			readerThread->addChannel(chId, channel.id,dmm);
 
@@ -246,12 +249,12 @@ void DataLogger::initMonitorToolView()
 
 				readerThread->channelToggled(chId,enabled);
 				if (enabled) {
-					m_customColGrid->addWidget(widgetId);
+					m_flexGridLayout->addWidget(widgetId);
 					m_activeChannels[chId] = monitor;
 
 				} else {
 					m_activeChannels.remove(chId);
-					m_customColGrid->removeWidget(widgetId);
+					m_flexGridLayout->removeWidget(widgetId);
 
 
 				}

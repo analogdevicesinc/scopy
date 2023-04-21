@@ -10,6 +10,7 @@
 #include <spinbox_a.hpp>
 #include <QElapsedTimer>
 #include <tool_view.hpp>
+#include <flexgridlayout.hpp>
 
 //#include <filter.hpp>
 //#include <tool_launcher.hpp>
@@ -77,7 +78,8 @@ private:
 	QMap<int,QColor> m_color;
 	DataLoggerController *dataLoggerController;
 	gui::ToolView* m_toolView;
-	CustomColQGridLayout* m_customColGrid;
+	QScrollArea* m_scrollArea;
+	FlexGridLayout* m_flexGridLayout;
 	libm2k::context::Context* m_context;
 	std::vector<libm2k::analog::DMM*> m_dmmList;
 	gui::GenericMenu* m_generalSettingsMenu;
