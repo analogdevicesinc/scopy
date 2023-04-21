@@ -1,0 +1,937 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2012-2013 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<adf4351>
+	<Register>
+		<Name>reg000</Name>
+		<Address>0x0000</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>32</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg000_b14_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>12-BIT FRACTIONAL VALUE (FRAC)</Description>
+			<Visibility>Public</Visibility>
+			<Width>12</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>12</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b30_b15</Name>
+			<Access>R/W</Access>
+			<DefaultValue>23</DefaultValue>
+			<Description>16-BIT INTEGER VALUE (INT)</Description>
+			<Visibility>Public</Visibility>
+			<Width>16</Width>
+			<Notes>Values smaller that 23 are not allowed. INTmin = 75 with prescaler = 8/9</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>15</RegOffset>
+			<SliceWidth>16</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001</Name>
+		<Address>0x0001</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>32</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001_b14_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>12-BIT MODULUS VALUE (MOD)    DBR</Description>
+			<Visibility>Public</Visibility>
+			<Width>12</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>12</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001_b26_b15</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>12-BIT PHASE VALUE (PHASE)    DBR</Description>
+			<Visibility>Public</Visibility>
+			<Width>12</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>15</RegOffset>
+			<SliceWidth>12</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001_b27</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PRESCALER</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = 4/5 PRESCALER</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = 8/9 PRESCALER</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>27</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001_b28</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PHASE ADJUST</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = OFF</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ON</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>28</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg002</Name>
+		<Address>0x0002</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>32</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg002_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>COUNTER RESET</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLEED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CP THREE-STATE</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>POWER-DOWN</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PD POLARITY</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = NEGATIVE</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = POSITIVE</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LDP</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = 10ns</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = 6ns</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b8</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LDF</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = FRAC-N</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = INT-N</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>8</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b12_b9</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CHARGE PUMP CURRENT SETTING</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0000 = 0.31 mA</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0001 = 0.63 mA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0010 = 0.94 mA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>0011 = 1.25 mA</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>0100 = 1.56 mA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>0101 = 1.88 mA</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>0110 = 2.19 mA</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>0111 = 2.50 mA</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>1000 = 2.81 mA</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>1001 = 3.13 mA</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>1010 = 3.44 mA</Description>
+					<Value>10</Value>
+				</Option>
+				<Option>
+					<Description>1011 = 3.75 mA</Description>
+					<Value>11</Value>
+				</Option>
+				<Option>
+					<Description>1100 = 4.06 mA</Description>
+					<Value>12</Value>
+				</Option>
+				<Option>
+					<Description>1101 = 4.38 mA</Description>
+					<Value>13</Value>
+				</Option>
+				<Option>
+					<Description>1110 = 4.69 mA</Description>
+					<Value>14</Value>
+				</Option>
+				<Option>
+					<Description>1111 = 5.00 mA</Description>
+					<Value>15</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>9</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b13</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>DOUBLE BUFFER</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISALBED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>13</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b23_b14</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-BIT R COUNTER    DBR</Description>
+			<Visibility>Public</Visibility>
+			<Width>10</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>14</RegOffset>
+			<SliceWidth>10</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b24</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFERENCE DIVIDE-BY-2    DBR</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>24</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b25</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFFERENCE DOUBLER    DBR</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>25</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b28_b26</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>MUXOUT</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000 = THREE-STATE OUTPUT</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = DVDD</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = DGND</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011  = R COUNTER OUTPUT</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = N DIVIDER OUTPUT</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = ANALOG LOCK DETECT</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = DIGITAL LOCK DETECT</Description>
+					<Value>6</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>26</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg002_b30_b29</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LOW NOISE AND LOW SPUR MODES</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = LOW NOISE MODE</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>11 = LOW SPUR MODE</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>29</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg003</Name>
+		<Address>0x0003</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>32</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg003_b14_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>12-BIT CLOCK DIVIDER VALUE</Description>
+			<Visibility>Public</Visibility>
+			<Width>12</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>12</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b16_b15</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CLK DIV MODE</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = CLOCK DIVIDER OFF</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = FAST LOCK ENABLE</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = RESYNC ENABLE</Description>
+					<Value>2</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>15</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b18</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CYCLE SLIP REDUCTION</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>18</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b21</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CHARGE CANCELATION</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>21</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b22</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>ANTIBACKSLASH PULSE WIDTH</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = 6ns (FRAC-N)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = 3ns (INT-N)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>22</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b23</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>BAND SELECT CLOCK MODE</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = LOW</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = HIGH</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>23</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg004</Name>
+		<Address>0x0004</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>32</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg004_b4_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUTPUT POWER</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = -4dBm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = -1dBm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = +2dBm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = +5dBm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>RF OUTPUT ENABLE</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b7_B6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>AUX OUTPUT POWER</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = -4dBm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = -1dBm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = +2dBm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = +5dBm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b8</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>AUX OUTPUT ENABLE</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>8</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b9</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>AUX OUTPUT SELECT</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DIVIDED OUTPUT</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = FUNDAMENTAL</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>9</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b10</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>MUTE TILL LOCK DETECT</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = MUTE DISABLED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = MUTE ENABLED</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>10</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b11</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO POWER-DOWN</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = VCO POWERED UP</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = VCO POWERED DOWN</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>11</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b19_B12</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>8-BIT BAND SELECT CLOCK DIVIDER VALUE</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>12</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b122_b20</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>RF DIVIDER SELECT    DBB</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000 = :1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = :2</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = :4</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = :8</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = :16</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = :32</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = :64</Description>
+					<Value>6</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>20</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b123</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FEEDBACK SELECT</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = DIVIDED</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = FUNDAMENTAL</Description>
+					<Value>0</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>23</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg005</Name>
+		<Address>0x0005</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>32</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg005_b19</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>19</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg005_b20</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>20</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg005_b23_B22</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LOCK DETECT PIN OPERATION</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = LOW</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = DIGITAL LOCK DETECT</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = LOW</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = HIGH</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>22</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</adf4351>
