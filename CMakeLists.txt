@@ -41,6 +41,12 @@ qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 find_library(IIO_LIBRARIES NAMES iio libiio)
 find_path(IIO_INCLUDE_DIRS iio.h)
 
+option(ENABLE_TESTING "Enable unit tests" ON)
+if(ENABLE_TESTING)
+    message(STATUS "Unit tests enabled")
+    add_subdirectory(tests)
+endif()
+
 add_subdirectory(gui)
 add_subdirectory(iioutil)
 add_subdirectory(pluginbase)
@@ -49,11 +55,7 @@ add_subdirectory(core)
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 
-option(ENABLE_TESTING "Enable building unit tests" ON)
-if(ENABLE_TESTING)
-    message(STATUS "Unit tests enabled")
-    add_subdirectory(tests)
-endif()
+
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
