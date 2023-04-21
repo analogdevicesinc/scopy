@@ -1,11 +1,13 @@
 #include "dataloggerplugin.hpp"
 #include "qloggingcategory.h"
 #include "src/datalogger.hpp"
+#include "src/datalogger_api.h"
 #include <iio.h>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QUuid>
+#include "pluginbase/scopyjs.h"
 #include <libm2k/contextbuilder.hpp>
 #include <ui_dataloggerInfoPage.h>
 
@@ -78,6 +80,8 @@ bool DataLoggerPlugin::onConnect()
 	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_DATALOGGER)<<"Ping Success";} );
 
 	tool = new DataLogger(libm2k_context);
+	api = new DataLogger_API(tool);
+	ScopyJS::GetInstance()->registerApi(api);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(tool);
@@ -119,6 +123,16 @@ void DataLoggerPlugin::initMetadata()
 	   ]
 	}
 )plugin");
+}
+
+void DataLoggerPlugin::saveSettings(QSettings &s)
+{
+	api->save(s);
+}
+
+void DataLoggerPlugin::loadSettings(QSettings &s)
+{
+	api->load(s);
 }
 
 
