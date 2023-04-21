@@ -1,0 +1,6607 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2013-2014 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<ad9528>
+	<Register>
+		<Name>reg0000</Name>
+		<Address>0x0</Address>
+		<Description>SPI Configuration A</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>spi_softreset</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Soft reset (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Device reset</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_lsb_first</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>LSB first (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Bit order for SPI port. This bit has no effect in I2C mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = most significant bit first</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = least significant bit first</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_address_ascension</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Address ascension (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This bit controls whether the register address is automatically incremented during a multibyte transfer. This bit has no effect in I2C mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = decremented</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = incremented</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_sdo_active</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SDO active (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables SPI port SDO pin. This bit has no effect in I2C mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = 3-wire mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = 4-wire mode</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_sdo_active_mirror</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SDO active (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables SPI port SDO pin. This bit has no effect in I2C mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = 3-wire mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = 4-wire mode</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_address_ascension_mirror</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Address ascension (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This bit controls whether the register address is automatically incremented during a multibyte transfer. This bit has no effect in I2C mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = decremented</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = incremented</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_lsb_first_mirror</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>LSB first (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Bit order for SPI port. This bit has no effect in I2C mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = most significant bit first</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = least significant bit first</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_softreset_mirror</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Soft reset (SPI only)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Device reset</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0001</Name>
+		<Address>0x1</Address>
+		<Description>SPI Configuration B</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>spi_reset_sans_regmap</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Reset sans regmap</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This bit resets the device while maintaining the current register settings.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = no action</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = resets the device</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>spi_read_buffer_register</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Read buffer register</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>For buffered registers, this bit controls whether the value read from the serial port is from the actual (active) registers or the buffered copy.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = reads buffered values</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = reads from actual registers</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0003</Name>
+		<Address>0x3</Address>
+		<Description>Chip type</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>spi_chip_type</Name>
+				<Access>R</Access>
+				<DefaultValue>5</DefaultValue>
+				<Description>Chip type</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>The Analog Devices unified SPI protocol reserves this read only register location for
+identifying the type of device. The default value of 0x05 identifies the AD9528 as a clock IC.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0004</Name>
+		<Address>0x4</Address>
+		<Description>Product ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>reserved_to_1_bit0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Reserved to 1</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>reserved_to_1_bit2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Reserved to 1</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>reserved_to_1_bit3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Reserved to 1</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>reserved_to_1_bit4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Reserved to 1</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>id_serial</Name>
+				<Access>R</Access>
+				<DefaultValue>15</DefaultValue>
+				<Description>Clock part serial ID, Bits[3:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0005</Name>
+		<Address>0x5</Address>
+		<Description>Product ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>id_serial</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Clock part serial ID, Bits[11:4]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes></Notes>
+				<BitOffset>4</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0006</Name>
+		<Address>0x6</Address>
+		<Description>Revision</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>id_versions</Name>
+				<Access>R</Access>
+				<DefaultValue>3</DefaultValue>
+				<Description>Part versions</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>The Analog Devices unified SPI protocol reserves this read only register location for identifying the die revision. Default = 0x03.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg000b</Name>
+		<Address>0xB</Address>
+		<Description>SPI version</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>spi_version</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SPI version</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>The Analog Devices unified SPI protocol reserves this read only register location for identifying the version of the unified SPI protocol. Default = 0x00.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg000c</Name>
+		<Address>0xC</Address>
+		<Description>Vendor ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>vender_id</Name>
+				<Access>R</Access>
+				<DefaultValue>86</DefaultValue>
+				<Description>Vendor ID, Bits[7:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>The Analog Devices unified SPI protocol reserves this read only register location for identifying Analog Devices as the chip vendor of this device. All Analog Devices devices adhering to the unified serial port specification have the same value in this register.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg000D</Name>
+		<Address>0xD</Address>
+		<Description>Vendor ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>vender_id</Name>
+				<Access>R</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Vendor ID, Bits[15:8]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>The Analog Devices unified SPI protocol reserves this read only register location for identifying Analog Devices as the chip vendor of this device. All Analog Devices devices adhering to the unified serial port specification have the same value in this register.</Notes>
+				<BitOffset>8</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg000f</Name>
+		<Address>0xF</Address>
+		<Description>IO Update</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ioupdate_reg</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>IO_Update</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Writing a 1 to this bit transfers the data in the serial input/output buffer registers to the internal control registers of the device. This is an autoclearing bit.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0100</Name>
+		<Address>0x100</Address>
+		<Description>PLL1 REFA (Ra) divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_refa_div</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>10-bit REFA (Ra) divider, Bits[7:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>10-bit REFA divider. Divide by 1 to divide by 1023.
+0000000000, 0000000001 = divide by 1.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0101</Name>
+		<Address>0x101</Address>
+		<Description>PLL1 REFA (Ra) divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_refa_div</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>10-bit REFA (Ra) divider, Bits[9:8]</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>10-bit REFA divider. Divide by 1 to divide by 1023.
+0000000000, 0000000001 = divide by 1.</Notes>
+				<BitOffset>8</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0102</Name>
+		<Address>0x102</Address>
+		<Description>PLL1 REFB (Rb) divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_refb_div</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>10-bit REFB (Rb) divider, Bits[7:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>10-bit REFB divider. Divide by 1 to divide by 1023.
+0000000000, 0000000001 = divide by 1.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0103</Name>
+		<Address>0x103</Address>
+		<Description>PLL1 REFB (Rb) divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_refb_div</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>10-bit REFB (Rb) divider, Bits[9:8]</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>10-bit REFB divider. Divide by 1 to divide by 1023.
+0000000000, 0000000001 = divide by 1.</Notes>
+				<BitOffset>8</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0104</Name>
+		<Address>0x104</Address>
+		<Description>PLL1 feedback divider (N1)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_fb_div</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>10-bit N1 divider, Bits[7:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>10-bit feedback divider. Divide by 1 to divide by 1023.
+0000000000, 0000000001 = divide by 1.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0105</Name>
+		<Address>0x105</Address>
+		<Description>PLL1 feedback divider (N1)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_fb_div</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>10-bit N1 divider, Bits[9:8]</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>10-bit feedback divider. Divide by 1 to divide by 1023.
+0000000000, 0000000001 = divide by 1.</Notes>
+				<BitOffset>8</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0106</Name>
+		<Address>0x106</Address>
+		<Description>PLL1 charge pump control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_cp</Name>
+				<Access>R/W</Access>
+				<DefaultValue>12</DefaultValue>
+				<Description>PLL1 charge pump current (uA)</Description>
+				<Visibility>Public</Visibility>
+				<Width>7</Width>
+				<Notes>These bits set the magnitude of the PLL1 charge pump current. Granularity is ~0.5 uA with a full-scale magnitude of ~63.5 uA.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>7</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_force_holdover</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Force holdover</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Tristates the PLL1 charge pump.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = forces holdover</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0107</Name>
+		<Address>0x107</Address>
+		<Description>PLL1 charge pump control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_cp_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Charge pump mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Controls the mode of the PLL1 charge pump.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = Tri-state</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = Pump Down</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = Pump Up</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>11 = Normal Operation</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>pll1_holdover_disable</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Disable holdover</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Disable automatic holdover.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = enabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = disabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0108</Name>
+		<Address>0x108</Address>
+		<Description>PLL1 input receiver control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_en_vcxo_diff_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>VCXO differential receiver enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = single-ended receiver mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = differential receiver mode</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_en_vcxo_neg_se_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>VCXO single-ended negative pin enable CMOS mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selects which single-ended input pin is enabled when in the single-ended receiver mode (Register 0x0108, Bit 0 = 0).
+1 = negative receiver from VCXO input (/VCXO_IN pin) selected.
+0 = positive receiver from VCXO input (VCXO_IN pin) selected (default).</Notes>
+				<Options>
+					<Option>
+						<Description>0 = positive receiver</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = negative receiver</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_vcxo_rcvr_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>VCXO receiver power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables control over power-down of the VCXO receivers.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = both receivers enabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = power-down control enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_en_refa_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFA input receiver enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>REFA receiver power-down control mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = power-down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enable REFA receiver</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_en_refb_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFB input receiver enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>REFB receiver power-down control mode.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = power-down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enable REFB receiver</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_en_refa_diff_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFA differential receiver enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = single-ended receiver mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = differential receiver mode</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_en_refb_diff_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFB differential receiver enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = single-ended receiver mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = differential receiver mode</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_vcxo_freq_det_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Frequency detector power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0109</Name>
+		<Address>0x109</Address>
+		<Description>PLL1 input receiver control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_en_refa_neg_se_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFA single-ended negative pin enable (CMOS mode)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selects which single-ended input pin is enabled when in single-ended receiver mode (also depends on Register 0x0108, Bit 5 = 0).</Notes>
+				<Options>
+					<Option>
+						<Description>0 = REFA pin enabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1= /REFA pin enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_en_refb_neg_se_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFB single-ended negative pin enable (CMOS mode)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selects which single-ended input pin is enabled when in single-ended receiver mode (also depends on Register 0x0108, Bit 6 = 0).</Notes>
+				<Options>
+					<Option>
+						<Description>0 = REFB pin enabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = /REFB pin enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_vcxo_out_fb</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL1 feedback divider source</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selects the input source to the PLL1 feedback divider.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = PLL2 Feedback</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = VCXO input</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_refa_divider_reset</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFA divider (Ra) reset</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Puts divider in reset.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = divider normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Divider held in reset</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_refb_divider_reset</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFB divider (Rb) reset</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Puts divider in reset.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = divider normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Divider held in reset</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_fb_divider_reset</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>N1 feedback divider reset</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Puts divider in reset.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = divider normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Divider held in reset</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg010A</Name>
+		<Address>0x10A</Address>
+		<Description>PLL1 input receiver control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>inputpll_ref_sel_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Reference selection mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Programs the REFA, REFB mode selection (default = 000).</Notes>
+				<Options>
+					<Option>
+						<Description>000 = Nonrevertive: stay on REFB</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = Revert to REFA</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = Select REFA</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = Select REFB</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = REF_SEL pin</Description>
+						<Value>4</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_vcxo_ctl_voltage</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Holdover mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>High permits the VCXO_CTRL control voltage to be forced to midsupply when the feedback or input clocks fail. Low tristates the charge pump output.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = Tri-state CP</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = VCC/2</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg010B</Name>
+		<Address>0x10B</Address>
+		<Description>PLL1 fast lock</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>input_pll_fast_lock_cp</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fast lock charge pump current (uA)</Description>
+				<Visibility>Public</Visibility>
+				<Width>7</Width>
+				<Notes>These bits set the magnitude of the PLL1 charge pump current. Granularity is ~0.5 uA with a
+full-scale magnitude of ~63.5 uA.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>7</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>inputpll_fast_lock_enable</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable fast lock</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables PLL1 fast lock operation.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0200</Name>
+		<Address>0x200</Address>
+		<Description>PLL2 charge pump control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_cp</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL2 CP current (uA)</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>These bits set the magnitude of the PLL2 charge pump current. Granularity is ~3.5 uA with a full-scale magnitude of ~900 uA.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0201</Name>
+		<Address>0x201</Address>
+		<Description>PLL2 VCO CAL feedback dividers</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Feedback Divider Constraints:
+A Divider (Bits[7:6])     B Divider (Bits[5:0])     Allowed N Division (4 x B + A)
+  A = 0                                      B = 3                          N = 16 to 255
+  A = 0 or A = 1                      B = 4 
+  A = 0 to A = 2                      B = 5
+  A = 0 to A = 2                      B = 6
+  A = 0 to A = 3                      B &gt;= 7</Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_fb_b_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>B divider</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>B divider word.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_fb_a_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>A divider</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>A divider word.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0202</Name>
+		<Address>0x202</Address>
+		<Description>PLL2 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_cp_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>3</DefaultValue>
+				<Description>PLL2 charge pump mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Controls the mode of the PLL2 charge pump.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = Tri-state</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = Pump Down</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = Pump Up</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>11 = Normal Operation</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_en_ref_freq_doubler</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Frequency doubler enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables doubling of the PLL2 reference input frequency.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = disabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_ld_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Lock detect power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Controls power-down of the PLL2 lock detector.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = lock detector active</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = lock detector powered down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0203</Name>
+		<Address>0x203</Address>
+		<Description>PLL2 VCO control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_cal_vco</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Manual VCO calibrate (not autoclearing)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = resets the VCO calibration</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = initiates VCO calibration (this is not an autoclearing bit).</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_force_vco_midpoint</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Force VCO to midpoint frequency</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selects VCO control voltage functionality.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal VCO operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = forces VCO control voltage to midscale</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_treat_ref_as_valid</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Treat reference as valid</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = uses the PLL1 VCXO indicator to determine when the reference clock to the PLL2 is valid</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = treats the reference clock as valid even if PLL1 does not consider it to be valid</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_fb_div_reset</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Reset VCO calibration dividers</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = resets A and B dividers</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_doubler_rdiv_path</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Doubler and R1 divider path enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Bypass Doubler/R1</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Use Doubler/R1 Path</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0204</Name>
+		<Address>0x204</Address>
+		<Description>PLL2 RF VCO divider (M1)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_rf_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>RF VCO divider (M1)</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>011 = Divide by 3</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = Divide by 4</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Divide by 5</Description>
+						<Value>5</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_rf_divider_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>RF VCO divider (M1) power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = powers down the M1 divider</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_fb_edge_ctl</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PFD feedback edge select</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = rising edge</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = falling edge</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_ref_edge_ctl</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PFD reference edge select</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = rising edge</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = falling edge</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0205</Name>
+		<Address>0x205</Address>
+		<Description>PLL2 loop filter control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_lf_ctl_cp1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Cpole1 (pF)</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>8</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>16</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>24</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>24</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>32</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>40</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>48</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_lf_ctl_rz</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Rzero (ohms)</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>3250</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>2750</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>2250</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>2100</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>3000</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>2500</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>2000</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>1850</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_lf_ctl_rp2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Rpole2 (ohms)</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>900</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>450</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>300</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>225</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0206</Name>
+		<Address>0x206</Address>
+		<Description>PLL2 loop filter control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_lf_ctl_bypass_rz</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Bypass internal Rzero resistor</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Bypasses the internal RZERO resistor (RZERO = 0 Ohm). Requires the use of a series external zero resistor. This bit is the MSB of the loop filter control register (Register 0x0205 and Register 0x0206).</Notes>
+				<Options>
+					<Option>
+						<Description>0 = internal Rzero used</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = internal Rzero bypassed</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0207</Name>
+		<Address>0x207</Address>
+		<Description>PLL2 input divider (R1)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_r_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>5-bit R1 divider</Description>
+				<Visibility>Public</Visibility>
+				<Width>5</Width>
+				<Notes>Divide by 1 to divide by 31.
+00000, 00001 = divide by 1.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>5</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0208</Name>
+		<Address>0x208</Address>
+		<Description>PLL2 feedback divider (N2)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_replica_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>8-bit N2 divider</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel Divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0209</Name>
+		<Address>0x209</Address>
+		<Description>PLL2 feedback divider (N2)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>outputpll_replica_div_phase</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>N2 phase</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase 0 = no phase offset.
+Phase 1 = 1/2 period offset.
+...
+Phase 63 = 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>outputpll_replica_div_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>N2 divider power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = N2 divider powered down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0300</Name>
+		<Address>0x300</Address>
+		<Description>Channel Output 0</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0301</Name>
+		<Address>0x301</Address>
+		<Description>Channel Output 0</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0302</Name>
+		<Address>0x302</Address>
+		<Description>Channel Output 0</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0303</Name>
+		<Address>0x303</Address>
+		<Description>Channel Output 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>2</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0304</Name>
+		<Address>0x304</Address>
+		<Description>Channel Output 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0305</Name>
+		<Address>0x305</Address>
+		<Description>Channel Output 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0306</Name>
+		<Address>0x306</Address>
+		<Description>Channel Output 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0307</Name>
+		<Address>0x307</Address>
+		<Description>Channel Output 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0308</Name>
+		<Address>0x308</Address>
+		<Description>Channel Output 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0309</Name>
+		<Address>0x309</Address>
+		<Description>Channel Output 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>2</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030A</Name>
+		<Address>0x30A</Address>
+		<Description>Channel Output 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030B</Name>
+		<Address>0x30B</Address>
+		<Description>Channel Output 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030C</Name>
+		<Address>0x30C</Address>
+		<Description>Channel Output 4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030D</Name>
+		<Address>0x30D</Address>
+		<Description>Channel Output 4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030E</Name>
+		<Address>0x30E</Address>
+		<Description>Channel Output 4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030F</Name>
+		<Address>0x30F</Address>
+		<Description>Channel Output 5</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>2</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0310</Name>
+		<Address>0x310</Address>
+		<Description>Channel Output 5</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0311</Name>
+		<Address>0x311</Address>
+		<Description>Channel Output 5</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0312</Name>
+		<Address>0x312</Address>
+		<Description>Channel Output 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0313</Name>
+		<Address>0x313</Address>
+		<Description>Channel Output 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0314</Name>
+		<Address>0x314</Address>
+		<Description>Channel Output 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0315</Name>
+		<Address>0x315</Address>
+		<Description>Channel Output 7</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>2</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0316</Name>
+		<Address>0x316</Address>
+		<Description>Channel Output 7</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0317</Name>
+		<Address>0x317</Address>
+		<Description>Channel Output 7</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0318</Name>
+		<Address>0x318</Address>
+		<Description>Channel Output 8</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0319</Name>
+		<Address>0x319</Address>
+		<Description>Channel Output 8</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031A</Name>
+		<Address>0x31A</Address>
+		<Description>Channel Output 8</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031B</Name>
+		<Address>0x31B</Address>
+		<Description>Channel Output 9</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>2</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031C</Name>
+		<Address>0x31C</Address>
+		<Description>Channel Output 9</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031D</Name>
+		<Address>0x31D</Address>
+		<Description>Channel Output 9</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031E</Name>
+		<Address>0x31E</Address>
+		<Description>Channel Output 10</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031F</Name>
+		<Address>0x31F</Address>
+		<Description>Channel Output 10</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0320</Name>
+		<Address>0x320</Address>
+		<Description>Channel Output 10</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>4</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0321</Name>
+		<Address>0x321</Address>
+		<Description>Channel Output 11</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>2</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0322</Name>
+		<Address>0x322</Address>
+		<Description>Channel Output 11</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0323</Name>
+		<Address>0x323</Address>
+		<Description>Channel Output 11</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0324</Name>
+		<Address>0x324</Address>
+		<Description>Channel Output 12</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0325</Name>
+		<Address>0x325</Address>
+		<Description>Channel Output 12</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0326</Name>
+		<Address>0x326</Address>
+		<Description>Channel Output 12</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0327</Name>
+		<Address>0x327</Address>
+		<Description>Channel Output 13</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_analog_delay_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes>15 fine delay steps.
+Step size = 31 ps.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_delay_en_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fine analog delay enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = disables fine analog delay for the corresponding channel</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables fine delay for the corresponding channel. 600 ps insertion delay</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_analog_ctl_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel control</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>Controls which signal source is selected by the output driver.</Notes>
+				<Options>
+					<Option>
+						<Description>000 = PLL2/divider output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>001 = PLL1/VCXO output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = SYSREF (retimed by PLL1 output)</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = PLL2/divider output</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = Inverted PLL1/VCXO output.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>110 = SYSREF (retimed by PLL2 output)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>111 = SYSREF (retimed by inverted PLL1 output)</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0328</Name>
+		<Address>0x328</Address>
+		<Description>Channel Output 13</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_phase_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Coarse digital delay</Description>
+				<Visibility>Public</Visibility>
+				<Width>6</Width>
+				<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset
+...
+Phase = 63: 31.5 period offset.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>6</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_drvr_ctl_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Output format</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Determines the output logic to be applied.</Notes>
+				<Options>
+					<Option>
+						<Description>00 = LVDS</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = LVDS (Boost Mode)</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = HSTL</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0329</Name>
+		<Address>0x329</Address>
+		<Description>Channel Output 13</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_div_ratio_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Divide ratio</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>Division = Channel divider Bits[7:0] + 1. For example, [7:0] = 0 is divided by 1, [7:0] = 1 is divided by 2...[7:0] = 255 is divided by 256. 8-bit channel divider.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg032A</Name>
+		<Address>0x32A</Address>
+		<Description>Distribution sync</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_sync</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Sync outputs</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Issues SYNC on transition of bit 0 from 1 to 0.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg032B</Name>
+		<Address>0x32B</Address>
+		<Description>Ignore sync enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_mask_sync_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 0 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 1 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 2 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 3 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 4 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 5 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 6 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 7 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg032C</Name>
+		<Address>0x32C</Address>
+		<Description>Ignore sync enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_mask_sync_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 8 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 9 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 10 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 11 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 12 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 13 ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_mask_sync_replica</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL2 feedback N2 divider ignore sync</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = PLL2 N2 divider synchronizes to sync command</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = PLL2 N2 divider ignores sync command</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg032D</Name>
+		<Address>0x32D</Address>
+		<Description>SYSREF Bypass resample control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_vcxo_bypass_outputpll</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable VCXO receiver path to distribution</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = path disabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enables path</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 0 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 1 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 2 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 3 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 4 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 5 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_sysref_bypass_resample_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 6 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg032E</Name>
+		<Address>0x32E</Address>
+		<Description>SYSREF Bypass resample control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 7 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 8 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 9 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 10 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 11 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 12 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>dist_bypass_sysref_resample_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 13 bypass SYSREF resample</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = not bypassed</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel bypass SYSREF resample</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0400</Name>
+		<Address>0x400</Address>
+		<Description>SYSREF pattern generator K divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>sysref_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>K divider, Bits[7:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>The 16-bit K divider divides the input clock to the SYSREF pattern generator to program the SYSREF pulse width. Bits[7:0] are the LSB byte, and Bits[15:8] are the MSB byte.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0401</Name>
+		<Address>0x401</Address>
+		<Description>SYSREF pattern generator K divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>sysref_divider</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>K divider, Bits[15:8]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes>The 16-bit K divider divides the input clock to the SYSREF pattern generator to program the SYSREF pulse width. Bits[7:0] are the LSB byte, and Bits[15:8] are the MSB byte.</Notes>
+				<BitOffset>8</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0402</Name>
+		<Address>0x402</Address>
+		<Description>SYSREF control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>sysref_reset</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF Reset</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>SYSREF reset</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_test_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF test mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>SYSREF test mode</Notes>
+				<Options>
+					<Option>
+						<Description>00 = GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = VDD</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = Counter Output Clock</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>11 = Counter Output Clock</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_ext_resample_clk_source</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Resample clock source for external SYSREF</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = device clock</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = PLL1 out</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_core_clk_source</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF pattern generator clock source</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = PLL2 Feedback Divider</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = PLL1 Out</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_edge_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF pattern generator trigger control</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>SYSREF pattern generator trigger control</Notes>
+				<Options>
+					<Option>
+						<Description>00 = Level Sensitive, Active High</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = Level Sensitive, Active High</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = Edge Sensitive, Rising Edge</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>11 = Edge Sensitive, Falling Edge</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_request_method</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF request method</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>SYSREF request method</Notes>
+				<Options>
+					<Option>
+						<Description>0 = SPI Controlled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Pin Controlled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0403</Name>
+		<Address>0x403</Address>
+		<Description>SYSREF control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>sysref_spi_request</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SPI SYSREF request</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>SPI SYSREF request
+In N-shot mode, the SYSREF pattern starts at the transition of this bit from 0 to 1 and bit automatically clears after the pattern completes In continuous or PRBS mode, SYSREF pattern starts at the transition of this bit from 0 to 1 and the bit stays set to 1 until user clears the bit; when the user clears the bit, the SYSREF pattern stops.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_internal_n_shot_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>N-shot mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes>N-shot mode</Notes>
+				<Options>
+					<Option>
+						<Description>001 = 1 pulse</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>010 = 2 pulses</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>011 = 4 pulses</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>100 = 6 pulses</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>101 = 8 pulses</Description>
+						<Value>5</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_internal_pattern_mode</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF pattern generator mode</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>Pattern mode</Notes>
+				<Options>
+					<Option>
+						<Description>00 = N Shot</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = Continuous</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = PRBS</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>11 = Stop</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_source_selection</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF Source</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>SYSREF source</Notes>
+				<Options>
+					<Option>
+						<Description>00 = External</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>01 = External Resampled</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>10 = Internal</Description>
+						<Value>2</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0404</Name>
+		<Address>0x404</Address>
+		<Description>SYSREF_IN receiver control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>sysref_en_ext_sysref_diff_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SYSREF differential receiver enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = single-ended receiver mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = differential receiver mode, single-ended receivers disabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_en_ext_negative_se_rcvr</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Single-ended source negative input (CMOS mode)</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selects which single-ended input pin is enabled when in the SYSREF single-ended receiver mode (Register 0x0404, Bit 0 = 0).</Notes>
+				<Options>
+					<Option>
+						<Description>0 = positive receiver from SYSREF input (/SYSREF_IN pin) selected</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = negative receiver from SYSREF input (/SYSREF_IN pin) selected</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>sysref_ext_rcvr_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>SYSREF IN receiver power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables control over power-down of the SYSREF input receivers.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = both receivers enabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = power-down control enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0500</Name>
+		<Address>0x500</Address>
+		<Description>Power-down control enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_pd_all</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Chip power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Clock distribution power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_inputpll_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL1 power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_outputpll_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL2 power-down enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_biasgen_pd</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Bias generation power-down disable or power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = power-down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0501</Name>
+		<Address>0x501</Address>
+		<Description>Output channel power down enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_dist_pd_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 0 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 1 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 2 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 3 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 4 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 5 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 6 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 7 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0502</Name>
+		<Address>0x502</Address>
+		<Description>Output channel power down enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_dist_pd_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 8 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 9 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 10 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 11 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 12 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_dist_pd_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Channel 13 power-down</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = Channel power-down</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0503</Name>
+		<Address>0x503</Address>
+		<Description>LDO regulator enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_ldo_en_ch0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 0 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 1 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch2</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 2 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch3</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 3 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch4</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 4 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch5</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 5 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch6</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 6 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch7</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 7 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0504</Name>
+		<Address>0x504</Address>
+		<Description>LDO regulator enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_ldo_en_ch8</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 8 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch9</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 9 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch10</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 10 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch11</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 11 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch12</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 12 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_ch13</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Channel 13 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = Channel LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_inputpll</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>PLL1 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = PLL1 LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_ldo_en_outputpll</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>PLL2 LDO enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = PLL2 LDO power down</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = normal operation</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0505</Name>
+		<Address>0x505</Address>
+		<Description>Status control signals</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_status_monitor_0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Status Monitor 0 Control</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 and PLL2 Locked</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Locked</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 Locked</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Both Refs Missing</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Both Refs Missing and PLL2 Locked</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>RefB Selected (Auto-switchover only)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>RefA OK</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>RefB OK</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Holdover</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>VCXO OK</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Feedback OK</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 Feedback OK</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>Fastlock in Progress</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>RefA and RefB OK</Description>
+						<Value>14</Value>
+					</Option>
+					<Option>
+						<Description>All Clocks OK</Description>
+						<Value>15</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Feedback /2</Description>
+						<Value>16</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 PFD Down /2</Description>
+						<Value>17</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Ref /2</Description>
+						<Value>18</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 PFD Up /2</Description>
+						<Value>19</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>20</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>21</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>22</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>23</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0506</Name>
+		<Address>0x506</Address>
+		<Description>Status control signals</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_status_monitor_1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Status Monitor 1 Control</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 and PLL2 Locked</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Locked</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 Locked</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Both Refs Missing</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Both Refs Missing and PLL2 Locked</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>RefB Selected (Auto-switchover only)</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>RefA OK</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>RefB OK</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Holdover</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>VCXO OK</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>PLL1 Feedback OK</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 Feedback OK</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>Fastlock in Progress</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>RefA and RefB OK</Description>
+						<Value>14</Value>
+					</Option>
+					<Option>
+						<Description>All Clocks OK</Description>
+						<Value>15</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>16</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>17</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>18</Value>
+					</Option>
+					<Option>
+						<Description>GND</Description>
+						<Value>19</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 feedback divide by 2</Description>
+						<Value>20</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 PFD down divide by 2</Description>
+						<Value>21</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 REF divide by 2</Description>
+						<Value>22</Value>
+					</Option>
+					<Option>
+						<Description>PLL2 PFD up divide by 2</Description>
+						<Value>23</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0507</Name>
+		<Address>0x507</Address>
+		<Description>Status pin enable and status divider enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_status_pin_en_div_1</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>STATUS1 divider enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables a divide-by-4 on the STATUS1 pin, allowing dynamic signals to be viewed at a lower frequency (such as the PFD input clocks). Not to be used with dc states on the status pins, which occur when the settings of Register 0x0506, Bits[5:0] are in the range of 000000 to 001111.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = disable</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enable</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_status_pin_div_en_0</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>STATUS0 divider enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables a divide by 4 on the STATUS0 pin, allowing dynamic signals to be viewed at a lower frequency (such as the PFD input clocks). Not to be used with dc states on the status pins, which occur when the settings of Register 0x0505, Bits[5:0] are in the range of 000000 to 001111.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = disabled</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enabled</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_status_pin0_en</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>STATUS0 pin output enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables the status on the STATUS0 pin.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = disable status output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enable status output</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_status_pin1_en</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>STATUS1 pin output enable</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Enables the status on the STATUS1 pin.</Notes>
+				<Options>
+					<Option>
+						<Description>0 = disable status output</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = enable status output</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0508</Name>
+		<Address>0x508</Address>
+		<Description>Status Readback 0</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_readback_inputpll_ld</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL1 locked status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = unlocked</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = locked</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_outputpll_ld</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL2 locked status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = unlocked</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = locked</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_status_refa</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFA status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = off/clocks are missing</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = correct</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_status_refb</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>REFB status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = off/clocks are missing</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = correct</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_refa_b_not_present</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Both REFA/REFB missing</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = correct</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = off/clocks are missing</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_status_vcxo</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>VCXO status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = off/clocks are missing</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = correct</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_status_fb_clk</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL1 feedback status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = off/clocks are missing</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = correct</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_status_outputpll_fb_clk</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>PLL2 feedback status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = off/clocks are missing</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = correct</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0509</Name>
+		<Address>0x509</Address>
+		<Description>Status Readback 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ctl_readback_vco_cal_active</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>VCO calibration busy status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = VCO calibration not in progress</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = VCO calibration in progress</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_fast_lock_in_progress</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Fast lock in progress</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = fast lock not in progress</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = fast lock in progress</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_selected_reference</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selected reference</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Selected reference (applies only when the device automatically selects the reference; for example, not in manual control mode).</Notes>
+				<Options>
+					<Option>
+						<Description>0 = RefA</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = RefB</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ctl_readback_holdover_active</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Holdover active status</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 = normal operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>1 = holdover is active (both references are missing)</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+</ad9528>
