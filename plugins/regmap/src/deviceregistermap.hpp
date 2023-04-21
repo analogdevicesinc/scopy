@@ -6,6 +6,7 @@
 #include <QWidget>
 #include "scopyregmap_export.h"
 
+class RecyclerViewAdapter;
 class QVBoxLayout;
 class RegisterModel;
 class RegisterDetailedWidget;
@@ -13,7 +14,7 @@ class RegisterController;
 class RegisterMapValues;
 class RegisterMapTemplate;
 class SearchBarWidget;
-class RegisterMapTable;
+//class RegisterMapTable;
 
 class SCOPYREGMAP_EXPORT DeviceRegisterMap : public QWidget
 {
@@ -31,7 +32,8 @@ private:
 	RegisterController *registerController = nullptr;
 
 	SearchBarWidget *searchBarWidget = nullptr;
-	RegisterMapTable *registerMapTableWidget = nullptr;
+//	RegisterMapTable *registerMapTableWidget = nullptr;
+    RecyclerViewAdapter *recycerViewAdapter = nullptr;
 
 	RegisterDetailedWidget *registerDetailedWidget = nullptr;
 Q_SIGNALS:
