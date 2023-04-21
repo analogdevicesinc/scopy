@@ -54,7 +54,7 @@ public:
 	int get_data_logger_recording_interval();
 	void set_data_logger_recording_interval(int interval);
 
-	explicit DataLogger_API(DataLogger *dataLogger) : ApiObject(), dataLogger(dataLogger) {};
+	explicit DataLogger_API(DataLogger *dataLogger) : ApiObject(dataLogger), dataLogger(dataLogger) {};
 
 private:
 	DataLogger *dataLogger;

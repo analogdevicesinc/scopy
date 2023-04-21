@@ -1,6 +1,7 @@
 #ifndef DATALOGGERPLUGIN_H
 #define DATALOGGERPLUGIN_H
 
+#include "src/datalogger_api.h"
 #define SCOPY_PLUGIN_NAME DataLoggerPlugin
 
 #include <pluginbase/plugin.h>
@@ -45,6 +46,8 @@ public:
 	void unload() override;
 	bool compatible(QString param) override;
 	void initMetadata() override;
+	void saveSettings(QSettings &) override;
+	void loadSettings(QSettings &) override;
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
@@ -57,7 +60,8 @@ private:
 	//	Ui::SwiotFaults *faultsgui;
 	//	Ui::Max14906Tool *maxgui;
 
-	QWidget *tool;
+	DataLogger *tool;
+	DataLogger_API *api;
 	//	QWidget *config ;
 	//	QWidget *runtime;
 	//	QWidget *faults;
@@ -67,7 +71,6 @@ private:
 	CyclicalTask *cs;
 
 	libm2k::context::Context *libm2k_context;
-
 };
 }
 }
