@@ -1,5 +1,6 @@
-#include "diodigitalchannel.hpp"
+#include "diodigitalchannel.h"
 #include <QPixmap>
+#include <QDebug>
 
 using namespace scopy::swiot;
 

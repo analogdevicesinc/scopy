@@ -1,4 +1,4 @@
-#include "faultwidget.hpp"
+#include "faultwidget.h"
 
 #include <utility>
 #include "ui_faultwidget.h"

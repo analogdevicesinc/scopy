@@ -1,5 +1,5 @@
-#ifndef SWIOTCONFIGMODEL_HPP
-#define SWIOTCONFIGMODEL_HPP
+#ifndef CONFIGMODEL_H
+#define CONFIGMODEL_H
 
 #include "qobject.h"
 
@@ -32,4 +32,4 @@ private:
 	QVector<QMap<QString, QStringList>> m_attrValues;
 };
 }
-#endif // SWIOTCONFIGMODEL_HPP
+#endif // CONFIGMODEL_H

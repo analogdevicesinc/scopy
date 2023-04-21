@@ -1,4 +1,4 @@
-#include "configcontroller.hpp"
+#include "configcontroller.h"
 #include "qdebug.h"
 
 using namespace scopy::swiot;

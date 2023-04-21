@@ -1,4 +1,4 @@
-#include "diocontroller.hpp"
+#include "diocontroller.h"
 
 using namespace scopy::swiot;
 

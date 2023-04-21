@@ -1,7 +1,7 @@
 #ifndef SWIOTPLUGIN_H
 #define SWIOTPLUGIN_H
 
-#include "src/runtime/swiotruntime.hpp"
+#include "src/runtime/swiotruntime.h"
 #define SCOPY_PLUGIN_NAME SWIOTPlugin
 
 #include <pluginbase/plugin.h>

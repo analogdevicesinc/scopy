@@ -1,5 +1,5 @@
 #include <QWidget>
-#include "configmenu.hpp"
+#include "configmenu.h"
 #include <QMap>
 #include <QObject>
 

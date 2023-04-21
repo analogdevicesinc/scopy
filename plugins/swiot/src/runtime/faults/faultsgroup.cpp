@@ -6,7 +6,7 @@
 
 #include <utility>
 
-#include "faultsgroup.hpp"
+#include "faultsgroup.h"
 #include "src/swiot_logging_categories.h"
 
 

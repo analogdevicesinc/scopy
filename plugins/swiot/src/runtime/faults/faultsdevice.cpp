@@ -1,6 +1,6 @@
-#include "faultsdevice.hpp"
+#include "faultsdevice.h"
 #include <utility>
-#include "faultsgroup.hpp"
+#include "faultsgroup.h"
 
 using namespace scopy::swiot;
 

@@ -1,4 +1,4 @@
-#include "bufferlogic.hpp"
+#include "bufferlogic.h"
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;

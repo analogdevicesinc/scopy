@@ -1,5 +1,5 @@
-#ifndef SCOPY_DIOMAX14906CONTROLLER_HPP
-#define SCOPY_DIOMAX14906CONTROLLER_HPP
+#ifndef SCOPY_DIOCONTROLLER_H
+#define SCOPY_DIOCONTROLLER_H
 
 #include <QString>
 #include <utility>
@@ -27,4 +27,4 @@ private:
 };
 }
 
-#endif //SCOPY_DIOMAX14906CONTROLLER_HPP
+#endif //SCOPY_DIOCONTROLLER_H

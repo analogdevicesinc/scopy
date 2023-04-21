@@ -1,5 +1,5 @@
-#ifndef SCOPY_FAULTWIDGET_HPP
-#define SCOPY_FAULTWIDGET_HPP
+#ifndef SCOPY_FAULTWIDGET_H
+#define SCOPY_FAULTWIDGET_H
 
 #include <QWidget>
 #include "ui_faultwidget.h"
@@ -63,4 +63,4 @@ private:
 };
 }
 
-#endif //SCOPY_FAULTWIDGET_HPP
+#endif //SCOPY_FAULTWIDGET_H

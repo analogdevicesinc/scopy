@@ -1,5 +1,5 @@
-#ifndef SWIOTADLOGIC_HPP
-#define SWIOTADLOGIC_HPP
+#ifndef BUFFERLOGIC_H
+#define BUFFERLOGIC_H
 
 #include <QObject>
 #include <QMap>
@@ -62,4 +62,4 @@ private:
 }
 
 
-#endif // SWIOTADLOGIC_HPP
+#endif // BUFFERLOGIC_H

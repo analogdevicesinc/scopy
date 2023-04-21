@@ -4,7 +4,6 @@
 #include <QWidget>
 #include "ui_swiotdigitalchannel.h"
 #include <gui/generic_menu.hpp>
-#include "core/logging_categories.h"
 
 namespace scopy::swiot {
 class DioDigitalChannel : public scopy::gui::GenericMenu {

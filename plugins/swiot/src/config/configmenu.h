@@ -1,5 +1,5 @@
-#ifndef SWIOTCONFIGMENU_HPP
-#define SWIOTCONFIGMENU_HPP
+#ifndef CONFIGMENU_H
+#define CONFIGMENU_H
 
 #include <QObject>
 #include "ui_swiotconfig.h"
@@ -19,4 +19,4 @@ private:
 
 }
 
-#endif // SWIOTCONFIGMENU_HPP
+#endif // CONFIGMENU_H

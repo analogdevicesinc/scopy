@@ -1,5 +1,5 @@
-#ifndef SWIOTMODEL_HPP
-#define SWIOTMODEL_HPP
+#ifndef BUFFERMENUMODEL_H
+#define BUFFERMENUMODEL_H
 
 #include "qobject.h"
 #include <QMap>
@@ -27,4 +27,4 @@ private:
 };
 }
 
-#endif // SWIOTMODEL_HPP
+#endif // BUFFERMENUMODEL_H
