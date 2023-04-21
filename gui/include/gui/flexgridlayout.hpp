@@ -1,5 +1,5 @@
-#ifndef CUSOTMCOLQGRIDLAYOUT_HPP
-#define CUSOTMCOLQGRIDLAYOUT_HPP
+#ifndef FLEXGRIDLAYOUT_HPP
+#define FLEXGRIDLAYOUT_HPP
 
 #include <QWidget>
 #include <QVBoxLayout>
@@ -62,4 +62,4 @@ private:
 	void repositionWidgets(int index, int row, int col);
 };
 }
-#endif // CUSOTMCOLQGRIDLAYOUT_HPP
+#endif // FLEXGRIDLAYOUT_HPP
