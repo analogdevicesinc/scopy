@@ -31,8 +31,9 @@ if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
 
-option(WITH_PYTHON ON)
-if(${WITH_PYTHON})
+option(WITH_PYTHON "Enable Python" ON)
+
+if(${WITH_PYTHON2})
     set(Python_ADDITIONAL_VERSIONS 3)
     find_package(PythonInterp REQUIRED)
     set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})

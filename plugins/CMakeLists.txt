@@ -3,10 +3,9 @@ project(scopyplugins VERSION 0.1 LANGUAGES CXX)
 set(SCOPY_PLUGIN_INSTALL_PATH "${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 message(STATUS "plugins to " ${SCOPY_PLUGIN_INSTALL_PATH})
 
-option(ENABLE_PLUGIN_TEST ON)
-option(ENABLE_PLUGIN_M2K ON)
-option(ENABLE_PLUGIN_SWIOT ON)
-option(ENABLE_PLUGIN_REGMAP ON)
+option(ENABLE_PLUGIN_TEST "Enable test plugin" ON)
+option(ENABLE_PLUGIN_M2K "Enable m2k plugin" ON)
+option(ENABLE_PLUGIN_SWIOT "Enable swiot plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
     add_subdirectory(guitestplugin)
