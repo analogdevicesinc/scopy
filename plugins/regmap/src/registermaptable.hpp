@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QMap>
+#include <src/recycerview/irecyclerviewadapter.hpp>
 #include "scopyregmap_export.h"
 
 class QGridLayout;
@@ -13,21 +14,21 @@ class VerticalScrollArea;
 
 class SCOPYREGMAP_EXPORT RegisterMapTable : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels, QWidget *parent = nullptr);
-	~RegisterMapTable();
+    explicit RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels, QWidget *parent = nullptr);
+    ~RegisterMapTable();
 
-	QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
+    QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
 
-	void hideAll();
-	void showAll();
+    void hideAll();
+    void showAll();
     void setFilters(QList<uint32_t> filters);
     void valueUpdated(uint32_t address, uint32_t value);
     void setMaxVisibleRows(int newMaxVisibleRows);
-Q_SIGNALS:
-	void registerSelected(uint32_t address);
 
+Q_SIGNALS:
+    void registerSelected(uint32_t address);
 
 private:
     int  m_maxVisibleRows = 10;
@@ -43,7 +44,7 @@ private:
     void scrollDown();
     void scrollUp();
     void populateMap();
-    void generateWidget(RegisterModel *model);
+    void generateWidget(RegisterModel *model); 
 };
 
 #endif // REGISTERMAPTABLE_HPP
