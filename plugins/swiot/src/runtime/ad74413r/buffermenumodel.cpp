@@ -1,6 +1,6 @@
 #include <iio.h>
 #include "qdebug.h"
-#include "buffermenumodel.hpp"
+#include "buffermenumodel.h"
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;

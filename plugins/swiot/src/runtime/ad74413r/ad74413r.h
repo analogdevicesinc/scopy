@@ -1,15 +1,15 @@
-#ifndef SWIOTAD_HPP
-#define SWIOTAD_HPP
+#ifndef AD74413R_H
+#define AD74413R_H
 
 #include <gui/tool_view.hpp>
 #include <qwidget.h>
-#include "bufferlogic.hpp"
+#include "bufferlogic.h"
 #include "src/runtime/readerthread.h"
-#include "buffermenucontroller.hpp"
+#include "buffermenucontroller.h"
 #include <gui/channel_manager.hpp>
 #include <gui/osc_export_settings.h>
 #include <QVector>
-#include "bufferplothandler.hpp"
+#include "bufferplothandler.h"
 #include <iio.h>
 
 #define MAX_CURVES_NUMBER 8
@@ -97,4 +97,4 @@ private:
 };
 }
 }
-#endif // SWIOTAD_HPP
+#endif // AD74413R_H

@@ -1,12 +1,12 @@
-#ifndef FAULTSPAGE_HPP
-#define FAULTSPAGE_HPP
+#ifndef FAULTSPAGE_H
+#define FAULTSPAGE_H
 
 #include <QWidget>
 #include <QPushButton>
 #include <QTextEdit>
 
-#include "faultsgroup.hpp"
-#include "faultsdevice.hpp"
+#include "faultsgroup.h"
+#include "faultsdevice.h"
 
 namespace Ui { class FaultsPage; }
 
@@ -28,4 +28,4 @@ private:
 	FaultsDevice* m_max14906FaultsDevice;
 };
 }
-#endif // FAULTSPAGE_HPP
+#endif // FAULTSPAGE_H

@@ -1,10 +1,10 @@
-#ifndef SCOPY_SWIOTFAULTSDEVICE_HPP
-#define SCOPY_SWIOTFAULTSDEVICE_HPP
+#ifndef SCOPY_FAULTSDEVICE_H
+#define SCOPY_FAULTSDEVICE_H
 
 #include <QWidget>
 #include <QTextEdit>
 #include "ui_faultsdevice.h"
-#include "faultsgroup.hpp"
+#include "faultsgroup.h"
 #include <gui/subsection_separator.hpp>
 
 
@@ -41,4 +41,4 @@ private Q_SLOTS:
 
 } // scopy::gui
 
-#endif //SCOPY_SWIOTFAULTSDEVICE_HPP
+#endif //SCOPY_FAULTSDEVICE_H

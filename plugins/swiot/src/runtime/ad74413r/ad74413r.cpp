@@ -1,8 +1,8 @@
-#include "ad74413r.hpp"
+#include "ad74413r.h"
 #include <gui/tool_view_builder.hpp>
 #include <gui/generic_menu.hpp>
-#include "buffermenuview.hpp"
-#include "buffermenumodel.hpp"
+#include "buffermenuview.h"
+#include "buffermenumodel.h"
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
 

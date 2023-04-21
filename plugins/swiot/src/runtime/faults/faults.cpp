@@ -1,4 +1,4 @@
-#include "faults.hpp"
+#include "faults.h"
 #include <gui/tool_view_builder.hpp>
 
 #include <QTimer>

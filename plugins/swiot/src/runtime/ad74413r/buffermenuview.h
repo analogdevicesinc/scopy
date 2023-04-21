@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <gui/generic_menu.hpp>
-#include "buffermenu.hpp"
+#include "buffermenu.h"
 #include <QMap>
 #include <QObject>
 

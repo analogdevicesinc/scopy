@@ -1,10 +1,10 @@
-#ifndef SWIOTCONFIG_HPP
-#define SWIOTCONFIG_HPP
+#ifndef SWIOTCONFIG_H
+#define SWIOTCONFIG_H
 #define AD_NAME "ad74413r"
 #define MAX_NAME "max14906"
 
-#include "configcontroller.hpp"
-#include "configmenu.hpp"
+#include "configcontroller.h"
+#include "configmenu.h"
 #include <gui/tool_view.hpp>
 #include <QPushButton>
 #include <QMap>
@@ -53,4 +53,4 @@ private:
 }
 
 
-#endif // SWIOTCONFIG_HPP
+#endif // SWIOTCONFIG_H

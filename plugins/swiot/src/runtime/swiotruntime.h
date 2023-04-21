@@ -1,7 +1,7 @@
-#ifndef SWIOTRUNTIME_HPP
-#define SWIOTRUNTIME_HPP
+#ifndef SWIOTRUNTIME_H
+#define SWIOTRUNTIME_H
 
-#include "src/runtime/ad74413r/ad74413r.hpp"
+#include "src/runtime/ad74413r/ad74413r.h"
 
 namespace scopy {
 namespace gui {
@@ -39,4 +39,4 @@ private:
 }
 }
 
-#endif // SWIOTRUNTIME_HPP
+#endif // SWIOTRUNTIME_H

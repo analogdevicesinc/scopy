@@ -1,4 +1,4 @@
-#include "max14906.hpp"
+#include "max14906.h"
 #include <gui/tool_view_builder.hpp>
 #include "src/swiot_logging_categories.h"
 

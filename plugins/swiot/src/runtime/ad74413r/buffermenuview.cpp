@@ -1,4 +1,4 @@
-#include "buffermenuview.hpp"
+#include "buffermenuview.h"
 #include <QHBoxLayout>
 
 using namespace scopy;

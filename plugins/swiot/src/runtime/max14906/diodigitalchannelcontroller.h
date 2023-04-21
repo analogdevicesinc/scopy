@@ -1,7 +1,7 @@
 #ifndef SCOPY_DIODIGITALCHANNELCONTROLLER_H
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
-#include "diodigitalchannel.hpp"
+#include "diodigitalchannel.h"
 
 #include <string>
 #include <iio.h>

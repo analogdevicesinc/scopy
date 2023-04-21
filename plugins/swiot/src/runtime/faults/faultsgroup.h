@@ -1,9 +1,9 @@
-#ifndef FAULTSGROUP_HPP
-#define FAULTSGROUP_HPP
+#ifndef FAULTSGROUP_H
+#define FAULTSGROUP_H
 
 #include <set>
 
-#include "faultwidget.hpp"
+#include "faultwidget.h"
 #include <gui/flexgridlayout.hpp>
 #include "ui_faultsgroup.h"
 
@@ -45,4 +45,4 @@ protected:
 };
 }
 
-#endif // FAULTSGROUP_HPP
+#endif // FAULTSGROUP_H
