@@ -76,15 +76,26 @@ bool DataLoggerPlugin::onConnect()
 	cs = new CyclicalTask(ping,this);
 	cs->start(2000);
 
-	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
-	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_DATALOGGER)<<"Ping Success";} );
-
 	tool = new DataLogger(libm2k_context);
 	api = new DataLogger_API(tool);
 	ScopyJS::GetInstance()->registerApi(api);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(tool);
+	m_toolList[0]->setRunBtnVisible(true);
+
+	connect(ping, &IIOPingTask::pingFailed, this, [this](){Q_EMIT disconnectDevice();} );
+	connect(ping, &IIOPingTask::pingSuccess, this, [](){qDebug(CAT_DATALOGGER)<<"Ping Success";} );
+	connect(tool->getRunButton(),&QPushButton::toggled, this,[=](bool en){
+		if (m_toolList[0]->running() != en) {
+			m_toolList[0]->setRunning(en);
+		}
+	});
+	connect(m_toolList[0],&ToolMenuEntry::runToggled, this,[=](bool en){
+		if (tool->getRunButton()->isChecked() != en) {
+			tool->getRunButton()->setChecked(en);
+		}
+	});
 
 	return true;
 }
@@ -97,6 +108,7 @@ bool DataLoggerPlugin::onDisconnect()
 	for (auto & tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setTool(nullptr);
+		m_toolList[0]->setRunBtnVisible(false);
 	}
 
 	try {

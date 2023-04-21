@@ -63,6 +63,7 @@ public:
 	void setPrecision(int precision);
 	int getValueReadingTimeInterval();
 	void setNativeDialogs(bool nativeDialogs);
+	QPushButton* getRunButton();
 
 private:
 	int VALUE_READING_TIME_INTERVAL = 1000;

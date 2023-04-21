@@ -300,6 +300,11 @@ void DataLogger::setNativeDialogs(bool nativeDialogs)
 	dataLoggerController->setUseNativeDialog(nativeDialogs);
 }
 
+QPushButton *DataLogger::getRunButton()
+{
+	return m_toolView->getRunBtn();
+}
+
 int DataLogger::getPrecision()
 {
 	return precisionValue->text().toInt();
