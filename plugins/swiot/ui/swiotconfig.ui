@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>9</x>
@@ -44,14 +44,14 @@
       <item>
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>                         AD74413r</string>
+         <string>                         AD74413R</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>          MAX4906</string>
+         <string>          MAX14906</string>
         </property>
        </widget>
       </item>

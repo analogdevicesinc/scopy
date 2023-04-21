@@ -1,4 +1,4 @@
-#include "configmodel.hpp"
+#include "configmodel.h"
 #include "qdebug.h"
 #include <iio.h>
 #include <QMap>

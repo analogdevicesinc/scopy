@@ -1,4 +1,4 @@
-#include "diodigitalchannelcontroller.hpp"
+#include "diodigitalchannelcontroller.h"
 #include "src/swiot_logging_categories.h"
 #include <sstream>
 

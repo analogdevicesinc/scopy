@@ -1,8 +1,8 @@
-#include "swiotconfig.hpp"
+#include "swiotconfig.h"
 #include <gui/tool_view_builder.hpp>
-#include "configcontroller.hpp"
-#include "configmenu.hpp"
-#include "configmodel.hpp"
+#include "configcontroller.h"
+#include "configmenu.h"
+#include "configmodel.h"
 #include "core/toolmenuitem.h"
 #include <iio.h>
 #include "src/swiot_logging_categories.h"

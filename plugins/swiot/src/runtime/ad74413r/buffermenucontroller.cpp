@@ -1,4 +1,4 @@
-#include "buffermenucontroller.hpp"
+#include "buffermenucontroller.h"
 #include "qdebug.h"
 
 using namespace scopy::swiot;

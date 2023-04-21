@@ -1,9 +1,9 @@
-#ifndef SWIOTPLOTHANDLER_HPP
-#define SWIOTPLOTHANDLER_HPP
+#ifndef BUFFERPLOTHANDLER_H
+#define BUFFERPLOTHANDLER_H
 
 #include <gui/oscilloscope_plot.hpp>
 #include <qobject.h>
-#include "bufferlogic.hpp"
+#include "bufferlogic.h"
 #include <qmutex.h>
 #include <QWidget>
 
@@ -55,4 +55,4 @@ private:
 };
 }
 
-#endif // SWIOTPLOTHANDLER_HPP
+#endif // BUFFERPLOTHANDLER_H

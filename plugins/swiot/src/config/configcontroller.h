@@ -1,9 +1,9 @@
-#ifndef SWIOTCONFIGCONTROLLER_HPP
-#define SWIOTCONFIGCONTROLLER_HPP
+#ifndef CONFIGCONTROLLER_H
+#define CONFIGCONTROLLER_H
 
 #include "qobject.h"
-#include "src/config/configchannelview.hpp"
-#include "configmodel.hpp"
+#include "src/config/configchannelview.h"
+#include "configmodel.h"
 
 namespace scopy::swiot {
 
@@ -30,4 +30,4 @@ private:
 }
 
 
-#endif // SWIOTCONFIGCONTROLLER_HPP
+#endif // CONFIGCONTROLLER_H

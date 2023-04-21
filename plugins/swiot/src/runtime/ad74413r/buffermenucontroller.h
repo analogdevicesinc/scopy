@@ -1,9 +1,9 @@
-#ifndef SWIOTCONTROLLER_HPP
-#define SWIOTCONTROLLER_HPP
+#ifndef BUFFERMENUCONTROLLER_H
+#define BUFFERMENUCONTROLLER_H
 
 #include "qobject.h"
-#include "buffermenuview.hpp"
-#include "buffermenumodel.hpp"
+#include "buffermenuview.h"
+#include "buffermenumodel.h"
 
 namespace scopy::swiot {
 class BufferMenuController : public QObject {
@@ -33,4 +33,4 @@ private:
 }
 
 
-#endif // SWIOTCONTROLLER_HPP
+#endif // BUFFERMENUCONTROLLER_H

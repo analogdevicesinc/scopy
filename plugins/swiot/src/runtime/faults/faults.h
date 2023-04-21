@@ -1,9 +1,9 @@
-#ifndef SWIOTFAULTS_HPP
-#define SWIOTFAULTS_HPP
+#ifndef FAULTS_H
+#define FAULTS_H
 
 #include "ui_swiotfaults.h"
 
-#include "faultspage.hpp"
+#include "faultspage.h"
 #include <gui/tool_view.hpp>
 #include <gui/generic_menu.hpp>
 #include <gui/channel_manager.hpp>
@@ -50,4 +50,4 @@ private:
 	FaultsPage *m_faultsPage{};
 };
 }
-#endif // SWIOTFAULTS_HPP
+#endif // FAULTS_H
