@@ -27,7 +27,8 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc src/*.hpp
     src/register/*.cpp src/register/*.hpp
     src/register/bitfield/*.cpp src/register/bitfield/*.hpp
-    src/readwrite/*.cpp src/readwrite/*.hpp )
+    src/readwrite/*.cpp src/readwrite/*.hpp
+    src/recycerview/*.cpp src/recycerview/*.hpp)
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 

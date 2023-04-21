@@ -12,6 +12,7 @@
 #include <QDebug>
 #include <QGridLayout>
 #include <QtConcurrent/QtConcurrent>
+#include <src/recycerview/recyclerviewadapter.hpp>
 #include "logging_categories.h"
 
 RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel *> *registerModels, QWidget *parent)
@@ -21,6 +22,7 @@ RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel *> *registerMode
     m_layout = new QVBoxLayout();
     setLayout(m_layout);
     setStyleSheet("border: 1px solid black");
+
     m_scrollArea = new VerticalScrollArea();
     m_scrollArea->setTabletTracking(true);
 
