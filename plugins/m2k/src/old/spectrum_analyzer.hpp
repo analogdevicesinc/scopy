@@ -209,7 +209,7 @@ private Q_SLOTS:
 	void refreshCurrentSampleLabel();
 	void validateSpinboxAveraging();
 	void onWaterfallSizeChanged(double);
-
+	void waterfallToggled(bool visible);
 private:
 	void initInstrumentStrings();
 	void build_gnuradio_block_chain();
@@ -340,6 +340,7 @@ private:
 
 	bool receivedFFTData;
 	bool receivedWaterfallData;
+	bool waterfall_visible;
 
 	// dockers
 	QMainWindow *mainWindow;
