@@ -47,11 +47,6 @@ public:
     // resize table cells and hide/show rows
     void refreshColumn(double column = -1) const;
 
-    // activate connects signals to listen for new decoded messages
-    // deactivate disconnects them.
-    void activate();
-    void deactivate();
-
     // Get index of the curve
     int indexOfCurve(const AnnotationCurve* curve) const;
 
