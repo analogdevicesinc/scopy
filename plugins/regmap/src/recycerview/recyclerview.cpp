@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QEvent>
 #include <QScrollEvent>
+#include <src/verticalscrollarea.hpp>
 
 RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
     : widgets(widgets),
@@ -19,15 +20,27 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
     QWidget *bitFieldsWidget = new QWidget();
     bitFieldsWidget->setLayout(bitFieldsWidgetLayout);
 
-    this->layout()->addWidget(bitFieldsWidget);
+    VerticalScrollArea *m_scrollArea = new VerticalScrollArea();
+    m_scrollArea->setWidget(bitFieldsWidget);
+    m_scrollArea->verticalScrollBar()->setVisible(false);
+    this->layout()->addWidget(m_scrollArea);
 
     slider = new QSlider();
     slider->setInvertedAppearance(true);
     slider->setInvertedControls(true);
-    slider->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::MinimumExpanding);
 
+    QObject::connect(m_scrollArea->verticalScrollBar(),&QAbstractSlider::valueChanged, this, [=](int value){
+        if (value == m_scrollArea->verticalScrollBar()->minimum()) {
+            slider->setValue(m_scrollBarCurrentValue - 1);
+            m_scrollArea->verticalScrollBar()->setValue(value + 1 );
+        }
+        if (value == m_scrollArea->verticalScrollBar()->maximum()){
+            slider->setValue(m_scrollBarCurrentValue + 1);
+            m_scrollArea->verticalScrollBar()->setValue(value - 1 );
+        }
+
+    });
     this->layout()->addWidget(slider);
-
 }
 
 RecyclerView::~RecyclerView()
@@ -152,7 +165,8 @@ void RecyclerView::populateMap()
         ++mapIterator;
     }
 
-    MAX_ROW_COUNT = 1;//this->size().height()/ widgetMap->value(0)->sizeHint().height();
+    //TODO find a way to autocompute max row count
+    MAX_ROW_COUNT = 3;//this->size().height()/ widgetMap->value(0)->sizeHint().height();
 
     int i = 0;
     while ( i < MAX_ROW_COUNT && mapIterator != widgets->end()) {
@@ -169,7 +183,6 @@ void RecyclerView::populateMap()
     activeWidgetBottom = mapIterator;
     activeWidgetTop = widgets->begin();
 
-    //TODO use the received data to compute slider maximum
     slider->setMaximum(widgets->length());
     slider->setSingleStep(1);
 }

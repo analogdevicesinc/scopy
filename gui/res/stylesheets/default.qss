@@ -337,15 +337,16 @@ QCheckBox::indicator {
 }
 QCheckBox::indicator:unchecked { background-color: transparent; }
 QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+/* Remove height : 2px; from QSlider groove */
 QSlider::groove {
  border: 1px solid #444444;
- height: 2px;
  background: #999999;
  margin: 2px 0;
  border-radius: 2px;
 }
+
 QSlider::handle {
- background: rgb(73, 99, 255);
+ background: #404040;
  border: 0px solid;
  width: 18px;
  margin: -8px 0;
@@ -678,3 +679,4 @@ QPushButton[userNote=true] {
 QPushButton[userNote=true]:checked {
  background-image: url(:/gui/icons/scopy-default/icons/note_checked.svg);
 }
+
