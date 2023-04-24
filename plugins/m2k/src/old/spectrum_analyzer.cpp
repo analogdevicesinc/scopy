@@ -292,7 +292,13 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDocker);
 	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, waterfallDocker);
-	//		mainWindow->tabifyDockWidget(fftDocker, waterfallDocker);
+
+	connect(ui->btnToggleWaterfall, SIGNAL(toggled(bool)), this, SLOT(waterfallToggled(bool)));
+
+	// dafault hidden
+	waterfallToggled(false);
+//	ui->btnToggleWaterfall->setChecked(false);
+
 
 #ifdef PLOT_MENU_BAR_ENABLED
 	DockerUtils::configureTopBar(fftDocker);
@@ -552,11 +558,15 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(fft_plot, &FftDisplayPlot::newFFTData, this, [=](){
 		receivedFFTData = true;
-		if (receivedWaterfallData) {
+		if (receivedWaterfallData || !waterfall_visible) {
 			singleCaptureDone();
 
 			receivedWaterfallData = false;
 			receivedFFTData = false;
+		} else if (ui->runSingleWidget->singleButtonChecked()){
+			for (size_t i = 0; i < m_adc_nb_channels; i++) {
+				iio->stop(fft_ids[i]);
+			}
 		}
 	});
 
@@ -567,6 +577,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			receivedWaterfallData = false;
 			receivedFFTData = false;
+		} else if (ui->runSingleWidget->singleButtonChecked()){
+			for (size_t i = 0; i < m_adc_nb_channels; i++) {
+				iio->stop(waterfall_ids[i]);
+			}
 		}
 	});
 
@@ -1739,6 +1753,24 @@ void SpectrumAnalyzer::connectZoomers()
 	});
 }
 
+void SpectrumAnalyzer::waterfallToggled(bool visible)
+{
+	waterfallDocker->setVisible(visible);
+	waterfall_visible = visible;
+
+	if (isIioManagerStarted() && isRunning()) {
+		if (visible) {
+			for (size_t i = 0; i < m_adc_nb_channels; i++) {
+				iio->start(waterfall_ids[i]);
+			}
+		} else {
+			for (int i = 0; i < channels.size(); i++) {
+				iio->stop(waterfall_ids[i]);
+			}
+		}
+	}
+}
+
 void SpectrumAnalyzer::connectCursorHandles()
 {
 	if (!btnLockHPlots) return;
@@ -2188,7 +2220,10 @@ void SpectrumAnalyzer::start_blockchain_flow()
 	if (iio) {
 		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->start(fft_ids[i]);
-			iio->start(waterfall_ids[i]);
+
+			if (waterfall_visible) {
+				iio->start(waterfall_ids[i]);
+			}
 		}
 	} else {
 		fft_sink->reset();
@@ -2201,7 +2236,10 @@ void SpectrumAnalyzer::stop_blockchain_flow()
 	if (iio) {
 		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->stop(fft_ids[i]);
-			iio->stop(waterfall_ids[i]);
+
+			if (waterfall_visible) {
+				iio->stop(waterfall_ids[i]);
+			}
 		}
 	} else {
 		top_block->stop();
@@ -2822,13 +2860,14 @@ void SpectrumAnalyzer::setFftSize(uint size)
 
 		iio->connect(fft, 0, channels[i]->ctm_block, 0);
 		iio->connect(channels[i]->ctm_block, 0, fft_sink, i);
-
 		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size * m_nb_overlapping_avg);
-//		iio->connect(channels[i]->ctm_block, 0, waterfall_sink, i);
 
 		if (started) {
 			iio->start(fft_ids[i]);
-			iio->start(waterfall_ids[i]);
+
+			if (waterfall_visible) {
+				iio->start(waterfall_ids[i]);
+			}
 		}
 
 		channels[i]->fft_block = fft;
