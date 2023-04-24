@@ -163,6 +163,8 @@ private Q_SLOTS:
 	void emitSearchSignal(int index = -1);
 
 	void onFilterChanged(QStandardItem *item);
+
+	void activateRunButton(bool en);
 protected:
 	uint16_t *m_buffer;
 

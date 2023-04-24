@@ -294,9 +294,6 @@ void DecoderTable::activate(bool logic)
 
 void DecoderTable::deactivate()
 {
-	if (const auto m = decoderModel()) {
-		m->deactivate();
-	}
 	m_active = false;
 }
 
