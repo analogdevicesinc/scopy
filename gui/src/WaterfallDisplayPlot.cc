@@ -591,10 +591,6 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 					d_spectrogram[i]->invalidateCache();
 					d_spectrogram[i]->itemChanged();
 				}
-
-				if (isVisible()) {
-					replot();
-				}
 			}
 
 			d_leftHandlesArea->update();
@@ -699,7 +695,7 @@ void WaterfallDisplayPlot::replot()
 		((WaterfallZoomer*)d_zoomer[0])->updateTrackerText();
 	}
 
-	QwtPlot::replot();
+	BasicPlot::replot();
 }
 
 void WaterfallDisplayPlot::clearData()
