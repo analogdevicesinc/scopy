@@ -182,40 +182,9 @@ QString DecoderTableModel::getsearchString()
 	return searchString;
 }
 
-void DecoderTableModel::activate()
-{
-	// TODO: REFACTOR THIS ??
-//	if (m_logic->getTme()->isRunning()) {
-//		m_logic->runButton()->click();
-//	}
-//	m_logic->enableRunButton(false);
-//	m_logic->runButton()->setEnabled(false);
-	//    m_logic->enableSingleButton(false);
-
-	m_filteredMessages.clear();
-	for (int i=0; i<m_curves.size(); i++) {
-		m_filteredMessages.insert(i, QVector<QString>());
-	}
-
-	m_active = true;
-
-	refreshSettings();
-}
-
-void DecoderTableModel::deactivate()
-{
-	m_logic->enableRunButton(true);
-//	m_logic->runButton()->setEnabled(true);
-	//    m_logic->enableSingleButton(true);
-
-	m_active = false;
-}
-
 void DecoderTableModel::reloadDecoders(bool logic)
 {
-	// Disconnect signals
-	deactivate();
-
+	m_active = false;
 	m_curves.clear();
 
 	// Reconnect signals for all the annotation curves
@@ -225,8 +194,13 @@ void DecoderTableModel::reloadDecoders(bool logic)
 		}
 	}
 
-	// Reconnect signals
-	activate();
+	m_filteredMessages.clear();
+	for (int i=0; i<m_curves.size(); i++) {
+		m_filteredMessages.insert(i, QVector<QString>());
+	}
+
+	m_active = true;
+	refreshSettings();
 }
 
 void DecoderTableModel::refreshColumn(double column) const

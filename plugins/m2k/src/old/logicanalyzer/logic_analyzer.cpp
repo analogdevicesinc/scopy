@@ -1050,6 +1050,7 @@ void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 		connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
 			if (ui->btnDecoderTable->isChecked()) {
 				ui->decoderTableView->blockSignals(false);
+				activateRunButton(false);
 				ui->decoderTableView->activate(true);
 			}
 
@@ -1060,6 +1061,7 @@ void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 
 	} else {
 		ui->decoderTableView->deactivate();
+		activateRunButton(true);
 	}
 }
 
@@ -1638,11 +1640,20 @@ void LogicAnalyzer::setStatusLabel(QString text)
 	ui->statusLabel->setText(text);
 }
 
+void LogicAnalyzer::activateRunButton(bool en)
+{
+	if (!en && getTme()->running()) {
+		getTme()->setRunning(false);
+	}
+
+	enableRunButton(en);
+	getTme()->setEnabled(en);
+}
+
 void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
 
-	connect(ui->decoderTableView, SIGNAL(show()), this, SLOT(PrimaryAnnotationChanged(int)));
 
 	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
 //	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSearchSignal(int)));
