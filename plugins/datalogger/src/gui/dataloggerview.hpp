@@ -12,6 +12,9 @@
 #include <QLabel>
 
 namespace scopy {
+namespace datalogger {
+namespace gui {
+
 class DataLoggerView : public QWidget
 {
 	Q_OBJECT
@@ -61,4 +64,7 @@ Q_SIGNALS:
 
 };
 }
+}
+}
+
 #endif // DATALOGGERVIEW_H

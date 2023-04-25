@@ -1,6 +1,8 @@
 #include "dataloggerview.hpp"
 
 using namespace scopy;
+using namespace datalogger;
+using namespace gui;
 
 DataLoggerView::DataLoggerView(bool lastValue, bool average, bool all, QWidget *parent) :
 	QWidget(parent)

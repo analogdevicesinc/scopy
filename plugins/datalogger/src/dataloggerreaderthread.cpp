@@ -2,6 +2,9 @@
 #include "qdebug.h"
 #include <libm2k/analog/dmm.hpp>
 
+using namespace scopy;
+using namespace datalogger;
+
 DataLoggerReaderThread::DataLoggerReaderThread()
 {
 
