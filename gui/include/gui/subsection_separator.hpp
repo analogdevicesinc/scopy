@@ -7,7 +7,7 @@
 #include "scopygui_export.h"
 
 namespace Ui {
-class SCOPYGUI_EXPORT SubsectionSeparator;
+class SubsectionSeparator;
 }
 
 namespace scopy {

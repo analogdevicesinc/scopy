@@ -42,7 +42,7 @@
 #include "WaterfallDisplayPlot.h"
 #include "spectrum_analyzer.hpp"
 #include "filter.hpp"
-#include "gui/math.hpp"
+#include "math.hpp"
 #include "fft_block.hpp"
 #include "gui/dynamicWidget.h"
 #include "gui/channel_widget.hpp"

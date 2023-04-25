@@ -29,8 +29,8 @@
 #include <libsigrokdecode/libsigrokdecode.h>
 
 #include "gui/logicdatacurve.h"
-#include "gui/annotationcurve.h"
-#include "gui/decoder.h"
+#include "sigrok-gui/annotationcurve.h"
+#include "sigrok-gui/decoder.h"
 #include "logicanalyzer/decoder_table_model.hpp"
 
 #include "gui/basemenu.h"

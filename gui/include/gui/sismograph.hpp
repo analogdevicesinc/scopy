@@ -29,7 +29,6 @@
 #include <qwt_plot_curve.h>
 
 #include "autoScaler.hpp"
-#include "customFifo.hpp"
 #include "scopygui_export.h"
 #include "customqwtscaledraw.hpp"
 

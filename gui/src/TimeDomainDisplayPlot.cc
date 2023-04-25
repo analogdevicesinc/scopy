@@ -278,7 +278,7 @@ TimeDomainDisplayPlot::replot()
   BasicPlot::replot();
 }
 
-void TimeDomainDisplayPlot::plotTags(const std::vector< std::vector<gr::tag_t> > &tags) {
+/*void TimeDomainDisplayPlot::plotTags(const std::vector< std::vector<gr::tag_t> > &tags) {
 	// Detach and delete any tags that were plotted last time
 	for(int n = 0; n < d_nplots; n++) {
 	  for(size_t i = 0; i < d_tag_markers[n].size(); i++) {
@@ -408,14 +408,14 @@ void TimeDomainDisplayPlot::plotTags(const std::vector< std::vector<gr::tag_t> >
 	  }
 	}
 
-}
+}*/
 
 void
 TimeDomainDisplayPlot::plotNewData(const std::string &sender,
 				   const std::vector<double*> &dataPoints,
 				   const int64_t numDataPoints,
-				   const double timeInterval,
-				   const std::vector< std::vector<gr::tag_t> > &tags
+				   const double timeInterval
+//				   const std::vector< std::vector<gr::tag_t> > &tags
 				   )
 {
   int sinkIndex = d_sinkManager.indexOfSink(sender);
@@ -464,7 +464,7 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
       d_curves_hidden = false;
 
       if(d_plotGrTags)
-	plotTags(tags);
+//	plotTags(tags);
 
       if(d_autoscale_state) {
 	double bottom=1e20, top=-1e20;
@@ -511,8 +511,7 @@ void TimeDomainDisplayPlot::newData(const QEvent* updateEvent)
 	this->plotNewData(sender,
 			dataPoints,
 			numDataPoints,
-			0,
-			tags);
+			0);
 }
 
 void TimeDomainDisplayPlot::customEvent(QEvent * e)

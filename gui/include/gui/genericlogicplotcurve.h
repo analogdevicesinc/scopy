@@ -67,6 +67,9 @@ public:
 	virtual void dataAvailable(uint64_t from, uint64_t to, uint16_t *data) {}
 	virtual void reset() {}
 
+	virtual int getVisibleRows() const;
+	virtual double getHeightOffset() const;
+
 	uint64_t fromTimeToSample(double time) const;
 	double fromSampleToTime(uint64_t sample) const;
 

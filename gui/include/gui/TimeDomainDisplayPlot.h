@@ -107,9 +107,9 @@ public:
 
   void plotNewData(const std::string &sender,
 		   const std::vector<double*> &dataPoints,
-		   const int64_t numDataPoints, const double timeInterval,
+		   const int64_t numDataPoints, const double timeInterval/*,
 		   const std::vector< std::vector<gr::tag_t> > &tags \
-		   = std::vector< std::vector<gr::tag_t> >()
+		   = std::vector< std::vector<gr::tag_t> >()*/
 		  );
   void replot();
 
@@ -232,7 +232,7 @@ protected:
 private:
   void _resetXAxisPoints(double*& xAxis, unsigned long long numPoints, double sampleRate);
   void _autoScale(double bottom, double top);
-  void plotTags(const std::vector<std::vector<gr::tag_t> > &tags);
+//  void plotTags(const std::vector<std::vector<gr::tag_t> > &tags);
 
   double d_sample_rate;
   double d_delay;
