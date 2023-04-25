@@ -51,7 +51,7 @@
 #include "filemanager.h"
 
 #include "gui/genericlogicplotcurve.h"
-#include "gui/decoder.h"
+#include "sigrok-gui/decoder.h"
 
 
 namespace Ui {

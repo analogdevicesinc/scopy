@@ -30,8 +30,8 @@
 
 #include <errno.h>
 #include "patterns.hpp"
-#include "gui/annotationcurve.h"
-#include "gui/annotationdecoder.h"
+#include "sigrok-gui/annotationcurve.h"
+#include "sigrok-gui/annotationdecoder.h"
 #include "gui/dynamicWidget.h"
 
 #include <math.h>

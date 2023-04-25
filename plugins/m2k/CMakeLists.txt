@@ -93,6 +93,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     scopypluginbase
     scopyiioutil
     scopygui
+    scopygr-gui
+    scopysigrok-gui
     libm2k::libm2k
     gnuradio::gnuradio-runtime
     gnuradio::gnuradio-analog

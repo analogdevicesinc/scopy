@@ -63,7 +63,7 @@
 #include "plot_utils.hpp"
 #include "m2ktool.hpp"
 #include "gui/osc_import_settings.h"
-#include "gui/math.hpp"
+#include "math.hpp"
 #include "mousewheelwidgetguard.h"
 #include "cancel_dc_offset_block.h"
 #include "frequency_compensation_filter.h"
