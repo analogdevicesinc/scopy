@@ -5,7 +5,9 @@
 #include <QVBoxLayout>
 #include <customSwitch.h>
 
-using namespace scopy::gui;
+using namespace scopy;
+using namespace datalogger;
+using namespace datalogger::gui;
 
 DataLoggerGenericMenu::DataLoggerGenericMenu(QWidget *parent):
 	GenericMenu(parent)

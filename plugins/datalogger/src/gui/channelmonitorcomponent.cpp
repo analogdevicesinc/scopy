@@ -5,6 +5,8 @@
 
 
 using namespace scopy;
+using namespace datalogger;
+using namespace gui;
 
 ChannelMonitorComponent::ChannelMonitorComponent(QWidget *parent) :
 	QWidget(parent),

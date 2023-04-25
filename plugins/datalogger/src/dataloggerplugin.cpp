@@ -13,7 +13,7 @@
 
 
 using namespace scopy;
-using namespace scopy::datalogger;
+using namespace datalogger;
 
 Q_LOGGING_CATEGORY(CAT_DATALOGGER,"DataLoggerPlugin");
 Q_LOGGING_CATEGORY(CAT_DATALOGGER_TOOL,"dataloggerTool");

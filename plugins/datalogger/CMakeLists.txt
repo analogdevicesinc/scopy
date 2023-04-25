@@ -27,10 +27,8 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 FILE(GLOB SRC_LIST
 	src/*.cpp
         src/*.hpp
-        src/*.h
         src/gui/*.cpp
         src/gui/*.hpp
-        src/gui/*.h
 )
 
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
@@ -74,7 +72,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 include_directories(${Qt5Concurrent_INCLUDE_DIRS} ${GLIBCONFIG_INCLUDE_DIRS} ${Qt5Concurrent_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets libm2k::libm2k scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    Qt5::Widgets
+    libm2k::libm2k
+    scopy-pluginbase
+    scopy-iioutil
+    scopy-gui
+    scopy-core
+    ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

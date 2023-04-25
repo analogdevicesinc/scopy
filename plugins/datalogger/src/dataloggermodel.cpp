@@ -3,6 +3,7 @@
 #include <filemanager.h>
 
 using namespace scopy;
+using namespace datalogger;
 
 DataLoggerModel::DataLoggerModel():
 	m_path(""),

@@ -1,9 +1,10 @@
 #include "datalogger_api.h"
-#include "src/gui/dataloggercontroller.hpp"
+#include "src/dataloggercontroller.hpp"
 #include <src/datalogger.hpp>
 #include <customSwitch.h>
 
-//using namespace scopy;
+using namespace scopy;
+using namespace datalogger;
 
 bool DataLogger_API::get_show_all()
 {

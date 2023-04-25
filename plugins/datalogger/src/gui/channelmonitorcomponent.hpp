@@ -9,6 +9,9 @@ class ChannelMonitorComponent;
 }
 
 namespace scopy {
+namespace datalogger {
+namespace gui {
+
 class ChannelMonitorComponent : public QWidget
 {
 	Q_OBJECT
@@ -59,4 +62,7 @@ private:
 	void resizeEvent(QResizeEvent *event);
 };
 }
+}
+}
+
 #endif // CHANNELMONITORCOMPONENT_H

@@ -9,7 +9,9 @@
 namespace scopy {
 class CustomSwitch;
 
+namespace datalogger {
 namespace gui {
+
 class DataLoggerGenericMenu : public ::scopy::gui::GenericMenu
 {
 	Q_OBJECT
@@ -50,6 +52,7 @@ private:
 	QComboBox *historyStyle;
 	QComboBox *historySize;
 };
+}
 }
 }
 
