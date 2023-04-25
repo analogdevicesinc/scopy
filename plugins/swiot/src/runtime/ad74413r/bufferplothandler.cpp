@@ -14,7 +14,7 @@ BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int sampl
 	m_plotChnlsNo = plotChnlsNo;
 	m_samplingFreq = samplingFreq;
 	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
-	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
+	m_plot = new CapturePlot(parent, false, 10, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
 	initPlot(plotChnlsNo);
 	resetPlotParameters();
 }
@@ -44,6 +44,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	gridPlot->setVerticalSpacing(0);
 	gridPlot->setHorizontalSpacing(0);
 	gridPlot->setContentsMargins(9, 0, 9, 0);
+	m_plotWidget->setStyleSheet("background-color:black;");
 	m_plotWidget->setLayout(gridPlot);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
@@ -72,7 +73,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		m_plot->DetachCurve(i);
 
 	}
-	m_plot->setAllYAxis(0, 20000);
+	m_plot->setAllYAxis(-10, 10);
 	m_plot->setOffsetInterval(__DBL_MIN__, __DBL_MAX__);
 }
 
@@ -84,40 +85,39 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 	int dataPointsNumber = m_buffersNumber * m_bufferSize;
 
 	m_lock->lock();
-	//	qDebug(CAT_SWIOT_RUNTIME) <<QString::number(bufferCounter)+" Before Copy";
-	if (bufferDataSize > 0) {
-		for (int i = 0; i < m_dataPoints.size(); i++) {
-			if (m_bufferIndex == m_buffersNumber)
-			{
-				memmove(m_dataPoints[i], m_dataPoints[i] + m_bufferSize, (dataPointsNumber - m_bufferSize) * sizeof(double));
-				rolling = true;
-			}
-			if (m_enabledPlots[i]) {
-				if (j < bufferDataSize) {
-					memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[j][0], (bufferData[j].size() * sizeof(double)));
-					j++;
+	if (!(m_singleCapture && (m_bufferIndex == m_buffersNumber))) {
+		if (bufferDataSize > 0) {
+			for (int i = 0; i < m_dataPoints.size(); i++) {
+				if (m_bufferIndex == m_buffersNumber)
+				{
+					memmove(m_dataPoints[i], m_dataPoints[i] + m_bufferSize, (dataPointsNumber - m_bufferSize) * sizeof(double));
+					rolling = true;
+				}
+				if (m_enabledPlots[i]) {
+					if (j < bufferDataSize) {
+						memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[j][0], (bufferData[j].size() * sizeof(double)));
+						j++;
+					} else {
+						memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
+					}
+
 				} else {
 					memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
 				}
 
-			} else {
-				memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
 			}
-
+			if (!rolling) {
+				m_bufferIndex++;
+				m_plotDataIndex+=m_bufferSize;
+			}
+			if (m_plotDataIndex >= dataPointsNumber - 1) {
+				m_plotDataIndex-=m_bufferSize;
+			}
 		}
-		if (!rolling) {
-			m_bufferIndex++;
-			m_plotDataIndex+=m_bufferSize;
-		}
-		if (m_plotDataIndex >= dataPointsNumber - 1) {
-			m_plotDataIndex-=m_bufferSize;
-		}
-		//		qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Copy";
-
+	} else {
+		Q_EMIT singleCaptureFinished();
 	}
-	//	qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before Drawing";
 	m_plot->plotNewData("Active Channels", m_dataPoints, m_plotSampleNumber, 1);
-	//	qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After Drawing";
 	m_lock->unlock();
 }
 
@@ -196,6 +196,11 @@ void BufferPlotHandler::onTimespanChanged(double value)
 void BufferPlotHandler::onSamplingFreqWritten(int samplingFreq)
 {
 	m_samplingFreq = samplingFreq;
+}
+
+void BufferPlotHandler::setSingleCapture(bool en)
+{
+	m_singleCapture = en;
 }
 
 void BufferPlotHandler::setPlotActiveAxis(int id) 

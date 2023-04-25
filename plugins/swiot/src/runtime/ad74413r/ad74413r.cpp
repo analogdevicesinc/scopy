@@ -83,6 +83,9 @@ void Ad74413r::setupConnections()
 	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
 	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
 
+	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, &Ad74413r::onSingleBtnPressed);
+	connect(m_plotHandler, &BufferPlotHandler::singleCaptureFinished, this, &Ad74413r::onSingleCaptureFinished);
+
 	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_plotHandler, &BufferPlotHandler::onSamplingFreqWritten);
 	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_readerThread, &ReaderThread::onSamplingFreqWritten);
 	//general settings connections
@@ -164,7 +167,9 @@ scopy::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* col
 	menu->initInteractiveMenu();
 	menu->setMenuHeader(title,color,false);
 
-	auto *generalSubsection = new scopy::gui::SubsectionSeparator("Acquisition settings", false, this);
+	auto *generalSubsection = new scopy::gui::SubsectionSeparator("ACQUISITION SETTINGS", false, this);
+	generalSubsection->getLabel()->setStyleSheet("color:gray;");
+	generalSubsection->layout()->setSpacing(10);
 	generalSubsection->getContentWidget()->layout()->setSpacing(10);
 
 	//channels sampling freq
@@ -268,6 +273,31 @@ void Ad74413r::onRunBtnPressed()
 	}
 }
 
+void Ad74413r::onSingleBtnPressed()
+{
+	if (m_toolView->getSingleBtn()->isChecked()) {
+		Q_EMIT activateExportButton();
+		verifyChnlsChanges();
+		if (m_readerThread->isRunning()) {
+			m_readerThread->requestInterruption();
+		} else {
+			m_plotHandler->resetPlotParameters();
+			m_readerThread->start();
+		}
+		m_plotHandler->setSingleCapture(true);
+		if (m_toolView->getRunBtn()->isChecked()) {
+			m_toolView->getRunBtn()->setChecked(false);
+		}
+	}
+}
+
+void Ad74413r::onSingleCaptureFinished()
+{
+	m_readerThread->requestInterruption();
+	m_plotHandler->setSingleCapture(false);
+	m_toolView->getSingleBtn()->setChecked(false);
+}
+
 void Ad74413r::verifyChnlsChanges()
 {
 	bool changes = m_swiotAdLogic->verifyEnableChanges(m_enabledChannels);
@@ -298,7 +328,7 @@ QPushButton* Ad74413r::createBackBtn()
 void Ad74413r::onReaderThreadFinished()
 {
 	qDebug(CAT_SWIOT_AD74413R) << "reader thread finished";
-	if (m_toolView->getRunBtn()->isChecked()) {
+	if (m_toolView->getRunBtn()->isChecked() || m_toolView->getSingleBtn()->isChecked()) {
 		m_plotHandler->resetPlotParameters();
 		m_readerThread->start();
 	}
