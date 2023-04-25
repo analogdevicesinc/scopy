@@ -45,7 +45,7 @@
 #include <vector>
 
 #include <QString>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 
 struct srd_proto_data;
@@ -53,7 +53,7 @@ class Row;
 
 using std::vector;
 
-class SCOPYGUI_EXPORT Annotation
+class SCOPY_SIGROK_GUI_EXPORT Annotation
 {
 public:
     typedef uint32_t Class;

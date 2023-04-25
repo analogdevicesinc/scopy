@@ -5,10 +5,10 @@
 #include <QVBoxLayout>
 #include <QResizeEvent>
 #include <QTimer>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT FlexGridLayout : public QWidget
+class SCOPY_GUI_EXPORT FlexGridLayout : public QWidget
 {
 	Q_OBJECT
 

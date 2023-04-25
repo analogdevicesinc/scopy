@@ -26,7 +26,7 @@
 #include <QStandardItem>
 #include <QPushButton>
 #include <QMap>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 /* Local includes */
 #include "dropdown_switch_list.h"
@@ -36,7 +36,7 @@ class ExportSettings;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT ExportSettings : public QWidget
+class SCOPY_GUI_EXPORT ExportSettings : public QWidget
 {
 	Q_OBJECT
 

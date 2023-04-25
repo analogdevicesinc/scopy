@@ -3,10 +3,10 @@
 
 #include <QStackedWidget>
 #include <QMap>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT MapStackedWidget : public QStackedWidget
+class SCOPY_CORE_EXPORT MapStackedWidget : public QStackedWidget
 {
 	Q_OBJECT
 public:

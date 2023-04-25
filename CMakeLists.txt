@@ -88,8 +88,8 @@ list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
 add_definitions(-DQT_NO_KEYWORDS)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
-target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopycore)
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopycore scopygui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-core)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets ${SCOPY_DEPENDENCIES} scopy-core scopy-gui)
 
 # Compiler options
 target_compile_options(${PROJECT_NAME} PUBLIC -Wall)

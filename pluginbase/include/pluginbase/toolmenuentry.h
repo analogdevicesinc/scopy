@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QString>
 #include <QUuid>
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 /**
@@ -12,7 +12,7 @@ namespace scopy {
  * Class used by plugin and scopy to populate the tool menu
  * SCOPY_NEW_TOOLMENUENTRY macro can be used to instantiate ToolMenuEntry objects
  */
-class SCOPYPLUGINBASE_EXPORT ToolMenuEntry : public QObject {
+class SCOPY_PLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr) :

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE iioutil)
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 

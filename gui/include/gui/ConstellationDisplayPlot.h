@@ -48,14 +48,14 @@
 
 #include "DisplayPlot.h"
 #include "spectrumUpdateEvents.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 /*!
  * \brief QWidget for displaying constellaton (I&Q) plots.
  * \ingroup qtgui_blk
  */
-class SCOPYGUI_EXPORT ConstellationDisplayPlot : public DisplayPlot
+class SCOPY_GUI_EXPORT ConstellationDisplayPlot : public DisplayPlot
 {
   Q_OBJECT
 

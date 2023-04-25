@@ -24,10 +24,10 @@
 #include <QEvent>
 #include <QTimer>
 #include <QScroller>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT OscCustomScrollArea : public QScrollArea
+class SCOPY_GUI_EXPORT OscCustomScrollArea : public QScrollArea
 {
 	Q_OBJECT
 public:

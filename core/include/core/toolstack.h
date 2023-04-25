@@ -3,16 +3,16 @@
 
 #include "mapstackedwidget.h"
 #include <QMap>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace Ui {
-class SCOPYCORE_EXPORT ToolStack;
+class SCOPY_CORE_EXPORT ToolStack;
 }
 /**
  * @brief The ToolStack class
  */
 namespace scopy {
-class SCOPYCORE_EXPORT ToolStack : public MapStackedWidget
+class SCOPY_CORE_EXPORT ToolStack : public MapStackedWidget
 {
 	Q_OBJECT
 

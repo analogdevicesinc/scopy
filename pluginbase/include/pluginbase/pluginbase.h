@@ -1,7 +1,7 @@
 #ifndef PLUGINBASE_H
 #define PLUGINBASE_H
 #include "plugin.h"
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 #include <QObject>
 #include "apiobject.h"
 
@@ -11,7 +11,7 @@ namespace scopy {
  * @brief The PluginBase class
  * PluginBase is used to provide default implementation to the plugin interface
  */
-class SCOPYPLUGINBASE_EXPORT PluginBase : public Plugin {
+class SCOPY_PLUGINBASE_EXPORT PluginBase : public Plugin {
 
 public:
 	virtual ~PluginBase() {}

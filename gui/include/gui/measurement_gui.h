@@ -30,7 +30,7 @@ namespace scopy {
 
 class MeasurementData;
 
-class SCOPYGUI_EXPORT MeasurementGui
+class SCOPY_GUI_EXPORT MeasurementGui
 {
 public:
 	MeasurementGui();
@@ -50,7 +50,7 @@ protected:
 	int m_minValLableWidth;
 };
 
-class SCOPYGUI_EXPORT MetricMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT MetricMeasurementGui: public MeasurementGui
 {
 public:
 	MetricMeasurementGui();
@@ -62,7 +62,7 @@ protected:
 	MetricPrefixFormatter m_formatter;
 };
 
-class SCOPYGUI_EXPORT TimeMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT TimeMeasurementGui: public MeasurementGui
 {
 public:
 	TimeMeasurementGui();
@@ -74,7 +74,7 @@ protected:
 	TimePrefixFormatter m_formatter;
 };
 
-class SCOPYGUI_EXPORT PercentageMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT PercentageMeasurementGui: public MeasurementGui
 {
 public:
 	PercentageMeasurementGui();
@@ -83,7 +83,7 @@ public:
 	virtual void update(const MeasurementData& data, double displayScale);
 };
 
-class SCOPYGUI_EXPORT DecibelsMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT DecibelsMeasurementGui: public MeasurementGui
 {
 public:
     DecibelsMeasurementGui();
@@ -92,7 +92,7 @@ public:
     virtual void update(const MeasurementData& data, double displayScale);
 };
 
-class SCOPYGUI_EXPORT DecibelstoCarrierMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT DecibelstoCarrierMeasurementGui: public MeasurementGui
 {
 public:
     DecibelstoCarrierMeasurementGui();
@@ -101,7 +101,7 @@ public:
     virtual void update(const MeasurementData& data, double displayScale);
 };
 
-class SCOPYGUI_EXPORT DimensionlessMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT DimensionlessMeasurementGui: public MeasurementGui
 {
 public:
 	DimensionlessMeasurementGui();

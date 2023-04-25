@@ -5,14 +5,14 @@
 #include <QAbstractButton>
 #include <deviceicon.h>
 #include "device.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace Ui {
 	class DeviceButton;
 };
 
 namespace scopy {
-class SCOPYCORE_EXPORT DeviceIconImpl : public DeviceIcon
+class SCOPY_CORE_EXPORT DeviceIconImpl : public DeviceIcon
 {
 	Q_OBJECT
 public:

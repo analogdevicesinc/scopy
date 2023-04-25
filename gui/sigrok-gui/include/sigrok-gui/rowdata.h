@@ -47,11 +47,11 @@
 
 #include <vector>
 #include <set>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 class Row;
 
-class SCOPYGUI_EXPORT RowData
+class SCOPY_SIGROK_GUI_EXPORT RowData
 {
 public:
     RowData() = default;

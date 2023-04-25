@@ -27,7 +27,7 @@
 #include "plot_line_handle.h"
 #include "handles_area.hpp"
 #include "cursor_readouts.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 	class SpectrumAverage;
@@ -52,7 +52,7 @@ namespace scopy {
 		QString label;
 	};
 
-	class SCOPYGUI_EXPORT FftDisplayPlot : public DisplayPlot
+	class SCOPY_GUI_EXPORT FftDisplayPlot : public DisplayPlot
 	{
 		Q_OBJECT
 

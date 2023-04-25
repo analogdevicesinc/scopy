@@ -25,10 +25,10 @@
 
 #include <qwt_scale_div.h>
 #include <qwt_thermo.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT AutoScaler : public QObject
+	class SCOPY_GUI_EXPORT AutoScaler : public QObject
 	{
 		Q_OBJECT;
 

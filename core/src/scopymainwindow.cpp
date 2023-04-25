@@ -15,7 +15,7 @@
 #include "pluginbase/scopyjs.h"
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
-#include "scopycore_config.h"
+#include "scopy-core_config.h"
 #include "versionchecker.h"
 #include "application_restarter.h"
 #include <QLoggingCategory>

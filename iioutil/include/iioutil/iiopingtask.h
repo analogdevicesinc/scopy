@@ -3,14 +3,14 @@
 
 #include <QThread>
 #include <iio.h>
-#include "scopyiioutil_export.h"
+#include "scopy-iioutil_export.h"
 
 namespace scopy {
 /**
  * @brief The IIOPingTask class
  * IIOPingTask verifies IIO connection and emits pingSuccess/pingFailed
  */
-class SCOPYIIOUTIL_EXPORT IIOPingTask : public QThread {
+class SCOPY_IIOUTIL_EXPORT IIOPingTask : public QThread {
 	Q_OBJECT
 public:
 	IIOPingTask(iio_context *c, QObject *parent = nullptr);

@@ -22,14 +22,14 @@
 
 #include <QWidget>
 #include <QButtonGroup>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class CustomPlotPositionButton;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT CustomPlotPositionButton : public QWidget
+class SCOPY_GUI_EXPORT CustomPlotPositionButton : public QWidget
 {
 	Q_OBJECT
 

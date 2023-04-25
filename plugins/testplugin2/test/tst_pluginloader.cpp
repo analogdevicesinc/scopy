@@ -23,7 +23,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopytestplugin2.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-testplugin2.so"
 
 
 void TST_TestPluginIp::fileExists()

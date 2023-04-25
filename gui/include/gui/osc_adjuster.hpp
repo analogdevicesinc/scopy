@@ -25,13 +25,13 @@
 #include <QWidget>
 #include <qevent.h>
 #include <qwt_plot.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QWidget;
 class QMouseEvent;
 class QWheelEvent;
 
-class SCOPYGUI_EXPORT OscAdjuster: public QObject
+class SCOPY_GUI_EXPORT OscAdjuster: public QObject
 {
 	Q_OBJECT
 public:
@@ -75,7 +75,7 @@ protected:
 	QwtAxisId d_axisId;
 };
 
-class SCOPYGUI_EXPORT VertMouseGestures: public OscAdjuster
+class SCOPY_GUI_EXPORT VertMouseGestures: public OscAdjuster
 {
 	Q_OBJECT
 public:
@@ -124,7 +124,7 @@ protected:
 	}
 };
 
-class SCOPYGUI_EXPORT HorizMouseGestures: public OscAdjuster
+class SCOPY_GUI_EXPORT HorizMouseGestures: public OscAdjuster
 {
 	Q_OBJECT
 public:

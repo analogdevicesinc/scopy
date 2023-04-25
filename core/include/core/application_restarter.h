@@ -3,10 +3,10 @@
 
 #include <QString>
 #include <QStringList>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT ApplicationRestarter
+class SCOPY_CORE_EXPORT ApplicationRestarter
 {
 public:
 	ApplicationRestarter(const QString &executable);

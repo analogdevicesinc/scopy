@@ -23,14 +23,14 @@
 
 #include <QWidget>
 #include <QString>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class HomepageControls;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT HomepageControls : public QWidget
+class SCOPY_GUI_EXPORT HomepageControls : public QWidget
 {
 	Q_OBJECT
 

@@ -53,7 +53,7 @@
 #include "annotation.h"
 #include "row.h"
 #include "rowdata.h"
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 using std::map;
 using std::string;
@@ -71,7 +71,7 @@ class Decoder;
 }
 }
 
-struct SCOPYGUI_EXPORT DecodeChannel
+struct SCOPY_SIGROK_GUI_EXPORT DecodeChannel
 {
     uint16_t id;     ///< Global numerical ID for the decode channels in the stack
     uint16_t bit_id; ///< Tells which bit within a sample represents this channel
@@ -83,7 +83,7 @@ struct SCOPYGUI_EXPORT DecodeChannel
     const srd_channel *pdch_;
 };
 
-struct SCOPYGUI_EXPORT DecodeSegment
+struct SCOPY_SIGROK_GUI_EXPORT DecodeSegment
 {
     map<const Row, RowData> annotation_rows;
 //    pv::util::Timestamp start_time;
@@ -94,7 +94,7 @@ struct SCOPYGUI_EXPORT DecodeSegment
 namespace scopy {
 namespace logic {
 
-class SCOPYGUI_EXPORT Decoder
+class SCOPY_SIGROK_GUI_EXPORT Decoder
 {
 public:
     Decoder(const srd_decoder *const dec);

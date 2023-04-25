@@ -42,14 +42,14 @@
 #define PULSEVIEW_PV_PROP_STRING_HPP
 
 #include "property.hpp"
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 class QLineEdit;
 
 namespace scopy {
 namespace prop {
 
-class SCOPYGUI_EXPORT String : public Property
+class SCOPY_SIGROK_GUI_EXPORT String : public Property
 {
 	Q_OBJECT;
 

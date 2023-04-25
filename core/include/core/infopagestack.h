@@ -5,13 +5,13 @@
 #include "mapstackedwidget.h"
 #include <QEasingCurve>
 #include "gui/homepage_controls.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
 
 // implement slide to-from  next/prev page - emits to button selection group
 
-class SCOPYCORE_EXPORT InfoPageStack : public MapStackedWidget
+class SCOPY_CORE_EXPORT InfoPageStack : public MapStackedWidget
 {
 	Q_OBJECT
 public:

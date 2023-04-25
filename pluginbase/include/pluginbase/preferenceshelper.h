@@ -4,14 +4,14 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include "preferences.h"
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 /**
  * @brief The PreferencesHelper class
  * PreferencesHelper class used to create widgets and connect the widgets to the Preferences singleton
  */
-class SCOPYPLUGINBASE_EXPORT PreferencesHelper {
+class SCOPY_PLUGINBASE_EXPORT PreferencesHelper {
 
 public:
 	static QCheckBox *addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent = nullptr);

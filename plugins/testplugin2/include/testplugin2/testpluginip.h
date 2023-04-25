@@ -7,10 +7,10 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"
-#include "scopytestplugin2_export.h"
+#include "scopy-testplugin2_export.h"
 
 namespace scopy {
-class SCOPYTESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
+class SCOPY_TESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN

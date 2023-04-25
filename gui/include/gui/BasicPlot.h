@@ -20,11 +20,11 @@
 #include <movingaverage.h>
 
 //#define IMMEDIATE_PAINT
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT BasicPlot : public QwtPlot
+class SCOPY_GUI_EXPORT BasicPlot : public QwtPlot
 {
 	Q_OBJECT
 public:

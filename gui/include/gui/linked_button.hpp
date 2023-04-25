@@ -2,11 +2,11 @@
 #define LINKEDBUTTON_HPP
 
 #include <QPushButton>
-#include <scopygui_export.h>
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT LinkedButton : public QPushButton
+class SCOPY_GUI_EXPORT LinkedButton : public QPushButton
 {
 	Q_OBJECT
 

@@ -4,7 +4,7 @@ set(SCOPY_MODULE regmap)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -58,7 +58,7 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopypluginbase scopyiioutil Qt${QT_VERSION_MAJOR}::Xml libm2k::libm2k Qt5::Test)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopy-pluginbase scopy-iioutil Qt${QT_VERSION_MAJOR}::Xml libm2k::libm2k Qt5::Test)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

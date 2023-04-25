@@ -22,10 +22,10 @@
 #define LCD_NUMBER_HPP
 
 #include <QLCDNumber>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT LcdNumber : public QLCDNumber
+	class SCOPY_GUI_EXPORT LcdNumber : public QLCDNumber
 	{
 		Q_OBJECT
 

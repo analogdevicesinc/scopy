@@ -24,11 +24,11 @@
 #include <QObject>
 #include <qwt_plot.h>
 #include <qwt_plot_scaleitem.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT Graticule : public QObject
+class SCOPY_GUI_EXPORT Graticule : public QObject
 {
 	Q_OBJECT
 public:
@@ -48,7 +48,7 @@ private:
 	QwtPlotScaleItem *horizScale2;
 };
 
-class SCOPYGUI_EXPORT GraticulePlotScaleItem: public QwtPlotScaleItem
+class SCOPY_GUI_EXPORT GraticulePlotScaleItem: public QwtPlotScaleItem
 {
 public:
 	explicit GraticulePlotScaleItem(

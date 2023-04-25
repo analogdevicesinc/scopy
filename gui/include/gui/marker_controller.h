@@ -24,7 +24,7 @@
 #include <QList>
 #include <qwt_plot.h>
 #include <memory>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QwtPlotPicker;
 
@@ -32,7 +32,7 @@ namespace scopy {
 
 class SpectrumMarker;
 
-class SCOPYGUI_EXPORT MarkerController: public QObject
+class SCOPY_GUI_EXPORT MarkerController: public QObject
 {
 	Q_OBJECT
 

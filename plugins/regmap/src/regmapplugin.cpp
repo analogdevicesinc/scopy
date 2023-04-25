@@ -18,7 +18,7 @@
 #include "iioutil/contextprovider.h"
 
 
-using namespace adiscope;
+using namespace scopy;
 
 bool REGMAPPlugin::loadPage()
 {

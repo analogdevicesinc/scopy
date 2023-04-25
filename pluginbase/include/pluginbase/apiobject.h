@@ -22,14 +22,14 @@
 #define APIOBJECT_HPP
 
 #include <QObject>
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 
 class QJSEngine;
 class QSettings;
 template <typename T> class QList;
 
 namespace scopy {
-	class SCOPYPLUGINBASE_EXPORT ApiObject : public QObject
+	class SCOPY_PLUGINBASE_EXPORT ApiObject : public QObject
 	{
 		Q_OBJECT
 

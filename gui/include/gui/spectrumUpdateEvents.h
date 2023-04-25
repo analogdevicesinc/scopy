@@ -29,14 +29,14 @@
 #include <gnuradio/high_res_timer.h>
 #include <gnuradio/tags.h>
 #include <volk/volk_alloc.hh>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 static const int SpectrumUpdateEventType = 10005;
 static const int SpectrumWindowCaptionEventType = 10008;
 static const int SpectrumWindowResetEventType = 10009;
 static const int SpectrumFrequencyRangeEventType = 10010;
 
-class SCOPYGUI_EXPORT SpectrumUpdateEvent:public QEvent{
+class SCOPY_GUI_EXPORT SpectrumUpdateEvent:public QEvent{
 
 public:
   SpectrumUpdateEvent(const float* fftPoints,
@@ -78,7 +78,7 @@ private:
   int _droppedFFTFrames;
 };
 
-class SCOPYGUI_EXPORT SpectrumWindowCaptionEvent:public QEvent{
+class SCOPY_GUI_EXPORT SpectrumWindowCaptionEvent:public QEvent{
 public:
   SpectrumWindowCaptionEvent(const QString&);
   ~SpectrumWindowCaptionEvent();
@@ -90,7 +90,7 @@ private:
   QString _labelString;
 };
 
-class SCOPYGUI_EXPORT SpectrumWindowResetEvent:public QEvent{
+class SCOPY_GUI_EXPORT SpectrumWindowResetEvent:public QEvent{
 public:
   SpectrumWindowResetEvent();
   ~SpectrumWindowResetEvent();
@@ -101,7 +101,7 @@ private:
 
 };
 
-class SCOPYGUI_EXPORT SpectrumFrequencyRangeEvent:public QEvent{
+class SCOPY_GUI_EXPORT SpectrumFrequencyRangeEvent:public QEvent{
 public:
   SpectrumFrequencyRangeEvent(const double, const double, const double);
   ~SpectrumFrequencyRangeEvent();
@@ -118,7 +118,7 @@ private:
 };
 
 
-class SCOPYGUI_EXPORT TimeUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT TimeUpdateEvent: public QEvent
 {
 public:
   TimeUpdateEvent(const std::vector<double*> &timeDomainPoints,
@@ -150,7 +150,7 @@ private:
 /********************************************************************/
 
 
-class SCOPYGUI_EXPORT IdentifiableTimeUpdateEvent: public TimeUpdateEvent
+class SCOPY_GUI_EXPORT IdentifiableTimeUpdateEvent: public TimeUpdateEvent
 {
 public:
   IdentifiableTimeUpdateEvent(const std::vector<double*> &timeDomainPoints,
@@ -172,7 +172,7 @@ private:
 /********************************************************************/
 
 
-class SCOPYGUI_EXPORT FreqUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT FreqUpdateEvent: public QEvent
 {
 public:
   FreqUpdateEvent(const std::vector<double*> &dataPoints,
@@ -214,7 +214,7 @@ private:
 /********************************************************************/
 
 
-class SCOPYGUI_EXPORT ConstUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT ConstUpdateEvent: public QEvent
 {
 public:
   ConstUpdateEvent(const std::vector<double*> &realDataPoints,
@@ -241,7 +241,7 @@ private:
   uint64_t _numDataPoints;
 };
 
-class SCOPYGUI_EXPORT WaterfallUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT WaterfallUpdateEvent: public QEvent
 {
 public:
     WaterfallUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
@@ -271,7 +271,7 @@ private:
 /********************************************************************/
 
 
-class SCOPYGUI_EXPORT TimeRasterUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT TimeRasterUpdateEvent: public QEvent
 {
 public:
   TimeRasterUpdateEvent(const std::vector<double*> &dataPoints,
@@ -298,7 +298,7 @@ private:
 /********************************************************************/
 
 
-class SCOPYGUI_EXPORT HistogramUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT HistogramUpdateEvent: public QEvent
 {
 public:
   HistogramUpdateEvent(const std::vector<double*> &points,
@@ -326,7 +326,7 @@ private:
 /********************************************************************/
 
 
-class SCOPYGUI_EXPORT NumberUpdateEvent: public QEvent
+class SCOPY_GUI_EXPORT NumberUpdateEvent: public QEvent
 {
 public:
   NumberUpdateEvent(const std::vector<float> &samples);

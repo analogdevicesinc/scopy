@@ -23,10 +23,10 @@
 #include "limitedplotzoomer.h"
 
 #include <qwt_plot_shapeitem.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT ExtendingPlotZoomer : public LimitedPlotZoomer
+class SCOPY_GUI_EXPORT ExtendingPlotZoomer : public LimitedPlotZoomer
 {
 public:
 	explicit ExtendingPlotZoomer(QWidget*, bool doReplot = false);

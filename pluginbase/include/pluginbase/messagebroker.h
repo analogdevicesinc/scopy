@@ -2,7 +2,7 @@
 #define MESSAGEBROKER_H
 
 #include <QObject>
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 #include <QMap>
 #include <QSet>
 
@@ -12,7 +12,7 @@ namespace scopy {
  * MessageBroker is a singleton class to implement a publisher-subscriber message exchange
  *
  */
-class SCOPYPLUGINBASE_EXPORT MessageBroker : public QObject
+class SCOPY_PLUGINBASE_EXPORT MessageBroker : public QObject
 {
 	Q_OBJECT
 protected:

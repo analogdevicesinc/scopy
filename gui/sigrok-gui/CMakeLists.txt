@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 set(SCOPY_MODULE sigrok-gui)
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -39,8 +39,8 @@ if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
 
-configure_file(include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h @ONLY)
+configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
@@ -66,13 +66,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/binding
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/prop
     ${LIBSIGROK_DECODE_INCLUDE_DIRS}
-    scopygui)
+    scopy-gui)
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
-    scopygui
+    scopy-gui
     ${LIBSIGROK_DECODE_LIBRARIES}
 )
 

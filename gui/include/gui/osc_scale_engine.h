@@ -22,9 +22,9 @@
 #define M2K_OSC_SCALE_ENGINE_H
 
 #include <qwt_scale_engine.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
-class SCOPYGUI_EXPORT OscScaleEngine: public QwtLinearScaleEngine
+class SCOPY_GUI_EXPORT OscScaleEngine: public QwtLinearScaleEngine
 {
 public:
 	OscScaleEngine();
