@@ -18,6 +18,7 @@ public:
 	QColor getCurveColor(int id) const;
 
 	void setPlotActiveAxis(int id);
+	void setSingleCapture(bool en);
 	void deleteResidualPlotData();
 	void resetPlotParameters();
 	QWidget *getPlotWidget() const;
@@ -28,6 +29,8 @@ public Q_SLOTS:
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
 	void onTimespanChanged(double value);
 	void onSamplingFreqWritten(int samplingFreq);
+Q_SIGNALS:
+	void singleCaptureFinished();
 private:
 	void initPlot(int plotChnlsNo);
 	void resetDataPoints();
@@ -46,6 +49,8 @@ private:
 	int m_bufferIndex = 0;
 	int m_bufferSize = 0;
 	int m_plotDataIndex = 0;
+
+	bool m_singleCapture = false;
 
 	std::vector<double*> m_dataPoints;
 	std::vector<bool> m_enabledPlots;
