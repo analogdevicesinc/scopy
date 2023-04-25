@@ -20,8 +20,6 @@ message(QtVersion: ${QT_VERSION_MAJOR})
 # Make sure our local CMake Modules path comes first
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
-
-
 FILE(GLOB SRC_LIST  *.cpp *.cc)
 FILE(GLOB HEADER_LIST *.h *.hpp)
 FILE(GLOB UI_LIST *.ui)
@@ -87,9 +85,6 @@ else()
 endif()
 
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_constexpr OUT_CONSTEXPR)
-if (NOT "${OUT_CONSTEXPR}" STREQUAL "-1")
-	add_definitions(-DHAS_CONSTEXPR=1)
-endif()
 add_definitions(-DQT_NO_KEYWORDS)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
