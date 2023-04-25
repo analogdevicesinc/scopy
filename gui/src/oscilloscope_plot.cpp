@@ -24,7 +24,7 @@
 #include "plot_line_handle.h"
 
 #include "logicdatacurve.h"
-#include "annotationcurve.h"
+#include "scopygui_config.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -1377,12 +1377,14 @@ bool CapturePlot::endGroupSelection(bool moveAnnotationCurvesLast)
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
-		AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve*>(logicCurve);
-		if (annCurve) {
-			bonusHeight = annCurve->getTraceHeight() * annCurve->getVisibleRows();
-			return static_cast<double>(handle->size().height());
-		}
-		bonusHeight = 0.0;
+//#ifdef SCOPY_HAVE_SIGROK_GUI
+//		AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve*>(logicCurve);
+//		if (annCurve) {
+//			bonusHeight = annCurve->getTraceHeight() * annCurve->getVisibleRows();
+//			return static_cast<double>(handle->size().height());
+//		}
+//#endif
+		bonusHeight = logicCurve->getHeightOffset();
 		return logicCurve->getTraceHeight();
 	};
 
@@ -1622,12 +1624,14 @@ void CapturePlot::handleInGroupChangedPosition(int position)
 		const int chIdx = d_offsetHandles.indexOf(handle);
 		QwtPlotCurve *curve = getDigitalPlotCurve(chIdx);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(curve);
-		AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve*>(logicCurve);
-		if (annCurve) {
-			bonusHeight = annCurve->getTraceHeight() * annCurve->getVisibleRows();
-			return static_cast<double>(handle->size().height());
-		}
-		bonusHeight = 0.0;
+//#ifdef SCOPY_HAVE_SIGROK_GUI
+//		AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve*>(logicCurve);
+//		if (annCurve) {
+//			bonusHeight = annCurve->getTraceHeight() * annCurve->getVisibleRows();
+//			return static_cast<double>(handle->size().height());
+//		}
+//#endif
+		bonusHeight = logicCurve->getHeightOffset();
 		return logicCurve->getTraceHeight();
 	};
 
