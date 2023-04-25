@@ -4,10 +4,10 @@
 #include <QObject>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT VersionCache : public QObject
+class SCOPY_CORE_EXPORT VersionCache : public QObject
 {
 	Q_OBJECT
 

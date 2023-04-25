@@ -46,7 +46,7 @@
 #include <QString>
 #include <QWidget>
 #include <QVariant>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 using std::function;
 
@@ -55,7 +55,7 @@ class QWidget;
 namespace scopy {
 namespace prop {
 
-class SCOPYGUI_EXPORT Property : public QObject
+class SCOPY_SIGROK_GUI_EXPORT Property : public QObject
 {
 	Q_OBJECT;
 

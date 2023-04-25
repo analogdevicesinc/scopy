@@ -24,7 +24,7 @@
 #include "plot_line_handle.h"
 
 #include "logicdatacurve.h"
-#include "scopygui_config.h"
+#include "scopy-gui_config.h"
 
 #include <QHBoxLayout>
 #include <QLabel>

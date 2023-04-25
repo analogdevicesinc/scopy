@@ -48,7 +48,7 @@
 
 #include <QObject>
 #include <QString>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 using std::map;
 using std::shared_ptr;
@@ -66,7 +66,7 @@ class Property;
 
 namespace bind {
 
-class SCOPYGUI_EXPORT Binding: public QObject
+class SCOPY_SIGROK_GUI_EXPORT Binding: public QObject
 {
 	Q_OBJECT
 

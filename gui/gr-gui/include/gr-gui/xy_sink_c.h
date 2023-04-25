@@ -49,11 +49,11 @@
 #include <gnuradio/sync_block.h>
 #include <qapplication.h>
 #include <gnuradio/filter/firdes.h>
-#include "scopygui_export.h"
+#include "scopy-gr-gui_export.h"
 
 namespace scopy {
 
-    class SCOPYGUI_EXPORT xy_sink_c : virtual public gr::sync_block
+    class SCOPY_GR_GUI_EXPORT xy_sink_c : virtual public gr::sync_block
     {
     public:
       // gr::qtgui::xy_sink_c::sptr

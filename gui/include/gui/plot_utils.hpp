@@ -23,10 +23,10 @@
 
 #include <vector>
 #include <qstring.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT PrefixFormatter
+	class SCOPY_GUI_EXPORT PrefixFormatter
 	{
 	public:
 		PrefixFormatter(const std::vector<std::pair<QString, double>>&);
@@ -53,13 +53,13 @@ namespace scopy {
 		bool m_trimZeroes;
 	};
 
-	class SCOPYGUI_EXPORT MetricPrefixFormatter: public PrefixFormatter
+	class SCOPY_GUI_EXPORT MetricPrefixFormatter: public PrefixFormatter
 	{
 	public:
 		MetricPrefixFormatter();
 	};
 
-	class SCOPYGUI_EXPORT TimePrefixFormatter: public PrefixFormatter
+	class SCOPY_GUI_EXPORT TimePrefixFormatter: public PrefixFormatter
 	{
 	public:
 		TimePrefixFormatter();
@@ -73,7 +73,7 @@ namespace scopy {
 	 * E.g. powerStep = 10, steps = {1, 2, 5} -> ..., 0.1, 0.2, 0.5, 1.0,
 	 *      2.0, 5.0, 10.0, 20.0, 50.0, ...
 	 */
-	class SCOPYGUI_EXPORT NumberSeries
+	class SCOPY_GUI_EXPORT NumberSeries
 	{
 	public:
 		NumberSeries(double lower = 1E-3, double upper = 1E3,

@@ -24,11 +24,11 @@
 #include <qpointer.h>
 #include <qwt_widget_overlay.h>
 #include "symbol.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QwtPlot;
 
-class SCOPYGUI_EXPORT SymbolController: public QObject
+class SCOPY_GUI_EXPORT SymbolController: public QObject
 {
 	Q_OBJECT
 

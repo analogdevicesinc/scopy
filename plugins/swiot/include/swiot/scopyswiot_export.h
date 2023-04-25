@@ -1,18 +1,18 @@
 
-#ifndef SCOPYSWIOT_EXPORT_H
-#define SCOPYSWIOT_EXPORT_H
+#ifndef SCOPY_SWIOT_EXPORT_H
+#define SCOPY_SWIOT_EXPORT_H
 
 #ifdef SCOPYSWIOT_STATIC_DEFINE
-#  define SCOPYSWIOT_EXPORT
+#  define SCOPY_SWIOT_EXPORT
 #  define SCOPYSWIOT_NO_EXPORT
 #else
-#  ifndef SCOPYSWIOT_EXPORT
+#  ifndef SCOPY_SWIOT_EXPORT
 #    ifdef scopyswiot_EXPORTS
         /* We are building this library */
-#      define SCOPYSWIOT_EXPORT __attribute__((visibility("default")))
+#      define SCOPY_SWIOT_EXPORT __attribute__((visibility("default")))
 #    else
         /* We are using this library */
-#      define SCOPYSWIOT_EXPORT __attribute__((visibility("default")))
+#      define SCOPY_SWIOT_EXPORT __attribute__((visibility("default")))
 #    endif
 #  endif
 
@@ -26,7 +26,7 @@
 #endif
 
 #ifndef SCOPYSWIOT_DEPRECATED_EXPORT
-#  define SCOPYSWIOT_DEPRECATED_EXPORT SCOPYSWIOT_EXPORT SCOPYSWIOT_DEPRECATED
+#  define SCOPYSWIOT_DEPRECATED_EXPORT SCOPY_SWIOT_EXPORT SCOPYSWIOT_DEPRECATED
 #endif
 
 #ifndef SCOPYSWIOT_DEPRECATED_NO_EXPORT
@@ -39,4 +39,4 @@
 #  endif
 #endif
 
-#endif /* SCOPYSWIOT_EXPORT_H */
+#endif /* SCOPY_SWIOT_EXPORT_H */

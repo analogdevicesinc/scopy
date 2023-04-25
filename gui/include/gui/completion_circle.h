@@ -22,10 +22,10 @@
 #define COMPLETIONCIRCLE_H
 
 #include <QDial>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT CompletionCircle : public QDial
+class SCOPY_GUI_EXPORT CompletionCircle : public QDial
 {
 	Q_OBJECT
 

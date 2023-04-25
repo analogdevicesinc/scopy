@@ -24,11 +24,11 @@
 #include <QWidget>
 #include <QPen>
 #include <plot_utils.hpp>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class HandlesArea;
 
-class SCOPYGUI_EXPORT PlotLineHandle: public QWidget
+class SCOPY_GUI_EXPORT PlotLineHandle: public QWidget
 {
 	Q_OBJECT
 
@@ -72,7 +72,7 @@ private:
 	void setGrabbed(bool);
 };
 
-class SCOPYGUI_EXPORT PlotGateHandle: public PlotLineHandle{
+class SCOPY_GUI_EXPORT PlotGateHandle: public PlotLineHandle{
 public:
 	PlotGateHandle(const QPixmap &handleIcon, QWidget *parent = 0);
 	void triggerMove();
@@ -100,7 +100,7 @@ private:
 	scopy::TimePrefixFormatter d_timeFormatter;
 };
 
-class SCOPYGUI_EXPORT PlotLineHandleH: public PlotLineHandle
+class SCOPY_GUI_EXPORT PlotLineHandleH: public PlotLineHandle
 {
 public:
 	PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent = 0,
@@ -122,7 +122,7 @@ protected:
 	bool m_facingBottom;
 };
 
-class SCOPYGUI_EXPORT PlotLineHandleV: public PlotLineHandle
+class SCOPY_GUI_EXPORT PlotLineHandleV: public PlotLineHandle
 {
 public:
 	PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent = 0,
@@ -143,7 +143,7 @@ protected:
 	bool m_facingRight;
 };
 
-class SCOPYGUI_EXPORT FreePlotLineHandleH: public PlotLineHandleH
+class SCOPY_GUI_EXPORT FreePlotLineHandleH: public PlotLineHandleH
 {
 public:
 
@@ -163,7 +163,7 @@ private:
 	bool m_isBeyondLeft;
 };
 
-class SCOPYGUI_EXPORT FreePlotLineHandleV: public PlotLineHandleV
+class SCOPY_GUI_EXPORT FreePlotLineHandleV: public PlotLineHandleV
 {
 public:
 
@@ -188,7 +188,7 @@ private:
 	QString m_name;
 };
 
-class SCOPYGUI_EXPORT RoundedHandleV: public FreePlotLineHandleV
+class SCOPY_GUI_EXPORT RoundedHandleV: public FreePlotLineHandleV
 {
 	Q_OBJECT
 public:

@@ -4,11 +4,11 @@
 #include <QObject>
 #include <QMap>
 #include <QVariant>
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 
-class SCOPYPLUGINBASE_EXPORT ScopyEnvironment: public QObject
+class SCOPY_PLUGINBASE_EXPORT ScopyEnvironment: public QObject
 {
 	Q_OBJECT
 protected:

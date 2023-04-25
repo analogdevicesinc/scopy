@@ -22,11 +22,11 @@
 #define MOUSEWHEELWIDGETGUARD
 
 #include <QObject>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT MouseWheelWidgetGuard : public QObject
+class SCOPY_GUI_EXPORT MouseWheelWidgetGuard : public QObject
 {
 public:
 	explicit MouseWheelWidgetGuard(QObject *parent);

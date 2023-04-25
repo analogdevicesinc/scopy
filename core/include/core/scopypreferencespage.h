@@ -2,10 +2,10 @@
 #define SCOPYPREFERENCESPAGE_H
 
 #include <QTabWidget>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT ScopyPreferencesPage : public QTabWidget
+class SCOPY_CORE_EXPORT ScopyPreferencesPage : public QTabWidget
 {
 	Q_OBJECT
 public:

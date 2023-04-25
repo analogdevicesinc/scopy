@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE core)
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -39,9 +39,9 @@ if(${WITH_PYTHON2})
     set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
 endif()
 
-configure_file(include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h @ONLY)
-set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h)
+configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
+set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
@@ -60,13 +60,17 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
-target_include_directories(${PROJECT_NAME} PUBLIC scopygui scopypluginbase scopyiioutil)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopyiioutil)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
     set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopygui scopypluginbase scopyiioutil )
+target_link_libraries(${PROJECT_NAME} PUBLIC
+	${SCOPY_QT_LIBRARIES}
+	scopy-gui
+	scopy-pluginbase
+	scopy-iioutil )
 
 
 

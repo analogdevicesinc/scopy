@@ -30,14 +30,14 @@
 
 #include <QPushButton>
 #include <QMouseEvent>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QwtPolarGrid;
 
 namespace scopy {
 	class NyquistSamplesArray;
 
-	class SCOPYGUI_EXPORT NyquistGraph : public QwtPolarPlot
+	class SCOPY_GUI_EXPORT NyquistGraph : public QwtPolarPlot
 	{
 		Q_OBJECT
 

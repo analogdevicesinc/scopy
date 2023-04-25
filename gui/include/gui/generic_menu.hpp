@@ -6,12 +6,12 @@
 #include "basemenu.h"
 #include "menu_header.hpp"
 #include "subsection_separator.hpp"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 namespace gui {
 
-class SCOPYGUI_EXPORT GenericMenu : public QWidget
+class SCOPY_GUI_EXPORT GenericMenu : public QWidget
 {
 	Q_OBJECT
 

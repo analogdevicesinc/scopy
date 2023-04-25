@@ -47,7 +47,7 @@
 
 #include "property.hpp"
 #include <glib.h>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 using std::pair;
 
@@ -56,7 +56,7 @@ class QSpinBox;
 namespace scopy {
 namespace prop {
 
-class SCOPYGUI_EXPORT Int : public Property
+class SCOPY_SIGROK_GUI_EXPORT Int : public Property
 {
 	Q_OBJECT;
 

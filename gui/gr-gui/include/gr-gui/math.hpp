@@ -23,14 +23,14 @@
 
 #include <QAction>
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gr-gui_export.h"
 
 namespace Ui {
 	class Math;
 }
 
 namespace scopy {
-	class SCOPYGUI_EXPORT Math : public QWidget
+	class SCOPY_GR_GUI_EXPORT Math : public QWidget
 	{
 		Q_OBJECT
 

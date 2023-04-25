@@ -7,10 +7,10 @@
 #include <QWidget>
 #include <QDockWidget>
 #include <QMainWindow>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 
-class SCOPYGUI_EXPORT QwtDblClickPlotPicker: public QwtPlotPicker
+class SCOPY_GUI_EXPORT QwtDblClickPlotPicker: public QwtPlotPicker
 {
 public:
 #if QWT_VERSION < 0x060100
@@ -24,7 +24,7 @@ public:
     virtual QwtPickerMachine * stateMachine(int) const;
 };
 
-class SCOPYGUI_EXPORT QwtPickerDblClickPointMachine: public QwtPickerMachine
+class SCOPY_GUI_EXPORT QwtPickerDblClickPointMachine: public QwtPickerMachine
 {
 public:
   QwtPickerDblClickPointMachine();

@@ -4,10 +4,10 @@
 #include <QWidget>
 #include <QHBoxLayout>
 #include <QLabel>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT InfoPageKeyValueWidget : public QWidget {
+class SCOPY_GUI_EXPORT InfoPageKeyValueWidget : public QWidget {
 public:
 	InfoPageKeyValueWidget(QString key, QString value, QWidget *parent = nullptr );
 	void updateValue(QString value);

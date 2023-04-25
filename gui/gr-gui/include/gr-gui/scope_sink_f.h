@@ -49,11 +49,11 @@
 #include "trigger_mode.h"
 #include <gnuradio/sync_block.h>
 #include <qapplication.h>
-#include "scopygui_export.h"
+#include "scopy-gr-gui_export.h"
 
 namespace scopy {
 
-    class SCOPYGUI_EXPORT scope_sink_f : virtual public gr::sync_block
+    class SCOPY_GR_GUI_EXPORT scope_sink_f : virtual public gr::sync_block
     {
     public:
       // scopy::scope_sink_f::sptr

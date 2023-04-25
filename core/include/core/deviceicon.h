@@ -2,10 +2,10 @@
 #define DEVICEICON_H
 #include <QAbstractButton>
 #include <device.h>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT DeviceIcon : public QAbstractButton {
+class SCOPY_CORE_EXPORT DeviceIcon : public QAbstractButton {
 	Q_OBJECT
 public:
 	DeviceIcon(QWidget *parent = nullptr) : QAbstractButton(parent) {};

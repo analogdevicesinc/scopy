@@ -7150,7 +7150,7 @@
                     <uid>{44b38167-0bd7-4be5-aac5-a1c3482ff64e}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>adiscope::gui::ToolView* m_toolView</declaration>
+                    <declaration>scopy::gui::ToolView* m_toolView</declaration>
                    </MClassMember>
                   </item>
                   <item>

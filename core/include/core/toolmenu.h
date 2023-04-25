@@ -27,13 +27,13 @@
 #include <QString>
 #include <QLabel>
 #include <QButtonGroup>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
 /**
  * @brief The ToolMenu class
  */
-class SCOPYCORE_EXPORT ToolMenu : public BaseMenu
+class SCOPY_CORE_EXPORT ToolMenu : public BaseMenu
 {
 	Q_OBJECT
 public:

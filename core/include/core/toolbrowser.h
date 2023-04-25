@@ -3,14 +3,14 @@
 
 #include <QWidget>
 #include <toolmenu.h>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace Ui {
 class ToolBrowser;
 }
 
 namespace scopy {
-class SCOPYCORE_EXPORT ToolBrowser : public QWidget
+class SCOPY_CORE_EXPORT ToolBrowser : public QWidget
 {
     Q_OBJECT
 

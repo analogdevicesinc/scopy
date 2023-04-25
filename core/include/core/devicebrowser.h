@@ -6,14 +6,14 @@
 #include <QButtonGroup>
 #include <QMap>
 #include <deviceicon.h>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace Ui {
 class DeviceBrowser;
 }
 
 namespace scopy {
-class SCOPYCORE_EXPORT DeviceBrowser : public QWidget
+class SCOPY_CORE_EXPORT DeviceBrowser : public QWidget
 {
 	Q_OBJECT
 

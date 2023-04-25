@@ -7,7 +7,7 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"
-#include "scopyregmap_export.h"
+#include "scopy-regmap_export.h"
 #include <pluginbase/pluginbase.h>
 #include <iio.h>
 
@@ -15,8 +15,8 @@ namespace Ui {
 
 }
 
-namespace adiscope {
-class SCOPYREGMAP_EXPORT REGMAPPlugin : public QObject, public PluginBase
+namespace scopy {
+class SCOPY_REGMAP_EXPORT REGMAPPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

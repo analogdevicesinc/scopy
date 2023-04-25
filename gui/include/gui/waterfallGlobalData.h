@@ -32,7 +32,7 @@
 
 #include <qwt_raster_data.h>
 #include <cinttypes>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_interval.h>
@@ -45,7 +45,7 @@ enum WaterfallFlowDirection {
     DOWN
 };
 
-class SCOPYGUI_EXPORT WaterfallData : public QwtRasterData
+class SCOPY_GUI_EXPORT WaterfallData : public QwtRasterData
 {
 public:
     WaterfallData(const double, const double, const uint64_t, const unsigned int);

@@ -4,7 +4,7 @@
 #include "scopyhomeaddpage.h"
 #include <QWidget>
 #include <QPushButton>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include "device.h"
 
 namespace Ui {
@@ -12,7 +12,7 @@ class ScopyHomePage;
 }
 
 namespace scopy {
-class SCOPYCORE_EXPORT ScopyHomePage : public QWidget
+class SCOPY_CORE_EXPORT ScopyHomePage : public QWidget
 {
 	Q_OBJECT
 

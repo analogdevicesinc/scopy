@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <QThread>
 #include <iio.h>
-#include "scopyiioutil_export.h"
+#include "scopy-iioutil_export.h"
 #include <QLoggingCategory>
 
 namespace scopy {
@@ -13,7 +13,7 @@ namespace scopy {
  * @brief The CyclicalTask class
  * Implements a way to cyclically call QThreads
  */
-class SCOPYIIOUTIL_EXPORT CyclicalTask : public QObject
+class SCOPY_IIOUTIL_EXPORT CyclicalTask : public QObject
 {
 	Q_OBJECT
 public:

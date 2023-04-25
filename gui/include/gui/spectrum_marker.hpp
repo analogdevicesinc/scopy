@@ -23,11 +23,11 @@
 
 #include <qwt_plot_marker.h>
 #include <QColor>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT SpectrumMarker: public QwtPlotMarker
+class SCOPY_GUI_EXPORT SpectrumMarker: public QwtPlotMarker
 {
 public:
 	SpectrumMarker(const QString& title, bool movable = true);

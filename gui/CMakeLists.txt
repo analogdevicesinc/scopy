@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 set(SCOPY_MODULE gui)
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -61,8 +61,8 @@ add_library(${PROJECT_NAME} SHARED
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
-configure_file(include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h @ONLY)
+configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE

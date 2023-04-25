@@ -27,11 +27,11 @@
 
 #include <exception>
 #include <iostream>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 
 namespace scopy {
-class SCOPYGUI_EXPORT FileManager
+class SCOPY_GUI_EXPORT FileManager
 {
 public:
 

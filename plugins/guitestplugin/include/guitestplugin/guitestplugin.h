@@ -6,12 +6,12 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopytestplugin_export.h"
+#include "scopy-guitestplugin_export.h"
 #include <QLineEdit>
 
 namespace scopy {
 
-class SCOPYTESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
+class SCOPY_GUITESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

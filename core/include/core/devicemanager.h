@@ -7,10 +7,10 @@
 #include "device.h"
 #include "deviceimpl.h"
 #include "pluginmanager.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT DeviceManager : public QObject
+class SCOPY_CORE_EXPORT DeviceManager : public QObject
 {
 	Q_OBJECT
 public:

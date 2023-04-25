@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 set(SCOPY_MODULE pluginbase)
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -37,9 +37,9 @@ if(ENABLE_SCOPYJS)
     message(STATUS "PLUGINBASE: scopy-js enabled")
 endif()
 
-configure_file(include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h @ONLY)
-set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h)
+configure_file(include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY)
+set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}

@@ -42,14 +42,14 @@
 #define PULSEVIEW_PV_PROP_BOOL_HPP
 
 #include "property.hpp"
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 class QCheckBox;
 
 namespace scopy {
 namespace prop {
 
-class SCOPYGUI_EXPORT Bool : public Property
+class SCOPY_SIGROK_GUI_EXPORT Bool : public Property
 {
 	Q_OBJECT;
 

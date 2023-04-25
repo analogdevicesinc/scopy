@@ -11,6 +11,7 @@ deps
 scopy
 android/assets/libsigrokdecode/*
 android/assets/python3.*/*
+resources/scopy_osp.html
 resources/stylesheets/default.qss
 resources/stylesheets/light.qss
 !android/src/org/adi/scopy
@@ -28,4 +29,4 @@ doc/*
 build/*
 .vscode/*
 CMakeLists.txt.user
-resources/scopy_osp.html
+

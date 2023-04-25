@@ -47,7 +47,7 @@
 #include "scope_sink_f.h"
 #include "TimeDomainDisplayPlot.h"
 #include "FftDisplayPlot.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
