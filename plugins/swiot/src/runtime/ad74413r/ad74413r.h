@@ -49,8 +49,11 @@ public Q_SLOTS:
 	void onChannelWidgetSelected(bool checked);
 
 	void onRunBtnPressed();
+	void onSingleBtnPressed();
 
 	void onReaderThreadFinished();
+
+	void onSingleCaptureFinished();
 
 Q_SIGNALS:
 
