@@ -6,6 +6,7 @@
 
 
 namespace scopy {
+namespace datalogger {
 
 class DataLoggerController: public QObject
 {
@@ -44,10 +45,12 @@ Q_SIGNALS:
 
 private:
 	DataLoggerModel *dataLoggerModel;
-	DataLoggerView *dataLoggerView;
+	gui::DataLoggerView *dataLoggerView;
 	bool isRunningOn;
 	void attemptDataLogging();
 
 };
 }
+}
+
 #endif // DATALOGGERCONTROLLER_H

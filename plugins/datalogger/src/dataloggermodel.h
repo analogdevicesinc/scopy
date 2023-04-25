@@ -9,6 +9,7 @@
 #include <QtConcurrent>
 
 namespace scopy {
+namespace datalogger {
 
 enum class CHANNEL_DATA_TYPE{
 	INT,
@@ -57,4 +58,6 @@ private:
 	bool isNumber(const QString &str);
 };
 }
+}
+
 #endif // DataLoggerModel_H

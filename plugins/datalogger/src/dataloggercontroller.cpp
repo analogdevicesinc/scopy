@@ -1,6 +1,8 @@
 #include "dataloggercontroller.hpp"
 
 using namespace scopy;
+using namespace datalogger;
+using namespace datalogger::gui;
 
 DataLoggerController::DataLoggerController(bool lastValue, bool average, bool all)
 {
