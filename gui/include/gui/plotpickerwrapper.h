@@ -26,9 +26,9 @@
 #include<QPointF>
 #include<qwt_axis_id.h>
 #include<QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
-class SCOPYGUI_EXPORT PlotPickerWrapper : public QwtPlotPicker
+class SCOPY_GUI_EXPORT PlotPickerWrapper : public QwtPlotPicker
 {
 public:
 	PlotPickerWrapper(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *);

@@ -4,10 +4,10 @@
 #include <QMap>
 #include <QObject>
 #include "pluginmanager.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT PluginRepository : public QObject
+class SCOPY_CORE_EXPORT PluginRepository : public QObject
 {
 	Q_OBJECT
 public:

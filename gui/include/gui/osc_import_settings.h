@@ -22,14 +22,14 @@
 #define OSC_IMPORT_SETTINGS_H
 
 #include "osc_export_settings.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class ExportSettings;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT ImportSettings : public ExportSettings
+class SCOPY_GUI_EXPORT ImportSettings : public ExportSettings
 {
         Q_OBJECT
 

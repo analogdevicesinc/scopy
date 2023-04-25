@@ -21,14 +21,14 @@
 #ifndef DYNAMIC_WIDGET_HPP
 #define DYNAMIC_WIDGET_HPP
 
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QWidget;
 
 namespace scopy {
-	void SCOPYGUI_EXPORT setDynamicProperty(QWidget *widget,
+	void SCOPY_GUI_EXPORT setDynamicProperty(QWidget *widget,
 			const char *property, bool set);
-	bool SCOPYGUI_EXPORT getDynamicProperty(QWidget *widget,
+	bool SCOPY_GUI_EXPORT getDynamicProperty(QWidget *widget,
 				const char *property);
 }
 

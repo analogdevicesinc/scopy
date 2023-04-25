@@ -26,10 +26,10 @@
 #include <QDropEvent>
 #include <QString>
 
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT DetachDragZone : public QWidget
+class SCOPY_GUI_EXPORT DetachDragZone : public QWidget
 {
 	Q_OBJECT
 

@@ -4,14 +4,14 @@
 #include <QObject>
 #include <QMap>
 #include <QSettings>
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 /**
  * @brief The Preferences class
  * Singleton preferences class. Maps QString keys to QVariant values.
  */
-class SCOPYPLUGINBASE_EXPORT Preferences : public QObject
+class SCOPY_PLUGINBASE_EXPORT Preferences : public QObject
 {
 	Q_OBJECT
 protected:

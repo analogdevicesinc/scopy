@@ -52,11 +52,11 @@
 //#include <gnuradio/qtgui/api.h>
 #include <gnuradio/sync_block.h>
 #include <qapplication.h>
-#include "scopygui_export.h"
+#include "scopy-gr-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT waterfall_sink_f : virtual public gr::sync_block
+class SCOPY_GR_GUI_EXPORT waterfall_sink_f : virtual public gr::sync_block
 {
 public:
 //	 scopy::waterfall_sink_f::sptr

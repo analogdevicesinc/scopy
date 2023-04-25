@@ -3,16 +3,16 @@
 
 #include <QObject>
 #include <QMap>
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 
-class SCOPYPLUGINBASE_EXPORT ResourceUser {
+class SCOPY_PLUGINBASE_EXPORT ResourceUser {
 public:
 	virtual void stop() = 0; // call ResourceManager::close
 };
 
-class SCOPYPLUGINBASE_EXPORT ResourceManager : public QObject
+class SCOPY_PLUGINBASE_EXPORT ResourceManager : public QObject
 {
 	Q_OBJECT
 protected:

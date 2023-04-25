@@ -6,13 +6,13 @@
 #include "device.h"
 #include <QPushButton>
 #include <QCheckBox>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include "pluginmanager.h"
 
 namespace scopy {
 
 
-class SCOPYCORE_EXPORT DeviceImpl : public QObject, public Device
+class SCOPY_CORE_EXPORT DeviceImpl : public QObject, public Device
 {
 	Q_OBJECT
 public:

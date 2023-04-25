@@ -25,10 +25,10 @@
 
 #include <qwt_curve_fitter.h>
 #include <qwt_spline.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT SmoothCurveFitter : public QwtCurveFitter
+class SCOPY_GUI_EXPORT SmoothCurveFitter : public QwtCurveFitter
 {
 public:
 	SmoothCurveFitter();

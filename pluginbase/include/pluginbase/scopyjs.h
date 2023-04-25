@@ -26,15 +26,15 @@
 #include <QFutureWatcher>
 #include <QJSEngine>
 #include "apiobject.h"
-#include "scopypluginbase_export.h"
-#include "scopypluginbase_config.h"
+#include "scopy-pluginbase_export.h"
+#include "scopy-pluginbase_config.h"
 #include <QSocketNotifier>
 
 class QJSEngine;
 
 namespace scopy {
 
-class SCOPYPLUGINBASE_EXPORT ScopyJS : public QObject
+class SCOPY_PLUGINBASE_EXPORT ScopyJS : public QObject
 {
 	Q_OBJECT
 

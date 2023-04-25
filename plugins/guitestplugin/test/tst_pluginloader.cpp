@@ -23,7 +23,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopyguitestplugin.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-guitestplugin.so"
 
 
 void TST_TestPlugin::fileExists()
@@ -45,7 +45,7 @@ void TST_TestPlugin::isLibrary()
 void TST_TestPlugin::className()
 {
 	QPluginLoader qp(FILENAME,this);
-	QVERIFY(qp.metaData().value("className") == "GuiTestPlugin");
+	QVERIFY(qp.metaData().value("className") == "TestPlugin");
 }
 
 void TST_TestPlugin::loaded()

@@ -26,7 +26,7 @@
 #include <QShowEvent>
 #include <qwt_axis_id.h>
 #include "customplotpositionbutton.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QwtPlot;
 
@@ -36,7 +36,7 @@ namespace Ui {
 
 
 namespace scopy {
-	class SCOPYGUI_EXPORT CursorReadouts: public QWidget
+	class SCOPY_GUI_EXPORT CursorReadouts: public QWidget
 	{
 	public:
 		CursorReadouts(QwtPlot *plot);

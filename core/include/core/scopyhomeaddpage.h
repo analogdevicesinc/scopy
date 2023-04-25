@@ -2,7 +2,7 @@
 #define SCOPYHOMEADDPAGE_H
 
 #include <QWidget>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include <QFuture>
 
 namespace Ui {
@@ -10,7 +10,7 @@ class ScopyHomeAddPage;
 }
 
 namespace scopy {
-class SCOPYCORE_EXPORT ScopyHomeAddPage : public QWidget
+class SCOPY_CORE_EXPORT ScopyHomeAddPage : public QWidget
 {
 	Q_OBJECT
 

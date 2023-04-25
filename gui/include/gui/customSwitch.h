@@ -25,12 +25,12 @@
 #include "customanimation.h"
 #include <QPushButton>
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QShowEvent;
 
 namespace scopy {
-	class SCOPYGUI_EXPORT CustomSwitch : public QPushButton
+	class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
 	{
 		Q_OBJECT
 

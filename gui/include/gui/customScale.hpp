@@ -24,10 +24,10 @@
 #include <qwt_thermo.h>
 
 #include "autoScaler.hpp"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT CustomScale : public QwtThermo
+class SCOPY_GUI_EXPORT CustomScale : public QwtThermo
 {
 	Q_OBJECT
 

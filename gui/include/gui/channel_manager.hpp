@@ -8,7 +8,7 @@
 
 #include "channel_widget.hpp"
 #include "customPushButton.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 namespace gui {
@@ -19,7 +19,7 @@ enum class ChannelsPositionEnum
 	HORIZONTAL
 };
 
-class SCOPYGUI_EXPORT ChannelManager : public QWidget
+class SCOPY_GUI_EXPORT ChannelManager : public QWidget
 {
 	Q_OBJECT
 

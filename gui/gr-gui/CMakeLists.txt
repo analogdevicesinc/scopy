@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 set(SCOPY_MODULE gr-gui)
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -31,8 +31,8 @@ if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
 
-configure_file(include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy${SCOPY_MODULE}_config.h @ONLY)
+configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
@@ -52,12 +52,12 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/
-    scopygui)
+    scopy-gui)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
-    scopygui
+    scopy-gui
     gnuradio::gnuradio-runtime
     gnuradio::gnuradio-analog
     gnuradio::gnuradio-blocks

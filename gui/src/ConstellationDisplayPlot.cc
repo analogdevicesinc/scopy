@@ -50,11 +50,11 @@
 #include <iostream>
 
 #include "ConstellationDisplayPlot.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 using namespace scopy;
 
-class SCOPYGUI_EXPORT ConstellationDisplayZoomer: public QwtPlotZoomer
+class SCOPY_GUI_EXPORT ConstellationDisplayZoomer: public QwtPlotZoomer
 {
 public:
 #if QWT_VERSION < 0x060100

@@ -29,10 +29,10 @@
 /*Qt includes*/
 #include <QWidget>
 #include <BasicPlot.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT PrintablePlot : public BasicPlot
+class SCOPY_GUI_EXPORT PrintablePlot : public BasicPlot
 {
 	Q_OBJECT
 public:

@@ -26,12 +26,12 @@
 #include <vector>
 
 #include "handlesareaextension.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QPoint;
 class PlotLineHandle;
 
-class SCOPYGUI_EXPORT HandlesArea: public QWidget
+class SCOPY_GUI_EXPORT HandlesArea: public QWidget
 {
 	Q_OBJECT
 
@@ -59,7 +59,7 @@ protected:
 	std::vector<std::unique_ptr<HandlesAreaExtension>> m_extensions;
 };
 
-class SCOPYGUI_EXPORT VertHandlesArea: public HandlesArea
+class SCOPY_GUI_EXPORT VertHandlesArea: public HandlesArea
 {
 	Q_OBJECT
 public:
@@ -81,7 +81,7 @@ private:
 	int largest_child_height;
 };
 
-class SCOPYGUI_EXPORT HorizHandlesArea: public HandlesArea
+class SCOPY_GUI_EXPORT HorizHandlesArea: public HandlesArea
 {
 	Q_OBJECT
 public:
@@ -103,7 +103,7 @@ private:
 	int largest_child_width;
 };
 
-class SCOPYGUI_EXPORT GateHandlesArea: public HorizHandlesArea
+class SCOPY_GUI_EXPORT GateHandlesArea: public HorizHandlesArea
 {
 public:
 	GateHandlesArea(QWidget *parent = 0);

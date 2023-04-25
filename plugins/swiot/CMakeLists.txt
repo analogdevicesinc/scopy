@@ -4,7 +4,7 @@ set(SCOPY_MODULE swiot)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -89,7 +89,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Concurrent
-	scopypluginbase scopyiioutil scopygui scopycore ${QWT_LIBRARIES})
+	scopy-pluginbase scopy-iioutil scopy-gui scopy-core ${QWT_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

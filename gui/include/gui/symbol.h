@@ -23,9 +23,9 @@
 
 #include <qwt_plot.h>
 #include <qwt_painter.h>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
-class SCOPYGUI_EXPORT Symbol: public QObject
+class SCOPY_GUI_EXPORT Symbol: public QObject
 {
 	Q_OBJECT
 
@@ -111,7 +111,7 @@ protected:
 	QPen d_pen;
 };
 
-class SCOPYGUI_EXPORT VertDebugSymbol: public Symbol
+class SCOPY_GUI_EXPORT VertDebugSymbol: public Symbol
 {
 	Q_OBJECT
 
@@ -138,7 +138,7 @@ private Q_SLOTS:
 
 };
 
-class SCOPYGUI_EXPORT HorizDebugSymbol: public Symbol
+class SCOPY_GUI_EXPORT HorizDebugSymbol: public Symbol
 {
 	Q_OBJECT
 
@@ -164,7 +164,7 @@ private Q_SLOTS:
 	void onBasePixelPositionChanged(int, int);
 };
 
-class SCOPYGUI_EXPORT TriggerLevelCursor: public VertDebugSymbol
+class SCOPY_GUI_EXPORT TriggerLevelCursor: public VertDebugSymbol
 {
 	Q_OBJECT
 
@@ -177,7 +177,7 @@ private:
 	QPixmap d_cursorPixmap;
 };
 
-class SCOPYGUI_EXPORT TriggerDelayCursor: public HorizDebugSymbol
+class SCOPY_GUI_EXPORT TriggerDelayCursor: public HorizDebugSymbol
 {
 	Q_OBJECT
 
@@ -190,7 +190,7 @@ private:
 	QPixmap d_cursorPixmap;
 };
 
-class SCOPYGUI_EXPORT HorizBar: public VertDebugSymbol
+class SCOPY_GUI_EXPORT HorizBar: public VertDebugSymbol
 {
 	Q_OBJECT
 
@@ -200,7 +200,7 @@ public:
 	void draw(QPainter *painter) const;
 };
 
-class SCOPYGUI_EXPORT VertBar: public HorizDebugSymbol
+class SCOPY_GUI_EXPORT VertBar: public HorizDebugSymbol
 {
 	Q_OBJECT
 

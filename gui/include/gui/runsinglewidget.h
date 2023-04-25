@@ -23,14 +23,14 @@
 
 #include <QPushButton>
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class RunSingleWidget;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT RunSingleWidget : public QWidget
+class SCOPY_GUI_EXPORT RunSingleWidget : public QWidget
 {
 	Q_OBJECT
 

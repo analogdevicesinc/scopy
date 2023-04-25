@@ -1,7 +1,7 @@
 #ifndef CONTEXTPROVIDER_H
 #define CONTEXTPROVIDER_H
 
-#include "scopyiioutil_export.h"
+#include "scopy-iioutil_export.h"
 #include <QObject>
 #include <QMap>
 #include <memory>
@@ -9,7 +9,7 @@
 #include <mutex>
 
 namespace scopy {
-class SCOPYIIOUTIL_EXPORT ContextRefCounter {
+class SCOPY_IIOUTIL_EXPORT ContextRefCounter {
 public:
 	ContextRefCounter(QString uri);
 	~ContextRefCounter();
@@ -18,7 +18,7 @@ public:
 	int refcnt = 0;
 };
 
-class SCOPYIIOUTIL_EXPORT ContextProvider : public QObject
+class SCOPY_IIOUTIL_EXPORT ContextProvider : public QObject
 {
 Q_OBJECT
 protected:

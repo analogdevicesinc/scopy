@@ -26,14 +26,14 @@
 
 #include <QColor>
 #include <QObject>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 enum class LogicPlotCurveType : int {
 	Data = 0,
 	Annotations = 1,
 };
 
-class SCOPYGUI_EXPORT GenericLogicPlotCurve : public QObject, public QwtPlotCurve
+class SCOPY_GUI_EXPORT GenericLogicPlotCurve : public QObject, public QwtPlotCurve
 {
 	Q_OBJECT
 public:

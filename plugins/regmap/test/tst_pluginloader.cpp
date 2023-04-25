@@ -3,7 +3,7 @@
 #include <QList>
 #include <pluginbase/plugin.h>
 
-using namespace adiscope;
+using namespace scopy;
 
 class TST_REGMAPPlugin : public QObject
 {
@@ -22,7 +22,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopyregmap.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-regmap.so"
 
 
 void TST_REGMAPPlugin::fileExists()

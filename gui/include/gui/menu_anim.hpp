@@ -24,10 +24,10 @@
 #include "customanimation.h"
 #include <QSize>
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT MenuAnim : public QWidget
+	class SCOPY_GUI_EXPORT MenuAnim : public QWidget
 	{
 		Q_OBJECT
 

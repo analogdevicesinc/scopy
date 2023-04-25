@@ -7,7 +7,7 @@
 #include <QObject>
 //#include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopym2kplugin_export.h"
+#include "scopy-m2kplugin_export.h"
 #include <QLineEdit>
 #include <QPushButton>
 #include "m2kcontroller.h"
@@ -19,7 +19,7 @@
 namespace scopy {
 
 namespace m2k {
-class SCOPYM2KPLUGIN_EXPORT M2kPlugin : public QObject, public PluginBase
+class SCOPY_M2KPLUGIN_EXPORT M2kPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

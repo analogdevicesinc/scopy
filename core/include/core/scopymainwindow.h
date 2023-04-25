@@ -9,7 +9,7 @@
 #include "toolmanager.h"
 #include "detachedtoolwindowmanager.h"
 #include "pluginrepository.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include "scopyaboutpage.h"
 #include "scopypreferencespage.h"
 #include "pluginbase/preferences.h"
@@ -20,7 +20,7 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
 QT_END_NAMESPACE
 namespace scopy {
-class SCOPYCORE_EXPORT ScopyMainWindow : public QMainWindow
+class SCOPY_CORE_EXPORT ScopyMainWindow : public QMainWindow
 {
     Q_OBJECT
 

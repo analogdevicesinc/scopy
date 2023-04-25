@@ -1,11 +1,12 @@
 cmake_minimum_required(VERSION 3.9)
-project(scopyplugins VERSION 0.1 LANGUAGES CXX)
+project(scopy-plugins VERSION 0.1 LANGUAGES CXX)
 set(SCOPY_PLUGIN_INSTALL_PATH "${CMAKE_CURRENT_BINARY_DIR}/plugins/")
 message(STATUS "plugins to " ${SCOPY_PLUGIN_INSTALL_PATH})
 
 option(ENABLE_PLUGIN_TEST "Enable test plugin" ON)
 option(ENABLE_PLUGIN_M2K "Enable m2k plugin" ON)
 option(ENABLE_PLUGIN_SWIOT "Enable swiot plugin" ON)
+option(ENABLE_PLUGIN_REGMAP "Enable regmap plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
     add_subdirectory(guitestplugin)

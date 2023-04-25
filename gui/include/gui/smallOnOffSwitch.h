@@ -26,12 +26,12 @@
 #include <QPushButton>
 #include <QWidget>
 #include <QLabel>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QShowEvent;
 
 namespace scopy {
-	class SCOPYGUI_EXPORT SmallOnOffSwitch : public QPushButton
+	class SCOPY_GUI_EXPORT SmallOnOffSwitch : public QPushButton
 	{
 		Q_OBJECT
 

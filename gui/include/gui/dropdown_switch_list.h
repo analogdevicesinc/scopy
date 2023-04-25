@@ -23,13 +23,13 @@
 
 #include <QComboBox>
 #include "ComboBoxLineEdit.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QStandardItemModel;
 class QTreeView;
 
 namespace scopy {
-	class SCOPYGUI_EXPORT DropdownSwitchList: public QComboBox
+	class SCOPY_GUI_EXPORT DropdownSwitchList: public QComboBox
 	{
 		Q_OBJECT
 

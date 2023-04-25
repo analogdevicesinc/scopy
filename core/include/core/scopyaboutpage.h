@@ -4,10 +4,10 @@
 #include <QTabWidget>
 #include <QTextBrowser>
 
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT ScopyAboutPage : public QTabWidget
+class SCOPY_CORE_EXPORT ScopyAboutPage : public QTabWidget
 {
 	Q_OBJECT
 public:

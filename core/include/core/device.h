@@ -3,11 +3,11 @@
 
 #include <QObject>
 #include "pluginbase/toolmenuentry.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include <QSettings>
 
 namespace scopy {
-class SCOPYCORE_EXPORT Device {
+class SCOPY_CORE_EXPORT Device {
 public:
 	virtual ~Device(){};
 	virtual QString id() = 0;

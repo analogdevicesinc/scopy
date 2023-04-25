@@ -23,11 +23,11 @@
 #define BUFFER_PREVIEWER_H
 
 #include <QFrame>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy{
 
-class SCOPYGUI_EXPORT BufferPreviewer: public QFrame
+class SCOPY_GUI_EXPORT BufferPreviewer: public QFrame
 {
 	Q_OBJECT
 
@@ -101,7 +101,7 @@ private:
 	bool m_cursorVisible;
 };
 
-class SCOPYGUI_EXPORT AnalogBufferPreviewer: public BufferPreviewer
+class SCOPY_GUI_EXPORT AnalogBufferPreviewer: public BufferPreviewer
 {
 public:
 	explicit AnalogBufferPreviewer(QWidget *parent = 0);
@@ -112,7 +112,7 @@ protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
 };
 
-class SCOPYGUI_EXPORT DigitalBufferPreviewer: public BufferPreviewer
+class SCOPY_GUI_EXPORT DigitalBufferPreviewer: public BufferPreviewer
 {
 public:
 	explicit DigitalBufferPreviewer(QWidget *parent = 0);

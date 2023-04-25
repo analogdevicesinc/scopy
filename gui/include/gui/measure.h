@@ -24,12 +24,12 @@
 #include <QList>
 #include <QString>
 #include <memory>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 	class CrossingDetection;
 
-	class SCOPYGUI_EXPORT MeasurementData
+	class SCOPY_GUI_EXPORT MeasurementData
 	{
 	public:
 		enum unitTypes {
@@ -75,7 +75,7 @@ namespace scopy {
 		enum axisType m_axis;
 	};
 
-	class SCOPYGUI_EXPORT Measure
+	class SCOPY_GUI_EXPORT Measure
 	{
 	public:
 		enum defaultMeasurements {
@@ -177,7 +177,7 @@ namespace scopy {
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
 	};
 
-	class SCOPYGUI_EXPORT Statistic
+	class SCOPY_GUI_EXPORT Statistic
 	{
 	public:
 		Statistic();

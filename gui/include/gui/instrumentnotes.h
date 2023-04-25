@@ -2,13 +2,13 @@
 #define INSTRUMENTNOTES_H
 
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class InstrumentNotes;
 }
 namespace scopy {
-class SCOPYGUI_EXPORT InstrumentNotes : public QWidget
+class SCOPY_GUI_EXPORT InstrumentNotes : public QWidget
 {
 	Q_OBJECT
 

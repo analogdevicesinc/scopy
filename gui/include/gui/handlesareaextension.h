@@ -2,11 +2,11 @@
 #define HANDLESAREAEXTENSION_H
 
 #include <QPainter>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QwtPlot;
 
-class SCOPYGUI_EXPORT HandlesAreaExtension
+class SCOPY_GUI_EXPORT HandlesAreaExtension
 {
 public:
 	HandlesAreaExtension(QwtPlot *plot);
@@ -21,7 +21,7 @@ protected:
 	QwtPlot *m_plot;
 };
 
-class SCOPYGUI_EXPORT XBottomRuller: public HandlesAreaExtension {
+class SCOPY_GUI_EXPORT XBottomRuller: public HandlesAreaExtension {
 public:
 	XBottomRuller(QwtPlot *plot);
 	virtual ~XBottomRuller() = default;
@@ -29,7 +29,7 @@ public:
 	virtual bool draw(QPainter *painter, QWidget *owner) Q_DECL_OVERRIDE;
 };
 
-class SCOPYGUI_EXPORT YLeftRuller: public HandlesAreaExtension {
+class SCOPY_GUI_EXPORT YLeftRuller: public HandlesAreaExtension {
 public:
 	YLeftRuller(QwtPlot *plot);
 	virtual ~YLeftRuller() = default;
@@ -37,7 +37,7 @@ public:
 	virtual bool draw(QPainter *painter, QWidget *owner) Q_DECL_OVERRIDE;
 };
 
-class SCOPYGUI_EXPORT XTopRuller: public HandlesAreaExtension {
+class SCOPY_GUI_EXPORT XTopRuller: public HandlesAreaExtension {
 public:
 	XTopRuller(QwtPlot *plot);
 	virtual ~XTopRuller() = default;

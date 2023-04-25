@@ -29,14 +29,14 @@
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"
 #include "DisplayPlot.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
 class OscScaleDraw;
 class PrefixFormatter;
 class OscScaleZoomer;
 
-class SCOPYGUI_EXPORT dBgraph : public DisplayPlot
+class SCOPY_GUI_EXPORT dBgraph : public DisplayPlot
 {
 	friend class NetworkAnalyzer_API;
 	Q_OBJECT

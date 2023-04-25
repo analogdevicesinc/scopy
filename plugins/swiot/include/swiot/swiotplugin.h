@@ -6,13 +6,13 @@
 
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopyswiot_export.h"
+#include "scopy-swiot_export.h"
 #include "QLabel"
 #include "src/swiotcontroller.h"
 #include "ui_swiotInfoPage.h"
 
 namespace scopy::swiot {
-class SCOPYSWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
+class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

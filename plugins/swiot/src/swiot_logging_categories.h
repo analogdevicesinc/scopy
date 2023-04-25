@@ -2,7 +2,6 @@
 #define SCOPY_SWIOT_LOGGING_CATEGORIES_H
 
 #include <QLoggingCategory>
-#include "core/scopycore_export.h"
 
 #ifndef QT_NO_DEBUG_OUTPUT
 Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT)

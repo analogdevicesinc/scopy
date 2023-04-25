@@ -23,10 +23,10 @@
 
 #include <qwt_plot_zoomer.h>
 #include "limitedplotzoomer.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT OscScaleZoomer : public LimitedPlotZoomer
+	class SCOPY_GUI_EXPORT OscScaleZoomer : public LimitedPlotZoomer
 	{
 		Q_OBJECT
 
