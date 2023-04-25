@@ -89,6 +89,16 @@ uint64_t GenericLogicPlotCurve::getBufferSize() const
 	return m_bufferSize;
 }
 
+int GenericLogicPlotCurve::getVisibleRows() const
+{
+	return 1;
+}
+
+double GenericLogicPlotCurve::getHeightOffset() const
+{
+	return 0;
+}
+
 LogicPlotCurveType GenericLogicPlotCurve::getType() const
 {
 	return m_type;

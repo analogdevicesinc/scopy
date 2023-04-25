@@ -1488,7 +1488,7 @@ background-repeat: no-repeat;
   <customwidget>
    <class>scopy::Math</class>
    <extends>QWidget</extends>
-   <header>gui/math.hpp</header>
+   <header>math.hpp</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -316,6 +316,11 @@ int AnnotationCurve::getVisibleRows() const
 	return m_visibleRows;
 }
 
+double AnnotationCurve::getHeightOffset() const
+{
+	return getTraceHeight() * getVisibleRows();
+}
+
 AnnotationDecoder *AnnotationCurve::getAnnotationDecoder()
 {
 	return m_annotationDecoder;

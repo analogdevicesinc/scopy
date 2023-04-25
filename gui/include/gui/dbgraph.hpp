@@ -25,7 +25,6 @@
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
 
-#include "customFifo.hpp"
 #include "symbol_controller.h"
 #include "plot_line_handle.h"
 #include "cursor_readouts.h"

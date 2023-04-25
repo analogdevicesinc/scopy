@@ -95,7 +95,8 @@ public:
 	void stackDecoder(std::shared_ptr<scopy::logic::Decoder> decoder);
 	std::vector<std::shared_ptr<scopy::logic::Decoder>> getDecoderStack();
 
-	int getVisibleRows() const;
+	int getVisibleRows() const override;
+	double getHeightOffset() const override;
 
 	AnnotationDecoder *getAnnotationDecoder();
 	std::vector<std::shared_ptr<scopy::bind::Decoder>> getDecoderBindings();

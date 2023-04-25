@@ -21,7 +21,6 @@
 #ifndef NYQUISTGRAPH_HPP
 #define NYQUISTGRAPH_HPP
 
-#include "customFifo.hpp"
 #include "dbgraph.hpp"
 #include "nyquistplotzoomer.h"
 

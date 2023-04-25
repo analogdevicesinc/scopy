@@ -31,8 +31,8 @@
 
 #include "gui/logicdatacurve.h"
 #include "patterns/patterns.hpp"
-#include "gui/annotationcurve.h"
-#include "gui/annotationdecoder.h"
+#include "sigrok-gui/annotationcurve.h"
+#include "sigrok-gui/annotationdecoder.h"
 #include "pattern_generator_api.h"
 
 #include <libm2k/m2kexceptions.hpp>
