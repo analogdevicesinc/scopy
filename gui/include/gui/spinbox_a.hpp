@@ -27,7 +27,7 @@
 #include <QSettings>
 
 #include "plot_utils.hpp"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -58,7 +58,7 @@ namespace scopy {
  */
 class SpinBoxA_API;
 
-class SCOPYGUI_EXPORT SpinBoxA : public QWidget
+class SCOPY_GUI_EXPORT SpinBoxA : public QWidget
 {
 	friend class SpinBoxA_API;
 
@@ -211,7 +211,7 @@ private:
 };
 #endif
 
-class SCOPYGUI_EXPORT ScaleSpinButton: public SpinBoxA
+class SCOPY_GUI_EXPORT ScaleSpinButton: public SpinBoxA
 {
 	Q_OBJECT
 public:
@@ -242,7 +242,7 @@ protected:
 	int integer_step;
 };
 
-class SCOPYGUI_EXPORT PositionSpinButton: public SpinBoxA
+class SCOPY_GUI_EXPORT PositionSpinButton: public SpinBoxA
 {
 	Q_OBJECT
 public:
@@ -265,7 +265,7 @@ protected:
 };
 
 
-class SCOPYGUI_EXPORT PhaseSpinButton: public SpinBoxA
+class SCOPY_GUI_EXPORT PhaseSpinButton: public SpinBoxA
 {
 	Q_OBJECT
 public:

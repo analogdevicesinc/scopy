@@ -4,12 +4,12 @@
 #include <QWidget>
 #include <QMap>
 #include <pluginbase/toolmenuentry.h>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include "detachedtoolwindow.h"
 
 namespace scopy {
 
-class SCOPYCORE_EXPORT DetachedToolWindowManager : public QObject {
+class SCOPY_CORE_EXPORT DetachedToolWindowManager : public QObject {
 	Q_OBJECT
 public:
 	DetachedToolWindowManager(QObject *parent = nullptr);

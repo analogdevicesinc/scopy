@@ -4,7 +4,7 @@ set(SCOPY_MODULE bareminimumplugin)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -56,8 +56,8 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopypluginbase)
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopypluginbase)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopy-pluginbase)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

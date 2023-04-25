@@ -32,9 +32,9 @@
 #include <algorithm>
 #include <QDebug>
 #include <QSizePolicy>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
-class SCOPYGUI_EXPORT Util
+class SCOPY_GUI_EXPORT Util
 {
 public:
 	static void retainWidgetSizeWhenHidden(QWidget *w, bool retain = true);
@@ -45,7 +45,7 @@ public:
 
 #define PLOT_MENU_BAR_ENABLED
 
-class SCOPYGUI_EXPORT DockerUtils : public QObject
+class SCOPY_GUI_EXPORT DockerUtils : public QObject
 {
 public:
 	static QDockWidget* createDockWidget(QMainWindow* mainWindow, QWidget* widget, const QString& title = "");

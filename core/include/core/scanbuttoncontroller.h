@@ -3,11 +3,11 @@
 
 #include <QObject>
 #include <QPushButton>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 #include "iioutil/cyclicaltask.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT ScanButtonController : public QObject
+class SCOPY_CORE_EXPORT ScanButtonController : public QObject
 {
 	Q_OBJECT
 public:

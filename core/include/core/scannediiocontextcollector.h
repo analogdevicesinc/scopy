@@ -4,10 +4,10 @@
 #include <QObject>
 #include <QSet>
 #include "device.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT ScannedIIOContextCollector : public QObject
+class SCOPY_CORE_EXPORT ScannedIIOContextCollector : public QObject
 {
 	Q_OBJECT
 public:

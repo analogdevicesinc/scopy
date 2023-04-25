@@ -23,13 +23,13 @@
 
 #include "gui/basemenuitem.h"
 #include "gui/customPushButton.h"
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
 /**
  * @brief The ToolMenuItem class
  */
-class SCOPYCORE_EXPORT ToolMenuItem : public BaseMenuItem
+class SCOPY_CORE_EXPORT ToolMenuItem : public BaseMenuItem
 {
 	Q_OBJECT
 public:

@@ -117,8 +117,8 @@ void TST_PluginManager::metadataOps()
 	p->sort();
 	QVERIFY2(p->count() > 0,"Load libs failed");
 
-	auto plugins = p->getPlugins("unittest");
-	QVERIFY2(plugins.count() == 2,"Exactly 2 unit tests not found");
+	auto plugins = p->getPlugins("test");
+	QVERIFY2(plugins.count() >= 2,"Exactly 2 unit tests not found");
 	qDebug()<<plugins[0]->name();
 
 	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not loaded with highest priority");

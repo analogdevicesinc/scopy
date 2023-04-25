@@ -47,14 +47,14 @@
 
 #include "DisplayPlot.h"
 #include "spectrumUpdateEvents.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 #include <qwt_plot_histogram.h>
 
 namespace scopy {
 
 
-class SCOPYGUI_EXPORT HistogramScaleDraw: public QwtScaleDraw
+class SCOPY_GUI_EXPORT HistogramScaleDraw: public QwtScaleDraw
 {
 public:
 	HistogramScaleDraw();
@@ -84,7 +84,7 @@ private:
  * \brief QWidget for displaying time domain plots.
  * \ingroup qtgui_blk
  */
-class SCOPYGUI_EXPORT HistogramDisplayPlot: public DisplayPlot
+class SCOPY_GUI_EXPORT HistogramDisplayPlot: public DisplayPlot
 {
   Q_OBJECT
 

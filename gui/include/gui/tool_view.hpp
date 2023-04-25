@@ -15,7 +15,7 @@
 #include "generic_menu.hpp"
 #include "linked_button.hpp"
 #include "menu_anim.hpp"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class ToolView;
@@ -24,7 +24,7 @@ class ToolView;
 namespace scopy {
 namespace gui {
 
-class SCOPYGUI_EXPORT ToolView : public QWidget
+class SCOPY_GUI_EXPORT ToolView : public QWidget
 {
 	friend class ToolViewBuilder;
 

@@ -4,7 +4,7 @@
 #include <QString>
 #include <QWidget>
 #include "toolmenuentry.h"
-#include "scopypluginbase_export.h"
+#include "scopy-pluginbase_export.h"
 #include <QtPlugin>
 #include <QSettings>
 #include <QAbstractButton>
@@ -21,7 +21,7 @@ namespace scopy {
  * onConnect()
  * onDisconnect()
  */
-class SCOPYPLUGINBASE_EXPORT Plugin {
+class SCOPY_PLUGINBASE_EXPORT Plugin {
 public:
 	virtual ~Plugin() {}
 

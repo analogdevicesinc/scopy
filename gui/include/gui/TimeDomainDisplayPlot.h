@@ -48,12 +48,12 @@
 
 #include "DisplayPlot.h"
 #include "spectrumUpdateEvents.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT Sink{
+class SCOPY_GUI_EXPORT Sink{
 public:
 	Sink(const std::string &name, unsigned int numChannels, unsigned long long channelsDataLength):
 		d_name(name), d_numChannels(numChannels), d_channelsDataLength(channelsDataLength) { }
@@ -70,7 +70,7 @@ private:
 	unsigned long long d_channelsDataLength;
 };
 
-class SCOPYGUI_EXPORT SinkManager
+class SCOPY_GUI_EXPORT SinkManager
 {
 public:
 	SinkManager();
@@ -92,7 +92,7 @@ private:
  * \brief QWidget for displaying time domain plots.
  * \ingroup qtgui_blk
  */
-class SCOPYGUI_EXPORT TimeDomainDisplayPlot: public DisplayPlot
+class SCOPY_GUI_EXPORT TimeDomainDisplayPlot: public DisplayPlot
 {
   Q_OBJECT
 

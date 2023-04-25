@@ -47,7 +47,7 @@
 #include "property.hpp"
 
 #include <QMetaType>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 using std::pair;
 using std::vector;
@@ -59,7 +59,7 @@ class QSlider;
 namespace scopy {
 namespace prop {
 
-class SCOPYGUI_EXPORT Enum : public Property
+class SCOPY_SIGROK_GUI_EXPORT Enum : public Property
 {
 	Q_OBJECT;
 

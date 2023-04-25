@@ -35,11 +35,11 @@
 
 #include "annotationcurve.h"
 #include "decoder.h"
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT AnnotationDecoder
+class SCOPY_SIGROK_GUI_EXPORT AnnotationDecoder
 {
 public:
     AnnotationDecoder(AnnotationCurve *annotationCurve, std::shared_ptr<logic::Decoder> initialDecoder);

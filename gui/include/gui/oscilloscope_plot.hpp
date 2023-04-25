@@ -31,7 +31,7 @@
 #include <qwt_plot_zoneitem.h>
 
 #include "genericlogicplotcurve.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 
 class QLabel;
@@ -40,7 +40,7 @@ namespace scopy {
 	class Oscilloscope_API;
 	class PlotWidget;
 
-	class SCOPYGUI_EXPORT OscilloscopePlot : public TimeDomainDisplayPlot
+	class SCOPY_GUI_EXPORT OscilloscopePlot : public TimeDomainDisplayPlot
 	{
 		Q_OBJECT
 
@@ -50,7 +50,7 @@ namespace scopy {
 		~OscilloscopePlot();
 	};
 
-	class SCOPYGUI_EXPORT CapturePlot: public OscilloscopePlot
+	class SCOPY_GUI_EXPORT CapturePlot: public OscilloscopePlot
 	{
 		friend class Oscilloscope_API;
 		friend class LogicAnalyzer_API;

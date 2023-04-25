@@ -22,7 +22,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopyswiot.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-swiot.so"
 
 
 void TST_SWIOTPlugin::fileExists()

@@ -21,12 +21,12 @@
 #ifndef ANIMATIONMANAGER_H
 #define ANIMATIONMANAGER_H
 
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 #include <customanimation.h>
 #include <QObject>
 
 namespace scopy {
-class SCOPYGUI_EXPORT AnimationManager : public QObject
+class SCOPY_GUI_EXPORT AnimationManager : public QObject
 {
     Q_OBJECT
 

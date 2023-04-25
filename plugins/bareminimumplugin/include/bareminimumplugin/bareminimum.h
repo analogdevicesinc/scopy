@@ -6,12 +6,12 @@
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopybareminimumplugin_export.h"
+#include "scopy-bareminimumplugin_export.h"
 #include <QLineEdit>
 
 namespace scopy {
 
-class SCOPYBAREMINIMUMPLUGIN_EXPORT BareMinimum : public QObject, public PluginBase
+class SCOPY_BAREMINIMUMPLUGIN_EXPORT BareMinimum : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;

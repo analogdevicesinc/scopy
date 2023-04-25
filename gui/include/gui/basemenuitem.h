@@ -21,7 +21,7 @@
 #ifndef BASEMENUITEM_H
 #define BASEMENUITEM_H
 
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 #include <QFrame>
 #include <QMouseEvent>
 #include <QDragMoveEvent>
@@ -36,7 +36,7 @@ class BaseMenu;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT BaseMenuItem : public QWidget
+class SCOPY_GUI_EXPORT BaseMenuItem : public QWidget
 {
 	Q_OBJECT
 

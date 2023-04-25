@@ -23,7 +23,7 @@
 #include <QWidget>
 #include <QString>
 #include <QAbstractButton>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 #include <QSpacerItem>
 
 namespace Ui {
@@ -32,7 +32,7 @@ class Channel;
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT ChannelWidget: public QWidget
+class SCOPY_GUI_EXPORT ChannelWidget: public QWidget
 {
 	Q_OBJECT
 

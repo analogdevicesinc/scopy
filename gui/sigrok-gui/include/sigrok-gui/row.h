@@ -44,9 +44,9 @@
 #include <libsigrokdecode/libsigrokdecode.h>
 
 #include <QString>
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
-class SCOPYGUI_EXPORT Row
+class SCOPY_SIGROK_GUI_EXPORT Row
 {
 public:
     Row();

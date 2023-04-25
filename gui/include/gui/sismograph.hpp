@@ -29,11 +29,11 @@
 #include <qwt_plot_curve.h>
 
 #include "autoScaler.hpp"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 #include "customqwtscaledraw.hpp"
 
 namespace scopy {
-	class SCOPYGUI_EXPORT Sismograph : public QwtPlot
+	class SCOPY_GUI_EXPORT Sismograph : public QwtPlot
 	{
 		Q_OBJECT
 

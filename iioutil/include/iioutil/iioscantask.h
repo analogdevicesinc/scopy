@@ -2,14 +2,14 @@
 #define IIOSCANTASK_H
 
 #include <QThread>
-#include "scopyiioutil_export.h"
+#include "scopy-iioutil_export.h"
 
 namespace scopy {
 /**
  * @brief The IIOScanTask class
  * IIOScanTask - scans for IIO context and emits a scanFinished signal
  */
-class SCOPYIIOUTIL_EXPORT IIOScanTask : public QThread {
+class SCOPY_IIOUTIL_EXPORT IIOScanTask : public QThread {
 	Q_OBJECT
 public:
 	IIOScanTask(QObject *parent);

@@ -4,7 +4,7 @@ set(SCOPY_MODULE m2kplugin)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -78,11 +78,11 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE
 	Qt::Widgets
 	Qt::Core
-	scopygui
-	scopypluginbase
+	scopy-gui
+	scopy-pluginbase
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/src/old
 	)
-target_include_directories(${PROJECT_NAME} PUBLIC scopypluginbase)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
     set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
@@ -90,11 +90,11 @@ endforeach()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${SCOPY_QT_LIBRARIES}
-    scopypluginbase
-    scopyiioutil
-    scopygui
-    scopygr-gui
-    scopysigrok-gui
+    scopy-pluginbase
+    scopy-iioutil
+    scopy-gui
+    scopy-gr-gui
+    scopy-sigrok-gui
     libm2k::libm2k
     gnuradio::gnuradio-runtime
     gnuradio::gnuradio-analog

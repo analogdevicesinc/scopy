@@ -22,10 +22,10 @@
 #define CUSTOMANIMATION_H
 
 #include <QPropertyAnimation>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPYGUI_EXPORT CustomAnimation : public QPropertyAnimation
+class SCOPY_GUI_EXPORT CustomAnimation : public QPropertyAnimation
 {
 public:
 	CustomAnimation(QObject *target = nullptr);

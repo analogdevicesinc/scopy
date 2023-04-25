@@ -3,10 +3,10 @@
 
 #include <QWidget>
 #include <pluginbase/toolmenuentry.h>
-#include "scopycore_export.h"
+#include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPYCORE_EXPORT DetachedToolWindow : public QWidget {
+class SCOPY_CORE_EXPORT DetachedToolWindow : public QWidget {
 	Q_OBJECT
 public:
 	DetachedToolWindow(QWidget *parent, ToolMenuEntry *tme);

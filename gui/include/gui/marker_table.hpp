@@ -21,7 +21,7 @@
 #define MARKER_TABLE_HPP
 
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 class QStandardItemModel;
 
@@ -31,7 +31,7 @@ class MarkerTable;
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT MarkerTable : public QWidget
+class SCOPY_GUI_EXPORT MarkerTable : public QWidget
 {
 	Q_OBJECT
 

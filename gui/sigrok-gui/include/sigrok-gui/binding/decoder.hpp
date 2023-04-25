@@ -46,7 +46,7 @@
 #include "../prop/property.hpp"
 
 #include "../annotationdecoder.h"
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 using std::shared_ptr;
 
@@ -62,7 +62,7 @@ namespace scopy {
 
 namespace bind {
 
-class SCOPYGUI_EXPORT Decoder : public Binding
+class SCOPY_SIGROK_GUI_EXPORT Decoder : public Binding
 {
 public:
 	Decoder(scopy::AnnotationDecoder *annDec,

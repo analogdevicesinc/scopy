@@ -71,7 +71,7 @@
 #include "handles_area.hpp"
 #include "plotpickerwrapper.h"
 #include <QWidget>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 typedef QList<QColor> QColorList;
 Q_DECLARE_METATYPE ( QColorList )
@@ -87,7 +87,7 @@ namespace scopy {
 
 class PlotAxisConfiguration;
 
-class SCOPYGUI_EXPORT ScaleDivisions: public QObject
+class SCOPY_GUI_EXPORT ScaleDivisions: public QObject
 {
 Q_OBJECT
 
@@ -236,7 +236,7 @@ struct cursorReadoutsText {
  * \brief QWidget base plot to build QTGUI plotting tools.
  * \ingroup qtgui_blk
  */
-class SCOPYGUI_EXPORT DisplayPlot:public PrintablePlot
+class SCOPY_GUI_EXPORT DisplayPlot:public PrintablePlot
 {
   Q_OBJECT
 
@@ -722,7 +722,7 @@ private:
 /*
  * OscScaleDraw class overrides the way the major values are being displayed.
  */
-class SCOPYGUI_EXPORT OscScaleDraw: public QwtScaleDraw
+class SCOPY_GUI_EXPORT OscScaleDraw: public QwtScaleDraw
 {
 public:
 	OscScaleDraw(const QString& unit_type = "");
@@ -757,7 +757,7 @@ private:
 
 };
 
-class SCOPYGUI_EXPORT OscPlotZoomer: public ExtendingPlotZoomer
+class SCOPY_GUI_EXPORT OscPlotZoomer: public ExtendingPlotZoomer
 {
 	Q_OBJECT
 public:
@@ -780,7 +780,7 @@ private:
 /*
  * PlotAxisConfiguration class holds a group of settings of an axis
  */
-class SCOPYGUI_EXPORT PlotAxisConfiguration
+class SCOPY_GUI_EXPORT PlotAxisConfiguration
 {
 public:
 	PlotAxisConfiguration(int axisPos, int axisIdx, DisplayPlot *plot);
@@ -813,7 +813,7 @@ private:
 /*
  * EdgelessPlotScaleItem class ensures that the first and last major ticks are ignored
  */
-class SCOPYGUI_EXPORT EdgelessPlotScaleItem: public QwtPlotScaleItem
+class SCOPY_GUI_EXPORT EdgelessPlotScaleItem: public QwtPlotScaleItem
 {
 public:
 	explicit EdgelessPlotScaleItem(

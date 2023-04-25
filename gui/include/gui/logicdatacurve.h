@@ -23,11 +23,11 @@
 #define LOGICDATACURVE_H
 
 #include "genericlogicplotcurve.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 #include <mutex>
 
-class SCOPYGUI_EXPORT LogicDataCurve : public GenericLogicPlotCurve
+class SCOPY_GUI_EXPORT LogicDataCurve : public GenericLogicPlotCurve
 {
 public:
 	LogicDataCurve(uint16_t *data, uint8_t bit);

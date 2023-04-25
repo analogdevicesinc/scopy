@@ -24,14 +24,14 @@
 #include <QWidget>
 
 #include "spinbox_a.hpp"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 namespace Ui {
 class StartStopRangeWidget;
 }
 
 namespace scopy {
-class SCOPYGUI_EXPORT StartStopRangeWidget : public QWidget
+class SCOPY_GUI_EXPORT StartStopRangeWidget : public QWidget
 {
 	Q_OBJECT
 

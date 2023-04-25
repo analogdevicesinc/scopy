@@ -35,7 +35,7 @@
 #include "row.h"
 #include "rowdata.h"
 #include "genericlogicplotcurve.h"
-#include "scopygui_export.h"
+#include "scopy-sigrok-gui_export.h"
 
 namespace scopy {
 namespace logic {
@@ -61,7 +61,7 @@ struct AnnotationQueryResult {
     inline bool isValid() const { return ann != nullptr; }
 };
 
-class SCOPYGUI_EXPORT AnnotationCurve : public GenericLogicPlotCurve
+class SCOPY_SIGROK_GUI_EXPORT AnnotationCurve : public GenericLogicPlotCurve
 {
 	Q_OBJECT
 public:

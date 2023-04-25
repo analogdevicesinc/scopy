@@ -6,12 +6,12 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include "infopagekeyvaluewidget.h"
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
 
 namespace scopy {
 
-class SCOPYGUI_EXPORT InfoPage : public QWidget
+class SCOPY_GUI_EXPORT InfoPage : public QWidget
 {
 	Q_OBJECT
 public:

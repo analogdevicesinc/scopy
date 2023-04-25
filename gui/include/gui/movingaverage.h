@@ -2,9 +2,9 @@
 #define MOVINGAVERAGE_H
 
 #include <QVector>
-#include "scopygui_export.h"
+#include "scopy-gui_export.h"
 
-class SCOPYGUI_EXPORT MovingAverage
+class SCOPY_GUI_EXPORT MovingAverage
 {
 public:
 	MovingAverage();
