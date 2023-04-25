@@ -1,59 +1,41 @@
 #include "datalogger.hpp"
 #include "dataloggerplugin.hpp"
-#include "src/gui/dataloggercontroller.hpp"
-//#include "gui/generic_menu.hpp"
-//#include "gui/customSwitch.hpp"
-//#include "gui/detachedwindowsmanager.h"
-//#include "gui/dynamicWidget.hpp"
+#include "src/dataloggercontroller.hpp"
 #include <QtConcurrent>
 #include <QFuture>
 #include <tool_view_builder.hpp>
-
-#include <libm2k/contextbuilder.hpp>
-#include <src/datalogger_api.h>
-#include <src/dataloggergenericmenu.hpp>
-
-#include <libm2k/contextbuilder.hpp>
-
 #include <src/gui/channelmonitorcomponent.hpp>
-//#include <libm2k/contextbuilder.hpp>
+#include <src/datalogger_api.h>
+#include <src/gui/dataloggergenericmenu.hpp>
+#include <libm2k/contextbuilder.hpp>
 
-//#include "gui/dataloggercontroller.hpp"
-//#include "gui/customSwitch.hpp"
-//#include "datalogger_api.h"
-//#include "gui/channelmonitorcomponent.hpp"
-//#include "dataloggergenericmenu.hpp"
-//#include "gui/customcolqgridlayout.hpp"
 
-//using namespace scopy;
-
-using gui::ToolViewBuilder;
+using namespace scopy;
+using namespace scopy::gui;
+using namespace datalogger;
+using namespace datalogger::gui;
 
 DataLogger::DataLogger(libm2k::context::Context *ctx, QWidget *parent):
 	QWidget(parent),
-//	Tool(ctx, toolMenuItem, new DataLogger_API(this), "DataLogger", parent),
 	m_timer(new QTimer(this)),
 	m_elapsed(new QElapsedTimer()),
 	readerThread(new DataLoggerReaderThread()),
 	m_context(ctx)
 {
-	//	run_button = nullptr;
-
-
 	m_colors = {QColor("#ff7200"),QColor("#9013fe"), QColor(Qt::green),QColor(Qt::cyan), QColor(Qt::magenta),
 				QColor(Qt::yellow), QColor(Qt::gray), QColor(Qt::darkRed), QColor(Qt::darkGreen),
 				QColor(Qt::darkBlue), QColor(Qt::darkGray),QColor(Qt::black)};
 
-	gui::ToolViewRecipe recipe;
+	ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPairSettingsBtn = true;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = true;
-	recipe.channelsPosition = gui::ChannelsPositionEnum::VERTICAL;
+	recipe.channelsPosition = ChannelsPositionEnum::VERTICAL;
 
-	m_monitorChannelManager = new gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager = new ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 	m_monitorChannelManager->setToolStatus("Stopped");
 
@@ -145,19 +127,12 @@ DataLogger::DataLogger(libm2k::context::Context *ctx, QWidget *parent):
 	m_scrollArea->setWidget(m_flexGridLayout);
 
 	m_toolView->addFixedCentralWidget(m_scrollArea,0,0,0,0);
-//	setCentralWidget(getToolView());
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
 
 	initMonitorToolView();
 
-//	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_DATALOGGER)));
-//	api->load(*settings);
-//	api->js_register(engine);
-
-
 	qInfo(CAT_DATALOGGER_TOOL) << "Initialized";
-//	Q_EMIT DataLogger::toggleAll(true);
 }
 
 void DataLogger::initMonitorToolView()
@@ -172,7 +147,7 @@ void DataLogger::initMonitorToolView()
 		auto dmmName = dmm->getName();
 		std::vector<ChannelWidget*> channelList;
 
-		scopy::gui::DataLoggerGenericMenu *menu = new scopy::gui::DataLoggerGenericMenu(this);
+		DataLoggerGenericMenu *menu = new DataLoggerGenericMenu(this);
 		menu->init(QString::fromStdString(dmmName),new QColor("green"));
 
 		ChannelWidget *mainCh_widget =
@@ -186,7 +161,7 @@ void DataLogger::initMonitorToolView()
 		auto dmmList = dmm->readAll();
 		for (const auto &channel : dmmList) {
 			QColor channelColor = getChannelColor(chId);
-			scopy::gui::DataLoggerGenericMenu *channelMenu = new scopy::gui::DataLoggerGenericMenu(this);
+			DataLoggerGenericMenu *channelMenu = new DataLoggerGenericMenu(this);
 			channelMenu->init(QString::fromStdString(dmmName + ": " + channel.id),new QColor(channelColor));
 
 			ChannelWidget *ch_widget = m_toolView->buildNewChannel(m_monitorChannelManager, channelMenu , false, chId, false, false,
@@ -195,7 +170,7 @@ void DataLogger::initMonitorToolView()
 			channelList.push_back(ch_widget);
 			ch_widget->enableButton()->setChecked(false);
 
-			scopy::ChannelMonitorComponent* monitor = new scopy::ChannelMonitorComponent();
+			ChannelMonitorComponent* monitor = new ChannelMonitorComponent();
 			monitor->setID(chId);
 			monitor->init(0,QString::fromStdString(channel.unit_name),QString::fromStdString(channel.unit_symbol),
 				      QString::fromStdString(dmmName + ": " + channel.id),channelColor );
@@ -210,7 +185,7 @@ void DataLogger::initMonitorToolView()
 				}
 			});
 
-			connect(monitor, &scopy::ChannelMonitorComponent::contentChanged, m_flexGridLayout, [=](){
+			connect(monitor, &ChannelMonitorComponent::contentChanged, m_flexGridLayout, [=](){
 				m_flexGridLayout->itemSizeChanged();
 			}, Qt::QueuedConnection);
 
@@ -267,27 +242,27 @@ void DataLogger::initMonitorToolView()
 	setUpdatesEnabled(true);
 }
 
-void DataLogger::createConnections(scopy::gui::DataLoggerGenericMenu* mainMenu,scopy::gui::DataLoggerGenericMenu* menu,scopy::ChannelMonitorComponent* monitor)
+void DataLogger::createConnections(DataLoggerGenericMenu* mainMenu, DataLoggerGenericMenu* menu, ChannelMonitorComponent* monitor)
 {
-	connect(menu,&scopy::gui::DataLoggerGenericMenu::togglePeakHolder, monitor, &scopy::ChannelMonitorComponent::displayPeakHold);
-	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::togglePeakHolder, menu, &scopy::gui::DataLoggerGenericMenu::peakHolderToggle);
+	connect(menu,&DataLoggerGenericMenu::togglePeakHolder, monitor, &ChannelMonitorComponent::displayPeakHold);
+	connect(mainMenu,&DataLoggerGenericMenu::togglePeakHolder, menu, &DataLoggerGenericMenu::peakHolderToggle);
 
-	connect(menu, &scopy::gui::DataLoggerGenericMenu::resetPeakHolder, monitor, &scopy::ChannelMonitorComponent::resetPeakHolder);
-	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::resetPeakHolder, menu, &scopy::gui::DataLoggerGenericMenu::peakHolderResetClicked);
+	connect(menu, &DataLoggerGenericMenu::resetPeakHolder, monitor, &ChannelMonitorComponent::resetPeakHolder);
+	connect(mainMenu,&DataLoggerGenericMenu::resetPeakHolder, menu, &DataLoggerGenericMenu::peakHolderResetClicked);
 
-	connect(menu, &scopy::gui::DataLoggerGenericMenu::toggleScale, monitor, &scopy::ChannelMonitorComponent::displayScale);
-	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::toggleScale, menu, &scopy::gui::DataLoggerGenericMenu::scaleToggle);
+	connect(menu, &DataLoggerGenericMenu::toggleScale, monitor, &ChannelMonitorComponent::displayScale);
+	connect(mainMenu,&DataLoggerGenericMenu::toggleScale, menu, &DataLoggerGenericMenu::scaleToggle);
 
-	connect(menu, &scopy::gui::DataLoggerGenericMenu::toggleHistory, monitor, &scopy::ChannelMonitorComponent::displayHistory);
-	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::toggleHistory, menu, &scopy::gui::DataLoggerGenericMenu::historyToggle);
+	connect(menu, &DataLoggerGenericMenu::toggleHistory, monitor, &ChannelMonitorComponent::displayHistory);
+	connect(mainMenu,&DataLoggerGenericMenu::toggleHistory, menu, &DataLoggerGenericMenu::historyToggle);
 
-	connect(menu, &scopy::gui::DataLoggerGenericMenu::changeHistorySize, monitor, &scopy::ChannelMonitorComponent::setHistoryDuration);
-	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::historySizeIndexChanged, menu, &scopy::gui::DataLoggerGenericMenu::historySizeChanged);
+	connect(menu, &DataLoggerGenericMenu::changeHistorySize, monitor, &ChannelMonitorComponent::setHistoryDuration);
+	connect(mainMenu,&DataLoggerGenericMenu::historySizeIndexChanged, menu, &DataLoggerGenericMenu::historySizeChanged);
 
-	connect(menu, &scopy::gui::DataLoggerGenericMenu::lineStyleChanged, monitor, &scopy::ChannelMonitorComponent::setLineStyle);
-	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::lineStyleIndexChanged, menu, &scopy::gui::DataLoggerGenericMenu::changeLineStyle);
+	connect(menu, &DataLoggerGenericMenu::lineStyleChanged, monitor, &ChannelMonitorComponent::setLineStyle);
+	connect(mainMenu,&DataLoggerGenericMenu::lineStyleIndexChanged, menu, &DataLoggerGenericMenu::changeLineStyle);
 
-	connect(menu, &scopy::gui::DataLoggerGenericMenu::monitorColorChanged, monitor, &ChannelMonitorComponent::setMonitorColor);
+	connect(menu, &DataLoggerGenericMenu::monitorColorChanged, monitor, &ChannelMonitorComponent::setMonitorColor);
 }
 
 scopy::gui::ToolView* DataLogger::getToolView()
@@ -459,7 +434,7 @@ scopy::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* color)
 			if (!m_activeChannels.empty()) {
 				for (int ch : m_activeChannels.keys()) {
 					QString name = m_activeChannels[ch]->getTitle();
-					dataLoggerController->createChannel(name, scopy::CHANNEL_DATA_TYPE::DOUBLE);
+					dataLoggerController->createChannel(name, CHANNEL_DATA_TYPE::DOUBLE);
 				}
 			}
 		}
@@ -488,9 +463,7 @@ DataLogger::~DataLogger()
 	if (readerThread) {
 		delete readerThread;
 	}
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
+
 	if (m_timer) {
 		delete m_timer;
 	}
@@ -500,5 +473,4 @@ DataLogger::~DataLogger()
 	if (m_toolView) {
 		delete m_toolView;
 	}
-//	delete api;
 }

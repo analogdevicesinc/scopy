@@ -22,10 +22,6 @@ Q_DECLARE_LOGGING_CATEGORY(CAT_DATALOGGER_TOOL);
 
 namespace Ui {
 class DataLoggerInfoPage;
-//class SWIOTInfoPage;
-//class SwiotRuntimeUI;
-//class SwiotFaults;
-//class Max14906Tool; // TODO: rename this class
 }
 
 namespace libm2k::context {
@@ -54,19 +50,8 @@ public Q_SLOTS:
 
 private:
 	Ui::DataLoggerInfoPage *infoui;
-	//	Ui::SWIOTInfoPage *infoui;
-	//	Ui::ConfigMenu *configui;
-	//	Ui::SwiotRuntimeUI *rungui;
-	//	Ui::SwiotFaults *faultsgui;
-	//	Ui::Max14906Tool *maxgui;
-
 	DataLogger *tool;
 	DataLogger_API *api;
-	//	QWidget *config ;
-	//	QWidget *runtime;
-	//	QWidget *faults;
-	//	QWidget *maxtool;
-
 	IIOPingTask *ping;
 	CyclicalTask *cs;
 

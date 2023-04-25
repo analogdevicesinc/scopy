@@ -6,11 +6,11 @@
 #include <src/datalogger.hpp>
 
 namespace scopy {
+class CustomSwitch;
+
+namespace datalogger {
 
 class DataLoggerController;
-class CustomSwitch;
-//class Datalogger;
-
 class DataLogger_API:public ApiObject
 {
 	friend class ToolLauncher_API;
@@ -60,4 +60,6 @@ private:
 	DataLogger *dataLogger;
 };
 }
+}
+
 #endif // DATALOGGER_API_H

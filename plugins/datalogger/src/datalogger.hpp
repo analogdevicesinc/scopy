@@ -6,26 +6,18 @@
 #include <QWidget>
 #include <QFileDialog>
 #include <QRadioButton>
-#include <QJSEngine>
+#include <QLineEdit>
 #include <spinbox_a.hpp>
+#include <QJSEngine>
 #include <QElapsedTimer>
-#include <tool_view.hpp>
+#include <gui/tool_view.hpp>
 #include <flexgridlayout.hpp>
 
-//#include <filter.hpp>
-//#include <tool_launcher.hpp>
-//#include <tool.hpp>
-//#include "gui/tool_view_builder.hpp"
-//#include "dataloggerreaderthread.hpp"
-
 /* libm2k includes */
-//#include <libm2k/context.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
 #include <libm2k/m2k.hpp>
 #include <libm2k/analog/dmm.hpp>
-//#include <scopyExceptionHandler.h>
 #include <libm2k/m2kexceptions.hpp>
-//#include <core/toolmenuitem.h>
 #include <src/dataloggerreaderthread.hpp>
 
 namespace libm2k::context {
@@ -36,15 +28,19 @@ namespace scopy {
 namespace gui {
 class GenericMenu;
 class ChannelManager;
+class ChannelWidget;
+}
+
+class CustomSwitch;
+
+namespace datalogger {
+namespace gui {
+class ChannelMonitorComponent;
 class DataLoggerGenericMenu;
 }
 
-class ChannelWidget;
-class CustomColQGridLayout;
-class ChannelMonitorComponent;
 class DataLogger_API;
 class DataLoggerController;
-class CustomSwitch;
 
 class DataLogger : public QWidget
 {
@@ -56,7 +52,7 @@ public:
 	explicit DataLogger(libm2k::context::Context *ctx, QWidget *parent = nullptr);
 	~DataLogger();
 
-	gui::ToolView* getToolView();
+	scopy::gui::ToolView* getToolView();
 
 	CustomSwitch* showAllSWitch;
 	int getPrecision();
@@ -78,21 +74,21 @@ private:
 	QList<QColor> m_colors;
 	QMap<int,QColor> m_color;
 	DataLoggerController *dataLoggerController;
-	gui::ToolView* m_toolView;
+	scopy::gui::ToolView* m_toolView;
 	QScrollArea* m_scrollArea;
 	FlexGridLayout* m_flexGridLayout;
 	libm2k::context::Context* m_context;
 	std::vector<libm2k::analog::DMM*> m_dmmList;
-	gui::GenericMenu* m_generalSettingsMenu;
-	gui::ChannelManager* m_monitorChannelManager;
-	QMap<int,ChannelMonitorComponent*> m_activeChannels;
+	scopy::gui::GenericMenu* m_generalSettingsMenu;
+	scopy::gui::ChannelManager* m_monitorChannelManager;
+	QMap<int, datalogger::gui::ChannelMonitorComponent*> m_activeChannels;
 	DataLoggerReaderThread *readerThread;
 	QColor generateColor();
 	void initMonitorToolView();
 	QColor getChannelColor(int chId);
-	gui::GenericMenu* generateMenu(QString title, QColor* color);
+	scopy::gui::GenericMenu* generateMenu(QString title, QColor* color);
 	std::vector<libm2k::analog::DMM*> getDmmList(libm2k::context::Context* m2k_context);
-	void createConnections(gui::DataLoggerGenericMenu* mainMenu,gui::DataLoggerGenericMenu* menu,ChannelMonitorComponent* monitor);
+	void createConnections(gui::DataLoggerGenericMenu* mainMenu, gui::DataLoggerGenericMenu* menu, gui::ChannelMonitorComponent* monitor);
 
 Q_SIGNALS:
 	void precisionChanged(int precision);
@@ -101,6 +97,6 @@ Q_SIGNALS:
 	void toggleAll(bool showAll);
 	void disableActivateChannel(bool disable);
 };
-
+}
 }
 #endif // DATALOGGER_H
