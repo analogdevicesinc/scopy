@@ -8,6 +8,9 @@
 
 #include <libm2k/analog/dmm.hpp>
 
+namespace scopy {
+namespace datalogger {
+
 struct activeChannel{
 	std::string dmmId;
 	libm2k::analog::DMM* dmm;
@@ -36,5 +39,7 @@ private:
 	QMap<int,QPair<bool,activeChannel>> m_activeChannels ;
 
 };
+}
+}
 
 #endif // DATALOGGERREADERTHREAD_HPP
