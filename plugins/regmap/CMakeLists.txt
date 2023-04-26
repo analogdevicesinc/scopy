@@ -24,6 +24,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
+set(SCOPY_QT_COMPONENTS Widgets Xml Test)
+
 FILE(GLOB SRC_LIST  src/*.cpp src/*.cc src/*.hpp
     src/register/*.cpp src/register/*.hpp
     src/register/bitfield/*.cpp src/register/bitfield/*.hpp
@@ -42,8 +44,8 @@ set(PROJECT_SOURCES
     ${UI_LIST}
 )
 
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Xml Test)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
+
 find_package(libm2k REQUIRED)
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
@@ -58,7 +60,15 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Widgets scopy-pluginbase scopy-iioutil Qt${QT_VERSION_MAJOR}::Xml libm2k::libm2k Qt5::Test)
+foreach(comp ${SCOPY_QT_COMPONENTS})
+    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
+endforeach()
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+	${SCOPY_QT_LIBRARIES}
+	scopy-pluginbase
+	scopy-iioutil
+	libm2k::libm2k)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
