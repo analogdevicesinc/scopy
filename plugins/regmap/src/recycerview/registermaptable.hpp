@@ -1,5 +1,5 @@
-#ifndef RECYCLERVIEWADAPTER_HPP
-#define RECYCLERVIEWADAPTER_HPP
+#ifndef REGISTERMAPTABLE_H
+#define REGISTERMAPTABLE_H
 
 #include "irecyclerviewadapter.hpp"
 
@@ -9,15 +9,16 @@
 class RegisterSimpleWidget;
 class RegisterModel;
 class RecyclerView;
-class RecyclerViewAdapter : public IRecyclerViewAdapter
+class RegisterMapTable : public IRecyclerViewAdapter
 {
     Q_OBJECT
 public:
-    RecyclerViewAdapter(QMap<uint32_t, RegisterModel*> *registerModels);
+    RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels);
 
     QWidget* getWidget();
     void setFilters(QList<uint32_t> filters);
     void valueUpdated(uint32_t address, uint32_t value);
+    void scrollTo(uint32_t index);
 
     // IRecyclerViewAdapter interface
     void generateWidget(int index);
@@ -32,4 +33,4 @@ private:
     QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
 };
 
-#endif // RECYCLERVIEWADAPTER_HPP
+#endif // REGISTERMAPTABLE_H

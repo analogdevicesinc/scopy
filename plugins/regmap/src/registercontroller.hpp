@@ -21,7 +21,7 @@ public:
 	~RegisterController();
 
 	void registerChanged(uint32_t address);
-	void registerValueChanged(QString value);
+    void registerValueChanged(QString value);
 
 private:
 

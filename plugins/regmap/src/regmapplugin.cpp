@@ -36,14 +36,14 @@ bool REGMAPPlugin::loadIcon()
 
 void REGMAPPlugin::loadToolList()
 {
-    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY(0,"Regmap",""));
+    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap","Register Map",":/gui/icons/scopy-default/icons/tool_debugger.svg"));
 }
 
 void REGMAPPlugin::unload()
 {
     //TODO
-     auto &&cp = ContextProvider::GetInstance();
-     cp->close(m_param);
+    auto &&cp = ContextProvider::GetInstance();
+    cp->close(m_param);
 }
 
 bool REGMAPPlugin::compatible(QString m_param, QString category)
@@ -65,18 +65,18 @@ bool REGMAPPlugin::compatible(QString m_param, QString category)
 
 void REGMAPPlugin::preload()
 {
-//    auto &&cp = ContextProvider::GetInstance();
-//    iio_context* ctx = cp->open(m_uri);
+    //    auto &&cp = ContextProvider::GetInstance();
+    //    iio_context* ctx = cp->open(m_uri);
 
-//    m_deviceList = new QList<iio_device*>();
+    //    m_deviceList = new QList<iio_device*>();
 
-//    auto deviceCount = iio_context_get_devices_count(ctx);
+    //    auto deviceCount = iio_context_get_devices_count(ctx);
 
-//    for (int i = 0; i < deviceCount; i++) {
-//        iio_device *dev = iio_context_get_device(ctx, i);
-//        qDebug(CAT_REGMAP)<<"DEVICE FOUND " << iio_device_get_name(dev);
-//        m_deviceList->push_back(dev);
-//    }
+    //    for (int i = 0; i < deviceCount; i++) {
+    //        iio_device *dev = iio_context_get_device(ctx, i);
+    //        qDebug(CAT_REGMAP)<<"DEVICE FOUND " << iio_device_get_name(dev);
+    //        m_deviceList->push_back(dev);
+    //    }
 
 }
 
@@ -106,11 +106,6 @@ bool REGMAPPlugin::onConnect()
         for (int i = 0; i < m_deviceList->size(); ++i) {
             iio_device *dev = m_deviceList->at(i);
             qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << iio_device_get_name(dev);
-            IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(dev);
-            IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(dev);
-            RegisterMapValues *registerMapValues = new RegisterMapValues();
-            registerMapValues->setReadStrategy(iioReadStrategy);
-            registerMapValues->setWriteStrategy(iioWriteStrategy);
 
             //TODO SEARCH THROW LIST OF TEMPLATES
             // if device has template
@@ -120,13 +115,13 @@ bool REGMAPPlugin::onConnect()
                 RegisterMapTemplate *registerMapTemplate = new RegisterMapTemplate();
                 XmlFileManager xmlFileManager(dev, "/home/ubuntu/Documents/RegisterMapDemo/ad9361-phy.xml");
                 registerMapTemplate->setRegisterList(xmlFileManager.getAllRegisters());
-                regMapInstrument->addTab( new DeviceRegisterMap(registerMapTemplate,registerMapValues), "ad9361");
+
+                regMapInstrument->addTab( dev, iio_device_get_name(dev), "/home/ubuntu/Documents/RegisterMapDemo/ad9361-phy.xml");
+
             } else {
                 regMapInstrument->addTab(dev, iio_device_get_name(dev));
             }
-
         }
-
         layout->addWidget(regMapInstrument);
 
         m_toolList[0]->setEnabled(true);
@@ -149,7 +144,7 @@ bool REGMAPPlugin::onDisconnect()
 void REGMAPPlugin::initMetadata()
 {
     loadMetadata(
-                R"plugin(
+        R"plugin(
 	{
 	   "priority":3,
 	   "category":[
