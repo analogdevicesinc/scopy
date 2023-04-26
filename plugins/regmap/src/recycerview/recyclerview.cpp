@@ -14,13 +14,16 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
 {
     this->installEventFilter(this);
     this->setLayout(new QHBoxLayout());
+    layout()->setMargin(0);
+    layout()->setSpacing(0);
 
     bitFieldsWidgetLayout = new QGridLayout();
-    setStyleSheet("border: 1px solid black");
+    bitFieldsWidgetLayout->setMargin(0);
+    bitFieldsWidgetLayout->setSpacing(0);
     QWidget *bitFieldsWidget = new QWidget();
     bitFieldsWidget->setLayout(bitFieldsWidgetLayout);
 
-    VerticalScrollArea *m_scrollArea = new VerticalScrollArea();
+    m_scrollArea = new VerticalScrollArea();
     m_scrollArea->setWidget(bitFieldsWidget);
     m_scrollArea->verticalScrollBar()->setVisible(false);
     this->layout()->addWidget(m_scrollArea);
@@ -45,9 +48,9 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
 
 RecyclerView::~RecyclerView()
 {
-    delete slider;
     delete bitFieldsWidgetLayout;
     delete widgetMap;
+    delete m_scrollArea;
 }
 
 void RecyclerView::init()
@@ -97,9 +100,6 @@ void RecyclerView::addWidget(int index, QWidget *widget)
 
 QWidget *RecyclerView::getWidgetAtIndex(int index)
 {
-    if (widgetMap->value(index) == bitFieldsWidgetLayout->itemAtPosition(index,0)->widget()){
-        qDebug()<<"TRUE";
-    }
     return widgetMap->value(index);
 }
 
@@ -122,6 +122,17 @@ void RecyclerView::showAll()
 void RecyclerView::setActiveWidgets(QList<int> *widgets)
 {
     this->widgets = widgets;
+}
+
+void RecyclerView::scrollTo(int index)
+{
+    m_scrollArea->verticalScrollBar()->setValue(0);
+    slider->setValue(index);
+}
+
+void RecyclerView::setMaxrowCount(int maxRowCount)
+{
+    this->maxRowCount = maxRowCount;
 }
 
 void RecyclerView::scrollDown()
@@ -157,19 +168,17 @@ void RecyclerView::scrollUp()
 
 void RecyclerView::populateMap()
 {
-
     QList<int>::iterator mapIterator = widgets->begin();
-
     if (widgetMap->isEmpty()) {
         Q_EMIT requestWidget(*mapIterator);
         ++mapIterator;
     }
 
     //TODO find a way to autocompute max row count
-    MAX_ROW_COUNT = 3;//this->size().height()/ widgetMap->value(0)->sizeHint().height();
+    maxRowCount = 5;
 
     int i = 0;
-    while ( i < MAX_ROW_COUNT && mapIterator != widgets->end()) {
+    while ( i < maxRowCount && mapIterator != widgets->end()) {
         if (widgetMap->contains(*mapIterator)) {
             widgetMap->value(*mapIterator)->show();
         }

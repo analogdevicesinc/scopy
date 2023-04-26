@@ -68,6 +68,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	${SCOPY_QT_LIBRARIES}
 	scopy-pluginbase
 	scopy-iioutil
-	libm2k::libm2k)
+        scopy-gui
+        scopy-core
+        Qt${QT_VERSION_MAJOR}::Xml
+        libm2k::libm2k
+        Qt5::Test)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

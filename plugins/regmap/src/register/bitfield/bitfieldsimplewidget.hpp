@@ -1,11 +1,13 @@
 #ifndef BITFIELDSIMPLEWIDGET_HPP
 #define BITFIELDSIMPLEWIDGET_HPP
 
+#include <QFrame>
 #include <QWidget>
+
 
 class QVBoxLayout;
 class QLabel;
-class BitFieldSimpleWidget : public QWidget
+class BitFieldSimpleWidget : public QFrame
 {
 	Q_OBJECT
 public:

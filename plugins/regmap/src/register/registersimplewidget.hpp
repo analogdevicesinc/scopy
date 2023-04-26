@@ -2,13 +2,14 @@
 #define REGISTERSIMPLEWIDGET_HPP
 
 #include <QColor>
+#include <QFrame>
 #include <QWidget>
 #include <qstring.h>
 
 class QLabel;
 class BitFieldSimpleWidget;
 class QHBoxLayout;
-class RegisterSimpleWidget : public QWidget
+class RegisterSimpleWidget : public QFrame
 {
 	Q_OBJECT
 public:
@@ -31,6 +32,7 @@ private:
 	QMap<QString, QColor> *m_colors;
 	QColor getColor(QString description);
 	QString address;
+    int registerWidth;
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 Q_SIGNALS:
