@@ -197,7 +197,7 @@ private:
 };
 
 
-class SetFreqEvent:public QEvent
+class SCOPY_GUI_EXPORT SetFreqEvent:public QEvent
 {
 public:
   SetFreqEvent(const double, const double);
