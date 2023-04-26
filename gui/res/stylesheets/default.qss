@@ -680,3 +680,7 @@ QPushButton[userNote=true]:checked {
  background-image: url(:/gui/icons/scopy-default/icons/note_checked.svg);
 }
 
+*[has_frame=true] {
+ border: 2px solid black;
+
+}

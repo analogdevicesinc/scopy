@@ -21,10 +21,12 @@ RegisterController::RegisterController(QWidget *parent)
 
     // make address a spinbox with custom value for custom hexa values ?
     QHBoxLayout *addressLayout = new QHBoxLayout();
-    addressLayout->addWidget(new QLabel("Address: "));
+    addressLayout->addWidget(new QLabel("Address: "),1);
     addressPicker = new QSpinBox();
     addressPicker->setDisplayIntegerBase(16);
     addressPicker->setMinimum(0);
+    addressPicker->setMaximum(INT_MAX);
+    addressPicker->setPrefix("0x");
 
     QObject::connect(addressPicker, &QSpinBox::textChanged, this, [=](QString address){
         addressChanged = true;
@@ -32,11 +34,11 @@ RegisterController::RegisterController(QWidget *parent)
         Q_EMIT	registerAddressChanged(address.toInt(&ok,16));
     });
 
-    addressLayout->addWidget(addressPicker);
+    addressLayout->addWidget(addressPicker,8);
 
     QHBoxLayout *valueLayout = new QHBoxLayout();
-    valueLayout->addWidget(new QLabel("Value: "));
-    valueLayout->addWidget(regValue);
+    valueLayout->addWidget(new QLabel("Value: "),1);
+    valueLayout->addWidget(regValue,8);
 
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout();
