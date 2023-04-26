@@ -111,6 +111,10 @@ set_target_properties(${PROJECT_NAME}  PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+configure_file(windows/scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy.iss @ONLY)
+configure_file(windows/scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-32.iss @ONLY)
+configure_file(windows/scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-64.iss @ONLY)
+
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
 
 if(QT_VERSION_MAJOR EQUAL 6)
