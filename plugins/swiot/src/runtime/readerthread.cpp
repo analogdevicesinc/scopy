@@ -150,8 +150,8 @@ void ReaderThread::runBuffered() {
                                 int idx = 0;
                                 double data = 0.0;
 
-                                u_int32_t* startAdr = (uint32_t*)iio_buffer_start(m_iioBuff);
-                                u_int32_t* endAdr = (uint32_t*)iio_buffer_end(m_iioBuff);
+                                uint32_t* startAdr = (uint32_t*)iio_buffer_start(m_iioBuff);
+                                uint32_t* endAdr = (uint32_t*)iio_buffer_end(m_iioBuff);
                                 m_bufferData.clear();
                                 for (int i=0; i < m_enabledChnlsNo; i++){
                                         m_bufferData.push_back({});

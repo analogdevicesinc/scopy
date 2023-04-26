@@ -33,7 +33,7 @@ endif()
 
 option(WITH_PYTHON "Enable Python" ON)
 
-if(${WITH_PYTHON2})
+if(${WITH_PYTHON})
     set(Python_ADDITIONAL_VERSIONS 3)
     find_package(PythonInterp REQUIRED)
     set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
