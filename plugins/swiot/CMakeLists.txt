@@ -24,6 +24,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
+set(SCOPY_QT_COMPONENTS Widgets Concurrent Svg Xml)
+
 FILE(GLOB SRC_LIST
 	src/config/*.cpp
 	src/config/*.cc
@@ -61,7 +63,7 @@ set(PROJECT_SOURCES
 	${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Concurrent Svg REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
@@ -88,8 +90,17 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg Qt${QT_VERSION_MAJOR}::Concurrent
-	scopy-pluginbase scopy-iioutil scopy-gui scopy-core ${QWT_LIBRARIES})
+foreach(comp ${SCOPY_QT_COMPONENTS})
+    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
+endforeach()
+
+target_link_libraries(${PROJECT_NAME} PUBLIC
+	${SCOPY_QT_LIBRARIES}
+	scopy-pluginbase
+	scopy-iioutil
+	scopy-gui
+	scopy-core
+	${QWT_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 

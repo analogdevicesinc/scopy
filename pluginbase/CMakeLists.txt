@@ -62,6 +62,8 @@ foreach(comp ${SCOPY_QT_COMPONENTS})
     set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC  ${SCOPY_QT_LIBRARIES} iio)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+	${SCOPY_QT_LIBRARIES}
+	iio)
 
 
