@@ -6,7 +6,7 @@
 #include <QWidget>
 #include "scopyregmap_export.h"
 
-class RecyclerViewAdapter;
+class RegisterMapTable;
 class QVBoxLayout;
 class RegisterModel;
 class RegisterDetailedWidget;
@@ -14,30 +14,45 @@ class RegisterController;
 class RegisterMapValues;
 class RegisterMapTemplate;
 class SearchBarWidget;
-//class RegisterMapTable;
 
+
+class QMainWindow;
+namespace scopy::regmap{
+namespace gui {
+class RegisterMapSettingsMenu;
+}
 class SCOPYREGMAP_EXPORT DeviceRegisterMap : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate = nullptr, RegisterMapValues *registerMapValues = nullptr,  QWidget *parent = nullptr);
-	~DeviceRegisterMap();
+    explicit DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate = nullptr, RegisterMapValues *registerMapValues = nullptr,  QWidget *parent = nullptr);
+    ~DeviceRegisterMap();
 
-	void registerChanged(RegisterModel *regModel);
+    void registerChanged(RegisterModel *regModel);
+    void toggleAutoread(bool toggled);
 
 private:
-	QVBoxLayout *layout;
-	RegisterMapTemplate *registerMapTemplate ;
-	RegisterMapValues *registerMapValues;
-	RegisterController *registerController = nullptr;
 
-	SearchBarWidget *searchBarWidget = nullptr;
-//	RegisterMapTable *registerMapTableWidget = nullptr;
-    RecyclerViewAdapter *recycerViewAdapter = nullptr;
+    bool autoread = false;
+    QVBoxLayout *deviceRegisterMapLayout;
+    QMainWindow *mainWindow;
+    RegisterMapTemplate *registerMapTemplate ;
+    RegisterMapValues *registerMapValues;
+    RegisterController *registerController = nullptr;
 
-	RegisterDetailedWidget *registerDetailedWidget = nullptr;
+    SearchBarWidget *searchBarWidget = nullptr;
+    RegisterMapTable *registerMapTableWidget = nullptr;
+
+    RegisterDetailedWidget *registerDetailedWidget = nullptr;
+
+    gui::RegisterMapSettingsMenu *settings;
+    void initSettings();
 Q_SIGNALS:
+    void requestRead(uint32_t address);
+    void requestWrite(uint32_t address, uint32_t value);
+    void requestRegisterDump(QString path);
+
 
 };
-
+}
 #endif // DEVICEREGISTERMAP_HPP

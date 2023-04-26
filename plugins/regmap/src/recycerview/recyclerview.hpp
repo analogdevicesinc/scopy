@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QMap>
 
+#include <src/verticalscrollarea.hpp>
+
 class QSlider;
 class QGridLayout;
 class RecyclerView : public QWidget
@@ -23,6 +25,8 @@ public:
     void hideAll();
     void showAll();
     void setActiveWidgets(QList<int> *widgets);
+    void scrollTo(int index);
+    void setMaxrowCount(int maxRowCount);
 
     void init();
     void populateMap();
@@ -31,8 +35,9 @@ Q_SIGNALS:
     void requestWidget(int index);
 
 private:
-    int MAX_ROW_COUNT;
+    int maxRowCount;
     QSlider *slider ;
+    VerticalScrollArea *m_scrollArea;
     int m_scrollBarCurrentValue;
 
     QGridLayout *bitFieldsWidgetLayout;
@@ -44,8 +49,6 @@ private:
 
     void scrollDown();
     void scrollUp();
-
-
 
     // QObject interface
 public:

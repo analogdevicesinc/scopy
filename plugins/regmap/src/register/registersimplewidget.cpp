@@ -4,110 +4,114 @@
 #include <qboxlayout.h>
 #include <qcoreevent.h>
 #include <qdebug.h>
+#include "dynamicWidget.h"
+#include <src/utils.hpp>
 
 RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QString description,
-					   QString notes,int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields, QWidget *parent)
-	:bitFields(bitFields),
-	  address(address)
+                                           QString notes,int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields, QWidget *parent)
+    :bitFields(bitFields),
+    registerWidth(registerWidth),
+    address(address)
 {
-	installEventFilter(this);
+    installEventFilter(this);
 
-	setMinimumWidth(10);
-	setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    scopy::setDynamicProperty(this, "has_frame", true);
 
-	m_colors = new QMap<QString, QColor>();
+    setMinimumWidth(10);
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    m_colors = new QMap<QString, QColor>();
 
-	QHBoxLayout *layout = new QHBoxLayout();
-	setLayout(layout);
 
-	QVBoxLayout *regBaseInfo = new QVBoxLayout();
-	regBaseInfo->addWidget(new QLabel(address + " " + name));
-	value = new QLabel("Value: Not Read");
-	regBaseInfo->addWidget(value);
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->setMargin(0);
+    layout->setSpacing(0);
+    setLayout(layout);
 
-	layout->addLayout(regBaseInfo,1);
 
-	// add bitfield widgets
 
-	QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
-	int bits = bitFields->length() - 1;
-	int row = 0;
-	int col = 0;
+    bool ok;
 
-	while (bits >= 0 ) {
-//		QColor color = getColor(bitFields->at(bits)->getDescription());
-//		bitFields->at(bits)->setStyleSheet("background-color: rgb(" + QString::number(color.red()) + "," + QString::number(color.green()) +"," + QString::number(color.blue()) + ");");
-		int streach = bitFields->at(bits)->getStreach();
-		bitFieldsWidgetLayout->addWidget(bitFields->at(bits), row, col, 1, streach);
-		col += streach;
-		if (col > 7) {
-			row++;
-			col = 0;
-		}
-		--bits;
-	}
+    QFrame *regBaseInfoWidget = new QFrame();
+    scopy::setDynamicProperty(regBaseInfoWidget,"has_frame",true);
+    QVBoxLayout *regBaseInfo = new QVBoxLayout();
+    regBaseInfo->addWidget(new QLabel(Utils::convertToHexa(address.toInt(&ok,16),registerWidth) + " " + name));
+    value = new QLabel("Value: Not Read");
+    regBaseInfo->addWidget(value);
 
-	for (int i = 0; i < bitFieldsWidgetLayout->columnCount(); i++){
-		bitFieldsWidgetLayout->setColumnStretch(i,1);
-	}
+    regBaseInfoWidget->setLayout(regBaseInfo);
+    layout->addWidget(regBaseInfoWidget,1);
 
-	layout->addLayout(bitFieldsWidgetLayout,8);
+    // add bitfield widgets
+    QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
 
-	QString toolTip = "Name : " + name + "\n"
-			+ "Address : " + address + "\n"
-			+ "Description : " + description + "\n"
-			+ "Notes : " + notes + "\n" ;
+    int bits = bitFields->length() - 1;
+    int row = 0;
+    int col = 0;
+    while (bits >= 0 ) {
+        int streach = bitFields->at(bits)->getStreach();
+        bitFieldsWidgetLayout->addWidget(bitFields->at(bits), row, col, 1, streach);
+        col += streach;
+        if (col > 7) {
+            row++;
+            col = 0;
+        }
+        --bits;
+    }
 
-	setToolTip(toolTip);
+    for (int i = 0; i < bitFieldsWidgetLayout->columnCount(); i++){
+        bitFieldsWidgetLayout->setColumnStretch(i,1);
+    }
+
+    layout->addLayout(bitFieldsWidgetLayout,8);
+
+    QString toolTip = "Name : " + name + "\n"
+                      + "Address : " + Utils::convertToHexa(address.toInt(&ok,16), registerWidth) + "\n"
+                      + "Description : " + description + "\n"
+                      + "Notes : " + notes + "\n" ;
+
+    setToolTip(toolTip);
 }
 
 RegisterSimpleWidget::~RegisterSimpleWidget()
 {
-	delete value;
+    delete value;
 }
 
 void RegisterSimpleWidget::valueUpdated(uint32_t value)
 {
-	int regOffset = 0;
-	for (int i = 0; i < bitFields->length(); ++i) {
-		bitFields->at(i)->blockSignals(true);
+    int regOffset = 0;
+    for (int i = 0; i < bitFields->length(); ++i) {
+        bitFields->at(i)->blockSignals(true);
 
-		int width = bitFields->at(i)->getWidth();
-		int bfVal = ( ((1 << (regOffset + width) ) - 1 ) & value) >> regOffset;
-		QString bitFieldValue =  QString::number(bfVal,16);
-//		if (bitFieldValue.size() < width) {
-//			QString aux = "";
-//			while ( aux.size() < (width - bitFieldValue.size() )) {
-//				aux += "0";
-//			}
-//			bitFieldValue = aux + bitFieldValue;
-//		}
-		bitFields->at(i)->updateValue(bitFieldValue);
-		regOffset += width;
+        int width = bitFields->at(i)->getWidth();
+        int bfVal = ( ((1 << (regOffset + width) ) - 1 ) & value) >> regOffset;
+        QString bitFieldValue = Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
+        bitFields->at(i)->updateValue(bitFieldValue);
+        regOffset += width;
 
-		bitFields->at(i)->blockSignals(false);
-	}
-	this->value->setText(QString::number(value,16));
+        bitFields->at(i)->blockSignals(false);
+    }
+    this->value->setText(Utils::convertToHexa(value,registerWidth));
 }
 
 QColor RegisterSimpleWidget::getColor(QString description)
 {
 
-	if (m_colors->contains(description)) return m_colors->value(description);
+    if (m_colors->contains(description)) return m_colors->value(description);
 
-	int red = rand() % 256;
-	int blue = rand() % 256;
-	int green = rand() % 256;
-	m_colors->insert(description, QColor(red,green,blue));
-	return m_colors->value(description);
+    int red = rand() % 256;
+    int blue = rand() % 256;
+    int green = rand() % 256;
+    m_colors->insert(description, QColor(red,green,blue));
+    return m_colors->value(description);
 }
 
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
 {
-	if (event->type() == QEvent::MouseButtonDblClick) {
-		bool ok;
-		Q_EMIT registerSelected(address.toInt(&ok,16));
-	}
-	return QWidget::eventFilter(object,event);
+    if (event->type() == QEvent::MouseButtonDblClick) {
+        bool ok;
+        Q_EMIT registerSelected(address.toInt(&ok,16));
+    }
+    return QWidget::eventFilter(object,event);
 }
 

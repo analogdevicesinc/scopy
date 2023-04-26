@@ -2,6 +2,7 @@
 #define BitFieldDetailedWidget_HPP
 
 #include <QWidget>
+#include <QFrame>
 
 class QLabel;
 class QLineEdit;
@@ -9,7 +10,7 @@ class QCheckBox;
 class QComboBox;
 class QVBoxLayout;
 
-class BitFieldDetailedWidget : public QWidget
+class BitFieldDetailedWidget : public QFrame
 {
 	Q_OBJECT
 public:
