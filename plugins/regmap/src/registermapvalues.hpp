@@ -22,6 +22,7 @@ public:
 	uint32_t getValueOfRegister(uint32_t address);
 	void setReadStrategy(IRegisterReadStrategy *readStrategy);
 	void setWriteStrategy(IRegisterWriteStrategy *writeStrategy);
+    void registerDump(QString path);
 
 	IRegisterReadStrategy *getReadStrategy() const;
 
