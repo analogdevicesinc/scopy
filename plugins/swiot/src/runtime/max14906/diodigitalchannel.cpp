@@ -29,19 +29,6 @@ DioDigitalChannel::DioDigitalChannel(const QString& deviceName, const QString& d
 		this->ui->customSwitch->setVisible(false);
 	}
 
-	this->ui->scaleChannel->setOrientation(Qt::Horizontal);
-	this->ui->scaleChannel->setScalePosition(QwtThermo::LeadingScale);
-	this->ui->scaleChannel->setOriginMode(QwtThermo::OriginCustom);
-	this->ui->scaleChannel->setMinimumSize(100, 50);
-	this->ui->scaleChannel->setAutoScaler(true);
-	this->ui->scaleChannel->setScale(0, 1);
-	this->ui->scaleChannel->setAutoScaler(false);
-	this->ui->scaleChannel->setScaleStepSize(1);
-	this->ui->scaleChannel->setOrientation(Qt::Horizontal);
-	this->ui->scaleChannel->setScalePosition(QwtThermo::LeadingScale);
-	this->ui->scaleChannel->setOriginMode(QwtThermo::OriginCustom);
-	this->ui->scaleChannel->setStyleSheet("font-size:16px;");
-
 	this->ui->sismograph->setPlotAxisXTitle(""); // clear title
 	this->ui->sismograph->setAxisScale(0, 0, 1, 1); // y axis
 	this->ui->sismograph->setAutoscale(false);
@@ -87,7 +74,7 @@ void DioDigitalChannel::addDataSample(double value) {
 	this->ui->sismograph->plot(value);
 	this->ui->sismograph->plot(value);
 	this->ui->sismograph->plot(value);
-	this->ui->scaleChannel->setValue(value);
+//	this->ui->scaleChannel->setValue(value);
 	this->ui->lcdNumber->display(value);
 }
 
