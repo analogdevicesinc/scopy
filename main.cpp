@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 					 "swiotConfig.debug=true\n"
 					 "CyclicalTask.debug=false\n"
 					 "SWIOTPlugin.debug=true\n"
+					 "AD74413R.debug=true\n"
 					 );
 
 	QCoreApplication::setOrganizationName("ADI");
