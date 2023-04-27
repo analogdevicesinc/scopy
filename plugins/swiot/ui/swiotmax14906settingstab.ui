@@ -34,7 +34,11 @@
     </spacer>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_maxTimer"/>
+    <layout class="QVBoxLayout" name="verticalLayout_maxTimer">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+    </layout>
    </item>
    <item>
     <spacer name="verticalSpacer">
