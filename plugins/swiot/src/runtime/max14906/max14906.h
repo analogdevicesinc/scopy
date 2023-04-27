@@ -43,7 +43,6 @@ private:
 	scopy::gui::ToolView *m_toolView;
 	FlexGridLayout* m_customColGrid;
 	scopy::gui::GenericMenu* m_generalSettingsMenu;
-	scopy::gui::ChannelManager* m_monitorChannelManager;
 	scopy::gui::SubsectionSeparator *settingsWidgetSeparator;
 	QTimer *m_qTimer;
 

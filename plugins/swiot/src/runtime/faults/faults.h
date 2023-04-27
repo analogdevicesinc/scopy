@@ -46,7 +46,6 @@ private:
 	uint32_t max14906_numeric;
 
 	scopy::gui::ToolView *m_toolView{};
-	scopy::gui::ChannelManager *m_monitorChannelManager{};
 	FaultsPage *m_faultsPage{};
 };
 }
