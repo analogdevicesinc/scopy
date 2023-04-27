@@ -73,13 +73,9 @@ bool SWIOTPlugin::compatible(QString m_param, QString category)
 
 	unsigned int devices_count = iio_context_get_devices_count(ctx);
 	if (devices_count >= 2) {
-		iio_device* device0 = iio_context_get_device(ctx, 0);
-		iio_device* device1 = iio_context_get_device(ctx, 1);
-
-		std::string device0_name = iio_device_get_name(device0);
-		std::string device1_name = iio_device_get_name(device1);
-
-		if ((device0_name == "ad74413r" && device1_name == "max14906") || (device0_name == "max14906" && device1_name == "ad74413r")) {
+		iio_device* device0 = iio_context_find_device(ctx, "ad74413r");
+		iio_device* device1 = iio_context_find_device(ctx, "max14906");
+		if (device0 && device1) {
 			ret = true;
 		} else {
 			ret = false;
@@ -147,7 +143,7 @@ void SWIOTPlugin::setupToolList()
 			m_swiotController->startSwitchContextTask();
 		});
 	} else {
-		adtool = new swiot::Ad74413r(ctx, channel_function);
+		adtool = new swiot::Ad74413r(ctx, m_chnlsFunction);
 		faults = new swiot::Faults(ctx);
 		maxtool = new swiot::Max14906(ctx);
 		m_toolList[1]->setEnabled(true);
