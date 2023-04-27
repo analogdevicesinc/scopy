@@ -16,6 +16,11 @@ ReaderThread::ReaderThread(bool isBuffered, QObject *parent)
         lock = new QMutex();
 }
 
+ReaderThread::~ReaderThread()
+{
+	destroyIioBuffer();
+}
+
 void ReaderThread::addDioChannel(int index, struct iio_channel *channel) {
         this->m_dioChannels.insert(index, channel);
 }
@@ -46,9 +51,8 @@ double ReaderThread::convertData(unsigned int data, int idx)
         data <<= 8;
         data = SWAP_UINT32(data);
         data &= 0x0000FFFF;
-        //	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second;
-        convertedData = data;
-        return data;
+	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second * 0.001;
+	return convertedData;
 }
 
 void ReaderThread::enableIioChnls()
@@ -142,9 +146,7 @@ void ReaderThread::runBuffered() {
                 if (m_iioBuff) {
                         bufferCounter++;
                         lock->lock();
-//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" Before refill" ;
                         int refillBytes = iio_buffer_refill(m_iioBuff);
-//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(bufferCounter)+" After refill";
                         if (refillBytes > 0) {
                                 int i = 0;
                                 int idx = 0;

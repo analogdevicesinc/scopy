@@ -45,9 +45,9 @@ void BufferLogic::createChannels()
 			if (erno < 0) {
 				scale = -1;
 				offset = -1;
-			} else {
-				plotChnlsNo = (!isOutput) ? (plotChnlsNo + 1) : plotChnlsNo;
 			}
+			auto isBufferedChnl = iio_channel_is_scan_element(iioChnl);
+			plotChnlsNo = (!isOutput && isBufferedChnl) ? (plotChnlsNo + 1) : plotChnlsNo;
 			chnlInfo->chnlId = chnlId;
 			chnlInfo->iioChnl = iioChnl;
 			chnlInfo->isEnabled = false;

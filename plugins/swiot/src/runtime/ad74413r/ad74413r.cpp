@@ -293,9 +293,8 @@ void Ad74413r::onSingleBtnPressed()
 
 void Ad74413r::onSingleCaptureFinished()
 {
-	m_readerThread->requestInterruption();
-	m_plotHandler->setSingleCapture(false);
 	m_toolView->getSingleBtn()->setChecked(false);
+	m_readerThread->requestInterruption();
 }
 
 void Ad74413r::verifyChnlsChanges()
@@ -328,6 +327,10 @@ QPushButton* Ad74413r::createBackBtn()
 void Ad74413r::onReaderThreadFinished()
 {
 	qDebug(CAT_SWIOT_AD74413R) << "reader thread finished";
+	bool singleCaptureOn = m_plotHandler->singleCapture();
+	if (singleCaptureOn) {
+		m_plotHandler->setSingleCapture(false);
+	}
 	if (m_toolView->getRunBtn()->isChecked() || m_toolView->getSingleBtn()->isChecked()) {
 		m_plotHandler->resetPlotParameters();
 		m_readerThread->start();

@@ -1,6 +1,7 @@
 #include "bufferplothandler.h"
 #include <QGridLayout>
 #include <gui/filemanager.h>
+#include "qcolormap.h"
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>
@@ -26,12 +27,15 @@ BufferPlotHandler::~BufferPlotHandler()
 			m_dataPoints[i] = nullptr;
 		}
 	}
+	if (m_plot) {
+		delete m_plot;
+	}
 }
 
 void BufferPlotHandler::initPlot(int plotChnlsNo)
 {
 	//the last 4 channels are for diagnostic
-	int configuredChnlsNo = plotChnlsNo / 2;
+	int configuredChnlsNo = plotChnlsNo - DIAG_CHNLS_NUMBER;
 
 	m_enabledPlots = std::vector<bool>(plotChnlsNo, false);
 
@@ -69,62 +73,68 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		} else {
 			m_plot->Curve(i)->setTitle("DIAG " + QString::number(i+1));
 		}
-
 		m_plot->DetachCurve(i);
-
 	}
-	m_plot->setAllYAxis(-10, 10);
+	m_plot->setAllYAxis(-5, 5);
 	m_plot->setOffsetInterval(__DBL_MIN__, __DBL_MAX__);
 }
 
+//bufferCounter is used only for debug
 void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, int bufferCounter)
 {
 	int bufferDataSize = bufferData.size();
-	int j = 0;
+	int enPlotIndex = 0;
 	bool rolling = false;
-	int dataPointsNumber = m_buffersNumber * m_bufferSize;
-
 	m_lock->lock();
+	resetDataPoints();
 	if (!(m_singleCapture && (m_bufferIndex == m_buffersNumber))) {
 		if (bufferDataSize > 0) {
-			for (int i = 0; i < m_dataPoints.size(); i++) {
+			for (int i = 0; i < m_dataPointsDeque.size(); i++) {
 				if (m_bufferIndex == m_buffersNumber)
 				{
-					memmove(m_dataPoints[i], m_dataPoints[i] + m_bufferSize, (dataPointsNumber - m_bufferSize) * sizeof(double));
-					rolling = true;
+					int dequeSize = m_dataPointsDeque[i].size();
+					if (dequeSize > 0) {
+						m_dataPointsDeque[i].pop_front();
+						rolling = true;
+					}
 				}
 				if (m_enabledPlots[i]) {
-					if (j < bufferDataSize) {
-						memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[j][0], (bufferData[j].size() * sizeof(double)));
-						j++;
-					} else {
-						memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
+					if (enPlotIndex < bufferDataSize) {
+						m_dataPointsDeque[i].push_back(bufferData[enPlotIndex]);
+						enPlotIndex++;
 					}
-
-				} else {
-					memmove(m_dataPoints[i] + m_plotDataIndex, &bufferData[0][0], bufferData[0].size() * sizeof(double));
 				}
-
 			}
 			if (!rolling) {
 				m_bufferIndex++;
-				m_plotDataIndex+=m_bufferSize;
 			}
-			if (m_plotDataIndex >= dataPointsNumber - 1) {
-				m_plotDataIndex-=m_bufferSize;
-			}
+			drawPlot();
 		}
 	} else {
 		Q_EMIT singleCaptureFinished();
 	}
-	m_plot->plotNewData("Active Channels", m_dataPoints, m_plotSampleNumber, 1);
 	m_lock->unlock();
+}
+
+void BufferPlotHandler::drawPlot()
+{
+	int dataPointsNumber = m_bufferIndex*m_bufferSize;
+	for (int i = 0; i < m_dataPointsDeque.size(); i++) {
+		m_dataPoints.push_back(new double[dataPointsNumber]());
+		int dequeSize = m_dataPointsDeque[i].size();
+		if (dequeSize > 0) {
+			for (int j = 0; j < dequeSize; j++) {
+				std::copy(m_dataPointsDeque[i][j].begin(),m_dataPointsDeque[i][j].end(), m_dataPoints[i] + (j*m_bufferSize));
+			}
+		}
+	}
+	m_plot->plotNewData("Active Channels", m_dataPoints, dataPointsNumber, 1);
+
 }
 
 void BufferPlotHandler::onPlotChnlsChanges(std::vector<bool> enabledPlots)
 {
 	m_enabledPlots = enabledPlots;
-	qDebug(CAT_SWIOT_AD74413R) << "Sample number on chnl changes:" << QString::number(m_plotSampleNumber);
 }
 
 void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
@@ -182,7 +192,9 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 				fm.save(data, "CH" + chNo + "(V)");
 			}
 		}
-		fm.setSampleRate(m_plotSampleNumber);
+		auto enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
+		auto plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
+		fm.setSampleRate(plotSampleRate);
 		fm.performWrite();
 	}
 }
@@ -218,9 +230,8 @@ QWidget *BufferPlotHandler::getPlotWidget() const
 	return m_plotWidget;
 }
 
-void BufferPlotHandler::resetPlotParameters()
+void BufferPlotHandler::atachCurves()
 {
-	int enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
 	for (int i = 0; i < m_enabledPlots.size(); i++) {
 		if (m_enabledPlots[i]) {
 			m_plot->AttachCurve(i);
@@ -228,34 +239,51 @@ void BufferPlotHandler::resetPlotParameters()
 			m_plot->DetachCurve(i);
 		}
 	}
+}
+
+void BufferPlotHandler::resetPlotParameters()
+{
+	m_lock->lock();
+	int enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
+	auto plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
+	int plotSampleNumber = m_samplingFreq * m_timespan;
+	plotSampleNumber = (enabledPlotsNo > 0) ? (plotSampleNumber / enabledPlotsNo) : plotSampleNumber;
+	m_buffersNumber = ((plotSampleNumber % m_bufferSize) == 0) ?
+				(plotSampleNumber / m_bufferSize) : ((plotSampleNumber / m_bufferSize) + 1);
 	m_bufferIndex = 0;
-	m_plotDataIndex = 0;
-	m_plotSampleNumber = m_samplingFreq * m_timespan;
-	m_plotSampleNumber = (enabledPlotsNo > 0) ? (m_plotSampleNumber / enabledPlotsNo) : m_plotSampleNumber;
-
-	m_buffersNumber = ((m_plotSampleNumber % m_bufferSize) == 0) ?
-				(m_plotSampleNumber / m_bufferSize) : ((m_plotSampleNumber / m_bufferSize) + 1);
-
-	resetDataPoints();
-
-	m_plot->setSampleRate(m_plotSampleNumber, 1, "");
+	resetDeque();
+	atachCurves();
+	m_plot->setSampleRate(plotSampleRate, 1, "");
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
 	m_plot->replot();
-	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(m_plotSampleNumber);
-
+	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(plotSampleNumber);
+	qDebug(CAT_SWIOT_AD74413R) << QString::number(m_buffersNumber) +" "  + QString::number(plotSampleNumber / m_bufferSize) + " ";
+	m_lock->unlock();
 }
 
 void BufferPlotHandler::resetDataPoints()
 {
-	int dataPointsNumber = m_buffersNumber * m_bufferSize;
-	if (m_dataPoints.size() > 0) {
-		for (int i = 0; i < m_dataPoints.size(); i++) {
-			delete[] m_dataPoints[i];
-			m_dataPoints[i] = nullptr;
-		}
-		m_dataPoints.clear();
+	for (int i = 0; i < m_dataPoints.size(); i++) {
+		delete[] m_dataPoints[i];
+		m_dataPoints[i] = nullptr;
 	}
+	m_dataPoints.clear();
+}
+
+void BufferPlotHandler::resetDeque()
+{
+	resetDataPoints();
+	for(int i = 0; i < m_dataPointsDeque.size(); i++) {
+		m_dataPointsDeque.clear();
+	}
+	m_dataPointsDeque.clear();
 	for (int i = 0; i < m_plotChnlsNo; i++) {
-		m_dataPoints.push_back(new double[dataPointsNumber]);
+		m_dataPointsDeque.push_back(std::deque<QVector<double>>());
 	}
 }
+
+bool BufferPlotHandler::singleCapture() const
+{
+	return m_singleCapture;
+}
+
