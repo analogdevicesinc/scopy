@@ -17,25 +17,25 @@ Faults::Faults(struct iio_context *ctx, QWidget *parent) :
 	ctx(ctx),
 	ui(new Ui::Faults),
 	timer(new QTimer()),
-        ad74413r_numeric(0),
-        max14906_numeric(0),
-        m_backButton(Faults::createBackButton()),
+	ad74413r_numeric(0),
+	max14906_numeric(0),
+	m_backButton(Faults::createBackButton()),
 	thread(new QThread(this)) {
 
-        iio_device* device0 = iio_context_get_device(ctx, 0);
-        const char* backAttr = iio_device_find_attr(device0, "back");
-        if (backAttr != nullptr) {
-                m_faultsPage = new FaultsPage(this);
+	iio_device* device0 = iio_context_get_device(ctx, 0);
+	const char* backAttr = iio_device_find_attr(device0, "back");
+	if (backAttr != nullptr) {
+		m_faultsPage = new FaultsPage(this);
 
-                qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
+		qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
-                ui->setupUi(this);
+		ui->setupUi(this);
 
-                this->setupDynamicUi(parent);
-                this->connectSignalsAndSlots();
-        } else {
-                qInfo(CAT_SWIOT_FAULTS) << "Could not initialize SWIOT faults page, the device seems to be in config mode.";
-        }
+		this->setupDynamicUi(parent);
+		this->connectSignalsAndSlots();
+	} else {
+		qInfo(CAT_SWIOT_FAULTS) << "Could not initialize SWIOT faults page, the device seems to be in config mode.";
+	}
 }
 
 Faults::~Faults() {
@@ -55,19 +55,16 @@ void Faults::setupDynamicUi(QWidget *parent) {
 	recipe.hasPairSettingsBtn = false;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = false;
-	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::HORIZONTAL;
+	recipe.hasHelpBtn = false;
 
-	this->m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
-	m_monitorChannelManager->setChannelIdVisible(false);
-
-	this->m_toolView = gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
+	this->m_toolView = gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
 	this->m_toolView->addFixedCentralWidget(m_faultsPage,0,0,-1,-1);
 
 	this->ui->mainLayout->addWidget(m_toolView);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 
-        this->m_toolView->addTopExtraWidget(m_backButton);
+	this->m_toolView->addTopExtraWidget(m_backButton);
 }
 
 void Faults::connectSignalsAndSlots() {
@@ -75,9 +72,9 @@ void Faults::connectSignalsAndSlots() {
 			 &Faults::runButtonClicked);
 	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this,
 			 &Faults::singleButtonClicked);
-        QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
-                Q_EMIT backBtnPressed();
-        });
+	QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
+		Q_EMIT backBtnPressed();
+	});
 
 	QObject::connect(this->timer, &QTimer::timeout, this, &Faults::pollFaults);
 	QObject::connect(this->thread, &QThread::started, this, [&](){
@@ -111,18 +108,18 @@ void Faults::getAd74413rFaultsNumeric()
 	}
 
 	char fau[100];
-        ssize_t readResult = iio_channel_attr_read(chn, "raw", fau, 100);
+	ssize_t readResult = iio_channel_attr_read(chn, "raw", fau, 100);
 
-        if (readResult < 0) {
-                qCritical(CAT_SWIOT_FAULTS) << "AD74413R faults value could not be read.";
-        } else {
-                qDebug(CAT_SWIOT_FAULTS) << "AD74413R faults read the value:" << fau;
-                try {
-                        this->ad74413r_numeric = std::stoi(fau);
-                } catch (std::invalid_argument& exception) {
-                        qCritical(CAT_SWIOT_FAULTS) << "AD74413R faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
-                }
-        }
+	if (readResult < 0) {
+		qCritical(CAT_SWIOT_FAULTS) << "AD74413R faults value could not be read.";
+	} else {
+		qDebug(CAT_SWIOT_FAULTS) << "AD74413R faults read the value:" << fau;
+		try {
+			this->ad74413r_numeric = std::stoi(fau);
+		} catch (std::invalid_argument& exception) {
+			qCritical(CAT_SWIOT_FAULTS) << "AD74413R faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
+		}
+	}
 }
 
 void Faults::getMax14906FaultsNumeric() {
@@ -151,16 +148,16 @@ void Faults::getMax14906FaultsNumeric() {
 	char fau[100];
 	ssize_t readResult = iio_channel_attr_read(chn, "raw", fau, 100);
 
-        if (readResult < 0) {
-                qCritical(CAT_SWIOT_FAULTS) << "MAX14906 faults value could not be read.";
-        } else {
-                qDebug(CAT_SWIOT_FAULTS) << "MAX14906 faults read the value:" << fau;
-                try {
-                        this->max14906_numeric = std::stoi(fau);
-                } catch (std::invalid_argument& exception) {
-                        qCritical(CAT_SWIOT_FAULTS) << "MAX14906 faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
-                }
-        }
+	if (readResult < 0) {
+		qCritical(CAT_SWIOT_FAULTS) << "MAX14906 faults value could not be read.";
+	} else {
+		qDebug(CAT_SWIOT_FAULTS) << "MAX14906 faults read the value:" << fau;
+		try {
+			this->max14906_numeric = std::stoi(fau);
+		} catch (std::invalid_argument& exception) {
+			qCritical(CAT_SWIOT_FAULTS) << "MAX14906 faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
+		}
+	}
 }
 
 void Faults::runButtonClicked() {
@@ -171,7 +168,7 @@ void Faults::runButtonClicked() {
 		this->thread->start();
 	} else {
 		if (this->thread->isRunning()) {
-                        qDebug(CAT_SWIOT_FAULTS) << "thread stopped";
+			qDebug(CAT_SWIOT_FAULTS) << "thread stopped";
 			this->thread->quit();
 			this->thread->wait();
 		}
@@ -195,21 +192,21 @@ void Faults::pollFaults() {
 }
 
 QPushButton *Faults::createBackButton() {
-        auto* backButton = new QPushButton();
-        backButton->setObjectName(QString::fromUtf8("backButton"));
-        backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-                                                    "  width: 95px;\n"
-                                                    "  height: 40px;\n"
-                                                    "\n"
-                                                    "  font-size: 12px;\n"
-                                                    "  text-align: center;\n"
-                                                    "  font-weight: bold;\n"
-                                                    "  padding-left: 15px;\n"
-                                                    "  padding-right: 15px;\n"
-                                                    "}"));
-        backButton->setProperty("blue_button", QVariant(true));
-        backButton->setText("Back");
-        return backButton;
+	auto* backButton = new QPushButton();
+	backButton->setObjectName(QString::fromUtf8("backButton"));
+	backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+						    "  width: 95px;\n"
+						    "  height: 40px;\n"
+						    "\n"
+						    "  font-size: 12px;\n"
+						    "  text-align: center;\n"
+						    "  font-weight: bold;\n"
+						    "  padding-left: 15px;\n"
+						    "  padding-right: 15px;\n"
+						    "}"));
+	backButton->setProperty("blue_button", QVariant(true));
+	backButton->setText("Back");
+	return backButton;
 }
 
 #include "moc_faults.cpp"
