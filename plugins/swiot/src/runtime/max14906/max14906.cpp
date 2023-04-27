@@ -41,12 +41,9 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	recipe.hasPairSettingsBtn = true;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = false;
-	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::HORIZONTAL;
+	recipe.hasHelpBtn = false;
 
-	this->m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
-	m_monitorChannelManager->setChannelIdVisible(false);
-
-	m_toolView = scopy::gui::ToolViewBuilder(recipe, this->m_monitorChannelManager, parent).build();
+	m_toolView = scopy::gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
 	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
