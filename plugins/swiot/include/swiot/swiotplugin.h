@@ -44,7 +44,7 @@ private:
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
 
-	QVector<QString> m_chnlsFunction{"high_z", "high_z", "high_z", "high_z",
+	QVector<QString> m_chnlsFunction{"resistance", "voltage_in", "voltage_in", "voltage_in",
 					 "diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 
 	//	//Runtime A

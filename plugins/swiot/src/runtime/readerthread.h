@@ -11,6 +11,7 @@ class ReaderThread : public QThread {
 	Q_OBJECT
 public:
 	explicit ReaderThread(bool isBuffered, QObject *parent = nullptr);
+	~ReaderThread();
 
 	void addDioChannel(int index, struct iio_channel *channel);
 
