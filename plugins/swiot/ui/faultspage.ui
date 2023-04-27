@@ -54,30 +54,6 @@
       </property>
       <layout class="QVBoxLayout" name="mainVerticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="1,100">
-         <item>
-          <widget class="QLabel" name="label_faults">
-           <property name="text">
-            <string>Faults</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_5">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
