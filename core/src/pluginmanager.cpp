@@ -135,7 +135,7 @@ Plugin* PluginManager::loadPlugin(QString file)
 	QPluginLoader qp(file);
 	ret = qp.load();
 	if(!ret) {
-		qWarning(CAT_PLUGINMANAGER) << "Cannot load library - " + qp.errorString();
+		qWarning(CAT_PLUGINMANAGER) << "Cannot load library " + qp.fileName() + "- err: " + qp.errorString();
 		return nullptr;
 	}
 
