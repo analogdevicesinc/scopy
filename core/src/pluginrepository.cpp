@@ -4,6 +4,13 @@
 #include <QDirIterator>
 #include <QJsonDocument>
 #include <QLoggingCategory>
+#include <QtGlobal>
+#include <QApplication>
+#ifdef Q_OS_WINDOWS
+#include <windows.h>
+#include <Winbase.h>
+#endif
+
 
 Q_LOGGING_CATEGORY(CAT_PLUGINREPOSTIORY,"PluginRepository");
 
@@ -52,6 +59,15 @@ void PluginRepository::init(QString location)
 		metadata = pluginMetaDocument.object();
 		pm->setMetadata(metadata);
 	}
+
+#ifdef Q_OS_WINDOWS
+	bool b = SetDllDirectoryA(QApplication::applicationDirPath().toStdString().c_str());
+	if (!b)	{
+		DWORD error = ::GetLastError();
+		std::string message = std::system_category().message(error);
+		qWarning(CAT_PLUGINREPOSTIORY) << "cannot add .exe folder to library search path - " << QString::fromStdString(message);;
+	}
+#endif
 
 	pm->clear();
 	pm->add(pluginFiles);
