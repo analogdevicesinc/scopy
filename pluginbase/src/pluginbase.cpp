@@ -6,8 +6,9 @@ Q_LOGGING_CATEGORY(CAT_PLUGIN,"Plugin");
 
 using namespace scopy;
 
-void PluginBase::setParam(QString param) {
+void PluginBase::setParam(QString param, QString category) {
 	m_param = param;
+	m_category = category;
 	m_displayDescription = param;
 }
 

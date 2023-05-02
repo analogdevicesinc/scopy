@@ -22,7 +22,7 @@ public:
 	void initPreferences() override;
 	void initMetadata() override;
 	void init() override;
-	bool compatible(QString m_param) override;
+	bool compatible(QString m_param, QString category) override;
 	bool loadPreferencesPage() override;
 	bool loadPage() override;
 	bool loadIcon() override;

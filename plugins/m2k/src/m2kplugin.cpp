@@ -34,7 +34,7 @@ using namespace scopy::m2k;
 
 Q_LOGGING_CATEGORY(CAT_M2KPLUGIN,"M2KPLUGIN");
 
-bool M2kPlugin::compatible(QString m_param) {
+bool M2kPlugin::compatible(QString m_param, QString category) {
 	qDebug(CAT_M2KPLUGIN)<<"compatible";
 	bool ret = false;
 	ContextProvider *c = ContextProvider::GetInstance();

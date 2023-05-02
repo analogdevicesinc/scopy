@@ -16,7 +16,7 @@ class SCOPY_PLUGINBASE_EXPORT PluginBase : public Plugin {
 public:
 	virtual ~PluginBase() {}
 
-	virtual void setParam(QString param) override;
+	virtual void setParam(QString param, QString category) override;
 	virtual void initMetadata() override;
 	virtual void setMetadata(QJsonObject obj) override;
 	virtual void initPreferences() override;
@@ -59,6 +59,7 @@ public Q_SLOTS:
 
 protected:
 	QString m_param;
+	QString m_category;
 	QString m_name;
 	QString m_displayName;
 	QString m_displayDescription;

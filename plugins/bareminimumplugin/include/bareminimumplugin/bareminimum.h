@@ -18,7 +18,7 @@ class SCOPY_BAREMINIMUMPLUGIN_EXPORT BareMinimum : public QObject, public Plugin
 public:
 
 	void initMetadata() override;
-	bool compatible(QString m_param) override;
+	bool compatible(QString m_param, QString category) override;
 	void loadToolList() override;
 
 	bool onConnect() override;
