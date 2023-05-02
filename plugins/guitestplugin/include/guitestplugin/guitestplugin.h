@@ -20,7 +20,7 @@ class SCOPY_GUITESTPLUGIN_EXPORT TestPlugin : public QObject, public PluginBase
 public:
 	friend class TestPlugin_API;
 	void initMetadata() override;
-	bool compatible(QString m_param) override;
+	bool compatible(QString m_param, QString category) override;
 	bool loadPage() override;
 	bool loadIcon() override;
 	void loadToolList() override;

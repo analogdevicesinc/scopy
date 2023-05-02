@@ -26,7 +26,7 @@ class SCOPY_M2KPLUGIN_EXPORT M2kPlugin : public QObject, public PluginBase
 public:
 
 	void initMetadata() override;
-	bool compatible(QString m_param) override;
+	bool compatible(QString m_param, QString category) override;
 
 
 	void preload() override;

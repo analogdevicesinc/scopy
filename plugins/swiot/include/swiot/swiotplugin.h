@@ -23,7 +23,7 @@ public:
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
-	bool compatible(QString param) override;
+	bool compatible(QString param, QString category) override;
 	void initMetadata() override;
 
 public Q_SLOTS:

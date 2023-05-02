@@ -32,7 +32,7 @@ public:
 	 * @param QString
 	 */
 
-	virtual void setParam(QString) = 0;
+	virtual void setParam(QString, QString) = 0;
 
 	/**
 	 * @brief initMetadata
@@ -115,7 +115,7 @@ public:
 	 *
 	 * No default implementation in PluginBase - must be overriden
 	 */
-	virtual bool compatible(QString param) = 0;
+	virtual bool compatible(QString param, QString category) = 0;
 
 	/**
 	 * @brief clone
