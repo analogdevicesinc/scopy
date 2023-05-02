@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QThread>
 
+#include "src/runtime/max14906/max14906.h"
 #include "src/swiot_logging_categories.h"
 #include <gui/channel_manager.hpp>
 
@@ -22,10 +23,10 @@ Faults::Faults(struct iio_context *ctx, QWidget *parent) :
 	m_backButton(Faults::createBackButton()),
 	thread(new QThread(this)) {
 
-	iio_device* device0 = iio_context_get_device(ctx, 0);
-	const char* backAttr = iio_device_find_attr(device0, "back");
-	if (backAttr != nullptr) {
-		m_faultsPage = new FaultsPage(this);
+	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
+        const char* backAttr = iio_device_find_attr(device0, "back");
+        if (backAttr != nullptr) {
+                m_faultsPage = new FaultsPage(this);
 
 		qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
