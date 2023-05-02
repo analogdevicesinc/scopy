@@ -21,7 +21,7 @@ public:
 	bool loadIcon() override;
 	bool loadPage() override;
 	void loadToolList() override;
-	bool compatible(QString m_param) override;
+	bool compatible(QString m_param, QString category) override;
 	void unload() override;
 	bool onConnect() override;
 	bool onDisconnect() override;

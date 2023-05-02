@@ -105,9 +105,9 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString categ
 			continue;
 		if(!PluginFilter::pluginInExclusionList(comp,plugin))
 			continue;
-		if(plugin->compatible(param)) {
+		if(plugin->compatible(param, category)) {
 			Plugin* p = plugin->clone();
-			p->setParam(param);
+			p->setParam(param, category);
 			comp.append(p);
 		}
 	}

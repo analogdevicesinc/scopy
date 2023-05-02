@@ -14,7 +14,7 @@
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace scopy;
 
-bool TestPlugin::compatible(QString m_param) {
+bool TestPlugin::compatible(QString m_param, QString category) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";
 	return true;
 }
