@@ -1,12 +1,13 @@
 #include "diocontroller.h"
 #include "src/swiot_logging_categories.h"
+#include "max14906.h"
 
 using namespace scopy::swiot;
 
 DioController::DioController(struct iio_context* context_, QString deviceName) :
 	m_deviceName(std::move(deviceName)),
 	m_context(context_) {
-	struct iio_device* dev = iio_context_get_device(this->m_context, 1);
+	struct iio_device* dev = iio_context_find_device(this->m_context, MAX_NAME);
 	this->m_device = dev;
 }
 

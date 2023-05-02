@@ -14,7 +14,7 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	m_readerThread(new ReaderThread(false)),
 	m_customColGrid(new FlexGridLayout(4, this))
 {
-	iio_device* device0 = iio_context_get_device(ctx, 0);
+	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
 	if (iio_device_find_attr(device0, "back")) {
 		qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
 

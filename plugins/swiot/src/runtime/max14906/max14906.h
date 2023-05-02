@@ -10,6 +10,7 @@
 #include <gui/flexgridlayout.hpp>
 
 namespace scopy::swiot {
+#define MAX_NAME "max14906"
 class DioDigitalChannel;
 class DioController;
 
