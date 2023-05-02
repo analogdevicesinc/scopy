@@ -9,7 +9,7 @@
 Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
 using namespace scopy;
 
-bool TestPluginIp::compatible(QString m_param) {
+bool TestPluginIp::compatible(QString m_param, QString category) {
 	qDebug(CAT_TESTPLUGINIP)<<"compatible";
 	return m_param.startsWith("ip:");
 }

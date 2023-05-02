@@ -13,7 +13,7 @@
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"BareMinimum");
 using namespace scopy;
 
-bool BareMinimum::compatible(QString m_param) {
+bool BareMinimum::compatible(QString m_param, QString category) {
 	qDebug(CAT_TESTPLUGIN)<<"compatible";
 	return true;
 }

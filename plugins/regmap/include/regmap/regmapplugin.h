@@ -26,7 +26,7 @@ public:
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
-	bool compatible(QString uri) override;
+	bool compatible(QString uri, QString category) override;
     void preload() override;
 
 
