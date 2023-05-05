@@ -74,9 +74,10 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 			m_plot->Curve(i)->setTitle("DIAG " + QString::number(i+1));
 		}
 		m_plot->DetachCurve(i);
+		m_plot->setOffsetHandleVisible(i, false);
 	}
 	m_plot->setAllYAxis(-5, 5);
-	m_plot->setOffsetInterval(__DBL_MIN__, __DBL_MAX__);
+	m_plot->setOffsetInterval(-__DBL_MAX__, __DBL_MAX__);
 }
 
 //bufferCounter is used only for debug
@@ -85,6 +86,7 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 	int bufferDataSize = bufferData.size();
 	int enPlotIndex = 0;
 	bool rolling = false;
+	auto plotSampleRate = (bufferDataSize > 0) ? ( m_samplingFreq / bufferDataSize ) : m_samplingFreq;
 	m_lock->lock();
 	resetDataPoints();
 	if (!(m_singleCapture && (m_bufferIndex == m_buffersNumber))) {
@@ -97,6 +99,13 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 						m_dataPointsDeque[i].pop_front();
 						rolling = true;
 					}
+				} else {
+					//more tests here
+					int plotDataSamplesNumber = m_buffersNumber * m_bufferSize;
+					int currentPlotDataSamplesNumber = (m_bufferIndex + 1) * m_bufferSize;
+					m_plot->setDataStartingPoint(plotDataSamplesNumber - currentPlotDataSamplesNumber);
+					m_plot->resetXaxisOnNextReceivedData();
+					////////
 				}
 				if (m_enabledPlots[i]) {
 					if (enPlotIndex < bufferDataSize) {
@@ -230,7 +239,7 @@ QWidget *BufferPlotHandler::getPlotWidget() const
 	return m_plotWidget;
 }
 
-void BufferPlotHandler::atachCurves()
+void BufferPlotHandler::attachCurves()
 {
 	for (int i = 0; i < m_enabledPlots.size(); i++) {
 		if (m_enabledPlots[i]) {
@@ -247,12 +256,14 @@ void BufferPlotHandler::resetPlotParameters()
 	int enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
 	auto plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
 	int plotSampleNumber = m_samplingFreq * m_timespan;
+
 	plotSampleNumber = (enabledPlotsNo > 0) ? (plotSampleNumber / enabledPlotsNo) : plotSampleNumber;
 	m_buffersNumber = ((plotSampleNumber % m_bufferSize) == 0) ?
 				(plotSampleNumber / m_bufferSize) : ((plotSampleNumber / m_bufferSize) + 1);
 	m_bufferIndex = 0;
 	resetDeque();
-	atachCurves();
+	attachCurves();
+
 	m_plot->setSampleRate(plotSampleRate, 1, "");
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
 	m_plot->replot();

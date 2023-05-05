@@ -40,7 +40,7 @@ private:
 	void initPlot(int plotChnlsNo);
 	void resetDataPoints();
 	void resetDeque();
-	void atachCurves();
+	void attachCurves();
 
 	CapturePlot *m_plot;
 	QWidget *m_plotWidget;
