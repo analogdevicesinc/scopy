@@ -29,18 +29,19 @@ public:
 	bool singleCapture() const;
 
 public Q_SLOTS:
-	void onPlotChnlsChanges(std::vector<bool> m_enabledPlots);
 	void onBufferRefilled(QVector<QVector<double>>, int bufferCounter);
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
 	void onTimespanChanged(double value);
 	void onSamplingFreqWritten(int samplingFreq);
+	void onChannelWidgetEnabled(int curveId, std::vector<bool> enabledPlots);
 Q_SIGNALS:
 	void singleCaptureFinished();
+	void offsetHandleSelected(int hdlIdx, bool selected);
 private:
 	void initPlot(int plotChnlsNo);
 	void resetDataPoints();
 	void resetDeque();
-	void attachCurves();
+	void readPreferences();
 
 	CapturePlot *m_plot;
 	QWidget *m_plotWidget;
