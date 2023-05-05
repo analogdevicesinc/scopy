@@ -18,6 +18,8 @@ public Q_SLOTS:
 private:
 	QWidget *createRestartWidget();
 	QWidget *restartWidget;
+	QWidget *buildSaveSessionPreference();
+	QWidget *buildResetScopyDefaultButton();
 };
 }
 #endif // SCOPYPREFERENCESPAGE_H
