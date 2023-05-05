@@ -45,8 +45,8 @@ public:
 public Q_SLOTS:
 
 	void onChannelWidgetEnabled(bool en);
-
 	void onChannelWidgetSelected(bool checked);
+	void onOffsetHdlSelected(int hdlIdx, bool selected);
 
 	void onRunBtnPressed();
 	void onSingleBtnPressed();
@@ -57,7 +57,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-	void plotChnlsChanges(std::vector<bool> m_enabledPlots);
+	void channelWidgetEnabled(int curveId, std::vector<bool> enabledPlots);
 
 	void exportBtnClicked(QMap<int, bool> exportConfig);
 
@@ -70,7 +70,7 @@ private:
 	void createMonitorChannelMenu();
 
 	void setupConnections();
-	void connectChnlsWidgesToPlot(std::vector<ChannelWidget *> channelList);
+	void connectChnlsWidgesToPlot();
 
 	QPushButton* createBackBtn();
 
@@ -88,6 +88,7 @@ private:
 
 	std::vector<bool> m_enabledChannels;
 	std::vector<bool> m_enabledPlots;
+	std::vector<ChannelWidget*> m_channelWidgetList;
 
 	BufferLogic *m_swiotAdLogic;
 	ReaderThread *m_readerThread;
