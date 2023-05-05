@@ -1,24 +1,25 @@
+#include <QOpenGLWidget>
+#include <QSurfaceFormat>
+#include <QLabel>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QLoggingCategory>
+
 #include "scopymainwindow.h"
 #include "animationmanager.h"
-#include "qopenglwidget.h"
-#include "qsurfaceformat.h"
+
 #include "scanbuttoncontroller.h"
 #include "ui_scopymainwindow.h"
 #include "scopyhomepage.h"
-#include <scopyaboutpage.h>
-#include <scopypreferencespage.h>
-#include <QLabel>
-#include <device.h>
-#include <QFileDialog>
-#include <QStandardPaths>
+#include "scopyaboutpage.h"
+#include "scopypreferencespage.h"
+#include "device.h"
+
 #include "pluginbase/preferences.h"
 #include "pluginbase/scopyjs.h"
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
-#include "versionchecker.h"
-#include "application_restarter.h"
-#include <QLoggingCategory>
 
 using namespace scopy;
 
@@ -56,9 +57,17 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	scc = new ScannedIIOContextCollector(this);
 	pr = new PluginRepository(this);
 
+	pr->init(DEFAULT_PLUGIN_LOCATION);
 
-	pr->init("plugins/plugins");
+#ifndef Q_OS_ANDROID
+	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
+	if(!pluginAdditionalPath.isEmpty()) {
+		pr->init(pluginAdditionalPath);
+	}
+#endif
+
 	PluginManager *pm = pr->getPluginManager();
+
 
 	initAboutPage(pm);
 	initPreferencesPage(pm);
@@ -209,6 +218,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_plot_target_fps", "60");
 	p->init("general_show_plot_fps", true);
 	p->init("general_use_native_dialogs", true);
+	p->init("general_additional_plugin_path", "");
 
 	connect(p, SIGNAL(preferenceChanged(QString,QVariant)), this, SLOT(handlePreferences(QString,QVariant)));
 

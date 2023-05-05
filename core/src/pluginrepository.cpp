@@ -20,6 +20,7 @@ PluginRepository::~PluginRepository()
 
 void PluginRepository::init(QString location)
 {
+	qInfo(CAT_PLUGINREPOSTIORY)<<"initializing plugins from: " << location;
 	const QString pluginMetaFileName = "plugin.json";
 	QString pluginMetaFilePath = "";
 	QDir loc(location);
@@ -53,7 +54,6 @@ void PluginRepository::init(QString location)
 		pm->setMetadata(metadata);
 	}
 
-	pm->clear();
 	pm->add(pluginFiles);
 	pm->sort();
 }
