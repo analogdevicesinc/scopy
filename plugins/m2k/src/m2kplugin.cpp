@@ -425,7 +425,7 @@ R"plugin(
 	      "iio",
 		"m2k"
 	   ],
-	   "exclude":["*"]
+	   "exclude":["*", "!debuggerplugin"]
 	}
 )plugin");
 }
