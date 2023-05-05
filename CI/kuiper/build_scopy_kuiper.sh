@@ -12,6 +12,7 @@ mkdir -p $STAGING_AREA_DEPS
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib
 
 apt-get install libsndfile-dev -y
+apt-get install libbost1.71-all-dev
 
 build_with_cmake() {
 	echo $PWD
