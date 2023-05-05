@@ -79,7 +79,7 @@ void Ad74413r::setupConnections()
 	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::backBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
-	connect(this, &Ad74413r::plotChnlsChanges, m_plotHandler, &BufferPlotHandler::onPlotChnlsChanges);
+	connect(this, &Ad74413r::channelWidgetEnabled, m_plotHandler, &BufferPlotHandler::onChannelWidgetEnabled);
 	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
 	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
 
@@ -103,7 +103,6 @@ void Ad74413r::initMonitorToolView()
 			m_toolView->buildNewChannel(m_monitorChannelManager, nullptr, false, chId, false, false,
 						    QColor("green"), deviceName, deviceName);
 	chId++;
-	std::vector<ChannelWidget*> channelWidgetList;
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
 			QString menuTitle(((deviceName + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
@@ -131,13 +130,13 @@ void Ad74413r::initMonitorToolView()
 				first = false;
 			}
 			controller->createConnections();
-			channelWidgetList.push_back(chWidget);
+			m_channelWidgetList.push_back(chWidget);
 			chId++;
 		}
 	}
 
-	m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget, channelWidgetList);
-	connectChnlsWidgesToPlot(channelWidgetList);
+	m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget, m_channelWidgetList);
+	connectChnlsWidgesToPlot();
 }
 
 void Ad74413r::initExportSettings(QWidget *parent)
@@ -216,12 +215,12 @@ scopy::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* col
 	return menu;
 }
 
-void Ad74413r::connectChnlsWidgesToPlot(std::vector<ChannelWidget*> channelList)
+void Ad74413r::connectChnlsWidgesToPlot()
 {
-	for (int i = 0; i < channelList.size(); i++) {
-		connect(channelList[i], SIGNAL(enabled(bool)),
+	for (int i = 0; i < m_channelWidgetList.size(); i++) {
+		connect(m_channelWidgetList[i], SIGNAL(enabled(bool)),
 			SLOT(onChannelWidgetEnabled(bool)));
-		connect(channelList[i], SIGNAL(selected(bool)),
+		connect(m_channelWidgetList[i], SIGNAL(selected(bool)),
 			SLOT(onChannelWidgetSelected(bool)));
 	}
 }
@@ -244,7 +243,7 @@ void Ad74413r::onChannelWidgetEnabled(bool en)
 		m_enabledChannels[chnlIdx] = false;
 		verifyChnlsChanges();
 	}
-	Q_EMIT plotChnlsChanges(m_enabledPlots);
+	Q_EMIT channelWidgetEnabled(id, m_enabledPlots);
 }
 
 void Ad74413r::onChannelWidgetSelected(bool checked)
@@ -255,6 +254,15 @@ void Ad74413r::onChannelWidgetSelected(bool checked)
 	int id = w->id() - 1;
 	m_plotHandler->setPlotActiveAxis(id);
 
+}
+
+void Ad74413r::onOffsetHdlSelected(int hdlIdx, bool selected)
+{
+	for (int i = 0; i < m_channelWidgetList.size(); i++) {
+		if (m_channelWidgetList[i] != nullptr) {
+			m_channelWidgetList[i]->nameButton()->setChecked(i == hdlIdx);
+		}
+	}
 }
 
 void Ad74413r::onRunBtnPressed()
