@@ -1,6 +1,7 @@
 #include "bufferplothandler.h"
 #include <QGridLayout>
 #include <gui/filemanager.h>
+#include "pluginbase/preferences.h"
 #include "qcolormap.h"
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
@@ -18,6 +19,7 @@ BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int sampl
 	m_plot = new CapturePlot(parent, false, 10, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
 	initPlot(plotChnlsNo);
 	resetPlotParameters();
+	readPreferences();
 }
 BufferPlotHandler::~BufferPlotHandler()
 {
@@ -60,6 +62,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 
 	m_plot->setSampleRate(m_samplingFreq, 1, "");
+	m_plot->setSampleRatelabelValue(m_samplingFreq);
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
@@ -75,9 +78,14 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		}
 		m_plot->DetachCurve(i);
 		m_plot->setOffsetHandleVisible(i, false);
+		m_plot->addZoomer(i);
 	}
 	m_plot->setAllYAxis(-5, 5);
 	m_plot->setOffsetInterval(-__DBL_MAX__, __DBL_MAX__);
+	connect(m_plot, &CapturePlot::channelSelected, this, [=](int hdlIdx, bool selected) {
+		m_plot->setActiveVertAxis(hdlIdx, true);
+		Q_EMIT offsetHandleSelected(hdlIdx, selected);
+	});
 }
 
 //bufferCounter is used only for debug
@@ -139,11 +147,6 @@ void BufferPlotHandler::drawPlot()
 	}
 	m_plot->plotNewData("Active Channels", m_dataPoints, dataPointsNumber, 1);
 
-}
-
-void BufferPlotHandler::onPlotChnlsChanges(std::vector<bool> enabledPlots)
-{
-	m_enabledPlots = enabledPlots;
 }
 
 void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
@@ -239,14 +242,16 @@ QWidget *BufferPlotHandler::getPlotWidget() const
 	return m_plotWidget;
 }
 
-void BufferPlotHandler::attachCurves()
+void BufferPlotHandler::onChannelWidgetEnabled(int curveId, std::vector<bool> enabledPlots)
 {
-	for (int i = 0; i < m_enabledPlots.size(); i++) {
-		if (m_enabledPlots[i]) {
-			m_plot->AttachCurve(i);
-		} else {
-			m_plot->DetachCurve(i);
-		}
+	bool enabled = enabledPlots[curveId];
+
+	m_enabledPlots = enabledPlots;
+	m_plot->setOffsetHandleVisible(curveId, enabled);
+	if (enabled) {
+		m_plot->AttachCurve(curveId);
+	} else {
+		m_plot->DetachCurve(curveId);
 	}
 }
 
@@ -262,9 +267,9 @@ void BufferPlotHandler::resetPlotParameters()
 				(plotSampleNumber / m_bufferSize) : ((plotSampleNumber / m_bufferSize) + 1);
 	m_bufferIndex = 0;
 	resetDeque();
-	attachCurves();
 
 	m_plot->setSampleRate(plotSampleRate, 1, "");
+	m_plot->setSampleRatelabelValue(plotSampleRate);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
 	m_plot->replot();
 	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(plotSampleNumber);
@@ -291,6 +296,13 @@ void BufferPlotHandler::resetDeque()
 	for (int i = 0; i < m_plotChnlsNo; i++) {
 		m_dataPointsDeque.push_back(std::deque<QVector<double>>());
 	}
+}
+
+void BufferPlotHandler::readPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	bool showFps = p->get("general_show_plot_fps").toBool();
+	m_plot->setVisibleFpsLabel(showFps);
 }
 
 bool BufferPlotHandler::singleCapture() const
