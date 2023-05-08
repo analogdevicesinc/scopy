@@ -41,7 +41,7 @@ bool SWIOTPlugin::loadPage()
 bool SWIOTPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-light/icons/locked.svg);");
+	m_icon->setStyleSheet("border-image: url(:/swiot/swiot_top_transparent.png);");
 	return true;
 }
 
