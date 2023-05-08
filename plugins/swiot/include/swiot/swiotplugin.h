@@ -1,11 +1,14 @@
 #ifndef SWIOTPLUGIN_H
 #define SWIOTPLUGIN_H
-
-#include "src/runtime/swiotruntime.h"
 #define SCOPY_PLUGIN_NAME SWIOTPlugin
+#define AD74413R_TME_ID "swiotad74413r"
+#define CONFIG_TME_ID "swiotconfig"
+#define FAULTS_TME_ID "swiotfaults"
+#define MAX14906_TME_ID "swiotmax14906"
 
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
+#include "src/runtime/swiotruntime.h"
 #include "scopyswiot_export.h"
 #include "QLabel"
 #include "src/swiotcontroller.h"
@@ -35,16 +38,9 @@ private:
 	void setupToolList();
 
 	Ui::SWIOTInfoPage *infoui;
-
-	QWidget *config ;
-	QWidget *adtool;
-        QWidget *faults;
-        QWidget *maxtool;
-
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
-
-	QVector<QString> m_chnlsFunction{"resistance", "voltage_in", "voltage_in", "voltage_in",
+	QVector<QString> m_chnlsFunction{"current_out", "high_z", "high_z", "high_z",
 					 "diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 
 	//	//Runtime A
