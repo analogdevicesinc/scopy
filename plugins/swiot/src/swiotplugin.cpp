@@ -139,7 +139,7 @@ void SWIOTPlugin::setupToolList()
 		m_toolList[3]->setEnabled(false);
 		Q_EMIT requestTool(m_toolList[0]->id());
 
-		connect(dynamic_cast<SwiotConfig*> (config), &SwiotConfig::configBtn, this, [=](QVector<QStringList*> funcAvailable) {
+		connect(dynamic_cast<SwiotConfig*> (config), &SwiotConfig::configBtn, this, [this](QVector<QStringList*> funcAvailable) {
 			QVector<QString> adConfigFunc = funcAvailable[0]->toVector();
 			for (int i = 0; i < adConfigFunc.size(); i++){
 				m_chnlsFunction[i] = adConfigFunc[i];
@@ -177,13 +177,13 @@ bool SWIOTPlugin::onConnect()
 	connect(m_swiotController, &SwiotController::pingSuccess, this, [](){
 		qDebug(CAT_SWIOT) << "Ping success!";
 	});
-	connect(m_swiotController, &SwiotController::contextSwitched, this,[=](){
+	connect(m_swiotController, &SwiotController::contextSwitched, this,[this](){
 		m_swiotController->stopSwitchContextTask();
 		cleanAfterLastContext();
 		setupToolList();
 
 	});
-	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, [=]() {
+	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, [this]() {
 		m_swiotController->stopPingTask();
 		m_swiotController->startSwitchContextTask();
 	});
