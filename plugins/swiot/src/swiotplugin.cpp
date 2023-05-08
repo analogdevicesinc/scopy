@@ -65,18 +65,12 @@ bool SWIOTPlugin::compatible(QString m_param)
 	bool ret = false;
 	auto &&cp = ContextProvider::GetInstance();
 
-	QString hw_serial;
 	iio_context* ctx = cp->open(m_param);
 
 	if(!ctx) {
 		qWarning(CAT_SWIOT) << "No context available for swiot";
 		return false;
 	}
-
-	hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
-	if(!hw_serial.isEmpty())
-		ret = true;
-
 
 	unsigned int devices_count = iio_context_get_devices_count(ctx);
 	if (devices_count >= 2) {
@@ -88,11 +82,12 @@ bool SWIOTPlugin::compatible(QString m_param)
 
 		if ((device0_name == "ad74413r" && device1_name == "max14906") || (device0_name == "max14906" && device1_name == "ad74413r")) {
 			ret = true;
+		} else {
+			ret = false;
 		}
 	} else {
 		ret = false;
 	}
-
 
 	cp->close(m_param);
 
