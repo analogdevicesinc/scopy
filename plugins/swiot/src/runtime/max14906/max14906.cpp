@@ -4,7 +4,7 @@
 
 using namespace scopy::swiot;
 
-Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
+Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	QWidget(parent),
 	max14906ToolController(new DioController(ctx)),
 	ui(new Ui::Max14906),
@@ -12,7 +12,8 @@ Max14906::Max14906(struct iio_context *ctx, QWidget *parent) :
 	m_qTimer(new QTimer(this)),
 	m_toolView(nullptr),
 	m_readerThread(new ReaderThread(false)),
-	m_customColGrid(new FlexGridLayout(4, this))
+	m_customColGrid(new FlexGridLayout(4, this)),
+	m_tme(tme)
 {
 	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
 	if (iio_device_find_attr(device0, "back")) {
@@ -85,6 +86,8 @@ void Max14906::connectSignalsAndSlots() {
 	connect(m_readerThread, &ReaderThread::started, this, [&](){
 		this->m_qTimer->start(1000);
 	});
+
+	connect(m_tme, &ToolMenuEntry::runToggled, this->m_toolView->getRunBtn(), &QPushButton::setChecked);
 }
 
 Max14906::~Max14906() {
@@ -110,11 +113,17 @@ void Max14906::runButtonToggled() {
 		}
 		qDebug(CAT_SWIOT_MAX14906) << "Reader thread started";
 		this->m_readerThread->start();
+		if (!this->m_tme->running()) {
+			m_tme->setRunning(true);
+		}
 	} else {
 		if (this->m_readerThread->isRunning()) {
 			qDebug(CAT_SWIOT_MAX14906) << "Reader thread stopped";
 			this->m_readerThread->quit();
 			this->m_readerThread->wait();
+		}
+		if (this->m_tme->running()) {
+			m_tme->setRunning(false);
 		}
 		this->m_qTimer->stop();
 	}
