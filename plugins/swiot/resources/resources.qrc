@@ -6,5 +6,6 @@
         <file>ic_lo_gray.svg</file>
         <file>ic_lo_snow.svg</file>
         <file>swiot_board.svg</file>
+        <file>swiot_top_transparent.png</file>
     </qresource>
 </RCC>
