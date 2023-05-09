@@ -144,7 +144,6 @@ Q_SIGNALS:
 protected:
 	void connectCursorHandles();
 	void connectZoomers();
-
 private Q_SLOTS:
 	void on_btnHistory_toggled(bool checked);
 	void onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx);
@@ -152,6 +151,7 @@ private Q_SLOTS:
 	void on_btnSettings_clicked(bool checked);
 	void on_btnSweep_toggled(bool checked);
 	void on_btnMarkers_toggled(bool checked);
+	void updateVisibleCursorHandles();
 
 #ifdef SPECTRAL_MSR
 	void on_btnMeasure_toggled(bool);
@@ -254,7 +254,7 @@ private:
 	libm2k::context::Generic* m_generic_context;
 	libm2k::analog::GenericAnalogIn* m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
-	scopy::SmallOnOffSwitch *btnLockHPlots;
+	scopy::SmallOnOffSwitch *btnSyncPlotCursors;
 	QHBoxLayout *horizontalLockLayout;
 
 #ifdef SPECTRAL_MSR

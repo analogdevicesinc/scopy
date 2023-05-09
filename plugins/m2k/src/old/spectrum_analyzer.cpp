@@ -296,11 +296,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->btnToggleWaterfall, SIGNAL(toggled(bool)), this, SLOT(waterfallToggled(bool)));
 
-	// dafault hidden
-	waterfallToggled(false);
-//	ui->btnToggleWaterfall->setChecked(false);
-
-
 #ifdef PLOT_MENU_BAR_ENABLED
 	DockerUtils::configureTopBar(fftDocker);
 	DockerUtils::configureTopBar(waterfallDocker);
@@ -631,6 +626,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			if (flow != waterfall_plot->getFlowDirection()) waterfall_plot->setFlowDirection(flow);
 		}
+		updateVisibleCursorHandles();
 	});
 
 	connect(fftDocker, &QDockWidget::topLevelChanged, this, [=](bool floating){
@@ -640,10 +636,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			if (flow != waterfall_plot->getFlowDirection()) waterfall_plot->setFlowDirection(flow);
 		}
+		updateVisibleCursorHandles();
 	});
 
 	// UI default
 	waterfall_size->setValue(200);
+	waterfallToggled(false);
 
 	ui->comboBox_window->setCurrentText("Hamming");
 	ui->comboBox_line_thickness->setCurrentText("1");
@@ -1097,6 +1095,7 @@ void SpectrumAnalyzer::on_boxCursors_toggled(bool on)
 
 		menuOrder.removeOne(ui->btnCursors);
 	}
+	updateVisibleCursorHandles();
 }
 
 void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)
@@ -1668,11 +1667,11 @@ void SpectrumAnalyzer::cursor_panel_init()
 
 	// add cursor lock botween waterfall and fft plot
 
-	btnLockHPlots = new scopy::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
-	btnLockHPlots->setObjectName(QString::fromUtf8("btnLockHPlots"));
-	btnLockHPlots->setStyleSheet(QString::fromUtf8("QPushButton[use_icon=true]"));
-	btnLockHPlots->setCheckable(true);
-	setDynamicProperty(btnLockHPlots, "use_icon", true);
+	btnSyncPlotCursors = new scopy::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
+	btnSyncPlotCursors->setObjectName(QString::fromUtf8("btnSyncPlotCursors"));
+	btnSyncPlotCursors->setStyleSheet(QString::fromUtf8("QPushButton[use_icon=true]"));
+	btnSyncPlotCursors->setCheckable(true);
+	setDynamicProperty(btnSyncPlotCursors, "use_icon", true);
 
 	auto lock_line = new QFrame(this);
 	lock_line->setObjectName(QString::fromUtf8("lock_line"));
@@ -1687,9 +1686,9 @@ void SpectrumAnalyzer::cursor_panel_init()
 	cr_ui->verticalLayout_2->addSpacing(10);
 	cr_ui->verticalLayout_2->addItem(horizontalLockLayout);
 
-	horizontalLockLayout->addWidget(new QLabel(tr("Lock plots cursors"), cr_ui->scrollAreaWidgetContents));
+	horizontalLockLayout->addWidget(new QLabel(tr("Sync plots cursors"), cr_ui->scrollAreaWidgetContents));
 	horizontalLockLayout->addSpacerItem(new QSpacerItem(0,0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-	horizontalLockLayout->addWidget(btnLockHPlots);
+	horizontalLockLayout->addWidget(btnSyncPlotCursors);
 
 	connectCursorHandles();
 	connectZoomers();
@@ -1773,29 +1772,57 @@ void SpectrumAnalyzer::waterfallToggled(bool visible)
 			}
 		}
 	}
+	updateVisibleCursorHandles();
+}
+
+void SpectrumAnalyzer::updateVisibleCursorHandles()
+{
+	int wf_pos = waterfallDocker->pos().y();
+	int fft_pos = fftDocker->pos().y();
+	bool sync_toggled = btnSyncPlotCursors->isChecked();
+	bool floatingDockers = waterfallDocker->isFloating() || fftDocker->isFloating();
+	bool cursors_enabled = ui->boxCursors->isChecked();
+
+	bool wf_toggle = cursors_enabled;
+	bool fft_toggle = cursors_enabled;
+
+	if (wf_pos <= fft_pos && !floatingDockers && waterfall_visible && cursors_enabled) {
+		wf_toggle = !sync_toggled;
+	} else if (fft_pos <= wf_pos && !floatingDockers && waterfall_visible && cursors_enabled) {
+		fft_toggle = !sync_toggled;
+	}
+
+	fft_plot->d_hCursorHandle1->setVisible(fft_toggle);
+	fft_plot->d_hCursorHandle2->setVisible(fft_toggle);
+	waterfall_plot->d_hCursorHandle1->setVisible(wf_toggle);
+	waterfall_plot->d_hCursorHandle2->setVisible(wf_toggle);
 }
 
 void SpectrumAnalyzer::connectCursorHandles()
 {
-	if (!btnLockHPlots) return;
+	if (!btnSyncPlotCursors) return;
+
+	connect(btnSyncPlotCursors, &QPushButton::toggled, this, [=](bool toggled){
+		updateVisibleCursorHandles();
+	});
 
 	connect(fft_plot->d_hCursorHandle1, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			waterfall_plot->d_hCursorHandle1->setPosition(pos);
 	});
 
 	connect(fft_plot->d_hCursorHandle2, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			waterfall_plot->d_hCursorHandle2->setPosition(pos);
 	});
 
 	connect(waterfall_plot->d_hCursorHandle1, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			fft_plot->d_hCursorHandle1->setPosition(pos);
 	});
 
 	connect(waterfall_plot->d_hCursorHandle2, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			fft_plot->d_hCursorHandle2->setPosition(pos);
 	});
 }
