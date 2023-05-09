@@ -15,8 +15,13 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 	this->m_iioAttrType = (this->m_channelType == "input") ? "IEC_type" : "do_mode";
 
 	char buffer[ATTR_BUFFER_LEN];
-	iio_channel_attr_read(this->m_channel, this->m_iioAttrAvailableTypes.c_str(), buffer, ATTR_BUFFER_LEN);
+	ssize_t readResult = iio_channel_attr_read(this->m_channel, this->m_iioAttrAvailableTypes.c_str(), buffer, ATTR_BUFFER_LEN);
 
+	if (readResult < 0) {
+		qCritical(CAT_SWIOT_MAX14906) << "Could not read the available types, error code:" << readResult;
+	}
+
+	// separate the available types
 	std::stringstream ss(buffer);
 	std::string aux;
 	while (std::getline(ss, aux, ' ')) {
@@ -24,7 +29,12 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 	}
 
 	memset(buffer, 0, ATTR_BUFFER_LEN);
-	iio_channel_attr_read(this->m_channel, this->m_iioAttrType.c_str(), buffer, ATTR_BUFFER_LEN);
+	readResult = iio_channel_attr_read(this->m_channel, this->m_iioAttrType.c_str(), buffer, ATTR_BUFFER_LEN);
+
+	if (readResult < 0) {
+		qCritical(CAT_SWIOT_MAX14906) << "Could not read the type, error code:" << readResult;
+	}
+
 	this->m_type = buffer;
 
 	this->m_digitalChannel->setConfigModes(this->m_availableTypes);
@@ -58,6 +68,6 @@ void DioDigitalChannelController::writeType() {
 
 	ssize_t res = iio_channel_attr_write(this->m_channel, this->m_iioAttrType.c_str(), s.toStdString().c_str());
 	if (res < 0) {
-		qCritical(CAT_SWIOT_MAX14906) << "Could not write attr to channel " << this->m_channelName << ", error code " << res;
+		qCritical(CAT_SWIOT_MAX14906) << "Could not write attr to channel " << this->m_channelName << ", error code:" << res;
 	}
 }

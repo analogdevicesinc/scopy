@@ -9,17 +9,17 @@ using namespace scopy::swiot;
 FaultWidget::FaultWidget(unsigned int id, QString name, QString faultExplanation, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultWidget),
-	stored(false),
-	active(false),
-	pressed(false),
-	id(id),
-	name(std::move(name)),
-	faultExplanation(std::move(faultExplanation)) {
+	m_stored(false),
+	m_active(false),
+	m_pressed(false),
+	m_id(id),
+	m_name(std::move(name)),
+	m_faultExplanation(std::move(faultExplanation)) {
 	ui->setupUi(this);
 
 	installEventFilter(this);
 
-	this->ui->title->setText("Bit" + QString::number(this->id));
+	this->ui->title->setText("Bit" + QString::number(this->m_id));
 
 	this->ui->mainFrame->setMinimumSize(70, 90);
 }
@@ -29,67 +29,67 @@ FaultWidget::~FaultWidget() {
 }
 
 bool FaultWidget::isStored() const {
-	return stored;
+	return m_stored;
 }
 
-void FaultWidget::setStored(bool stored_) {
-	FaultWidget::stored = stored_;
-	this->ui->stored->setProperty("high", this->stored);
+void FaultWidget::setStored(bool stored) {
+	FaultWidget::m_stored = stored;
+	this->ui->stored->setProperty("high", this->m_stored);
 	this->ui->stored->setStyle(this->ui->stored->style());
 }
 
 bool FaultWidget::isActive() const {
-	return active;
+	return m_active;
 }
 
-void FaultWidget::setActive(bool active_) {
-	FaultWidget::active = active_;
-	this->ui->active->setProperty("high", this->active);
+void FaultWidget::setActive(bool active) {
+	FaultWidget::m_active = active;
+	this->ui->active->setProperty("high", m_active);
 	this->ui->active->setStyle(this->ui->active->style());
 }
 
 const QString &FaultWidget::getName() const {
-	return name;
+	return m_name;
 }
 
-void FaultWidget::setName(const QString &name_) {
-	FaultWidget::name = name_;
+void FaultWidget::setName(const QString &name) {
+	FaultWidget::m_name = name;
 }
 
 const QString &FaultWidget::getFaultExplanation() const {
-	return faultExplanation;
+	return m_faultExplanation;
 }
 
-void FaultWidget::setFaultExplanation(const QString &faultExplanation_) {
-	FaultWidget::faultExplanation = faultExplanation_;
+void FaultWidget::setFaultExplanation(const QString &faultExplanation) {
+	FaultWidget::m_faultExplanation = faultExplanation;
 }
 
 unsigned int FaultWidget::getId() const {
-	return id;
+	return m_id;
 }
 
-void FaultWidget::setId(unsigned int id_) {
-	FaultWidget::id = id_;
+void FaultWidget::setId(unsigned int id) {
+	FaultWidget::m_id = id;
 }
 
 bool FaultWidget::isPressed() const {
-	return pressed;
+	return m_pressed;
 }
 
-void FaultWidget::setPressed(bool pressed_) {
-	FaultWidget::pressed = pressed_;
-	scopy::setDynamicProperty(this->ui->mainFrame, "pressed", pressed_);
+void FaultWidget::setPressed(bool pressed) {
+	FaultWidget::m_pressed = pressed;
+	scopy::setDynamicProperty(this->ui->mainFrame, "pressed", pressed);
 }
 
 bool FaultWidget::eventFilter(QObject *object, QEvent *event) {
 	if (event->type() == QEvent::MouseButtonPress) {
 		this->setPressed( !scopy::getDynamicProperty(this->ui->mainFrame, "pressed") );
 
-		Q_EMIT faultSelected(this->id);
+		Q_EMIT faultSelected(this->m_id);
 	}
 
 	if (event->type() == QEvent::ToolTip) {
-		this->setToolTip(this->name);
+		this->setToolTip(this->m_name);
 	}
 
 	return QWidget::eventFilter(object, event);
