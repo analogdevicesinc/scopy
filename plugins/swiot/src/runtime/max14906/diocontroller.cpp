@@ -1,4 +1,5 @@
 #include "diocontroller.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
 
@@ -20,6 +21,10 @@ int DioController::getChannelCount() {
 
 QString DioController::getChannelName(unsigned int index) {
 	iio_channel *channel = iio_device_get_channel(this->m_device, index);
+	if (channel == nullptr) {
+		qCritical(CAT_SWIOT_MAX14906) << "Error when selecting channel with index" << index << ", returning empty string.";
+		return "";
+	}
 	QString name = iio_channel_get_id(channel);
 
 	return name;
@@ -27,6 +32,10 @@ QString DioController::getChannelName(unsigned int index) {
 
 QString DioController::getChannelType(unsigned int index) {
 	iio_channel* channel = iio_device_get_channel(this->m_device, index);
+	if (channel == nullptr) {
+		qCritical(CAT_SWIOT_MAX14906) << "Error when selecting channel with index" << index << ", returning empty string.";
+		return "";
+	}
 	bool output = iio_channel_is_output(channel);
 
 	return output ? "output" : "input";

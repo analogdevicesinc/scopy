@@ -17,31 +17,24 @@ class FaultWidget : public QWidget {
 
 public:
 	explicit FaultWidget(unsigned int id, QString name, QString faultExplanation, QWidget *parent = nullptr);
-
 	~FaultWidget() override;
 
 	unsigned int getId() const;
-
 	void setId(unsigned int id);
 
 	bool isStored() const;
-
 	void setStored(bool stored);
 
 	bool isActive() const;
-
 	void setActive(bool active);
 
 	const QString &getName() const;
-
 	void setName(const QString &name);
 
 	const QString &getFaultExplanation() const;
-
 	void setFaultExplanation(const QString &faultExplanation);
 
 	bool isPressed() const;
-
 	void setPressed(bool pressed);
 
 Q_SIGNALS:
@@ -54,12 +47,12 @@ protected:
 private:
 	Ui::FaultWidget *ui;
 
-	bool stored;
-	bool active;
-	bool pressed{};
-	unsigned int id{};
-	QString name;
-	QString faultExplanation;
+	bool m_stored;
+	bool m_active;
+	bool m_pressed{};
+	unsigned int m_id{};
+	QString m_name;
+	QString m_faultExplanation;
 };
 }
 
