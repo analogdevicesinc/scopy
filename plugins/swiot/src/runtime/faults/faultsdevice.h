@@ -1,5 +1,5 @@
-#ifndef SCOPY_FAULTSDEVICE_H
-#define SCOPY_FAULTSDEVICE_H
+#ifndef FAULTSDEVICE_H
+#define FAULTSDEVICE_H
 
 #include <QWidget>
 #include <QTextEdit>
@@ -39,6 +39,6 @@ private Q_SLOTS:
 	void updateMinimumHeight();
 };
 
-} // scopy::gui
+} // scopy::swiot
 
-#endif //SCOPY_FAULTSDEVICE_H
+#endif //FAULTSDEVICE_H
