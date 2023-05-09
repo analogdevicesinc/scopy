@@ -486,7 +486,6 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
 	  d_autoscale_shot = false;
 	}
       }
-
       replot();
 
       Q_EMIT newData();
@@ -991,12 +990,17 @@ QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value)
 
 void
 TimeDomainDisplayPlot::setYLabel(const std::string &label,
-				 const std::string &unit)
+				 const std::string &unit,
+				 int axisIdx)
 {
   std::string l = label;
   if(unit.length() > 0)
     l += " (" + unit + ")";
+<<<<<<< HEAD
   setAxisTitle(m_qwtYAxis, QString(l.c_str()));
+=======
+  setAxisTitle(QwtAxisId(m_qwtYAxis, axisIdx), QString(l.c_str()));
+>>>>>>> 805563b2 (gui/TimeDomainDisplayPlot: Fix YAxis scaleDraw bugs.)
 }
 
 void
@@ -1256,6 +1260,18 @@ void TimeDomainDisplayPlot::updatePreview(double reftimebase, double timebase, d
 	}
 
 
+}
+
+void TimeDomainDisplayPlot::configureAllYAxis()
+{
+	int yAxisSize = vertAxes.size();
+	for (int i = 0; i < yAxisSize; i++) {
+		if (d_xAxisFormatter) {
+			configureAxis(QwtAxis::YLeft, i, d_xAxisFormatter);
+		} else {
+			configureAxis(QwtAxis::YLeft, i, new MetricPrefixFormatter());
+		}
+	}
 }
 
 void TimeDomainDisplayPlot::realignReferenceWaveforms(double timebase, double timeposition)

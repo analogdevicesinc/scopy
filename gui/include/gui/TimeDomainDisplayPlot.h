@@ -190,7 +190,12 @@ public Q_SLOTS:
   void enableTagMarker(int which, bool en);
 
   void setYLabel(const std::string &label,
+<<<<<<< HEAD
 		 const std::string &unit="");
+=======
+		 const std::string &unit="",
+		 int axisIdx = 0);
+>>>>>>> 805563b2 (gui/TimeDomainDisplayPlot: Fix YAxis scaleDraw bugs.)
 
   void attachTriggerLines(bool en);
   void setTriggerLines(double x, double y);
@@ -212,6 +217,8 @@ public Q_SLOTS:
   void hideCurvesUntilNewData();
 
   void updatePreview(double reftimebase, double timebase, double timeposition);
+
+  void configureAllYAxis();
 
 protected:
   virtual void configureAxis(int axisPos, int axisIdx, PrefixFormatter* prefixFormatter);
