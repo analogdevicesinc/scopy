@@ -74,7 +74,7 @@ void DioDigitalChannel::addDataSample(double value) {
 	this->ui->sismograph->plot(value);
 	this->ui->sismograph->plot(value);
 	this->ui->sismograph->plot(value);
-//	this->ui->scaleChannel->setValue(value);
+
 	this->ui->lcdNumber->display(value);
 }
 
