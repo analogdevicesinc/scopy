@@ -42,6 +42,7 @@ private:
 protected:
 	void setupDynamicUi();
 	QWidget* buildActiveStoredWidget();
+	QJsonArray* getJsonArray(const QString& path);
 };
 }
 
