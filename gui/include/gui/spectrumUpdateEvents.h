@@ -244,7 +244,7 @@ private:
 class SCOPY_GUI_EXPORT WaterfallUpdateEvent: public QEvent
 {
 public:
-    WaterfallUpdateEvent(const std::vector<volk::vector<double>> dataPoints,
+    WaterfallUpdateEvent(const std::vector<double*> &dataPoints,
 			 const uint64_t numDataPoints,
 			 const gr::high_res_timer_type dataTimestamp);
 

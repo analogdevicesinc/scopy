@@ -27,7 +27,7 @@
 
 #include "iio_manager.hpp"
 #include "scope_sink_f.h"
-#include "waterfall_sink_f.h"
+#include "waterfall_sink.h"
 #include "fft_block.hpp"
 #include "FftDisplayPlot.h"
 #include "m2ktool.hpp"
@@ -246,6 +246,8 @@ private:
 	unsigned int selected_ch_settings;
 	QVector<QStringList> importedChannelDetails;
 
+	bool use_float_sink;
+
 private:
 	libm2k::context::M2k* m_m2k_context;
 	libm2k::analog::M2kAnalogIn* m_m2k_analogin;
@@ -295,7 +297,8 @@ private:
 	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
 
 	scopy::scope_sink_f::sptr fft_sink;
-	scopy::waterfall_sink_f::sptr waterfall_sink;
+	scopy::waterfall_sink::sptr waterfall_sink;
+
 	iio_manager::port_id *fft_ids;
 	iio_manager::port_id *waterfall_ids;
 
