@@ -486,7 +486,6 @@ TimeDomainDisplayPlot::plotNewData(const std::string &sender,
 	  d_autoscale_shot = false;
 	}
       }
-
       replot();
 
       Q_EMIT newData();
@@ -730,15 +729,15 @@ TimeDomainDisplayPlot::sampleRate() const
   return d_sample_rate;
 }
 
-void TimeDomainDisplayPlot::setYaxisUnit(QString unitType)
+void TimeDomainDisplayPlot::setYaxisUnit(QString unitType, int axisIdx)
 {
 	if (d_yAxisUnit != unitType) {
 		d_yAxisUnit = unitType;
-
-		OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxis::YLeft));
-		if (scaleDraw)
-			scaleDraw->setUnitType(d_yAxisUnit);
 	}
+	OscScaleDraw *scaleDraw =
+			static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtAxis::YLeft,axisIdx)));
+	if (scaleDraw)
+		scaleDraw->setUnitType(d_yAxisUnit);
 }
 
 QString TimeDomainDisplayPlot::yAxisUnit(void)
@@ -982,12 +981,13 @@ QString TimeDomainDisplayPlot::yAxisScaleValueFormat(double value)
 
 void
 TimeDomainDisplayPlot::setYLabel(const std::string &label,
-				 const std::string &unit)
+				 const std::string &unit,
+				 int axisIdx)
 {
   std::string l = label;
   if(unit.length() > 0)
     l += " (" + unit + ")";
-  setAxisTitle(QwtAxis::YLeft, QString(l.c_str()));
+  setAxisTitle(QwtAxisId(QwtAxis::YLeft, axisIdx), QString(l.c_str()));
 }
 
 void
@@ -1247,6 +1247,18 @@ void TimeDomainDisplayPlot::updatePreview(double reftimebase, double timebase, d
 	}
 
 
+}
+
+void TimeDomainDisplayPlot::configureAllYAxis()
+{
+	int yAxisSize = vertAxes.size();
+	for (int i = 0; i < yAxisSize; i++) {
+		if (d_xAxisFormatter) {
+			configureAxis(QwtAxis::YLeft, i, d_xAxisFormatter);
+		} else {
+			configureAxis(QwtAxis::YLeft, i, new MetricPrefixFormatter());
+		}
+	}
 }
 
 void TimeDomainDisplayPlot::realignReferenceWaveforms(double timebase, double timeposition)

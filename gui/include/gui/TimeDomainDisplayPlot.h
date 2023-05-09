@@ -120,7 +120,7 @@ public:
 
   double sampleRate() const;
 
-  void setYaxisUnit(QString unitType);
+  void setYaxisUnit(QString unitType, int axisIdx = 0);
   QString yAxisUnit(void);
 
   void setXaxisUnit(QString unitType);
@@ -188,7 +188,8 @@ public Q_SLOTS:
   void enableTagMarker(int which, bool en);
 
   void setYLabel(const std::string &label,
-                 const std::string &unit="");
+		 const std::string &unit="",
+		 int axisIdx = 0);
 
   void attachTriggerLines(bool en);
   void setTriggerLines(double x, double y);
@@ -210,6 +211,8 @@ public Q_SLOTS:
   void hideCurvesUntilNewData();
 
   void updatePreview(double reftimebase, double timebase, double timeposition);
+
+  void configureAllYAxis();
 
 protected:
   virtual void configureAxis(int axisPos, int axisIdx, PrefixFormatter* prefixFormatter);
