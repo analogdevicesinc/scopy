@@ -67,8 +67,6 @@ private:
 	std::unique_ptr<gr::fft::fft_complex_fwd> d_fft;
 
 	int d_index, d_start, d_end;
-	//    std::vector<volk::vector<gr_complex>> d_residbufs;
-	//    std::vector<volk::vector<double>> d_magbufs;
 
 	std::vector<gr_complex*> d_fbuffers;
 	std::vector<double*> d_buffers;
