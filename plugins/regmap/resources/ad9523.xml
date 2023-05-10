@@ -1,0 +1,5901 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2012-2013 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<ad9523_1>
+	<Register>
+		<Name>reg000</Name>
+		<Address>0x0000</Address>
+		<Description>SPI/I2C mode serial port configuration</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Bits[3:0] should always mirror Bits[7:4] so that it does not matter whether the part is in MSB first or LSB first mode (see Register 0x000, Bit 6). Set bits as follows:
+Bit 0 = Bit 7.
+Bit 1 = Bit 6.
+Bit 2 = Bit 5.
+Bit 3 = Bit 4.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg000_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SDO active/ Reserved(Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects unidirectional or bidirectional data transfer mode. This bit is ignored in I2C mode.
+0: SDIO pin used for write and read; SDO is high impedance (default).
+1: SDO used for read; SDIO used for write; unidirectional mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = SDO bidirectional</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = SDO unidirectional</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB first/ address increment(Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>SPI MSB or LSB data orientation. This bit is ignored in I2C mode.
+0: data-oriented MSB first; addressing decrements (default).
+1: data-oriented LSB first; addressing increments.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = MSB first</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = LSB first</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft reset(Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Soft reset.
+1 (self clearing): soft reset; restores default values to internal registers.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft reset</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Soft reset.
+1 (self clearing): soft reset; restores default values to internal registers.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB first/ address increment</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>SPI MSB or LSB data orientation. This bit is ignored in I2C mode.
+0: data-oriented MSB first; addressing decrements (default).
+1: data-oriented LSB first; addressing increments.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = MSB first</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = LSB first</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SDO active/ Reserved</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects unidirectional or bidirectional data transfer mode. This bit is ignored in I2C mode.
+0: SDIO pin used for write and read; SDO is high impedance (default).
+1: SDO used for read; SDIO used for write; unidirectional mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = SDO bidirectional</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = SDO unidirectional</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg004</Name>
+		<Address>0x0004</Address>
+		<Description>Readback control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg004_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Read back active registers</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>For buffered registers, serial port readback reads from actual (active) registers instead of from the buffer.
+0 (default): reads values currently applied to the internal logic of the device.
+1: reads buffered values that take effect on the next assertion of the I/O update.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = read active</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = read buffer</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg005</Name>
+		<Address>0x0005</Address>
+		<Description>EEPROM customer version ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg005_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>EEPROM customer version ID[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>16-bit EEPROM ID, Bits[7:0]. This register, along with Register 0x006, allows the user to store a unique ID to identify which version of the AD9523-1 register settings is stored in the EEPROM. It does not affect AD9523-1 operation in any way (default: 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg006</Name>
+		<Address>0x0006</Address>
+		<Description>EEPROM customer version ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg006_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>EEPROM customer version ID[15:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>16-bit EEPROM ID, Bits[15:8]. This register, along with Register 0x005, allows the user to store a unique ID to identify which version of the AD9523-1 register settings is stored in the EEPROM. It does not affect AD9523-1 operation in any way (default: 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg010</Name>
+		<Address>0x0010</Address>
+		<Description>PLL1 REFA R divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg010_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit REFA R divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>10-bit REFA R divider, Bits[7:0] (LSB). Divide-by-1 to divide-by-1023. 00000000, 00000001: divide-by-1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg011</Name>
+		<Address>0x0011</Address>
+		<Description>PLL1 REFA R divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg011_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit REFA R divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit REFA R divider, Bits[9:8] (MSB)</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg012</Name>
+		<Address>0x0012</Address>
+		<Description>PLL1 REFB R divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Requires Register 0x01C, Bit 7 = 1 for division that is independent of REFA division.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg012_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit REFB R divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>10-bit REFB R divider, Bits[7:0] (LSB). Divide-by-1 to divide-by-1023. 00000000, 00000001: divide-by-1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg013</Name>
+		<Address>0x0013</Address>
+		<Description>PLL1 REFB R divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Requires Register 0x01C, Bit 7 = 1 for division that is independent of REFA division.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg013_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit REFB R divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit REFB R divider, Bits[9:8] (MSB)</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg014</Name>
+		<Address>0x0014</Address>
+		<Description>PLL1 reference test divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg014_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF_TEST divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>6-bit reference test divider. Divide-by-1 to divide-by-63. 000000, 000001: divide-by-1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg016</Name>
+		<Address>0x0016</Address>
+		<Description>PLL1 feedback N divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg016_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit PLL1 feedback divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>10-bit feedback divider, Bits[7:0] (LSB). Divide-by-1 to divide-by-1023. 00000000, 00000001: divide-by-1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg017</Name>
+		<Address>0x0017</Address>
+		<Description>PLL1 feedback N divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg017_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit PLL1 feedback divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit feedback divider, Bits[1:0] (MSB)</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg018</Name>
+		<Address>0x0018</Address>
+		<Description>PLL1 charge pump control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg018_b6_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>12</DefaultValue>
+			<Description>PLL1 charge pump control</Description>
+			<Visibility>Public</Visibility>
+			<Width>7</Width>
+			<Notes>These bits set the magnitude of the PLL1 charge pump current. Granularity is ~0.5 uA with a full-scale magnitude of ~63.5 uA.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>7</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg018_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL1 charge pump tristate</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Tristates the PLL1 charge pump.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019</Name>
+		<Address>0x0019</Address>
+		<Description>PLL1 charge pump control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL1 charge pump mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Controls the mode of the PLL1 charge pump.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = tristate</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = pump up</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = pump down</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = normal(default)</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Antibacklash pulse width control</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Controls the PFD antibacklash period. These bits are ineffective unless Register 0x019, Bit 4 = 1.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Minimum(default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Low</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = High</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Maximum</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable SPI control of antibacklash pulse width</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Controls the functionality of Register 0x019, Bits[3:2].
+0 (default): the device automatically controls the antibacklash period.
+1: antibacklash period defined by Register 0x019, Bits[3:2].</Notes>
+			<Options>
+				<Option>
+					<Description>0  = Automatic</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = defined by Register 0x019</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01A</Name>
+		<Address>0x001A</Address>
+		<Description>PLL1 input receiver control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01A_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OSC_IN differential receiver mode enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1: differential receiver mode.
+0: single-ended receiver mode (also depends on Bit 1) (default).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = single-ended receiver mode</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = differential receiver mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>/OSC_IN single-ended receiver mode enable (CMOS mode)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects which single-ended input pin is enabled when in the single-ended receiver mode (Register 0x01A, Bit 0 = 0).
+1: negative receiver from oscillator input (/OSC_IN pin) selected.
+0: positive receiver from oscillator input (OSC_IN pin) selected (default).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = positive receiver</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = negative receiver</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Input REFA, REFB receiver power- down control enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables power-down control of the input receivers, REFA and REFB.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = both receivers enabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down control enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFA receiver enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>REFA receiver power-down control mode only when Bit 2 = 1.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power-down</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable REFA receiver</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFB receiver enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>REFB receiver power-down control mode only when Bit 2 = 1.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power-down</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable REFB receiver</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFA differential receiver enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1: differential receiver mode. 
+0: single-ended receiver mode (also depends on Register 0x01B, Bit 0) (default).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = single-ended receiver mode</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = differential receiver mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFB differential receiver enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1: differential receiver mode. 
+0: single-ended receiver mode (also depends on Register 0x01B, Bit 1) (default).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = single-ended receiver mode</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = differential receiver mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF_TEST input receiver enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = disabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01B</Name>
+		<Address>0x001B</Address>
+		<Description>REF_TEST, REFA, REFB, and ZD_IN control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01B_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>/REFA single-ended receiver mode enable (CMOS mode)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects which single-ended input pin is enabled when in single-ended receiver mode (Register 0x01A, Bit 5 = 0).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REFA pin enabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = /REFA pin enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>/REFB single-ended receiver mode enable (CMOS mode)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects which single-ended input pin is enabled when in single-ended receiver mode (Register 0x01A, Bit 6 = 0).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REFB pin enabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = /REFB pin enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>ZD_IN differen. receiver mode enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1: differential receiver mode.
+0: single-ended receiver mode (also depends on Register 0x01B, Bit 3).</Notes>
+			<Options>
+				<Option>
+					<Description>1 = differential receiver mode</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0 = single-ended receiver mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>/ZD_IN single- ended receiver mode enable (CMOS mode)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects which single-ended input pin is enabled when in the single-ended receiver mode (Register 0x01B, Bit 2 = 0).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = ZD_IN pin enabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = /ZD_IN pin enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OSC_IN signal feedback for PLL1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Controls the input PLL feedback path, local feedback from the OSC_IN receiver or zero delay mode.
+1: OSC_IN receiver input used for the input PLL feedback (non-zero delay mode).
+0: zero delay mode enabled (also depends on Register 0x01B, Bit 5 to select the zero delay path.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = zero delay mode enabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OSC_IN receiver input used</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Zero delay mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects the zero delay mode used (via the ZD_IN pin) when Register 0x01B, Bit 4 = 0. Otherwise, this bit is ignored.
+1: internal zero delay mode. The zero delay receiver is powered down. The internal zero delay path from Distribution Divider Channel 0 is used.
+0: external zero delay mode. The ZD_IN receiver is enabled.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = external zero delay mode</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = internal zero delay mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass feedback divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Puts the divider into bypass mode (same as programming the divider word to 0 or 1).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = divider normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = divider in bypass mode (divide = 1)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass REF_TEST divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Puts the divider into bypass mode (same as programming the divider word to 0 or 1).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = divider normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = divider in bypass mode (divide = 1)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01C</Name>
+		<Address>0x001C</Address>
+		<Description>PLL1 miscellaneous control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01C_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass REFA R divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Puts the divider into bypass mode (same as programming divider word to 0 or 1).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = divider normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = divider in bypass mode (divide = 1)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01C_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass REFB R divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Puts the divider into bypass mode (same as programming divider word to 0 or 1).</Notes>
+			<Options>
+				<Option>
+					<Description>1 = divider in bypass mode (divide = 1)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0 = divider normal operation</Description>
+					<Value>0</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01C_b4_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reference selection mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Programs the REFA, REFB mode selection. X = don't care.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = Nonrevertive: stay on REFB</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = Revert to REFA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = Select REFA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = Select REFB</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>1XX = REF_SEL pin = 0 (low): REFA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>1XX = REF_SEL pin = 1 (high): REFB</Description>
+					<Value>5</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01C_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OSC_CTRL control voltage to VCC/2 when ref clock fails</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>High permits the OSC_CTRL control voltage to be forced to midsupply when the feedback or input clocks fail. Low tristates the charge pump output.
+1: OSC_CTRL control voltage goes to VCC/2.
+0: OSC_CTRL control voltage tracks the tristated (high impedance) charge pump (through the buffer).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OSC_CTRL control voltage tracks charge pump</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OSC_CTRL control voltage goes to VCC/2</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01C_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable REFB R divider indepen. division control</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1: REFB R divider is controlled by Register 0x012 and Register 0x013.
+0: REFB R divider is set to the same setting as the REFA R divider (Register 0x010 and Register 0x011). This requires that, for the loop to stay locked, the REFA and REFB input frequencies must be the same.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REFB R divider is set to the same setting as the REFA R divider</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = REFB R divider is controlled by Register 0x012 and Register 0x013</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01D</Name>
+		<Address>0x001D</Address>
+		<Description>PLL1 loop filter zero resistor control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01D_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL1 loop filter, RZERO</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Programs the value of the zero resistor, RZERO.</Notes>
+			<Options>
+				<Option>
+					<Description>0000 = 833</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0001 = 677</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0010 = 341</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>0011 = 135</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>0100 = 10</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>0101 = 10</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>0110 = 10</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>0111 = 10</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>1000 = Use external resistor</Description>
+					<Value>8</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F0</Name>
+		<Address>0x00F0</Address>
+		<Description>PLL2 charge pump control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F0_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL2 charge pump control</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>These bits set the magnitude of the PLL2 charge pump current. Granularity is ~3.5 uA with a full-scale magnitude of ~900 uA.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F1</Name>
+		<Address>0x00F1</Address>
+		<Description>PLL2 feedback N divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F1_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>4</DefaultValue>
+			<Description>B counter</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>B counter word.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F1_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>A counter</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>A counter word.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F2</Name>
+		<Address>0x00F2</Address>
+		<Description>PLL2 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F2_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>PLL2 charge pump mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Controls the mode of the PLL2 charge pump.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = tristate</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = pump up</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = pump down</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = normal(default)</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F2_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Antibacklash pulse width control</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Controls the PFD antibacklash period of PLL2. These bits are ineffective unless Register 0x0F2, Bit 4 = 1.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = minimum(default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = low</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = high</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = maximum</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F2_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable SPI control of antibacklash pulse width</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Controls the functionality of Register 0x0F2, Bits[3:2]. Set the antibacklash pulse width to the minimum setting. By setting Bit 4 to 1 from the default of 0, Bits[3:2] consequently default to 00.
+0 (default): device automatically controls the antibacklash period to high (equivalent to Register 0x0F2, Bits[3:2] = 10).
+1: antibacklash period defined by Register 0x0F2, Bits[3:2] (recommended setting).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = automatic</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = defined by Register 0x0F2</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F2_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable frequency doubler</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables doubling of the PLL2 reference input frequency.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F2_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL2 lock detector power- down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Controls power-down of the PLL2 lock detector.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = lock detector active</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = lock detector powered down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F3</Name>
+		<Address>0x00F3</Address>
+		<Description>VCO control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F3_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Calibrate VCO (not auto- clearing)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = resets the VCO calibration</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = initiates VCO calibration</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Force VCO to midpoint frequency</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects VCO control voltage functionality.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal VCO operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = forces VCO control voltage to midscale</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F3_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Treat reference as valid</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 (default): uses the PLL1 VCXO indicator to determine when the reference clock to the PLL2 is valid.
+1: treats the reference clock as valid even if PLL1 does not consider it to be valid.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = use PLL1 VCXO indicator</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = treat reference clock as valid</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F3_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Force release of  distribution sync when PLL2 is unlocked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 (default): distribution is held in sync (static) until the output PLL locks. Then it is automatically released from sync with all dividers synchronized.
+1: overrides the PLL2 lock detector state; forces release of the distribution from sync.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = distribution is held in sync</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = force release of the distribution from sync</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F4</Name>
+		<Address>0x00F4</Address>
+		<Description>VCO divider control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F4_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO divider M1</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Note that the VCO Divider M1 connects to all output channels.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Divide-by-3</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Divide-by-4</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Divide-by-5</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Divide-by-3</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F4_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO M1 divider power- down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the divider</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F4_b5_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO divider M2</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Note that the VCO Divider M2 connects to Output Channel 4 through Output Channel 9.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Divide-by-3</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Divide-by-4</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Divide-by-5</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Divide-by-3</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F4_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO M2 divider power- down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the divider</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F5</Name>
+		<Address>0x00F5</Address>
+		<Description>PLL2 loop filter control (9 bits)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F5_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Pole 1 capacitor (CPOLE1)</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000 = 0 pF</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 8 pF</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 16 pF</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 24 pF</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 24 pF</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 32 pF</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 40 pF</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 48 pF</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F5_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Zero resistor (RZERO)</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000 = 3250 Ohm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 2750 Ohm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 2250 Ohm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 2100 Ohm</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 3000 Ohm</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 2500 Ohm</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 2000 Ohm</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1850 Ohm</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0F5_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Pole 2 resistor (RPOLE2)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = 900 Ohm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 450 Ohm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 300 Ohm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 225 Ohm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F6</Name>
+		<Address>0x00F6</Address>
+		<Description>PLL2 loop filter control (9 bits)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F6_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass internal RZERO resistor</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses the internal RZERO resistor (RZERO = 0 Ohm). Requires the use of a series external zero resistor. This bit is the MSB of the loop filter control register (Address 0x0F5 and Address 0x0F6).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0F7</Name>
+		<Address>0x00F7</Address>
+		<Description>PLL2 R2 divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0F7_b4_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL R2 divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>5</Width>
+			<Notes>Divide-by-1 to divide-by-31.
+00000, 00001: divide-by-1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>5</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg190</Name>
+		<Address>0x0190</Address>
+		<Description>Channel 0 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg190_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg190_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg190_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg190_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg190_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg191</Name>
+		<Address>0x0191</Address>
+		<Description>Channel 0 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg191_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg192</Name>
+		<Address>0x0192</Address>
+		<Description>Channel 0 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg192_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg192_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg193</Name>
+		<Address>0x0193</Address>
+		<Description>Channel 1 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg193_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg193_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg193_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg193_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg193_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg194</Name>
+		<Address>0x0194</Address>
+		<Description>Channel 1 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg194_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg195</Name>
+		<Address>0x0195</Address>
+		<Description>Channel 1 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg195_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg195_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg196</Name>
+		<Address>0x0196</Address>
+		<Description>Channel 2 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg196_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg196_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg196_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg196_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg196_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg197</Name>
+		<Address>0x0197</Address>
+		<Description>Channel 2 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg197_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg198</Name>
+		<Address>0x0198</Address>
+		<Description>Channel 2 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg198_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg198_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg199</Name>
+		<Address>0x0199</Address>
+		<Description>Channel 3 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg199_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg199_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg199_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg199_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg199_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg19A</Name>
+		<Address>0x019A</Address>
+		<Description>Channel 3 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg19A_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg19B</Name>
+		<Address>0x019B</Address>
+		<Description>Channel 3 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg19B_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19B_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg19C</Name>
+		<Address>0x019C</Address>
+		<Description>Channel 4 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg19C_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19C_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19C_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19C_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19C_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg19D</Name>
+		<Address>0x019D</Address>
+		<Description>Channel 4 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg19D_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg19E</Name>
+		<Address>0x019E</Address>
+		<Description>Channel 4 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg19E_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19E_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg19F</Name>
+		<Address>0x019F</Address>
+		<Description>Channel 5 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg19F_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19F_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19F_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19F_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg19F_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A0</Name>
+		<Address>0x01A0</Address>
+		<Description>Channel 5 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A0_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A1</Name>
+		<Address>0x01A1</Address>
+		<Description>Channel 5 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A1_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A1_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A2</Name>
+		<Address>0x01A2</Address>
+		<Description>Channel 6 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A2_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A2_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A2_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A2_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A2_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A3</Name>
+		<Address>0x01A3</Address>
+		<Description>Channel 6 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A3_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A4</Name>
+		<Address>0x01A4</Address>
+		<Description>Channel 6 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A4_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A4_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A5</Name>
+		<Address>0x01A5</Address>
+		<Description>Channel 7 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A5_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A5_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A5_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A5_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A5_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A6</Name>
+		<Address>0x01A6</Address>
+		<Description>Channel 7 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A6_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A7</Name>
+		<Address>0x01A7</Address>
+		<Description>Channel 7 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A7_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A7_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A8</Name>
+		<Address>0x01A8</Address>
+		<Description>Channel 8 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A8_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A8_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A8_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A8_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1A8_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1A9</Name>
+		<Address>0x01A9</Address>
+		<Description>Channel 8 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1A9_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1AA</Name>
+		<Address>0x01AA</Address>
+		<Description>Channel 8 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1AA_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AA_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1AB</Name>
+		<Address>0x01AB</Address>
+		<Description>Channel 9 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1AB_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AB_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AB_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AB_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AB_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1AC</Name>
+		<Address>0x01AC</Address>
+		<Description>Channel 9 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1AC_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1AD</Name>
+		<Address>0x01AD</Address>
+		<Description>Channel 9 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1AD_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AD_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1AE</Name>
+		<Address>0x01AE</Address>
+		<Description>Channel 10 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1AE_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AE_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AE_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AE_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1AE_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1AF</Name>
+		<Address>0x01AF</Address>
+		<Description>Channel 10 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1AF_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B0</Name>
+		<Address>0x01B0</Address>
+		<Description>Channel 10 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B0_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B0_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B1</Name>
+		<Address>0x01B1</Address>
+		<Description>Channel 11 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B1_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B1_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B1_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B1_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B1_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B2</Name>
+		<Address>0x01B2</Address>
+		<Description>Channel 11 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B2_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B3</Name>
+		<Address>0x01B3</Address>
+		<Description>Channel 11 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B3_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B3_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B4</Name>
+		<Address>0x01B4</Address>
+		<Description>Channel 12 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B4_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B4_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B4_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B4_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B4_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B5</Name>
+		<Address>0x01B5</Address>
+		<Description>Channel 12 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B5_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B6</Name>
+		<Address>0x01B6</Address>
+		<Description>Channel 12 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B6_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B6_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B7</Name>
+		<Address>0x01B7</Address>
+		<Description>Channel 13 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B7_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Driver mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Driver mode.
+0000 = Tristate output
+0001 = LVPECL (8 mA)
+0010 = LVDS (3.5 mA)
+0011 = LVDS (7 mA)
+0100 = HSTL-0 (16 mA)
+0101 = HSTL-1 (8 mA)
+0110 = CMOS (both outputs in phase)
+           + Pin: true phase relative to divider output 
+           - Pin: true phase relative to divider output
+0111 = CMOS (opposite phases on outputs)
+           + Pin: true phase relative to divider output 
+           - Pin: complement phase relative to divider output
+1000 = CMOS 
+           + Pin: true phase relative to divider output 
+           - Pin: high-Z
+1001 = CMOS 
+           + Pin: high-Z 
+           - Pin: true phase relative to divider output
+1010 = CMOS
+            + Pin: high-Z 
+            - Pin: high-Z
+1011 = CMOS (both outputs in phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: complement phase relative to divider output
+1100 = CMOS (both outputs out of phase) 
+            + Pin: complement phase relative to divider output 
+            - Pin: true phase relative to divider output
+1101  = CMOS 
+            + Pin: complement phase relative to divider output 
+            - Pin: high-Z
+1110 = CMOS 
+            + Pin: high-Z 
+            - Pin: complement phase relative to divider output
+1111 = Tristate output</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lower power mode (differential modes only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Reduces power used in the differential output modes (LVDS/LVPECL/HSTL). This reduction may result in power savings, but at the expense of performance. Note that this bit does not affect output swing and current, just the internal driver power.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low strength/lower power</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B7_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power- down channel</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = powers down the entire channel</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Ignore sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B7_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert divider output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Inverts the polarity of the divider's output clock.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B8</Name>
+		<Address>0x01B8</Address>
+		<Description>Channel 13 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B8_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>31</DefaultValue>
+			<Description>10-bit channel divider[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Division = Channel Divider Bits[9:0] + 1. For example, [9:0] = 0 is divided by 1, [9:0] = 1 is divided by 2 ... [9:0] = 1023 is divided by 1024. 10-bit channel divider, Bits[7:0] (LSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1B9</Name>
+		<Address>0x01B9</Address>
+		<Description>Channel 13 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1B9_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>10-bit channel divider[9:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>10-bit channel divider, Bits[9:8] (MSB).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1B9_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider phase[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Divider initial phase after a sync is asserted relative to the divider input clock (from the VCO divider output). LSB = 1/2 of a period of the divider input clock.
+Phase = 0: no phase offset.
+Phase = 1: 1/2 period offset, ...
+Phase = 63: 31 period offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1BA</Name>
+		<Address>0x01BA</Address>
+		<Description>PLL1 output control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1BA_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Out PLL1 output</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0000 = divide-by-1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0001 = divide-by-2(default)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0010 = divide-by-4</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>0100 = divide-by-8</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>1000 = divide-by-16</Description>
+					<Value>8</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BA_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL1 output CMOS driver strength</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>CMOS driver strength</Notes>
+			<Options>
+				<Option>
+					<Description>0 = strong</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = weak</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BA_b7_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CLK2 select[2:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bits[2:0] of the VCO divider channel select.
+Bit 7 selects Channel Output 6.
+Bit 6 selects Channel Output 5.
+Bit 5 selects Channel Output 4.
+0: VCO Divider M1.
+1: VCO Divider M2.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg1BB</Name>
+		<Address>0x01BB</Address>
+		<Description>PLL1 output channel control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg1BB_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Route VCXO clock to Ch 0 divider input</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = channel uses VCO divider output clock</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = channel uses VCXO clock. Routes VCXO clock to divider input</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BB_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Route VCXO clock to Ch 1 divider input</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = channel uses VCO divider output clock</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = channel uses VCXO clock. Routes VCXO clock to divider input</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BB_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Route VCXO clock to Ch 2 divider input</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = channel uses VCO divider output clock</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = channel uses VCXO clock. Routes VCXO clock to divider input</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BB_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Route VCXO clock to Ch 3 divider input</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = channel uses VCO divider output clock</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = channel uses VCXO clock. Routes VCXO clock to divider input</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BB_b6_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>CLK2 select[5:3]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Bits[5:3] of the VCO divider channel select.
+Bit 6 selects Channel Output 9.
+Bit 5 selects Channel Output 8.
+Bit 4 selects Channel Output 7.
+0: VCO Divider M1.
+1: VCO Divider M2.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg1BB_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL1 output driver power- down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>PLL1 output driver power-down</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg22C</Name>
+		<Address>0x022C</Address>
+		<Description>Readback 0</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg22C_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lock detect PLL1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = unlocked</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = locked</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lock detect PLL2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = unlocked</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = locked</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status REFA</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = off/clocks are missing</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status REFB</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = off/clocks are missing</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status REF_TEST</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = off/clocks are missing</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status VCXO</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = off/clocks are missing</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status PLL1 feedback clock</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = off/clocks are missing</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22C_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status PLL2 reference clock</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = off/clocks are missing</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg22D</Name>
+		<Address>0x022D</Address>
+		<Description>Readback 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg22D_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO calibration in progress</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = VCO calibration not in progress</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = VCO calibration in progress</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22D_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Selected reference (in auto mode)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selected reference (applies only when the device automatically selects the reference; for example, not in manual control mode)</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REFA</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = REFB</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg22D_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Holdover active</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = holdover is active (both references are missing)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg230</Name>
+		<Address>0x0230</Address>
+		<Description>Status signals</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg230_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status Monitor 0 control</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000000 = GND</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>000001 = PLL1 and PLL2 locked</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>000010 = PLL1 locked</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>000011 = PLL2 locked</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>000100 = Both references are missing (REFA and REFB)</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>000101 = Both references are missing and PLL2 is locked</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>000110 = REFB selected (applies only to auto select mode)</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>000111 = REFA is OK</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>001000 = REFB is OK</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>001001 = REF_TEST is OK</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>001010 = VCXO is OK</Description>
+					<Value>10</Value>
+				</Option>
+				<Option>
+					<Description>001011 = PLL1 feedback is OK</Description>
+					<Value>11</Value>
+				</Option>
+				<Option>
+					<Description>001100 = PLL2 reference clock is OK</Description>
+					<Value>12</Value>
+				</Option>
+				<Option>
+					<Description>001110 = REFA and REFB are OK</Description>
+					<Value>14</Value>
+				</Option>
+				<Option>
+					<Description>001111 = All clocks are OK (except REF_TEST)</Description>
+					<Value>15</Value>
+				</Option>
+				<Option>
+					<Description>010000 = PLL1 feedback is divide-by-2</Description>
+					<Value>16</Value>
+				</Option>
+				<Option>
+					<Description>010001 = PLL1 PFD down divide-by-2</Description>
+					<Value>17</Value>
+				</Option>
+				<Option>
+					<Description>010010 = PLL1 REF divide-by-2</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>010011 = PLL1 PFD up divide-by-2</Description>
+					<Value>19</Value>
+				</Option>
+				<Option>
+					<Description>010100 = GND</Description>
+					<Value>20</Value>
+				</Option>
+				<Option>
+					<Description>010101 = GND</Description>
+					<Value>21</Value>
+				</Option>
+				<Option>
+					<Description>010110 = GND</Description>
+					<Value>22</Value>
+				</Option>
+				<Option>
+					<Description>010111 = GND</Description>
+					<Value>23</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg231</Name>
+		<Address>0x0231</Address>
+		<Description>Status signals</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg231_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status Monitor 1 control</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000000 = GND</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>000001 = PLL1 and PLL2 locked</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>000010 = PLL1 locked</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>000011 = PLL2 locked</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>000100 = Both references are missing (REFA and REFB)</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>000101 = Both references are missing and PLL2 is locked</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>000110 = REFB selected (applies only to auto select mode)</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>000111 = REFA is OK</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>001000 = REFB is OK</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>001001 = REF_TEST is OK</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>001010 = VCXO is OK</Description>
+					<Value>10</Value>
+				</Option>
+				<Option>
+					<Description>001011 = PLL1 feedback is OK</Description>
+					<Value>11</Value>
+				</Option>
+				<Option>
+					<Description>001100 = PLL2 reference clock is OK</Description>
+					<Value>12</Value>
+				</Option>
+				<Option>
+					<Description>001110 = REFA and REFB are OK</Description>
+					<Value>14</Value>
+				</Option>
+				<Option>
+					<Description>001111 = All clocks are OK (except REF_TEST)</Description>
+					<Value>15</Value>
+				</Option>
+				<Option>
+					<Description>010000 = GND</Description>
+					<Value>16</Value>
+				</Option>
+				<Option>
+					<Description>010001 = GND</Description>
+					<Value>17</Value>
+				</Option>
+				<Option>
+					<Description>010010 = GND</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>010011 = GND</Description>
+					<Value>19</Value>
+				</Option>
+				<Option>
+					<Description>010100 = PLL2 feedback is divide-by-2</Description>
+					<Value>20</Value>
+				</Option>
+				<Option>
+					<Description>010101 = PLL2 PFD down divide-by-2</Description>
+					<Value>21</Value>
+				</Option>
+				<Option>
+					<Description>010110 = PLL2 REF divide-by-2</Description>
+					<Value>22</Value>
+				</Option>
+				<Option>
+					<Description>010111 = PLL2 PFD up divide-by-2</Description>
+					<Value>23</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg232</Name>
+		<Address>0x0232</Address>
+		<Description>Status signals</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg232_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync dividers (manual control)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Set bit to put dividers in sync; clear bit to release. Functions like /SYNC pin low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = sync</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg232_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>STATUS0 pin divider enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables a divide-by-4 on the STATUS0 pin, allowing dynamic signals to be viewed at a lower frequency (such as the PFD input clocks). Not to be used with dc states on the status pins, which occur when the settings of Register 0x230, Bits[5:0] are in the range of 000000 to 001111.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg232_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>STATUS1 pin divider enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables a divide-by-4 on the STATUS1 pin, allowing dynamic signals to be viewed at a lower frequency (such as the PFD input clocks). Not to be used with dc states on the status pins, which occur when the settings of Register 0x231, Bits[5:0] are in the range of 000000 to 001111.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0 = enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg232_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable Status_ EEPROM on STATUS0 pin</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables the EEPROM status on the STATUS0 pin.
+1: enable status.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg233</Name>
+		<Address>0x0233</Address>
+		<Description>Power-down control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg233_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Distribution power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down the distribution.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation.</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg233_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>PLL2 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation.</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg233_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>PLL1 power- down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation.</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg234</Name>
+		<Address>0x0234</Address>
+		<Description>Update all registers</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg234_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>IO_Update</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>This bit must be set to 1 to transfer the contents of the buffer registers into the active registers, which happens on the next SCLK rising edge. This bit is self-clearing; that is, it does not have to be set back to 0.
+1 (self-clearing): update all active registers to the contents of the buffer registers.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA00</Name>
+		<Address>0x0A00</Address>
+		<Description>EEPROM Buffer Segment Register 1 to EEPROM Buffer Segment Register 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA00_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Instruction (data)[7:0] (serial port configuration register)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA01</Name>
+		<Address>0x0A01</Address>
+		<Description>EEPROM Buffer Segment Register 1 to EEPROM Buffer Segment Register 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA01_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>High byte of register address (serial port configuration register)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA02</Name>
+		<Address>0x0A02</Address>
+		<Description>EEPROM Buffer Segment Register 1 to EEPROM Buffer Segment Register 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA02_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Low byte of register address (serial port configuration register)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA03</Name>
+		<Address>0x0A03</Address>
+		<Description>EEPROM Buffer Segment Register 4 to EEPROM Buffer Segment Register 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA03_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>Instruction (data)[7:0] (reaback control register)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA04</Name>
+		<Address>0x0A04</Address>
+		<Description>EEPROM Buffer Segment Register 4 to EEPROM Buffer Segment Register 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA04_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>High byte of register address (reaback control register)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA05</Name>
+		<Address>0x0A05</Address>
+		<Description>EEPROM Buffer Segment Register 4 to EEPROM Buffer Segment Register 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA05_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>4</DefaultValue>
+			<Description>Low byte of register address (reaback control register)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA06</Name>
+		<Address>0x0A06</Address>
+		<Description>EEPROM Buffer Segment Register 7 to EEPROM Buffer Segment Register 9</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA06_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>14</DefaultValue>
+			<Description>Instruction (data)[7:0] (PLL segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA07</Name>
+		<Address>0x0A07</Address>
+		<Description>EEPROM Buffer Segment Register 7 to EEPROM Buffer Segment Register 9</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA07_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>High byte of register address (PLL segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA08</Name>
+		<Address>0x0A08</Address>
+		<Description>EEPROM Buffer Segment Register 7 to EEPROM Buffer Segment Register 9</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA08_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>16</DefaultValue>
+			<Description>Low byte of register address (PLL segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA09</Name>
+		<Address>0x0A09</Address>
+		<Description>EEPROM Buffer Segment Register 10 to EEPROM Buffer Segment Register 12</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA09_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>14</DefaultValue>
+			<Description>Instruction (data)[7:0] (PECL/CMOS output segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA0A</Name>
+		<Address>0x0A0A</Address>
+		<Description>EEPROM Buffer Segment Register 10 to EEPROM Buffer Segment Register 12</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA0A_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>High byte of register address (PECL/CMOS output segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA0B</Name>
+		<Address>0x0A0B</Address>
+		<Description>EEPROM Buffer Segment Register 10 to EEPROM Buffer Segment Register 12</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA0B_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>240</DefaultValue>
+			<Description>Low byte of register address (PECL/CMOS output segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA0C</Name>
+		<Address>0x0A0C</Address>
+		<Description>EEPROM Buffer Segment Register 13 to EEPROM Buffer Segment Register 15</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA0C_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>43</DefaultValue>
+			<Description>Instruction (data)[7:0] (divider segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA0D</Name>
+		<Address>0x0A0D</Address>
+		<Description>EEPROM Buffer Segment Register 13 to EEPROM Buffer Segment Register 15</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA0D_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>High byte of register address (divider segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA0E</Name>
+		<Address>0x0A0E</Address>
+		<Description>EEPROM Buffer Segment Register 13 to EEPROM Buffer Segment Register 15</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA0E_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>144</DefaultValue>
+			<Description>Low byte of register address (divider segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA0F</Name>
+		<Address>0x0A0F</Address>
+		<Description>EEPROM Buffer Segment Register 16 to EEPROM Buffer Segment Register 18</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA0F_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Instruction (data)[7:0] (clock input and REF segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA10</Name>
+		<Address>0x0A10</Address>
+		<Description>EEPROM Buffer Segment Register 16 to EEPROM Buffer Segment Register 18</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA10_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>High byte of register address (clock input and REF segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA11</Name>
+		<Address>0x0A11</Address>
+		<Description>EEPROM Buffer Segment Register 16 to EEPROM Buffer Segment Register 18</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA11_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>224</DefaultValue>
+			<Description>Low byte of register address (clock input and REF segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA12</Name>
+		<Address>0x0A12</Address>
+		<Description>EEPROM Buffer Segment Register 19 to EEPROM Buffer Segment Register 21</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA12_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>Instruction (data)[7:0] (other segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA13</Name>
+		<Address>0x0A13</Address>
+		<Description>EEPROM Buffer Segment Register 19 to EEPROM Buffer Segment Register 21</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA13_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>High byte of register address (other segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA14</Name>
+		<Address>0x0A14</Address>
+		<Description>EEPROM Buffer Segment Register 19 to EEPROM Buffer Segment Register 21</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA14_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>48</DefaultValue>
+			<Description>Low byte of register address (other segment)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA15</Name>
+		<Address>0x0A15</Address>
+		<Description>EEPROM Buffer Segment Register 22</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA15_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>128</DefaultValue>
+			<Description>I/O update</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regA16</Name>
+		<Address>0x0A16</Address>
+		<Description>EEPROM Buffer Segment Register 23</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regA16_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>255</DefaultValue>
+			<Description>End of data</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regB00</Name>
+		<Address>0x0B00</Address>
+		<Description>Status_ EEPROM (read only)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regB00_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Status_ EEPROM (read only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>This read-only bit indicates the status of the data transferred between the EEPROM and the buffer register bank during the writing and reading of the EEPROM. This signal is also available at the STATUS0 pin when Register 0x232, Bit 4 is set.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = data transfer is complete</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = data transfer is not complete</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regB01</Name>
+		<Address>0x0B01</Address>
+		<Description>EEPROM error checking readback (read only)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regB01_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>EEPROM data error (read only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>This read-only bit indicates an error during the data transfer between the EEPROM and the buffer.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = no error; data is correct</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = incorrect data detected</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regB02</Name>
+		<Address>0x0B02</Address>
+		<Description>EEPROM Control 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regB02_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable EEPROM write</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables the user to write to the EEPROM.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = EEPROM write protection is enabled. User cannot write to EEPROM</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = EEPROM write protection is disabled. User can write to EEPROM</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>regB02_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft_EEPROM</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>When the EEPROM_SEL pin is tied low, setting the Soft_EEPROM bit resets the AD9523 using the settings saved in EEPROM.
+1: soft reset with EEPROM settings (self-clearing).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>regB03</Name>
+		<Address>0x0B03</Address>
+		<Description>EEPROM Control 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>regB03_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REG2EEPROM</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Transfers data from the buffer register to the EEPROM (self-clearing).
+1: setting this bit initiates the data transfer from the buffer register to the EEPROM (writing process); it is reset by the I2C master after the data transfer is done.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</ad9523_1>

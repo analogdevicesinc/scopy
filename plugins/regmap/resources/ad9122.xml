@@ -1,0 +1,2822 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2012-2013 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<ad9122>
+	<Register>
+		<Name>reg000</Name>
+		<Address>0x000</Address>
+		<Description>Comm</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg000_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reset</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>The device is placed in reset when this bit is written high and remains in reset until the bit is written low.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB_FIRST</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Serial port communication, LSB or MSB first.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = MSB first</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = LSB first</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SDIO</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>SDIO pin operation.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = SDIO - input only</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = SDIO - bidirectional input/output</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001</Name>
+		<Address>0x001</Address>
+		<Description>Power control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Power down aux ADC</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = power down the auxiliary ADC for temperature sensor.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down data receiver</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = power down the input data receiver.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down Q DAC</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = power down Q DAC.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down I DAC</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = power down I DAC.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg003</Name>
+		<Address>0x003</Address>
+		<Description>Data format</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg003_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Data Bus Width[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Data receiver interface mode. See the LVDS Input Data Ports section for information about the operation of the different interface modes.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = word mode; 16-bit interface bus width</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = byte mode; 8-bit interface bus width</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = nibble mode; 4-bit interface bus width</Description>
+					<Value>2</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>MSB swap</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Swaps the bit order of the data input port.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = order of the data bits corresponds to the pin descriptions</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bit designations are swapped; most significant bits become the least significant bits</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q data first</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Indicates I/Q data pairing on data input.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = I data sent to data receiver first</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = Q data sent to data receiver first</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg003_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Binary data format</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = input data is in twos complement format</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = input data is in binary format</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg004</Name>
+		<Address>0x004</Address>
+		<Description>Interrupt enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg004_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable FIFO Warning 2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for FIFO Warning 2.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable FIFO Warning 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for FIFO Warning 1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable sync signal locked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for sync signal locked.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable sync signal lost</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for sync signal lost.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable PLL locked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for PLL locked.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg004_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable PLL lock lost</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for PLL lock lost.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg005</Name>
+		<Address>0x005</Address>
+		<Description>Interrupt enable</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg005_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable SED compare fail</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for SED comparison fail.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg005_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable AED compare fail</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for AED comparison fail.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg005_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable AED compare pass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable interrupt for AED comparison pass.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg006</Name>
+		<Address>0x006</Address>
+		<Description>Event flag</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A. Note that all event flags are cleared by writing the respective bit high.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg006_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO Warning 2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the difference between the FIFO read and write pointers is 2.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg006_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO Warning 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the difference between the FIFO read and write pointers is 1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg006_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync signal locked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the sync logic has achieved sync alignment. This is indicated when no phase changes were requested for at least a few full averaging cycles.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg006_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync signal lost</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the sync logic, which had been previously locked, has lost alignment. This is a latched signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg006_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLLlocked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the PLL has locked to the reference clock input.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg006_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL lock lost</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the PLL, which had been previously locked, has unlocked from the reference signal. This is a latched signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg007</Name>
+		<Address>0x007</Address>
+		<Description>Event flag</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A. Note that all event flags are cleared by writing the respective bit high.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg007_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SED compare fail</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the SED logic detected an invalid input data pattern compared against the preprogrammed expected values. This is a latched signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg007_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>AED compare fail</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the SED logic detected an invalid input data pattern compared against the preprogrammed expected values. This latched signal is automatically cleared when eight valid I/Q data pairs are received.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg007_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>AED compare pass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the SED logic detected a valid input data pattern compared against the preprogrammed expected values. This is a latched signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg008</Name>
+		<Address>0x008</Address>
+		<Description>Clock receiver control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg008_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>REFCLK cross - correction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable differential crossing correction on the REFCLK input.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>DACCLK cross - correction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable differential crossing correction on the DACCLK input.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFCLK duty correction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable duty cycle correction on the REFCLK input.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>DACCLK duty correction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable duty cycle correction on the DACCLK input.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A</Name>
+		<Address>0x00A</Address>
+		<Description>PLL control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Manual VCO Band[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the VCO band to be used.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00A_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>PLL manual enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable manual selection of the VCO band. The correct VCO band must be determined by the user and written to Bits[5:0].</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00A_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable the PLL clock multiplier. The REFCLK input is used as the PLL reference clock signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00C</Name>
+		<Address>0x00C</Address>
+		<Description>PLL control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00C_b4_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>17</DefaultValue>
+			<Description>PLL Charge Pump Current[4:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>5</Width>
+			<Notes>Sets the nominal PLL charge pump current.
+00000 = lowest current setting.
+...
+11111 = highest current setting.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>5</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00C_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>PLL Loop Bandwidth[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Selects the PLL loop filter bandwidth.
+00 = widest bandwidth.
+...
+11 = narrowest bandwidth.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00D</Name>
+		<Address>0x00D</Address>
+		<Description>PLL control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00D_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>N1[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>PLL loop divider. This divider determines the ratio of the DACCLK frequency to the REFCLK frequency.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = fDACCLK/fREFCLK = 2</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = fDACCLK/fREFCLK = 4</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = fDACCLK/fREFCLK = 8</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = fDACCLK/fREFCLK = 16</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00D_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>N0[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>PLL VCO divider. This divider determines the ratio of the VCO frequency to the DACCLK frequency.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = fVCO/fDACCLK = 1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = fVCO/fDACCLK = 2</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = fVCO/fDACCLK = 4</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = fVCO/fDACCLK = 4</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00D_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>PLL cross- control enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable PLL cross-point controller.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00D_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>N2[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>PLL control clock divider. This divider determines the ratio of the DACCLK frequency to the PLL controller clock frequency. fPC_CLK must always be less than 75 MHz.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = fDACCLK/fPC_CLK = 2</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = fDACCLK/fPC_CLK = 4</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = fDACCLK/fPC_CLK = 8</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = fDACCLK/fPC_CLK = 16</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00E</Name>
+		<Address>0x00E</Address>
+		<Description>PLL status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00E_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO Control Voltage[3:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>VCO control voltage readback. See Table 24 of the datasheet.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00E_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL locked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = the PLL-generated clock is tracking the REFCLK input signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00F</Name>
+		<Address>0x00F</Address>
+		<Description>PLL status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00F_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO Band Readback[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Indicates the VCO band currently selected.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg010</Name>
+		<Address>0x010</Address>
+		<Description>Sync control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg010_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync Averaging[2:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Sets the number of input samples that are averaged in determining the sync phase.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 2</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 4</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 8</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 16</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 32</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 64</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 128</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg010_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Rising edge sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = sync is initiated on the falling edge of the sync input</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = sync is initiated on the rising edge of the sync input</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg010_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Data/FIFO rate toggle</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = operate the synchronization at the FIFO reset rate</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = operate the synchronization at the data rate</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg010_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable the synchronization logic.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg011</Name>
+		<Address>0x011</Address>
+		<Description>Sync control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg011_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync Phase Request[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>This register sets the requested clock phase offset after sync. The offset unit is in DACCLK cycles. This register enables repositioning of the DAC output with respect to the sync input. The offset can also be used to skew the DAC outputs between the synchronized DACs.
+000000 = 0 DACCLK cycles.
+000001 = 1 DACCLK cycle.
+...
+111111 = 63 DACCLK cycles.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg012</Name>
+		<Address>0x012</Address>
+		<Description>Sync status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg012_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync locked</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = synchronization has been attained.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg012_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync lost</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = synchronization was attained but has been lost.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg013</Name>
+		<Address>0x013</Address>
+		<Description>Sync status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg013_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sync Phase Readback[7:0] (6.2 format)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Indicates the averaged sync phase offset (6.2 format). If this value differs from the Sync Phase Request[5:0] value in Register 0x11, a sync timing error has occurred. For more information, see the Sync Status Bits section.
+00000000 = 0.0.
+00000001 = 0.25.
+...
+11111110 = 63.50.
+11111111 = 63.75.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg015</Name>
+		<Address>0x015</Address>
+		<Description>Data receiver status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg015_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LVDS data level low</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>One or more LVDS Dx input signals have crossed below 0.7 V.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg015_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LVDS data level high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>One or more LVDS Dx input signals have exceeded 1.7 V.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg015_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LVDS DCI level low</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>One or both LVDS DCI input signals have crossed below 0.7 V.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg015_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LVDS DCI level high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>One or both LVDS DCI input signals have exceeded 1.7 V.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg015_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LVDS FRAME level low</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>One or both LVDS FRAME input signals have crossed below 0.7 V.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg015_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LVDS FRAME level high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>One or both LVDS FRAME input signals have exceeded 1.7 V.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg016</Name>
+		<Address>0x016</Address>
+		<Description>DCI delay</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg016_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>DCI Delay[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>This option is available for the Revision 2 silicon only. The DCI delay bits control the delay applied to the DCI signal. The DCI delay affects the sampling interval of the DCI with respect to the Dx inputs. See Table 13 of the datasheet.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 350 ps delay of DCI signal</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 590 ps delay of DCI signal</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 800 ps delay of DCI signal</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 925 ps delay of DCI signal</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg017</Name>
+		<Address>0x017</Address>
+		<Description>FIFO control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg017_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>4</DefaultValue>
+			<Description>FIFO Phase Offset[2:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>FIFO write pointer phase offset following FIFO reset. This is the difference between the read pointer and the write pointer values upon FIFO reset. The optimal value is nominally 4.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 0</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 1</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 2</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 3</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 4</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 5</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 6</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 7</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg018</Name>
+		<Address>0x018</Address>
+		<Description>FIFO status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg018_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO soft align request</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = request FIFO read and write pointer alignment via the serial port</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg018_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO soft align ack</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = FIFO read and write pointers are aligned after a serial port initiated FIFO reset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg018_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO Warning 2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = FIFO read and write pointers are within +-2.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg018_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO Warning 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = FIFO read and write pointers are within +-1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019</Name>
+		<Address>0x019</Address>
+		<Description>FIFO status</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FIFO Level[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Thermometer encoded measure of the FIFO level.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01B</Name>
+		<Address>0x01B</Address>
+		<Description>Datapath control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01B_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SendI data to Q data</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = ignore Q data from the interface and disable the clocks to the Q datapath. Send I data to both the I and Q DACs.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Select sideband</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 = the modulator outputs the high-side image.
+1 = the modulator outputs the low-side image. The image is spectrally inverted compared to the input data.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = the modulator outputs the high-side image</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = the modulator outputs the low-side image</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Bypass phase comp and dc offset</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass phase compensation and dc offset.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>NCO gain</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 = no gain scaling is applied to the NCO input to the internal digital modulator (default).
+1 = gain scaling of 0.5 is applied to the NCO input to the internal digital modulator. Gain scaling can eliminate satu-ration of the modulator output for some combinations of data inputs and NCO signals.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = no gain scaling is applied to the NCO input</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = gain scaling of 0.5 is applied to the NCO input</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Bypass NCO</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass the NCO.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Bypass sinc</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass the inverse sinc filter.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01B_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Bypass premod</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass the fS/2 premodulator</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01C</Name>
+		<Address>0x01C</Address>
+		<Description>HB1 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01C_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass HB1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass the first-stage interpolation filter.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01C_b2_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>HB1[1:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Modulation mode for I Side Half-Band Filter 1.
+00 = input signal not modulated; filter pass band is from -0.4 to +0.4 of fIN1.
+01 = input signal not modulated; filter pass band is from 0.1 to 0.9 of fIN1.
+10 = input signal modulated by fIN1; filter pass band is from 0.6 to 1.4 of fIN1.
+11 = input signal modulated by fIN1; filter pass band is from 1.1 to 1.9 of fIN1.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = filter pass band: -0.4 to +0.4 of fIN1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = filter pass band: 0.1 to 0.9 of fIN1</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>2 = filter pass band: 0.6 to 1.4 of fIN1</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>3 = filter pass band: 1.1 to 1.9 of fIN1</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01D</Name>
+		<Address>0x01D</Address>
+		<Description>HB2 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01D_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass HB2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass the second-stage interpolation filter.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01D_b6_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>HB2[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Modulation mode for I Side Half-Band Filter 2.
+0 = input signal not modulated; filter pass band is from -0.25 to +0.25 of fIN2.
+9 = input signal not modulated; filter pass band is from 0.0 to 0.5 of fIN2.
+18 = input signal not modulated; filter pass band is from 0.25 to 0.75 of fIN2.
+27 = input signal not modulated; filter pass band is from 0.5 to 1.0 of fIN2.
+36 = input signal modulated by fIN2; filter pass band is from 0.75 to 1.25 of fIN2.
+45 = input signal modulated by fIN2; filter pass band is from 1.0 to 1.5 of fIN2.
+54 = input signal modulated by fIN2; filter pass band is from 1.25 to 1.75 of fIN2.
+63 = input signal modulated by fIN2; filter pass band is from 1.5 to 2.0 of fIN2.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = filter pass band: -0.25 to +0.25 of fIN2</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>9 = filter pass band: 0.0 to 0.5 of fIN2</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>18 = filter pass band: 0.25 to 0.75 of fIN2</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>27 = filter pass band: 0.5 to 1.0 of fIN2</Description>
+					<Value>27</Value>
+				</Option>
+				<Option>
+					<Description>36 = filter pass band: 0.75 to 1.25 of fIN2</Description>
+					<Value>36</Value>
+				</Option>
+				<Option>
+					<Description>45 = filter pass band: 1.0 to 1.5 of fIN2</Description>
+					<Value>45</Value>
+				</Option>
+				<Option>
+					<Description>54 = filter pass band: 1.25 to 1.75 of fIN2</Description>
+					<Value>54</Value>
+				</Option>
+				<Option>
+					<Description>63 = filter pass band: 1.5 to 2.0 of fIN2</Description>
+					<Value>63</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01E</Name>
+		<Address>0x01E</Address>
+		<Description>HB3 control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01E_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass HB3</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = bypass the third-stage interpolation filter.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01E_b6_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>HB3[5:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Modulation mode for I Side Half-Band Filter 3.
+0 = input signal not modulated; filter pass band is from -0.2 to +0.2 of fIN3.
+9 = input signal not modulated; filter pass band is from 0.05 to 0.45 of fIN3.
+18 = input signal not modulated; filter pass band is from 0.3 to 0.7 of fIN3.
+27 = input signal not modulated; filter pass band is from 0.55 to 0.95 of fIN3.
+36 = input signal modulated by fIN3; filter pass band is from 0.8 to 1.2 of fIN3.
+45 = input signal modulated by fIN3; filter pass band is from 1.05 to 1.45 of fIN3.
+54 = input signal modulated by fIN3; filter pass band is from 1.3 to 1.7 of fIN3.
+64 = input signal modulated by fIN3; filter pass band is from 1.55 to 1.95 of fIN3.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = filter pass band: −0.2 to +0.2 of fIN3</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>9 = filter pass band: 0.05 to 0.45 of fIN3</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>18 = filter pass band: 0.3 to 0.7 of fIN3</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>27 = filter pass band: 0.55 to 0.95 of fIN3</Description>
+					<Value>27</Value>
+				</Option>
+				<Option>
+					<Description>36 = filter pass band: 0.8 to 1.2 of fIN3</Description>
+					<Value>36</Value>
+				</Option>
+				<Option>
+					<Description>45 = filter pass band: 1.05 to 1.45 of fIN3</Description>
+					<Value>45</Value>
+				</Option>
+				<Option>
+					<Description>54 = filter pass band: 1.3 to 1.7 of fIN3</Description>
+					<Value>54</Value>
+				</Option>
+				<Option>
+					<Description>63 = filter pass band: 1.55 to 1.95 of fIN3</Description>
+					<Value>63</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01F</Name>
+		<Address>0x01F</Address>
+		<Description>Chip ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01F_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>8</DefaultValue>
+			<Description>Chip ID[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>This register identifies the device as an AD9122.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg030</Name>
+		<Address>0x030</Address>
+		<Description>FTW LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg030_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FTW[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x33.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg031</Name>
+		<Address>0x031</Address>
+		<Description>FTW</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg031_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FTW[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x33.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg032</Name>
+		<Address>0x032</Address>
+		<Description>FTW</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg032_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FTW[23:16]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x33.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg033</Name>
+		<Address>0x033</Address>
+		<Description>FTW MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg033_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FTW[31:24]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>FTW[31:0] is the 32-bit frequency tuning word that deter-mines the frequency of the complex carrier generated by the on-chip NCO. The frequency is not updated when the FTW registers are written. The values are only updated when Bit 0 of Register 0x36 transitions from 0 to 1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg034</Name>
+		<Address>0x034</Address>
+		<Description>NCO phase offset LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg034_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>NCO Phase Offset[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x35.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg035</Name>
+		<Address>0x035</Address>
+		<Description>NCO phase offset MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg035_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>NCO Phase Offset[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>The NCO sets the phase of the complex carrier signal when the NCO is reset. The phase offset spans from 0 degrees to 360 degrees. Each bit represents an offset of 0.0055 degrees. This value is in twos complement format.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg036</Name>
+		<Address>0x036</Address>
+		<Description>NCO FTWupdate</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg036_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Update FTW request</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>The FTW is updated on the 0-to-1 transition of this bit.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg036_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Update FTW acknowledge</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = the FTW has been updated.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg036_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FRAME FTW request</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 = the NCO is reset on the first extended FRAME pulse after this bit is set to 1.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg036_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FRAME FTW acknowledge</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = the NCO has been reset due to an extended FRAME pulse signal.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg038</Name>
+		<Address>0x038</Address>
+		<Description>I phase adj LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg038_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I Phase Adj[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x39.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg039</Name>
+		<Address>0x039</Address>
+		<Description>I phase adj MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg039_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I Phase Adj[9:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>I Phase Adj[9:0] is used to insert a phase offset between the I and Q datapaths. This offset can be used to correct for phase imbalance in a quadrature modulator. See the Quadrature Phase Correction section in the datasheet for more information.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03A</Name>
+		<Address>0x03A</Address>
+		<Description>Q phase adj LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03A_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q Phase Adj[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x3B.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03B</Name>
+		<Address>0x03B</Address>
+		<Description>Q phase adj MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03B_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q Phase Adj[9:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Q Phase Adj[9:0] is used to insert a phase offset between the I and Q datapaths. This offset can be used to correct for phase imbalance in a quadrature modulator. See the Quadrature Phase Correction section in the datasheet for more information.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03C</Name>
+		<Address>0x03C</Address>
+		<Description>I DAC offset LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03C_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I DAC Offset[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x3D.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03D</Name>
+		<Address>0x03D</Address>
+		<Description>I DAC offset MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03D_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I DAC Offset[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>I DAC Offset[15:0] is a value that is added directly to the samples written to the I DAC.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03E</Name>
+		<Address>0x03E</Address>
+		<Description>Q DAC offset LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03E_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q DAC Offset[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x3F.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03F</Name>
+		<Address>0x03F</Address>
+		<Description>Q DAC offset MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03F_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q DAC Offset[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Q DAC Offset[15:0] is a value that is added directly to the samples written to the Q DAC.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg040</Name>
+		<Address>0x040</Address>
+		<Description>I DAC FS adjust</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg040_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>249</DefaultValue>
+			<Description>I DAC FS Adj[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x41, Bits[1:0].</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg041</Name>
+		<Address>0x041</Address>
+		<Description>I DAC control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg041_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>I DAC FS Adj[9:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>I DAC FS Adj[9:0] sets the full-scale current of the I DAC. The full-scale current can be adjusted from 8.64 mA to 31.68 mA in step sizes of approximately 22.5 uA.
+0x000 = 8.64 mA.
+...
+0x200 = 20.16 mA.
+...
+0x3FF = 31.68 mA.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg041_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I DACsleep</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = puts the I DAC into sleep mode (fast wake-up mode).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg042</Name>
+		<Address>0x042</Address>
+		<Description>I aux DAC data</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg042_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I Aux DAC[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x43, Bits[1:0].</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg043</Name>
+		<Address>0x043</Address>
+		<Description>I aux DAC control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg043_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I Aux DAC[9:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>I Aux DAC[9:0] sets the magnitude of the auxiliary DAC current. The range is 0 mA to 2 mA, and the step size is 2 uA.
+0x000 = 0.000 mA.
+0x001 = 0.002 mA.
+...
+0x3FF = 2.046 mA.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg043_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I aux DAC sleep</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = puts the I auxiliary DAC into sleep mode.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg043_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I aux DAC current direction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = the I auxiliary DAC sources current</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = the I auxiliary DAC sinks current</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg043_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>I aux DAC sign</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 = the I auxiliary DAC sign is positive, and the current is directed to the IOUT1P pin (Pin 67).
+1 = the I auxiliary DAC sign is negative, and the current is directed to the IOUT1N pin (Pin 66).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = the I auxiliary DAC sign is positive</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = the I auxiliary DAC sign is negative</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg044</Name>
+		<Address>0x044</Address>
+		<Description>Q DAC FS adjust</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg044_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>249</DefaultValue>
+			<Description>Q DAC FS Adj[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x45, Bits[1:0].</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg045</Name>
+		<Address>0x045</Address>
+		<Description>Q DAC control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg045_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Q DAC FS Adj[9:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Q DAC FS Adj[9:0] sets the full-scale current of the Q DAC. The full-scale current can be adjusted from 8.64 mA to 31.68 mA in step sizes of approximately 22.5 uA.
+0x000 = 8.64 mA.
+...
+0x200 = 20.16 mA.
+...
+0x3FF = 31.68 mA.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg045_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q DACsleep</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = puts the Q DAC into sleep mode (fast wake-up mode).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg046</Name>
+		<Address>0x046</Address>
+		<Description>Q aux DAC data</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg046_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q Aux DAC[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x47, Bits[1:0].</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg047</Name>
+		<Address>0x047</Address>
+		<Description>Q aux DAC control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg047_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q Aux DAC[9:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Q Aux DAC[9:0] sets the magnitude of the auxiliary DAC current. The range is 0 mA to 2 mA, and the step size is 2 uA.
+0x000 = 0.000 mA.
+0x001 = 0.002 mA.
+...
+0x3FF = 2.046 mA.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg047_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q aux DACsleep</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = puts the Q auxiliary DAC into sleep mode.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg047_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q aux DAC current direction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = the Q auxiliary DAC sources current</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = the Q auxiliary DAC sinks current</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg047_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Q aux DAC sign</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>0 = the Q auxiliary DAC sign is positive, and the current is directed to the IOUT2P pin (Pin 58).
+1 = the Q auxiliary DAC sign is negative, and the current is directed to the IOUT2N pin (Pin 59).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = the Q auxiliary DAC sign is positive</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = the Q auxiliary DAC sign is negative</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg048</Name>
+		<Address>0x048</Address>
+		<Description>Die temp range control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg048_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Capacitor value</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Auxiliary ADC internal capacitor value.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = 5 pF</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = 10 pF</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg048_b3_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reference Current[2:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Auxiliary ADC reference current.
+000 = lowest current.
+...
+111 = highest current.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg048_b6_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>FS Current[2:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Auxiliary ADC full-scale current.
+000 = lowest current.
+...
+111 = highest current.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg049</Name>
+		<Address>0x049</Address>
+		<Description>Die temp LSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg049_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Die Temp[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x4A.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg04A</Name>
+		<Address>0x04A</Address>
+		<Description>Die temp MSB</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg04A_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Die Temp[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Die Temp[15:0] indicates the approximate die temperature. For more information, see the Temperature Sensor section in the datasheet.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg067</Name>
+		<Address>0x067</Address>
+		<Description>SED control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg067_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Compare pass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates that the last sample comparison was error free.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg067_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Compare fail</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates an error was detected. This bit remains set until it is autocleared by the reception of eight consecutive error-free comparisons or is cleared by a write to this register.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg067_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Autoclear enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable autoclear mode. This activates Bit 1 and Bit 0 of this register and causes Register 0x70 through Register 0x73 to be autocleared when eight consecutive sample data sets are received error free.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg067_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Sample error detected</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = indicates an error was detected. The bit remains set until cleared. Any write to this register clears this bit to 0.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg067_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SED compare enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>1 = enable the SED circuitry. None of the flags in this register or the values in Register 0x70 through Register 0x73 are significant if the SED is not enabled.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg068</Name>
+		<Address>0x068</Address>
+		<Description>Compare I0 LSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg068_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>182</DefaultValue>
+			<Description>Compare Value I0[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x69.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg069</Name>
+		<Address>0x069</Address>
+		<Description>Compare I0 MSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg069_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>122</DefaultValue>
+			<Description>Compare Value I0[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Compare Value I0[15:0] is the word that is compared with the I0 input sample captured at the input interface.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg06A</Name>
+		<Address>0x06A</Address>
+		<Description>Compare Q0 LSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg06A_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>69</DefaultValue>
+			<Description>Compare Value Q0[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x6B.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg06B</Name>
+		<Address>0x06B</Address>
+		<Description>Compare Q0 MSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg06B_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>234</DefaultValue>
+			<Description>Compare Value Q0[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Compare Value Q0[15:0] is the word that is compared with the Q0 input sample captured at the input interface.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg06C</Name>
+		<Address>0x06C</Address>
+		<Description>Compare I1 LSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg06C_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>22</DefaultValue>
+			<Description>Compare Value I1[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x6D.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg06D</Name>
+		<Address>0x06D</Address>
+		<Description>Compare I1 MSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg06D_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>26</DefaultValue>
+			<Description>Compare Value I1[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Compare Value I1[15:0] is the word that is compared with the I1 input sample captured at the input interface.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg06E</Name>
+		<Address>0x06E</Address>
+		<Description>Compare Q1 LSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg06E_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>198</DefaultValue>
+			<Description>Compare Value Q1[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x6F.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg06F</Name>
+		<Address>0x06F</Address>
+		<Description>Compare Q1 MSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg06F_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>170</DefaultValue>
+			<Description>Compare Value Q1[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Compare Value Q1[15:0] is the word that is compared with the Q1 input sample captured at the input interface.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg070</Name>
+		<Address>0x070</Address>
+		<Description>SED I LSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg070_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Errors Detected I_BITS[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x71.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg071</Name>
+		<Address>0x071</Address>
+		<Description>SED I MSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg071_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Errors Detected I_BITS[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Errors Detected I_BITS[15:0] indicates which bits were received in error.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg072</Name>
+		<Address>0x072</Address>
+		<Description>SED Q LSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg072_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Errors Detected Q_BITS[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>See Register 0x73.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg073</Name>
+		<Address>0x073</Address>
+		<Description>SED Q MSBs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg073_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Errors Detected Q_BITS[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Errors Detected Q_BITS[15:0] indicates which bits were received in error.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg07F</Name>
+		<Address>0x07F</Address>
+		<Description>Revision</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg07F_b5_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Revision[3:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>This value corresponds to the die revision number.</Notes>
+			<Options>
+				<Option>
+					<Description>0001 = Die Revision 1</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0011 = Die Revision 2</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</ad9122>
