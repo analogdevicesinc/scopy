@@ -2,17 +2,15 @@
 #define DATALOGGERGENERICMENU_H
 
 #include <QWidget>
-#include "gui/generic_menu.hpp"
-#include "gui/spinbox_a.hpp"
+#include <generic_menu.hpp>
 #include "qcombobox.h"
 
-namespace adiscope {
+
+namespace scopy {
 class CustomSwitch;
 
 namespace gui {
-class GenericMenu;
-
-class DataLoggerGenericMenu : public GenericMenu
+class DataLoggerGenericMenu : public ::scopy::gui::GenericMenu
 {
 	Q_OBJECT
 public:

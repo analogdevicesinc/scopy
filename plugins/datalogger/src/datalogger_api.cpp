@@ -1,8 +1,9 @@
 #include "datalogger_api.h"
-#include "gui/customSwitch.hpp"
-#include "gui/dataloggercontroller.hpp"
+#include "src/gui/dataloggercontroller.hpp"
+#include <src/datalogger.hpp>
+#include <customSwitch.h>
 
-using namespace adiscope;
+//using namespace scopy;
 
 bool DataLogger_API::get_show_all()
 {
