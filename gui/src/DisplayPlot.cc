@@ -612,9 +612,10 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 
 	d_bottomHandlesArea->setMinimumHeight(50);
 	d_rightHandlesArea->setMinimumWidth(50);
-	d_bottomHandlesArea->setLargestChildWidth(60);
-	d_rightHandlesArea->setLargestChildHeight(60);
+//	d_bottomHandlesArea->setLargestChildWidth(60);
+//	d_rightHandlesArea->setLargestChildHeight(60);
 	d_rightHandlesArea->setMinimumHeight(this->minimumHeight());
+	d_rightHandlesArea->setBottomPadding(50);
 
 	d_formatter = static_cast<PrefixFormatter *>(new MetricPrefixFormatter);
 
@@ -1806,6 +1807,39 @@ void DisplayPlot::setActiveVertAxis(unsigned int axisIdx, bool selected)
 		scaleDraw->setColor(getLineColor(axisIdx));
 		scaleDraw->invalidateCache();
 	}
+}
+
+// remove empty space above plot
+// assumes that axis labels are left and bottom, cursor handles are right and bottom
+void DisplayPlot::adjustHandleAreasSize(bool cursors)
+{
+	int top_height = cursors ? d_vCursorHandle1->height() / 2 : 2;
+	topHandlesArea()->setMinimumHeight(top_height);
+	topHandlesArea()->setMaximumHeight(top_height);
+
+	d_leftHandlesArea->setTopPadding(top_height);
+	d_rightHandlesArea->setTopPadding(top_height);
+
+	int bottom_height = cursors ? d_hCursorHandle1->height() : axisWidget(QwtAxis::XBottom)->height();
+	bottomHandlesArea()->setMinimumHeight(bottom_height);
+	bottomHandlesArea()->setMaximumHeight(bottom_height);
+
+	d_leftHandlesArea->setBottomPadding(bottom_height);
+	d_rightHandlesArea->setBottomPadding(bottom_height);
+
+	int right_width = cursors ? d_vCursorHandle1->width() : 2;
+	rightHandlesArea()->setMinimumWidth(right_width);
+	rightHandlesArea()->setMaximumWidth(right_width);
+
+	d_topHandlesArea->setRightPadding(right_width);
+	d_bottomHandlesArea->setRightPadding(right_width);
+
+	int left_width = axisWidget(QwtAxis::YLeft)->width();
+	leftHandlesArea()->setMinimumWidth(left_width);
+	leftHandlesArea()->setMaximumWidth(left_width);
+
+	d_topHandlesArea->setLeftPadding(left_width);
+	d_bottomHandlesArea->setLeftPadding(left_width);
 }
 
 int DisplayPlot::activeVertAxis()
