@@ -141,10 +141,8 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 		// a hack around the fact that we aren't using plot curves for the
 		// spectrogram plots.
 		d_plot_curve.push_back(new QwtPlotCurve(QString("Data %1").arg(i)));
-//		d_plot_curve[i]->setRenderHint(QwtPlotItem::RenderAntialiased);
 
 		d_spectrogram[i]->attach(this);
-//		d_spectrogram[i]->setRenderHint(QwtPlotItem::RenderAntialiased);
 
 		d_intensity_color_map_type.push_back(
 					INTENSITY_COLOR_MAP_TYPE_DEFAULT_DARK);
@@ -379,10 +377,6 @@ void WaterfallDisplayPlot::updateHandleAreaPadding()
 {
 	d_leftHandlesArea->update();
 	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
-	d_bottomHandlesArea->setRightPadding(50);
-
-	d_rightHandlesArea->setTopPadding(50);
-	d_rightHandlesArea->setBottomPadding(50);
 
 	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
 	d_hCursorHandle1->updatePosition();
