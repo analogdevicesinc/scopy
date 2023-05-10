@@ -1,60 +1,77 @@
 #include "datalogger.hpp"
-#include "gui/generic_menu.hpp"
-#include "gui/customSwitch.hpp"
-#include "gui/detachedwindowsmanager.h"
-#include "gui/dynamicWidget.hpp"
+#include "dataloggerplugin.hpp"
+#include "src/gui/dataloggercontroller.hpp"
+//#include "gui/generic_menu.hpp"
+//#include "gui/customSwitch.hpp"
+//#include "gui/detachedwindowsmanager.h"
+//#include "gui/dynamicWidget.hpp"
 #include <QtConcurrent>
 #include <QFuture>
+#include <tool_view_builder.hpp>
 
-#include "gui/dataloggercontroller.hpp"
-#include "gui/customSwitch.hpp"
-#include "datalogger_api.h"
-#include "gui/channelmonitorcomponent.hpp"
-#include "dataloggergenericmenu.hpp"
-#include "gui/customcolqgridlayout.hpp"
+#include <libm2k/contextbuilder.hpp>
+#include <src/datalogger_api.h>
+#include <src/dataloggergenericmenu.hpp>
 
-using namespace adiscope;
+#include <libm2k/contextbuilder.hpp>
 
-DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
-							   ToolMenuItem *toolMenuItem,	QJSEngine *engine, ToolLauncher *parent):
-	Tool(ctx, toolMenuItem, new DataLogger_API(this), "DataLogger", parent),
+#include <src/gui/channelmonitorcomponent.hpp>
+#include <src/gui/customcolqgridlayout.hpp>
+//#include <libm2k/contextbuilder.hpp>
+
+//#include "gui/dataloggercontroller.hpp"
+//#include "gui/customSwitch.hpp"
+//#include "datalogger_api.h"
+//#include "gui/channelmonitorcomponent.hpp"
+//#include "dataloggergenericmenu.hpp"
+//#include "gui/customcolqgridlayout.hpp"
+
+//using namespace scopy;
+
+using gui::ToolViewBuilder;
+
+DataLogger::DataLogger(struct iio_context *ctx, QWidget *parent):
+	QWidget(parent),
+//	Tool(ctx, toolMenuItem, new DataLogger_API(this), "DataLogger", parent),
 	m_timer(new QTimer(this)),
 	m_elapsed(new QElapsedTimer()),
-	readerThread(new DataLoggerReaderThread()),
-	m_context(contextOpen(ctx, ""))
+	readerThread(new DataLoggerReaderThread())
+//	m_context(libm2k::context::contextOpen(ctx, ""))
 {
-	run_button = nullptr;
+	//	run_button = nullptr;
 
-	m_colors = {QColor("#ff7200"),QColor("#9013fe"), QColor(Qt::green),QColor(Qt::cyan), QColor(Qt::magenta),
-				QColor(Qt::yellow), QColor(Qt::gray), QColor(Qt::darkRed), QColor(Qt::darkGreen),
-				QColor(Qt::darkBlue), QColor(Qt::darkGray),QColor(Qt::black)};
+	m_context = libm2k::context::contextOpen(ctx, "");
+	m_colors = {QColor("#ff7200"),    QColor("#9013fe"),    QColor(Qt::green),
+		    QColor(Qt::cyan),     QColor(Qt::magenta),  QColor(Qt::yellow),
+		    QColor(Qt::gray),     QColor(Qt::darkRed),  QColor(Qt::darkGreen),
+		    QColor(Qt::darkBlue), QColor(Qt::darkGray), QColor(Qt::black)};
 
-	adiscope::gui::ToolViewRecipe recipe;
+	gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPairSettingsBtn = true;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = true;
-	recipe.channelsPosition = adiscope::gui::ChannelsPositionEnum::VERTICAL;
+	recipe.channelsPosition = gui::ChannelsPositionEnum::VERTICAL;
 
-	m_monitorChannelManager = new adiscope::gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager = new gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
 	m_monitorChannelManager->setToolStatus("Stopped");
 
-	m_toolView = adiscope::gui::ToolViewBuilder(recipe,m_monitorChannelManager,parent).build();
+	m_toolView = ToolViewBuilder(recipe, m_monitorChannelManager, parent).build();
 
 	m_timer->setSingleShot(true);
-	//on timeout read on thread
+	// on timeout read on thread
 	connect(m_timer, &QTimer::timeout, this, [=]() {
-		if ( !m_elapsed->isValid() ){
+		if (!m_elapsed->isValid()) {
 			m_elapsed->start();
 		}
 		readerThread->start();
 	});
 
 	connect(readerThread, &DataLoggerReaderThread::finished, this, [=]() {
-		//after read is done check if another read is needed
+		// after read is done check if another read is needed
 		if (m_toolView->getRunBtn()->isChecked()) {
 			int newInterval = VALUE_READING_TIME_INTERVAL - m_elapsed->elapsed();
 			m_elapsed->invalidate();
@@ -69,21 +86,24 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 		}
 	});
 
-	m_generalSettingsMenu = generateMenu("General settings", new QColor("#4a64ff"));
-	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu,true);
+	m_generalSettingsMenu =
+			generateMenu("General settings", new QColor("#4a64ff"));
+	m_toolView->setGeneralSettingsMenu(m_generalSettingsMenu, true);
 
 	m_dmmList = getDmmList(m_context);
 
-	connect(this, &DataLogger::recordingIntervalChanged, this , [=](double interval){
+	connect(this, &DataLogger::recordingIntervalChanged, this,
+		[=](double interval) {
 		VALUE_READING_TIME_INTERVAL = interval;
-		recording_timer->setValue(interval/1000);
+		recording_timer->setValue(interval / 1000);
 	});
 
-	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, [=](bool toggled){
-		dataLoggerController->setIsRunningOn(m_toolView->getRunBtn()->isChecked());
+	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this,
+		[=](bool toggled) {
+		dataLoggerController->setIsRunningOn(
+					m_toolView->getRunBtn()->isChecked());
 
-
-		//update status and if needed start data logging
+		// update status and if needed start data logging
 		if (!m_toolView->getRunBtn()->isChecked()) {
 			m_monitorChannelManager->setToolStatus("Stopped");
 			showAllSWitch->setEnabled(true);
@@ -101,7 +121,8 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 		if (toggled) {
 			m_timer->start(VALUE_READING_TIME_INTERVAL);
 		} else {
-			//if thread is running after current action on thread is done stop thread
+			// if thread is running after current action on thread is done
+			// stop thread
 			if (readerThread->isRunning()) {
 				readerThread->quit();
 				readerThread->wait();
@@ -109,7 +130,8 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 		}
 	});
 
-	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, [=](bool toggled){
+	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this,
+		[=](bool toggled) {
 		if (toggled) {
 			if (m_toolView->getRunBtn()->isChecked()) {
 				m_toolView->getRunBtn()->toggled(false);
@@ -121,13 +143,19 @@ DataLogger::DataLogger(struct iio_context *ctx, Filter *filt,
 
 	m_customColGrid = new CustomColQGridLayout(100,this);
 	m_toolView->addFixedCentralWidget(m_customColGrid,0,0,0,0);
-	setCentralWidget(getToolView());
+//	setCentralWidget(getToolView());
+	this->setLayout(new QVBoxLayout());
+	this->layout()->addWidget(m_toolView);
 
 	initMonitorToolView();
 
-	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_DATALOGGER)));
-	api->load(*settings);
-	api->js_register(engine);
+//	api->setObjectName(QString::fromStdString(Filter::tool_name(TOOL_DATALOGGER)));
+//	api->load(*settings);
+//	api->js_register(engine);
+
+
+	qInfo(CAT_DATALOGGER_TOOL) << "Initialized";
+//	Q_EMIT DataLogger::toggleAll(true);
 }
 
 void DataLogger::initMonitorToolView()
@@ -142,7 +170,7 @@ void DataLogger::initMonitorToolView()
 		auto dmmName = dmm->getName();
 		std::vector<ChannelWidget*> channelList;
 
-		adiscope::gui::DataLoggerGenericMenu *menu = new adiscope::gui::DataLoggerGenericMenu(this);
+		scopy::gui::DataLoggerGenericMenu *menu = new scopy::gui::DataLoggerGenericMenu(this);
 		menu->init(QString::fromStdString(dmmName),new QColor("green"));
 
 		ChannelWidget *mainCh_widget =
@@ -156,7 +184,7 @@ void DataLogger::initMonitorToolView()
 		auto dmmList = dmm->readAll();
 		for (const auto &channel : dmmList) {
 			QColor channelColor = getChannelColor(chId);
-			adiscope::gui::DataLoggerGenericMenu *channelMenu = new adiscope::gui::DataLoggerGenericMenu(this);
+			scopy::gui::DataLoggerGenericMenu *channelMenu = new scopy::gui::DataLoggerGenericMenu(this);
 			channelMenu->init(QString::fromStdString(dmmName + ": " + channel.id),new QColor(channelColor));
 
 			ChannelWidget *ch_widget = m_toolView->buildNewChannel(m_monitorChannelManager, channelMenu , false, chId, false, false,
@@ -165,7 +193,7 @@ void DataLogger::initMonitorToolView()
 			channelList.push_back(ch_widget);
 			ch_widget->enableButton()->setChecked(false);
 
-			adiscope::ChannelMonitorComponent* monitor = new adiscope::ChannelMonitorComponent();
+			scopy::ChannelMonitorComponent* monitor = new scopy::ChannelMonitorComponent();
 			monitor->setID(chId);
 			monitor->init(0,QString::fromStdString(channel.unit_name),QString::fromStdString(channel.unit_symbol),
 				      QString::fromStdString(dmmName + ": " + channel.id),channelColor );
@@ -180,7 +208,7 @@ void DataLogger::initMonitorToolView()
 				}
 			});
 
-			connect(monitor, &adiscope::ChannelMonitorComponent::contentChanged, m_customColGrid, [=](){
+			connect(monitor, &scopy::ChannelMonitorComponent::contentChanged, m_customColGrid, [=](){
 				m_customColGrid->itemSizeChanged();
 			}, Qt::QueuedConnection);
 
@@ -237,36 +265,36 @@ void DataLogger::initMonitorToolView()
 	setUpdatesEnabled(true);
 }
 
-void DataLogger::createConnections(adiscope::gui::DataLoggerGenericMenu* mainMenu,adiscope::gui::DataLoggerGenericMenu* menu,adiscope::ChannelMonitorComponent* monitor)
+void DataLogger::createConnections(scopy::gui::DataLoggerGenericMenu* mainMenu,scopy::gui::DataLoggerGenericMenu* menu,scopy::ChannelMonitorComponent* monitor)
 {
-	connect(menu,&adiscope::gui::DataLoggerGenericMenu::togglePeakHolder, monitor, &adiscope::ChannelMonitorComponent::displayPeakHold);
-	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::togglePeakHolder, menu, &adiscope::gui::DataLoggerGenericMenu::peakHolderToggle);
+	connect(menu,&scopy::gui::DataLoggerGenericMenu::togglePeakHolder, monitor, &scopy::ChannelMonitorComponent::displayPeakHold);
+	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::togglePeakHolder, menu, &scopy::gui::DataLoggerGenericMenu::peakHolderToggle);
 
-	connect(menu, &adiscope::gui::DataLoggerGenericMenu::resetPeakHolder, monitor, &adiscope::ChannelMonitorComponent::resetPeakHolder);
-	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::resetPeakHolder, menu, &adiscope::gui::DataLoggerGenericMenu::peakHolderResetClicked);
+	connect(menu, &scopy::gui::DataLoggerGenericMenu::resetPeakHolder, monitor, &scopy::ChannelMonitorComponent::resetPeakHolder);
+	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::resetPeakHolder, menu, &scopy::gui::DataLoggerGenericMenu::peakHolderResetClicked);
 
-	connect(menu, &adiscope::gui::DataLoggerGenericMenu::toggleScale, monitor, &adiscope::ChannelMonitorComponent::displayScale);
-	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::toggleScale, menu, &adiscope::gui::DataLoggerGenericMenu::scaleToggle);
+	connect(menu, &scopy::gui::DataLoggerGenericMenu::toggleScale, monitor, &scopy::ChannelMonitorComponent::displayScale);
+	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::toggleScale, menu, &scopy::gui::DataLoggerGenericMenu::scaleToggle);
 
-	connect(menu, &adiscope::gui::DataLoggerGenericMenu::toggleHistory, monitor, &adiscope::ChannelMonitorComponent::displayHistory);
-	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::toggleHistory, menu, &adiscope::gui::DataLoggerGenericMenu::historyToggle);
+	connect(menu, &scopy::gui::DataLoggerGenericMenu::toggleHistory, monitor, &scopy::ChannelMonitorComponent::displayHistory);
+	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::toggleHistory, menu, &scopy::gui::DataLoggerGenericMenu::historyToggle);
 
-	connect(menu, &adiscope::gui::DataLoggerGenericMenu::changeHistorySize, monitor, &adiscope::ChannelMonitorComponent::setHistoryDuration);
-	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::historySizeIndexChanged, menu, &adiscope::gui::DataLoggerGenericMenu::historySizeChanged);
+	connect(menu, &scopy::gui::DataLoggerGenericMenu::changeHistorySize, monitor, &scopy::ChannelMonitorComponent::setHistoryDuration);
+	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::historySizeIndexChanged, menu, &scopy::gui::DataLoggerGenericMenu::historySizeChanged);
 
-	connect(menu, &adiscope::gui::DataLoggerGenericMenu::lineStyleChanged, monitor, &adiscope::ChannelMonitorComponent::setLineStyle);
-	connect(mainMenu,&adiscope::gui::DataLoggerGenericMenu::lineStyleIndexChanged, menu, &adiscope::gui::DataLoggerGenericMenu::changeLineStyle);
+	connect(menu, &scopy::gui::DataLoggerGenericMenu::lineStyleChanged, monitor, &scopy::ChannelMonitorComponent::setLineStyle);
+	connect(mainMenu,&scopy::gui::DataLoggerGenericMenu::lineStyleIndexChanged, menu, &scopy::gui::DataLoggerGenericMenu::changeLineStyle);
 
-	connect(menu, &adiscope::gui::DataLoggerGenericMenu::monitorColorChanged, monitor, &ChannelMonitorComponent::setMonitorColor);
+	connect(menu, &scopy::gui::DataLoggerGenericMenu::monitorColorChanged, monitor, &ChannelMonitorComponent::setMonitorColor);
 }
 
-adiscope::gui::ToolView* DataLogger::getToolView()
+scopy::gui::ToolView* DataLogger::getToolView()
 {
 	return m_toolView;
 }
 void DataLogger::setNativeDialogs(bool nativeDialogs)
 {
-	Tool::setNativeDialogs(nativeDialogs);
+//	Tool::setNativeDialogs(nativeDialogs);
 	dataLoggerController->setUseNativeDialog(nativeDialogs);
 }
 
@@ -288,7 +316,7 @@ int DataLogger::getValueReadingTimeInterval()
 
 std::vector<libm2k::analog::DMM*> DataLogger::getDmmList(libm2k::context::Context* context)
 {
-	return context->getAllDmm() ;
+	return context->getAllDmm();
 }
 
 QColor DataLogger::generateColor()
@@ -327,13 +355,13 @@ QColor DataLogger::getChannelColor(int chId)
 	}
 }
 
-adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* color)
+scopy::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* color)
 {
-	adiscope::gui::GenericMenu *menu = new adiscope::gui::GenericMenu(this);
+	scopy::gui::GenericMenu *menu = new scopy::gui::GenericMenu(this);
 	menu->initInteractiveMenu();
 	menu->setMenuHeader(title,color,false);
 
-	auto *showAllSection = new adiscope::gui::SubsectionSeparator("Show all", false, this);
+	auto *showAllSection = new scopy::gui::SubsectionSeparator("Show all", false, this);
 
 	QWidget *showAllWidget = new QWidget(this);
 	auto *showAllLayout = new QHBoxLayout(showAllWidget);
@@ -349,7 +377,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 		Q_EMIT DataLogger::toggleAll(toggled);
 	});
 
-	auto *precisionSection = new adiscope::gui::SubsectionSeparator("Precision", false,this);
+	auto *precisionSection = new scopy::gui::SubsectionSeparator("Precision", false,this);
 
 	QWidget *precisionWidget = new QWidget(this);
 	auto *precisionLayout = new QHBoxLayout(precisionWidget);
@@ -379,7 +407,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	precisionSection->setContent(precisionWidget);
 
-	auto *recordingIntervalSection = new adiscope::gui::SubsectionSeparator("Recording interval", false, this);
+	auto *recordingIntervalSection = new scopy::gui::SubsectionSeparator("Recording interval", false, this);
 	auto recordingIntervalWidget = new QWidget(this);
 	auto *recordingIntevlaLayout = new QVBoxLayout(recordingIntervalWidget);
 
@@ -404,7 +432,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 
 	recordingIntervalSection->setContent(recordingIntervalWidget);
 
-	auto dataLoggingSection = new adiscope::gui::SubsectionSeparator("Data Logging",true,this);
+	auto dataLoggingSection = new scopy::gui::SubsectionSeparator("Data Logging",true,this);
 
 	dataLoggerController = new DataLoggerController(true,true,false);
 	dataLoggerController->setWarningMessage("* While data logging you won't be able to add/remove channels");
@@ -424,7 +452,7 @@ adiscope::gui::GenericMenu* DataLogger::generateMenu(QString title, QColor* colo
 			if (!m_activeChannels.empty()) {
 				for (int ch : m_activeChannels.keys()) {
 					QString name = m_activeChannels[ch]->getTitle();
-					dataLoggerController->createChannel(name, adiscope::CHANNEL_DATA_TYPE::DOUBLE);
+					dataLoggerController->createChannel(name, scopy::CHANNEL_DATA_TYPE::DOUBLE);
 				}
 			}
 		}
@@ -453,9 +481,9 @@ DataLogger::~DataLogger()
 	if (readerThread) {
 		delete readerThread;
 	}
-	if (saveOnExit) {
-		api->save(*settings);
-	}
+//	if (saveOnExit) {
+//		api->save(*settings);
+//	}
 	if (m_timer) {
 		delete m_timer;
 	}
@@ -463,7 +491,7 @@ DataLogger::~DataLogger()
 		delete m_elapsed;
 	}
 	if (m_toolView) {
-		delete m_toolView;
+//		delete m_toolView;
 	}
-	delete api;
+//	delete api;
 }

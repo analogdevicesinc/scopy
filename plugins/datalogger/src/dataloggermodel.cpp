@@ -1,6 +1,8 @@
 #include "dataloggermodel.h"
 
-using namespace adiscope;
+#include <filemanager.h>
+
+using namespace scopy;
 
 DataLoggerModel::DataLoggerModel():
 	m_path(""),

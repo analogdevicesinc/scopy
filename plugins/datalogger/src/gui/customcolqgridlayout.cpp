@@ -4,7 +4,7 @@
 #include <QSpacerItem>
 #include <QtDebug>
 
-using namespace adiscope;
+using namespace scopy;
 
 CustomColQGridLayout::CustomColQGridLayout(int maxCols,QWidget *parent) :
 	QWidget(parent),

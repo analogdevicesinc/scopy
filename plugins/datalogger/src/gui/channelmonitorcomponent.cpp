@@ -4,7 +4,7 @@
 #include <QDebug>
 
 
-using namespace adiscope;
+using namespace scopy;
 
 ChannelMonitorComponent::ChannelMonitorComponent(QWidget *parent) :
 	QWidget(parent),
