@@ -27,10 +27,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 
 		QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
 		int samplingFreq = actualSamplingFreq[0].toInt();
-
 		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
-		m_enabledPlots = std::vector<bool>(m_swiotAdLogic->getPlotChnlsNo(), false);
-
 		setupToolView();
 		initMonitorToolView();
 		setupConnections();
@@ -96,6 +93,9 @@ void Ad74413r::setupConnections()
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
 
 	connect(m_tme, &ToolMenuEntry::runToggled, m_toolView->getRunBtn(), &QPushButton::setChecked);
+
+	connect(m_plotHandler, &BufferPlotHandler::offsetHandleSelected, this, &Ad74413r::onOffsetHdlSelected);
+	connect(this, &Ad74413r::channelWidgetSelected, m_plotHandler, &BufferPlotHandler::onChannelWidgetSelected);
 }
 
 void Ad74413r::initMonitorToolView()
@@ -239,16 +239,14 @@ void Ad74413r::onChannelWidgetEnabled(bool en)
 	int chnlIdx = m_controllers[id]->getChnlIdx();
 
 	if (en) {
-		m_enabledPlots[id] = true;
 		m_enabledChannels[chnlIdx] = true;
 		verifyChnlsChanges();
 	}
 	else {
-		m_enabledPlots[id] = false;
 		m_enabledChannels[chnlIdx] = false;
 		verifyChnlsChanges();
 	}
-	Q_EMIT channelWidgetEnabled(id, m_enabledPlots);
+	Q_EMIT channelWidgetEnabled(id, en);
 }
 
 void Ad74413r::onChannelWidgetSelected(bool checked)
@@ -257,8 +255,7 @@ void Ad74413r::onChannelWidgetSelected(bool checked)
 	//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 	//that's why we have to decrease by 1
 	int id = w->id() - 1;
-	m_plotHandler->setPlotActiveAxis(id);
-
+	Q_EMIT channelWidgetSelected(id);
 }
 
 void Ad74413r::onOffsetHdlSelected(int hdlIdx, bool selected)
