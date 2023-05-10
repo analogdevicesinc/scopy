@@ -1,0 +1,973 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2012-2013 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<ad9643>
+	<Register>
+		<Name>reg000</Name>
+		<Address>0x000</Address>
+		<Description>SPI port configuration (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>The nibbles are mirrored so that LSB first mode or MSB first mode registers correctly, regardless of shift mode.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg000_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB first</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft reset</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Reserved to 1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft reset</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg000_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB first</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001</Name>
+		<Address>0x001</Address>
+		<Description>Chip ID (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Read only.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>130</DefaultValue>
+			<Description>8-bit chip ID[7:0] (AD9643 = 0x82)(default)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg002</Name>
+		<Address>0x002</Address>
+		<Description>Chip grade (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Speed grade ID used to differentiate devices; read only.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg002_b5_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Speed grade ID</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = 250 MSPS</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 210 MSPS</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>11 = 170 MSPS</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg005</Name>
+		<Address>0x005</Address>
+		<Description>Channel index (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Bits are set to determine which device on the chip receives the next write command; applies to local registers only.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg005_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>ADC A (default)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg005_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>ADC B (default)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg008</Name>
+		<Address>0x008</Address>
+		<Description>Power modes (local)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Determines various generic modes of chip operation.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg008_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Internal power-down mode (local)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = full power-down</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = standby</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = reserved</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg008_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>External power- down pin function (local)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = power-down</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = standby</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg009</Name>
+		<Address>0x009</Address>
+		<Description>Global clock (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg009_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Duty cycle stabilizer (default)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00B</Name>
+		<Address>0x00B</Address>
+		<Description>Clock divide (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Clock divide values other than 000 automatically cause the duty cycle stabilizer to become active.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00B_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Clock divide ratio</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000 = divide by 1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = divide by 2</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = divide by 3</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = divide by 4</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = divide by 5</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = divide by 6</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = divide by 7</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = divide by 8</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00B_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Input clock divider phase adjust</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>000 = no delay</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 1 input clock cycle</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 2 input clock cycles</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 3 input clock cycles</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 4 input clock cycles</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 5 input clock cycles</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 6 input clock cycles</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 7 input clock cycles</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00D</Name>
+		<Address>0x00D</Address>
+		<Description>Test mode (local)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>When this register is set, the test data is placed on the output pins in place of normal data.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00D_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Output test mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0000 = off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0001 = midscale short</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0010 = positive FS</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>0011 = negative FS</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>0100 = alternating checkerboard</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>0101 = PN long sequence</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>0110 = PN short sequence</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>0111 = one/zero word toggle</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>1000 = user test mode</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>1111 = ramp output</Description>
+					<Value>15</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00D_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reset PN short gen</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00D_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reset PN long gen</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00D_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User test mode control</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = continuous/ repeat pattern</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = single pattern, then 0s</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg010</Name>
+		<Address>0x010</Address>
+		<Description>Offset adjust (local)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg010_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Offset adjust in LSBs from +31 to -32 (twos complement format)</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg014</Name>
+		<Address>0x014</Address>
+		<Description>Output mode</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Configures the outputs and the format of the data.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg014_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Output format (local)</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = offset binary</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = twos complement (default)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = gray code</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = reserved</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg014_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Output invert (local)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = inverted</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = normal (default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg014_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Output enable bar (local)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg015</Name>
+		<Address>0x015</Address>
+		<Description>Output Adjust (Global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg015_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>LVDS output drive current adjust</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0000 = 3.72 mA output drive current</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>0001 = 3.5 mA output drive current (default)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>0010 = 3.30 mA output drive current</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>0011 = 2.96 mA output drive current</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>0100 = 2.82 mA output drive current</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>0101 = 2.57 mA output drive current</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>0110 = 2.27 mA output drive current</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>0111 = 2.0 mA output drive current (reduced range)</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg016</Name>
+		<Address>0x016</Address>
+		<Description>Clock phase control (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg016_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Even/odd mode output enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = disabled</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enabled</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg016_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Invert DCO clock</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg017</Name>
+		<Address>0x017</Address>
+		<Description>DCO output delay (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg017_b4_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>DCO clock delay [delay = (3100 ps x register value/31 +100)] 00000 = 100 ps 00001 = 200 ps ...  11111 = 3200 ps</Description>
+			<Visibility>Public</Visibility>
+			<Width>5</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>5</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg017_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Enable DCO clock delay</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg018</Name>
+		<Address>0x018</Address>
+		<Description>Input Span select (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Full-scale input adjustment in 0.022 V steps.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg018_b4_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Full-scale input voltage selection 01111 = 2.087 V p-p ... 00001 = 1.772 V p-p 00000 = 1.75 V p-p (default) 11111 = 1.727 V p-p ... 10000 = 1.383 V p-p</Description>
+			<Visibility>Public</Visibility>
+			<Width>5</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>5</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019</Name>
+		<Address>0x019</Address>
+		<Description>User Test Pattern 1 LSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 1[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01A</Name>
+		<Address>0x01A</Address>
+		<Description>User Test Pattern 1 MSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01A_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 1[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01B</Name>
+		<Address>0x01B</Address>
+		<Description>User Test Pattern 2 LSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01B_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 2[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01C</Name>
+		<Address>0x01C</Address>
+		<Description>User Test Pattern 2 MSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01C_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 2[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01D</Name>
+		<Address>0x01D</Address>
+		<Description>User Test Pattern 3 LSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01D_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 3[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01E</Name>
+		<Address>0x01E</Address>
+		<Description>User Test Pattern 3 MSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01E_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 3[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01F</Name>
+		<Address>0x01F</Address>
+		<Description>User Test Pattern 4 LSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01F_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 4[7:0]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg020</Name>
+		<Address>0x020</Address>
+		<Description>User Test Pattern 4 MSB (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg020_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>User Test Pattern 4[15:8]</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg03A</Name>
+		<Address>0x03A</Address>
+		<Description>Sync control (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg03A_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Master sync buffer enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg03A_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Clock divider sync enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg03A_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Clock divider next sync only</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0FF</Name>
+		<Address>0x0FF</Address>
+		<Description>Transfer (global)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Synchronously transfers data from the master shift register to the slave.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0FF_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Transfer</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</ad9643>
