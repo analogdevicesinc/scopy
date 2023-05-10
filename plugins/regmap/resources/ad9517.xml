@@ -1,0 +1,4988 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2012-2013 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<ad9517>
+	<Register>
+		<Name>reg0000</Name>
+		<Address>0x0000</Address>
+		<Description>Serial port configuration</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Bits[7:4] should always mirror Bits[3:0] so that it does not matter whether the part is in MSB or LSB first mode (see Bit 1, Register 0x000). The user should set the bits as follows:
+Bit 7 = Bit 0.
+Bit 6 = Bit 1.
+Bit 5 = Bit 2.
+Bit 4 = Bit 3.</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0000_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SDO active</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects unidirectional or bidirectional data transfer mode.
+0: SDIO pin used for write and read; SDO set to high impedance; bidirectional mode (default).
+1: SDO used for read, SDIO used for write; unidirectional mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = SDO bidirectional</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = SDO unidirectional</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB first</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>MSB or LSB data orientation.
+0: data-oriented MSB first; addressing decrements (default).
+1: data-oriented LSB first; addressing increments.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = MSB first</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = LSB first</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft reset</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Soft reset.
+1: soft reset; restores default values to internal registers. Not self-clearing. Must be cleared to 0b to complete reset operation.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Long instruction</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Short/long instruction mode. This part uses long instruction mode only, so this bit should always be set to 1b.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = 8-bit instruction (short)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = 16-bit instruction (long)(default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Long instruction (Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = 8-bit instruction (short)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = 16-bit instruction (long)(default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft reset (Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LSB first (Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = MSB first</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = LSB first</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0000_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>SDO active (Mirrored)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>0 = SDO bidirectional</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = SDO unidirectional</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0003</Name>
+		<Address>0x0003</Address>
+		<Description>Part ID</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0003_b7_b0</Name>
+			<Access>R</Access>
+			<DefaultValue>17</DefaultValue>
+			<Description>Part ID (read only)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>Uniquely identifies the dash version (-0 through -4) of the AD9517.</Notes>
+			<Options>
+				<Option>
+					<Description>0x11 = AD9517-0</Description>
+					<Value>17</Value>
+				</Option>
+				<Option>
+					<Description>0x51 = AD9517-1</Description>
+					<Value>81</Value>
+				</Option>
+				<Option>
+					<Description>0x91 = AD9517-2</Description>
+					<Value>145</Value>
+				</Option>
+				<Option>
+					<Description>0x53 = AD9517-3</Description>
+					<Value>83</Value>
+				</Option>
+				<Option>
+					<Description>0xD3 = AD9517-4</Description>
+					<Value>211</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0004</Name>
+		<Address>0x0004</Address>
+		<Description>Readback control</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0004_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Read back active registers</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects register bank used for a readback.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = reads back buffer registers(default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = reads back active registers</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0010</Name>
+		<Address>0x0010</Address>
+		<Description>PFD and charge pump</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0010_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>PLL power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>PLL operating mode.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Asynchronous power-down (default)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Normal operation</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Synchronous power-down</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0010_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>Charge pump mode</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Charge pump operating mode.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = High impedance state</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Force source current (pump up)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Force sink current (pump down)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Normal operation (default)</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0010_b6_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>7</DefaultValue>
+			<Description>Charge pump current</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Charge pump current (with CPRSET = 5.1 kOhm).</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 0.6 mA</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 1.2 mA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 1.8 mA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 2.4 mA</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 3.0 mA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 3.6 mA</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 4.2 mA</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 4.8 mA (default)</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0010_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PFD polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the PFD polarity. Negative polarity is for use (if needed) with external VCO/VCXO only. The on-chip VCO requires positive polarity; Bit 7 = 0b.
+0: positive; higher control voltage produces higher frequency (default).
+1: negative; higher control voltage produces lower frequency.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = positive (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = negative</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0011</Name>
+		<Address>0x0011</Address>
+		<Description>R counter</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0011_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>14-bit R divider, Bits[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>R divider LSBs—lower eight bits (default = 0x01).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0012</Name>
+		<Address>0x0012</Address>
+		<Description>R counter</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0012_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>14-bit R divider, Bits[13:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>R divider MSBs—upper six bits (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0013</Name>
+		<Address>0x0013</Address>
+		<Description>A counter</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0013_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>6-bit A counter</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>A counter (part of N divider) (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0014</Name>
+		<Address>0x0014</Address>
+		<Description>B counter</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0014_b7_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>13-bit B counter, Bits[7:0] (LSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>8</Width>
+			<Notes>B counter (part of N divider)—lower eight bits (default = 0x03).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>8</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0015</Name>
+		<Address>0x0015</Address>
+		<Description>B counter</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0015_b4_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>13-bit B counter, Bits[12:8] (MSB)</Description>
+			<Visibility>Public</Visibility>
+			<Width>5</Width>
+			<Notes>B counter (part of N divider)—upper five bits (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>5</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0016</Name>
+		<Address>0x0016</Address>
+		<Description>PLL Control 1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0016_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>6</DefaultValue>
+			<Description>Prescaler P</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Prescaler: DM = dual modulus and FD = fixed divide.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = Mode: FD. Divide-by-1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = Mode: FD Divide-by-2</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = Mode: DM Divide-by-2 (2/3 mode)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = Mode: DM Divide-by-4 (4/5 mode)</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = Mode: DM Divide-by-8 (8/9 mode)</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = Mode: DM Divide-by-16 (16/17 mode)</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = Mode: DM Divide-by-32 (32/33 mode) (default)</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = Mode: FD Divide-by-3</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0016_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>B counter bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>B counter bypass. This is valid only when operating the prescaler in FD mode.
+0: normal (default).
+1: B counter is set to divide-by-1. This allows the prescaler setting to determine the divide for the N divider.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = B counter is set to divide-by-1</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0016_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reset all counters</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Resets R, A, and B counters.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = holds the R, A, and B counters in reset</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0016_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reset A and B counters</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Resets A and B counters (part of N divider).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = holds the A and B counters in reset</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0016_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reset R counter</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Resets R counter (R divider).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = holds the R counter in reset</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0016_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Set CP pin to VCP/2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the CP pin to one-half of the VCP supply voltage.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = CP normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = CP pin set to VCP/2</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0017</Name>
+		<Address>0x0017</Address>
+		<Description>PLL Control 2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0017_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Antibacklash pulse width</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Antibacklash Pulse Width (ns)
+2.9 (default). This is the recommended setting; it does not normally need to be changed.
+1.3. This setting may be necessary if the PFD frequency &gt; 50 MHz.
+6.0.
+6.0.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 2.9 ns</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 1.3 ns</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 6.0 ns</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 2.9 ns</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0017_b7_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>STATUS pin control</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the signal that is connected to the STATUS pin.</Notes>
+			<Options>
+				<Option>
+					<Description>000000 = Ground (dc) (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>000001 = N divider output (after the delay)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>000010 = R divider output (after the delay)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>000011 = A divider output</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>000100 = Prescaler output</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>000101 = PFD up pulse</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>000110 = PFD down pulse</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>000111 = Ground(dc); for all other cases of 0XXXXXb not specified above.</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>001000 = Ground(dc)</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>001001 = Ground(dc)</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>001010 = Ground(dc)</Description>
+					<Value>10</Value>
+				</Option>
+				<Option>
+					<Description>001011 = Ground(dc)</Description>
+					<Value>11</Value>
+				</Option>
+				<Option>
+					<Description>001100 = Ground(dc)</Description>
+					<Value>12</Value>
+				</Option>
+				<Option>
+					<Description>001101 = Ground(dc)</Description>
+					<Value>13</Value>
+				</Option>
+				<Option>
+					<Description>001110 = Ground(dc)</Description>
+					<Value>14</Value>
+				</Option>
+				<Option>
+					<Description>001111 = Ground(dc)</Description>
+					<Value>15</Value>
+				</Option>
+				<Option>
+					<Description>010000 = Ground(dc)</Description>
+					<Value>16</Value>
+				</Option>
+				<Option>
+					<Description>010001 = Ground(dc)</Description>
+					<Value>17</Value>
+				</Option>
+				<Option>
+					<Description>010010 = Ground(dc)</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>010011 = Ground(dc)</Description>
+					<Value>19</Value>
+				</Option>
+				<Option>
+					<Description>010100 = Ground(dc)</Description>
+					<Value>20</Value>
+				</Option>
+				<Option>
+					<Description>010101 = Ground(dc)</Description>
+					<Value>21</Value>
+				</Option>
+				<Option>
+					<Description>010110 = Ground(dc)</Description>
+					<Value>22</Value>
+				</Option>
+				<Option>
+					<Description>010111 = Ground(dc)</Description>
+					<Value>23</Value>
+				</Option>
+				<Option>
+					<Description>011000 = Ground(dc)</Description>
+					<Value>24</Value>
+				</Option>
+				<Option>
+					<Description>011001 = Ground(dc)</Description>
+					<Value>25</Value>
+				</Option>
+				<Option>
+					<Description>011010 = Ground(dc)</Description>
+					<Value>26</Value>
+				</Option>
+				<Option>
+					<Description>011011 = Ground(dc)</Description>
+					<Value>27</Value>
+				</Option>
+				<Option>
+					<Description>011100 = Ground(dc)</Description>
+					<Value>28</Value>
+				</Option>
+				<Option>
+					<Description>011101 = Ground(dc)</Description>
+					<Value>29</Value>
+				</Option>
+				<Option>
+					<Description>011110 = Ground(dc)</Description>
+					<Value>30</Value>
+				</Option>
+				<Option>
+					<Description>011111 = Ground(dc)</Description>
+					<Value>31</Value>
+				</Option>
+				<Option>
+					<Description>100000 = Ground(dc)</Description>
+					<Value>32</Value>
+				</Option>
+				<Option>
+					<Description>100001 = REF1 clock (differential reference when in differential mode)</Description>
+					<Value>33</Value>
+				</Option>
+				<Option>
+					<Description>100010 = REF2 clock (not available in differential mode)</Description>
+					<Value>34</Value>
+				</Option>
+				<Option>
+					<Description>100011 = Selected reference to PLL (differential reference when in differential mode)</Description>
+					<Value>35</Value>
+				</Option>
+				<Option>
+					<Description>100100 = Unselected reference to PLL (not available in differential mode)</Description>
+					<Value>36</Value>
+				</Option>
+				<Option>
+					<Description>100101 = Status of selected reference (status of differential reference); active high</Description>
+					<Value>37</Value>
+				</Option>
+				<Option>
+					<Description>100110 = Status of unselected reference (not available in differential mode); active high</Description>
+					<Value>38</Value>
+				</Option>
+				<Option>
+					<Description>100111 = Status REF1 frequency (active high)</Description>
+					<Value>39</Value>
+				</Option>
+				<Option>
+					<Description>101000 = Status REF2 frequency (active high)</Description>
+					<Value>40</Value>
+				</Option>
+				<Option>
+					<Description>101001 = (Status REF1 frequency) AND (status REF2 frequency)</Description>
+					<Value>41</Value>
+				</Option>
+				<Option>
+					<Description>101010 = (DLD) AND (status of selected reference) AND (status of VCO)</Description>
+					<Value>42</Value>
+				</Option>
+				<Option>
+					<Description>101011 = Status of VCO frequency (active high)</Description>
+					<Value>43</Value>
+				</Option>
+				<Option>
+					<Description>101100 = Selected reference (low = REF1, high = REF2)</Description>
+					<Value>44</Value>
+				</Option>
+				<Option>
+					<Description>101101 = Digital lock detect (DLD); active high</Description>
+					<Value>45</Value>
+				</Option>
+				<Option>
+					<Description>101110 = Holdover active (active high)</Description>
+					<Value>46</Value>
+				</Option>
+				<Option>
+					<Description>101111 = LD pin comparator output (active high)</Description>
+					<Value>47</Value>
+				</Option>
+				<Option>
+					<Description>110000 = VS (PLL supply)</Description>
+					<Value>48</Value>
+				</Option>
+				<Option>
+					<Description>110001 = !(REF1 clock) (differential reference when in differential mode).</Description>
+					<Value>49</Value>
+				</Option>
+				<Option>
+					<Description>110010 = !(REF2 clock) (not available in differential mode)</Description>
+					<Value>50</Value>
+				</Option>
+				<Option>
+					<Description>110011 = !(Selected reference to PLL) (differential reference when in differential mode)</Description>
+					<Value>51</Value>
+				</Option>
+				<Option>
+					<Description>110100 = !(Unselected reference to PLL) (not available when in differential mode)</Description>
+					<Value>52</Value>
+				</Option>
+				<Option>
+					<Description>110101 = Status of selected reference (status of differential reference); active low</Description>
+					<Value>53</Value>
+				</Option>
+				<Option>
+					<Description>110110 = Status of unselected reference (not available in differential mode); active low</Description>
+					<Value>54</Value>
+				</Option>
+				<Option>
+					<Description>110111 = Status of REF1 frequency (active low)</Description>
+					<Value>55</Value>
+				</Option>
+				<Option>
+					<Description>111000 = Status of REF2 frequency (active low)</Description>
+					<Value>56</Value>
+				</Option>
+				<Option>
+					<Description>111001 = !((Status of REF1 frequency) AND (status of REF2 frequency))</Description>
+					<Value>57</Value>
+				</Option>
+				<Option>
+					<Description>111010 = !((DLD) AND (status of selected reference) AND (status of VCO))</Description>
+					<Value>58</Value>
+				</Option>
+				<Option>
+					<Description>111011 = Status of VCO frequency (active low)</Description>
+					<Value>59</Value>
+				</Option>
+				<Option>
+					<Description>111100 = Selected reference (low = REF2, high = REF1)</Description>
+					<Value>60</Value>
+				</Option>
+				<Option>
+					<Description>111101 = Digital lock detect (DLD) (active low)</Description>
+					<Value>61</Value>
+				</Option>
+				<Option>
+					<Description>111110 = Holdover active (active low)</Description>
+					<Value>62</Value>
+				</Option>
+				<Option>
+					<Description>111111 = LD pin comparator output (active low)</Description>
+					<Value>63</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0018</Name>
+		<Address>0x0018</Address>
+		<Description>PLL Control 3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0018_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO cal now</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bit used to initiate the VCO calibration. This bit must be toggled from 0b to 1b in the active registers. To initiate calibration, use the following three steps: first, ensure that the input reference signal is present; second, set to 0b (if not zero already), followed by an update bit (Register 0x232, Bit 0); and third, program to 1b, followed by another update bit (Register 0x232, Bit 0). Clearing this bit discards the VCO calibration and usually results in the PLL losing lock. The user must ensure that the holdover enable bits in Register 0x01D = 00b during VCO calibration.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0018_b2_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>3</DefaultValue>
+			<Description>VCO calibration divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>VCO calibration divider. Divider used to generate the VCO calibration clock from the PLL reference clock.
+2. This setting is fine for PFD frequencies &lt; 12.5 MHz. The PFD frequency is fREF/R.
+4. This setting is fine for PFD frequencies &lt; 25 MHz.
+8. This setting is fine for PFD frequencies &lt; 50 MHz.
+16 (default). This setting is fine for any PFD frequency but also results in the longest VCO calibration time.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 2</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 4</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 8</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 16</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0018_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Disable digital lock detect</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Digital lock detect operation.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal lock detect operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disables lock detect</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0018_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Digital lock detect window</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>If the time difference of the rising edges at the inputs to the PFD is less than the lock detect window time, the digital lock detect flag is set. The flag remains set until the time difference is greater than the loss-of-lock threshold.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = high range (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = low range</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0018_b6_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Lock detect counter</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Required consecutive number of PFD cycles with edges inside lock detect window before the DLD indicates a locked condition.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 5 PDF Cycles (default).</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 16 PDF Cycles</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 64 PDF Cycles</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 255 PDF Cycles</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0019</Name>
+		<Address>0x0019</Address>
+		<Description>PLL Control 4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0019_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>N path delay</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>N path delay (default = 0x00) (see Table 2) from the datasheet.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0019_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>R path delay</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>R path delay (default = 0x00) (see Table 2) from the datasheet.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0019_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>R, A, B counters /SYNC pin  reset</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+				<Option>
+					<Description>00 = Does nothing on /SYNC (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Asynchronous reset</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Synchronous reset</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Does nothing on /SYNC</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001A</Name>
+		<Address>0x001A</Address>
+		<Description>PLL Control 5</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001A_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LD pin control</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the signal that is connected to the LD pin.</Notes>
+			<Options>
+				<Option>
+					<Description>000000 = Digital lock detect (high = lock, low = unlock) (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>000001 = P-channel, open-drain lock detect (analog lock detect)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>000010 = N-channel, open-drain lock detect (analog lock detect)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>000011 = High-Z LD pin</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>000100 = Current source lock detect (110 uA when DLD is true)</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>000111 = Ground(dc); for all other cases of 0XXXXXb not specified above.</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>001000 = Ground(dc)</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>001001 = Ground(dc)</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>001010 = Ground(dc)</Description>
+					<Value>10</Value>
+				</Option>
+				<Option>
+					<Description>001011 = Ground(dc)</Description>
+					<Value>11</Value>
+				</Option>
+				<Option>
+					<Description>001100 = Ground(dc)</Description>
+					<Value>12</Value>
+				</Option>
+				<Option>
+					<Description>001101 = Ground(dc)</Description>
+					<Value>13</Value>
+				</Option>
+				<Option>
+					<Description>001110 = Ground(dc)</Description>
+					<Value>14</Value>
+				</Option>
+				<Option>
+					<Description>001111 = Ground(dc)</Description>
+					<Value>15</Value>
+				</Option>
+				<Option>
+					<Description>010000 = Ground(dc)</Description>
+					<Value>16</Value>
+				</Option>
+				<Option>
+					<Description>010001 = Ground(dc)</Description>
+					<Value>17</Value>
+				</Option>
+				<Option>
+					<Description>010010 = Ground(dc)</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>010011 = Ground(dc)</Description>
+					<Value>19</Value>
+				</Option>
+				<Option>
+					<Description>010100 = Ground(dc)</Description>
+					<Value>20</Value>
+				</Option>
+				<Option>
+					<Description>010101 = Ground(dc)</Description>
+					<Value>21</Value>
+				</Option>
+				<Option>
+					<Description>010110 = Ground(dc)</Description>
+					<Value>22</Value>
+				</Option>
+				<Option>
+					<Description>010111 = Ground(dc)</Description>
+					<Value>23</Value>
+				</Option>
+				<Option>
+					<Description>011000 = Ground(dc)</Description>
+					<Value>24</Value>
+				</Option>
+				<Option>
+					<Description>011001 = Ground(dc)</Description>
+					<Value>25</Value>
+				</Option>
+				<Option>
+					<Description>011010 = Ground(dc)</Description>
+					<Value>26</Value>
+				</Option>
+				<Option>
+					<Description>011011 = Ground(dc)</Description>
+					<Value>27</Value>
+				</Option>
+				<Option>
+					<Description>011100 = Ground(dc)</Description>
+					<Value>28</Value>
+				</Option>
+				<Option>
+					<Description>011101 = Ground(dc)</Description>
+					<Value>29</Value>
+				</Option>
+				<Option>
+					<Description>011110 = Ground(dc)</Description>
+					<Value>30</Value>
+				</Option>
+				<Option>
+					<Description>011111 = Ground(dc)</Description>
+					<Value>31</Value>
+				</Option>
+				<Option>
+					<Description>100000 = Ground(dc)</Description>
+					<Value>32</Value>
+				</Option>
+				<Option>
+					<Description>100001 = REF1 clock (differential reference when in differential mode)</Description>
+					<Value>33</Value>
+				</Option>
+				<Option>
+					<Description>100010 = REF2 clock (not available in differential mode)</Description>
+					<Value>34</Value>
+				</Option>
+				<Option>
+					<Description>100011 = Selected reference to PLL (differential reference when in differential mode)</Description>
+					<Value>35</Value>
+				</Option>
+				<Option>
+					<Description>100100 = Unselected reference to PLL (not available in differential mode)</Description>
+					<Value>36</Value>
+				</Option>
+				<Option>
+					<Description>100101 = Status of selected reference (status of differential reference); active high</Description>
+					<Value>37</Value>
+				</Option>
+				<Option>
+					<Description>100110 = Status of unselected reference (not available in differential mode); active high</Description>
+					<Value>38</Value>
+				</Option>
+				<Option>
+					<Description>100111 = Status REF1 frequency (active high)</Description>
+					<Value>39</Value>
+				</Option>
+				<Option>
+					<Description>101000 = Status REF2 frequency (active high)</Description>
+					<Value>40</Value>
+				</Option>
+				<Option>
+					<Description>101001 = (Status REF1 frequency) AND (status REF2 frequency)</Description>
+					<Value>41</Value>
+				</Option>
+				<Option>
+					<Description>101010 = (DLD) AND (status of selected reference) AND (status of VCO)</Description>
+					<Value>42</Value>
+				</Option>
+				<Option>
+					<Description>101011 = Status of VCO frequency (active high)</Description>
+					<Value>43</Value>
+				</Option>
+				<Option>
+					<Description>101100 = Selected reference (low = REF1, high = REF2)</Description>
+					<Value>44</Value>
+				</Option>
+				<Option>
+					<Description>101101 = Digital lock detect (DLD); active high</Description>
+					<Value>45</Value>
+				</Option>
+				<Option>
+					<Description>101110 = Holdover active (active high)</Description>
+					<Value>46</Value>
+				</Option>
+				<Option>
+					<Description>110000 = VS (PLL supply)</Description>
+					<Value>48</Value>
+				</Option>
+				<Option>
+					<Description>110001 = !(REF1 clock) (differential reference when in differential mode).</Description>
+					<Value>49</Value>
+				</Option>
+				<Option>
+					<Description>110010 = !(REF2 clock) (not available in differential mode)</Description>
+					<Value>50</Value>
+				</Option>
+				<Option>
+					<Description>110011 = !(Selected reference to PLL) (differential reference when in differential mode)</Description>
+					<Value>51</Value>
+				</Option>
+				<Option>
+					<Description>110100 = !(Unselected reference to PLL) (not available when in differential mode)</Description>
+					<Value>52</Value>
+				</Option>
+				<Option>
+					<Description>110101 = Status of selected reference (status of differential reference); active low</Description>
+					<Value>53</Value>
+				</Option>
+				<Option>
+					<Description>110110 = Status of unselected reference (not available in differential mode); active low</Description>
+					<Value>54</Value>
+				</Option>
+				<Option>
+					<Description>110111 = Status of REF1 frequency (active low)</Description>
+					<Value>55</Value>
+				</Option>
+				<Option>
+					<Description>111000 = Status of REF2 frequency (active low)</Description>
+					<Value>56</Value>
+				</Option>
+				<Option>
+					<Description>111001 = !((Status of REF1 frequency) AND (status of REF2 frequency))</Description>
+					<Value>57</Value>
+				</Option>
+				<Option>
+					<Description>111010 = !((DLD) AND (status of selected reference) AND (status of VCO))</Description>
+					<Value>58</Value>
+				</Option>
+				<Option>
+					<Description>111011 = Status of VCO frequency (active low)</Description>
+					<Value>59</Value>
+				</Option>
+				<Option>
+					<Description>111100 = Selected reference (low = REF2, high = REF1)</Description>
+					<Value>60</Value>
+				</Option>
+				<Option>
+					<Description>111101 = Digital lock detect (DLD) (active low)</Description>
+					<Value>61</Value>
+				</Option>
+				<Option>
+					<Description>111110 = Holdover active (active low)</Description>
+					<Value>62</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001A_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Reference frequency monitor threshold</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the reference (REF1/REF2) frequency monitor’s detection threshold frequency. This does not affect the VCO frequency monitor’s detection threshold (see Table 16: REF1, REF2, and VCO frequency status monitor parameter).
+0: frequency valid if frequency is above the higher frequency threshold (default).
+1: frequency valid if frequency is above the lower frequency threshold.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = above higher frequency threshold</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = above lower frequency threshold</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001B</Name>
+		<Address>0x001B</Address>
+		<Description>PLL Control 6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001B_b4_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REFMON pin control</Description>
+			<Visibility>Public</Visibility>
+			<Width>5</Width>
+			<Notes>Selects the signal that is connected to the REFMON pin.</Notes>
+			<Options>
+				<Option>
+					<Description>00000 = Ground(dc)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>00001 = REF1 clock (differential reference when in differential mode)</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>00010 = REF2 clock (not available in differential mode)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>00011 = Selected reference to PLL (differential reference when in differential mode)</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>00100 = Unselected reference to PLL (not available in differential mode)</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>00101 = Status of selected reference (status of differential reference); active high</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>00110 = Status of unselected reference (not available in differential mode); active high</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>00111 = Status REF1 frequency (active high)</Description>
+					<Value>7</Value>
+				</Option>
+				<Option>
+					<Description>01000 = Status REF2 frequency (active high)</Description>
+					<Value>8</Value>
+				</Option>
+				<Option>
+					<Description>01001 = (Status REF1 frequency) AND (status REF2 frequency)</Description>
+					<Value>9</Value>
+				</Option>
+				<Option>
+					<Description>01010 = (DLD) AND (status of selected reference) AND (status of VCO)</Description>
+					<Value>10</Value>
+				</Option>
+				<Option>
+					<Description>01011 = Status of VCO frequency (active high)</Description>
+					<Value>11</Value>
+				</Option>
+				<Option>
+					<Description>01100 = Selected reference (low = REF1, high = REF2)</Description>
+					<Value>12</Value>
+				</Option>
+				<Option>
+					<Description>01101 = Digital lock detect (DLD); active high</Description>
+					<Value>13</Value>
+				</Option>
+				<Option>
+					<Description>01110 = Holdover active (active high)</Description>
+					<Value>14</Value>
+				</Option>
+				<Option>
+					<Description>01111 = LD pin comparator output (active high)</Description>
+					<Value>15</Value>
+				</Option>
+				<Option>
+					<Description>10000 = VS (PLL supply)</Description>
+					<Value>16</Value>
+				</Option>
+				<Option>
+					<Description>10001 = !(REF1 clock) (differential reference when in differential mode).</Description>
+					<Value>17</Value>
+				</Option>
+				<Option>
+					<Description>10010 =!( REF2 clock) (not available in differential mode)</Description>
+					<Value>18</Value>
+				</Option>
+				<Option>
+					<Description>10011 = !(Selected reference to PLL) (differential reference when in differential mode)</Description>
+					<Value>19</Value>
+				</Option>
+				<Option>
+					<Description>10100 = !(Unselected reference to PLL) (not available when in differential mode)</Description>
+					<Value>20</Value>
+				</Option>
+				<Option>
+					<Description>10101 = Status of selected reference (status of differential reference); active low</Description>
+					<Value>21</Value>
+				</Option>
+				<Option>
+					<Description>10110 = Status of unselected reference (not available in differential mode); active low</Description>
+					<Value>22</Value>
+				</Option>
+				<Option>
+					<Description>10111 = Status of REF1 frequency (active low)</Description>
+					<Value>23</Value>
+				</Option>
+				<Option>
+					<Description>11000 = Status of REF2 frequency (active low)</Description>
+					<Value>24</Value>
+				</Option>
+				<Option>
+					<Description>11001 = !((Status of REF1 frequency) AND (status of REF2 frequency))</Description>
+					<Value>25</Value>
+				</Option>
+				<Option>
+					<Description>11010 = !((DLD) AND (status of selected reference) AND (status of VCO))</Description>
+					<Value>26</Value>
+				</Option>
+				<Option>
+					<Description>11011 = Status of VCO frequency (active low)</Description>
+					<Value>27</Value>
+				</Option>
+				<Option>
+					<Description>11100 = Selected reference (low = REF2, high = REF1)</Description>
+					<Value>28</Value>
+				</Option>
+				<Option>
+					<Description>11101 = Digital lock detect (DLD) (active low)</Description>
+					<Value>29</Value>
+				</Option>
+				<Option>
+					<Description>11110 = Holdover active (active low)</Description>
+					<Value>30</Value>
+				</Option>
+				<Option>
+					<Description>11111 = LD pin comparator output (active low)</Description>
+					<Value>31</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>5</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001B_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF1 (REFIN) frequency monitor</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>REF1 (REFIN) frequency monitor enable; this is for both REF1 (single-ended) and REFIN (differential) inputs (as selected by differential reference mode).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001B_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF2 (/REFIN) frequency monitor</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables or disables REF2 frequency monitor.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001B_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO frequency monitor</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables or disables VCO frequency monitor.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001C</Name>
+		<Address>0x001C</Address>
+		<Description>PLL Control 7</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001C_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Differential reference</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects the PLL reference mode, differential or single-ended. Single-ended must be selected for the automatic switchover between REF1 and REF2 to work.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = single-ended reference mode (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = differential reference mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001C_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF1 power-on</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>This bit turns the REF1 power on.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power on</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001C_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF2 power-on</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>This bit turns the REF2 power on.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power on</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001C_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Use REF_SEL pin</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets method of PLL reference selection.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses Register 0x01C, Bit 6 (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = uses REF_SEL pin</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001C_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Select REF2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>If Register 0x01C, Bit 5 = 0b, selects reference for PLL.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = selects REF1 (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = selects REF2</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001C_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Disable switchover deglitch</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Disables or enables the switchover deglitch circuit.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = enable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001D</Name>
+		<Address>0x001D</Address>
+		<Description>PLL Control 8</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001D_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Holdover enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Along with Bit 2, enables the holdover function. Automatic holdover must be disabled during VCO calibration.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>0</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001D_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>External holdover control</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables the external hold control through the /SYNC pin. (This disables the internal holdover mode.)
+0: automatic holdover mode—holdover controlled by automatic holdover circuit. (default)
+1: external holdover mode—holdover controlled by /SYNC pin.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = automatic holdover mode</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = external holdover mode</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001D_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Holdover enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Along with Bit 0, enables the holdover function. Automatic holdover must be disabled during VCO calibration.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001D_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>LD pin comparator enable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Enables the LD pin voltage comparator. This function is used with the LD pin current source lock detect mode. When in the internal (automatic) holdover mode, this function enables the use of the voltage on the LD pin to determine if the PLL was previously in a locked state (see Figure 53) from the datasheet. Otherwise, this function can be used with the REFMON and STATUS pins to monitor the voltage on this pin.
+0: disables LD pin comparator; internal/automatic holdover controller treats this pin as true (high) (default).
+1: enables LD pin comparator.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = disable</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = enable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001D_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>PLL status register disable</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Disables the PLL status register readback.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = enable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg001F</Name>
+		<Address>0x001F</Address>
+		<Description>PLL readback</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Default value: N/A</Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg001F_b0</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Digital lock detect</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: digital lock detect.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = PLL is not locked</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = PLL is locked</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001F_b1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF1 frequency &gt; threshold</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: indicates if the frequency of the signal at REF2 is greater than the threshold frequency set by Register 0x01A, Bit 6.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REF1 frequency &lt; threshold frequency</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = REF1 frequency &gt; threshold frequency</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001F_b2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF2 frequency &gt; threshold</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: indicates if the frequency of the signal at REF2 is greater than the threshold frequency set by Register 0x1A, Bit 6.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REF2 frequency &lt; threshold frequency.</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = REF2 frequency &gt; threshold frequency</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001F_b3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO frequency &gt; threshold</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: indicates if the VCO frequency is greater than the threshold (see Table 16 from the datasheet: REF1, REF2, and VCO frequency status monitor).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = VCO frequency &lt; threshold</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = VCO frequency &gt; threshold</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001F_b4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>REF2 selected</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: indicates which PLL reference is selected as the input to the PLL.
+0: REF1 selected (or differential reference if in differential mode).
+1: REF2 selected.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = REF1 selected</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = REF2 selected</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001F_b5</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Holdover active</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: indicates if the part is in the holdover state (see Figure 53) from the datasheet. This is not the same as holdover enabled.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = not in holdover</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = holdover state active</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg001F_b6</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VCO cal finished</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read-only register: indicates status of the VCO calibration.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = not finished</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = finished</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A0</Name>
+		<Address>0x00A0</Address>
+		<Description>OUT4 delay bypass</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A0_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT4 delay bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses or uses the delay function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses delay function</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses delay function (default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A1</Name>
+		<Address>0x00A1</Address>
+		<Description>OUT4 delay full-scale</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A1_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 ramp current</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Ramp current for the delay function. The combination of the number of capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 200 uA (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 400 uA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 600 uA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 800 uA</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 1000uA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 1200 uA</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 1400 uA</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1600 uA</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00A1_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 ramp capacitors</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Selects the number of ramp capacitors used by the delay function. The combination of the number of the capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 4 Capacitors (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 3 Capacitors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 3 Capacitors</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 2 Capacitors</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 3 Capacitors</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 2 Capacitors</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 2 Capacitors</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1 Capacitor</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A2</Name>
+		<Address>0x00A2</Address>
+		<Description>OUT4 delay fraction</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A2_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 delay fraction</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the fraction of the full-scale delay desired (6-bit binary). A setting of 000000b gives zero delay. Only delay values up to 47 decimals (101111b; 0x2F) are supported (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A3</Name>
+		<Address>0x00A3</Address>
+		<Description>OUT5 delay bypass</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT5 delay bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses or uses the delay function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses delay function</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses delay function (default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A4</Name>
+		<Address>0x00A4</Address>
+		<Description>OUT5 delay full-scale</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A4_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT5 ramp current</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Ramp current for the delay function. The combination of the number of capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 200 uA (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 400 uA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 600 uA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 800 uA</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 1000uA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 1200 uA</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 1400 uA</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1600 uA</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00A4_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT5 ramp capacitors</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Selects the number of ramp capacitors used by the delay function. The combination of the number of the capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 4 Capacitors (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 3 Capacitors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 3 Capacitors</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 2 Capacitors</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 3 Capacitors</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 2 Capacitors</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 2 Capacitors</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1 Capacitor</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A5</Name>
+		<Address>0x00A5</Address>
+		<Description>OUT5 delay fraction</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A5_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT5 delay fraction</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the fraction of the full-scale delay desired (6-bit binary). A setting of 000000b gives zero delay. Only delay values up to 47 decimals (101111b; 0x2F) are supported (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A6</Name>
+		<Address>0x00A6</Address>
+		<Description>OUT6 delay bypass</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A6_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT6 delay bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses or uses the delay function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses delay function</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses delay function (default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A7</Name>
+		<Address>0x00A7</Address>
+		<Description>OUT6 delay full-scale</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A7_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 ramp current</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Ramp current for the delay function. The combination of the number of capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 200 uA (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 400 uA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 600 uA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 800 uA</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 1000uA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 1200 uA</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 1400 uA</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1600 uA</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00A7_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 ramp capacitors</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Selects the number of ramp capacitors used by the delay function. The combination of the number of capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 4 Capacitors (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 3 Capacitors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 3 Capacitors</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 2 Capacitors</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 3 Capacitors</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 2 Capacitors</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 2 Capacitors</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1 Capacitor</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A8</Name>
+		<Address>0x00A8</Address>
+		<Description>OUT6 delay fraction</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A8_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 delay fraction</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the fraction of the full-scale delay desired (6-bit binary). A setting of 000000b gives zero delay. Only delay values up to 47 decimals (101111b; 0x2F) are supported (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00A9</Name>
+		<Address>0x00A9</Address>
+		<Description>OUT7 delay bypass</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00A9_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT7 delay bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses or uses the delay function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses delay function</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses delay function (default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00AA</Name>
+		<Address>0x00AA</Address>
+		<Description>OUT7 delay full-scale</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00AA_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT7 ramp current</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Ramp current for the delay function. The combination of the number of capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 200 uA (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 400 uA</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 600 uA</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 800 uA</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 1000uA</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 1200 uA</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 1400 uA</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1600 uA</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00AA_b5_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT7 ramp capacitors</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>Selects the number of ramp capacitors used by the delay function. The combination of the number of capacitors and the ramp current sets the delay full scale.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 4 Capacitors (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 3 Capacitors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 3 Capacitors</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 2 Capacitors</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 3 Capacitors</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = 2 Capacitors</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = 2 Capacitors</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = 1 Capacitor</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00AB</Name>
+		<Address>0x00AB</Address>
+		<Description>OUT7 delay fraction</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00AB_b5_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT7 delay fraction</Description>
+			<Visibility>Public</Visibility>
+			<Width>6</Width>
+			<Notes>Selects the fraction of the full-scale delay desired (6-bit binary). A setting of 000000b gives zero delay. Only delay values up to 47 decimals (101111b; 0x2F) are supported (default = 0x00).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>6</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00F0</Name>
+		<Address>0x00F0</Address>
+		<Description>OUT0</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00F0_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT0 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>LVPECL power-down modes.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Partial power-down, reference on; use only if there are no external load resistors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Partial power-down, reference on, safe LVPECL power-down</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Total power-down, reference off; use only if there are no external load resistors.</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F0_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>OUT0 LVPECL differential voltage</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets the LVPECL output differential voltage (VOD).</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 400 mV</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 600 mV</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 780 mV(default)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 960 mV</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F0_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT0 invert</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the output polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = noninverting (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00F1</Name>
+		<Address>0x00F1</Address>
+		<Description>OUT1</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00F1_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>OUT1 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>LVPECL power-down modes.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Partial power-down, reference on; use only if there are no external load resistors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Partial power-down, reference on, safe LVPECL power-down</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Total power-down, reference off; use only if there are no external load resistors.</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F1_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>OUT1 LVPECLdifferential voltage</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets the LVPECL output differential voltage (VOD).</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 400 mV</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 600 mV</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 780 mV(default)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 960 mV</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F1_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT1 invert</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the output polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = noninverting (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00F4</Name>
+		<Address>0x00F4</Address>
+		<Description>OUT2</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00F4_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT2 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>LVPECL power-down modes.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Partial power-down, reference on; use only if there are no external load resistors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Partial power-down, reference on, safe LVPECL power-down</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Total power-down, reference off; use only if there are no external load resistors.</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F4_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>OUT2 LVPECL differential voltage</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets the LVPECL output differential voltage (VOD).</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 400 mV</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 600 mV</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 780 mV(default)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 960 mV</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F4_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT2 invert</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the output polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = noninverting (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg00F5</Name>
+		<Address>0x00F5</Address>
+		<Description>OUT3</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg00F5_b1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>OUT3 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>LVPECL power-down modes.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = Normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = Partial power-down, reference on; use only if there are no external load resistors</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = Partial power-down, reference on, safe LVPECL power-down</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = Total power-down, reference off; use only if there are no external load resistors.</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F5_b3_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>OUT3 LVPECL differential voltage</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets the LVPECL output differential voltage (VOD).</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 400 mV</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 600 mV</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 780 mV(default)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 960 mV</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg00F5_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT3 invert</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Sets the output polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = noninverting (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0140</Name>
+		<Address>0x0140</Address>
+		<Description>OUT4</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0140_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down output (LVDS/CMOS).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power on (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power off</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0140_b2_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT4 LVDS output current</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets output current level in LVDS mode. This has no effect in CMOS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 1.75 mA, Recommended Termination: 100 Ohm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 3.5 mA(default), Recommended Termination: 100 Ohm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 5.25 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 7 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0140_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 select LVDS/CMOS</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects LVDS or CMOS logic levels.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = LVDS (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = CMOS</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0140_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 CMOS B</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In CMOS mode, turn on/off the CMOS B output. There is no effect in LVDS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = turn off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = turn on</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0140_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT4 LVDS/ CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In LVDS mode, only Bit 5 determines LVDS polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OUT4: noninverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OUT4: inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0140_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT4 CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>In CMOS mode, selects the output polarity of each CMOS output.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = OUT4A: noninverting, OUT4B: inverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = OUT4A: noninverting, OUT4B: noninverting</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = OUT4A: inverting, OUT4B: inverting</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = OUT4A: noninverting, OUT4B: noninverting</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0141</Name>
+		<Address>0x0141</Address>
+		<Description>OUT5</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0141_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT5 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down output (LVDS/CMOS).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power on (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power off</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0141_b2_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT5 LVDS output current</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets output current level in LVDS mode. This has no effect in CMOS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 1.75 mA, Recommended Termination: 100 Ohm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 3.5 mA(default), Recommended Termination: 100 Ohm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 5.25 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 7 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0141_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT5 select LVDS/CMOS</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects LVDS or CMOS logic levels.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = LVDS (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = CMOS</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0141_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT5 CMOS B</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In CMOS mode, turn on/off the CMOS B output. There is no effect in LVDS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = turn off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = turn on</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0141_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT5 LVDS/ CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In LVDS mode, only Bit 5 determines LVDS polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OUT5: noninverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OUT5: inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0141_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT5 CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>In CMOS mode, selects the output polarity of each CMOS output.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = OUT5A: noninverting, OUT5B: inverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = OUT5A: noninverting, OUT5B: noninverting</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = OUT5A: inverting, OUT5B: inverting</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = OUT5A: noninverting, OUT5B: noninverting</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0142</Name>
+		<Address>0x0142</Address>
+		<Description>OUT6</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0142_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down output (LVDS/CMOS).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power on (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power off</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0142_b2_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT6 LVDS output current</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets output current level in LVDS mode. This has no effect in CMOS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 1.75 mA, Recommended Termination: 100 Ohm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 3.5 mA(default), Recommended Termination: 100 Ohm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 5.25 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 7 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0142_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 select LVDS/CMOS</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects LVDS or CMOS logic levels.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = LVDS (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = CMOS</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0142_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 CMOS B</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In CMOS mode, turn on/off the CMOS B output. There is no effect in LVDS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = turn off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = turn on</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0142_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT6 LVDS/ CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In LVDS mode, only Bit 5 determines LVDS polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OUT6: noninverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OUT6: inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0142_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT6 CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>In CMOS mode, selects the output polarity of each CMOS output.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = OUT6A: noninverting, OUT6B: inverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = OUT6A: noninverting, OUT6B: noninverting</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = OUT6A: inverting, OUT6B: inverting</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = OUT6A: noninverting, OUT6B: noninverting</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0143</Name>
+		<Address>0x0143</Address>
+		<Description>OUT7</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0143_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT7 power-down</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down output (LVDS/CMOS).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = power on (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power off</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0143_b2_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT7 LVDS output current</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>Sets output current level in LVDS mode. This has no effect in CMOS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = 1.75 mA, Recommended Termination: 100 Ohm</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = 3.5 mA(default), Recommended Termination: 100 Ohm</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = 5.25 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = 7 mA, Recommended Termination: 50 Ohm</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0143_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT7 select LVDS/CMOS</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects LVDS or CMOS logic levels.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = LVDS (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = CMOS</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0143_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT7 CMOS B</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In CMOS mode, turn on/off the CMOS B output. There is no effect in LVDS mode.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = turn off (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = turn on</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0143_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>OUT7 LVDS/ CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>In LVDS mode, only Bit 5 determines LVDS polarity.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OUT7: noninverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OUT7: inverting</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0143_b7_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>OUT7 CMOS output polarity</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes>In CMOS mode, selects the output polarity of each CMOS output.</Notes>
+			<Options>
+				<Option>
+					<Description>00 = OUT7A: noninverting, OUT7B: inverting</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>01 = OUT7A: noninverting, OUT7B: noninverting</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>10 = OUT7A: inverting, OUT7B: inverting</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>11 = OUT7A: noninverting, OUT7B: noninverting</Description>
+					<Value>3</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>2</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0190</Name>
+		<Address>0x0190</Address>
+		<Description>Divider 0 (PECL)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0190_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 high cycles</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of the divider input during which divider output stays high. A value of 0x0 means that the divider is high for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0190_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 low cycles</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of the divider input during which divider output stays low. A value of 0x0 means that the divider is low for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0191</Name>
+		<Address>0x0191</Address>
+		<Description>Divider 0 (PECL)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0191_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 phase offset</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Phase offset (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0191_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 start high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects clock output to start high or start low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = starts low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = starts high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0191_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 force high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Forces divider output to high. This requires that nosync (Bit 6) also be set.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = divider output forced to low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = divider output forced to high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0191_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 nosync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>No sync.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0191_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Divider 0 bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses and powers down the divider; routes input to divider output.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses divider</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses divider (default)</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0192</Name>
+		<Address>0x0192</Address>
+		<Description>Divider 0 (PECL)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0192_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 DCCOFF</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Duty-cycle correction function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = enable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0192_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 0 direct to output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Connects OUT0 and OUT1 to Divider 0 or directly to VCO or CLK.
+0: OUT0 and OUT1 are connected to Divider 0 (default).
+1: If Register 0x1E1[1:0] = 10b, the VCO is routed directly to OUT0 and OUT1. If Register 0x1E1[1:0] = 00b, the CLK is routed directly to OUT0 and OUT1. If Register 0x1E1[1:0] = 01b, there is no effect.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OUT0 and OUT1 to Divider 0</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OUT0 and OUT1 to VCO or CLK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0196</Name>
+		<Address>0x0196</Address>
+		<Description>Divider1 (PECL)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0196_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 high cycles</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of the divider input during which divider output stays high. A value of 0x0 means that the divider is high for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0196_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 low cycles</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles of the divider input during which divider output stays low. A value of 0x0 means that the divider is low for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0197</Name>
+		<Address>0x0197</Address>
+		<Description>Divider1 (PECL)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0197_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 phase offset</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Phase offset (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0197_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 start high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects clock output to start high or start low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = starts low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = starts high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0197_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 force high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Forces divider output to high. This requires that nosync (Bit 6) also be set.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = divider output forced to low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = divider output forced to high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0197_b6</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 nosync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>No sync.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0197_b7</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 bypass</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses and powers down the divider; routes input to divider output.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses divider (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses divider</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0198</Name>
+		<Address>0x0198</Address>
+		<Description>Divider1 (PECL)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0198_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 DCCOFF</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Duty-cycle correction function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = enable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0198_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 1 direct to output</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Connects OUT2 and OUT3 to Divider 2 or directly to VCO or CLK.
+0: OUT2 and OUT3 are connected to Divider 1 (default).
+1: If Register 0x1E1[1:0] = 10b, the VCO is routed directly to OUT2 and OUT3. If Register 0x1E1[1:0] = 00b, the CLK is routed directly to OUT2 and OUT3. If Register 0x1E1[1:0] = 01b, there is no effect.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = OUT2 and OUT3 to Divider 1</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = OUT2 and OUT3 to VCO or CLK</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0199</Name>
+		<Address>0x0199</Address>
+		<Description>Divider 2 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0199_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>High Cycles Divider 2.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 2.1 divider input during which 2.1 output stays high. A value of 0x0 means that the divider is high for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0199_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>Low Cycles Divider 2.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 2.1 divider input during which 2.1 output stays low. A value of 0x0 means that the divider is low for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019A</Name>
+		<Address>0x019A</Address>
+		<Description>Divider 2 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019A_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Phase Offset Divider 2.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Refer to LVDS/CMOS channel divider function description (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019A_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Phase Offset Divider 2.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Refer to LVDS/CMOS channel divider function description (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019B</Name>
+		<Address>0x019B</Address>
+		<Description>Divider 2 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019B_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>High Cycles Divider 2.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1)of 2.2 divider input during which 2.2 output stays high. A value of 0x0 means that the divider is high for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019B_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Low Cycles Divider 2.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 2.2 divider input during which 2.2 output stays low. A value of 0x0 means that the divider is low for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019C</Name>
+		<Address>0x019C</Address>
+		<Description>Divider 2 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019C_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Start High Divider 2.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Divider 2.1 start high/low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = starts low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = starts high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019C_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Start High Divider 2.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Divider 2.2 start high/low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = starts low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = starts high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019C_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 2 force high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Forces Divider 2 output high. Requires that nosync also be set.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = forces low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = forces high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019C_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 2 nosync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>No sync.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019C_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass Divider 2.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses (and powers down) 2.1 divider logic, routes clock to 2.1 output.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = does not bypass (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019C_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass Divider 2.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses (and powers down) 2.2 divider logic, routes clock to 2.2 output.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = does not bypass (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019D</Name>
+		<Address>0x019D</Address>
+		<Description>Divider 2 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019D_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 2 DCCOFF</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Duty-cycle correction function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = enable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019E</Name>
+		<Address>0x019E</Address>
+		<Description>Divider 3 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019E_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>High Cycles Divider 3.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 3.1 divider input during which 3.1 output stays high. A value of 0x0 means that the divider is high for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019E_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>Low Cycles Divider 3.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 3.1 divider input during which 3.1 output stays low. A value of 0x0 means that the divider is low for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg019F</Name>
+		<Address>0x019F</Address>
+		<Description>Divider 3 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg019F_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Phase Offset Divider 3.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Refer to LVDS/CMOS channel divider function description (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg019F_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Phase Offset Divider 3.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Refer to LVDS/CMOS channel divider function description (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01A0</Name>
+		<Address>0x01A0</Address>
+		<Description>Divider 3 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01A0_b3_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>High Cycles Divider 3.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 3.2 divider input during which 3.2 output stays high. A value of 0x0 means that the divider is high for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A0_b7_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>1</DefaultValue>
+			<Description>Low Cycles Divider 3.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>4</Width>
+			<Notes>Number of clock cycles (minus 1) of 3.2 divider input during which 3.2 output stays low. A value of 0x0 means that the divider is low for one input clock cycle (default = 0x0).</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>4</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01A1</Name>
+		<Address>0x01A1</Address>
+		<Description>Divider 3 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01A1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Start High Divider 3.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Divider 3.1 start high/low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = starts low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = starts high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A1_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Start High Divider 3.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Divider 3.2 start high/low.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = starts low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = starts high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A1_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 3 force high</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Forces Divider 3 output high. Requires that nosync also be set.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = forces low (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = forces high</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A1_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 3 nosync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Nosync.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = obeys chip-level SYNC signal (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = ignores chip-level SYNC signal</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A1_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass Divider 3.1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses (and powers down) 3.1 divider logic; routes clock to 3.1 output.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = does not bypass (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01A1_b5</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass Divider 3.2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses (and powers down) 3.2 divider logic; routes clock to 3.2 output.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = does not bypass (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01A2</Name>
+		<Address>0x01A2</Address>
+		<Description>Divider 3 (LVDS/CMOS)</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01A2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Divider 3 DCCOFF</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Duty-cycle correction function.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = enable (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = disable</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01E0</Name>
+		<Address>0x01E0</Address>
+		<Description>VCO divider</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01E0_b2_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>2</DefaultValue>
+			<Description>VCO Divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>3</Width>
+			<Notes>000 = 2
+001 = 3
+010 = 4 (default)
+011 = 5
+100 = 6
+101 = Output static. Note that setting the VCO divider static should occur only after VCO calibration.
+110 = Output static. Note that setting the VCO divider static should occur only after VCO calibration.
+111 = Output static. Note that setting the VCO divider static should occur only after VCO calibration.</Notes>
+			<Options>
+				<Option>
+					<Description>000 = 2</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>001 = 3</Description>
+					<Value>1</Value>
+				</Option>
+				<Option>
+					<Description>010 = 4 (default)</Description>
+					<Value>2</Value>
+				</Option>
+				<Option>
+					<Description>011 = 5</Description>
+					<Value>3</Value>
+				</Option>
+				<Option>
+					<Description>100 = 6</Description>
+					<Value>4</Value>
+				</Option>
+				<Option>
+					<Description>101 = Output static</Description>
+					<Value>5</Value>
+				</Option>
+				<Option>
+					<Description>110 = Output static</Description>
+					<Value>6</Value>
+				</Option>
+				<Option>
+					<Description>111 = Output static</Description>
+					<Value>7</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>3</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg01E1</Name>
+		<Address>0x01E1</Address>
+		<Description>Input CLKs</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg01E1_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Bypass VCO divider</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Bypasses or uses the VCO divider.
+0: uses VCO divider (default).
+1: bypasses VCO divider; cannot select VCO as input when this is selected.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = uses VCO divider (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = bypasses VCO divider</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01E1_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Select VCO or CLK</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Selects either the VCO or the CLK as the input to VCO divider.
+0: selects external CLK as input to VCO divider (default).
+1: selects VCO as input to VCO divider; cannot bypass VCO divider when this is selected.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = external CLK</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = VCO</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01E1_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down VCO and CLK</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down both VCO and CLK input.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01E1_b3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down VCO clock interface</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down the interface block between VCO and clock distribution.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg01E1_b4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down clock input section</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down the clock input section (including CLK buffer, VCO divider, and CLK tree).</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power-down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0230</Name>
+		<Address>0x0230</Address>
+		<Description>Power down and sync</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0230_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Soft sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>The soft sync bit works the same as the /SYNC pin, except that the polarity of the bit is reversed. That is, a high level forces selected channels into a predetermined static state, and a 1-to-0 transition triggers a sync.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = same as /SYNC high (default)</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = same as /SYNC low</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0230_b1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down distribution reference</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down the reference for distribution section.
+0: normal operation of the reference for the distribution section (default).
+1: powers down the reference for the distribution section.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>reg0230_b2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Power down sync</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Powers down the sync function.
+0: normal operation of the sync function (default).
+1: powers down sync circuitry.</Notes>
+			<Options>
+				<Option>
+					<Description>0 = normal operation</Description>
+					<Value>0</Value>
+				</Option>
+				<Option>
+					<Description>1 = power down</Description>
+					<Value>1</Value>
+				</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>reg0232</Name>
+		<Address>0x0232</Address>
+		<Description>Update all registers</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>reg0232_b0</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Update all registers (self- clearing bit)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>This bit must be set to 1b to transfer the contents of the buffer registers into the active registers. This bit is self-clearing; that is, it does not have to be set back to 0b.
+1 (self-clearing): updates all active registers to the contents of the buffer registers.</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</ad9517>
