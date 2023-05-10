@@ -19,7 +19,6 @@ public:
 
 	QColor getCurveColor(int id) const;
 
-	void setPlotActiveAxis(int id);
 	void setSingleCapture(bool en);
 	void deleteResidualPlotData();
 	void resetPlotParameters();
@@ -33,7 +32,8 @@ public Q_SLOTS:
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
 	void onTimespanChanged(double value);
 	void onSamplingFreqWritten(int samplingFreq);
-	void onChannelWidgetEnabled(int curveId, std::vector<bool> enabledPlots);
+	void onChannelWidgetEnabled(int curveId, bool en);
+	void onChannelWidgetSelected(int curveId);
 Q_SIGNALS:
 	void singleCaptureFinished();
 	void offsetHandleSelected(int hdlIdx, bool selected);
