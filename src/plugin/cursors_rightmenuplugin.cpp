@@ -1,7 +1,6 @@
 #include "gui/dynamicWidget.hpp"
 #include "logging_categories.h"
 #include "plugin/irightmenuplugin.h"
-#include <FftDisplayPlot.h>
 #include <newinstrument.hpp>
 #include <ui_cursors_settings.h>
 
@@ -37,12 +36,9 @@ public:
 		qDebug(CAT_CURSOR_RIGHTMENU_PLUGIN) << "init()";
 
 		auto instrument = dynamic_cast<NewInstrument *>(parent);
-		auto plots = instrument->getPlotList();
 
-		for (auto plot: *plots) {
-			if (dynamic_cast<FftDisplayPlot*>(plot) != nullptr) {
-				plotList.push_back(dynamic_cast<FftDisplayPlot*>(plot));
-			}
+		for (auto plot: *instrument->getPlotList()) {
+				plotList.push_back(plot);
 		}
 
 		menu = new GenericMenu(new QWidget());
@@ -64,9 +60,9 @@ public:
 
 		for (auto plot: plotList) {
 			connect(cr_ui->btnLockHorizontal, &QPushButton::toggled,
-				plot, &FftDisplayPlot::setHorizCursorsLocked);
+				plot, &DisplayPlot::setHorizCursorsLocked);
 			connect(cr_ui->btnLockVertical, &QPushButton::toggled,
-				plot, &FftDisplayPlot::setVertCursorsLocked);
+				plot, &DisplayPlot::setVertCursorsLocked);
 
 			connect(cr_ui->hCursorsEnable, SIGNAL(toggled(bool)), plot, SLOT(setVertCursorsEnabled(bool)));
 			connect(cr_ui->vCursorsEnable, SIGNAL(toggled(bool)), plot, SLOT(setHorizCursorsEnabled(bool)));
