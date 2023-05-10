@@ -2,14 +2,14 @@
 #define DATALOGGER_API_H
 
 #include <QObject>
-#include "apiObject.hpp"
-#include "datalogger.hpp"
+#include <pluginbase/apiobject.h>
+#include <src/datalogger.hpp>
 
-namespace adiscope {
+namespace scopy {
 
 class DataLoggerController;
 class CustomSwitch;
-class DataLogger;
+//class Datalogger;
 
 class DataLogger_API:public ApiObject
 {

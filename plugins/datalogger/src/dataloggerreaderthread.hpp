@@ -3,8 +3,10 @@
 
 
 #include <QObject>
-#include <dmm.hpp>
 #include <qthread.h>
+#include <QMap>
+
+#include <libm2k/analog/dmm.hpp>
 
 struct activeChannel{
 	std::string dmmId;

@@ -1,4 +1,5 @@
 #include "dataloggerreaderthread.hpp"
+#include "qdebug.h"
 #include <libm2k/analog/dmm.hpp>
 
 DataLoggerReaderThread::DataLoggerReaderThread()

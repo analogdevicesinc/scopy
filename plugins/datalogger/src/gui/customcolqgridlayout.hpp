@@ -10,7 +10,7 @@ namespace Ui {
 class CustomColQGridLayout;
 }
 
-namespace adiscope {
+namespace scopy {
 class CustomColQGridLayout : public QWidget
 {
 	Q_OBJECT

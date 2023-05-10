@@ -3,9 +3,9 @@
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include "gui/customSwitch.hpp"
+#include <customSwitch.h>
 
-using namespace adiscope::gui;
+using namespace scopy::gui;
 
 DataLoggerGenericMenu::DataLoggerGenericMenu(QWidget *parent):
 	GenericMenu(parent)
@@ -22,7 +22,7 @@ void DataLoggerGenericMenu::init(QString title, QColor* color)
 	initInteractiveMenu();
 	setMenuHeader(title,color,false);
 
-	adiscope::gui::SubsectionSeparator *scaleSection = new adiscope::gui::SubsectionSeparator("Settings", false);
+	scopy::gui::SubsectionSeparator *scaleSection = new scopy::gui::SubsectionSeparator("Settings", false);
 	insertSection(scaleSection);
 
 	//scale
@@ -36,7 +36,7 @@ void DataLoggerGenericMenu::init(QString title, QColor* color)
 	scaleSection->getContentWidget()->layout()->addItem(scaleLayout);
 
 	////history
-	adiscope::gui::SubsectionSeparator *historySection = new adiscope::gui::SubsectionSeparator("History", true);
+	scopy::gui::SubsectionSeparator *historySection = new scopy::gui::SubsectionSeparator("History", true);
 	insertSection(historySection);
 
 	historySwitch = new CustomSwitch(historySection->getContentWidget());
@@ -72,7 +72,7 @@ void DataLoggerGenericMenu::init(QString title, QColor* color)
 	historySection->getContentWidget()->layout()->addItem(h2layout);
 
 	////Peak holder
-	adiscope::gui::SubsectionSeparator *peakHolderSection = new adiscope::gui::SubsectionSeparator("Peak Holder", true);
+	scopy::gui::SubsectionSeparator *peakHolderSection = new scopy::gui::SubsectionSeparator("Peak Holder", true);
 	insertSection(peakHolderSection);
 
 	QHBoxLayout *peakHolderLayout = new QHBoxLayout();

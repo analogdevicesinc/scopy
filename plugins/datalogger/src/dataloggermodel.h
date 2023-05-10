@@ -5,11 +5,10 @@
 #include <qvector.h>
 #include <QTimer>
 #include <QMap>
-#include <filemanager.h>
 #include <QDateTime>
 #include <QtConcurrent>
 
-namespace adiscope {
+namespace scopy {
 
 enum class CHANNEL_DATA_TYPE{
 	INT,
