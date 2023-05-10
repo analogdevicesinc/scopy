@@ -8,7 +8,7 @@ namespace Ui {
 class ChannelMonitorComponent;
 }
 
-namespace adiscope {
+namespace scopy {
 class ChannelMonitorComponent : public QWidget
 {
 	Q_OBJECT

@@ -1,6 +1,6 @@
 #include "dataloggercontroller.hpp"
 
-using namespace adiscope;
+using namespace scopy;
 
 DataLoggerController::DataLoggerController(bool lastValue, bool average, bool all)
 {

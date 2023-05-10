@@ -1,11 +1,11 @@
 #ifndef DATALOGGERCONTROLLER_H
 #define DATALOGGERCONTROLLER_H
 
-#include "dataloggerview.hpp"
-#include "dataloggermodel.h"
+#include "src/gui/dataloggerview.hpp"
+#include "src/dataloggermodel.h"
 
 
-namespace adiscope {
+namespace scopy {
 
 class DataLoggerController: public QObject
 {

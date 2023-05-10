@@ -1,17 +1,17 @@
 #ifndef DATALOGGERVIEW_H
 #define DATALOGGERVIEW_H
 
+#include <spinbox_a.hpp>
 #include <QWidget>
 #include <QLineEdit>
 #include <QRadioButton>
-#include "customSwitch.hpp"
+#include <customSwitch.h>
 #include <QVBoxLayout>
-#include "spinbox_a.hpp"
 #include <QFileDialog>
 #include <qcombobox.h>
 #include <QLabel>
 
-namespace adiscope {
+namespace scopy {
 class DataLoggerView : public QWidget
 {
 	Q_OBJECT

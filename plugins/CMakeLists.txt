@@ -8,6 +8,7 @@ option(ENABLE_PLUGIN_M2K "Enable m2k plugin" ON)
 option(ENABLE_PLUGIN_SWIOT "Enable swiot plugin" ON)
 option(ENABLE_PLUGIN_REGMAP "Enable regmap plugin" ON)
 option(ENABLE_PLUGIN_DEBUGGER "Enable debugger plugin" ON)
+option(ENABLE_PLUGIN_DATALOGGER "Enable datalogger plugin" ON)
 
 if(ENABLE_PLUGIN_TEST)
     add_subdirectory(guitestplugin)
@@ -37,6 +38,11 @@ endif()
 
 if(ENABLE_PLUGIN_DEBUGGER)
     add_subdirectory(debugger)
+list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
+
+if(ENABLE_PLUGIN_DATALOGGER)
+    add_subdirectory(datalogger)
     list(APPEND PLUGINS ${PLUGIN_NAME})
 endif()
 
