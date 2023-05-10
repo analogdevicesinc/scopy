@@ -437,6 +437,8 @@ public:
   HorizBar *getHBar1() const;
   HorizBar *getHBar2() const;
 
+  void adjustHandleAreasSize(bool cursors = false);
+
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
