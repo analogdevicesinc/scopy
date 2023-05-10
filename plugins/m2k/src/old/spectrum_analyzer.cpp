@@ -238,6 +238,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	receivedFFTData = false;
 	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
 	fft_plot->disableLegend();
+	fft_plot->adjustHandleAreasSize();
 
 	// Disable mouse interactions with the axes until they are in a working state
 	fft_plot->setXaxisMouseGesturesEnabled(false);
@@ -264,10 +265,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YRight, false);
-//	waterfall_plot->setVisibleSampleCount(200);
 	waterfall_plot->setFlowDirection(WaterfallFlowDirection::DOWN);
 	waterfall_plot->enableYaxisLabels();
 	waterfall_plot->enableXaxisLabels();
+	waterfall_plot->adjustHandleAreasSize();
 	waterfall_plot->replot();
 
 	// plot widget
@@ -1096,6 +1097,8 @@ void SpectrumAnalyzer::on_boxCursors_toggled(bool on)
 		menuOrder.removeOne(ui->btnCursors);
 	}
 	updateVisibleCursorHandles();
+	fft_plot->adjustHandleAreasSize(on);
+	waterfall_plot->adjustHandleAreasSize(on);
 }
 
 void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)

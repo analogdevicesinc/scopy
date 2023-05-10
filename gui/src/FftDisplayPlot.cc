@@ -269,10 +269,6 @@ void FftDisplayPlot::updateHandleAreaPadding()
 {
 	d_leftHandlesArea->update();
 	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
-	d_bottomHandlesArea->setRightPadding(50);
-
-	d_rightHandlesArea->setTopPadding(50);
-	d_rightHandlesArea->setBottomPadding(50);
 
 	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
 	d_hCursorHandle1->updatePosition();
