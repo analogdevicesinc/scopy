@@ -2,7 +2,6 @@
 #include <QGridLayout>
 #include <gui/filemanager.h>
 #include "pluginbase/preferences.h"
-#include "qcolormap.h"
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>
@@ -59,6 +58,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
 	gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
 	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
+	gridPlot->addWidget(m_plot->bottomHandlesArea(), 4, 0, 2, 4);
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 
 	m_plot->setSampleRate(m_samplingFreq, 1, "");
@@ -79,7 +79,9 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		m_plot->DetachCurve(i);
 		m_plot->setOffsetHandleVisible(i, false);
 		m_plot->addZoomer(i);
+		m_plot->setYaxisUnit("V", i);
 	}
+	m_plot->configureAllYAxis();
 	m_plot->setAllYAxis(-5, 5);
 	m_plot->setOffsetInterval(-__DBL_MAX__, __DBL_MAX__);
 	connect(m_plot, &CapturePlot::channelSelected, this, [=](int hdlIdx, bool selected) {
@@ -227,11 +229,6 @@ void BufferPlotHandler::setSingleCapture(bool en)
 	m_singleCapture = en;
 }
 
-void BufferPlotHandler::setPlotActiveAxis(int id) 
-{
-	m_plot->setActiveVertAxis(id, true);
-}
-
 QColor BufferPlotHandler::getCurveColor(int id) const
 {
 	return m_plot->getLineColor(id);
@@ -242,17 +239,22 @@ QWidget *BufferPlotHandler::getPlotWidget() const
 	return m_plotWidget;
 }
 
-void BufferPlotHandler::onChannelWidgetEnabled(int curveId, std::vector<bool> enabledPlots)
+void BufferPlotHandler::onChannelWidgetEnabled(int curveId, bool en)
 {
-	bool enabled = enabledPlots[curveId];
-
-	m_enabledPlots = enabledPlots;
-	m_plot->setOffsetHandleVisible(curveId, enabled);
-	if (enabled) {
+	m_enabledPlots[curveId] = en;
+	m_plot->setOffsetHandleVisible(curveId, en);
+	if (en) {
 		m_plot->AttachCurve(curveId);
 	} else {
 		m_plot->DetachCurve(curveId);
 	}
+}
+
+void BufferPlotHandler::onChannelWidgetSelected(int curveId)
+{
+	m_plot->bringCurveToFront(curveId);
+	m_plot->setActiveVertAxis(curveId);
+	m_plot->setAllAxes(curveId);
 }
 
 void BufferPlotHandler::resetPlotParameters()

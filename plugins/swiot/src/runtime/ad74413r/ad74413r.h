@@ -58,7 +58,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 
-	void channelWidgetEnabled(int curveId, std::vector<bool> enabledPlots);
+	void channelWidgetEnabled(int curveId, bool en);
+	void channelWidgetSelected(int curveId);
 
 	void exportBtnClicked(QMap<int, bool> exportConfig);
 
@@ -89,7 +90,6 @@ private:
 	QVector<QString> m_chnlsFunction;
 
 	std::vector<bool> m_enabledChannels;
-	std::vector<bool> m_enabledPlots;
 	std::vector<ChannelWidget*> m_channelWidgetList;
 
 	BufferLogic *m_swiotAdLogic;
