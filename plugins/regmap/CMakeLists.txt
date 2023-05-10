@@ -51,8 +51,12 @@ if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
+
+
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
+    ${PROJECT_RESOURCES}
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)

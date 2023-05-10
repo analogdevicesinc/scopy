@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QWidget>
 #include <QVector>
+#include <QDir>
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include "logging_categories.h"
@@ -106,21 +107,22 @@ bool REGMAPPlugin::onConnect()
         for (int i = 0; i < m_deviceList->size(); ++i) {
             iio_device *dev = m_deviceList->at(i);
             qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << iio_device_get_name(dev);
+            QString devName = QString::fromStdString(iio_device_get_name(dev));
 
-            //TODO SEARCH THROW LIST OF TEMPLATES
-            // if device has template
-            if (strcasecmp(iio_device_get_name(dev), "ad9361-phy") == 0) {
-                qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << iio_device_get_name(dev);
-
-                RegisterMapTemplate *registerMapTemplate = new RegisterMapTemplate();
-                XmlFileManager xmlFileManager(dev, "/home/ubuntu/Documents/RegisterMapDemo/ad9361-phy.xml");
-                registerMapTemplate->setRegisterList(xmlFileManager.getAllRegisters());
-
-                regMapInstrument->addTab( dev, iio_device_get_name(dev), "/home/ubuntu/Documents/RegisterMapDemo/ad9361-phy.xml");
-
-            } else {
+            bool foundTemplate = false;
+                //check if device has template
+            foreach (const QString &templatePath, QDir(":/xmls").entryList()) {
+                if (templatePath.contains(devName)) {
+                    qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << iio_device_get_name(dev);
+                    regMapInstrument->addTab( dev, iio_device_get_name(dev),":/xmls/" + templatePath);
+                    foundTemplate = true;
+                    break;
+                }
+            }
+            if(!foundTemplate) {
                 regMapInstrument->addTab(dev, iio_device_get_name(dev));
             }
+
         }
         layout->addWidget(regMapInstrument);
 
