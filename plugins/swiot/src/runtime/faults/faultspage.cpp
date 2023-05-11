@@ -6,8 +6,8 @@ using namespace scopy::swiot;
 FaultsPage::FaultsPage(QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultsPage),
-	m_ad74413rFaultsDevice(new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", this)),
-	m_max14906FaultsDevice(new FaultsDevice("max14906", ":/swiot/swiot_faults.json", this))
+	m_ad74413rFaultsDevice(new FaultsDevice("AD74413R", ":/swiot/swiot_faults.json", this)),
+	m_max14906FaultsDevice(new FaultsDevice("MAX14906", ":/swiot/swiot_faults.json", this))
 {
 	ui->setupUi(this);
 
