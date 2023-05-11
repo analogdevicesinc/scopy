@@ -1,5 +1,5 @@
 {
-	"ad74413r": {
+	"AD74413R": {
 		"max_faults": 16,
 		"faults": [
 			{
@@ -68,7 +68,7 @@
 			}
 		]
 	},
-	"max14906": {
+	"MAX14906": {
 		"max_faults": 32,
 		"faults": [
 			{
