@@ -22,6 +22,7 @@ struct ToolViewRecipe
 	bool hasChannels{false};
 	ChannelsPositionEnum channelsPosition{ChannelsPositionEnum::HORIZONTAL};
 	bool hasHeader{true};
+	bool hasRightMenu{false};
 };
 
 class SCOPY_GUI_EXPORT ToolViewBuilder

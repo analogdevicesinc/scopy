@@ -38,26 +38,40 @@ public:
 
 	CustomPushButton* getAddChannelBtn();
 	QList<ChannelWidget*> getChannelsList();
+	int getChannelsCount();
 
 	void setChannelAlignment(ChannelWidget* ch,Qt::Alignment alignment);
 	void setChannelIdVisible(bool visible);
-	const QString getToolStatus() const;
+	const QString &getToolStatus() const;
 	void setToolStatus(const QString &newToolStatus);
-
+	void enableSwitchButton(bool en);
+	int getChannelID(ChannelWidget *ch);
+	int getSelectedChannel();
+	const ChannelWidget *getChannelAt(int id);
 public Q_SLOTS:
 	void changeParent(QWidget* newParent);
 	void toggleChannelManager(bool toggled);
+
+	void onChannelSelected(bool toggled);
+	void onChannelEnabled(bool toggled);
+	void onChannelDeleted();
 
 Q_SIGNALS:
 	void configureAddBtn(QWidget* menu, bool dockable);
 	void positionChanged(ChannelsPositionEnum position);
 	void channelManagerToggle(bool toggled);
 
+	void selectedChannel(int id);
+	void enabledChannel(int id, bool toggled);
+	void deletedChannel(QString name);
+
 private:
 	QWidget* m_parent;
+	QWidget* header;
 	QScrollArea* m_scrollArea;
 	QWidget* m_channelsWidget;
 	bool m_hasAddBtn;
+	QPushButton *m_switchBtn;
 	CustomPushButton* m_addChannelBtn;
 	ChannelsPositionEnum m_position;
 	QList<ChannelWidget*> m_channelsList;
@@ -67,6 +81,7 @@ private:
 	QLabel *toolStatus;
 	int m_maxChannelWidth;
 	int m_minChannelWidth;
+	int m_selectedChannel;
 };
 } // namespace gui
 } // namespace scopy

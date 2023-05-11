@@ -199,7 +199,7 @@
          </widget>
         </item>
         <item>
-         <widget class="scopy::CustomPushButton" name="delBtn">
+         <widget class="QPushButton" name="delBtn">
           <property name="text">
            <string/>
           </property>
