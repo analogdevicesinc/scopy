@@ -43,7 +43,7 @@ jobs:
                 -e GITHUB_RUN_ID=%GITHUB_RUN_ID% ^
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
-                cristianbindea/scopy2-mingw64:latest C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/CI/appveyor/inside_mingw_docker.sh'
+                cristianbindea/scopy2-mingw64:latest C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/inside_mingw_docker.sh'
 
     - uses: actions/upload-artifact@v3
       with:
