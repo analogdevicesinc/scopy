@@ -14,7 +14,7 @@ BUILD_FOLDER=$WORKDIR/build_$ARCH
 DEBUG_FOLDER=$WORKDIR/debug_$ARCH
 ARTIFACT_FOLDER=$WORKDIR/artifact_$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
-DLL_DEPS=$(cat $SRC_FOLDER/CI/appveyor/mingw_dll_deps)
+DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
 
 PLUGINBASE_DLL=$BUILD_FOLDER/pluginbase
 CORE_DLL=$BUILD_FOLDER/core
