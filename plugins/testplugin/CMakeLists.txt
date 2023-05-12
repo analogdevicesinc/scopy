@@ -56,8 +56,8 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase)
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopy-pluginbase)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopy-pluginbase scopy-gui)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
