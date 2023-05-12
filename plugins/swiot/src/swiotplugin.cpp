@@ -17,6 +17,8 @@ using namespace scopy::swiot;
 
 void SWIOTPlugin::preload()
 {
+	m_displayName = "SWIOT";
+
 	m_swiotController = new SwiotController(m_param, this);
 	m_runtime = new SwiotRuntime();
 }
