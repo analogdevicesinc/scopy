@@ -5,7 +5,10 @@
 #include "tintedoverlay.h"
 #include "tutorialchapter.h"
 #include "scopy-gui_export.h"
-#include "ui_tutorial.h"
+
+namespace Ui {
+class Tutorial;
+}
 
 namespace scopy::gui {
 
@@ -38,7 +41,7 @@ private:
 	QList<TintedOverlay*> highlights;
 	QString title;
 	int cnt;
-	Ui_Tutorial *ui;
+	Ui::Tutorial *ui;
 
 };
 }
