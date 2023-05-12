@@ -17,6 +17,7 @@ public:
 	virtual ~PluginBase() {}
 
 	virtual void setParam(QString param, QString category) override;
+	virtual void setEnabled(bool en) override;
 	virtual void initMetadata() override;
 	virtual void setMetadata(QJsonObject obj) override;
 	virtual void initPreferences() override;
@@ -37,6 +38,7 @@ public:
 	virtual void unload() override;
 
 	virtual QString param() override;
+	virtual bool enabled() override;
 	virtual QString name() override;
 	virtual QString displayName() override;
 	virtual QString displayDescription() override;
@@ -69,6 +71,7 @@ protected:
 	QList<ToolMenuEntry*> m_toolList;
 	QList<QAbstractButton*> m_extraButtons;
 	QJsonObject m_metadata;
+	bool m_enabled;
 };
 }
 
