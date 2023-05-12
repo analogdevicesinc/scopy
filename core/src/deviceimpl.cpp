@@ -44,8 +44,8 @@ void DeviceImpl::preload() {
 	}
 }
 
-
 void DeviceImpl::loadPlugins() {
+	removeDisabledPlugins();
 	preload();
 	loadName();
 	loadIcons();
@@ -73,6 +73,14 @@ void DeviceImpl::unloadPlugins() {
 		delete (*pI);
 	}
 	m_plugins.clear();
+}
+
+void DeviceImpl::removeDisabledPlugins() {
+	QMutableListIterator<Plugin*> i(m_plugins);
+	while (i.hasNext()) {
+		if (i.next()->enabled() == false)
+			i.remove();
+	}
 }
 
 void DeviceImpl::loadName() {
