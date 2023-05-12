@@ -16,9 +16,6 @@ private:
 	QSettings *s;
 };
 
-
-
-
 const QString filePath = QDir::currentPath()+"Pref.ini";
 
 void TST_Preferences::initPreferences()

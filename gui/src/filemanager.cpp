@@ -434,7 +434,7 @@ void FileManager::writeToFile(bool overwrite,QMap<QString,QVector<QString>> data
 
 			//add columns
 			QString columns = "";
-			for (auto ch : data.keys()) {
+			for (const auto &ch : data.keys()) {
 				columns+= ch + separator;
 			}
 			exportStream << columns << "\n";
@@ -443,9 +443,9 @@ void FileManager::writeToFile(bool overwrite,QMap<QString,QVector<QString>> data
 
 			file.open(QIODevice::Append);
 			QString dataToWrite = "";
-			for (auto ch : data.keys()) {
+			for (const auto &ch : data.keys()) {
 				if (!data[ch].empty()) {
-					for (auto d : data[ch]) {
+					for (const auto &d : data[ch]) {
 						dataToWrite += d + " ";
 					}
 					dataToWrite += separator;
