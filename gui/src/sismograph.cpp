@@ -261,9 +261,15 @@ void Sismograph::setUnitOfMeasure(QString unitOfMeasureName,QString unitOfMeasur
 	m_unitOfMeasureSymbol = unitOfMeasureSymbol;
 }
 
-void Sismograph::setPlotAxisXTitle(QString title)
+void Sismograph::setPlotAxisXTitle(const QString& title)
 {
 	//setAxisTitle(QwtAxis::XTop, title);
 	setAxisTitle(QwtAxis::YLeft, title);
 }
+
+void Sismograph::setPlotAxisYTitle(const QString& title)
+{
+	setAxisTitle(QwtAxis::XBottom, title);
+}
+
 #include "moc_sismograph.cpp"
