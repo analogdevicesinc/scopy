@@ -8,6 +8,8 @@
 #include <pluginbase/pluginbase.h>
 #include "scopy-testplugin_export.h"
 #include <QLineEdit>
+#include <QLabel>
+#include <QPushButton>
 
 namespace scopy {
 
@@ -45,6 +47,15 @@ private:
 	QLineEdit *edit;
 	int renameCnt;
 	ApiObject* m_pluginApi;
+	void startTutorial();
+
+
+	QLabel *lbl;
+	QLabel *pic;
+	QLabel *lbl2;
+	QPushButton *btn;
+	QPushButton *btn2;
+	QPushButton *btn3;
 };
 
 class SCOPY_TESTPLUGIN_EXPORT TestPlugin_API : public ApiObject {
