@@ -10,6 +10,12 @@ void PluginBase::setParam(QString param, QString category) {
 	m_param = param;
 	m_category = category;
 	m_displayDescription = param;
+	m_enabled = true;
+}
+
+void PluginBase::setEnabled(bool en)
+{
+	m_enabled = en;
 }
 
 void PluginBase::preload() {
@@ -62,6 +68,10 @@ void PluginBase::messageCallback(QString topic, QString message)
 void PluginBase::requestTool(QString id)
 {
 	Q_EMIT requestToolByUuid(ToolMenuEntry::findToolMenuEntryById(m_toolList,id)->uuid());
+}
+
+bool PluginBase::enabled() {
+	return m_enabled;
 }
 
 QString PluginBase::param() {

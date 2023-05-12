@@ -35,6 +35,16 @@ public:
 	virtual void setParam(QString, QString) = 0;
 
 	/**
+	 * @brief setEnabled
+	 * sets whether the plugin is enabled or not
+	 * Default implementation in PluginBase - override not recommended
+	 * @param QString
+	 */
+
+	virtual void setEnabled(bool) = 0;
+
+
+	/**
 	 * @brief initMetadata
 	 * initializes plugin metadata. initialize m_metadata
 	 * use loadMetadata() helper to convert QString to QJsonObject.
@@ -198,6 +208,14 @@ public:
 	 * Default implementation in PluginBase - can be overriden
 	 */
 	virtual void unload() = 0;
+
+
+	/**
+	 * @brief param
+	 * @return plugin m_enabled getter - shows whether the plugin will load or not on loadPlugin()
+	 * Default implementation in PluginBase - override not recommended
+	 */
+	virtual bool enabled() = 0;
 
 	/**
 	 * @brief param
