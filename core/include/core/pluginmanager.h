@@ -9,7 +9,6 @@
 namespace scopy {
 class SCOPY_CORE_EXPORT PluginManager : public QObject
 {
-
 	Q_OBJECT
 public:
 	PluginManager(QObject *parent = nullptr);
