@@ -388,7 +388,8 @@ const ChannelWidget* ChannelManager::getChannelAt(int id)
 
 const QString &ChannelManager::getToolStatus() const
 {
-	return toolStatus->text();
+	static const auto text = toolStatus->text();
+	return text;
 }
 
 void ChannelManager::setToolStatus(const QString &newToolStatus)
