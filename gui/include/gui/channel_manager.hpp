@@ -48,6 +48,7 @@ public:
 	int getChannelID(ChannelWidget *ch);
 	int getSelectedChannel();
 	const ChannelWidget *getChannelAt(int id);
+	void updatePosition(ChannelsPositionEnum position);
 public Q_SLOTS:
 	void changeParent(QWidget* newParent);
 	void toggleChannelManager(bool toggled);

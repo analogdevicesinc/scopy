@@ -20,48 +20,40 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	, m_maxChannelWidth(-Q_INFINITY)
 	, m_selectedChannel(-1)
 {
-	if (m_position == ChannelsPositionEnum::VERTICAL) {
-		m_channelsWidget->setLayout(new QVBoxLayout(m_channelsWidget));
+	m_channelsWidget->setLayout(new QVBoxLayout(m_channelsWidget));
 
-		m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-		m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-		header = new QWidget();
-		auto headerLayout = new QHBoxLayout(header);
-		header->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
-		headerLayout->setMargin(10);
-		headerLayout->setSpacing(0);
+	header = new QWidget();
+	auto headerLayout = new QHBoxLayout(header);
+	header->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+	headerLayout->setMargin(10);
+	headerLayout->setSpacing(0);
 
-		toolStatus = new QLabel("");
-		channelManagerToggled = false;
+	toolStatus = new QLabel("");
+	channelManagerToggled = false;
 
-		QStringList icons = QStringList() << ":/gui/icons/scopy-default/icons/menu.svg";
+	QStringList icons = QStringList() << ":/gui/icons/scopy-default/icons/menu.svg";
 
-		QIcon my_icon;
-		my_icon.addFile(icons[0],QSize(), QIcon::Normal);
+	QIcon my_icon;
+	my_icon.addFile(icons[0],QSize(), QIcon::Normal);
 
-		toggleChannels = new QPushButton(this);
-		toggleChannels->setStyleSheet("font-size: 12px; color: rgba(255, 255, 255, 70);");
-		toggleChannels->setIcon(my_icon);
-		toggleChannels->setIconSize(QSize(24,24));
-		toggleChannels->setCheckable(true);
+	toggleChannels = new QPushButton(this);
+	toggleChannels->setStyleSheet("font-size: 12px; color: rgba(255, 255, 255, 70);");
+	toggleChannels->setIcon(my_icon);
+	toggleChannels->setIconSize(QSize(24,24));
+	toggleChannels->setCheckable(true);
 
-		toggleChannels->setFixedWidth(20);
-		toggleChannels->setCheckable(true);
-		toggleChannels->setChecked(true);
+	toggleChannels->setFixedWidth(20);
+	toggleChannels->setCheckable(true);
+	toggleChannels->setChecked(true);
 
-		connect(toggleChannels, &QPushButton::clicked, this, &ChannelManager::toggleChannelManager);
+	connect(toggleChannels, &QPushButton::clicked, this, &ChannelManager::toggleChannelManager);
 
-		headerLayout->addWidget(toggleChannels);
-		headerLayout->addWidget(toolStatus);
-		m_channelsWidget->layout()->addWidget(header);
-
-	} else {
-		m_channelsWidget->setLayout(new QHBoxLayout(m_channelsWidget));
-
-		m_scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-		m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	}
+	headerLayout->addWidget(toggleChannels);
+	headerLayout->addWidget(toolStatus);
+	m_channelsWidget->layout()->addWidget(header);
 
 	m_channelsWidget->layout()->setSpacing(0);
 	m_channelsWidget->layout()->setMargin(0);
@@ -110,6 +102,14 @@ void ChannelManager::build(QWidget* parent)
 	m_parent->layout()->addWidget(m_scrollArea);
 }
 
+void ChannelManager::updatePosition(ChannelsPositionEnum position)
+{
+	m_position = position == ChannelsPositionEnum::VERTICAL ?
+				ChannelsPositionEnum::HORIZONTAL :
+				ChannelsPositionEnum::VERTICAL;
+	Q_EMIT m_switchBtn->toggled(true);
+}
+
 int ChannelManager::getChannelID(ChannelWidget *ch)
 {
 	return m_channelsList.indexOf(ch);
@@ -156,6 +156,10 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 		}
 
 	} else {
+		if (m_maxChannelWidth < ch->sizeHint().width()) {
+			m_minChannelWidth = ch->minimumWidth();
+			m_maxChannelWidth = ch->sizeHint().width();
+		}
 		m_channelsWidget->setMinimumWidth(m_channelsList.size() * m_channelsList.first()->width());
 		m_channelsWidget->setMaximumWidth(m_channelsList.size() * m_channelsList.first()->width());
 
@@ -164,6 +168,7 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 	}
 
 	ch->enableButton()->setChecked(true);
+	updatePosition(m_position);
 
 	return ch;
 }

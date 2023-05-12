@@ -33,6 +33,9 @@ ToolView::ToolView(QWidget* parent)
 
 	m_ui->widgetMenuAnim->setMaximumWidth(0);
 
+	getGeneralSettingsBtn()->setVisible(false);
+	getSettingsBtn()->setVisible(false);
+
 	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
 }
 
@@ -160,13 +163,10 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 		}
 	});
 
-	if (position == ChannelsPositionEnum::HORIZONTAL) {
-		m_ui->widgetFooter->setVisible(true);
-		cm->build(m_ui->widgetHorizontalChannelsContainer);
-	} else {
-		m_ui->widgetVerticalChannels->setVisible(true);
-		cm->build(m_ui->widgetVerticalChannelsContainer);
-	}
+	// if it's horizontal, will be later updated (needs rework)
+	m_ui->widgetVerticalChannels->setVisible(true);
+	cm->build(m_ui->widgetVerticalChannelsContainer);
+
 }
 
 QDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
@@ -501,6 +501,10 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 			m_ui->widgetSettingsPairBtns->getSettingsBtn()->setChecked(!toggled);
 		}
 	});
+
+	if (!getGeneralSettingsBtn()->isVisible()) {
+		getGeneralSettingsBtn()->setVisible(true);
+	}
 }
 
 void ToolView::setFixedMenu(QWidget* menu, bool dockable)
