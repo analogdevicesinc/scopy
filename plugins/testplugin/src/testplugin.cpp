@@ -10,6 +10,11 @@
 #include <pluginbase/messagebroker.h>
 #include <pluginbase/preferenceshelper.h>
 #include <QFile>
+#include <QGraphicsEffect>
+#include <QPainter>
+#include <QDialog>
+#include "tutorialoverlay.h"
+#include <gui/utils.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace scopy;
@@ -83,6 +88,48 @@ bool TestPlugin::loadExtraButtons()
 	return true;
 }
 
+void TestPlugin::startTutorial() {
+
+	QWidget *window = Util::findContainingWindow(m_toolList[0]->tool());
+	gui::TutorialOverlay *tut = new gui::TutorialOverlay(window);
+
+	tut->addChapter({btn,lbl},
+R"story(
+# First Button
+
+Two highlights with default **description** location.
+)story");
+	tut->addChapter(btn3, R"story(
+# Second Button translated
+
+One button, but tutorial *moved*
+)story");
+tut->addChapter(pic, R"story(
+# Picture
+
+Text overlayed on picture
+
+You can even put a picture on top
+![ADALM2000 pic!](:/gui/icons/adalm.svg "svgg")
+)story");
+tut->addChapter(lbl, R"story(
+# Cristi's Label
+
+This label is cool
+)story");
+
+tut->addChapter(nullptr,R"story(
+# Link
+
+For more info, visit [wiki](https://wiki.analog.com/)
+![ADI](:/gui/icons/scopy-default/icons/logo.svg "ADI")
+)story");
+
+
+	tut->setTitle("Welcome to TestPlugin ! ");
+	tut->start();
+}
+
 bool TestPlugin::onConnect()
 {
 	MessageBroker::GetInstance()->subscribe(this, "TestPlugin");
@@ -95,13 +142,15 @@ bool TestPlugin::onConnect()
 
 	tool = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(tool);
-	QLabel *lbl = new QLabel("TestPlugin", tool);
-	QLabel *pic = new QLabel("Picture",tool);
-	QLabel *lbl2 = new QLabel("m_initText->"+m_initText,tool);
-	QPushButton *btn = new QPushButton("detach");
-	QPushButton *btn2 = new QPushButton("renameTool");
+	lbl = new QLabel("TestPlugin", tool);
+	pic = new QLabel("Picture",tool);
+	lbl2 = new QLabel("m_initText->"+m_initText,tool);
+	btn = new QPushButton("detach");
+	btn2 = new QPushButton("renameTool");
+	btn3 = new QPushButton("tutorial");
 	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
 	connect(btn2,&QPushButton::clicked,this,[=](){m_toolList[0]->setName("TestPlugin"+QString::number(renameCnt++));});
+	connect(btn3,&QPushButton::clicked,this,[=](){startTutorial();});
 	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testplugin/testImage.png\") ");
 	lay->addWidget(lbl);
@@ -110,6 +159,7 @@ bool TestPlugin::onConnect()
 	lay->addWidget(lbl2);
 	lay->addWidget(btn);
 	lay->addWidget(btn2);
+	lay->addWidget(btn3);
 	m_toolList[0]->setTool(tool);
 
 	m_pluginApi = new TestPlugin_API(this);

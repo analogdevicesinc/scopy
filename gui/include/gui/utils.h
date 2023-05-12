@@ -41,6 +41,7 @@ public:
 	static void setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars=0);
 	static QString loadStylesheetFromFile(const QString &path);
 	static bool compareNatural(const std::string &a, const std::string &b);
+	static QWidget* findContainingWindow(QWidget* w);
 };
 
 #define PLOT_MENU_BAR_ENABLED
