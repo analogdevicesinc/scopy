@@ -1,5 +1,6 @@
 #include "tutorialoverlay.h"
 #include <QLoggingCategory>
+#include "ui_tutorial.h"
 
 Q_LOGGING_CATEGORY(CAT_TUTORIALOVERLAY,"TutorialOverlay");
 using namespace scopy::gui;
@@ -113,7 +114,7 @@ void TutorialOverlay::buildUi()
 	qDebug(CAT_TUTORIALOVERLAY)<<"build";
 	overlay = new TintedOverlay(parent);
 
-	ui = new Ui_Tutorial();
+	ui = new Ui::Tutorial();
 	ui->setupUi(this);
 	ui->description->setStyleSheet("background-color: rgba(0,0,0,60);color: white;");
 	ui->title->setStyleSheet("color:white");
