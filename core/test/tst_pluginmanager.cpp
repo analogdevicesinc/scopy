@@ -16,7 +16,12 @@ private Q_SLOTS:
 	void loadLibs();
 	void metadataOps();
 	void exclusion();
+	void exclusionSpecificLowercase();
+	void exclusionSpecificUppercase();
 	void exclusionExcept();
+	void exclusionExceptUppercase();
+	void exclusionExceptLowercase();
+
 private:
 
 	void initFileList();
@@ -149,11 +154,86 @@ void TST_PluginManager::exclusion()
 	QVERIFY2(p->count() > 0,"Load libs failed");
 
 	auto plugins = p->getCompatiblePlugins("ip:","unittest");
-	QVERIFY2(plugins.count() == 1,"Exactly 1 unit tests not found");
+	QVERIFY2(plugins.count() == 2,"Only TestPluginIp plugin compatible compatible");
+	qDebug()<<plugins[0]->name();
+	qDebug()<<plugins[1]->name();
+
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPlugin is the first plugin");
+	QVERIFY2(plugins[0]->metadata()["exclude"]=="*", "TestPluginIp excludes everything");
+	QVERIFY2(plugins[1]->name()=="TestPlugin", "TestPluginIp is the second plugin");
+
+	QVERIFY2(plugins[0]->enabled() == true, "TestPluginIp not enabled");
+	QVERIFY2(plugins[1]->enabled() == false, "TestPlugin is enabled");
+}
+
+void TST_PluginManager::exclusionSpecificLowercase()
+{
+	PluginManager *p = new PluginManager(this);
+	p->add(libs);
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	QString json = QString(
+			#include "testPluginExcludeSpecificLower.json"
+				);
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical() << "JSON Parse error !" << err.errorString();
+		qCritical() << json;
+		qCritical() << QString(" ").repeated(err.offset)+"^";
+	}
+	QJsonObject obj = doc.object();
+	p->clear();
+	p->setMetadata(obj);
+	p->add(libs);
+	p->sort();
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
+	QVERIFY2(plugins.count() == 2,"Exactly 1 unit tests not found");
 	qDebug()<<plugins[0]->name();
 
-	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not the first plugin");
-	QVERIFY2(plugins[0]->metadata()["exclude"]=="*", "TestPluginIp excludes everything");
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is the first plugin");
+	QVERIFY2(plugins[0]->metadata()["exclude"].toArray()[0] == "testplugin", "TestPluginIP ");
+	QVERIFY2(plugins[1]->name()=="TestPlugin", "TestPlugin is the second plugin");
+
+	QVERIFY2(plugins[0]->enabled() == true, "TestPluginIp not enabled");
+	QVERIFY2(plugins[1]->enabled() == false, "TestPlugin is enabled");
+}
+
+void TST_PluginManager::exclusionSpecificUppercase()
+{
+	PluginManager *p = new PluginManager(this);
+	p->add(libs);
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	QString json = QString(
+			#include "testPluginExcludeSpecificUpper.json"
+				);
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical() << "JSON Parse error !" << err.errorString();
+		qCritical() << json;
+		qCritical() << QString(" ").repeated(err.offset)+"^";
+	}
+	QJsonObject obj = doc.object();
+	p->clear();
+	p->setMetadata(obj);
+	p->add(libs);
+	p->sort();
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
+	QVERIFY2(plugins.count() == 2,"Exactly 1 unit tests not found");
+	qDebug()<<plugins[0]->name();
+
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is the first plugin");
+	QVERIFY2(plugins[0]->metadata()["exclude"].toArray()[0] == "TESTPLUGIN", "TestPluginIP ");
+	QVERIFY2(plugins[1]->name()=="TestPlugin", "TestPlugin is the second plugin");
+
+	QVERIFY2(plugins[0]->enabled() == true, "TestPluginIp not enabled");
+	QVERIFY2(plugins[1]->enabled() == false, "TestPlugin is enabled");
 }
 
 void TST_PluginManager::exclusionExcept()
@@ -185,6 +265,70 @@ void TST_PluginManager::exclusionExcept()
 
 	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not loaded");
 	QVERIFY2(plugins[0]->metadata()["exclude"].toArray()[0] == "*" && plugins[0]->metadata()["exclude"].toArray()[1]=="!TestPlugin", "TestPluginIP ");
+	QVERIFY2(plugins[1]->name()=="TestPlugin", "Second TestPlugin is not loaded");
+}
+
+void TST_PluginManager::exclusionExceptUppercase()
+{
+	PluginManager *p = new PluginManager(this);
+	p->add(libs);
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	QString json = QString(
+			#include "testPluginExcludeUpper.json"
+				);
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical() << "JSON Parse error !" << err.errorString();
+		qCritical() << json;
+		qCritical() << QString(" ").repeated(err.offset)+"^";
+	}
+	QJsonObject obj = doc.object();
+	p->clear();
+	p->setMetadata(obj);
+	p->add(libs);
+	p->sort();
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
+	QVERIFY2(plugins.count() == 2,"Exactly 1 unit tests not found");
+	qDebug()<<plugins[0]->name();
+
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not loaded");
+	QVERIFY2(plugins[0]->metadata()["exclude"].toArray()[0] == "*" && plugins[0]->metadata()["exclude"].toArray()[1]=="!TESTPLUGIN", "TestPluginIP ");
+	QVERIFY2(plugins[1]->name()=="TestPlugin", "Second TestPlugin is not loaded");
+}
+
+void TST_PluginManager::exclusionExceptLowercase()
+{
+	PluginManager *p = new PluginManager(this);
+	p->add(libs);
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	QString json = QString(
+			#include "testPluginExcludeLower.json"
+				);
+	QJsonParseError err;
+	QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8(), &err);
+	if(err.error != QJsonParseError::NoError) {
+		qCritical() << "JSON Parse error !" << err.errorString();
+		qCritical() << json;
+		qCritical() << QString(" ").repeated(err.offset)+"^";
+	}
+	QJsonObject obj = doc.object();
+	p->clear();
+	p->setMetadata(obj);
+	p->add(libs);
+	p->sort();
+	QVERIFY2(p->count() > 0,"Load libs failed");
+
+	auto plugins = p->getCompatiblePlugins("ip:","unittest");
+	QVERIFY2(plugins.count() == 2,"Exactly 1 unit tests not found");
+	qDebug()<<plugins[0]->name();
+
+	QVERIFY2(plugins[0]->name()=="TestPluginIp", "TestPluginIp is not loaded");
+	QVERIFY2(plugins[0]->metadata()["exclude"].toArray()[0] == "*" && plugins[0]->metadata()["exclude"].toArray()[1]=="!testplugin", "TestPluginIP ");
 	QVERIFY2(plugins[1]->name()=="TestPlugin", "Second TestPlugin is not loaded");
 }
 
