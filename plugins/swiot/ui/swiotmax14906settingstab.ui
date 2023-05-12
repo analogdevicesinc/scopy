@@ -28,7 +28,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>237</width>
-       <height>21</height>
+       <height>10</height>
       </size>
      </property>
     </spacer>
@@ -36,8 +36,15 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_maxTimer">
      <property name="spacing">
-      <number>0</number>
+      <number>6</number>
      </property>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Polling at 1 sample/second</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
