@@ -49,10 +49,10 @@ bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
 		if(exclude == "*") {
 			ret = true;
 		}
-		if(exclude == p->name()) {
+		if(exclude.toLower() == p->name().toLower()) {
 			ret = true;
 		}
-		if(exclude == "!"+p->name()) {
+		if(exclude.toLower() == QString("!"+p->name()).toLower()) {
 			ret = false;
 			break;
 		}
