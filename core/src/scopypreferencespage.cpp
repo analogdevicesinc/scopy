@@ -50,6 +50,7 @@ QWidget* ScopyPreferencesPage::createRestartWidget() {
 	QSpacerItem *space = new QSpacerItem(20,20,QSizePolicy::Preferred,QSizePolicy::Preferred);
 	QPushButton* btn = new QPushButton("Restart");
 	btn->setProperty("blue_button",true);
+	btn->setStyleSheet("width:80;height:20");
 
 	lay->addWidget(lab,3);
 	lay->addSpacerItem(space);
@@ -64,12 +65,14 @@ QWidget* ScopyPreferencesPage::buildSaveSessionPreference() {
 	Preferences *p = Preferences::GetInstance();
 	QWidget *w = new QWidget(this);
 	QHBoxLayout *lay = new QHBoxLayout(w);
+	lay->setMargin(0);
 
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_save_session", "Save/Load Scopy session", this));
 	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding,QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ",this));
 	QPushButton *navigateBtn = new QPushButton("Open",this);
 	navigateBtn->setProperty("blue_button",true);
+	navigateBtn->setStyleSheet("width:80;height:20");
 	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)); });
 	lay->addWidget(navigateBtn);
 	return w;
@@ -84,6 +87,7 @@ QWidget* ScopyPreferencesPage::buildResetScopyDefaultButton() {
 	lay->addWidget(new QLabel("Reset to settings and plugins to default"));
 	QPushButton	*resetBtn = new QPushButton("Reset",this);
 	resetBtn->setProperty("blue_button",true);
+	resetBtn->setStyleSheet("width:80;height:20");
 	connect(resetBtn,&QPushButton::clicked,this,[=]() {
 		QString dir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
 		QDir loc(dir);
