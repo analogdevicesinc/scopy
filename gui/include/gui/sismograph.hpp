@@ -57,7 +57,8 @@ namespace scopy {
 		void setSampleRate(double rate);
 
 		void setUnitOfMeasure(QString unitOfMeasureName,QString unitOfMeasureSymbol);
-		void setPlotAxisXTitle(QString title);
+		void setPlotAxisXTitle(const QString& title);
+		void setPlotAxisYTitle(const QString& title);
 
 		bool getAutoscale() const;
 		void setAutoscale(bool newAutoscale);
