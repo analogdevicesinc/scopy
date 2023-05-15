@@ -15,11 +15,14 @@ public:
 	void addHorizontalTab(QWidget *w, QString text);
 public Q_SLOTS:
 	void showRestartWidget();
+private Q_SLOTS:
+	void resetScopyPreferences();
 private:
 	QWidget *createRestartWidget();
 	QWidget *restartWidget;
 	QWidget *buildSaveSessionPreference();
 	QWidget *buildResetScopyDefaultButton();
+	void removeIniFiles(bool backup = true);
 };
 }
 #endif // SCOPYPREFERENCESPAGE_H
