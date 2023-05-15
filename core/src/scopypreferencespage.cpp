@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QLoggingCategory>
+#include <pluginbase/scopyconfig.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 
@@ -73,13 +74,41 @@ QWidget* ScopyPreferencesPage::buildSaveSessionPreference() {
 	QPushButton *navigateBtn = new QPushButton("Open",this);
 	navigateBtn->setProperty("blue_button",true);
 	navigateBtn->setStyleSheet("width:80;height:20");
-	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)); });
+	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
 	lay->addWidget(navigateBtn);
 	return w;
 }
 
-QWidget* ScopyPreferencesPage::buildResetScopyDefaultButton() {
+void ScopyPreferencesPage::removeIniFiles(bool backup) {
+	QString dir = scopy::config::settingsFolderPath();
+	QDir loc(dir);
+	QFileInfoList plugins = loc.entryInfoList(QDir::Files);
+	QStringList settingsFiles;
+
+	for(const QFileInfo &p : plugins) {
+		if(p.suffix() == "ini")
+			settingsFiles.append(p.absoluteFilePath());
+	}
+	qInfo(CAT_PREFERENCESPAGE)<<"Removing ini files .. ";
+	for(auto &&file : settingsFiles) {
+		if(backup) {
+			QFile(file).rename(file+".bak");
+			qDebug(CAT_PREFERENCESPAGE)<<"Renamed" << file << "to" << file <<".bak";
+		} else {
+			QFile(file).remove();
+			qDebug(CAT_PREFERENCESPAGE)<<"Removed" << file;
+		}
+	}
+}
+
+void ScopyPreferencesPage::resetScopyPreferences() {
 	Preferences *p = Preferences::GetInstance();
+	removeIniFiles();
+	p->clear();
+	showRestartWidget();
+}
+
+QWidget* ScopyPreferencesPage::buildResetScopyDefaultButton() {
 	QWidget *w = new QWidget(this);
 	QHBoxLayout *lay = new QHBoxLayout(w);
 
@@ -88,23 +117,7 @@ QWidget* ScopyPreferencesPage::buildResetScopyDefaultButton() {
 	QPushButton	*resetBtn = new QPushButton("Reset",this);
 	resetBtn->setProperty("blue_button",true);
 	resetBtn->setStyleSheet("width:80;height:20");
-	connect(resetBtn,&QPushButton::clicked,this,[=]() {
-		QString dir = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation);
-		QDir loc(dir);
-		QFileInfoList plugins = loc.entryInfoList(QDir::Files);
-		QStringList settingsFiles;
-
-		for(const QFileInfo &p : plugins) {
-			if(p.suffix() == "ini")
-				settingsFiles.append(p.absoluteFilePath());
-		}
-		qInfo(CAT_PREFERENCESPAGE)<<settingsFiles;
-		for(auto &&file : settingsFiles) {
-			QFile(file).rename(file+".bak");
-		}
-		p->clear();
-		showRestartWidget();
-	}	);
+	connect(resetBtn,&QPushButton::clicked,this,&ScopyPreferencesPage::resetScopyPreferences);
 	lay->addWidget(resetBtn);
 	return w;
 }

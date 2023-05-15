@@ -25,7 +25,6 @@
 #include <QMetaProperty>
 #include <QSettings>
 #include <QLoggingCategory>
-#include <QStandardPaths>
 
 Q_LOGGING_CATEGORY(CAT_APIOBJECT,"ApiObject");
 using namespace scopy;
