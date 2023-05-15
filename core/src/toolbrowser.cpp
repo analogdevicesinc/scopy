@@ -1,13 +1,14 @@
 #include "toolbrowser.h"
 #include "ui_toolbrowser.h"
 #include <QDebug>
+#include <gui/utils.h>
 
 using namespace scopy;
 
 ToolBrowser::ToolBrowser(QWidget *parent) :
-    QWidget(parent),
+	QWidget(parent),
 	ui(new Ui::ToolBrowser),
-	collapsed(false)
+	m_collapsed(false)
 {
     ui->setupUi(this);
 
@@ -21,10 +22,12 @@ ToolBrowser::ToolBrowser(QWidget *parent) :
 	homeTmi->getToolRunBtn()->setVisible(false);
 	homeTmi->setEnabled(true);
 	ui->homePlaceholder->layout()->addWidget(homeTmi);
+	Util::retainWidgetSizeWhenHidden(ui->logo);
 	homeTmi->setDraggable(false);
 
 
-//	connect(ui->btnCollapse, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
+	connect(ui->btnCollapse, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
+	connect(ui->btnCollapseMini, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
     connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
     connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
 
@@ -38,11 +41,33 @@ ToolMenu* ToolBrowser::getToolMenu() {
 	return ui->wToolMenu;
 }
 
+void ToolBrowser::hideMenuText(bool collapsed) {
+	ToolMenu *tm = ui->wToolMenu;
+
+	if(collapsed) {
+		setMinimumWidth(50);
+		ui->btnLoad->setText("");
+		ui->btnSave->setText("");
+		ui->btnAbout->setText("");
+		ui->btnPreferences->setText("");
+
+	} else {
+		setMinimumWidth(200);
+		ui->btnLoad->setText(tr("Load"));
+		ui->btnSave->setText(tr("Save"));
+		ui->btnAbout->setText(tr("About"));
+		ui->btnPreferences->setText(tr("Preferences"));
+	}
+	ui->btnCollapse->setVisible(!collapsed);
+	ui->logo->setVisible(!collapsed);
+	tm->hideMenuText(collapsed);
+}
+
 void ToolBrowser::toggleCollapse()
 {
-	 ToolMenu *tm = ui->wToolMenu;
-	collapsed = !collapsed;
-	tm->hideMenuText(collapsed);
+	m_collapsed = !m_collapsed;
+	hideMenuText(m_collapsed);
+	Q_EMIT collapsed(m_collapsed);
 }
 
 ToolBrowser::~ToolBrowser()
