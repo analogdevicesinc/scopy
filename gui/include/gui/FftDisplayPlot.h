@@ -260,8 +260,8 @@ namespace scopy {
 		void enableYaxisLabels();
 		QString formatXValue(double value, int precision) const;
 		QString formatYValue(double value, int precision) const;
-		void resetZoomerStack();
 		void setAmplitude(double top, double bottom);
+		void updateZoomerBase();
 	Q_SIGNALS:
 		void channelAdded(int);
 		void newFFTData();

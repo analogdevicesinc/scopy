@@ -149,6 +149,7 @@ public:
 	void updateCursorsData();
 
 	void useLogFreq(bool use_log_freq);
+	void updateZoomerBase();
 public Q_SLOTS:
 	void
 	setIntensityColorMapType(const unsigned int, const int, const QColor, const QColor);
