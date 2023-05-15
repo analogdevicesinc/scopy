@@ -4,6 +4,7 @@
 #include <gui/oscilloscope_plot.hpp>
 #include <qobject.h>
 #include "bufferlogic.h"
+#include "linked_button.hpp"
 #include <qmutex.h>
 #include <QWidget>
 #include <deque>
@@ -44,10 +45,13 @@ private:
 	void resetDeque();
 	void readPreferences();
 
+	bool eventFilter(QObject *obj, QEvent *event);
+
 	CapturePlot *m_plot;
 	QWidget *m_plotWidget;
 	QLabel *m_samplesAquiredLabel;
 	QLabel *m_plotSamplesNumber;
+	LinkedButton* m_btnInfoStatus;
 
 	int m_samplingFreq = 4800;
 	double m_timespan = 1;
