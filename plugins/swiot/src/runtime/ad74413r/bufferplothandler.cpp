@@ -1,8 +1,10 @@
 #include "bufferplothandler.h"
 #include <QGridLayout>
 #include <gui/filemanager.h>
+#include "linked_button.hpp"
 #include "pluginbase/preferences.h"
 #include "qlabel.h"
+#include "qpushbutton.h"
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>
@@ -106,10 +108,16 @@ void BufferPlotHandler::initStatusWidget()
 
 	m_samplesAquiredLabel = new QLabel("0");
 	m_plotSamplesNumber = new QLabel(QString::number(m_samplingFreq));
+	m_btnInfoStatus = new scopy::LinkedButton();
+	m_btnInfoStatus->installEventFilter(this);
+	m_btnInfoStatus->setObjectName(QString::fromUtf8("btnHelp"));
+	m_btnInfoStatus->setCheckable(false);
+	m_btnInfoStatus->setText(QString());
 	statusLayout->insertWidget(0, m_samplesAquiredLabel);
 	statusLayout->insertWidget(1, new QLabel("Samples at"));
 	statusLayout->insertWidget(2, m_plotSamplesNumber);
 	statusLayout->insertWidget(3, new QLabel("sps"));
+	statusLayout->insertWidget(4, m_btnInfoStatus);
 	m_plot->setStatusWidget(statusWidget);
 }
 
@@ -133,13 +141,11 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 						rolling = true;
 					}
 				} else {
-					//more tests here
 					int plotDataSamplesNumber = m_buffersNumber * m_bufferSize;
 					int currentPlotDataSamplesNumber = (m_bufferIndex + 1) * m_bufferSize;
 					m_plot->setDataStartingPoint(plotDataSamplesNumber - currentPlotDataSamplesNumber);
 					m_plot->resetXaxisOnNextReceivedData();
 					m_samplesAquiredLabel->setText(QString::number(currentPlotDataSamplesNumber));
-					////////
 				}
 				if (m_enabledPlots[i]) {
 					if (enPlotIndex < bufferDataSize) {
@@ -334,8 +340,25 @@ void BufferPlotHandler::readPreferences()
 	m_plot->setVisibleFpsLabel(showFps);
 }
 
+bool BufferPlotHandler::eventFilter(QObject *obj, QEvent *event)
+{
+	if (obj == (QObject*)m_btnInfoStatus) {
+		if (event->type() == QEvent::Enter)
+		{
+			auto enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
+			m_btnInfoStatus->setToolTip("sps = samples per second \n"
+					      "sps = sampling_frequency / enabled_channels \n"
+					      "Enabled channels = " + QString::number(enabledPlotsNo) + "\n" +
+					      "Samples per channel = " + m_samplesAquiredLabel->text() + "\n" +
+					      "Sampling frequency = " + QString::number(m_samplingFreq));
+		}
+		return false;
+	} else {
+		return QWidget::eventFilter(obj, event);
+	}
+}
+
 bool BufferPlotHandler::singleCapture() const
 {
 	return m_singleCapture;
 }
-
