@@ -20,6 +20,7 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
+#include "pluginbase/scopyconfig.h"
 
 using namespace scopy;
 
@@ -30,6 +31,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	, ui(new Ui::ScopyMainWindow)
 {	
 	ui->setupUi(this);
+	setWindowTitle("Scopy-" + scopy::config::fullversion());
 
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPreferences();
@@ -202,8 +204,7 @@ void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
 
 void ScopyMainWindow::initPreferences()
 {
-	QString preferencesPath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)
-							  + "/preferences.ini";
+	QString preferencesPath = scopy::config::preferencesFolderPath()  + "/preferences.ini";
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
 	p->load();

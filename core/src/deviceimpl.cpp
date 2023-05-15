@@ -7,7 +7,7 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QThread>
-#include <QStandardPaths>
+#include <pluginbase/scopyconfig.h>
 
 #include "qscrollarea.h"
 #include "ui_devicepage.h"
@@ -198,7 +198,7 @@ void DeviceImpl::connectDev() {
 	for(auto &&p : m_plugins) {
 		p->onConnect();
 		if(pref->get("general_save_session").toBool()) {
-			QSettings s = QSettings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/" +p->name() +".ini", QSettings::IniFormat);
+			QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
 			p->loadSettings(s);
 		}
 	}
@@ -211,7 +211,7 @@ void DeviceImpl::disconnectDev() {
 	Preferences *pref = Preferences::GetInstance();
 	for(auto &&p : m_plugins) {
 		if(pref->get("general_save_session").toBool()) {
-			QSettings s = QSettings(QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation) + "/" +p->name() +".ini", QSettings::IniFormat);
+			QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
 			p->saveSettings(s);
 		}
 		p->onDisconnect();
