@@ -2,6 +2,7 @@
 #include <QGridLayout>
 #include <gui/filemanager.h>
 #include "pluginbase/preferences.h"
+#include "qlabel.h"
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>
@@ -45,6 +46,8 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 
 	m_plotWidget = new QWidget(this);
 
+	initStatusWidget();
+
 	QGridLayout *gridPlot = new QGridLayout(m_plotWidget);
 	gridPlot->setVerticalSpacing(0);
 	gridPlot->setHorizontalSpacing(0);
@@ -56,13 +59,13 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 						  QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
+	gridPlot->addWidget(m_plot->topHandlesArea(), 2, 0, 1, 4);
 	gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
-	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
 	gridPlot->addWidget(m_plot->bottomHandlesArea(), 4, 0, 2, 4);
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
+	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
 
 	m_plot->setSampleRate(m_samplingFreq, 1, "");
-	m_plot->setSampleRatelabelValue(m_samplingFreq);
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
@@ -88,6 +91,26 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		m_plot->setActiveVertAxis(hdlIdx, true);
 		Q_EMIT offsetHandleSelected(hdlIdx, selected);
 	});
+	connect(m_plot->getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
+		if (isZoomOut) {
+			m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
+			m_plot->replot();
+		}
+	});
+}
+
+void BufferPlotHandler::initStatusWidget()
+{
+	QWidget *statusWidget = new QWidget();
+	QHBoxLayout *statusLayout = new QHBoxLayout(statusWidget);
+
+	m_samplesAquiredLabel = new QLabel("0");
+	m_plotSamplesNumber = new QLabel(QString::number(m_samplingFreq));
+	statusLayout->insertWidget(0, m_samplesAquiredLabel);
+	statusLayout->insertWidget(1, new QLabel("Samples at"));
+	statusLayout->insertWidget(2, m_plotSamplesNumber);
+	statusLayout->insertWidget(3, new QLabel("sps"));
+	m_plot->setStatusWidget(statusWidget);
 }
 
 //bufferCounter is used only for debug
@@ -115,6 +138,7 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 					int currentPlotDataSamplesNumber = (m_bufferIndex + 1) * m_bufferSize;
 					m_plot->setDataStartingPoint(plotDataSamplesNumber - currentPlotDataSamplesNumber);
 					m_plot->resetXaxisOnNextReceivedData();
+					m_samplesAquiredLabel->setText(QString::number(currentPlotDataSamplesNumber));
 					////////
 				}
 				if (m_enabledPlots[i]) {
@@ -137,13 +161,13 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 
 void BufferPlotHandler::drawPlot()
 {
-	int dataPointsNumber = m_bufferIndex*m_bufferSize;
+	int dataPointsNumber = m_bufferIndex * m_bufferSize;
 	for (int i = 0; i < m_dataPointsDeque.size(); i++) {
 		m_dataPoints.push_back(new double[dataPointsNumber]());
 		int dequeSize = m_dataPointsDeque[i].size();
 		if (dequeSize > 0) {
 			for (int j = 0; j < dequeSize; j++) {
-				std::copy(m_dataPointsDeque[i][j].begin(),m_dataPointsDeque[i][j].end(), m_dataPoints[i] + (j*m_bufferSize));
+				std::copy(m_dataPointsDeque[i][j].begin(), m_dataPointsDeque[i][j].end(), m_dataPoints[i] + (j * m_bufferSize));
 			}
 		}
 	}
@@ -222,6 +246,7 @@ void BufferPlotHandler::onTimespanChanged(double value)
 void BufferPlotHandler::onSamplingFreqWritten(int samplingFreq)
 {
 	m_samplingFreq = samplingFreq;
+	resetPlotParameters();
 }
 
 void BufferPlotHandler::setSingleCapture(bool en)
@@ -265,17 +290,19 @@ void BufferPlotHandler::resetPlotParameters()
 	int plotSampleNumber = m_samplingFreq * m_timespan;
 
 	plotSampleNumber = (enabledPlotsNo > 0) ? (plotSampleNumber / enabledPlotsNo) : plotSampleNumber;
+	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
 	m_buffersNumber = ((plotSampleNumber % m_bufferSize) == 0) ?
 				(plotSampleNumber / m_bufferSize) : ((plotSampleNumber / m_bufferSize) + 1);
 	m_bufferIndex = 0;
 	resetDeque();
 
+	m_plotSamplesNumber->setText(QString::number(plotSampleRate));
+
 	m_plot->setSampleRate(plotSampleRate, 1, "");
-	m_plot->setSampleRatelabelValue(plotSampleRate);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
 	m_plot->replot();
-	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(plotSampleNumber);
-	qDebug(CAT_SWIOT_AD74413R) << QString::number(m_buffersNumber) +" "  + QString::number(plotSampleNumber / m_bufferSize) + " ";
+	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(plotSampleNumber) <<" "<<QString::number(m_buffersNumber)
+				      +" "  + QString::number(plotSampleNumber / m_bufferSize) + " ";
 	m_lock->unlock();
 }
 

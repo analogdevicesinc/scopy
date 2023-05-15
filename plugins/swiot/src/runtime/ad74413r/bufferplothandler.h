@@ -39,12 +39,15 @@ Q_SIGNALS:
 	void offsetHandleSelected(int hdlIdx, bool selected);
 private:
 	void initPlot(int plotChnlsNo);
+	void initStatusWidget();
 	void resetDataPoints();
 	void resetDeque();
 	void readPreferences();
 
 	CapturePlot *m_plot;
 	QWidget *m_plotWidget;
+	QLabel *m_samplesAquiredLabel;
+	QLabel *m_plotSamplesNumber;
 
 	int m_samplingFreq = 4800;
 	double m_timespan = 1;
@@ -52,7 +55,7 @@ private:
 
 	//all of these will be calculated in functions; for example we will have a spinbox for timespan,
 	//and in a slot we will set its value and we will calculate plotSampleRate and the number of necessary buffers
-	int m_buffersNumber = (m_samplingFreq * m_timespan) / MAX_BUFFER_SIZE;
+	int m_buffersNumber = 0;
 	int m_bufferIndex = 0;
 	int m_bufferSize = 0;
 
