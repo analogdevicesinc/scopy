@@ -16,7 +16,7 @@ void swiot::BufferMenuView::init(QString title, QString function, QColor* color)
 	initInteractiveMenu();
 	setMenuHeader(title,color,false);
 
-	m_advanceSettingsSection = new gui::SubsectionSeparator("ADVANCE SETTINGS", false);
+	m_advanceSettingsSection = new gui::SubsectionSeparator("SETTINGS", false);
 	m_advanceSettingsSection->getLabel()->setStyleSheet("color:gray;");
 	m_advanceSettingsSection->layout()->setSpacing(10);
 	m_advanceSettingsSection->getContentWidget()->layout()->setSpacing(10);
