@@ -41,6 +41,7 @@ namespace scopy {
 		int getAnimationDuration() const;
 		void setAnimationDuration(int newAnimationDuration);
 
+		void setAnimMinWidth(int min);
 	Q_SIGNALS:
 		void finished(bool opened);
 

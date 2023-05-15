@@ -133,4 +133,9 @@ void MenuAnim::setAnimationDuration(int newAnimationDuration)
 	close_anim_min.setDuration(animationDuration);
 }
 
+void MenuAnim::setAnimMinWidth(int min)
+{
+	min_width = min;
+}
+
 #include "moc_menu_anim.cpp"
