@@ -291,6 +291,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fftDocker = DockerUtils::createDockWidget(mainWindow, fft_plot->getPlotwithElements(), "FFT");
 	waterfallDocker = DockerUtils::createDockWidget(mainWindow, waterfall_plot->getPlotwithElements(), "Waterfall");
 
+	fftDocker->setMinimumHeight(150);
+	waterfallDocker->setMinimumHeight(150);
 
 	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDocker);
 	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, waterfallDocker);
@@ -409,7 +411,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		fft_plot->replot();
 		fft_plot->bottomHandlesArea()->repaint();
-		fft_plot->resetZoomerStack();
 
 		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		waterfall_sink->set_frequency_range(start, stop * 2 - start * 2);
@@ -434,6 +435,9 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		marker_freq_pos->setMaxValue(stop);
 		marker_freq_pos->setStep(2 * (stop -
 						  start) / bin_sizes[ui->cmb_rbw->currentIndex()]);
+
+		fft_plot->updateZoomerBase();
+		waterfall_plot->updateZoomerBase();
 
 	});
 
@@ -1699,6 +1703,9 @@ void SpectrumAnalyzer::cursor_panel_init()
 
 void SpectrumAnalyzer::connectZoomers()
 {
+	fft_plot->getZoomer()->zoom(0);
+	waterfall_plot->getZoomer()->zoom(0);
+
 	connect(fft_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
 		auto waterfall_zoomer = waterfall_plot->getZoomer();
 		auto const new_rect = QRectF(rect.left(), waterfall_zoomer->zoomBase().top(), rect.width(), waterfall_zoomer->zoomBase().height());
@@ -1736,7 +1743,7 @@ void SpectrumAnalyzer::connectZoomers()
 		waterfall_plot->getZoomer()->blockSignals(true);
 
 
-		// if fft was zoomed out
+		// if waterfall was zoomed out
 		if (fft_zoomer->zoomRectIndex() > waterfall_plot->getZoomer()->zoomRectIndex()) {
 			auto fft_stack = fft_zoomer->zoomStack();
 			auto wf_stack = waterfall_plot->getZoomer()->zoomStack();
@@ -1746,7 +1753,7 @@ void SpectrumAnalyzer::connectZoomers()
 			fft_zoomer->setZoomStack(fft_stack, fft_zoomer->zoomRectIndex() - 1);
 			waterfall_plot->getZoomer()->setZoomStack(wf_stack, waterfall_plot->getZoomer()->zoomRectIndex());
 
-			// if fft was zoomed in
+			// if waterfall was zoomed in
 		} else if (fft_zoomer->zoomRectIndex() < waterfall_plot->getZoomer()->zoomRectIndex()){
 			auto fft_stack = fft_zoomer->zoomStack();
 			fft_stack.push(new_rect);
@@ -2826,6 +2833,9 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 
 	if (new_fft_size != fft_size) {
 		setFftSize(new_fft_size);
+
+		fft_plot->updateZoomerBase();
+		waterfall_plot->updateZoomerBase();
 	}
 
 	marker_freq_pos->setMinValue(startStopRange->getStartValue());
@@ -3376,7 +3386,8 @@ void SpectrumAnalyzer::onWaterfallSizeChanged(double value)
 	waterfall_plot->setVisibleSampleCount((int) value);
 	waterfall_plot->replot();
 
-	fft_plot->resetZoomerStack();
+	waterfall_plot->updateZoomerBase();
+	fft_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onTopValueChanged(double top_value)
@@ -3404,6 +3415,9 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 	fft_plot->leftHandlesArea()->repaint();
 
 	fft_plot->setAmplitude(top_value, bottom_value);
+
+	fft_plot->updateZoomerBase();
+	waterfall_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
@@ -3441,6 +3455,9 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 	fft_plot->leftHandlesArea()->repaint();
 
 	fft_plot->setAmplitude(topValue, bottomValue);
+
+	fft_plot->updateZoomerBase();
+	waterfall_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
@@ -3468,6 +3485,9 @@ void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 	fft_plot->leftHandlesArea()->repaint();
 
 	fft_plot->setAmplitude(top_value, bottom_value);
+
+	fft_plot->updateZoomerBase();
+	waterfall_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx)
