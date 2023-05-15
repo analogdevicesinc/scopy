@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>233</width>
     <height>459</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>200</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
@@ -25,11 +37,12 @@
 #btnLoad:hover,
 #btnPreferences:hover,
 #btnAbout:hover,
-#btnCollapse:hover{
+#btnCollapse_2:hover{
  background-color: rgba(0, 0, 0, 60);
  border: 1px solid rgba(0, 0, 0, 30);
  border-radius:5px;
 }
+
 
 #btnSave {
  qproperty-icon: url(&quot;:/gui/icons/scopy-default/icons/save.svg&quot;);
@@ -48,7 +61,15 @@ background-image: url(:/gui/icons/scopy-default/icons/logo_analog.svg);
 background-repeat: no-repeat;
 background-position: center center;
 background-repeat: no-repeat;
-min-height:48px;
+min-height:36px;
+}
+
+#btnCollapseMini {
+ height:40px;
+ width:40px;
+ background-image: url(:/gui/icons/scopy-default/icons/menu.svg);
+ background-repeat: no-repeat;
+ background-position: center center;
 }
 
 #btnCollapse {
@@ -77,10 +98,47 @@ min-height:48px;
     <number>0</number>
    </property>
    <item>
-    <widget class="QPushButton" name="btnCollapse">
-     <property name="text">
-      <string/>
-     </property>
+    <widget class="QWidget" name="btnCollapse_2" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="btnCollapseMini">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCollapse">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -120,7 +178,7 @@ min-height:48px;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>398</width>
+        <width>231</width>
         <height>16</height>
        </rect>
       </property>
@@ -214,6 +272,18 @@ min-height:48px;
     <widget class="QLabel" name="logo">
      <property name="enabled">
       <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>36</height>
+      </size>
      </property>
     </widget>
    </item>
