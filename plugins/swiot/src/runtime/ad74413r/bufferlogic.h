@@ -15,7 +15,7 @@ Q_DECLARE_OPAQUE_POINTER(struct iio_buffer*)
 
 namespace scopy::swiot {
 #define MAX_BUFFER_SIZE 160
-#define MIN_BUFFER_SIZE 20
+#define MIN_BUFFER_SIZE 5
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 #define MAX_INPUT_CHNLS_NO 8
 
