@@ -978,6 +978,18 @@ void WaterfallDisplayPlot::setUpdateTime(double t)
 	d_time_per_fft = t;
 }
 
+void WaterfallDisplayPlot::updateZoomerBase()
+{
+	QRectF rect = QRectF(d_start_frequency, 0, d_stop_frequency - d_start_frequency, d_visible_samples);
+	getZoomer()->zoom(rect);
+
+	getZoomer()->blockSignals(true);
+	getZoomer()->setZoomBase(rect);
+	getZoomer()->QwtPlotZoomer::zoom(rect);
+	getZoomer()->blockSignals(false);
+
+}
+
 void WaterfallDisplayPlot::customEvent(QEvent *e)
 {
 	if (e->type() == WaterfallUpdateEvent::Type()) {
@@ -987,23 +999,6 @@ void WaterfallDisplayPlot::customEvent(QEvent *e)
 		const gr::high_res_timer_type dataTimestamp = event->getDataTimestamp();
 
 		plotNewData(dataPoints, numDataPoints, dataTimestamp);
-
-		// reset zoomer base if plot axis changed
-		if (getZoomer()->zoomBase().left() != d_start_frequency || getZoomer()->zoomBase().width() != d_stop_frequency - d_start_frequency) {
-			getZoomer()->blockSignals(true);
-
-			auto vert_interval = axisInterval(QwtAxis::YLeft);
-			auto rect = QRectF(d_start_frequency, vert_interval.minValue(), d_stop_frequency - d_start_frequency, vert_interval.maxValue() - vert_interval.minValue());
-			getZoomer()->zoom(rect);
-			getZoomer()->setZoomBase(rect);
-			getZoomer()->zoom(0);
-
-			auto stack = QStack<QRectF>();
-			stack.push(getZoomer()->zoomStack().first());
-			getZoomer()->setZoomStack(stack, 0);
-
-			getZoomer()->blockSignals(false);
-		}
 	}
 }
 
