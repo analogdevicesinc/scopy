@@ -27,6 +27,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 
 		QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
 		int samplingFreq = actualSamplingFreq[0].toInt();
+		m_readerThread->onSamplingFreqWritten(samplingFreq);
 		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
 		setupToolView();
 		initMonitorToolView();
@@ -110,7 +111,7 @@ void Ad74413r::initMonitorToolView()
 	chId++;
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
-			QString menuTitle(((deviceName + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
+			QString menuTitle(((deviceName.toUpper() + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
 			BufferMenuView *menu = new BufferMenuView(m_widget);
 			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 			//that's why we have to decrease by 1
@@ -293,6 +294,7 @@ void Ad74413r::onRunBtnPressed()
 void Ad74413r::onSingleBtnPressed()
 {
 	if (m_toolView->getSingleBtn()->isChecked()) {
+		bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
 		Q_EMIT activateExportButton();
 		verifyChnlsChanges();
 		if (m_readerThread->isRunning()) {
@@ -302,14 +304,21 @@ void Ad74413r::onSingleBtnPressed()
 			m_readerThread->start();
 		}
 		m_plotHandler->setSingleCapture(true);
-		if (m_toolView->getRunBtn()->isChecked()) {
+		if (runBtnChecked) {
 			m_toolView->getRunBtn()->setChecked(false);
+		}
+	} else {
+		if (m_tme->running()) {
+			m_tme->setRunning(false);
 		}
 	}
 }
 
 void Ad74413r::onSingleCaptureFinished()
 {
+	if (m_tme->running()) {
+		m_tme->setRunning(false);
+	}
 	m_toolView->getSingleBtn()->setChecked(false);
 	m_readerThread->requestInterruption();
 }
