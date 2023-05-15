@@ -31,6 +31,7 @@
 #include <qwt_plot_zoneitem.h>
 
 #include "genericlogicplotcurve.h"
+#include "qstackedwidget.h"
 #include "scopygui_export.h"
 
 
@@ -142,6 +143,8 @@ namespace scopy {
 
 		QList<RoundedHandleV *> getOffsetHandles() const;
 
+		void setStatusWidget(QWidget *newStatusWidget);
+
 	Q_SIGNALS:
 		void timeTriggerValueChanged(double);
 		void channelOffsetChanged(unsigned int, double);
@@ -230,10 +233,11 @@ namespace scopy {
 		bool d_measurementsEnabled;
 		bool d_labelsEnabled;
 
-		QWidget *d_topWidget;
+		QStackedWidget *d_topWidget;
 		GateHandlesArea *d_topGateHandlesArea;
 		int d_bonusWidth;
 
+		QWidget *m_statusWidget;
 		QLabel *d_timeBaseLabel;
 		QLabel *d_sampleRateLabel;
 		QLabel *d_triggerStateLabel;
