@@ -6,7 +6,7 @@
 
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopydatalogger_export.h"
+#include "scopy-datalogger_export.h"
 #include <iioutil/contextprovider.h>
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iiopingtask.h"
@@ -30,7 +30,7 @@ class Context;
 
 namespace scopy {
 namespace datalogger {
-class SCOPYDATALOGGER_EXPORT DataLoggerPlugin : public QObject, public PluginBase
+class SCOPY_DATALOGGER_EXPORT DataLoggerPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
@@ -40,7 +40,7 @@ public:
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
-	bool compatible(QString param) override;
+	bool compatible(QString param, QString cateogory) override;
 	void initMetadata() override;
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
@@ -49,7 +49,6 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
-	Ui::DataLoggerInfoPage *infoui;
 	DataLogger *tool;
 	DataLogger_API *api;
 	IIOPingTask *ping;

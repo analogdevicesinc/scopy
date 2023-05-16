@@ -1,6 +1,6 @@
 #include "datalogger_api.h"
-#include "src/dataloggercontroller.hpp"
-#include <src/datalogger.hpp>
+#include "dataloggercontroller.hpp"
+#include "datalogger.hpp"
 #include <customSwitch.h>
 
 using namespace scopy;

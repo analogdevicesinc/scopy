@@ -1,7 +1,7 @@
 #include "dataloggerplugin.hpp"
 #include "qloggingcategory.h"
-#include "src/datalogger.hpp"
-#include "src/datalogger_api.h"
+#include "datalogger.hpp"
+#include "datalogger_api.h"
 #include <iio.h>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -9,7 +9,6 @@
 #include <QUuid>
 #include "pluginbase/scopyjs.h"
 #include <libm2k/contextbuilder.hpp>
-#include <ui_dataloggerInfoPage.h>
 
 
 using namespace scopy;
@@ -20,16 +19,7 @@ Q_LOGGING_CATEGORY(CAT_DATALOGGER_TOOL,"dataloggerTool");
 
 bool DataLoggerPlugin::loadPage()
 {
-	infoui = new Ui::DataLoggerInfoPage();
 	m_page = new QWidget();
-	infoui->setupUi(m_page);
-	connect(infoui->pushButton,&QPushButton::clicked, this, [=] (){
-		auto &&cp = ContextProvider::GetInstance();
-		iio_context* ctx = cp->open(m_param);
-		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
-		cp->close(m_param);
-		infoui->textBrowser->setText(hw_serial);
-	});
 	return true;
 }
 
@@ -47,22 +37,21 @@ void DataLoggerPlugin::loadToolList()
 
 void DataLoggerPlugin::unload()
 {
-	delete infoui;
 }
 
-bool DataLoggerPlugin::compatible(QString m_param)
+bool DataLoggerPlugin::compatible(QString param, QString cateogory)
 {
 	m_name = "Datalogger";
 	auto &&cp = ContextProvider::GetInstance();
 
-	iio_context* ctx = cp->open(m_param);
+	iio_context* ctx = cp->open(param);
 
 	if(!ctx) {
 		qWarning(CAT_DATALOGGER) << "No context available for datalogger";
 		return false;
 	}
 
-	cp->close(m_param);
+	cp->close(param);
 
 	return true;
 }

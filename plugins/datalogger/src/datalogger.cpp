@@ -1,14 +1,11 @@
 #include "datalogger.hpp"
 #include "dataloggerplugin.hpp"
-#include "src/dataloggercontroller.hpp"
+#include "dataloggercontroller.hpp"
 #include <QtConcurrent>
 #include <QFuture>
 #include <tool_view_builder.hpp>
-#include <src/gui/channelmonitorcomponent.hpp>
-#include <src/datalogger_api.h>
-#include <src/gui/dataloggergenericmenu.hpp>
-#include <libm2k/contextbuilder.hpp>
-
+#include "gui/channelmonitorcomponent.hpp"
+#include "gui/dataloggergenericmenu.hpp"
 
 using namespace scopy;
 using namespace scopy::gui;
