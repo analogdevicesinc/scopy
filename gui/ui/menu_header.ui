@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>278</width>
-    <height>67</height>
+    <width>243</width>
+    <height>103</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,40 +27,71 @@
     <number>10</number>
    </property>
    <item>
-    <layout class="QHBoxLayout" name="hLayout">
-     <property name="spacing">
-      <number>10</number>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="topMargin">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <property name="rightMargin">
-      <number>15</number>
-     </property>
-     <item>
-      <widget class="QLabel" name="lblTitle">
-       <property name="text">
-        <string>TextLabel</string>
+     <widget class="QWidget" name="page">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>10</number>
        </property>
-       <property name="menu_header_lbl" stdset="0">
-        <bool>true</bool>
+       <property name="leftMargin">
+        <number>1</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="scopy::CustomSwitch" name="btnEnabled">
-       <property name="text">
-        <string/>
+       <property name="topMargin">
+        <number>1</number>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
+       <property name="rightMargin">
+        <number>15</number>
        </property>
-       <property name="checked">
-        <bool>true</bool>
+       <property name="bottomMargin">
+        <number>1</number>
        </property>
-      </widget>
-     </item>
-    </layout>
+       <item>
+        <widget class="QLabel" name="lblTitle">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+         <property name="menu_header_lbl" stdset="0">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="scopy::CustomSwitch" name="btnEnabled">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </item>
    <item>
     <spacer name="vSpacer">

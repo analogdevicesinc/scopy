@@ -1,5 +1,4 @@
 #include <QVBoxLayout>
-
 #include "generic_menu.hpp"
 
 using namespace scopy::gui;
@@ -48,3 +47,7 @@ void GenericMenu::insertSection(SubsectionSeparator* section)
 	m_lastOpenPosition++;
 }
 
+void GenericMenu::addNewHeaderWidget(QWidget *widget)
+{
+	m_menuHeader->addNewHeaderWidget(widget);
+}

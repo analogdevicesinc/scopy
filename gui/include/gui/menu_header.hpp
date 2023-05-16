@@ -36,6 +36,7 @@ public:
 	void setEnableBtnVisible(bool visible);
 
 	QPushButton* getEnableBtn();
+	void addNewHeaderWidget(QWidget *widget);
 };
 } // namespace gui
 } // namespace scopy
