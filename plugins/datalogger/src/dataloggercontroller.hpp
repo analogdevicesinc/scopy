@@ -1,8 +1,8 @@
 #ifndef DATALOGGERCONTROLLER_H
 #define DATALOGGERCONTROLLER_H
 
-#include "src/gui/dataloggerview.hpp"
-#include "src/dataloggermodel.h"
+#include "gui/dataloggerview.hpp"
+#include "dataloggermodel.h"
 
 
 namespace scopy {

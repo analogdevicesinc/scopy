@@ -18,7 +18,8 @@
 #include <libm2k/m2k.hpp>
 #include <libm2k/analog/dmm.hpp>
 #include <libm2k/m2kexceptions.hpp>
-#include <src/dataloggerreaderthread.hpp>
+
+#include "dataloggerreaderthread.hpp"
 
 namespace libm2k::context {
 class ContextBuilder;
