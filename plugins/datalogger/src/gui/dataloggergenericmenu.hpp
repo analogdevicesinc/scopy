@@ -12,7 +12,7 @@ class CustomSwitch;
 namespace datalogger {
 namespace gui {
 
-class DataLoggerGenericMenu : public ::scopy::gui::GenericMenu
+class DataLoggerGenericMenu : public scopy::gui::GenericMenu
 {
 	Q_OBJECT
 public:

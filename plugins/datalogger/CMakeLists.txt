@@ -4,7 +4,7 @@ set(SCOPY_MODULE datalogger)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
-project(scopy${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
+project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
@@ -56,9 +56,6 @@ if(ANDROID)
 else()
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
 endif()
-
-
-qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED
 	${PROJECT_SOURCES}
