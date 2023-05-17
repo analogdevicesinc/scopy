@@ -47,18 +47,31 @@ namespace scopy {
 				WRITE setSampleRate
 		)
 
+		Q_PROPERTY(PlotDirection plotDirection
+				READ getPlotDirection
+				WRITE setPlotDirection
+		)
+
 	public:
 		explicit Sismograph(QWidget *parent = nullptr);
 		~Sismograph();
 
+		enum PlotDirection : bool {
+			LEFT_TO_RIGHT = false,
+			RIGHT_TO_LEFT = true
+		};
+
 		int getNumSamples() const;
 		void setNumSamples(int num);
+
+		Sismograph::PlotDirection getPlotDirection() const;
+		void setPlotDirection(PlotDirection plotDirection);
+
 		double getSampleRate() const;
 		void setSampleRate(double rate);
 
 		void setUnitOfMeasure(QString unitOfMeasureName,QString unitOfMeasureSymbol);
 		void setPlotAxisXTitle(const QString& title);
-		void setPlotAxisYTitle(const QString& title);
 
 		bool getAutoscale() const;
 		void setAutoscale(bool newAutoscale);
@@ -92,6 +105,7 @@ namespace scopy {
 		void updateScale();
 		double findMaxInFifo();
 		bool autoscale;
+		enum PlotDirection plotDirection;
 
 	Q_SIGNALS:
 		void dataChanged(std::vector<double> data);
