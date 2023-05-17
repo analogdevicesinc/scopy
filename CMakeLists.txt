@@ -19,7 +19,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-message(QtVersion: ${QT_VERSION_MAJOR})
+
+if (Qt5Widgets_VERSION VERSION_LESS 5.15.2)
+	message(FATAL_ERROR "Minimum supported Qt 5.15.2")
+	return()
+else()
+	message(STATUS "Using Qt version: "${Qt5Widgets_VERSION})
+endif()
+
+#message(QtVersion: ${QT_VERSION_MAJOR}:${QT_VERSION_MINOR})
 
 
 FILE(GLOB SRC_LIST  *.cpp *.cc)
@@ -35,7 +43,7 @@ set(PROJECT_SOURCES
 include(ScopyAbout)
 configure_about(./resources/about)
 FILE(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
-message(${SCOPY_RESOURCE_FILES})
+message(STATUS ${SCOPY_RESOURCE_FILES})
 qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 find_library(IIO_LIBRARIES NAMES iio libiio)
