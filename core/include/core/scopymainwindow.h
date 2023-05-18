@@ -31,6 +31,7 @@ public:
     void initPreferencesPage(PluginManager *pm = nullptr);
     void initPreferences();
     void initPythonWIN32();
+    void loadPluginsFromRepository(PluginRepository *pr = nullptr);
 
 public Q_SLOTS:
     void requestTools(QString id);
