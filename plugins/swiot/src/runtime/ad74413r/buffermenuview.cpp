@@ -1,4 +1,5 @@
 #include "buffermenuview.h"
+#include "linked_button.hpp"
 #include <QHBoxLayout>
 
 using namespace scopy;
@@ -15,6 +16,7 @@ void swiot::BufferMenuView::init(QString title, QString function, QColor* color)
 {
 	initInteractiveMenu();
 	setMenuHeader(title,color,false);
+	createHeaderWidget(title);
 
 	m_advanceSettingsSection = new gui::SubsectionSeparator("SETTINGS", false);
 	m_advanceSettingsSection->getLabel()->setStyleSheet("color:gray;");
@@ -36,6 +38,40 @@ void swiot::BufferMenuView::initAdvMenu(QMap<QString, QStringList> values)
 		m_advanceSettingsSection->getContentWidget()->layout()->addItem(layers[i]);
 	}
 
+}
+
+void swiot::BufferMenuView::createHeaderWidget(const QString title)
+{
+	QWidget *headerWidget = new QWidget();
+	headerWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	QHBoxLayout *headerLayout = new QHBoxLayout(headerWidget);
+	headerLayout->setContentsMargins(0,0,0,0);
+	headerLayout->setSpacing(0);
+	m_btnInfoStatus = new scopy::LinkedButton();
+	m_btnInfoStatus->installEventFilter(this);
+	m_btnInfoStatus->setObjectName(QString::fromUtf8("btnHelp"));
+	m_btnInfoStatus->setCheckable(false);
+	m_btnInfoStatus->setText(QString());
+	m_btnInfoStatus->setToolTip("For each output channel, a buffered\n"
+				  "input channel is generated which is\n"
+				  "displayed on the plot");
+	headerLayout->insertWidget(headerLayout->count(), new QLabel(title));
+	headerLayout->insertWidget(headerLayout->count(), m_btnInfoStatus);
+	addNewHeaderWidget(headerWidget);
+}
+
+bool swiot::BufferMenuView::eventFilter(QObject *obj, QEvent *event)
+{
+	if (obj == (QObject*)m_btnInfoStatus) {
+		if (event->type() == QEvent::Enter)
+		{
+			m_btnInfoStatus->setToolTip(m_swiotAdvMenu->getInfoMessage());
+		}
+		return false;
+	} else {
+		return QWidget::eventFilter(obj, event);
+	}
 }
 
 swiot::BufferMenu* swiot::BufferMenuView::getAdvMenu()
