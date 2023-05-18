@@ -20,12 +20,12 @@ class BufferMenu: public QWidget
 {
 	Q_OBJECT
 public:
-	explicit BufferMenu(QWidget* parent = nullptr);
+	explicit BufferMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~BufferMenu();
 
 	virtual void init() = 0;
 	virtual void connectSignalsToSlots() = 0;
-
+	virtual QString getInfoMessage();
 	QVector<QHBoxLayout *> getMenuLayers();
 	QMap<QString, QStringList> getAttrValues();
 
@@ -37,6 +37,7 @@ Q_SIGNALS:
 
 protected:
 	QWidget *m_widget;
+	QString m_chnlFunction;
 	QMap<QString, QStringList> m_attrValues;
 private:
 	QVector<QHBoxLayout *> m_menuLayers;
@@ -46,7 +47,7 @@ class CurrentInLoopMenu: public BufferMenu
 {
 	Q_OBJECT
 public:
-	explicit CurrentInLoopMenu(QWidget* parent = nullptr);
+	explicit CurrentInLoopMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~CurrentInLoopMenu();
 	void init();
 	void connectSignalsToSlots();
@@ -61,7 +62,7 @@ class DigitalInLoopMenu: public BufferMenu
 {
 	Q_OBJECT
 public:
-	explicit DigitalInLoopMenu(QWidget* parent = nullptr);
+	explicit DigitalInLoopMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~DigitalInLoopMenu();
 	void init();
 	void connectSignalsToSlots();
@@ -76,10 +77,11 @@ class VoltageOutMenu: public BufferMenu
 {
 	Q_OBJECT
 public:
-	explicit VoltageOutMenu(QWidget* parent = nullptr);
+	explicit VoltageOutMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~VoltageOutMenu();
 	void init();
 	void connectSignalsToSlots();
+	QString getInfoMessage();
 public Q_SLOTS:
 	void slewStepIndexChanged(int idx);
 	void slewRateIndexChanged(int idx);
@@ -99,10 +101,11 @@ class CurrentOutMenu: public BufferMenu
 {
 	Q_OBJECT
 public:
-	explicit CurrentOutMenu(QWidget* parent = nullptr);
+	explicit CurrentOutMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~CurrentOutMenu();
 	void init();
 	void connectSignalsToSlots();
+	QString getInfoMessage();
 
 public Q_SLOTS:
 	void slewStepIndexChanged(int idx);
@@ -123,7 +126,7 @@ class DiagnosticMenu: public BufferMenu
 {
 	Q_OBJECT
 public:
-	explicit DiagnosticMenu(QWidget* parent = nullptr);
+	explicit DiagnosticMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~DiagnosticMenu();
 	void init();
 	void connectSignalsToSlots();
@@ -139,7 +142,7 @@ class WithoutAdvSettings: public BufferMenu
 {
 	Q_OBJECT
 public:
-	explicit WithoutAdvSettings(QWidget* parent = nullptr);
+	explicit WithoutAdvSettings(QWidget* parent = nullptr, QString chnlFunction = "");
 	~WithoutAdvSettings();
 	void init();
 	void connectSignalsToSlots();
@@ -209,17 +212,17 @@ public:
 		int menu_type = decodeFunctionName(function);
 		switch (menu_type) {
 		case CURRENT_IN_LOOP:
-			return new CurrentInLoopMenu(widget);
+			return new CurrentInLoopMenu(widget, function);
 		case DIGITAL_IN_LOOP:
-			return new DigitalInLoopMenu(widget);
+			return new DigitalInLoopMenu(widget, function);
 		case VOLTAGE_OUT:
-			return new VoltageOutMenu(widget);
+			return new VoltageOutMenu(widget, function);
 		case CURRENT_OUT:
-			return new CurrentOutMenu(widget);
+			return new CurrentOutMenu(widget, function);
 		case DIAGNOSTIC:
-			return new DiagnosticMenu(widget);
+			return new DiagnosticMenu(widget, function);
 		default:
-			return new WithoutAdvSettings(widget);
+			return new WithoutAdvSettings(widget, function);
 		}
 	}
 

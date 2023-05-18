@@ -1,13 +1,23 @@
 #include "buffermenu.h"
 
 using namespace scopy::swiot;
-BufferMenu::BufferMenu(QWidget *parent)
+BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction)
 	: QWidget(parent),
-	  m_widget(parent)
+	  m_widget(parent),
+	  m_chnlFunction(chnlFunction)
 {}
 
 BufferMenu::~BufferMenu()
 {}
+
+QString BufferMenu::getInfoMessage()
+{
+	QString defaultMessage = "\"" + m_chnlFunction + "\" configuration generates\n" +
+			"a buffer capable channel which is directly\n" +
+			"related to the plot. The channel attributes\n" +
+			"can be changed through this menu.";
+	return defaultMessage;
+}
 
 void BufferMenu::addMenuLayout(QHBoxLayout *layout)
 {
@@ -40,8 +50,8 @@ double BufferMenu::convertFromRaw(int rawValue)
 	return value;
 }
 
-CurrentInLoopMenu::CurrentInLoopMenu(QWidget* parent):
-	BufferMenu(parent)
+CurrentInLoopMenu::CurrentInLoopMenu(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
 {}
 
 CurrentInLoopMenu::~CurrentInLoopMenu()
@@ -85,8 +95,8 @@ void CurrentInLoopMenu::dacCodeChanged(double value)
 	Q_EMIT attrValuesChanged(attrName);
 }
 
-DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent):
-	BufferMenu(parent)
+DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
 {}
 
 DigitalInLoopMenu::~DigitalInLoopMenu()
@@ -131,7 +141,8 @@ void DigitalInLoopMenu::dacCodeChanged(double value)
 	Q_EMIT attrValuesChanged(attrName);
 }
 
-VoltageOutMenu::VoltageOutMenu(QWidget* parent): BufferMenu(parent)
+VoltageOutMenu::VoltageOutMenu(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
 {}
 
 VoltageOutMenu::~VoltageOutMenu()
@@ -192,6 +203,16 @@ void VoltageOutMenu::connectSignalsToSlots()
 	connect(m_slewOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VoltageOutMenu::slewIndexChanged);
 }
 
+QString VoltageOutMenu::getInfoMessage()
+{
+	QString infoMessage = "\"" + m_chnlFunction + "\" configuration generates 2 context channels.\n" +
+			"One of them is an input buffer capable channel (current_in)\n" +
+			"which is related to the plot and the other one is an\n" +
+			"output channel whose attributes can be changed from\n" +
+			"this menu.";
+	return infoMessage;
+}
+
 void VoltageOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
 	QStringList availableValues = m_attrValues[attrName];
@@ -246,7 +267,8 @@ void VoltageOutMenu::slewIndexChanged(int idx)
 	Q_EMIT attrValuesChanged(attrName);
 }
 
-CurrentOutMenu::CurrentOutMenu(QWidget* parent): BufferMenu(parent)
+CurrentOutMenu::CurrentOutMenu(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
 {}
 
 CurrentOutMenu::~CurrentOutMenu()
@@ -307,6 +329,16 @@ void CurrentOutMenu::connectSignalsToSlots()
 	connect(m_slewOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CurrentOutMenu::slewIndexChanged);
 }
 
+QString CurrentOutMenu::getInfoMessage()
+{
+	QString infoMessage = "\"" + m_chnlFunction + "\" configuration generates 2 context channels.\n" +
+			"One of them is an input buffer capable channel (volage_in)\n" +
+			"which is related to the plot and the other one is an\n" +
+			"output channel whose attributes can be changed from\n" +
+			"this menu.";
+	return infoMessage;
+}
+
 void CurrentOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
 	QStringList availableValues = m_attrValues[attrName];
@@ -361,8 +393,8 @@ void CurrentOutMenu::slewIndexChanged(int idx)
 	Q_EMIT attrValuesChanged(attrName);
 }
 
-DiagnosticMenu::DiagnosticMenu(QWidget* parent):
-	BufferMenu(parent)
+DiagnosticMenu::DiagnosticMenu(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
 {}
 
 DiagnosticMenu::~DiagnosticMenu()
@@ -404,8 +436,8 @@ void DiagnosticMenu::diagIndextChanged(int idx)
 	Q_EMIT attrValuesChanged(attrName);
 }
 
-WithoutAdvSettings::WithoutAdvSettings(QWidget* parent):
-	BufferMenu(parent)
+WithoutAdvSettings::WithoutAdvSettings(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
 {}
 
 WithoutAdvSettings::~WithoutAdvSettings()
