@@ -16,6 +16,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+include(GNUInstallDirs)
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -24,7 +25,7 @@ if (Qt5Widgets_VERSION VERSION_LESS 5.15.2)
 	message(FATAL_ERROR "Minimum supported Qt 5.15.2")
 	return()
 else()
-	message(STATUS "Using Qt version: "${Qt5Widgets_VERSION})
+	message(STATUS "Using Qt version: " ${Qt5Widgets_VERSION})
 endif()
 
 #message(QtVersion: ${QT_VERSION_MAJOR}:${QT_VERSION_MINOR})
@@ -55,6 +56,9 @@ if(ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
+set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
+set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/plugins/plugins)
+set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/scopy-plugins)
 add_subdirectory(gui)
 add_subdirectory(iioutil)
 add_subdirectory(pluginbase)
@@ -119,14 +123,23 @@ set_target_properties(${PROJECT_NAME}  PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
+
 configure_file(windows/scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy.iss @ONLY)
 configure_file(windows/scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-32.iss @ONLY)
 configure_file(windows/scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-64.iss @ONLY)
 configure_file(windows/qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
 
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION share/applications)
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION share/icons/hicolor/scalable/apps RENAME scopy.svg)
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg)
+endif()
+
+install(TARGETS ${PROJECT_NAME}
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
 
 
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)

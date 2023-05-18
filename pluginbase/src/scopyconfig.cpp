@@ -6,7 +6,17 @@
 
 QString scopy::config::defaultPluginFolderPath()
 {
-	return "./plugins/plugins";
+	// Plugin path is different per system
+	//  - Windows - In Scopy.exe location
+	//  - Linux - /usr/share/scopy/plugins
+	//  -  macOS - similar(?)
+	//  - Android - Only in app cache - On init, copy plugins from data to cache (?))
+	return SCOPY_PLUGIN_INSTALL_PATH;
+}
+
+QString scopy::config::localPluginFolderPath()
+{
+	return SCOPY_PLUGIN_BUILD_PATH;
 }
 
 QString scopy::config::preferencesFolderPath()
