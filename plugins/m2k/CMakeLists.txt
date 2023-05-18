@@ -61,8 +61,8 @@ find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filte
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
-if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
+if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
@@ -108,7 +108,3 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME
-    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})

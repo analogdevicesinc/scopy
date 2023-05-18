@@ -8,17 +8,6 @@
 
 namespace scopy {
 
-
-// Plugin path is different per system -
-//  - Windows - In Scopy.exe location
-//  - Linux - /usr/share/scopy/plugins,
-//  -  macOS - similar(?)
-//  - Android - Only in app cache - On init, copy plugins from data to cache (?))
-
-//#if defined(Q_OS_WINDOWS) || defined(Q_OS_UNIX)
-#define DEFAULT_PLUGIN_LOCATION "plugins/plugins"
-//#endif
-
 class SCOPY_CORE_EXPORT PluginRepository : public QObject
 {
 	Q_OBJECT

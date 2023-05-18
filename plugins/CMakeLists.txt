@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.9)
 project(scopy-plugins VERSION 0.1 LANGUAGES CXX)
-set(SCOPY_PLUGIN_INSTALL_PATH "${CMAKE_CURRENT_BINARY_DIR}/plugins/")
-message(STATUS "plugins to " ${SCOPY_PLUGIN_INSTALL_PATH})
+
+message(STATUS "Plugins folder: " ${SCOPY_PLUGIN_BUILD_PATH})
+message(STATUS "Plugins folder after install: " ${SCOPY_PLUGIN_INSTALL_PATH})
 
 option(ENABLE_PLUGIN_TEST "Enable test plugin" ON)
 option(ENABLE_PLUGIN_M2K "Enable m2k plugin" ON)
@@ -48,3 +49,7 @@ endif()
 
 message(STATUS "Building plugins:" ${PLUGINS})
 
+install(TARGETS ${PLUGINS}
+	LIBRARY DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}
+	RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_PATH}
+)
