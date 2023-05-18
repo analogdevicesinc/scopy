@@ -9,6 +9,7 @@ namespace scopy {
 class SCOPY_PLUGINBASE_EXPORT config {
 public:
 	static QString defaultPluginFolderPath();
+	static QString localPluginFolderPath();
 	static QString preferencesFolderPath();
 	static QString settingsFolderPath();
 	static QString executableFolderPath();

@@ -41,8 +41,8 @@ set(PROJECT_SOURCES
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core )
 
 
-if(NOT "${SCOPY_PLUGIN_INSTALL_PATH}" STREQUAL "")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_INSTALL_PATH})
+if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
@@ -60,7 +60,3 @@ target_include_directories(${PROJECT_NAME} PUBLIC  scopy-gui scopy-pluginbase)
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core scopy-gui scopy-pluginbase)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
-
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME
-    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})

@@ -58,18 +58,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	scanCycle = new CyclicalTask(scanTask,this);
 	scc = new ScannedIIOContextCollector(this);
 	pr = new PluginRepository(this);
-
-	pr->init(DEFAULT_PLUGIN_LOCATION);
-
-#ifndef Q_OS_ANDROID
-	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
-	if(!pluginAdditionalPath.isEmpty()) {
-		pr->init(pluginAdditionalPath);
-	}
-#endif
+	loadPluginsFromRepository(pr);
 
 	PluginManager *pm = pr->getPluginManager();
-
 
 	initAboutPage(pm);
 	initPreferencesPage(pm);
@@ -248,6 +239,24 @@ void ScopyMainWindow::loadOpenGL() {
 	auto a = new QOpenGLWidget(this);
 	qInfo(CAT_SCOPY, "OpenGL loaded");
 	a->deleteLater();
+}
+
+void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr){
+
+	// Check the local plugins folder first
+	QDir pathDir(scopy::config::localPluginFolderPath());
+	if (pathDir.exists()){
+		pr->init(scopy::config::localPluginFolderPath());
+	}
+	else{
+		pr->init(scopy::config::defaultPluginFolderPath());
+	}
+	#ifndef Q_OS_ANDROID
+		QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
+		if(!pluginAdditionalPath.isEmpty()) {
+			pr->init(pluginAdditionalPath);
+		}
+	#endif
 }
 
 
