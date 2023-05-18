@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <gui/generic_menu.hpp>
 #include "buffermenu.h"
+#include "linked_button.hpp"
 #include <QMap>
 #include <QObject>
 
@@ -20,14 +21,17 @@ public:
 	~BufferMenuView();
 
 	void init(QString title, QString function, QColor *color);
-
 	void initAdvMenu(QMap<QString, QStringList> values);
+	void createHeaderWidget(const QString title);
 
 	BufferMenu *getAdvMenu();
 
 private:
+	bool eventFilter(QObject *obj, QEvent *event);
+
 	BufferMenu *m_swiotAdvMenu;
 	scopy::gui::SubsectionSeparator *m_advanceSettingsSection;
+	scopy::LinkedButton *m_btnInfoStatus;
 };
 }
 }
