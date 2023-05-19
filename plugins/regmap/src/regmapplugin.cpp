@@ -47,7 +47,7 @@ void REGMAPPlugin::unload()
      cp->close(m_param);
 }
 
-bool REGMAPPlugin::compatible(QString m_param)
+bool REGMAPPlugin::compatible(QString m_param, QString category)
 {
     m_name="REGMAP";
     auto &&cp = ContextProvider::GetInstance();

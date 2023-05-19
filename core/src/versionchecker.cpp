@@ -5,6 +5,7 @@
 #include <QFileInfo>
 #include <QNetworkReply>
 #include <QLoggingCategory>
+#include <pluginbase/scopyconfig.h>
 
 Q_LOGGING_CATEGORY(CAT_VERSION,"VersionCache");
 
@@ -50,7 +51,7 @@ void VersionCache::read() {
 
 void VersionCache::init() {
 	m_nam = nullptr;
-	m_cacheFilePath = QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation)+"version.json";
+	m_cacheFilePath = scopy::config::settingsFolderPath() + "version.json";
 	read();
 }
 

@@ -111,6 +111,13 @@ bool Util::compareNatural(const std::string& a, const std::string& b) {
 	return (compareNatural(a_new, b_new));
 }
 
+QWidget *Util::findContainingWindow(QWidget *w)
+{
+	while(dynamic_cast<QWidget*>(w->parent())!=nullptr)
+		w = dynamic_cast<QWidget*>(w->parent());
+	return w;
+}
+
 QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *widget, const QString &title)
 {
 	QDockWidget* dockWidget = new QDockWidget(title, mainWindow);

@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.9)
 enable_testing()
 
-project(scopy VERSION 0.1 LANGUAGES CXX)
+project(scopy VERSION 2.0.0 LANGUAGES CXX)
+set(SCOPY_VERSION ${PROJECT_VERSION})
+
+# Make sure our local CMake Modules path comes first
+list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -25,8 +29,6 @@ endif()
 
 #message(QtVersion: ${QT_VERSION_MAJOR}:${QT_VERSION_MINOR})
 
-# Make sure our local CMake Modules path comes first
-list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 
 FILE(GLOB SRC_LIST  *.cpp *.cc)
 FILE(GLOB HEADER_LIST *.h *.hpp)
@@ -60,8 +62,6 @@ add_subdirectory(plugins)
 add_subdirectory(core)
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
-
-
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
@@ -127,6 +127,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop.cmakein ${CMA
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION share/applications)
 install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION share/icons/hicolor/scalable/apps RENAME scopy.svg)
+
 
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
 

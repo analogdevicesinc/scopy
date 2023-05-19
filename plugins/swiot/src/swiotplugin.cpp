@@ -59,7 +59,7 @@ void SWIOTPlugin::unload()
 	delete infoui;
 }
 
-bool SWIOTPlugin::compatible(QString m_param)
+bool SWIOTPlugin::compatible(QString m_param, QString category)
 {
 	m_name = "SWIOT";
 	bool ret = false;

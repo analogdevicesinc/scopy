@@ -32,7 +32,17 @@ public:
 	 * @param QString
 	 */
 
-	virtual void setParam(QString) = 0;
+	virtual void setParam(QString, QString) = 0;
+
+	/**
+	 * @brief setEnabled
+	 * sets whether the plugin is enabled or not
+	 * Default implementation in PluginBase - override not recommended
+	 * @param QString
+	 */
+
+	virtual void setEnabled(bool) = 0;
+
 
 	/**
 	 * @brief initMetadata
@@ -115,7 +125,7 @@ public:
 	 *
 	 * No default implementation in PluginBase - must be overriden
 	 */
-	virtual bool compatible(QString param) = 0;
+	virtual bool compatible(QString param, QString category) = 0;
 
 	/**
 	 * @brief clone
@@ -198,6 +208,14 @@ public:
 	 * Default implementation in PluginBase - can be overriden
 	 */
 	virtual void unload() = 0;
+
+
+	/**
+	 * @brief param
+	 * @return plugin m_enabled getter - shows whether the plugin will load or not on loadPlugin()
+	 * Default implementation in PluginBase - override not recommended
+	 */
+	virtual bool enabled() = 0;
 
 	/**
 	 * @brief param

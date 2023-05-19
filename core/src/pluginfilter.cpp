@@ -25,9 +25,11 @@ bool PluginFilter::pluginInCategory(Plugin* p, QString category) { // PluginFilt
 }
 
 bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
-	bool ret = true;
+	bool ret = false;
 	QStringList excludeList;
 	for(Plugin* test : pl) {
+		if(test->enabled() == false)
+			continue;
 		if(!test->metadata().contains("exclude"))
 			continue;
 		QJsonValue excludeVal = test->metadata().value("exclude");
@@ -45,13 +47,15 @@ bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
 
 	for(const QString &exclude : excludeList) {
 		if(exclude == "*") {
-			ret = false;
-		}
-		if(exclude == p->name()) {
-			ret = false;
-		}
-		if(exclude == "!"+p->name())
 			ret = true;
+		}
+		if(exclude.toLower() == p->name().toLower()) {
+			ret = true;
+		}
+		if(exclude.toLower() == QString("!"+p->name()).toLower()) {
+			ret = false;
+			break;
+		}
 	}
 	return ret;
 }

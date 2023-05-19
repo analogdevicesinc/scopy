@@ -103,11 +103,12 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString categ
 	for(Plugin* plugin : qAsConst(list)) {
 		if(!PluginFilter::pluginInCategory(plugin,category))
 			continue;
-		if(!PluginFilter::pluginInExclusionList(comp,plugin))
-			continue;
-		if(plugin->compatible(param)) {
+		bool enable = (!PluginFilter::pluginInExclusionList(comp,plugin));
+
+		if(plugin->compatible(param, category)) {
 			Plugin* p = plugin->clone();
-			p->setParam(param);
+			p->setParam(param, category);
+			p->setEnabled(enable);
 			comp.append(p);
 		}
 	}

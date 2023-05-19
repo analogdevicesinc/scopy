@@ -52,6 +52,7 @@ Q_SIGNALS:
 	void requestedRestart() override;
 	void requestTool(QString) override;
 protected:
+	void removeDisabledPlugins();
 	void loadName();
 	void loadIcons();
 	void loadPages();

@@ -22,13 +22,15 @@ public:
 public Q_SLOTS:
 	void toggleCollapse();
 Q_SIGNALS:
+	void collapsed(bool);
 	void requestTool(QString);
 	void requestSave();
 	void requestLoad();
 
 private:
-	bool collapsed;
-    Ui::ToolBrowser *ui;
+	bool m_collapsed;
+	Ui::ToolBrowser *ui;
+	void hideMenuText(bool collapesd);
 };
 }
 
