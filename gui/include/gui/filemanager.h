@@ -71,7 +71,7 @@ public:
 	double getNrOfSamples() const;
 	int getNrOfChannels() const;
 
-	void performWrite();
+	void performWrite(bool withScopyHeader = true);
 	void performDecoderWrite(bool skip_empty_lines = false);
 
 	QStringList getAdditionalInformation() const;
