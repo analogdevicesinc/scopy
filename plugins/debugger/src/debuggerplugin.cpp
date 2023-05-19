@@ -4,7 +4,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
-#include <QUuid>
 #include <QLoggingCategory>
 
 #include <iioutil/contextprovider.h>

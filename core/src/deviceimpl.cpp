@@ -21,7 +21,7 @@ DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObjec
 	  m_category(category),
 	  p(p)
 {
-	m_id = QUuid::createUuid().toString();
+	m_id = "dev_"+category+"_"+param+"_"+scopy::config::getUuid();
 	qDebug(CAT_DEVICEIMPL)<< m_param <<"ctor";
 }
 

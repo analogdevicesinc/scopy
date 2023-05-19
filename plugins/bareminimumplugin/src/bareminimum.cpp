@@ -4,7 +4,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QLoggingCategory>
-#include <QUuid>
 #include <QSpacerItem>
 #include <pluginbase/preferences.h>
 #include <pluginbase/messagebroker.h>

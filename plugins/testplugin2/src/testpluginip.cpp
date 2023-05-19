@@ -3,7 +3,6 @@
 #include "qpushbutton.h"
 #include <QVBoxLayout>
 #include <QLoggingCategory>
-#include <QUuid>
 #include <pluginbase/messagebroker.h>
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
