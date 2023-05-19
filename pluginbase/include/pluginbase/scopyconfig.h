@@ -19,6 +19,9 @@ public:
 	static QString pcSpecs();
 
 	static QString dump();
+	static QString getUuid();
+private:
+	inline static int uuid = 0;
 };
 }
 #endif // SCOPYCONFIG_H

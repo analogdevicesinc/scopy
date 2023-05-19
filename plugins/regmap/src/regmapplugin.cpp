@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
-#include <QUuid>
 #include <QWidget>
 #include <QVector>
 #include <src/readwrite/iioregisterreadstrategy.hpp>

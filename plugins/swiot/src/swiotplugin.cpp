@@ -3,7 +3,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QDebug>
-#include <QUuid>
 
 #include "src/runtime/faults/faults.h"
 #include "src/runtime/max14906/max14906.h"
