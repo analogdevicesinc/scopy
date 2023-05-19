@@ -6,7 +6,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QLoggingCategory>
-#include <QUuid>
 #include <QSpacerItem>
 #include <QTimer>
 #include <libsigrokdecode/libsigrokdecode.h>
