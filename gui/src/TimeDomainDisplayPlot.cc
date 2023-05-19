@@ -626,19 +626,19 @@ void TimeDomainDisplayPlot::configureAllYAxis()
 void
 TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 {
-    QFont font;
-    font.setPointSize(10);
-    font.setWeight(75);
+	QFont font;
+	font.setPointSize(10);
+	font.setWeight(75);
 	d_zoomer[zoomerIdx]->setTrackerFont(font);
 
-	#if QWT_VERSION < 0x060000
-		d_zoomer[zoomerIdx]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
-	#endif
+#if QWT_VERSION < 0x060000
+	d_zoomer[zoomerIdx]->setSelectionFlags(QwtPicker::RectSelection | QwtPicker::DragSelection);
+#endif
 
 	d_zoomer[zoomerIdx]->setMousePattern(QwtEventPattern::MouseSelect2,
-				 Qt::RightButton, Qt::ControlModifier);
+					     Qt::RightButton, Qt::ControlModifier);
 	d_zoomer[zoomerIdx]->setMousePattern(QwtEventPattern::MouseSelect3,
-				 Qt::RightButton);
+					     Qt::RightButton);
 	d_zoomer[zoomerIdx]->setTrackerMode(QwtPicker::AlwaysOff);
 	const QColor c("#999999");
 	d_zoomer[zoomerIdx]->setRubberBandPen(c);
@@ -752,6 +752,18 @@ void TimeDomainDisplayPlot::setYaxisUnit(QString unitType, int axisIdx)
 QString TimeDomainDisplayPlot::yAxisUnit(void)
 {
 	return d_yAxisUnit;
+}
+
+QString TimeDomainDisplayPlot::yAxisUnit(int axisIdx)
+{
+	OscScaleDraw *scaleDraw =
+			static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtAxis::YLeft,axisIdx)));
+	if (scaleDraw) {
+		return scaleDraw->getUnitType();
+	} else {
+		return  d_yAxisUnit;
+	}
+
 }
 
 void TimeDomainDisplayPlot::setXaxisUnit(QString unitType)
