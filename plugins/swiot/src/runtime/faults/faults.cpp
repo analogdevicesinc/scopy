@@ -215,7 +215,7 @@ QPushButton *Faults::createBackButton() {
 						    "  padding-right: 15px;\n"
 						    "}"));
 	backButton->setProperty("blue_button", QVariant(true));
-	backButton->setText("Back");
+	backButton->setText("Config");
 	return backButton;
 }
 
