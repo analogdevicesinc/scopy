@@ -277,7 +277,7 @@ int FileManager::getNrOfChannels() const
 	}
 }
 
-void FileManager::performWrite()
+void FileManager::performWrite(bool withScopyHeader)
 {
 	QString additionalInfo = "";
 	if (openedFor == IMPORT) {
@@ -291,16 +291,18 @@ void FileManager::performWrite()
 
 	additionalInfo = (additionalInformation.size() != 0) ? additionalInformation[0] : "";
 
-	QStringList header = ScopyFileHeader::getHeader();
+	if (withScopyHeader) {
+		QStringList header = ScopyFileHeader::getHeader();
 
-	//prepare header
-	//exportStream << header[0] << separator << QString(SCOPY_VERSION_GIT) << "\n";
-	exportStream << header[1] << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
-	exportStream << header[2] << separator << "M2K" << "\n";
-	exportStream << header[3] << separator << data.size() << "\n";
-	exportStream << header[4] << separator << sampleRate << "\n";
-	exportStream << header[5] << separator << toolName << "\n";
-	exportStream << header[6] << separator << additionalInfo << "\n";
+		//prepare header
+		//exportStream << header[0] << separator << QString(SCOPY_VERSION_GIT) << "\n";
+		exportStream << header[1] << separator << QDate::currentDate().toString("dddd MMMM dd/MM/yyyy") << "\n";
+		exportStream << header[2] << separator << "M2K" << "\n";
+		exportStream << header[3] << separator << data.size() << "\n";
+		exportStream << header[4] << separator << sampleRate << "\n";
+		exportStream << header[5] << separator << toolName << "\n";
+		exportStream << header[6] << separator << additionalInfo << "\n";
+	}
 
 	//column names row
 	exportStream << "Sample" << separator;
