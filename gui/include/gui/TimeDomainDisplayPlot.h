@@ -122,6 +122,7 @@ public:
 
   void setYaxisUnit(QString unitType, int axisIdx = 0);
   QString yAxisUnit(void);
+  QString yAxisUnit(int axisIdx);
 
   void setXaxisUnit(QString unitType);
   QString xAxisUnit(void);
