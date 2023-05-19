@@ -354,7 +354,7 @@ QPushButton* Ad74413r::createBackBtn()
 						 "  padding-right: 15px;\n"
 						 "}"));
 	backBtn->setProperty("blue_button", QVariant(true));
-	backBtn->setText("Back");
+	backBtn->setText("Config");
 	return backBtn;
 }
 
