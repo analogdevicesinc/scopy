@@ -29,8 +29,9 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 		int samplingFreq = actualSamplingFreq[0].toInt();
 		m_readerThread->onSamplingFreqWritten(samplingFreq);
 		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
-		setupToolView();
-		initMonitorToolView();
+		gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
+		setupToolView(settingsMenu);
+		initMonitorToolView(settingsMenu);
 		setupConnections();
 	}
 }
@@ -50,14 +51,14 @@ Ad74413r::~Ad74413r()
 	}
 }
 
-void Ad74413r::setupToolView()
+void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 {
 	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
 	recipe.hasSingleBtn = true;
 	recipe.hasPairSettingsBtn = true;
-	recipe.hasPrintBtn = false;
+	recipe.hasPrintBtn = true;
 	recipe.hasChannels = true;
 	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::VERTICAL;
 
@@ -66,8 +67,6 @@ void Ad74413r::setupToolView()
 	m_monitorChannelManager->setToolStatus("Channels");
 
 	m_toolView = scopy::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
-
-	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor("Red"));
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
 	m_toolView->addTopExtraWidget(m_backBtn);
 	m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
@@ -99,14 +98,14 @@ void Ad74413r::setupConnections()
 	connect(this, &Ad74413r::channelWidgetSelected, m_plotHandler, &BufferPlotHandler::onChannelWidgetSelected);
 }
 
-void Ad74413r::initMonitorToolView()
+void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 {
 	int chId = 0;
 	bool first = true;
 
 	QString deviceName(iio_device_get_name(m_iioDev));
 	ChannelWidget *mainCh_widget =
-			m_toolView->buildNewChannel(m_monitorChannelManager, nullptr, false, chId, false, false,
+			m_toolView->buildNewChannel(m_monitorChannelManager, settingsMenu, false, chId, false, false,
 						    QColor("green"), deviceName, deviceName);
 	chId++;
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
