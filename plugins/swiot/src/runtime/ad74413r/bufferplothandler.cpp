@@ -87,7 +87,6 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		m_plot->setYaxisUnit("V", i);
 	}
 	m_plot->configureAllYAxis();
-	m_plot->setAllYAxis(-5, 5);
 	m_plot->setOffsetInterval(-__DBL_MAX__, __DBL_MAX__);
 	connect(m_plot, &CapturePlot::channelSelected, this, [=](int hdlIdx, bool selected) {
 		m_plot->setActiveVertAxis(hdlIdx, true);
@@ -179,6 +178,23 @@ void BufferPlotHandler::drawPlot()
 	}
 	m_plot->plotNewData("Active Channels", m_dataPoints, dataPointsNumber, 1);
 
+}
+
+void BufferPlotHandler::setChnlsUnitOfMeasure(QVector<QString> unitsOfMeasure)
+{
+	for (int i = 0; i < m_plot->leftVertAxesCount(); i++) {
+		m_plot->setYaxisUnit(unitsOfMeasure[i], i);
+	}
+	m_plot->replot();
+}
+
+void BufferPlotHandler::setChnlsRangeValues(QVector<std::pair<int, int> > rangeValues)
+{
+	for (int i = 0; i < m_plot->leftVertAxesCount(); i++) {
+		double numberOfUnitsPerDiv = (rangeValues[i].second - rangeValues[i].first)/m_plot->yAxisNumDiv();
+		m_plot->setVertUnitsPerDiv(numberOfUnitsPerDiv, i);
+	}
+	m_plot->replot();
 }
 
 void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
