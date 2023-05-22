@@ -8,6 +8,7 @@ BufferLogic::BufferLogic(struct iio_device* iioDev) :
       ,m_iioDev(iioDev)
 {
 	if (m_iioDev) {
+		initializeChnlsScaleInfo();
 		createChannels();
 		m_samplingFreqAvailable = readChnlsSamplingFreqAttr("sampling_frequency_available");
 	}
@@ -26,18 +27,19 @@ void BufferLogic::createChannels()
 	if(m_iioDev) {
 		int chnlsNumber = iio_device_get_channels_count(m_iioDev);
 		int plotChnlsNo = 0;
+		int chnlIdx = -1;
 		bool isOutput = false;
+		bool isScanElement = false;
 		const QRegExp rx("[^0-9]+");
 		for (int i = 0; i < chnlsNumber; i++) {
 			struct iio_channel* iioChnl = iio_device_get_channel(m_iioDev, i);
 			struct chnlInfo* chnlInfo = new struct chnlInfo;
-			int chnlIdx = -1;
 			QString chnlId(iio_channel_get_id(iioChnl));
 			double offset = 0.0;
 			double scale = 0.0;
 			int erno = 0;
 			const auto&& parts = chnlId.split(rx);
-
+			chnlIdx = -1;
 			iio_channel_disable(iioChnl);
 			isOutput = iio_channel_is_output(iioChnl);
 			erno = iio_channel_attr_read_double(iioChnl, "offset", &offset);
@@ -46,12 +48,15 @@ void BufferLogic::createChannels()
 				scale = -1;
 				offset = -1;
 			}
-			auto isBufferedChnl = iio_channel_is_scan_element(iioChnl);
-			plotChnlsNo = (!isOutput && isBufferedChnl) ? (plotChnlsNo + 1) : plotChnlsNo;
+			isScanElement = iio_channel_is_scan_element(iioChnl);
+			plotChnlsNo = (!isOutput && isScanElement) ? (plotChnlsNo + 1) : plotChnlsNo;
 			chnlInfo->chnlId = chnlId;
 			chnlInfo->iioChnl = iioChnl;
 			chnlInfo->isEnabled = false;
+			chnlInfo->isScanElement = isScanElement;
 			chnlInfo->isOutput = isOutput;
+			chnlInfo->unitOfMeasure = m_unitsOfMeasure[chnlId[0].toLower()];
+			chnlInfo->rangeValues = m_valuesRange[chnlId[0].toLower()];
 			chnlInfo->offsetScalePair = {offset, scale};
 			if (parts.size() > 1) {
 				if(parts[1].compare("")){
@@ -64,6 +69,17 @@ void BufferLogic::createChannels()
 		m_plotChnlsNo = plotChnlsNo;
 	}
 
+}
+
+void BufferLogic::initializeChnlsScaleInfo()
+{
+	m_unitsOfMeasure['v'] = VOLTAGE_UM;
+	m_unitsOfMeasure['c'] = CURRENT_UM;
+	m_unitsOfMeasure['r'] = RESISTANCE_UM;
+
+	m_valuesRange['v'] = {-VOLTAGE_LIMIT, VOLTAGE_LIMIT};
+	m_valuesRange['c'] = {-CURRENT_LIMIT, CURRENT_LIMIT};
+	m_valuesRange['r'] = {RESISTANCE_LOWER_LIMIT, RESISTANCE_UPPER_LIMIT};
 }
 
 struct iio_channel* BufferLogic::getIioChnl(int chnlIdx, bool outputPriority)
@@ -141,4 +157,29 @@ QStringList BufferLogic::readChnlsSamplingFreqAttr(QString attrName)
 int BufferLogic::getPlotChnlsNo()
 {
 	return m_plotChnlsNo;
+}
+
+QVector<QString> BufferLogic::getChnlsUnitOfMeasure()
+{
+	QVector<QString> chnlsUnitOfMeasure;
+
+	for (struct chnlInfo* chnl : m_chnlsInfo) {
+		if (chnl->isScanElement && !chnl->isOutput) {
+			QString unitOfMeasure = chnl->unitOfMeasure;
+			chnlsUnitOfMeasure.push_back(unitOfMeasure);
+		}
+	}
+	return chnlsUnitOfMeasure;
+}
+
+QVector<std::pair<int, int>> BufferLogic::getChnlsRangeValues()
+{
+	QVector<std::pair<int, int>> chnlsRangeValues;
+	for (struct chnlInfo* chnl : m_chnlsInfo) {
+		if (chnl->isScanElement && !chnl->isOutput) {
+			std::pair<int, int> rangeValues = chnl->rangeValues;
+			chnlsRangeValues.push_back(rangeValues);
+		}
+	}
+	return chnlsRangeValues;
 }
