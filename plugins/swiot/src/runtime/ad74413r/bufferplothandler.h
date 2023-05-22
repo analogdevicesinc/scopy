@@ -24,6 +24,8 @@ public:
 	void deleteResidualPlotData();
 	void resetPlotParameters();
 	void drawPlot();
+	void setChnlsUnitOfMeasure(QVector<QString> unitsOfMeasure);
+	void setChnlsRangeValues(QVector<std::pair<int, int>> rangeValues);
 	QWidget *getPlotWidget() const;
 
 	bool singleCapture() const;
