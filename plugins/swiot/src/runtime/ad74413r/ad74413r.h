@@ -36,7 +36,7 @@ public:
 
 	~Ad74413r();
 
-	void initMonitorToolView();
+	void initMonitorToolView(gui::GenericMenu *settingsMenu);
 
 	void initExportSettings(QWidget *parent);
 
@@ -67,7 +67,7 @@ Q_SIGNALS:
 
 	void backBtnPressed();
 private:
-	void setupToolView();
+	void setupToolView(gui::GenericMenu *settingsMenu);
 
 	void createMonitorChannelMenu();
 
