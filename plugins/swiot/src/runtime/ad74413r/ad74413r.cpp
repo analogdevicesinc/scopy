@@ -29,6 +29,11 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 		int samplingFreq = actualSamplingFreq[0].toInt();
 		m_readerThread->onSamplingFreqWritten(samplingFreq);
 		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
+		QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getChnlsUnitOfMeasure();
+		m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
+		QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getChnlsRangeValues();
+		m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
+
 		gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
 		setupToolView(settingsMenu);
 		initMonitorToolView(settingsMenu);
