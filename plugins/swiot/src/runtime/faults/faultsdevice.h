@@ -24,11 +24,15 @@ public Q_SLOTS:
 	void updateExplanations();
 
 private:
+	void initFaultExplanations();
+	void connectSignalsAndSlots();
+
 	Ui::FaultsDevice *ui;
-	QTextEdit *m_faults_explanation;
+	QWidget *m_faults_explanation;
 	scopy::gui::SubsectionSeparator *m_subsectionSeparator;
 
 	FaultsGroup* m_faultsGroup;
+	QVector<QWidget*> m_faultExplanationWidgets;
 
 	QString m_name;
 	QString m_path;

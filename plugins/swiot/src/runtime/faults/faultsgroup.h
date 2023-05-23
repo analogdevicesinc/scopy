@@ -3,6 +3,8 @@
 
 #include <set>
 
+#include <QVector>
+
 #include "faultwidget.h"
 #include <gui/flexgridlayout.hpp>
 #include "ui_faultsgroup.h"
@@ -18,14 +20,16 @@ public:
 	explicit FaultsGroup(QString name, const QString& path, QWidget *parent = nullptr);
 	~FaultsGroup() override;
 
-	const std::vector<FaultWidget *> &getFaults() const;
+	const QVector<FaultWidget *> &getFaults() const;
 
 	const QString &getName() const;
 	void setName(const QString &name);
 
 	void clearSelection();
 	void update(uint32_t faults_numeric);
-	QString getExplanations();
+	QStringList getExplanations();
+	std::set<unsigned int> getSelectedIndexes();
+	std::set<unsigned int> getActiveIndexes();
 
 Q_SIGNALS:
 	void selectionUpdated();
@@ -34,10 +38,13 @@ Q_SIGNALS:
 private:
 	Ui::FaultsGroup *ui;
 	QString m_name;
-	std::vector<FaultWidget *> m_faults;
+	QVector<FaultWidget *> m_faults;
 	std::set<unsigned int> m_currentlySelected;
+	std::set<unsigned int> m_actives;
 	int m_max_faults;
 	FlexGridLayout* m_customColGrid;
+
+	void resizeEvent(QResizeEvent *event) override;
 
 protected:
 	void setupDynamicUi();
