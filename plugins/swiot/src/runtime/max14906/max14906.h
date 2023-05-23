@@ -40,6 +40,7 @@ private:
 
 	static QFrame* createVLine(QWidget* parent);
 	static QFrame* createHLine(QWidget* parent);
+	static QMainWindow* createDockableMainWindow(const QString& title, DioDigitalChannel* digitalChannel, QWidget* parent);
 
         QPushButton *m_backButton;
 	DioController *max14906ToolController;
