@@ -743,6 +743,10 @@ void TimeDomainDisplayPlot::setYaxisUnit(QString unitType, int axisIdx)
 	if (d_yAxisUnit != unitType) {
 		d_yAxisUnit = unitType;
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> d2328132 (gui: Customized plot y-axis.)
 	OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(m_qwtYAxis, axisIdx)));
 	if (scaleDraw)
 		scaleDraw->setUnitType(d_yAxisUnit);
@@ -1009,10 +1013,14 @@ TimeDomainDisplayPlot::setYLabel(const std::string &label,
   if(unit.length() > 0)
     l += " (" + unit + ")";
 <<<<<<< HEAD
+<<<<<<< HEAD
   setAxisTitle(m_qwtYAxis, QString(l.c_str()));
 =======
   setAxisTitle(QwtAxisId(m_qwtYAxis, axisIdx), QString(l.c_str()));
 >>>>>>> 805563b2 (gui/TimeDomainDisplayPlot: Fix YAxis scaleDraw bugs.)
+=======
+  setAxisTitle(QwtAxisId(QwtAxis::m_qwtYAxis, axisIdx), QString(l.c_str()));
+>>>>>>> d2328132 (gui: Customized plot y-axis.)
 }
 
 void
