@@ -18,10 +18,33 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultsGroup),
 	m_name(std::move(name)),
-	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this)) {
+	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
+{
 	ui->setupUi(this);
 
-	QJsonArray* faults_obj = this->getJsonArray(path);
+	connect(m_customColGrid, &FlexGridLayout::reqestLayoutUpdate, this, [this]() {
+		qWarning() << "FaultsGroup::reqestLayoutUpdate()";
+		if (this->ui->activeStoredLayout->count() != m_customColGrid->rows()) {
+			while (this->ui->activeStoredLayout->count() < m_customColGrid->rows()) {
+				this->ui->activeStoredLayout->addWidget(this->buildActiveStoredWidget());
+			}
+			while (this->ui->activeStoredLayout->count() > m_customColGrid->rows()) {
+				QWidget *widgetToDelete = this->ui->activeStoredLayout->itemAt(
+					this->ui->activeStoredLayout->count() - 1)->widget();
+				this->ui->activeStoredLayout->removeWidget(widgetToDelete);
+				delete widgetToDelete;
+				qDebug(CAT_SWIOT_FAULTS) << "deleted widget";
+			}
+		}
+
+		this->ui->activeStoredWidget->setMaximumHeight(m_customColGrid->sizeHint().height());
+		this->setFixedHeight(this->sizeHint().height() + 1);
+
+		Q_EMIT minimumSizeChanged();
+	});
+
+	QJsonArray *faults_obj = this->getJsonArray(path);
+	m_max_faults = faults_obj->size();
 	this->setupDynamicUi();
 
 	for (int i = 0; i < m_max_faults; ++i) {
@@ -33,7 +56,7 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 			bool added = m_currentlySelected.insert(id_).second;
 			if (!added) {
 				m_currentlySelected.erase(id_);
-				m_faults.at(id_)->setPressed(false);
+				m_faults.at((int)(id_))->setPressed(false);
 			}
 			Q_EMIT selectionUpdated();
 		});
@@ -45,31 +68,13 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	m_customColGrid->toggleAll(true);
 
 	m_customColGrid->itemSizeChanged();
-	this->ui->horizontalLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Maximum, QSizePolicy::Minimum));
-	connect(m_customColGrid, &FlexGridLayout::reqestLayoutUpdate, this, [this]() {
-		if (this->ui->activeStoredLayout->count() != m_customColGrid->rows()) {
-			while (this->ui->activeStoredLayout->count() < m_customColGrid->rows()) {
-				this->ui->activeStoredLayout->addWidget(this->buildActiveStoredWidget());
-			}
-			while (this->ui->activeStoredLayout->count() > m_customColGrid->rows()) {
-				QWidget *widgetToDelete = this->ui->activeStoredLayout->itemAt(
-					this->ui->activeStoredLayout->count() - 1)->widget();
-				this->ui->activeStoredLayout->removeWidget(widgetToDelete);
-				delete widgetToDelete;
-			}
-		}
-
-		this->setMinimumHeight(m_customColGrid->minimumHeight());
-
-		Q_EMIT minimumSizeChanged();
-	});
 }
 
 FaultsGroup::~FaultsGroup() {
 	delete ui;
 }
 
-const std::vector<FaultWidget *> &FaultsGroup::getFaults() const {
+const QVector<FaultWidget *> &FaultsGroup::getFaults() const {
 	return m_faults;
 }
 
@@ -88,7 +93,7 @@ void FaultsGroup::setupDynamicUi() {
 
 void FaultsGroup::clearSelection() {
 	for (unsigned int i: m_currentlySelected) {
-		m_faults[i]->setPressed(false);
+		m_faults[(int)(i)]->setPressed(false);
 	}
 
 	m_currentlySelected.clear();
@@ -96,38 +101,29 @@ void FaultsGroup::clearSelection() {
 }
 
 void FaultsGroup::update(uint32_t faults_numeric) {
-	uint32_t aux = faults_numeric;
 	for (int i = (int) (m_faults.size() - 1); i >= 0; --i) {
-		bool bit = (bool) (aux & 0b1);
+		bool bit = (bool) (faults_numeric & 0b1);
 		if (m_faults.at(i)->isActive() && bit) { // if we get 2 active signals, we set the stored to 1
 			m_faults.at(i)->setStored(true);
 		}
 		m_faults.at(i)->setActive(bit);
-		aux >>= 1;
+
+		if (bit) {
+			m_actives.insert(i);
+		} else {
+			m_actives.erase(i);
+		}
+
+		faults_numeric >>= 1;
 	}
 }
 
-QString FaultsGroup::getExplanations() {
-	QString res = "";
-	if (!m_currentlySelected.empty()) {
-		for (unsigned int i: m_currentlySelected) {
-			if (m_faults.at(i)->isActive()) {
-				res += QString("Bit%1 (%2): %3<br>").arg(QString::number(i), m_faults.at(i)->getName(),
-									 m_faults.at(i)->getFaultExplanation());
-			}
-		}
-	} else {
-		for (auto fault: m_faults) {
-			if (fault->isActive()) {
-				res += QString("Bit%1 (%2): %3<br>").arg(QString::number(fault->getId()),
-									 fault->getName(),
-									 fault->getFaultExplanation());
-			} else {
-				res += QString("<font color=\"#5c5c5c\">Bit%1 (%2): %3</font><br>").arg(
-					QString::number(fault->getId()), fault->getName(),
-					fault->getFaultExplanation());
-			}
-		}
+QStringList FaultsGroup::getExplanations() {
+	QStringList res;
+	for (auto fault: m_faults) {
+		res += QString("Bit%1 (%2): %3").arg(QString::number(fault->getId()),
+						     fault->getName(),
+						     fault->getFaultExplanation());
 	}
 
 	return res;
@@ -150,7 +146,7 @@ QWidget *FaultsGroup::buildActiveStoredWidget() {
 	return widget;
 }
 
-QJsonArray *FaultsGroup::getJsonArray(const QString& path) {
+QJsonArray *FaultsGroup::getJsonArray(const QString &path) {
 	QString contents;
 	QFile file;
 	file.setFileName(path);
@@ -183,5 +179,19 @@ QJsonArray *FaultsGroup::getJsonArray(const QString& path) {
 	*array = faults_json.toArray();
 
 	return array;
+}
+
+std::set<unsigned int> FaultsGroup::getSelectedIndexes() {
+	return this->m_currentlySelected;
+}
+
+std::set<unsigned int> FaultsGroup::getActiveIndexes() {
+	return m_actives;
+}
+
+void FaultsGroup::resizeEvent(QResizeEvent *event) {
+	this->ui->activeStoredWidget->setMaximumHeight(m_customColGrid->sizeHint().height());
+
+	QWidget::resizeEvent(event);
 }
 
