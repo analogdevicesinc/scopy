@@ -1,16 +1,17 @@
 ﻿#include "channel_widget.hpp"
-#include "menu_header.hpp"
+//#include "menu_header.hpp"
 #include "tool_view.hpp"
 #include "utils.h"
 #include <QTabWidget>
 #include "ui_tool_view.h"
-
+#include <QMainWindow>
 
 using namespace scopy::gui;
 
 ToolView::ToolView(QWidget* parent)
 	: QWidget(parent)
 	, m_ui(new Ui::ToolView)
+	, m_nextMenuIndex(0)
 {
 	m_ui->setupUi(this);
 
@@ -25,11 +26,15 @@ ToolView::ToolView(QWidget* parent)
 	m_ui->btnHelp->setVisible(false);
 	m_ui->btnPrint->setVisible(false);
 
+	m_ui->widgetInstrumentNotes->setVisible(false);
 	m_ui->widgetVerticalChannels->setVisible(false);
 	m_ui->widgetFooter->setVisible(false);
 	m_ui->widgetMenuBtns->setVisible(false);
 
 	m_ui->widgetMenuAnim->setMaximumWidth(0);
+
+	getGeneralSettingsBtn()->setVisible(false);
+	getSettingsBtn()->setVisible(false);
 
 	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
 }
@@ -107,7 +112,7 @@ void ToolView::toggleRightMenu(CustomPushButton* btn, bool checked)
 
 void ToolView::settingsPanelUpdate(int id)
 {
-	if (id >= 0) {
+	if (id > 0) {
 		m_ui->stackedWidget->setCurrentIndex(0);
 	} else {
 		m_ui->stackedWidget->setCurrentWidget(m_menuList[-id]);
@@ -115,12 +120,15 @@ void ToolView::settingsPanelUpdate(int id)
 
 	for (int i = 0; i < m_ui->stackedWidget->count(); i++) {
 		QSizePolicy::Policy policy = QSizePolicy::Ignored;
+		bool visible = false;
 
 		if (i == m_ui->stackedWidget->currentIndex()) {
 			policy = QSizePolicy::Expanding;
+			visible = true;
 		}
 		QWidget* widget = m_ui->stackedWidget->widget(i);
 		widget->setSizePolicy(policy, policy);
+		widget->setVisible(visible);
 	}
 	m_ui->stackedWidget->adjustSize();
 }
@@ -155,13 +163,10 @@ void ToolView::buildChannelsContainer(ChannelManager* cm, ChannelsPositionEnum p
 		}
 	});
 
-	if (position == ChannelsPositionEnum::HORIZONTAL) {
-		m_ui->widgetFooter->setVisible(true);
-		cm->build(m_ui->widgetHorizontalChannelsContainer);
-	} else {
-		m_ui->widgetVerticalChannels->setVisible(true);
-		cm->build(m_ui->widgetVerticalChannelsContainer);
-	}
+	// if it's horizontal, will be later updated (needs rework)
+	m_ui->widgetVerticalChannels->setVisible(true);
+	cm->build(m_ui->widgetVerticalChannelsContainer);
+
 }
 
 QDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
@@ -177,7 +182,10 @@ QDockWidget* ToolView::createDetachableMenu(QWidget* menu, int& id)
 	DockerUtils::configureTopBar(docker);
 #endif
 
-	id = m_ui->stackedWidget->addWidget(subWindow);
+	m_ui->stackedWidget->addWidget(subWindow);
+
+	id = getNewID();
+	m_menuList[id] = subWindow;
 
 	return docker;
 }
@@ -218,7 +226,9 @@ void ToolView::configureAddMathBtn(QWidget* menu, bool dockable)
 			}
 		});
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		id = getNewID();
+		m_menuList[id] = dynamic_cast<gui::GenericMenu *>(menu);
 	}
 
 	m_group.addButton(addBtn);
@@ -233,6 +243,10 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 					 bool deletable, bool simplefied, QColor color, const QString& fullName,
 					 const QString& shortName)
 {
+	if (chId == -1) {
+		chId = getNewID();
+	}
+
 	ChannelWidget* ch = channelManager->buildNewChannel(chId, deletable, simplefied, color, fullName, shortName);
 	int id;
 
@@ -305,12 +319,9 @@ scopy::MenuAnim* ToolView::addMenuToStack()
 void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* mainChannel, std::vector<ChannelWidget*> channelGroup)
 {
 	for (ChannelWidget* ch : channelGroup) {
-		ch->setMenuButtonVisibility(false);
-		ch->setBottomLineVIsibility(false);
 		channelManager->setChannelAlignment(ch,Qt::AlignLeft);
 	}
 	mainChannel->setIsMainChannel(true);
-	mainChannel->setBottomLineVIsibility(false);
 	channelManager->setChannelAlignment(mainChannel,Qt::AlignLeft);
 
 	connect(mainChannel, &ChannelWidget::enabled,this, [=](){
@@ -324,11 +335,15 @@ void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* 
 	});
 }
 
-void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible,
+int ToolView::getNewID()
+{
+	return m_nextMenuIndex++;
+}
+
+CustomMenuButton *ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible,
 				      bool checkBoxChecked)
 {
 	m_ui->widgetFooter->setVisible(true);
-	m_ui->widgetFooter->setStyleSheet("background:blue;");
 	m_ui->widgetMenuBtns->setVisible(true);
 
 	CustomMenuButton* btn = new CustomMenuButton(name, checkBoxVisible, checkBoxChecked);
@@ -349,7 +364,9 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 		});
 
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		id = getNewID();
+		m_menuList[id] = menu;
 	}
 
 	m_ui->hLayoutMenuBtnsContainer->addWidget(btn);
@@ -370,11 +387,14 @@ void ToolView::buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QS
 		menu->setMenuButton(toggled);
 	});
 
+	// what is this for?
 	connect(menu, &GenericMenu::enableBtnToggled, [=](bool toggled) { btn->getCheckBox()->setChecked(toggled); });
 
 	if ((checkBoxVisible && checkBoxChecked) || !checkBoxVisible) {
 		m_menuOrder.push_back(btn->getBtn());
 	}
+
+	return btn;
 }
 
 void ToolView::addFixedCentralWidget(QWidget *widget, int row, int column, int rowspan, int columnspan)
@@ -400,6 +420,11 @@ int ToolView::addDockableCentralWidget(QWidget *widget, Qt::DockWidgetArea area,
 	return m_docksList.size() - 1;
 }
 
+void ToolView::addPlotInfoWidget(QWidget *widget)
+{
+	m_ui->widgetPlotInfo->layout()->addWidget(widget);
+}
+
 void ToolView::setWidgetVisibility(int widgetId, bool visible)
 {
 	if (visible) {
@@ -419,10 +444,12 @@ void ToolView::setHeaderVisibility(bool visible)
 	m_ui->widgetHeader->setVisible(visible);
 }
 
-void ToolView::addDockableTabbedWidget(QWidget *widget, const QString &dockerName, int plotId)
+QDockWidget *ToolView::addDockableTabbedWidget(QWidget* plot, const QString &dockerName)
 {
-	QDockWidget* docker = this->createDockableWidget(widget, dockerName);
-	m_centralMainWindow->tabifyDockWidget(m_docksList.at(plotId), docker);
+	QDockWidget* docker = DockerUtils::createDockWidget(m_centralMainWindow, plot, dockerName);
+	m_centralMainWindow->addDockWidget(Qt::LeftDockWidgetArea, docker);
+
+	return docker;
 }
 
 int ToolView::addFixedTabbedWidget(QWidget *widget, const QString& title, int plotId, int row, int column, int rowspan, int columnspan)
@@ -460,7 +487,9 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 			generalSettingsBtn->setDisabled(topLevel);
 		});
 	} else {
-		m_generalSettingsMenuId = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		m_generalSettingsMenuId = getNewID();
+		m_menuList[m_generalSettingsMenuId] = menu;
 	}
 
 	generalSettingsBtn->setProperty("id", QVariant(-m_generalSettingsMenuId));
@@ -472,6 +501,10 @@ void ToolView::setGeneralSettingsMenu(QWidget* menu, bool dockable)
 			m_ui->widgetSettingsPairBtns->getSettingsBtn()->setChecked(!toggled);
 		}
 	});
+
+	if (!getGeneralSettingsBtn()->isVisible()) {
+		getGeneralSettingsBtn()->setVisible(true);
+	}
 }
 
 void ToolView::setFixedMenu(QWidget* menu, bool dockable)
@@ -484,7 +517,8 @@ void ToolView::setFixedMenu(QWidget* menu, bool dockable)
 		connect(docker, &QDockWidget::topLevelChanged,
 			[=](bool topLevel) { m_ui->widgetMenuAnim->toggleMenu(!topLevel); });
 	} else {
-		id = m_ui->stackedWidget->addWidget(menu);
+		m_ui->stackedWidget->addWidget(menu);
+		id = getNewID();
 	}
 
 	settingsPanelUpdate(-id);
@@ -511,6 +545,8 @@ void ToolView::setStackedWidget(QStackedWidget* sw)
 {
 	m_ui->stackedWidget = sw;
 }
+
+void ToolView::setInstrumentNotesVisible(bool visible) { m_ui->widgetInstrumentNotes->setVisible(visible); }
 
 LinkedButton* ToolView::getHelpBtn() { return m_ui->btnHelp; }
 
