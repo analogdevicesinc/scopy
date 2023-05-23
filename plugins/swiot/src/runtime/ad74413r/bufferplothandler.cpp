@@ -70,7 +70,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	m_plot->setSampleRate(m_samplingFreq, 1, "");
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
-	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
+	updatePlotTimespan();
 
 	for (unsigned int i = 0; i < plotChnlsNo; i++) {
 		m_plot->Curve(i)->setAxes(
@@ -91,12 +91,6 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	connect(m_plot, &CapturePlot::channelSelected, this, [=](int hdlIdx, bool selected) {
 		m_plot->setActiveVertAxis(hdlIdx, true);
 		Q_EMIT offsetHandleSelected(hdlIdx, selected);
-	});
-	connect(m_plot->getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
-		if (isZoomOut) {
-			m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
-			m_plot->replot();
-		}
 	});
 }
 
@@ -261,7 +255,9 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 
 void BufferPlotHandler::onTimespanChanged(double value)
 {
+	m_plot->cancelZoom();
 	m_timespan = value;
+	updatePlotTimespan();
 	resetPlotParameters();
 }
 
@@ -319,9 +315,8 @@ void BufferPlotHandler::resetPlotParameters()
 	resetDeque();
 
 	m_plotSamplesNumber->setText(QString::number(plotSampleRate));
-
 	m_plot->setSampleRate(plotSampleRate, 1, "");
-	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, m_timespan);
+
 	m_plot->replot();
 	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(plotSampleNumber) <<" "<<QString::number(m_buffersNumber)
 				      +" "  + QString::number(plotSampleNumber / m_bufferSize) + " ";
@@ -354,6 +349,17 @@ void BufferPlotHandler::readPreferences()
 	Preferences *p = Preferences::GetInstance();
 	bool showFps = p->get("general_show_plot_fps").toBool();
 	m_plot->setVisibleFpsLabel(showFps);
+}
+
+void BufferPlotHandler::updatePlotTimespan()
+{
+	double unitsPerDiv = m_timespan / m_plot->xAxisNumDiv();
+	m_plot->setHorizUnitsPerDiv(unitsPerDiv);
+	//the offset is calculated so that the 0 moment of time to be on the right side of the x axis
+	//we divide by 2 the number of x divisions because the moment
+	//0 of time is by default in the middle of the x Axis
+	double offset = unitsPerDiv * (m_plot->xAxisNumDiv() / 2);
+	m_plot->setHorizOffset(-offset);
 }
 
 bool BufferPlotHandler::eventFilter(QObject *obj, QEvent *event)
