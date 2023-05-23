@@ -62,20 +62,21 @@ public:
 	QPushButton* getSettingsBtn();
 	void setPairSettingsVisible(bool visible);
 
+	void setInstrumentNotesVisible(bool visible);
+
 	void setFixedMenu(QWidget* menu, bool dockable);
 	void setGeneralSettingsMenu(QWidget* menu, bool dockable);
 
 	ChannelWidget* buildNewChannel(ChannelManager* channelManager, GenericMenu* menu, bool dockable, int chId,
 				       bool deletable, bool simplified, QColor color, const QString& fullName,
 				       const QString& shortName);
-
 	void buildChannelGroup(ChannelManager* channelManager,ChannelWidget* mainChannal, std::vector<ChannelWidget*> channelGroup);
-	void buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
+	CustomMenuButton *buildNewInstrumentMenu(GenericMenu* menu, bool dockable, const QString& name, bool checkBoxVisible = false,
 				    bool checkBoxChecked = false);
 
 	void addFixedCentralWidget(QWidget* widget, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
 	int addDockableCentralWidget(QWidget* widget, Qt::DockWidgetArea area, const QString& dockerName);
-	void addDockableTabbedWidget(QWidget* widget, const QString &dockerName, int plotId);
+	QDockWidget *addDockableTabbedWidget(QWidget* plot, const QString &dockerName);
 	int addFixedTabbedWidget(QWidget* widget, const QString& title, int plotId = -1, int row = -1, int column = -1,int rowspan = -1, int columnspan = -1);
 
 	void setWidgetVisibility(int widgetId, bool visible);
@@ -83,9 +84,12 @@ public:
 
 	void setHeaderVisibility(bool visible);
 
-	MenuAnim* addMenuToStack();
+	scopy::MenuAnim* addMenuToStack();
 	void setStackedWidget(QStackedWidget* sw);
 
+	int getNewID();
+	void addPlotInfoWidget(QWidget *widget);
+	QWidget *getPlotInfoWidget();
 private:
 	void configureLastOpenedMenu();
 	void buildChannelsContainer(ChannelManager* channelManager, ChannelsPositionEnum position);
@@ -118,7 +122,10 @@ private:
 	QMainWindow* m_centralMainWindow;
 	QList<QDockWidget*> m_docksList;
 	QList<QWidget*> m_centralFixedWidgets;
-	QMap<int,GenericMenu*> m_menuList;
+	QMap<int,QWidget*> m_menuList;
+
+	int m_nextMenuIndex;
+	void initPlotInfoWidget();
 };
 } // namespace gui
 } // namespace scopy
