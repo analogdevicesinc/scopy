@@ -46,7 +46,7 @@ namespace scopy {
 
 	public:
 		OscilloscopePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10,
-				 unsigned int yNumDiv = 10, PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr);
+				 unsigned int yNumDiv = 10, PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr, int qwtAxis = QwtAxis::YLeft);
 		~OscilloscopePlot();
 	};
 
@@ -68,7 +68,7 @@ namespace scopy {
 
 	public:
 		CapturePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10,
-			    PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr);
+			    PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr, int qwtAxis = QwtAxis::YLeft);
 		~CapturePlot();
 
 		void replot();
