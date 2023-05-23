@@ -12,6 +12,7 @@ scopy--DetachedToolWindow, QMainWindow > .QWidget, scopy--Sismograph > QwtPlotCa
 
 QDockWidget {
  titlebar-normal-icon: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow_right.svg);
+ background-color: #272730;
 }
 QDockWidget::title {
  background-color: transparent;
@@ -480,6 +481,11 @@ scopy--ChannelWidget QWidget#widget {
 }
 scopy--ChannelWidget QWidget#widget[selected=true] {
  background-color: rbga(20, 20, 22, 153);
+}
+.scopy--ChannelWidget QWidget#widget::hover {
+background-color: rgba(0, 0, 0, 60);
+font-weight: bold;
+border-bottom: 0px solid none;
 }
 scopy--ChannelWidget QCheckBox#box{
  spacing: 0px;

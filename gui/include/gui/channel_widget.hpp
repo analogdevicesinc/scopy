@@ -34,6 +34,7 @@ namespace scopy {
 
 class SCOPY_GUI_EXPORT ChannelWidget: public QWidget
 {
+
 	Q_OBJECT
 
 public:
@@ -74,8 +75,10 @@ public:
 
 	void toggleChannel(bool toggled);
 	void setIsMainChannel(bool mainChannel);
+	void setIsPhysicalChannel(bool physChannel);
 
 	bool isMainChannel() const;
+	bool isPhysicalChannel() const;
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;
@@ -114,6 +117,7 @@ private:
 
 	bool m_floatingMenu;
 	bool m_isMainChannel;
+	bool m_isPhysicalChannel;
 	QSpacerItem *m_channelWSpacer;
 };
 
