@@ -614,15 +614,6 @@ void TimeDomainDisplayPlot::setPlotGrTags(bool val)
 	d_plotGrTags = val;
 }
 
-void TimeDomainDisplayPlot::configureAllYAxis()
-{
-	int yAxisNumber = vertAxes.size();
-	PrefixFormatter *yPf = new MetricPrefixFormatter();
-	for (int i = 0; i < yAxisNumber; i++) {
-		configureAxis(m_qwtYAxis, i, yPf);
-	}
-}
-
 void
 TimeDomainDisplayPlot::addZoomer(unsigned int zoomerIdx)
 {
@@ -743,10 +734,6 @@ void TimeDomainDisplayPlot::setYaxisUnit(QString unitType, int axisIdx)
 	if (d_yAxisUnit != unitType) {
 		d_yAxisUnit = unitType;
 	}
-<<<<<<< HEAD
-=======
-
->>>>>>> d2328132 (gui: Customized plot y-axis.)
 	OscScaleDraw *scaleDraw = static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(m_qwtYAxis, axisIdx)));
 	if (scaleDraw)
 		scaleDraw->setUnitType(d_yAxisUnit);
@@ -761,7 +748,7 @@ QString TimeDomainDisplayPlot::yAxisUnit(void)
 QString TimeDomainDisplayPlot::yAxisUnit(int axisIdx)
 {
 	OscScaleDraw *scaleDraw =
-			static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(QwtAxis::YLeft,axisIdx)));
+			static_cast<OscScaleDraw *>(this->axisScaleDraw(QwtAxisId(m_qwtYAxis, axisIdx)));
 	if (scaleDraw) {
 		return scaleDraw->getUnitType();
 	} else {
@@ -1012,15 +999,7 @@ TimeDomainDisplayPlot::setYLabel(const std::string &label,
   std::string l = label;
   if(unit.length() > 0)
     l += " (" + unit + ")";
-<<<<<<< HEAD
-<<<<<<< HEAD
-  setAxisTitle(m_qwtYAxis, QString(l.c_str()));
-=======
   setAxisTitle(QwtAxisId(m_qwtYAxis, axisIdx), QString(l.c_str()));
->>>>>>> 805563b2 (gui/TimeDomainDisplayPlot: Fix YAxis scaleDraw bugs.)
-=======
-  setAxisTitle(QwtAxisId(QwtAxis::m_qwtYAxis, axisIdx), QString(l.c_str()));
->>>>>>> d2328132 (gui: Customized plot y-axis.)
 }
 
 void
@@ -1287,9 +1266,9 @@ void TimeDomainDisplayPlot::configureAllYAxis()
 	int yAxisSize = vertAxes.size();
 	for (int i = 0; i < yAxisSize; i++) {
 		if (d_xAxisFormatter) {
-			configureAxis(QwtAxis::YLeft, i, d_xAxisFormatter);
+			configureAxis(m_qwtYAxis, i, d_xAxisFormatter);
 		} else {
-			configureAxis(QwtAxis::YLeft, i, new MetricPrefixFormatter());
+			configureAxis(m_qwtYAxis, i, new MetricPrefixFormatter());
 		}
 	}
 }
