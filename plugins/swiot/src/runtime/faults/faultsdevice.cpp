@@ -2,24 +2,21 @@
 #include <utility>
 #include "faultsgroup.h"
 
+#include "src/swiot_logging_categories.h"
+
 using namespace scopy::swiot;
 
 FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	: ui(new Ui::FaultsDevice),
 	  QWidget(parent),
-	  m_faults_explanation(new QTextEdit(this)),
+	  m_faults_explanation(new QWidget(this)),
 	  m_subsectionSeparator(new scopy::gui::SubsectionSeparator("Faults Explanation", true, this)),
 	  m_faultsGroup(new FaultsGroup(name, path, this)),
 	  m_name(std::move(name)),
 	  m_path(std::move(path)) {
-
 	ui->setupUi(this);
-
-	m_faults_explanation->setReadOnly(true);
-	m_faults_explanation->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_faults_explanation->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
-	m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
+	this->connectSignalsAndSlots();
+	this->initFaultExplanations();
 
 	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
 	m_subsectionSeparator->setContent(m_faults_explanation);
@@ -27,14 +24,7 @@ FaultsDevice::FaultsDevice(QString name, QString path, QWidget *parent)
 	this->ui->label_name->setText(m_name);
 	this->ui->faults_layout->addWidget(this->m_faultsGroup);
 	this->ui->faults_explanation->layout()->addWidget(m_subsectionSeparator);
-
-	connect(this->ui->clear_selection_button, &QPushButton::clicked, this->m_faultsGroup, &FaultsGroup::clearSelection);
-	connect(this->ui->reset_button, &QPushButton::clicked, this, &FaultsDevice::resetStored);
-	connect(m_faultsGroup, &FaultsGroup::selectionUpdated, this, &FaultsDevice::updateExplanations);
-	connect(m_faultsGroup, &FaultsGroup::minimumSizeChanged, this, &FaultsDevice::updateMinimumHeight);
-	connect(m_faults_explanation, &QTextEdit::textChanged, this, [this](){ // TODO: make this a separate slot
-		m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
-	});
+	m_faults_explanation->ensurePolished();
 }
 
 FaultsDevice::~FaultsDevice() {
@@ -42,7 +32,7 @@ FaultsDevice::~FaultsDevice() {
 }
 
 void FaultsDevice::resetStored() {
-	for (auto fault : this->m_faultsGroup->getFaults()) {
+	for (auto fault: this->m_faultsGroup->getFaults()) {
 		fault->setStored(false);
 	}
 	this->updateExplanations();
@@ -55,17 +45,74 @@ void FaultsDevice::update(uint32_t faults_numeric) {
 }
 
 void FaultsDevice::updateExplanations() {
-	m_faults_explanation->clear();
-	this->m_faults_explanation->setHtml(this->m_faultsGroup->getExplanations());
+	std::set<unsigned int> selected = m_faultsGroup->getSelectedIndexes();
+	std::set<unsigned int> actives = m_faultsGroup->getActiveIndexes();
+	if (selected.empty()) {
+		for (int i = 0; i < m_faultExplanationWidgets.size(); ++i) {
+			m_faultExplanationWidgets[i]->show();
+
+			if (actives.contains(i)) {
+				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", true);
+			} else {
+				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", false);
+			}
+		}
+	} else {
+		for (int i = 0; i < m_faultExplanationWidgets.size(); ++i) {
+			if (selected.contains(i)) {
+				m_faultExplanationWidgets[i]->show();
+			} else {
+				m_faultExplanationWidgets[i]->hide();
+			}
+
+			if (actives.contains(i)) {
+				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", true);
+			} else {
+				setDynamicProperty(m_faultExplanationWidgets[i], "highlighted", false);
+			}
+		}
+	}
+
+	m_faults_explanation->ensurePolished();
 }
 
 void FaultsDevice::updateMinimumHeight() {
-	this->setMinimumHeight(this->sizeHint().height());
+	this->ensurePolished();
+	this->m_faults_explanation->ensurePolished();
+	qWarning() << "FaultsDevice::updateMinimumHeight()";
 	this->m_faultsGroup->ensurePolished();
 }
 
 void FaultsDevice::resizeEvent(QResizeEvent *event) {
-	m_faults_explanation->setFixedHeight(m_faults_explanation->document()->size().toSize().height() + 3);
+	qDebug(CAT_SWIOT_FAULTS) << "resize faults explanation:" << m_faults_explanation->height(); // TODO: delete this if not used
 
 	QWidget::resizeEvent(event);
+}
+
+void FaultsDevice::initFaultExplanations() {
+	m_faults_explanation->setLayout(new QVBoxLayout(m_faults_explanation));
+	m_faults_explanation->layout()->setContentsMargins(0, 0, 0, 0);
+	m_faults_explanation->layout()->setSpacing(0);
+	m_faults_explanation->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+	m_faults_explanation->layout()->setSizeConstraint(QLayout::SetMinimumSize);
+
+	QStringList l = this->m_faultsGroup->getExplanations();
+	for (const auto &item: l) {
+		auto widget = new QLabel(item, m_faults_explanation);
+		widget->setTextFormat(Qt::PlainText);
+		widget->setStyleSheet("QWidget[highlighted=true]{color:white;} QWidget{color:#5c5c5c;}");
+//		widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+		widget->setWordWrap(true);
+		m_faultExplanationWidgets.push_back(widget);
+		m_faults_explanation->layout()->addWidget(widget);
+	}
+	m_faults_explanation->ensurePolished();
+}
+
+void FaultsDevice::connectSignalsAndSlots() {
+	connect(this->ui->clear_selection_button, &QPushButton::clicked, this->m_faultsGroup,
+		&FaultsGroup::clearSelection);
+	connect(this->ui->reset_button, &QPushButton::clicked, this, &FaultsDevice::resetStored);
+	connect(m_faultsGroup, &FaultsGroup::selectionUpdated, this, &FaultsDevice::updateExplanations);
+	connect(m_faultsGroup, &FaultsGroup::minimumSizeChanged, this, &FaultsDevice::updateMinimumHeight);
 }
