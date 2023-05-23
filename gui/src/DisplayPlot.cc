@@ -527,9 +527,11 @@ DisplayPlot::DisplayPlot(int nplots, QWidget* parent,  bool isdBgraph,
 		      << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
 		      << QColor(Qt::black);
 
-	d_printColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::darkGreen)
-		      << QColor(Qt::blue) << QColor(Qt::magenta)
-		      << QColor(Qt::darkRed);
+	d_printColors << QColor("#ff7200") << QColor("#9013fe") << QColor(Qt::green)
+		      << QColor(Qt::cyan) << QColor(Qt::magenta)
+		      << QColor(Qt::yellow) << QColor(Qt::gray) << QColor(Qt::darkRed)
+		      << QColor(Qt::darkGreen) << QColor(Qt::darkBlue) << QColor(Qt::darkGray)
+		      << QColor(Qt::black);
 
 	qRegisterMetaType<QColorList>("QColorList");
 	resize(parent->width(), parent->height());
