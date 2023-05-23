@@ -46,6 +46,7 @@ private:
 	void resetDataPoints();
 	void resetDeque();
 	void readPreferences();
+	void updatePlotTimespan();
 
 	bool eventFilter(QObject *obj, QEvent *event);
 
