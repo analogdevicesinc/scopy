@@ -29,10 +29,12 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 		int samplingFreq = actualSamplingFreq[0].toInt();
 		m_readerThread->onSamplingFreqWritten(samplingFreq);
 		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
-		QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getChnlsUnitOfMeasure();
+		QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
 		m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
-		QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getChnlsRangeValues();
+		QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
 		m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
+		QMap<int, QString> chnlsId = m_swiotAdLogic->getPlotChnlsId();
+		m_plotHandler->setHandlesName(chnlsId);
 
 		gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
 		setupToolView(settingsMenu);
@@ -93,7 +95,7 @@ void Ad74413r::setupConnections()
 
 	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_plotHandler, &BufferPlotHandler::onSamplingFreqWritten);
 	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_readerThread, &ReaderThread::onSamplingFreqWritten);
-	//general settings connections
+
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
 
@@ -101,6 +103,8 @@ void Ad74413r::setupConnections()
 
 	connect(m_plotHandler, &BufferPlotHandler::offsetHandleSelected, this, &Ad74413r::onOffsetHdlSelected);
 	connect(this, &Ad74413r::channelWidgetSelected, m_plotHandler, &BufferPlotHandler::onChannelWidgetSelected);
+
+	connect(m_toolView->getPrintBtn(), &QPushButton::clicked, m_plotHandler, &BufferPlotHandler::onPrintBtnClicked);
 }
 
 void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
@@ -111,7 +115,7 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 	QString deviceName(iio_device_get_name(m_iioDev));
 	ChannelWidget *mainCh_widget =
 			m_toolView->buildNewChannel(m_monitorChannelManager, settingsMenu, false, chId, false, false,
-						    QColor("green"), deviceName, deviceName);
+						    QColor("green"), deviceName.toUpper(), deviceName.toUpper());
 	chId++;
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {

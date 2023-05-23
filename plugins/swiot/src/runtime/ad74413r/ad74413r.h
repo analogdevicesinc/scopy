@@ -96,7 +96,6 @@ private:
 	ReaderThread *m_readerThread;
 	BufferPlotHandler *m_plotHandler;
 
-	//--------GENERAL SETTINGS
 	QComboBox *m_samplingFreqOptions;
 	PositionSpinButton *m_timespanSpin;
 	ExportSettings *m_exportSettings;
