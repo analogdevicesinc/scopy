@@ -52,8 +52,9 @@ public:
 	bool verifyEnableChanges(std::vector<bool> enabledChnls);
 
 	int getPlotChnlsNo();
-	QVector<QString> getChnlsUnitOfMeasure();
-	QVector<std::pair<int, int>> getChnlsRangeValues();
+	QVector<QString> getPlotChnlsUnitOfMeasure();
+	QVector<std::pair<int, int>> getPlotChnlsRangeValues();
+	QMap<int, QString> getPlotChnlsId();
 
 	QStringList readChnlsSamplingFreqAttr(QString attrName);
 
