@@ -42,10 +42,10 @@ using namespace scopy;
  * OscilloscopePlot class
  */
 OscilloscopePlot::OscilloscopePlot(QWidget *parent, bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs
-				   ,PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis):
-	TimeDomainDisplayPlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis)
+				   ,PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis, int qwtAxis):
+	TimeDomainDisplayPlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis, qwtAxis)
 {
-	setYaxisUnit("V");
+//	setYaxisUnit("V");
 
 	setMinXaxisDivision(100E-9); // A minimum division of 100 nano second
 	setMaxXaxisDivision(1E-3); // A maximum division of 1 milli second - until adding decimation
@@ -61,8 +61,8 @@ OscilloscopePlot::~OscilloscopePlot()
  * CapturePlot class
  */
 CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs, unsigned int yNumDivs
-			 ,PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis):
-	OscilloscopePlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis),
+			 ,PrefixFormatter* pfXaxis, PrefixFormatter* pfYaxis, int qwtAxis):
+	OscilloscopePlot(parent, isdBgraph, xNumDivs, yNumDivs, pfXaxis, pfYaxis, qwtAxis),
 	d_triggerAEnabled(false),
 	d_triggerBEnabled(false),
 	d_measurementsEnabled(false),
@@ -374,8 +374,9 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 
 	installEventFilter(this);
 	QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XBottom);
-	const int fmw = QFontMetrics(scaleWidget->font()).horizontalAdvance("-XXX.XXX XX");
-	scaleWidget->setMinBorderDist(fmw / 2 + 30, fmw / 2 + 30);
+	const int fmw = QFontMetrics( scaleWidget->font()).horizontalAdvance("-XXX.XXX XX");
+	//WIP: elimination of unnecessary spaces
+	scaleWidget->setMinBorderDist(0, 0);//fmw / 2 + 30, fmw / 2 + 30);
 
 	displayGraticule = false;
 
@@ -844,12 +845,12 @@ void CapturePlot::showEvent(QShowEvent *event)
 void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleDraw)
 {
 	QwtPlotMarker detailsMarker;
-	detailsMarker.setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
+	detailsMarker.setAxes(QwtAxis::XBottom, m_qwtYAxis);
 	detailsMarker.attach(this);
 	double xMarker = axisInterval(QwtAxis::XBottom).maxValue();
 	double length = axisInterval(QwtAxis::XBottom).maxValue() - axisInterval(QwtAxis::XBottom).minValue();
 	xMarker -= (0.2 * length);
-	double yMarker = axisInterval(QwtAxis::YLeft).maxValue();
+	double yMarker = axisInterval(m_qwtYAxis).maxValue();
 	yMarker -= (0.1 * yMarker);
 	detailsMarker.setValue(xMarker, yMarker);
 	QwtText text(d_timeBaseLabel->text() + " " + d_sampleRateLabel->text());
@@ -864,7 +865,7 @@ void CapturePlot::printWithNoBackground(const QString& toolName, bool editScaleD
 			double xCoord = axisInterval(QwtAxis::XBottom).minValue();
 
 			markers.push_back(new QwtPlotMarker());
-			markers.last()->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
+			markers.last()->setAxes(QwtAxis::XBottom, m_qwtYAxis);
 			markers.last()->attach(this);
 			markers.last()->setValue(xCoord, yCoord);
 
@@ -925,9 +926,9 @@ void CapturePlot::enableAxisLabels(bool enabled)
 {
 	setAxisVisible(QwtAxis::XBottom, enabled);
 	if (!enabled) {
-		int nrAxes = axesCount(QwtAxis::YLeft);
+		int nrAxes = axesCount(m_qwtYAxis);
 		for (int i = 0; i < nrAxes; ++i) {
-			setAxisVisible(QwtAxisId(QwtAxis::YLeft, i),
+			setAxisVisible(QwtAxisId(m_qwtYAxis, i),
 					enabled);
 		}
 	}
@@ -1018,13 +1019,13 @@ void CapturePlot::showYAxisWidget(unsigned int axisIdx, bool en)
 	if (!d_labelsEnabled)
 		return;
 
-	setAxisVisible(QwtAxisId(QwtAxis::YLeft, axisIdx),
+	setAxisVisible(QwtAxisId(m_qwtYAxis, axisIdx),
 						en);
 
-	int nrAxes = axesCount(QwtAxis::YLeft);
+	int nrAxes = axesCount(m_qwtYAxis);
 	bool allAxisDisabled = true;
 	for (int i = 0; i < nrAxes; ++i)
-		if (isAxisVisible(QwtAxisId(QwtAxis::YLeft, i)))
+		if (isAxisVisible(QwtAxisId(m_qwtYAxis, i)))
 			allAxisDisabled = false;
 
 	if (allAxisDisabled) {
@@ -1047,8 +1048,8 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 	}
 
 	if (enabled) {
-		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(QwtAxis::YLeft, d_activeVertAxis))->width());
-		d_topGateHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(QwtAxis::YLeft, d_activeVertAxis))->width());
+		d_bottomHandlesArea->setLeftPadding(50 + axisWidget(QwtAxisId(m_qwtYAxis, d_activeVertAxis))->width());
+		d_topGateHandlesArea->setLeftPadding(90 + axisWidget(QwtAxisId(m_qwtYAxis, d_activeVertAxis))->width());
 		QwtScaleWidget *scaleWidget = axisWidget(QwtAxis::XBottom);
 		const int fmw = QFontMetrics(scaleWidget->font()).horizontalAdvance("-XX.XX XX");
 		const int fmh = QFontMetrics(scaleWidget->font()).height();
@@ -1122,7 +1123,7 @@ bool CapturePlot::eventFilter(QObject *object, QEvent *event)
                 break;
             }
             case QEvent::Resize: {
-                updateHandleAreaPadding(d_labelsEnabled);
+		updateHandleAreaPadding(d_labelsEnabled);
 
                 //force cursor handles to emit position changed
                 //when the plot canvas is being resized
@@ -1285,9 +1286,9 @@ void CapturePlot::onDigitalChannelAdded(int chnIdx)
 
 //			qDebug() << pos;
 
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, chn_id));
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(m_qwtYAxis, chn_id));
 
-			auto y = axisInterval(QwtAxisId(QwtAxis::YLeft, chn_id));
+			auto y = axisInterval(QwtAxisId(m_qwtYAxis, chn_id));
 
 //			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
 //			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(0);
@@ -1745,7 +1746,7 @@ void scopy::CapturePlot::pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, H
 	d_offsetHandles.insert(indexOfNewChannel, chOffsetHdl);
 
 	for (int i = 0; i < d_offsetBars.size(); ++i) {
-		d_offsetBars[i]->setMobileAxis(QwtAxisId(QwtAxis::YLeft, i));
+		d_offsetBars[i]->setMobileAxis(QwtAxisId(m_qwtYAxis, i));
 	}
 
 	for (int i = 0; i < d_logic_curves.size(); ++i) {
@@ -1763,7 +1764,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 	d_symbolCtrl->attachSymbol(chOffsetBar);
 	chOffsetBar->setCanLeavePlot(true);
 	chOffsetBar->setVisible(false);
-	chOffsetBar->setMobileAxis(QwtAxisId(QwtAxis::YLeft, chnIdx));
+	chOffsetBar->setMobileAxis(QwtAxisId(m_qwtYAxis, chnIdx));
 
 	RoundedHandleV *chOffsetHdl = new RoundedHandleV(
 				QPixmap(":/gui/icons/handle_right_arrow.svg"),
@@ -1781,7 +1782,7 @@ void CapturePlot::onChannelAdded(int chnIdx)
 			if (chn_id < 0)
 				return;
 
-			QwtScaleMap yMap = this->canvasMap(QwtAxisId(QwtAxis::YLeft, chn_id));
+			QwtScaleMap yMap = this->canvasMap(QwtAxisId(m_qwtYAxis, chn_id));
 			double min = -(yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 			double max = (yAxisNumDiv() / 2.0) * VertUnitsPerDiv(chn_id);
 
