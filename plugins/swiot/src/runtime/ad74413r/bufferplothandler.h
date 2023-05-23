@@ -26,8 +26,8 @@ public:
 	void drawPlot();
 	void setChnlsUnitOfMeasure(QVector<QString> unitsOfMeasure);
 	void setChnlsRangeValues(QVector<std::pair<int, int>> rangeValues);
+	void setHandlesName(QMap<int, QString> chnlsId);
 	QWidget *getPlotWidget() const;
-
 	bool singleCapture() const;
 
 public Q_SLOTS:
@@ -37,6 +37,7 @@ public Q_SLOTS:
 	void onSamplingFreqWritten(int samplingFreq);
 	void onChannelWidgetEnabled(int curveId, bool en);
 	void onChannelWidgetSelected(int curveId);
+	void onPrintBtnClicked();
 Q_SIGNALS:
 	void singleCaptureFinished();
 	void offsetHandleSelected(int hdlIdx, bool selected);

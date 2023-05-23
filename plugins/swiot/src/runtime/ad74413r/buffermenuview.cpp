@@ -1,5 +1,4 @@
 #include "buffermenuview.h"
-#include "linked_button.hpp"
 #include <QHBoxLayout>
 
 using namespace scopy;

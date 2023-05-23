@@ -4,7 +4,7 @@
 #include "linked_button.hpp"
 #include "pluginbase/preferences.h"
 #include "qlabel.h"
-#include "qpushbutton.h"
+#include "src/runtime/ad74413r/ad74413r.h"
 #include "src/swiot_logging_categories.h"
 #include <QFileDialog>
 #include <unistd.h>
@@ -18,7 +18,7 @@ BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int sampl
 	m_plotChnlsNo = plotChnlsNo;
 	m_samplingFreq = samplingFreq;
 	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
-	m_plot = new CapturePlot(parent, false, 10, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
+	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
 	initPlot(plotChnlsNo);
 	resetPlotParameters();
 	readPreferences();
@@ -63,7 +63,8 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
 	gridPlot->addWidget(m_plot->topHandlesArea(), 2, 0, 1, 4);
 	gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
-	gridPlot->addWidget(m_plot->bottomHandlesArea(), 4, 0, 2, 4);
+	gridPlot->addWidget(m_plot->bottomHandlesArea(), 4, 0, 1, 4);
+	gridPlot->addWidget(m_plot->rightHandlesArea(), 1, 3, 4, 1);
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
 
@@ -76,6 +77,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 		m_plot->Curve(i)->setAxes(
 					QwtAxisId(QwtAxis::XBottom, 0),
 					QwtAxisId(QwtAxis::YLeft, i));
+		//need to be by chnl id not by plot chnl idx
 		if (i < configuredChnlsNo) {
 			m_plot->Curve(i)->setTitle("CH " + QString::number(i+1));
 		} else {
@@ -112,6 +114,27 @@ void BufferPlotHandler::initStatusWidget()
 	statusLayout->insertWidget(3, new QLabel("sps"));
 	statusLayout->insertWidget(4, m_btnInfoStatus);
 	m_plot->setStatusWidget(statusWidget);
+}
+
+void BufferPlotHandler::setHandlesName(QMap<int, QString> chnlsId)
+{
+	QList<RoundedHandleV *> offsetHandles = m_plot->getOffsetHandles();
+	int offsetHandlesSize =offsetHandles.size();
+	int mapSize = chnlsId.size();
+	int activeChnlsIndex = 0;
+	if (mapSize == offsetHandlesSize) {
+		for (int key : chnlsId.keys()) {
+			if (activeChnlsIndex < (m_plotChnlsNo - DIAG_CHNLS_NUMBER)) {
+				QString chId = QString::number(key + 1);
+				offsetHandles[activeChnlsIndex]->setName(chnlsId[key][0].toUpper() + chId);
+			} else {
+				QString chId = QString::number(key + 1);
+				offsetHandles[activeChnlsIndex]->setName("DIAG" + chId);
+			}
+			activeChnlsIndex++;
+		}
+	}
+
 }
 
 //bufferCounter is used only for debug
@@ -225,8 +248,6 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 	if (!fileName.isEmpty()){
 		FileManager fm("SWIOTad74413rRuntime");
 		fm.open(fileName, FileManager::EXPORT);
-
-		int channels_number = m_plotChnlsNo;
 		QVector<double> time_data;
 
 		for (size_t i = 0; i < m_plot->Curve(0)->data()->size(); ++i) {
@@ -235,21 +256,21 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 
 		fm.save(time_data, "Time(S)");
 
-		for (int i = 0; i < channels_number; ++i){
+		for (int i = 0; i < m_plotChnlsNo; ++i){
 			if (exportConfig[i]){
 				QVector<double> data;
 				int samples = m_plot->Curve(i)->data()->size();
 				for (int j = 0; j < samples; ++j)
 					data.push_back(m_plot->Curve(i)->data()->sample(j).y());
-				QString chNo = (i > 1) ? QString::number(i - 1) : QString::number(i + 1);
-
-				fm.save(data, "CH" + chNo + "(V)");
+				QString chNo = QString::number(i + 1);
+				QString chType = (i < (m_plotChnlsNo - DIAG_CHNLS_NUMBER))
+						? QString("CH") : QString("DIAG");
+				fm.save(data, chType + chNo + "(" + m_plot->yAxisUnit(i) + ")");
 			}
 		}
 		auto enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
 		auto plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
-		fm.setSampleRate(plotSampleRate);
-		fm.performWrite();
+		fm.performWrite(false);
 	}
 }
 
@@ -298,6 +319,11 @@ void BufferPlotHandler::onChannelWidgetSelected(int curveId)
 	m_plot->bringCurveToFront(curveId);
 	m_plot->setActiveVertAxis(curveId);
 	m_plot->setAllAxes(curveId);
+}
+
+void BufferPlotHandler::onPrintBtnClicked()
+{
+	m_plot->printWithNoBackground(AD_NAME);
 }
 
 void BufferPlotHandler::resetPlotParameters()
