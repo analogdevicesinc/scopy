@@ -304,7 +304,7 @@ public:
 	DisplayPlot(int nplots, QWidget*,
 		    bool isdBgraph = false,
 		    unsigned int xNumDivs = 10,
-		    unsigned int yNumDivs = 10);
+		    unsigned int yNumDivs = 10, int qwtAxis = QwtAxis::YLeft);
   virtual ~DisplayPlot();
 
   virtual void replot() = 0;
@@ -619,6 +619,7 @@ protected:
     H2Marker
   };
 
+  int m_qwtYAxis;
   int d_nplots;
   std::vector<QwtPlotCurve*> d_plot_curve;
 

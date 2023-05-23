@@ -18,7 +18,7 @@ BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int sampl
 	m_plotChnlsNo = plotChnlsNo;
 	m_samplingFreq = samplingFreq;
 	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
-	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter);
+	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter, QwtAxis::YRight);
 	initPlot(plotChnlsNo);
 	resetPlotParameters();
 	readPreferences();
@@ -71,12 +71,13 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	m_plot->setSampleRate(m_samplingFreq, 1, "");
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
+	m_plot->setAxisVisible(QwtAxis::YLeft, false);
 	updatePlotTimespan();
 
 	for (unsigned int i = 0; i < plotChnlsNo; i++) {
 		m_plot->Curve(i)->setAxes(
 					QwtAxisId(QwtAxis::XBottom, 0),
-					QwtAxisId(QwtAxis::YLeft, i));
+					QwtAxisId(QwtAxis::YRight, i));
 		//need to be by chnl id not by plot chnl idx
 		if (i < configuredChnlsNo) {
 			m_plot->Curve(i)->setTitle("CH " + QString::number(i+1));

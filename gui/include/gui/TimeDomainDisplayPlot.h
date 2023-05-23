@@ -102,7 +102,7 @@ class SCOPYGUI_EXPORT TimeDomainDisplayPlot: public DisplayPlot
 
 public:
   TimeDomainDisplayPlot(QWidget*, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10,
-			PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr);
+			PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr, int qwtAxis = QwtAxis::YLeft);
   virtual ~TimeDomainDisplayPlot();
 
   void plotNewData(const std::string &sender,
@@ -165,6 +165,8 @@ public:
   bool getPlotGrTags() const;
   void setPlotGrTags(bool val);
 
+  void configureAllYAxis();
+
 Q_SIGNALS:
   void channelAdded(int);
   void newData();
@@ -212,8 +214,6 @@ public Q_SLOTS:
   void hideCurvesUntilNewData();
 
   void updatePreview(double reftimebase, double timebase, double timeposition);
-
-  void configureAllYAxis();
 
 protected:
   virtual void configureAxis(int axisPos, int axisIdx, PrefixFormatter* prefixFormatter);
