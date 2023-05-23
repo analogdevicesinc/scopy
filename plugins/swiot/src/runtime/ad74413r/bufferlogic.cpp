@@ -159,7 +159,7 @@ int BufferLogic::getPlotChnlsNo()
 	return m_plotChnlsNo;
 }
 
-QVector<QString> BufferLogic::getChnlsUnitOfMeasure()
+QVector<QString> BufferLogic::getPlotChnlsUnitOfMeasure()
 {
 	QVector<QString> chnlsUnitOfMeasure;
 
@@ -172,7 +172,7 @@ QVector<QString> BufferLogic::getChnlsUnitOfMeasure()
 	return chnlsUnitOfMeasure;
 }
 
-QVector<std::pair<int, int>> BufferLogic::getChnlsRangeValues()
+QVector<std::pair<int, int>> BufferLogic::getPlotChnlsRangeValues()
 {
 	QVector<std::pair<int, int>> chnlsRangeValues;
 	for (struct chnlInfo* chnl : m_chnlsInfo) {
@@ -183,3 +183,19 @@ QVector<std::pair<int, int>> BufferLogic::getChnlsRangeValues()
 	}
 	return chnlsRangeValues;
 }
+
+QMap<int, QString> BufferLogic::getPlotChnlsId()
+{
+	QMap<int, QString> chnlsId;
+
+	for (int key : m_chnlsInfo.keys()){
+		if (m_chnlsInfo[key]->isScanElement && !m_chnlsInfo[key]->isOutput) {
+			QString chnlId = m_chnlsInfo[key]->chnlId;
+			chnlsId[key] = chnlId;
+		}
+	}
+
+	return chnlsId;
+}
+
+
