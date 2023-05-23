@@ -45,11 +45,13 @@ ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 	m_math(false),
 	m_function(""),
 	m_ref(false),
-	m_isMainChannel(false)
+	m_isMainChannel(false),
+	m_isPhysicalChannel(false)
 {
 	init();
 	nameButton()->installEventFilter(this);
 	m_channelWSpacer = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed);
+	setStyleSheet("scopy--ChannelWidget QPushButton#btn:hover:!pressed:!checked {		      border-image: url(:/gui/icons/setup_btn_hover.svg)		     }");
 }
 
 ChannelWidget::~ChannelWidget()
@@ -67,6 +69,7 @@ void ChannelWidget::init()
 	m_ui->setupUi(this);
 	m_ui->toggleChannels->hide();
 	m_ui->toggleChannels->setChecked(true);
+	m_ui->toggleChannels->setProperty("subsection_arrow_button", true);
 	setId(m_id);
 	m_ui->delBtn->setVisible(m_deletable);
 	setColor(m_color);
@@ -90,6 +93,8 @@ void ChannelWidget::init()
 	m_ui->horizontalLayout->setAlignment(Qt::AlignLeft);
 	m_ui->horizontalLayout->setAlignment(m_ui->btn,Qt::AlignRight);
 	Util::setWidgetNrOfChars(m_ui->name,6,15);
+//	m_ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Fixed,
+//		QSizePolicy::Fixed);
 }
 
 QAbstractButton* ChannelWidget::enableButton() const
@@ -306,6 +311,11 @@ bool ChannelWidget::isMainChannel() const
 	return m_isMainChannel;
 }
 
+bool ChannelWidget::isPhysicalChannel() const
+{
+	return m_isPhysicalChannel;
+}
+
 void ChannelWidget::setButtonNoGroup(QAbstractButton *btn)
 {
 	QButtonGroup *group = btn->group();
@@ -316,30 +326,18 @@ void ChannelWidget::setButtonNoGroup(QAbstractButton *btn)
 
 void ChannelWidget::setMenuButtonVisibility(bool visible)
 {
-	if (visible) {
-		m_ui->btn->show();
-
-	} else {
-		m_ui->btn->hide();
-	}
+	m_ui->btn->setVisible(visible);
 }
 
 void ChannelWidget::setBottomLineVIsibility(bool visible)
 {
-	if (visible) {
-		m_ui->line->show();
-	} else {
-		m_ui->line->hide();
-	}
+	m_ui->line->setVisible(visible);
 }
 
 void ChannelWidget::toggleChannel(bool toggled)
 {
-	if (toggled) {
-		m_ui->name->hide();
-	} else {
-		m_ui->name->show();
-	}
+	m_ui->name->setVisible(!toggled);
+	m_ui->delBtn->setVisible(!toggled && m_deletable);
 }
 
 void ChannelWidget::setIsMainChannel(bool mainChannel)
@@ -353,4 +351,8 @@ void ChannelWidget::setIsMainChannel(bool mainChannel)
 		});
 	}
 }
-#include "moc_channel_widget.cpp"
+
+void ChannelWidget::setIsPhysicalChannel(bool physChannel)
+{
+	m_isPhysicalChannel = physChannel;
+}
