@@ -1,6 +1,13 @@
 #include "max14906.h"
 #include <gui/tool_view_builder.hpp>
 #include "src/swiot_logging_categories.h"
+#include "utils.h"
+
+#include <QMainWindow>
+#include <QDockWidget>
+#include <QLineEdit>
+
+#define MAX14906_POLLING_TIME 1000
 
 using namespace scopy::swiot;
 
@@ -21,7 +28,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 		this->setupDynamicUi(this);
 		this->connectSignalsAndSlots();
 
-		this->m_qTimer->setInterval(1000); // poll once every second
+		this->m_qTimer->setInterval(MAX14906_POLLING_TIME); // poll once every second
 		this->m_qTimer->setSingleShot(true);
 
 		this->initChannels();
@@ -149,19 +156,27 @@ void Max14906::initMonitorToolView() {
 	switch (m_channelControls.size()) {
 		case 4: {
 			DioDigitalChannel* digitalChannel = m_channelControls[3]->getDigitalChannel();
-			this->ui->gridLayout->addWidget(digitalChannel, 2, 2);
+			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
+
+			this->ui->gridLayout->addWidget(mainWindow, 2, 2);
 		}
 		case 3: {
 			DioDigitalChannel* digitalChannel = m_channelControls[2]->getDigitalChannel();
-			this->ui->gridLayout->addWidget(digitalChannel, 2, 0);
+			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
+
+			this->ui->gridLayout->addWidget(mainWindow, 2, 0);
 		}
 		case 2: {
 			DioDigitalChannel* digitalChannel = m_channelControls[1]->getDigitalChannel();
-			this->ui->gridLayout->addWidget(m_channelControls[1]->getDigitalChannel(), 0, 2);
+			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
+
+			this->ui->gridLayout->addWidget(mainWindow, 0, 2);
 		}
 		case 1: {
 			DioDigitalChannel* digitalChannel = m_channelControls[0]->getDigitalChannel();
-			this->ui->gridLayout->addWidget(digitalChannel, 0, 0);
+			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
+
+			this->ui->gridLayout->addWidget(mainWindow, 0, 0);
 		}
 		default: {
 			break;
@@ -233,6 +248,18 @@ QFrame *Max14906::createHLine(QWidget* parent) {
 	frame->setFixedWidth(2);
 
 	return frame;
+}
+
+QMainWindow *Max14906::createDockableMainWindow(const QString &title, DioDigitalChannel *digitalChannel, QWidget *parent) {
+	auto mainWindow = new QMainWindow(parent);
+	mainWindow->setCentralWidget(nullptr);
+	mainWindow->setWindowFlags(Qt::Widget);
+
+	auto dockWidget = DockerUtils::createDockWidget(mainWindow, digitalChannel, title);
+	DockerUtils::configureTopBar(dockWidget);
+
+	mainWindow->addDockWidget(Qt::TopDockWidgetArea, dockWidget);
+	return mainWindow;
 }
 
 #include "moc_max14906.cpp"
