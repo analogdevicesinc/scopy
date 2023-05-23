@@ -11,8 +11,9 @@ FaultsPage::FaultsPage(QWidget *parent) :
 {
 	ui->setupUi(this);
 
-	this->m_ad74413rFaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	this->m_max14906FaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	// needed for subsection separator resize
+	this->m_ad74413rFaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	this->m_max14906FaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	this->ui->mainVerticalLayout->insertWidget(0, this->m_ad74413rFaultsDevice);
 	this->ui->mainVerticalLayout->insertWidget(1, this->m_max14906FaultsDevice);
