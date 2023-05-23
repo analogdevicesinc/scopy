@@ -247,7 +247,7 @@ TimeDomainDisplayPlot::TimeDomainDisplayPlot(QWidget* parent, bool isdBgraph, un
   d_trigger_lines[1]->setXValue(0.0);
   d_trigger_lines[1]->setYValue(0.0);
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 8; i++) {
 	  d_zoomer.push_back(new TimeDomainDisplayZoomer(this->canvas()));
 	  d_zoomer[i]->setEnabled(false);
   }
