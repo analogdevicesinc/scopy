@@ -93,7 +93,6 @@ protected Q_SLOTS:
 	void onMobileScaleChanged();
 
 protected:
-
 	QRect d_surface;
 	QPoint d_anchor;     // sets which point of d_surface to point exactly to d_plotCoord. Default point is: top-left of d_surface (d_anchor = (0, 0))
 	QPointF d_plotCoord; // Position of symbol in plot coordinates
