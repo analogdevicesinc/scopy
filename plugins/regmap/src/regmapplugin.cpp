@@ -154,8 +154,7 @@ void REGMAPPlugin::initMetadata()
 	   "priority":3,
 	   "category":[
 	      "iio"
-       ],
-"exclude" : ["*"]
+       ]
 	}
 )plugin");
 }
