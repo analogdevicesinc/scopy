@@ -1,6 +1,7 @@
 #ifndef FAULTS_H
 #define FAULTS_H
 
+#include "pluginbase/toolmenuentry.h"
 #include "ui_swiotfaults.h"
 
 #include "faultspage.h"
@@ -14,7 +15,7 @@ namespace scopy::swiot {
 class Faults : public QWidget {
 	Q_OBJECT
 public:
-	explicit Faults(struct iio_context *ctx, QWidget *parent = nullptr);
+	explicit Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Faults() override;
 
 	void getAd74413rFaultsNumeric();
@@ -47,6 +48,8 @@ private:
 
 	scopy::gui::ToolView *m_toolView{};
 	FaultsPage *m_faultsPage{};
+
+	ToolMenuEntry *m_tme;
 };
 }
 #endif // FAULTS_H
