@@ -6,10 +6,13 @@
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
 
+using namespace scopy;
 using namespace scopy::swiot;
 
-Ad74413r::Ad74413r(iio_context *ctx, QVector<QString> chnlsFunc, QWidget* parent):
+Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
+		   QVector<QString> chnlsFunc, QWidget* parent):
 	QWidget(parent)
+      ,m_tme(tme)
       ,m_swiotAdLogic(nullptr), m_iioDev(nullptr)
       ,m_widget(parent), m_readerThread(nullptr)
 {
@@ -91,6 +94,8 @@ void Ad74413r::setupConnections()
 	//general settings connections
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
+
+	connect(m_tme, &ToolMenuEntry::runToggled, m_toolView->getRunBtn(), &QPushButton::setChecked);
 }
 
 void Ad74413r::initMonitorToolView()
@@ -268,16 +273,23 @@ void Ad74413r::onOffsetHdlSelected(int hdlIdx, bool selected)
 void Ad74413r::onRunBtnPressed()
 {
 	Q_EMIT activateExportButton();
-	if (m_toolView->getRunBtn()->isChecked()) {
+	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
+	if (runBtnChecked) {
 		m_samplingFreqOptions->setEnabled(false);
 		verifyChnlsChanges();
 		if (!m_readerThread->isRunning()) {
 			m_plotHandler->resetPlotParameters();
 			m_readerThread->start();
 		}
+		if (!m_tme->running()) {
+			m_tme->setRunning(runBtnChecked);
+		}
 	} else {
 		m_samplingFreqOptions->setEnabled(true);
 		m_readerThread->requestInterruption();
+		if (m_tme->running()) {
+			m_tme->setRunning(runBtnChecked);
+		}
 	}
 }
 
