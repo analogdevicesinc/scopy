@@ -11,9 +11,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_backButton(Max14906::createBackButton()),
 	m_qTimer(new QTimer(this)),
 	m_toolView(nullptr),
-	m_readerThread(new ReaderThread(false)),
-	m_customColGrid(new FlexGridLayout(4, this)),
-	m_tme(tme)
+	m_readerThread(new ReaderThread(false))
 {
 	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
 	if (iio_device_find_attr(device0, "back")) {
@@ -21,6 +19,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 
 		this->ui->setupUi(this);
 		this->setupDynamicUi(this);
+		this->connectSignalsAndSlots();
 
 		this->m_qTimer->setInterval(1000); // poll once every second
 		this->m_qTimer->setSingleShot(true);
@@ -28,7 +27,6 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 		this->initChannels();
 		this->initMonitorToolView();
 		this->ui->mainLayout->addWidget(m_toolView);
-		this->connectSignalsAndSlots();
 	} else {
 		qInfo(CAT_SWIOT_MAX14906) << "Could not initialize SWIOT MAX14906, the device seems to be in config mode.";
 	}
@@ -49,12 +47,11 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-	this->m_customColGrid = new FlexGridLayout(4, this); // 4 max channels
+//	this->m_customColGrid = new FlexGridLayout(4, this); // 4 max channels
+//	this->m_grid->setLayout(new QGridLayout(m_grid));
 
-	this->m_toolView->addFixedCentralWidget(m_customColGrid, 0, 0, 0, 0);
-
+	this->m_toolView->addFixedCentralWidget(this->ui->grid, 0, 0);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
-
 	this->m_toolView->addTopExtraWidget(m_backButton);
 }
 
@@ -145,10 +142,41 @@ void Max14906::timerChanged(double value) {
 }
 
 void Max14906::initMonitorToolView() {
-	for (int i = 0; i < this->m_channelControls.size(); ++i) {
-		this->m_customColGrid->addQWidgetToList(this->m_channelControls[i]->getDigitalChannel());
-		this->m_customColGrid->addWidget(i);
+	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 0);
+//	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 1);
+	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 2);
+
+	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createHLine(this->ui->grid), 0, 1);
+	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createHLine(this->ui->grid), 2, 1);
+
+	// there can only be 4 channels, so we position them accordingly
+	switch (m_channelControls.size()) {
+		case 4: {
+			DioDigitalChannel* digitalChannel = m_channelControls[3]->getDigitalChannel();
+			this->ui->gridLayout->addWidget(digitalChannel, 2, 2);
+		}
+		case 3: {
+			DioDigitalChannel* digitalChannel = m_channelControls[2]->getDigitalChannel();
+			this->ui->gridLayout->addWidget(digitalChannel, 2, 0);
+		}
+		case 2: {
+			DioDigitalChannel* digitalChannel = m_channelControls[1]->getDigitalChannel();
+			this->ui->gridLayout->addWidget(m_channelControls[1]->getDigitalChannel(), 0, 2);
+		}
+		case 1: {
+			DioDigitalChannel* digitalChannel = m_channelControls[0]->getDigitalChannel();
+			this->ui->gridLayout->addWidget(digitalChannel, 0, 0);
+		}
+		default: {
+			break;
+		}
 	}
+	this->ui->gridLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 0);
+
+//	for (int i = 0; i < this->m_channelControls.size(); ++i) {
+//		this->m_customColGrid->addQWidgetToList(this->m_channelControls[i]->getDigitalChannel());
+//		this->m_customColGrid->addWidget(i);
+//	}
 
 	setUpdatesEnabled(true);
 }
@@ -192,6 +220,28 @@ QPushButton *Max14906::createBackButton() {
 	backButton->setProperty("blue_button", QVariant(true));
 	backButton->setText("Back");
 	return backButton;
+}
+
+QFrame *Max14906::createVLine(QWidget* parent) {
+	auto *frame = new QFrame(parent);
+	frame->setFrameShape(QFrame::VLine);
+	frame->setFrameShadow(QFrame::Sunken);
+	frame->setStyleSheet("background-color: grey;");
+	frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	frame->setFixedHeight(2);
+
+	return frame;
+}
+
+QFrame *Max14906::createHLine(QWidget* parent) {
+	auto *frame = new QFrame(parent);
+	frame->setFrameShape(QFrame::HLine);
+	frame->setFrameShadow(QFrame::Sunken);
+	frame->setStyleSheet("background-color: grey;");
+	frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	frame->setFixedWidth(2);
+
+	return frame;
 }
 
 #include "moc_max14906.cpp"
