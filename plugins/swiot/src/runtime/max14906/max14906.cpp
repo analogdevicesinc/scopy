@@ -47,9 +47,6 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-//	this->m_customColGrid = new FlexGridLayout(4, this); // 4 max channels
-//	this->m_grid->setLayout(new QGridLayout(m_grid));
-
 	this->m_toolView->addFixedCentralWidget(this->ui->grid, 0, 0);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 	this->m_toolView->addTopExtraWidget(m_backButton);
@@ -137,13 +134,12 @@ void Max14906::singleButtonToggled() {
 
 void Max14906::timerChanged(double value) {
 	for (auto & channelControl : this->m_channelControls) {
-		channelControl->getDigitalChannel()->updateTimeScale(0, value);
+		channelControl->getDigitalChannel()->updateTimeScale(value);
 	}
 }
 
 void Max14906::initMonitorToolView() {
 	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 0);
-//	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 1);
 	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 2);
 
 	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createHLine(this->ui->grid), 0, 1);
@@ -172,11 +168,6 @@ void Max14906::initMonitorToolView() {
 		}
 	}
 	this->ui->gridLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 0);
-
-//	for (int i = 0; i < this->m_channelControls.size(); ++i) {
-//		this->m_customColGrid->addQWidgetToList(this->m_channelControls[i]->getDigitalChannel());
-//		this->m_customColGrid->addWidget(i);
-//	}
 
 	setUpdatesEnabled(true);
 }
