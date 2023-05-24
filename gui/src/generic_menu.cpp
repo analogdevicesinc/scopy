@@ -1,5 +1,4 @@
 #include <QVBoxLayout>
-
 #include "generic_menu.hpp"
 
 using namespace scopy::gui;
@@ -71,4 +70,9 @@ void GenericMenu::hideEvent(QHideEvent *)
 void GenericMenu::showEvent(QShowEvent *)
 {
     Q_EMIT menuVisibilityChanged(true);
+}
+
+void GenericMenu::addNewHeaderWidget(QWidget *widget)
+{
+	m_menuHeader->addNewHeaderWidget(widget);
 }
