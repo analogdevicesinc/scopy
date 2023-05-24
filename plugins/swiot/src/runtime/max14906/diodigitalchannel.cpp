@@ -10,26 +10,20 @@ DioDigitalChannel::DioDigitalChannel(const QString& deviceName, const QString& d
 	m_deviceType(deviceType) {
 
 	this->ui->setupUi(this);
+	this->connectSignalsAndSlots();
 
 	this->ui->m_channelName->setText(deviceName);
 	this->ui->m_channelType->setText(deviceType);
 
-        // shrink pixmap for better looks
-        m_pixmapSize = QPixmap(":/swiot/ic_hi_snow.svg").size() - QSize(2, 2);
+	this->ui->customSwitch->setOnText("1");
+	this->ui->customSwitch->setOffText("0");
 
-        m_highSnow = QPixmap(":/swiot/ic_hi_snow.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
-        m_highGray = QPixmap(":/swiot/ic_hi_gray.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
-        m_lowSnow = QPixmap(":/swiot/ic_lo_snow.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
-        m_lowGray = QPixmap(":/swiot/ic_lo_gray.svg").scaled(m_pixmapSize, Qt::KeepAspectRatio);
-
-	this->ui->customSwitch->setOn(m_highSnow);
-	this->ui->customSwitch->setOff(m_lowGray);
-
-	if (deviceType == "input") {
+	if (deviceType == "INPUT") {
 		this->ui->customSwitch->setVisible(false);
 	}
 
 	this->ui->sismograph->setPlotAxisXTitle(""); // clear title
+	this->ui->sismograph->setPlotAxisYTitle(""); // clear title
 	this->ui->sismograph->setAxisScale(0, 0, 1, 1); // y axis
 	this->ui->sismograph->setAutoscale(false);
 	this->ui->sismograph->setColor(Qt::red);
@@ -37,8 +31,9 @@ DioDigitalChannel::DioDigitalChannel(const QString& deviceName, const QString& d
 	this->ui->sismograph->updateYScale(10, 0);
         this->ui->sismograph->setUpdatesEnabled(true);
 
-	this->connectSignalsAndSlots();
 	this->ui->lcdNumber->setPrecision(0);
+
+	this->ui->modeLabel->setText(deviceType.toLower() + " mode");
 }
 
 DioDigitalChannel::~DioDigitalChannel() {
@@ -48,13 +43,6 @@ DioDigitalChannel::~DioDigitalChannel() {
 void DioDigitalChannel::connectSignalsAndSlots() {
 	connect(this->ui->customSwitch, &CustomSwitch::toggled, this, [this] (){
                 bool isChecked = this->ui->customSwitch->isChecked();
-                if (isChecked) { // swap the icons
-                        this->ui->customSwitch->setOn(m_highSnow);
-                        this->ui->customSwitch->setOff(m_lowGray);
-                } else {
-                        this->ui->customSwitch->setOn(m_highGray);
-                        this->ui->customSwitch->setOff(m_lowSnow);
-                }
 
 		Q_EMIT this->outputValueChanged(isChecked);
 	});
