@@ -1,6 +1,7 @@
 #ifndef MAX14906TOOL_H
 #define MAX14906TOOL_H
 
+#include "pluginbase/toolmenuentry.h"
 #include "ui_swiotmax14906.h"
 #include "diocontroller.h"
 #include "diodigitalchannelcontroller.h"
@@ -17,7 +18,7 @@ class DioController;
 class Max14906 : public QWidget {
 	Q_OBJECT
 public:
-	explicit Max14906(struct iio_context *ctx, QWidget *parent = nullptr);
+	explicit Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Max14906() override;
 
 Q_SIGNALS:
@@ -49,6 +50,8 @@ private:
 
 	ReaderThread *m_readerThread;
 	QMap<int, DioDigitalChannelController*> m_channelControls;
+
+	ToolMenuEntry *m_tme;
 };
 }
 #endif // MAX14906TOOL_H

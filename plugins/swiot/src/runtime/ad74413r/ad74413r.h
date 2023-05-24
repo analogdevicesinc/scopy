@@ -4,6 +4,7 @@
 #include <gui/tool_view.hpp>
 #include <qwidget.h>
 #include "bufferlogic.h"
+#include "pluginbase/toolmenuentry.h"
 #include "src/runtime/readerthread.h"
 #include "buffermenucontroller.h"
 #include <gui/channel_manager.hpp>
@@ -30,8 +31,8 @@ namespace swiot {
 class Ad74413r : public QWidget {
 	Q_OBJECT
 public:
-	explicit Ad74413r(iio_context *ctx = nullptr, QVector<QString> chnlsFunc = {},
-			  QWidget *parent = nullptr);
+	explicit Ad74413r(iio_context *ctx = nullptr, ToolMenuEntry *tme = 0,
+			  QVector<QString> chnlsFunc = {}, QWidget *parent = nullptr);
 
 	~Ad74413r();
 
@@ -82,6 +83,7 @@ private:
 	scopy::gui::ToolView *m_toolView;
 	QWidget *m_widget;
 	QPushButton *m_backBtn;
+	ToolMenuEntry *m_tme;
 
 	QVector<BufferMenuController *> m_controllers;
 	QVector<QString> m_chnlsFunction;

@@ -3,7 +3,6 @@
 #include "configcontroller.h"
 #include "configmenu.h"
 #include "configmodel.h"
-#include "core/toolmenuitem.h"
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
 #include <QVBoxLayout>
@@ -11,7 +10,7 @@
 using namespace scopy::swiot;
 
 SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent):
-        QWidget(parent)
+	QWidget(parent)
 {
 	m_funcAvailable.push_back(new QStringList());
 	m_funcAvailable.push_back(new QStringList());
