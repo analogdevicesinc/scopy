@@ -12,7 +12,6 @@ MenuHeader::MenuHeader(QWidget* parent)
 	, m_ui(new Ui::MenuHeader)
 {
 	m_ui->setupUi(this);
-
 	this->setEnableBtnVisible(false);
 }
 
@@ -38,3 +37,9 @@ void MenuHeader::setLineColor(const QColor* color)
 void MenuHeader::setEnableBtnVisible(bool visible) { m_ui->btnEnabled->setVisible(visible); }
 
 QPushButton* MenuHeader::getEnableBtn() { return m_ui->btnEnabled; }
+
+void MenuHeader::addNewHeaderWidget(QWidget *widget)
+{
+	m_ui->stackedWidget->addWidget(widget);
+	m_ui->stackedWidget->setCurrentWidget(widget);
+}
