@@ -37,10 +37,21 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 
 	this->m_type = buffer;
 
-	this->m_digitalChannel->setConfigModes(this->m_availableTypes);
+	this->m_digitalChannel->setConfigModes(&this->m_availableTypes);
 	this->m_digitalChannel->setSelectedConfigMode(QString::fromStdString(this->m_type));
 
-	QObject::connect(this->m_digitalChannel->getUi()->configModes, QOverload<int>::of(&QComboBox::currentIndexChanged),
+	if (deviceType == "OUTPUT") {
+		bool valueRead;
+		int res = iio_channel_attr_read_bool(channel, "raw", &valueRead);
+
+		if (res < 0) {
+			qCritical(CAT_SWIOT_MAX14906) << "Could not read initial channel raw value, error code:" << readResult;
+		} else {
+			m_digitalChannel->ui->customSwitch->setChecked(valueRead);
+		}
+	}
+
+	QObject::connect(this->m_digitalChannel->ui->configModes, QOverload<int>::of(&QComboBox::currentIndexChanged),
 			 [&](int index){
 		this->writeType();
 	});
@@ -53,16 +64,14 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 	});
 }
 
-DioDigitalChannelController::~DioDigitalChannelController() {
-
-}
+DioDigitalChannelController::~DioDigitalChannelController() = default;
 
 DioDigitalChannel *DioDigitalChannelController::getDigitalChannel() const {
 	return m_digitalChannel;
 }
 
 void DioDigitalChannelController::writeType() {
-	QString s = this->m_digitalChannel->getUi()->configModes->currentText();
+	QString s = this->m_digitalChannel->ui->configModes->currentText();
 	this->m_type = s.toStdString();
 	qDebug(CAT_SWIOT_MAX14906) << "Writing <" << s << "> to channel <" << this->m_channelName << "> ";
 
