@@ -2,7 +2,7 @@
 #define SCOPY_DIODIGITALCHANNEL_H
 
 #include <QWidget>
-#include "ui_swiotdigitalchannel.h"
+#include "ui_diodigitalchannel.h"
 #include <gui/generic_menu.hpp>
 
 namespace scopy::swiot {
@@ -34,9 +34,6 @@ private:
 	Ui::DioDigitalChannel *ui;
 	QString m_deviceName;
 	QString m_deviceType;
-
-        QPixmap m_highSnow, m_highGray, m_lowSnow, m_lowGray;
-        QSize m_pixmapSize;
 
 	std::vector<std::string> m_configModes;
 
