@@ -20,14 +20,30 @@ SwiotRuntime::~SwiotRuntime()
 
 bool SwiotRuntime::isRuntimeCtx()
 {
-	bool runtime = false;
-	for (const auto &key : m_iioDevices.keys()) {
-		if (iio_device_find_attr(m_iioDevices[key], "back")) {
-			runtime = true;
-			break;
+	iio_device* swiotDevice = iio_context_find_device(m_iioCtx, "swiot");
+	if (swiotDevice) {
+		const char* modeAttribute = iio_device_find_attr(swiotDevice, "mode");
+		if (modeAttribute) {
+			char mode[64];
+			ssize_t result = iio_device_attr_read(swiotDevice, "mode", mode, 64);
+
+			if (result < 0) {
+				qCritical(CAT_SWIOT) << R"(Critical error: could not read mode attribute, error code:)" << result;
+			}
+
+			if (strcmp(mode, "runtime") == 0) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			qCritical(CAT_SWIOT) << R"(Critical error: did not find "mode" attribute in the "swiot" device)";
 		}
+	} else {
+		qCritical(CAT_SWIOT) << R"(Critical error: did not find "swiot" device in the context)";
 	}
-	return runtime;
+
+	return false;
 }
 
 void SwiotRuntime::setContext(iio_context *ctx)
