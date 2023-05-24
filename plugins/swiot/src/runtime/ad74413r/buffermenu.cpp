@@ -332,7 +332,7 @@ void CurrentOutMenu::connectSignalsToSlots()
 QString CurrentOutMenu::getInfoMessage()
 {
 	QString infoMessage = "\"" + m_chnlFunction + "\" configuration generates 2 context channels.\n" +
-			"One of them is an input buffer capable channel (volage_in)\n" +
+			"One of them is an input buffer capable channel (voltage_in)\n" +
 			"which is related to the plot and the other one is an\n" +
 			"output channel whose attributes can be changed from\n" +
 			"this menu.";
