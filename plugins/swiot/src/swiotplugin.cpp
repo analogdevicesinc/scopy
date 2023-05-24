@@ -75,17 +75,9 @@ bool SWIOTPlugin::compatible(QString m_param, QString category)
 		return false;
 	}
 
-	unsigned int devices_count = iio_context_get_devices_count(ctx);
-	if (devices_count >= 2) {
-		iio_device* device0 = iio_context_find_device(ctx, AD_NAME);
-		iio_device* device1 = iio_context_find_device(ctx, MAX_NAME);
-		if (device0 && device1) {
-			ret = true;
-		} else {
-			ret = false;
-		}
-	} else {
-		ret = false;
+	iio_device* swiotDevice = iio_context_find_device(ctx, "swiot");
+	if (swiotDevice) {
+		ret = true;
 	}
 
 	cp->close(m_param);
