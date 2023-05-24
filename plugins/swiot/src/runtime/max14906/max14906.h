@@ -2,7 +2,7 @@
 #define MAX14906TOOL_H
 
 #include "pluginbase/toolmenuentry.h"
-#include "ui_swiotmax14906.h"
+#include "ui_max14906.h"
 #include "diocontroller.h"
 #include "diodigitalchannelcontroller.h"
 #include "src/runtime/readerthread.h"
