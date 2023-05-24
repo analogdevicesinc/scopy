@@ -9,6 +9,7 @@
 #include "src/config/swiotconfig.h"
 #include "src/runtime/swiotruntime.h"
 #include "src/swiot_logging_categories.h"
+#include "swiotinfopage.h"
 #include <iioutil/contextprovider.h>
 
 
@@ -22,16 +23,20 @@ void SWIOTPlugin::preload()
 
 bool SWIOTPlugin::loadPage()
 {
-	infoui = new Ui::SWIOTInfoPage();
 	m_page = new QWidget();
-	infoui->setupUi(m_page);
-	connect(infoui->pushButton,&QPushButton::clicked, this, [this] (){
+	m_page->setLayout(new QVBoxLayout(m_page));
+	m_page->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	m_infoPage = new swiot::SwiotInfoPage(m_page);
+	m_page->layout()->addWidget(m_infoPage);
+	connect(m_infoPage->getCtxAttrsButton(), &QPushButton::clicked, this, [this] (){
 		auto &&cp = ContextProvider::GetInstance();
 		iio_context* ctx = cp->open(m_param);
 		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
 		cp->close(m_param);
-		infoui->textBrowser->setText(hw_serial);
+		m_infoPage->setText(hw_serial);
 	});
+	m_page->ensurePolished();
+
 	return true;
 }
 
@@ -52,7 +57,7 @@ void SWIOTPlugin::loadToolList()
 
 void SWIOTPlugin::unload()
 {
-	delete infoui;
+	delete m_infoPage;
 }
 
 bool SWIOTPlugin::compatible(QString m_param, QString category)
