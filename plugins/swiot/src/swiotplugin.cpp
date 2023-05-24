@@ -202,7 +202,8 @@ void SWIOTPlugin::initMetadata()
 	   "priority":3,
 	   "category":[
 	      "iio"
-	   ]
+	   ],
+	   "exclude":["*", "!debuggerplugin", "!dataloggerplugin", "!regmapplugin"]
 	}
 )plugin");
 }
