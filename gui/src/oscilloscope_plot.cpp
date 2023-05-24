@@ -30,6 +30,7 @@
 #include <QLabel>
 #include <QThread>
 #include <QDebug>
+#include <QSizePolicy>
 
 #include <algorithm>
 
@@ -94,11 +95,14 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	zoomBaseUpdate();
 
 	/* Adjacent areas */
-	d_topWidget = new QWidget(this);
+	d_topWidget = new QStackedWidget(this);
 	d_topGateHandlesArea = new GateHandlesArea(this->canvas());
 
 	d_topWidget->setStyleSheet("QWidget {background-color: transparent}");
 	d_topWidget->setMinimumHeight(50);
+	d_topWidget->setSizePolicy(QSizePolicy::Fixed,
+				   QSizePolicy::Fixed);
+
 	d_topGateHandlesArea->setMinimumHeight(20);
 	d_topGateHandlesArea->setLargestChildWidth(80);
 	d_leftHandlesArea->setMinimumWidth(50);
@@ -123,6 +127,9 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	// Sample Rate and Buffer Size
 	d_sampleRateLabel = new QLabel("", this);
 
+	// Status Widget
+	m_statusWidget = new QWidget();
+
 	// Trigger State
 	d_triggerStateLabel = new QLabel(this);
 
@@ -134,12 +141,11 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	d_maxBufferError->setWordWrap(true);
 
 	// Top area layout
-	QHBoxLayout *topWidgetLayout = new QHBoxLayout(d_topWidget);
+	QWidget *oldStatusWidget = new QWidget();
+	QHBoxLayout *topWidgetLayout = new QHBoxLayout(oldStatusWidget);
 	topWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
-		0, d_rightHandlesArea->minimumWidth(), 5);
-
+						      0, d_rightHandlesArea->minimumWidth(), 5);
 	topWidgetLayout->setSpacing(10);
-
 	topWidgetLayout->insertWidget(0, d_timeBaseLabel, 0, Qt::AlignLeft |
 		Qt::AlignBottom);
 	topWidgetLayout->insertWidget(1, d_sampleRateLabel, 0, Qt::AlignLeft |
@@ -152,9 +158,15 @@ CapturePlot::CapturePlot(QWidget *parent,  bool isdBgraph, unsigned int xNumDivs
 	QSpacerItem *spacerItem = new QSpacerItem(0, 0, QSizePolicy::Expanding,
 		QSizePolicy::Fixed);
 	topWidgetLayout->insertSpacerItem(2, spacerItem);
+	oldStatusWidget->setLayout(topWidgetLayout);
 
-	d_topWidget->setLayout(topWidgetLayout);
+	d_topWidget->addWidget(oldStatusWidget);
+	d_topWidget->addWidget(m_statusWidget);
 
+	QHBoxLayout *stackWidgetLayout = new QHBoxLayout(d_topWidget);
+	stackWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
+					      0, d_rightHandlesArea->minimumWidth(), 5);
+	d_topWidget->setLayout(stackWidgetLayout);
 
 	/* Time trigger widget */
 	d_timeTriggerBar = new VertBar(this);
@@ -530,6 +542,19 @@ void CapturePlot::onVCursor2Moved(double value)
 
 	value_v2 = value;
 	Q_EMIT cursorReadoutsChanged(d_cursorReadoutsText);
+}
+
+void CapturePlot::setStatusWidget(QWidget *newStatusWidget)
+{
+	if (!m_statusWidget->layout()) {
+		QHBoxLayout *statusWidgetLayout = new QHBoxLayout(m_statusWidget);
+		statusWidgetLayout->setSpacing(0);
+		statusWidgetLayout->setContentsMargins(d_leftHandlesArea->minimumWidth(),
+							      0, d_rightHandlesArea->minimumWidth(), 5);
+		statusWidgetLayout->insertWidget(0, newStatusWidget, 0, Qt::AlignLeft |
+						 Qt::AlignBottom);
+		d_topWidget->setCurrentIndex(1);
+	}
 }
 
 QList<RoundedHandleV *> CapturePlot::getOffsetHandles() const
@@ -1049,9 +1074,11 @@ void CapturePlot::updateHandleAreaPadding(bool enabled)
 			d_rightHandlesArea->setBottomPadding(50);
 
 		int topPadding = d_gatingEnabled ? d_topGateHandlesArea->height() : 0;
+		topPadding += (d_topWidget->height() - 50);
 		d_leftHandlesArea->setTopPadding(50 + topPadding);
-		d_rightHandlesArea->setTopPadding(50 + topPadding);
-
+		if (d_gatingEnabled) {
+			d_rightHandlesArea->setTopPadding(50 + topPadding);
+		}
 		QMargins margins = d_topWidget->layout()->contentsMargins();
 		margins.setLeft(d_leftHandlesArea->minimumWidth());
 		d_topWidget->layout()->setContentsMargins(margins);
