@@ -11,8 +11,8 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 	m_channelType(deviceType),
 	m_channel(channel)
 {
-	this->m_iioAttrAvailableTypes = (this->m_channelType == "input") ? "IEC_type_available" : "do_mode_available";
-	this->m_iioAttrType = (this->m_channelType == "input") ? "IEC_type" : "do_mode";
+	this->m_iioAttrAvailableTypes = (this->m_channelType == "INPUT") ? "IEC_type_available" : "do_mode_available";
+	this->m_iioAttrType = (this->m_channelType == "INPUT") ? "IEC_type" : "do_mode";
 
 	char buffer[ATTR_BUFFER_LEN];
 	ssize_t readResult = iio_channel_attr_read(this->m_channel, this->m_iioAttrAvailableTypes.c_str(), buffer, ATTR_BUFFER_LEN);
