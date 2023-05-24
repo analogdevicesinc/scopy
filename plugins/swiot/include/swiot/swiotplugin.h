@@ -12,7 +12,7 @@
 #include "src/runtime/swiotruntime.h"
 #include "QLabel"
 #include "src/swiotcontroller.h"
-#include "ui_swiotInfoPage.h"
+#include "src/swiotinfopage.h"
 
 namespace scopy::swiot {
 class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
@@ -37,7 +37,14 @@ private:
 	void cleanAfterLastContext();
 	void setupToolList();
 
-	Ui::SWIOTInfoPage *infoui;
+	SwiotInfoPage* m_infoPage;
+//	Ui::SWIOTInfoPage *infoui;
+
+	QWidget *config;
+	QWidget *adtool;
+    QWidget *faults;
+    QWidget *maxtool;
+
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
 	QVector<QString> m_chnlsFunction{"current_out", "high_z", "high_z", "high_z",
