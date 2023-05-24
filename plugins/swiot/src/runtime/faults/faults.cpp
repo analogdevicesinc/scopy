@@ -13,16 +13,17 @@ using namespace scopy::swiot;
 #define POLLING_INTERVAL 1000
 #define FAULT_CHANNEL_NAME "voltage"
 
-Faults::Faults(struct iio_context *ctx, QWidget *parent) :
+Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	QWidget(parent),
 	ctx(ctx),
 	ui(new Ui::Faults),
 	timer(new QTimer()),
-	ad74413r_numeric(0),
-	max14906_numeric(0),
-	m_backButton(Faults::createBackButton()),
-	thread(new QThread(this)) {
-
+    ad74413r_numeric(0),
+    max14906_numeric(0),
+    m_backButton(Faults::createBackButton()),
+	thread(new QThread(this)),
+	m_tme(tme)
+{
 	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
         const char* backAttr = iio_device_find_attr(device0, "back");
         if (backAttr != nullptr) {
@@ -82,6 +83,8 @@ void Faults::connectSignalsAndSlots() {
 		qDebug(CAT_SWIOT_FAULTS) << "Faults reader thread started";
 		this->timer->start(POLLING_INTERVAL);
 	});
+
+	QObject::connect(this->m_tme, &ToolMenuEntry::runToggled, this->m_toolView->getRunBtn(), &QPushButton::setChecked);
 }
 
 void Faults::getAd74413rFaultsNumeric()
@@ -167,11 +170,17 @@ void Faults::runButtonClicked() {
 	if (this->m_toolView->getRunBtn()->isChecked()) {
 		qDebug(CAT_SWIOT_FAULTS) << "thread started";
 		this->thread->start();
+		if (!this->m_tme->running()) {
+			this->m_tme->setRunning(true);
+		}
 	} else {
 		if (this->thread->isRunning()) {
 			qDebug(CAT_SWIOT_FAULTS) << "thread stopped";
 			this->thread->quit();
 			this->thread->wait();
+		}
+		if (this->m_tme->running()) {
+			this->m_tme->setRunning(false);
 		}
 		this->timer->stop();
 	}

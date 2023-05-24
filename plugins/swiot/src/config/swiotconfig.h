@@ -1,5 +1,6 @@
 #ifndef SWIOTCONFIG_H
 #define SWIOTCONFIG_H
+
 #define AD_NAME "ad74413r"
 #define MAX_NAME "max14906"
 
