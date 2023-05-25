@@ -2,90 +2,120 @@
 #include "qdebug.h"
 #include <iio.h>
 #include <QMap>
+#include <utility>
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
 
-ConfigModel::ConfigModel(struct iio_channel* adChannel, struct iio_channel* maxChannel)
+ConfigModel::ConfigModel(struct iio_device* device, int channelId) :
+	m_device(device),
+	m_channelId(channelId)
 {
-	m_channels.push_back(adChannel);
-	m_channels.push_back(maxChannel);
+	std::string attributePrefix = "ch" + std::to_string(m_channelId);
 
-	initChnlAttrValues(adChannel);
-	initChnlAttrValues(maxChannel);
-
+	m_enableAttribute = attributePrefix + "_enable";
+	m_functionAttribute = attributePrefix + "_function";
+	m_functionAvailableAttribute = attributePrefix + "_function_available";
+	m_deviceAttribute = attributePrefix + "_device";
+	m_deviceAvailableAttribute = attributePrefix + "_device_available";
 }
 
 ConfigModel::~ConfigModel()
 {}
 
-void ConfigModel::initChnlAttrValues(struct iio_channel* iioChnl)
-{
-	if (iioChnl) {
-		QMap<QString, QStringList> chnlAttr;
-		int chnlAttrNumber = iio_channel_get_attrs_count(iioChnl);
-		QStringList attrValues;
-		for (int i = 0; i < chnlAttrNumber; i++) {
-			QString attrName(iio_channel_get_attr(iioChnl, i));
-			attrValues = readChnlAttr(iioChnl, attrName);
-			chnlAttr[attrName] = attrValues;
-			attrValues.clear();
-		}
-		m_attrValues.push_back(chnlAttr);
+QString ConfigModel::readEnabled() {
+	char buffer[16] = {0};
+	ssize_t res = iio_device_attr_read(m_device, m_enableAttribute.c_str(), buffer, 15);
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"enable\" on channel" << m_channelId << "error id ->" << res;
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from enable on channel" << m_channelId;
+		return {buffer};
+	}
 
+	return "0";
+}
+
+void ConfigModel::writeEnabled(const QString& enabled) {
+	ssize_t res = iio_device_attr_write(m_device, m_enableAttribute.c_str(), enabled.toStdString().c_str());
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"enable\", (" << enabled << ") on channel" << m_channelId << "error id ->" << res;
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Wrote value " << enabled << "in enable on channel" << m_channelId;
 	}
 }
 
-QStringList ConfigModel::readChnlAttr(struct iio_channel* iio_chnl, QString attrName)
-{
-	QStringList attrValues;
-	char* buffer = new char[500];
-	std::string s_attrName = attrName.toStdString();
-
-	int returnCode = iio_channel_attr_read(iio_chnl, s_attrName.c_str(), buffer, 499);
-
-	if (returnCode > 0) {
-		QString bufferValues(buffer);
-		attrValues = bufferValues.split(" ");
+QString ConfigModel::readDevice() {
+	char buffer[256] = {0};
+	ssize_t res = iio_device_attr_read(m_device, m_deviceAttribute.c_str(), buffer, 255);
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"device\" on channel" << m_channelId << "error id ->" << res;
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from device on channel" << m_channelId;
+		return {buffer};
 	}
 
-	delete[] buffer;
-	return attrValues;
+	return "0";
 }
 
-void ConfigModel::updateChnlAttributes(QVector<QMap<QString,QStringList>> newValues, QString attrName,
-				       int deviceIdx)
-{
-	QStringList value = newValues[deviceIdx].value(attrName);
-	if (value.size() == 1) {
-		QString attrVal = value.first();
-		std::string s_attrValue = attrVal.toStdString();
-		std::string s_attrName = attrName.toStdString();
-
-		if (m_channels[deviceIdx]) {
-			qDebug(CAT_SWIOT_CONFIG) <<QString::number(deviceIdx) + attrName + " before:" + readChnlAttr(m_channels[deviceIdx],attrName).front();
-			ssize_t retCode = iio_channel_attr_write(m_channels[deviceIdx],s_attrName.c_str(),s_attrValue.c_str());
-			if (retCode >= 0) {
-				m_attrValues[deviceIdx] = newValues[deviceIdx];
-			}
-			qDebug(CAT_SWIOT_CONFIG) << QString::number(deviceIdx) + attrName + " after:" + readChnlAttr(m_channels[deviceIdx],attrName).front();
-		}
+void ConfigModel::writeDevice(const QString& device) {
+	ssize_t res = iio_device_attr_write(m_device, m_deviceAttribute.c_str(), device.toStdString().c_str());
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"device\", (" << device << ")  on channel" << m_channelId << "error id ->" << res;
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Wrote value " << device << "in device on channel" << m_channelId;
 	}
 }
 
-QVector<QMap<QString, QStringList>> ConfigModel::getChnlsAttrValues()
-{
-	return m_attrValues;
+QString ConfigModel::readFunction() {
+	char buffer[256] = {0};
+	ssize_t res = iio_device_attr_read(m_device, m_functionAttribute.c_str(), buffer, 255);
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function\" on channel" << m_channelId << "error id ->" << res;
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from function on channel" << m_channelId;
+		return {buffer};
+	}
+
+	return "0";
 }
 
-QStringList ConfigModel::getActiveFunctions()
-{
-	QStringList func;
-	QStringList funcAttrNames = {"function_cfg", "function"};
-	if (m_attrValues.size() == funcAttrNames.size()) {
-		for (int i = 0; i < m_attrValues.size(); i++) {
-			func.push_back(m_attrValues[i][funcAttrNames[i]].first());
-		}
+void ConfigModel::writeFunction(const QString& function) {
+	ssize_t res = iio_device_attr_write(m_device, m_functionAttribute.c_str(), function.toStdString().c_str());
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"function\", (" << function << ")  on channel" << m_channelId << "error id ->" << res;
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Wrote value " << function << "in function on channel" << m_channelId;
 	}
-	return func;
 }
+
+QStringList ConfigModel::readDeviceAvailable() {
+	char buffer[512] = {0};
+	ssize_t res = iio_device_attr_read(m_device, m_deviceAvailableAttribute.c_str(), buffer, 511);
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"device available\" on channel" << m_channelId << "error id ->" << res;
+		return {};
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from device available on channel" << m_channelId;
+	}
+
+	QStringList result = QString(buffer).split(" ");
+	return result;
+}
+
+QStringList ConfigModel::readFunctionAvailable() {
+	char buffer[512] = {0};
+	ssize_t res = iio_device_attr_read(m_device, m_functionAvailableAttribute.c_str(), buffer, 511);
+	if (res < 0) {
+		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function available\" on channel" << m_channelId << "error id ->" << res;
+		return {};
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from function available on channel" << m_channelId;
+	}
+
+	QStringList result = QString(buffer).split(" ");
+	return result;
+}
+
+
+

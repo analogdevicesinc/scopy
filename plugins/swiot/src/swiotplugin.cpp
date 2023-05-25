@@ -107,18 +107,26 @@ void SWIOTPlugin::setupToolList()
 	m_swiotController->startPingTask();
 	m_runtime->setContext(ctx);
 
+	bool isRuntimeContext = m_runtime->isRuntimeCtx();
+
 	auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
 	auto ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
-	configTme->setTool(new swiot::SwiotConfig(ctx));
-	ad74413rTme->setTool(new swiot::Ad74413r(ctx, ad74413rTme, m_chnlsFunction));
-	max14906Tme->setTool(new swiot::Max14906(ctx, max14906Tme));
-	faultsTme->setTool(new swiot::Faults(ctx, faultsTme));
+	if (isRuntimeContext) {
+		QVector<QString> adConfigFunc = m_swiotController->getAd74413rChannelFunctions();
+		m_chnlsFunction = adConfigFunc;
 
-	connect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, [=](QVector<QStringList*> funcAvailable) {
-		QVector<QString> adConfigFunc = funcAvailable[0]->toVector();
+		ad74413rTme->setTool(new swiot::Ad74413r(ctx, ad74413rTme, m_chnlsFunction));
+		max14906Tme->setTool(new swiot::Max14906(ctx, max14906Tme));
+		faultsTme->setTool(new swiot::Faults(ctx, faultsTme));
+	} else {
+		configTme->setTool(new swiot::SwiotConfig(ctx));
+	}
+
+	connect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, [this]() {
+		QVector<QString> adConfigFunc = m_swiotController->getAd74413rChannelFunctions();
 		m_chnlsFunction = adConfigFunc;
 		m_swiotController->stopPingTask();
 		m_swiotController->startSwitchContextTask();
@@ -129,7 +137,7 @@ void SWIOTPlugin::setupToolList()
 
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(true);
-		if (!m_runtime->isRuntimeCtx()) {
+		if (!isRuntimeContext) {
 			if (tme->id().compare(CONFIG_TME_ID)) {
 				tme->setVisible(false);
 			}
@@ -143,9 +151,8 @@ void SWIOTPlugin::setupToolList()
 		}
 	}
 
-	if (!m_runtime->isRuntimeCtx()) {
+	if (!isRuntimeContext) {
 		Q_EMIT requestTool(configTme->id());
-
 	} else {
 		Q_EMIT requestTool(ad74413rTme->id());
 	}
@@ -198,11 +205,11 @@ void SWIOTPlugin::initMetadata()
 	loadMetadata(
 				R"plugin(
 	{
-	   "priority":3,
+	   "priority":100,
 	   "category":[
 	      "iio"
 	   ],
-	   "exclude":["*", "!debuggerplugin", "!dataloggerplugin", "!regmapplugin"]
+	   "exclude":["*", "!debuggerplugin", "!regmapplugin"]
 	}
 )plugin");
 }
