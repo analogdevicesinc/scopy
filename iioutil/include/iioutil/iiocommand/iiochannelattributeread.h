@@ -1,0 +1,47 @@
+#ifndef IIOCHANNELATTRIBUTEREAD_H
+#define IIOCHANNELATTRIBUTEREAD_H
+
+#include "command.h"
+#include <iio.h>
+
+namespace scopy {
+class SCOPY_IIOUTIL_EXPORT IioChannelAttributeRead : public Command {
+	Q_OBJECT
+public:
+	explicit IioChannelAttributeRead(struct iio_channel *channel,
+					const char *attribute,
+					 QObject *parent)
+		: m_channel(channel)
+		, m_attribute_name(attribute) {
+		this->setParent(parent);
+		m_cmdResult = new CommandResult();
+	}
+
+	virtual ~IioChannelAttributeRead() {
+		if (m_cmdResult->results) {
+			delete[] (char*)m_cmdResult->results;
+			m_cmdResult->results = nullptr;
+		}
+	}
+
+	virtual void execute() override {
+		Q_EMIT started(this);
+		if (!m_cmdResult->results) {
+			m_cmdResult->results = new char[m_maxAttrSize];
+		}
+		ssize_t ret = iio_channel_attr_read(m_channel, m_attribute_name,(char*)m_cmdResult->results, m_maxAttrSize);
+		m_cmdResult->errorCode = ret;
+		Q_EMIT finished(this);
+	}
+
+	char* getResult() {
+		return static_cast<char*>(m_cmdResult->results);
+	}
+private:
+	struct iio_channel *m_channel;
+	const char *m_attribute_name;
+	const ssize_t m_maxAttrSize = 1024;
+};
+}
+
+#endif // IIOCHANNELATTRIBUTEREAD_H
