@@ -18,26 +18,20 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	ctx(ctx),
 	ui(new Ui::Faults),
 	timer(new QTimer()),
-    ad74413r_numeric(0),
-    max14906_numeric(0),
-    m_backButton(Faults::createBackButton()),
+	ad74413r_numeric(0),
+	max14906_numeric(0),
+	m_backButton(Faults::createBackButton()),
 	thread(new QThread(this)),
 	m_tme(tme)
 {
-	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
-        const char* backAttr = iio_device_find_attr(device0, "back");
-        if (backAttr != nullptr) {
-                m_faultsPage = new FaultsPage(this);
+	struct iio_device *m_faultsDevice = iio_context_find_device(ctx, MAX_NAME);
+	m_faultsPage = new FaultsPage(this);
+	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
-		qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
+	ui->setupUi(this);
 
-		ui->setupUi(this);
-
-		this->setupDynamicUi(parent);
-		this->connectSignalsAndSlots();
-	} else {
-		qInfo(CAT_SWIOT_FAULTS) << "Could not initialize SWIOT faults page, the device seems to be in config mode.";
-	}
+	this->setupDynamicUi(parent);
+	this->connectSignalsAndSlots();
 }
 
 Faults::~Faults() {

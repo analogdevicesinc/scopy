@@ -20,8 +20,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_toolView(nullptr),
 	m_readerThread(new ReaderThread(false))
 {
-	iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
-	if (iio_device_find_attr(device0, "back")) {
+		iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
 		qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
 
 		this->ui->setupUi(this);
@@ -34,9 +33,6 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 		this->initChannels();
 		this->initMonitorToolView();
 		this->ui->mainLayout->addWidget(m_toolView);
-	} else {
-		qInfo(CAT_SWIOT_MAX14906) << "Could not initialize SWIOT MAX14906, the device seems to be in config mode.";
-	}
 }
 
 void Max14906::setupDynamicUi(QWidget *parent) {

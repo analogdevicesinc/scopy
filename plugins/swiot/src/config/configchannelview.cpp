@@ -1,162 +1,117 @@
 #include "configchannelview.h"
+#include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
 
-ConfigChannelView::ConfigChannelView(int chnlIdx, QWidget *parent) :
+ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent) :
 	QWidget(parent),
-	m_chnlIdx(chnlIdx),
-	m_ui(new Ui::ConfigChannelView)
+	channelLabel(new QLabel(this)),
+	deviceOptions(new QComboBox(this)),
+	functionOptions(new QComboBox(this)),
+	enabledCheckBox(new QCheckBox(this)),
+	m_channelIndex(channelIndex)
 {
-	m_ui->setupUi(this);
-	m_ui->chnlLabel->setText(QString::fromStdString("Channel ") + QString::number(m_chnlIdx));
-	connectSignalsToSlots();
+	this->enabledCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	this->channelLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	channelLabel->setText(QString::fromStdString("Channel ") + QString::number(m_channelIndex + 1));
+	enabledCheckBox->toggled(true);
+	this->connectSignalsAndSlots();
 }
 
 ConfigChannelView::~ConfigChannelView()
 {
-	delete m_ui;
-}
-
-void ConfigChannelView::setChnlsAttr(QVector<QMap<QString, QStringList>> values)
-{
-	for (int i = 0; i < values.size(); i++) {
-		m_chnlsAttr.push_back(values[i]);
-	}
-	if (m_chnlsAttr.size() == 2) {
-		setAvailableOptions(m_ui->adOptions,QString(AD_FUNC_ATTR_NAME) + QString("_available"), m_chnlsAttr[AD_INDEX]);
-		m_adHighZIdx = getHighZIdx(m_ui->adOptions);
-		m_ui->adOptions->setCurrentIndex(m_adHighZIdx);
-
-		setAvailableOptions(m_ui->maxOptions1, QString(MAX_FUNC_ATTR_NAME) + QString("_available"), m_chnlsAttr[MAX_INDEX]);
-		m_maxHighZIdx = getHighZIdx(m_ui->maxOptions1);
-		m_ui->maxOptions1->setCurrentIndex(m_maxHighZIdx);
-
-		setAvailableOptions(m_ui->maxOptions2, QString(MAX_IEC_ATTR_NAME) + QString("_available"), m_chnlsAttr[MAX_INDEX]);
-	}
 
 }
 
-void ConfigChannelView::setAvailableOptions(QComboBox* list, QString attrName,
-					    QMap<QString, QStringList> chnlAttr)
+void ConfigChannelView::connectSignalsAndSlots()
 {
-	QStringList availableValues = chnlAttr[attrName];
-	for (const auto& value : availableValues) {
-		list->addItem(value);
+	QObject::connect(enabledCheckBox, &QCheckBox::stateChanged, this, [this] () {
+		this->setChannelEnabled(enabledCheckBox->isChecked());
+		Q_EMIT enabledChanged(m_channelIndex, enabledCheckBox->isChecked());
+	});
+
+	QObject::connect(deviceOptions, &QComboBox::textActivated, this, [this] (const QString& text) {
+		Q_EMIT deviceChanged(m_channelIndex, text);
+	});
+
+	QObject::connect(functionOptions, &QComboBox::textActivated, this, [this] (const QString& text) {
+		Q_EMIT functionChanged(m_channelIndex, text);
+	});
+}
+
+bool ConfigChannelView::isChannelEnabled() const {
+	return m_channelEnabled;
+}
+
+void ConfigChannelView::setChannelEnabled(bool mChannelEnabled) {
+	m_channelEnabled = mChannelEnabled;
+	enabledCheckBox->setChecked(m_channelEnabled);
+
+	if (m_channelEnabled) {
+		deviceOptions->setEnabled(true);
+		functionOptions->setEnabled(true);
+	} else {
+		deviceOptions->setEnabled(false);
+		functionOptions->setEnabled(false);
 	}
 }
 
-void ConfigChannelView::connectSignalsToSlots()
-{
-	connect(m_ui->adOptions, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		this, &ConfigChannelView::adIndexChanged);
-	connect(m_ui->adOptions, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		this, &ConfigChannelView::adEnabledChanged);
-
-	connect(m_ui->maxOptions1, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		this, &ConfigChannelView::maxIndexChanged);
-	connect(m_ui->maxOptions1, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		this, &ConfigChannelView::maxEnabledChanged);
-
-	connect(m_ui->maxOptions2, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		this, &ConfigChannelView::max2IndexChanged);
+const QString &ConfigChannelView::getSelectedDevice() const {
+	return m_selectedDevice;
 }
 
-void ConfigChannelView::adIndexChanged(int idx)
-{
-	QString attrName = AD_FUNC_ATTR_NAME;
-	QString funcAvailable = QString(AD_FUNC_ATTR_NAME) + QString("_available");
-	const auto& function = m_chnlsAttr[AD_INDEX][funcAvailable][idx];
-	m_chnlsAttr[AD_INDEX][attrName].clear();
-	m_chnlsAttr[AD_INDEX][attrName].push_back(function);
-	if (idx != m_adHighZIdx) {
-		m_ui->maxOptions1->setCurrentIndex(m_maxHighZIdx);
-	}
-	Q_EMIT attrValueChanged(attrName, AD_INDEX);
+void ConfigChannelView::setSelectedDevice(const QString &mSelectedDevice) {
+	m_selectedDevice = mSelectedDevice;
+	int index = deviceOptions->findText(m_selectedDevice);
+	deviceOptions->setCurrentIndex(index);
 }
 
-void ConfigChannelView::adEnabledChanged(int idx)
-{
-	QString attrName = "enabled";
-	if (idx != m_adHighZIdx) {
-		if (m_chnlsAttr[AD_INDEX][attrName].front().compare("0")==0) {
-			m_chnlsAttr[AD_INDEX][attrName].clear();
-			m_chnlsAttr[AD_INDEX][attrName].push_back("1");
-			Q_EMIT attrValueChanged(attrName, AD_INDEX);
-		}
-	}
-	else {
-		if (m_chnlsAttr[AD_INDEX][attrName].front().compare("1")==0) {
-			m_chnlsAttr[AD_INDEX][attrName].clear();
-			m_chnlsAttr[AD_INDEX][attrName].push_back("0");
-			Q_EMIT attrValueChanged(attrName, AD_INDEX);
-		}
-	}
-
+const QStringList &ConfigChannelView::getDeviceAvailable() const {
+	return m_deviceAvailable;
 }
 
-void ConfigChannelView::maxIndexChanged(int idx)
-{
-	QString attrName = MAX_FUNC_ATTR_NAME;
-	QString funcAvailable = QString(MAX_FUNC_ATTR_NAME) + QString("_available");
-	const auto& function = m_chnlsAttr[MAX_INDEX][funcAvailable][idx];
-	m_chnlsAttr[MAX_INDEX][attrName].clear();
-	m_chnlsAttr[MAX_INDEX][attrName].push_back(function);
-	if (function.compare("direction_in") == 0) {
-		m_ui->maxOptions2->setVisible(true);
-	}
-	else {
-		m_ui->maxOptions2->setVisible(false);
-	}
-	if (idx != m_maxHighZIdx) {
-		m_ui->adOptions->setCurrentIndex(m_adHighZIdx);
-	}
-	Q_EMIT attrValueChanged(attrName, MAX_INDEX);
-}
-
-void ConfigChannelView::maxEnabledChanged(int idx)
-{
-	QString attrName = "enabled";
-	if (idx != m_maxHighZIdx) {
-		if (m_chnlsAttr[MAX_INDEX][attrName].front().compare("0")==0) {
-			m_chnlsAttr[MAX_INDEX][attrName].clear();
-			m_chnlsAttr[MAX_INDEX][attrName].push_back("1");
-			Q_EMIT attrValueChanged(attrName, MAX_INDEX);
-		}
-	}
-	else {
-		if (m_chnlsAttr[MAX_INDEX][attrName].front().compare("1")==0) {
-			m_chnlsAttr[MAX_INDEX][attrName].clear();
-			m_chnlsAttr[MAX_INDEX][attrName].push_back("0");
-			Q_EMIT attrValueChanged(attrName, MAX_INDEX);
-		}
+void ConfigChannelView::setDeviceAvailable(const QStringList &mDeviceAvailable) {
+	m_deviceAvailable = mDeviceAvailable;
+	deviceOptions->clear();
+	for (const QString& device : m_deviceAvailable) {
+		deviceOptions->addItem(device);
 	}
 }
 
-void ConfigChannelView::max2IndexChanged(int idx)
-{
-	QString attrName = MAX_IEC_ATTR_NAME;
-	QString funcAvailable = QString(MAX_IEC_ATTR_NAME) + QString("_available");
-	const auto& function = m_chnlsAttr[MAX_INDEX][funcAvailable][idx];
-	m_chnlsAttr[MAX_INDEX][attrName].clear();
-	m_chnlsAttr[MAX_INDEX][attrName].push_back(function);
-	Q_EMIT attrValueChanged(attrName, MAX_INDEX);
+const QString &ConfigChannelView::getSelectedFunction() const {
+	return m_selectedFunction;
 }
 
-QVector<QMap<QString, QStringList>> ConfigChannelView::getChnlsAttr()
-{
-	return m_chnlsAttr;
+void ConfigChannelView::setSelectedFunction(const QString &mSelectedFunction) {
+	m_selectedFunction = mSelectedFunction;
+	int index = functionOptions->findText(m_selectedFunction);
+	functionOptions->setCurrentIndex(index);
 }
 
-int ConfigChannelView::getHighZIdx(QComboBox* list)
-{
-	int idx = 0;
-	for (int i = 0; i < list->count(); i++) {
-		if (list->itemText(i).compare("high_z") == 0) {
-			idx = i;
-		}
-		if (list->itemText(i).compare("direction_high_z") == 0) {
-			idx = i;
-		}
+const QStringList &ConfigChannelView::getFunctionAvailable() const {
+	return m_functionAvailable;
+}
+
+void ConfigChannelView::setFunctionAvailable(const QStringList &mFunctionAvailable) {
+	m_functionAvailable = mFunctionAvailable;
+	functionOptions->clear();
+	for (const QString& device : m_functionAvailable) {
+		functionOptions->addItem(device);
 	}
-	return idx;
+}
+
+QLabel *ConfigChannelView::getChannelLabel() const {
+	return channelLabel;
+}
+
+QComboBox *ConfigChannelView::getDeviceOptions() const {
+	return deviceOptions;
+}
+
+QComboBox *ConfigChannelView::getFunctionOptions() const {
+	return functionOptions;
+}
+
+QCheckBox *ConfigChannelView::getEnabledCheckBox() const {
+	return enabledCheckBox;
 }
