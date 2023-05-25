@@ -7,24 +7,24 @@
 
 namespace scopy::swiot {
 
-class ConfigController: public QObject
-{
-	Q_OBJECT
+class ConfigController : public QObject {
+Q_OBJECT
 public:
-	explicit ConfigController(ConfigChannelView* chnlsView = nullptr,
-				  ConfigModel* model = nullptr);
+	explicit ConfigController(ConfigChannelView *chnlsView,
+				  ConfigModel *model,
+				  int channelId);
+
 	~ConfigController();
 
-	void addMenuAttrValues();
-	void createConnections();
+	void connectSignalsAndSlots();
+	void initChannelView();
 
-	QStringList getActiveFunctions();
 public Q_SLOTS:
-	void attrChanged(QString attrName, int deviceIdx);
-private:
-	ConfigChannelView* m_chnlsView;
-	ConfigModel* m_model;
 
+private:
+	ConfigChannelView *m_channelsView;
+	ConfigModel *m_model;
+	int m_channelId;
 };
 
 }

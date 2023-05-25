@@ -18,29 +18,33 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 {
 	m_iioDev = iio_context_find_device(ctx, AD_NAME);
 	m_chnlsFunction = chnlsFunc;
+	m_chnlsFunction.append("diagnostic");
+	m_chnlsFunction.append("diagnostic");
+	m_chnlsFunction.append("diagnostic");
+	m_chnlsFunction.append("diagnostic"); // FIXME: to be changed
 	m_enabledChannels = std::vector<bool>(m_chnlsFunction.size(), false);
 	m_backBtn = createBackBtn();
-	if (iio_device_find_attr(m_iioDev, "back")) {
-		m_swiotAdLogic = new BufferLogic(m_iioDev);
-		m_readerThread = new ReaderThread(true);
-                m_readerThread->addBufferedDevice(m_iioDev);
+//	if (iio_device_find_attr(m_iioDev, "back")) {
+	m_swiotAdLogic = new BufferLogic(m_iioDev);
+	m_readerThread = new ReaderThread(true);
+	m_readerThread->addBufferedDevice(m_iioDev);
 
-		QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
-		int samplingFreq = actualSamplingFreq[0].toInt();
-		m_readerThread->onSamplingFreqWritten(samplingFreq);
-		m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
-		QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
-		m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
-		QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
-		m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
-		QMap<int, QString> chnlsId = m_swiotAdLogic->getPlotChnlsId();
-		m_plotHandler->setHandlesName(chnlsId);
+	QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
+	int samplingFreq = actualSamplingFreq[0].toInt();
+	m_readerThread->onSamplingFreqWritten(samplingFreq);
+	m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
+	QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
+	m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
+	QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
+	m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
+	QMap<int, QString> chnlsId = m_swiotAdLogic->getPlotChnlsId();
+	m_plotHandler->setHandlesName(chnlsId);
 
-		gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
-		setupToolView(settingsMenu);
-		initMonitorToolView(settingsMenu);
-		setupConnections();
-	}
+	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
+	setupToolView(settingsMenu);
+	initMonitorToolView(settingsMenu);
+	setupConnections();
+//	}
 }
 
 Ad74413r::~Ad74413r()

@@ -1,47 +1,66 @@
 #ifndef CONFIGCHANNELVIEW_H
 #define CONFIGCHANNELVIEW_H
-#define AD_INDEX  0
-#define MAX_INDEX 1
-#define AD_FUNC_ATTR_NAME  "function_cfg"
-#define MAX_FUNC_ATTR_NAME "function"
-#define MAX_IEC_ATTR_NAME  "IEC_type"
 
 #include "qwidget.h"
-#include "ui_swiotconfigchnlview.h"
+
 #include <QObject>
+#include <QString>
+#include <QLabel>
+#include <QComboBox>
+#include <QCheckBox>
 
 namespace scopy::swiot {
 class ConfigChannelView: public QWidget
 {
 	Q_OBJECT
 public:
-	explicit ConfigChannelView(int chnlIdx = 0, QWidget *parent = nullptr);
+	explicit ConfigChannelView(int channelIndex, QWidget *parent = nullptr);
 	~ConfigChannelView();
 
-	void setChnlsAttr(QVector<QMap<QString, QStringList>> values);
-	void setAvailableOptions(QComboBox* list, QString attrName,
-				 QMap<QString, QStringList> chnlAttr);
-	void connectSignalsToSlots();
-	QVector<QMap<QString, QStringList>> getChnlsAttr();
-public Q_SLOTS:
-	void adIndexChanged(int idx);
-	void maxIndexChanged(int idx);
-	void adEnabledChanged(int idx);
-	void maxEnabledChanged(int idx);
-	void max2IndexChanged(int idx);
+	bool isChannelEnabled() const;
+	void setChannelEnabled(bool channelEnabled);
+
+	const QString &getSelectedDevice() const;
+	void setSelectedDevice(const QString &selectedDevice);
+
+	const QStringList &getDeviceAvailable() const;
+	void setDeviceAvailable(const QStringList &deviceAvailable);
+
+	const QString &getSelectedFunction() const;
+	void setSelectedFunction(const QString &selectedFunction);
+
+	const QStringList &getFunctionAvailable() const;
+	void setFunctionAvailable(const QStringList &functionAvailable);
+
+	void connectSignalsAndSlots();
+
+	QLabel *getChannelLabel() const;
+	QComboBox *getDeviceOptions() const;
+	QComboBox *getFunctionOptions() const;
+	QCheckBox *getEnabledCheckBox() const;
+
 Q_SIGNALS:
-	void attrValueChanged(QString attrName, int deviceIdx);
+	void enabledChanged(int channelIndex, bool enabled);
+	void deviceChanged(int channelIndex, const QString& device);
+	void functionChanged(int channelIndex, const QString& function);
 
 private:
-	int m_chnlIdx;
-	int m_adHighZIdx;
-	int m_maxHighZIdx;
-	Ui::ConfigChannelView* m_ui;
-	QVector<QMap<QString, QStringList>> m_chnlsAttr;
+	int m_channelIndex;
+	bool m_channelEnabled;
+	QString m_selectedDevice;
+	QStringList m_deviceAvailable;
 
-	int getHighZIdx(QComboBox* list);
+	QString m_selectedFunction;
+	QStringList m_functionAvailable;
+
+	// UI elements
+	QLabel* channelLabel;
+
+	QComboBox* deviceOptions;
+	QComboBox* functionOptions;
+	QCheckBox* enabledCheckBox;
+//	Ui::ConfigChannelView* m_ui;
 };
 }
-
 
 #endif // CONFIGCHANNELVIEW_H
