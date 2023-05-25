@@ -102,10 +102,17 @@ void SwiotRuntime::createDevicesMap()
 
 void SwiotRuntime::onBackBtnPressed()
 {
-	for (const auto &key : m_iioDevices.keys()) {
-		if (iio_device_find_attr(m_iioDevices[key], "back")) {
-			iio_device_attr_write_bool(m_iioDevices[key], "back", 1);
+	struct iio_device* swiot = iio_context_find_device(m_iioCtx, "swiot");
+	if (swiot) {
+		ssize_t res = iio_device_attr_write(swiot, "mode", "config");
+		if (res > 0) {
+			qInfo(CAT_SWIOT) << "Successfully changed the config mode to runtime";
+		} else {
+			qCritical(CAT_SWIOT) << "Error, could not change swiot mode to config";
 		}
+	} else {
+		qCritical(CAT_SWIOT) << "Error, could not find swiot device to change config mode";
 	}
+
 	Q_EMIT backBtnPressed();
 }
