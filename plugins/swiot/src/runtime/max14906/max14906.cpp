@@ -40,11 +40,12 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
-	recipe.hasSingleBtn = true;
+	recipe.hasSingleBtn = false;
 	recipe.hasPairSettingsBtn = true;
 	recipe.hasPrintBtn = false;
 	recipe.hasChannels = false;
 	recipe.hasHelpBtn = false;
+	recipe.hasHamburgerMenuBtn = false;
 
 	m_toolView = scopy::gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
@@ -73,7 +74,7 @@ scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, Q
 
 void Max14906::connectSignalsAndSlots() {
 	connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this, &Max14906::runButtonToggled);
-	connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Max14906::singleButtonToggled);
+//	connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Max14906::singleButtonToggled);
 	QObject::connect(m_backButton, &QPushButton::clicked, this, [this]() {
 		Q_EMIT backBtnPressed();
 	});
