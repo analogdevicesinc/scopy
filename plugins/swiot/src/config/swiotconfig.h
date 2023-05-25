@@ -5,7 +5,9 @@
 #define MAX_NAME "max14906"
 
 #include "configcontroller.h"
-#include "configmenu.h"
+//#include "configmenu.h"
+#include "ui_swiotconfig.h"
+
 #include <gui/tool_view.hpp>
 #include <QPushButton>
 #include <QMap>
@@ -30,24 +32,27 @@ public:
 
 public Q_SLOTS:
 	void configBtnPressed();
+
 Q_SIGNALS:
-	void configBtn(QVector<QStringList*> funcAvailable);
+	void configBtn();
+
 private:
 	QMap<QString, struct iio_device*> m_iioDevices;
+	struct iio_context* m_context;
+	struct iio_device* m_swiotDevice;
+
 	QVector<ConfigController*> m_controllers;
 	QVector<QStringList*> m_funcAvailable;
 	QPushButton* m_configBtn;
-	ConfigMenu* m_configMenu;
 	scopy::gui::ToolView* m_toolView;
 
 	DrawArea* m_drawArea;
 	QScrollArea* m_scrollArea;
+	Ui::ConfigMenu* ui;
 
-private:
         void setupToolView(QWidget* parent);
-	void init();
+	void init(struct iio_context *ctx);
         void createPageLayout();
-	bool isConfigCtx();
 	void setDevices(struct iio_context* ctx);
 	static QPushButton* createConfigBtn();
 };
