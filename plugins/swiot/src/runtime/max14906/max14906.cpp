@@ -21,19 +21,19 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_tme(tme),
 	m_readerThread(new ReaderThread(false))
 {
-		iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
-		qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
+	iio_device *device0 = iio_context_find_device(ctx, MAX_NAME);
+	qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
 
-		this->ui->setupUi(this);
-		this->setupDynamicUi(this);
-		this->connectSignalsAndSlots();
+	this->ui->setupUi(this);
+	this->setupDynamicUi(this);
+	this->connectSignalsAndSlots();
 
-		this->m_qTimer->setInterval(MAX14906_POLLING_TIME); // poll once every second
-		this->m_qTimer->setSingleShot(true);
+	this->m_qTimer->setInterval(MAX14906_POLLING_TIME); // poll once every second
+	this->m_qTimer->setSingleShot(true);
 
-		this->initChannels();
-		this->initMonitorToolView();
-		this->ui->mainLayout->addWidget(m_toolView);
+	this->initChannels();
+	this->initMonitorToolView();
+	this->ui->mainLayout->addWidget(m_toolView);
 }
 
 void Max14906::setupDynamicUi(QWidget *parent) {
@@ -48,7 +48,8 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 
 	m_toolView = scopy::gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
-	this->m_generalSettingsMenu = this->createGeneralSettings("General settings", new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
+	this->m_generalSettingsMenu = this->createGeneralSettings("General settings",
+								  new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
 	this->m_toolView->addFixedCentralWidget(this->ui->grid, 0, 0);
@@ -56,7 +57,7 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	this->m_toolView->addTopExtraWidget(m_backButton);
 }
 
-scopy::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, QColor* color) {
+scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, QColor *color) {
 	auto generalSettingsMenu = new scopy::gui::GenericMenu(this);
 	generalSettingsMenu->initInteractiveMenu();
 	generalSettingsMenu->setMenuHeader(title, color, false);
@@ -73,15 +74,15 @@ scopy::gui::GenericMenu* Max14906::createGeneralSettings(const QString& title, Q
 void Max14906::connectSignalsAndSlots() {
 	connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this, &Max14906::runButtonToggled);
 	connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Max14906::singleButtonToggled);
-	QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
+	QObject::connect(m_backButton, &QPushButton::clicked, this, [this]() {
 		Q_EMIT backBtnPressed();
 	});
 
 	connect(this->m_max14906SettingsTab, &DioSettingsTab::timeValueChanged, this, &Max14906::timerChanged);
-	connect(this->m_qTimer, &QTimer::timeout, this, [&](){
+	connect(this->m_qTimer, &QTimer::timeout, this, [&]() {
 		this->m_readerThread->start();
 	});
-	connect(m_readerThread, &ReaderThread::started, this, [&](){
+	connect(m_readerThread, &ReaderThread::started, this, [&]() {
 		this->m_qTimer->start(1000);
 	});
 
@@ -106,7 +107,7 @@ void Max14906::runButtonToggled() {
 	qDebug(CAT_SWIOT_MAX14906) << "Run button clicked";
 	this->m_toolView->getSingleBtn()->setChecked(false);
 	if (this->m_toolView->getRunBtn()->isChecked()) {
-		for (auto & channel : this->m_channelControls) {
+		for (auto &channel: this->m_channelControls) {
 			channel->getDigitalChannel()->resetSismograph();
 		}
 		qDebug(CAT_SWIOT_MAX14906) << "Reader thread started";
@@ -137,7 +138,7 @@ void Max14906::singleButtonToggled() {
 }
 
 void Max14906::timerChanged(double value) {
-	for (auto & channelControl : this->m_channelControls) {
+	for (auto &channelControl: this->m_channelControls) {
 		channelControl->getDigitalChannel()->updateTimeScale(value);
 	}
 }
@@ -152,25 +153,25 @@ void Max14906::initMonitorToolView() {
 	// there can only be 4 channels, so we position them accordingly
 	switch (m_channelControls.size()) {
 		case 4: {
-			DioDigitalChannel* digitalChannel = m_channelControls[3]->getDigitalChannel();
+			DioDigitalChannel *digitalChannel = m_channelControls[3]->getDigitalChannel();
 			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
 
 			this->ui->gridLayout->addWidget(mainWindow, 2, 2);
 		}
 		case 3: {
-			DioDigitalChannel* digitalChannel = m_channelControls[2]->getDigitalChannel();
+			DioDigitalChannel *digitalChannel = m_channelControls[2]->getDigitalChannel();
 			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
 
 			this->ui->gridLayout->addWidget(mainWindow, 2, 0);
 		}
 		case 2: {
-			DioDigitalChannel* digitalChannel = m_channelControls[1]->getDigitalChannel();
+			DioDigitalChannel *digitalChannel = m_channelControls[1]->getDigitalChannel();
 			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
 
 			this->ui->gridLayout->addWidget(mainWindow, 0, 2);
 		}
 		case 1: {
-			DioDigitalChannel* digitalChannel = m_channelControls[0]->getDigitalChannel();
+			DioDigitalChannel *digitalChannel = m_channelControls[0]->getDigitalChannel();
 			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
 
 			this->ui->gridLayout->addWidget(mainWindow, 0, 0);
@@ -179,7 +180,7 @@ void Max14906::initMonitorToolView() {
 			break;
 		}
 	}
-	this->ui->gridLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 0);
+	this->ui->gridLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), 2, 0);
 
 	setUpdatesEnabled(true);
 }
@@ -190,25 +191,25 @@ void Max14906::initChannels() {
 	for (int i = 0; i < channel_num - 1; ++i) { // -1 because of the fault channel
 		struct iio_channel *channel = iio_device_get_channel(this->max14906ToolController->getDevice(), i);
 		auto *channel_control = new DioDigitalChannelController(
-					channel,
-					this->max14906ToolController->getChannelName(i),
-					this->max14906ToolController->getChannelType(i),
-					this
-					);
+			channel,
+			this->max14906ToolController->getChannelName(i),
+			this->max14906ToolController->getChannelType(i),
+			this
+		);
 
 		this->m_channelControls.insert(i, channel_control);
 		this->m_readerThread->addDioChannel(i, channel);
 		connect(this->m_readerThread, &ReaderThread::channelDataChanged, channel_control,
-			[this, i] (int index, double value){
-			if (i == index) {
-				this->m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);
-			}
-		});
+			[this, i](int index, double value) {
+				if (i == index) {
+					this->m_channelControls.value(index)->getDigitalChannel()->addDataSample(value);
+				}
+			});
 	}
 }
 
 QPushButton *Max14906::createBackButton() {
-	auto* backButton = new QPushButton();
+	auto *backButton = new QPushButton();
 	backButton->setObjectName(QString::fromUtf8("backButton"));
 	backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
 						    "  width: 95px;\n"
@@ -225,7 +226,7 @@ QPushButton *Max14906::createBackButton() {
 	return backButton;
 }
 
-QFrame *Max14906::createVLine(QWidget* parent) {
+QFrame *Max14906::createVLine(QWidget *parent) {
 	auto *frame = new QFrame(parent);
 	frame->setFrameShape(QFrame::VLine);
 	frame->setFrameShadow(QFrame::Sunken);
@@ -236,7 +237,7 @@ QFrame *Max14906::createVLine(QWidget* parent) {
 	return frame;
 }
 
-QFrame *Max14906::createHLine(QWidget* parent) {
+QFrame *Max14906::createHLine(QWidget *parent) {
 	auto *frame = new QFrame(parent);
 	frame->setFrameShape(QFrame::HLine);
 	frame->setFrameShadow(QFrame::Sunken);
@@ -247,7 +248,8 @@ QFrame *Max14906::createHLine(QWidget* parent) {
 	return frame;
 }
 
-QMainWindow *Max14906::createDockableMainWindow(const QString &title, DioDigitalChannel *digitalChannel, QWidget *parent) {
+QMainWindow *
+Max14906::createDockableMainWindow(const QString &title, DioDigitalChannel *digitalChannel, QWidget *parent) {
 	auto mainWindow = new QMainWindow(parent);
 	mainWindow->setCentralWidget(nullptr);
 	mainWindow->setWindowFlags(Qt::Widget);
