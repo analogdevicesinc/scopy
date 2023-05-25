@@ -18,6 +18,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_backButton(Max14906::createBackButton()),
 	m_qTimer(new QTimer(this)),
 	m_toolView(nullptr),
+	m_tme(tme),
 	m_readerThread(new ReaderThread(false))
 {
 		iio_device* device0 = iio_context_find_device(ctx, MAX_NAME);
