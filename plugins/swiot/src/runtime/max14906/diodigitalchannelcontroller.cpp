@@ -41,13 +41,33 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 	this->m_digitalChannel->setSelectedConfigMode(QString::fromStdString(this->m_type));
 
 	if (deviceType == "OUTPUT") {
+		// set the initial logic value
 		bool valueRead;
 		int res = iio_channel_attr_read_bool(channel, "raw", &valueRead);
 
 		if (res < 0) {
-			qCritical(CAT_SWIOT_MAX14906) << "Could not read initial channel raw value, error code:" << readResult;
+			qCritical(CAT_SWIOT_MAX14906) << "Could not read initial channel raw value, error code:" << res;
 		} else {
 			m_digitalChannel->ui->customSwitch->setChecked(valueRead);
+		}
+
+		// set the current limit attributes
+		char currentLimitAttributes[512] = {0};
+		ssize_t result = iio_channel_attr_read(channel, "current_limit_available", currentLimitAttributes, 512);
+		if (result < 0) {
+			qCritical(CAT_SWIOT_MAX14906) << R"(Could not read "current_limit_available", error code:)" << result;
+		} else {
+			QStringList limitAvailable = QString(currentLimitAttributes).trimmed().split(" ");
+			for (const auto& item : limitAvailable) {
+				this->m_digitalChannel->ui->currentLimitValues->addItem(item);
+			}
+
+			char currentLimitSelection[256] = {0};
+			result = iio_channel_attr_read(m_channel, "current_limit", currentLimitSelection, 256);
+			if (res < 0) {
+				qCritical(CAT_SWIOT_MAX14906) << R"(Could not read "current_limit", error code:)" << result;
+			}
+			this->m_digitalChannel->ui->currentLimitValues->setCurrentIndex(m_digitalChannel->ui->currentLimitValues->findText(currentLimitSelection));
 		}
 	}
 
@@ -60,6 +80,12 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 		ssize_t res = iio_channel_attr_write_bool(m_channel, "raw", value);
 		if (res < 0) {
 			qCritical(CAT_SWIOT_MAX14906) << "Could not write value" << value << "to channel" << this->m_channelName << ", error code " << res;
+		}
+	});
+	QObject::connect(m_digitalChannel->ui->currentLimitValues, &QComboBox::textActivated, [this] (const QString& text) {
+		ssize_t result = iio_channel_attr_write(this->m_channel, "current_limit", text.toStdString().c_str());
+		if (result < 0) {
+			qCritical(CAT_SWIOT_MAX14906) << "Could not write value" << text << "to channel" << this->m_channelName << "error code" << result;
 		}
 	});
 }
