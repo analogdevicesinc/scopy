@@ -22,9 +22,6 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
-
-private Q_SLOTS:
-	void addDebugWindow();
 };
 }
 
