@@ -2,6 +2,8 @@
 #define CONFIGMODEL_H
 
 #include "qobject.h"
+#include <QMap>
+#include <string>
 
 extern "C"{
 struct iio_channel;
@@ -12,24 +14,34 @@ namespace scopy::swiot {
 class ConfigModel : public QObject {
 	Q_OBJECT
 public:
-	explicit ConfigModel(struct iio_channel *adChannel, struct iio_channel *maxChannel);
-
+	explicit ConfigModel(struct iio_device* device, int channelId);
 	~ConfigModel();
 
-	QVector<QMap<QString, QStringList>> getChnlsAttrValues();
+	QString readEnabled();
+	void writeEnabled(const QString& enabled);
 
-	QStringList getActiveFunctions();
+	QString readDevice();
+	void writeDevice(const QString& device);
 
-	QStringList readChnlAttr(struct iio_channel *iio_chnl, QString attrName);
+	QString readFunction();
+	void writeFunction(const QString& function);
 
-	void initChnlAttrValues(struct iio_channel *iioChnl);
-
-	void updateChnlAttributes(QVector<QMap<QString, QStringList>> newValues, QString attrName, int deviceIdx);
+	QStringList readDeviceAvailable();
+	QStringList readFunctionAvailable();
 
 private:
-	struct iio_device *m_iioDev;
-	QVector<struct iio_channel *> m_channels;
-	QVector<QMap<QString, QStringList>> m_attrValues;
+	struct iio_device* m_device;
+	int m_channelId;
+
+	std::string m_enableAttribute;
+	std::string m_functionAttribute;
+	std::string m_functionAvailableAttribute;
+	std::string m_deviceAttribute;
+	std::string m_deviceAvailableAttribute;
+
+	QString m_enabled;
+	QStringList m_availableDevices;
+	QStringList m_availableFunctions;
 };
 }
 #endif // CONFIGMODEL_H
