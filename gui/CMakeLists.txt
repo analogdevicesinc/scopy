@@ -30,7 +30,20 @@ qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 if(ANDROID)
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
 else()
-	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
+	set(QWT_QT_VERSION qt5)
+	find_path(
+		QWT_INCLUDE_DIRS
+		NAMES qwt_global.h
+		HINTS ${CMAKE_INSTALL_PREFIX}/include /include /usr/local/include /usr/include /opt/local/include /sw/include/usr/local/lib/qwt.framework/Headers
+		PATH_SUFFIXES qwt-${QWT_QT_VERSION} qwt qwt6 qwt5 ${QWT_QT_VERSION}/qwt
+		REQUIRED)
+
+	find_library(QWT_LIBRARIES
+		NAMES qwt
+		HINTS ${CMAKE_INSTALL_PREFIX}/lib /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64 /opt/local/lib /opt/local/lib64
+		REQUIRED)
+	message("QWT LIBRARIES: " ${QWT_LIBRARIES})
+
 endif()
 
 if(ENABLE_TESTING)
