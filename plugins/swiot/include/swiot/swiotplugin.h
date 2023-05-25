@@ -37,13 +37,13 @@ private:
 	void cleanAfterLastContext();
 	void setupToolList();
 
-	SwiotInfoPage* m_infoPage;
+	SwiotInfoPage *m_infoPage;
 //	Ui::SWIOTInfoPage *infoui;
 
 	QWidget *config;
 	QWidget *adtool;
-    QWidget *faults;
-    QWidget *maxtool;
+	QWidget *faults;
+	QWidget *maxtool;
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
@@ -60,8 +60,8 @@ private:
 //		const QVector<QString> channel_function{"digital_input_loop", "current_in_ext_hart", "current_in_ext_hart", "high_z",
 //		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 	//	//Runtime D
-		const QVector<QString> channel_function{"current_out", "high_z", "high_z", "high_z",
-		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
+	const QVector<QString> channel_function{"current_out", "high_z", "high_z", "high_z",
+						"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
 
 };
 }

@@ -19,5 +19,5 @@ ConfigMenu::~ConfigMenu()
 
 void ConfigMenu::addWidget(QWidget* widget)
 {
-	m_ui->verticalLayout->addWidget(widget);
+//	m_ui->verticalLayout->addWidget(widget);
 }
