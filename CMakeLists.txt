@@ -47,8 +47,18 @@ FILE(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
 message(STATUS ${SCOPY_RESOURCE_FILES})
 qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
-find_library(IIO_LIBRARIES NAMES iio libiio)
-find_path(IIO_INCLUDE_DIRS iio.h)
+find_path(
+	IIO_INCLUDE_DIRS
+	NAMES iio.h
+	HINTS  ${CMAKE_INSTALL_PREFIX}/include /include /usr/include /usr/local/include /opt/local/include
+	REQUIRED)
+
+find_library(
+	IIO_LIBRARIES
+	NAMES iio libiio
+	HINTS  ${CMAKE_INSTALL_PREFIX}/lib /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64 /opt/local/lib /opt/local/lib64
+	REQUIRED)
+message("IIO LIBRARIES: " ${IIO_LIBRARIES})
 
 option(ENABLE_TESTING "Enable unit tests" ON)
 if(ENABLE_TESTING)
