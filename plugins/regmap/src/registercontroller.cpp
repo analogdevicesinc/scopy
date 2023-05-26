@@ -9,6 +9,8 @@
 #include <QPushButton>
 #include <qspinbox.h>
 
+#include "dynamicWidget.h"
+
 RegisterController::RegisterController(QWidget *parent)
     : QWidget{parent}
 {
@@ -34,14 +36,14 @@ RegisterController::RegisterController(QWidget *parent)
         Q_EMIT	registerAddressChanged(address.toInt(&ok,16));
     });
 
-    addressLayout->addWidget(addressPicker,8);
+    addressLayout->addWidget(addressPicker,4);
 
     QHBoxLayout *valueLayout = new QHBoxLayout();
     valueLayout->addWidget(new QLabel("Value: "),1);
-    valueLayout->addWidget(regValue,8);
+    valueLayout->addWidget(regValue,4);
 
 
-    QHBoxLayout *buttonsLayout = new QHBoxLayout();
+
     readButton = new QPushButton("Read");
     //request read
     QObject::connect( readButton, &QPushButton::clicked, this , [=](){
@@ -57,12 +59,15 @@ RegisterController::RegisterController(QWidget *parent)
         Q_EMIT requestWrite(addressPicker->text().toInt(&ok,16), regValue->text().toInt(&ok,16));
     });
 
-    buttonsLayout->addWidget(readButton);
-    buttonsLayout->addWidget(writeButton);
+    scopy::setDynamicProperty(readButton, "blue_button", true);
+    readButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+    scopy::setDynamicProperty(writeButton, "blue_button", true);
+    addressLayout->addWidget(readButton,1);
+    valueLayout->addWidget(writeButton,1);
 
     layout->addLayout(addressLayout);
     layout->addLayout(valueLayout);
-    layout->addLayout(buttonsLayout);
+//    layout->addLayout(buttonsLayout);
 
     QSpacerItem *spacer = new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding);
     layout->addItem(spacer);
