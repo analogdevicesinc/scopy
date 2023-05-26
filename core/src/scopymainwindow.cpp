@@ -52,7 +52,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	auto ts = ui->wsToolStack;
 	auto tm = tb->getToolMenu();
 
-	hp = new ScopyHomePage(this);
 	scanTask = new IIOScanTask(this);
 	scanTask->setScanParams("usb");
 	scanCycle = new CyclicalTask(scanTask,this);
@@ -65,6 +64,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initAboutPage(pm);
 	initPreferencesPage(pm);
 
+	hp = new ScopyHomePage(this, pm);
 	ScanButtonController *sbc = new ScanButtonController(scanCycle,hp->scanControlBtn(),this);
 
 	dm = new DeviceManager(pm, this);
@@ -122,6 +122,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
+
+	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
 }
 
 void ScopyMainWindow::save() {
