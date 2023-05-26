@@ -6,7 +6,7 @@
 
 
 using namespace scopy;
-ScopyHomePage::ScopyHomePage(QWidget *parent) :
+ScopyHomePage::ScopyHomePage(QWidget *parent, PluginManager *pm ) :
 	QWidget(parent),
 	ui(new Ui::ScopyHomePage)
 {
@@ -14,7 +14,7 @@ ScopyHomePage::ScopyHomePage(QWidget *parent) :
 	auto &&is = ui->wInfoPageStack;
 	auto &&hc = is->getHomepageControls();
 	auto &&db = ui->wDeviceBrowser;
-	add = new ScopyHomeAddPage();
+	add = new ScopyHomeAddPage(this, pm);
 
 	is->add("home",new ScopyHomeInfoPage());
 	is->add("add", add);
@@ -29,6 +29,10 @@ ScopyHomePage::ScopyHomePage(QWidget *parent) :
 	connect(db,SIGNAL(requestRemoveDevice(QString)),this,SIGNAL(requestRemoveDevice(QString)));
 	connect(add,SIGNAL(requestAddDevice(QString,QString)),this,SIGNAL(requestAddDevice(QString,QString)));
 	connect(add,&ScopyHomeAddPage::requestDevice,this,[=](QString id){Q_EMIT db->requestDevice(id,-1);});
+
+	connect(add, &ScopyHomeAddPage::newDeviceAvailable, this, [=](DeviceImpl *d){
+		Q_EMIT newDeviceAvailable(d);
+	});
 }
 
 ScopyHomePage::~ScopyHomePage()
