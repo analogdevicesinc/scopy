@@ -19,6 +19,7 @@ public:
 	~InfoPage();
 
 	void update(QString key, QString value);
+	void clear();
 
 private:
 
