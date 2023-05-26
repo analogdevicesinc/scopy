@@ -28,5 +28,17 @@ void InfoPage::update(QString key, QString value)
 	}
 }
 
+void InfoPage::clear()
+{
+	if (!map.empty()) {
+		map.clear();
+	}
+
+	if (!wmap.empty()) {
+		qDeleteAll(wmap);
+		wmap.clear();
+	}
+}
+
 
 #include "moc_infopage.cpp"
