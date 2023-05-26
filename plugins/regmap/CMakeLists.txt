@@ -51,8 +51,21 @@ if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
-qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
+set(REGMAP_XML_PATH ${CMAKE_INSTALL_FULL_DATADIR}/regmap)
+set(REGMAP_XML_SYSTEM_PATH ${REGMAP_XML_PATH}/xmls)
+set(REGMAP_XML_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/xmls)
 
+INSTALL(DIRECTORY xmls DESTINATION ${REGMAP_XML_PATH})
+
+FILE(GLOB XMLS ${CMAKE_CURRENT_SOURCE_DIR}/xmls/*.xml)
+
+foreach(_xml ${XMLS})
+    file(COPY ${_xml} DESTINATION ${REGMAP_XML_BUILD_PATH})
+endforeach()
+
+configure_file(include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY)
+set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h)
 
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}

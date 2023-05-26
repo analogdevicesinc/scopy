@@ -16,7 +16,7 @@
 #include "logging_categories.h"
 
 #include "iioutil/contextprovider.h"
-
+#include "scopy-regmap_config.h"
 
 using namespace scopy;
 
@@ -92,10 +92,13 @@ bool REGMAPPlugin::onConnect()
 
     auto deviceCount = iio_context_get_devices_count(ctx);
 
+
     for (int i = 0; i < deviceCount; i++) {
         iio_device *dev = iio_context_get_device(ctx, i);
-        qDebug(CAT_REGMAP)<<"DEVICE FOUND " << iio_device_get_name(dev);
-        m_deviceList->push_back(dev);
+        if (iio_device_find_debug_attr(dev,"direct_reg_access")) {
+            qDebug(CAT_REGMAP)<<"DEVICE FOUND " << iio_device_get_name(dev);
+            m_deviceList->push_back(dev);
+        }
     }
     //TODO
     m_registerMapWidget = new QWidget();
@@ -107,14 +110,26 @@ bool REGMAPPlugin::onConnect()
         for (int i = 0; i < m_deviceList->size(); ++i) {
             iio_device *dev = m_deviceList->at(i);
             qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << iio_device_get_name(dev);
+
             QString devName = QString::fromStdString(iio_device_get_name(dev));
+
+            if (isBufferCapable(dev)) {
+                qDebug(CAT_REGMAP)<<"DEVICE :" << iio_device_get_name(dev) << " IS BUFFER CAPABLE";
+            }
 
             bool foundTemplate = false;
                 //check if device has template
-            foreach (const QString &templatePath, QDir(":/xmls").entryList()) {
+
+            QDir xmlsPath(REGMAP_XML_BUILD_PATH);
+
+            if ( xmlsPath.entryList().empty()) {
+                xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
+            }
+
+            foreach (const QString &templatePath, xmlsPath.entryList()) {
                 if (templatePath.contains(devName)) {
                     qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << iio_device_get_name(dev);
-                    regMapInstrument->addTab( dev, iio_device_get_name(dev),":/xmls/" + templatePath);
+                    regMapInstrument->addTab( dev, iio_device_get_name(dev),xmlsPath.absoluteFilePath(templatePath));
                     foundTemplate = true;
                     break;
                 }
@@ -174,7 +189,17 @@ struct iio_device* REGMAPPlugin::getIioDevice(iio_context* ctx, const char *dev_
     return nullptr;
 }
 
-QString REGMAPPlugin::description()
+bool REGMAPPlugin::isBufferCapable(iio_device *dev)
 {
-	return "Read/Write to a live register map";
+    unsigned int i;
+
+    for (i = 0; i < iio_device_get_channels_count(dev); i++) {
+        struct iio_channel *chn = iio_device_get_channel(dev, i);
+
+        if (iio_channel_is_scan_element(chn)){
+            return true;
+        }
+    }
+
+    return false;
 }

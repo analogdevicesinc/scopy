@@ -17,6 +17,8 @@ class SearchBarWidget;
 
 
 class QMainWindow;
+
+class QDockWidget;
 namespace scopy::regmap{
 namespace gui {
 class RegisterMapSettingsMenu;
@@ -42,11 +44,13 @@ private:
 
     SearchBarWidget *searchBarWidget = nullptr;
     RegisterMapTable *registerMapTableWidget = nullptr;
+    QDockWidget *docRegisterMapTable = nullptr;
 
     RegisterDetailedWidget *registerDetailedWidget = nullptr;
-
+    QDockWidget *dockRegisterDetailedWidget = nullptr;
     gui::RegisterMapSettingsMenu *settings;
     void initSettings();
+    int selectedRegister;
 Q_SIGNALS:
     void requestRead(uint32_t address);
     void requestWrite(uint32_t address, uint32_t value);

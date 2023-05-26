@@ -25,6 +25,7 @@ public:
 
 
 	void valueUpdated(uint32_t value);
+    void setRegisterSelected(bool selected);
 private:
 	QHBoxLayout *layout;
 	QLabel *value;

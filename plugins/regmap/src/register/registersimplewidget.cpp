@@ -16,6 +16,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     installEventFilter(this);
 
     scopy::setDynamicProperty(this, "has_frame", true);
+    setStyleSheet("::hover {background-color: #4a4a4b; }");
 
     setMinimumWidth(10);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
@@ -27,16 +28,29 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     layout->setSpacing(0);
     setLayout(layout);
 
-
-
     bool ok;
 
     QFrame *regBaseInfoWidget = new QFrame();
     scopy::setDynamicProperty(regBaseInfoWidget,"has_frame",true);
-    QVBoxLayout *regBaseInfo = new QVBoxLayout();
-    regBaseInfo->addWidget(new QLabel(Utils::convertToHexa(address.toInt(&ok,16),registerWidth) + " " + name));
-    value = new QLabel("Value: Not Read");
-    regBaseInfo->addWidget(value);
+
+    QHBoxLayout *regBaseInfo = new QHBoxLayout();
+    QVBoxLayout *rightLayout = new QVBoxLayout();
+    rightLayout->setAlignment(Qt::AlignRight);
+
+    QLabel *registerAddressLable = new QLabel(Utils::convertToHexa(address.toInt(&ok,16),registerWidth));
+    registerAddressLable->setAlignment(Qt::AlignRight);
+    rightLayout->addWidget(registerAddressLable);
+    value = new QLabel("Not Read");
+    rightLayout->addWidget(value);
+
+    QVBoxLayout *leftLayout = new QVBoxLayout();
+    leftLayout->setAlignment(Qt::AlignTop);
+    QLabel *registerNameLabel = new QLabel(name);
+    registerNameLabel->setWordWrap(true);
+    leftLayout->addWidget(registerNameLabel);
+
+    regBaseInfo->addLayout(leftLayout);
+    regBaseInfo->addLayout(rightLayout);
 
     regBaseInfoWidget->setLayout(regBaseInfo);
     layout->addWidget(regBaseInfoWidget,1);
@@ -94,6 +108,11 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
     this->value->setText(Utils::convertToHexa(value,registerWidth));
 }
 
+void RegisterSimpleWidget::setRegisterSelected(bool selected)
+{
+    scopy::setDynamicProperty(this,"is_selected",selected);
+}
+
 QColor RegisterSimpleWidget::getColor(QString description)
 {
 
@@ -112,6 +131,7 @@ bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
         bool ok;
         Q_EMIT registerSelected(address.toInt(&ok,16));
     }
+
     return QWidget::eventFilter(object,event);
 }
 
