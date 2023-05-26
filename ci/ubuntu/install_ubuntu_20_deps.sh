@@ -1,246 +1,296 @@
 #!/bin/bash
+set -xe
 
-LIBIIO_VERSION=0ed18cd8f6b2fac5204a99e38922bea73f1f778c
+USE_STAGING=$1
+
+LIBIIO_VERSION=v0.24
 LIBAD9361_BRANCH=master
 GLOG_BRANCH=v0.4.0
+
 LIBM2K_BRANCH=master
-#GRIIO_BRANCH=upgrade-3.8
-#GNURADIO_FORK=analogdevicesinc
-#GNURADIO_BRANCH=scopy
+SPDLOG_BRANCH=v1.x
+VOLK_BRANCH=main
+GNURADIO_BRANCH=maint-3.10
 GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=master
-QWT_BRANCH=qwt-multiaxes
-LIBSIGROK_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master
+QWT_BRANCH=qwt-multiaxes
 LIBTINYIIOD_BRANCH=master
 
-set -e
-if [ $# -eq 0 ]; then
-	echo "Using default qmake"
-	QMAKE=qmake
-	$QMAKE --version
-else
-	QMAKE=$1/gcc_64/bin/qmake
-	$QMAKE --version
 
+STAGING_AREA=$PWD/staging
+STAGING_AREA_DEPS=$STAGING_AREA/dependencies
+QT=$HOME/5.15.2/gcc_64 # this is used to force the use of Qt5.15 for qt_add_resources
+#QT=/opt/Qt/5.15.2/gcc_64
+QMAKE_BIN=$QT/bin/qmake
+CMAKE_BIN=/bin/cmake
+JOBS=-j8
+ARCH=x86_64
+
+PATH=$PATH:/home/appveyor/.local/bin # appveyour specific fix
+
+if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
+	then
+		echo -- USING STAGING
+		mkdir -p $STAGING_AREA_DEPS
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT/lib
+		CMAKE_OPTS=(\
+			-DCMAKE_LIBRARY_PATH=$STAGING_AREA_DEPS \
+			-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
+			-DCMAKE_PREFIX_PATH=$QT\;$STAGING_AREA_DEPS \
+			-DCMAKE_EXE_LINKER_FLAGS="-L$STAGING_AREA_DEPS -L$STAGING_AREA_DEPS/lib" \
+			-DCMAKE_SHARED_LINKER_FLAGS="-L$STAGING_AREA_DEPS -L$STAGING_AREA_DEPS/lib" \
+			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+			-DCMAKE_VERBOSE_MAKEFILE=ON \
+		)
+		echo  -- STAGING_DIR $STAGING_AREA_DEPS
+	else
+		echo -- NO STAGING
+		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$QT/lib
+		CMAKE_OPTS=(\
+			-DCMAKE_PREFIX_PATH=$QT \
+			-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+			-DCMAKE_VERBOSE_MAKEFILE=ON \
+		)
 fi
 
-cd ~
-WORKDIR=${PWD}
+CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
+echo -- USING CMAKE COMMAND:
+echo $CMAKE
+echo -- USING QT: $QT
+echo -- USING QMAKE: $QMAKE_BIN
+
+clone() {
+	echo "#######CLONE#######"
+	mkdir -p $STAGING_AREA
+	pushd $STAGING_AREA
+	git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+	git clone --recursive https://github.com/google/glog.git -b $GLOG_BRANCH glog
+	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+	git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
+	git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
+	git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
+	git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
+	git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
+	git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+	popd
+}
+
+
+build_with_cmake() {
+	echo $PWD
+	BUILD_FOLDER=$PWD/build-${ARCH}
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
+	cd $BUILD_FOLDER
+	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
+	make $JOBS
+	sudo make $JOBS install
+	sudo ldconfig
+}
+
+update(){
+	sudo apt-get update
+	sudo apt-get -y upgrade
+}
 
 install_apt() {
-	sudo add-apt-repository -y ppa:gnuradio/gnuradio-releases
-	sudo apt-get -y update
-	
-	sudo apt-get -y install libxml2-dev libxml2 flex bison swig libpython3-all-dev python3 python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 liblog4cpp5-dev g++ git cmake autoconf libzip5 libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev
-	
-	sudo apt-get -y install gnuradio python3-packaging
+	sudo apt-get -y install vim git cmake libgmp3-dev libboost-all-dev libxml2-dev libxml2 flex bison swig \
+	libpython3-all-dev python3 python3-pip python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 \
+	liblog4cpp5-dev g++ autoconf libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev \
+	libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 \
+	libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev libzmq3-dev libsndfile1-dev \
+	libavahi-client-dev graphviz 
+	pip3 install mako
+	pip3 install packaging
+}
+
+install_qt(){
+	sudo apt-get -y install qtchooser qt5-default qtcreator qtdeclarative5-dev qtdeclarative5-dev-tools libqt5svg5 libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5opengl5
+	pip3 install aqtinstall
+	python3 -m aqt install-qt --outputdir $HOME linux desktop 5.15.2
 }
 
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
-
-	cd ~
-	git clone https://github.com/analogdevicesinc/libiio.git ${WORKDIR}/libiio
-	cd ${WORKDIR}/libiio
-	git checkout $LIBIIO_VERSION
-
-	mkdir ${WORKDIR}/libiio/build-${ARCH}
-	cd ${WORKDIR}/libiio/build-${ARCH}
-	# Download a 32-bit version of windres.exe
-
-	cmake ${CMAKE_OPTS} \
+	pushd $STAGING_AREA/libiio
+	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
 		-DHAVE_DNS_SD:BOOL=OFF\
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
 		-DCSHARP_BINDINGS:BOOL=OFF \
 		-DPYTHON_BINDINGS:BOOL=OFF \
-		${WORKDIR}/libiio
-
-	make $JOBS
-	sudo make ${JOBS} install
-#	DESTDIR=${WORKDIR} make ${JOBS} install
+		-DINSTALL_UDEV_RULE:BOOL=OFF
+		"
+	build_with_cmake 
+	popd
 }
 
 build_glog() {
-
 	echo "### Building glog - branch $GLOG_BRANCH"
+	pushd $STAGING_AREA/glog
+	CURRENT_BUILD_CMAKE_OPTS="-DWITH_GFLAGS=OFF"
+	build_with_cmake
+	popd
+}
 
-	cd ~
-	git clone --depth 1 https://github.com/google/glog.git -b $GLOG_BRANCH ${WORKDIR}/glog
-
-	mkdir ${WORKDIR}/glog/build-${ARCH}
-	cd ${WORKDIR}/glog/build-${ARCH}
-
-	cmake	${CMAKE_OPTS} \
-		-DWITH_GFLAGS=OFF\
-		${WORKDIR}/glog
-
-	make $JOBS
-	sudo make ${JOBS} install
-	#DESTDIR=${WORKDIR} make ${JOBS} install
+build_libad9361() {
+	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
+	pushd $STAGING_AREA/libad9361
+	build_with_cmake
+	popd
 }
 
 build_libm2k() {
-
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
-
-	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH ${WORKDIR}/libm2k
-
-	mkdir ${WORKDIR}/libm2k/build-${ARCH}
-	cd ${WORKDIR}/libm2k/build-${ARCH}
-
-	cmake	${CMAKE_OPTS} \
-		-DENABLE_PYTHON=OFF\
-		-DENABLE_CSHARP=OFF\
-		-DBUILD_EXAMPLES=OFF\
-		-DENABLE_TOOLS=OFF\
-		-DINSTALL_UDEV_RULES=OFF\
-		-DENABLE_LOG=ON\
-		${WORKDIR}/libm2k
-
-	make $JOBS
-	sudo make ${JOBS} install
-	#DESTDIR=${WORKDIR} make ${JOBS} install
-}
-build_libad9361() {
-	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
-
-	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH ${WORKDIR}/libad9361
-
-	mkdir ${WORKDIR}/libad9361/build-${ARCH}
-	cd ${WORKDIR}/libad9361/build-${ARCH}
-
-	cmake ${CMAKE_OPTS} \
-		${WORKDIR}/libad9361
-
-	make $JOBS
-	sudo make $JOBS install
-	#DESTDIR=${WORKDIR} make $JOBS install
+	pushd $STAGING_AREA/libm2k
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DENABLE_PYTHON=OFF \
+		-DENABLE_CSHARP=OFF \
+		-DBUILD_EXAMPLES=OFF \
+		-DENABLE_TOOLS=OFF \
+		-DINSTALL_UDEV_RULES=OFF \
+		-DENABLE_LOG=ON
+		"
+	build_with_cmake 
+	popd
 }
 
-build_griio() {
-	echo "### Building gr-iio - branch $GRIIO_BRANCH"
+build_spdlog() {
+	echo "### Building spdlog - branch $SPDLOG_BRANCH"
+	pushd $STAGING_AREA/spdlog
+	CURRENT_BUILD_CMAKE_OPTS="-DSPDLOG_BUILD_SHARED=ON"
+	build_with_cmake 
+	popd
+}
 
-	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/gr-iio.git -b $GRIIO_BRANCH ${WORKDIR}/gr-iio
-	mkdir ${WORKDIR}/gr-iio/build-${ARCH}
-	cd ${WORKDIR}/gr-iio/build-${ARCH}
+build_volk() {
+	echo "### Building volk - branch $VOLK_BRANCH"
+	pushd $STAGING_AREA/volk
+	CURRENT_BUILD_CMAKE_OPTS="-DPYTHON_EXECUTABLE=/usr/bin/python3"
+	build_with_cmake \
+	popd
+}
 
-	cmake ${CMAKE_OPTS} \
-		${WORKDIR}/gr-iio
-
-	make $JOBS
-	sudo make $JOBS install
-	#DESTDIR=${WORKDIR} make $JOBS install
+build_gnuradio() {
+	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
+	pushd $STAGING_AREA/gnuradio
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
+		-DENABLE_DEFAULT=OFF \
+		-DENABLE_GNURADIO_RUNTIME=ON \
+		-DENABLE_GR_ANALOG=ON \
+		-DENABLE_GR_BLOCKS=ON \
+		-DENABLE_GR_FFT=ON \
+		-DENABLE_GR_FILTER=ON \
+		-DENABLE_GR_IIO=ON \
+		-DENABLE_POSTINSTALL=OFF
+		"
+	build_with_cmake 		
+	popd
 }
 
 build_grm2k() {
 	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
-
-	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH ${WORKDIR}/gr-m2k
-	mkdir ${WORKDIR}/gr-m2k/build-${ARCH}
-	cd ${WORKDIR}/gr-m2k/build-${ARCH}
-
-	cmake ${CMAKE_OPTS} \
+	pushd $STAGING_AREA/gr-m2k
+	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF \
-		${WORKDIR}/gr-m2k
-
-	make $JOBS
-	sudo make $JOBS install
-	#DESTDIR=${WORKDIR} make $JOBS install
-
+		-DDIGITAL=OFF
+		"
+	build_with_cmake
+	popd
 }
 
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
-
-	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH ${WORKDIR}/gr-scopy
-	mkdir ${WORKDIR}/gr-scopy/build-${ARCH}
-	cd ${WORKDIR}/gr-scopy/build-${ARCH}
-
-	cmake ${CMAKE_OPTS} \
-		${WORKDIR}/gr-scopy
-
-	make $JOBS
-	sudo make $JOBS install
-	#DESTDIR=${WORKDIR} make $JOBS install
-}
-
-build_libsigrok() {
-	echo "### Building libsigrok - branch $LIBSIGROK_BRANCH"
-
-	git clone --depth 1 https://github.com/sigrokproject/libsigrok.git -b $LIBSIGROK_BRANCH ${WORKDIR}/libsigrok
-
-	mkdir ${WORKDIR}/libsigrok/build-${ARCH}
-	cd ${WORKDIR}/libsigrok
-
-	./autogen.sh
-	./configure --disable-all-drivers --enable-bindings --enable-cxx
-
-	sudo make $JOBS install
-	#DESTDIR=${WORKDIR} make $JOBS install
-
-	# For some reason, Scopy chokes if these are present in enums.hpp
-	#sed -i "s/static const Quantity \* const DIFFERENCE;$//g" ${WORKDIR}/msys64/${MINGW_VERSION}/include/libsigrokcxx/enums.hpp
-	#sed -i "s/static const QuantityFlag \* const RELATIVE;$//g" ${WORKDIR}/msys64/${MINGW_VERSION}/include/libsigrokcxx/enums.hpp
+	pushd $STAGING_AREA/gr-scopy
+	build_with_cmake
+	popd
 }
 
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
-
-	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
-
-	cd ${WORKDIR}/libsigrokdecode
-
+	pushd $STAGING_AREA/libsigrokdecode
 	./autogen.sh
-	./configure
-
+	if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
+	then
+		./configure --prefix $STAGING_AREA_DEPS
+	else
+		./configure``
+	fi
 	sudo make $JOBS install
-	#DESTDIR=${WORKDIR} make $JOBS install
+	sudo ldconfig
+	popd
 }
 
 build_qwt() {
 	echo "### Building qwt - branch $QWT_BRANCH"
+	pushd $STAGING_AREA/qwt
 
-	git clone https://github.com/cseci/qwt --branch $QWT_BRANCH ${WORKDIR}/qwt
-	cd ${WORKDIR}/qwt
+	if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
+	then
+		$QMAKE_BIN INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
+		make $JOBS
+		sudo make INSTALL_ROOT=$STAGING_AREA_DEPS install
+		sudo cp -r $STAGING_AREA_DEPS/usr/local/* $STAGING_AREA_DEPS/
+	else
+		$QMAKE_BIN qwt.pro
+		make $JOBS
+		sudo make install
+	fi
 
-	$QMAKE qwt.pro
-	make $JOBS
-	sudo make install
+	sudo ldconfig
+	popd
 }
 
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
-
-	cd ~
-	git clone --depth 1 https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH ${WORKDIR}/libtinyiiod
-	mkdir ${WORKDIR}/libtinyiiod/build-${ARCH}
-	cd ${WORKDIR}/libtinyiiod/build-${ARCH}
-
-	cmake ${CMAKE_OPTS} \
-		-DBUILD_EXAMPLES=OFF \
-		${WORKDIR}/libtinyiiod
-
-	make $JOBS
-	sudo make $JOBS install
+	pushd $STAGING_AREA/libtinyiiod
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
+	build_with_cmake 
+	popd
 }
 
+build_scopy() {
+	echo "### Building scopy"
+	ls -la $GITHUB_WORKSPACE
+	pushd $GITHUB_WORKSPACE
+	rm -rf $GITHUB_WORKSPACE/build-$ARCH
+	mkdir -p $GITHUB_WORKSPACE/build-$ARCH
+	cd $GITHUB_WORKSPACE/build-$ARCH
+	$CMAKE \
+		-DCMAKE_LIBRARY_PATH=$STAGING_AREA_DEPS \
+		-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
+		-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS\;$QT \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
+		../
+	make $JOBS
+	popd
+}
+
+build_deps(){
+	build_libiio
+	build_libad9361
+	build_glog
+	build_spdlog
+	build_libm2k
+	build_volk
+	build_gnuradio
+	build_grscopy
+	build_grm2k
+	build_qwt
+	build_libsigrokdecode
+	build_libtinyiiod
+}
+
+clone
+update
 install_apt
-build_libiio
-build_libad9361
-build_glog
-build_libm2k
-#build_griio
-build_grscopy
-build_grm2k
-build_qwt
-build_libsigrokdecode
-build_libtinyiiod
+install_qt
+build_deps
+build_scopy
