@@ -22,6 +22,7 @@
 #include <src/readwrite/fileregisterwritestrategy.hpp>
 #include <src/recycerview/registermaptable.hpp>
 #include <tool_view_builder.hpp>
+#include "dynamicWidget.h"
 
 using namespace scopy;
 using namespace regmap;
@@ -57,7 +58,10 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
         searchBarWidget = new SearchBarWidget();
 
+        QWidget *tableHeadWidget = new QWidget();
+        scopy::setDynamicProperty(tableHeadWidget, "has_frame", true);
         QHBoxLayout *tableHead = new QHBoxLayout();
+        tableHeadWidget->setLayout(tableHead);
         tableHead->addWidget(new QLabel(""), 1);
 
         for (int i = 7; i >= 0; i--) {
@@ -74,10 +78,10 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         });
 
         registerMapTableLayout->addWidget(searchBarWidget);
-        registerMapTableLayout->addLayout(tableHead);
+        registerMapTableLayout->addWidget(tableHeadWidget);
         registerMapTableLayout->addWidget(registerMapTableWidget->getWidget());
-
-        mainWindow->addDockWidget(Qt::TopDockWidgetArea, DockerUtils::createDockWidget(mainWindow, registerMapTable, "Register map"));
+        docRegisterMapTable = DockerUtils::createDockWidget(mainWindow, registerMapTable, "Register map");
+        mainWindow->addDockWidget(Qt::TopDockWidgetArea, docRegisterMapTable);
 
         QObject::connect(registerController, &RegisterController::registerAddressChanged, this , [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
@@ -91,7 +95,6 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
     QObject::connect(registerController, &RegisterController::requestRead, registerMapValues, &RegisterMapValues::requestRead);
     QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues, &RegisterMapValues::requestWrite);
     QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this, [=](uint32_t address, uint32_t value){
-
         registerController->registerValueChanged(Utils::convertToHexa(value, 8));
         if (registerMapTemplate) {
             registerMapTableWidget->valueUpdated(address, value);
@@ -111,8 +114,9 @@ DeviceRegisterMap::~DeviceRegisterMap()
     delete deviceRegisterMapLayout;
     if (registerController) delete registerController;
     if (registerMapTableWidget) delete registerMapTableWidget;
-    if (searchBarWidget) delete searchBarWidget;
+    if (docRegisterMapTable) delete docRegisterMapTable;
     if (registerDetailedWidget) delete registerDetailedWidget;
+    if (mainWindow) delete mainWindow;
 }
 
 void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
@@ -120,11 +124,14 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
     registerController->registerChanged(regModel->getAddress());
     registerController->registerValueChanged("Not Read");
 
-    if (registerDetailedWidget) delete registerDetailedWidget;
+    if (dockRegisterDetailedWidget) {
+        delete registerDetailedWidget;
+        delete dockRegisterDetailedWidget;
+    }
 
     registerDetailedWidget = new RegisterDetailedWidget(regModel);
-//    deviceRegisterMapLayout->addWidget(registerDetailedWidget);
-    mainWindow->addDockWidget(Qt::BottomDockWidgetArea, DockerUtils::createDockWidget(mainWindow, registerDetailedWidget, "Detailed bitfield"));
+    dockRegisterDetailedWidget =  DockerUtils::createDockWidget(mainWindow, registerDetailedWidget, "Detailed bitfield");
+    mainWindow->addDockWidget(Qt::BottomDockWidgetArea, dockRegisterDetailedWidget);
 
     if (registerMapValues) {
         uint32_t address = regModel->getAddress();

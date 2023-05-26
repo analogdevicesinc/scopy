@@ -4,37 +4,38 @@
 #include <QFrame>
 #include <QWidget>
 
+class QHBoxLayout;
 
 class QVBoxLayout;
 class QLabel;
 class BitFieldSimpleWidget : public QFrame
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit BitFieldSimpleWidget(QString name,
-				      int defaultValue,
-				      QString description,
-				      int width,
-				      QString notes,
-				      int regOffset,
-				      int streach,
-				      QWidget *parent = nullptr);
+    explicit BitFieldSimpleWidget(QString name,
+                                  int defaultValue,
+                                  QString description,
+                                  int width,
+                                  QString notes,
+                                  int regOffset,
+                                  int streach,
+                                  QWidget *parent = nullptr);
 
-	~BitFieldSimpleWidget();
-	void updateValue(QString newValue);
-	int getWidth() const;
+    ~BitFieldSimpleWidget();
+    void updateValue(QString newValue);
+    int getWidth() const;
 
 
-	QString getDescription() const;
+    QString getDescription() const;
 
-	int getStreach() const;
+    int getStreach() const;
 
 private:
-	QVBoxLayout *layout;
-	QLabel *value;
-	int width;
-	int streach;
-	QString description;
+    QHBoxLayout *layout;
+    QLabel *value;
+    int width;
+    int streach;
+    QString description;
 Q_SIGNALS:
 
 };

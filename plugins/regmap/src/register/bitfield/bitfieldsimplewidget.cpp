@@ -16,16 +16,32 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 {
     scopy::setDynamicProperty(this, "has_frame", true);
 
+    setStyleSheet("::hover {background-color: #4a34ff; }");
+
     setMinimumWidth(10);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-    layout = new QVBoxLayout();
+    layout = new QHBoxLayout();
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    layout->addWidget(new QLabel(name));
-    layout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
-    layout->addWidget(new QLabel(description));
-    layout->addWidget(new QLabel("Default Value: " + Utils::convertToHexa(defaultValue, width)));
+    QVBoxLayout *rightLayout = new QVBoxLayout();
+    rightLayout->setAlignment(Qt::AlignRight);
+
+    value = new QLabel("Not Read");
+    QLabel *bitfieldWidth = new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset));
+    bitfieldWidth->setAlignment(Qt::AlignRight);
+    rightLayout->addWidget(bitfieldWidth);
+    rightLayout->addWidget(value);
+
+    QVBoxLayout *leftLayout = new QVBoxLayout();
+    leftLayout->setAlignment(Qt::AlignTop);
+    QLabel *descriptionLabel = new QLabel(description);
+    descriptionLabel->setWordWrap(true);
+
+    leftLayout->addWidget(descriptionLabel);
+
+    layout->addLayout(leftLayout);
+    layout->addLayout(rightLayout);
 
     QString toolTip = "Name : " + name + "\n"
                       + QString::number(regOffset + width - 1) + ":" + QString::number(regOffset) + "\n"
@@ -35,8 +51,6 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 
     setToolTip(toolTip);
 
-    value = new QLabel("Not Read");
-    layout->addWidget(value);
 
     setLayout(layout);
 }
