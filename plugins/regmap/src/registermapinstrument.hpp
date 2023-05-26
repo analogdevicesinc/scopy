@@ -33,7 +33,6 @@ private:
     RegisterMapValues* getRegisterMapValues(struct iio_device *dev);
 
     QMap<QString , scopy::regmap::DeviceRegisterMap*> *tabs;
-    int i = 1;
     bool first = false;
 };
 #endif // REGISTERMAPINSTRUMENT_HPP

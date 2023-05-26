@@ -19,6 +19,7 @@ public:
     void setFilters(QList<uint32_t> filters);
     void valueUpdated(uint32_t address, uint32_t value);
     void scrollTo(uint32_t index);
+    void setRegisterSelected(uint32_t address, bool selected);
 
     // IRecyclerViewAdapter interface
     void generateWidget(int index);
@@ -31,6 +32,7 @@ private:
     RecyclerView * recyclerView;
     QMap<uint32_t, RegisterModel*> *registerModels;
     QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
+    uint32_t selectedAddress = 0;
 };
 
 #endif // REGISTERMAPTABLE_H

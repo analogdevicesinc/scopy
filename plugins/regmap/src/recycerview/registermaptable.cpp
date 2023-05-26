@@ -60,12 +60,20 @@ void RegisterMapTable::scrollTo(uint32_t index)
         while (iterator != registerModels->end() ) {
             if (iterator.key() == index) {
                 recyclerView->scrollTo(i);
+                setRegisterSelected(iterator.key(), true);
                 break;
             }
             i++;
             iterator++;
         }
     }
+}
+
+void RegisterMapTable::setRegisterSelected(uint32_t address, bool selected)
+{
+    registersMap->value(selectedAddress)->setRegisterSelected(false);
+    selectedAddress = address;
+    registersMap->value(address)->setRegisterSelected(true);
 }
 
 void RegisterMapTable::generateWidget(int index)
