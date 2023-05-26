@@ -682,5 +682,8 @@ QPushButton[userNote=true]:checked {
 
 *[has_frame=true] {
  border: 2px solid black;
+}
 
+*[is_selected=true] {
+ background-color: #2a44df;
 }

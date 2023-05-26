@@ -22,8 +22,8 @@ RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
     mainWidget->setLayout(new QVBoxLayout());
 
     scopy::gui::ToolViewRecipe recepie;
-    recepie.helpBtnUrl = "";
     recepie.hasChannels = true;
+    recepie.hasHeader = false;
     channelManager = new scopy::gui::ChannelManager();
 
     toolView = scopy::gui::ToolViewBuilder(recepie, channelManager, parent).build();
@@ -53,9 +53,8 @@ RegisterMapValues *RegisterMapInstrument::getRegisterMapValues(iio_device *dev)
 void RegisterMapInstrument::addTab(QWidget *widget, QString title)
 {
     scopy::regmap::gui::RegisterMapSettingsMenu *settings = new scopy::regmap::gui::RegisterMapSettingsMenu(this);
-    toolView->buildNewChannel(channelManager,settings, false, i, false, false, QColor("green"),
+    toolView->buildNewChannel(channelManager,settings, false, -1, false, false, QColor("green"),
                               title, title);
-    i++;
 }
 
 void RegisterMapInstrument::addTab(iio_device *dev, QString title)
@@ -77,7 +76,7 @@ void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPa
     tabs->insert(title, regMap);
 
     scopy::regmap::gui::RegisterMapSettingsMenu *settings = new scopy::regmap::gui::RegisterMapSettingsMenu(this);
-    ChannelWidget *ch_widget = toolView->buildNewChannel(channelManager,settings, false, i, false, false, QColor("orange"),
+    ChannelWidget *ch_widget = toolView->buildNewChannel(channelManager,settings, false, -1, false, false, QColor("orange"),
                                                          title, title);
 
     ch_widget->enableButton()->setVisible(false);
@@ -101,7 +100,6 @@ void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPa
     QObject::connect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestRegisterDump, regMap, &regmap::DeviceRegisterMap::requestRegisterDump);
     QObject::connect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestWrite, regMap, &regmap::DeviceRegisterMap::requestWrite);
 
-    i++;
 }
 
 
