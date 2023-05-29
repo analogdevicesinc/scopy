@@ -10,7 +10,7 @@ namespace scopy::swiot {
 class ConfigController : public QObject {
 Q_OBJECT
 public:
-	explicit ConfigController(ConfigChannelView *chnlsView,
+	explicit ConfigController(ConfigChannelView *channelView,
 				  ConfigModel *model,
 				  int channelId);
 

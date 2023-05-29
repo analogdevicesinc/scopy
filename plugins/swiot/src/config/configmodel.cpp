@@ -1,8 +1,6 @@
 #include "configmodel.h"
-#include "qdebug.h"
 #include <iio.h>
 #include <QMap>
-#include <utility>
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
