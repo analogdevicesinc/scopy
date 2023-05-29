@@ -77,7 +77,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	for (unsigned int i = 0; i < plotChnlsNo; i++) {
 		m_plot->Curve(i)->setAxes(
 					QwtAxisId(QwtAxis::XBottom, 0),
-					QwtAxisId(QwtAxis::YRight, i));
+					QwtAxisId(QwtAxis::YLeft, i));
 		//need to be by chnl id not by plot chnl idx
 		if (i < configuredChnlsNo) {
 			m_plot->Curve(i)->setTitle("CH " + QString::number(i+1));
@@ -160,7 +160,7 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 				} else {
 					int plotDataSamplesNumber = m_buffersNumber * m_bufferSize;
 					int currentPlotDataSamplesNumber = (m_bufferIndex + 1) * m_bufferSize;
-					m_plot->setDataStartingPoint(plotDataSamplesNumber - currentPlotDataSamplesNumber);
+					m_plot->setDataStartingPoint(-currentPlotDataSamplesNumber);
 					m_plot->resetXaxisOnNextReceivedData();
 					m_samplesAquiredLabel->setText(QString::number(currentPlotDataSamplesNumber));
 				}
@@ -387,6 +387,7 @@ void BufferPlotHandler::updatePlotTimespan()
 	//0 of time is by default in the middle of the x Axis
 	double offset = unitsPerDiv * (m_plot->xAxisNumDiv() / 2);
 	m_plot->setHorizOffset(-offset);
+	m_plot->resetXaxisOnNextReceivedData();
 }
 
 bool BufferPlotHandler::eventFilter(QObject *obj, QEvent *event)
