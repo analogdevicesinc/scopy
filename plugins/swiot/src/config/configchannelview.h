@@ -59,7 +59,6 @@ private:
 	QComboBox* deviceOptions;
 	QComboBox* functionOptions;
 	QCheckBox* enabledCheckBox;
-//	Ui::ConfigChannelView* m_ui;
 };
 }
 

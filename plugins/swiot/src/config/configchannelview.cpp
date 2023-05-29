@@ -9,6 +9,7 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent) :
 	deviceOptions(new QComboBox(this)),
 	functionOptions(new QComboBox(this)),
 	enabledCheckBox(new QCheckBox(this)),
+	m_channelEnabled(false),
 	m_channelIndex(channelIndex)
 {
 	this->enabledCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -115,3 +116,5 @@ QComboBox *ConfigChannelView::getFunctionOptions() const {
 QCheckBox *ConfigChannelView::getEnabledCheckBox() const {
 	return enabledCheckBox;
 }
+
+#include "moc_configchannelview.cpp"

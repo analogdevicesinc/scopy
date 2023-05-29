@@ -51,12 +51,11 @@ private:
 	Ui::ConfigMenu* ui;
 
         void setupToolView(QWidget* parent);
-	void init(struct iio_context *ctx);
+	void init();
         void createPageLayout();
 	void setDevices(struct iio_context* ctx);
 	static QPushButton* createConfigBtn();
 };
 }
-
 
 #endif // SWIOTCONFIG_H
