@@ -1,7 +1,6 @@
 #include "swiotconfig.h"
 #include <gui/tool_view_builder.hpp>
 #include "configcontroller.h"
-#include "configmenu.h"
 #include "configmodel.h"
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
@@ -11,9 +10,15 @@ using namespace scopy::swiot;
 
 SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	QWidget(parent),
-	ui(new Ui::ConfigMenu)
-{
-	m_swiotDevice = iio_context_find_device(ctx, "swiot"); // TODO: clean
+	m_context(ctx),
+	m_drawArea(nullptr),
+	m_scrollArea(nullptr),
+	m_toolView(nullptr),
+	ui(new Ui::ConfigMenu) {
+	m_swiotDevice = iio_context_find_device(ctx, "swiot");
+	if (m_swiotDevice == nullptr) {
+		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
+	}
 
 	this->ui->setupUi(this);
 	m_configBtn = createConfigBtn();
@@ -21,28 +26,28 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	this->layout()->addWidget(m_configBtn);
 
 	this->setupToolView(parent);
-	this->init(ctx);
+	this->init();
 	this->createPageLayout();
 	connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::configBtnPressed);
 }
 
 SwiotConfig::~SwiotConfig() {}
 
-void SwiotConfig::init(struct iio_context *ctx) {
+void SwiotConfig::init() {
 	for (int i = 0; i < 4; i++) { // there can only be 4 channels
 		auto *channelView = new ConfigChannelView(i);
 		auto *configModel = new ConfigModel(m_swiotDevice, i);
 		auto *configController = new ConfigController(channelView, configModel, i);
 		m_controllers.push_back(configController);
-		ui->gridLayout->addWidget(channelView->getChannelLabel(), i+1, 0);
-		ui->gridLayout->addWidget(channelView->getEnabledCheckBox(), i+1, 1);
-		ui->gridLayout->addWidget(channelView->getDeviceOptions(), i+1, 2);
-		ui->gridLayout->addWidget(channelView->getFunctionOptions(), i+1, 3);
+		ui->gridLayout->addWidget(channelView->getChannelLabel(), i + 1, 0);
+		ui->gridLayout->addWidget(channelView->getEnabledCheckBox(), i + 1, 1);
+		ui->gridLayout->addWidget(channelView->getDeviceOptions(), i + 1, 2);
+		ui->gridLayout->addWidget(channelView->getFunctionOptions(), i + 1, 3);
 	}
 }
 
 void SwiotConfig::setDevices(iio_context *ctx) {
-	int devicesNumber = iio_context_get_devices_count(ctx);
+	ssize_t devicesNumber = iio_context_get_devices_count(ctx);
 	for (int i = 0; i < devicesNumber; i++) {
 		struct iio_device *iioDev = iio_context_get_device(ctx, i);
 		if (iioDev) {
@@ -53,7 +58,7 @@ void SwiotConfig::setDevices(iio_context *ctx) {
 }
 
 QPushButton *SwiotConfig::createConfigBtn() {
-	QPushButton *configBtn = new QPushButton();
+	auto *configBtn = new QPushButton();
 	configBtn->setObjectName(QString::fromUtf8("configBtn"));
 	configBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
 						   "  width: 95px;\n"
@@ -71,25 +76,7 @@ QPushButton *SwiotConfig::createConfigBtn() {
 }
 
 void SwiotConfig::configBtnPressed() {
-//	for (int i = 0; i < m_funcAvailable.size(); i++) {
-//		m_funcAvailable[i]->clear();
-//	}
-//	for (int i = 0; i < m_controllers.size(); i++) {
-//		QStringList func = m_controllers[i]->getActiveFunctions();
-//		if (func.size() == m_funcAvailable.size()) {
-//			for (int j = 0; j < m_funcAvailable.size(); j++) {
-//				m_funcAvailable[j]->push_back(func[j]);
-//			}
-//		}
-//	}
-//
-//	for (const auto &key: m_iioDevices.keys()) {
-//		if (iio_device_find_attr(m_iioDevices[key], "apply")) {
-//			iio_device_attr_write_bool(m_iioDevices[key], "apply", 1);
-//		}
-//	}
 	iio_device_attr_write(m_swiotDevice, "mode", "runtime");
-
 	Q_EMIT configBtn();
 
 	qInfo(CAT_SWIOT_CONFIG) << "Swiot mode has been changed to runtime";
@@ -115,7 +102,6 @@ void SwiotConfig::setupToolView(QWidget *parent) {
 }
 
 void SwiotConfig::createPageLayout() {
-//	this->setMinimumSize(m_configMenu->size());
 	auto scrollWidget = new QWidget(this);
 	scrollWidget->setLayout(new QVBoxLayout(scrollWidget));
 	scrollWidget->layout()->addWidget(this->ui->mainGrid);
@@ -128,3 +114,5 @@ void SwiotConfig::createPageLayout() {
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
 }
+
+#include "moc_swiotconfig.cpp"

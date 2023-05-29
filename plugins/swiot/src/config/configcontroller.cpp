@@ -3,10 +3,10 @@
 
 using namespace scopy::swiot;
 
-ConfigController::ConfigController(ConfigChannelView *chnlsView,
+ConfigController::ConfigController(ConfigChannelView *channelView,
 				   ConfigModel *model,
 				   int channelId) :
-	m_channelsView(chnlsView), m_model(model), m_channelId(channelId)
+	m_channelsView(channelView), m_model(model), m_channelId(channelId)
 {
 	this->initChannelView();
 	this->connectSignalsAndSlots();
@@ -26,7 +26,7 @@ ConfigController::~ConfigController() {
 
 void ConfigController::connectSignalsAndSlots() {
 	QObject::connect(m_channelsView, &ConfigChannelView::enabledChanged, this, [this] (int index, bool value) {
-		if (m_channelId == index) { // TODO: find a better alternative
+		if (m_channelId == index) {
 			if (value) {
 				m_model->writeEnabled("1");
 			} else {
@@ -70,25 +70,3 @@ void ConfigController::initChannelView() {
 	QString selectedFunction = m_model->readFunction();
 	m_channelsView->setSelectedFunction(selectedFunction);
 }
-
-//void ConfigController::addMenuAttrValues() {
-//	//get all the attributes from the iio_channel
-//	QStringList chnlsValues = m_model->getMFunctionAvailable();
-//
-//	if (!chnlsValues.empty()) {
-//		m_chnlsView->setChnlsAttr(chnlsValues);
-//	}
-//}
-//
-//void ConfigController::createConnections() {
-//	connect(m_chnlsView, &scopy::swiot::ConfigChannelView::attrValueChanged, this, &ConfigController::attrChanged);
-//}
-//
-//void ConfigController::attrChanged(const QString& attrName, const QString& attrValue) {
-////	QMap<QString, QString> values = m_chnlsView->getChnlsAttr();
-//	m_model->updateChnlAttributes(attrName, attrValue);
-//}
-//
-//QStringList ConfigController::getActiveFunctions() {
-//	return m_model->getActiveFunctions();
-//}
