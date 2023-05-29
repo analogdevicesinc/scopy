@@ -64,7 +64,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         tableHeadWidget->setLayout(tableHead);
         tableHead->addWidget(new QLabel(""), 1);
 
-        for (int i = 7; i >= 0; i--) {
+        for (int i = Utils::getBitsPerRow(); i >= 0; i--) {
             tableHead->addWidget(new QLabel("Bit"+QString::number(i)),1);
         }
 

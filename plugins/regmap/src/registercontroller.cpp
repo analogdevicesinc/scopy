@@ -9,18 +9,19 @@
 #include <QPushButton>
 #include <qspinbox.h>
 
-#include "dynamicWidget.h"
+#include "utils.hpp"
 
 RegisterController::RegisterController(QWidget *parent)
     : QWidget{parent}
 {
-    layout= new QVBoxLayout();
+    layout= new QHBoxLayout();
     setLayout(layout);
 
     regValue = new QLineEdit(this);
     regValue->setText("Not Read");
     QObject::connect(regValue, &QLineEdit::textChanged, this, &RegisterController::valueChanged);
 
+    QVBoxLayout *auxLayout = new QVBoxLayout();
     // make address a spinbox with custom value for custom hexa values ?
     QHBoxLayout *addressLayout = new QHBoxLayout();
     addressLayout->addWidget(new QLabel("Address: "),1);
@@ -36,11 +37,11 @@ RegisterController::RegisterController(QWidget *parent)
         Q_EMIT	registerAddressChanged(address.toInt(&ok,16));
     });
 
-    addressLayout->addWidget(addressPicker,4);
+    addressLayout->addWidget(addressPicker,6);
 
     QHBoxLayout *valueLayout = new QHBoxLayout();
     valueLayout->addWidget(new QLabel("Value: "),1);
-    valueLayout->addWidget(regValue,4);
+    valueLayout->addWidget(regValue,6);
 
 
 
@@ -59,15 +60,18 @@ RegisterController::RegisterController(QWidget *parent)
         Q_EMIT requestWrite(addressPicker->text().toInt(&ok,16), regValue->text().toInt(&ok,16));
     });
 
-    scopy::setDynamicProperty(readButton, "blue_button", true);
-    readButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    scopy::setDynamicProperty(writeButton, "blue_button", true);
-    addressLayout->addWidget(readButton,1);
-    valueLayout->addWidget(writeButton,1);
+    scopy::regmap::Utils::applyScopyButtonStyle(readButton);
+    scopy::regmap::Utils::applyScopyButtonStyle(writeButton);
 
-    layout->addLayout(addressLayout);
-    layout->addLayout(valueLayout);
-//    layout->addLayout(buttonsLayout);
+    QVBoxLayout *buttonsLayout = new QVBoxLayout();
+    buttonsLayout->addWidget(readButton);
+    buttonsLayout->addWidget(writeButton);
+
+    auxLayout->addLayout(addressLayout);
+    auxLayout->addLayout(valueLayout);
+
+    layout->addLayout(auxLayout,8);
+    layout->addLayout(buttonsLayout,1);
 
     QSpacerItem *spacer = new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding);
     layout->addItem(spacer);

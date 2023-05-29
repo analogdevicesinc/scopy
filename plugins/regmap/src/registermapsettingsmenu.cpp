@@ -8,7 +8,7 @@
 #include <QFileDialog>
 #include <QDebug>
 #include <QComboBox>
-#include "dynamicWidget.h"
+#include "utils.hpp"
 
 #include <src/readwrite/fileregisterreadstrategy.hpp>
 
@@ -39,16 +39,28 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     insertSection(intervalSection);
     intervalSection->getContentWidget()->layout()->setSpacing(5);
 
+    QWidget *setIntervalWidget = new QWidget();
+    QVBoxLayout *setIntervalWidgetLayout = new QVBoxLayout();
+    setIntervalWidget->setLayout(setIntervalWidgetLayout);
+
+    QHBoxLayout *startReadIntervalLayout = new QHBoxLayout();
+    startReadIntervalLayout->addWidget(new QLabel("0x"));
+    setIntervalWidgetLayout->addLayout(startReadIntervalLayout);
+
     QLineEdit *startReadInterval = new QLineEdit();
     startReadInterval->setPlaceholderText("From register");
-//    startReadInterval->setInputMask("0x");
+    startReadIntervalLayout->addWidget(startReadInterval);
+
+    QHBoxLayout *endReadIntervalLayout = new QHBoxLayout();
+    endReadIntervalLayout->addWidget(new QLabel("0x"));
+    setIntervalWidgetLayout->addLayout(endReadIntervalLayout);
 
     QLineEdit *endReadInterval = new QLineEdit();
     endReadInterval->setPlaceholderText("To register");
-//    endReadInterval->setInputMask("0x");
+    endReadIntervalLayout->addWidget(endReadInterval);
 
     QPushButton *readInterval = new QPushButton("Read interval");
-    scopy::setDynamicProperty(readInterval, "blue_button", true);
+    Utils::applyScopyButtonStyle(readInterval);
 
     QObject::connect(readInterval, &QPushButton::clicked, this, [=](){
         bool ok;
@@ -58,14 +70,14 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
             Q_EMIT requestRead(i);
         }
     });
-    intervalSection->getContentWidget()->layout()->addWidget(startReadInterval);
-    intervalSection->getContentWidget()->layout()->addWidget(endReadInterval);
+    intervalSection->getContentWidget()->layout()->addWidget(setIntervalWidget);
     intervalSection->getContentWidget()->layout()->addWidget(readInterval);
 
     QLineEdit *filePath = new QLineEdit();
     filePath->setPlaceholderText("File path");
     QPushButton *pathButton = new QPushButton("Find path");
-    scopy::setDynamicProperty(pathButton, "blue_button", true);
+    Utils::applyScopyButtonStyle(pathButton);
+
 
     QObject::connect(pathButton, &QPushButton::clicked, this, [=](){
         filePath->setText(QFileDialog::getOpenFileName(this, ("Open File"), ""));
@@ -76,7 +88,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
 
     QPushButton *writeListOfValuesButton = new QPushButton("Write values");
-    scopy::setDynamicProperty(writeListOfValuesButton, "blue_button", true);
+    Utils::applyScopyButtonStyle(writeListOfValuesButton);
+
     QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=](){
 
         bool ok;
@@ -95,7 +108,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     intervalSection->getContentWidget()->layout()->addWidget(writeListOfValuesButton);
 
     QPushButton *registerDump = new QPushButton("Register dump");
-    scopy::setDynamicProperty(registerDump, "blue_button", true);
+    Utils::applyScopyButtonStyle(registerDump);
+
     QObject::connect(registerDump, &QPushButton::clicked, this, [=](){
         if (autoread->isChecked()) {
             readInterval->click();

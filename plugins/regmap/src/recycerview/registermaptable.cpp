@@ -21,6 +21,9 @@ RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModel
     QObject::connect(this, &RegisterMapTable::widgetGenerated, recyclerView, &RecyclerView::addWidget);
 
     recyclerView->init();
+
+    selectedAddress = 0;
+    registersMap->value(selectedAddress)->setRegisterSelected(true);
 }
 
 QWidget *RegisterMapTable::getWidget()
