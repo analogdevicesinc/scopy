@@ -17,6 +17,9 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
       ,m_widget(parent), m_readerThread(nullptr)
 {
 	m_iioDev = iio_context_find_device(ctx, AD_NAME);
+	if (m_iioDev) {
+		m_iioDeviceName = iio_device_get_name(m_iioDev);
+	}
 	m_chnlsFunction = chnlsFunc;
 	m_chnlsFunction.append("diagnostic");
 	m_chnlsFunction.append("diagnostic");
@@ -42,8 +45,8 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 
 	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
 	setupToolView(settingsMenu);
-	initMonitorToolView(settingsMenu);
 	setupConnections();
+	initMonitorToolView(settingsMenu);
 //	}
 }
 
@@ -75,7 +78,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 
 	m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
-	m_monitorChannelManager->setToolStatus("Channels");
+	m_monitorChannelManager->setToolStatus(m_iioDeviceName.toUpper());
 
 	m_toolView = scopy::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
@@ -90,7 +93,10 @@ void Ad74413r::setupConnections()
 	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::backBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
+
+	connect(m_monitorChannelManager, &scopy::gui::ChannelManager::enabledChannel, this, &Ad74413r::onChannelWidgetEnabled);
 	connect(this, &Ad74413r::channelWidgetEnabled, m_plotHandler, &BufferPlotHandler::onChannelWidgetEnabled);
+
 	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
 	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
 
@@ -106,6 +112,8 @@ void Ad74413r::setupConnections()
 	connect(m_tme, &ToolMenuEntry::runToggled, m_toolView->getRunBtn(), &QPushButton::setChecked);
 
 	connect(m_plotHandler, &BufferPlotHandler::offsetHandleSelected, this, &Ad74413r::onOffsetHdlSelected);
+
+	connect(m_monitorChannelManager, &scopy::gui::ChannelManager::selectedChannel, this, &Ad74413r::onChannelWidgetSelected);
 	connect(this, &Ad74413r::channelWidgetSelected, m_plotHandler, &BufferPlotHandler::onChannelWidgetSelected);
 
 	connect(m_toolView->getPrintBtn(), &QPushButton::clicked, m_plotHandler, &BufferPlotHandler::onPrintBtnClicked);
@@ -113,21 +121,17 @@ void Ad74413r::setupConnections()
 
 void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 {
-	int chId = 0;
+	int chId = 1;
 	bool first = true;
 
-	QString deviceName(iio_device_get_name(m_iioDev));
-	ChannelWidget *mainCh_widget =
-			m_toolView->buildNewChannel(m_monitorChannelManager, settingsMenu, false, chId, false, false,
-						    QColor("green"), deviceName.toUpper(), deviceName.toUpper());
-	chId++;
 	for (int i = 0; i < m_chnlsFunction.size(); i++) {
 		if (m_chnlsFunction[i].compare("high_z") != 0) {
-			QString menuTitle(((deviceName.toUpper() + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
-			BufferMenuView *menu = new BufferMenuView(m_widget);
+
+			QString menuTitle(((m_iioDeviceName.toUpper() + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
+			BufferMenuView *menu = new BufferMenuView(this);
 			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 			//that's why we have to decrease by 1
-			menu->init(menuTitle, m_chnlsFunction[i], new QColor(m_plotHandler->getCurveColor(chId - 1)));
+			menu->init(menuTitle, m_chnlsFunction[i], new QColor(m_plotHandler->getCurveColor(chId-1)));
 
 			struct iio_channel* iioChnl = m_swiotAdLogic->getIioChnl(i, true);
 			BufferMenuModel* swiotModel = new BufferMenuModel(iioChnl);
@@ -141,8 +145,8 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 			//that's why we have to decrease by 1
 			ChannelWidget *chWidget =
-					m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, chId, false, false,
-								    m_plotHandler->getCurveColor(chId - 1), chnlWidgetName, chnlWidgetName);
+					m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, -1, false, false,
+								    m_plotHandler->getCurveColor(chId-1), chnlWidgetName, chnlWidgetName);
 			if (first) {
 				chWidget->menuButton()->click();
 				first = false;
@@ -152,9 +156,6 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 			chId++;
 		}
 	}
-
-	m_toolView->buildChannelGroup(m_monitorChannelManager, mainCh_widget, m_channelWidgetList);
-	connectChnlsWidgesToPlot();
 }
 
 void Ad74413r::initExportSettings(QWidget *parent)
@@ -233,22 +234,10 @@ scopy::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* col
 	return menu;
 }
 
-void Ad74413r::connectChnlsWidgesToPlot()
+void Ad74413r::onChannelWidgetEnabled(int chnWidgetId, bool en)
 {
-	for (int i = 0; i < m_channelWidgetList.size(); i++) {
-		connect(m_channelWidgetList[i], SIGNAL(enabled(bool)),
-			SLOT(onChannelWidgetEnabled(bool)));
-		connect(m_channelWidgetList[i], SIGNAL(selected(bool)),
-			SLOT(onChannelWidgetSelected(bool)));
-	}
-}
+	int id = chnWidgetId;
 
-void Ad74413r::onChannelWidgetEnabled(bool en)
-{
-	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
-	//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
-	//that's why we have to decrease by 1
-	int id = w->id() - 1;
 	int chnlIdx = m_controllers[id]->getChnlIdx();
 
 	if (en) {
@@ -262,12 +251,11 @@ void Ad74413r::onChannelWidgetEnabled(bool en)
 	Q_EMIT channelWidgetEnabled(id, en);
 }
 
-void Ad74413r::onChannelWidgetSelected(bool checked)
+void Ad74413r::onChannelWidgetSelected(int chnWidgetId, bool en)
 {
-	ChannelWidget *w = static_cast<ChannelWidget *>(QObject::sender());
-	//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
-	//that's why we have to decrease by 1
-	int id = w->id() - 1;
+	if (!en) { return; }
+
+	int id = chnWidgetId;
 	Q_EMIT channelWidgetSelected(id);
 }
 
