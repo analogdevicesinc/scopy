@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BITFIELD_H
-#define BITFIELD_H
+#ifndef BITFIELDWIDGET_H
+#define BITFIELDWIDGET_H
 
 #include <QWidget>
 #include <QDomDocument>
@@ -77,4 +77,4 @@ private:
 };
 }
 }
-#endif // BITFIELD_H
+#endif // BITFIELDWIDGET_H

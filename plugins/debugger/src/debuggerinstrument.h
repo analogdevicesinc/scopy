@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef DEBUGGER_H
-#define DEBUGGER_H
+#ifndef DEBUGGERINSTRUMENT_H
+#define DEBUGGERINSTRUMENT_H
 
 #include <iio.h>
 #include <gui/tool_view.hpp>
@@ -33,10 +33,6 @@
 #include "debuggercontroller.h"
 #include "bitfieldwidget.h"
 #include "registerwidget.h"
-//#include "filter.hpp"
-//#include "tool.hpp"
-//#include <gui/detachedWindow.hpp"
-//#include "tool_launcher.hpp"
 
 class QJSEngine;
 
@@ -77,19 +73,12 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void on_detailedRegMapCheckBox_stateChanged(int arg1);
 
-//	void on_newWindowButton_clicked();
-
-//	void on_loadButton_clicked();
-
-//	void on_runButton_clicked();
-
 private:
 	Ui::DebuggerInstrument *ui;
 	QPushButton *menuRunButton;
 	scopy::gui::ToolView *m_toolView;
 	QWidget *m_widget;
 
-//	Filter *filter;
 	QJSEngine *eng;
 
 	DebuggerController m_debugController;
@@ -101,4 +90,4 @@ private:
 }
 }
 
-#endif // DEBUGGER_H
+#endif // DEBUGGERINSTRUMENT_H
