@@ -47,7 +47,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
                       + QString::number(regOffset + width - 1) + ":" + QString::number(regOffset) + "\n"
                       + "Description : " + description + "\n"
                       + "Notes : " + notes + "\n"
-                      + "Default Value : " + Utils::convertToHexa(defaultValue, width);
+                      + "Default Value : " + scopy::regmap::Utils::convertToHexa(defaultValue, width);
 
     setToolTip(toolTip);
 

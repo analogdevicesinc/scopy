@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "scopyregmap_export.h"
 
+class QHBoxLayout;
 class QSpinBox;
 class QTextSpinBox;
 class QLabel;
@@ -25,7 +26,7 @@ public:
 
 private:
 
-	QVBoxLayout *layout;
+    QHBoxLayout *layout;
 	QLineEdit *regValue;
 	QPushButton *readButton;
 	QPushButton *writeButton;

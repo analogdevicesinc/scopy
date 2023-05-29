@@ -32,7 +32,7 @@ private:
     RecyclerView * recyclerView;
     QMap<uint32_t, RegisterModel*> *registerModels;
     QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
-    uint32_t selectedAddress = 0;
+    uint32_t selectedAddress;
 };
 
 #endif // REGISTERMAPTABLE_H
