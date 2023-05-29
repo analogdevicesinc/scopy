@@ -18,9 +18,6 @@ public:
 	explicit Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Faults() override;
 
-	void getAd74413rFaultsNumeric();
-	void getMax14906FaultsNumeric();
-
 	void pollFaults();
 
 Q_SIGNALS:
@@ -47,7 +44,7 @@ private:
 	uint32_t max14906_numeric;
 
 	scopy::gui::ToolView *m_toolView{};
-	FaultsPage *m_faultsPage{};
+	FaultsPage *m_faultsPage;
 
 	ToolMenuEntry *m_tme;
 };
