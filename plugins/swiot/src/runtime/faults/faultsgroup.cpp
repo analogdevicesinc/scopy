@@ -5,6 +5,7 @@
 #include <QJsonArray>
 
 #include <utility>
+#include <iio.h>
 
 #include "faultsgroup.h"
 #include "src/swiot_logging_categories.h"
@@ -14,16 +15,15 @@ using namespace scopy::swiot;
 
 #define MAX_COLS_IN_GRID 100
 
-FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
+FaultsGroup::FaultsGroup(QString name, const QString &path, QMap<int, QString> *specialFaults, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultsGroup),
 	m_name(std::move(name)),
-	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
-{
+	m_specialFaults(specialFaults),
+	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this)) {
 	ui->setupUi(this);
 
 	connect(m_customColGrid, &FlexGridLayout::reqestLayoutUpdate, this, [this]() {
-		qWarning() << "FaultsGroup::reqestLayoutUpdate()";
 		if (this->ui->activeStoredLayout->count() != m_customColGrid->rows()) {
 			while (this->ui->activeStoredLayout->count() < m_customColGrid->rows()) {
 				this->ui->activeStoredLayout->addWidget(this->buildActiveStoredWidget());
@@ -33,7 +33,6 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 					this->ui->activeStoredLayout->count() - 1)->widget();
 				this->ui->activeStoredLayout->removeWidget(widgetToDelete);
 				delete widgetToDelete;
-				qDebug(CAT_SWIOT_FAULTS) << "deleted widget";
 			}
 		}
 
@@ -50,13 +49,38 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	for (int i = 0; i < m_max_faults; ++i) {
 		QJsonObject fault_object = faults_obj->at(i).toObject();
 		QString fault_name = fault_object.value("name").toString();
-		QString fault_description = fault_object.value("description").toString();
+		QString fault_description;
+
+		if (fault_object.contains("condition")) {
+			if (m_specialFaults) {
+				QJsonObject condition = fault_object["condition"].toObject();
+				if (condition.contains(m_specialFaults->value(i))) {
+					// this logic works because the index variable will be the same as when creating the
+					// m_specialFaults map since the json is read in the same order for both cases
+					// ex: VI_ERR_A matches channel 0, so it will always have the 0 index in m_specialFaults
+					if (
+						(fault_name == " VI_ERR_A " && m_specialFaults->contains(0)) ||
+						(fault_name == " VI_ERR_B " && m_specialFaults->contains(1)) ||
+						(fault_name == " VI_ERR_C " && m_specialFaults->contains(2)) ||
+						(fault_name == " VI_ERR_D " && m_specialFaults->contains(3))
+						)
+					{
+						fault_description = condition[m_specialFaults->value(i)].toString();
+					}
+				} else {
+					fault_description = fault_object.value("description").toString();
+				}
+			}
+		} else {
+			fault_description = fault_object.value("description").toString();
+		}
+
 		auto fault_widget = new FaultWidget(i, fault_name, fault_description, this);
 		connect(fault_widget, &FaultWidget::faultSelected, this, [this](unsigned int id_) {
 			bool added = m_currentlySelected.insert(id_).second;
 			if (!added) {
 				m_currentlySelected.erase(id_);
-				m_faults.at((int)(id_))->setPressed(false);
+				m_faults.at((int) (id_))->setPressed(false);
 			}
 			Q_EMIT selectionUpdated();
 		});
@@ -93,7 +117,7 @@ void FaultsGroup::setupDynamicUi() {
 
 void FaultsGroup::clearSelection() {
 	for (unsigned int i: m_currentlySelected) {
-		m_faults[(int)(i)]->setPressed(false);
+		m_faults[(int) (i)]->setPressed(false);
 	}
 
 	m_currentlySelected.clear();
