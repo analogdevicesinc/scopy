@@ -17,6 +17,7 @@
 
 #include "iioutil/contextprovider.h"
 #include "scopy-regmap_config.h"
+#include "utils.hpp"
 
 using namespace scopy;
 
@@ -53,15 +54,23 @@ bool REGMAPPlugin::compatible(QString m_param, QString category)
     auto &&cp = ContextProvider::GetInstance();
     iio_context* ctx = cp->open(m_param);
 
-    if(!ctx)
+    if (!ctx) {
+        cp->close(m_param);
         return false;
+    } else {
 
-    //TODO check if any device found
-    // TODO check if device allows reg map access ?
-
+        auto deviceCount = iio_context_get_devices_count(ctx);
+        for (int i = 0; i < deviceCount; i++) {
+            iio_device *dev = iio_context_get_device(ctx, i);
+            if (iio_device_find_debug_attr(dev,"direct_reg_access")) {
+                cp->close(m_param);
+                return true;
+            }
+        }
+    }
     cp->close(m_param);
 
-    return true;
+    return false;
 }
 
 void REGMAPPlugin::preload()
@@ -120,11 +129,7 @@ bool REGMAPPlugin::onConnect()
             bool foundTemplate = false;
                 //check if device has template
 
-            QDir xmlsPath(REGMAP_XML_BUILD_PATH);
-
-            if ( xmlsPath.entryList().empty()) {
-                xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
-            }
+            QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
 
             foreach (const QString &templatePath, xmlsPath.entryList()) {
                 if (templatePath.contains(devName)) {

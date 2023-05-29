@@ -8,9 +8,9 @@
 #include <QtMath>
 
 #include "dynamicWidget.h"
+#include "utils.hpp"
 
-#include <src/utils.hpp>
-
+//using namespace scopy::regmap;
 BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, int defaultValue, QString description,
                                                int width, QString notes, int regOffset, QMap<QString, QString> *options, QWidget *parent)
     :options(options),
@@ -27,13 +27,13 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, int defaultValue, Q
     layout->addWidget(new QLabel(name));
     layout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
     layout->addWidget(new QLabel(description));
-    layout->addWidget(new QLabel("Default Value: " + Utils::convertToHexa(defaultValue, width)));
+    layout->addWidget(new QLabel("Default Value: " + scopy::regmap::Utils::convertToHexa(defaultValue, width)));
 
     toolTip = "Name : " + name + "\n"
               + QString::number(regOffset + width - 1) + ":" + QString::number(regOffset) + "\n"
               + "Description : " + description + "\n"
               + "Notes : " + notes + "\n"
-              + "Default Value : " + Utils::convertToHexa(defaultValue, width);
+              + "Default Value : " + scopy::regmap::Utils::convertToHexa(defaultValue, width);
 
     setToolTip(toolTip);
 
