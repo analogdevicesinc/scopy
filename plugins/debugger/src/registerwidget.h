@@ -59,10 +59,10 @@ public Q_SLOTS:
 	void createRegMap(const QString *device, int *address,const QString *source);
 	void setValue(int var);
 	void setValue(uint32_t var, uint32_t mask);
-	void updateBitfields(void);
+	void updateBitfields();
 
 private:
-	void checkRegisterMap(void);
+	void checkRegisterMap();
 
 	Ui::RegisterWidget *ui;
 	RegmapParser regMap;
