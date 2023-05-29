@@ -11,12 +11,12 @@
 using namespace scopy::swiot;
 
 #define POLLING_INTERVAL 1000
-#define FAULT_CHANNEL_NAME "voltage"
 
 Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	QWidget(parent),
 	ctx(ctx),
 	ui(new Ui::Faults),
+	m_faultsPage(new FaultsPage(ctx, this)),
 	timer(new QTimer()),
 	ad74413r_numeric(0),
 	max14906_numeric(0),
@@ -24,8 +24,6 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	thread(new QThread(this)),
 	m_tme(tme)
 {
-	struct iio_device *m_faultsDevice = iio_context_find_device(ctx, MAX_NAME);
-	m_faultsPage = new FaultsPage(this);
 	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
 	ui->setupUi(this);
@@ -81,83 +79,6 @@ void Faults::connectSignalsAndSlots() {
 	QObject::connect(this->m_tme, &ToolMenuEntry::runToggled, this->m_toolView->getRunBtn(), &QPushButton::setChecked);
 }
 
-void Faults::getAd74413rFaultsNumeric()
-{
-	iio_device *dev = nullptr;
-	unsigned int devCount = iio_context_get_devices_count(ctx);
-	for (int i = 0; i < devCount; ++i) {
-		iio_device *aux = iio_context_get_device(ctx, i);
-		std::string name = iio_device_get_name(aux);
-		if (name == "ad74413r") {
-			dev = aux;
-			break;
-		}
-	}
-
-	if (dev == nullptr) {
-		qCritical(CAT_SWIOT_FAULTS) << "No device was found";
-		return;
-	}
-
-	iio_channel *chn = iio_device_find_channel(dev, FAULT_CHANNEL_NAME, false);
-	if (chn == nullptr) {
-		qCritical(CAT_SWIOT_FAULTS) << "Channel" << FAULT_CHANNEL_NAME << "was not found";
-		return;
-	}
-
-	char fau[100];
-	ssize_t readResult = iio_channel_attr_read(chn, "raw", fau, 100);
-
-	if (readResult < 0) {
-		qCritical(CAT_SWIOT_FAULTS) << "AD74413R faults value could not be read.";
-	} else {
-		qDebug(CAT_SWIOT_FAULTS) << "AD74413R faults read the value:" << fau;
-		try {
-			this->ad74413r_numeric = std::stoi(fau);
-		} catch (std::invalid_argument& exception) {
-			qCritical(CAT_SWIOT_FAULTS) << "AD74413R faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
-		}
-	}
-}
-
-void Faults::getMax14906FaultsNumeric() {
-	iio_device *dev = nullptr;
-	unsigned int devCount = iio_context_get_devices_count(this->ctx);
-	for (int i = 0; i < devCount; ++i) {
-		iio_device *aux = iio_context_get_device(this->ctx, i);
-		std::string name = iio_device_get_name(aux);
-		if (name == "max14906") {
-			dev = aux;
-			break;
-		}
-	}
-
-	if (dev == nullptr) {
-		qCritical(CAT_SWIOT_FAULTS) << "No device was found.";
-		return;
-	}
-
-	iio_channel *chn = iio_device_find_channel(dev, FAULT_CHANNEL_NAME, false);
-	if (chn == nullptr) {
-		qCritical(CAT_SWIOT_FAULTS) << "Device" << FAULT_CHANNEL_NAME << "was not found.";
-		return;
-	}
-
-	char fau[100];
-	ssize_t readResult = iio_channel_attr_read(chn, "raw", fau, 100);
-
-	if (readResult < 0) {
-		qCritical(CAT_SWIOT_FAULTS) << "MAX14906 faults value could not be read.";
-	} else {
-		qDebug(CAT_SWIOT_FAULTS) << "MAX14906 faults read the value:" << fau;
-		try {
-			this->max14906_numeric = std::stoi(fau);
-		} catch (std::invalid_argument& exception) {
-			qCritical(CAT_SWIOT_FAULTS) << "MAX14906 faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
-		}
-	}
-}
-
 void Faults::runButtonClicked() {
 	qDebug(CAT_SWIOT_FAULTS) << "Run button clicked";
 	this->m_toolView->getSingleBtn()->setChecked(false);
@@ -190,9 +111,7 @@ void Faults::singleButtonClicked() {
 
 void Faults::pollFaults() {
 	qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
-	this->getAd74413rFaultsNumeric();
-	this->getMax14906FaultsNumeric();
-	this->m_faultsPage->update(this->ad74413r_numeric, this->max14906_numeric);
+	this->m_faultsPage->update();
 }
 
 QPushButton *Faults::createBackButton() {
