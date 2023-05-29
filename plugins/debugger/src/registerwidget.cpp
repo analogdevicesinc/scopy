@@ -139,7 +139,7 @@ bool lessThan(const BitfieldWidget *b1, const BitfieldWidget *b2)
 	}
 }
 
-void RegisterWidget::checkRegisterMap(void)
+void RegisterWidget::checkRegisterMap()
 {
 	int size = 0;
 	int regOffsets[32];
