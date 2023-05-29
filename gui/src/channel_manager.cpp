@@ -362,8 +362,7 @@ void ChannelManager::onChannelSelected(bool toggled)
 	if (ch != nullptr) {
 		int id = m_channelsList.indexOf(ch);
 		m_selectedChannel = id;
-
-		Q_EMIT selectedChannel(id);
+		Q_EMIT selectedChannel(id, toggled);
 	}
 }
 

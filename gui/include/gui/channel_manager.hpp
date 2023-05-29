@@ -62,7 +62,7 @@ Q_SIGNALS:
 	void positionChanged(ChannelsPositionEnum position);
 	void channelManagerToggle(bool toggled);
 
-	void selectedChannel(int id);
+	void selectedChannel(int id, bool toggled);
 	void enabledChannel(int id, bool toggled);
 	void deletedChannel(QString name);
 
