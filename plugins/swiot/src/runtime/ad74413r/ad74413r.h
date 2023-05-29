@@ -45,8 +45,8 @@ public:
 	scopy::gui::GenericMenu *createSettingsMenu(QString title, QColor *color);
 public Q_SLOTS:
 
-	void onChannelWidgetEnabled(bool en);
-	void onChannelWidgetSelected(bool checked);
+	void onChannelWidgetEnabled(int chnWidgetId, bool en);
+	void onChannelWidgetSelected(int chnWidgetId, bool en);
 	void onOffsetHdlSelected(int hdlIdx, bool selected);
 
 	void onRunBtnPressed();
@@ -72,12 +72,12 @@ private:
 	void createMonitorChannelMenu();
 
 	void setupConnections();
-	void connectChnlsWidgesToPlot();
 
 	QPushButton* createBackBtn();
 
 private:
 	struct iio_device *m_iioDev;
+	QString m_iioDeviceName;
 	int m_enabledChnlsNo = 0;
 
 	scopy::gui::ChannelManager *m_monitorChannelManager;
