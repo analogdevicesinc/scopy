@@ -175,7 +175,7 @@ void RecyclerView::populateMap()
     }
 
     //TODO find a way to autocompute max row count
-    maxRowCount = 5;
+    maxRowCount = 10;
 
     int i = 0;
     while ( i < maxRowCount && mapIterator != widgets->end()) {

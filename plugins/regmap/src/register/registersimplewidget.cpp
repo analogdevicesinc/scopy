@@ -37,7 +37,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     QVBoxLayout *rightLayout = new QVBoxLayout();
     rightLayout->setAlignment(Qt::AlignRight);
 
-    QLabel *registerAddressLable = new QLabel(Utils::convertToHexa(address.toInt(&ok,16),registerWidth));
+    QLabel *registerAddressLable = new QLabel(scopy::regmap::Utils::convertToHexa(address.toInt(&ok,16),registerWidth));
     registerAddressLable->setAlignment(Qt::AlignRight);
     rightLayout->addWidget(registerAddressLable);
     value = new QLabel("Not Read");
@@ -65,7 +65,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
         int streach = bitFields->at(bits)->getStreach();
         bitFieldsWidgetLayout->addWidget(bitFields->at(bits), row, col, 1, streach);
         col += streach;
-        if (col > 7) {
+        if (col > scopy::regmap::Utils::getBitsPerRow()) {
             row++;
             col = 0;
         }
@@ -79,7 +79,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     layout->addLayout(bitFieldsWidgetLayout,8);
 
     QString toolTip = "Name : " + name + "\n"
-                      + "Address : " + Utils::convertToHexa(address.toInt(&ok,16), registerWidth) + "\n"
+                      + "Address : " + scopy::regmap::Utils::convertToHexa(address.toInt(&ok,16), registerWidth) + "\n"
                       + "Description : " + description + "\n"
                       + "Notes : " + notes + "\n" ;
 
@@ -99,13 +99,13 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 
         int width = bitFields->at(i)->getWidth();
         int bfVal = ( ((1 << (regOffset + width) ) - 1 ) & value) >> regOffset;
-        QString bitFieldValue = Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
+        QString bitFieldValue = scopy::regmap::Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
         bitFields->at(i)->updateValue(bitFieldValue);
         regOffset += width;
 
         bitFields->at(i)->blockSignals(false);
     }
-    this->value->setText(Utils::convertToHexa(value,registerWidth));
+    this->value->setText(scopy::regmap::Utils::convertToHexa(value,registerWidth));
 }
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)

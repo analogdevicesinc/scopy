@@ -1,9 +1,9 @@
 #include "searchbarwidget.hpp"
+#include "utils.hpp"
 
 #include <qboxlayout.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
-#include "dynamicWidget.h"
 
 SearchBarWidget::SearchBarWidget(QWidget *parent)
 	: QWidget{parent}
@@ -11,7 +11,7 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 	searchBar = new QLineEdit();
 	searchBar->setPlaceholderText("Search for regist by address");
 	searchButton = new QPushButton("Search");
-    scopy::setDynamicProperty(searchButton, "blue_button", true);
+    scopy::regmap::Utils::applyScopyButtonStyle(searchButton);
 	layout = new QHBoxLayout();
 
 	QObject::connect(searchButton, &QPushButton::pressed, this, [=](){

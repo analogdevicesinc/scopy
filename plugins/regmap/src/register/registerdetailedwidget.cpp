@@ -7,6 +7,7 @@
 #include <qlabel.h>
 #include "registermodel.hpp"
 #include "qdebug.h"
+#include "utils.hpp"
 #include <QtMath>
 
 RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget *parent)
@@ -38,7 +39,11 @@ RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget
         bitFieldsWidgetLayout->addWidget(bitFieldDetailedWidget, row, col);
         col++;
         currentBitFieldCount += bitFieldDetailedWidget->getWidth();
-        if (currentBitFieldCount % 8 == 0) {
+//        if (currentBitFieldCount % 8 == 0) {
+//            row++;
+//            col = 0;
+//        }
+        if (col > scopy::regmap::Utils::getBitsPerRow()) {
             row++;
             col = 0;
         }
