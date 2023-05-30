@@ -1,0 +1,24 @@
+{
+    "spi": [
+        {
+            "file_name": "ad9361-phy.xml",
+            "use_description_as_name": true
+        }
+    ],
+    "axi": [
+        {
+            "file_name": "adi_regmap_adc_v10_axi.xml",
+            "compatible_drivers": [
+                "cf-ad9361-lpc"
+            ],
+            "use_description_as_name": true
+        },
+        {
+            "file_name": "adi_regmap_dac_v9_axi.xml",
+            "compatible_drivers": [
+                "cf-ad9361-dds-core-lpc"
+            ],
+            "use_description_as_name": true
+        }
+    ]
+}
