@@ -5,6 +5,7 @@
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
 #include <QVBoxLayout>
+#include <QMessageBox>
 
 using namespace scopy::swiot;
 
@@ -14,6 +15,8 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	m_drawArea(nullptr),
 	m_scrollArea(nullptr),
 	m_toolView(nullptr),
+	m_mainView(new QWidget(this)),
+	m_statusLabel(new QLabel(this)),
 	ui(new Ui::ConfigMenu) {
 	m_swiotDevice = iio_context_find_device(ctx, "swiot");
 	if (m_swiotDevice == nullptr) {
@@ -28,7 +31,18 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	this->setupToolView(parent);
 	this->init();
 	this->createPageLayout();
-	connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::configBtnPressed);
+	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::configBtnPressed);
+
+	// The "ext_psu" attribute will be checked only once in the config context
+	bool extPowerSupplyConnected = false;
+	int res = iio_device_attr_read_bool(m_swiotDevice, "ext_psu", &extPowerSupplyConnected);
+	if (res < 0) {
+		qWarning(CAT_SWIOT_CONFIG) << "Error, could not read value from \"ext_psu\" from the swiot device.";
+	} else {
+		if (extPowerSupplyConnected) {
+			m_statusLabel->hide();
+		}
+	}
 }
 
 SwiotConfig::~SwiotConfig() {}
@@ -63,7 +77,6 @@ QPushButton *SwiotConfig::createConfigBtn() {
 	configBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
 						   "  width: 95px;\n"
 						   "  height: 40px;\n"
-						   "\n"
 						   "  font-size: 12px;\n"
 						   "  text-align: center;\n"
 						   "  font-weight: bold;\n"
@@ -109,7 +122,17 @@ void SwiotConfig::createPageLayout() {
 	scrollWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	m_scrollArea->setWidget(scrollWidget);
 	m_scrollArea->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
-	m_toolView->addFixedCentralWidget(m_scrollArea, 0, 0, 0, 0);
+
+	m_statusLabel->setText("The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	m_statusLabel->setStyleSheet("color: red;");
+	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+
+	m_mainView->setLayout(new QVBoxLayout(m_mainView));
+	m_mainView->layout()->addWidget(m_statusLabel);
+	m_mainView->layout()->addWidget(m_scrollArea);
+
+	m_toolView->addFixedCentralWidget(m_mainView, 0, 0, 0, 0);
 	m_toolView->addTopExtraWidget(m_configBtn);
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
