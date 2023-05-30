@@ -5,6 +5,8 @@
 
 class QDir;
 class QPushButton;
+
+class JsonFormatedElement;
 namespace scopy::regmap {
 class Utils : public QObject
 {
@@ -18,8 +20,16 @@ public:
 
     static int getBitsPerRow();
 
+    static void applyJsonConfig();
+    static QList<QString>* getTemplate(QString devName);
+
 private:
     static const int bitsPerRow = 7;
+    static QMap<QString, JsonFormatedElement*>* spiJson;
+    static QMap<QString, JsonFormatedElement*>* axiJson;
+    static void getConfigurationFromJson(QString filePath);
+    static void populateJsonTemplateMap(QJsonArray jsonArray, bool spi);
+    static void generateJsonTemplate(QString filePath);
 
 signals:
 
