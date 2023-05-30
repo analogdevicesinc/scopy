@@ -68,7 +68,9 @@ void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPa
     if (xmlPath != "") {
         registerMapTemplate = new RegisterMapTemplate();
         XmlFileManager xmlFileManager(dev, xmlPath);
-        registerMapTemplate->setRegisterList(xmlFileManager.getAllRegisters());
+        if (!xmlFileManager.getAllRegisters()->isEmpty()){
+            registerMapTemplate->setRegisterList(xmlFileManager.getAllRegisters());
+        }
     }
 
     RegisterMapValues *registerMapValues = getRegisterMapValues(dev);
