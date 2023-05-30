@@ -64,6 +64,8 @@ bool REGMAPPlugin::compatible(QString m_param, QString category)
             iio_device *dev = iio_context_get_device(ctx, i);
             if (iio_device_find_debug_attr(dev,"direct_reg_access")) {
                 cp->close(m_param);
+                // if we have regmap we create the config file
+                scopy::regmap::Utils::applyJsonConfig();
                 return true;
             }
         }
@@ -92,8 +94,6 @@ void REGMAPPlugin::preload()
 
 bool REGMAPPlugin::onConnect()
 {
-
-
     auto &&cp = ContextProvider::GetInstance();
     iio_context* ctx = cp->open(m_param);
 
@@ -115,33 +115,31 @@ bool REGMAPPlugin::onConnect()
     m_registerMapWidget->setLayout(layout);
 
     if (m_deviceList && !m_deviceList->isEmpty()) {
+        QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
         RegisterMapInstrument *regMapInstrument = new RegisterMapInstrument();
+
         for (int i = 0; i < m_deviceList->size(); ++i) {
             iio_device *dev = m_deviceList->at(i);
-            qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << iio_device_get_name(dev);
-
             QString devName = QString::fromStdString(iio_device_get_name(dev));
+            qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << devName;
 
             if (isBufferCapable(dev)) {
-                qDebug(CAT_REGMAP)<<"DEVICE :" << iio_device_get_name(dev) << " IS BUFFER CAPABLE";
+                qDebug(CAT_REGMAP)<<"DEVICE :" << devName << " IS BUFFER CAPABLE";
             }
 
-            bool foundTemplate = false;
-                //check if device has template
 
-            QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
-
-            foreach (const QString &templatePath, xmlsPath.entryList()) {
-                if (templatePath.contains(devName)) {
-                    qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << iio_device_get_name(dev);
-                    regMapInstrument->addTab( dev, iio_device_get_name(dev),xmlsPath.absoluteFilePath(templatePath));
-                    foundTemplate = true;
-                    break;
+            QList<QString> *templatePaths = scopy::regmap::Utils::getTemplate(devName);
+            if (!templatePaths->empty()) {
+                for (int i = 0 ; i < templatePaths->size(); i++) {
+                    qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << devName;
+                    regMapInstrument->addTab( dev, devName, xmlsPath.absoluteFilePath(templatePaths->at(i)));
                 }
-            }
-            if(!foundTemplate) {
+
+            } else {
+                //TODO GROUP ALL DEVICES IN ONE WITH A COMBOBOX
                 regMapInstrument->addTab(dev, iio_device_get_name(dev));
             }
+
 
         }
         layout->addWidget(regMapInstrument);
