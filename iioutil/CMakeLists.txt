@@ -30,6 +30,10 @@ if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
 
+configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
+set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h)
+
 set(PROJECT_SOURCES
         ${SRC_LIST}
         ${HEADER_LIST}
@@ -38,16 +42,25 @@ set(PROJECT_SOURCES
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
+option(WITH_LIBSERIALPORT "Add serial backend support to Scopy - also needs to be enabled in libiio" ON)
+find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
+find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
+if (${WITH_LIBSERIALPORT})
+	find_library(LIBSERIALPORT_LIBRARIES serialport REQUIRED)
+	find_path(LIBSERIALPORT_INCLUDE_DIR libserialport.h REQUIRED)
+	message(STATUS "Building with libserialport support")
+endif()
+
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
 
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${IIO_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/ ${IIO_INCLUDE_DIRS} ${LIBSERIALPORT_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${IIO_INCLUDE_DIRS} ${LIBSERIALPORT_INCLUDE_DIR})
 
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets iio)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Widgets ${IIO_LIBRARIES} ${LIBSERIALPORT_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION ${SCOPY_DLL_PATH}
