@@ -30,6 +30,7 @@
 #include <QtConcurrent>
 #include <thread>
 #include <iostream>
+#include <common/common.h>
 
 
 

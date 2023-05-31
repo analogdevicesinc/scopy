@@ -2,11 +2,11 @@
 #define SCOPYCONFIG_H
 
 #include <QString>
-#include "scopy-pluginbase_export.h"
+#include "scopy-common_export.h"
 
 namespace scopy {
 
-class SCOPY_PLUGINBASE_EXPORT config {
+class SCOPY_COMMON_EXPORT config {
 public:
 	static QString defaultPluginFolderPath();
 	static QString localPluginFolderPath();
