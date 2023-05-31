@@ -16,29 +16,30 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 {
 	ui->setupUi(this);
 	initAddPage();
-	initInfoWidget();
+	initSubSections();
 	verifyIioBackend();
+	pendingUri = "";
 
+	//verify
 	fw = new QFutureWatcher<bool>(this);
 	connect(fw,&QFutureWatcher<bool>::finished,this,[=](){
 		bool result = fw->result();
-		ui->infoSection->setVisible(result);
 		if (result == true) {
 			createDevice();
-			ui->btnAdd->setVisible(false);
-			ui->scanSection->setVisible((false));
 		} else {
 			ui->uriMessageLabel->clear();
 			ui->uriMessageLabel->setText("\""+ui->editUri->text() + "\" not a valid context!");
 		}
 	});
 
+	//scan
 	scanTask = new IIOScanTask(this);
 	connect(scanTask, SIGNAL(scanFinished(QStringList)), this, SLOT(scanFinished(QStringList)));
 
+	//btns connections
 	connect(ui->btnBack, &QPushButton::clicked, this, [=](){
 		ui->scanSection->setVisible(true);
-		ui->infoSection->setVisible(false);
+		ui->scrollAreaDevInfo->setVisible(false);
 		ui->btnVerify->setVisible(true);
 		ui->btnAdd->setVisible(false);
 		ui->btnBack->setVisible(false);
@@ -88,8 +89,6 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 			deviceInfoPage->update(key, ctxInfo[key]);
 		}
 	},Qt::QueuedConnection);
-
-	pendingUri = "";
 }
 
 ScopyHomeAddPage::~ScopyHomeAddPage()
@@ -98,12 +97,16 @@ ScopyHomeAddPage::~ScopyHomeAddPage()
 	if (deviceImpl) {
 		delete deviceImpl;
 	}
+	if (libSerialSupport) {
+		delete libSerialSupport;
+	}
+
 }
 
 void ScopyHomeAddPage::initAddPage()
 {
 	bool hasLibSerialPort = libSerialSupport->hasLibSerialSupport();
-	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}$");
+	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
 
 	ui->editSerialFrameConfig->setValidator(validator);
@@ -115,24 +118,25 @@ void ScopyHomeAddPage::initAddPage()
 	ui->autoDetectionSection->setEnabled(false);
 	ui->btnAdd->setVisible(false);
 	ui->btnScan->setEnabled(false);
-	ui->infoSection->setVisible(false);
+	ui->scrollAreaDevInfo->setVisible(false);
 	ui->btnBack->setVisible(false);
 	ui->serialSettingsWidget->setEnabled(hasLibSerialPort);
 	for (int baudRate : availableBaudRates) {
 		ui->comboBoxBaudRate->addItem(QString::number(baudRate));
 	}
-
-
 }
 
-void ScopyHomeAddPage::initInfoWidget()
+void ScopyHomeAddPage::initSubSections()
 {
-	QVBoxLayout *layout = new QVBoxLayout(ui->ctxInfoWidget);
-	deviceInfoPage = new InfoPage(ui->ctxInfoWidget);
+	ui->subSeparatorPlugins->setLabel("Compatible plugins");
+	ui->subSeparatorPlugins->getContentWidget()->layout()->setSpacing(10);
+
+	ui->subSeparatorDevInfo->setLabel("Context info");
+	deviceInfoPage = new InfoPage(ui->subSeparatorDevInfo->getContentWidget());
 	deviceInfoPage->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-	layout->addWidget(deviceInfoPage);
+	ui->subSeparatorDevInfo->getContentWidget()->layout()->addWidget(deviceInfoPage);
 	QSpacerItem *vSpacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	layout->addItem(vSpacer);
+	ui->subSeparatorDevInfo->getContentWidget()->layout()->addItem(vSpacer);
 }
 
 void ScopyHomeAddPage::findAvailableSerialPorts()
@@ -232,6 +236,7 @@ void ScopyHomeAddPage::futureScan()
 
 void ScopyHomeAddPage::deviceAddedToUi(QString id)
 {
+	ui->btnBack->clicked(true);
 	if(!pendingUri.isEmpty()) {
 		Q_EMIT requestDevice(id);
 		pendingUri = "";
@@ -257,16 +262,17 @@ void ScopyHomeAddPage::deviceLoaderInitialized()
 		QCheckBox *cb = new QCheckBox();
 		cb->setText(p->name());
 		cb->setChecked(p->enabled());
-		ui->pluginsWidget->layout()->addWidget(cb);
+		ui->subSeparatorPlugins->getContentWidget()->layout()->addWidget(cb);
 		connect(cb, &QCheckBox::toggled, this, [=](bool en){
 			p->setEnabled(en);
 		});
 	}
-	QSpacerItem *vSpacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	ui->pluginsWidget->layout()->addItem(vSpacer);
+	ui->btnVerify->setVisible(false);
+	ui->scanSection->setVisible((false));
 	ui->btnAdd->setVisible(true);
 	ui->btnBack->setVisible(true);
-	ui->btnVerify->setVisible(false);
+	ui->scrollAreaDevInfo->setVisible(true);
+
 }
 
 void ScopyHomeAddPage::createDevice()
@@ -282,9 +288,9 @@ void ScopyHomeAddPage::createDevice()
 
 void ScopyHomeAddPage::removePluginsCheckBoxs()
 {
-	if (ui->pluginsWidget->layout()) {
+	if (ui->subSeparatorPlugins->getContentWidget()->layout()) {
 		QLayoutItem* item;
-		while ((item = ui->pluginsWidget->layout()->takeAt(0)) != nullptr) {
+		while ((item = ui->subSeparatorPlugins->getContentWidget()->layout()->takeAt(0)) != nullptr) {
 			delete item->widget();
 			delete item;
 		}

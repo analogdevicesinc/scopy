@@ -40,7 +40,7 @@ private Q_SLOTS:
 
 private:
 	void initAddPage();
-	void initInfoWidget();
+	void initSubSections();
 	void findAvailableSerialPorts();
 	void getContextData(struct iio_context *ctx);
 	void verifyIioBackend();
