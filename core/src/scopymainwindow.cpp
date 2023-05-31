@@ -20,7 +20,7 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
-#include "pluginbase/scopyconfig.h"
+#include <common/scopyconfig.h>
 
 using namespace scopy;
 

@@ -23,6 +23,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QDate>
+#include <common/common.h>
 
 using namespace scopy;
 

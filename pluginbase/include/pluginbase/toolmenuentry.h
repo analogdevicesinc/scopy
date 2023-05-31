@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QString>
-#include "scopyconfig.h"
+#include <common/scopyconfig.h>
 #include "scopy-pluginbase_export.h"
 
 namespace scopy {
