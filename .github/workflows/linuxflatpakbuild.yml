@@ -12,19 +12,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Pull the Docker Image
-      run: docker pull analogdevices/scopy-build:flatpak
+      run: docker pull cristianbindea/scopy2-flatpak
 
     - name: Run Docker Image
       run: |
-            $GITHUB_WORKSPACE/CI/appveyor/gen_ci_envs.sh > $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs
+            $GITHUB_WORKSPACE/ci/general/gen_ci_envs.sh > $GITHUB_WORKSPACE/ci/general/gh-actions.envs
             docker run --privileged \
                 -v `pwd`:$GITHUB_WORKSPACE:rw \
-                --env-file $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs \
-                analogdevices/scopy-build:flatpak /bin/bash -xe $GITHUB_WORKSPACE/CI/appveyor/inside_flatpak_docker.sh
+                --env-file $GITHUB_WORKSPACE/ci/general/gh-actions.envs \
+                cristianbindea/scopy2-flatpak /bin/bash -xe $GITHUB_WORKSPACE/ci/flatpak/inside_flatpak_docker.sh
 
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
         name: Scopy.flatpak
         path: ${{ github.workspace }}/Scopy.flatpak

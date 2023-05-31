@@ -10,13 +10,14 @@ apt-get install -y jq
 
 REPO_LOCAL=/home/docker/scopy-flatpak
 cd "$REPO_LOCAL"
-# this ensures that latest master is pulled from origin while keeping file cache
-# the cache should be updated from time to time locally
-git fetch && git reset origin/qt5-gr3.10 --hard
 
 #workaround for https://github.blog/2021-10-18-git-security-vulnerabilities-announced/#cve-2022-39253
 git config --global protocol.file.allow always
 
+# this ensures that latest master is pulled from origin while keeping file cache
+# the cache should be updated from time to time locally
+git fetch && git reset origin/ci-for-scopy2 --hard
+git submodule update --init
 
 # Run the preprocess step to generate org.adi.Scopy.json
 make preprocess
@@ -26,7 +27,7 @@ make preprocess
 export EN_PREPROCESS=false
 
 # check the number of elements in the json file in order to get the last element, which is Scopy
-cnt=$( echo `jq '.modules | length' org.adi.Scopy.json` )
+cnt=$( echo $(jq '.modules | length' org.adi.Scopy.json) )
 cnt=$(($cnt-1))
 
 if [ -n "$BRANCH" ]; then
@@ -55,7 +56,7 @@ echo "Details about the versions of dependencies can be found <a href="https://g
 cp build-status $GITHUB_WORKSPACE/build-status
 
 # Insert env vars in the sandboxed flatpak build
-CI_ENVS=`jq -R -n -c '[inputs|split("=")|{(.[0]):.[1]}] | add' $GITHUB_WORKSPACE/CI/appveyor/gh-actions.envs`
+CI_ENVS=$(jq -R -n -c '[inputs|split("=")|{(.[0]):.[1]}] | add' $GITHUB_WORKSPACE/ci/general/gh-actions.envs)
 echo "CI_ENVS= $CI_ENVS"
 cat org.adi.Scopy.json | jq --tab '."build-options".env += ('$CI_ENVS')' > tmp.json
 cp tmp.json org.adi.Scopy.json
