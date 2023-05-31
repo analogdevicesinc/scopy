@@ -57,7 +57,7 @@ add_library(${PROJECT_NAME} SHARED
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} scopy-common)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
     set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
@@ -65,7 +65,8 @@ endforeach()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
 	${SCOPY_QT_LIBRARIES}
-	iio)
+	iio
+	scopy-common)
 
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION ${SCOPY_DLL_PATH}

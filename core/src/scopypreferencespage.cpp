@@ -11,7 +11,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QLoggingCategory>
-#include <pluginbase/scopyconfig.h>
+#include <common/scopyconfig.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 

@@ -5,7 +5,7 @@
 #include <QFileInfo>
 #include <QNetworkReply>
 #include <QLoggingCategory>
-#include <pluginbase/scopyconfig.h>
+#include <common/scopyconfig.h>
 
 Q_LOGGING_CATEGORY(CAT_VERSION,"VersionCache");
 

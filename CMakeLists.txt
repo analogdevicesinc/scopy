@@ -66,9 +66,12 @@ if(ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
+
 set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
 set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/plugins/plugins)
 set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/scopy-plugins)
+
+add_subdirectory(common)
 add_subdirectory(gui)
 add_subdirectory(iioutil)
 add_subdirectory(pluginbase)

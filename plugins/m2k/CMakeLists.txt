@@ -80,6 +80,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	Qt::Core
 	scopy-gui
 	scopy-pluginbase
+	scopy-common
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/src/old
 	)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase)
@@ -90,6 +91,7 @@ endforeach()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${SCOPY_QT_LIBRARIES}
+    scopy-common
     scopy-pluginbase
     scopy-iioutil
     scopy-gui

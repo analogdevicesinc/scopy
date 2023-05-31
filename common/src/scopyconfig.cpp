@@ -1,5 +1,5 @@
 #include "scopyconfig.h"
-#include "scopy-pluginbase_config.h"
+#include "scopy-common_config.h"
 #include <QStandardPaths>
 #include <QApplication>
 #include <QSysInfo>
