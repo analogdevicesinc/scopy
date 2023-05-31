@@ -7,7 +7,7 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QThread>
-#include <pluginbase/scopyconfig.h>
+#include <common/scopyconfig.h>
 
 #include "qscrollarea.h"
 #include "ui_devicepage.h"

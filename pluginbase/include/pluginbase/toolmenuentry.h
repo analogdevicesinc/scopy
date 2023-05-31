@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QString>
+#include <common/scopyconfig.h>
 #include <QUuid>
 #include "scopy-pluginbase_export.h"
 
