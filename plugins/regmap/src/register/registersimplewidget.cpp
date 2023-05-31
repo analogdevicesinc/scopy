@@ -6,6 +6,7 @@
 #include <qdebug.h>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>
+#include <pluginbase/preferences.h>
 
 RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QString description,
                                            QString notes,int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields, QWidget *parent)
@@ -53,6 +54,8 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     regBaseInfo->addLayout(rightLayout);
 
     regBaseInfoWidget->setLayout(regBaseInfo);
+    // to make sure table proportions are good we use a fixed size for this
+    regBaseInfoWidget->setFixedWidth(120);
     layout->addWidget(regBaseInfoWidget,1);
 
     // add bitfield widgets
@@ -116,12 +119,18 @@ void RegisterSimpleWidget::setRegisterSelected(bool selected)
 QColor RegisterSimpleWidget::getColor(QString description)
 {
 
-    if (m_colors->contains(description)) return m_colors->value(description);
+    scopy::Preferences *p = scopy::Preferences::GetInstance();
+    bool background = p->get("regmap_background_color_by_value").toBool();
 
-    int red = rand() % 256;
-    int blue = rand() % 256;
-    int green = rand() % 256;
-    m_colors->insert(description, QColor(red,green,blue));
+    if (background) {
+       // get value % 16
+        if (m_colors->contains(description)) return m_colors->value(description);
+
+        int red = rand() % 256;
+        int blue = rand() % 256;
+        int green = rand() % 256;
+        m_colors->insert(description, QColor(red,green,blue));
+    }
     return m_colors->value(description);
 }
 

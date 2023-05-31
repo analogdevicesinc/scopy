@@ -6,21 +6,21 @@
 class JsonFormatedElement
 {
 public:
-    JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices = new QList<QString>(), bool isAxiCompatible = false, bool useNameAsDescription = false);
+    JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices = new QList<QString>(), bool isAxiCompatible = false, bool useRegisterDescriptionAsName = false, bool useBifieldDescriptionAsName = false);
     QString getFileName() const;
 
     QList<QString> *getCompatibleDevices() const;
     void addCompatibleDevice(QString device);
-
     bool getIsAxiCompatible() const;
-
-    bool getUseNameAsDescription() const;
+    bool getUseRegisterNameAsDescription() const;
+    bool getUseBifieldNameAsDescription() const;
 
 private :
     QString fileName;
     QList<QString> *compatibleDevices;
     bool isAxiCompatible;
-    bool useNameAsDescription;
+    bool useRegisterDescriptionAsName;
+    bool useBifieldDescriptionAsName;
 
 };
 
