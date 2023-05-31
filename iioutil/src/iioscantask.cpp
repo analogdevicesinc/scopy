@@ -1,6 +1,7 @@
 #include "iioscantask.h"
 #include <iio.h>
 #include <QLoggingCategory>
+#include <QElapsedTimer>
 
 using namespace scopy;
 IIOScanTask::IIOScanTask(QObject *parent) : QThread(parent) {}

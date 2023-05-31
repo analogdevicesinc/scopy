@@ -51,6 +51,7 @@
 #include "dmm_api.hpp"
 #include <pluginbase/preferences.h>
 #include <pluginbase/scopyjs.h>
+#include <common/scopy-common_config.h>
 
 Q_LOGGING_CATEGORY(CAT_VOLTMETER,"M2kDMM");
 
