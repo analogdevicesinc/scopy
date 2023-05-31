@@ -35,7 +35,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 
     QVBoxLayout *leftLayout = new QVBoxLayout();
     leftLayout->setAlignment(Qt::AlignTop);
-    QLabel *descriptionLabel = new QLabel(description);
+    QLabel *descriptionLabel = new QLabel(name);
     descriptionLabel->setWordWrap(true);
 
     leftLayout->addWidget(descriptionLabel);

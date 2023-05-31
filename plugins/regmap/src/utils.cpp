@@ -8,6 +8,7 @@
 #include <qjsondocument.h>
 #include <qjsonobject.h>
 #include <QPushButton>
+#include <QLayout>
 
 using namespace scopy::regmap;
 
@@ -27,8 +28,14 @@ QString Utils::convertToHexa(uint32_t value, int size)
 void Utils::applyScopyButtonStyle(QPushButton *button)
 {
     scopy::setDynamicProperty(button, "blue_button", true);
-    button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    button->setFixedHeight(30);
+    button->setMinimumWidth(150);
+}
 
+void Utils::removeLayoutMargins(QLayout *layout)
+{
+    layout->setMargin(0);
+    layout->setContentsMargins(0,0,0,0);
 }
 
 QDir Utils::setXmlPath()
@@ -43,6 +50,19 @@ QDir Utils::setXmlPath()
 int Utils::getBitsPerRow()
 {
     return bitsPerRow;
+}
+
+JsonFormatedElement *Utils::getJsonTemplate(QString xml)
+{
+    if (spiJson->contains(xml)) {
+        return spiJson->value(xml);
+    }
+
+    if (axiJson->contains(xml)) {
+        return axiJson->value(xml);
+    }
+
+    return nullptr;
 }
 
 QList<QString>* Utils::getTemplate(QString devName)
@@ -103,7 +123,8 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool spi)
 
         QString fileName = object.toObject().value(QString("file_name")).toString();
         bool axiCompatible = object.toObject().value(QString("axi_compatible")).toBool();
-        bool useDescriptionAsName = object.toObject().value(QString("use_description_as_name")).toBool();
+        bool useRegisterDescriptionAsName = object.toObject().value(QString("use_register_description_as_name")).toBool();
+        bool useBifieldDescriptionAsName = object.toObject().value(QString("use_bitfield_description_as_name")).toBool();
 
         QList<QString> *compatibleDevicesList = new QList<QString>();
         QJsonArray compatibleDevices = object.toObject().value(QString("compatible_drivers")).toArray();
@@ -113,9 +134,9 @@ void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool spi)
             }
         }
         if (spi) {
-            spiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, axiCompatible, useDescriptionAsName));
+            spiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, axiCompatible, useRegisterDescriptionAsName, useBifieldDescriptionAsName));
         } else {
-            axiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, axiCompatible, useDescriptionAsName));
+            axiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, axiCompatible, useRegisterDescriptionAsName, useBifieldDescriptionAsName));
         }
     }
 }
