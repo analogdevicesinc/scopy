@@ -7,6 +7,8 @@ class QDir;
 class QPushButton;
 
 class JsonFormatedElement;
+
+class QLayout;
 namespace scopy::regmap {
 class Utils : public QObject
 {
@@ -16,9 +18,12 @@ public:
 
     static QString convertToHexa(uint32_t value, int size);
     static void applyScopyButtonStyle(QPushButton *button);
+    static void removeLayoutMargins(QLayout *layout);
     static QDir setXmlPath();
 
     static int getBitsPerRow();
+
+    static JsonFormatedElement* getJsonTemplate(QString xml);
 
     static void applyJsonConfig();
     static QList<QString>* getTemplate(QString devName);

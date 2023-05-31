@@ -1,11 +1,12 @@
 #include "jsonformatedelement.hpp"
 
 
-JsonFormatedElement::JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices, bool isAxiCompatible, bool useNameAsDescription)
+JsonFormatedElement::JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices, bool isAxiCompatible, bool useRegisterDescriptionAsName, bool useBifieldDescriptionAsName)
     : fileName(fileName),
     compatibleDevices(compatibleDevices),
     isAxiCompatible(isAxiCompatible),
-    useNameAsDescription(useNameAsDescription)
+    useRegisterDescriptionAsName(useRegisterDescriptionAsName),
+    useBifieldDescriptionAsName(useBifieldDescriptionAsName)
 {
 
 }
@@ -30,7 +31,12 @@ bool JsonFormatedElement::getIsAxiCompatible() const
     return isAxiCompatible;
 }
 
-bool JsonFormatedElement::getUseNameAsDescription() const
+bool JsonFormatedElement::getUseBifieldNameAsDescription() const
 {
-    return useNameAsDescription;
+    return useBifieldDescriptionAsName;
+}
+
+bool JsonFormatedElement::getUseRegisterNameAsDescription() const
+{
+    return useRegisterDescriptionAsName;
 }

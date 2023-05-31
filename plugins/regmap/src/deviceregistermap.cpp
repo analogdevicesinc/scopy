@@ -2,7 +2,6 @@
 #include "deviceregistermap.hpp"
 
 #include "registermapvalues.hpp"
-#include "searchbarwidget.hpp"
 #include "registermaptemplate.hpp"
 #include "search.hpp"
 #include "registermapsettingsmenu.hpp"
@@ -35,6 +34,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 {
 
     QVBoxLayout *layout = new QVBoxLayout();
+    Utils::removeLayoutMargins(layout);
     setLayout( layout);
 
     deviceRegisterMapLayout = new QVBoxLayout();
@@ -56,8 +56,6 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         QVBoxLayout *registerMapTableLayout = new QVBoxLayout();
         registerMapTable->setLayout(registerMapTableLayout);
 
-        searchBarWidget = new SearchBarWidget();
-
         QWidget *tableHeadWidget = new QWidget();
         scopy::setDynamicProperty(tableHeadWidget, "has_frame", true);
         QHBoxLayout *tableHead = new QHBoxLayout();
@@ -70,14 +68,10 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
         registerMapTableWidget = new RegisterMapTable(registerMapTemplate->getRegisterList());
 
-        QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam){
-            registerMapTableWidget->setFilters(Search::searchForRegisters(registerMapTemplate->getRegisterList(),searchParam));
-        });
         QObject::connect(registerMapTableWidget, &RegisterMapTable::registerSelected, this, [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
         });
 
-        registerMapTableLayout->addWidget(searchBarWidget);
         registerMapTableLayout->addWidget(tableHeadWidget);
         registerMapTableLayout->addWidget(registerMapTableWidget->getWidget());
         docRegisterMapTable = DockerUtils::createDockWidget(mainWindow, registerMapTable, "Register map");
@@ -152,6 +146,22 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 void DeviceRegisterMap::toggleAutoread(bool toggled)
 {
     autoread = toggled;
+}
+
+void DeviceRegisterMap::applyFilters(QString filter)
+{
+    if (registerMapTemplate) {
+        registerMapTableWidget->setFilters(Search::searchForRegisters(registerMapTemplate->getRegisterList(),filter));
+    }
+}
+
+bool DeviceRegisterMap::hasTemplate()
+{
+    if (registerMapTemplate) {
+        return true;
+    }
+
+    return false;
 }
 
 void DeviceRegisterMap::initSettings()
