@@ -81,12 +81,14 @@ configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/
+    scopy-common
     scopysigrok-gui)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
     ${QWT_LIBRARIES}
+    scopy-common
 )
 
 install(TARGETS ${PROJECT_NAME}
