@@ -14,8 +14,10 @@
 RegisterController::RegisterController(QWidget *parent)
     : QWidget{parent}
 {
+    QVBoxLayout *mainLayout = new QVBoxLayout();
+
+    setLayout(mainLayout);
     layout= new QHBoxLayout();
-    setLayout(layout);
 
     regValue = new QLineEdit(this);
     regValue->setText("Not Read");
@@ -70,11 +72,13 @@ RegisterController::RegisterController(QWidget *parent)
     auxLayout->addLayout(addressLayout);
     auxLayout->addLayout(valueLayout);
 
-    layout->addLayout(auxLayout,8);
-    layout->addLayout(buttonsLayout,1);
+    layout->addLayout(auxLayout);
+    layout->addLayout(buttonsLayout);
 
     QSpacerItem *spacer = new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding);
-    layout->addItem(spacer);
+
+    mainLayout->addLayout(layout);
+    mainLayout->addItem(spacer);
 
 }
 

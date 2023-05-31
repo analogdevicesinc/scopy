@@ -32,6 +32,8 @@ public:
 
     void registerChanged(RegisterModel *regModel);
     void toggleAutoread(bool toggled);
+    void applyFilters(QString filter);
+    bool hasTemplate();
 
 private:
 
@@ -42,7 +44,6 @@ private:
     RegisterMapValues *registerMapValues;
     RegisterController *registerController = nullptr;
 
-    SearchBarWidget *searchBarWidget = nullptr;
     RegisterMapTable *registerMapTableWidget = nullptr;
     QDockWidget *docRegisterMapTable = nullptr;
 
