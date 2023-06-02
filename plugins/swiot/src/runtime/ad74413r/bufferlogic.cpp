@@ -1,13 +1,14 @@
 #include "bufferlogic.h"
+#include "src/runtime/ad74413r/ad74413r.h"
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
 
-BufferLogic::BufferLogic(struct iio_device* iioDev) :
+BufferLogic::BufferLogic(QMap<QString, iio_device*> devicesMap) :
 	m_plotChnlsNo(0)
-      ,m_iioDev(iioDev)
+      ,m_iioDevicesMap(devicesMap)
 {
-	if (m_iioDev) {
+	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
 		initializeChnlsScaleInfo();
 		createChannels();
 		m_samplingFreqAvailable = readChnlsSamplingFreqAttr("sampling_frequency_available");
@@ -24,15 +25,15 @@ BufferLogic::~BufferLogic()
 
 void BufferLogic::createChannels()
 {
-	if(m_iioDev) {
-		int chnlsNumber = iio_device_get_channels_count(m_iioDev);
+	if(m_iioDevicesMap[AD_NAME]) {
+		int chnlsNumber = iio_device_get_channels_count(m_iioDevicesMap[AD_NAME]);
 		int plotChnlsNo = 0;
 		int chnlIdx = -1;
 		bool isOutput = false;
 		bool isScanElement = false;
 		const QRegExp rx("[^0-9]+");
 		for (int i = 0; i < chnlsNumber; i++) {
-			struct iio_channel* iioChnl = iio_device_get_channel(m_iioDev, i);
+			struct iio_channel* iioChnl = iio_device_get_channel(m_iioDevicesMap[AD_NAME], i);
 			struct chnlInfo* chnlInfo = new struct chnlInfo;
 			QString chnlId(iio_channel_get_id(iioChnl));
 			double offset = 0.0;
@@ -196,6 +197,38 @@ QMap<int, QString> BufferLogic::getPlotChnlsId()
 	}
 
 	return chnlsId;
+}
+
+QVector<QString> BufferLogic::getAd74413rChnlsFunctions() {
+	auto result = QVector<QString>();
+//	on the SWIOT board we have only 4 channels
+	for (int i = 0; i < 4; ++i) {
+		char device[256] = {0};
+		bool isEnable = false;
+		std::string deviceAttributeName = "ch" + std::to_string(i) + "_device";
+		std::string chnlEnableAttribute = "ch" + std::to_string(i) + "_enable";
+		ssize_t deviceReadResult = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], deviceAttributeName.c_str(), device, 255);
+		ssize_t chnlEnableResult = iio_device_attr_read_bool(m_iioDevicesMap[SWIOT_DEVICE_NAME], chnlEnableAttribute.c_str(), &isEnable);
+		if (deviceReadResult > 0 && chnlEnableResult >= 0) {
+			if (!isEnable || (strcmp(device, "max14906") == 0)) {
+				result.push_back("no_config");
+			} else {
+				char function[256] = {0};
+				std::string functionAttributeName = "ch" + std::to_string(i) + "_function";
+				ssize_t functionReadResult = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], functionAttributeName.c_str(), function, 255);
+				if (functionReadResult > 0) {
+					result.push_back(QString(function));
+				}
+			}
+		}
+	}
+//	The last 4 channels from context are always the diagnostic channels
+//	(they are not physically on the board)
+	for (int i = result.size(); i < MAX_INPUT_CHNLS_NO; i++) {
+		result.push_back("diagnostic");
+	}
+
+	return result;
 }
 
 

@@ -12,6 +12,7 @@ class ChannelManager;
 namespace swiot {
 #define AD_NAME "ad74413r"
 #define AD_TRIGGER_NAME "ad74413r-dev0"
+#define SWIOT_DEVICE_NAME "swiot"
 #define TRIGGER_TIMER_MS 1000
 
 class SwiotRuntime : public QObject
