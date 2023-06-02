@@ -43,7 +43,7 @@ struct chnlInfo {
 class BufferLogic : public QObject {
 	Q_OBJECT
 public:
-	explicit BufferLogic(struct iio_device *iioDev = nullptr);
+	explicit BufferLogic(QMap<QString, iio_device*> devicesMap = {});
 
 	~BufferLogic();
 
@@ -57,6 +57,7 @@ public:
 	QMap<int, QString> getPlotChnlsId();
 
 	QStringList readChnlsSamplingFreqAttr(QString attrName);
+	QVector<QString> getAd74413rChnlsFunctions();
 
 public Q_SLOTS:
 	void onSamplingFreqChanged(int idx);
@@ -70,12 +71,12 @@ private:
 
 private:
 	int m_plotChnlsNo;
+	QMap<QString, iio_device*> m_iioDevicesMap;
 	QStringList m_samplingFreqAvailable;
 
 	QMap<int, struct chnlInfo *> m_chnlsInfo;
 	QMap<QChar, QString> m_unitsOfMeasure;
 	QMap<QChar, std::pair<double, double>> m_valuesRange;
-	struct iio_device *m_iioDev;
 };
 }
 
