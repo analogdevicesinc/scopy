@@ -23,9 +23,11 @@ public:
 Q_SIGNALS:
         void backBtnPressed();
 
-protected Q_SLOTS:
+public Q_SLOTS:
 	void runButtonClicked();
 	void singleButtonClicked();
+
+	void externalPowerSupply(bool ps);
 
 private:
         void connectSignalsAndSlots();
@@ -36,6 +38,7 @@ private:
 
 	Ui::Faults *ui;
         QPushButton *m_backButton;
+	QLabel* m_statusLabel;
 
 	QTimer *timer;
 	QThread *thread;
