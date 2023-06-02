@@ -15,6 +15,7 @@
 
 #define MAX_CURVES_NUMBER 8
 #define AD_NAME "ad74413r"
+#define SWIOT_DEVICE_NAME "swiot"
 
 extern "C"{
 struct iio_device;
@@ -32,7 +33,7 @@ class Ad74413r : public QWidget {
 	Q_OBJECT
 public:
 	explicit Ad74413r(iio_context *ctx = nullptr, ToolMenuEntry *tme = 0,
-			  QVector<QString> chnlsFunc = {}, QWidget *parent = nullptr);
+			  QWidget *parent = nullptr);
 
 	~Ad74413r();
 
@@ -41,6 +42,8 @@ public:
 	void initExportSettings(QWidget *parent);
 
 	void verifyChnlsChanges();
+
+	void createDevicesMap(iio_context *ctx);
 
 	scopy::gui::GenericMenu *createSettingsMenu(QString title, QColor *color);
 
@@ -77,8 +80,7 @@ private:
 	QPushButton* createBackBtn();
 
 private:
-	struct iio_device *m_iioDev;
-	QString m_iioDeviceName;
+	QMap<QString, iio_device*> m_iioDevicesMap;
 	int m_enabledChnlsNo = 0;
 
 	scopy::gui::ChannelManager *m_monitorChannelManager;
@@ -89,7 +91,6 @@ private:
 	ToolMenuEntry *m_tme;
 
 	QVector<BufferMenuController *> m_controllers;
-	QVector<QString> m_chnlsFunction;
 
 	std::vector<bool> m_enabledChannels;
 	std::vector<ChannelWidget*> m_channelWidgetList;
