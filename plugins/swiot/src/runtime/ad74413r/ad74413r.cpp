@@ -9,45 +9,42 @@
 using namespace scopy;
 using namespace scopy::swiot;
 
-Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
-		   QVector<QString> chnlsFunc, QWidget* parent):
+Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 	QWidget(parent)
       ,m_tme(tme), m_statusLabel(new QLabel(this))
-      ,m_swiotAdLogic(nullptr), m_iioDev(nullptr)
-      ,m_widget(parent), m_readerThread(nullptr)
+      ,m_swiotAdLogic(nullptr), m_widget(parent)
+      ,m_readerThread(nullptr)
 {
-	m_iioDev = iio_context_find_device(ctx, AD_NAME);
-	if (m_iioDev) {
-		m_iioDeviceName = iio_device_get_name(m_iioDev);
+	createDevicesMap(ctx);
+	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
+		char mode[64];
+		ssize_t result = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], "mode", mode, 64);
+		if ((result >= 0) && (strcmp(mode, "runtime") == 0)) {
+			m_backBtn = createBackBtn();
+			m_enabledChannels = std::vector<bool>(MAX_CURVES_NUMBER, false);
+
+			m_swiotAdLogic = new BufferLogic(m_iioDevicesMap);
+			m_readerThread = new ReaderThread(true);
+			m_readerThread->addBufferedDevice(m_iioDevicesMap[AD_NAME]);
+
+			QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
+			int samplingFreq = actualSamplingFreq[0].toInt();
+			m_readerThread->onSamplingFreqWritten(samplingFreq);
+			m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
+			QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
+			m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
+			QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
+			m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
+			QMap<int, QString> chnlsId = m_swiotAdLogic->getPlotChnlsId();
+			m_plotHandler->setHandlesName(chnlsId);
+
+			gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
+			setupToolView(settingsMenu);
+			setupConnections();
+			initMonitorToolView(settingsMenu);
+		}
 	}
-	m_chnlsFunction = chnlsFunc;
-	m_chnlsFunction.append("diagnostic");
-	m_chnlsFunction.append("diagnostic");
-	m_chnlsFunction.append("diagnostic");
-	m_chnlsFunction.append("diagnostic"); // FIXME: to be changed
-	m_enabledChannels = std::vector<bool>(m_chnlsFunction.size(), false);
-	m_backBtn = createBackBtn();
-//	if (iio_device_find_attr(m_iioDev, "back")) {
-	m_swiotAdLogic = new BufferLogic(m_iioDev);
-	m_readerThread = new ReaderThread(true);
-	m_readerThread->addBufferedDevice(m_iioDev);
 
-	QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
-	int samplingFreq = actualSamplingFreq[0].toInt();
-	m_readerThread->onSamplingFreqWritten(samplingFreq);
-	m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
-	QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
-	m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
-	QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
-	m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
-	QMap<int, QString> chnlsId = m_swiotAdLogic->getPlotChnlsId();
-	m_plotHandler->setHandlesName(chnlsId);
-
-	gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
-	setupToolView(settingsMenu);
-	setupConnections();
-	initMonitorToolView(settingsMenu);
-//	}
 }
 
 Ad74413r::~Ad74413r()
@@ -78,7 +75,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 
 	m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
 	m_monitorChannelManager->setChannelIdVisible(false);
-	m_monitorChannelManager->setToolStatus(m_iioDeviceName.toUpper());
+	m_monitorChannelManager->setToolStatus(QString(AD_NAME).toUpper());
 
 	m_toolView = scopy::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
@@ -135,15 +132,16 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 {
 	int chId = 1;
 	bool first = true;
+	QVector<QString> chnlsFunctions = m_swiotAdLogic->getAd74413rChnlsFunctions();
 
-	for (int i = 0; i < m_chnlsFunction.size(); i++) {
-		if (m_chnlsFunction[i].compare("high_z") != 0) {
+	for (int i = 0; i < chnlsFunctions.size(); i++) {
+		if (chnlsFunctions[i].compare("no_config") != 0) {
 
-			QString menuTitle(((m_iioDeviceName.toUpper() + " - Channel ") + QString::number(i+1)) + (": " + m_chnlsFunction[i]));
+			QString menuTitle(((QString(AD_NAME).toUpper() + " - Channel ") + QString::number(i+1)) + (": " + chnlsFunctions[i]));
 			BufferMenuView *menu = new BufferMenuView(this);
 			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 			//that's why we have to decrease by 1
-			menu->init(menuTitle, m_chnlsFunction[i], new QColor(m_plotHandler->getCurveColor(chId-1)));
+			menu->init(menuTitle, chnlsFunctions[i], new QColor(m_plotHandler->getCurveColor(chId-1)));
 
 			struct iio_channel* iioChnl = m_swiotAdLogic->getIioChnl(i, true);
 			BufferMenuModel* swiotModel = new BufferMenuModel(iioChnl);
@@ -153,7 +151,7 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 			if (controller) {
 				m_controllers.push_back(controller);
 			}
-			QString chnlWidgetName(m_chnlsFunction[i] +" "+QString::number(i+1));
+			QString chnlWidgetName(chnlsFunctions[i] +" "+QString::number(i+1));
 			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 			//that's why we have to decrease by 1
 			ChannelWidget *chWidget =
@@ -319,6 +317,7 @@ void Ad74413r::onSingleBtnPressed()
 		if (runBtnChecked) {
 			m_toolView->getRunBtn()->setChecked(false);
 		}
+		m_toolView->getSingleBtn()->setEnabled(false);
 	} else {
 		if (m_tme->running()) {
 			m_tme->setRunning(false);
@@ -332,6 +331,7 @@ void Ad74413r::onSingleCaptureFinished()
 		m_tme->setRunning(false);
 	}
 	m_toolView->getSingleBtn()->setChecked(false);
+	m_toolView->getSingleBtn()->setEnabled(true);
 	m_readerThread->requestInterruption();
 }
 
@@ -340,6 +340,21 @@ void Ad74413r::verifyChnlsChanges()
 	bool changes = m_swiotAdLogic->verifyEnableChanges(m_enabledChannels);
 	if (changes) {
 		m_readerThread->requestInterruption();
+	}
+}
+
+void Ad74413r::createDevicesMap(iio_context *ctx)
+{
+	int devicesCount = iio_context_get_devices_count(ctx);
+	for (int i = 0; i < devicesCount; i++) {
+		struct iio_device* iioDev = iio_context_get_device(ctx, i);
+		if (iioDev) {
+			QString deviceName = QString(iio_device_get_name(iioDev));
+			if ((deviceName.compare(AD_NAME) && deviceName.compare(SWIOT_DEVICE_NAME)) == 0)
+			{
+				m_iioDevicesMap[deviceName] = iioDev;
+			}
+		}
 	}
 }
 
