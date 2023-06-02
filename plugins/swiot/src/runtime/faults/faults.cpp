@@ -17,6 +17,7 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	ctx(ctx),
 	ui(new Ui::Faults),
 	m_faultsPage(new FaultsPage(ctx, this)),
+	m_statusLabel(new QLabel(this)),
 	timer(new QTimer()),
 	ad74413r_numeric(0),
 	max14906_numeric(0),
@@ -53,7 +54,18 @@ void Faults::setupDynamicUi(QWidget *parent) {
 
 	this->m_toolView = gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
-	this->m_toolView->addFixedCentralWidget(m_faultsPage,0,0,-1,-1);
+	m_statusLabel->setText(
+		"The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	m_statusLabel->setStyleSheet("color: red;");
+	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+
+	auto *container = new QWidget(this);
+	container->setLayout(new QVBoxLayout(container));
+	container->layout()->addWidget(m_statusLabel);
+	container->layout()->addWidget(m_faultsPage);
+
+	this->m_toolView->addFixedCentralWidget(container,0,0,-1,-1);
 
 	this->ui->mainLayout->addWidget(m_toolView);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
@@ -130,6 +142,14 @@ QPushButton *Faults::createBackButton() {
 	backButton->setProperty("blue_button", QVariant(true));
 	backButton->setText("Config");
 	return backButton;
+}
+
+void Faults::externalPowerSupply(bool ps) {
+	if (ps) {
+		m_statusLabel->hide();
+	} else {
+		m_statusLabel->show();
+	}
 }
 
 #include "moc_faults.cpp"
