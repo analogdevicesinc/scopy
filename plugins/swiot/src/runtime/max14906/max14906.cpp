@@ -19,9 +19,12 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_qTimer(new QTimer(this)),
 	m_toolView(nullptr),
 	m_tme(tme),
+	m_max14906SettingsTab(nullptr),
+	m_generalSettingsMenu(),
+	settingsWidgetSeparator(),
+	m_statusLabel(new QLabel(this)),
 	m_readerThread(new ReaderThread(false))
 {
-	iio_device *device0 = iio_context_find_device(ctx, MAX_NAME);
 	qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
 
 	this->ui->setupUi(this);
@@ -53,7 +56,18 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 								  new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-	this->m_toolView->addFixedCentralWidget(this->ui->grid, 0, 0);
+	m_statusLabel->setText(
+		"The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	m_statusLabel->setStyleSheet("color: red;");
+	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+
+	auto *container = new QWidget(this);
+	container->setLayout(new QVBoxLayout(container));
+	container->layout()->addWidget(m_statusLabel);
+	container->layout()->addWidget(this->ui->grid);
+
+	this->m_toolView->addFixedCentralWidget(container, 0, 0);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 	this->m_toolView->addTopExtraWidget(m_backButton);
 }
@@ -127,15 +141,6 @@ void Max14906::runButtonToggled() {
 		}
 		this->m_qTimer->stop();
 	}
-}
-
-void Max14906::singleButtonToggled() {
-	if (m_toolView->getRunBtn()->isChecked()) {
-		this->m_toolView->getRunBtn()->setChecked(false);
-	}
-	this->m_qTimer->stop();
-	this->m_readerThread->singleDio();
-	this->m_toolView->getSingleBtn()->setChecked(false);
 }
 
 void Max14906::timerChanged(double value) {
@@ -260,6 +265,14 @@ Max14906::createDockableMainWindow(const QString &title, DioDigitalChannel *digi
 
 	mainWindow->addDockWidget(Qt::TopDockWidgetArea, dockWidget);
 	return mainWindow;
+}
+
+void Max14906::externalPowerSupply(bool ps) {
+	if (ps) {
+		m_statusLabel->hide();
+	} else {
+		m_statusLabel->show();
+	}
 }
 
 #include "moc_max14906.cpp"

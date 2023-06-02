@@ -12,7 +12,7 @@ using namespace scopy::swiot;
 Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme,
 		   QVector<QString> chnlsFunc, QWidget* parent):
 	QWidget(parent)
-      ,m_tme(tme)
+      ,m_tme(tme), m_statusLabel(new QLabel(this))
       ,m_swiotAdLogic(nullptr), m_iioDev(nullptr)
       ,m_widget(parent), m_readerThread(nullptr)
 {
@@ -83,7 +83,19 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 	m_toolView = scopy::gui::ToolViewBuilder(recipe, m_monitorChannelManager, m_widget).build();
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
 	m_toolView->addTopExtraWidget(m_backBtn);
-	m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
+
+	m_statusLabel->setText(
+		"The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	m_statusLabel->setStyleSheet("color: red;");
+	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+
+	auto *container = new QWidget(this);
+	container->setLayout(new QVBoxLayout(container));
+	container->layout()->addWidget(m_statusLabel);
+	container->layout()->addWidget(m_plotHandler->getPlotWidget());
+
+	m_toolView->addFixedCentralWidget(container, 0, 0, 0, 0);
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
 }
@@ -360,5 +372,13 @@ void Ad74413r::onReaderThreadFinished()
 	if (m_toolView->getRunBtn()->isChecked() || m_toolView->getSingleBtn()->isChecked()) {
 		m_plotHandler->resetPlotParameters();
 		m_readerThread->start();
+	}
+}
+
+void Ad74413r::externalPowerSupply(bool ps) {
+	if (ps) {
+		m_statusLabel->hide();
+	} else {
+		m_statusLabel->show();
 	}
 }
