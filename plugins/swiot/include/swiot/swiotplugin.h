@@ -52,22 +52,6 @@ private:
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
-	QVector<QString> m_chnlsFunction{"current_out", "high_z", "high_z", "high_z",
-					 "diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-
-	//	//Runtime A
-//	const QVector<QString> channel_function{"digital_input", "voltage_out", "current_out", "voltage_in",
-//							"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-	//	//Runtime B
-//		const QVector<QString> channel_function{"current_in_ext", "current_in_loop", "resistance", "digital_input",
-//		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-	//	//Runtime C
-//		const QVector<QString> channel_function{"digital_input_loop", "current_in_ext_hart", "current_in_ext_hart", "high_z",
-//		"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-	//	//Runtime D
-	const QVector<QString> channel_function{"current_out", "high_z", "high_z", "high_z",
-						"diagnostic", "diagnostic", "diagnostic", "diagnostic"};
-
 };
 }
 

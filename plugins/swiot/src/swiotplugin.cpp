@@ -116,10 +116,7 @@ void SWIOTPlugin::setupToolList()
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
 	if (isRuntimeContext) {
-		QVector<QString> adConfigFunc = m_swiotController->getAd74413rChannelFunctions();
-		m_chnlsFunction = adConfigFunc;
-
-		ad74413rTme->setTool(new swiot::Ad74413r(ctx, ad74413rTme, m_chnlsFunction));
+		ad74413rTme->setTool(new swiot::Ad74413r(ctx, ad74413rTme));
 		max14906Tme->setTool(new swiot::Max14906(ctx, max14906Tme));
 		faultsTme->setTool(new swiot::Faults(ctx, faultsTme));
 	} else {
@@ -127,8 +124,6 @@ void SWIOTPlugin::setupToolList()
 	}
 
 	connect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, [this]() {
-		QVector<QString> adConfigFunc = m_swiotController->getAd74413rChannelFunctions();
-		m_chnlsFunction = adConfigFunc;
 		m_swiotController->stopPingTask();
 		m_swiotController->startSwitchContextTask();
 	});
