@@ -32,6 +32,7 @@ public:
 
 public Q_SLOTS:
 	void configBtnPressed();
+	void externalPowerSupply(bool ps);
 
 Q_SIGNALS:
 	void configBtn();

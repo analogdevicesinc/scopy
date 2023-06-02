@@ -138,4 +138,12 @@ void SwiotConfig::createPageLayout() {
 	this->layout()->addWidget(m_toolView);
 }
 
+void SwiotConfig::externalPowerSupply(bool ps) {
+	if (ps) {
+		m_statusLabel->hide();
+	} else {
+		m_statusLabel->show();
+	}
+}
+
 #include "moc_swiotconfig.cpp"
