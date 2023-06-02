@@ -164,45 +164,37 @@ public:
 		CURRENT_IN_LOOP_HART	= 7,
 		CURRENT_IN_EXT_HART	= 8,
 		RESISTANCE		= 9,
-		DIAGNOSTIC		= 10
+		DIAGNOSTIC		= 10,
+		HIGH_Z			= 11
 	};
 
 	static int decodeFunctionName(QString function)
 	{
 		if (function.compare("voltage_in") == 0) {
 			return VOLTAGE_IN;
-		}
-		else if (function.compare("current_in_ext") == 0) {
+		} else if (function.compare("current_in_ext") == 0) {
 			return CURRENT_IN_EXT;
-		}
-		else if (function.compare("current_in_loop_hart") == 0) {
+		} else if (function.compare("current_in_loop_hart") == 0) {
 			return CURRENT_IN_LOOP_HART;
-		}
-		else if (function.compare("current_in_ext_hart") == 0) {
+		} else if (function.compare("current_in_ext_hart") == 0) {
 			return CURRENT_IN_EXT_HART;
-		}
-		else if (function.compare("resistance") == 0) {
+		} else if (function.compare("resistance") == 0) {
 			return RESISTANCE;
-		}
-		else if (function.compare("current_in_loop") == 0) {
+		} else if (function.compare("current_in_loop") == 0) {
 			return CURRENT_IN_LOOP;
-		}
-		else if (function.compare("digital_input") == 0) {
+		} else if (function.compare("digital_input") == 0) {
 			return DIGITAL_IN;
-		}
-		else if (function.compare("digital_input_loop") == 0) {
+		} else if (function.compare("digital_input_loop") == 0) {
 			return DIGITAL_IN_LOOP;
-		}
-		else if (function.compare("voltage_out") == 0) {
+		} else if (function.compare("voltage_out") == 0) {
 			return VOLTAGE_OUT;
-		}
-		else if (function.compare("current_out") == 0) {
+		} else if (function.compare("current_out") == 0) {
 			return CURRENT_OUT;
-		}
-		else if (function.compare("diagnostic") == 0) {
+		} else if (function.compare("diagnostic") == 0) {
 			return DIAGNOSTIC;
-		}
-		else{
+		} else if (function.compare("high_z") == 0) {
+			return HIGH_Z;
+		} else {
 			return -1;
 		}
 	}

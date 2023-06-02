@@ -20,12 +20,11 @@ SwiotRuntime::~SwiotRuntime()
 
 bool SwiotRuntime::isRuntimeCtx()
 {
-	iio_device* swiotDevice = iio_context_find_device(m_iioCtx, "swiot");
-	if (swiotDevice) {
-		const char* modeAttribute = iio_device_find_attr(swiotDevice, "mode");
+	if (m_iioDevices.contains(SWIOT_DEVICE_NAME) && m_iioDevices[SWIOT_DEVICE_NAME]) {
+		const char* modeAttribute = iio_device_find_attr(m_iioDevices[SWIOT_DEVICE_NAME], "mode");
 		if (modeAttribute) {
 			char mode[64];
-			ssize_t result = iio_device_attr_read(swiotDevice, "mode", mode, 64);
+			ssize_t result = iio_device_attr_read(m_iioDevices[SWIOT_DEVICE_NAME], "mode", mode, 64);
 
 			if (result < 0) {
 				qCritical(CAT_SWIOT) << R"(Critical error: could not read mode attribute, error code:)" << result;
@@ -102,9 +101,8 @@ void SwiotRuntime::createDevicesMap()
 
 void SwiotRuntime::onBackBtnPressed()
 {
-	struct iio_device* swiot = iio_context_find_device(m_iioCtx, "swiot");
-	if (swiot) {
-		ssize_t res = iio_device_attr_write(swiot, "mode", "config");
+	if (m_iioDevices.contains(SWIOT_DEVICE_NAME) && m_iioDevices[SWIOT_DEVICE_NAME]) {
+		ssize_t res = iio_device_attr_write(m_iioDevices[SWIOT_DEVICE_NAME], "mode", "config");
 		if (res > 0) {
 			qInfo(CAT_SWIOT) << "Successfully changed the config mode to runtime";
 		} else {

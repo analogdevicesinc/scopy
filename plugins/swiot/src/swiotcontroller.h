@@ -21,7 +21,6 @@ public:
 
 //	void startPowerSupplyTask();
 //	void stopPowerSupplyTask();
-	QVector<QString> getAd74413rChannelFunctions(); // FIXME: workaround to fit the new context, without changing too much. This will be moved in the ad74413r plugin later
 
 	void startSwitchContextTask();
 	void stopSwitchContextTask();
