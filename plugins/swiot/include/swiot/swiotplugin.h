@@ -13,6 +13,8 @@
 #include "QLabel"
 #include "src/swiotcontroller.h"
 #include "src/swiotinfopage.h"
+#include <iioutil/cyclicaltask.h>
+#include "src/externalpsreaderthread.h"
 
 namespace scopy::swiot {
 class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
@@ -39,6 +41,9 @@ private:
 
 	SwiotInfoPage *m_infoPage;
 //	Ui::SWIOTInfoPage *infoui;
+
+	ExternalPsReaderThread *m_extPsThread;
+	CyclicalTask *m_extPsTask;
 
 	QWidget *config;
 	QWidget *adtool;

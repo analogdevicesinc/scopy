@@ -24,9 +24,11 @@ public:
 Q_SIGNALS:
         void backBtnPressed();
 
+public Q_SLOTS:
+	void externalPowerSupply(bool ps);
+
 private Q_SLOTS:
 	void runButtonToggled();
-	void singleButtonToggled();
 
 	void timerChanged(double value);
 
@@ -43,6 +45,8 @@ private:
 	static QMainWindow* createDockableMainWindow(const QString& title, DioDigitalChannel* digitalChannel, QWidget* parent);
 
         QPushButton *m_backButton;
+	QLabel* m_statusLabel;
+
 	DioController *max14906ToolController;
 	Ui::Max14906 *ui;
 	DioSettingsTab *m_max14906SettingsTab;

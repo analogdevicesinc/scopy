@@ -43,8 +43,8 @@ public:
 	void verifyChnlsChanges();
 
 	scopy::gui::GenericMenu *createSettingsMenu(QString title, QColor *color);
-public Q_SLOTS:
 
+public Q_SLOTS:
 	void onChannelWidgetEnabled(int chnWidgetId, bool en);
 	void onChannelWidgetSelected(int chnWidgetId, bool en);
 	void onOffsetHdlSelected(int hdlIdx, bool selected);
@@ -53,8 +53,9 @@ public Q_SLOTS:
 	void onSingleBtnPressed();
 
 	void onReaderThreadFinished();
-
 	void onSingleCaptureFinished();
+
+	void externalPowerSupply(bool ps);
 
 Q_SIGNALS:
 
@@ -84,6 +85,7 @@ private:
 	scopy::gui::ToolView *m_toolView;
 	QWidget *m_widget;
 	QPushButton *m_backBtn;
+	QLabel* m_statusLabel;
 	ToolMenuEntry *m_tme;
 
 	QVector<BufferMenuController *> m_controllers;
