@@ -85,10 +85,10 @@ void DeviceImpl::removeDisabledPlugins() {
 
 void DeviceImpl::loadName() {
 	if(m_plugins.count()) {
-		m_name = m_plugins[0]->displayName();
-		m_description = m_plugins[0]->displayDescription();
+		m_displayName = m_plugins[0]->displayName();
+		m_displayParam = m_plugins[0]->displayParam();
 	} else {
-		m_name = "NO_PLUGIN";
+		m_displayName = "NO_PLUGIN";
 	}
 }
 
@@ -229,9 +229,9 @@ QString DeviceImpl::id()
 	return m_id;
 }
 
-QString DeviceImpl::name()
+QString DeviceImpl::displayName()
 {
-	return m_name;
+	return m_displayName;
 }
 
 QString DeviceImpl::category()
@@ -239,9 +239,9 @@ QString DeviceImpl::category()
 	return m_category;
 }
 
-QString DeviceImpl::description()
+QString DeviceImpl::displayParam()
 {
-	return m_description;
+	return m_displayParam;
 }
 
 

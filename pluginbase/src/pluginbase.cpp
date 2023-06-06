@@ -9,7 +9,7 @@ using namespace scopy;
 void PluginBase::setParam(QString param, QString category) {
 	m_param = param;
 	m_category = category;
-	m_displayDescription = param;
+	m_displayParam = param;
 	m_enabled = true;
 }
 
@@ -77,18 +77,17 @@ bool PluginBase::enabled() {
 QString PluginBase::param() {
 	return m_param;
 }
+
 QString PluginBase::name() {
 	return m_name;
 }
 
-QString PluginBase::displayName()
-{
+QString PluginBase::displayName() {
 	return m_displayName;
 }
 
-QString PluginBase::displayDescription()
-{
-	return m_displayDescription;
+QString PluginBase::displayParam() {
+	return m_displayParam;
 }
 
 QWidget* PluginBase::icon() {
@@ -131,6 +130,11 @@ QString PluginBase::version()
 {
 	return "";
 }
+
+QString PluginBase::description() {
+	return "";
+}
+
 
 void PluginBase::setMetadata(QJsonObject obj)
 {
