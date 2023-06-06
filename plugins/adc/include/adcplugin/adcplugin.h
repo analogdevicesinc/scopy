@@ -106,9 +106,9 @@ private:
 class GRTimeChannelAddon : public QObject, public ToolAddon {
 	Q_OBJECT
 public:
-	GRTimeChannelAddon(grutil::GRIIOChannel* ch, QObject *parent = nullptr) {
-		this->ch = ch;
-		name = dynamic_cast<grutil::GRIIOFloatChannelSrc*>(dynamic_cast<grutil::GRSignalPath*>(ch)->path()[0])->getChannelName(); // LOL
+	GRTimeChannelAddon(grutil::GRSignalPath* path, QObject *parent = nullptr) {
+		this->ch = dynamic_cast<grutil::GRIIOChannel*>(path->path()[0]);
+		name = ch->getChannelName();
 		widget = new QLabel(name);
 	}
 	~GRTimeChannelAddon() {}
@@ -207,17 +207,10 @@ public:
 	}
 
 
-
-
 	QString getPrefix() { return prefix; }
 	void setPrefix(QString p) { prefix = p;}
 private:
-//	QList<grutil::GRSignalPath> paths;
-//	grutil::GRTopBlock *top;
 
-//	ToolAddon* plotSettings;
-//	QMap<QString, ToolAddon*> channelSettings;
-//	QMap<QString, ToolAddon*> additionalSettings;
 	GRTimePlotAddon *plotAddon;
 	GRTimePlotAddonSettings *plotSettingsAddon;
 	QList<ToolAddon*> deviceAddons;

@@ -5,8 +5,8 @@
 #include "grlog.h"
 
 using namespace scopy::grutil;
-GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ, QObject *parent) :
-      GRIIOChannel(parent), dev(dev), channelNameI(channelNameI), channelNameQ(channelNameQ)
+GRIIOComplexChannelSrc::GRIIOComplexChannelSrc(QString channelName, GRIIODeviceSource *dev, QString channelNameI, QString channelNameQ, QObject *parent) :
+	  GRIIOChannel(channelName, dev, parent), channelNameI(channelNameI), channelNameQ(channelNameQ)
 {
 }
 
