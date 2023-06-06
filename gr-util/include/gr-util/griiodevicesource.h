@@ -9,11 +9,19 @@
 namespace scopy::grutil {
 
 class GRIIODeviceSource;
-typedef GRProxyBlock GRIIOChannel; // TODO: create interface here
-//class SCOPY_GR_UTIL_EXPORT GRIIOChannel : public GRProxyBlock {
-//	GRIIODeviceSource* getDeviceSrc();
-//	QString getChannelName();
-//};
+//typedef GRProxyBlock GRIIOChannel; // TODO: create interface here
+class SCOPY_GR_UTIL_EXPORT GRIIOChannel : public GRProxyBlock {
+public:
+	GRIIOChannel(QString channelName, GRIIODeviceSource *dev, QObject *parent = nullptr) : GRProxyBlock(parent), channelName(channelName), dev(dev) { }
+	GRIIODeviceSource* getDeviceSrc() { return dev; }
+	QString getChannelName() { return channelName;}
+
+protected:
+
+	QString channelName;
+	GRIIODeviceSource* dev;
+
+};
 
 class SCOPY_GR_UTIL_EXPORT GRIIODeviceSource : public GRProxyBlock { // is this a proxy block
 public:
