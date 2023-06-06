@@ -3,7 +3,7 @@
 
 using namespace scopy::grutil;
 GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent) :
-      GRIIOChannel(parent), dev(dev), channelName(channelName)
+	  GRIIOChannel(channelName, dev, parent)
 {
 }
 
@@ -22,9 +22,4 @@ void GRIIOFloatChannelSrc::destroy_blks(GRTopBlock *top)
 	s2f = nullptr;
 	end_blk = nullptr;
 	start_blk.clear();
-}
-
-const QString &GRIIOFloatChannelSrc::getChannelName() const
-{
-	return channelName;
 }
