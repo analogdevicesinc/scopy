@@ -137,7 +137,7 @@ QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_doubleclick_attach", "Doubleclick to attach/detach tool", this));
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_opengl", "Enable OpenGL plotting", this));
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_animations", "Enable menu animations", this));
-	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_theme", "Theme", {"dark","light"}, this));
+	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_theme", "Theme", {"default","light"}, this));
 	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_language", "Language",{"english","romanian"}, this));
 
 	lay->addWidget(new QLabel("--- Debug preferences --- "));
