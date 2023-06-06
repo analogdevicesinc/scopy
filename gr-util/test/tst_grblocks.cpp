@@ -631,7 +631,7 @@ void TST_GRBlocks::test5() {
 
 	fch1 = new GRIIOFloatChannelSrc(dev,"voltage0", ch1);
 	fch2 = new GRIIOFloatChannelSrc(dev,"voltage1", ch2);
-	cch1 = new GRIIOComplexChannelSrc(dev,"voltage0","voltage1",ch3);
+	cch1 = new GRIIOComplexChannelSrc("complex_voltage0/1",dev,"voltage0","voltage1",ch3);
 
 	ch1->append(fch1);
 	ch2->append(fch2);

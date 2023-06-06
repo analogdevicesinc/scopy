@@ -13,11 +13,7 @@ public:
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
-	const QString &getChannelName() const;
-
 protected:
-	QString channelName;
-	GRIIODeviceSource* dev;
 	gr::blocks::short_to_float::sptr s2f;
 
 };
