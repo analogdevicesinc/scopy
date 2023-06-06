@@ -232,6 +232,13 @@ public:
 	virtual QString name() = 0;
 
 	/**
+	 * @brief description
+	 * @return plugin m_description getter
+	 * Default implementation in PluginBase - override not recommended
+	 */
+	virtual QString description() = 0;
+
+	/**
 	 * @brief displayName
 	 * @return plugin m_displayName getter - name used by the plugin in Scopy Ui
 	 * Default implementation in PluginBase - override not recommended
@@ -239,11 +246,11 @@ public:
 	virtual QString displayName() = 0;
 
 	/**
-	 * @brief displayDescription
-	 * @return plugin m_displayDescription getter - description used by the plugin in Scopy Ui
+	 * @brief displayParam
+	 * @return plugin m_displayParam getter - description used by the plugin in Scopy Ui
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QString displayDescription() = 0;
+	virtual QString displayParam() = 0;
 
 	/**
 	 * @brief icon

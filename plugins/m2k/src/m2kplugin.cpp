@@ -57,6 +57,7 @@ bool M2kPlugin::compatible(QString m_param, QString category) {
 void M2kPlugin::preload()
 {
 	m_m2kController = new M2kController(m_param,this);
+	m_displayName = "M2k";
 }
 
 
@@ -412,7 +413,9 @@ bool M2kPlugin::onDisconnect()
 	return true;
 }
 
-
+QString M2kPlugin::description() {
+	return "Implements ADALM2000 intstruments - Oscilloscope, Spectrum Analyzer, Voltmeter, Network Analyzer,Signal Generator, Logic Analyzer, Pattern Generator, Digital I/O";
+}
 
 void M2kPlugin::initMetadata()
 {
