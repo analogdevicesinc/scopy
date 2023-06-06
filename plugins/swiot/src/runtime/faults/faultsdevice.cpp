@@ -24,6 +24,8 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	this->connectSignalsAndSlots();
 	this->initFaultExplanations();
 
+	this->ui->lineEdit_numeric->setPlaceholderText("0x0");
+
 	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
 	m_subsectionSeparator->setContent(m_faults_explanation);
 
