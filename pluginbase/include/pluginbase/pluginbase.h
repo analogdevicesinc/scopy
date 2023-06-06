@@ -41,15 +41,18 @@ public:
 	virtual bool enabled() override;
 	virtual QString name() override;
 	virtual QString displayName() override;
-	virtual QString displayDescription() override;
+	virtual QString displayParam() override;
 	virtual QWidget* icon() override;
 	virtual QWidget* page() override;
 	virtual QWidget* preferencesPage() override;
 	virtual QList<QAbstractButton*> extraButtons() override;
 	virtual QList<ToolMenuEntry*> toolList() override;
 	virtual QJsonObject metadata() override;
+
 	virtual QString about() override;
 	virtual QString version() override;
+	virtual QString description() override;
+
 	virtual void loadMetadata(QString data);
 	virtual void cloneExtra(Plugin*) override;
 
@@ -64,7 +67,7 @@ protected:
 	QString m_category;
 	QString m_name;
 	QString m_displayName;
-	QString m_displayDescription;
+	QString m_displayParam;
 	QWidget *m_page;
 	QWidget *m_preferencesPage;
 	QWidget *m_icon;

@@ -22,10 +22,10 @@ public:
 	// Device interface
 public:
 	QString id() override;
-	QString name() override;
+	QString displayName() override;
+	QString displayParam() override;
 	QString category() override;
 	QString param() override;
-	QString description() override;
 	QWidget *icon() override;
 	QWidget *page() override;
 	QList<ToolMenuEntry*> toolList() override;
@@ -63,9 +63,9 @@ protected:
 	QList<Plugin*> m_plugins;
 	QString m_id;
 	QString m_category;
-	QString m_description;
+	QString m_displayName;
+	QString m_displayParam;
 	QString m_param;
-	QString m_name;
 	QWidget *m_icon;
 	QWidget *m_page;
 	QPushButton *connbtn,*discbtn;
