@@ -22,6 +22,7 @@ GUI_DLL=$BUILD_FOLDER/gui
 SIGROK_GUI_DLL=$BUILD_FOLDER/gui/sigrok-gui
 GR_GUI_DLL=$BUILD_FOLDER/gui/gr-gui
 IIOUTIL_DLL=$BUILD_FOLDER/iioutil
+COMMON_DLL=$BUILD_FOLDER/common
 
 # Generate build status info for the about page
 cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
@@ -62,6 +63,7 @@ deploy_app(){
 	cp $IIOUTIL_DLL/libscopy-iioutil.dll $DEST_FOLDER
 	cp $SIGROK_GUI_DLL/libscopy-sigrok-gui.dll $DEST_FOLDER
 	cp $GR_GUI_DLL/libscopy-gr-gui.dll $DEST_FOLDER
+	cp $COMMON_DLL/libscopy-common.dll $DEST_FOLDER
 
 
 	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins -type f -name "*.dll")
