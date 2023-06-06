@@ -43,7 +43,7 @@ public:
 	void init() override;
 	void saveSettings(QSettings &s) override;
 	void loadSettings(QSettings &s) override;
-
+	QString description() override;
 
 public Q_SLOTS:
 	void showPageCallback() override;

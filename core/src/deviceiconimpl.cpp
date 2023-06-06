@@ -12,8 +12,8 @@ DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 {
 	ui = new Ui::DeviceButton;
 	ui->setupUi(this);
-	ui->description->setText(d->description());
-	ui->name->setText(d->name());
+	ui->description->setText(d->displayParam());
+	ui->name->setText(d->displayName());
 	ui->iconPlaceHolder->layout()->addWidget(d->icon());
 	ui->iconPlaceHolder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
 	QPushButton *forgetBtn = new QPushButton("X",d->icon());
@@ -23,8 +23,8 @@ DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 	forgetBtn->move(80,0);
 	connectionBadge->setMaximumSize(20,20);
 	connectionBadge->move(0,0);
-	if(!d->description().isEmpty())
-		connectionBadge->setText(QString(d->description().at(0)));
+	if(!d->displayParam().isEmpty())
+		connectionBadge->setText(QString(d->displayParam().at(0)));
 //	forgetBtn->move(30,30);
 	forgetBtn->raise();
 	connect(forgetBtn,SIGNAL(clicked()),this,SIGNAL(forget()));
