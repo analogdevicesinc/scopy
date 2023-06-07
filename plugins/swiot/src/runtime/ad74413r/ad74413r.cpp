@@ -13,7 +13,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 	QWidget(parent)
       ,m_tme(tme), m_statusLabel(new QLabel(this))
       ,m_swiotAdLogic(nullptr), m_widget(parent)
-      ,m_readerThread(nullptr)
+      ,m_readerThread(nullptr), m_statusContainer(new QWidget(this))
 {
 	createDevicesMap(ctx);
 	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
@@ -81,18 +81,24 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 	m_toolView->setGeneralSettingsMenu(settingsMenu, true);
 	m_toolView->addTopExtraWidget(m_backBtn);
 
-	m_statusLabel->setText(
-		"The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
-	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_statusLabel->setStyleSheet("color: red;");
-	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+	m_statusLabel->setText("The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setWordWrap(true);
 
-	auto *container = new QWidget(this);
-	container->setLayout(new QVBoxLayout(container));
-	container->layout()->addWidget(m_statusLabel);
-	container->layout()->addWidget(m_plotHandler->getPlotWidget());
+	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
+	m_statusContainer->layout()->setSpacing(0);
+	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
+	m_statusContainer->setStyleSheet("color: red; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
 
-	m_toolView->addFixedCentralWidget(container, 0, 0, 0, 0);
+	auto exclamationButton = new QPushButton(m_statusContainer);
+	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
+	exclamationButton->setIconSize(QSize(32, 32));
+	exclamationButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	m_statusContainer->layout()->addWidget(exclamationButton);
+	m_statusContainer->layout()->addWidget(m_statusLabel);
+
+	m_toolView->addPlotInfoWidget(m_statusContainer);
+	m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
 	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
 }
@@ -392,8 +398,9 @@ void Ad74413r::onReaderThreadFinished()
 
 void Ad74413r::externalPowerSupply(bool ps) {
 	if (ps) {
-		m_statusLabel->hide();
+		m_statusContainer->hide();
 	} else {
+		m_statusContainer->show();
 		m_statusLabel->show();
 	}
 }
