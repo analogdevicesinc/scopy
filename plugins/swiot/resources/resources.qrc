@@ -7,5 +7,6 @@
         <file>ic_lo_snow.svg</file>
         <file>swiot_board.svg</file>
         <file>swiot_top_transparent.png</file>
+        <file>warning.svg</file>
     </qresource>
 </RCC>

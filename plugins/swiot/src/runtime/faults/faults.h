@@ -39,6 +39,7 @@ private:
 	Ui::Faults *ui;
         QPushButton *m_backButton;
 	QLabel* m_statusLabel;
+	QWidget* m_statusContainer;
 
 	QTimer *timer;
 	QThread *thread;

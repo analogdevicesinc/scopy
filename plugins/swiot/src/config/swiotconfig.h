@@ -51,6 +51,7 @@ private:
 	QScrollArea* m_scrollArea;
 	QWidget* m_mainView;
 	QLabel* m_statusLabel;
+	QWidget* m_statusContainer;
 	Ui::ConfigMenu* ui;
 
         void setupToolView(QWidget* parent);
