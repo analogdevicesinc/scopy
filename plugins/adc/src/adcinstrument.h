@@ -10,6 +10,10 @@ class AdcInstrument : public QWidget
 	Q_OBJECT
 public:
 	AdcInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
+public Q_SLOTS:
+	void run(bool);
+private:
+	PlotProxy* proxy;
 };
 }
 #endif // ADCINSTRUMENT_H
