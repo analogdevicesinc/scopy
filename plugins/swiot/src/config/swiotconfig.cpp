@@ -17,6 +17,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	m_toolView(nullptr),
 	m_mainView(new QWidget(this)),
 	m_statusLabel(new QLabel(this)),
+	m_statusContainer(new QWidget(this)),
 	ui(new Ui::ConfigMenu) {
 	m_swiotDevice = iio_context_find_device(ctx, "swiot");
 	if (m_swiotDevice == nullptr) {
@@ -124,14 +125,26 @@ void SwiotConfig::createPageLayout() {
 	m_scrollArea->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	m_statusLabel->setText("The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
-	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_statusLabel->setStyleSheet("color: red;");
-	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+	m_statusLabel->setWordWrap(true);
+
+	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
+	m_statusContainer->layout()->setSpacing(0);
+	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
+	m_statusContainer->setStyleSheet("color: red; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
+
+	auto exclamationButton = new QPushButton(m_statusContainer);
+	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
+	exclamationButton->setIconSize(QSize(32, 32));
+	exclamationButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	m_statusContainer->layout()->addWidget(exclamationButton);
+	m_statusContainer->layout()->addWidget(m_statusLabel);
 
 	m_mainView->setLayout(new QVBoxLayout(m_mainView));
-	m_mainView->layout()->addWidget(m_statusLabel);
+//	m_mainView->layout()->addWidget(statusContainer);
 	m_mainView->layout()->addWidget(m_scrollArea);
 
+	m_toolView->addPlotInfoWidget(m_statusContainer);
 	m_toolView->addFixedCentralWidget(m_mainView, 0, 0, 0, 0);
 	m_toolView->addTopExtraWidget(m_configBtn);
 	this->setLayout(new QVBoxLayout());
@@ -140,8 +153,9 @@ void SwiotConfig::createPageLayout() {
 
 void SwiotConfig::externalPowerSupply(bool ps) {
 	if (ps) {
-		m_statusLabel->hide();
+		m_statusContainer->hide();
 	} else {
+		m_statusContainer->show();
 		m_statusLabel->show();
 	}
 }

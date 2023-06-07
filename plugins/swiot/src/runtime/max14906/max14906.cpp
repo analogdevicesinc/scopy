@@ -23,6 +23,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_generalSettingsMenu(),
 	settingsWidgetSeparator(),
 	m_statusLabel(new QLabel(this)),
+	m_statusContainer(new QWidget(this)),
 	m_readerThread(new ReaderThread(false))
 {
 	qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
@@ -56,20 +57,26 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 								  new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
-	m_statusLabel->setText(
-		"The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
-	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_statusLabel->setStyleSheet("color: red;");
-	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+	m_statusLabel->setText("The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setWordWrap(true);
 
-	auto *container = new QWidget(this);
-	container->setLayout(new QVBoxLayout(container));
-	container->layout()->addWidget(m_statusLabel);
-	container->layout()->addWidget(this->ui->grid);
+	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
+	m_statusContainer->layout()->setSpacing(0);
+	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
+	m_statusContainer->setStyleSheet("color: red; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
 
-	this->m_toolView->addFixedCentralWidget(container, 0, 0);
-	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
-	this->m_toolView->addTopExtraWidget(m_backButton);
+	auto exclamationLabel = new QPushButton(m_statusContainer);
+	exclamationLabel->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
+	exclamationLabel->setIconSize(QSize(32, 32));
+	exclamationLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	m_statusContainer->layout()->addWidget(exclamationLabel);
+	m_statusContainer->layout()->addWidget(m_statusLabel);
+
+	m_toolView->addPlotInfoWidget(m_statusContainer);
+	m_toolView->addFixedCentralWidget(this->ui->grid, 0, 0);
+	m_toolView->getGeneralSettingsBtn()->setChecked(true);
+	m_toolView->addTopExtraWidget(m_backButton);
 }
 
 scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, QColor *color) {
@@ -269,8 +276,9 @@ Max14906::createDockableMainWindow(const QString &title, DioDigitalChannel *digi
 
 void Max14906::externalPowerSupply(bool ps) {
 	if (ps) {
-		m_statusLabel->hide();
+		m_statusContainer->hide();
 	} else {
+		m_statusContainer->show();
 		m_statusLabel->show();
 	}
 }

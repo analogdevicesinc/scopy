@@ -18,13 +18,13 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	ui(new Ui::Faults),
 	m_faultsPage(new FaultsPage(ctx, this)),
 	m_statusLabel(new QLabel(this)),
+	m_statusContainer(new QWidget(this)),
 	timer(new QTimer()),
 	ad74413r_numeric(0),
 	max14906_numeric(0),
 	m_backButton(Faults::createBackButton()),
 	thread(new QThread(this)),
-	m_tme(tme)
-{
+	m_tme(tme) {
 	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
 	ui->setupUi(this);
@@ -54,18 +54,23 @@ void Faults::setupDynamicUi(QWidget *parent) {
 
 	this->m_toolView = gui::ToolViewBuilder(recipe, nullptr, parent).build();
 
-	m_statusLabel->setText(
-		"The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
-	m_statusLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	m_statusLabel->setStyleSheet("color: red;");
-	m_statusLabel->setContentsMargins(6, 0, 6, 0);
+	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
+	m_statusContainer->layout()->setSpacing(0);
+	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
+	m_statusLabel->setText("The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setWordWrap(true);
+	m_statusContainer->setStyleSheet("color: red; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
 
-	auto *container = new QWidget(this);
-	container->setLayout(new QVBoxLayout(container));
-	container->layout()->addWidget(m_statusLabel);
-	container->layout()->addWidget(m_faultsPage);
+	auto exclamationLabel = new QPushButton(m_statusContainer);
+	exclamationLabel->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
+	exclamationLabel->setIconSize(QSize(32, 32));
+	exclamationLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	this->m_toolView->addFixedCentralWidget(container,0,0,-1,-1);
+	m_statusContainer->layout()->addWidget(exclamationLabel);
+	m_statusContainer->layout()->addWidget(m_statusLabel);
+
+	m_toolView->addPlotInfoWidget(m_statusContainer);
+	this->m_toolView->addFixedCentralWidget(m_faultsPage, 0, 0, -1, -1);
 
 	this->ui->mainLayout->addWidget(m_toolView);
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
@@ -78,17 +83,18 @@ void Faults::connectSignalsAndSlots() {
 			 &Faults::runButtonClicked);
 	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this,
 			 &Faults::singleButtonClicked);
-	QObject::connect(m_backButton, &QPushButton::clicked, this, [this] () {
+	QObject::connect(m_backButton, &QPushButton::clicked, this, [this]() {
 		Q_EMIT backBtnPressed();
 	});
 
 	QObject::connect(this->timer, &QTimer::timeout, this, &Faults::pollFaults);
-	QObject::connect(this->thread, &QThread::started, this, [&](){
+	QObject::connect(this->thread, &QThread::started, this, [&]() {
 		qDebug(CAT_SWIOT_FAULTS) << "Faults reader thread started";
 		this->timer->start(POLLING_INTERVAL);
 	});
 
-	QObject::connect(this->m_tme, &ToolMenuEntry::runToggled, this->m_toolView->getRunBtn(), &QPushButton::setChecked);
+	QObject::connect(this->m_tme, &ToolMenuEntry::runToggled, this->m_toolView->getRunBtn(),
+			 &QPushButton::setChecked);
 }
 
 void Faults::runButtonClicked() {
@@ -127,7 +133,7 @@ void Faults::pollFaults() {
 }
 
 QPushButton *Faults::createBackButton() {
-	auto* backButton = new QPushButton();
+	auto *backButton = new QPushButton();
 	backButton->setObjectName(QString::fromUtf8("backButton"));
 	backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
 						    "  width: 95px;\n"
@@ -146,8 +152,9 @@ QPushButton *Faults::createBackButton() {
 
 void Faults::externalPowerSupply(bool ps) {
 	if (ps) {
-		m_statusLabel->hide();
+		m_statusContainer->hide();
 	} else {
+		m_statusContainer->show();
 		m_statusLabel->show();
 	}
 }
