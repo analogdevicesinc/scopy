@@ -88,6 +88,7 @@ private:
 	QWidget *m_widget;
 	QPushButton *m_backBtn;
 	QLabel* m_statusLabel;
+	QWidget* m_statusContainer;
 	ToolMenuEntry *m_tme;
 
 	QVector<BufferMenuController *> m_controllers;
