@@ -53,6 +53,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Core
     iio
+    scopy-gui
+    scopy-gr-gui
     gnuradio::gnuradio-runtime
     gnuradio::gnuradio-analog
     gnuradio::gnuradio-blocks

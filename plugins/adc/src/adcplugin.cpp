@@ -11,6 +11,7 @@
 #include "adcinstrument.h"
 
 
+
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN,"ADCPlugin");
 using namespace scopy;
 using namespace scopy::grutil;
@@ -110,10 +111,11 @@ PlotProxy* ADCPlugin::createRecipe(iio_context *ctx) {
 	QString plotRecipePrefix = "time_";
 	recipe->setPrefix(plotRecipePrefix);
 
-	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix,this);
+	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix, top,this);
 	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p,this);
 	recipe->setPlotAddon(p,s);
 
+	int i = 0;
 	for(const QString &iio_dev : deviceList) {
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx,iio_dev,iio_dev,0x400,this);
 		top->registerIIODeviceSource(gr_dev);
@@ -123,14 +125,16 @@ PlotProxy* ADCPlugin::createRecipe(iio_context *ctx) {
 
 		for(const QString &ch : devChannelMap.value(iio_dev,{})) {
 			qDebug()<<ch;
-			GRSignalPath *sig = new GRSignalPath(plotRecipePrefix + ch, top);
+			GRSignalPath *sig = new GRSignalPath(plotRecipePrefix + iio_dev + ch, top);
 			sig->append(new GRIIOFloatChannelSrc(gr_dev,ch,sig));
 			sig->append(new GRScaleOffsetProc(sig));
-			sig->setEnabled(false);
-			top->registerSignalPath(sig);
+			sig->setEnabled(true);
+			top->registerSignalPath(sig);			
 
-			GRTimeChannelAddon *t = new GRTimeChannelAddon(sig, this);
+			GRTimeChannelAddon *t = new GRTimeChannelAddon(sig, p, this);
+			t->setDevice(d);
 			recipe->addChannelAddon(t);
+			i++;
 		}
 	}
 
