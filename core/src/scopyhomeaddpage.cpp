@@ -14,6 +14,9 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	pluginManager(pm), deviceImpl(nullptr),
 	libSerialSupport(new LibSerialPortSupport())
 {
+	bool serialBackEnd = iio_has_backend("serial");
+	bool hasLibSerialPort = libSerialSupport->hasLibSerialSupport();
+
 	ui->setupUi(this);
 	initAddPage();
 	initSubSections();
@@ -75,6 +78,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	connect(ui->radioBtnDiscover, &QRadioButton::toggled, this, [=](bool checked){
 		ui->radioBtnManual->setChecked(!checked);
 		ui->autoDetectionSection->setEnabled(checked);
+		ui->serialSettingsWidget->setEnabled(serialBackEnd && hasLibSerialPort);
 		ui->btnScan->setEnabled(checked);
 	});
 	connect(ui->radioBtnManual, &QRadioButton::toggled, this, [=](bool checked){
@@ -110,10 +114,6 @@ void ScopyHomeAddPage::initAddPage()
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
 
 	ui->editSerialFrameConfig->setValidator(validator);
-	ui->btnAdd->setProperty("blue_button", QVariant(true));
-	ui->btnVerify->setProperty("blue_button", QVariant(true));
-	ui->btnScan->setProperty("blue_button", QVariant(true));
-	ui->btnBack->setProperty("blue_button", QVariant(true));
 	ui->radioBtnManual->setChecked(true);
 	ui->autoDetectionSection->setEnabled(false);
 	ui->btnAdd->setVisible(false);
@@ -124,6 +124,10 @@ void ScopyHomeAddPage::initAddPage()
 	for (int baudRate : availableBaudRates) {
 		ui->comboBoxBaudRate->addItem(QString::number(baudRate));
 	}
+	ui->btnAdd->setProperty("blue_button", QVariant(true));
+	ui->btnVerify->setProperty("blue_button", QVariant(true));
+	ui->btnScan->setProperty("blue_button", QVariant(true));
+	ui->btnBack->setProperty("blue_button", QVariant(true));
 }
 
 void ScopyHomeAddPage::initSubSections()
