@@ -18,22 +18,16 @@
 #include <gr-util/griiodevicesource.h>
 #include <gr-util/griiofloatchannelsrc.h>
 #include <gr-util/grscaleoffsetproc.h>
+#include <gr-util/tooladdon.h>
+
+#include <gr-util/grtimeplotaddon.h>
+#include <gr-util/grtimeplotaddonsettings.h>
+#include <gr-util/grdeviceaddon.h>
+#include <gr-util/grtimechanneladdon.h>
 
 
 namespace scopy {
-
-class SCOPY_ADCPLUGIN_EXPORT ToolAddon {
-public:
-	virtual QString getName() = 0;
-	virtual QWidget* getWidget() = 0;
-
-	virtual void enable() = 0;
-	virtual void disable() = 0;
-	virtual void onStart() = 0;
-		virtual void onStop() = 0;
-};
-
-
+using namespace grutil;
 // timedomainplot addon
 // x-y plot addon
 // histogram plot addon
@@ -50,107 +44,6 @@ public:
 // waterfall plot addon
 
 
-class SCOPY_ADCPLUGIN_EXPORT GRTimePlotAddon : public QObject, public ToolAddon {
-	Q_OBJECT
-public:
-	GRTimePlotAddon(QString name, QObject *parent = nullptr) : QObject(parent){
-		this->name = name;
-		widget = new QWidget();
-		widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-		plot = new CapturePlot(widget);
-	}
-	~GRTimePlotAddon() { }
-
-	QString getName() override { return name; }
-	QWidget* getWidget() override { return widget; }
-
-public Q_SLOTS:
-	void enable() override {};
-	void disable() override {}
-	void onStart() override {}
-	void onStop() override {}
-
-private:
-	QString name;
-	QWidget *widget;
-	CapturePlot *plot;
-
-};
-
-class SCOPY_ADCPLUGIN_EXPORT GRTimePlotAddonSettings : public QObject, public ToolAddon {
-	Q_OBJECT
-public:
-	GRTimePlotAddonSettings(GRTimePlotAddon *p,QObject *parent = nullptr) :
-		QObject(parent),p(p) {
-		name = p->getName()+"_settings";
-		widget = new QLabel(name);
-	}
-	~GRTimePlotAddonSettings() {}
-
-	QString getName() override { return name;}
-	QWidget* getWidget() override { return widget;}
-
-public Q_SLOTS:
-	void enable() override {}
-	void disable() override {}
-	void onStart() override {}
-	void onStop() override {}
-
-private:
-	GRTimePlotAddon* p;
-	QString name;
-	QWidget *widget;
-};
-
-
-class GRTimeChannelAddon : public QObject, public ToolAddon {
-	Q_OBJECT
-public:
-	GRTimeChannelAddon(grutil::GRSignalPath* path, QObject *parent = nullptr) {
-		this->ch = dynamic_cast<grutil::GRIIOChannel*>(path->path()[0]);
-		name = ch->getChannelName();
-		widget = new QLabel(name);
-	}
-	~GRTimeChannelAddon() {}
-
-	QString getName() override {return name;}
-	QWidget* getWidget() override {return widget;}
-
-public Q_SLOTS:
-	void enable() override {}
-	void disable() override {}
-	void onStart() override {}
-	void onStop() override {}
-
-private:
-
-	grutil::GRIIOChannel* ch;
-	QString name;
-	QWidget *widget;
-};
-
-class GRDeviceAddon : public QObject, public ToolAddon {
-	Q_OBJECT
-public:
-	GRDeviceAddon(grutil::GRIIODeviceSource *src, QObject *parent = nullptr) {
-		name = src->deviceName();
-		widget = new QLabel("devicename" + src->deviceName());
-	}
-	~GRDeviceAddon() {}
-
-	QString getName() override { return name;}
-	QWidget* getWidget() override { return widget;}
-
-public Q_SLOTS:
-	void enable() override {}
-	void disable() override {}
-	void onStart() override {}
-	void onStop() override {}
-
-private:
-	QString name;
-	QWidget *widget;
-};
 
 class SCOPY_ADCPLUGIN_EXPORT PlotProxy {
 public:
