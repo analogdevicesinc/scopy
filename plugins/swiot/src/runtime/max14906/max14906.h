@@ -45,6 +45,7 @@ private:
 	static QMainWindow* createDockableMainWindow(const QString& title, DioDigitalChannel* digitalChannel, QWidget* parent);
 
         QPushButton *m_backButton;
+	QWidget* m_statusContainer;
 	QLabel* m_statusLabel;
 
 	DioController *max14906ToolController;
