@@ -141,7 +141,6 @@ void SwiotConfig::createPageLayout() {
 	m_statusContainer->layout()->addWidget(m_statusLabel);
 
 	m_mainView->setLayout(new QVBoxLayout(m_mainView));
-//	m_mainView->layout()->addWidget(statusContainer);
 	m_mainView->layout()->addWidget(m_scrollArea);
 
 	m_toolView->addPlotInfoWidget(m_statusContainer);
