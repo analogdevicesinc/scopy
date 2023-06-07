@@ -91,6 +91,9 @@
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
+          <property name="placeholderText">
+           <string/>
+          </property>
          </widget>
         </item>
        </layout>
