@@ -21,6 +21,8 @@ DioDigitalChannel::DioDigitalChannel(const QString &deviceName, const QString &d
 	this->ui->customSwitch->setOnText("1");
 	this->ui->customSwitch->setOffText("0");
 
+	this->ui->channelTitleLineEdit->setPlaceholderText("Enter title here...");
+
 	if (deviceType == "INPUT") {
 		this->ui->customSwitch->setVisible(false);
 		this->ui->currentLimitValues->hide();

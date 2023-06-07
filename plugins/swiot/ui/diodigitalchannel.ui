@@ -81,7 +81,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="channelTitleLineEdit"/>
         </item>
         <item>
          <spacer name="horizontalSpacer_3">
