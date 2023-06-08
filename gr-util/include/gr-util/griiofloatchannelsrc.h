@@ -3,7 +3,6 @@
 
 #include "scopy-gr-util_export.h"
 #include "griiodevicesource.h"
-#include "gnuradio/blocks/short_to_float.h"
 
 namespace scopy::grutil {
 class SCOPY_GR_UTIL_EXPORT GRIIOFloatChannelSrc : public GRIIOChannel {
@@ -14,8 +13,7 @@ public:
 	void destroy_blks(GRTopBlock *top);
 
 protected:
-	gr::blocks::short_to_float::sptr s2f;
-
+	gr::basic_block_sptr x2f;
 };
 }
 #endif // GRIIOFLOATCHANNELSRC_H

@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
 					 "SWIOTPlugin.debug=true\n"
 					 "AD74413R.debug=true\n"
 					 "ScopyTranslations.debug=true\n"
+					 "ADCPlugin.debug=true\n"
+					 "GRManager.debug=true\n"
 					 );
 
 	QCoreApplication::setOrganizationName("ADI");

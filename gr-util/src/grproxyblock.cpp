@@ -20,7 +20,7 @@ void GRProxyBlock::destroy_blks(GRTopBlock *top)
 void GRProxyBlock::connect_blk(GRTopBlock *top, GRProxyBlock *src) {
 	if(src == nullptr) // block is a source
 		return;
-	int nrOfOutputs = src->getGrEndPoint()->output_signature()->max_streams();
+	int nrOfOutputs = src->getGrEndPoint()->output_signature()->min_streams();
 	for(int i = 0; i < nrOfOutputs;i++) {
 
 		int j = 0;
