@@ -41,6 +41,7 @@ public:
 	std::vector<std::string> channelNames() const;
 
 	QString deviceName() const;
+	const iio_data_format *getChannelFormat(QString ch);
 
 protected:
 	QList<GRIIOChannel*> m_list;
