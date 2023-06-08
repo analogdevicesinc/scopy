@@ -40,13 +40,11 @@ void GRIIODeviceSource::computeChannelNames() {
 		}
 	}
 
-
-
 	m_channelNames.erase(std::remove_if(
-							 m_channelNames.begin(),
-							 m_channelNames.end(),
-				   [=](std::string x){return x.empty();}),
-						 m_channelNames.end()); // clear empty channels
+				 m_channelNames.begin(),
+				 m_channelNames.end(),
+				 [=](std::string x){return x.empty();}),
+			     m_channelNames.end()); // clear empty channels
 
 }
 
@@ -56,6 +54,13 @@ int GRIIODeviceSource::getOutputIndex(QString ch) {
 			return i;
 	}
 	return -1;
+}
+
+const iio_data_format* GRIIODeviceSource::getChannelFormat(QString ch) {
+	std::string channel_name = ch.toStdString();
+	iio_device* iio_dev = iio_context_find_device(m_ctx,m_deviceName.toStdString().c_str());
+	iio_channel* iio_ch = iio_device_find_channel(iio_dev, channel_name.c_str(), false);
+	return iio_channel_get_data_format(iio_ch);
 }
 
 void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top) {
@@ -84,6 +89,7 @@ void GRIIODeviceSource::build_blks(GRTopBlock *top)
 	computeChannelNames();
 	// create block
 	src = gr::iio::device_source::make_from(m_ctx, m_deviceName.toStdString(), m_channelNames, m_phyDeviceName.toStdString(), gr::iio::iio_param_vec_t(), m_buffersize);
+	src->set_output_multiple(m_buffersize);
 	// match channels with blocks
 
 	end_blk = src;

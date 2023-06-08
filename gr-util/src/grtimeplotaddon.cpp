@@ -3,6 +3,7 @@
 #include <grtimechanneladdon.h>
 #include <grdeviceaddon.h>
 #include <grtopblock.h>
+#include <grlog.h>
 #include <gr-gui/scope_sink_f.h>
 
 using namespace scopy;
@@ -32,13 +33,17 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 
 	m_plot->setSampleRate(1000, 1, "Hz");
+	m_plot->setActiveVertAxis(0);
+//	m_plot->setAxisVisible(QwtAxis::YLeft, false);
+//	m_plot->setAxisVisible(QwtAxis::XBottom, false);
+	m_plot->setUsingLeftAxisScales(false);
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, 0.1);
-	m_plot->setAllYAxis(-20000, 20000);
-	m_plot->setOffsetInterval(-20000, 20000);
+	m_plot->setOffsetInterval(-65535, 65535);
 //	m_plot->setAutoScale(true);
 	connect(m_plot, SIGNAL(newData()),this, SLOT(onNewData()));
+	m_plot->replot();
 
 	widget = m_plotWidget;
 }
@@ -58,12 +63,14 @@ void GRTimePlotAddon::disable() {}
 void GRTimePlotAddon::onStart() {
 	connect(m_top,SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
 	connect(m_top,SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
+
 	m_top->build();
 	m_top->start();
 }
 
 void GRTimePlotAddon::onStop() {
 	m_top->stop();
+	m_top->teardown();
 	disconnect(m_top,SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
 	disconnect(m_top,SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 }
@@ -75,8 +82,8 @@ void GRTimePlotAddon::onRemove() {}
 void GRTimePlotAddon::onChannelAdded(ToolAddon *t) {
 	GRTimeChannelAddon *ch = dynamic_cast<GRTimeChannelAddon*>(t);
 	QString sinkName = (name + ch->getDevice()->getName() +  t->getName());
-	m_plot->registerSink(sinkName.toStdString(),1,1024);
-	qInfo()<<"created plot_sinks"<<sinkName;
+	bool ret = m_plot->registerSink(sinkName.toStdString(),1,0);
+	qInfo()<<"created plot_sinks "<<sinkName << ret;
 }
 
 void GRTimePlotAddon::onChannelRemoved(ToolAddon *) {}
@@ -96,6 +103,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 
 		qInfo()<<"created scope_sink_f with name" << sigpath->name();
 		m_top->connect(sigpath->getGrEndPoint(), 0, sink, 0);
+		m_plot->setAllYAxis(-1000000,1000000);
 	}
 }
 
@@ -107,5 +115,18 @@ void GRTimePlotAddon::tearDownSignalPaths() {
 }
 
 void GRTimePlotAddon::onNewData() {
-	qInfo()<<"new dataa!"	;
+	float sum0 = 0;
+	float sum1 = 0;
+	for(int i=0;i<m_plot->Curve(0)->data()->size();i++) {
+		sum0 += m_plot->Curve(0)->data()->sample(i).y();
+	}
+//	for(int i=0;i<m_plot->Curve(1)->data()->size();i++) {
+//		sum1 += m_plot->Curve(1)->data()->sample(i).y();
+//	}
+
+
+	qInfo()<<"new dataa! avgs - "
+		<< sum0/m_plot->Curve(0)->data()->size()
+//		<< sum1 / m_plot->Curve(1)->data()->size()
+	    ;
 }
