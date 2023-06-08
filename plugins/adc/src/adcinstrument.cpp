@@ -6,6 +6,9 @@ using namespace scopy;
 using namespace scopy::grutil;
 AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent), proxy(proxy)
 {
+
+	// TODO LIST
+	//
 	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
@@ -60,8 +63,11 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			plot->Curve(curveId)->setAxes(
 			    QwtAxisId(QwtAxis::XBottom, 0),
 			    QwtAxisId(QwtAxis::YLeft, curveId));
-//			plot->DetachCurve(curveId);
-			plot->addZoomer(curveId);
+
+//			plot->Curve(curveId)->
+			plot->DetachCurve(curveId);
+			plot->AttachCurve(curveId);
+//			plot->addZoomer(curveId);
 
 			ch->setMenuButtonVisibility(false);
 			chGroup.push_back(ch);

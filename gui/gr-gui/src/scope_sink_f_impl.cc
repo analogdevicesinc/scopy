@@ -384,6 +384,8 @@ scope_sink_f_impl::work(int noutput_items,
 				|| !d_cleanBuffers) {
 			d_last_time = gr::high_res_timer_now();
 			if (d_qApplication) {
+				qInfo()<<QString::fromStdString(d_name);
+
 				d_qApplication->postEvent(this->plot,
 							  new IdentifiableTimeUpdateEvent(d_buffers,
 											  nItemsToSend,
