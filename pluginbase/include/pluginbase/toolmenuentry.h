@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QString>
 #include <common/scopyconfig.h>
-#include <QUuid>
 #include "scopy-pluginbase_export.h"
 
 namespace scopy {
@@ -17,7 +16,7 @@ class SCOPY_PLUGINBASE_EXPORT ToolMenuEntry : public QObject {
 	Q_OBJECT
 public:
 	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr) :
-		QObject(parent), m_id(id), m_uuid(QUuid::createUuid().toString()),
+		QObject(parent), m_id(id), m_uuid("tme_"+pluginName+"_"+id+"_"+scopy::config::getUuid()),
 		m_name(name), m_icon(icon), m_pluginName(pluginName), m_visible(true),
 		m_enabled(false), m_running(false), m_runBtnVisible(false),
 		m_attached(true), m_tool(nullptr) {}

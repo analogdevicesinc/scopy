@@ -3,6 +3,7 @@
 #include <QStandardPaths>
 #include <QApplication>
 #include <QSysInfo>
+#include <QUuid>
 
 QString scopy::config::defaultPluginFolderPath()
 {
@@ -86,4 +87,13 @@ QString scopy::config::dump() {
 	ret+= QString("\n") + "pcSpecs: \n" + pcSpecs();
 
 	return ret;
+}
+
+QString scopy::config::getUuid()
+{
+#ifdef USE_QUUID
+	return QUuid.createUuid().toString();
+#else
+	return QString::number(uuid++);
+#endif
 }
