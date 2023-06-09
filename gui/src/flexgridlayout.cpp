@@ -1,7 +1,7 @@
 #include "flexgridlayout.hpp"
 #include "QScrollArea"
 #include <QSpacerItem>
-#include <QtDebug>
+#include <QDebug>
 
 using namespace scopy;
 
@@ -27,7 +27,7 @@ FlexGridLayout::FlexGridLayout(int maxCols, QWidget *parent) :
 	m_gridLayout->addItem(m_hspacer,0, m_maxCols + 1);
 	m_gridLayout->addItem(m_vspacer,10, 0);
 
-	connect(this, &FlexGridLayout::reqestLayoutUpdate, this, &FlexGridLayout::updateLayout, Qt::QueuedConnection);
+	QObject::connect(this, &FlexGridLayout::reqestLayoutUpdate, this, &FlexGridLayout::updateLayout, Qt::DirectConnection);
 }
 
 // adds widget to internal widget list and return the index of the added widget
