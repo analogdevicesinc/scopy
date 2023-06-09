@@ -24,6 +24,8 @@ GR_GUI_DLL=$BUILD_FOLDER/gui/gr-gui
 IIOUTIL_DLL=$BUILD_FOLDER/iioutil
 COMMON_DLL=$BUILD_FOLDER/common
 
+REGMAP_XMLS=$BUILD_FOLDER/xmls
+
 # Generate build status info for the about page
 cp $BUILD_STATUS_FILE $SRC_FOLDER/build-status
 pacman -Qe >> $SRC_FOLDER/build-status
@@ -65,6 +67,9 @@ deploy_app(){
 	cp $GR_GUI_DLL/libscopy-gr-gui.dll $DEST_FOLDER
 	cp $COMMON_DLL/libscopy-common.dll $DEST_FOLDER
 
+	if [ -d $REGMAP_XMLS ]; then
+		cp -r $REGMAP_XMLS $DEST_FOLDER
+	fi
 
 	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins -type f -name "*.dll")
 	mkdir -p $DEST_FOLDER/plugins/plugins
