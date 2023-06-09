@@ -40,6 +40,7 @@ private Q_SLOTS:
 	void connectDevice();
 	void disconnectDevice();
 	void restartDevice();
+	void onRestart(QString id, Device *d);
 
 Q_SIGNALS:
 	void deviceChangedToolList(QString, QList<ToolMenuEntry*>);
@@ -56,6 +57,8 @@ private:
 	void disconnectDeviceFromManager(DeviceImpl *d);
 private:
 	bool exclusive = false;
+	QString m_restartedDevNewId;
+
 	QStringList scannedDev;
 	QStringList connectedDev;
 	QMap<QString,Device*> map;
