@@ -18,7 +18,6 @@ using namespace scopy::swiot;
 void SWIOTPlugin::preload()
 {
 	m_displayName = "SWIOT";
-
 	m_swiotController = new SwiotController(m_param, this);
 	m_runtime = new SwiotRuntime();
 }
@@ -85,19 +84,6 @@ bool SWIOTPlugin::compatible(QString m_param, QString category)
 	return ret;
 }
 
-void SWIOTPlugin::cleanAfterLastContext()
-{
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
-		tme->setEnabled(false);
-		tme->setRunBtnVisible(false);
-		tme->setRunning(false);
-		delete tme->tool();
-		tme->setTool(nullptr);
-	}
-	auto &&cp = ContextProvider::GetInstance();
-	cp->close(m_param);
-}
-
 void SWIOTPlugin::setupToolList()
 {
 	auto &&cp = ContextProvider::GetInstance();
@@ -106,16 +92,17 @@ void SWIOTPlugin::setupToolList()
 	m_swiotController->connectSwiot(ctx);
 	m_swiotController->startPingTask();
 	m_swiotController->startPowerSupplyTask("ext_psu");
+
 	m_runtime->setContext(ctx);
 
-	bool isRuntimeContext = m_runtime->isRuntimeCtx();
+	m_isRuntime = m_runtime->isRuntimeCtx();
 
 	auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
 	auto ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
-	if (isRuntimeContext) {
+	if (m_isRuntime) {
 		ad74413rTme->setTool(new swiot::Ad74413r(ctx, ad74413rTme));
 		max14906Tme->setTool(new swiot::Max14906(ctx, max14906Tme));
 		faultsTme->setTool(new swiot::Faults(ctx, faultsTme));
@@ -123,10 +110,7 @@ void SWIOTPlugin::setupToolList()
 		configTme->setTool(new swiot::SwiotConfig(ctx));
 	}
 
-	connect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, [this]() {
-		m_swiotController->stopPingTask();
-		m_swiotController->startSwitchContextTask();
-	});
+	connect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, &SWIOTPlugin::startCtxSwitch);
 	connect(dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Faults*> (faultsTme->tool()), &Faults::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
@@ -141,7 +125,8 @@ void SWIOTPlugin::setupToolList()
 
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(true);
-		if (!isRuntimeContext) {
+		tme->setVisible(true);
+		if (!m_isRuntime) {
 			if (tme->id().compare(CONFIG_TME_ID)) {
 				tme->setVisible(false);
 			}
@@ -155,7 +140,7 @@ void SWIOTPlugin::setupToolList()
 		}
 	}
 
-	if (!isRuntimeContext) {
+	if (!m_isRuntime) {
 		Q_EMIT requestTool(configTme->id());
 	} else {
 		Q_EMIT requestTool(ad74413rTme->id());
@@ -165,26 +150,32 @@ void SWIOTPlugin::setupToolList()
 bool SWIOTPlugin::onConnect()
 {
 	setupToolList();
-
-	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
-	connect(m_swiotController, &SwiotController::pingSuccess, this, [](){
-		qDebug(CAT_SWIOT) << "Ping success!";
-	});
-	connect(m_swiotController, &SwiotController::contextSwitched, this,[this](){
-		m_swiotController->stopSwitchContextTask();
-		cleanAfterLastContext();
-		setupToolList();
-
-	});
-	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, [this]() {
-		m_swiotController->stopPingTask();
-		m_swiotController->startSwitchContextTask();
-	});
+	connect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched, Qt::QueuedConnection);
+	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 	return true;
 }
 
 bool SWIOTPlugin::onDisconnect()
 {
+	auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
+	auto ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
+	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
+	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
+
+	disconnect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, &SWIOTPlugin::startCtxSwitch);
+	disconnect(dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
+	disconnect(dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
+	disconnect(dynamic_cast<Faults*> (faultsTme->tool()), &Faults::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
+
+	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Faults*> (faultsTme->tool()), &Faults::externalPowerSupply);
+	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::externalPowerSupply);
+	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
+	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::externalPowerSupply);
+
+	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
+	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched);
+	disconnect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
+
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -193,16 +184,31 @@ bool SWIOTPlugin::onDisconnect()
 		tme->setTool(nullptr);
 	}
 
-	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
-
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
 	m_swiotController->disconnectSwiot();
+
+	delete m_swiotController;
+	delete m_runtime;
 
 	auto &&cp = ContextProvider::GetInstance();
 	cp->close(m_param);
 
 	return true;
+}
+
+void SWIOTPlugin::startCtxSwitch()
+{
+	m_swiotController->stopPingTask();
+	m_swiotController->stopPowerSupplyTask();
+	ContextProvider::GetInstance()->close(m_param);
+	m_swiotController->startSwitchContextTask(m_isRuntime);
+}
+
+void SWIOTPlugin::onCtxSwitched()
+{
+	m_swiotController->stopSwitchContextTask();
+	Q_EMIT restartDevice();
 }
 
 void SWIOTPlugin::initMetadata()
@@ -214,7 +220,7 @@ void SWIOTPlugin::initMetadata()
 	   "category":[
 	      "iio"
 	   ],
-	   "exclude":["*", "!debuggerplugin", "!regmapplugin"]
+	   "exclude":["*"]
 	}
 )plugin");
 }
