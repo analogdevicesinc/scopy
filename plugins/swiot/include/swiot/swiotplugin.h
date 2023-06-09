@@ -33,9 +33,10 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+	void startCtxSwitch();
+	void onCtxSwitched();
 
 private:
-	void cleanAfterLastContext();
 	void setupToolList();
 
 	SwiotInfoPage *m_infoPage;
@@ -48,6 +49,8 @@ private:
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
+
+	bool m_isRuntime;
 };
 }
 

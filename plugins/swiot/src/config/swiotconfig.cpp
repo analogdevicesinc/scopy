@@ -90,7 +90,12 @@ QPushButton *SwiotConfig::createConfigBtn() {
 }
 
 void SwiotConfig::configBtnPressed() {
-	iio_device_attr_write(m_swiotDevice, "mode", "runtime");
+	ssize_t res = iio_device_attr_write(m_swiotDevice, "mode", "runtime");
+	if (res >= 0 ) {
+		qDebug(CAT_SWIOT_CONFIG) << "Swiot mode changed to runtime!";
+	} else {
+		qDebug(CAT_SWIOT_CONFIG) << "Swiot mode cannot be changed to runtime!";
+	}
 	Q_EMIT configBtn();
 
 	qInfo(CAT_SWIOT_CONFIG) << "Swiot mode has been changed to runtime";
