@@ -23,7 +23,7 @@ public:
 	void startPowerSupplyTask(QString attribute);
 	void stopPowerSupplyTask();
 
-	void startSwitchContextTask();
+	void startSwitchContextTask(bool isRuntime);
 	void stopSwitchContextTask();
 
 	void connectSwiot(iio_context *ctx);

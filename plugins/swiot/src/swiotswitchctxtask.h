@@ -10,13 +10,14 @@ class SwiotSwitchCtxTask : public QThread
 {
 	Q_OBJECT
 public:
-	SwiotSwitchCtxTask(QString uri);
+	SwiotSwitchCtxTask(QString uri, bool wasRuntime);
 	void run() override;
 
 Q_SIGNALS:
 	void contextSwitched();
 private:
 	QString m_uri;
+	bool m_wasRuntime;
 };
 }
 
