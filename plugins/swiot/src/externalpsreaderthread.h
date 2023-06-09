@@ -9,14 +9,14 @@ namespace scopy::swiot {
 class ExternalPsReaderThread : public QThread {
 	Q_OBJECT
 public:
-	explicit ExternalPsReaderThread(struct iio_device* device, QString attribute, QObject *parent = nullptr);
+	explicit ExternalPsReaderThread(QString uri, QString attr);
 	void run() override;
 
 Q_SIGNALS:
 	void hasConnectedPowerSupply(bool ps);
 
 private:
-	struct iio_device* m_device;
+	QString m_uri;
 	QString m_attribute;
 
 };
