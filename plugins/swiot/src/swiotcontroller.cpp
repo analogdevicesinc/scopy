@@ -54,3 +54,18 @@ void SwiotController::disconnectSwiot()
 {
 	m_iioCtx = nullptr;
 }
+
+void SwiotController::startPowerSupplyTask(QString attribute)
+{
+	extPsTask = new ExternalPsReaderThread(uri, attribute);
+	powerSupplyTimer = new CyclicalTask(extPsTask);
+	powerSupplyTimer->start(5000);
+	connect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this, &SwiotController::hasConnectedPowerSupply);
+}
+
+void SwiotController::stopPowerSupplyTask()
+{
+	powerSupplyTimer->stop();
+	extPsTask->requestInterruption();
+	disconnect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this, &SwiotController::hasConnectedPowerSupply);
+}
