@@ -5,6 +5,7 @@
 #include <iio.h>
 #include "iioutil/iiopingtask.h"
 #include "iioutil/cyclicaltask.h"
+#include "src/externalpsreaderthread.h"
 #include "src/swiotswitchctxtask.h"
 
 
@@ -19,8 +20,8 @@ public:
 	void startPingTask();
 	void stopPingTask();
 
-//	void startPowerSupplyTask();
-//	void stopPowerSupplyTask();
+	void startPowerSupplyTask(QString attribute);
+	void stopPowerSupplyTask();
 
 	void startSwitchContextTask();
 	void stopSwitchContextTask();
@@ -32,15 +33,18 @@ Q_SIGNALS:
 	void pingSuccess();
 	void pingFailed();
 	void contextSwitched();
+	void hasConnectedPowerSupply(bool ps);
 
 private:
 	IIOPingTask *pingTask;
 	SwiotSwitchCtxTask *switchCtxTask;
+	ExternalPsReaderThread *extPsTask;
 	iio_context *m_iioCtx;
 	QString uri;
 
 	CyclicalTask *pingTimer;
 	CyclicalTask *switchCtxTimer;
+	CyclicalTask *powerSupplyTimer;
 
 };
 }

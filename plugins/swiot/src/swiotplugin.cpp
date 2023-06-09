@@ -10,7 +10,6 @@
 #include "src/runtime/swiotruntime.h"
 #include "src/swiot_logging_categories.h"
 #include "swiotinfopage.h"
-#include "externalpsreaderthread.h"
 #include <iioutil/contextprovider.h>
 
 
@@ -106,6 +105,7 @@ void SWIOTPlugin::setupToolList()
 
 	m_swiotController->connectSwiot(ctx);
 	m_swiotController->startPingTask();
+	m_swiotController->startPowerSupplyTask("ext_psu");
 	m_runtime->setContext(ctx);
 
 	bool isRuntimeContext = m_runtime->isRuntimeCtx();
@@ -131,21 +131,13 @@ void SWIOTPlugin::setupToolList()
 	connect(dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Faults*> (faultsTme->tool()), &Faults::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 
-	iio_device *swiotDevice = iio_context_find_device(ctx, "swiot");
-	if (swiotDevice) {
-		m_extPsThread = new ExternalPsReaderThread(swiotDevice, "ext_psu", this);
-		m_extPsTask = new CyclicalTask(m_extPsThread, this);
 
-		connect(m_extPsThread, &ExternalPsReaderThread::hasConnectedPowerSupply, dynamic_cast<Faults*> (faultsTme->tool()), &Faults::externalPowerSupply);
-		connect(m_extPsThread, &ExternalPsReaderThread::hasConnectedPowerSupply, dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::externalPowerSupply);
-		connect(m_extPsThread, &ExternalPsReaderThread::hasConnectedPowerSupply, dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
-		connect(m_extPsThread, &ExternalPsReaderThread::hasConnectedPowerSupply, dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::externalPowerSupply);
+	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Faults*> (faultsTme->tool()), &Faults::externalPowerSupply);
+	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::externalPowerSupply);
+	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
+	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::externalPowerSupply);
+	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
 
-		m_extPsTask->start(5000); // read every 5 seconds
-	} else {
-		qCritical(CAT_SWIOT)
-			<< "Could not find device swiot. The external power supply reading task will not be available";
-	}
 
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(true);
@@ -204,6 +196,7 @@ bool SWIOTPlugin::onDisconnect()
 	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
 
 	m_swiotController->stopPingTask();
+	m_swiotController->stopPowerSupplyTask();
 	m_swiotController->disconnectSwiot();
 
 	auto &&cp = ContextProvider::GetInstance();
