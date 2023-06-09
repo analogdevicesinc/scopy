@@ -8,5 +8,6 @@
         <file>swiot_board.svg</file>
         <file>swiot_top_transparent.png</file>
         <file>warning.svg</file>
+        <file>swiot_icon.png</file>
     </qresource>
 </RCC>
