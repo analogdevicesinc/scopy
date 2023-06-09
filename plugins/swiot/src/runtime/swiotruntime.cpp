@@ -103,8 +103,8 @@ void SwiotRuntime::onBackBtnPressed()
 {
 	if (m_iioDevices.contains(SWIOT_DEVICE_NAME) && m_iioDevices[SWIOT_DEVICE_NAME]) {
 		ssize_t res = iio_device_attr_write(m_iioDevices[SWIOT_DEVICE_NAME], "mode", "config");
-		if (res > 0) {
-			qInfo(CAT_SWIOT) << "Successfully changed the config mode to runtime";
+		if (res >= 0) {
+			qInfo(CAT_SWIOT) << "Successfully changed the swiot mode to config";
 		} else {
 			qCritical(CAT_SWIOT) << "Error, could not change swiot mode to config";
 		}

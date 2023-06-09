@@ -30,11 +30,11 @@ void SwiotController::stopPingTask()
 	disconnect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
 }
 
-void SwiotController::startSwitchContextTask()
+void SwiotController::startSwitchContextTask(bool isRuntime)
 {
-	switchCtxTask = new SwiotSwitchCtxTask(uri);
+	switchCtxTask = new SwiotSwitchCtxTask(uri, isRuntime);
 	switchCtxTimer = new CyclicalTask(switchCtxTask, this);
-	switchCtxTimer->start(3000);
+	switchCtxTimer->start(1000);
 	connect(switchCtxTask, &SwiotSwitchCtxTask::contextSwitched, this, &SwiotController::contextSwitched);
 }
 
