@@ -35,7 +35,7 @@ DioDigitalChannel::DioDigitalChannel(const QString &deviceName, const QString &d
 	this->ui->sismograph->setAxisTitle(QwtAxis::XBottom, ""); // clear title
 	this->ui->sismograph->setAxisScale(0, 0, 1, 1); // y axis
 	this->ui->sismograph->setPlotDirection(Sismograph::RIGHT_TO_LEFT); // plot from right to left
-	this->ui->sismograph->setColor(Qt::red);
+	this->ui->sismograph->setColor(QColor(0xff, 0x72, 0x00)); // #ff7200
 	this->ui->sismograph->setUpdatesEnabled(true);
 	this->ui->sismograph->setAutoscale(false);
 	this->ui->sismograph->setAxisScale(QwtAxis::YRight, 0.0, 1.0);
