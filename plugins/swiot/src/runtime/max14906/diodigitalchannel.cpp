@@ -46,7 +46,9 @@ DioDigitalChannel::DioDigitalChannel(const QString &deviceName, const QString &d
 
 	this->ui->lcdNumber->setPrecision(0);
 
-	this->ui->modeLabel->setText(deviceType.toLower() + " mode");
+	QString modeLabel = deviceType.toLower();
+	modeLabel[0] = modeLabel[0].toUpper();
+	this->ui->modeLabel->setText(modeLabel + " mode");
 }
 
 DioDigitalChannel::~DioDigitalChannel() {
