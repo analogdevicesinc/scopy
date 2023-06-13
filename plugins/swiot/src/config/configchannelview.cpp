@@ -4,39 +4,44 @@
 using namespace scopy::swiot;
 
 ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent) :
-	QWidget(parent),
-	channelLabel(new QLabel(this)),
-	deviceOptions(new QComboBox(this)),
-	functionOptions(new QComboBox(this)),
-	enabledCheckBox(new QCheckBox(this)),
+	QFrame(parent),
+	ui(new Ui::ConfigChannelView()),
 	m_channelEnabled(false),
 	m_channelIndex(channelIndex)
 {
-	this->enabledCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	this->channelLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	channelLabel->setText(QString::fromStdString("Channel ") + QString::number(m_channelIndex + 1));
-	enabledCheckBox->toggled(true);
+	this->installEventFilter(this);
+	this->ui->setupUi(this);
+
+	this->setAttribute(Qt::WA_Hover, true);
+
+	this->ui->enabledCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	this->ui->channelLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	this->ui->channelLabel->setText(QString::fromStdString("Channel ") + QString::number(m_channelIndex + 1));
+	this->ui->enabledCheckBox->toggled(true);
 	this->connectSignalsAndSlots();
 }
 
-ConfigChannelView::~ConfigChannelView()
-{
-
+ConfigChannelView::~ConfigChannelView() {
+	delete ui;
 }
 
-void ConfigChannelView::connectSignalsAndSlots()
-{
-	QObject::connect(enabledCheckBox, &QCheckBox::stateChanged, this, [this] () {
-		this->setChannelEnabled(enabledCheckBox->isChecked());
-		Q_EMIT enabledChanged(m_channelIndex, enabledCheckBox->isChecked());
+void ConfigChannelView::connectSignalsAndSlots() {
+	QObject::connect(this->ui->enabledCheckBox, &QCheckBox::stateChanged, this, [this]() {
+		this->setChannelEnabled(this->ui->enabledCheckBox->isChecked());
+		if (m_channelEnabled) {
+			Q_EMIT showPath(m_channelIndex, m_selectedDevice);
+		} else {
+			Q_EMIT hidePaths();
+		}
+		Q_EMIT enabledChanged(m_channelIndex, this->ui->enabledCheckBox->isChecked());
 	});
 
-	QObject::connect(deviceOptions, &QComboBox::textActivated, this, [this] (const QString& text) {
-		Q_EMIT deviceChanged(m_channelIndex, text);
+	QObject::connect(this->ui->deviceOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+		Q_EMIT deviceChanged(m_channelIndex, this->ui->deviceOptions->currentText());
 	});
 
-	QObject::connect(functionOptions, &QComboBox::textActivated, this, [this] (const QString& text) {
-		Q_EMIT functionChanged(m_channelIndex, text);
+	QObject::connect(this->ui->functionOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+		Q_EMIT functionChanged(m_channelIndex, this->ui->functionOptions->currentText());
 	});
 }
 
@@ -46,14 +51,14 @@ bool ConfigChannelView::isChannelEnabled() const {
 
 void ConfigChannelView::setChannelEnabled(bool mChannelEnabled) {
 	m_channelEnabled = mChannelEnabled;
-	enabledCheckBox->setChecked(m_channelEnabled);
+	this->ui->enabledCheckBox->setChecked(m_channelEnabled);
 
 	if (m_channelEnabled) {
-		deviceOptions->setEnabled(true);
-		functionOptions->setEnabled(true);
+		this->ui->deviceOptions->setEnabled(true);
+		this->ui->functionOptions->setEnabled(true);
 	} else {
-		deviceOptions->setEnabled(false);
-		functionOptions->setEnabled(false);
+		this->ui->deviceOptions->setEnabled(false);
+		this->ui->functionOptions->setEnabled(false);
 	}
 }
 
@@ -63,8 +68,8 @@ const QString &ConfigChannelView::getSelectedDevice() const {
 
 void ConfigChannelView::setSelectedDevice(const QString &mSelectedDevice) {
 	m_selectedDevice = mSelectedDevice;
-	int index = deviceOptions->findText(m_selectedDevice);
-	deviceOptions->setCurrentIndex(index);
+	int index = this->ui->deviceOptions->findText(m_selectedDevice);
+	this->ui->deviceOptions->setCurrentIndex(index);
 }
 
 const QStringList &ConfigChannelView::getDeviceAvailable() const {
@@ -73,9 +78,9 @@ const QStringList &ConfigChannelView::getDeviceAvailable() const {
 
 void ConfigChannelView::setDeviceAvailable(const QStringList &mDeviceAvailable) {
 	m_deviceAvailable = mDeviceAvailable;
-	deviceOptions->clear();
-	for (const QString& device : m_deviceAvailable) {
-		deviceOptions->addItem(device);
+	this->ui->deviceOptions->clear();
+	for (const QString &device: m_deviceAvailable) {
+		this->ui->deviceOptions->addItem(device);
 	}
 }
 
@@ -85,8 +90,8 @@ const QString &ConfigChannelView::getSelectedFunction() const {
 
 void ConfigChannelView::setSelectedFunction(const QString &mSelectedFunction) {
 	m_selectedFunction = mSelectedFunction;
-	int index = functionOptions->findText(m_selectedFunction);
-	functionOptions->setCurrentIndex(index);
+	int index = this->ui->functionOptions->findText(m_selectedFunction);
+	this->ui->functionOptions->setCurrentIndex(index);
 }
 
 const QStringList &ConfigChannelView::getFunctionAvailable() const {
@@ -95,26 +100,26 @@ const QStringList &ConfigChannelView::getFunctionAvailable() const {
 
 void ConfigChannelView::setFunctionAvailable(const QStringList &mFunctionAvailable) {
 	m_functionAvailable = mFunctionAvailable;
-	functionOptions->clear();
-	for (const QString& device : m_functionAvailable) {
-		functionOptions->addItem(device);
+	this->ui->functionOptions->clear();
+	for (const QString &device: m_functionAvailable) {
+		this->ui->functionOptions->addItem(device);
 	}
 }
 
-QLabel *ConfigChannelView::getChannelLabel() const {
-	return channelLabel;
-}
+bool ConfigChannelView::eventFilter(QObject* object, QEvent *event) {
+	if (event->type() == QEvent::HoverEnter) {
+		this->setStyleSheet("background-color: #272730;");
+		if (m_channelEnabled) {
+			Q_EMIT showPath(m_channelIndex, m_selectedDevice);
+		}
+	}
 
-QComboBox *ConfigChannelView::getDeviceOptions() const {
-	return deviceOptions;
-}
+	if (event->type() == QEvent::HoverLeave) {
+		this->setStyleSheet("");
+		Q_EMIT hidePaths();
+	}
 
-QComboBox *ConfigChannelView::getFunctionOptions() const {
-	return functionOptions;
-}
-
-QCheckBox *ConfigChannelView::getEnabledCheckBox() const {
-	return enabledCheckBox;
+	return QFrame::event(event);
 }
 
 #include "moc_configchannelview.cpp"
