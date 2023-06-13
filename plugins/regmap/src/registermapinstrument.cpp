@@ -101,8 +101,8 @@ void RegisterMapInstrument::toggleSearchBarVisible(bool visible)
 
 RegisterMapValues *RegisterMapInstrument::getRegisterMapValues(struct iio_device *dev)
 {
-    IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(filePath);
-    IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(filePath);
+    IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(dev);
+    IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(dev);
     RegisterMapValues *registerMapValues = new RegisterMapValues();
     registerMapValues->setReadStrategy(iioReadStrategy);
     registerMapValues->setWriteStrategy(iioWriteStrategy);

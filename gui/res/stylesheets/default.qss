@@ -681,7 +681,13 @@ QPushButton[userNote=true]:checked {
 }
 
 *[has_frame=true] {
- border: 2px solid black;
+ border-top: 2px solid black;
+ border-right: 2px solid black;
+ border-left: 2px solid black;
+}
+
+*[has_bottom_border=true] {
+ border-bottom: 2px solid black;
 }
 
 *[is_selected=true] {

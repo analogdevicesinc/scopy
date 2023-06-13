@@ -60,7 +60,6 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     endReadIntervalLayout->addWidget(endReadInterval);
 
     QPushButton *readInterval = new QPushButton("Read interval");
-    readInterval->setEnabled(false);
     Utils::applyScopyButtonStyle(readInterval);
 
     QObject::connect(readInterval, &QPushButton::clicked, this, [=](){
@@ -71,29 +70,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
             Q_EMIT requestRead(i);
         }
     });
-
-    QObject::connect(startReadInterval, &QLineEdit::textChanged, this, [=](){
-        if ( !startReadInterval->text().isEmpty() && !endReadInterval->text().isEmpty()) {
-            readInterval->setEnabled(true);
-        } else {
-            readInterval->setEnabled(false);
-        }
-    });
-
-    QObject::connect(endReadInterval, &QLineEdit::textChanged, this, [=](){
-        if ( !startReadInterval->text().isEmpty() && !endReadInterval->text().isEmpty()) {
-            readInterval->setEnabled(true);
-        } else {
-            readInterval->setEnabled(false);
-        }
-    });
-
     intervalSection->getContentWidget()->layout()->addWidget(setIntervalWidget);
     intervalSection->getContentWidget()->layout()->addWidget(readInterval);
-
-    QWidget *findPathWidget = new QWidget();
-    QHBoxLayout *findPathLayout = new QHBoxLayout();
-    findPathWidget->setLayout(findPathLayout);
 
     QLineEdit *filePath = new QLineEdit();
     filePath->setPlaceholderText("File path");
@@ -105,13 +83,11 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
         filePath->setText(QFileDialog::getOpenFileName(this, ("Open File"), ""));
     });
 
-    findPathLayout->addWidget(filePath);
-    findPathLayout->addWidget(pathButton);
-    intervalSection->getContentWidget()->layout()->addWidget(findPathWidget);
+    intervalSection->getContentWidget()->layout()->addWidget(filePath);
+    intervalSection->getContentWidget()->layout()->addWidget(pathButton);
 
 
     QPushButton *writeListOfValuesButton = new QPushButton("Write values");
-    writeListOfValuesButton->setEnabled(false);
     Utils::applyScopyButtonStyle(writeListOfValuesButton);
 
     QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=](){
@@ -132,7 +108,6 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     intervalSection->getContentWidget()->layout()->addWidget(writeListOfValuesButton);
 
     QPushButton *registerDump = new QPushButton("Register dump");
-    registerDump->setEnabled(false);
     Utils::applyScopyButtonStyle(registerDump);
 
     QObject::connect(registerDump, &QPushButton::clicked, this, [=](){
@@ -144,12 +119,6 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     });
 
     intervalSection->getContentWidget()->layout()->addWidget(registerDump);
-
-
-    QObject::connect(filePath, &QLineEdit::textChanged, this, [=](QString text){
-        writeListOfValuesButton->setEnabled(!text.isEmpty());
-        registerDump->setEnabled(!text.isEmpty());
-    });
 
     QSpacerItem *spacer = new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding);
     settingsLayout->addItem(spacer);
