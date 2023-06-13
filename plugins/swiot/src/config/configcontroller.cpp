@@ -38,6 +38,8 @@ void ConfigController::connectSignalsAndSlots() {
 	QObject::connect(m_channelsView, &ConfigChannelView::deviceChanged, this, [this] (int index, const QString& device) {
 		if (m_channelId == index) {
 			m_model->writeDevice(device);
+			Q_EMIT clearDrawArea();
+			m_channelsView->setSelectedDevice(device);
 
 			QStringList functionsAvailable = m_model->readFunctionAvailable();
 			m_channelsView->setFunctionAvailable(functionsAvailable);
