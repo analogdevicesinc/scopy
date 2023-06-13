@@ -29,6 +29,8 @@ public:
     QString getDescription() const;
 
     int getStreach() const;
+public Q_SLOTS:
+    void checkPreferences();
 
 private:
     QHBoxLayout *layout;
@@ -36,6 +38,7 @@ private:
     int width;
     int streach;
     QString description;
+
 Q_SIGNALS:
 
 };
