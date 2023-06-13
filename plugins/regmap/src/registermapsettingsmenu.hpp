@@ -20,7 +20,6 @@ Q_SIGNALS:
     void requestRead(int address);
     void requestWrite(uint32_t address, uint32_t value);
     void requestRegisterDump(QString path);
-
 };
 }
 }
