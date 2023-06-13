@@ -2,34 +2,36 @@
 #define TOOL_LAUNCHER_DRAWAREA_H
 
 #include <QWidget>
-#include <QtSvg/QSvgWidget>
-
+#include <QLabel>
+#include <QMap>
 
 namespace scopy::swiot {
 class DrawArea : public QWidget {
-	Q_OBJECT
+Q_OBJECT
 
 public:
 	explicit DrawArea(QWidget *parent = nullptr);
 
 	~DrawArea() override;
 
-	void addLine(QLine *line);
+	enum ChannelName : int {
+		AD74413R = 0,
+		MAX14906 = 1
+	};
 
-	void removeLine(int index);
-
-	std::vector<QLine *> getLines();
-
-	void changeLine();
+	void activateConnection(int channelIndex, ChannelName channelName);
+	void deactivateConnections();
 
 	void setSize(QSize newSize);
 
 private:
-	QString filePath;
-	QString redLine;
+	QString m_filePath;
+	QImage *m_boardImage;
+	const QImage *m_baseImage;
 
-	std::vector<QLine *> lines;
-	QSvgWidget *svgWidget;
+	QLabel *m_drawLabel;
+
+	QMap<QPair<int, int>, QPixmap *> *m_connectionsMap;
 };
 }
 

@@ -18,7 +18,8 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	m_mainView(new QWidget(this)),
 	m_statusLabel(new QLabel(this)),
 	m_statusContainer(new QWidget(this)),
-	ui(new Ui::ConfigMenu) {
+	ui(new Ui::ConfigMenu)
+{
 	m_swiotDevice = iio_context_find_device(ctx, "swiot");
 	if (m_swiotDevice == nullptr) {
 		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
@@ -54,10 +55,25 @@ void SwiotConfig::init() {
 		auto *configModel = new ConfigModel(m_swiotDevice, i);
 		auto *configController = new ConfigController(channelView, configModel, i);
 		m_controllers.push_back(configController);
-		ui->gridLayout->addWidget(channelView->getChannelLabel(), i + 1, 0);
-		ui->gridLayout->addWidget(channelView->getEnabledCheckBox(), i + 1, 1);
-		ui->gridLayout->addWidget(channelView->getDeviceOptions(), i + 1, 2);
-		ui->gridLayout->addWidget(channelView->getFunctionOptions(), i + 1, 3);
+		ui->gridLayout->addWidget(channelView, i + 1, 0, 1, 4);
+
+		QObject::connect(channelView, &ConfigChannelView::showPath, this,
+				 [this, i](int channelIndex, const QString &deviceName) {
+					 if (channelIndex == i) {
+						 m_drawArea->activateConnection(channelIndex + 1,
+										(deviceName == "ad74413r")
+										? DrawArea::AD74413R
+										: DrawArea::MAX14906);
+					 }
+				 });
+
+		QObject::connect(channelView, &ConfigChannelView::hidePaths, this, [this]() {
+			m_drawArea->deactivateConnections();
+		});
+
+		QObject::connect(configController, &ConfigController::clearDrawArea, this, [this]() {
+			m_drawArea->deactivateConnections();
+		});
 	}
 }
 
@@ -91,7 +107,7 @@ QPushButton *SwiotConfig::createConfigBtn() {
 
 void SwiotConfig::configBtnPressed() {
 	ssize_t res = iio_device_attr_write(m_swiotDevice, "mode", "runtime");
-	if (res >= 0 ) {
+	if (res >= 0) {
 		qDebug(CAT_SWIOT_CONFIG) << "Swiot mode changed to runtime!";
 	} else {
 		qDebug(CAT_SWIOT_CONFIG) << "Swiot mode cannot be changed to runtime!";
@@ -115,27 +131,25 @@ void SwiotConfig::setupToolView(QWidget *parent) {
 
 	m_drawArea = new DrawArea(this);
 	m_scrollArea = new QScrollArea(this);
-
-	m_scrollArea->setLayout(new QVBoxLayout(this));
-	m_scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarPolicy::ScrollBarAlwaysOff);
 }
 
 void SwiotConfig::createPageLayout() {
 	auto scrollWidget = new QWidget(this);
-	scrollWidget->setLayout(new QVBoxLayout(scrollWidget));
-	scrollWidget->layout()->addWidget(this->ui->mainGrid);
+	m_scrollArea->setStyleSheet("background-color: black;");
+	scrollWidget->setLayout(new QHBoxLayout(this));
+	scrollWidget->layout()->addWidget(this->ui->mainGridContainer);
 	scrollWidget->layout()->addWidget(m_drawArea);
 	scrollWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	m_scrollArea->setWidget(scrollWidget);
-	m_scrollArea->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	m_statusLabel->setText("The system is powered at limited capacity.");
 	m_statusLabel->setWordWrap(true);
 
 	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
 	m_statusContainer->layout()->setSpacing(0);
-	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
-	m_statusContainer->setStyleSheet("color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
+	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
+	m_statusContainer->setStyleSheet(
+		"QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt}");
 
 	auto exclamationButton = new QPushButton(m_statusContainer);
 	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
@@ -146,12 +160,12 @@ void SwiotConfig::createPageLayout() {
 	m_statusContainer->layout()->addWidget(m_statusLabel);
 
 	m_mainView->setLayout(new QVBoxLayout(m_mainView));
+	m_mainView->layout()->setContentsMargins(0,0,0,0);
 	m_mainView->layout()->addWidget(m_scrollArea);
 
 	m_toolView->addPlotInfoWidget(m_statusContainer);
 	m_toolView->addFixedCentralWidget(m_mainView, 0, 0, 0, 0);
 	m_toolView->addTopExtraWidget(m_configBtn);
-	this->setLayout(new QVBoxLayout());
 	this->layout()->addWidget(m_toolView);
 }
 

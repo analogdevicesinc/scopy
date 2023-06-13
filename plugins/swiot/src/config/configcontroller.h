@@ -19,7 +19,8 @@ public:
 	void connectSignalsAndSlots();
 	void initChannelView();
 
-public Q_SLOTS:
+Q_SIGNALS:
+	void clearDrawArea();
 
 private:
 	ConfigChannelView *m_channelsView;
