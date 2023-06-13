@@ -4,9 +4,13 @@
 #include <qboxlayout.h>
 #include <qcoreevent.h>
 #include <qdebug.h>
+#include <utils.h>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>
 #include <pluginbase/preferences.h>
+
+using namespace scopy;
+using namespace regmap;
 
 RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QString description,
                                            QString notes,int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields, QWidget *parent)
@@ -21,8 +25,6 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
     setMinimumWidth(10);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
-    m_colors = new QMap<QString, QColor>();
-
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->setMargin(0);
@@ -31,7 +33,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
     bool ok;
 
-    QFrame *regBaseInfoWidget = new QFrame();
+    regBaseInfoWidget = new QFrame();
     scopy::setDynamicProperty(regBaseInfoWidget,"has_frame",true);
 
     QHBoxLayout *regBaseInfo = new QHBoxLayout();
@@ -109,6 +111,7 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
         bitFields->at(i)->blockSignals(false);
     }
     this->value->setText(scopy::regmap::Utils::convertToHexa(value,registerWidth));
+    checkPreferences();
 }
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)
@@ -116,22 +119,20 @@ void RegisterSimpleWidget::setRegisterSelected(bool selected)
     scopy::setDynamicProperty(this,"is_selected",selected);
 }
 
-QColor RegisterSimpleWidget::getColor(QString description)
+void RegisterSimpleWidget::checkPreferences()
 {
-
     scopy::Preferences *p = scopy::Preferences::GetInstance();
-    bool background = p->get("regmap_background_color_by_value").toBool();
+    QString background = p->get("regmap_color_by_value").toString();
 
-    if (background) {
-       // get value % 16
-        if (m_colors->contains(description)) return m_colors->value(description);
-
-        int red = rand() % 256;
-        int blue = rand() % 256;
-        int green = rand() % 256;
-        m_colors->insert(description, QColor(red,green,blue));
+    if (background.contains("Register background")) {
+        bool ok;
+        regBaseInfoWidget->setStyleSheet(QString("background-color: " +  Util::getColors().at(value->text().toInt(&ok,16) % 16)));
     }
-    return m_colors->value(description);
+
+    if (background.contains("Register text")) {
+        bool ok;
+        value->setStyleSheet(QString("color: " +  Util::getColors().at(value->text().toInt(&ok,16) % 16)));
+    }
 }
 
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)

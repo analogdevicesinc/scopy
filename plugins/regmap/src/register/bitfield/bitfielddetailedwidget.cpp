@@ -19,6 +19,7 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, int defaultValue, Q
     regOffset(regOffset)
 {
     scopy::setDynamicProperty(this, "has_frame", true);
+    scopy::setDynamicProperty(this, "has_bottom_border", true);
     setMinimumWidth(10);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
 
