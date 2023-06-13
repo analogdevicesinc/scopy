@@ -58,6 +58,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
         QWidget *tableHeadWidget = new QWidget();
         scopy::setDynamicProperty(tableHeadWidget, "has_frame", true);
+        scopy::setDynamicProperty(tableHeadWidget, "has_bottom_border", true);
         QHBoxLayout *tableHead = new QHBoxLayout();
         tableHeadWidget->setLayout(tableHead);
         tableHead->addWidget(new QLabel(""), 1);
