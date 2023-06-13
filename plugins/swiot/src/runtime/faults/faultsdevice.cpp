@@ -25,6 +25,7 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	this->initFaultExplanations();
 
 	this->ui->lineEdit_numeric->setPlaceholderText("0x0");
+	this->ui->lineEdit_numeric->setFocusPolicy(Qt::NoFocus);
 
 	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
 	m_subsectionSeparator->setContent(m_faults_explanation);
