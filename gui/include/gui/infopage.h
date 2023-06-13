@@ -21,9 +21,14 @@ public:
 	void update(QString key, QString value);
 	void clear();
 
-private:
+	void setAdvancedMode(bool newAdvancedMode);
 
+private:
+	void getKeyMap();
+
+	bool m_advancedMode;
 	QVBoxLayout *lay;
+	QMap<QString, QString> keyMap;
 	QMap<QString,QString> map;
 	QMap<QString, InfoPageKeyValueWidget*> wmap;
 };
