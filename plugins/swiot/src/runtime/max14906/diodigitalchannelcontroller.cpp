@@ -59,7 +59,7 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 		} else {
 			QStringList limitAvailable = QString(currentLimitAttributes).trimmed().split(" ");
 			for (const auto& item : limitAvailable) {
-				this->m_digitalChannel->ui->currentLimitValues->addItem(item);
+				this->m_digitalChannel->ui->currentLimitValues->addItem(item + " mA");
 			}
 
 			char currentLimitSelection[256] = {0};
