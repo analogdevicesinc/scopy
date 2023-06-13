@@ -4,8 +4,10 @@
 #include <qlabel.h>
 #include <QStyle>
 #include <QBoxLayout>
+#include <utils.h>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QString description, int width, QString notes, int regOffset, int streach, QWidget *parent):
@@ -64,6 +66,7 @@ BitFieldSimpleWidget::~BitFieldSimpleWidget()
 void BitFieldSimpleWidget::updateValue(QString newValue)
 {
     value->setText(newValue);
+    checkPreferences();
 }
 
 int BitFieldSimpleWidget::getWidth() const
@@ -79,4 +82,20 @@ QString BitFieldSimpleWidget::getDescription() const
 int BitFieldSimpleWidget::getStreach() const
 {
     return streach;
+}
+
+void BitFieldSimpleWidget::checkPreferences()
+{
+    scopy::Preferences *p = scopy::Preferences::GetInstance();
+    QString background = p->get("regmap_color_by_value").toString();
+
+    if (background.contains("Bitfield background")) {
+        bool ok;
+        this->setStyleSheet(QString("background-color: " +  Util::getColors().at(value->text().toInt(&ok,16) % 16)));
+    }
+
+    if (background.contains("Bitfield text")) {
+        bool ok;
+        value->setStyleSheet(QString("color: " +  Util::getColors().at(value->text().toInt(&ok,16) % 16)));
+    }
 }

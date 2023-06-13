@@ -28,6 +28,8 @@ public:
 	void unload() override;
 	bool compatible(QString uri, QString category) override;
     void preload() override;
+    void initPreferences() override;
+    bool loadPreferencesPage() override;
 
 
 	void initMetadata() override;
@@ -42,8 +44,12 @@ private:
     QWidget *m_registerMapWidget;
     QList<iio_device*> *m_deviceList = nullptr;
     struct iio_device* getIioDevice(iio_context* ctx, const char *dev_name);
-
     bool isBufferCapable(iio_device *dev);
+
+private Q_SLOTS:
+    void handlePreferenceChange(QString, QVariant);
+
+
 
 };
 }
