@@ -2,6 +2,7 @@
 #define CONFIGCHANNELVIEW_H
 
 #include "qwidget.h"
+#include "ui_swiotconfigchnlview.h"
 
 #include <QObject>
 #include <QString>
@@ -10,7 +11,7 @@
 #include <QCheckBox>
 
 namespace scopy::swiot {
-class ConfigChannelView: public QWidget
+class ConfigChannelView: public QFrame
 {
 	Q_OBJECT
 public:
@@ -23,6 +24,10 @@ public:
 	const QString &getSelectedDevice() const;
 	void setSelectedDevice(const QString &selectedDevice);
 
+protected:
+	bool eventFilter(QObject* object, QEvent *event) override;
+
+public:
 	const QStringList &getDeviceAvailable() const;
 	void setDeviceAvailable(const QStringList &deviceAvailable);
 
@@ -34,15 +39,13 @@ public:
 
 	void connectSignalsAndSlots();
 
-	QLabel *getChannelLabel() const;
-	QComboBox *getDeviceOptions() const;
-	QComboBox *getFunctionOptions() const;
-	QCheckBox *getEnabledCheckBox() const;
-
 Q_SIGNALS:
 	void enabledChanged(int channelIndex, bool enabled);
 	void deviceChanged(int channelIndex, const QString& device);
 	void functionChanged(int channelIndex, const QString& function);
+
+	void showPath(int channelIndex, const QString& device);
+	void hidePaths();
 
 private:
 	int m_channelIndex;
@@ -54,11 +57,7 @@ private:
 	QStringList m_functionAvailable;
 
 	// UI elements
-	QLabel* channelLabel;
-
-	QComboBox* deviceOptions;
-	QComboBox* functionOptions;
-	QCheckBox* enabledCheckBox;
+	Ui::ConfigChannelView *ui;
 };
 }
 
