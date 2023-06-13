@@ -1,0 +1,39 @@
+{
+  "fw_version": {
+    "value": "Firmware version"
+  },
+  "hw_model": {
+    "value": "Model"
+  },
+  "hw_model_variant": {
+  	"value": "Model variant"
+  },
+  "hw_serial": {
+    "value": "Serial"
+  },
+  "local,kernel": {
+  	"value": ""
+  },
+  "usb,serial": {
+  	"value": "Serial"
+  },
+  "usb,idProduct": {
+  	"value": "Product ID"
+  },
+  "usb,idVendor": {
+  	"value": "Vendor ID"
+  },
+  "usb,product": {
+  	"value": "Product name"
+  },
+  "usb,vendor": {
+  	"value": "Vendor"
+  },
+  "usb,release": {
+  	"value": "Release"
+  },
+   "ip,ip-addr": {
+    "value": "IP Address"
+  }
+  
+}
