@@ -129,13 +129,13 @@ void SwiotConfig::createPageLayout() {
 	m_scrollArea->setWidget(scrollWidget);
 	m_scrollArea->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	m_statusLabel->setText("The external power supply is not connected. The MAX14906 chip will not be used at full capacity.");
+	m_statusLabel->setText("The system is powered at limited capacity.");
 	m_statusLabel->setWordWrap(true);
 
 	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
 	m_statusContainer->layout()->setSpacing(0);
 	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
-	m_statusContainer->setStyleSheet("color: red; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
+	m_statusContainer->setStyleSheet("color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
 
 	auto exclamationButton = new QPushButton(m_statusContainer);
 	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
