@@ -11,29 +11,33 @@ class BitFieldSimpleWidget;
 class QHBoxLayout;
 class RegisterSimpleWidget : public QFrame
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit RegisterSimpleWidget(QString name,
-				      QString address,
-				      QString description,
-				      QString notes,
-				      int registerWidth,
-				      QVector<BitFieldSimpleWidget*> *bitFields,
-				      QWidget *parent = nullptr);
+    explicit RegisterSimpleWidget(QString name,
+                                  QString address,
+                                  QString description,
+                                  QString notes,
+                                  int registerWidth,
+                                  QVector<BitFieldSimpleWidget*> *bitFields,
+                                  QWidget *parent = nullptr);
 
-	~RegisterSimpleWidget();
+    ~RegisterSimpleWidget();
 
 
-	void valueUpdated(uint32_t value);
+    void valueUpdated(uint32_t value);
     void setRegisterSelected(bool selected);
+
+public Q_SLOTS:
+    void checkPreferences();
+
 private:
-	QHBoxLayout *layout;
-	QLabel *value;
-	QVector<BitFieldSimpleWidget*> *bitFields;
-	QMap<QString, QColor> *m_colors;
-	QColor getColor(QString description);
-	QString address;
+    QHBoxLayout *layout;
+    QLabel *value;
+    QVector<BitFieldSimpleWidget*> *bitFields;
+    QString address;
     int registerWidth;
+    QFrame *regBaseInfoWidget;
+
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 Q_SIGNALS:

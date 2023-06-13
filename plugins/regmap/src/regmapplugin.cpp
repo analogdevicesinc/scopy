@@ -13,6 +13,8 @@
 #include <QDir>
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
+#include <pluginbase/preferences.h>
+#include <pluginbase/preferenceshelper.h>
 #include "logging_categories.h"
 
 #include "iioutil/contextprovider.h"
@@ -92,6 +94,24 @@ void REGMAPPlugin::preload()
 
 }
 
+void REGMAPPlugin::initPreferences()
+{
+    Preferences *p = Preferences::GetInstance();
+    p->init("regmap_color_by_value","Default");
+}
+
+bool REGMAPPlugin::loadPreferencesPage()
+{
+    Preferences *p = Preferences::GetInstance();
+
+    m_preferencesPage = new QWidget();
+    QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+    QWidget *pref1 = PreferencesHelper::addPreferenceCombo(p,"regmap_color_by_value","Use color to reflect value",{"Default","Bitfield background","Bitfield text","Register background", "Register text", "Register background and Bitfield background", "Register text and Bitfield text", "Register background and Bitfield text", "Register text and Bitfield background"},this);
+    lay->addWidget(pref1);
+    lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
+    return true;
+}
+
 bool REGMAPPlugin::onConnect()
 {
     auto &&cp = ContextProvider::GetInstance();
@@ -146,6 +166,10 @@ bool REGMAPPlugin::onConnect()
 
         m_toolList[0]->setEnabled(true);
         m_toolList[0]->setTool(m_registerMapWidget);
+
+        Preferences *p = Preferences::GetInstance();
+        QObject::connect(p, &Preferences::preferenceChanged, this, &REGMAPPlugin::handlePreferenceChange);
+
         return true;
     }
 
@@ -205,4 +229,11 @@ bool REGMAPPlugin::isBufferCapable(iio_device *dev)
     }
 
     return false;
+}
+
+void REGMAPPlugin::handlePreferenceChange(QString id , QVariant val)
+{
+    if (id == "regmap_background_color_by_value") {
+        // TODO set backround color by value
+    }
 }
