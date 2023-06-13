@@ -9,5 +9,13 @@
         <file>swiot_top_transparent.png</file>
         <file>warning.svg</file>
         <file>swiot_icon.png</file>
+        <file>ad74413r_channel1.png</file>
+        <file>ad74413r_channel2.png</file>
+        <file>ad74413r_channel3.png</file>
+        <file>ad74413r_channel4.png</file>
+        <file>max14906_channel1.png</file>
+        <file>max14906_channel2.png</file>
+        <file>max14906_channel3.png</file>
+        <file>max14906_channel4.png</file>
     </qresource>
 </RCC>
