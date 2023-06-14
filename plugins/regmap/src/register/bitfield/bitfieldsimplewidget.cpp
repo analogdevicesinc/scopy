@@ -10,6 +10,9 @@
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QString description, int width, QString notes, int regOffset, int streach, QWidget *parent):
     width(width),
     description(description),

@@ -136,7 +136,7 @@ bool REGMAPPlugin::onConnect()
 
     if (m_deviceList && !m_deviceList->isEmpty()) {
         QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
-        RegisterMapInstrument *regMapInstrument = new RegisterMapInstrument();
+        scopy::regmap::RegisterMapInstrument *regMapInstrument = new scopy::regmap::RegisterMapInstrument();
 
         for (int i = 0; i < m_deviceList->size(); ++i) {
             iio_device *dev = m_deviceList->at(i);

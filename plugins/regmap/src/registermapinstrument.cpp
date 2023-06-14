@@ -11,7 +11,6 @@
 #include "xmlfilemanager.hpp"
 #include <QTabWidget>
 #include <qboxlayout.h>
-#include <iio.h>
 #include <tool_view_builder.hpp>
 #include <searchbarwidget.hpp>
 #include <QComboBox>
@@ -34,10 +33,10 @@ RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
     recepie.hasHeader = true;
     recepie.hasPairSettingsBtn = true;
     recepie.hasHamburgerMenuBtn = false;
-    channelManager = new scopy::gui::ChannelManager();
 
-    toolView = scopy::gui::ToolViewBuilder(recepie, channelManager, parent).build();
+    toolView = scopy::gui::ToolViewBuilder(recepie, nullptr, parent).build();
     toolView->addFixedCentralWidget(mainWidget,0,0,0,0);
+    Utils::removeLayoutMargins(toolView->getCentralWidget()->layout());
 
     registerDeviceList = new QComboBox();
     activeRegisterMap = "";
@@ -45,17 +44,17 @@ RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
     QObject::connect(registerDeviceList, &QComboBox::currentTextChanged, this, &RegisterMapInstrument::updateActiveRegisterMap);
     toolView->addTopExtraWidget(registerDeviceList);
 
-    searchBarWidget =  new SearchBarWidget();
+    searchBarWidget =  new scopy::regmap::gui::SearchBarWidget();
     searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam){
+    QObject::connect(searchBarWidget, &scopy::regmap::gui::SearchBarWidget::requestSearch, this, [=](QString searchParam){
         tabs->value(registerDeviceList->currentText())->applyFilters(searchParam);
     });
 
     toolView->addTopExtraWidget(searchBarWidget);
     layout->addWidget(toolView);
 
-    tabs = new QMap<QString, scopy::regmap::DeviceRegisterMap*>();
+    tabs = new QMap<QString, DeviceRegisterMap*>();
 }
 
 RegisterMapInstrument::~RegisterMapInstrument()
@@ -148,7 +147,7 @@ void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPa
     } else {
         registerMapValues = getRegisterMapValues(xmlPath);
     }
-    scopy::regmap::DeviceRegisterMap *regMap = new scopy::regmap::DeviceRegisterMap(registerMapTemplate,registerMapValues);
+    DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate,registerMapValues);
 
     tabs->insert(title, regMap);
     mainWidget->layout()->addWidget(regMap);

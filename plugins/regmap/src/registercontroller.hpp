@@ -11,8 +11,10 @@ class QLabel;
 class QPushButton;
 class QLineEdit;
 class QVBoxLayout;
-class RegisterModel;
 
+namespace scopy::regmap{
+class RegisterModel;
+namespace gui {
 class SCOPYREGMAP_EXPORT RegisterController : public QWidget
 {
 	Q_OBJECT
@@ -39,5 +41,6 @@ Q_SIGNALS:
 	void registerAddressChanged(uint32_t address);
 	void valueChanged(QString value);
 };
-
+}
+}
 #endif // REGISTERCONTROLLER_HPP

@@ -5,9 +5,11 @@
 #include <QMap>
 #include "scopyregmap_export.h"
 
+namespace scopy::regmap{
 class IRegisterWriteStrategy;
 class IRegisterReadStrategy;
 class RegReadWrite;
+
 class SCOPYREGMAP_EXPORT RegisterMapValues : public QObject
 {
 	Q_OBJECT
@@ -42,5 +44,5 @@ private:
 	QMetaObject::Connection m_readConnection;
 	QMetaObject::Connection writeConnection;
 };
-
+}
 #endif // REGISTERMAPVALUES_HPP

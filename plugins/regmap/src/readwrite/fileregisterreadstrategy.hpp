@@ -4,6 +4,7 @@
 #include "iregisterreadstrategy.hpp"
 
 class QString;
+namespace scopy::regmap{
 class FileRegisterReadStrategy: public IRegisterReadStrategy
 {
 public:
@@ -14,5 +15,5 @@ Q_SIGNALS:
 private:
     QString path;
 };
-
+}
 #endif // FILEREGISTERREADSTRATEGY_HPP

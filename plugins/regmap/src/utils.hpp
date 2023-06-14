@@ -5,11 +5,11 @@
 
 class QDir;
 class QPushButton;
+class QLayout;
 
+namespace scopy::regmap {
 class JsonFormatedElement;
 
-class QLayout;
-namespace scopy::regmap {
 class Utils : public QObject
 {
     Q_OBJECT

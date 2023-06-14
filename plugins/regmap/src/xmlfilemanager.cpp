@@ -7,8 +7,10 @@
 #include <QDomDocument>
 #include <qfile.h>
 #include <qdebug.h>
-#include <iio.h>
 #include <QHBoxLayout>
+
+using namespace scopy;
+using namespace regmap;
 
 XmlFileManager::XmlFileManager(struct iio_device *dev, QString filePath):
     dev(dev),

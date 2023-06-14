@@ -3,7 +3,9 @@
 
 #include <QObject>
 
+namespace scopy::regmap{
 class BitFieldModel;
+
 class RegisterModel : public QObject
 {
 	Q_OBJECT
@@ -35,5 +37,5 @@ private:
 Q_SIGNALS:
 
 };
-
+}
 #endif // REGISTERMODEL_HPP

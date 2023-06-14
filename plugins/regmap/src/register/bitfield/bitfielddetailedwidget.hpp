@@ -10,6 +10,8 @@ class QCheckBox;
 class QComboBox;
 class QVBoxLayout;
 
+namespace scopy::regmap{
+namespace gui{
 class BitFieldDetailedWidget : public QFrame
 {
 	Q_OBJECT
@@ -52,5 +54,6 @@ Q_SIGNALS:
     void valueUpdated(QString value);
 
 };
-
+}
+}
 #endif // BitFieldDetailedWidget_HPP

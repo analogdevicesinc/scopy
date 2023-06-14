@@ -4,6 +4,7 @@
 #include <QObject>
 #include "scopyregmap_export.h"
 
+namespace scopy::regmap{
 class RegisterModel;
 class SCOPYREGMAP_EXPORT Search : public QObject
 {
@@ -15,5 +16,5 @@ public:
 Q_SIGNALS:
 
 };
-
+}
 #endif // SEARCH_HPP

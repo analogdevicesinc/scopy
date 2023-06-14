@@ -6,11 +6,15 @@
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <QtMath>
+#include <utils.hpp>
 
 #include "dynamicWidget.h"
 #include "utils.hpp"
 
-//using namespace scopy::regmap;
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, int defaultValue, QString description,
                                                int width, QString notes, int regOffset, QMap<QString, QString> *options, QWidget *parent)
     :options(options),
@@ -21,13 +25,13 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, int defaultValue, Q
     scopy::setDynamicProperty(this, "has_frame", true);
     scopy::setDynamicProperty(this, "has_bottom_border", true);
     setMinimumWidth(10);
-    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
     layout = new QVBoxLayout();
+    Utils::removeLayoutMargins(layout);
 
     layout->addWidget(new QLabel(name));
     layout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
-    layout->addWidget(new QLabel(description));
     layout->addWidget(new QLabel("Default Value: " + scopy::regmap::Utils::convertToHexa(defaultValue, width)));
 
     toolTip = "Name : " + name + "\n"
