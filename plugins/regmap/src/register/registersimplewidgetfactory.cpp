@@ -5,6 +5,10 @@
 #include "registersimplewidget.hpp"
 #include "registersimplewidgetfactory.hpp"
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 RegisterSimpleWidgetFactory::RegisterSimpleWidgetFactory(QObject *parent)
 	: QObject{parent}
 { }

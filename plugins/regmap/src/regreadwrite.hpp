@@ -2,11 +2,13 @@
 #define REGREADWRITE_HPP
 
 #include <QObject>
+#include <iio.h>
 #include "scopyregmap_export.h"
 
 // TODO set the right buf size
 #define BUF_SIZE 16384
 
+namespace scopy::regmap{
 class SCOPYREGMAP_EXPORT RegReadWrite : public QObject
 {
 	Q_OBJECT
@@ -28,5 +30,5 @@ Q_SIGNALS:
 private:
 	struct iio_device *dev;
 };
-
+}
 #endif // REGREADWRITE_HPP

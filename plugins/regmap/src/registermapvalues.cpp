@@ -7,6 +7,9 @@
 #include <src/readwrite/fileregisterwritestrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 
+using namespace scopy;
+using namespace regmap;
+
 RegisterMapValues::RegisterMapValues(QObject *parent)
     : QObject{parent}
 {

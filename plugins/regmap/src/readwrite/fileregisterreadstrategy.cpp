@@ -6,6 +6,8 @@
 #include <QFile>
 #include <QStringList>
 
+using namespace scopy::regmap;
+
 FileRegisterReadStrategy::FileRegisterReadStrategy(QString path)
 	:path(path)
 {

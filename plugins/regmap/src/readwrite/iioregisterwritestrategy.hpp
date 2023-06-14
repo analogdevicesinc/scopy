@@ -2,7 +2,9 @@
 #define IIOREGISTERWRITESTRATEGY_HPP
 
 #include "iregisterwritestrategy.hpp"
+#include <iio.h>
 
+namespace scopy::regmap{
 class IIORegisterWriteStrategy: public IRegisterWriteStrategy
 {
 public:
@@ -15,5 +17,5 @@ private:
 public:
     void write(uint32_t address, uint32_t val);
 };
-
+}
 #endif // IIOREGISTERWRITESTRATEGY_HPP

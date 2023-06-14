@@ -6,6 +6,10 @@
 #include <src/register/registersimplewidget.hpp>
 #include <src/register/registersimplewidgetfactory.hpp>
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels)
     :registerModels(registerModels)
 {

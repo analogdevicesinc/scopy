@@ -5,6 +5,10 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 SearchBarWidget::SearchBarWidget(QWidget *parent)
 	: QWidget{parent}
 {

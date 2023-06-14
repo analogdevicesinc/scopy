@@ -11,6 +11,10 @@
 
 #include "utils.hpp"
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 RegisterController::RegisterController(QWidget *parent)
     : QWidget{parent}
 {
