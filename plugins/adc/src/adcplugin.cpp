@@ -88,6 +88,8 @@ PlotProxy* ADCPlugin::createRecipe(iio_context *ctx) {
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
 
 		qDebug(CAT_ADCPLUGIN)<< "Looking for scanelements in "<< dev_name;
+		if(dev_name == "m2k-logic-analyzer-rx")
+			continue;
 		QStringList channelList;
 		for (int j = 0; j < iio_device_get_channels_count(dev); j++) {
 
