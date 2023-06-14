@@ -11,6 +11,7 @@
 
 using namespace scopy;
 using namespace regmap;
+using namespace regmap::gui;
 
 RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QString description,
                                            QString notes,int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields, QWidget *parent)

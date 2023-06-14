@@ -4,6 +4,9 @@
 #include <QTextStream>
 #include "../logging_categories.h"
 
+using namespace scopy;
+using namespace regmap;
+
 FileRegisterWriteStrategy::FileRegisterWriteStrategy(QString path)
 	:path(path)
 {

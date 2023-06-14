@@ -1,10 +1,10 @@
 #include "regreadwrite.hpp"
-#include <iio.h>
 #include <qdebug.h>
 #include <QLoggingCategory>
 #include "logging_categories.h"
 
-//Q_LOGGING_CATEGORY(CAT_IIO_OPERATION, "RegReadWrite")
+using namespace scopy;
+using namespace regmap;
 
 RegReadWrite::RegReadWrite(struct iio_device *dev, QObject *parent)
 	: dev(dev),

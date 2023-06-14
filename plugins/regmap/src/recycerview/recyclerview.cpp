@@ -8,6 +8,8 @@
 #include <QScrollEvent>
 #include <src/verticalscrollarea.hpp>
 
+using namespace scopy::regmap::gui;
+
 RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
     : widgets(widgets),
     QWidget{parent}
