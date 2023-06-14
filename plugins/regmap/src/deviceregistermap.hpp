@@ -38,7 +38,7 @@ public:
 private:
 
     bool autoread = false;
-    QVBoxLayout *deviceRegisterMapLayout;
+    QVBoxLayout *layout;
     QMainWindow *mainWindow;
     RegisterMapTemplate *registerMapTemplate ;
     RegisterMapValues *registerMapValues;
