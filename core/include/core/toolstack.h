@@ -1,7 +1,7 @@
 #ifndef TOOLSTACK_H
 #define TOOLSTACK_H
 
-#include "mapstackedwidget.h"
+#include "gui/mapstackedwidget.h"
 #include <QMap>
 #include "scopy-core_export.h"
 
