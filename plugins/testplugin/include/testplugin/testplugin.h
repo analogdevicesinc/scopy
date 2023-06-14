@@ -44,6 +44,7 @@ public Q_SLOTS:
 private:
 	QString m_initText;
 	QWidget *tool;
+	QWidget *tool2;
 	QLineEdit *edit;
 	int renameCnt;
 	ApiObject* m_pluginApi;

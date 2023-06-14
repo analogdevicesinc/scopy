@@ -1380,16 +1380,16 @@ DisplayPlot::getLineColor(int which) const
 
 // Use a preprocessor macro to create a bunch of hooks for Q_PROPERTY and hence the stylesheet.
 #define SETUPLINE(i, im1) \
-    void DisplayPlot::setLineColor ## i (QColor c) {setLineColor(im1, c);} \
-    const QColor DisplayPlot::getLineColor ## i () const {return getLineColor(im1);} \
-    void DisplayPlot::setLineWidth ## i (int width) {setLineWidth(im1, width);} \
-    int DisplayPlot::getLineWidth ## i () const {return getLineWidth(im1);} \
-    void DisplayPlot::setLineStyle ## i (Qt::PenStyle ps) {setLineStyle(im1, ps);} \
-    const Qt::PenStyle DisplayPlot::getLineStyle ## i () const {return getLineStyle(im1);} \
-    void DisplayPlot::setLineMarker ## i (QwtSymbol::Style ms) {setLineMarker(im1, ms);} \
-    const QwtSymbol::Style DisplayPlot::getLineMarker ## i () const {return getLineMarker(im1);} \
-    void DisplayPlot::setMarkerAlpha ## i (int alpha) {setMarkerAlpha(im1, alpha);} \
-    int DisplayPlot::getMarkerAlpha ## i () const {return getMarkerAlpha(im1);}
+	void DisplayPlot::setLineColor ## i (QColor c) {setLineColor(im1, c);} \
+	const QColor DisplayPlot::getLineColor ## i () const {return getLineColor(im1);} \
+	void DisplayPlot::setLineWidth ## i (int width) {setLineWidth(im1, width);} \
+	int DisplayPlot::getLineWidth ## i () const {return getLineWidth(im1);} \
+	void DisplayPlot::setLineStyle ## i (Qt::PenStyle ps) {setLineStyle(im1, ps);} \
+	const Qt::PenStyle DisplayPlot::getLineStyle ## i () const {return getLineStyle(im1);} \
+	void DisplayPlot::setLineMarker ## i (QwtSymbol::Style ms) {setLineMarker(im1, ms);} \
+	const QwtSymbol::Style DisplayPlot::getLineMarker ## i () const {return getLineMarker(im1);} \
+	void DisplayPlot::setMarkerAlpha ## i (int alpha) {setMarkerAlpha(im1, alpha);} \
+	int DisplayPlot::getMarkerAlpha ## i () const {return getMarkerAlpha(im1);}
 SETUPLINE(1, 0)
 SETUPLINE(2, 1)
 SETUPLINE(3, 2)

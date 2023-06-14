@@ -31,6 +31,7 @@ MenuAnim::MenuAnim(QWidget *parent) : QWidget(parent),
 	close_anim_max(this, "maximumWidth"),
 	close_anim_min(this, "minimumWidth"),
 	min_width(-1),
+	max_width(-1),
 	animInProg(false),
 	animationDuration(200)
 {
@@ -59,12 +60,12 @@ void MenuAnim::toggleMenu(bool open)
 
 	animInProg = true;
 
-	if (min_width < 0)
-		min_width = 0;
+	int min = min_width < 0 ? 0 : min_width;
+	int max = max_width < 0 ? sizeHint().width() : max_width;
 
 	if (open) {
-		start = min_width;
-		stop = sizeHint().width();
+		start = min;
+		stop = max;
 
 		close_anim_max.stop();
 		close_anim_min.stop();
@@ -77,8 +78,8 @@ void MenuAnim::toggleMenu(bool open)
 		open_anim_min.setEndValue(stop);
 		open_anim_min.start();
 	} else {
-		start = sizeHint().width();
-		stop = min_width;
+		start = max;
+		stop = min;
 
 		open_anim_max.stop();
 		open_anim_min.stop();
@@ -136,6 +137,10 @@ void MenuAnim::setAnimationDuration(int newAnimationDuration)
 void MenuAnim::setAnimMinWidth(int min)
 {
 	min_width = min;
+}
+void MenuAnim::setAnimMaxWidth(int max)
+{
+	max_width = max;
 }
 
 #include "moc_menu_anim.cpp"

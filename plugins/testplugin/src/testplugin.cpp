@@ -15,9 +15,8 @@
 #include "tutorialoverlay.h"
 #include <gui/utils.h>
 #include <gui/widgets/hoverwidget.h>
-
 #include "ui_cursors_settings.h"
-
+#include "testtool.h"
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace scopy;
@@ -79,7 +78,7 @@ void TestPlugin::loadToolList()
 {
 	renameCnt = 0;
 	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first","FirstPlugin",":/gui/icons/scopy-default/icons/tool_home.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Alexandra",":/gui/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Second Plugin",":/gui/icons/scopy-default/icons/tool_io.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()
@@ -150,6 +149,7 @@ bool TestPlugin::onConnect()
 	lbl = new QLabel("TestPlugin", tool);
 	pic = new QLabel("Picture",tool);
 	lbl2 = new QLabel("m_initText->"+m_initText,tool);
+
 	btn = new QPushButton("detach",tool);
 	btn2 = new QPushButton("renameTool",tool);
 	btn3 = new QPushButton("tutorial",tool);
@@ -164,6 +164,7 @@ bool TestPlugin::onConnect()
 	HoverWidget* hover = new HoverWidget(cursorMenu, btn4, tool);
 	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hover->setContentPos(HoverPosition::HP_TOPRIGHT);
+
 	connect(btn4, &QPushButton::toggled, this, [=](bool b) {
 		hover->setVisible(b);
 		hover->raise();
@@ -183,6 +184,11 @@ bool TestPlugin::onConnect()
 	lay->addWidget(btn3);
 	lay->addWidget(btn4);
 
+	tool2 = new TestTool();
+
+	m_toolList[1]->setTool(tool2);
+	m_toolList[1]->setEnabled(true);
+	m_toolList[1]->setRunBtnVisible(true);
 
 	m_pluginApi = new TestPlugin_API(this);
 	m_pluginApi->setObjectName(m_name);
