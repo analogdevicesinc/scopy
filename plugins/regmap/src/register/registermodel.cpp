@@ -1,6 +1,8 @@
 #include "bitfield/bitfieldmodel.hpp"
 #include "registermodel.hpp"
 
+using namespace scopy::regmap;
+
 RegisterModel::RegisterModel(QString name, uint32_t address, QString description, bool exists, int width, QString notes,
 			     QVector<BitFieldModel *> *bitFields):
 	name(name),

@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+namespace scopy::regmap{
 class IRegisterReadStrategy : public QObject
 {
 	Q_OBJECT
@@ -14,5 +15,5 @@ Q_SIGNALS:
 	void readDone(uint32_t address, uint32_t value);
 	void readError(const char *err);
 };
-
+}
 #endif // IREGISTERREADSTRATEGY_HPP

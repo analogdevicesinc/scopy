@@ -6,23 +6,25 @@
 #include <QWidget>
 #include "scopyregmap_export.h"
 
-class RegisterMapTable;
 class QVBoxLayout;
-class RegisterModel;
-class RegisterDetailedWidget;
-class RegisterController;
-class RegisterMapValues;
-class RegisterMapTemplate;
-class SearchBarWidget;
-
-
-class QMainWindow;
 
 class QDockWidget;
+
 namespace scopy::regmap{
+class RegisterMapTemplate;
+class RegisterModel;
+class RegisterMapValues;
+
 namespace gui {
 class RegisterMapSettingsMenu;
+class RegisterDetailedWidget;
+class RegisterController;
+class SearchBarWidget;
+class RegisterMapTable;
 }
+
+
+
 class SCOPYREGMAP_EXPORT DeviceRegisterMap : public QWidget
 {
     Q_OBJECT
@@ -39,16 +41,14 @@ private:
 
     bool autoread = false;
     QVBoxLayout *layout;
-    QMainWindow *mainWindow;
     RegisterMapTemplate *registerMapTemplate ;
     RegisterMapValues *registerMapValues;
-    RegisterController *registerController = nullptr;
+    gui::RegisterController *registerController = nullptr;
 
-    RegisterMapTable *registerMapTableWidget = nullptr;
+    gui::RegisterMapTable *registerMapTableWidget = nullptr;
     QDockWidget *docRegisterMapTable = nullptr;
 
-    RegisterDetailedWidget *registerDetailedWidget = nullptr;
-    QDockWidget *dockRegisterDetailedWidget = nullptr;
+    gui::RegisterDetailedWidget *registerDetailedWidget = nullptr;
     gui::RegisterMapSettingsMenu *settings;
     void initSettings();
     int selectedRegister;

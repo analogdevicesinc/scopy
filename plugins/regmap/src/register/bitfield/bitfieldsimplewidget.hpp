@@ -8,6 +8,8 @@ class QHBoxLayout;
 
 class QVBoxLayout;
 class QLabel;
+namespace scopy::regmap{
+namespace gui {
 class BitFieldSimpleWidget : public QFrame
 {
     Q_OBJECT
@@ -42,5 +44,6 @@ private:
 Q_SIGNALS:
 
 };
-
+}
+}
 #endif // BITFIELDSIMPLEWIDGET_HPP

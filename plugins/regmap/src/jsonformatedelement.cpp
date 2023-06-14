@@ -1,5 +1,6 @@
 #include "jsonformatedelement.hpp"
 
+using namespace scopy::regmap;
 
 JsonFormatedElement::JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices, bool isAxiCompatible, bool useRegisterDescriptionAsName, bool useBifieldDescriptionAsName)
     : fileName(fileName),

@@ -5,6 +5,9 @@
 #include "register/bitfield/bitfieldmodel.hpp"
 #include "search.hpp"
 
+using namespace scopy;
+using namespace regmap;
+
 RegisterMapTemplate::RegisterMapTemplate(QObject *parent)
 	: QObject{parent}
 {
