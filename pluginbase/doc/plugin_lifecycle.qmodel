@@ -4392,7 +4392,7 @@ and then clone(copy) the relevant plugins to the device</text>
                     <uid>{dcd2f436-99db-45ee-b2fc-c3b39bd1147e}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>loadApi()</name>
+                  <name>loadApi(</name>
                   <relations>
                    <handles>
                     <handles>

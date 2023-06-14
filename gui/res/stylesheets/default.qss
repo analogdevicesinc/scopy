@@ -6,7 +6,7 @@ QWidget {
  font-size: 13px;
 }
 
-scopy--DetachedToolWindow, QMainWindow > .QWidget, scopy--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip {
+scopy--DetachedToolWindow, QMainWindow > .QWidget, scopy--Sismograph > QwtPlotCanvas, QMessageBox, QToolTip, scopy--HoverWidget{
  background-color: #272730;
 }
 

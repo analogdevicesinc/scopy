@@ -828,7 +828,7 @@ public:
 /*
  * EdgelessPlotGrid class ensures that the first and last major ticks are ignored
  */
-class EdgelessPlotGrid: public QwtPlotGrid
+class SCOPY_GUI_EXPORT EdgelessPlotGrid: public QwtPlotGrid
 {
 public:
 	explicit EdgelessPlotGrid();
