@@ -75,9 +75,14 @@ void BitFieldDetailedWidget::firstRead()
         valueLineEdit->setText("0x0");
         valueLineEdit->setReadOnly(true);
         layout->replaceWidget(value,valueLineEdit);
-    } else if (options &&  !options->isEmpty() && (options->count() == qPow(2,width))) {
-        //check if there are enough options to cover all posible cases for the number of bits
+    } else if (options &&  !options->isEmpty()) {
         valueComboBox = new QComboBox();
+
+        //check if there are enough options to cover all posible cases for the number of bits
+        if (!(options->count() == qPow(2,width))) {
+            valueComboBox->setEditable(true);
+        }
+
         layout->replaceWidget(value,valueComboBox);
         QMap<QString, QString>::iterator i = options->begin();
         int index = 0;
