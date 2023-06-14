@@ -268,7 +268,6 @@ Max14906::createDockableMainWindow(const QString &title, DioDigitalChannel *digi
 	mainWindow->setWindowFlags(Qt::Widget);
 
 	auto dockWidget = DockerUtils::createDockWidget(mainWindow, digitalChannel, title);
-	DockerUtils::configureTopBar(dockWidget);
 
 	mainWindow->addDockWidget(Qt::TopDockWidgetArea, dockWidget);
 	return mainWindow;
