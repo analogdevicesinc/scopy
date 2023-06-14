@@ -67,7 +67,9 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			if (res < 0) {
 				qCritical(CAT_SWIOT_MAX14906) << R"(Could not read "current_limit", error code:)" << result;
 			}
-			this->m_digitalChannel->ui->currentLimitValues->setCurrentIndex(m_digitalChannel->ui->currentLimitValues->findText(currentLimitSelection));
+
+			int currentLimitIndex = m_digitalChannel->ui->currentLimitValues->findText(QString(currentLimitSelection) + " mA");
+			this->m_digitalChannel->ui->currentLimitValues->setCurrentIndex(currentLimitIndex);
 		}
 	}
 
@@ -75,6 +77,7 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			 [&](int index){
 		this->writeType();
 	});
+
 	QObject::connect(m_digitalChannel, &DioDigitalChannel::outputValueChanged, this,
 			 [this] (bool value) {
 		ssize_t res = iio_channel_attr_write_bool(m_channel, "raw", value);
@@ -82,8 +85,9 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			qCritical(CAT_SWIOT_MAX14906) << "Could not write value" << value << "to channel" << this->m_channelName << ", error code " << res;
 		}
 	});
+
 	QObject::connect(m_digitalChannel->ui->currentLimitValues, &QComboBox::textActivated, [this] (const QString& text) {
-		ssize_t result = iio_channel_attr_write(this->m_channel, "current_limit", text.toStdString().c_str());
+		ssize_t result = iio_channel_attr_write(this->m_channel, "current_limit", text.split(" ")[0].toStdString().c_str());
 		if (result < 0) {
 			qCritical(CAT_SWIOT_MAX14906) << "Could not write value" << text << "to channel" << this->m_channelName << "error code" << result;
 		}
@@ -97,7 +101,7 @@ DioDigitalChannel *DioDigitalChannelController::getDigitalChannel() const {
 }
 
 void DioDigitalChannelController::writeType() {
-	QString s = this->m_digitalChannel->ui->configModes->currentText();
+	QString s = this->m_digitalChannel->ui->configModes->currentText().split(" ")[0];
 	this->m_type = s.toStdString();
 	qDebug(CAT_SWIOT_MAX14906) << "Writing <" << s << "> to channel <" << this->m_channelName << "> ";
 

@@ -27,6 +27,7 @@ DioDigitalChannel::DioDigitalChannel(const QString &deviceName, const QString &d
 		this->ui->customSwitch->setVisible(false);
 		this->ui->currentLimitValues->hide();
 		this->ui->currentLimitLabel->hide();
+		this->ui->setValueLabel->hide();
 	} else {
 		this->ui->customSwitch->setChecked(false);
 	}
