@@ -32,34 +32,23 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
     registerMapTemplate(registerMapTemplate),
     QWidget{parent}
 {
-
-    QVBoxLayout *layout = new QVBoxLayout();
+    layout = new QVBoxLayout();
     Utils::removeLayoutMargins(layout);
     setLayout( layout);
 
-    deviceRegisterMapLayout = new QVBoxLayout();
-
-    QWidget *toolViewWidget = new QWidget();
-    toolViewWidget->setLayout(deviceRegisterMapLayout);
-
-    mainWindow = new QMainWindow(this);
-
-    deviceRegisterMapLayout->addWidget(mainWindow);
-
-    initSettings();
-
-    layout->addWidget(toolViewWidget);
     registerController = new RegisterController();
 
     if (registerMapTemplate) {
         QWidget *registerMapTable = new QWidget();
         QVBoxLayout *registerMapTableLayout = new QVBoxLayout();
+        Utils::removeLayoutMargins(registerMapTableLayout);
         registerMapTable->setLayout(registerMapTableLayout);
 
         QWidget *tableHeadWidget = new QWidget();
         scopy::setDynamicProperty(tableHeadWidget, "has_frame", true);
         scopy::setDynamicProperty(tableHeadWidget, "has_bottom_border", true);
         QHBoxLayout *tableHead = new QHBoxLayout();
+        Utils::removeLayoutMargins(tableHead);
         tableHeadWidget->setLayout(tableHead);
         tableHead->addWidget(new QLabel(""), 1);
 
@@ -75,8 +64,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
         registerMapTableLayout->addWidget(tableHeadWidget);
         registerMapTableLayout->addWidget(registerMapTableWidget->getWidget());
-        docRegisterMapTable = DockerUtils::createDockWidget(mainWindow, registerMapTable, "Register map");
-        mainWindow->addDockWidget(Qt::TopDockWidgetArea, docRegisterMapTable);
+        layout->addWidget(registerMapTable,4);
 
         QObject::connect(registerController, &RegisterController::registerAddressChanged, this , [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
@@ -97,7 +85,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         }
     });
 
-    mainWindow->setCentralWidget(registerController);
+    layout->addWidget(registerController,1);
 
     if (registerMapTemplate) {
         registerChanged(registerMapTemplate->getRegisterTemplate(2000));
@@ -106,7 +94,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 DeviceRegisterMap::~DeviceRegisterMap()
 {
-    delete deviceRegisterMapLayout;
+    delete layout;
     if (registerController) delete registerController;
     if (registerMapTableWidget) delete registerMapTableWidget;
     if (docRegisterMapTable) delete docRegisterMapTable;
@@ -125,8 +113,7 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
     }
 
     registerDetailedWidget = new RegisterDetailedWidget(regModel);
-    dockRegisterDetailedWidget =  DockerUtils::createDockWidget(mainWindow, registerDetailedWidget, "Detailed bitfield");
-    mainWindow->addDockWidget(Qt::BottomDockWidgetArea, dockRegisterDetailedWidget);
+    layout->addWidget(registerDetailedWidget,2);
 
     if (registerMapValues) {
         uint32_t address = regModel->getAddress();
