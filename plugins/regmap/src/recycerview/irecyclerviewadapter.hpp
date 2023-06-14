@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+namespace scopy::regmap{
 class IRecyclerViewAdapter : public QObject
 {
     Q_OBJECT
@@ -12,5 +13,5 @@ Q_SIGNALS:
     void widgetGenerated(int index, QWidget *widget);
 
 };
-
+}
 #endif // IRECYCLERVIEWADAPTER_HPP

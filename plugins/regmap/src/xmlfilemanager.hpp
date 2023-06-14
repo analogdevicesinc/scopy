@@ -3,11 +3,14 @@
 
 #include <QObject>
 #include "scopyregmap_export.h"
+#include <iio.h>
 
 class QDomElement;
+class QString;
+
+namespace scopy::regmap{
 class RegisterModel;
 class BitFieldModel;
-class QString;
 
 class SCOPYREGMAP_EXPORT XmlFileManager: public QObject
 {
@@ -29,5 +32,5 @@ private:
 	QString filePath;
 	struct iio_device *dev;
 };
-
+}
 #endif // XMLFILEMANAGER_HPP

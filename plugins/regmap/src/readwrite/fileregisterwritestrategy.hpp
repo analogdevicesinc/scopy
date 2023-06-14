@@ -4,6 +4,7 @@
 #include "iregisterwritestrategy.hpp"
 
 class QString;
+namespace scopy::regmap{
 class FileRegisterWriteStrategy: public IRegisterWriteStrategy
 {
 public:
@@ -16,5 +17,5 @@ private:
 public:
 	void write(uint32_t address, uint32_t val);
 };
-
+}
 #endif // FILEREGISTERWRITESTRATEGY_HPP

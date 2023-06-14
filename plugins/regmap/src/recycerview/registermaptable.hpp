@@ -6,9 +6,13 @@
 #include <QMap>
 #include <QObject>
 
-class RegisterSimpleWidget;
+namespace scopy::regmap{
 class RegisterModel;
+
+namespace gui {
+class RegisterSimpleWidget;
 class RecyclerView;
+
 class RegisterMapTable : public IRecyclerViewAdapter
 {
     Q_OBJECT
@@ -34,5 +38,6 @@ private:
     QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
     uint32_t selectedAddress;
 };
-
+}
+}
 #endif // REGISTERMAPTABLE_H

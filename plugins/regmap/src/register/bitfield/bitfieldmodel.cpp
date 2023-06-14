@@ -1,5 +1,7 @@
 #include "bitfieldmodel.hpp"
 
+using namespace scopy::regmap;
+
 BitFieldModel::BitFieldModel(QString name, int width,int regOffset, QString description, QObject *parent)
 	: name(name),
 	  width(width),

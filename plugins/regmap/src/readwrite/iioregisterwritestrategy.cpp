@@ -1,6 +1,7 @@
 #include "iioregisterwritestrategy.hpp"
-#include <iio.h>
 #include "../logging_categories.h"
+
+using namespace scopy::regmap;
 
 IIORegisterWriteStrategy::IIORegisterWriteStrategy(struct iio_device *dev)
     :dev(dev)

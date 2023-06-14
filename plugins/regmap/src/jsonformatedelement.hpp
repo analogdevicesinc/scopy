@@ -3,6 +3,7 @@
 
 #include <QObject>
 
+namespace scopy::regmap{
 class JsonFormatedElement
 {
 public:
@@ -23,5 +24,5 @@ private :
     bool useBifieldDescriptionAsName;
 
 };
-
+}
 #endif // JSONFORMATEDELEMENT_HPP

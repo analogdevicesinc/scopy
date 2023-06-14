@@ -7,8 +7,12 @@
 #include <qstring.h>
 
 class QLabel;
-class BitFieldSimpleWidget;
 class QHBoxLayout;
+
+namespace scopy::regmap{
+namespace gui {
+class BitFieldSimpleWidget;
+
 class RegisterSimpleWidget : public QFrame
 {
     Q_OBJECT
@@ -43,5 +47,6 @@ protected:
 Q_SIGNALS:
     void registerSelected(uint32_t address);
 };
-
+}
+}
 #endif // REGISTERSIMPLEWIDGET_HPP

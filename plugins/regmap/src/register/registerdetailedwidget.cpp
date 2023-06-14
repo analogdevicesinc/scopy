@@ -10,6 +10,10 @@
 #include "utils.hpp"
 #include <QtMath>
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget *parent)
     : QWidget{parent}
 {

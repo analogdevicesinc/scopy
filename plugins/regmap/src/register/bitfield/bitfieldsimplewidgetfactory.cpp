@@ -2,6 +2,10 @@
 #include "bitfieldsimplewidget.hpp"
 #include "bitfieldsimplewidgetfactory.hpp"
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 BitFieldSimpleWidgetFactory::BitFieldSimpleWidgetFactory(QObject *parent)
 	: QObject{parent}
 {

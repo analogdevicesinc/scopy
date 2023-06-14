@@ -9,6 +9,7 @@
 
 class QSlider;
 class QGridLayout;
+namespace scopy::regmap::gui{
 class RecyclerView : public QWidget
 {
     Q_OBJECT
@@ -54,5 +55,5 @@ private:
 public:
     bool eventFilter(QObject *watched, QEvent *event);
 };
-
+}
 #endif // RECYCLERVIEW_H

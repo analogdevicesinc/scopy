@@ -3,8 +3,12 @@
 
 #include <QObject>
 
-class RegisterSimpleWidget;
+namespace scopy::regmap{
 class RegisterModel;
+
+namespace gui {
+class RegisterSimpleWidget;
+
 class RegisterSimpleWidgetFactory : public QObject
 {
 	Q_OBJECT
@@ -15,5 +19,6 @@ public:
 Q_SIGNALS:
 
 };
-
+}
+}
 #endif // REGISTERSIMPLEWIDGETFACTORY_HPP

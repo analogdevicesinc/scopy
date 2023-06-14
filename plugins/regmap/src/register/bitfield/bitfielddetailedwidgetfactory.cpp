@@ -3,6 +3,10 @@
 #include "bitfielddetailedwidget.hpp"
 #include "bitfieldmodel.hpp"
 
+using namespace scopy;
+using namespace regmap;
+using namespace regmap::gui;
+
 BitFieldDetailedWidgetFactory::BitFieldDetailedWidgetFactory(QObject *parent)
 	: QObject{parent}
 {

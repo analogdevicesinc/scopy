@@ -36,7 +36,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
     Utils::removeLayoutMargins(layout);
     setLayout( layout);
 
-    registerController = new RegisterController();
+    registerController = new gui::RegisterController();
 
     if (registerMapTemplate) {
         QWidget *registerMapTable = new QWidget();
@@ -56,17 +56,17 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
             tableHead->addWidget(new QLabel("Bit"+QString::number(i)),1);
         }
 
-        registerMapTableWidget = new RegisterMapTable(registerMapTemplate->getRegisterList());
+        registerMapTableWidget = new gui::RegisterMapTable(registerMapTemplate->getRegisterList());
 
-        QObject::connect(registerMapTableWidget, &RegisterMapTable::registerSelected, this, [=](uint32_t address){
+        QObject::connect(registerMapTableWidget, &gui::RegisterMapTable::registerSelected, this, [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
         });
 
         registerMapTableLayout->addWidget(tableHeadWidget);
         registerMapTableLayout->addWidget(registerMapTableWidget->getWidget());
-        layout->addWidget(registerMapTable,4);
+        layout->addWidget(registerMapTable,5);
 
-        QObject::connect(registerController, &RegisterController::registerAddressChanged, this , [=](uint32_t address){
+        QObject::connect(registerController, &gui::RegisterController::registerAddressChanged, this , [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
             registerMapTableWidget->scrollTo(address);
             if (autoread) {
@@ -99,7 +99,6 @@ DeviceRegisterMap::~DeviceRegisterMap()
     if (registerMapTableWidget) delete registerMapTableWidget;
     if (docRegisterMapTable) delete docRegisterMapTable;
     if (registerDetailedWidget) delete registerDetailedWidget;
-    if (mainWindow) delete mainWindow;
 }
 
 void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
@@ -107,9 +106,8 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
     registerController->registerChanged(regModel->getAddress());
     registerController->registerValueChanged("Not Read");
 
-    if (dockRegisterDetailedWidget) {
+    if (registerDetailedWidget) {
         delete registerDetailedWidget;
-        delete dockRegisterDetailedWidget;
     }
 
     registerDetailedWidget = new RegisterDetailedWidget(regModel);

@@ -4,6 +4,7 @@
 #include <QMap>
 #include <QObject>
 
+namespace scopy::regmap{
 class BitFieldModel : public QObject
 {
 	Q_OBJECT
@@ -54,5 +55,5 @@ private:
 Q_SIGNALS:
 
 };
-
+}
 #endif // BITFIELDMODEL_HPP
