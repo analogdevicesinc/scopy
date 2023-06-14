@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <adcplugin.h>
+#include "gui/tooltemplate.h"
+#include <QPushButton>
 
 namespace scopy {
 class AdcInstrument : public QWidget
@@ -13,7 +15,9 @@ public:
 public Q_SLOTS:
 	void run(bool);
 private:
+	ToolTemplate *tool;
 	PlotProxy* proxy;
+	QPushButton *openLastMenuBtn;
 };
 }
 #endif // ADCINSTRUMENT_H

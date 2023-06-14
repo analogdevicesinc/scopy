@@ -42,6 +42,7 @@ namespace scopy {
 		void setAnimationDuration(int newAnimationDuration);
 
 		void setAnimMinWidth(int min);
+		void setAnimMaxWidth(int max);
 	Q_SIGNALS:
 		void finished(bool opened);
 
@@ -56,6 +57,7 @@ namespace scopy {
 		CustomAnimation close_anim_max, close_anim_min,
 				   open_anim_max, open_anim_min;
 		int min_width;
+		int max_width;
 		int animationDuration;
 		bool animInProg;
 	};
