@@ -20,7 +20,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">.QWidget{background-color: rgb(10, 10, 10);}</string>
+   <string notr="true">.QWidget{background-color : rgb(10, 10, 10)}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout" columnstretch="0">
    <property name="leftMargin">
@@ -427,7 +427,7 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_2">
            <item>
-            <widget class="scopy::gui::SubsectionSeparator" name="subSeparatorDevInfo" native="true">
+            <widget class="scopy::gui::SubsectionSeparator" name="deviceInfo" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -437,7 +437,7 @@
             </widget>
            </item>
            <item>
-            <widget class="scopy::gui::SubsectionSeparator" name="subSeparatorPlugins" native="true">
+            <widget class="scopy::gui::SubsectionSeparator" name="devicePluginBrowser" native="true">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>

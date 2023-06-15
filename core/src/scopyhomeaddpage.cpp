@@ -1,4 +1,4 @@
-#include "scopyhomeaddpage.h"
+﻿#include "scopyhomeaddpage.h"
 
 #include "devicefactory.h"
 #include "deviceloader.h"
@@ -23,7 +23,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 
 	//verify
 	fw = new QFutureWatcher<bool>(this);
-	connect(fw,&QFutureWatcher<bool>::finished,this,[=](){
+	connect(fw, &QFutureWatcher<bool>::finished, this, [=](){
 		bool result = fw->result();
 		if (result == true) {
 			ui->uriMessageLabel->clear();
@@ -43,31 +43,26 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 		ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
 	});
 	connect(ui->btnScan, SIGNAL(clicked()), this, SLOT(futureScan()));
-	connect(ui->btnVerify, SIGNAL(clicked()), this, SLOT(futureverify()));
+	connect(ui->btnVerify, SIGNAL(clicked()), this, SLOT(futureVerify()));
 	connect(ui->btnAdd, &QPushButton::clicked, this, [=](){
 		pendingUri = ui->editUri->text();
 		Q_EMIT newDeviceAvailable(deviceImpl);
 	});
-
-
 	connect(ui->comboBoxContexts,&QComboBox::textActivated, [=](){
-		ui->editUri->clear();
-		ui->editUri->setText(ui->comboBoxContexts->currentText());
+		Q_EMIT uriChanged(ui->comboBoxContexts->currentText());
 	});
 
 	//serial widget connections
 	connect(ui->comboBoxSerialPort, &QComboBox::textActivated, [=](){
-		ui->editUri->clear();
-		ui->editUri->setText(getSerialPath());
+		Q_EMIT uriChanged(getSerialPath());
 	});
-	connect(ui->comboBoxBaudRate, &QComboBox::textActivated, [=](QString br){
-		ui->editUri->clear();
-		ui->editUri->setText(getSerialPath());
+	connect(ui->comboBoxBaudRate, &QComboBox::textActivated, [=](){
+		Q_EMIT uriChanged(getSerialPath());
 	});
-	connect(ui->editSerialFrameConfig, &QLineEdit::textChanged, [=](QString config){
-		ui->editUri->clear();
-		ui->editUri->setText(getSerialPath());
+	connect(ui->editSerialFrameConfig, &QLineEdit::textChanged, [=](){
+		Q_EMIT uriChanged(getSerialPath());
 	});
+	connect(this, &ScopyHomeAddPage::uriChanged, this, &ScopyHomeAddPage::updateUri);
 	connect(ui->editUri, &QLineEdit::textChanged, [=](QString uri){
 		if (uri.isEmpty()) {
 			ui->btnVerify->setEnabled(false);
@@ -76,7 +71,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 		}
 	});
 
-	connect(this, &ScopyHomeAddPage::contextDataAvailable, this, [=](QMap<QString, QString> ctxInfo){
+	connect(this, &ScopyHomeAddPage::deviceInfoAvailable, this, [=](QMap<QString, QString> ctxInfo){
 		for (QString key : ctxInfo.keys()) {
 			deviceInfoPage->update(key, ctxInfo[key]);
 		}
@@ -86,13 +81,9 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 ScopyHomeAddPage::~ScopyHomeAddPage()
 {
 	delete ui;
-	if (deviceImpl) {
-		delete deviceImpl;
-	}
 	if (libSerialSupport) {
 		delete libSerialSupport;
 	}
-
 }
 
 void ScopyHomeAddPage::initAddPage()
@@ -119,16 +110,16 @@ void ScopyHomeAddPage::initAddPage()
 
 void ScopyHomeAddPage::initSubSections()
 {
-	ui->subSeparatorPlugins->setLabel("Compatible plugins");
-	ui->subSeparatorPlugins->getContentWidget()->layout()->setSpacing(10);
+	ui->devicePluginBrowser->setLabel("Compatible plugins");
+	ui->devicePluginBrowser->getContentWidget()->layout()->setSpacing(10);
 
-	ui->subSeparatorDevInfo->setLabel("Device info");
-	deviceInfoPage = new InfoPage(ui->subSeparatorDevInfo->getContentWidget());
+	ui->deviceInfo->setLabel("Device info");
+	deviceInfoPage = new InfoPage(ui->deviceInfo->getContentWidget());
 	deviceInfoPage->setAdvancedMode(false);
 	deviceInfoPage->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-	ui->subSeparatorDevInfo->getContentWidget()->layout()->addWidget(deviceInfoPage);
+	ui->deviceInfo->getContentWidget()->layout()->addWidget(deviceInfoPage);
 	QSpacerItem *vSpacer = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Expanding);
-	ui->subSeparatorDevInfo->getContentWidget()->layout()->addItem(vSpacer);
+	ui->deviceInfo->getContentWidget()->layout()->addItem(vSpacer);
 }
 
 void ScopyHomeAddPage::findAvailableSerialPorts()
@@ -150,63 +141,57 @@ void ScopyHomeAddPage::verifyIioBackend()
 	int backEndsCount = iio_get_backends_count();
 	for (int i = 0; i < backEndsCount; i++) {
 		QString backEnd(iio_get_backend(i));
-		if (backEnd.compare("xml")) {
-			QCheckBox *cb = new QCheckBox();
-			cb->setText(backEnd);
-			if (backEnd.compare("serial") == 0) {
-				connect(cb, &QCheckBox::toggled, this, [=](bool en) {
-					if (en) {
-						scanParamsList.push_back(backEnd + ":");
-					} else {
-						scanParamsList.removeOne(backEnd + ":");
-					}
-					ui->serialSettingsWidget->setEnabled(en);
-				});
-			} else {
-				connect(cb, &QCheckBox::toggled, this, [=](bool en) {
-					if (en) {
-						scanParamsList.push_back(backEnd + ":");
-					} else {
-						scanParamsList.removeOne(backEnd + ":");
-					}
-				});
-			}
-			cb->setChecked(true);
-			ui->filterCheckBoxes->layout()->addWidget(cb);
+		if (backEnd.compare("xml") == 0) {
+			continue;
 		}
+		QCheckBox *cb = new QCheckBox();
+		cb->setText(backEnd);
+		connect(cb, &QCheckBox::toggled, this, [=](bool en) {
+			if (en) {
+				scanParamsList.push_back(backEnd + ":");
+			} else {
+				scanParamsList.removeOne(backEnd + ":");
+			}
+			if (backEnd.compare("serial") == 0) {
+				ui->serialSettingsWidget->setEnabled(en);
+			}
+		});
+		cb->setChecked(true);
+		ui->filterCheckBoxes->layout()->addWidget(cb);
 		scan = true;
 	}
 	ui->btnScan->setVisible(scan);
 }
 
-void ScopyHomeAddPage::getContextData(struct iio_context *ctx)
+QMap<QString, QString> ScopyHomeAddPage::readContextAttributes(struct iio_context *ctx)
 {
-	QMap <QString, QString> contextInfo;
+	QMap <QString, QString> contextAttributes;
 	for(int i=0;i<iio_context_get_attrs_count(ctx);i++) {
 		const char *name;
 		const char *value;
 		int ret = iio_context_get_attr(ctx,i,&name,&value);
 		if(ret != 0)
 			continue;
-		contextInfo[name] = value;
+		contextAttributes[name] = value;
 	}
-	Q_EMIT contextDataAvailable(contextInfo);
+	return contextAttributes;
 }
 
 bool ScopyHomeAddPage::verify() {
 	QString uri = ui->editUri->text();
 	struct iio_context* ctx = ContextProvider::GetInstance()->open(uri);
 	if(ctx) {
-		getContextData(ctx);
+		QMap<QString, QString> attrMap = readContextAttributes(ctx);
 		ContextProvider::GetInstance()->close(uri);
+		Q_EMIT deviceInfoAvailable(attrMap);
 		return true;
 	}	
 	return false;
 }
 
-void ScopyHomeAddPage::futureverify()
+void ScopyHomeAddPage::futureVerify()
 {
-	removePluginsCheckBoxs();
+	removePluginsCheckBoxes();
 	deviceInfoPage->clear();
 	QFuture<bool> f = QtConcurrent::run(std::bind(&ScopyHomeAddPage::verify,this));
 	fw->setFuture(f);
@@ -239,37 +224,30 @@ void ScopyHomeAddPage::scanFinished(QStringList scanCtxs)
 		ui->comboBoxContexts->addItem(ctx);
 	}
 	findAvailableSerialPorts();
-	ui->editUri->clear();
-	ui->editUri->setText(ui->comboBoxContexts->currentText());
+	updateUri(ui->comboBoxContexts->currentText());
 }
 
 void ScopyHomeAddPage::deviceLoaderInitialized()
 {
 	QList<Plugin *> plugins = deviceImpl->plugins();
 	for (Plugin *p : qAsConst(plugins)) {
-		QWidget *pluginInfo = new QWidget();
-		QHBoxLayout *hLayout = new QHBoxLayout(pluginInfo);
-
-		QCheckBox *cb = new QCheckBox();
-		cb->setText(p->name());
-		cb->setChecked(p->enabled());
-		connect(cb, &QCheckBox::toggled, this, [=](bool en){
+		PluginEntry *pluginDescription = new PluginEntry(ui->devicePluginBrowser->getContentWidget());
+		pluginDescription->setDescription(p->description());
+		pluginDescription->checkBox()->setText(p->name());
+		pluginDescription->checkBox()->setChecked(p->enabled());
+		ui->devicePluginBrowser->getContentWidget()->layout()->addWidget(pluginDescription);
+		pluginDescriptionList.push_back(pluginDescription);
+		connect(pluginDescription->checkBox(), &QCheckBox::toggled, this, [=](bool en){
 			p->setEnabled(en);
 		});
-
-		QLabel *descriptionLabel = new QLabel();
-		descriptionLabel->setWordWrap(true);
-		descriptionLabel->setText(p->description());
-
-		pluginInfo->setStyleSheet("background-color: rgb(0, 0, 0);");
-		hLayout->setContentsMargins(5, 5, 5, 5);
-		hLayout->addWidget(cb);
-		hLayout->addWidget(descriptionLabel);
-		hLayout->setStretch(0,1);
-		hLayout->setStretch(1,3);
-		ui->subSeparatorPlugins->getContentWidget()->layout()->addWidget(pluginInfo);
 	}
 	ui->stackedWidget->setCurrentWidget(ui->deviceInfoPage);
+}
+
+void ScopyHomeAddPage::updateUri(QString uri)
+{
+	ui->editUri->clear();
+	ui->editUri->setText(uri);
 }
 
 void ScopyHomeAddPage::createDevice()
@@ -278,20 +256,14 @@ void ScopyHomeAddPage::createDevice()
 	deviceImpl = DeviceFactory::build(uri, pluginManager, "");
 	DeviceLoader* dl = new DeviceLoader(deviceImpl, this);
 	dl->init();
-
 	connect(dl, &DeviceLoader::initialized, this, &ScopyHomeAddPage::deviceLoaderInitialized);
 	connect(dl, &DeviceLoader::initialized, dl, &QObject::deleteLater); // don't forget to delete loader once we're done
 }
 
-void ScopyHomeAddPage::removePluginsCheckBoxs()
+void ScopyHomeAddPage::removePluginsCheckBoxes()
 {
-	if (ui->subSeparatorPlugins->getContentWidget()->layout()) {
-		QLayoutItem* item;
-		while ((item = ui->subSeparatorPlugins->getContentWidget()->layout()->takeAt(0)) != nullptr) {
-			delete item->widget();
-			delete item;
-		}
-	}
+	qDeleteAll(pluginDescriptionList);
+	pluginDescriptionList.clear();
 }
 
 QString ScopyHomeAddPage::getSerialPath()
