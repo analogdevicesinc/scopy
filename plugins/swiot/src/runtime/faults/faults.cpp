@@ -59,7 +59,7 @@ void Faults::setupDynamicUi(QWidget *parent) {
 	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
 	m_statusLabel->setText("The system is powered at limited capacity.");
 	m_statusLabel->setWordWrap(true);
-	m_statusContainer->setStyleSheet("color: ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
+	m_statusContainer->setStyleSheet("QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt}");
 
 	auto exclamationLabel = new QPushButton(m_statusContainer);
 	exclamationLabel->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));

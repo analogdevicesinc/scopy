@@ -87,7 +87,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
 	m_statusContainer->layout()->setSpacing(0);
 	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
-	m_statusContainer->setStyleSheet("color: ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt");
+	m_statusContainer->setStyleSheet("QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt}");
 
 	auto exclamationButton = new QPushButton(m_statusContainer);
 	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
