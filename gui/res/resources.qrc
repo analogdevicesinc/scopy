@@ -2,6 +2,7 @@
     <qresource prefix="/gui">
         <file>icon.ico</file>
         <file>open-sans-regular.ttf</file>
+        <file>loading.gif</file>
         <file>infoPageMap.json</file>
         <file>Scopy.icns</file>
         <file>icons/scopy-default/index.theme</file>
