@@ -414,7 +414,7 @@ bool M2kPlugin::onDisconnect()
 }
 
 QString M2kPlugin::description() {
-	return "Implements ADALM2000 intstruments - Oscilloscope, Spectrum Analyzer, Voltmeter, Network Analyzer,Signal Generator, Logic Analyzer, Pattern Generator, Digital I/O";
+	return "Implements ADALM2000 instruments - Oscilloscope, Spectrum Analyzer, Voltmeter, Network Analyzer, Signal Generator, Logic Analyzer, Pattern Generator, Digital I/O";
 }
 
 void M2kPlugin::initMetadata()
