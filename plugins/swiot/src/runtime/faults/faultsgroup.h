@@ -45,8 +45,6 @@ private:
 	int m_max_faults;
 	FlexGridLayout* m_customColGrid;
 
-	void resizeEvent(QResizeEvent *event) override;
-
 protected:
 	void setupDynamicUi();
 	QWidget* buildActiveStoredWidget();
