@@ -4,6 +4,7 @@
 #include <qboxlayout.h>
 #include <qcoreevent.h>
 #include <qdebug.h>
+#include <qlabelmaxchar.hpp>
 #include <utils.h>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>
@@ -25,7 +26,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     setStyleSheet("::hover {background-color: #4a4a4b; }");
 
     setMinimumWidth(10);
-    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->setMargin(0);
@@ -44,13 +45,13 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
     QLabel *registerAddressLable = new QLabel(scopy::regmap::Utils::convertToHexa(address.toInt(&ok,16),registerWidth));
     registerAddressLable->setAlignment(Qt::AlignRight);
     rightLayout->addWidget(registerAddressLable);
-    value = new QLabel("Not Read");
+    value = new QLabel("N/R");
     rightLayout->addWidget(value);
 
     QVBoxLayout *leftLayout = new QVBoxLayout();
     leftLayout->setAlignment(Qt::AlignTop);
     QLabel *registerNameLabel = new QLabel(name);
-    registerNameLabel->setWordWrap(true);
+    registerNameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     leftLayout->addWidget(registerNameLabel);
 
     regBaseInfo->addLayout(leftLayout);
@@ -58,7 +59,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
     regBaseInfoWidget->setLayout(regBaseInfo);
     // to make sure table proportions are good we use a fixed size for this
-    regBaseInfoWidget->setFixedWidth(120);
+    regBaseInfoWidget->setFixedWidth(130);
     layout->addWidget(regBaseInfoWidget,1);
 
     // add bitfield widgets
