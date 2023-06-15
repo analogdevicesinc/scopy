@@ -1,0 +1,2299 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2012-2013 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<max14906_public>
+	<Register>
+		<Name>SetOUT</Name>
+		<Address>0x000</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>SetDi4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI4 Digital Output Mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI4 Digital Input Mode</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SetDi3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI3 Digital Output Mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI3 Digital Input Mode</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>			
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SetDi2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI2 Digital Output Mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI2 Digital Input Mode</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SetDi1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI1 Digital Output Mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI1 Digital Input Mode</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>HighO4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>HighO_ is used to set the state of DOI_ when configured in DO modes. The logic state of a DOI_ output is a logical OR of the associated D_ input pin and the associated HighO_ bit.In DI modes, the associated HighO_ bit is ignored. In DO modes, the DOI_ output is high-impedance when the associated VDD_falls below the undervoltage-lockout threshold, but the HighO_ bit is not reset. The HighO_ bit is reset when the internal register supply voltage (VINT) is below the VTUV_INT threshold.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI4 if HS mode switch = open, or PP mode driver = GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI4 if HS mode switch = closed, or PP mode driver = VDD4</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>HighO3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI3 if HS mode switch = open, or PP mode driver = GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI3 if HS mode switch = closed, or PP mode driver = VDD3</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>HighO2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI2 if HS mode switch = open, or PP mode driver = GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI2 if HS mode switch = closed, or PP mode driver = VDD2</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>HighO1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>DOI1 if HS mode switch = open, or PP mode driver = GND</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>DOI1 if HS mode switch = closed, or PP mode driver = VDD1</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>SetLED</Name>
+		<Address>0x001</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>SLED4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The SLEDSet bit in the Config1 register determines the operating mode for this register. If SLEDSet bit = 0, staus LEDs are controlled directly by the MAX14906. If SLEDSet bit = 1, status LEDs are controlled by SLED_ bits.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> Turn off SLED4 (Status LED for DOI4)</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Turn on SLED4 (Status LED for DOI4)</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SLED3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> Turn off SLED3 (Status LED for DOI3)</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Turn on SLED3 (Status LED for DOI3)</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SLED2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> Turn off SLED2 (Status LED for DOI2)</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Turn on SLED2 (Status LED for DOI2)</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SLED1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> Turn off SLED1 (Status LED for DOI1)</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Turn on SLED1 (Status LED for DOI1)</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLED4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The FLEDSet bit in the Config1 register determines the operating mode for this register. If FLEDSet bit = 0, fault LEDs are controlled directly by the MAX14906. If FLEDSet bit = 1, fault LEDs are controlled by FLED_ bits</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Turn off FLED4 (Fault LED for DOI4) </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Turn on FLED4 (Fault LED for DOI4) </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLED3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Turn off FLED3 (Fault LED for DOI3) </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Turn on FLED3 (Fault LED for DOI3) </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLED2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Turn off FLED2 (Fault LED for DOI2) </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Turn on FLED2 (Fault LED for DOI2) </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLED1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Turn off FLED1 (Fault LED for DOI1) </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Turn on FLED1 (Fault LED for DOI1) </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DoiLevel</Name>
+		<Address>0x002</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Read Clears All</Notes>
+		<BitFields>
+		<BitField>
+			<Name>SafeDemagF4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Thermal Overload on DOI4 during SafeDemag. This fault is always latched and never masked.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SafeDemagF3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Thermal Overload on DOI3 during SafeDemag. This fault is always latched and never masked.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SafeDemagF2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Thermal Overload on DOI2 during SafeDemag. This fault is always latched and never masked. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SafeDemagF1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Thermal Overload on DOI1 during SafeDemag. This fault is always latched and never masked. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoiLevel4/VDDOKFault4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> Functionality controlled by the VDDFaultSel bit in the ConfigDI register: If VDDFaultSel = 0, reports DOI4 logic level in DI and DO modes. If VDDFaultSel = 1, reports a VDDOK bit fault for the VDD4 supply. VDDOKFault_ bits are set when per-channel VDDOK condition is not met (VDD_ thresholds are controlled by the VDDOnThr bit in the Config2 register). This fault is always latched. VDDOKFault_ bits affect the SupplyErr fault bit in the Interrupt register if the VDDFaultDis bit in the ConfigDI register is not set. It also asserts the FAULT pin if not masked by the SupplyErrM bit in the Mask register</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoiLevel3/VDDOKFault3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If VDDFaultSel = 0, reports DOI3 logic level in DI and DO modes. If VDDFaultSel = 1, reports a VDDOK bit fault for the VDD3 supply. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoiLevel2/VDDOKFault2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If VDDFaultSel = 0, reports DOI2 logic level in DI and DO modes. If VDDFaultSel = 1, reports a VDDOK bit fault for the VDD2 supply. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoiLevel1/VDDOKFault1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> If VDDFaultSel = 0, reports DOI1 logic level in DI and DO modes. If VDDFaultSel = 1, reports a VDDOK bit fault for the VDD1 supply. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>Interrupt</Name>
+		<Address>0x003</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>ComErr</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Communication error detected ComErr is the logic OR result of an SPI watchdog error (if enabled), a SYNCH watchdog error (if enabled), an SPI CRC error (if enabled), and a number of SPI clock cycles error. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SupplyErr</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Supply error detected SupplyErr is the logical OR result of VDDOV_ bits, VDDOKFault_ faults (if enabled by the VDDFaultDis bit in the ConfigDI register), and the 6 supply error bits (VDD_UVLO, VDD_Warn, VDD_Low, V5_UVLO, VINT_UV, and LossGND) in the GlobalErr register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DeMagFault</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: SafeDemag fault detected on any DOI channel Logic OR result of per-channel SafeDemag faults. The per-channel faults can be identfied using the SafeDemagF_ bits in the DoiLevel register.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShtVDDFault</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Short-to-VDD fault detected on any DOI channel Logic OR result of per-channel short-to-VDD faults. The per-channel faults can be identified using SHVDD_ bits in the ShtVDDChF register.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>AboveVDDFault</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Above-VDD fault detected on any DOI channel Logic OR result of per-channel above-VDD faults. The per-channel faults can be identified using the AboveVDD_ bits in the OpnWirChF register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOffFault</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Open-wire fault in off state detected on any DOI channel Logic OR result of per-channel open-wire faults. The per-channel faults can be identified using the OWOff_ bits in the OpnWirChF register</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CurrLim</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Overcurrent occured on any DOI channel Logic OR result of per-channel current limit faults. The per-channel faults can be identified using the CL_ bits in the OvrLdChF register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OverLdFault</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Thermal overload occured on any DOI channel Logic OR result of per-channel thermal overload faults and the global thermal shutdown bit ThrmShutd. The per-chan</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>OvrLdChF</Name>
+		<Address>0x004</Address>
+		<Description></Description> 
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Read Clears All</Notes>
+		<BitFields>
+		<BitField>
+			<Name>CL4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Current limit detected on DOI4 The FLatchEn bit in the Config1 register determines if this bit is real time (FLatchEn = 0) and cleared when the event disappears, or latched (FLatchEn = 1) and cleared when OvrLdChF register is read AND a current limiting condition is not present. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CL3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Current limit detected on DOI3</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CL2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Current limit detected on DOI2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CL1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Current limit detected on DOI1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OVL4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Thermal overload is detected on DOI4 The FLatchEn bit in the Config1 register determines if this bit is real time (FLatchEn = 0) and cleared when the event disappears, or latched (FLatchEn = 1) and cleared when the OvrLdChF register is read AND a thermal overload condition is not present. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OVL3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Thermal overload is detected on DOI3</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OVL2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Thermal overload is detected on DOI2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OVL1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Thermal overload is detected on DOI2</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>OpnWirChF</Name>
+		<Address>0x005</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Read Clears All</Notes>
+		<BitFields>
+		<BitField>
+			<Name>AboveVDD4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Above-VDD fault is detected on DOI4 The FLatchEn bit in the Config1 register determines if this bit is real time (FLatchEn = 0) and cleared when the event disappears, or latched (FLatchEn = 1) and cleared when OpnWirChF register is read AND the fault condition is not present. The Above-VDD fault is always stretched by 10.7ms (typ), so once it is detected it is set for at least 10.7ms (typ). </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>AboveVDD3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Above-VDD fault is detected on DOI3</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>AboveVDD2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Above-VDD fault is detected on DOI2 </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>AboveVDD1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Above-VDD fault is detected on DOI1</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOff4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Open-wire fault is detected on DOI4 when the high-side switch is in the off state The FLatchEn bit in the Config1 register determines if this bit is real time (FLatchEn = 0) and cleared when the event disappears, or latched (FLatchEn = 1) and cleared when the OpnWirChF register is read AND the fault condition is not present. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOff3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Open-wire fault is detected on DOI3 when the high-side switch is in the off state </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOff2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Open-wire fault is detected on DOI2 when the high-side switch is in the off state</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOff1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditions 1: Only active in digital output high-side mode. Open-wire fault is detected on DOI1 when the high-side switch is in the off state</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ShtVDDChF</Name>
+		<Address>0x006</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Read Clears All</Notes>
+		<BitFields>
+		<BitField>
+			<Name>VDDOV4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD4 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ) The FLatchEn bit in the Config1 register determines if this bit is real time (FLatchEn = 0) and cleared when the event disappears, or latched (FLatchEn = 1) and cleared when ShtVDDChF register is read AND the fault condition is not present. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOV3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD3 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOV2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD2 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOV1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD1 supply is higher than the VDD_OVTH threshold voltage (43.5V, typ)</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SHVDD4</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Short-to-VDD fault is detected on DOI4 when the high-side switch is in the off state. The FLatchEn bit in the Config1 register determines if this bit is real time (FLatchEn = 0) and cleared when the event disappears, or latched (FLatchEn = 1) and cleared when the ShtVDDChF register is read AND the fault condition is not present. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SHVDD3</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Short-to-VDD fault is detected on DOI3 when the high-side switch is in the off state.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes> Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SHVDD2</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Short-to-VDD fault is detected on DOI2 when the high-side switch is in the off state.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SHVDD1</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Only active in digital output high-side mode. Short-to-VDD fault is detected on DOI1 when the high-side switch is in the off state. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>GlobalErr</Name>
+		<Address>0x007</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes>Read Clears All</Notes>
+		<BitFields>
+		<BitField>
+			<Name>WDogErr</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: SPI or SYNCH watchdog timeout is detected This bit takes effect when the SPI or SYNCH watchdog functions are enabled using the WDTo[1:0] and SynchWDEn bits in the Config2 register. This bit is part of the logical OR result of the ComErr bit in the Interrupt register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>LossGND</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: The MAX14906 detects loss of GND fault At power-on-reset, this bit can be 0 or 1. The microcontroller should ignore this initial setting until after it reads the GlobalErr register to clear this bit for normal operation. This bit is part of the logical OR result of the SupplyErr bit in the Interrupt register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ThrmShutd</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: The MAX14906 enters thermal shutdown This bit is part of the logical OR result of the OverLdFault bit in the Interrupt register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDD_UVLO</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD supply falls under VDD_UVLO threshold Set after power-on-reset. This bit can be cleared by reading the GlobalErr register when the VDD voltage exceeds the VDD_UVLO threshold. VDD_UVLO is part of the logic OR result of the SupplyErr bit in the Interrupt register if not disabled by the VDDFaultDis bit in the ConfigDI register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDD_Warn</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD supply falls below VDD_WARN threshold Set after power-on-reset. This bit can be cleared by reading the GlobalErr register when the VDD voltage exceeds the VDD_WARN threshold. VDD_Warm is part of the logic OR result of the SupplyErr bit in the Interrupt register if not disabled by the VDDFaultDis bit in the ConfigDI register. It also asserts FAULT pin if not masked by the VddOKM bit in the Mask register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDD_Low</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: VDD supply is below VDD_GOOD threshold Set after power-on-reset. This bit can be cleared by reading the GlobalErr register when the VDD voltage exceeds the VDD_GOOD threshold. VDD_Low is part of the logic OR result of the SupplyErr bit in the Interrupt register if not disabled by the VDDFaultDis bit in the ConfigDI register. It also asserts FAULT pin if not masked by the VddOKM bit in the Mask register.  </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>V5_UVLO</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> 0: Normal operating conditionsv 1: V5 voltage input falls under the V5_UVLO threshold Set after power-on-reset. This bit can be cleared by reading the GlobalErr register when the V5 voltage exceeds the V5_UVLO threshold. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VINT_UV</Name>
+			<Access>R</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>0: Normal operating conditions 1: Set on initial power-up and when the internal supply to the registers falls to a level where the register contents are lost. This indicates that a power-onreset has occurred and all register contents were reset. This bit can be cleared by reading the GlobalErr register when the internal register supply voltage (VINT) exceeds the VTUV_INT threshold. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes>Read Clears All</Notes>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>OpnWrEn</Name>
+		<Address>0x008</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>GDrvEn4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable gate driver on G4 if not used to reduce power consumption </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable gate driver for external pMOS transistor on G4 pin  </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>GDrvEn3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable gate driver on G3 if not used to reduce power consumption </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable gate driver for external pMOS transistor on G3 pin  </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>GDrvEn2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable gate driver on G2 if not used to reduce power consumption </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable gate driver for external pMOS transistor on G2 pin  </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>GDrvEn1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable gate driver on G1 if not used to reduce power consumption </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable gate driver for external pMOS transistor on G1 pin  </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OwOffEn4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable the pullup current source and open-wire detection on DOI4</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable open-wire detection on DOI4 in DO high-side mode, off state </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OwOffEn3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable the pullup current source and open-wire detection on DOI3</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable open-wire detection on DOI3 in DO high-side mode, off state </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OwOffEn2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable the pullup current source and open-wire detection on DOI2</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable open-wire detection on DOI2 in DO high-side mode, off state </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OwOffEn1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable the pullup current source and open-wire detection on DOI1</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable open-wire detection on DOI1 in DO high-side mode, off state </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ShtVDDEn</Name>
+		<Address>0x009</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>VDDOVEn4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable VDD OVLO detection on VDD4</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable VDD OVLO detection (43.5V, typ) on VDD4</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOVEn3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable VDD OVLO detection on VDD3</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable VDD OVLO detection (43.5V, typ) on VDD3</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOVEn2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable VDD OVLO detection on VDD2</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable VDD OVLO detection (43.5V, typ) on VDD2</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOVEn1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable VDD OVLO detection on VDD1</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable VDD OVLO detection (43.5V, typ) on VDD1</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShVddEn4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable short-to-VDD detection on DOI4 </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable short-to-VDD detection on DOI4</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShVddEn3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable short-to-VDD detection on DOI3 </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable short-to-VDD detection on DOI3</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShVddEn2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable short-to-VDD detection on DOI2 </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable short-to-VDD detection on DOI2</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShVddEn1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable short-to-VDD detection on DOI1 </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable short-to-VDD detection on DOI1</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>Config1</Name>
+		<Address>0x00A</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>LEDCurrLim</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If FLEDSet = 0, fault LEDs are controlled by internal FLED logic. LEDCurrLim controls whether fault LEDs signaling current limit faults. 0: Disable fault LEDs (FLEDs) signaling current limit 1: Enable fault LEDs (FLEDs) signaling current limit If FLEDSet = 1, fault LEDs are controlled by SetLED register. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable fault LEDs (FLEDs) signaling current limit</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable fault LEDs (FLEDs) signaling current limit</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLatchEn</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Faults in GlobalErr register are always latched regardless of the FlatchEn bit setting. SafeDemagF_ and VDDOKFault_ faults are always latched too. When the fault LEDs are controlled internally (FLEDSet = 0), the LED on-time is not affected by this bit, but has a minimum on-time defined by the FLEDStrech[1:0] bits. The fault LEDs are turned off when the faults disappear and minimum LED on-time expires as defined by the FLEDStrech[1:0] bits. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>: To select regular blanking time (4ms, typ) for diagnostic fault bits, OWOff_ and SHVDD_ </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> To select long blanking time (8ms, typ) for diagnostic fault bits, OWOff_ and SHVDD_ </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FilterLong</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> This bit also affects the fault LEDs (FLEDs) on-time when controlled internally (FLEDSet = 0). </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>To select regular blanking time (4ms, typ) for diagnostic fault bits, OWOff_ and SHVDD_ </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> To select long blanking time (8ms, typ) for diagnostic fault bits, OWOff_ and SHVDD_ </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FFilterEn</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> When the fault LEDs (FLEDs) are controlled internally (FLEDSet = 0), openwire and short-to-VDD diagnostics always use filtering and cannot be disabled by the FFilterEn bit. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable blanking and filtering of the SHVDD_ and OWOff_ diagnostic bits. In this mode, open-wire and short-to-VDD diagnostics are real-time (only filtered by a 68μs (typ) filter) and any additional filtering is left to application software</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable blanking and filtering of the SHVDD_ and OWOff_ diagnostic bits </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLEDStretch</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The FLEDStretch bits select the minimum on-time for the fault LEDs (FLEDs) when they are controlled internally (FLEDSet = 0), so the user can visually see short events.</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable minimum fault LED (FLED) on-time</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Minimum fault LED (FLED) on-time = 1s (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Minimum fault LED (FLED) on-time = 2s (typ)</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Minimum fault LED (FLED) on-time = 3s (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SLEDSet</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>All four status LEDs are controlled by the DOI1 to DOI4 status </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>All four status LEDs are controlled by the SLED_ bits in the SetLED register</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>FLEDSet</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description> Internal fault diagnostics include (if enabled): SafeDemagF_, SHVDD_, VDDOV_, OWOff_, AboveVDD_, CL_, OVL_, VDDOKFault_. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>All four fault LEDs are controlled by the DOI1 to DOI4 fault diagnostics</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>All four fault LEDs are controlled by the FLED_ bits in the SetLED register</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>Config2</Name>
+		<Address>0x00B</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>WDTo</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>When the SPI watchdog is disabled, the SYNCH watchdog is configured by the SynchWDEn bit and the SYNCH watchdog timeout is set to 600ms (typ). </Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable SPI Watchdog Status and SPI Watchdog Timeout</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Enable SPI Watchdog Status, set SPI and SYNCH Watchdog Timeout to 200ms (typ) </Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Enable SPI Watchdog Status, set SPI and SYNCH Watchdog Timeout to 600ms (typ)</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Enable SPI Watchdog Status, set SPI and SYNCH Watchdog Timeout to 1.2s (typ) </Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOffCs</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The OWOffCs[1:0] bits select the pullup current used for the open-wire and short-to-VDD detection when the switch is in the off state: </Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Set open-wire and short-to-VDD detection current to 60μA (typ) </Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>: Set open-wire and short-to-VDD detection current to 100μA (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Set open-wire and short-to-VDD detection current to 300μA (typ)</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Set open-wire and short-to-VDD detection current to 600μA (typ) </Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShtVddThr</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Set threshold voltage for short-to-VDD detection to 9V (typ) </Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Set threshold voltage for short-to-VDD detection to 10V (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Set threshold voltage for short-to-VDD detection to 12V (typ) </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description> Set threshold voltage for short-to-VDD detection to 14V (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SynchWDEn</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The SYNCH watchdog timeout is defined by the WDTo[1:0] bits if the SPI watchdog is enabled. When WDTo[1:0] = 00 (SPI watchdog disabled), the SYNCH watchdog timeout is 600ms (typ) if enabled. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable the SYNCH Watchdog Status and Timeout </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable the SYNCH Watchdog Status and Timeout</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDOnThr</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>VDDOK pin is asserted low and DOI_ channels automatically turn on when VDD and VDD_ rise above the thresholds. See the Power-Up and Undervoltage Lcokout section for details. The VDDOnThr bit affects per-channel VDDOKFault_ bits in the DoiLevel register when VDDFaultSel is set to 1. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> Disable higher voltage thresholds for VDD and VDD_ undervoltage monitoring</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable higher voltage thresholds for VDD and VDD_ undervoltage monitoring </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ConfigDI</Name>
+		<Address>0x00C</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>Typ2Di</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Select IEC 61131-2 Type 1 and 3 in digital input mode</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Select IEC 61131-2 Type 2 in digital input mode</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDFaultDis</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Enable all VDD and VDD_ voltage level monitoring faults (VDD_UVLO, VDD_Warn, VDD_Low and VDDOKFault_) to be the source of the logic OR result of the SupplyErr bit in the Interrupt register </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Mask all VDD and VDD_ voltage level monitoring faults (VDD_UVLO, VDD_Warn, VDD_Low and VDDOKFault_) to be the source of the logic OR result of the SupplyErr bit in the Interrupt register </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VDDFaultSel</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>When VDDFaultSel = 0, the per-channel VDDOKFault_ bits are not mapped to the SupplyErr bit in the Interrupt register; hence, VDDOKFault_ bits do not generate an interrupt on the FAULT pin</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Bits[3:0] in the DoiLevel register are per-channel DOI_ pin logic level</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Bits[3:0] in DoiLevel register are per-channel VDDOK fault diagnostics for VDD_ supply</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>AboveVDDProtEn</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> Disable Above-VDD protection</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Enable Above-VDD protection. External pMOS transistors on G_ pins are turned-off when Above-VDD fault is detected on DOI_ pins </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OVLStretchEn</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description></Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable a 100ms (typ) minimum delay time to avoid channel thermal overload faults (OVL_ bits in the OvrLdChF register) toggling on and off when turning on a cold incandescent lamp </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>  Enable a 100ms (typ) minimum delay time to avoid channel thermal overload faults (OVL_ bits in the OvrLdChF register) toggling on and off when turning on a cold incandescent lamp</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OVLBlank</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>These bits select the banking time for the OVL_ diagnostic bits in the OvrLdChF register and apply to all DOI_ channels no matter they are on or off. </Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable the blanking time for the OVL_ diagnostic bits</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description> Set the OVL_ blanking time to 8ms (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description> Set the OVL_ blanking time to 50ms (typ)</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Set the OVL_ blanking time to 300ms (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ConfigDO</Name>
+		<Address>0x00D</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>DoMode4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The DoMode4[1:0] bits select the digital output operating mode for DOI4.</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> High-side</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>High-side with 2x inrush current for tINRUSH time (see CL4[1:0] bits for details) </Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description> Active-clamp push-pull </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Simple push-pull </Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoMode3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The DoMode3[1:0] bits select the digital output operating mode for DOI3.</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> High-side</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>High-side with 2x inrush current for tINRUSH time (see CL3[1:0] bits for details) </Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description> Active-clamp push-pull </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Simple push-pull </Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoMode2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The DoMode2[1:0] bits select the digital output operating mode for DOI2.</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> High-side</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>High-side with 2x inrush current for tINRUSH time (see CL2[1:0] bits for details) </Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description> Active-clamp push-pull </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Simple push-pull </Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>DoMode1</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The DoMode1[1:0] bits select the digital output operating mode for DOI1.</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description> High-side</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>High-side with 2x inrush current for tINRUSH time (see CL1[1:0] bits for details) </Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description> Active-clamp push-pull </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Simple push-pull </Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>CurrLim</Name>
+		<Address>0x00E</Address>
+		<Description></Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>CL4</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The CL4[1:0] bits set the current limit for DOI4 high-side transistor</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CL3</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The CL3[1:0] bits set the current limit for DOI3 high-side transistor</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CL2</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The CL2[1:0] bits set the current limit for DOI2 high-side transistor</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CL11</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The CL1[1:0] bits set the current limit for DOI1 high-side transistor</Description>
+			<Visibility>Public</Visibility>
+			<Width>2</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
+						<Value>00</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
+						<Value>01</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
+						<Value>11</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>Mask</Name>
+		<Address>0x00F</Address>
+		<Description>Disabling the mask (setting the bit = 0) enables the fault source to assert the FAULT pin output. Enabling the mask (setting the bit = 1) disables the fault source to assert the FAULT pin output.</Description>
+		<Exists>True</Exists>
+		<Width>8</Width>
+		<Notes></Notes>
+		<BitFields>
+		<BitField>
+			<Name>ComErrM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Independent of this bit setting, the error conditions are flagged using the ComErr bit in the Interrupt register and the GLOBF bit in the SDO data packet. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of watchdog error and SPI/CRC error bits on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Enable masking of watchdog error and SPI/CRC error bits on the FAULT pin </Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>0</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>SupplyErrM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Independent of this bit, the error conditions are flagged using the SupplyErr bit in the Interrupt register and the GLOBF bit in the SDO data packet. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of supply errors on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Enable masking of supply errors on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>1</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>VddOKM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>The SupplyErr bit is always active and not affected by this bit setting.</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of VDD_Low and VDD_Warn errors on the FAULT pin </Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable masking of VDD_Low and VDD_Warn errors on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>2</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>ShtVddM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If the short-to-VDD detection is enabled in the ShtVDDEn register, short-toVDD conditions are signaled in the SHVDD_ bits in the ShtVDDChF register, and the SHTVDD bit in the SPI SDO data. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of short-to-VDD error on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description> Enable masking of short-to-VDD error on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>3</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>AboveVDDM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If the above-VDD detection is enabled in the ShtVDDEn register, above-VDD conditions are signaled in the AboveVDD_ bits in the OpnWirChF register, and the AbvVDD bit in the SPI SDO data. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of above-VDD error on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable masking of above-VDD error on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>4</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OWOffM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If the open-wire detection in off state is enabled by the OwOffEn_ bits in the OpnWrEn register, the open-wire detection in off state is signaled by the OWOff_ bits in the OpnWirChF register and the OWOffF bit in the SPI SDO data</Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of open-wire in off-state error on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable masking of open-wire in off-state error on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>5</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>CurrLimM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>If the open-wire detection in off state is enabled by the OwOffEn_ bits in the OpnWrEn register, the open-wire detection in off state is signaled by the OWOff_ bits in the OpnWirChF register and the OWOffF bit in the SPI SDO data. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of open-wire in off-state error on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable masking of open-wire in off-state error on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>6</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		<BitField>
+			<Name>OverLdM</Name>
+			<Access>R/W</Access>
+			<DefaultValue>0</DefaultValue>
+			<Description>Independent of this bit setting, thermal overload faults are always signaled by the OVL_ bits in the OvrLdChF register and the OvldF bit in the SPI SDO data. </Description>
+			<Visibility>Public</Visibility>
+			<Width>1</Width>
+			<Notes></Notes>
+			<Options>
+					<Option>
+						<Description>Disable masking of thermal overload error on the FAULT pin</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable masking of thermal overload error on the FAULT pin</Description>
+						<Value>1</Value>
+					</Option>
+			</Options>
+			<BitOffset>0</BitOffset>
+			<RegOffset>7</RegOffset>
+			<SliceWidth>1</SliceWidth>
+		</BitField>
+		</BitFields>
+	</Register>
+</max14906_public>

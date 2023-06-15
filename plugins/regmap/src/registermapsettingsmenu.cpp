@@ -24,11 +24,12 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     setMenuHeader("Settings", color, false);
 
     setStyleSheet("font: normal; color: white; font-size: 16px");
+
     QVBoxLayout *settingsLayout = new QVBoxLayout();
     this->setLayout(settingsLayout);
 
     //autoread section
-    scopy::gui::SubsectionSeparator *autoreadSection = new scopy::gui::SubsectionSeparator("Autoread", false);
+    scopy::gui::SubsectionSeparator *autoreadSection = new scopy::gui::SubsectionSeparator("", false);
     insertSection(autoreadSection);
 
     QCheckBox *autoread = new QCheckBox("Autoread");
@@ -45,7 +46,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     setIntervalWidget->setLayout(setIntervalWidgetLayout);
 
     QHBoxLayout *startReadIntervalLayout = new QHBoxLayout();
-    startReadIntervalLayout->addWidget(new QLabel("0x"));
+    startReadIntervalLayout->addWidget( new QLabel("0x"));
     setIntervalWidgetLayout->addLayout(startReadIntervalLayout);
 
     QLineEdit *startReadInterval = new QLineEdit();
@@ -108,6 +109,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     findPathLayout->addWidget(filePath);
     findPathLayout->addWidget(pathButton);
+    findPathLayout->setAlignment(pathButton, Qt::AlignRight);
     intervalSection->getContentWidget()->layout()->addWidget(findPathWidget);
 
 

@@ -21,18 +21,22 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 {
     scopy::setDynamicProperty(this, "has_frame", true);
 
+
     setStyleSheet("::hover {background-color: #4a34ff; }");
 
-    setMinimumWidth(10);
-    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Preferred);
+    setMinimumWidth(60);
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
     layout = new QHBoxLayout();
-    layout->setMargin(0);
-    layout->setSpacing(0);
 
     QVBoxLayout *rightLayout = new QVBoxLayout();
     rightLayout->setAlignment(Qt::AlignRight);
 
-    value = new QLabel("Not Read");
+    value = new QLabel("N/R");
+    value->setAlignment(Qt::AlignRight);
+//    value->setMinimumWidth(60);
+    value->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
+//    value->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
+    value->setMinimumWidth(25);
     QLabel *bitfieldWidth = new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset));
     bitfieldWidth->setAlignment(Qt::AlignRight);
     rightLayout->addWidget(bitfieldWidth);
@@ -41,8 +45,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
     QVBoxLayout *leftLayout = new QVBoxLayout();
     leftLayout->setAlignment(Qt::AlignTop);
     QLabel *descriptionLabel = new QLabel(name);
-    descriptionLabel->setWordWrap(true);
-
+    descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     leftLayout->addWidget(descriptionLabel);
 
     layout->addLayout(leftLayout);
