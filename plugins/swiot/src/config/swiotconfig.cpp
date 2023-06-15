@@ -91,16 +91,20 @@ void SwiotConfig::setDevices(iio_context *ctx) {
 QPushButton *SwiotConfig::createConfigBtn() {
 	auto *configBtn = new QPushButton();
 	configBtn->setObjectName(QString::fromUtf8("configBtn"));
+	configBtn->setLayoutDirection(Qt::RightToLeft);
 	configBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
 						   "  width: 95px;\n"
 						   "  height: 40px;\n"
 						   "  font-size: 12px;\n"
-						   "  text-align: center;\n"
+						   "  text-align: left;\n"
 						   "  font-weight: bold;\n"
 						   "  padding-left: 15px;\n"
 						   "  padding-right: 15px;\n"
 						   "}"));
 	configBtn->setProperty("blue_button", QVariant(true));
+	QIcon icon = QIcon(":/gui/icons/scopy-default/icons/save.svg");
+	configBtn->setIcon(icon);
+	configBtn->setIconSize(QSize(13, 13));
 	configBtn->setText("Apply");
 	return configBtn;
 }
