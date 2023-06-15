@@ -366,20 +366,24 @@ void Ad74413r::createDevicesMap(iio_context *ctx)
 
 QPushButton* Ad74413r::createBackBtn()
 {
-	QPushButton* backBtn = new QPushButton();
+	QPushButton* backBtn = new QPushButton(this);
 	backBtn->setObjectName(QString::fromUtf8("backBtn"));
+	backBtn->setLayoutDirection(Qt::RightToLeft);
 	backBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-						 "  width: 95px;\n"
+						 "  width: 80px;\n"
 						 "  height: 40px;\n"
 						 "\n"
 						 "  font-size: 12px;\n"
-						 "  text-align: center;\n"
+						 "  text-align: left;\n"
 						 "  font-weight: bold;\n"
 						 "  padding-left: 15px;\n"
 						 "  padding-right: 15px;\n"
 						 "}"));
-	backBtn->setProperty("blue_button", QVariant(true));
 	backBtn->setText("Config");
+	QIcon icon = QIcon(":/gui/icons/scopy-default/icons/preferences.svg");
+	backBtn->setIcon(icon);
+	backBtn->setIconSize(QSize(13, 13));
+	backBtn->setProperty("blue_button", QVariant(true));
 	return backBtn;
 }
 
