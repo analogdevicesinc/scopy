@@ -15,12 +15,13 @@ using namespace scopy;
 using namespace regmap;
 using namespace regmap::gui;
 
-BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, int defaultValue, QString description,
+BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int defaultValue, QString description,
                                                int width, QString notes, int regOffset, QMap<QString, QString> *options, QWidget *parent)
     :options(options),
     width(width),
     description(description),
-    regOffset(regOffset)
+    regOffset(regOffset),
+    access(access)
 {
     scopy::setDynamicProperty(this, "has_frame", true);
     scopy::setDynamicProperty(this, "has_bottom_border", true);
@@ -75,7 +76,9 @@ void BitFieldDetailedWidget::firstRead()
         valueLineEdit->setText("0x0");
         valueLineEdit->setReadOnly(true);
         layout->replaceWidget(value,valueLineEdit);
-    } else if (options &&  !options->isEmpty()) {
+    }else if (access == "R") {
+
+    }  else if (options &&  !options->isEmpty()) {
         valueComboBox = new QComboBox();
 
         //check if there are enough options to cover all posible cases for the number of bits
@@ -126,9 +129,13 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
         firstRead();
     }
 
+    // if bit is reserved or read only
     if (description == "Reserved") {
         Q_EMIT valueUpdated("0");
 
+    } else if (access == "R") {
+        value->setText(newValue);
+        Q_EMIT valueUpdated(newValue);
     } else {
         if (valueLineEdit) {
             valueLineEdit->setText(newValue);
