@@ -88,7 +88,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
     layout->addWidget(registerController,1);
 
     if (registerMapTemplate) {
-        registerChanged(registerMapTemplate->getRegisterTemplate(2000));
+        registerChanged(registerMapTemplate->getRegisterList()->first());
     }
 }
 
