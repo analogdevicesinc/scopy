@@ -2,7 +2,8 @@
     "spi": [
         {
             "file_name": "ad9361-phy.xml",
-            "use_description_as_name": true
+            "use_register_description_as_name": true,
+            "use_bitfield_description_as_name": true
         }
     ],
     "axi": [

@@ -48,9 +48,11 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         scopy::setDynamicProperty(tableHeadWidget, "has_frame", true);
         scopy::setDynamicProperty(tableHeadWidget, "has_bottom_border", true);
         QHBoxLayout *tableHead = new QHBoxLayout();
-        Utils::removeLayoutMargins(tableHead);
         tableHeadWidget->setLayout(tableHead);
-        tableHead->addWidget(new QLabel(""), 1);
+
+        QLabel *empty = new QLabel("");
+        empty->setFixedWidth(130);
+        tableHead->addWidget(empty, 1);
 
         for (int i = Utils::getBitsPerRow(); i >= 0; i--) {
             tableHead->addWidget(new QLabel("Bit"+QString::number(i)),1);
