@@ -135,18 +135,22 @@ void Faults::pollFaults() {
 QPushButton *Faults::createBackButton() {
 	auto *backButton = new QPushButton();
 	backButton->setObjectName(QString::fromUtf8("backButton"));
+	backButton->setLayoutDirection(Qt::RightToLeft);
 	backButton->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-						    "  width: 95px;\n"
+						    "  width: 80px;\n"
 						    "  height: 40px;\n"
 						    "\n"
 						    "  font-size: 12px;\n"
-						    "  text-align: center;\n"
+						    "  text-align: left;\n"
 						    "  font-weight: bold;\n"
 						    "  padding-left: 15px;\n"
 						    "  padding-right: 15px;\n"
 						    "}"));
 	backButton->setProperty("blue_button", QVariant(true));
 	backButton->setText("Config");
+	QIcon icon = QIcon(":/gui/icons/scopy-default/icons/preferences.svg");
+	backButton->setIcon(icon);
+	backButton->setIconSize(QSize(13, 13));
 	return backButton;
 }
 
