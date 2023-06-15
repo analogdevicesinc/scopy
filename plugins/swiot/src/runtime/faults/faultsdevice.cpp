@@ -90,7 +90,6 @@ void FaultsDevice::updateExplanations() {
 void FaultsDevice::updateMinimumHeight() {
 	this->ensurePolished();
 	this->m_faults_explanation->ensurePolished();
-	qWarning() << "FaultsDevice::updateMinimumHeight()";
 	this->m_faultsGroup->ensurePolished();
 }
 
