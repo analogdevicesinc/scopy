@@ -54,6 +54,7 @@ private:
 	Ui::ScopyHomeAddPage *ui;
 	QString pendingUri;
 	QFutureWatcher<bool> *fw;
+	QFutureWatcher<void> *fwScan;
 
 	IIOScanTask *scanTask;
 	QStringList scanParamsList;
@@ -62,6 +63,7 @@ private:
 	DeviceImpl *deviceImpl;
 	LibSerialPortSupport *libSerialSupport;
 	QList<PluginEntry*> pluginDescriptionList;
+	QMovie *loadingIcon;
 
 	const QVector<unsigned int> availableBaudRates = {2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
 };
