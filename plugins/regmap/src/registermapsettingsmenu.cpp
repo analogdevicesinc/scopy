@@ -23,6 +23,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     const QColor *color = new QColor("orange");
     setMenuHeader("Settings", color, false);
 
+    setStyleSheet("font: normal; color: white; font-size: 16px");
     QVBoxLayout *settingsLayout = new QVBoxLayout();
     this->setLayout(settingsLayout);
 
