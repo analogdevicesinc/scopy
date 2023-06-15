@@ -2,6 +2,7 @@
 
 #include "devicefactory.h"
 #include "deviceloader.h"
+#include "qmovie.h"
 #include "ui_scopyhomeaddpage.h"
 #include "iioutil/contextprovider.h"
 #include <QtConcurrent>
@@ -21,6 +22,13 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	verifyIioBackend();
 	pendingUri = "";
 
+	//loading icon
+	loadingIcon = new QMovie(this);
+	loadingIcon->setFileName(":/gui/loading.gif");
+	connect(loadingIcon, &QMovie::frameChanged, [=]{
+	    ui->btnScan->setIcon(loadingIcon->currentPixmap());
+	});
+
 	//verify
 	fw = new QFutureWatcher<bool>(this);
 	connect(fw, &QFutureWatcher<bool>::finished, this, [=](){
@@ -37,6 +45,13 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	//scan
 	scanTask = new IIOScanTask(this);
 	connect(scanTask, SIGNAL(scanFinished(QStringList)), this, SLOT(scanFinished(QStringList)));
+	fwScan = new QFutureWatcher<void>(this);
+	connect(fwScan, &QFutureWatcher<void>::finished, this, [=](){
+		loadingIcon->stop();
+		ui->btnScan->setIcon(QIcon());
+		ui->btnScan->setText("Scan");
+		ui->btnScan->setEnabled(true);
+	});
 
 	//btns connections
 	connect(ui->btnBack, &QPushButton::clicked, this, [=](){
@@ -200,10 +215,14 @@ void ScopyHomeAddPage::futureVerify()
 void ScopyHomeAddPage::futureScan()
 {
 	QString scanParams = scanParamsList.join("");
-	QtConcurrent::run([=](){
+	QFuture<void> f = QtConcurrent::run([&](){
 		scanTask->setScanParams(scanParams);
 		scanTask->run();
 	});
+	fwScan->setFuture(f);
+	(f.isStarted()) ? loadingIcon->start() : loadingIcon->stop();
+	ui->btnScan->setText("");
+	ui->btnScan->setEnabled(false);
 }
 
 void ScopyHomeAddPage::deviceAddedToUi(QString id)
