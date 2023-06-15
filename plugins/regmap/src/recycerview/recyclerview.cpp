@@ -23,6 +23,7 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
     bitFieldsWidgetLayout->setMargin(0);
     bitFieldsWidgetLayout->setSpacing(0);
     QWidget *bitFieldsWidget = new QWidget();
+    bitFieldsWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
     bitFieldsWidget->setLayout(bitFieldsWidgetLayout);
 
     m_scrollArea = new VerticalScrollArea();
