@@ -16,11 +16,13 @@ DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 	ui->name->setText(d->displayName());
 	ui->iconPlaceHolder->layout()->addWidget(d->icon());
 	ui->iconPlaceHolder->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding );
-	QPushButton *forgetBtn = new QPushButton("X",d->icon());
-	forgetBtn->setStyleSheet("color:red");
+	QPushButton *forgetBtn = new QPushButton("",d->icon());
+	forgetBtn->setStyleSheet("background-color: transparent; border: 0px");
+	QIcon forgetIcon = QIcon(":/gui/icons/orange_close.svg");
+	forgetBtn->setIcon(forgetIcon);
 	QLabel *connectionBadge = new QLabel("",d->icon());
 	forgetBtn->setMaximumSize(20,20);
-	forgetBtn->move(80,0);
+	forgetBtn->move(80,80);
 	connectionBadge->setMaximumSize(20,20);
 	connectionBadge->move(0,0);
 	if(!d->displayParam().isEmpty())
