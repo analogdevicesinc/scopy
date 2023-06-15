@@ -16,15 +16,16 @@ class BitFieldDetailedWidget : public QFrame
 {
 	Q_OBJECT
 public:
-	explicit BitFieldDetailedWidget(QString name,
-				int defaultValue,
-				QString description,
-				int width,
-				QString notes,
-				int regOffset,
-				QMap<QString,QString> *options,
-				QWidget *parent = nullptr);
-	~BitFieldDetailedWidget();
+    explicit BitFieldDetailedWidget(QString name,
+                                    QString access,
+                                    int defaultValue,
+                                    QString description,
+                                    int width,
+                                    QString notes,
+                                    int regOffset,
+                                    QMap<QString,QString> *options,
+                                    QWidget *parent = nullptr);
+    ~BitFieldDetailedWidget();
 
 	QString getToolTip() const;
 	void updateValue(QString newValue);
@@ -41,6 +42,7 @@ private:
 	QString description;
 	bool reserved;
 	int regOffset;
+    QString access;
 
 	QMap<QString,QString> *options;
 	QLabel *value;
