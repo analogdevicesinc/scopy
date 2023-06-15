@@ -45,19 +45,23 @@ jobs:
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
                 cristianbindea/scopy2-mingw64:latest C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/inside_mingw_docker.sh'
 
+    - name: Set short git commit SHA
+      shell: bash
+      run: echo "commit_sha=$(git rev-parse --short ${{ github.sha }})" >> "$GITHUB_ENV"
+
     - uses: actions/upload-artifact@v3
       with:
-        name: scopy-x86_64
+        name: scopy-windows-x86_64-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-x86_64
 
 #    - uses: actions/upload-artifact@v3
 #      with:
-#        name: debug-x86_64
+#        name: debug-x86_64-${{ env.commit_sha }}
 #        path: ${{ github.workspace }}\artifacts\debug-x86_64
 
     - uses: actions/upload-artifact@v3
       with:
-        name: scopy-x86_64-setup
+        name: scopy-windows-x86_64-setup-${{ env.commit_sha }}
         path: ${{ github.workspace }}\artifacts\scopy-64-setup.exe
 
     # Debug session
