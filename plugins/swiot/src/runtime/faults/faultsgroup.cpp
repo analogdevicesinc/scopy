@@ -20,7 +20,8 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QMap<int, QString> *
 	ui(new Ui::FaultsGroup),
 	m_name(std::move(name)),
 	m_specialFaults(specialFaults),
-	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this)) {
+	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
+{
 	ui->setupUi(this);
 
 	connect(m_customColGrid, &FlexGridLayout::reqestLayoutUpdate, this, [this]() {
@@ -37,7 +38,7 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QMap<int, QString> *
 		}
 
 		this->ui->activeStoredWidget->setMaximumHeight(m_customColGrid->sizeHint().height());
-		this->setFixedHeight(this->sizeHint().height() + 1);
+		this->setMaximumHeight(this->sizeHint().height() + 1);
 
 		Q_EMIT minimumSizeChanged();
 	});
@@ -212,10 +213,3 @@ std::set<unsigned int> FaultsGroup::getSelectedIndexes() {
 std::set<unsigned int> FaultsGroup::getActiveIndexes() {
 	return m_actives;
 }
-
-void FaultsGroup::resizeEvent(QResizeEvent *event) {
-	this->ui->activeStoredWidget->setMaximumHeight(m_customColGrid->sizeHint().height());
-
-	QWidget::resizeEvent(event);
-}
-
