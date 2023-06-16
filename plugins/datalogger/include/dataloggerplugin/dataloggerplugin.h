@@ -6,7 +6,7 @@
 
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopy-datalogger_export.h"
+#include "scopy-dataloggerplugin_export.h"
 #include <iioutil/contextprovider.h>
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iiopingtask.h"
@@ -30,7 +30,7 @@ class Context;
 
 namespace scopy {
 namespace datalogger {
-class SCOPY_DATALOGGER_EXPORT DataLoggerPlugin : public QObject, public PluginBase
+class SCOPY_DATALOGGERPLUGIN_EXPORT DataLoggerPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
