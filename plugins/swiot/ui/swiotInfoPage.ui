@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>SWIOT</string>
+      <string>SWIOT1L</string>
      </property>
     </widget>
    </item>
