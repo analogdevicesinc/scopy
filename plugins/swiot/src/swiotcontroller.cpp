@@ -29,6 +29,7 @@ SwiotController::SwiotController(QString uri, QObject *parent)
 {
 	pingTask = nullptr;
 	pingTimer = nullptr;
+	identifyTask = nullptr;
 }
 
 SwiotController::~SwiotController()
@@ -101,4 +102,16 @@ void SwiotController::stopTemperatureTask() {
 	temperatureTimer->stop();
 	temperatureTask->requestInterruption();
 	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+}
+
+void SwiotController::identify()
+{
+	if(!identifyTask) {
+		identifyTask = new SwiotIdentifyTask(uri);
+		identifyTask->start();
+		connect(identifyTask,&QThread::finished,this,[=](){
+			delete identifyTask;
+			identifyTask = nullptr;
+		});
+	}
 }
