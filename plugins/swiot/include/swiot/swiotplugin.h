@@ -36,11 +36,13 @@ public Q_SLOTS:
 	void startCtxSwitch();
 	void onCtxSwitched();
 
+	void showPageCallback() override;
+	void hidePageCallback() override;
+
 private:
 	void setupToolList();
 
 	SwiotInfoPage *m_infoPage;
-//	Ui::SWIOTInfoPage *infoui;
 
 	QWidget *config;
 	QWidget *adtool;

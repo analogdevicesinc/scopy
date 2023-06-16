@@ -26,16 +26,32 @@ bool SWIOTPlugin::loadPage()
 {
 	m_page = new QWidget();
 	m_page->setLayout(new QVBoxLayout(m_page));
-	m_page->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+	m_page->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_infoPage = new swiot::SwiotInfoPage(m_page);
 	m_page->layout()->addWidget(m_infoPage);
-	connect(m_infoPage->getCtxAttrsButton(), &QPushButton::clicked, this, [this] (){
-		auto &&cp = ContextProvider::GetInstance();
-		iio_context* ctx = cp->open(m_param);
-		QString hw_serial = QString(iio_context_get_attr_value(ctx,"hw_serial"));
-		cp->close(m_param);
-		m_infoPage->setText(hw_serial);
+	m_page->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+
+	connect(m_swiotController, &SwiotController::readTemperature, this, [this] (double temperature) {
+		m_infoPage->update("Temperature", QString::number(temperature));
 	});
+
+	auto cp = ContextProvider::GetInstance();
+	struct iio_context* context = cp->open(m_param);
+
+	ssize_t attributeCount = iio_context_get_attrs_count(context);
+	for (int i = 0; i < attributeCount; ++i) {
+		const char *name;
+		const char *value;
+		int ret = iio_context_get_attr(context, i, &name, &value);
+		if (ret < 0) {
+			qWarning(CAT_SWIOT) << "Could not read attribute with index:" << i;
+			continue;
+		}
+
+		m_infoPage->update(name, value);
+	}
+
+	cp->close(m_param);
 	m_page->ensurePolished();
 
 	return true;
@@ -46,6 +62,14 @@ bool SWIOTPlugin::loadIcon()
 	m_icon = new QLabel("");
 	m_icon->setStyleSheet("border-image: url(:/swiot/swiot_icon.svg);");
 	return true;
+}
+
+void SWIOTPlugin::showPageCallback() {
+	m_swiotController->startTemperatureTask();
+}
+
+void SWIOTPlugin::hidePageCallback() {
+	m_swiotController->stopTemperatureTask();
 }
 
 void SWIOTPlugin::loadToolList()
@@ -186,6 +210,7 @@ bool SWIOTPlugin::onDisconnect()
 
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
+	m_swiotController->stopTemperatureTask();
 	m_swiotController->disconnectSwiot();
 
 	delete m_swiotController;
@@ -201,6 +226,7 @@ void SWIOTPlugin::startCtxSwitch()
 {
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
+	m_swiotController->stopTemperatureTask();
 	ContextProvider::GetInstance()->close(m_param);
 	m_swiotController->startSwitchContextTask(m_isRuntime);
 }
