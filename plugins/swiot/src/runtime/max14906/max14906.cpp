@@ -237,12 +237,11 @@ void Max14906::initChannels() {
 
 	for (int i = 0; i < channel_num - 1; ++i) { // -1 because of the fault channel
 		struct iio_channel *channel = iio_device_get_channel(this->max14906ToolController->getDevice(), i);
-		auto *channel_control = new DioDigitalChannelController(
+		DioDigitalChannelController *channel_control = new DioDigitalChannelController(
 			channel,
 			this->max14906ToolController->getChannelName(i),
 			this->max14906ToolController->getChannelType(i),
-			this
-		);
+			m_cmdQueue, this);
 
 		this->m_channelControls.insert(i, channel_control);
 		this->m_readerThread->addDioChannel(i, channel);
