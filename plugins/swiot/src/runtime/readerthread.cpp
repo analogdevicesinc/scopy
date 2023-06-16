@@ -28,12 +28,14 @@ void ReaderThread::addDioChannel(int index, struct iio_channel *channel) {
 void ReaderThread::runDio() {
 	qDebug(CAT_SWIOT_MAX14906) << "DioReaderThread started";
         try {
-                if (!this->m_dioChannels.empty()) {
-                        for (int index: this->m_dioChannels.keys()) {
-                                double raw = -1;
-                                iio_channel_attr_read_double(this->m_dioChannels[index], "raw", &raw);
+
+		if (!this->m_dioChannels.empty()) {
+			auto keys = this->m_dioChannels.keys();
+			for (int index : keys) {
+				double raw = -1;
+				iio_channel_attr_read_double(this->m_dioChannels[index], "raw", &raw);
 				qDebug(CAT_SWIOT_MAX14906) << "Channel with index " << index << " read raw value: " << raw;
-                                Q_EMIT channelDataChanged(index, raw);
+				Q_EMIT channelDataChanged(index, raw);
                         }
                 }
         } catch (...) {
@@ -58,10 +60,11 @@ double ReaderThread::convertData(unsigned int data, int idx)
 void ReaderThread::enableIioChnls()
 {
         if (m_iioDev) {
-                for(const auto &key : m_chnlsInfo.keys()) {
+		auto keys = m_chnlsInfo.keys();
+		for(const auto &key : keys) {
                         struct iio_channel* iioChnl = m_chnlsInfo[key]->iioChnl;
                         bool isEnabled = iio_channel_is_enabled(iioChnl);
-                        if (m_chnlsInfo[key]->isEnabled) {
+			if (m_chnlsInfo[key]->isEnabled) {
                                 if (!isEnabled) {
                                         iio_channel_enable(iioChnl);
                                 }
@@ -80,7 +83,8 @@ QVector<std::pair<double, double>> ReaderThread::getOffsetScaleVector()
 {
         QVector<std::pair<double, double>> offsetScalePairs = {};
 
-        for (const auto &key : m_chnlsInfo.keys()) {
+	auto keys = m_chnlsInfo.keys();
+	for (const auto &key : keys) {
                 if (m_chnlsInfo[key]->isEnabled) {
                         offsetScalePairs.push_back(m_chnlsInfo[key]->offsetScalePair);
                 }
@@ -90,8 +94,9 @@ QVector<std::pair<double, double>> ReaderThread::getOffsetScaleVector()
 
 int ReaderThread::getEnabledChnls()
 {
-        int enChnls = 0;
-        for (const auto &key : m_chnlsInfo.keys()) {
+	int enChnls = 0;
+	auto keys = m_chnlsInfo.keys();
+	for (const auto &key : keys) {
                 if (iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl)) {
                         enChnls++;
                 }
