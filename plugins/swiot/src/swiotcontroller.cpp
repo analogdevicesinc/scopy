@@ -69,3 +69,16 @@ void SwiotController::stopPowerSupplyTask()
 	extPsTask->requestInterruption();
 	disconnect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this, &SwiotController::hasConnectedPowerSupply);
 }
+
+void SwiotController::startTemperatureTask() {
+	temperatureTask = new SwiotReadTemperatureTask(uri, this);
+	temperatureTimer = new CyclicalTask(temperatureTask);
+	temperatureTimer->start(1000);
+	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+}
+
+void SwiotController::stopTemperatureTask() {
+	temperatureTimer->stop();
+	temperatureTask->requestInterruption();
+	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+}
