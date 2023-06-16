@@ -3,20 +3,12 @@
 
 #include <QWidget>
 #include <infopage.h>
-#include "ui_swiotInfoPage.h"
 
 namespace scopy::swiot {
-class SwiotInfoPage : public QWidget {
+class SwiotInfoPage : public InfoPage {
 	Q_OBJECT
 public:
 	explicit SwiotInfoPage(QWidget* parent = nullptr);
-	~SwiotInfoPage();
-
-	QPushButton* getCtxAttrsButton() const; // TODO: rename this
-	void setText(const QString& text);
-
-private:
-	Ui::SWIOTInfoPage *ui;
 };
 }
 

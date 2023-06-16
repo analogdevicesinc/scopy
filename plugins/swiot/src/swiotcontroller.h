@@ -7,6 +7,7 @@
 #include "iioutil/cyclicaltask.h"
 #include "src/externalpsreaderthread.h"
 #include "src/swiotswitchctxtask.h"
+#include "src/swiotreadtemperaturetask.h"
 
 
 namespace scopy::swiot {
@@ -26,6 +27,9 @@ public:
 	void startSwitchContextTask(bool isRuntime);
 	void stopSwitchContextTask();
 
+	void startTemperatureTask();
+	void stopTemperatureTask();
+
 	void connectSwiot(iio_context *ctx);
 	void disconnectSwiot();
 
@@ -34,18 +38,20 @@ Q_SIGNALS:
 	void pingFailed();
 	void contextSwitched();
 	void hasConnectedPowerSupply(bool ps);
+	void readTemperature(double temperature);
 
 private:
 	IIOPingTask *pingTask;
 	SwiotSwitchCtxTask *switchCtxTask;
 	ExternalPsReaderThread *extPsTask;
+	SwiotReadTemperatureTask *temperatureTask;
 	iio_context *m_iioCtx;
 	QString uri;
 
 	CyclicalTask *pingTimer;
 	CyclicalTask *switchCtxTimer;
 	CyclicalTask *powerSupplyTimer;
-
+	CyclicalTask *temperatureTimer;
 };
 }
 
