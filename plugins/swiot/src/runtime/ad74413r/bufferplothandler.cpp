@@ -77,8 +77,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	for (unsigned int i = 0; i < plotChnlsNo; i++) {
 		m_plot->Curve(i)->setAxes(
 					QwtAxisId(QwtAxis::XBottom, 0),
-					QwtAxisId(QwtAxis::YLeft, i));
-		//need to be by chnl id not by plot chnl idx
+					QwtAxisId(QwtAxis::YRight, i));
 		if (i < configuredChnlsNo) {
 			m_plot->Curve(i)->setTitle("CH " + QString::number(i+1));
 		} else {
