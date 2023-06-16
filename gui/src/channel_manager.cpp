@@ -27,9 +27,9 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 
 	header = new QWidget();
 	auto headerLayout = new QHBoxLayout(header);
-	header->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+	header->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
 	headerLayout->setMargin(10);
-	headerLayout->setSpacing(0);
+	headerLayout->setSpacing(10);
 
 	toolStatus = new QLabel("");
 	channelManagerToggled = false;
@@ -43,13 +43,10 @@ ChannelManager::ChannelManager(ChannelsPositionEnum position, QWidget* parent)
 	toggleChannels->setStyleSheet("font-size: 12px; color: rgba(255, 255, 255, 70);");
 	toggleChannels->setIcon(my_icon);
 	toggleChannels->setIconSize(QSize(24,24));
-	toggleChannels->setCheckable(true);
-
 	toggleChannels->setFixedWidth(20);
 	toggleChannels->setCheckable(true);
-	toggleChannels->setChecked(true);
-
-	connect(toggleChannels, &QPushButton::clicked, this, &ChannelManager::toggleChannelManager);
+	toggleChannels->setChecked(false);
+	connect(toggleChannels, &QPushButton::toggled, this, &ChannelManager::toggleChannelManager);
 
 	headerLayout->addWidget(toggleChannels);
 	headerLayout->addWidget(toolStatus);
@@ -89,9 +86,10 @@ void ChannelManager::build(QWidget* parent)
 		if (m_position == ChannelsPositionEnum::VERTICAL) {
 			m_position = ChannelsPositionEnum::HORIZONTAL;
 
-			if (channelManagerToggled) {
-//				Q_EMIT toggleChannels->clicked();
-			}
+
+//			if (channelManagerToggled) {
+//				toggleChannels->click();
+//			}
 		} else {
 			m_position = ChannelsPositionEnum::VERTICAL;
 		}
@@ -122,12 +120,12 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 	m_channelsWidget->layout()->setMargin(0);
 	m_channelsWidget->layout()->addWidget(ch);
 	if (m_channelIdVisible) {
-	ch->setFullName(fullName + QString(" %1").arg(chId + 1));
-	ch->setShortName(shortName + QString(" %1").arg(chId + 1));
+		ch->setFullName(fullName + QString(" %1").arg(chId + 1));
+		ch->setShortName(shortName + QString(" %1").arg(chId + 1));
 	} else {
-	ch->setFullName(fullName);
-	ch->setShortName(shortName);
-    }
+		ch->setFullName(fullName);
+		ch->setShortName(shortName);
+	}
 	ch->nameButton()->setText(ch->shortName());
 
 	m_channelsList.append(ch);
@@ -169,7 +167,9 @@ ChannelWidget* ChannelManager::buildNewChannel(int chId, bool deletable, bool si
 
 	ch->enableButton()->setChecked(true);
 	updatePosition(m_position);
-
+	// fake signal
+	toggleChannels->setChecked(true);
+	Q_EMIT toggleChannels->toggled(true);
 	return ch;
 }
 
@@ -324,11 +324,10 @@ void ChannelManager::setChannelIdVisible(bool visible)
 
 void ChannelManager::toggleChannelManager(bool toggled)
 {
-	channelManagerToggled = !channelManagerToggled;
 	Q_EMIT channelManagerToggle(toggled);
 
 	for (auto ch : qAsConst(m_channelsList)) {
-		ch->toggleChannel(channelManagerToggled);
+		ch->toggleChannel(!toggled);
 		if (ch->isMainChannel() ||ch-> isPhysicalChannel()) {
 			ch->setMenuButtonVisibility(toggled);
 		}
