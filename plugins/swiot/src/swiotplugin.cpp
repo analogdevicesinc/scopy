@@ -17,7 +17,7 @@ using namespace scopy::swiot;
 
 void SWIOTPlugin::preload()
 {
-	m_displayName = "SWIOT";
+	m_displayName = "SWIOT1L";
 	m_swiotController = new SwiotController(m_param, this);
 	m_runtime = new SwiotRuntime();
 	connect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched, Qt::QueuedConnection);
@@ -91,7 +91,7 @@ void SWIOTPlugin::unload()
 
 bool SWIOTPlugin::compatible(QString m_param, QString category)
 {
-	m_name = "SWIOT";
+	m_name = "SWIOT1L";
 	bool ret = false;
 	auto &&cp = ContextProvider::GetInstance();
 
