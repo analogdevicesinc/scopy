@@ -53,6 +53,7 @@ void DeviceImpl::loadPlugins() {
 	loadToolList();
 
 	for(auto &p : m_plugins) {
+		connect(dynamic_cast<QObject*>(p),SIGNAL(connectDevice()),this,SLOT(connectDev()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
@@ -65,6 +66,7 @@ void DeviceImpl::unloadPlugins() {
 	QList<Plugin*>::const_iterator pI = m_plugins.constEnd();
 	while(pI != m_plugins.constBegin()) {
 		--pI;
+		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(connectDevice()),this,SLOT(connectDev()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));

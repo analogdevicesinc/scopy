@@ -710,7 +710,7 @@
                          </stereotypes>
                          <name>Device</name>
                          <pos>x:710;y:1520</pos>
-                         <rect>x:-120;y:-190;w:240;h:380</rect>
+                         <rect>x:-120;y:-185;w:240;h:370</rect>
                          <visual-role>5</visual-role>
                          <stereotype-display>1</stereotype-display>
                         </DObject>
@@ -1424,7 +1424,7 @@
                          </stereotypes>
                          <name>Plugin</name>
                          <pos>x:1325;y:1390</pos>
-                         <rect>x:-180;y:-300;w:360;h:600</rect>
+                         <rect>x:-180;y:-305;w:360;h:610</rect>
                          <visual-role>5</visual-role>
                          <stereotype-display>1</stereotype-display>
                         </DObject>
@@ -4397,7 +4397,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{792d152f-9937-4ef8-8ac7-0a1de85c3965}</uid>
+                    <uid>{94069fd5-92dc-4d2d-a734-c5e44150bc19}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString id()</declaration>
@@ -4405,7 +4405,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{b6b239e8-9026-4c7d-8ee9-118a5777b306}</uid>
+                    <uid>{0814edaf-1988-4493-8fe4-0322551437aa}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString category()</declaration>
@@ -4413,7 +4413,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d5e0e096-3c6c-4745-bf94-5b796e69bfb0}</uid>
+                    <uid>{7a8e6629-10f4-455d-a462-c7e60f56019f}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString name()</declaration>
@@ -4421,7 +4421,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{36b081e1-eb74-439b-b839-387ad802a108}</uid>
+                    <uid>{32fee839-d668-4979-98bf-d9a61c4bcd2d}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString param()</declaration>
@@ -4429,7 +4429,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{01470c6d-62a6-43c1-b673-22f84f42d8a2}</uid>
+                    <uid>{bd4b3cb7-6296-4f96-b2cb-5bd8cb6b02f4}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString description()</declaration>
@@ -4437,7 +4437,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1b53d2a3-0c9a-49d9-b444-d18b3ced38cd}</uid>
+                    <uid>{6c5e1a43-3cac-4861-97d3-394f3f6b8cbd}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QWidget *icon()</declaration>
@@ -4445,7 +4445,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9b70042e-97d3-4d63-9f6f-be83efb8de34}</uid>
+                    <uid>{7cd66d18-1d48-4115-b38d-fac7dfdcc42e}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QWidget *page()</declaration>
@@ -4453,7 +4453,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{03b0b464-86ba-4001-bb8d-07956c65e16a}</uid>
+                    <uid>{700e4c72-93e7-4d9f-a52c-37b8b24f7984}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QList&lt;ToolMenuEntry*&gt; toolList()</declaration>
@@ -4461,23 +4461,15 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{f95183b6-7b49-40bd-be76-cada918ad1e9}</uid>
+                    <uid>{cd3891f8-b5c0-4eab-9a21-0c9c81c7d662}</uid>
                     <type>2</type>
                     <properties>3</properties>
-                    <declaration>void loadCompatiblePlugins()</declaration>
+                    <declaration>void preload()</declaration>
                    </MClassMember>
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{5a761e49-6756-4ff9-959f-777d555002b3}</uid>
-                    <type>2</type>
-                    <properties>3</properties>
-                    <declaration>void compatiblePreload()</declaration>
-                   </MClassMember>
-                  </item>
-                  <item>
-                   <MClassMember>
-                    <uid>{1d9b3255-a844-4022-94e3-29475c63f9bb}</uid>
+                    <uid>{b87b6365-0909-439d-a65f-2cffedf54ee2}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void loadPlugins()</declaration>
@@ -4485,7 +4477,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ae28d285-0f6d-412d-866d-98e33bb83432}</uid>
+                    <uid>{3d1240ab-b4f8-4c5b-81fc-c23a04ce466f}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void unloadPlugins()</declaration>
@@ -4493,7 +4485,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{fb89884a-3f6d-477f-86ac-635e050a12a0}</uid>
+                    <uid>{e1cdb6a7-092f-447b-bf0b-1aa103f8c4f6}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4502,7 +4494,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{08e3fd0e-e653-4615-9df1-8156ef3cfeaf}</uid>
+                    <uid>{68859b74-f818-4f0a-bb82-a29060840aa4}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4511,7 +4503,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1265478a-4fd5-49f3-b2c0-6cedab4466a4}</uid>
+                    <uid>{b19cce14-52b1-40b1-8862-a137b81a6ac0}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4520,7 +4512,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{0c27f93c-370b-44ee-9f2a-824df6de6fdd}</uid>
+                    <uid>{c6ecc041-7b47-42ba-b665-24609a202d24}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4529,7 +4521,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{f680ad70-562c-4a50-9393-88fd0f1c6745}</uid>
+                    <uid>{6a5d21c4-19c7-4731-9fd1-727d1a933a3e}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4538,7 +4530,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{8f35fb80-1a53-48c2-8db7-d7d216da9b25}</uid>
+                    <uid>{19b5245d-45b1-4b7f-b1ca-286a48cd8ab4}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4547,7 +4539,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{cf6ded6d-db8e-4799-8bde-b3708bf16b46}</uid>
+                    <uid>{b6036b0b-de64-4e83-aa7e-c29846c3750c}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4556,7 +4548,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{69778e91-827f-4dc4-9861-65a465f59e42}</uid>
+                    <uid>{c0762541-90f9-472a-a22e-2d9c693a0af7}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4565,7 +4557,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{b8bd51e1-caf7-423c-aefd-754102d4603b}</uid>
+                    <uid>{7a86c318-662e-4697-9e0f-6cb1256874ec}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4574,7 +4566,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{053fbde9-e69d-4b94-b91e-53581cd62177}</uid>
+                    <uid>{c3305a68-4d52-4af8-b3e0-af4dad413374}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -4583,7 +4575,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{ddfc5a65-0994-4858-a32b-6487fd714024}</uid>
+                    <uid>{41693a0b-a173-4b6f-b70a-0c278e67af97}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -5891,7 +5883,7 @@
                  <qlist>
                   <item>
                    <MClassMember>
-                    <uid>{8f752b66-1a63-4561-b9c8-3fe48623d62a}</uid>
+                    <uid>{4014520e-2d52-454f-a3b9-98b04277b48f}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void setParam(QString)</declaration>
@@ -5899,7 +5891,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{992d4d24-ebc4-4be0-9038-df00cc4d78d7}</uid>
+                    <uid>{b65513ca-32b7-4b85-873a-534ad90c4d2a}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void preload()</declaration>
@@ -5907,7 +5899,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{e52c2de9-a8e8-4b59-8f81-d27b9ad2696f}</uid>
+                    <uid>{d61a5ba2-5128-42af-971a-d6da03a83dcd}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void initPreferences()</declaration>
@@ -5915,7 +5907,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{66d2c81d-9bc2-41d2-acfd-ffab599922cd}</uid>
+                    <uid>{744904e6-825d-47de-8093-49e63df17728}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void postload()</declaration>
@@ -5923,7 +5915,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9d55f139-41fe-4acd-a26f-68eddadeca03}</uid>
+                    <uid>{ad6cf349-7123-486a-8ab3-9bd1e6a7fcc8}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>bool loadIcon()</declaration>
@@ -5931,7 +5923,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{afec339f-5d40-4fce-ac14-1c27731c4888}</uid>
+                    <uid>{161576ef-1e28-4523-80aa-042d9a8062b4}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>bool loadPage()</declaration>
@@ -5939,7 +5931,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{399d1958-b896-4a5d-a928-c2e236aa15b1}</uid>
+                    <uid>{af9e5afa-d450-46ea-81a0-8d93dd47075c}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void loadToolList()</declaration>
@@ -5947,7 +5939,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{3c0dd87d-0ed1-46b6-bf75-bea0c75b9e20}</uid>
+                    <uid>{5de11a32-8f05-4379-b51b-9b7edcf74a3f}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>bool loadPreferencesPage()</declaration>
@@ -5955,7 +5947,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d88f3ae5-6093-4856-baf5-0e2ce5d2e37a}</uid>
+                    <uid>{d276963b-5edb-40f5-9b4d-34a76f1a2677}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>bool loadExtraButtons()</declaration>
@@ -5963,7 +5955,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c21339e3-636d-4dc1-a337-1c8dd028cbcb}</uid>
+                    <uid>{f86b7407-9549-4ace-a0d3-294e091efc01}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void init()</declaration>
@@ -5971,7 +5963,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{a78efde2-d05d-4ce1-8624-5eac8bdaabc8}</uid>
+                    <uid>{892d0f32-d704-463d-86e1-07f17a889dfd}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void deinit()</declaration>
@@ -5979,7 +5971,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c1039b18-9136-4195-8cd5-23a3dac2a05d}</uid>
+                    <uid>{aae974af-0770-4745-b7fb-f30213722187}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void initMetadata()</declaration>
@@ -5987,7 +5979,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{9e0c0fb6-4184-406e-9817-890eccb8eaaf}</uid>
+                    <uid>{ffdc813b-f1f3-4649-8c32-07ce8878e10d}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void setMetadata(QJsonObject obj)</declaration>
@@ -5995,7 +5987,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{330557dc-259e-4022-9dc2-e0d75aa8632e}</uid>
+                    <uid>{5082a005-f8fb-4d39-8d9a-a7f615ae9e70}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void saveSettings(QSettings&amp;)</declaration>
@@ -6003,7 +5995,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{8182a750-b0d2-44fa-b772-d3ca58ce28fe}</uid>
+                    <uid>{abe020fd-dd39-46fe-b29b-545dc5987b66}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void loadSettings(QSettings&amp;)</declaration>
@@ -6011,7 +6003,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{25c4db0f-bb40-4bc4-8817-3cdbf8106f8a}</uid>
+                    <uid>{7c899173-841f-462f-b4ae-33b2a272d0c1}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void unload()</declaration>
@@ -6019,7 +6011,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{4cbd15ac-8858-4023-b0b2-aab77f470c67}</uid>
+                    <uid>{f615e960-9d75-4190-8398-b8d6ff1864f8}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>bool compatible(QString param)</declaration>
@@ -6027,7 +6019,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{7498a303-d510-4c80-9660-f6e8d93f86a8}</uid>
+                    <uid>{45a72db4-5904-4d0b-8d33-60374f89e18d}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>Plugin* clone()</declaration>
@@ -6035,7 +6027,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{efddd02f-affb-4c89-a611-d85e21352695}</uid>
+                    <uid>{8d9866fe-204d-46d4-8722-4213139b2687}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>void cloneExtra(Plugin*)</declaration>
@@ -6043,7 +6035,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{6631e417-ae36-4a05-9ec2-62ad23d705a6}</uid>
+                    <uid>{8061db89-00d8-4cab-9729-b566e2c5466e}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString param()</declaration>
@@ -6051,7 +6043,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{72c05ae9-800a-4432-81c8-9e2614cd5245}</uid>
+                    <uid>{00e3264b-01f6-4341-9ba0-92166b576b92}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString name()</declaration>
@@ -6059,7 +6051,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{f35211a8-5701-4a4c-9b47-cd004189e3fc}</uid>
+                    <uid>{034243a2-9761-4939-8ae0-7d60d35cf9bc}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString displayName()</declaration>
@@ -6067,7 +6059,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{23826726-c568-430e-944a-9793b575b4a5}</uid>
+                    <uid>{95867797-d1b7-47ab-ac44-b90a8c20b8f9}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString displayDescription()</declaration>
@@ -6075,7 +6067,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{46c03724-1897-419b-bc80-e8e67da0b0a7}</uid>
+                    <uid>{eef4f581-1426-40d6-a87a-6fda2cfe3b39}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QWidget* icon()</declaration>
@@ -6083,7 +6075,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{125904cd-f99e-447a-af36-e99fb0fed139}</uid>
+                    <uid>{a72bbe96-a362-4ae8-b642-65282e357d9a}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QWidget* page()</declaration>
@@ -6091,7 +6083,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{3a380835-fe2f-4f4c-be48-b7af188be220}</uid>
+                    <uid>{7a27f674-a15a-4135-bffc-4c55fdb78a75}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QWidget* preferencesPage()</declaration>
@@ -6099,7 +6091,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{1c84b76f-5d03-4625-bab1-e78a297e49b5}</uid>
+                    <uid>{4e4e3be5-5fef-496b-8c28-f9c58393fed0}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QList&lt;QAbstractButton*&gt; extraButtons()</declaration>
@@ -6107,7 +6099,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{130c03a9-6bc5-4aba-801a-93e7b55c620f}</uid>
+                    <uid>{fa8d8fe5-3c09-4e86-9ef5-b1bb2f1f4212}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QList&lt;adiscope::ToolMenuEntry*&gt; toolList()</declaration>
@@ -6115,7 +6107,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{dddbb7af-989b-4667-8fdd-3cb4df62f0fd}</uid>
+                    <uid>{58ee79ec-a22a-436d-9270-2c8fdd590525}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QJsonObject metadata()</declaration>
@@ -6123,7 +6115,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{2e3bc744-d4e1-4434-aa26-8cefae417a54}</uid>
+                    <uid>{02712944-5dbe-4489-80bd-710a72e7ed51}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString about()</declaration>
@@ -6131,7 +6123,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{144cfe63-b1fb-44e6-b918-212d684e7417}</uid>
+                    <uid>{acecc1ff-5e8c-4784-a310-520a8907d903}</uid>
                     <type>2</type>
                     <properties>3</properties>
                     <declaration>QString version()</declaration>
@@ -6139,7 +6131,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{4ee44fc2-22e3-41ac-9763-d8aa29b20d49}</uid>
+                    <uid>{cfd573ff-3018-44a3-b692-670bbe8f7ea6}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6148,7 +6140,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{fe2324cb-5f0f-42b7-b489-fadc50085409}</uid>
+                    <uid>{460e570b-09a5-4d25-b4fb-234ab1e1033e}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6157,7 +6149,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{c4986570-c97f-47bc-b3da-325f80136ec6}</uid>
+                    <uid>{39bf4c11-3e10-4c96-a82e-aad0b6653bd7}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6166,7 +6158,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{85cd4171-d881-491f-8527-afa362e12949}</uid>
+                    <uid>{e4cffa90-2ef5-4f4c-81e0-a4b5b4966031}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6175,7 +6167,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{341a0524-0e85-4530-93cb-9bbc4df39d70}</uid>
+                    <uid>{78dd9454-b062-402c-a0ba-b9345c8d6163}</uid>
                     <visibility>7</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6184,7 +6176,16 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{7973c13b-29bb-4baa-997d-c3f7408ea243}</uid>
+                    <uid>{30acb4aa-3167-48bc-a249-1568dfec7bfc}</uid>
+                    <visibility>4</visibility>
+                    <type>2</type>
+                    <properties>3</properties>
+                    <declaration>void connectDevice()</declaration>
+                   </MClassMember>
+                  </item>
+                  <item>
+                   <MClassMember>
+                    <uid>{d80efac0-5641-4e04-b2be-d06a600f6873}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6193,7 +6194,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{6bc085a7-0df3-46fc-acec-b9641d7eb7fe}</uid>
+                    <uid>{51362b24-eacb-4894-887b-ed784af7ecf9}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6202,7 +6203,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{77b66e7a-4166-4ca7-a495-4c6c778b7ae0}</uid>
+                    <uid>{9a493c98-d484-425e-9607-38f8d1ce9106}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>
@@ -6211,7 +6212,7 @@
                   </item>
                   <item>
                    <MClassMember>
-                    <uid>{d45c0ec1-6b32-471f-9530-0675ecaf2fd5}</uid>
+                    <uid>{57f4408a-1a37-496a-bc0d-6169cea1f296}</uid>
                     <visibility>4</visibility>
                     <type>2</type>
                     <properties>3</properties>

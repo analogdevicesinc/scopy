@@ -98,6 +98,7 @@ public:\
 	}\
 \
 Q_SIGNALS:\
+	void connectDevice() override;\
 	void disconnectDevice() override;\
 	void restartDevice() override;\
 	void toolListChanged() override;\
