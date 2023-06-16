@@ -24,12 +24,12 @@ class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
 public:
 	void preload() override;
 	bool loadPage() override;
+	bool loadExtraButtons() override;
 	bool loadIcon() override;
 	void loadToolList() override;
 	void unload() override;
 	bool compatible(QString param, QString category) override;
 	void initMetadata() override;
-
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
@@ -41,8 +41,8 @@ public Q_SLOTS:
 
 private:
 	void setupToolList();
-
 	SwiotInfoPage *m_infoPage;
+	QPushButton *m_btnIdentify;
 
 	QWidget *config;
 	QWidget *adtool;

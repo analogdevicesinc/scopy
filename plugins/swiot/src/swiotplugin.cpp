@@ -59,6 +59,13 @@ bool SWIOTPlugin::loadPage()
 	return true;
 }
 
+bool SWIOTPlugin::loadExtraButtons()
+{
+	m_btnIdentify = new QPushButton("Identify"); m_extraButtons.append(m_btnIdentify);
+	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
+	return true;
+}
+
 bool SWIOTPlugin::loadIcon()
 {
 	m_icon = new QLabel("");

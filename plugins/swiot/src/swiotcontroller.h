@@ -8,6 +8,7 @@
 #include "src/externalpsreaderthread.h"
 #include "src/swiotswitchctxtask.h"
 #include "src/swiotreadtemperaturetask.h"
+#include "src/swiotidentifytask.h"
 
 
 namespace scopy::swiot {
@@ -33,6 +34,9 @@ public:
 	void connectSwiot(iio_context *ctx);
 	void disconnectSwiot();
 
+public Q_SLOTS:
+	void identify();
+
 Q_SIGNALS:
 	void pingSuccess();
 	void pingFailed();
@@ -41,6 +45,7 @@ Q_SIGNALS:
 	void readTemperature(double temperature);
 
 private:
+	SwiotIdentifyTask *identifyTask;
 	IIOPingTask *pingTask;
 	SwiotSwitchCtxTask *switchCtxTask;
 	ExternalPsReaderThread *extPsTask;
