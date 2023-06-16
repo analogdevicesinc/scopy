@@ -24,18 +24,17 @@ void SwiotController::startPingTask()
 
 void SwiotController::stopPingTask()
 {
-	pingTimer->stop();
 	pingTask->requestInterruption();
-	disconnect(pingTask, SIGNAL(pingSuccess()), this, SIGNAL(pingSuccess()));
-	disconnect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
+	pingTask->deleteLater();
+	pingTimer->deleteLater();
 }
 
 void SwiotController::startSwitchContextTask(bool isRuntime)
 {
 	switchCtxTask = new SwiotSwitchCtxTask(uri, isRuntime);
 	switchCtxTimer = new CyclicalTask(switchCtxTask, this);
-	switchCtxTimer->start(1000);
 	connect(switchCtxTask, &SwiotSwitchCtxTask::contextSwitched, this, &SwiotController::contextSwitched);
+	switchCtxTimer->start(1000);
 }
 
 void SwiotController::stopSwitchContextTask()
@@ -59,8 +58,8 @@ void SwiotController::startPowerSupplyTask(QString attribute)
 {
 	extPsTask = new ExternalPsReaderThread(uri, attribute);
 	powerSupplyTimer = new CyclicalTask(extPsTask);
-	powerSupplyTimer->start(5000);
 	connect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this, &SwiotController::hasConnectedPowerSupply);
+	powerSupplyTimer->start(5000);
 }
 
 void SwiotController::stopPowerSupplyTask()
