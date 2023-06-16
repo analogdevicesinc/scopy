@@ -243,7 +243,8 @@ void SWIOTPlugin::initMetadata()
 	   "category":[
 	      "iio"
 	   ],
-	   "exclude":["*"]
+	   "exclude":["*", "!debuggerplugin"]
+
 	}
 )plugin");
 }
