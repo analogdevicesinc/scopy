@@ -1,4 +1,5 @@
 #include "max14906.h"
+#include <iioutil/commandqueueprovider.h>
 #include <gui/tool_view_builder.hpp>
 #include "src/swiot_logging_categories.h"
 #include "utils.h"
@@ -24,10 +25,10 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	settingsWidgetSeparator(),
 	m_statusLabel(new QLabel(this)),
 	m_statusContainer(new QWidget(this)),
-	m_readerThread(new ReaderThread(false))
+	m_ctx(ctx),
+	m_cmdQueue(CommandQueueProvider::GetInstance()->open(m_ctx)),
+	m_readerThread(new ReaderThread(false, m_cmdQueue))
 {
-	qInfo(CAT_SWIOT_MAX14906) << "Initialising SWIOT MAX14906.";
-
 	this->ui->setupUi(this);
 	this->setupDynamicUi(this);
 	this->connectSignalsAndSlots();
@@ -120,6 +121,12 @@ Max14906::~Max14906() {
 			this->m_readerThread->quit();
 			this->m_readerThread->wait();
 		}
+		delete m_readerThread;
+	}
+	if (m_cmdQueue) {
+		CommandQueueProvider::GetInstance()->close(m_ctx);
+		m_cmdQueue = nullptr;
+		m_ctx = nullptr;
 	}
 	delete m_toolView;
 	delete ui;

@@ -29,7 +29,7 @@ public:
 	void setHandlesName(QMap<int, QString> chnlsId);
 	QWidget *getPlotWidget() const;
 	bool singleCapture() const;
-
+	int getRequiredBuffersNumber();
 public Q_SLOTS:
 	void onBufferRefilled(QVector<QVector<double>>, int bufferCounter);
 	void onBtnExportClicked(QMap<int, bool> exportConfig);

@@ -175,10 +175,16 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 			}
 			drawPlot();
 		}
-	} else {
+	}
+	if (m_singleCapture && (m_bufferIndex == m_buffersNumber)) {
 		Q_EMIT singleCaptureFinished();
 	}
 	m_lock->unlock();
+}
+
+int BufferPlotHandler::getRequiredBuffersNumber()
+{
+	return m_buffersNumber;
 }
 
 void BufferPlotHandler::drawPlot()

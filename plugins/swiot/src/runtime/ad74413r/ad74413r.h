@@ -99,10 +99,13 @@ private:
 	BufferLogic *m_swiotAdLogic;
 	ReaderThread *m_readerThread;
 	BufferPlotHandler *m_plotHandler;
+	CommandQueue *m_cmdQueue;
 
 	QComboBox *m_samplingFreqOptions;
 	PositionSpinButton *m_timespanSpin;
 	ExportSettings *m_exportSettings;
+
+	struct iio_context *m_ctx;
 };
 }
 }
