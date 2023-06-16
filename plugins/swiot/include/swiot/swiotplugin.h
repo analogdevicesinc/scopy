@@ -35,6 +35,8 @@
 #include "src/swiotcontroller.h"
 #include "src/swiotinfopage.h"
 #include <iioutil/cyclicaltask.h>
+#include <iioutil/commandqueue.h>
+#include "src/externalpsreaderthread.h"
 
 namespace scopy::swiot {
 class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
