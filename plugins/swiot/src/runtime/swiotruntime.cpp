@@ -4,9 +4,10 @@
 
 using namespace scopy::swiot;
 
-SwiotRuntime::SwiotRuntime():
-	m_iioCtx(nullptr)
-      ,m_triggerTimer(nullptr)
+SwiotRuntime::SwiotRuntime(QObject *parent)
+	: QObject(parent)
+	, m_iioCtx(nullptr)
+	, m_triggerTimer(nullptr)
 {}
 
 SwiotRuntime::~SwiotRuntime()

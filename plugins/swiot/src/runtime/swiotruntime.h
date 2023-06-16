@@ -19,7 +19,7 @@ class SwiotRuntime : public QObject
 {
 	Q_OBJECT
 public:
-	SwiotRuntime();
+	SwiotRuntime(QObject *parent = nullptr);
 	~SwiotRuntime();
 
 	bool isRuntimeCtx();
