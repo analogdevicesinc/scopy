@@ -336,6 +336,14 @@ public Q_SLOTS:
 //Q_SIGNALS:
 
 	/**
+	 * @brief connectDevice
+	 * Plugin can emit this signal if it requests device connect
+	 * For example when the context needs refreshment and
+	 * all plugins need restarting
+	 */
+	virtual void connectDevice() = 0;
+
+	/**
 	 * @brief disconnectDevice
 	 * Plugin can emit this signal if it requests device disconnect
 	 * For example when the device is no longer available

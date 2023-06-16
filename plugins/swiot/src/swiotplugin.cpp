@@ -20,6 +20,8 @@ void SWIOTPlugin::preload()
 	m_displayName = "SWIOT";
 	m_swiotController = new SwiotController(m_param, this);
 	m_runtime = new SwiotRuntime();
+	connect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched, Qt::QueuedConnection);
+	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 }
 
 bool SWIOTPlugin::loadPage()
@@ -82,6 +84,8 @@ void SWIOTPlugin::loadToolList()
 
 void SWIOTPlugin::unload()
 {
+	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched);
+	disconnect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 	delete m_infoPage;
 }
 
@@ -174,8 +178,6 @@ void SWIOTPlugin::setupToolList()
 bool SWIOTPlugin::onConnect()
 {
 	setupToolList();
-	connect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched, Qt::QueuedConnection);
-	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 	return true;
 }
 
@@ -185,6 +187,14 @@ bool SWIOTPlugin::onDisconnect()
 	auto ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
+
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(false);
+		tme->setRunBtnVisible(false);
+		tme->setRunning(false);
+		delete tme->tool();
+		tme->setTool(nullptr);
+	}
 
 	disconnect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, &SWIOTPlugin::startCtxSwitch);
 	disconnect(dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
@@ -197,28 +207,14 @@ bool SWIOTPlugin::onDisconnect()
 	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::externalPowerSupply);
 
 	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
-	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched);
-	disconnect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
-
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
-		tme->setEnabled(false);
-		tme->setRunBtnVisible(false);
-		tme->setRunning(false);
-		delete tme->tool();
-		tme->setTool(nullptr);
-	}
 
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
 	m_swiotController->stopTemperatureTask();
 	m_swiotController->disconnectSwiot();
 
-	delete m_swiotController;
-	delete m_runtime;
-
-	auto &&cp = ContextProvider::GetInstance();
+	ContextProvider *cp = ContextProvider::GetInstance();
 	cp->close(m_param);
-
 	return true;
 }
 
@@ -227,14 +223,15 @@ void SWIOTPlugin::startCtxSwitch()
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
 	m_swiotController->stopTemperatureTask();
-	ContextProvider::GetInstance()->close(m_param);
+	m_swiotController->disconnectSwiot();
+    Q_EMIT disconnectDevice();
 	m_swiotController->startSwitchContextTask(m_isRuntime);
 }
 
 void SWIOTPlugin::onCtxSwitched()
 {
 	m_swiotController->stopSwitchContextTask();
-	Q_EMIT restartDevice();
+	Q_EMIT connectDevice();
 }
 
 void SWIOTPlugin::initMetadata()
