@@ -3,8 +3,6 @@
 
 #include <QThread>
 
-#include <iio.h>
-
 namespace scopy::swiot {
 class ExternalPsReaderThread : public QThread {
 	Q_OBJECT
