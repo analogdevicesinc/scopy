@@ -157,11 +157,17 @@ void Max14906::timerChanged(double value) {
 }
 
 void Max14906::initMonitorToolView() {
-	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 0);
-	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 2);
+	int nbChannels = m_channelControls.size();
+	int lineSpan;
+	if (nbChannels > 2) {
+		lineSpan = 3;
+		this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 0, 1, lineSpan);
 
-	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createHLine(this->ui->grid), 0, 1);
-	this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createHLine(this->ui->grid), 2, 1);
+		this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createHLine(this->ui->grid), 0, 1, lineSpan, 1);
+	} else if (nbChannels == 2) {
+		lineSpan = 1;
+		this->ui->gridLayout->addWidget(scopy::swiot::Max14906::createVLine(this->ui->grid), 1, 0, 1, lineSpan);
+	}
 
 	// there can only be 4 channels, so we position them accordingly
 	switch (m_channelControls.size()) {
@@ -175,13 +181,13 @@ void Max14906::initMonitorToolView() {
 			DioDigitalChannel *digitalChannel = m_channelControls[2]->getDigitalChannel();
 			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
 
-			this->ui->gridLayout->addWidget(mainWindow, 2, 0);
+			this->ui->gridLayout->addWidget(mainWindow, 0, 2);
 		}
 		case 2: {
 			DioDigitalChannel *digitalChannel = m_channelControls[1]->getDigitalChannel();
 			auto mainWindow = createDockableMainWindow("", digitalChannel, this);
 
-			this->ui->gridLayout->addWidget(mainWindow, 0, 2);
+			this->ui->gridLayout->addWidget(mainWindow, 2, 0);
 		}
 		case 1: {
 			DioDigitalChannel *digitalChannel = m_channelControls[0]->getDigitalChannel();
