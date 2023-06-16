@@ -15,8 +15,8 @@ public:
 
 	void updateTimeScale(double newMax);
 	void addDataSample(double value);
-	const std::vector<std::string> *getConfigModes() const;
-	void setConfigModes(std::vector<std::string> *configModes);
+	const std::vector<std::string> getConfigModes() const;
+	void setConfigModes(std::vector<std::string> &configModes);
 	const QString &getSelectedConfigMode() const;
 	void setSelectedConfigMode(const QString &selectedConfigMode);
 	void resetSismograph();
@@ -28,7 +28,7 @@ private:
 	QString m_deviceName;
 	QString m_deviceType;
 
-	std::vector<std::string> *m_configModes;
+	std::vector<std::string> m_configModes;
 	QString m_selectedConfigMode;
 
 	friend class DioDigitalChannelController;
