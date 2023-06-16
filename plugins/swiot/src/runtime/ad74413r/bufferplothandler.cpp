@@ -90,7 +90,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	}
 	m_plot->configureAllYAxis();
 	m_plot->setOffsetInterval(-__DBL_MAX__, __DBL_MAX__);
-	connect(m_plot, &CapturePlot::channelSelected, this, [=](int hdlIdx, bool selected) {
+	connect(m_plot, &CapturePlot::channelSelected, this, [=, this](int hdlIdx, bool selected) {
 		m_plot->setActiveVertAxis(hdlIdx, true);
 		Q_EMIT offsetHandleSelected(hdlIdx, selected);
 	});
