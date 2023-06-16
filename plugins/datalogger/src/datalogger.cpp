@@ -1,5 +1,5 @@
+#include "dataloggerplugin.h"
 #include "datalogger.hpp"
-#include "dataloggerplugin.hpp"
 #include "dataloggercontroller.hpp"
 #include <QtConcurrent>
 #include <QFuture>
