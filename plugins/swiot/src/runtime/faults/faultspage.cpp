@@ -59,18 +59,15 @@ void FaultsPage::setupDevices() {
 	struct iio_device* max14906 = iio_context_find_device(m_context, "max14906");
 	struct iio_device* swiot = iio_context_find_device(m_context, "swiot");
 
-	char buffer[256] = {0};
-	iio_device_attr_read(swiot, "ch0_device", buffer, 256);
-
 	if (swiot) {
 		if (ad74413r) {
-			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", ad74413r, swiot, this);
+			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", ad74413r, swiot, m_context, this);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find ad74413r device.";
 		}
 
 		if (max14906) {
-			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiot/swiot_faults.json", max14906, swiot, this);
+			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiot/swiot_faults.json", max14906, swiot, m_context, this);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find max14906 device.";
 		}
