@@ -37,7 +37,7 @@ using namespace scopy;
 ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
 		QColor color, QWidget *parent) :
 	QWidget(parent),
-	m_ui(new Ui::Channel()),
+	m_ui(new Ui::Channel),
 	m_id(id),
 	m_deletable(deletable),
 	m_simplified(simplified),
