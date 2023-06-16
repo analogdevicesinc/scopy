@@ -17,7 +17,7 @@ namespace scopy::swiot {
 class FaultsGroup : public QWidget {
 	Q_OBJECT
 public:
-	explicit FaultsGroup(QString name, const QString& path, QMap<int, QString> *specialFaults = nullptr, QWidget *parent = nullptr);
+	explicit FaultsGroup(QString name, const QString& path, QWidget *parent = nullptr);
 	~FaultsGroup() override;
 
 	const QVector<FaultWidget *> &getFaults() const;
@@ -34,12 +34,12 @@ public:
 Q_SIGNALS:
 	void selectionUpdated();
 	void minimumSizeChanged();
+	void specialFaultsUpdated(int index, QString channelFunction);
 
 private:
 	Ui::FaultsGroup *ui;
 	QString m_name;
 	QVector<FaultWidget *> m_faults;
-	QMap<int, QString> *m_specialFaults;
 	std::set<unsigned int> m_currentlySelected;
 	std::set<unsigned int> m_actives;
 	int m_max_faults;

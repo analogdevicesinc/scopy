@@ -2,6 +2,7 @@
 #define SCOPY_FAULTWIDGET_H
 
 #include <QWidget>
+#include <QJsonObject>
 #include "ui_faultwidget.h"
 #include "gui/dynamicWidget.h"
 #include <qcoreevent.h>
@@ -34,11 +35,15 @@ public:
 	const QString &getFaultExplanation() const;
 	void setFaultExplanation(const QString &faultExplanation);
 
+	void setFaultExplanationOptions(QJsonObject options);
+
 	bool isPressed() const;
 	void setPressed(bool pressed);
 
-Q_SIGNALS:
+public Q_SLOTS:
+	void specialFaultUpdated(int index, QString channelFunction);
 
+Q_SIGNALS:
 	void faultSelected(unsigned int id);
 
 protected:
@@ -53,6 +58,7 @@ private:
 	unsigned int m_id{};
 	QString m_name;
 	QString m_faultExplanation;
+	QJsonObject m_faultExplanationOptions;
 };
 }
 

@@ -5,7 +5,6 @@
 #include <QJsonArray>
 
 #include <utility>
-#include <iio.h>
 
 #include "faultsgroup.h"
 #include "src/swiot_logging_categories.h"
@@ -15,12 +14,11 @@ using namespace scopy::swiot;
 
 #define MAX_COLS_IN_GRID 100
 
-FaultsGroup::FaultsGroup(QString name, const QString &path, QMap<int, QString> *specialFaults, QWidget *parent) :
+FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultsGroup),
 	m_name(std::move(name)),
-	m_specialFaults(specialFaults),
-	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
+    m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
 {
 	ui->setupUi(this);
 
@@ -50,33 +48,27 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QMap<int, QString> *
 	for (int i = 0; i < m_max_faults; ++i) {
 		QJsonObject fault_object = faults_obj->at(i).toObject();
 		QString fault_name = fault_object.value("name").toString();
-		QString fault_description;
+		QString fault_description = fault_object.value("description").toString();
+		auto fault_widget = new FaultWidget(i, fault_name, fault_description, this);
 
 		if (fault_object.contains("condition")) {
-			if (m_specialFaults) {
-				QJsonObject condition = fault_object["condition"].toObject();
-				if (condition.contains(m_specialFaults->value(i))) {
-					// this logic works because the index variable will be the same as when creating the
-					// m_specialFaults map since the json is read in the same order for both cases
-					// ex: VI_ERR_A matches channel 0, so it will always have the 0 index in m_specialFaults
-					if (
-						(fault_name == " VI_ERR_A " && m_specialFaults->contains(0)) ||
-						(fault_name == " VI_ERR_B " && m_specialFaults->contains(1)) ||
-						(fault_name == " VI_ERR_C " && m_specialFaults->contains(2)) ||
-						(fault_name == " VI_ERR_D " && m_specialFaults->contains(3))
-						)
-					{
-						fault_description = condition[m_specialFaults->value(i)].toString();
-					}
-				} else {
-					fault_description = fault_object.value("description").toString();
-				}
-			}
-		} else {
-			fault_description = fault_object.value("description").toString();
+			QJsonObject condition = fault_object["condition"].toObject();
+			fault_widget->setFaultExplanationOptions(condition);
+			connect(this, &FaultsGroup::specialFaultsUpdated, fault_widget, &FaultWidget::specialFaultUpdated);
+//				if (condition.contains(m_specialFaults.value(i))) {
+//					// this logic works because the index variable will be the same as when creating the
+//					// m_specialFaults map since the json is read in the same order for both cases
+//					// ex: VI_ERR_A matches channel 0, so it will always have the 0 index in m_specialFaults
+//					if (
+//						(fault_name == " VI_ERR_A " && m_specialFaults.contains(0)) ||
+//						(fault_name == " VI_ERR_B " && m_specialFaults.contains(1)) ||
+//						(fault_name == " VI_ERR_C " && m_specialFaults.contains(2)) ||
+//						(fault_name == " VI_ERR_D " && m_specialFaults.contains(3))
+//						)
+//					{
+//						fault_description = condition[m_specialFaults.value(i)].toString();
 		}
 
-		auto fault_widget = new FaultWidget(i, fault_name, fault_description, this);
 		connect(fault_widget, &FaultWidget::faultSelected, this, [this](unsigned int id_) {
 			bool added = m_currentlySelected.insert(id_).second;
 			if (!added) {
@@ -98,6 +90,11 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QMap<int, QString> *
 FaultsGroup::~FaultsGroup() {
 	delete ui;
 }
+
+//void FaultsGroup::updateSpecialFault(int specialChnIdx)
+//{
+//	m_faults.at(specialChnIdx)->setFaultExplanation()
+//}
 
 const QVector<FaultWidget *> &FaultsGroup::getFaults() const {
 	return m_faults;

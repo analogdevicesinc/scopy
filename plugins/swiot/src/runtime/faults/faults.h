@@ -16,7 +16,7 @@ class Faults : public QWidget {
 	Q_OBJECT
 public:
 	explicit Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
-	~Faults() override;
+	~Faults();
 
 	void pollFaults();
 

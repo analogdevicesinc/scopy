@@ -14,7 +14,8 @@ FaultWidget::FaultWidget(unsigned int id, QString name, QString faultExplanation
 	m_pressed(false),
 	m_id(id),
 	m_name(std::move(name)),
-	m_faultExplanation(std::move(faultExplanation)) {
+	m_faultExplanation(std::move(faultExplanation))
+{
 	ui->setupUi(this);
 
 	installEventFilter(this);
@@ -64,6 +65,11 @@ void FaultWidget::setFaultExplanation(const QString &faultExplanation) {
 	FaultWidget::m_faultExplanation = faultExplanation;
 }
 
+void FaultWidget::setFaultExplanationOptions(QJsonObject options)
+{
+	m_faultExplanationOptions = options;
+}
+
 unsigned int FaultWidget::getId() const {
 	return m_id;
 }
@@ -79,6 +85,13 @@ bool FaultWidget::isPressed() const {
 void FaultWidget::setPressed(bool pressed) {
 	FaultWidget::m_pressed = pressed;
 	scopy::setDynamicProperty(this->ui->mainFrame, "pressed", pressed);
+}
+
+void FaultWidget::specialFaultUpdated(int index, QString channelFunction)
+{
+	if (index == m_id) {
+		setFaultExplanation(m_faultExplanationOptions[channelFunction].toString());
+	}
 }
 
 bool FaultWidget::eventFilter(QObject *object, QEvent *event) {
