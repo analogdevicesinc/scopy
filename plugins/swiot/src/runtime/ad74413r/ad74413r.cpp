@@ -186,12 +186,12 @@ void Ad74413r::initExportSettings(QWidget *parent)
 					     QString::number(i+1));
 	}
 
-	connect(m_exportSettings->getExportButton(), &QPushButton::clicked, this, [=](){
+	connect(m_exportSettings->getExportButton(), &QPushButton::clicked, this, [=, this](){
 		Q_EMIT exportBtnClicked(m_exportSettings->getExportConfig());
 	});
 	connect(this, &Ad74413r::exportBtnClicked, m_plotHandler, &BufferPlotHandler::onBtnExportClicked);
 	connect(this, &Ad74413r::activateExportButton,
-		[=](){
+		[=, this](){
 		m_exportSettings->enableExportButton(true);
 	});
 }
