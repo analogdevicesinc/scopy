@@ -25,14 +25,16 @@
 #include "src/runtime/ad74413r/chnlinfo.h"
 #include <QThread>
 #include <QMap>
-#include <iio.h>
 #include <QMutex>
+#include <atomic>
+#include <iio.h>
+#include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
 class ReaderThread : public QThread {
 	Q_OBJECT
 public:
-	explicit ReaderThread(bool isBuffered, QObject *parent = nullptr);
+	explicit ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *parent = nullptr);
 	~ReaderThread();
 
 	void addDioChannel(int index, struct iio_channel *channel);
@@ -42,7 +44,7 @@ public:
 	void runDio();
         void singleDio();
 
-	void runBuffered();
+	void runBuffered(int requiredBuffersNumber = 0);
 
 	void createIioBuffer();
 
@@ -51,7 +53,12 @@ public:
 	void enableIioChnls();
 
 	int getEnabledChnls();
+
 	QVector<ChnlInfo *> getEnabledBufferedChnls();
+
+	void startCapture(int requiredBuffersNumber = 0);
+
+	void requestStop();
 public Q_SLOTS:
 
 	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
@@ -63,7 +70,15 @@ Q_SIGNALS:
 
 	void channelDataChanged(int channelId, double value);
 
+private Q_SLOTS:
+	void bufferRefillCommandFinished(scopy::Command *cmd);
+	void bufferCreateCommandFinished(scopy::Command *cmd);
+	void bufferDestroyCommandFinished(scopy::Command *cmd);
+
 private:
+	void createBufferRefillCommand();
+	void createBufferDestroyCommand();
+
         void run() override;
 
 	bool isBuffered;
@@ -71,7 +86,14 @@ private:
 
 	int m_samplingFreq = 4800;
 	int m_enabledChnlsNo;
-	int bufferCounter = 0;
+	std::atomic<int> bufferCounter;
+	std::atomic<int> m_requiredBuffersNumber;
+	std::condition_variable m_cond, m_condBufferCreated;
+
+	CommandQueue *m_cmdQueue;
+	QVector<scopy::Command*> m_dioChannelsReadCommands;
+	Command *m_refillBufferCommand, *m_createBufferCommand;
+	Command *m_destroyBufferCommand;
 
 	struct iio_device *m_iioDev;
 	struct iio_buffer *m_iioBuff;
@@ -79,7 +101,7 @@ private:
 	QVector<ChnlInfo *> m_bufferedChnls;
 	QVector<QVector<double>> m_bufferData;
 
-	QMutex *lock;
+	std::mutex m_mutex;
 };
 }
 
