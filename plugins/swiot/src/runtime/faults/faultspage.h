@@ -40,7 +40,7 @@ class FaultsPage : public QWidget {
 	Q_OBJECT
 public:
 	explicit FaultsPage(struct iio_context* context, QWidget *parent = nullptr);
-	~FaultsPage() override;
+	~FaultsPage();
 
 	void update();
 
