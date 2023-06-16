@@ -3,7 +3,6 @@
 
 #include <QThread>
 #include <QObject>
-#include <iio.h>
 
 namespace scopy::swiot {
 class SwiotSwitchCtxTask : public QThread
