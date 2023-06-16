@@ -24,6 +24,7 @@
 #include <gui/generic_menu.hpp>
 #include "buffermenuview.h"
 #include "buffermenumodel.h"
+#include <iioutil/commandqueueprovider.h>
 #include <iio.h>
 #include "src/swiot_logging_categories.h"
 
@@ -35,8 +36,10 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
       ,m_tme(tme), m_statusLabel(new QLabel(this))
       ,m_swiotAdLogic(nullptr), m_widget(parent)
       ,m_readerThread(nullptr), m_statusContainer(new QWidget(this))
+      , m_ctx(ctx)
+      , m_cmdQueue(CommandQueueProvider::GetInstance()->open(m_ctx))
 {
-	createDevicesMap(ctx);
+	createDevicesMap(m_ctx);
 	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
 		char mode[64];
 		ssize_t result = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], "mode", mode, 64);
@@ -45,7 +48,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 			m_enabledChannels = std::vector<bool>(MAX_CURVES_NUMBER, false);
 
 			m_swiotAdLogic = new BufferLogic(m_iioDevicesMap);
-			m_readerThread = new ReaderThread(true);
+			m_readerThread = new ReaderThread(true, m_cmdQueue);
 			m_readerThread->addBufferedDevice(m_iioDevicesMap[AD_NAME]);
 
 			QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
@@ -72,11 +75,16 @@ Ad74413r::~Ad74413r()
 {
 	if (m_readerThread) {
 		if (m_readerThread->isRunning()) {
-			m_readerThread->requestInterruption();
+			m_readerThread->requestStop();
 			m_readerThread->quit();
 			m_readerThread->wait();
 		}
 		delete m_readerThread;
+	}
+	if (m_cmdQueue) {
+		CommandQueueProvider::GetInstance()->close(m_ctx);
+		m_cmdQueue = nullptr;
+		m_ctx = nullptr;
 	}
 	if (m_controllers.size() > 0) {
 		m_controllers.clear();
@@ -317,14 +325,14 @@ void Ad74413r::onRunBtnPressed()
 		verifyChnlsChanges();
 		if (!m_readerThread->isRunning()) {
 			m_plotHandler->resetPlotParameters();
-			m_readerThread->start();
+			m_readerThread->startCapture();
 		}
 		if (!m_tme->running()) {
 			m_tme->setRunning(runBtnChecked);
 		}
 	} else {
 		m_samplingFreqOptions->setEnabled(true);
-		m_readerThread->requestInterruption();
+		m_readerThread->requestStop();
 		if (m_tme->running()) {
 			m_tme->setRunning(runBtnChecked);
 		}
@@ -338,10 +346,11 @@ void Ad74413r::onSingleBtnPressed()
 		Q_EMIT activateExportButton();
 		verifyChnlsChanges();
 		if (m_readerThread->isRunning()) {
-			m_readerThread->requestInterruption();
+			m_readerThread->requestStop();
 		} else {
 			m_plotHandler->resetPlotParameters();
-			m_readerThread->start();
+			int bufNumber = m_plotHandler->getRequiredBuffersNumber();
+			m_readerThread->startCapture(bufNumber);
 		}
 		m_plotHandler->setSingleCapture(true);
 		if (runBtnChecked) {
@@ -363,14 +372,14 @@ void Ad74413r::onSingleCaptureFinished()
 	m_toolView->getSingleBtn()->setChecked(false);
 	m_toolView->getSingleBtn()->setEnabled(true);
 	m_samplingFreqOptions->setEnabled(true);
-	m_readerThread->requestInterruption();
+	m_readerThread->requestStop();
 }
 
 void Ad74413r::verifyChnlsChanges()
 {
 	bool changes = m_swiotAdLogic->verifyEnableChanges(m_enabledChannels);
 	if (changes) {
-		m_readerThread->requestInterruption();
+		m_readerThread->requestStop();
 	}
 }
 
@@ -419,9 +428,13 @@ void Ad74413r::onReaderThreadFinished()
 	if (singleCaptureOn) {
 		m_plotHandler->setSingleCapture(false);
 	}
+	int nbRequiredBuffers = 0;
 	if (m_toolView->getRunBtn()->isChecked() || m_toolView->getSingleBtn()->isChecked()) {
 		m_plotHandler->resetPlotParameters();
-		m_readerThread->start();
+		if (m_toolView->getSingleBtn()->isChecked()) {
+			nbRequiredBuffers = m_plotHandler->getRequiredBuffersNumber();
+		}
+		m_readerThread->startCapture(nbRequiredBuffers);
 	}
 }
 

@@ -65,6 +65,8 @@ private:
 	static QFrame* createHLine(QWidget* parent);
 	static QMainWindow* createDockableMainWindow(const QString& title, DioDigitalChannel* digitalChannel, QWidget* parent);
 
+	struct iio_context *m_ctx;
+
         QPushButton *m_backButton;
 	QWidget* m_statusContainer;
 	QLabel* m_statusLabel;
@@ -77,6 +79,7 @@ private:
 	scopy::gui::SubsectionSeparator *settingsWidgetSeparator;
 	QTimer *m_qTimer;
 
+	CommandQueue *m_cmdQueue;
 	ReaderThread *m_readerThread;
 	QMap<int, DioDigitalChannelController*> m_channelControls;
 
