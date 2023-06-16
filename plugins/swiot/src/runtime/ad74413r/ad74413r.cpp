@@ -163,6 +163,7 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 			ChannelWidget *chWidget =
 					m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, -1, false, false,
 								    m_plotHandler->getCurveColor(chId-1), chnlWidgetName, chnlWidgetName);
+			chWidget->setIsPhysicalChannel(true);
 			if (first) {
 				chWidget->menuButton()->click();
 				first = false;
