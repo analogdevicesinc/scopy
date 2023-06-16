@@ -21,6 +21,8 @@
 
 #include "swiotswitchctxtask.h"
 #include <iioutil/contextprovider.h>
+#include <iioutil/commandqueueprovider.h>
+#include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
@@ -41,23 +43,40 @@ void SwiotSwitchCtxTask::run()
 		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
+
+	CommandQueue *commandQueue = CommandQueueProvider::GetInstance()->open(ctx);
+	if (!commandQueue) {
+		ContextProvider::GetInstance()->close(m_uri);
+		return;
+	}
+
 	iio_device *swiotDevice = iio_context_find_device(ctx, "swiot");
 	if (swiotDevice) {
-		char mode[64];
-		ssize_t result = iio_device_attr_read(swiotDevice, "mode", mode, 64);
-		if (result >= 0) {
-			if (m_wasRuntime && (strcmp(mode,"runtime") == 0)) {
-				return;
-			}
+		IioDeviceAttributeRead *iioAttrRead = new IioDeviceAttributeRead(swiotDevice, "mode", commandQueue, true);
 
-			if (!m_wasRuntime && (strcmp(mode,"config") == 0)) {
+		connect(iioAttrRead, &scopy::Command::finished, this, [=, this] (scopy::Command *cmd) {
+			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+			if (!tcmd) {
+				CommandQueueProvider::GetInstance()->close(ctx);
+				ContextProvider::GetInstance()->close(m_uri);
 				return;
 			}
-			//need to be changed to CAT_SWIOTPLUGIN
-			qDebug(CAT_SWIOT)<<"Context has been changed";
-			Q_EMIT contextSwitched();
-		}
+			char *readMode = tcmd->getResult();
+			if (tcmd->getReturnCode() >= 0) {
+				if ((m_wasRuntime && (strcmp(readMode, "config") == 0)) ||
+				    (!m_wasRuntime && (strcmp(readMode, "runtime") == 0))) {
+					qDebug(CAT_SWIOT)<<"Context has been changed";
+					Q_EMIT contextSwitched();
+				}
+			}
+			CommandQueueProvider::GetInstance()->close(ctx);
+			ContextProvider::GetInstance()->close(m_uri);
+		}, Qt::QueuedConnection);
+
+		commandQueue->enqueue(iioAttrRead);
+	} else {
+		CommandQueueProvider::GetInstance()->close(ctx);
+		ContextProvider::GetInstance()->close(m_uri);
 	}
-	ContextProvider::GetInstance()->close(m_uri);
 }
 
