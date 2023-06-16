@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE datalogger)
+set(SCOPY_MODULE dataloggerplugin)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
