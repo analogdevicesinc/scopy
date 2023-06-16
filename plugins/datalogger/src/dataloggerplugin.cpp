@@ -1,6 +1,5 @@
-#include "dataloggerplugin.hpp"
+#include "dataloggerplugin.h"
 #include "qloggingcategory.h"
-#include "datalogger.hpp"
 #include "datalogger_api.h"
 #include <iio.h>
 #include <QLabel>
@@ -42,7 +41,7 @@ void DataLoggerPlugin::unload()
 bool DataLoggerPlugin::compatible(QString param, QString cateogory)
 {
 	m_name = "Datalogger";
-	auto &&cp = ContextProvider::GetInstance();
+	ContextProvider *cp = ContextProvider::GetInstance();
 
 	iio_context* ctx = cp->open(param);
 
@@ -58,7 +57,7 @@ bool DataLoggerPlugin::compatible(QString param, QString cateogory)
 
 bool DataLoggerPlugin::onConnect()
 {
-	auto &&cp = ContextProvider::GetInstance();
+	ContextProvider *cp = ContextProvider::GetInstance();
 	iio_context* ctx = cp->open(m_param);
 	libm2k_context = libm2k::context::contextOpen(ctx, "");
 	ping = new IIOPingTask(ctx);
