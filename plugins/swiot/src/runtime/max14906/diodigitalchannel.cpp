@@ -99,15 +99,15 @@ void DioDigitalChannel::addDataSample(double value) {
 	this->ui->lcdNumber->display(value);
 }
 
-const std::vector<std::string> *DioDigitalChannel::getConfigModes() const {
+const std::vector<std::string> DioDigitalChannel::getConfigModes() const {
 	return m_configModes;
 }
 
-void DioDigitalChannel::setConfigModes(std::vector<std::string> *configModes) {
+void DioDigitalChannel::setConfigModes(std::vector<std::string> &configModes) {
 	m_configModes = configModes;
 
 	this->ui->configModes->clear();
-	for (const std::string &item: *m_configModes) {
+	for (const std::string &item: m_configModes) {
 		this->ui->configModes->addItem(QString::fromStdString(item));
 	}
 }
