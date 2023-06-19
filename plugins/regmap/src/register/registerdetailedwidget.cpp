@@ -17,15 +17,13 @@ using namespace regmap::gui;
 RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget *parent)
     : QWidget{parent}
 {
-
     QVBoxLayout *layout = new QVBoxLayout(this);
     setLayout(layout);
-    description = new QLabel("Description : " + regModel->getDescription());
 
-    layout->addWidget(description);
     QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
     bitFieldsWidgetLayout->setMargin(0);
     bitFieldsWidgetLayout->setSpacing(0);
+
     bitFieldList = new QVector<BitFieldDetailedWidget*>();
     BitFieldDetailedWidgetFactory bitFieldDetailedWidgetFactory;
     QWidget *bitFieldsWidget = new QWidget();
@@ -41,12 +39,12 @@ RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget
         bitFieldList->push_back(bitFieldDetailedWidget);
 
         bitFieldsWidgetLayout->addWidget(bitFieldDetailedWidget, row, col);
+
+        bitFieldsWidgetLayout->setColumnStretch(col,1);
         col++;
+
         currentBitFieldCount += bitFieldDetailedWidget->getWidth();
-//        if (currentBitFieldCount % 8 == 0) {
-//            row++;
-//            col = 0;
-//        }
+
         if (col > scopy::regmap::Utils::getBitsPerRow()) {
             row++;
             col = 0;

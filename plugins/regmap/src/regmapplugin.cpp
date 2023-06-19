@@ -34,13 +34,13 @@ bool REGMAPPlugin::loadPage()
 bool REGMAPPlugin::loadIcon()
 {
     m_icon = new QLabel("");
-    m_icon->setStyleSheet("border-image: url(:/icons/scopy-light/icons/locked.svg);");
+    m_icon->setStyleSheet("border-image: url(:/icons/RegMap.svg);");
     return true;
 }
 
 void REGMAPPlugin::loadToolList()
 {
-    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap","Register Map",":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap","Register Map",":/icons/RegMap.svg"));
 }
 
 void REGMAPPlugin::unload()

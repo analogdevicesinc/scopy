@@ -106,7 +106,8 @@ DeviceRegisterMap::~DeviceRegisterMap()
 void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 {
     registerController->registerChanged(regModel->getAddress());
-    registerController->registerValueChanged("Not Read");
+    registerController->registerValueChanged("N/R");
+    registerController->addNameAndDescription(regModel->getName(), regModel->getDescription());
 
     if (registerDetailedWidget) {
         delete registerDetailedWidget;

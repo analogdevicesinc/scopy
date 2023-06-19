@@ -95,6 +95,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     QWidget *findPathWidget = new QWidget();
     QHBoxLayout *findPathLayout = new QHBoxLayout();
+    Utils::removeLayoutMargins(findPathLayout);
     findPathWidget->setLayout(findPathLayout);
 
     QLineEdit *filePath = new QLineEdit();
@@ -109,7 +110,6 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     findPathLayout->addWidget(filePath);
     findPathLayout->addWidget(pathButton);
-    findPathLayout->setAlignment(pathButton, Qt::AlignRight);
     intervalSection->getContentWidget()->layout()->addWidget(findPathWidget);
 
 

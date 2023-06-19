@@ -1,19 +1,5 @@
 <RCC>
-    <qresource prefix="/xmls">
-        <file>ad9361-phy.xml</file>
-        <file>adi_regmap_dac_v9.xml</file>
-        <file>adi_regmap_dac.xml</file>
-        <file>adi_regmap_adc_v10.xml</file>
-        <file>adi_regmap_adc_v9.xml</file>
-        <file>adi_regmap_adc.xml</file>
-        <file>adf4351.xml</file>
-        <file>ad9680.xml</file>
-        <file>ad9643.xml</file>
-        <file>ad9528.xml</file>
-        <file>ad9523.xml</file>
-        <file>ad9517.xml</file>
-        <file>ad9250.xml</file>
-        <file>ad9144.xml</file>
-        <file>ad9122.xml</file>
+    <qresource prefix="/icons">
+        <file>RegMap.svg</file>
     </qresource>
 </RCC>
