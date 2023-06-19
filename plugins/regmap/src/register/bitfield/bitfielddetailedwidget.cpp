@@ -30,9 +30,21 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 
     layout = new QVBoxLayout();
     Utils::removeLayoutMargins(layout);
+    layout->setSpacing(0);
 
-    layout->addWidget(new QLabel(name));
-    layout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
+    QLabel *nameLabel = new QLabel(name);
+//    nameLabel->setStyleSheet("color: white;");
+    nameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+
+
+    QHBoxLayout *firstLayout = new QHBoxLayout();
+    firstLayout->addWidget(nameLabel);
+    firstLayout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
+    firstLayout->itemAt(1)->setAlignment(Qt::AlignRight);
+
+    layout->addLayout(firstLayout);
+//    layout->addWidget(nameLabel);
+//    layout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
     layout->addWidget(new QLabel("Default Value: " + scopy::regmap::Utils::convertToHexa(defaultValue, width)));
 
     toolTip = "Name : " + name + "\n"
@@ -43,7 +55,7 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 
     setToolTip(toolTip);
 
-    value = new QLabel("Not Read");
+    value = new QLabel("N/R");
     layout->addWidget(value);
 
     setLayout(layout);
@@ -124,7 +136,7 @@ void BitFieldDetailedWidget::firstRead()
 
 void BitFieldDetailedWidget::updateValue(QString newValue)
 {
-    if (value->text() == "Not Read") {
+    if (value->text() == "N/R") {
         value->setText("");
         firstRead();
     }

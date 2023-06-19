@@ -34,6 +34,8 @@ FILE(GLOB SRC_LIST  src/*.cpp src/*.cc src/*.hpp
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
+qt_add_resources(PROJECT_RESOURCES resources/resources.qrc)
+
 if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
