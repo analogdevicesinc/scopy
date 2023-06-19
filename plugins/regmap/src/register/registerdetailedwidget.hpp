@@ -22,7 +22,6 @@ public:
 
 private:
     QVector<BitFieldDetailedWidget*> *bitFieldList;
-    QLabel *description;
 Q_SIGNALS:
     void bitFieldValueChanged(QString value);
 };
