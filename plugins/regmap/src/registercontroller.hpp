@@ -12,9 +12,15 @@ class QPushButton;
 class QLineEdit;
 class QVBoxLayout;
 
+
+
 namespace scopy::regmap{
 class RegisterModel;
 namespace gui {
+
+class RegisterValueWidget;
+class AddressPicker;
+
 class SCOPYREGMAP_EXPORT RegisterController : public QWidget
 {
 	Q_OBJECT
@@ -25,15 +31,23 @@ public:
 
 	void registerChanged(uint32_t address);
     void registerValueChanged(QString value);
+    void addNameAndDescription(QString name, QString description);
 
 private:
 
+//    AddressPicker *addressPicker;
+//    RegisterValueWidget *regValue;
     QHBoxLayout *layout;
-	QLineEdit *regValue;
-	QPushButton *readButton;
-	QPushButton *writeButton;
-	QSpinBox *addressPicker;
+
+    QSpinBox *addressPicker;
+    QPushButton *readButton;
+    QPushButton *writeButton;
+    QLineEdit *regValue;
+
+
 	bool addressChanged = false;
+    QLabel *nameLabel = nullptr;
+    QLabel *descriptionLabel = nullptr;
 
 Q_SIGNALS:
 	void requestRead(uint32_t address);
