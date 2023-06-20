@@ -102,7 +102,7 @@ void BufferPlotHandler::initStatusWidget()
 	QHBoxLayout *statusLayout = new QHBoxLayout(statusWidget);
 
 	m_samplesAquiredLabel = new QLabel("0");
-	m_plotSamplesNumber = new QLabel(QString::number(m_samplingFreq));
+	m_plotSamplesNumberLabel = new QLabel(QString::number(m_samplingFreq));
 	m_btnInfoStatus = new scopy::LinkedButton();
 	m_btnInfoStatus->installEventFilter(this);
 	m_btnInfoStatus->setObjectName(QString::fromUtf8("btnHelp"));
@@ -110,7 +110,7 @@ void BufferPlotHandler::initStatusWidget()
 	m_btnInfoStatus->setText(QString());
 	statusLayout->insertWidget(0, m_samplesAquiredLabel);
 	statusLayout->insertWidget(1, new QLabel("Samples at"));
-	statusLayout->insertWidget(2, m_plotSamplesNumber);
+	statusLayout->insertWidget(2, m_plotSamplesNumberLabel);
 	statusLayout->insertWidget(3, new QLabel("sps"));
 	statusLayout->insertWidget(4, m_btnInfoStatus);
 	m_plot->setStatusWidget(statusWidget);
@@ -140,14 +140,15 @@ void BufferPlotHandler::setHandlesName(QMap<int, QString> chnlsId)
 //bufferCounter is used only for debug
 void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, int bufferCounter)
 {
+	int plotSampleNumber = m_plotSampleRate * m_timespan;
 	int bufferDataSize = bufferData.size();
 	int enPlotIndex = 0;
 	bool rolling = false;
-	auto plotSampleRate = (bufferDataSize > 0) ? ( m_samplingFreq / bufferDataSize ) : m_samplingFreq;
 	m_lock->lock();
 	resetDataPoints();
 	if (!(m_singleCapture && (m_bufferIndex == m_buffersNumber))) {
 		if (bufferDataSize > 0) {
+			int currentPlotDataSamplesNumber = 0;
 			for (int i = 0; i < m_dataPointsDeque.size(); i++) {
 				if (m_bufferIndex == m_buffersNumber)
 				{
@@ -157,22 +158,24 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 						rolling = true;
 					}
 				} else {
-					int plotDataSamplesNumber = m_buffersNumber * m_bufferSize;
-					int currentPlotDataSamplesNumber = (m_bufferIndex + 1) * m_bufferSize;
-					m_plot->setDataStartingPoint(-currentPlotDataSamplesNumber);
+					int lastBuffer = plotSampleNumber % m_bufferSize;
+					if ((m_bufferIndex  == (m_buffersNumber - 1)) && lastBuffer != 0 ) {
+						currentPlotDataSamplesNumber = (m_bufferIndex * m_bufferSize) + lastBuffer;
+					} else {
+						currentPlotDataSamplesNumber = (m_bufferIndex + 1) * m_bufferSize;
+					}
+					// the range is between (-currentPlotDataSamplesNumber, 0]
+					// so we need to add 1 to currentPlotDataSamplesNumber
+					m_plot->setDataStartingPoint(-currentPlotDataSamplesNumber + 1);
 					m_plot->resetXaxisOnNextReceivedData();
 					m_samplesAquiredLabel->setText(QString::number(currentPlotDataSamplesNumber));
 				}
-				if (m_enabledPlots[i]) {
-					if (enPlotIndex < bufferDataSize) {
-						m_dataPointsDeque[i].push_back(bufferData[enPlotIndex]);
-						enPlotIndex++;
-					}
+				if (m_enabledPlots[i] && (enPlotIndex < bufferDataSize)) {
+					m_dataPointsDeque[i].push_back(bufferData[enPlotIndex]);
+					enPlotIndex++;
 				}
 			}
-			if (!rolling) {
-				m_bufferIndex++;
-			}
+			m_bufferIndex = (rolling) ? m_bufferIndex : m_bufferIndex + 1;
 			drawPlot();
 		}
 	} else {
@@ -183,18 +186,26 @@ void BufferPlotHandler::onBufferRefilled(QVector<QVector<double>> bufferData, in
 
 void BufferPlotHandler::drawPlot()
 {
+	int plotSampleNumber = m_plotSampleRate * m_timespan;
 	int dataPointsNumber = m_bufferIndex * m_bufferSize;
+	int lastBufferData = plotSampleNumber % m_bufferSize;
+	if ((m_bufferIndex == m_buffersNumber) && (lastBufferData != 0)) {
+		dataPointsNumber = (dataPointsNumber - m_bufferSize) + lastBufferData;
+	}
 	for (int i = 0; i < m_dataPointsDeque.size(); i++) {
 		m_dataPoints.push_back(new double[dataPointsNumber]());
 		int dequeSize = m_dataPointsDeque[i].size();
 		if (dequeSize > 0) {
 			for (int j = 0; j < dequeSize; j++) {
-				std::copy(m_dataPointsDeque[i][j].begin(), m_dataPointsDeque[i][j].end(), m_dataPoints[i] + (j * m_bufferSize));
+				if (j == (m_buffersNumber - 1) && (lastBufferData != 0)) {
+					std::copy(m_dataPointsDeque[i][j].begin(), m_dataPointsDeque[i][j].begin() + lastBufferData, m_dataPoints[i] + (j * m_bufferSize));
+				} else {
+					std::copy(m_dataPointsDeque[i][j].begin(), m_dataPointsDeque[i][j].end(), m_dataPoints[i] + (j * m_bufferSize));
+				}
 			}
 		}
 	}
 	m_plot->plotNewData("Active Channels", m_dataPoints, dataPointsNumber, 1);
-
 }
 
 void BufferPlotHandler::setChnlsUnitOfMeasure(QVector<QString> unitsOfMeasure)
@@ -268,8 +279,6 @@ void BufferPlotHandler::onBtnExportClicked(QMap<int, bool> exportConfig)
 				fm.save(data, chType + chNo + "(" + m_plot->yAxisUnit(i) + ")");
 			}
 		}
-		auto enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
-		auto plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
 		fm.performWrite(false);
 	}
 }
@@ -329,21 +338,22 @@ void BufferPlotHandler::onPrintBtnClicked()
 void BufferPlotHandler::resetPlotParameters()
 {
 	m_lock->lock();
-	int enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true);
-	auto plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
-	int plotSampleNumber = m_samplingFreq * m_timespan;
+	int enabledPlotsNo = std::count(m_enabledPlots.begin(), m_enabledPlots.end(), true); 
+	m_plotSampleRate = (enabledPlotsNo > 0) ? ( m_samplingFreq / enabledPlotsNo ) : m_samplingFreq;
 
-	plotSampleNumber = (enabledPlotsNo > 0) ? (plotSampleNumber / enabledPlotsNo) : plotSampleNumber;
+	auto plotSampleNumber = m_plotSampleRate * m_timespan;
 	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
-	m_buffersNumber = ((plotSampleNumber % m_bufferSize) == 0) ?
+	m_buffersNumber = (((int)plotSampleNumber % m_bufferSize) == 0) ?
 				(plotSampleNumber / m_bufferSize) : ((plotSampleNumber / m_bufferSize) + 1);
 	m_bufferIndex = 0;
 	resetDeque();
 
-	m_plotSamplesNumber->setText(QString::number(plotSampleRate));
-	m_plot->setSampleRate(plotSampleRate, 1, "");
-
+	m_plotSamplesNumberLabel->setText(QString::number(m_plotSampleRate));
+	// setSampleRate sets the samples range
+	// in our case (-m_plotSampleRate, 0], that's why we subtract by 1
+	m_plot->setSampleRate(m_plotSampleRate - 1, 1, "");
 	m_plot->replot();
+
 	qDebug(CAT_SWIOT_AD74413R) << "Plot samples number: " << QString::number(plotSampleNumber) <<" "<<QString::number(m_buffersNumber)
 				      +" "  + QString::number(plotSampleNumber / m_bufferSize) + " ";
 	m_lock->unlock();
@@ -362,7 +372,7 @@ void BufferPlotHandler::resetDeque()
 {
 	resetDataPoints();
 	for(int i = 0; i < m_dataPointsDeque.size(); i++) {
-		m_dataPointsDeque.clear();
+		m_dataPointsDeque[i].clear();
 	}
 	m_dataPointsDeque.clear();
 	for (int i = 0; i < m_plotChnlsNo; i++) {

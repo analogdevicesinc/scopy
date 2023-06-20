@@ -54,7 +54,7 @@ private:
 	CapturePlot *m_plot;
 	QWidget *m_plotWidget;
 	QLabel *m_samplesAquiredLabel;
-	QLabel *m_plotSamplesNumber;
+	QLabel *m_plotSamplesNumberLabel;
 	LinkedButton* m_btnInfoStatus;
 
 	int m_samplingFreq = 4800;
@@ -66,6 +66,7 @@ private:
 	int m_buffersNumber = 0;
 	int m_bufferIndex = 0;
 	int m_bufferSize = 0;
+	int m_plotSampleRate = 0;
 
 	bool m_singleCapture = false;
 
