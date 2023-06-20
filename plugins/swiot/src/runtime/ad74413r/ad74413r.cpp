@@ -254,7 +254,6 @@ scopy::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* col
 void Ad74413r::onChannelWidgetEnabled(int chnWidgetId, bool en)
 {
 	int id = chnWidgetId;
-
 	int chnlIdx = m_controllers[id]->getChnlIdx();
 
 	if (en) {
@@ -339,6 +338,7 @@ void Ad74413r::onSingleCaptureFinished()
 	}
 	m_toolView->getSingleBtn()->setChecked(false);
 	m_toolView->getSingleBtn()->setEnabled(true);
+	m_samplingFreqOptions->setEnabled(true);
 	m_readerThread->requestInterruption();
 }
 
