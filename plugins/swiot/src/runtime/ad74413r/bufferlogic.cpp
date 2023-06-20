@@ -58,6 +58,9 @@ void BufferLogic::createChannels()
 			chnlInfo->isOutput = isOutput;
 			chnlInfo->unitOfMeasure = m_unitsOfMeasure[chnlId[0].toLower()];
 			chnlInfo->rangeValues = m_valuesRange[chnlId[0].toLower()];
+			//to have the value in V and mA we need to multiply by 10^(-3)
+			scale = (chnlInfo->unitOfMeasure == VOLTAGE_UM || chnlInfo->unitOfMeasure == CURRENT_UM)
+					? (scale * 0.001) : scale;
 			chnlInfo->offsetScalePair = {offset, scale};
 			if (parts.size() > 1) {
 				if(parts[1].compare("")){
