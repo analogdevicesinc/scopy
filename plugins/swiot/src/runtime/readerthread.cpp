@@ -53,7 +53,7 @@ double ReaderThread::convertData(unsigned int data, int idx)
         data <<= 8;
         data = SWAP_UINT32(data);
         data &= 0x0000FFFF;
-	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second * 0.001;
+	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second;
 	return convertedData;
 }
 
