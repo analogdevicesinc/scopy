@@ -1,7 +1,6 @@
 #include <iio.h>
 #include "qdebug.h"
 #include "buffermenumodel.h"
-#include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
 
@@ -54,19 +53,18 @@ QStringList BufferMenuModel::readChnlAttr(struct iio_channel* iio_chnl, QString 
 void BufferMenuModel::updateChnlAttributes(QMap<QString,QStringList> newValues, QString attrName)
 {
 	QStringList value = newValues.value(attrName);
-
 	if (value.size() == 1) {
 		QString attrVal = value.first();
 		std::string s_attrValue = attrVal.toStdString();
 		std::string s_attrName = attrName.toStdString();
-
 		if (m_iioChnl != nullptr) {
-			qDebug(CAT_SWIOT_AD74413R) << attrName + " before:" + readChnlAttr(m_iioChnl,attrName).front();
 			int retCode = iio_channel_attr_write(m_iioChnl,s_attrName.c_str(),s_attrValue.c_str());
-			if (retCode > 0) {
+			if (retCode >= 0) {
 				m_chnlAttributes = newValues;
+				qInfo() << attrName.toUpper() +" was successfully written!";
+			} else {
+				qWarning() << "Couldn't write " + attrName.toUpper() + " attribute! (" + QString::number(retCode) + ")";
 			}
-			qDebug(CAT_SWIOT_AD74413R) << attrName + " after:" + readChnlAttr(m_iioChnl,attrName).front();
 		}
 	}
 
