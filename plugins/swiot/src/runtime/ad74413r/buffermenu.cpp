@@ -171,7 +171,9 @@ void VoltageOutMenu::init()
 	m_slewOptions = new QComboBox(m_widget);
 	m_slewOptions->addItem(QString("Disable"));
 	m_slewOptions->addItem(QString("Enable"));
-	m_slewOptions->setCurrentIndex(0);
+	(m_attrValues["slew_en"].first().compare("0") == 0)
+			? m_slewOptions->setCurrentText("Disable")
+			: m_slewOptions->setCurrentText("Enable");
 	slewLayout->addWidget(new QLabel("Slew", m_widget), 1);
 	slewLayout->addWidget(m_slewOptions, 1);
 	addMenuLayout(slewLayout);
@@ -179,7 +181,9 @@ void VoltageOutMenu::init()
 	QHBoxLayout *slewStepLayout = new QHBoxLayout();
 	m_slewStepOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	m_slewStepOptions->setCurrentIndex(0);
+	(m_attrValues.contains("slew_step") && m_attrValues["slew_step"].size() > 0)
+			? m_slewStepOptions->setCurrentText(m_attrValues["slew_step"].first())
+			: m_slewStepOptions->setCurrentText("ERROR");
 	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
 	slewStepLayout->addWidget(m_slewStepOptions, 1);
 	addMenuLayout(slewStepLayout);
@@ -187,7 +191,9 @@ void VoltageOutMenu::init()
 	QHBoxLayout *slewRateLayout = new QHBoxLayout();
 	m_slewRateOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-	m_slewRateOptions->setCurrentIndex(0);
+	(m_attrValues.contains("slew_rate") && m_attrValues["slew_rate"].size() > 0)
+			? m_slewRateOptions->setCurrentText(m_attrValues["slew_rate"].first())
+			: m_slewRateOptions->setCurrentText("ERROR");
 	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)", m_widget), 1);
 	slewRateLayout->addWidget(m_slewRateOptions, 1);
 	addMenuLayout(slewRateLayout);
@@ -226,7 +232,8 @@ void VoltageOutMenu::dacCodeChanged(double value)
 	QString attrName("raw");
 	m_attrValues[attrName].clear();
 	m_attrValues[attrName].push_back(QString::number((int)value));
-	double val = convertFromRaw(value);
+	//the convertFromRaw return value is in mV that's why we multiply by 10^(-3)
+	double val = convertFromRaw(value) * 0.001;
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val) + " V");
 
@@ -297,7 +304,9 @@ void CurrentOutMenu::init()
 	m_slewOptions = new QComboBox(m_widget);
 	m_slewOptions->addItem(QString("Disable"));
 	m_slewOptions->addItem(QString("Enable"));
-	m_slewOptions->setCurrentIndex(0);
+	(m_attrValues["slew_en"].first().compare("0") == 0)
+			? m_slewOptions->setCurrentText("Disable")
+			: m_slewOptions->setCurrentText("Enable");
 	slewLayout->addWidget(new QLabel("Slew", m_widget), 1);
 	slewLayout->addWidget(m_slewOptions, 1);
 	addMenuLayout(slewLayout);
@@ -305,7 +314,9 @@ void CurrentOutMenu::init()
 	QHBoxLayout *slewStepLayout = new QHBoxLayout();
 	m_slewStepOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	m_slewStepOptions->setCurrentIndex(0);
+	(m_attrValues.contains("slew_step") && m_attrValues["slew_step"].size() > 0)
+			? m_slewStepOptions->setCurrentText(m_attrValues["slew_step"].first())
+			: m_slewStepOptions->setCurrentText("ERROR");
 	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
 	slewStepLayout->addWidget(m_slewStepOptions, 1);
 	addMenuLayout(slewStepLayout);
@@ -313,9 +324,11 @@ void CurrentOutMenu::init()
 	QHBoxLayout *slewRateLayout = new QHBoxLayout();
 	m_slewRateOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-	m_slewRateOptions->setCurrentIndex(0);
+	(m_attrValues.contains("slew_rate") && m_attrValues["slew_rate"].size() > 0)
+			? m_slewRateOptions->setCurrentText(m_attrValues["slew_rate"].first())
+			: m_slewRateOptions->setCurrentText("ERROR");
 	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)",m_widget),1);
-	slewRateLayout->addWidget(m_slewRateOptions,1);
+	slewRateLayout->addWidget(m_slewRateOptions, 1);
 	addMenuLayout(slewRateLayout);
 
 	connectSignalsToSlots();
@@ -352,7 +365,8 @@ void CurrentOutMenu::dacCodeChanged(double value)
 	QString attrName("raw");
 	m_attrValues[attrName].clear();
 	m_attrValues[attrName].push_back(QString::number((int)value));
-	double val = convertFromRaw(value);
+	//by default the current value is measured in μA
+	double val = convertFromRaw(value) * 0.001;
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val)+" mA");
 
@@ -406,6 +420,9 @@ void DiagnosticMenu::init()
 	m_diagOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_diagOptions, "diag_function_available");
 	m_diagOptions->setCurrentIndex(0);
+	(m_attrValues.contains("diag_function") && m_attrValues["diag_function"].size() > 0)
+			? m_diagOptions->setCurrentText(m_attrValues["diag_function"].first())
+			: m_diagOptions->setCurrentText("ERROR");
 	diagLayout->addWidget(new QLabel("Function", m_widget));
 	diagLayout->addWidget(m_diagOptions);
 	addMenuLayout(diagLayout);
