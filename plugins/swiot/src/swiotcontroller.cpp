@@ -109,7 +109,7 @@ void SwiotController::identify()
 	if(!identifyTask) {
 		identifyTask = new SwiotIdentifyTask(uri);
 		identifyTask->start();
-		connect(identifyTask,&QThread::finished,this,[=](){
+		connect(identifyTask,&QThread::finished,this,[=, this](){
 			delete identifyTask;
 			identifyTask = nullptr;
 		});
