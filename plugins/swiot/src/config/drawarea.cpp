@@ -19,8 +19,6 @@ DrawArea::DrawArea(QWidget *parent) :
 	m_connectionsMap(new QMap<QPair<int, int>, QPixmap *>())
 {
 	this->setLayout(new QVBoxLayout(this));
-	this->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//	this->setFixedSize(600, 600);
 	this->setStyleSheet("background-color: black;");
 
 	// insert, for each channel, the 2 PixMaps, one for ad74413r and one for max14906
@@ -41,21 +39,13 @@ DrawArea::~DrawArea() {
 	delete m_connectionsMap;
 }
 
-void DrawArea::setSize(QSize newSize) {
-	this->setBaseSize(newSize);
-}
-
 void DrawArea::activateConnection(int channelIndex, DrawArea::ChannelName channelName) {
-	qCritical(CAT_SWIOT_CONFIG) << "activated";
-
 	QPainter painter(m_boardImage);
 	painter.drawPixmap(0, 0, *m_connectionsMap->value(qMakePair(channelIndex, channelName)));
 	m_drawLabel->setPixmap(QPixmap::fromImage(*m_boardImage));
 }
 
 void DrawArea::deactivateConnections() {
-	qCritical(CAT_SWIOT_CONFIG) << "deactivated";
-
 	m_boardImage = new QImage(*m_baseImage);
 	m_drawLabel->setPixmap(QPixmap::fromImage(*m_baseImage));
 }
