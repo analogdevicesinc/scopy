@@ -22,8 +22,6 @@ public:
 	void activateConnection(int channelIndex, ChannelName channelName);
 	void deactivateConnections();
 
-	void setSize(QSize newSize);
-
 private:
 	QString m_filePath;
 	QImage *m_boardImage;
@@ -31,6 +29,7 @@ private:
 
 	QLabel *m_drawLabel;
 
+	// channel-device pairs
 	QMap<QPair<int, int>, QPixmap *> *m_connectionsMap;
 };
 }
