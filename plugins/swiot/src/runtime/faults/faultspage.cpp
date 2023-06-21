@@ -19,8 +19,9 @@ FaultsPage::FaultsPage(struct iio_context* context, QWidget *parent) :
 	this->m_ad74413rFaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	this->m_max14906FaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	this->ui->mainVerticalLayout->insertWidget(0, this->m_ad74413rFaultsDevice);
-	this->ui->mainVerticalLayout->insertWidget(1, this->m_max14906FaultsDevice);
+	this->ui->mainVerticalLayout->addWidget(this->m_ad74413rFaultsDevice);
+	this->ui->mainVerticalLayout->addWidget(this->m_max14906FaultsDevice);
+	this->ui->mainVerticalLayout->addItem(new QSpacerItem(0 ,0, QSizePolicy::Preferred, QSizePolicy::Expanding));
 }
 
 FaultsPage::~FaultsPage() {
