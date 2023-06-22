@@ -1,9 +1,10 @@
 #include "searchbarwidget.hpp"
-#include "utils.hpp"
+
 
 #include <qboxlayout.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
+#include "regmapstylehelper.hpp"
 
 using namespace scopy;
 using namespace regmap;
@@ -15,7 +16,7 @@ SearchBarWidget::SearchBarWidget(QWidget *parent)
 	searchBar = new QLineEdit();
 	searchBar->setPlaceholderText("Search for regist by address");
 	searchButton = new QPushButton("Search");
-    scopy::regmap::Utils::applyScopyButtonStyle(searchButton);
+    scopy::regmap::RegmapStyleHelper::BlueButton(searchButton);
 	layout = new QHBoxLayout();
 
 	QObject::connect(searchButton, &QPushButton::pressed, this, [=](){

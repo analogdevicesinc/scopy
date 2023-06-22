@@ -17,7 +17,6 @@ public:
     explicit Utils(QObject *parent = nullptr);
 
     static QString convertToHexa(uint32_t value, int size);
-    static void applyScopyButtonStyle(QPushButton *button);
     static void removeLayoutMargins(QLayout *layout);
     static QDir setXmlPath();
 
@@ -26,14 +25,14 @@ public:
     static JsonFormatedElement* getJsonTemplate(QString xml);
 
     static void applyJsonConfig();
-    static QList<QString>* getTemplate(QString devName);
+    static QString getTemplate(QString devName);
 
 private:
     static const int bitsPerRow = 7;
     static QMap<QString, JsonFormatedElement*>* spiJson;
     static QMap<QString, JsonFormatedElement*>* axiJson;
     static void getConfigurationFromJson(QString filePath);
-    static void populateJsonTemplateMap(QJsonArray jsonArray, bool spi);
+    static void populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi);
     static void generateJsonTemplate(QString filePath);
 
 signals:

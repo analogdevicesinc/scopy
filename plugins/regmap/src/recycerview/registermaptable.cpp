@@ -10,7 +10,7 @@ using namespace scopy;
 using namespace regmap;
 using namespace regmap::gui;
 
-RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels)
+RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels, QWidget *parent)
     :registerModels(registerModels)
 {
     registersMap = new QMap<uint32_t, RegisterSimpleWidget*>();
@@ -19,7 +19,7 @@ RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModel
     foreach(uint32_t index, registerModels->keys()) {
         widgets->push_back((int)index);
     }
-    recyclerView = new RecyclerView(widgets);
+    recyclerView = new RecyclerView(widgets, parent);
 
     QObject::connect(recyclerView, &RecyclerView::requestWidget, this, &RegisterMapTable::generateWidget);
     QObject::connect(this, &RegisterMapTable::widgetGenerated, recyclerView, &RecyclerView::addWidget);

@@ -15,11 +15,12 @@ public:
     bool getIsAxiCompatible() const;
     bool getUseRegisterNameAsDescription() const;
     bool getUseBifieldNameAsDescription() const;
+    QString toString();
 
 private :
     QString fileName;
     QList<QString> *compatibleDevices;
-    bool isAxiCompatible;
+    bool isAxiCompatible = false;
     bool useRegisterDescriptionAsName;
     bool useBifieldDescriptionAsName;
 

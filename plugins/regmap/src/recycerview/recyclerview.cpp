@@ -11,27 +11,30 @@
 using namespace scopy::regmap::gui;
 
 RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
-    : widgets(widgets),
-    QWidget{parent}
+    : QWidget(parent),
+    widgets(widgets)
 {
     this->installEventFilter(this);
-    this->setLayout(new QHBoxLayout());
-    layout()->setMargin(0);
-    layout()->setSpacing(0);
+    layout = new QHBoxLayout();
+    this->setLayout(layout);
+    layout->setMargin(0);
+    layout->setSpacing(0);
+
+    //    setMinimumSize(100,100);
 
     bitFieldsWidgetLayout = new QGridLayout();
     bitFieldsWidgetLayout->setMargin(0);
     bitFieldsWidgetLayout->setSpacing(0);
-    QWidget *bitFieldsWidget = new QWidget();
+    QWidget *bitFieldsWidget = new QWidget(this);
     bitFieldsWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
     bitFieldsWidget->setLayout(bitFieldsWidgetLayout);
 
-    m_scrollArea = new VerticalScrollArea();
+    m_scrollArea = new VerticalScrollArea(this);
     m_scrollArea->setWidget(bitFieldsWidget);
     m_scrollArea->verticalScrollBar()->setVisible(false);
-    this->layout()->addWidget(m_scrollArea);
+    layout->addWidget(m_scrollArea);
 
-    slider = new QSlider();
+    slider = new QSlider(this);
     slider->setInvertedAppearance(true);
     slider->setInvertedControls(true);
 
@@ -46,7 +49,7 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
         }
 
     });
-    this->layout()->addWidget(slider);
+    layout->addWidget(slider);
 }
 
 RecyclerView::~RecyclerView()
@@ -54,6 +57,7 @@ RecyclerView::~RecyclerView()
     delete bitFieldsWidgetLayout;
     delete widgetMap;
     delete m_scrollArea;
+    delete layout;
 }
 
 void RecyclerView::init()
