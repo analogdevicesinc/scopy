@@ -9,6 +9,8 @@
 
 class QSlider;
 class QGridLayout;
+
+class QHBoxLayout;
 namespace scopy::regmap::gui{
 class RecyclerView : public QWidget
 {
@@ -42,6 +44,7 @@ private:
     int m_scrollBarCurrentValue;
 
     QGridLayout *bitFieldsWidgetLayout;
+    QHBoxLayout *layout;
 
     QMap<int, QWidget*> *widgetMap;
     QList<int> *widgets;

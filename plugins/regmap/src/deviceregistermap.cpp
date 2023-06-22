@@ -6,6 +6,7 @@
 #include "search.hpp"
 #include "registermapsettingsmenu.hpp"
 #include "utils.hpp"
+#include "logging_categories.h"
 
 #include <QLineEdit>
 #include <QPushButton>
@@ -22,15 +23,16 @@
 #include <src/recycerview/registermaptable.hpp>
 #include <tool_view_builder.hpp>
 #include "dynamicWidget.h"
+#include "regmapstylehelper.hpp"
 
 using namespace scopy;
 using namespace regmap;
 using namespace regmap::gui;
 
 DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, RegisterMapValues *registerMapValues,  QWidget *parent)
-    : registerMapValues(registerMapValues),
-    registerMapTemplate(registerMapTemplate),
-    QWidget{parent}
+    : QWidget(parent),
+    registerMapValues(registerMapValues),
+    registerMapTemplate(registerMapTemplate)
 {
     layout = new QVBoxLayout();
     Utils::removeLayoutMargins(layout);
@@ -45,8 +47,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         registerMapTable->setLayout(registerMapTableLayout);
 
         QWidget *tableHeadWidget = new QWidget();
-        scopy::setDynamicProperty(tableHeadWidget, "has_frame", true);
-        scopy::setDynamicProperty(tableHeadWidget, "has_bottom_border", true);
+        scopy::regmap::RegmapStyleHelper::FrameWidget(tableHeadWidget);
         QHBoxLayout *tableHead = new QHBoxLayout();
         tableHeadWidget->setLayout(tableHead);
 
@@ -58,14 +59,17 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
             tableHead->addWidget(new QLabel("Bit"+QString::number(i)),1);
         }
 
-        registerMapTableWidget = new gui::RegisterMapTable(registerMapTemplate->getRegisterList());
+        registerMapTableWidget = new gui::RegisterMapTable(registerMapTemplate->getRegisterList(), this);
 
         QObject::connect(registerMapTableWidget, &gui::RegisterMapTable::registerSelected, this, [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
         });
 
         registerMapTableLayout->addWidget(tableHeadWidget);
-        registerMapTableLayout->addWidget(registerMapTableWidget->getWidget());
+        auto aux = registerMapTableWidget->getWidget();
+        if (aux) {
+            registerMapTableLayout->addWidget(aux);
+        }
         layout->addWidget(registerMapTable,5);
 
         QObject::connect(registerController, &gui::RegisterController::registerAddressChanged, this , [=](uint32_t address){
@@ -75,6 +79,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
                 Q_EMIT registerMapValues->requestRead(address);
             }
         });
+        layout->addWidget(registerController,1);
     }
 
     QObject::connect(registerController, &RegisterController::requestRead, registerMapValues, &RegisterMapValues::requestRead);
@@ -91,6 +96,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
     if (registerMapTemplate) {
         registerChanged(registerMapTemplate->getRegisterList()->first());
+    } else {
+        layout->addItem(new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding));
     }
 }
 

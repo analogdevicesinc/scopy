@@ -17,7 +17,7 @@ class RegisterMapTable : public IRecyclerViewAdapter
 {
     Q_OBJECT
 public:
-    RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels);
+    RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels, QWidget *parent);
 
     QWidget* getWidget();
     void setFilters(QList<uint32_t> filters);
@@ -33,7 +33,7 @@ Q_SIGNALS:
     void registerSelected(uint32_t address);
 
 private:
-    RecyclerView * recyclerView;
+    RecyclerView * recyclerView = nullptr;
     QMap<uint32_t, RegisterModel*> *registerModels;
     QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
     uint32_t selectedAddress;
