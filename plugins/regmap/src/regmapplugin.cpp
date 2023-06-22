@@ -11,6 +11,9 @@
 #include <QWidget>
 #include <QVector>
 #include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
@@ -18,6 +21,7 @@
 #include "logging_categories.h"
 
 #include "iioutil/contextprovider.h"
+#include "jsonformatedelement.hpp"
 #include "scopy-regmap_config.h"
 #include "utils.hpp"
 
@@ -48,6 +52,8 @@ void REGMAPPlugin::unload()
     //TODO
     auto &&cp = ContextProvider::GetInstance();
     cp->close(m_param);
+    if (m_registerMapWidget) delete m_registerMapWidget;
+    if (m_deviceList) delete m_deviceList;
 }
 
 bool REGMAPPlugin::compatible(QString m_param, QString category)
@@ -66,8 +72,6 @@ bool REGMAPPlugin::compatible(QString m_param, QString category)
             iio_device *dev = iio_context_get_device(ctx, i);
             if (iio_device_find_debug_attr(dev,"direct_reg_access")) {
                 cp->close(m_param);
-                // if we have regmap we create the config file
-                scopy::regmap::Utils::applyJsonConfig();
                 return true;
             }
         }
@@ -75,23 +79,6 @@ bool REGMAPPlugin::compatible(QString m_param, QString category)
     cp->close(m_param);
 
     return false;
-}
-
-void REGMAPPlugin::preload()
-{
-    //    auto &&cp = ContextProvider::GetInstance();
-    //    iio_context* ctx = cp->open(m_uri);
-
-    //    m_deviceList = new QList<iio_device*>();
-
-    //    auto deviceCount = iio_context_get_devices_count(ctx);
-
-    //    for (int i = 0; i < deviceCount; i++) {
-    //        iio_device *dev = iio_context_get_device(ctx, i);
-    //        qDebug(CAT_REGMAP)<<"DEVICE FOUND " << iio_device_get_name(dev);
-    //        m_deviceList->push_back(dev);
-    //    }
-
 }
 
 void REGMAPPlugin::initPreferences()
@@ -134,6 +121,8 @@ bool REGMAPPlugin::onConnect()
     QVBoxLayout *layout  = new QVBoxLayout();
     m_registerMapWidget->setLayout(layout);
 
+    scopy::regmap::Utils::applyJsonConfig();
+
     if (m_deviceList && !m_deviceList->isEmpty()) {
         QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
         scopy::regmap::RegisterMapInstrument *regMapInstrument = new scopy::regmap::RegisterMapInstrument();
@@ -142,25 +131,17 @@ bool REGMAPPlugin::onConnect()
             iio_device *dev = m_deviceList->at(i);
             QString devName = QString::fromStdString(iio_device_get_name(dev));
             qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << devName;
-
-            if (isBufferCapable(dev)) {
-                qDebug(CAT_REGMAP)<<"DEVICE :" << devName << " IS BUFFER CAPABLE";
-            }
-
-
-            QList<QString> *templatePaths = scopy::regmap::Utils::getTemplate(devName);
-            if (!templatePaths->empty()) {
-                for (int i = 0 ; i < templatePaths->size(); i++) {
-                    qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << devName;
-                    regMapInstrument->addTab( dev, devName, xmlsPath.absoluteFilePath(templatePaths->at(i)));
-                }
-
+            QString templatePaths = scopy::regmap::Utils::getTemplate(devName);
+            qDebug(CAT_REGMAP)<<"templatePaths :" << templatePaths ;
+            if (!templatePaths.isEmpty()) {
+                qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << devName;
+                regMapInstrument->addTab( dev, devName, xmlsPath.absoluteFilePath(templatePaths));
             } else {
                 //TODO GROUP ALL DEVICES IN ONE WITH A COMBOBOX
                 regMapInstrument->addTab(dev, iio_device_get_name(dev));
             }
 
-
+            qDebug(CAT_REGMAP) << "";
         }
         layout->addWidget(regMapInstrument);
 

@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QComboBox>
 #include "utils.hpp"
+#include "regmapstylehelper.hpp"
 
 #include <src/readwrite/fileregisterreadstrategy.hpp>
 
@@ -63,7 +64,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     QPushButton *readInterval = new QPushButton("Read interval");
     readInterval->setEnabled(false);
-    Utils::applyScopyButtonStyle(readInterval);
+    scopy::regmap::RegmapStyleHelper::BlueButton(readInterval);
 
     QObject::connect(readInterval, &QPushButton::clicked, this, [=](){
         bool ok;
@@ -101,7 +102,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     QLineEdit *filePath = new QLineEdit();
     filePath->setPlaceholderText("File path");
     QPushButton *pathButton = new QPushButton("Find path");
-    Utils::applyScopyButtonStyle(pathButton);
+    scopy::regmap::RegmapStyleHelper::BlueButton(pathButton);
 
 
     QObject::connect(pathButton, &QPushButton::clicked, this, [=](){
@@ -115,7 +116,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     QPushButton *writeListOfValuesButton = new QPushButton("Write values");
     writeListOfValuesButton->setEnabled(false);
-    Utils::applyScopyButtonStyle(writeListOfValuesButton);
+    scopy::regmap::RegmapStyleHelper::BlueButton(writeListOfValuesButton);
 
     QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=](){
 
@@ -136,7 +137,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     QPushButton *registerDump = new QPushButton("Register dump");
     registerDump->setEnabled(false);
-    Utils::applyScopyButtonStyle(registerDump);
+    scopy::regmap::RegmapStyleHelper::BlueButton(registerDump);
 
     QObject::connect(registerDump, &QPushButton::clicked, this, [=](){
         if (autoread->isChecked()) {

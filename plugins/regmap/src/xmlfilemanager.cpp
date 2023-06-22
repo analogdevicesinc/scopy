@@ -86,7 +86,7 @@ QVector<BitFieldModel*> *XmlFileManager::getBitFields(QString regAddr)
     {
         QDomElement address = reg.firstChildElement("Address");
         if (address.firstChild().toText().data() == regAddr) {
-            return getBitFieldsOfRegister(reg);
+            return getBitFieldsOfRegister(reg, true);
         }
         reg = reg.nextSibling().toElement();
     }
@@ -102,12 +102,14 @@ RegisterModel *XmlFileManager::getRegister(QDomElement reg)
 
         QString name = "";
         QString description = "";
+        bool isAxiCompatible = false;
         QStringList xmlName = filePath.split(QLatin1Char('/'));
 
         JsonFormatedElement *jsonFormatedElement = scopy::regmap::Utils::getJsonTemplate(xmlName.at(xmlName.length() - 1));
         if (jsonFormatedElement && jsonFormatedElement->getUseRegisterNameAsDescription()) {
             name = reg.firstChildElement("Description").firstChild().toText().data();
             description = reg.firstChildElement("Name").firstChild().toText().data();
+            isAxiCompatible = jsonFormatedElement->getIsAxiCompatible();
         } else {
             name = reg.firstChildElement("Name").firstChild().toText().data();
             description = reg.firstChildElement("Description").firstChild().toText().data();
@@ -119,42 +121,58 @@ RegisterModel *XmlFileManager::getRegister(QDomElement reg)
                                  reg.firstChildElement("Exists").toText().data().toUpper() == "TRUE",
                                  reg.firstChildElement("Width").firstChild().toText().data().toInt(),
                                  reg.firstChildElement("Notes").firstChild().toText().data(),
-                                 getBitFieldsOfRegister(reg)
+                                 getBitFieldsOfRegister(reg, isAxiCompatible)
                                  );
     }
     return nullptr;
 }
 
-QVector<BitFieldModel*> *XmlFileManager::getBitFieldsOfRegister(QDomElement reg)
+bool compareRegisters(const BitFieldModel *bf1, const BitFieldModel *bf2) {
+    return bf1->getRegOffset() < bf2->getRegOffset();
+}
+
+QVector<BitFieldModel*> *XmlFileManager::getBitFieldsOfRegister(QDomElement reg, bool reverseBitOrder)
 {
     if (!reg.isNull()) {
+
         QVector<BitFieldModel*>  *bitFieldsList = new QVector<BitFieldModel*>();
         QDomElement bitFields = reg.firstChildElement("BitFields");
         QDomElement bf;
-
         bf = bitFields.firstChild().toElement();
         int regWidth = reg.firstChildElement("Width").firstChild().toText().data().toInt();
         int numberOfBits = 0;
-        while(numberOfBits < regWidth) {
-            if (!bf.isNull()) {
-                int bitFieldRegOffset = bf.firstChildElement("RegOffset").firstChild().toText().data().toInt();
-                if ( bitFieldRegOffset == numberOfBits){
-                    BitFieldModel *bitField = getBitField(bf);
-                    bitFieldsList->push_back(bitField);
-                    bf = bf.nextSibling().toElement();
-                    numberOfBits += bitField->getWidth();
-                } else {
-                    BitFieldModel *bitField = new BitFieldModel("Bit " +QString::number(bitFieldRegOffset -1) + ":" + QString::number(numberOfBits), bitFieldRegOffset - numberOfBits, numberOfBits , "Reserved" , nullptr);
-                    bitFieldsList->push_back(bitField);
-                    numberOfBits+= bitFieldRegOffset - numberOfBits;
+        while(!bf.isNull()) {
+            BitFieldModel *bitField = getBitField(bf);
+            bitFieldsList->push_back(bitField);
+            numberOfBits += bitField->getWidth();
+            bf = bf.nextSibling().toElement();
+        }
+        // after getting all available bitfields sort the list and add all the missing bits as reserved
+        if (!bitFieldsList->empty()) {
+            QVector<BitFieldModel*>  *bitFieldsListWithReserved = new QVector<BitFieldModel*>();
+                if (regWidth > numberOfBits){
+                //sort bitfield list
+                std::sort(bitFieldsList->begin(), bitFieldsList->end(), compareRegisters);
+                 bitFieldsListWithReserved->push_back(bitFieldsList->at(0));
+                for (int i = 1; i < bitFieldsList->length(); i++) {
+                    int bf1 = bitFieldsList->at(i - 1)->getRegOffset() + bitFieldsList->at(i -1)->getWidth();
+                    int bf2 = bitFieldsList->at(i)->getRegOffset();
+                    if ( bf1 != bf2) {
+                        BitFieldModel *bitField = new BitFieldModel("Bit " +QString::number(bf2 -1) + ":" + QString::number(bf1),
+                                                                    bf2 - bf1, bf1 , "Reserved" , nullptr);
+                        bitFieldsListWithReserved->push_back(bitField);
+                        numberOfBits += bf2 - bf1;
+                    } else {
+                        bitFieldsListWithReserved->push_back(bitFieldsList->at(i));
+                    }
                 }
-            } else { //for all remaining ?
-                BitFieldModel *bitField = new BitFieldModel("Bit " + QString::number(regWidth -1) + ":" + QString::number(numberOfBits) , regWidth - numberOfBits, numberOfBits, "Reserved", nullptr);
-                bitFieldsList->push_back(bitField);
-                numberOfBits += regWidth - numberOfBits;
-            }
-            //			bf = bf.nextSibling().toElement();
 
+                if (regWidth > numberOfBits){
+                    BitFieldModel *bitField = new BitFieldModel("Bit " + QString::number(regWidth -1) + ":" + QString::number(numberOfBits) , regWidth - numberOfBits, numberOfBits, "Reserved", nullptr);
+                    bitFieldsListWithReserved->push_back(bitField);
+                }
+                return bitFieldsListWithReserved;
+            }
         }
         return bitFieldsList;
     }

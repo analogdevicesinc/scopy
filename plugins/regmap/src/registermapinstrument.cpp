@@ -36,6 +36,8 @@ RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
 
     toolView = scopy::gui::ToolViewBuilder(recepie, nullptr, parent).build();
     toolView->addFixedCentralWidget(mainWidget,0,0,0,0);
+    toolView->getTopExtraWidget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
     Utils::removeLayoutMargins(toolView->getCentralWidget()->layout());
 
     registerDeviceList = new QComboBox();
@@ -45,7 +47,7 @@ RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
     toolView->addTopExtraWidget(registerDeviceList);
 
     searchBarWidget =  new scopy::regmap::gui::SearchBarWidget();
-    searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QObject::connect(searchBarWidget, &scopy::regmap::gui::SearchBarWidget::requestSearch, this, [=](QString searchParam){
         tabs->value(registerDeviceList->currentText())->applyFilters(searchParam);
@@ -134,11 +136,12 @@ void RegisterMapInstrument::addTab(QString filePath, QString title)
 void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPath)
 {
     RegisterMapTemplate *registerMapTemplate = nullptr;
-    if (xmlPath != "") {
-        registerMapTemplate = new RegisterMapTemplate();
+    if (!xmlPath.isEmpty()) {
+        registerMapTemplate = new RegisterMapTemplate(this);
         XmlFileManager xmlFileManager(dev, xmlPath);
-        if (!xmlFileManager.getAllRegisters()->isEmpty()){
-            registerMapTemplate->setRegisterList(xmlFileManager.getAllRegisters());
+        auto aux = xmlFileManager.getAllRegisters();
+        if (!aux->isEmpty()){
+            registerMapTemplate->setRegisterList(aux);
         }
     }
     RegisterMapValues *registerMapValues = nullptr;
@@ -147,7 +150,7 @@ void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPa
     } else {
         registerMapValues = getRegisterMapValues(xmlPath);
     }
-    DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate,registerMapValues);
+    DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate,registerMapValues, this);
 
     tabs->insert(title, regMap);
     mainWidget->layout()->addWidget(regMap);
