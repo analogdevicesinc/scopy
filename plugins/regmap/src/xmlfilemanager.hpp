@@ -25,7 +25,7 @@ public:
 	RegisterModel* getRegister(QDomElement reg);
 	void getRegMapData(QString addr);
 	QVector<BitFieldModel*> *getBitFields(QString regAddr);
-	QVector<BitFieldModel*> *getBitFieldsOfRegister(QDomElement reg);
+    QVector<BitFieldModel*> *getBitFieldsOfRegister(QDomElement reg, bool reverseBitOrder);
 	BitFieldModel *getBitField(QDomElement bitField);
 
 private:

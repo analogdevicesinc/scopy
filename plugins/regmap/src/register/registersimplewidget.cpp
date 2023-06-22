@@ -4,7 +4,6 @@
 #include <qboxlayout.h>
 #include <qcoreevent.h>
 #include <qdebug.h>
-#include <qlabelmaxchar.hpp>
 #include <utils.h>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>

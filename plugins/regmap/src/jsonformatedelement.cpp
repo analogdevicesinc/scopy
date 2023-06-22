@@ -37,6 +37,14 @@ bool JsonFormatedElement::getUseBifieldNameAsDescription() const
     return useBifieldDescriptionAsName;
 }
 
+QString JsonFormatedElement::toString()
+{
+    return QString("Filename : " + fileName + " Compatible Dev: " + compatibleDevices->length() +
+                   " isAxiCompatible :"  + isAxiCompatible +
+                   " useRegisterDescriptionAsName: " + useRegisterDescriptionAsName +
+                   " useBifieldDescriptionAsName: " + useBifieldDescriptionAsName);
+}
+
 bool JsonFormatedElement::getUseRegisterNameAsDescription() const
 {
     return useRegisterDescriptionAsName;

@@ -10,6 +10,8 @@
 #include <QPushButton>
 #include <QLayout>
 
+#include "logging_categories.h"
+
 using namespace scopy::regmap;
 
 QMap<QString, JsonFormatedElement*>* Utils::spiJson {new QMap<QString,JsonFormatedElement*>()};
@@ -23,13 +25,6 @@ Utils::Utils(QObject *parent)
 QString Utils::convertToHexa(uint32_t value, int size)
 {
     return QStringLiteral("0x%1").arg(value, (size / getBitsPerRow()) + 1, 16, QLatin1Char('0'));
-}
-
-void Utils::applyScopyButtonStyle(QPushButton *button)
-{
-    scopy::setDynamicProperty(button, "blue_button", true);
-    button->setFixedHeight(30);
-    button->setMinimumWidth(150);
 }
 
 void Utils::removeLayoutMargins(QLayout *layout)
@@ -65,15 +60,13 @@ JsonFormatedElement *Utils::getJsonTemplate(QString xml)
     return nullptr;
 }
 
-QList<QString>* Utils::getTemplate(QString devName)
+QString Utils::getTemplate(QString devName)
 {
-    QList<QString> *templates = new QList<QString>();
     // search for SPI template
     foreach (QString key, spiJson->keys()) {
         for (int i = 0; i < spiJson->value(key)->getCompatibleDevices()->size(); i++) {
             if (spiJson->value(key)->getCompatibleDevices()->at(i).contains(devName)) {
-                templates->push_back(key);
-                break;
+                return QString(key);
             }
         }
     }
@@ -81,13 +74,12 @@ QList<QString>* Utils::getTemplate(QString devName)
     foreach (QString key, axiJson->keys()) {
         for (int i = 0; i < axiJson->value(key)->getCompatibleDevices()->size(); i++) {
             if (axiJson->value(key)->getCompatibleDevices()->at(i).contains(devName)) {
-                templates->push_back(key);
-                break;
+                return QString(key);
             }
         }
     }
 
-    return templates;
+    return QString("");
 }
 
 void Utils::applyJsonConfig()
@@ -111,33 +103,34 @@ void Utils::getConfigurationFromJson(QString filePath)
     QJsonObject obj = d.object();
 
     QJsonArray jsonSpiArray = obj.value(QString("spi")).toArray();
-    populateJsonTemplateMap(jsonSpiArray,true);
+    populateJsonTemplateMap(jsonSpiArray,false);
     QJsonArray jsonAxiArray = obj.value(QString("axi")).toArray();
-    populateJsonTemplateMap(jsonAxiArray,false);
+    populateJsonTemplateMap(jsonAxiArray,true);
 
 }
 
-void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool spi)
+void Utils::populateJsonTemplateMap(QJsonArray jsonArray, bool isAxi)
 {
     for (auto object : jsonArray) {
 
         QString fileName = object.toObject().value(QString("file_name")).toString();
-        bool axiCompatible = object.toObject().value(QString("axi_compatible")).toBool();
         bool useRegisterDescriptionAsName = object.toObject().value(QString("use_register_description_as_name")).toBool();
         bool useBifieldDescriptionAsName = object.toObject().value(QString("use_bitfield_description_as_name")).toBool();
 
         QList<QString> *compatibleDevicesList = new QList<QString>();
         QJsonArray compatibleDevices = object.toObject().value(QString("compatible_drivers")).toArray();
+
+        qDebug(CAT_REGMAP)<< "fileName : " <<  fileName;
+        qDebug(CAT_REGMAP)<< "useRegisterDescriptionAsName : " << useRegisterDescriptionAsName;
+        qDebug(CAT_REGMAP)<< "useBifieldDescriptionAsName : " << useBifieldDescriptionAsName;
+
         if (!compatibleDevices.isEmpty()) {
             for (auto device : compatibleDevices) {
                 compatibleDevicesList->push_back(device.toString());
+                qDebug(CAT_REGMAP)<< "compatible device : " <<  device.toString();
             }
         }
-        if (spi) {
-            spiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, axiCompatible, useRegisterDescriptionAsName, useBifieldDescriptionAsName));
-        } else {
-            axiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, axiCompatible, useRegisterDescriptionAsName, useBifieldDescriptionAsName));
-        }
+        spiJson->insert(fileName , new JsonFormatedElement(fileName, compatibleDevicesList, isAxi, useRegisterDescriptionAsName, useBifieldDescriptionAsName));
     }
 }
 
@@ -147,16 +140,14 @@ void Utils::generateJsonTemplate(QString filePath)
 
     foreach (const QString &xmlName, scopy::regmap::Utils::setXmlPath().entryList()) {
         if (xmlName.contains(".xml") ) {
-            if (!xmlName.contains("_axi")) {
-                auto deviceName = xmlName.toLower();
-                deviceName.chop(4);
-                if (spiJson->contains(xmlName)) {
-                    spiJson->value(xmlName)->addCompatibleDevice(deviceName);
-                } else {
-                    JsonFormatedElement *jsonFormatedElement = new JsonFormatedElement(xmlName);
-                    jsonFormatedElement->addCompatibleDevice(deviceName);
-                    spiJson->insert(xmlName,jsonFormatedElement);
-                }
+            auto deviceName = xmlName.toLower();
+            deviceName.chop(4);
+            if (spiJson->contains(xmlName)) {
+                spiJson->value(xmlName)->addCompatibleDevice(deviceName);
+            } else {
+                JsonFormatedElement *jsonFormatedElement = new JsonFormatedElement(xmlName);
+                jsonFormatedElement->addCompatibleDevice(deviceName);
+                spiJson->insert(xmlName,jsonFormatedElement);
             }
         }
     }

@@ -16,6 +16,10 @@ namespace Ui {
 }
 
 namespace scopy {
+namespace regmap {
+class JsonFormatedElement;
+}
+
 class SCOPY_REGMAP_EXPORT REGMAPPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
@@ -27,7 +31,6 @@ public:
 	void loadToolList() override;
 	void unload() override;
 	bool compatible(QString uri, QString category) override;
-    void preload() override;
     void initPreferences() override;
     bool loadPreferencesPage() override;
 
@@ -41,7 +44,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 
 private:
-    QWidget *m_registerMapWidget;
+    QWidget *m_registerMapWidget = nullptr;
     QList<iio_device*> *m_deviceList = nullptr;
     struct iio_device* getIioDevice(iio_context* ctx, const char *dev_name);
     bool isBufferCapable(iio_device *dev);
