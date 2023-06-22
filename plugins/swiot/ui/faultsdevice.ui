@@ -51,13 +51,13 @@
        <number>6</number>
       </property>
       <property name="leftMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="topMargin">
        <number>9</number>
       </property>
       <property name="rightMargin">
-       <number>0</number>
+       <number>9</number>
       </property>
       <property name="bottomMargin">
        <number>9</number>
@@ -155,15 +155,7 @@ STORED</string>
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">QPushButton[deb=true]
-{
-	height: 30px;
-	font-weight: normal;
-	font-style: normal;
-	text-align: center;
-}
-
-QPushButton {
+         <string notr="true">QPushButton {
   width: 80px;
   height: 40px;
   border-radius: 4px;
