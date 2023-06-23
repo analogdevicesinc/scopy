@@ -44,6 +44,7 @@ public:
 	void initMetadata() override;
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
+	QString description() override;
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
