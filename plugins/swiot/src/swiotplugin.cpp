@@ -211,6 +211,11 @@ void SWIOTPlugin::onCtxSwitched()
 	Q_EMIT restartDevice();
 }
 
+QString SWIOTPlugin::description()
+{
+	return "Adds functionality specific to SWIOT1L board";
+}
+
 void SWIOTPlugin::initMetadata()
 {
 	loadMetadata(

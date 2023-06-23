@@ -18,6 +18,7 @@ public:
 	bool compatible(QString param, QString category) override;
 	bool loadPage() override;
 	void loadToolList() override;
+	QString description() override;
 
 public Q_SLOTS:
 	bool onConnect() override;

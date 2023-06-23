@@ -29,6 +29,7 @@ public:
 	void unload() override;
 	bool compatible(QString param, QString category) override;
 	void initMetadata() override;
+	QString description() override;
 
 public Q_SLOTS:
 	bool onConnect() override;
