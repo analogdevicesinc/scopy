@@ -1,5 +1,5 @@
-#ifndef PLUGINENTRY_H
-#define PLUGINENTRY_H
+#ifndef PLUGINENABLEWIDGET_H
+#define PLUGINENABLEWIDGET_H
 
 #include <qwidget.h>
 #include "qcheckbox.h"
@@ -7,11 +7,11 @@
 
 namespace scopy {
 
-class PluginEntry : public QWidget {
+class PluginEnableWidget : public QWidget {
 	Q_OBJECT
 public:
-	explicit PluginEntry(QWidget *parent = nullptr);
-	~PluginEntry();
+	explicit PluginEnableWidget(QWidget *parent = nullptr);
+	~PluginEnableWidget();
 
 	void paintEvent(QPaintEvent *e) override;
 	void setDescription(QString description);
@@ -25,4 +25,4 @@ private:
 }
 
 
-#endif // PLUGINENTRY_H
+#endif // PLUGINENABLEWIDGET_H

@@ -1,4 +1,4 @@
-#include "pluginentry.h"
+#include "pluginenablewidget.h"
 #include "qboxlayout.h"
 #include "qpainter.h"
 
@@ -6,7 +6,7 @@
 
 using namespace scopy;
 
-PluginEntry::PluginEntry(QWidget *parent)
+PluginEnableWidget::PluginEnableWidget(QWidget *parent)
 	: QWidget(parent)
 {
 	QHBoxLayout *layout = new QHBoxLayout(this);
@@ -27,21 +27,21 @@ PluginEntry::PluginEntry(QWidget *parent)
 	this->setAutoFillBackground(true);
 }
 
-PluginEntry::~PluginEntry()
+PluginEnableWidget::~PluginEnableWidget()
 {}
 
-void PluginEntry::setDescription(QString description)
+void PluginEnableWidget::setDescription(QString description)
 {
 	m_descriptionLabel->clear();
 	m_descriptionLabel->setText(description);
 }
 
-QCheckBox *PluginEntry::checkBox() const
+QCheckBox *PluginEnableWidget::checkBox() const
 {
 	return m_checkBox;
 }
 
-void PluginEntry::paintEvent(QPaintEvent *e) {
+void PluginEnableWidget::paintEvent(QPaintEvent *e) {
 	// https://forum.qt.io/topic/25142/solved-applying-style-on-derived-widget-with-custom-property-failes/2
 	// https://doc.qt.io/qt-5/stylesheet-reference.html
 	QStyleOption opt;
