@@ -2,6 +2,7 @@
 #include <iio.h>
 #include <QLoggingCategory>
 #include <QElapsedTimer>
+#include <libserialport.h>
 
 using namespace scopy;
 IIOScanTask::IIOScanTask(QObject *parent) : QThread(parent) {}
@@ -62,6 +63,20 @@ int IIOScanTask::scan(QStringList *ctxs, QString scanParams) {
 scan_err:
 	iio_scan_context_destroy(scan_ctx);
 	return ret;
+}
+
+QVector<QString> IIOScanTask::getSerialPortsName()
+{
+	QVector<QString> serialPortsName;
+	struct sp_port** serialPorts;
+	int retCode = sp_list_ports(&serialPorts);
+	if (retCode == SP_OK) {
+		for (int i = 0; serialPorts[i]; i++) {
+		      serialPortsName.push_back(QString(sp_get_port_name(serialPorts[i])));
+		}
+		sp_free_port_list(serialPorts);
+	}
+	return serialPortsName;
 }
 
 #include "moc_iioscantask.cpp"

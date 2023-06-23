@@ -4,9 +4,8 @@
 #include <QWidget>
 #include "deviceimpl.h"
 #include "iioutil/iioscantask.h"
-#include "iioutil/libserialportsupport.h"
 #include "infopage.h"
-#include "pluginentry.h"
+#include "pluginenablewidget.h"
 #include "pluginmanager.h"
 #include "scopy-core_export.h"
 #include <QFuture>
@@ -61,8 +60,7 @@ private:
 	InfoPage *deviceInfoPage;
 	PluginManager *pluginManager;
 	DeviceImpl *deviceImpl;
-	LibSerialPortSupport *libSerialSupport;
-	QList<PluginEntry*> pluginDescriptionList;
+	QList<PluginEnableWidget*> pluginDescriptionList;
 	QMovie *loadingIcon;
 
 	const QVector<unsigned int> availableBaudRates = {2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
