@@ -31,6 +31,7 @@ public:
 
 
 	void initMetadata() override;
+	QString description() override;
 
     QWidget* getTool();
 public Q_SLOTS:

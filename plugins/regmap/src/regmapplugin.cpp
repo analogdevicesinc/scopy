@@ -164,6 +164,7 @@ QWidget *REGMAPPlugin::getTool()
     return m_registerMapWidget;
 }
 
+
 struct iio_device* REGMAPPlugin::getIioDevice(iio_context* ctx, const char *dev_name){
     auto deviceCount = iio_context_get_devices_count(ctx);
 
@@ -176,3 +177,7 @@ struct iio_device* REGMAPPlugin::getIioDevice(iio_context* ctx, const char *dev_
     return nullptr;
 }
 
+QString REGMAPPlugin::description()
+{
+	return "Read/Write to a live register map";
+}
