@@ -1,5 +1,5 @@
 ﻿#include "scopyhomeaddpage.h"
-
+#include "iioutil/scopy-iioutil_config.h"
 #include "devicefactory.h"
 #include "deviceloader.h"
 #include "qmovie.h"
@@ -12,8 +12,7 @@ using namespace scopy;
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	QWidget(parent),
 	ui(new Ui::ScopyHomeAddPage),
-	pluginManager(pm), deviceImpl(nullptr),
-	libSerialSupport(new LibSerialPortSupport())
+	pluginManager(pm), deviceImpl(nullptr)
 {
 	ui->setupUi(this);
 	this->setProperty("device_page", true);
@@ -96,14 +95,14 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 ScopyHomeAddPage::~ScopyHomeAddPage()
 {
 	delete ui;
-	if (libSerialSupport) {
-		delete libSerialSupport;
-	}
 }
 
 void ScopyHomeAddPage::initAddPage()
 {
-	bool hasLibSerialPort = libSerialSupport->hasLibSerialSupport();
+	bool hasLibSerialPort = false;
+#ifdef WITH_LIBSERIALPORT
+	hasLibSerialPort = true;
+#endif
 	bool serialBackEnd = iio_has_backend("serial");
 
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){1}$");
@@ -140,7 +139,7 @@ void ScopyHomeAddPage::initSubSections()
 void ScopyHomeAddPage::findAvailableSerialPorts()
 {
 	if (scanParamsList.contains("serial:")) {
-		QVector<QString> portsName = libSerialSupport->getSerialPortsName();
+		QVector<QString> portsName = IIOScanTask::getSerialPortsName();
 		ui->comboBoxSerialPort->clear();
 		if (!portsName.empty()) {
 			for (QString port : portsName) {
@@ -154,9 +153,16 @@ void ScopyHomeAddPage::verifyIioBackend()
 {
 	bool scan = false;
 	int backEndsCount = iio_get_backends_count();
+	bool hasLibSerialPort = false;
+#ifdef WITH_LIBSERIALPORT
+	hasLibSerialPort = true;
+#endif
 	for (int i = 0; i < backEndsCount; i++) {
 		QString backEnd(iio_get_backend(i));
 		if (backEnd.compare("xml") == 0) {
+			continue;
+		}
+		if (!hasLibSerialPort && backEnd.compare("serial") == 0) {
 			continue;
 		}
 		QCheckBox *cb = new QCheckBox();
@@ -250,7 +256,7 @@ void ScopyHomeAddPage::deviceLoaderInitialized()
 {
 	QList<Plugin *> plugins = deviceImpl->plugins();
 	for (Plugin *p : qAsConst(plugins)) {
-		PluginEntry *pluginDescription = new PluginEntry(ui->devicePluginBrowser->getContentWidget());
+		PluginEnableWidget *pluginDescription = new PluginEnableWidget(ui->devicePluginBrowser->getContentWidget());
 		pluginDescription->setDescription(p->description());
 		pluginDescription->checkBox()->setText(p->name());
 		pluginDescription->checkBox()->setChecked(p->enabled());
