@@ -681,10 +681,11 @@ void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph) {
         }
 
         // Plot needs a grid
-        d_grid = new EdgelessPlotGrid();
-        QColor majorPenColor("#353537");
-        d_grid->setMajorPen(majorPenColor, 1.0, Qt::DashLine);
-        d_grid->attach(this);
+	d_grid = new EdgelessPlotGrid();
+	QColor majorPenColor("#353537");
+	d_grid->setYAxis(m_qwtYAxis);
+	d_grid->setMajorPen(majorPenColor, 1.0, Qt::DashLine);
+	d_grid->attach(this);
     }
 }
 
