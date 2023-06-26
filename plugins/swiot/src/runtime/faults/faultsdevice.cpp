@@ -48,6 +48,8 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	  m_cmdQueue(nullptr)
 {
 	ui->setupUi(this);
+	ui->reset_button->setProperty("blue_button", QVariant(true));
+	ui->clear_selection_button->setProperty("blue_button", QVariant(true));
 	m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_context);
 	initSpecialFaults();
 	m_faultsGroup = new FaultsGroup(name, m_path, this);
