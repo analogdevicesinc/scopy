@@ -132,9 +132,6 @@
          <string>RESET
 STORED</string>
         </property>
-        <property name="blue_button" stdset="0">
-         <bool>true</bool>
-        </property>
        </widget>
       </item>
       <item>
@@ -170,9 +167,6 @@ STORED</string>
         <property name="text">
          <string>CLEAR
 SELECTION</string>
-        </property>
-        <property name="blue_button" stdset="0">
-         <bool>true</bool>
         </property>
        </widget>
       </item>
