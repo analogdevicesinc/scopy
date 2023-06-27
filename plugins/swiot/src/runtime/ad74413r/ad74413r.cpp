@@ -191,6 +191,9 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 			}
 			controller->createConnections();
 			m_channelWidgetList.push_back(chWidget);
+			if (chnlsFunctions[i].compare("diagnostic") == 0) {
+				chWidget->enableButton()->setChecked(false);
+			}
 			chId++;
 		}
 	}
