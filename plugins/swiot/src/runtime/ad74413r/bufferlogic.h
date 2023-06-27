@@ -49,7 +49,7 @@ public:
 
 	~BufferLogic();
 
-	struct iio_channel *getIioChnl(int chnlIdx, bool outputPriority);
+	QMap<QString, iio_channel*> getIioChnl(int chnlIdx);
 
 	bool verifyEnableChanges(std::vector<bool> enabledChnls);
 
