@@ -1,5 +1,4 @@
 #include "buffermenucontroller.h"
-#include "qdebug.h"
 
 using namespace scopy::swiot;
 
@@ -15,7 +14,7 @@ BufferMenuController::~BufferMenuController()
 void BufferMenuController::addMenuAttrValues()
 {
 	//get all the attributes from the iio_channel
-	QMap<QString, QStringList> contextValues = m_model->getChnlAttrValues();
+	QMap<QString, QMap<QString, QStringList>> contextValues = m_model->getChnlAttrValues();
 	if (!contextValues.empty()) {
 		m_genericMenu->initAdvMenu(contextValues);
 	}
@@ -27,12 +26,11 @@ void BufferMenuController::createConnections()
 	connect(advMenu, &BufferMenu::attrValuesChanged, this, &BufferMenuController::attributesChanged);
 }
 
-void BufferMenuController::attributesChanged(QString attrName)
+void BufferMenuController::attributesChanged(QString attrName, QString chnlType)
 {
 	BufferMenu* menu=m_genericMenu->getAdvMenu();
-	QMap<QString, QStringList> attributes = menu->getAttrValues();
-	m_model->updateChnlAttributes(attributes, attrName);
-
+	QMap<QString, QMap<QString, QStringList>> attributes = menu->getAttrValues();
+	m_model->updateChnlAttributes(attributes, attrName, chnlType);
 }
 
 int BufferMenuController::getChnlIdx()

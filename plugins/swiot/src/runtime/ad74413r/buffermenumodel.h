@@ -12,17 +12,19 @@ namespace scopy::swiot {
 class BufferMenuModel: public QObject{
 	Q_OBJECT
 public:
-	explicit BufferMenuModel(struct iio_channel* iioChnl = nullptr);
+	explicit BufferMenuModel(QMap<QString, iio_channel*> chnlsMap = {});
 	~BufferMenuModel();
 
-	QMap<QString, QStringList> getChnlAttrValues();
+	QMap<QString, QMap<QString, QStringList>> getChnlAttrValues();
 	QStringList readChnlAttr(struct iio_channel* iio_chnl, QString attrName);
 
 	void init();
-	void updateChnlAttributes(QMap<QString,QStringList> newValues, QString attrName);
+	void updateChnlAttributes(QMap<QString, QMap<QString,QStringList>> newValues, QString attrName, QString chnlType);
+Q_SIGNALS:
+	void attrWritten(QString value);
 private:
-	struct iio_channel* m_iioChnl;
-	QMap<QString, QStringList> m_chnlAttributes;
+	QMap<QString, iio_channel*> m_chnlsMap;
+	QMap<QString, QMap<QString, QStringList>> m_chnlAttributes;
 
 };
 }

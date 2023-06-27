@@ -15,6 +15,8 @@ class CustomSwitch;
 namespace swiot {
 
 #define SLEW_DISABLE_IDX 0
+#define OUTPUT_CHNL "output"
+#define INPUT_CHNL "input"
 
 class BufferMenu: public QWidget
 {
@@ -27,18 +29,18 @@ public:
 	virtual void connectSignalsToSlots() = 0;
 	virtual QString getInfoMessage();
 	QVector<QHBoxLayout *> getMenuLayers();
-	QMap<QString, QStringList> getAttrValues();
+	QMap<QString, QMap<QString, QStringList>> getAttrValues();
 
 	void addMenuLayout(QHBoxLayout *layout);
-	void setAttrValues(QMap<QString, QStringList> values);
-	double convertFromRaw(int rawValue);
+	void setAttrValues(QMap<QString, QMap<QString, QStringList>> values);
+	double convertFromRaw(int rawValue, QString chnlType = OUTPUT_CHNL);
 Q_SIGNALS:
-	void attrValuesChanged(QString attrName);
+	void attrValuesChanged(QString attrName, QString chnlType);
 
 protected:
 	QWidget *m_widget;
 	QString m_chnlFunction;
-	QMap<QString, QStringList> m_attrValues;
+	QMap<QString, QMap<QString, QStringList>> m_attrValues;
 private:
 	QVector<QHBoxLayout *> m_menuLayers;
 };
@@ -51,6 +53,7 @@ public:
 	~CurrentInLoopMenu();
 	void init();
 	void connectSignalsToSlots();
+	QString getInfoMessage();
 public Q_SLOTS:
 	void dacCodeChanged(double value);
 private:
@@ -66,10 +69,13 @@ public:
 	~DigitalInLoopMenu();
 	void init();
 	void connectSignalsToSlots();
+	QString getInfoMessage();
 public Q_SLOTS:
 	void dacCodeChanged(double value);
+	void thresholdChanged(double value);
 private:
 	PositionSpinButton *m_dacCodeSpinButton;
+	PositionSpinButton *m_thresholdSpinButton;
 	QLabel *m_dacLabel;
 };
 
@@ -136,6 +142,21 @@ private:
 	QComboBox *m_diagOptions;
 
 	void setAvailableOptions(QComboBox *list, QString attrName);
+};
+
+class DigitalInMenu : public BufferMenu
+{
+	Q_OBJECT
+public:
+	explicit DigitalInMenu(QWidget* parent = nullptr, QString chnlFunction = "");
+	~DigitalInMenu();
+	void init();
+	void connectSignalsToSlots();
+public Q_SLOTS:
+	void thresholdChanged(double value);
+private:
+	PositionSpinButton *m_thresholdSpinButton;
+
 };
 
 class WithoutAdvSettings: public BufferMenu
@@ -211,6 +232,8 @@ public:
 			return new VoltageOutMenu(widget, function);
 		case CURRENT_OUT:
 			return new CurrentOutMenu(widget, function);
+		case DIGITAL_IN:
+			return new DigitalInMenu(widget, function);
 		case DIAGNOSTIC:
 			return new DiagnosticMenu(widget, function);
 		default:

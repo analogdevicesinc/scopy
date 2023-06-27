@@ -21,7 +21,7 @@ public:
 	~BufferMenuView();
 
 	void init(QString title, QString function, QColor *color);
-	void initAdvMenu(QMap<QString, QStringList> values);
+	void initAdvMenu(QMap<QString, QMap<QString, QStringList>> values);
 	void createHeaderWidget(const QString title);
 
 	BufferMenu *getAdvMenu();

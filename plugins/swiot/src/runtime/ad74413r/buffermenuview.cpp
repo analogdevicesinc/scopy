@@ -27,7 +27,7 @@ void swiot::BufferMenuView::init(QString title, QString function, QColor* color)
 
 }
 
-void swiot::BufferMenuView::initAdvMenu(QMap<QString, QStringList> values)
+void swiot::BufferMenuView::initAdvMenu(QMap<QString, QMap<QString, QStringList>> values)
 {
 	m_swiotAdvMenu->setAttrValues(values);
 	m_swiotAdvMenu->init();

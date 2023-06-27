@@ -218,8 +218,9 @@ void BufferPlotHandler::setChnlsUnitOfMeasure(QVector<QString> unitsOfMeasure)
 
 void BufferPlotHandler::setChnlsRangeValues(QVector<std::pair<int, int> > rangeValues)
 {
+	unsigned int yAxisNumDiv = m_plot->yAxisNumDiv();
 	for (int i = 0; i < m_plot->leftVertAxesCount(); i++) {
-		double numberOfUnitsPerDiv = (rangeValues[i].second - rangeValues[i].first)/m_plot->yAxisNumDiv();
+		double numberOfUnitsPerDiv = (rangeValues[i].second - rangeValues[i].first) / (double)yAxisNumDiv;
 		m_plot->setVertUnitsPerDiv(numberOfUnitsPerDiv, i);
 	}
 	m_plot->replot();
