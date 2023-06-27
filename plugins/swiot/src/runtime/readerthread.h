@@ -1,6 +1,7 @@
 #ifndef READERTHREAD_H
 #define READERTHREAD_H
 
+#include "src/runtime/ad74413r/chnlinfo.h"
 #include <QThread>
 #include <QMap>
 #include <iio.h>
@@ -29,14 +30,10 @@ public:
 	void enableIioChnls();
 
 	int getEnabledChnls();
-
-	QVector<std::pair<double, double>> getOffsetScaleVector();
-
-	double convertData(unsigned int data, int idx);
-
+	QVector<ChnlInfo *> getEnabledBufferedChnls();
 public Q_SLOTS:
 
-	void onChnlsChange(QMap<int, struct chnlInfo *> chnlsInfo);
+	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
 	void onSamplingFreqWritten(int samplingFreq);
 
 Q_SIGNALS:
@@ -57,9 +54,9 @@ private:
 
 	struct iio_device *m_iioDev;
 	struct iio_buffer *m_iioBuff;
-	QMap<int, struct chnlInfo *> m_chnlsInfo;
+	QMap<int, ChnlInfo*> m_chnlsInfo;
+	QVector<ChnlInfo *> m_bufferedChnls;
 	QVector<QVector<double>> m_bufferData;
-	QVector<std::pair<double, double>> m_offsetScaleValues;
 
 	QMutex *lock;
 };

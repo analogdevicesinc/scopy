@@ -1,6 +1,8 @@
 #ifndef BUFFERLOGIC_H
 #define BUFFERLOGIC_H
 
+#include "chnlinfo.h"
+
 #include <QObject>
 #include <QMap>
 #include <iio.h>
@@ -18,27 +20,6 @@ namespace scopy::swiot {
 #define MIN_BUFFER_SIZE 5
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 #define MAX_INPUT_CHNLS_NO 8
-
-#define VOLTAGE_UM "V"
-#define CURRENT_UM "mA"
-#define RESISTANCE_UM "Ω"
-
-#define VOLTAGE_LIMIT 5
-#define CURRENT_LIMIT 25
-#define RESISTANCE_UPPER_LIMIT 8191
-#define RESISTANCE_LOWER_LIMIT 0
-
-struct chnlInfo {
-	QString chnlId;
-	bool isOutput;
-	bool isEnabled;
-	bool isScanElement;
-	QString unitOfMeasure;
-	std::pair<int, int> rangeValues;
-	std::pair<double, double> offsetScalePair;
-	struct iio_channel *iioChnl;
-};
-
 
 class BufferLogic : public QObject {
 	Q_OBJECT
@@ -63,20 +44,17 @@ public Q_SLOTS:
 	void onSamplingFreqChanged(int idx);
 
 Q_SIGNALS:
-	void chnlsChanged(QMap<int, struct chnlInfo*> chnlsInfo);
+	void chnlsChanged(QMap<int,  ChnlInfo *> chnlsInfo);
 	void samplingFreqWritten(int samplingFreq);
 private:
 	void createChannels();
-	void initializeChnlsScaleInfo();
 
 private:
 	int m_plotChnlsNo;
 	QMap<QString, iio_device*> m_iioDevicesMap;
 	QStringList m_samplingFreqAvailable;
 
-	QMap<int, struct chnlInfo *> m_chnlsInfo;
-	QMap<QChar, QString> m_unitsOfMeasure;
-	QMap<QChar, std::pair<double, double>> m_valuesRange;
+	QMap<int, ChnlInfo *> m_chnlsInfo;
 };
 }
 
