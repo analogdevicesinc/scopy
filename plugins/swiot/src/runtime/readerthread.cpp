@@ -24,15 +24,13 @@
 #include <iio.h>
 #include "src/runtime/ad74413r/bufferlogic.h"
 
-#define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
-
 using namespace scopy::swiot;
 
 ReaderThread::ReaderThread(bool isBuffered, QObject *parent)
 	: QThread{parent}
         , isBuffered(isBuffered)
-        , m_enabledChnlsNo(0), m_iioBuff(nullptr)
-        , m_offsetScaleValues(), m_iioDev(nullptr)
+	, m_enabledChnlsNo(0), m_iioBuff(nullptr)
+	, m_iioDev(nullptr)
 {
         lock = new QMutex();
 }
@@ -49,7 +47,6 @@ void ReaderThread::addDioChannel(int index, struct iio_channel *channel) {
 void ReaderThread::runDio() {
 	qDebug(CAT_SWIOT_MAX14906) << "DioReaderThread started";
         try {
-
 		if (!this->m_dioChannels.empty()) {
 			auto keys = this->m_dioChannels.keys();
 			for (int index : keys) {
@@ -68,24 +65,14 @@ void ReaderThread::addBufferedDevice(iio_device *device) {
         m_iioDev = device;
 }
 
-double ReaderThread::convertData(unsigned int data, int idx)
-{
-        double convertedData = 0.0;
-        data <<= 8;
-        data = SWAP_UINT32(data);
-        data &= 0x0000FFFF;
-	convertedData = (data + m_offsetScaleValues[idx].first) * m_offsetScaleValues[idx].second;
-	return convertedData;
-}
-
 void ReaderThread::enableIioChnls()
 {
         if (m_iioDev) {
 		auto keys = m_chnlsInfo.keys();
 		for(const auto &key : keys) {
-                        struct iio_channel* iioChnl = m_chnlsInfo[key]->iioChnl;
+			struct iio_channel* iioChnl = m_chnlsInfo[key]->iioChnl();
                         bool isEnabled = iio_channel_is_enabled(iioChnl);
-			if (m_chnlsInfo[key]->isEnabled) {
+			if (m_chnlsInfo[key]->isEnabled()) {
                                 if (!isEnabled) {
                                         iio_channel_enable(iioChnl);
                                 }
@@ -100,36 +87,36 @@ void ReaderThread::enableIioChnls()
         }
 }
 
-QVector<std::pair<double, double>> ReaderThread::getOffsetScaleVector()
-{
-        QVector<std::pair<double, double>> offsetScalePairs = {};
-
-	auto keys = m_chnlsInfo.keys();
-	for (const auto &key : keys) {
-                if (m_chnlsInfo[key]->isEnabled) {
-                        offsetScalePairs.push_back(m_chnlsInfo[key]->offsetScalePair);
-                }
-        }
-        return offsetScalePairs;
-}
-
 int ReaderThread::getEnabledChnls()
 {
 	int enChnls = 0;
 	auto keys = m_chnlsInfo.keys();
 	for (const auto &key : keys) {
-                if (iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl)) {
+		if (iio_channel_is_enabled(m_chnlsInfo[key]->iioChnl())) {
                         enChnls++;
                 }
         }
+	return enChnls;
+}
 
-        return enChnls;
+QVector<ChnlInfo *> ReaderThread::getEnabledBufferedChnls()
+{
+	QVector<ChnlInfo *> enabledBufferedChnls= {};
+
+	auto keys = m_chnlsInfo.keys();
+	for (const auto &key : keys) {
+		if (m_chnlsInfo[key]->isScanElement() && m_chnlsInfo[key]->isEnabled()
+				&& !m_chnlsInfo[key]->isOutput()) {
+			enabledBufferedChnls.push_back(m_chnlsInfo[key]);
+		}
+	}
+	return enabledBufferedChnls;
 }
 
 void ReaderThread::createIioBuffer()
 {
 	m_enabledChnlsNo = getEnabledChnls();
-	m_offsetScaleValues = getOffsetScaleVector();
+	m_bufferedChnls = getEnabledBufferedChnls();
 	qInfo(CAT_SWIOT_AD74413R) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
 	if (m_iioDev) {
 		if(m_samplingFreq >= MAX_BUFFER_SIZE) {
@@ -151,10 +138,11 @@ void ReaderThread::destroyIioBuffer()
 		qDebug(CAT_SWIOT_AD74413R) << "Buffer destroyed";
                 iio_buffer_destroy(m_iioBuff);
                 m_iioBuff = nullptr;
+		m_bufferedChnls.clear();
         }
 }
 
-void ReaderThread::onChnlsChange(QMap<int, struct chnlInfo*> chnlsInfo)
+void ReaderThread::onChnlsChange(QMap<int, ChnlInfo*> chnlsInfo)
 {
         m_chnlsInfo = chnlsInfo;
 }
@@ -186,7 +174,7 @@ void ReaderThread::runBuffered() {
                                 }
                                 for (uint32_t* ptr = startAdr; ptr != endAdr; ptr++) {
                                         idx = i % m_enabledChnlsNo;
-                                        data = convertData(*ptr, idx);
+					data = m_bufferedChnls[idx]->convertData(*ptr);
                                         m_bufferData[idx].push_back(data);
                                         i++;
                                 }
