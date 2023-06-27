@@ -72,19 +72,6 @@ void BufferLogic::createChannels()
 
 }
 
-struct iio_channel* BufferLogic::getIioChnl(int chnlIdx, bool outputPriority)
-{
-	struct iio_channel* iioChnl = nullptr;
-	if (outputPriority) {
-		iioChnl = (m_chnlsInfo.contains(chnlIdx + MAX_INPUT_CHNLS_NO)) ?
-					m_chnlsInfo[chnlIdx + MAX_INPUT_CHNLS_NO]->iioChnl() : m_chnlsInfo[chnlIdx]->iioChnl();
-	} else {
-		iioChnl = m_chnlsInfo[chnlIdx]->iioChnl();
-	}
-
-	return iioChnl;
-}
-
 bool BufferLogic::verifyEnableChanges(std::vector<bool> enabledChnls)
 {
 	bool changes = false;
@@ -217,6 +204,22 @@ QVector<QString> BufferLogic::getAd74413rChnlsFunctions() {
 	}
 
 	return result;
+}
+
+QMap<QString, iio_channel*> BufferLogic::getIioChnl(int chnlIdx)
+{
+	QMap<QString, iio_channel*> chnlsMap;
+	int outputChblIdx = chnlIdx + MAX_INPUT_CHNLS_NO;
+
+	if (m_chnlsInfo.contains(chnlIdx) && !m_chnlsInfo[chnlIdx]->isOutput()) {
+		chnlsMap["input"] = m_chnlsInfo[chnlIdx]->iioChnl();
+	}
+
+	if (m_chnlsInfo.contains(outputChblIdx) && m_chnlsInfo[outputChblIdx]->isOutput()) {
+		chnlsMap["output"] = m_chnlsInfo[outputChblIdx]->iioChnl();
+	}
+
+	return chnlsMap;
 }
 
 
