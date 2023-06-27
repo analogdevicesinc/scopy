@@ -20,6 +20,7 @@
 
 
 #include "buffermenu.h"
+#include "qdebug.h"
 
 using namespace scopy::swiot;
 BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction)
@@ -45,12 +46,12 @@ void BufferMenu::addMenuLayout(QHBoxLayout *layout)
 	m_menuLayers.push_back(layout);
 }
 
-void BufferMenu::setAttrValues(QMap<QString, QStringList> values)
+void BufferMenu::setAttrValues(QMap<QString, QMap<QString, QStringList>> values)
 {
 	m_attrValues=values;
 }
 
-QMap<QString, QStringList> BufferMenu::getAttrValues()
+QMap<QString, QMap<QString, QStringList>> BufferMenu::getAttrValues()
 {
 	return m_attrValues;
 }
@@ -60,12 +61,14 @@ QVector<QHBoxLayout *> BufferMenu::getMenuLayers()
 	return m_menuLayers;
 }
 
-double BufferMenu::convertFromRaw(int rawValue)
+double BufferMenu::convertFromRaw(int rawValue, QString chnlType)
 {
 	double value=0.0;
-	if (m_attrValues.contains("offset") && m_attrValues.contains("scale")) {
-		double offset = m_attrValues["offset"][0].toDouble();
-		double scale = m_attrValues["scale"][0].toDouble();
+	if (m_attrValues.contains(chnlType)
+			&& m_attrValues[chnlType].contains("offset")
+			&& m_attrValues[chnlType].contains("scale")) {
+		double offset = m_attrValues[chnlType]["offset"][0].toDouble();
+		double scale = m_attrValues[chnlType]["scale"][0].toDouble();
 		value = (rawValue + offset) * scale;
 	}
 	return value;
@@ -96,24 +99,40 @@ void CurrentInLoopMenu::init()
 	m_dacLabelLayout->addWidget(m_dacLabel);
 	m_dacLabelLayout->setAlignment(Qt::AlignRight);
 	addMenuLayout(m_dacLabelLayout);
+
+	connectSignalsToSlots();
 }
 
 void CurrentInLoopMenu::connectSignalsToSlots()
 {
 	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &CurrentInLoopMenu::dacCodeChanged);
+}
 
+QString CurrentInLoopMenu::getInfoMessage()
+{
+	QString infoMessage = "\"" + m_chnlFunction + "\" configuration generates 2 context channels.\n" +
+			"One of them is an input buffer capable channel (current_in)\n" +
+			"which is related to the plot and the other one is an output\n" +
+			"channel (current_out) whose attributes can be changed from\n" +
+			"this menu.";
+	return infoMessage;
 }
 
 void CurrentInLoopMenu::dacCodeChanged(double value)
 {
 	QString attrName("raw");
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(QString::number(value));
-	double val = convertFromRaw(value);
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number(value));
+	double val = convertFromRaw(value) ;
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val)+" mA");
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+
 }
 
 DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent, QString chnlFunction)
@@ -125,6 +144,16 @@ DigitalInLoopMenu::~DigitalInLoopMenu()
 
 void DigitalInLoopMenu::init()
 {
+	//threshold
+	QHBoxLayout *thresholdLayout = new QHBoxLayout();
+	m_thresholdSpinButton = new PositionSpinButton({
+							{"mV", 1E0}
+						     },
+						     "Threshold", 0,
+						     16000,
+						     true, false, m_widget);
+	thresholdLayout->addWidget(m_thresholdSpinButton);
+	addMenuLayout(thresholdLayout);
 	//dac code
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
 	m_dacCodeSpinButton = new PositionSpinButton({
@@ -148,19 +177,52 @@ void DigitalInLoopMenu::init()
 void DigitalInLoopMenu::connectSignalsToSlots()
 {
 	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInLoopMenu::dacCodeChanged);
+	connect(m_thresholdSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInLoopMenu::thresholdChanged);
+}
+
+QString DigitalInLoopMenu::getInfoMessage()
+{
+	QString infoMessage = "\"" + m_chnlFunction + "\" configuration generates 2 context channels.\n" +
+			"One of them is an input buffer capable channel (voltage_in)\n" +
+			"which is related to the plot and the other one is an output\n" +
+			"channel (current_out). The threshold is set for the\n" +
+			"input channel and the DAC Code for the output channel.";
+	return infoMessage;
 }
 
 void DigitalInLoopMenu::dacCodeChanged(double value)
 {
 	QString attrName("raw");
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(QString::number(value));
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number(value));
 	double val = convertFromRaw(value);
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val) + " mA");
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+
 }
+
+void DigitalInLoopMenu::thresholdChanged(double value)
+{
+	QString attrName("threshold");
+	if (!m_attrValues.contains(INPUT_CHNL)) {
+		qWarning() << "There is no input channel available for this function!";
+		return;
+	}
+	if (m_attrValues[INPUT_CHNL].contains(attrName)) {
+		m_attrValues[INPUT_CHNL][attrName].clear();
+		m_attrValues[INPUT_CHNL][attrName].push_back(QString::number((int)value));
+		Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
+	} else {
+		qWarning() << attrName.toUpper() + " attribute does not exist!";
+	}
+}
+
 
 VoltageOutMenu::VoltageOutMenu(QWidget* parent, QString chnlFunction)
 	: BufferMenu(parent, chnlFunction)
@@ -192,7 +254,7 @@ void VoltageOutMenu::init()
 	m_slewOptions = new QComboBox(m_widget);
 	m_slewOptions->addItem(QString("Disable"));
 	m_slewOptions->addItem(QString("Enable"));
-	(m_attrValues["slew_en"].first().compare("0") == 0)
+	(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0)
 			? m_slewOptions->setCurrentText("Disable")
 			: m_slewOptions->setCurrentText("Enable");
 	slewLayout->addWidget(new QLabel("Slew", m_widget), 1);
@@ -202,8 +264,8 @@ void VoltageOutMenu::init()
 	QHBoxLayout *slewStepLayout = new QHBoxLayout();
 	m_slewStepOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	(m_attrValues.contains("slew_step") && m_attrValues["slew_step"].size() > 0)
-			? m_slewStepOptions->setCurrentText(m_attrValues["slew_step"].first())
+	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && m_attrValues[OUTPUT_CHNL]["slew_step"].size() > 0)
+			? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
 			: m_slewStepOptions->setCurrentText("ERROR");
 	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
 	slewStepLayout->addWidget(m_slewStepOptions, 1);
@@ -212,8 +274,8 @@ void VoltageOutMenu::init()
 	QHBoxLayout *slewRateLayout = new QHBoxLayout();
 	m_slewRateOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-	(m_attrValues.contains("slew_rate") && m_attrValues["slew_rate"].size() > 0)
-			? m_slewRateOptions->setCurrentText(m_attrValues["slew_rate"].first())
+	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && m_attrValues[OUTPUT_CHNL]["slew_rate"].size() > 0)
+			? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
 			: m_slewRateOptions->setCurrentText("ERROR");
 	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)", m_widget), 1);
 	slewRateLayout->addWidget(m_slewRateOptions, 1);
@@ -242,7 +304,11 @@ QString VoltageOutMenu::getInfoMessage()
 
 void VoltageOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
-	QStringList availableValues = m_attrValues[attrName];
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	QStringList availableValues = m_attrValues[OUTPUT_CHNL][attrName];
 	for (const auto& slewValue : availableValues) {
 		list->addItem(slewValue);
 	}
@@ -251,48 +317,68 @@ void VoltageOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 void VoltageOutMenu::dacCodeChanged(double value)
 {
 	QString attrName("raw");
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(QString::number((int)value));
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number((int)value));
 	//the convertFromRaw return value is in mV that's why we multiply by 10^(-3)
 	double val = convertFromRaw(value) * 0.001;
 	m_dacLabel->clear();
 	m_dacLabel->setText(QString::number(val) + " V");
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+
 }
 
 void VoltageOutMenu::slewStepIndexChanged(int idx)
 {
 	QString attrName = "slew_step";
-	const auto& slewStep = m_attrValues["slew_step_available"][idx];
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(slewStep);
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	const auto& slewStep = m_attrValues[OUTPUT_CHNL]["slew_step_available"][idx];
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+
 }
 
 void VoltageOutMenu::slewRateIndexChanged(int idx)
 {
 	QString attrName = "slew_rate";
-	const auto& slewStep = m_attrValues["slew_rate_available"][idx];
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(slewStep);
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	const auto& slewStep = m_attrValues[OUTPUT_CHNL]["slew_rate_available"][idx];
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+
 }
 
 void VoltageOutMenu::slewIndexChanged(int idx)
 {
 	QString attrName = "slew_en";
-	m_attrValues[attrName].clear();
+	if (!m_attrValues.contains(OUTPUT_CHNL) ) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
 	if (idx == SLEW_DISABLE_IDX) {
-		m_attrValues[attrName].push_back(QString("0"));
+		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("0"));
 	}
 	else {
-		m_attrValues[attrName].push_back(QString("1"));
+		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("1"));
 	}
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+
 }
 
 CurrentOutMenu::CurrentOutMenu(QWidget* parent, QString chnlFunction)
@@ -325,7 +411,7 @@ void CurrentOutMenu::init()
 	m_slewOptions = new QComboBox(m_widget);
 	m_slewOptions->addItem(QString("Disable"));
 	m_slewOptions->addItem(QString("Enable"));
-	(m_attrValues["slew_en"].first().compare("0") == 0)
+	(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0)
 			? m_slewOptions->setCurrentText("Disable")
 			: m_slewOptions->setCurrentText("Enable");
 	slewLayout->addWidget(new QLabel("Slew", m_widget), 1);
@@ -335,8 +421,8 @@ void CurrentOutMenu::init()
 	QHBoxLayout *slewStepLayout = new QHBoxLayout();
 	m_slewStepOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	(m_attrValues.contains("slew_step") && m_attrValues["slew_step"].size() > 0)
-			? m_slewStepOptions->setCurrentText(m_attrValues["slew_step"].first())
+	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && m_attrValues[OUTPUT_CHNL]["slew_step"].size() > 0)
+			? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
 			: m_slewStepOptions->setCurrentText("ERROR");
 	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
 	slewStepLayout->addWidget(m_slewStepOptions, 1);
@@ -345,8 +431,8 @@ void CurrentOutMenu::init()
 	QHBoxLayout *slewRateLayout = new QHBoxLayout();
 	m_slewRateOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-	(m_attrValues.contains("slew_rate") && m_attrValues["slew_rate"].size() > 0)
-			? m_slewRateOptions->setCurrentText(m_attrValues["slew_rate"].first())
+	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && m_attrValues[OUTPUT_CHNL]["slew_rate"].size() > 0)
+			? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
 			: m_slewRateOptions->setCurrentText("ERROR");
 	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)",m_widget),1);
 	slewRateLayout->addWidget(m_slewRateOptions, 1);
@@ -375,7 +461,11 @@ QString CurrentOutMenu::getInfoMessage()
 
 void CurrentOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
-	QStringList availableValues = m_attrValues[attrName];
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	QStringList availableValues = m_attrValues[OUTPUT_CHNL][attrName];
 	for (const auto& slewValue : availableValues) {
 		list->addItem(slewValue);
 	}
@@ -384,48 +474,66 @@ void CurrentOutMenu::setAvailableOptions(QComboBox *list, QString attrName)
 void CurrentOutMenu::dacCodeChanged(double value)
 {
 	QString attrName("raw");
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(QString::number((int)value));
-	//by default the current value is measured in μA
-	double val = convertFromRaw(value) * 0.001;
-	m_dacLabel->clear();
-	m_dacLabel->setText(QString::number(val)+" mA");
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	if (m_attrValues.contains(OUTPUT_CHNL)) {
+		m_attrValues[OUTPUT_CHNL][attrName].clear();
+		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number((int)value));
+		//by default the current value is measured in μA
+		double val = convertFromRaw(value) * 0.001;
+		m_dacLabel->clear();
+		m_dacLabel->setText(QString::number(val)+" mA");
 
-	Q_EMIT attrValuesChanged(attrName);
+		Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
+	}
 }
 
 void CurrentOutMenu::slewStepIndexChanged(int idx)
 {
 	QString attrName = "slew_step";
-	const auto& slewStep = m_attrValues["slew_step_available"][idx];
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(slewStep);
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	const auto& slewStep = m_attrValues[OUTPUT_CHNL]["slew_step_available"][idx];
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
 }
 
 void CurrentOutMenu::slewRateIndexChanged(int idx)
 {
 	QString attrName = "slew_rate";
-	const auto& slewStep = m_attrValues["slew_rate_available"][idx];
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(slewStep);
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	const auto& slewStep = m_attrValues[OUTPUT_CHNL]["slew_rate_available"][idx];
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
+	m_attrValues[OUTPUT_CHNL][attrName].push_back(slewStep);
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
 }
 
 void CurrentOutMenu::slewIndexChanged(int idx)
 {
 	QString attrName = "slew_en";
-	m_attrValues[attrName].clear();
+	if (!m_attrValues.contains(OUTPUT_CHNL)) {
+		qWarning() << "There is no output channel available for this function!";
+		return;
+	}
+	m_attrValues[OUTPUT_CHNL][attrName].clear();
 	if (idx == SLEW_DISABLE_IDX) {
-		m_attrValues[attrName].push_back(QString("0"));
+		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("0"));
 	}
 	else {
-		m_attrValues[attrName].push_back(QString("1"));
+		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString("1"));
 	}
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
 }
 
 DiagnosticMenu::DiagnosticMenu(QWidget* parent, QString chnlFunction)
@@ -441,8 +549,8 @@ void DiagnosticMenu::init()
 	m_diagOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_diagOptions, "diag_function_available");
 	m_diagOptions->setCurrentIndex(0);
-	(m_attrValues.contains("diag_function") && m_attrValues["diag_function"].size() > 0)
-			? m_diagOptions->setCurrentText(m_attrValues["diag_function"].first())
+	(m_attrValues[INPUT_CHNL].contains("diag_function") && m_attrValues[INPUT_CHNL]["diag_function"].size() > 0)
+			? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
 			: m_diagOptions->setCurrentText("ERROR");
 	diagLayout->addWidget(new QLabel("Function", m_widget));
 	diagLayout->addWidget(m_diagOptions);
@@ -458,7 +566,11 @@ void DiagnosticMenu::connectSignalsToSlots()
 
 void DiagnosticMenu::setAvailableOptions(QComboBox *list, QString attrName)
 {
-	QStringList availableValues = m_attrValues[attrName];
+	if (!m_attrValues.contains(INPUT_CHNL)) {
+		qWarning() << "There is no input channel available for this function!";
+		return;
+	}
+	QStringList availableValues = m_attrValues[INPUT_CHNL][attrName];
 	for (const auto& slewValue : availableValues) {
 		list->addItem(slewValue);
 	}
@@ -467,11 +579,15 @@ void DiagnosticMenu::setAvailableOptions(QComboBox *list, QString attrName)
 void DiagnosticMenu::diagIndextChanged(int idx)
 {
 	QString attrName = "diag_function";
-	const auto& diagFunc = m_attrValues["diag_function_available"][idx];
-	m_attrValues[attrName].clear();
-	m_attrValues[attrName].push_back(diagFunc);
+	if (!m_attrValues.contains(INPUT_CHNL)) {
+		qWarning() << "There is no input channel available for this function!";
+		return;
+	}
+	const auto& diagFunc = m_attrValues[INPUT_CHNL]["diag_function_available"][idx];
+	m_attrValues[INPUT_CHNL][attrName].clear();
+	m_attrValues[INPUT_CHNL][attrName].push_back(diagFunc);
 
-	Q_EMIT attrValuesChanged(attrName);
+	Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
 }
 
 WithoutAdvSettings::WithoutAdvSettings(QWidget* parent, QString chnlFunction)
@@ -490,3 +606,49 @@ void WithoutAdvSettings::init()
 
 void WithoutAdvSettings::connectSignalsToSlots()
 {}
+
+DigitalInMenu::DigitalInMenu(QWidget* parent, QString chnlFunction)
+	: BufferMenu(parent, chnlFunction)
+{}
+
+DigitalInMenu::~DigitalInMenu()
+{}
+
+void DigitalInMenu::init()
+{
+	//threshold
+	QHBoxLayout *thresholdLayout = new QHBoxLayout();
+	m_thresholdSpinButton = new PositionSpinButton({
+							{"mV", 1E0}
+						     },
+						     "Theshold", 0,
+						     16000,
+						     true, false, m_widget);
+	thresholdLayout->addWidget(m_thresholdSpinButton);
+	addMenuLayout(thresholdLayout);
+
+	connectSignalsToSlots();
+}
+
+void DigitalInMenu::connectSignalsToSlots()
+{
+	connect(m_thresholdSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInMenu::thresholdChanged);
+}
+
+void DigitalInMenu::thresholdChanged(double value)
+{
+	QString attrName("threshold");
+	if (!m_attrValues.contains(INPUT_CHNL)) {
+		qWarning() << "There is no input channel available for this function!";
+		return;
+	}
+	if (m_attrValues[INPUT_CHNL].contains(attrName)) {
+		m_attrValues[INPUT_CHNL][attrName].clear();
+		m_attrValues[INPUT_CHNL][attrName].push_back(QString::number((int)value));
+		Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
+	} else {
+		qWarning() << attrName.toUpper() + " attribute does not exist!";
+	}
+}
+
+

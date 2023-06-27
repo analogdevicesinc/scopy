@@ -170,8 +170,8 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 			//that's why we have to decrease by 1
 			menu->init(menuTitle, chnlsFunctions[i], new QColor(m_plotHandler->getCurveColor(chId-1)));
 
-			struct iio_channel* iioChnl = m_swiotAdLogic->getIioChnl(i, true);
-			BufferMenuModel* swiotModel = new BufferMenuModel(iioChnl);
+			QMap<QString, iio_channel*> chnlsMap = m_swiotAdLogic->getIioChnl(i);
+			BufferMenuModel* swiotModel = new BufferMenuModel(chnlsMap);
 			BufferMenuController* controller = new BufferMenuController(menu, swiotModel, i);
 
 			controller->addMenuAttrValues();
