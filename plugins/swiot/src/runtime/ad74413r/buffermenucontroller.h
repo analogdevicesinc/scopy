@@ -43,7 +43,7 @@ public:
 
 public Q_SLOTS:
 
-	void attributesChanged(QString attrName);
+	void attributesChanged(QString attrName, QString chnlType);
 
 private:
 	int m_chnlIdx;
