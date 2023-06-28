@@ -32,9 +32,8 @@ FaultsPage::FaultsPage(struct iio_context* context, QWidget *parent) :
 	m_ad74413rFaultsDevice(nullptr),
 	m_max14906FaultsDevice(nullptr)
 {
-	this->setupDevices();
-
 	ui->setupUi(this);
+	this->setupDevices();
 
 	// needed for subsection separator resize
 	this->m_ad74413rFaultsDevice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -43,6 +42,8 @@ FaultsPage::FaultsPage(struct iio_context* context, QWidget *parent) :
 	this->ui->mainVerticalLayout->addWidget(this->m_ad74413rFaultsDevice);
 	this->ui->mainVerticalLayout->addWidget(this->m_max14906FaultsDevice);
 	this->ui->mainVerticalLayout->addItem(new QSpacerItem(0 ,0, QSizePolicy::Preferred, QSizePolicy::Expanding));
+
+	this->ui->frame->setStyleSheet("QFrame#frame{background-color:#1C1C20;}");
 }
 
 FaultsPage::~FaultsPage() {
