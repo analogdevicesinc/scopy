@@ -61,7 +61,7 @@ bool SWIOTPlugin::loadPage()
 	});
 	connect(m_infoPage, &SwiotInfoPage::temperatureReadEnabled,
 		this, [=, this](bool toggled) {
-		if (!m_runtime->isRuntimeCtx()) { return; }
+//		if (!m_runtime->isRuntimeCtx()) { return; }
 		if (toggled) {
 			m_swiotController->startTemperatureTask();
 		} else {
@@ -106,15 +106,16 @@ bool SWIOTPlugin::loadIcon()
 }
 
 void SWIOTPlugin::showPageCallback() {
-	if (!m_runtime->isRuntimeCtx()) {
-		return;
-	}
-	if (m_infoPage) {
-		m_infoPage->enableTemperatureReadBtn(true);
-	}
+	// wip: rethink the temp cyclic mechanism
+//	if (m_infoPage) {
+//		m_infoPage->enableTemperatureReadBtn(true);
+//		m_swiotController->startTemperatureTask();
+//	}
 }
 
 void SWIOTPlugin::hidePageCallback() {
+	// wip: rethink the temp cyclic mechanism
+//	m_swiotController->stopTemperatureTask();
 }
 
 void SWIOTPlugin::loadToolList()
@@ -168,9 +169,9 @@ void SWIOTPlugin::setupToolList()
 	m_isRuntime = m_runtime->isRuntimeCtx();
 
 	m_infoPage->enableTemperatureReadBtn(m_isRuntime);
-	if (m_isRuntime) {
+//	if (m_isRuntime) {
 		m_swiotController->startTemperatureTask();
-	}
+//	}
 
 	auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
 	auto ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
@@ -257,9 +258,9 @@ bool SWIOTPlugin::onDisconnect()
 
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
-	if (m_isRuntime) {
+//	if (m_isRuntime) {
 		m_swiotController->stopTemperatureTask();
-	}
+//	}
 	m_swiotController->disconnectSwiot();
 
 	ContextProvider *cp = ContextProvider::GetInstance();
@@ -271,9 +272,9 @@ void SWIOTPlugin::startCtxSwitch()
 {
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
-	if (m_isRuntime) {
-		m_swiotController->stopTemperatureTask();
-	}
+//	if (m_isRuntime) {
+//		m_swiotController->stopTemperatureTask();
+//	}
 
 	m_swiotController->disconnectSwiot();
 	Q_EMIT disconnectDevice();
