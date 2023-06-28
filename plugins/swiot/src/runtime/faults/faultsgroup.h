@@ -49,14 +49,15 @@ public:
 	void clearSelection();
 	void update(uint32_t faults_numeric);
 	QStringList getExplanations();
+	QString getExplanation(unsigned int id);
 	std::set<unsigned int> getSelectedIndexes();
 	std::set<unsigned int> getActiveIndexes();
 
 Q_SIGNALS:
 	void selectionUpdated();
 	void minimumSizeChanged();
-	void specialFaultsUpdated(int index, QString channelFunction);
-
+	void specialFaultsUpdated(unsigned int index, QString channelFunction);
+	void specialFaultExplanationChanged(unsigned int, QString);
 private:
 	Ui::FaultsGroup *ui;
 	QString m_name;

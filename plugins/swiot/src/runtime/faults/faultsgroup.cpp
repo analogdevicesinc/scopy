@@ -39,7 +39,7 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	QWidget(parent),
 	ui(new Ui::FaultsGroup),
 	m_name(std::move(name)),
-    m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
+	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
 {
 	ui->setupUi(this);
 
@@ -76,18 +76,7 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 			QJsonObject condition = fault_object["condition"].toObject();
 			fault_widget->setFaultExplanationOptions(condition);
 			connect(this, &FaultsGroup::specialFaultsUpdated, fault_widget, &FaultWidget::specialFaultUpdated);
-//				if (condition.contains(m_specialFaults.value(i))) {
-//					// this logic works because the index variable will be the same as when creating the
-//					// m_specialFaults map since the json is read in the same order for both cases
-//					// ex: VI_ERR_A matches channel 0, so it will always have the 0 index in m_specialFaults
-//					if (
-//						(fault_name == " VI_ERR_A " && m_specialFaults.contains(0)) ||
-//						(fault_name == " VI_ERR_B " && m_specialFaults.contains(1)) ||
-//						(fault_name == " VI_ERR_C " && m_specialFaults.contains(2)) ||
-//						(fault_name == " VI_ERR_D " && m_specialFaults.contains(3))
-//						)
-//					{
-//						fault_description = condition[m_specialFaults.value(i)].toString();
+			connect(fault_widget, &FaultWidget::specialFaultExplanationChanged, this, &FaultsGroup::specialFaultExplanationChanged);
 		}
 
 		connect(fault_widget, &FaultWidget::faultSelected, this, [this](unsigned int id_) {
@@ -111,11 +100,6 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 FaultsGroup::~FaultsGroup() {
 	delete ui;
 }
-
-//void FaultsGroup::updateSpecialFault(int specialChnIdx)
-//{
-//	m_faults.at(specialChnIdx)->setFaultExplanation()
-//}
 
 const QVector<FaultWidget *> &FaultsGroup::getFaults() const {
 	return m_faults;
@@ -164,6 +148,16 @@ void FaultsGroup::update(uint32_t faults_numeric) {
 QStringList FaultsGroup::getExplanations() {
 	QStringList res;
 	for (auto fault: m_faults) {
+		res += getExplanation(fault->getId());
+	}
+
+	return res;
+}
+
+QString FaultsGroup::getExplanation(unsigned int id) {
+	QString res = "";
+	auto fault = m_faults.at(id);
+	if (fault) {
 		res += QString("Bit%1 (%2): %3").arg(QString::number(fault->getId()),
 						     fault->getName(),
 						     fault->getFaultExplanation());
