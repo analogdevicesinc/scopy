@@ -8,6 +8,7 @@ trigger:
     include:
     - main
     - master
+    - scopy2-ci-macOS
     - staging/*
     - ci-*
   tags:
@@ -39,8 +40,8 @@ stages:
     - checkout: self
       fetchDepth: 1
       clean: true
-    - script: ./CI/appveyor/install_macos_deps.sh
-      displayName: 'Dependencies'
+    - script: ./ci/macOS/install_macos_deps.sh
+      displayName: 'Build and Install Dependencies'
       workingDirectory: $(Build.Repository.LocalPath)
     - script: |
             export BUILD_HOST="$(vmImage)"
@@ -53,14 +54,14 @@ stages:
             export JOB_ID=$(System.JobId)
             export JOB_NAME=$(System.JobName)
             export RUNNER_ARCH=$(Agent.OSArchitecture)
-            ./CI/appveyor/build_appveyor_macos.sh
-      displayName: 'Build'
+            ./ci/macOS/build_azure_macos.sh
+      displayName: 'Build Scopy'
       workingDirectory: $(Build.Repository.LocalPath)
-    - script: ./CI/appveyor/package_darwin.sh
+    - script: ./ci/macOS/package_darwin.sh
       displayName: 'Create Scopy.dmg'
       workingDirectory: $(Build.Repository.LocalPath)
     - script: cp -R staging ${BUILD_ARTIFACTSTAGINGDIRECTORY}
-      displayName: 'Copy staging dir'
+      displayName: 'Copy Staging Dir'
       workingDirectory: $(Build.Repository.LocalPath)
     - script: |
             echo "ACCOUNT_NAME = " ${ACCOUNT_NAME}

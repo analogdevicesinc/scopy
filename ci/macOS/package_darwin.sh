@@ -1,6 +1,8 @@
 #!/bin/bash
-set -e
-STAGINGDIR="${PWD}/staging"
+set -ex
+STAGING_AREA=$PWD/staging
+STAGINGDIR=$STAGING_AREA/dependencies
+
 cd build
 mkdir -p ./Scopy.app/Contents/Frameworks
 
