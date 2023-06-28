@@ -32,6 +32,7 @@ class SwiotReadTemperatureTask : public QThread {
 	Q_OBJECT
 public:
 	explicit SwiotReadTemperatureTask(QString  uri, QObject* parent = nullptr);
+	~SwiotReadTemperatureTask();
 	void run() override;
 
 Q_SIGNALS:
