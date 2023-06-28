@@ -99,6 +99,7 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	m_toolView->addFixedCentralWidget(this->ui->grid, 0, 0);
 	m_toolView->getGeneralSettingsBtn()->setChecked(true);
 	m_toolView->addTopExtraWidget(m_backButton);
+	ui->grid->setStyleSheet("background-color: #1C1C20");
 }
 
 scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, QColor *color) {

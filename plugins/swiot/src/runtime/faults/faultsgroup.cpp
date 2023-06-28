@@ -170,14 +170,19 @@ QWidget *FaultsGroup::buildActiveStoredWidget() {
 	auto widget = new QWidget(this);
 	auto storedLabel = new QLabel(this);
 	storedLabel->setText("Stored");
+	storedLabel->setContentsMargins(0, 0, 0, 0);
+	storedLabel->setAlignment(Qt::AlignLeft);
 	auto activeLabel = new QLabel(this);
 	activeLabel->setText("Active");
+	activeLabel->setContentsMargins(0, 0, 0, 0);
+	activeLabel->setAlignment(Qt::AlignLeft);
 	auto spacer = new QSpacerItem(0, 30, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	widget->setLayout(new QVBoxLayout(widget));
 	widget->layout()->addWidget(storedLabel);
 	widget->layout()->addWidget(activeLabel);
 	widget->layout()->addItem(spacer);
+	widget->setContentsMargins(0, 0, 0, 0);
 	widget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	return widget;
