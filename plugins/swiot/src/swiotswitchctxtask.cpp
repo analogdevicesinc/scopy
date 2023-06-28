@@ -52,7 +52,7 @@ void SwiotSwitchCtxTask::run()
 
 	iio_device *swiotDevice = iio_context_find_device(ctx, "swiot");
 	if (swiotDevice) {
-		IioDeviceAttributeRead *iioAttrRead = new IioDeviceAttributeRead(swiotDevice, "mode", commandQueue, true);
+		IioDeviceAttributeRead *iioAttrRead = new IioDeviceAttributeRead(swiotDevice, "mode", nullptr, true);
 
 		connect(iioAttrRead, &scopy::Command::finished, this, [=, this] (scopy::Command *cmd) {
 			IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);

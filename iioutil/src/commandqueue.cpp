@@ -148,6 +148,7 @@ void CommandQueue::work()
 			lock.unlock();
 			qDebug(CAT_COMMANDQUEUE) << "CommandQueue executing " << m_currentCommand;
 			m_currentCommand->execute();
+			m_currentCommand->deleteLater();
 			m_currentCommand = nullptr;
 			lock.lock();
 		}
