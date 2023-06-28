@@ -29,4 +29,19 @@ SwiotInfoPage::SwiotInfoPage(QWidget* parent) : InfoPage(parent)
 {
 	// not enough attributes for correct display with normal size policies, there is too much spacing without this
 	this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+
+	m_enTempReadCheckBox = new QCheckBox("Enable temperature read");
+	m_enTempReadCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	connect(m_enTempReadCheckBox, &QCheckBox::toggled,
+		this, &SwiotInfoPage::temperatureReadEnabled);
+	m_enTempReadCheckBox->setEnabled(false);
+	m_enTempReadCheckBox->setVisible(false);
+	m_enTempReadCheckBox->setChecked(true);
+	this->layout()->addWidget(m_enTempReadCheckBox);
+}
+
+void SwiotInfoPage::enableTemperatureReadBtn(bool enable)
+{
+	m_enTempReadCheckBox->setEnabled(enable);
+	m_enTempReadCheckBox->setVisible(enable);
 }
