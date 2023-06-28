@@ -66,6 +66,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void faultSelected(unsigned int id);
+	void specialFaultExplanationChanged(unsigned int, QString);
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;
