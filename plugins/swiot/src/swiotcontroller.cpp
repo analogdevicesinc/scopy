@@ -37,7 +37,7 @@ SwiotController::~SwiotController()
 
 void SwiotController::startPingTask()
 {
-	pingTask = new IIOPingTask(m_iioCtx);
+	pingTask = new SwiotPingTask(m_iioCtx);
 	pingTimer = new CyclicalTask(pingTask);
 	connect(pingTask,SIGNAL(pingSuccess()),this,SIGNAL(pingSuccess()));
 	connect(pingTask,SIGNAL(pingFailed()),this,SIGNAL(pingFailed()));

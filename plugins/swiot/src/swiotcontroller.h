@@ -30,6 +30,7 @@
 #include "src/swiotswitchctxtask.h"
 #include "src/swiotreadtemperaturetask.h"
 #include "src/swiotidentifytask.h"
+#include "src/swiotpingtask.h"
 
 
 namespace scopy::swiot {
@@ -67,7 +68,7 @@ Q_SIGNALS:
 
 private:
 	SwiotIdentifyTask *identifyTask;
-	IIOPingTask *pingTask;
+	SwiotPingTask *pingTask;
 	SwiotSwitchCtxTask *switchCtxTask;
 	ExternalPsReaderThread *extPsTask;
 	SwiotReadTemperatureTask *temperatureTask;
