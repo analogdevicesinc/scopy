@@ -94,8 +94,8 @@ void SwiotController::stopPowerSupplyTask()
 void SwiotController::startTemperatureTask() {
 	temperatureTask = new SwiotReadTemperatureTask(uri, this);
 	temperatureTimer = new CyclicalTask(temperatureTask);
-	temperatureTimer->start(1000);
 	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+	temperatureTimer->start(2000);
 }
 
 void SwiotController::stopTemperatureTask() {

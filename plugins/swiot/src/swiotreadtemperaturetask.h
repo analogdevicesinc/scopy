@@ -24,6 +24,8 @@
 
 #include <QThread>
 #include <iio.h>
+#include <iioutil/command.h>
+#include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
 class SwiotReadTemperatureTask : public QThread {
@@ -35,8 +37,18 @@ public:
 Q_SIGNALS:
 	void newTemperature(double value);
 
+private Q_SLOTS:
+	void readRawCommandFinished(scopy::Command *cmd);
+	void readScaleCommandFinished(scopy::Command *cmd);
+	void readOffsetCommandFinished(scopy::Command *cmd);
+
 private:
 	QString m_uri;
+	struct iio_context *m_context;
+	struct iio_channel *m_channel;
+	struct iio_device *m_device;
+	CommandQueue *m_commandQueue;
+	double m_raw, m_scale, m_offset;
 
 };
 } // scopy::swiot
