@@ -92,16 +92,18 @@ void SwiotController::stopPowerSupplyTask()
 }
 
 void SwiotController::startTemperatureTask() {
-	temperatureTask = new SwiotReadTemperatureTask(uri, this);
-	temperatureTimer = new CyclicalTask(temperatureTask);
-	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
-	temperatureTimer->start(2000);
+//	temperatureTask = new SwiotReadTemperatureTask(uri, this);
+//	temperatureTimer = new CyclicalTask(temperatureTask);
+//	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+//	temperatureTimer->start(2000);
 }
 
 void SwiotController::stopTemperatureTask() {
-	temperatureTimer->stop();
-	temperatureTask->requestInterruption();
-	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+//	temperatureTimer->stop();
+//	temperatureTask->requestInterruption();
+//	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+//	temperatureTask->deleteLater();
+//	temperatureTimer->deleteLater();
 }
 
 void SwiotController::identify()
