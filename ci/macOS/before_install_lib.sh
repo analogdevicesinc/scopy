@@ -1,13 +1,11 @@
 #!/bin/bash
 set -e
 
-
 NUM_JOBS=4
-if [ "$APPVEYOR" == "true" ] ; then
-	STAGINGDIR=/usr/local
-else
-	STAGINGDIR="${WORKDIR}/staging"
-fi
+
+STAGING_AREA=$PWD/staging
+STAGINGDIR=$STAGING_AREA/dependencies
+WORKDIR=$STAGING_AREA
 
 export PYTHON3=python3
 
