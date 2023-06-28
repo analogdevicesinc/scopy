@@ -54,6 +54,7 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	initSpecialFaults();
 	m_faultsGroup = new FaultsGroup(name, m_path, this);
 	connect(this, &FaultsDevice::specialFaultsUpdated, m_faultsGroup, &FaultsGroup::specialFaultsUpdated);
+	connect(m_faultsGroup, &FaultsGroup::specialFaultExplanationChanged, this, &FaultsDevice::updateExplanation);
 
 
 	if (m_device == nullptr) {
@@ -99,6 +100,16 @@ void FaultsDevice::update() {
 	this->ui->lineEdit_numeric->setText(QString("0x%1").arg(m_faultNumeric, 8, 16, QLatin1Char('0')));
 	this->m_faultsGroup->update(m_faultNumeric);
 	this->updateExplanations();
+}
+
+void FaultsDevice::updateExplanation(int index)
+{
+	QLabel *lbl = dynamic_cast<QLabel*>(m_faultExplanationWidgets[index]);
+	if (lbl) {
+		QString updatedText = m_faultsGroup->getExplanation(index);
+		lbl->setText(updatedText);
+	}
+	m_faults_explanation->ensurePolished();
 }
 
 void FaultsDevice::updateExplanations() {

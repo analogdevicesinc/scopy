@@ -111,7 +111,12 @@ void FaultWidget::setPressed(bool pressed) {
 void FaultWidget::specialFaultUpdated(int index, QString channelFunction)
 {
 	if (index == m_id) {
-		setFaultExplanation(m_faultExplanationOptions[channelFunction].toString());
+		QString option = m_faultExplanationOptions[channelFunction].toString();
+		if (option.isEmpty()) {
+			option = "channel configured as: " + channelFunction;
+		}
+		setFaultExplanation(option);
+		Q_EMIT specialFaultExplanationChanged(m_id, m_faultExplanation);
 	}
 }
 

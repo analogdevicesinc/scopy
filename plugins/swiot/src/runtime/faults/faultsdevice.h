@@ -46,6 +46,7 @@ public:
 public Q_SLOTS:
 	void resetStored();
 	void updateExplanations();
+	void updateExplanation(int index);
 
 Q_SIGNALS:
 	void specialFaultsUpdated(int index, QString channelFunction);
