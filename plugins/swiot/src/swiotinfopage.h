@@ -23,6 +23,8 @@
 #define SCOPY_SWIOTINFOPAGE_H
 
 #include <QWidget>
+#include <QPushButton>
+#include <QCheckBox>
 #include <infopage.h>
 
 namespace scopy::swiot {
@@ -30,6 +32,11 @@ class SwiotInfoPage : public InfoPage {
 	Q_OBJECT
 public:
 	explicit SwiotInfoPage(QWidget* parent = nullptr);
+	void enableTemperatureReadBtn(bool enable);
+Q_SIGNALS:
+	void temperatureReadEnabled(bool toggled);
+private:
+	QCheckBox *m_enTempReadCheckBox;
 };
 }
 
