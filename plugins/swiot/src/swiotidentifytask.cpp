@@ -28,7 +28,7 @@ void SwiotIdentifyTask::run() {
 	iio_device *swiotDevice = iio_context_find_device(ctx, "swiot");
 
 	if (swiotDevice) {
-		IioDeviceAttributeWrite *iioAttrWrite = new IioDeviceAttributeWrite(swiotDevice, "identify", "1", commandQueue, true);
+		IioDeviceAttributeWrite *iioAttrWrite = new IioDeviceAttributeWrite(swiotDevice, "identify", "1", nullptr, true);
 
 		connect(iioAttrWrite, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 			IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite*>(cmd);
