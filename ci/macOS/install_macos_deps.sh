@@ -1,6 +1,10 @@
 #!/bin/bash
 
-LIBIIO_VERSION=0ed18cd8f6b2fac5204a99e38922bea73f1f778c
+set -ex
+
+REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
+
+LIBIIO_VERSION=master
 LIBAD9361_BRANCH=master
 LIBM2K_BRANCH=master
 GNURADIO_BRANCH=maint-3.10
@@ -11,254 +15,254 @@ LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
 
 PYTHON="python3"
+
 PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
-PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr"
+PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport"
 
-set -e
-REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
-WORKDIR=${PWD}
-JOBS=4
+STAGING_AREA=$PWD/staging
+STAGING_AREA_DEPS=$STAGING_AREA/dependencies
+JOBS=-j8
 
-brew search ${QT_FORMULAE}
-brew install $PACKAGES
+source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
-for pkg in gcc bison gettext cmake python; do
-	brew link --overwrite --force $pkg
-done
+install_packages() {
+	brew search ${QT_FORMULAE}
+	brew install $PACKAGES
+	for pkg in gcc bison gettext cmake python; do
+		brew link --overwrite --force $pkg
+	done
 
-pip3 install mako
+	pip3 install mako
+}
 
-# Generate build status info for the about page
-BUILD_STATUS_FILE=${REPO_SRC}/build-status
-brew list --versions $PACKAGES > $BUILD_STATUS_FILE
+export_paths(){
+	QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
+	export PATH="/usr/local/bin:$PATH"
+	export PATH="/usr/local/opt/bison/bin:$PATH"
+	export PATH="${QT_PATH}:$PATH"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
+	export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGINGDIR/lib/pkgconfig"
 
-source ${REPO_SRC}/CI/appveyor/before_install_lib.sh
+	QMAKE="$(command -v qmake)"
+	CMAKE_BIN="$(command -v cmake)"
+	CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
+	CMAKE="$CMAKE_BIN ${CMAKE_OPTS[*]}"
 
-QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
+	echo -- USING CMAKE COMMAND:
+	echo $CMAKE
+	echo -- USING QT: $QT_PATH
+	echo -- USING QMAKE: $QMAKE_BIN
+	echo -- PATH: $PATH
+	echo -- PKG_CONFIG_PATH: $PKG_CONFIG_PATH
+}
 
-export PATH="/usr/local/bin:$PATH"
-export PATH="/usr/local/opt/bison/bin:$PATH"
-export PATH="${QT_PATH}:$PATH"
-export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libzip/lib/pkgconfig"
-export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/usr/local/opt/libffi/lib/pkgconfig"
-export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:$STAGINGDIR/lib/pkgconfig"
+clone() {
+	echo "#######CLONE#######"
+	mkdir -p $STAGING_AREA
+	pushd $STAGING_AREA
+	git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	git clone --recursive https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH libad9361
+	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+	git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
+	git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
+	git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
+	git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+	popd
+}
 
-echo $PKG_CONFIG_PATH
-QMAKE="$(command -v qmake)"
-
-CMAKE_OPTS="-DCMAKE_PREFIX_PATH=$STAGINGDIR -DCMAKE_INSTALL_PREFIX=$STAGINGDIR"
+generate_status_file(){
+	# Generate build status info for the about page
+	BUILD_STATUS_FILE=${REPO_SRC}/build-status
+	brew list --versions $PACKAGES > $BUILD_STATUS_FILE
+}
 
 save_version_info() {
 	echo "$CURRENT_BUILD - $(git rev-parse --short HEAD)" >> $BUILD_STATUS_FILE
 }
 
+build_with_cmake() {
+	echo $PWD
+	BUILD_FOLDER=$PWD/build-${ARCH}
+	rm -rf $BUILD_FOLDER
+	mkdir -p $BUILD_FOLDER
+	cd $BUILD_FOLDER
+	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
+	make $JOBS
+	sudo make $JOBS install
+
+	#clear variable
+	CURRENT_BUILD_CMAKE_OPTS=""
+}
+
 build_libiio() {
 	echo "### Building libiio - version $LIBIIO_VERSION"
-
-	git clone https://github.com/analogdevicesinc/libiio.git ${WORKDIR}/libiio
-	cd ${WORKDIR}/libiio
-	git checkout $LIBIIO_VERSION
-
-	mkdir ${WORKDIR}/libiio/build-${ARCH}
-	cd ${WORKDIR}/libiio/build-${ARCH}
 	CURRENT_BUILD=libiio
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
+	pushd $STAGING_AREA/libiio
+	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=OFF \
+		-DENABLE_DNS_SD:BOOL=OFF \
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
-		-DENABLE_DNS_SD:BOOL=OFF\
 		-DCSHARP_BINDINGS:BOOL=OFF \
 		-DPYTHON_BINDINGS:BOOL=OFF \
-		-DOSX_PACKAGE:BOOL=OFF \
-		${WORKDIR}/libiio
-
-	make -j $JOBS
-	sudo make -j ${JOBS} install
+		-DINSTALL_UDEV_RULE:BOOL=OFF \
+		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DOSX_PACKAGE:BOOL=OFF
+		"
+	build_with_cmake
+	popd
 }
 
 build_libm2k() {
-
 	echo "### Building libm2k - branch $LIBM2K_BRANCH"
-
-	git clone --depth 1 https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH ${WORKDIR}/libm2k
-
-	mkdir ${WORKDIR}/libm2k/build-${ARCH}
-	cd ${WORKDIR}/libm2k/build-${ARCH}
+	pushd $STAGING_AREA/libm2k
 	CURRENT_BUILD=libm2k
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
+	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
 		-DENABLE_CSHARP=OFF \
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
-		-DENABLE_LOG=ON\
-		${WORKDIR}/libm2k
-
-	make -j $JOBS
-	sudo make -j ${JOBS} install
+		-DENABLE_LOG=ON \
+		"
+	build_with_cmake
+	popd
 }
 
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
-
-	git clone --depth 1 https://github.com/analogdevicesinc/libad9361-iio.git -b $LIBAD9361_BRANCH ${WORKDIR}/libad9361
-
-	mkdir ${WORKDIR}/libad9361/build-${ARCH}
-	cd ${WORKDIR}/libad9361/build-${ARCH}
 	CURRENT_BUILD=libad9361-iio
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
-		${WORKDIR}/libad9361
-
-	make -j $JOBS
-	sudo make -j $JOBS install
+	pushd $STAGING_AREA/libad9361
+	build_with_cmake
+	popd
 }
 
 build_gnuradio() {
 	echo "### Building gnuradio - branch $GNURADIO_BRANCH"
-
-	git clone --recurse-submodules https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH ${WORKDIR}/gnuradio
-	mkdir ${WORKDIR}/gnuradio/build-${ARCH}
-	cd ${WORKDIR}/gnuradio/build-${ARCH}
 	CURRENT_BUILD=gnuradio
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
-		-DENABLE_GR_DIGITAL:BOOL=OFF \
-		-DENABLE_GR_DTV:BOOL=OFF \
-		-DENABLE_GR_AUDIO:BOOL=OFF \
-		-DENABLE_GR_CHANNELS:BOOL=OFF \
-		-DENABLE_GR_TRELLIS:BOOL=OFF \
-		-DENABLE_GR_VOCODER:BOOL=OFF \
-		-DENABLE_GR_QTGUI:BOOL=OFF \
-		-DENABLE_GR_FEC:BOOL=OFF \
-		-DENABLE_SPHINX:BOOL=OFF \
-		-DENABLE_DOXYGEN:BOOL=OFF \
-		-DENABLE_INTERNAL_VOLK=ON \
-		-DENABLE_PYTHON=OFF \
-		-DENABLE_TESTING=OFF \
-		-DENABLE_GR_CHANNELS=OFF \
-		-DENABLE_GR_VOCODER=OFF \
-		-DENABLE_GR_TRELLIS=OFF \
-		-DENABLE_GR_WAVELET=OFF \
-		-DENABLE_GR_CTRLPORT=OFF \
-		-DENABLE_CTRLPORT_THRIFT=OFF \
-		-DCMAKE_C_FLAGS=-fno-asynchronous-unwind-tables \
-		${WORKDIR}/gnuradio
-	make -j $JOBS
-	sudo make -j $JOBS install
+	pushd $STAGING_AREA/gnuradio
+	CURRENT_BUILD_CMAKE_OPTS="\
+		-DPYTHON_EXECUTABLE=/usr/bin/python3 \
+		-DENABLE_DEFAULT=OFF \
+		-DENABLE_GNURADIO_RUNTIME=ON \
+		-DENABLE_GR_ANALOG=ON \
+		-DENABLE_GR_BLOCKS=ON \
+		-DENABLE_GR_FFT=ON \
+		-DENABLE_GR_FILTER=ON \
+		-DENABLE_GR_IIO=ON \
+		-DENABLE_POSTINSTALL=OFF
+		"
+	build_with_cmake
+	popd
 }
 
 build_grm2k() {
 	echo "### Building gr-m2k - branch $GRM2K_BRANCH"
-
-	git clone --depth 1 https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH ${WORKDIR}/gr-m2k
-	mkdir ${WORKDIR}/gr-m2k/build-${ARCH}
-	cd ${WORKDIR}/gr-m2k/build-${ARCH}
 	CURRENT_BUILD=gr-m2k
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
+	pushd $STAGING_AREA/gr-m2k
+	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PYTHON=OFF \
-		-DDIGITAL=OFF \
-		${WORKDIR}/gr-m2k
-
-	make -j $JOBS
-	sudo make -j $JOBS install
+		-DDIGITAL=OFF
+		"
+	build_with_cmake
+	popd
 }
 
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
-
-	git clone --depth 1 https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH ${WORKDIR}/gr-scopy
-	mkdir ${WORKDIR}/gr-scopy/build-${ARCH}
-	cd ${WORKDIR}/gr-scopy/build-${ARCH}
 	CURRENT_BUILD=gr-scopy
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
-		-DWITH_PYTHON=OFF \
-		${WORKDIR}/gr-scopy
-
-	make -j $JOBS
-	sudo make -j $JOBS install
-}
-build_glibmm() {
-	echo "### Building glibmm - 2.64.0"
-	cd ${WORKDIR}
-	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
-	tar xzvf glibmm-2.64.0.tar.xz
-	cd glibmm-2.64.0
-	echo "libglibmm - v2.64.0" >> $BUILD_STATUS_FILE
-	./configure --prefix=$STAGINGDIR
-	make -j $JOBS
-	sudo make -j $JOBS install
-}
-
-build_sigcpp() {
-	echo "### Building libsigc++ -2.10.0"
-	cd ${WORKDIR}
-	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
-	tar xvzf libsigc++-2.10.0.tar.xz
-	cd libsigc++-2.10.0
-	echo "libsigc++ - v2.10.0" >> $BUILD_STATUS_FILE
-	./configure --prefix=$STAGINGDIR
-	make -j $JOBS
-	sudo make -j $JOBS install
+	pushd $STAGING_AREA/gr-scopy
+	CURRENT_BUILD_CMAKE_OPTS="-DWITH_PYTHON=OFF "
+	build_with_cmake
+	popd
 }
 
 build_libsigrokdecode() {
 	echo "### Building libsigrokdecode - branch $LIBSIGROKDECODE_BRANCH"
-
-	git clone --depth 1 https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH ${WORKDIR}/libsigrokdecode
-	cd ${WORKDIR}/libsigrokdecode
 	CURRENT_BUILD=libsigrokdecode
 	save_version_info
 
+	pushd $STAGING_AREA/libsigrokdecode
 	./autogen.sh
-	./configure --prefix=$STAGINGDIR
-
-	sudo make -j $JOBS install
+	./configure --prefix $STAGING_AREA_DEPS
+	sudo make $JOBS install
+	popd
 }
 
 build_qwt() {
 	echo "### Building qwt - branch qwt-multiaxes"
-	git clone --depth 1 https://github.com/cseci/qwt -b $QWT_BRANCH ${WORKDIR}/qwt
 	CURRENT_BUILD=qwt
 	save_version_info
+
 	qmake_build_local "qwt" "qwt.pro" "patch_qwt"
 }
 
 build_libtinyiiod() {
 	echo "### Building libtinyiiod - branch $LIBTINYIIOD_BRANCH"
-
-	git clone --depth 1 https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH ${WORKDIR}/libtinyiiod
-	mkdir ${WORKDIR}/libtinyiiod/build-${ARCH}
-	cd ${WORKDIR}/libtinyiiod/build-${ARCH}
 	CURRENT_BUILD=libtinyiiod
 	save_version_info
 
-	cmake ${CMAKE_OPTS} \
-		-DBUILD_EXAMPLES=OFF \
-		${WORKDIR}/libtinyiiod
-
-	make -j $JOBS
-	sudo make -j $JOBS install
+	pushd $STAGING_AREA/libtinyiiod
+	CURRENT_BUILD_CMAKE_OPTS="-DBUILD_EXAMPLES=OFF"
+	build_with_cmake
+	popd
 }
 
-build_sigcpp
-build_glibmm
-build_libiio
-build_libad9361
-build_libm2k
-build_gnuradio
-build_grscopy
-build_grm2k
-build_qwt
-build_libsigrokdecode
-build_libtinyiiod
+build_deps(){
+	build_libiio
+	build_libad9361
+	build_libm2k
+	build_gnuradio
+	build_grscopy
+	build_grm2k
+	build_qwt
+	build_libsigrokdecode
+	build_libtinyiiod
+}
+
+install_packages
+export_paths
+clone
+generate_status_file
+build_deps
+
+
+# build_glibmm() {
+# 	echo "### Building glibmm - 2.64.0"
+# 	cd ${WORKDIR}
+# 	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
+# 	tar xzvf glibmm-2.64.0.tar.xz
+# 	cd glibmm-2.64.0
+# 	echo "libglibmm - v2.64.0" >> $BUILD_STATUS_FILE
+# 	./configure --prefix=$STAGINGDIR
+# 	make -j $JOBS
+# 	sudo make -j $JOBS install
+# }
+
+# build_sigcpp() {
+# 	echo "### Building libsigc++ -2.10.0"
+# 	cd ${WORKDIR}
+# 	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
+# 	tar xvzf libsigc++-2.10.0.tar.xz
+# 	cd libsigc++-2.10.0
+# 	echo "libsigc++ - v2.10.0" >> $BUILD_STATUS_FILE
+# 	./configure --prefix=$STAGINGDIR
+# 	make -j $JOBS
+# 	sudo make -j $JOBS install
+# }
