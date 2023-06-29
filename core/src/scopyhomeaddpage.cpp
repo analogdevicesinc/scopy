@@ -7,6 +7,9 @@
 #include "iioutil/contextprovider.h"
 #include <QtConcurrent>
 #include <QFuture>
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE,"ScopyHomeAddPage")
 
 using namespace scopy;
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
@@ -21,72 +24,49 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	verifyIioBackend();
 	pendingUri = "";
 
-	//loading icon
-	loadingIcon = new QMovie(this);
-	loadingIcon->setFileName(":/gui/loading.gif");
-	connect(loadingIcon, &QMovie::frameChanged, [=]{
-	    ui->btnScan->setIcon(loadingIcon->currentPixmap());
-	});
-
 	//verify
 	fw = new QFutureWatcher<bool>(this);
-	connect(fw, &QFutureWatcher<bool>::finished, this, [=](){
-		bool result = fw->result();
-		if (result == true) {
-			ui->uriMessageLabel->clear();
-			createDevice();
-		} else {
-			ui->uriMessageLabel->clear();
-			ui->uriMessageLabel->setText("\""+ui->editUri->text() + "\" not a valid context!");
-		}
-	});
+	connect(fw, &QFutureWatcher<bool>::started, ui->btnVerify, &AnimationPushButton::startAnimation, Qt::QueuedConnection);
+	connect(fw, &QFutureWatcher<bool>::finished, this, &ScopyHomeAddPage::verifyFinished, Qt::QueuedConnection);
+	connect(ui->btnVerify, SIGNAL(clicked()), this, SLOT(futureVerify()), Qt::QueuedConnection);
 
 	//scan
-	scanTask = new IIOScanTask(this);
-	connect(scanTask, SIGNAL(scanFinished(QStringList)), this, SLOT(scanFinished(QStringList)));
-	fwScan = new QFutureWatcher<void>(this);
-	connect(fwScan, &QFutureWatcher<void>::finished, this, [=](){
-		loadingIcon->stop();
-		ui->btnScan->setIcon(QIcon());
-		ui->btnScan->setText("Scan");
-		ui->btnScan->setEnabled(true);
-	});
+	fwScan = new QFutureWatcher<int>(this);
+	connect(fwScan, &QFutureWatcher<int>::started, ui->btnScan, &AnimationPushButton::startAnimation, Qt::QueuedConnection);
+	connect(fwScan, &QFutureWatcher<int>::finished, this, &ScopyHomeAddPage::scanFinished, Qt::QueuedConnection);
+	connect(ui->btnScan, SIGNAL(clicked()), this, SLOT(futureScan()), Qt::QueuedConnection);
 
 	//btns connections
 	connect(ui->btnBack, &QPushButton::clicked, this, [=](){
+		ui->labelConnectionLost->clear();
 		ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
 	});
-	connect(ui->btnScan, SIGNAL(clicked()), this, SLOT(futureScan()));
-	connect(ui->btnVerify, SIGNAL(clicked()), this, SLOT(futureVerify()));
-	connect(ui->btnAdd, &QPushButton::clicked, this, [=](){
-		pendingUri = ui->editUri->text();
-		Q_EMIT newDeviceAvailable(deviceImpl);
-	});
-	connect(ui->comboBoxContexts,&QComboBox::textActivated, [=](){
+	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(addBtnClicked()));
+	connect(ui->comboBoxContexts,&QComboBox::textActivated, this, [=](){
 		Q_EMIT uriChanged(ui->comboBoxContexts->currentText());
 	});
 
 	//serial widget connections
-	connect(ui->comboBoxSerialPort, &QComboBox::textActivated, [=](){
+	connect(ui->comboBoxSerialPort, &QComboBox::textActivated, this, [=](){
 		Q_EMIT uriChanged(getSerialPath());
 	});
-	connect(ui->comboBoxBaudRate, &QComboBox::textActivated, [=](){
+	connect(ui->comboBoxBaudRate, &QComboBox::textActivated, this, [=](){
 		Q_EMIT uriChanged(getSerialPath());
 	});
-	connect(ui->editSerialFrameConfig, &QLineEdit::textChanged, [=](){
+	connect(ui->editSerialFrameConfig, &QLineEdit::textChanged, this, [=](){
 		Q_EMIT uriChanged(getSerialPath());
 	});
 	connect(this, &ScopyHomeAddPage::uriChanged, this, &ScopyHomeAddPage::updateUri);
-	connect(ui->editUri, &QLineEdit::textChanged, [=](QString uri){
-		if (uri.isEmpty()) {
-			ui->btnVerify->setEnabled(false);
-		} else {
-			ui->btnVerify->setEnabled(true);
-		}
+	connect(ui->editUri, &QLineEdit::textChanged, this, [=](QString uri){
+		ui->btnVerify->setEnabled(!uri.isEmpty());
+	});
+
+	connect(ui->editUri, &QLineEdit::returnPressed, this, [=](){
+		Q_EMIT ui->btnVerify->clicked();
 	});
 
 	connect(this, &ScopyHomeAddPage::deviceInfoAvailable, this, [=](QMap<QString, QString> ctxInfo){
-		for (QString key : ctxInfo.keys()) {
+		foreach (const QString &key, ctxInfo.keys()){
 			deviceInfoPage->update(key, ctxInfo[key]);
 		}
 	},Qt::QueuedConnection);
@@ -105,6 +85,14 @@ void ScopyHomeAddPage::initAddPage()
 #endif
 	bool serialBackEnd = iio_has_backend("serial");
 
+	QMovie *veifyIcon(new QMovie(this));
+	veifyIcon->setFileName(":/gui/loading.gif");
+	ui->btnVerify->setAnimation(veifyIcon);
+
+	QMovie *scanIcon(new QMovie(this));
+	scanIcon->setFileName(":/gui/loading.gif");
+	ui->btnScan->setAnimation(scanIcon);
+
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
 
@@ -113,9 +101,14 @@ void ScopyHomeAddPage::initAddPage()
 	ui->btnAdd->setProperty("blue_button", QVariant(true));
 	ui->btnVerify->setProperty("blue_button", QVariant(true));
 	ui->btnScan->setProperty("blue_button", QVariant(true));
+	ui->btnScan->setIcon(QIcon(":/gui/icons/refresh.svg"));
+	ui->btnScan->setIconSize(QSize(25,25));
 	ui->btnBack->setProperty("blue_button", QVariant(true));
 	ui->btnVerify->setEnabled(false);
 	ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
+	ui->labelConnectionLost->clear();
+	ui->comboBoxContexts->addItem("No scanned contexts... Press the refresh button!");
+	ui->comboBoxContexts->setEnabled(false);
 
 	for (int baudRate : availableBaudRates) {
 		ui->comboBoxBaudRate->addItem(QString::number(baudRate));
@@ -142,7 +135,7 @@ void ScopyHomeAddPage::findAvailableSerialPorts()
 		QVector<QString> portsName = IIOScanTask::getSerialPortsName();
 		ui->comboBoxSerialPort->clear();
 		if (!portsName.empty()) {
-			for (QString port : portsName) {
+			for (const QString &port : portsName) {
 				ui->comboBoxSerialPort->addItem(port);
 			}
 		}
@@ -175,6 +168,11 @@ void ScopyHomeAddPage::verifyIioBackend()
 			}
 			if (backEnd.compare("serial") == 0) {
 				ui->serialSettingsWidget->setEnabled(en);
+			}
+			if (scanParamsList.empty()) {
+				ui->btnScan->setEnabled(false);
+			} else if (!ui->btnScan->isEnabled()) {
+				ui->btnScan->setEnabled(true);
 			}
 		});
 		cb->setChecked(true);
@@ -212,6 +210,14 @@ bool ScopyHomeAddPage::verify() {
 
 void ScopyHomeAddPage::futureVerify()
 {
+	QRegExp ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$");
+	QString uri(ui->editUri->text());
+	bool isIp = uri.contains(ipRegex);
+	if (isIp && !ui->editUri->text().contains("ip:")) {
+		ui->editUri->blockSignals(true);
+		ui->editUri->setText("ip:" + uri);
+		ui->editUri->blockSignals(false);
+	}
 	removePluginsCheckBoxes();
 	deviceInfoPage->clear();
 	QFuture<bool> f = QtConcurrent::run(std::bind(&ScopyHomeAddPage::verify,this));
@@ -220,15 +226,10 @@ void ScopyHomeAddPage::futureVerify()
 
 void ScopyHomeAddPage::futureScan()
 {
+	scanList.clear();
 	QString scanParams = scanParamsList.join("");
-	QFuture<void> f = QtConcurrent::run([&](){
-		scanTask->setScanParams(scanParams);
-		scanTask->run();
-	});
+	QFuture<int> f = QtConcurrent::run(std::bind(&IIOScanTask::scan, &scanList, scanParams));
 	fwScan->setFuture(f);
-	(f.isStarted()) ? loadingIcon->start() : loadingIcon->stop();
-	ui->btnScan->setText("");
-	ui->btnScan->setEnabled(false);
 }
 
 void ScopyHomeAddPage::deviceAddedToUi(QString id)
@@ -241,15 +242,37 @@ void ScopyHomeAddPage::deviceAddedToUi(QString id)
 	}
 }
 
-void ScopyHomeAddPage::scanFinished(QStringList scanCtxs)
+void ScopyHomeAddPage::scanFinished()
 {
+	ui->btnScan->stopAnimation();
+	int retCode = fwScan->result();
+	if (retCode < 0) {
+		qWarning(CAT_HOME_ADD_PAGE) <<"iio_scan_context_get_info_list error " << retCode;
+		return;
+	}
+	if (!ui->comboBoxContexts->isEnabled()) {
+		ui->comboBoxContexts->setEnabled(true);
+	}
 	ui->comboBoxContexts->clear();
 	ui->uriMessageLabel->clear();
-	for (QString ctx: scanCtxs) {
+	for (const auto &ctx: qAsConst(scanList)) {
 		ui->comboBoxContexts->addItem(ctx);
 	}
 	findAvailableSerialPorts();
 	updateUri(ui->comboBoxContexts->currentText());
+}
+
+void ScopyHomeAddPage::verifyFinished()
+{
+	bool result = fw->result();
+	if (result) {
+		ui->uriMessageLabel->clear();
+		createDevice();
+	} else {
+		ui->uriMessageLabel->clear();
+		ui->uriMessageLabel->setText("\""+ui->editUri->text() + "\" not a valid context!");
+		ui->btnVerify->stopAnimation();
+	}
 }
 
 void ScopyHomeAddPage::deviceLoaderInitialized()
@@ -267,12 +290,26 @@ void ScopyHomeAddPage::deviceLoaderInitialized()
 		});
 	}
 	ui->stackedWidget->setCurrentWidget(ui->deviceInfoPage);
+	ui->btnVerify->stopAnimation();
 }
 
 void ScopyHomeAddPage::updateUri(QString uri)
 {
 	ui->editUri->clear();
 	ui->editUri->setText(uri);
+}
+
+void ScopyHomeAddPage::addBtnClicked()
+{
+	pendingUri = ui->editUri->text();
+	iio_context *ctx = ContextProvider::GetInstance()->open(deviceImpl->param());
+	if (!ctx) {
+		ui->labelConnectionLost->setText("Connection with " + deviceImpl->param() + " has been lost!");
+		return;
+	}
+	ContextProvider::GetInstance()->close(deviceImpl->param());
+	ui->labelConnectionLost->clear();
+	Q_EMIT newDeviceAvailable(deviceImpl);
 }
 
 void ScopyHomeAddPage::createDevice()
