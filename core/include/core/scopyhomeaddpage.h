@@ -36,9 +36,11 @@ private Q_SLOTS:
 	void futureScan();
 	bool verify();
 	void deviceAddedToUi(QString);
-	void scanFinished(QStringList);
+	void scanFinished();
+	void verifyFinished();
 	void deviceLoaderInitialized();
 	void updateUri(QString uri);
+	void addBtnClicked();
 
 private:
 	void initAddPage();
@@ -53,15 +55,14 @@ private:
 	Ui::ScopyHomeAddPage *ui;
 	QString pendingUri;
 	QFutureWatcher<bool> *fw;
-	QFutureWatcher<void> *fwScan;
+	QFutureWatcher<int> *fwScan;
 
-	IIOScanTask *scanTask;
 	QStringList scanParamsList;
+	QStringList scanList;
 	InfoPage *deviceInfoPage;
 	PluginManager *pluginManager;
 	DeviceImpl *deviceImpl;
 	QList<PluginEnableWidget*> pluginDescriptionList;
-	QMovie *loadingIcon;
 
 	const QVector<unsigned int> availableBaudRates = {2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 230400, 460800, 921600};
 };
