@@ -56,6 +56,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
+    ${QWT_LIBRARIES}
     Qt${QT_VERSION_MAJOR}::Widgets
     scopy-gui
     gnuradio::gnuradio-runtime

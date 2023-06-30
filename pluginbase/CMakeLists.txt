@@ -65,7 +65,7 @@ endforeach()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
 	${SCOPY_QT_LIBRARIES}
-	iio
+        ${IIO_LIBRARIES}
 	scopy-common)
 
 install(TARGETS ${PROJECT_NAME}

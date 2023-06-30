@@ -66,6 +66,10 @@ if(ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
+if (APPLE)
+        option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" ON)
+        set(EXTRA_BUNDLE_FILES "")
+endif(APPLE)
 
 set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
 set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/plugins/plugins)
@@ -79,6 +83,43 @@ add_subdirectory(plugins)
 add_subdirectory(core)
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
+
+if (ENABLE_APPLICATION_BUNDLE)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+
+        set(PKGINFO ${CMAKE_BINARY_DIR}/PkgInfo)
+        file(WRITE ${PKGINFO} "APPLScopy")
+        set_source_files_properties(${PKGINFO} PROPERTIES MACOSX_PACKAGE_LOCATION .)
+
+        set(QT_CONF ${CMAKE_BINARY_DIR}/qt.conf)
+        file(APPEND ${QT_CONF} "")
+        set_source_files_properties(${QT_CONF} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+        set(ICON_FILE ${CMAKE_SOURCE_DIR}/gui/res/Scopy.icns)
+        set_source_files_properties(${ICON_FILE} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+
+        set(CMAKE_EXE_LINKER_FLAGS "-Wl,-headerpad_max_install_names -Wl,-search_paths_first ${CMAKE_EXE_LINKER_FLAGS}")
+
+        foreach(plugin ${Qt5Gui_PLUGINS} ${Qt5Svg_PLUGINS})
+                get_target_property(_loc ${plugin} LOCATION)
+                get_filename_component(_name ${_loc} NAME)
+                get_filename_component(_dir ${_loc} DIRECTORY)
+                get_filename_component(_dir ${_dir} NAME)
+
+                set_source_files_properties(${_loc} PROPERTIES MACOSX_PACKAGE_LOCATION plugins/${_dir})
+                set(QT_PLUGINS ${QT_PLUGINS} ${_loc})
+                set(BUNDLED_QT_PLUGINS ${BUNDLED_QT_PLUGINS} ${CMAKE_BINARY_DIR}/Scopy.app/Contents/plugins/${_dir}/${_name})
+        endforeach()
+
+        install(CODE "
+                set(BU_CHMOD_BUNDLE_ITEMS ON)
+                include(BundleUtilities)
+                fixup_bundle(\"${CMAKE_BINARY_DIR}/Scopy.app\" \"${BUNDLED_QT_PLUGINS}\" \"${CMAKE_SOURCE_DIR}\")"
+        )
+
+        set(OSX_BUNDLE MACOSX_BUNDLE)
+        set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${QT_PLUGINS} ${ICON_FILE} ${PKGINFO} ${QT_CONF})
+endif()
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME}
@@ -101,10 +142,11 @@ else()
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
-	add_executable(${PROJECT_NAME}
+        add_executable(${PROJECT_NAME} WIN32 ${OSX_BUNDLE}
             ${PROJECT_SOURCES}
             ${SCOPY_RESOURCES}
             ${SCOPY_DEPENDENCIES}
+            ${EXTRA_BUNDLE_FILES}
         )
     endif()
 endif()
@@ -127,15 +169,17 @@ target_compile_options(${PROJECT_NAME} PUBLIC
         -Werror=switch
 )
 
-
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/apple/Info.plist.cmakein ${CMAKE_CURRENT_BINARY_DIR}/Info.plist COPYONLY)
 set_target_properties(${PROJECT_NAME}  PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
     MACOSX_BUNDLE TRUE
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_BINARY_DIR}/Info.plist
     WIN32_EXECUTABLE TRUE
 )
 
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
 
 configure_file(windows/scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy.iss @ONLY)
 configure_file(windows/scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-32.iss @ONLY)
@@ -143,16 +187,16 @@ configure_file(windows/scopy-64.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/
 configure_file(windows/qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf COPYONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
 
-
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
 	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg)
 endif()
-
-install(TARGETS ${PROJECT_NAME}
-	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+if (NOT ENABLE_APPLICATION_BUNDLE)
+    install(TARGETS ${PROJECT_NAME}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+endif()
 
 install(TARGETS ${PROJECT_NAME} BUNDLE DESTINATION .)
 
