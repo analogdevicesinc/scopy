@@ -35,6 +35,16 @@ FILE(GLOB HEADER_LIST
 
 FILE(GLOB UI_LIST ui/*.ui)
 
+if (ENABLE_APPLICATION_BUNDLE)
+    file(GLOB_RECURSE DECODERS ${LIBSIGROK_DECODERS_DIR}/*.py)
+    foreach(_decoder ${DECODERS})
+            file(RELATIVE_PATH _file ${LIBSIGROK_DECODERS_DIR} ${_decoder})
+            get_filename_component(_path ${_file} DIRECTORY)
+            set_source_files_properties(${_decoder} PROPERTIES MACOSX_PACKAGE_LOCATION MacOS/decoders/${_path})
+            set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${DECODERS} PARENT_SCOPE)
+    endforeach()
+endif()
+
 if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
@@ -73,7 +83,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
     scopy-gui
-    ${LIBSIGROK_DECODE_LIBRARIES}
+    ${LIBSIGROK_DECODE_LINK_LIBRARIES}
 )
 
 set(SCOPY_SIGROK_GUI ON PARENT_SCOPE)

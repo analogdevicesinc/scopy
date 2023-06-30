@@ -47,7 +47,7 @@ endif()
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
-	${OLD_SCOPY_FILES}
+	    ${OLD_SCOPY_FILES}
         ${HEADER_LIST}
         ${UI_LIST}
 )
@@ -86,7 +86,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	scopy-common
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/src/old
 	)
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase ${QWT_INCLUDE_DIRS})
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
     set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
@@ -94,6 +94,7 @@ endforeach()
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     ${SCOPY_QT_LIBRARIES}
+    ${QWT_LIBRARIES}
     scopy-common
     scopy-pluginbase
     scopy-iioutil

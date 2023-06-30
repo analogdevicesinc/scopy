@@ -68,6 +68,11 @@ if(SCOPY_ENABLE_SIGROK_GUI)
 	set(SCOPY_HAVE_SIGROK_GUI ON)
 endif()
 
+set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} PARENT_SCOPE)
+
+add_definitions(-DBOOST_ALL_DYN_LINK)
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
+
 message(STATUS "Building " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
@@ -83,11 +88,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/
     scopy-common
     scopysigrok-gui)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
     Qt${QT_VERSION_MAJOR}::Widgets
     ${QWT_LIBRARIES}
+    ${Boost_LIBRARIES}
     scopy-common
 )
 
