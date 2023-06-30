@@ -17,6 +17,11 @@ QString scopy::config::defaultPluginFolderPath()
 
 QString scopy::config::localPluginFolderPath()
 {
+
+	#if defined __APPLE__
+		return QCoreApplication::applicationDirPath() + "/plugins/plugins";
+	#endif
+
 	return SCOPY_PLUGIN_BUILD_PATH;
 }
 
