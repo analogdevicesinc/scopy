@@ -217,9 +217,9 @@ void SWIOTPlugin::setupToolList()
 	}
 
 	if (!m_isRuntime) {
-		Q_EMIT requestTool(configTme->id());
+		requestTool(configTme->id());
 	} else {
-		Q_EMIT requestTool(ad74413rTme->id());
+		requestTool(ad74413rTme->id());
 	}
 }
 
@@ -237,9 +237,9 @@ bool SWIOTPlugin::onDisconnect()
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setRunning(false);
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
-		tme->setRunning(false);
 		delete tme->tool();
 		tme->setTool(nullptr);
 	}
