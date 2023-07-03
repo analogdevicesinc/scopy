@@ -51,6 +51,9 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_readerThread(new ReaderThread(false, m_cmdQueue))
 {
 	this->ui->setupUi(this);
+	/* One of the channels is a fault channel, it has no DIO capabilities */
+	m_nbDioChannels = max14906ToolController->getChannelCount() - 1;
+
 	this->setupDynamicUi(this);
 	this->connectSignalsAndSlots();
 
@@ -100,6 +103,10 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	m_toolView->getGeneralSettingsBtn()->setChecked(true);
 	m_toolView->addTopExtraWidget(m_backButton);
 	ui->grid->setStyleSheet("background-color: #1C1C20");
+
+	m_toolView->getRunBtn()->setEnabled(!!m_nbDioChannels);
+	m_toolView->getGeneralSettingsBtn()->setChecked(!!m_nbDioChannels);
+	m_tme->setRunBtnVisible(!!m_nbDioChannels);
 }
 
 scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, QColor *color) {
@@ -242,9 +249,7 @@ void Max14906::initMonitorToolView() {
 }
 
 void Max14906::initChannels() {
-	int channel_num = this->max14906ToolController->getChannelCount();
-
-	for (int i = 0; i < channel_num - 1; ++i) { // -1 because of the fault channel
+	for (int i = 0; i < m_nbDioChannels; ++i) {
 		struct iio_channel *channel = iio_device_get_channel(this->max14906ToolController->getDevice(), i);
 		DioDigitalChannelController *channel_control = new DioDigitalChannelController(
 			channel,
