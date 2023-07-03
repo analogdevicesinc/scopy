@@ -27,6 +27,7 @@
 #include <iioutil/iiocommand/iiodevicecreatebuffer.h>
 #include <iioutil/iiocommand/iiobufferdestroy.h>
 #include <iioutil/iiocommand/iiobufferrefill.h>
+#include <iioutil/iiocommand/iiobuffercancel.h>
 
 #include <iio.h>
 
@@ -39,41 +40,49 @@ ReaderThread::ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *par
 	, m_iioBuff(nullptr)
 	, m_iioDev(nullptr)
 	, m_cmdQueue(cmdQueue)
-	, m_refillBufferCommand(nullptr)
-	, m_createBufferCommand(nullptr)
-	, m_destroyBufferCommand(nullptr)
 	, m_requiredBuffersNumber(0)
 	, bufferCounter(0)
+	, m_running(false)
 {
 }
 
 ReaderThread::~ReaderThread()
 {
-	destroyIioBuffer();
+	requestStop();
 }
 
 void ReaderThread::addDioChannel(int index, struct iio_channel *channel) {
 	m_dioChannels.insert(index, channel);
-	m_dioChannelsReadCommands.insert(index, new IioChannelAttributeRead(m_dioChannels[index], "raw", m_cmdQueue)); //overwrite?
+}
 
-	connect(m_dioChannelsReadCommands[index], &scopy::Command::finished, this, [=, this] (scopy::Command *cmd) {
+void ReaderThread::createDioChannelCommand(int index)
+{
+	Command *dioChannelReadCommand = new IioChannelAttributeRead(m_dioChannels[index], "raw", nullptr);
+
+	connect(dioChannelReadCommand, &scopy::Command::finished, this, [=, this] (scopy::Command *cmd) {
 		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
 		if (!tcmd) {
 			return;
 		}
-		int cmdIndex = m_dioChannelsReadCommands.indexOf(cmd);
+
+		auto channel = tcmd->getChannel();
+		if (!channel) {
+			return;
+		}
+		int channelIndex = m_dioChannels.key(channel);
 		if (tcmd->getReturnCode() >= 0) {
 			char *res = tcmd->getResult();
 			bool ok = false;
 			double raw = QString(res).toDouble(&ok);
 			if (ok) {
-				 Q_EMIT channelDataChanged(cmdIndex, raw);
+				 Q_EMIT channelDataChanged(channelIndex, raw);
 			}
-			qDebug(CAT_SWIOT_MAX14906) << "Channel with index " << cmdIndex << " read raw value: " << raw;
+			qDebug(CAT_SWIOT_MAX14906) << "Channel with index " << channelIndex << " read raw value: " << raw;
 		} else {
 			qCritical(CAT_SWIOT_MAX14906) << "Failed to acquire data on DioReaderThread " << tcmd->getReturnCode();
 		}
 	}, Qt::QueuedConnection);
+	m_cmdQueue->enqueue(dioChannelReadCommand);
 }
 
 void ReaderThread::runDio() {
@@ -82,7 +91,7 @@ void ReaderThread::runDio() {
 		if (!this->m_dioChannels.empty()) {
 			auto keys = this->m_dioChannels.keys();
 			for (int index : keys) {
-				m_cmdQueue->enqueue(m_dioChannelsReadCommands[index]);
+				createDioChannelCommand(index);
 			}
 		}
 	} catch (...) {
@@ -144,6 +153,7 @@ QVector<ChnlInfo *> ReaderThread::getEnabledBufferedChnls()
 
 void ReaderThread::bufferRefillCommandFinished(scopy::Command* cmd)
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
 	IioBufferRefill *tcmd = dynamic_cast<IioBufferRefill*>(cmd);
 	if (!tcmd) {
 		return;
@@ -169,38 +179,12 @@ void ReaderThread::bufferRefillCommandFinished(scopy::Command* cmd)
 	} else {
 		qDebug(CAT_SWIOT_AD74413R) << "Refill error " << QString(strerror(-tcmd->getReturnCode()));
 	}
-}
-
-void ReaderThread::createBufferRefillCommand()
-{
-	if (m_refillBufferCommand) {
-		disconnect(m_refillBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferRefillCommandFinished);
-		int occurences = m_cmdQueue->remove(m_refillBufferCommand);
-		qDebug(CAT_SWIOT_AD74413R) << " Dequeued occurences of refill command " << occurences;
-		delete m_refillBufferCommand;
-		m_refillBufferCommand = nullptr;
-	}
-	m_refillBufferCommand = new IioBufferRefill(m_iioBuff, m_cmdQueue);
-	connect(m_refillBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferRefillCommandFinished, Qt::QueuedConnection);
-	qDebug(CAT_SWIOT_AD74413R) << "==== Command refill created";
-}
-
-void ReaderThread::createBufferDestroyCommand()
-{
-	if (m_destroyBufferCommand) {
-		int occurences = m_cmdQueue->remove(m_destroyBufferCommand);
-		qDebug(CAT_SWIOT_AD74413R) << " Dequeued occurences of destroy command " << occurences;
-		disconnect(m_destroyBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferDestroyCommandFinished);
-		delete m_destroyBufferCommand;
-		m_destroyBufferCommand = nullptr;
-	}
-	m_destroyBufferCommand = new IioBufferDestroy(m_iioBuff, m_cmdQueue);
-	connect(m_destroyBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferDestroyCommandFinished, Qt::QueuedConnection);
-	qDebug(CAT_SWIOT_AD74413R) << "==== Command destroy created";
+	start();
 }
 
 void ReaderThread::bufferCreateCommandFinished(scopy::Command *cmd)
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
 	IioDeviceCreateBuffer *tcmd = dynamic_cast<IioDeviceCreateBuffer*>(cmd);
 	if (!tcmd) {
 		return;
@@ -209,18 +193,31 @@ void ReaderThread::bufferCreateCommandFinished(scopy::Command *cmd)
 		qDebug(CAT_SWIOT_AD74413R) << "Buffer wasn't created: " + QString(strerror(-tcmd->getReturnCode()));
 	} else {
 		m_iioBuff = tcmd->getResult();
-		if (m_iioBuff) {
-			createBufferRefillCommand();
-			createBufferDestroyCommand();
-			m_condBufferCreated.notify_one();
-		}
+		start();
 	}
 }
 
+void ReaderThread::bufferCancelCommandFinished(scopy::Command *cmd)
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	IioBufferCancel *tcmd = dynamic_cast<IioBufferCancel*>(cmd);
+	if (!tcmd) {
+		return;
+	}
+	if (tcmd->getReturnCode() < 0) {
+		qDebug(CAT_SWIOT_AD74413R) << "Buffer wasn't canceled: " + QString(strerror(-tcmd->getReturnCode()));
+	}
+	lock.unlock();
+	destroyIioBuffer();
+}
+
+
 void ReaderThread::bufferDestroyCommandFinished(scopy::Command *cmd)
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
 	IioBufferDestroy *tcmd = dynamic_cast<IioBufferDestroy*>(cmd);
 	if (!tcmd) {
+		Q_EMIT readerThreadFinished();
 		return;
 	}
 	if (tcmd->getReturnCode() < 0) {
@@ -228,41 +225,45 @@ void ReaderThread::bufferDestroyCommandFinished(scopy::Command *cmd)
 	} else {
 		m_iioBuff = nullptr;
 		m_bufferedChnls.clear();
-		qDebug(CAT_SWIOT_AD74413R) << "Buffer destroyed";
 	}
+	Q_EMIT readerThreadFinished();
 }
 
 void ReaderThread::createIioBuffer()
 {
+	std::unique_lock<std::mutex> lock(m_mutex);
 	m_enabledChnlsNo = getEnabledChnls();
 	m_bufferedChnls = getEnabledBufferedChnls();
 	qInfo(CAT_SWIOT_AD74413R) << "Enabled channels number: " + QString::number(m_enabledChnlsNo);
 	if (m_iioDev) {
-		if (m_createBufferCommand) {
-			int occurences = m_cmdQueue->remove(m_createBufferCommand);
-			qDebug(CAT_SWIOT_AD74413R) << " Dequeued occurences of create command " << occurences;
-			disconnect(m_createBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferCreateCommandFinished);
-			delete m_createBufferCommand;
-			m_createBufferCommand = nullptr;
-		}
-
+		Command *createBufferCommand ;
 		if(m_samplingFreq >= MAX_BUFFER_SIZE) {
-			m_createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MAX_BUFFER_SIZE, false, m_cmdQueue);
+			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MAX_BUFFER_SIZE, false, nullptr);
 		} else {
-			m_createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MIN_BUFFER_SIZE, false, m_cmdQueue);
+			createBufferCommand = new IioDeviceCreateBuffer(m_iioDev, MIN_BUFFER_SIZE, false, nullptr);
 		}
-		connect(m_createBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferCreateCommandFinished, Qt::QueuedConnection);
-		m_cmdQueue->enqueue(m_createBufferCommand);
+		connect(createBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferCreateCommandFinished, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(createBufferCommand);
+	}
+}
+
+void ReaderThread::cancelIioBuffer()
+{
+	std::unique_lock<std::mutex> lock(m_mutex);
+	if (m_iioBuff) {
+		Command *cancelBufferCommand = new IioBufferCancel(m_iioBuff, nullptr);
+		connect(cancelBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferCancelCommandFinished, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(cancelBufferCommand);
 	}
 }
 
 void ReaderThread::destroyIioBuffer()
 {
-        if (m_iioBuff) {
-		m_cmdQueue->enqueue(m_destroyBufferCommand);
-		qDebug(CAT_SWIOT_AD74413R) << "===== Command enqueued " << m_destroyBufferCommand;
-		int occurences = m_cmdQueue->remove(m_refillBufferCommand);
-		qDebug(CAT_SWIOT_AD74413R) << "Removed occurences of refill command " << occurences;
+	std::unique_lock<std::mutex> lock(m_mutex);
+	if (m_iioBuff) {
+		Command *destroyBufferCommand = new IioBufferDestroy(m_iioBuff, nullptr);
+		connect(destroyBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferDestroyCommandFinished, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(destroyBufferCommand);
         }
 }
 
@@ -277,43 +278,31 @@ void ReaderThread::onSamplingFreqWritten(int samplingFreq)
 }
 
 void ReaderThread::runBuffered(int requiredBuffersNumber) {
-	qDebug(CAT_SWIOT_AD74413R) << "Thread";
-        enableIioChnls();
-        createIioBuffer();
-	bufferCounter = 0;
-	while (!isInterruptionRequested()) {
-		std::unique_lock<std::mutex> lock(m_mutex);
-		m_condBufferCreated.wait(lock, [=, this] { return !!m_iioBuff; });
-
-		if ((m_requiredBuffersNumber != 0) ) {
-			m_cond.wait(lock, [=, this] {
-				// If we reached the required nb of buffers (single mode) then wait until
-				// interrupt is requested
-				return (bufferCounter < m_requiredBuffersNumber);
-			});
-		}
-		if (isInterruptionRequested()) {
-			break;
-		}
-
-		if (m_iioBuff) {
-			if (m_refillBufferCommand) {
-				m_cmdQueue->enqueue(m_refillBufferCommand);
-				bufferCounter++;
-			}
-		}
+	std::unique_lock<std::mutex> lock(m_mutex);
+	if (!m_iioBuff || !m_running) {
+		m_running = false;
+		return;
 	}
-        destroyIioBuffer();
+	if ((m_requiredBuffersNumber != 0) && (bufferCounter >= m_requiredBuffersNumber)) {
+		return;
+	}
+
+	if (m_iioBuff) {
+		Command *refillBufferCommand = new IioBufferRefill(m_iioBuff, nullptr);
+		connect(refillBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferRefillCommandFinished, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(refillBufferCommand);
+		bufferCounter++;
+	}
 }
 
 void ReaderThread::requestStop()
 {
-	//std::lock_guard<std::mutex> lock(m_mutex);
-	if (isRunning()) {
-		requestInterruption();
+	requestInterruption();
+	if (isBuffered && m_running) {
+		m_running = false;
+		cancelIioBuffer();
 	}
-	bufferCounter = 0;
-	m_cond.notify_one();
+	wait();
 }
 
 void ReaderThread::run() {
@@ -326,9 +315,15 @@ void ReaderThread::run() {
 
 void ReaderThread::startCapture(int requiredBuffersNumber)
 {
-	m_requiredBuffersNumber = requiredBuffersNumber;
-	this->start();
-
+	if (isBuffered) {
+		bufferCounter = 0;
+		m_requiredBuffersNumber = requiredBuffersNumber;
+		enableIioChnls();
+		createIioBuffer();
+		m_running = true;
+	} else {
+		this->start();
+	}
 }
 
 void ReaderThread::singleDio() {
