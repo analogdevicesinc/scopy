@@ -57,10 +57,6 @@ private:
 	std::string m_type;
 
 	CommandQueue *m_cmdQueue;
-	Command *m_writeCurrentLimitCmd, *m_writeRawCmd;
-	Command *m_writeTypeCmd, *m_readAvailableTypeCmd;
-	Command *m_readTypeCmd, *m_readRawCmd;
-	Command *m_readCurrentLimitAvailableCmd;
 
 	struct iio_channel* m_channel;
 };
