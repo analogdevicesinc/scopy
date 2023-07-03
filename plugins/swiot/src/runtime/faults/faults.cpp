@@ -55,11 +55,11 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 }
 
 Faults::~Faults() {
-	if (this->thread->isRunning()) {
-		this->thread->quit();
-		this->thread->wait();
+	if (thread) {
+		thread->quit();
+		thread->wait();
+		delete thread;
 	}
-	delete thread;
 	delete ui;
 }
 
@@ -104,9 +104,7 @@ void Faults::connectSignalsAndSlots() {
 			 &Faults::runButtonClicked);
 	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this,
 			 &Faults::singleButtonClicked);
-	QObject::connect(m_backButton, &QPushButton::clicked, this, [this]() {
-		Q_EMIT backBtnPressed();
-	});
+	QObject::connect(m_backButton, &QPushButton::clicked, this, &Faults::onBackBtnPressed);
 
 	QObject::connect(this->timer, &QTimer::timeout, this, &Faults::pollFaults);
 	QObject::connect(this->thread, &QThread::started, this, [&]() {
@@ -118,8 +116,14 @@ void Faults::connectSignalsAndSlots() {
 			 &QPushButton::setChecked);
 }
 
-void Faults::runButtonClicked() {
-	qDebug(CAT_SWIOT_FAULTS) << "Run button clicked";
+void Faults::onBackBtnPressed()
+{
+
+	thread->quit();
+	thread->wait();
+	Q_EMIT backBtnPressed();
+}
+
 void Faults::runButtonClicked(bool toggled) {
 	this->m_toolView->getSingleBtn()->setChecked(false);
 	if (toggled) {
