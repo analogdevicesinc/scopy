@@ -621,7 +621,7 @@ void DigitalInMenu::init()
 	m_thresholdSpinButton = new PositionSpinButton({
 							{"mV", 1E0}
 						     },
-						     "Theshold", 0,
+						     "Threshold", 0,
 						     16000,
 						     true, false, m_widget);
 	thresholdLayout->addWidget(m_thresholdSpinButton);
