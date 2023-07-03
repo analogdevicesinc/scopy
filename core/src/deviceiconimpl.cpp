@@ -23,8 +23,6 @@ DeviceIconImpl::DeviceIconImpl(Device *d, QWidget *parent)
 	forgetBtn->move(80,0);
 	connectionBadge->setMaximumSize(20,20);
 	connectionBadge->move(0,0);
-	if(!d->displayParam().isEmpty())
-		connectionBadge->setText(QString(d->displayParam().at(0)));
 //	forgetBtn->move(30,30);
 	forgetBtn->raise();
 	connect(forgetBtn,SIGNAL(clicked()),this,SIGNAL(forget()));
