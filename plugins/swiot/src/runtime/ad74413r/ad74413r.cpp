@@ -130,7 +130,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 
 void Ad74413r::setupConnections()
 {
-	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::backBtnPressed);
+	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::onBackBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
 
@@ -441,4 +441,10 @@ void Ad74413r::externalPowerSupply(bool ps) {
 		m_statusContainer->show();
 		m_statusLabel->show();
 	}
+}
+
+void Ad74413r::onBackBtnPressed()
+{
+	m_readerThread->requestStop();
+	Q_EMIT backBtnPressed();
 }
