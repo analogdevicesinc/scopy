@@ -47,9 +47,11 @@ public Q_SLOTS:
 	void resetStored();
 	void updateExplanations();
 	void updateExplanation(int index);
+	void onFaultNumericUpdated();
 
 Q_SIGNALS:
 	void specialFaultsUpdated(int index, QString channelFunction);
+	void faultNumericUpdated();
 
 private:
 	Ui::FaultsDevice *ui;
@@ -70,7 +72,6 @@ private:
 	struct iio_context* m_context;
 
 	uint32_t m_faultNumeric;
-	Command *m_readFaultCommand;
 	QVector<Command*> m_deviceConfigCmds;
 	QVector<Command*> m_functionConfigCmds;
 
