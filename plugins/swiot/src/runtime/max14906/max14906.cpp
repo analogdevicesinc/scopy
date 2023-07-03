@@ -53,6 +53,10 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	this->ui->setupUi(this);
 	this->setupDynamicUi(this);
 	this->connectSignalsAndSlots();
+	if (max14906ToolController->getChannelCount()) {
+		m_toolView->getRunBtn()->setEnabled(false);
+		m_toolView->getGeneralSettingsBtn()->setChecked(false);
+	}
 
 	this->m_qTimer->setInterval(MAX14906_POLLING_TIME); // poll once every second
 	this->m_qTimer->setSingleShot(true);
