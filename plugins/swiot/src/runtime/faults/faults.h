@@ -45,7 +45,7 @@ Q_SIGNALS:
         void backBtnPressed();
 
 public Q_SLOTS:
-	void runButtonClicked();
+	void runButtonClicked(bool toggled);
 	void singleButtonClicked();
 
 	void externalPowerSupply(bool ps);
