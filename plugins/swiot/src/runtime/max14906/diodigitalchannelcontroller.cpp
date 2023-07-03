@@ -37,23 +37,16 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 	m_channelName(deviceName),
 	m_channelType(deviceType),
 	m_cmdQueue(cmdQueue),
-	m_channel(channel),
-	m_writeCurrentLimitCmd(nullptr),
-	m_writeTypeCmd(nullptr),
-	m_writeRawCmd(nullptr),
-	m_readAvailableTypeCmd(nullptr),
-	m_readTypeCmd(nullptr),
-	m_readRawCmd(nullptr),
-	m_readCurrentLimitAvailableCmd(nullptr)
+	m_channel(channel)
 {
 	m_iioAttrAvailableTypes = (m_channelType == "INPUT") ? "IEC_type_available" : "do_mode_available";
 	m_iioAttrType = (m_channelType == "INPUT") ? "IEC_type" : "do_mode";
 
 
-	m_readAvailableTypeCmd = new IioChannelAttributeRead(m_channel, m_iioAttrAvailableTypes.c_str(), m_cmdQueue, true);
-	m_readTypeCmd = new IioChannelAttributeRead(m_channel, m_iioAttrType.c_str(), m_cmdQueue, true);
+	Command *readAvailableTypeCmd = new IioChannelAttributeRead(m_channel, m_iioAttrAvailableTypes.c_str(), nullptr);
+	Command *readTypeCmd = new IioChannelAttributeRead(m_channel, m_iioAttrType.c_str(), nullptr);
 
-	connect(m_readAvailableTypeCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+	connect(readAvailableTypeCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
 		if (!tcmd) {
 			return;
@@ -71,7 +64,7 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 		}
 	}, Qt::QueuedConnection);
 
-	connect(m_readTypeCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+	connect(readTypeCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
 		if (!tcmd) {
 			return;
@@ -85,14 +78,14 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 		}
 	}, Qt::QueuedConnection);
 
-	m_cmdQueue->enqueue(m_readAvailableTypeCmd);
-	m_cmdQueue->enqueue(m_readTypeCmd);
+	m_cmdQueue->enqueue(readAvailableTypeCmd);
+	m_cmdQueue->enqueue(readTypeCmd);
 
 	if (m_channelType == "OUTPUT") {
-		m_readRawCmd = new IioChannelAttributeRead(m_channel, "raw", m_cmdQueue, true);
-		m_readCurrentLimitAvailableCmd = new IioChannelAttributeRead(m_channel, "current_limit_available", m_cmdQueue, true);
+		Command *readRawCmd = new IioChannelAttributeRead(m_channel, "raw", nullptr);
+		Command *readCurrentLimitAvailableCmd = new IioChannelAttributeRead(m_channel, "current_limit_available", nullptr);
 
-		connect(m_readRawCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+		connect(readRawCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
 			if (!tcmd) {
 				return;
@@ -109,7 +102,7 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			}
 		}, Qt::QueuedConnection);
 
-		connect(m_readCurrentLimitAvailableCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+		connect(readCurrentLimitAvailableCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
 			if (!tcmd) {
 				return;
@@ -121,7 +114,7 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 					this->m_digitalChannel->ui->currentLimitValues->addItem(item);
 				}
 
-				IioChannelAttributeRead *readCurrentLimitCmd = new IioChannelAttributeRead(m_channel, "current_limit", m_cmdQueue, true);
+				IioChannelAttributeRead *readCurrentLimitCmd = new IioChannelAttributeRead(m_channel, "current_limit", nullptr);
 				connect(readCurrentLimitCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 					IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
 					if (!tcmd) {
@@ -140,27 +133,24 @@ DioDigitalChannelController::DioDigitalChannelController(struct iio_channel* cha
 			}
 		}, Qt::QueuedConnection);
 
-		m_cmdQueue->enqueue(m_readRawCmd);
-		m_cmdQueue->enqueue(m_readCurrentLimitAvailableCmd);
+		m_cmdQueue->enqueue(readRawCmd);
+		m_cmdQueue->enqueue(readCurrentLimitAvailableCmd);
 	}
 
 
 	QObject::connect(m_digitalChannel->ui->configModes, QOverload<int>::of(&QComboBox::currentIndexChanged),
 			 [=, this](int index){
 		createWriteTypeCommand(index);
-		m_cmdQueue->enqueue(m_writeTypeCmd);
 	});
 
 	QObject::connect(m_digitalChannel, &DioDigitalChannel::outputValueChanged, this,
 			 [=, this] (bool value) {
 		createWriteRawCommand(value);
-		m_cmdQueue->enqueue(m_writeRawCmd);
 	});
 
 	QObject::connect(m_digitalChannel->ui->currentLimitValues, QOverload<int>::of(&QComboBox::currentIndexChanged),
 			 [=, this] (int index) {
 		createWriteCurrentLimitCommand(index);
-		m_cmdQueue->enqueue(m_writeCurrentLimitCmd);
 	});
 }
 
@@ -175,8 +165,8 @@ DioDigitalChannel *DioDigitalChannelController::getDigitalChannel() const {
 
 void DioDigitalChannelController::createWriteRawCommand(bool value)
 {
-	m_writeRawCmd = new IioChannelAttributeWrite(m_channel, "raw", QString::number(value).toStdString().c_str(), m_cmdQueue, true);
-	connect(m_writeRawCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+	Command *writeRawCmd = new IioChannelAttributeWrite(m_channel, "raw", QString::number(value).toStdString().c_str(), nullptr);
+	connect(writeRawCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 		IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite*>(cmd);
 		if (!tcmd) {
 			return;
@@ -187,13 +177,14 @@ void DioDigitalChannelController::createWriteRawCommand(bool value)
 							 " error code" << tcmd->getReturnCode();
 		}
 	}, Qt::QueuedConnection);
+	m_cmdQueue->enqueue(writeRawCmd);
 }
 
 void DioDigitalChannelController::createWriteCurrentLimitCommand(int index)
 {
 	QString text = m_digitalChannel->ui->currentLimitValues->currentText();
-	m_writeCurrentLimitCmd = new IioChannelAttributeWrite(m_channel, "current_limit", text.toStdString().c_str(), m_cmdQueue, true);
-	connect(m_writeCurrentLimitCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+	Command *writeCurrentLimitCmd = new IioChannelAttributeWrite(m_channel, "current_limit", text.toStdString().c_str(), nullptr);
+	connect(writeCurrentLimitCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 		IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite*>(cmd);
 		if (!tcmd) {
 			return;
@@ -204,6 +195,7 @@ void DioDigitalChannelController::createWriteCurrentLimitCommand(int index)
 							 " error code " << tcmd->getReturnCode();
 		}
 	}, Qt::QueuedConnection);
+	m_cmdQueue->enqueue(writeCurrentLimitCmd);
 
 }
 
@@ -211,8 +203,8 @@ void DioDigitalChannelController::createWriteTypeCommand(int index)
 {
 	QString text = m_digitalChannel->ui->configModes->currentText();
 	m_type = text.toStdString();
-	m_writeTypeCmd = new IioChannelAttributeWrite(m_channel, m_iioAttrType.c_str(), text.toStdString().c_str(), m_cmdQueue, true);
-	connect(m_writeTypeCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+	Command *writeTypeCmd = new IioChannelAttributeWrite(m_channel, m_iioAttrType.c_str(), text.toStdString().c_str(), nullptr);
+	connect(writeTypeCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
 		IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite*>(cmd);
 		if (!tcmd) {
 			return;
@@ -222,4 +214,5 @@ void DioDigitalChannelController::createWriteTypeCommand(int index)
 							 " error code " << tcmd->getReturnCode();
 		}
 	}, Qt::QueuedConnection);
+	m_cmdQueue->enqueue(writeTypeCmd);
 }
