@@ -142,7 +142,7 @@ void Ad74413r::setupConnections()
 	connect(this, &Ad74413r::channelWidgetEnabled, m_plotHandler, &BufferPlotHandler::onChannelWidgetEnabled);
 
 	connect(m_readerThread, &ReaderThread::bufferRefilled, m_plotHandler, &BufferPlotHandler::onBufferRefilled, Qt::QueuedConnection);
-	connect(m_readerThread, &ReaderThread::finished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
+	connect(m_readerThread, &ReaderThread::readerThreadFinished, this, &Ad74413r::onReaderThreadFinished, Qt::QueuedConnection);
 
 	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, &Ad74413r::onSingleBtnPressed);
 	connect(m_plotHandler, &BufferPlotHandler::singleCaptureFinished, this, &Ad74413r::onSingleCaptureFinished);
@@ -316,63 +316,63 @@ void Ad74413r::onOffsetHdlSelected(int hdlIdx, bool selected)
 	}
 }
 
-void Ad74413r::onRunBtnPressed()
+void Ad74413r::onRunBtnPressed(bool toggled)
 {
 	Q_EMIT activateExportButton();
-	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
-	if (runBtnChecked) {
+	if (toggled) {
+		m_toolView->getSingleBtn()->setChecked(false);
+		m_toolView->getSingleBtn()->setEnabled(false);
 		m_samplingFreqOptions->setEnabled(false);
 		verifyChnlsChanges();
 		if (!m_readerThread->isRunning()) {
+			m_plotHandler->setSingleCapture(false);
 			m_plotHandler->resetPlotParameters();
 			m_readerThread->startCapture();
 		}
 		if (!m_tme->running()) {
-			m_tme->setRunning(runBtnChecked);
+			m_tme->setRunning(toggled);
 		}
 	} else {
+		m_toolView->getSingleBtn()->setEnabled(true);
 		m_samplingFreqOptions->setEnabled(true);
 		m_readerThread->requestStop();
 		if (m_tme->running()) {
-			m_tme->setRunning(runBtnChecked);
+			m_tme->setRunning(toggled);
 		}
 	}
 }
 
-void Ad74413r::onSingleBtnPressed()
+void Ad74413r::onSingleBtnPressed(bool toggled)
 {
-	if (m_toolView->getSingleBtn()->isChecked()) {
-		bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
+	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
+	if (toggled) {
 		Q_EMIT activateExportButton();
 		verifyChnlsChanges();
-		if (m_readerThread->isRunning()) {
-			m_readerThread->requestStop();
-		} else {
+		if (runBtnChecked) {
+			m_toolView->getRunBtn()->setChecked(false);
+		}
+		m_plotHandler->setSingleCapture(true);
+		if (!m_readerThread->isRunning()) {
 			m_plotHandler->resetPlotParameters();
 			int bufNumber = m_plotHandler->getRequiredBuffersNumber();
 			m_readerThread->startCapture(bufNumber);
 		}
-		m_plotHandler->setSingleCapture(true);
-		if (runBtnChecked) {
-			m_toolView->getRunBtn()->setChecked(false);
-		}
 		m_toolView->getSingleBtn()->setEnabled(false);
-	} else {
-		if (m_tme->running()) {
-			m_tme->setRunning(false);
-		}
 	}
 }
 
 void Ad74413r::onSingleCaptureFinished()
 {
-	if (m_tme->running()) {
-		m_tme->setRunning(false);
+	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
+	if (!runBtnChecked) {
+		if (m_tme->running()) {
+			m_tme->setRunning(false);
+		}
+		m_samplingFreqOptions->setEnabled(true);
+		m_toolView->getSingleBtn()->setEnabled(true);
 	}
-	m_toolView->getSingleBtn()->setChecked(false);
-	m_toolView->getSingleBtn()->setEnabled(true);
-	m_samplingFreqOptions->setEnabled(true);
 	m_readerThread->requestStop();
+	m_toolView->getSingleBtn()->setChecked(false);
 }
 
 void Ad74413r::verifyChnlsChanges()
@@ -423,15 +423,15 @@ QPushButton* Ad74413r::createBackBtn()
 
 void Ad74413r::onReaderThreadFinished()
 {
-	qDebug(CAT_SWIOT_AD74413R) << "reader thread finished";
 	bool singleCaptureOn = m_plotHandler->singleCapture();
 	if (singleCaptureOn) {
 		m_plotHandler->setSingleCapture(false);
 	}
 	int nbRequiredBuffers = 0;
-	if (m_toolView->getRunBtn()->isChecked() || m_toolView->getSingleBtn()->isChecked()) {
+	if (m_toolView->getRunBtn()->isChecked() || !m_toolView->getSingleBtn()->isEnabled()) {
 		m_plotHandler->resetPlotParameters();
 		if (m_toolView->getSingleBtn()->isChecked()) {
+			m_plotHandler->setSingleCapture(true);
 			nbRequiredBuffers = m_plotHandler->getRequiredBuffersNumber();
 		}
 		m_readerThread->startCapture(nbRequiredBuffers);
