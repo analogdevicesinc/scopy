@@ -50,6 +50,8 @@ public Q_SLOTS:
 
 	void externalPowerSupply(bool ps);
 
+private Q_SLOTS:
+	void onBackBtnPressed();
 private:
         void connectSignalsAndSlots();
         void setupDynamicUi(QWidget *parent);
