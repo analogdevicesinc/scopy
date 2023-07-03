@@ -37,7 +37,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
       ,m_swiotAdLogic(nullptr), m_widget(parent)
       ,m_readerThread(nullptr), m_statusContainer(new QWidget(this))
       , m_ctx(ctx)
-      , m_cmdQueue(CommandQueueProvider::GetInstance()->open(m_ctx))
+      , m_cmdQueue(CommandQueueProvider::GetInstance()->open(ctx))
 {
 	createDevicesMap(m_ctx);
 	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
@@ -48,7 +48,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 			m_enabledChannels = std::vector<bool>(MAX_CURVES_NUMBER, false);
 
 			m_swiotAdLogic = new BufferLogic(m_iioDevicesMap);
-			m_readerThread = new ReaderThread(true, m_cmdQueue);
+			m_readerThread = new ReaderThread(true, m_cmdQueue, this);
 			m_readerThread->addBufferedDevice(m_iioDevicesMap[AD_NAME]);
 
 			QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
@@ -74,11 +74,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 Ad74413r::~Ad74413r()
 {
 	if (m_readerThread) {
-		if (m_readerThread->isRunning()) {
-			m_readerThread->requestStop();
-			m_readerThread->quit();
-			m_readerThread->wait();
-		}
+		m_readerThread->requestStop();
 		delete m_readerThread;
 	}
 	if (m_cmdQueue) {
