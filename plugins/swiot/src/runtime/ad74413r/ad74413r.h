@@ -91,6 +91,8 @@ Q_SIGNALS:
 	void activateExportButton();
 
 	void backBtnPressed();
+private Q_SLOTS:
+	void onBackBtnPressed();
 private:
 	void setupToolView(gui::GenericMenu *settingsMenu);
 
