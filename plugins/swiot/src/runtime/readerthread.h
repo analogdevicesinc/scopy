@@ -39,6 +39,8 @@ public:
 
 	void addDioChannel(int index, struct iio_channel *channel);
 
+	void createDioChannelCommand(int index);
+
 	void addBufferedDevice(iio_device *device);
 
 	void runDio();
@@ -49,6 +51,8 @@ public:
 	void createIioBuffer();
 
 	void destroyIioBuffer();
+
+	void cancelIioBuffer();
 
 	void enableIioChnls();
 
@@ -65,21 +69,18 @@ public Q_SLOTS:
 	void onSamplingFreqWritten(int samplingFreq);
 
 Q_SIGNALS:
-
+	void readerThreadFinished();
 	void bufferRefilled(QVector<QVector<double>> bufferData, int bufferCounter);
-
 	void channelDataChanged(int channelId, double value);
 
 private Q_SLOTS:
 	void bufferRefillCommandFinished(scopy::Command *cmd);
 	void bufferCreateCommandFinished(scopy::Command *cmd);
 	void bufferDestroyCommandFinished(scopy::Command *cmd);
+	void bufferCancelCommandFinished(scopy::Command *cmd);
 
 private:
-	void createBufferRefillCommand();
-	void createBufferDestroyCommand();
-
-        void run() override;
+	void run() override;
 
 	bool isBuffered;
 	QMap<int, struct iio_channel *> m_dioChannels;
@@ -88,19 +89,14 @@ private:
 	int m_enabledChnlsNo;
 	std::atomic<int> bufferCounter;
 	std::atomic<int> m_requiredBuffersNumber;
-	std::condition_variable m_cond, m_condBufferCreated;
-
 	CommandQueue *m_cmdQueue;
-	QVector<scopy::Command*> m_dioChannelsReadCommands;
-	Command *m_refillBufferCommand, *m_createBufferCommand;
-	Command *m_destroyBufferCommand;
 
 	struct iio_device *m_iioDev;
 	struct iio_buffer *m_iioBuff;
 	QMap<int, ChnlInfo*> m_chnlsInfo;
 	QVector<ChnlInfo *> m_bufferedChnls;
 	QVector<QVector<double>> m_bufferData;
-
+	std::atomic<bool> m_running;
 	std::mutex m_mutex;
 };
 }
