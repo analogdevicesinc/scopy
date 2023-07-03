@@ -53,6 +53,7 @@ private Q_SLOTS:
 
 	void timerChanged(double value);
 
+	void onBackBtnPressed();
 private:
         static QPushButton* createBackButton();
 	void initChannels();

@@ -119,9 +119,7 @@ scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, Q
 void Max14906::connectSignalsAndSlots() {
 	connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this, &Max14906::runButtonToggled);
 //	connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Max14906::singleButtonToggled);
-	QObject::connect(m_backButton, &QPushButton::clicked, this, [this]() {
-		Q_EMIT backBtnPressed();
-	});
+	QObject::connect(m_backButton, &QPushButton::clicked, this, &Max14906::onBackBtnPressed);
 
 	connect(this->m_max14906SettingsTab, &DioSettingsTab::timeValueChanged, this, &Max14906::timerChanged);
 	connect(this->m_qTimer, &QTimer::timeout, this, [&]() {
@@ -132,6 +130,16 @@ void Max14906::connectSignalsAndSlots() {
 	});
 
 	connect(m_tme, &ToolMenuEntry::runToggled, this->m_toolView->getRunBtn(), &QPushButton::setChecked);
+}
+
+void Max14906::onBackBtnPressed()
+{
+	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
+	bool singleBtnChecked = m_toolView->getSingleBtn()->isChecked();
+
+	if (runBtnChecked) { m_toolView->getRunBtn()->setChecked(false); }
+	if (singleBtnChecked) { m_toolView->getSingleBtn()->setChecked(false); }
+	Q_EMIT backBtnPressed();
 }
 
 Max14906::~Max14906() {
