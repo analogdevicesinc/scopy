@@ -73,8 +73,8 @@ public Q_SLOTS:
 	void onChannelWidgetSelected(int chnWidgetId, bool en);
 	void onOffsetHdlSelected(int hdlIdx, bool selected);
 
-	void onRunBtnPressed();
-	void onSingleBtnPressed();
+	void onRunBtnPressed(bool toggled);
+	void onSingleBtnPressed(bool toggled);
 
 	void onReaderThreadFinished();
 	void onSingleCaptureFinished();
