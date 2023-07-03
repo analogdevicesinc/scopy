@@ -71,6 +71,7 @@ private:
         QPushButton *m_backButton;
 	QWidget* m_statusContainer;
 	QLabel* m_statusLabel;
+	int m_nbDioChannels;
 
 	DioController *max14906ToolController;
 	Ui::Max14906 *ui;
