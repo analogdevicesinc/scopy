@@ -43,9 +43,9 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	  m_device(device),
 	  m_swiot(swiot),
 	  m_context(context),
-	  m_readFaultCommand(nullptr),
 	  m_faultsChannel(nullptr),
-	  m_cmdQueue(nullptr)
+	  m_cmdQueue(nullptr),
+	  m_faultNumeric(0)
 {
 	ui->setupUi(this);
 	ui->reset_button->setProperty("blue_button", QVariant(true));
@@ -55,7 +55,7 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	m_faultsGroup = new FaultsGroup(name, m_path, this);
 	connect(this, &FaultsDevice::specialFaultsUpdated, m_faultsGroup, &FaultsGroup::specialFaultsUpdated);
 	connect(m_faultsGroup, &FaultsGroup::specialFaultExplanationChanged, this, &FaultsDevice::updateExplanation);
-
+	connect(this, &FaultsDevice::faultNumericUpdated, this, &FaultsDevice::onFaultNumericUpdated, Qt::QueuedConnection);
 
 	if (m_device == nullptr) {
 		qCritical(CAT_SWIOT_FAULTS) << "No device was found";
@@ -79,6 +79,7 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	this->ui->faults_layout->addWidget(this->m_faultsGroup);
 	this->ui->faults_explanation->layout()->addWidget(m_subsectionSeparator);
 	m_faults_explanation->ensurePolished();
+	onFaultNumericUpdated();
 }
 
 FaultsDevice::~FaultsDevice() {
@@ -97,9 +98,6 @@ void FaultsDevice::resetStored() {
 
 void FaultsDevice::update() {
 	this->readFaults();
-	this->ui->lineEdit_numeric->setText(QString("0x%1").arg(m_faultNumeric, 8, 16, QLatin1Char('0')));
-	this->m_faultsGroup->update(m_faultNumeric);
-	this->updateExplanations();
 }
 
 void FaultsDevice::updateExplanation(int index)
@@ -178,33 +176,39 @@ void FaultsDevice::connectSignalsAndSlots() {
 	connect(m_faultsGroup, &FaultsGroup::minimumSizeChanged, this, &FaultsDevice::updateMinimumHeight);
 }
 
+void FaultsDevice::onFaultNumericUpdated()
+{
+	ui->lineEdit_numeric->setText(QString("0x%1").arg(m_faultNumeric, 8, 16, QLatin1Char('0')));
+	m_faultsGroup->update(m_faultNumeric);
+	updateExplanations();
+}
+
 void FaultsDevice::readFaults()
 {
-	if (!m_readFaultCommand) {
-		m_readFaultCommand = new IioChannelAttributeRead(m_faultsChannel, "raw", m_cmdQueue, true);
-		connect(m_readFaultCommand, &scopy::Command::finished,
-			this, [=, this](scopy::Command* cmd) {
-			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
-			if (!tcmd) {
-				qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be read.";
-				return;
-			}
-			char *fau = tcmd->getResult();
+	Command *readFaultCommand = new IioChannelAttributeRead(m_faultsChannel, "raw", nullptr);
+	connect(readFaultCommand, &scopy::Command::finished,
+		this, [=, this](scopy::Command* cmd) {
+		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
+		if (!tcmd) {
+			qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be read.";
+			return;
+		}
+		char *fau = tcmd->getResult();
 
-			if (tcmd->getReturnCode() < 0) {
-				qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be read.";
-			} else {
-				qDebug(CAT_SWIOT_FAULTS) << m_name << "faults read the value:" << fau;
-				try {
-					m_faultNumeric = std::stoi(fau);
-					qDebug(CAT_SWIOT_FAULTS) << m_name << "faults read the value INT:" << m_faultNumeric;
-				} catch (std::invalid_argument& exception) {
-					qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
-				}
+		if (tcmd->getReturnCode() < 0) {
+			qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be read.";
+		} else {
+			qDebug(CAT_SWIOT_FAULTS) << m_name << "faults read the value:" << fau;
+			try {
+				m_faultNumeric = std::stoi(fau);
+				Q_EMIT faultNumericUpdated();
+				qDebug(CAT_SWIOT_FAULTS) << m_name << "faults read the value INT:" << m_faultNumeric;
+			} catch (std::invalid_argument& exception) {
+				qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
 			}
-		}, Qt::QueuedConnection);
-	}
-	m_cmdQueue->enqueue(m_readFaultCommand);
+		}
+	}, Qt::QueuedConnection);
+	m_cmdQueue->enqueue(readFaultCommand);
 }
 
 void FaultsDevice::functionConfigCmdFinished(scopy::Command *cmd)
