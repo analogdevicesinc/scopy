@@ -120,18 +120,17 @@ void Faults::connectSignalsAndSlots() {
 
 void Faults::runButtonClicked() {
 	qDebug(CAT_SWIOT_FAULTS) << "Run button clicked";
+void Faults::runButtonClicked(bool toggled) {
 	this->m_toolView->getSingleBtn()->setChecked(false);
-	if (this->m_toolView->getRunBtn()->isChecked()) {
-		qDebug(CAT_SWIOT_FAULTS) << "thread started";
+	if (toggled) {
 		this->thread->start();
 		if (!this->m_tme->running()) {
 			this->m_tme->setRunning(true);
 		}
 	} else {
 		if (this->thread->isRunning()) {
-			qDebug(CAT_SWIOT_FAULTS) << "thread stopped";
 			this->thread->quit();
-			this->thread->wait();
+//			this->thread->wait();
 		}
 		if (this->m_tme->running()) {
 			this->m_tme->setRunning(false);
