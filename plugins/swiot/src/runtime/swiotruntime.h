@@ -45,10 +45,10 @@ public:
 
 	bool isRuntimeCtx();
 	void setContext(iio_context *ctx);
-//	void triggerPing();
 public Q_SLOTS:
-//	void onTriggerTimeout();
 	void onBackBtnPressed();
+private Q_SLOTS:
+	void setTriggerCommandFinished(scopy::Command*);
 Q_SIGNALS:
 	void backBtnPressed();
 private:
@@ -57,6 +57,7 @@ private:
 	iio_context *m_iioCtx;
 	QTimer *m_triggerTimer;
 	QMap<QString, struct iio_device*> m_iioDevices;
+	CommandQueue *m_cmdQueue;
 };
 }
 }

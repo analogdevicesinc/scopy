@@ -22,6 +22,8 @@
 #include "swiotruntime.h"
 #include <string>
 #include "src/swiot_logging_categories.h"
+#include <iioutil/commandqueueprovider.h>
+#include <iioutil/iiocommand/iiodevicesettrigger.h>
 
 using namespace scopy::swiot;
 
@@ -29,6 +31,7 @@ SwiotRuntime::SwiotRuntime(QObject *parent)
 	: QObject(parent)
 	, m_iioCtx(nullptr)
 	, m_triggerTimer(nullptr)
+	, m_cmdQueue(nullptr)
 {}
 
 SwiotRuntime::~SwiotRuntime()
@@ -70,41 +73,41 @@ bool SwiotRuntime::isRuntimeCtx()
 void SwiotRuntime::setContext(iio_context *ctx)
 {
 	m_iioCtx = ctx;
+	if (m_iioCtx) {
+		m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_iioCtx);
+	} else {
+		if (m_cmdQueue) {
+			CommandQueueProvider::GetInstance()->close(m_iioCtx);
+			m_cmdQueue = nullptr;
+			m_iioCtx = nullptr;
+		}
+	}
 	createDevicesMap();
 	bool isRuntime = isRuntimeCtx();
 	if (isRuntime) {
 		qInfo(CAT_SWIOT) <<"runtime context";
 		if (m_iioDevices.contains(AD_TRIGGER_NAME)) {
-			int retCode = iio_device_set_trigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME]);
-			qDebug(CAT_SWIOT) <<"Trigger has been set: " + QString::number(retCode);
+			Command *setTriggerCommand = new IioDeviceSetTrigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME], nullptr);
+			connect(setTriggerCommand, &scopy::Command::finished, this, &SwiotRuntime::setTriggerCommandFinished, Qt::QueuedConnection);
+			m_cmdQueue->enqueue(setTriggerCommand);
+		} else {
+			qDebug(CAT_SWIOT) << "isn't runtime context";
 		}
-		//		m_triggerTimer = new QTimer();
-		//		m_triggerTimer->start(TRIGGER_TIMER_MS);
-		//		connect(m_triggerTimer, SIGNAL(timeout()), this, SLOT(onTriggerTimeout()));
-	} else {
-		qDebug(CAT_SWIOT) << "isn't runtime context";
 	}
 }
 
-//void SwiotRuntime::triggerPing()
-//{
-//	if (m_iioDevices[AD_NAME]) {
-//		const iio_device* triggerDevice = nullptr;
-//		int ret = iio_device_get_trigger(m_iioDevices[AD_NAME], &triggerDevice);
-
-//		if (ret < 0 && m_iioDevices.contains(AD_TRIGGER_NAME) && m_iioDevices[AD_TRIGGER_NAME]) {
-//			iio_device_set_trigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME]);
-//			qDebug(CAT_SWIOT_RUNTIME) << "Trigger has been set";
-//		} else {
-//			qDebug(CAT_SWIOT_RUNTIME) << QString::number(ret) +" returned";
-//		}
-//	}
-//}
-
-//void SwiotRuntime::onTriggerTimeout()
-//{
-//	QtConcurrent::run(std::mem_fn(&SwiotRuntime::triggerPing), this);
-//}
+void SwiotRuntime::setTriggerCommandFinished(scopy::Command *cmd)
+{
+	IioDeviceSetTrigger *tcmd = dynamic_cast<IioDeviceSetTrigger*>(cmd);
+	if (!tcmd) {
+		return;
+	}
+	if (tcmd->getReturnCode() >= 0) {
+		qDebug(CAT_SWIOT) << "Trigger has been set: " + QString::number(tcmd->getReturnCode());
+	} else {
+		qDebug(CAT_SWIOT) << "Can't set trigger, not in runtime context";
+	}
+}
 
 void SwiotRuntime::createDevicesMap()
 {
