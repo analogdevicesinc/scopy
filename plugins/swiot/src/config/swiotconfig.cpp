@@ -54,7 +54,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	this->setupToolView(parent);
 	this->init();
 	this->createPageLayout();
-	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::configBtnPressed);
+	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
 
 	// The "ext_psu" attribute will be checked only once in the config context
 	bool extPowerSupplyConnected = false;
@@ -130,16 +130,15 @@ QPushButton *SwiotConfig::createConfigBtn() {
 	return configBtn;
 }
 
-void SwiotConfig::configBtnPressed() {
-	ssize_t res = iio_device_attr_write(m_swiotDevice, "mode", "runtime");
-	if (res >= 0) {
-		qDebug(CAT_SWIOT_CONFIG) << "Swiot mode changed to runtime!";
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Swiot mode cannot be changed to runtime!";
-	}
-	Q_EMIT configBtn();
+void SwiotConfig::onConfigBtnPressed() {
+	Q_EMIT writeModeAttribute("runtime");
+}
 
-	qInfo(CAT_SWIOT_CONFIG) << "Swiot mode has been changed to runtime";
+void SwiotConfig::modeAttributeChanged(std::string mode)
+{
+	if (mode == "runtime") {
+		Q_EMIT configBtnPressed();
+	}
 }
 
 void SwiotConfig::setupToolView(QWidget *parent) {
