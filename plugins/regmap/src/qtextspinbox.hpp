@@ -4,9 +4,9 @@
 #include <QSpinBox>
 #include <QObject>
 #include <QWidget>
-#include "scopyregmap_export.h"
+#include "scopy-regmapplugin_export.h"
 
-class SCOPYREGMAP_EXPORT QTextSpinBox : public QSpinBox
+class SCOPY_REGMAPPLUGIN_EXPORT QTextSpinBox : public QSpinBox
 {
 public:
     explicit QTextSpinBox(QWidget *parent = 0);

@@ -4,7 +4,7 @@
 #include <QMap>
 #include <QObject>
 #include <QWidget>
-#include "scopyregmap_export.h"
+#include "scopy-regmapplugin_export.h"
 
 class QVBoxLayout;
 
@@ -25,7 +25,7 @@ class RegisterMapTable;
 
 
 
-class SCOPYREGMAP_EXPORT DeviceRegisterMap : public QWidget
+class SCOPY_REGMAPPLUGIN_EXPORT DeviceRegisterMap : public QWidget
 {
     Q_OBJECT
 public:
