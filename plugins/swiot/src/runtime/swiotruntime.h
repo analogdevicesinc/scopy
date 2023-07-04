@@ -33,29 +33,28 @@ class ChannelManager;
 namespace swiot {
 #define AD_NAME "ad74413r"
 #define AD_TRIGGER_NAME "ad74413r-dev0"
-#define SWIOT_DEVICE_NAME "swiot"
-#define TRIGGER_TIMER_MS 1000
 
 class SwiotRuntime : public QObject
 {
 	Q_OBJECT
 public:
-	SwiotRuntime(QObject *parent = nullptr);
+	SwiotRuntime(struct iio_context *ctx, QObject *parent = nullptr);
 	~SwiotRuntime();
 
-	bool isRuntimeCtx();
-	void setContext(iio_context *ctx);
 public Q_SLOTS:
 	void onBackBtnPressed();
+	void modeAttributeChanged(std::string mode);
+	void writeTriggerDevice();
+	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
 private Q_SLOTS:
 	void setTriggerCommandFinished(scopy::Command*);
 Q_SIGNALS:
+	void writeModeAttribute(std::string mode);
 	void backBtnPressed();
 private:
 	void createDevicesMap();
 private:
 	iio_context *m_iioCtx;
-	QTimer *m_triggerTimer;
 	QMap<QString, struct iio_device*> m_iioDevices;
 	CommandQueue *m_cmdQueue;
 };
