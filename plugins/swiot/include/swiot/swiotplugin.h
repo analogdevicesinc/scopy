@@ -60,6 +60,7 @@ public Q_SLOTS:
 	bool onDisconnect() override;
 	void startCtxSwitch();
 	void onCtxSwitched();
+	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
 
 	void showPageCallback() override;
 	void hidePageCallback() override;
