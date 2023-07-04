@@ -40,9 +40,8 @@ void SWIOTPlugin::preload()
 {
 	m_displayName = "SWIOT1L";
 	m_swiotController = new SwiotController(m_param, this);
-	m_runtime = new SwiotRuntime(this);
 	connect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched, Qt::QueuedConnection);
-	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
+	connect(m_swiotController, &SwiotController::isRuntimeCtxChanged, this, &SWIOTPlugin::onIsRuntimeCtxChanged);
 }
 
 bool SWIOTPlugin::loadPage()
@@ -61,7 +60,6 @@ bool SWIOTPlugin::loadPage()
 	});
 	connect(m_infoPage, &SwiotInfoPage::temperatureReadEnabled,
 		this, [=, this](bool toggled) {
-//		if (!m_runtime->isRuntimeCtx()) { return; }
 		if (toggled) {
 			m_swiotController->startTemperatureTask();
 		} else {
@@ -128,8 +126,8 @@ void SWIOTPlugin::loadToolList()
 
 void SWIOTPlugin::unload()
 {
+	disconnect(m_swiotController, &SwiotController::isRuntimeCtxChanged, this, &SWIOTPlugin::onIsRuntimeCtxChanged);
 	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched);
-	disconnect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 	delete m_infoPage;
 }
 
@@ -161,13 +159,6 @@ void SWIOTPlugin::setupToolList()
 	auto &&cp = ContextProvider::GetInstance();
 	iio_context* ctx = cp->open(m_param);
 
-	m_swiotController->connectSwiot(ctx);
-	m_swiotController->startPingTask();
-	m_swiotController->startPowerSupplyTask("ext_psu");
-
-	m_runtime->setContext(ctx);
-	m_isRuntime = m_runtime->isRuntimeCtx();
-
 	m_infoPage->enableTemperatureReadBtn(m_isRuntime);
 //	if (m_isRuntime) {
 		m_swiotController->startTemperatureTask();
@@ -186,7 +177,9 @@ void SWIOTPlugin::setupToolList()
 		configTme->setTool(new swiot::SwiotConfig(ctx));
 	}
 
-	connect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, &SWIOTPlugin::startCtxSwitch);
+	connect(dynamic_cast<SwiotConfig*>(configTme->tool()), &SwiotConfig::writeModeAttribute, m_swiotController, &SwiotController::writeModeAttribute);
+	connect(m_swiotController, &SwiotController::modeAttributeChanged, dynamic_cast<SwiotConfig*>(configTme->tool()), &SwiotConfig::modeAttributeChanged);
+	connect(dynamic_cast<SwiotConfig*>(configTme->tool()), &SwiotConfig::configBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
 	connect(dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	connect(dynamic_cast<Faults*> (faultsTme->tool()), &Faults::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
@@ -221,11 +214,30 @@ void SWIOTPlugin::setupToolList()
 	} else {
 		requestTool(ad74413rTme->id());
 	}
+	cp->close(m_param);
+}
+
+void SWIOTPlugin::onIsRuntimeCtxChanged(bool isRuntimeCtx)
+{
+	m_isRuntime = isRuntimeCtx;
+	setupToolList();
 }
 
 bool SWIOTPlugin::onConnect()
 {
-	setupToolList();
+	auto &&cp = ContextProvider::GetInstance();
+	iio_context* ctx = cp->open(m_param);
+
+	m_runtime = new SwiotRuntime(ctx, this);
+	connect(m_runtime, &SwiotRuntime::writeModeAttribute, m_swiotController, &SwiotController::writeModeAttribute);
+	connect(m_swiotController, &SwiotController::modeAttributeChanged, m_runtime, &SwiotRuntime::modeAttributeChanged);
+	connect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
+	connect(m_swiotController, &SwiotController::isRuntimeCtxChanged, m_runtime, &SwiotRuntime::onIsRuntimeCtxChanged);
+
+	m_swiotController->connectSwiot(ctx);
+	m_swiotController->startPingTask();
+	m_swiotController->startPowerSupplyTask("ext_psu");
+
 	return true;
 }
 
@@ -244,7 +256,9 @@ bool SWIOTPlugin::onDisconnect()
 		tme->setTool(nullptr);
 	}
 
-	disconnect(dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::configBtn, this, &SWIOTPlugin::startCtxSwitch);
+	disconnect(dynamic_cast<SwiotConfig*>(configTme->tool()), &SwiotConfig::configBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
+	disconnect(m_swiotController, &SwiotController::modeAttributeChanged, dynamic_cast<SwiotConfig*>(configTme->tool()), &SwiotConfig::modeAttributeChanged);
+	disconnect(dynamic_cast<SwiotConfig*>(configTme->tool()), &SwiotConfig::writeModeAttribute, m_swiotController, &SwiotController::writeModeAttribute);
 	disconnect(dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	disconnect(dynamic_cast<Max14906*> (max14906Tme->tool()), &Max14906::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
 	disconnect(dynamic_cast<Faults*> (faultsTme->tool()), &Faults::backBtnPressed, m_runtime, &SwiotRuntime::onBackBtnPressed);
@@ -256,12 +270,22 @@ bool SWIOTPlugin::onDisconnect()
 
 	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
 
+	disconnect(m_swiotController, &SwiotController::isRuntimeCtxChanged, m_runtime, &SwiotRuntime::onIsRuntimeCtxChanged);
+	disconnect(m_runtime, &SwiotRuntime::backBtnPressed, this, &SWIOTPlugin::startCtxSwitch);
+	disconnect(m_swiotController, &SwiotController::modeAttributeChanged, m_runtime, &SwiotRuntime::modeAttributeChanged);
+	disconnect(m_runtime, &SwiotRuntime::writeModeAttribute, m_swiotController, &SwiotController::writeModeAttribute);
+
 	m_swiotController->stopPingTask();
 	m_swiotController->stopPowerSupplyTask();
 //	if (m_isRuntime) {
 		m_swiotController->stopTemperatureTask();
 //	}
 	m_swiotController->disconnectSwiot();
+
+	if (m_runtime) {
+		delete m_runtime;
+		m_runtime = nullptr;
+	}
 
 	ContextProvider *cp = ContextProvider::GetInstance();
 	cp->close(m_param);
