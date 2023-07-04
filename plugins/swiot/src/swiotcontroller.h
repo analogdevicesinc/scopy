@@ -58,6 +58,8 @@ public:
 
 public Q_SLOTS:
 	void identify();
+	void writeModeAttribute(std::string mode);
+	void readModeAttribute();
 
 Q_SIGNALS:
 	void pingSuccess();
@@ -65,15 +67,24 @@ Q_SIGNALS:
 	void contextSwitched();
 	void hasConnectedPowerSupply(bool ps);
 	void readTemperature(double temperature);
+	void modeAttributeChanged(std::string mode);
+	void isRuntimeCtxChanged(bool isRuntimeCtx);
+private Q_SLOTS:
+	void writeModeCommandFinished(scopy::Command *cmd);
+	void readModeCommandFinished(scopy::Command *cmd);
 
 private:
+	void setIsRuntimeCtx(bool runtimeCtx);
+
 	SwiotIdentifyTask *identifyTask;
 	SwiotPingTask *pingTask;
 	SwiotSwitchCtxTask *switchCtxTask;
 	ExternalPsReaderThread *extPsTask;
 	SwiotReadTemperatureTask *temperatureTask;
+	CommandQueue *m_cmdQueue;
 	iio_context *m_iioCtx;
 	QString uri;
+	bool m_isRuntimeCtx;
 
 	CyclicalTask *pingTimer;
 	CyclicalTask *switchCtxTimer;
