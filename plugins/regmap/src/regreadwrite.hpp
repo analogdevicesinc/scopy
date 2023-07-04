@@ -3,13 +3,13 @@
 
 #include <QObject>
 #include <iio.h>
-#include "scopyregmap_export.h"
+#include "scopy-regmapplugin_export.h"
 
 // TODO set the right buf size
 #define BUF_SIZE 16384
 
 namespace scopy::regmap{
-class SCOPYREGMAP_EXPORT RegReadWrite : public QObject
+class SCOPY_REGMAPPLUGIN_EXPORT RegReadWrite : public QObject
 {
 	Q_OBJECT
 

@@ -1,13 +1,13 @@
 #ifndef REGMAPPLUGIN_H
 #define REGMAPPLUGIN_H
 
-#define SCOPY_PLUGIN_NAME REGMAPPlugin
+#define SCOPY_PLUGIN_NAME RegmapPlugin
 #define SCOPY_PLUGIN_PRIO 100
 
 #include <QObject>
 #include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"
-#include "scopy-regmap_export.h"
+#include "scopy-regmapplugin_export.h"
 #include <pluginbase/pluginbase.h>
 #include <iio.h>
 
@@ -20,7 +20,7 @@ namespace regmap {
 class JsonFormatedElement;
 }
 
-class SCOPY_REGMAP_EXPORT REGMAPPlugin : public QObject, public PluginBase
+class SCOPY_REGMAPPLUGIN_EXPORT RegmapPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
