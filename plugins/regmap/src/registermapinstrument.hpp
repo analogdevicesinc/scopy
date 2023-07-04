@@ -6,7 +6,7 @@
 #include <QMap>
 #include <QWidget>
 #include <tool_view.hpp>
-#include "scopyregmap_export.h"
+#include "scopy-regmapplugin_export.h"
 
 class QComboBox;
 class QVBoxLayout;
@@ -21,7 +21,7 @@ class RegisterMapSettingsMenu;
 class SearchBarWidget;
 }
 
-class SCOPYREGMAP_EXPORT RegisterMapInstrument : public QWidget
+class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapInstrument : public QWidget
 {
 	Q_OBJECT
 public:
