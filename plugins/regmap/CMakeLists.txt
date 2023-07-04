@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(SCOPY_MODULE regmap)
+set(SCOPY_MODULE regmapplugin)
 
 message(STATUS "building plugin: " ${SCOPY_MODULE})
 
@@ -66,6 +66,7 @@ foreach(_xml ${XMLS})
     file(COPY ${_xml} DESTINATION ${REGMAP_XML_BUILD_PATH})
 endforeach()
 
+message(include/${SCOPY_MODULE}/)
 configure_file(include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY)
 set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h)
@@ -94,5 +95,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         Qt${QT_VERSION_MAJOR}::Xml
         libm2k::libm2k
         Qt5::Test)
+
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

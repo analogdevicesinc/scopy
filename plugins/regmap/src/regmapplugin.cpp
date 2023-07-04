@@ -22,12 +22,12 @@
 
 #include "iioutil/contextprovider.h"
 #include "jsonformatedelement.hpp"
-#include "scopy-regmap_config.h"
+#include "scopy-regmapplugin_config.h"
 #include "utils.hpp"
 
 using namespace scopy;
 
-bool REGMAPPlugin::loadPage()
+bool RegmapPlugin::loadPage()
 {
     //TODO
     m_page = new QWidget();
@@ -35,19 +35,19 @@ bool REGMAPPlugin::loadPage()
     return true;
 }
 
-bool REGMAPPlugin::loadIcon()
+bool RegmapPlugin::loadIcon()
 {
     m_icon = new QLabel("");
     m_icon->setStyleSheet("border-image: url(:/icons/RegMap.svg);");
     return true;
 }
 
-void REGMAPPlugin::loadToolList()
+void RegmapPlugin::loadToolList()
 {
     m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap","Register Map",":/icons/RegMap.svg"));
 }
 
-void REGMAPPlugin::unload()
+void RegmapPlugin::unload()
 {
     //TODO
     auto &&cp = ContextProvider::GetInstance();
@@ -56,7 +56,7 @@ void REGMAPPlugin::unload()
     if (m_deviceList) delete m_deviceList;
 }
 
-bool REGMAPPlugin::compatible(QString m_param, QString category)
+bool RegmapPlugin::compatible(QString m_param, QString category)
 {
     m_name="REGMAP";
     auto &&cp = ContextProvider::GetInstance();
@@ -81,13 +81,13 @@ bool REGMAPPlugin::compatible(QString m_param, QString category)
     return false;
 }
 
-void REGMAPPlugin::initPreferences()
+void RegmapPlugin::initPreferences()
 {
     Preferences *p = Preferences::GetInstance();
     p->init("regmap_color_by_value","Default");
 }
 
-bool REGMAPPlugin::loadPreferencesPage()
+bool RegmapPlugin::loadPreferencesPage()
 {
     Preferences *p = Preferences::GetInstance();
 
@@ -99,7 +99,7 @@ bool REGMAPPlugin::loadPreferencesPage()
     return true;
 }
 
-bool REGMAPPlugin::onConnect()
+bool RegmapPlugin::onConnect()
 {
     auto &&cp = ContextProvider::GetInstance();
     iio_context* ctx = cp->open(m_param);
@@ -149,7 +149,7 @@ bool REGMAPPlugin::onConnect()
         m_toolList[0]->setTool(m_registerMapWidget);
 
         Preferences *p = Preferences::GetInstance();
-        QObject::connect(p, &Preferences::preferenceChanged, this, &REGMAPPlugin::handlePreferenceChange);
+        QObject::connect(p, &Preferences::preferenceChanged, this, &RegmapPlugin::handlePreferenceChange);
 
         return true;
     }
@@ -157,7 +157,7 @@ bool REGMAPPlugin::onConnect()
     return false;
 }
 
-bool REGMAPPlugin::onDisconnect()
+bool RegmapPlugin::onDisconnect()
 {
     //TODO
     delete m_deviceList;
@@ -166,7 +166,7 @@ bool REGMAPPlugin::onDisconnect()
     return true;
 }
 
-void REGMAPPlugin::initMetadata()
+void RegmapPlugin::initMetadata()
 {
     loadMetadata(
         R"plugin(
@@ -179,13 +179,18 @@ void REGMAPPlugin::initMetadata()
 )plugin");
 }
 
-QWidget *REGMAPPlugin::getTool()
+QString RegmapPlugin::description()
+{
+    return "Register map tool";
+}
+
+QWidget *RegmapPlugin::getTool()
 {
     return m_registerMapWidget;
 }
 
 
-struct iio_device* REGMAPPlugin::getIioDevice(iio_context* ctx, const char *dev_name){
+struct iio_device* RegmapPlugin::getIioDevice(iio_context* ctx, const char *dev_name){
     auto deviceCount = iio_context_get_devices_count(ctx);
 
     for (int i = 0; i < deviceCount; i++) {
@@ -197,7 +202,7 @@ struct iio_device* REGMAPPlugin::getIioDevice(iio_context* ctx, const char *dev_
     return nullptr;
 }
 
-bool REGMAPPlugin::isBufferCapable(iio_device *dev)
+bool RegmapPlugin::isBufferCapable(iio_device *dev)
 {
     unsigned int i;
 
@@ -212,7 +217,7 @@ bool REGMAPPlugin::isBufferCapable(iio_device *dev)
     return false;
 }
 
-void REGMAPPlugin::handlePreferenceChange(QString id , QVariant val)
+void RegmapPlugin::handlePreferenceChange(QString id , QVariant val)
 {
     if (id == "regmap_background_color_by_value") {
         // TODO set backround color by value

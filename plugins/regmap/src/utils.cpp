@@ -1,6 +1,6 @@
 #include "utils.hpp"
 #include "dynamicWidget.h"
-#include "scopy-regmap_config.h"
+#include "scopy-regmapplugin_config.h"
 #include "jsonformatedelement.hpp"
 
 #include <QDir>
