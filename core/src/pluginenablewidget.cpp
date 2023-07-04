@@ -19,12 +19,11 @@ PluginEnableWidget::PluginEnableWidget(QWidget *parent)
 	m_descriptionLabel->setWordWrap(true);
 
 	layout->addWidget(m_checkBox);
+	layout->setAlignment(m_checkBox, Qt::AlignTop);
 	layout->addWidget(m_descriptionLabel);
+	layout->setAlignment(m_descriptionLabel, Qt::AlignTop);
 	layout->setStretch(0,1);
 	layout->setStretch(1,3);
-
-	this->setStyleSheet("background-color: black;");
-	this->setAutoFillBackground(true);
 }
 
 PluginEnableWidget::~PluginEnableWidget()
