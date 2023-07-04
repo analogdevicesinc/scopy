@@ -27,6 +27,10 @@ ChnlInfo::ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl) :
 	}
 }
 
+ChnlInfo::~ChnlInfo()
+{
+}
+
 iio_channel *ChnlInfo::iioChnl() const
 {
 	return m_iioChnl;
