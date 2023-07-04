@@ -2,7 +2,7 @@
 #define REGISTERCONTROLLER_HPP
 
 #include <QWidget>
-#include "scopyregmap_export.h"
+#include "scopy-regmapplugin_export.h"
 
 class QHBoxLayout;
 class QSpinBox;
@@ -21,7 +21,7 @@ namespace gui {
 class RegisterValueWidget;
 class AddressPicker;
 
-class SCOPYREGMAP_EXPORT RegisterController : public QWidget
+class SCOPY_REGMAPPLUGIN_EXPORT RegisterController : public QWidget
 {
 	Q_OBJECT
 public:
