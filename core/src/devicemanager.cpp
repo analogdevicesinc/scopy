@@ -101,6 +101,7 @@ void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
 	connect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	connect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	connect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+
 }
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
 	disconnect(d,SIGNAL(connected()));
@@ -188,22 +189,14 @@ void DeviceManager::setExclusive(bool val) {
 bool DeviceManager::getExclusive() const {
 	return exclusive;
 }
-//WIP: We need it at SWIOT until a better method is found
+
 void DeviceManager::restartDevice() {
 	QString id = dynamic_cast<Device*>(QObject::sender())->id();
 	qDebug(CAT_DEVICEMANAGER)<<"restarting "<< id << "...";
-	m_restartedDevNewId = restartDevice(id);
-	connect(this, &DeviceManager::deviceAdded, this, &DeviceManager::onRestart, Qt::QueuedConnection);
+	QString newId = restartDevice(id);
+//	connect(this,SIGNAL(deviceAdded(QString,Device*)),this,SIGNAL(requestDevice(QString)));
+//	Q_EMIT requestDevice(newId);
 }
 
-void DeviceManager::onRestart(QString id, Device *d)
-{
-	if (m_restartedDevNewId.compare(id) == 0) {
-		DeviceImpl* di = dynamic_cast<DeviceImpl*>(d);
-		di->connectDev();
-		disconnect(this, &DeviceManager::deviceAdded, this, &DeviceManager::onRestart);
-	}
-}
-//------------------------
 
 #include "moc_devicemanager.cpp"
