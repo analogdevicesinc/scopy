@@ -27,72 +27,43 @@
 
 using namespace scopy::swiot;
 
-SwiotRuntime::SwiotRuntime(QObject *parent)
+SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QObject *parent)
 	: QObject(parent)
-	, m_iioCtx(nullptr)
-	, m_triggerTimer(nullptr)
+	, m_iioCtx(ctx)
 	, m_cmdQueue(nullptr)
-{}
+{
+	if (m_iioCtx) {
+		m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_iioCtx);
+	}
+	createDevicesMap();
+}
 
 SwiotRuntime::~SwiotRuntime()
 {
-	if (m_triggerTimer) {
-		m_triggerTimer->stop();
-		delete m_triggerTimer;
-		m_triggerTimer = nullptr;
+	if (m_cmdQueue) {
+		CommandQueueProvider::GetInstance()->close(m_iioCtx);
+		m_cmdQueue = nullptr;
+		m_iioCtx = nullptr;
 	}
 }
 
-bool SwiotRuntime::isRuntimeCtx()
+void SwiotRuntime::onIsRuntimeCtxChanged(bool isRuntimeCtx)
 {
-	if (m_iioDevices.contains(SWIOT_DEVICE_NAME) && m_iioDevices[SWIOT_DEVICE_NAME]) {
-		const char* modeAttribute = iio_device_find_attr(m_iioDevices[SWIOT_DEVICE_NAME], "mode");
-		if (modeAttribute) {
-			char mode[64];
-			ssize_t result = iio_device_attr_read(m_iioDevices[SWIOT_DEVICE_NAME], "mode", mode, 64);
-
-			if (result < 0) {
-				qCritical(CAT_SWIOT) << R"(Critical error: could not read mode attribute, error code:)" << result;
-			}
-
-			if (strcmp(mode, "runtime") == 0) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			qCritical(CAT_SWIOT) << R"(Critical error: did not find "mode" attribute in the "swiot" device)";
-		}
-	} else {
-		qCritical(CAT_SWIOT) << R"(Critical error: did not find "swiot" device in the context)";
+	if (isRuntimeCtx) {
+		writeTriggerDevice();
 	}
-
-	return false;
 }
 
-void SwiotRuntime::setContext(iio_context *ctx)
+void SwiotRuntime::writeTriggerDevice()
 {
-	m_iioCtx = ctx;
-	if (m_iioCtx) {
-		m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_iioCtx);
+	if (m_iioDevices.contains(AD_TRIGGER_NAME)) {
+		Command *setTriggerCommand = new IioDeviceSetTrigger(m_iioDevices[AD_NAME],
+								     m_iioDevices[AD_TRIGGER_NAME], nullptr);
+		connect(setTriggerCommand, &scopy::Command::finished, this,
+			&SwiotRuntime::setTriggerCommandFinished, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(setTriggerCommand);
 	} else {
-		if (m_cmdQueue) {
-			CommandQueueProvider::GetInstance()->close(m_iioCtx);
-			m_cmdQueue = nullptr;
-			m_iioCtx = nullptr;
-		}
-	}
-	createDevicesMap();
-	bool isRuntime = isRuntimeCtx();
-	if (isRuntime) {
-		qInfo(CAT_SWIOT) <<"runtime context";
-		if (m_iioDevices.contains(AD_TRIGGER_NAME)) {
-			Command *setTriggerCommand = new IioDeviceSetTrigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME], nullptr);
-			connect(setTriggerCommand, &scopy::Command::finished, this, &SwiotRuntime::setTriggerCommandFinished, Qt::QueuedConnection);
-			m_cmdQueue->enqueue(setTriggerCommand);
-		} else {
-			qDebug(CAT_SWIOT) << "isn't runtime context";
-		}
+		qDebug(CAT_SWIOT) << "Isn't runtime context";
 	}
 }
 
@@ -126,16 +97,12 @@ void SwiotRuntime::createDevicesMap()
 
 void SwiotRuntime::onBackBtnPressed()
 {
-	if (m_iioDevices.contains(SWIOT_DEVICE_NAME) && m_iioDevices[SWIOT_DEVICE_NAME]) {
-		ssize_t res = iio_device_attr_write(m_iioDevices[SWIOT_DEVICE_NAME], "mode", "config");
-		if (res >= 0) {
-			qInfo(CAT_SWIOT) << "Successfully changed the swiot mode to config";
-		} else {
-			qCritical(CAT_SWIOT) << "Error, could not change swiot mode to config";
-		}
-	} else {
-		qCritical(CAT_SWIOT) << "Error, could not find swiot device to change config mode";
-	}
+	Q_EMIT writeModeAttribute("config");
+}
 
-	Q_EMIT backBtnPressed();
+void SwiotRuntime::modeAttributeChanged(std::string mode)
+{
+	if (mode == "config") {
+		Q_EMIT backBtnPressed();
+	}
 }
