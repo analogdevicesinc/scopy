@@ -37,9 +37,7 @@ void SwiotIdentifyTask::run() {
 				ContextProvider::GetInstance()->close(m_uri);
 				return;
 			}
-			if (tcmd->getReturnCode() >= 0) {
-				Q_EMIT hasPerformedIdentification();
-			} else {
+			if (tcmd->getReturnCode() < 0) {
 				qCritical(CAT_SWIOT) << "Error, could not identify swiot, error code" << tcmd->getReturnCode();
 			}
 			CommandQueueProvider::GetInstance()->close(ctx);
