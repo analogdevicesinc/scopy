@@ -8,8 +8,6 @@ public:
 	SwiotIdentifyTask(QString uri, QObject *parent = nullptr);
 	~SwiotIdentifyTask();
 	void run() override;
-Q_SIGNALS:
-	void hasPerformedIdentification();
 private:
 	QString m_uri;
 };
