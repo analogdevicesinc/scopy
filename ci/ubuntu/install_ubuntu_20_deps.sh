@@ -3,7 +3,7 @@ set -xe
 
 USE_STAGING=$1
 
-LIBIIO_VERSION=v0.24
+LIBIIO_VERSION=master
 LIBAD9361_BRANCH=master
 GLOG_BRANCH=v0.4.0
 
@@ -17,17 +17,16 @@ LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
 LIBTINYIIOD_BRANCH=master
 
-
+SRC_DIR=$GITHUB_WORKSPACE
 STAGING_AREA=$PWD/staging
 STAGING_AREA_DEPS=$STAGING_AREA/dependencies
-QT=$HOME/5.15.2/gcc_64 # this is used to force the use of Qt5.15 for qt_add_resources
+QT=/home/runner/Qt/5.15.2/gcc_64 # this is used to force the use of Qt5.15 for qt_add_resources
 #QT=/opt/Qt/5.15.2/gcc_64
 QMAKE_BIN=$QT/bin/qmake
 CMAKE_BIN=/bin/cmake
 JOBS=-j8
 ARCH=x86_64
 
-#PATH=$PATH:/home/appveyor/.local/bin # appveyour specific fix
 
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
@@ -84,6 +83,7 @@ build_with_cmake() {
 	echo $PWD
 	BUILD_FOLDER=$PWD/build-${ARCH}
 	rm -rf $BUILD_FOLDER
+	git clean -xdf
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
@@ -98,20 +98,16 @@ update(){
 }
 
 install_apt() {
-	sudo apt-get -y install vim git cmake libgmp3-dev libboost-all-dev libxml2-dev libxml2 flex bison swig \
+	sudo DEBIAN_FRONTEND=noninteractive apt-get -y install keyboard-configuration
+	sudo apt-get -y install vim git wget libxcb-xinerama0 cmake libgmp3-dev libboost-all-dev libxml2-dev libxml2 flex bison swig \
 	libpython3-all-dev python3 python3-pip python3-numpy libfftw3-bin libfftw3-dev libfftw3-3 liblog4cpp5v5 \
 	liblog4cpp5-dev g++ autoconf libzip-dev libglib2.0-dev libsigc++-2.0-dev libglibmm-2.4-dev \
 	libclang1-9 doxygen curl libmatio-dev liborc-0.4-dev subversion mesa-common-dev libgl1-mesa-dev libserialport0 \
 	libserialport-dev libusb-1.0 libusb-1.0-0 libusb-1.0-0-dev libtool libaio-dev libzmq3-dev libsndfile1-dev \
-	libavahi-client-dev graphviz 
+	libavahi-client-dev graphviz unzip xserver-xorg openjdk-11-jre   build-essential pkg-config \
+	autogen python-dev gettext texinfo libxkbcommon-x11-0 libqt5gui5 libncurses5 autoconf-archive mm-common
 	pip3 install mako
 	pip3 install packaging
-}
-
-install_qt(){
-	sudo apt-get -y install qtchooser qt5-default qtcreator qtdeclarative5-dev qtdeclarative5-dev-tools libqt5svg5 libqt5svg5-dev qttools5-dev qttools5-dev-tools libqt5opengl5
-	pip3 install aqtinstall
-	python3 -m aqt install-qt --outputdir $HOME linux desktop 5.15.2
 }
 
 build_libiio() {
@@ -258,17 +254,18 @@ build_libtinyiiod() {
 
 build_scopy() {
 	echo "### Building scopy"
-	ls -la $GITHUB_WORKSPACE
-	pushd $GITHUB_WORKSPACE
-	rm -rf $GITHUB_WORKSPACE/build-$ARCH
-	mkdir -p $GITHUB_WORKSPACE/build-$ARCH
-	cd $GITHUB_WORKSPACE/build-$ARCH
+	ls -la $SRC_DIR
+	pushd $SRC_DIR
+	rm -rf $SRC_DIR/build-$ARCH
+	mkdir -p $SRC_DIR/build-$ARCH
+	cd $SRC_DIR/build-$ARCH
 	$CMAKE \
 		-DCMAKE_LIBRARY_PATH=$STAGING_AREA_DEPS \
 		-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
 		-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS\;$QT \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
+		-DENABLE_PLUGIN_TEST=ON \
 		../
 	make $JOBS
 	popd
@@ -289,9 +286,9 @@ build_deps(){
 	build_libtinyiiod
 }
 
-clone
-update
-install_apt
-install_qt
-build_deps
-build_scopy
+#clone
+#update
+#install_apt
+#install_qt
+#build_deps
+#build_scopy
