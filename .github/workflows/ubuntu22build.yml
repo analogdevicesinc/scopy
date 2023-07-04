@@ -3,34 +3,36 @@ name: Ubuntu 22 Scopy Build
 on: [push, pull_request]
 
 env:
-  BUILD_HOST: ubuntu-latest
+  BUILD_HOST: ubuntu-22.04
   USERNAME: github-actions
 
 jobs:
 
-  build_scopy_on_ubuntu:
-    runs-on: ubuntu-latest
-
+  build_scopy_on_ubuntu22:
+    runs-on: ubuntu-22.04
+    container:
+        image: cristianbindea/scopy2-ubuntu22:latest
+        options: --user root
     steps:
-    - uses: actions/checkout@v3
+        - uses: actions/checkout@v3
+        - name: Build Scopy
+          run: |
+            /bin/bash -c "source $GITHUB_WORKSPACE/ci/ubuntu/install_ubuntu_22_deps.sh && build_scopy"
 
-    - name: Run Build Script
-      run: $GITHUB_WORKSPACE/ci/ubuntu/install_ubuntu_22_deps.sh
+        - name: Run Tests
+          run: |
+            cd $GITHUB_WORKSPACE/build-x86_64
+            QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/test-result-ubuntu22.xml
 
-    - name: Run Tests
-      run: |
-        cd $GITHUB_WORKSPACE/build-x86_64
-        QT_QPA_PLATFORM=offscreen ctest -V --output-on-failure --output-junit $GITHUB_WORKSPACE/build-x86_64/test-result-ubuntu22.xml
-
-    - name: Report
-      uses: mikepenz/action-junit-report@v3.7.8
-      if: always()
-      with:
-          job_name: Verify Results
-          check_name: 'Scopy Test'
-          check_title_template: '{{TEST_NAME}}'
-          report_paths: '**/build-x86_64/test-result-ubuntu22.xml'
-          detailed_summary: 'true'
-          fail_on_failure: 'true'
-          require_tests: 'true'
-          include_passed: 'true'
+        - name: Report
+          uses: mikepenz/action-junit-report@v3.7.8
+          if: always()
+          with:
+             job_name: Verify Results
+             check_name: 'Scopy Test'
+             check_title_template: '{{TEST_NAME}}'
+             report_paths: '${{github.workspace}}/test-result-ubuntu22.xml'
+             detailed_summary: 'true'
+             fail_on_failure: 'true'
+             require_tests: 'true'
+             include_passed: 'true'
