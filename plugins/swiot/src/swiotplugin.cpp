@@ -169,6 +169,23 @@ void SWIOTPlugin::setupToolList()
 	auto max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	auto faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 
+	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+		tme->setEnabled(true);
+		tme->setVisible(true);
+		if (!m_isRuntime) {
+			if (tme->id().compare(CONFIG_TME_ID)) {
+				tme->setVisible(false);
+			}
+		} else {
+			if (tme->id().compare(CONFIG_TME_ID)) {
+				tme->setRunBtnVisible(true);
+				tme->setRunning(false);
+			} else {
+				tme->setVisible(false);
+			}
+		}
+	}
+
 	if (m_isRuntime) {
 		ad74413rTme->setTool(new swiot::Ad74413r(ctx, ad74413rTme));
 		max14906Tme->setTool(new swiot::Max14906(ctx, max14906Tme));
@@ -190,24 +207,6 @@ void SWIOTPlugin::setupToolList()
 	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<Ad74413r*> (ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
 	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply, dynamic_cast<SwiotConfig*> (configTme->tool()), &SwiotConfig::externalPowerSupply);
 	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
-
-
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
-		tme->setEnabled(true);
-		tme->setVisible(true);
-		if (!m_isRuntime) {
-			if (tme->id().compare(CONFIG_TME_ID)) {
-				tme->setVisible(false);
-			}
-		} else {
-			if (tme->id().compare(CONFIG_TME_ID)) {
-				tme->setRunBtnVisible(true);
-				tme->setRunning(false);
-			} else {
-				tme->setVisible(false);
-			}
-		}
-	}
 
 	if (!m_isRuntime) {
 		requestTool(configTme->id());
