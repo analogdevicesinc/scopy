@@ -52,11 +52,13 @@ public:
 	~SwiotConfig();
 
 public Q_SLOTS:
-	void configBtnPressed();
+	void onConfigBtnPressed();
 	void externalPowerSupply(bool ps);
+	void modeAttributeChanged(std::string mode);
 
 Q_SIGNALS:
-	void configBtn();
+	void writeModeAttribute(std::string mode);
+	void configBtnPressed();
 
 private:
 	QMap<QString, struct iio_device*> m_iioDevices;
