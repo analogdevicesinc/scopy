@@ -40,6 +40,8 @@ if(${WITH_PYTHON})
     set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
 endif()
 
+option(SCOPY_DEV_MODE "Enable development specific scopy behavior - autoconnect to a context on start" FALSE)
+
 configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h)
