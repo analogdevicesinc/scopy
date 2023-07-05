@@ -4,6 +4,12 @@
             "file_name": "ad9361-phy.xml",
             "use_register_description_as_name": true,
             "use_bitfield_description_as_name": true
+        },
+        {
+            "file_name": "AD74412.xml",
+            "compatible_drivers": [
+                "ad74413r"
+            ]
         }
     ],
     "axi": [
