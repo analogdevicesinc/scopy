@@ -1,0 +1,2438 @@
+<!--                                                                 -->
+<!-- Copyright (C) 2013-2014 Analog Devices, Inc.                    -->
+<!-- This is a machine generated file, do not modify                 -->
+<!-- Please send bug reports to http://ez.analog.com/community/fpga  -->
+<!--                                                                 -->
+<GENERIC>
+	<Register>
+		<Name>NOP</Name>
+		<Address>0x0</Address>
+		<Description>No Operation Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>NOP</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Write 0x0000 to Perform a NOP Command.</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>CH_FUNC_SETUP</Name>
+		<Address>0x1</Address>
+		<Description>Function Setup Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes>Channel A at least significant Address above, to access channel B use the least significant Address above + 1, etc.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>CH_FUNC</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Set the Channel Function.</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>High Impedance</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Voltage Output</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Current Output</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Voltage Input.</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Current Input Externally powered.</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Current Input Loop powered.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>Resistance Measurement.</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>Digital Input (Logic).</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>Digital Input (Loop powered).</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>Current Input (externally powered) with HART</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>Current Input (loop powered) with HART</Description>
+						<Value>10</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ADC_CONFIG</Name>
+		<Address>0x5</Address>
+		<Description>ADC Configuration Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>ADC_MUX</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects the ADC Input Node.</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Voltage between I/OP and AGND_SENSE</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Voltage across 100Ω resistor.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Reserved. Voltage across screw terminals selected.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Reserved. Voltage across screw terminals selected.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CH_200K_TO_GND</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable the 200kΩ Resistor to ground.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>EN_50_60_HZ</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable 50/60 Hz Rejection and set the ADC Conversion Rate for channel conversions (Separate bit in "ADC_CONV_CTRL" for diagnostic conversions)</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Enables the 50/60 Hz rejection resulting in a sampling rate of 20 Samples Per Second.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Disables the 50/60 Hz rejection resulting in a sampling rate of 4k8 Samples Per Second.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Enables 50/60 Hz noise rejection and HART noise rejection resulting in a sampling rate of 10 Samples Per Second.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Disables 50/60 Hz noise rejection resulting in a sampling rate of 1k2 Samples Per Second.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>RANGE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects the ADC Range.</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>0 to 10V range</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>2.5V range, RTD &amp; IIN Ext Powered</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>2.5V range, IIN Loop Powered</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>-2.5V to 2.5V range</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>(100), -104mV to 104mV range</Description>
+						<Value>4</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIN_CONFIG</Name>
+		<Address>0x9</Address>
+		<Description>Digital Input Configuration Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>DEBOUNCE_TIME</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>This Bit Field Configures the Debounce Time on the DIN Pins.</Description>
+				<Visibility>Public</Visibility>
+				<Width>5</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>5</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DEBOUNCE_MODE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>This Bit Determines the Operation of the DIN Debounce Logic.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Debounce Mode 0</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Debounce Mode 1</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIN_SINK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Sets the Sink Current on the DIN Pins.</Description>
+				<Visibility>Public</Visibility>
+				<Width>=(DIN_UPGRADE == True ? 5: 4)</Width>
+				<Notes>On AD74413R(din_upgrade=1), all 5 bits(din_config&lt;10:6&gt;) are used to set the current.
+
+On AD74412R(din_upgrade=0) then only the lower 4 bits(din_config&lt;9:6&gt;) are used to set the current.
+
+Hence Fullscale DIN sink current =1.8mA on AD74412R.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>=(DIN_UPGRADE == True ? 5: 4)</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIN_RANGE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Select the DIN_SINK Current Range.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Only Range0 is available on AD74412(ie. din_upgrade bit=0)</Notes>
+				<Options>
+					<Option>
+						<Description>Range 0</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Range 1</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>11</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>COMPARATOR_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Set to 1 to Enable the Comparator.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>12</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>INV_DIN_COMP_OUT</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Set to 1 to Invert the Output from the Comparator.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>13</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>COMP_INPUT_FILTERED</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Set to 1 to Select the Filtered Input to the Comparator.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>14</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>COUNT_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>DIN Count Enable.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This function is only available if the fuse bit din_upgrade is set to 1.  Setting this bit to 1 when when din_upgrade is 0 will not enable the counter.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>15</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>GPO_PARALLEL</Name>
+		<Address>0xD</Address>
+		<Description>GPO Parallel Data Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>GPO_PAR_DATA_A</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>When a pad is configured for parallel GPO data, this Bitfield Sets the logic Level of the GPO_A pin.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>GPO_PAR_DATA_B</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>When a pad is configured for parallel GPO data, this Bitfield Sets the logic Level of the GPO_B pin.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>GPO_PAR_DATA_C</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>When a pad is configured for parallel GPO data, this Bitfield Sets the logic Level of the GPO_C pin.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>GPO_PAR_DATA_D</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>When a pad is configured for parallel GPO data, this Bitfield Sets the logic Level of the GPO_D pin.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>GPO_CONFIG</Name>
+		<Address>0xE</Address>
+		<Description>General Purpose Output Configuration Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>GPO_SELECT</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Select the General Purpose Output Mode.</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>The GPO pin is configured with a 100k pulldown resistor.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>The GPO pin Logic state is set by the GPO_DATA bit.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>The GPO pin is configured by the GPO_PAR_DATA bit in the GPO_PARALLEL register</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>The GPO pin is configured to output the debounced comparator output of the Digital Input Circuit</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>The GPO pin is configured in a high impedance state.</Description>
+						<Value>4</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>GPO_DATA</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>This Bit Sets the GPO Logic state When GPO_SELECT = 001</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Drive a logic low on GPO_n pin.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Drive a logic high on GPO_n pin.</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>OUTPUT_CONFIG</Name>
+		<Address>0x12</Address>
+		<Description>Output Configuration Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>I_LIMIT</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>This Bit Sets the Source Current Limit in VOUT Mode.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>30mA Current Limit</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>7.5mA Current Limit</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CLR_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Clear Function for the Channel.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SLEW_LIN_RATE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Update Rate for Digital Linear Slew.</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>The Digital Linear Slew controller updates at a rate of 4kHz.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>The Digital Linear Slew controller updates at a rate of 64kHz.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>The Digital Linear Slew controller updates at a rate of 150kHz.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>The Digital Linear Slew controller updates at a rate of 240kHz.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SLEW_LIN_STEP</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Step Size for Digital Linear Slew.</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Digital Linear slew step size of 64 codes.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Digital Linear slew step size of 120 codes.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Digital Linear slew step size of 500 codes.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Digital Linear slew step size of 1820 codes.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SLEW_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Set to 1 to Slew to the Requested DAC Code.</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Slewing disabled.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Enable linear slew on the DAC output.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Enable HART compliant slewing on the DAC output.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Same as slew_ctrl_off option.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DAC_CODE</Name>
+		<Address>0x16</Address>
+		<Description>DAC Code Register per Channel.</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>DAC_CODE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>13-bit DAC Code Data for the Channel.</Description>
+				<Visibility>Public</Visibility>
+				<Width>13</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>13</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DAC_CLR_CODE</Name>
+		<Address>0x1A</Address>
+		<Description>DAC Clear Code Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>CLR_CODE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>DAC Clear Code for the Channel.</Description>
+				<Visibility>Public</Visibility>
+				<Width>13</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>13</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DAC_ACTIVE</Name>
+		<Address>0x1E</Address>
+		<Description>DAC Active Code Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>DAC_ACTIVE_CODE</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>The Active DAC Code on the Channel.</Description>
+				<Visibility>Public</Visibility>
+				<Width>13</Width>
+				<Notes>If a DAC_CODEn register is written while the ldac_n pin is high, then the new DAC code is not passed to the analog domain until the ldac_n pin toggles low (or there is a SW ldac update ). DAC_ACTIVE can be used in this case to determine when ldac_n toggles low as DAC_ACTIVE does not update until the new code is passed to the analog domain.  Also if slewing this field can be used to determine the current slew position.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>13</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIN_THRESH</Name>
+		<Address>0x22</Address>
+		<Description>Digital Input Threshold Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIN_THRESH_MODE</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>This Bitfield Sets the Reference to the DIN Threshold DAC.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Threshold is set between GND and AVDD.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Threshold is set between GND and 16V.</Description>
+						<Value>1</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>COMP_THRESH</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Comparator Threshold.</Description>
+				<Visibility>Public</Visibility>
+				<Width>5</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>5</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ADC_CONV_CTRL</Name>
+		<Address>0x23</Address>
+		<Description>ADC Conversion Control Register.</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>CH_A_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Channel A</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CH_B_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Channel B</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CH_C_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Channel C</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CH_D_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Channel D</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG_0_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Diagnostic 0</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG_1_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Diagnostic 1</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG_2_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Diagnostic 2</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG_3_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable Conversions on Diagnostic 3</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CONV_SEQ</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects Single or Continuous Mode.</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Stop Continuous Conversions and Leave the ADC Powered up or Power up the ADC.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Start Single Sequence Conversion.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Start Continuous Conversions.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Stop Continuous Conversions and Power Down the ADC or Power Down the ADC.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>8</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>EN_50_60_HZ_REJ_DIAG</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enable 50/60Hz Rejection for Diagnostics.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>10</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIAG_ASSIGN</Name>
+		<Address>0x24</Address>
+		<Description>Diagnostics Select Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIAG0_ASSIGN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects the Diagnostic Assigned to DIAG_RESULT[0].</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Assign AGND to Diagnostic 0</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Temperature Sensor to Diagnostic 0.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Assign AVDD/16 to Diagnostic 0</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Charge Pump Voltage (AVSS) to Diagnostic 0.</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Assign REFOUT*0.8 to Diagnostic 0.</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO5V/7 to Diagnostic 0.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO1V8/2.33 to Diagnostic 0.</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>Assign DLDO1V8/3 to Diagnostic 0.</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>Assign DVCC/3.3 to Diagnostic 0.</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>Assign IOVDD/3.3 to Diagnostic 0.</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_A/12 to Diagnostic 0.</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_B/12 to Diagnostic 0.</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_C/12 to Diagnostic 0.</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_D/12 to Diagnostic 0.</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>Assign LVIN pin to Diagnostic 0</Description>
+						<Value>14</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG1_ASSIGN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects the Diagnostic Assigned to DIAG_RESULT[1].</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Assign AGND to Diagnostic 1.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Temperature Sensor to Diagnostic 1.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Assign AVDD/16 to Diagnostic 1.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Charge Pump Voltage (AVSS) to Diagnostic 1.</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Assign REFOUT to Diagnostic 1.</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO5V to Diagnostic 1.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO1V8 to Diagnostic 1.</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>Assign DLDO1V8 to Diagnostic 1.</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>Assign DVCC to Diagnostic 1.</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>Assign IOVDD to Diagnostic 1.</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_A to Diagnostic 1.</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_B to Diagnostic 1.</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_C to Diagnostic 1.</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_D to Diagnostic 1.</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>Assign LVIN to Diagnostic 1.</Description>
+						<Value>14</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG2_ASSIGN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects the Diagnostic Assigned to DIAG_RESULT[2].</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Assign AGND to Diagnostic 2.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Temperature Sensor to Diagnostic 2.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Assign AVDD/16 to Diagnostic 2.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Charge Pump Voltage (AVSS) to Diagnostic 2.</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Assign REFOUT to Diagnostic 2.</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO5V to Diagnostic 2.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO1V8 to Diagnostic 2.</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>Assign DLDO1V8 to Diagnostic 2.</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>Assign DVCC to Diagnostic 2.</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>Assign IOVDD to Diagnostic 2.</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_A to Diagnostic 2.</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_B to Diagnostic 2.</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_C to Diagnostic 2.</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_D to Diagnostic 2.</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>Assign LVIN to Diagnostic 2.</Description>
+						<Value>14</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>8</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIAG3_ASSIGN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects the Diagnostic Assigned to DIAG_RESULT[3].</Description>
+				<Visibility>Public</Visibility>
+				<Width>4</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Assign AGND to Diagnostic 3.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Temperature Sensor to Diagnostic 3.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Assign AVDD/16 to Diagnostic 3.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Assign the Charge Pump Voltage (AVSS) to Diagnostic 3.</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Assign REFOUT to Diagnostic 3.</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO5V to Diagnostic 3.</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>Assign ALDO1V8 to Diagnostic 3.</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>Assign DLDO1V8 to Diagnostic 3.</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>Assign DVCC to Diagnostic 3.</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>Assign IOVDD to Diagnostic 3.</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_A to Diagnostic 3.</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_B to Diagnostic 3.</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_C to Diagnostic 3.</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>Assign SENSEL_D to Diagnostic 3.</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>Assign LVIN to Diagnostic 3.</Description>
+						<Value>14</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>12</RegOffset>
+				<SliceWidth>4</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIN_COMP_OUT</Name>
+		<Address>0x25</Address>
+		<Description>Digital Output Level Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIN_COMP_OUT_A</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Debounced Digital Input State of Channel A</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIN_COMP_OUT_B</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Debounced Digital Input State of Channel B</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIN_COMP_OUT_C</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Debounced Digital Input State of Channel C</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DIN_COMP_OUT_D</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Debounced Digital Input State of Channel D</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ADC_RESULT</Name>
+		<Address>0x26</Address>
+		<Description>ADC Conversion Results Register per Channel</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes>These registers can only be read if the fuse bit adc_data_24 is 0 and the test mode bit adc_data_24 is 0.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>CH_ADC_RESULT</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Contains the 16-bit Result of the ADC Conversion on Channeln</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIAG_RESULT</Name>
+		<Address>0x2A</Address>
+		<Description>Diagnostic Results Registers per Diagnostic Channel.</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes>These registers can only be read if the fuse bit adc_data_24 is 0 and the test mode bit adc_data_24 is 0.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIAG_RESULT</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Contains the 16-bit Diagnostic Result on Diagnostic Channeln</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ALERT_STATUS</Name>
+		<Address>0x2E</Address>
+		<Description>Alert Status Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>VI_ERR_A</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Voltage or Current Error Detected on Channel A.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_B</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Voltage or Current Error Detected on Channel B.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_C</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Voltage or Current Error Detected on Channel C.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_D</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Voltage or Current Error Detected on Channel D.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>HI_TEMP_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>High Temperature Detected</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CHARGE_PUMP_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Charge Pump Error Detected</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ALDO5V_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ALDO5V Power Supply Monitor Error</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>AVDD_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>AVDD Power Supply Monitor Error</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DVCC_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>DVCC Power Supply Monitor Error</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>8</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ALDO1V8_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ALDO1V8 Power Supply Monitor Error</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>9</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_CONV_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ADC Conversion Error</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This bit is asserted if the DSP output data exceeds 24bits after truncation(typically caused by an analog input overrange).
+
+When an ADC conversion causes this bit to be set, the ADC result is automatically set to all ones or all zeroes depending whether the error is an over-range or under-range. Subsequent conversions will overwrite the ADC result register.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>10</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_SAT_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ADC Saturation Error</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>Indicates that the ones density of the modulator data stream is incorrect.  If more than 20 consecutive modulator outputs equal logic high or low then this flag is set.
+When an ADC conversion causes this bit to be set, the ADC result is automatically set to all ones or all zeroes depending whether the error is an over-range or under-range. Subsequent conversions will overwrite the ADC result register.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>11</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SPI_SCLK_CNT_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SPI SCLK Count Error Detected</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>12</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SPI_CRC_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>SPI CRC Error Detected</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>13</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CAL_MEM_ERR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Calibration Memory Error.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>14</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>RESET_OCCURRED</Name>
+				<Access>R/W</Access>
+				<DefaultValue>1</DefaultValue>
+				<Description>Reset Occurred.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>A mask bit is not provided with this bit, because the mask bit would get reset by a reset event.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>15</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>LIVE_STATUS</Name>
+		<Address>0x2F</Address>
+		<Description>Live Status Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes>NOTE: Bits only reset on POR.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>VI_ERR_CURR_A</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of VI_ERR_A</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_CURR_B</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of VI_ERR_B</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_CURR_C</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of VI_ERR_C</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_CURR_D</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of VI_ERR_D</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>This signal from the AFE has a 2ms integration style deglitch in user mode.  However in testmode this delay is reduced to 200us.</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>HI_TEMP_STATUS</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of HI_TEMP_ERR</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CHARGE_PUMP_STATUS</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of CHARGE_PUMP_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ALDO5V_STATUS</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of ALDO5V_ERR</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>AVDD_STATUS</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of AVDD_ERR</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DVCC_STATUS</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of DVCC_ERR</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>8</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ALDO1V8_STATUS</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Live Status of ALDO1V8_ERR</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>9</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_CH_CURR</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Address of the Channel Currently Being Converted by the ADC.</Description>
+				<Visibility>Public</Visibility>
+				<Width>3</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>Channel A</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Channel B</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Channel C</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Channel D</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>Diagnostics 0</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>Diagnostics 1</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>Diagnostics 2</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>Diagnostics 3</Description>
+						<Value>7</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>10</RegOffset>
+				<SliceWidth>3</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_BUSY</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ADC Busy Status Bit.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>13</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_DATA_RDY</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ADC Data Ready.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>14</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ADC_RESULT24_8</Name>
+		<Address>0x30</Address>
+		<Description>ADC Conversion Result Register per Channel (16 MSBs)</Description>
+		<Exists>=ADC_24BIT</Exists>
+		<Width>16</Width>
+		<Notes>These registers can only be read if the fuse bit adc_data_24 is 1 or the test mode bit adc_data_24 is 1.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>CH_ADC_RESULT24</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ADC Conversion Result on Channeln, Bits[23:8]</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>8</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ADC_RESULT7_0</Name>
+		<Address>0x31</Address>
+		<Description>ADC Conversion Result Register per Channel (8 LSBs)</Description>
+		<Exists>=ADC_24BIT</Exists>
+		<Width>16</Width>
+		<Notes>These registers can only be read if the fuse bit adc_data_24 is 1 or the test mode bit adc_data_24 is 1.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>CH_ADC_RESULT24</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>ADC Conversion Result on Channeln, Bits[7:0]</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIAGNOSTIC_RESULT</Name>
+		<Address>0x38</Address>
+		<Description>Diagnostic Results Registers per Diagnostic Channel.</Description>
+		<Exists>=ADC_24BIT</Exists>
+		<Width>16</Width>
+		<Notes>These registers can only be read if the fuse bit adc_data_24 is 1 or the test mode bit adc_data_24 is 1.
+The DIAG_RESULT registers are mirrored here to allow burst read when using the 24 bit ADC results registers.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIAGNOSTIC_RESULT</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Contains the 16bit Diagnostic Result on Diagnostic Channel</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ALERT_MASK</Name>
+		<Address>0x3C</Address>
+		<Description>Alert Mask Register.</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>VI_ERR_MASK_A</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for VI_ERR_A.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_MASK_B</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for VI_ERR_B.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>1</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_MASK_C</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for VI_ERR_C.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>2</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>VI_ERR_MASK_D</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for VI_ERR_D.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>3</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>HI_TEMP_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for HI_TEMP_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>4</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CHARGE_PUMP_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for CHARGE_PUMP_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>5</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ALDO5V_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for ALDO5V_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>6</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>AVDD_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for AVDD_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>7</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>DVCC_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for DVCC_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>8</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ALDO1V8_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for ALDO1V8_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>9</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_CONV_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for ADC_CONV_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>10</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>ADC_SAT_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for ADC_SAT_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>11</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SPI_SCLK_CNT_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for SPI_SCLK_CNT_ERR</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>12</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SPI_CRC_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for SPI_CRC_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>13</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>CAL_MEM_ERR_MASK</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Mask Bit for CAL_MEM_ERR.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>14</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>DIN_COUNTER</Name>
+		<Address>0x3D</Address>
+		<Description>Debounced DIN Count Register per Channel.</Description>
+		<Exists>=DIN_UPGRADE</Exists>
+		<Width>16</Width>
+		<Notes>This count is allowed to roll over by design as in normal operation it's update rate should be slow.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>DIN_CNT</Name>
+				<Access>R</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Contains the 16bit Count from the DIN Counter.</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>READ_SELECT</Name>
+		<Address>0x41</Address>
+		<Description>Readback Select Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes>When uploading data in single read mode the actual register address associated with the data will be shipped in the SPI address field.</Notes>
+		<BitFields>
+			<BitField>
+				<Name>READBACK_ADDR</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>D7 to D0 contains the register address to be read.</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>NOP</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>CH_FUNC_SETUPA</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>CH_FUNC_SETUPB</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>CH_FUNC_SETUPC</Description>
+						<Value>3</Value>
+					</Option>
+					<Option>
+						<Description>CH_FUNC_SETUPD</Description>
+						<Value>4</Value>
+					</Option>
+					<Option>
+						<Description>ADC_CONFIGA</Description>
+						<Value>5</Value>
+					</Option>
+					<Option>
+						<Description>ADC_CONFIGB</Description>
+						<Value>6</Value>
+					</Option>
+					<Option>
+						<Description>ADC_CONFIGC</Description>
+						<Value>7</Value>
+					</Option>
+					<Option>
+						<Description>ADC_CONFIGD</Description>
+						<Value>8</Value>
+					</Option>
+					<Option>
+						<Description>DIN_CONFIGA</Description>
+						<Value>9</Value>
+					</Option>
+					<Option>
+						<Description>DIN_CONFIGB</Description>
+						<Value>10</Value>
+					</Option>
+					<Option>
+						<Description>DIN_CONFIGC</Description>
+						<Value>11</Value>
+					</Option>
+					<Option>
+						<Description>DIN_CONFIGD</Description>
+						<Value>12</Value>
+					</Option>
+					<Option>
+						<Description>GPO_PARALLEL</Description>
+						<Value>13</Value>
+					</Option>
+					<Option>
+						<Description>GPO_CONFIGA</Description>
+						<Value>14</Value>
+					</Option>
+					<Option>
+						<Description>GPO_CONFIGB</Description>
+						<Value>15</Value>
+					</Option>
+					<Option>
+						<Description>GPO_CONFIGC</Description>
+						<Value>16</Value>
+					</Option>
+					<Option>
+						<Description>GPO_CONFIGD</Description>
+						<Value>17</Value>
+					</Option>
+					<Option>
+						<Description>OUTPUT_CONFIGA</Description>
+						<Value>18</Value>
+					</Option>
+					<Option>
+						<Description>OUTPUT_CONFIGB</Description>
+						<Value>19</Value>
+					</Option>
+					<Option>
+						<Description>OUTPUT_CONFIGC</Description>
+						<Value>20</Value>
+					</Option>
+					<Option>
+						<Description>OUTPUT_CONFIGD</Description>
+						<Value>21</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CODEA</Description>
+						<Value>22</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CODEB</Description>
+						<Value>23</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CODEC</Description>
+						<Value>24</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CODED</Description>
+						<Value>25</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CLR_CODEA</Description>
+						<Value>26</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CLR_CODEB</Description>
+						<Value>27</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CLR_CODEC</Description>
+						<Value>28</Value>
+					</Option>
+					<Option>
+						<Description>DAC_CLR_CODED</Description>
+						<Value>29</Value>
+					</Option>
+					<Option>
+						<Description>DAC_ACTIVEA</Description>
+						<Value>30</Value>
+					</Option>
+					<Option>
+						<Description>DAC_ACTIVEB</Description>
+						<Value>31</Value>
+					</Option>
+					<Option>
+						<Description>DAC_ACTIVEC</Description>
+						<Value>32</Value>
+					</Option>
+					<Option>
+						<Description>DAC_ACTIVED</Description>
+						<Value>33</Value>
+					</Option>
+					<Option>
+						<Description>DIN_THRESH</Description>
+						<Value>34</Value>
+					</Option>
+					<Option>
+						<Description>ADC_CONV_CTRL</Description>
+						<Value>35</Value>
+					</Option>
+					<Option>
+						<Description>DIAG_ASSIGN</Description>
+						<Value>36</Value>
+					</Option>
+					<Option>
+						<Description>DIN_COMP_OUT</Description>
+						<Value>37</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULTA</Description>
+						<Value>38</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULTB</Description>
+						<Value>39</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULTC</Description>
+						<Value>40</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULTD</Description>
+						<Value>41</Value>
+					</Option>
+					<Option>
+						<Description>DIAG_RESULTA</Description>
+						<Value>42</Value>
+					</Option>
+					<Option>
+						<Description>DIAG_RESULTB</Description>
+						<Value>43</Value>
+					</Option>
+					<Option>
+						<Description>DIAG_RESULTC</Description>
+						<Value>44</Value>
+					</Option>
+					<Option>
+						<Description>DIAG_RESULTD</Description>
+						<Value>45</Value>
+					</Option>
+					<Option>
+						<Description>ALERT_STATUS</Description>
+						<Value>46</Value>
+					</Option>
+					<Option>
+						<Description>LIVE_STATUS</Description>
+						<Value>47</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT23_8A</Description>
+						<Value>48</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT7_0A</Description>
+						<Value>49</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT23_8B</Description>
+						<Value>50</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT7_0B</Description>
+						<Value>51</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT23_8C</Description>
+						<Value>52</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT7_0C</Description>
+						<Value>53</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT23_8D</Description>
+						<Value>54</Value>
+					</Option>
+					<Option>
+						<Description>ADC_RESULT7_0D</Description>
+						<Value>55</Value>
+					</Option>
+					<Option>
+						<Description>DIAGNOSTIC_RESULTA</Description>
+						<Value>56</Value>
+					</Option>
+					<Option>
+						<Description>DIAGNOSTIC_RESULTB</Description>
+						<Value>57</Value>
+					</Option>
+					<Option>
+						<Description>DIAGNOSTIC_RESULTC</Description>
+						<Value>58</Value>
+					</Option>
+					<Option>
+						<Description>DIAGNOSTIC_RESULTD</Description>
+						<Value>59</Value>
+					</Option>
+					<Option>
+						<Description>ALERT_MASK</Description>
+						<Value>60</Value>
+					</Option>
+					<Option>
+						<Description>DIN_COUNTERA</Description>
+						<Value>61</Value>
+					</Option>
+					<Option>
+						<Description>DIN_COUNTERB</Description>
+						<Value>62</Value>
+					</Option>
+					<Option>
+						<Description>DIN_COUNTERC</Description>
+						<Value>63</Value>
+					</Option>
+					<Option>
+						<Description>DIN_COUNTERD</Description>
+						<Value>64</Value>
+					</Option>
+					<Option>
+						<Description>READ_SELECT</Description>
+						<Value>65</Value>
+					</Option>
+					<Option>
+						<Description>ADC_CONV_CTRL_40SPS</Description>
+						<Value>66</Value>
+					</Option>
+					<Option>
+						<Description>THERM_RST</Description>
+						<Value>67</Value>
+					</Option>
+					<Option>
+						<Description>CMD_KEY</Description>
+						<Value>68</Value>
+					</Option>
+					<Option>
+						<Description>SCRATCH</Description>
+						<Value>69</Value>
+					</Option>
+					<Option>
+						<Description>SILICON_REV</Description>
+						<Value>70</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>SPI_RD_RET_INFO</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Determines the Content of the MSBs in the SPI Read Frame.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes>When this bit is set to 1, 6 information bits are a FAULT flag, an ADC_RDY flag and the DIN comparator outputs are returned in bits [30:24] of any subsequent SPI read.  (The FAULT flag is the inverse of the FAULTb pin and the ADC_RDY reflects the status of the ADC_DATA_RDY bit in the LIVE_STATUS register).</Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>8</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+			<BitField>
+				<Name>AUTO_RD_EN</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Automatic read enabled.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>9</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>ADC_CONV_CTRL_40SPS</Name>
+		<Address>0x42</Address>
+		<Description>80SPS ADC Conversion Control Register.</Description>
+		<Exists>=ADC_40SPS</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>CONV_SEQ_40SPS</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Selects Single or Continuous Mode.</Description>
+				<Visibility>Public</Visibility>
+				<Width>2</Width>
+				<Notes>If the fuse bit adc_40sps_dis is set then writing to this register will not start conversions.
+If the fuse bit adc_40sps_dis is 1 then this field is not available for writes.  Reads will return 0.</Notes>
+				<Options>
+					<Option>
+						<Description>Stop continuous conversions and leave the ADC powered up or power up the ADC.</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Start single sequence conversion.</Description>
+						<Value>1</Value>
+					</Option>
+					<Option>
+						<Description>Start Continuous Conversions.</Description>
+						<Value>2</Value>
+					</Option>
+					<Option>
+						<Description>Stop continuous conversions and power down the ADC or power down the ADC.</Description>
+						<Value>3</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>2</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>THERM_RST</Name>
+		<Address>0x43</Address>
+		<Description>Thermal Reset Enable Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>EN_THERM_RST</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Set to 1 to Enable Thermal Reset Functionality.</Description>
+				<Visibility>Public</Visibility>
+				<Width>1</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>1</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>CMD_KEY</Name>
+		<Address>0x44</Address>
+		<Description>Command Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>CMD_KEY</Name>
+				<Access>W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Enter a Key to Execute a Command.</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<Options>
+					<Option>
+						<Description>No Operation</Description>
+						<Value>0</Value>
+					</Option>
+					<Option>
+						<Description>Software Reset Key1.</Description>
+						<Value>5626</Value>
+					</Option>
+					<Option>
+						<Description>Fuse Upload Key</Description>
+						<Value>16220</Value>
+					</Option>
+					<Option>
+						<Description>DAC Clear Key</Description>
+						<Value>29649</Value>
+					</Option>
+					<Option>
+						<Description>LDAC Key</Description>
+						<Value>38202</Value>
+					</Option>
+					<Option>
+						<Description>Software Reset Key2.</Description>
+						<Value>44881</Value>
+					</Option>
+				</Options>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>SCRATCH</Name>
+		<Address>0x45</Address>
+		<Description>Scratch or Spare Register.</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>SCRATCH_BITS</Name>
+				<Access>R/W</Access>
+				<DefaultValue>0</DefaultValue>
+				<Description>Scratch or spare register field.</Description>
+				<Visibility>Public</Visibility>
+				<Width>16</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>16</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+	<Register>
+		<Name>SILICON_REV</Name>
+		<Address>0x46</Address>
+		<Description>Silicon Revision Register</Description>
+		<Exists>True</Exists>
+		<Width>16</Width>
+		<Notes></Notes>
+		<BitFields>
+			<BitField>
+				<Name>SILICON_REV_ID</Name>
+				<Access>R</Access>
+				<DefaultValue>3</DefaultValue>
+				<Description>Silicon Revision Identification.</Description>
+				<Visibility>Public</Visibility>
+				<Width>8</Width>
+				<Notes></Notes>
+				<BitOffset>0</BitOffset>
+				<RegOffset>0</RegOffset>
+				<SliceWidth>8</SliceWidth>
+			</BitField>
+		</BitFields>
+	</Register>
+</GENERIC>
