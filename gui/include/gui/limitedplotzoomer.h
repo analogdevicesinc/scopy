@@ -27,6 +27,7 @@ namespace scopy {
 class SCOPY_GUI_EXPORT LimitedPlotZoomer : public QwtPlotZoomer
 {
 public:
+	LimitedPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget*, bool doReplot = false);
 	LimitedPlotZoomer(QWidget*, bool doReplot = false);
 	void resetZoom();
 	void popZoom();

@@ -29,6 +29,7 @@ namespace scopy {
 class SCOPY_GUI_EXPORT ExtendingPlotZoomer : public LimitedPlotZoomer
 {
 public:
+	explicit ExtendingPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget*, bool doReplot = false);
 	explicit ExtendingPlotZoomer(QWidget*, bool doReplot = false);
 	virtual ~ExtendingPlotZoomer();
 
