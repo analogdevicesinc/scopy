@@ -53,34 +53,22 @@
 
 namespace scopy {
 
-	class SCOPY_ADCPLUGIN_EXPORT time_sink_f : virtual public gr::sync_block
-    {
-    public:
-	  // scopy::time_sink_f::sptr
-	  typedef std::shared_ptr<time_sink_f> sptr;
+class SCOPY_ADCPLUGIN_EXPORT time_sink_f : virtual public gr::sync_block
+{
+public:
+	// scopy::time_sink_f::sptr
+	typedef std::shared_ptr<time_sink_f> sptr;
 
-      static sptr make(int size, double samp_rate,
-		       const std::string &name,
-		       int nconnections=1,
-		       QObject *plot=NULL);
+	static sptr make(int size, const std::string &name,
+			 int nconnections );
 
-      virtual void exec_() = 0;
+	virtual void set_update_time(double t) = 0;
+	virtual void set_nsamps(const int newsize) = 0;
 
-      virtual void set_update_time(double t) = 0;
-      virtual void set_nsamps(const int newsize) = 0;
-      virtual void set_samp_rate(const double samp_rate) = 0;
+	virtual int nsamps() const = 0;
+	virtual std::string name() const = 0;
 
-      virtual void set_trigger_mode(trigger_mode mode, int channel,
-				    const std::string &tag_key="") = 0;
-
-      virtual int nsamps() const = 0;
-      virtual std::string name() const = 0;
-      virtual void reset() = 0;
-      virtual void set_displayOneBuffer(bool) = 0;
-      virtual void clean_buffers() = 0;
-
-      QApplication *d_qApplication;
-    };
+};
 
 } /* namespace scopy */
 

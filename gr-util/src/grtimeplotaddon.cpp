@@ -34,14 +34,14 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 
 	m_plot->setSampleRate(1000, 1, "Hz");
 	m_plot->setActiveVertAxis(0);
-//	m_plot->setAxisVisible(QwtAxis::YLeft, false);
-//	m_plot->setAxisVisible(QwtAxis::XBottom, false);
+	//	m_plot->setAxisVisible(QwtAxis::YLeft, false);
+	//	m_plot->setAxisVisible(QwtAxis::XBottom, false);
 	m_plot->setUsingLeftAxisScales(false);
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisScale(QwtAxisId(QwtAxis::XBottom, 0), 0, 0.1);
 	m_plot->setOffsetInterval(-65535, 65535);
-//	m_plot->setAutoScale(true);
+	//	m_plot->setAutoScale(true);
 	connect(m_plot, SIGNAL(newData()),this, SLOT(onNewData()));
 	m_plot->replot();
 
@@ -64,11 +64,41 @@ void GRTimePlotAddon::onStart() {
 	connect(m_top,SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
 	connect(m_top,SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 
+	// PlotChannel Structure - { // Create Plot in TestPlugin, addPlotChannel, removePlotChannel
+	// single axis vs multiaxis (?)
+	// QwtPlot*
+	// QwtCurve
+	// QwtAxis
+	// QwtZoomer (?)
+	// float *data
+	//
+	// }
+
+
+	// populate reference channels // when creating reference channel - do this
+	// QwtCurve[].setSamples(X/Y)
+
+	// connect sink stopped ?
+
 	m_top->build();
 	m_top->start();
+
+	// connect timer to time sink to get data - or data driven - connect to sink_new data
+	// start timer
+
+
 }
 
-void GRTimePlotAddon::onStop() {
+/* void GRTimePlotAddon::getData() {
+	data = sink.getData(); // copies data from sink to plot
+	replot();
+	// Q_EMIT replot ?
+
+*/
+
+
+
+    void GRTimePlotAddon::onStop() {
 	m_top->stop();
 	m_top->teardown();
 	disconnect(m_top,SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
@@ -82,12 +112,14 @@ void GRTimePlotAddon::onRemove() {}
 void GRTimePlotAddon::onChannelAdded(ToolAddon *t) {
 	GRTimeChannelAddon *ch = dynamic_cast<GRTimeChannelAddon*>(t);
 	QString sinkName = (name /*+ ch->getDevice()->getName() +  t->getName()*/);
-//	m_plot->unregisterSink(sinkName.toStdString());
-//	bool ret = m_plot->registerSink(sinkName.toStdString(),1,0);
-//	qInfo()<<"created plot_sinks "<<sinkName << ret;
+	// create new PlotChannel object - this could also be created
+
 }
 
-void GRTimePlotAddon::onChannelRemoved(ToolAddon *) {}
+void GRTimePlotAddon::onChannelRemoved(ToolAddon *) {
+	// remove PlotChannel object
+
+}
 
 void GRTimePlotAddon::connectSignalPaths() {
 	QList<GRSignalPath*> sigpaths;
@@ -103,6 +135,15 @@ void GRTimePlotAddon::connectSignalPaths() {
 		qInfo()<<"created scope_sink_f with name" << sigpath->name();
 
 	}
+
+
+
+	// create and configure time_sink_f
+	// allocate memory for data to be plotted - could be done by time_sink ?
+	// 	for(int i=0;i<sigpaths.count();i++) {
+	//	QwtCurve[].setRawSamples(data[i]) // just get pointer from time_sink
+	// }
+
 	auto sink = scope_sink_f::make(1024,1000,name.toStdString(),sigpaths.count(),m_plot);
 	sinks.append(sink);
 	sink->set_update_time(0.01);
@@ -119,10 +160,10 @@ void GRTimePlotAddon::connectSignalPaths() {
 	for(int i=0;i<sigpaths.count();i++) {
 		auto curveId = m_plot->getAnalogChannels() - 1;
 		auto color = m_plot->getLineColor(curveId);
-	//	btn->setColor(color);
+		//	btn->setColor(color);
 		m_plot->Curve(curveId)->setAxes(
-			QwtAxisId(QwtAxis::XBottom, 0),
-			QwtAxisId(QwtAxis::YLeft, curveId));
+		    QwtAxisId(QwtAxis::XBottom, 0),
+		    QwtAxisId(QwtAxis::YLeft, curveId));
 		m_plot->DetachCurve(curveId);
 		m_plot->AttachCurve(curveId);
 		m_plot->addZoomer(curveId);
@@ -135,7 +176,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 	// TO DO: Give user the option to make these axes visible
 	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YLeft, 0), false);
 	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XBottom,0), false);
-//	m_plot->setUsingLeftAxisScales(false);
+	//	m_plot->setUsingLeftAxisScales(false);
 
 
 }
@@ -153,13 +194,13 @@ void GRTimePlotAddon::onNewData() {
 	for(int i=0;i<m_plot->Curve(0)->data()->size();i++) {
 		sum0 += m_plot->Curve(0)->data()->sample(i).y();
 	}
-//	for(int i=0;i<m_plot->Curve(1)->data()->size();i++) {
-//		sum1 += m_plot->Curve(1)->data()->sample(i).y();
-//	}
+	//	for(int i=0;i<m_plot->Curve(1)->data()->size();i++) {
+	//		sum1 += m_plot->Curve(1)->data()->sample(i).y();
+	//	}
 
 
 	qInfo()<<"new dataa! avgs - "
 		<< sum0/m_plot->Curve(0)->data()->size()
-//		<< sum1 / m_plot->Curve(1)->data()->size()
+	    //		<< sum1 / m_plot->Curve(1)->data()->size()
 	    ;
 }
