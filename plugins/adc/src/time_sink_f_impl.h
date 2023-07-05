@@ -47,69 +47,40 @@
 
 namespace scopy {
 
-	class time_sink_f_impl : public time_sink_f
-    {
-    private:
-      void initialize();
+class time_sink_f_impl : public time_sink_f
+{
+private:
+	std::vector <std::deque <float>> m_buffers;
+	std::vector< std::vector<gr::tag_t> > m_tags;
 
-      int d_size, d_buffer_size;
-      double d_samp_rate;
-      std::string d_name;
-      int d_nconnections;
-
-      int d_index, d_start, d_end;
-      std::vector<float*> d_fbuffers;
-      std::vector<double*> d_buffers;
-      std::vector< std::vector<gr::tag_t> > d_tags;
-
-      QObject *plot;
-
-      gr::high_res_timer_type d_update_time;
-      gr::high_res_timer_type d_last_time;
-
-      // Members used for triggering scope
-      trigger_mode d_trigger_mode;
-      int d_trigger_channel;
-      pmt::pmt_t d_trigger_tag_key;
-      bool d_triggered;
-
-      bool d_displayOneBuffer;
-      bool d_cleanBuffers;
-
-      void _reset();
-      void _npoints_resize();
-      void _adjust_tags(int adj);
-      void _test_trigger_tags(int nitems);
-
-    public:
-	  time_sink_f_impl(int size, double samp_rate,
-		       const std::string &name,
-		       int nconnections,
-		       QObject *plot = NULL);
-	  ~time_sink_f_impl();
-
-      bool check_topology(int ninputs, int noutputs);
-
-      void exec_();
-
-      void set_update_time(double t);
-      void set_nsamps(const int size);
-      void set_samp_rate(const double samp_rate);
-      void set_trigger_mode(trigger_mode mode, int channel,
-			    const std::string &tag_key="");
-
-      void set_displayOneBuffer(bool);
-
-      int nsamps() const;
-      std::string name() const;
-      void reset();
-      void clean_buffers();
+	int m_size;
+	double d_samp_rate;
+	std::string m_name;
+	int m_nconnections;
 
 
-      int work(int noutput_items,
-	       gr_vector_const_void_star &input_items,
-	       gr_vector_void_star &output_items);
-    };
+	gr::high_res_timer_type d_update_time;
+	gr::high_res_timer_type d_last_time;
+
+public:
+	time_sink_f_impl(int size,
+			 const std::string &name,
+			 int nconnections);
+	~time_sink_f_impl();
+
+	bool check_topology(int ninputs, int noutputs);
+
+	void set_update_time(double t);
+	void set_nsamps(const int size);
+
+	int nsamps() const;
+	std::string name() const;
+
+
+	int work(int noutput_items,
+		 gr_vector_const_void_star &input_items,
+		 gr_vector_void_star &output_items);
+};
 
 } /* namespace scopy */
 

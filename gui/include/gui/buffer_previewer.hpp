@@ -41,7 +41,7 @@ public:
 	void setWaveformPos(double);
 	double waveformWidth() const;
 	void setWaveformWidth(double);
-	double highlighPos() const;
+	double highlightPos() const;
 	void setHighlightPos(double);
 	double highlightWidth() const;
 	void setHighlightWidth(double);
@@ -65,15 +65,15 @@ Q_SIGNALS:
 	void bufferResetPosition();
 
 protected:
-	void paintEvent(QPaintEvent *) Q_DECL_OVERRIDE;
-	void resizeEvent(QResizeEvent *) Q_DECL_OVERRIDE;
+	void paintEvent(QPaintEvent *) override;
+	void resizeEvent(QResizeEvent *) override;
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts) = 0;
 
-	void mousePressEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void enterEvent(QEvent *event);
-	void leaveEvent(QEvent *event);
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
+	void enterEvent(QEvent *event) override;
+	void leaveEvent(QEvent *event) override;
 
 private:
 	double m_waveformPos;

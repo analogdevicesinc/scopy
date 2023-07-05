@@ -764,9 +764,11 @@ class SCOPY_GUI_EXPORT OscPlotZoomer: public ExtendingPlotZoomer
 {
 	Q_OBJECT
 public:
+	OscPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *parent, bool doReplot);
 	OscPlotZoomer(QWidget*, bool doReplot = true);
 
 	void cancel() { reset(); }
+
 
 Q_SIGNALS:
 	void zoomIn();

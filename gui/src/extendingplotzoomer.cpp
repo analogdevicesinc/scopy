@@ -23,6 +23,23 @@
 
 using namespace scopy;
 
+
+ExtendingPlotZoomer::ExtendingPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis,QWidget *parent, bool doReplot):
+	LimitedPlotZoomer(xAxis, yAxis,parent, doReplot),
+	widthPass(false),
+	heightPass(false),
+	extendWidth(false),
+	extendHeight(false)
+{
+	extendMarkers.push_back(new QwtPlotShapeItem());
+	extendMarkers.push_back(new QwtPlotShapeItem());
+
+	cornerMarkers.push_back(new QwtPlotShapeItem());
+	cornerMarkers.push_back(new QwtPlotShapeItem());
+	cornerMarkers.push_back(new QwtPlotShapeItem());
+	cornerMarkers.push_back(new QwtPlotShapeItem());
+}
+
 ExtendingPlotZoomer::ExtendingPlotZoomer(QWidget *parent, bool doReplot):
     LimitedPlotZoomer(parent, doReplot),
     widthPass(false),
