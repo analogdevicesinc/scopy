@@ -42,7 +42,7 @@ void DeviceManager::addDevice(Device* d) {
 	Q_EMIT deviceAdded(id, d);
 }
 
-QString DeviceManager::createDevice(QString category, QString param)
+QString DeviceManager::createDevice(QString category, QString param, bool async)
 {
 	qInfo(CAT_DEVICEMANAGER) <<category<< "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
@@ -52,7 +52,7 @@ QString DeviceManager::createDevice(QString category, QString param)
 
 	connect(dl, &DeviceLoader::initialized, this, [=](){addDevice(d);}); // add device to manager once it is initialized
 	connect(dl, &DeviceLoader::initialized, dl, &QObject::deleteLater); // don't forget to delete loader once we're done
-	dl->init();
+	dl->init(async);
 
 	return d->id();
 }

@@ -12,15 +12,15 @@ class DeviceLoader : public QObject {
 public:
 	DeviceLoader(DeviceImpl *d, QObject *parent = nullptr);
 	~DeviceLoader();
-	void init();
+	void init(bool async = true);
+	void asyncInit();
+	void syncInit();
 Q_SIGNALS:
 	void initialized();
 
 private:
 	DeviceImpl *d;
 	QObject *oldParent;
-	static constexpr bool threaded = true;
-
 };
 }
 
