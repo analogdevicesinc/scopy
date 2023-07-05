@@ -49,21 +49,26 @@ public:
 	virtual void init() = 0;
 	virtual void connectSignalsToSlots() = 0;
 	virtual QString getInfoMessage();
-	QVector<QHBoxLayout *> getMenuLayers();
+	QVector<QBoxLayout *> getMenuLayers();
 	QMap<QString, QMap<QString, QStringList>> getAttrValues();
 
-	void addMenuLayout(QHBoxLayout *layout);
+	void addMenuLayout(QBoxLayout *layout);
 	void setAttrValues(QMap<QString, QMap<QString, QStringList>> values);
 	double convertFromRaw(int rawValue, QString chnlType = OUTPUT_CHNL);
+public Q_SLOT:
+	void onAttrWritten(QMap<QString, QMap<QString, QStringList>> values);
 Q_SIGNALS:
 	void attrValuesChanged(QString attrName, QString chnlType);
+	void mapUpdated();
+	void broadcastThresholdReadForward(QString value);
+	void broadcastThresholdReadBackward(QString value);
 
 protected:
 	QWidget *m_widget;
 	QString m_chnlFunction;
 	QMap<QString, QMap<QString, QStringList>> m_attrValues;
 private:
-	QVector<QHBoxLayout *> m_menuLayers;
+	QVector<QBoxLayout *> m_menuLayers;
 };
 
 class CurrentInLoopMenu: public BufferMenu
@@ -77,6 +82,7 @@ public:
 	QString getInfoMessage();
 public Q_SLOTS:
 	void dacCodeChanged(double value);
+	void onMapUpdated();
 private:
 	PositionSpinButton *m_dacCodeSpinButton;
 	QLabel *m_dacLabel;
@@ -93,10 +99,13 @@ public:
 	QString getInfoMessage();
 public Q_SLOTS:
 	void dacCodeChanged(double value);
-	void thresholdChanged(double value);
+	void thresholdChanged();
+	void onMapUpdated();
+	void onBroadcastThresholdRead(QString value);
 private:
+	QLabel *m_titleLabel;
+	QLineEdit *m_thresholdLineEdit;
 	PositionSpinButton *m_dacCodeSpinButton;
-	PositionSpinButton *m_thresholdSpinButton;
 	QLabel *m_dacLabel;
 };
 
@@ -114,6 +123,7 @@ public Q_SLOTS:
 	void slewRateIndexChanged(int idx);
 	void slewIndexChanged(int idx);
 	void dacCodeChanged(double value);
+	void onMapUpdated();
 private:
 	PositionSpinButton *m_dacCodeSpinButton;
 	QLabel *m_dacLabel;
@@ -139,6 +149,7 @@ public Q_SLOTS:
 	void slewRateIndexChanged(int idx);
 	void slewIndexChanged(int idx);
 	void dacCodeChanged(double value);
+	void onMapUpdated();
 private: 
 	PositionSpinButton *m_dacCodeSpinButton;
 	QComboBox *m_slewOptions;
@@ -159,6 +170,7 @@ public:
 	void connectSignalsToSlots();
 public Q_SLOTS:
 	void diagIndextChanged(int idx);
+	void onMapUpdated();
 private:
 	QComboBox *m_diagOptions;
 
@@ -174,10 +186,12 @@ public:
 	void init();
 	void connectSignalsToSlots();
 public Q_SLOTS:
-	void thresholdChanged(double value);
+	void thresholdChanged();
+	void onMapUpdated();
+	void onBroadcastThresholdRead(QString value);
 private:
-	PositionSpinButton *m_thresholdSpinButton;
-
+	QLabel *m_titleLabel;
+	QLineEdit *m_thresholdLineEdit;
 };
 
 class WithoutAdvSettings: public BufferMenu

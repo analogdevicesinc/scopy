@@ -62,7 +62,7 @@ QStringList BufferMenuModel::readChnlAttr(struct iio_channel* iio_chnl, QString 
 	std::string s_attrName = attrName.toStdString();
 	int returnCode = iio_channel_attr_read(iio_chnl, s_attrName.c_str(), buffer, 199);
 
-	if (returnCode > 0) {
+	if (returnCode >= 0) {
 		QString bufferValues(buffer);
 		attrValues = bufferValues.split(" ");
 	}
@@ -86,6 +86,11 @@ void BufferMenuModel::updateChnlAttributes(QMap<QString, QMap<QString,QStringLis
 				qInfo() << attrName.toUpper() +" was successfully written!";
 			} else {
 				qWarning() << "Couldn't write " + attrName.toUpper() + " attribute! (" + QString::number(retCode) + ")";
+			}
+			QStringList readBack = readChnlAttr(m_chnlsMap[chnlType], attrName);
+			if (readBack.size() == 1) {
+				m_chnlAttributes[chnlType][attrName] = readBack;
+				Q_EMIT attrWritten(m_chnlAttributes);
 			}
 		}
 	}
