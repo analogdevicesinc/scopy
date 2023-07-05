@@ -29,7 +29,10 @@
 
 #include <iio.h>
 #include <QDebug>
+#include <QLoggingCategory>
 
+
+Q_DECLARE_LOGGING_CATEGORY(CAT_M2KPLUGIN);
 using namespace scopy::m2k;
 
 static const QStringList tool_names = {
@@ -91,7 +94,7 @@ Filter::Filter(const struct iio_context *ctx)
 		}
 	}
 
-	fprintf(stderr, "Unable to find device in filter file\n");
+	qDebug(CAT_M2KPLUGIN)<<("Unable to find device in filter file\n");
 	this->root = obj["generic"].toObject();
 	hwname = "generic";
 }

@@ -90,7 +90,7 @@ void BufferPreviewer::setWaveformWidth(double width)
 	update();
 }
 
-double BufferPreviewer::highlighPos() const
+double BufferPreviewer::highlightPos() const
 {
 	return m_highlightPos;
 }

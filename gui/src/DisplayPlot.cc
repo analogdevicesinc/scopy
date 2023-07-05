@@ -318,6 +318,12 @@ void EdgelessPlotGrid::updateScaleDiv( const QwtScaleDiv& xScaleDiv,
 					getEdgelessScaleDiv(yScaleDiv));
 }
 
+OscPlotZoomer::OscPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *parent, bool doReplot) :
+	ExtendingPlotZoomer(xAxis, yAxis, parent, doReplot),
+	lastIndex(-1){
+
+}
+
 OscPlotZoomer::OscPlotZoomer(QWidget *parent, bool doReplot) :
 	ExtendingPlotZoomer(parent, doReplot),
 	lastIndex(-1)
