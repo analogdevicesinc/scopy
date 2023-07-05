@@ -42,7 +42,7 @@ public:
 	void init();
 	void updateChnlAttributes(QMap<QString, QMap<QString,QStringList>> newValues, QString attrName, QString chnlType);
 Q_SIGNALS:
-	void attrWritten(QString value);
+	void attrWritten(QMap<QString, QMap<QString, QStringList>> chnlAttributes);
 private:
 	QMap<QString, iio_channel*> m_chnlsMap;
 	QMap<QString, QMap<QString, QStringList>> m_chnlAttributes;
