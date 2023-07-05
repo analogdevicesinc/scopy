@@ -27,9 +27,9 @@ using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_SCOPY,"Scopy")
 
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
-	: QMainWindow(parent)
-	, ui(new Ui::ScopyMainWindow)
-{	
+    : QMainWindow(parent)
+      , ui(new Ui::ScopyMainWindow)
+{
 	ui->setupUi(this);
 	setWindowTitle("Scopy-" + scopy::config::fullversion());
 
@@ -40,13 +40,13 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
-//	auto vc = VersionCache::GetInstance();
-//	if(vc->cacheOutdated()) {
-//		vc->updateCache();
-//		connect(vc,&VersionCache::cacheUpdated,this,[=](){
-//			qInfo()<<vc->cache();
-//		});
-//	}
+	//	auto vc = VersionCache::GetInstance();
+	//	if(vc->cacheOutdated()) {
+	//		vc->updateCache();
+	//		connect(vc,&VersionCache::cacheUpdated,this,[=](){
+	//			qInfo()<<vc->cache();
+	//		});
+	//	}
 
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
@@ -117,8 +117,17 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	sbc->startScan();
 
-//	dm->createDevice("m2k","ip:127.0.0.1");
-	dm->createDevice("","ip:test");
+#ifdef SCOPY_DEV_MODE
+	//	auto id = dm->createDevice("m2k","ip:127.0.0.1"), false;
+	//	auto id = dm->createDevice("iio","ip:10.48.65.163", false);
+	//	auto id = dm->createDevice("iio","ip:192.168.2.1", false);
+	auto id = dm->createDevice("test","", false);
+
+	auto d = dm->getDevice(id);
+	d->connectDev();
+	auto tool_id = dynamic_cast<DeviceImpl*>(d)->plugins()[0]->toolList()[0]->uuid();
+	Q_EMIT tb->requestTool(tool_id);
+#endif
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
@@ -231,8 +240,8 @@ void ScopyMainWindow::loadOpenGL() {
 	// this should be part of scopygui
 	// set surfaceFormat as in Qt example: HelloGL2 - https://code.qt.io/cgit/qt/qtbase.git/tree/examples/opengl/hellogl2/main.cpp?h=5.15#n81
 	QSurfaceFormat fmt;
-//	fmt.setDepthBufferSize(24);
-//	QSurfaceFormat::setDefaultFormat(fmt);
+	//	fmt.setDepthBufferSize(24);
+	//	QSurfaceFormat::setDefaultFormat(fmt);
 
 	// This acts as a loader for the OpenGL context, our plots load and draw in the OpenGL context
 	// at the same time which causes some race condition and causes the app to hang
@@ -253,12 +262,12 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr){
 	else{
 		pr->init(scopy::config::defaultPluginFolderPath());
 	}
-	#ifndef Q_OS_ANDROID
-		QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
-		if(!pluginAdditionalPath.isEmpty()) {
-			pr->init(pluginAdditionalPath);
-		}
-	#endif
+#ifndef Q_OS_ANDROID
+	QString pluginAdditionalPath = Preferences::GetInstance()->get("general_additional_plugin_path").toString();
+	if(!pluginAdditionalPath.isEmpty()) {
+		pr->init(pluginAdditionalPath);
+	}
+#endif
 }
 
 
@@ -278,16 +287,16 @@ void ScopyMainWindow::handlePreferences(QString str,QVariant val) {
 }
 
 void ScopyMainWindow::initPythonWIN32(){
-	#ifdef WIN32
-		auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-		auto path_str = QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
-		path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
-		path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
-		path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
-		path_str += QString::fromLocal8Bit(pythonpath);
+#ifdef WIN32
+	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
+	auto path_str = QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
+	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
+	path_str += QString::fromLocal8Bit(pythonpath);
 
-		qputenv("PYTHONPATH", path_str.toLocal8Bit());
-	#endif
+	qputenv("PYTHONPATH", path_str.toLocal8Bit());
+#endif
 }
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
