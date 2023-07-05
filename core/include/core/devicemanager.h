@@ -23,7 +23,7 @@ public:
 public Q_SLOTS:
 
 	void addDevice(Device *d);
-	QString createDevice(QString category, QString param);
+	QString createDevice(QString category, QString param, bool async = true);
 	void removeDevice(QString category, QString id);
 
 	void removeDeviceById(QString id);
