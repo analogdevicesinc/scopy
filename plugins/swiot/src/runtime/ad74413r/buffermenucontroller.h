@@ -42,8 +42,11 @@ public:
 	int getChnlIdx();
 
 public Q_SLOTS:
-
 	void attributesChanged(QString attrName, QString chnlType);
+
+Q_SIGNALS:
+	void broadcastThresholdReadForward(QString value);
+	void broadcastThresholdReadBackward(QString value);
 
 private:
 	int m_chnlIdx;

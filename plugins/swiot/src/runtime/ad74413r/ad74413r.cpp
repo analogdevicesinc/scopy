@@ -199,6 +199,8 @@ void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
 				chWidget->enableButton()->setChecked(false);
 			}
 			chId++;
+			connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastReadThreshold(QString)));
+			connect(this, SIGNAL(broadcastReadThreshold(QString)), controller, SIGNAL(broadcastThresholdReadBackward(QString)));
 		}
 	}
 }

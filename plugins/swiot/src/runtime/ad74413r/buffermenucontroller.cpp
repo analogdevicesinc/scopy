@@ -45,6 +45,9 @@ void BufferMenuController::createConnections()
 {
 	BufferMenu* advMenu = m_genericMenu->getAdvMenu();
 	connect(advMenu, &BufferMenu::attrValuesChanged, this, &BufferMenuController::attributesChanged);
+	connect(m_model, &BufferMenuModel::attrWritten, advMenu, &BufferMenu::onAttrWritten);
+	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastThresholdReadForward(QString)));
+	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu, SIGNAL(broadcastThresholdReadBackward(QString)));
 }
 
 void BufferMenuController::attributesChanged(QString attrName, QString chnlType)
