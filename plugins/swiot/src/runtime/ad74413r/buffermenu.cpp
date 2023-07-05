@@ -21,6 +21,7 @@
 
 #include "buffermenu.h"
 #include "qdebug.h"
+#include "qlineedit.h"
 
 using namespace scopy::swiot;
 BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction)
@@ -41,7 +42,7 @@ QString BufferMenu::getInfoMessage()
 	return defaultMessage;
 }
 
-void BufferMenu::addMenuLayout(QHBoxLayout *layout)
+void BufferMenu::addMenuLayout(QBoxLayout *layout)
 {
 	m_menuLayers.push_back(layout);
 }
@@ -56,7 +57,7 @@ QMap<QString, QMap<QString, QStringList>> BufferMenu::getAttrValues()
 	return m_attrValues;
 }
 
-QVector<QHBoxLayout *> BufferMenu::getMenuLayers()
+QVector<QBoxLayout *> BufferMenu::getMenuLayers()
 {
 	return m_menuLayers;
 }
@@ -67,11 +68,17 @@ double BufferMenu::convertFromRaw(int rawValue, QString chnlType)
 	if (m_attrValues.contains(chnlType)
 			&& m_attrValues[chnlType].contains("offset")
 			&& m_attrValues[chnlType].contains("scale")) {
-		double offset = m_attrValues[chnlType]["offset"][0].toDouble();
-		double scale = m_attrValues[chnlType]["scale"][0].toDouble();
+		double offset = m_attrValues[chnlType]["offset"].first().toDouble();
+		double scale = m_attrValues[chnlType]["scale"].first().toDouble();
 		value = (rawValue + offset) * scale;
 	}
 	return value;
+}
+
+void BufferMenu::onAttrWritten(QMap<QString, QMap<QString, QStringList> > values)
+{
+	m_attrValues = values;
+	Q_EMIT mapUpdated();
 }
 
 CurrentInLoopMenu::CurrentInLoopMenu(QWidget* parent, QString chnlFunction)
@@ -91,6 +98,9 @@ void CurrentInLoopMenu::init()
 						     "DAC Code", 0,
 						     8191,
 						     true, false, m_widget);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 	addMenuLayout(dacCodeLayout);
 	//dac label
@@ -106,6 +116,7 @@ void CurrentInLoopMenu::init()
 void CurrentInLoopMenu::connectSignalsToSlots()
 {
 	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &CurrentInLoopMenu::dacCodeChanged);
+	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 }
 
 QString CurrentInLoopMenu::getInfoMessage()
@@ -135,6 +146,15 @@ void CurrentInLoopMenu::dacCodeChanged(double value)
 
 }
 
+void CurrentInLoopMenu::onMapUpdated()
+{
+	m_dacCodeSpinButton->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
+	m_dacCodeSpinButton->blockSignals(false);
+}
+
 DigitalInLoopMenu::DigitalInLoopMenu(QWidget* parent, QString chnlFunction)
 	: BufferMenu(parent, chnlFunction)
 {}
@@ -145,14 +165,24 @@ DigitalInLoopMenu::~DigitalInLoopMenu()
 void DigitalInLoopMenu::init()
 {
 	//threshold
-	QHBoxLayout *thresholdLayout = new QHBoxLayout();
-	m_thresholdSpinButton = new PositionSpinButton({
-							{"mV", 1E0}
-						     },
-						     "Threshold", 0,
-						     16000,
-						     true, false, m_widget);
-	thresholdLayout->addWidget(m_thresholdSpinButton);
+	QVBoxLayout *thresholdLayout = new QVBoxLayout();
+	QRegExp regExp("([0-9]|[1-9][0-9]{1,3}|1[0-5][0-9]{3}|16000)");
+	QRegExpValidator *validator = new QRegExpValidator(regExp, this);
+	m_titleLabel = new QLabel("Threshold (0 - 16000 mV)", m_widget);
+	m_titleLabel->setStyleSheet("font-size: 14px;");
+	m_thresholdLineEdit = new QLineEdit(m_widget);
+	m_thresholdLineEdit->setStyleSheet("background: transparent; height: 20px; width: 75px; font-size: 18px; border: 0px; bottom: 10px;");
+	m_thresholdLineEdit->setValidator(validator);
+	m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first());
+	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
+			? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first())
+			: m_thresholdLineEdit->setText(0);
+	QFrame *frame = new QFrame(m_widget);
+	frame->setFrameShape(QFrame::HLine);
+	frame->setStyleSheet("color: #4a64ff;");
+	thresholdLayout->addWidget(m_titleLabel);
+	thresholdLayout->addWidget(m_thresholdLineEdit);
+	thresholdLayout->addWidget(frame);
 	addMenuLayout(thresholdLayout);
 	//dac code
 	QHBoxLayout *dacCodeLayout = new QHBoxLayout();
@@ -162,6 +192,9 @@ void DigitalInLoopMenu::init()
 						     "DAC Code", 0,
 						     8191,
 						     true, false, m_widget);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 	addMenuLayout(dacCodeLayout);
 	//dac label
@@ -177,7 +210,9 @@ void DigitalInLoopMenu::init()
 void DigitalInLoopMenu::connectSignalsToSlots()
 {
 	connect(m_dacCodeSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInLoopMenu::dacCodeChanged);
-	connect(m_thresholdSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInLoopMenu::thresholdChanged);
+	connect(m_thresholdLineEdit, &QLineEdit::returnPressed, this, &DigitalInLoopMenu::thresholdChanged);
+	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
+	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), this, SLOT(onBroadcastThresholdRead(QString)));
 }
 
 QString DigitalInLoopMenu::getInfoMessage()
@@ -207,7 +242,7 @@ void DigitalInLoopMenu::dacCodeChanged(double value)
 
 }
 
-void DigitalInLoopMenu::thresholdChanged(double value)
+void DigitalInLoopMenu::thresholdChanged()
 {
 	QString attrName("threshold");
 	if (!m_attrValues.contains(INPUT_CHNL)) {
@@ -216,13 +251,43 @@ void DigitalInLoopMenu::thresholdChanged(double value)
 	}
 	if (m_attrValues[INPUT_CHNL].contains(attrName)) {
 		m_attrValues[INPUT_CHNL][attrName].clear();
-		m_attrValues[INPUT_CHNL][attrName].push_back(QString::number((int)value));
+		m_attrValues[INPUT_CHNL][attrName].push_back(m_thresholdLineEdit->text());
 		Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
 	} else {
 		qWarning() << attrName.toUpper() + " attribute does not exist!";
 	}
 }
 
+void DigitalInLoopMenu::onMapUpdated()
+{
+	m_thresholdLineEdit->blockSignals(true);
+	if (m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty()) {
+		if (m_attrValues[INPUT_CHNL]["threshold"].first().compare(m_thresholdLineEdit->text()) != 0 ) {
+			Q_EMIT broadcastThresholdReadForward(m_attrValues[INPUT_CHNL]["threshold"].first());
+		}
+		m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first());
+		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first());
+	} else {
+		m_thresholdLineEdit->setText(0);
+	}
+	m_thresholdLineEdit->blockSignals(false);
+	m_dacCodeSpinButton->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
+	m_dacCodeSpinButton->blockSignals(false);
+}
+
+void DigitalInLoopMenu::onBroadcastThresholdRead(QString value)
+{
+	m_thresholdLineEdit->blockSignals(true);
+	if (value.compare(m_thresholdLineEdit->text()) != 0 ) {
+		m_thresholdLineEdit->setText(value);
+		m_thresholdLineEdit->setPlaceholderText(value);
+		m_attrValues[INPUT_CHNL]["threshold"].first() = value;
+	}
+	m_thresholdLineEdit->blockSignals(false);
+}
 
 VoltageOutMenu::VoltageOutMenu(QWidget* parent, QString chnlFunction)
 	: BufferMenu(parent, chnlFunction)
@@ -241,6 +306,9 @@ void VoltageOutMenu::init()
 						     "DAC Code", 0,
 						     8191,
 						     true, false, m_widget);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 	addMenuLayout(dacCodeLayout);
 	//dac label
@@ -264,7 +332,7 @@ void VoltageOutMenu::init()
 	QHBoxLayout *slewStepLayout = new QHBoxLayout();
 	m_slewStepOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && m_attrValues[OUTPUT_CHNL]["slew_step"].size() > 0)
+	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
 			? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
 			: m_slewStepOptions->setCurrentText("ERROR");
 	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
@@ -274,7 +342,7 @@ void VoltageOutMenu::init()
 	QHBoxLayout *slewRateLayout = new QHBoxLayout();
 	m_slewRateOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && m_attrValues[OUTPUT_CHNL]["slew_rate"].size() > 0)
+	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
 			? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
 			: m_slewRateOptions->setCurrentText("ERROR");
 	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)", m_widget), 1);
@@ -290,6 +358,7 @@ void VoltageOutMenu::connectSignalsToSlots()
 	connect(m_slewStepOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VoltageOutMenu::slewStepIndexChanged);
 	connect(m_slewRateOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VoltageOutMenu::slewRateIndexChanged);
 	connect(m_slewOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VoltageOutMenu::slewIndexChanged);
+	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 }
 
 QString VoltageOutMenu::getInfoMessage()
@@ -381,6 +450,34 @@ void VoltageOutMenu::slewIndexChanged(int idx)
 
 }
 
+void VoltageOutMenu::onMapUpdated()
+{
+	m_dacCodeSpinButton->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
+	m_dacCodeSpinButton->blockSignals(false);
+
+	m_slewOptions->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0)
+			? m_slewOptions->setCurrentText("Disable")
+			: m_slewOptions->setCurrentText("Enable");
+	m_slewOptions->blockSignals(false);
+
+	m_slewStepOptions->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
+			? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
+			: m_slewStepOptions->setCurrentText("ERROR");
+	m_slewStepOptions->blockSignals(false);
+
+	m_slewRateOptions->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
+			? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
+			: m_slewRateOptions->setCurrentText("ERROR");
+	m_slewRateOptions->blockSignals(false);
+
+}
+
 CurrentOutMenu::CurrentOutMenu(QWidget* parent, QString chnlFunction)
 	: BufferMenu(parent, chnlFunction)
 {}
@@ -398,6 +495,9 @@ void CurrentOutMenu::init()
 						     "DAC Code", 0,
 						     8196,
 						     true, false, m_widget);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
 	dacCodeLayout->addWidget(m_dacCodeSpinButton);
 	addMenuLayout(dacCodeLayout);
 	//dac label
@@ -421,7 +521,7 @@ void CurrentOutMenu::init()
 	QHBoxLayout *slewStepLayout = new QHBoxLayout();
 	m_slewStepOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
-	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && m_attrValues[OUTPUT_CHNL]["slew_step"].size() > 0)
+	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
 			? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
 			: m_slewStepOptions->setCurrentText("ERROR");
 	slewStepLayout->addWidget(new QLabel("Slew Step Size", m_widget), 1);
@@ -431,7 +531,7 @@ void CurrentOutMenu::init()
 	QHBoxLayout *slewRateLayout = new QHBoxLayout();
 	m_slewRateOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
-	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && m_attrValues[OUTPUT_CHNL]["slew_rate"].size() > 0)
+	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
 			? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
 			: m_slewRateOptions->setCurrentText("ERROR");
 	slewRateLayout->addWidget(new QLabel("Slew Rate (kHz)",m_widget),1);
@@ -447,6 +547,7 @@ void CurrentOutMenu::connectSignalsToSlots()
 	connect(m_slewStepOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CurrentOutMenu::slewStepIndexChanged);
 	connect(m_slewRateOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CurrentOutMenu::slewRateIndexChanged);
 	connect(m_slewOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CurrentOutMenu::slewIndexChanged);
+	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 }
 
 QString CurrentOutMenu::getInfoMessage()
@@ -481,8 +582,7 @@ void CurrentOutMenu::dacCodeChanged(double value)
 	if (m_attrValues.contains(OUTPUT_CHNL)) {
 		m_attrValues[OUTPUT_CHNL][attrName].clear();
 		m_attrValues[OUTPUT_CHNL][attrName].push_back(QString::number((int)value));
-		//by default the current value is measured in μA
-		double val = convertFromRaw(value) * 0.001;
+		double val = convertFromRaw(value);
 		m_dacLabel->clear();
 		m_dacLabel->setText(QString::number(val)+" mA");
 
@@ -536,6 +636,33 @@ void CurrentOutMenu::slewIndexChanged(int idx)
 	Q_EMIT attrValuesChanged(attrName, OUTPUT_CHNL);
 }
 
+void CurrentOutMenu::onMapUpdated()
+{
+	m_dacCodeSpinButton->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
+			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
+			: m_dacCodeSpinButton->setValue(0);
+	m_dacCodeSpinButton->blockSignals(false);
+
+	m_slewOptions->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL]["slew_en"].first().compare("0") == 0)
+			? m_slewOptions->setCurrentText("Disable")
+			: m_slewOptions->setCurrentText("Enable");
+	m_slewOptions->blockSignals(false);
+
+	m_slewStepOptions->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("slew_step") && !m_attrValues[OUTPUT_CHNL]["slew_step"].isEmpty())
+			? m_slewStepOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_step"].first())
+			: m_slewStepOptions->setCurrentText("ERROR");
+	m_slewStepOptions->blockSignals(false);
+
+	m_slewRateOptions->blockSignals(true);
+	(m_attrValues[OUTPUT_CHNL].contains("slew_rate") && !m_attrValues[OUTPUT_CHNL]["slew_rate"].isEmpty())
+			? m_slewRateOptions->setCurrentText(m_attrValues[OUTPUT_CHNL]["slew_rate"].first())
+			: m_slewRateOptions->setCurrentText("ERROR");
+	m_slewRateOptions->blockSignals(false);
+}
+
 DiagnosticMenu::DiagnosticMenu(QWidget* parent, QString chnlFunction)
 	: BufferMenu(parent, chnlFunction)
 {}
@@ -548,8 +675,7 @@ void DiagnosticMenu::init()
 	QHBoxLayout *diagLayout = new QHBoxLayout();
 	m_diagOptions = new QComboBox(m_widget);
 	setAvailableOptions(m_diagOptions, "diag_function_available");
-	m_diagOptions->setCurrentIndex(0);
-	(m_attrValues[INPUT_CHNL].contains("diag_function") && m_attrValues[INPUT_CHNL]["diag_function"].size() > 0)
+	(m_attrValues[INPUT_CHNL].contains("diag_function") && !m_attrValues[INPUT_CHNL]["diag_function"].isEmpty())
 			? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
 			: m_diagOptions->setCurrentText("ERROR");
 	diagLayout->addWidget(new QLabel("Function", m_widget));
@@ -562,6 +688,7 @@ void DiagnosticMenu::init()
 void DiagnosticMenu::connectSignalsToSlots()
 {
 	connect(m_diagOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DiagnosticMenu::diagIndextChanged);
+	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 }
 
 void DiagnosticMenu::setAvailableOptions(QComboBox *list, QString attrName)
@@ -588,6 +715,15 @@ void DiagnosticMenu::diagIndextChanged(int idx)
 	m_attrValues[INPUT_CHNL][attrName].push_back(diagFunc);
 
 	Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
+}
+
+void DiagnosticMenu::onMapUpdated()
+{
+	m_diagOptions->blockSignals(true);
+	(m_attrValues[INPUT_CHNL].contains("diag_function") && !m_attrValues[INPUT_CHNL]["diag_function"].isEmpty())
+			? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
+			: m_diagOptions->setCurrentText("ERROR");
+	m_diagOptions->blockSignals(false);
 }
 
 WithoutAdvSettings::WithoutAdvSettings(QWidget* parent, QString chnlFunction)
@@ -617,14 +753,26 @@ DigitalInMenu::~DigitalInMenu()
 void DigitalInMenu::init()
 {
 	//threshold
-	QHBoxLayout *thresholdLayout = new QHBoxLayout();
-	m_thresholdSpinButton = new PositionSpinButton({
-							{"mV", 1E0}
-						     },
-						     "Threshold", 0,
-						     16000,
-						     true, false, m_widget);
-	thresholdLayout->addWidget(m_thresholdSpinButton);
+	QVBoxLayout *thresholdLayout = new QVBoxLayout();
+	QRegExp regExp("([0-9]|[1-9][0-9]{1,3}|1[0-5][0-9]{3}|16000)");
+	QRegExpValidator *validator = new QRegExpValidator(regExp, this);
+
+	m_titleLabel = new QLabel("Threshold (0 - 16000 mV)", m_widget);
+	m_titleLabel->setStyleSheet("font-size: 14px;");
+	m_thresholdLineEdit = new QLineEdit(m_widget);
+	m_thresholdLineEdit->setStyleSheet("background: transparent; height: 20px; width: 75px; font-size: 18px; border: 0px; bottom: 10px;");
+	m_thresholdLineEdit->setValidator(validator);
+	m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first());
+	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
+			? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first())
+			: m_thresholdLineEdit->setText(0);
+
+	QFrame *frame = new QFrame(m_widget);
+	frame->setFrameShape(QFrame::HLine);
+	frame->setStyleSheet("color: #4a64ff;");
+	thresholdLayout->addWidget(m_titleLabel);
+	thresholdLayout->addWidget(m_thresholdLineEdit);
+	thresholdLayout->addWidget(frame);
 	addMenuLayout(thresholdLayout);
 
 	connectSignalsToSlots();
@@ -632,10 +780,12 @@ void DigitalInMenu::init()
 
 void DigitalInMenu::connectSignalsToSlots()
 {
-	connect(m_thresholdSpinButton, &PositionSpinButton::valueChanged, this, &DigitalInMenu::thresholdChanged);
+	connect(m_thresholdLineEdit, &QLineEdit::returnPressed, this, &DigitalInMenu::thresholdChanged);
+	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
+	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), this, SLOT(onBroadcastThresholdRead(QString)));
 }
 
-void DigitalInMenu::thresholdChanged(double value)
+void DigitalInMenu::thresholdChanged()
 {
 	QString attrName("threshold");
 	if (!m_attrValues.contains(INPUT_CHNL)) {
@@ -644,11 +794,38 @@ void DigitalInMenu::thresholdChanged(double value)
 	}
 	if (m_attrValues[INPUT_CHNL].contains(attrName)) {
 		m_attrValues[INPUT_CHNL][attrName].clear();
-		m_attrValues[INPUT_CHNL][attrName].push_back(QString::number((int)value));
+		m_attrValues[INPUT_CHNL][attrName].push_back(m_thresholdLineEdit->text());
 		Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
 	} else {
 		qWarning() << attrName.toUpper() + " attribute does not exist!";
 	}
 }
+
+void DigitalInMenu::onMapUpdated()
+{
+	m_thresholdLineEdit->blockSignals(true);
+	if (m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty()) {
+		if (m_attrValues[INPUT_CHNL]["threshold"].first().compare(m_thresholdLineEdit->text()) != 0 ) {
+			Q_EMIT broadcastThresholdReadForward(m_attrValues[INPUT_CHNL]["threshold"].first());
+		}
+		m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first());
+		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first());
+	} else {
+		m_thresholdLineEdit->setText(0);
+	}
+	m_thresholdLineEdit->blockSignals(false);
+}
+
+void DigitalInMenu::onBroadcastThresholdRead(QString value)
+{
+	m_thresholdLineEdit->blockSignals(true);
+	if (value.compare(m_thresholdLineEdit->text()) != 0 ) {
+		m_thresholdLineEdit->setText(value);
+		m_thresholdLineEdit->setPlaceholderText(value);
+		m_attrValues[INPUT_CHNL]["threshold"].first() = value;
+	}
+	m_thresholdLineEdit->blockSignals(false);
+}
+
 
 

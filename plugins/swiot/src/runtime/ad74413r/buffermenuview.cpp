@@ -53,7 +53,7 @@ void swiot::BufferMenuView::initAdvMenu(QMap<QString, QMap<QString, QStringList>
 	m_swiotAdvMenu->setAttrValues(values);
 	m_swiotAdvMenu->init();
 
-	QVector<QHBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
+	QVector<QBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
 	for (int i = 0; i < layers.size(); i++) {
 		m_advanceSettingsSection->getContentWidget()->layout()->addItem(layers[i]);
 	}
