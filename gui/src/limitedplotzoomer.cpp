@@ -23,6 +23,13 @@
 
 using namespace scopy;
 
+LimitedPlotZoomer::LimitedPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis,QWidget *parent, bool doReplot):
+	QwtPlotZoomer(xAxis, yAxis,parent, doReplot),
+	m_boundVertical(false), m_updateBaseNextZoom(true)
+{
+	setMaxStackDepth(5);
+}
+
 LimitedPlotZoomer::LimitedPlotZoomer(QWidget *parent, bool doReplot):
 	QwtPlotZoomer(parent, doReplot),
 	m_boundVertical(false), m_updateBaseNextZoom(true)
