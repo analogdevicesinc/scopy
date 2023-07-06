@@ -23,16 +23,19 @@
 #include "src/runtime/ad74413r/ad74413r.h"
 #include "src/swiot_logging_categories.h"
 #include "chnlinfobuilder.h"
+#include <iioutil/iiocommand/iiochannelattributewrite.h>
+#include <iioutil/iiocommand/iiochannelattributeread.h>
+#include <iioutil/iiocommand/iiodeviceattributeread.h>
 
 using namespace scopy::swiot;
 
-BufferLogic::BufferLogic(QMap<QString, iio_device*> devicesMap) :
-	m_plotChnlsNo(0)
-      ,m_iioDevicesMap(devicesMap)
+BufferLogic::BufferLogic(QMap<QString, iio_device*> devicesMap, CommandQueue *commandQueue)
+	: m_plotChnlsNo(0)
+	, m_iioDevicesMap(devicesMap)
+	, m_commandQueue(commandQueue)
 {
 	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
 		createChannels();
-		m_samplingFreqAvailable = readChnlsSamplingFreqAttr("sampling_frequency_available");
 	}
 }
 
@@ -93,42 +96,83 @@ void BufferLogic::onSamplingFreqChanged(int idx)
 {
 	std::string newSamplingFreq = m_samplingFreqAvailable[idx].toStdString();
 
-	for (int key : m_chnlsInfo.keys()) {
-		if (key > 0 && !m_chnlsInfo[key]->isOutput()) {
-			int returnCode = iio_channel_attr_write(m_chnlsInfo[key]->iioChnl(), SAMPLING_FREQ_ATTR_NAME, newSamplingFreq.c_str());
-			if (returnCode < 0) {
-				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute write error " + QString::number(returnCode);
-			} else {
-				QStringList newSamplingFreq = readChnlsSamplingFreqAttr(SAMPLING_FREQ_ATTR_NAME);
-				int samplingFreq = newSamplingFreq[0].toInt();
-				Q_EMIT samplingFreqWritten(samplingFreq);
-				break;
-			}
-		}
+	if (!m_chnlsInfo.size()) {
+		return;
 	}
+	Command *writeSrCmd = new IioChannelAttributeWrite(m_chnlsInfo.first()->iioChnl(), SAMPLING_FREQ_ATTR_NAME,
+			newSamplingFreq.c_str(), nullptr);
+	connect(writeSrCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+		IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite*>(cmd);
+		if (!tcmd) {
+			return;
+		}
+		if (tcmd->getReturnCode() < 0) {
+			qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute write error " + QString::number(tcmd->getReturnCode());
+		} else {
+			readChnlsSamplingFreqAttr();
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(writeSrCmd);
 }
 
-QStringList BufferLogic::readChnlsSamplingFreqAttr(QString attrName)
+void BufferLogic::readChnlsSamplingFreqAvailableAttr()
 {
-	QStringList attrValues;
-	char* buffer = new char[200];
-	std::string s_attrName = attrName.toStdString();
+	std::string s_attrName = "sampling_frequency_available";
 
-	for (int key : m_chnlsInfo.keys()) {
-		if (key > 0 && !m_chnlsInfo[key]->isOutput()) {
-			int returnCode = iio_channel_attr_read(m_chnlsInfo[key]->iioChnl(), s_attrName.c_str(), buffer, 199);
-			if (returnCode > 0) {
-				QString bufferValues(buffer);
-				attrValues = bufferValues.split(" ");
-				break;
-			} else {
-				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error " + QString::number(returnCode);
+	if (!m_chnlsInfo.size()) {
+		return;
+	}
+	Command *readSrCommand = new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
+	connect(readSrCommand, &scopy::Command::finished,
+		this, [=, this](scopy::Command* cmd) {
+		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
+		if (!tcmd) {
+			return;
+		}
+		QStringList attrValues;
+		char *sr_available = tcmd->getResult();
+
+		if (tcmd->getReturnCode() < 0) {
+			qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
+		} else {
+			QString bufferValues(sr_available);
+			m_samplingFreqAvailable = bufferValues.split(" ");
+			m_samplingFreqAvailable.removeAll("");
+			Q_EMIT samplingFreqAvailableRead(m_samplingFreqAvailable);
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(readSrCommand);
+}
+
+void BufferLogic::readChnlsSamplingFreqAttr()
+{
+	std::string s_attrName = "sampling_frequency";
+
+	if (!m_chnlsInfo.size()) {
+		return;
+	}
+	Command *readSrCommand = new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
+	connect(readSrCommand, &scopy::Command::finished,
+		this, [=, this](scopy::Command* cmd) {
+		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
+		if (!tcmd) {
+			return;
+		}
+		QStringList attrValues;
+		char *srAttrValueStr = tcmd->getResult();
+
+		if (tcmd->getReturnCode() < 0) {
+			qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
+		} else {
+			try {
+				int samplingFreq = std::stoi(srAttrValueStr);
+				Q_EMIT samplingFreqRead(samplingFreq);
+			} catch (std::invalid_argument& exception) {
+				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error conversion: " + QString(srAttrValueStr);
 			}
 		}
-	}
-	attrValues.removeAll("");
-	delete[] buffer;
-	return attrValues;
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(readSrCommand);
 }
 
 int BufferLogic::getPlotChnlsNo()
@@ -174,36 +218,92 @@ QMap<int, QString> BufferLogic::getPlotChnlsId()
 	return chnlsId;
 }
 
-QVector<QString> BufferLogic::getAd74413rChnlsFunctions() {
-	auto result = QVector<QString>();
+void BufferLogic::initAd74413rChnlsFunctions()
+{
 //	on the SWIOT board we have only 4 channels
 	for (int i = 0; i < 4; ++i) {
-		char device[256] = {0};
-		bool isEnable = false;
-		std::string deviceAttributeName = "ch" + std::to_string(i) + "_device";
-		std::string chnlEnableAttribute = "ch" + std::to_string(i) + "_enable";
-		ssize_t deviceReadResult = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], deviceAttributeName.c_str(), device, 255);
-		ssize_t chnlEnableResult = iio_device_attr_read_bool(m_iioDevicesMap[SWIOT_DEVICE_NAME], chnlEnableAttribute.c_str(), &isEnable);
-		if (deviceReadResult > 0 && chnlEnableResult >= 0) {
-			if (!isEnable || (strcmp(device, "max14906") == 0)) {
-				result.push_back("no_config");
-			} else {
-				char function[256] = {0};
-				std::string functionAttributeName = "ch" + std::to_string(i) + "_function";
-				ssize_t functionReadResult = iio_device_attr_read(m_iioDevicesMap[SWIOT_DEVICE_NAME], functionAttributeName.c_str(), function, 255);
-				if (functionReadResult > 0) {
-					result.push_back(QString(function));
-				}
-			}
+		initChannelFunction(i);
+	}
+}
+
+void BufferLogic::initDiagnosticChannels()
+{
+	//	The last 4 channels from context are always the diagnostic channels
+	//	(they are not physically on the board)
+	for (int i = 4; i < MAX_INPUT_CHNLS_NO; i++) {
+		Q_EMIT channelFunctionDetermined(i, "diagnostic");
+	}
+}
+
+void BufferLogic::initChannelFunction(unsigned int i)
+{
+	std::string chnlEnableAttribute = "ch" + std::to_string(i) + "_enable";
+	Command *enabledChnCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
+							    chnlEnableAttribute.c_str(), nullptr);
+	connect(enabledChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+		enabledChnCmdFinished(i, cmd);
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(enabledChnCmd);
+}
+
+void BufferLogic::enabledChnCmdFinished(unsigned int i, scopy::Command *cmd)
+{
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+	if (!tcmd) { return; }
+
+	if (tcmd->getReturnCode() >= 0) {
+		char *result = tcmd->getResult();
+		bool ok = false;
+		bool enabled = QString(result).toInt(&ok);
+		if (!ok) { return; }
+		if (enabled) {
+			std::string deviceAttributeName = "ch" + std::to_string(i) + "_device";
+			Command *configuredDevCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
+									       deviceAttributeName.c_str(), nullptr);
+			connect(configuredDevCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+				configuredDevCmdFinished(i, cmd);
+			}, Qt::QueuedConnection);
+			m_commandQueue->enqueue(configuredDevCmd);
+
+		} else {
+			Q_EMIT channelFunctionDetermined(i, "no_config");
 		}
 	}
-//	The last 4 channels from context are always the diagnostic channels
-//	(they are not physically on the board)
-	for (int i = result.size(); i < MAX_INPUT_CHNLS_NO; i++) {
-		result.push_back("diagnostic");
-	}
+}
 
-	return result;
+void BufferLogic::configuredDevCmdFinished(unsigned int i, scopy::Command *cmd)
+{
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+	if (!tcmd) { return; }
+
+	if (tcmd->getReturnCode() >= 0) {
+		char *result = tcmd->getResult();
+		std::string device = std::string(result);
+		if (device == "ad74413r") {
+			std::string functionAttributeName = "ch" + std::to_string(i) + "_function";
+			Command *chnFunctionCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
+									     functionAttributeName.c_str(), nullptr);
+			connect(chnFunctionCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+				chnFunctionCmdFinished(i, cmd);
+			}, Qt::QueuedConnection);
+			m_commandQueue->enqueue(chnFunctionCmd);
+
+		} else {
+			Q_EMIT channelFunctionDetermined(i, "no_config");
+		}
+	}
+}
+
+void BufferLogic::chnFunctionCmdFinished(unsigned int i, scopy::Command *cmd)
+{
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+	if (!tcmd) { return; }
+
+	if (tcmd->getReturnCode() >= 0) {
+		char *result = tcmd->getResult();
+		QString function = QString(result);
+		Q_EMIT channelFunctionDetermined(i, function);
+	}
 }
 
 QMap<QString, iio_channel*> BufferLogic::getIioChnl(int chnlIdx)

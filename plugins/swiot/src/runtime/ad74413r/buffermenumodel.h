@@ -24,6 +24,7 @@
 
 #include "qobject.h"
 #include <QMap>
+#include <iioutil/commandqueue.h>
 
 extern "C"{
 struct iio_channel;
@@ -33,20 +34,26 @@ namespace scopy::swiot {
 class BufferMenuModel: public QObject{
 	Q_OBJECT
 public:
-	explicit BufferMenuModel(QMap<QString, iio_channel*> chnlsMap = {});
+	explicit BufferMenuModel(QMap<QString, iio_channel*> chnlsMap, CommandQueue *cmdQueue);
 	~BufferMenuModel();
 
 	QMap<QString, QMap<QString, QStringList>> getChnlAttrValues();
-	QStringList readChnlAttr(struct iio_channel* iio_chnl, QString attrName);
-
-	void init();
+	void readChnlAttr(QString iioChannelKey, QString attrName);
+	void writeChnlAttr(QString iioChannelKey, QString attrName, QString attrVal,
+			   QMap<QString, QMap<QString,QStringList>> newValues);
 	void updateChnlAttributes(QMap<QString, QMap<QString,QStringList>> newValues, QString attrName, QString chnlType);
+public Q_SLOTS:
+	void onChannelAttributeRead(QString iioChannelKey, QString attrName, QStringList);
+	void onChannelAttributeWritten(QString iioChannelKey, QString attrName);
 Q_SIGNALS:
 	void attrWritten(QMap<QString, QMap<QString, QStringList>> chnlAttributes);
+	void channelAttributeRead(QString iioChannelKey, QString attrName, QStringList attrValues);
+	void channelAttributeWritten(QString iioChannelKey, QString attrName);
 private:
 	QMap<QString, iio_channel*> m_chnlsMap;
 	QMap<QString, QMap<QString, QStringList>> m_chnlAttributes;
-
+	CommandQueue *m_commandQueue;
+	void init();
 };
 }
 
