@@ -8,6 +8,7 @@
 #include <QtConcurrent>
 #include <QFuture>
 #include <QLoggingCategory>
+#include "iioutil/iioscantask.h"
 
 Q_LOGGING_CATEGORY(CAT_HOME_ADD_PAGE,"ScopyHomeAddPage")
 
@@ -107,8 +108,7 @@ void ScopyHomeAddPage::initAddPage()
 	ui->btnVerify->setEnabled(false);
 	ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
 	ui->labelConnectionLost->clear();
-	ui->comboBoxContexts->addItem("No scanned contexts... Press the refresh button!");
-	ui->comboBoxContexts->setEnabled(false);
+	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
 
 	for (int baudRate : availableBaudRates) {
 		ui->comboBoxBaudRate->addItem(QString::number(baudRate));
@@ -152,31 +152,10 @@ void ScopyHomeAddPage::verifyIioBackend()
 #endif
 	for (int i = 0; i < backEndsCount; i++) {
 		QString backEnd(iio_get_backend(i));
-		if (backEnd.compare("xml") == 0) {
+		if (backEnd.compare("xml") == 0 || (!hasLibSerialPort && backEnd.compare("serial") == 0)) {
 			continue;
 		}
-		if (!hasLibSerialPort && backEnd.compare("serial") == 0) {
-			continue;
-		}
-		QCheckBox *cb = new QCheckBox();
-		cb->setText(backEnd);
-		connect(cb, &QCheckBox::toggled, this, [=](bool en) {
-			if (en) {
-				scanParamsList.push_back(backEnd + ":");
-			} else {
-				scanParamsList.removeOne(backEnd + ":");
-			}
-			if (backEnd.compare("serial") == 0) {
-				ui->serialSettingsWidget->setEnabled(en);
-			}
-			if (scanParamsList.empty()) {
-				ui->btnScan->setEnabled(false);
-			} else if (!ui->btnScan->isEnabled()) {
-				ui->btnScan->setEnabled(true);
-			}
-		});
-		cb->setChecked(true);
-		ui->filterCheckBoxes->layout()->addWidget(cb);
+		createBackEndCheckBox(backEnd);
 		scan = true;
 	}
 	ui->btnScan->setVisible(scan);
@@ -244,17 +223,22 @@ void ScopyHomeAddPage::deviceAddedToUi(QString id)
 
 void ScopyHomeAddPage::scanFinished()
 {
-	ui->btnScan->stopAnimation();
 	int retCode = fwScan->result();
+	ui->btnScan->stopAnimation();
+	ui->comboBoxContexts->clear();
+	ui->uriMessageLabel->clear();
 	if (retCode < 0) {
+		addScanFeedbackMsg("Scan command failed!");
 		qWarning(CAT_HOME_ADD_PAGE) <<"iio_scan_context_get_info_list error " << retCode;
+		return;
+	}
+	if (scanList.isEmpty()) {
+		addScanFeedbackMsg("No scanned contexts available!");
 		return;
 	}
 	if (!ui->comboBoxContexts->isEnabled()) {
 		ui->comboBoxContexts->setEnabled(true);
 	}
-	ui->comboBoxContexts->clear();
-	ui->uriMessageLabel->clear();
 	for (const auto &ctx: qAsConst(scanList)) {
 		ui->comboBoxContexts->addItem(ctx);
 	}
@@ -335,6 +319,37 @@ QString ScopyHomeAddPage::getSerialPath()
 	serialPath.append("," + ui->comboBoxBaudRate->currentText());
 	serialPath.append("," + ui->editSerialFrameConfig->text());
 	return serialPath;
+}
+
+void ScopyHomeAddPage::createBackEndCheckBox(QString backEnd)
+{
+	QCheckBox *cb = new QCheckBox();
+	cb->setText(backEnd);
+	connect(cb, &QCheckBox::toggled, this, [=](bool en) {
+		if (en) {
+			scanParamsList.push_back(backEnd + ":");
+		} else {
+			scanParamsList.removeOne(backEnd + ":");
+		}
+		if (backEnd.compare("serial") == 0) {
+			ui->serialSettingsWidget->setEnabled(en);
+		}
+		if (scanParamsList.empty()) {
+			ui->btnScan->setEnabled(false);
+		} else if (!ui->btnScan->isEnabled()) {
+			ui->btnScan->setEnabled(true);
+		}
+	});
+	cb->setChecked(true);
+	ui->filterCheckBoxes->layout()->addWidget(cb);
+}
+
+void ScopyHomeAddPage::addScanFeedbackMsg(QString message)
+{
+	ui->comboBoxContexts->clear();
+	ui->comboBoxContexts->addItem(message);
+	ui->comboBoxContexts->setEnabled(false);
+	updateUri("");
 }
 
 #include "moc_scopyhomeaddpage.cpp"
