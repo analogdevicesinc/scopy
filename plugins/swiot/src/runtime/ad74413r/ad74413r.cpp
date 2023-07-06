@@ -33,9 +33,9 @@ using namespace scopy::swiot;
 
 Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 	QWidget(parent)
-      ,m_tme(tme), m_statusLabel(new QLabel(this))
-      ,m_swiotAdLogic(nullptr), m_widget(parent)
-      ,m_readerThread(nullptr), m_statusContainer(new QWidget(this))
+      , m_tme(tme), m_statusLabel(new QLabel(this))
+      , m_swiotAdLogic(nullptr), m_widget(parent)
+      , m_readerThread(nullptr), m_statusContainer(new QWidget(this))
       , m_ctx(ctx)
       , m_cmdQueue(CommandQueueProvider::GetInstance()->open(ctx))
       , m_currentChannelSelected(0)
