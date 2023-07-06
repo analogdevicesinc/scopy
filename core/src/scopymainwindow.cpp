@@ -301,8 +301,8 @@ void ScopyMainWindow::initPythonWIN32(){
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
 {
-	hp->addDevice(id,d);
 	toolman->addToolList(id,d->toolList());
+	hp->addDevice(id,d);
 }
 
 void ScopyMainWindow::removeDeviceFromUi(QString id)
