@@ -27,6 +27,8 @@
 #include <QObject>
 #include <QMap>
 #include <iio.h>
+#include <iioutil/command.h>
+#include <iioutil/commandqueue.h>
 #include <cerrno>
 
 extern "C" {
@@ -45,7 +47,7 @@ namespace scopy::swiot {
 class BufferLogic : public QObject {
 	Q_OBJECT
 public:
-	explicit BufferLogic(QMap<QString, iio_device*> devicesMap = {});
+	explicit BufferLogic(QMap<QString, iio_device*> devicesMap, CommandQueue *commandQueue);
 
 	~BufferLogic();
 
@@ -58,8 +60,10 @@ public:
 	QVector<std::pair<int, int>> getPlotChnlsRangeValues();
 	QMap<int, QString> getPlotChnlsId();
 
-	QStringList readChnlsSamplingFreqAttr(QString attrName);
-	QVector<QString> getAd74413rChnlsFunctions();
+	void readChnlsSamplingFreqAttr();
+	void readChnlsSamplingFreqAvailableAttr();
+	void initAd74413rChnlsFunctions();
+	void initDiagnosticChannels();
 
 public Q_SLOTS:
 	void onSamplingFreqChanged(int idx);
@@ -67,8 +71,17 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void chnlsChanged(QMap<int,  ChnlInfo *> chnlsInfo);
 	void samplingFreqWritten(int samplingFreq);
+	void samplingFreqRead(int samplingFreq);
+	void channelFunctionDetermined(unsigned int i, QString function);
+	void samplingFreqAvailableRead(QStringList freqAvailable);
+
+private Q_SLOTS:
+	void enabledChnCmdFinished(unsigned int i, scopy::Command *cmd);
+	void configuredDevCmdFinished(unsigned int i, scopy::Command *cmd);
+	void chnFunctionCmdFinished(unsigned int i, scopy::Command *cmd);
 private:
 	void createChannels();
+	void initChannelFunction(unsigned int i);
 
 private:
 	int m_plotChnlsNo;
@@ -76,6 +89,7 @@ private:
 	QStringList m_samplingFreqAvailable;
 
 	QMap<int, ChnlInfo *> m_chnlsInfo;
+	CommandQueue *m_commandQueue;
 };
 }
 
