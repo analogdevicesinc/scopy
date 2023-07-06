@@ -2,8 +2,9 @@
 
 using namespace scopy::swiot;
 
-VoltageChnlInfo::VoltageChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl)
-	: ChnlInfo(plotUm, hwUm, iioChnl)
+VoltageChnlInfo::VoltageChnlInfo(QString plotUm, QString hwUm,
+				 iio_channel *iioChnl, CommandQueue *cmdQueue)
+	: ChnlInfo(plotUm, hwUm, iioChnl, cmdQueue)
 {
 	m_rangeValues = {MIN_VOLTAGE_VALUE, MAX_VOLTAGE_VALUE};
 }
