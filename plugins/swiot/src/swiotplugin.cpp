@@ -129,6 +129,7 @@ void SWIOTPlugin::unload()
 	disconnect(m_swiotController, &SwiotController::isRuntimeCtxChanged, this, &SWIOTPlugin::onIsRuntimeCtxChanged);
 	disconnect(m_swiotController, &SwiotController::contextSwitched, this, &SWIOTPlugin::onCtxSwitched);
 	delete m_infoPage;
+	delete m_swiotController;
 }
 
 bool SWIOTPlugin::compatible(QString m_param, QString category)
