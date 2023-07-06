@@ -24,6 +24,7 @@
 #include "configcontroller.h"
 #include "configmodel.h"
 #include <iio.h>
+#include <iioutil/commandqueueprovider.h>
 #include "src/swiot_logging_categories.h"
 #include <QVBoxLayout>
 #include <QMessageBox>
@@ -39,6 +40,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	m_mainView(new QWidget(this)),
 	m_statusLabel(new QLabel(this)),
 	m_statusContainer(new QWidget(this)),
+	m_commandQueue(CommandQueueProvider::GetInstance()->open(ctx)),
 	ui(new Ui::ConfigMenu)
 {
 	m_swiotDevice = iio_context_find_device(ctx, "swiot");
@@ -55,25 +57,21 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	this->init();
 	this->createPageLayout();
 	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
-
-	// The "ext_psu" attribute will be checked only once in the config context
-	bool extPowerSupplyConnected = false;
-	int res = iio_device_attr_read_bool(m_swiotDevice, "ext_psu", &extPowerSupplyConnected);
-	if (res < 0) {
-		qWarning(CAT_SWIOT_CONFIG) << "Error, could not read value from \"ext_psu\" from the swiot device.";
-	} else {
-		if (extPowerSupplyConnected) {
-			m_statusLabel->hide();
-		}
-	}
 }
 
-SwiotConfig::~SwiotConfig() {}
+SwiotConfig::~SwiotConfig()
+{
+	if (m_commandQueue) {
+		CommandQueueProvider::GetInstance()->close(m_context);
+		m_commandQueue = nullptr;
+		m_context = nullptr;
+	}
+}
 
 void SwiotConfig::init() {
 	for (int i = 0; i < 4; i++) { // there can only be 4 channels
 		auto *channelView = new ConfigChannelView(i);
-		auto *configModel = new ConfigModel(m_swiotDevice, i);
+		auto *configModel = new ConfigModel(m_swiotDevice, i, m_commandQueue);
 		auto *configController = new ConfigController(channelView, configModel, i);
 		m_controllers.push_back(configController);
 		ui->gridLayout->addWidget(channelView, i + 1, 0, 1, 4);

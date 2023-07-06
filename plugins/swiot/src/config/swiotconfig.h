@@ -25,10 +25,9 @@
 #define AD_NAME "ad74413r"
 #define MAX_NAME "max14906"
 
+#include <iioutil/commandqueue.h>
 #include "configcontroller.h"
-//#include "configmenu.h"
 #include "ui_swiotconfig.h"
-
 #include <gui/tool_view.hpp>
 #include <QPushButton>
 #include <QMap>
@@ -69,6 +68,7 @@ private:
 	QVector<QStringList*> m_funcAvailable;
 	QPushButton* m_configBtn;
 	scopy::gui::ToolView* m_toolView;
+	CommandQueue *m_commandQueue;
 
 	DrawArea* m_drawArea;
 	QScrollArea* m_scrollArea;

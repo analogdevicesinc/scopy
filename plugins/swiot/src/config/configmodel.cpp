@@ -23,12 +23,15 @@
 #include <iio.h>
 #include <QMap>
 #include "src/swiot_logging_categories.h"
+#include <iioutil/iiocommand/iiodeviceattributeread.h>
+#include <iioutil/iiocommand/iiodeviceattributewrite.h>
 
 using namespace scopy::swiot;
 
-ConfigModel::ConfigModel(struct iio_device* device, int channelId) :
+ConfigModel::ConfigModel(struct iio_device* device, int channelId, CommandQueue *commandQueue) :
 	m_device(device),
-	m_channelId(channelId)
+	m_channelId(channelId),
+	m_commandQueue(commandQueue)
 {
 	std::string attributePrefix = "ch" + std::to_string(m_channelId);
 
@@ -42,98 +45,156 @@ ConfigModel::ConfigModel(struct iio_device* device, int channelId) :
 ConfigModel::~ConfigModel()
 {}
 
-QString ConfigModel::readEnabled() {
-	char buffer[16] = {0};
-	ssize_t res = iio_device_attr_read(m_device, m_enableAttribute.c_str(), buffer, 15);
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"enable\" on channel" << m_channelId << "error id ->" << res;
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from enable on channel" << m_channelId;
-		return {buffer};
-	}
+void ConfigModel::readEnabled()
+{
+	Command *enabledChnCmd = new IioDeviceAttributeRead(m_device, m_enableAttribute.c_str(), nullptr);
+	connect(enabledChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+		if (!tcmd) { return; }
 
-	return "0";
+		if (tcmd->getReturnCode() >= 0) {
+			char *result = tcmd->getResult();
+			bool ok = false;
+			bool enabled = QString(result).toInt(&ok);
+			if (!ok) { return; }
+			Q_EMIT readConfigChannelEnabled(enabled);
+		} else {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"enable\" on channel" << m_channelId
+						    << "error id ->" << tcmd->getReturnCode() ;
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(enabledChnCmd);
 }
 
-void ConfigModel::writeEnabled(const QString& enabled) {
-	ssize_t res = iio_device_attr_write(m_device, m_enableAttribute.c_str(), enabled.toStdString().c_str());
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"enable\", (" << enabled << ") on channel" << m_channelId << "error id ->" << res;
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Wrote value " << enabled << "in enable on channel" << m_channelId;
-	}
+void ConfigModel::writeEnabled(const QString& enabled)
+{
+	Command *enabledChnCmd = new IioDeviceAttributeWrite(m_device, m_enableAttribute.c_str(), enabled.toStdString().c_str(), nullptr);
+	connect(enabledChnCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+		IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite*>(cmd);
+		if (!tcmd) {
+			return;
+		}
+		if (tcmd->getReturnCode() < 0) {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"enable\", ("
+						    << enabled << ") on channel"
+						    << m_channelId << "error id ->" << tcmd->getReturnCode();
+		} else {
+			Q_EMIT configChannelEnabled();
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(enabledChnCmd);
 }
 
-QString ConfigModel::readDevice() {
-	char buffer[256] = {0};
-	ssize_t res = iio_device_attr_read(m_device, m_deviceAttribute.c_str(), buffer, 255);
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"device\" on channel" << m_channelId << "error id ->" << res;
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from device on channel" << m_channelId;
-		return {buffer};
-	}
+void ConfigModel::readDevice()
+{
+	Command *deviceChnCmd = new IioDeviceAttributeRead(m_device, m_deviceAttribute.c_str(), nullptr);
+	connect(deviceChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+		if (!tcmd) { return; }
 
-	return "0";
+		if (tcmd->getReturnCode() >= 0) {
+			char *result = tcmd->getResult();
+			Q_EMIT readConfigChannelDevice(result);
+		} else {
+			qDebug(CAT_SWIOT_CONFIG) << "Can't read value from device on channel" << m_channelId
+						 << "error id ->" << tcmd->getReturnCode() ;
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(deviceChnCmd);
 }
 
-void ConfigModel::writeDevice(const QString& device) {
-	ssize_t res = iio_device_attr_write(m_device, m_deviceAttribute.c_str(), device.toStdString().c_str());
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"device\", (" << device << ")  on channel" << m_channelId << "error id ->" << res;
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Wrote value " << device << "in device on channel" << m_channelId;
-	}
+void ConfigModel::writeDevice(const QString& device)
+{
+	Command *deviceChnCmd = new IioDeviceAttributeWrite(m_device, m_deviceAttribute.c_str(), device.toStdString().c_str(), nullptr);
+	connect(deviceChnCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+		IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite*>(cmd);
+		if (!tcmd) {
+			return;
+		}
+		if (tcmd->getReturnCode() < 0) {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"device\", ("
+						    << device << ") on channel"
+						    << m_channelId << "error id ->" << tcmd->getReturnCode();
+		} else {
+			Q_EMIT configChannelDevice();
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(deviceChnCmd);
 }
 
-QString ConfigModel::readFunction() {
-	char buffer[256] = {0};
-	ssize_t res = iio_device_attr_read(m_device, m_functionAttribute.c_str(), buffer, 255);
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function\" on channel" << m_channelId << "error id ->" << res;
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from function on channel" << m_channelId;
-		return {buffer};
-	}
+void ConfigModel::readFunction()
+{
+	Command *functionChnCmd = new IioDeviceAttributeRead(m_device, m_functionAttribute.c_str(), nullptr);
+	connect(functionChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+		if (!tcmd) { return; }
 
-	return "0";
+		if (tcmd->getReturnCode() >= 0) {
+			char *result = tcmd->getResult();
+			Q_EMIT readConfigChannelFunction(result);
+		} else {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function\" on channel"
+						    << m_channelId << "error id ->" << tcmd->getReturnCode() ;
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(functionChnCmd);
 }
 
-void ConfigModel::writeFunction(const QString& function) {
-	ssize_t res = iio_device_attr_write(m_device, m_functionAttribute.c_str(), function.toStdString().c_str());
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"function\", (" << function << ")  on channel" << m_channelId << "error id ->" << res;
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Wrote value " << function << "in function on channel" << m_channelId;
-	}
+void ConfigModel::writeFunction(const QString& function)
+{
+	Command *functionChnCmd = new IioDeviceAttributeWrite(m_device, m_functionAttribute.c_str(), function.toStdString().c_str(), nullptr);
+	connect(functionChnCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
+		IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite*>(cmd);
+		if (!tcmd) {
+			return;
+		}
+		if (tcmd->getReturnCode() < 0) {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not write attribute \"function\", ("
+						    << function << ") on channel"
+						    << m_channelId << "error id ->" << tcmd->getReturnCode();
+		} else {
+			Q_EMIT configChannelFunction();
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(functionChnCmd);
 }
 
-QStringList ConfigModel::readDeviceAvailable() {
-	char buffer[512] = {0};
-	ssize_t res = iio_device_attr_read(m_device, m_deviceAvailableAttribute.c_str(), buffer, 511);
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"device available\" on channel" << m_channelId << "error id ->" << res;
-		return {};
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from device available on channel" << m_channelId;
-	}
+void ConfigModel::readDeviceAvailable()
+{
+	Command *deviceAvailableChnCmd = new IioDeviceAttributeRead(m_device, m_deviceAvailableAttribute.c_str(), nullptr);
+	connect(deviceAvailableChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+		if (!tcmd) { return; }
 
-	QStringList result = QString(buffer).split(" ");
-	return result;
+		if (tcmd->getReturnCode() >= 0) {
+			char *result = tcmd->getResult();
+			QStringList resultList = QStringList(QString(result).split(" "));
+			Q_EMIT readConfigChannelDeviceAvailable(resultList);
+		} else {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function available\" on channel"
+						    << m_channelId << "error id ->" << tcmd->getReturnCode();
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(deviceAvailableChnCmd);
 }
 
-QStringList ConfigModel::readFunctionAvailable() {
-	char buffer[512] = {0};
-	ssize_t res = iio_device_attr_read(m_device, m_functionAvailableAttribute.c_str(), buffer, 511);
-	if (res < 0) {
-		qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"function available\" on channel" << m_channelId << "error id ->" << res;
-		return {};
-	} else {
-		qDebug(CAT_SWIOT_CONFIG) << "Read value \"" << buffer << "\" from function available on channel" << m_channelId;
-	}
+void ConfigModel::readFunctionAvailable()
+{
+	Command *functionAvailableChnCmd = new IioDeviceAttributeRead(m_device, m_functionAvailableAttribute.c_str(), nullptr);
+	connect(functionAvailableChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
+		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
+		if (!tcmd) { return; }
 
-	QStringList result = QString(buffer).split(" ");
-	return result;
+		if (tcmd->getReturnCode() >= 0) {
+			char *result = tcmd->getResult();
+			QStringList resultList = QStringList(QString(result).split(" "));
+			Q_EMIT readConfigChannelFunctionAvailable(resultList);
+		} else {
+			qCritical(CAT_SWIOT_CONFIG) << "Error: could not read attribute \"device available\" on channel"
+						    << m_channelId << "error id ->" << tcmd->getReturnCode();
+		}
+	}, Qt::QueuedConnection);
+	m_commandQueue->enqueue(functionAvailableChnCmd);
 }
 
 
