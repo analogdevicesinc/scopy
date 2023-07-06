@@ -26,11 +26,13 @@ using namespace scopy::swiot;
 
 ConfigController::ConfigController(ConfigChannelView *channelView,
 				   ConfigModel *model,
-				   int channelId) :
-	m_channelsView(channelView), m_model(model), m_channelId(channelId)
+				   int channelId)
+	: m_channelsView(channelView)
+	, m_model(model)
+	, m_channelId(channelId)
 {
-	this->initChannelView();
 	this->connectSignalsAndSlots();
+	this->initChannelView();
 }
 
 ConfigController::~ConfigController() {
@@ -45,7 +47,29 @@ ConfigController::~ConfigController() {
 	}
 }
 
-void ConfigController::connectSignalsAndSlots() {
+void ConfigController::connectSignalsAndSlots()
+{
+	connect(m_model, &ConfigModel::readConfigChannelEnabled, this, [=, this] (bool enabled) {
+		m_channelsView->setChannelEnabled(enabled);
+	});
+	connect(m_model, &ConfigModel::readConfigChannelDevice, this, [=, this] (QString device) {
+		m_channelsView->setSelectedDevice(device);
+	});
+	connect(m_model, &ConfigModel::readConfigChannelFunction, this, [=, this] (QString function) {
+		m_channelsView->setSelectedFunction(function);
+	});
+	connect(m_model, &ConfigModel::readConfigChannelDeviceAvailable, this, [=, this] (QStringList devicesAvailable) {
+		m_channelsView->setDeviceAvailable(devicesAvailable);
+	});
+	connect(m_model, &ConfigModel::readConfigChannelFunctionAvailable, this, [=, this] (QStringList functionsAvailable) {
+		m_channelsView->setFunctionAvailable(functionsAvailable);
+	});
+	connect(m_model, &ConfigModel::configChannelDevice, this, [=, this] () {
+		m_model->readDevice();
+		m_model->readFunctionAvailable();
+		m_model->readFunction();
+	});
+
 	QObject::connect(m_channelsView, &ConfigChannelView::enabledChanged, this, [this] (int index, bool value) {
 		if (m_channelId == index) {
 			if (value) {
@@ -60,13 +84,6 @@ void ConfigController::connectSignalsAndSlots() {
 		if (m_channelId == index) {
 			m_model->writeDevice(device);
 			Q_EMIT clearDrawArea();
-			m_channelsView->setSelectedDevice(device);
-
-			QStringList functionsAvailable = m_model->readFunctionAvailable();
-			m_channelsView->setFunctionAvailable(functionsAvailable);
-
-			QString selectedFunction = m_model->readFunction();
-			m_channelsView->setSelectedFunction(selectedFunction);
 		}
 	});
 
@@ -78,18 +95,10 @@ void ConfigController::connectSignalsAndSlots() {
 }
 
 void ConfigController::initChannelView() {
-	QString enabled = m_model->readEnabled();
-	m_channelsView->setChannelEnabled((enabled == "1"));
 
-	QStringList devicesAvailable = m_model->readDeviceAvailable();
-	m_channelsView->setDeviceAvailable(devicesAvailable);
-
-	QString selectedDevice = m_model->readDevice();
-	m_channelsView->setSelectedDevice(selectedDevice);
-
-	QStringList functionsAvailable = m_model->readFunctionAvailable();
-	m_channelsView->setFunctionAvailable(functionsAvailable);
-
-	QString selectedFunction = m_model->readFunction();
-	m_channelsView->setSelectedFunction(selectedFunction);
+	m_model->readEnabled();
+	m_model->readDeviceAvailable();
+	m_model->readDevice();
+	m_model->readFunctionAvailable();
+	m_model->readFunction();
 }
