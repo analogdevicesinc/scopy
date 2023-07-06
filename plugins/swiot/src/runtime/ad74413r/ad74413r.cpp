@@ -38,6 +38,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
       ,m_readerThread(nullptr), m_statusContainer(new QWidget(this))
       , m_ctx(ctx)
       , m_cmdQueue(CommandQueueProvider::GetInstance()->open(ctx))
+      , m_currentChannelSelected(0)
 {
 	createDevicesMap(m_ctx);
 	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
@@ -47,14 +48,11 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 			m_backBtn = createBackBtn();
 			m_enabledChannels = std::vector<bool>(MAX_CURVES_NUMBER, false);
 
-			m_swiotAdLogic = new BufferLogic(m_iioDevicesMap);
+			m_swiotAdLogic = new BufferLogic(m_iioDevicesMap, m_cmdQueue);
 			m_readerThread = new ReaderThread(true, m_cmdQueue, this);
 			m_readerThread->addBufferedDevice(m_iioDevicesMap[AD_NAME]);
+			m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo());
 
-			QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
-			int samplingFreq = actualSamplingFreq[0].toInt();
-			m_readerThread->onSamplingFreqWritten(samplingFreq);
-			m_plotHandler = new BufferPlotHandler(this, m_swiotAdLogic->getPlotChnlsNo(), samplingFreq);
 			QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
 			m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
 			QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
@@ -65,7 +63,9 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 			gui::GenericMenu *settingsMenu = createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
 			setupToolView(settingsMenu);
 			setupConnections();
-			initMonitorToolView(settingsMenu);
+			m_swiotAdLogic->readChnlsSamplingFreqAvailableAttr();
+			m_swiotAdLogic->readChnlsSamplingFreqAttr();
+			m_swiotAdLogic->initAd74413rChnlsFunctions();
 		}
 	}
 
@@ -143,8 +143,17 @@ void Ad74413r::setupConnections()
 	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, &Ad74413r::onSingleBtnPressed);
 	connect(m_plotHandler, &BufferPlotHandler::singleCaptureFinished, this, &Ad74413r::onSingleCaptureFinished);
 
-	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_plotHandler, &BufferPlotHandler::onSamplingFreqWritten);
-	connect(m_swiotAdLogic, &BufferLogic::samplingFreqWritten, m_readerThread, &ReaderThread::onSamplingFreqWritten);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFreqRead, m_plotHandler, &BufferPlotHandler::onSamplingFreqWritten);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFreqRead, m_readerThread, &ReaderThread::onSamplingFreqWritten);
+	connect(m_swiotAdLogic, &BufferLogic::channelFunctionDetermined, this, &Ad74413r::initChannelToolView);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFreqRead, this, [=, this] (int sampFreq) {
+		if (m_samplingFreqOptions->currentText() != QString::number(sampFreq)) {
+			m_samplingFreqOptions->setCurrentText(QString::number(sampFreq));
+		}
+	});
+	connect(m_swiotAdLogic, &BufferLogic::samplingFreqAvailableRead, this, [=, this] (QStringList availableFreq) {
+		m_samplingFreqOptions->addItems(availableFreq);
+	});
 
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
@@ -159,49 +168,42 @@ void Ad74413r::setupConnections()
 	connect(m_toolView->getPrintBtn(), &QPushButton::clicked, m_plotHandler, &BufferPlotHandler::onPrintBtnClicked);
 }
 
-void Ad74413r::initMonitorToolView(gui::GenericMenu *settingsMenu)
+void Ad74413r::initChannelToolView(unsigned int i, QString function)
 {
-	int chId = 1;
-	bool first = true;
-	QVector<QString> chnlsFunctions = m_swiotAdLogic->getAd74413rChnlsFunctions();
+	if (function.compare("no_config") != 0) {
+		int nextColorId = m_monitorChannelManager->getChannelsCount();
+		QString menuTitle(((QString(AD_NAME).toUpper() + " - Channel ") + QString::number(i+1)) + (": " + function));
+		BufferMenuView *menu = new BufferMenuView(this);
+		//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
+		//that's why we have to decrease by 1
+		menu->init(menuTitle, function, new QColor(m_plotHandler->getCurveColor(nextColorId)));
 
-	for (int i = 0; i < chnlsFunctions.size(); i++) {
-		if (chnlsFunctions[i].compare("no_config") != 0) {
+		QMap<QString, iio_channel*> chnlsMap = m_swiotAdLogic->getIioChnl(i);
+		BufferMenuModel* swiotModel = new BufferMenuModel(chnlsMap, m_cmdQueue);
+		BufferMenuController* controller = new BufferMenuController(menu, swiotModel, i);
 
-			QString menuTitle(((QString(AD_NAME).toUpper() + " - Channel ") + QString::number(i+1)) + (": " + chnlsFunctions[i]));
-			BufferMenuView *menu = new BufferMenuView(this);
-			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
-			//that's why we have to decrease by 1
-			menu->init(menuTitle, chnlsFunctions[i], new QColor(m_plotHandler->getCurveColor(chId-1)));
-
-			QMap<QString, iio_channel*> chnlsMap = m_swiotAdLogic->getIioChnl(i);
-			BufferMenuModel* swiotModel = new BufferMenuModel(chnlsMap);
-			BufferMenuController* controller = new BufferMenuController(menu, swiotModel, i);
-
-			controller->addMenuAttrValues();
-			if (controller) {
-				m_controllers.push_back(controller);
-			}
-			QString chnlWidgetName(chnlsFunctions[i] +" "+QString::number(i+1));
-			//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
-			//that's why we have to decrease by 1
-			ChannelWidget *chWidget =
-					m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, -1, false, false,
-								    m_plotHandler->getCurveColor(chId-1), chnlWidgetName, chnlWidgetName);
-			chWidget->setIsPhysicalChannel(true);
-			if (first) {
-				chWidget->menuButton()->click();
-				first = false;
-			}
-			controller->createConnections();
-			m_channelWidgetList.push_back(chWidget);
-			if (chnlsFunctions[i].compare("diagnostic") == 0) {
-				chWidget->enableButton()->setChecked(false);
-			}
-			chId++;
-			connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastReadThreshold(QString)));
-			connect(this, SIGNAL(broadcastReadThreshold(QString)), controller, SIGNAL(broadcastThresholdReadBackward(QString)));
+		controller->addMenuAttrValues();
+		if (controller) {
+			m_controllers.push_back(controller);
 		}
+		QString chnlWidgetName(function + " " + QString::number(i+1));
+		//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
+		//that's why we have to decrease by 1
+		ChannelWidget *chWidget =
+				m_toolView->buildNewChannel(m_monitorChannelManager, menu, false, -1, false, false,
+							    m_plotHandler->getCurveColor(nextColorId), chnlWidgetName, chnlWidgetName);
+		chWidget->setIsPhysicalChannel(true);
+		controller->createConnections();
+		m_channelWidgetList.push_back(chWidget);
+		if (function.compare("diagnostic") == 0) {
+			chWidget->enableButton()->setChecked(false);
+		}
+		connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastReadThreshold(QString)));
+		connect(this, SIGNAL(broadcastReadThreshold(QString)), controller, SIGNAL(broadcastThresholdReadBackward(QString)));
+	}
+	m_currentChannelSelected++;
+	if (m_currentChannelSelected == 4) {
+		m_swiotAdLogic->initDiagnosticChannels();
 	}
 }
 
@@ -240,19 +242,6 @@ scopy::gui::GenericMenu* Ad74413r::createSettingsMenu(QString title, QColor* col
 	//channels sampling freq
 	auto *samplingFreqLayout = new QHBoxLayout();
 	m_samplingFreqOptions = new QComboBox(generalSubsection->getContentWidget());
-
-	QStringList actualSamplingFreq = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency");
-	QStringList samplingFreqValues = m_swiotAdLogic->readChnlsSamplingFreqAttr("sampling_frequency_available");
-	int actualSamplingFreqIdx = 0;
-	int valuesIdx = 0;
-	for (QString val : samplingFreqValues) {
-		m_samplingFreqOptions->addItem(val);
-		if (val.compare(actualSamplingFreq[0]) == 0) {
-			actualSamplingFreqIdx = valuesIdx;
-		}
-		valuesIdx++;
-	}
-	m_samplingFreqOptions->setCurrentIndex(actualSamplingFreqIdx);
 	samplingFreqLayout->addWidget(new QLabel("Sampling frequency",generalSubsection->getContentWidget()));
 	samplingFreqLayout->addWidget(m_samplingFreqOptions);
 

@@ -58,7 +58,7 @@ public:
 
 	~Ad74413r();
 
-	void initMonitorToolView(gui::GenericMenu *settingsMenu);
+	void initChannelToolView(unsigned int i, QString function);
 
 	void initExportSettings(QWidget *parent);
 
@@ -106,6 +106,7 @@ private:
 private:
 	QMap<QString, iio_device*> m_iioDevicesMap;
 	int m_enabledChnlsNo = 0;
+	int m_currentChannelSelected;
 
 	scopy::gui::ChannelManager *m_monitorChannelManager;
 	scopy::gui::ToolView *m_toolView;
