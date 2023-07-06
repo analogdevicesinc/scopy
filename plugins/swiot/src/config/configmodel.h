@@ -25,6 +25,7 @@
 #include "qobject.h"
 #include <QMap>
 #include <string>
+#include <iioutil/commandqueue.h>
 
 extern "C"{
 struct iio_channel;
@@ -35,20 +36,30 @@ namespace scopy::swiot {
 class ConfigModel : public QObject {
 	Q_OBJECT
 public:
-	explicit ConfigModel(struct iio_device* device, int channelId);
+	explicit ConfigModel(struct iio_device* device, int channelId, CommandQueue *m_commandQueue);
 	~ConfigModel();
 
-	QString readEnabled();
+	void readEnabled();
 	void writeEnabled(const QString& enabled);
 
-	QString readDevice();
+	void readDevice();
 	void writeDevice(const QString& device);
 
-	QString readFunction();
+	void readFunction();
 	void writeFunction(const QString& function);
 
-	QStringList readDeviceAvailable();
-	QStringList readFunctionAvailable();
+	void readDeviceAvailable();
+	void readFunctionAvailable();
+Q_SIGNALS:
+	void readConfigChannelEnabled(bool);
+	void readConfigChannelDevice(QString);
+	void readConfigChannelFunction(QString);
+	void readConfigChannelDeviceAvailable(QStringList);
+	void readConfigChannelFunctionAvailable(QStringList);
+
+	void configChannelEnabled();
+	void configChannelDevice();
+	void configChannelFunction();
 
 private:
 	struct iio_device* m_device;
@@ -63,6 +74,7 @@ private:
 	QString m_enabled;
 	QStringList m_availableDevices;
 	QStringList m_availableFunctions;
+	CommandQueue *m_commandQueue;
 };
 }
 #endif // CONFIGMODEL_H
