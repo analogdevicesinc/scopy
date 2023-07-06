@@ -77,13 +77,13 @@ Ad74413r::~Ad74413r()
 		m_readerThread->requestStop();
 		delete m_readerThread;
 	}
+	if (m_controllers.size() > 0) {
+		m_controllers.clear();
+	}
 	if (m_cmdQueue) {
 		CommandQueueProvider::GetInstance()->close(m_ctx);
 		m_cmdQueue = nullptr;
 		m_ctx = nullptr;
-	}
-	if (m_controllers.size() > 0) {
-		m_controllers.clear();
 	}
 }
 
