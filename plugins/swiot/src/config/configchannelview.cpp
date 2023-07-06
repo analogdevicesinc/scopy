@@ -47,14 +47,14 @@ ConfigChannelView::~ConfigChannelView() {
 }
 
 void ConfigChannelView::connectSignalsAndSlots() {
-	QObject::connect(this->ui->enabledCheckBox, &QCheckBox::stateChanged, this, [this]() {
-		this->setChannelEnabled(this->ui->enabledCheckBox->isChecked());
+	QObject::connect(this->ui->enabledCheckBox, &QCheckBox::stateChanged, this, [=, this](int state) {
+		this->setChannelEnabled(state);
 		if (m_channelEnabled) {
 			Q_EMIT showPath(m_channelIndex, m_selectedDevice);
 		} else {
 			Q_EMIT hidePaths();
 		}
-		Q_EMIT enabledChanged(m_channelIndex, this->ui->enabledCheckBox->isChecked());
+		Q_EMIT enabledChanged(m_channelIndex, state);
 	});
 
 	QObject::connect(this->ui->deviceOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
@@ -72,7 +72,6 @@ bool ConfigChannelView::isChannelEnabled() const {
 
 void ConfigChannelView::setChannelEnabled(bool mChannelEnabled) {
 	m_channelEnabled = mChannelEnabled;
-	this->ui->enabledCheckBox->setChecked(m_channelEnabled);
 
 	if (m_channelEnabled) {
 		this->ui->deviceOptions->setEnabled(true);
