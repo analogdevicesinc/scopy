@@ -30,7 +30,10 @@ BufferMenuController::BufferMenuController(BufferMenuView* genericMenu, BufferMe
 {}
 
 BufferMenuController::~BufferMenuController()
-{}
+{
+	delete m_model;
+	delete m_genericMenu;
+}
 
 void BufferMenuController::addMenuAttrValues()
 {
