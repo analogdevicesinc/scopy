@@ -1,8 +1,9 @@
 #include "currentchnlinfo.h"
 
 using namespace scopy::swiot;
-CurrentChnlInfo::CurrentChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl)
-	: ChnlInfo(plotUm, hwUm, iioChnl)
+CurrentChnlInfo::CurrentChnlInfo(QString plotUm, QString hwUm,
+				 iio_channel *iioChnl, CommandQueue *cmdQueue)
+	: ChnlInfo(plotUm, hwUm, iioChnl, cmdQueue)
 {
 	m_rangeValues = {MIN_CURRENT_VALUE, MAX_CURRENT_VALUE};
 }
