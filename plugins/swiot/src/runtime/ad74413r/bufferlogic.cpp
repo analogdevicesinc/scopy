@@ -186,7 +186,7 @@ QVector<QString> BufferLogic::getPlotChnlsUnitOfMeasure()
 {
 	QVector<QString> chnlsUnitOfMeasure;
 
-	for (ChnlInfo* chnl : m_chnlsInfo) {
+	for (ChnlInfo* chnl : qAsConst(m_chnlsInfo)) {
 		if (chnl->isScanElement() && !chnl->isOutput()) {
 			QString unitOfMeasure = chnl->unitOfMeasure();
 			chnlsUnitOfMeasure.push_back(unitOfMeasure);
@@ -198,7 +198,7 @@ QVector<QString> BufferLogic::getPlotChnlsUnitOfMeasure()
 QVector<std::pair<int, int>> BufferLogic::getPlotChnlsRangeValues()
 {
 	QVector<std::pair<int, int>> chnlsRangeValues;
-	for (ChnlInfo* chnl : m_chnlsInfo) {
+	for (ChnlInfo* chnl : qAsConst(m_chnlsInfo)) {
 		if (chnl->isScanElement() && !chnl->isOutput()) {
 			std::pair<int, int> rangeValues = chnl->rangeValues();
 			chnlsRangeValues.push_back(rangeValues);
