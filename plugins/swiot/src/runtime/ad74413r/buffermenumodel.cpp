@@ -42,7 +42,8 @@ BufferMenuModel::~BufferMenuModel()
 void BufferMenuModel::init()
 {
 	if (m_chnlsMap.size() > 0) {
-		for (const QString &key : m_chnlsMap.keys()) {
+		auto keys = m_chnlsMap.keys();
+		for (const QString &key : keys) {
 			int chnlAttrNumber = iio_channel_get_attrs_count(m_chnlsMap[key]);
 			QStringList attrValues;
 			for (int i = 0; i < chnlAttrNumber; i++) {

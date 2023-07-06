@@ -210,7 +210,8 @@ QVector<std::pair<int, int>> BufferLogic::getPlotChnlsRangeValues()
 QMap<int, QString> BufferLogic::getPlotChnlsId()
 {
 	QMap<int, QString> chnlsId;
-	for (int key : m_chnlsInfo.keys()){
+	auto keys = m_chnlsInfo.keys();
+	for (int key : keys){
 		if (m_chnlsInfo[key]->isScanElement() && !m_chnlsInfo[key]->isOutput()) {
 			QString chnlId = m_chnlsInfo[key]->chnlId();
 			chnlsId[key] = chnlId;
