@@ -2,8 +2,9 @@
 
 using namespace scopy::swiot;
 
-ResistanceChnlInfo::ResistanceChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl)
-	: ChnlInfo(plotUm, hwUm, iioChnl)
+ResistanceChnlInfo::ResistanceChnlInfo(QString plotUm, QString hwUm,
+				       iio_channel *iioChnl, CommandQueue *cmdQueue)
+	: ChnlInfo(plotUm, hwUm, iioChnl, cmdQueue)
 {
 	m_rangeValues = {MIN_RESISTANCE_VALUE, MAX_RESISTANCE_VALUE};
 }

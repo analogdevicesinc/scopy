@@ -25,7 +25,7 @@ public:
 			return -1;
 		}
 	}
-	static ChnlInfo* build(iio_channel *iioChnl, QString id);
+	static ChnlInfo* build(iio_channel *iioChnl, QString id, CommandQueue *cmdQueue);
 
 };
 }
