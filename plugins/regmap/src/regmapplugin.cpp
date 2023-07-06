@@ -50,10 +50,6 @@ void RegmapPlugin::loadToolList()
 void RegmapPlugin::unload()
 {
     //TODO
-    auto &&cp = ContextProvider::GetInstance();
-    cp->close(m_param);
-    if (m_registerMapWidget) delete m_registerMapWidget;
-    if (m_deviceList) delete m_deviceList;
 }
 
 bool RegmapPlugin::compatible(QString m_param, QString category)
@@ -160,8 +156,11 @@ bool RegmapPlugin::onConnect()
 bool RegmapPlugin::onDisconnect()
 {
     //TODO
-    delete m_deviceList;
-    delete m_registerMapWidget;
+    auto &&cp = ContextProvider::GetInstance();
+    cp->close(m_param);
+
+    if (m_registerMapWidget) delete m_registerMapWidget;
+    if (m_deviceList) delete m_deviceList;
 
     return true;
 }
