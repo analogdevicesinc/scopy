@@ -1,12 +1,16 @@
 #include "chnlinfo.h"
 #include <math.h>
+#include <iioutil/iiocommand/iiochannelattributeread.h>
 
 using namespace scopy::swiot;
 
-ChnlInfo::ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl) :
+ChnlInfo::ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQueue *cmdQueue) :
 	m_iioChnl(iioChnl),
-	m_plotUm(plotUm), m_hwUm(hwUm)
+	m_plotUm(plotUm),
+	m_hwUm(hwUm),
+	m_commandQueue(cmdQueue)
 {
+	m_offsetScalePair = {1, 0};
 	if (m_iioChnl) {
 		iio_channel_disable(iioChnl);
 		m_chnlId = QString(iio_channel_get_id(m_iioChnl));
@@ -14,22 +18,68 @@ ChnlInfo::ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl) :
 		double scale = 0.0;
 		int erno = 0;
 		m_isOutput = iio_channel_is_output(iioChnl);
-		erno = iio_channel_attr_read_double(iioChnl, "offset", &offset);
-		iio_channel_attr_read_double(iioChnl, "scale", &scale);
-		if (erno < 0) {
-			scale = 1;
-			offset = 0;
-		}
+
+		Command *attrReadScale = new IioChannelAttributeRead(m_iioChnl, "scale", nullptr);
+		Command *attrReadOffset = new IioChannelAttributeRead(m_iioChnl, "offset", nullptr);
+
+		connect(attrReadScale, &scopy::Command::finished, this,
+			&ChnlInfo::readScaleCommandFinished, Qt::QueuedConnection);
+		connect(attrReadOffset, &scopy::Command::finished, this,
+			&ChnlInfo::readOffsetCommandFinished, Qt::QueuedConnection);
+		m_commandQueue->enqueue(attrReadScale);
+		m_commandQueue->enqueue(attrReadOffset);
+
 		m_isScanElement = iio_channel_is_scan_element(iioChnl);
 		m_isEnabled = false;
-		m_offsetScalePair = {offset, scale};
+
 		initUnitOfMeasureFactor();
 	}
 }
 
 ChnlInfo::~ChnlInfo()
 {
+	if (m_commandQueue) {
+		m_commandQueue = nullptr;
+	}
 }
+
+
+void ChnlInfo::readScaleCommandFinished(Command *cmd)
+{
+	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
+	if (!tcmd) {
+		return;
+	}
+	if (tcmd->getReturnCode() >= 0) {
+		char *res = tcmd->getResult();
+		bool ok = false;
+		double scale = QString(res).toDouble(&ok);
+		if (ok) {
+			m_offsetScalePair.first = scale;
+		}
+	} else {
+//		qDebug(CAT_SWIOT) << "Error, could not read \"scale\" attribute for channel.";
+	}
+}
+
+void ChnlInfo::readOffsetCommandFinished(Command *cmd)
+{
+	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
+	if (!tcmd) {
+		return;
+	}
+	if (tcmd->getReturnCode() >= 0) {
+		char *res = tcmd->getResult();
+		bool ok = false;
+		double offset = QString(res).toDouble(&ok);
+		if (ok) {
+			m_offsetScalePair.second = offset;
+		}
+	} else {
+//		qDebug(CAT_SWIOT) << "Error, could not read \"offset\" attribute from channel";
+	}
+}
+
 
 iio_channel *ChnlInfo::iioChnl() const
 {

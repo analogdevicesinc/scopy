@@ -11,7 +11,8 @@ class ResistanceChnlInfo : public ChnlInfo
 {
 	Q_OBJECT
 public:
-	explicit ResistanceChnlInfo(QString plotUm = "Ω", QString hwUm = "Ω", iio_channel *iioChnl = nullptr);
+	explicit ResistanceChnlInfo(QString plotUm = "Ω", QString hwUm = "Ω",
+				    iio_channel *iioChnl = nullptr, CommandQueue *cmdQueue = nullptr);
 	~ResistanceChnlInfo();
 
 	double convertData(unsigned int data) override;
