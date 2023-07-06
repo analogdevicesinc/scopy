@@ -141,7 +141,8 @@ void BufferPlotHandler::setHandlesName(QMap<int, QString> chnlsId)
 	int mapSize = chnlsId.size();
 	int activeChnlsIndex = 0;
 	if (mapSize == offsetHandlesSize) {
-		for (int key : chnlsId.keys()) {
+		auto keys = chnlsId.keys();
+		for (int key : keys) {
 			if (activeChnlsIndex < (m_plotChnlsNo - DIAG_CHNLS_NUMBER)) {
 				QString chId = QString::number(key + 1);
 				offsetHandles[activeChnlsIndex]->setName(chnlsId[key][0].toUpper() + chId);
