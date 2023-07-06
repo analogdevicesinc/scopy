@@ -36,7 +36,7 @@ class BufferPlotHandler : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit BufferPlotHandler(QWidget *parent = nullptr, int plotChnlsNo = 0, int sampleRate = 0);
+	explicit BufferPlotHandler(QWidget *parent = nullptr, int plotChnlsNo = 0);
 	~BufferPlotHandler();
 
 	QColor getCurveColor(int id) const;

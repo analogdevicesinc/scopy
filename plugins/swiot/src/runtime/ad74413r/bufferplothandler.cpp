@@ -32,16 +32,13 @@
 
 using namespace scopy::swiot;
 
-BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo, int samplingFreq) :
+BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo) :
 	QWidget(parent)
 {
 	m_lock = new QMutex();
 	m_plotChnlsNo = plotChnlsNo;
-	m_samplingFreq = samplingFreq;
-	m_bufferSize = (m_samplingFreq > MAX_BUFFER_SIZE) ? MAX_BUFFER_SIZE : MIN_BUFFER_SIZE;
 	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter, QwtAxis::YRight);
 	initPlot(plotChnlsNo);
-	resetPlotParameters();
 	readPreferences();
 }
 BufferPlotHandler::~BufferPlotHandler()
