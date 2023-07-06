@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include "deviceimpl.h"
-#include "iioutil/iioscantask.h"
 #include "infopage.h"
 #include "pluginenablewidget.h"
 #include "pluginmanager.h"
@@ -51,6 +50,8 @@ private:
 	void createDevice();
 	void removePluginsCheckBoxes();
 	QString getSerialPath();
+	void createBackEndCheckBox(QString backEnd);
+	void addScanFeedbackMsg(QString message);
 
 	Ui::ScopyHomeAddPage *ui;
 	QString pendingUri;
