@@ -38,7 +38,7 @@ void SwiotPingTask::getTriggerCommandFinished(scopy::Command *cmd)
 		return;
 	}
 	int ret = tcmd->getReturnCode();
-	if (tcmd->getReturnCode() >= 0 || tcmd->getReturnCode() == -ENOENT) {
+	if (ret>= 0 || ret == -ENOENT) {
 		Q_EMIT pingSuccess();
 	} else {
 		Q_EMIT pingFailed();
