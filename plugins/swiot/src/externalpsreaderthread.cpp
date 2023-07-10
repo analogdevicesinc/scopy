@@ -28,8 +28,8 @@
 
 using namespace scopy::swiot;
 
-ExternalPsReaderThread::ExternalPsReaderThread(QString uri, QString attr)
-	: QThread()
+ExternalPsReaderThread::ExternalPsReaderThread(QString uri, QString attr, QObject* parent)
+	: QThread(parent)
 	, m_uri(uri)
 	, m_attribute(attr)
 {
