@@ -38,6 +38,8 @@ SwiotController::SwiotController(QString uri, QObject *parent)
 	pingTimer = nullptr;
 	temperatureTask = nullptr;
 	temperatureTimer = nullptr;
+	extPsTask = nullptr;
+	powerSupplyTimer = nullptr;
 	identifyTask = nullptr;
 	m_cmdQueue = nullptr;
 }
@@ -96,7 +98,7 @@ void SwiotController::disconnectSwiot()
 
 void SwiotController::startPowerSupplyTask(QString attribute)
 {
-	extPsTask = new ExternalPsReaderThread(uri, attribute);
+	extPsTask = new ExternalPsReaderThread(uri, attribute, this);
 	powerSupplyTimer = new CyclicalTask(extPsTask);
 	connect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this, &SwiotController::hasConnectedPowerSupply);
 	powerSupplyTimer->start(5000);
@@ -107,6 +109,8 @@ void SwiotController::stopPowerSupplyTask()
 	powerSupplyTimer->stop();
 	extPsTask->requestInterruption();
 	disconnect(extPsTask, &ExternalPsReaderThread::hasConnectedPowerSupply, this, &SwiotController::hasConnectedPowerSupply);
+	powerSupplyTimer->deleteLater();
+	extPsTask->deleteLater();
 }
 
 void SwiotController::startTemperatureTask() {
