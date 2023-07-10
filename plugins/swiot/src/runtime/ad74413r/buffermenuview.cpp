@@ -45,6 +45,10 @@ void swiot::BufferMenuView::init(QString title, QString function, QColor* color)
 
 	insertSection(m_advanceSettingsSection);
 	m_swiotAdvMenu = swiot::BufferMenuBuilder::newAdvMenu(m_advanceSettingsSection->getContentWidget(), function);
+	QVector<QBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
+	for (int i = 0; i < layers.size(); i++) {
+		m_advanceSettingsSection->getContentWidget()->layout()->addItem(layers[i]);
+	}
 
 }
 
@@ -52,12 +56,6 @@ void swiot::BufferMenuView::initAdvMenu(QMap<QString, QMap<QString, QStringList>
 {
 	m_swiotAdvMenu->setAttrValues(values);
 	m_swiotAdvMenu->init();
-
-	QVector<QBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
-	for (int i = 0; i < layers.size(); i++) {
-		m_advanceSettingsSection->getContentWidget()->layout()->addItem(layers[i]);
-	}
-
 }
 
 void swiot::BufferMenuView::createHeaderWidget(const QString title)
