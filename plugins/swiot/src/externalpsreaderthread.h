@@ -28,7 +28,7 @@ namespace scopy::swiot {
 class ExternalPsReaderThread : public QThread {
 	Q_OBJECT
 public:
-	explicit ExternalPsReaderThread(QString uri, QString attr);
+	explicit ExternalPsReaderThread(QString uri, QString attr, QObject* parent = nullptr);
 	void run() override;
 
 Q_SIGNALS:
