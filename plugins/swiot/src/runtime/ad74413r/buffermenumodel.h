@@ -38,21 +38,24 @@ public:
 	~BufferMenuModel();
 
 	QMap<QString, QMap<QString, QStringList>> getChnlAttrValues();
-	void readChnlAttr(QString iioChannelKey, QString attrName);
+	void readChnlAttr(QString iioChannelKey, QString attrName, bool readback = false);
 	void writeChnlAttr(QString iioChannelKey, QString attrName, QString attrVal,
 			   QMap<QString, QMap<QString,QStringList>> newValues);
 	void updateChnlAttributes(QMap<QString, QMap<QString,QStringList>> newValues, QString attrName, QString chnlType);
 public Q_SLOTS:
-	void onChannelAttributeRead(QString iioChannelKey, QString attrName, QStringList);
+	void onChannelAttributeRead(QString iioChannelKey, QString attrName, QStringList, bool readback);
 	void onChannelAttributeWritten(QString iioChannelKey, QString attrName);
 Q_SIGNALS:
+	void menuModelInitDone(QMap<QString, QMap<QString, QStringList>> chnlAttributes);
+	void attrRead(QMap<QString, QMap<QString, QStringList>> chnlAttributes);
 	void attrWritten(QMap<QString, QMap<QString, QStringList>> chnlAttributes);
-	void channelAttributeRead(QString iioChannelKey, QString attrName, QStringList attrValues);
+	void channelAttributeRead(QString iioChannelKey, QString attrName, QStringList attrValues, bool readback);
 	void channelAttributeWritten(QString iioChannelKey, QString attrName);
 private:
 	QMap<QString, iio_channel*> m_chnlsMap;
 	QMap<QString, QMap<QString, QStringList>> m_chnlAttributes;
 	CommandQueue *m_commandQueue;
+	bool m_initialized;
 	void init();
 };
 }
