@@ -35,12 +35,10 @@ BufferMenuController::~BufferMenuController()
 	delete m_genericMenu;
 }
 
-void BufferMenuController::addMenuAttrValues()
+void BufferMenuController::addMenuAttrValues(QMap<QString, QMap<QString, QStringList> > values)
 {
-	//get all the attributes from the iio_channel
-	QMap<QString, QMap<QString, QStringList>> contextValues = m_model->getChnlAttrValues();
-	if (!contextValues.empty()) {
-		m_genericMenu->initAdvMenu(contextValues);
+	if (!values.empty()) {
+		m_genericMenu->initAdvMenu(values);
 	}
 }
 
@@ -49,6 +47,8 @@ void BufferMenuController::createConnections()
 	BufferMenu* advMenu = m_genericMenu->getAdvMenu();
 	connect(advMenu, &BufferMenu::attrValuesChanged, this, &BufferMenuController::attributesChanged);
 	connect(m_model, &BufferMenuModel::attrWritten, advMenu, &BufferMenu::onAttrWritten);
+	connect(m_model, &BufferMenuModel::menuModelInitDone, this, &BufferMenuController::addMenuAttrValues);
+
 	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastThresholdReadForward(QString)));
 	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu, SIGNAL(broadcastThresholdReadBackward(QString)));
 }

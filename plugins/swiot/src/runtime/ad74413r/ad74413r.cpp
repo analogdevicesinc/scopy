@@ -182,7 +182,7 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 		BufferMenuModel* swiotModel = new BufferMenuModel(chnlsMap, m_cmdQueue);
 		BufferMenuController* controller = new BufferMenuController(menu, swiotModel, i);
 
-		controller->addMenuAttrValues();
+//		controller->addMenuAttrValues();
 		if (controller) {
 			m_controllers.push_back(controller);
 		}

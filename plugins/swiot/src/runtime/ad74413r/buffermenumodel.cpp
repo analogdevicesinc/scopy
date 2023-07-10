@@ -30,6 +30,7 @@ using namespace scopy::swiot;
 BufferMenuModel::BufferMenuModel(QMap<QString, iio_channel*> chnlsMap, CommandQueue *cmdQueue)
 	: m_chnlsMap(chnlsMap)
 	, m_commandQueue(cmdQueue)
+	, m_initialized(false)
 {
 	connect(this, &BufferMenuModel::channelAttributeRead, this, &BufferMenuModel::onChannelAttributeRead);
 	connect(this, &BufferMenuModel::channelAttributeWritten, this, &BufferMenuModel::onChannelAttributeWritten);
@@ -49,9 +50,18 @@ void BufferMenuModel::init()
 			for (int i = 0; i < chnlAttrNumber; i++) {
 				QString attrName(iio_channel_get_attr(m_chnlsMap[key], i));
 				readChnlAttr(key, attrName);
-
 			}
 		}
+		auto key = m_chnlsMap.lastKey();
+		int chnlAttrNumber = iio_channel_get_attrs_count(m_chnlsMap[key]);
+		connect(this, &BufferMenuModel::attrRead, this, [=, this]
+			(QMap<QString, QMap<QString, QStringList>> chnlAttributes){
+			if (!m_initialized && (chnlAttributes.size() == m_chnlsMap.size())
+					&& (chnlAttributes[key].size() == chnlAttrNumber)) {
+				m_initialized = true;
+				Q_EMIT menuModelInitDone(chnlAttributes);
+			}
+		});
 	}
 }
 
@@ -61,19 +71,24 @@ QMap<QString, QMap<QString, QStringList>> BufferMenuModel::getChnlAttrValues()
 }
 
 
-void BufferMenuModel::onChannelAttributeRead(QString iioChannelKey, QString attrName, QStringList attrValues)
+void BufferMenuModel::onChannelAttributeRead(QString iioChannelKey, QString attrName,
+					     QStringList attrValues, bool readback)
 {
 	m_chnlAttributes[iioChannelKey][attrName] = attrValues;
+	Q_EMIT attrRead(m_chnlAttributes);
+	if (readback) {
+		Q_EMIT attrWritten(m_chnlAttributes);
+	}
 }
 
 void BufferMenuModel::onChannelAttributeWritten(QString iioChannelKey, QString attrName)
 {
-	// perform a readback
-	readChnlAttr(iioChannelKey, attrName);
-	Q_EMIT attrWritten(m_chnlAttributes);
+	// perform readback
+	bool readback = true;
+	readChnlAttr(iioChannelKey, attrName, readback);
 }
 
-void BufferMenuModel::readChnlAttr(QString iioChannelKey, QString attrName)
+void BufferMenuModel::readChnlAttr(QString iioChannelKey, QString attrName, bool readback)
 {
 	Command *channelAttrReadCommand = new IioChannelAttributeRead(m_chnlsMap[iioChannelKey], attrName.toStdString().c_str(), nullptr);
 	connect(channelAttrReadCommand, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
@@ -84,7 +99,9 @@ void BufferMenuModel::readChnlAttr(QString iioChannelKey, QString attrName)
 			char *result = tcmd->getResult();
 			QString bufferValues(result);
 			QStringList attrValues = bufferValues.split(" ");
-			Q_EMIT channelAttributeRead(iioChannelKey, attrName, attrValues);
+			//threshold should have a default value in the driver
+			//			attrValues.removeAll(QString(""));
+			Q_EMIT channelAttributeRead(iioChannelKey, attrName, attrValues, readback);
 		}
 	}, Qt::QueuedConnection);
 	m_commandQueue->enqueue(channelAttrReadCommand);

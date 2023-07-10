@@ -47,7 +47,6 @@ public:
 	~BufferMenu();
 
 	virtual void init() = 0;
-	virtual void connectSignalsToSlots() = 0;
 	virtual QString getInfoMessage();
 	QVector<QBoxLayout *> getMenuLayers();
 	QMap<QString, QMap<QString, QStringList>> getAttrValues();

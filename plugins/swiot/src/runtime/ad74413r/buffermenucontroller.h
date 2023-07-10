@@ -35,8 +35,6 @@ public:
 
 	~BufferMenuController();
 
-	void addMenuAttrValues();
-
 	void createConnections();
 
 	int getChnlIdx();
@@ -44,6 +42,7 @@ public:
 public Q_SLOTS:
 	void attributesChanged(QString attrName, QString chnlType);
 
+	void addMenuAttrValues(QMap<QString, QMap<QString, QStringList> > values);
 Q_SIGNALS:
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
