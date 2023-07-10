@@ -85,6 +85,7 @@ private:
 	iio_context *m_iioCtx;
 	QString uri;
 	bool m_isRuntimeCtx;
+	bool m_temperatureReadEn;
 
 	CyclicalTask *pingTimer;
 	CyclicalTask *switchCtxTimer;

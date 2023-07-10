@@ -32,9 +32,12 @@ SwiotController::SwiotController(QString uri, QObject *parent)
 	: QObject(parent)
 	, uri(uri)
 	, m_isRuntimeCtx(false)
+	, m_temperatureReadEn(false)
 {
 	pingTask = nullptr;
 	pingTimer = nullptr;
+	temperatureTask = nullptr;
+	temperatureTimer = nullptr;
 	identifyTask = nullptr;
 	m_cmdQueue = nullptr;
 }
@@ -107,18 +110,26 @@ void SwiotController::stopPowerSupplyTask()
 }
 
 void SwiotController::startTemperatureTask() {
-//	temperatureTask = new SwiotReadTemperatureTask(uri, this);
-//	temperatureTimer = new CyclicalTask(temperatureTask);
-//	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
-//	temperatureTimer->start(2000);
+	if (!m_isRuntimeCtx || m_temperatureReadEn) {
+		return;
+	}
+	temperatureTask = new SwiotReadTemperatureTask(uri, this);
+	temperatureTimer = new CyclicalTask(temperatureTask);
+	connect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+	temperatureTimer->start(2000);
+	m_temperatureReadEn = true;
 }
 
 void SwiotController::stopTemperatureTask() {
-//	temperatureTimer->stop();
-//	temperatureTask->requestInterruption();
-//	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
-//	temperatureTask->deleteLater();
-//	temperatureTimer->deleteLater();
+	if (!m_isRuntimeCtx || !m_temperatureReadEn) {
+		return;
+	}
+	temperatureTask->requestInterruption();
+	temperatureTimer->stop();
+	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
+	temperatureTask->deleteLater();
+	temperatureTimer->deleteLater();
+	m_temperatureReadEn = false;
 }
 
 void SwiotController::identify()
