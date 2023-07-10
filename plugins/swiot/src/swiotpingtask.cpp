@@ -14,7 +14,7 @@ void SwiotPingTask::run() {
 
 	enabled = true;
 	CommandQueue *commandQueue = CommandQueueProvider::GetInstance()->open(c);
-	if (!commandQueue) {
+	if (!commandQueue || !c) {
 		Q_EMIT pingFailed();
 		return;
 	}
