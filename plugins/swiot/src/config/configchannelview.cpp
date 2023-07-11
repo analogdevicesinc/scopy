@@ -127,15 +127,17 @@ void ConfigChannelView::setFunctionAvailable(const QStringList &mFunctionAvailab
 }
 
 bool ConfigChannelView::eventFilter(QObject* object, QEvent *event) {
-	if (event->type() == QEvent::HoverEnter) {
+	if (event->type() == QEvent::Enter) {
 		this->setStyleSheet("background-color: #272730;");
+		this->ensurePolished();
 		if (m_channelEnabled) {
 			Q_EMIT showPath(m_channelIndex, m_selectedDevice);
 		}
 	}
 
-	if (event->type() == QEvent::HoverLeave) {
+	if (event->type() == QEvent::Leave) {
 		this->setStyleSheet("");
+		this->ensurePolished();
 		Q_EMIT hidePaths();
 	}
 
