@@ -74,7 +74,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 Ad74413r::~Ad74413r()
 {
 	if (m_readerThread) {
-		m_readerThread->requestStop();
+		m_readerThread->forcedStop();
 		delete m_readerThread;
 	}
 	if (m_controllers.size() > 0) {
@@ -436,6 +436,6 @@ void Ad74413r::externalPowerSupply(bool ps) {
 
 void Ad74413r::onBackBtnPressed()
 {
-	m_readerThread->requestStop();
+	m_readerThread->forcedStop();
 	Q_EMIT backBtnPressed();
 }
