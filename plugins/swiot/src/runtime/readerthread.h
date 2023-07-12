@@ -63,6 +63,7 @@ public:
 	void startCapture(int requiredBuffersNumber = 0);
 
 	void requestStop();
+	void forcedStop();
 public Q_SLOTS:
 
 	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
