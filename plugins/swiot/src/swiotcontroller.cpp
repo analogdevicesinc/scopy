@@ -59,8 +59,8 @@ void SwiotController::startPingTask()
 void SwiotController::stopPingTask()
 {
 	pingTask->requestInterruption();
-	pingTask->deleteLater();
 	pingTimer->deleteLater();
+	pingTask->deleteLater();
 }
 
 void SwiotController::startSwitchContextTask(bool isRuntime)
@@ -131,8 +131,8 @@ void SwiotController::stopTemperatureTask() {
 	temperatureTask->requestInterruption();
 	temperatureTimer->stop();
 	disconnect(temperatureTask, &SwiotReadTemperatureTask::newTemperature, this, &SwiotController::readTemperature);
-	temperatureTask->deleteLater();
 	temperatureTimer->deleteLater();
+	temperatureTask->deleteLater();
 	m_temperatureReadEn = false;
 }
 
