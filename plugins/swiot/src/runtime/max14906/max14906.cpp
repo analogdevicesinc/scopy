@@ -155,7 +155,7 @@ Max14906::~Max14906() {
 			this->m_toolView->getRunBtn()->setChecked(false);
 		}
 		if (this->m_readerThread->isRunning()) {
-			this->m_readerThread->requestStop();
+			this->m_readerThread->forcedStop();
 			this->m_readerThread->wait();
 		}
 		delete m_readerThread;
@@ -184,7 +184,7 @@ void Max14906::runButtonToggled() {
 	} else {
 		if (this->m_readerThread->isRunning()) {
 			qDebug(CAT_SWIOT_MAX14906) << "Reader thread stopped";
-			this->m_readerThread->requestStop();
+			this->m_readerThread->forcedStop();
 			this->m_readerThread->wait();
 		}
 		if (this->m_tme->running()) {
