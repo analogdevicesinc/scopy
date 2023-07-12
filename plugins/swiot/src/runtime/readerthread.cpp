@@ -300,7 +300,7 @@ void ReaderThread::requestStop()
 	requestInterruption();
 	if (isBuffered && m_running) {
 		m_running = false;
-		cancelIioBuffer();
+		destroyIioBuffer();
 	}
 	wait();
 }
