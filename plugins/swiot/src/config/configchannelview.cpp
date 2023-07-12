@@ -74,9 +74,11 @@ void ConfigChannelView::setChannelEnabled(bool mChannelEnabled) {
 	m_channelEnabled = mChannelEnabled;
 
 	if (m_channelEnabled) {
+		this->ui->enabledCheckBox->setChecked(true);
 		this->ui->deviceOptions->setEnabled(true);
 		this->ui->functionOptions->setEnabled(true);
 	} else {
+		this->ui->enabledCheckBox->setChecked(false);
 		this->ui->deviceOptions->setEnabled(false);
 		this->ui->functionOptions->setEnabled(false);
 	}
