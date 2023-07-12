@@ -48,7 +48,7 @@ ReaderThread::ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *par
 
 ReaderThread::~ReaderThread()
 {
-	requestStop();
+	forcedStop();
 }
 
 void ReaderThread::addDioChannel(int index, struct iio_channel *channel) {
@@ -330,3 +330,12 @@ void ReaderThread::singleDio() {
         this->runDio();
 }
 
+void ReaderThread::forcedStop()
+{
+	requestInterruption();
+	if (isBuffered && m_running) {
+		m_running = false;
+		cancelIioBuffer();
+	}
+	wait();
+}
