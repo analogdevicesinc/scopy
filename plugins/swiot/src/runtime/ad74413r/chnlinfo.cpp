@@ -10,7 +10,7 @@ ChnlInfo::ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQu
 	m_hwUm(hwUm),
 	m_commandQueue(cmdQueue)
 {
-	m_offsetScalePair = {1, 0};
+	m_offsetScalePair = {0, 1};
 	if (m_iioChnl) {
 		iio_channel_disable(iioChnl);
 		m_chnlId = QString(iio_channel_get_id(m_iioChnl));
@@ -55,7 +55,7 @@ void ChnlInfo::readScaleCommandFinished(Command *cmd)
 		bool ok = false;
 		double scale = QString(res).toDouble(&ok);
 		if (ok) {
-			m_offsetScalePair.first = scale;
+			m_offsetScalePair.second = scale;
 		}
 	} else {
 //		qDebug(CAT_SWIOT) << "Error, could not read \"scale\" attribute for channel.";
@@ -73,7 +73,7 @@ void ChnlInfo::readOffsetCommandFinished(Command *cmd)
 		bool ok = false;
 		double offset = QString(res).toDouble(&ok);
 		if (ok) {
-			m_offsetScalePair.second = offset;
+			m_offsetScalePair.first = offset;
 		}
 	} else {
 //		qDebug(CAT_SWIOT) << "Error, could not read \"offset\" attribute from channel";
