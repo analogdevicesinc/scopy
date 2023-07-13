@@ -24,6 +24,35 @@ bool PluginFilter::pluginInCategory(Plugin* p, QString category) { // PluginFilt
 	return false;
 }
 
+bool PluginFilter::pluginForcedInclusionList(QList<Plugin*> pl, Plugin *p) {
+	bool ret = false;
+	QStringList includeList;
+	for(Plugin* test : pl) {
+		if(test->enabled() == false)
+			continue;
+		if(!test->metadata().contains("include-forced"))
+			continue;
+		QJsonValue includeVal = test->metadata().value("include-forced");
+		if(includeVal.isString())
+			includeList.append(includeVal.toString());
+		if(includeVal.isArray()) {
+			for(auto v : includeVal.toArray()) {
+				if(!v.isString()) {
+					continue;
+				}
+				includeList.append(v.toString());
+			}
+		}
+	}
+
+	for(const QString &include : includeList) {
+		if(include.toLower() == p->name().toLower()) {
+			ret = true;
+		}
+	}
+	return ret;
+}
+
 bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
 	bool ret = false;
 	QStringList excludeList;
