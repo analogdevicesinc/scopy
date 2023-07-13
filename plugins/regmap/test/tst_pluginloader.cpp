@@ -22,7 +22,7 @@ private Q_SLOTS:
 };
 
 #define PLUGIN_LOCATION "../../plugins"
-#define FILENAME PLUGIN_LOCATION "/libscopy-regmap.so"
+#define FILENAME PLUGIN_LOCATION "/libscopy-regmapplugin.so"
 
 
 void TST_REGMAPPlugin::fileExists()
@@ -43,7 +43,7 @@ void TST_REGMAPPlugin::isLibrary()
 void TST_REGMAPPlugin::className()
 {
 	QPluginLoader qp(FILENAME,this);
-    QVERIFY(qp.metaData().value("className") == "REGMAPPlugin");
+    QVERIFY(qp.metaData().value("className") == "RegmapPlugin");
 }
 
 void TST_REGMAPPlugin::loaded()
