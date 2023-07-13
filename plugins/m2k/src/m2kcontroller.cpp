@@ -34,8 +34,8 @@ void M2kController::startPingTask()
 void M2kController::stopPingTask()
 {
 	pingTask->requestInterruption();
-	pingTask->deleteLater();
 	pingTimer->deleteLater();
+	pingTask->deleteLater();
 }
 
 void M2kController::startTemperatureTask()
