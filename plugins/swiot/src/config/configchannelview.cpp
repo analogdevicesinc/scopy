@@ -47,7 +47,7 @@ ConfigChannelView::~ConfigChannelView() {
 }
 
 void ConfigChannelView::connectSignalsAndSlots() {
-	QObject::connect(this->ui->enabledCheckBox, &QCheckBox::stateChanged, this, [=, this](int state) {
+	QObject::connect(this->ui->enabledCheckBox, &QCheckBox::stateChanged, this, [=, this] (int state) {
 		this->setChannelEnabled(state);
 		if (m_channelEnabled) {
 			Q_EMIT showPath(m_channelIndex, m_selectedDevice);
@@ -57,11 +57,13 @@ void ConfigChannelView::connectSignalsAndSlots() {
 		Q_EMIT enabledChanged(m_channelIndex, state);
 	});
 
-	QObject::connect(this->ui->deviceOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+	QObject::connect(this->ui->deviceOptions, &QComboBox::textActivated, this, [this] (const QString& text) {
+		m_selectedDevice = text;
 		Q_EMIT deviceChanged(m_channelIndex, this->ui->deviceOptions->currentText());
 	});
 
-	QObject::connect(this->ui->functionOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int index) {
+	QObject::connect(this->ui->functionOptions, &QComboBox::textActivated, this, [=, this] (const QString& text) {
+		m_selectedFunction = text;
 		Q_EMIT functionChanged(m_channelIndex, this->ui->functionOptions->currentText());
 	});
 }
@@ -101,7 +103,7 @@ const QStringList &ConfigChannelView::getDeviceAvailable() const {
 void ConfigChannelView::setDeviceAvailable(const QStringList &mDeviceAvailable) {
 	m_deviceAvailable = mDeviceAvailable;
 	this->ui->deviceOptions->clear();
-	for (const QString &device: m_deviceAvailable) {
+	for (const QString &device: qAsConst(m_deviceAvailable)) {
 		this->ui->deviceOptions->addItem(device);
 	}
 }
@@ -112,8 +114,14 @@ const QString &ConfigChannelView::getSelectedFunction() const {
 
 void ConfigChannelView::setSelectedFunction(const QString &mSelectedFunction) {
 	m_selectedFunction = mSelectedFunction;
-	int index = this->ui->functionOptions->findText(m_selectedFunction);
-	this->ui->functionOptions->setCurrentIndex(index);
+	if (mSelectedFunction.isEmpty()) {
+		this->ui->functionOptions->setCurrentIndex(0);
+	} else {
+		int index = this->ui->functionOptions->findText(m_selectedFunction);
+		if (index >= 0) {
+			this->ui->functionOptions->setCurrentIndex(index);
+		}
+	}
 }
 
 const QStringList &ConfigChannelView::getFunctionAvailable() const {
@@ -123,7 +131,7 @@ const QStringList &ConfigChannelView::getFunctionAvailable() const {
 void ConfigChannelView::setFunctionAvailable(const QStringList &mFunctionAvailable) {
 	m_functionAvailable = mFunctionAvailable;
 	this->ui->functionOptions->clear();
-	for (const QString &device: m_functionAvailable) {
+	for (const QString &device: qAsConst(m_functionAvailable)) {
 		this->ui->functionOptions->addItem(device);
 	}
 }
