@@ -13,49 +13,73 @@ Q_DECLARE_METATYPE(QSignalSpy*);
 Q_DECLARE_METATYPE(CommandQueue*);
 
 
-class TestCommand : public Command {
+class TestCommandCounter : public Command {
 	Q_OBJECT
 public:
-	explicit TestCommand(int sleep, QObject *parent)
-		: m_sleep(sleep) {
+	explicit TestCommandCounter(QObject *parent)
+	{
 		this->setParent(parent);
 		m_cmdResult = new CommandResult();
 	}
 
-	virtual ~TestCommand() {
+	virtual ~TestCommandCounter() {
+		qDebug() << "TestCommandCounter deleted";
+	}
+
+	virtual void execute() override {
+		m_commandCounter++;
+	}
+
+public:
+	static std::atomic<int> m_commandCounter;
+};
+std::atomic<int> TestCommandCounter::m_commandCounter = 0;
+
+class TestCommandAdd : public Command {
+	Q_OBJECT
+public:
+	explicit TestCommandAdd(int a, int b, QObject *parent)
+		: m_a(a)
+		, m_b(b)
+	{
+		this->setParent(parent);
+		m_cmdResult = new CommandResult();
+	}
+
+	virtual ~TestCommandAdd() {
 		qDebug() << "TestCommand deleted";
 	}
 
 	virtual void execute() override {
 		Q_EMIT started(this);
-		QThread::msleep(m_sleep);
-		m_cmdResult->errorCode = m_sleep;
+		m_cmdResult->errorCode = m_a + m_b;
 		Q_EMIT finished(this);
 	}
 
 private:
-	int m_sleep;
+	int m_a, m_b;
 };
 
-class TestCommandResult : public Command {
+class TestCommandMultiply : public Command {
 	Q_OBJECT
 public:
-	explicit TestCommandResult(int sleep, std::string message, QObject *parent)
-		: m_sleep(sleep)
-		, m_msg(message) {
+	explicit TestCommandMultiply(int a, int b,  QObject *parent)
+		: m_a(a)
+		, m_b(b)
+	{
 		this->setParent(parent);
 		m_cmdResult = new CommandResult();
 	}
 
-	virtual ~TestCommandResult() {
-		qDebug() << "TestCommandResult deleted";
+	virtual ~TestCommandMultiply() {
+		qDebug() << "TestCommandMultiply deleted";
 	}
 
 	virtual void execute() override {
 		Q_EMIT started(this);
-		QThread::msleep(m_sleep);
-		m_cmdResult->errorCode = m_sleep;
-		m_cmdResult->results = (void*)m_msg.c_str();
+		m_cmdResult->errorCode = m_a * m_b;
+		char* tmp = "TEST OK";
+		m_cmdResult->results = tmp;
 		Q_EMIT finished(this);
 	}
 
@@ -64,22 +88,22 @@ public:
 		return std::string((char*)m_cmdResult->results);
 	}
 private:
-	int m_sleep;
+	int m_a, m_b;
 	std::string m_msg;
 };
 
-class TestCommandResultObject : public Command {
+class TestCommandMsg : public Command {
 	Q_OBJECT
 public:
-	explicit TestCommandResultObject(int sleep, QString message, QObject *parent)
+	explicit TestCommandMsg(int sleep, QString message, QObject *parent)
 		: m_sleep(sleep)
 		, m_msg_btn(new QPushButton(message)) {
 		this->setParent(parent);
 		m_cmdResult = new CommandResult();
 	}
 
-	virtual ~TestCommandResultObject() {
-		qDebug() << "TestCommandResultObject deleted";
+	virtual ~TestCommandMsg() {
+		qDebug() << "TestCommandMsg deleted";
 		if (m_cmdResult->results) {
 			delete (QPushButton*)m_cmdResult->results;
 			m_cmdResult->results = nullptr;
@@ -108,31 +132,29 @@ class TST_IioCommandQueue : public QObject
 	Q_OBJECT
 private Q_SLOTS:
 	void testResults();
-	void testSignalsCount();
-	void testCommandsOrder();
-	void testSameCommandMultipleTimes();
+	void testCommandOrder();
+	void testLaunchCommandFromThread();
 private:
-	CommandQueue *cmdQ;
-	Command *cmd1, *cmd2, *cmd3;
+	int TEST_A = 100;
+	int TEST_B = 20;
+	QThreadPool m_commandExecThreadPool;
 };
 
 void TST_IioCommandQueue::testResults() {
-	cmdQ = new CommandQueue(1, this);
-	cmd1 = new TestCommand(100, cmdQ);
-	cmd2 = new TestCommandResult(200, "Test command 200", cmdQ);
-	cmd3 = new TestCommandResultObject(300, "Test command 300", cmdQ);
-
-	QSignalSpy spy(cmd2, SIGNAL(finished(scopy::Command *)));
+	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
+	Command *cmd1 = new TestCommandAdd(TEST_A, TEST_B, nullptr);
+	Command *cmd2 = new TestCommandMultiply(TEST_A, TEST_B, nullptr);
+	Command *cmd3 = new TestCommandMsg(TEST_A, "Test command 300", nullptr);
 
 	connect(cmd1, &scopy::Command::finished,
 		this, [=](scopy::Command* cmd) {
 		if (!cmd) {
 			cmd = dynamic_cast<Command*>(QObject::sender());
 		}
-		TestCommand *tcmd = dynamic_cast<TestCommand*>(cmd);
+		TestCommandAdd *tcmd = dynamic_cast<TestCommandAdd*>(cmd);
 		QVERIFY2(tcmd != nullptr, "Capture command is null");
 		QVERIFY2(tcmd == cmd1, "Captured command not the expected one");
-		QVERIFY2(tcmd->getReturnCode() == 100, "TestCommand did not execute");
+		QVERIFY2(tcmd->getReturnCode() == (TEST_B + TEST_A), "TestCommandAdd did not execute");
 	}, Qt::QueuedConnection);
 
 	connect(cmd2, &scopy::Command::finished,
@@ -140,11 +162,11 @@ void TST_IioCommandQueue::testResults() {
 		if (!cmd) {
 			cmd = dynamic_cast<Command*>(QObject::sender());
 		}
-		TestCommandResult *tcmd = dynamic_cast<TestCommandResult*>(cmd);
+		TestCommandMultiply *tcmd = dynamic_cast<TestCommandMultiply*>(cmd);
 		QVERIFY2(tcmd != nullptr, "Capture command is null");
 		QVERIFY2(tcmd == cmd2, "Captured command not the expected one");
-		QVERIFY2(tcmd->getResult() == "Test command 200", "TestCommandResult did not execute correctly");
-		QVERIFY2(tcmd->getReturnCode() == 200, "TestCommandResult did not execute");
+		QVERIFY2(tcmd->getResult() == "TEST OK", "TestCommandMultiply not executed properly");
+		QVERIFY2(tcmd->getReturnCode() == (TEST_B * TEST_A), "TestCommandMultiply did not execute");
 	}, Qt::QueuedConnection);
 
 	connect(cmd3, &scopy::Command::finished,
@@ -152,78 +174,90 @@ void TST_IioCommandQueue::testResults() {
 		if (!cmd) {
 			cmd = dynamic_cast<Command*>(QObject::sender());
 		}
-		TestCommandResultObject *tcmd = dynamic_cast<TestCommandResultObject*>(cmd);
+		TestCommandMsg *tcmd = dynamic_cast<TestCommandMsg*>(cmd);
 		QVERIFY2(tcmd != nullptr, "Capture command is null");
 		QVERIFY2(tcmd == cmd3, "Captured command not the expected one");
-		QVERIFY2(tcmd->getReturnCode() == 300, "TestCommandResultObject did not execute");
+		QVERIFY2(tcmd->getReturnCode() == TEST_A, "TestCommandMsg did not execute");
 		QPushButton *testBtn = tcmd->getResult();
-		QVERIFY2(testBtn != nullptr, "TestCommandResultObject did not generate results");
+		QVERIFY2(testBtn != nullptr, "TestCommandMsg did not generate results");
 		qDebug() << "TestBtn text: " << testBtn->text();
-		QVERIFY2(testBtn->text() == "Test command 300", "TestCommandResultObject generated wrong results");
+		QVERIFY2(testBtn->text() == "Test command 300", "TestCommandMsg generated wrong results");
 	}, Qt::QueuedConnection);
 
-	cmdQ->enqueue(cmd3);
-	cmdQ->enqueue(cmd1);
-	cmdQ->enqueue(cmd2);
-}
-
-void TST_IioCommandQueue::testSignalsCount() {
-	cmdQ = new CommandQueue(1, this);
-	cmd1 = new TestCommand(100, cmdQ);
-	cmd2 = new TestCommandResult(200, "Test command 200", cmdQ);
-	cmd3 = new TestCommandResultObject(300, "Test command 300", cmdQ);
-
-	QSignalSpy spy1(cmd1, SIGNAL(finished(scopy::Command *)));
-	QSignalSpy spy2(cmd2, SIGNAL(finished(scopy::Command *)));
-	QSignalSpy spy3(cmd3, SIGNAL(finished(scopy::Command *)));
-
-	cmdQ->enqueue(cmd3);
 	cmdQ->enqueue(cmd1);
 	cmdQ->enqueue(cmd2);
 	cmdQ->enqueue(cmd3);
-//	cmdQ->requestStop();
-//	cmdQ->wait();
-//	QVERIFY2(spy1.count() == 1, "The first command did not emit 1 signal");
-//	QVERIFY2(spy2.count() == 1, "The second command did not emit 1 signal");
-//	QVERIFY2(spy3.count() == 2, "The third command did not emit 2 signals");
+	cmdQ->wait();
+	delete cmdQ;
 }
 
-void TST_IioCommandQueue::testCommandsOrder() {
-	cmdQ = new CommandQueue(1, this);
-	cmd1 = new TestCommand(100, cmdQ);
-	cmd2 = new TestCommandResult(200, "Test command 200", cmdQ);
-	cmd3 = new TestCommandResultObject(300, "Test command 300", cmdQ);
+void TST_IioCommandQueue::testCommandOrder() {
+	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
+	Command *cmd1 = new TestCommandAdd(TEST_A, TEST_B, nullptr);
 
-	QSignalSpy spy(cmdQ, SIGNAL(finished(scopy::Command *)));
+	Command *cmd3 = new TestCommandMsg(TEST_A, "Test command 300", nullptr);
 
+	connect(cmd1, &scopy::Command::finished,
+		this, [=](scopy::Command* cmd) {
+		if (!cmd) {
+			cmd = dynamic_cast<Command*>(QObject::sender());
+		}
+		TestCommandAdd *tcmd = dynamic_cast<TestCommandAdd*>(cmd);
+		QVERIFY2(tcmd != nullptr, "Capture command is null");
+		QVERIFY2(tcmd == cmd1, "Captured command not the expected one");
+		QVERIFY2(tcmd->getReturnCode() == (TEST_B + TEST_A), "TestCommandAdd did not execute");
+
+		Command *cmd2 = new TestCommandMultiply(tcmd->getReturnCode(), TEST_B, nullptr);
+		cmdQ->enqueue(cmd2);
+		connect(cmd2, &scopy::Command::finished,
+			this, [=](scopy::Command* cmd) {
+			if (!cmd) {
+				cmd = dynamic_cast<Command*>(QObject::sender());
+			}
+			TestCommandMultiply *tcmd = dynamic_cast<TestCommandMultiply*>(cmd);
+			QVERIFY2(tcmd != nullptr, "Capture command is null");
+			QVERIFY2(tcmd == cmd2, "Captured command not the expected one");
+			QVERIFY2(tcmd->getResult() == "TEST OK", "TestCommandMultiply not executed properly");
+			QVERIFY2(tcmd->getReturnCode() == (TEST_B *  (TEST_B + TEST_A)), "TestCommandMultiply did not execute");
+		}, Qt::QueuedConnection);
+	}, Qt::QueuedConnection);
+
+	connect(cmd3, &scopy::Command::finished,
+		this, [=](scopy::Command* cmd) {
+		if (!cmd) {
+			cmd = dynamic_cast<Command*>(QObject::sender());
+		}
+		TestCommandMsg *tcmd = dynamic_cast<TestCommandMsg*>(cmd);
+		QVERIFY2(tcmd != nullptr, "Capture command is null");
+		QVERIFY2(tcmd == cmd3, "Captured command not the expected one");
+		QVERIFY2(tcmd->getReturnCode() == TEST_A, "TestCommandMsg did not execute");
+		QPushButton *testBtn = tcmd->getResult();
+		QVERIFY2(testBtn != nullptr, "TestCommandMsg did not generate results");
+		qDebug() << "TestBtn text: " << testBtn->text();
+		QVERIFY2(testBtn->text() == "Test command 300", "TestCommandMsg generated wrong results");
+	}, Qt::QueuedConnection);
+
+	cmdQ->enqueue(cmd1);
 	cmdQ->enqueue(cmd3);
-	cmdQ->enqueue(cmd1);
-	cmdQ->enqueue(cmd2);
-//	cmdQ->requestStop();
-//	cmdQ->wait();
-//	QVERIFY2(spy.count() == 3, "The command queue did not emit 3 signals");
-//	QVERIFY2(qvariant_cast<TestCommandResultObject*>(spy.at(0).at(0)) == cmd3, "The 1st signal not emitted by TestCommandResultObject");
-//	QVERIFY2(qvariant_cast<TestCommand*>(spy.at(1).at(0)) == cmd1, "The 2nd signal not emitted by TestCommand");
-//	QVERIFY2(qvariant_cast<TestCommandResult*>(spy.at(2).at(0)) == cmd2, "The 3rd signal not emitted by TestCommandResult");
+	cmdQ->wait();
+	delete cmdQ;
 }
 
-void TST_IioCommandQueue::testSameCommandMultipleTimes() {
-	cmdQ = new CommandQueue(1, this);
-	cmd1 = new TestCommand(100, cmdQ);
+void TST_IioCommandQueue::testLaunchCommandFromThread() {
+	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
+	int m_nbOfThreads = 10;
+	m_commandExecThreadPool.setMaxThreadCount(std::min(m_nbOfThreads, QThread::idealThreadCount()));
 
-	QSignalSpy spy(cmdQ, SIGNAL(finished(scopy::Command *)));
+	for (int i = 0; i < m_nbOfThreads * 2; i++) {
+		m_commandExecThreadPool.start([=] () {
+			Command *cmd = new TestCommandCounter(nullptr);
+			cmdQ->enqueue(cmd);
+		});
+	}
 
-	cmdQ->enqueue(cmd1);
-	cmdQ->enqueue(cmd1);
-	cmdQ->enqueue(cmd1);
-	cmdQ->enqueue(cmd1);
-//	cmdQ->requestStop();
-//	cmdQ->wait();
-//	QVERIFY2(spy.count() == 4, "The command queue did not emit 3 signals");
-//	QVERIFY2(qvariant_cast<TestCommand*>(spy.at(0).at(0)) == cmd1, "The 1st signal not emitted by TestCommand");
-//	QVERIFY2(qvariant_cast<TestCommand*>(spy.at(1).at(0)) == cmd1, "The 2nd signal not emitted by TestCommand");
-//	QVERIFY2(qvariant_cast<TestCommand*>(spy.at(2).at(0)) == cmd1, "The 3rd signal not emitted by TestCommand");
-//	QVERIFY2(qvariant_cast<TestCommand*>(spy.at(3).at(0)) == cmd1, "The 4th signal not emitted by TestCommand");
+	m_commandExecThreadPool.waitForDone();
+	QVERIFY2(TestCommandCounter::m_commandCounter == m_nbOfThreads * 2, "The threaded cmds were not executed in order/properly.");
+	delete cmdQ;
 }
 
 
