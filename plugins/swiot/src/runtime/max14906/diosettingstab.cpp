@@ -31,7 +31,7 @@ DioSettingsTab::DioSettingsTab(QWidget *parent) :
 
 	this->m_max_spin_button = new PositionSpinButton({
 								 {tr("s"), 1}
-							 }, tr("Timespan"), 0, 300, true, false, this);
+							 }, tr("Timespan"), 1, 300, true, false, this);
 	this->m_max_spin_button->setValue(10); // default value
 	this->ui->verticalLayout_maxTimer->addWidget(this->m_max_spin_button);
 
