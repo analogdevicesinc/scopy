@@ -20,7 +20,10 @@
 
 
 #include "configcontroller.h"
-#include "qdebug.h"
+#include <QDebug>
+#include <QObject>
+
+#include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
 
@@ -54,6 +57,7 @@ void ConfigController::connectSignalsAndSlots()
 	});
 	connect(m_model, &ConfigModel::readConfigChannelDevice, this, [=, this] (QString device) {
 		m_channelsView->setSelectedDevice(device);
+		Q_EMIT deviceReadingComplete();
 	});
 	connect(m_model, &ConfigModel::readConfigChannelFunction, this, [=, this] (QString function) {
 		m_channelsView->setSelectedFunction(function);
@@ -63,10 +67,17 @@ void ConfigController::connectSignalsAndSlots()
 	});
 	connect(m_model, &ConfigModel::readConfigChannelFunctionAvailable, this, [=, this] (QStringList functionsAvailable) {
 		m_channelsView->setFunctionAvailable(functionsAvailable);
+		Q_EMIT functionAvailableReadingComplete();
 	});
 	connect(m_model, &ConfigModel::configChannelDevice, this, [=, this] () {
-		m_model->readDevice();
+		Q_EMIT deviceReadingComplete();
+		// stop and wait for readConfigChannelDevice to finish in order to continue
+	});
+	connect(this, &ConfigController::deviceReadingComplete, this, [this] () {
 		m_model->readFunctionAvailable();
+		// stop and wait for readConfigChannelFunctionAvailable to finish in order to continue
+	});
+	connect(this, &ConfigController::functionAvailableReadingComplete, this, [this] () {
 		m_model->readFunction();
 	});
 
@@ -94,11 +105,10 @@ void ConfigController::connectSignalsAndSlots()
 	});
 }
 
-void ConfigController::initChannelView() {
-
+void ConfigController::initChannelView()
+{
 	m_model->readEnabled();
 	m_model->readDeviceAvailable();
 	m_model->readDevice();
-	m_model->readFunctionAvailable();
-	m_model->readFunction();
+	// the read device function activates a sequence that also reads the "function_available" and "function" attributes
 }
