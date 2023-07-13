@@ -22,7 +22,7 @@
 #ifndef CONFIGCONTROLLER_H
 #define CONFIGCONTROLLER_H
 
-#include "qobject.h"
+#include "QObject"
 #include "src/config/configchannelview.h"
 #include "configmodel.h"
 
@@ -42,6 +42,8 @@ public:
 
 Q_SIGNALS:
 	void clearDrawArea();
+	void deviceReadingComplete();
+	void functionAvailableReadingComplete();
 
 private:
 	ConfigChannelView *m_channelsView;
