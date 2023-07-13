@@ -162,9 +162,8 @@ QVector<BitFieldModel*> *XmlFileManager::getBitFieldsOfRegister(QDomElement reg,
                                                                     bf2 - bf1, bf1 , "Reserved" , nullptr);
                         bitFieldsListWithReserved->push_back(bitField);
                         numberOfBits += bf2 - bf1;
-                    } else {
-                        bitFieldsListWithReserved->push_back(bitFieldsList->at(i));
                     }
+                    bitFieldsListWithReserved->push_back(bitFieldsList->at(i));
                 }
 
                 if (regWidth > numberOfBits){
