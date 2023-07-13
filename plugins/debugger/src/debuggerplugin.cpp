@@ -64,7 +64,7 @@ bool DebuggerPlugin::onDisconnect()
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
 		tme->setRunning(false);
-		delete tme->tool();
+		tme->tool()->deleteLater();
 		tme->setTool(nullptr);
 	}
 
