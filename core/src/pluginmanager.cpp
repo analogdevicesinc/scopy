@@ -104,8 +104,9 @@ QList<Plugin *> PluginManager::getCompatiblePlugins(QString param, QString categ
 		if(!PluginFilter::pluginInCategory(plugin,category))
 			continue;
 		bool enable = (!PluginFilter::pluginInExclusionList(comp,plugin));
+		bool forcedInclusion = (PluginFilter::pluginForcedInclusionList(comp, plugin));
 
-		if(plugin->compatible(param, category)) {
+		if(plugin->compatible(param, category) || forcedInclusion) {
 			Plugin* p = plugin->clone();
 			p->setParam(param, category);
 			p->setEnabled(enable);
