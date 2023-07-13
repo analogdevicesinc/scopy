@@ -260,6 +260,8 @@ public:
 		switch (menu_type) {
 		case CURRENT_IN_LOOP:
 			return new CurrentInLoopMenu(widget, function);
+		case CURRENT_IN_LOOP_HART:
+			return new CurrentInLoopMenu(widget, function);
 		case DIGITAL_IN_LOOP:
 			return new DigitalInLoopMenu(widget, function);
 		case VOLTAGE_OUT:
