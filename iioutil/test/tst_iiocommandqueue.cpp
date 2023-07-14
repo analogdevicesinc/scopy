@@ -243,10 +243,16 @@ void TST_IioCommandQueue::testCommandOrder() {
 	delete cmdQ;
 }
 
+/*
+ * Creating the CommandQueue with just 1 possible running thread at a time
+ * should allow us to enqueue commands from different threads but
+ * the CommandQueue should ensure that the commands are executed in order,
+ * one at a time, all on just one running thread.
+ */
 void TST_IioCommandQueue::testLaunchCommandFromThread() {
 	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
 	int m_nbOfThreads = 10;
-	m_commandExecThreadPool.setMaxThreadCount(std::min(m_nbOfThreads, QThread::idealThreadCount()));
+	m_commandExecThreadPool.setMaxThreadCount(m_nbOfThreads);
 
 	for (int i = 0; i < m_nbOfThreads * 2; i++) {
 		m_commandExecThreadPool.start([=] () {
@@ -255,7 +261,11 @@ void TST_IioCommandQueue::testLaunchCommandFromThread() {
 		});
 	}
 
-	m_commandExecThreadPool.waitForDone();
+	int waitResult = m_commandExecThreadPool.waitForDone();
+	qInfo() << "Thread pool wait result: " << waitResult;
+	qInfo() << "Command counter: " << TestCommandCounter::m_commandCounter;
+	qInfo() << "Thread pool expiry timeout: " << m_commandExecThreadPool.expiryTimeout();
+
 	QVERIFY2(TestCommandCounter::m_commandCounter == m_nbOfThreads * 2, "The threaded cmds were not executed in order/properly.");
 	delete cmdQ;
 }
