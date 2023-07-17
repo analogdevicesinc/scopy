@@ -1,7 +1,7 @@
 #include "utils.hpp"
-#include "dynamicWidget.h"
 #include "scopy-regmapplugin_config.h"
 #include "jsonformatedelement.hpp"
+#include <pluginbase/preferences.h>
 
 #include <QDir>
 #include <qjsonarray.h>
@@ -35,11 +35,27 @@ void Utils::removeLayoutMargins(QLayout *layout)
 
 QDir Utils::setXmlPath()
 {
-    QDir xmlsPath(REGMAP_XML_BUILD_PATH);
-    if ( xmlsPath.entryList().empty()) {
-        xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
+    QString pluginAdditionalPath = Preferences::GetInstance()->get("additional_regmap_xml_path").toString();
+    // Check the xml path from preferences
+
+    QDir xmlsPath(pluginAdditionalPath);
+    if(!xmlsPath.entryList().empty()) {
+        return xmlsPath;
     }
+
+    xmlsPath.setPath(REGMAP_XML_BUILD_PATH);
+    if(!xmlsPath.entryList().empty()) {
+        return xmlsPath;
+    }
+
+    xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
     return xmlsPath;
+    if(!xmlsPath.entryList().empty()) {
+        return xmlsPath;
+    }
+
+    qDebug(CAT_REGMAP)<< "No XML folder found";
+    return QDir("");
 }
 
 int Utils::getBitsPerRow()
