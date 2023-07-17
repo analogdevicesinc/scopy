@@ -23,6 +23,9 @@ public:
 	void setHandle(PlotAxisHandle *newHandle);
 
 public Q_SLOTS:
+	void raise();
+	void attach();
+	void detach();
 	void setEnabled(bool b);
 	void enable();
 	void disable();
