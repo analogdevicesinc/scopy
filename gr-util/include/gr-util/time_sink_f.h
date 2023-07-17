@@ -39,49 +39,32 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TIME_SINK_F_IMPL_H
-#define TIME_SINK_F_IMPL_H
+#ifndef TIME_SINK_F_H
+#define TIME_SINK_F_H
 
-#include <gnuradio/high_res_timer.h>
-#include "time_sink_f.h"
+#ifdef ENABLE_PYTHON
+#include <Python.h>
+#endif
+
+#include <gnuradio/sync_block.h>
+#include "scopy-gr-util_export.h"
 
 namespace scopy {
 
-class time_sink_f_impl : public time_sink_f
+class SCOPY_GR_UTIL_EXPORT time_sink_f : virtual public gr::sync_block
 {
-private:
-	std::vector <std::deque <float>> m_buffers;
-	std::vector< std::vector<gr::tag_t> > m_tags;
-
-	int m_size;
-	double d_samp_rate;
-	std::string m_name;
-	int m_nconnections;
-
-
-	gr::high_res_timer_type d_update_time;
-	gr::high_res_timer_type d_last_time;
-
 public:
-	time_sink_f_impl(int size,
-			 const std::string &name,
-			 int nconnections);
-	~time_sink_f_impl();
+	// scopy::time_sink_f::sptr
+	typedef std::shared_ptr<time_sink_f> sptr;
 
-	bool check_topology(int ninputs, int noutputs);
-
-	void set_update_time(double t);
-	void set_nsamps(const int size);
-
-	int nsamps() const;
-	std::string name() const;
-
-
-	int work(int noutput_items,
-		 gr_vector_const_void_star &input_items,
-		 gr_vector_void_star &output_items);
+	static sptr make(int size, float sampleRate, const std::string &name,
+			 int nconnections );
+	virtual std::string name() const = 0;
+	virtual void updateData() = 0;
+	virtual const std::vector<float> &time() const = 0;
+	virtual const std::vector<std::vector<float> > &data() const = 0;
 };
 
 } /* namespace scopy */
 
-#endif /* M2K_time_sink_f_IMPL_H */
+#endif /* M2K_time_sink_f_H */

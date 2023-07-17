@@ -25,7 +25,7 @@
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
-
+#include <stylehelper.h>
 
 using namespace scopy;
 
@@ -45,6 +45,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
+	StyleHelper::GetInstance()->initColorMap();
+
 	//	auto vc = VersionCache::GetInstance();
 	//	if(vc->cacheOutdated()) {
 	//		vc->updateCache();

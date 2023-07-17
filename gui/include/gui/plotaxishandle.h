@@ -13,7 +13,7 @@ class SCOPY_GUI_EXPORT PlotAxisHandle : public QObject
 public:
 	PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, QObject *parent = nullptr);
 	~PlotAxisHandle();
-	RoundedHandleV *offsetHdl() const;
+	RoundedHandleV *handle() const;
 	PlotAxis *axis() const;
 
 private:
@@ -21,7 +21,7 @@ private:
 	PlotAxis *m_axis;
 	QPen m_pen;
 	HorizBar *m_chOffsetBar;
-	RoundedHandleV *m_chOffsetHdl;
+	RoundedHandleV *m_handle;
 	SymbolController* m_symbolCtrl;
 
 };
