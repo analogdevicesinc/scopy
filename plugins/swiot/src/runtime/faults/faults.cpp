@@ -97,6 +97,9 @@ void Faults::setupDynamicUi(QWidget *parent) {
 	this->m_toolView->getGeneralSettingsBtn()->setChecked(true);
 
 	this->m_toolView->addTopExtraWidget(m_backButton);
+
+	// assures that everything looks neat in detached state mode
+	this->setMinimumSize(800, 500);
 }
 
 void Faults::connectSignalsAndSlots() {
