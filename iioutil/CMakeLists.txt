@@ -31,6 +31,15 @@ if(ENABLE_TESTING)
     add_subdirectory(test)
 endif()
 
+option(WITH_LIBSERIALPORT "Add serial backend support to Scopy - also needs to be enabled in libiio" ON)
+find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
+find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
+if (${WITH_LIBSERIALPORT})
+	find_library(LIBSERIALPORT_LIBRARIES serialport REQUIRED)
+	find_path(LIBSERIALPORT_INCLUDE_DIR libserialport.h REQUIRED)
+	message(STATUS "Building with libserialport support")
+endif()
+
 configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
     ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h)
@@ -42,15 +51,6 @@ set(PROJECT_SOURCES
 )
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
-
-option(WITH_LIBSERIALPORT "Add serial backend support to Scopy - also needs to be enabled in libiio" ON)
-find_library(IIO_LIBRARIES NAMES iio libiio REQUIRED)
-find_path(IIO_INCLUDE_DIRS iio.h REQUIRED)
-if (${WITH_LIBSERIALPORT})
-	find_library(LIBSERIALPORT_LIBRARIES serialport REQUIRED)
-	find_path(LIBSERIALPORT_INCLUDE_DIR libserialport.h REQUIRED)
-	message(STATUS "Building with libserialport support")
-endif()
 
 add_library(${PROJECT_NAME} SHARED
     ${PROJECT_SOURCES}
