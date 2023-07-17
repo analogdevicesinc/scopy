@@ -22,7 +22,6 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->rightContainer()->setVisible(true);
 	lay->addWidget(tool);
 
-	StyleHelper::GetInstance()->initColorMap();
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuAnim*>(tool->rightContainer()),true,this);
 	QButtonGroup* rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn*>(openLastMenuBtn)->getButtonGroup();
 	tool->setLeftContainerWidth(200);
@@ -93,18 +92,16 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 			btn->setName(ch->getName());
 			btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-			btn->setCheckable(false);
+			btn->setColor(ch->pen().color());
+			btn->setCheckable(true);
 
 			QString id = ch->getName() + QString::number(uuid++);
 			tool->rightStack()->add(id, ch->getWidget());
+			connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) { if(b) ch->enable(); else ch->disable();} );
 			connect(btn->button(), &QPushButton::toggled, this, [=](bool b) { if(b) tool->requestMenu(id);});
 			rightMenuBtnGrp->addButton(btn->button());
 			plotAddon->onChannelAdded(ch);
-			auto plot = plotAddon->plot();
-
-
-
-
+			btn->checkBox()->setChecked(true);
 
 		}
 	}
@@ -114,24 +111,31 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 void AdcInstrument::run(bool b) {
 	qInfo()<<b;
+	QElapsedTimer tim;
+	tim.start();
 
+
+	qInfo()<<tim.elapsed();
 	for(auto ch : proxy->getChannelAddons()) {
 		if(b)
 			ch->onStart();
 		else
 			ch->onStop();
 	}
+	qInfo()<<tim.elapsed();
 	for(auto dev : proxy->getDeviceAddons()) {
 		if(b)
 			dev->onStart();
 		else
 			dev->onStop();
 	}
+	qInfo()<<tim.elapsed();
 
 	if(b)
 		proxy->getPlotAddon()->onStart();
 	else
 		proxy->getPlotAddon()->onStop();
+	qInfo()<<tim.elapsed();
 
 
 
