@@ -81,6 +81,7 @@ void RegmapPlugin::initPreferences()
 {
     Preferences *p = Preferences::GetInstance();
     p->init("regmap_color_by_value","Default");
+    p->init("additional_regmap_xml_path",REGMAP_XML_PATH_LOCAL);
 }
 
 bool RegmapPlugin::loadPreferencesPage()
