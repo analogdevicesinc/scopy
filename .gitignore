@@ -45,6 +45,7 @@ gui/include/gui/scopy-gui_config.h
 gui/sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_export.h
 gui/sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_config.h
 iioutil/include/iioutil/scopy-iioutil_export.h
+plugins/regmap/include/regmapplugin/scopy-regmapplugin_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
 plugins/bareminimumplugin/include/bareminimumplugin/scopy-bareminimumplugin_export.h
