@@ -23,7 +23,7 @@ RUN echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-$USER && \
 
 USER $USER
 WORKDIR /home/${USER}
-RUN git clone https://github.com/analogdevicesinc/scopy --branch scopy2_docker_ubuntu
+RUN git clone https://github.com/analogdevicesinc/scopy --branch dev
 
 RUN source scopy/ci/ubuntu/install_ubuntu_20_deps.sh && install_apt
 
