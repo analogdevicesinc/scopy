@@ -4,8 +4,13 @@
 Q_LOGGING_CATEGORY(SCOPY_GR_UTIL, "GRManager")
 
 using namespace scopy::grutil;
-GRTopBlock::GRTopBlock(QString name, QObject *parent) : running(false), built(false)
+GRTopBlock::GRTopBlock(QString name, QObject *parent) : QObject(parent), running(false), built(false)
 {
+	static int topblockid = 0;
+	QString topblockname = m_name + QString::number(topblockid);
+	topblockid++;
+	qInfo()<<"building" <<topblockname;
+	top = gr::make_top_block(topblockname.toStdString());
 
 }
 
@@ -41,7 +46,8 @@ void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 }
 
 void GRTopBlock::build() {
-	top = gr::make_top_block(m_name.toStdString());
+
+	top->disconnect_all();
 
 	for (GRSignalPath* sig : qAsConst(m_signalPaths)) {
 		if(sig->enabled() ) {

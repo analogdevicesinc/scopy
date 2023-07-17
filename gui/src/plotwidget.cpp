@@ -31,7 +31,6 @@ PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent) {
 	setupOpenGLCanvas();
 	setupHandlesArea();
 
-
 	auto xAxis = new PlotAxis(QwtAxis::XBottom,this,this);
 	auto yAxis = new PlotAxis(QwtAxis::YLeft,this,this);
 	yAxis->setVisible(false);
@@ -338,12 +337,7 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 	m_selectedChannel->yAxis()->setVisible(false);
 
 	if(m_selectedChannel->curve()) {
-		m_selectedChannel->curve()->detach();
-		m_selectedChannel->curve()->attach(m_plot);
-	}
-
-	if(m_selectedChannel->handle()) {
-		m_selectedChannel->handle()->offsetHdl()->raise();
+		m_selectedChannel->raise();
 	}
 }
 

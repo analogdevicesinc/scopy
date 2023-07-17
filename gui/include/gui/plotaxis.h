@@ -29,6 +29,9 @@ public:
 	double max() const;
 
 	QwtPlotZoomer *zoomer() const;
+	OscScaleEngine *scaleEngine() const;
+
+	OscScaleDraw *scaleDraw() const;
 
 public Q_SLOTS:
 	void setVisible(bool);
