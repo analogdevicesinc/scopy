@@ -98,7 +98,7 @@ void BufferMenuModel::readChnlAttr(QString iioChannelKey, QString attrName, bool
 		if (tcmd->getReturnCode() >= 0) {
 			char *result = tcmd->getResult();
 			QString bufferValues(result);
-			QStringList attrValues = bufferValues.split(" ");
+			QStringList attrValues = bufferValues.trimmed().split(" ");
 			//threshold should have a default value in the driver
 			//			attrValues.removeAll(QString(""));
 			Q_EMIT channelAttributeRead(iioChannelKey, attrName, attrValues, readback);
