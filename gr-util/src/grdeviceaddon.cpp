@@ -15,6 +15,10 @@ QString GRDeviceAddon::getName() { return name;}
 
 QWidget *GRDeviceAddon::getWidget() { return widget;}
 
+GRIIODeviceSource *GRDeviceAddon::src() const {
+	return m_src;
+}
+
 void GRDeviceAddon::enable() {}
 
 void GRDeviceAddon::disable() {}

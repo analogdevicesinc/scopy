@@ -23,27 +23,27 @@ PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, QObject *p
 	m_chOffsetBar->setMobileAxis(ax->axisId());
 	m_chOffsetBar->setPen(pen);
 
-	m_chOffsetHdl = new RoundedHandleV(
+	m_handle = new RoundedHandleV(
 	    QPixmap(":/gui/icons/handle_right_arrow.svg"),
 	    QPixmap(":/gui/icons/handle_up_arrow.svg"),
 	    QPixmap(":/gui/icons/handle_down_arrow.svg"),
 	    p->leftHandlesArea(), true);
 
-	m_chOffsetHdl->setRoundRectColor(m_pen.color());
-	m_chOffsetHdl->setPen(pen);
-	m_chOffsetHdl->setVisible(true);
+	m_handle->setRoundRectColor(m_pen.color());
+	m_handle->setPen(pen);
+	m_handle->setVisible(true);
 
 	/* When bar position changes due to plot resizes update the handle */
-	connect(p->leftHandlesArea(), &HandlesArea::sizeChanged, m_chOffsetHdl, [=](){
-		m_chOffsetHdl->updatePosition();
+	connect(p->leftHandlesArea(), &HandlesArea::sizeChanged, m_handle, [=](){
+		m_handle->updatePosition();
 	});
 
 	connect(m_chOffsetBar, &HorizBar::pixelPositionChanged, this,
 		[=](int pos) {
-			m_chOffsetHdl->setPositionSilenty(pos);
+			m_handle->setPositionSilenty(pos);
 		});
 
-	connect(m_chOffsetHdl, &RoundedHandleV::positionChanged, this,
+	connect(m_handle, &RoundedHandleV::positionChanged, this,
 		[=](int pos) {
 			QwtScaleMap yMap = p->plot()->canvasMap(ax->axisId());
 			double offset = yMap.invTransform(pos);			
@@ -61,9 +61,9 @@ PlotAxisHandle::~PlotAxisHandle()
 {	
 }
 
-RoundedHandleV *PlotAxisHandle::offsetHdl() const
+RoundedHandleV *PlotAxisHandle::handle() const
 {
-	return m_chOffsetHdl;
+	return m_handle;
 }
 
 PlotAxis *PlotAxisHandle::axis() const

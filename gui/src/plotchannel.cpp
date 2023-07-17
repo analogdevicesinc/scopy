@@ -6,11 +6,12 @@
 using namespace scopy;
 
 PlotChannel::PlotChannel(QString name, QPen pen, PlotWidget *plot, PlotAxis *xAxis, PlotAxis *yAxis, QObject *parent)
-    : QObject(parent),
-      m_plotWidget(plot),
-      m_plot(m_plotWidget->plot()),
-	  m_xAxis(xAxis),
-	  m_yAxis(yAxis)
+	: QObject(parent),
+	m_plotWidget(plot),
+	m_plot(m_plotWidget->plot()),
+	m_xAxis(xAxis),
+	m_yAxis(yAxis),
+	m_handle(nullptr)
 {
 	m_curve = new QwtPlotCurve(name);
 	m_curve->setAxes(m_xAxis->axisId(), m_yAxis->axisId());
@@ -62,6 +63,25 @@ PlotAxisHandle *PlotChannel::handle() const
 void PlotChannel::setHandle(PlotAxisHandle *newHandle)
 {
 	m_handle = newHandle;
+}
+
+void PlotChannel::raise()
+{
+	detach();
+	attach();
+	if(m_handle->handle()) {
+		m_handle->handle()->raise();
+	}
+}
+
+void PlotChannel::attach()
+{
+	m_curve->attach(m_plot);
+}
+
+void PlotChannel::detach()
+{
+	m_curve->detach();
 }
 
 PlotAxis *PlotChannel::yAxis() const

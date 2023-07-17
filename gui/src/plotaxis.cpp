@@ -8,10 +8,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QObject *parent) :
 {
 	m_min = -1;
 	m_max = 1;
-	m_divs = (isHorizontal()) ? 16.0 : 10.0;
-
-	// bufferpreviewer - part of instrument - connected to plotcontroller (?)
-	// cursors - part of instrument  (?)
+	m_divs = (isHorizontal()) ? 10.0 : 10.0;
 
 	// setRawSamples
 	// - how to compute X axis ?
@@ -34,6 +31,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QObject *parent) :
 	m_plot->setAxisScaleDraw(m_axisId,m_scaleDraw);
 
 	m_scaleEngine = new OscScaleEngine();
+	m_scaleEngine->setMajorTicksCount(m_divs);
 	m_plot->setAxisScaleEngine(m_axisId, (QwtScaleEngine *)m_scaleEngine);
 
 	m_plotWidget->addPlotAxis(this);
@@ -121,6 +119,16 @@ void PlotAxis::setVisible(bool val)
 
 void PlotAxis::updateAxisScale() {
 	m_plot->setAxisScale(m_axisId, m_min, m_max, (m_max - m_min)/m_divs); // set Divs, limits
+}
+
+OscScaleDraw *PlotAxis::scaleDraw() const
+{
+	return m_scaleDraw;
+}
+
+OscScaleEngine *PlotAxis::scaleEngine() const
+{
+	return m_scaleEngine;
 }
 
 QwtPlotZoomer *PlotAxis::zoomer() const
