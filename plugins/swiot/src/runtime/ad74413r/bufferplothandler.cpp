@@ -90,6 +90,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisVisible(QwtAxis::YLeft, false);
+	m_plot->enableColoredLabels(true);
 	updatePlotTimespan();
 
 	for (unsigned int i = 0; i < plotChnlsNo; i++) {
