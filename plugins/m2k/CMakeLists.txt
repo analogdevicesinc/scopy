@@ -61,9 +61,12 @@ find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filte
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
-if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+else()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
+
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
