@@ -206,7 +206,7 @@ void ScopyHomeAddPage::futureVerify()
 void ScopyHomeAddPage::futureScan()
 {
 	scanList.clear();
-	QString scanParams = scanParamsList.join("");
+	QString scanParams = scanParamsList.join("").remove("serial:");
 	QFuture<int> f = QtConcurrent::run(std::bind(&IIOScanTask::scan, &scanList, scanParams));
 	fwScan->setFuture(f);
 }
