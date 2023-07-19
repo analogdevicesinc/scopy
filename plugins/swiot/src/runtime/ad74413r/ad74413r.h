@@ -83,7 +83,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void broadcastReadThreshold(QString value);
-
+	void thresholdControlEnable(bool enable);
 	void channelWidgetEnabled(int curveId, bool en);
 	void channelWidgetSelected(int curveId);
 

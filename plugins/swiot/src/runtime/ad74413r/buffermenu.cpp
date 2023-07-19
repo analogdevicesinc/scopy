@@ -220,6 +220,7 @@ void DigitalInLoopMenu::connectSignalsToSlots()
 	connect(m_thresholdLineEdit, &QLineEdit::returnPressed, this, &DigitalInLoopMenu::thresholdChanged);
 	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), this, SLOT(onBroadcastThresholdRead(QString)));
+	connect(this, &BufferMenu::thresholdControlEnable, this, &DigitalInLoopMenu::onThresholdControlEnable);
 }
 
 QString DigitalInLoopMenu::getInfoMessage()
@@ -294,6 +295,11 @@ void DigitalInLoopMenu::onBroadcastThresholdRead(QString value)
 		m_attrValues[INPUT_CHNL]["threshold"].first() = value;
 	}
 	m_thresholdLineEdit->blockSignals(false);
+}
+
+void DigitalInLoopMenu::onThresholdControlEnable(bool enabled)
+{
+	m_thresholdLineEdit->setEnabled(enabled);
 }
 
 VoltageOutMenu::VoltageOutMenu(QWidget* parent, QString chnlFunction)
@@ -814,6 +820,7 @@ void DigitalInMenu::connectSignalsToSlots()
 	connect(m_thresholdLineEdit, &QLineEdit::returnPressed, this, &DigitalInMenu::thresholdChanged);
 	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), this, SLOT(onBroadcastThresholdRead(QString)));
+	connect(this, &BufferMenu::thresholdControlEnable, this, &DigitalInMenu::onThresholdControlEnable);
 }
 
 void DigitalInMenu::thresholdChanged()
@@ -856,6 +863,11 @@ void DigitalInMenu::onBroadcastThresholdRead(QString value)
 		m_attrValues[INPUT_CHNL]["threshold"].first() = value;
 	}
 	m_thresholdLineEdit->blockSignals(false);
+}
+
+void DigitalInMenu::onThresholdControlEnable(bool enabled)
+{
+	m_thresholdLineEdit->setEnabled(enabled);
 }
 
 
