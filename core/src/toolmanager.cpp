@@ -1,5 +1,6 @@
 #include "toolmanager.h"
 #include "pluginbase/preferences.h"
+#include "dynamicWidget.h"
 #include <QLoggingCategory>
 #include <QDebug>
 #include <QEvent>
@@ -163,20 +164,44 @@ void ToolManager::updateToolAttached(bool oldAttach) {
 	QString id = tme->uuid();
 
 	if(tme->attached()) {
+		// tool is detached, it will attach to the main window
 		if(dwm->contains(id)) {
 			dwm->remove(id);
 		}
 		ts->add(id,tool);
 		tm->attachSuccesful(id);
 	} else {
+		// tool is attached, it will detach
 		if(ts->contains(id)) {
 			ts->remove(id);
 		}
 		dwm->add(id, tme);
 		tm->detachSuccesful(id);
 	}
+
+	// by this time, the tool has changed it's state, either from attached to detached, or from detached to attached
 	saveToolAttachedState(tme);
 	showTool(id);
+
+	// highlight the current tool from the main window
+	if(tme->attached()) {
+		// the selected tool just attached, so it will be at the top of the stack, therefore highlighted
+		auto t = tm->getToolMenuItemFor(id);
+
+		if (t) {
+			t->getToolBtn()->setChecked(true);
+			setDynamicProperty(t, "selected", true);
+		}
+	} else {
+		// the top tool just detached, so we need to find the tool that is positioned at the new top of the stack.
+		auto ts_current_widget = ts->currentWidget();
+		auto ts_current_widget_key = ts->getKey(ts_current_widget);
+		auto t = tm->getToolMenuItemFor(ts_current_widget_key);
+
+		if (t) {
+			t->getToolBtn()->toggle();
+		}
+	}
 }
 
 void ToolManager::showTool(QString s) {
