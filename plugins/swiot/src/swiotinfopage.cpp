@@ -35,7 +35,7 @@ SwiotInfoPage::SwiotInfoPage(QWidget* parent) : InfoPage(parent)
 	connect(m_enTempReadCheckBox, &QCheckBox::toggled,
 		this, &SwiotInfoPage::temperatureReadEnabled);
 	m_enTempReadCheckBox->setEnabled(false);
-	m_enTempReadCheckBox->setVisible(false);
+	m_enTempReadCheckBox->setVisible(true);
 	m_enTempReadCheckBox->setChecked(true);
 	this->layout()->addWidget(m_enTempReadCheckBox);
 }
