@@ -46,6 +46,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
+	void thresholdControlEnable(bool enable);
 
 private:
 	int m_chnlIdx;
