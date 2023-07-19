@@ -59,6 +59,7 @@ public Q_SLOT:
 Q_SIGNALS:
 	void attrValuesChanged(QString attrName, QString chnlType);
 	void mapUpdated();
+	void thresholdControlEnable(bool enable);
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
 
@@ -101,6 +102,7 @@ public Q_SLOTS:
 	void thresholdChanged();
 	void onMapUpdated();
 	void onBroadcastThresholdRead(QString value);
+	void onThresholdControlEnable(bool enabled);
 private:
 	QLabel *m_titleLabel;
 	QLineEdit *m_thresholdLineEdit;
@@ -188,6 +190,7 @@ public Q_SLOTS:
 	void thresholdChanged();
 	void onMapUpdated();
 	void onBroadcastThresholdRead(QString value);
+	void onThresholdControlEnable(bool enabled);
 private:
 	QLabel *m_titleLabel;
 	QLineEdit *m_thresholdLineEdit;
