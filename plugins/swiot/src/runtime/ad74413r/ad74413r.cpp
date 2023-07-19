@@ -200,6 +200,7 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 		}
 		connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastReadThreshold(QString)));
 		connect(this, SIGNAL(broadcastReadThreshold(QString)), controller, SIGNAL(broadcastThresholdReadBackward(QString)));
+		connect(this, &Ad74413r::thresholdControlEnable, controller, &BufferMenuController::thresholdControlEnable);
 	}
 	m_currentChannelSelected++;
 	if (m_currentChannelSelected == 4) {
@@ -306,6 +307,7 @@ void Ad74413r::onOffsetHdlSelected(int hdlIdx, bool selected)
 void Ad74413r::onRunBtnPressed(bool toggled)
 {
 	Q_EMIT activateExportButton();
+	Q_EMIT thresholdControlEnable(!toggled);
 	if (toggled) {
 		m_toolView->getSingleBtn()->setChecked(false);
 		m_toolView->getSingleBtn()->setEnabled(false);
@@ -334,6 +336,7 @@ void Ad74413r::onSingleBtnPressed(bool toggled)
 	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
 	if (toggled) {
 		Q_EMIT activateExportButton();
+		Q_EMIT thresholdControlEnable(toggled);
 		verifyChnlsChanges();
 		if (runBtnChecked) {
 			m_toolView->getRunBtn()->setChecked(false);
@@ -355,6 +358,7 @@ void Ad74413r::onSingleCaptureFinished()
 		if (m_tme->running()) {
 			m_tme->setRunning(false);
 		}
+		Q_EMIT thresholdControlEnable(true);
 		m_samplingFreqOptions->setEnabled(true);
 		m_toolView->getSingleBtn()->setEnabled(true);
 	}

@@ -51,6 +51,7 @@ void BufferMenuController::createConnections()
 
 	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastThresholdReadForward(QString)));
 	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu, SIGNAL(broadcastThresholdReadBackward(QString)));
+	connect(this, &BufferMenuController::thresholdControlEnable, advMenu, &BufferMenu::thresholdControlEnable);
 }
 
 void BufferMenuController::attributesChanged(QString attrName, QString chnlType)
