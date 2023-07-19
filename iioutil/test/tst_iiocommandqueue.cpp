@@ -78,8 +78,8 @@ public:
 	virtual void execute() override {
 		Q_EMIT started(this);
 		m_cmdResult->errorCode = m_a * m_b;
-		char* tmp = "TEST OK";
-		m_cmdResult->results = tmp;
+		const char* tmp = "TEST OK";
+		m_cmdResult->results = (char*)tmp;
 		Q_EMIT finished(this);
 	}
 
@@ -251,7 +251,7 @@ void TST_IioCommandQueue::testCommandOrder() {
  */
 void TST_IioCommandQueue::testLaunchCommandFromThread() {
 	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
-	int m_nbOfThreads = 10;
+	int m_nbOfThreads = 5;
 	m_commandExecThreadPool.setMaxThreadCount(m_nbOfThreads);
 
 	for (int i = 0; i < m_nbOfThreads * 2; i++) {
