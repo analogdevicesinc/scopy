@@ -66,9 +66,9 @@ if(ENABLE_TESTING)
     add_subdirectory(tests)
 endif()
 
+option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" OFF)
 if (APPLE)
-        option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" ON)
-        set(EXTRA_BUNDLE_FILES "")
+	set(ENABLE_APPLICATION_BUNDLE ON)
 endif(APPLE)
 
 set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
@@ -118,6 +118,20 @@ if (ENABLE_APPLICATION_BUNDLE)
         )
 
         set(OSX_BUNDLE MACOSX_BUNDLE)
+
+        find_package(PkgConfig)
+        set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
+        pkg_check_modules(GLIB REQUIRED glib-2.0)
+        pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+        pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
+        file(GLOB_RECURSE DECODERS ${LIBSIGROK_DECODERS_DIR}/*.py)
+        foreach(_decoder ${DECODERS})
+                file(RELATIVE_PATH _file ${LIBSIGROK_DECODERS_DIR} ${_decoder})
+                get_filename_component(_path ${_file} DIRECTORY)
+                set_property(SOURCE ${_decoder} PROPERTY MACOSX_PACKAGE_LOCATION MacOS/decoders/${_path})
+                set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${_decoder})
+        endforeach()
+
         set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} ${QT_PLUGINS} ${ICON_FILE} ${PKGINFO} ${QT_CONF})
 endif()
 
@@ -179,7 +193,9 @@ set_target_properties(${PROJECT_NAME}  PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
+if (ENABLE_APPLICATION_BUNDLE)
+	set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
+endif()
 
 configure_file(windows/scopy.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy.iss @ONLY)
 configure_file(windows/scopy-32.iss.cmakein ${CMAKE_CURRENT_BINARY_DIR}/windows/scopy-32.iss @ONLY)
