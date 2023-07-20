@@ -13,15 +13,18 @@ GRM2K_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
 LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
+GLOG_BRANCH=v0.4.0
+SPDLOG_BRANCH=v1.x
 
 PYTHON="python3"
+QT_FORMULAE=qt@5
 
 PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
-PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport"
+PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
 
 STAGING_AREA=$PWD/staging
-STAGING_AREA_DEPS=$STAGING_AREA/dependencies
 JOBS=-j8
+STAGINGDIR=$STAGING_AREA/dependencies
 
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
@@ -85,8 +88,9 @@ save_version_info() {
 
 build_with_cmake() {
 	echo $PWD
-	BUILD_FOLDER=$PWD/build-${ARCH}
+	BUILD_FOLDER=$PWD/build
 	rm -rf $BUILD_FOLDER
+	git clean -xdf
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
@@ -106,13 +110,14 @@ build_libiio() {
 	CURRENT_BUILD_CMAKE_OPTS="\
 		-DWITH_TESTS:BOOL=OFF \
 		-DWITH_DOC:BOOL=OFF \
-		-DHAVE_DNS_SD:BOOL=OFF \
-		-DENABLE_DNS_SD:BOOL=OFF \
+		-DHAVE_DNS_SD:BOOL=ON \
+		-DENABLE_DNS_SD:BOOL=ON \
 		-DWITH_MATLAB_BINDINGS:BOOL=OFF \
 		-DCSHARP_BINDINGS:BOOL=OFF \
 		-DPYTHON_BINDINGS:BOOL=OFF \
 		-DINSTALL_UDEV_RULE:BOOL=OFF \
 		-DWITH_SERIAL_BACKEND:BOOL=ON \
+		-DENABLE_IPV6:BOOL=OFF \
 		-DOSX_PACKAGE:BOOL=OFF
 		"
 	build_with_cmake
@@ -131,7 +136,7 @@ build_libm2k() {
 		-DBUILD_EXAMPLES=OFF \
 		-DENABLE_TOOLS=OFF \
 		-DINSTALL_UDEV_RULES=OFF \
-		-DENABLE_LOG=ON \
+		-DENABLE_LOG=OFF\
 		"
 	build_with_cmake
 	popd
@@ -199,8 +204,9 @@ build_libsigrokdecode() {
 	save_version_info
 
 	pushd $STAGING_AREA/libsigrokdecode
+	git reset --hard
 	./autogen.sh
-	./configure --prefix $STAGING_AREA_DEPS
+	./configure --prefix $STAGINGDIR
 	sudo make $JOBS install
 	popd
 }
@@ -241,28 +247,3 @@ export_paths
 clone
 generate_status_file
 build_deps
-
-
-# build_glibmm() {
-# 	echo "### Building glibmm - 2.64.0"
-# 	cd ${WORKDIR}
-# 	wget http://ftp.acc.umu.se/pub/gnome/sources/glibmm/2.64/glibmm-2.64.0.tar.xz
-# 	tar xzvf glibmm-2.64.0.tar.xz
-# 	cd glibmm-2.64.0
-# 	echo "libglibmm - v2.64.0" >> $BUILD_STATUS_FILE
-# 	./configure --prefix=$STAGINGDIR
-# 	make -j $JOBS
-# 	sudo make -j $JOBS install
-# }
-
-# build_sigcpp() {
-# 	echo "### Building libsigc++ -2.10.0"
-# 	cd ${WORKDIR}
-# 	wget http://ftp.acc.umu.se/pub/GNOME/sources/libsigc++/2.10/libsigc++-2.10.0.tar.xz
-# 	tar xvzf libsigc++-2.10.0.tar.xz
-# 	cd libsigc++-2.10.0
-# 	echo "libsigc++ - v2.10.0" >> $BUILD_STATUS_FILE
-# 	./configure --prefix=$STAGINGDIR
-# 	make -j $JOBS
-# 	sudo make -j $JOBS install
-# }
