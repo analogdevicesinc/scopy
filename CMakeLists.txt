@@ -56,6 +56,15 @@ endif()
 
 qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
+if (WIN32)
+	# Set .exe properties
+	string(REPLACE "." "," SCOPY_FILEVERSION ${PROJECT_VERSION})
+	set(SCOPY_PRODUCTVERSION_STR ${PROJECT_VERSION})
+	string(TIMESTAMP BUILD_YEAR "%Y")
+	set(SCOPY_WIN32_RESOURCES ${CMAKE_CURRENT_BINARY_DIR}/resources/properties.rc)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/resources/properties.rc.cmakein ${SCOPY_WIN32_RESOURCES} @ONLY)
+endif()
+
 find_path(
 	IIO_INCLUDE_DIRS
 	NAMES iio.h
@@ -102,6 +111,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 	${PROJECT_SOURCES}
 	${SCOPY_RESOURCES}
 	${SCOPY_DEPENDENCIES}
+	${SCOPY_WIN32_RESOURCES}
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET tool_launcher APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
