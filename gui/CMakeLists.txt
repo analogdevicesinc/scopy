@@ -68,8 +68,6 @@ if(SCOPY_ENABLE_SIGROK_GUI)
 	set(SCOPY_HAVE_SIGROK_GUI ON)
 endif()
 
-set(EXTRA_BUNDLE_FILES ${EXTRA_BUNDLE_FILES} PARENT_SCOPE)
-
 add_definitions(-DBOOST_ALL_DYN_LINK)
 find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
