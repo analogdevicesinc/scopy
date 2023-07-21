@@ -7,10 +7,11 @@ using namespace scopy;
 
 InfoPage::InfoPage(QWidget *parent) :
 	QWidget(parent)
-      , m_advancedMode(true)
+      , m_advancedMode(false)
 {
 	getKeyMap();
 	lay = new QVBoxLayout(this);
+	lay->setSpacing(3);
 }
 
 InfoPage::~InfoPage()
