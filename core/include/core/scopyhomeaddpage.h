@@ -30,6 +30,8 @@ Q_SIGNALS:
 	void deviceInfoAvailable(QMap<QString, QString> ctxInfo);
 	void uriChanged(QString uri);
 
+protected:
+	void showEvent(QShowEvent *event) override;
 private Q_SLOTS:
 	void futureVerify();
 	void futureScan();

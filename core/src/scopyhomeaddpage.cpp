@@ -54,23 +54,28 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	connect(ui->comboBoxBaudRate, &QComboBox::textActivated, this, [=](){
 		Q_EMIT uriChanged(getSerialPath());
 	});
-	connect(ui->editSerialFrameConfig, &QLineEdit::textChanged, this, [=](){
+	connect(ui->editSerialFrameConfig, &QLineEdit::returnPressed, this, [=](){
 		Q_EMIT uriChanged(getSerialPath());
 	});
 	connect(this, &ScopyHomeAddPage::uriChanged, this, &ScopyHomeAddPage::updateUri);
-	connect(ui->editUri, &QLineEdit::textChanged, this, [=](QString uri){
-		ui->btnVerify->setEnabled(!uri.isEmpty());
-	});
-
 	connect(ui->editUri, &QLineEdit::returnPressed, this, [=](){
 		Q_EMIT ui->btnVerify->clicked();
 	});
-
+	connect(ui->editUri, &QLineEdit::textChanged, this, [=](QString uri){
+		ui->btnVerify->setEnabled(!uri.isEmpty());
+	});
 	connect(this, &ScopyHomeAddPage::deviceInfoAvailable, this, [=](QMap<QString, QString> ctxInfo){
 		foreach (const QString &key, ctxInfo.keys()){
 			deviceInfoPage->update(key, ctxInfo[key]);
 		}
 	},Qt::QueuedConnection);
+	connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, [=](){
+		if (ui->stackedWidget->currentWidget() == ui->deviceInfoPage) {
+			ui->btnAdd->setFocus();
+		} else {
+			ui->btnScan->setFocus();
+		}
+	});
 }
 
 ScopyHomeAddPage::~ScopyHomeAddPage()
@@ -94,21 +99,24 @@ void ScopyHomeAddPage::initAddPage()
 	scanIcon->setFileName(":/gui/loading.gif");
 	ui->btnScan->setAnimation(scanIcon);
 
-	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){1}$");
+	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
 
 	ui->editSerialFrameConfig->setValidator(validator);
 	ui->serialSettingsWidget->setEnabled(hasLibSerialPort && serialBackEnd);
 	ui->btnAdd->setProperty("blue_button", QVariant(true));
 	ui->btnVerify->setProperty("blue_button", QVariant(true));
+	ui->btnVerify->setEnabled(false);
 	ui->btnScan->setProperty("blue_button", QVariant(true));
 	ui->btnScan->setIcon(QIcon(":/gui/icons/refresh.svg"));
 	ui->btnScan->setIconSize(QSize(25,25));
 	ui->btnBack->setProperty("blue_button", QVariant(true));
-	ui->btnVerify->setEnabled(false);
 	ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
 	ui->labelConnectionLost->clear();
 	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
+	ui->btnScan->setAutoDefault(true);
+	ui->btnVerify->setAutoDefault(true);
+	ui->btnAdd->setAutoDefault(true);
 
 	for (int baudRate : availableBaudRates) {
 		ui->comboBoxBaudRate->addItem(QString::number(baudRate));
@@ -281,6 +289,9 @@ void ScopyHomeAddPage::updateUri(QString uri)
 {
 	ui->editUri->clear();
 	ui->editUri->setText(uri);
+	if (!uri.isEmpty()) {
+		ui->btnVerify->setFocus();
+	}
 }
 
 void ScopyHomeAddPage::addBtnClicked()
@@ -351,6 +362,12 @@ void ScopyHomeAddPage::addScanFeedbackMsg(QString message)
 	ui->comboBoxContexts->addItem(message);
 	ui->comboBoxContexts->setEnabled(false);
 	updateUri("");
+}
+
+void ScopyHomeAddPage::showEvent(QShowEvent *event)
+{
+	QWidget::showEvent(event);
+	ui->btnScan->setFocus();
 }
 
 #include "moc_scopyhomeaddpage.cpp"
