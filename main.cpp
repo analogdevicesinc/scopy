@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 
 	scopy::ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
+	a.setWindowIcon(QIcon(":/gui/icon.ico"));
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
 	scopy::ScopyMainWindow w;
 	w.show();
