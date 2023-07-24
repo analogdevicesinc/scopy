@@ -16,6 +16,7 @@ using namespace scopy;
 ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 	QWidget(parent),
 	ui(new Ui::ScopyHomeAddPage),
+	emuWidget(new EmuWidget()),
 	pluginManager(pm), deviceImpl(nullptr)
 {
 	ui->setupUi(this);
@@ -76,6 +77,7 @@ ScopyHomeAddPage::ScopyHomeAddPage(QWidget *parent, PluginManager *pm) :
 			ui->btnScan->setFocus();
 		}
 	});
+	connect(emuWidget, &EmuWidget::emuDeviceAvailable, this, &ScopyHomeAddPage::onEmuDeviceAvailable);
 }
 
 ScopyHomeAddPage::~ScopyHomeAddPage()
@@ -114,6 +116,8 @@ void ScopyHomeAddPage::initAddPage()
 	ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
 	ui->labelConnectionLost->clear();
 	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
+	ui->tabEmu->layout()->addWidget(emuWidget);
+
 	ui->btnScan->setAutoDefault(true);
 	ui->btnVerify->setAutoDefault(true);
 	ui->btnAdd->setAutoDefault(true);
@@ -306,6 +310,13 @@ void ScopyHomeAddPage::addBtnClicked()
 	ContextProvider::GetInstance()->close(deviceImpl->param());
 	ui->labelConnectionLost->clear();
 	Q_EMIT newDeviceAvailable(deviceImpl);
+}
+
+void ScopyHomeAddPage::onEmuDeviceAvailable(QString uri)
+{
+	updateUri(uri);
+	ui->tabWidget->setCurrentWidget(ui->tabIio);
+	ui->stackedWidget->setCurrentWidget(ui->deviceDetectionPage);
 }
 
 void ScopyHomeAddPage::createDevice(QString cat)

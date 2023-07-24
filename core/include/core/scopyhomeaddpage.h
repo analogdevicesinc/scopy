@@ -8,6 +8,7 @@
 #include "pluginmanager.h"
 #include "scopy-core_export.h"
 #include <QFuture>
+#include "emuwidget.h"
 #include <iio.h>
 
 namespace Ui {
@@ -42,6 +43,7 @@ private Q_SLOTS:
 	void deviceLoaderInitialized();
 	void updateUri(QString uri);
 	void addBtnClicked();
+	void onEmuDeviceAvailable(QString uri);
 
 private:
 	void initAddPage();
@@ -56,6 +58,7 @@ private:
 	void addScanFeedbackMsg(QString message);
 
 	Ui::ScopyHomeAddPage *ui;
+	EmuWidget *emuWidget;
 	QString pendingUri;
 	QFutureWatcher<bool> *fw;
 	QFutureWatcher<int> *fwScan;
