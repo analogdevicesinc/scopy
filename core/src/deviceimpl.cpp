@@ -127,10 +127,12 @@ void DeviceImpl::loadPages() {
 
 	connbtn->setProperty("device_page",true);
 	connbtn->setProperty("blue_button",true);
+	connbtn->setAutoDefault(true);
 	m_buttonLayout->addWidget(connbtn);
 
 	discbtn->setProperty("device_page",true);
 	discbtn->setProperty("blue_button",true);
+	discbtn->setAutoDefault(true);
 	m_buttonLayout->addWidget(discbtn);
 	discbtn->setVisible(false);
 
@@ -202,13 +204,16 @@ QList<Plugin *> DeviceImpl::plugins() const
 void DeviceImpl::showPage() {
 	for(auto &&p : m_plugins)
 		p->showPageCallback();
-
+	if (connbtn->isHidden()) {
+		discbtn->setFocus();
+	} else {
+		connbtn->setFocus();
+	}
 }
 
 void DeviceImpl::hidePage() {
 	for(auto &&p : m_plugins)
 		p->hidePageCallback();
-
 }
 
 void DeviceImpl::save(QSettings &s) {
@@ -250,6 +255,7 @@ void DeviceImpl::connectDev() {
 	} else {
 		connbtn->hide();
 		discbtn->show();
+		discbtn->setFocus();
 		Q_EMIT connected();
 	}
 }
@@ -266,6 +272,7 @@ void DeviceImpl::disconnectDev() {
 		p->onDisconnect();
 	}
 	m_connectedPlugins.clear();
+	connbtn->setFocus();
 	Q_EMIT disconnected();
 }
 
