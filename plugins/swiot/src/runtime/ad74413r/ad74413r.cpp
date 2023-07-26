@@ -34,7 +34,7 @@ using namespace scopy::swiot;
 Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 	QWidget(parent)
       , m_tme(tme), m_statusLabel(new QLabel(this))
-      , m_swiotAdLogic(nullptr), m_widget(parent)
+      , m_swiotAdLogic(nullptr), m_widget(this)
       , m_readerThread(nullptr), m_statusContainer(new QWidget(this))
       , m_ctx(ctx)
       , m_cmdQueue(CommandQueueProvider::GetInstance()->open(ctx))
@@ -69,6 +69,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 		}
 	}
 
+	this->initTutorialProperties();
 }
 
 Ad74413r::~Ad74413r()
@@ -98,7 +99,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 	recipe.hasChannels = true;
 	recipe.channelsPosition = scopy::gui::ChannelsPositionEnum::VERTICAL;
 
-	m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition);
+	m_monitorChannelManager = new scopy::gui::ChannelManager(recipe.channelsPosition, this);
 	m_monitorChannelManager->setChannelIdVisible(false);
 	m_monitorChannelManager->setToolStatus(QString(AD_NAME).toUpper());
 
@@ -124,7 +125,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 
 	m_toolView->addPlotInfoWidget(m_statusContainer);
 	m_toolView->addFixedCentralWidget(m_plotHandler->getPlotWidget(), 0, 0, 0, 0);
-	this->setLayout(new QVBoxLayout());
+	this->setLayout(new QVBoxLayout(this));
 	this->layout()->addWidget(m_toolView);
 }
 
@@ -442,4 +443,13 @@ void Ad74413r::onBackBtnPressed()
 {
 	m_readerThread->forcedStop();
 	Q_EMIT backBtnPressed();
+}
+
+void Ad74413r::initTutorialProperties() {
+	// initialize components that might be used for the AD74413R tutorial
+	m_plotHandler->getPlotWidget()->setProperty("tutorial_name", "AD74413R_PLOT");
+	m_toolView->getSingleBtn()->setProperty("tutorial_name", "SINGLE_BUTTON");
+	m_toolView->getRunBtn()->setProperty("tutorial_name", "RUN_BUTTON");
+	m_toolView->getGeneralSettingsBtn()->setProperty("tutorial_name", "AD74413R_SETTINGS");
+	m_backBtn->setProperty("tutorial_name", "CONFIG_BUTTON");
 }

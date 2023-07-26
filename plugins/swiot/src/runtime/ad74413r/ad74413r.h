@@ -103,6 +103,8 @@ private:
 
 	QPushButton* createBackBtn();
 
+	void initTutorialProperties();
+
 private:
 	QMap<QString, iio_device*> m_iioDevicesMap;
 	int m_enabledChnlsNo = 0;

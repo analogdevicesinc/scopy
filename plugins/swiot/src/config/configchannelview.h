@@ -79,6 +79,8 @@ private:
 
 	// UI elements
 	Ui::ConfigChannelView *ui;
+
+	void initTutorialProperties();
 };
 }
 

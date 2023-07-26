@@ -77,6 +77,7 @@ private:
 	QWidget* m_statusContainer;
 	Ui::ConfigMenu* ui;
 
+	void initTutorialProperties();
         void setupToolView(QWidget* parent);
 	void init();
         void createPageLayout();

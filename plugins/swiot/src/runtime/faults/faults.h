@@ -55,6 +55,7 @@ private Q_SLOTS:
 private:
         void connectSignalsAndSlots();
         void setupDynamicUi(QWidget *parent);
+	void initTutorialProperties();
         static QPushButton* createBackButton();
 
 	struct iio_context* ctx;

@@ -35,11 +35,11 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent) :
 
 	this->setAttribute(Qt::WA_Hover, true);
 
-	this->ui->enabledCheckBox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	this->ui->channelLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	this->ui->channelLabel->setText(QString::fromStdString("Channel ") + QString::number(m_channelIndex + 1));
 	this->ui->enabledCheckBox->toggled(true);
 	this->connectSignalsAndSlots();
+
+	this->initTutorialProperties();
 }
 
 ConfigChannelView::~ConfigChannelView() {
@@ -152,6 +152,15 @@ bool ConfigChannelView::eventFilter(QObject* object, QEvent *event) {
 	}
 
 	return QFrame::event(event);
+}
+
+void ConfigChannelView::initTutorialProperties() {
+	if (m_channelIndex == 0) {
+		this->setProperty("tutorial_name", "CHANNEL_WIDGET_1");
+		this->ui->enabledCheckBox->setProperty("tutorial_name", "CHANNEL_ENABLE_1");
+		this->ui->deviceOptions->setProperty("tutorial_name", "CHANNEL_DEVICE_1");
+		this->ui->functionOptions->setProperty("tutorial_name", "CHANNEL_FUNCTION_1");
+	}
 }
 
 #include "moc_configchannelview.cpp"

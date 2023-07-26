@@ -56,6 +56,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 	this->setupToolView(parent);
 	this->init();
 	this->createPageLayout();
+	this->initTutorialProperties();
 	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
 }
 
@@ -198,6 +199,11 @@ void SwiotConfig::externalPowerSupply(bool ps) {
 		m_statusContainer->show();
 		m_statusLabel->show();
 	}
+}
+
+void SwiotConfig::initTutorialProperties() {
+	m_configBtn->setProperty("tutorial_name", "APPLY_BUTTON");
+	m_drawArea->setProperty("tutorial_name", "DRAW_AREA");
 }
 
 #include "moc_swiotconfig.cpp"
