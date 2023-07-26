@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/swiot">
         <file>swiot_faults.json</file>
+        <file>tutorial_chapters.json</file>
         <file>ic_hi_gray.svg</file>
         <file>ic_hi_snow.svg</file>
         <file>ic_lo_gray.svg</file>
