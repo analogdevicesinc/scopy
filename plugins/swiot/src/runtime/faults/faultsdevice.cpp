@@ -71,6 +71,11 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	this->ui->lineEdit_numeric->setPlaceholderText("0x0");
 	this->ui->lineEdit_numeric->setFocusPolicy(Qt::NoFocus);
 
+	// initialize components that might be used for the Faults tutorial
+	if (m_name == "AD74413R") {
+		this->initTutorialProperties();
+	}
+
 	setDynamicProperty(m_subsectionSeparator->getButton(), "subsection_arrow_button", true);
 	m_subsectionSeparator->setContent(m_faults_explanation);
 
@@ -266,4 +271,12 @@ void FaultsDevice::initSpecialFaults()
 			m_cmdQueue->enqueue(m_deviceConfigCmds.at(i));
 		}
 	}
+}
+
+void FaultsDevice::initTutorialProperties() {
+	ui->lineEdit_numeric->setProperty("tutorial_name", "AD74413R_NUMERIC");
+	ui->reset_button->setProperty("tutorial_name", "AD74413R_RESET_STORED");
+	ui->clear_selection_button->setProperty("tutorial_name", "AD74413R_CLEAR_SELECTION");
+	m_faultsGroup->setProperty("tutorial_name", "AD74413R_FAULTS_GROUP");
+	m_faults_explanation->setProperty("tutorial_name", "AD74413R_EXPLANATIONS");
 }

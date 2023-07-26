@@ -80,6 +80,7 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 
 	this->m_generalSettingsMenu = this->createGeneralSettings("General settings",
 								  new QColor(0x4a, 0x64, 0xff)); // "#4a64ff"
+	this->m_generalSettingsMenu->setProperty("tutorial_name", "GENERAL_SETTINGS");
 	this->m_toolView->setGeneralSettingsMenu(this->m_generalSettingsMenu, true);
 
 	m_statusLabel->setText("The system is powered at limited capacity.");
@@ -107,6 +108,9 @@ void Max14906::setupDynamicUi(QWidget *parent) {
 	m_toolView->getRunBtn()->setEnabled(!!m_nbDioChannels);
 	m_toolView->getGeneralSettingsBtn()->setChecked(!!m_nbDioChannels);
 	m_tme->setRunBtnVisible(!!m_nbDioChannels);
+
+	m_toolView->getRunBtn()->setProperty("tutorial_name", "RUN_BUTTON");
+	m_backButton->setProperty("tutorial_name", "CONFIG_BUTTON");
 }
 
 scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, QColor *color) {
@@ -201,6 +205,7 @@ void Max14906::timerChanged(double value) {
 }
 
 void Max14906::initMonitorToolView() {
+	this->ui->grid->setProperty("tutorial_name", "DIO_DIGITAL_CHANNEL_SPACE");
 	int nbChannels = m_channelControls.size();
 	int lineSpan;
 	if (nbChannels > 2) {

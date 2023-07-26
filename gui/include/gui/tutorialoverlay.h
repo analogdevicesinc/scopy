@@ -27,9 +27,12 @@ public:
 	void setTitle(const QString &newTitle);
 
 public Q_SLOTS:
-	void start();
+	virtual void start();
 	void next();
 	void finish();
+
+Q_SIGNALS:
+	void finished();
 
 private:
 

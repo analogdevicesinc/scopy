@@ -53,7 +53,18 @@ Q_SIGNALS:
 	void specialFaultsUpdated(int index, QString channelFunction);
 	void faultNumericUpdated();
 
+private Q_SLOTS:
+	void updateMinimumHeight();
+	void deviceConfigCmdFinished(scopy::Command *cmd);
+	void functionConfigCmdFinished(scopy::Command *cmd);
+
 private:
+	void initTutorialProperties();
+	void initFaultExplanations();
+	void connectSignalsAndSlots();
+	void readFaults();
+	void initSpecialFaults();
+
 	Ui::FaultsDevice *ui;
 	QWidget *m_faults_explanation;
 	scopy::gui::SubsectionSeparator *m_subsectionSeparator;
@@ -74,16 +85,6 @@ private:
 	uint32_t m_faultNumeric;
 	QVector<Command*> m_deviceConfigCmds;
 	QVector<Command*> m_functionConfigCmds;
-
-	void initFaultExplanations();
-	void connectSignalsAndSlots();
-	void readFaults();
-	void initSpecialFaults();
-
-private Q_SLOTS:
-	void updateMinimumHeight();
-	void deviceConfigCmdFinished(scopy::Command *cmd);
-	void functionConfigCmdFinished(scopy::Command *cmd);
 };
 
 } // scopy::swiot

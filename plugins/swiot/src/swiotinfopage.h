@@ -33,9 +33,13 @@ class SwiotInfoPage : public InfoPage {
 public:
 	explicit SwiotInfoPage(QWidget* parent = nullptr);
 	void enableTemperatureReadBtn(bool enable);
+
 Q_SIGNALS:
 	void temperatureReadEnabled(bool toggled);
+
 private:
+	void initTempCheckBox();
+
 	QCheckBox *m_enTempReadCheckBox;
 };
 }

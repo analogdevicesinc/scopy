@@ -45,13 +45,16 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	max14906_numeric(0),
 	m_backButton(Faults::createBackButton()),
 	thread(new QThread(this)),
-	m_tme(tme) {
+	m_tme(tme)
+{
 	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
 	ui->setupUi(this);
 
 	this->setupDynamicUi(parent);
 	this->connectSignalsAndSlots();
+
+	this->initTutorialProperties();
 }
 
 Faults::~Faults() {
@@ -188,6 +191,13 @@ void Faults::externalPowerSupply(bool ps) {
 		m_statusContainer->show();
 		m_statusLabel->show();
 	}
+}
+
+void Faults::initTutorialProperties() {
+	// initialize components that might be used for the Faults tutorial
+	m_toolView->getSingleBtn()->setProperty("tutorial_name", "SINGLE_BUTTON");
+	m_toolView->getRunBtn()->setProperty("tutorial_name", "RUN_BUTTON");
+	m_backButton->setProperty("tutorial_name", "CONFIG_BUTTON");
 }
 
 #include "moc_faults.cpp"
