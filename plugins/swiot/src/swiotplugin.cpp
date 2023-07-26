@@ -31,6 +31,7 @@
 #include "src/runtime/swiotruntime.h"
 #include "src/swiot_logging_categories.h"
 #include "swiotinfopage.h"
+#include "utils.h"
 #include <iioutil/contextprovider.h>
 
 
@@ -66,6 +67,7 @@ bool SWIOTPlugin::loadPage()
 			m_swiotController->stopTemperatureTask();
 		}
 	});
+	connect(m_btnTutorial, &QPushButton::clicked, this, &SWIOTPlugin::startTutorial);
 
 	auto cp = ContextProvider::GetInstance();
 	struct iio_context* context = cp->open(m_param);
@@ -93,6 +95,12 @@ bool SWIOTPlugin::loadExtraButtons()
 {
 	m_btnIdentify = new QPushButton("Identify"); m_extraButtons.append(m_btnIdentify);
 	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
+
+	// The tutorial button will only be clickable when the user connects to the device
+	m_btnTutorial = new QPushButton("Tutorial"); m_extraButtons.append(m_btnTutorial);
+	m_btnTutorial->setEnabled(false);
+	m_btnTutorial->setToolTip("The tutorial will be available once the device is connected.");
+
 	return true;
 }
 
@@ -228,6 +236,8 @@ bool SWIOTPlugin::onConnect()
 	m_swiotController->connectSwiot(ctx);
 	m_swiotController->startPingTask();
 	m_swiotController->startPowerSupplyTask("ext_psu");
+	m_btnTutorial->setEnabled(true);
+	m_btnTutorial->setToolTip("");
 
 	return true;
 }
@@ -271,6 +281,8 @@ bool SWIOTPlugin::onDisconnect()
 	m_swiotController->stopTemperatureTask();
 	m_swiotController->disconnectSwiot();
 
+	m_btnTutorial->setEnabled(false);
+
 	if (m_runtime) {
 		delete m_runtime;
 		m_runtime = nullptr;
@@ -300,6 +312,65 @@ void SWIOTPlugin::onCtxSwitched()
 	Q_EMIT connectDevice();
 }
 
+void SWIOTPlugin::startTutorial() {
+	if (m_isRuntime) {
+		qInfo(CAT_SWIOT) << "Starting SWIOT runtime tutorial.";
+
+		// The tutorial builder is responsible for deleting itself after the tutorial is finished, so creating
+		// a new one each time the tutorial is started will not create memory leaks.
+		ToolMenuEntry* ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
+		ToolMenuEntry* max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
+		ToolMenuEntry* faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
+
+		QWidget* ad74413rTool = ad74413rTme->tool();
+		QWidget* max14906Tool = max14906Tme->tool();
+		QWidget* faultsTool = faultsTme->tool();
+		QWidget* parent = Util::findContainingWindow(ad74413rTool);
+
+		m_ad74413rTutorial = new gui::TutorialBuilder(ad74413rTool, ":/swiot/tutorial_chapters.json", "ad74413r", parent);
+		m_max14906Tutorial = new gui::TutorialBuilder(max14906Tool, ":/swiot/tutorial_chapters.json", "max14906", parent);
+		m_faultsTutorial = new gui::TutorialBuilder(faultsTool, ":/swiot/tutorial_chapters.json", "faults", parent);
+
+		connect(m_ad74413rTutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startMax14906Tutorial);
+		connect(m_max14906Tutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startFaultsTutorial);
+
+		this->startAd74413rTutorial();
+	} else {
+		qInfo(CAT_SWIOT) << "Starting SWIOT config tutorial.";
+		auto configTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, CONFIG_TME_ID);
+
+		auto configTool = configTme->tool();
+		auto parent = Util::findContainingWindow(configTool);
+		auto tut = new gui::TutorialBuilder(configTool, ":/swiot/tutorial_chapters.json", "config", parent);
+		requestTool(configTme->id());
+		tut->start();
+	}
+}
+
+void SWIOTPlugin::startAd74413rTutorial() {
+	qInfo(CAT_SWIOT) << "Starting ad74413r tutorial.";
+	ToolMenuEntry* ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
+	this->requestTool(ad74413rTme->id());
+	m_ad74413rTutorial->setTitle("AD74413R ");
+	m_ad74413rTutorial->start();
+}
+
+void SWIOTPlugin::startMax14906Tutorial() {
+	qInfo(CAT_SWIOT) << "Starting max14906 tutorial.";
+	ToolMenuEntry* max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
+	this->requestTool(max14906Tme->id());
+	m_max14906Tutorial->setTitle("MAX14906 ");
+	m_max14906Tutorial->start();
+}
+
+void SWIOTPlugin::startFaultsTutorial() {
+	qInfo(CAT_SWIOT) << "Starting faults tutorial.";
+	ToolMenuEntry* faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
+	this->requestTool(faultsTme->id());
+	m_faultsTutorial->setTitle("FAULTS ");
+	m_faultsTutorial->start();
+}
+
 QString SWIOTPlugin::description()
 {
 	return "Adds functionality specific to SWIOT1L board";
@@ -319,7 +390,5 @@ void SWIOTPlugin::initMetadata()
 	}
 )plugin");
 }
-
-
 
 #include "moc_swiotplugin.cpp"

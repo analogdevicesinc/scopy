@@ -36,6 +36,7 @@
 #include "src/swiotinfopage.h"
 #include <iioutil/cyclicaltask.h>
 #include <iioutil/commandqueue.h>
+#include <gui/tutorialbuilder.h>
 #include "src/externalpsreaderthread.h"
 
 namespace scopy::swiot {
@@ -65,10 +66,17 @@ public Q_SLOTS:
 	void showPageCallback() override;
 	void hidePageCallback() override;
 
+	void startTutorial();
+
+	void startAd74413rTutorial();
+	void startMax14906Tutorial();
+	void startFaultsTutorial();
+
 private:
 	void setupToolList();
 	SwiotInfoPage *m_infoPage;
 	QPushButton *m_btnIdentify;
+	QPushButton *m_btnTutorial;
 
 	QWidget *config;
 	QWidget *adtool;
@@ -77,6 +85,10 @@ private:
 
 	SwiotController *m_swiotController;
 	SwiotRuntime *m_runtime;
+
+	gui::TutorialBuilder *m_ad74413rTutorial;
+	gui::TutorialBuilder *m_max14906Tutorial;
+	gui::TutorialBuilder *m_faultsTutorial;
 
 	bool m_isRuntime;
 };
