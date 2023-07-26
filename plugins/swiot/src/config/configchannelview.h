@@ -23,7 +23,7 @@
 #define CONFIGCHANNELVIEW_H
 
 #include "qwidget.h"
-#include "ui_swiotconfigchnlview.h"
+#include "ui_configchannelview.h"
 
 #include <QObject>
 #include <QString>
