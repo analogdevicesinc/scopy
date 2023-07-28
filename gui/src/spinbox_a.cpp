@@ -95,6 +95,7 @@ SpinBoxA::SpinBoxA(vector<pair<QString, double> >units, const QString& name,
 	setMaxValue(max_value);
 
 	ui->SBA_Label->setText(name);
+	setInvertCircle(invertCircle);
 
 	m_displayScale = 1;
 
@@ -497,7 +498,7 @@ bool SpinBoxA::isCircleInverted() const
 	return ui->SBA_CompletionCircle->property("inverted").toBool();
 }
 
-void SpinBoxA::invertCircle(bool invert)
+void SpinBoxA::setInvertCircle(bool invert)
 {
 	ui->SBA_CompletionCircle->setProperty("inverted", QVariant(invert));
 }
