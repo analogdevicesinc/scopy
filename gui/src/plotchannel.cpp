@@ -55,6 +55,43 @@ void PlotChannel::disable()
 	setEnabled(false);
 }
 
+void PlotChannel::setThickness(int thickness)
+{
+	QPen pen = m_curve->pen();
+	pen.setWidthF(thickness);
+	m_curve->setPen(pen);
+}
+
+void PlotChannel::setStyle(int style)
+{
+
+	m_curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
+	m_curve->setCurveAttribute(QwtPlotCurve::Fitted, false);
+
+	switch(style) {
+	case PCS_LINES:
+		m_curve->setStyle(QwtPlotCurve::Lines);
+		break;
+	case PCS_DOTS:
+		m_curve->setStyle(QwtPlotCurve::Dots);
+		break;
+	case PCS_STEPS:
+		m_curve->setStyle(QwtPlotCurve::Steps);
+		break;
+	case PCS_STICKS:
+		m_curve->setStyle(QwtPlotCurve::Sticks);
+		break;
+	case PCS_SMOOTH:
+		m_curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
+		m_curve->setCurveAttribute(QwtPlotCurve::Fitted, true);
+		m_curve->setStyle(QwtPlotCurve::Lines);
+		break;
+	default:
+		m_curve->setStyle(QwtPlotCurve::Lines);
+		break;
+	}
+}
+
 PlotAxisHandle *PlotChannel::handle() const
 {
 	return m_handle;

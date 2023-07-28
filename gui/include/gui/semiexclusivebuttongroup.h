@@ -5,7 +5,7 @@
 #include <QButtonGroup>
 #include "scopy-gui_export.h"
 
-namespace scopy::gui {
+namespace scopy {
 class SCOPY_GUI_EXPORT SemiExclusiveButtonGroup : public QButtonGroup
 {
 	Q_OBJECT

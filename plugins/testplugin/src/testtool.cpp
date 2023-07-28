@@ -4,11 +4,22 @@
 #include <QDebug>
 #include <gui/stylehelper.h>
 #include <QButtonGroup>
-#include <hoverwidget.h>
 #include "plotwidget.h"
 #include "plotaxis.h"
 #include "plotcursors.h"
 
+#include <gui/widgets/hoverwidget.h>
+#include <gui/widgets/menucontrolbutton.h>
+#include <gui/widgets/toolbuttons.h>
+#include <gui/widgets/menuheader.h>
+#include <gui/stylehelper.h>
+#include <gui/widgets/menucombo.h>
+#include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/menubigswitch.h>
+#include <gui/widgets/menulineedit.h>
+#include <gui/widgets/verticalchannelmanager.h>
 
 using namespace scopy;
 
@@ -76,9 +87,10 @@ TestTool::TestTool(QWidget *parent)
 	ch1->setChecked(true);
 	channelButtonGroup->addButton(ch1);
 
-	auto *ch1PlotAxis = new PlotAxis(QwtAxis::YLeft, plot);
-	PlotChannel *ch1_plotch = new PlotChannel("Channel1", QPen(QColor(StyleHelper::getColor("CH1")), 1), plot, plot->xAxis(), ch1PlotAxis, this);
-	ch1_plotch->setHandle(new PlotAxisHandle(QPen(QColor(StyleHelper::getColor("CH1")),1),ch1PlotAxis,plot,this));
+	QPen ch1pen = QPen(QColor(StyleHelper::getColor("CH1")), 1);
+	auto *ch1PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch1pen);
+	PlotChannel *ch1_plotch = new PlotChannel("Channel1", ch1pen, plot, plot->xAxis(), ch1PlotAxis, this);
+	ch1_plotch->setHandle(new PlotAxisHandle(ch1pen ,ch1PlotAxis,plot,this));
 	plot->addPlotAxisHandle(ch1_plotch->handle());
 
 	connect(ch1->checkBox(),&QCheckBox::toggled, ch1_plotch, &PlotChannel::setEnabled);
@@ -93,9 +105,10 @@ TestTool::TestTool(QWidget *parent)
 	ch2->setColor(StyleHelper::getColor("CH2"));
 	channelButtonGroup->addButton(ch2);
 
-	auto *ch2PlotAxis = new PlotAxis(QwtAxis::YLeft, plot);
-	PlotChannel *ch2_plotch = new PlotChannel("Channel2", QPen(QColor(StyleHelper::getColor("CH2")), 1), plot, plot->xAxis(), ch2PlotAxis, this);
-	ch2_plotch->setHandle(new PlotAxisHandle(QPen(QColor(StyleHelper::getColor("CH2")), 1),ch2PlotAxis, plot, this));
+	QPen ch2pen = QPen(QColor(StyleHelper::getColor("CH2")), 1);
+	auto *ch2PlotAxis = new PlotAxis(QwtAxis::YLeft, plot, ch2pen);
+	PlotChannel *ch2_plotch = new PlotChannel("Channel2", ch2pen, plot, plot->xAxis(), ch2PlotAxis, this);
+	ch2_plotch->setHandle(new PlotAxisHandle(ch2pen,ch2PlotAxis, plot, this));
 	plot->addPlotAxisHandle(ch2_plotch->handle());
 	connect(ch2->checkBox(),&QCheckBox::toggled, ch2_plotch, &PlotChannel::setEnabled);
 	connect(ch2->checkBox(),&QCheckBox::toggled, this, [=](){plot->replot();});
@@ -124,7 +137,7 @@ TestTool::TestTool(QWidget *parent)
 	tool->addWidgetToBottomContainerHelper(cursor, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
-	QLabel *wch0 = new QLabel("Channel0Label");
+	QWidget *wch0 = createMenu(tool);
 	QLabel *wch1 = new QLabel("Channel1Label");
 	QLabel *wch2 = new QLabel("Channel2Label");
 
@@ -200,8 +213,74 @@ TestTool::TestTool(QWidget *parent)
 		hv->raise();
 
 	});
-
 }
+
+
+QWidget* TestTool::createMenu(QWidget* parent) {
+	QWidget *w = new QWidget(parent);
+	QVBoxLayout *lay = new QVBoxLayout(w);
+	lay->setMargin(0);
+	lay->setSpacing(10);
+	w->setLayout(lay);
+
+	MenuHeaderWidget *header = new MenuHeaderWidget("channel 0", QPen(StyleHelper::getColor("CH0")), w);
+	MenuComboWidget *yscale = new MenuComboWidget(tr("Y-Axis"), w);
+	MenuSectionWidget *vdiv = new MenuSectionWidget(w);
+
+	QLabel *txt = new QLabel("VDiv",vdiv);
+	StyleHelper::MenuSmallLabel(txt,"vdivLabel");
+	QComboBox *cbb = new QComboBox(vdiv);
+	cbb->addItem("Lorem");
+	cbb->addItem("Ipsum");
+	cbb->addItem("Corectipsum");
+	StyleHelper::MenuComboBox(cbb,"vdivCombo");
+
+	PositionSpinButton *ssb = new PositionSpinButton(
+	    {
+		{"Hz",1e0},
+		{"kHz",1e3},
+		{"MHz",1e6}
+	    },"Volts",0,1000,true,false,vdiv);
+	ssb->setMaxValue(1000);
+	StyleHelper::MenuSpinBox(ssb,"vdivSpin");
+
+	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), vdiv, false);
+
+	MenuCollapseSection *section1 = new MenuCollapseSection("SECTION1", MenuCollapseSection::MHCW_ARROW, vdiv);
+	section1->add(txt);
+	section1->add(cbb);
+	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF, vdiv);
+	section2->add(ssb);
+	section2->add(autoscale);
+
+	//	MenuBigSwitch *bigsw = new MenuBigSwitch("Yes", "No", vdiv);
+	QLabel *lbl = new QLabel("AUTOSCALE");
+	StyleHelper::MenuSmallLabel(lbl,"edit");
+	MenuLineEdit *edit = new MenuLineEdit(vdiv);
+
+	vdiv->contentLayout()->addWidget(section1);
+	vdiv->contentLayout()->addWidget(section2);
+	//	vdiv->contentLayout()->addWidget(bigsw);
+	vdiv->contentLayout()->addWidget(lbl);
+	vdiv->contentLayout()->addWidget(edit);
+
+	yscale->combo()->addItem("ADC Counts");
+	yscale->combo()->addItem("% Full Scale");
+
+	lay->addWidget(header);
+	lay->addWidget(yscale);
+	lay->addWidget(vdiv);
+	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+	QPushButton *btn = new QPushButton("TESTBtn");
+	StyleHelper::BlueButton(btn,"TestBtn");
+	vdiv->contentLayout()->addWidget(btn);
+	vdiv->contentLayout()->setSpacing(4);
+
+
+	return w;
+}
+
 
 void TestTool::initData()
 {

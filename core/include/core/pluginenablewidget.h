@@ -4,16 +4,17 @@
 #include <qwidget.h>
 #include "qcheckbox.h"
 #include "qlabel.h"
+#include "gui/utils.h"
 
 namespace scopy {
 
 class PluginEnableWidget : public QWidget {
 	Q_OBJECT
+	QWIDGET_PAINT_EVENT_HELPER
 public:
 	explicit PluginEnableWidget(QWidget *parent = nullptr);
 	~PluginEnableWidget();
 
-	void paintEvent(QPaintEvent *e) override;
 	void setDescription(QString description);
 	QCheckBox *checkBox() const;
 
