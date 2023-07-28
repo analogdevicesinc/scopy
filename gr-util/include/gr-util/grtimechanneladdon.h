@@ -10,6 +10,7 @@
 #include <gui/plotaxis.h>
 #include <gui/plotaxishandle.h>
 #include <gui/plotchannel.h>
+#include "grscaleoffsetproc.h"
 
 
 namespace scopy::grutil {
@@ -24,7 +25,6 @@ public:
 	QWidget* getWidget() override;
 	void setDevice(GRDeviceAddon *d);
 	GRDeviceAddon* getDevice();
-
 
 	QPen pen() const;
 
@@ -43,18 +43,25 @@ public Q_SLOTS:
 	void onChannelRemoved(ToolAddon*) override;
 
 private:
+	QString m_channelName;
+	GRDeviceAddon* m_dev;
+	GRScaleOffsetProc* m_scOff;
 	GRSignalPath *m_signalPath;
 	GRIIOChannel *m_grch;
 	GRTimePlotAddon* m_plotAddon;
-	GRDeviceAddon* m_dev;
 	QPen m_pen;
 
 	PlotChannel *m_plotCh;
 	PlotAxis *m_plotAxis;
 	PlotAxisHandle *m_plotAxisHandle;
 
+	bool m_scaleAvailable;
+	QString m_unit;
 	QString name;
 	QWidget *widget;
+	QWidget *createMenu(QWidget *parent = nullptr);
+	QWidget *createYAxisMenu(QWidget *parent);
+	QWidget *createCurveMenu(QWidget *parent);
 };
 }
 #endif // GRTIMECHANNELADDON_H

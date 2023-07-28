@@ -13,7 +13,7 @@ namespace scopy {
 class SCOPY_GUI_EXPORT PlotAxis : public QObject {
 	Q_OBJECT
 public:
-	PlotAxis(int position, PlotWidget *p, QObject *parent = nullptr);
+	PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent = nullptr);
 	~PlotAxis() {}
 
 	int position();
@@ -34,8 +34,15 @@ public:
 	OscScaleDraw *scaleDraw() const;
 
 public Q_SLOTS:
+	void setMax(double newMax);
+	void setMin(double newMin);
+
 	void setVisible(bool);
 	void updateAxisScale();
+
+Q_SIGNALS:
+	void maxChanged();
+	void minChanged();
 
 private:
 	QwtAxisId m_axisId;
@@ -46,7 +53,6 @@ private:
 	OscScaleDraw *m_scaleDraw;
 	OscScaleEngine *m_scaleEngine;
 
-	PlotAxisHandle *offsetHandle;
 	int m_id;
 	double m_divs;
 	double m_min;
@@ -54,6 +60,8 @@ private:
 
 	void setupAxisScale();
 	void setupZoomer();
+	Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
+	Q_PROPERTY(double min READ min WRITE setMin NOTIFY minChanged)
 };
 }
 #endif // PLOTAXIS_H

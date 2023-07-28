@@ -25,6 +25,9 @@ FILE(GLOB SRC_LIST  src/*.cpp src/widgets/*.cpp src/*.cc src/binding/*.cpp src/p
 FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp  include/${SCOPY_MODULE}/widgets/*.h include/${SCOPY_MODULE}/binding/*.hpp include/${SCOPY_MODULE}/prop/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
+message(${SRC_LIST})
+message(${HEADER_LIST})
+
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
 if(ANDROID)
