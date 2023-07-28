@@ -74,7 +74,7 @@ QWidget* ScopyPreferencesPage::buildSaveSessionPreference() {
 	QPushButton *navigateBtn = new QPushButton("Open",this);
 	navigateBtn->setProperty("blue_button",true);
 	navigateBtn->setStyleSheet("width:80;height:20");
-	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
+	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl("file://"+scopy::config::settingsFolderPath()); });
 	lay->addWidget(navigateBtn);
 	return w;
 }
