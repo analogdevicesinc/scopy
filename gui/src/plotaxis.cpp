@@ -8,7 +8,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen,QObject *parent) :
 {
 	m_min = -1;
 	m_max = 1;
-	m_divs = (isHorizontal()) ? 10.0 : 10.0;
+	m_divs = (isHorizontal()) ? 11.0 : 11.0;
 
 	m_zoomer = nullptr;
 	m_id = m_plotWidget->plotAxis(m_position).count();
@@ -102,9 +102,9 @@ void PlotAxis::setDivs(double divs) {
 }
 
 void PlotAxis::setInterval(double min, double max) {
-	m_min = min;
-	m_max = max;
-	updateAxisScale();
+	setMin(min);
+	setMax(max);
+//	updateAxisScale();
 }
 
 void PlotAxis::setVisible(bool val)

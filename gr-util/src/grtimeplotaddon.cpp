@@ -41,14 +41,10 @@ void GRTimePlotAddon::onStart() {
 	connect(m_top,SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));
 	connect(m_top,SIGNAL(teardownSignalPaths()), this, SLOT(tearDownSignalPaths()));
 	// connect sink stopped ?
-	qInfo()<<"start"<<tim.elapsed();
 	m_top->build();
-	qInfo()<<"build"<<tim.elapsed();
 	m_top->start();
-	qInfo()<<"start"<<tim.elapsed();
 	m_plotTimer->setInterval(1/60.0);	
 	m_plotTimer->start();
-	qInfo()<<"timerstart"<<tim.elapsed();
 
 }
 
@@ -59,6 +55,7 @@ void GRTimePlotAddon::replot() {
 }
 
  void GRTimePlotAddon::onStop() {
+	m_plotTimer->stop();
 	m_top->stop();
 	m_top->teardown();
 	disconnect(m_top,SIGNAL(builtSignalPaths()), this, SLOT(connectSignalPaths()));

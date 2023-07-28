@@ -60,6 +60,7 @@ void PlotChannel::setThickness(int thickness)
 	QPen pen = m_curve->pen();
 	pen.setWidthF(thickness);
 	m_curve->setPen(pen);
+	m_plot->replot();
 }
 
 void PlotChannel::setStyle(int style)
@@ -90,6 +91,7 @@ void PlotChannel::setStyle(int style)
 		m_curve->setStyle(QwtPlotCurve::Lines);
 		break;
 	}
+	m_plot->replot();
 }
 
 PlotAxisHandle *PlotChannel::handle() const
