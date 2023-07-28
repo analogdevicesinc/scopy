@@ -1,6 +1,6 @@
 #include "semiexclusivebuttongroup.h"
 
-using namespace scopy::gui;
+using namespace scopy;
 
 SemiExclusiveButtonGroup::SemiExclusiveButtonGroup(QObject *parent) : QButtonGroup(parent) {
 	m_exclusive = true;

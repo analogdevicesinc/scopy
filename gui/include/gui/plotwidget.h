@@ -72,6 +72,9 @@ private:
 	QList<PlotAxis*> m_plotAxis[QwtAxis::AxisPositions];
 	QList<PlotAxisHandle*> m_plotAxisHandles[QwtAxis::AxisPositions];
 
+	PlotAxis *m_xAxis;
+	PlotAxis *m_yAxis;
+
 	bool displayGraticule;
 	Graticule *graticule;
 

@@ -12,6 +12,14 @@ class PlotAxisHandle;
 class SCOPY_GUI_EXPORT PlotChannel : public QObject {
 	Q_OBJECT
 public:
+	typedef enum {
+		PCS_LINES = 0,
+		PCS_DOTS,
+		PCS_STEPS,
+		PCS_STICKS,
+		PCS_SMOOTH
+	} PlotCurveStyle;
+
 	PlotChannel(QString name, QPen pen, PlotWidget *plot, PlotAxis* xAxis, PlotAxis *yAxis, QObject *parent = nullptr);
 	~PlotChannel();
 
@@ -29,6 +37,9 @@ public Q_SLOTS:
 	void setEnabled(bool b);
 	void enable();
 	void disable();
+
+	void setThickness(int);
+	void setStyle(int);
 
 private:
 	PlotAxis *m_xAxis, *m_yAxis;

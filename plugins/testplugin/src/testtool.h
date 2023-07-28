@@ -29,6 +29,7 @@ private:
 
 	ToolTemplate *tool;
 	QPushButton *btn1, *btn2, *btn3;
+	QWidget* createMenu(QWidget* parent);
 };
 //};
 #endif // TESTTOOL_H

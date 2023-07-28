@@ -28,6 +28,7 @@
 
 #include "plot_utils.hpp"
 #include "scopy-gui_export.h"
+#include "utils.h"
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -60,9 +61,11 @@ class SpinBoxA_API;
 
 class SCOPY_GUI_EXPORT SpinBoxA : public QWidget
 {
+	friend class StyleHelper;
 	friend class SpinBoxA_API;
 
 	Q_OBJECT
+	QWIDGET_PAINT_EVENT_HELPER
 
 public:
 	explicit SpinBoxA(QWidget *parent = nullptr);
@@ -91,7 +94,7 @@ public:
 	bool isInFineMode();
 
 	bool isCircleInverted() const;
-	void invertCircle(bool invert);
+	void setInvertCircle(bool invert);
 
 	bool progressShown() const;
 	void showProgress(bool show);
