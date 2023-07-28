@@ -75,6 +75,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	VerticalChannelManager *vcm = new VerticalChannelManager(this);
 	tool->leftStack()->add("vcm",vcm);
 
+	QButtonGroup *channelGroup = new QButtonGroup(this);
 	for(auto d: proxy->getDeviceAddons()) {
 		GRDeviceAddon *dev = dynamic_cast<GRDeviceAddon*>(d);
 		if(!dev)
@@ -90,6 +91,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 		for(GRTimeChannelAddon* ch : dev->getRegisteredChannels()) {
 			MenuControlButton *btn = new MenuControlButton(devBtn);
 			devBtn->add(btn);
+			channelGroup->addButton(btn);
 
 			btn->setName(ch->getName());
 			btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
@@ -110,6 +112,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 	connect(runBtn,&QPushButton::toggled, this, &AdcInstrument::run);
 	tool->requestMenu("voltage02");
+	channelGroup->buttons()[0]->setChecked(true);
 }
 
 void AdcInstrument::run(bool b) {
