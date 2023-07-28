@@ -37,6 +37,7 @@ public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
 	void onNewData();
+
 private:
 	QString name;
 	QWidget *widget;
