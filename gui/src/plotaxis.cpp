@@ -3,20 +3,12 @@
 #include <QDebug>
 
 using namespace scopy;
-PlotAxis::PlotAxis(int position, PlotWidget *p, QObject *parent) :
+PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen,QObject *parent) :
       QObject(parent), m_plotWidget(p), m_plot(p->plot()), m_position(position), m_axisId(QwtAxisId(position))
 {
 	m_min = -1;
 	m_max = 1;
 	m_divs = (isHorizontal()) ? 10.0 : 10.0;
-
-	// setRawSamples
-	// - how to compute X axis ?
-
-	// measurements
-	// histo/X-Y
-	// acquisition metadata
-	// print
 
 	m_zoomer = nullptr;
 	m_id = m_plotWidget->plotAxis(m_position).count();
@@ -27,7 +19,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QObject *parent) :
 
 	// move this outside (?)
 	m_scaleDraw = new OscScaleDraw(new MetricPrefixFormatter(),"");
-	//	m_scaleDraw->setColor(QColor("red"));
+	m_scaleDraw->setColor(pen.color());
 	m_plot->setAxisScaleDraw(m_axisId,m_scaleDraw);
 
 	m_scaleEngine = new OscScaleEngine();
@@ -41,6 +33,9 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QObject *parent) :
 		setupZoomer();
 	}
 	setVisible(false);
+
+	connect(this, &PlotAxis::minChanged, this, &PlotAxis::updateAxisScale);
+	connect(this, &PlotAxis::maxChanged, this, &PlotAxis::updateAxisScale);
 
 }
 
@@ -119,6 +114,23 @@ void PlotAxis::setVisible(bool val)
 
 void PlotAxis::updateAxisScale() {
 	m_plot->setAxisScale(m_axisId, m_min, m_max, (m_max - m_min)/m_divs); // set Divs, limits
+	m_plot->replot();
+}
+
+void PlotAxis::setMin(double newMin)
+{
+	if (qFuzzyCompare(m_min, newMin))
+		return;
+	m_min = newMin;
+	emit minChanged();
+}
+
+void PlotAxis::setMax(double newMax)
+{
+	if (qFuzzyCompare(m_max, newMax))
+		return;
+	m_max = newMax;
+	emit maxChanged();
 }
 
 OscScaleDraw *PlotAxis::scaleDraw() const

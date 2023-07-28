@@ -1,14 +1,15 @@
 #include "adcinstrument.h"
-#include <gui/tool_view.hpp>
 #include "stylehelper.h"
-#include <gui/tool_view_builder.hpp>
+
+#include <gui/widgets/toolbuttons.h>
+#include <gui/widgets/menucontrolbutton.h>
+#include <gui/widgets/verticalchannelmanager.h>
 
 using namespace scopy;
 using namespace scopy::grutil;
 
 AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent), proxy(proxy)
 {
-
 	static int uuid = 0;
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -86,7 +87,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 		rightMenuBtnGrp->addButton(devBtn->getControlBtn()->button());
 
 		vcm->add(devBtn);
-		for(auto ch : dev->getRegisteredChannels()) {
+		for(GRTimeChannelAddon* ch : dev->getRegisteredChannels()) {
 			MenuControlButton *btn = new MenuControlButton(devBtn);
 			devBtn->add(btn);
 
@@ -99,6 +100,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			tool->rightStack()->add(id, ch->getWidget());
 			connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) { if(b) ch->enable(); else ch->disable();} );
 			connect(btn->button(), &QPushButton::toggled, this, [=](bool b) { if(b) tool->requestMenu(id);});
+			connect(btn, &QAbstractButton::toggled, this, [=](){plotAddon->plot()->selectChannel(ch->plotCh());});
 			rightMenuBtnGrp->addButton(btn->button());
 			plotAddon->onChannelAdded(ch);
 			btn->checkBox()->setChecked(true);
@@ -107,6 +109,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	}
 
 	connect(runBtn,&QPushButton::toggled, this, &AdcInstrument::run);
+	tool->requestMenu("voltage02");
 }
 
 void AdcInstrument::run(bool b) {

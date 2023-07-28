@@ -28,19 +28,23 @@ PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent) {
 	m_layout->setMargin(0);
 	setLayout(m_layout);
 
+	QPen pen(QColor("#9E9E9F"));
+
 	setupOpenGLCanvas();
 	setupHandlesArea();
 
-	auto xAxis = new PlotAxis(QwtAxis::XBottom,this,this);
-	auto yAxis = new PlotAxis(QwtAxis::YLeft,this,this);
-	yAxis->setVisible(false);
+	m_xAxis = new PlotAxis(QwtAxis::XBottom,this,pen,this);
+	m_yAxis = new PlotAxis(QwtAxis::YLeft,this,pen,this);
+	m_yAxis->setVisible(true);
+	m_xAxis->setVisible(true);
 
 	setupAxisScales();
 	setAxisScalesVisible(true);
 
 	// Plot needs a grid
+	QPen gridpen(QColor("#353537"));
 	EdgelessPlotGrid *d_grid = new EdgelessPlotGrid();
-	QColor majorPenColor("#353537");
+	QColor majorPenColor(gridpen.color());
 	d_grid->setMajorPen(majorPenColor, 1.0, Qt::DashLine);
 	d_grid->attach(m_plot);
 
@@ -54,7 +58,7 @@ PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent) {
 	connect(this, SIGNAL(canvasSizeChanged()),graticule,SLOT(onCanvasSizeChanged()));
 	setDisplayGraticule(false);
 
-	m_plot->plotLayout()->setAlignCanvasToScales(true);
+	m_plot->plotLayout()->setAlignCanvasToScales(false);
 	m_plot->plotLayout()->setCanvasMargin(0);
 	m_plot->plotLayout()->setSpacing(0);
 	setupZoomer();
@@ -308,11 +312,11 @@ QList<PlotAxis *> &PlotWidget::plotAxis(int position) {
 }
 
 PlotAxis *PlotWidget::xAxis() {
-	return m_plotAxis[QwtAxis::XBottom][0];
+	return m_xAxis;
 }
 
 PlotAxis *PlotWidget::yAxis() {
-	return m_plotAxis[QwtAxis::YLeft][0];
+	return m_yAxis;
 }
 
 
@@ -328,13 +332,14 @@ void PlotWidget::replot()
 
 void PlotWidget::selectChannel(PlotChannel *ch)
 {
+	m_yAxis->setVisible(false);
 	if(m_selectedChannel != nullptr) {
 		m_selectedChannel->yAxis()->setVisible(false);
 	}
 	m_selectedChannel = ch;
 
 	m_selectedChannel->xAxis()->setVisible(false);
-	m_selectedChannel->yAxis()->setVisible(false);
+	m_selectedChannel->yAxis()->setVisible(true);
 
 	if(m_selectedChannel->curve()) {
 		m_selectedChannel->raise();

@@ -1,8 +1,5 @@
 #include "pluginenablewidget.h"
 #include "qboxlayout.h"
-#include "qpainter.h"
-
-#include <qstyleoption.h>
 
 using namespace scopy;
 
@@ -38,13 +35,4 @@ void PluginEnableWidget::setDescription(QString description)
 QCheckBox *PluginEnableWidget::checkBox() const
 {
 	return m_checkBox;
-}
-
-void PluginEnableWidget::paintEvent(QPaintEvent *e) {
-	// https://forum.qt.io/topic/25142/solved-applying-style-on-derived-widget-with-custom-property-failes/2
-	// https://doc.qt.io/qt-5/stylesheet-reference.html
-	QStyleOption opt;
-	opt.init(this);
-	QPainter p(this);
-	style()->drawPrimitive(QStyle::PE_Widget, &opt, &p, this);
 }

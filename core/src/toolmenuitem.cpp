@@ -22,10 +22,6 @@
 
 #include <QHBoxLayout>
 #include <QSpacerItem>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QStyle>
-#include <QStyleOption>
 #include "gui/dynamicWidget.h"
 #include "qdebug.h"
 #include "gui/utils.h"
