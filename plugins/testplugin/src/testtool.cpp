@@ -247,11 +247,11 @@ QWidget* TestTool::createMenu(QWidget* parent) {
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), vdiv, false);
 
 	MenuCollapseSection *section1 = new MenuCollapseSection("SECTION1", MenuCollapseSection::MHCW_ARROW, vdiv);
-	section1->add(txt);
-	section1->add(cbb);
+	section1->contentLayout()->addWidget(txt);
+	section1->contentLayout()->addWidget(cbb);
 	MenuCollapseSection *section2 = new MenuCollapseSection("SECTION2", MenuCollapseSection::MHCW_ONOFF, vdiv);
-	section2->add(ssb);
-	section2->add(autoscale);
+	section2->contentLayout()->addWidget(ssb);
+	section2->contentLayout()->addWidget(autoscale);
 
 	//	MenuBigSwitch *bigsw = new MenuBigSwitch("Yes", "No", vdiv);
 	QLabel *lbl = new QLabel("AUTOSCALE");

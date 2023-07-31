@@ -22,13 +22,16 @@ public:
 	void registerChannel(GRTimeChannelAddon *ch);
 	QList<GRTimeChannelAddon*> getRegisteredChannels();
 
+Q_SIGNALS:
+	void updateBufferSize(uint32_t);
+
 public Q_SLOTS:
 	void enable() override;
 	void disable() override;
 	void onStart() override;
 	void onStop() override;
-	void onAdd() override;
-	void onRemove() override;
+	void onInit() override;
+	void onDeinit() override;
 	void onChannelAdded(ToolAddon*) override;
 	void onChannelRemoved(ToolAddon*) override;
 
@@ -37,6 +40,10 @@ private:
 	QWidget *widget;
 	GRIIODeviceSource *m_src;
 	QList<GRTimeChannelAddon*> m_channels;
+
+private Q_SLOTS:
+	void setBufferSize(uint32_t bufferSize);
+
 };
 }
 

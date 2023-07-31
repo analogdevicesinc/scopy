@@ -63,6 +63,8 @@ public:
 	virtual void updateData() = 0;
 	virtual const std::vector<float> &time() const = 0;
 	virtual const std::vector<std::vector<float> > &data() const = 0;
+	virtual void setRollingMode(bool) = 0;
+	virtual bool rollingMode() = 0;
 };
 
 } /* namespace scopy */
