@@ -18,7 +18,9 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen,QObject *parent) :
 	updateAxisScale();
 
 	// move this outside (?)
-	m_scaleDraw = new OscScaleDraw(new MetricPrefixFormatter(),"");
+	auto prefixFormatter = new MetricPrefixFormatter();
+
+	m_scaleDraw = new OscScaleDraw(prefixFormatter,"");
 	m_scaleDraw->setColor(pen.color());
 	m_plot->setAxisScaleDraw(m_axisId,m_scaleDraw);
 

@@ -7,6 +7,7 @@ GRDeviceAddon::GRDeviceAddon(GRIIODeviceSource *src, QObject *parent) : QObject(
 	name = src->deviceName();
 	widget = new QLabel("devicename" + src->deviceName());
 	m_src = src;
+	connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
 }
 
 GRDeviceAddon::~GRDeviceAddon() {}
@@ -27,13 +28,18 @@ void GRDeviceAddon::onStart() {}
 
 void GRDeviceAddon::onStop() {}
 
-void GRDeviceAddon::onAdd() {}
+void GRDeviceAddon::onInit() {}
 
-void GRDeviceAddon::onRemove() {}
+void GRDeviceAddon::onDeinit() {}
 
 void GRDeviceAddon::onChannelAdded(ToolAddon *) {}
 
 void GRDeviceAddon::onChannelRemoved(ToolAddon *) {}
+
+void GRDeviceAddon::setBufferSize(uint32_t bufferSize)
+{
+	m_src->setBuffersize(bufferSize);
+}
 
 void GRDeviceAddon::registerChannel(GRTimeChannelAddon* ch) {
 	m_channels.append(ch);

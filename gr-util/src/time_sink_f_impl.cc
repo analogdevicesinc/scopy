@@ -30,6 +30,9 @@
 #include <string.h>
 
 #include "time_sink_f_impl.h"
+#include <QLoggingCategory>
+
+Q_LOGGING_CATEGORY(CAT_TIME_SINK_F, "TimeSink_f");
 
 using namespace gr;
 
@@ -43,12 +46,22 @@ time_sink_f::make(int size, float sampleRate, const std::string &name,
 		(new time_sink_f_impl(size, sampleRate, name, nconnections));
 }
 
+void time_sink_f_impl::generate_time_axis() {
+	qInfo(CAT_TIME_SINK_F)<< "Generating x-Axis";
+	double timeoffset = 0;
+	m_time.clear();
+	for (int i = 0;i < m_size;i++) {
+		m_time.push_back(timeoffset + i/m_sampleRate);
+	}
+}
+
 time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections )
     : sync_block("time_sink_f",
 	io_signature::make(nconnections, nconnections, sizeof(float)),
 	io_signature::make(0, 0, 0)),
-	m_size(size), m_sampleRate(sampleRate), m_name(name), m_nconnections(nconnections)
+	m_size(size), m_sampleRate(sampleRate), m_name(name), m_nconnections(nconnections), m_rollingMode(false)
 {
+	qInfo(CAT_TIME_SINK_F)<<"ctor";
 	// reserve memory for n buffers
 	m_data.reserve(nconnections);
 
@@ -59,18 +72,15 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 		m_data[i].reserve(size);
 	}
 
-
-	double timeoffset = 0;
 	m_time.reserve(size);
-	for (int i = 0;i < size;i++) {
-		m_time.push_back(timeoffset + i/sampleRate);
-	}
+	generate_time_axis();
+
 
 	m_tags = std::vector< std::vector<gr::tag_t> >(m_nconnections);
 }
 
 time_sink_f_impl::~time_sink_f_impl() {
-
+qInfo(CAT_TIME_SINK_F)<<"dtor";
 }
 
 bool time_sink_f_impl::check_topology(int ninputs, int noutputs) {
@@ -92,6 +102,16 @@ void time_sink_f_impl::updateData() {
 	}
 }
 
+bool time_sink_f_impl::rollingMode()
+{
+	return m_rollingMode;
+}
+
+void time_sink_f_impl::setRollingMode(bool b)
+{
+	m_rollingMode = b;
+}
+
 const std::vector<float> &time_sink_f_impl::time() const {
 	return m_time;
 }
@@ -104,9 +124,17 @@ int time_sink_f_impl::work(int noutput_items,
 		       gr_vector_const_void_star &input_items,
 		       gr_vector_void_star &output_items) {
 
+//	qInfo(CAT_TIME_SINK_F)<<"Work";
 	gr::thread::scoped_lock lock(d_setlock);
 
 	// Trigger on BUFFER_START (?)
+	if(!m_rollingMode) {
+	for(int i = 0; i < m_nconnections; i++) {
+			if(m_buffers[i].size() >= m_size) {
+				m_buffers[i].clear();
+			}
+		}
+	}
 
 	for(int i = 0; i < m_nconnections; i++) {
 		for(int j = 0; j < noutput_items; j++) {

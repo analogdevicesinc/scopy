@@ -28,8 +28,8 @@ private:
 class SCOPY_GUI_EXPORT MenuComboWidget : public QWidget {
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
-	    public:
-		     MenuComboWidget(QString title, QWidget *parent = nullptr);
+public:
+	MenuComboWidget(QString title, QWidget *parent = nullptr);
 	virtual ~MenuComboWidget();
 
 	QComboBox *combo();

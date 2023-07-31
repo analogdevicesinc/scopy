@@ -12,6 +12,8 @@ class AdcInstrument : public QWidget
 	Q_OBJECT
 public:
 	AdcInstrument(PlotProxy *proxy, QWidget *parent = nullptr);
+	void init();
+	void deinit();
 public Q_SLOTS:
 	void run(bool);
 private:

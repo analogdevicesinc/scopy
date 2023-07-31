@@ -7,6 +7,7 @@
 #include <QGridLayout>
 #include "time_sink_f.h"
 #include <QTimer>
+#include <QVBoxLayout>
 
 namespace scopy::grutil {
 using namespace scopy;
@@ -23,13 +24,16 @@ public:
 	QWidget *getWidget() override;
 	PlotWidget *plot();
 
+Q_SIGNALS:
+	void requestRebuild();
+
 public Q_SLOTS:
 	void enable() override;
 	void disable() override;
 	void onStart() override;
 	void onStop() override;
-	void onAdd() override;
-	void onRemove() override;
+	void onInit() override;
+	void onDeinit() override;
 	void onChannelAdded(ToolAddon* t) override;
 	void onChannelRemoved(ToolAddon*) override;
 
@@ -37,6 +41,14 @@ public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
 	void onNewData();
+
+	void setRollingMode(bool b);
+	void setBufferSize(uint32_t size);
+	void setPlotSize(uint32_t size);
+
+private Q_SLOTS:
+	void stopPlotRefresh();
+	void startPlotRefresh();
 
 private:
 	QString name;
@@ -46,6 +58,14 @@ private:
 	PlotWidget *m_plotWidget;
 	time_sink_f::sptr time_sink;
 	QList<GRTimeChannelAddon*> grChannels;
+	QVBoxLayout* m_lay;
+	void setupBufferPreviewer();
+
+	uint32_t m_bufferSize;
+	uint32_t m_plotSize;
+	bool m_rollingMode;
+	void setRawSamplesPtr();
+	void updateXAxis();
 };
 }
 

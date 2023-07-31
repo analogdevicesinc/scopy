@@ -72,7 +72,11 @@ MenuCollapseSection::MenuCollapseSection(QString title, MenuCollapseSection::Men
 
 MenuCollapseSection::~MenuCollapseSection() {}
 QAbstractButton *MenuCollapseSection::header() { return m_header; }
-void MenuCollapseSection::add(QWidget *ch) {
-	m_contLayout->addWidget(ch);
-}
+
+QVBoxLayout* MenuCollapseSection::contentLayout() const { return m_contLayout; }
+
+
+//void MenuCollapseSection::add(QWidget *ch) {
+//	m_contLayout->addWidget(ch);
+//}
 

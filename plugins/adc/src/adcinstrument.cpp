@@ -111,8 +111,36 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	}
 
 	connect(runBtn,&QPushButton::toggled, this, &AdcInstrument::run);
-	tool->requestMenu("voltage02");
+	tool->requestMenu("time__settings");
 	channelGroup->buttons()[0]->setChecked(true);
+
+	init();
+}
+
+void AdcInstrument::init() {
+	for(auto ch : proxy->getChannelAddons()) {
+			ch->onInit();
+	}
+
+	for(auto dev : proxy->getDeviceAddons()) {
+			dev->onInit();
+	}
+
+	proxy->getPlotSettings()->onInit();
+	proxy->getPlotAddon()->onInit();
+}
+
+void AdcInstrument::deinit() {
+	for(auto ch : proxy->getChannelAddons()) {
+			ch->onDeinit();
+	}
+
+	for(auto dev : proxy->getDeviceAddons()) {
+			dev->onDeinit();
+	}
+
+	proxy->getPlotSettings()->onDeinit();
+	proxy->getPlotAddon()->onDeinit();
 }
 
 void AdcInstrument::run(bool b) {
@@ -137,6 +165,12 @@ void AdcInstrument::run(bool b) {
 	}
 	qInfo()<<tim.elapsed();
 
+	if(b)
+		proxy->getPlotSettings()->onStart();
+	else
+		proxy->getPlotSettings()->onStop();
+
+	qInfo()<<tim.elapsed();
 	if(b)
 		proxy->getPlotAddon()->onStart();
 	else
