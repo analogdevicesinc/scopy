@@ -144,5 +144,7 @@ fi
 # sudo install_name_tool -change ${tinyrpath} @executable_path/../Frameworks/${tinyid} ./Scopy.app/Contents/MacOS/iio-emu
 
 echo "### Bundle the Qt libraries & Create Scopy.dmg"
+sudo macdeployqt Scopy.app -verbose=3
+zip -Xvr ScopyApp.zip Scopy.app
 sudo macdeployqt Scopy.app -dmg -verbose=3
 
