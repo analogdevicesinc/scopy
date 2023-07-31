@@ -28,7 +28,8 @@ public:
 	~MenuCollapseSection();
 
 	QAbstractButton *header();
-	void add(QWidget *ch);
+	QVBoxLayout* contentLayout() const;
+
 private:
 	QVBoxLayout *m_lay;
 	QWidget *m_container;

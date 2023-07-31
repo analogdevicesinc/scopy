@@ -27,6 +27,23 @@ namespace scopy {
 
 class time_sink_f_impl : public time_sink_f
 {
+public:
+	time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections);
+	~time_sink_f_impl();
+
+	bool check_topology(int ninputs, int noutputs);
+	std::string name() const;
+
+	void updateData();
+
+	bool rollingMode();
+	void setRollingMode(bool b);
+
+	const std::vector<float> &time() const;
+	const std::vector<std::vector<float>> &data() const;
+	int work(int noutput_items,
+		 gr_vector_const_void_star &input_items,
+			 gr_vector_void_star &output_items);
 private:
 	std::vector <std::deque <float>> m_buffers;
 	std::vector< std::vector<gr::tag_t> > m_tags;
@@ -37,20 +54,9 @@ private:
 	float m_sampleRate;
 	std::string m_name;
 	int m_nconnections;
+	bool m_rollingMode;
 
-public:
-	time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections);
-	~time_sink_f_impl();
-
-	bool check_topology(int ninputs, int noutputs);
-	std::string name() const;
-
-	void updateData();
-	const std::vector<float> &time() const;
-	const std::vector<std::vector<float>> &data() const;
-	int work(int noutput_items,
-		 gr_vector_const_void_star &input_items,
-			 gr_vector_void_star &output_items);
+	void generate_time_axis();
 };
 
 } /* namespace scopy */

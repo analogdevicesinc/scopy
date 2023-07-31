@@ -15,6 +15,8 @@
 #include "grscaleoffsetproc.h"
 #include <gui/spinbox_a.hpp>
 
+#include <gui/widgets/menucombo.h>
+
 
 namespace scopy::grutil {
 class GRDeviceAddon;
@@ -44,8 +46,8 @@ public Q_SLOTS:
 	void disable() override;
 	void onStart() override;
 	void onStop() override;
-	void onAdd() override;
-	void onRemove() override;
+	void onInit() override;
+	void onDeinit() override;
 	void onChannelAdded(ToolAddon*) override;
 	void onChannelRemoved(ToolAddon*) override;
 
@@ -62,8 +64,9 @@ private:
 	QPen m_pen;
 	QTimer *m_autoScaleTimer;
 
-	ScaleSpinButton *m_ymin;
-	ScaleSpinButton *m_ymax;
+	PositionSpinButton *m_ymin;
+	PositionSpinButton *m_ymax;
+	MenuCombo *m_ymodeCb;
 
 	PlotChannel *m_plotCh;
 	PlotAxis *m_plotAxis;

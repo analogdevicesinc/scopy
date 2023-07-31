@@ -118,14 +118,16 @@ PlotProxy* ADCPlugin::createRecipe(iio_context *ctx) {
 
 	GRTimePlotAddon *p = new GRTimePlotAddon(plotRecipePrefix, top,this);
 	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p,this);
+
 	recipe->setPlotAddon(p,s);
 
 	int i = 0;
 	for(const QString &iio_dev : deviceList) {
-		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx,iio_dev,iio_dev,0x400,this);
+		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx,iio_dev,iio_dev,0x400,this);		
 		top->registerIIODeviceSource(gr_dev);
 
 		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);
+		connect(s, &GRTimePlotAddonSettings::bufferSizeChanged, d, &GRDeviceAddon::updateBufferSize);
 		recipe->addDeviceAddon(d);
 
 		for(const QString &ch : devChannelMap.value(iio_dev,{})) {
