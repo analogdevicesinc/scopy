@@ -132,9 +132,7 @@ unsigned int GRIIODeviceSource::getBuffersize() const
 void GRIIODeviceSource::setBuffersize(unsigned int newBuffersize)
 {
 	m_buffersize = newBuffersize;
-	if(built()) {
-		src->set_buffer_size(newBuffersize);
-	}
+	Q_EMIT requestRebuild();
 }
 
 std::vector<std::string> GRIIODeviceSource::channelNames() const

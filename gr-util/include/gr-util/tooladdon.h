@@ -13,8 +13,8 @@ public:
 	virtual void disable() = 0;
 	virtual void onStart() = 0;
 	virtual void onStop() = 0;
-	virtual void onAdd() = 0;
-	virtual void onRemove() = 0;
+	virtual void onInit() = 0;
+	virtual void onDeinit() = 0;
 	virtual void onChannelAdded(ToolAddon* ) = 0;
 	virtual void onChannelRemoved(ToolAddon* ) = 0;
 };

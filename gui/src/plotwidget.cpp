@@ -22,6 +22,7 @@ using namespace scopy;
 PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent) {
 
 	m_selectedChannel = nullptr;
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	m_plot = new QwtPlot(this);
 	m_layout = new QGridLayout(this);
 	m_layout->setSpacing(0);
@@ -94,39 +95,7 @@ void PlotWidget::setupHandlesArea() {
 	m_topHandlesArea->setRightPadding(0); /// Why ?
 	m_topHandlesArea->setVisible(false);
 
-//	m_bufferPreviewer = new AnalogBufferPreviewer(this);
-//	m_bufferPreviewer->setMinimumHeight(20);
-//	m_bufferPreviewer->setCursorPos(0.5);
-//	m_bufferPreviewer->setHighlightPos(0.05);
-//	m_bufferPreviewer->setHighlightWidth(0.2);
-//	m_bufferPreviewer->setCursorVisible(false);
-//	m_bufferPreviewer->setWaveformPos(0.1);
-//	m_bufferPreviewer->setWaveformWidth(0.5);
 
-//	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {
-//		horiz_offset = m_bufferPreviewer->highlightPos();
-//	});
-//	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int value) {
-////		qInfo()<<value;
-//		double moveTo = 0.0;
-//		double min = xAxis()->min();
-//		double max = xAxis()->max();
-//		int width = m_bufferPreviewer->width();
-//		double xA0xisWidth = max - min;
-
-//		moveTo = value * xAxisWidth / width;
-//		xAxis()->setInterval(min - moveTo, max - moveTo);
-//		m_plot->replot();
-
-//		auto delta = horiz_offset + (value/(float)width);
-
-//		qInfo()<< delta << value << width;
-//		m_bufferPreviewer->setHighlightPos(delta);
-
-
-////		updateBufferPreviewer();
-
-//	} );
 //	m_layout->addWidget(m_bufferPreviewer,0,1);
 	m_layout->addWidget(m_bottomHandlesArea,3,1);
 	m_layout->addWidget(m_rightHandlesArea,2,2);
@@ -338,7 +307,7 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 	}
 	m_selectedChannel = ch;
 
-	m_selectedChannel->xAxis()->setVisible(false);
+	m_selectedChannel->xAxis()->setVisible(true);
 	m_selectedChannel->yAxis()->setVisible(true);
 
 	if(m_selectedChannel->curve()) {
