@@ -21,8 +21,10 @@ using namespace scopy::grutil;
 QWidget* GRTimeChannelAddon::createYAxisMenu(QWidget* parent) {
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS",MenuCollapseSection::MHCW_NONE, yaxiscontainer);
-	MenuCombo *cbb = new MenuCombo("", yaxis);
-	auto cb = cbb->combo();
+
+	// Y-MODE
+	m_ymodeCb = new MenuCombo("YMODE", yaxis);
+	auto cb = m_ymodeCb->combo();
 	cb->addItem("ADC Counts", YMODE_COUNT);
 	cb->addItem("% Full Scale", YMODE_FS);
 
@@ -30,51 +32,53 @@ QWidget* GRTimeChannelAddon::createYAxisMenu(QWidget* parent) {
 		cb->addItem(m_unit, YMODE_SCALE);
 	}
 
-	QWidget *startStop = new QWidget(yaxis);
-	QHBoxLayout *startStopLay = new QHBoxLayout(startStop);
-	startStopLay->setMargin(0);
-	startStopLay->setSpacing(10);
-	startStop->setLayout(startStopLay);
+	// Y-MIN-MAX
+	QWidget *yMinMax = new QWidget(yaxis);
+	QHBoxLayout *yMinMaxLayout = new QHBoxLayout(yMinMax);
+	yMinMaxLayout->setMargin(0);
+	yMinMaxLayout->setSpacing(10);
+	yMinMax->setLayout(yMinMaxLayout);
 
-	m_ymin = new ScaleSpinButton(
+	m_ymin = new PositionSpinButton(
 		{
 		 {"V",1e0},
 		 {"k",1e3},
 		 {"M",1e6},
 		 {"G",1e9},
-		 },"YMin",(double)((long)(-1<<31)),(double)((long)1<<31),false,false,startStop);
+		 },"YMin",(double)((long)(-1<<31)),(double)((long)1<<31),false,false,yMinMax);
 
 
-	m_ymax = new ScaleSpinButton(
+	m_ymax = new PositionSpinButton(
 	    {
 	     {"V",1e0},
 	     {"k",1e3},
 	     {"M",1e6},
 	     {"G",1e9},
-	     },"YMax",(double)((long)(-1<<31)),(double)((long)1<<31),false,false,startStop);
+	     },"YMax",(double)((long)(-1<<31)),(double)((long)1<<31),false,false,yMinMax);
 
-	startStopLay->addWidget(m_ymin);
-	startStopLay->addWidget(m_ymax);
+	yMinMaxLayout->addWidget(m_ymin);
+	yMinMaxLayout->addWidget(m_ymax);
 
+	// AUTOSCALE
 	m_autoScaleTimer = new QTimer(this);
 	m_autoScaleTimer->setInterval(1000);
 	connect(m_autoScaleTimer, &QTimer::timeout, this, &GRTimeChannelAddon::autoscale);
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yaxis, false);
 
-	yaxis->add(startStop);
-	yaxis->add(autoscale);
-	yaxis->add(cbb);
+	yaxis->contentLayout()->addWidget(autoscale);
+	yaxis->contentLayout()->addWidget(yMinMax);
+	yaxis->contentLayout()->addWidget(m_ymodeCb);
 
 	yaxiscontainer->contentLayout()->addWidget(yaxis);
 
 	// Connects
-	connect(m_ymin, &ScaleSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMin);
+	connect(m_ymin, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMin);
 	connect(m_plotAxis, &PlotAxis::minChanged, this, [=](){
 		QSignalBlocker b(m_ymin);
 		m_ymin->setValue(m_plotAxis->min());
 	});
 
-	connect(m_ymax, &ScaleSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMax);
+	connect(m_ymax, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMax);
 	connect(m_plotAxis, &PlotAxis::maxChanged, this, [=](){
 		QSignalBlocker b(m_ymax);
 		m_ymax->setValue(m_plotAxis->max());
@@ -93,10 +97,6 @@ QWidget* GRTimeChannelAddon::createYAxisMenu(QWidget* parent) {
 		setYMode(static_cast<YMode>(mode));
 	});
 
-	// Defaults
-	m_ymin->setValue(-1.0);
-	m_ymax->setValue(1.0);
-	cb->setCurrentIndex(1);
 
 	return yaxiscontainer;
 }
@@ -138,7 +138,7 @@ QWidget* GRTimeChannelAddon::createCurveMenu(QWidget* parent) {
 
 	curveSettingsLay->addWidget(cbThicknessW);
 	curveSettingsLay->addWidget(cbStyleW);
-	curve->add(curveSettings);
+	curve->contentLayout()->addWidget(curveSettings);
 	curvecontainer->contentLayout()->addWidget(curve);
 
 	return curvecontainer;
@@ -159,7 +159,7 @@ QWidget* GRTimeChannelAddon::createMenu(QWidget* parent) {
 	lay->addWidget(yaxismenu);
 	lay->addWidget(curvemenu);
 
-	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
+	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
 
 	return w;
@@ -215,6 +215,7 @@ void GRTimeChannelAddon::enable() {
 	m_plotAxisHandle->handle()->raise();
 	m_signalPath->setEnabled(true);
 	m_grch->setEnabled(true);
+//	m_plotAddon->plot();
 	m_plotAddon->plot()->replot();
 }
 
@@ -225,6 +226,7 @@ void GRTimeChannelAddon::disable() {
 	m_plotAxisHandle->handle()->setVisible(false);
 	m_signalPath->setEnabled(false);
 	m_grch->setEnabled(false);
+//	m_plotAddon->plot();
 	m_plotAddon->plot()->replot();
 }
 
@@ -306,9 +308,14 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 }
 
 
-void GRTimeChannelAddon::onAdd() {  }
+void GRTimeChannelAddon::onInit() {
+	// Defaults
+	m_ymin->setValue(-1.0);
+	m_ymax->setValue(1.0);
+	m_ymodeCb->combo()->setCurrentIndex(1);
+}
 
-void GRTimeChannelAddon::onRemove() {}
+void GRTimeChannelAddon::onDeinit() {}
 
 void GRTimeChannelAddon::onChannelAdded(ToolAddon *) {}
 

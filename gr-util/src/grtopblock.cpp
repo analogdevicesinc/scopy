@@ -80,15 +80,21 @@ void GRTopBlock::teardown() {
 
 void GRTopBlock::start()
 {
+	qInfo(SCOPY_GR_UTIL)<<"Starting top block";
 	running = true;
+	Q_EMIT aboutToStart();
 	top->start();
+	Q_EMIT started();
 }
 
 void GRTopBlock::stop()
 {
+	qInfo(SCOPY_GR_UTIL)<<"Stopping top block";
+	Q_EMIT aboutToStop();
 	running = false;
 	top->stop();
 	top->wait(); // ??
+	Q_EMIT stopped();
 }
 
 void GRTopBlock::run()
@@ -98,6 +104,7 @@ void GRTopBlock::run()
 }
 
 void GRTopBlock::rebuild() {
+	qInfo(SCOPY_GR_UTIL)<<"Rebuilding top block";
 	bool wasRunning = false;
 	if(running) {
 		wasRunning = true;

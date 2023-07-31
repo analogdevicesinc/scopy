@@ -28,6 +28,10 @@ public:
 Q_SIGNALS:
 	void builtSignalPaths();
 	void teardownSignalPaths();
+	void aboutToStart();
+	void started();
+	void aboutToStop();
+	void stopped();
 
 public Q_SLOTS:
 	void build();
