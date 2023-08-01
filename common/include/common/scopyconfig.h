@@ -10,6 +10,8 @@ class SCOPY_COMMON_EXPORT config {
 public:
 	static QString defaultPluginFolderPath();
 	static QString localPluginFolderPath();
+	static QString defaultTranslationFolderPath();
+	static QString localTranslationFolderPath();
 	static QString preferencesFolderPath();
 	static QString settingsFolderPath();
 	static QString executableFolderPath();

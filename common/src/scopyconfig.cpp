@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QSysInfo>
 #include <QUuid>
+#include <QDir>
 
 QString scopy::config::defaultPluginFolderPath()
 {
@@ -23,6 +24,16 @@ QString scopy::config::localPluginFolderPath()
 	#endif
 
 	return SCOPY_PLUGIN_BUILD_PATH;
+}
+
+QString scopy::config::defaultTranslationFolderPath()
+{
+	return SCOPY_TRANSLATION_INSTALL_PATH;
+}
+
+QString scopy::config::localTranslationFolderPath()
+{
+	return SCOPY_TRANSLATION_BUILD_PATH;
 }
 
 QString scopy::config::preferencesFolderPath()

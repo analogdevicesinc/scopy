@@ -6,12 +6,14 @@
 #include <QTabBar>
 #include <QDesktopServices>
 #include <QUrl>
+#include <QCoreApplication>
 #include "pluginbase/preferenceshelper.h"
 #include "application_restarter.h"
 #include <QDir>
 #include <QDebug>
 #include <QLoggingCategory>
 #include <common/scopyconfig.h>
+#include <translationsrepository.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 
@@ -130,6 +132,7 @@ QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
 	QHBoxLayout *lay3 = new QHBoxLayout(page);
 
 	Preferences *p = Preferences::GetInstance();
+	TranslationsRepository *t = scopy::TranslationsRepository::GetInstance();
 
 	lay->addWidget(buildSaveSessionPreference());
 
@@ -138,7 +141,7 @@ QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_opengl", "Enable OpenGL plotting", this));
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_animations", "Enable menu animations", this));
 	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_theme", "Theme", {"default","light"}, this));
-	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_language", "Language",{"english","romanian"}, this));
+	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_language", "Language", t->getLanguages(), this));
 
 	lay->addWidget(new QLabel("--- Debug preferences --- "));
 	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_show_plot_fps","Show plot FPS", this));

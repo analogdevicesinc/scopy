@@ -47,6 +47,7 @@ int main(int argc, char *argv[])
 					 "CyclicalTask.debug=false\n"
 					 "SWIOTPlugin.debug=true\n"
 					 "AD74413R.debug=true\n"
+					 "ScopyTranslations.debug=true\n"
 					 );
 
 	QCoreApplication::setOrganizationName("ADI");
