@@ -53,7 +53,6 @@ else()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
-
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
 
 add_library(${PROJECT_NAME} SHARED

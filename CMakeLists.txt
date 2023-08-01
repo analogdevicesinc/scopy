@@ -19,7 +19,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(GNUInstallDirs)
 
 find_package(QT NAMES Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
 
 if (Qt5Widgets_VERSION VERSION_LESS 5.15.2)
 	message(FATAL_ERROR "Minimum supported Qt 5.15.2")
@@ -45,6 +45,15 @@ include(ScopyAbout)
 configure_about(./resources/about)
 FILE(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
 message(STATUS ${SCOPY_RESOURCE_FILES})
+
+option(ENABLE_TRANSLATION "Enable translation" ON)
+include(ScopyTranslation)
+
+if(ENABLE_TRANSLATION)
+	generate_translations()
+	qt_add_resources(SCOPY_RESOURCES ${CMAKE_BINARY_DIR}/translations.qrc)
+endif()
+
 qt_add_resources(SCOPY_RESOURCES ${SCOPY_RESOURCE_FILES})
 
 find_path(
@@ -75,6 +84,8 @@ endif(APPLE)
 set(SCOPY_DLL_PATH ${CMAKE_INSTALL_LIBDIR})
 set(SCOPY_PLUGIN_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/plugins/plugins)
 set(SCOPY_PLUGIN_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/scopy-plugins)
+set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
+set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/translations)
 
 add_subdirectory(common)
 add_subdirectory(gui)
@@ -151,8 +162,9 @@ configure_file(resources/qt.conf.cmakein ${CMAKE_CURRENT_BINARY_DIR}/qt.conf COP
 configure_file(resources/scopy.desktop.cmakein ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop @ONLY)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg)
+	install(FILES ${CMAKE_CURRENT_BINARY_DIR}/scopy.desktop DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/applications)
+	install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/gui/res/icon_small.svg DESTINATION ${CMAKE_INSTALL_FULL_DATADIR}/icons/hicolor/scalable/apps RENAME scopy.svg)
+	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/translations DESTINATION ${CMAKE_INSTALL_FULL_DATADIR})
 endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include(ScopyWindows)
