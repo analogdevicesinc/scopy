@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QLoggingCategory>
+#include <QTranslator>
 
 #include "scopymainwindow.h"
 #include "animationmanager.h"
@@ -21,6 +22,7 @@
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
 #include <common/scopyconfig.h>
+#include <translationsrepository.h>
 
 using namespace scopy;
 
@@ -63,6 +65,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 	initAboutPage(pm);
 	initPreferencesPage(pm);
+	initTranslations();
 
 	hp = new ScopyHomePage(this, pm);
 	ScanButtonController *sbc = new ScanButtonController(scanCycle,hp->scanControlBtn(),this);
@@ -205,6 +208,12 @@ void ScopyMainWindow::initPreferencesPage(PluginManager *pm)
 	}
 }
 
+void ScopyMainWindow::initTranslations()
+{
+	TranslationsRepository *t = TranslationsRepository::GetInstance();
+	t->loadTranslations(Preferences::GetInstance()->get("general_language").toString());
+}
+
 void ScopyMainWindow::initPreferences()
 {
 	QString preferencesPath = scopy::config::preferencesFolderPath()  + "/preferences.ini";
@@ -218,7 +227,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_use_opengl", true);
 	p->init("general_use_animations", true);
 	p->init("general_theme", "default");
-	p->init("general_language", "english");
+	p->init("general_language", "en");
 	p->init("general_plot_target_fps", "60");
 	p->init("general_show_plot_fps", true);
 	p->init("general_use_native_dialogs", true);
