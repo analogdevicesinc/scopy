@@ -29,10 +29,10 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->setRightContainerWidth(300);
 
 	GearBtn *settingsMenu = new GearBtn(this);
-	RunBtn *runBtn = new RunBtn(this);
 	InfoBtn *infoBtn = new InfoBtn(this);
-	SingleShotBtn *singleBtn = new SingleShotBtn(this);
 	PrintBtn *printBtn = new PrintBtn(this);
+	runBtn = new RunBtn(this);
+	singleBtn = new SingleShotBtn(this);
 
 	MenuControlButton *channelsBtn = new MenuControlButton(this);
 	channelsBtn->setName("Channels");
@@ -110,37 +110,82 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 		}
 	}
 
-	connect(runBtn,&QPushButton::toggled, this, &AdcInstrument::run);
+	connect(runBtn,&QPushButton::toggled, this, &AdcInstrument::setRunning);
+	connect(singleBtn,&QPushButton::toggled, plotAddon, &GRTimePlotAddon::setSingleShot);
+	connect(singleBtn,&QPushButton::toggled, this, &AdcInstrument::setRunning);
+	connect(this, &AdcInstrument::runningChanged, this, &AdcInstrument::run);
+	connect(this, &AdcInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
+
+	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);
+
 	tool->requestMenu("time__settings");
 	channelGroup->buttons()[0]->setChecked(true);
 
 	init();
 }
 
+AdcInstrument::~AdcInstrument()
+{
+	deinit();
+}
+
 void AdcInstrument::init() {
-	for(auto ch : proxy->getChannelAddons()) {
-			ch->onInit();
+	auto addons = proxy->getAddons();
+	proxy->init();
+	for(auto addon : addons) {
+		addon->onInit();
 	}
-
-	for(auto dev : proxy->getDeviceAddons()) {
-			dev->onInit();
-	}
-
-	proxy->getPlotSettings()->onInit();
-	proxy->getPlotAddon()->onInit();
 }
 
 void AdcInstrument::deinit() {
-	for(auto ch : proxy->getChannelAddons()) {
-			ch->onDeinit();
-	}
+	auto addons = proxy->getAddons();
 
-	for(auto dev : proxy->getDeviceAddons()) {
-			dev->onDeinit();
+	for(auto addon : addons) {
+			addon->onDeinit();
 	}
+}
 
-	proxy->getPlotSettings()->onDeinit();
-	proxy->getPlotAddon()->onDeinit();
+void AdcInstrument::restart() {
+	if(m_running) {
+			run(false);
+			run(true);
+	}
+}
+
+bool AdcInstrument::running() const
+{
+	return m_running;
+}
+
+void AdcInstrument::setRunning(bool newRunning)
+{
+	if (m_running == newRunning)
+			return;
+	m_running = newRunning;
+	Q_EMIT runningChanged(newRunning);
+}
+
+void AdcInstrument::start() {
+	run(true);
+}
+
+void AdcInstrument::stop() {
+	run(false);
+}
+
+void AdcInstrument::startAddons() {
+	auto addons = proxy->getAddons();
+
+	for(auto addon : addons) {
+			addon->onStart();
+	}
+}
+void AdcInstrument::stopAddons() {
+	auto addons = proxy->getAddons();
+
+	for(auto addon : addons) {
+			addon->onStop();
+	}
 }
 
 void AdcInstrument::run(bool b) {
@@ -148,37 +193,16 @@ void AdcInstrument::run(bool b) {
 	QElapsedTimer tim;
 	tim.start();
 
-
-	qInfo()<<tim.elapsed();
-	for(auto ch : proxy->getChannelAddons()) {
-		if(b)
-			ch->onStart();
-		else
-			ch->onStop();
+	if(!b) {
+		runBtn->setChecked(false);
+		singleBtn->setChecked(false);
 	}
-	qInfo()<<tim.elapsed();
-	for(auto dev : proxy->getDeviceAddons()) {
-		if(b)
-			dev->onStart();
-		else
-			dev->onStop();
+
+	if(b)  {
+		startAddons();
+	} else {
+		stopAddons();
 	}
-	qInfo()<<tim.elapsed();
-
-	if(b)
-		proxy->getPlotSettings()->onStart();
-	else
-		proxy->getPlotSettings()->onStop();
-
-	qInfo()<<tim.elapsed();
-	if(b)
-		proxy->getPlotAddon()->onStart();
-	else
-		proxy->getPlotAddon()->onStop();
-	qInfo()<<tim.elapsed();
-
-
-
 }
 
 

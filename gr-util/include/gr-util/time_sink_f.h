@@ -48,8 +48,14 @@
 
 #include <gnuradio/sync_block.h>
 #include "scopy-gr-util_export.h"
+#include <QString>
 
 namespace scopy {
+
+typedef struct  {
+	QString str;
+	int offset;
+} PlotTag_t;
 
 class SCOPY_GR_UTIL_EXPORT time_sink_f : virtual public gr::sync_block
 {
@@ -63,8 +69,13 @@ public:
 	virtual void updateData() = 0;
 	virtual const std::vector<float> &time() const = 0;
 	virtual const std::vector<std::vector<float> > &data() const = 0;
+	virtual const std::vector<std::vector<PlotTag_t> > &tags() const = 0;
 	virtual void setRollingMode(bool) = 0;
 	virtual bool rollingMode() = 0;
+	virtual void setSingleShot(bool) = 0;
+	virtual bool singleShot() = 0;
+	virtual bool finishedAcquisition() = 0;
+
 };
 
 } /* namespace scopy */

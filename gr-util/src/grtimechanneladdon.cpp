@@ -214,9 +214,9 @@ void GRTimeChannelAddon::enable() {
 	m_plotAxisHandle->handle()->setVisible(true);
 	m_plotAxisHandle->handle()->raise();
 	m_signalPath->setEnabled(true);
-	m_grch->setEnabled(true);
-//	m_plotAddon->plot();
-	m_plotAddon->plot()->replot();
+//	m_grch->setEnabled(true);
+	m_plotAddon->replot();
+//	m_plotAddon->plot()->replot();
 }
 
 
@@ -225,9 +225,9 @@ void GRTimeChannelAddon::disable() {
 	m_plotCh->disable();
 	m_plotAxisHandle->handle()->setVisible(false);
 	m_signalPath->setEnabled(false);
-	m_grch->setEnabled(false);
-//	m_plotAddon->plot();
-	m_plotAddon->plot()->replot();
+//	m_grch->setEnabled(false);
+	m_plotAddon->replot();
+//	m_plotAddon->plot()->replot();
 }
 
 void GRTimeChannelAddon::onStart() {
