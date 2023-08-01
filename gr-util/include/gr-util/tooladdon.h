@@ -18,9 +18,19 @@ public:
 	virtual void onChannelAdded(ToolAddon* ) = 0;
 	virtual void onChannelRemoved(ToolAddon* ) = 0;
 };
+
+class SCOPY_GR_UTIL_EXPORT GRTopAddon {
+public:
+	virtual void preFlowStart() = 0;
+	virtual void postFlowStart() = 0;
+	virtual void preFlowStop() = 0;
+	virtual void postFlowStop() = 0;
+};
 }
 
 #define ToolAddon_iid "org.adi.Scopy.Plugins.ToolAddon/0.1"
+#define GRTopAddon_iid "org.adi.Scopy.Plugins.GRTopAddon/0.1"
 Q_DECLARE_INTERFACE(scopy::ToolAddon, ToolAddon_iid)
+Q_DECLARE_INTERFACE(scopy::GRTopAddon, GRTopAddon_iid)
 
 #endif // TOOLADDON_H
