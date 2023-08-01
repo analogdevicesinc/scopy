@@ -64,16 +64,16 @@ void M2kPlugin::preload()
 void M2kPlugin::loadToolList()
 {
 	Preferences *p = Preferences::GetInstance();
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc","Oscilloscope",":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec","Spectrum Analyzer",":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet","Network Analyzer",":/gui/icons/scopy-default/icons/tool_network_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen","Signal Generator",":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic","Logic Analyzer",":/gui/icons/scopy-default/icons/tool_logic_analyzer.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern","Pattern Generator",":/gui/icons/scopy-default/icons/tool_pattern_generator.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio","Digital I/O",":/gui/icons/scopy-default/icons/tool_io.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm","Voltmeter",":/gui/icons/scopy-default/icons/tool_voltmeter.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower","Power Supply",":/gui/icons/scopy-default/icons/tool_power_supply.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal","Calibration",":/gui/icons/scopy-default/icons/tool_calibration.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kosc",tr("Oscilloscope"),":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kspec",tr("Spectrum Analyzer"),":/gui/icons/scopy-default/icons/tool_spectrum_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2knet",tr("Network Analyzer"),":/gui/icons/scopy-default/icons/tool_network_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2ksiggen",tr("Signal Generator"),":/gui/icons/scopy-default/icons/tool_signal_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2klogic",tr("Logic Analyzer"),":/gui/icons/scopy-default/icons/tool_logic_analyzer.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpattern",tr("Pattern Generator"),":/gui/icons/scopy-default/icons/tool_pattern_generator.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdio",tr("Digital I/O"),":/gui/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kdmm",tr("Voltmeter"),":/gui/icons/scopy-default/icons/tool_voltmeter.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kpower",tr("Power Supply"),":/gui/icons/scopy-default/icons/tool_power_supply.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("m2kcal",tr("Calibration"),":/gui/icons/scopy-default/icons/tool_calibration.svg"));
 	ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal")->setVisible(p->get("m2k_manual_calibration_enable").toBool());
 
 }
