@@ -79,7 +79,19 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 	bufferPlotSizeLayout->addWidget(m_bufferSizeSpin);
 	bufferPlotSizeLayout->addWidget(m_plotSizeSpin);
 
-	MenuOnOffSwitch *syncBufferPlot = new MenuOnOffSwitch(tr("SYNC BUFFER-PLOT SIZES"), xaxis, false);
+	m_syncBufferPlot = new MenuOnOffSwitch(tr("SYNC BUFFER-PLOT SIZES"), xaxis, false);
+	connect(m_syncBufferPlot->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+		m_plotSizeSpin->setEnabled(!b);
+		m_rollingModeSw->setEnabled(!b);
+		if(b) {
+			m_rollingModeSw->onOffswitch()->setChecked(false);
+			m_plotSizeSpin->setValue(m_bufferSizeSpin->value());
+			connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, m_plotSizeSpin, &ScaleSpinButton::setValue);
+		} else {
+			disconnect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, m_plotSizeSpin, &ScaleSpinButton::setValue);
+		}
+
+	});
 	m_rollingModeSw = new MenuOnOffSwitch(tr("ROLLING MODE"), xaxis, false);
 	connect(m_rollingModeSw->onOffswitch(), &QAbstractButton::toggled, this, &GRTimePlotAddonSettings::setRollingMode);
 	connect(this, &GRTimePlotAddonSettings::rollingModeChanged, m_plot, &GRTimePlotAddon::setRollingMode);
@@ -96,7 +108,7 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 		 {"k",1e3},
 		 {"M",1e6},
 		 {"G",1e9},
-		 },"XMin",(double)((long)(-1<<31)),(double)((long)1<<31),false,false,xMinMax);
+			},"XMin",(double)((-((long)1<<31))),(double)((long)1<<31),false,false,xMinMax);
 
 	m_xmax = new PositionSpinButton(
 		{
@@ -104,7 +116,7 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 		 {"k",1e3},
 		 {"M",1e6},
 		 {"G",1e9},
-		 },"XMax",(double)((long)(-1<<31)),(double)((long)1<<31),false,false,xMinMax);
+			},"XMax",(double)((-((long)1<<31))),(double)((long)1<<31),false,false,xMinMax);
 
 	auto m_plotAxis = m_plot->plot()->xAxis();
 	// Connects
@@ -140,17 +152,35 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 		 {"GHz",1e9},
 		 },"SampleRate",1,(double)((long)1<<31),false,false,xaxis);
 
+	m_showTagsSw = new MenuOnOffSwitch(tr("SHOW TAGS"), xaxis, false);
+	connect(m_showTagsSw->onOffswitch(), &QAbstractButton::toggled, this, &GRTimePlotAddonSettings::setShowPlotTags);
+	connect(this, &GRTimePlotAddonSettings::showPlotTagsChanged, m_plot, &GRTimePlotAddon::setDrawPlotTags);
+
 	xaxiscontainer->contentLayout()->setSpacing(10);
 	xaxiscontainer->contentLayout()->addWidget(xaxis);
 	xaxis->contentLayout()->addWidget(bufferPlotSize);
-	xaxis->contentLayout()->addWidget(syncBufferPlot);
+	xaxis->contentLayout()->addWidget(m_syncBufferPlot);
 	xaxis->contentLayout()->addWidget(m_rollingModeSw);
 	xaxis->contentLayout()->addWidget(xMinMax);
 	xaxis->contentLayout()->addWidget(cbb);
 	xaxis->contentLayout()->addWidget(m_sampleRateSpin);
+	xaxis->contentLayout()->addWidget(m_showTagsSw);
 	xaxis->contentLayout()->setSpacing(10);
 
 	return xaxiscontainer;
+}
+
+bool GRTimePlotAddonSettings::showPlotTags() const
+{
+	return m_showPlotTags;
+}
+
+void GRTimePlotAddonSettings::setShowPlotTags(bool newShowPlotTags)
+{
+	if (m_showPlotTags == newShowPlotTags)
+		return;
+	m_showPlotTags = newShowPlotTags;
+	Q_EMIT showPlotTagsChanged(m_showPlotTags);
 }
 
 bool GRTimePlotAddonSettings::rollingMode() const
@@ -184,7 +214,8 @@ void GRTimePlotAddonSettings::onInit() {
 	m_plotSizeSpin->setValue(32);
 	m_xmin->setValue(0);
 	m_xmax->setValue(31);
-	m_rollingModeSw->onOffswitch()->setChecked(false);
+	m_syncBufferPlot->onOffswitch()->setChecked(true);
+//	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
 void GRTimePlotAddonSettings::onDeinit() {

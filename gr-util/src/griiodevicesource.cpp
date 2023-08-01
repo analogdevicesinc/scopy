@@ -90,6 +90,7 @@ void GRIIODeviceSource::build_blks(GRTopBlock *top)
 	// create block
 	src = gr::iio::device_source::make_from(m_ctx, m_deviceName.toStdString(), m_channelNames, m_phyDeviceName.toStdString(), gr::iio::iio_param_vec_t(), m_buffersize);
 	src->set_output_multiple(m_buffersize);
+	src->set_len_tag_key("buffer_start");
 	// match channels with blocks
 
 	end_blk = src;

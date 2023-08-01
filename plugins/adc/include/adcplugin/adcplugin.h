@@ -10,8 +10,6 @@
 #include "scopy-adcplugin_export.h"
 #include <QLineEdit>
 #include <iio.h>
-#include "oscilloscope_plot.hpp"
-
 
 #include <gr-util/grtopblock.h>
 #include <gr-util/grproxyblock.h>
@@ -51,6 +49,8 @@ public:
 	virtual ToolAddon* getPlotSettings() = 0;
 	virtual QList<ToolAddon*> getDeviceAddons() = 0;
 	virtual QList<ToolAddon*> getChannelAddons() = 0;
+	virtual QList<ToolAddon*> getAddons() = 0;
+	virtual void init() = 0;
 
 };
 
@@ -60,8 +60,6 @@ public:
 	GRTimePlotProxy(QObject *parent = nullptr) : QObject(parent) { }
 	~GRTimePlotProxy() {}
 
-//	void addDeviceAddon(GRDeviceAddon* d);
-//	void addChannelAddon(GRTimeChannelAddon *t);
 	void setPlotAddon(GRTimePlotAddon *p, GRTimePlotAddonSettings *s) {
 		this->plotAddon = p;
 		this->plotSettingsAddon = s;
@@ -99,15 +97,40 @@ public:
 		return channelAddons;
 	}
 
+	QList<ToolAddon*> getAddons() override {
+		QList<ToolAddon*> addons;
+		addons.append(channelAddons);
+		addons.append(deviceAddons);
+		addons.append(plotSettingsAddon);
+		addons.append(plotAddon);
+		return addons;
+	}
+
+	void init() override {
+		for(auto *addon : getAddons()) {
+			if(dynamic_cast<GRTopAddon*>(addon)) {
+				auto GRAddon = dynamic_cast<GRTopAddon*>(addon);
+				connect(topBlock,&GRTopBlock::aboutToStart, this, [=](){GRAddon->preFlowStart();});
+				connect(topBlock,&GRTopBlock::started, this, [=](){GRAddon->postFlowStart();});
+				connect(topBlock,&GRTopBlock::aboutToStop, this, [=](){GRAddon->preFlowStop();});
+				connect(topBlock,&GRTopBlock::stopped, this, [=](){GRAddon->postFlowStop();});
+			}
+		}
+	}
+
 
 	QString getPrefix() { return prefix; }
 	void setPrefix(QString p) { prefix = p;}
+	GRTopBlock *getTopBlock() const	{ return topBlock; }
+	void setTopBlock(GRTopBlock *newTopBlock) {	topBlock = newTopBlock;	}
+
 private:
 
 	GRTimePlotAddon *plotAddon;
 	GRTimePlotAddonSettings *plotSettingsAddon;
 	QList<ToolAddon*> deviceAddons;
 	QList<ToolAddon*> channelAddons;
+	GRTopBlock* topBlock;
 
 	QString prefix;
 };

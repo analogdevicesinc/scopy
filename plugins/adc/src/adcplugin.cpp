@@ -137,6 +137,7 @@ PlotProxy* ADCPlugin::createRecipe(iio_context *ctx) {
 			i++;
 		}
 	}
+	recipe->setTopBlock(top);
 
 	qDebug(CAT_ADCPLUGIN)<<deviceList;
 	qDebug(CAT_ADCPLUGIN)<<devChannelMap;
@@ -209,4 +210,3 @@ R"plugin(
 QString ADCPlugin::version() {
 	return "0.1";
 }
-

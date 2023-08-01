@@ -3,7 +3,10 @@
 
 #include <QwtPlotCurve>
 #include <QwtPlot>
+#include <QwtPlotMarker>
 #include "scopy-gui_export.h"
+#include <QPen>
+#include <QwtSymbol>
 
 namespace scopy {
 class PlotAxis;
@@ -30,6 +33,12 @@ public:
 	PlotAxisHandle *handle() const;
 	void setHandle(PlotAxisHandle *newHandle);
 
+	QList<QwtPlotMarker *> markers();
+	QwtPlotMarker *buildMarker(QString str, QwtSymbol::Style shape, double x, double y);
+	void clearMarkers();
+	void removeMarker(QwtPlotMarker *m);
+	void addMarker(QwtPlotMarker *m);
+
 public Q_SLOTS:
 	void raise();
 	void attach();
@@ -45,9 +54,11 @@ private:
 	PlotAxis *m_xAxis, *m_yAxis;
 	PlotAxisHandle *m_handle;
 	QwtPlotCurve *m_curve;
+	QList<QwtPlotMarker*> m_markers;
 	QwtSymbol *symbol;
 	PlotWidget *m_plotWidget;
 	QwtPlot *m_plot;
+	QPen m_pen;
 	float *m_data;
 };
 }
