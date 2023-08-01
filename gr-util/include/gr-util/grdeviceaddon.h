@@ -8,7 +8,7 @@
 
 namespace scopy::grutil {
 class GRTimeChannelAddon;
-class SCOPY_GR_UTIL_EXPORT GRDeviceAddon : public QObject, public ToolAddon {
+class SCOPY_GR_UTIL_EXPORT GRDeviceAddon : public QObject, public ToolAddon, public GRTopAddon {
 	Q_OBJECT
 public:
 	GRDeviceAddon(GRIIODeviceSource *src, QObject *parent = nullptr);
@@ -32,6 +32,10 @@ public Q_SLOTS:
 	void onStop() override;
 	void onInit() override;
 	void onDeinit() override;
+	void preFlowStart() override;
+	void postFlowStart() override;
+	void preFlowStop() override;
+	void postFlowStop() override;
 	void onChannelAdded(ToolAddon*) override;
 	void onChannelRemoved(ToolAddon*) override;
 
