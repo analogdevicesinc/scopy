@@ -31,6 +31,9 @@ public:
 	bool rollingMode() const;
 	void setRollingMode(bool newRollingMode);
 
+	bool showPlotTags() const;
+	void setShowPlotTags(bool newShowPlotTags);
+
 public Q_SLOTS:
 	void enable() override {}
 	void disable() override {}
@@ -47,6 +50,7 @@ Q_SIGNALS:
 	void bufferSizeChanged(uint32_t);
 	void plotSizeChanged(uint32_t);
 	void rollingModeChanged(bool);
+	void showPlotTagsChanged(bool);
 
 private:
 	QWidget* createMenu(QWidget* parent = nullptr);
@@ -65,16 +69,20 @@ private:
 	PositionSpinButton *m_xmax;
 	PositionSpinButton *m_sampleRateSpin;
 	MenuOnOffSwitch *m_rollingModeSw;
+	MenuOnOffSwitch *m_syncBufferPlot;
+	MenuOnOffSwitch *m_showTagsSw;
 
 	bool m_sampleRateAvailable;
 
 	uint32_t m_bufferSize;
 	uint32_t m_plotSize;
 	bool m_rollingMode;
+	bool m_showPlotTags;
 
 	Q_PROPERTY(uint32_t bufferSize READ bufferSize WRITE setBufferSize NOTIFY bufferSizeChanged)
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)
 	Q_PROPERTY(bool rollingMode READ rollingMode WRITE setRollingMode NOTIFY rollingModeChanged)
+	Q_PROPERTY(bool showPlotTags READ showPlotTags WRITE setShowPlotTags NOTIFY showPlotTagsChanged)
 };
 }
 
