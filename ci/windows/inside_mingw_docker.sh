@@ -49,7 +49,7 @@ deploy_app(){
 	cp $BUILD_FOLDER/qt.conf $DEST_FOLDER/
 
 	mkdir $DEST_FOLDER/resources
-	$STAGING_DIR/bin/windeployqt.exe --dir $DEST_FOLDER --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport $BUILD_FOLDER/Scopy.exe
+	$STAGING_DIR/bin/windeployqt.exe --dir $DEST_FOLDER --no-translations --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport $BUILD_FOLDER/Scopy.exe
 
 	cp -r $STAGING_DIR/share/libsigrokdecode/decoders  $DEST_FOLDER/
 
@@ -70,6 +70,10 @@ deploy_app(){
 	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins -type f -name "*.dll")
 	mkdir -p $DEST_FOLDER/plugins/plugins
 	cp $PLUGINS_DLL $DEST_FOLDER/plugins/plugins
+	
+	TRANSLATIONS_QM=$(find $BUILD_FOLDER/translations -type f -name "*.qm")
+	mkdir -p $DEST_FOLDER/translations
+	cp $TRANSLATIONS_QM $DEST_FOLDER/translations
 
 	if [ -d $REGMAP_XMLS ]; then
 		cp -r $REGMAP_XMLS $DEST_FOLDER/plugins/plugins
