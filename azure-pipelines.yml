@@ -10,7 +10,6 @@ trigger:
     - master
     - dev
     - scopy2-ci-macOS
-    - staging/*
     - ci-*
   tags:
     include:
@@ -21,7 +20,8 @@ pr:
     include:
     - main
     - master
-    - 20*
+    - dev
+    - ci-*
 
 stages:
 - stage: Builds
