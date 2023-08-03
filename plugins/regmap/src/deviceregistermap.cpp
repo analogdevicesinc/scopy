@@ -38,6 +38,8 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
     Utils::removeLayoutMargins(layout);
     setLayout( layout);
 
+    initSettings();
+
     registerController = new gui::RegisterController();
 
     if (registerMapTemplate) {
