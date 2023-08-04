@@ -5,13 +5,21 @@
 #include <QDebug>
 
 using namespace scopy;
-PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, QObject *parent)
+PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, int position, QObject *parent)
 	: QObject(parent),
 	m_plotWidget(p),
 	m_axis(ax),
 	m_pen(pen)
-
 {
+	VertHandlesArea *area;
+	bool left = false;
+	if(position == QwtAxis::YLeft) {
+		area = p->leftHandlesArea();
+		left = true;
+	} else {
+		area = p->rightHandlesArea();
+	}
+
 	//QColor chnColor = color;
 	m_symbolCtrl = p->symbolCtrl();
 	/* Channel offset widget */
@@ -24,17 +32,18 @@ PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, QObject *p
 	m_chOffsetBar->setPen(pen);
 
 	m_handle = new RoundedHandleV(
-	    QPixmap(":/gui/icons/handle_right_arrow.svg"),
+	    (left) ? QPixmap(":/gui/icons/handle_right_arrow.svg")
+		   : QPixmap(":/gui/icons/handle_right_arrow.svg"),
 	    QPixmap(":/gui/icons/handle_up_arrow.svg"),
 	    QPixmap(":/gui/icons/handle_down_arrow.svg"),
-	    p->leftHandlesArea(), true);
+	    area, left);
 
 	m_handle->setRoundRectColor(m_pen.color());
 	m_handle->setPen(pen);
 	m_handle->setVisible(true);
 
 	/* When bar position changes due to plot resizes update the handle */
-	connect(p->leftHandlesArea(), &HandlesArea::sizeChanged, m_handle, [=](){
+	connect(area, &HandlesArea::sizeChanged, m_handle, [=](){
 		m_handle->updatePosition();
 	});
 

@@ -48,9 +48,17 @@ public:
 
 	PlotChannel *selectedChannel() const;
 
+	bool showXAxisLabels() const;
+	void setShowXAxisLabels(bool newShowXAxisLabels);
+
+	bool showYAxisLabels() const;
+	void setShowYAxisLabels(bool newShowYAxisLabels);
+
 public Q_SLOTS:
 	void replot();
-	void selectChannel(PlotChannel*);
+	void selectChannel(PlotChannel*);	
+	void showAxisLabels();
+	void hideAxisLabels();	
 
 Q_SIGNALS:
 	void canvasSizeChanged();
@@ -75,8 +83,14 @@ private:
 	PlotAxis *m_xAxis;
 	PlotAxis *m_yAxis;
 
+	int m_xPosition;
+	int m_yPosition;
+
 	bool displayGraticule;
 	Graticule *graticule;
+
+	bool m_showXAxisLabels;
+	bool m_showYAxisLabels;
 
 	SymbolController *m_symbolCtrl;
 	PlotChannel* m_selectedChannel;
@@ -94,6 +108,7 @@ private:
 	void setupOpenGLCanvas();
 	void setupHandlesArea();
 	void setupZoomer();
+	void hideDefaultAxis();
 };
 
 

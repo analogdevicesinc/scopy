@@ -28,7 +28,8 @@ public:
 	 * @brief init
 	 * Initializes a preferences value. If preference already exist, the value is not updated
 	 */
-	void init(QString, QVariant);
+	static void init(QString, QVariant);
+	void _init(QString, QVariant);
 	/**
 	 * @brief clear
 	 * clears preferences table
@@ -38,12 +39,14 @@ public:
 	 * @brief get
 	 * @return gets preferences value
 	 */
-	QVariant get(QString);
+	static QVariant get(QString val);
+	QVariant _get(QString);
 	/**
 	 * @brief set
 	 * Updates preferences value
 	 */
-	void set(QString, QVariant);
+	static void set(QString, QVariant);
+	void _set(QString, QVariant);
 
 	QMap<QString, QVariant> getPreferences() const;
 	void setPreferences(QMap<QString, QVariant> s);

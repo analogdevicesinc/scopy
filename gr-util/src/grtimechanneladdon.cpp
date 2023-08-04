@@ -14,9 +14,48 @@
 #include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menulineedit.h>
 #include <QLoggingCategory>
+#include <pluginbase/preferences.h>
 
 Q_LOGGING_CATEGORY(CAT_GR_TIME_CHANNEL, "GRTimeChannel");
 using namespace scopy::grutil;
+
+GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlotAddon *plotAddon, QPen pen, QObject *parent)
+    : QObject(parent), m_channelName(ch), m_dev(dev), m_plotAddon(plotAddon), m_pen(pen) {
+
+	int yPlotAxisPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
+	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
+
+	m_running = false;
+	m_autoscaleEnabled = false;
+	m_signalPath = new GRSignalPath("time_" + dev->getName() + ch, this);
+	m_grch = new GRIIOFloatChannelSrc(dev->src(),ch,m_signalPath);
+	m_signalPath->append(m_grch);
+	m_scOff = new GRScaleOffsetProc(m_signalPath);
+	m_signalPath->append(m_scOff);
+	m_scOff->setOffset(0);
+	m_scOff->setScale(1);
+	m_signalPath->setEnabled(false);
+
+	m_scaleAvailable = true; // query from GRIIOFloatChannel;
+	m_unit = "Volts"; // query from GRIIOFloatChannel;
+
+	setDevice(dev);
+
+	name = m_grch->getChannelName();
+	auto plot = plotAddon->plot();;
+
+	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
+	m_plotCh = new PlotChannel(name, pen, plot, plot->xAxis(), m_plotAxis,this);
+	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle,this);
+	m_plotCh->setHandle(m_plotAxisHandle);
+	plot->addPlotAxisHandle(m_plotAxisHandle);
+
+	widget = createMenu();
+
+	// - create ADCCount/VFS/V
+}
+
+GRTimeChannelAddon::~GRTimeChannelAddon() {}
 
 QWidget* GRTimeChannelAddon::createYAxisMenu(QWidget* parent) {
 	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
@@ -165,41 +204,6 @@ QWidget* GRTimeChannelAddon::createMenu(QWidget* parent) {
 	return w;
 }
 
-GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlotAddon *plotAddon, QPen pen, QObject *parent)
-    : QObject(parent), m_channelName(ch), m_dev(dev), m_plotAddon(plotAddon), m_pen(pen) {
-
-	m_running = false;
-	m_autoscaleEnabled = false;
-	m_signalPath = new GRSignalPath("time_" + dev->getName() + ch, this);
-	m_grch = new GRIIOFloatChannelSrc(dev->src(),ch,m_signalPath);
-	m_signalPath->append(m_grch);
-	m_scOff = new GRScaleOffsetProc(m_signalPath);
-	m_signalPath->append(m_scOff);
-	m_scOff->setOffset(0);
-	m_scOff->setScale(1);
-	m_signalPath->setEnabled(false);
-
-	m_scaleAvailable = true; // query from GRIIOFloatChannel;
-	m_unit = "Volts"; // query from GRIIOFloatChannel;
-
-	setDevice(dev);
-
-	name = m_grch->getChannelName();
-	auto plot = plotAddon->plot();;
-
-	m_plotAxis = new PlotAxis(QwtAxis::YLeft, plot, pen, this);
-	m_plotCh = new PlotChannel(name, pen, plot, plot->xAxis(), m_plotAxis,this);
-	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis,plot,this);
-	m_plotCh->setHandle(m_plotAxisHandle);
-	plot->addPlotAxisHandle(m_plotAxisHandle);
-
-	widget = createMenu();
-
-	// - create ADCCount/VFS/V
-}
-
-GRTimeChannelAddon::~GRTimeChannelAddon() {}
-
 QString GRTimeChannelAddon::getName() {return name;}
 
 QWidget *GRTimeChannelAddon::getWidget() {return widget;}
@@ -235,9 +239,12 @@ void GRTimeChannelAddon::onStart() {
 	toggleAutoScale();
 }
 
-void GRTimeChannelAddon::onStop() {
+void GRTimeChannelAddon::onStop() {	
 	m_running = false;
 	toggleAutoScale();
+	if(m_autoscaleEnabled) {
+		autoscale();
+	}
 }
 
 void GRTimeChannelAddon::toggleAutoScale() {

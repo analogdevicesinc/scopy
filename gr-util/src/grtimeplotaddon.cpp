@@ -26,7 +26,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_started(false),
 	m_singleShot(false),
 	m_showPlotTags(false),
-	m_refreshTimerRunning(false) {
+	m_refreshTimerRunning(false)
+{
 
 	Preferences *p = Preferences::GetInstance();
 
