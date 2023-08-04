@@ -20,7 +20,7 @@
 
 namespace scopy::grutil {
 class GRDeviceAddon;
-class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public QObject, public ToolAddon {
+class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public QObject, public ToolAddon, public GRTopAddon {
 	Q_OBJECT
 public:
 	typedef enum {
@@ -38,8 +38,12 @@ public:
 	GRDeviceAddon* getDevice();
 
 	QPen pen() const;
+	bool enabled() const;
 	GRSignalPath *signalPath() const;
 	PlotChannel *plotCh() const;
+
+	bool sampleRateAvailable() const;
+	GRIIOFloatChannelSrc *grch() const;
 
 public Q_SLOTS:
 	void enable() override;
@@ -48,6 +52,8 @@ public Q_SLOTS:
 	void onStop() override;
 	void onInit() override;
 	void onDeinit() override;
+	void preFlowBuild() override;
+
 	void onChannelAdded(ToolAddon*) override;
 	void onChannelRemoved(ToolAddon*) override;
 
@@ -72,9 +78,12 @@ private:
 	PlotAxis *m_plotAxis;
 	PlotAxisHandle *m_plotAxisHandle;
 
+	bool m_enabled;
 	bool m_scaleAvailable;
+	bool m_sampleRateAvailable;
 	bool m_running;
 	bool m_autoscaleEnabled;
+
 	QString m_unit;
 	QString name;
 	QWidget *widget;

@@ -15,6 +15,9 @@ public:
 	GRIIOChannel(QString channelName, GRIIODeviceSource *dev, QObject *parent = nullptr) : GRProxyBlock(parent), channelName(channelName), dev(dev) { }
 	GRIIODeviceSource* getDeviceSrc() { return dev; }
 	QString getChannelName() { return channelName;}
+	virtual bool sampleRateAvailable() { return false; }
+	virtual double readSampleRate() { return -1; }
+	static QString findAttribute(QStringList possibleNames, iio_channel*);
 
 protected:
 
@@ -41,7 +44,11 @@ public:
 	std::vector<std::string> channelNames() const;
 
 	QString deviceName() const;
-	const iio_data_format *getChannelFormat(QString ch);
+	double readSampleRate();
+
+	static QString findAttribute(QStringList possibleNames, iio_device *dev);
+
+	iio_device *iioDev() const;
 
 protected:
 	QList<GRIIOChannel*> m_list;
@@ -49,11 +56,13 @@ protected:
 	QString m_deviceName;
 	QString m_phyDeviceName;
 	iio_context *m_ctx;
+	iio_device* m_iioDev;
 	unsigned int m_buffersize;
 
 	gr::iio::device_source::sptr src;
 
 private:
+	QString m_sampleRateAttribute;
 	void computeChannelNames();
 	void addChannelAtIndex(iio_device *dev, QString channelName);
 	void matchChannelToBlockOutputs(GRTopBlock* top);

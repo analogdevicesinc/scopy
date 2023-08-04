@@ -18,9 +18,17 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen,QObject *parent) :
 	updateAxisScale();
 
 	// move this outside (?)
-	auto prefixFormatter = new MetricPrefixFormatter();
+	if(isHorizontal()) {
+		auto prefixFormatter = new TimePrefixFormatter();
+		m_scaleDraw = new OscScaleDraw(prefixFormatter,"");
+	}
+	else  {
+		auto prefixFormatter = new MetricPrefixFormatter();
+		prefixFormatter->setTrimZeroes(true);
+		prefixFormatter->setTwoDecimalMode(true);
+		m_scaleDraw = new OscScaleDraw(prefixFormatter,"");
+	}
 
-	m_scaleDraw = new OscScaleDraw(prefixFormatter,"");
 	m_scaleDraw->setColor(pen.color());
 	m_plot->setAxisScaleDraw(m_axisId,m_scaleDraw);
 
@@ -38,7 +46,6 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen,QObject *parent) :
 
 	connect(this, &PlotAxis::minChanged, this, &PlotAxis::updateAxisScale);
 	connect(this, &PlotAxis::maxChanged, this, &PlotAxis::updateAxisScale);
-
 }
 
 void PlotAxis::setupZoomer() {

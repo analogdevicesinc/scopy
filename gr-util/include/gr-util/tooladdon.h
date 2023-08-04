@@ -9,22 +9,26 @@ public:
 	virtual QString getName() = 0;
 	virtual QWidget* getWidget() = 0;
 
-	virtual void enable() = 0;
-	virtual void disable() = 0;
-	virtual void onStart() = 0;
-	virtual void onStop() = 0;
-	virtual void onInit() = 0;
-	virtual void onDeinit() = 0;
-	virtual void onChannelAdded(ToolAddon* ) = 0;
-	virtual void onChannelRemoved(ToolAddon* ) = 0;
+	virtual void enable() {}
+	virtual void disable() {}
+	virtual void onStart() {}
+	virtual void onStop() {}
+	virtual void onInit() {}
+	virtual void onDeinit() {}
+	virtual void onChannelAdded(ToolAddon* ) {}
+	virtual void onChannelRemoved(ToolAddon* ) {}
 };
 
 class SCOPY_GR_UTIL_EXPORT GRTopAddon {
 public:
-	virtual void preFlowStart() = 0;
-	virtual void postFlowStart() = 0;
-	virtual void preFlowStop() = 0;
-	virtual void postFlowStop() = 0;
+	virtual void preFlowBuild() {}
+	virtual void postFlowBuild() {}
+	virtual void preFlowStart() {}
+	virtual void postFlowStart() {}
+	virtual void preFlowStop() {}
+	virtual void postFlowStop() {}
+	virtual void preFlowTeardown() {}
+	virtual void postFlowTeardown() {}
 };
 }
 
