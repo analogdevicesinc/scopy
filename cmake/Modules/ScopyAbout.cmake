@@ -90,12 +90,15 @@ configure_file(${ABOUT_RESOURCES_DIR}/buildinfo.html.cmakein ${ABOUT_RESOURCES_T
 configure_file(${ABOUT_RESOURCES_DIR}/scopy_osp.html.cmakein ${ABOUT_RESOURCES_TARGET_DIR}/scopy_osp.html)
 configure_file(${ABOUT_RESOURCES_DIR}/credits.html.cmakein ${ABOUT_RESOURCES_TARGET_DIR}/credits.html)
 configure_file(${ABOUT_RESOURCES_DIR}/about.html.cmakein ${ABOUT_RESOURCES_TARGET_DIR}/about.html)
+configure_file(${ABOUT_RESOURCES_DIR}/scopy_home.html.cmakein ${ABOUT_RESOURCES_TARGET_DIR}/scopy_home.html)
 
 SET(ABOUT_HTML_SOURCES 
 ${ABOUT_RESOURCES_TARGET_DIR}/buildinfo.html 
 ${ABOUT_RESOURCES_TARGET_DIR}/scopy_osp.html 
 ${ABOUT_RESOURCES_TARGET_DIR}/credits.html 
-${ABOUT_RESOURCES_TARGET_DIR}/about.html)
+${ABOUT_RESOURCES_TARGET_DIR}/about.html
+${ABOUT_RESOURCES_TARGET_DIR}/scopy_home.html
+)
 
 set(ABOUT_HTML_QRC_SOURCES)
 foreach(file ${ABOUT_HTML_SOURCES})
