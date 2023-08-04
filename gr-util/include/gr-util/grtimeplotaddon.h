@@ -4,8 +4,11 @@
 #include "scopy-gr-util_export.h"
 #include "tooladdon.h"
 #include <gui/oscilloscope_plot.hpp>
+
+#include "grtimeplotaddonsettings.h"
 #include <QGridLayout>
 #include "time_sink_f.h"
+#include <plotwidget.h>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QFuture>
@@ -16,6 +19,7 @@ namespace scopy::grutil {
 using namespace scopy;
 class GRTopBlock;
 class GRTimeChannelAddon;
+class GRTimePlotAddonSettings;
 
 class SCOPY_GR_UTIL_EXPORT GRTimePlotAddon : public QObject, public ToolAddon, public GRTopAddon {
 	Q_OBJECT
@@ -26,10 +30,12 @@ public:
 	QString getName() override;
 	QWidget *getWidget() override;
 	PlotWidget *plot();
+	int xMode();
 
 Q_SIGNALS:
 	void requestRebuild();
 	void requestStop();
+	void xAxisUpdated();
 
 public Q_SLOTS:
 	void enable() override;
@@ -52,11 +58,13 @@ public Q_SLOTS:
 
 	void setRollingMode(bool b);
 	void setDrawPlotTags(bool b);
+	void setSampleRate(double);
 	void setBufferSize(uint32_t size);
 	void setPlotSize(uint32_t size);
 	void handlePreferences(QString,QVariant);
 	void setSingleShot(bool);
 	void setFrameRate(double);
+	void setXMode(int mode);
 
 private Q_SLOTS:
 	void stopPlotRefresh();
@@ -81,11 +89,13 @@ private:
 
 	uint32_t m_bufferSize;
 	uint32_t m_plotSize;
+	double m_sampleRate;
 	bool m_started;
 	bool m_rollingMode;
 	bool m_singleShot;
 	bool m_showPlotTags;
 	bool m_refreshTimerRunning;
+	int m_xmode;
 
 	QMap<QString,int> time_channel_map;
 

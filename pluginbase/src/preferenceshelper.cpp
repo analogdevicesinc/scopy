@@ -20,6 +20,37 @@ QLineEdit* PreferencesHelper::addPreferenceEdit(Preferences *p, QString id, QStr
 	return pref;
 }
 
+QWidget* PreferencesHelper::addPreferenceComboList(Preferences *p, QString id, QString description, QList<QPair<QString, QVariant>> options, QObject *parent) {
+	QWidget *w = new QWidget();
+	QHBoxLayout *lay = new QHBoxLayout();
+	lay->setSpacing(0);
+	lay->setMargin(0);
+	w->setLayout(lay);
+	QLabel *lab = new QLabel(description);
+	QSpacerItem *space = new QSpacerItem(20,20,QSizePolicy::Preferred,QSizePolicy::Preferred);
+	QString pref1Val;
+
+
+	QComboBox *pref = new QComboBox();
+	for( auto option : options) {
+		pref->addItem(option.first,option.second);
+		if(option.second == p->get(id) ) {
+			pref1Val = option.first;
+		}
+	}
+
+	pref->setCurrentText(pref1Val);
+	lay->addWidget(lab,1);
+	lay->addSpacerItem(space);
+	lay->addWidget(pref,1);
+
+	parent->connect(pref,qOverload<int>(&QComboBox::currentIndexChanged),parent,[pref, p,id](int idx) {
+		auto data = pref->itemData(idx);
+		p->set(id,data);
+	});
+	return w;
+}
+
 QWidget* PreferencesHelper::addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options, QObject *parent) {
 	QWidget *w = new QWidget();
 	QHBoxLayout *lay = new QHBoxLayout();

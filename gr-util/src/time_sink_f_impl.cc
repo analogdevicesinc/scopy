@@ -85,7 +85,6 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	m_time.reserve(size);
 	generate_time_axis();
 
-
 	m_tags = std::vector< std::vector<gr::tag_t> >(m_nconnections);
 }
 

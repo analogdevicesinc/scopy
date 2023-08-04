@@ -26,7 +26,9 @@ public:
 	gr::top_block_sptr getGrBlock();
 
 Q_SIGNALS:
+	void aboutToBuild();
 	void builtSignalPaths();
+	void aboutToTeardown();
 	void teardownSignalPaths();
 	void aboutToStart();
 	void started();
