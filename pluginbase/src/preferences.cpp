@@ -19,7 +19,7 @@ Preferences::~Preferences()
 
 }
 
-void Preferences::init(QString k, QVariant v)
+void Preferences::_init(QString k, QVariant v)
 {
 	if(!p.contains(k)) {
 		p.insert(k,v);
@@ -27,7 +27,7 @@ void Preferences::init(QString k, QVariant v)
 	// else - map contains key so it is already initialized to the correct value, nothing to do
 }
 
-QVariant Preferences::get(QString k)
+QVariant Preferences::_get(QString k)
 {
 	QVariant v = QVariant();
 	if(p.contains(k))
@@ -35,7 +35,11 @@ QVariant Preferences::get(QString k)
 	return v;
 }
 
-void Preferences::set(QString k, QVariant v)
+void Preferences::set(QString k, QVariant v) {
+	return Preferences::GetInstance()->_set(k,v);
+}
+
+void Preferences::_set(QString k, QVariant v)
 {
 	QVariant oldVal = p[k];
 	p[k] = v;
@@ -46,6 +50,10 @@ void Preferences::set(QString k, QVariant v)
 void Preferences::clear()
 {
 	p.clear();
+}
+
+QVariant Preferences::get(QString val) {
+	return Preferences::GetInstance()->_get(val);
 }
 
 QMap<QString, QVariant> Preferences::getPreferences() const
@@ -95,6 +103,11 @@ Preferences *Preferences::GetInstance()
 		pinstance_ = new Preferences(QApplication::instance()); // singleton has the app as parent
 	}
 	return pinstance_;
+}
+
+void Preferences::init(QString k, QVariant v)
+{
+	return Preferences::GetInstance()->_init(k,v);
 }
 
 
