@@ -732,7 +732,13 @@ void RoundedHandleV::setSelectable(bool selectable)
 void RoundedHandleV::paintEvent(QPaintEvent *pv)
 {
 	QPainter p(this);
-	QRect rect(0, 0, m_image.width() - 1, m_image.height() - 1);
+	int x;
+	if(m_facingRight) {
+		x = 0;
+	} else {
+		x = m_innerSpacing;
+	}
+	QRect rect(x, 0, m_image.width() - 1, m_image.height() - 1);
 
 	if (m_selected && m_selectable) {
 		if (QIcon::themeName() == "scopy-default") {
