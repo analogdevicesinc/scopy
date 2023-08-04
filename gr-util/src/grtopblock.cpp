@@ -49,6 +49,7 @@ void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 void GRTopBlock::build() {
 
 	top->disconnect_all();
+	Q_EMIT aboutToBuild();
 
 	for (GRSignalPath* sig : qAsConst(m_signalPaths)) {
 		if(sig->enabled() ) {
@@ -64,6 +65,7 @@ void GRTopBlock::build() {
 }
 
 void GRTopBlock::teardown() {
+	Q_EMIT aboutToTeardown();
 	built = false;
 
 	for (GRIIODeviceSource* dev : qAsConst(m_iioDeviceSources)) {
