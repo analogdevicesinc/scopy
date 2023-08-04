@@ -104,8 +104,9 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			connect(btn->button(), &QPushButton::toggled, this, [=](bool b) { if(b) tool->requestMenu(id);});
 			connect(btn, &QAbstractButton::toggled, this, [=](){plotAddon->plot()->selectChannel(ch->plotCh());});
 			rightMenuBtnGrp->addButton(btn->button());
-			plotAddon->onChannelAdded(ch);
 			btn->checkBox()->setChecked(true);
+			plotAddon->onChannelAdded(ch);
+			plotAddonSettings->onChannelAdded(ch);
 
 		}
 	}

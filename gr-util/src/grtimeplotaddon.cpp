@@ -19,14 +19,15 @@ Q_LOGGING_CATEGORY(CAT_GRTIMEPLOT, "GRTimePlotAddon");
 using namespace scopy;
 using namespace scopy::grutil;
 GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
-	: QObject(parent),
-	m_top(top),
-	time_sink(nullptr),
-	m_rollingMode(false),
-	m_started(false),
-	m_singleShot(false),
-	m_showPlotTags(false),
-	m_refreshTimerRunning(false)
+    : QObject(parent),
+      m_top(top),
+      time_sink(nullptr),
+      m_rollingMode(false),
+      m_started(false),
+      m_singleShot(false),
+      m_showPlotTags(false),
+      m_refreshTimerRunning(false),
+      m_xmode(GRTimePlotAddonSettings::XMODE_SAMPLES)
 {
 
 	Preferences *p = Preferences::GetInstance();
@@ -131,9 +132,8 @@ void GRTimePlotAddon::startPlotRefresh() {
 #endif
 	drawPlot();
 	m_plotTimer->start();
-
-
 }
+
 void GRTimePlotAddon::setShowPlotTags() {
 	for(GRTimeChannelAddon* gr : qAsConst(grChannels)) {
 		if(gr->signalPath()->enabled()) {
@@ -227,7 +227,7 @@ void GRTimePlotAddon::onStart() {
 		m_plotTimer->start();
 #else	  
 	 refillFuture = QtConcurrent::run([=]() {
-		qInfo(CAT_GRTIMEPLOT)<<"UpdateData";
+//		qInfo(CAT_GRTIMEPLOT)<<"UpdateData";
 		std::unique_lock lock(refillMutex);
 
 		 time_sink->updateData();
@@ -238,6 +238,9 @@ void GRTimePlotAddon::onStart() {
 
  void GRTimePlotAddon::onInit() {
 	 qDebug(CAT_GRTIMEPLOT)<<"Init";
+	 m_sampleRate = 1;
+	 m_bufferSize = 32;
+	 m_plotSize = 32;
 //	 m_top->build();
  }
 
@@ -290,7 +293,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 
 	}
 
-	time_sink = time_sink_f::make(m_plotSize,1,name.toStdString(),sigpaths.count());
+	time_sink = time_sink_f::make(m_plotSize, m_sampleRate, name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_rollingMode);
 	time_sink->setSingleShot(m_singleShot);
 	updateXAxis();
@@ -334,6 +337,8 @@ void GRTimePlotAddon::updateXAxis() {
 		plot()->xAxis()->setMin(time_sink->time().front());
 		plot()->xAxis()->setMax(time_sink->time().back());
 	}
+
+	Q_EMIT xAxisUpdated();
 }
 
 void GRTimePlotAddon::setRollingMode(bool b)
@@ -350,6 +355,11 @@ void GRTimePlotAddon::setDrawPlotTags(bool b)
 {
 	m_showPlotTags = b;
 	drawPlot();
+}
+
+void GRTimePlotAddon::setSampleRate(double val)
+{
+	m_sampleRate = val;
 }
 
 void GRTimePlotAddon::setBufferSize(uint32_t size)
@@ -379,11 +389,6 @@ void GRTimePlotAddon::setSingleShot(bool b)
 	if(time_sink) {
 		time_sink->setSingleShot(m_singleShot);
 	}
-	/*if(m_singleShot) {
-		connect(m_top, &GRTopBlock::finished, this, &GRTimePlotAddon::requestStop, Qt::QueuedConnection);
-	} else {
-		disconnect(m_top, &GRTopBlock::finished, this, &GRTimePlotAddon::requestStop);
-	}*/
 }
 
 void GRTimePlotAddon::updateFrameRate() {
@@ -397,3 +402,14 @@ void GRTimePlotAddon::setFrameRate(double val) {
 	int timeout = (1.0/val)*1000;
 	m_plotTimer->setInterval(timeout);
 }
+
+void GRTimePlotAddon::setXMode(int mode)
+{
+	m_xmode = mode;
+}
+
+int GRTimePlotAddon::xMode()
+{
+	return m_xmode;
+}
+
