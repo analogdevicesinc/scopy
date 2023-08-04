@@ -46,8 +46,11 @@ finish:
 void ADCPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-//	p->init("pref1",false);
-
+	p->init("adc_plot_xaxis_label_position",QwtAxis::XBottom);
+	p->init("adc_plot_yaxis_label_position",QwtAxis::YLeft);
+	p->init("adc_plot_yaxis_handle_position",QwtAxis::YLeft);
+	p->init("adc_plot_xcursor_position",QwtAxis::XBottom);
+	p->init("adc_plot_ycursor_position",QwtAxis::YLeft);
 }
 
 bool ADCPlugin::loadPreferencesPage()

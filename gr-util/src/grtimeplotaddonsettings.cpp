@@ -61,7 +61,13 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 		 {"Msamples",1e6},
 		 },"Buffer Size",16,(double)((long)1<<31),false,false,bufferPlotSize);
 
-	connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val){ setBufferSize((uint32_t)val);});
+	connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val){
+		if(m_plotSizeSpin->value() < val) {
+			m_plotSizeSpin->setValue(val);
+		}
+		m_plotSizeSpin->setMinValue(val);
+		setBufferSize((uint32_t)val);
+	});
 	connect(this, &GRTimePlotAddonSettings::bufferSizeChanged, m_plot, &GRTimePlotAddon::setBufferSize);
 
 	m_plotSizeSpin = new ScaleSpinButton(
@@ -156,6 +162,14 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 	connect(m_showTagsSw->onOffswitch(), &QAbstractButton::toggled, this, &GRTimePlotAddonSettings::setShowPlotTags);
 	connect(this, &GRTimePlotAddonSettings::showPlotTagsChanged, m_plot, &GRTimePlotAddon::setDrawPlotTags);
 
+	m_showLabels = new MenuOnOffSwitch("PLOT LABELS", xaxis);
+	connect(m_showLabels->onOffswitch(), &QAbstractButton::toggled, [=](bool b) {
+		PlotWidget* plotWidget = m_plot->plot();
+		plotWidget->setShowXAxisLabels(b);
+		plotWidget->setShowYAxisLabels(b);
+		plotWidget->showAxisLabels();
+	});
+
 	xaxiscontainer->contentLayout()->setSpacing(10);
 	xaxiscontainer->contentLayout()->addWidget(xaxis);
 	xaxis->contentLayout()->addWidget(bufferPlotSize);
@@ -165,7 +179,9 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 	xaxis->contentLayout()->addWidget(cbb);
 	xaxis->contentLayout()->addWidget(m_sampleRateSpin);
 	xaxis->contentLayout()->addWidget(m_showTagsSw);
+	xaxis->contentLayout()->addWidget(m_showLabels);
 	xaxis->contentLayout()->setSpacing(10);
+
 
 	return xaxiscontainer;
 }
@@ -215,6 +231,7 @@ void GRTimePlotAddonSettings::onInit() {
 	m_xmin->setValue(0);
 	m_xmax->setValue(31);
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
+	m_showLabels->onOffswitch()->setChecked(true);
 //	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 

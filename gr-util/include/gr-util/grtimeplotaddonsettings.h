@@ -71,6 +71,7 @@ private:
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuOnOffSwitch *m_showTagsSw;
+	MenuOnOffSwitch* m_showLabels;
 
 	bool m_sampleRateAvailable;
 

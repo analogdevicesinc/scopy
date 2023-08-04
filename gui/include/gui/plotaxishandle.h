@@ -11,7 +11,7 @@ class SCOPY_GUI_EXPORT PlotAxisHandle : public QObject
 {
 	Q_OBJECT
 public:
-	PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, QObject *parent = nullptr);
+	PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, int position, QObject *parent = nullptr);
 	~PlotAxisHandle();
 	RoundedHandleV *handle() const;
 	PlotAxis *axis() const;

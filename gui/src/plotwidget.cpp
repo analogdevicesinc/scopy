@@ -34,10 +34,16 @@ PlotWidget::PlotWidget(QWidget *parent) : QWidget(parent) {
 	setupOpenGLCanvas();
 	setupHandlesArea();
 
-	m_xAxis = new PlotAxis(QwtAxis::XBottom,this,pen,this);
-	m_yAxis = new PlotAxis(QwtAxis::YLeft,this,pen,this);
-	m_yAxis->setVisible(true);
-	m_xAxis->setVisible(true);
+	m_xPosition = Preferences::get("adc_plot_xaxis_label_position").toInt();
+	m_yPosition = Preferences::get("adc_plot_yaxis_label_position").toInt();
+
+	// default Axis
+	new PlotAxis(QwtAxis::XBottom,this,pen,this);
+	new PlotAxis(QwtAxis::YLeft,this,pen,this);
+	hideDefaultAxis();
+
+	m_xAxis = new PlotAxis(m_xPosition,this,pen,this);
+	m_yAxis = new PlotAxis(m_yPosition,this,pen,this);
 
 	setupAxisScales();
 	setAxisScalesVisible(true);
@@ -75,22 +81,22 @@ void PlotWidget::setupHandlesArea() {
 	m_topHandlesArea = new HorizHandlesArea(m_plot->canvas());
 	m_leftHandlesArea = new VertHandlesArea(m_plot->canvas());
 
-	m_leftHandlesArea->setMinimumWidth(50);	
+	m_leftHandlesArea->setMinimumWidth(40);
 	m_leftHandlesArea->setBottomPadding(0);
 	m_leftHandlesArea->setTopPadding(0); /// Why ?
 	m_leftHandlesArea->setVisible(false);
 
-	m_rightHandlesArea->setMinimumWidth(50);
+	m_rightHandlesArea->setMinimumWidth(60);
 	m_rightHandlesArea->setBottomPadding(0);
 	m_rightHandlesArea->setTopPadding(0); /// Why ?
 	m_rightHandlesArea->setVisible(false);
 
-	m_bottomHandlesArea->setMinimumHeight(50);
+	m_bottomHandlesArea->setMinimumHeight(60);
 	m_bottomHandlesArea->setLeftPadding(0);
 	m_bottomHandlesArea->setRightPadding(0); /// Why ?
 	m_bottomHandlesArea->setVisible(false);
 
-	m_topHandlesArea->setMinimumHeight(50);
+	m_topHandlesArea->setMinimumHeight(60);
 	m_topHandlesArea->setLeftPadding(0);
 	m_topHandlesArea->setRightPadding(0); /// Why ?
 	m_topHandlesArea->setVisible(false);
@@ -299,16 +305,52 @@ void PlotWidget::replot()
 	m_plot->replot();
 }
 
-void PlotWidget::selectChannel(PlotChannel *ch)
-{
+void PlotWidget::hideAxisLabels() {
 	m_yAxis->setVisible(false);
 	if(m_selectedChannel != nullptr) {
 		m_selectedChannel->yAxis()->setVisible(false);
 	}
-	m_selectedChannel = ch;
+}
 
-	m_selectedChannel->xAxis()->setVisible(true);
-	m_selectedChannel->yAxis()->setVisible(true);
+void PlotWidget::hideDefaultAxis()
+{
+	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XBottom,0), false);
+	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XTop,0), false);
+	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YLeft,0), false);
+	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YRight,0), false);
+}
+
+bool PlotWidget::showYAxisLabels() const
+{
+	return m_showYAxisLabels;
+}
+
+void PlotWidget::setShowYAxisLabels(bool newShowYAxisLabels)
+{
+	m_showYAxisLabels = newShowYAxisLabels;
+}
+
+bool PlotWidget::showXAxisLabels() const
+{
+	return m_showXAxisLabels;
+}
+
+void PlotWidget::setShowXAxisLabels(bool newShowXAxisLabels)
+{
+	m_showXAxisLabels = newShowXAxisLabels;
+}
+
+void PlotWidget::showAxisLabels() {
+	if(m_selectedChannel != nullptr) {
+		m_selectedChannel->xAxis()->setVisible(m_showXAxisLabels);
+		m_selectedChannel->yAxis()->setVisible(m_showYAxisLabels);
+	}
+}
+
+void PlotWidget::selectChannel(PlotChannel *ch) {
+	hideAxisLabels();
+	m_selectedChannel = ch;
+	showAxisLabels();
 
 	if(m_selectedChannel->curve()) {
 		m_selectedChannel->raise();
