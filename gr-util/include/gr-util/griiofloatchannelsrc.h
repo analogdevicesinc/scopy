@@ -11,6 +11,8 @@ public:
 
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
+	virtual bool sampleRateAvailable() override;
+	virtual double readSampleRate() override;
 
 	const iio_data_format *getFmt() const;
 
@@ -18,6 +20,8 @@ protected:
 	gr::basic_block_sptr x2f;
 private:
 	const iio_data_format* fmt;
+	iio_channel *m_iioCh;
+	QString m_sampleRateAttribute;
 };
 }
 #endif // GRIIOFLOATCHANNELSRC_H

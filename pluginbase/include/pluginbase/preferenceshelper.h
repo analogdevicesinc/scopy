@@ -17,6 +17,7 @@ public:
 	static QCheckBox *addPreferenceCheckBox(Preferences *p, QString id, QString description, QObject *parent = nullptr);
 	static QLineEdit *addPreferenceEdit(Preferences *p, QString id, QString description, QObject *parent = nullptr);
 	static QWidget *addPreferenceCombo(Preferences *p, QString id, QString description, QStringList options, QObject *parent = nullptr);
+	static QWidget *addPreferenceComboList(Preferences *p, QString id, QString description, QList<QPair<QString, QVariant> > options, QObject *parent);
 };
 }
 #endif // PREFERENCESHELPER_H

@@ -34,20 +34,16 @@ void GRDeviceAddon::onInit() {}
 void GRDeviceAddon::onDeinit() {}
 
 void GRDeviceAddon::preFlowStart() {
-	qInfo()<<"READ SAMPLE RATE";
 }
 
 void GRDeviceAddon::postFlowStart() {
 
 }
 
-void GRDeviceAddon::preFlowStop() {
-
+void GRDeviceAddon::preFlowBuild()
+{
 }
 
-void GRDeviceAddon::postFlowStop() {
-
-}
 
 void GRDeviceAddon::onChannelAdded(ToolAddon *) {}
 

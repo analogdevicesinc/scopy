@@ -5,9 +5,47 @@
 #include "grlog.h"
 
 using namespace scopy::grutil;
+QString GRIIODeviceSource::findAttribute(QStringList possibleNames, iio_device* dev) {
+
+	const char *attr = nullptr;
+	for(QString name : possibleNames) {
+		attr = iio_device_find_attr(dev,name.toStdString().c_str());
+		if(attr)
+			break;
+	}
+	QString attributeName = QString(attr);
+	return attributeName;
+}
+
+iio_device *GRIIODeviceSource::iioDev() const
+{
+	return m_iioDev;
+}
+
+QString GRIIOChannel::findAttribute(QStringList possibleNames, iio_channel *ch)
+{
+	const char *attr = nullptr;
+	for(QString name : possibleNames) {
+		attr = iio_channel_find_attr(ch, name.toStdString().c_str());
+		if(attr)
+			break;
+	}
+	QString attributeName = QString(attr);
+	return attributeName;
+}
+
 GRIIODeviceSource::GRIIODeviceSource(iio_context *ctx, QString deviceName, QString phyDeviceName, unsigned int buffersize, QObject *parent) :
 	GRProxyBlock(parent), m_ctx(ctx), m_deviceName(deviceName), m_phyDeviceName(phyDeviceName), m_buffersize(buffersize)
 {
+
+	m_iioDev = iio_context_find_device(m_ctx,m_deviceName.toStdString().c_str());
+	m_sampleRateAttribute = findAttribute( {
+					       "sample_rate",
+					       "sampling_rate",
+					       "sample_frequency",
+					       "sampling_frequency",
+						  }, m_iioDev);
+
 
 }
 
@@ -20,8 +58,7 @@ void GRIIODeviceSource::addChannelAtIndex(iio_device* iio_dev, QString channelNa
 
 void GRIIODeviceSource::computeChannelNames() {
 
-	iio_device* iio_dev = iio_context_find_device(m_ctx,m_deviceName.toStdString().c_str());
-	int max_channels = iio_device_get_channels_count(iio_dev);
+	int max_channels = iio_device_get_channels_count(m_iioDev);
 
 	for(int i = 0;i<max_channels;i++) {
 		m_channelNames.push_back(std::string());
@@ -30,13 +67,13 @@ void GRIIODeviceSource::computeChannelNames() {
 	for(GRIIOChannel* ch : qAsConst(m_list)) {
 		GRIIOFloatChannelSrc* floatCh = dynamic_cast<GRIIOFloatChannelSrc*>(ch);
 		if(floatCh) {
-			addChannelAtIndex(iio_dev, floatCh->getChannelName());
+			addChannelAtIndex(m_iioDev, floatCh->getChannelName());
 		}
 
 		GRIIOComplexChannelSrc* complexCh = dynamic_cast<GRIIOComplexChannelSrc*>(ch);
 		if(complexCh) {
-			addChannelAtIndex(iio_dev, complexCh->getChannelNameI());
-			addChannelAtIndex(iio_dev, complexCh->getChannelNameQ());
+			addChannelAtIndex(m_iioDev, complexCh->getChannelNameI());
+			addChannelAtIndex(m_iioDev, complexCh->getChannelNameQ());
 		}
 	}
 
@@ -56,11 +93,26 @@ int GRIIODeviceSource::getOutputIndex(QString ch) {
 	return -1;
 }
 
-const iio_data_format* GRIIODeviceSource::getChannelFormat(QString ch) {
+/*const iio_data_format* GRIIODeviceSource::getChannelFormat(QString ch) {
 	std::string channel_name = ch.toStdString();
-	iio_device* iio_dev = iio_context_find_device(m_ctx,m_deviceName.toStdString().c_str());
 	iio_channel* iio_ch = iio_device_find_channel(iio_dev, channel_name.c_str(), false);
 	return iio_channel_get_data_format(iio_ch);
+}*/
+
+double GRIIODeviceSource::readSampleRate()
+{
+	char buffer[20];
+	bool ok = false;
+	double sr;
+	if(!m_sampleRateAttribute.isEmpty()) {
+		iio_device_attr_read(m_iioDev, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+		QString str(buffer);
+		sr = str.toDouble(&ok);
+		if(ok) {
+			return sr;
+		}
+	}
+	return -1;
 }
 
 void GRIIODeviceSource::matchChannelToBlockOutputs(GRTopBlock *top) {
@@ -145,3 +197,5 @@ QString GRIIODeviceSource::deviceName() const
 {
 	return m_deviceName;
 }
+
+

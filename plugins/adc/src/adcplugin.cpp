@@ -59,6 +59,20 @@ bool ADCPlugin::loadPreferencesPage()
 
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+
+	auto adc_plot_xaxis_label_position = PreferencesHelper::addPreferenceComboList(p,"adc_plot_xaxis_label_position", "Plot X-Axis scale position", {{"Top",QwtAxis::XTop}, {"Bottom",QwtAxis::XBottom}},m_preferencesPage);
+	auto adc_plot_yaxis_label_position = PreferencesHelper::addPreferenceComboList(p,"adc_plot_yaxis_label_position", "Plot Y-Axis scale position", {{"Left",QwtAxis::YLeft}, {"Right",QwtAxis::YRight}},m_preferencesPage);
+	auto adc_plot_yaxis_handle_position = PreferencesHelper::addPreferenceComboList(p,"adc_plot_yaxis_handle_position", "Plot channel Y-handle position", {{"Left",QwtAxis::YLeft}, {"Right",QwtAxis::YRight}},m_preferencesPage);
+	auto adc_plot_xcursor_position = PreferencesHelper::addPreferenceComboList(p,"adc_plot_xcursor_position", "Plot X-Cursor position", {{"Top",QwtAxis::XTop}, {"Bottom",QwtAxis::XBottom}},m_preferencesPage);
+	auto adc_plot_ycursor_position = PreferencesHelper::addPreferenceComboList(p,"adc_plot_ycursor_position", "Plot Y-Curosr position", {{"Left",QwtAxis::YLeft}, {"Right",QwtAxis::YRight}},m_preferencesPage);
+
+	lay->addWidget(adc_plot_xaxis_label_position);
+	lay->addWidget(adc_plot_yaxis_label_position);
+	lay->addWidget(adc_plot_yaxis_handle_position);
+	lay->addWidget(adc_plot_xcursor_position);
+	lay->addWidget(adc_plot_ycursor_position);
+
+//	connect(p, &Preferences::preferenceChanged, )
 	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
 	return true;

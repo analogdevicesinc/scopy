@@ -11,7 +11,16 @@ using namespace scopy::grutil;
 GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent) :
 	GRIIOChannel(channelName, dev, parent)
 {
-	fmt = dev->getChannelFormat(channelName);
+	m_iioCh = iio_device_find_channel(dev->iioDev(), channelName.toStdString().c_str(), false);
+	fmt =  iio_channel_get_data_format(m_iioCh);
+
+	m_sampleRateAttribute = findAttribute( {
+					       "sample_rate",
+					       "sampling_rate",
+					       "sample_frequency",
+					       "sampling_frequency",
+					       }, m_iioCh);
+
 }
 
 void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
@@ -40,6 +49,31 @@ void GRIIOFloatChannelSrc::destroy_blks(GRTopBlock *top)
 	x2f = nullptr;
 	end_blk = nullptr;
 	start_blk.clear();
+}
+
+bool GRIIOFloatChannelSrc::sampleRateAvailable()
+{
+	if(m_sampleRateAttribute.isEmpty())
+		return false;
+	return true;
+}
+
+double GRIIOFloatChannelSrc::readSampleRate()
+{
+	char buffer[20];
+	bool ok = false;
+	double sr;
+	if(!sampleRateAvailable())
+		return -1;
+
+	iio_channel_attr_read(m_iioCh, m_sampleRateAttribute.toStdString().c_str(), buffer, 20);
+	QString str(buffer);
+	sr = str.toDouble(&ok);
+	if(ok) {
+		return sr;
+	} else {
+		return -1;
+	}
 }
 
 const iio_data_format *GRIIOFloatChannelSrc::getFmt() const

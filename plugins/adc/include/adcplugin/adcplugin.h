@@ -114,6 +114,10 @@ public:
 				connect(topBlock,&GRTopBlock::started, this, [=](){GRAddon->postFlowStart();});
 				connect(topBlock,&GRTopBlock::aboutToStop, this, [=](){GRAddon->preFlowStop();});
 				connect(topBlock,&GRTopBlock::stopped, this, [=](){GRAddon->postFlowStop();});
+				connect(topBlock, &GRTopBlock::aboutToBuild, this,[=](){GRAddon->preFlowBuild();});
+				connect(topBlock, &GRTopBlock::builtSignalPaths, this,[=](){GRAddon->postFlowBuild();});
+				connect(topBlock, &GRTopBlock::aboutToTeardown, this,[=](){GRAddon->preFlowTeardown();});
+				connect(topBlock, &GRTopBlock::teardownSignalPaths, this,[=](){GRAddon->postFlowTeardown();});
 			}
 		}
 	}

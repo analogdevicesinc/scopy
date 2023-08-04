@@ -26,6 +26,7 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	int yPlotAxisHandle = Preferences::get("adc_plot_yaxis_handle_position").toInt();
 
 	m_running = false;
+	m_enabled = false;
 	m_autoscaleEnabled = false;
 	m_signalPath = new GRSignalPath("time_" + dev->getName() + ch, this);
 	m_grch = new GRIIOFloatChannelSrc(dev->src(),ch,m_signalPath);
@@ -51,6 +52,7 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	plot->addPlotAxisHandle(m_plotAxisHandle);
 
 	widget = createMenu();
+	m_sampleRateAvailable = m_grch->sampleRateAvailable();
 
 	// - create ADCCount/VFS/V
 }
@@ -214,6 +216,7 @@ GRDeviceAddon* GRTimeChannelAddon::getDevice() { return m_dev;}
 
 void GRTimeChannelAddon::enable() {
 	qInfo(CAT_GR_TIME_CHANNEL)<<name<<" enabled";
+	m_enabled = true;
 	m_plotCh->enable();
 	m_plotAxisHandle->handle()->setVisible(true);
 	m_plotAxisHandle->handle()->raise();
@@ -226,6 +229,7 @@ void GRTimeChannelAddon::enable() {
 
 void GRTimeChannelAddon::disable() {
 	qInfo(CAT_GR_TIME_CHANNEL())<<name<<" disabled";
+	m_enabled = false;
 	m_plotCh->disable();
 	m_plotAxisHandle->handle()->setVisible(false);
 	m_signalPath->setEnabled(false);
@@ -314,6 +318,16 @@ void GRTimeChannelAddon::setYMode(YMode mode)
 
 }
 
+GRIIOFloatChannelSrc *GRTimeChannelAddon::grch() const
+{
+	return m_grch;
+}
+
+bool GRTimeChannelAddon::sampleRateAvailable() const
+{
+	return m_sampleRateAvailable;
+}
+
 
 void GRTimeChannelAddon::onInit() {
 	// Defaults
@@ -323,6 +337,12 @@ void GRTimeChannelAddon::onInit() {
 }
 
 void GRTimeChannelAddon::onDeinit() {}
+
+void GRTimeChannelAddon::preFlowBuild()
+{
+	double m_sampleRate = m_grch->readSampleRate();
+	qInfo()<<"READ SAMPLE RATE" << m_sampleRate;
+}
 
 void GRTimeChannelAddon::onChannelAdded(ToolAddon *) {}
 
@@ -340,4 +360,9 @@ GRSignalPath *GRTimeChannelAddon::signalPath() const
 
 QPen GRTimeChannelAddon::pen() const {
 	return m_pen;
+}
+
+bool GRTimeChannelAddon::enabled() const
+{
+	return m_enabled;
 }

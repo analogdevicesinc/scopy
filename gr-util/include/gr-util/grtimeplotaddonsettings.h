@@ -7,9 +7,12 @@
 #include "grtimeplotaddon.h"
 #include <gui/spinbox_a.hpp>
 #include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menucombo.h>
 
 namespace scopy::grutil {
-class SCOPY_GR_UTIL_EXPORT GRTimePlotAddonSettings : public QObject, public ToolAddon {
+class GRTimePlotAddon;
+class GRTimeChannelAddon;
+class SCOPY_GR_UTIL_EXPORT GRTimePlotAddonSettings : public QObject, public ToolAddon, public GRTopAddon {
 	Q_OBJECT
 public:
 	typedef enum {
@@ -17,6 +20,7 @@ public:
 		XMODE_TIME,
 		XMODE_OVERRIDE
 	} XMode;
+
 	GRTimePlotAddonSettings(GRTimePlotAddon *p, QObject *parent = nullptr);
 	~GRTimePlotAddonSettings();
 
@@ -34,6 +38,9 @@ public:
 	bool showPlotTags() const;
 	void setShowPlotTags(bool newShowPlotTags);
 
+	double sampleRate() const;
+	void setSampleRate(double newSampleRate);
+
 public Q_SLOTS:
 	void enable() override {}
 	void disable() override {}
@@ -41,16 +48,19 @@ public Q_SLOTS:
 	void onStop() override {}
 	void onInit() override;
 	void onDeinit() override;
-	void onChannelAdded(ToolAddon*) override {}
-	void onChannelRemoved(ToolAddon*) override {}
-	void setBufferSize(uint32_t newBufferSize);
+	void preFlowBuild() override;
+	void onChannelAdded(ToolAddon* t) override;
+	void onChannelRemoved(ToolAddon*) override;
 
+	void setBufferSize(uint32_t newBufferSize);
+	void computeSampleRateAvailable();
 
 Q_SIGNALS:
 	void bufferSizeChanged(uint32_t);
 	void plotSizeChanged(uint32_t);
 	void rollingModeChanged(bool);
 	void showPlotTagsChanged(bool);
+	void sampleRateChanged(double);
 
 private:
 	QWidget* createMenu(QWidget* parent = nullptr);
@@ -58,6 +68,7 @@ private:
 
 private:
 	GRTimePlotAddon* m_plot;
+	QList<GRTimeChannelAddon*> grChannels;
 	QString name;
 	QWidget *widget;
 	QPen m_pen;
@@ -72,11 +83,13 @@ private:
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuOnOffSwitch *m_showTagsSw;
 	MenuOnOffSwitch* m_showLabels;
+	MenuCombo *m_xModeCb;
 
 	bool m_sampleRateAvailable;
 
 	uint32_t m_bufferSize;
 	uint32_t m_plotSize;
+	double m_sampleRate;
 	bool m_rollingMode;
 	bool m_showPlotTags;
 
@@ -84,6 +97,9 @@ private:
 	Q_PROPERTY(uint32_t plotSize READ plotSize WRITE setPlotSize NOTIFY plotSizeChanged)
 	Q_PROPERTY(bool rollingMode READ rollingMode WRITE setRollingMode NOTIFY rollingModeChanged)
 	Q_PROPERTY(bool showPlotTags READ showPlotTags WRITE setShowPlotTags NOTIFY showPlotTagsChanged)
+
+	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
+	double readSampleRate();
 };
 }
 
