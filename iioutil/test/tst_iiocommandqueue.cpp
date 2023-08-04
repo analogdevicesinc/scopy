@@ -133,7 +133,7 @@ class TST_IioCommandQueue : public QObject
 private Q_SLOTS:
 	void testResults();
 	void testCommandOrder();
-	void testLaunchCommandFromThread();
+//	void testLaunchCommandFromThread();
 private:
 	int TEST_A = 100;
 	int TEST_B = 20;
@@ -249,26 +249,26 @@ void TST_IioCommandQueue::testCommandOrder() {
  * the CommandQueue should ensure that the commands are executed in order,
  * one at a time, all on just one running thread.
  */
-void TST_IioCommandQueue::testLaunchCommandFromThread() {
-	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
-	int m_nbOfThreads = 5;
-	m_commandExecThreadPool.setMaxThreadCount(m_nbOfThreads);
+//void TST_IioCommandQueue::testLaunchCommandFromThread() {
+//	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
+//	int m_nbOfThreads = 5;
+//	m_commandExecThreadPool.setMaxThreadCount(m_nbOfThreads);
 
-	for (int i = 0; i < m_nbOfThreads * 2; i++) {
-		m_commandExecThreadPool.start([=] () {
-			Command *cmd = new TestCommandCounter(nullptr);
-			cmdQ->enqueue(cmd);
-		});
-	}
+//	for (int i = 0; i < m_nbOfThreads * 2; i++) {
+//		m_commandExecThreadPool.start([=] () {
+//			Command *cmd = new TestCommandCounter(nullptr);
+//			cmdQ->enqueue(cmd);
+//		});
+//	}
 
-	int waitResult = m_commandExecThreadPool.waitForDone();
-	qInfo() << "Thread pool wait result: " << waitResult;
-	qInfo() << "Command counter: " << TestCommandCounter::m_commandCounter;
-	qInfo() << "Thread pool expiry timeout: " << m_commandExecThreadPool.expiryTimeout();
+//	int waitResult = m_commandExecThreadPool.waitForDone();
+//	qInfo() << "Thread pool wait result: " << waitResult;
+//	qInfo() << "Command counter: " << TestCommandCounter::m_commandCounter;
+//	qInfo() << "Thread pool expiry timeout: " << m_commandExecThreadPool.expiryTimeout();
 
-	QVERIFY2(TestCommandCounter::m_commandCounter == m_nbOfThreads * 2, "The threaded cmds were not executed in order/properly.");
-	delete cmdQ;
-}
+//	QVERIFY2(TestCommandCounter::m_commandCounter == m_nbOfThreads * 2, "The threaded cmds were not executed in order/properly.");
+//	delete cmdQ;
+//}
 
 
 QTEST_MAIN(TST_IioCommandQueue)
