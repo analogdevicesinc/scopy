@@ -33,12 +33,29 @@ if(ENABLE_TESTING)
 endif()
 
 option(WITH_PYTHON "Enable Python" ON)
-
 if(${WITH_PYTHON})
-    set(Python_ADDITIONAL_VERSIONS 3)
-    find_package(PythonInterp REQUIRED)
-    set(PYTHON_VERSION python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
+	set(Python_ADDITIONAL_VERSIONS 3)
+	find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
+	set(PYTHON_VERSION python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR})
+	if(NOT Python3_FOUND)
+		set(WITH_PYTHON OFF)
+		message(STATUS "Python not found")
+	endif()
 endif()
+
+option(WITH_SIGROK "Search for libsigrokdecode" ON)
+if(WITH_SIGROK)
+find_package(PkgConfig)
+	set(PKG_CONFIG_USE_CMAKE_PREFIX_PATH ON)
+	pkg_check_modules(GLIB REQUIRED glib-2.0)
+	pkg_check_modules(LIBSIGROK_DECODE REQUIRED libsigrokdecode)
+	pkg_get_variable(LIBSIGROK_DECODERS_DIR libsigrokdecode decodersdir)
+	if(NOT LIBSIGROK_DECODE_FOUND)
+		set(WITH_SIGROK OFF)
+		message(STATUS "Libsigrokdecode not found")
+	endif()
+endif()
+
 
 option(SCOPY_DEV_MODE "Enable development specific scopy behavior - autoconnect to a context on start" FALSE)
 
@@ -62,7 +79,11 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+    ${GLIB_INCLUDE_DIRS}
+    ${GLIBCONFIG_INCLUDE_DIRS}
+    ${LIBSIGROK_DECODE_INCLUDE_DIRS}
+    ${Python3_INCLUDE_DIRS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-gui scopy-pluginbase scopy-iioutil scopy-common)
 
@@ -75,7 +96,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	scopy-common
 	scopy-gui
 	scopy-pluginbase
-	scopy-iioutil )
+	scopy-iioutil
+	${LIBSIGROK_DECODE_LINK_LIBRARIES}
+	${Python3_LIBRARIES})
 
 install(TARGETS ${PROJECT_NAME}
 	LIBRARY DESTINATION ${SCOPY_DLL_PATH}
