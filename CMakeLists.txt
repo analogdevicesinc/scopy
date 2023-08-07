@@ -77,7 +77,7 @@ endif()
 
 option(ENABLE_APPLICATION_BUNDLE "Enable application bundle for OSX" OFF)
 if (APPLE)
-	set(ENABLE_APPLICATION_BUNDLE ON)
+    set(ENABLE_APPLICATION_BUNDLE ON)
     include(ScopyMacOS)
 endif(APPLE)
 
@@ -88,11 +88,11 @@ set(SCOPY_TRANSLATION_BUILD_PATH ${CMAKE_CURRENT_BINARY_DIR}/translations)
 set(SCOPY_TRANSLATION_INSTALL_PATH ${CMAKE_INSTALL_FULL_DATADIR}/translations)
 
 add_subdirectory(common)
-add_subdirectory(gui)
 add_subdirectory(iioutil)
+add_subdirectory(gui)
 add_subdirectory(pluginbase)
-add_subdirectory(plugins)
 add_subdirectory(core)
+add_subdirectory(plugins)
 
 set(SCOPY_DEPENDENCIES ${IIO_LIBRARIES})
 
