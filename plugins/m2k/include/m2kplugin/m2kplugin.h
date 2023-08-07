@@ -76,7 +76,6 @@ private:
 	QMap<QString,ToolMenuEntry*> toolMenuEntryCalibrationCache;
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
-	bool loadDecoders(QString path);
 
 };
 }

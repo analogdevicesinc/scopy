@@ -31,7 +31,6 @@ public:
     void initPreferencesPage(PluginManager *pm = nullptr);
     void initPreferences();
     void initTranslations();
-    void initPythonWIN32();
     void loadPluginsFromRepository(PluginRepository *pr = nullptr);
 
 public Q_SLOTS:
@@ -61,6 +60,8 @@ private:
     Ui::ScopyMainWindow *ui;
 
     void loadOpenGL();
+    void initPythonWIN32();
+    void loadDecoders();
 protected:
     void closeEvent(QCloseEvent *event) override;
 };

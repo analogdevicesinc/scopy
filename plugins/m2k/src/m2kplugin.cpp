@@ -254,11 +254,6 @@ bool M2kPlugin::loadPreferencesPage()
 
 void M2kPlugin::init()
 {
-#if defined __APPLE__
-	bool success = loadDecoders(QCoreApplication::applicationDirPath() + "/decoders");
-#else
-	bool success = loadDecoders("decoders");
-#endif
 }
 
 void M2kPlugin::saveSettings(QSettings &s)
@@ -279,31 +274,6 @@ void M2kPlugin::loadSettings(QSettings &s)
 			api->load(s);
 		}
 	}
-}
-
-bool M2kPlugin::loadDecoders(QString path)
-{
-	static bool srd_loaded = false;
-
-	if (srd_loaded) {
-		srd_exit();
-	}
-
-	if (srd_init(path.toStdString().c_str()) != SRD_OK) {
-		qDebug(CAT_M2KPLUGIN) << "ERROR: libsigrokdecode init failed.";
-		return false;
-	} else {
-		srd_loaded = true;
-		/* Load the protocol decoders */
-		srd_decoder_load_all();
-		auto decoder = srd_decoder_get_by_id("parallel");
-
-		if (decoder == nullptr) {
-			return false;
-		}
-	}
-
-	return true;
 }
 
 bool M2kPlugin::onConnect()
