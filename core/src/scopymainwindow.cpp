@@ -6,6 +6,7 @@
 #include <QLoggingCategory>
 #include <QTranslator>
 
+#include "qmessagebox.h"
 #include "scopymainwindow.h"
 #include "animationmanager.h"
 
@@ -23,6 +24,8 @@
 #include "scopy-core_config.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
+#include <libsigrokdecode/libsigrokdecode.h>
+
 
 using namespace scopy;
 
@@ -38,6 +41,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPreferences();
 	initPythonWIN32();
+
 
 	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
@@ -232,11 +236,15 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_show_plot_fps", true);
 	p->init("general_use_native_dialogs", true);
 	p->init("general_additional_plugin_path", "");
+	p->init("general_load_decoders", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString,QVariant)), this, SLOT(handlePreferences(QString,QVariant)));
 
 	if (p->get("general_use_opengl").toBool()) {
 		loadOpenGL();
+	}
+	if(p->get("general_load_decoders").toBool()){
+		loadDecoders();
 	}
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
@@ -306,6 +314,47 @@ void ScopyMainWindow::initPythonWIN32(){
 
 	qputenv("PYTHONPATH", path_str.toLocal8Bit());
 #endif
+}
+
+
+void ScopyMainWindow::loadDecoders()
+{
+	#if defined(WITH_SIGROK) && defined(WITH_PYTHON)
+		#if defined __APPLE__
+			QString path = QCoreApplication::applicationDirPath() + "/decoders";
+		#else
+			QString path = "decoders";
+		#endif
+
+		bool success = true;
+		static bool srd_loaded = false;
+		if (srd_loaded) {
+			srd_exit();
+		}
+
+		if (srd_init(path.toStdString().c_str()) != SRD_OK) {
+			qInfo(CAT_SCOPY) << "ERROR: libsigrokdecode init failed.";
+			success = false;
+		} else {
+			srd_loaded = true;
+			/* Load the protocol decoders */
+			srd_decoder_load_all();
+			auto decoder = srd_decoder_get_by_id("parallel");
+
+			if (decoder == nullptr) {
+				success = false;
+				qInfo(CAT_SCOPY) << "ERROR: libsigrokdecode load the protocol decoders failed.";
+			}
+		}
+
+		if (!success) {
+			QMessageBox error(this);
+			error.setText(tr("ERROR: There was a problem initializing libsigrokdecode. Some features may be missing"));
+			error.exec();
+		}
+	#else
+		qInfo(CAT_SCOPY) << "Python or libsigrokdecode are disabled, can't load decoders";
+	#endif
 }
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)

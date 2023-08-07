@@ -2,6 +2,7 @@
 #define SCOPY_CORE_CONFIG_H_CMAKEIN
 
 #cmakedefine WITH_PYTHON
+#cmakedefine WITH_SIGROK
 #cmakedefine PYTHON_VERSION "@PYTHON_VERSION@"
 #cmakedefine SCOPY_DEV_MODE
 
