@@ -33,6 +33,10 @@ QString scopy::config::defaultTranslationFolderPath()
 
 QString scopy::config::localTranslationFolderPath()
 {
+	#if defined __APPLE__
+		return QCoreApplication::applicationDirPath() + "/translations";
+	#endif
+
 	return SCOPY_TRANSLATION_BUILD_PATH;
 }
 
