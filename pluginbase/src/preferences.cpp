@@ -11,12 +11,12 @@ Preferences* Preferences::pinstance_{nullptr};
 
 Preferences::Preferences(QObject *parent) : QObject(parent)
 {
-
+	connect(parent, SIGNAL(aboutToQuit()),this,SLOT(save()));
 }
 
 Preferences::~Preferences()
 {
-	save();
+
 }
 
 void Preferences::init(QString k, QVariant v)
@@ -73,6 +73,8 @@ void Preferences::save()
 	for(const QString &key : keys) {
 		s->setValue(key,p[key]);
 	}
+
+	s->sync();
 }
 
 void Preferences::load()
