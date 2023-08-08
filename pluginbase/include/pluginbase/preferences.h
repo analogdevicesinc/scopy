@@ -49,6 +49,14 @@ public:
 	void setPreferences(QMap<QString, QVariant> s);
 
 	/**
+	 * @brief setPreferencesFilename
+	 * @param s
+	 * Sets preferences filename
+	 */
+	void setPreferencesFilename(QString s);
+
+public Q_SLOTS:
+	/**
 	 * @brief save
 	 * Save preferences to file
 	 */
@@ -58,12 +66,6 @@ public:
 	 * Loads preferences from file
 	 */
 	void load();
-	/**
-	 * @brief setPreferencesFilename
-	 * @param s
-	 * Sets preferences filename
-	 */
-	void setPreferencesFilename(QString s);
 
 Q_SIGNALS:
 	/**
