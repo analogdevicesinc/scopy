@@ -10,11 +10,19 @@
 
 using namespace scopy;
 
-ApplicationRestarter::ApplicationRestarter(const QString &executable)
-        : m_executable(executable)
-        , m_currentPath(QDir::currentPath())
-{
+ApplicationRestarter* ApplicationRestarter::pinstance_{nullptr};
 
+ApplicationRestarter::ApplicationRestarter(const QString &executable)
+	: m_executable(executable)
+	, m_currentPath(QDir::currentPath())
+	, m_restart(false)
+{
+	pinstance_ = this;
+}
+
+ApplicationRestarter *ApplicationRestarter::GetInstance()
+{
+	return pinstance_;
 }
 
 void ApplicationRestarter::setArguments(const QStringList &arguments)
@@ -29,7 +37,7 @@ QStringList ApplicationRestarter::getArguments() const
 
 int ApplicationRestarter::restart(int exitCode)
 {
-	if (qApp->property("restart").toBool()) {
+	if (m_restart) {
 #ifdef __ANDROID__
 		QAndroidJniObject activity = QtAndroid::androidActivity();
 		activity.callMethod<void>("restart");
@@ -43,6 +51,6 @@ int ApplicationRestarter::restart(int exitCode)
 
 void ApplicationRestarter::triggerRestart()
 {
-	qApp->setProperty("restart", QVariant(true));
+	GetInstance()->m_restart = true;
 	qApp->exit();
 }
