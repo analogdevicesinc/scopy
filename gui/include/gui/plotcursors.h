@@ -58,8 +58,8 @@ class SCOPY_GUI_EXPORT PlotCursors : public QObject
 	Q_OBJECT
 public:
 	PlotCursors(PlotWidget* plot) {
-		m_vCursors.first = new VCursor(plot, plot->plotAxis(QwtAxis::YLeft)[1]);
-		m_vCursors.second = new VCursor(plot, plot->plotAxis(QwtAxis::YLeft)[1]);
+		m_vCursors.first = new VCursor(plot, plot->plotAxis(QwtAxis::YLeft)[0]); // default y-axis
+		m_vCursors.second = new VCursor(plot, plot->plotAxis(QwtAxis::YLeft)[0]);
 		m_hCursors.first = new HCursor(plot,plot->xAxis());
 		m_hCursors.second = new HCursor(plot,plot->xAxis());
 

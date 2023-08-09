@@ -698,7 +698,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	api->setObjectName(Filter::tool_name(TOOL_SPECTRUM_ANALYZER));
 	ScopyJS::GetInstance()->registerApi(api);
 
-	connect(ui->rightMenu, &MenuAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
+	connect(ui->rightMenu, &MenuHAnim::finished, this, &SpectrumAnalyzer::rightMenuFinished);
 	menuOrder.push_back(ui->btnSweep);
 
 

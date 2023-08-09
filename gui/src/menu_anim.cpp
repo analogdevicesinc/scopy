@@ -25,15 +25,44 @@
 
 using namespace scopy;
 
-MenuAnim::MenuAnim(QWidget *parent) : QWidget(parent),
-	open_anim_max(this, "maximumWidth"),
-	open_anim_min(this, "minimumWidth"),
-	close_anim_max(this, "maximumWidth"),
-	close_anim_min(this, "minimumWidth"),
-	min_width(-1),
-	max_width(-1),
-	animInProg(false),
-	animationDuration(200)
+MenuVAnim::MenuVAnim(QWidget *parent) : MenuAnim("minimumHeight", "maximumHeight", parent)
+{
+}
+
+int MenuVAnim::getImplicitMin()
+{
+	return 0;
+}
+
+int MenuVAnim::getImplicitMax()
+{
+	return sizeHint().height();
+}
+
+MenuHAnim::MenuHAnim(QWidget *parent) : MenuAnim("minimumWidth", "maximumWidth", parent)
+{
+
+}
+
+int MenuHAnim::getImplicitMin()
+{
+	return 0;
+}
+
+int MenuHAnim::getImplicitMax()
+{
+	return sizeHint().width();
+}
+
+MenuAnim::MenuAnim(QByteArray minAnimationProperty, QByteArray maxAnimationProperty, QWidget *parent) : QWidget(parent),
+      open_anim_max(this, maxAnimationProperty),
+      open_anim_min(this, minAnimationProperty),
+      close_anim_max(this, maxAnimationProperty),
+      close_anim_min(this, minAnimationProperty),
+      min_val(-1),
+      max_val(-1),
+      animInProg(false),
+      animationDuration(200)
 {
 	setAttribute(Qt::WA_StyledBackground, true);
 	open_anim_max.setDuration(animationDuration);
@@ -60,8 +89,8 @@ void MenuAnim::toggleMenu(bool open)
 
 	animInProg = true;
 
-	int min = min_width < 0 ? 0 : min_width;
-	int max = max_width < 0 ? sizeHint().width() : max_width;
+	int min = min_val < 0 ? getImplicitMin() : min_val;
+	int max = max_val < 0 ? getImplicitMax() : max_val;
 
 	if (open) {
 		start = min;
@@ -92,15 +121,6 @@ void MenuAnim::toggleMenu(bool open)
 		close_anim_min.setEndValue(stop);
 		close_anim_min.start();
 	}
-}
-
-void MenuAnim::setMinimumSize(QSize size)
-{
-	QWidget::setMinimumSize(size);
-
-	/* Memorize the min width set in the .ui file */
-	if (min_width < 0)
-		min_width = size.width();
 }
 
 bool MenuAnim::animInProgress() const
@@ -134,13 +154,13 @@ void MenuAnim::setAnimationDuration(int newAnimationDuration)
 	close_anim_min.setDuration(animationDuration);
 }
 
-void MenuAnim::setAnimMinWidth(int min)
+void MenuAnim::setAnimMin(int min)
 {
-	min_width = min;
+	min_val = min;
 }
-void MenuAnim::setAnimMaxWidth(int max)
+void MenuAnim::setAnimMax(int max)
 {
-	max_width = max;
+	max_val = max;
 }
 
 #include "moc_menu_anim.cpp"

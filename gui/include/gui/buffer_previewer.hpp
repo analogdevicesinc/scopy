@@ -60,6 +60,7 @@ public:
 	void setCursorVisible(bool visible);
 
 Q_SIGNALS:
+	void bufferStartDrag();
 	void bufferMovedBy(int);
 	void bufferStopDrag();
 	void bufferResetPosition();
@@ -69,6 +70,7 @@ protected:
 	void resizeEvent(QResizeEvent *) override;
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts) = 0;
 
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
 	void mouseMoveEvent(QMouseEvent *event) override;
 	void mouseReleaseEvent(QMouseEvent *event) override;
