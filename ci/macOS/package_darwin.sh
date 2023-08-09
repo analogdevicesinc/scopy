@@ -12,7 +12,6 @@ echo "### Copy DLLs to Frameworks folder"
 mkdir -p $BUILDDIR/Scopy.app/Contents/Frameworks
 find . -name "*.dylib" -d 2 -exec cp "{}" $BUILDDIR/Scopy.app/Contents/Frameworks \;
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
-cp $BUILDDIR/plugins/plugins/* $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
 mkdir -p $BUILDDIR/Scopy.app/Contents/MacOS/translations
 cp $BUILDDIR/translations/* $BUILDDIR/Scopy.app/Contents/MacOS/translations
 cp -R $BUILDDIR/plugins/regmap/xmls $BUILDDIR/Scopy.app/Contents/MacOS/plugins/plugins
