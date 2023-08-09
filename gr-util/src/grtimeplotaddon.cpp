@@ -45,7 +45,9 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_plotWidget->xAxis()->setVisible(true);
 //	m_plotWidget->topHandlesArea()->setVisible(true);
 
-//	setupBufferPreviewer();
+	setupBufferPreviewer();
+	m_cursors = new PlotCursors(m_plotWidget);
+	m_cursors->setVisible(true);
 	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);
 	m_plotTimer->setSingleShot(true);
@@ -61,7 +63,7 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 }
 
 void GRTimePlotAddon::setupBufferPreviewer() {
-	AnalogBufferPreviewer* m_bufferPreviewer = new AnalogBufferPreviewer(widget);
+	m_bufferPreviewer = new AnalogBufferPreviewer(widget);
 	m_bufferPreviewer->setMinimumHeight(20);
 	m_bufferPreviewer->setCursorPos(0.5);
 	m_bufferPreviewer->setHighlightPos(0.05);
@@ -70,30 +72,68 @@ void GRTimePlotAddon::setupBufferPreviewer() {
 	m_bufferPreviewer->setWaveformPos(0.1);
 	m_bufferPreviewer->setWaveformWidth(0.5);
 
-//	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {
-//		horiz_offset = m_bufferPreviewer->highlightPos();
-//	});
-//	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int value) {
-//		qInfo()<<value;
-//		double moveTo = 0.0;
-//		double min = xAxis()->min();
-//		double max = xAxis()->max();
-//		int width = m_bufferPreviewer->width();
-//		double xA0xisWidth = max - min;
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {
+	});
 
-//		moveTo = value * xAxisWidth / width;
-//		xAxis()->setInterval(min - moveTo, max - moveTo);
-//		m_plot->replot();
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [=]() {
+		m_bufferPrevInitMin = plot()->xAxis()->min();
+		m_bufferPrevInitMax = plot()->xAxis()->max();
+	});
 
-//		auto delta = horiz_offset + (value/(float)width);
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int value) {
+		qInfo()<<value;
+		double moveTo = 0.0;
 
-//		qInfo()<< delta << value << width;
-//		m_bufferPreviewer->setHighlightPos(delta);
+		int width = m_bufferPreviewer->width();
+		double xAxisWidth = m_plotSize;
+
+		moveTo = value * xAxisWidth / width;
+		plot()->xAxis()->setInterval(m_bufferPrevInitMin + moveTo,  m_bufferPrevInitMax + moveTo);
+		plot()->replot();
+
+		updateBufferPreviewer();
+	} );
+
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
+		plot()->xAxis()->setInterval(0,  m_plotSize);
+		plot()->replot();
+
+		updateBufferPreviewer();
+	} );
+
+	plot()->addBufferPreviewerSlot(m_bufferPreviewer);
+//	m_lay->addWidget(m_bufferPreviewer);
+	m_bufferPreviewer->setVisible(Preferences::get("adc_plot_show_buffer_previewer").toBool());
+}
+
+void GRTimePlotAddon::updateBufferPreviewer() {
+	// Time interval within the plot canvas
+	QwtInterval plotInterval(plot()->xAxis()->min(), plot()->xAxis()->max());
+
+	// Time interval that represents the captured data
+	QwtInterval dataInterval(0.0, m_plotSize);
+
+	// Use the two intervals to determine the width and position of the
+	// waveform and of the highlighted area
+	QwtInterval fullInterval = plotInterval | dataInterval;
+	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
+			      fullInterval.width();
+	double wWidth = dataInterval.width() / fullInterval.width();
+
+	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
+			      fullInterval.width();
+	double hWidth = plotInterval.width() / fullInterval.width();
 
 
-//		updateBufferPreviewer();
-//	} );
-	m_lay->addWidget(m_bufferPreviewer);
+	m_bufferPreviewer->setWaveformWidth(wWidth);
+	m_bufferPreviewer->setWaveformPos(wPos);
+	m_bufferPreviewer->setHighlightWidth(hWidth);
+	m_bufferPreviewer->setHighlightPos(hPos);
+}
+
+void GRTimePlotAddon::showCursors(bool b)
+{
+	m_cursors->setVisible(b);
 }
 
 GRTimePlotAddon::~GRTimePlotAddon() {
@@ -241,6 +281,7 @@ void GRTimePlotAddon::onStart() {
 	 m_sampleRate = 1;
 	 m_bufferSize = 32;
 	 m_plotSize = 32;
+	 updateBufferPreviewer();
 //	 m_top->build();
  }
 
@@ -337,7 +378,6 @@ void GRTimePlotAddon::updateXAxis() {
 		plot()->xAxis()->setMin(time_sink->time().front());
 		plot()->xAxis()->setMax(time_sink->time().back());
 	}
-
 	Q_EMIT xAxisUpdated();
 }
 
@@ -376,10 +416,12 @@ void GRTimePlotAddon::setPlotSize(uint32_t size)
 	Q_EMIT requestRebuild();
 }
 
-void GRTimePlotAddon::handlePreferences(QString key, QVariant)
+void GRTimePlotAddon::handlePreferences(QString key, QVariant v)
 {
 	if(key == "general_plot_target_fps") {
 		updateFrameRate();
+	} else if(key == "adc_plot_show_buffer_previewer") {
+		m_bufferPreviewer->setVisible(v.toBool());
 	}
 }
 

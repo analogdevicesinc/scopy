@@ -154,7 +154,7 @@
          </widget>
         </item>
         <item>
-         <widget class="scopy::MenuAnim" name="rightMenu" native="true">
+         <widget class="scopy::MenuHAnim" name="rightMenu" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
@@ -1469,7 +1469,7 @@ background-repeat: no-repeat;
    <header>gui/linked_button.hpp</header>
   </customwidget>
   <customwidget>
-   <class>scopy::MenuAnim</class>
+   <class>scopy::MenuHAnim</class>
    <extends>QWidget</extends>
    <header location="global">gui/menu_anim.hpp</header>
    <container>1</container>

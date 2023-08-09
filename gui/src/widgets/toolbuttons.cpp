@@ -11,14 +11,14 @@ PrintBtn::PrintBtn(QWidget *parent) : QPushButton(parent) {
 	setText("Print");
 }
 
-OpenLastMenuBtn::OpenLastMenuBtn(MenuAnim *menu, bool opened, QWidget *parent) : QPushButton(parent), m_menu(menu) {
+OpenLastMenuBtn::OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent) : QPushButton(parent), m_menu(menu) {
 	QIcon icon1;
 	icon1.addPixmap(Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/setup3_unchecked_hover.svg","white",1));
 	setIcon(icon1);
 	StyleHelper::SquareToggleButtonWithIcon(this,"open_last_menu_btn",true);
 	setChecked(opened);
 	grp = new SemiExclusiveButtonGroup(this);
-	connect(this, &QPushButton::toggled, m_menu, &MenuAnim::toggleMenu);
+	connect(this, &QPushButton::toggled, m_menu, &MenuHAnim::toggleMenu);
 	connect(grp,&SemiExclusiveButtonGroup::buttonSelected, this, [=](QAbstractButton* btn) {
 		if(btn == nullptr){
 			this->setChecked(false);

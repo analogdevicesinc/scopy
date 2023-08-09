@@ -633,7 +633,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	connect(&m_phaseGraph, &dBgraph::zoomOut, &m_dBgraph, &dBgraph::onZoomOut);
 #endif
 
-	connect(ui->rightMenu, &MenuAnim::finished, this,
+	connect(ui->rightMenu, &MenuHAnim::finished, this,
 		&NetworkAnalyzer::rightMenuFinished);
 
 	connect(ui->btnSettings, &CustomPushButton::toggled, [=](bool checked) {

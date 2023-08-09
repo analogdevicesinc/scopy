@@ -31,12 +31,12 @@ ToolView::ToolView(QWidget* parent)
 	m_ui->widgetFooter->setVisible(false);
 	m_ui->widgetMenuBtns->setVisible(false);
 
-	m_ui->widgetMenuAnim->setMaximumWidth(0);
+	m_ui->widgetMenuHAnim->setMaximumWidth(0);
 
 	getGeneralSettingsBtn()->setVisible(false);
 	getSettingsBtn()->setVisible(false);
 
-	connect(m_ui->widgetMenuAnim, &MenuAnim::finished, this, &ToolView::rightMenuFinished);
+	connect(m_ui->widgetMenuHAnim, &MenuHAnim::finished, this, &ToolView::rightMenuFinished);
 }
 
 ToolView::~ToolView() { delete m_ui; }
@@ -82,7 +82,7 @@ void ToolView::triggerRightMenuToggle(bool checked)
 	// the action will be remembered and performed right after the animation
 	// finishes
 	CustomPushButton* btn = static_cast<CustomPushButton*>(QObject::sender());
-	if (m_ui->widgetMenuAnim->animInProgress()) {
+	if (m_ui->widgetMenuHAnim->animInProgress()) {
 		m_menuButtonActions.enqueue(QPair<CustomPushButton*, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
@@ -107,7 +107,7 @@ void ToolView::toggleRightMenu(CustomPushButton* btn, bool checked)
 		settingsPanelUpdate(id);
 	}
 
-	m_ui->widgetMenuAnim->toggleMenu(checked);
+	m_ui->widgetMenuHAnim->toggleMenu(checked);
 }
 
 void ToolView::settingsPanelUpdate(int id)
@@ -311,9 +311,9 @@ ChannelWidget* ToolView::buildNewChannel(ChannelManager* channelManager, Generic
 	return ch;
 }
 
-scopy::MenuAnim* ToolView::addMenuToStack()
+scopy::MenuHAnim* ToolView::addMenuToStack()
 {
-	return m_ui->widgetMenuAnim;
+	return m_ui->widgetMenuHAnim;
 }
 
 void ToolView::buildChannelGroup(ChannelManager* channelManager, ChannelWidget* mainChannel, std::vector<ChannelWidget*> channelGroup)
@@ -515,14 +515,14 @@ void ToolView::setFixedMenu(QWidget* menu, bool dockable)
 		QDockWidget* docker = this->createDetachableMenu(menu, id);
 
 		connect(docker, &QDockWidget::topLevelChanged,
-			[=](bool topLevel) { m_ui->widgetMenuAnim->toggleMenu(!topLevel); });
+			[=](bool topLevel) { m_ui->widgetMenuHAnim->toggleMenu(!topLevel); });
 	} else {
 		m_ui->stackedWidget->addWidget(menu);
 		id = getNewID();
 	}
 
 	settingsPanelUpdate(-id);
-	m_ui->widgetMenuAnim->toggleMenu(true);
+	m_ui->widgetMenuHAnim->toggleMenu(true);
 }
 
 QWidget* ToolView::getTopExtraWidget() { return m_ui->widgetTopExtra; }

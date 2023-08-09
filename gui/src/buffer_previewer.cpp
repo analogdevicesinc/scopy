@@ -279,6 +279,11 @@ void BufferPreviewer::resizeEvent(QResizeEvent *)
 	buildFullWaveform(m_fullWavePoints, m_fullWaveNumPoints);
 }
 
+void BufferPreviewer::mouseDoubleClickEvent(QMouseEvent *event)
+{
+	Q_EMIT bufferResetPosition();
+}
+
 void BufferPreviewer::mousePressEvent(QMouseEvent *event)
 {
 	if (event->button() == Qt::RightButton) {
@@ -286,6 +291,7 @@ void BufferPreviewer::mousePressEvent(QMouseEvent *event)
 	} else {
 		setCursor(Qt::ClosedHandCursor);
 		m_offset = event->pos();
+		Q_EMIT bufferStartDrag();
 	}
 }
 

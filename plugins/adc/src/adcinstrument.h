@@ -27,6 +27,7 @@ public Q_SLOTS:
 	void stop();
 	void start();
 	void restart();
+	void showMeasurements(bool b);
 Q_SIGNALS:
 	void runningChanged(bool);
 

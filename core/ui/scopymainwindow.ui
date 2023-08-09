@@ -55,7 +55,7 @@
      <number>9</number>
     </property>
     <item>
-     <widget class="scopy::MenuAnim" name="animHolder" native="true">
+     <widget class="scopy::MenuHAnim" name="animHolder" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
@@ -130,7 +130,7 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::MenuAnim</class>
+   <class>scopy::MenuHAnim</class>
    <extends>QWidget</extends>
    <header location="global">gui/menu_anim.hpp</header>
    <container>1</container>
