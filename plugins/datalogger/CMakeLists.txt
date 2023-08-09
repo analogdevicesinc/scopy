@@ -47,8 +47,14 @@ set(PROJECT_SOURCES
 find_package(libm2k REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt5Concurrent REQUIRED)
-if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+         "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
+else()
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
 if(ANDROID)
@@ -76,6 +82,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     scopy-iioutil
     scopy-gui
     scopy-core
-    ${QWT_LIBRARIES} ${GLIB_LIBRARIES})
+    ${QWT_LIBRARIES}
+    ${GLIB_LINK_LIBRARIES})
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

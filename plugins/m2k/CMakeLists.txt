@@ -47,7 +47,7 @@ endif()
 
 set(PROJECT_SOURCES
         ${SRC_LIST}
-	    ${OLD_SCOPY_FILES}
+        ${OLD_SCOPY_FILES}
         ${HEADER_LIST}
         ${UI_LIST}
 )
@@ -63,6 +63,9 @@ find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+         "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
 else()
     set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
