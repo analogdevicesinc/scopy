@@ -40,7 +40,7 @@ TestTool::TestTool(QWidget *parent)
 	lay->addWidget(tool);
 
 	StyleHelper::GetInstance()->initColorMap();
-	btn3 = new OpenLastMenuBtn(dynamic_cast<MenuAnim*>(tool->rightContainer()),false,this);
+	btn3 = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),false,this);
 	tool->setLeftContainerWidth(200);
 	tool->setRightContainerWidth(300);
 	tool->openLeftContainerHelper(false);

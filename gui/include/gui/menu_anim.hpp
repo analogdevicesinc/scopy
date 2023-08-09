@@ -32,17 +32,20 @@ namespace scopy {
 		Q_OBJECT
 
 	public:
-		explicit MenuAnim(QWidget *parent = nullptr);
+		explicit MenuAnim(QByteArray minAnimationProperty, QByteArray maxAnimationProperty, QWidget *parent = nullptr);
 		~MenuAnim() {}
 
-		void setMinimumSize(QSize size);
 		bool animInProgress() const;
 
 		int getAnimationDuration() const;
 		void setAnimationDuration(int newAnimationDuration);
 
-		void setAnimMinWidth(int min);
-		void setAnimMaxWidth(int max);
+		void setAnimMin(int min);
+		void setAnimMax(int max);
+
+	protected:
+		virtual int getImplicitMin() = 0;
+		virtual int getImplicitMax() = 0;
 	Q_SIGNALS:
 		void finished(bool opened);
 
@@ -56,10 +59,28 @@ namespace scopy {
 	private:
 		CustomAnimation close_anim_max, close_anim_min,
 				   open_anim_max, open_anim_min;
-		int min_width;
-		int max_width;
+		int min_val;
+		int max_val;
 		int animationDuration;
 		bool animInProg;
+	};
+
+	class SCOPY_GUI_EXPORT MenuVAnim : public MenuAnim {
+		Q_OBJECT
+	public:
+		explicit MenuVAnim(QWidget *parent = nullptr);
+	protected:
+		int getImplicitMin() override;
+		int getImplicitMax() override;
+	};
+
+	class SCOPY_GUI_EXPORT MenuHAnim : public MenuAnim {
+		Q_OBJECT
+	public:
+		explicit MenuHAnim(QWidget *parent = nullptr);
+	protected:
+		int getImplicitMin() override;
+		int getImplicitMax() override;
 	};
 }
 

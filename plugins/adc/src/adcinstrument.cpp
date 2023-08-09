@@ -17,13 +17,14 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	setLayout(lay);
 	tool = new ToolTemplate(this);
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
 	tool->bottomContainer()->setVisible(true);
 	tool->topContainer()->setVisible(true);
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	lay->addWidget(tool);
 
-	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuAnim*>(tool->rightContainer()),true,this);
+	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),true,this);
 	QButtonGroup* rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn*>(openLastMenuBtn)->getButtonGroup();
 	tool->setLeftContainerWidth(200);
 	tool->setRightContainerWidth(300);
@@ -45,6 +46,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 	MenuControlButton *measure = new MenuControlButton(this);
 	measure->setName("Measure");
+	tool->topStack()->add("measure", new QLabel("Measure panel", this));
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn,TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu,TTA_LEFT);
@@ -61,7 +63,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
 
-	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuAnim*>(tool->leftContainer()), &MenuAnim::toggleMenu);
+	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim*>(tool->leftContainer()), &MenuHAnim::toggleMenu);
 
 	GRTimePlotAddon* plotAddon = dynamic_cast<GRTimePlotAddon*>(proxy->getPlotAddon());
 	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
@@ -118,7 +120,8 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	connect(this, &AdcInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
 
 	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);
-
+	connect(cursor, &MenuControlButton::toggled, plotAddon,  &GRTimePlotAddon::showCursors);
+	connect(measure, &MenuControlButton::toggled, this, &AdcInstrument::showMeasurements);
 	tool->requestMenu("time__settings");
 	channelGroup->buttons()[0]->setChecked(true);
 
@@ -151,6 +154,14 @@ void AdcInstrument::restart() {
 			run(false);
 			run(true);
 	}
+}
+
+void AdcInstrument::showMeasurements(bool b)
+{
+	if(b) {
+		tool->requestMenu("measure");
+	}
+	tool->openTopContainerHelper(b);
 }
 
 bool AdcInstrument::running() const

@@ -226,7 +226,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="scopy::MenuAnim" name="widgetVerticalChannels" native="true">
+         <widget class="scopy::MenuHAnim" name="widgetVerticalChannels" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
             <horstretch>0</horstretch>
@@ -402,7 +402,7 @@
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
           <item>
-           <widget class="scopy::MenuAnim" name="widgetMenuAnim" native="true">
+           <widget class="scopy::MenuHAnim" name="widgetMenuHAnim" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -681,7 +681,7 @@ QPushButton:checked { border-image: url(:/gui/icons/setup_btn_checked.svg); }</s
    <header>linked_button.hpp</header>
   </customwidget>
   <customwidget>
-   <class>scopy::MenuAnim</class>
+   <class>scopy::MenuHAnim</class>
    <extends>QWidget</extends>
    <header>menu_anim.hpp</header>
    <container>1</container>

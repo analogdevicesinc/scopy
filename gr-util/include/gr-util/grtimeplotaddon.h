@@ -9,6 +9,7 @@
 #include <QGridLayout>
 #include "time_sink_f.h"
 #include <plotwidget.h>
+#include <plotcursors.h>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QFuture>
@@ -55,7 +56,9 @@ public Q_SLOTS:
 	void connectSignalPaths();
 	void tearDownSignalPaths();
 	void onNewData();
+	void updateBufferPreviewer();
 
+	void showCursors(bool b);
 	void setRollingMode(bool b);
 	void setDrawPlotTags(bool b);
 	void setSampleRate(double);
@@ -71,12 +74,15 @@ private Q_SLOTS:
 	void startPlotRefresh();
 	void drawPlot();
 
+
 private:
 	QString name;
 	QWidget *widget;
 	QTimer *m_plotTimer;
 	GRTopBlock *m_top;
 	PlotWidget *m_plotWidget;
+	PlotCursors *m_cursors;
+	AnalogBufferPreviewer* m_bufferPreviewer;
 	time_sink_f::sptr time_sink;
 	QList<GRTimeChannelAddon*> grChannels;
 	QVBoxLayout* m_lay;
@@ -96,6 +102,9 @@ private:
 	bool m_showPlotTags;
 	bool m_refreshTimerRunning;
 	int m_xmode;
+
+	double m_bufferPrevInitMin;
+	double m_bufferPrevInitMax;
 
 	QMap<QString,int> time_channel_map;
 
