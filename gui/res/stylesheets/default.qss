@@ -44,10 +44,10 @@ QLabel:disabled, QRadioButton:disabled {color: rgba(255, 255, 255, 80); }
 QLabel[invalid=true] { color: red; }
 QLabel[valid=true] { color: rgba(255, 255, 255, 150) }
 QTextBrowser { background-color: rgba(0, 0, 0, 150); }
-scopy--MenuAnim, scopy--m2k--DMM #widget_2, .scopy--m2k--PowerController #rightMenu {
+scopy--MenuHAnim, scopy--m2k--DMM #widget_2, .scopy--m2k--PowerController #rightMenu {
  background-color: qlineargradient(spread:pad, x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 rgba(0, 0, 0, 40), stop: 0.15 transparent, stop: 0.85 transparent, stop: 1.0 rgba(0, 0, 0, 40));
 }
-QMainWindow > .QWidget > .scopy--MenuAnim { background-color: none; }
+QMainWindow > .QWidget > .scopy--MenuHAnim { background-color: none; }
 QwtPlot, QwtPolarPlot, pv--view--Viewport, QWidget[plot_container=true]{
  background-color: black;
 }

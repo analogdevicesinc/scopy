@@ -138,12 +138,14 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 	connect(m_plotAxis, &PlotAxis::minChanged, this, [=](){
 		QSignalBlocker b(m_xmin);
 		m_xmin->setValue(m_plotAxis->min());
+		m_plot->updateBufferPreviewer();
 	});	
 
 	connect(m_xmax, &PositionSpinButton::valueChanged, m_plotAxis, &PlotAxis::setMax);
 	connect(m_plotAxis, &PlotAxis::maxChanged, this, [=](){
 		QSignalBlocker b(m_xmax);
 		m_xmax->setValue(m_plotAxis->max());
+		m_plot->updateBufferPreviewer();
 	});
 
 	xMinMaxLayout->addWidget(m_xmin);

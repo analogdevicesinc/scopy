@@ -30,20 +30,30 @@ public:
 
 	QWidget *bottomContainer();
 	QWidget *topContainer();
+	QWidget *topCentral();
+	QWidget *bottomCentral();
 	QWidget *leftContainer();
 	QWidget *rightContainer();
 	QWidget *topContainerMenuControl();
 	QWidget *centralContainer();
 	MapStackedWidget *leftStack();
 	MapStackedWidget *rightStack();
+	MapStackedWidget *topStack();
+	MapStackedWidget *bottomStack();
 
 	MapStackedWidget *m_leftStack;
 	MapStackedWidget *m_rightStack;
+	MapStackedWidget *m_topStack;
+	MapStackedWidget *m_bottomStack;
 
+	void setTopContainerHeight(int h);
+	void setBottomContainerHeight(int h);
 	void setLeftContainerWidth(int w);
 	void setRightContainerWidth(int w);
 	void openLeftContainerHelper(bool open = true);
 	void openRightContainerHelper(bool open = true);
+	void openTopContainerHelper(bool open = true);
+	void openBottomContainerHelper(bool open = true);
 
 	void addWidgetToTopContainerHelper(QWidget *w, enum ToolTemplateAlignment);
 	void addWidgetToTopContainerMenuControlHelper(QWidget *w, ToolTemplateAlignment a);

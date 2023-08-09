@@ -763,7 +763,7 @@ border: 5px solid white;
            <number>0</number>
           </property>
           <item>
-           <widget class="scopy::MenuAnim" name="rightMenu" native="true">
+           <widget class="scopy::MenuHAnim" name="rightMenu" native="true">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -3146,7 +3146,7 @@ QLabel {
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>scopy::MenuAnim</class>
+   <class>scopy::MenuHAnim</class>
    <extends>QWidget</extends>
    <header>gui/menu_anim.hpp</header>
    <container>1</container>

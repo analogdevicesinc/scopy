@@ -18,11 +18,11 @@ public:
 class SCOPY_GUI_EXPORT OpenLastMenuBtn : public QPushButton {
 	Q_OBJECT
 public:
-	OpenLastMenuBtn(MenuAnim *menu, bool opened, QWidget *parent = nullptr);
+	OpenLastMenuBtn(MenuHAnim *menu, bool opened, QWidget *parent = nullptr);
 	QButtonGroup *getButtonGroup();
 
 private:
-	MenuAnim *m_menu;
+	MenuHAnim *m_menu;
 	SemiExclusiveButtonGroup *grp;
 };
 
