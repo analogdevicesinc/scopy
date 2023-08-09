@@ -34,7 +34,9 @@ build_scopy(){
 	echo "### Building Scopy"
 	mkdir -p $BUILD_FOLDER
 	cd $BUILD_FOLDER
-	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe $SRC_FOLDER
+	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe \
+				-DENABLE_TESTING=OFF \
+				$SRC_FOLDER
 	$MAKE_BIN -j 4
 	ls -la $BUILD_FOLDER
 }
