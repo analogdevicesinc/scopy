@@ -1707,7 +1707,7 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		this, &LogicAnalyzer::startStop);
 
 
-	connect(ui->rightMenu, &MenuAnim::finished,
+	connect(ui->rightMenu, &MenuHAnim::finished,
 		this, &LogicAnalyzer::rightMenuFinished);
 
 

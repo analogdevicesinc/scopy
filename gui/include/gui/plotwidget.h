@@ -54,6 +54,7 @@ public:
 	bool showYAxisLabels() const;
 	void setShowYAxisLabels(bool newShowYAxisLabels);
 
+	void addBufferPreviewerSlot(QWidget *w);
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel*);	

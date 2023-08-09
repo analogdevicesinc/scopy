@@ -84,7 +84,7 @@ public:
 
 	void setHeaderVisibility(bool visible);
 
-	scopy::MenuAnim* addMenuToStack();
+	scopy::MenuHAnim* addMenuToStack();
 	void setStackedWidget(QStackedWidget* sw);
 
 	int getNewID();

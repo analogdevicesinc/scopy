@@ -900,7 +900,7 @@ void PatternGenerator::connectSignalsAndSlots()
 		this, &PatternGenerator::startStop);
 
 
-	connect(m_ui->rightMenu, &MenuAnim::finished,
+	connect(m_ui->rightMenu, &MenuHAnim::finished,
 		this, &PatternGenerator::rightMenuFinished);
 
 	connect(&m_plot, &CapturePlot::channelSelected,

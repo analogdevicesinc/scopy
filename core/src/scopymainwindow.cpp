@@ -84,7 +84,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	toolman->addToolList("add",{});
 
 	connect(tm,&ToolMenu::toggleAttach,toolman,&ToolManager::toggleAttach);
-	connect(tb,&ToolBrowser::collapsed,[=](bool coll){ ui->animHolder->setAnimMinWidth(50);	ui->animHolder->toggleMenu(!coll);	});
+	connect(tb,&ToolBrowser::collapsed,[=](bool coll){ ui->animHolder->setAnimMin(50);	ui->animHolder->toggleMenu(!coll);	});
 	connect(tb,&ToolBrowser::requestTool,ts, &ToolStack::show);
 	connect(tb,&ToolBrowser::requestTool,dtm, &DetachedToolWindowManager::show);
 

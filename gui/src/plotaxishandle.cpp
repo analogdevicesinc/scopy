@@ -63,7 +63,6 @@ PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, int positi
 		}
 		);
 
-
 }
 
 PlotAxisHandle::~PlotAxisHandle()
