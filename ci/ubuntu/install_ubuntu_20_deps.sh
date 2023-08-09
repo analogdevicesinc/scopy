@@ -267,6 +267,7 @@ build_scopy() {
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DENABLE_PLUGIN_TEST=ON \
+		-DENABLE_TESTING=ON \
 		../
 	make $JOBS
 	popd
