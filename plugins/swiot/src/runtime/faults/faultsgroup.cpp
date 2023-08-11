@@ -128,8 +128,8 @@ void FaultsGroup::clearSelection() {
 }
 
 void FaultsGroup::update(uint32_t faults_numeric) {
-	for (int i = (int) (m_faults.size() - 1); i >= 0; --i) {
-		bool bit = (bool) (faults_numeric & 0b1);
+	for (int i = 0; i < m_faults.size(); i++) {
+		bool bit = (bool) ((faults_numeric >> i) & 0b1);
 		if (m_faults.at(i)->isActive() && bit) { // if we get 2 active signals, we set the stored to 1
 			m_faults.at(i)->setStored(true);
 		}
@@ -140,8 +140,6 @@ void FaultsGroup::update(uint32_t faults_numeric) {
 		} else {
 			m_actives.erase(i);
 		}
-
-		faults_numeric >>= 1;
 	}
 }
 
