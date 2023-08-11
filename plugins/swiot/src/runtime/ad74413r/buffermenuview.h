@@ -41,7 +41,7 @@ public:
 
 	~BufferMenuView();
 
-	void init(QString title, QString function, QColor *color);
+	void init(QString title, QString function, QColor *color, QString unit, double yMin, double yMax);
 	void initAdvMenu(QMap<QString, QMap<QString, QStringList>> values);
 	void createHeaderWidget(const QString title);
 
@@ -52,6 +52,7 @@ private:
 
 	BufferMenu *m_swiotAdvMenu;
 	scopy::gui::SubsectionSeparator *m_advanceSettingsSection;
+	scopy::gui::SubsectionSeparator *m_verticalSettingsSection;
 	scopy::LinkedButton *m_btnInfoStatus;
 };
 }

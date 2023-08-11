@@ -71,6 +71,9 @@ void BufferLogic::createChannels()
 				chnlIdx = (channelInfo->isOutput()) ? (chnlIdx + MAX_INPUT_CHNLS_NO) : chnlIdx;
 			}
 			m_chnlsInfo[chnlIdx] = channelInfo;
+			connect(channelInfo, &ChnlInfo::instantValueChanged, this, [=, this](double value) {
+				Q_EMIT instantValueChanged(chnlIdx, value);
+			});
 		}
 		m_plotChnlsNo = plotChnlsNo;
 	}
@@ -191,6 +194,18 @@ int BufferLogic::getPlotChnlsNo()
 	return m_plotChnlsNo;
 }
 
+QString BufferLogic::getPlotChnlUnitOfMeasure(int channel)
+{
+	QString unit = "";
+	ChnlInfo *chnlInfo = m_chnlsInfo[channel];
+	if (chnlInfo) {
+		if (chnlInfo->isScanElement() && !chnlInfo->isOutput()) {
+			unit = chnlInfo->unitOfMeasure();
+		}
+	}
+	return unit;
+}
+
 QVector<QString> BufferLogic::getPlotChnlsUnitOfMeasure()
 {
 	QVector<QString> chnlsUnitOfMeasure;
@@ -202,6 +217,18 @@ QVector<QString> BufferLogic::getPlotChnlsUnitOfMeasure()
 		}
 	}
 	return chnlsUnitOfMeasure;
+}
+
+std::pair<int, int> BufferLogic::getPlotChnlRangeValues(int channel)
+{
+	std::pair<int, int> range = {0, 0};
+	ChnlInfo *chnlInfo = m_chnlsInfo[channel];
+	if (chnlInfo) {
+		if (chnlInfo->isScanElement() && !chnlInfo->isOutput()) {
+			range = chnlInfo->rangeValues();
+		}
+	}
+	return range;
 }
 
 QVector<std::pair<int, int>> BufferLogic::getPlotChnlsRangeValues()
