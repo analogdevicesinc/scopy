@@ -32,19 +32,27 @@ swiot::BufferMenuView::BufferMenuView(QWidget *parent):
 swiot::BufferMenuView::~BufferMenuView()
 {}
 
-void swiot::BufferMenuView::init(QString title, QString function, QColor* color)
+void swiot::BufferMenuView::init(QString title, QString function, QColor* color, QString unit,
+				 double yMin, double yMax)
 {
 	initInteractiveMenu();
 	setMenuHeader(title,color,false);
-	createHeaderWidget(title);
+	createHeaderWidget(title);;
 
 	m_advanceSettingsSection = new gui::SubsectionSeparator("SETTINGS", false);
 	m_advanceSettingsSection->getLabel()->setStyleSheet("color:gray;");
 	m_advanceSettingsSection->layout()->setSpacing(10);
 	m_advanceSettingsSection->getContentWidget()->layout()->setSpacing(10);
 
+	m_verticalSettingsSection = new gui::SubsectionSeparator("Y-AXIS", false);
+	m_verticalSettingsSection->getLabel()->setStyleSheet("color:gray;");
+	m_verticalSettingsSection->layout()->setSpacing(10);
+	m_verticalSettingsSection->getContentWidget()->layout()->setSpacing(10);
+
+	insertSection(m_verticalSettingsSection);
 	insertSection(m_advanceSettingsSection);
 	m_swiotAdvMenu = swiot::BufferMenuBuilder::newAdvMenu(m_advanceSettingsSection->getContentWidget(), function);
+	m_swiotAdvMenu->setupVerticalSettingsMenu(m_verticalSettingsSection->getContentWidget(), unit, yMin, yMax);
 	QVector<QBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
 	for (int i = 0; i < layers.size(); i++) {
 		m_advanceSettingsSection->getContentWidget()->layout()->addItem(layers[i]);

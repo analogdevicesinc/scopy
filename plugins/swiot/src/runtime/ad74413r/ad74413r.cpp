@@ -55,8 +55,7 @@ Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget* parent):
 
 			QVector<QString> chnlsUnitOfMeasure = m_swiotAdLogic->getPlotChnlsUnitOfMeasure();
 			m_plotHandler->setChnlsUnitOfMeasure(chnlsUnitOfMeasure);
-			QVector<std::pair<int, int>> chnlsRangeValues = m_swiotAdLogic->getPlotChnlsRangeValues();
-			m_plotHandler->setChnlsRangeValues(chnlsRangeValues);
+
 			QMap<int, QString> chnlsId = m_swiotAdLogic->getPlotChnlsId();
 			m_plotHandler->setHandlesName(chnlsId);
 
@@ -155,6 +154,7 @@ void Ad74413r::setupConnections()
 	connect(m_swiotAdLogic, &BufferLogic::samplingFreqAvailableRead, this, [=, this] (QStringList availableFreq) {
 		m_samplingFreqOptions->addItems(availableFreq);
 	});
+	connect(m_swiotAdLogic, &BufferLogic::instantValueChanged, m_plotHandler, &BufferPlotHandler::setInstantValue);
 
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler, &BufferPlotHandler::onTimespanChanged);
 	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic, &BufferLogic::onSamplingFreqChanged);
@@ -172,18 +172,25 @@ void Ad74413r::setupConnections()
 void Ad74413r::initChannelToolView(unsigned int i, QString function)
 {
 	if (function.compare("no_config") != 0) {
+		bool enabled = (function.compare("diagnostic") != 0);
 		int nextColorId = m_monitorChannelManager->getChannelsCount();
 		QString menuTitle(((QString(AD_NAME).toUpper() + " - Channel ") + QString::number(i+1)) + (": " + function));
 		BufferMenuView *menu = new BufferMenuView(this);
 		//the curves id is in the range (0, chnlsNumber - 1) and the chnlsWidgets id is in the range (1, chnlsNumber)
 		//that's why we have to decrease by 1
-		menu->init(menuTitle, function, new QColor(m_plotHandler->getCurveColor(nextColorId)));
+
+		QString unit = m_swiotAdLogic->getPlotChnlUnitOfMeasure(i);
+		auto yRange = m_swiotAdLogic->getPlotChnlRangeValues(i);
+		m_plotHandler->addChannelScale(i, m_plotHandler->getCurveColor(nextColorId), unit, enabled);
+		menu->init(menuTitle, function, new QColor(m_plotHandler->getCurveColor(nextColorId)),
+			   unit, yRange.first, yRange.second);
+
+		m_plotHandler->mapChannelCurveId(nextColorId, i);
 
 		QMap<QString, iio_channel*> chnlsMap = m_swiotAdLogic->getIioChnl(i);
 		BufferMenuModel* swiotModel = new BufferMenuModel(chnlsMap, m_cmdQueue);
 		BufferMenuController* controller = new BufferMenuController(menu, swiotModel, i);
 
-//		controller->addMenuAttrValues();
 		if (controller) {
 			m_controllers.push_back(controller);
 		}
@@ -196,9 +203,14 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 		chWidget->setIsPhysicalChannel(true);
 		controller->createConnections();
 		m_channelWidgetList.push_back(chWidget);
-		if (function.compare("diagnostic") == 0) {
+		if (!enabled) {
 			chWidget->enableButton()->setChecked(false);
 		}
+
+		connect(controller, &BufferMenuController::setUnitPerDivision, m_plotHandler, &BufferPlotHandler::setUnitPerDivision);
+		connect(m_plotHandler, &BufferPlotHandler::unitPerDivisionChanged, controller, &BufferMenuController::unitPerDivisionChanged);
+
+		connect(controller, &BufferMenuController::diagnosticFunctionUpdated, this, &Ad74413r::onDiagnosticFunctionUpdated);
 		connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastReadThreshold(QString)));
 		connect(this, SIGNAL(broadcastReadThreshold(QString)), controller, SIGNAL(broadcastThresholdReadBackward(QString)));
 		connect(this, &Ad74413r::thresholdControlEnable, controller, &BufferMenuController::thresholdControlEnable);

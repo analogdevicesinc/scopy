@@ -20,5 +20,6 @@ double ResistanceChnlInfo::convertData(unsigned int data)
 	data &= 0x0000FFFF;
 	convertedData = ((ADC_MAX_VALUE - data) != 0)
 			? ((data * RPULL_UP) / (ADC_MAX_VALUE - data)) : MAX_RESISTANCE_VALUE;
+	Q_EMIT instantValueChanged(convertedData);
 	return convertedData;
 }
