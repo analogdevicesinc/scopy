@@ -2,8 +2,8 @@
 #define VOLTAGECHNLINFO_H
 
 #include "chnlinfo.h"
-#define MIN_VOLTAGE_VALUE -5
-#define MAX_VOLTAGE_VALUE 5
+#define MIN_VOLTAGE_VALUE 0
+#define MAX_VOLTAGE_VALUE 10
 namespace scopy::swiot{
 class VoltageChnlInfo : public ChnlInfo
 {
