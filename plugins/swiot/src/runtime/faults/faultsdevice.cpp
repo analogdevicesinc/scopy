@@ -26,6 +26,7 @@
 #include <iioutil/iiocommand/iiochannelattributeread.h>
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include <iioutil/commandqueueprovider.h>
+#include <iioutil/iiocommand/iioregisterread.h>
 
 #define FAULT_CHANNEL_NAME "voltage"
 #define SWIOT_NB_CHANNELS 4
@@ -33,7 +34,8 @@
 using namespace scopy::swiot;
 
 FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device* device,
-			   struct iio_device* swiot, struct iio_context *context, QWidget *parent)
+			   struct iio_device* swiot, struct iio_context *context,
+			   QVector<uint32_t> &registers, QWidget *parent)
 	: ui(new Ui::FaultsDevice),
 	  QWidget(parent),
 	  m_faults_explanation(new QWidget(this)),
@@ -45,7 +47,8 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	  m_context(context),
 	  m_faultsChannel(nullptr),
 	  m_cmdQueue(nullptr),
-	  m_faultNumeric(0)
+	  m_faultNumeric(0),
+	  m_registers(registers)
 {
 	ui->setupUi(this);
 	ui->reset_button->setProperty("blue_button", QVariant(true));
@@ -56,6 +59,7 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	connect(this, &FaultsDevice::specialFaultsUpdated, m_faultsGroup, &FaultsGroup::specialFaultsUpdated);
 	connect(m_faultsGroup, &FaultsGroup::specialFaultExplanationChanged, this, &FaultsDevice::updateExplanation);
 	connect(this, &FaultsDevice::faultNumericUpdated, this, &FaultsDevice::onFaultNumericUpdated, Qt::QueuedConnection);
+	connect(this, &FaultsDevice::faultRegisterRead, this, &FaultsDevice::onFaultRegisterRead, Qt::QueuedConnection);
 
 	if (m_device == nullptr) {
 		qCritical(CAT_SWIOT_FAULTS) << "No device was found";
@@ -102,7 +106,7 @@ void FaultsDevice::resetStored() {
 }
 
 void FaultsDevice::update() {
-	this->readFaults();
+	readRegister();
 }
 
 void FaultsDevice::updateExplanation(int index)
@@ -186,6 +190,50 @@ void FaultsDevice::onFaultNumericUpdated()
 	ui->lineEdit_numeric->setText(QString("0x%1").arg(m_faultNumeric, 8, 16, QLatin1Char('0')));
 	m_faultsGroup->update(m_faultNumeric);
 	updateExplanations();
+}
+
+void FaultsDevice::onFaultRegisterRead(int iReg, uint32_t value)
+{
+	m_registerValues.insert(iReg, value);
+	if (m_registerValues.size() == m_registers.size()) {
+		uint32_t faultRegisterValue = 0;
+		for (int i = 0; i < m_registerValues.size(); i++) {
+			faultRegisterValue |= (m_registerValues.at(i) << (i * 8));
+		}
+		m_faultNumeric = faultRegisterValue;
+		Q_EMIT faultNumericUpdated();
+		m_registerValues.clear();
+	}
+}
+
+void FaultsDevice::readRegister()
+{
+	for (int i = 0; i < m_registers.size(); i++) {
+		uint32_t reg_val;
+		uint32_t address = m_registers.at(i);
+		Command *readRegisterCommand = new IioRegisterRead(m_device, address, nullptr);
+		connect(readRegisterCommand, &scopy::Command::finished,
+			this, [=, this](scopy::Command* cmd) {
+			IioRegisterRead *tcmd = dynamic_cast<IioRegisterRead*>(cmd);
+			if (!tcmd) {
+				qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
+				return;
+			}
+			uint32_t reg = tcmd->getResult();
+
+			if (tcmd->getReturnCode() < 0) {
+				qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
+			} else {
+				qDebug(CAT_SWIOT_FAULTS) << m_name << "faults register read val:" << reg;
+				try {
+					Q_EMIT faultRegisterRead(i, reg);
+				} catch (std::invalid_argument& exception) {
+					qCritical(CAT_SWIOT_FAULTS) << m_name << "faults register could not be read.";
+				}
+			}
+		}, Qt::QueuedConnection);
+		m_cmdQueue->enqueue(readRegisterCommand);
+	}
 }
 
 void FaultsDevice::readFaults()

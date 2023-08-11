@@ -38,20 +38,24 @@ class FaultsDevice : public QWidget {
 public:
 	explicit FaultsDevice(const QString& name, QString path, struct iio_device* device,
 			      struct iio_device* swiot, struct iio_context *context,
+			      QVector<uint32_t> &registers,
 			      QWidget* parent = nullptr);
 	~FaultsDevice();
 
 	void update();
 
+	void readRegister();
 public Q_SLOTS:
 	void resetStored();
 	void updateExplanations();
 	void updateExplanation(int index);
 	void onFaultNumericUpdated();
+	void onFaultRegisterRead(int iReg, uint32_t value);
 
 Q_SIGNALS:
 	void specialFaultsUpdated(int index, QString channelFunction);
 	void faultNumericUpdated();
+	void faultRegisterRead(int iReg, uint32_t value);
 
 private Q_SLOTS:
 	void updateMinimumHeight();
@@ -83,6 +87,8 @@ private:
 	struct iio_context* m_context;
 
 	uint32_t m_faultNumeric;
+	QVector<uint32_t> m_registers;
+	QVector<uint32_t> m_registerValues;
 	QVector<Command*> m_deviceConfigCmds;
 	QVector<Command*> m_functionConfigCmds;
 };
