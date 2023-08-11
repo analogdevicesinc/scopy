@@ -49,6 +49,13 @@ void BufferMenuController::createConnections()
 	connect(m_model, &BufferMenuModel::attrWritten, advMenu, &BufferMenu::onAttrWritten);
 	connect(m_model, &BufferMenuModel::menuModelInitDone, this, &BufferMenuController::addMenuAttrValues);
 
+	connect(advMenu, &BufferMenu::setUnitPerDivision, this, [=, this] (double unitPerDiv) {
+		Q_EMIT setUnitPerDivision(m_chnlIdx, unitPerDiv);
+	});
+	connect(this, &BufferMenuController::unitPerDivisionChanged, this, [=, this] (int chnl, double unitPerDiv) {
+		Q_EMIT advMenu->unitPerDivisionChanged(unitPerDiv);
+	});
+
 	connect(advMenu, &BufferMenu::diagnosticFunctionUpdated, this, &BufferMenuController::diagnosticFunctionUpdated);
 	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastThresholdReadForward(QString)));
 	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu, SIGNAL(broadcastThresholdReadBackward(QString)));

@@ -57,7 +57,9 @@ public:
 	void applyChannelsEnabledChanges(std::vector<bool> enabledChnls);
 
 	int getPlotChnlsNo();
+	QString getPlotChnlUnitOfMeasure(int channel);
 	QVector<QString> getPlotChnlsUnitOfMeasure();
+	std::pair<int, int> getPlotChnlRangeValues(int channel);
 	QVector<std::pair<int, int>> getPlotChnlsRangeValues();
 	QMap<int, QString> getPlotChnlsId();
 
@@ -75,6 +77,7 @@ Q_SIGNALS:
 	void samplingFreqRead(int samplingFreq);
 	void channelFunctionDetermined(unsigned int i, QString function);
 	void samplingFreqAvailableRead(QStringList freqAvailable);
+	void instantValueChanged(int channel, double value);
 
 private Q_SLOTS:
 	void enabledChnCmdFinished(unsigned int i, scopy::Command *cmd);

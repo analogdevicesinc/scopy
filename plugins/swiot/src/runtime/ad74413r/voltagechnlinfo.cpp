@@ -25,5 +25,6 @@ double VoltageChnlInfo::convertData(unsigned int data)
 	data = SWAP_UINT32(data);
 	data &= 0x0000FFFF;
 	convertedData = (data + m_offsetScalePair.first) * m_offsetScalePair.second * factor;
+	Q_EMIT instantValueChanged(convertedData);
 	return convertedData;
 }
