@@ -77,21 +77,30 @@ void BufferLogic::createChannels()
 
 }
 
-bool BufferLogic::verifyEnableChanges(std::vector<bool> enabledChnls)
+bool BufferLogic::verifyChannelsEnabledChanges(std::vector<bool> enabledChnls)
 {
 	bool changes = false;
 	for (int i = 0; i < enabledChnls.size(); i++) {
 		if (m_chnlsInfo.contains(i)) {
 			if (enabledChnls[i] != m_chnlsInfo[i]->isEnabled()) {
-				m_chnlsInfo[i]->setIsEnabled(enabledChnls[i]);
 				changes = true;
+				break;
 			}
 		}
 	}
-	if (changes) {
-		Q_EMIT chnlsChanged(m_chnlsInfo);
-	}
 	return changes;
+}
+
+void BufferLogic::applyChannelsEnabledChanges(std::vector<bool> enabledChnls)
+{
+	for (int i = 0; i < enabledChnls.size(); i++) {
+		if (m_chnlsInfo.contains(i)) {
+			if (enabledChnls[i] != m_chnlsInfo[i]->isEnabled()) {
+				m_chnlsInfo[i]->setIsEnabled(enabledChnls[i]);
+			}
+		}
+	}
+	Q_EMIT chnlsChanged(m_chnlsInfo);
 }
 
 void BufferLogic::onSamplingFreqChanged(int idx)

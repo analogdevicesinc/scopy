@@ -47,6 +47,7 @@ Q_SIGNALS:
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
 	void thresholdControlEnable(bool enable);
+	void diagnosticFunctionUpdated();
 
 private:
 	int m_chnlIdx;
