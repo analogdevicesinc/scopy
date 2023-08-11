@@ -373,9 +373,10 @@ void Ad74413r::onSingleCaptureFinished()
 
 void Ad74413r::verifyChnlsChanges()
 {
-	bool changes = m_swiotAdLogic->verifyEnableChanges(m_enabledChannels);
+	bool changes = m_swiotAdLogic->verifyChannelsEnabledChanges(m_enabledChannels);
 	if (changes) {
 		m_readerThread->requestStop();
+		m_swiotAdLogic->applyChannelsEnabledChanges(m_enabledChannels);
 	}
 }
 
@@ -441,6 +442,12 @@ void Ad74413r::externalPowerSupply(bool ps) {
 		m_statusContainer->show();
 		m_statusLabel->show();
 	}
+}
+
+void Ad74413r::onDiagnosticFunctionUpdated()
+{
+	m_readerThread->requestStop();
+	m_swiotAdLogic->applyChannelsEnabledChanges(m_enabledChannels);
 }
 
 void Ad74413r::onBackBtnPressed()
