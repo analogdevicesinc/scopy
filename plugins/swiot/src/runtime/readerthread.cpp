@@ -43,6 +43,7 @@ ReaderThread::ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *par
 	, m_requiredBuffersNumber(0)
 	, bufferCounter(0)
 	, m_running(false)
+	, m_bufferInvalid(false)
 {
 }
 
@@ -167,6 +168,9 @@ void ReaderThread::bufferRefillCommandFinished(scopy::Command* cmd)
 	if (!tcmd) {
 		return;
 	}
+	if (m_bufferInvalid) {
+		return;
+	}
 	if (tcmd->getReturnCode() > 0) {
 		int i = 0;
 		int idx = 0;
@@ -178,9 +182,11 @@ void ReaderThread::bufferRefillCommandFinished(scopy::Command* cmd)
 		for (int i=0; i < m_enabledChnlsNo; i++){
 			m_bufferData.push_back({});
 		}
+
 		for (uint32_t* ptr = startAdr; ptr != endAdr; ptr++) {
 			idx = i % m_enabledChnlsNo;
-			data = m_bufferedChnls[idx]->convertData(*ptr);
+			uint32_t d_ptr = (uint32_t)*ptr;
+			data = m_bufferedChnls[idx]->convertData(d_ptr);
 			m_bufferData[idx].push_back(data);
 			i++;
 		}
@@ -202,6 +208,7 @@ void ReaderThread::bufferCreateCommandFinished(scopy::Command *cmd)
 		qDebug(CAT_SWIOT_AD74413R) << "Buffer wasn't created: " + QString(strerror(-tcmd->getReturnCode()));
 	} else {
 		m_iioBuff = tcmd->getResult();
+		m_bufferInvalid = false;
 		start();
 	}
 }
@@ -220,6 +227,15 @@ void ReaderThread::bufferCancelCommandFinished(scopy::Command *cmd)
 	destroyIioBuffer();
 }
 
+
+void ReaderThread::bufferDestroyCommandStarted(scopy::Command *cmd)
+{
+	IioBufferDestroy *tcmd = dynamic_cast<IioBufferDestroy*>(cmd);
+	if (!tcmd) {
+		return;
+	}
+	m_bufferInvalid = true;
+}
 
 void ReaderThread::bufferDestroyCommandFinished(scopy::Command *cmd)
 {
@@ -272,6 +288,7 @@ void ReaderThread::destroyIioBuffer()
 	if (m_iioBuff) {
 		Command *destroyBufferCommand = new IioBufferDestroy(m_iioBuff, nullptr);
 		connect(destroyBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferDestroyCommandFinished, Qt::QueuedConnection);
+		m_bufferInvalid = true;
 		m_cmdQueue->enqueue(destroyBufferCommand);
         }
 }
@@ -295,7 +312,9 @@ void ReaderThread::runBuffered(int requiredBuffersNumber) {
 	if ((m_requiredBuffersNumber != 0) && (bufferCounter >= m_requiredBuffersNumber)) {
 		return;
 	}
-
+	if (m_bufferInvalid) {
+		return;
+	}
 	if (m_iioBuff) {
 		Command *refillBufferCommand = new IioBufferRefill(m_iioBuff, nullptr);
 		connect(refillBufferCommand, &scopy::Command::finished, this, &ReaderThread::bufferRefillCommandFinished, Qt::QueuedConnection);
