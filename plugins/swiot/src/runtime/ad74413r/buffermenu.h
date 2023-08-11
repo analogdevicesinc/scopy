@@ -46,12 +46,13 @@ public:
 	explicit BufferMenu(QWidget* parent = nullptr, QString chnlFunction = "");
 	~BufferMenu();
 
-	virtual void init() = 0;
+	virtual void init();
 	virtual QString getInfoMessage();
 	QVector<QBoxLayout *> getMenuLayers();
 	QMap<QString, QMap<QString, QStringList>> getAttrValues();
 
 	void addMenuLayout(QBoxLayout *layout);
+	void setupVerticalSettingsMenu(QWidget *settingsWidget, QString unit, double yMin, double yMax);
 	void setAttrValues(QMap<QString, QMap<QString, QStringList>> values);
 	double convertFromRaw(int rawValue, QString chnlType = OUTPUT_CHNL);
 public Q_SLOT:
@@ -62,11 +63,15 @@ Q_SIGNALS:
 	void thresholdControlEnable(bool enable);
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
+	void diagnosticFunctionUpdated();
+	void setUnitPerDivision(double val);
+	void unitPerDivisionChanged(double val);
 
 protected:
 	QWidget *m_widget;
 	QString m_chnlFunction;
 	QMap<QString, QMap<QString, QStringList>> m_attrValues;
+	PositionSpinButton *m_unitPerDivision;
 private:
 	QVector<QBoxLayout *> m_menuLayers;
 };
@@ -170,7 +175,7 @@ public:
 	void init();
 	void connectSignalsToSlots();
 public Q_SLOTS:
-	void diagIndextChanged(int idx);
+	void diagIndexChanged(int idx);
 	void onMapUpdated();
 private:
 	QComboBox *m_diagOptions;

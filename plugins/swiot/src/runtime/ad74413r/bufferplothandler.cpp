@@ -38,6 +38,7 @@ BufferPlotHandler::BufferPlotHandler(QWidget *parent, int plotChnlsNo) :
 	m_lock = new QMutex();
 	m_plotChnlsNo = plotChnlsNo;
 	m_plot = new CapturePlot(parent, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter, QwtAxis::YRight);
+	m_plotScalesController = new ChannelPlotScalesController(this);
 	initPlot(plotChnlsNo);
 	readPreferences();
 }
@@ -51,6 +52,9 @@ BufferPlotHandler::~BufferPlotHandler()
 	}
 	if (m_plot) {
 		delete m_plot;
+	}
+	if (m_plotScalesController) {
+		delete m_plotScalesController;
 	}
 }
 
@@ -81,7 +85,8 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
 	gridPlot->addWidget(m_plot->topHandlesArea(), 2, 0, 1, 4);
 	gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
-	gridPlot->addWidget(m_plot->bottomHandlesArea(), 4, 0, 1, 4);
+	gridPlot->addWidget(m_plotScalesController, 4, 0, 1, 4);
+
 	gridPlot->addWidget(m_plot->rightHandlesArea(), 1, 3, 4, 1);
 	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
 	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
@@ -90,6 +95,7 @@ void BufferPlotHandler::initPlot(int plotChnlsNo)
 	m_plot->enableTimeTrigger(false);
 	m_plot->setActiveVertAxis(0, true);
 	m_plot->setAxisVisible(QwtAxis::YLeft, false);
+	setYAxisVisible(true);
 	m_plot->enableColoredLabels(true);
 	updatePlotTimespan();
 
@@ -135,8 +141,18 @@ void BufferPlotHandler::initStatusWidget()
 	m_plot->setStatusWidget(statusWidget);
 }
 
+void BufferPlotHandler::setYAxisVisible(bool visible)
+{
+	m_plot->setAxisVisible(QwtAxis::YRight, visible);
+}
+
 void BufferPlotHandler::setHandlesName(QMap<int, QString> chnlsId)
 {
+	connect(m_plot, &CapturePlot::channelOffsetChanged, this, [=, this] (int chn, double offset) {
+		double unitPerDiv = m_plot->VertUnitsPerDiv(chn);
+		setUnitPerDivision(chn, unitPerDiv);
+
+	});
 	QList<RoundedHandleV *> offsetHandles = m_plot->getOffsetHandles();
 	int offsetHandlesSize =offsetHandles.size();
 	int mapSize = chnlsId.size();
@@ -242,13 +258,33 @@ void BufferPlotHandler::setChnlsUnitOfMeasure(QVector<QString> unitsOfMeasure)
 	m_plot->replot();
 }
 
-void BufferPlotHandler::setChnlsRangeValues(QVector<std::pair<int, int> > rangeValues)
+void BufferPlotHandler::setUnitPerDivision(int i, double unitPerDiv)
 {
-	unsigned int yAxisNumDiv = m_plot->yAxisNumDiv();
-	for (int i = 0; i < m_plot->leftVertAxesCount(); i++) {
-		double numberOfUnitsPerDiv = (rangeValues[i].second - rangeValues[i].first) / (double)yAxisNumDiv;
-		m_plot->setVertUnitsPerDiv(numberOfUnitsPerDiv, i);
-	}
+	m_unitPerDivision.insert(i, unitPerDiv);
+	updateScale(i);
+	Q_EMIT unitPerDivisionChanged(i, unitPerDiv);
+}
+
+void BufferPlotHandler::setInstantValue(int channel, double value)
+{
+	m_plotScalesController->setInstantValue(channel, value);
+}
+
+void BufferPlotHandler::addChannelScale(int index, QColor color, QString unit, bool enabled)
+{
+	m_plotScalesController->addChannel(index, color, unit, enabled);
+}
+
+void BufferPlotHandler::mapChannelCurveId(int curveId, int channelId)
+{
+	m_channelCurveId.insert(curveId, channelId);
+}
+
+void BufferPlotHandler::updateScale(int channel)
+{
+	int curveId = m_channelCurveId.key(channel);
+	m_plot->setVertUnitsPerDiv(m_unitPerDivision[channel], curveId);
+	m_plotScalesController->setUnitPerDivision(channel, m_unitPerDivision[channel]);
 	m_plot->replot();
 }
 
@@ -343,6 +379,7 @@ void BufferPlotHandler::onChannelWidgetEnabled(int curveId, bool en)
 {
 	m_enabledPlots[curveId] = en;
 	m_plot->setOffsetHandleVisible(curveId, en);
+	m_plotScalesController->setChannelEnabled(m_channelCurveId.value(curveId), en);
 	if (en) {
 		m_plot->AttachCurve(curveId);
 	} else {
