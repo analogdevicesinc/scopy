@@ -37,6 +37,8 @@ public:
 
 	QString unitOfMeasure() const;
 
+	void addReadScaleCommand();
+	void addReadOffsetCommand();
 private Q_SLOTS:
 	void readScaleCommandFinished(scopy::Command *cmd);
 	void readOffsetCommandFinished(scopy::Command *cmd);

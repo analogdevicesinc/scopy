@@ -103,6 +103,15 @@ void ReaderThread::addBufferedDevice(iio_device *device) {
         m_iioDev = device;
 }
 
+void ReaderThread::initIioChannels()
+{
+	auto vals = m_chnlsInfo.values();
+	for(const auto &val : vals) {
+		val->addReadScaleCommand();
+		val->addReadOffsetCommand();
+	}
+}
+
 void ReaderThread::enableIioChnls()
 {
         if (m_iioDev) {
@@ -319,6 +328,7 @@ void ReaderThread::startCapture(int requiredBuffersNumber)
 		bufferCounter = 0;
 		m_requiredBuffersNumber = requiredBuffersNumber;
 		enableIioChnls();
+		initIioChannels();
 		createIioBuffer();
 		m_running = true;
 	} else {
