@@ -53,7 +53,8 @@ public:
 
 	QMap<QString, iio_channel*> getIioChnl(int chnlIdx);
 
-	bool verifyEnableChanges(std::vector<bool> enabledChnls);
+	bool verifyChannelsEnabledChanges(std::vector<bool> enabledChnls);
+	void applyChannelsEnabledChanges(std::vector<bool> enabledChnls);
 
 	int getPlotChnlsNo();
 	QVector<QString> getPlotChnlsUnitOfMeasure();

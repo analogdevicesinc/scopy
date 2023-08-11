@@ -80,6 +80,7 @@ public Q_SLOTS:
 	void onSingleCaptureFinished();
 
 	void externalPowerSupply(bool ps);
+	void onDiagnosticFunctionUpdated();
 
 Q_SIGNALS:
 	void broadcastReadThreshold(QString value);
