@@ -206,6 +206,10 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 	m_currentChannelSelected++;
 	if (m_currentChannelSelected == 4) {
 		m_swiotAdLogic->initDiagnosticChannels();
+
+	}
+	if (m_currentChannelSelected == MAX_INPUT_CHNLS_NO) {
+		m_monitorChannelManager->getChannelAt(0)->nameButton()->click();
 	}
 }
 
