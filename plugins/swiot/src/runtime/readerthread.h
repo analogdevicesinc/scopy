@@ -79,6 +79,7 @@ private Q_SLOTS:
 	void bufferRefillCommandFinished(scopy::Command *cmd);
 	void bufferCreateCommandFinished(scopy::Command *cmd);
 	void bufferDestroyCommandFinished(scopy::Command *cmd);
+	void bufferDestroyCommandStarted(scopy::Command *cmd);
 	void bufferCancelCommandFinished(scopy::Command *cmd);
 
 private:
@@ -98,7 +99,7 @@ private:
 	QMap<int, ChnlInfo*> m_chnlsInfo;
 	QVector<ChnlInfo *> m_bufferedChnls;
 	QVector<QVector<double>> m_bufferData;
-	std::atomic<bool> m_running;
+	std::atomic<bool> m_running, m_bufferInvalid;
 	std::mutex m_mutex;
 };
 }
