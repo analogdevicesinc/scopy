@@ -19,15 +19,8 @@ ChnlInfo::ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQu
 		int erno = 0;
 		m_isOutput = iio_channel_is_output(iioChnl);
 
-		Command *attrReadScale = new IioChannelAttributeRead(m_iioChnl, "scale", nullptr);
-		Command *attrReadOffset = new IioChannelAttributeRead(m_iioChnl, "offset", nullptr);
-
-		connect(attrReadScale, &scopy::Command::finished, this,
-			&ChnlInfo::readScaleCommandFinished, Qt::QueuedConnection);
-		connect(attrReadOffset, &scopy::Command::finished, this,
-			&ChnlInfo::readOffsetCommandFinished, Qt::QueuedConnection);
-		m_commandQueue->enqueue(attrReadScale);
-		m_commandQueue->enqueue(attrReadOffset);
+		addReadScaleCommand();
+		addReadOffsetCommand();
 
 		m_isScanElement = iio_channel_is_scan_element(iioChnl);
 		m_isEnabled = false;
@@ -43,6 +36,21 @@ ChnlInfo::~ChnlInfo()
 	}
 }
 
+void ChnlInfo::addReadScaleCommand()
+{
+	Command *attrReadScale = new IioChannelAttributeRead(m_iioChnl, "scale", nullptr);
+	connect(attrReadScale, &scopy::Command::finished, this,
+		&ChnlInfo::readScaleCommandFinished, Qt::QueuedConnection);
+	m_commandQueue->enqueue(attrReadScale);
+}
+
+void ChnlInfo::addReadOffsetCommand()
+{
+	Command *attrReadOffset = new IioChannelAttributeRead(m_iioChnl, "offset", nullptr);
+	connect(attrReadOffset, &scopy::Command::finished, this,
+		&ChnlInfo::readOffsetCommandFinished, Qt::QueuedConnection);
+	m_commandQueue->enqueue(attrReadOffset);
+}
 
 void ChnlInfo::readScaleCommandFinished(Command *cmd)
 {
