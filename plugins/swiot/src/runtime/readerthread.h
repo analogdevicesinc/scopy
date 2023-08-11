@@ -55,6 +55,7 @@ public:
 	void cancelIioBuffer();
 
 	void enableIioChnls();
+	void initIioChannels();
 
 	int getEnabledChnls();
 
