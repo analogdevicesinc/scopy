@@ -28,10 +28,17 @@ BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction)
 	: QWidget(parent),
 	  m_widget(parent),
 	  m_chnlFunction(chnlFunction)
-{}
+{
+}
 
 BufferMenu::~BufferMenu()
 {}
+
+void BufferMenu::init()
+{
+	m_unitPerDivision->setValue(1);
+	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
+}
 
 QString BufferMenu::getInfoMessage()
 {
@@ -45,6 +52,30 @@ QString BufferMenu::getInfoMessage()
 void BufferMenu::addMenuLayout(QBoxLayout *layout)
 {
 	m_menuLayers.push_back(layout);
+}
+
+void BufferMenu::setupVerticalSettingsMenu(QWidget *settingsWidget, QString unit, double yMin, double yMax)
+{
+	// Y-UNIT-PER-DIV
+	QHBoxLayout *yMinMaxLayout = new QHBoxLayout(settingsWidget);
+	yMinMaxLayout->setMargin(0);
+	yMinMaxLayout->setSpacing(10);
+
+	m_unitPerDivision = new PositionSpinButton(
+		{
+		 {unit, 1e0},
+		 },"Unit/Div",0.1,yMax,false,false,settingsWidget);
+
+
+	yMinMaxLayout->addWidget(m_unitPerDivision);
+	settingsWidget->layout()->addItem(yMinMaxLayout);
+
+	// Connects
+	connect(m_unitPerDivision, &PositionSpinButton::valueChanged, this, &BufferMenu::setUnitPerDivision);
+	connect(this, &BufferMenu::unitPerDivisionChanged, this, [=, this] (double unitPerDiv) {
+		QSignalBlocker block(m_unitPerDivision);
+		m_unitPerDivision->setValue(unitPerDiv);
+	});
 }
 
 void BufferMenu::setAttrValues(QMap<QString, QMap<QString, QStringList>> values)
@@ -109,7 +140,7 @@ CurrentInLoopMenu::~CurrentInLoopMenu()
 
 void CurrentInLoopMenu::init()
 {
-
+	BufferMenu::init();
 	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
 			? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
 			: m_dacCodeSpinButton->setValue(0);
@@ -203,6 +234,7 @@ DigitalInLoopMenu::~DigitalInLoopMenu()
 
 void DigitalInLoopMenu::init()
 {
+	BufferMenu::init();
 	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
 			? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first()),
 			m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first())
@@ -353,6 +385,7 @@ VoltageOutMenu::~VoltageOutMenu()
 
 void VoltageOutMenu::init()
 {
+	BufferMenu::init();
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
 
@@ -553,6 +586,7 @@ CurrentOutMenu::~CurrentOutMenu()
 
 void CurrentOutMenu::init()
 {
+	BufferMenu::init();
 	setAvailableOptions(m_slewStepOptions, "slew_step_available");
 	setAvailableOptions(m_slewRateOptions, "slew_rate_available");
 
@@ -714,6 +748,7 @@ DiagnosticMenu::~DiagnosticMenu()
 
 void DiagnosticMenu::init()
 {
+	BufferMenu::init();
 	setAvailableOptions(m_diagOptions, "diag_function_available");
 	(m_attrValues[INPUT_CHNL].contains("diag_function") && !m_attrValues[INPUT_CHNL]["diag_function"].isEmpty())
 			? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
@@ -722,7 +757,7 @@ void DiagnosticMenu::init()
 
 void DiagnosticMenu::connectSignalsToSlots()
 {
-	connect(m_diagOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DiagnosticMenu::diagIndextChanged);
+	connect(m_diagOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DiagnosticMenu::diagIndexChanged);
 	connect(this, SIGNAL(mapUpdated()), this, SLOT(onMapUpdated()));
 }
 
@@ -733,12 +768,12 @@ void DiagnosticMenu::setAvailableOptions(QComboBox *list, QString attrName)
 		return;
 	}
 	QStringList availableValues = m_attrValues[INPUT_CHNL][attrName];
-	for (const auto& slewValue : availableValues) {
+	for (const auto& slewValue : qAsConst(availableValues)) {
 		list->addItem(slewValue);
 	}
 }
 
-void DiagnosticMenu::diagIndextChanged(int idx)
+void DiagnosticMenu::diagIndexChanged(int idx)
 {
 	QString attrName = "diag_function";
 	if (!m_attrValues.contains(INPUT_CHNL)) {
@@ -759,6 +794,7 @@ void DiagnosticMenu::onMapUpdated()
 			? m_diagOptions->setCurrentText(m_attrValues[INPUT_CHNL]["diag_function"].first())
 			: m_diagOptions->setCurrentText("ERROR");
 	m_diagOptions->blockSignals(false);
+	Q_EMIT diagnosticFunctionUpdated();
 }
 
 WithoutAdvSettings::WithoutAdvSettings(QWidget* parent, QString chnlFunction)
@@ -774,6 +810,7 @@ WithoutAdvSettings::~WithoutAdvSettings()
 
 void WithoutAdvSettings::init()
 {
+	BufferMenu::init();
 }
 
 void WithoutAdvSettings::connectSignalsToSlots()
@@ -807,6 +844,7 @@ DigitalInMenu::~DigitalInMenu()
 
 void DigitalInMenu::init()
 {
+	BufferMenu::init();
 	//threshold
 	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
 			? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first()),

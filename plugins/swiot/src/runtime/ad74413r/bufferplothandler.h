@@ -26,6 +26,7 @@
 #include <qobject.h>
 #include "bufferlogic.h"
 #include "linked_button.hpp"
+#include "channelplotscalescontroller.h"
 #include <qmutex.h>
 #include <QWidget>
 #include <deque>
@@ -51,6 +52,11 @@ public:
 	QWidget *getPlotWidget() const;
 	bool singleCapture() const;
 	int getRequiredBuffersNumber();
+	void setUnitPerDivision(int channel, double unitPerDiv);
+	void setInstantValue(int channel, double value);
+	void addChannelScale(int index, QColor color, QString unit, bool enabled);
+	void mapChannelCurveId(int curveId, int channelId);
+	void setYAxisVisible(bool visible);
 public Q_SLOTS:
 	void onBufferRefilled(QVector<QVector<double>>, int bufferCounter);
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
@@ -62,6 +68,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void singleCaptureFinished();
 	void offsetHandleSelected(int hdlIdx, bool selected);
+	void unitPerDivisionChanged(int i, double val);
 private:
 	void initPlot(int plotChnlsNo);
 	void initStatusWidget();
@@ -69,6 +76,7 @@ private:
 	void resetDeque();
 	void readPreferences();
 	void updatePlotTimespan();
+	void updateScale(int channel);
 
 	bool eventFilter(QObject *obj, QEvent *event);
 
@@ -77,6 +85,7 @@ private:
 	QLabel *m_samplesAquiredLabel;
 	QLabel *m_plotSamplesNumberLabel;
 	LinkedButton* m_btnInfoStatus;
+	ChannelPlotScalesController *m_plotScalesController;
 
 	int m_samplingFreq = 4800;
 	double m_timespan = 1;
@@ -96,7 +105,8 @@ private:
 	std::vector<bool> m_enabledPlots;
 	QMutex *m_lock;
 
-
+	QMap<int, double> m_unitPerDivision;
+	QMap<int, int> m_channelCurveId;
 };
 }
 
