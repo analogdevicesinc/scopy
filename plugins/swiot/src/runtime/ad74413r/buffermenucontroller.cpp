@@ -49,6 +49,7 @@ void BufferMenuController::createConnections()
 	connect(m_model, &BufferMenuModel::attrWritten, advMenu, &BufferMenu::onAttrWritten);
 	connect(m_model, &BufferMenuModel::menuModelInitDone, this, &BufferMenuController::addMenuAttrValues);
 
+	connect(advMenu, &BufferMenu::diagnosticFunctionUpdated, this, &BufferMenuController::diagnosticFunctionUpdated);
 	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastThresholdReadForward(QString)));
 	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu, SIGNAL(broadcastThresholdReadBackward(QString)));
 	connect(this, &BufferMenuController::thresholdControlEnable, advMenu, &BufferMenu::thresholdControlEnable);
