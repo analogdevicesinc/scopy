@@ -82,6 +82,8 @@ public Q_SLOTS:
 	void externalPowerSupply(bool ps);
 	void onDiagnosticFunctionUpdated();
 
+	void onActivateRunBtns(bool activate);
+
 Q_SIGNALS:
 	void broadcastReadThreshold(QString value);
 	void thresholdControlEnable(bool enable);
@@ -91,6 +93,7 @@ Q_SIGNALS:
 	void exportBtnClicked(QMap<int, bool> exportConfig);
 
 	void activateExportButton();
+	void activateRunBtns(bool activate);
 
 	void backBtnPressed();
 private Q_SLOTS:
