@@ -25,6 +25,7 @@ DefaultDirName={pf}\{#AppDev}\{#AppName}
 DefaultGroupName={#AppName}
 AlwaysRestart=yes
 DisableDirPage=no
+MinVersion=6.2
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
