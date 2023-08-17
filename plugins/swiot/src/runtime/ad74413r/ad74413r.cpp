@@ -133,6 +133,7 @@ void Ad74413r::setupConnections()
 	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::onBackBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
+	connect(this, &Ad74413r::activateRunBtns, this, &Ad74413r::onActivateRunBtns);
 
 	connect(m_monitorChannelManager, &scopy::gui::ChannelManager::enabledChannel, this, &Ad74413r::onChannelWidgetEnabled);
 	connect(this, &Ad74413r::channelWidgetEnabled, m_plotHandler, &BufferPlotHandler::onChannelWidgetEnabled);
@@ -301,6 +302,14 @@ void Ad74413r::onChannelWidgetEnabled(int chnWidgetId, bool en)
 		m_enabledChannels[chnlIdx] = false;
 		verifyChnlsChanges();
 	}
+
+	if (std::find(m_enabledChannels.begin(), m_enabledChannels.end(), true) == m_enabledChannels.end()) {
+		Q_EMIT activateRunBtns(false);
+
+	} else {
+		Q_EMIT activateRunBtns(true);
+	}
+
 	Q_EMIT channelWidgetEnabled(id, en);
 }
 
@@ -318,6 +327,25 @@ void Ad74413r::onOffsetHdlSelected(int hdlIdx, bool selected)
 		if (m_channelWidgetList[i] != nullptr) {
 			m_channelWidgetList[i]->nameButton()->setChecked(i == hdlIdx);
 		}
+	}
+}
+
+void Ad74413r::onActivateRunBtns(bool enable)
+{
+	if (!enable) {
+		if (m_toolView->getRunBtn()->isChecked()) {
+			m_toolView->getRunBtn()->setChecked(false);
+		}
+		if (m_toolView->getSingleBtn()->isChecked()) {
+			m_toolView->getSingleBtn()->setChecked(false);
+		}
+		m_toolView->getRunBtn()->setEnabled(false);
+		m_toolView->getSingleBtn()->setEnabled(false);
+		m_tme->setRunEnabled(false);
+	} else {
+		m_toolView->getRunBtn()->setEnabled(true);
+		m_toolView->getSingleBtn()->setEnabled(true);
+		m_tme->setRunEnabled(true);
 	}
 }
 
