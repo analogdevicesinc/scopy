@@ -66,7 +66,6 @@ private:
 	void initTutorialProperties();
 	void initFaultExplanations();
 	void connectSignalsAndSlots();
-	void readFaults();
 	void initSpecialFaults();
 
 	Ui::FaultsDevice *ui;
@@ -83,7 +82,6 @@ private:
 
 	struct iio_device* m_device;
 	struct iio_device* m_swiot;
-	struct iio_channel* m_faultsChannel;
 	struct iio_context* m_context;
 
 	uint32_t m_faultNumeric;
