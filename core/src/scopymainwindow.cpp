@@ -39,9 +39,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	setWindowTitle("Scopy-" + scopy::config::fullversion());
 
 	setAttribute(Qt::WA_QuitOnClose, true);
-	initPreferences();
 	initPythonWIN32();
-
+	initPreferences();
 
 	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
@@ -311,7 +310,7 @@ void ScopyMainWindow::initPythonWIN32(){
 	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
 	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
 	path_str += QString::fromLocal8Bit(pythonpath);
-
+	qInfo(CAT_SCOPY) << "PYTHONPATH: " << path_str;
 	qputenv("PYTHONPATH", path_str.toLocal8Bit());
 #endif
 }
