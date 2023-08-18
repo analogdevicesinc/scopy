@@ -45,7 +45,6 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 	  m_device(device),
 	  m_swiot(swiot),
 	  m_context(context),
-	  m_faultsChannel(nullptr),
 	  m_cmdQueue(nullptr),
 	  m_faultNumeric(0),
 	  m_registers(registers)
@@ -63,10 +62,6 @@ FaultsDevice::FaultsDevice(const QString& name, QString path, struct iio_device*
 
 	if (m_device == nullptr) {
 		qCritical(CAT_SWIOT_FAULTS) << "No device was found";
-	}
-	m_faultsChannel = iio_device_find_channel(m_device, FAULT_CHANNEL_NAME, false);
-	if (m_faultsChannel == nullptr) {
-		qCritical(CAT_SWIOT_FAULTS) << "Channel" << FAULT_CHANNEL_NAME << "was not found";
 	}
 
 	this->connectSignalsAndSlots();
@@ -234,34 +229,6 @@ void FaultsDevice::readRegister()
 		}, Qt::QueuedConnection);
 		m_cmdQueue->enqueue(readRegisterCommand);
 	}
-}
-
-void FaultsDevice::readFaults()
-{
-	Command *readFaultCommand = new IioChannelAttributeRead(m_faultsChannel, "raw", nullptr);
-	connect(readFaultCommand, &scopy::Command::finished,
-		this, [=, this](scopy::Command* cmd) {
-		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
-		if (!tcmd) {
-			qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be read.";
-			return;
-		}
-		char *fau = tcmd->getResult();
-
-		if (tcmd->getReturnCode() < 0) {
-			qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be read.";
-		} else {
-			qDebug(CAT_SWIOT_FAULTS) << m_name << "faults read the value:" << fau;
-			try {
-				m_faultNumeric = std::stoi(fau);
-				Q_EMIT faultNumericUpdated();
-				qDebug(CAT_SWIOT_FAULTS) << m_name << "faults read the value INT:" << m_faultNumeric;
-			} catch (std::invalid_argument& exception) {
-				qCritical(CAT_SWIOT_FAULTS) << m_name << "faults value could not be converted from string to int, read" << fau << "; exception message:" << exception.what();
-			}
-		}
-	}, Qt::QueuedConnection);
-	m_cmdQueue->enqueue(readFaultCommand);
 }
 
 void FaultsDevice::functionConfigCmdFinished(scopy::Command *cmd)
