@@ -276,89 +276,16 @@ void M2kPlugin::loadSettings(QSettings &s)
 	}
 }
 
-bool M2kPlugin::onConnect()
+void M2kPlugin::cleanup()
 {
-	ContextProvider *c = ContextProvider::GetInstance();
-	iio_context *ctx = c->open(m_param);
-	m2k_man = new m2k_iio_manager();
-	m_btnCalibrate->setDisabled(false);
-
-	m_m2kController->connectM2k(ctx);
-	m_m2kController->startPingTask();
-
-	Filter *f = new Filter(ctx);
-	QJSEngine *js = ScopyJS::GetInstance()->engine();
-
-	auto calib = new Calibration(ctx);
-	auto diom = new DIOManager(ctx,f);
-
-	auto dmmTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdmm");
-	auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal");
-	auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
-	auto pwrTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpower");
-	auto siggenTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2ksiggen");
-	auto specTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kspec");
-	auto oscTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kosc");
-	auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2knet");
-	auto laTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2klogic");
-	auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
-	m_adcBtnGrp = new QButtonGroup(this);
-
-	tools.insert("m2kdmm",new DMM(ctx, f, dmmTme, m2k_man)); dmmTme->setTool(tools["m2kdmm"]);
-	tools.insert("m2kcal",new ManualCalibration(ctx,f,mancalTme,nullptr,calib)); mancalTme->setTool(tools["m2kcal"]);
-	tools.insert("m2kdio",new DigitalIO(ctx,f,dioTme,diom,js,nullptr));dioTme->setTool(tools["m2kdio"]);
-	tools.insert("m2kpower",new PowerController(ctx,pwrTme,js,nullptr));pwrTme->setTool(tools["m2kpower"]);
-	tools.insert("m2ksiggen",new SignalGenerator(ctx,f,siggenTme,js,nullptr));siggenTme->setTool(tools["m2ksiggen"]);
-	tools.insert("m2kspec",new SpectrumAnalyzer(ctx,f,specTme,m2k_man,js,nullptr));specTme->setTool(tools["m2kspec"]);
-	tools.insert("m2kosc",new Oscilloscope(ctx,f,oscTme,m2k_man,js,nullptr));oscTme->setTool(tools["m2kosc"]);
-	tools.insert("m2knet",new NetworkAnalyzer(ctx,f,netTme,m2k_man,js,nullptr));netTme->setTool(tools["m2knet"]);
-	tools.insert("m2klogic",new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));laTme->setTool(tools["m2klogic"]);
-
-	logic::LogicAnalyzer* logic_analyzer = dynamic_cast<logic::LogicAnalyzer*>(tools["m2klogic"]);
-	Oscilloscope* oscilloscope = dynamic_cast<Oscilloscope*>(tools["m2kosc"]);
-	NetworkAnalyzer* network_analyzer = dynamic_cast<NetworkAnalyzer*>(tools["m2knet"]);
-
-	oscilloscope->setLogicAnalyzer(logic_analyzer);
-	network_analyzer->setOscilloscope(oscilloscope);
-
-	tools.insert("m2kpattern",new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));pgTme->setTool(tools["m2kpattern"]);
-
-	connect(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
-		if(en) {
-			if(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton()->isChecked())
-				dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton()->setChecked(false);
-		}
-	});
-
-	connect(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
-		if(en) {
-			if(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton()->isChecked())
-				dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton()->setChecked(false);
-		}
-	});
-
-//	m_dacBtnGrp->addButton(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton());
-//	m_dacBtnGrp->addButton(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton());
-
-	connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);	
-	connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
-	connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
-	connect(m_m2kController, SIGNAL(calibrationFailed()) , this, SLOT(calibrationFinished()));
-
-	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
-		tme->setEnabled(true);
-		tme->setRunBtnVisible(true);
-		tme->setRunning(false);
+	if (m2k_man) {
+		delete m2k_man;
+		m2k_man = nullptr;
 	}
-
-	m_m2kController->initialCalibration();
-	return true;
-}
-
-bool M2kPlugin::onDisconnect()
-{	
-	delete m2k_man;
-	delete calib;
+	if (calib) {
+		delete calib;
+		calib = nullptr;
+	}
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -372,14 +299,103 @@ bool M2kPlugin::onDisconnect()
 	disconnect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
 	disconnect(m_m2kController, SIGNAL(calibrationFailed()) , this, SLOT(calibrationFinished()));
 
-
 	m_m2kController->stopPingTask();
 	m_m2kController->disconnectM2k();
 	m_btnCalibrate->setDisabled(true);
 
-
 	ContextProvider *c = ContextProvider::GetInstance();
 	c->close(m_param);
+}
+
+bool M2kPlugin::onConnect()
+{
+	ContextProvider *c = ContextProvider::GetInstance();
+	iio_context *ctx = c->open(m_param);
+
+	if (!ctx) {
+		return false;
+	}
+	try {
+		m2k_man = new m2k_iio_manager();
+		m_btnCalibrate->setDisabled(false);
+
+		m_m2kController->connectM2k(ctx);
+		m_m2kController->startPingTask();
+		connect(m_m2kController,&M2kController::pingFailed,this,&M2kPlugin::disconnectDevice);
+
+		Filter *f = new Filter(ctx);
+		QJSEngine *js = ScopyJS::GetInstance()->engine();
+
+		auto calib = new Calibration(ctx);
+		auto diom = new DIOManager(ctx,f);
+		auto dmmTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdmm");
+		auto mancalTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kcal");
+		auto dioTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kdio");
+		auto pwrTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpower");
+		auto siggenTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2ksiggen");
+		auto specTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kspec");
+		auto oscTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kosc");
+		auto netTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2knet");
+		auto laTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2klogic");
+		auto pgTme =  ToolMenuEntry::findToolMenuEntryById(m_toolList,"m2kpattern");
+		m_adcBtnGrp = new QButtonGroup(this);
+
+		tools.insert("m2kdmm",new DMM(ctx, f, dmmTme, m2k_man)); dmmTme->setTool(tools["m2kdmm"]);
+		tools.insert("m2kcal",new ManualCalibration(ctx,f,mancalTme,nullptr,calib)); mancalTme->setTool(tools["m2kcal"]);
+		tools.insert("m2kdio",new DigitalIO(ctx,f,dioTme,diom,js,nullptr));dioTme->setTool(tools["m2kdio"]);
+		tools.insert("m2kpower",new PowerController(ctx,pwrTme,js,nullptr));pwrTme->setTool(tools["m2kpower"]);
+		tools.insert("m2ksiggen",new SignalGenerator(ctx,f,siggenTme,js,nullptr));siggenTme->setTool(tools["m2ksiggen"]);
+		tools.insert("m2kspec",new SpectrumAnalyzer(ctx,f,specTme,m2k_man,js,nullptr));specTme->setTool(tools["m2kspec"]);
+		tools.insert("m2kosc",new Oscilloscope(ctx,f,oscTme,m2k_man,js,nullptr));oscTme->setTool(tools["m2kosc"]);
+		tools.insert("m2knet",new NetworkAnalyzer(ctx,f,netTme,m2k_man,js,nullptr));netTme->setTool(tools["m2knet"]);
+		tools.insert("m2klogic",new logic::LogicAnalyzer(ctx,f,laTme,js,nullptr));laTme->setTool(tools["m2klogic"]);
+
+		logic::LogicAnalyzer* logic_analyzer = dynamic_cast<logic::LogicAnalyzer*>(tools["m2klogic"]);
+		Oscilloscope* oscilloscope = dynamic_cast<Oscilloscope*>(tools["m2kosc"]);
+		NetworkAnalyzer* network_analyzer = dynamic_cast<NetworkAnalyzer*>(tools["m2knet"]);
+
+		oscilloscope->setLogicAnalyzer(logic_analyzer);
+		network_analyzer->setOscilloscope(oscilloscope);
+
+		tools.insert("m2kpattern",new logic::PatternGenerator(ctx,f,pgTme,js,diom,nullptr));pgTme->setTool(tools["m2kpattern"]);
+		connect(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
+			if(en) {
+				if(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton()->isChecked())
+					dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton()->setChecked(false);
+			}
+		});
+
+		connect(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton(),&QPushButton::toggled, this,[=](bool en){
+			if(en) {
+				if(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton()->isChecked())
+					dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton()->setChecked(false);
+			}
+		});
+
+		//	m_dacBtnGrp->addButton(dynamic_cast<NetworkAnalyzer*>(netTme->tool())->getRunButton());
+		//	m_dacBtnGrp->addButton(dynamic_cast<SignalGenerator*>(siggenTme->tool())->getRunButton());
+
+		connect(m_m2kController, SIGNAL(calibrationStarted()), this, SLOT(calibrationStarted()));
+		connect(m_m2kController, SIGNAL(calibrationSuccess()), this, SLOT(calibrationSuccess()));
+		connect(m_m2kController, SIGNAL(calibrationFailed()) , this, SLOT(calibrationFinished()));
+
+		for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
+			tme->setEnabled(true);
+			tme->setRunBtnVisible(true);
+			tme->setRunning(false);
+		}
+		m_m2kController->initialCalibration();
+	} catch(...) {
+		qWarning(CAT_M2KPLUGIN) << "M2K plugin connection failed!";
+		cleanup();
+		return false;
+	}
+	return true;
+}
+
+bool M2kPlugin::onDisconnect()
+{	
+	cleanup();
 	return true;
 }
 
@@ -392,10 +408,11 @@ void M2kPlugin::initMetadata()
 	loadMetadata(
 R"plugin(
 	{
+	   "disconnectDevOnConnectFailure":true,
 	   "priority":100,
 	   "category":[
 	      "iio",
-		"m2k"
+	      "m2k"
 	   ],
 	   "exclude":["*", "!debuggerplugin"]
 	}
