@@ -8,7 +8,6 @@
 #include <QDebug>
 #include <QThread>
 #include <common/scopyconfig.h>
-
 #include "qscrollarea.h"
 #include "ui_devicepage.h"
 
@@ -49,9 +48,12 @@ void DeviceImpl::loadPlugins() {
 	preload();
 	loadName();
 	loadIcons();
+	loadWarningBadge();
 	loadPages();
 	loadToolList();
-
+	if (m_plugins.isEmpty()) {
+		connbtn->hide();
+	}
 	for(auto &p : m_plugins) {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(connectDevice()),this,SLOT(connectDev()));
 		connect(dynamic_cast<QObject*>(p),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
@@ -99,7 +101,6 @@ void DeviceImpl::loadIcons() {
 	m_icon->setFixedHeight(100);
 	m_icon->setFixedWidth(100);
 	new QHBoxLayout(m_icon);
-
 	for( auto &p : m_plugins) {
 		if(p->loadIcon()) {
 			m_icon->layout()->addWidget(p->icon());
@@ -134,6 +135,7 @@ void DeviceImpl::loadPages() {
 
 	connect(connbtn,&QPushButton::clicked,this,&DeviceImpl::connectDev);
 	connect(discbtn,&QPushButton::clicked,this,&DeviceImpl::disconnectDev);
+	connect(this, &DeviceImpl::connectionFailed, this, &DeviceImpl::onConnectionFailed);
 
 	for(auto &&p : plugins()) {
 		if(p->loadExtraButtons()) {
@@ -157,6 +159,28 @@ void DeviceImpl::loadToolList() {
 	for(auto &&p : m_plugins) {
 		p->loadToolList();
 	}
+}
+
+void DeviceImpl::onConnectionFailed()
+{
+	m_warningBtn->show();
+	disconnectDev();
+}
+
+void DeviceImpl::loadWarningBadge()
+{
+	m_warningBtn = new QPushButton(QString(), m_icon);
+	m_warningBtn->installEventFilter(this);
+	m_warningBtn->setObjectName(QString::fromUtf8("btnHelp"));
+	m_warningBtn->setCheckable(false);
+	m_warningBtn->setText(QString());
+	m_warningBtn->setStyleSheet("background-color: transparent; border: 0px");
+	QIcon warningIcon = QIcon(":/gui/icons/warning.svg");
+	m_warningBtn->setIcon(warningIcon);
+	m_warningBtn->setMaximumSize(25,25);
+	m_warningBtn->move(80,0);
+	m_warningBtn->raise();
+	m_warningBtn->hide();
 }
 
 QList<Plugin *> DeviceImpl::plugins() const
@@ -193,18 +217,31 @@ void DeviceImpl::load(QSettings &s) {
 }
 
 void DeviceImpl::connectDev() {
-	connbtn->hide();
-	discbtn->show();
 	Preferences *pref = Preferences::GetInstance();
-
+	bool disconnectDevice = false;
 	for(auto &&p : m_plugins) {
-		p->onConnect();
-		if(pref->get("general_save_session").toBool()) {
-			QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
-			p->loadSettings(s);
+		bool pluginConnectionSucceeded = p->onConnect();
+		if (pluginConnectionSucceeded) {
+			if(pref->get("general_save_session").toBool()) {
+				QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
+				p->loadSettings(s);
+			}
+			m_connectedPlugins.push_back(p);
+		} else {
+			disconnectDevice = p->metadata().value("disconnectDevOnConnectFailure").toBool();
+			if (disconnectDevice) {
+				break;
+			}
 		}
 	}
-	Q_EMIT connected();
+	if (disconnectDevice || m_connectedPlugins.isEmpty()) {
+		Q_EMIT connectionFailed();
+	} else {
+		connbtn->hide();
+		discbtn->show();
+		m_warningBtn->hide();
+		Q_EMIT connected();
+	}
 }
 
 void DeviceImpl::disconnectDev() {
@@ -212,12 +249,13 @@ void DeviceImpl::disconnectDev() {
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
 	for(auto &&p : m_plugins) {
-		if(pref->get("general_save_session").toBool()) {
+		if(m_connectedPlugins.contains(p) && pref->get("general_save_session").toBool()) {
 			QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
 			p->saveSettings(s);
 		}
 		p->onDisconnect();
 	}
+	m_connectedPlugins.clear();
 	Q_EMIT disconnected();
 }
 
@@ -272,6 +310,22 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 	}
 	return ret;
 }
+
+// WIP: to be move in DeviceIconImpl
+bool DeviceImpl::eventFilter(QObject *obj, QEvent *event)
+{
+	if (obj == (QObject*)m_warningBtn) {
+		if (event->type() == QEvent::Enter)
+		{
+			m_warningBtn->setToolTip("The device is not available!\n"
+						 "Verify the connection!");
+		}
+		return false;
+	} else {
+		return QObject::eventFilter(obj, event);
+	}
+}
+
 }
 
 #include "moc_deviceimpl.cpp"
