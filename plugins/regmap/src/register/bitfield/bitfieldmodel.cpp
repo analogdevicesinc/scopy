@@ -3,94 +3,94 @@
 using namespace scopy::regmap;
 
 BitFieldModel::BitFieldModel(QString name, int width,int regOffset, QString description, QObject *parent)
-	: name(name),
-	  width(width),
-	  regOffset(regOffset),
-	  description(description),
-	  QObject{parent}
+    : name(name),
+    width(width),
+    regOffset(regOffset),
+    description(description),
+    QObject{parent}
 {
-	if (description == "Reserved") {
-		reserved = true;
-	}
+    if (description == "Reserved") {
+        reserved = true;
+    }
 
-	defaultValue = 0;
+    defaultValue = 0;
 
 }
 BitFieldModel::BitFieldModel(   QString name, QString access, int defaultValue, QString description,
-				QString visibility, int width, QString notes,  int bitOffset, int regOffset,
-				int sliceWidth, QMap<QString,QString> *options, QObject *parent):
-	name(name),
-	access(access),
-	defaultValue(defaultValue),
-	description(description),
-	visibility(visibility),
-	width(width),
-	notes(notes),
-	bitOffset(bitOffset),
-	regOffset(regOffset),
-	sliceWidth(sliceWidth),
-	options(options),
-	QObject{parent}
+                             QString visibility, int width, QString notes,  int bitOffset, int regOffset,
+                             int sliceWidth, QVector<BitFieldOption*> *options, QObject *parent):
+    name(name),
+    access(access),
+    defaultValue(defaultValue),
+    description(description),
+    visibility(visibility),
+    width(width),
+    notes(notes),
+    bitOffset(bitOffset),
+    regOffset(regOffset),
+    sliceWidth(sliceWidth),
+    options(options),
+    QObject{parent}
 {
-	reserved = false;
+    reserved = false;
 }
 
 BitFieldModel::~BitFieldModel()
 {
-	if (options) delete options;
+    if (options) delete options;
 }
 QString BitFieldModel::getName() const
 {
-	return name;
+    return name;
 }
 
 
 QString BitFieldModel::getAccess() const
 {
-	return access;
+    return access;
 }
 
 int BitFieldModel::getDefaultValue() const
 {
-	return defaultValue;
+    return defaultValue;
 }
 
 QString BitFieldModel::getDescription() const
 {
-	return description;
+    return description;
 }
 
 QString BitFieldModel::getVisibility() const
 {
-	return visibility;
+    return visibility;
 }
 
 int BitFieldModel::getWidth() const
 {
-	return width;
+    return width;
 }
 
 QString BitFieldModel::getNotes() const
 {
-	return notes;
+    return notes;
 }
 
 int BitFieldModel::getBitOffset() const
 {
-	return bitOffset;
+    return bitOffset;
 }
 
 int BitFieldModel::getRegOffset() const
 {
-	return regOffset;
+    return regOffset;
 }
 
 int BitFieldModel::getSliceWidth() const
 {
-	return sliceWidth;
+    return sliceWidth;
 }
 
-QMap<QString, QString>* BitFieldModel::getOptions() const
+QVector<BitFieldOption*>* BitFieldModel::getOptions() const
 {
-	return options;
+    return options;
 }
