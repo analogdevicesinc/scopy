@@ -45,12 +45,14 @@ public Q_SLOTS:
 	virtual void save(QSettings &) override;
 	virtual void load(QSettings &) override;
 //	void forgetDev() override;
+	void onConnectionFailed();
 Q_SIGNALS:
 	void toolListChanged() override;
 	void connected() override;
 	void disconnected() override;
 	void requestedRestart() override;
 	void requestTool(QString) override;
+	void connectionFailed();
 protected:
 	void removeDisabledPlugins();
 	void loadName();
@@ -61,6 +63,7 @@ protected:
 protected:
 	PluginManager *p;
 	QList<Plugin*> m_plugins;
+	QList<Plugin*> m_connectedPlugins;
 	QString m_id;
 	QString m_category;
 	QString m_displayName;
@@ -68,7 +71,12 @@ protected:
 	QString m_param;
 	QWidget *m_icon;
 	QWidget *m_page;
-	QPushButton *connbtn,*discbtn;
+	QPushButton *connbtn, *discbtn;
+
+private:
+	void loadWarningBadge();
+	bool eventFilter(QObject *obj, QEvent *event) override;
+	QPushButton *m_warningBtn;
 
 };
 }
