@@ -58,7 +58,6 @@ void BufferLogic::createChannels()
 			struct iio_channel* iioChnl = iio_device_get_channel(m_iioDevicesMap[AD_NAME], i);
 			QString chnlId(iio_channel_get_id(iioChnl));
 			QString chnlName(iio_channel_get_name(iioChnl));
-			if (chnlName == "fault") { continue; }
 			ChnlInfo *channelInfo = ChnlInfoBuilder::build(iioChnl, chnlId[0].toLower(), m_commandQueue);
 			const auto&& parts = chnlId.split(rx);
 			chnlIdx = -1;
