@@ -58,7 +58,7 @@ void Util::retainWidgetSizeWhenHidden(QWidget *w, bool retain)
 }
 
 void Util::setWidgetNrOfChars(QWidget *w,
-		int minNrOfChars, int maxNrOfChars)
+			      int minNrOfChars, int maxNrOfChars)
 {
 	QFontMetrics labelm(w->font());
 
@@ -149,19 +149,19 @@ void DockerUtils::configureTopBar(QDockWidget *docker)
 
 		if(topLevel) {
 			docker->setWindowFlags(Qt::CustomizeWindowHint |
-							Qt::Window |
-							Qt::WindowMinimizeButtonHint |
-							Qt::WindowMaximizeButtonHint);
+					       Qt::Window |
+					       Qt::WindowMinimizeButtonHint |
+					       Qt::WindowMaximizeButtonHint);
 			docker->show();
 
 			docker->setStyleSheet("QDockWidget {"
-						"titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow.svg);"
-						"}");
+					      "titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow.svg);"
+											 "}");
 			docker->setContentsMargins(10, 0, 10, 10);
 		} else {
 			docker->setStyleSheet("QDockWidget {"
-						  "titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow_right.svg);"
-						  "}");
+					      "titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow_right.svg);"
+											 "}");
 			docker->setContentsMargins(0, 0, 0, 0);
 		}
 	});

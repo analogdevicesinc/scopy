@@ -68,9 +68,6 @@ if(SCOPY_ENABLE_SIGROK_GUI)
 	set(SCOPY_HAVE_SIGROK_GUI ON)
 endif()
 
-add_definitions(-DBOOST_ALL_DYN_LINK)
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
-
 message(STATUS "Building " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED
 	${PROJECT_SOURCES}
