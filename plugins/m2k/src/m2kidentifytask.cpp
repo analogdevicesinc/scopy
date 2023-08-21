@@ -22,12 +22,14 @@ void M2kIdentifyTask::run() {
 		return;
 
 	for( int i = 0;i<10;i++) {
+		if(isInterruptionRequested())
+			break;
 		iio_channel_attr_write(ch,"done_led_overwrite_powerdown","1");
-		QThread::msleep(100);
-		iio_channel_attr_write(ch,"done_led_overwrite_powerdown","0");
 		QThread::msleep(100);
 		if(isInterruptionRequested())
 			break;
+		iio_channel_attr_write(ch,"done_led_overwrite_powerdown","0");
+		QThread::msleep(100);
 	}
 
 finish:

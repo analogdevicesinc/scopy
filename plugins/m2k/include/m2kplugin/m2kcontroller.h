@@ -44,7 +44,6 @@ Q_SIGNALS:
 	void calibrationFailed();
 	void calibrationFinished();
 
-
 private:
 	M2kReadTemperatureTask *tempTask;
 	M2kIdentifyTask *identifyTask;
