@@ -12,6 +12,7 @@ public:
 	~IIODeviceImpl() {}
 
 	virtual void init() override;
+	bool verify();
 };
 
 }
