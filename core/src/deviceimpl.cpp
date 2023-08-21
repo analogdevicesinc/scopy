@@ -248,8 +248,8 @@ void DeviceImpl::disconnectDev() {
 	connbtn->show();
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
-	for(auto &&p : m_plugins) {
-		if(m_connectedPlugins.contains(p) && pref->get("general_save_session").toBool()) {
+	for(auto &&p : m_connectedPlugins) {
+		if(pref->get("general_save_session").toBool()) {
 			QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
 			p->saveSettings(s);
 		}

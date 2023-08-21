@@ -15,6 +15,8 @@ using namespace scopy::m2k;
 M2kController::M2kController(QString uri, QObject *parent) : QObject(parent), uri(uri)
 {	
 	identifyTask = nullptr;
+	pingTask = nullptr;
+	m_m2k = nullptr;
 }
 
 M2kController::~M2kController()
@@ -33,9 +35,14 @@ void M2kController::startPingTask()
 
 void M2kController::stopPingTask()
 {
+	if (!pingTask) {
+		return;
+	}
 	pingTask->requestInterruption();
 	pingTimer->deleteLater();
+	pingTimer = nullptr;
 	pingTask->deleteLater();
+	pingTask = nullptr;
 }
 
 void M2kController::startTemperatureTask()
@@ -62,9 +69,14 @@ void M2kController::connectM2k(iio_context *ctx)
 
 void M2kController::disconnectM2k()
 {
-
+	if (!m_m2k) {
+		return;
+	}
 	try {
-	contextClose(m_m2k,true);
+		if (identifyTask && identifyTask->isRunning()) {
+			identifyTask->requestInterruption();
+		}
+		contextClose(m_m2k,true);
 	} catch(std::exception &ex) {
 		qDebug(CAT_M2KPLUGIN)<<ex.what();
 
@@ -97,16 +109,18 @@ void M2kController::initialCalibration()
 
 void M2kController::calibrate()
 {
-
 	QFutureWatcher<bool> *fw = new QFutureWatcher<bool>(this);
 	QFuture<bool> f = QtConcurrent::run(std::bind(&libm2k::context::M2k::calibrate,m_m2k));
-
 	connect(fw,&QFutureWatcher<bool>::finished,this,[=](){
-
-		if(fw->result()) {
-			Q_EMIT calibrationSuccess();
-		} else  {
+		try {
+			if(fw->result()) {
+				Q_EMIT calibrationSuccess();
+			} else  {
+				Q_EMIT calibrationFailed();
+			}
+		} catch(...) {
 			Q_EMIT calibrationFailed();
+			qWarning(CAT_M2KPLUGIN) <<"An exception occurred during CALIBRATION!";
 		}
 		Q_EMIT calibrationFinished();
 		fw->deleteLater();
@@ -114,9 +128,4 @@ void M2kController::calibrate()
 	fw->setFuture(f);
 
 	Q_EMIT calibrationStarted();
-
 }
-
-
-
-
