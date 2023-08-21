@@ -1447,19 +1447,19 @@
 			<Options>
 					<Option>
 						<Description>Disable minimum fault LED (FLED) on-time</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Minimum fault LED (FLED) on-time = 1s (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Minimum fault LED (FLED) on-time = 2s (typ)</Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Minimum fault LED (FLED) on-time = 3s (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1619,19 +1619,19 @@
 			<Options>
 					<Option>
 						<Description>Set threshold voltage for short-to-VDD detection to 9V (typ) </Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Set threshold voltage for short-to-VDD detection to 10V (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Set threshold voltage for short-to-VDD detection to 12V (typ) </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description> Set threshold voltage for short-to-VDD detection to 14V (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1649,19 +1649,19 @@
 			<Options>
 					<Option>
 						<Description>Set open-wire and short-to-VDD detection current to 60μA (typ) </Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>: Set open-wire and short-to-VDD detection current to 100μA (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Set open-wire and short-to-VDD detection current to 300μA (typ)</Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Set open-wire and short-to-VDD detection current to 600μA (typ) </Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1679,19 +1679,19 @@
 			<Options>
 					<Option>
 						<Description>Disable SPI Watchdog Status and SPI Watchdog Timeout</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Enable SPI Watchdog Status, set SPI and SYNCH Watchdog Timeout to 200ms (typ) </Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Enable SPI Watchdog Status, set SPI and SYNCH Watchdog Timeout to 600ms (typ)</Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Enable SPI Watchdog Status, set SPI and SYNCH Watchdog Timeout to 1.2s (typ) </Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1719,19 +1719,19 @@
 			<Options>
 					<Option>
 						<Description>Disable the blanking time for the OVL_ diagnostic bits</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description> Set the OVL_ blanking time to 8ms (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description> Set the OVL_ blanking time to 50ms (typ)</Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Set the OVL_ blanking time to 300ms (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1869,19 +1869,19 @@
 			<Options>
 					<Option>
 						<Description> High-side</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>High-side with 2x inrush current for tINRUSH time (see CL1[1:0] bits for details) </Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description> Active-clamp push-pull </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Simple push-pull </Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1899,19 +1899,19 @@
 			<Options>
 					<Option>
 						<Description> High-side</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>High-side with 2x inrush current for tINRUSH time (see CL2[1:0] bits for details) </Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description> Active-clamp push-pull </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Simple push-pull </Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1929,19 +1929,19 @@
 			<Options>
 					<Option>
 						<Description> High-side</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>High-side with 2x inrush current for tINRUSH time (see CL3[1:0] bits for details) </Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description> Active-clamp push-pull </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Simple push-pull </Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1959,19 +1959,19 @@
 			<Options>
 					<Option>
 						<Description> High-side</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>High-side with 2x inrush current for tINRUSH time (see CL4[1:0] bits for details) </Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description> Active-clamp push-pull </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Simple push-pull </Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -1999,19 +1999,19 @@
 			<Options>
 					<Option>
 						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -2029,19 +2029,19 @@
 			<Options>
 					<Option>
 						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -2059,19 +2059,19 @@
 			<Options>
 					<Option>
 						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
@@ -2089,19 +2089,19 @@
 			<Options>
 					<Option>
 						<Description>Current Limit = 600mA (typ), tINRUSH = 20ms (typ)</Description>
-						<Value>00</Value>
+						<Value>0</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 130mA (typ), tINRUSH = 50ms (typ)</Description>
-						<Value>01</Value>
+						<Value>1</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 300mA (typ), tINRUSH = 40ms (typ) </Description>
-						<Value>10</Value>
+						<Value>2</Value>
 					</Option>
 					<Option>
 						<Description>Current Limit = 1.2A (typ), tINRUSH = 10ms (typ)</Description>
-						<Value>11</Value>
+						<Value>3</Value>
 					</Option>
 			</Options>
 			<BitOffset>0</BitOffset>
