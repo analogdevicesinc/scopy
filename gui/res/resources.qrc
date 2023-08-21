@@ -155,5 +155,6 @@
         <file>icons/scopy-default/icons/tool_spectrum_analyzer.svg</file>
         <file>icons/scopy-default/icons/tool_voltmeter.svg</file>
         <file>icons/scopy-default/icons/unlocked.svg</file>
+        <file>icons/warning.svg</file>
     </qresource>
 </RCC>
