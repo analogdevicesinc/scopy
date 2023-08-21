@@ -47,7 +47,7 @@ private:
 	void findAvailableSerialPorts();
 	QMap<QString, QString> readContextAttributes(struct iio_context *ctx);
 	void verifyIioBackend();
-	void createDevice();
+	void createDevice(QString cat = "");
 	void removePluginsCheckBoxes();
 	QString getSerialPath();
 	void createBackEndCheckBox(QString backEnd);
