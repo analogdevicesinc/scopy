@@ -9,6 +9,8 @@
 #include <qdebug.h>
 #include <QHBoxLayout>
 
+#include <register/bitfield/bitfieldoption.hpp>
+
 using namespace scopy;
 using namespace regmap;
 
@@ -181,13 +183,12 @@ QVector<BitFieldModel*> *XmlFileManager::getBitFieldsOfRegister(QDomElement reg,
 BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
 {
     if (!bitField.isNull()) {
-        QMap<QString,QString> *options = new QMap<QString, QString>();
+        QVector<BitFieldOption*> *options = new QVector<BitFieldOption*>();
         QDomElement bitFieldOptions = bitField.firstChildElement("Options");
         QDomElement bfOption = bitFieldOptions.firstChildElement("Option");
         while (!bfOption.isNull()) {
-            options->insert(bfOption.firstChildElement("Description").firstChild().toText().data(),
-                            bfOption.firstChildElement("Value").firstChild().toText().data()
-                            );
+            options->push_back(new BitFieldOption(bfOption.firstChildElement("Value").firstChild().toText().data(),
+                                                  bfOption.firstChildElement("Description").firstChild().toText().data()));
             bfOption = bfOption.nextSibling().toElement();
         }
 
