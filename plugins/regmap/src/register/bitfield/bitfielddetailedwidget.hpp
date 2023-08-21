@@ -1,6 +1,8 @@
 #ifndef BitFieldDetailedWidget_HPP
 #define BitFieldDetailedWidget_HPP
 
+#include "bitfieldoption.hpp"
+
 #include <QWidget>
 #include <QFrame>
 
@@ -23,7 +25,7 @@ public:
                                     int width,
                                     QString notes,
                                     int regOffset,
-                                    QMap<QString,QString> *options,
+                                    QVector<BitFieldOption*> *options,
                                     QWidget *parent = nullptr);
     ~BitFieldDetailedWidget();
 
@@ -44,7 +46,7 @@ private:
 	int regOffset;
     QString access;
 
-	QMap<QString,QString> *options;
+    QVector<BitFieldOption*> *options;
 	QLabel *value;
 	QComboBox *valueComboBox = nullptr;
 	QCheckBox *valueCheckBox = nullptr;

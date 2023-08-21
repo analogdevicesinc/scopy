@@ -16,7 +16,7 @@ using namespace regmap;
 using namespace regmap::gui;
 
 BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int defaultValue, QString description,
-                                               int width, QString notes, int regOffset, QMap<QString, QString> *options, QWidget *parent)
+                                               int width, QString notes, int regOffset, QVector<BitFieldOption*> *options, QWidget *parent)
     :options(options),
     width(width),
     description(description),
@@ -33,7 +33,6 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
     layout->setSpacing(0);
 
     QLabel *nameLabel = new QLabel(name);
-//    nameLabel->setStyleSheet("color: white;");
     nameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
 
@@ -43,8 +42,6 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
     firstLayout->itemAt(1)->setAlignment(Qt::AlignRight);
 
     layout->addLayout(firstLayout);
-//    layout->addWidget(nameLabel);
-//    layout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
     layout->addWidget(new QLabel("Default Value: " + scopy::regmap::Utils::convertToHexa(defaultValue, width)));
 
     toolTip = "Name : " + name + "\n"
@@ -99,16 +96,19 @@ void BitFieldDetailedWidget::firstRead()
         }
 
         layout->replaceWidget(value,valueComboBox);
-        QMap<QString, QString>::iterator i = options->begin();
-        int index = 0;
-        while (i != options->end()) {
-            valueComboBox->insertItem(index,i.key());
-            ++i;
-            ++index;
+
+        for (int i = 0; i < options->length(); i++) {
+            valueComboBox->insertItem(i, options->at(i)->getDescription());
         }
 
         QObject::connect(valueComboBox, &QComboBox::currentTextChanged, this, [=](QString val){
-            Q_EMIT valueUpdated(options->value(val));
+
+            for (int i = 0; i < options->length(); i++) {
+                if (options->at(i)->getDescription() == val) {
+                    Q_EMIT valueUpdated(options->at(i)->getValue());
+                    break;
+                }
+            }
         });
 
         //if is only one bit we will use a toggle button
@@ -155,7 +155,15 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
         } else if (valueCheckBox){
             valueCheckBox->setChecked(newValue == "1");
         } else if (valueComboBox) {
-            valueComboBox->setCurrentText(options->key(newValue));
+
+            for (int i = 0; i < options->length(); i++) {
+                if (options->at(i)->getValue() == newValue) {
+                    valueComboBox->setCurrentText(options->at(i)->getDescription());
+                    break;
+                }
+            }
+
+
         } else {
             value->setText(newValue);
         }
@@ -178,7 +186,12 @@ QString BitFieldDetailedWidget::getValue()
         }
     }
     if (valueComboBox) {
-        return options->value(valueComboBox->currentText());
+        for (int i = 0; i < options->length(); i++) {
+            if (options->at(i)->getDescription() == valueComboBox->currentText()) {
+                return options->at(i)->getValue();
+            }
+        }
+        return "0";
     }
 
     return value->text();
