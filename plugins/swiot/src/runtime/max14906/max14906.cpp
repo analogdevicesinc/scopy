@@ -51,8 +51,7 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	m_readerThread(new ReaderThread(false, m_cmdQueue))
 {
 	this->ui->setupUi(this);
-	/* One of the channels is a fault channel, it has no DIO capabilities */
-	m_nbDioChannels = max14906ToolController->getChannelCount() - 1;
+	m_nbDioChannels = max14906ToolController->getChannelCount();
 
 	this->setupDynamicUi(this);
 	this->connectSignalsAndSlots();
