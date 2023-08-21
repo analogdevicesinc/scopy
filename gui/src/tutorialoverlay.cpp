@@ -122,6 +122,7 @@ void TutorialOverlay::buildUi()
 	ui->title->setStyleSheet("color:white");
 	ui->btnNext->setStyleSheet("width:80;height:20");
 	ui->btnNext->setProperty("blue_button", true);
+	ui->btnNext->setFocus();
 	connect(ui->btnNext,&QPushButton::clicked,this,&TutorialOverlay::next);
 
 	overlay->raise();
