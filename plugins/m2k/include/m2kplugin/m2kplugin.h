@@ -43,6 +43,7 @@ public:
 	void init() override;
 	void saveSettings(QSettings &s) override;
 	void loadSettings(QSettings &s) override;
+
 	QString description() override;
 
 public Q_SLOTS:
@@ -76,6 +77,7 @@ private:
 	QMap<QString,ToolMenuEntry*> toolMenuEntryCalibrationCache;
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
+	void cleanup();
 
 };
 }
