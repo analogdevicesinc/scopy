@@ -150,7 +150,8 @@ void BufferPlotHandler::setHandlesName(QMap<int, QString> chnlsId)
 {
 	connect(m_plot, &CapturePlot::channelOffsetChanged, this, [=, this] (int chn, double offset) {
 		double unitPerDiv = m_plot->VertUnitsPerDiv(chn);
-		setUnitPerDivision(chn, unitPerDiv);
+		int curveId = m_channelCurveId[chn];
+		setUnitPerDivision(curveId, unitPerDiv);
 
 	});
 	QList<RoundedHandleV *> offsetHandles = m_plot->getOffsetHandles();
