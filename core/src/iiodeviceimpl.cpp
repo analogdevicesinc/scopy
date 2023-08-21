@@ -13,3 +13,13 @@ void IIODeviceImpl::init()
 	cp->close(m_param);
 }
 
+bool IIODeviceImpl::verify()
+{
+	iio_context *ctx = ContextProvider::GetInstance()->open(m_param);
+	if (!ctx) {
+		return false;
+	}
+	ContextProvider::GetInstance()->close(m_param);
+	return true;
+}
+
