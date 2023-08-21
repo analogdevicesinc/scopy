@@ -152,10 +152,10 @@ QVector<BitFieldModel*> *XmlFileManager::getBitFieldsOfRegister(QDomElement reg,
         // after getting all available bitfields sort the list and add all the missing bits as reserved
         if (!bitFieldsList->empty()) {
             QVector<BitFieldModel*>  *bitFieldsListWithReserved = new QVector<BitFieldModel*>();
-                if (regWidth > numberOfBits){
+            if (regWidth > numberOfBits){
                 //sort bitfield list
                 std::sort(bitFieldsList->begin(), bitFieldsList->end(), compareRegisters);
-                 bitFieldsListWithReserved->push_back(bitFieldsList->at(0));
+                bitFieldsListWithReserved->push_back(bitFieldsList->at(0));
                 for (int i = 1; i < bitFieldsList->length(); i++) {
                     int bf1 = bitFieldsList->at(i - 1)->getRegOffset() + bitFieldsList->at(i -1)->getWidth();
                     int bf2 = bitFieldsList->at(i)->getRegOffset();
@@ -187,8 +187,11 @@ BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
         QDomElement bitFieldOptions = bitField.firstChildElement("Options");
         QDomElement bfOption = bitFieldOptions.firstChildElement("Option");
         while (!bfOption.isNull()) {
-            options->push_back(new BitFieldOption(bfOption.firstChildElement("Value").firstChild().toText().data(),
-                                                  bfOption.firstChildElement("Description").firstChild().toText().data()));
+            bool ok;
+            options->push_back(new BitFieldOption(
+                QString::number(bfOption.firstChildElement("Value").firstChild().toText().data().toInt(&ok,16)),
+                bfOption.firstChildElement("Description").firstChild().toText().data() ));
+
             bfOption = bfOption.nextSibling().toElement();
         }
 
