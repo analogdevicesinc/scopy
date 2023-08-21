@@ -53,7 +53,9 @@ void BufferMenuController::createConnections()
 		Q_EMIT setUnitPerDivision(m_chnlIdx, unitPerDiv);
 	});
 	connect(this, &BufferMenuController::unitPerDivisionChanged, this, [=, this] (int chnl, double unitPerDiv) {
-		Q_EMIT advMenu->unitPerDivisionChanged(unitPerDiv);
+		if (m_chnlIdx == chnl) {
+			Q_EMIT advMenu->unitPerDivisionChanged(unitPerDiv);
+		}
 	});
 
 	connect(advMenu, &BufferMenu::diagnosticFunctionUpdated, this, &BufferMenuController::diagnosticFunctionUpdated);
