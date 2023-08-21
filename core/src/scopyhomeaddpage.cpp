@@ -251,7 +251,7 @@ void ScopyHomeAddPage::verifyFinished()
 	bool result = fw->result();
 	if (result) {
 		ui->uriMessageLabel->clear();
-		createDevice();
+		createDevice("iio");
 	} else {
 		ui->uriMessageLabel->clear();
 		ui->uriMessageLabel->setText("\""+ui->editUri->text() + "\" not a valid context!");
@@ -285,6 +285,7 @@ void ScopyHomeAddPage::updateUri(QString uri)
 
 void ScopyHomeAddPage::addBtnClicked()
 {
+	//can be used only for iio devices
 	pendingUri = ui->editUri->text();
 	iio_context *ctx = ContextProvider::GetInstance()->open(deviceImpl->param());
 	if (!ctx) {
@@ -296,10 +297,10 @@ void ScopyHomeAddPage::addBtnClicked()
 	Q_EMIT newDeviceAvailable(deviceImpl);
 }
 
-void ScopyHomeAddPage::createDevice()
+void ScopyHomeAddPage::createDevice(QString cat)
 {
 	QString uri = ui->editUri->text();
-	deviceImpl = DeviceFactory::build(uri, pluginManager, "");
+	deviceImpl = DeviceFactory::build(uri, pluginManager, cat);
 	DeviceLoader* dl = new DeviceLoader(deviceImpl, this);
 	dl->init();
 	connect(dl, &DeviceLoader::initialized, this, &ScopyHomeAddPage::deviceLoaderInitialized);
