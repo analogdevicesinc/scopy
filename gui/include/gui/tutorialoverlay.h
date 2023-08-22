@@ -35,8 +35,8 @@ Q_SIGNALS:
 	void finished();
 
 private:
-
 	void buildUi();
+	bool eventFilter(QObject *watched, QEvent *event) override;
 
 	QList<TutorialChapter*> chapter;
 	QWidget *parent;
@@ -45,7 +45,6 @@ private:
 	QString title;
 	int cnt;
 	Ui::Tutorial *ui;
-
 };
 }
 
