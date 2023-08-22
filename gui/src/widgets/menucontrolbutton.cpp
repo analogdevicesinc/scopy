@@ -1,4 +1,5 @@
 #include <widgets/menucontrolbutton.h>
+#include <dynamicWidget.h>
 #include <stylehelper.h>
 
 using namespace scopy;

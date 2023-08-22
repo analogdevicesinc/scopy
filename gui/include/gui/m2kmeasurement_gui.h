@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef MEASUREMENT_GUI_H
-#define MEASUREMENT_GUI_H
+#ifndef M2KMEASUREMENT_GUI_H
+#define M2KMEASUREMENT_GUI_H
 
 #include "plot_utils.hpp"
 #include <QString>
@@ -28,19 +28,19 @@ class QColor;
 
 namespace scopy {
 
-class MeasurementData;
+class M2kMeasurementData;
 
-class SCOPY_GUI_EXPORT MeasurementGui
+class SCOPY_GUI_EXPORT M2kMeasurementGui
 {
 public:
-	MeasurementGui();
-	virtual ~MeasurementGui();
+	M2kMeasurementGui();
+	virtual ~M2kMeasurementGui();
 
 	QString name() const;
 	QString value() const;
 	void setLabelsColor(const QColor& color);
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale) = 0;
+	virtual void update(const M2kMeasurementData& data, double displayScale) = 0;
 
 protected:
 	QString m_name;
@@ -50,65 +50,65 @@ protected:
 	int m_minValLableWidth;
 };
 
-class SCOPY_GUI_EXPORT MetricMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT M2kMetricMeasurementGui: public M2kMeasurementGui
 {
 public:
-	MetricMeasurementGui();
+	M2kMetricMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const M2kMeasurementData& data, double displayScale);
 
 protected:
 	MetricPrefixFormatter m_formatter;
 };
 
-class SCOPY_GUI_EXPORT TimeMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT M2kTimeMeasurementGui: public M2kMeasurementGui
 {
 public:
-	TimeMeasurementGui();
+	M2kTimeMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const M2kMeasurementData& data, double displayScale);
 
 protected:
 	TimePrefixFormatter m_formatter;
 };
 
-class SCOPY_GUI_EXPORT PercentageMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT M2kPercentageMeasurementGui: public M2kMeasurementGui
 {
 public:
-	PercentageMeasurementGui();
+	M2kPercentageMeasurementGui();
 
 	virtual void init(QLabel *name, QLabel *value);
-	virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const M2kMeasurementData& data, double displayScale);
 };
 
-class SCOPY_GUI_EXPORT DecibelsMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT M2kDecibelsMeasurementGui: public M2kMeasurementGui
 {
 public:
-    DecibelsMeasurementGui();
+	M2kDecibelsMeasurementGui();
 
     virtual void init(QLabel *name, QLabel *value);
-    virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const M2kMeasurementData& data, double displayScale);
 };
 
-class SCOPY_GUI_EXPORT DecibelstoCarrierMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT M2kDecibelstoCarrierMeasurementGui: public M2kMeasurementGui
 {
 public:
-    DecibelstoCarrierMeasurementGui();
+	M2kDecibelstoCarrierMeasurementGui();
 
     virtual void init(QLabel *name, QLabel *value);
-    virtual void update(const MeasurementData& data, double displayScale);
+	virtual void update(const M2kMeasurementData& data, double displayScale);
 };
 
-class SCOPY_GUI_EXPORT DimensionlessMeasurementGui: public MeasurementGui
+class SCOPY_GUI_EXPORT M2kDimensionlessMeasurementGui: public M2kMeasurementGui
 {
 public:
-	DimensionlessMeasurementGui();
-
-	virtual void update(const MeasurementData& data, double displayScale);
+	M2kDimensionlessMeasurementGui();
+	
+	virtual void update(const M2kMeasurementData& data, double displayScale);
 };
 
 } // namespace scopy
 
-#endif // MEASUREMENT_GUI_H
+#endif // M2KMEASUREMENT_GUI_H

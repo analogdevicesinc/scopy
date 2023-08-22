@@ -23,13 +23,15 @@
 
 #include <vector>
 #include <qstring.h>
+#include <QObject>
 #include "scopy-gui_export.h"
 
 namespace scopy {
-	class SCOPY_GUI_EXPORT PrefixFormatter
+	class SCOPY_GUI_EXPORT PrefixFormatter : public QObject
 	{
+	Q_OBJECT
 	public:
-		PrefixFormatter(const std::vector<std::pair<QString, double>>&);
+		PrefixFormatter(const std::vector<std::pair<QString, double>>&, QObject *parent = nullptr);
 		virtual ~PrefixFormatter();
 		void setTwoDecimalMode(bool);
 		bool getTwoDecimalMode();
@@ -56,13 +58,13 @@ namespace scopy {
 	class SCOPY_GUI_EXPORT MetricPrefixFormatter: public PrefixFormatter
 	{
 	public:
-		MetricPrefixFormatter();
+		MetricPrefixFormatter(QObject *parent = nullptr);
 	};
 
 	class SCOPY_GUI_EXPORT TimePrefixFormatter: public PrefixFormatter
 	{
 	public:
-		TimePrefixFormatter();
+		TimePrefixFormatter(QObject *parent = nullptr);
 	};
 
 	/*

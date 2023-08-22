@@ -50,7 +50,7 @@
 #include "gui/customPushButton.h"
 #include "oscilloscope.hpp"
 #include "gui/dynamicWidget.h"
-#include "measurement_gui.h"
+#include "m2kmeasurement_gui.h"
 #include "measure_settings.h"
 #include "statistic_widget.h"
 #include "state_updater.h"
@@ -4351,24 +4351,24 @@ void Oscilloscope::update_measure_for_channel(int ch_idx)
 	measure_settings->setChannelUnderlineColor(chn_widget->color());
 }
 
-void Oscilloscope::measureCreateAndAppendGuiFrom(const MeasurementData&
+void Oscilloscope::measureCreateAndAppendGuiFrom(const M2kMeasurementData&
 		measurement)
 {
-	std::shared_ptr<MeasurementGui> p;
+	std::shared_ptr<M2kMeasurementGui> p;
 
 	switch(measurement.unitType()) {
-
-	case MeasurementData::METRIC:
-		p = std::make_shared<MetricMeasurementGui>();
+		
+	case M2kMeasurementData::METRIC:
+		p = std::make_shared<M2kMetricMeasurementGui>();
 		break;
-	case MeasurementData::TIME:
-		p = std::make_shared<TimeMeasurementGui>();
+	case M2kMeasurementData::TIME:
+		p = std::make_shared<M2kTimeMeasurementGui>();
 		break;
-	case MeasurementData::PERCENTAGE:
-		p = std::make_shared<PercentageMeasurementGui>();
+	case M2kMeasurementData::PERCENTAGE:
+		p = std::make_shared<M2kPercentageMeasurementGui>();
 		break;
-	case MeasurementData::DIMENSIONLESS:
-		p = std::make_shared<DimensionlessMeasurementGui>();
+	case M2kMeasurementData::DIMENSIONLESS:
+		p = std::make_shared<M2kDimensionlessMeasurementGui>();
 		break;
 	default:
 		break;
@@ -4461,7 +4461,7 @@ void Oscilloscope::measureUpdateValues()
 
 void Oscilloscope::measure_settings_init()
 {
-	QList<Measure *>* measure_obj = plot.getMeasurements();
+	QList<M2kMeasure *>* measure_obj = plot.getMeasurements();
 	measure_settings = new MeasureSettings(measure_obj, this);
 
 	int measure_panel = ui->stackedWidget->insertWidget(-1, measure_settings);
@@ -4538,7 +4538,7 @@ void Oscilloscope::onMeasurementDeactivated(int id, int chnIdx)
 	mList[id]->setEnabled(false);
 
 	auto it = find_if(measurements_data.begin(), measurements_data.end(),
-		[&](std::shared_ptr<MeasurementData> const& p)
+					  [&](std::shared_ptr<M2kMeasurementData> const& p)
 		{ return  (p->name() == name) && (p->channel() == chnIdx); });
 	if (it != measurements_data.end()) {
 		int i = it - measurements_data.begin();
@@ -4718,12 +4718,12 @@ void Oscilloscope::statisticsUpdateGuiPosIndex()
 
 void Oscilloscope::onStatisticActivated(int id, int chnIdx)
 {
-	std::shared_ptr<MeasurementData> pmd = plot.measurement(id, chnIdx);
+	std::shared_ptr<M2kMeasurementData> pmd = plot.measurement(id, chnIdx);
 	if (!pmd)
 		return;
-
-	statistics_data.push_back(QPair<std::shared_ptr<MeasurementData>,
-		Statistic>(pmd, Statistic()));
+	
+	statistics_data.push_back(QPair<std::shared_ptr<M2kMeasurementData>,
+									M2kStatistic>(pmd, M2kStatistic()));
 
 	/* Add a widget for the new statistic */
 	QWidget *statisticContainer = statistics_panel_ui->statistics;
@@ -4740,14 +4740,14 @@ void Oscilloscope::onStatisticActivated(int id, int chnIdx)
 
 void Oscilloscope::onStatisticDeactivated(int id, int chnIdx)
 {
-	std::shared_ptr<MeasurementData> pmd = plot.measurement(id, chnIdx);
+	std::shared_ptr<M2kMeasurementData> pmd = plot.measurement(id, chnIdx);
 	if (!pmd)
 		return;
 
 	QString name = pmd->name();
 
 	auto it = std::find_if(statistics_data.begin(), statistics_data.end(),
-		[&](QPair<std::shared_ptr<MeasurementData>, Statistic> pair) {
+						   [&](QPair<std::shared_ptr<M2kMeasurementData>, M2kStatistic> pair) {
 			return pair.first->name() == name &&
 				pair.first->channel() == chnIdx;
 		});

@@ -101,9 +101,9 @@ namespace Ui {
 namespace scopy {
 	class ChannelWidget;
 	class AnalogBufferPreviewer;
-	class MeasurementData;
+	class M2kMeasurementData;
 	class CustomPushButton;
-	class MeasurementGui;
+	class M2kMeasurementGui;
 
 }
 
@@ -404,12 +404,12 @@ namespace scopy::m2k {
 		QPushButton *menuRunButton;
 
 		QList<Channel_API *> channels_api;
-
-		QList<std::shared_ptr<MeasurementData>> measurements_data;
-		QList<std::shared_ptr<MeasurementGui>> measurements_gui;
-
-		QList<QPair<std::shared_ptr<MeasurementData>,
-			Statistic>> statistics_data;
+		
+		QList<std::shared_ptr<M2kMeasurementData>> measurements_data;
+		QList<std::shared_ptr<M2kMeasurementGui>> measurements_gui;
+		
+		QList<QPair<std::shared_ptr<M2kMeasurementData>,
+					M2kStatistic>> statistics_data;
 
 		QList<CustomPushButton *> menuOrder;
 
@@ -442,7 +442,7 @@ namespace scopy::m2k {
 		void measure_settings_init();
 		void measureLabelsRearrange();
 		void measureUpdateValues();
-		void measureCreateAndAppendGuiFrom(const MeasurementData&);
+		void measureCreateAndAppendGuiFrom(const M2kMeasurementData&);
 
 		void statistics_panel_init();
 		void statisticsUpdateValues();
