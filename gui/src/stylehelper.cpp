@@ -2,6 +2,14 @@
 #include <QApplication>
 #include "ui_spinbox_a.h"
 
+#include <dynamicWidget.h>
+#include <menu_anim.hpp>
+#include <semiexclusivebuttongroup.h>
+#include <spinbox_a.hpp>
+#include <smallOnOffSwitch.h>
+#include <customSwitch.h>
+#include <widgets/measurementlabel.h>
+
 using namespace scopy;
 
 StyleHelper* StyleHelper::pinstance_{nullptr};
@@ -101,6 +109,16 @@ void StyleHelper::BlueGrayButton(QPushButton *btn, QString objectName) {
 						)css");
 	btn->setStyleSheet(style);
 	btn->setIconSize(QSize(48,48));
+}
+
+void StyleHelper::MeasurementPanelLabel(MeasurementLabel *w, QString objectName)
+{
+	QString style = QString(R"css(
+						color: &&colorname&&;
+						)css");
+					style.replace(QString("&&colorname&&"),w->m_color.name());
+	w->m_nameLabel->setStyleSheet(style);
+	w->m_valueLabel->setStyleSheet(style);
 }
 
 void StyleHelper::BlueButton(QPushButton *btn, QString objectName) {

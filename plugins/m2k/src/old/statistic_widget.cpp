@@ -19,7 +19,7 @@
  */
 
 #include "statistic_widget.h"
-#include "gui/measure.h"
+#include "gui/m2kmeasure.h"
 #include "plot_utils.hpp"
 #include "ui_statistic.h"
 
@@ -166,7 +166,7 @@ void StatisticWidget::setPositionIndex(int pos)
 	}
 }
 
-void StatisticWidget::initForMeasurement(const MeasurementData &data)
+void StatisticWidget::initForMeasurement(const M2kMeasurementData &data)
 {
 	m_title = data.name();
 	m_channelId = data.channel();
@@ -179,21 +179,21 @@ void StatisticWidget::initForMeasurement(const MeasurementData &data)
 	QLabel *label = new QLabel(m_ui->label_avg);
 
 	switch(data.unitType()) {
-	case MeasurementData::METRIC:
+	case M2kMeasurementData::METRIC:
 		m_formatter = new MetricFormatter(data.unit());
 
 		label->setText("-999.999 mV");
 		m_valueLabelWidth = label->minimumSizeHint().width();
 
 		break;
-	case MeasurementData::TIME:
+	case M2kMeasurementData::TIME:
 		m_formatter = new TimeFormatter();
 
 		label->setText("-999.999 ms");
 		m_valueLabelWidth = label->minimumSizeHint().width();
 
 		break;
-	case MeasurementData::PERCENTAGE:
+	case M2kMeasurementData::PERCENTAGE:
 		m_formatter = new PercentageFormatter();
 
 		label->setText("100.00 %");
@@ -216,7 +216,7 @@ void StatisticWidget::initForMeasurement(const MeasurementData &data)
 	delete label;
 }
 
-void StatisticWidget::updateStatistics(const Statistic& data)
+void StatisticWidget::updateStatistics(const M2kStatistic& data)
 {
 	QString avg_text;
 	QString min_text;

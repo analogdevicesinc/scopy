@@ -22,7 +22,7 @@
 #define M2K_OSCILLOSCOPE_PLOT_H
 
 #include "TimeDomainDisplayPlot.h"
-#include "measure.h"
+#include "m2kmeasure.h"
 #include "customplotpositionbutton.h"
 #include "graticule.h"
 
@@ -91,11 +91,11 @@ namespace scopy {
 		void removeOffsetWidgets(int chnIdx);
 		void removeLeftVertAxis(unsigned int axis);
 
-		QList<Measure *>* getMeasurements();
+		QList<M2kMeasure *>* getMeasurements();
 		void measure();
 		int activeMeasurementsCount(int chnIdx);
-		QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
-		std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
+		QList<std::shared_ptr<M2kMeasurementData>> measurements(int chnIdx);
+		std::shared_ptr<M2kMeasurementData> measurement(int id, int chnIdx);
 
 		OscPlotZoomer* getZoomer();
 		void setOffsetInterval(double minValue, double maxValue);
@@ -197,7 +197,7 @@ namespace scopy {
 		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
 	private:
-		Measure* measureOfChannel(int chnIdx) const;
+		M2kMeasure* measureOfChannel(int chnIdx) const;
 		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
 		void updateHandleAreaPadding(bool);
 		void updateGateMargins();
@@ -277,7 +277,7 @@ namespace scopy {
 		QPen d_timeTriggerInactiveLinePen;
 		QPen d_timeTriggerActiveLinePen;
 
-	        QList<Measure *> d_measureObjs;
+	        QList<M2kMeasure *> d_measureObjs;
 
 		double value_v1, value_v2, value_h1, value_h2;
 		double value_gateLeft, value_gateRight;

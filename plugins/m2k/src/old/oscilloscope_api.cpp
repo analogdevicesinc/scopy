@@ -920,7 +920,7 @@ QList<double> Channel_API::data() const
 	double Channel_API::measured_ ## m () const\
 	{\
 		int index = osc->channels_api.indexOf(const_cast<Channel_API*>(this));\
-		auto measData = osc->plot.measurement(Measure::t, index);\
+		auto measData = osc->plot.measurement(M2kMeasure::t, index);\
 		return measData->value();\
 	}
 DECLARE_MEASURE(period, PERIOD)
