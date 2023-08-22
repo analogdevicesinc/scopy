@@ -1,5 +1,6 @@
 #include "tutorialoverlay.h"
 #include <QLoggingCategory>
+#include <QResizeEvent>
 #include "ui_tutorial.h"
 
 Q_LOGGING_CATEGORY(CAT_TUTORIALOVERLAY,"TutorialOverlay");
@@ -9,6 +10,7 @@ TutorialOverlay::TutorialOverlay(QWidget *parent)
 {
 	qDebug(CAT_TUTORIALOVERLAY)<<"ctor";
 	overlay = nullptr;
+	this->parent->installEventFilter(this);
 }
 
 TutorialOverlay::~TutorialOverlay()
@@ -138,4 +140,17 @@ const QString &TutorialOverlay::getTitle() const
 void TutorialOverlay::setTitle(const QString &newTitle)
 {
 	title = newTitle;
+}
+
+bool TutorialOverlay::eventFilter(QObject *watched, QEvent *event) {
+	if (watched == this->parent && event->type() == QEvent::Resize) {
+		QWidget* w = qobject_cast<QWidget*>(watched);
+		if (w) {
+			QSize s = w->size();
+			this->overlay->resize(s);
+			this->move((overlay->width() - this->width()) / 2, (overlay->height() - this->height()) / 2);
+		}
+	}
+
+	return QObject::eventFilter(watched, event);
 }
