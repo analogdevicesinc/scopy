@@ -102,7 +102,7 @@ void TutorialOverlay::next()
 
 	cnt++;
 	if(cnt == chapter.count())
-		ui->btnNext->setText("Finish");
+		ui->btnNext->setText(tr("Finish"));
 }
 
 void TutorialOverlay::finish() {
@@ -122,6 +122,7 @@ void TutorialOverlay::buildUi()
 	ui->setupUi(this);
 	ui->description->setStyleSheet("background-color: rgba(0,0,0,60);color: white;");
 	ui->title->setStyleSheet("color:white");
+	ui->btnNext->setText(tr(ui->btnNext->text().toStdString().c_str()));
 	ui->btnNext->setStyleSheet("width:80;height:20");
 	ui->btnNext->setProperty("blue_button", true);
 	ui->btnNext->setFocus();
