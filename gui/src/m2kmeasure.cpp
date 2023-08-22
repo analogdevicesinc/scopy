@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "measure.h"
+#include "m2kmeasure.h"
 #include <fstream>
 #include <cmath>
 #include <qmath.h>
@@ -189,10 +189,10 @@ namespace scopy {
 		}
 	};
 
-	class CrossingDetection
+	class M2kCrossingDetection
 	{
 	public:
-		CrossingDetection(double level, double hysteresis_span,
+		M2kCrossingDetection(double level, double hysteresis_span,
 				const QString &name):
 			m_posCrossFound(false),
 			m_negCrossFound(false),
@@ -718,7 +718,7 @@ namespace scopy {
 	};
 }
 
-Measure::Measure(int channel, double *buffer, size_t length,
+M2kMeasure::M2kMeasure(int channel, double *buffer, size_t length,
 		 const std::function<double(unsigned int, double, bool)> &conversion_fct, bool isTimeDomain):
 	m_channel(channel),
 	m_buffer(buffer),
@@ -738,79 +738,79 @@ Measure::Measure(int channel, double *buffer, size_t length,
 	if(m_isTimeDomain) {
 
 		// Create a set of measurements
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Period"),
-									   MeasurementData::HORIZONTAL, "s",  channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Frequency"),
-									   MeasurementData::HORIZONTAL, "Hz", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Min"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Max"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Peak-peak"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Mean"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Mean"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("RMS"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle RMS"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("AC RMS"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Area"),
-									   MeasurementData::VERTICAL, "Vs", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Area"),
-									   MeasurementData::VERTICAL, "Vs", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Low"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("High"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Amplitude"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Middle"),
-									   MeasurementData::VERTICAL, "V", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Over"),
-									   MeasurementData::VERTICAL, "%", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Over"),
-									   MeasurementData::VERTICAL, "%", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Rise"),
-									   MeasurementData::HORIZONTAL, "s", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Fall"),
-									   MeasurementData::HORIZONTAL, "s", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Width"),
-									   MeasurementData::HORIZONTAL, "s", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Width"),
-									   MeasurementData::HORIZONTAL, "s", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Duty"),
-									   MeasurementData::HORIZONTAL, "%", channel));
-		m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Duty"),
-									   MeasurementData::HORIZONTAL, "%", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Period"),
+																	  M2kMeasurementData::HORIZONTAL, "s",  channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Frequency"),
+																	  M2kMeasurementData::HORIZONTAL, "Hz", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Min"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Max"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Peak-peak"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Mean"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Cycle Mean"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("RMS"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Cycle RMS"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("AC RMS"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Area"),
+																	  M2kMeasurementData::VERTICAL, "Vs", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Cycle Area"),
+																	  M2kMeasurementData::VERTICAL, "Vs", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Low"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("High"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Amplitude"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Middle"),
+																	  M2kMeasurementData::VERTICAL, "V", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("+Over"),
+																	  M2kMeasurementData::VERTICAL, "%", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("-Over"),
+																	  M2kMeasurementData::VERTICAL, "%", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Rise"),
+																	  M2kMeasurementData::HORIZONTAL, "s", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("Fall"),
+																	  M2kMeasurementData::HORIZONTAL, "s", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("+Width"),
+																	  M2kMeasurementData::HORIZONTAL, "s", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("-Width"),
+																	  M2kMeasurementData::HORIZONTAL, "s", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("+Duty"),
+																	  M2kMeasurementData::HORIZONTAL, "%", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>(QObject::tr("-Duty"),
+																	  M2kMeasurementData::HORIZONTAL, "%", channel));
 	} else {
-	    //Spectral Measurements
-	    m_measurements.push_back(std::make_shared<MeasurementData>("Noise_Floor",
-		MeasurementData::HORIZONTAL_F, "dB", channel));
-	    m_measurements.push_back(std::make_shared<MeasurementData>("SINAD",
-		MeasurementData::HORIZONTAL_F, "dB", channel));
-	    m_measurements.push_back(std::make_shared<MeasurementData>("SNR",
-		MeasurementData::HORIZONTAL_F, "dB", channel));
-	    m_measurements.push_back(std::make_shared<MeasurementData>("THD",
-		MeasurementData::HORIZONTAL_F, "dB", channel));
-	    m_measurements.push_back(std::make_shared<MeasurementData>("THDN",
-		MeasurementData::HORIZONTAL_F, "dB", channel));
-	    m_measurements.push_back(std::make_shared<MeasurementData>("SFDR",
-		MeasurementData::VERTICAL_F, "dBc", channel));
+		//Spectral Measurements
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>("Noise_Floor",
+																	  M2kMeasurementData::HORIZONTAL_F, "dB", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>("SINAD",
+																	  M2kMeasurementData::HORIZONTAL_F, "dB", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>("SNR",
+																	  M2kMeasurementData::HORIZONTAL_F, "dB", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>("THD",
+																	  M2kMeasurementData::HORIZONTAL_F, "dB", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>("THDN",
+																	  M2kMeasurementData::HORIZONTAL_F, "dB", channel));
+		m_measurements.push_back(std::make_shared<M2kMeasurementData>("SFDR",
+																	  M2kMeasurementData::VERTICAL_F, "dBc", channel));
 	}
 
 }
 
-void Measure::setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp)
+void M2kMeasure::setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp)
 {
 	m_conversion_function = fp;
 
 }
 
-bool Measure::highLowFromHistogram(double &low, double &high,
+bool M2kMeasure::highLowFromHistogram(double &low, double &high,
 		double min, double max)
 {
 	bool success = false;
@@ -855,19 +855,19 @@ bool Measure::highLowFromHistogram(double &low, double &high,
 	return success;
 }
 
-void Measure::clearMeasurements()
+void M2kMeasure::clearMeasurements()
 {
 	 for (int i = 0; i < m_measurements.size(); i++)
 		m_measurements[i]->setMeasured(false);
 }
 
-void Measure::setDataSource(double *buffer, size_t length)
+void M2kMeasure::setDataSource(double *buffer, size_t length)
 {
 	m_buffer = buffer;
 	m_buf_length = length;
 }
 
-void Measure::measure()
+void M2kMeasure::measure()
 {
 	clearMeasurements();
 
@@ -881,7 +881,7 @@ void Measure::measure()
 	}
 }
 
-void Measure::measureTimeDomain()
+void M2kMeasure::measureTimeDomain()
 {
 	double period;
 	double frequency;
@@ -953,7 +953,7 @@ void Measure::measureTimeDomain()
 		endIndex = data_length;
 	}
 
-	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
+	m_cross_detect = new M2kCrossingDetection(m_cross_level, m_hysteresis_span,
 			"P");
 	if (using_histogram_method)
 		m_histogram = new int[adc_span]{};
@@ -1081,9 +1081,9 @@ void Measure::measureTimeDomain()
 		double midRef = low + (0.5 * amplitude);
 		double highRef = low + (0.9 * amplitude);
 
-		CrossingDetection cdLow(lowRef, 0.2, "L");
-		CrossingDetection cdMid(midRef, 0.2, "M");
-		CrossingDetection cdHigh(highRef, 0.2, "H");
+		M2kCrossingDetection cdLow(lowRef, 0.2, "L");
+		M2kCrossingDetection cdMid(midRef, 0.2, "M");
+		M2kCrossingDetection cdHigh(highRef, 0.2, "H");
 
 		QList<CrossPoint> crossSequence;
 		cdLow.setExternalList(&crossSequence);
@@ -1200,7 +1200,7 @@ void Measure::measureTimeDomain()
 
 }
 
-void Measure::measureSpectral() {
+void M2kMeasure::measureSpectral() {
 
     //TODO - reconsider computation of measurements
     double spur, harm_dist, noise, average_noise = 0, signal;
@@ -1230,52 +1230,52 @@ void Measure::measureSpectral() {
 }
 
 
-double Measure::sampleRate()
+double M2kMeasure::sampleRate()
 {
 	return m_sample_rate;
 }
 
-void Measure::setSampleRate(double value)
+void M2kMeasure::setSampleRate(double value)
 {
 	m_sample_rate = value;
 }
 
-unsigned int Measure::adcBitCount()
+unsigned int M2kMeasure::adcBitCount()
 {
 	return m_adc_bit_count;
 }
 
-void Measure::setAdcBitCount(unsigned int val)
+void M2kMeasure::setAdcBitCount(unsigned int val)
 {
 	m_adc_bit_count = val;
 }
 
-double Measure::crossLevel()
+double M2kMeasure::crossLevel()
 {
 	return m_cross_level;
 }
 
-void Measure::setCrossLevel(double value)
+void M2kMeasure::setCrossLevel(double value)
 {
 	m_cross_level = value;
 }
 
-double Measure::hysteresisSpan()
+double M2kMeasure::hysteresisSpan()
 {
 	return m_hysteresis_span;
 }
 
-void Measure::setHysteresisSpan(double value)
+void M2kMeasure::setHysteresisSpan(double value)
 {
 	m_hysteresis_span = value;
 }
 
-int Measure::channel() const
+int M2kMeasure::channel() const
 {
 	return m_channel;
 }
 
-void Measure::setChannel(int channel)
+void M2kMeasure::setChannel(int channel)
 {
 	if (m_channel != channel) {
 		for (int i = 0; i < m_measurements.size(); i++) {
@@ -1285,21 +1285,21 @@ void Measure::setChannel(int channel)
 	}
 }
 
-void Measure::setStartIndex(int index)
+void M2kMeasure::setStartIndex(int index)
 {
 	m_startIndex = index;
 }
 
-void Measure::setEndIndex(int index)
+void M2kMeasure::setEndIndex(int index)
 {
 	m_endIndex = index;
 }
 
-void Measure::setGatingEnabled(bool enable){
+void M2kMeasure::setGatingEnabled(bool enable){
 	m_gatingEnabled = enable;
 }
 
-std::vector<int> Measure::LoadMaskfromFile(std::string file_name)
+std::vector<int> M2kMeasure::LoadMaskfromFile(std::string file_name)
 {
     std::vector<int> mask;
     std::ifstream mask_file(file_name.c_str());
@@ -1314,27 +1314,27 @@ std::vector<int> Measure::LoadMaskfromFile(std::string file_name)
     return mask;
 }
 
-void Measure::setHarmonicNumber(int harmonics_number)
+void M2kMeasure::setHarmonicNumber(int harmonics_number)
 {
     m_harmonics_number = harmonics_number;
 }
 
-void Measure::setMask(std::vector<int> mask)
+void M2kMeasure::setMask(std::vector<int> mask)
 {
     std::vector<int> m_mask = mask;
 }
 
-QList<std::shared_ptr<MeasurementData>> Measure::measurments()
+QList<std::shared_ptr<M2kMeasurementData>> M2kMeasure::measurments()
 {
 	return m_measurements;
 }
 
-std::shared_ptr<MeasurementData> Measure::measurement(int id)
+std::shared_ptr<M2kMeasurementData> M2kMeasure::measurement(int id)
 {
 	return m_measurements[id];
 }
 
-int Measure::activeMeasurementsCount() const
+int M2kMeasure::activeMeasurementsCount() const
 {
 	int count = 0;
 
@@ -1349,7 +1349,7 @@ int Measure::activeMeasurementsCount() const
  * Class MeasurementData implementation
  */
 
-MeasurementData::MeasurementData(const QString& name, axisType axis,
+M2kMeasurementData::M2kMeasurementData(const QString& name, axisType axis,
 		const QString& unit, int channel):
 	m_name(name),
 	m_value(0),
@@ -1374,63 +1374,63 @@ MeasurementData::MeasurementData(const QString& name, axisType axis,
 		m_unitType = METRIC;
 }
 
-QString MeasurementData::name() const
+QString M2kMeasurementData::name() const
 {
 	return m_name;
 }
 
-double MeasurementData::value() const
+double M2kMeasurementData::value() const
 {
 	return m_value;
 }
 
-void MeasurementData::setValue(double value)
+void M2kMeasurementData::setValue(double value)
 {
 	m_value = value;
 	m_measured = true;
 }
 
-bool MeasurementData::measured() const
+bool M2kMeasurementData::measured() const
 {
 	return m_measured;
 }
 
-void MeasurementData::setMeasured(bool state)
+void M2kMeasurementData::setMeasured(bool state)
 {
 	m_measured = state;
 }
 
-bool MeasurementData::enabled() const
+bool M2kMeasurementData::enabled() const
 {
 	return m_enabled;
 }
 
-void MeasurementData::setEnabled(bool en)
+void M2kMeasurementData::setEnabled(bool en)
 {
 	m_enabled = en;
 }
 
-QString MeasurementData::unit() const
+QString M2kMeasurementData::unit() const
 {
 	return m_unit;
 }
 
-MeasurementData::unitTypes MeasurementData::unitType() const
+M2kMeasurementData::unitTypes M2kMeasurementData::unitType() const
 {
 	return m_unitType;
 }
 
-int MeasurementData::channel() const
+int M2kMeasurementData::channel() const
 {
 	return m_channel;
 }
 
-void MeasurementData::setChannel(int channel)
+void M2kMeasurementData::setChannel(int channel)
 {
 	m_channel = channel;
 }
 
-MeasurementData::axisType MeasurementData::axis() const
+M2kMeasurementData::axisType M2kMeasurementData::axis() const
 {
 	return m_axis;
 }
@@ -1439,7 +1439,7 @@ MeasurementData::axisType MeasurementData::axis() const
  * Class Statistic implementation
  */
 
-Statistic::Statistic():
+M2kStatistic::M2kStatistic():
 	m_sum(0),
 	m_min(0),
 	m_max(0),
@@ -1448,7 +1448,7 @@ Statistic::Statistic():
 {
 }
 
-void Statistic::pushNewData(double data)
+void M2kStatistic::pushNewData(double data)
 {
 	m_sum += data;
 
@@ -1466,7 +1466,7 @@ void Statistic::pushNewData(double data)
 	m_average = m_sum / m_dataCount;
 }
 
-void Statistic::clear()
+void M2kStatistic::clear()
 {
 	m_sum = 0;
 	m_min = 0;
@@ -1475,22 +1475,22 @@ void Statistic::clear()
 	m_average = 0;
 }
 
-double Statistic::average() const
+double M2kStatistic::average() const
 {
 	return m_average;
 }
 
-double Statistic::min() const
+double M2kStatistic::min() const
 {
 	return m_min;
 }
 
-double Statistic::max() const
+double M2kStatistic::max() const
 {
 	return m_max;
 }
 
-double Statistic::numPushedData() const
+double M2kStatistic::numPushedData() const
 {
 	return m_dataCount;
 }

@@ -17,47 +17,49 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef MEASUREMENT_GUI_H
+#define MEASUREMENT_GUI_H
 
-#ifndef STATISTIC_WIDGET_H
-#define STATISTIC_WIDGET_H
-
+#include "plot_utils.hpp"
+#include <QString>
+#include <QWidget>
+#include <QHBoxLayout>
 #include <QLabel>
-
-namespace Ui {
-	class Statistic;
-}
+#include <QColor>
+#include <cmath>
+#include <stylehelper.h>
 
 namespace scopy {
 
-class M2kMeasurementData;
-class M2kStatistic;
-class Formatter;
+class MeasurementData;
 
-class StatisticWidget: public QWidget
-{
+class SCOPY_GUI_EXPORT MeasurementLabel : public QWidget {
+	friend class scopy::StyleHelper;
+	Q_OBJECT;
 public:
-	explicit StatisticWidget(QWidget *parent = nullptr);
-	~StatisticWidget();
+	MeasurementLabel(QWidget *parent = nullptr);
+	~MeasurementLabel();
 
-	QString title() const;
-	int channelId() const;
-	int positionIndex() const;
 
-	void setTitleColor(const QColor& color);
-	void setPositionIndex(int pos);
-	
-	void initForMeasurement(const M2kMeasurementData & data);
-	void updateStatistics(const M2kStatistic & data);
+	void setName(QString str);
+	void setUnit(QString str);
+	void setPrecision(int val);
+	void setColor(QColor color);
+	void setValue(double val);
+	void setMeasurementValueFormatter(PrefixFormatter* f);
+
+	QString name() const;
 
 private:
-	Ui::Statistic *m_ui;
-	QString m_title;
-	int m_channelId;
-	int m_posIndex;
-	Formatter *m_formatter;
-	int m_valueLabelWidth;
+	QColor m_color;
+	QString m_name;
+	QString m_unit;
+	int m_precision;
+	QLabel *m_nameLabel;
+	QLabel *m_valueLabel;
+	PrefixFormatter * m_formatter;
 };
 
 } // namespace scopy
 
-#endif // STATISTIC_WIDGET_H
+#endif // MEASUREMENT_GUI_H

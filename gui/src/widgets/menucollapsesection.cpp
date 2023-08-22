@@ -1,4 +1,5 @@
 #include <widgets/menucollapsesection.h>
+#include <smallOnOffSwitch.h>
 
 using namespace scopy;
 

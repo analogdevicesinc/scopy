@@ -6,6 +6,8 @@
 #include "grtimeplotaddon.h"
 #include "griiodevicesource.h"
 #include "griiofloatchannelsrc.h"
+#include "measurementcontroller.h"
+#include "measure.h"
 
 #include <QLabel>
 #include "scopy-gr-util_export.h"
@@ -54,12 +56,20 @@ public Q_SLOTS:
 	void onDeinit() override;
 	void preFlowBuild() override;
 
+	void onNewData(const float* xData, const float* yData, int size);
+
 	void onChannelAdded(ToolAddon*) override;
 	void onChannelRemoved(ToolAddon*) override;
 
 	void toggleAutoScale();
 	void autoscale();
 	void setYMode(YMode mode);
+
+Q_SIGNALS:
+	void enableMeasurement(MeasurementLabel*);
+	void disableMeasurement(MeasurementLabel*);
+
+
 private:
 	QString m_channelName;
 	GRDeviceAddon* m_dev;
@@ -69,6 +79,9 @@ private:
 	GRTimePlotAddon* m_plotAddon;
 	QPen m_pen;
 	QTimer *m_autoScaleTimer;
+
+	TimeChannelMeasurementController *m_measureController;
+	TimeMeasureModel *m_measureModel;
 
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
@@ -90,6 +103,7 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
+	QWidget *createMeasurementMenu(QWidget *parent);
 };
 }
 #endif // GRTIMECHANNELADDON_H

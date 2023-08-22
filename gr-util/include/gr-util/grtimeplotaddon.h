@@ -36,6 +36,7 @@ public:
 Q_SIGNALS:
 	void requestRebuild();
 	void requestStop();
+	void newData();
 	void xAxisUpdated();
 
 public Q_SLOTS:
@@ -62,6 +63,7 @@ public Q_SLOTS:
 	void setRollingMode(bool b);
 	void setDrawPlotTags(bool b);
 	void setSampleRate(double);
+	double sampleRate();
 	void setBufferSize(uint32_t size);
 	void setPlotSize(uint32_t size);
 	void handlePreferences(QString,QVariant);

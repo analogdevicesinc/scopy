@@ -1,4 +1,6 @@
 #include <widgets/menuonoffswitch.h>
+#include <smallOnOffSwitch.h>
+#include <customSwitch.h>
 
 using namespace scopy;
 
