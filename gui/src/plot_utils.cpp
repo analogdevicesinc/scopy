@@ -30,7 +30,8 @@ using namespace std;
  * PrefixFormatter class implementation
  */
 
-PrefixFormatter::PrefixFormatter(const vector<pair<QString, double>> &prefixes):
+PrefixFormatter::PrefixFormatter(const vector<pair<QString, double>> &prefixes, QObject *parent ):
+	QObject(parent),
 	m_prefixes(prefixes),
 	m_twoDecimalMode(false)
 {
@@ -127,7 +128,7 @@ double PrefixFormatter::getFormatedValue(double value)
 /*
  * MetricPrefixFormatter class implementation
  */
-MetricPrefixFormatter::MetricPrefixFormatter():
+MetricPrefixFormatter::MetricPrefixFormatter(QObject *parent):
 	PrefixFormatter({
 					{"p", 1E-12},
 					{"n", 1E-9},
@@ -137,7 +138,8 @@ MetricPrefixFormatter::MetricPrefixFormatter():
 					{"k", 1E3},
 					{"M", 1E6},
 					{"G", 1E9},
-					{"T", 1E12} }
+					{"T", 1E12} },
+					parent
 				)
 {
 }
@@ -145,7 +147,7 @@ MetricPrefixFormatter::MetricPrefixFormatter():
 /*
  * TimePrefixFormatter class implementation
  */
-TimePrefixFormatter::TimePrefixFormatter():
+TimePrefixFormatter::TimePrefixFormatter(QObject *parent):
 	PrefixFormatter({
 					{"ps", 1E-12},
 					{"ns", 1E-9},
@@ -154,7 +156,8 @@ TimePrefixFormatter::TimePrefixFormatter():
 					{"s", 1E0},
 					{"min", 60},
 					{"hr", 60 * 60},
-					{"days", 24 * 60 * 60} }
+					{"days", 24 * 60 * 60} },
+					parent
 				)
 {
 }

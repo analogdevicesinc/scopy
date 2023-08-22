@@ -15,6 +15,7 @@
 #include <gui/widgets/menulineedit.h>
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
+#include "measurementselector.h"
 
 Q_LOGGING_CATEGORY(CAT_GR_TIME_CHANNEL, "GRTimeChannel");
 using namespace scopy::grutil;
@@ -185,6 +186,34 @@ QWidget* GRTimeChannelAddon::createCurveMenu(QWidget* parent) {
 	return curvecontainer;
 }
 
+QWidget* GRTimeChannelAddon::createMeasurementMenu(QWidget* parent) {
+
+	MenuSectionWidget *measureContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *measureSection = new MenuCollapseSection("MEASUREMENT",MenuCollapseSection::MHCW_NONE, measureContainer);
+	MeasurementSelector *measureSelector = new MeasurementSelector(measureSection);
+	measureSection->contentLayout()->addWidget(measureSelector);
+	measureContainer->contentLayout()->addWidget(measureSection);
+
+	m_measureModel = new TimeMeasureModel(nullptr,0,this);
+	m_measureController = new TimeChannelMeasurementController(m_measureModel, m_pen, this);
+	m_measureModel->setAdcBitCount(grch()->getFmt()->bits);
+
+	connect(m_measureController, &TimeChannelMeasurementController::measurementEnabled, this, &GRTimeChannelAddon::enableMeasurement);
+	connect(m_measureController, &TimeChannelMeasurementController::measurementDisabled, this, &GRTimeChannelAddon::disableMeasurement);
+
+	for(auto &meas : m_measureController->availableMeasurements()) {
+		measureSelector->addMeasurement(meas.name, meas.icon);
+		connect(measureSelector->measurement(meas.name)->measureCheckbox(), &QCheckBox::toggled, [=](bool b){
+			if(b)
+				m_measureController->enableMeasurement(meas.name);
+			else
+				m_measureController->disableMeasurement(meas.name);
+		});
+	}
+
+	return measureContainer;
+}
+
 QWidget* GRTimeChannelAddon::createMenu(QWidget* parent) {
 	QWidget *w = new QWidget(parent);
 	QVBoxLayout *lay = new QVBoxLayout(w);
@@ -195,10 +224,12 @@ QWidget* GRTimeChannelAddon::createMenu(QWidget* parent) {
 	MenuHeaderWidget *header = new MenuHeaderWidget(m_channelName, m_pen, w);
 	QWidget* yaxismenu = createYAxisMenu(w);
 	QWidget* curvemenu = createCurveMenu(w);
+	QWidget* measuremenu = createMeasurementMenu(w);
 
 	lay->addWidget(header);
 	lay->addWidget(yaxismenu);
 	lay->addWidget(curvemenu);
+	lay->addWidget(measuremenu);
 
 	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
@@ -240,6 +271,7 @@ void GRTimeChannelAddon::disable() {
 
 void GRTimeChannelAddon::onStart() {
 	m_running = true;
+	m_measureModel->setSampleRate(m_plotAddon->sampleRate());
 	toggleAutoScale();
 }
 
@@ -342,6 +374,12 @@ void GRTimeChannelAddon::preFlowBuild()
 {
 	double m_sampleRate = m_grch->readSampleRate();
 	qInfo()<<"READ SAMPLE RATE" << m_sampleRate;
+}
+
+void GRTimeChannelAddon::onNewData(const float* xData, const float* yData, int size)
+{
+	m_measureModel->setDataSource(yData, size);
+	m_measureModel->measure();
 }
 
 void GRTimeChannelAddon::onChannelAdded(ToolAddon *) {}

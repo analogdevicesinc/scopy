@@ -30,42 +30,42 @@ using namespace scopy;
 using namespace scopy::m2k;
 
 static const std::map<int, QString> icons_lut = {
-	{Measure::PERIOD, ":/gui/icons/measurements/period.svg"},
-	{Measure::FREQUENCY, ":/gui/icons/measurements/frequency.svg"},
-	{Measure::MIN, ":/gui/icons/measurements/min.svg"},
-	{Measure::MAX, ":/gui/icons/measurements/max.svg"},
-	{Measure::PEAK_PEAK, ":/gui/icons/measurements/peak_to_peak.svg"},
-	{Measure::MEAN, ":/gui/icons/measurements/mean.svg"},
-	{Measure::CYCLE_MEAN, ":/gui/icons/measurements/cycle_mean.svg"},
-	{Measure::RMS, ":/gui/icons/measurements/rms.svg"},
-	{Measure::CYCLE_RMS, ":/gui/icons/measurements/cycle_rms.svg"},
-	{Measure::AC_RMS, ":/gui/icons/measurements/rms.svg"},
-	{Measure::AREA, ":/gui/icons/measurements/area.svg"},
-	{Measure::CYCLE_AREA, ":/gui/icons/measurements/cycle_area.svg"},
-	{Measure::LOW, ":/gui/icons/measurements/low.svg"},
-	{Measure::HIGH, ":/gui/icons/measurements/high.svg"},
-	{Measure::AMPLITUDE, ":/gui/icons/measurements/amplitude.svg"},
-	{Measure::MIDDLE, ":/gui/icons/measurements/middle.svg"},
-	{Measure::P_OVER, ":/gui/icons/measurements/p_overshoot.svg"},
-	{Measure::N_OVER, ":/gui/icons/measurements/n_overshoot.svg"},
-	{Measure::RISE, ":/gui/icons/measurements/rise_time.svg"},
-	{Measure::FALL, ":/gui/icons/measurements/fall_time.svg"},
-	{Measure::P_WIDTH, ":/gui/icons/measurements/p_width.svg"},
-	{Measure::N_WIDTH, ":/gui/icons/measurements/n_width.svg"},
-	{Measure::P_DUTY, ":/gui/icons/measurements/p_duty.svg"},
-	{Measure::N_DUTY, ":/gui/icons/measurements/n_duty.svg"},
+	{M2kMeasure::PERIOD, ":/gui/icons/measurements/period.svg"},
+	{M2kMeasure::FREQUENCY, ":/gui/icons/measurements/frequency.svg"},
+	{M2kMeasure::MIN, ":/gui/icons/measurements/min.svg"},
+	{M2kMeasure::MAX, ":/gui/icons/measurements/max.svg"},
+	{M2kMeasure::PEAK_PEAK, ":/gui/icons/measurements/peak_to_peak.svg"},
+	{M2kMeasure::MEAN, ":/gui/icons/measurements/mean.svg"},
+	{M2kMeasure::CYCLE_MEAN, ":/gui/icons/measurements/cycle_mean.svg"},
+	{M2kMeasure::RMS, ":/gui/icons/measurements/rms.svg"},
+	{M2kMeasure::CYCLE_RMS, ":/gui/icons/measurements/cycle_rms.svg"},
+	{M2kMeasure::AC_RMS, ":/gui/icons/measurements/rms.svg"},
+	{M2kMeasure::AREA, ":/gui/icons/measurements/area.svg"},
+	{M2kMeasure::CYCLE_AREA, ":/gui/icons/measurements/cycle_area.svg"},
+	{M2kMeasure::LOW, ":/gui/icons/measurements/low.svg"},
+	{M2kMeasure::HIGH, ":/gui/icons/measurements/high.svg"},
+	{M2kMeasure::AMPLITUDE, ":/gui/icons/measurements/amplitude.svg"},
+	{M2kMeasure::MIDDLE, ":/gui/icons/measurements/middle.svg"},
+	{M2kMeasure::P_OVER, ":/gui/icons/measurements/p_overshoot.svg"},
+	{M2kMeasure::N_OVER, ":/gui/icons/measurements/n_overshoot.svg"},
+	{M2kMeasure::RISE, ":/gui/icons/measurements/rise_time.svg"},
+	{M2kMeasure::FALL, ":/gui/icons/measurements/fall_time.svg"},
+	{M2kMeasure::P_WIDTH, ":/gui/icons/measurements/p_width.svg"},
+	{M2kMeasure::N_WIDTH, ":/gui/icons/measurements/n_width.svg"},
+	{M2kMeasure::P_DUTY, ":/gui/icons/measurements/p_duty.svg"},
+	{M2kMeasure::N_DUTY, ":/gui/icons/measurements/n_duty.svg"},
 };
 
 static const std::map<int, QString> icons_spect = {
-	{Measure::NOISE_FLOOR, ":/gui/icons/measurements/period.svg"},
-	{Measure::SINAD, ":/gui/icons/measurements/frequency.svg"},
-	{Measure::SNR, ":/gui/icons/measurements/frequency.svg"},
-	{Measure::THD, ":/gui/icons/measurements/frequency.svg"},
-	{Measure::THDN, ":/gui/icons/measurements/frequency.svg"},
-	{Measure::SFDR, ":/gui/icons/measurements/frequency.svg"},
+	{M2kMeasure::NOISE_FLOOR, ":/gui/icons/measurements/period.svg"},
+	{M2kMeasure::SINAD, ":/gui/icons/measurements/frequency.svg"},
+	{M2kMeasure::SNR, ":/gui/icons/measurements/frequency.svg"},
+	{M2kMeasure::THD, ":/gui/icons/measurements/frequency.svg"},
+	{M2kMeasure::THDN, ":/gui/icons/measurements/frequency.svg"},
+	{M2kMeasure::SFDR, ":/gui/icons/measurements/frequency.svg"},
 };
 
-MeasureSettings::MeasureSettings( QList<Measure *>* measures_list, QWidget *parent, bool is_time_domain) :
+MeasureSettings::MeasureSettings( QList<M2kMeasure *>* measures_list, QWidget *parent, bool is_time_domain) :
     QWidget(parent),
     m_ui(new Ui::MeasureSettings),
     m_channelName(""),
@@ -165,7 +165,7 @@ MeasureSettings::~MeasureSettings()
 
 void MeasureSettings::onharmValueChanged(int id)
 {
-     Measure *measure = measureOfChannel(m_selectedChannel);
+     M2kMeasure *measure = measureOfChannel(m_selectedChannel);
      measure->setHarmonicNumber(id + 1);
 }
 
@@ -322,12 +322,12 @@ void MeasureSettings::on_button_measDeleteAll_toggled(bool checked)
 	}
 }
 
-Measure* MeasureSettings::measureOfChannel(int chnIdx) const
+M2kMeasure* MeasureSettings::measureOfChannel(int chnIdx) const
 {
-    Measure *measure = nullptr;
+    M2kMeasure *measure = nullptr;
 
     auto it = std::find_if(m_measures_list->begin(), m_measures_list->end(),
-	    [&](Measure *m) { return m->channel() == chnIdx; });
+	    [&](M2kMeasure *m) { return m->channel() == chnIdx; });
     if (it != m_measures_list->end())
 	measure = *it;
 
@@ -341,8 +341,8 @@ void MeasureSettings::onChannelAdded(int chnIdx)
     if (m_are_dropdowns_filled)
 	return;
 
-    Measure *measure = measureOfChannel(chnIdx);
-    auto measurements = QList<std::shared_ptr<MeasurementData>>();
+    M2kMeasure *measure = measureOfChannel(chnIdx);
+	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
     if (measure)
 	measurements = measure->measurments();
     int h = 0;
@@ -351,14 +351,14 @@ void MeasureSettings::onChannelAdded(int chnIdx)
     if(m_is_time_domain)
     {
 	for (int i = 0; i < measurements.size(); i++) {
-	    enum MeasurementData::axisType axis = measurements[i]->axis();
-
-	    if (axis == MeasurementData::HORIZONTAL) {
+			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
+			
+			if (axis == M2kMeasurementData::HORIZONTAL) {
 		m_horizMeasurements->addDropdownElement(
 			QIcon(icons_lut.at(i)),
 			measurements[i]->name(), QVariant(i));
 		m_measurePosInDropdowns.append(h++);
-	    } else if (axis == MeasurementData::VERTICAL) {
+			} else if (axis == M2kMeasurementData::VERTICAL) {
 		m_vertMeasurements->addDropdownElement(
 			QIcon(icons_lut.at(i)),
 			measurements[i]->name(), QVariant(i));
@@ -369,13 +369,13 @@ void MeasureSettings::onChannelAdded(int chnIdx)
     else
     {
 	for (int i = 0; i < measurements.size(); i++) {
-	    enum MeasurementData::axisType axis = measurements[i]->axis();
-
-	    if (axis == MeasurementData::HORIZONTAL_F) {
+		enum M2kMeasurementData::axisType axis = measurements[i]->axis();
+		
+		if (axis == M2kMeasurementData::HORIZONTAL_F) {
 		m_horizMeasurements->addDropdownElement(
 			QIcon(icons_spect.at(i)),
 			measurements[i]->name(), QVariant(i));
-	    } else if (axis == MeasurementData::VERTICAL_F) {
+		} else if (axis == M2kMeasurementData::VERTICAL_F) {
 		m_vertMeasurements->addDropdownElement(
 			QIcon(icons_spect.at(i)),
 			measurements[i]->name(), QVariant(i));
@@ -416,8 +416,8 @@ void MeasureSettings::setSelectedChannel(int chnIdx)
 
 void MeasureSettings::loadMeasurementStatesFromData()
 {
-	Measure *measure = measureOfChannel(m_selectedChannel);
-	    auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	M2kMeasure *measure = measureOfChannel(m_selectedChannel);
+	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
 	    if (measure)
 		measurements = measure->measurments();
 
@@ -436,11 +436,11 @@ void MeasureSettings::loadMeasurementStatesFromData()
 		for (int i = 0; i < measurements.size(); i++) {
 		    int axis = measurements[i]->axis();
 		    int state = measurements[i]->enabled();
-
-		    if (axis == MeasurementData::HORIZONTAL) {
+			
+			if (axis == M2kMeasurementData::HORIZONTAL) {
 			horiz_model->item(h_idx++, 1)->setData(
 				QVariant((int) state), Qt::EditRole);
-		    } else if (axis == MeasurementData::VERTICAL) {
+			} else if (axis == M2kMeasurementData::VERTICAL) {
 			vert_model->item(v_idx++, 1)->setData(
 				QVariant((int) state), Qt::EditRole);
 		    }
@@ -449,13 +449,13 @@ void MeasureSettings::loadMeasurementStatesFromData()
 	    else
 	    {
 		for (int i = 0; i < measurements.size(); i++) {
-		    enum MeasurementData::axisType axis = measurements[i]->axis();
+			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
 		    int state = measurements[i]->enabled();
-
-		    if (axis == MeasurementData::HORIZONTAL_F) {
+			
+			if (axis == M2kMeasurementData::HORIZONTAL_F) {
 			horiz_model->item(h_idx++, 1)->setData(
 				QVariant((int) state), Qt::EditRole);
-		    } else if (axis == MeasurementData::VERTICAL_F) {
+			} else if (axis == M2kMeasurementData::VERTICAL_F) {
 			vert_model->item(v_idx++, 1)->setData(
 				QVariant((int) state), Qt::EditRole);
 		    }
@@ -486,8 +486,8 @@ void MeasureSettings::displayAllMeasurements()
 	m_displayAllBackup = m_selectedMeasurements;
 	m_selectedMeasurements.clear();
 
-	Measure *measure = measureOfChannel(m_selectedChannel);
-	auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	M2kMeasure *measure = measureOfChannel(m_selectedChannel);
+	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
 	if (measure)
 		measurements = measure->measurments();
 
@@ -511,8 +511,8 @@ void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 	if (chnIdx < 0)
 		return;
 
-	Measure *measure = measureOfChannel(chnIdx);
-	auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	M2kMeasure *measure = measureOfChannel(chnIdx);
+	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
 	if (measure)
 		measurements = measure->measurments();
 
@@ -710,17 +710,17 @@ void MeasureSettings::recoverAllStatistics()
 
 void MeasureSettings::addStatistic(int measure_id, int ch_id)
 {
-	Measure *measure = measureOfChannel(ch_id);
-	auto measurements = QList<std::shared_ptr<MeasurementData>>();
+	M2kMeasure *measure = measureOfChannel(ch_id);
+	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
 	if (measure)
 	    measurements = measure->measurments();
-
-	MeasurementData::axisType axis = measurements[measure_id]->axis();
+	
+	M2kMeasurementData::axisType axis = measurements[measure_id]->axis();
 	struct StatisticSelection selection;
-
-	if (axis == MeasurementData::HORIZONTAL)
+	
+	if (axis == M2kMeasurementData::HORIZONTAL)
 		selection.dropdown = m_horizMeasurements;
-	else if (axis == MeasurementData::VERTICAL)
+	else if (axis == M2kMeasurementData::VERTICAL)
 		selection.dropdown = m_vertMeasurements;
 	else
 		return;

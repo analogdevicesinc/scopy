@@ -23,6 +23,7 @@ public:
 	void setRunning(bool newRunning);
 
 public Q_SLOTS:
+	void onNewData();
 	void run(bool);
 	void stop();
 	void start();

@@ -4,6 +4,7 @@
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/verticalchannelmanager.h>
+#include <gui/widgets/measurementpanel.h>
 
 using namespace scopy;
 using namespace scopy::grutil;
@@ -45,8 +46,11 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	cursor->setName("Cursors");
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 	MenuControlButton *measure = new MenuControlButton(this);
+
+	// create measurement panel here ? or measurement addon ?
 	measure->setName("Measure");
-	tool->topStack()->add("measure", new QLabel("Measure panel", this));
+	gui::MeasurementPanel* measure_panel = new gui::MeasurementPanel(this);
+	tool->topStack()->add("measure", measure_panel);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn,TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu,TTA_LEFT);
@@ -105,6 +109,8 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) { if(b) ch->enable(); else ch->disable();} );
 			connect(btn->button(), &QPushButton::toggled, this, [=](bool b) { if(b) tool->requestMenu(id);});
 			connect(btn, &QAbstractButton::toggled, this, [=](){plotAddon->plot()->selectChannel(ch->plotCh());});
+			connect(ch,&GRTimeChannelAddon::enableMeasurement, measure_panel, &gui::MeasurementPanel::addMeasurement);
+			connect(ch,&GRTimeChannelAddon::disableMeasurement, measure_panel, &gui::MeasurementPanel::removeMeasurement);
 			rightMenuBtnGrp->addButton(btn->button());
 			btn->checkBox()->setChecked(true);
 			plotAddon->onChannelAdded(ch);
