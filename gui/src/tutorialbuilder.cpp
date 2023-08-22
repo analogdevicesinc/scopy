@@ -179,7 +179,7 @@ void TutorialBuilder::readTutorialRequirements() {
 
 		ChapterInstructions chapterInstructions;
 		chapterInstructions.name = name;
-		chapterInstructions.description = description;
+		chapterInstructions.description = tr(description.toStdString().c_str());
 		chapterInstructions.widget = nullptr;
 		m_chapters.insert(index, chapterInstructions);
 	}
