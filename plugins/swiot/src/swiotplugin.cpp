@@ -97,7 +97,7 @@ bool SWIOTPlugin::loadExtraButtons()
 	connect(m_btnIdentify, SIGNAL(clicked()), m_swiotController, SLOT(identify()));
 
 	// The tutorial button will only be clickable when the user connects to the device
-	m_btnTutorial = new QPushButton("Tutorial"); m_extraButtons.append(m_btnTutorial);
+	m_btnTutorial = new QPushButton(tr("Tutorial")); m_extraButtons.append(m_btnTutorial);
 	m_btnTutorial->setEnabled(false);
 	m_btnTutorial->setToolTip("The tutorial will be available once the device is connected.");
 
