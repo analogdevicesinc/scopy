@@ -9,16 +9,18 @@
 
 #include <scopy-gui_export.h>
 #include <utils.h>
-#include <dynamicWidget.h>
-#include <menu_anim.hpp>
 
-#include <semiexclusivebuttongroup.h>
+
 #include <QVBoxLayout>
 #include <QComboBox>
-#include <spinbox_a.hpp>
-#include <smallOnOffSwitch.h>
-#include <customSwitch.h>
-#include "widgets/popupwidget.h"
+
+// Forward declarations
+namespace scopy {
+class SmallOnOffSwitch;
+class CustomSwitch;
+class SpinBoxA;
+class MeasurementLabel;
+}
 
 namespace scopy {
 class SCOPY_GUI_EXPORT StyleHelper : public QObject {
@@ -61,11 +63,11 @@ public:
 	static void MenuComboLabel(QLabel *w, QString objectName = "");
 	static void MenuHeaderLabel(QLabel *w, QString objectName = "");
 	static void MenuControlLabel(QLabel *w, QString objectName = "");
-	static void MenuBigSwitch(QWidget *w, QString objectName);
-	static void MenuBigSwitchButton(CustomSwitch *w, QString objectName);
-	static void MenuLineEdit(QLineEdit *m_edit, QString objectName);
-	static void MenuLineEditWidget(QWidget *w, QString objectName);
-	static void BlueGrayButton(QPushButton *btn, QString objectName);
+	static void MenuBigSwitch(QWidget *w, QString objectName = "");
+	static void MenuBigSwitchButton(CustomSwitch *w, QString objectName = "");
+	static void MenuLineEdit(QLineEdit *m_edit, QString objectName = "");
+	static void MenuLineEditWidget(QWidget *w, QString objectName = "");
+	static void BlueGrayButton(QPushButton *btn, QString objectName = "");
 	static void OverlayMenu(QWidget *w, QString objectName = "");
 	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName = "");
 	static void TabWidgetEastMenu(QTabWidget *w, QString objectName = "");
@@ -73,6 +75,7 @@ public:
 	static void BackgroundWidget(QWidget *w, QString objectName = "");
 	static void TabWidgetLabel(QLabel *w, QString objectName = "");
 	static void TutorialChapterTitleLabel(QLabel *w, QString objectName = "");
+	static void MeasurementPanelLabel(MeasurementLabel* w, QString objectName = "");
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;

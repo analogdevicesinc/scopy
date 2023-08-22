@@ -13,8 +13,6 @@
 #include "adcinstrument.h"
 #include "gui/stylehelper.h"
 
-
-
 Q_LOGGING_CATEGORY(CAT_ADCPLUGIN,"ADCPlugin");
 using namespace scopy;
 using namespace scopy::grutil;

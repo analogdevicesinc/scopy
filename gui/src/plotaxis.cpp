@@ -19,8 +19,8 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen,QObject *parent) :
 
 	// move this outside (?)
 	if(isHorizontal()) {
-		auto prefixFormatter = new TimePrefixFormatter();
-		m_scaleDraw = new OscScaleDraw(prefixFormatter,"");
+		auto prefixFormatter = new MetricPrefixFormatter();
+		m_scaleDraw = new OscScaleDraw(prefixFormatter,"s");
 	}
 	else  {
 		auto prefixFormatter = new MetricPrefixFormatter();

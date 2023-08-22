@@ -249,6 +249,11 @@ void GRTimePlotAddon::onStart() {
 				time_sink->time().data(),
 				time_sink->data()[index].data(),
 				time_sink->data()[index].size());
+
+			gr->onNewData(time_sink->time().data(),
+				time_sink->data()[index].data(),
+				time_sink->data()[index].size());
+
 			} else {
 			gr->plotCh()->curve()->setRawSamples(
 				time_sink->time().data(), 0, 0); // assign no data curve
@@ -397,8 +402,11 @@ void GRTimePlotAddon::setDrawPlotTags(bool b)
 	drawPlot();
 }
 
-void GRTimePlotAddon::setSampleRate(double val)
-{
+double GRTimePlotAddon::sampleRate() {
+	return m_sampleRate;
+}
+
+void GRTimePlotAddon::setSampleRate(double val) {
 	m_sampleRate = val;
 }
 

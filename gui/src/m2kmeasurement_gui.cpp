@@ -17,8 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include "measurement_gui.h"
-#include "measure.h"
+#include "m2kmeasurement_gui.h"
+#include "m2kmeasure.h"
 
 #include <QLabel>
 
@@ -27,7 +27,7 @@ using namespace scopy;
 /*
  * Class MeasurementGui implementation
  */
-MeasurementGui::MeasurementGui():
+M2kMeasurementGui::M2kMeasurementGui():
 	m_name(""),
 	m_value(""),
 	m_nameLabel(NULL),
@@ -36,21 +36,21 @@ MeasurementGui::MeasurementGui():
 {
 }
 
-MeasurementGui::~MeasurementGui()
+M2kMeasurementGui::~M2kMeasurementGui()
 {
 }
 
-QString MeasurementGui::name() const
+QString M2kMeasurementGui::name() const
 {
 	return m_name;
 }
 
-QString MeasurementGui::value() const
+QString M2kMeasurementGui::value() const
 {
 	return m_value;
 }
 
-void MeasurementGui::setLabelsColor(const QColor& color)
+void M2kMeasurementGui::setLabelsColor(const QColor& color)
 {
 	QString stylesheet = QString("color: %1;").arg(color.name());
 	if (m_nameLabel)
@@ -59,7 +59,7 @@ void MeasurementGui::setLabelsColor(const QColor& color)
 		m_valueLabel->setStyleSheet(stylesheet);
 }
 
-void MeasurementGui::init(QLabel *name, QLabel *value)
+void M2kMeasurementGui::init(QLabel *name, QLabel *value)
 {
 	m_nameLabel = name;
 	m_valueLabel = value;
@@ -70,12 +70,12 @@ void MeasurementGui::init(QLabel *name, QLabel *value)
  * Class MetricMeasurementGui implementation
  */
 
- MetricMeasurementGui::MetricMeasurementGui():
-		MeasurementGui()
+M2kMetricMeasurementGui::M2kMetricMeasurementGui():
+	M2kMeasurementGui()
 {
 }
 
-void MetricMeasurementGui::init(QLabel *name, QLabel *value)
+void M2kMetricMeasurementGui::init(QLabel *name, QLabel *value)
 {
 	// Get the necessary label width so that the label will never resize
 	QLabel *label = new QLabel(value);
@@ -84,15 +84,15 @@ void MetricMeasurementGui::init(QLabel *name, QLabel *value)
 	value->setMinimumWidth(m_minValLableWidth);
 	delete label;
 
-	MeasurementGui::init(name, value);
+	M2kMeasurementGui::init(name, value);
 }
 
-void MetricMeasurementGui::update(const MeasurementData& data, double displayScale)
+void M2kMetricMeasurementGui::update(const M2kMeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
-		if (data.axis() == MeasurementData::VERTICAL) {
+		if (data.axis() == M2kMeasurementData::VERTICAL) {
 			value *= displayScale;
 		}
 		m_value = m_formatter.format(value, data.unit(), 3);
@@ -108,12 +108,12 @@ void MetricMeasurementGui::update(const MeasurementData& data, double displaySca
  * Class TimeMeasurementGui implementation
  */
 
- TimeMeasurementGui::TimeMeasurementGui():
-		MeasurementGui()
+M2kTimeMeasurementGui::M2kTimeMeasurementGui():
+	M2kMeasurementGui()
 {
 }
 
-void TimeMeasurementGui::init(QLabel *name, QLabel *value)
+void M2kTimeMeasurementGui::init(QLabel *name, QLabel *value)
 {
 	// Get the necessary label width so that the label will never resize
 	QLabel *label = new QLabel(value);
@@ -122,16 +122,16 @@ void TimeMeasurementGui::init(QLabel *name, QLabel *value)
 	value->setMinimumWidth(m_minValLableWidth);
 	delete label;
 
-	MeasurementGui::init(name, value);
+	M2kMeasurementGui::init(name, value);
 }
 
-void TimeMeasurementGui::update(const MeasurementData& data, double displayScale)
+void M2kTimeMeasurementGui::update(const M2kMeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
-		if (data.axis() == MeasurementData::VERTICAL) {
+		if (data.axis() == M2kMeasurementData::VERTICAL) {
 			value *= displayScale;
 		}
 		m_value = m_formatter.format(value, "", 3);
@@ -146,12 +146,12 @@ void TimeMeasurementGui::update(const MeasurementData& data, double displayScale
  * Class PercentageMeasurementGui implementation
  */
 
- PercentageMeasurementGui::PercentageMeasurementGui():
-		MeasurementGui()
+M2kPercentageMeasurementGui::M2kPercentageMeasurementGui():
+	M2kMeasurementGui()
 {
 }
 
-void PercentageMeasurementGui::init(QLabel *name, QLabel *value)
+void M2kPercentageMeasurementGui::init(QLabel *name, QLabel *value)
 {
 	// Get the necessary label width so that the label will never resize
 	QLabel *label = new QLabel(value);
@@ -160,16 +160,16 @@ void PercentageMeasurementGui::init(QLabel *name, QLabel *value)
 	value->setMinimumWidth(m_minValLableWidth);
 	delete label;
 
-	MeasurementGui::init(name, value);
+	M2kMeasurementGui::init(name, value);
 }
 
-void PercentageMeasurementGui::update(const MeasurementData& data, double displayScale)
+void M2kPercentageMeasurementGui::update(const M2kMeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
-		if (data.axis() == MeasurementData::VERTICAL) {
+		if (data.axis() == M2kMeasurementData::VERTICAL) {
 			value *= displayScale;
 		}
 		m_value.setNum(value, 'f', 2);
@@ -186,12 +186,12 @@ void PercentageMeasurementGui::update(const MeasurementData& data, double displa
  * Class DecibelsMeasurementGui implementation
  */
 
- DecibelsMeasurementGui::DecibelsMeasurementGui():
-	MeasurementGui()
+ M2kDecibelsMeasurementGui::M2kDecibelsMeasurementGui():
+	M2kMeasurementGui()
 {
 }
 
-void DecibelsMeasurementGui::init(QLabel *name, QLabel *value)
+void M2kDecibelsMeasurementGui::init(QLabel *name, QLabel *value)
 {
     // Get the necessary label width so that the label will never resize
     QLabel *label = new QLabel(value);
@@ -200,16 +200,16 @@ void DecibelsMeasurementGui::init(QLabel *name, QLabel *value)
     value->setMinimumWidth(m_minValLableWidth);
     delete label;
 
-    MeasurementGui::init(name, value);
+	M2kMeasurementGui::init(name, value);
 }
 
-void DecibelsMeasurementGui::update(const MeasurementData& data, double displayScale)
+void M2kDecibelsMeasurementGui::update(const M2kMeasurementData& data, double displayScale)
 {
     m_name = data.name() + ":";
 
     if (data.measured() && data.enabled()) {
 	double value = data.value();
-	if (data.axis() == MeasurementData::VERTICAL_F) {
+		if (data.axis() == M2kMeasurementData::VERTICAL_F) {
 	    value *= displayScale;
 	}
 	m_value.setNum(value, 'f', 3);
@@ -226,12 +226,12 @@ void DecibelsMeasurementGui::update(const MeasurementData& data, double displayS
  * Class DecibelstoCarrierMeasurementGui implementation
  */
 
- DecibelstoCarrierMeasurementGui::DecibelstoCarrierMeasurementGui():
-	MeasurementGui()
+M2kDecibelstoCarrierMeasurementGui::M2kDecibelstoCarrierMeasurementGui():
+	M2kMeasurementGui()
 {
 }
 
-void DecibelstoCarrierMeasurementGui::init(QLabel *name, QLabel *value)
+void M2kDecibelstoCarrierMeasurementGui::init(QLabel *name, QLabel *value)
 {
     // Get the necessary label width so that the label will never resize
     QLabel *label = new QLabel(value);
@@ -240,16 +240,16 @@ void DecibelstoCarrierMeasurementGui::init(QLabel *name, QLabel *value)
     value->setMinimumWidth(m_minValLableWidth);
     delete label;
 
-    MeasurementGui::init(name, value);
+	M2kMeasurementGui::init(name, value);
 }
 
-void DecibelstoCarrierMeasurementGui::update(const MeasurementData& data, double displayScale)
+void M2kDecibelstoCarrierMeasurementGui::update(const M2kMeasurementData& data, double displayScale)
 {
     m_name = data.name() + ":";
 
     if (data.measured() && data.enabled()) {
 	double value = data.value();
-	if (data.axis() == MeasurementData::VERTICAL_F) {
+	if (data.axis() == M2kMeasurementData::VERTICAL_F) {
 	    value *= displayScale;
 	}
 	m_value.setNum(value, 'f', 3);
@@ -266,18 +266,18 @@ void DecibelstoCarrierMeasurementGui::update(const MeasurementData& data, double
  * Class DimensionlessMeasurementGui implementation
  */
 
- DimensionlessMeasurementGui::DimensionlessMeasurementGui():
-		MeasurementGui()
+M2kDimensionlessMeasurementGui::M2kDimensionlessMeasurementGui():
+	M2kMeasurementGui()
 {
 }
 
-void DimensionlessMeasurementGui::update(const MeasurementData& data, double displayScale)
+void M2kDimensionlessMeasurementGui::update(const M2kMeasurementData& data, double displayScale)
 {
 	m_name = data.name() + ":";
 
 	if (data.measured() && data.enabled()) {
 		double value = data.value();
-		if (data.axis() == MeasurementData::VERTICAL) {
+	if (data.axis() == M2kMeasurementData::VERTICAL) {
 			value *= displayScale;
 		}
 		m_value.setNum(value, 'f', 3);

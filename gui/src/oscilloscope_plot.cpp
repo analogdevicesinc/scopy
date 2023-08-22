@@ -455,7 +455,7 @@ void CapturePlot::replot()
 	}
 }
 
-QList<Measure *>* CapturePlot::getMeasurements()
+QList<M2kMeasure *>* CapturePlot::getMeasurements()
 {
     return &d_measureObjs;
 }
@@ -674,7 +674,7 @@ void CapturePlot::onGateBar1Moved(double value)
 	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
 
 	for (int i = 0; i < d_measureObjs.size(); i++) {
-		Measure *measure = d_measureObjs[i];
+		M2kMeasure *measure = d_measureObjs[i];
 		measure->setStartIndex(currentIndex);
 	}
 
@@ -718,7 +718,7 @@ void CapturePlot::onGateBar2Moved(double value)
 	int currentIndex = (value - minTime) / (maxTime-minTime) * n;
 
 	for (int i = 0; i < d_measureObjs.size(); i++) {
-		Measure *measure = d_measureObjs[i];
+		M2kMeasure *measure = d_measureObjs[i];
 		measure->setEndIndex(currentIndex);
 	}
 
@@ -889,12 +889,12 @@ int CapturePlot::getAnalogChannels() const
 	return d_ydata.size() + d_ref_ydata.size();
 }
 
-Measure* CapturePlot::measureOfChannel(int chnIdx) const
+M2kMeasure* CapturePlot::measureOfChannel(int chnIdx) const
 {
-	Measure *measure = nullptr;
+	M2kMeasure *measure = nullptr;
 
 	auto it = std::find_if(d_measureObjs.begin(), d_measureObjs.end(),
-		[&](Measure *m) { return m->channel() == chnIdx; });
+		[&](M2kMeasure *m) { return m->channel() == chnIdx; });
 	if (it != d_measureObjs.end())
 		measure = *it;
 
@@ -994,7 +994,7 @@ void CapturePlot::setGatingEnabled(bool enabled){
 			d_topGateHandlesArea->hide();
 		}
 		for (int i = 0; i < d_measureObjs.size(); i++) {
-			Measure *measure = d_measureObjs[i];
+			M2kMeasure *measure = d_measureObjs[i];
 			measure->setGatingEnabled(enabled);
 		}
 
@@ -1840,15 +1840,15 @@ void CapturePlot::onChannelAdded(int chnIdx)
 
 	/* Add Measure ojbect that handles all channel measurements */
 
-	Measure *measure = nullptr;
+	M2kMeasure *measure = nullptr;
 
 	if (isReferenceWaveform(Curve(chnIdx))) {
 		int idx = chnIdx - d_ydata.size();
-		measure = new Measure(chnIdx, d_ref_ydata[idx],
+		measure = new M2kMeasure(chnIdx, d_ref_ydata[idx],
 			Curve(chnIdx)->data()->size(), nullptr);
 	} else {
 		int count = countReferenceWaveform(chnIdx);
-		measure = new Measure(chnIdx, d_ydata[chnIdx - count],
+		measure = new M2kMeasure(chnIdx, d_ydata[chnIdx - count],
 			Curve(chnIdx)->data()->size(), m_conversion_function);
 	}
 
@@ -1862,7 +1862,7 @@ void CapturePlot::computeMeasurementsForChannel(unsigned int chnIdx, unsigned in
 		return;
 	}
 
-	Measure *measure = d_measureObjs[chnIdx];
+	M2kMeasure *measure = d_measureObjs[chnIdx];
 	measure->setSampleRate(sampleRate);
 	measure->measure();
 
@@ -1873,14 +1873,14 @@ void CapturePlot::setConversionFunction(const std::function<double(unsigned int,
 {
 	m_conversion_function = fp;
 	for (int i = 0; i < d_measureObjs.size(); i++) {
-		Measure *measure = d_measureObjs[i];
+		M2kMeasure *measure = d_measureObjs[i];
 		measure->setConversionFunction(fp);
 	}
 }
 
 void CapturePlot::cleanUpJustBeforeChannelRemoval(int chnIdx)
 {
-	Measure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 	if (measure) {
 		int pos = d_measureObjs.indexOf(measure);
 		for (int i = pos + 1; i < d_measureObjs.size(); i++) {
@@ -1944,7 +1944,7 @@ void CapturePlot::removeOffsetWidgets(int chnIdx)
 void CapturePlot::measure()
 {
 	for (int i = 0; i < d_measureObjs.size(); i++) {
-		Measure *measure = d_measureObjs[i];
+		M2kMeasure *measure = d_measureObjs[i];
 		if (measure->activeMeasurementsCount() > 0) {
 			measure->setSampleRate(this->sampleRate());
 			measure->measure();
@@ -1955,7 +1955,7 @@ void CapturePlot::measure()
 int CapturePlot::activeMeasurementsCount(int chnIdx)
 {
 	int count = -1;
-	Measure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 
 	if (measure)
 		count = measure->activeMeasurementsCount();
@@ -1968,7 +1968,7 @@ void CapturePlot::onNewDataReceived()
 	int ref_idx = 0;
 	if(d_measurementsEnabled) {
 		for (int i = 0; i < d_measureObjs.size(); i++) {
-			Measure *measure = d_measureObjs[i];
+			M2kMeasure *measure = d_measureObjs[i];
 			int chn = measure->channel();
 			if (isReferenceWaveform(Curve(chn))) {
 				measure->setDataSource(d_ref_ydata[ref_idx],
@@ -1992,23 +1992,23 @@ void CapturePlot::onNewDataReceived()
 	}
 }
 
-QList<std::shared_ptr<MeasurementData>> CapturePlot::measurements(int chnIdx)
+QList<std::shared_ptr<M2kMeasurementData>> CapturePlot::measurements(int chnIdx)
 {
-	Measure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 
 	if (measure)
 		return measure->measurments();
 	else
-		return QList<std::shared_ptr<MeasurementData>>();
+		return QList<std::shared_ptr<M2kMeasurementData>>();
 }
 
-std::shared_ptr<MeasurementData> CapturePlot::measurement(int id, int chnIdx)
+std::shared_ptr<M2kMeasurementData> CapturePlot::measurement(int id, int chnIdx)
 {
-	Measure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 	if (measure)
 		return measure->measurement(id);
 	else
-		return std::shared_ptr<MeasurementData>();
+		return std::shared_ptr<M2kMeasurementData>();
 }
 
 OscPlotZoomer *CapturePlot::getZoomer()
@@ -2036,14 +2036,14 @@ double CapturePlot::getMinOffsetValue()
 
 void CapturePlot::setPeriodDetectLevel(int chnIdx, double lvl)
 {
-	Measure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 	if (measure)
 		measure->setCrossLevel(lvl);
 }
 
 void CapturePlot::setPeriodDetectHyst(int chnIdx, double hyst)
 {
-	Measure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 	if (measure)
 		measure->setHysteresisSpan(hyst);
 }

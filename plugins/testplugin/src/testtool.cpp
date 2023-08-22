@@ -8,6 +8,7 @@
 #include "plotwidget.h"
 #include "plotaxis.h"
 #include "plotcursors.h"
+#include "spinbox_a.hpp"
 
 #include "spinbox_a.hpp"
 #include <gui/widgets/hoverwidget.h>

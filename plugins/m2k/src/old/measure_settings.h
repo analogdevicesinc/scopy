@@ -22,7 +22,7 @@
 
 #include <QWidget>
 #include <memory>
-#include "measure.h"
+#include "m2kmeasure.h"
 
 namespace Ui {
 	class MeasureSettings;
@@ -35,7 +35,7 @@ class QStandardItemModel;
 namespace scopy {
 class CapturePlot;
 class DropdownSwitchList;
-class MeasurementData;
+class M2kMeasurementData;
 }
 
 namespace scopy::m2k {
@@ -80,7 +80,7 @@ class MeasureSettings : public QWidget
 	Q_OBJECT
 
 public:
-	explicit MeasureSettings(QList<Measure *>* measures_list, QWidget *parent = 0, bool is_time_domain = true);
+	explicit MeasureSettings(QList<M2kMeasure *>* measures_list, QWidget *parent = 0, bool is_time_domain = true);
 	~MeasureSettings();
 
 	QString channelName() const;
@@ -138,7 +138,7 @@ private Q_SLOTS:
 private:
 	void hide_measure_settings(bool is_time_domain);
 	void deleteAllMeasurements();
-	Measure* measureOfChannel(int chnIdx) const;
+	M2kMeasure* measureOfChannel(int chnIdx) const;
 	void recoverAllMeasurements();
 	void displayAllMeasurements();
 	void disableDisplayAllMeasurements();
@@ -170,7 +170,7 @@ private:
 	bool m_enableDisplayAll;
 	bool m_is_time_domain;
 
-	QList<Measure *>* m_measures_list;
+	QList<M2kMeasure *>* m_measures_list;
 
 	int m_selectedChannel;
 	QList<MeasurementItem> m_selectedMeasurements;

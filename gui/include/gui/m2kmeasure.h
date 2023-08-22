@@ -18,8 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MEASURE_H
-#define MEASURE_H
+#ifndef M2KMEASURE_H
+#define M2KMEASURE_H
 
 #include <QList>
 #include <QString>
@@ -27,9 +27,9 @@
 #include "scopy-gui_export.h"
 
 namespace scopy {
-	class CrossingDetection;
+class M2kCrossingDetection;
 
-	class SCOPY_GUI_EXPORT MeasurementData
+class SCOPY_GUI_EXPORT M2kMeasurementData
 	{
 	public:
 		enum unitTypes {
@@ -48,7 +48,7 @@ namespace scopy {
 			VERTICAL_F
 		};
 
-		MeasurementData(const QString& name, axisType axis,
+		M2kMeasurementData(const QString& name, axisType axis,
 				const QString& unit = "", int channel = -1);
 
 		QString name() const;
@@ -75,7 +75,7 @@ namespace scopy {
 		enum axisType m_axis;
 	};
 
-	class SCOPY_GUI_EXPORT Measure
+	class SCOPY_GUI_EXPORT M2kMeasure
 	{
 	public:
 		enum defaultMeasurements {
@@ -116,7 +116,7 @@ namespace scopy {
 			    DEFAULT_SPECTRAL_MEASUREMENT_COUNT
 			};
 
-		Measure(int channel, double *buffer = NULL, size_t length = 0,
+		M2kMeasure(int channel, double *buffer = NULL, size_t length = 0,
 			const std::function<double(unsigned int, double, bool)> &conversion = nullptr, bool isTimeDomain = true);
 
 		void setDataSource(double *buffer, size_t length);
@@ -142,8 +142,8 @@ namespace scopy {
 		void setHarmonicNumber(int harmonics_number);
 		void setMask(std::vector<int> mask);
 
-		QList<std::shared_ptr<MeasurementData>> measurments();
-		std::shared_ptr<MeasurementData> measurement(int id);
+		QList<std::shared_ptr<M2kMeasurementData>> measurments();
+		std::shared_ptr<M2kMeasurementData> measurement(int id);
 		int activeMeasurementsCount() const;
 
 		void setConversionFunction(const std::function<double (unsigned int, double, bool)> &fp);
@@ -167,20 +167,20 @@ namespace scopy {
 		int m_endIndex;
 		int m_gatingEnabled;
 		int *m_histogram;
-		CrossingDetection *m_cross_detect;
+		M2kCrossingDetection *m_cross_detect;
 
 		int m_harmonics_number;
 		std::vector<int> m_mask;
 		bool m_isTimeDomain;
 
-		QList<std::shared_ptr<MeasurementData>> m_measurements;
+		QList<std::shared_ptr<M2kMeasurementData>> m_measurements;
 		std::function<double(unsigned int, double, bool)> m_conversion_function;
 	};
 
-	class SCOPY_GUI_EXPORT Statistic
+	class SCOPY_GUI_EXPORT M2kStatistic
 	{
 	public:
-		Statistic();
+		M2kStatistic();
 
 		void pushNewData(double data);
 		void clear();
@@ -199,4 +199,4 @@ namespace scopy {
 	};
 }
 
-#endif // MEASURE_H
+#endif // M2KMEASURE_H

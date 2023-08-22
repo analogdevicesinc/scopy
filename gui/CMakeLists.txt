@@ -84,8 +84,10 @@ generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_D
 configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 
-target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
+target_include_directories(${PROJECT_NAME} INTERFACE
+	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
+)
 target_include_directories(${PROJECT_NAME} PRIVATE
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/
 	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/widgets
@@ -104,11 +106,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	Qt${QT_VERSION_MAJOR}::Widgets
 	Qt${QT_VERSION_MAJOR}::Xml
 	Qt${QT_VERSION_MAJOR}::Svg
-	${Boost_LIBRARIES}
 	${QWT_LIBRARIES}
 	${Boost_LIBRARIES}
 	scopy-common
-    	scopy-pluginbase
+	scopy-pluginbase
 )
 
 install(TARGETS ${PROJECT_NAME}
