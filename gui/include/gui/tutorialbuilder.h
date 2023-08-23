@@ -77,7 +77,15 @@ private:
 		QWidget* widget;
 	};
 
-	QMap<uint16_t, ChapterInstructions> m_chapters;
+	QMap<uint16_t, QList<ChapterInstructions>> m_chapters;
+
+	/**
+	 * @brief Searches for the ChapterInstructions entries that have the name field matching the name parameter
+	 * @param name QString with the name of the ChapterInstructions that will be searched
+	 * @throws std::runtime_error Thrown when the name is not found in the m_chapters QMap
+	 * @return The list of references to the ChapterInstructions that were found with this name
+	 * */
+	QList<std::reference_wrapper<TutorialBuilder::ChapterInstructions>> getChapterInstructionFromName(const QString& name);
 };
 }
 
