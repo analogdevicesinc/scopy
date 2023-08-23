@@ -22,6 +22,7 @@
 
 #include "tutorialbuilder.h"
 #include <utility>
+#include <exception>
 #include <QLoggingCategory>
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -103,27 +104,36 @@ uint16_t TutorialBuilder::collectChapters() {
 
 		// if the object has no property named "tutorial_name", then it is not part of the tutorial
 		if (!currentObjectName.isEmpty()) {
-			for (ChapterInstructions& item: m_chapters) {
-				// add the object to the entry with the same name
-				if (item.name == currentObjectName) {
-					item.widget = qobject_cast<QWidget*>(child);
-					break;
+			try {
+				QList<std::reference_wrapper<TutorialBuilder::ChapterInstructions>> chapters = this->getChapterInstructionFromName(currentObjectName);
+				for (auto chapter: chapters) {
+					chapter.get().widget = qobject_cast<QWidget*>(child);
 				}
+				++chaptersCollected;
+			} catch (std::runtime_error &error) {
+				qCritical(CAT_TUTORIALBUILDER) << error.what();
 			}
-			++chaptersCollected;
 		}
 		++totalChaptersCollected;
 	}
 	qDebug(CAT_TUTORIALBUILDER) << "Collected a total of" << totalChaptersCollected << "in the" << m_jsonEntry << "entry.";
 
 	// add the now sorted chapters into the tutorial overlay
-	for (const auto &chapter: qAsConst(m_chapters)) {
-		if (chapter.widget) {
-			this->addChapter(chapter.widget, chapter.description);
-		} else {
-			// no widget with this name was found, it will not be included in the tutorial and a warning will be issued
-			qWarning(CAT_TUTORIALBUILDER) << "No object with the name" << chapter.name << "was found. The tutorial will skip this chapter.";
+	for (const auto &chapterList: qAsConst(m_chapters)) {
+		// init an empty list for the chapter widgets, all wiglets should have the same description
+		QList<QWidget*> chapterWidgets;
+		QString description = "";
+		for (const auto &chapter: qAsConst(chapterList)) {
+			if (chapter.widget) {
+				chapterWidgets.push_back(chapter.widget);
+				description = chapter.description;
+			} else {
+				// no widget with this name was found, it will not be included in the tutorial and a warning will be issued
+				qWarning(CAT_TUTORIALBUILDER) << "No object with the name" << chapter.name << "was found. The tutorial will skip this chapter.";
+			}
 		}
+
+		this->addChapter(chapterWidgets, description);
 	}
 
 	return chaptersCollected;
@@ -181,7 +191,28 @@ void TutorialBuilder::readTutorialRequirements() {
 		chapterInstructions.name = name;
 		chapterInstructions.description = tr(description.toStdString().c_str());
 		chapterInstructions.widget = nullptr;
-		m_chapters.insert(index, chapterInstructions);
+		if (m_chapters.contains(index)) {
+			m_chapters[index].append(chapterInstructions);
+		} else {
+			m_chapters.insert(index, {chapterInstructions});
+		}
+	}
+}
+
+QList<std::reference_wrapper<TutorialBuilder::ChapterInstructions>> TutorialBuilder::getChapterInstructionFromName(const QString& name) {
+	QList<std::reference_wrapper<TutorialBuilder::ChapterInstructions>> result;
+	for (auto& chapterList: m_chapters) {
+		for (auto& item: chapterList) {
+			if (item.name == name) {
+				result.push_back(item);
+			}
+		}
+	}
+
+	if (result.isEmpty()) {
+		throw std::runtime_error("Invalid name.");
+	} else {
+		return result;
 	}
 }
 
