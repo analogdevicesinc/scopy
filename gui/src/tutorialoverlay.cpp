@@ -10,7 +10,6 @@ TutorialOverlay::TutorialOverlay(QWidget *parent)
 {
 	qDebug(CAT_TUTORIALOVERLAY)<<"ctor";
 	overlay = nullptr;
-	this->parent->installEventFilter(this);
 }
 
 TutorialOverlay::~TutorialOverlay()
@@ -48,6 +47,8 @@ void TutorialOverlay::start()
 	cnt = 0;
 
 	buildUi();
+	// the event filter should be installed only after the UI is built
+	this->parent->installEventFilter(this);
 	next();
 }
 
