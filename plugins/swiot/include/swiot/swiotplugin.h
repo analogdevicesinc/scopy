@@ -67,6 +67,7 @@ public Q_SLOTS:
 	void hidePageCallback() override;
 
 	void startTutorial();
+	void abortTutorial();
 
 	void startAd74413rTutorial();
 	void startMax14906Tutorial();

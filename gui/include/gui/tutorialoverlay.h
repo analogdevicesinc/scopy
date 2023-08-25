@@ -30,9 +30,18 @@ public Q_SLOTS:
 	virtual void start();
 	void next();
 	void finish();
+	void abort();
 
 Q_SIGNALS:
+	/**
+	 * @brief Used to signal that the current tutorial was fully completed by the user, not exited early.
+	 * */
 	void finished();
+
+	/**
+	 * @brief Used to signal that the current tutorial was exited early, without completion, by the user.
+	 * */
+	void aborted();
 
 private:
 	void buildUi();
