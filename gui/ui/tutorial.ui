@@ -68,6 +68,13 @@
       </spacer>
      </item>
      <item>
+      <widget class="QPushButton" name="btnExit">
+       <property name="text">
+        <string>Exit</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QLabel" name="title">
        <property name="text">
         <string>Title</string>

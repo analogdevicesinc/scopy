@@ -114,6 +114,21 @@ void TutorialOverlay::finish() {
 	Q_EMIT finished();
 }
 
+void TutorialOverlay::abort() {
+	qInfo(CAT_TUTORIALOVERLAY) << "Tutorial Aborted";
+	if(!highlights.isEmpty()) {
+		// delete previous highlight
+		for (TintedOverlay *highlight : qAsConst(highlights)) {
+			highlight->deleteLater();
+		}
+		highlights.clear();
+	}
+	overlay->deleteLater();
+	deleteLater();
+
+	Q_EMIT aborted();
+}
+
 void TutorialOverlay::buildUi()
 {
 	qDebug(CAT_TUTORIALOVERLAY)<<"build";
@@ -123,11 +138,15 @@ void TutorialOverlay::buildUi()
 	ui->setupUi(this);
 	ui->description->setStyleSheet("background-color: rgba(0,0,0,60);color: white;");
 	ui->title->setStyleSheet("color:white");
+	ui->btnExit->setText(tr(ui->btnExit->text().toStdString().c_str()));
+	ui->btnExit->setStyleSheet("width:80;height:20");
+	ui->btnExit->setProperty("blue_button", true);
 	ui->btnNext->setText(tr(ui->btnNext->text().toStdString().c_str()));
 	ui->btnNext->setStyleSheet("width:80;height:20");
 	ui->btnNext->setProperty("blue_button", true);
 	ui->btnNext->setFocus();
 	connect(ui->btnNext,&QPushButton::clicked,this,&TutorialOverlay::next);
+	connect(ui->btnExit, &QPushButton::clicked, this, &TutorialOverlay::abort);
 
 	overlay->raise();
 	overlay->show();
@@ -156,3 +175,5 @@ bool TutorialOverlay::eventFilter(QObject *watched, QEvent *event) {
 
 	return QObject::eventFilter(watched, event);
 }
+
+#include "moc_tutorialoverlay.cpp"
