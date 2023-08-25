@@ -333,6 +333,7 @@ void SWIOTPlugin::startTutorial() {
 
 		connect(m_ad74413rTutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startMax14906Tutorial);
 		connect(m_max14906Tutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startFaultsTutorial);
+		connect(m_ad74413rTutorial, &gui::TutorialBuilder::aborted, this, &SWIOTPlugin::abortTutorial);
 
 		this->startAd74413rTutorial();
 	} else {
@@ -370,6 +371,12 @@ void SWIOTPlugin::startFaultsTutorial() {
 	m_faultsTutorial->setTitle("FAULTS ");
 	m_faultsTutorial->start();
 }
+
+void SWIOTPlugin::abortTutorial() {
+	disconnect(m_ad74413rTutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startMax14906Tutorial);
+	disconnect(m_max14906Tutorial, &gui::TutorialBuilder::finished, this, &SWIOTPlugin::startFaultsTutorial);
+}
+
 
 QString SWIOTPlugin::description()
 {
