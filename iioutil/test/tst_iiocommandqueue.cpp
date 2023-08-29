@@ -138,7 +138,7 @@ private:
 
 void TST_IioCommandQueue::testResults()
 {
-	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
+	CommandQueue *cmdQ = new CommandQueue(nullptr);
 	Command *cmd1 = new TestCommandAdd(TEST_A, TEST_B, nullptr);
 	Command *cmd2 = new TestCommandMultiply(TEST_A, TEST_B, nullptr);
 	Command *cmd3 = new TestCommandMsg(TEST_A, "Test command 300", nullptr);
@@ -196,7 +196,7 @@ void TST_IioCommandQueue::testResults()
 
 void TST_IioCommandQueue::testCommandOrder()
 {
-	CommandQueue *cmdQ = new CommandQueue(1, nullptr);
+	CommandQueue *cmdQ = new CommandQueue(nullptr);
 	Command *cmd1 = new TestCommandAdd(TEST_A, TEST_B, nullptr);
 
 	Command *cmd3 = new TestCommandMsg(TEST_A, "Test command 300", nullptr);
