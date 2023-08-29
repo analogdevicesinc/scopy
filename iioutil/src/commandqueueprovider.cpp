@@ -12,7 +12,7 @@ CommandQueueRefCounter::CommandQueueRefCounter(struct iio_context *ctx)
 	this->ctx = ctx;
 	this->refcnt++;
 	// TBD: automatically check the iio_context to see if multiple threads are possible (iiod vs tinyiiod)
-	this->cmdQueue = new CommandQueue(1);
+	this->cmdQueue = new CommandQueue();
 }
 
 CommandQueueRefCounter::~CommandQueueRefCounter()

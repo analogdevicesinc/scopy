@@ -90,6 +90,7 @@ void SwiotController::connectSwiot(iio_context *ctx)
 void SwiotController::disconnectSwiot()
 {
 	if(m_cmdQueue) {
+		m_cmdQueue->requestStop();
 		CommandQueueProvider::GetInstance()->close(m_iioCtx);
 		m_cmdQueue = nullptr;
 	}
