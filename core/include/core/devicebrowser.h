@@ -38,7 +38,6 @@ public Q_SLOTS:
 private Q_SLOTS:
 	void updateSelectedDeviceIdx(QString);
 	void forwardRequestDeviceWithDirection();
-	void forwardRequestRemoveDevice();
 
 private:
 	void initBtns();
