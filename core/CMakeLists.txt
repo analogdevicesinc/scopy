@@ -41,6 +41,7 @@ if(${WITH_PYTHON})
 		set(WITH_PYTHON OFF)
 		message(STATUS "Python not found")
 	endif()
+       set(BUILD_PYTHON_LIBRARY_DIRS ${Python3_LIBRARY_DIRS}/${PYTHON_VERSION})
 endif()
 
 option(WITH_SIGROK "Search for libsigrokdecode" ON)
