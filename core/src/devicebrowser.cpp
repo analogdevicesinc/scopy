@@ -69,7 +69,6 @@ void DeviceBrowser::addDevice(QString id, Device *d,int position)
 		list.insert(position,w);
 
 	connect(w, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
-	connect(w, SIGNAL(forget()), this, SLOT(forwardRequestRemoveDevice()));
 }
 
 void DeviceBrowser::removeDevice(QString id)
@@ -133,11 +132,6 @@ void DeviceBrowser::prevDevice()
 	QString nextId = getIdOfIndex(nextIdx);
 	Q_EMIT requestDevice(nextId, -1); // start animation
 	list[nextIdx]->setChecked(true);  // set checked afterwards
-}
-
-void DeviceBrowser::forwardRequestRemoveDevice() {
-	QString id = QObject::sender()->property(devBrowserId).toString();
-	Q_EMIT requestRemoveDevice(id);
 }
 
 void DeviceBrowser::forwardRequestDeviceWithDirection()
