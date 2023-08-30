@@ -122,16 +122,17 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(dm,SIGNAL(deviceChangedToolList(QString,QList<ToolMenuEntry*>)),toolman,SLOT(changeToolListContents(QString,QList<ToolMenuEntry*>)));
 	sbc->startScan();
 
+//this is an example of how autoconnect is done
 #ifdef SCOPY_DEV_MODE
 	//	auto id = dm->createDevice("m2k","ip:127.0.0.1"), false;
 	//	auto id = dm->createDevice("iio","ip:10.48.65.163", false);
 	//	auto id = dm->createDevice("iio","ip:192.168.2.1", false);
-	auto id = dm->createDevice("test","", false);
+	// auto id = dm->createDevice("test","", false);
 
-	auto d = dm->getDevice(id);
-	d->connectDev();
-	auto tool_id = dynamic_cast<DeviceImpl*>(d)->plugins()[0]->toolList()[0]->uuid();
-	Q_EMIT tb->requestTool(tool_id);
+	// auto d = dm->getDevice(id);
+	// d->connectDev();
+	// auto tool_id = dynamic_cast<DeviceImpl*>(d)->plugins()[0]->toolList()[0]->uuid();
+	// Q_EMIT tb->requestTool(tool_id);
 #endif
 
 	connect(tb, SIGNAL(requestSave()), this, SLOT(save()));
@@ -303,14 +304,30 @@ void ScopyMainWindow::handlePreferences(QString str,QVariant val) {
 
 void ScopyMainWindow::initPythonWIN32(){
 #ifdef WIN32
-	auto pythonpath = qgetenv("SCOPY_PYTHONPATH");
-	auto path_str = QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
-	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
-	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
-	path_str += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
-	path_str += QString::fromLocal8Bit(pythonpath);
-	qInfo(CAT_SCOPY) << "PYTHONPATH: " << path_str;
-	qputenv("PYTHONPATH", path_str.toLocal8Bit());
+	QString pythonhome;
+	QString pythonpath;
+
+	pythonpath += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + ";";
+	pythonpath += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\plat-win;";
+	pythonpath += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\lib-dynload;";
+	pythonpath += QCoreApplication::applicationDirPath() + "\\" + PYTHON_VERSION + "\\site-packages;";
+	QString scopypythonpath = qgetenv("SCOPY_PYTHONPATH");
+	pythonpath += scopypythonpath;
+
+    #ifdef SCOPY_DEV_MODE
+        pythonhome += QString(BUILD_PYTHON_LIBRARY_DIRS) +";";
+        pythonpath += QString(BUILD_PYTHON_LIBRARY_DIRS) +";";
+        pythonpath += QString(BUILD_PYTHON_LIBRARY_DIRS) + "\\plat-win;";
+        pythonpath += QString(BUILD_PYTHON_LIBRARY_DIRS) + "\\lib-dynload;";
+        pythonpath += QString(BUILD_PYTHON_LIBRARY_DIRS) + "\\site-packages;";
+    #endif
+
+	qputenv("PYTHONHOME", pythonhome.toLocal8Bit());
+	qputenv("PYTHONPATH", pythonpath.toLocal8Bit());
+
+	qInfo(CAT_SCOPY) <<"SCOPY_PYTHONPATH: " << scopypythonpath;
+	qInfo(CAT_SCOPY) <<"PYTHONHOME: " << qgetenv("PYTHONHOME");
+	qInfo(CAT_SCOPY) <<"PYTHONPATH: " << qgetenv("PYTHONPATH");
 #endif
 }
 
