@@ -15,6 +15,7 @@ DEBUG_FOLDER=$WORKDIR/debug_$ARCH
 ARTIFACT_FOLDER=$WORKDIR/artifact_$ARCH
 PYTHON_FILES=$STAGING_DIR/lib/python3.*
 DLL_DEPS=$(cat $SRC_FOLDER/ci/windows/mingw_dll_deps)
+EMU_BUILD_FOLDER=$WORKDIR/iio-emu/build
 
 PLUGINBASE_DLL=$BUILD_FOLDER/pluginbase
 CORE_DLL=$BUILD_FOLDER/core
@@ -37,8 +38,17 @@ build_scopy(){
 	$CMAKE $RC_COMPILER_OPT -DPYTHON_EXECUTABLE=$STAGING_DIR/bin/python3.exe \
 				-DENABLE_TESTING=OFF \
 				$SRC_FOLDER
-	$MAKE_BIN -j 4
+	$MAKE_BIN -j4
 	ls -la $BUILD_FOLDER
+}
+
+build_iio-emu(){
+	echo "### Building IIO-EMU"
+	git clone https://github.com/analogdevicesinc/iio-emu -b windows_fix $WORKDIR/iio-emu
+	mkdir -p $EMU_BUILD_FOLDER
+	cd $EMU_BUILD_FOLDER
+	$CMAKE ../
+	$MAKE_BIN -j4
 }
 
 deploy_app(){
@@ -59,6 +69,7 @@ deploy_app(){
 	cp -n $DLL_DEPS $DEST_FOLDER/
 	popd
 
+	cp $EMU_BUILD_FOLDER/iio-emu.exe $DEST_FOLDER
 	cp -r $PYTHON_FILES $DEST_FOLDER
 	cp $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss $DEST_FOLDER
 	cp $PLUGINBASE_DLL/libscopy-pluginbase.dll $DEST_FOLDER
@@ -134,6 +145,7 @@ create_installer() {
 }
 
 build_scopy
+build_iio-emu
 deploy_app
 bundle_drivers
 create_installer
