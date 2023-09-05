@@ -1,9 +1,31 @@
+/*
+ * Copyright (c) 2023 Analog Devices Inc.
+ *
+ * This file is part of Scopy
+ * (see https://www.github.com/analogdevicesinc/scopy).
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <https://www.gnu.org/licenses/>.
+ */
+
+
 #ifndef TUTORIALOVERLAY_H
 #define TUTORIALOVERLAY_H
 
 #include <QWidget>
 #include "tintedoverlay.h"
 #include "tutorialchapter.h"
+#include <widgets/hoverwidget.h>
 #include "scopy-gui_export.h"
 
 namespace Ui {
@@ -19,7 +41,14 @@ public:
 	explicit TutorialOverlay(QWidget *parent = nullptr);
 	~TutorialOverlay();
 
-	TutorialChapter* addChapter(QList<QWidget*> subjects, QString description);
+	TutorialChapter* addChapter(
+		const QList<QWidget*>& subjects,
+		const QString& description,
+		QWidget* mainWidget = nullptr,
+		int x_offset = 0,
+		int y_offset = 0,
+		HoverPosition anchor = HoverPosition::HP_CENTER,
+		HoverPosition content = HoverPosition::HP_CENTER);
 	TutorialChapter* addChapter(QWidget* subject, QString description);
 	void addChapter(TutorialChapter* ch);
 
@@ -51,6 +80,7 @@ private:
 	QWidget *parent;
 	TintedOverlay *overlay;
 	QList<TintedOverlay*> highlights;
+	HoverWidget *m_hoverWidget;
 	QString title;
 	int cnt;
 	Ui::Tutorial *ui;
