@@ -57,6 +57,8 @@ set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 find_package(libm2k REQUIRED)
 
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED) # workaround for Gnuradio not finding Boost::chrono
+
 find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt iio)
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
