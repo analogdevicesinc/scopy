@@ -4,14 +4,15 @@
 #include <qboxlayout.h>
 #include <qcoreevent.h>
 #include <qdebug.h>
+#include <regmapstylehelper.hpp>
 #include <utils.h>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>
 #include <pluginbase/preferences.h>
+#include <regmapstylehelper.hpp>
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QString description,
                                            QString notes,int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields, QWidget *parent)
@@ -21,21 +22,17 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 {
     installEventFilter(this);
 
-    scopy::setDynamicProperty(this, "has_frame", true);
-    setStyleSheet("::hover {background-color: #4a4a4b; }");
-
     setMinimumWidth(10);
+    setFixedHeight(60 * (registerWidth / 8) );
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
 
+    bool ok;
     QHBoxLayout *layout = new QHBoxLayout();
-    layout->setMargin(0);
-    layout->setSpacing(0);
+    layout->setMargin(2);
+    layout->setSpacing(4);
     setLayout(layout);
 
-    bool ok;
-
     regBaseInfoWidget = new QFrame();
-    scopy::setDynamicProperty(regBaseInfoWidget,"has_frame",true);
 
     QHBoxLayout *regBaseInfo = new QHBoxLayout();
     QVBoxLayout *rightLayout = new QVBoxLayout();
@@ -49,7 +46,8 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
     QVBoxLayout *leftLayout = new QVBoxLayout();
     leftLayout->setAlignment(Qt::AlignTop);
-    QLabel *registerNameLabel = new QLabel(name);
+    registerNameLabel = new QLabel(name);
+    registerNameLabel->setWordWrap(true);
     registerNameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     leftLayout->addWidget(registerNameLabel);
 
@@ -63,6 +61,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
     // add bitfield widgets
     QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
+    bitFieldsWidgetLayout->setSpacing(0);
 
     int bits = bitFields->length() - 1;
     int row = 0;
@@ -84,6 +83,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
     layout->addLayout(bitFieldsWidgetLayout,8);
 
+
     QString toolTip = "Name : " + name + "\n"
                       + "Address : " + scopy::regmap::Utils::convertToHexa(address.toInt(&ok,16), registerWidth) + "\n"
                       + "Description : " + description + "\n"
@@ -94,7 +94,10 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
 RegisterSimpleWidget::~RegisterSimpleWidget()
 {
+    delete registerNameLabel;
     delete value;
+    delete regBaseInfoWidget;
+
 }
 
 void RegisterSimpleWidget::valueUpdated(uint32_t value)
@@ -117,7 +120,10 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)
 {
-    scopy::setDynamicProperty(this,"is_selected",selected);
+    scopy::setDynamicProperty(regBaseInfoWidget,"is_selected",selected);
+    for (int i = 0; i < bitFields->length(); ++i) {
+        bitFields->at(i)->setSelected(selected);
+    }
 }
 
 void RegisterSimpleWidget::checkPreferences()
@@ -138,7 +144,7 @@ void RegisterSimpleWidget::checkPreferences()
 
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
 {
-    if (event->type() == QEvent::MouseButtonDblClick) {
+    if (event->type() == QEvent::MouseButtonPress) {
         bool ok;
         Q_EMIT registerSelected(address.toInt(&ok,16));
     }

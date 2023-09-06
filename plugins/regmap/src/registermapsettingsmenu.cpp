@@ -15,56 +15,48 @@
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     : GenericMenu{parent}
 {
     initInteractiveMenu();
-    const QColor *color = new QColor("orange");
+    const QColor *color = new QColor(RegmapStyleHelper::getColor("ScopyBlue"));
     setMenuHeader("Settings", color, false);
 
-    setStyleSheet("font: normal; color: white; font-size: 16px");
+    scopy::gui::SubsectionSeparator *menuSection = new scopy::gui::SubsectionSeparator("", false);
+    menuSection->setLineVisible(false);
+    insertSection(menuSection);
+    menuSection->getContentWidget()->layout()->setSpacing(5);
 
-    QVBoxLayout *settingsLayout = new QVBoxLayout();
-    this->setLayout(settingsLayout);
+    autoread = new QCheckBox("Autoread");
 
-    //autoread section
-    scopy::gui::SubsectionSeparator *autoreadSection = new scopy::gui::SubsectionSeparator("", false);
-    insertSection(autoreadSection);
-
-    QCheckBox *autoread = new QCheckBox("Autoread");
     QObject::connect(autoread, &QCheckBox::toggled, this, &RegisterMapSettingsMenu::autoreadToggled);
-    autoreadSection->getContentWidget()->layout()->addWidget(autoread);
-
-    // interval section
-    scopy::gui::SubsectionSeparator *intervalSection = new scopy::gui::SubsectionSeparator("Interval operations", true);
-    insertSection(intervalSection);
-    intervalSection->getContentWidget()->layout()->setSpacing(5);
+    menuSection->getContentWidget()->layout()->addWidget(autoread);
 
     QWidget *setIntervalWidget = new QWidget();
-    QVBoxLayout *setIntervalWidgetLayout = new QVBoxLayout();
+    QVBoxLayout *setIntervalWidgetLayout = new QVBoxLayout(setIntervalWidget);
     setIntervalWidget->setLayout(setIntervalWidgetLayout);
 
     QHBoxLayout *startReadIntervalLayout = new QHBoxLayout();
-    startReadIntervalLayout->addWidget( new QLabel("0x"));
+    hexaPrefix1 = new QLabel("0x");
+    startReadIntervalLayout->addWidget(hexaPrefix1);
     setIntervalWidgetLayout->addLayout(startReadIntervalLayout);
 
-    QLineEdit *startReadInterval = new QLineEdit();
+    startReadInterval = new QLineEdit();
     startReadInterval->setPlaceholderText("From register");
     startReadIntervalLayout->addWidget(startReadInterval);
-
+    hexaPrefix2 = new QLabel("0x");
     QHBoxLayout *endReadIntervalLayout = new QHBoxLayout();
-    endReadIntervalLayout->addWidget(new QLabel("0x"));
+    endReadIntervalLayout->addWidget(hexaPrefix2);
     setIntervalWidgetLayout->addLayout(endReadIntervalLayout);
 
-    QLineEdit *endReadInterval = new QLineEdit();
+    endReadInterval = new QLineEdit();
     endReadInterval->setPlaceholderText("To register");
     endReadIntervalLayout->addWidget(endReadInterval);
 
-    QPushButton *readInterval = new QPushButton("Read interval");
+    readInterval = new QPushButton("Read interval");
+
     readInterval->setEnabled(false);
-    scopy::regmap::RegmapStyleHelper::BlueButton(readInterval);
 
     QObject::connect(readInterval, &QPushButton::clicked, this, [=](){
         bool ok;
@@ -91,18 +83,17 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
         }
     });
 
-    intervalSection->getContentWidget()->layout()->addWidget(setIntervalWidget);
-    intervalSection->getContentWidget()->layout()->addWidget(readInterval);
+    menuSection->getContentWidget()->layout()->addWidget(setIntervalWidget);
+    menuSection->getContentWidget()->layout()->addWidget(readInterval);
 
     QWidget *findPathWidget = new QWidget();
     QHBoxLayout *findPathLayout = new QHBoxLayout();
     Utils::removeLayoutMargins(findPathLayout);
     findPathWidget->setLayout(findPathLayout);
 
-    QLineEdit *filePath = new QLineEdit();
+    filePath = new QLineEdit();
     filePath->setPlaceholderText("File path");
-    QPushButton *pathButton = new QPushButton("Find path");
-    scopy::regmap::RegmapStyleHelper::BlueButton(pathButton);
+    pathButton = new QPushButton("Find path");
 
 
     QObject::connect(pathButton, &QPushButton::clicked, this, [=](){
@@ -111,12 +102,11 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
     findPathLayout->addWidget(filePath);
     findPathLayout->addWidget(pathButton);
-    intervalSection->getContentWidget()->layout()->addWidget(findPathWidget);
+    menuSection->getContentWidget()->layout()->addWidget(findPathWidget);
 
 
-    QPushButton *writeListOfValuesButton = new QPushButton("Write values");
+    writeListOfValuesButton = new QPushButton("Write values");
     writeListOfValuesButton->setEnabled(false);
-    scopy::regmap::RegmapStyleHelper::BlueButton(writeListOfValuesButton);
 
     QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=](){
 
@@ -133,11 +123,10 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
         }
     });
 
-    intervalSection->getContentWidget()->layout()->addWidget(writeListOfValuesButton);
+    menuSection->getContentWidget()->layout()->addWidget(writeListOfValuesButton);
 
-    QPushButton *registerDump = new QPushButton("Register dump");
+    registerDump = new QPushButton("Register dump");
     registerDump->setEnabled(false);
-    scopy::regmap::RegmapStyleHelper::BlueButton(registerDump);
 
     QObject::connect(registerDump, &QPushButton::clicked, this, [=](){
         if (autoread->isChecked()) {
@@ -147,7 +136,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
         Q_EMIT requestRegisterDump(filePath->text());
     });
 
-    intervalSection->getContentWidget()->layout()->addWidget(registerDump);
+    menuSection->getContentWidget()->layout()->addWidget(registerDump);
 
 
     QObject::connect(filePath, &QLineEdit::textChanged, this, [=](QString text){
@@ -156,5 +145,18 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
     });
 
     QSpacerItem *spacer = new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding);
-    settingsLayout->addItem(spacer);
+    this->layout()->addItem(spacer);
+
+    applyStyle();
+}
+
+void RegisterMapSettingsMenu::applyStyle()
+{
+    RegmapStyleHelper::checkboxStyle(autoread, "");
+    RegmapStyleHelper::bigTextLabelStyle(hexaPrefix1, "");
+    RegmapStyleHelper::bigTextLabelStyle(hexaPrefix2, "");
+    RegmapStyleHelper::BlueButton(readInterval, "");
+    RegmapStyleHelper::BlueButton(writeListOfValuesButton, "");
+    RegmapStyleHelper::BlueButton(registerDump, "");
+    RegmapStyleHelper::BlueButton(pathButton, "");
 }

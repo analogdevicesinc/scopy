@@ -3,9 +3,10 @@
 #include "bitfielddetailedwidget.hpp"
 #include "bitfieldmodel.hpp"
 
+#include <regmapstylehelper.hpp>
+
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 BitFieldDetailedWidgetFactory::BitFieldDetailedWidgetFactory(QObject *parent)
 	: QObject{parent}
@@ -15,7 +16,7 @@ BitFieldDetailedWidgetFactory::BitFieldDetailedWidgetFactory(QObject *parent)
 
 BitFieldDetailedWidget *BitFieldDetailedWidgetFactory::buildWidget(BitFieldModel *model)
 {
-    return new BitFieldDetailedWidget(model->getName(),
+    BitFieldDetailedWidget *bfdw = new BitFieldDetailedWidget(model->getName(),
                                       model->getAccess(),
                                       model->getDefaultValue(),
                                       model->getDescription(),
@@ -23,4 +24,6 @@ BitFieldDetailedWidget *BitFieldDetailedWidgetFactory::buildWidget(BitFieldModel
                                       model->getNotes(),
                                       model->getRegOffset(),
                                       model->getOptions());
+    bfdw->setStyleSheet(RegmapStyleHelper::detailedBitFieldStyle(bfdw, ""));
+    return bfdw;
 }

@@ -7,13 +7,13 @@
 #include <qlineedit.h>
 #include <QtMath>
 #include <utils.hpp>
+#include <regmapstylehelper.hpp>
 
 #include "dynamicWidget.h"
 #include "utils.hpp"
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int defaultValue, QString description,
                                                int width, QString notes, int regOffset, QVector<BitFieldOption*> *options, QWidget *parent)
@@ -23,39 +23,50 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
     regOffset(regOffset),
     access(access)
 {
-    scopy::setDynamicProperty(this, "has_frame", true);
-    scopy::setDynamicProperty(this, "has_bottom_border", true);
-    setMinimumWidth(10);
-    setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
 
-    layout = new QVBoxLayout();
-    Utils::removeLayoutMargins(layout);
-    layout->setSpacing(0);
-
-    QLabel *nameLabel = new QLabel(name);
-    nameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
-
+    mainFrame = new QFrame();
+    layout = new QVBoxLayout(this);
+    layout->setSpacing(4);
 
     QHBoxLayout *firstLayout = new QHBoxLayout();
+    nameLabel = new QLabel(name);
+    nameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     firstLayout->addWidget(nameLabel);
     firstLayout->addWidget(new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset)));
     firstLayout->itemAt(1)->setAlignment(Qt::AlignRight);
 
     layout->addLayout(firstLayout);
-    layout->addWidget(new QLabel("Default Value: " + scopy::regmap::Utils::convertToHexa(defaultValue, width)));
+
+    descriptionLabel = new QLabel(description);
+    layout->addWidget(descriptionLabel);
+
+   QHBoxLayout *secondLayout = new QHBoxLayout();
+
+    lastReadValue = new QLabel("Current : N/R");
+    secondLayout->addWidget(lastReadValue);
+
+    defaultValueLabel = new QLabel("Default : " + scopy::regmap::Utils::convertToHexa(defaultValue, width));
+    secondLayout->addWidget(defaultValueLabel, Qt::AlignRight, Qt::AlignRight);
+
+    layout->addLayout(secondLayout);
+
+    QString defaultValueString = scopy::regmap::Utils::convertToHexa(defaultValue, width);
 
     toolTip = "Name : " + name + "\n"
               + QString::number(regOffset + width - 1) + ":" + QString::number(regOffset) + "\n"
               + "Description : " + description + "\n"
               + "Notes : " + notes + "\n"
-              + "Default Value : " + scopy::regmap::Utils::convertToHexa(defaultValue, width);
+              + "Default Value : " + defaultValueString;
 
     setToolTip(toolTip);
 
-    value = new QLabel("N/R");
-    layout->addWidget(value);
+    mainFrame->setLayout(layout);
 
-    setLayout(layout);
+    QVBoxLayout *mainLayout = new QVBoxLayout();
+    mainLayout->addWidget(mainFrame);
+    mainLayout->setSpacing(4);
+    mainLayout->setMargin(4);
+    setLayout(mainLayout);
 
     if (description == "Reserved") {
         reserved = true;
@@ -63,14 +74,17 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
         reserved = false;
     }
 
+    updateValue(defaultValueString);
 }
 
 BitFieldDetailedWidget::~BitFieldDetailedWidget()
 {
-    delete value;
+    delete defaultValueLabel;
+    if (value) delete value;
     if (valueComboBox) delete valueComboBox;
     if (valueCheckBox) delete valueCheckBox;
     if (valueLineEdit) delete valueLineEdit;
+    delete mainFrame;
 }
 
 QString BitFieldDetailedWidget::getToolTip() const
@@ -84,9 +98,9 @@ void BitFieldDetailedWidget::firstRead()
         valueLineEdit = new QLineEdit();
         valueLineEdit->setText("0x0");
         valueLineEdit->setReadOnly(true);
-        layout->replaceWidget(value,valueLineEdit);
+        layout->addWidget(valueLineEdit);
     }else if (access == "R") {
-
+        value = new QLabel();
     }  else if (options &&  !options->isEmpty()) {
         valueComboBox = new QComboBox();
 
@@ -95,7 +109,7 @@ void BitFieldDetailedWidget::firstRead()
             valueComboBox->setEditable(true);
         }
 
-        layout->replaceWidget(value,valueComboBox);
+        layout->addWidget(valueComboBox);
 
         for (int i = 0; i < options->length(); i++) {
             valueComboBox->insertItem(i, options->at(i)->getDescription());
@@ -114,7 +128,7 @@ void BitFieldDetailedWidget::firstRead()
         //if is only one bit we will use a toggle button
     } else if (width == 1) {
         valueCheckBox = new QCheckBox();
-        layout->replaceWidget(value,valueCheckBox);
+        layout->addWidget(valueCheckBox);
 
         QObject::connect(valueCheckBox, &QCheckBox::toggled, this, [=](){
             if (valueCheckBox->isChecked() ) {
@@ -126,7 +140,7 @@ void BitFieldDetailedWidget::firstRead()
 
     } else {
         valueLineEdit = new QLineEdit();
-        layout->replaceWidget(value,valueLineEdit);
+        layout->addWidget(valueLineEdit);
 
         QObject::connect(valueLineEdit, &QLineEdit::textChanged, this, [=](QString val){
             Q_EMIT valueUpdated(val);
@@ -136,9 +150,9 @@ void BitFieldDetailedWidget::firstRead()
 
 void BitFieldDetailedWidget::updateValue(QString newValue)
 {
-    if (value->text() == "N/R") {
-        value->setText("");
+    if (isFirstRead) {
         firstRead();
+        isFirstRead = false;
     }
 
     // if bit is reserved or read only
@@ -171,6 +185,12 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
         Q_EMIT valueUpdated(newValue);
     }
 
+}
+
+void BitFieldDetailedWidget::registerValueUpdated(QString newValue)
+{
+    lastReadValue->setText(QString("Current : 0x")  +newValue);
+    updateValue(newValue);
 }
 
 QString BitFieldDetailedWidget::getValue()

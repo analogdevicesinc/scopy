@@ -14,16 +14,10 @@ namespace scopy::regmap{
 class RegisterMapTemplate;
 class RegisterModel;
 class RegisterMapValues;
-
-namespace gui {
-class RegisterMapSettingsMenu;
 class RegisterDetailedWidget;
 class RegisterController;
 class SearchBarWidget;
 class RegisterMapTable;
-}
-
-
 
 class SCOPY_REGMAPPLUGIN_EXPORT DeviceRegisterMap : public QWidget
 {
@@ -43,13 +37,12 @@ private:
     QVBoxLayout *layout;
     RegisterMapTemplate *registerMapTemplate ;
     RegisterMapValues *registerMapValues;
-    gui::RegisterController *registerController = nullptr;
+    RegisterController *registerController = nullptr;
 
-    gui::RegisterMapTable *registerMapTableWidget = nullptr;
+    RegisterMapTable *registerMapTableWidget = nullptr;
     QDockWidget *docRegisterMapTable = nullptr;
 
-    gui::RegisterDetailedWidget *registerDetailedWidget = nullptr;
-    gui::RegisterMapSettingsMenu *settings;
+    RegisterDetailedWidget *registerDetailedWidget = nullptr;
     void initSettings();
     int selectedRegister;
 Q_SIGNALS:

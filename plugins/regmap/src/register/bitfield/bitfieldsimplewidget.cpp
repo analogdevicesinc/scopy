@@ -5,13 +5,13 @@
 #include <QStyle>
 #include <QBoxLayout>
 #include <utils.h>
+#include <regmapstylehelper.hpp>
 #include "dynamicWidget.h"
 #include <src/utils.hpp>
 #include <pluginbase/preferences.h>
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QString description, int width, QString notes, int regOffset, int streach, QWidget *parent):
     width(width),
@@ -19,10 +19,9 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
     streach(streach),
     QFrame{parent}
 {
-    scopy::setDynamicProperty(this, "has_frame", true);
 
-
-    setStyleSheet("::hover {background-color: #4a34ff; }");
+    mainFrame = new QFrame;
+    RegmapStyleHelper::grayBackgroundHoverWidget(mainFrame, "");
 
     setMinimumWidth(60);
     setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
@@ -33,9 +32,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 
     value = new QLabel("N/R");
     value->setAlignment(Qt::AlignRight);
-//    value->setMinimumWidth(60);
     value->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
-//    value->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
     value->setMinimumWidth(25);
     QLabel *bitfieldWidth = new QLabel(QString::number(regOffset + width - 1) + ":" + QString::number(regOffset));
     bitfieldWidth->setAlignment(Qt::AlignRight);
@@ -45,6 +42,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
     QVBoxLayout *leftLayout = new QVBoxLayout();
     leftLayout->setAlignment(Qt::AlignTop);
     QLabel *descriptionLabel = new QLabel(name);
+    descriptionLabel->setWordWrap(true);
     descriptionLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     leftLayout->addWidget(descriptionLabel);
 
@@ -60,7 +58,12 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
     setToolTip(toolTip);
 
 
-    setLayout(layout);
+    mainFrame->setLayout(layout);
+    QVBoxLayout *mainFrameLayout = new QVBoxLayout();
+    mainFrameLayout->setMargin(0);
+    mainFrameLayout->setSpacing(0);
+    mainFrameLayout->addWidget(mainFrame);
+    setLayout(mainFrameLayout);
 }
 
 BitFieldSimpleWidget::~BitFieldSimpleWidget()
@@ -104,4 +107,9 @@ void BitFieldSimpleWidget::checkPreferences()
         bool ok;
         value->setStyleSheet(QString("color: " +  Util::getColors().at(value->text().toInt(&ok,16) % 16)));
     }
+}
+
+void BitFieldSimpleWidget::setSelected(bool selected)
+{
+    scopy::setDynamicProperty(mainFrame,"is_selected",selected);
 }
