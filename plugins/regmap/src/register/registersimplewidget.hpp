@@ -10,11 +10,12 @@ class QLabel;
 class QHBoxLayout;
 
 namespace scopy::regmap{
-namespace gui {
 class BitFieldSimpleWidget;
 
 class RegisterSimpleWidget : public QFrame
 {
+    friend class RegmapStyleHelper;
+
     Q_OBJECT
 public:
     explicit RegisterSimpleWidget(QString name,
@@ -40,13 +41,13 @@ private:
     QVector<BitFieldSimpleWidget*> *bitFields;
     QString address;
     int registerWidth;
-    QFrame *regBaseInfoWidget;
+    QFrame *regBaseInfoWidget = nullptr;
+    QLabel *registerNameLabel;
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 Q_SIGNALS:
     void registerSelected(uint32_t address);
 };
-}
 }
 #endif // REGISTERSIMPLEWIDGET_HPP
