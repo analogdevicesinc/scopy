@@ -8,7 +8,6 @@ class QHBoxLayout;
 class QPushButton;
 class QLineEdit;
 namespace scopy::regmap{
-namespace gui {
 class  SCOPY_REGMAPPLUGIN_EXPORT SearchBarWidget : public QWidget
 {
 	Q_OBJECT
@@ -22,7 +21,7 @@ private:
 	QLineEdit *searchBar;
 	QPushButton *searchButton;
 	QHBoxLayout *layout;
+    void applyStyle();
 };
-}
 }
 #endif // SEARCHBARWIDGET_HPP

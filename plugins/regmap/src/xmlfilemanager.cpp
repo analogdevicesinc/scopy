@@ -191,7 +191,6 @@ BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
             options->push_back(new BitFieldOption(
                 QString::number(bfOption.firstChildElement("Value").firstChild().toText().data().toInt(&ok,16)),
                 bfOption.firstChildElement("Description").firstChild().toText().data() ));
-
             bfOption = bfOption.nextSibling().toElement();
         }
 

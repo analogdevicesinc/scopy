@@ -12,10 +12,13 @@ class QCheckBox;
 class QComboBox;
 class QVBoxLayout;
 
+class QHBoxLayout;
 namespace scopy::regmap{
-namespace gui{
+
 class BitFieldDetailedWidget : public QFrame
 {
+    friend class RegmapStyleHelper;
+
 	Q_OBJECT
 public:
     explicit BitFieldDetailedWidget(QString name,
@@ -31,6 +34,7 @@ public:
 
 	QString getToolTip() const;
 	void updateValue(QString newValue);
+    void registerValueUpdated(QString newValue);
 	QString getValue();
 
 	int getWidth() const;
@@ -38,6 +42,7 @@ public:
 	int getRegOffset() const;
 
 private:
+    QFrame *mainFrame;
 	QVBoxLayout *layout;
 	QString toolTip;
 	int width;
@@ -47,17 +52,22 @@ private:
     QString access;
 
     QVector<BitFieldOption*> *options;
-	QLabel *value;
+    QLabel *nameLabel;
+    QLabel *descriptionLabel;
+    QLabel *lastReadValue;
+    QLabel *defaultValueLabel;
+    QLabel *value = nullptr;
 	QComboBox *valueComboBox = nullptr;
 	QCheckBox *valueCheckBox = nullptr;
-	QLineEdit *valueLineEdit = nullptr;
+    QLineEdit *valueLineEdit = nullptr;
 
-	void firstRead();
+    bool isFirstRead = true;
+
+    void firstRead();
 
 Q_SIGNALS:
     void valueUpdated(QString value);
 
 };
-}
 }
 #endif // BitFieldDetailedWidget_HPP

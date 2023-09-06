@@ -12,13 +12,14 @@
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget *parent)
     : QWidget{parent}
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
     setLayout(layout);
+
+    setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
 
     QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
     bitFieldsWidgetLayout->setMargin(0);
@@ -45,13 +46,26 @@ RegisterDetailedWidget::RegisterDetailedWidget( RegisterModel *regModel, QWidget
 
         currentBitFieldCount += bitFieldDetailedWidget->getWidth();
 
-        if (col > scopy::regmap::Utils::getBitsPerRow()) {
+        if (col > scopy::regmap::Utils::getBitsPerRowDetailed()) {
             row++;
             col = 0;
         }
         QObject::connect(bitFieldDetailedWidget, &BitFieldDetailedWidget::valueUpdated, this, [=](){
             Q_EMIT bitFieldValueChanged(getBitFieldsValue());
         });
+    }
+    // add spacers to keep the shape of the detailed bitfileds when the number of bitfields didn't fill a row
+    if (row == 0) {
+        while ( col <= scopy::regmap::Utils::getBitsPerRowDetailed()) {
+            BitFieldDetailedWidget *aux = new BitFieldDetailedWidget("","",0,"",1,"",0,nullptr);
+            aux->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+            aux->sizePolicy().setRetainSizeWhenHidden(true);
+            aux->hide();
+            bitFieldsWidgetLayout->addWidget(aux, row, col);
+            bitFieldsWidgetLayout->setColumnStretch(col,1);
+            col++;
+        }
+        bitFieldsWidgetLayout->addItem(new QSpacerItem(10,10,QSizePolicy::Preferred, QSizePolicy::Expanding), row + 1 , col);
     }
 }
 
@@ -65,6 +79,22 @@ void RegisterDetailedWidget::updateBitFieldsValue(uint32_t value)
         int bfVal = ( ((1 << (regOffset + width) ) - 1 ) & value) >> regOffset;
         QString bitFieldValue =  QString::number(bfVal,16);
         bitFieldList->at(i)->updateValue(bitFieldValue);
+        regOffset += width;
+
+        bitFieldList->at(i)->blockSignals(false);
+    }
+}
+
+void RegisterDetailedWidget::registerValueUpdated(uint32_t value)
+{
+    int regOffset = 0;
+    for (int i = bitFieldList->length() - 1; i >= 0; --i) {
+        bitFieldList->at(i)->blockSignals(true);
+
+        int width = bitFieldList->at(i)->getWidth();
+        int bfVal = ( ((1 << (regOffset + width) ) - 1 ) & value) >> regOffset;
+        QString bitFieldValue =  QString::number(bfVal,16);
+        bitFieldList->at(i)->registerValueUpdated(bitFieldValue);
         regOffset += width;
 
         bitFieldList->at(i)->blockSignals(false);

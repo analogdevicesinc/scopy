@@ -11,7 +11,7 @@ class QSlider;
 class QGridLayout;
 
 class QHBoxLayout;
-namespace scopy::regmap::gui{
+namespace scopy::regmap{
 class RecyclerView : public QWidget
 {
     Q_OBJECT
@@ -36,6 +36,8 @@ public:
 
 Q_SIGNALS:
     void requestWidget(int index);
+    void initDone();
+    void requestInit();
 
 private:
     int maxRowCount;
