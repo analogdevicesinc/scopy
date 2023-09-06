@@ -21,6 +21,7 @@ public:
     static QDir setXmlPath();
 
     static int getBitsPerRow();
+    static int getBitsPerRowDetailed();
 
     static JsonFormatedElement* getJsonTemplate(QString xml);
 
@@ -29,6 +30,7 @@ public:
 
 private:
     static const int bitsPerRow = 7;
+    static const int bitsPerRowDetailed = 3;
     static QMap<QString, JsonFormatedElement*>* spiJson;
     static QMap<QString, JsonFormatedElement*>* axiJson;
     static void getConfigurationFromJson(QString filePath);

@@ -9,7 +9,6 @@ class QHBoxLayout;
 class QVBoxLayout;
 class QLabel;
 namespace scopy::regmap{
-namespace gui {
 class BitFieldSimpleWidget : public QFrame
 {
     Q_OBJECT
@@ -33,6 +32,7 @@ public:
     int getStreach() const;
 public Q_SLOTS:
     void checkPreferences();
+    void setSelected(bool selected);
 
 private:
     QHBoxLayout *layout;
@@ -40,10 +40,10 @@ private:
     int width;
     int streach;
     QString description;
+    QFrame *mainFrame;
 
 Q_SIGNALS:
 
 };
-}
 }
 #endif // BITFIELDSIMPLEWIDGET_HPP

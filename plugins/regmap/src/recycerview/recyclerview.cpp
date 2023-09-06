@@ -8,7 +8,7 @@
 #include <QScrollEvent>
 #include <src/verticalscrollarea.hpp>
 
-using namespace scopy::regmap::gui;
+using namespace scopy::regmap;
 
 RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
     : QWidget(parent),
@@ -20,7 +20,6 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
     layout->setMargin(0);
     layout->setSpacing(0);
 
-    //    setMinimumSize(100,100);
 
     bitFieldsWidgetLayout = new QGridLayout();
     bitFieldsWidgetLayout->setMargin(0);
@@ -50,6 +49,8 @@ RecyclerView::RecyclerView(QList<int> *widgets,QWidget *parent)
 
     });
     layout->addWidget(slider);
+
+    QObject::connect(this, &RecyclerView::requestInit, this, &RecyclerView::init , Qt::QueuedConnection);
 }
 
 RecyclerView::~RecyclerView()
@@ -71,14 +72,15 @@ void RecyclerView::init()
     QObject::connect(slider, &QAbstractSlider::valueChanged, this, [=](int value){
 
         if(m_scrollBarCurrentValue < value) {
-            int diff = value - *activeWidgetTop;
-            while (diff > 0 ) {
-                scrollDown();
-                diff--;
-            }
+            int diff = value - (activeWidgetTop - widgets->begin());
+
+                while (diff > 0 ) {
+                    scrollDown();
+                    diff--;
+                }
 
         } else {
-            int diff = *activeWidgetTop - value;
+            int diff = (activeWidgetTop - widgets->begin()) - value;
             while (diff > 0 ) {
                 scrollUp();
                 diff--;
@@ -87,6 +89,7 @@ void RecyclerView::init()
         m_scrollBarCurrentValue = value;
     });
 
+    Q_EMIT initDone();
 }
 
 QMap<int, QWidget*> *RecyclerView::getWidgetsMap() const
@@ -145,12 +148,15 @@ void RecyclerView::setMaxrowCount(int maxRowCount)
 void RecyclerView::scrollDown()
 {
     if (activeWidgetBottom != widgets->end()) {
-        widgetMap->value(*activeWidgetTop)->hide();
         if (widgetMap->contains(*activeWidgetBottom)) {
             widgetMap->value(*activeWidgetBottom)->show();
         }
         else {
             Q_EMIT requestWidget(*activeWidgetBottom);
+        }
+
+        if (widgetMap->value(*activeWidgetTop)) {
+            widgetMap->value(*activeWidgetTop)->hide();
         }
 
         activeWidgetTop++;
@@ -163,12 +169,15 @@ void RecyclerView::scrollUp()
     if (activeWidgetTop != widgets->begin()) {
         activeWidgetTop--;
         activeWidgetBottom--;
-        widgetMap->value(*activeWidgetBottom)->hide();
+
         if (widgetMap->contains(*activeWidgetTop)) {
             widgetMap->value(*activeWidgetTop)->show();
         }
         else {
             Q_EMIT requestWidget(*activeWidgetTop);
+        }
+        if (widgetMap->value(*activeWidgetBottom)) {
+            widgetMap->value(*activeWidgetBottom)->hide();
         }
     }
 }
@@ -182,7 +191,7 @@ void RecyclerView::populateMap()
     }
 
     //TODO find a way to autocompute max row count
-    maxRowCount = 10;
+   // maxRowCount = 10;
 
     int i = 0;
     while ( i < maxRowCount && mapIterator != widgets->end()) {

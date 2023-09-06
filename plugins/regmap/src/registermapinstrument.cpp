@@ -14,19 +14,20 @@
 #include <tool_view_builder.hpp>
 #include <searchbarwidget.hpp>
 #include <QComboBox>
+#include <QElapsedTimer>
+#include <QDebug>
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
     : QWidget{parent}
 {
-    layout = new QVBoxLayout();
+    layout = new QVBoxLayout(this);
     Utils::removeLayoutMargins(layout);
     this->setLayout(layout);
     mainWidget = new QWidget();
-    mainWidget->setLayout(new QVBoxLayout());
+    mainWidget->setLayout(new QVBoxLayout(mainWidget));
 
     scopy::gui::ToolViewRecipe recepie;
     recepie.hasChannels = false;
@@ -42,21 +43,23 @@ RegisterMapInstrument::RegisterMapInstrument(QWidget *parent)
 
     registerDeviceList = new QComboBox();
     activeRegisterMap = "";
-    settings = new scopy::regmap::gui::RegisterMapSettingsMenu(this);
+    settings = new scopy::regmap::RegisterMapSettingsMenu(this);
     QObject::connect(registerDeviceList, &QComboBox::currentTextChanged, this, &RegisterMapInstrument::updateActiveRegisterMap);
     toolView->addTopExtraWidget(registerDeviceList);
 
-    searchBarWidget =  new scopy::regmap::gui::SearchBarWidget();
-    searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    searchBarWidget =  new scopy::regmap::SearchBarWidget();
+    searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-    QObject::connect(searchBarWidget, &scopy::regmap::gui::SearchBarWidget::requestSearch, this, [=](QString searchParam){
+    QObject::connect(searchBarWidget, &scopy::regmap::SearchBarWidget::requestSearch, this, [=](QString searchParam){
         tabs->value(registerDeviceList->currentText())->applyFilters(searchParam);
     });
 
     toolView->addTopExtraWidget(searchBarWidget);
+    toolView->getTopExtraWidget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     layout->addWidget(toolView);
 
     tabs = new QMap<QString, DeviceRegisterMap*>();
+    tabsInfo = new  QMap<QString , TabInfo*>();
 }
 
 RegisterMapInstrument::~RegisterMapInstrument()
@@ -69,16 +72,41 @@ RegisterMapInstrument::~RegisterMapInstrument()
 void RegisterMapInstrument::toggleSettingsMenu(QString registerName, bool toggle)
 {
     if (toggle) {
-        QObject::connect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::autoreadToggled, tabs->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
-        QObject::connect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestRead, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRead);
-        QObject::connect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestRegisterDump, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
-        QObject::connect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestWrite, tabs->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
+        QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::autoreadToggled, tabs->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
+        QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRead, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRead);
+        QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRegisterDump, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
+        QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestWrite, tabs->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
     } else {
-        QObject::disconnect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::autoreadToggled, tabs->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
-        QObject::disconnect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestRead, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRead);
-        QObject::disconnect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestRegisterDump, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
-        QObject::disconnect(settings, &scopy::regmap::gui::RegisterMapSettingsMenu::requestWrite, tabs->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
+        QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::autoreadToggled, tabs->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
+        QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRead, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRead);
+        QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRegisterDump, tabs->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
+        QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestWrite, tabs->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
     }
+}
+
+void RegisterMapInstrument::generateDeviceRegisterMap(TabInfo *tabInfo)
+{
+    RegisterMapTemplate *registerMapTemplate = nullptr;
+    if (!tabInfo->getXmlPath().isEmpty()) {
+        registerMapTemplate = new RegisterMapTemplate(this);
+        XmlFileManager xmlFileManager(tabInfo->getDev(), tabInfo->getXmlPath());
+        auto aux = xmlFileManager.getAllRegisters();
+        if (!aux->isEmpty()){
+            registerMapTemplate->setRegisterList(aux);
+        }
+    }
+   RegisterMapValues *registerMapValues = nullptr;
+    if (tabInfo->getDev()){
+        registerMapValues = getRegisterMapValues(tabInfo->getDev());
+    } else {
+        registerMapValues = getRegisterMapValues(tabInfo->getXmlPath());
+    }
+
+    DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate,registerMapValues, this);
+    tabs->insert(tabInfo->getDeviceName(), regMap);
+    mainWidget->layout()->addWidget(regMap);
+    tabs->value(tabInfo->getDeviceName())->hide();
+
 }
 
 void RegisterMapInstrument::updateActiveRegisterMap(QString registerName)
@@ -87,9 +115,13 @@ void RegisterMapInstrument::updateActiveRegisterMap(QString registerName)
         tabs->value(activeRegisterMap)->hide();
         toggleSettingsMenu(activeRegisterMap, false);
 
+        if (! tabs->value(registerName) ) {
+            generateDeviceRegisterMap(tabsInfo->value(registerName));
+        }
         tabs->value(registerName)->show();
         toggleSettingsMenu(registerName, true);
         toggleSearchBarVisible(tabs->value(registerName)->hasTemplate());
+
         activeRegisterMap = registerName;
     }
 }
@@ -135,34 +167,21 @@ void RegisterMapInstrument::addTab(QString filePath, QString title)
 
 void RegisterMapInstrument::addTab(iio_device *dev, QString title, QString xmlPath)
 {
-    RegisterMapTemplate *registerMapTemplate = nullptr;
-    if (!xmlPath.isEmpty()) {
-        registerMapTemplate = new RegisterMapTemplate(this);
-        XmlFileManager xmlFileManager(dev, xmlPath);
-        auto aux = xmlFileManager.getAllRegisters();
-        if (!aux->isEmpty()){
-            registerMapTemplate->setRegisterList(aux);
-        }
-    }
-    RegisterMapValues *registerMapValues = nullptr;
-    if (dev){
-        registerMapValues = getRegisterMapValues(dev);
-    } else {
-        registerMapValues = getRegisterMapValues(xmlPath);
-    }
-    DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate,registerMapValues, this);
 
-    tabs->insert(title, regMap);
-    mainWidget->layout()->addWidget(regMap);
+    tabsInfo->insert(title, new TabInfo(dev,title,xmlPath));
+
+
     registerDeviceList->addItem(title);
 
+
     if (first) {
-        tabs->value(title)->hide();
-    } else {
         // the first regmap is set active
         activeRegisterMap = title;
-        toggleSettingsMenu(title, true);
-        first = true;
+        first = false;
+        generateDeviceRegisterMap(tabsInfo->value(title));
         toolView->setGeneralSettingsMenu(settings, true);
+        tabs->value(title)->show();
+        toggleSettingsMenu(title, true);
     }
+
 }

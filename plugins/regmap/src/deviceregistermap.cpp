@@ -4,7 +4,6 @@
 #include "registermapvalues.hpp"
 #include "registermaptemplate.hpp"
 #include "search.hpp"
-#include "registermapsettingsmenu.hpp"
 #include "utils.hpp"
 #include "logging_categories.h"
 
@@ -27,26 +26,28 @@
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, RegisterMapValues *registerMapValues,  QWidget *parent)
     : QWidget(parent),
     registerMapValues(registerMapValues),
     registerMapTemplate(registerMapTemplate)
 {
-    layout = new QVBoxLayout();
+    layout = new QVBoxLayout(this);
     Utils::removeLayoutMargins(layout);
     setLayout( layout);
 
+    RegmapStyleHelper::RegisterMapStyle(this);
+
     initSettings();
 
-    registerController = new gui::RegisterController();
+    registerController = new RegisterController(this);
 
     if (registerMapTemplate) {
         QWidget *registerMapTable = new QWidget();
-        QVBoxLayout *registerMapTableLayout = new QVBoxLayout();
+        QVBoxLayout *registerMapTableLayout = new QVBoxLayout(registerMapTable);
         Utils::removeLayoutMargins(registerMapTableLayout);
         registerMapTable->setLayout(registerMapTableLayout);
+        layout->addWidget(registerMapTable);
 
         QWidget *tableHeadWidget = new QWidget();
         scopy::regmap::RegmapStyleHelper::FrameWidget(tableHeadWidget);
@@ -60,28 +61,29 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         for (int i = Utils::getBitsPerRow(); i >= 0; i--) {
             tableHead->addWidget(new QLabel("Bit"+QString::number(i)),1);
         }
-
-        registerMapTableWidget = new gui::RegisterMapTable(registerMapTemplate->getRegisterList(), this);
-
-        QObject::connect(registerMapTableWidget, &gui::RegisterMapTable::registerSelected, this, [=](uint32_t address){
-            registerChanged(registerMapTemplate->getRegisterTemplate(address));
-        });
-
         registerMapTableLayout->addWidget(tableHeadWidget);
-        auto aux = registerMapTableWidget->getWidget();
+        registerMapTableWidget = new RegisterMapTable(registerMapTemplate->getRegisterList(), this);
+
+        QWidget *aux = registerMapTableWidget->getWidget();
         if (aux) {
             registerMapTableLayout->addWidget(aux);
         }
-        layout->addWidget(registerMapTable,5);
 
-        QObject::connect(registerController, &gui::RegisterController::registerAddressChanged, this , [=](uint32_t address){
+        QObject::connect(registerMapTableWidget, &RegisterMapTable::registerSelected, this, [=](uint32_t address){
+            registerController->blockSignals(true);
+            registerMapTableWidget->setRegisterSelected(address);
+            registerChanged(registerMapTemplate->getRegisterTemplate(address));
+            registerController->blockSignals(false);
+        });
+
+        QObject::connect(registerController, &RegisterController::registerAddressChanged, this , [=](uint32_t address){
             registerChanged(registerMapTemplate->getRegisterTemplate(address));
             registerMapTableWidget->scrollTo(address);
             if (autoread) {
                 Q_EMIT registerMapValues->requestRead(address);
             }
         });
-        layout->addWidget(registerController,1);
+        layout->addWidget(registerController);
     }
 
     QObject::connect(registerController, &RegisterController::requestRead, registerMapValues, &RegisterMapValues::requestRead);
@@ -91,10 +93,11 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
         if (registerMapTemplate) {
             registerMapTableWidget->valueUpdated(address, value);
             registerDetailedWidget->updateBitFieldsValue(value);
+            registerDetailedWidget->registerValueUpdated(value);
         }
     });
 
-    layout->addWidget(registerController,1);
+    layout->addWidget(registerController);
 
     if (registerMapTemplate) {
         registerChanged(registerMapTemplate->getRegisterList()->first());
@@ -123,7 +126,7 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
     }
 
     registerDetailedWidget = new RegisterDetailedWidget(regModel);
-    layout->addWidget(registerDetailedWidget,2);
+    layout->addWidget(registerDetailedWidget);
 
     if (registerMapValues) {
         uint32_t address = regModel->getAddress();

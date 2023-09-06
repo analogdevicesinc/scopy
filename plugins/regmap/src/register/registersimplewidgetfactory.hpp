@@ -5,8 +5,6 @@
 
 namespace scopy::regmap{
 class RegisterModel;
-
-namespace gui {
 class RegisterSimpleWidget;
 
 class RegisterSimpleWidgetFactory : public QObject
@@ -19,6 +17,5 @@ public:
 Q_SIGNALS:
 
 };
-}
 }
 #endif // REGISTERSIMPLEWIDGETFACTORY_HPP
