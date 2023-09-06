@@ -8,18 +8,18 @@ namespace scopy::regmap{
 class RegisterModel;
 class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapTemplate : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit RegisterMapTemplate(QObject *parent = nullptr);
-	~RegisterMapTemplate();
+    explicit RegisterMapTemplate(QObject *parent = nullptr);
+    ~RegisterMapTemplate();
 
-	QMap<uint32_t, RegisterModel *> *getRegisterList() const;
-	RegisterModel* getRegisterTemplate(uint32_t address);
-	void setRegisterList(QMap<uint32_t, RegisterModel *> *newRegisterList);
-	RegisterModel* getDefaultTemplate();
+    QMap<uint32_t, RegisterModel *> *getRegisterList() const;
+    RegisterModel* getRegisterTemplate(uint32_t address);
+    void setRegisterList(QMap<uint32_t, RegisterModel *> *newRegisterList);
+    RegisterModel* getDefaultTemplate(uint32_t address);
 
 private:
-	QMap<uint32_t, RegisterModel*> *registerList;
+    QMap<uint32_t, RegisterModel*> *registerList;
 Q_SIGNALS:
 
 };

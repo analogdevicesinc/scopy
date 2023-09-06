@@ -16,8 +16,6 @@ class QVBoxLayout;
 
 namespace scopy::regmap{
 class RegisterModel;
-namespace gui {
-
 class RegisterValueWidget;
 class AddressPicker;
 
@@ -35,19 +33,19 @@ public:
 
 private:
 
-//    AddressPicker *addressPicker;
-//    RegisterValueWidget *regValue;
-    QHBoxLayout *layout;
+    QHBoxLayout *mainLayout;
 
     QSpinBox *addressPicker;
     QPushButton *readButton;
     QPushButton *writeButton;
     QLineEdit *regValue;
-
+    QLabel *addressLabel;
+    QLabel *valueLabel;
 
 	bool addressChanged = false;
     QLabel *nameLabel = nullptr;
     QLabel *descriptionLabel = nullptr;
+    void applyStyle();
 
 Q_SIGNALS:
 	void requestRead(uint32_t address);
@@ -55,6 +53,5 @@ Q_SIGNALS:
 	void registerAddressChanged(uint32_t address);
 	void valueChanged(QString value);
 };
-}
 }
 #endif // REGISTERCONTROLLER_HPP

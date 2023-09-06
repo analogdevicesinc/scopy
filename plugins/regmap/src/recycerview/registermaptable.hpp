@@ -8,8 +8,6 @@
 
 namespace scopy::regmap{
 class RegisterModel;
-
-namespace gui {
 class RegisterSimpleWidget;
 class RecyclerView;
 
@@ -23,7 +21,7 @@ public:
     void setFilters(QList<uint32_t> filters);
     void valueUpdated(uint32_t address, uint32_t value);
     void scrollTo(uint32_t index);
-    void setRegisterSelected(uint32_t address, bool selected);
+    void setRegisterSelected(uint32_t address);
 
     // IRecyclerViewAdapter interface
     void generateWidget(int index);
@@ -38,6 +36,5 @@ private:
     QMap<uint32_t, RegisterSimpleWidget*> *registersMap;
     uint32_t selectedAddress;
 };
-}
 }
 #endif // REGISTERMAPTABLE_H

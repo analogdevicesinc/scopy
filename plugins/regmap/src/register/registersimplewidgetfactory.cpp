@@ -5,9 +5,10 @@
 #include "registersimplewidget.hpp"
 #include "registersimplewidgetfactory.hpp"
 
+#include <regmapstylehelper.hpp>
+
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 RegisterSimpleWidgetFactory::RegisterSimpleWidgetFactory(QObject *parent)
 	: QObject{parent}
@@ -35,11 +36,14 @@ RegisterSimpleWidget *RegisterSimpleWidgetFactory::buildWidget(RegisterModel *mo
 		}
 	}
 
-	return new RegisterSimpleWidget(model->getName(),
+    RegisterSimpleWidget *rsw = new RegisterSimpleWidget(model->getName(),
 					QString::number(model->getAddress(),16),
 					model->getDescription(),
 					model->getNotes(),
 					model->getWidth(),
-					bitFields) ;
+                    bitFields) ;
+
+    rsw->setStyleSheet(RegmapStyleHelper::simpleRegisterStyle(rsw, "rsw") + RegmapStyleHelper::frameBorderHover(rsw, "rsw")  );
+    return rsw;
 }
 

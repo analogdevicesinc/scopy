@@ -5,7 +5,6 @@
 
 namespace scopy::regmap{
 class BitFieldModel;
-namespace gui {
 class BitFieldDetailedWidget;
 
 class BitFieldDetailedWidgetFactory : public QObject
@@ -18,6 +17,5 @@ public:
 Q_SIGNALS:
 
 };
-}
 }
 #endif // BITFIELDDETAILEDWIDGETFACTORY_HPP

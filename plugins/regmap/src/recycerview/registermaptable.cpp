@@ -8,7 +8,6 @@
 
 using namespace scopy;
 using namespace regmap;
-using namespace regmap::gui;
 
 RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModels, QWidget *parent)
     :registerModels(registerModels)
@@ -19,15 +18,18 @@ RegisterMapTable::RegisterMapTable(QMap<uint32_t, RegisterModel*> *registerModel
     foreach(uint32_t index, registerModels->keys()) {
         widgets->push_back((int)index);
     }
+
     recyclerView = new RecyclerView(widgets, parent);
+    recyclerView->setMaxrowCount(10);
 
     QObject::connect(recyclerView, &RecyclerView::requestWidget, this, &RegisterMapTable::generateWidget);
     QObject::connect(this, &RegisterMapTable::widgetGenerated, recyclerView, &RecyclerView::addWidget);
+    QObject::connect(recyclerView, &RecyclerView::initDone, this, [=](){
+            selectedAddress = 0;
+            registersMap->value(selectedAddress)->setRegisterSelected(true);
+        }, Qt::QueuedConnection);
 
-    recyclerView->init();
-
-    selectedAddress = 0;
-    registersMap->value(selectedAddress)->setRegisterSelected(true);
+   Q_EMIT recyclerView->requestInit();
 }
 
 QWidget *RegisterMapTable::getWidget()
@@ -67,7 +69,7 @@ void RegisterMapTable::scrollTo(uint32_t index)
         while (iterator != registerModels->end() ) {
             if (iterator.key() == index) {
                 recyclerView->scrollTo(i);
-                setRegisterSelected(iterator.key(), true);
+                setRegisterSelected(iterator.key());
                 break;
             }
             i++;
@@ -76,11 +78,15 @@ void RegisterMapTable::scrollTo(uint32_t index)
     }
 }
 
-void RegisterMapTable::setRegisterSelected(uint32_t address, bool selected)
+void RegisterMapTable::setRegisterSelected(uint32_t address)
 {
-    registersMap->value(selectedAddress)->setRegisterSelected(false);
+    if (registersMap->value(selectedAddress)) {
+        registersMap->value(selectedAddress)->setRegisterSelected(false);
+    }
     selectedAddress = address;
-    registersMap->value(address)->setRegisterSelected(true);
+    if (registersMap->value(address)) {
+        registersMap->value(address)->setRegisterSelected(true);
+    }
 }
 
 void RegisterMapTable::generateWidget(int index)

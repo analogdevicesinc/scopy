@@ -134,9 +134,8 @@ bool RegmapPlugin::onConnect()
             m_deviceList->push_back(dev);
         }
     }
-    //TODO
     m_registerMapWidget = new QWidget();
-    QVBoxLayout *layout  = new QVBoxLayout();
+    QVBoxLayout *layout  = new QVBoxLayout(m_registerMapWidget);
     m_registerMapWidget->setLayout(layout);
 
     scopy::regmap::Utils::applyJsonConfig();
@@ -144,6 +143,8 @@ bool RegmapPlugin::onConnect()
     if (m_deviceList && !m_deviceList->isEmpty()) {
         QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
         scopy::regmap::RegisterMapInstrument *regMapInstrument = new scopy::regmap::RegisterMapInstrument();
+
+        layout->addWidget(regMapInstrument);
 
         for (int i = 0; i < m_deviceList->size(); ++i) {
             iio_device *dev = m_deviceList->at(i);
@@ -155,13 +156,11 @@ bool RegmapPlugin::onConnect()
                 qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << devName;
                 regMapInstrument->addTab( dev, devName, xmlsPath.absoluteFilePath(templatePaths));
             } else {
-                //TODO GROUP ALL DEVICES IN ONE WITH A COMBOBOX
                 regMapInstrument->addTab(dev, iio_device_get_name(dev));
             }
 
             qDebug(CAT_REGMAP) << "";
         }
-        layout->addWidget(regMapInstrument);
 
         m_toolList[0]->setEnabled(true);
         m_toolList[0]->setTool(m_registerMapWidget);

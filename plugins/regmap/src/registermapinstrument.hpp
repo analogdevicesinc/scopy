@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QWidget>
 #include <tool_view.hpp>
+#include <tabinfo.hpp>
 #include "scopy-regmapplugin_export.h"
 
 class QComboBox;
@@ -15,11 +16,8 @@ class QTabWidget;
 namespace scopy::regmap {
 class RegisterMapValues;
 class DeviceRegisterMap;
-
-namespace gui {
 class RegisterMapSettingsMenu;
 class SearchBarWidget;
-}
 
 class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapInstrument : public QWidget
 {
@@ -27,8 +25,9 @@ class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapInstrument : public QWidget
 public:
 	explicit RegisterMapInstrument(QWidget *parent = nullptr);
     ~RegisterMapInstrument();
-    void addTab(struct iio_device *dev, QString title);
+
     void addTab(struct iio_device *dev, QString title, QString xmlPath);
+    void addTab(struct iio_device *dev, QString title);
     void addTab(QString filePath, QString title);
 signals:
 
@@ -41,12 +40,14 @@ private:
     RegisterMapValues* getRegisterMapValues(QString filePath);
 
     QMap<QString , DeviceRegisterMap*> *tabs;
-    bool first = false;
+    QMap<QString , TabInfo*> *tabsInfo;
+    bool first = true;
     QString activeRegisterMap;
     QComboBox *registerDeviceList;
     void toggleSettingsMenu(QString registerName, bool toggle);
-    scopy::regmap::gui::RegisterMapSettingsMenu *settings;
-    gui::SearchBarWidget *searchBarWidget;
+    scopy::regmap::RegisterMapSettingsMenu *settings;
+    SearchBarWidget *searchBarWidget;
+    void generateDeviceRegisterMap(TabInfo *tabInfo);
 
 private Q_SLOTS:
     void updateActiveRegisterMap(QString registerName);

@@ -35,21 +35,15 @@ void Utils::removeLayoutMargins(QLayout *layout)
 
 QDir Utils::setXmlPath()
 {
-    QString pluginAdditionalPath = Preferences::GetInstance()->get("additional_regmap_xml_path").toString();
-    // Check the xml path from preferences
-
-    QDir xmlsPath(pluginAdditionalPath);
-    if(!xmlsPath.entryList().empty()) {
-        return xmlsPath;
+    QDir xmlsPath(REGMAP_XML_BUILD_PATH);
+    if ( xmlsPath.entryList().empty()) {
+        #ifdef Q_OS_WINDOWS
+            xmlsPath.setPath("/plugins/regmap/xmls");
+        #else
+            xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
+        #endif
     }
 
-    xmlsPath.setPath(REGMAP_XML_BUILD_PATH);
-    if(!xmlsPath.entryList().empty()) {
-        return xmlsPath;
-    }
-
-    xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
-    return xmlsPath;
     if(!xmlsPath.entryList().empty()) {
         return xmlsPath;
     }
@@ -61,6 +55,11 @@ QDir Utils::setXmlPath()
 int Utils::getBitsPerRow()
 {
     return bitsPerRow;
+}
+
+int Utils::getBitsPerRowDetailed()
+{
+    return bitsPerRowDetailed;
 }
 
 JsonFormatedElement *Utils::getJsonTemplate(QString xml)
