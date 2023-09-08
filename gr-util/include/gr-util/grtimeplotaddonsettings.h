@@ -11,7 +11,7 @@ class SCOPY_GR_UTIL_EXPORT GRTimePlotAddonSettings : public QObject, public Tool
 	Q_OBJECT
 public:
 	GRTimePlotAddonSettings(GRTimePlotAddon *p, QObject *parent = nullptr) :
-	      QObject(parent),p(p) {
+		  QObject(parent),p(p) {
 		name = p->getName()+"_settings";
 		widget = new QLabel(name);
 	}
