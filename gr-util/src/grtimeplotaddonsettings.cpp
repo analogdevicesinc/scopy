@@ -283,7 +283,7 @@ void GRTimePlotAddonSettings::onInit() {
 	m_xmin->setValue(0);
 	m_xmax->setValue(31);
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
-	m_showLabels->onOffswitch()->setChecked(true);
+	m_showLabels->onOffswitch()->setChecked(false);
 	m_xModeCb->combo()->setCurrentIndex(0);
 //	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
