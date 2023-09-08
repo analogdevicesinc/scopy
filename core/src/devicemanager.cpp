@@ -98,6 +98,7 @@ void DeviceManager::removeDeviceById(QString id)
 void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
 	connect(d,&DeviceImpl::connected,this,[=](){connectDevice(d->id());});
 	connect(d,&DeviceImpl::disconnected,this,[=](){disconnectDevice(d->id());});
+	connect(d,&DeviceImpl::forget,this,[=](){removeDeviceById(d->id());});
 	connect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	connect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	connect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
@@ -106,6 +107,7 @@ void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
 	disconnect(d,SIGNAL(connected()));
 	disconnect(d,SIGNAL(disconnected()));
+	disconnect(d,SIGNAL(forget));
 	disconnect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	disconnect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	disconnect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));

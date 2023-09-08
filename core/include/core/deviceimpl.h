@@ -53,12 +53,14 @@ Q_SIGNALS:
 	void requestedRestart() override;
 	void requestTool(QString) override;
 	void connectionFailed();
+	void forget();
 protected:
 	void removeDisabledPlugins();
 	void loadName();
 	void loadIcons();
 	void loadPages();
 	void loadToolList();
+	void loadBadges();
 
 protected:
 	PluginManager *p;
@@ -72,11 +74,6 @@ protected:
 	QWidget *m_icon;
 	QWidget *m_page;
 	QPushButton *connbtn, *discbtn;
-
-private:
-	void loadWarningBadge();
-	bool eventFilter(QObject *obj, QEvent *event) override;
-	QPushButton *m_warningBtn;
 
 };
 }
