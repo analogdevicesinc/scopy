@@ -21,16 +21,16 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	QGridLayout *gridPlot = new QGridLayout(m_plotWidget);
 	gridPlot->setVerticalSpacing(0);
 	gridPlot->setHorizontalSpacing(0);
-	gridPlot->setContentsMargins(9, 0, 9, 0);
+	gridPlot->setContentsMargins(0, 0, 0, 0);
 	m_plotWidget->setLayout(gridPlot);
 
 	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
 						  QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-	gridPlot->addWidget(m_plot->topArea(), 1, 0, 1, 4);
-	gridPlot->addWidget(m_plot->leftHandlesArea(), 1, 0, 4, 1);
-	gridPlot->addWidget(m_plot, 3, 1, 1, 1);
-	gridPlot->addItem(plotSpacer, 5, 0, 1, 4);
+	gridPlot->addWidget(m_plot->topArea(), 0, 0, 1, 4);
+	gridPlot->addWidget(m_plot->leftHandlesArea(), 0, 0, 4, 1);
+	gridPlot->addWidget(m_plot, 1, 1, 1, 1);
+	gridPlot->addItem(plotSpacer, 2, 0, 1, 4);
 
 	m_plot->setSampleRate(1000, 1, "Hz");
 	m_plot->setActiveVertAxis(0);
@@ -81,30 +81,63 @@ void GRTimePlotAddon::onRemove() {}
 
 void GRTimePlotAddon::onChannelAdded(ToolAddon *t) {
 	GRTimeChannelAddon *ch = dynamic_cast<GRTimeChannelAddon*>(t);
-	QString sinkName = (name + ch->getDevice()->getName() +  t->getName());
-	bool ret = m_plot->registerSink(sinkName.toStdString(),1,0);
-	qInfo()<<"created plot_sinks "<<sinkName << ret;
+	QString sinkName = (name /*+ ch->getDevice()->getName() +  t->getName()*/);
+//	m_plot->unregisterSink(sinkName.toStdString());
+//	bool ret = m_plot->registerSink(sinkName.toStdString(),1,0);
+//	qInfo()<<"created plot_sinks "<<sinkName << ret;
 }
 
 void GRTimePlotAddon::onChannelRemoved(ToolAddon *) {}
 
 void GRTimePlotAddon::connectSignalPaths() {
+	QList<GRSignalPath*> sigpaths;
 	for(auto &sigpath : m_top->signalPaths()) {
 		qInfo()<<sigpath->name();
 		if(!sigpath->enabled())
 			continue;
 		if(!sigpath->name().startsWith(name))
 			continue;
+		sigpaths.append(sigpath);
 
-		auto sink = scope_sink_f::make(1024,1000,sigpath->name().toStdString(),1,m_plot);
-		sinks.append(sink);
-		sink->set_update_time(0.1);
-		sink->set_trigger_mode(TRIG_MODE_FREE,1,"");
 
 		qInfo()<<"created scope_sink_f with name" << sigpath->name();
-		m_top->connect(sigpath->getGrEndPoint(), 0, sink, 0);
-		m_plot->setAllYAxis(-1000000,1000000);
+
 	}
+	auto sink = scope_sink_f::make(1024,1000,name.toStdString(),sigpaths.count(),m_plot);
+	sinks.append(sink);
+	sink->set_update_time(0.01);
+	sink->set_trigger_mode(TRIG_MODE_FREE,1,"");
+	m_plot->registerSink(name.toStdString(),sigpaths.count(),0);
+	m_plot->setAllYAxis(-(1<<11),1<<11);
+
+	int i=0;
+	for(auto &sigpath : sigpaths) {
+		m_top->connect(sigpath->getGrEndPoint(), 0, sink, i);
+		i++;
+	}
+
+	for(int i=0;i<sigpaths.count();i++) {
+		auto curveId = m_plot->getAnalogChannels() - 1;
+		auto color = m_plot->getLineColor(curveId);
+	//	btn->setColor(color);
+		m_plot->Curve(curveId)->setAxes(
+			QwtAxisId(QwtAxis::XBottom, 0),
+			QwtAxisId(QwtAxis::YLeft, curveId));
+		m_plot->DetachCurve(curveId);
+		m_plot->AttachCurve(curveId);
+		m_plot->addZoomer(curveId);
+
+
+	}
+	m_plot->setSampleRatelabelValue(1234);
+	m_plot->setBufferSizeLabelValue(4321);
+	m_plot->setTimeBaseLabelValue(12.5e-5);
+	// TO DO: Give user the option to make these axes visible
+	m_plot->setAxisVisible(QwtAxisId(QwtAxis::YLeft, 0), false);
+	m_plot->setAxisVisible(QwtAxisId(QwtAxis::XBottom,0), false);
+//	m_plot->setUsingLeftAxisScales(false);
+
+
 }
 
 void GRTimePlotAddon::tearDownSignalPaths() {

@@ -3,7 +3,7 @@
 
 using namespace scopy::grutil;
 
-GRTimeChannelAddon::GRTimeChannelAddon(GRSignalPath *path, GRTimePlotAddon *plotAddon, QObject *parent) : m_plotAddon(plotAddon) {
+GRTimeChannelAddon::GRTimeChannelAddon(GRSignalPath *path, GRTimePlotAddon *plotAddon, QObject *parent) : QObject(parent), m_plotAddon(plotAddon) {
 	this->ch = dynamic_cast<GRIIOChannel*>(path->path()[0]);
 	name = ch->getChannelName();
 	widget = new QLabel(name);
