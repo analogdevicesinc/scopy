@@ -3,6 +3,7 @@
 
 #include <QTabWidget>
 #include <QTextBrowser>
+#include <QPushButton>
 
 #include "scopy-core_export.h"
 
@@ -14,7 +15,10 @@ public:
 	ScopyAboutPage(QWidget *parent = nullptr);
 	~ScopyAboutPage();
 	void addHorizontalTab(QWidget *w, QString text);
-	QWidget *buildPage(QString src, QTextDocument::ResourceType r = QTextDocument::MarkdownResource);
+	QWidget *buildPage(QString src);
+private:
+	QWidget* createNavigationWidget(QTextBrowser *browser);
+	QPushButton *createNavigationButton(QIcon icon);
 };
 }
 
