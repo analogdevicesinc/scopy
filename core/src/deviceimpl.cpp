@@ -8,6 +8,7 @@
 #include <QDebug>
 #include <QThread>
 #include <common/scopyconfig.h>
+#include <widgets/hoverwidget.h>
 #include "qscrollarea.h"
 #include "ui_devicepage.h"
 
@@ -48,7 +49,7 @@ void DeviceImpl::loadPlugins() {
 	preload();
 	loadName();
 	loadIcons();
-	loadWarningBadge();
+	loadBadges();
 	loadPages();
 	loadToolList();
 	if (m_plugins.isEmpty()) {
@@ -161,26 +162,36 @@ void DeviceImpl::loadToolList() {
 	}
 }
 
-void DeviceImpl::onConnectionFailed()
+void DeviceImpl::loadBadges()
 {
-	m_warningBtn->show();
-	disconnectDev();
+	QPushButton *forgetBtn = new QPushButton();
+	forgetBtn->setMaximumSize(25, 25);
+	forgetBtn->setIcon(QIcon(":/gui/icons/orange_close.svg"));
+	connect(forgetBtn, &QPushButton::clicked, this, &DeviceImpl::forget);
+	HoverWidget *forgetHover = new HoverWidget(forgetBtn, m_icon, m_icon);
+	forgetHover->setStyleSheet("background-color: transparent; border: 0px;");
+	forgetHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
+	forgetHover->setContentPos(HoverPosition::HP_TOPLEFT);
+	forgetHover->setVisible(true);
+	forgetHover->raise();
+
+	QPushButton *warningBtn = new QPushButton();
+	warningBtn->setMaximumSize(25, 25);
+	warningBtn->setIcon(QIcon(":/gui/icons/warning.svg"));
+	warningBtn->setToolTip(tr("The device is not available!\n"
+				   "Verify the connection!"));
+	HoverWidget *warningHover = new HoverWidget(warningBtn, m_icon, m_icon);
+	warningHover->setStyleSheet("background-color: transparent; border: 0px;");
+	warningHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	warningHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	warningHover->raise();
+	connect(this, &DeviceImpl::connectionFailed, warningHover, &HoverWidget::show);
+	connect(this, &DeviceImpl::connected, warningHover, &HoverWidget::hide);
 }
 
-void DeviceImpl::loadWarningBadge()
+void DeviceImpl::onConnectionFailed()
 {
-	m_warningBtn = new QPushButton(QString(), m_icon);
-	m_warningBtn->installEventFilter(this);
-	m_warningBtn->setObjectName(QString::fromUtf8("btnHelp"));
-	m_warningBtn->setCheckable(false);
-	m_warningBtn->setText(QString());
-	m_warningBtn->setStyleSheet("background-color: transparent; border: 0px");
-	QIcon warningIcon = QIcon(":/gui/icons/warning.svg");
-	m_warningBtn->setIcon(warningIcon);
-	m_warningBtn->setMaximumSize(25,25);
-	m_warningBtn->move(80,0);
-	m_warningBtn->raise();
-	m_warningBtn->hide();
+	disconnectDev();
 }
 
 QList<Plugin *> DeviceImpl::plugins() const
@@ -239,7 +250,6 @@ void DeviceImpl::connectDev() {
 	} else {
 		connbtn->hide();
 		discbtn->show();
-		m_warningBtn->hide();
 		Q_EMIT connected();
 	}
 }
@@ -309,21 +319,6 @@ QList<ToolMenuEntry*> DeviceImpl::toolList()
 		ret.append(p->toolList());
 	}
 	return ret;
-}
-
-// WIP: to be move in DeviceIconImpl
-bool DeviceImpl::eventFilter(QObject *obj, QEvent *event)
-{
-	if (obj == (QObject*)m_warningBtn) {
-		if (event->type() == QEvent::Enter)
-		{
-			m_warningBtn->setToolTip("The device is not available!\n"
-						 "Verify the connection!");
-		}
-		return false;
-	} else {
-		return QObject::eventFilter(obj, event);
-	}
 }
 
 }
