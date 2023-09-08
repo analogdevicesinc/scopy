@@ -24,7 +24,7 @@ class SCOPY_GUI_EXPORT HoverWidget : public QWidget {
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-	HoverWidget(QWidget *content, QWidget *anchor = nullptr, QWidget *parent = nullptr);
+	HoverWidget(QWidget *content = nullptr, QWidget *anchor = nullptr, QWidget *parent = nullptr);
 	~HoverWidget();
 
 	bool eventFilter(QObject *watched, QEvent *event) override;
@@ -37,7 +37,9 @@ public:
 
 public:
 	void moveToAnchor();
-
+	void setContent(QWidget *widget);
+	void setAnchor(QWidget *anchor);
+	void setParent(QWidget *parent);
 private:
 	QHBoxLayout *m_lay;
 	QWidget* m_parent;
