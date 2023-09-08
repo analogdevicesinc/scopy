@@ -47,7 +47,7 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 
 	setupBufferPreviewer();
 	m_cursors = new PlotCursors(m_plotWidget);
-	m_cursors->setVisible(true);
+	m_cursors->setVisible(false);
 	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);
 	m_plotTimer->setSingleShot(true);
