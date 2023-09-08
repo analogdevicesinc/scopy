@@ -11,14 +11,13 @@ using namespace scopy::grutil;
 GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent) :
 	GRIIOChannel(channelName, dev, parent)
 {
+	fmt = dev->getChannelFormat(channelName);
 }
 
 void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
 {
 	qDebug(SCOPY_GR_UTIL)<<"Building GRIIOFloatChannelSrc";
 	dev->addChannel(this);
-
-	auto fmt = dev->getChannelFormat(channelName);
 	switch(fmt->length) {
 	case 16:
 		x2f = gr::blocks::short_to_float::make();
@@ -31,7 +30,6 @@ void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
 		x2f = gr::blocks::copy::make(fmt->length/8);
 		break;
 	}
-
 	end_blk = x2f;
 	start_blk.append(x2f);
 }
@@ -42,4 +40,9 @@ void GRIIOFloatChannelSrc::destroy_blks(GRTopBlock *top)
 	x2f = nullptr;
 	end_blk = nullptr;
 	start_blk.clear();
+}
+
+const iio_data_format *GRIIOFloatChannelSrc::getFmt() const
+{
+	return fmt;
 }
