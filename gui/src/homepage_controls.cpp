@@ -25,11 +25,31 @@
 using namespace scopy;
 
 HomepageControls::HomepageControls(QWidget *parent) :
-	QWidget(parent),
+	HoverWidget(),
 	ui(new Ui::HomepageControls)
 {
-	ui->setupUi(this);
+	QWidget *controls = new QWidget(this);
+	ui->setupUi(controls);
+	ui->openBtn->hide();
 
+	setContent(controls);
+	setAnchor(parent);
+	setParent(parent);
+	setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	setAnchorOffset(QPoint(-6, 6));
+	show();
+
+	connectSignals();
+}
+
+HomepageControls::~HomepageControls()
+{
+	delete ui;
+}
+
+void HomepageControls::connectSignals()
+{
 	connect(ui->leftBtn, &QPushButton::clicked, this, [=](){
 		Q_EMIT goLeft();
 	});
@@ -39,30 +59,6 @@ HomepageControls::HomepageControls(QWidget *parent) :
 	connect(ui->openBtn, &QPushButton::clicked, this, [=](){
 		Q_EMIT openFile();
 	});
-
-	ui->openBtn->hide();
-
-	updatePosition();
-}
-
-HomepageControls::~HomepageControls()
-{
-	delete ui;
-}
-
-void HomepageControls::updatePosition()
-{
-	move(parentWidget()->width() - 120, 5);
-}
-
-bool HomepageControls::eventFilter(QObject *watched, QEvent *event)
-{
-	if (event->type() == QEvent::Resize) {
-		updatePosition();
-		return false;
-	}
-
-	return QObject::eventFilter(watched, event);
 }
 
 void HomepageControls::enableLeft(bool en)
@@ -76,3 +72,4 @@ void HomepageControls::enableRight(bool en)
 }
 
 #include "moc_homepage_controls.cpp"
+#include <widgets/hoverwidget.h>

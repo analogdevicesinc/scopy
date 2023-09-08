@@ -23,6 +23,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <widgets/hoverwidget.h>
 #include "scopy-gui_export.h"
 
 namespace Ui {
@@ -30,16 +31,13 @@ class HomepageControls;
 }
 
 namespace scopy {
-class SCOPY_GUI_EXPORT HomepageControls : public QWidget
+class SCOPY_GUI_EXPORT HomepageControls : public HoverWidget
 {
 	Q_OBJECT
 
 public:
 	explicit HomepageControls(QWidget *parent = 0);
 	~HomepageControls();
-
-	void updatePosition();
-	virtual bool eventFilter(QObject *, QEvent *);
 
 public Q_SLOTS:
 	void enableLeft(bool);
@@ -52,6 +50,7 @@ Q_SIGNALS:
 
 private:
 	Ui::HomepageControls *ui;
+	void connectSignals();
 };
 }
 #endif // HOMEPAGE_CONTROLS_H
