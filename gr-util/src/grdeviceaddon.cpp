@@ -3,7 +3,7 @@
 
 using namespace scopy::grutil;
 
-GRDeviceAddon::GRDeviceAddon(GRIIODeviceSource *src, QObject *parent) {
+GRDeviceAddon::GRDeviceAddon(GRIIODeviceSource *src, QObject *parent) : QObject(parent){
 	name = src->deviceName();
 	widget = new QLabel("devicename" + src->deviceName());
 	m_src = src;
