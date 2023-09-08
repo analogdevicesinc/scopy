@@ -40,12 +40,15 @@
  */
 
 #include "utils.h"
+#include "QtSvg/qsvgrenderer.h"
+#include "qpainter.h"
 #include <sstream>
 #include <string>
 #include <algorithm>
 #include <QDebug>
 #include <QSizePolicy>
 #include <QFile>
+
 
 void Util::retainWidgetSizeWhenHidden(QWidget *w, bool retain)
 {
@@ -162,4 +165,51 @@ void DockerUtils::configureTopBar(QDockWidget *docker)
 			docker->setContentsMargins(0, 0, 0, 0);
 		}
 	});
+}
+
+void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, QString strattrval)
+{
+	// if it has the tagname then overwritte desired attribute
+	if (elem.tagName().compare(strtagname) == 0)
+	{
+		elem.setAttribute(strattr, strattrval);
+	}
+	// loop all children
+	for (int i = 0; i < elem.childNodes().count(); i++)
+	{
+		if (!elem.childNodes().at(i).isElement())
+		{
+			continue;
+		}
+		QDomElement docElem = elem.childNodes().at(i).toElement(); //<-- make const "variable"
+		SetAttrRecur(docElem, strtagname, strattr, strattrval);
+	}
+}
+
+/*QIcon*/ QPixmap Util::ChangeSVGColor(QString iconPath, QString color, float opacity)
+{
+	// open svg resource load contents to qbytearray
+	QFile file(iconPath);
+	if(!file.open(QIODevice::ReadOnly))
+		return {};
+	QByteArray baData = file.readAll();
+	// load svg contents to xml document and edit contents
+	QDomDocument doc;
+	doc.setContent(baData);
+	// recurivelly change color
+	QDomElement docElem = doc.documentElement(); //<-- make const "variable"
+	SetAttrRecur(docElem, "path", "fill", color);
+	SetAttrRecur(docElem, "path", "opacity", QString::number(opacity,'g', 2));
+	// create svg renderer with edited contents
+	QSvgRenderer svgRenderer(doc.toByteArray());
+	// create pixmap target (could be a QImage)
+	QPixmap pix(svgRenderer.defaultSize());
+	pix.fill(Qt::transparent);
+	// create painter to act over pixmap
+	QPainter pixPainter(&pix);
+	// use renderer to render over painter which paints on pixmap
+	svgRenderer.render(&pixPainter);
+	return pix;
+//	QIcon myicon(pix);
+//	return myicon;
 }

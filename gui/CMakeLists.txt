@@ -21,8 +21,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-FILE(GLOB SRC_LIST  src/*.cpp src/*.cc src/binding/*.cpp src/prop/*.cpp)
-FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp include/${SCOPY_MODULE}/binding/*.hpp include/${SCOPY_MODULE}/prop/*.hpp)
+FILE(GLOB SRC_LIST  src/*.cpp src/widgets/*.cpp src/*.cc src/binding/*.cpp src/prop/*.cpp)
+FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp  include/${SCOPY_MODULE}/widgets/*.h include/${SCOPY_MODULE}/binding/*.hpp include/${SCOPY_MODULE}/prop/*.hpp)
 FILE(GLOB UI_LIST ui/*.ui)
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
@@ -47,16 +47,16 @@ else()
 endif()
 
 if(ENABLE_TESTING)
-    add_subdirectory(test)
+	add_subdirectory(test)
 endif()
 
 set(PROJECT_SOURCES
-        ${SRC_LIST}
-        ${HEADER_LIST}
-        ${UI_LIST}
+	${SRC_LIST}
+	${HEADER_LIST}
+	${UI_LIST}
 )
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Xml Svg REQUIRED)
 option(SCOPY_ENABLE_GR_GUI "Build gnuradio addons for scopy-gui" ON)
 option(SCOPY_ENABLE_SIGROK_GUI "Build sigrok addons for scopy-gui" ON)
 if(SCOPY_ENABLE_GR_GUI)
@@ -73,26 +73,29 @@ find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED)
 
 message(STATUS "Building " ${PROJECT_NAME})
 add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
-    ${PROJECT_RESOURCES}
+	${PROJECT_SOURCES}
+	${PROJECT_RESOURCES}
 )
 
 generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
 configure_file(include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_config.h @ONLY)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/
-    scopy-common
-    scopysigrok-gui)
+	${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/
+	${CMAKE_CURRENT_SOURCE_DIR}include/${SCOPY_MODULE}/widgets
+	scopy-common
+	scopysigrok-gui)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${QWT_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    Qt${QT_VERSION_MAJOR}::Widgets
-    ${QWT_LIBRARIES}
-    ${Boost_LIBRARIES}
-    scopy-common
+	Qt${QT_VERSION_MAJOR}::Widgets
+	Qt${QT_VERSION_MAJOR}::Xml
+	Qt${QT_VERSION_MAJOR}::Svg
+	${QWT_LIBRARIES}
+	${Boost_LIBRARIES}
+	scopy-common
 )
 
 install(TARGETS ${PROJECT_NAME}
