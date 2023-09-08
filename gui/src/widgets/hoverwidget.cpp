@@ -18,17 +18,59 @@ HoverWidget::HoverWidget(QWidget *content,
 	m_lay->setMargin(2);
 	m_container->setLayout(m_lay);
 
-	m_lay->addWidget(content);
-	m_container->resize(content->size());
-	moveToAnchor();
+	if (m_content) {
+		m_lay->addWidget(m_content);
+		m_container->resize(m_content->size());
+		moveToAnchor();
 
-	anchor->installEventFilter(this);
-	content->installEventFilter(this);
-	m_parent->installEventFilter(this);
+		m_content->installEventFilter(this);
+	}
+
+	if (m_anchor) {
+		m_anchor->installEventFilter(this);
+	}
+
+	if (m_parent) {
+		m_parent->installEventFilter(this);
+	}
 
 	hide();
+}
 
+void HoverWidget::setContent(QWidget *content)
+{
+	if (m_content) {
+		m_lay->removeWidget(m_content);
+		m_content->removeEventFilter(this);
+	}
 
+	m_content = content;
+	m_lay->addWidget(m_content);
+	m_container->resize(m_content->size());
+	moveToAnchor();
+
+	m_content->installEventFilter(this);
+}
+
+void HoverWidget::setAnchor(QWidget *anchor)
+{
+	if (m_anchor) {
+		m_anchor->removeEventFilter(this);
+	}
+
+	m_anchor = anchor;
+	m_anchor->installEventFilter(this);
+}
+
+void HoverWidget::setParent(QWidget *parent)
+{
+	if (m_parent) {
+		m_parent->removeEventFilter(this);
+	}
+
+	m_parent = parent;
+	QWidget::setParent(m_parent);
+	m_parent->installEventFilter(this);
 }
 
 HoverWidget::~HoverWidget()
