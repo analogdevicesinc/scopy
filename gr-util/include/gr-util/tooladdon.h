@@ -19,4 +19,8 @@ public:
 	virtual void onChannelRemoved(ToolAddon* ) = 0;
 };
 }
+
+#define ToolAddon_iid "org.adi.Scopy.Plugins.ToolAddon/0.1"
+Q_DECLARE_INTERFACE(scopy::ToolAddon, ToolAddon_iid)
+
 #endif // TOOLADDON_H
