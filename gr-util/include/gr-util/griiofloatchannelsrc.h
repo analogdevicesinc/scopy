@@ -12,8 +12,12 @@ public:
 	void build_blks(GRTopBlock *top);
 	void destroy_blks(GRTopBlock *top);
 
+	const iio_data_format *getFmt() const;
+
 protected:
 	gr::basic_block_sptr x2f;
+private:
+	const iio_data_format* fmt;
 };
 }
 #endif // GRIIOFLOATCHANNELSRC_H
