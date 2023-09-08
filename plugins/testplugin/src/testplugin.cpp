@@ -233,9 +233,7 @@ void TestPlugin::loadSettings(QSettings &s)
 
 QString TestPlugin::about()
 {
-	QFile f(":/testplugin/about.md");
-	f.open(QFile::ReadOnly);
-	QString content = f.readAll();
+	QString content = "qrc:/testplugin/about.md";
 	return content;
 }
 
