@@ -14,6 +14,10 @@
 #include <QDialog>
 #include "tutorialoverlay.h"
 #include <gui/utils.h>
+#include <gui/widgets/hoverwidget.h>
+
+#include "ui_cursors_settings.h"
+
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
 using namespace scopy;
@@ -140,13 +144,31 @@ bool TestPlugin::onConnect()
 	m_toolList[0]->setRunBtnVisible(true);
 
 	tool = new QWidget();
+	m_toolList[0]->setTool(tool);
+
 	QVBoxLayout *lay = new QVBoxLayout(tool);
 	lbl = new QLabel("TestPlugin", tool);
 	pic = new QLabel("Picture",tool);
 	lbl2 = new QLabel("m_initText->"+m_initText,tool);
-	btn = new QPushButton("detach");
-	btn2 = new QPushButton("renameTool");
-	btn3 = new QPushButton("tutorial");
+	btn = new QPushButton("detach",tool);
+	btn2 = new QPushButton("renameTool",tool);
+	btn3 = new QPushButton("tutorial",tool);
+	btn4 = new QPushButton("CursorButton",tool);
+	btn4->setCheckable(true);
+
+	Ui::CursorsSettings* ui_curs = new Ui::CursorsSettings;
+	QWidget *cursorMenu = new QWidget(tool);
+	ui_curs->setupUi(cursorMenu);
+//	cursorMenu->setWindowModality(Qt::WindowModal);
+
+	HoverWidget* hover = new HoverWidget(cursorMenu, btn4, tool);
+	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
+	hover->setContentPos(HoverPosition::HP_TOPRIGHT);
+	connect(btn4, &QPushButton::toggled, this, [=](bool b) {
+		hover->setVisible(b);
+		hover->raise();
+	});
+
 	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
 	connect(btn2,&QPushButton::clicked,this,[=](){m_toolList[0]->setName("TestPlugin"+QString::number(renameCnt++));});
 	connect(btn3,&QPushButton::clicked,this,[=](){startTutorial();});
@@ -159,7 +181,8 @@ bool TestPlugin::onConnect()
 	lay->addWidget(btn);
 	lay->addWidget(btn2);
 	lay->addWidget(btn3);
-	m_toolList[0]->setTool(tool);
+	lay->addWidget(btn4);
+
 
 	m_pluginApi = new TestPlugin_API(this);
 	m_pluginApi->setObjectName(m_name);
