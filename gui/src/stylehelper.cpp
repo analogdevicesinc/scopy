@@ -691,3 +691,14 @@ void StyleHelper::MenuOnOffSwitchButton(SmallOnOffSwitch *w, QString objectName)
 
 }
 
+void StyleHelper::OverlayMenu(QWidget *w, QString objectName) {
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QString style = QString(R"css(
+				.QWidget {
+					background-color: &&UIElementBackground&&;
+					border-radius: 4px;
+				})css");
+	style.replace("&&UIElementBackground&&",StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
