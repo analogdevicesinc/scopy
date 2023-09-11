@@ -94,6 +94,7 @@ void ScopyPreferencesPage::removeIniFiles(bool backup) {
 	qInfo(CAT_PREFERENCESPAGE)<<"Removing ini files .. ";
 	for(auto &&file : settingsFiles) {
 		if(backup) {
+			QFile(file+".bak").remove();
 			QFile(file).rename(file+".bak");
 			qDebug(CAT_PREFERENCESPAGE)<<"Renamed" << file << "to" << file <<".bak";
 		} else {

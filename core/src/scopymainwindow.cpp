@@ -5,6 +5,7 @@
 #include <QStandardPaths>
 #include <QLoggingCategory>
 #include <QTranslator>
+#include <license_overlay.h>
 
 #include "qmessagebox.h"
 #include "scopymainwindow.h"
@@ -38,6 +39,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ui->setupUi(this);
 	setWindowTitle("Scopy-" + scopy::config::fullversion());
 
+	StyleHelper::GetInstance()->initColorMap();
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();
 	initPreferences();
@@ -45,7 +47,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
-	StyleHelper::GetInstance()->initColorMap();
 
 	//	auto vc = VersionCache::GetInstance();
 	//	if(vc->cacheOutdated()) {
@@ -246,6 +247,10 @@ void ScopyMainWindow::initPreferences()
 	}
 	if(p->get("general_load_decoders").toBool()){
 		loadDecoders();
+	}
+	if (p->get("general_first_run").toBool()) {
+		LicenseOverlay *license = new LicenseOverlay(this);
+		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();
 	QString themeName = "scopy-" + theme;
