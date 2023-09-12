@@ -54,6 +54,7 @@ public Q_SLOTS:
 
 	void setBufferSize(uint32_t newBufferSize);
 	void computeSampleRateAvailable();
+	void showPlotLabels(bool);
 
 Q_SIGNALS:
 	void bufferSizeChanged(uint32_t);

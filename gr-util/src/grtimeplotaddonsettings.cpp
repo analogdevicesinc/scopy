@@ -202,12 +202,8 @@ QWidget* GRTimePlotAddonSettings::createXAxisMenu(QWidget* parent) {
 	connect(this, &GRTimePlotAddonSettings::showPlotTagsChanged, m_plot, &GRTimePlotAddon::setDrawPlotTags);
 
 	m_showLabels = new MenuOnOffSwitch("PLOT LABELS", xaxis);
-	connect(m_showLabels->onOffswitch(), &QAbstractButton::toggled, [=](bool b) {
-		PlotWidget* plotWidget = m_plot->plot();
-		plotWidget->setShowXAxisLabels(b);
-		plotWidget->setShowYAxisLabels(b);
-		plotWidget->showAxisLabels();
-	});
+	showPlotLabels(false);
+	connect(m_showLabels->onOffswitch(), &QAbstractButton::toggled, this, &GRTimePlotAddonSettings::showPlotLabels);
 
 	xaxiscontainer->contentLayout()->setSpacing(10);
 	xaxiscontainer->contentLayout()->addWidget(xaxis);
@@ -350,6 +346,14 @@ void GRTimePlotAddonSettings::computeSampleRateAvailable()
 			break;
 		}
 	}
+}
+
+void GRTimePlotAddonSettings::showPlotLabels(bool b)
+{
+	PlotWidget* plotWidget = m_plot->plot();
+	plotWidget->setShowXAxisLabels(b);
+	plotWidget->setShowYAxisLabels(b);
+	plotWidget->showAxisLabels();
 }
 
 QString GRTimePlotAddonSettings::getName() { return name;}
