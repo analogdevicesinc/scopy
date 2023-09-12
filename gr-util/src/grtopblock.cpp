@@ -49,6 +49,7 @@ void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 void GRTopBlock::build() {
 
 	top->disconnect_all();
+	top = gr::make_top_block(m_name.toStdString());
 	Q_EMIT aboutToBuild();
 
 	for (GRSignalPath* sig : qAsConst(m_signalPaths)) {
