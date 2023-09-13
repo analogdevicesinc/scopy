@@ -15,6 +15,8 @@
 #include "tutorialoverlay.h"
 #include <gui/utils.h>
 #include <gui/widgets/hoverwidget.h>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
 #include "ui_cursors_settings.h"
 #include "testtool.h"
 
@@ -42,16 +44,20 @@ bool TestPlugin::loadPreferencesPage()
 
 	m_preferencesPage = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
-	QCheckBox *pref1 = PreferencesHelper::addPreferenceCheckBox(p,"pref1","First Option",this);
-	QCheckBox *pref2 = PreferencesHelper::addPreferenceCheckBox(p,"pref2","Second Option",this);
-	QLineEdit *pref3 = PreferencesHelper::addPreferenceEdit(p,"prefstr","PreferenceString",this);
-	QWidget *pref4 = PreferencesHelper::addPreferenceCombo(p,"pref4","languages",{"english","french","italian"},this);
 
-	lay->addWidget(pref1);
-	lay->addWidget(pref2);
-	lay->addWidget(pref3);
-	lay->addWidget(pref4);
-	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *generalSection = new MenuCollapseSection("General",MenuCollapseSection::MHCW_NONE, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->setMargin(0);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"pref1","First Option",generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"pref2","Second Option",generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(p,"prefstr","PreferenceString",generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"pref4","languages",{"english","french","italian"},generalSection));
 
 	return true;
 }

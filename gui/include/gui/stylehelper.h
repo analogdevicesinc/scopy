@@ -65,8 +65,12 @@ public:
 	static void MenuLineEdit(QLineEdit *m_edit, QString objectName);
 	static void MenuLineEditWidget(QWidget *w, QString objectName);
 	static void BlueGrayButton(QPushButton *btn, QString objectName);
-	static void OverlayMenu(QWidget *w, QString objectName);
-	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName);
+	static void OverlayMenu(QWidget *w, QString objectName = "");
+	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName = "");
+	static void TabWidgetEastMenu(QTabWidget *w, QString objectName = "");
+	static void BackgroundPage(QWidget *w, QString objectName = "");
+	static void BackgroundWidget(QWidget *w, QString objectName = "");
+	static void TabWidgetLabel(QLabel *w, QString objectName = "");
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;

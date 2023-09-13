@@ -308,17 +308,19 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr){
 
 
 void ScopyMainWindow::handlePreferences(QString str,QVariant val) {
+	Preferences *p = Preferences::GetInstance();
 
 	if(str == "general_use_opengl") {
-		prefPage->showRestartWidget();
+		Q_EMIT p->restartRequired();
+
 	} else if(str == "general_use_animations") {
 		AnimationManager::getInstance().toggleAnimations(val.toBool());
 
 	} else if(str == "general_theme") {
-		prefPage->showRestartWidget();
+		Q_EMIT p->restartRequired();
 
 	} else if(str == "general_language") {
-		prefPage->showRestartWidget();
+		Q_EMIT p->restartRequired();
 	}
 }
 
