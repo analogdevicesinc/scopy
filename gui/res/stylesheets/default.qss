@@ -139,8 +139,12 @@ QComboBox::item:selected {
  border-bottom: 0px solid none;
  background-color: #272730;
 }
+QComboBox::item {
+ background-color: #1b1b21;
+}
 QComboBox::drop-down {
  subcontrol-position: center right;
+ background-color: transparent;
  border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
  width: 10px;
  height: 6px;
