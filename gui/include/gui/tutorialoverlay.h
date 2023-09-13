@@ -26,6 +26,7 @@
 #include "tintedoverlay.h"
 #include "tutorialchapter.h"
 #include <widgets/hoverwidget.h>
+#include "widgets/popupwidget.h"
 #include "scopy-gui_export.h"
 
 namespace Ui {
@@ -74,6 +75,7 @@ Q_SIGNALS:
 
 private:
 	void buildUi();
+	void initPopupWidget();
 	bool eventFilter(QObject *watched, QEvent *event) override;
 
 	QList<TutorialChapter*> chapter;
@@ -83,7 +85,7 @@ private:
 	HoverWidget *m_hoverWidget;
 	QString title;
 	int cnt;
-	Ui::Tutorial *ui;
+	PopupWidget *ui;
 };
 }
 

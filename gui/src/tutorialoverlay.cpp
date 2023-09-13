@@ -96,6 +96,7 @@ void TutorialOverlay::next()
 		}
 		highlights.clear();
 		m_hoverWidget->deleteLater();
+		m_popupWidget->deleteLater();
 	}
 
 	if(cnt == chapter.count()) {
@@ -108,15 +109,16 @@ void TutorialOverlay::next()
 
 	Q_EMIT chapter[cnt]->chapterStarted();
 
-	ui->description->setMarkdown(chapter[cnt]->description);
+	initPopupWidget();
+	m_popupWidget->setDescription(chapter[cnt]->description);
 	overlay->raise();
 	overlay->clearHoles();
 
 	QList<QWidget*> subjects = chapter[cnt]->subjects;
 	if(!subjects.isEmpty()) {
 		overlay->setHoles(subjects);
-		m_hoverWidget = new HoverWidget(this, chapter[cnt]->mainSubject, qApp->activeWindow());
 
+		m_hoverWidget = new HoverWidget(ui, chapter[cnt]->mainSubject, qApp->activeWindow());
 		m_hoverWidget->setContentPos(chapter[cnt]->content);
 		m_hoverWidget->setAnchorPos(chapter[cnt]->anchor);
 		m_hoverWidget->setAnchorOffset(QPoint(chapter[cnt]->x_offset, chapter[cnt]->y_offset));
@@ -125,7 +127,7 @@ void TutorialOverlay::next()
 		m_hoverWidget->setVisible(true);
 		for (QWidget *subj : qAsConst(subjects)) {
 			subj->raise();
-			ui->btnNext->setFocus();
+			ui->setFocusOnContinueButton();
 			auto* highlight = new TintedOverlay(subj,QColor(255,255,255,35));
 			highlight->raise();
 			highlight->show();
@@ -133,28 +135,23 @@ void TutorialOverlay::next()
 		}
 	}
 
-	QString storyTitle = title + QString::number(cnt + 1) + "/" + QString::number(chapter.count());
-	ui->title->setText(storyTitle);
-
-	int pw = parent->geometry().width();
-	int ph = parent->geometry().height();
-	int w = 400;
-	int h = 150;
-
-	setGeometry((pw-w)/2,(ph-h)/2,w,h);
+	QString storyTitle = title + " " + QString::number(cnt + 1) + "/" + QString::number(chapter.count());
+	m_popupWidget->setTitle(storyTitle);
 
 	raise();
 	show();
+	ui->raise();
 
 	cnt++;
-	if(cnt == chapter.count())
-		ui->btnNext->setText(tr("Finish"));
+//	if(cnt == chapter.count())
+//		ui->btnNext->setText("Finish");
 }
 
 void TutorialOverlay::finish() {
 	qInfo(CAT_TUTORIALOVERLAY)<<"Tutorial Finished";
 	overlay->deleteLater();
 	m_hoverWidget->deleteLater();
+	m_popupWidget->deleteLater();
 	deleteLater();
 
 	Q_EMIT finished();
@@ -169,6 +166,7 @@ void TutorialOverlay::abort() {
 		}
 		highlights.clear();
 		m_hoverWidget->deleteLater();
+		m_popupWidget->deleteLater();
 	}
 	overlay->deleteLater();
 	deleteLater();
@@ -181,21 +179,17 @@ void TutorialOverlay::buildUi()
 	qDebug(CAT_TUTORIALOVERLAY)<<"build";
 	overlay = new TintedOverlay(parent);
 
-	ui = new Ui::Tutorial();
-	ui->setupUi(this);
-	ui->description->setStyleSheet("background-color: rgba(0,0,0,60);color: white;");
-	ui->title->setStyleSheet("color:white");
-	ui->btnExit->setStyleSheet("width:80;height:20");
-	ui->btnExit->setProperty("blue_button", true);
-	ui->btnNext->setStyleSheet("width:80;height:20");
-	ui->btnNext->setProperty("blue_button", true);
-	ui->btnNext->setFocus();
-	connect(ui->btnNext,&QPushButton::clicked,this,&TutorialOverlay::next);
-	connect(ui->btnExit, &QPushButton::clicked, this, &TutorialOverlay::abort);
+	initPopupWidget();
 
 	overlay->raise();
 	overlay->show();
+}
 
+void TutorialOverlay::initPopupWidget() {
+	m_popupWidget = new PopupWidget();
+	m_popupWidget->setFocusOnContinueButton();
+	connect(m_popupWidget, &PopupWidget::continueButtonClicked, this, &TutorialOverlay::next);
+	connect(m_popupWidget, &PopupWidget::exitButtonClicked, this, &TutorialOverlay::abort);
 }
 
 const QString &TutorialOverlay::getTitle() const

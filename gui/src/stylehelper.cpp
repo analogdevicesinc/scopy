@@ -800,3 +800,14 @@ void StyleHelper::OverlayMenu(QWidget *w, QString objectName) {
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::TitleLabel(QLabel *w, QString objectName) {
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QString style = QString(R"css(
+				QLabel {
+					font-weight: bold;
+					color: &&LabelText&&;
+				}
+				)css");
+	style.replace("&&LabelText&&", StyleHelper::getColor("LabelText"));
+	w->setStyleSheet(style);
+}
