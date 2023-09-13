@@ -17,8 +17,7 @@ public:
 	void addHorizontalTab(QWidget *w, QString text);
 	QWidget *buildPage(QString src);
 private:
-	QWidget* createNavigationWidget(QTextBrowser *browser);
-	QPushButton *createNavigationButton(QIcon icon);
+	void initNavigationWidget(QTextBrowser *browser);
 };
 }
 

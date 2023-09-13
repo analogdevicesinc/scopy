@@ -38,6 +38,8 @@ void StyleHelper::initColorMap() {
 	sh->colorMap.insert("UIElementBackground",	"#272730");
 	sh->colorMap.insert("LabelText",			"#FFFFFF");
 	sh->colorMap.insert("ScopyBackground",		"#141416");
+	sh->colorMap.insert("ScopyBlueHover",		"#4A34FF");
+	sh->colorMap.insert("ScopyBlueSelected",		"#3324B1");
 }
 
 QString StyleHelper::getColor(QString id) {
@@ -658,6 +660,33 @@ void StyleHelper::MenuSectionWidget(QWidget *w, QString objectName) {
 			}
 			)css");
 	style.replace("&&UIElementBackground&&",StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::BlueIconButton(QPushButton *w, QIcon icon, QString objectName) {
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	int size = 30;
+	w->setIcon(icon);
+	w->setIconSize(QSize(size, size));
+	w->setProperty("blue_button", true);
+	w->setFixedHeight(size);
+	w->setFixedWidth(size);
+
+	QString style = QString(R"css(
+			QPushButton{
+			 background-color: &&ScopyBlue&&;
+			 color: &&LabelText&&;
+			 border-radius: 4px;
+			 font-size: 14px;
+			}
+			QPushButton:hover:!pressed { background-color: &&ScopyBlueHover&&; }
+			QPushButton:pressed { background-color: &&ScopyBlueSelected&&; }
+			QPushButton:disabled { background-color: grey; }
+			)css");
+	style.replace("&&ScopyBlue&&",StyleHelper::getColor("ScopyBlue"));
+	style.replace("&&LabelText&&",StyleHelper::getColor("LabelText"));
+	style.replace("&&ScopyBlueHover&&",StyleHelper::getColor("ScopyBlueHover"));
+	style.replace("&&ScopyBlueSelected&&",StyleHelper::getColor("ScopyBlueSelected"));
 	w->setStyleSheet(style);
 }
 
