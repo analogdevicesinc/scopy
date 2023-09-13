@@ -32,6 +32,7 @@ using namespace scopy;
 using namespace scopy::m2k;
 
 Q_LOGGING_CATEGORY(CAT_M2KPLUGIN,"M2KPLUGIN");
+Q_LOGGING_CATEGORY(CAT_BENCHMARK, "Benchmark")
 
 bool M2kPlugin::compatible(QString m_param, QString category) {
 	qDebug(CAT_M2KPLUGIN)<<"compatible";
@@ -309,6 +310,8 @@ void M2kPlugin::cleanup()
 
 bool M2kPlugin::onConnect()
 {
+	QElapsedTimer timer;
+	timer.start();
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
 
@@ -390,12 +393,16 @@ bool M2kPlugin::onConnect()
 		cleanup();
 		return false;
 	}
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << " ms";
 	return true;
 }
 
 bool M2kPlugin::onDisconnect()
 {	
+	QElapsedTimer timer;
+	timer.start();
 	cleanup();
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << " ms";
 	return true;
 }
 
