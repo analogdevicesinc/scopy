@@ -7,6 +7,7 @@
 #include <QTranslator>
 #include <license_overlay.h>
 
+#include "logging_categories.h"
 #include "qmessagebox.h"
 #include "scopymainwindow.h"
 #include "animationmanager.h"
@@ -36,6 +37,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
     : QMainWindow(parent)
       , ui(new Ui::ScopyMainWindow)
 {
+	QElapsedTimer timer;
+	timer.start();
 	ui->setupUi(this);
 	setWindowTitle("Scopy-" + scopy::config::fullversion());
 
@@ -142,6 +145,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void ScopyMainWindow::save() {
@@ -186,6 +190,8 @@ ScopyMainWindow::~ScopyMainWindow(){
 
 void ScopyMainWindow::initAboutPage(PluginManager *pm)
 {
+	QElapsedTimer timer;
+	timer.start();
 	about = new ScopyAboutPage(this);
 	if(!pm)
 		return;
@@ -196,6 +202,7 @@ void ScopyMainWindow::initAboutPage(PluginManager *pm)
 			about->addHorizontalTab(about->buildPage(content),p->name());
 		}
 	}
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 
@@ -222,6 +229,8 @@ void ScopyMainWindow::initTranslations()
 
 void ScopyMainWindow::initPreferences()
 {
+	QElapsedTimer timer;
+	timer.start();
 	QString preferencesPath = scopy::config::preferencesFolderPath()  + "/preferences.ini";
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(preferencesPath);
@@ -256,6 +265,7 @@ void ScopyMainWindow::initPreferences()
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);
 	QIcon::setThemeSearchPaths({":/gui/icons/"+themeName});
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void ScopyMainWindow::loadOpenGL() {
@@ -277,6 +287,8 @@ void ScopyMainWindow::loadOpenGL() {
 
 void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr){
 
+	QElapsedTimer timer;
+	timer.start();
 	// Check the local plugins folder first
 	QDir pathDir(scopy::config::localPluginFolderPath());
 	if (pathDir.exists()){
@@ -291,6 +303,7 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr){
 		pr->init(pluginAdditionalPath);
 	}
 #endif
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 
@@ -341,6 +354,8 @@ void ScopyMainWindow::initPythonWIN32(){
 
 void ScopyMainWindow::loadDecoders()
 {
+	QElapsedTimer timer;
+	timer.start();
 	#if defined(WITH_SIGROK) && defined(WITH_PYTHON)
 		#if defined __APPLE__
 			QString path = QCoreApplication::applicationDirPath() + "/decoders";
@@ -377,6 +392,7 @@ void ScopyMainWindow::loadDecoders()
 	#else
 		qInfo(CAT_SCOPY) << "Python or libsigrokdecode are disabled, can't load decoders";
 	#endif
+		qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
