@@ -7,6 +7,8 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QCoreApplication>
+#include <QScrollArea>
+#include <stylehelper.h>
 #include "pluginbase/preferenceshelper.h"
 #include "application_restarter.h"
 #include <QDir>
@@ -14,54 +16,85 @@
 #include <QLoggingCategory>
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_PREFERENCESPAGE, "ScopyPreferencesPage");
 
 using namespace scopy;
-ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent) : QTabWidget(parent)
+ScopyPreferencesPage::ScopyPreferencesPage(QWidget *parent) :
+	QWidget(parent)
+      , tabWidget(new QTabWidget(this))
+      , layout(new QVBoxLayout(this))
 {
-	setTabPosition(TabPosition::East);
+	initUI();
+	initRestartWidget();
+
 	addHorizontalTab(buildGeneralPreferencesPage(),"General");
 }
 
-void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
-	// Hackish - so we don't override paint event
-	addTab(w, "");
-	QLabel *lbl1 = new QLabel();
-	lbl1->setText(text);
-	QTabBar *tabbar = tabBar();
-	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
+void ScopyPreferencesPage::initUI()
+{
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	this->setLayout(layout);
+	layout->addWidget(tabWidget);
 
+	StyleHelper::BackgroundPage(tabWidget, "preferencesTable");
+	StyleHelper::TabWidgetEastMenu(tabWidget, "preferencesTable");
 }
 
-void ScopyPreferencesPage::showRestartWidget()
-{
-	restartWidget->show();
+void ScopyPreferencesPage::addHorizontalTab(QWidget *w, QString text) {
+	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+	QWidget* pane = new QWidget();
+	QHBoxLayout* lay = new QHBoxLayout();
+	lay->setMargin(10);
+	pane->setLayout(lay);
+
+	QScrollArea* scrollArea = new QScrollArea();
+	scrollArea->setWidget(w);
+	scrollArea->setWidgetResizable(true);
+	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	lay->addWidget(scrollArea);
+
+	// Hackish - so we don't override paint event
+	tabWidget->addTab(pane, "");
+	QLabel *lbl1 = new QLabel();
+	StyleHelper::TabWidgetLabel(lbl1, "tabWidgetLabel");
+	lbl1->setText(text);
+	QTabBar *tabbar = tabWidget->tabBar();
+	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
+
 }
 
 ScopyPreferencesPage::~ScopyPreferencesPage() {
 
 }
 
-QWidget* ScopyPreferencesPage::createRestartWidget() {
-	QWidget *w = new QWidget();
+void ScopyPreferencesPage::initRestartWidget() {
+	restartWidget = new QWidget();
 	QHBoxLayout *lay = new QHBoxLayout();
 	lay->setSpacing(0);
-	lay->setMargin(0);
-	w->setLayout(lay);
+	lay->setMargin(10);
+	restartWidget->setLayout(lay);
+	restartWidget->setVisible(false);
 	QLabel *lab = new QLabel("An application restart is required for these settings to take effect. ");
-	QSpacerItem *space = new QSpacerItem(20,20,QSizePolicy::Preferred,QSizePolicy::Preferred);
+	QSpacerItem *space1 = new QSpacerItem(6,20,QSizePolicy::Expanding,QSizePolicy::Fixed);
+	QSpacerItem *space2 = new QSpacerItem(6,20,QSizePolicy::Preferred,QSizePolicy::Fixed);
 	QPushButton* btn = new QPushButton("Restart");
-	btn->setProperty("blue_button",true);
-	btn->setStyleSheet("width:80;height:20");
+	StyleHelper::BlueButton(btn, "RestartBtn");
+	StyleHelper::BackgroundWidget(restartWidget, "restartWidget");
+	btn->setFixedWidth(100);
 
-	lay->addWidget(lab,3);
-	lay->addSpacerItem(space);
-	lay->addWidget(btn,1);
+	lay->addWidget(btn);
+	lay->addSpacerItem(space2);
+	lay->addWidget(lab);
+	lay->addSpacerItem(space1);
+	layout->addWidget(restartWidget);
 
-	w->connect(btn,&QPushButton::clicked, btn, [](){ApplicationRestarter::triggerRestart();});
-	w->hide();
-	return w;
+	connect(btn, &QPushButton::clicked, btn, [](){ApplicationRestarter::triggerRestart();});
+	connect(Preferences::GetInstance(), &Preferences::restartRequired, this, [=](){restartWidget->setVisible(true);});
 }
 
 QWidget* ScopyPreferencesPage::buildSaveSessionPreference() {
@@ -74,9 +107,9 @@ QWidget* ScopyPreferencesPage::buildSaveSessionPreference() {
 	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding,QSizePolicy::Fixed));
 	lay->addWidget(new QLabel("Settings files location ",this));
 	QPushButton *navigateBtn = new QPushButton("Open",this);
-	navigateBtn->setProperty("blue_button",true);
-	navigateBtn->setStyleSheet("width:80;height:20");
-	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl("file://"+scopy::config::settingsFolderPath()); });
+	StyleHelper::BlueButton(navigateBtn, "navigateBtn");
+	navigateBtn->setMaximumWidth(80);
+	connect(navigateBtn,&QPushButton::clicked,this,[=]() {QDesktopServices::openUrl(scopy::config::settingsFolderPath()); });
 	lay->addWidget(navigateBtn);
 	return w;
 }
@@ -108,20 +141,24 @@ void ScopyPreferencesPage::resetScopyPreferences() {
 	Preferences *p = Preferences::GetInstance();
 	removeIniFiles();
 	p->clear();
-	showRestartWidget();
+	Q_EMIT Preferences::GetInstance()->restartRequired();
 }
 
 QWidget* ScopyPreferencesPage::buildResetScopyDefaultButton() {
 	QWidget *w = new QWidget(this);
 	QHBoxLayout *lay = new QHBoxLayout(w);
 
-	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding, QSizePolicy::Fixed));
-	lay->addWidget(new QLabel("Reset to settings and plugins to default"));
-	QPushButton	*resetBtn = new QPushButton("Reset",this);
-	resetBtn->setProperty("blue_button",true);
-	resetBtn->setStyleSheet("width:80;height:20");
+	QPushButton *resetBtn = new QPushButton("Reset",this);
+	StyleHelper::BlueButton(resetBtn, "resetBtn");
+	resetBtn->setMaximumWidth(80);
 	connect(resetBtn,&QPushButton::clicked,this,&ScopyPreferencesPage::resetScopyPreferences);
 	lay->addWidget(resetBtn);
+	lay->setMargin(0);
+	lay->addSpacerItem(new QSpacerItem(6,40,QSizePolicy::Preferred, QSizePolicy::Fixed));
+	lay->addWidget(new QLabel("Reset to settings and plugins to default"));
+	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding, QSizePolicy::Fixed));
+
+
 	return w;
 }
 
@@ -129,31 +166,43 @@ QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
 {
 	QWidget *page = new QWidget(this);
 	QVBoxLayout *lay = new QVBoxLayout(page);
-	lay->setSpacing(10);
-	QHBoxLayout *lay3 = new QHBoxLayout(page);
-
 	Preferences *p = Preferences::GetInstance();
 	TranslationsRepository *t = scopy::TranslationsRepository::GetInstance();
 
-	lay->addWidget(buildSaveSessionPreference());
+	lay->setMargin(0);
+	lay->setSpacing(10);
+	page->setLayout(lay);
 
-	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_save_attached", "Save/Load tool attached state", this));
-	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_doubleclick_attach", "Doubleclick to attach/detach tool", this));
-	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_opengl", "Enable OpenGL plotting", this));
-	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_animations", "Enable menu animations", this));
-	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_theme", "Theme", {"default","light"}, this));
-	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_language", "Language", t->getLanguages(), this));
+	// General preferences
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(page);
+	MenuCollapseSection *generalSection = new MenuCollapseSection("General",MenuCollapseSection::MHCW_NONE, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
-	lay->addWidget(new QLabel("--- Debug preferences --- "));
-	lay->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_show_plot_fps","Show plot FPS", this));
-	lay->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_plot_target_fps", "Plot target FPS", {"15","20","30","60"}, this));
+	generalSection->contentLayout()->addWidget(buildSaveSessionPreference());
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_save_attached", "Save/Load tool attached state", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_doubleclick_attach", "Doubleclick to attach/detach tool", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_opengl", "Enable OpenGL plotting", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_animations", "Enable menu animations", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_theme", "Theme", {"default","light"}, generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_language", "Language",t->getLanguages(), generalSection));
 
-	lay->addWidget(buildResetScopyDefaultButton());
+	// Debug preferences
+	MenuSectionWidget *debugWidget = new MenuSectionWidget(page);
+	MenuCollapseSection *debugSection = new MenuCollapseSection("Debug",MenuCollapseSection::MHCW_NONE, debugWidget);
+	debugWidget->contentLayout()->setSpacing(10);
+	debugWidget->contentLayout()->addWidget(debugSection);
+	debugSection->contentLayout()->setSpacing(10);
+	lay->addWidget(debugWidget);
+	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
+	debugSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_show_plot_fps","Show plot FPS", debugSection));
+	debugSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_plot_target_fps", "Plot target FPS", {"15","20","30","60"}, debugSection));
+	debugSection->contentLayout()->addWidget(buildResetScopyDefaultButton());
 
-	lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Expanding,QSizePolicy::Expanding));
-	restartWidget = createRestartWidget();
-	lay->addWidget(restartWidget);
 	return page;
 }
 
