@@ -89,15 +89,7 @@ void TutorialOverlay::start()
 
 void TutorialOverlay::next()
 {
-	if(!highlights.isEmpty()) {
-		// delete previous highlight
-		for (TintedOverlay *highlight : qAsConst(highlights)) {
-			highlight->deleteLater();
-		}
-		highlights.clear();
-		m_hoverWidget->deleteLater();
-		m_popupWidget->deleteLater();
-	}
+	cleanupChapter();
 
 	if(cnt == chapter.count()) {
 		// stop story
@@ -118,7 +110,7 @@ void TutorialOverlay::next()
 	if(!subjects.isEmpty()) {
 		overlay->setHoles(subjects);
 
-		m_hoverWidget = new HoverWidget(ui, chapter[cnt]->mainSubject, qApp->activeWindow());
+		m_hoverWidget = new HoverWidget(m_popupWidget, chapter[cnt]->mainSubject, qApp->activeWindow());
 		m_hoverWidget->setContentPos(chapter[cnt]->content);
 		m_hoverWidget->setAnchorPos(chapter[cnt]->anchor);
 		m_hoverWidget->setAnchorOffset(QPoint(chapter[cnt]->x_offset, chapter[cnt]->y_offset));
@@ -127,7 +119,7 @@ void TutorialOverlay::next()
 		m_hoverWidget->setVisible(true);
 		for (QWidget *subj : qAsConst(subjects)) {
 			subj->raise();
-			ui->setFocusOnContinueButton();
+			m_popupWidget->setFocusOnContinueButton();
 			auto* highlight = new TintedOverlay(subj,QColor(255,255,255,35));
 			highlight->raise();
 			highlight->show();
@@ -140,34 +132,24 @@ void TutorialOverlay::next()
 
 	raise();
 	show();
-	ui->raise();
+	m_popupWidget->raise();
 
 	cnt++;
-//	if(cnt == chapter.count())
-//		ui->btnNext->setText("Finish");
+	if(cnt == chapter.count())
+		m_popupWidget->setContinueButtonText("Finish");
 }
 
 void TutorialOverlay::finish() {
 	qInfo(CAT_TUTORIALOVERLAY)<<"Tutorial Finished";
 	overlay->deleteLater();
-	m_hoverWidget->deleteLater();
-	m_popupWidget->deleteLater();
-	deleteLater();
+	cleanupChapter();
 
 	Q_EMIT finished();
 }
 
 void TutorialOverlay::abort() {
 	qInfo(CAT_TUTORIALOVERLAY) << "Tutorial Aborted";
-	if(!highlights.isEmpty()) {
-		// delete previous highlight
-		for (TintedOverlay *highlight : qAsConst(highlights)) {
-			highlight->deleteLater();
-		}
-		highlights.clear();
-		m_hoverWidget->deleteLater();
-		m_popupWidget->deleteLater();
-	}
+	cleanupChapter();
 	overlay->deleteLater();
 	deleteLater();
 
@@ -191,6 +173,20 @@ void TutorialOverlay::initPopupWidget() {
 	connect(m_popupWidget, &PopupWidget::continueButtonClicked, this, &TutorialOverlay::next);
 	connect(m_popupWidget, &PopupWidget::exitButtonClicked, this, &TutorialOverlay::abort);
 }
+
+void TutorialOverlay::cleanupChapter() {
+	if(!highlights.isEmpty()) {
+		// delete previous highlight
+		for (TintedOverlay *highlight : qAsConst(highlights)) {
+			delete highlight;
+		}
+		highlights.clear();
+
+		delete m_popupWidget;
+		delete m_hoverWidget;
+	}
+}
+
 
 const QString &TutorialOverlay::getTitle() const
 {

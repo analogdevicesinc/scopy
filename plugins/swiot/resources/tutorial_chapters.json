@@ -55,10 +55,8 @@
 			"index": 1,
 			"names": ["DIO_DIGITAL_CHANNEL_SPACE"],
 			"description": "The channels configured as MAX14906 will be displayed here, or nothing if there are none. Each channel shows its own controls.",
-			"anchor": "HP_TOPRIGHT",
-			"content": "HP_CENTER",
-			"x_offset": 100,
-			"y_offset": -15
+			"anchor": "HP_RIGHT",
+			"content": "HP_CENTER"
 		},
 		{
 			"index": 2,
@@ -91,7 +89,8 @@
 			"names": ["AD74413R_PLOT"],
 			"description": "The plot displays the values read from all channels of AD74413R.",
 			"anchor": "HP_LEFT",
-			"content": "HP_LEFT"
+			"content": "HP_CENTER",
+			"x_offset": 20
 		},
 		{
 			"index": 2,
@@ -172,10 +171,9 @@
 			"index": 6,
 			"names": ["SINGLE_BUTTON"],
 			"description": "Reads the value of the faults once for both devices.",
-			"anchor": "HP_BOTTOM",
-			"content": "HP_BOTTOM",
-			"y_offset": 10,
-			"offset_x": -20
+			"anchor": "HP_BOTTOMLEFT",
+			"content": "HP_BOTTOMLEFT",
+			"y_offset": 10
 		},
 		{
 			"index": 7,

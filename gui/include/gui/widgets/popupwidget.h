@@ -32,6 +32,7 @@ class SCOPY_GUI_EXPORT PopupWidget : public QWidget {
 	Q_OBJECT
 public:
 	explicit PopupWidget(QWidget* parent = nullptr);
+	~PopupWidget();
 
 	void setFocusOnContinueButton();
 	void setFocusOnExitButton();
