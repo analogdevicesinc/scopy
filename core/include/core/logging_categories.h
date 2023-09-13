@@ -28,7 +28,7 @@
 #define QDEBUG_LOG_MSG_TYPE
 #define QDEBUG_LOG_FILE
 //#define QDEBUG_CATEGORY
-//#define QDEBUG_FUNCTION
+#define QDEBUG_FUNCTION
 
 
 #define QDEBUG_LOG_TIME_STR "%{time h:mm:ss.zzz}"
