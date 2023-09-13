@@ -66,6 +66,7 @@ public:
 	static void MenuLineEditWidget(QWidget *w, QString objectName);
 	static void BlueGrayButton(QPushButton *btn, QString objectName);
 	static void OverlayMenu(QWidget *w, QString objectName);
+	static void BlueIconButton(QPushButton *w, QIcon icon, QString objectName);
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;

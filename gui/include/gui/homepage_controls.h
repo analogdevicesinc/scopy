@@ -24,11 +24,8 @@
 #include <QWidget>
 #include <QString>
 #include <widgets/hoverwidget.h>
+#include <widgets/pagenavigationwidget.h>
 #include "scopy-gui_export.h"
-
-namespace Ui {
-class HomepageControls;
-}
 
 namespace scopy {
 class SCOPY_GUI_EXPORT HomepageControls : public HoverWidget
@@ -49,7 +46,7 @@ Q_SIGNALS:
 	void openFile();
 
 private:
-	Ui::HomepageControls *ui;
+	PageNavigationWidget *controls;
 	void connectSignals();
 };
 }

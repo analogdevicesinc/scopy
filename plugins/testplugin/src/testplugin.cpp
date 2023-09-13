@@ -156,20 +156,6 @@ bool TestPlugin::onConnect()
 	btn4 = new QPushButton("CursorButton",tool);
 	btn4->setCheckable(true);
 
-	Ui::CursorsSettings* ui_curs = new Ui::CursorsSettings;
-	QWidget *cursorMenu = new QWidget(tool);
-	ui_curs->setupUi(cursorMenu);
-//	cursorMenu->setWindowModality(Qt::WindowModal);
-
-	HoverWidget* hover = new HoverWidget(cursorMenu, btn4, tool);
-	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
-	hover->setContentPos(HoverPosition::HP_TOPRIGHT);
-
-	connect(btn4, &QPushButton::toggled, this, [=](bool b) {
-		hover->setVisible(b);
-		hover->raise();
-	});
-
 	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
 	connect(btn2,&QPushButton::clicked,this,[=](){m_toolList[0]->setName("TestPlugin"+QString::number(renameCnt++));});
 	connect(btn3,&QPushButton::clicked,this,[=](){startTutorial();});
@@ -193,9 +179,80 @@ bool TestPlugin::onConnect()
 	m_pluginApi = new TestPlugin_API(this);
 	m_pluginApi->setObjectName(m_name);
 
+	initHoverWidgetTests();
+
 	return true;
 }
 
+void TestPlugin::initHoverWidgetTests()
+{
+	Ui::CursorsSettings* ui_curs = new Ui::CursorsSettings;
+	QWidget *cursorMenu = new QWidget();
+	ui_curs->setupUi(cursorMenu);
+//	cursorMenu->setWindowModality(Qt::WindowModal);
+
+	HoverWidget* hover = new HoverWidget(cursorMenu, btn4, tool);
+	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
+	hover->setContentPos(HoverPosition::HP_TOPRIGHT);
+	connect(btn4, &QPushButton::toggled, this, [=](bool b) {
+		hover->setVisible(b);
+		hover->raise();
+	});
+
+	QWidget *hoverTest = new QWidget(tool);
+	QHBoxLayout *hoverTestLayout = new QHBoxLayout(hoverTest);
+	QPushButton *testBtn = new  QPushButton(hoverTest);
+
+	testBtn->setText("change content");
+	hoverTestLayout->addWidget(testBtn);
+	QComboBox *testCB = new QComboBox();
+	testCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	testCB->addItem("--HOVER TEST--");
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setContent(testCB);});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("reset content");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setContent(cursorMenu);});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("change anchor");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setAnchor(edit);});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("reset anchor");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setAnchor(btn4);});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("change parent");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setParent(lbl2);});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("reset parent");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setParent(tool);});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("change position");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){
+		hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+		hover->setContentPos(HoverPosition::HP_TOPLEFT);
+	});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("reset position");
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::clicked, this, [=](){
+		hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
+		hover->setContentPos(HoverPosition::HP_TOPRIGHT);
+	});
+
+	tool->layout()->addWidget(hoverTest);
+}
 
 bool TestPlugin::onDisconnect()
 {

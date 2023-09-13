@@ -49,6 +49,7 @@ private:
 	int renameCnt;
 	ApiObject* m_pluginApi;
 	void startTutorial();
+	void initHoverWidgetTests();
 
 
 	QLabel *lbl;
