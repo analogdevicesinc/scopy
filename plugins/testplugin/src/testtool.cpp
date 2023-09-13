@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <gui/stylehelper.h>
 #include <QButtonGroup>
+#include <widgets/hoverwidget.h>
 #include "plotwidget.h"
 #include "plotaxis.h"
 #include "plotcursors.h"

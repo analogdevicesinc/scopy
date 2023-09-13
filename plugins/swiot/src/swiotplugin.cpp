@@ -343,6 +343,8 @@ void SWIOTPlugin::startTutorial() {
 		auto configTool = configTme->tool();
 		auto parent = Util::findContainingWindow(configTool);
 		auto tut = new gui::TutorialBuilder(configTool, ":/swiot/tutorial_chapters.json", "config", parent);
+
+		tut->setTitle("CONFIG");
 		requestTool(configTme->id());
 		tut->start();
 	}
@@ -352,7 +354,7 @@ void SWIOTPlugin::startAd74413rTutorial() {
 	qInfo(CAT_SWIOT) << "Starting ad74413r tutorial.";
 	ToolMenuEntry* ad74413rTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, AD74413R_TME_ID);
 	this->requestTool(ad74413rTme->id());
-	m_ad74413rTutorial->setTitle("AD74413R ");
+	m_ad74413rTutorial->setTitle("AD74413R");
 	m_ad74413rTutorial->start();
 }
 
@@ -360,7 +362,7 @@ void SWIOTPlugin::startMax14906Tutorial() {
 	qInfo(CAT_SWIOT) << "Starting max14906 tutorial.";
 	ToolMenuEntry* max14906Tme = ToolMenuEntry::findToolMenuEntryById(m_toolList, MAX14906_TME_ID);
 	this->requestTool(max14906Tme->id());
-	m_max14906Tutorial->setTitle("MAX14906 ");
+	m_max14906Tutorial->setTitle("MAX14906");
 	m_max14906Tutorial->start();
 }
 
@@ -368,7 +370,7 @@ void SWIOTPlugin::startFaultsTutorial() {
 	qInfo(CAT_SWIOT) << "Starting faults tutorial.";
 	ToolMenuEntry* faultsTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, FAULTS_TME_ID);
 	this->requestTool(faultsTme->id());
-	m_faultsTutorial->setTitle("FAULTS ");
+	m_faultsTutorial->setTitle("FAULTS");
 	m_faultsTutorial->start();
 }
 

@@ -18,6 +18,7 @@
 #include <spinbox_a.hpp>
 #include <smallOnOffSwitch.h>
 #include <customSwitch.h>
+#include "widgets/popupwidget.h"
 
 namespace scopy {
 class SCOPY_GUI_EXPORT StyleHelper : public QObject {
@@ -71,6 +72,7 @@ public:
 	static void BackgroundPage(QWidget *w, QString objectName = "");
 	static void BackgroundWidget(QWidget *w, QString objectName = "");
 	static void TabWidgetLabel(QLabel *w, QString objectName = "");
+	static void TitleLabel(QLabel *w, QString objectName = "");
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;
