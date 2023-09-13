@@ -28,8 +28,8 @@ bool ADCPlugin::compatible(QString m_param, QString category) {
 
 	for(int i=0;i<iio_context_get_devices_count(ctx);i++) {
 		iio_device *dev = iio_context_get_device(ctx,i);
-		for (i = 0; i < iio_device_get_channels_count(dev); i++) {
-			struct iio_channel *chn = iio_device_get_channel(dev, i);
+		for (int j = 0; j < iio_device_get_channels_count(dev); j++) {
+			struct iio_channel *chn = iio_device_get_channel(dev, j);
 			if (iio_channel_is_scan_element(chn)) {
 				ret = true;
 				goto finish;
@@ -104,7 +104,7 @@ PlotProxy* ADCPlugin::createRecipe(iio_context *ctx) {
 	QMap<QString, QStringList> devChannelMap;
 	int devCount = iio_context_get_devices_count(ctx);
 	qDebug(CAT_ADCPLUGIN)<<" Found " << devCount << "devices";
-	for(int i=0;i<devCount;i++) {
+	for(int i = 0;i < devCount;i++) {
 		iio_device *dev = iio_context_get_device(ctx,i);
 		QString dev_name = QString::fromLocal8Bit(iio_device_get_name(dev));
 
