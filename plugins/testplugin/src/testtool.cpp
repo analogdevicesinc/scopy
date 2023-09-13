@@ -21,6 +21,7 @@
 #include <gui/widgets/menubigswitch.h>
 #include <gui/widgets/menulineedit.h>
 #include <gui/widgets/verticalchannelmanager.h>
+#include <gui/widgets/hoverwidget.h>
 
 using namespace scopy;
 

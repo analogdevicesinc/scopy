@@ -5,12 +5,25 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTabBar>
+#include <stylehelper.h>
 
 using namespace scopy;
-ScopyAboutPage::ScopyAboutPage(QWidget *parent) : QTabWidget(parent)
+ScopyAboutPage::ScopyAboutPage(QWidget *parent) : QWidget(parent)
+      , tabWidget(new QTabWidget(this))
+      , layout(new QVBoxLayout(this))
 {
-	setTabPosition(TabPosition::East);
+	initUI();
 	addHorizontalTab(buildPage(QString("qrc:/about.html")),"Scopy");
+}
+
+void ScopyAboutPage::initUI()
+{
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	this->setLayout(layout);
+	layout->addWidget(tabWidget);
+
+	StyleHelper::TabWidgetEastMenu(tabWidget, "aboutPageTable");
 }
 
 QWidget* ScopyAboutPage::buildPage(QString src) {
@@ -19,6 +32,7 @@ QWidget* ScopyAboutPage::buildPage(QString src) {
 	QTextBrowser *browser = new QTextBrowser(page);
 
 	lay->addWidget(browser);
+	lay->setMargin(0);
 	initNavigationWidget(browser);
 
 	if (QFile::exists(QString(src).replace("qrc:/", ":/"))) {
@@ -59,10 +73,11 @@ void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 
 void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) {
 	// Hackish - so we don't override paint event
-	addTab(w, "");
+	tabWidget->addTab(w, "");
 	QLabel *lbl1 = new QLabel();
 	lbl1->setText(text);
-	QTabBar *tabbar = tabBar();
+	StyleHelper::TabWidgetLabel(lbl1, "tabWidgetLabel");
+	QTabBar *tabbar = tabWidget->tabBar();
 	tabbar->setTabButton(tabbar->count() - 1, QTabBar::RightSide, lbl1);
 
 }

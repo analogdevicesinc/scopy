@@ -2,10 +2,11 @@
 #define SCOPYPREFERENCESPAGE_H
 
 #include <QTabWidget>
+#include <QVBoxLayout>
 #include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPY_CORE_EXPORT ScopyPreferencesPage : public QTabWidget
+class SCOPY_CORE_EXPORT ScopyPreferencesPage : public QWidget
 {
 	Q_OBJECT
 public:
@@ -13,16 +14,17 @@ public:
 	~ScopyPreferencesPage();
 	QWidget* buildGeneralPreferencesPage();
 	void addHorizontalTab(QWidget *w, QString text);
-public Q_SLOTS:
-	void showRestartWidget();
 private Q_SLOTS:
 	void resetScopyPreferences();
 private:
-	QWidget *createRestartWidget();
+	QTabWidget *tabWidget;
+	void initRestartWidget();
 	QWidget *restartWidget;
 	QWidget *buildSaveSessionPreference();
 	QWidget *buildResetScopyDefaultButton();
+	QVBoxLayout *layout;
 	void removeIniFiles(bool backup = true);
+	void initUI();
 };
 }
 #endif // SCOPYPREFERENCESPAGE_H

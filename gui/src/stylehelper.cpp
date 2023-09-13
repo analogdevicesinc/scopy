@@ -36,6 +36,7 @@ void StyleHelper::initColorMap() {
 	sh->colorMap.insert("CH7",					"#F5A623");
 	sh->colorMap.insert("ScopyBlue",			"#4A64FF");
 	sh->colorMap.insert("UIElementBackground",	"#272730");
+	sh->colorMap.insert("UIElementHighlight",	"#373740");
 	sh->colorMap.insert("LabelText",			"#FFFFFF");
 	sh->colorMap.insert("ScopyBackground",		"#141416");
 	sh->colorMap.insert("ScopyBlueHover",		"#4A34FF");
@@ -688,6 +689,74 @@ void StyleHelper::BlueIconButton(QPushButton *w, QIcon icon, QString objectName)
 	style.replace("&&ScopyBlueHover&&",StyleHelper::getColor("ScopyBlueHover"));
 	style.replace("&&ScopyBlueSelected&&",StyleHelper::getColor("ScopyBlueSelected"));
 	w->setStyleSheet(style);
+}
+
+void StyleHelper::BackgroundPage(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QString style = QString(R"css(
+		.QWidget {
+			background-color: &&ScopyBackground&&;
+		}
+		)css");
+	style.replace("&&ScopyBackground&&",StyleHelper::getColor("ScopyBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::BackgroundWidget(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QString style = QString(R"css(
+		.QWidget {
+			background-color: &&UIElementBackground&&;
+		}
+		)css");
+	style.replace("&&UIElementBackground&&",StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::TabWidgetLabel(QLabel *w, QString objectName)
+{
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QString style = QString(R"css(
+		QLabel {
+			font-weight: bold;
+			font-size: 11;
+		}"
+		)css");
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::TabWidgetEastMenu(QTabWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	w->setTabPosition(QTabWidget::TabPosition::East);
+	QString style = QString(R"css(
+		QTabWidget::tab-bar { left: 0; }
+		QTabWidget::pane { border-top: 0px; }
+		QTabBar { qproperty-drawBase: 0; }
+		QTabBar::tab {
+		 min-width: 100px;
+		 min-height: 32px;
+		 padding-bottom: 5px;
+		 font: normal;
+		}
+		QTabBar::tab:selected {
+		 color: white;
+		 border-bottom: 2px solid &&ScopyBlue&&;
+		 margin-top: 0px;
+		}
+		QTabBar::tab:!selected {
+		 border-bottom: 2px solid &&UIElementHighlight&&;
+		}
+		QTabBar::scroller {
+		 width: 25px;
+		}
+		)css");
+	style.replace("&&UIElementBackground&&",StyleHelper::getColor("UIElementBackground"));
+	style.replace("&&UIElementHighlight&&",StyleHelper::getColor("UIElementHighlight"));
+	style.replace("&&ScopyBlue&&",StyleHelper::getColor("ScopyBlue"));
+	w->tabBar()->setStyleSheet(style);
 }
 
 void StyleHelper::MenuComboLabel(QLabel *w, QString objectName) {
