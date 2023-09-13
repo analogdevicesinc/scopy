@@ -1,5 +1,6 @@
 #include "scopyaboutpage.h"
 #include "widgets/hoverwidget.h"
+#include "widgets/pagenavigationwidget.h"
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -15,15 +16,10 @@ ScopyAboutPage::ScopyAboutPage(QWidget *parent) : QTabWidget(parent)
 QWidget* ScopyAboutPage::buildPage(QString src) {
 	QWidget *page = new QWidget(this);
 	QVBoxLayout *lay = new QVBoxLayout(page);
-
 	QTextBrowser *browser = new QTextBrowser(page);
 
-	HoverWidget* hover = new HoverWidget(createNavigationWidget(browser), browser, browser);
-	hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-	hover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	hover->setAnchorOffset(QPoint(-10, 0));
-	hover->show();
 	lay->addWidget(browser);
+	initNavigationWidget(browser);
 
 	if (QFile::exists(QString(src).replace("qrc:/", ":/"))) {
 		browser->setSource(src);
@@ -34,51 +30,31 @@ QWidget* ScopyAboutPage::buildPage(QString src) {
 	return page;
 }
 
-QPushButton *ScopyAboutPage::createNavigationButton(QIcon icon)
+void ScopyAboutPage::initNavigationWidget(QTextBrowser *browser)
 {
-	QPushButton *btn = new QPushButton();
-	int size = 24;
-
-	btn->setIcon(icon);
-	btn->setIconSize(QSize(size, size));
-	btn->setProperty("blue_button", true);
-	btn->setFixedHeight(size);
-	btn->setFixedWidth(size);
-
-	return btn;
-}
-
-QWidget* ScopyAboutPage::createNavigationWidget(QTextBrowser *browser)
-{
-	QWidget* widget = new QWidget();
-	QHBoxLayout *buttonsLayout = new QHBoxLayout();
-	widget->setLayout(buttonsLayout);
-	buttonsLayout->setSpacing(10);
-
-	QPushButton *homeButton = createNavigationButton(QIcon(":/gui/icons/launcher_home.svg"));
-	buttonsLayout->addWidget(homeButton);
+	PageNavigationWidget *navWidget = new PageNavigationWidget(true, false, this);
+	QPushButton *homeButton = navWidget->getHomeBtn();
 	connect(homeButton, SIGNAL(clicked()), browser, SLOT(home()));
 
-	QPushButton *backwardButton = createNavigationButton(QIcon(":/gui/icons/handle_left_arrow.svg"));
+	QPushButton *backwardButton = navWidget->getBackwardBtn();
 	backwardButton->setEnabled(false);
-	buttonsLayout->addWidget(backwardButton);
 	connect(backwardButton, SIGNAL(clicked()), browser, SLOT(backward()));
 	connect(browser, &QTextBrowser::backwardAvailable, backwardButton, [=](bool available){
 		backwardButton->setEnabled(available);
 	});
 
-	QPushButton *forwardButton = createNavigationButton(QIcon(":/gui/icons/handle_right_arrow.svg"));
+	QPushButton *forwardButton = navWidget->getForwardBtn();
 	forwardButton->setEnabled(false);
-	buttonsLayout->addWidget(forwardButton);
 	connect(forwardButton, SIGNAL(clicked()), browser, SLOT(forward()));
 	connect(browser, &QTextBrowser::forwardAvailable, forwardButton, [=](bool available){
 		forwardButton->setEnabled(available);
 	});
 
-	buttonsLayout->addSpacerItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed));
-	widget->setMaximumSize(widget->minimumSizeHint());
-
-	return widget;
+	HoverWidget* hover = new HoverWidget(navWidget, browser, browser);
+	hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	hover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	hover->setAnchorOffset(QPoint(-10, 0));
+	hover->show();
 }
 
 void ScopyAboutPage::addHorizontalTab(QWidget *w, QString text) {

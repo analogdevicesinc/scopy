@@ -19,25 +19,19 @@
  */
 
 #include "homepage_controls.h"
-#include "ui_homepage_controls.h"
 #include <QDebug>
 
 using namespace scopy;
 
 HomepageControls::HomepageControls(QWidget *parent) :
 	HoverWidget(),
-	ui(new Ui::HomepageControls)
+	controls(new PageNavigationWidget(false, false, this))
 {
-	QWidget *controls = new QWidget(this);
-	ui->setupUi(controls);
-	ui->openBtn->hide();
-
 	setContent(controls);
 	setAnchor(parent);
 	setParent(parent);
 	setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	setAnchorOffset(QPoint(-6, 6));
 	show();
 
 	connectSignals();
@@ -45,31 +39,30 @@ HomepageControls::HomepageControls(QWidget *parent) :
 
 HomepageControls::~HomepageControls()
 {
-	delete ui;
+
 }
 
 void HomepageControls::connectSignals()
 {
-	connect(ui->leftBtn, &QPushButton::clicked, this, [=](){
+	connect(controls->getBackwardBtn(), &QPushButton::clicked, this, [=](){
 		Q_EMIT goLeft();
 	});
-	connect(ui->rightBtn, &QPushButton::clicked, this, [=](){
+	connect(controls->getForwardBtn(), &QPushButton::clicked, this, [=](){
 		Q_EMIT goRight();
 	});
-	connect(ui->openBtn, &QPushButton::clicked, this, [=](){
+	connect(controls->getOpenBtn(), &QPushButton::clicked, this, [=](){
 		Q_EMIT openFile();
 	});
 }
 
 void HomepageControls::enableLeft(bool en)
 {
-	ui->leftBtn->setEnabled(en);
+	controls->getBackwardBtn()->setEnabled(en);
 }
 
 void HomepageControls::enableRight(bool en)
 {
-	ui->rightBtn->setEnabled(en);
+	controls->getForwardBtn()->setEnabled(en);
 }
 
 #include "moc_homepage_controls.cpp"
-#include <widgets/hoverwidget.h>

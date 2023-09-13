@@ -15,23 +15,17 @@ HoverWidget::HoverWidget(QWidget *content,
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
 	m_lay = new QHBoxLayout(m_container);
-	m_lay->setMargin(2);
+	m_lay->setMargin(0);
 	m_container->setLayout(m_lay);
 
 	if (m_content) {
-		m_lay->addWidget(m_content);
-		m_container->resize(m_content->size());
-		moveToAnchor();
-
-		m_content->installEventFilter(this);
+		setContent(m_content);
 	}
-
 	if (m_anchor) {
-		m_anchor->installEventFilter(this);
+		setAnchor(m_anchor);
 	}
-
 	if (m_parent) {
-		m_parent->installEventFilter(this);
+		setParent(m_parent);
 	}
 
 	hide();
@@ -41,15 +35,19 @@ void HoverWidget::setContent(QWidget *content)
 {
 	if (m_content) {
 		m_lay->removeWidget(m_content);
+		m_content->setParent(nullptr);
 		m_content->removeEventFilter(this);
 	}
 
 	m_content = content;
+	m_content->setParent(m_container);
 	m_lay->addWidget(m_content);
-	m_container->resize(m_content->size());
-	moveToAnchor();
+	m_container->resize(m_content->sizeHint());
+	this->resize(m_content->sizeHint());
 
 	m_content->installEventFilter(this);
+	moveToAnchor();
+
 }
 
 void HoverWidget::setAnchor(QWidget *anchor)
@@ -60,6 +58,7 @@ void HoverWidget::setAnchor(QWidget *anchor)
 
 	m_anchor = anchor;
 	m_anchor->installEventFilter(this);
+	moveToAnchor();
 }
 
 void HoverWidget::setParent(QWidget *parent)
@@ -68,9 +67,12 @@ void HoverWidget::setParent(QWidget *parent)
 		m_parent->removeEventFilter(this);
 	}
 
+	bool visible = isVisible();
 	m_parent = parent;
 	QWidget::setParent(m_parent);
 	m_parent->installEventFilter(this);
+	moveToAnchor();
+	setVisible(visible);
 }
 
 HoverWidget::~HoverWidget()
@@ -85,7 +87,7 @@ bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 			resize(m_content->size());
 		}
 	}
-	if(watched == m_anchor || watched == m_parent ) {
+	if(watched == m_anchor || watched == m_parent || watched == m_content) {
 		if(event->type() == QEvent::Move || event->type() == QEvent::Resize) {
 			moveToAnchor();
 		}
@@ -128,6 +130,7 @@ void HoverWidget::setContentPos(HoverPosition pos)
 
 void HoverWidget::moveToAnchor()
 {
+	if (!m_content) return;
 	QPoint global = m_anchor->mapToGlobal(QPoint(0,0));
 	QPoint mappedPoint =  m_parent->mapFromGlobal(global);
 	QPoint anchorPosition = QPoint(0,0);
