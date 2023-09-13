@@ -800,7 +800,7 @@ void StyleHelper::OverlayMenu(QWidget *w, QString objectName) {
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::TitleLabel(QLabel *w, QString objectName) {
+void StyleHelper::TutorialChapterTitleLabel(QLabel *w, QString objectName) {
 	if(!objectName.isEmpty()) w->setObjectName(objectName);
 	QString style = QString(R"css(
 				QLabel {

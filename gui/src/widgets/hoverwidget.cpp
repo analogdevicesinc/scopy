@@ -2,11 +2,9 @@
 #include <QDebug>
 #include <QLoggingCategory>
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_HOVERWIDGET,"HoverWidget")
+Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
-HoverWidget::HoverWidget(QWidget *content,
-						 QWidget *anchor,
-						 QWidget *parent)
+HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	: QWidget(parent), m_parent(parent), m_anchor(anchor), m_content(content),
 	m_anchorPos(HP_TOPLEFT), m_contentPos(HP_TOPRIGHT) {
 
@@ -16,6 +14,7 @@ HoverWidget::HoverWidget(QWidget *content,
 
 	m_lay = new QHBoxLayout(m_container);
 	m_lay->setMargin(0);
+	m_lay->setContentsMargins(0, 0, 0, 0);
 	m_container->setLayout(m_lay);
 	m_lay->addWidget(content);
 
@@ -96,7 +95,7 @@ bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 		}
 	}
 
-	return QObject::eventFilter(watched,event);
+	return QObject::eventFilter(watched, event);
 }
 
 QPoint HoverWidget::getAnchorOffset()
