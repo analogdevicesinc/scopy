@@ -51,6 +51,7 @@ public:
 	QMap<QString, QVariant> getPreferences() const;
 	void setPreferences(QMap<QString, QVariant> s);
 
+public Q_SLOTS:
 	/**
 	 * @brief setPreferencesFilename
 	 * @param s
@@ -77,6 +78,12 @@ Q_SIGNALS:
 	 * Useful to monitor preferences
 	 */
 	void preferenceChanged(QString, QVariant);
+
+	/**
+	 * @brief restartRequired
+	 * Signal emitted when a preference was changed and app needs to be restarted
+	 */
+	void restartRequired();
 
 private:
 

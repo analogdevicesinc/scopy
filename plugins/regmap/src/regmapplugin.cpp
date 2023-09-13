@@ -18,6 +18,8 @@
 #include <src/readwrite/iioregisterwritestrategy.hpp>
 #include <pluginbase/preferences.h>
 #include <pluginbase/preferenceshelper.h>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
 #include "logging_categories.h"
 
 #include "iioutil/contextprovider.h"
@@ -97,9 +99,21 @@ bool RegmapPlugin::loadPreferencesPage()
 
     m_preferencesPage = new QWidget();
     QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
-    QWidget *pref1 = PreferencesHelper::addPreferenceCombo(p,"regmap_color_by_value","Use color to reflect value",{"Default","Bitfield background","Bitfield text","Register background", "Register text", "Register background and Bitfield background", "Register text and Bitfield text", "Register background and Bitfield text", "Register text and Bitfield background"},this);
-    lay->addWidget(pref1);
-    lay->addSpacerItem(new QSpacerItem(40,40,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+    MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+    MenuCollapseSection *generalSection = new MenuCollapseSection("General",MenuCollapseSection::MHCW_NONE, generalWidget);
+    generalWidget->contentLayout()->setSpacing(10);
+    generalWidget->contentLayout()->addWidget(generalSection);
+    generalSection->contentLayout()->setSpacing(10);
+    lay->setMargin(0);
+    lay->addWidget(generalWidget);
+    lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
+
+    generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"regmap_color_by_value","Use color to reflect value",
+										     {"Default","Bitfield background","Bitfield text",
+										      "Register background", "Register text", "Register background and Bitfield background",
+										      "Register text and Bitfield text", "Register background and Bitfield text",
+										      "Register text and Bitfield background"}, generalSection));
     return true;
 }
 
