@@ -76,6 +76,7 @@ Q_SIGNALS:
 private:
 	void buildUi();
 	void initPopupWidget();
+	void cleanupChapter();
 	bool eventFilter(QObject *watched, QEvent *event) override;
 
 	QList<TutorialChapter*> chapter;
@@ -85,7 +86,7 @@ private:
 	HoverWidget *m_hoverWidget;
 	QString title;
 	int cnt;
-	PopupWidget *ui;
+	PopupWidget *m_popupWidget;
 };
 }
 
