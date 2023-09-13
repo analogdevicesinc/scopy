@@ -9,6 +9,7 @@
 #include <iioutil/contextprovider.h>
 #include <core/detachedtoolwindow.h>
 #include <core/detachedtoolwindowmanager.h>
+#include <QElapsedTimer>
 
 
 
@@ -16,6 +17,7 @@ using namespace scopy;
 using namespace scopy::debugger;
 
 Q_LOGGING_CATEGORY(CAT_DEBUGGERPLUGIN, "DEBUGGERPLUGIN");
+Q_LOGGING_CATEGORY(CAT_BENCHMARK, "Benchmark");
 
 bool DebuggerPlugin::compatible(QString m_param, QString category)
 {
@@ -44,6 +46,8 @@ QString DebuggerPlugin::description()
 
 bool DebuggerPlugin::onConnect()
 {
+	QElapsedTimer timer;
+	timer.start();
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
 	if (!ctx) {
@@ -54,12 +58,15 @@ bool DebuggerPlugin::onConnect()
 	dbgTme->setEnabled(true);
 	dbgTme->setRunBtnVisible(true);
 
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 	return true;
 
 }
 
 bool DebuggerPlugin::onDisconnect()
 {
+	QElapsedTimer timer;
+	timer.start();
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -70,6 +77,7 @@ bool DebuggerPlugin::onDisconnect()
 
 	ContextProvider *c = ContextProvider::GetInstance();
 	c->close(m_param);
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 	return true;
 }
 
