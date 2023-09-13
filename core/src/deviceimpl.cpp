@@ -11,6 +11,7 @@
 #include <widgets/hoverwidget.h>
 #include "qscrollarea.h"
 #include "ui_devicepage.h"
+#include "logging_categories.h"
 
 Q_LOGGING_CATEGORY(CAT_DEVICEIMPL, "Device")
 
@@ -27,6 +28,8 @@ DeviceImpl::DeviceImpl(QString param, PluginManager *p, QString category ,QObjec
 
 void DeviceImpl::init()
 {
+	QElapsedTimer timer;
+	timer.start();
 	m_plugins = p->getCompatiblePlugins(m_param,m_category);
 	for (Plugin *p : qAsConst(m_plugins)) {
 		QObject* obj = dynamic_cast<QObject*>(p);
@@ -36,6 +39,7 @@ void DeviceImpl::init()
 			qWarning(CAT_DEVICEIMPL, "Plugin not a QObject");
 		}
 	}
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::preload() {
@@ -45,6 +49,8 @@ void DeviceImpl::preload() {
 }
 
 void DeviceImpl::loadPlugins() {
+	QElapsedTimer timer;
+	timer.start();
 	removeDisabledPlugins();
 	preload();
 	loadName();
@@ -63,9 +69,12 @@ void DeviceImpl::loadPlugins() {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(requestToolByUuid(QString)),this,SIGNAL(requestTool(QString)));
 		p->postload();
 	}
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::unloadPlugins() {
+	QElapsedTimer timer;
+	timer.start();
 	QList<Plugin*>::const_iterator pI = m_plugins.constEnd();
 	while(pI != m_plugins.constBegin()) {
 		--pI;
@@ -78,6 +87,7 @@ void DeviceImpl::unloadPlugins() {
 		delete (*pI);
 	}
 	m_plugins.clear();
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::removeDisabledPlugins() {
@@ -228,6 +238,8 @@ void DeviceImpl::load(QSettings &s) {
 }
 
 void DeviceImpl::connectDev() {
+	QElapsedTimer timer;
+	timer.start();
 	Preferences *pref = Preferences::GetInstance();
 	bool disconnectDevice = false;
 	for(auto &&p : m_plugins) {
@@ -252,9 +264,12 @@ void DeviceImpl::connectDev() {
 		discbtn->show();
 		Q_EMIT connected();
 	}
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::disconnectDev() {
+	QElapsedTimer timer;
+	timer.start();
 	connbtn->show();
 	discbtn->hide();
 	Preferences *pref = Preferences::GetInstance();
@@ -267,6 +282,7 @@ void DeviceImpl::disconnectDev() {
 	}
 	m_connectedPlugins.clear();
 	Q_EMIT disconnected();
+	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 }
 
 DeviceImpl::~DeviceImpl() {
