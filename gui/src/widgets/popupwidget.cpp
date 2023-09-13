@@ -31,7 +31,7 @@ PopupWidget::PopupWidget(QWidget* parent) :
 {
 	ui->setupUi(this);
 
-	StyleHelper::TitleLabel(ui->titleLabel, "titleLabel");
+	StyleHelper::TutorialChapterTitleLabel(ui->titleLabel, "titleLabel");
 	StyleHelper::BlueButton(ui->continueButton, "continueButton");
 	StyleHelper::BlueButton(ui->exitButton, "exitButton");
 	StyleHelper::OverlayMenu(this, "popupOverlay");
@@ -40,6 +40,10 @@ PopupWidget::PopupWidget(QWidget* parent) :
 	QObject::connect(ui->exitButton, &QPushButton::clicked, this, &PopupWidget::exitButtonClicked);
 
 	ui->continueButton->setFocus();
+}
+
+PopupWidget::~PopupWidget() {
+	delete ui;
 }
 
 void PopupWidget::setFocusOnContinueButton() {
