@@ -72,7 +72,7 @@ public:
 	static void BackgroundPage(QWidget *w, QString objectName = "");
 	static void BackgroundWidget(QWidget *w, QString objectName = "");
 	static void TabWidgetLabel(QLabel *w, QString objectName = "");
-	static void TitleLabel(QLabel *w, QString objectName = "");
+	static void TutorialChapterTitleLabel(QLabel *w, QString objectName = "");
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;
