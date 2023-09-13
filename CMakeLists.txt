@@ -133,6 +133,7 @@ else()
             ${SCOPY_RESOURCES}
             ${SCOPY_DEPENDENCIES}
             ${EXTRA_BUNDLE_FILES}
+            ${SCOPY_WIN32_RESOURCES}
         )
     endif()
 endif()
