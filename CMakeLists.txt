@@ -165,7 +165,7 @@ set_target_properties(${PROJECT_NAME}  PROPERTIES
     WIN32_EXECUTABLE TRUE
 )
 
-if (ENABLE_APPLICATION_BUNDLE)
+if (ENABLE_APPLICATION_BUNDLE OR ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME Scopy)
 endif()
 
@@ -179,6 +179,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	include(ScopyWindows)
+	duplicate_target(${PROJECT_NAME} Scopy-console)
+	set_target_properties(Scopy-console PROPERTIES WIN32_EXECUTABLE FALSE)
 endif()
 if (NOT ENABLE_APPLICATION_BUNDLE)
     install(TARGETS ${PROJECT_NAME}
