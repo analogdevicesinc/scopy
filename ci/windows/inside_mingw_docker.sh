@@ -44,7 +44,7 @@ build_scopy(){
 
 build_iio-emu(){
 	echo "### Building IIO-EMU"
-	git clone https://github.com/analogdevicesinc/iio-emu -b windows_fix $WORKDIR/iio-emu
+	git clone https://github.com/analogdevicesinc/iio-emu $WORKDIR/iio-emu
 	mkdir -p $EMU_BUILD_FOLDER
 	cd $EMU_BUILD_FOLDER
 	$CMAKE ../
