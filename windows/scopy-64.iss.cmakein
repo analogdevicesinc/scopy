@@ -18,15 +18,17 @@ OutputBaseFilename=scopy-64-setup
 LicenseFile="C:\msys64\home\docker\scopy\LICENSE"
 OutputDir="C:\msys64\home\docker\"
 AllowNoIcons=yes
-Compression=lzma
+Compression=lzma2
 SolidCompression=yes
 ArchitecturesInstallIn64BitMode=x64
-DefaultDirName={pf}\{#AppDev}\{#AppName}
+DefaultDirName={code:SetInstallLocation}
 DefaultGroupName={#AppName}
 AlwaysRestart=yes
 DisableDirPage=no
 MinVersion=6.2
+PrivilegesRequired=lowest
 SetupIconFile="@SCOPY_ICON_ICO@"
+WizardStyle=modern
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -52,10 +54,18 @@ Name: "turkish"; MessagesFile: "compiler:Languages\Turkish.isl"
 Name: "ukrainian"; MessagesFile: "compiler:Languages\Ukrainian.isl"
 
 [Code]
+function SetInstallLocation(Param: string): string;
+begin
+  if IsAdmin then
+    Result := ExpandConstant('{pf}\{#AppDev}\{#AppName}')
+  else
+    Result := ExpandConstant('{sd}\{#AppDev}\{#AppName}');
+end;
+
 function isDriverInstalled(): Boolean;
 begin
   Result := True;
-  if not RegKeyExists(HKLM, 'Software\Analog Devices\{#AppName}\Settings') then
+  if not RegKeyExists(HKA, 'Software\Analog Devices\{#AppName}\Settings') then
   begin
     Result := False;
   end;
@@ -187,7 +197,7 @@ var
 begin
   regPath := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1');
   installLocationString := '';
-  if not RegQueryStringValue(HKLM, regPath, 'InstallLocation', installLocationString) then
+  if not RegQueryStringValue(HKA, regPath, 'InstallLocation', installLocationString) then
     RegQueryStringValue(HKCU, regPath, 'InstallLocation', installLocationString);
   Result := installLocationString;
 end;
@@ -199,17 +209,15 @@ var
 begin
   regPath := ExpandConstant('Software\Microsoft\Windows\CurrentVersion\Uninstall\{#SetupSetting("AppId")}_is1');
   uninstallerString := '';
-  if not RegQueryStringValue(HKLM, regPath, 'UninstallString', uninstallerString) then
+  if not RegQueryStringValue(HKA, regPath, 'UninstallString', uninstallerString) then
     RegQueryStringValue(HKCU, regPath, 'UninstallString', uninstallerString);
   Result := uninstallerString;
 end;
-
 
 function IsUpgrade(): Boolean;
 begin
   Result := (GetInstallLocation() = ExpandConstant('{app}\'));
 end;
-
 
 procedure RemoveOldVersion();
 var
@@ -242,31 +250,73 @@ begin
   end;
 end;
 
+[Types]
+Name: "full"; Description: "Full installation"
+Name: "compact"; Description: "Compact installation"
+Name: "plugins"; Description: "Scopy with plugins"
+Name: "custom"; Description: "Custom installation"; Flags: iscustom
+
+[Components]
+Name: "main"; Description: "Scopy"; Types: full compact custom; Flags: fixed
+Name: "plugins"; Description: "Plugins"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins\m2kplugin"; Description: "KIT ADALM2000"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "plugins\swiotplugin"; Description: "KIT SWIOT1L"; Types: full plugins; Flags: disablenouninstallwarning
+Name: "emu"; Description: "IIO Emulator"; Types: full; Flags: disablenouninstallwarning
+
+[Files]
+//Executables
+Source: "C:\msys64\home\docker\scopy_x86_64\Scopy.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion
+Source: "C:\msys64\home\docker\scopy_x86_64\Scopy-console.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
+Source: "C:\msys64\home\docker\iio-emu\build\iio-emu.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
+//Folders
+Source: "C:\msys64\home\docker\scopy_x86_64\decoders\*"; DestDir: "{app}\decoders"; Components: plugins\m2kplugin; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\@PYTHON_VERSION@\*"; DestDir: "{app}\@PYTHON_VERSION@"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\resources\*"; DestDir: "{app}\resources"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\styles\*"; DestDir: "{app}\styles"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+//DLLs
+Source: "C:\msys64\home\docker\scopy_x86_64\*.dll"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
+//Plugins
+Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-regmapplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-debuggerplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-m2kplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\m2kplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-swiot.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\swiotplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 Name: "deleteini"; Description: Delete previous settings (Scopy.ini)
 Name: "deletepreferences"; Description: Delete previous application preferences (Preferences.ini)
-Name: "drivers"; Description: Install drivers for ADALM2000; Check: not isDriverInstalled;
-Name: "drivers_overwrite"; Description: Install drivers for ADALM2000; Check: isDriverInstalled; Flags: unchecked
-
-[Files]
-Source: "c:\msys64\home\docker\scopy_x86_64\*"; DestDir: "{app}"; Check: Is64BitInstallMode; Flags: ignoreversion recursesubdirs createallsubdirs
+Name: "drivers"; Description: Install drivers for ADALM2000 - Requires Administrator Rights; Check: not isDriverInstalled;
+Name: "drivers_overwrite"; Description: Install drivers for ADALM2000 - Requires Administrator Rights; Check: isDriverInstalled; Flags: unchecked
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
 Name: "{group}\{cm:UninstallProgram,{#AppName}}"; Filename: "{uninstallexe}"
-Name: "{commondesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
+Name: "{userdesktop}\{#AppName}"; Filename: "{app}\{#AppExeName}"; Tasks: desktopicon
 
 [InstallDelete]
 Type: files; Name: "{userappdata}\ADI\Scopy.ini"; Tasks: deleteini
 Type: files; Name: "{userappdata}\ADI\Preferences.ini"; Tasks: deletepreferences
+Type: filesandordirs; Name: "{app}\decoders"; Check: not WizardIsComponentSelected('plugins\m2kplugin')
+Type: files; Name: "{app}\plugins\plugins\libscopy-m2kplugin.dll"; Check: not WizardIsComponentSelected('plugins\m2kplugin')
+Type: files; Name: "{app}\plugins\plugins\libscopy-swiot.dll"; Check: not WizardIsComponentSelected('plugins\swiotplugin')
+Type: files; Name: "{app}\iio-emu.exe"; Check: not WizardIsComponentSelected('emu')
+
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\decoders"
 
 [Run]
-Filename: "{app}\drivers\dpinst.exe"; Parameters: "/PATH ""{app}\drivers"" {param:dpinstflags|/F}" ; Flags: waituntilterminated; Tasks: drivers drivers_overwrite
+Filename: "{app}\drivers\dpinst.exe"; Parameters: "/PATH ""{app}\drivers"" {param:dpinstflags|/F}" ; Verb: runas; Flags: waituntilterminated shellexec; Tasks: drivers drivers_overwrite; StatusMsg: "Installing ADALM2000/ADALM-PLUTO drivers..."
 
 [Registry]
-Root: HKLM; Subkey: "Software\Analog Devices"
-Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}"
-Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"
-Root: HKLM; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallVersion"; ValueData: {#DriverVersion}
+Root: HKA; Subkey: "Software\Analog Devices"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Analog Devices\{#AppName}"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Analog Devices\{#AppName}\Settings"; ValueType: string; ValueName: "InstallVersion"; ValueData: {#DriverVersion}; Flags: uninsdeletekey
