@@ -179,9 +179,9 @@ void TST_GRBlocks::test1() {
 		top.getGrBlock()->run();
 		// |sig_source| --> |head| --> |stream_to_vector| --> |vector_sink|
 		QCOMPARE(QString::fromStdString(top.getGrBlock()->edge_list()),
-				 QString("sig_source0:0->head0:0\n"
-						 "head0:0->stream_to_vector0:0\n"
-						 "stream_to_vector0:0->vector_sink0:0\n"));
+				 QString("sig_source1:0->head1:0\n"
+						 "head1:0->stream_to_vector1:0\n"
+						 "stream_to_vector1:0->vector_sink1:0\n"));
 
 
 		QVector<float> expected = computeSigSourceExpected(gr::analog::GR_CONST_WAVE,t1.sig_ampl,t1.sig_offset,t1.sig_sr,t1.sig_freq, 1, 0);
@@ -344,12 +344,12 @@ void TST_GRBlocks::test3() {
 		connectVectorSinks(&top);
 		top.getGrBlock()->run();
 		QCOMPARE(QString::fromStdString(top.getGrBlock()->edge_list()),
-				 QString("sig_source0:0->head0:0\n"
-						 "head0:0->stream_to_vector0:0\n"
-						 "stream_to_vector0:0->vector_sink0:0\n"
-						 "sig_source1:0->head1:0\n"
-						 "head1:0->stream_to_vector1:0\n"
-						 "stream_to_vector1:0->vector_sink1:0\n"));
+				 QString("sig_source2:0->head3:0\n"
+						 "head3:0->stream_to_vector3:0\n"
+						 "stream_to_vector3:0->vector_sink3:0\n"
+						 "sig_source3:0->head4:0\n"
+						 "head4:0->stream_to_vector4:0\n"
+						 "stream_to_vector4:0->vector_sink4:0\n"));
 
 
 		QVector<QVector<float>> expectedAll;
