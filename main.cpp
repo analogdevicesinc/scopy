@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
 
 	scopy::ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
+	a.setStyle("Fusion");
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
 	scopy::ScopyMainWindow w;
 	w.show();
