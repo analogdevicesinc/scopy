@@ -59,6 +59,7 @@ deploy_app(){
 	mkdir $DEST_FOLDER
 	cp $BUILD_FOLDER/Scopy.exe $DEST_FOLDER/
 	cp $BUILD_FOLDER/qt.conf $DEST_FOLDER/
+	cp $BUILD_FOLDER/Scopy-console.exe $DEST_FOLDER/
 
 	mkdir $DEST_FOLDER/resources
 	$STAGING_DIR/bin/windeployqt.exe --dir $DEST_FOLDER --no-translations --no-system-d3d-compiler --no-compiler-runtime --no-quick-import --opengl --printsupport $BUILD_FOLDER/Scopy.exe
