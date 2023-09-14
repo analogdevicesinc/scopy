@@ -49,7 +49,6 @@ void GRTopBlock::unregisterIIODeviceSource(GRIIODeviceSource *dev)
 void GRTopBlock::build() {
 
 	top->disconnect_all();
-	top = gr::make_top_block(m_name.toStdString());
 	Q_EMIT aboutToBuild();
 
 	for (GRSignalPath* sig : qAsConst(m_signalPaths)) {
@@ -92,10 +91,10 @@ void GRTopBlock::start()
 	top->start();
 	Q_EMIT started();
 
-	QtConcurrent::run([=]() {
-		top->wait();
-		Q_EMIT finished();
-	});
+//	QtConcurrent::run([=]() { - this causes a race condition
+//		top->wait();
+//		Q_EMIT finished();
+//	});
 }
 
 void GRTopBlock::stop()
