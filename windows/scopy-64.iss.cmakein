@@ -26,6 +26,7 @@ DefaultGroupName={#AppName}
 AlwaysRestart=yes
 DisableDirPage=no
 MinVersion=6.2
+SetupIconFile="@SCOPY_ICON_ICO@"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"

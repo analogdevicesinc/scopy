@@ -44,7 +44,8 @@ set(PROJECT_SOURCES
 include(ScopyAbout)
 configure_about(./resources/about)
 FILE(GLOB SCOPY_RESOURCE_FILES gui/res/resources.qrc resources/aboutpage.qrc)
-message(STATUS ${SCOPY_RESOURCE_FILES})
+find_file(SCOPY_ICON_ICO icon.ico PATHS ${CMAKE_SOURCE_DIR}/gui/res)
+message(STATUS "SCOPY_RESOURCE_FILES: " ${SCOPY_RESOURCE_FILES})
 
 option(ENABLE_TRANSLATION "Enable translation" ON)
 include(ScopyTranslation)
