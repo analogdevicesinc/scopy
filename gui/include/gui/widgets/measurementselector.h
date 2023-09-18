@@ -6,12 +6,14 @@
 #include "scopy-gui_export.h"
 #include <QVBoxLayout>
 #include <QMap>
+#include <QLabel>
 
 namespace scopy {
 
 
 class SCOPY_GUI_EXPORT MeasurementSelectorItem : public QWidget {
 	Q_OBJECT
+	friend class StyleHelper;
 public:
 	MeasurementSelectorItem(QString name, QString icon, QWidget *parent);
 	~MeasurementSelectorItem();
@@ -20,6 +22,8 @@ public:
 	QCheckBox *statsCheckbox() const;
 
 private:
+	QLabel *m_icon;
+	QLabel *m_name;
 	QCheckBox *m_measureCheckbox;
 	QCheckBox *m_statsCheckbox;
 
@@ -29,7 +33,7 @@ class SCOPY_GUI_EXPORT MeasurementSelector : public QWidget
 {
 	Q_OBJECT
 public:
-	MeasurementSelector(QWidget *parent);
+	MeasurementSelector(QWidget *parent = nullptr);
 	~MeasurementSelector();
 
 	void addMeasurement(QString name, QString icon);
