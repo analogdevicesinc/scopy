@@ -30,15 +30,16 @@ MeasurementLabel::MeasurementLabel(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	m_unit = "";
 	setLayout(lay);
-	lay->setStretch(0,3); // 75 %
-	lay->setStretch(1,1); // 25 %
 	m_nameLabel = new QLabel(this);
 	setName("None");
 	m_valueLabel = new QLabel("---", this);
 	m_formatter = nullptr;
+	m_precision = 2;
 
 	lay->addWidget(m_nameLabel);
 	lay->addWidget(m_valueLabel);
+	lay->setStretch(0,3); // 75 %
+	lay->setStretch(1,1); // 25 %
 
 }
 
@@ -80,3 +81,73 @@ QString MeasurementLabel::name() const
 {
 	return m_name;
 }
+
+StatsLabel::StatsLabel(QWidget *parent) : QWidget(parent) {
+	QVBoxLayout *lay = new QVBoxLayout(this);
+
+	m_unit = "";
+	setLayout(lay);
+	lay->setMargin(0);
+	m_nameLabel = new QLabel(this);
+	setName("None");
+
+	m_avgLabel = new QLabel("Avg: ---", this);
+	m_minLabel = new QLabel("Min: ---", this);
+	m_maxLabel = new QLabel("Max: ---", this);
+	lay->setAlignment(m_nameLabel, Qt::AlignCenter);
+	lay->setAlignment(Qt::AlignLeft);
+	m_formatter = nullptr;
+	m_precision = 2;
+
+	lay->addWidget(m_nameLabel);
+	lay->addWidget(m_avgLabel);
+	lay->addWidget(m_minLabel);
+	lay->addWidget(m_maxLabel);
+	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Maximum,QSizePolicy::Expanding));
+
+
+}
+
+StatsLabel::~StatsLabel() {
+
+}
+
+void StatsLabel::setName(QString str) {
+	m_name = str;
+	m_nameLabel->setText(str);
+}
+
+void StatsLabel::setUnit(QString str) {
+	m_unit = str;
+}
+
+void StatsLabel::setPrecision(int val) {
+	m_precision = val;
+}
+
+void StatsLabel::setColor(QColor color) {
+	m_color = color;
+	StyleHelper::StatsPanelLabel(this, m_name + "MeasurementLabel");
+}
+
+void StatsLabel::setValue(double avg, double min, double max) {
+	if(!m_formatter) {
+		m_avgLabel->setText( "Avg: " + QString::number(avg,'g', m_precision) + " " + m_unit);
+		m_minLabel->setText( "Min: " + QString::number(min,'g', m_precision) + " " + m_unit);
+		m_maxLabel->setText( "Max: " + QString::number(max,'g', m_precision) + " " + m_unit);
+	} else {
+		m_avgLabel->setText( "Avg: " + m_formatter->format(avg, m_unit, m_precision));
+		m_minLabel->setText( "Min: " + m_formatter->format(min, m_unit, m_precision));
+		m_maxLabel->setText( "Max: " + m_formatter->format(max, m_unit, m_precision));
+	}
+}
+
+void StatsLabel::setMeasurementValueFormatter(PrefixFormatter *f) {
+	m_formatter = f;
+}
+
+QString StatsLabel::name() const
+{
+	return m_name;
+}
+

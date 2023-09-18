@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <widgets/measurementpanel.h>
+#include <widgets/measurementlabel.h>
 #include "measure.h"
 #include "scopy-gr-util_export.h"
 
@@ -25,14 +26,21 @@ public:
 	virtual ~MeasurementController();
 	
 	MeasurementLabel* findMeasurementLabel(QString name);
-	virtual MeasurementLabel* enableMeasurement(QString name);
+	StatsLabel* findStatsLabel(QString name);
+	virtual QWidget* enableMeasurement(QString name);
 	virtual void disableMeasurement(QString name);
+
+	virtual QWidget* enableStats(QString name);
+	virtual void disableStats(QString name);
+
 	void addMeasurement(MeasurementInfo v);
 	QList<MeasurementInfo> availableMeasurements() const;
 
 Q_SIGNALS:
-	void measurementEnabled(MeasurementLabel*);
-	void measurementDisabled(MeasurementLabel*);
+	void measurementEnabled(QWidget*);
+	void measurementDisabled(QWidget*);
+	void statsEnabled(QWidget *);
+	void statsDisabled(QWidget *);
 
 protected:
 	QList<MeasurementInfo> m_availableMeasurements;
@@ -40,7 +48,8 @@ protected:
 
 private:
 	QPen m_pen;
-	QList<MeasurementLabel*> m_labels;
+	QList<StatsLabel*> m_statsLabels;
+	QList<MeasurementLabel*> m_measureLabels;
 
 };
 

@@ -29,6 +29,28 @@
 
 namespace scopy::grutil {
 class CrossingDetection;
+class Statistic;
+
+class SCOPY_GR_UTIL_EXPORT Statistic
+{
+public:
+	Statistic();
+
+	void pushNewData(double data);
+	void clear();
+
+	double average() const;
+	double min() const;
+	double max() const;
+	double numPushedData() const;
+
+private:
+	double m_sum;
+	double m_min;
+	double m_max;
+	double m_dataCount;
+	double m_average;
+};
 
 class SCOPY_GR_UTIL_EXPORT MeasurementData
 {
@@ -63,14 +85,22 @@ public:
 	enum unitTypes unitType() const;
 	enum axisType axis() const;
 
+	bool statEnabled() const;
+	void setStatEnabled(bool newStatEnabled);
+	void clearStat();
+
+	Statistic stat() const;
+
 private:
 	QString m_name;
 	double m_value;
+	bool m_statEnabled;
 	bool m_measured;
 	bool m_enabled;
 	QString m_unit;
 	enum unitTypes m_unitType;
 	enum axisType m_axis;
+	Statistic m_stat;
 };
 
 class SCOPY_GR_UTIL_EXPORT MeasureModel : public QObject
@@ -96,6 +126,7 @@ public:
 	void setStartIndex(int);
 	void setEndIndex(int);
 	void setGatingEnabled(bool);
+	void clearStats();
 
 
 	QList<std::shared_ptr<MeasurementData>> measurments();
@@ -190,27 +221,6 @@ private:
 	std::vector<int> m_mask;
 
 	void measureSpectral();
-};
-
-class SCOPY_GR_UTIL_EXPORT Statistic
-{
-public:
-	Statistic();
-
-	void pushNewData(double data);
-	void clear();
-
-	double average() const;
-	double min() const;
-	double max() const;
-	double numPushedData() const;
-
-private:
-	double m_sum;
-	double m_min;
-	double m_max;
-	double m_dataCount;
-	double m_average;
 };
 }
 
