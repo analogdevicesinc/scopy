@@ -66,8 +66,10 @@ public Q_SLOTS:
 	void setYMode(YMode mode);
 
 Q_SIGNALS:
-	void enableMeasurement(MeasurementLabel*);
-	void disableMeasurement(MeasurementLabel*);
+	void enableMeasurement(QWidget*);
+	void disableMeasurement(QWidget*);
+	void enableStat(QWidget*);
+	void disableStat(QWidget*);
 
 
 private:
@@ -103,7 +105,10 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
-	QWidget *createMeasurementMenu(QWidget *parent);
+
+	void initMeasure();
+	void createMeasurementMenu(QWidget *parent);
+	QWidget *createMeasurementMenuSection(QString category, QWidget *parent);
 };
 }
 #endif // GRTIMECHANNELADDON_H

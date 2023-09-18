@@ -29,12 +29,13 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
       m_refreshTimerRunning(false),
       m_xmode(GRTimePlotAddonSettings::XMODE_SAMPLES)
 {
-
 	Preferences *p = Preferences::GetInstance();
 
 	this->name = name;
 	widget = new QWidget();
 	m_lay = new QVBoxLayout(widget);
+	m_lay->setMargin(0);
+	m_lay->setSpacing(0);
 	m_plotWidget = new PlotWidget(widget);
 	widget->setLayout(m_lay);
 
