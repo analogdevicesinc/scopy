@@ -91,12 +91,12 @@ void PlotWidget::setupHandlesArea() {
 	m_rightHandlesArea->setTopPadding(0); /// Why ?
 	m_rightHandlesArea->setVisible(false);
 
-	m_bottomHandlesArea->setMinimumHeight(60);
+	m_bottomHandlesArea->setMinimumHeight(55);
 	m_bottomHandlesArea->setLeftPadding(0);
 	m_bottomHandlesArea->setRightPadding(0); /// Why ?
 	m_bottomHandlesArea->setVisible(false);
 
-	m_topHandlesArea->setMinimumHeight(60);
+	m_topHandlesArea->setMinimumHeight(55);
 	m_topHandlesArea->setLeftPadding(0);
 	m_topHandlesArea->setRightPadding(0); /// Why ?
 	m_topHandlesArea->setVisible(false);

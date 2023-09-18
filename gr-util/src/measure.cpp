@@ -1292,6 +1292,13 @@ void MeasureModel::setGatingEnabled(bool enable){
 	m_gatingEnabled = enable;
 }
 
+void MeasureModel::clearStats()
+{
+	for(auto meas : m_measurements) {
+		meas->clearStat();
+	}
+}
+
 
 QList<std::shared_ptr<MeasurementData>> MeasureModel::measurments()
 {
@@ -1337,7 +1344,8 @@ MeasurementData::MeasurementData(const QString& name, axisType axis,
 	m_enabled(false),
 	m_unit(unit),
 	m_unitType(DIMENSIONLESS),
-	m_axis(axis)
+	m_axis(axis),
+	m_statEnabled(false)
 {
 	if (unit.isEmpty())
 		m_unitType = DIMENSIONLESS;
@@ -1367,6 +1375,8 @@ void MeasurementData::setValue(double value)
 {
 	m_value = value;
 	m_measured = true;
+	if(m_statEnabled)
+		m_stat.pushNewData(value);
 }
 
 bool MeasurementData::measured() const
@@ -1402,6 +1412,28 @@ MeasurementData::unitTypes MeasurementData::unitType() const
 MeasurementData::axisType MeasurementData::axis() const
 {
 	return m_axis;
+}
+
+bool MeasurementData::statEnabled() const
+{
+	return m_statEnabled;
+}
+
+void MeasurementData::setStatEnabled(bool newStatEnabled)
+{
+	m_statEnabled = newStatEnabled;
+	if(m_statEnabled == false)
+		m_stat.clear();
+}
+
+void MeasurementData::clearStat()
+{
+	m_stat.clear();
+}
+
+Statistic MeasurementData::stat() const
+{
+	return m_stat;
 }
 
 /*

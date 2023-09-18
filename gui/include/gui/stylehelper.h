@@ -20,6 +20,8 @@ class SmallOnOffSwitch;
 class CustomSwitch;
 class SpinBoxA;
 class MeasurementLabel;
+class StatsLabel;
+class MeasurementSelectorItem;
 }
 
 namespace scopy {
@@ -76,6 +78,9 @@ public:
 	static void TabWidgetLabel(QLabel *w, QString objectName = "");
 	static void TutorialChapterTitleLabel(QLabel *w, QString objectName = "");
 	static void MeasurementPanelLabel(MeasurementLabel* w, QString objectName = "");
+	static void StatsPanelLabel(StatsLabel* w, QString objectName = "");
+	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem* w, QString objectName = "");
+
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;

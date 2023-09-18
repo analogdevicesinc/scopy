@@ -1,9 +1,11 @@
 #include "stylehelper.h"
 #include <QApplication>
+#include "qstackedlayout.h"
 #include "ui_spinbox_a.h"
 
 #include <dynamicWidget.h>
 #include <menu_anim.hpp>
+#include <measurementselector.h>
 #include <semiexclusivebuttongroup.h>
 #include <spinbox_a.hpp>
 #include <smallOnOffSwitch.h>
@@ -119,6 +121,61 @@ void StyleHelper::MeasurementPanelLabel(MeasurementLabel *w, QString objectName)
 					style.replace(QString("&&colorname&&"),w->m_color.name());
 	w->m_nameLabel->setStyleSheet(style);
 	w->m_valueLabel->setStyleSheet(style);
+}
+
+void StyleHelper::StatsPanelLabel(StatsLabel *w, QString objectName)
+{
+	QString style = QString(R"css(
+							font-weight: 500;
+							font-family: Open Sans;
+							font-size: 12px;
+							font-style: normal;
+							color: &&colorname&&;
+							)css");
+					style.replace(QString("&&colorname&&"),w->m_color.name());
+	w->m_nameLabel->setStyleSheet(style);
+
+	style = QString(R"css(e
+							font-size: 12px;
+							)css");
+					style.replace(QString("&&colorname&&"),w->m_color.name());
+	w->m_avgLabel->setStyleSheet(style);
+	w->m_minLabel->setStyleSheet(style);
+	w->m_maxLabel->setStyleSheet(style);
+}
+
+void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w, QString objectName)
+{
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QHBoxLayout *lay = dynamic_cast<QHBoxLayout*>(w->layout());
+	Q_ASSERT(lay);
+
+	lay->setMargin(0);
+	lay->setSpacing(0);
+
+
+	w->m_icon->setPixmap(QPixmap(iconPath));
+	w->m_icon->setFixedSize(24,24);
+
+	w->m_name->setContentsMargins(5,0,0,0);
+	StyleHelper::MenuMediumLabel(w->m_name);
+
+//	// Add "M" letter on top of combobox
+//	QWidget *msrStack = new QWidget(w);
+//	QStackedLayout *msr_layout = new QStackedLayout(w);
+//	msrStack->setLayout(msr_layout);
+//	lay->replaceWidget(w->m_measureCheckbox, msrStack);
+//	auto measureLabel = new QLabel("M", msrStack);
+//	StyleHelper::MenuSmallLabel(measureLabel);
+//	measureLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
+//	msr_layout->setStackingMode(QStackedLayout::StackAll);
+//	msr_layout->addWidget(measureLabel);
+//	msr_layout->addWidget(w->m_measureCheckbox);
+
+//	auto statsLabel = new QLabel("  S", w->m_statsCheckbox);
+//	statsLabel->setFixedSize(18,18);
+//	StyleHelper::MenuSmallLabel(statsLabel);
+
 }
 
 void StyleHelper::BlueButton(QPushButton *btn, QString objectName) {

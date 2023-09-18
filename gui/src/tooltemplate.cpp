@@ -8,7 +8,7 @@ ToolTemplate::ToolTemplate(QWidget *parent) : QWidget(parent)
 	m_ui->setupUi(this);
 
 	m_ui->bottomCentral->setVisible(false);
-	m_ui->topCentral->setVisible(true);
+	m_ui->topCentral->setVisible(false);
 	m_ui->bottomContainer->setVisible(false);
 	m_ui->topContainer->setVisible(false);
 	m_ui->leftContainer->setVisible(false);
@@ -113,16 +113,16 @@ void ToolTemplate::setRightContainerWidth(int w)
 
 void ToolTemplate::setTopContainerHeight(int h)
 {
-	dynamic_cast<MenuHAnim*>(m_ui->leftContainer)->setAnimMin(0);
-	dynamic_cast<MenuHAnim*>(m_ui->leftContainer)->setAnimMax(h);
-	m_ui->leftContainer->setMaximumWidth(h);
-	m_ui->leftContainer->setMinimumWidth(h);
+	dynamic_cast<MenuVAnim*>(m_ui->topCentral)->setAnimMin(0);
+	dynamic_cast<MenuVAnim*>(m_ui->topCentral)->setAnimMax(h);
+	m_ui->topCentral->setMaximumHeight(h);
+	m_ui->topCentral->setMinimumHeight(h);
 }
 
 void ToolTemplate::setBottomContainerHeight(int h)
 {
-	dynamic_cast<MenuHAnim*>(m_ui->bottomCentral)->setAnimMin(0);
-	dynamic_cast<MenuHAnim*>(m_ui->bottomCentral)->setAnimMax(h);
+	dynamic_cast<MenuVAnim*>(m_ui->bottomCentral)->setAnimMin(0);
+	dynamic_cast<MenuVAnim*>(m_ui->bottomCentral)->setAnimMax(h);
 	m_ui->bottomCentral->setMaximumHeight(h);
 	m_ui->bottomCentral->setMinimumHeight(h);
 }
@@ -138,7 +138,7 @@ void ToolTemplate::openRightContainerHelper(bool open)
 }
 
 void ToolTemplate::openTopContainerHelper(bool open)
-{
+{	
 	m_ui->topCentral->toggleMenu(open);
 }
 
