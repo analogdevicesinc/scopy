@@ -5,12 +5,15 @@
 #include <QLabel>
 #include <QCheckBox>
 #include <QMap>
+#include <stylehelper.h>
 
 using namespace scopy;
 MeasurementSelector::MeasurementSelector(QWidget *parent) : QWidget(parent)
 {
 	lay = new QVBoxLayout(this);
 	setLayout(lay);
+	lay->setMargin(0);
+	lay->setSpacing(6);
 }
 
 MeasurementSelector::~MeasurementSelector()
@@ -35,33 +38,30 @@ MeasurementSelectorItem* MeasurementSelector::measurement(QString name) {
 	return m_map.value(name);
 }
 
-
-
-
-MeasurementSelectorItem::MeasurementSelectorItem(QString name, QString icon, QWidget *parent) : QWidget(parent)
+MeasurementSelectorItem::MeasurementSelectorItem(QString name, QString iconPath, QWidget *parent) : QWidget(parent)
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	setLayout(lay);
-	lay->setMargin(0);
-	lay->setSpacing(0);
 
-	QLabel *m_icon = new QLabel("",this);
-	QString style(QString("background-image: url(%1);").arg(icon));
 
-	m_icon->setStyleSheet(style);
-	QLabel *m_name = new QLabel(name, this);
+	m_icon = new QLabel("",this);
+	m_name = new QLabel(name, this);
+
 
 	m_measureCheckbox = new QCheckBox(this);
 	m_statsCheckbox = new QCheckBox(this);
+
 	lay->addWidget(m_icon);
 	lay->addWidget(m_name);
 	lay->addWidget(m_measureCheckbox);
 	lay->addWidget(m_statsCheckbox);
 
 	lay->setStretch(0,1);
-	lay->setStretch(1,8);
+	lay->setStretch(1,5);
 	lay->setStretch(2,1);
 	lay->setStretch(3,1);
+	StyleHelper::MeasurementSelectorItemWidget(iconPath, this, "MeasurementSelectorItem" + name);
+
 }
 
 MeasurementSelectorItem::~MeasurementSelectorItem()

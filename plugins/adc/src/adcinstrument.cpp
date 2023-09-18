@@ -1,5 +1,4 @@
 #include "adcinstrument.h"
-#include "stylehelper.h"
 
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -23,12 +22,16 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->topContainer()->setVisible(true);
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
+	tool->topCentral()->setVisible(true);
+	tool->bottomCentral()->setVisible(true);
 	lay->addWidget(tool);
 
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),true,this);
 	QButtonGroup* rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn*>(openLastMenuBtn)->getButtonGroup();
 	tool->setLeftContainerWidth(200);
 	tool->setRightContainerWidth(300);
+	tool->setTopContainerHeight(120);
+	tool->setBottomContainerHeight(90);
 
 	GearBtn *settingsMenu = new GearBtn(this);
 	InfoBtn *infoBtn = new InfoBtn(this);
@@ -44,13 +47,19 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 	MenuControlButton *cursor = new MenuControlButton(this);
 	cursor->setName("Cursors");
+	cursor->checkBox()->setVisible(false);
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 	MenuControlButton *measure = new MenuControlButton(this);
 
 	// create measurement panel here ? or measurement addon ?
 	measure->setName("Measure");
-	gui::MeasurementPanel* measure_panel = new gui::MeasurementPanel(this);
+	measure->checkBox()->setVisible(false);
+	measure->button()->setVisible(false);
+	gui::MeasurementsPanel* measure_panel = new gui::MeasurementsPanel(this);
 	tool->topStack()->add("measure", measure_panel);
+
+	gui::StatsPanel* stats_panel = new gui::StatsPanel(this);
+	tool->bottomStack()->add("stats", stats_panel);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn,TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu,TTA_LEFT);
@@ -65,7 +74,6 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 	tool->addWidgetToBottomContainerHelper(cursor, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
-
 
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim*>(tool->leftContainer()), &MenuHAnim::toggleMenu);
 
@@ -109,8 +117,12 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) { if(b) ch->enable(); else ch->disable();} );
 			connect(btn->button(), &QPushButton::toggled, this, [=](bool b) { if(b) tool->requestMenu(id);});
 			connect(btn, &QAbstractButton::toggled, this, [=](){plotAddon->plot()->selectChannel(ch->plotCh());});
-			connect(ch,&GRTimeChannelAddon::enableMeasurement, measure_panel, &gui::MeasurementPanel::addMeasurement);
-			connect(ch,&GRTimeChannelAddon::disableMeasurement, measure_panel, &gui::MeasurementPanel::removeMeasurement);
+
+			connect(ch,&GRTimeChannelAddon::enableMeasurement, measure_panel, &gui::MeasurementsPanel::addMeasurement);
+			connect(ch,&GRTimeChannelAddon::disableMeasurement, measure_panel, &gui::MeasurementsPanel::removeMeasurement);
+			connect(ch,&GRTimeChannelAddon::enableStat, stats_panel, &gui::StatsPanel::addStat);
+			connect(ch,&GRTimeChannelAddon::disableStat, stats_panel, &gui::StatsPanel::removeStat);
+
 			rightMenuBtnGrp->addButton(btn->button());
 			btn->checkBox()->setChecked(true);
 			plotAddon->onChannelAdded(ch);
@@ -128,7 +140,8 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);
 	connect(cursor, &MenuControlButton::toggled, plotAddon,  &GRTimePlotAddon::showCursors);
 	connect(measure, &MenuControlButton::toggled, this, &AdcInstrument::showMeasurements);
-	tool->requestMenu("time__settings");
+
+	tool->requestMenu("voltage02");
 	channelGroup->buttons()[0]->setChecked(true);
 
 	init();
@@ -166,8 +179,10 @@ void AdcInstrument::showMeasurements(bool b)
 {
 	if(b) {
 		tool->requestMenu("measure");
+		tool->requestMenu("stats");
 	}
 	tool->openTopContainerHelper(b);
+	tool->openBottomContainerHelper(b);
 }
 
 bool AdcInstrument::running() const

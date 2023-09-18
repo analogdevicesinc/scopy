@@ -52,6 +52,7 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
 
+	initMeasure();
 	widget = createMenu();
 	m_sampleRateAvailable = m_grch->sampleRateAvailable();
 
@@ -186,30 +187,51 @@ QWidget* GRTimeChannelAddon::createCurveMenu(QWidget* parent) {
 	return curvecontainer;
 }
 
-QWidget* GRTimeChannelAddon::createMeasurementMenu(QWidget* parent) {
-
-	MenuSectionWidget *measureContainer = new MenuSectionWidget(parent);
-	MenuCollapseSection *measureSection = new MenuCollapseSection("MEASUREMENT",MenuCollapseSection::MHCW_NONE, measureContainer);
-	MeasurementSelector *measureSelector = new MeasurementSelector(measureSection);
-	measureSection->contentLayout()->addWidget(measureSelector);
-	measureContainer->contentLayout()->addWidget(measureSection);
-
+void GRTimeChannelAddon::initMeasure() {
 	m_measureModel = new TimeMeasureModel(nullptr,0,this);
 	m_measureController = new TimeChannelMeasurementController(m_measureModel, m_pen, this);
 	m_measureModel->setAdcBitCount(grch()->getFmt()->bits);
 
 	connect(m_measureController, &TimeChannelMeasurementController::measurementEnabled, this, &GRTimeChannelAddon::enableMeasurement);
 	connect(m_measureController, &TimeChannelMeasurementController::measurementDisabled, this, &GRTimeChannelAddon::disableMeasurement);
+	connect(m_measureController, &TimeChannelMeasurementController::statsEnabled, this, &GRTimeChannelAddon::enableStat);
+	connect(m_measureController, &TimeChannelMeasurementController::statsDisabled, this, &GRTimeChannelAddon::disableStat);
+
+}
+
+QWidget* GRTimeChannelAddon::createMeasurementMenuSection(QString category, QWidget* parent) {
+
+
+	MenuSectionWidget *measureContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *measureSection = new MenuCollapseSection("MEASUREMENT " + category,MenuCollapseSection::MHCW_ARROW, measureContainer);
+	QScrollArea *measureScroll = new QScrollArea(measureSection);
+	MeasurementSelector *measureSelector = new MeasurementSelector();
+	measureContainer->contentLayout()->addWidget(measureSection);
+	measureSection->contentLayout()->addWidget(measureScroll);
+	measureScroll->setWidget(measureSelector);
+	measureScroll->setWidgetResizable(true);
+
+	measureScroll->setFixedHeight(150);
 
 	for(auto &meas : m_measureController->availableMeasurements()) {
-		measureSelector->addMeasurement(meas.name, meas.icon);
-		connect(measureSelector->measurement(meas.name)->measureCheckbox(), &QCheckBox::toggled, [=](bool b){
-			if(b)
-				m_measureController->enableMeasurement(meas.name);
-			else
-				m_measureController->disableMeasurement(meas.name);
-		});
+		if(meas.type.toUpper() == category.toUpper()) {
+			measureSelector->addMeasurement(meas.name, meas.icon);
+			connect(measureSelector->measurement(meas.name)->measureCheckbox(), &QCheckBox::toggled, [=](bool b){
+				if(b)
+					m_measureController->enableMeasurement(meas.name);
+				else
+					m_measureController->disableMeasurement(meas.name);
+			});
+
+			connect(measureSelector->measurement(meas.name)->statsCheckbox(), &QCheckBox::toggled, [=](bool b){
+				if(b)
+					m_measureController->enableStats(meas.name);
+				else
+					m_measureController->disableStats(meas.name);
+			});
+		}
 	}
+	measureSection->header()->setChecked(false);
 
 	return measureContainer;
 }
@@ -217,6 +239,21 @@ QWidget* GRTimeChannelAddon::createMeasurementMenu(QWidget* parent) {
 QWidget* GRTimeChannelAddon::createMenu(QWidget* parent) {
 	QWidget *w = new QWidget(parent);
 	QVBoxLayout *lay = new QVBoxLayout(w);
+
+	QScrollArea *scroll = new QScrollArea(parent);
+	QWidget *wScroll = new QWidget(scroll);
+	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
+	layScroll->setMargin(0);
+	layScroll->setSpacing(10);
+
+	wScroll->setLayout(layScroll);
+	scroll->setWidgetResizable(true);
+	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	//if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
+
+	scroll->setWidget(wScroll);
+
 	lay->setMargin(0);
 	lay->setSpacing(10);
 	w->setLayout(lay);
@@ -224,14 +261,18 @@ QWidget* GRTimeChannelAddon::createMenu(QWidget* parent) {
 	MenuHeaderWidget *header = new MenuHeaderWidget(m_channelName, m_pen, w);
 	QWidget* yaxismenu = createYAxisMenu(w);
 	QWidget* curvemenu = createCurveMenu(w);
-	QWidget* measuremenu = createMeasurementMenu(w);
+
+	QWidget *hMeasure = createMeasurementMenuSection("HORIZONTAL", parent);
+	QWidget *vMeasure = createMeasurementMenuSection("VERTICAL", parent);
 
 	lay->addWidget(header);
-	lay->addWidget(yaxismenu);
-	lay->addWidget(curvemenu);
-	lay->addWidget(measuremenu);
+	lay->addWidget(scroll);
+	layScroll->addWidget(yaxismenu);
+	layScroll->addWidget(curvemenu);
+	layScroll->addWidget(hMeasure);
+	layScroll->addWidget(vMeasure);
 
-	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
+	layScroll->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
 
 
 	return w;
