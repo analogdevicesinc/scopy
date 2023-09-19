@@ -10,14 +10,11 @@ using namespace scopy::grutil;
 
 AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent), proxy(proxy)
 {
-	static int uuid = 0;
-
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	setLayout(lay);
 	tool = new ToolTemplate(this);
 	tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
 	tool->bottomContainer()->setVisible(true);
 	tool->topContainer()->setVisible(true);
 	tool->leftContainer()->setVisible(true);
@@ -25,13 +22,13 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->topCentral()->setVisible(true);
 	tool->bottomCentral()->setVisible(true);
 	lay->addWidget(tool);
-
-	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),true,this);
-	QButtonGroup* rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn*>(openLastMenuBtn)->getButtonGroup();
 	tool->setLeftContainerWidth(210);
 	tool->setRightContainerWidth(300);
 	tool->setTopContainerHeight(90);
 	tool->setBottomContainerHeight(90);
+
+	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),true,this);
+	rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn*>(openLastMenuBtn)->getButtonGroup();
 
 	tool->openBottomContainerHelper(false);
 	tool->openTopContainerHelper(false);
@@ -42,39 +39,19 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	runBtn = new RunBtn(this);
 	singleBtn = new SingleShotBtn(this);
 
-	MenuControlButton *channelsBtn = new MenuControlButton(this);
-	channelsBtn->setName("Channels");
-	channelsBtn->setOpenMenuChecksThis(true);
-	channelsBtn->setDoubleClickToOpenMenu(true);
-	channelsBtn->checkBox()->setVisible(false);
-	channelsBtn->setChecked(true);
-	MapStackedWidget *channelStack = new MapStackedWidget(this);
-	tool->rightStack()->add(channelsMenuId,channelStack);
-	connect(channelsBtn->button(), &QAbstractButton::toggled, this, [=](bool b){
-		if(b)
-			tool->requestMenu(channelsMenuId);
-	});
-	rightMenuBtnGrp->addButton(channelsBtn->button());
+	channelsBtn = new MenuControlButton(this);
+	setupChannelsButtonHelper(channelsBtn);
 
 
 	MenuControlButton *cursor = new MenuControlButton(this);
-	cursor->setName("Cursors");
-	cursor->setOpenMenuChecksThis(true);
-	cursor->setDoubleClickToOpenMenu(true);
-	cursor->checkBox()->setVisible(false);
-	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
-	MenuControlButton *measure = new MenuControlButton(this);
+	setupCursorButtonHelper(cursor);
 
-	// create measurement panel here ? or measurement addon ?
-	measure->setName("Measure");
-	measure->setOpenMenuChecksThis(true);
-	measure->setDoubleClickToOpenMenu(true);
-	measure->checkBox()->setVisible(false);
-	measure->button()->setVisible(false);
-	MeasurementsPanel* measure_panel = new MeasurementsPanel(this);
+	MenuControlButton *measure = new MenuControlButton(this);
+	setupMeasureButtonHelper(measure);
+	measure_panel = new MeasurementsPanel(this);
 	tool->topStack()->add(measureMenuId, measure_panel);
 
-	StatsPanel* stats_panel = new StatsPanel(this);
+	stats_panel = new StatsPanel(this);
 	tool->bottomStack()->add(statsMenuId, stats_panel);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn,TTA_RIGHT);
@@ -93,10 +70,10 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim*>(tool->leftContainer()), &MenuHAnim::toggleMenu);
 
-	GRTimePlotAddon* plotAddon = dynamic_cast<GRTimePlotAddon*>(proxy->getPlotAddon());
+	plotAddon = dynamic_cast<GRTimePlotAddon*>(proxy->getPlotAddon());
 	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
 
-	GRTimePlotAddonSettings* plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings*>(proxy->getPlotSettings());
+	plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings*>(proxy->getPlotSettings());
 	rightMenuBtnGrp->addButton(settingsBtn);
 
 	QString settingsMenuId = plotAddonSettings->getName() + QString(uuid++);
@@ -109,19 +86,15 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	VerticalChannelManager *vcm = new VerticalChannelManager(this);
 	tool->leftStack()->add(verticalChannelManagerId, vcm);
 
-	QButtonGroup *channelGroup = new QButtonGroup(this);
+	channelGroup = new QButtonGroup(this);
 	for(auto d: proxy->getDeviceAddons()) {
 		GRDeviceAddon *dev = dynamic_cast<GRDeviceAddon*>(d);
 		if(!dev)
 			return;
 		CollapsableMenuControlButton *devBtn = new CollapsableMenuControlButton(this);
-		QString id = dev->getName() + QString::number(uuid++);
-		devBtn->getControlBtn()->setName(dev->getName());
-		devBtn->getControlBtn()->setCheckable(true);
-		devBtn->getControlBtn()->button()->setVisible(false);
-		devBtn->getControlBtn()->setOpenMenuChecksThis(true);
-		devBtn->getControlBtn()->setDoubleClickToOpenMenu(true);
+		setupDeviceMenuControlButtonHelper(devBtn->getControlBtn(), dev);
 		channelGroup->addButton(devBtn->getControlBtn());
+		QString id = dev->getName() + QString::number(uuid++);
 		channelStack->add(id, dev->getWidget());
 		connect(devBtn->getControlBtn(), &QPushButton::toggled, this, [=](bool b) {
 			if(b) {
@@ -129,24 +102,18 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 				channelStack->show(id);
 			}
 		});
-
 		vcm->add(devBtn);
+
 		for(GRTimeChannelAddon* ch : dev->getRegisteredChannels()) {
 			MenuControlButton *btn = new MenuControlButton(devBtn);
 			devBtn->add(btn);
 			channelGroup->addButton(btn);
 
-			btn->setName(ch->getName());
-			btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
-			btn->setOpenMenuChecksThis(true);
-			btn->setDoubleClickToOpenMenu(true);
-			btn->setColor(ch->pen().color());
-			btn->button()->setVisible(false);
-			btn->setCheckable(true);
-
 			QString id = ch->getName() + QString::number(uuid++);
+			setupChannelMenuControlButtonHelper(btn, ch);
+
 			channelStack->add(id, ch->getWidget());
-			connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) { if(b) ch->enable(); else ch->disable();} );
+
 			connect(btn, &QAbstractButton::clicked, this, [=](bool b){
 				if(b) {
 					if(!channelsBtn->button()->isChecked()) {
@@ -164,7 +131,6 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			connect(ch,&GRTimeChannelAddon::enableStat, stats_panel, &StatsPanel::addStat);
 			connect(ch,&GRTimeChannelAddon::disableStat, stats_panel, &StatsPanel::removeStat);
 
-			btn->checkBox()->setChecked(true);
 			plotAddon->onChannelAdded(ch);
 			plotAddonSettings->onChannelAdded(ch);
 
@@ -191,6 +157,62 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 AdcInstrument::~AdcInstrument()
 {
 	deinit();
+}
+
+void AdcInstrument::setupCursorButtonHelper(MenuControlButton *cursor) {
+	cursor->setName("Cursors");
+	cursor->setOpenMenuChecksThis(true);
+	cursor->setDoubleClickToOpenMenu(true);
+	cursor->checkBox()->setVisible(false);
+	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+}
+
+void AdcInstrument::setupMeasureButtonHelper(MenuControlButton *measure) {
+	measure->setName("Measure");
+	measure->setOpenMenuChecksThis(true);
+	measure->setDoubleClickToOpenMenu(true);
+	measure->checkBox()->setVisible(false);
+}
+
+
+void AdcInstrument::setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, GRDeviceAddon *dev)
+{
+	devBtn->setName(dev->getName());
+	devBtn->setCheckable(true);
+	devBtn->button()->setVisible(false);
+	devBtn->setOpenMenuChecksThis(true);
+	devBtn->setDoubleClickToOpenMenu(true);
+}
+
+void AdcInstrument::setupChannelMenuControlButtonHelper(MenuControlButton *btn, GRTimeChannelAddon *ch) {
+	btn->setName(ch->getName());
+	btn->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
+	btn->setOpenMenuChecksThis(true);
+	btn->setDoubleClickToOpenMenu(true);
+	btn->setColor(ch->pen().color());
+	btn->button()->setVisible(false);
+	btn->setCheckable(true);
+
+	connect(btn->checkBox(), &QCheckBox::toggled, this, [=](bool b) {
+		if(b) ch->enable(); else ch->disable();
+	} );
+	btn->checkBox()->setChecked(true);
+}
+
+void AdcInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
+{
+	channelsBtn->setName("Channels");
+	channelsBtn->setOpenMenuChecksThis(true);
+	channelsBtn->setDoubleClickToOpenMenu(true);
+	channelsBtn->checkBox()->setVisible(false);
+	channelsBtn->setChecked(true);
+	channelStack = new MapStackedWidget(this);
+	tool->rightStack()->add(channelsMenuId,channelStack);
+	connect(channelsBtn->button(), &QAbstractButton::toggled, this, [=](bool b){
+		if(b)
+			tool->requestMenu(channelsMenuId);
+	});
+	rightMenuBtnGrp->addButton(channelsBtn->button());
 }
 
 void AdcInstrument::init() {
