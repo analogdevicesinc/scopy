@@ -28,9 +28,9 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),true,this);
 	QButtonGroup* rightMenuBtnGrp = dynamic_cast<OpenLastMenuBtn*>(openLastMenuBtn)->getButtonGroup();
-	tool->setLeftContainerWidth(200);
+	tool->setLeftContainerWidth(210);
 	tool->setRightContainerWidth(300);
-	tool->setTopContainerHeight(120);
+	tool->setTopContainerHeight(90);
 	tool->setBottomContainerHeight(90);
 
 	GearBtn *settingsMenu = new GearBtn(this);
@@ -55,10 +55,10 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	measure->setName("Measure");
 	measure->checkBox()->setVisible(false);
 	measure->button()->setVisible(false);
-	gui::MeasurementsPanel* measure_panel = new gui::MeasurementsPanel(this);
+	MeasurementsPanel* measure_panel = new MeasurementsPanel(this);
 	tool->topStack()->add("measure", measure_panel);
 
-	gui::StatsPanel* stats_panel = new gui::StatsPanel(this);
+	StatsPanel* stats_panel = new StatsPanel(this);
 	tool->bottomStack()->add("stats", stats_panel);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn,TTA_RIGHT);
@@ -118,10 +118,10 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 			connect(btn->button(), &QPushButton::toggled, this, [=](bool b) { if(b) tool->requestMenu(id);});
 			connect(btn, &QAbstractButton::toggled, this, [=](){plotAddon->plot()->selectChannel(ch->plotCh());});
 
-			connect(ch,&GRTimeChannelAddon::enableMeasurement, measure_panel, &gui::MeasurementsPanel::addMeasurement);
-			connect(ch,&GRTimeChannelAddon::disableMeasurement, measure_panel, &gui::MeasurementsPanel::removeMeasurement);
-			connect(ch,&GRTimeChannelAddon::enableStat, stats_panel, &gui::StatsPanel::addStat);
-			connect(ch,&GRTimeChannelAddon::disableStat, stats_panel, &gui::StatsPanel::removeStat);
+			connect(ch,&GRTimeChannelAddon::enableMeasurement, measure_panel, &MeasurementsPanel::addMeasurement);
+			connect(ch,&GRTimeChannelAddon::disableMeasurement, measure_panel, &MeasurementsPanel::removeMeasurement);
+			connect(ch,&GRTimeChannelAddon::enableStat, stats_panel, &StatsPanel::addStat);
+			connect(ch,&GRTimeChannelAddon::disableStat, stats_panel, &StatsPanel::removeStat);
 
 			rightMenuBtnGrp->addButton(btn->button());
 			btn->checkBox()->setChecked(true);
