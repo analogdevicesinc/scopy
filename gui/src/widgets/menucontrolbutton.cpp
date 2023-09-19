@@ -29,17 +29,8 @@ MenuControlButton::MenuControlButton(QWidget *parent) : QAbstractButton(parent) 
 		setDynamicProperty(this,"selected",b);
 	}); // Hackish - QStyle should be implemented
 
-	connect(m_btn, &QAbstractButton::toggled, this, [=](bool b) {
-		if(b)
-			setChecked(true);
-	});
-
-	connect(this, &MenuControlButton::doubleClicked, this, [=](){
-			setChecked(true);
-			if(m_btn->isVisible()) {
-				m_btn->toggle();
-			}
-	});
+	dblClickToOpenMenu = QMetaObject::Connection();
+	openMenuChecksThis = QMetaObject::Connection();
 }
 
 MenuControlButton::~MenuControlButton()
@@ -59,6 +50,34 @@ void MenuControlButton::setCheckBoxStyle(CheckboxStyle cs) {
 
 void MenuControlButton::setName(QString s) {
 	m_label->setText(s);
+}
+
+void MenuControlButton::setDoubleClickToOpenMenu(bool b)
+{
+	if(b) {
+		dblClickToOpenMenu =
+			connect(this, &MenuControlButton::doubleClicked, this, [=](){
+			setChecked(true);
+			if(m_btn->isVisible()) {
+				m_btn->toggle();
+			}
+		});
+	} else {
+		disconnect(dblClickToOpenMenu);
+	}
+}
+
+void MenuControlButton::setOpenMenuChecksThis(bool b)
+{
+	if(b) {
+		openMenuChecksThis =
+			connect(m_btn, &QAbstractButton::toggled, this, [=](bool b) {
+			if(b)
+				setChecked(true);
+		});
+	} else {
+		disconnect(openMenuChecksThis);
+	}
 }
 
 void MenuControlButton::mouseDoubleClickEvent(QMouseEvent * e) {
