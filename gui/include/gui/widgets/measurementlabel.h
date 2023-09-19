@@ -33,8 +33,6 @@ namespace scopy {
 
 class MeasurementData;
 
-
-
 class SCOPY_GUI_EXPORT MeasurementLabel : public QWidget {
 	friend class scopy::StyleHelper;
 	Q_OBJECT;
