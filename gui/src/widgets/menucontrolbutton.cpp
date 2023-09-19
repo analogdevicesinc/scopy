@@ -1,6 +1,7 @@
 #include <widgets/menucontrolbutton.h>
 #include <dynamicWidget.h>
 #include <stylehelper.h>
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
@@ -23,7 +24,22 @@ MenuControlButton::MenuControlButton(QWidget *parent) : QAbstractButton(parent) 
 	lay->addWidget(m_label);
 	lay->addWidget(m_btn);
 	applyStylesheet();
-	connect(this, &QAbstractButton::toggled, this, [=](bool b){ setDynamicProperty(this,"selected",b);}); // Hackish - QStyle should be implemented
+
+	connect(this, &QAbstractButton::toggled, this, [=](bool b){
+		setDynamicProperty(this,"selected",b);
+	}); // Hackish - QStyle should be implemented
+
+	connect(m_btn, &QAbstractButton::toggled, this, [=](bool b) {
+		if(b)
+			setChecked(true);
+	});
+
+	connect(this, &MenuControlButton::doubleClicked, this, [=](){
+			setChecked(true);
+			if(m_btn->isVisible()) {
+				m_btn->toggle();
+			}
+	});
 }
 
 MenuControlButton::~MenuControlButton()
@@ -43,6 +59,28 @@ void MenuControlButton::setCheckBoxStyle(CheckboxStyle cs) {
 
 void MenuControlButton::setName(QString s) {
 	m_label->setText(s);
+}
+
+void MenuControlButton::mouseDoubleClickEvent(QMouseEvent * e) {
+	if ( e->button() == Qt::LeftButton ) {
+		if(Preferences::get("general_doubleclick_ctrl_opens_menu").toBool() == true) {
+			Q_EMIT doubleClicked();
+			return;
+		}
+	}
+	QAbstractButton::mouseDoubleClickEvent(e);
+}
+
+void MenuControlButton::mousePressEvent(QMouseEvent *e) {
+	if (e->button() == Qt::LeftButton) {
+		if(Preferences::get("general_doubleclick_ctrl_opens_menu").toBool() == true) {
+			if(m_btn->isChecked()) {
+				m_btn->setChecked(false);
+				return;
+			}
+		}
+	}
+	QAbstractButton::mousePressEvent(e);
 }
 
 QCheckBox *MenuControlButton::checkBox() { return m_chk;}

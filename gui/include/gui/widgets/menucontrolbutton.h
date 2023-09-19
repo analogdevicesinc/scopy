@@ -32,6 +32,10 @@ public:
 	QCheckBox* checkBox();
 	QPushButton* button();
 
+
+Q_SIGNALS:
+	void doubleClicked();
+
 private:
 	void applyStylesheet();
 
@@ -42,6 +46,10 @@ private:
 	QLabel *m_label;
 	QPushButton *m_btn;
 	CheckboxStyle m_cs;
+
+protected:
+	void mouseDoubleClickEvent(QMouseEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
 };
 
 

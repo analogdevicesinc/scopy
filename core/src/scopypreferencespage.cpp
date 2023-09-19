@@ -185,6 +185,7 @@ QWidget* ScopyPreferencesPage::buildGeneralPreferencesPage()
 	generalSection->contentLayout()->addWidget(buildSaveSessionPreference());
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_save_attached", "Save/Load tool attached state", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_doubleclick_attach", "Doubleclick to attach/detach tool", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_doubleclick_ctrl_opens_menu", "Doubleclick control buttons to open menu", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_opengl", "Enable OpenGL plotting", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"general_use_animations", "Enable menu animations", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"general_theme", "Theme", {"default","light"}, generalSection));
