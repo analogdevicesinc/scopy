@@ -29,6 +29,9 @@ public:
 	void setCheckBoxStyle(MenuControlButton::CheckboxStyle cs);
 	void setName(QString s);
 
+	void setDoubleClickToOpenMenu(bool b);
+	void setOpenMenuChecksThis(bool b);
+
 	QCheckBox* checkBox();
 	QPushButton* button();
 
@@ -46,6 +49,8 @@ private:
 	QLabel *m_label;
 	QPushButton *m_btn;
 	CheckboxStyle m_cs;
+	QMetaObject::Connection dblClickToOpenMenu;
+	QMetaObject::Connection openMenuChecksThis;
 
 protected:
 	void mouseDoubleClickEvent(QMouseEvent *event) override;
