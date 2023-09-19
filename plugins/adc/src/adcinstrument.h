@@ -41,6 +41,11 @@ private:
 	QPushButton *openLastMenuBtn;
 
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
+
+	const QString channelsMenuId = "channels";
+	const QString measureMenuId = "measure";
+	const QString statsMenuId = "stats";
+	const QString verticalChannelManagerId = "vcm";
 };
 }
 #endif // ADCINSTRUMENT_H
