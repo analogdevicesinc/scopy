@@ -248,6 +248,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_use_native_dialogs", true);
 	p->init("general_additional_plugin_path", "");
 	p->init("general_load_decoders", true);
+	p->init("general_doubleclick_ctrl_opens_menu", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString,QVariant)), this, SLOT(handlePreferences(QString,QVariant)));
 
