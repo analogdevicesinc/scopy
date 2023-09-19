@@ -23,9 +23,12 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
+#include "versionchecker.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
+#include <functional>
+#include <utility>
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
 
@@ -50,13 +53,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
 
-	//	auto vc = VersionCache::GetInstance();
-	//	if(vc->cacheOutdated()) {
-	//		vc->updateCache();
-	//		connect(vc,&VersionCache::cacheUpdated,this,[=](){
-	//			qInfo()<<vc->cache();
-	//		});
-	//	}
+	// get the version document
+	auto vc = VersionCache::GetInstance(); // get VersionCache instance
+	auto *function = new std::function<void(QJsonDocument document)>(); // allocate space for the function wrapper
+	*function = [this] (QJsonDocument document) { this->receiveVersionDocument(std::move(document)); }; // set function value
+	vc->subscribe(function); // 'subscribe' to receive the version QJsonDocument
 
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
@@ -416,6 +417,10 @@ void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
 	toolman->removeToolList(id);
 	hp->removeDevice(id);
+}
+
+void ScopyMainWindow::receiveVersionDocument(QJsonDocument document) {
+	qInfo(CAT_SCOPY) << "The upstream scopy version is" << document["scopy"]["version"] << "and the current one is" << SCOPY_VERSION;
 }
 
 

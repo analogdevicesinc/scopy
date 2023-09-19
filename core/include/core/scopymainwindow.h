@@ -14,6 +14,7 @@
 #include "scopyaboutpage.h"
 #include "scopypreferencespage.h"
 #include "pluginbase/preferences.h"
+#include "versionchecker.h"
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iioscantask.h"
 
@@ -35,6 +36,7 @@ public:
 	void initPreferences();
 	void initTranslations();
 	void loadPluginsFromRepository(PluginRepository *pr = nullptr);
+	void receiveVersionDocument(QJsonDocument document);
 
 public Q_SLOTS:
 	void requestTools(QString id);

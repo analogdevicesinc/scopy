@@ -4,38 +4,75 @@
 #include <QObject>
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
+#include <functional>
+#include <mutex>
+#include <QThread>
 #include "scopy-core_export.h"
 
 namespace scopy {
-class SCOPY_CORE_EXPORT VersionCache : public QObject
+class SCOPY_CORE_EXPORT VersionChecker : public QObject
 {
 	Q_OBJECT
 
 protected:
-	VersionCache(QObject *parent = nullptr);
+	explicit VersionChecker(QObject *parent = nullptr);
 	void init();
-	~VersionCache();
+	~VersionChecker() override;
 
 public:
-	VersionCache(VersionCache &other) = delete;
-	void operator=(const VersionCache &) = delete;
+	VersionChecker(VersionChecker &other) = delete;
+	void operator=(const VersionChecker &) = delete;
 
-	static VersionCache *GetInstance();
-	void updateCache();
-	QJsonDocument cache();
-	bool cacheOutdated() const;
-	void read();
+	static VersionChecker *GetInstance();
+
+	template<typename T, typename R>
+	void subscribe(T* object, R(T::* function)(QJsonDocument)) {
+		m_mutex.lock();
+		auto f = std::bind(function, object, std::placeholders::_1);
+
+		m_subscriptions.push_back(f);
+		m_mutex.unlock();
+		Q_EMIT addedNewSubscription();
+	};
+
 Q_SIGNALS:
 	void cacheUpdated();
-private:
-	static VersionCache * pinstance_;
-	const QString url = "http://swdownloads.analog.com/cse/sw_versions.json";
+	void addedNewSubscription();
 
+private Q_SLOTS:
+	void updateSubscriptions();
+
+private:
+
+	/**
+	 * @brief Pull the json file with the current version from m_url and save it in the m_cache variable.
+	 * */
+	void pullNewCache();
+
+	/**
+	 * @brief Reads the cache from the file m_cacheFilePath.
+	 * */
+	void readCache();
+
+	/**
+	 * @brief Checks whether the cache needs to be pulled from m_url by verifying that the file from m_cacheFilePath
+	 * has not been altered in the last 24h.
+	 * @return bool
+	 * */
+	bool checkCacheOutdated();
+
+	static VersionChecker * pinstance_;
+	const QString m_url = "https://swdownloads.analog.com/cse/sw_versions.json";
+
+	QList< std::function<void(QJsonDocument)> > m_subscriptions;
+	std::mutex m_mutex; // mutex for managing subscriptions
+	QThread *m_thread;
 	QJsonDocument m_cache;
 	QString m_cacheFilePath;
 	QNetworkAccessManager *m_nam;
 	bool m_cacheOutdated;
-
+	bool m_onlineCheckInProgress;
+	int m_ttl; // maximum number of redirects allowed
 };
 }
 #endif // VERSIONCHECKER_H
