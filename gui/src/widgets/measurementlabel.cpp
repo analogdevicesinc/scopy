@@ -29,7 +29,10 @@ using namespace scopy;
 MeasurementLabel::MeasurementLabel(QWidget *parent) : QWidget(parent) {
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	m_unit = "";
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	setLayout(lay);
+	lay->setMargin(0);
+	lay->setSpacing(0);
 	m_nameLabel = new QLabel(this);
 	setName("None");
 	m_valueLabel = new QLabel("---", this);
@@ -37,9 +40,12 @@ MeasurementLabel::MeasurementLabel(QWidget *parent) : QWidget(parent) {
 	m_precision = 2;
 
 	lay->addWidget(m_nameLabel);
+	lay->addSpacerItem(new QSpacerItem(10,0,QSizePolicy::Expanding,QSizePolicy::Maximum));
 	lay->addWidget(m_valueLabel);
-	lay->setStretch(0,3); // 75 %
-	lay->setStretch(1,1); // 25 %
+	m_valueLabel->setAlignment(Qt::AlignRight);
+
+	m_color = StyleHelper::getColor("LabelText");
+	StyleHelper::MeasurementPanelLabel(this, m_name + "MeasurementLabel");
 
 }
 

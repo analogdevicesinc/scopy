@@ -11,85 +11,52 @@ namespace Ui {
 class MeasurementsPanel;
 };
 
-namespace scopy::gui {
+namespace scopy {
 
-class RowColumnWrappingWidget : public QWidget {
+class VerticalWidgetStack : public QWidget {
 	Q_OBJECT
 public:
-	typedef enum {
-		HORIZONTAL,
-		VERTICAL
-	} WrappingDirection;
-
-	RowColumnWrappingWidget(QWidget *parent = nullptr) {
-		m_maxCount = 4;
-		m_dir = HORIZONTAL;
-		m_grid = new QGridLayout(this);
-		setLayout(m_grid);
-		m_grid->setSpacing(0);
-		m_grid->setMargin(0);
-		m_grid->setAlignment(Qt::AlignTop);
-		setFixedHeight(parent->height());
-		m_grid->addItem(new QSpacerItem(10,10,QSizePolicy::Minimum, QSizePolicy::Expanding),m_maxCount,0);
-
+	VerticalWidgetStack(QWidget *parent = nullptr) {
+		lay = new QVBoxLayout(this);
+		setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Expanding);
+		setLayout(lay);
+		lay->setMargin(0);
+		lay->setSpacing(6);
+		spacer = new QSpacerItem(10, 10, QSizePolicy::Minimum, QSizePolicy::Expanding);
+		lay->addSpacerItem(spacer);
+		stackSize = 4;
 	}
+	~VerticalWidgetStack() {
 
-
-	void setWrappingDirection(int count, WrappingDirection dir) {
-		m_maxCount = count;
-		m_dir = dir;
-		update();
 	}
 	void addWidget(QWidget *w) {
-		m_list.push_back(w);		
-		m_grid->addWidget(w, m_rowCount, m_columnCount);
-		switch(m_dir) {
-		case HORIZONTAL:
-			m_rowCount++;
-			if(m_rowCount == m_maxCount) {
-				m_columnCount++;
-				m_rowCount = 0;
-			}
+		int idx = lay->indexOf(spacer);
+		lay->insertWidget(idx,w,Qt::AlignTop | Qt::AlignLeft);
+		m_widgets.append(w);
+	}
 
-			break;
-		case VERTICAL:
-		default:
-			m_columnCount++;
-			if(m_columnCount < m_maxCount) {
-				m_rowCount++;
-				m_columnCount = 0;
-			}
-			break;
+	void setStackSize(int val) {
+		stackSize = val;
+	}
+
+	void reparentWidgets(QWidget *parent = nullptr) {
+		for(QWidget *w : m_widgets) {
+			lay->removeWidget(w);
+			w->setParent(parent);
+
 		}
+		m_widgets.clear();
 	}
 
-	void removeWidget(QWidget *w) {
-		m_list.removeAll(w);
-		w->setParent(nullptr);
-		update();
-	}
-
-public Q_SLOTS:
-	void update() {
-		for(QWidget *w : m_list) {
-			addWidget(w);
-		}
-	}
-
-	void reset() {
-		m_list.clear();
-		m_rowCount = 0;
-		m_columnCount = 0;
-		update();
+	bool full() {
+		return(lay->count() > stackSize);
 	}
 
 private:
-	int m_maxCount;
-	int m_rowCount;
-	int m_columnCount;
-	QGridLayout *m_grid;
-	WrappingDirection m_dir;
-	QList<QWidget*> m_list;
+	QVBoxLayout *lay;
+	QSpacerItem *spacer;
+	int stackSize;
+	QList<QWidget*> m_widgets;
 };
 
 class SCOPY_GUI_EXPORT MeasurementsPanel : public QWidget
@@ -104,10 +71,14 @@ public Q_SLOTS:
 	void removeMeasurement(QWidget *meas);
 	void update();
 	void sort();
+
 private:
+	QHBoxLayout *panelLayout;
 	QList<QWidget*> m_labels;
-	Ui::MeasurementsPanel *ui;
-	RowColumnWrappingWidget *wrap;
+	QList<VerticalWidgetStack*> m_stacks;
+	QWidget *m_cursor;
+	QSpacerItem *spacer;
+	void addWidget(QWidget *meas);
 };
 
 class SCOPY_GUI_EXPORT StatsPanel : public QWidget
