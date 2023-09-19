@@ -8,6 +8,9 @@
 #include <QPushButton>
 
 namespace scopy {
+class MenuControlButton;
+class CollapsableMenuControlButton;
+
 class AdcInstrument : public QWidget
 {
 	Q_OBJECT
@@ -23,7 +26,6 @@ public:
 	void setRunning(bool newRunning);
 
 public Q_SLOTS:
-	void onNewData();
 	void run(bool);
 	void stop();
 	void start();
@@ -40,8 +42,27 @@ private:
 	PlotProxy* proxy;
 	QPushButton *openLastMenuBtn;
 
+	MenuControlButton *channelsBtn;
+
+	MeasurementsPanel* measure_panel;
+	StatsPanel* stats_panel;
+
+	GRTimePlotAddon* plotAddon;
+	GRTimePlotAddonSettings* plotAddonSettings;
+
+	MapStackedWidget *channelStack;
+	QButtonGroup* rightMenuBtnGrp;
+	QButtonGroup *channelGroup;
+
+	void setupCursorButtonHelper(MenuControlButton *cursor);
+	void setupMeasureButtonHelper(MenuControlButton *measure);
+	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
+	void setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, GRDeviceAddon *dev);
+	void setupChannelMenuControlButtonHelper(MenuControlButton *btn, GRTimeChannelAddon *ch);
+
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
 
+	int uuid = 0;
 	const QString channelsMenuId = "channels";
 	const QString measureMenuId = "measure";
 	const QString statsMenuId = "stats";
