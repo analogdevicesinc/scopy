@@ -57,6 +57,7 @@
 #include "gui/osc_export_settings.h"
 #include "filemanager.h"
 #include "state_updater.h"
+#include <unistd.h>
 
 using namespace scopy;
 using namespace scopy::logic;
