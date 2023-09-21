@@ -36,6 +36,9 @@
        <string>qrc:/scopy_home.html</string>
       </url>
      </property>
+     <property name="openExternalLinks">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
   </layout>
