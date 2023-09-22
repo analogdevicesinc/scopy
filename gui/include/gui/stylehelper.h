@@ -1,6 +1,7 @@
 #ifndef STYLEHELPER_H
 #define STYLEHELPER_H
 
+#include "widgets/hoverwidget.h"
 #include <QMap>
 #include <QLabel>
 #include <QCheckBox>
@@ -83,10 +84,10 @@ public:
 	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem* w, QString objectName = "");
 	static void TimePlotHDivInfo(QLabel *w, QString objectName = "");
 	static void TimePlotSamplingInfo(QLabel *w, QString objectName = "");
-	static void HoverWidget(QWidget *w, QString objectName = "");
 	static void DeviceIconBackgroundShadow(QAbstractButton* w, QString objectName = "");
 	static void FrameBackgroundShadow(QFrame* w, QString objectName = "");
-
+	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
+	static void TransparentWidget(QWidget *w, QString objectName = "");
 private:
 	QMap<QString,QString> colorMap;
 	static StyleHelper * pinstance_;

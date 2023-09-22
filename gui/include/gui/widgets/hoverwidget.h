@@ -40,6 +40,7 @@ public:
 	void setContent(QWidget *widget);
 	void setAnchor(QWidget *anchor);
 	void setParent(QWidget *parent);
+	void setDraggable(bool draggable);
 private:
 	QHBoxLayout *m_lay;
 	QWidget* m_parent;
@@ -49,11 +50,17 @@ private:
 	QPoint m_anchorOffset;
 	HoverPosition m_anchorPos;
 	HoverPosition m_contentPos;
+	bool m_draggable;
+	bool is_dragging;
+	QPoint mouse_pos;
 
 
 	// QWidget interface
 protected:
 	void showEvent(QShowEvent *event) override;
+	void mousePressEvent(QMouseEvent *event) override;
+	void mouseReleaseEvent(QMouseEvent *event) override;
+	void mouseMoveEvent(QMouseEvent *event) override;
 };
 }
 #endif // HOVERWIDGET_H
