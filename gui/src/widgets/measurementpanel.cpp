@@ -2,6 +2,7 @@
 #include <QScrollArea>
 #include <QWidget>
 #include <QGridLayout>
+#include <measurementlabel.h>
 
 using namespace scopy;
 
@@ -26,7 +27,7 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent) : QWidget(parent)
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
 
 	QWidget *panel = new QWidget(this);
-	panelLayout = new QHBoxLayout(this);
+	panelLayout = new QHBoxLayout(panel);
 	panelLayout->setMargin(0);
 	panelLayout->setSpacing(12);
 	panelLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -65,21 +66,43 @@ void MeasurementsPanel::addWidget(QWidget *meas) {
 	m_stacks.last()->addWidget(meas);
 }
 
-void MeasurementsPanel::addMeasurement(QWidget *meas) {
+void MeasurementsPanel::addMeasurement(MeasurementLabel *meas) {
 	addWidget(meas);
 	m_labels.append(meas);
 }
 
-void MeasurementsPanel::removeMeasurement(QWidget *meas) {
+void MeasurementsPanel::removeMeasurement(MeasurementLabel *meas) {
 	m_labels.removeAll(meas);
-	update();
+//	updateOrder();
 }
 
-void MeasurementsPanel::sort() {
-	update();
+void MeasurementsPanel::sort(int sortType) {
+
+	if(sortType == 0) {
+		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel* first, MeasurementLabel* second){
+			if(first->idx() == second->idx()) {
+				return first->color().name() > second->color().name();
+			}
+			return first->idx() < second->idx();
+		});
+	} else {
+		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel* first, MeasurementLabel* second){
+			if(first->color().name() == second->color().name()) {
+				return first->idx() < second->idx();
+			}
+			return first->color().name() > second->color().name();
+		});
+	}
+	updateOrder();
 }
 
-void MeasurementsPanel::update() {
+/*void MeasurementsPanel::inhibitUpdates(bool b) {
+	m_inhibitUpdates = b;
+	if(!b)
+		updateOrder();
+}*/
+
+void MeasurementsPanel::updateOrder() {
 	for(VerticalWidgetStack* stack : m_stacks) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
@@ -116,7 +139,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 	QScrollArea *scrollArea = new QScrollArea(this);
 	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	QWidget *panel = new QWidget(this);
-	panelLayout = new QHBoxLayout(this);
+	panelLayout = new QHBoxLayout(panel);
 	panelLayout->setMargin(0);
 	panelLayout->setSpacing(6);
 	panel->setLayout(panelLayout);
@@ -132,23 +155,46 @@ StatsPanel::~StatsPanel()
 
 }
 
-void StatsPanel::addStat(QWidget *stat)
+void StatsPanel::addStat(StatsLabel *stat)
 {
 	m_labels.append(stat);
 	panelLayout->addWidget(stat);
 }
 
-void StatsPanel::removeStat(QWidget *stat)
+void StatsPanel::removeStat(StatsLabel *stat)
 {
 	m_labels.removeAll(stat);
 	panelLayout->removeWidget(stat);
 }
 
-void StatsPanel::clear()
+void StatsPanel::updateOrder()
 {
+	for(StatsLabel *label : m_labels) {
+		panelLayout->removeWidget(label);
+	}
+
+	for(StatsLabel *label : m_labels) {
+		panelLayout->addWidget(label);
+	}
 }
 
-void StatsPanel::sort()
-{
 
+void StatsPanel::sort(int sortType)
+{
+	if(sortType == 0) {
+		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel* first, StatsLabel* second){
+			if(first->idx() == second->idx()) {
+				return first->color().name() > second->color().name();
+			}
+			return first->idx() < second->idx();
+		});
+	} else {
+		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel* first, StatsLabel* second){
+			if(first->color().name() == second->color().name()) {
+				return first->idx() < second->idx();
+			}
+			return first->color().name() > second->color().name();
+		});
+	}
+	updateOrder();
 }
