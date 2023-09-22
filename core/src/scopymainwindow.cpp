@@ -145,7 +145,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
 }
 
 void ScopyMainWindow::save() {
@@ -202,7 +202,7 @@ void ScopyMainWindow::initAboutPage(PluginManager *pm)
 			about->addHorizontalTab(about->buildPage(content),p->name());
 		}
 	}
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << " Init about page took: " << timer.elapsed() << "ms";
 }
 
 
@@ -266,7 +266,7 @@ void ScopyMainWindow::initPreferences()
 	QString themeName = "scopy-" + theme;
 	QIcon::setThemeName(themeName);
 	QIcon::setThemeSearchPaths({":/gui/icons/"+themeName});
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << "Init preferences took: " << timer.elapsed() << "ms";
 }
 
 void ScopyMainWindow::loadOpenGL() {
@@ -304,7 +304,7 @@ void ScopyMainWindow::loadPluginsFromRepository(PluginRepository *pr){
 		pr->init(pluginAdditionalPath);
 	}
 #endif
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << "Loading the plugins from the repository took: " << timer.elapsed() << "ms";
 }
 
 
@@ -395,7 +395,7 @@ void ScopyMainWindow::loadDecoders()
 	#else
 		qInfo(CAT_SCOPY) << "Python or libsigrokdecode are disabled, can't load decoders";
 	#endif
-		qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+		qInfo(CAT_BENCHMARK) << "Loading the decoders took: " << timer.elapsed() << "ms";
 }
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)
