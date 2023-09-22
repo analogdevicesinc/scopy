@@ -47,6 +47,11 @@ void LicenseOverlay::showOverlay()
 	this->move(parent->rect().center() - this->rect().center());
 }
 
+QPushButton *LicenseOverlay::getContinueBtn()
+{
+	return ui->btnContinue;
+}
+
 QString LicenseOverlay::getLicense()
 {
 	QFile file(":/license.html");
