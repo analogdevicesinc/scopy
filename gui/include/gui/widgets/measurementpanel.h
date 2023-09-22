@@ -12,6 +12,8 @@ class MeasurementsPanel;
 };
 
 namespace scopy {
+class MeasurementLabel;
+class StatsLabel;
 
 class VerticalWidgetStack : public QWidget {
 	Q_OBJECT
@@ -43,7 +45,6 @@ public:
 		for(QWidget *w : m_widgets) {
 			lay->removeWidget(w);
 			w->setParent(parent);
-
 		}
 		m_widgets.clear();
 	}
@@ -67,18 +68,19 @@ public:
 	QWidget *cursorArea();
 
 public Q_SLOTS:
-	void addMeasurement(QWidget *meas);
-	void removeMeasurement(QWidget *meas);
-	void update();
-	void sort();
+	void addMeasurement(MeasurementLabel *meas);
+	void removeMeasurement(MeasurementLabel *meas);
+	void updateOrder();
+	void sort(int sortType); // hackish
 
 private:
 	QHBoxLayout *panelLayout;
-	QList<QWidget*> m_labels;
+	QList<MeasurementLabel*> m_labels;
 	QList<VerticalWidgetStack*> m_stacks;
 	QWidget *m_cursor;
 	QSpacerItem *spacer;
 	void addWidget(QWidget *meas);
+
 };
 
 class SCOPY_GUI_EXPORT StatsPanel : public QWidget
@@ -89,13 +91,13 @@ public:
 	StatsPanel(QWidget *parent = nullptr);
 	~StatsPanel();
 public Q_SLOTS:
-	void addStat(QWidget *stat);
-	void removeStat(QWidget *stat);
-	void clear();
-	void sort();
+	void addStat(StatsLabel *stat);
+	void removeStat(StatsLabel *stat);
+	void updateOrder();
+	void sort(int sortType);  // hackish
 private:
 	QHBoxLayout *panelLayout;
-	QList<QWidget*> m_labels;
+	QList<StatsLabel*> m_labels;
 
 
 };

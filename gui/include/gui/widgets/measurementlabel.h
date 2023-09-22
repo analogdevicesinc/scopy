@@ -49,6 +49,9 @@ public:
 	void setMeasurementValueFormatter(PrefixFormatter* f);
 
 	QString name() const;
+	QColor color() const;
+	int idx() const;
+	void setIdx(int newIdx);
 
 private:
 	QColor m_color;
@@ -58,6 +61,7 @@ private:
 	QLabel *m_nameLabel;
 	QLabel *m_valueLabel;
 	PrefixFormatter * m_formatter;
+	int m_idx;
 };
 
 
@@ -78,6 +82,9 @@ public:
 	void setMeasurementValueFormatter(PrefixFormatter* f);
 
 	QString name() const;
+	QColor color() const;
+	int idx() const;
+	void setIdx(int newIdx);
 
 private:
 	QColor m_color;
@@ -89,6 +96,8 @@ private:
 	QLabel *m_minLabel;
 	QLabel *m_maxLabel;
 	PrefixFormatter * m_formatter;
+
+	int m_idx;
 };
 
 } // namespace scopy

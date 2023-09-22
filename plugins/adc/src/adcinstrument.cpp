@@ -4,6 +4,8 @@
 #include <gui/widgets/menucontrolbutton.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/measurementpanel.h>
+#include <gui/widgets/hoverwidget.h>
+#include "gui/widgets/measurementsettings.h"
 
 using namespace scopy;
 using namespace scopy::grutil;
@@ -20,11 +22,11 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->leftContainer()->setVisible(true);
 	tool->rightContainer()->setVisible(true);
 	tool->topCentral()->setVisible(true);
-	tool->bottomCentral()->setVisible(true);
+	tool->bottomCentral()->setVisible(false);
 	lay->addWidget(tool);
 	tool->setLeftContainerWidth(210);
 	tool->setRightContainerWidth(300);
-	tool->setTopContainerHeight(90);
+	tool->setTopContainerHeight(100);
 	tool->setBottomContainerHeight(90);
 
 	openLastMenuBtn = new OpenLastMenuBtn(dynamic_cast<MenuHAnim*>(tool->rightContainer()),true,this);
@@ -53,6 +55,21 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 	stats_panel = new StatsPanel(this);
 	tool->bottomStack()->add(statsMenuId, stats_panel);
+
+	MeasurementSettings* measureSettings = new MeasurementSettings(this);
+	HoverWidget *measurePanelManagerHover = new HoverWidget(nullptr, measure, tool);
+	measurePanelManagerHover->setContent(measureSettings);
+	measurePanelManagerHover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	measurePanelManagerHover->setContentPos(HoverPosition::HP_TOPLEFT);
+	connect(measure->button(), &QPushButton::toggled, this, [=](bool b) {
+		measurePanelManagerHover->setVisible(b);
+		measurePanelManagerHover->raise();
+	});
+	connect(measureSettings, &MeasurementSettings::enableMeasurementPanel, tool->topCentral(), &QWidget::setVisible);
+	connect(measureSettings, &MeasurementSettings::enableStatsPanel, tool->bottomCentral(), &QWidget::setVisible);
+
+	connect(measureSettings, &MeasurementSettings::sortMeasurements, measure_panel, &MeasurementsPanel::sort);
+	connect(measureSettings, &MeasurementSettings::sortStats, stats_panel, &StatsPanel::sort);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLastMenuBtn,TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsBtn,TTA_LEFT);
@@ -128,6 +145,8 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 
 			connect(ch,&GRTimeChannelAddon::enableMeasurement, measure_panel, &MeasurementsPanel::addMeasurement);
 			connect(ch,&GRTimeChannelAddon::disableMeasurement, measure_panel, &MeasurementsPanel::removeMeasurement);
+			connect(measureSettings, &MeasurementSettings::toggleAllMeasurements, ch, &GRTimeChannelAddon::toggleAllMeasurement);
+			connect(measureSettings, &MeasurementSettings::toggleAllStats, ch, &GRTimeChannelAddon::toggleAllStats);
 			connect(ch,&GRTimeChannelAddon::enableStat, stats_panel, &StatsPanel::addStat);
 			connect(ch,&GRTimeChannelAddon::disableStat, stats_panel, &StatsPanel::removeStat);
 
@@ -167,13 +186,12 @@ void AdcInstrument::setupCursorButtonHelper(MenuControlButton *cursor) {
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
 }
 
-void AdcInstrument::setupMeasureButtonHelper(MenuControlButton *measure) {
-	measure->setName("Measure");
-	measure->setOpenMenuChecksThis(true);
-	measure->setDoubleClickToOpenMenu(true);
-	measure->checkBox()->setVisible(false);
+void AdcInstrument::setupMeasureButtonHelper(MenuControlButton *btn) {
+	btn->setName("Measure");
+	btn->setOpenMenuChecksThis(true);
+	btn->setDoubleClickToOpenMenu(true);
+	btn->checkBox()->setVisible(false);
 }
-
 
 void AdcInstrument::setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, GRDeviceAddon *dev)
 {
