@@ -1,6 +1,7 @@
 #ifndef LICENSEOVERLAY_H
 #define LICENSEOVERLAY_H
 
+#include "qpushbutton.h"
 #include "scopy-core_export.h"
 #include "tintedoverlay.h"
 
@@ -16,6 +17,7 @@ public:
 	LicenseOverlay(QWidget* parent = nullptr);
 	QString static getLicense();
 	void showOverlay();
+	QPushButton *getContinueBtn();
 private:
 	QWidget *parent;
 	gui::TintedOverlay *overlay;

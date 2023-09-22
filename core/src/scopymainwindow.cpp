@@ -5,7 +5,6 @@
 #include <QStandardPaths>
 #include <QLoggingCategory>
 #include <QTranslator>
-#include <license_overlay.h>
 
 #include "logging_categories.h"
 #include "qmessagebox.h"
@@ -28,6 +27,7 @@
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
 #include <stylehelper.h>
+#include <scopymainwindow_api.h>
 
 using namespace scopy;
 
@@ -35,7 +35,7 @@ Q_LOGGING_CATEGORY(CAT_SCOPY,"Scopy")
 
 ScopyMainWindow::ScopyMainWindow(QWidget *parent)
     : QMainWindow(parent)
-      , ui(new Ui::ScopyMainWindow)
+    , ui(new Ui::ScopyMainWindow)
 {
 	QElapsedTimer timer;
 	timer.start();
@@ -47,7 +47,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initPythonWIN32();
 	initPreferences();
 
-	ScopyJS::GetInstance();
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
 
@@ -130,12 +129,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 #ifdef SCOPY_DEV_MODE
 	// this is an example of how autoconnect is done
-	
+
 	// auto id = dm->createDevice("m2k","ip:127.0.0.1"), false;
 	// auto id = dm->createDevice("iio","ip:10.48.65.163", false);
 	// auto id = dm->createDevice("iio","ip:192.168.2.1", false);
 	// auto id = dm->createDevice("test","", false);
-	
+
 	// auto d = dm->getDevice(id);
 	// d->connectDev();
 	// auto tool_id = dynamic_cast<DeviceImpl*>(d)->plugins()[0]->toolList()[0]->uuid();
@@ -145,6 +144,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	connect(tb, SIGNAL(requestLoad()), this, SLOT(load()));
 
 	connect(hp, &ScopyHomePage::newDeviceAvailable, dm, &DeviceManager::addDevice);
+
+	initApi();
 	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
 }
 
@@ -259,7 +260,7 @@ void ScopyMainWindow::initPreferences()
 		loadDecoders();
 	}
 	if (p->get("general_first_run").toBool()) {
-		LicenseOverlay *license = new LicenseOverlay(this);
+		license = new LicenseOverlay(this);
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();
@@ -396,6 +397,14 @@ void ScopyMainWindow::loadDecoders()
 		qInfo(CAT_SCOPY) << "Python or libsigrokdecode are disabled, can't load decoders";
 	#endif
 		qInfo(CAT_BENCHMARK) << "Loading the decoders took: " << timer.elapsed() << "ms";
+}
+
+void ScopyMainWindow::initApi()
+{
+	api = new ScopyMainWindow_API(this);
+	ScopyJS *js = ScopyJS::GetInstance();
+	api->setObjectName("scopy");
+	js->registerApi(api);
 }
 
 void ScopyMainWindow::addDeviceToUi(QString id, Device *d)

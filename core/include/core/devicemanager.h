@@ -13,6 +13,7 @@ namespace scopy {
 class SCOPY_CORE_EXPORT DeviceManager : public QObject
 {
 	Q_OBJECT
+	friend class ScopyMainWindow_API;
 public:
 	explicit DeviceManager(PluginManager *pm, QObject *parent = nullptr);
 	~DeviceManager();
