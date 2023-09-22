@@ -16,4 +16,4 @@ jobs:
     steps:
         - uses: actions/checkout@v3
         - name: Build Scopy
-          run: /bin/bash -c "source $GITHUB_WORKSPACE/ci/ubuntu/install_ubuntu_20_deps.sh && build_scopy"
+          run: /bin/bash -c "export CI_SCRIPT=ON && source $GITHUB_WORKSPACE/ci/ubuntu/ubuntu20_build_process.sh && build_scopy"

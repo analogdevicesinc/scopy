@@ -25,10 +25,10 @@ USER $USER
 WORKDIR /home/${USER}
 RUN git clone https://github.com/analogdevicesinc/scopy --branch dev
 
-RUN source scopy/ci/ubuntu/install_ubuntu_22_deps.sh && install_apt
+RUN source scopy/ci/ubuntu/ubuntu22_build_process.sh && install_apt
 
 RUN pip3 install aqtinstall && python3 -m aqt install-qt --outputdir $HOME linux desktop 5.15.2
 
-RUN source scopy/ci/ubuntu/install_ubuntu_22_deps.sh && clone
-RUN source scopy/ci/ubuntu/install_ubuntu_22_deps.sh && build_deps
+RUN source scopy/ci/ubuntu/ubuntu22_build_process.sh && clone
+RUN source scopy/ci/ubuntu/ubuntu22_build_process.sh && build_deps
 RUN sudo rm -rf staging
