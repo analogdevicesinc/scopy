@@ -187,11 +187,15 @@ void StyleHelper::BlueButton(QPushButton *btn, QString objectName) {
 							border-radius: 2px; /* design token - buttonBorder*/
 							border-style: outset;
 
-							background-color:#4A64FF; /* design token - uiElement*/
+							background-color: &&ScopyBlue&&; /* design token - uiElement*/
 
-						color: white; /* design token - font */
+							color: white; /* design token - font */
 							font-weight: 700;
 							font-size: 14px;
+						}
+
+						QPushButton:disabled {
+							background-color:#4A64FF; /* design token - uiElement*/
 						}
 
 						QPushButton:checked {
@@ -202,6 +206,42 @@ void StyleHelper::BlueButton(QPushButton *btn, QString objectName) {
 						}
 
 						)css");
+
+					style.replace("&&ScopyBlue&&",StyleHelper::getColor("ScopyBlue"));
+	btn->setStyleSheet(style);
+	btn->setIconSize(QSize(48,48));
+}
+
+void StyleHelper::SmallBlueButton(QPushButton *btn, QString objectName) {
+	if(!objectName.isEmpty()) btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	btn->setFixedHeight(24);
+	QString style = QString(R"css(
+						QPushButton {
+							border-radius: 2px; /* design token - buttonBorder*/
+							border-style: outset;
+
+							background-color: &&ScopyBlue&&; /* design token - uiElement*/
+
+						color: white; /* design token - font */
+							font-weight: 700;
+							font-size: 14px;
+						}
+
+						QPushButton:disabled {
+							background-color:#4A64FF; /* design token - uiElement*/
+						}
+
+						QPushButton:checked {
+							background-color:#272730; /* design token - scopy blue*/
+						}
+						QPushButton:pressed {
+							background-color:#272730;
+						}
+
+						)css");
+
+					style.replace("&&ScopyBlue&&",StyleHelper::getColor("ScopyBlue"));
 	btn->setStyleSheet(style);
 	btn->setIconSize(QSize(48,48));
 }

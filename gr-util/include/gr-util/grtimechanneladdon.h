@@ -4,10 +4,10 @@
 #include "tooladdon.h"
 #include "grsignalpath.h"
 #include "grtimeplotaddon.h"
-#include "griiodevicesource.h"
 #include "griiofloatchannelsrc.h"
 #include "measurementcontroller.h"
 #include "measure.h"
+#include "measurementselector.h"
 
 #include <QLabel>
 #include "scopy-gr-util_export.h"
@@ -66,10 +66,12 @@ public Q_SLOTS:
 	void setYMode(YMode mode);
 
 Q_SIGNALS:
-	void enableMeasurement(QWidget*);
-	void disableMeasurement(QWidget*);
-	void enableStat(QWidget*);
-	void disableStat(QWidget*);
+	void enableMeasurement(MeasurementLabel*);
+	void disableMeasurement(MeasurementLabel*);
+	void toggleAllMeasurement(bool b);
+	void toggleAllStats(bool b);
+	void enableStat(StatsLabel*);
+	void disableStat(StatsLabel*);
 
 
 private:

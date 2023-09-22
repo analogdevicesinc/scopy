@@ -15,7 +15,6 @@
 #include <gui/widgets/menulineedit.h>
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
-#include "measurementselector.h"
 
 Q_LOGGING_CATEGORY(CAT_GR_TIME_CHANNEL, "GRTimeChannel");
 using namespace scopy::grutil;
@@ -232,6 +231,9 @@ QWidget* GRTimeChannelAddon::createMeasurementMenuSection(QString category, QWid
 		}
 	}
 	measureSection->header()->setChecked(false);
+
+	connect(this, &GRTimeChannelAddon::toggleAllMeasurement, measureSelector, &MeasurementSelector::toggleAllMeasurement);
+	connect(this, &GRTimeChannelAddon::toggleAllStats, measureSelector, &MeasurementSelector::toggleAllStats);
 
 	return measureContainer;
 }
