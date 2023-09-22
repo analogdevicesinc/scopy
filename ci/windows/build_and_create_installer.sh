@@ -1,15 +1,23 @@
 #!/bin/bash
+if [ "$CI_SCRIPT" == "ON" ];
+	then
+		set -ex
+		export WORKDIR=$HOME
+		SRC_FOLDER=$WORKDIR/scopy
+	else
+		set -x
+		SRC_FOLDER=$(git rev-parse --show-toplevel)
+		export WORKDIR=$SRC_FOLDER
+		git clone https://github.com/analogdevicesinc/scopy-mingw-build-deps.git -b ci-for-scopy2 $WORKDIR/scopy-mingw-build-deps
+fi
 
-set -ex
-
-TOOLS_FOLDER=$HOME/scopy-mingw-build-deps
+BUILD_TARGET=x86_64
+TOOLS_FOLDER=$WORKDIR/scopy-mingw-build-deps
 pushd $TOOLS_FOLDER
 source ./mingw_toolchain.sh $BUILD_TARGET OFF  # USING_STAGING = OFF
 popd
 
-WORKDIR=$HOME
-SRC_FOLDER=$WORKDIR/scopy
-DEST_FOLDER=$WORKDIR/scopy_$ARCH
+export DEST_FOLDER=$WORKDIR/scopy_$ARCH
 BUILD_FOLDER=$WORKDIR/build_$ARCH
 DEBUG_FOLDER=$WORKDIR/debug_$ARCH
 ARTIFACT_FOLDER=$WORKDIR/artifact_$ARCH
@@ -44,7 +52,10 @@ build_scopy(){
 
 build_iio-emu(){
 	echo "### Building IIO-EMU"
-	git clone https://github.com/analogdevicesinc/iio-emu $WORKDIR/iio-emu
+	if [ ! -d "$WORKDIR/iio-emu" ]; then
+		git clone https://github.com/analogdevicesinc/iio-emu $WORKDIR/iio-emu
+	fi
+
 	mkdir -p $EMU_BUILD_FOLDER
 	cd $EMU_BUILD_FOLDER
 	$CMAKE ../
@@ -134,13 +145,12 @@ create_installer() {
 	cd $WORKDIR
 	cp -R $WORKDIR/scopy_${ARCH} $ARTIFACT_FOLDER/scopy-${ARCH}
 #	cp -R $WORKDIR/debug_${ARCH} $ARTIFACT_FOLDER/debug-${ARCH}
-	PATH=/c/innosetup:$PATH
+	PATH="/c/innosetup:/c/Program Files (x86)/Inno Setup 6:$PATH"
 	iscc //p $BUILD_FOLDER/windows/scopy-$ARCH_BIT.iss
 	mv $WORKDIR/scopy-$ARCH_BIT-setup.exe $ARTIFACT_FOLDER
 
 	echo "Done. Artifacts generated in $ARTIFACT_FOLDER"
 	ls -la $ARTIFACT_FOLDER
-	echo $GITHUB_WORKSPACE
 	cp -R $ARTIFACT_FOLDER $SRC_FOLDER
 	ls -la $SRC_FOLDER
 }
