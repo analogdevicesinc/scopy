@@ -199,14 +199,6 @@ void StyleHelper::TimePlotSamplingInfo(QLabel *w, QString objectName) {
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::HoverWidget(QWidget *w, QString objectName)
-{
-	QString style = QString(R"css(
-							background-color: rgba(255,255,255,0);
-							)css");
-	w->setStyleSheet(style);
-}
-
 void StyleHelper::BlueButton(QPushButton *btn, QString objectName) {
 	if(!objectName.isEmpty()) btn->setObjectName(objectName);
 	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -495,6 +487,9 @@ void StyleHelper::MenuSmallLabel(QLabel *m_lbl, QString objectName)
 					font-size: 12px;
 					font-style: normal;
 					}
+				QLabel:disabled {
+					color: grey;
+				}
 				)css");
 	m_lbl->setText(m_lbl->text().toUpper());
 	m_lbl->setStyleSheet(style);
@@ -978,6 +973,33 @@ void StyleHelper::FrameBackgroundShadow(QFrame *w, QString objectName) {
 					border-radius: 4px;
 				}
 				)css");
+}
 
+void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName) {
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	w->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	QString style;
+
+	if (draggable) {
+		style = QString(R"css(
+				background-color: rgba(255,255,255,0);
+				.QWidget:hover {
+					background-color: &&UIElementBackground&&;
+					border-radius: 4px;
+				})css");
+	} else {
+		style = QString(R"css(
+				background-color: rgba(255,255,255,0);
+				.QWidget:hover {
+					background-color: transparent;
+				})css");
+	}
+	style.replace("&&UIElementBackground&&",StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::TransparentWidget(QWidget *w, QString objectName) {
+	if(!objectName.isEmpty()) w->setObjectName(objectName);
+	QString style = QString(R"css(background-color: transparent;)css");
 	w->setStyleSheet(style);
 }
