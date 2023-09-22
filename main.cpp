@@ -1,8 +1,13 @@
 #include "core/scopymainwindow.h"
 #include "core/logging_categories.h"
 #include <QApplication>
+#include <QCommandLineParser>
 #include <core/application_restarter.h>
+#include <core/cmdlinehandler.h>
+#include <core/scopymainwindow_api.h>
 #include <gui/utils.h>
+
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_RUNTIME_ENVIRONMENT_INFO, "RuntimeEnvironmentInfo")
 
@@ -76,16 +81,37 @@ int main(int argc, char *argv[])
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 	QApplication a(argc, argv);
-	printRuntimeEnvironmentInfo();
+	QCommandLineParser parser;
+	parser.addHelpOption();
+	parser.addVersionOption();
+	parser.addOptions({
+				  { {"s", "script"}, "Run given script.", "script" },
+				  { {"a", "accept-license"}, "Accept the license in advance." },
+				  { {"l", "logfile"}, "Saves all the logging messages into a file.", "filename"},
+				  { {"c", "connect"}, "Establish the connection to a given device by URI.","URI"},
+				  { {"t", "tool"}, "Select the desired tool for the device.", "tool"} ,
+			  });
 
-	scopy::ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
+	parser.process(a);
+	CmdLineHandler::withLogFileOption(parser);
+
+	printRuntimeEnvironmentInfo();
+	ApplicationRestarter restarter(QString::fromLocal8Bit(argv[0]));
 	a.setWindowIcon(QIcon(":/gui/icon.ico"));
 	a.setStyle("Fusion");
 	a.setStyleSheet(Util::loadStylesheetFromFile(":/gui/stylesheets/default.qss"));
-	scopy::ScopyMainWindow w;
+	ScopyMainWindow w;
 	w.show();
+
+	ScopyMainWindow_API scopyApi(&w);
+	int retHandler = CmdLineHandler::handle(parser, scopyApi);
+	if (retHandler == EXIT_FAILURE) {
+		return retHandler;
+	}
+
 	int ret = a.exec();
 	restarter.restart(ret);
 	printf("Scopy finished gracefully\n");
+	CmdLineHandler::closeLogFile();
 	return ret;
 }
