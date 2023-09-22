@@ -43,7 +43,8 @@ jobs:
                 -e GITHUB_RUN_ID=%GITHUB_RUN_ID% ^
                 -e GITHUB_RUN_NUMBER=%GITHUB_RUN_NUMBER% ^
                 -e RUNNER_ARCH=%RUNNER_ARCH% ^
-                cristianbindea/scopy2-mingw64:latest C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/inside_mingw_docker.sh'
+                -e CI_SCRIPT=ON ^
+                cristianbindea/scopy2-mingw64:latest C:\msys64\usr\bin\bash.exe -c '/home/docker/scopy/ci/windows/build_and_create_installer.sh'
 
     - name: Set short git commit SHA
       shell: bash
