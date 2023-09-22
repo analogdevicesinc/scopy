@@ -40,7 +40,8 @@ public:
 	static void initColorMap();
 	static QString getColor(QString id);
 	static void SquareToggleButtonWithIcon(QPushButton* btn, QString objectName, bool checkable = false);
-	static void BlueButton(QPushButton *btn, QString objectName);
+	static void BlueButton(QPushButton *btn, QString objectName="");
+	static void SmallBlueButton(QPushButton *btn, QString objectName="");
 	static void BlueSquareCheckbox(QCheckBox *chk, QString objectName  = "");
 	static void CollapseCheckbox(QCheckBox *chk, QString objectName = "");
 	static void ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString objectName = "");

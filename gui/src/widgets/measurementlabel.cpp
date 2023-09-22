@@ -88,6 +88,21 @@ QString MeasurementLabel::name() const
 	return m_name;
 }
 
+QColor MeasurementLabel::color() const
+{
+	return m_color;
+}
+
+int MeasurementLabel::idx() const
+{
+	return m_idx;
+}
+
+void MeasurementLabel::setIdx(int newIdx)
+{
+	m_idx = newIdx;
+}
+
 StatsLabel::StatsLabel(QWidget *parent) : QWidget(parent) {
 	QVBoxLayout *lay = new QVBoxLayout(this);
 
@@ -104,14 +119,13 @@ StatsLabel::StatsLabel(QWidget *parent) : QWidget(parent) {
 	lay->setAlignment(Qt::AlignLeft);
 	m_formatter = nullptr;
 	m_precision = 2;
+	m_idx = 0;
 
 	lay->addWidget(m_nameLabel);
 	lay->addWidget(m_avgLabel);
 	lay->addWidget(m_minLabel);
 	lay->addWidget(m_maxLabel);
 	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Maximum,QSizePolicy::Expanding));
-
-
 }
 
 StatsLabel::~StatsLabel() {
@@ -157,3 +171,17 @@ QString StatsLabel::name() const
 	return m_name;
 }
 
+QColor StatsLabel::color() const
+{
+	return m_color;
+}
+
+int StatsLabel::idx() const
+{
+	return m_idx;
+}
+
+void StatsLabel::setIdx(int newIdx)
+{
+	m_idx = newIdx;
+}

@@ -7,6 +7,7 @@
 #include "measure.h"
 #include "scopy-gr-util_export.h"
 
+
 namespace scopy::grutil {
 class GRTimeChannelAddon;
 
@@ -37,10 +38,10 @@ public:
 	QList<MeasurementInfo> availableMeasurements() const;
 
 Q_SIGNALS:
-	void measurementEnabled(QWidget*);
-	void measurementDisabled(QWidget*);
-	void statsEnabled(QWidget *);
-	void statsDisabled(QWidget *);
+	void measurementEnabled(MeasurementLabel*);
+	void measurementDisabled(MeasurementLabel*);
+	void statsEnabled(StatsLabel *);
+	void statsDisabled(StatsLabel *);
 
 protected:
 	QList<MeasurementInfo> m_availableMeasurements;
