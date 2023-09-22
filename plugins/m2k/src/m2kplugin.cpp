@@ -339,8 +339,6 @@ void M2kPlugin::cleanup()
 
 bool M2kPlugin::onConnect()
 {
-	QElapsedTimer timer;
-	timer.start();
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
 
@@ -422,16 +420,12 @@ bool M2kPlugin::onConnect()
 		cleanup();
 		return false;
 	}
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << " ms";
 	return true;
 }
 
 bool M2kPlugin::onDisconnect()
 {	
-	QElapsedTimer timer;
-	timer.start();
 	cleanup();
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << " ms";
 	return true;
 }
 

@@ -39,7 +39,7 @@ void DeviceImpl::init()
 			qWarning(CAT_DEVICEIMPL, "Plugin not a QObject");
 		}
 	}
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << this->displayName() << " init took: " << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::preload() {
@@ -69,7 +69,7 @@ void DeviceImpl::loadPlugins() {
 		connect(dynamic_cast<QObject*>(p),SIGNAL(requestToolByUuid(QString)),this,SIGNAL(requestTool(QString)));
 		p->postload();
 	}
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << this->displayName() << " plugins load took: " << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::unloadPlugins() {
@@ -87,7 +87,7 @@ void DeviceImpl::unloadPlugins() {
 		delete (*pI);
 	}
 	m_plugins.clear();
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << this->displayName() << " plugins unload took: " << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::removeDisabledPlugins() {
@@ -243,12 +243,15 @@ void DeviceImpl::load(QSettings &s) {
 }
 
 void DeviceImpl::connectDev() {
+	QElapsedTimer pluginTimer;
 	QElapsedTimer timer;
 	timer.start();
 	Preferences *pref = Preferences::GetInstance();
 	bool disconnectDevice = false;
 	for(auto &&p : m_plugins) {
+		pluginTimer.start();
 		bool pluginConnectionSucceeded = p->onConnect();
+		qInfo(CAT_BENCHMARK) << p->name() << " connection took: " << pluginTimer.elapsed() << "ms";
 		if (pluginConnectionSucceeded) {
 			if(pref->get("general_save_session").toBool()) {
 				QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
@@ -270,10 +273,11 @@ void DeviceImpl::connectDev() {
 		discbtn->setFocus();
 		Q_EMIT connected();
 	}
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << this->displayName() << " device connection took: " << timer.elapsed() << "ms";
 }
 
 void DeviceImpl::disconnectDev() {
+	QElapsedTimer pluginTimer;
 	QElapsedTimer timer;
 	timer.start();
 	connbtn->show();
@@ -284,12 +288,14 @@ void DeviceImpl::disconnectDev() {
 			QSettings s = QSettings(scopy::config::settingsFolderPath() + "/" +p->name() +".ini", QSettings::IniFormat);
 			p->saveSettings(s);
 		}
+		pluginTimer.start();
 		p->onDisconnect();
+		qInfo(CAT_BENCHMARK) << p->name() << " disconnection took: " << pluginTimer.elapsed() << "ms";
 	}
 	m_connectedPlugins.clear();
 	connbtn->setFocus();
 	Q_EMIT disconnected();
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
+	qInfo(CAT_BENCHMARK) << this->displayName() << " device disconnection took: " << timer.elapsed() << "ms";
 }
 
 DeviceImpl::~DeviceImpl() {
