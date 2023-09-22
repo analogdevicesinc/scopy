@@ -1,4 +1,5 @@
 #include "widgets/hoverwidget.h"
+#include "stylehelper.h"
 #include <QDebug>
 #include <QLoggingCategory>
 #include <stylehelper.h>
@@ -7,13 +8,10 @@ Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	: QWidget(parent), m_parent(parent), m_anchor(anchor), m_content(content),
-	m_anchorPos(HP_TOPLEFT), m_contentPos(HP_TOPRIGHT) {
-
+	m_anchorPos(HP_TOPLEFT), m_contentPos(HP_TOPRIGHT), is_dragging(false), m_draggable(false) {
 	m_container = new QWidget(this);
-	m_container->setObjectName("container");
-	StyleHelper::HoverWidget(this);
-	StyleHelper::HoverWidget(m_container);
-	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	StyleHelper::TransparentWidget(this, "hoverWidget");
+	StyleHelper::TransparentWidget(m_container, "hoverWidgetContainer");
 
 	m_lay = new QHBoxLayout(m_container);
 	m_lay->setMargin(0);
@@ -24,8 +22,6 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 
 	if (m_content) {
 		setContent(m_content);
-		m_container->setMinimumSize(content->size());
-		setMinimumSize(content->size());
 	}
 	if (m_anchor) {
 		setAnchor(m_anchor);
@@ -35,6 +31,43 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	}
 
 	hide();
+}
+
+void HoverWidget::setDraggable(bool draggable)
+{
+	m_draggable = draggable;
+	StyleHelper::HoverWidget(m_container, m_draggable);
+}
+
+void HoverWidget::mousePressEvent(QMouseEvent *event)
+{
+	raise();
+	if (event->button() == Qt::LeftButton &&
+			m_container->geometry().contains(event->pos()) &&
+			m_draggable) {
+		is_dragging = true;
+		mouse_pos = event->pos();
+	}
+}
+
+void HoverWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+	if (event->button() == Qt::LeftButton &&
+			is_dragging) {
+		is_dragging = false;
+		mouse_pos = QPoint();
+	}
+}
+
+void HoverWidget::mouseMoveEvent(QMouseEvent *event)
+{
+	QPoint new_pos = event->pos() - mouse_pos;
+	QPoint container_bottomLeft = mapToParent(m_container->geometry().bottomLeft() + new_pos);
+	QPoint container_topRight = mapToParent(m_container->geometry().topRight() + new_pos);
+
+	if (is_dragging && m_parent->geometry().contains(QRect(container_bottomLeft, container_topRight))) {
+		move(mapToParent(new_pos));
+	}
 }
 
 void HoverWidget::setContent(QWidget *content)
@@ -48,12 +81,11 @@ void HoverWidget::setContent(QWidget *content)
 	m_content = content;
 	m_content->setParent(m_container);
 	m_lay->addWidget(m_content);
-	m_container->resize(m_content->sizeHint());
-	this->resize(m_content->sizeHint());
+	m_container->resize(m_content->size());
+	resize(m_content->size());
 
 	m_content->installEventFilter(this);
 	moveToAnchor();
-
 }
 
 void HoverWidget::setAnchor(QWidget *anchor)
@@ -90,11 +122,20 @@ bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 {
 	if(watched == m_content) {
 		if(event->type() == QEvent::Resize) {
+			m_container->resize(m_content->size());
 			resize(m_content->size());
+		}
+
+		if (event->type() == QEvent::HoverMove) {
+			QMouseEvent* e = static_cast<QMouseEvent*>(event);
+			if (m_container->geometry().contains(e->pos()) && m_draggable)
+				m_content->setCursor(Qt::ClosedHandCursor);
+			else
+				m_content->setCursor(Qt::ArrowCursor);
 		}
 	}
 	if(watched == m_anchor || watched == m_parent || watched == m_content) {
-		if(event->type() == QEvent::Move || event->type() == QEvent::Resize) {
+		if((event->type() == QEvent::Move || event->type() == QEvent::Resize) && !m_draggable) {
 			moveToAnchor();
 		}
 	}
@@ -136,7 +177,7 @@ void HoverWidget::setContentPos(HoverPosition pos)
 
 void HoverWidget::moveToAnchor()
 {
-	if (!m_content) return;
+	if (!m_content || !m_anchor || !m_parent) return;
 	QPoint global = m_anchor->mapToGlobal(QPoint(0,0));
 	QPoint mappedPoint =  m_parent->mapFromGlobal(global);
 	QPoint anchorPosition = QPoint(0,0);
@@ -216,6 +257,9 @@ void HoverWidget::moveToAnchor()
 
 void HoverWidget::showEvent(QShowEvent *event)
 {
-	moveToAnchor();
+	if(!m_draggable) {
+		moveToAnchor();
+	}
+	raise();
 	QWidget::showEvent(event);
 }
