@@ -46,8 +46,6 @@ QString DebuggerPlugin::description()
 
 bool DebuggerPlugin::onConnect()
 {
-	QElapsedTimer timer;
-	timer.start();
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
 	if (!ctx) {
@@ -58,15 +56,12 @@ bool DebuggerPlugin::onConnect()
 	dbgTme->setEnabled(true);
 	dbgTme->setRunBtnVisible(true);
 
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 	return true;
 
 }
 
 bool DebuggerPlugin::onDisconnect()
 {
-	QElapsedTimer timer;
-	timer.start();
 	for(ToolMenuEntry *tme : qAsConst(m_toolList)) {
 		tme->setEnabled(false);
 		tme->setRunBtnVisible(false);
@@ -77,7 +72,6 @@ bool DebuggerPlugin::onDisconnect()
 
 	ContextProvider *c = ContextProvider::GetInstance();
 	c->close(m_param);
-	qInfo(CAT_BENCHMARK) << timer.elapsed() << "ms";
 	return true;
 }
 
