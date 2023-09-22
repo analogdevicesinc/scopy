@@ -38,6 +38,26 @@ MeasurementSelectorItem* MeasurementSelector::measurement(QString name) {
 	return m_map.value(name);
 }
 
+void MeasurementSelector::toggleAllMeasurement(bool b)
+{
+	for(int i = 0; i < children().count(); i++) {
+		MeasurementSelectorItem* item = dynamic_cast<MeasurementSelectorItem*>(children()[i]);
+		if(!item)
+			continue;
+		item->measureCheckbox()->setChecked(b);
+	}
+}
+
+void MeasurementSelector::toggleAllStats(bool b)
+{
+	for(int i = 0; i < children().count(); i++) {
+		MeasurementSelectorItem* item = dynamic_cast<MeasurementSelectorItem*>(children()[i]);
+		if(!item)
+			continue;
+		item->statsCheckbox()->setChecked(b);
+	}
+}
+
 MeasurementSelectorItem::MeasurementSelectorItem(QString name, QString iconPath, QWidget *parent) : QWidget(parent)
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
