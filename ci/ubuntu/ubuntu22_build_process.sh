@@ -1,5 +1,15 @@
 #!/bin/bash
-set -xe
+if [ "$CI_SCRIPT" == "ON" ]
+	then
+		set -ex
+		SRC_DIR=$GITHUB_WORKSPACE
+		git config --global --add safe.directory '*'
+		QT=/home/runner/5.15.2/gcc_64 # this is used to force the use of Qt5.15 for qt_add_resources
+	else
+		set -x
+		SRC_DIR=$(git rev-parse --show-toplevel)
+		QT=/opt/Qt/5.15.2/gcc_64
+fi
 
 USE_STAGING=$1
 
@@ -17,10 +27,6 @@ LIBSIGROKDECODE_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
 LIBTINYIIOD_BRANCH=master
 
-SRC_DIR=$GITHUB_WORKSPACE
-STAGING_AREA=$PWD/staging
-STAGING_AREA_DEPS=$STAGING_AREA/dependencies
-QT=/home/runner/5.15.2/gcc_64 # this is used to force the use of Qt5.15 for qt_add_resources
 QMAKE_BIN=$QT/bin/qmake
 CMAKE_BIN=/bin/cmake
 JOBS=-j8
@@ -29,6 +35,8 @@ ARCH=x86_64
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
 		echo -- USING STAGING
+		STAGING_AREA=$PWD/staging
+		STAGING_AREA_DEPS=$STAGING_AREA/dependencies
 		mkdir -p $STAGING_AREA_DEPS
 		export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$STAGING_AREA_DEPS/lib:$QT/lib
 		CMAKE_OPTS=(\
@@ -86,8 +94,13 @@ build_with_cmake() {
 	cd $BUILD_FOLDER
 	$CMAKE $CURRENT_BUILD_CMAKE_OPTS ../
 	make $JOBS
-	sudo make $JOBS install
-	sudo ldconfig
+	if [ $INSTALL = "ON" ]
+		then
+		sudo make $JOBS install
+		sudo ldconfig
+	fi
+	INSTALL=""
+	CURRENT_BUILD_CMAKE_OPTS=""
 }
 
 update(){
@@ -121,6 +134,7 @@ build_libiio() {
 		-DENABLE_IPV6:BOOL=OFF \
 		-DINSTALL_UDEV_RULE:BOOL=OFF
 		"
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -129,6 +143,7 @@ build_glog() {
 	echo "### Building glog - branch $GLOG_BRANCH"
 	pushd $STAGING_AREA/glog
 	CURRENT_BUILD_CMAKE_OPTS="-DWITH_GFLAGS=OFF"
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -136,6 +151,7 @@ build_glog() {
 build_libad9361() {
 	echo "### Building libad9361 - branch $LIBAD9361_BRANCH"
 	pushd $STAGING_AREA/libad9361
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -151,6 +167,7 @@ build_libm2k() {
 		-DINSTALL_UDEV_RULES=OFF \
 		-DENABLE_LOG=ON
 		"
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -159,6 +176,7 @@ build_spdlog() {
 	echo "### Building spdlog - branch $SPDLOG_BRANCH"
 	pushd $STAGING_AREA/spdlog
 	CURRENT_BUILD_CMAKE_OPTS="-DSPDLOG_BUILD_SHARED=ON"
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -167,7 +185,8 @@ build_volk() {
 	echo "### Building volk - branch $VOLK_BRANCH"
 	pushd $STAGING_AREA/volk
 	CURRENT_BUILD_CMAKE_OPTS="-DPYTHON_EXECUTABLE=/usr/bin/python3"
-	build_with_cmake \
+	INSTALL="ON"
+	build_with_cmake
 	popd
 }
 
@@ -185,6 +204,7 @@ build_gnuradio() {
 		-DENABLE_GR_IIO=ON \
 		-DENABLE_POSTINSTALL=OFF
 		"
+	INSTALL="ON"
 	build_with_cmake	
 	popd
 }
@@ -196,6 +216,7 @@ build_grm2k() {
 		-DENABLE_PYTHON=OFF \
 		-DDIGITAL=OFF
 		"
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -203,6 +224,7 @@ build_grm2k() {
 build_grscopy() {
 	echo "### Building gr-scopy - branch $GRSCOPY_BRANCH"
 	pushd $STAGING_AREA/gr-scopy
+	INSTALL="ON"
 	build_with_cmake
 	popd
 }
@@ -215,9 +237,10 @@ build_libsigrokdecode() {
 	then
 		./configure --prefix $STAGING_AREA_DEPS
 	else
-		./configure``
+		./configure
 	fi
-	sudo make $JOBS install
+	make $JOBS
+	sudo make install
 	sudo ldconfig
 	popd
 }
@@ -254,19 +277,12 @@ build_scopy() {
 	echo "### Building scopy"
 	ls -la $SRC_DIR
 	pushd $SRC_DIR
-	rm -rf $SRC_DIR/build-$ARCH
-	mkdir -p $SRC_DIR/build-$ARCH
-	cd $SRC_DIR/build-$ARCH
-	$CMAKE \
-		-DCMAKE_LIBRARY_PATH=$STAGING_AREA_DEPS \
-		-DCMAKE_INSTALL_PREFIX=$STAGING_AREA_DEPS \
-		-DCMAKE_PREFIX_PATH=$STAGING_AREA_DEPS\;$QT \
-		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-		-DCMAKE_VERBOSE_MAKEFILE=ON \
+	CURRENT_BUILD_CMAKE_OPTS="\
 		-DENABLE_PLUGIN_TEST=ON \
-		-DENABLE_TESTING=ON \
-		../
-	make $JOBS
+		-DENABLE_TESTING=ON
+		"
+	INSTALL="OFF"
+	build_with_cmake 
 	popd
 }
 
