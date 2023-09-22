@@ -3,6 +3,8 @@
 #define AppDev "Analog Devices"
 #define Python "@PYTHON_VERSION@"
 #define DriverVersion "0.8"
+#define DestFolder "@ENV_DEST_FOLDER@"
+#define Workdir "@ENV_WORKDIR@"
 
 [Setup]
 AppId={{02A7A7F9-F068-4B1C-85F6-B6D325938E19}
@@ -15,8 +17,8 @@ AppUpdatesURL="http://www.analog.com"
 AppCopyright="Copyright 2018 Analog Devices, Inc."
 CreateAppDir=yes
 OutputBaseFilename=scopy-64-setup
-LicenseFile="C:\msys64\home\docker\scopy\LICENSE"
-OutputDir="C:\msys64\home\docker\"
+LicenseFile="@CMAKE_SOURCE_DIR@\LICENSE"
+OutputDir="{#Workdir}"
 AllowNoIcons=yes
 Compression=lzma2
 SolidCompression=yes
@@ -265,29 +267,29 @@ Name: "emu"; Description: "IIO Emulator"; Types: full; Flags: disablenouninstall
 
 [Files]
 //Executables
-Source: "C:\msys64\home\docker\scopy_x86_64\Scopy.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion
-Source: "C:\msys64\home\docker\scopy_x86_64\Scopy-console.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
-Source: "C:\msys64\home\docker\iio-emu\build\iio-emu.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#DestFolder}\Scopy.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion
+Source: "{#DestFolder}\Scopy-console.exe"; DestDir: "{app}"; Components: main; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#Workdir}\iio-emu\build\iio-emu.exe"; DestDir: "{app}"; Components: emu; Flags: ignoreversion skipifsourcedoesntexist
 //Folders
-Source: "C:\msys64\home\docker\scopy_x86_64\decoders\*"; DestDir: "{app}\decoders"; Components: plugins\m2kplugin; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\@PYTHON_VERSION@\*"; DestDir: "{app}\@PYTHON_VERSION@"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\resources\*"; DestDir: "{app}\resources"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\styles\*"; DestDir: "{app}\styles"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\decoders\*"; DestDir: "{app}\decoders"; Components: plugins\m2kplugin; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\drivers\*"; DestDir: "{app}\drivers"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\iconengines\*"; DestDir: "{app}\iconengines"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\imageformats\*"; DestDir: "{app}\imageformats"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\platforms\*"; DestDir: "{app}\platforms"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\printsupport\*"; DestDir: "{app}\printsupport"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\{#Python}\*"; DestDir: "{app}\{#Python}"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\resources\*"; DestDir: "{app}\resources"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist skipifsourcedoesntexist
+Source: "{#DestFolder}\styles\*"; DestDir: "{app}\styles"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\translations\*"; DestDir: "{app}\translations"; Components: main; Flags: ignoreversion recursesubdirs createallsubdirs onlyifdoesntexist
 //DLLs
-Source: "C:\msys64\home\docker\scopy_x86_64\*.dll"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
+Source: "{#DestFolder}\*.dll"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
+Source: "{#DestFolder}\qt.conf"; DestDir: "{app}"; Components: main; Flags: ignoreversion onlyifdoesntexist
 //Plugins
-Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-regmapplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-debuggerplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-m2kplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\m2kplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
-Source: "C:\msys64\home\docker\scopy_x86_64\plugins\plugins\libscopy-swiot.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\swiotplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\xmls\*"; DestDir: "{app}\plugins\plugins\xmls"; Components: main; Flags: ignoreversion skipifsourcedoesntexist recursesubdirs createallsubdirs onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-regmapplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-debuggerplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: main; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-m2kplugin.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\m2kplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
+Source: "{#DestFolder}\plugins\plugins\libscopy-swiot.dll"; DestDir: "{app}\plugins\plugins"; Components: plugins\swiotplugin; Flags: ignoreversion skipifsourcedoesntexist onlyifdoesntexist
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
