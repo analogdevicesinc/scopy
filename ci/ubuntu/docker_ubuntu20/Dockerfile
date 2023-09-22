@@ -25,7 +25,7 @@ USER $USER
 WORKDIR /home/${USER}
 RUN git clone https://github.com/analogdevicesinc/scopy --branch dev
 
-RUN source scopy/ci/ubuntu/install_ubuntu_20_deps.sh && install_apt
+RUN source scopy/ci/ubuntu/ubuntu20_build_process.sh && install_apt
 
 RUN wget https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run && chmod +x qt-unified-linux-x64-online.run
 ARG QT_USER
@@ -33,6 +33,6 @@ ARG QT_PASSWORD
 RUN ./qt-unified-linux-x64-online.run install --ao --al --aa DownloadError=Retry -c -m $QT_USER --pw $QT_PASSWORD qt.qt5.5152.gcc_64 qt.tools.cmake
 RUN sudo apt remove qtchooser && sudo ln -s /home/$USER/Qt/Tools/QtCreator/bin/qtcreator.sh /usr/local/bin/qtcreator
 
-RUN source scopy/ci/ubuntu/install_ubuntu_20_deps.sh && clone
-RUN source scopy/ci/ubuntu/install_ubuntu_20_deps.sh && build_deps
+RUN source scopy/ci/ubuntu/ubuntu20_build_process.sh && clone
+RUN source scopy/ci/ubuntu/ubuntu20_build_process.sh && build_deps
 RUN sudo rm -rf staging
