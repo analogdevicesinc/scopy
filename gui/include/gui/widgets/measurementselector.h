@@ -39,6 +39,10 @@ public:
 	void addMeasurement(QString name, QString icon);
 	void removeMeasurement(QString name);
 	MeasurementSelectorItem* measurement(QString name);
+
+	void toggleAllMeasurement(bool b);
+	void toggleAllStats(bool b);
+
 private:
 	QMap<QString, MeasurementSelectorItem*> m_map;
 	QVBoxLayout *lay;

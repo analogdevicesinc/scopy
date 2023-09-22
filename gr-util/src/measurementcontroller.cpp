@@ -51,7 +51,8 @@ MeasurementLabel *MeasurementController::findMeasurementLabel(QString name)
 
 QWidget* MeasurementController::enableMeasurement(QString name)
 {
-	for(auto &meas : m_availableMeasurements) {
+	for( int i = 0; i < m_availableMeasurements.count(); i++) {
+		auto meas = m_availableMeasurements[i];
 		if(meas.name == name) {
 
 			if(findMeasurementLabel(name) != nullptr) {
@@ -60,6 +61,7 @@ QWidget* MeasurementController::enableMeasurement(QString name)
 			}
 			m_measure->measurement(name)->setEnabled(true);
 			MeasurementLabel *lbl = new MeasurementLabel();
+			lbl->setIdx(i);
 			lbl->setName(meas.name);
 			lbl->setUnit(meas.unit);
 			lbl->setColor(m_pen.color());
@@ -95,7 +97,8 @@ void MeasurementController::disableMeasurement(QString name)
 
 QWidget *MeasurementController::enableStats(QString name)
 {
-	for(auto &meas : m_availableMeasurements) {
+	for( int i = 0; i < m_availableMeasurements.count(); i++) {
+		auto meas = m_availableMeasurements[i];
 		if(meas.name == name) {
 
 			if(findStatsLabel(name) != nullptr) {
@@ -106,6 +109,7 @@ QWidget *MeasurementController::enableStats(QString name)
 			m_measure->measurement(name)->clearStat();
 			m_measure->measurement(name)->setStatEnabled(true);
 			StatsLabel *lbl = new StatsLabel();
+			lbl->setIdx(i);
 			lbl->setName(meas.name);
 			lbl->setUnit(meas.unit);
 			lbl->setColor(m_pen.color());
