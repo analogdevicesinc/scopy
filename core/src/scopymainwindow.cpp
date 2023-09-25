@@ -23,7 +23,7 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
-#include "versionchecker.h"
+#include "popupwidget.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
@@ -54,10 +54,8 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	MessageBroker::GetInstance();
 
 	// get the version document
-	auto vc = VersionCache::GetInstance(); // get VersionCache instance
-	auto *function = new std::function<void(QJsonDocument document)>(); // allocate space for the function wrapper
-	*function = [this] (QJsonDocument document) { this->receiveVersionDocument(std::move(document)); }; // set function value
-	vc->subscribe(function); // 'subscribe' to receive the version QJsonDocument
+	auto vc = VersionChecker::GetInstance(); // get VersionCache instance
+	vc->subscribe(this, &ScopyMainWindow::receiveVersionDocument); // 'subscribe' to receive the version QJsonDocument
 
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
@@ -250,6 +248,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_additional_plugin_path", "");
 	p->init("general_load_decoders", true);
 	p->init("general_doubleclick_ctrl_opens_menu", true);
+	p->init("general_check_online_version", false);
 
 	connect(p, SIGNAL(preferenceChanged(QString,QVariant)), this, SLOT(handlePreferences(QString,QVariant)));
 
@@ -261,6 +260,23 @@ void ScopyMainWindow::initPreferences()
 	}
 	if (p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
+		PopupWidget *versionCheckerOverlay = new PopupWidget(this);
+		versionCheckerOverlay->setDescription("Do you want to automatically check for newer Scopy and m2k-firmware versions?\n\nYou can change this anytime from the Preferences menu.");
+		versionCheckerOverlay->setExitButtonText("No");
+		versionCheckerOverlay->setContinueButtonText("Yes");
+		versionCheckerOverlay->enableTitleBar(false);
+		versionCheckerOverlay->enableTintedOverlay(true);
+		connect(versionCheckerOverlay, &PopupWidget::continueButtonClicked, this, [versionCheckerOverlay, p] () {
+			p->set("general_check_online_version", true);
+			delete versionCheckerOverlay;
+		});
+		connect(versionCheckerOverlay, &PopupWidget::exitButtonClicked, this, [versionCheckerOverlay, p] () {
+			p->set("general_check_online_version", false);
+			delete versionCheckerOverlay;
+		});
+		versionCheckerOverlay->move(this->rect().center() - versionCheckerOverlay->rect().center());
+
+		QMetaObject::invokeMethod(versionCheckerOverlay, &PopupWidget::show, Qt::QueuedConnection);
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();
@@ -420,7 +436,7 @@ void ScopyMainWindow::removeDeviceFromUi(QString id)
 }
 
 void ScopyMainWindow::receiveVersionDocument(QJsonDocument document) {
-	qInfo(CAT_SCOPY) << "The upstream scopy version is" << document["scopy"]["version"] << "and the current one is" << SCOPY_VERSION;
+	qInfo(CAT_SCOPY) << "The upstream scopy version is" << document << "and the current one is" << SCOPY_VERSION;
 }
 
 
