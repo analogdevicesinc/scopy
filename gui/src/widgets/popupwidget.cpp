@@ -27,6 +27,7 @@ using namespace scopy;
 
 PopupWidget::PopupWidget(QWidget* parent) :
 	ui(new Ui::PopupWidget),
+	m_tintedOverlay(nullptr),
 	QWidget(parent)
 {
 	ui->setupUi(this);
@@ -44,6 +45,7 @@ PopupWidget::PopupWidget(QWidget* parent) :
 
 PopupWidget::~PopupWidget() {
 	delete ui;
+	delete m_tintedOverlay;
 }
 
 void PopupWidget::setFocusOnContinueButton() {
@@ -94,6 +96,20 @@ QString PopupWidget::getExitButtonText() {
 
 void PopupWidget::setExitButtonText(const QString& text) {
 	ui->exitButton->setText(text);
+}
+
+void PopupWidget::enableTintedOverlay(bool enable) {
+	if (enable) {
+		delete m_tintedOverlay;
+
+		m_tintedOverlay = new gui::TintedOverlay(parentWidget());
+		m_tintedOverlay->show();
+		raise();
+		show();
+	} else {
+		delete m_tintedOverlay;
+		m_tintedOverlay = nullptr;
+	}
 }
 
 #include "moc_popupwidget.cpp"

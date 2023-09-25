@@ -23,6 +23,7 @@
 #define SCOPY_POPUPWIDGET_H
 
 #include <QWidget>
+#include "tintedoverlay.h"
 #include "scopy-gui_export.h"
 
 namespace Ui { class PopupWidget; }
@@ -38,6 +39,7 @@ public:
 	void setFocusOnExitButton();
 
 	void enableTitleBar(bool enable = true);
+	void enableTintedOverlay(bool enable = true);
 
 	QString getDescription();
 	void setDescription(const QString& description);
@@ -57,6 +59,7 @@ Q_SIGNALS:
 
 protected:
 	Ui::PopupWidget *ui;
+	gui::TintedOverlay *m_tintedOverlay;
 };
 }
 
