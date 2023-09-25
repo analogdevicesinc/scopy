@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-	@ABOUT_HTML_QRC_SOURCES@
-    </qresource>
-</RCC>
