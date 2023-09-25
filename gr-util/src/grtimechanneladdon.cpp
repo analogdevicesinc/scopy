@@ -447,3 +447,5 @@ bool GRTimeChannelAddon::enabled() const
 {
 	return m_enabled;
 }
+
+#include "moc_grtimechanneladdon.cpp"

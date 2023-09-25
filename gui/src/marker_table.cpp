@@ -172,3 +172,5 @@ bool MarkerTable::isMarker(int mkIdx, int chIdx)
 	}
 	return false;
 }
+
+#include "moc_marker_table.cpp"

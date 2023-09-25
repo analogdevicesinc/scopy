@@ -78,3 +78,5 @@ PlotAxis *PlotAxisHandle::axis() const
 {
 	return m_axis;
 }
+
+#include "moc_plotaxishandle.cpp"

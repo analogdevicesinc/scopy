@@ -215,3 +215,5 @@ void HoverWidget::showEvent(QShowEvent *event)
 	moveToAnchor();
 	QWidget::showEvent(event);
 }
+
+#include "moc_hoverwidget.cpp"

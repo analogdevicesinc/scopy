@@ -391,3 +391,5 @@ void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
 	}
 }
 
+
+#include "moc_buffer_previewer.cpp"

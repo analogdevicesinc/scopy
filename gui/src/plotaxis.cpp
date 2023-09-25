@@ -171,3 +171,5 @@ const QwtAxisId &PlotAxis::axisId() const
 {
 	return m_axisId;
 }
+
+#include "moc_plotaxis.cpp"

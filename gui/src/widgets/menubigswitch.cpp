@@ -25,3 +25,5 @@ void MenuBigSwitch::applyStylesheet() {
 	StyleHelper::MenuBigSwitchButton(m_switch, "menuButton");
 	StyleHelper::MenuBigSwitch(this, "menuBigSwitch");
 }
+
+#include "moc_menubigswitch.cpp"

@@ -148,3 +148,5 @@ MeasurementSettings::MeasurementSettings(QWidget *parent) {
 }
 
 MeasurementSettings::~MeasurementSettings() {}
+
+#include "moc_measurementsettings.cpp"

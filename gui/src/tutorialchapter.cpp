@@ -114,3 +114,5 @@ scopy::HoverPosition TutorialChapter::getContent() const {
 void TutorialChapter::setContent(scopy::HoverPosition newContent) {
 	content = newContent;
 }
+
+#include "moc_tutorialchapter.cpp"

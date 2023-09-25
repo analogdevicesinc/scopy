@@ -77,3 +77,5 @@ QList<GRProxyBlock *> GRSignalPath::path()
 {
 	return list;
 }
+
+#include "moc_grsignalpath.cpp"

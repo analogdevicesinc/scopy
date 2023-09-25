@@ -63,3 +63,5 @@ gr::basic_block_sptr GRProxyBlock::getGrEndPoint() { return end_blk; }
 
 
 
+
+#include "moc_grproxyblock.cpp"

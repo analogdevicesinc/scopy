@@ -192,3 +192,5 @@ static const std::map<int, QString> icons_spect = {
 */
 
 }
+
+#include "moc_measurementcontroller.cpp"

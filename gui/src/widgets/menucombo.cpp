@@ -50,3 +50,5 @@ void MenuCombo::applyStylesheet() {
 	StyleHelper::MenuComboBox(m_combo, "menuCombobox");
 }
 
+
+#include "moc_menucombo.cpp"

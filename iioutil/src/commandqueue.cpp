@@ -127,3 +127,5 @@ void CommandQueue::cmdStarted(scopy::Command *cmd)
 		Q_EMIT started(cmd);
 	}
 }
+
+#include "moc_commandqueue.cpp"

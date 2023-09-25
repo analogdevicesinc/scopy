@@ -185,3 +185,5 @@ void StatsLabel::setIdx(int newIdx)
 {
 	m_idx = newIdx;
 }
+
+#include "moc_measurementlabel.cpp"

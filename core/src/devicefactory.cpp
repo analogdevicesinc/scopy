@@ -12,3 +12,5 @@ DeviceImpl *DeviceFactory::build(QString param, PluginManager *pm, QString categ
 		return new DeviceImpl(param, pm, category, parent);
 	}
 }
+
+#include "moc_devicefactory.cpp"

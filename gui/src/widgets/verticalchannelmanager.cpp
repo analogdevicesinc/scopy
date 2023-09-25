@@ -19,3 +19,5 @@ void VerticalChannelManager::add(QWidget *ch) {
 	lay->insertWidget(position,ch);
 	ch->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
 }
+
+#include "moc_verticalchannelmanager.cpp"

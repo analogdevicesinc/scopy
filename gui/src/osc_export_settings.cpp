@@ -188,3 +188,5 @@ void ExportSettings::setExportAllButtonLabel(const QString& text)
 }
 
 
+
+#include "moc_osc_export_settings.cpp"

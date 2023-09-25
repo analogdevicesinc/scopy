@@ -198,3 +198,5 @@ void StatsPanel::sort(int sortType)
 	}
 	updateOrder();
 }
+
+#include "moc_measurementpanel.cpp"

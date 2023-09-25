@@ -55,3 +55,5 @@ QwtText XAxisScaleZoomer::trackerText(const QPoint &p) const
 		  plt->getScaleValueFormat(dp.y(), QwtAxis::YLeft));
 	return t;
 }
+
+#include "moc_x_axis_scale_zoomer.cpp"

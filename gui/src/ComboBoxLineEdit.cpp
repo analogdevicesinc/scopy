@@ -45,3 +45,5 @@ void ComboBoxLineEdit::leaveEvent(QEvent *event)
 {
 	QWidget::leaveEvent(event);
 }
+
+#include "moc_ComboBoxLineEdit.cpp"

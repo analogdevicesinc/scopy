@@ -1496,3 +1496,5 @@ double Statistic::numPushedData() const
 	return m_dataCount;
 }
 }
+
+#include "moc_measure.cpp"

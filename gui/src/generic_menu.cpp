@@ -76,3 +76,5 @@ void GenericMenu::addNewHeaderWidget(QWidget *widget)
 {
 	m_menuHeader->addNewHeaderWidget(widget);
 }
+
+#include "moc_generic_menu.cpp"

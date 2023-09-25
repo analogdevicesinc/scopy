@@ -71,3 +71,5 @@ void CheckboxDelegate::commitDataToModel()
 
 	Q_EMIT commitData(editor);
 }
+
+#include "moc_checkbox_delegate.cpp"

@@ -23,3 +23,5 @@ void MenuLineEdit::applyStylesheet() {
 	StyleHelper::MenuLineEdit(m_edit, "menuButton");
 	StyleHelper::MenuLineEditWidget(this, "menuBigSwitch");
 }
+
+#include "moc_menulineedit.cpp"

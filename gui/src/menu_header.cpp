@@ -43,3 +43,5 @@ void MenuHeader::addNewHeaderWidget(QWidget *widget)
 	m_ui->stackedWidget->addWidget(widget);
 	m_ui->stackedWidget->setCurrentWidget(widget);
 }
+
+#include "moc_menu_header.cpp"

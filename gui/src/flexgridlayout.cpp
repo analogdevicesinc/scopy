@@ -283,3 +283,5 @@ FlexGridLayout::~FlexGridLayout()
 		delete m_gridLayout;
 	}
 }
+
+#include "moc_flexgridlayout.cpp"

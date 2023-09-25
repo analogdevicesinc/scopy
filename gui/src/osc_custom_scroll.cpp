@@ -96,3 +96,5 @@ void OscCustomScrollArea::leaveEvent(QEvent *event)
 
 
 
+
+#include "moc_osc_custom_scroll.cpp"

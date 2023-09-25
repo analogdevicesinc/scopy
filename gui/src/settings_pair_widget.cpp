@@ -16,3 +16,5 @@ SettingsPairWidget::~SettingsPairWidget() { delete m_ui; }
 CustomPushButton* SettingsPairWidget::getGeneralSettingsBtn() { return m_ui->btnGenSettings; }
 
 QPushButton* SettingsPairWidget::getSettingsBtn() { return m_ui->btnSettings; }
+
+#include "moc_settings_pair_widget.cpp"

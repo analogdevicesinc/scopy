@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
 
-scopymodules=("core" "pluginbase" "gui" "iioutil")
-scopyplugins=("testplugin" "testplugin2" "swiot")
+scopymodules=("core" "pluginbase" "gui" "iioutil" "gr-util")
+scopyplugins=("testplugin" "testplugin2" "swiot" "adc" )
 
 for mod in ${scopymodules[@]};do
 	echo ${mod}

@@ -61,3 +61,5 @@ QString LicenseOverlay::getLicense()
 
 	return text;
 }
+
+#include "moc_license_overlay.cpp"

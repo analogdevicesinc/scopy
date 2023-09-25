@@ -52,3 +52,5 @@ void CustomMenuButton::checkBoxToggled(bool toggled)
 		m_ui->btnCustomMenuButton->setEnabled(toggled);
 	}
 }
+
+#include "moc_custom_menu_button.cpp"

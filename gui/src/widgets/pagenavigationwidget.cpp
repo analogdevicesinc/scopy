@@ -80,3 +80,5 @@ QPushButton *PageNavigationWidget::getOpenBtn()
 {
 	return openButton;
 }
+
+#include "moc_pagenavigationwidget.cpp"

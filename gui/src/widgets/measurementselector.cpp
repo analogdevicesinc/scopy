@@ -98,3 +98,5 @@ QCheckBox *MeasurementSelectorItem::statsCheckbox() const
 {
 	return m_statsCheckbox;
 }
+
+#include "moc_measurementselector.cpp"

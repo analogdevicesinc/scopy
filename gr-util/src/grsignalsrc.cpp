@@ -59,3 +59,5 @@ void GRSignalSrc::destroy_blks(GRTopBlock *top) {
 	start_blk.clear();
 
 }
+
+#include "moc_grsignalsrc.cpp"

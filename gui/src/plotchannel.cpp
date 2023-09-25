@@ -181,3 +181,5 @@ PlotAxis *PlotChannel::xAxis() const
 }
 
 
+
+#include "moc_plotchannel.cpp"

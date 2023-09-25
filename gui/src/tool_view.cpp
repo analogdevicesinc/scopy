@@ -571,3 +571,5 @@ void ToolView::setPairSettingsVisible(bool visible) { m_ui->widgetSettingsPairBt
 CustomPushButton* ToolView::getGeneralSettingsBtn() { return m_ui->widgetSettingsPairBtns->getGeneralSettingsBtn(); }
 
 QPushButton* ToolView::getSettingsBtn() { return m_ui->widgetSettingsPairBtns->getSettingsBtn(); }
+
+#include "moc_tool_view.cpp"

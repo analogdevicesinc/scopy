@@ -51,3 +51,5 @@ QWidget* SubsectionSeparator::getContentWidget()
 {
 	return m_ui->widgetSubsectionContent;
 }
+
+#include "moc_subsection_separator.cpp"

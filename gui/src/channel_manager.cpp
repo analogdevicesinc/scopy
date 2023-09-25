@@ -401,3 +401,5 @@ void ChannelManager::setToolStatus(const QString &newToolStatus)
 }
 
 
+
+#include "moc_channel_manager.cpp"

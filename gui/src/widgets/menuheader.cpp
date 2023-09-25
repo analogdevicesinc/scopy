@@ -30,3 +30,5 @@ void MenuHeaderWidget::applyStylesheet() {
 	StyleHelper::MenuHeaderLine(m_line, m_pen, "menuSeparator");
 	StyleHelper::MenuHeaderWidget(this, "menuHeader");
 }
+
+#include "moc_menuheader.cpp"

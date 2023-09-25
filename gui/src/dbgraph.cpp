@@ -797,3 +797,5 @@ void dBgraph::setPlotBarEnabled(bool enabled)
 {
 	d_plotBarEnabled = enabled;
 }
+
+#include "moc_dbgraph.cpp"

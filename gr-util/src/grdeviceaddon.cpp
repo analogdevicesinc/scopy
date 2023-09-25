@@ -65,3 +65,5 @@ QList<GRTimeChannelAddon *> GRDeviceAddon::getRegisteredChannels() {
 
 
 
+
+#include "moc_grdeviceaddon.cpp"

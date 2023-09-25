@@ -391,3 +391,5 @@ SymbolController *PlotWidget::symbolCtrl() const
 	return m_symbolCtrl;
 }
 
+
+#include "moc_plotwidget.cpp"

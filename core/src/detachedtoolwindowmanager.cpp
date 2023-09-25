@@ -41,3 +41,5 @@ bool DetachedToolWindowManager::contains(QString key) {
 	return map.contains(key);
 }
 
+
+#include "moc_detachedtoolwindowmanager.cpp"

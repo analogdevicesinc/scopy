@@ -158,3 +158,5 @@ void CollapsableMenuControlButton::add(QWidget *ch) {
 MenuControlButton *CollapsableMenuControlButton::getControlBtn() {
 	return m_ctrl;
 }
+
+#include "moc_menucontrolbutton.cpp"

@@ -205,3 +205,5 @@ void DropdownSwitchList::resetIndex(int)
 {
 	setCurrentIndex(-1);
 }
+
+#include "moc_dropdown_switch_list.cpp"

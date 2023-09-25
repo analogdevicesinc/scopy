@@ -356,3 +356,5 @@ void ChannelWidget::setIsPhysicalChannel(bool physChannel)
 {
 	m_isPhysicalChannel = physChannel;
 }
+
+#include "moc_channel_widget.cpp"

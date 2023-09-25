@@ -36,3 +36,5 @@ void MenuOnOffSwitch::applyStylesheet() {
 
 	StyleHelper::MenuOnOffSwitch(this, "menuOnOffSwitch");
 }
+
+#include "moc_menuonoffswitch.cpp"

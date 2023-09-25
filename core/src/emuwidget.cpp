@@ -170,3 +170,5 @@ void EmuWidget::showEvent(QShowEvent *event)
 	QWidget::showEvent(event);
 	m_ui->btnEnableDemo->setFocus();
 }
+
+#include "moc_emuwidget.cpp"
