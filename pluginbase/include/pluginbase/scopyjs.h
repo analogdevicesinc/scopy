@@ -26,6 +26,7 @@
 #include <QFutureWatcher>
 #include <QJSEngine>
 #include "apiobject.h"
+#include "qloggingcategory.h"
 #include "scopy-pluginbase_export.h"
 #include "scopy-pluginbase_config.h"
 #include <QSocketNotifier>
@@ -55,6 +56,7 @@ public:
 	Q_INVOKABLE void printToConsole(const QString& text);
 	Q_INVOKABLE QString readFromConsole(const QString& text);
 	Q_INVOKABLE void returnToApplication();
+	Q_INVOKABLE void suppressScopyMessages(bool b);
 
 	QJSEngine *engine();
 
@@ -78,6 +80,8 @@ private:
 	QSocketNotifier *notifier;
 	bool done;
 	static ScopyJS * pinstance_;
+	static QLoggingCategory::CategoryFilter oldCategoryFilter;
+	static void jsCategoryFilter(QLoggingCategory *category);
 };
 
 }
