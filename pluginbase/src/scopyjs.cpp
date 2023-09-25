@@ -32,10 +32,12 @@
 #include <iostream>
 #include <common/common.h>
 
-
+Q_LOGGING_CATEGORY(CAT_JS, "Scopy_JS")
 
 using std::cout;
 using namespace scopy;
+
+QLoggingCategory::CategoryFilter ScopyJS::oldCategoryFilter{nullptr};
 
 ScopyJS* ScopyJS::pinstance_{nullptr};
 ScopyJS::ScopyJS(QObject *parent) : QObject(parent) {
@@ -98,6 +100,15 @@ void ScopyJS::returnToApplication()
 	while(!done) {
 		QCoreApplication::processEvents();
 		QThread::msleep(1);
+	}
+}
+
+void ScopyJS::suppressScopyMessages(bool b)
+{
+	if (b) {
+		QLoggingCategory::installFilter(jsCategoryFilter);
+	} else {
+		QLoggingCategory::installFilter(oldCategoryFilter);
 	}
 }
 
@@ -226,5 +237,28 @@ void ScopyJS::hasText()
 	out.flush();
 }
 
+void ScopyJS::jsCategoryFilter(QLoggingCategory *category)
+{
+	if (oldCategoryFilter) {
+		oldCategoryFilter(category);
+	}
+	category->setEnabled(QtDebugMsg, false);
+	category->setEnabled(QtInfoMsg, false);
+	category->setEnabled(QtWarningMsg, false);
+	category->setEnabled(QtCriticalMsg, false);
+	category->setEnabled(QtFatalMsg, false);
+
+	if (qstrcmp(category->categoryName(), "Scopy_JS") == 0) {
+		category->setEnabled(QtDebugMsg, true);
+		category->setEnabled(QtInfoMsg, true);
+		category->setEnabled(QtWarningMsg, true);
+		category->setEnabled(QtCriticalMsg, true);
+		category->setEnabled(QtFatalMsg, true);
+	}
+
+	if (qstrcmp(category->categoryName(), "Scopy_API") == 0) {
+		category->setEnabled(QtWarningMsg, true);
+	}
+}
 
 #include "moc_scopyjs.cpp"
