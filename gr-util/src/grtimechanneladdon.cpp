@@ -50,12 +50,12 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 	m_plotAxisHandle = new PlotAxisHandle(pen, m_plotAxis, plot, yPlotAxisHandle,this);
 	m_plotCh->setHandle(m_plotAxisHandle);
 	plot->addPlotAxisHandle(m_plotAxisHandle);
+	plot->addPlotChannel(m_plotCh);
 
 	initMeasure();
 	widget = createMenu();
 	m_sampleRateAvailable = m_grch->sampleRateAvailable();
 
-	// - create ADCCount/VFS/V
 }
 
 GRTimeChannelAddon::~GRTimeChannelAddon() {}

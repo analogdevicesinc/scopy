@@ -212,6 +212,9 @@ void PlotWidget::setAxisScalesVisible(bool visible) {
 void PlotWidget::addPlotChannel(PlotChannel *ch)
 {
 	m_plotChannels.append(ch);
+	if(m_selectedChannel == nullptr) {
+		selectChannel(ch);
+	}
 }
 
 void PlotWidget::removePlotChannel(PlotChannel *ch)
