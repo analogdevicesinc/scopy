@@ -7,9 +7,6 @@
 #include <widgets/hoverwidget.h>
 #include "plotwidget.h"
 #include "plotaxis.h"
-#include "plotcursors.h"
-#include "spinbox_a.hpp"
-
 #include "spinbox_a.hpp"
 #include <gui/widgets/hoverwidget.h>
 #include <gui/widgets/menucontrolbutton.h>
@@ -24,6 +21,7 @@
 #include <gui/widgets/menulineedit.h>
 #include <gui/widgets/verticalchannelmanager.h>
 #include <gui/widgets/hoverwidget.h>
+#include <gui/cursorcontroller.h>
 
 using namespace scopy;
 
@@ -121,9 +119,26 @@ TestTool::TestTool(QWidget *parent)
 
 	MenuControlButton *cursor = new MenuControlButton(this);
 	cursor->setName("Cursors");
+	cursor->setOpenMenuChecksThis(true);
+	cursor->setDoubleClickToOpenMenu(true);
+	cursor->checkBox()->setVisible(false);
 	cursor->setCheckBoxStyle(MenuControlButton::CS_SQUARE);
+
 	MenuControlButton *measure = new MenuControlButton(this);
 	measure->setName("Measure");
+	measure->setOpenMenuChecksThis(true);
+	measure->setDoubleClickToOpenMenu(true);
+	measure->checkBox()->setVisible(false);
+
+	CursorController *cursorController = new CursorController(plot, this);
+
+	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
+	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
+	hoverSettings->setAnchorOffset(QPoint(0, -10));
+
+	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
+	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
 
 	tool->addWidgetToTopContainerMenuControlHelper(btn3,TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(btn5,TTA_LEFT);
@@ -185,7 +200,8 @@ TestTool::TestTool(QWidget *parent)
 	vcm->add(fileChannel);
 	vcm->setFixedSize(260,350);
 
-	HoverWidget *hv = new HoverWidget(vcm, channels, tool);
+	HoverWidget *hv = new HoverWidget(nullptr, channels, tool);
+	hv->setContent(vcm);
 	hv->setAnchorOffset(QPoint(0,-10));
 	hv->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hv->setContentPos(HoverPosition::HP_TOPRIGHT);
@@ -194,22 +210,6 @@ TestTool::TestTool(QWidget *parent)
 	plot->rightHandlesArea()->setVisible(true);
 	plot->bottomHandlesArea()->setVisible(true);
 	plot->topHandlesArea()->setVisible(true);
-
-	PlotCursors* plotCursors = new PlotCursors(plot);
-	plotCursors->setVisible(false);
-
-	PlotCursorReadouts* plotCursorReadouts = new PlotCursorReadouts(plot);
-	plotCursorReadouts->hide();
-	plotCursorReadouts->setFixedSize(200,80);
-	plotCursorReadouts->move(100,100);
-
-	connect(cursor,&QAbstractButton::toggled, plotCursorReadouts, &PlotCursorReadouts::setVisible);
-	connect(cursor,&QAbstractButton::toggled, plotCursors, &PlotCursors::setVisible);
-
-	connect(plotCursors, &PlotCursors::v1PositionChanged,plotCursorReadouts,&PlotCursorReadouts::setV1);
-	connect(plotCursors, &PlotCursors::v2PositionChanged,plotCursorReadouts,&PlotCursorReadouts::setV2);
-	connect(plotCursors, &PlotCursors::h1PositionChanged,plotCursorReadouts,&PlotCursorReadouts::setH1);
-	connect(plotCursors, &PlotCursors::h2PositionChanged,plotCursorReadouts,&PlotCursorReadouts::setH2);
 
 	connect(channels, &QAbstractButton::toggled, this, [=](bool b) {
 		qInfo()<<"setVisible: "<<b;

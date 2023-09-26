@@ -6,7 +6,7 @@ max-width: 40px;
 border-radius: 4px;
 background-color: #141416;
 qproperty-color_start: #4a64ff;
-qproperty-color_end: #727273;
+qproperty-color_end: grey;
 }
 
 QWidget#handle {
@@ -19,11 +19,11 @@ max-height: 16px;
 min-width: 16px;
 max-width: 16px;
 border-radius: 2px;
-background-color: white;
+background-color: grey;
 }
 
 QWidget#handle:disabled {
-background-color: #aaaaaa;
+background-color: #272730;
 }
 
 
