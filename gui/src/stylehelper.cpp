@@ -182,11 +182,21 @@ void StyleHelper::TimePlotHDivInfo(QLabel *w, QString objectName)
 {
 	QString style = QString(R"css(
 							color: &&ScopyBlue&&;
-							background-color: rgba(255,255,255,0);
+							font-weight: 500;
+							font-size: 12px;
 							)css");
 	style.replace("&&ScopyBlue&&",StyleHelper::getColor("ScopyBlue"));
 	w->setStyleSheet(style);
 
+}
+void StyleHelper::TimePlotSamplingInfo(QLabel *w, QString objectName) {
+	QString style = QString(R"css(
+							color: rgba(192,192,192,255);
+							font-weight: 400;
+							font-size: 12px;
+							)css");
+					style.replace("&&LabelText&&",StyleHelper::getColor("LabelText"));
+	w->setStyleSheet(style);
 }
 
 void StyleHelper::HoverWidget(QWidget *w, QString objectName)
