@@ -5,7 +5,6 @@
 #include "tooladdon.h"
 #include <gui/oscilloscope_plot.hpp>
 
-#include "grtimeplotaddonsettings.h"
 #include <QGridLayout>
 #include "time_sink_f.h"
 #include <plotwidget.h>
@@ -15,8 +14,11 @@
 #include <QFuture>
 #include <QtConcurrent>
 
+namespace scopy {
+class TimePlotHDivInfo;
+class TimePlotSamplingInfo;
 
-namespace scopy::grutil {
+namespace grutil {
 using namespace scopy;
 class GRTopBlock;
 class GRTimeChannelAddon;
@@ -84,6 +86,8 @@ private:
 	GRTopBlock *m_top;
 	PlotWidget *m_plotWidget;
 	PlotCursors *m_cursors;
+	TimePlotHDivInfo *m_hdivinfo;
+	TimePlotSamplingInfo *m_samplinginfo;
 	AnalogBufferPreviewer* m_bufferPreviewer;
 	time_sink_f::sptr time_sink;
 	QList<GRTimeChannelAddon*> grChannels;
@@ -115,6 +119,7 @@ private:
 	void updateFrameRate();
 	void setShowPlotTags();
 };
+}
 }
 
 #endif // GRTIMEPLOTADDON_H
