@@ -104,6 +104,11 @@ bool PlotAxis::isVertical()
 	return (m_position == QwtAxis::YLeft || m_position == QwtAxis::YRight);
 }
 
+double PlotAxis::divs() const
+{
+	return (m_divs-1);
+}
+
 void PlotAxis::setDivs(double divs) {
 	m_divs = divs;
 	updateAxisScale();
