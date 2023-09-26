@@ -1,6 +1,7 @@
 #include "widgets/hoverwidget.h"
 #include <QDebug>
 #include <QLoggingCategory>
+#include <stylehelper.h>
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
@@ -10,6 +11,8 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 
 	m_container = new QWidget(this);
 	m_container->setObjectName("container");
+	StyleHelper::HoverWidget(this);
+	StyleHelper::HoverWidget(m_container);
 	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
 	m_lay = new QHBoxLayout(m_container);
