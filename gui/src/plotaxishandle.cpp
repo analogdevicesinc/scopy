@@ -33,7 +33,7 @@ PlotAxisHandle::PlotAxisHandle(QPen pen, PlotAxis* ax, PlotWidget *p, int positi
 
 	m_handle = new RoundedHandleV(
 	    (left) ? QPixmap(":/gui/icons/handle_right_arrow.svg")
-		   : QPixmap(":/gui/icons/handle_right_arrow.svg"),
+		   : QPixmap(":/gui/icons/handle_left_arrow.svg"),
 	    QPixmap(":/gui/icons/handle_up_arrow.svg"),
 	    QPixmap(":/gui/icons/handle_down_arrow.svg"),
 	    area, left);
