@@ -50,7 +50,7 @@ void time_sink_f_impl::generate_time_axis() {
 	qInfo(CAT_TIME_SINK_F)<< "Generating x-Axis";
 	double timeoffset = 0;
 	m_time.clear();
-	for (int i = 0; i < m_size;i++) {
+	for (int i = 0; i <= m_size;i++) {
 		m_time.push_back(timeoffset + i/m_sampleRate);
 	}
 }
@@ -82,7 +82,7 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 		m_data[i].reserve(size);
 	}
 
-	m_time.reserve(size);
+	m_time.reserve(size+1);
 	generate_time_axis();
 
 	m_tags = std::vector< std::vector<gr::tag_t> >(m_nconnections);
