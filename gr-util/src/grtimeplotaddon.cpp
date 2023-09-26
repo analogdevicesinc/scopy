@@ -1,4 +1,6 @@
 #include "grtimeplotaddon.h"
+#include "grtimeplotaddonsettings.h"
+#include "hoverwidget.h"
 #include <grlog.h>
 #include <grtimechanneladdon.h>
 #include <grdeviceaddon.h>
@@ -11,6 +13,7 @@
 #include <QLoggingCategory>
 #include <pluginbase/preferences.h>
 #include <QwtWeedingCurveFitter>
+#include <plotinfo.h>
 
 Q_LOGGING_CATEGORY(CAT_GRTIMEPLOT, "GRTimePlotAddon");
 
@@ -45,6 +48,26 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_plotWidget->bottomHandlesArea()->setVisible(true);
 	m_plotWidget->xAxis()->setVisible(true);
 //	m_plotWidget->topHandlesArea()->setVisible(true);
+
+	HoverWidget *hdivhover = new HoverWidget(nullptr, m_plotWidget->plot()->canvas(), m_plotWidget->plot());
+	m_hdivinfo = new TimePlotHDivInfo();
+	hdivhover->setContent(m_hdivinfo);
+	hdivhover->setAnchorPos(HoverPosition::HP_TOPLEFT);
+	hdivhover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
+	hdivhover->setAnchorOffset(QPoint(8,6));
+	hdivhover->show();
+	hdivhover->raise();
+	hdivhover->setAttribute(Qt::WA_TransparentForMouseEvents);
+
+	HoverWidget *samplinginfohover = new HoverWidget(nullptr, m_plotWidget->plot()->canvas(), m_plotWidget->plot());
+	m_samplinginfo = new TimePlotSamplingInfo();
+	samplinginfohover->setContent(m_samplinginfo);
+	samplinginfohover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	samplinginfohover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	samplinginfohover->setAnchorOffset(QPoint(-8,6));
+	samplinginfohover->show();
+	samplinginfohover->raise();
+	samplinginfohover->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	setupBufferPreviewer();
 	m_cursors = new PlotCursors(m_plotWidget);
@@ -340,6 +363,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 
 	}
 
+	m_samplinginfo->update(m_plotSize, m_bufferSize, m_sampleRate);
 	time_sink = time_sink_f::make(m_plotSize, m_sampleRate, name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_rollingMode);
 	time_sink->setSingleShot(m_singleShot);
@@ -375,15 +399,21 @@ void GRTimePlotAddon::onNewData() {
 }
 
 void GRTimePlotAddon::updateXAxis() {
+	auto x = plot()->xAxis();
 	if(m_rollingMode) {
 		// not normal mode - rolling mode
-		plot()->xAxis()->setMin(time_sink->time().back());
-		plot()->xAxis()->setMax(time_sink->time().front());
+		x->setMin(time_sink->time().back());
+		x->setMax(time_sink->time().front());
 	} else {
 		// normal mode
-		plot()->xAxis()->setMin(time_sink->time().front());
-		plot()->xAxis()->setMax(time_sink->time().back());
+		x->setMin(time_sink->time().front());
+		x->setMax(time_sink->time().back());
 	}
+	auto max = x->max();
+	auto min = x->min();
+	auto divs = x->divs();
+	double hdiv = abs(max - min) / divs;
+	m_hdivinfo->update(hdiv);
 	Q_EMIT xAxisUpdated();
 }
 

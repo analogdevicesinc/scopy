@@ -33,6 +33,8 @@ public:
 
 	OscScaleDraw *scaleDraw() const;
 
+	double divs() const;
+
 public Q_SLOTS:
 	void setMax(double newMax);
 	void setMin(double newMin);

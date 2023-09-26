@@ -18,6 +18,7 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	m_lay = new QHBoxLayout(m_container);
 	m_lay->setMargin(0);
 	m_lay->setContentsMargins(0, 0, 0, 0);
+	m_lay->setSizeConstraint(QBoxLayout::SetMinimumSize);
 	m_container->setLayout(m_lay);
 	m_lay->addWidget(content);
 
