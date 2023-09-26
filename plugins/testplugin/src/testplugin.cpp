@@ -12,12 +12,12 @@
 #include <QGraphicsEffect>
 #include <QPainter>
 #include <QDialog>
+#include <cursorsettings.h>
 #include "tutorialoverlay.h"
 #include <gui/utils.h>
 #include <gui/widgets/hoverwidget.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
-#include "ui_cursors_settings.h"
 #include "testtool.h"
 
 Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
@@ -192,10 +192,7 @@ bool TestPlugin::onConnect()
 
 void TestPlugin::initHoverWidgetTests()
 {
-	Ui::CursorsSettings* ui_curs = new Ui::CursorsSettings;
-	QWidget *cursorMenu = new QWidget();
-	ui_curs->setupUi(cursorMenu);
-//	cursorMenu->setWindowModality(Qt::WindowModal);
+	CursorSettings *cursorMenu = new CursorSettings();
 
 	HoverWidget* hover = new HoverWidget(cursorMenu, btn4, tool);
 	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
