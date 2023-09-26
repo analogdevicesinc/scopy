@@ -178,6 +178,25 @@ void StyleHelper::MeasurementSelectorItemWidget(QString iconPath, MeasurementSel
 
 }
 
+void StyleHelper::TimePlotHDivInfo(QLabel *w, QString objectName)
+{
+	QString style = QString(R"css(
+							color: &&ScopyBlue&&;
+							background-color: rgba(255,255,255,0);
+							)css");
+	style.replace("&&ScopyBlue&&",StyleHelper::getColor("ScopyBlue"));
+	w->setStyleSheet(style);
+
+}
+
+void StyleHelper::HoverWidget(QWidget *w, QString objectName)
+{
+	QString style = QString(R"css(
+							background-color: rgba(255,255,255,0);
+							)css");
+	w->setStyleSheet(style);
+}
+
 void StyleHelper::BlueButton(QPushButton *btn, QString objectName) {
 	if(!objectName.isEmpty()) btn->setObjectName(objectName);
 	btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
