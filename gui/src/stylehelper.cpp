@@ -955,3 +955,29 @@ void StyleHelper::TutorialChapterTitleLabel(QLabel *w, QString objectName) {
 	style.replace("&&LabelText&&", StyleHelper::getColor("LabelText"));
 	w->setStyleSheet(style);
 }
+
+void StyleHelper::DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName) {
+	if (!objectName.isEmpty()) w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+				QAbstractButton[selected=true] {
+					background-color: #141416;
+					border-radius: 4px;
+				}
+				)css");
+
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::FrameBackgroundShadow(QFrame *w, QString objectName) {
+	if (!objectName.isEmpty()) w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+				.QFrame[selected=true] {
+					background-color: #141416;
+					border-radius: 4px;
+				}
+				)css");
+
+	w->setStyleSheet(style);
+}
