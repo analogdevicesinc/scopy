@@ -4,6 +4,8 @@
 #include <QLoggingCategory>
 #include <QDebug>
 #include "deviceicon.h"
+#include "stylehelper.h"
+#include "dynamicWidget.h"
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
 
@@ -33,6 +35,8 @@ DeviceBrowser::~DeviceBrowser()
 
 void DeviceBrowser::initBtns()
 {
+	StyleHelper::FrameBackgroundShadow(ui->containerHome);
+	StyleHelper::FrameBackgroundShadow(ui->containerAdd);
 	
 	bg = new QButtonGroup(this);
 
@@ -43,6 +47,7 @@ void DeviceBrowser::initBtns()
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);
 	ui->btnHome->setChecked(true);
+	setDynamicProperty(ui->containerHome, "selected", true); // select home shadow on init
 	currentIdx = 0;
 }
 
@@ -68,7 +73,7 @@ void DeviceBrowser::addDevice(QString id, Device *d,int position)
 	else
 		list.insert(position,w);
 
-	connect(w, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
+	connect(w, &QAbstractButton::clicked, this, &DeviceBrowser::forwardRequestDeviceWithDirection);
 }
 
 void DeviceBrowser::removeDevice(QString id)
@@ -136,16 +141,36 @@ void DeviceBrowser::prevDevice()
 
 void DeviceBrowser::forwardRequestDeviceWithDirection()
 {
-    QString id = QObject::sender()->property(devBrowserId).toString();
-    int idx = getIndexOfId(id);
-    int direction = currentIdx - idx;
-    Q_EMIT requestDevice(id, direction);
+	QString id = QObject::sender()->property(devBrowserId).toString();
+	int idx = getIndexOfId(id);
+	int direction = currentIdx - idx;
+	Q_EMIT requestDevice(id, direction);
 }
 
 void DeviceBrowser::updateSelectedDeviceIdx(QString k)
 {	
 	int prevIdx = currentIdx; // local, just for debug	
 	currentIdx = getIndexOfId(k);
+
+	QWidget* prevDevice = getDeviceWidgetFor(getIdOfIndex(prevIdx));
+	QWidget* currentDevice = getDeviceWidgetFor(getIdOfIndex(currentIdx));
+
+	// hackish -- the btnHome and btnAdd already have a background color so their container must display the shadow
+	if (currentDevice == ui->btnHome)
+		currentDevice = ui->containerHome;
+
+	if (currentDevice == ui->btnAdd)
+		currentDevice = ui->containerAdd;
+
+	if (prevDevice == ui->btnHome)
+		prevDevice = ui->containerHome;
+
+	if (prevDevice == ui->btnAdd)
+		prevDevice = ui->containerAdd;
+
+	setDynamicProperty(prevDevice, "selected", false);
+	setDynamicProperty(currentDevice, "selected", true);
+
 	qDebug(CAT_DEVBROWSER)<<"prev: "
 			     << "["<<prevIdx<<"] -"
 			     << getIdOfIndex(prevIdx)<<"-> current: "
