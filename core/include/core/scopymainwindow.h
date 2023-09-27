@@ -17,6 +17,7 @@
 #include "versionchecker.h"
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iioscantask.h"
+#include "versionoverlay.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
@@ -63,6 +64,7 @@ private:
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;
+	VersionOverlay *versionOverlay = nullptr;
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;
 

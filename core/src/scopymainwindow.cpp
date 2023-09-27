@@ -260,23 +260,9 @@ void ScopyMainWindow::initPreferences()
 	}
 	if (p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
-		PopupWidget *versionCheckerOverlay = new PopupWidget(this);
-		versionCheckerOverlay->setDescription("Do you want to automatically check for newer Scopy and m2k-firmware versions?\n\nYou can change this anytime from the Preferences menu.");
-		versionCheckerOverlay->setExitButtonText("No");
-		versionCheckerOverlay->setContinueButtonText("Yes");
-		versionCheckerOverlay->enableTitleBar(false);
-		versionCheckerOverlay->enableTintedOverlay(true);
-		connect(versionCheckerOverlay, &PopupWidget::continueButtonClicked, this, [versionCheckerOverlay, p] () {
-			p->set("general_check_online_version", true);
-			delete versionCheckerOverlay;
-		});
-		connect(versionCheckerOverlay, &PopupWidget::exitButtonClicked, this, [versionCheckerOverlay, p] () {
-			p->set("general_check_online_version", false);
-			delete versionCheckerOverlay;
-		});
-		versionCheckerOverlay->move(this->rect().center() - versionCheckerOverlay->rect().center());
+		versionOverlay = new VersionOverlay(this);
 
-		QMetaObject::invokeMethod(versionCheckerOverlay, &PopupWidget::show, Qt::QueuedConnection);
+		QMetaObject::invokeMethod(versionOverlay, &VersionOverlay::showOverlay, Qt::QueuedConnection);
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();
