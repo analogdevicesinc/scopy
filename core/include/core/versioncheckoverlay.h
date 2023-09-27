@@ -3,14 +3,17 @@
 
 #include <QWidget>
 #include <popupwidget.h>
+#include <QPushButton>
 
 namespace scopy {
-class VersionOverlay : public PopupWidget {
+class VersionCheckOverlay : public PopupWidget {
 	Q_OBJECT
 public:
-	explicit VersionOverlay(QWidget* parent = nullptr);
-	~VersionOverlay();
+	explicit VersionCheckOverlay(QWidget* parent = nullptr);
+	~VersionCheckOverlay();
 	void showOverlay();
+	QPushButton getExitBtn();
+
 };
 }
 

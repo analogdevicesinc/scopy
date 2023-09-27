@@ -1,9 +1,10 @@
 #include "versionoverlay.h"
 #include <pluginbase/preferences.h>
+//#include "ui_popupwidget.h"
+
 
 using namespace scopy;
-
-VersionOverlay::VersionOverlay(QWidget *parent) : PopupWidget(parent) {
+VersionCheckOverlay::VersionCheckOverlay(QWidget *parent) : PopupWidget(parent) {
 	setDescription("Do you want to automatically check for newer Scopy and m2k-firmware versions?\n\nYou can change this anytime from the Preferences menu.");
 	setExitButtonText("No");
 	setContinueButtonText("Yes");
@@ -20,15 +21,20 @@ VersionOverlay::VersionOverlay(QWidget *parent) : PopupWidget(parent) {
 	});
 }
 
-VersionOverlay::~VersionOverlay() {
+VersionCheckOverlay::~CheckUpdateOverlay() {
 
 }
 
-void VersionOverlay::showOverlay() {
+void VersionCheckOverlay::showOverlay() {
 	raise();
 	show();
 
 	this->move(parentWidget()->rect().center() - this->rect().center());
 }
 
-#include "moc_versionoverlay.cpp"
+QPushButton VersionCheckOverlay::getExitBtn()
+{
+	return ui->continueButton;
+}
+
+#include "moc_versioncheckoverlay.cpp"

@@ -37,10 +37,10 @@ public:
 	void initPreferences();
 	void initTranslations();
 	void loadPluginsFromRepository(PluginRepository *pr = nullptr);
-	void receiveVersionDocument(QJsonDocument document);
 
 public Q_SLOTS:
 	void requestTools(QString id);
+	void receiveVersionDocument(QJsonDocument document);
 	void addDeviceToUi(QString id, Device *d);
 	void removeDeviceFromUi(QString);
 	void save();
@@ -64,7 +64,7 @@ private:
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;
-	VersionOverlay *versionOverlay = nullptr;
+	CheckUpdateOverlay *checkUpdate = nullptr;
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;
 

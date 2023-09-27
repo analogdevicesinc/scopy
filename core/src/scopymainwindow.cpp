@@ -260,9 +260,9 @@ void ScopyMainWindow::initPreferences()
 	}
 	if (p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
-		versionOverlay = new VersionOverlay(this);
+		checkUpdate = new CheckUpdateOverlay(this);
 
-		QMetaObject::invokeMethod(versionOverlay, &VersionOverlay::showOverlay, Qt::QueuedConnection);
+		QMetaObject::invokeMethod(checkUpdate, &CheckUpdateOverlay::showOverlay, Qt::QueuedConnection);
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();

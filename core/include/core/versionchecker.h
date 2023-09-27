@@ -25,15 +25,26 @@ public:
 
 	static VersionChecker *GetInstance();
 
-	template<typename T, typename R>
-	void subscribe(T* object, R(T::* function)(QJsonDocument)) {
-		m_mutex.lock();
-		auto f = std::bind(function, object, std::placeholders::_1);
+	typedef enum {
+		NOT_INIT,
+		IN_PROGRESS,
+		DONE
+	} state;
 
-		m_subscriptions.push_back(f);
-		m_mutex.unlock();
-		Q_EMIT addedNewSubscription();
-	};
+	template<typename T, typename R>
+	void subscribe(T* object, R(T::* function)(QJsonDocument)){
+		switch(currentState) {
+		case NOT_INIT:
+		case IN_PROGRESS:
+		default:
+			return;
+		case DONE:
+			auto f = std::bind(function, object, std::placeholders::_1);
+			m_subscriptions.push_back(f);
+			Q_EMIT addedNewSubscription();
+			break;
+		}
+	}
 
 Q_SIGNALS:
 	void cacheUpdated();
@@ -59,20 +70,18 @@ private:
 	 * has not been altered in the last 24h.
 	 * @return bool
 	 * */
-	bool checkCacheOutdated();
+	bool cacheOutdated();
 
 	static VersionChecker * pinstance_;
 	const QString m_url = "https://swdownloads.analog.com/cse/sw_versions.json";
 
 	QList< std::function<void(QJsonDocument)> > m_subscriptions;
-	std::mutex m_mutex; // mutex for managing subscriptions
-	QThread *m_thread;
 	QJsonDocument m_cache;
 	QString m_cacheFilePath;
 	QNetworkAccessManager *m_nam;
-	bool m_cacheOutdated;
-	bool m_onlineCheckInProgress;
 	int m_ttl; // maximum number of redirects allowed
+	state currentState;
+
 };
 }
 #endif // VERSIONCHECKER_H
