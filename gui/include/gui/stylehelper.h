@@ -84,6 +84,8 @@ public:
 	static void TimePlotHDivInfo(QLabel *w, QString objectName = "");
 	static void TimePlotSamplingInfo(QLabel *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, QString objectName = "");
+	static void DeviceIconBackgroundShadow(QAbstractButton* w, QString objectName = "");
+	static void FrameBackgroundShadow(QFrame* w, QString objectName = "");
 
 private:
 	QMap<QString,QString> colorMap;
