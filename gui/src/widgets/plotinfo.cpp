@@ -33,7 +33,7 @@ TimePlotSamplingInfo::~TimePlotSamplingInfo()
 
 void TimePlotSamplingInfo::update(int ps, int bs, double sr) {
 	QString text;
-	text = QString("%1").arg(m_mpf->format(ps, "samples", 2)).arg(m_mpf->format(bs, "samples", 2));
+	text = QString("%1").arg(m_mpf->format(ps, "samples", 2));//.arg(m_mpf->format(bs, "samples", 2));
 //	if(sr != 1.0)
 		text += QString(" at %2").arg(m_mpf->format(sr, "sps", 2));
 
