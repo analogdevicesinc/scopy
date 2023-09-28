@@ -33,17 +33,9 @@ public:
 
 	template<typename T, typename R>
 	void subscribe(T* object, R(T::* function)(QJsonDocument)){
-		switch(currentState) {
-		case NOT_INIT:
-		case IN_PROGRESS:
-		default:
-			return;
-		case DONE:
-			auto f = std::bind(function, object, std::placeholders::_1);
-			m_subscriptions.push_back(f);
-			Q_EMIT addedNewSubscription();
-			break;
-		}
+		auto f = std::bind(function, object, std::placeholders::_1);
+		m_subscriptions.push_back(f);
+		Q_EMIT addedNewSubscription();
 	}
 
 Q_SIGNALS:

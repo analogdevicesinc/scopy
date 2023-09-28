@@ -133,12 +133,22 @@ void VersionChecker::pullNewCache() {
 }
 
 void VersionChecker::updateSubscriptions() {
-	for (auto& function: qAsConst(m_subscriptions)) {
-		std::invoke(function, m_cache);
-	}
+	switch (currentState) {
+		case NOT_INIT:
+			qWarning(CAT_VERSION) << "VersionChecker is not initialized.";
+			break;
+		case IN_PROGRESS:
+			qDebug(CAT_VERSION) << "VersionChecker is in progress";
+			break;
+		case DONE:
+			for (auto& function: qAsConst(m_subscriptions)) {
+				std::invoke(function, m_cache);
+			}
 
-	// the functions that were called should not be called again, in case a new class subscribes
-	m_subscriptions.clear();
+			// the functions that were called should not be called again, in case a new class subscribes
+			m_subscriptions.clear();
+			break;
+	}
 }
 
 #include "moc_versionchecker.cpp"
