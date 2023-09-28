@@ -136,18 +136,15 @@ if command -v brew ; then
 	export PATH="${QT_PATH}:$PATH"
 fi
 
+echo "=== Fixing iio-emu + libtinyiiod"
+cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
+echo $STAGINGDIR/lib | dylibbundler -ns -of -b \
+	--fix-file $BUILDDIR/Scopy.app/Contents/MacOS/iio-emu \
+	--dest-dir $BUILDDIR/Scopy.app/Contents/Frameworks/ \
+	--install-path @executable_path/../Frameworks/ \
+	--search-path $BUILDDIR/Scopy.app/Contents/Frameworks/
 
-# echo "### Handle iio-emu + libtinyiiod"
-# cp ./iio-emu/iio-emu ./Scopy.app/Contents/MacOS/
-# tinypath=${STAGINGDIR}/lib/tinyiiod.dylib
-# tinyrpath="$(otool -D ${tinypath} | grep @rpath)"
-# tinyid=${tinyrpath#"@rpath/"}
-# cp ${STAGINGDIR}/lib/tinyiiod.* ./Scopy.app/Contents/Frameworks
-# sudo install_name_tool -id @executable_path/../Frameworks/${tinyid} ./Scopy.app/Contents/Frameworks/${tinyid}
-# sudo install_name_tool -change ${tinyrpath} @executable_path/../Frameworks/${tinyid} ./Scopy.app/Contents/MacOS/iio-emu
-
-echo "### Bundle the Qt libraries & Create Scopy.dmg"
+echo "=== Bundle the Qt libraries & Create Scopy.dmg"
 sudo macdeployqt Scopy.app -verbose=3
 zip -Xvr ScopyApp.zip Scopy.app
 sudo macdeployqt Scopy.app -dmg -verbose=3
-
