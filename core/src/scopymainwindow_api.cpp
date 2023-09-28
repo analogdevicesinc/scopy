@@ -23,7 +23,7 @@ void ScopyMainWindow_API::acceptLicense()
 	}
 
 	if (m_w->checkUpdate) {
-//		Q_EMIT m_w->checkUpdate->getExitButtonText()->clicked();
+		Q_EMIT m_w->checkUpdate->getExitBtn()->clicked();
 	}
 }
 

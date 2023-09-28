@@ -50,11 +50,8 @@ public:
 	QString getTitle();
 	void setTitle(const QString& title);
 
-	QString getContinueButtonText();
-	void setContinueButtonText(const QString& text);
-
-	QString getExitButtonText();
-	void setExitButtonText(const QString& text);
+	QPushButton* getExitBtn();
+	QPushButton* getContinueBtn();
 
 Q_SIGNALS:
 	void continueButtonClicked();

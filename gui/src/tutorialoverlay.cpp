@@ -136,7 +136,7 @@ void TutorialOverlay::next()
 
 	cnt++;
 	if(cnt == chapter.count())
-		m_popupWidget->setContinueButtonText("Finish");
+		m_popupWidget->getContinueBtn()->setText("Finish");
 }
 
 void TutorialOverlay::finish() {

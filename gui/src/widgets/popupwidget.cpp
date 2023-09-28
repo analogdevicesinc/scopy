@@ -21,7 +21,6 @@
 
 #include "widgets/popupwidget.h"
 #include "stylehelper.h"
-#include "ui_popupwidget.h"
 
 using namespace scopy;
 
@@ -118,20 +117,12 @@ void PopupWidget::enableTitleBar(bool enable) {
 	}
 }
 
-QString PopupWidget::getContinueButtonText() {
-	return m_continueButton->text();
+QPushButton *PopupWidget::getExitBtn() {
+	return m_exitButton;
 }
 
-void PopupWidget::setContinueButtonText(const QString& text) {
-	m_continueButton->setText(text);
-}
-
-QString PopupWidget::getExitButtonText() {
-	return m_exitButton->text();
-}
-
-void PopupWidget::setExitButtonText(const QString& text) {
-	m_exitButton->setText(text);
+QPushButton *PopupWidget::getContinueBtn() {
+	return m_continueButton;
 }
 
 void PopupWidget::enableTintedOverlay(bool enable) {
