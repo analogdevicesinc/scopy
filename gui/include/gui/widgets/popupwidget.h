@@ -23,10 +23,11 @@
 #define SCOPY_POPUPWIDGET_H
 
 #include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QTextBrowser>
 #include "tintedoverlay.h"
 #include "scopy-gui_export.h"
-
-namespace Ui { class PopupWidget; }
 
 namespace scopy {
 class SCOPY_GUI_EXPORT PopupWidget : public QWidget {
@@ -34,6 +35,8 @@ class SCOPY_GUI_EXPORT PopupWidget : public QWidget {
 public:
 	explicit PopupWidget(QWidget* parent = nullptr);
 	~PopupWidget();
+
+	void initUI();
 
 	void setFocusOnContinueButton();
 	void setFocusOnExitButton();
@@ -58,8 +61,12 @@ Q_SIGNALS:
 	void exitButtonClicked();
 
 protected:
-	Ui::PopupWidget *ui;
 	gui::TintedOverlay *m_tintedOverlay;
+
+	QLabel *m_titleLabel;
+	QTextBrowser *m_descriptionTextBrowser;
+	QPushButton *m_exitButton;
+	QPushButton *m_continueButton;
 };
 }
 
