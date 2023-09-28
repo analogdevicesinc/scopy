@@ -42,6 +42,9 @@ public:
 	bool singleShot() override;
 	void setSingleShot(bool b) override;
 
+	bool computeTags() override;
+	void setComputeTags(bool newComputeTags) override;
+
 	bool finishedAcquisition() override;
 
 	const std::vector<float> &time() const override;
@@ -53,9 +56,13 @@ public:
 	int work(int noutput_items,
 		 gr_vector_const_void_star &input_items,
 			 gr_vector_void_star &output_items) override;
+
+
+
 private:
 	std::vector <std::deque <float>> m_buffers;
-	std::vector< std::vector<gr::tag_t> > m_tags;
+	std::vector< std::vector<gr::tag_t> > m_localtags;
+	std::vector< std::deque<gr::tag_t> > m_tags;
 
 	std::vector<float> m_time;
 
@@ -70,6 +77,7 @@ private:
 	bool m_singleShot;
 	bool m_workFinished;
 	bool m_dataUpdated;
+	bool m_computeTags;
 
 	void generate_time_axis();
 };
