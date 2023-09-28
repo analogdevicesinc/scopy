@@ -15,6 +15,15 @@ namespace scopy {
 class PlotAxis;
 class PlotAxisHandle;
 
+
+typedef struct _PlotSamplingInfo{
+	_PlotSamplingInfo() { startingPoint = 0;}
+	uint32_t bufferSize;
+	uint32_t plotSize;
+	double sampleRate;
+	double startingPoint;
+} PlotSamplingInfo;
+
 class SCOPY_GUI_EXPORT PlotWidget : public QWidget {
 	Q_OBJECT
 public:
@@ -54,7 +63,7 @@ public:
 	bool showYAxisLabels() const;
 	void setShowYAxisLabels(bool newShowYAxisLabels);
 
-	void addBufferPreviewerSlot(QWidget *w);
+	void addPlotInfoSlot(QWidget *w);
 public Q_SLOTS:
 	void replot();
 	void selectChannel(PlotChannel*);	
