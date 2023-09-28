@@ -112,7 +112,7 @@ private:
 	void setRawSamplesPtr();
 	void updateXAxis();
 	void updateFrameRate();
-	void setShowPlotTags();
+	void drawTags();
 };
 }
 }

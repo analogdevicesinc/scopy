@@ -76,7 +76,8 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	for (int i = 0; i < m_nconnections;i++) {
 		m_buffers.push_back(std::deque<float>());
 		m_data.push_back(std::vector<float>());
-		m_tags.push_back(std::vector<tag_t>());
+		m_localtags.push_back(std::vector<tag_t>());
+		m_tags.push_back(std::deque<tag_t>());
 		m_dataTags.push_back(std::vector<PlotTag_t>());
 		// each data buffer reserves size
 		m_data[i].reserve(size);
@@ -84,8 +85,6 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 
 	m_time.reserve(size+1);
 	generate_time_axis();
-
-	m_tags = std::vector< std::vector<gr::tag_t> >(m_nconnections);
 }
 
 time_sink_f_impl::~time_sink_f_impl() {
@@ -105,20 +104,28 @@ void time_sink_f_impl::updateData() {
 
 	for(int i = 0; i < m_nconnections; i++) {
 		m_data[i].clear();
+		m_dataTags[i].clear();
 		for(int j = 0; j < m_buffers[i].size(); j++) {
 			m_data[i].push_back(m_buffers[i][j]);
 		}
+
+		if(!m_computeTags)
+			continue;
+
 		for(int j = 0 ;j < m_tags[i].size(); j++) {
 			PlotTag_t tag;
 
 			std::stringstream s;
 			s << m_tags[i][j].key << ": " << m_tags[i][j].value;
 			tag.str = QString::fromStdString(s.str());
-			tag.offset = m_tags[i][j].offset;
+			qInfo()<<"nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;;
+			tag.offset = nitems_read(i) - m_tags[i][j].offset;
 
 			m_dataTags[i].push_back(tag);
 		}
 	}
+
+//	nitems_read();
 	if(m_workFinished) {
 		m_dataUpdated = true;
 	}
@@ -194,7 +201,7 @@ int time_sink_f_impl::work(int noutput_items,
 	for(int i = 0; i < m_nconnections; i++) {
 			if(m_buffers[i].size() >= m_size) {
 				m_buffers[i].clear();
-				m_tags[i].clear();
+//				m_tags[i].clear();
 			}
 		}
 	}
@@ -209,11 +216,35 @@ int time_sink_f_impl::work(int noutput_items,
 			in = (const float*)input_items[i];
 			m_buffers[i].push_front(in[j]);
 		}
-		get_tags_in_window(m_tags[i],i,0,noutput_items);
-	}
 
+		if(m_computeTags)
+		{
+			m_localtags[i].clear();
+			get_tags_in_window(m_localtags[i],i,0,noutput_items);
+			m_tags[i].insert(m_tags[i].end(), m_localtags[i].begin(), m_localtags[i].end());
+			while(m_size < nitems_read(i) - m_tags[i].front().offset) {
+				m_tags[i].pop_front();
+			}
+
+		}
+	}
 
 	return noutput_items;
 
+}
+
+bool time_sink_f_impl::computeTags()
+{
+	return m_computeTags;
+}
+
+void time_sink_f_impl::setComputeTags(bool newComputeTags)
+{
+	m_computeTags = newComputeTags;
+//	for(int i = 0; i < m_nconnections; i++) {
+//		m_dataTags[i].clear();
+//		m_tags[i].clear();
+//		m_localtags[i].clear();
+//	}
 }
 } /* namespace gr */
