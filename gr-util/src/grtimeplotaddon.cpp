@@ -113,18 +113,17 @@ void GRTimePlotAddon::startPlotRefresh() {
 	m_plotTimer->start();
 }
 
-void GRTimePlotAddon::setShowPlotTags() {
+void GRTimePlotAddon::drawTags() {
+
 	for(GRTimeChannelAddon* gr : qAsConst(grChannels)) {
-		if(gr->signalPath()->enabled()) {
-			gr->plotCh()->clearMarkers();
-		}
+		gr->plotCh()->clearMarkers();
 	}
 
 	if(!m_showPlotTags)
 		return;
 
 	for(GRTimeChannelAddon* gr : qAsConst(grChannels)) {
-		if(gr->signalPath()->enabled()) {
+			if(gr->signalPath()->enabled()) {
 
 			int index = time_channel_map.value(gr->signalPath()->name(),-1);
 			if(index == -1)
@@ -138,13 +137,14 @@ void GRTimePlotAddon::setShowPlotTags() {
 
 		}
 	}
-
 }
 
 void GRTimePlotAddon::drawPlot() {
 //	qInfo(CAT_GRTIMEPLOT)<<"Draw plot";
+	if(!time_sink)
+		return;
 	setRawSamplesPtr();
-	setShowPlotTags();
+	drawTags();
 	plot()->replot();
 	if(time_sink->finishedAcquisition())
 		Q_EMIT requestStop();
@@ -194,8 +194,8 @@ void GRTimePlotAddon::onStart() {
 				time_sink->data()[index].size());
 
 			} else {
-			gr->plotCh()->curve()->setRawSamples(
-				time_sink->time().data(), 0, 0); // assign no data curve
+//			gr->plotCh()->curve()->setRawSamples(
+//				{}); // assign no data curve
 			}
 		 }
 	 }
@@ -285,6 +285,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 	time_sink = time_sink_f::make(m_currentSamplingInfo.plotSize, m_currentSamplingInfo.sampleRate, name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_rollingMode);
 	time_sink->setSingleShot(m_singleShot);
+	time_sink->setComputeTags(m_showPlotTags);
 	updateXAxis();
 
 	int i=0;
@@ -349,6 +350,9 @@ void GRTimePlotAddon::setRollingMode(bool b)
 void GRTimePlotAddon::setDrawPlotTags(bool b)
 {
 	m_showPlotTags = b;
+	if(time_sink) {
+		time_sink->setComputeTags(m_showPlotTags);
+	}
 	drawPlot();
 }
 

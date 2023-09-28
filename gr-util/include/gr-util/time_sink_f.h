@@ -75,6 +75,8 @@ public:
 	virtual void setSingleShot(bool) = 0;
 	virtual bool singleShot() = 0;
 	virtual bool finishedAcquisition() = 0;
+	virtual bool computeTags() = 0;
+	virtual void setComputeTags(bool newComputeTags) = 0;
 
 };
 
