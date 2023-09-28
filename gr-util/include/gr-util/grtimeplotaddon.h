@@ -1,6 +1,7 @@
 #ifndef GRTIMEPLOTADDON_H
 #define GRTIMEPLOTADDON_H
 
+#include "plotinfo.h"
 #include "scopy-gr-util_export.h"
 #include "tooladdon.h"
 #include <gui/oscilloscope_plot.hpp>
@@ -86,9 +87,7 @@ private:
 	GRTopBlock *m_top;
 	PlotWidget *m_plotWidget;
 	PlotCursors *m_cursors;
-	TimePlotHDivInfo *m_hdivinfo;
-	TimePlotSamplingInfo *m_samplinginfo;
-	AnalogBufferPreviewer* m_bufferPreviewer;
+	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
 	QList<GRTimeChannelAddon*> grChannels;
 	QVBoxLayout* m_lay;
@@ -99,18 +98,14 @@ private:
 	QMetaObject::Connection futureWatcherConn;
 	std::mutex refillMutex;
 
-	uint32_t m_bufferSize;
-	uint32_t m_plotSize;
-	double m_sampleRate;
+
+	PlotSamplingInfo m_currentSamplingInfo;
 	bool m_started;
 	bool m_rollingMode;
 	bool m_singleShot;
 	bool m_showPlotTags;
 	bool m_refreshTimerRunning;
 	int m_xmode;
-
-	double m_bufferPrevInitMin;
-	double m_bufferPrevInitMax;
 
 	QMap<QString,int> time_channel_map;
 
