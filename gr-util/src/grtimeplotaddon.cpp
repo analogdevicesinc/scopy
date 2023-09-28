@@ -49,29 +49,13 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_plotWidget->xAxis()->setVisible(true);
 //	m_plotWidget->topHandlesArea()->setVisible(true);
 
-	HoverWidget *hdivhover = new HoverWidget(nullptr, m_plotWidget->plot()->canvas(), m_plotWidget->plot());
-	m_hdivinfo = new TimePlotHDivInfo();
-	hdivhover->setContent(m_hdivinfo);
-	hdivhover->setAnchorPos(HoverPosition::HP_TOPLEFT);
-	hdivhover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-	hdivhover->setAnchorOffset(QPoint(8,6));
-	hdivhover->show();
-	hdivhover->raise();
-	hdivhover->setAttribute(Qt::WA_TransparentForMouseEvents);
 
-	HoverWidget *samplinginfohover = new HoverWidget(nullptr, m_plotWidget->plot()->canvas(), m_plotWidget->plot());
-	m_samplinginfo = new TimePlotSamplingInfo();
-	samplinginfohover->setContent(m_samplinginfo);
-	samplinginfohover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
-	samplinginfohover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	samplinginfohover->setAnchorOffset(QPoint(-8,6));
-	samplinginfohover->show();
-	samplinginfohover->raise();
-	samplinginfohover->setAttribute(Qt::WA_TransparentForMouseEvents);
-
-	setupBufferPreviewer();
 	m_cursors = new PlotCursors(m_plotWidget);
 	m_cursors->setVisible(false);
+
+	m_info = new TimePlotInfo(m_plotWidget, widget);
+	m_plotWidget->addPlotInfoSlot(m_info);
+
 	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);
 	m_plotTimer->setSingleShot(true);
@@ -84,75 +68,6 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 			if(m_refreshTimerRunning)
 				m_plotTimer->start();
 		}, Qt::QueuedConnection);
-}
-
-void GRTimePlotAddon::setupBufferPreviewer() {
-	m_bufferPreviewer = new AnalogBufferPreviewer(widget);
-	m_bufferPreviewer->setMinimumHeight(20);
-	m_bufferPreviewer->setCursorPos(0.5);
-	m_bufferPreviewer->setHighlightPos(0.05);
-	m_bufferPreviewer->setHighlightWidth(0.2);
-	m_bufferPreviewer->setCursorVisible(false);
-	m_bufferPreviewer->setWaveformPos(0.1);
-	m_bufferPreviewer->setWaveformWidth(0.5);
-
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {
-	});
-
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [=]() {
-		m_bufferPrevInitMin = plot()->xAxis()->min();
-		m_bufferPrevInitMax = plot()->xAxis()->max();
-	});
-
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, this, [=](int value) {
-		qInfo()<<value;
-		double moveTo = 0.0;
-
-		int width = m_bufferPreviewer->width();
-		double xAxisWidth = m_plotSize;
-
-		moveTo = value * xAxisWidth / width;
-		plot()->xAxis()->setInterval(m_bufferPrevInitMin + moveTo,  m_bufferPrevInitMax + moveTo);
-		plot()->replot();
-
-		updateBufferPreviewer();
-	} );
-
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
-		plot()->xAxis()->setInterval(0,  m_plotSize);
-		plot()->replot();
-
-		updateBufferPreviewer();
-	} );
-
-	plot()->addBufferPreviewerSlot(m_bufferPreviewer);
-//	m_lay->addWidget(m_bufferPreviewer);
-	m_bufferPreviewer->setVisible(Preferences::get("adc_plot_show_buffer_previewer").toBool());
-}
-
-void GRTimePlotAddon::updateBufferPreviewer() {
-	// Time interval within the plot canvas
-	QwtInterval plotInterval(plot()->xAxis()->min(), plot()->xAxis()->max());
-
-	// Time interval that represents the captured data
-	QwtInterval dataInterval(0.0, m_plotSize);
-
-	// Use the two intervals to determine the width and position of the
-	// waveform and of the highlighted area
-	QwtInterval fullInterval = plotInterval | dataInterval;
-	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
-			      fullInterval.width();
-	double wWidth = dataInterval.width() / fullInterval.width();
-
-	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
-			      fullInterval.width();
-	double hWidth = plotInterval.width() / fullInterval.width();
-
-
-	m_bufferPreviewer->setWaveformWidth(wWidth);
-	m_bufferPreviewer->setWaveformPos(wPos);
-	m_bufferPreviewer->setHighlightWidth(hWidth);
-	m_bufferPreviewer->setHighlightPos(hPos);
 }
 
 void GRTimePlotAddon::showCursors(bool b)
@@ -305,11 +220,15 @@ void GRTimePlotAddon::onStart() {
 #endif
  }
 
+ void GRTimePlotAddon::updateBufferPreviewer() {
+	 m_info->updateBufferPreviewer();
+ }
+
  void GRTimePlotAddon::onInit() {
 	 qDebug(CAT_GRTIMEPLOT)<<"Init";
-	 m_sampleRate = 1;
-	 m_bufferSize = 32;
-	 m_plotSize = 32;
+	 m_currentSamplingInfo.sampleRate = 1;
+	 m_currentSamplingInfo.bufferSize = 32;
+	 m_currentSamplingInfo.plotSize = 32;
 	 updateBufferPreviewer();
 //	 m_top->build();
  }
@@ -363,8 +282,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 
 	}
 
-	m_samplinginfo->update(m_plotSize, m_bufferSize, m_sampleRate);
-	time_sink = time_sink_f::make(m_plotSize, m_sampleRate, name.toStdString(), sigpaths.count());
+	time_sink = time_sink_f::make(m_currentSamplingInfo.plotSize, m_currentSamplingInfo.sampleRate, name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_rollingMode);
 	time_sink->setSingleShot(m_singleShot);
 	updateXAxis();
@@ -376,7 +294,7 @@ void GRTimePlotAddon::connectSignalPaths() {
 		if(gr->signalPath()->enabled()) {
 			m_top->connect(gr->signalPath()->getGrEndPoint(), 0, time_sink, i);
 			time_channel_map.insert(gr->signalPath()->name(),i);
-			if(m_plotSize >= 1000000) {
+			if(m_currentSamplingInfo.plotSize >= 1000000) {
 				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::ClipPolygons);
 				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::ImageBuffer);
 				gr->plotCh()->curve()->setPaintAttribute(QwtPlotCurve::FilterPoints);
@@ -413,7 +331,8 @@ void GRTimePlotAddon::updateXAxis() {
 	auto min = x->min();
 	auto divs = x->divs();
 	double hdiv = abs(max - min) / divs;
-	m_hdivinfo->update(hdiv);
+
+	m_info->update(m_currentSamplingInfo);
 	Q_EMIT xAxisUpdated();
 }
 
@@ -434,23 +353,23 @@ void GRTimePlotAddon::setDrawPlotTags(bool b)
 }
 
 double GRTimePlotAddon::sampleRate() {
-	return m_sampleRate;
+	return m_currentSamplingInfo.sampleRate;
 }
 
 void GRTimePlotAddon::setSampleRate(double val) {
-	m_sampleRate = val;
+	m_currentSamplingInfo.sampleRate = val;
 }
 
 void GRTimePlotAddon::setBufferSize(uint32_t size)
 {
-	m_bufferSize = size;
+	m_currentSamplingInfo.bufferSize = size;
 //	std::unique_lock lock(refillMutex);
 	Q_EMIT requestRebuild();
 }
 
 void GRTimePlotAddon::setPlotSize(uint32_t size)
 {
-	m_plotSize = size;
+	m_currentSamplingInfo.plotSize = size;
 //	std::unique_lock lock(refillMutex);
 	Q_EMIT requestRebuild();
 }
@@ -459,8 +378,6 @@ void GRTimePlotAddon::handlePreferences(QString key, QVariant v)
 {
 	if(key == "general_plot_target_fps") {
 		updateFrameRate();
-	} else if(key == "adc_plot_show_buffer_previewer") {
-		m_bufferPreviewer->setVisible(v.toBool());
 	}
 }
 

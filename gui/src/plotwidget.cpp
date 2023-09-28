@@ -110,7 +110,7 @@ void PlotWidget::setupHandlesArea() {
 	m_layout->addWidget(m_plot,2,1);
 }
 
-void PlotWidget::addBufferPreviewerSlot(QWidget *w) {
+void PlotWidget::addPlotInfoSlot(QWidget *w) {
 	m_layout->addWidget(w,0,1);
 }
 
