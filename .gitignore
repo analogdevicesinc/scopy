@@ -9,6 +9,7 @@ ui_*.h
 build*
 deps
 scopy
+iio-emu
 android/assets/libsigrokdecode/*
 android/assets/python3.*/*
 resources/scopy_osp.html
