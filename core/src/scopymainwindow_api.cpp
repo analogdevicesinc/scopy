@@ -21,6 +21,10 @@ void ScopyMainWindow_API::acceptLicense()
 	if (m_w->license) {
 		Q_EMIT m_w->license->getContinueBtn()->clicked();
 	}
+
+	if (m_w->checkUpdate) {
+		Q_EMIT m_w->checkUpdate->getExitBtn()->clicked();
+	}
 }
 
 QString ScopyMainWindow_API::addDevice(QString cat, QString uri)

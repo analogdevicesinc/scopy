@@ -23,9 +23,12 @@
 #include "iioutil/contextprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
+#include "popupwidget.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
+#include <functional>
+#include <utility>
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
 
@@ -50,13 +53,9 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	ContextProvider::GetInstance();
 	MessageBroker::GetInstance();
 
-	//	auto vc = VersionCache::GetInstance();
-	//	if(vc->cacheOutdated()) {
-	//		vc->updateCache();
-	//		connect(vc,&VersionCache::cacheUpdated,this,[=](){
-	//			qInfo()<<vc->cache();
-	//		});
-	//	}
+	// get the version document
+	auto vc = VersionChecker::GetInstance(); // get VersionCache instance
+	vc->subscribe(this, &ScopyMainWindow::receiveVersionDocument); // 'subscribe' to receive the version QJsonDocument
 
 	auto tb = ui->wToolBrowser;
 	auto ts = ui->wsToolStack;
@@ -249,6 +248,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_additional_plugin_path", "");
 	p->init("general_load_decoders", true);
 	p->init("general_doubleclick_ctrl_opens_menu", true);
+	p->init("general_check_online_version", false);
 
 	connect(p, SIGNAL(preferenceChanged(QString,QVariant)), this, SLOT(handlePreferences(QString,QVariant)));
 
@@ -260,6 +260,9 @@ void ScopyMainWindow::initPreferences()
 	}
 	if (p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
+		checkUpdate = new VersionCheckOverlay(this);
+
+		QMetaObject::invokeMethod(checkUpdate, &VersionCheckOverlay::showOverlay, Qt::QueuedConnection);
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();
@@ -416,6 +419,10 @@ void ScopyMainWindow::removeDeviceFromUi(QString id)
 {
 	toolman->removeToolList(id);
 	hp->removeDevice(id);
+}
+
+void ScopyMainWindow::receiveVersionDocument(QJsonDocument document) {
+	qInfo(CAT_SCOPY) << "The upstream scopy version is" << document << "and the current one is" << SCOPY_VERSION;
 }
 
 
