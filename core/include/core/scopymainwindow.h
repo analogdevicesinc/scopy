@@ -14,8 +14,10 @@
 #include "scopyaboutpage.h"
 #include "scopypreferencespage.h"
 #include "pluginbase/preferences.h"
+#include "pluginbase/versionchecker.h"
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iioscantask.h"
+#include "versioncheckoverlay.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ScopyMainWindow; }
@@ -38,6 +40,7 @@ public:
 
 public Q_SLOTS:
 	void requestTools(QString id);
+	void receiveVersionDocument(QJsonDocument document);
 	void addDeviceToUi(QString id, Device *d);
 	void removeDeviceFromUi(QString);
 	void save();
@@ -61,6 +64,7 @@ private:
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;
+	VersionCheckOverlay *checkUpdate = nullptr;
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;
 
