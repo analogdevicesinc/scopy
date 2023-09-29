@@ -14,8 +14,8 @@ environment:
           ARCH_BIT: 64
           APPVEYOR_BUILD_WORKER_IMAGE: Ubuntu2004
           PKG_MANAGER_UPDATE_CMD: "sudo apt-get -y update"
-          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_20_deps.sh /home/appveyor/Qt/5.14.2"
-          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.14.2"
+          BUILD_DEPS_CMD: "/home/appveyor/projects/scopy/CI/appveyor/install_ubuntu_20_deps.sh /home/appveyor/Qt/5.15.2"
+          BUILD_CMD: "/home/appveyor/projects/scopy/CI/appveyor/build_appveyor_ubuntu.sh /home/appveyor/Qt/5.15.2"
           PACKAGE_CMD: ""
           DEPLOY_FILE: ""
 
