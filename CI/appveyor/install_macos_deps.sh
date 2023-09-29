@@ -13,8 +13,8 @@ LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
 
 PYTHON="python3"
-PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
-PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr"
+PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog"
+PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libsndfile"
 
 REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 WORKDIR=${PWD}
@@ -199,7 +199,6 @@ build_libsigrokdecode() {
 	CURRENT_BUILD=libsigrokdecode
 	save_version_info
 
-	patch -p1 < $REPO_SRC/CI/appveyor/patches/libsigrokdecode_macOS.patch
 	./autogen.sh
 	./configure --prefix=$STAGINGDIR
 
