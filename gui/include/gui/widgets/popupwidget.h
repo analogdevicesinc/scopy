@@ -23,9 +23,11 @@
 #define SCOPY_POPUPWIDGET_H
 
 #include <QWidget>
+#include <QLabel>
+#include <QPushButton>
+#include <QTextBrowser>
+#include "tintedoverlay.h"
 #include "scopy-gui_export.h"
-
-namespace Ui { class PopupWidget; }
 
 namespace scopy {
 class SCOPY_GUI_EXPORT PopupWidget : public QWidget {
@@ -34,10 +36,13 @@ public:
 	explicit PopupWidget(QWidget* parent = nullptr);
 	~PopupWidget();
 
+	void initUI();
+
 	void setFocusOnContinueButton();
 	void setFocusOnExitButton();
 
 	void enableTitleBar(bool enable = true);
+	void enableTintedOverlay(bool enable = true);
 
 	QString getDescription();
 	void setDescription(const QString& description);
@@ -45,18 +50,20 @@ public:
 	QString getTitle();
 	void setTitle(const QString& title);
 
-	QString getContinueButtonText();
-	void setContinueButtonText(const QString& text);
-
-	QString getExitButtonText();
-	void setExitButtonText(const QString& text);
+	QPushButton* getExitBtn();
+	QPushButton* getContinueBtn();
 
 Q_SIGNALS:
 	void continueButtonClicked();
 	void exitButtonClicked();
 
 protected:
-	Ui::PopupWidget *ui;
+	gui::TintedOverlay *m_tintedOverlay;
+
+	QLabel *m_titleLabel;
+	QTextBrowser *m_descriptionTextBrowser;
+	QPushButton *m_exitButton;
+	QPushButton *m_continueButton;
 };
 }
 

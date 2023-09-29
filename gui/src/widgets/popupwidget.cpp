@@ -21,79 +21,122 @@
 
 #include "widgets/popupwidget.h"
 #include "stylehelper.h"
-#include "ui_popupwidget.h"
 
 using namespace scopy;
 
 PopupWidget::PopupWidget(QWidget* parent) :
-	ui(new Ui::PopupWidget),
+	m_tintedOverlay(nullptr),
 	QWidget(parent)
 {
-	ui->setupUi(this);
+	this->initUI();
 
-	StyleHelper::TutorialChapterTitleLabel(ui->titleLabel, "titleLabel");
-	StyleHelper::BlueButton(ui->continueButton, "continueButton");
-	StyleHelper::BlueButton(ui->exitButton, "exitButton");
-	StyleHelper::OverlayMenu(this, "popupOverlay");
+	QObject::connect(m_continueButton, &QPushButton::clicked, this, &PopupWidget::continueButtonClicked);
+	QObject::connect(m_exitButton, &QPushButton::clicked, this, &PopupWidget::exitButtonClicked);
 
-	QObject::connect(ui->continueButton, &QPushButton::clicked, this, &PopupWidget::continueButtonClicked);
-	QObject::connect(ui->exitButton, &QPushButton::clicked, this, &PopupWidget::exitButtonClicked);
-
-	ui->continueButton->setFocus();
+	m_continueButton->setFocus();
 }
 
 PopupWidget::~PopupWidget() {
-	delete ui;
+	delete m_tintedOverlay;
+}
+
+void PopupWidget::initUI() {
+	this->setObjectName("PopupWidget");
+	this->setStyleSheet("");
+	this->resize(500, 300);
+	auto verticalLayout = new QVBoxLayout(this);
+	this->setLayout(verticalLayout);
+
+	auto backgroundWidget = new QWidget(this);
+	auto backgroundLayout = new QVBoxLayout(backgroundWidget);
+	verticalLayout->addWidget(backgroundWidget);
+
+	m_titleLabel = new QLabel(backgroundWidget);
+	m_titleLabel->setObjectName("titleLabel");
+
+	m_descriptionTextBrowser = new QTextBrowser(backgroundWidget);
+	m_descriptionTextBrowser->setObjectName("descriptionTextBrowser");
+
+	auto buttonGroup = new QWidget(backgroundWidget);
+	auto buttonGroupLayout = new QHBoxLayout(buttonGroup);
+	buttonGroupLayout->setContentsMargins(0, 0, 0, 0);
+	buttonGroupLayout->setSpacing(10);
+
+	m_continueButton = new QPushButton("Continue", buttonGroup);
+	m_continueButton->setObjectName("continueButton");
+
+	m_exitButton = new QPushButton("Exit", buttonGroup);
+	m_exitButton->setObjectName("exitButton");
+
+	buttonGroupLayout->addWidget(m_exitButton);
+	buttonGroupLayout->addWidget(m_continueButton);
+
+	backgroundLayout->addWidget(m_titleLabel);
+	backgroundLayout->addWidget(m_descriptionTextBrowser);
+	backgroundLayout->addWidget(buttonGroup);
+
+	backgroundWidget->setLayout(backgroundLayout);
+
+	StyleHelper::TutorialChapterTitleLabel(m_titleLabel, "titleLabel");
+	StyleHelper::BlueButton(m_continueButton, "continueButton");
+	StyleHelper::BlueButton(m_exitButton, "exitButton");
+	StyleHelper::OverlayMenu(this, "popupOverlay");
 }
 
 void PopupWidget::setFocusOnContinueButton() {
-	ui->continueButton->setAutoDefault(true);
-	ui->continueButton->setFocus();
+	m_continueButton->setAutoDefault(true);
+	m_continueButton->setFocus();
 }
 
 void PopupWidget::setFocusOnExitButton() {
-	ui->exitButton->setAutoDefault(true);
-	ui->exitButton->setFocus();
+	m_exitButton->setAutoDefault(true);
+	m_exitButton->setFocus();
 }
 
 QString PopupWidget::getDescription() {
-	return ui->descriptionTextBrowser->toMarkdown();
+	return m_descriptionTextBrowser->toMarkdown();
 }
 
 void PopupWidget::setDescription(const QString& description) {
-	ui->descriptionTextBrowser->setMarkdown(description);
+	m_descriptionTextBrowser->setMarkdown(description);
 }
 
 QString PopupWidget::getTitle() {
-	return ui->titleLabel->text();
+	return m_titleLabel->text();
 }
 
 void PopupWidget::setTitle(const QString &title) {
-	ui->titleLabel->setText(title);
+	m_titleLabel->setText(title);
 }
 
 void PopupWidget::enableTitleBar(bool enable) {
 	if (enable) {
-		ui->titleLabel->show();
+		m_titleLabel->show();
 	} else {
-		ui->titleLabel->hide();
+		m_titleLabel->hide();
 	}
 }
 
-QString PopupWidget::getContinueButtonText() {
-	return ui->continueButton->text();
+QPushButton *PopupWidget::getExitBtn() {
+	return m_exitButton;
 }
 
-void PopupWidget::setContinueButtonText(const QString& text) {
-	ui->continueButton->setText(text);
+QPushButton *PopupWidget::getContinueBtn() {
+	return m_continueButton;
 }
 
-QString PopupWidget::getExitButtonText() {
-	return ui->exitButton->text();
-}
+void PopupWidget::enableTintedOverlay(bool enable) {
+	if (enable) {
+		delete m_tintedOverlay;
 
-void PopupWidget::setExitButtonText(const QString& text) {
-	ui->exitButton->setText(text);
+		m_tintedOverlay = new gui::TintedOverlay(parentWidget());
+		m_tintedOverlay->show();
+		raise();
+		show();
+	} else {
+		delete m_tintedOverlay;
+		m_tintedOverlay = nullptr;
+	}
 }
 
 #include "moc_popupwidget.cpp"
