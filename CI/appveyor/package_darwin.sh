@@ -103,10 +103,11 @@ sudo install_name_tool -change ${tinyrpath} @executable_path/../Frameworks/${tin
 ## Bundle the Qt libraries
 sudo macdeployqt Scopy.app
 
-curl -o /tmp/macdeployqtfix.py https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
-sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ${QT_PATH}
-sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/iio-emu ${QT_PATH}
-sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ./Scopy.app/Contents/Frameworks/
+# curl -o /tmp/macdeployqtfix.py https://raw.githubusercontent.com/aurelien-rainone/macdeployqtfix/master/macdeployqtfix.py
+# sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ${QT_PATH}
+# sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/iio-emu ${QT_PATH}
+# sudo python /tmp/macdeployqtfix.py ./Scopy.app/Contents/MacOS/Scopy ./Scopy.app/Contents/Frameworks/
 
+zip -Xvr ScopyApp.zip Scopy.app # create a zip with the app in case macdeployqt fails
 sudo macdeployqt Scopy.app -dmg
 
