@@ -6,7 +6,7 @@
 #include <QNetworkReply>
 #include <QLoggingCategory>
 #include <QNetworkRequest>
-#include <pluginbase/preferences.h>
+#include <preferences.h>
 #include <common/scopyconfig.h>
 
 #include <QtConcurrent>

@@ -14,7 +14,7 @@
 #include "scopyaboutpage.h"
 #include "scopypreferencespage.h"
 #include "pluginbase/preferences.h"
-#include "versionchecker.h"
+#include "pluginbase/versionchecker.h"
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iioscantask.h"
 #include "versioncheckoverlay.h"

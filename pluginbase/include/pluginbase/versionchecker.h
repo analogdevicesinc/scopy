@@ -7,10 +7,10 @@
 #include <functional>
 #include <mutex>
 #include <QThread>
-#include "scopy-core_export.h"
+#include "scopy-pluginbase_export.h"
 
 namespace scopy {
-class SCOPY_CORE_EXPORT VersionChecker : public QObject
+class SCOPY_PLUGINBASE_EXPORT VersionChecker : public QObject
 {
 	Q_OBJECT
 
