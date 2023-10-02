@@ -9,15 +9,10 @@ Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	: QWidget(parent), m_parent(parent), m_anchor(anchor), m_content(content),
 	m_anchorPos(HP_TOPLEFT), m_contentPos(HP_TOPRIGHT), is_dragging(false), m_draggable(false) {
-	m_container = new QWidget(this);
 	StyleHelper::TransparentWidget(this, "hoverWidget");
-	StyleHelper::TransparentWidget(m_container, "hoverWidgetContainer");
-
-	m_lay = new QHBoxLayout(m_container);
-	m_lay->setMargin(0);
+	m_lay = new QHBoxLayout(this);
 	m_lay->setContentsMargins(0, 0, 0, 0);
-	m_lay->setSizeConstraint(QBoxLayout::SetMinimumSize);
-	m_container->setLayout(m_lay);
+	setLayout(m_lay);
 	m_lay->addWidget(content);
 
 	if (m_content) {
@@ -36,14 +31,14 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 void HoverWidget::setDraggable(bool draggable)
 {
 	m_draggable = draggable;
-	StyleHelper::HoverWidget(m_container, m_draggable);
+	StyleHelper::HoverWidget(this, m_draggable);
 }
 
 void HoverWidget::mousePressEvent(QMouseEvent *event)
 {
 	raise();
 	if (event->button() == Qt::LeftButton &&
-			m_container->geometry().contains(event->pos()) &&
+			m_content->geometry().contains(event->pos()) &&
 			m_draggable) {
 		is_dragging = true;
 		mouse_pos = event->pos();
@@ -62,10 +57,11 @@ void HoverWidget::mouseReleaseEvent(QMouseEvent *event)
 void HoverWidget::mouseMoveEvent(QMouseEvent *event)
 {
 	QPoint new_pos = event->pos() - mouse_pos;
-	QPoint container_bottomLeft = mapToParent(m_container->geometry().bottomLeft() + new_pos);
-	QPoint container_topRight = mapToParent(m_container->geometry().topRight() + new_pos);
+	QRect content_rect = QRect(
+				mapToParent(m_content->geometry().bottomLeft() + new_pos),
+				mapToParent(m_content->geometry().topRight() + new_pos));
 
-	if (is_dragging && m_parent->geometry().contains(QRect(container_bottomLeft, container_topRight))) {
+	if (is_dragging && m_parent->geometry().contains(content_rect)) {
 		move(mapToParent(new_pos));
 	}
 }
@@ -79,9 +75,8 @@ void HoverWidget::setContent(QWidget *content)
 	}
 
 	m_content = content;
-	m_content->setParent(m_container);
+	m_content->setParent(this);
 	m_lay->addWidget(m_content);
-	m_container->resize(m_content->size());
 	resize(m_content->size());
 
 	m_content->installEventFilter(this);
@@ -121,21 +116,25 @@ HoverWidget::~HoverWidget()
 bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 {
 	if(watched == m_content) {
-		if(event->type() == QEvent::Resize) {
-			m_container->resize(m_content->size());
+		if (event->type() == QEvent::Resize) {
 			resize(m_content->size());
 		}
 
 		if (event->type() == QEvent::HoverMove) {
 			QMouseEvent* e = static_cast<QMouseEvent*>(event);
-			if (m_container->geometry().contains(e->pos()) && m_draggable)
+			if (m_content->geometry().contains(e->pos()) && m_draggable)
 				m_content->setCursor(Qt::ClosedHandCursor);
 			else
 				m_content->setCursor(Qt::ArrowCursor);
 		}
 	}
 	if(watched == m_anchor || watched == m_parent || watched == m_content) {
-		if((event->type() == QEvent::Move || event->type() == QEvent::Resize) && !m_draggable) {
+		QRect content_rect = QRect(
+					mapToParent(m_content->geometry().bottomLeft()),
+					mapToParent(m_content->geometry().topRight()));
+
+		if((event->type() == QEvent::Move || event->type() == QEvent::Resize) &&
+				(!m_draggable || !m_parent->geometry().contains(content_rect))) {
 			moveToAnchor();
 		}
 	}
