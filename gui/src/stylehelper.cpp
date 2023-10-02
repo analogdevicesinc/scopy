@@ -1,6 +1,5 @@
 #include "stylehelper.h"
 #include <QApplication>
-#include "qstackedlayout.h"
 #include "ui_spinbox_a.h"
 
 #include <dynamicWidget.h>
@@ -846,7 +845,7 @@ void StyleHelper::BackgroundWidget(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty()) w->setObjectName(objectName);
 	QString style = QString(R"css(
-		.QWidget {
+		QWidget {
 			background-color: &&UIElementBackground&&;
 		}
 		)css");
@@ -977,22 +976,20 @@ void StyleHelper::FrameBackgroundShadow(QFrame *w, QString objectName) {
 
 void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName) {
 	if(!objectName.isEmpty()) w->setObjectName(objectName);
-	w->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+	w->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QString style;
 
 	if (draggable) {
 		style = QString(R"css(
-				background-color: rgba(255,255,255,0);
-				.QWidget:hover {
+				.QWidget {
+					background-color: transparent;
+					border-radius: 4px;
+				}
+				QWidget:hover {
 					background-color: &&UIElementBackground&&;
 					border-radius: 4px;
-				})css");
-	} else {
-		style = QString(R"css(
-				background-color: rgba(255,255,255,0);
-				.QWidget:hover {
-					background-color: transparent;
-				})css");
+				}
+				)css");
 	}
 	style.replace("&&UIElementBackground&&",StyleHelper::getColor("UIElementBackground"));
 	w->setStyleSheet(style);
