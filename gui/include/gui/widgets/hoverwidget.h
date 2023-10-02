@@ -46,7 +46,6 @@ private:
 	QWidget* m_parent;
 	QWidget* m_anchor;
 	QWidget* m_content;
-	QWidget* m_container;
 	QPoint m_anchorOffset;
 	HoverPosition m_anchorPos;
 	HoverPosition m_contentPos;
