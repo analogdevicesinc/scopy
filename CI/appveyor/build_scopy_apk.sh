@@ -1,9 +1,7 @@
 #!/bin/bash
 set -xe
-source ./android_toolchain.sh $1 $2
-
+source ./android_toolchain.sh
 ARTIFACT_LOCATION=$GITHUB_WORKSPACE
-
 
 clone_scopy() {
 	git clone $REPO_URL
@@ -15,7 +13,6 @@ clone_scopy() {
 	popd
 }
 
-
 #cp libs
 cp_scripts() {
 	pushd scopy
@@ -26,7 +23,6 @@ cp_scripts() {
 }
 
 make_apk_aab() {
-	source ./android_toolchain.sh arm
 	pushd scopy
 	rm -rf build*
 
@@ -38,24 +34,10 @@ make_apk_aab() {
 	./android_deploy_libs.sh
 	./android_deploy_qt.sh apk
 
-	pushd ../
-	source ./android_toolchain.sh aarch64
-	popd
-
-	./android_cmake.sh .
-	cd $BUILDDIR
-	make -j$JOBS iio-emu
-	make -j$JOBS scopy
-	cd ..
-	./android_deploy_libs.sh
-	./android_deploy_qt.sh apk #sign
-
 	./android_deploy_qt.sh aab #sign
 	./android_get_symbols.sh
 	popd
 }
-
-
 
 move_artifact() {
 	pushd scopy
