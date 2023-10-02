@@ -6,6 +6,7 @@
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/hoverwidget.h>
 #include "gui/widgets/measurementsettings.h"
+#include <cursorcontroller.h>
 
 using namespace scopy;
 using namespace scopy::grutil;
@@ -44,9 +45,27 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	channelsBtn = new MenuControlButton(this);
 	setupChannelsButtonHelper(channelsBtn);
 
+	plotAddon = dynamic_cast<GRTimePlotAddon*>(proxy->getPlotAddon());
+	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
+
+	plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings*>(proxy->getPlotSettings());
+	rightMenuBtnGrp->addButton(settingsBtn);
+
+	QString settingsMenuId = plotAddonSettings->getName() + QString(uuid++);
+	tool->rightStack()->add(settingsMenuId, plotAddonSettings->getWidget());
+	connect(settingsBtn, &QPushButton::toggled, this, [=](bool b) {
+		if(b)
+			tool->requestMenu(settingsMenuId);
+	});
 
 	MenuControlButton *cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(cursor);
+
+	CursorController *cursorController = new CursorController(plotAddon->plot(), this);
+	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
+	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
+	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
+	hoverSettings->setAnchorOffset(QPoint(0, -10));
 
 	MenuControlButton *measure = new MenuControlButton(this);
 	setupMeasureButtonHelper(measure);
@@ -86,19 +105,6 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
 
 	connect(channelsBtn, &QPushButton::toggled, dynamic_cast<MenuHAnim*>(tool->leftContainer()), &MenuHAnim::toggleMenu);
-
-	plotAddon = dynamic_cast<GRTimePlotAddon*>(proxy->getPlotAddon());
-	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
-
-	plotAddonSettings = dynamic_cast<GRTimePlotAddonSettings*>(proxy->getPlotSettings());
-	rightMenuBtnGrp->addButton(settingsBtn);
-
-	QString settingsMenuId = plotAddonSettings->getName() + QString(uuid++);
-	tool->rightStack()->add(settingsMenuId, plotAddonSettings->getWidget());
-	connect(settingsBtn, &QPushButton::toggled, this, [=](bool b) {
-		if(b)
-			tool->requestMenu(settingsMenuId);
-	});
 
 	VerticalChannelManager *vcm = new VerticalChannelManager(this);
 	tool->leftStack()->add(verticalChannelManagerId, vcm);
@@ -163,7 +169,8 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	connect(this, &AdcInstrument::runningChanged, runBtn, &QAbstractButton::setChecked);
 
 	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);
-	connect(cursor, &MenuControlButton::toggled, plotAddon,  &GRTimePlotAddon::showCursors);
+	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
+	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
 	connect(measure, &MenuControlButton::toggled, this, &AdcInstrument::showMeasurements);
 
 	channelStack->show("voltage02");
