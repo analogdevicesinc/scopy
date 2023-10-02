@@ -8,7 +8,7 @@ jobs:
     runs-on: windows-2019
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Pull the Docker Image
       run: docker pull cristianbindea/scopy-mingw64 
 
