@@ -9,7 +9,6 @@
 #include <QGridLayout>
 #include "time_sink_f.h"
 #include <plotwidget.h>
-#include <plotcursors.h>
 #include <QTimer>
 #include <QVBoxLayout>
 #include <QFuture>
@@ -62,7 +61,6 @@ public Q_SLOTS:
 	void onNewData();
 	void updateBufferPreviewer();
 
-	void showCursors(bool b);
 	void setRollingMode(bool b);
 	void setDrawPlotTags(bool b);
 	void setSampleRate(double);
@@ -86,7 +84,6 @@ private:
 	QTimer *m_plotTimer;
 	GRTopBlock *m_top;
 	PlotWidget *m_plotWidget;
-	PlotCursors *m_cursors;
 	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
 	QList<GRTimeChannelAddon*> grChannels;
