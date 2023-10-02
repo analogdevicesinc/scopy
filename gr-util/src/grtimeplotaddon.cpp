@@ -49,10 +49,6 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_plotWidget->xAxis()->setVisible(true);
 //	m_plotWidget->topHandlesArea()->setVisible(true);
 
-
-	m_cursors = new PlotCursors(m_plotWidget);
-	m_cursors->setVisible(false);
-
 	m_info = new TimePlotInfo(m_plotWidget, widget);
 	m_plotWidget->addPlotInfoSlot(m_info);
 
@@ -68,11 +64,6 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 			if(m_refreshTimerRunning)
 				m_plotTimer->start();
 		}, Qt::QueuedConnection);
-}
-
-void GRTimePlotAddon::showCursors(bool b)
-{
-	m_cursors->setVisible(b);
 }
 
 GRTimePlotAddon::~GRTimePlotAddon() {
