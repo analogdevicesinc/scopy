@@ -107,7 +107,7 @@ void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
 void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
 	disconnect(d,SIGNAL(connected()));
 	disconnect(d,SIGNAL(disconnected()));
-	disconnect(d,SIGNAL(forget));
+	disconnect(d,SIGNAL(forget()));
 	disconnect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
 	disconnect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
 	disconnect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
