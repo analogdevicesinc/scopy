@@ -82,7 +82,7 @@ void DeviceImpl::unloadPlugins() {
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(disconnectDevice()),this,SLOT(disconnectDev()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(toolListChanged()),this,SIGNAL(toolListChanged()));
 		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(restartDevice()),this,SIGNAL(requestedRestart()));
-		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+		disconnect(dynamic_cast<QObject*>(*pI),SIGNAL(requestToolByUuid(QString)),this,SIGNAL(requestTool(QString)));
 		(*pI)->unload();
 		delete (*pI);
 	}
