@@ -17,6 +17,7 @@ public:
 	~CursorController();
 
 	CursorSettings *getCursorSettings();
+	PlotCursors *getPlotCursors();
 
 public Q_SLOTS:
 	void setVisible(bool visible);

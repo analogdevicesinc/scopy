@@ -36,11 +36,15 @@ public:
 	void setContentPos(HoverPosition);
 
 public:
+	void updatePos();
+	void moveToRelativePos();
 	void moveToAnchor();
 	void setContent(QWidget *widget);
 	void setAnchor(QWidget *anchor);
 	void setParent(QWidget *parent);
 	void setDraggable(bool draggable);
+	void setRelative(bool relative);
+	void setRelativeOffset(QPointF offset);
 private:
 	QHBoxLayout *m_lay;
 	QWidget* m_parent;
@@ -51,8 +55,12 @@ private:
 	HoverPosition m_contentPos;
 	bool m_draggable;
 	bool is_dragging;
-	QPoint mouse_pos;
+	QPoint *mouse_pos;
+	bool m_relative;
+	QPointF *m_relativeOffset;
 
+private:
+	void updateRelativeOffset();
 
 	// QWidget interface
 protected:
