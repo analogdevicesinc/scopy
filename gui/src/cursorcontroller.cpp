@@ -30,9 +30,11 @@ void CursorController::initUI()
 	plotCursors->setVisible(false);
 
 	plotCursorReadouts = new PlotCursorReadouts(m_plot);
-	hoverReadouts = new HoverWidget(plotCursorReadouts, m_plot, m_plot);
+	hoverReadouts = new HoverWidget(plotCursorReadouts, m_plot->plot()->canvas(), m_plot);
 	hoverReadouts->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hoverReadouts->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
+	hoverReadouts->setAnchorOffset(QPoint(10, 10));
+	hoverReadouts->setRelative(true);
 
 	cursorSettings = new CursorSettings(m_plot);
 }
@@ -134,7 +136,7 @@ void CursorController::vertLockToggled(bool toggled)
 void CursorController::readoutsDragToggled(bool toggled)
 {
 	readoutDragsEn = toggled;
-	Q_EMIT hoverReadouts->setDraggable(readoutDragsEn);
+	hoverReadouts->setDraggable(readoutDragsEn);
 }
 
 void CursorController::setVisible(bool visible)
@@ -157,4 +159,9 @@ void CursorController::cursorsSetVisible(bool visible)
 CursorSettings *CursorController::getCursorSettings()
 {
 	return cursorSettings;
+}
+
+PlotCursors *CursorController::getPlotCursors()
+{
+	return plotCursors;
 }

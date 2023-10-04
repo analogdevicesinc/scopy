@@ -23,6 +23,7 @@ PageNavigationWidget::~PageNavigationWidget()
 
 void PageNavigationWidget::initUI(QWidget *parent)
 {
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QHBoxLayout *buttonsLayout = new QHBoxLayout();
 	setLayout(buttonsLayout);
 	buttonsLayout->setSpacing(10);
@@ -46,7 +47,6 @@ void PageNavigationWidget::initUI(QWidget *parent)
 	openButton->hide();
 
 	buttonsLayout->addSpacerItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed));
-	setMinimumSize(sizeHint());
 }
 
 void PageNavigationWidget::setHomeBtnVisible(bool en)

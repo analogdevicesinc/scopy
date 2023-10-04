@@ -34,6 +34,7 @@ void PlotCursorReadouts::update()
 
 void PlotCursorReadouts::initContent()
 {
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	QHBoxLayout *content_lay = new QHBoxLayout(this);
 	setLayout(content_lay);
 	content_lay->setMargin(10);
@@ -90,19 +91,16 @@ void PlotCursorReadouts::initContent()
 	for (auto w: this->findChildren<QWidget*>()) {
 		StyleHelper::TransparentWidget(w);
 	}
-	resize(sizeHint());
 }
 
 void PlotCursorReadouts::horizSetVisible(bool visible)
 {
 	horiz_contents->setVisible(visible);
-	resize(sizeHint());
 }
 
 void PlotCursorReadouts::vertSetVisible(bool visible)
 {
 	vert_contents->setVisible(visible);
-	resize(sizeHint());
 }
 
 bool PlotCursorReadouts::horizIsVisible()

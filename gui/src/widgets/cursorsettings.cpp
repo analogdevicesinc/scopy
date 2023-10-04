@@ -15,6 +15,7 @@ CursorSettings::~CursorSettings() {}
 
 void CursorSettings::initUI()
 {
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	StyleHelper::TransparentWidget(this, "cursorSettings");
 	setFixedWidth(200);
 	layout = new QVBoxLayout(this);
@@ -51,8 +52,6 @@ void CursorSettings::initUI()
 
 	readoutsDrag = new MenuOnOffSwitch(tr("Move readouts"), readoutsControls, false);
 	readoutsControls->contentLayout()->addWidget(readoutsDrag);
-
-	resize(sizeHint());
 }
 
 void CursorSettings::connectSignals()
