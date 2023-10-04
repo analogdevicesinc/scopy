@@ -6,7 +6,6 @@
 #include <gui/widgets/measurementpanel.h>
 #include <gui/widgets/hoverwidget.h>
 #include "gui/widgets/measurementsettings.h"
-#include <cursorcontroller.h>
 
 using namespace scopy;
 using namespace scopy::grutil;
@@ -61,7 +60,7 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	MenuControlButton *cursor = new MenuControlButton(this);
 	setupCursorButtonHelper(cursor);
 
-	CursorController *cursorController = new CursorController(plotAddon->plot(), this);
+	cursorController = new CursorController(plotAddon->plot(), this);
 	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	hoverSettings->setContentPos(HoverPosition::HP_TOPLEFT);
@@ -180,6 +179,14 @@ AdcInstrument::AdcInstrument(PlotProxy* proxy, QWidget *parent) : QWidget(parent
 	init();
 }
 
+void AdcInstrument::initCursors()
+{
+	cursorController->getPlotCursors()->getH1Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getH2Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getV1Cursor()->setPosition(0);
+	cursorController->getPlotCursors()->getV2Cursor()->setPosition(0);
+}
+
 AdcInstrument::~AdcInstrument()
 {
 	deinit();
@@ -243,6 +250,7 @@ void AdcInstrument::setupChannelsButtonHelper(MenuControlButton *channelsBtn)
 void AdcInstrument::init() {
 	auto addons = proxy->getAddons();
 	proxy->init();
+	initCursors();
 	for(auto addon : addons) {
 		addon->onInit();
 	}

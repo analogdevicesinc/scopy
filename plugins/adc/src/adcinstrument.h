@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <adcplugin.h>
+#include <cursorcontroller.h>
 #include "gui/tooltemplate.h"
 #include <gui/widgets/toolbuttons.h>
 #include <QPushButton>
@@ -54,11 +55,14 @@ private:
 	QButtonGroup* rightMenuBtnGrp;
 	QButtonGroup *channelGroup;
 
+	CursorController *cursorController;
+
 	void setupCursorButtonHelper(MenuControlButton *cursor);
 	void setupMeasureButtonHelper(MenuControlButton *measure);
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 	void setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, GRDeviceAddon *dev);
 	void setupChannelMenuControlButtonHelper(MenuControlButton *btn, GRTimeChannelAddon *ch);
+	void initCursors();
 
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
 
