@@ -152,14 +152,21 @@ bool TestPlugin::onConnect()
 	m_toolList[0]->setTool(tool);
 
 	QVBoxLayout *lay = new QVBoxLayout(tool);
+	QHBoxLayout *hlay = new QHBoxLayout(tool);
+	lay->addLayout(hlay);
 	lbl = new QLabel("TestPlugin", tool);
+
+	lbl->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
+	hlay->addWidget(lbl);
+	hlay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Fixed));
+
 	pic = new QLabel("Picture",tool);
 	lbl2 = new QLabel("m_initText->"+m_initText,tool);
 
 	btn = new QPushButton("detach",tool);
 	btn2 = new QPushButton("renameTool",tool);
 	btn3 = new QPushButton("tutorial",tool);
-	btn4 = new QPushButton("CursorButton",tool);
+	btn4 = new QPushButton("show hoverwidget",tool);
 	btn4->setCheckable(true);
 
 	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
@@ -167,7 +174,7 @@ bool TestPlugin::onConnect()
 	connect(btn3,&QPushButton::clicked,this,[=](){startTutorial();});
 	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testplugin/testImage.png\") ");
-	lay->addWidget(lbl);
+
 	lay->addWidget(pic);
 	lay->addWidget(edit);
 	lay->addWidget(lbl2);
@@ -208,10 +215,9 @@ void TestPlugin::initHoverWidgetTests()
 
 	testBtn->setText("change content");
 	hoverTestLayout->addWidget(testBtn);
-	QComboBox *testCB = new QComboBox();
-	testCB->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	testCB->addItem("--HOVER TEST--");
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setContent(testCB);});
+	QLabel *testLabel = new QLabel("--HOVER TEST--");
+	testLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setContent(testLabel);});
 
 	testBtn = new  QPushButton(hoverTest);
 	testBtn->setText("reset content");
@@ -253,6 +259,24 @@ void TestPlugin::initHoverWidgetTests()
 		hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 		hover->setContentPos(HoverPosition::HP_TOPRIGHT);
 	});
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("set draggable");
+	testBtn->setCheckable(true);
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled){
+		hover->setDraggable(toggled);
+	});
+	testBtn->setStyleSheet("QPushButton::checked{background-color: grey;}");
+
+	testBtn = new  QPushButton(hoverTest);
+	testBtn->setText("set relative");
+	testBtn->setCheckable(true);
+	hoverTestLayout->addWidget(testBtn);
+	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled){
+		hover->setRelative(toggled);
+	});
+	testBtn->setStyleSheet("QPushButton::checked{background-color: grey;}");
 
 	tool->layout()->addWidget(hoverTest);
 }

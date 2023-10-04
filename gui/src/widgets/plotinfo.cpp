@@ -5,8 +5,8 @@
 using namespace scopy;
 
 TimePlotHDivInfo::TimePlotHDivInfo(QWidget *parent) {
-	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	StyleHelper::TimePlotHDivInfo(this);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_mpf = new MetricPrefixFormatter(this);
 
 }
@@ -21,8 +21,8 @@ void TimePlotHDivInfo::update(double val) {
 }
 
 TimePlotSamplingInfo::TimePlotSamplingInfo(QWidget *parent) {
-	setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	StyleHelper::TimePlotSamplingInfo(this);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_mpf = new MetricPrefixFormatter(this);
 }
 
@@ -166,7 +166,6 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 	hdivhover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
 	hdivhover->setAnchorOffset(QPoint(8,6));
 	hdivhover->show();
-	hdivhover->raise();
 	m_hdiv->setAttribute(Qt::WA_TransparentForMouseEvents);
 
 	HoverWidget *samplinginfohover = new HoverWidget(nullptr,  plot->plot()->canvas(), plot->plot());
@@ -175,7 +174,6 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 	samplinginfohover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
 	samplinginfohover->setAnchorOffset(QPoint(-8,6));
 	samplinginfohover->show();
-	samplinginfohover->raise();
 	samplinginfohover->setAttribute(Qt::WA_TransparentForMouseEvents);
 #endif
 }
