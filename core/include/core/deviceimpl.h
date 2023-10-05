@@ -33,9 +33,10 @@ public:
 	virtual void preload() override;
 	virtual void loadPlugins() override;
 	virtual void unloadPlugins() override;
+	virtual bool verify();
+	virtual QMap<QString, QString> readDeviceInfo();
 
 	QList<Plugin *> plugins() const;
-
 
 public Q_SLOTS:
 	virtual void connectDev() override;
