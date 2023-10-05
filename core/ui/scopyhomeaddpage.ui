@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>767</width>
-    <height>699</height>
+    <width>1037</width>
+    <height>725</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,130 +23,124 @@
    <string notr="true">.QWidget{background-color : rgb(10, 10, 10)}</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
-    <widget class="QTabWidget" name="tabWidget">
-     <property name="currentIndex">
-      <number>0</number>
+    <widget class="QStackedWidget" name="stackedWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <widget class="QWidget" name="tabIio">
-      <attribute name="title">
-       <string>IIO</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="tabPage">
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QTabWidget" name="tabWidget">
+         <property name="currentIndex">
+          <number>-1</number>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="addPage">
+      <layout class="QVBoxLayout" name="verticalLayout_4">
        <property name="topMargin">
-        <number>0</number>
+        <number>9</number>
        </property>
        <property name="rightMargin">
-        <number>0</number>
+        <number>9</number>
        </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item row="0" column="0">
-        <widget class="QStackedWidget" name="stackedWidget">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
          </property>
-         <property name="minimumSize">
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>550</width>
-           <height>0</height>
+           <width>20</width>
+           <height>40</height>
           </size>
          </property>
-         <property name="styleSheet">
-          <string notr="true"/>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QScrollArea" name="scrollAreaDevInfo">
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
          </property>
-         <property name="currentIndex">
-          <number>0</number>
+         <property name="widgetResizable">
+          <bool>true</bool>
          </property>
-         <widget class="QWidget" name="deviceDetectionPage">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <widget class="QWidget" name="infoSection">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1017</width>
+            <height>570</height>
+           </rect>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2">
+          <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="leftMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="topMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="rightMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
            <property name="bottomMargin">
-            <number>9</number>
+            <number>0</number>
            </property>
-           <item row="0" column="0">
-            <widget class="QWidget" name="filterWidget" native="true">
+           <item>
+            <widget class="scopy::gui::SubsectionSeparator" name="deviceInfo" native="true">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
-             <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,7">
-              <property name="spacing">
-               <number>8</number>
-              </property>
-              <property name="leftMargin">
-               <number>9</number>
-              </property>
-              <item>
-               <widget class="QLabel" name="labelFilter">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Filter: </string>
-                </property>
-               </widget>
-              </item>
-              <item alignment="Qt::AlignLeft">
-               <widget class="QWidget" name="filterCheckBoxes" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_4">
-                 <property name="spacing">
-                  <number>10</number>
-                 </property>
-                 <property name="leftMargin">
-                  <number>0</number>
-                 </property>
-                 <property name="rightMargin">
-                  <number>0</number>
-                 </property>
-                </layout>
-               </widget>
-              </item>
-             </layout>
             </widget>
            </item>
-           <item row="4" column="0">
-            <spacer name="verticalSpacer">
+           <item>
+            <widget class="scopy::gui::SubsectionSeparator" name="devicePluginBrowser" native="true">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -156,436 +150,63 @@
              </property>
             </spacer>
            </item>
-           <item row="1" column="1">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="1" column="0">
-            <widget class="QWidget" name="scanSection" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="styleSheet">
-              <string notr="true"/>
-             </property>
-             <layout class="QVBoxLayout" name="verticalLayout_5">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
-               <number>0</number>
-              </property>
-              <item>
-               <widget class="QWidget" name="discoveredContextsWidget" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,7">
-                 <item>
-                  <widget class="QLabel" name="labelContext">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Context:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QWidget" name="contextsScanWidget" native="true">
-                   <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="7,1">
-                    <property name="spacing">
-                     <number>8</number>
-                    </property>
-                    <property name="leftMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="topMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="rightMargin">
-                     <number>0</number>
-                    </property>
-                    <property name="bottomMargin">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <widget class="QComboBox" name="comboBoxContexts">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="scopy::AnimationPushButton" name="btnScan">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton{width: 30px;
-								height: 30px;
-						 		font-size: 12px;
-						   		text-align: center;
-						   		font-weight: bold;
-						 		}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                   </layout>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QWidget" name="serialSettingsWidget" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,3,2,2">
-                 <property name="horizontalSpacing">
-                  <number>8</number>
-                 </property>
-                 <item row="0" column="1">
-                  <widget class="QComboBox" name="comboBoxSerialPort"/>
-                 </item>
-                 <item row="1" column="3">
-                  <widget class="QLabel" name="labelFrameFormat">
-                   <property name="text">
-                    <string>Port Config</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QLabel" name="labelBaudRate">
-                   <property name="text">
-                    <string>Baud rate</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2">
-                  <widget class="QComboBox" name="comboBoxBaudRate"/>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="labelSerial">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>Serial: </string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="3">
-                  <widget class="QLineEdit" name="editSerialFrameConfig">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>8n1</string>
-                   </property>
-                   <property name="readOnly">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLabel" name="labelPortName">
-                   <property name="text">
-                    <string>Port name</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-              <item>
-               <widget class="QWidget" name="uriWidget" native="true">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="layoutDirection">
-                 <enum>Qt::LeftToRight</enum>
-                </property>
-                <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,7">
-                 <property name="horizontalSpacing">
-                  <number>8</number>
-                 </property>
-                 <item row="1" column="1">
-                  <widget class="QLabel" name="uriMessageLabel">
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="0">
-                  <widget class="QLabel" name="labelUri">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <property name="text">
-                    <string>URI:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="1">
-                  <widget class="QLineEdit" name="editUri">
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-           <item row="3" column="0" alignment="Qt::AlignRight">
-            <widget class="QWidget" name="btnsWidget_2" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="scopy::AnimationPushButton" name="btnVerify">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">QPushButton{width: 95px;
-								height: 40px;
-						 		font-size: 12px;
-						   		text-align: center;
-						   		font-weight: bold;
-						   		padding-left: 15px;
-						   		padding-right: 15px;
-						 		}</string>
-                </property>
-                <property name="text">
-                 <string>Verify</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-         <widget class="QWidget" name="deviceInfoPage">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout">
-           <item>
-            <widget class="QScrollArea" name="scrollAreaDevInfo">
-             <property name="widgetResizable">
-              <bool>true</bool>
-             </property>
-             <widget class="QWidget" name="infoSection">
-              <property name="geometry">
-               <rect>
-                <x>0</x>
-                <y>0</y>
-                <width>725</width>
-                <height>541</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_2">
-               <item>
-                <widget class="scopy::gui::SubsectionSeparator" name="deviceInfo" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="scopy::gui::SubsectionSeparator" name="devicePluginBrowser" native="true">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <spacer name="verticalSpacer_2">
-                 <property name="orientation">
-                  <enum>Qt::Vertical</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Expanding</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>40</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="labelConnectionLost">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
-           </item>
-           <item alignment="Qt::AlignRight">
-            <widget class="QWidget" name="btnsWidget" native="true">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QPushButton" name="btnBack">
-                <property name="styleSheet">
-                 <string notr="true">QPushButton{width: 95px;
-								height: 40px;
-						 		font-size: 12px;
-						   		text-align: center;
-						   		font-weight: bold;
-						   		padding-left: 15px;
-						   		padding-right: 15px;
-						 		}</string>
-                </property>
-                <property name="text">
-                 <string>Back</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="btnAdd">
-                <property name="styleSheet">
-                 <string notr="true">QPushButton{width: 95px;
-								height: 40px;
-						 		font-size: 12px;
-						   		text-align: center;
-						   		font-weight: bold;
-						   		padding-left: 15px;
-						   		padding-right: 15px;
-						 		}</string>
-                </property>
-                <property name="text">
-                 <string>Add Device</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </widget>
-           </item>
           </layout>
          </widget>
         </widget>
        </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tabEmu">
-      <attribute name="title">
-       <string>EMU</string>
-      </attribute>
-      <layout class="QGridLayout" name="gridLayout_6">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
+       <item>
+        <widget class="QLabel" name="labelConnectionLost">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item alignment="Qt::AlignRight|Qt::AlignVCenter">
+        <widget class="QWidget" name="btnsWidget" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QPushButton" name="btnBack">
+            <property name="styleSheet">
+             <string notr="true">QPushButton{width: 95px;
+								height: 40px;
+						 		font-size: 12px;
+						   		text-align: center;
+						   		font-weight: bold;
+						   		padding-left: 15px;
+						   		padding-right: 15px;
+						 		}</string>
+            </property>
+            <property name="text">
+             <string>Back</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnAdd">
+            <property name="styleSheet">
+             <string notr="true">QPushButton{width: 95px;
+								height: 40px;
+						 		font-size: 12px;
+						   		text-align: center;
+						   		font-weight: bold;
+						   		padding-left: 15px;
+						   		padding-right: 15px;
+						 		}</string>
+            </property>
+            <property name="text">
+             <string>Add Device</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -593,11 +214,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>scopy::AnimationPushButton</class>
-   <extends>QPushButton</extends>
-   <header>animationpushbutton.h</header>
-  </customwidget>
   <customwidget>
    <class>scopy::gui::SubsectionSeparator</class>
    <extends>QWidget</extends>
