@@ -12,7 +12,8 @@ public:
 	~IIODeviceImpl() {}
 
 	virtual void init() override;
-	bool verify();
+	bool verify() override;
+	QMap<QString, QString> readDeviceInfo() override;
 };
 
 }
