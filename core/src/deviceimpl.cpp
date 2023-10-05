@@ -90,6 +90,17 @@ void DeviceImpl::unloadPlugins() {
 	qInfo(CAT_BENCHMARK) << this->displayName() << " plugins unload took: " << timer.elapsed() << "ms";
 }
 
+bool DeviceImpl::verify()
+{
+	return true;
+}
+
+QMap<QString, QString> DeviceImpl::readDeviceInfo()
+{
+	QMap<QString, QString> map;
+	return  map;
+}
+
 void DeviceImpl::removeDisabledPlugins() {
 	QMutableListIterator<Plugin*> i(m_plugins);
 	while (i.hasNext()) {
