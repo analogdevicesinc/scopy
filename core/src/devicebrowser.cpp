@@ -16,6 +16,7 @@ DeviceBrowser::DeviceBrowser(QWidget *parent) :
 {
 	qDebug(CAT_DEVBROWSER) << "ctor";
 	ui->setupUi(this);
+	this->setFixedHeight(185);
 
 	auto dbm = ui->wDeviceBrowserMenu;
 	layout = new QHBoxLayout(dbm);
