@@ -18,33 +18,36 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "swiotconfig.h"
-#include <gui/tool_view_builder.hpp>
+
 #include "configcontroller.h"
 #include "configmodel.h"
-#include <iio.h>
-#include <iioutil/commandqueueprovider.h>
 #include "src/swiot_logging_categories.h"
-#include <QVBoxLayout>
+
+#include <iio.h>
+
 #include <QMessageBox>
+#include <QVBoxLayout>
+
+#include <gui/tool_view_builder.hpp>
+#include <iioutil/commandqueueprovider.h>
 
 using namespace scopy::swiot;
 
-SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
-	QWidget(parent),
-	m_context(ctx),
-	m_drawArea(nullptr),
-	m_scrollArea(nullptr),
-	m_toolView(nullptr),
-	m_mainView(new QWidget(this)),
-	m_statusLabel(new QLabel(this)),
-	m_statusContainer(new QWidget(this)),
-	m_commandQueue(CommandQueueProvider::GetInstance()->open(ctx)),
-	ui(new Ui::ConfigMenu)
+SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent)
+	: QWidget(parent)
+	, m_context(ctx)
+	, m_drawArea(nullptr)
+	, m_scrollArea(nullptr)
+	, m_toolView(nullptr)
+	, m_mainView(new QWidget(this))
+	, m_statusLabel(new QLabel(this))
+	, m_statusContainer(new QWidget(this))
+	, m_commandQueue(CommandQueueProvider::GetInstance()->open(ctx))
+	, ui(new Ui::ConfigMenu)
 {
 	m_swiotDevice = iio_context_find_device(ctx, "swiot");
-	if (m_swiotDevice == nullptr) {
+	if(m_swiotDevice == nullptr) {
 		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
 	}
 
@@ -62,15 +65,16 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent) :
 
 SwiotConfig::~SwiotConfig()
 {
-	if (m_commandQueue) {
+	if(m_commandQueue) {
 		CommandQueueProvider::GetInstance()->close(m_context);
 		m_commandQueue = nullptr;
 		m_context = nullptr;
 	}
 }
 
-void SwiotConfig::init() {
-	for (int i = 0; i < 4; i++) { // there can only be 4 channels
+void SwiotConfig::init()
+{
+	for(int i = 0; i < 4; i++) { // there can only be 4 channels
 		auto *channelView = new ConfigChannelView(i);
 		auto *configModel = new ConfigModel(m_swiotDevice, i, m_commandQueue);
 		auto *configController = new ConfigController(channelView, configModel, i);
@@ -79,36 +83,36 @@ void SwiotConfig::init() {
 
 		QObject::connect(channelView, &ConfigChannelView::showPath, this,
 				 [this, i](int channelIndex, const QString &deviceName) {
-					 if (channelIndex == i) {
+					 if(channelIndex == i) {
 						 m_drawArea->activateConnection(channelIndex + 1,
 										(deviceName == "ad74413r")
-										? DrawArea::AD74413R
-										: DrawArea::MAX14906);
+											? DrawArea::AD74413R
+											: DrawArea::MAX14906);
 					 }
 				 });
 
-		QObject::connect(channelView, &ConfigChannelView::hidePaths, this, [this]() {
-			m_drawArea->deactivateConnections();
-		});
+		QObject::connect(channelView, &ConfigChannelView::hidePaths, this,
+				 [this]() { m_drawArea->deactivateConnections(); });
 
-		QObject::connect(configController, &ConfigController::clearDrawArea, this, [this]() {
-			m_drawArea->deactivateConnections();
-		});
+		QObject::connect(configController, &ConfigController::clearDrawArea, this,
+				 [this]() { m_drawArea->deactivateConnections(); });
 	}
 }
 
-void SwiotConfig::setDevices(iio_context *ctx) {
+void SwiotConfig::setDevices(iio_context *ctx)
+{
 	ssize_t devicesNumber = iio_context_get_devices_count(ctx);
-	for (int i = 0; i < devicesNumber; i++) {
+	for(int i = 0; i < devicesNumber; i++) {
 		struct iio_device *iioDev = iio_context_get_device(ctx, i);
-		if (iioDev) {
+		if(iioDev) {
 			QString deviceName = QString(iio_device_get_name(iioDev));
 			m_iioDevices[deviceName] = iioDev;
 		}
 	}
 }
 
-QPushButton *SwiotConfig::createConfigBtn() {
+QPushButton *SwiotConfig::createConfigBtn()
+{
 	auto *configBtn = new QPushButton();
 	configBtn->setObjectName(QString::fromUtf8("configBtn"));
 	configBtn->setLayoutDirection(Qt::RightToLeft);
@@ -129,18 +133,17 @@ QPushButton *SwiotConfig::createConfigBtn() {
 	return configBtn;
 }
 
-void SwiotConfig::onConfigBtnPressed() {
-	Q_EMIT writeModeAttribute("runtime");
-}
+void SwiotConfig::onConfigBtnPressed() { Q_EMIT writeModeAttribute("runtime"); }
 
 void SwiotConfig::modeAttributeChanged(std::string mode)
 {
-	if (mode == "runtime") {
+	if(mode == "runtime") {
 		Q_EMIT configBtnPressed();
 	}
 }
 
-void SwiotConfig::setupToolView(QWidget *parent) {
+void SwiotConfig::setupToolView(QWidget *parent)
+{
 	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = false;
@@ -156,7 +159,8 @@ void SwiotConfig::setupToolView(QWidget *parent) {
 	m_scrollArea = new QScrollArea(this);
 }
 
-void SwiotConfig::createPageLayout() {
+void SwiotConfig::createPageLayout()
+{
 	auto scrollWidget = new QWidget(this);
 	m_scrollArea->setStyleSheet("background-color: black;");
 	scrollWidget->setLayout(new QHBoxLayout(this));
@@ -171,8 +175,8 @@ void SwiotConfig::createPageLayout() {
 	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
 	m_statusContainer->layout()->setSpacing(0);
 	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
-	m_statusContainer->setStyleSheet(
-		"QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt}");
+	m_statusContainer->setStyleSheet("QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px "
+					 "solid rgba(0, 0, 0, 30); font-size: 11pt}");
 
 	auto exclamationButton = new QPushButton(m_statusContainer);
 	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
@@ -183,7 +187,7 @@ void SwiotConfig::createPageLayout() {
 	m_statusContainer->layout()->addWidget(m_statusLabel);
 
 	m_mainView->setLayout(new QVBoxLayout(m_mainView));
-	m_mainView->layout()->setContentsMargins(0,0,0,0);
+	m_mainView->layout()->setContentsMargins(0, 0, 0, 0);
 	m_mainView->layout()->addWidget(m_scrollArea);
 
 	m_toolView->addPlotInfoWidget(m_statusContainer);
@@ -192,8 +196,9 @@ void SwiotConfig::createPageLayout() {
 	this->layout()->addWidget(m_toolView);
 }
 
-void SwiotConfig::externalPowerSupply(bool ps) {
-	if (ps) {
+void SwiotConfig::externalPowerSupply(bool ps)
+{
+	if(ps) {
 		m_statusContainer->hide();
 	} else {
 		m_statusContainer->show();
@@ -201,7 +206,8 @@ void SwiotConfig::externalPowerSupply(bool ps) {
 	}
 }
 
-void SwiotConfig::initTutorialProperties() {
+void SwiotConfig::initTutorialProperties()
+{
 	m_configBtn->setProperty("tutorial_name", "APPLY_BUTTON");
 	m_drawArea->setProperty("tutorial_name", "DRAW_AREA");
 }

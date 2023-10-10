@@ -21,32 +21,28 @@
 #ifndef IIO_MANAGER_HPP
 #define IIO_MANAGER_HPP
 
-#include <QObject>
+#include "timeout_block.hpp"
 
-#include <gnuradio/top_block.h>
-#include <gnuradio/iio/device_source.h>
 #include <gnuradio/blocks/copy.h>
 #include <gnuradio/blocks/float_to_complex.h>
+#include <gnuradio/iio/device_source.h>
 #include <gnuradio/m2k/analog_in_source.h>
+#include <gnuradio/m2k/mixed_signal_source.h>
+#include <gnuradio/top_block.h>
+
+#include <QObject>
 
 #include <frequency_compensation_filter.h>
-
-#include <libm2k/contextbuilder.hpp>
-#include <libm2k/m2k.hpp>
 #include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
-
-#include <gnuradio/m2k/mixed_signal_source.h>
-
+#include <libm2k/m2k.hpp>
 #include <mutex>
-
-#include "timeout_block.hpp"
 
 /* 1k samples by default */
 #define IIO_BUFFER_SIZE 0x400
 
 namespace scopy::m2k {
-
 
 class iio_manager : public QObject, public gr::top_block
 {
@@ -57,29 +53,24 @@ public:
 	typedef gr::blocks::copy::sptr port_id;
 
 	const unsigned id;
-	iio_manager(unsigned int id, struct iio_context *ctx,
-		    QString dev,
-		    unsigned long buffer_size);
+	iio_manager(unsigned int id, struct iio_context *ctx, QString dev, unsigned long buffer_size);
 	~iio_manager();
 
 	/* Connect a block to one of the channels of the IIO source.
-		 * This function returns the ID, that can later be used with
-		 * start() and stop().
-		 * Warning: the flowgraph needs to be locked first! */
-	port_id connect(gr::basic_block_sptr dst, int src_port,
-			int dst_port, bool use_float = false,
+	 * This function returns the ID, that can later be used with
+	 * start() and stop().
+	 * Warning: the flowgraph needs to be locked first! */
+	port_id connect(gr::basic_block_sptr dst, int src_port, int dst_port, bool use_float = false,
 			unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 	/* Connect two regular blocks between themselves. */
-	void connect(gr::basic_block_sptr src, int src_port,
-		     gr::basic_block_sptr dst, int dst_port);
+	void connect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port);
 
 	/* Disconnect the whole tree of blocks connected to this port ID */
 	void disconnect(port_id id);
 
 	/* Disconnect two regular blocks. */
-	void disconnect(gr::basic_block_sptr src, int src_port,
-			gr::basic_block_sptr dst, int dst_port);
+	void disconnect(gr::basic_block_sptr src, int src_port, gr::basic_block_sptr dst, int dst_port);
 
 	/* Start feeding data to the client connected at [port, id] */
 	void start(port_id id);
@@ -94,9 +85,9 @@ public:
 	bool started() { return _started; }
 
 	/* Change the buffer size at runtime.
-		 * Warning: the flowgraph needs to be locked first! */
+	 * Warning: the flowgraph needs to be locked first! */
 	void set_buffer_size(port_id id, unsigned long size);
-	void set_filter_parameters(int channel, int index, bool enable, float TC, float gain, float sample_rate );
+	void set_filter_parameters(int channel, int index, bool enable, float TC, float gain, float sample_rate);
 	void set_data_rate(double rate);
 	void set_kernel_buffer_count(int kb = 0);
 
@@ -105,7 +96,8 @@ public:
 	 * are not properly routed to the blocks connected during the
 	 * reconfiguration. So until GNU Radio gets fixed, we just force
 	 * the whole flowgraph to stop when connecting new blocks. */
-	void lock() {
+	void lock()
+	{
 		gr::top_block::stop();
 		// cancel acquisition, work might be blocked waiting for a trigger
 		// and the timeout. Don't wait for it just cancel the acquisition
@@ -119,9 +111,11 @@ public:
 
 		gr::top_block::wait();
 	}
-	void unlock() {
+	void unlock()
+	{
 		//			m_context->startMixedSignalAcquisition(buffer_size);
-		gr::top_block::start(); }
+		gr::top_block::start();
+	}
 
 	/* Set the timeout for the source device */
 	void set_device_timeout(unsigned int mseconds);
@@ -145,7 +139,7 @@ private:
 	unsigned long buffer_size;
 	std::vector<unsigned long> buffer_sizes;
 
-	std::vector<std::pair<port_id, unsigned long> > copy_blocks;
+	std::vector<std::pair<port_id, unsigned long>> copy_blocks;
 
 	gr::m2k::analog_in_source::sptr iio_block;
 	unsigned int nb_channels;
@@ -153,7 +147,8 @@ private:
 	std::shared_ptr<timeout_block> timeout_b;
 	gr::m2k::mixed_signal_source::sptr m_mixed_source;
 
-	struct connection {
+	struct connection
+	{
 		gr::basic_block_sptr src;
 		gr::basic_block_sptr dst;
 		int src_port, dst_port;
@@ -171,8 +166,8 @@ Q_SIGNALS:
 	void timeout();
 };
 
-
-class m2k_iio_manager  {
+class m2k_iio_manager
+{
 public:
 	m2k_iio_manager() {}
 	~m2k_iio_manager() {}
@@ -185,17 +180,14 @@ public:
 
 	/* Get a shared pointer to the instance of iio_manager that
 	 * manages the requested device */
-	std::shared_ptr<iio_manager> get_instance(
-			struct iio_context *ctx,
-			QString dev,
-			unsigned long buffer_size = IIO_BUFFER_SIZE);
+	std::shared_ptr<iio_manager> get_instance(struct iio_context *ctx, QString dev,
+						  unsigned long buffer_size = IIO_BUFFER_SIZE);
 
 private:
 	std::map<QString, iio_manager::map_entry> dev_map;
 	unsigned _id;
 };
 
-
-}
+} // namespace scopy::m2k
 
 #endif /* IIO_MANAGER_HPP */

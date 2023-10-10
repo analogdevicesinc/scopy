@@ -22,19 +22,19 @@
 #ifndef BUFFER_PREVIEWER_H
 #define BUFFER_PREVIEWER_H
 
-#include <QFrame>
 #include "scopy-gui_export.h"
 
-namespace scopy{
+#include <QFrame>
 
-class SCOPY_GUI_EXPORT BufferPreviewer: public QFrame
+namespace scopy {
+
+class SCOPY_GUI_EXPORT BufferPreviewer : public QFrame
 {
 	Q_OBJECT
 
 public:
 	explicit BufferPreviewer(QWidget *parent = 0);
-	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase,
-		QWidget *parent = 0);
+	explicit BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
 	virtual ~BufferPreviewer();
 
 	double waveformPos() const;
@@ -103,18 +103,17 @@ private:
 	bool m_cursorVisible;
 };
 
-class SCOPY_GUI_EXPORT AnalogBufferPreviewer: public BufferPreviewer
+class SCOPY_GUI_EXPORT AnalogBufferPreviewer : public BufferPreviewer
 {
 public:
 	explicit AnalogBufferPreviewer(QWidget *parent = 0);
-	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase,
-		QWidget *parent = 0);
+	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
 
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
 };
 
-class SCOPY_GUI_EXPORT DigitalBufferPreviewer: public BufferPreviewer
+class SCOPY_GUI_EXPORT DigitalBufferPreviewer : public BufferPreviewer
 {
 public:
 	explicit DigitalBufferPreviewer(QWidget *parent = 0);
@@ -124,6 +123,7 @@ public:
 
 protected:
 	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+
 private:
 	double m_noOfSteps;
 };

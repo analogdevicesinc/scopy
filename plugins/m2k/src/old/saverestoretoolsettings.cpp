@@ -1,11 +1,13 @@
 #include "saverestoretoolsettings.h"
-#include <pluginbase/apiobject.h>
+
 #include <QSettings>
+
+#include <pluginbase/apiobject.h>
 
 using namespace scopy::m2k;
 
 SaveRestoreToolSettings::SaveRestoreToolSettings(M2kTool *tool)
-        : m_tool(tool)
+	: m_tool(tool)
 {
 	QSettings settings(m_temp.fileName(), QSettings::IniFormat);
 

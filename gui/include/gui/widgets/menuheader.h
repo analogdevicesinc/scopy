@@ -1,13 +1,15 @@
 #ifndef MENUHEADER_H
 #define MENUHEADER_H
 
-#include <scopy-gui_export.h>
-#include <QWidget>
-#include <utils.h>
 #include <QLabel>
+#include <QWidget>
+
+#include <scopy-gui_export.h>
+#include <utils.h>
 
 namespace scopy {
-class SCOPY_GUI_EXPORT MenuHeaderWidget : public QWidget {
+class SCOPY_GUI_EXPORT MenuHeaderWidget : public QWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
@@ -22,6 +24,6 @@ private:
 	QFrame *m_line;
 	QPen m_pen;
 };
-}
+} // namespace scopy
 
 #endif // MENUHEADER_H

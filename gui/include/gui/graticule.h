@@ -21,10 +21,11 @@
 #ifndef GRATICULE_H
 #define GRATICULE_H
 
+#include "scopy-gui_export.h"
+
 #include <QObject>
 #include <qwt_plot.h>
 #include <qwt_plot_scaleitem.h>
-#include "scopy-gui_export.h"
 
 namespace scopy {
 
@@ -48,16 +49,13 @@ private:
 	QwtPlotScaleItem *horizScale2;
 };
 
-class SCOPY_GUI_EXPORT GraticulePlotScaleItem: public QwtPlotScaleItem
+class SCOPY_GUI_EXPORT GraticulePlotScaleItem : public QwtPlotScaleItem
 {
 public:
-	explicit GraticulePlotScaleItem(
-	        QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale,
-	        const double pos = 0.0);
+	explicit GraticulePlotScaleItem(QwtScaleDraw::Alignment = QwtScaleDraw::BottomScale, const double pos = 0.0);
 	virtual void updateScaleDiv(const QwtScaleDiv &, const QwtScaleDiv &);
 };
 
-}
-
+} // namespace scopy
 
 #endif // GRATICULE_H

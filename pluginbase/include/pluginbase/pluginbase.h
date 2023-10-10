@@ -1,17 +1,18 @@
 #ifndef PLUGINBASE_H
 #define PLUGINBASE_H
+#include "apiobject.h"
 #include "plugin.h"
 #include "scopy-pluginbase_export.h"
-#include <QObject>
-#include "apiobject.h"
 
+#include <QObject>
 
 namespace scopy {
 /**
  * @brief The PluginBase class
  * PluginBase is used to provide default implementation to the plugin interface
  */
-class SCOPY_PLUGINBASE_EXPORT PluginBase : public Plugin {
+class SCOPY_PLUGINBASE_EXPORT PluginBase : public Plugin
+{
 
 public:
 	virtual ~PluginBase() {}
@@ -42,11 +43,11 @@ public:
 	virtual QString name() override;
 	virtual QString displayName() override;
 	virtual QString displayParam() override;
-	virtual QWidget* icon() override;
-	virtual QWidget* page() override;
-	virtual QWidget* preferencesPage() override;
-	virtual QList<QAbstractButton*> extraButtons() override;
-	virtual QList<ToolMenuEntry*> toolList() override;
+	virtual QWidget *icon() override;
+	virtual QWidget *page() override;
+	virtual QWidget *preferencesPage() override;
+	virtual QList<QAbstractButton *> extraButtons() override;
+	virtual QList<ToolMenuEntry *> toolList() override;
 	virtual QJsonObject metadata() override;
 
 	virtual QString about() override;
@@ -54,7 +55,7 @@ public:
 	virtual QString description() override;
 
 	virtual void loadMetadata(QString data);
-	virtual void cloneExtra(Plugin*) override;
+	virtual void cloneExtra(Plugin *) override;
 
 public Q_SLOTS:
 	virtual void showPageCallback() override;
@@ -71,42 +72,45 @@ protected:
 	QWidget *m_page;
 	QWidget *m_preferencesPage;
 	QWidget *m_icon;
-	QList<ToolMenuEntry*> m_toolList;
-	QList<QAbstractButton*> m_extraButtons;
+	QList<ToolMenuEntry *> m_toolList;
+	QList<QAbstractButton *> m_extraButtons;
 	QJsonObject m_metadata;
 	bool m_enabled;
 };
-}
+} // namespace scopy
 
 #define scopyxstr(a) scopystr(a)
 #define scopystr(a) #a
 
-#define SCOPY_PLUGIN \
-	Q_PLUGIN_METADATA(IID ScopyPlugin_iid)\
-	Q_INTERFACES(scopy::Plugin)\
-public:\
-	virtual ~SCOPY_PLUGIN_NAME () override {}\
-	SCOPY_PLUGIN_NAME* clone(QObject *parent) override { \
-		SCOPY_PLUGIN_NAME* ret = new SCOPY_PLUGIN_NAME(); \
-		/* copy metadata from this object to the next one */\
-		ret->m_name = scopyxstr(SCOPY_PLUGIN_NAME);\
-		ret->setParent(parent);\
-		ret->m_displayName = ret->m_name;\
-		ret->setMetadata(metadata()); \
-		ret->cloneExtra(this);\
-		return ret;\
-	}\
-\
-Q_SIGNALS:\
-	void connectDevice() override;\
-	void disconnectDevice() override;\
-	void restartDevice() override;\
-	void toolListChanged() override;\
-	void requestToolByUuid(QString) override;\
-private:\
+#define SCOPY_PLUGIN                                                                                                   \
+	Q_PLUGIN_METADATA(IID ScopyPlugin_iid)                                                                         \
+	Q_INTERFACES(scopy::Plugin)                                                                                    \
+public:                                                                                                                \
+	virtual ~SCOPY_PLUGIN_NAME() override {}                                                                       \
+	SCOPY_PLUGIN_NAME *clone(QObject *parent) override                                                             \
+	{                                                                                                              \
+		SCOPY_PLUGIN_NAME *ret = new SCOPY_PLUGIN_NAME();                                                      \
+		/* copy metadata from this object to the next one */                                                   \
+		ret->m_name = scopyxstr(SCOPY_PLUGIN_NAME);                                                            \
+		ret->setParent(parent);                                                                                \
+		ret->m_displayName = ret->m_name;                                                                      \
+		ret->setMetadata(metadata());                                                                          \
+		ret->cloneExtra(this);                                                                                 \
+		return ret;                                                                                            \
+	}                                                                                                              \
+                                                                                                                       \
+Q_SIGNALS:                                                                                                             \
+	void connectDevice() override;                                                                                 \
+	void disconnectDevice() override;                                                                              \
+	void restartDevice() override;                                                                                 \
+	void toolListChanged() override;                                                                               \
+	void requestToolByUuid(QString) override;                                                                      \
+                                                                                                                       \
+private:
 
-#define SCOPY_PLUGIN_ICON(x) m_icon = new QLabel(""); m_icon->setStyleSheet("border-image: url(" x ");")
-#define SCOPY_NEW_TOOLMENUENTRY(id, name, icon) new ToolMenuEntry(id,name,icon,this->m_name,this)
-
+#define SCOPY_PLUGIN_ICON(x)                                                                                           \
+	m_icon = new QLabel("");                                                                                       \
+	m_icon->setStyleSheet("border-image: url(" x ");")
+#define SCOPY_NEW_TOOLMENUENTRY(id, name, icon) new ToolMenuEntry(id, name, icon, this->m_name, this)
 
 #endif // PLUGINBASE_H

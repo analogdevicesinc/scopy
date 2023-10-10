@@ -3,13 +3,15 @@
 
 #define SCOPY_PLUGIN_NAME TestPlugin
 
+#include "scopy-testplugin_export.h"
+
+#include <QLabel>
+#include <QLineEdit>
 #include <QObject>
+#include <QPushButton>
+
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopy-testplugin_export.h"
-#include <QLineEdit>
-#include <QLabel>
-#include <QPushButton>
 
 namespace scopy {
 
@@ -34,7 +36,7 @@ public:
 	QString version() override;
 	bool onConnect() override;
 	bool onDisconnect() override;
-	void cloneExtra(Plugin*) override;
+	void cloneExtra(Plugin *) override;
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
 
@@ -47,10 +49,9 @@ private:
 	QWidget *tool2;
 	QLineEdit *edit;
 	int renameCnt;
-	ApiObject* m_pluginApi;
+	ApiObject *m_pluginApi;
 	void startTutorial();
 	void initHoverWidgetTests();
-
 
 	QLabel *lbl;
 	QLabel *pic;
@@ -61,21 +62,25 @@ private:
 	QPushButton *btn4;
 };
 
-class SCOPY_TESTPLUGIN_EXPORT TestPlugin_API : public ApiObject {
+class SCOPY_TESTPLUGIN_EXPORT TestPlugin_API : public ApiObject
+{
 	Q_OBJECT
 public:
-	explicit TestPlugin_API(TestPlugin *p) : ApiObject(p),p(p) {}
+	explicit TestPlugin_API(TestPlugin *p)
+		: ApiObject(p)
+		, p(p)
+	{}
 	~TestPlugin_API() {}
-	TestPlugin* p;
+	TestPlugin *p;
 
 	Q_PROPERTY(QString testText READ testText WRITE setTestText);
 	QString testText() const;
 	void setTestText(const QString &newTestText);
+
 private:
 	QString m_testText;
 };
 
-}
-
+} // namespace scopy
 
 #endif // TESTPLUGIN_H

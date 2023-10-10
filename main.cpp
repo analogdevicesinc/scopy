@@ -1,7 +1,9 @@
-#include "core/scopymainwindow.h"
 #include "core/logging_categories.h"
+#include "core/scopymainwindow.h"
+
 #include <QApplication>
 #include <QCommandLineParser>
+
 #include <core/application_restarter.h>
 #include <core/cmdlinehandler.h>
 #include <core/scopymainwindow_api.h>
@@ -14,34 +16,31 @@ Q_LOGGING_CATEGORY(CAT_RUNTIME_ENVIRONMENT_INFO, "RuntimeEnvironmentInfo")
 void SetScopyQDebugMessagePattern()
 {
 
-	qSetMessagePattern(
-		"[ "
-		#ifdef QDEBUG_LOG_MSG_TYPE
-			QDEBUG_LOG_MSG_TYPE_STR " "
-			QDEBUG_CATEGORY_STR " "
-		#endif
-		#ifdef QDEBUG_LOG_TIME
-			QDEBUG_LOG_TIME_STR
-		#endif
-		#ifdef QDEBUG_LOG_DATE
-			QDEBUG_LOG_DATE_STR
-		#endif
-		#ifdef QDEBUG_LOG_CATEGORY
-		QDEBUG_CATEGORY_STR
-		#endif
-		" ] "
-		#ifdef QDEBUG_LOG_FILE
-		QDEBUG_LOG_FILE_STR
-		#endif
+	qSetMessagePattern("[ "
+#ifdef QDEBUG_LOG_MSG_TYPE
+			   QDEBUG_LOG_MSG_TYPE_STR " " QDEBUG_CATEGORY_STR " "
+#endif
+#ifdef QDEBUG_LOG_TIME
+			   QDEBUG_LOG_TIME_STR
+#endif
+#ifdef QDEBUG_LOG_DATE
+				   QDEBUG_LOG_DATE_STR
+#endif
+#ifdef QDEBUG_LOG_CATEGORY
+					   QDEBUG_CATEGORY_STR
+#endif
+			   " ] "
+#ifdef QDEBUG_LOG_FILE
+			   QDEBUG_LOG_FILE_STR
+#endif
 
-		" - "
-		"%{message}"
-		);
+			   " - "
+			   "%{message}");
 }
 
 void initLogging()
 {
-	if (!getenv("QT_LOGGING_RULES")) {
+	if(!getenv("QT_LOGGING_RULES")) {
 		QLoggingCategory::setFilterRules(""
 						 "*.debug=false\n"
 						 "ToolStack.debug=true\n"
@@ -56,7 +55,7 @@ void initLogging()
 						 "AD74413R.debug=true\n"
 						 "ScopyTranslations.debug=true\n");
 	}
-	if (!getenv("QT_MESSAGE_PATTERN")) {
+	if(!getenv("QT_MESSAGE_PATTERN")) {
 		SetScopyQDebugMessagePattern();
 	}
 }
@@ -64,7 +63,7 @@ void initLogging()
 void printRuntimeEnvironmentInfo()
 {
 	QStringList infoList = scopy::config::dump().split("\n");
-	for (const QString &info : infoList) {
+	for(const QString &info : infoList) {
 		qInfo(CAT_RUNTIME_ENVIRONMENT_INFO) << info;
 	}
 }
@@ -77,7 +76,7 @@ int main(int argc, char *argv[])
 	QCoreApplication::setApplicationName("Scopy-v2");
 	QSettings::setDefaultFormat(QSettings::IniFormat);
 
-	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts,true);
+	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 
 	QApplication a(argc, argv);
@@ -85,12 +84,12 @@ int main(int argc, char *argv[])
 	parser.addHelpOption();
 	parser.addVersionOption();
 	parser.addOptions({
-				  { {"s", "script"}, "Run given script.", "script" },
-				  { {"a", "accept-license"}, "Accept the license in advance." },
-				  { {"l", "logfile"}, "Saves all the logging messages into a file.", "filename"},
-				  { {"c", "connect"}, "Establish the connection to a given device by URI.","URI"},
-				  { {"t", "tool"}, "Select the desired tool for the device.", "tool"} ,
-			  });
+		{{"s", "script"}, "Run given script.", "script"},
+		{{"a", "accept-license"}, "Accept the license in advance."},
+		{{"l", "logfile"}, "Saves all the logging messages into a file.", "filename"},
+		{{"c", "connect"}, "Establish the connection to a given device by URI.", "URI"},
+		{{"t", "tool"}, "Select the desired tool for the device.", "tool"},
+	});
 
 	parser.process(a);
 	CmdLineHandler::withLogFileOption(parser);
@@ -105,7 +104,7 @@ int main(int argc, char *argv[])
 
 	ScopyMainWindow_API scopyApi(&w);
 	int retHandler = CmdLineHandler::handle(parser, scopyApi);
-	if (retHandler == EXIT_FAILURE) {
+	if(retHandler == EXIT_FAILURE) {
 		return retHandler;
 	}
 

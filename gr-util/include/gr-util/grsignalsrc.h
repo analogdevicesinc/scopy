@@ -2,11 +2,13 @@
 #define GRSIGNALSRC_H
 
 #include "grproxyblock.h"
-#include <gnuradio/analog/sig_source.h>
 #include "scopy-gr-util_export.h"
 
+#include <gnuradio/analog/sig_source.h>
+
 namespace scopy::grutil {
-class SCOPY_GR_UTIL_EXPORT GRSignalSrc : public GRProxyBlock {
+class SCOPY_GR_UTIL_EXPORT GRSignalSrc : public GRProxyBlock
+{
 	Q_OBJECT
 public:
 	GRSignalSrc(QObject *parent = nullptr);
@@ -30,5 +32,5 @@ protected:
 	double m_amplitude;
 	double m_offset;
 };
-}
+} // namespace scopy::grutil
 #endif // GRSIGNALSRC_H

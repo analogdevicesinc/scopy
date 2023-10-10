@@ -21,30 +21,31 @@
 #ifndef SCOPY_CUSTOM_PUSH_BUTTON_HPP
 #define SCOPY_CUSTOM_PUSH_BUTTON_HPP
 
-#include <QPushButton>
 #include "scopy-gui_export.h"
+
+#include <QPushButton>
 
 class QMouseEvent;
 
 namespace scopy {
-	/* The CustomPushButton class behaves exactly like QPushButton. The only
-	 * difference is, when it's part of a button group and is the active
-	 * button, it is possible to disactivate it by clicking on it. */
+/* The CustomPushButton class behaves exactly like QPushButton. The only
+ * difference is, when it's part of a button group and is the active
+ * button, it is possible to disactivate it by clicking on it. */
 
-	class SCOPY_GUI_EXPORT CustomPushButton : public QPushButton
-	{
-		Q_OBJECT
+class SCOPY_GUI_EXPORT CustomPushButton : public QPushButton
+{
+	Q_OBJECT
 
-	public:
-		explicit CustomPushButton(QWidget *parent = Q_NULLPTR);
-		~CustomPushButton();
+public:
+	explicit CustomPushButton(QWidget *parent = Q_NULLPTR);
+	~CustomPushButton();
 
-	protected:
-		void mouseReleaseEvent(QMouseEvent *event);
+protected:
+	void mouseReleaseEvent(QMouseEvent *event);
 
-	public Q_SLOTS:
-		void setChecked(bool checked);
-	};
-}
+public Q_SLOTS:
+	void setChecked(bool checked);
+};
+} // namespace scopy
 
 #endif /* SCOPY_CUSTOM_PUSH_BUTTON_HPP */

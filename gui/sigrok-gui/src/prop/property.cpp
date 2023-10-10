@@ -37,46 +37,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "prop/property.hpp"
 
 namespace scopy {
 namespace prop {
 
-Property::Property(QString name, QString desc, Getter getter, Setter setter) :
-	getter_(getter),
-	setter_(setter),
-	name_(name),
-	desc_(desc)
-{
-}
+Property::Property(QString name, QString desc, Getter getter, Setter setter)
+	: getter_(getter)
+	, setter_(setter)
+	, name_(name)
+	, desc_(desc)
+{}
 
-const QString& Property::name() const
-{
-	return name_;
-}
+const QString &Property::name() const { return name_; }
 
-const QString& Property::desc() const
-{
-	return desc_;
-}
+const QString &Property::desc() const { return desc_; }
 
-QVariant Property::get() const
-{
-	return getter_();
-}
+QVariant Property::get() const { return getter_(); }
 
-void Property::set(QVariant val)
-{
-	return setter_(val);
-}
+void Property::set(QVariant val) { return setter_(val); }
 
-bool Property::labeled_widget() const
-{
-	return false;
-}
+bool Property::labeled_widget() const { return false; }
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #include "prop/moc_property.cpp"

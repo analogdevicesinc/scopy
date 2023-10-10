@@ -23,14 +23,16 @@
 #include <config.h>
 #endif
 
-#include <gnuradio/io_signature.h>
+#include "time_sink_f_impl.h"
+
 #include <gnuradio/block_detail.h>
 #include <gnuradio/buffer.h>
+#include <gnuradio/io_signature.h>
 #include <gnuradio/prefs.h>
-#include <string.h>
 
-#include "time_sink_f_impl.h"
 #include <QLoggingCategory>
+
+#include <string.h>
 
 Q_LOGGING_CATEGORY(CAT_TIME_SINK_F, "TimeSink_f");
 
@@ -38,42 +40,39 @@ using namespace gr;
 
 namespace scopy {
 
-time_sink_f::sptr
-time_sink_f::make(int size, float sampleRate, const std::string &name,
-		  int nconnections )
+time_sink_f::sptr time_sink_f::make(int size, float sampleRate, const std::string &name, int nconnections)
 {
-	return gnuradio::get_initial_sptr
-		(new time_sink_f_impl(size, sampleRate, name, nconnections));
+	return gnuradio::get_initial_sptr(new time_sink_f_impl(size, sampleRate, name, nconnections));
 }
 
-void time_sink_f_impl::generate_time_axis() {
-	qInfo(CAT_TIME_SINK_F)<< "Generating x-Axis";
+void time_sink_f_impl::generate_time_axis()
+{
+	qInfo(CAT_TIME_SINK_F) << "Generating x-Axis";
 	double timeoffset = 0;
 	m_time.clear();
-	for (int i = 0; i <= m_size;i++) {
-		m_time.push_back(timeoffset + i/m_sampleRate);
+	for(int i = 0; i <= m_size; i++) {
+		m_time.push_back(timeoffset + i / m_sampleRate);
 	}
 }
 
-time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections )
-    : sync_block("time_sink_f",
-	io_signature::make(nconnections, nconnections, sizeof(float)),
-	io_signature::make(0, 0, 0)),
-      m_size(size),
-      m_sampleRate(sampleRate),
-      m_name(name),
-      m_nconnections(nconnections),
-      m_rollingMode(false),
-      m_workFinished(false),
-      m_dataUpdated(false)
+time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections)
+	: sync_block("time_sink_f", io_signature::make(nconnections, nconnections, sizeof(float)),
+		     io_signature::make(0, 0, 0))
+	, m_size(size)
+	, m_sampleRate(sampleRate)
+	, m_name(name)
+	, m_nconnections(nconnections)
+	, m_rollingMode(false)
+	, m_workFinished(false)
+	, m_dataUpdated(false)
 {
-	qInfo(CAT_TIME_SINK_F)<<"ctor";
+	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers
 	m_data.reserve(nconnections);
 	m_dataTags.reserve(nconnections);
 	m_tags.reserve(nconnections);
 
-	for (int i = 0; i < m_nconnections;i++) {
+	for(int i = 0; i < m_nconnections; i++) {
 		m_buffers.push_back(std::deque<float>());
 		m_data.push_back(std::vector<float>());
 		m_localtags.push_back(std::vector<tag_t>());
@@ -83,23 +82,18 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 		m_data[i].reserve(size);
 	}
 
-	m_time.reserve(size+1);
+	m_time.reserve(size + 1);
 	generate_time_axis();
 }
 
-time_sink_f_impl::~time_sink_f_impl() {
-qInfo(CAT_TIME_SINK_F)<<"dtor";
-}
+time_sink_f_impl::~time_sink_f_impl() { qInfo(CAT_TIME_SINK_F) << "dtor"; }
 
-bool time_sink_f_impl::check_topology(int ninputs, int noutputs) {
-	return ninputs == m_nconnections;
-}
+bool time_sink_f_impl::check_topology(int ninputs, int noutputs) { return ninputs == m_nconnections; }
 
-std::string time_sink_f_impl::name() const {
-	return m_name;
-}
+std::string time_sink_f_impl::name() const { return m_name; }
 
-void time_sink_f_impl::updateData() {
+void time_sink_f_impl::updateData()
+{
 	gr::thread::scoped_lock lock(d_setlock);
 
 	for(int i = 0; i < m_nconnections; i++) {
@@ -112,62 +106,41 @@ void time_sink_f_impl::updateData() {
 		if(!m_computeTags)
 			continue;
 
-		for(int j = 0 ;j < m_tags[i].size(); j++) {
+		for(int j = 0; j < m_tags[i].size(); j++) {
 			PlotTag_t tag;
 
 			std::stringstream s;
 			s << m_tags[i][j].key << ": " << m_tags[i][j].value;
 			tag.str = QString::fromStdString(s.str());
-			qInfo()<<"nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;;
+			qInfo() << "nitems_read(i)" << nitems_read(i) << "tag.offset" << m_tags[i][j].offset;
+			;
 			tag.offset = nitems_read(i) - m_tags[i][j].offset;
 
 			m_dataTags[i].push_back(tag);
 		}
 	}
 
-//	nitems_read();
+	//	nitems_read();
 	if(m_workFinished) {
 		m_dataUpdated = true;
 	}
 }
 
-bool time_sink_f_impl::rollingMode()
-{
-	return m_rollingMode;
-}
+bool time_sink_f_impl::rollingMode() { return m_rollingMode; }
 
-void time_sink_f_impl::setRollingMode(bool b)
-{
-	m_rollingMode = b;
-}
+void time_sink_f_impl::setRollingMode(bool b) { m_rollingMode = b; }
 
-bool time_sink_f_impl::singleShot()
-{
-	return m_singleShot;
-}
+bool time_sink_f_impl::singleShot() { return m_singleShot; }
 
-void time_sink_f_impl::setSingleShot(bool b)
-{
-	m_singleShot = b;
-}
+void time_sink_f_impl::setSingleShot(bool b) { m_singleShot = b; }
 
-bool time_sink_f_impl::finishedAcquisition()
-{
-	return m_workFinished && m_dataUpdated;
-}
+bool time_sink_f_impl::finishedAcquisition() { return m_workFinished && m_dataUpdated; }
 
-const std::vector<float> &time_sink_f_impl::time() const {
-	return m_time;
-}
+const std::vector<float> &time_sink_f_impl::time() const { return m_time; }
 
-const std::vector<std::vector<float> > &time_sink_f_impl::data() const {
-	return m_data;
-}
+const std::vector<std::vector<float>> &time_sink_f_impl::data() const { return m_data; }
 
-const std::vector<std::vector<PlotTag_t> > &time_sink_f_impl::tags() const
-{
-	return m_dataTags;
-}
+const std::vector<std::vector<PlotTag_t>> &time_sink_f_impl::tags() const { return m_dataTags; }
 
 bool time_sink_f_impl::start()
 {
@@ -176,17 +149,12 @@ bool time_sink_f_impl::start()
 	return true;
 }
 
-bool time_sink_f_impl::stop()
+bool time_sink_f_impl::stop() { return true; }
+
+int time_sink_f_impl::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
-	return true;
-}
 
-
-int time_sink_f_impl::work(int noutput_items,
-		       gr_vector_const_void_star &input_items,
-		       gr_vector_void_star &output_items) {
-
-//	qInfo(CAT_TIME_SINK_F)<<"Work";
+	//	qInfo(CAT_TIME_SINK_F)<<"Work";
 	gr::thread::scoped_lock lock(d_setlock);
 
 	// Trigger on BUFFER_START (?)
@@ -198,10 +166,10 @@ int time_sink_f_impl::work(int noutput_items,
 	}
 
 	if(!m_rollingMode) {
-	for(int i = 0; i < m_nconnections; i++) {
+		for(int i = 0; i < m_nconnections; i++) {
 			if(m_buffers[i].size() >= m_size) {
 				m_buffers[i].clear();
-//				m_tags[i].clear();
+				//				m_tags[i].clear();
 			}
 		}
 	}
@@ -213,38 +181,32 @@ int time_sink_f_impl::work(int noutput_items,
 			}
 
 			const float *in;
-			in = (const float*)input_items[i];
+			in = (const float *)input_items[i];
 			m_buffers[i].push_front(in[j]);
 		}
 
-		if(m_computeTags)
-		{
+		if(m_computeTags) {
 			m_localtags[i].clear();
-			get_tags_in_window(m_localtags[i],i,0,noutput_items);
+			get_tags_in_window(m_localtags[i], i, 0, noutput_items);
 			m_tags[i].insert(m_tags[i].end(), m_localtags[i].begin(), m_localtags[i].end());
 			while(m_size < nitems_read(i) - m_tags[i].front().offset) {
 				m_tags[i].pop_front();
 			}
-
 		}
 	}
 
 	return noutput_items;
-
 }
 
-bool time_sink_f_impl::computeTags()
-{
-	return m_computeTags;
-}
+bool time_sink_f_impl::computeTags() { return m_computeTags; }
 
 void time_sink_f_impl::setComputeTags(bool newComputeTags)
 {
 	m_computeTags = newComputeTags;
-//	for(int i = 0; i < m_nconnections; i++) {
-//		m_dataTags[i].clear();
-//		m_tags[i].clear();
-//		m_localtags[i].clear();
-//	}
+	//	for(int i = 0; i < m_nconnections; i++) {
+	//		m_dataTags[i].clear();
+	//		m_tags[i].clear();
+	//		m_localtags[i].clear();
+	//	}
 }
-} /* namespace gr */
+} // namespace scopy

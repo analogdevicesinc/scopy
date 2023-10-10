@@ -21,8 +21,9 @@
 #ifndef X_AXIS_SCALE_ZOOMER_H
 #define X_AXIS_SCALE_ZOOMER_H
 
-#include <qwt_plot_zoomer.h>
 #include "osc_scale_zoomer.h"
+
+#include <qwt_plot_zoomer.h>
 
 namespace scopy {
 class XAxisScaleZoomer : public OscScaleZoomer
@@ -33,8 +34,8 @@ public:
 	~XAxisScaleZoomer();
 
 protected:
-	virtual void zoom(const QRectF&);
-	virtual QwtText trackerText( const QPoint& p ) const;
+	virtual void zoom(const QRectF &);
+	virtual QwtText trackerText(const QPoint &p) const;
 };
-}
+} // namespace scopy
 #endif // X_AXIS_SCALE_ZOOMER_H

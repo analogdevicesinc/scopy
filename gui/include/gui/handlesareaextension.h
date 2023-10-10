@@ -1,8 +1,9 @@
 #ifndef HANDLESAREAEXTENSION_H
 #define HANDLESAREAEXTENSION_H
 
-#include <QPainter>
 #include "scopy-gui_export.h"
+
+#include <QPainter>
 
 class QwtPlot;
 
@@ -17,11 +18,13 @@ public:
 	// return true if this will be the last extension to be drawn no matter
 	// the number of extensions installed
 	virtual bool draw(QPainter *painter, QWidget *owner) = 0;
+
 protected:
 	QwtPlot *m_plot;
 };
 
-class SCOPY_GUI_EXPORT XBottomRuller: public HandlesAreaExtension {
+class SCOPY_GUI_EXPORT XBottomRuller : public HandlesAreaExtension
+{
 public:
 	XBottomRuller(QwtPlot *plot);
 	virtual ~XBottomRuller() = default;
@@ -29,7 +32,8 @@ public:
 	virtual bool draw(QPainter *painter, QWidget *owner) Q_DECL_OVERRIDE;
 };
 
-class SCOPY_GUI_EXPORT YLeftRuller: public HandlesAreaExtension {
+class SCOPY_GUI_EXPORT YLeftRuller : public HandlesAreaExtension
+{
 public:
 	YLeftRuller(QwtPlot *plot);
 	virtual ~YLeftRuller() = default;
@@ -37,7 +41,8 @@ public:
 	virtual bool draw(QPainter *painter, QWidget *owner) Q_DECL_OVERRIDE;
 };
 
-class SCOPY_GUI_EXPORT XTopRuller: public HandlesAreaExtension {
+class SCOPY_GUI_EXPORT XTopRuller : public HandlesAreaExtension
+{
 public:
 	XTopRuller(QwtPlot *plot);
 	virtual ~XTopRuller() = default;

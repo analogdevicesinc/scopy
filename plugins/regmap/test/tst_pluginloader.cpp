@@ -1,6 +1,8 @@
 #include "qpluginloader.h"
-#include <QTest>
+
 #include <QList>
+#include <QTest>
+
 #include <pluginbase/plugin.h>
 
 using namespace scopy;
@@ -24,7 +26,6 @@ private Q_SLOTS:
 #define PLUGIN_LOCATION "../../plugins"
 #define FILENAME PLUGIN_LOCATION "/libscopy-regmapplugin.so"
 
-
 void TST_REGMAPPlugin::fileExists()
 {
 	QFile f(FILENAME);
@@ -35,54 +36,49 @@ void TST_REGMAPPlugin::fileExists()
 	QVERIFY(ret);
 }
 
-void TST_REGMAPPlugin::isLibrary()
-{
-	QVERIFY(QLibrary::isLibrary(FILENAME));
-}
+void TST_REGMAPPlugin::isLibrary() { QVERIFY(QLibrary::isLibrary(FILENAME)); }
 
 void TST_REGMAPPlugin::className()
 {
-	QPluginLoader qp(FILENAME,this);
-    QVERIFY(qp.metaData().value("className") == "RegmapPlugin");
+	QPluginLoader qp(FILENAME, this);
+	QVERIFY(qp.metaData().value("className") == "RegmapPlugin");
 }
 
 void TST_REGMAPPlugin::loaded()
 {
-	QPluginLoader qp(FILENAME,this);
+	QPluginLoader qp(FILENAME, this);
 	qp.load();
-    qDebug() << qp.errorString();
+	qDebug() << qp.errorString();
 	QVERIFY(qp.isLoaded());
 }
 
 void TST_REGMAPPlugin::instanceNotNull()
 {
-	QPluginLoader qp(FILENAME,this);
+	QPluginLoader qp(FILENAME, this);
 	QVERIFY(qp.instance() != nullptr);
 }
 
 void TST_REGMAPPlugin::multipleInstances()
 {
-	QPluginLoader qp1(FILENAME,this);
-	QPluginLoader qp2(FILENAME,this);
+	QPluginLoader qp1(FILENAME, this);
+	QPluginLoader qp2(FILENAME, this);
 
 	QVERIFY(qp1.instance() == qp2.instance());
 }
 
-
 void TST_REGMAPPlugin::qobjectcast_to_plugin()
 {
-	QPluginLoader qp(FILENAME,this);
-	auto instance = qobject_cast<Plugin*>(qp.instance());
-	QVERIFY(instance != nullptr );
+	QPluginLoader qp(FILENAME, this);
+	auto instance = qobject_cast<Plugin *>(qp.instance());
+	QVERIFY(instance != nullptr);
 }
-
 
 void TST_REGMAPPlugin::clone()
 {
-	QPluginLoader qp(FILENAME,this);
+	QPluginLoader qp(FILENAME, this);
 
 	Plugin *p1 = nullptr, *p2 = nullptr;
-	auto original = qobject_cast<Plugin*>(qp.instance());
+	auto original = qobject_cast<Plugin *>(qp.instance());
 	p1 = original->clone();
 	QVERIFY(p1 != nullptr);
 	p2 = original->clone();
@@ -90,27 +86,27 @@ void TST_REGMAPPlugin::clone()
 	QVERIFY(p1 != p2);
 }
 
-void TST_REGMAPPlugin::name() {
-	QPluginLoader qp(FILENAME,this);
+void TST_REGMAPPlugin::name()
+{
+	QPluginLoader qp(FILENAME, this);
 
 	Plugin *p1 = nullptr, *p2 = nullptr;
-	auto original = qobject_cast<Plugin*>(qp.instance());
+	auto original = qobject_cast<Plugin *>(qp.instance());
 	p1 = original->clone();
-	qDebug()<<p1->name();
+	qDebug() << p1->name();
 }
 
 void TST_REGMAPPlugin::metadata()
 {
-	QPluginLoader qp(FILENAME,this);
+	QPluginLoader qp(FILENAME, this);
 
 	Plugin *p1 = nullptr, *p2 = nullptr;
-	auto original = qobject_cast<Plugin*>(qp.instance());
+	auto original = qobject_cast<Plugin *>(qp.instance());
 	original->initMetadata();
 	p1 = original->clone();
-	qDebug()<<p1->metadata();
+	qDebug() << p1->metadata();
 	QVERIFY(!p1->metadata().isEmpty());
 }
-
 
 QTEST_MAIN(TST_REGMAPPlugin)
 

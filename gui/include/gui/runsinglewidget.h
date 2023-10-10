@@ -21,9 +21,10 @@
 #ifndef RUNSINGLEWIDGET_H
 #define RUNSINGLEWIDGET_H
 
+#include "scopy-gui_export.h"
+
 #include <QPushButton>
 #include <QWidget>
-#include "scopy-gui_export.h"
 
 namespace Ui {
 class RunSingleWidget;
@@ -47,8 +48,8 @@ public:
 	bool singleButtonChecked() const;
 	bool runButtonChecked() const;
 
-	QPushButton* getRunButton();
-	QPushButton* getSingleButton();
+	QPushButton *getRunButton();
+	QPushButton *getSingleButton();
 
 public Q_SLOTS:
 	void toggle(bool);
@@ -65,6 +66,6 @@ private:
 	bool d_singleButtonEnabled;
 	bool d_runButtonEnabled;
 };
-}
+} // namespace scopy
 
 #endif // RUNSINGLEWIDGET_H

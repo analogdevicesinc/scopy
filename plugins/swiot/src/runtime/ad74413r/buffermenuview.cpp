@@ -18,26 +18,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "buffermenuview.h"
+
 #include <QHBoxLayout>
 
 using namespace scopy;
 
-swiot::BufferMenuView::BufferMenuView(QWidget *parent):
-	GenericMenu(parent)
-      ,m_swiotAdvMenu(nullptr)
+swiot::BufferMenuView::BufferMenuView(QWidget *parent)
+	: GenericMenu(parent)
+	, m_swiotAdvMenu(nullptr)
 {}
 
-swiot::BufferMenuView::~BufferMenuView()
-{}
+swiot::BufferMenuView::~BufferMenuView() {}
 
-void swiot::BufferMenuView::init(QString title, QString function, QColor* color, QString unit,
-				 double yMin, double yMax)
+void swiot::BufferMenuView::init(QString title, QString function, QColor *color, QString unit, double yMin, double yMax)
 {
 	initInteractiveMenu();
-	setMenuHeader(title,color,false);
-	createHeaderWidget(title);;
+	setMenuHeader(title, color, false);
+	createHeaderWidget(title);
+	;
 
 	m_advanceSettingsSection = new gui::SubsectionSeparator("SETTINGS", false);
 	m_advanceSettingsSection->getLabel()->setStyleSheet("color:gray;");
@@ -54,10 +53,9 @@ void swiot::BufferMenuView::init(QString title, QString function, QColor* color,
 	m_swiotAdvMenu = swiot::BufferMenuBuilder::newAdvMenu(m_advanceSettingsSection->getContentWidget(), function);
 	m_swiotAdvMenu->setupVerticalSettingsMenu(m_verticalSettingsSection->getContentWidget(), unit, yMin, yMax);
 	QVector<QBoxLayout *> layers = m_swiotAdvMenu->getMenuLayers();
-	for (int i = 0; i < layers.size(); i++) {
+	for(int i = 0; i < layers.size(); i++) {
 		m_advanceSettingsSection->getContentWidget()->layout()->addItem(layers[i]);
 	}
-
 }
 
 void swiot::BufferMenuView::initAdvMenu(QMap<QString, QMap<QString, QStringList>> values)
@@ -72,7 +70,7 @@ void swiot::BufferMenuView::createHeaderWidget(const QString title)
 	headerWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	QHBoxLayout *headerLayout = new QHBoxLayout(headerWidget);
-	headerLayout->setContentsMargins(0,0,0,0);
+	headerLayout->setContentsMargins(0, 0, 0, 0);
 	headerLayout->setSpacing(0);
 	m_btnInfoStatus = new scopy::LinkedButton();
 	m_btnInfoStatus->installEventFilter(this);
@@ -80,8 +78,8 @@ void swiot::BufferMenuView::createHeaderWidget(const QString title)
 	m_btnInfoStatus->setCheckable(false);
 	m_btnInfoStatus->setText(QString());
 	m_btnInfoStatus->setToolTip("For each output channel, a buffered\n"
-				  "input channel is generated which is\n"
-				  "displayed on the plot");
+				    "input channel is generated which is\n"
+				    "displayed on the plot");
 	headerLayout->insertWidget(headerLayout->count(), new QLabel(title));
 	headerLayout->insertWidget(headerLayout->count(), m_btnInfoStatus);
 	addNewHeaderWidget(headerWidget);
@@ -89,9 +87,8 @@ void swiot::BufferMenuView::createHeaderWidget(const QString title)
 
 bool swiot::BufferMenuView::eventFilter(QObject *obj, QEvent *event)
 {
-	if (obj == (QObject*)m_btnInfoStatus) {
-		if (event->type() == QEvent::Enter)
-		{
+	if(obj == (QObject *)m_btnInfoStatus) {
+		if(event->type() == QEvent::Enter) {
 			m_btnInfoStatus->setToolTip(m_swiotAdvMenu->getInfoMessage());
 		}
 		return false;
@@ -100,7 +97,4 @@ bool swiot::BufferMenuView::eventFilter(QObject *obj, QEvent *event)
 	}
 }
 
-swiot::BufferMenu* swiot::BufferMenuView::getAdvMenu()
-{
-	return m_swiotAdvMenu;
-}
+swiot::BufferMenu *swiot::BufferMenuView::getAdvMenu() { return m_swiotAdvMenu; }

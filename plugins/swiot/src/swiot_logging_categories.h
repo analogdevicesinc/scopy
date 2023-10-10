@@ -18,7 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_SWIOT_LOGGING_CATEGORIES_H
 #define SCOPY_SWIOT_LOGGING_CATEGORIES_H
 
@@ -38,4 +37,4 @@ Q_DECLARE_LOGGING_CATEGORY(CAT_SWIOT_MAX14906)
 #define CAT_SWIOT_MAX14906
 #endif
 
-#endif //SCOPY_SWIOT_LOGGING_CATEGORIES_H
+#endif // SCOPY_SWIOT_LOGGING_CATEGORIES_H

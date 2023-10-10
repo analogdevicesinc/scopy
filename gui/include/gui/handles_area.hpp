@@ -21,17 +21,18 @@
 #ifndef HANDLES_AREA_H
 #define HANDLES_AREA_H
 
-#include <QWidget>
-#include <memory>
-#include <vector>
-
 #include "handlesareaextension.h"
 #include "scopy-gui_export.h"
+
+#include <QWidget>
+
+#include <memory>
+#include <vector>
 
 class QPoint;
 class PlotLineHandle;
 
-class SCOPY_GUI_EXPORT HandlesArea: public QWidget
+class SCOPY_GUI_EXPORT HandlesArea : public QWidget
 {
 	Q_OBJECT
 
@@ -49,7 +50,7 @@ protected:
 	void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 	virtual void resizeMask(QSize) = 0;
 
-	void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+	void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
 protected:
 	QWidget *canvas;
@@ -59,7 +60,7 @@ protected:
 	std::vector<std::unique_ptr<HandlesAreaExtension>> m_extensions;
 };
 
-class SCOPY_GUI_EXPORT VertHandlesArea: public HandlesArea
+class SCOPY_GUI_EXPORT VertHandlesArea : public HandlesArea
 {
 	Q_OBJECT
 public:
@@ -81,7 +82,7 @@ private:
 	int largest_child_height;
 };
 
-class SCOPY_GUI_EXPORT HorizHandlesArea: public HandlesArea
+class SCOPY_GUI_EXPORT HorizHandlesArea : public HandlesArea
 {
 	Q_OBJECT
 public:
@@ -103,12 +104,14 @@ private:
 	int largest_child_width;
 };
 
-class SCOPY_GUI_EXPORT GateHandlesArea: public HorizHandlesArea
+class SCOPY_GUI_EXPORT GateHandlesArea : public HorizHandlesArea
 {
 public:
 	GateHandlesArea(QWidget *parent = 0);
+
 protected:
 	void mousePressEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
+
 private:
 };
 

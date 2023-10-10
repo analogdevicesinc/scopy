@@ -21,6 +21,7 @@
 #define SPECTRUM_ANALYZER_API_HPP
 
 #include "spectrum_analyzer.hpp"
+
 #include <pluginbase/apiobject.h>
 
 namespace scopy::m2k {
@@ -31,7 +32,7 @@ class SpectrumAnalyzer_API : public ApiObject
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool single READ isSingle WRITE single STORED false);
 	Q_PROPERTY(double startFreq READ startFreq WRITE setStartFreq);
-	Q_PROPERTY(double stopFreq  READ stopFreq  WRITE setStopFreq);
+	Q_PROPERTY(double stopFreq READ stopFreq WRITE setStopFreq);
 	Q_PROPERTY(QString units READ units WRITE setUnits);
 	Q_PROPERTY(QString resBW READ resBW WRITE setResBW);
 	Q_PROPERTY(double topScale READ topScale WRITE setTopScale);
@@ -39,18 +40,13 @@ class SpectrumAnalyzer_API : public ApiObject
 	Q_PROPERTY(double unitPerDiv READ unitPerDiv WRITE setunitPerDiv);
 	Q_PROPERTY(QVariantList channels READ getChannels);
 	Q_PROPERTY(int currentChannel READ currentChannel WRITE setCurrentChannel);
-	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE
-	           setMarkerTableVisible);
+	Q_PROPERTY(bool markerTableVisible READ markerTableVisible WRITE setMarkerTableVisible);
 	Q_PROPERTY(QVariantList markers READ getMarkers);
 
-	Q_PROPERTY(bool horizontal_cursors READ horizontalCursors
-			WRITE setHorizontalCursors)
-	Q_PROPERTY(bool vertical_cursors READ verticalCursors
-			WRITE setVerticalCursors)
-	Q_PROPERTY(int cursors_position READ getCursorsPosition
-		  WRITE setCursorsPosition)
-	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
-		  WRITE setCursorsTransparency)
+	Q_PROPERTY(bool horizontal_cursors READ horizontalCursors WRITE setHorizontalCursors)
+	Q_PROPERTY(bool vertical_cursors READ verticalCursors WRITE setVerticalCursors)
+	Q_PROPERTY(int cursors_position READ getCursorsPosition WRITE setCursorsPosition)
+	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency WRITE setCursorsTransparency)
 
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
@@ -58,8 +54,10 @@ class SpectrumAnalyzer_API : public ApiObject
 
 public:
 	Q_INVOKABLE void show();
-	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp) :
-		ApiObject(), sp(sp) {}
+	explicit SpectrumAnalyzer_API(SpectrumAnalyzer *sp)
+		: ApiObject()
+		, sp(sp)
+	{}
 	~SpectrumAnalyzer_API() {}
 
 private:
@@ -124,7 +122,6 @@ private:
 
 	bool getWaterfallVisible() const;
 	void setWaterfallVisible(bool en);
-
 };
 
 class SpectrumChannel_API : public ApiObject
@@ -134,27 +131,29 @@ class SpectrumChannel_API : public ApiObject
 	Q_PROPERTY(int type READ type WRITE setType);
 	Q_PROPERTY(int window READ window WRITE setWindow);
 	Q_PROPERTY(int averaging READ averaging WRITE setAveraging);
-        Q_PROPERTY(float line_thickness READ lineThickness WRITE setLineThickness);
-        Q_PROPERTY(QList<double> data READ data STORED false)
+	Q_PROPERTY(float line_thickness READ lineThickness WRITE setLineThickness);
+	Q_PROPERTY(QList<double> data READ data STORED false)
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
 
 public:
-	explicit SpectrumChannel_API(SpectrumAnalyzer *sp,
-				     std::shared_ptr<SpectrumChannel> spch) :
-		ApiObject(), spch(spch),sp(sp) {}
+	explicit SpectrumChannel_API(SpectrumAnalyzer *sp, std::shared_ptr<SpectrumChannel> spch)
+		: ApiObject()
+		, spch(spch)
+		, sp(sp)
+	{}
 	~SpectrumChannel_API() {}
 
 	bool enabled();
 	int type();
 	int window();
 	int averaging();
-        float lineThickness();
+	float lineThickness();
 
-        void enable(bool);
+	void enable(bool);
 	void setType(int);
 	void setWindow(int);
 	void setAveraging(int);
-        void setLineThickness(float val);
+	void setLineThickness(float val);
 
 	QList<double> data() const;
 	QList<double> freq() const;
@@ -164,7 +163,7 @@ private:
 	std::shared_ptr<SpectrumChannel> spch;
 };
 
-class SpectrumMarker_API :public ApiObject
+class SpectrumMarker_API : public ApiObject
 {
 	Q_OBJECT
 
@@ -179,9 +178,15 @@ class SpectrumMarker_API :public ApiObject
 	int m_chid;
 	int m_mkid;
 	int m_type;
+
 public:
-	explicit SpectrumMarker_API(SpectrumAnalyzer *sp,int chid, int mkid) :
-		ApiObject(), sp(sp), m_mkid(mkid), m_chid(chid), m_type(0) {}
+	explicit SpectrumMarker_API(SpectrumAnalyzer *sp, int chid, int mkid)
+		: ApiObject()
+		, sp(sp)
+		, m_mkid(mkid)
+		, m_chid(chid)
+		, m_type(0)
+	{}
 	~SpectrumMarker_API() {}
 
 	int chId();
@@ -205,8 +210,7 @@ public:
 	double magnitude();
 
 	SpectrumAnalyzer *sp;
-
 };
-}
+} // namespace scopy::m2k
 
 #endif // SPECTRUM_ANALYZER_API_HPP

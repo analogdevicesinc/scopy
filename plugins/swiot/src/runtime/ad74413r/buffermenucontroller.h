@@ -18,20 +18,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef BUFFERMENUCONTROLLER_H
 #define BUFFERMENUCONTROLLER_H
 
-#include "qobject.h"
-#include "buffermenuview.h"
 #include "buffermenumodel.h"
+#include "buffermenuview.h"
+#include "qobject.h"
 
 namespace scopy::swiot {
-class BufferMenuController : public QObject {
+class BufferMenuController : public QObject
+{
 	Q_OBJECT
 public:
-	explicit BufferMenuController(BufferMenuView *genericMenu = nullptr,
-				      BufferMenuModel *model = nullptr, int chnlIdx = -1);
+	explicit BufferMenuController(BufferMenuView *genericMenu = nullptr, BufferMenuModel *model = nullptr,
+				      int chnlIdx = -1);
 
 	~BufferMenuController();
 
@@ -42,7 +42,7 @@ public:
 public Q_SLOTS:
 	void attributesChanged(QString attrName, QString chnlType);
 
-	void addMenuAttrValues(QMap<QString, QMap<QString, QStringList> > values);
+	void addMenuAttrValues(QMap<QString, QMap<QString, QStringList>> values);
 Q_SIGNALS:
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
@@ -55,9 +55,7 @@ private:
 	int m_chnlIdx;
 	BufferMenuView *m_genericMenu;
 	BufferMenuModel *m_model;
-
 };
-}
-
+} // namespace scopy::swiot
 
 #endif // BUFFERMENUCONTROLLER_H

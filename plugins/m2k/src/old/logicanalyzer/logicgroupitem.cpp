@@ -18,33 +18,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "logicgroupitem.h"
-
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QDebug>
 
 #include "gui/basemenu.h"
 
+#include <QDebug>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QVBoxLayout>
+
 using namespace scopy;
 
-LogicGroupItem::LogicGroupItem(const QString &name, QWidget *parent):
-	BaseMenuItem(parent),
-	m_nameLabel(new QLabel(name, this))
+LogicGroupItem::LogicGroupItem(const QString &name, QWidget *parent)
+	: BaseMenuItem(parent)
+	, m_nameLabel(new QLabel(name, this))
 {
 	buildUi();
 }
 
-QString LogicGroupItem::getName() const
-{
-	return m_nameLabel->text();
-}
+QString LogicGroupItem::getName() const { return m_nameLabel->text(); }
 
 void LogicGroupItem::setName(const QString &name)
 {
-	if (m_nameLabel->text() != name) {
+	if(m_nameLabel->text() != name) {
 		m_nameLabel->setText(name);
 		qDebug() << "Changing name to: " << name;
 	}
@@ -79,7 +75,7 @@ void LogicGroupItem::buildUi()
 	dragWidget->setMinimumSize(QSize(16, 16));
 
 	QFrame *frame = new QFrame(dragWidget);
-	frame->setProperty("drag_widget",true);
+	frame->setProperty("drag_widget", true);
 	layoutDragWidget->addWidget(frame);
 
 	QSpacerItem *spacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
@@ -88,12 +84,11 @@ void LogicGroupItem::buildUi()
 	deleteBtn->setFlat(true);
 	deleteBtn->setIcon(QIcon(":/gui/icons/close_hovered.svg"));
 	deleteBtn->setMaximumSize(QSize(16, 16));
-	connect(deleteBtn, &QPushButton::clicked,
-		this, &LogicGroupItem::deleteBtnClicked);
-	connect(deleteBtn, &QPushButton::clicked, [=](){
+	connect(deleteBtn, &QPushButton::clicked, this, &LogicGroupItem::deleteBtnClicked);
+	connect(deleteBtn, &QPushButton::clicked, [=]() {
 		BaseMenu *menu = getOwner();
 
-		if (!menu) {
+		if(!menu) {
 			return;
 		}
 

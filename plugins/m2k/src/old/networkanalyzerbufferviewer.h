@@ -21,22 +21,25 @@
 #ifndef NETWORKANALYZERBUFFERVIEWER_H
 #define NETWORKANALYZERBUFFERVIEWER_H
 
-#include <QWidget>
-#include <QPushButton>
+#include "TimeDomainDisplayPlot.h"
 #include "oscilloscope.hpp"
 
-#include "TimeDomainDisplayPlot.h"
+#include <QPushButton>
+#include <QWidget>
 
 namespace Ui {
 class NetworkAnalyzerBufferViewer;
 }
 
-struct Buffer {
+struct Buffer
+{
 	Buffer() {}
-	Buffer(double frequency, unsigned int sampleRate,
-	       unsigned int bufferSize, const std::vector<float> &buffer):
-		frequency(frequency), sampleRate(sampleRate),
-		bufferSize(bufferSize), buffer(buffer) {}
+	Buffer(double frequency, unsigned int sampleRate, unsigned int bufferSize, const std::vector<float> &buffer)
+		: frequency(frequency)
+		, sampleRate(sampleRate)
+		, bufferSize(bufferSize)
+		, buffer(buffer)
+	{}
 
 	double frequency;
 	unsigned int sampleRate;
@@ -86,6 +89,6 @@ private:
 	QVector<double> d_currentXdata;
 	int d_numBuffers;
 };
-}
+} // namespace scopy::m2k
 
 #endif // NETWORKANALYZERBUFFERVIEWER_H

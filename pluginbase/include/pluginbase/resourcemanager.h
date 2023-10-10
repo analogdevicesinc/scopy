@@ -1,13 +1,15 @@
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
 
-#include <QObject>
-#include <QMap>
 #include "scopy-pluginbase_export.h"
+
+#include <QMap>
+#include <QObject>
 
 namespace scopy {
 
-class SCOPY_PLUGINBASE_EXPORT ResourceUser {
+class SCOPY_PLUGINBASE_EXPORT ResourceUser
+{
 public:
 	virtual void stop() = 0; // call ResourceManager::close
 };
@@ -29,8 +31,8 @@ public:
 	static void close(QString resource);
 
 private:
-	QMap<QString, ResourceUser*> map;
-	static ResourceManager * pinstance_;
+	QMap<QString, ResourceUser *> map;
+	static ResourceManager *pinstance_;
 };
-}
+} // namespace scopy
 #endif // RESOURCEMANAGER_H

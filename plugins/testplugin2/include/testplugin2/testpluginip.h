@@ -1,13 +1,14 @@
 #ifndef TESTPLUGINIP_H
 #define TESTPLUGINIP_H
 
-
 #define SCOPY_PLUGIN_NAME TestPluginIp
 
-#include <QObject>
-#include <pluginbase/plugin.h>
 #include "pluginbase/pluginbase.h"
 #include "scopy-testplugin2_export.h"
+
+#include <QObject>
+
+#include <pluginbase/plugin.h>
 
 namespace scopy {
 class SCOPY_TESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
@@ -15,7 +16,7 @@ class SCOPY_TESTPLUGIN2_EXPORT TestPluginIp : public QObject, public PluginBase
 	Q_OBJECT
 	SCOPY_PLUGIN
 
-// Plugin interface
+	// Plugin interface
 public:
 	void postload() override;
 	bool loadIcon() override;
@@ -31,9 +32,6 @@ public:
 
 private:
 	QWidget *m_tool;
-
-
-
 };
-}
+} // namespace scopy
 #endif // TESTPLUGINIP_H

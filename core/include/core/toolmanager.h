@@ -1,13 +1,14 @@
 #ifndef TOOLMANAGER_H
 #define TOOLMANAGER_H
 
-#include <QObject>
-#include <QMap>
-#include "toolmenu.h"
 #include "detachedtoolwindowmanager.h"
 #include "pluginbase/toolmenuentry.h"
-#include "toolstack.h"
 #include "scopy-core_export.h"
+#include "toolmenu.h"
+#include "toolstack.h"
+
+#include <QMap>
+#include <QObject>
 
 namespace scopy {
 
@@ -15,13 +16,13 @@ class SCOPY_CORE_EXPORT ToolManager : public QObject
 {
 	Q_OBJECT
 public:
-	ToolManager(ToolMenu* tm, ToolStack *ts, DetachedToolWindowManager *dwm,QObject *parent = nullptr);
+	ToolManager(ToolMenu *tm, ToolStack *ts, DetachedToolWindowManager *dwm, QObject *parent = nullptr);
 	~ToolManager();
 
 public Q_SLOTS:
-	void addToolList(QString, QList<ToolMenuEntry*>);
-	void removeToolList(QString);	
-	void changeToolListContents(QString, QList<ToolMenuEntry*>);
+	void addToolList(QString, QList<ToolMenuEntry *>);
+	void removeToolList(QString);
+	void changeToolListContents(QString, QList<ToolMenuEntry *>);
 	void showToolList(QString);
 	void hideToolList(QString);
 	void lockToolList(QString);
@@ -31,7 +32,7 @@ public Q_SLOTS:
 	void updateToolEntry();
 	void updateToolAttached(bool old);
 
-	void updateTool(QWidget* old);
+	void updateTool(QWidget *old);
 	void showTool(QString id);
 	void toggleAttach(QString id);
 
@@ -39,13 +40,13 @@ Q_SIGNALS:
 	void requestTool(QString id);
 
 private:
-
 	void saveToolAttachedState(ToolMenuEntry *tme);
 	void loadToolAttachedState(ToolMenuEntry *tme);
 
-	typedef struct {
+	typedef struct
+	{
 		QString id;
-		QList<ToolMenuEntry*> tools;
+		QList<ToolMenuEntry *> tools;
 		bool lock;
 
 	} st;
@@ -56,6 +57,6 @@ private:
 	ToolStack *ts;
 	DetachedToolWindowManager *dwm;
 };
-}
+} // namespace scopy
 
 #endif // TOOLMANAGER_H

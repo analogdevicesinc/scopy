@@ -37,18 +37,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_BINDING_BINDING_HPP
 #define PULSEVIEW_PV_BINDING_BINDING_HPP
+
+#include "scopy-sigrok-gui_export.h"
+
+#include <QObject>
+#include <QString>
 
 #include <glib.h>
 #include <map>
 #include <memory>
 #include <vector>
-
-#include <QObject>
-#include <QString>
-#include "scopy-sigrok-gui_export.h"
 
 using std::map;
 using std::shared_ptr;
@@ -66,18 +66,18 @@ class Property;
 
 namespace bind {
 
-class SCOPY_SIGROK_GUI_EXPORT Binding: public QObject
+class SCOPY_SIGROK_GUI_EXPORT Binding : public QObject
 {
 	Q_OBJECT
 
 public:
-	const vector< shared_ptr<prop::Property> >& properties();
+	const vector<shared_ptr<prop::Property>> &properties();
 
 	void commit();
 
 	void add_properties_to_form(QFormLayout *layout, bool auto_commit = false);
 
-	QWidget* get_property_form(QWidget *parent, bool auto_commit = false);
+	QWidget *get_property_form(QWidget *parent, bool auto_commit = false);
 
 	void update_property_widgets();
 
@@ -87,11 +87,11 @@ protected Q_SLOTS:
 	void on_help_clicked();
 
 protected:
-	vector< shared_ptr<prop::Property> > properties_;
-	map<QWidget*, QLabel*> help_labels_;
+	vector<shared_ptr<prop::Property>> properties_;
+	map<QWidget *, QLabel *> help_labels_;
 };
 
-}  // namespace binding
-}  // namespace pv
+} // namespace bind
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_BINDING_BINDING_HPP

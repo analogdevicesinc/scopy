@@ -18,7 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SWIOTPLUGIN_H
 #define SWIOTPLUGIN_H
 #define SCOPY_PLUGIN_NAME SWIOTPlugin
@@ -27,17 +26,18 @@
 #define FAULTS_TME_ID "swiotfaults"
 #define MAX14906_TME_ID "swiotmax14906"
 
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
-#include "scopy-swiot_export.h"
-#include "src/runtime/swiotruntime.h"
 #include "QLabel"
+#include "scopy-swiot_export.h"
+#include "src/externalpsreaderthread.h"
+#include "src/runtime/swiotruntime.h"
 #include "src/swiotcontroller.h"
 #include "src/swiotinfopage.h"
-#include <iioutil/cyclicaltask.h>
-#include <iioutil/commandqueue.h>
+
 #include <gui/tutorialbuilder.h>
-#include "src/externalpsreaderthread.h"
+#include <iioutil/commandqueue.h>
+#include <iioutil/cyclicaltask.h>
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
 
 namespace scopy::swiot {
 class SCOPY_SWIOT_EXPORT SWIOTPlugin : public QObject, public PluginBase
@@ -93,6 +93,6 @@ private:
 
 	bool m_isRuntime;
 };
-}
+} // namespace scopy::swiot
 
 #endif // SWIOTPLUGIN_H

@@ -18,15 +18,15 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "widgets/popupwidget.h"
+
 #include "stylehelper.h"
 
 using namespace scopy;
 
-PopupWidget::PopupWidget(QWidget* parent) :
-	m_tintedOverlay(nullptr),
-	QWidget(parent)
+PopupWidget::PopupWidget(QWidget *parent)
+	: m_tintedOverlay(nullptr)
+	, QWidget(parent)
 {
 	this->initUI();
 
@@ -36,11 +36,10 @@ PopupWidget::PopupWidget(QWidget* parent) :
 	m_continueButton->setFocus();
 }
 
-PopupWidget::~PopupWidget() {
-	delete m_tintedOverlay;
-}
+PopupWidget::~PopupWidget() { delete m_tintedOverlay; }
 
-void PopupWidget::initUI() {
+void PopupWidget::initUI()
+{
 	this->setObjectName("PopupWidget");
 	this->setStyleSheet("");
 	this->resize(500, 300);
@@ -83,50 +82,42 @@ void PopupWidget::initUI() {
 	StyleHelper::OverlayMenu(this, "popupOverlay");
 }
 
-void PopupWidget::setFocusOnContinueButton() {
+void PopupWidget::setFocusOnContinueButton()
+{
 	m_continueButton->setAutoDefault(true);
 	m_continueButton->setFocus();
 }
 
-void PopupWidget::setFocusOnExitButton() {
+void PopupWidget::setFocusOnExitButton()
+{
 	m_exitButton->setAutoDefault(true);
 	m_exitButton->setFocus();
 }
 
-QString PopupWidget::getDescription() {
-	return m_descriptionTextBrowser->toMarkdown();
-}
+QString PopupWidget::getDescription() { return m_descriptionTextBrowser->toMarkdown(); }
 
-void PopupWidget::setDescription(const QString& description) {
-	m_descriptionTextBrowser->setMarkdown(description);
-}
+void PopupWidget::setDescription(const QString &description) { m_descriptionTextBrowser->setMarkdown(description); }
 
-QString PopupWidget::getTitle() {
-	return m_titleLabel->text();
-}
+QString PopupWidget::getTitle() { return m_titleLabel->text(); }
 
-void PopupWidget::setTitle(const QString &title) {
-	m_titleLabel->setText(title);
-}
+void PopupWidget::setTitle(const QString &title) { m_titleLabel->setText(title); }
 
-void PopupWidget::enableTitleBar(bool enable) {
-	if (enable) {
+void PopupWidget::enableTitleBar(bool enable)
+{
+	if(enable) {
 		m_titleLabel->show();
 	} else {
 		m_titleLabel->hide();
 	}
 }
 
-QPushButton *PopupWidget::getExitBtn() {
-	return m_exitButton;
-}
+QPushButton *PopupWidget::getExitBtn() { return m_exitButton; }
 
-QPushButton *PopupWidget::getContinueBtn() {
-	return m_continueButton;
-}
+QPushButton *PopupWidget::getContinueBtn() { return m_continueButton; }
 
-void PopupWidget::enableTintedOverlay(bool enable) {
-	if (enable) {
+void PopupWidget::enableTintedOverlay(bool enable)
+{
+	if(enable) {
 		delete m_tintedOverlay;
 
 		m_tintedOverlay = new gui::TintedOverlay(parentWidget());

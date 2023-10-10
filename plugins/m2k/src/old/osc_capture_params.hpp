@@ -26,7 +26,8 @@
 class OscCaptureParams
 {
 public:
-	struct capture_parameters {
+	struct capture_parameters
+	{
 		double sampleRate;
 		double timePos;
 		unsigned long entireBufferSize;
@@ -42,7 +43,7 @@ public:
 	virtual void setTriggerPos(double pos) = 0;
 };
 
-class SymmetricBufferMode: public OscCaptureParams
+class SymmetricBufferMode : public OscCaptureParams
 {
 public:
 	SymmetricBufferMode();
@@ -50,7 +51,7 @@ public:
 
 	capture_parameters captureParameters() const;
 
-	void setSampleRates(const std::vector<double>& sampleRates);
+	void setSampleRates(const std::vector<double> &sampleRates);
 	void setEntireBufferMaxSize(unsigned long maxSize);
 	void setTriggerBufferMaxSize(unsigned long maxSize);
 	void setTimeDivisionCount(int count);

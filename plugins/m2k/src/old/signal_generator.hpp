@@ -21,35 +21,33 @@
 #ifndef M2K_SIGNAL_GENERATOR_H
 #define M2K_SIGNAL_GENERATOR_H
 
-#include <gnuradio/analog/sig_source_waveform.h>
+#include "filemanager.h"
+#include "filter.hpp"
+#include "gnuradio/analog/noise_type.h"
+#include "m2ktool.hpp"
+#include "oscilloscope_plot.hpp"
+#include "pluginbase/apiobject.h"
+#include "scope_sink_f.h"
+
 #include <gnuradio/analog/noise_type.h>
+#include <gnuradio/analog/sig_source_waveform.h>
 #include <gnuradio/top_block.h>
 
 #include <QButtonGroup>
 #include <QPushButton>
-#include <QTreeWidgetItem>
-#include <QSharedPointer>
-#include <QWidget>
 #include <QQueue>
 #include <QSharedPointer>
-
-#include "pluginbase/apiobject.h"
-#include "filter.hpp"
-#include "oscilloscope_plot.hpp"
-#include "scope_sink_f.h"
-#include "m2ktool.hpp"
-#include "filemanager.h"
-
-#include "gnuradio/analog/noise_type.h"
+#include <QTreeWidgetItem>
+#include <QWidget>
 
 /* libm2k includes */
+#include "externalloadlineedit.h"
+
 #include <libm2k/analog/m2kanalogout.hpp>
 #include <libm2k/m2k.hpp>
 
-#include "externalloadlineedit.h"
-
-
-extern "C" {
+extern "C"
+{
 	struct iio_context;
 }
 
@@ -65,14 +63,15 @@ class PhaseSpinButton;
 class PositionSpinButton;
 class ScaleSpinButton;
 
-}
+} // namespace scopy
 
 namespace scopy::m2k {
 struct signal_generator_data;
 struct time_block_data;
 class SignalGenerator_API;
 
-enum sg_noise {
+enum sg_noise
+{
 	SG_NO_NOISE = 0,
 	SG_UNIFORM_NOISE = 1,
 	SG_GAUSSIAN_NOISE = 2,
@@ -80,18 +79,20 @@ enum sg_noise {
 	SG_IMPULSE_NOISE = 4,
 };
 
-enum sg_waveform {
+enum sg_waveform
+{
 	SG_SIN_WAVE = gr::analog::GR_SIN_WAVE,
 	SG_SQR_WAVE = gr::analog::GR_SQR_WAVE,
 	SG_TRI_WAVE = gr::analog::GR_TRI_WAVE,
 	SG_TRA_WAVE = 109,
 	SG_SAW_WAVE = gr::analog::GR_SAW_WAVE,
 	SG_INV_SAW_WAVE = 108,
-	SG_STAIR_WAVE =110,
+	SG_STAIR_WAVE = 110,
 
 };
 
-enum sg_file_format {
+enum sg_file_format
+{
 	FORMAT_NO_FILE,
 	FORMAT_BIN_FLOAT,
 	FORMAT_CSV,
@@ -99,20 +100,24 @@ enum sg_file_format {
 	FORMAT_MAT
 };
 
-typedef union {
-	struct {
-		uint16_t	format;    // Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
-		uint16_t	noChan;      // Number of channels 1=Mono 2=Sterio
-		uint32_t	SamplesPerSec;  // Sampling Frequency in Hz
-		uint32_t	bytesPerSec;    // bytes per second
-		uint16_t	blockAlign;     // 2=16-bit mono, 4=16-bit stereo
-		uint16_t	bitsPerSample;  // Number of bits per sample
+typedef union
+{
+	struct
+	{
+		uint16_t format;	// Audio format 1=PCM,6=mulaw,7=alaw, 257=IBM Mu-Law, 258=IBM A-Law, 259=ADPCM
+		uint16_t noChan;	// Number of channels 1=Mono 2=Sterio
+		uint32_t SamplesPerSec; // Sampling Frequency in Hz
+		uint32_t bytesPerSec;	// bytes per second
+		uint16_t blockAlign;	// 2=16-bit mono, 4=16-bit stereo
+		uint16_t bitsPerSample; // Number of bits per sample
 	};
 	char header_data[16];
 } wav_header_t;
 
-typedef union {
-	struct {
+typedef union
+{
+	struct
+	{
 		uint8_t riff[4];
 		uint32_t size;
 		uint8_t id[4];
@@ -120,9 +125,11 @@ typedef union {
 	char data[12];
 } riff_header_t;
 
-typedef union {
-	struct {
-		uint8_t  id[4];
+typedef union
+{
+	struct
+	{
+		uint8_t id[4];
 		uint32_t size;
 	};
 	char data[8];
@@ -136,9 +143,8 @@ class SignalGenerator : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit SignalGenerator(struct iio_context *ctx,
-				 Filter *filt, ToolMenuEntry *tme,
-				 QJSEngine *engine, QWidget *parent);
+	explicit SignalGenerator(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
+				 QWidget *parent);
 	~SignalGenerator();
 
 	static const size_t min_buffer_size = 1024;
@@ -146,13 +152,13 @@ public:
 	static constexpr float max_frequency = 30000000;
 
 	static double get_best_ratio(double ratio, double max, double *fract);
-	QPushButton* getRunButton();
+	QPushButton *getRunButton();
 	void settingsLoaded();
 
 private:
 	const size_t m_maxNbOfSamples;
-	libm2k::context::M2k* m_m2k_context;
-	libm2k::analog::M2kAnalogOut* m_m2k_analogout;
+	libm2k::context::M2k *m_m2k_context;
+	libm2k::analog::M2kAnalogOut *m_m2k_analogout;
 
 	Ui::SignalGenerator *ui;
 	CapturePlot *m_plot;
@@ -160,7 +166,7 @@ private:
 	struct time_block_data *time_block_data;
 
 	PhaseSpinButton *phase;
-	PositionSpinButton  *filePhase, *stairPhase;
+	PositionSpinButton *filePhase, *stairPhase;
 	PositionSpinButton *offset, *fileOffset;
 	PositionSpinButton *constantValue, *dutycycle;
 	ScaleSpinButton *amplitude, *frequency;
@@ -189,7 +195,7 @@ private:
 	QSharedPointer<signal_generator_data> getData(QWidget *obj);
 	QSharedPointer<signal_generator_data> getCurrentData();
 
-	void start();	
+	void start();
 	void resetZoom();
 
 	void updatePreview();
@@ -199,33 +205,25 @@ private:
 	void loadFileFromPath(QString filename);
 	void reloadFileFromPath();
 
-	gr::basic_block_sptr getSignalSource(
-	        gr::top_block_sptr top,
-		double sample_rate,
-	        struct signal_generator_data& data, double phase_correction=0.0);
+	gr::basic_block_sptr getSignalSource(gr::top_block_sptr top, double sample_rate,
+					     struct signal_generator_data &data, double phase_correction = 0.0);
 
-	gr::basic_block_sptr getNoise(QWidget *obj,gr::top_block_sptr top);
-	gr::basic_block_sptr getSource(QWidget *obj,
-				       double sample_rate,
-	                               gr::top_block_sptr top, bool     phase_correction=false);
-	gr::basic_block_sptr displayResampler(double samp_rate,
-					      double freq,
-					      gr::top_block_sptr top,
-					      gr::basic_block_sptr generated_wave,
-					      gr::basic_block_sptr noiseSrc,
+	gr::basic_block_sptr getNoise(QWidget *obj, gr::top_block_sptr top);
+	gr::basic_block_sptr getSource(QWidget *obj, double sample_rate, gr::top_block_sptr top,
+				       bool phase_correction = false);
+	gr::basic_block_sptr displayResampler(double samp_rate, double freq, gr::top_block_sptr top,
+					      gr::basic_block_sptr generated_wave, gr::basic_block_sptr noiseSrc,
 					      gr::basic_block_sptr noiseAdd);
 
-	static void reduceFraction(double input,long *numerator, long *denominator, long precision=1000000);
+	static void reduceFraction(double input, long *numerator, long *denominator, long precision = 1000000);
 	static size_t gcd(size_t a, size_t b);
 	static size_t lcm(size_t a, size_t b);
 	static int sg_waveform_to_idx(enum sg_waveform wave);
 
 	size_t get_samples_count(unsigned int chnIdx, double sample_rate, bool perfect = false);
 	double get_best_sample_rate(unsigned int chnIdx);
-	void calc_sampling_params(unsigned int chnIdx,
-				  double sample_rate,
-	                          unsigned long& out_sample_rate,
-	                          unsigned long& out_oversampling_ratio);
+	void calc_sampling_params(unsigned int chnIdx, double sample_rate, unsigned long &out_sample_rate,
+				  unsigned long &out_oversampling_ratio);
 	bool use_oversampling(unsigned int chnIdx);
 
 	bool sample_rate_forced(unsigned int chnIdx);
@@ -237,14 +235,13 @@ private:
 	double zoomT1OnScreen;
 	double zoomT2OnScreen;
 
-	std::vector<float>get_stairstep(int rise, int fall, float amplitude, float offset, int phase);
+	std::vector<float> get_stairstep(int rise, int fall, float amplitude, float offset, int phase);
 
 	enum sg_file_format getFileFormat(QString filePath);
-	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr,
-	                            QString filePath);
+	bool loadParametersFromFile(QSharedPointer<signal_generator_data> ptr, QString filePath);
 	void loadFileChannelData(int chIdx);
-	bool riffCompare(riff_header_t& ptr, const char *id2);
-	bool chunkCompare(chunk_header_t& ptr, const char *id2);
+	bool riffCompare(riff_header_t &ptr, const char *id2);
+	bool chunkCompare(chunk_header_t &ptr, const char *id2);
 
 public Q_SLOTS:
 	void run() override;
@@ -277,7 +274,6 @@ private Q_SLOTS:
 	void stepsDownChanged(double value);
 	void stairPhaseChanged(double value);
 
-
 	void mathRecordLengthChanged(double val);
 	void mathSampleRateChanged(double value);
 
@@ -292,20 +288,22 @@ private Q_SLOTS:
 	void rescale();
 
 	void startStop(bool start);
-	void setFunction(const QString& function);
+	void setFunction(const QString &function);
 	void readPreferences();
 Q_SIGNALS:
 	void showTool();
 };
 
-enum SIGNAL_TYPE {
-	SIGNAL_TYPE_CONSTANT	= 0,
-	SIGNAL_TYPE_WAVEFORM	= 1,
-	SIGNAL_TYPE_BUFFER	= 2,
-	SIGNAL_TYPE_MATH	= 3,
+enum SIGNAL_TYPE
+{
+	SIGNAL_TYPE_CONSTANT = 0,
+	SIGNAL_TYPE_WAVEFORM = 1,
+	SIGNAL_TYPE_BUFFER = 2,
+	SIGNAL_TYPE_MATH = 3,
 };
 
-struct signal_generator_data {
+struct signal_generator_data
+{
 	enum SIGNAL_TYPE type;
 	unsigned int id;
 	bool enabled;
@@ -343,7 +341,7 @@ struct signal_generator_data {
 	QStringList file_channel_names;
 	enum sg_file_format file_type;
 	wav_header_t file_wav_hdr;
-	//bool file_loaded;
+	// bool file_loaded;
 	// SIGNAL_TYPE_MATH
 	QString function;
 	double math_record_length;
@@ -355,11 +353,12 @@ struct signal_generator_data {
 	double load;
 };
 
-struct time_block_data {
+struct time_block_data
+{
 	scope_sink_f::sptr time_block;
 	unsigned long nb_channels;
 };
-}
+} // namespace scopy::m2k
 Q_DECLARE_METATYPE(gr::analog::noise_type_t)
 
 #endif /* M2K_SIGNAL_GENERATOR_H */

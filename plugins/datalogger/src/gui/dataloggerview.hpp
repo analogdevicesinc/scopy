@@ -1,15 +1,16 @@
 #ifndef DATALOGGERVIEW_H
 #define DATALOGGERVIEW_H
 
-#include <spinbox_a.hpp>
-#include <QWidget>
+#include <QFileDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QRadioButton>
-#include <customSwitch.h>
 #include <QVBoxLayout>
-#include <QFileDialog>
+#include <QWidget>
 #include <qcombobox.h>
-#include <QLabel>
+
+#include <customSwitch.h>
+#include <spinbox_a.hpp>
 
 namespace scopy {
 namespace datalogger {
@@ -25,7 +26,7 @@ public:
 
 	void init();
 	void chooseFile();
-	QWidget* getDataLoggerViewWidget();
+	QWidget *getDataLoggerViewWidget();
 	bool isDataLoggingOn();
 	bool isOverwrite();
 	QString getFilter();
@@ -61,10 +62,9 @@ Q_SIGNALS:
 	void toggleDataLogger(bool toggled);
 	void pathChanged(QString path);
 	void timeIntervalChanged(double inetrval);
-
 };
-}
-}
-}
+} // namespace gui
+} // namespace datalogger
+} // namespace scopy
 
 #endif // DATALOGGERVIEW_H

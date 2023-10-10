@@ -21,19 +21,18 @@
 #ifndef MIXED_SIGNAL_SINK_H
 #define MIXED_SIGNAL_SINK_H
 
-#include <gnuradio/sync_block.h>
-
-#include "logicanalyzer/logic_analyzer.h"
 #include "TimeDomainDisplayPlot.h"
+#include "logicanalyzer/logic_analyzer.h"
+
+#include <gnuradio/sync_block.h>
 
 class mixed_signal_sink : virtual public gr::sync_block
 {
 public:
 	typedef std::shared_ptr<mixed_signal_sink> sptr;
 
-	static sptr make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
-	                 scopy::TimeDomainDisplayPlot *oscPlot,
-	                 int bufferSize);
+	static sptr make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer, scopy::TimeDomainDisplayPlot *oscPlot,
+			 int bufferSize);
 
 	virtual void clean_buffers() = 0;
 	virtual void set_nsamps(int newsize) = 0;

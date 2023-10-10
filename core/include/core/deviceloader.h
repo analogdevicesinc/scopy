@@ -1,13 +1,14 @@
 #ifndef DEVICELOADER_H
 #define DEVICELOADER_H
 
-#include <QObject>
 #include "deviceimpl.h"
+
+#include <QObject>
 
 namespace scopy {
 
-
-class DeviceLoader : public QObject {
+class DeviceLoader : public QObject
+{
 	Q_OBJECT
 public:
 	DeviceLoader(DeviceImpl *d, QObject *parent = nullptr);
@@ -22,6 +23,6 @@ private:
 	DeviceImpl *d;
 	QObject *oldParent;
 };
-}
+} // namespace scopy
 
 #endif // DEVICELOADER_H

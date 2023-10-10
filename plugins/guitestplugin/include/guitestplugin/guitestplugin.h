@@ -3,11 +3,13 @@
 
 #define SCOPY_PLUGIN_NAME TestPlugin
 
+#include "scopy-guitestplugin_export.h"
+
+#include <QLineEdit>
 #include <QObject>
+
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>
-#include "scopy-guitestplugin_export.h"
-#include <QLineEdit>
 
 namespace scopy {
 
@@ -33,9 +35,6 @@ private:
 	QLineEdit *edit;
 };
 
-
-
-}
-
+} // namespace scopy
 
 #endif // TESTPLUGIN_H

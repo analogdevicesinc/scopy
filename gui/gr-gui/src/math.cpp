@@ -18,22 +18,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "math.hpp"
+
 #include "dynamicWidget.h"
+
 #include "ui_math.h"
 
-#include "math.hpp"
+#include <gnuradio/scopy/math.h>
 
 #include <QLocale>
 #include <QMenu>
 
-#include <gnuradio/scopy/math.h>
-
 using namespace scopy;
 
-Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent),
-	num_inputs(num_inputs), ui(new Ui::Math)
+Math::Math(QWidget *parent, unsigned int num_inputs)
+	: QWidget(parent)
+	, num_inputs(num_inputs)
+	, ui(new Ui::Math)
 {
-	if (num_inputs == 0)
+	if(num_inputs == 0)
 		throw std::runtime_error("Math widget used with zero inputs");
 
 	ui->setupUi(this);
@@ -66,15 +69,14 @@ Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent),
 	menuExp->addAction("sqrt");
 	ui->btnExp->setMenu(menuExp);
 
-	if (num_inputs > 1) {
+	if(num_inputs > 1) {
 		QMenu *menuT = new QMenu(ui->btnT);
 
-		for (unsigned int i = 0; i < num_inputs; i++)
+		for(unsigned int i = 0; i < num_inputs; i++)
 			menuT->addAction(QString("t%1").arg(i));
 		ui->btnT->setMenu(menuT);
 
-		connect(menuT, SIGNAL(triggered(QAction *)),
-				this, SLOT(handleMenuButtonT(QAction *)));
+		connect(menuT, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButtonT(QAction *)));
 	} else {
 		ui->btnT->setProperty("token", QVariant("t"));
 		connect(ui->btnT, SIGNAL(clicked()), this, SLOT(handleButton()));
@@ -126,26 +128,19 @@ Math::Math(QWidget *parent, unsigned int num_inputs) : QWidget(parent),
 	connect(ui->btnDiv, SIGNAL(clicked()), this, SLOT(handleButton()));
 	connect(ui->btnPow, SIGNAL(clicked()), this, SLOT(handleButton()));
 
-	connect(menuCos, SIGNAL(triggered(QAction *)),
-			this, SLOT(handleMenuButton(QAction *)));
-	connect(menuSin, SIGNAL(triggered(QAction *)),
-			this, SLOT(handleMenuButton(QAction *)));
-	connect(menuTan, SIGNAL(triggered(QAction *)),
-			this, SLOT(handleMenuButton(QAction *)));
-	connect(menuLog, SIGNAL(triggered(QAction *)),
-			this, SLOT(handleMenuButton(QAction *)));
-	connect(menuExp, SIGNAL(triggered(QAction *)),
-			this, SLOT(handleMenuButton(QAction *)));
+	connect(menuCos, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
+	connect(menuSin, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
+	connect(menuTan, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
+	connect(menuLog, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
+	connect(menuExp, SIGNAL(triggered(QAction *)), this, SLOT(handleMenuButton(QAction *)));
 
 	connect(ui->btnClear, SIGNAL(clicked()), ui->function, SLOT(clear()));
 	connect(ui->btnBackspace, SIGNAL(clicked()), this, SLOT(delLastChar()));
 
 	connect(ui->btnApply, SIGNAL(clicked()), this, SLOT(validateFunction()));
-	connect(ui->function, SIGNAL(returnPressed()),
-			this, SLOT(validateFunction()));
+	connect(ui->function, SIGNAL(returnPressed()), this, SLOT(validateFunction()));
 
-	connect(ui->function, SIGNAL(textChanged(const QString&)),
-			this, SLOT(resetState()));
+	connect(ui->function, SIGNAL(textChanged(const QString &)), this, SLOT(resetState()));
 }
 
 void Math::handleButton()
@@ -156,15 +151,9 @@ void Math::handleButton()
 	ui->function->insert(token);
 }
 
-void Math::handleMenuButton(QAction *action)
-{
-	ui->function->insert(action->text() + "(");
-}
+void Math::handleMenuButton(QAction *action) { ui->function->insert(action->text() + "("); }
 
-void Math::handleMenuButtonT(QAction *action)
-{
-	ui->function->insert(action->text());
-}
+void Math::handleMenuButtonT(QAction *action) { ui->function->insert(action->text()); }
 
 void Math::validateFunction()
 {
@@ -177,7 +166,7 @@ void Math::validateFunction()
 
 		setDynamicProperty(ui->function, "valid", true);
 		setDynamicProperty(ui->btnApply, "valid", true);
-	} catch (std::exception ex) {
+	} catch(std::exception ex) {
 		setDynamicProperty(ui->function, "invalid", true);
 		setDynamicProperty(ui->btnApply, "invalid", true);
 	}
@@ -193,14 +182,8 @@ void Math::resetState()
 	Q_EMIT stateReseted();
 }
 
-void Math::setFunction(const QString& function)
-{
-	ui->function->setText(function);
-}
+void Math::setFunction(const QString &function) { ui->function->setText(function); }
 
-void Math::delLastChar()
-{
-	ui->function->backspace();
-}
+void Math::delLastChar() { ui->function->backspace(); }
 
 #include "moc_math.cpp"

@@ -1,16 +1,19 @@
 #ifndef MEASUREMENTSETTINGS_H
 #define MEASUREMENTSETTINGS_H
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <QPushButton>
 #include "scopy-gui_export.h"
 
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QWidget>
+
 namespace scopy {
-class SCOPY_GUI_EXPORT MeasurementSettings : public QWidget {
+class SCOPY_GUI_EXPORT MeasurementSettings : public QWidget
+{
 	Q_OBJECT
 public:
-	typedef enum {
+	typedef enum
+	{
 		MPM_SORT_CHANNEL,
 		MPM_SORT_TYPE
 	} MeasurementSortingType;
@@ -24,9 +27,7 @@ Q_SIGNALS:
 	void sortStats(MeasurementSortingType type);
 	void enableMeasurementPanel(bool b);
 	void enableStatsPanel(bool b);
-
-
 };
-}
+} // namespace scopy
 
 #endif // MEASUREMENTSETTINGS_H

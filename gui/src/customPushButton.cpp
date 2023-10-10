@@ -24,43 +24,40 @@
 
 using namespace scopy;
 
-CustomPushButton::CustomPushButton(QWidget *parent) : QPushButton(parent)
-{
-}
+CustomPushButton::CustomPushButton(QWidget *parent)
+	: QPushButton(parent)
+{}
 
-CustomPushButton::~CustomPushButton()
-{
-}
+CustomPushButton::~CustomPushButton() {}
 
 void CustomPushButton::mouseReleaseEvent(QMouseEvent *event)
 {
 	QButtonGroup *btnGroup = group();
 
-	if (btnGroup) {
+	if(btnGroup) {
 		if(btnGroup->checkedId() == group()->id(this) && isDown())
 			btnGroup->setExclusive(false);
 	}
 
 	QPushButton::mouseReleaseEvent(event);
 
-	if (btnGroup) {
+	if(btnGroup) {
 		btnGroup->setExclusive(true);
 	}
-
 }
 
 void CustomPushButton::setChecked(bool checked)
 {
 	QButtonGroup *btnGroup = group();
 
-	if (btnGroup) {
+	if(btnGroup) {
 		if(btnGroup->checkedId() == group()->id(this) && !checked)
 			btnGroup->setExclusive(false);
 	}
 
 	QPushButton::setChecked(checked);
 
-	if (btnGroup) {
+	if(btnGroup) {
 		btnGroup->setExclusive(true);
 	}
 }

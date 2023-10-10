@@ -8,8 +8,7 @@ project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
-# TODO: split stylesheet/resources and add here
-# TODO: export header files correctly
+# TODO: split stylesheet/resources and add here TODO: export header files correctly
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -26,54 +25,44 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 set(SCOPY_QT_COMPONENTS Widgets Concurrent Svg Xml)
 
-FILE(GLOB SRC_LIST
+file(
+	GLOB
+	SRC_LIST
 	src/config/*.cpp
 	src/config/*.cc
-
-#	some of these will eventually be moved to the core/gui directories
+	# some of these will eventually be moved to the core/gui directories
 	src/refactoring/maincore/*
 	src/refactoring/maingui/*
 	src/refactoring/tool/*
-
 	src/runtime/ad74413r/*.cpp
 	src/runtime/ad74413r/*.cc
-
 	src/runtime/max14906/*.cpp
 	src/runtime/max14906/*.cc
-
 	src/runtime/faults/*.cpp
 	src/runtime/faults/*.cc
-
 	src/runtime/*.cpp
-
 	src/*.cpp
 	model/*
 )
 
-FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
-FILE(GLOB UI_LIST ui/*.ui)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(GLOB UI_LIST ui/*.ui)
 
 if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
-set(PROJECT_SOURCES
-	${SRC_LIST}
-	${HEADER_LIST}
-	${UI_LIST}
-)
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-         "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
 else()
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
-
 
 if(ANDROID)
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt_${ANDROID_ABI})
@@ -81,15 +70,13 @@ else()
 	find_library(QWT_LIBRARIES REQUIRED NAMES qwt)
 endif()
 
-
 qt_add_resources(PROJECT_RESOURCES resources/resources.qrc ../../resources/resources.qrc)
 
-add_library(${PROJECT_NAME} SHARED
-	${PROJECT_SOURCES}
-	${PROJECT_RESOURCES}
-)
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
-generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
+generate_export_header(
+	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
+)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
@@ -97,15 +84,17 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/i
 include_directories(${Qt${QT_VERSION_MAJOR}Concurrent_INCLUDE_DIRS})
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
-    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
+	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-	${SCOPY_QT_LIBRARIES}
-	scopy-pluginbase
-	scopy-iioutil
-	scopy-gui
-	scopy-core
-	${QWT_LIBRARIES})
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC ${SCOPY_QT_LIBRARIES}
+	       scopy-pluginbase
+	       scopy-iioutil
+	       scopy-gui
+	       scopy-core
+	       ${QWT_LIBRARIES}
+)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

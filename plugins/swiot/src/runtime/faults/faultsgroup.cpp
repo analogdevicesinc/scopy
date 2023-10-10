@@ -18,39 +18,39 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
-#include <QWidget>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-
-#include <utility>
-
 #include "faultsgroup.h"
+
 #include "src/swiot_logging_categories.h"
 
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QWidget>
+
+#include <utility>
 
 using namespace scopy::swiot;
 
 #define MAX_COLS_IN_GRID 100
 
-FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::FaultsGroup),
-	m_name(std::move(name)),
-	m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
+FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::FaultsGroup)
+	, m_name(std::move(name))
+	, m_customColGrid(new FlexGridLayout(MAX_COLS_IN_GRID, this))
 {
 	ui->setupUi(this);
 
 	connect(m_customColGrid, &FlexGridLayout::reqestLayoutUpdate, this, [this]() {
-		if (this->ui->activeStoredLayout->count() != m_customColGrid->rows()) {
-			while (this->ui->activeStoredLayout->count() < m_customColGrid->rows()) {
+		if(this->ui->activeStoredLayout->count() != m_customColGrid->rows()) {
+			while(this->ui->activeStoredLayout->count() < m_customColGrid->rows()) {
 				this->ui->activeStoredLayout->addWidget(this->buildActiveStoredWidget());
 			}
-			while (this->ui->activeStoredLayout->count() > m_customColGrid->rows()) {
-				QWidget *widgetToDelete = this->ui->activeStoredLayout->itemAt(
-					this->ui->activeStoredLayout->count() - 1)->widget();
+			while(this->ui->activeStoredLayout->count() > m_customColGrid->rows()) {
+				QWidget *widgetToDelete =
+					this->ui->activeStoredLayout->itemAt(this->ui->activeStoredLayout->count() - 1)
+						->widget();
 				this->ui->activeStoredLayout->removeWidget(widgetToDelete);
 				delete widgetToDelete;
 			}
@@ -66,24 +66,26 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	m_max_faults = faults_obj->size();
 	this->setupDynamicUi();
 
-	for (int i = 0; i < m_max_faults; ++i) {
+	for(int i = 0; i < m_max_faults; ++i) {
 		QJsonObject fault_object = faults_obj->at(i).toObject();
 		QString fault_name = fault_object.value("name").toString();
 		QString fault_description = fault_object.value("description").toString();
 		auto fault_widget = new FaultWidget(i, fault_name, fault_description, this);
 
-		if (fault_object.contains("condition")) {
+		if(fault_object.contains("condition")) {
 			QJsonObject condition = fault_object["condition"].toObject();
 			fault_widget->setFaultExplanationOptions(condition);
-			connect(this, &FaultsGroup::specialFaultsUpdated, fault_widget, &FaultWidget::specialFaultUpdated);
-			connect(fault_widget, &FaultWidget::specialFaultExplanationChanged, this, &FaultsGroup::specialFaultExplanationChanged);
+			connect(this, &FaultsGroup::specialFaultsUpdated, fault_widget,
+				&FaultWidget::specialFaultUpdated);
+			connect(fault_widget, &FaultWidget::specialFaultExplanationChanged, this,
+				&FaultsGroup::specialFaultExplanationChanged);
 		}
 
 		connect(fault_widget, &FaultWidget::faultSelected, this, [this](unsigned int id_) {
 			bool added = m_currentlySelected.insert(id_).second;
-			if (!added) {
+			if(!added) {
 				m_currentlySelected.erase(id_);
-				m_faults.at((int) (id_))->setPressed(false);
+				m_faults.at((int)(id_))->setPressed(false);
 			}
 			Q_EMIT selectionUpdated();
 		});
@@ -97,45 +99,40 @@ FaultsGroup::FaultsGroup(QString name, const QString &path, QWidget *parent) :
 	m_customColGrid->itemSizeChanged();
 }
 
-FaultsGroup::~FaultsGroup() {
-	delete ui;
-}
+FaultsGroup::~FaultsGroup() { delete ui; }
 
-const QVector<FaultWidget *> &FaultsGroup::getFaults() const {
-	return m_faults;
-}
+const QVector<FaultWidget *> &FaultsGroup::getFaults() const { return m_faults; }
 
-const QString &FaultsGroup::getName() const {
-	return m_name;
-}
+const QString &FaultsGroup::getName() const { return m_name; }
 
-void FaultsGroup::setName(const QString &name_) {
-	FaultsGroup::m_name = name_;
-}
+void FaultsGroup::setName(const QString &name_) { FaultsGroup::m_name = name_; }
 
-void FaultsGroup::setupDynamicUi() {
+void FaultsGroup::setupDynamicUi()
+{
 	m_customColGrid->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	this->ui->horizontalLayout->addWidget(m_customColGrid);
 }
 
-void FaultsGroup::clearSelection() {
-	for (unsigned int i: m_currentlySelected) {
-		m_faults[(int) (i)]->setPressed(false);
+void FaultsGroup::clearSelection()
+{
+	for(unsigned int i : m_currentlySelected) {
+		m_faults[(int)(i)]->setPressed(false);
 	}
 
 	m_currentlySelected.clear();
 	Q_EMIT selectionUpdated();
 }
 
-void FaultsGroup::update(uint32_t faults_numeric) {
-	for (int i = 0; i < m_faults.size(); i++) {
-		bool bit = (bool) ((faults_numeric >> i) & 0b1);
-		if (m_faults.at(i)->isActive() && bit) { // if we get 2 active signals, we set the stored to 1
+void FaultsGroup::update(uint32_t faults_numeric)
+{
+	for(int i = 0; i < m_faults.size(); i++) {
+		bool bit = (bool)((faults_numeric >> i) & 0b1);
+		if(m_faults.at(i)->isActive() && bit) { // if we get 2 active signals, we set the stored to 1
 			m_faults.at(i)->setStored(true);
 		}
 		m_faults.at(i)->setActive(bit);
 
-		if (bit) {
+		if(bit) {
 			m_actives.insert(i);
 		} else {
 			m_actives.erase(i);
@@ -143,28 +140,30 @@ void FaultsGroup::update(uint32_t faults_numeric) {
 	}
 }
 
-QStringList FaultsGroup::getExplanations() {
+QStringList FaultsGroup::getExplanations()
+{
 	QStringList res;
-	for (auto fault: m_faults) {
+	for(auto fault : m_faults) {
 		res += getExplanation(fault->getId());
 	}
 
 	return res;
 }
 
-QString FaultsGroup::getExplanation(unsigned int id) {
+QString FaultsGroup::getExplanation(unsigned int id)
+{
 	QString res = "";
 	auto fault = m_faults.at(id);
-	if (fault) {
-		res += QString("Bit%1 (%2): %3").arg(QString::number(fault->getId()),
-						     fault->getName(),
-						     fault->getFaultExplanation());
+	if(fault) {
+		res += QString("Bit%1 (%2): %3")
+			       .arg(QString::number(fault->getId()), fault->getName(), fault->getFaultExplanation());
 	}
 
 	return res;
 }
 
-QWidget *FaultsGroup::buildActiveStoredWidget() {
+QWidget *FaultsGroup::buildActiveStoredWidget()
+{
 	auto widget = new QWidget(this);
 	auto storedLabel = new QLabel(this);
 	storedLabel->setText("Stored");
@@ -186,12 +185,13 @@ QWidget *FaultsGroup::buildActiveStoredWidget() {
 	return widget;
 }
 
-QJsonArray *FaultsGroup::getJsonArray(const QString &path) {
+QJsonArray *FaultsGroup::getJsonArray(const QString &path)
+{
 	QString contents;
 	QFile file;
 	file.setFileName(path);
 	file.open(QIODevice::ReadOnly | QIODevice::Text);
-	if (!file.isOpen()) {
+	if(!file.isOpen()) {
 		qCritical(CAT_SWIOT_FAULTS) << "File could not be opened (read): " << path;
 	} else {
 		qDebug(CAT_SWIOT_FAULTS) << "File opened (read): " << path;
@@ -201,11 +201,13 @@ QJsonArray *FaultsGroup::getJsonArray(const QString &path) {
 
 	QJsonParseError parse_error{};
 	QJsonDocument document = QJsonDocument::fromJson(contents.toUtf8(), &parse_error);
-	if (document.isNull()) { qCritical(CAT_SWIOT_FAULTS) << "Invalid json: " << parse_error.errorString(); }
+	if(document.isNull()) {
+		qCritical(CAT_SWIOT_FAULTS) << "Invalid json: " << parse_error.errorString();
+	}
 
 	QJsonObject document_object = document.object();
 	QJsonValue device_value = document_object.value(m_name);
-	if (device_value == QJsonValue::Undefined) {
+	if(device_value == QJsonValue::Undefined) {
 		qCritical(CAT_SWIOT_FAULTS) << "Invalid json: Could not extract value " << m_name;
 	}
 
@@ -221,10 +223,6 @@ QJsonArray *FaultsGroup::getJsonArray(const QString &path) {
 	return array;
 }
 
-std::set<unsigned int> FaultsGroup::getSelectedIndexes() {
-	return this->m_currentlySelected;
-}
+std::set<unsigned int> FaultsGroup::getSelectedIndexes() { return this->m_currentlySelected; }
 
-std::set<unsigned int> FaultsGroup::getActiveIndexes() {
-	return m_actives;
-}
+std::set<unsigned int> FaultsGroup::getActiveIndexes() { return m_actives; }

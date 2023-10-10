@@ -2,24 +2,26 @@
 #define IIOCHANNELENABLE_H
 
 #include "../command.h"
+
 #include <iio.h>
 
 namespace scopy {
-class SCOPY_IIOUTIL_EXPORT IioChannelEnable : public Command {
+class SCOPY_IIOUTIL_EXPORT IioChannelEnable : public Command
+{
 	Q_OBJECT
 public:
-	explicit IioChannelEnable(struct iio_channel *channel,
-				  bool enable,
-				  QObject *parent)
+	explicit IioChannelEnable(struct iio_channel *channel, bool enable, QObject *parent)
 		: m_channel(channel)
-		, m_enable(enable) {
+		, m_enable(enable)
+	{
 		this->setParent(parent);
 		m_cmdResult = new CommandResult();
 	}
 
-	virtual void execute() override {
+	virtual void execute() override
+	{
 		Q_EMIT started(this);
-		if (m_enable) {
+		if(m_enable) {
 			iio_channel_enable(m_channel);
 		} else {
 			iio_channel_disable(m_channel);
@@ -33,6 +35,6 @@ private:
 	const char *m_attribute_name;
 	bool m_enable;
 };
-}
+} // namespace scopy
 
 #endif // IIOCHANNELENABLE_H

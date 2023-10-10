@@ -7,29 +7,26 @@
 
 #include <QApplication>
 #include <QDir>
-#include <QLibrary>
 #include <QDirIterator>
 #include <QJsonDocument>
+#include <QLibrary>
 #include <QLoggingCategory>
 #include <QtGlobal>
 
-
-Q_LOGGING_CATEGORY(CAT_PLUGINREPOSTIORY,"PluginRepository");
+Q_LOGGING_CATEGORY(CAT_PLUGINREPOSTIORY, "PluginRepository");
 
 using namespace scopy;
-PluginRepository::PluginRepository(QObject *parent) : QObject(parent)
+PluginRepository::PluginRepository(QObject *parent)
+	: QObject(parent)
 {
 	pm = new PluginManager(this);
 }
 
-PluginRepository::~PluginRepository()
-{
-
-}
+PluginRepository::~PluginRepository() {}
 
 void PluginRepository::init(QString location)
 {
-	qInfo(CAT_PLUGINREPOSTIORY)<<"initializing plugins from: " << location;
+	qInfo(CAT_PLUGINREPOSTIORY) << "initializing plugins from: " << location;
 	const QString pluginMetaFileName = "plugin.json";
 	QString pluginMetaFilePath = "";
 	QDir loc(location);
@@ -54,10 +51,9 @@ void PluginRepository::init(QString location)
 		if(err.error != QJsonParseError::NoError) {
 			qCritical(CAT_PLUGINREPOSTIORY) << "JSON Parse error !" << err.errorString();
 			qCritical(CAT_PLUGINREPOSTIORY) << json;
-			qCritical(CAT_PLUGINREPOSTIORY) << QString(" ").repeated(err.offset)+"^";
-		}
-		else {
-			qDebug(CAT_PLUGINREPOSTIORY) << "Found valid json @ "<<pluginMetaFilePath;
+			qCritical(CAT_PLUGINREPOSTIORY) << QString(" ").repeated(err.offset) + "^";
+		} else {
+			qDebug(CAT_PLUGINREPOSTIORY) << "Found valid json @ " << pluginMetaFilePath;
 		}
 		metadata = pluginMetaDocument.object();
 		pm->setMetadata(metadata);
@@ -65,10 +61,12 @@ void PluginRepository::init(QString location)
 
 #ifdef Q_OS_WINDOWS
 	bool b = SetDllDirectoryA(QApplication::applicationDirPath().toStdString().c_str());
-	if (!b)	{
+	if(!b) {
 		DWORD error = ::GetLastError();
 		std::string message = std::system_category().message(error);
-		qWarning(CAT_PLUGINREPOSTIORY) << "cannot add .exe folder to library search path - " << QString::fromStdString(message);;
+		qWarning(CAT_PLUGINREPOSTIORY)
+			<< "cannot add .exe folder to library search path - " << QString::fromStdString(message);
+		;
 	}
 #endif
 
@@ -76,8 +74,5 @@ void PluginRepository::init(QString location)
 	pm->add(pluginFiles);
 	pm->sort();
 }
-
-
-
 
 #include "moc_pluginrepository.cpp"

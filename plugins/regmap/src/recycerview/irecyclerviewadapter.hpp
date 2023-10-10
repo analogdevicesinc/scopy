@@ -3,15 +3,14 @@
 
 #include <QObject>
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 class IRecyclerViewAdapter : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    virtual void generateWidget(int index) = 0;
+	virtual void generateWidget(int index) = 0;
 Q_SIGNALS:
-    void widgetGenerated(int index, QWidget *widget);
-
+	void widgetGenerated(int index, QWidget *widget);
 };
-}
+} // namespace scopy::regmap
 #endif // IRECYCLERVIEWADAPTER_HPP

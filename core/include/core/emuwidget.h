@@ -1,10 +1,11 @@
 #ifndef EMUWIDGET_H
 #define EMUWIDGET_H
 
+#include "scopy-core_export.h"
+
 #include <QLineEdit>
 #include <QProcess>
-#include<QWidget>
-#include "scopy-core_export.h"
+#include <QWidget>
 
 namespace Ui {
 class EmuWidget;
@@ -15,7 +16,6 @@ class SCOPY_CORE_EXPORT EmuWidget : public QWidget
 {
 	Q_OBJECT
 public:
-
 	explicit EmuWidget(QString path = "", QWidget *parent = nullptr);
 	~EmuWidget();
 
@@ -43,8 +43,7 @@ private:
 	bool m_enableDemo;
 	QProcess *m_emuProcess;
 	const QVector<QString> m_availableOptions{"adalm2000", "generic"};
-
 };
-}
+} // namespace scopy
 
 #endif // EMUWIDGET_H

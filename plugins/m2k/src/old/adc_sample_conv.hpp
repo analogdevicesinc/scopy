@@ -22,32 +22,29 @@
 #define ADC_SAMPLE_CONV_HPP
 
 #include <gnuradio/sync_block.h>
+
 #include <memory>
 namespace libm2k {
 namespace analog {
 class M2kAnalogIn;
 }
-}
+} // namespace libm2k
 namespace scopy {
-	class adc_sample_conv : public gr::sync_block
-	{
-	private:
-		int d_nconnections;
-		bool inverse;
-		libm2k::analog::M2kAnalogIn* m2k_adc;
+class adc_sample_conv : public gr::sync_block
+{
+private:
+	int d_nconnections;
+	bool inverse;
+	libm2k::analog::M2kAnalogIn *m2k_adc;
 
-	public:
-		explicit adc_sample_conv(int nconnections,
-					 libm2k::analog::M2kAnalogIn* m2k_adc,
-					 bool inverse = false);
+public:
+	explicit adc_sample_conv(int nconnections, libm2k::analog::M2kAnalogIn *m2k_adc, bool inverse = false);
 
-		~adc_sample_conv();
+	~adc_sample_conv();
 
-		int work(int noutput_items,
-				gr_vector_const_void_star &input_items,
-			 gr_vector_void_star &output_items);
-		double conversionWrapper(unsigned int chn_idx, double sample, bool raw_to_volts);
-	};
-}
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
+	double conversionWrapper(unsigned int chn_idx, double sample, bool raw_to_volts);
+};
+} // namespace scopy
 
 #endif /* ADC_SAMPLE_CONV_HPP */

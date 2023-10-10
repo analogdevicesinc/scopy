@@ -1,10 +1,11 @@
 #ifndef PREFERENCES_H
 #define PREFERENCES_H
 
-#include <QObject>
-#include <QMap>
-#include <QSettings>
 #include "scopy-pluginbase_export.h"
+
+#include <QMap>
+#include <QObject>
+#include <QSettings>
 
 namespace scopy {
 /**
@@ -86,12 +87,10 @@ Q_SIGNALS:
 	void restartRequired();
 
 private:
-
-	QMap<QString,QVariant> p;
+	QMap<QString, QVariant> p;
 	QSettings *s;
-	static Preferences * pinstance_;
-
+	static Preferences *pinstance_;
 };
-}
+} // namespace scopy
 
 #endif // PREFERENCES_H

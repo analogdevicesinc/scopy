@@ -18,24 +18,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef TOOL_LAUNCHER_DRAWAREA_H
 #define TOOL_LAUNCHER_DRAWAREA_H
 
-#include <QWidget>
 #include <QLabel>
 #include <QMap>
+#include <QWidget>
 
 namespace scopy::swiot {
-class DrawArea : public QWidget {
-Q_OBJECT
+class DrawArea : public QWidget
+{
+	Q_OBJECT
 
 public:
 	explicit DrawArea(QWidget *parent = nullptr);
 
 	~DrawArea() override;
 
-	enum ChannelName : int {
+	enum ChannelName : int
+	{
 		AD74413R = 0,
 		MAX14906 = 1
 	};
@@ -53,6 +54,6 @@ private:
 	// channel-device pairs
 	QMap<QPair<int, int>, QPixmap *> *m_connectionsMap;
 };
-}
+} // namespace scopy::swiot
 
-#endif //TOOL_LAUNCHER_DRAWAREA_H
+#endif // TOOL_LAUNCHER_DRAWAREA_H

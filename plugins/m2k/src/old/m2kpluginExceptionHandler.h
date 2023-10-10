@@ -5,17 +5,17 @@
 //#include <config.h>
 #include <libm2k/m2kexceptions.hpp>
 //#include <scopyApplication.hpp>
-#include <QThread>
 #include <QDebug>
+#include <QThread>
 
-//using namespace scopy::m2k;
+// using namespace scopy::m2k;
 
 // Debug messages are currently disabled for users, can be used for development.
 // The message box was removed because exceptions might occur both from the control flow
 // and for signaling problems. Until those are handled separately, we can't use
 // QMessageBox to show the exception, since those can be thrown from different threads.
 
-#define HANDLE_EXCEPTION(e) \
+#define HANDLE_EXCEPTION(e)                                                                                            \
 //if (GetScopyApplicationInstance()->getDebugMode()) { \
 //	auto me = dynamic_cast<libm2k::m2k_exception *>(&e); \
 //	QString str; \

@@ -10,20 +10,13 @@ using namespace regmap;
 
 BitFieldDetailedWidgetFactory::BitFieldDetailedWidgetFactory(QObject *parent)
 	: QObject{parent}
-{
-
-}
+{}
 
 BitFieldDetailedWidget *BitFieldDetailedWidgetFactory::buildWidget(BitFieldModel *model)
 {
-    BitFieldDetailedWidget *bfdw = new BitFieldDetailedWidget(model->getName(),
-                                      model->getAccess(),
-                                      model->getDefaultValue(),
-                                      model->getDescription(),
-                                      model->getWidth(),
-                                      model->getNotes(),
-                                      model->getRegOffset(),
-                                      model->getOptions());
-    bfdw->setStyleSheet(RegmapStyleHelper::detailedBitFieldStyle(bfdw, ""));
-    return bfdw;
+	BitFieldDetailedWidget *bfdw = new BitFieldDetailedWidget(
+		model->getName(), model->getAccess(), model->getDefaultValue(), model->getDescription(),
+		model->getWidth(), model->getNotes(), model->getRegOffset(), model->getOptions());
+	bfdw->setStyleSheet(RegmapStyleHelper::detailedBitFieldStyle(bfdw, ""));
+	return bfdw;
 }

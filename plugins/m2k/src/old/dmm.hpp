@@ -21,128 +21,128 @@
 #ifndef DMM_HPP
 #define DMM_HPP
 
+#include "filter.hpp"
+#include "gui/mousewheelwidgetguard.h"
+#include "gui/spinbox_a.hpp"
+#include "iio_manager.hpp"
+#include "pluginbase/toolmenuentry.h"
+#include "signal_sample.hpp"
+
 #include <QPushButton>
 #include <QWidget>
+
 #include <atomic>
 #include <condition_variable>
-#include "pluginbase/toolmenuentry.h"
-#include "filter.hpp"
-#include "iio_manager.hpp"
-#include "signal_sample.hpp"
-#include "gui/mousewheelwidgetguard.h"
-#include <thread>
-#include "gui/spinbox_a.hpp"
 #include <deque>
+#include <thread>
 
 /* libm2k includes */
-#include <libm2k/analog/m2kanalogin.hpp>
-#include <libm2k/m2k.hpp>
 #include "m2ktool.hpp"
 
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/m2k.hpp>
 
 namespace Ui {
-	class DMM;
+class DMM;
 }
 
 class QJSEngine;
 
 namespace scopy::m2k {
-	class DMM_API;
+class DMM_API;
 
-	class DMM : public M2kTool
-	{
-		friend class DMM_API;
-		friend class ToolLauncher_API;
+class DMM : public M2kTool
+{
+	friend class DMM_API;
+	friend class ToolLauncher_API;
 
-		Q_OBJECT
+	Q_OBJECT
 
-	public:
-		explicit DMM(struct iio_context *ctx, Filter *filt,
-				ToolMenuEntry *toolMenuItem, m2k_iio_manager* m2k_man,
-				QWidget *parent = nullptr);
-		QPushButton* getRunButton();
-		~DMM();
+public:
+	explicit DMM(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, m2k_iio_manager *m2k_man,
+		     QWidget *parent = nullptr);
+	QPushButton *getRunButton();
+	~DMM();
 
-	private:
-		libm2k::context::M2k* m_m2k_context;
-		libm2k::analog::M2kAnalogIn* m_m2k_analogin;
-		unsigned int m_adc_nb_channels;
-		Ui::DMM *ui;
-		std::shared_ptr<iio_manager> manager;
-		iio_manager::port_id id_ch1, id_ch2;
-		std::shared_ptr<signal_sample> signal;
-		unsigned long sample_rate;
-		bool m_running;
+private:
+	libm2k::context::M2k *m_m2k_context;
+	libm2k::analog::M2kAnalogIn *m_m2k_analogin;
+	unsigned int m_adc_nb_channels;
+	Ui::DMM *ui;
+	std::shared_ptr<iio_manager> manager;
+	iio_manager::port_id id_ch1, id_ch2;
+	std::shared_ptr<signal_sample> signal;
+	unsigned long sample_rate;
+	bool m_running;
 
-		std::atomic<bool> interrupt_data_logging;
-		std::atomic<bool> data_logging;
-		QString filename;
-		std::thread data_logging_thread;
-		bool use_timer;
-		unsigned long logging_refresh_rate;
-		PositionSpinButton *data_logging_timer;
+	std::atomic<bool> interrupt_data_logging;
+	std::atomic<bool> data_logging;
+	QString filename;
+	std::thread data_logging_thread;
+	bool use_timer;
+	unsigned long logging_refresh_rate;
+	PositionSpinButton *data_logging_timer;
 
-		std::mutex data_mutex;
-		std::condition_variable data_cond;
-		MouseWheelWidgetGuard *wheelEventGuard;
+	std::mutex data_mutex;
+	std::condition_variable data_cond;
+	MouseWheelWidgetGuard *wheelEventGuard;
 
-		std::vector<double> m_min, m_max;
+	std::vector<double> m_min, m_max;
 
-		std::vector<bool> m_autoGainEnabled;
-		std::vector<std::deque<libm2k::analog::M2K_RANGE>> m_gainHistory;
-		int m_gainHistorySize;
+	std::vector<bool> m_autoGainEnabled;
+	std::vector<std::deque<libm2k::analog::M2K_RANGE>> m_gainHistory;
+	int m_gainHistorySize;
 
-		void disconnectAll();
-		gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f,
-				bool is_ac);
-		void configureModes();
-		libm2k::analog::M2K_RANGE suggestRange(double volt_max, double volt_min);
-		int numSamplesFromIdx(int idx);
-		void writeAllSettingsToHardware();
-		void checkPeakValues(int, double);
-		bool isIioManagerStarted() const;
-		void checkAndUpdateGainMode(const std::vector<double> &volts);
+	void disconnectAll();
+	gr::basic_block_sptr configureGraph(gr::basic_block_sptr s2f, bool is_ac);
+	void configureModes();
+	libm2k::analog::M2K_RANGE suggestRange(double volt_max, double volt_min);
+	int numSamplesFromIdx(int idx);
+	void writeAllSettingsToHardware();
+	void checkPeakValues(int, double);
+	bool isIioManagerStarted() const;
+	void checkAndUpdateGainMode(const std::vector<double> &volts);
 
-	public Q_SLOTS:
-		void toggleTimer(bool start);
-		void run();
-		void stop();
+public Q_SLOTS:
+	void toggleTimer(bool start);
+	void run();
+	void stop();
 
-	private Q_SLOTS:
-		void setHistorySizeCh1(int idx);
-		void setHistorySizeCh2(int idx);
+private Q_SLOTS:
+	void setHistorySizeCh1(int idx);
+	void setHistorySizeCh2(int idx);
 
-		void setLineThicknessCh1(int idx);
-                void setLineThicknessCh2(int idx);
+	void setLineThicknessCh1(int idx);
+	void setLineThicknessCh2(int idx);
 
-                void updateValuesList(std::vector<float> values);
+	void updateValuesList(std::vector<float> values);
 
-		void toggleAC();
+	void toggleAC();
 
-		void enableDataLogging(bool);
+	void enableDataLogging(bool);
 
-		void toggleDataLogging(bool);
+	void toggleDataLogging(bool);
 
-		void startDataLogging(bool);
+	void startDataLogging(bool);
 
-		void dataLoggingThread();
+	void dataLoggingThread();
 
-		void chooseFile();
+	void chooseFile();
 
-		void resetPeakHold(bool);
+	void resetPeakHold(bool);
 
-		void displayPeakHold(bool);
+	void displayPeakHold(bool);
 
-		void collapsePeakHold(bool);
-		void collapseDataLog(bool);
+	void collapsePeakHold(bool);
+	void collapseDataLog(bool);
 
-		void readPreferences();
+	void readPreferences();
 
-		void gainModeChanged(int idx);
+	void gainModeChanged(int idx);
 
-	Q_SIGNALS:
-		void showTool();
-	};
-}
+Q_SIGNALS:
+	void showTool();
+};
+} // namespace scopy::m2k
 
 #endif /* DMM_HPP */

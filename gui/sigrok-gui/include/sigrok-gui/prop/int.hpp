@@ -37,17 +37,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_PROP_INT_HPP
 #define PULSEVIEW_PV_PROP_INT_HPP
 
-#include <utility>
-
-#include <optional>
-
 #include "property.hpp"
-#include <glib.h>
 #include "scopy-sigrok-gui_export.h"
+
+#include <glib.h>
+#include <optional>
+#include <utility>
 
 using std::pair;
 
@@ -61,13 +59,12 @@ class SCOPY_SIGROK_GUI_EXPORT Int : public Property
 	Q_OBJECT;
 
 public:
-	Int(QString name, QString desc, QString suffix,
-		std::optional< pair<int64_t, int64_t> > range,
-		Getter getter, Setter setter, GVariantClass gvarClass);
+	Int(QString name, QString desc, QString suffix, std::optional<pair<int64_t, int64_t>> range, Getter getter,
+	    Setter setter, GVariantClass gvarClass);
 
 	virtual ~Int() = default;
 
-	QWidget* get_widget(QWidget *parent, bool auto_commit);
+	QWidget *get_widget(QWidget *parent, bool auto_commit);
 	void update_widget();
 
 	void commit();
@@ -77,14 +74,14 @@ private Q_SLOTS:
 
 private:
 	const QString suffix_;
-	const std::optional< pair<int64_t, int64_t> > range_;
+	const std::optional<pair<int64_t, int64_t>> range_;
 
 	QVariant value_;
 	QSpinBox *spin_box_;
 	GVariantClass gvar_class_type_;
 };
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_PROP_INT_HPP

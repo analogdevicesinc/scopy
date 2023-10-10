@@ -26,14 +26,15 @@
 
 using namespace scopy;
 
-AutoScaler::AutoScaler(QObject *parent,
-		const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms) :
-	QObject(parent), divs(divs), timer(this)
+AutoScaler::AutoScaler(QObject *parent, const QVector<QwtScaleDiv> &divs, unsigned int timeout_ms)
+	: QObject(parent)
+	, divs(divs)
+	, timer(this)
 {
 	timer.setSingleShot(true);
 	timer.setInterval(timeout_ms);
 
-	if (divs.empty())
+	if(divs.empty())
 		throw std::runtime_error("AutoScaler called with empty divs vector");
 
 	changeScaleDiv(&this->divs.at(0));
@@ -41,27 +42,25 @@ AutoScaler::AutoScaler(QObject *parent,
 	connect(&timer, SIGNAL(timeout()), this, SLOT(timeout()));
 }
 
-AutoScaler::~AutoScaler()
-{
-}
+AutoScaler::~AutoScaler() {}
 
 void AutoScaler::setValue(double val)
 {
-	if (val < min)
+	if(val < min)
 		min = val;
-	else if (val > max)
+	else if(val > max)
 		max = val;
 
-	if (val < current_div->lowerBound()) {
-		for (auto it = divs.cbegin(); it != divs.cend(); ++it) {
-			if (it->lowerBound() <= val) {
+	if(val < current_div->lowerBound()) {
+		for(auto it = divs.cbegin(); it != divs.cend(); ++it) {
+			if(it->lowerBound() <= val) {
 				changeScaleDiv(&*it);
 				break;
 			}
 		}
-	} else if (val > current_div->upperBound()) {
-		for (auto it = divs.cbegin(); it != divs.cend(); ++it) {
-			if (it->upperBound() >= val) {
+	} else if(val > current_div->upperBound()) {
+		for(auto it = divs.cbegin(); it != divs.cend(); ++it) {
+			if(it->upperBound() >= val) {
 				changeScaleDiv(&*it);
 				break;
 			}
@@ -82,16 +81,13 @@ void AutoScaler::startTimer()
 	timer.start();
 }
 
-void AutoScaler::stopTimer()
-{
-	timer.stop();
-}
+void AutoScaler::stopTimer() { timer.stop(); }
 
 void AutoScaler::timeout()
 {
-	for (auto it = divs.cbegin(); it != divs.cend(); ++it) {
-		if (it->lowerBound() <= min && it->upperBound() >= max) {
-			if (&*it != current_div)
+	for(auto it = divs.cbegin(); it != divs.cend(); ++it) {
+		if(it->lowerBound() <= min && it->upperBound() >= max) {
+			if(&*it != current_div)
 				changeScaleDiv(&*it);
 			break;
 		}
@@ -105,12 +101,9 @@ void AutoScaler::setTimeout(int timeout_ms)
 	timer.setInterval(timeout_ms);
 
 	/* restart timer */
-	if (timer.isActive())
+	if(timer.isActive())
 		timer.start();
 }
 
-void AutoScaler::addScaleDivs(QwtScaleDiv div)
-{
-	divs.push_back(div);
-}
+void AutoScaler::addScaleDivs(QwtScaleDiv div) { divs.push_back(div); }
 #include "moc_autoScaler.cpp"

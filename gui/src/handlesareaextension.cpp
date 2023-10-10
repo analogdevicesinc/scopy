@@ -1,29 +1,30 @@
 #include "handlesareaextension.h"
 
-#include <QObject>
-
-#include <qwt_plot.h>
-
-#include "handles_area.hpp"
 #include "DisplayPlot.h"
+#include "handles_area.hpp"
+
+#include <QObject>
+#include <qwt_plot.h>
 
 using namespace scopy;
 
-HandlesAreaExtension::HandlesAreaExtension(QwtPlot* plot)
-	: m_plot(plot) {}
+HandlesAreaExtension::HandlesAreaExtension(QwtPlot *plot)
+	: m_plot(plot)
+{}
 
 XBottomRuller::XBottomRuller(QwtPlot *plot)
-	: HandlesAreaExtension(plot) {}
+	: HandlesAreaExtension(plot)
+{}
 
 bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 {
-	HorizHandlesArea *area = qobject_cast<HorizHandlesArea*>(owner);
-	if (!area) {
+	HorizHandlesArea *area = qobject_cast<HorizHandlesArea *>(owner);
+	if(!area) {
 		return false;
 	}
 
-	const DisplayPlot *plot = qobject_cast<DisplayPlot*>(m_plot);
-	if (!plot) {
+	const DisplayPlot *plot = qobject_cast<DisplayPlot *>(m_plot);
+	if(!plot) {
 		return false;
 	}
 
@@ -33,12 +34,11 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 	QVector<QRectF> labelRectangles;
 	QStringList labelTexts;
 
-	if(plot->isLogaritmicPlot())
-	{
+	if(plot->isLogaritmicPlot()) {
 		QList<double> majorTicks = plot->getXaxisMajorTicksPos();
 		double pointVal, currentValue;
 
-		for (int i = 0; i < majorTicks.size(); ++i) {
+		for(int i = 0; i < majorTicks.size(); ++i) {
 			currentValue = majorTicks.at(i);
 			pointVal = plot->transform(QwtAxis::XBottom, currentValue) + leftP;
 
@@ -55,18 +55,18 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 
 		// adjust labels to fit visible area of the handle area
 		// mainly the first and last label
-		if (labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
-			int offset = owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
+		if(labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
+			int offset =
+				owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
 			labelRectangles.first().adjust(offset, 0, offset, 0);
 		}
 
-		if (labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
-			int offset = labelRectangles.last().bottomRight().x() - owner->mask().boundingRect().bottomRight().x();
+		if(labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
+			int offset = labelRectangles.last().bottomRight().x() -
+				owner->mask().boundingRect().bottomRight().x();
 			labelRectangles.last().adjust(-offset, 0, -offset, 0);
 		}
-	}
-	else
-	{
+	} else {
 		// Some extensions might alter the state of the painter
 		// such as its brush or pen. Consider saving its state
 		// then restore it when done using it so other extensions
@@ -82,7 +82,7 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 
 		double midPoint = leftP;
 		double currentValue = interval.minValue();
-		for (int i = 0; i < labels; ++i) {
+		for(int i = 0; i < labels; ++i) {
 
 			const QString text = plot->formatXValue(currentValue, 2);
 
@@ -99,8 +99,8 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 		}
 
 		bool allLabelsTheSame = true;
-		for (int i = 1; i < labelTexts.size(); ++i) {
-			if (labelTexts[i] != labelTexts[i - 1]) {
+		for(int i = 1; i < labelTexts.size(); ++i) {
+			if(labelTexts[i] != labelTexts[i - 1]) {
 				allLabelsTheSame = false;
 				break;
 			}
@@ -110,20 +110,23 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 		const int nrMajorTicks = plot->axisScaleDiv(QwtAxis::XBottom).ticks(QwtScaleDiv::MajorTick).size();
 		const int midLabelTick = nrMajorTicks / 2;
 
-		if (allLabelsTheSame) {
+		if(allLabelsTheSame) {
 			// draw delta as middle label
 			labelRectangles.clear();
 			labelTexts.clear();
 			midPoint = leftP;
 			currentValue = interval.minValue();
-			for (int i = 0; i < labels; ++i) {
+			for(int i = 0; i < labels; ++i) {
 				QString text;
-				if (i == midLabelTick) {
+				if(i == midLabelTick) {
 					text = plot->formatXValue(currentValue, 6);
 				} else {
-					text = plot->formatXValue(currentValue - (interval.minValue() + midLabelTick * valueBetween2Labels), 2);
+					text = plot->formatXValue(
+						currentValue -
+							(interval.minValue() + midLabelTick * valueBetween2Labels),
+						2);
 
-					if (i > midLabelTick) {
+					if(i > midLabelTick) {
 						text = "+" + text;
 					}
 				}
@@ -139,18 +142,19 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 				midPoint += distBetween2Labels;
 				currentValue += valueBetween2Labels;
 			}
-
 		}
 
 		// adjust labels to fit visible area of the handle area
 		// mainly the first and last label
-		if (labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
-			int offset = owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
+		if(labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
+			int offset =
+				owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
 			labelRectangles.first().adjust(offset, 0, offset, 0);
 		}
 
-		if (labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
-			int offset = labelRectangles.last().bottomRight().x() - owner->mask().boundingRect().bottomRight().x();
+		if(labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
+			int offset = labelRectangles.last().bottomRight().x() -
+				owner->mask().boundingRect().bottomRight().x();
 			labelRectangles.last().adjust(-offset, 0, -offset, 0);
 		}
 
@@ -163,34 +167,34 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 
 			// find overlaping
 			int i = 0;
-			for (; i < labelRectangles.size() - 1; ++i) {
-				if (labelRectangles[i].intersects(labelRectangles[i + 1])) {
+			for(; i < labelRectangles.size() - 1; ++i) {
+				if(labelRectangles[i].intersects(labelRectangles[i + 1])) {
 					overlaping = true;
 					break;
 				}
 			}
 
 			// done
-			if (!overlaping) {
+			if(!overlaping) {
 				break;
 			}
-			if (allLabelsTheSame) {
+			if(allLabelsTheSame) {
 				int center = midLabelTick;
-				for (int i = center - 1; i >= 0; i -= 2) {
+				for(int i = center - 1; i >= 0; i -= 2) {
 					// Remove the tick and make sure to update the center
 					// label position
 					labelRectangles.removeAt(i);
 					labelTexts.removeAt(i);
 					--center;
 				}
-				for (int j = center + 1; j < labelRectangles.size(); j += 1) {
+				for(int j = center + 1; j < labelRectangles.size(); j += 1) {
 					labelRectangles.removeAt(j);
 					labelTexts.removeAt(j);
 				}
 
 			} else {
 				// remove overlaping
-				if (i + 1 == labelRectangles.size() - 1) {
+				if(i + 1 == labelRectangles.size() - 1) {
 					labelRectangles.removeAt(i);
 					labelTexts.removeAt(i);
 				} else {
@@ -199,10 +203,9 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 				}
 			}
 		} while(overlaping);
-
 	}
 	// draw the labels
-	for (int i = 0; i < labelRectangles.size(); ++i) {
+	for(int i = 0; i < labelRectangles.size(); ++i) {
 		painter->drawText(labelRectangles[i], labelTexts[i]);
 	}
 
@@ -210,17 +213,18 @@ bool XBottomRuller::draw(QPainter *painter, QWidget *owner)
 }
 
 XTopRuller::XTopRuller(QwtPlot *plot)
-	: HandlesAreaExtension(plot) {}
+	: HandlesAreaExtension(plot)
+{}
 
 bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 {
-	HorizHandlesArea *area = qobject_cast<HorizHandlesArea*>(owner);
-	if (!area) {
+	HorizHandlesArea *area = qobject_cast<HorizHandlesArea *>(owner);
+	if(!area) {
 		return false;
 	}
 
-	const DisplayPlot *plot = qobject_cast<DisplayPlot*>(m_plot);
-	if (!plot) {
+	const DisplayPlot *plot = qobject_cast<DisplayPlot *>(m_plot);
+	if(!plot) {
 		return false;
 	}
 
@@ -230,12 +234,11 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 	QVector<QRectF> labelRectangles;
 	QStringList labelTexts;
 
-	if(plot->isLogaritmicPlot())
-	{
+	if(plot->isLogaritmicPlot()) {
 		QList<double> majorTicks = plot->getXaxisMajorTicksPos();
 		double pointVal, currentValue;
 
-		for (int i = 0; i < majorTicks.size(); ++i) {
+		for(int i = 0; i < majorTicks.size(); ++i) {
 			currentValue = majorTicks.at(i);
 			pointVal = plot->transform(QwtAxis::XTop, currentValue) + leftP;
 
@@ -252,25 +255,23 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 
 		// adjust labels to fit visible area of the handle area
 		// mainly the first and last label
-		if (labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
-			int offset = owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
+		if(labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
+			int offset =
+				owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
 			labelRectangles.first().adjust(offset, 0, offset, 0);
 		}
 
-		if (labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
-			int offset = labelRectangles.last().bottomRight().x() - owner->mask().boundingRect().bottomRight().x();
+		if(labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
+			int offset = labelRectangles.last().bottomRight().x() -
+				owner->mask().boundingRect().bottomRight().x();
 			labelRectangles.last().adjust(-offset, 0, -offset, 0);
 		}
 
-
-	}
-	else
-	{
+	} else {
 		// Some extensions might alter the state of the painter
 		// such as its brush or pen. Consider saving its state
 		// then restore it when done using it so other extensions
 		// won't be affected
-
 
 		const QwtInterval interval = plot->axisInterval(QwtAxis::XTop);
 
@@ -282,7 +283,7 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 		double midPoint = leftP;
 		double currentValue = interval.minValue();
 
-		for (int i = 0; i < labels; ++i) {
+		for(int i = 0; i < labels; ++i) {
 			const QString text = plot->formatXValue(currentValue, 2);
 
 			const QSizeF textSize = QwtText(text).textSize(painter->font());
@@ -298,8 +299,8 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 		}
 
 		bool allLabelsTheSame = true;
-		for (int i = 1; i < labelTexts.size(); ++i) {
-			if (labelTexts[i] != labelTexts[i - 1]) {
+		for(int i = 1; i < labelTexts.size(); ++i) {
+			if(labelTexts[i] != labelTexts[i - 1]) {
 				allLabelsTheSame = false;
 				break;
 			}
@@ -309,19 +310,22 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 		const int nrMajorTicks = plot->axisScaleDiv(QwtAxis::XTop).ticks(QwtScaleDiv::MajorTick).size();
 		const int midLabelTick = nrMajorTicks / 2;
 
-		if (allLabelsTheSame) {
+		if(allLabelsTheSame) {
 			// draw delta as middle label
 			labelRectangles.clear();
 			labelTexts.clear();
 			midPoint = leftP;
 			currentValue = interval.minValue();
-			for (int i = 0; i < labels; ++i) {
+			for(int i = 0; i < labels; ++i) {
 				QString text;
-				if (i == midLabelTick) {
+				if(i == midLabelTick) {
 					text = plot->formatXValue(currentValue, 2);
 				} else {
-					text= plot->formatXValue(currentValue - (interval.minValue() + midLabelTick * valueBetween2Labels), 2);
-					if (i > midLabelTick) {
+					text = plot->formatXValue(
+						currentValue -
+							(interval.minValue() + midLabelTick * valueBetween2Labels),
+						2);
+					if(i > midLabelTick) {
 						text = "+" + text;
 					}
 				}
@@ -337,18 +341,19 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 				midPoint += distBetween2Labels;
 				currentValue += valueBetween2Labels;
 			}
-
 		}
 
 		// adjust labels to fit visible area of the handle area
 		// mainly the first and last label
-		if (labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
-			int offset = owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
+		if(labelRectangles.first().topLeft().x() < owner->mask().boundingRect().bottomLeft().x()) {
+			int offset =
+				owner->mask().boundingRect().bottomLeft().x() - labelRectangles.first().topLeft().x();
 			labelRectangles.first().adjust(offset, 0, offset, 0);
 		}
 
-		if (labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
-			int offset = labelRectangles.last().bottomRight().x() - owner->mask().boundingRect().bottomRight().x();
+		if(labelRectangles.last().bottomRight().x() > owner->mask().boundingRect().bottomRight().x()) {
+			int offset = labelRectangles.last().bottomRight().x() -
+				owner->mask().boundingRect().bottomRight().x();
 			labelRectangles.last().adjust(-offset, 0, -offset, 0);
 		}
 
@@ -361,34 +366,34 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 
 			// find overlaping
 			int i = 0;
-			for (; i < labelRectangles.size() - 1; ++i) {
-				if (labelRectangles[i].intersects(labelRectangles[i + 1])) {
+			for(; i < labelRectangles.size() - 1; ++i) {
+				if(labelRectangles[i].intersects(labelRectangles[i + 1])) {
 					overlaping = true;
 					break;
 				}
 			}
 
 			// done
-			if (!overlaping) {
+			if(!overlaping) {
 				break;
 			}
-			if (allLabelsTheSame) {
+			if(allLabelsTheSame) {
 				int center = midLabelTick;
-				for (int i = center - 1; i >= 0; i -= 2) {
+				for(int i = center - 1; i >= 0; i -= 2) {
 					// Remove the tick and make sure to update the center
 					// label position
 					labelRectangles.removeAt(i);
 					labelTexts.removeAt(i);
 					--center;
 				}
-				for (int j = center + 1; j < labelRectangles.size(); j += 1) {
+				for(int j = center + 1; j < labelRectangles.size(); j += 1) {
 					labelRectangles.removeAt(j);
 					labelTexts.removeAt(j);
 				}
 
 			} else {
 				// remove overlaping
-				if (i + 1 == labelRectangles.size() - 1) {
+				if(i + 1 == labelRectangles.size() - 1) {
 					labelRectangles.removeAt(i);
 					labelTexts.removeAt(i);
 				} else {
@@ -400,7 +405,7 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 	}
 
 	// draw the labels
-	for (int i = 0; i < labelRectangles.size(); ++i) {
+	for(int i = 0; i < labelRectangles.size(); ++i) {
 		painter->drawText(labelRectangles[i], labelTexts[i]);
 	}
 
@@ -408,12 +413,13 @@ bool XTopRuller::draw(QPainter *painter, QWidget *owner)
 }
 
 YLeftRuller::YLeftRuller(QwtPlot *plot)
-	: HandlesAreaExtension(plot) {}
+	: HandlesAreaExtension(plot)
+{}
 
 bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 {
-	VertHandlesArea *area = qobject_cast<VertHandlesArea*>(owner);
-	if (!area) {
+	VertHandlesArea *area = qobject_cast<VertHandlesArea *>(owner);
+	if(!area) {
 		return false;
 	}
 
@@ -421,11 +427,10 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 	if(area->width() != width_text)
 		area->setMinimumWidth(width_text);
 
-	const DisplayPlot *plot = qobject_cast<DisplayPlot*>(m_plot);
-	if (!plot) {
+	const DisplayPlot *plot = qobject_cast<DisplayPlot *>(m_plot);
+	if(!plot) {
 		return false;
 	}
-
 
 	const double topP = area->topPadding();
 	const double bottomP = area->bottomPadding();
@@ -433,12 +438,11 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 	QVector<QRectF> labelRectangles;
 	QStringList labelTexts;
 
-	if(plot->isLogaritmicYPlot())
-	{
+	if(plot->isLogaritmicYPlot()) {
 		QList<double> majorTicks = plot->getYaxisMajorTicksPos();
 		double pointVal, currentValue;
 
-		for (int i = 0; i < majorTicks.size(); ++i) {
+		for(int i = 0; i < majorTicks.size(); ++i) {
 			currentValue = majorTicks.at(i);
 			pointVal = plot->transform(QwtAxis::YLeft, currentValue) + topP;
 
@@ -455,21 +459,20 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 
 		// adjust labels to fit visible area of the handle area
 		// mainly the first and last label
-		if(!labelRectangles.empty())
-		{
-			if (labelRectangles.first().topRight().y() < owner->mask().boundingRect().topLeft().y()) {
-				int offset = owner->mask().boundingRect().topLeft().y() - labelRectangles.first().topRight().y();
+		if(!labelRectangles.empty()) {
+			if(labelRectangles.first().topRight().y() < owner->mask().boundingRect().topLeft().y()) {
+				int offset = owner->mask().boundingRect().topLeft().y() -
+					labelRectangles.first().topRight().y();
 				labelRectangles.first().adjust(0, offset, 0, offset);
 			}
 
-			if (labelRectangles.last().bottomRight().y() > owner->mask().boundingRect().bottomLeft().y()) {
-				int offset = labelRectangles.last().bottomRight().y() - owner->mask().boundingRect().bottomLeft().y();
+			if(labelRectangles.last().bottomRight().y() > owner->mask().boundingRect().bottomLeft().y()) {
+				int offset = labelRectangles.last().bottomRight().y() -
+					owner->mask().boundingRect().bottomLeft().y();
 				labelRectangles.last().adjust(0, -offset, 0, -offset);
 			}
 		}
-	}
-	else
-	{
+	} else {
 
 		const QwtInterval interval = plot->axisInterval(QwtAxis::YLeft);
 
@@ -484,7 +487,7 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 		QList<double> majorTicks = plot->axisScaleDiv(QwtAxis::YLeft).ticks(QwtScaleDiv::MajorTick);
 
 		double pointVal, currentValue;
-		for (int i = 0; i < majorTicks.size(); ++i) {
+		for(int i = 0; i < majorTicks.size(); ++i) {
 			// this is the same way ticks are parsed in logarithmic mode too
 			// this whole function may need refactoring soon ...
 
@@ -503,8 +506,8 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 		}
 
 		bool allLabelsTheSame = true;
-		for (int i = 1; i < labelTexts.size(); ++i) {
-			if (labelTexts[i] != labelTexts[i - 1]) {
+		for(int i = 1; i < labelTexts.size(); ++i) {
+			if(labelTexts[i] != labelTexts[i - 1]) {
 				allLabelsTheSame = false;
 				break;
 			}
@@ -514,19 +517,22 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 		const int nrMajorTicks = plot->axisScaleDiv(QwtAxis::YLeft).ticks(QwtScaleDiv::MajorTick).size();
 		const int midLabelTick = nrMajorTicks / 2;
 
-		if (allLabelsTheSame) {
+		if(allLabelsTheSame) {
 			// draw delta as middle label
 			labelRectangles.clear();
 			labelTexts.clear();
 			midPoint = topP;
 			currentValue = interval.maxValue();
-			for (int i = 0; i < labels; ++i) {
+			for(int i = 0; i < labels; ++i) {
 				QString text;
-				if (i == midLabelTick) {
+				if(i == midLabelTick) {
 					text = plot->formatYValue(currentValue, 2);
 				} else {
-					text = plot->formatYValue(currentValue - (interval.maxValue() + midLabelTick * valueBetween2Labels), 2);
-					if (i > midLabelTick) {
+					text = plot->formatYValue(
+						currentValue -
+							(interval.maxValue() + midLabelTick * valueBetween2Labels),
+						2);
+					if(i > midLabelTick) {
 						text = "+" + text;
 					}
 				}
@@ -546,13 +552,15 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 
 		// adjust labels to fit visible area of the handle area
 		// mainly the first and last label
-		if (labelRectangles.first().topRight().y() < owner->mask().boundingRect().topLeft().y()) {
-			int offset = owner->mask().boundingRect().topLeft().y() - labelRectangles.first().topRight().y();
+		if(labelRectangles.first().topRight().y() < owner->mask().boundingRect().topLeft().y()) {
+			int offset =
+				owner->mask().boundingRect().topLeft().y() - labelRectangles.first().topRight().y();
 			labelRectangles.first().adjust(0, offset, 0, offset);
 		}
 
-		if (labelRectangles.last().bottomRight().y() > owner->mask().boundingRect().bottomLeft().y()) {
-			int offset = labelRectangles.last().bottomRight().y() - owner->mask().boundingRect().bottomLeft().y();
+		if(labelRectangles.last().bottomRight().y() > owner->mask().boundingRect().bottomLeft().y()) {
+			int offset = labelRectangles.last().bottomRight().y() -
+				owner->mask().boundingRect().bottomLeft().y();
 			labelRectangles.last().adjust(0, -offset, 0, -offset);
 		}
 
@@ -565,34 +573,34 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 
 			// find overlaping
 			int i = 0;
-			for (; i < labelRectangles.size() - 1; ++i) {
-				if (labelRectangles[i].intersects(labelRectangles[i + 1])) {
+			for(; i < labelRectangles.size() - 1; ++i) {
+				if(labelRectangles[i].intersects(labelRectangles[i + 1])) {
 					overlaping = true;
 					break;
 				}
 			}
 
 			// done
-			if (!overlaping) {
+			if(!overlaping) {
 				break;
 			}
-			if (allLabelsTheSame) {
+			if(allLabelsTheSame) {
 				int center = midLabelTick;
-				for (int i = center - 1; i >= 0; i -= 2) {
+				for(int i = center - 1; i >= 0; i -= 2) {
 					// Remove the tick and make sure to update the center
 					// label position
 					labelRectangles.removeAt(i);
 					labelTexts.removeAt(i);
 					--center;
 				}
-				for (int j = center + 1; j < labelRectangles.size(); j += 1) {
+				for(int j = center + 1; j < labelRectangles.size(); j += 1) {
 					labelRectangles.removeAt(j);
 					labelTexts.removeAt(j);
 				}
 
-			}else {
+			} else {
 				// remove overlaping
-				if (i + 1 == labelRectangles.size() - 1) {
+				if(i + 1 == labelRectangles.size() - 1) {
 					labelRectangles.removeAt(i);
 					labelTexts.removeAt(i);
 				} else {
@@ -600,11 +608,11 @@ bool YLeftRuller::draw(QPainter *painter, QWidget *owner)
 					labelTexts.removeAt(i + 1);
 				}
 			}
-		}while(overlaping);
+		} while(overlaping);
 	}
 
 	// draw the labels
-	for (int i = 0; i < labelRectangles.size(); ++i) {
+	for(int i = 0; i < labelRectangles.size(); ++i) {
 		painter->drawText(labelRectangles[i], labelTexts[i]);
 	}
 

@@ -24,21 +24,20 @@
 #include <gnuradio/hier_block2.h>
 
 namespace scopy {
-	class fft_block : public gr::hier_block2
-	{
-	public:
-		fft_block(bool use_complex, size_t fft_size,
-				unsigned int nbthreads = 1);
-		~fft_block();
+class fft_block : public gr::hier_block2
+{
+public:
+	fft_block(bool use_complex, size_t fft_size, unsigned int nbthreads = 1);
+	~fft_block();
 
-		void set_window(const std::vector<float>& window);
-		void set_overlap_factor(double overlap_factor);
+	void set_window(const std::vector<float> &window);
+	void set_overlap_factor(double overlap_factor);
 
-	private:
-		bool d_complex;
-		gr::basic_block_sptr d_fft;
-		gr::basic_block_sptr d_s2v_overlap;
-	};
-}
+private:
+	bool d_complex;
+	gr::basic_block_sptr d_fft;
+	gr::basic_block_sptr d_s2v_overlap;
+};
+} // namespace scopy
 
 #endif /* FFT_BLOCK_HPP */

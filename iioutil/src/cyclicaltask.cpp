@@ -1,27 +1,30 @@
 #include "cyclicaltask.h"
+
 #include <QDebug>
-#include <QLoggingCategory>
 #include <QElapsedTimer>
+#include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_CYCLICALTASK, "CyclicalTask")
 
 using namespace scopy;
-CyclicalTask::CyclicalTask(QThread *task, QObject *parent) : QObject(parent)
+CyclicalTask::CyclicalTask(QThread *task, QObject *parent)
+	: QObject(parent)
 {
-	qDebug(CAT_CYCLICALTASK)<< "ctor ";
+	qDebug(CAT_CYCLICALTASK) << "ctor ";
 	t = new QTimer(this);
 	this->task = task;
 	this->task->setParent(this);
-	connect(t,SIGNAL(timeout()),this,SLOT(startThread()));
+	connect(t, SIGNAL(timeout()), this, SLOT(startThread()));
 }
 
-CyclicalTask::~CyclicalTask() {
+CyclicalTask::~CyclicalTask()
+{
 	stop();
 	if(!task->isFinished()) {
-		qDebug(CAT_CYCLICALTASK)<< "Waiting to finish thread - max 30 seconds";
+		qDebug(CAT_CYCLICALTASK) << "Waiting to finish thread - max 30 seconds";
 		task->wait(THREAD_FINISH_TIMEOUT);
 	}
-	qDebug(CAT_CYCLICALTASK)<< "dtor ";
+	qDebug(CAT_CYCLICALTASK) << "dtor ";
 }
 
 void CyclicalTask::start(int period)
@@ -31,21 +34,20 @@ void CyclicalTask::start(int period)
 		t->start(period);
 		enabled = true;
 	}
-
 }
 
-void CyclicalTask::startThread() {
-	qDebug(CAT_CYCLICALTASK)<<"Attempting to start thread";
+void CyclicalTask::startThread()
+{
+	qDebug(CAT_CYCLICALTASK) << "Attempting to start thread";
 	if(task->isFinished()) {
 		task->start();
 	}
 }
 
-
 void CyclicalTask::stop()
 {
 	if(enabled) {
-		qDebug(CAT_CYCLICALTASK)<<"Stopping scanner thread";
+		qDebug(CAT_CYCLICALTASK) << "Stopping scanner thread";
 		task->requestInterruption();
 		t->stop();
 		enabled = false;

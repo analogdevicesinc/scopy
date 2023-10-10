@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOGICDATACURVE_H
 #define LOGICDATACURVE_H
 
@@ -32,7 +31,7 @@ class SCOPY_GUI_EXPORT LogicDataCurve : public GenericLogicPlotCurve
 public:
 	LogicDataCurve(uint16_t *data, uint8_t bit);
 
-	virtual void setData(uint16_t*);
+	virtual void setData(uint16_t *);
 	virtual void dataAvailable(uint64_t from, uint64_t to, uint16_t *data) override;
 	virtual void reset() override;
 
@@ -40,19 +39,15 @@ public:
 
 	void setDisplaySampling(bool display);
 
-
 protected:
-	void drawLines( QPainter *painter,
-			const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-			const QRectF &canvasRect, int from, int to ) const override;
+	void drawLines(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect,
+		       int from, int to) const override;
 
 private:
-	void getSubsampledEdges(std::vector<std::pair<uint64_t, bool> > &edges, const QwtScaleMap &xMap) const;
-	uint64_t edgeAtX(int x, const std::vector<std::pair<uint64_t, bool> > &edges) const;
-
+	void getSubsampledEdges(std::vector<std::pair<uint64_t, bool>> &edges, const QwtScaleMap &xMap) const;
+	uint64_t edgeAtX(int x, const std::vector<std::pair<uint64_t, bool>> &edges) const;
 
 private:
-
 	// pointer to data which this curve listens to
 	uint16_t *m_data;
 	// bit to watch in each sample from m_data
@@ -67,7 +62,6 @@ private:
 	bool m_displaySampling;
 
 	mutable std::mutex m_dataAvailableMutex;
-
 };
 
 #endif // LOGICDATACURVE_H

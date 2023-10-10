@@ -1,9 +1,10 @@
 #ifndef M2KREADTEMPERATURETASK_H
 #define M2KREADTEMPERATURETASK_H
 
+#include <iio.h>
+
 #include <QObject>
 #include <QThread>
-#include <iio.h>
 
 namespace scopy::m2k {
 class M2kReadTemperatureTask : public QThread
@@ -15,9 +16,9 @@ public:
 
 Q_SIGNALS:
 	void newTemperature(double);
+
 private:
 	QString m_uri;
-
 };
-}
+} // namespace scopy::m2k
 #endif // M2KREADTEMPERATURETASK_H
