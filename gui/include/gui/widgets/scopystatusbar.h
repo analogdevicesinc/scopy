@@ -34,6 +34,13 @@ public Q_SLOTS:
 	 * */
 	void showHistory(bool checked);
 
+	/**
+	 * @brief overrides the current message with the one send as parameter.
+	 * @param message QString with the urgent message
+	 * @param ms The time that the message will be displayed (in milliseconds)
+	 * */
+	void receiveUrgentMessage(QString message, int ms);
+
 private:
 	void initUi();
 	void initHistory();

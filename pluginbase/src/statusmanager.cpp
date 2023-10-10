@@ -40,6 +40,8 @@ void StatusManager::addTemporaryWidget(QWidget *widget, int ms)
 	Q_EMIT announceStatusAvailable();
 }
 
+void StatusManager::addUrgentMessage(const QString &message, int ms) { Q_EMIT sendUrgentMessage(message, ms); }
+
 void StatusManager::requestStatus()
 {
 	if(!m_itemQueue.isEmpty()) {
