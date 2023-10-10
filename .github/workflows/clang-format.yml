@@ -17,7 +17,7 @@ jobs:
       with:
         source: '.'
         extensions: 'h,hpp,cpp,cc,cc.in'
-        clangFormatVersion: 10
+        clangFormatVersion: 12
 
   check-cmake-formatting:
     name: Check CMakeLists Formatting
