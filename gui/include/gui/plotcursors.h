@@ -1,25 +1,26 @@
 #ifndef PLOTCURSORS_H
 #define PLOTCURSORS_H
-#include <QObject>
 #include "plotwidget.h"
-#include <QPair>
 #include "scopy-gui_export.h"
+
+#include <QObject>
+#include <QPair>
+
 #include <hcursor.h>
 #include <vcursor.h>
 
 namespace scopy {
 
-
 class SCOPY_GUI_EXPORT PlotCursors : public QObject
 {
 	Q_OBJECT
 public:
-	PlotCursors(PlotWidget* plot);
+	PlotCursors(PlotWidget *plot);
 	~PlotCursors();
 
 	void displayIntersection();
 
-public Q_SLOTS:	
+public Q_SLOTS:
 	void setVisible(bool visible);
 	void horizSetVisible(bool visible);
 	void vertSetVisible(bool visible);
@@ -35,8 +36,8 @@ Q_SIGNALS:
 
 private:
 	PlotWidget *m_plot;
-	QPair<VCursor*, VCursor*> m_vCursors;
-	QPair<HCursor*, HCursor*> m_hCursors;
+	QPair<VCursor *, VCursor *> m_vCursors;
+	QPair<HCursor *, HCursor *> m_hCursors;
 	QwtPlotMarker *plotMarker1;
 	QwtPlotMarker *plotMarker2;
 	bool m_tracking;
@@ -46,7 +47,6 @@ private:
 	void updateTracking();
 	double getHorizIntersectionAt(double pos);
 };
-}
+} // namespace scopy
 
 #endif // PLOTCURSORS_H
-

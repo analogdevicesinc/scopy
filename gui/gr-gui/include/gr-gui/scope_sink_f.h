@@ -46,41 +46,40 @@
 #include <Python.h>
 #endif
 
-#include "trigger_mode.h"
-#include <gnuradio/sync_block.h>
-#include <qapplication.h>
 #include "scopy-gr-gui_export.h"
+#include "trigger_mode.h"
+
+#include <gnuradio/sync_block.h>
+
+#include <qapplication.h>
 
 namespace scopy {
 
-    class SCOPY_GR_GUI_EXPORT scope_sink_f : virtual public gr::sync_block
-    {
-    public:
-      // scopy::scope_sink_f::sptr
-      typedef std::shared_ptr<scope_sink_f> sptr;
+class SCOPY_GR_GUI_EXPORT scope_sink_f : virtual public gr::sync_block
+{
+public:
+	// scopy::scope_sink_f::sptr
+	typedef std::shared_ptr<scope_sink_f> sptr;
 
-      static sptr make(int size, double samp_rate,
-		       const std::string &name,
-		       int nconnections=1,
-		       QObject *plot=NULL);
+	static sptr make(int size, double samp_rate, const std::string &name, int nconnections = 1,
+			 QObject *plot = NULL);
 
-      virtual void exec_() = 0;
+	virtual void exec_() = 0;
 
-      virtual void set_update_time(double t) = 0;
-      virtual void set_nsamps(const int newsize) = 0;
-      virtual void set_samp_rate(const double samp_rate) = 0;
+	virtual void set_update_time(double t) = 0;
+	virtual void set_nsamps(const int newsize) = 0;
+	virtual void set_samp_rate(const double samp_rate) = 0;
 
-      virtual void set_trigger_mode(trigger_mode mode, int channel,
-				    const std::string &tag_key="") = 0;
+	virtual void set_trigger_mode(trigger_mode mode, int channel, const std::string &tag_key = "") = 0;
 
-      virtual int nsamps() const = 0;
-      virtual std::string name() const = 0;
-      virtual void reset() = 0;
-      virtual void set_displayOneBuffer(bool) = 0;
-      virtual void clean_buffers() = 0;
+	virtual int nsamps() const = 0;
+	virtual std::string name() const = 0;
+	virtual void reset() = 0;
+	virtual void set_displayOneBuffer(bool) = 0;
+	virtual void clean_buffers() = 0;
 
-      QApplication *d_qApplication;
-    };
+	QApplication *d_qApplication;
+};
 
 } /* namespace scopy */
 

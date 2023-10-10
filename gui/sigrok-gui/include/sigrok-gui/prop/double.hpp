@@ -37,16 +37,14 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_PROP_DOUBLE_HPP
 #define PULSEVIEW_PV_PROP_DOUBLE_HPP
 
-#include <utility>
-
-#include <optional>
-
 #include "property.hpp"
 #include "scopy-sigrok-gui_export.h"
+
+#include <optional>
+#include <utility>
 
 using std::pair;
 
@@ -60,15 +58,12 @@ class SCOPY_SIGROK_GUI_EXPORT Double : public Property
 	Q_OBJECT
 
 public:
-	Double(QString name, QString desc, int decimals, QString suffix,
-		std::optional< pair<double, double> > range,
-		std::optional<double> step,
-		Getter getter,
-		Setter setter);
+	Double(QString name, QString desc, int decimals, QString suffix, std::optional<pair<double, double>> range,
+	       std::optional<double> step, Getter getter, Setter setter);
 
 	virtual ~Double() = default;
 
-	QWidget* get_widget(QWidget *parent, bool auto_commit);
+	QWidget *get_widget(QWidget *parent, bool auto_commit);
 	void update_widget();
 
 	void commit();
@@ -79,13 +74,13 @@ private Q_SLOTS:
 private:
 	const int decimals_;
 	const QString suffix_;
-	const std::optional< pair<double, double> > range_;
+	const std::optional<pair<double, double>> range_;
 	const std::optional<double> step_;
 
 	QDoubleSpinBox *spin_box_;
 };
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_PROP_DOUBLE_HPP

@@ -18,17 +18,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_EXTERNALPSREADERTHREAD_H
 #define SCOPY_EXTERNALPSREADERTHREAD_H
 
 #include <QThread>
 
 namespace scopy::swiot {
-class ExternalPsReaderThread : public QThread {
+class ExternalPsReaderThread : public QThread
+{
 	Q_OBJECT
 public:
-	explicit ExternalPsReaderThread(QString uri, QString attr, QObject* parent = nullptr);
+	explicit ExternalPsReaderThread(QString uri, QString attr, QObject *parent = nullptr);
 	void run() override;
 
 Q_SIGNALS:
@@ -37,8 +37,7 @@ Q_SIGNALS:
 private:
 	QString m_uri;
 	QString m_attribute;
-
 };
-} // scopy::swiot
+} // namespace scopy::swiot
 
-#endif //SCOPY_EXTERNALPSREADERTHREAD_H
+#endif // SCOPY_EXTERNALPSREADERTHREAD_H

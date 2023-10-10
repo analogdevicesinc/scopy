@@ -17,25 +17,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <vector>
-#include <string.h>
-
 #include <iio.h>
+
 #include <QDebug>
+#include <QDirIterator>
+#include <QFile>
+#include <QFileDialog>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QPushButton>
 #include <QTimer>
-#include <QFile>
 #include <QtQml/QJSEngine>
 #include <QtQml/QQmlEngine>
-#include <QDirIterator>
-#include <QPushButton>
-#include <QFileDialog>
+
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <vector>
 
 //#include "pattern_generator.hpp"
 
@@ -48,10 +49,7 @@ constexpr int DIGITAL_NR_CHANNELS = 16;
 
 namespace scopy {
 
-void DIOManager::init()
-{
-
-}
+void DIOManager::init() {}
 
 DIOManager::DIOManager(struct iio_context *ctx, Filter *filt)
 	: m_m2k_context(m2kOpen(ctx, ""))
@@ -59,7 +57,7 @@ DIOManager::DIOManager(struct iio_context *ctx, Filter *filt)
 {
 	outputEnabled = false;
 
-	for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+	for(int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 		digital->setDirection(i, DIO_DIRECTION::DIO_INPUT);
 		digital->setValueRaw(i, DIO_LEVEL::LOW);
 	}
@@ -67,52 +65,40 @@ DIOManager::DIOManager(struct iio_context *ctx, Filter *filt)
 	direction = gpi = gpo = lockMask = outputEnabled = 0x00;
 }
 
-DIOManager::~DIOManager()
-{
-
-}
+DIOManager::~DIOManager() {}
 
 void DIOManager::setOutputMode(int chid, bool mode)
 {
-	digital->setOutputMode(chid, mode ? DIO_MODE::DIO_OPENDRAIN
-					  : DIO_MODE::DIO_PUSHPULL);
+	digital->setOutputMode(chid, mode ? DIO_MODE::DIO_OPENDRAIN : DIO_MODE::DIO_PUSHPULL);
 }
 
 void DIOManager::setDeviceDirection(int chid, bool force)
 {
-	if (!isLocked(chid)) {
+	if(!isLocked(chid)) {
 		const bool output = (outputEnabled & getDirection(chid)) | force;
-		digital->setDirection(chid, output ? DIO_DIRECTION::DIO_OUTPUT
-						   : DIO_DIRECTION::DIO_INPUT);
+		digital->setDirection(chid, output ? DIO_DIRECTION::DIO_OUTPUT : DIO_DIRECTION::DIO_INPUT);
 	}
 }
 
-int DIOManager::getGpo()
-{
-	return gpo;
-}
+int DIOManager::getGpo() { return gpo; }
 
 void DIOManager::setOutRaw(int ch, bool val)
 {
-	if (val) {
-		gpo |= 1<<ch;
+	if(val) {
+		gpo |= 1 << ch;
 	} else {
-		gpo &= ( ~ (1 << ch));
+		gpo &= (~(1 << ch));
 	}
 
 	setDeviceOutRaw(ch);
 }
 
-bool DIOManager::getOutRaw(int ch)
-{
-	return gpo & (1 << ch);
-}
+bool DIOManager::getOutRaw(int ch) { return gpo & (1 << ch); }
 
 void DIOManager::setDeviceOutRaw(int ch)
 {
-	if (outputEnabled) {
-		digital->setValueRaw(ch, getOutRaw(ch) ? DIO_LEVEL::HIGH
-						       : DIO_LEVEL::LOW);
+	if(outputEnabled) {
+		digital->setValueRaw(ch, getOutRaw(ch) ? DIO_LEVEL::HIGH : DIO_LEVEL::LOW);
 	}
 }
 
@@ -120,38 +106,31 @@ int DIOManager::getGpi()
 {
 	gpi = 0;
 
-	for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+	for(int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 		gpi |= (getInRaw(i) << i);
 	}
 
 	return gpi;
 }
 
-bool DIOManager::getInRaw(int ch)
-{
-	return static_cast<bool>(digital->getValueRaw(ch));
-
-}
+bool DIOManager::getInRaw(int ch) { return static_cast<bool>(digital->getValueRaw(ch)); }
 
 void DIOManager::setDirection(int ch, bool output)
 {
-	if (output) {
-		direction |= (1<<ch);
+	if(output) {
+		direction |= (1 << ch);
 	} else {
-		direction &= ( ~ (1 << ch));
+		direction &= (~(1 << ch));
 	}
 
 	setDeviceDirection(ch, false);
 }
 
-bool DIOManager::getDirection(int ch)
-{
-	return direction & (1 << ch);
-}
+bool DIOManager::getDirection(int ch) { return direction & (1 << ch); }
 
 void DIOManager::setMode(int mask)
 {
-	for(int i=0; i < DIGITAL_NR_CHANNELS; ++i) {
+	for(int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 		setOutputMode(i, mask & 0x01);
 		mask = mask >> 1;
 	}
@@ -162,54 +141,45 @@ void DIOManager::lock(int mask)
 	lockMask = mask;
 	int i = 0;
 
-	while (mask) {
-		if (mask & 0x01) {
+	while(mask) {
+		if(mask & 0x01) {
 			setDeviceDirection(i, true);
 		}
 
-		mask= mask >> 1;
+		mask = mask >> 1;
 		i++;
 	}
 
 	Q_EMIT locked();
 }
 
-bool DIOManager::isLocked(int ch)
-{
-	return lockMask & (1 << ch);
-}
+bool DIOManager::isLocked(int ch) { return lockMask & (1 << ch); }
 
-int DIOManager::getLockMask()
-{
-	return lockMask;
-}
+int DIOManager::getLockMask() { return lockMask; }
 
 void DIOManager::unlock()
 {
 	lockMask = 0;
 
-	for (auto i=0; i < DIGITAL_NR_CHANNELS; ++i) {
+	for(auto i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 		setDeviceDirection(i, false);
 	}
 
 	Q_EMIT unlocked();
 }
 
-bool DIOManager::getOutputEnabled()
-{
-	return outputEnabled;
-}
+bool DIOManager::getOutputEnabled() { return outputEnabled; }
 
 void DIOManager::enableOutput(bool output)
 {
-	if (outputEnabled != output) {
+	if(outputEnabled != output) {
 		outputEnabled = output;
 
-		for (auto i=0; i < DIGITAL_NR_CHANNELS; ++i) {
+		for(auto i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 			setDeviceDirection(i, false);
 			setDeviceOutRaw(i);
 		}
 	}
 }
 
-}
+} // namespace scopy

@@ -18,34 +18,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "faults.h"
-#include <gui/tool_view_builder.hpp>
-
-#include <QTimer>
-#include <QThread>
 
 #include "src/runtime/max14906/max14906.h"
 #include "src/swiot_logging_categories.h"
+
+#include <QThread>
+#include <QTimer>
+
 #include <gui/channel_manager.hpp>
+#include <gui/tool_view_builder.hpp>
 
 using namespace scopy::swiot;
 
 #define POLLING_INTERVAL 1000
 
-Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
-	QWidget(parent),
-	ctx(ctx),
-	ui(new Ui::Faults),
-	m_faultsPage(new FaultsPage(ctx, this)),
-	m_statusLabel(new QLabel(this)),
-	m_statusContainer(new QWidget(this)),
-	timer(new QTimer()),
-	ad74413r_numeric(0),
-	max14906_numeric(0),
-	m_backButton(Faults::createBackButton()),
-	thread(new QThread(this)),
-	m_tme(tme)
+Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
+	: QWidget(parent)
+	, ctx(ctx)
+	, ui(new Ui::Faults)
+	, m_faultsPage(new FaultsPage(ctx, this))
+	, m_statusLabel(new QLabel(this))
+	, m_statusContainer(new QWidget(this))
+	, timer(new QTimer())
+	, ad74413r_numeric(0)
+	, max14906_numeric(0)
+	, m_backButton(Faults::createBackButton())
+	, thread(new QThread(this))
+	, m_tme(tme)
 {
 	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
 
@@ -57,8 +57,9 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent) :
 	this->initTutorialProperties();
 }
 
-Faults::~Faults() {
-	if (thread) {
+Faults::~Faults()
+{
+	if(thread) {
 		thread->quit();
 		thread->wait();
 		delete thread;
@@ -66,7 +67,8 @@ Faults::~Faults() {
 	delete ui;
 }
 
-void Faults::setupDynamicUi(QWidget *parent) {
+void Faults::setupDynamicUi(QWidget *parent)
+{
 	scopy::gui::ToolViewRecipe recipe;
 	recipe.helpBtnUrl = "";
 	recipe.hasRunBtn = true;
@@ -80,10 +82,11 @@ void Faults::setupDynamicUi(QWidget *parent) {
 
 	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
 	m_statusContainer->layout()->setSpacing(0);
-	m_statusContainer->layout()->setContentsMargins(0,0,0,0);
+	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
 	m_statusLabel->setText("The system is powered at limited capacity.");
 	m_statusLabel->setWordWrap(true);
-	m_statusContainer->setStyleSheet("QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px solid rgba(0, 0, 0, 30); font-size: 11pt}");
+	m_statusContainer->setStyleSheet("QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px "
+					 "solid rgba(0, 0, 0, 30); font-size: 11pt}");
 
 	auto exclamationLabel = new QPushButton(m_statusContainer);
 	exclamationLabel->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
@@ -105,11 +108,10 @@ void Faults::setupDynamicUi(QWidget *parent) {
 	this->setMinimumSize(800, 500);
 }
 
-void Faults::connectSignalsAndSlots() {
-	QObject::connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this,
-			 &Faults::runButtonClicked);
-	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this,
-			 &Faults::singleButtonClicked);
+void Faults::connectSignalsAndSlots()
+{
+	QObject::connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this, &Faults::runButtonClicked);
+	QObject::connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Faults::singleButtonClicked);
 	QObject::connect(m_backButton, &QPushButton::clicked, this, &Faults::onBackBtnPressed);
 
 	QObject::connect(this->timer, &QTimer::timeout, this, &Faults::pollFaults);
@@ -130,26 +132,28 @@ void Faults::onBackBtnPressed()
 	Q_EMIT backBtnPressed();
 }
 
-void Faults::runButtonClicked(bool toggled) {
+void Faults::runButtonClicked(bool toggled)
+{
 	this->m_toolView->getSingleBtn()->setChecked(false);
-	if (toggled) {
+	if(toggled) {
 		this->thread->start();
-		if (!this->m_tme->running()) {
+		if(!this->m_tme->running()) {
 			this->m_tme->setRunning(true);
 		}
 	} else {
-		if (this->thread->isRunning()) {
+		if(this->thread->isRunning()) {
 			this->thread->quit();
-//			this->thread->wait();
+			//			this->thread->wait();
 		}
-		if (this->m_tme->running()) {
+		if(this->m_tme->running()) {
 			this->m_tme->setRunning(false);
 		}
 		this->timer->stop();
 	}
 }
 
-void Faults::singleButtonClicked() {
+void Faults::singleButtonClicked()
+{
 	qDebug(CAT_SWIOT_FAULTS) << "Single button clicked";
 	this->m_toolView->getRunBtn()->setChecked(false);
 	this->timer->stop();
@@ -157,12 +161,14 @@ void Faults::singleButtonClicked() {
 	this->m_toolView->getSingleBtn()->setChecked(false);
 }
 
-void Faults::pollFaults() {
+void Faults::pollFaults()
+{
 	qDebug(CAT_SWIOT_FAULTS) << "Polling faults...";
 	this->m_faultsPage->update();
 }
 
-QPushButton *Faults::createBackButton() {
+QPushButton *Faults::createBackButton()
+{
 	auto *backButton = new QPushButton();
 	backButton->setObjectName(QString::fromUtf8("backButton"));
 	backButton->setLayoutDirection(Qt::RightToLeft);
@@ -184,8 +190,9 @@ QPushButton *Faults::createBackButton() {
 	return backButton;
 }
 
-void Faults::externalPowerSupply(bool ps) {
-	if (ps) {
+void Faults::externalPowerSupply(bool ps)
+{
+	if(ps) {
 		m_statusContainer->hide();
 	} else {
 		m_statusContainer->show();
@@ -193,7 +200,8 @@ void Faults::externalPowerSupply(bool ps) {
 	}
 }
 
-void Faults::initTutorialProperties() {
+void Faults::initTutorialProperties()
+{
 	// initialize components that might be used for the Faults tutorial
 	m_toolView->getSingleBtn()->setProperty("tutorial_name", "SINGLE_BUTTON");
 	m_toolView->getRunBtn()->setProperty("tutorial_name", "RUN_BUTTON");

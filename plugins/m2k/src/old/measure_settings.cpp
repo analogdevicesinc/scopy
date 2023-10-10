@@ -18,13 +18,15 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "measure_settings.h"
-#include "oscilloscope_plot.hpp"
+
 #include "gui/dropdown_switch_list.h"
+#include "oscilloscope_plot.hpp"
+
 #include "ui_measure_settings.h"
 
+#include <QHeaderView>
 #include <QStandardItem>
 #include <QTreeView>
-#include <QHeaderView>
 
 using namespace scopy;
 using namespace scopy::m2k;
@@ -65,230 +67,190 @@ static const std::map<int, QString> icons_spect = {
 	{M2kMeasure::SFDR, ":/gui/icons/measurements/frequency.svg"},
 };
 
-MeasureSettings::MeasureSettings( QList<M2kMeasure *>* measures_list, QWidget *parent, bool is_time_domain) :
-    QWidget(parent),
-    m_ui(new Ui::MeasureSettings),
-    m_channelName(""),
-    m_chnUnderlineColor(),
-    m_horizMeasurements(nullptr),
-    m_vertMeasurements(nullptr),
-    m_is_time_domain(is_time_domain),
-    m_emitActivated(true),
-    m_emitStatsChanged(true),
-    m_emitStatsDeleteAll(true),
-    m_emitDeleteAll(true),
-    m_are_dropdowns_filled(false),
-    m_measures_list(measures_list),
-    m_selectedChannel(-1),
-    m_enableDisplayAll(false)
+MeasureSettings::MeasureSettings(QList<M2kMeasure *> *measures_list, QWidget *parent, bool is_time_domain)
+	: QWidget(parent)
+	, m_ui(new Ui::MeasureSettings)
+	, m_channelName("")
+	, m_chnUnderlineColor()
+	, m_horizMeasurements(nullptr)
+	, m_vertMeasurements(nullptr)
+	, m_is_time_domain(is_time_domain)
+	, m_emitActivated(true)
+	, m_emitStatsChanged(true)
+	, m_emitStatsDeleteAll(true)
+	, m_emitDeleteAll(true)
+	, m_are_dropdowns_filled(false)
+	, m_measures_list(measures_list)
+	, m_selectedChannel(-1)
+	, m_enableDisplayAll(false)
 {
-    QTreeView *treeView;
+	QTreeView *treeView;
 
-    m_ui->setupUi(this);
-    hide_measure_settings(m_is_time_domain);
+	m_ui->setupUi(this);
+	hide_measure_settings(m_is_time_domain);
 
-    if(m_is_time_domain)
-    {
-	m_horizMeasurements = new DropdownSwitchList(2, this);
-	m_vertMeasurements = new DropdownSwitchList(2, this);
-	m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
-	m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
+	if(m_is_time_domain) {
+		m_horizMeasurements = new DropdownSwitchList(2, this);
+		m_vertMeasurements = new DropdownSwitchList(2, this);
+		m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
+		m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
 
-	m_horizMeasurements->setTitle(tr("Horizontal"));
-	m_horizMeasurements->setColumnTitle(0, tr("Name"));
-	m_horizMeasurements->setColumnTitle(1, tr("Measure"));
-	m_horizMeasurements->setColumnTitle(2, tr("Stats"));
-	m_horizMeasurements->setMaxVisibleItems(4);
-	treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
-	treeView->header()->resizeSection(0, 122);
-	treeView->setIconSize(QSize(30, 20));
+		m_horizMeasurements->setTitle(tr("Horizontal"));
+		m_horizMeasurements->setColumnTitle(0, tr("Name"));
+		m_horizMeasurements->setColumnTitle(1, tr("Measure"));
+		m_horizMeasurements->setColumnTitle(2, tr("Stats"));
+		m_horizMeasurements->setMaxVisibleItems(4);
+		treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
+		treeView->header()->resizeSection(0, 122);
+		treeView->setIconSize(QSize(30, 20));
 
-	connect(m_horizMeasurements->model(),
-	    SIGNAL(itemChanged(QStandardItem*)),
-	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+		connect(m_horizMeasurements->model(), SIGNAL(itemChanged(QStandardItem *)),
+			SLOT(onMeasurementPropertyChanged(QStandardItem *)));
 
-	m_vertMeasurements->setTitle(tr("Vertical"));
-	m_vertMeasurements->setColumnTitle(0, tr("Name"));
-	m_vertMeasurements->setColumnTitle(1, tr("Measure"));
-	m_vertMeasurements->setColumnTitle(2, tr("Stats"));
-	m_vertMeasurements->setMaxVisibleItems(4);
-	treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
-	treeView->header()->resizeSection(0, 122);
-	treeView->setIconSize(QSize(30, 20));
+		m_vertMeasurements->setTitle(tr("Vertical"));
+		m_vertMeasurements->setColumnTitle(0, tr("Name"));
+		m_vertMeasurements->setColumnTitle(1, tr("Measure"));
+		m_vertMeasurements->setColumnTitle(2, tr("Stats"));
+		m_vertMeasurements->setMaxVisibleItems(4);
+		treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
+		treeView->header()->resizeSection(0, 122);
+		treeView->setIconSize(QSize(30, 20));
 
-	connect(m_vertMeasurements->model(),
-	    SIGNAL(itemChanged(QStandardItem*)),
-	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
-    }
-    else
-    {
-	m_horizMeasurements = new DropdownSwitchList(1, this);
-	m_vertMeasurements = new DropdownSwitchList(1, this);
+		connect(m_vertMeasurements->model(), SIGNAL(itemChanged(QStandardItem *)),
+			SLOT(onMeasurementPropertyChanged(QStandardItem *)));
+	} else {
+		m_horizMeasurements = new DropdownSwitchList(1, this);
+		m_vertMeasurements = new DropdownSwitchList(1, this);
 
-	connect(m_ui->comboBox_harm, SIGNAL(currentIndexChanged(int)),
-	    SLOT(onharmValueChanged(int)));
+		connect(m_ui->comboBox_harm, SIGNAL(currentIndexChanged(int)), SLOT(onharmValueChanged(int)));
 
-	m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
-	m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
+		m_ui->hLayout_hMeasurements->addWidget(m_horizMeasurements);
+		m_ui->hLayout_vMeasurements->addWidget(m_vertMeasurements);
 
-	m_horizMeasurements->setTitle(tr("Horizontals"));
-	m_horizMeasurements->setColumnTitle(0, tr("Name"));
-	m_horizMeasurements->setColumnTitle(1, tr("Measure"));
-	m_horizMeasurements->setMaxVisibleItems(4);
-	treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
-	treeView->header()->resizeSection(0, 150);
-	treeView->setIconSize(QSize(30, 20));
+		m_horizMeasurements->setTitle(tr("Horizontals"));
+		m_horizMeasurements->setColumnTitle(0, tr("Name"));
+		m_horizMeasurements->setColumnTitle(1, tr("Measure"));
+		m_horizMeasurements->setMaxVisibleItems(4);
+		treeView = static_cast<QTreeView *>(m_horizMeasurements->view());
+		treeView->header()->resizeSection(0, 150);
+		treeView->setIconSize(QSize(30, 20));
 
-	connect(m_horizMeasurements->model(),
-	    SIGNAL(itemChanged(QStandardItem*)),
-	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
+		connect(m_horizMeasurements->model(), SIGNAL(itemChanged(QStandardItem *)),
+			SLOT(onMeasurementPropertyChanged(QStandardItem *)));
 
-	m_vertMeasurements->setTitle(tr("Verticals"));
-	m_vertMeasurements->setColumnTitle(0, tr("Name"));
-	m_vertMeasurements->setColumnTitle(1, tr("Measure"));
+		m_vertMeasurements->setTitle(tr("Verticals"));
+		m_vertMeasurements->setColumnTitle(0, tr("Name"));
+		m_vertMeasurements->setColumnTitle(1, tr("Measure"));
 
-	m_vertMeasurements->setMaxVisibleItems(4);
-	treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
-	treeView->header()->resizeSection(0, 150);
-	treeView->setIconSize(QSize(30, 20));
+		m_vertMeasurements->setMaxVisibleItems(4);
+		treeView = static_cast<QTreeView *>(m_vertMeasurements->view());
+		treeView->header()->resizeSection(0, 150);
+		treeView->setIconSize(QSize(30, 20));
 
-	connect(m_vertMeasurements->model(),
-	    SIGNAL(itemChanged(QStandardItem*)),
-	    SLOT(onMeasurementPropertyChanged(QStandardItem*)));
-    }
+		connect(m_vertMeasurements->model(), SIGNAL(itemChanged(QStandardItem *)),
+			SLOT(onMeasurementPropertyChanged(QStandardItem *)));
+	}
 }
 
-MeasureSettings::~MeasureSettings()
-{
-	delete m_ui;
-}
+MeasureSettings::~MeasureSettings() { delete m_ui; }
 
 void MeasureSettings::onharmValueChanged(int id)
 {
-     M2kMeasure *measure = measureOfChannel(m_selectedChannel);
-     measure->setHarmonicNumber(id + 1);
+	M2kMeasure *measure = measureOfChannel(m_selectedChannel);
+	measure->setHarmonicNumber(id + 1);
 }
 
-void MeasureSettings::hide_measure_settings(bool is_time_domain) {
-    if(is_time_domain)
-    {
-	m_ui->comboBox_harm->hide();
-	m_ui->label_9->hide();
-	m_ui->line_6->hide();
-	m_ui->label_10->hide();
-    }
-    else
-    {
-	m_ui->label_7->hide();
-	m_ui->line_3->hide();
-	m_ui->verticalSpacer_6->changeSize(0,0);
-	m_ui->verticalSpacer_7->changeSize(0,0);
-
-	m_ui->button_StatisticsEn->hide();
-	m_ui->button_statsDeleteAll->hide();
-	m_ui->button_StatisticsReset->hide();
-
-	m_ui->button_GatingEnable->hide();
-	m_ui->label_4->hide();
-	m_ui->label_5->hide();
-	m_ui->line_5->hide();
-
-	m_ui->comboBox_harm->addItem("1");
-	m_ui->comboBox_harm->addItem("2");
-	m_ui->comboBox_harm->addItem("3");
-	m_ui->comboBox_harm->addItem("4");
-	m_ui->comboBox_harm->addItem("5");
-	m_ui->comboBox_harm->addItem("6");
-	m_ui->comboBox_harm->addItem("7");
-	m_ui->comboBox_harm->addItem("8");
-	m_ui->comboBox_harm->addItem("9");
-
-	m_ui->comboBox_harm->setCurrentIndex(6);
-    }
-}
-
-QString MeasureSettings::channelName() const
+void MeasureSettings::hide_measure_settings(bool is_time_domain)
 {
-	return m_channelName;
+	if(is_time_domain) {
+		m_ui->comboBox_harm->hide();
+		m_ui->label_9->hide();
+		m_ui->line_6->hide();
+		m_ui->label_10->hide();
+	} else {
+		m_ui->label_7->hide();
+		m_ui->line_3->hide();
+		m_ui->verticalSpacer_6->changeSize(0, 0);
+		m_ui->verticalSpacer_7->changeSize(0, 0);
+
+		m_ui->button_StatisticsEn->hide();
+		m_ui->button_statsDeleteAll->hide();
+		m_ui->button_StatisticsReset->hide();
+
+		m_ui->button_GatingEnable->hide();
+		m_ui->label_4->hide();
+		m_ui->label_5->hide();
+		m_ui->line_5->hide();
+
+		m_ui->comboBox_harm->addItem("1");
+		m_ui->comboBox_harm->addItem("2");
+		m_ui->comboBox_harm->addItem("3");
+		m_ui->comboBox_harm->addItem("4");
+		m_ui->comboBox_harm->addItem("5");
+		m_ui->comboBox_harm->addItem("6");
+		m_ui->comboBox_harm->addItem("7");
+		m_ui->comboBox_harm->addItem("8");
+		m_ui->comboBox_harm->addItem("9");
+
+		m_ui->comboBox_harm->setCurrentIndex(6);
+	}
 }
 
-void MeasureSettings::setChannelName(const QString& name)
+QString MeasureSettings::channelName() const { return m_channelName; }
+
+void MeasureSettings::setChannelName(const QString &name)
 {
 	m_channelName = name;
 	m_ui->lblChanName->setText(name);
 }
 
-QColor MeasureSettings::channelUnderlineColor() const
-{
-	return m_chnUnderlineColor;
-}
+QColor MeasureSettings::channelUnderlineColor() const { return m_chnUnderlineColor; }
 
-void MeasureSettings::setChannelUnderlineColor(const QColor& color)
+void MeasureSettings::setChannelUnderlineColor(const QColor &color)
 {
 	m_chnUnderlineColor = color;
-	QString stylesheet = QString("border: 2px solid %1;"
-				).arg(color.name());
+	QString stylesheet = QString("border: 2px solid %1;").arg(color.name());
 
 	m_ui->line->setStyleSheet(stylesheet);
 }
 
-bool MeasureSettings::emitActivated() const
-{
-	return m_emitActivated;
-}
-void MeasureSettings::setEmitActivated(bool en)
-{
-	m_emitActivated = en;
-}
+bool MeasureSettings::emitActivated() const { return m_emitActivated; }
+void MeasureSettings::setEmitActivated(bool en) { m_emitActivated = en; }
 
-bool MeasureSettings::emitStatsChanged()const
-{
-	return m_emitStatsChanged;
-}
-void MeasureSettings::setEmitStatsChanged(bool en)
-{
-	m_emitStatsChanged = en;
-}
+bool MeasureSettings::emitStatsChanged() const { return m_emitStatsChanged; }
+void MeasureSettings::setEmitStatsChanged(bool en) { m_emitStatsChanged = en; }
 
-QList<MeasurementItem> MeasureSettings::measurementSelection()
-{
-	return m_selectedMeasurements;
-}
+QList<MeasurementItem> MeasureSettings::measurementSelection() { return m_selectedMeasurements; }
 
 void MeasureSettings::onMeasurementPropertyChanged(QStandardItem *item)
 {
-	QAbstractItemModel *model = static_cast<QAbstractItemModel *>
-		(QObject::sender());
-	DropdownSwitchList *dropdown = static_cast<DropdownSwitchList *>
-		(model->parent());
+	QAbstractItemModel *model = static_cast<QAbstractItemModel *>(QObject::sender());
+	DropdownSwitchList *dropdown = static_cast<DropdownSwitchList *>(model->parent());
 	bool en = item->data(Qt::EditRole).toBool();
 	QStandardItem *nameItem = item->model()->item(item->row(), 0);
 	int id = nameItem->data(Qt::UserRole).toInt();
 
-	if (item->column() == 1) {
-		if (m_emitActivated)
+	if(item->column() == 1) {
+		if(m_emitActivated)
 			onMeasurementActivated(m_selectedChannel, id, en);
-	} else if (item->column() == 2) {
-		if (m_emitStatsChanged)
+	} else if(item->column() == 2) {
+		if(m_emitStatsChanged)
 			onStatisticActivated(dropdown, id, en);
 	}
 
 	// Switch from Recover to Delete All if a measurement state gets changed
-	if (item->column() == 1 && m_emitActivated &&
-			m_ui->button_measDeleteAll->isChecked()) {
+	if(item->column() == 1 && m_emitActivated && m_ui->button_measDeleteAll->isChecked()) {
 		m_emitDeleteAll = false;
 		m_ui->button_measDeleteAll->setChecked(false);
 	}
 
 	// Disable Display All if a measurement state gets changed
-	if (item->column() == 1 &&m_emitActivated &&
-			m_ui->button_measDisplayAll->isChecked()) {
+	if(item->column() == 1 && m_emitActivated && m_ui->button_measDisplayAll->isChecked()) {
 		m_ui->button_measDisplayAll->setChecked(false);
 	}
 
 	// Switch from Recover to Delete All if a statistic state gets changed
-	if (item->column() == 2 && m_emitStatsChanged &&
-			m_ui->button_statsDeleteAll->isChecked()) {
+	if(item->column() == 2 && m_emitStatsChanged && m_ui->button_statsDeleteAll->isChecked()) {
 		m_emitStatsDeleteAll = false;
 		m_ui->button_statsDeleteAll->setChecked(false);
 	}
@@ -298,7 +260,7 @@ void MeasureSettings::on_button_measDisplayAll_toggled(bool checked)
 {
 	m_ui->button_measDeleteAll->setEnabled(!checked);
 
-	if (checked)
+	if(checked)
 		displayAllMeasurements();
 	else
 		disableDisplayAllMeasurements();
@@ -306,84 +268,77 @@ void MeasureSettings::on_button_measDisplayAll_toggled(bool checked)
 
 void MeasureSettings::on_button_measDeleteAll_toggled(bool checked)
 {
-	QPushButton *button = static_cast<QPushButton*>(QObject::sender());
-	if (checked)
+	QPushButton *button = static_cast<QPushButton *>(QObject::sender());
+	if(checked)
 		button->setText(tr("Recover"));
 	else
 		button->setText(tr("Delete All"));
 
-	if (!m_emitDeleteAll) {
+	if(!m_emitDeleteAll) {
 		m_emitDeleteAll = true;
 	} else {
-		if (checked)
+		if(checked)
 			deleteAllMeasurements();
 		else
 			recoverAllMeasurements();
 	}
 }
 
-M2kMeasure* MeasureSettings::measureOfChannel(int chnIdx) const
+M2kMeasure *MeasureSettings::measureOfChannel(int chnIdx) const
 {
-    M2kMeasure *measure = nullptr;
+	M2kMeasure *measure = nullptr;
 
-    auto it = std::find_if(m_measures_list->begin(), m_measures_list->end(),
-	    [&](M2kMeasure *m) { return m->channel() == chnIdx; });
-    if (it != m_measures_list->end())
-	measure = *it;
+	auto it = std::find_if(m_measures_list->begin(), m_measures_list->end(),
+			       [&](M2kMeasure *m) { return m->channel() == chnIdx; });
+	if(it != m_measures_list->end())
+		measure = *it;
 
-    return measure;
+	return measure;
 }
 
 void MeasureSettings::onChannelAdded(int chnIdx)
 {
-    // Use the measurements of the 1st channel to construct the dropdowns.
-    // All channels have the same set of measurements.
-    if (m_are_dropdowns_filled)
-	return;
+	// Use the measurements of the 1st channel to construct the dropdowns.
+	// All channels have the same set of measurements.
+	if(m_are_dropdowns_filled)
+		return;
 
-    M2kMeasure *measure = measureOfChannel(chnIdx);
+	M2kMeasure *measure = measureOfChannel(chnIdx);
 	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
-    if (measure)
-	measurements = measure->measurments();
-    int h = 0;
-    int v = 0;
+	if(measure)
+		measurements = measure->measurments();
+	int h = 0;
+	int v = 0;
 
-    if(m_is_time_domain)
-    {
-	for (int i = 0; i < measurements.size(); i++) {
+	if(m_is_time_domain) {
+		for(int i = 0; i < measurements.size(); i++) {
 			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
-			
-			if (axis == M2kMeasurementData::HORIZONTAL) {
-		m_horizMeasurements->addDropdownElement(
-			QIcon(icons_lut.at(i)),
-			measurements[i]->name(), QVariant(i));
-		m_measurePosInDropdowns.append(h++);
-			} else if (axis == M2kMeasurementData::VERTICAL) {
-		m_vertMeasurements->addDropdownElement(
-			QIcon(icons_lut.at(i)),
-			measurements[i]->name(), QVariant(i));
-		m_measurePosInDropdowns.append(v++);
-	    }
-	}
-    }
-    else
-    {
-	for (int i = 0; i < measurements.size(); i++) {
-		enum M2kMeasurementData::axisType axis = measurements[i]->axis();
-		
-		if (axis == M2kMeasurementData::HORIZONTAL_F) {
-		m_horizMeasurements->addDropdownElement(
-			QIcon(icons_spect.at(i)),
-			measurements[i]->name(), QVariant(i));
-		} else if (axis == M2kMeasurementData::VERTICAL_F) {
-		m_vertMeasurements->addDropdownElement(
-			QIcon(icons_spect.at(i)),
-			measurements[i]->name(), QVariant(i));
-	    }
-	}
-    }
 
-    m_are_dropdowns_filled = true;
+			if(axis == M2kMeasurementData::HORIZONTAL) {
+				m_horizMeasurements->addDropdownElement(QIcon(icons_lut.at(i)), measurements[i]->name(),
+									QVariant(i));
+				m_measurePosInDropdowns.append(h++);
+			} else if(axis == M2kMeasurementData::VERTICAL) {
+				m_vertMeasurements->addDropdownElement(QIcon(icons_lut.at(i)), measurements[i]->name(),
+								       QVariant(i));
+				m_measurePosInDropdowns.append(v++);
+			}
+		}
+	} else {
+		for(int i = 0; i < measurements.size(); i++) {
+			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
+
+			if(axis == M2kMeasurementData::HORIZONTAL_F) {
+				m_horizMeasurements->addDropdownElement(QIcon(icons_spect.at(i)),
+									measurements[i]->name(), QVariant(i));
+			} else if(axis == M2kMeasurementData::VERTICAL_F) {
+				m_vertMeasurements->addDropdownElement(QIcon(icons_spect.at(i)),
+								       measurements[i]->name(), QVariant(i));
+			}
+		}
+	}
+
+	m_are_dropdowns_filled = true;
 }
 
 void MeasureSettings::onChannelRemoved(int chnIdx)
@@ -403,11 +358,11 @@ void MeasureSettings::onChannelRemoved(int chnIdx)
 
 void MeasureSettings::setSelectedChannel(int chnIdx)
 {
-	if (m_selectedChannel != chnIdx) {
+	if(m_selectedChannel != chnIdx) {
 		m_selectedChannel = chnIdx;
 		loadMeasurementStatesFromData();
 		loadStatisticStatesForChannel(chnIdx);
-		if (m_ui->button_measDisplayAll->isChecked()){
+		if(m_ui->button_measDisplayAll->isChecked()) {
 			disableDisplayAllMeasurements();
 			displayAllMeasurements();
 		}
@@ -418,51 +373,42 @@ void MeasureSettings::loadMeasurementStatesFromData()
 {
 	M2kMeasure *measure = measureOfChannel(m_selectedChannel);
 	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
-	    if (measure)
+	if(measure)
 		measurements = measure->measurments();
 
-	    int h_idx = 0;
-	    int v_idx = 0;
+	int h_idx = 0;
+	int v_idx = 0;
 
-	    QStandardItemModel *horiz_model =
-		static_cast<QStandardItemModel *>(m_horizMeasurements->model());
-	    QStandardItemModel *vert_model =
-		static_cast<QStandardItemModel *>(m_vertMeasurements->model());
+	QStandardItemModel *horiz_model = static_cast<QStandardItemModel *>(m_horizMeasurements->model());
+	QStandardItemModel *vert_model = static_cast<QStandardItemModel *>(m_vertMeasurements->model());
 
-	    setEmitActivated(false);
+	setEmitActivated(false);
 
-	    if(m_is_time_domain)
-	    {
-		for (int i = 0; i < measurements.size(); i++) {
-		    int axis = measurements[i]->axis();
-		    int state = measurements[i]->enabled();
-			
-			if (axis == M2kMeasurementData::HORIZONTAL) {
-			horiz_model->item(h_idx++, 1)->setData(
-				QVariant((int) state), Qt::EditRole);
-			} else if (axis == M2kMeasurementData::VERTICAL) {
-			vert_model->item(v_idx++, 1)->setData(
-				QVariant((int) state), Qt::EditRole);
-		    }
+	if(m_is_time_domain) {
+		for(int i = 0; i < measurements.size(); i++) {
+			int axis = measurements[i]->axis();
+			int state = measurements[i]->enabled();
+
+			if(axis == M2kMeasurementData::HORIZONTAL) {
+				horiz_model->item(h_idx++, 1)->setData(QVariant((int)state), Qt::EditRole);
+			} else if(axis == M2kMeasurementData::VERTICAL) {
+				vert_model->item(v_idx++, 1)->setData(QVariant((int)state), Qt::EditRole);
+			}
 		}
-	    }
-	    else
-	    {
-		for (int i = 0; i < measurements.size(); i++) {
+	} else {
+		for(int i = 0; i < measurements.size(); i++) {
 			enum M2kMeasurementData::axisType axis = measurements[i]->axis();
-		    int state = measurements[i]->enabled();
-			
-			if (axis == M2kMeasurementData::HORIZONTAL_F) {
-			horiz_model->item(h_idx++, 1)->setData(
-				QVariant((int) state), Qt::EditRole);
-			} else if (axis == M2kMeasurementData::VERTICAL_F) {
-			vert_model->item(v_idx++, 1)->setData(
-				QVariant((int) state), Qt::EditRole);
-		    }
-		}
-	    }
+			int state = measurements[i]->enabled();
 
-	    setEmitActivated(true);
+			if(axis == M2kMeasurementData::HORIZONTAL_F) {
+				horiz_model->item(h_idx++, 1)->setData(QVariant((int)state), Qt::EditRole);
+			} else if(axis == M2kMeasurementData::VERTICAL_F) {
+				vert_model->item(v_idx++, 1)->setData(QVariant((int)state), Qt::EditRole);
+			}
+		}
+	}
+
+	setEmitActivated(true);
 }
 
 void MeasureSettings::deleteAllMeasurements()
@@ -488,10 +434,10 @@ void MeasureSettings::displayAllMeasurements()
 
 	M2kMeasure *measure = measureOfChannel(m_selectedChannel);
 	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
-	if (measure)
+	if(measure)
 		measurements = measure->measurments();
 
-	for (int i = 0; i < measurements.size(); i++) {
+	for(int i = 0; i < measurements.size(); i++) {
 		MeasurementItem item(i, measurements[i]->channel());
 		m_selectedMeasurements.push_back(MeasurementItem(item));
 	}
@@ -508,16 +454,16 @@ void MeasureSettings::disableDisplayAllMeasurements()
 
 void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 {
-	if (chnIdx < 0)
+	if(chnIdx < 0)
 		return;
 
 	M2kMeasure *measure = measureOfChannel(chnIdx);
 	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
-	if (measure)
+	if(measure)
 		measurements = measure->measurments();
 
 	MeasurementItem mItem(id, measurements[id]->channel());
-	if (en) {
+	if(en) {
 		m_selectedMeasurements.push_back(mItem);
 		Q_EMIT measurementActivated(mItem.id(), mItem.channel_id());
 	} else {
@@ -526,13 +472,12 @@ void MeasureSettings::onMeasurementActivated(int chnIdx, int id, bool en)
 	}
 }
 
-void MeasureSettings::onStatisticActivated(DropdownSwitchList *dropdown,
-	int id, bool en)
+void MeasureSettings::onStatisticActivated(DropdownSwitchList *dropdown, int id, bool en)
 {
-	if (m_selectedChannel < 0)
+	if(m_selectedChannel < 0)
 		return;
 
-	if (en) {
+	if(en) {
 		addStatistic(id, m_selectedChannel);
 		Q_EMIT statisticActivated(id, m_selectedChannel);
 	} else {
@@ -544,7 +489,7 @@ void MeasureSettings::onStatisticActivated(DropdownSwitchList *dropdown,
 void MeasureSettings::loadStatisticStatesForChannel(int chnIdx)
 {
 	// makes sense only for the oscilloscope
-	if (m_is_time_domain) {
+	if(m_is_time_domain) {
 		const int stats_col = 2;
 
 		setEmitStatsChanged(false);
@@ -553,39 +498,30 @@ void MeasureSettings::loadStatisticStatesForChannel(int chnIdx)
 		setAllMeasurements(stats_col, false);
 
 		// Restore selections that are present in the selected statistics list
-		for (int i = 0; i < m_selectedStatistics.size(); i++) {
-			if (m_selectedStatistics[i].measurementItem.channel_id() !=
-					chnIdx) {
+		for(int i = 0; i < m_selectedStatistics.size(); i++) {
+			if(m_selectedStatistics[i].measurementItem.channel_id() != chnIdx) {
 				continue;
 			}
-			QStandardItemModel *model = static_cast<QStandardItemModel *>
-				(m_selectedStatistics[i].dropdown->model());
+			QStandardItemModel *model =
+				static_cast<QStandardItemModel *>(m_selectedStatistics[i].dropdown->model());
 
 			int measId = m_selectedStatistics[i].measurementItem.id();
 
-			model->item(m_measurePosInDropdowns[measId], stats_col)->
-				setData(QVariant(1), Qt::EditRole);
+			model->item(m_measurePosInDropdowns[measId], stats_col)->setData(QVariant(1), Qt::EditRole);
 		}
 		setEmitStatsChanged(true);
 	}
 }
 
-void MeasureSettings::on_button_StatisticsEn_toggled(bool checked)
-{
-	Q_EMIT statisticsEnabled(checked);
-}
+void MeasureSettings::on_button_StatisticsEn_toggled(bool checked) { Q_EMIT statisticsEnabled(checked); }
 
-void MeasureSettings::on_button_StatisticsReset_pressed()
-{
-	Q_EMIT statisticsReset();
-}
+void MeasureSettings::on_button_StatisticsReset_pressed() { Q_EMIT statisticsReset(); }
 
-void MeasureSettings::setColumnData(QStandardItemModel *model, int column,
-		bool en)
+void MeasureSettings::setColumnData(QStandardItemModel *model, int column, bool en)
 {
 	int val = en ? 1 : 0;
 
-	for (int i = 0; i < model->rowCount(); i++)
+	for(int i = 0; i < model->rowCount(); i++)
 		model->item(i, column)->setData(QVariant(val), Qt::EditRole);
 }
 
@@ -600,29 +536,26 @@ void MeasureSettings::setAllMeasurements(int col, bool en)
 	setColumnData(model, col, en);
 }
 
-void MeasureSettings::deleteMeasurementsOfChannel(QList<MeasurementItem>& list,
-	int chnIdx)
+void MeasureSettings::deleteMeasurementsOfChannel(QList<MeasurementItem> &list, int chnIdx)
 {
 	QMutableListIterator<MeasurementItem> i(list);
-	while (i.hasNext()) {
+	while(i.hasNext()) {
 		i.next();
-		if (i.value().channel_id() == chnIdx)
+		if(i.value().channel_id() == chnIdx)
 			i.remove();
 	}
 }
 
-void MeasureSettings::updateMeasurementsOnChannelDel(QList<MeasurementItem>& list,
-						     int chnIdx)
+void MeasureSettings::updateMeasurementsOnChannelDel(QList<MeasurementItem> &list, int chnIdx)
 {
 	int listSize = list.size();
 	int idx = 0;
 	int currentItemIdx = 0;
-	while (idx < listSize) {
+	while(idx < listSize) {
 		auto item = m_selectedMeasurements.at(currentItemIdx);
-		if (item.channel_id() > chnIdx) {
+		if(item.channel_id() > chnIdx) {
 			Q_EMIT measurementDeactivated(item.id(), item.channel_id());
-			m_selectedMeasurements.push_back(MeasurementItem(item.id(),
-									 item.channel_id() - 1));
+			m_selectedMeasurements.push_back(MeasurementItem(item.id(), item.channel_id() - 1));
 			Q_EMIT measurementActivated(item.id(), item.channel_id() - 1);
 			m_selectedMeasurements.removeAt(currentItemIdx);
 		} else {
@@ -632,13 +565,12 @@ void MeasureSettings::updateMeasurementsOnChannelDel(QList<MeasurementItem>& lis
 	}
 }
 
-void MeasureSettings::deleteStatisticsOfChannel(
-	QList<struct StatisticSelection>& list, int chnIdx)
+void MeasureSettings::deleteStatisticsOfChannel(QList<struct StatisticSelection> &list, int chnIdx)
 {
 	QMutableListIterator<struct StatisticSelection> i(list);
-	while (i.hasNext()) {
+	while(i.hasNext()) {
 		i.next();
-		if (i.value().measurementItem.channel_id() == chnIdx)
+		if(i.value().measurementItem.channel_id() == chnIdx)
 			i.remove();
 	}
 }
@@ -647,38 +579,35 @@ QList<MeasurementItem> MeasureSettings::statisticSelection()
 {
 	QList<MeasurementItem> statistics;
 
-	for (int i = 0; i < m_selectedStatistics.size(); i++)
+	for(int i = 0; i < m_selectedStatistics.size(); i++)
 		statistics.push_back(m_selectedStatistics[i].measurementItem);
 
 	return statistics;
-
 }
 
 void MeasureSettings::on_button_statsDeleteAll_toggled(bool checked)
 {
-	QPushButton *button = static_cast<QPushButton*>(QObject::sender());
-	if (checked)
+	QPushButton *button = static_cast<QPushButton *>(QObject::sender());
+	if(checked)
 		button->setText(tr("Recover"));
 	else
 		button->setText(tr("Delete All"));
 
-	if (!m_emitStatsDeleteAll) {
+	if(!m_emitStatsDeleteAll) {
 		m_emitStatsDeleteAll = true;
 	} else {
-		if (checked)
+		if(checked)
 			deleteAllStatistics();
 		else
 			recoverAllStatistics();
 	}
 }
 
-void MeasureSettings::on_button_GatingEnable_toggled(bool checked){
-	Q_EMIT gatingEnabled(checked);
-}
+void MeasureSettings::on_button_GatingEnable_toggled(bool checked) { Q_EMIT gatingEnabled(checked); }
 
 void MeasureSettings::disableDisplayAll()
 {
-	if (m_ui->button_measDisplayAll->isChecked()){
+	if(m_ui->button_measDisplayAll->isChecked()) {
 		m_ui->button_measDisplayAll->setChecked(false);
 		m_enableDisplayAll = true;
 	} else {
@@ -686,9 +615,7 @@ void MeasureSettings::disableDisplayAll()
 	}
 }
 
-void MeasureSettings::activateDisplayAll(){
-	m_ui->button_measDisplayAll->setChecked(m_enableDisplayAll);
-}
+void MeasureSettings::activateDisplayAll() { m_ui->button_measDisplayAll->setChecked(m_enableDisplayAll); }
 
 void MeasureSettings::deleteAllStatistics()
 {
@@ -712,15 +639,15 @@ void MeasureSettings::addStatistic(int measure_id, int ch_id)
 {
 	M2kMeasure *measure = measureOfChannel(ch_id);
 	auto measurements = QList<std::shared_ptr<M2kMeasurementData>>();
-	if (measure)
-	    measurements = measure->measurments();
-	
+	if(measure)
+		measurements = measure->measurments();
+
 	M2kMeasurementData::axisType axis = measurements[measure_id]->axis();
 	struct StatisticSelection selection;
-	
-	if (axis == M2kMeasurementData::HORIZONTAL)
+
+	if(axis == M2kMeasurementData::HORIZONTAL)
 		selection.dropdown = m_horizMeasurements;
-	else if (axis == M2kMeasurementData::VERTICAL)
+	else if(axis == M2kMeasurementData::VERTICAL)
 		selection.dropdown = m_vertMeasurements;
 	else
 		return;
@@ -733,13 +660,11 @@ void MeasureSettings::removeStatistic(int measure_id, int ch_id)
 {
 	MeasurementItem item(measure_id, ch_id);
 
-	auto it = std::find_if(m_selectedStatistics.begin(),
-			m_selectedStatistics.end(),
-			[&](struct StatisticSelection s) {
-				return s.measurementItem.id() == measure_id &&
-					s.measurementItem.channel_id() == ch_id;
-			});
-		if (it != m_selectedStatistics.end()) {
-			m_selectedStatistics.erase(it);
-		}
+	auto it = std::find_if(
+		m_selectedStatistics.begin(), m_selectedStatistics.end(), [&](struct StatisticSelection s) {
+			return s.measurementItem.id() == measure_id && s.measurementItem.channel_id() == ch_id;
+		});
+	if(it != m_selectedStatistics.end()) {
+		m_selectedStatistics.erase(it);
+	}
 }

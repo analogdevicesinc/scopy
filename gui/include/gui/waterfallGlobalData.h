@@ -30,73 +30,77 @@
 #ifndef WATERFALL_GLOBAL_DATA_HPP
 #define WATERFALL_GLOBAL_DATA_HPP
 
-#include <qwt_raster_data.h>
-#include <cinttypes>
 #include "scopy-gui_export.h"
 
+#include <qwt_raster_data.h>
+
+#include <cinttypes>
+
 #if QWT_VERSION >= 0x060000
-#include <deque>
 #include <qwt_interval.h>
+
+#include <deque>
 
 typedef QwtInterval QwtDoubleInterval;
 #endif
 
-enum WaterfallFlowDirection {
-    UP,
-    DOWN
+enum WaterfallFlowDirection
+{
+	UP,
+	DOWN
 };
 
 class SCOPY_GUI_EXPORT WaterfallData : public QwtRasterData
 {
 public:
-    WaterfallData(const double, const double, const uint64_t, const unsigned int);
-    ~WaterfallData() override;
+	WaterfallData(const double, const double, const uint64_t, const unsigned int);
+	~WaterfallData() override;
 
-    virtual void reset();
-    virtual void copy(const WaterfallData*);
+	virtual void reset();
+	virtual void copy(const WaterfallData *);
 
-    virtual void
-    resizeData(const double, const double, const uint64_t, const int history = 0);
+	virtual void resizeData(const double, const double, const uint64_t, const int history = 0);
 
-    virtual QwtRasterData* copy() const;
+	virtual QwtRasterData *copy() const;
 
 #if QWT_VERSION < 0x060000
-    virtual QwtDoubleInterval range() const;
-    virtual void setRange(const QwtDoubleInterval&);
+	virtual QwtDoubleInterval range() const;
+	virtual void setRange(const QwtDoubleInterval &);
 #elif QWT_VERSION >= 0x060200
-    virtual QwtInterval interval(Qt::Axis) const;
-    void setInterval(Qt::Axis, const QwtInterval&);
+	virtual QwtInterval interval(Qt::Axis) const;
+	void setInterval(Qt::Axis, const QwtInterval &);
 #endif
 
-    double value(double x, double y) const override;
+	double value(double x, double y) const override;
 
-    virtual uint64_t getNumFFTPoints() const;
-    virtual void addFFTData(const double*, const uint64_t);
+	virtual uint64_t getNumFFTPoints() const;
+	virtual void addFFTData(const double *, const uint64_t);
 
-    virtual const std::deque<std::vector<double>> getSpectrumDataBuffer() const;
-    virtual void setSpectrumDataBuffer(const std::deque<std::vector<double>>);
+	virtual const std::deque<std::vector<double>> getSpectrumDataBuffer() const;
+	virtual void setSpectrumDataBuffer(const std::deque<std::vector<double>>);
 
-    virtual int getNumLinesToUpdate() const;
-    virtual void setNumLinesToUpdate(const int);
-    virtual void incrementNumLinesToUpdate();
+	virtual int getNumLinesToUpdate() const;
+	virtual void setNumLinesToUpdate(const int);
+	virtual void incrementNumLinesToUpdate();
 
-    void setFlowDirection(WaterfallFlowDirection direction);
-    WaterfallFlowDirection getFlowDirection();
+	void setFlowDirection(WaterfallFlowDirection direction);
+	WaterfallFlowDirection getFlowDirection();
+
 protected:
-    std::deque<std::vector<double>>  _spectrumData;
-    uint64_t _fftPoints;
-    uint64_t _historyLength;
-    int _numLinesToUpdate;
-    WaterfallFlowDirection flow_direction;
+	std::deque<std::vector<double>> _spectrumData;
+	uint64_t _fftPoints;
+	uint64_t _historyLength;
+	int _numLinesToUpdate;
+	WaterfallFlowDirection flow_direction;
 
 #if QWT_VERSION < 0x060000
-    QwtDoubleInterval _intensityRange;
+	QwtDoubleInterval _intensityRange;
 #else
-    QwtInterval _intensityRange;
+	QwtInterval _intensityRange;
 #endif
 
 #if QWT_VERSION >= 0x060200
-    QwtInterval d_intervals[3];
+	QwtInterval d_intervals[3];
 #endif
 
 private:

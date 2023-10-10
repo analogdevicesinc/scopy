@@ -37,36 +37,34 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <cassert>
+#include "prop/bool.hpp"
 
 #include <QCheckBox>
 #include <QDebug>
 
-#include "prop/bool.hpp"
+#include <cassert>
 
 namespace scopy {
 namespace prop {
 
-Bool::Bool(QString name, QString desc, Getter getter, Setter setter) :
-	Property(name, desc, getter, setter),
-	check_box_(nullptr)
-{
-}
+Bool::Bool(QString name, QString desc, Getter getter, Setter setter)
+	: Property(name, desc, getter, setter)
+	, check_box_(nullptr)
+{}
 
-QWidget* Bool::get_widget(QWidget *parent, bool auto_commit)
+QWidget *Bool::get_widget(QWidget *parent, bool auto_commit)
 {
-	if (check_box_)
+	if(check_box_)
 		return check_box_;
 
-	if (!getter_)
+	if(!getter_)
 		return nullptr;
 
 	try {
 		QVariant variant = getter_();
-		if (!variant.isValid())
+		if(!variant.isValid())
 			return nullptr;
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return nullptr;
 	}
@@ -76,28 +74,24 @@ QWidget* Bool::get_widget(QWidget *parent, bool auto_commit)
 
 	update_widget();
 
-	if (auto_commit)
-		connect(check_box_, SIGNAL(stateChanged(int)),
-			this, SLOT(on_state_changed(int)));
+	if(auto_commit)
+		connect(check_box_, SIGNAL(stateChanged(int)), this, SLOT(on_state_changed(int)));
 
 	return check_box_;
 }
 
-bool Bool::labeled_widget() const
-{
-	return true;
-}
+bool Bool::labeled_widget() const { return true; }
 
 void Bool::update_widget()
 {
-	if (!check_box_)
+	if(!check_box_)
 		return;
 
 	QVariant variant;
 
 	try {
 		variant = getter_();
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return;
 	}
@@ -111,18 +105,15 @@ void Bool::commit()
 {
 	assert(setter_);
 
-	if (!check_box_)
+	if(!check_box_)
 		return;
 
 	setter_(QVariant(check_box_->checkState() == Qt::Checked));
 }
 
-void Bool::on_state_changed(int)
-{
-	commit();
-}
+void Bool::on_state_changed(int) { commit(); }
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #include "prop/moc_bool.cpp"

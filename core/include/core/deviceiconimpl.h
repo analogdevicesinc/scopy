@@ -1,16 +1,18 @@
 #ifndef DEVICEICONIMPL_H
 #define DEVICEICONIMPL_H
 
-#include <QWidget>
-#include <QAbstractButton>
-#include <deviceicon.h>
 #include "device.h"
-#include "scopy-core_export.h"
 #include "gui/utils.h"
+#include "scopy-core_export.h"
+
+#include <QAbstractButton>
 #include <QPaintEvent>
+#include <QWidget>
+
+#include <deviceicon.h>
 
 namespace Ui {
-	class DeviceButton;
+class DeviceButton;
 };
 
 namespace scopy {
@@ -26,9 +28,7 @@ public Q_SLOTS:
 
 private:
 	Ui::DeviceButton *ui;
-
-
 };
-}
+} // namespace scopy
 
 #endif // DEVICEICONIMPL_H

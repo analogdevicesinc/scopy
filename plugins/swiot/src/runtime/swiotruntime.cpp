@@ -18,12 +18,13 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "swiotruntime.h"
-#include <string>
+
 #include "src/swiot_logging_categories.h"
+
 #include <iioutil/commandqueueprovider.h>
 #include <iioutil/iiocommand/iiodevicesettrigger.h>
+#include <string>
 
 using namespace scopy::swiot;
 
@@ -32,7 +33,7 @@ SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QObject *parent)
 	, m_iioCtx(ctx)
 	, m_cmdQueue(nullptr)
 {
-	if (m_iioCtx) {
+	if(m_iioCtx) {
 		m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_iioCtx);
 	}
 	createDevicesMap();
@@ -40,7 +41,7 @@ SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QObject *parent)
 
 SwiotRuntime::~SwiotRuntime()
 {
-	if (m_cmdQueue) {
+	if(m_cmdQueue) {
 		CommandQueueProvider::GetInstance()->close(m_iioCtx);
 		m_cmdQueue = nullptr;
 		m_iioCtx = nullptr;
@@ -49,18 +50,18 @@ SwiotRuntime::~SwiotRuntime()
 
 void SwiotRuntime::onIsRuntimeCtxChanged(bool isRuntimeCtx)
 {
-	if (isRuntimeCtx) {
+	if(isRuntimeCtx) {
 		writeTriggerDevice();
 	}
 }
 
 void SwiotRuntime::writeTriggerDevice()
 {
-	if (m_iioDevices.contains(AD_TRIGGER_NAME)) {
-		Command *setTriggerCommand = new IioDeviceSetTrigger(m_iioDevices[AD_NAME],
-								     m_iioDevices[AD_TRIGGER_NAME], nullptr);
-		connect(setTriggerCommand, &scopy::Command::finished, this,
-			&SwiotRuntime::setTriggerCommandFinished, Qt::QueuedConnection);
+	if(m_iioDevices.contains(AD_TRIGGER_NAME)) {
+		Command *setTriggerCommand =
+			new IioDeviceSetTrigger(m_iioDevices[AD_NAME], m_iioDevices[AD_TRIGGER_NAME], nullptr);
+		connect(setTriggerCommand, &scopy::Command::finished, this, &SwiotRuntime::setTriggerCommandFinished,
+			Qt::QueuedConnection);
 		m_cmdQueue->enqueue(setTriggerCommand);
 	} else {
 		qDebug(CAT_SWIOT) << "Isn't runtime context";
@@ -69,11 +70,11 @@ void SwiotRuntime::writeTriggerDevice()
 
 void SwiotRuntime::setTriggerCommandFinished(scopy::Command *cmd)
 {
-	IioDeviceSetTrigger *tcmd = dynamic_cast<IioDeviceSetTrigger*>(cmd);
-	if (!tcmd) {
+	IioDeviceSetTrigger *tcmd = dynamic_cast<IioDeviceSetTrigger *>(cmd);
+	if(!tcmd) {
 		return;
 	}
-	if (tcmd->getReturnCode() >= 0) {
+	if(tcmd->getReturnCode() >= 0) {
 		qDebug(CAT_SWIOT) << "Trigger has been set: " + QString::number(tcmd->getReturnCode());
 	} else {
 		qDebug(CAT_SWIOT) << "Can't set trigger, not in runtime context";
@@ -82,12 +83,12 @@ void SwiotRuntime::setTriggerCommandFinished(scopy::Command *cmd)
 
 void SwiotRuntime::createDevicesMap()
 {
-	if (m_iioCtx) {
+	if(m_iioCtx) {
 		int devicesNumber = iio_context_get_devices_count(m_iioCtx);
 		m_iioDevices.clear();
-		for (int i = 0; i < devicesNumber; i++) {
-			struct iio_device* iioDev = iio_context_get_device(m_iioCtx, i);
-			if (iioDev) {
+		for(int i = 0; i < devicesNumber; i++) {
+			struct iio_device *iioDev = iio_context_get_device(m_iioCtx, i);
+			if(iioDev) {
 				QString deviceName = QString(iio_device_get_name(iioDev));
 				m_iioDevices[deviceName] = iioDev;
 			}
@@ -95,14 +96,11 @@ void SwiotRuntime::createDevicesMap()
 	}
 }
 
-void SwiotRuntime::onBackBtnPressed()
-{
-	Q_EMIT writeModeAttribute("config");
-}
+void SwiotRuntime::onBackBtnPressed() { Q_EMIT writeModeAttribute("config"); }
 
 void SwiotRuntime::modeAttributeChanged(std::string mode)
 {
-	if (mode == "config") {
+	if(mode == "config") {
 		Q_EMIT backBtnPressed();
 	}
 }

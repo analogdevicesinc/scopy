@@ -1,8 +1,11 @@
 #include "infopagestack.h"
+
 #include "gui/customanimation.h"
-#include <QParallelAnimationGroup>
-#include <QLoggingCategory>
+
 #include <QDebug>
+#include <QLoggingCategory>
+#include <QParallelAnimationGroup>
+
 #include <device.h>
 
 using namespace scopy;
@@ -23,32 +26,33 @@ InfoPageStack::InfoPageStack(QWidget *parent)
 	next = 0;
 	hc->setVisible(true);
 	hc->raise();
-	qDebug(CAT_INFOPAGESTACK)<<"ctor";
+	qDebug(CAT_INFOPAGESTACK) << "ctor";
 }
 
 InfoPageStack::~InfoPageStack()
 {
 	this->removeEventFilter(hc);
-	qDebug(CAT_INFOPAGESTACK)<<"dtor";
+	qDebug(CAT_INFOPAGESTACK) << "dtor";
 }
 
-void InfoPageStack::add(QString key, QWidget *w) {
-	MapStackedWidget::add(key,w);
+void InfoPageStack::add(QString key, QWidget *w)
+{
+	MapStackedWidget::add(key, w);
 	if(count() == 1) {
 		hc->raise();
 	}
 	hc->setVisible(count() > 1);
 }
 
-void InfoPageStack::add(QString key, Device* d)
+void InfoPageStack::add(QString key, Device *d)
 {
 	QWidget *w = d->page();
 	add(key, w);
-	idDevMap.insert(key,d);
-
+	idDevMap.insert(key, d);
 }
 
-bool InfoPageStack::remove(QString key) {
+bool InfoPageStack::remove(QString key)
+{
 	bool ret = MapStackedWidget::remove(key);
 	idDevMap.take(key);
 	return ret;
@@ -68,7 +72,8 @@ bool InfoPageStack::show(QString key)
 	return ret;
 }
 
-bool InfoPageStack::slideInKey(QString key, int direction) {
+bool InfoPageStack::slideInKey(QString key, int direction)
+{
 	QString oldKey = getKey(currentWidget());
 
 	if(idDevMap.contains(oldKey))
@@ -88,16 +93,16 @@ bool InfoPageStack::slideInKey(QString key, int direction) {
 void InfoPageStack::animationDone()
 {
 	setCurrentIndex(next);
-//	widget(current)->hide();
-//	widget(current)->move(now);
+	//	widget(current)->hide();
+	//	widget(current)->move(now);
 	active = false;
 	hc->raise();
 }
 
 void InfoPageStack::slideInWidget(QWidget *newWidget, int direction)
 {
-	if (active) {
-		if (this->next != indexOf(newWidget)) {
+	if(active) {
+		if(this->next != indexOf(newWidget)) {
 			animationDone();
 		} else {
 			return;
@@ -107,7 +112,7 @@ void InfoPageStack::slideInWidget(QWidget *newWidget, int direction)
 
 	int current = currentIndex();
 	int next = indexOf(newWidget);
-	if (current == next) {
+	if(current == next) {
 		active = false;
 		return;
 	}
@@ -116,8 +121,8 @@ void InfoPageStack::slideInWidget(QWidget *newWidget, int direction)
 	int offsety = frameRect().height();
 	widget(next)->setGeometry(0, 0, offsetx, offsety);
 
-	if (direction < 0) {
-		offsetx = - offsetx;
+	if(direction < 0) {
+		offsetx = -offsetx;
 		offsety = 0;
 	} else {
 		offsety = 0;
@@ -154,9 +159,6 @@ void InfoPageStack::slideInWidget(QWidget *newWidget, int direction)
 	animGroup->start();
 }
 
-HomepageControls *InfoPageStack::getHomepageControls() const
-{
-	return hc;
-}
+HomepageControls *InfoPageStack::getHomepageControls() const { return hc; }
 
 #include "moc_infopagestack.cpp"

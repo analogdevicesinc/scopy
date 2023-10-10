@@ -1,13 +1,17 @@
 #ifndef SWIOTPINGTASK_H
 #define SWIOTPINGTASK_H
 
-#include <QThread>
-#include <iio.h>
 #include "scopy-swiot_export.h"
+
+#include <iio.h>
+
+#include <QThread>
+
 #include <iioutil/command.h>
 
 namespace scopy::swiot {
-class SwiotPingTask : public QThread {
+class SwiotPingTask : public QThread
+{
 	Q_OBJECT
 public:
 	SwiotPingTask(iio_context *c, QObject *parent = nullptr);
@@ -16,6 +20,7 @@ public:
 Q_SIGNALS:
 	void pingSuccess();
 	void pingFailed();
+
 protected:
 	iio_context *c;
 	bool enabled;
@@ -23,5 +28,5 @@ protected:
 private Q_SLOTS:
 	void getTriggerCommandFinished(scopy::Command *cmd);
 };
-}
+} // namespace scopy::swiot
 #endif // SWIOTPINGTASK_H

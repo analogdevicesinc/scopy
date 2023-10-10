@@ -21,11 +21,12 @@
 #ifndef SMOOTHCURVEFITTER_H
 #define SMOOTHCURVEFITTER_H
 
-#include <memory>
+#include "scopy-gui_export.h"
 
 #include <qwt_curve_fitter.h>
 #include <qwt_spline.h>
-#include "scopy-gui_export.h"
+
+#include <memory>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT SmoothCurveFitter : public QwtCurveFitter
@@ -33,12 +34,12 @@ class SCOPY_GUI_EXPORT SmoothCurveFitter : public QwtCurveFitter
 public:
 	SmoothCurveFitter();
 
-	virtual QPolygonF fitCurve( const QPolygonF &points ) const;
-	virtual QPainterPath fitCurvePath( const QPolygonF &points ) const;
+	virtual QPolygonF fitCurve(const QPolygonF &points) const;
+	virtual QPainterPath fitCurvePath(const QPolygonF &points) const;
 
 private:
-        std::unique_ptr<QwtSpline> d_spline;
+	std::unique_ptr<QwtSpline> d_spline;
 };
-}
+} // namespace scopy
 
 #endif // SMOOTHCURVEFITTER_H

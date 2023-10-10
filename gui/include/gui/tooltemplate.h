@@ -1,9 +1,10 @@
 #ifndef TOOLBUILDER_H
 #define TOOLBUILDER_H
 
-#include <QWidget>
 #include "mapstackedwidget.h"
 #include "scopy-gui_export.h"
+
+#include <QWidget>
 
 namespace Ui {
 class ToolTemplate;
@@ -11,11 +12,13 @@ class ToolTemplate;
 
 namespace scopy {
 
-enum ToolTemplateAlignment {
+enum ToolTemplateAlignment
+{
 	TTA_LEFT,
 	TTA_RIGHT
 };
-enum ToolTemplateContainer {
+enum ToolTemplateContainer
+{
 	TTC_LEFT,
 	TTC_RIGHT,
 	TTC_TOP,
@@ -61,10 +64,10 @@ public:
 	void addWidgetToCentralContainerHelper(QWidget *w);
 public Q_SLOTS:
 	void requestMenu(QString);
+
 private:
 	Ui::ToolTemplate *m_ui;
-
 };
-}
+} // namespace scopy
 
 #endif // TOOLBUILDER_H

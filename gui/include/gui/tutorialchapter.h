@@ -18,36 +18,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef TUTORIALCHAPTER_H
 #define TUTORIALCHAPTER_H
 
-#include <QWidget>
 #include <QList>
+#include <QWidget>
+
 #include <scopy-gui_export.h>
 #include <widgets/hoverwidget.h>
 
 namespace scopy::gui {
-class SCOPY_GUI_EXPORT TutorialChapter : public QObject {
+class SCOPY_GUI_EXPORT TutorialChapter : public QObject
+{
 	Q_OBJECT
 public:
 	TutorialChapter(QObject *parent = nullptr);
 	~TutorialChapter();
 
-	static TutorialChapter* build(
-		const QList<QWidget *>& subjects,
-		const QString& description,
-		QWidget* mainSubject,
-		int x_offset,
-		int y_offset,
-		HoverPosition anchor,
-		HoverPosition content,
-		QObject *parent = nullptr);
+	static TutorialChapter *build(const QList<QWidget *> &subjects, const QString &description,
+				      QWidget *mainSubject, int x_offset, int y_offset, HoverPosition anchor,
+				      HoverPosition content, QObject *parent = nullptr);
 
-	void addSubject( QWidget* s);
+	void addSubject(QWidget *s);
 
-	QList<QWidget*> subjects;
-	QWidget* mainSubject; // the main subject is the widget that will act as the anchor for the overlay
+	QList<QWidget *> subjects;
+	QWidget *mainSubject; // the main subject is the widget that will act as the anchor for the overlay
 	QString description;
 	int x_offset;
 	int y_offset;
@@ -76,5 +71,5 @@ Q_SIGNALS:
 	void chapterStarted();
 	void chapterFinished();
 };
-}
+} // namespace scopy::gui
 #endif // TUTORIALCHAPTER_H

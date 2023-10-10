@@ -26,7 +26,7 @@ namespace scopy {
 class NyquistPlotZoomer : public QwtPolarMagnifier
 {
 public:
-        NyquistPlotZoomer(QwtPolarCanvas* parent);
+	NyquistPlotZoomer(QwtPolarCanvas *parent);
 
 public:
 	void zoomIn();
@@ -37,6 +37,6 @@ public:
 private:
 	int zoom_count;
 };
-}
+} // namespace scopy
 
 #endif // NYQUISTPLOTZOOMER_H

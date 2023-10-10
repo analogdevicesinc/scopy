@@ -1,16 +1,19 @@
 #ifndef PLOTAXIS_H
 #define PLOTAXIS_H
 
-#include "scopy-gui_export.h"
-#include <QwtScaleEngine>
-#include "plotwidget.h"
-#include <DisplayPlot.h>
 #include "osc_scale_engine.h"
 #include "plotaxishandle.h"
+#include "plotwidget.h"
+#include "scopy-gui_export.h"
+
 #include <QwtPlotZoomer>
+#include <QwtScaleEngine>
+
+#include <DisplayPlot.h>
 
 namespace scopy {
-class SCOPY_GUI_EXPORT PlotAxis : public QObject {
+class SCOPY_GUI_EXPORT PlotAxis : public QObject
+{
 	Q_OBJECT
 public:
 	PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent = nullptr);
@@ -19,7 +22,7 @@ public:
 	int position();
 	bool isHorizontal();
 	bool isVertical();
-	QwtPlot* plot();
+	QwtPlot *plot();
 	void setDivs(double);
 	void setInterval(double min, double max);
 
@@ -65,5 +68,5 @@ private:
 	Q_PROPERTY(double max READ max WRITE setMax NOTIFY maxChanged)
 	Q_PROPERTY(double min READ min WRITE setMin NOTIFY minChanged)
 };
-}
+} // namespace scopy
 #endif // PLOTAXIS_H

@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOGICGROUPITEM_H
 #define LOGICGROUPITEM_H
 
@@ -47,6 +46,6 @@ private:
 private:
 	QLabel *m_nameLabel;
 };
-}
+} // namespace scopy
 
 #endif // LOGICGROUPITEM_H

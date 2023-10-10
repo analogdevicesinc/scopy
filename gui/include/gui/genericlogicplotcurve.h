@@ -18,17 +18,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef GENERICLOGICPLOTCURVE_H
 #define GENERICLOGICPLOTCURVE_H
 
-#include <qwt_plot_curve.h>
+#include "scopy-gui_export.h"
 
 #include <QColor>
 #include <QObject>
-#include "scopy-gui_export.h"
+#include <qwt_plot_curve.h>
 
-enum class LogicPlotCurveType : int {
+enum class LogicPlotCurveType : int
+{
 	Data = 0,
 	Annotations = 1,
 };
@@ -37,9 +37,10 @@ class SCOPY_GUI_EXPORT GenericLogicPlotCurve : public QObject, public QwtPlotCur
 {
 	Q_OBJECT
 public:
-	GenericLogicPlotCurve(const QString &name = {}, const QString &id = {}, LogicPlotCurveType type = LogicPlotCurveType::Data,
-			      double pixelOffset = 0.0, double traceHeight = 0.0, double sampleRate = 0.0,
-			      double timeTriggerOffset = 0.0, uint64_t bufferSize = 0.0);
+	GenericLogicPlotCurve(const QString &name = {}, const QString &id = {},
+			      LogicPlotCurveType type = LogicPlotCurveType::Data, double pixelOffset = 0.0,
+			      double traceHeight = 0.0, double sampleRate = 0.0, double timeTriggerOffset = 0.0,
+			      uint64_t bufferSize = 0.0);
 
 	QString getName() const;
 	QString getId() const;
@@ -75,15 +76,15 @@ public:
 
 	// Check if the point is on the curve. When invoked by the CapturePlot
 	// this point is already mapped to the plot's bounds.
-	virtual bool testHit(const QPointF& p) const { return false; }
+	virtual bool testHit(const QPointF &p) const { return false; }
 
 	// Map screen point to curve point
-	QPointF screenPosToCurvePoint(const QPoint& pos) const;
+	QPointF screenPosToCurvePoint(const QPoint &pos) const;
 
 Q_SIGNALS:
 	void nameChanged(QString);
 	void pixelOffsetChanged(double);
-	void clicked(const QPointF& p);
+	void clicked(const QPointF &p);
 
 protected:
 	QString m_name;

@@ -1,18 +1,21 @@
 #include "devicebrowser.h"
-#include "deviceiconimpl.h"
-#include "ui_devicebrowser.h"
-#include <QLoggingCategory>
-#include <QDebug>
+
 #include "deviceicon.h"
-#include "stylehelper.h"
+#include "deviceiconimpl.h"
 #include "dynamicWidget.h"
+#include "stylehelper.h"
+
+#include "ui_devicebrowser.h"
+
+#include <QDebug>
+#include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_DEVBROWSER, "DeviceBrowser")
 
 using namespace scopy;
-DeviceBrowser::DeviceBrowser(QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::DeviceBrowser)
+DeviceBrowser::DeviceBrowser(QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::DeviceBrowser)
 {
 	qDebug(CAT_DEVBROWSER) << "ctor";
 	ui->setupUi(this);
@@ -23,9 +26,9 @@ DeviceBrowser::DeviceBrowser(QWidget *parent) :
 
 	initBtns();
 
-	connect(ui->btnHome, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
-	connect(ui->btnAdd, SIGNAL(clicked()),this, SLOT(forwardRequestDeviceWithDirection()));
-	connect(this,SIGNAL(requestDevice(QString,int)),this,SLOT(updateSelectedDeviceIdx(QString)));
+	connect(ui->btnHome, SIGNAL(clicked()), this, SLOT(forwardRequestDeviceWithDirection()));
+	connect(ui->btnAdd, SIGNAL(clicked()), this, SLOT(forwardRequestDeviceWithDirection()));
+	connect(this, SIGNAL(requestDevice(QString, int)), this, SLOT(updateSelectedDeviceIdx(QString)));
 }
 
 DeviceBrowser::~DeviceBrowser()
@@ -38,13 +41,13 @@ void DeviceBrowser::initBtns()
 {
 	StyleHelper::FrameBackgroundShadow(ui->containerHome);
 	StyleHelper::FrameBackgroundShadow(ui->containerAdd);
-	
+
 	bg = new QButtonGroup(this);
 
 	bg->addButton(ui->btnAdd);
 	bg->addButton(ui->btnHome);
-	ui->btnHome->setProperty(devBrowserId,"home");
-	ui->btnAdd->setProperty(devBrowserId,"add");
+	ui->btnHome->setProperty(devBrowserId, "home");
+	ui->btnAdd->setProperty(devBrowserId, "add");
 	list.append(ui->btnHome);
 	list.append(ui->btnAdd);
 	ui->btnHome->setChecked(true);
@@ -62,24 +65,24 @@ QAbstractButton *DeviceBrowser::getDeviceWidgetFor(QString id)
 	return nullptr;
 }
 
-void DeviceBrowser::addDevice(QString id, Device *d,int position)
+void DeviceBrowser::addDevice(QString id, Device *d, int position)
 {
-	qInfo(CAT_DEVBROWSER)<<"adding device " << id;
-	auto w = dynamic_cast<QAbstractButton*>(buildDeviceIcon(d, this));
-	w->setProperty(devBrowserId,id);
-	layout->insertWidget(position,w);
+	qInfo(CAT_DEVBROWSER) << "adding device " << id;
+	auto w = dynamic_cast<QAbstractButton *>(buildDeviceIcon(d, this));
+	w->setProperty(devBrowserId, id);
+	layout->insertWidget(position, w);
 	bg->addButton(w);
 	if(position == -1)
 		list.append(w);
 	else
-		list.insert(position,w);
+		list.insert(position, w);
 
 	connect(w, &QAbstractButton::clicked, this, &DeviceBrowser::forwardRequestDeviceWithDirection);
 }
 
 void DeviceBrowser::removeDevice(QString id)
 {
-	qInfo(CAT_DEVBROWSER)<<"removing device " << id;
+	qInfo(CAT_DEVBROWSER) << "removing device " << id;
 	QAbstractButton *w = getDeviceWidgetFor(id);
 	layout->removeWidget(w);
 	bg->removeButton(w);
@@ -90,25 +93,22 @@ void DeviceBrowser::removeDevice(QString id)
 
 	if(currentIdx == idx) { // removed currently selected device
 		currentIdx = 0;
-		Q_EMIT requestDevice("home",-1);
-	} else if(currentIdx>idx) {
+		Q_EMIT requestDevice("home", -1);
+	} else if(currentIdx > idx) {
 		currentIdx--;
 	}
 }
 
-
 int DeviceBrowser::getIndexOfId(QString k)
 {
-    for(int i = 0;i<list.size();i++) {
+	for(int i = 0; i < list.size(); i++) {
 		if(list[i]->property(devBrowserId) == k)
 			return i;
 	}
 	return -1;
 }
 
-QString DeviceBrowser::getIdOfIndex(int idx){
-	return (list[idx]->property(devBrowserId).toString());
-}
+QString DeviceBrowser::getIdOfIndex(int idx) { return (list[idx]->property(devBrowserId).toString()); }
 
 void DeviceBrowser::nextDevice()
 {
@@ -122,7 +122,7 @@ void DeviceBrowser::nextDevice()
 
 	QString nextId = getIdOfIndex(nextIdx);
 	Q_EMIT requestDevice(nextId, 1); // start animation
-	list[nextIdx]->setChecked(true); // set checked afterwards	
+	list[nextIdx]->setChecked(true); // set checked afterwards
 }
 
 void DeviceBrowser::prevDevice()
@@ -149,49 +149,47 @@ void DeviceBrowser::forwardRequestDeviceWithDirection()
 }
 
 void DeviceBrowser::updateSelectedDeviceIdx(QString k)
-{	
-	int prevIdx = currentIdx; // local, just for debug	
+{
+	int prevIdx = currentIdx; // local, just for debug
 	currentIdx = getIndexOfId(k);
 
-	QWidget* prevDevice = getDeviceWidgetFor(getIdOfIndex(prevIdx));
-	QWidget* currentDevice = getDeviceWidgetFor(getIdOfIndex(currentIdx));
+	QWidget *prevDevice = getDeviceWidgetFor(getIdOfIndex(prevIdx));
+	QWidget *currentDevice = getDeviceWidgetFor(getIdOfIndex(currentIdx));
 
 	// hackish -- the btnHome and btnAdd already have a background color so their container must display the shadow
-	if (currentDevice == ui->btnHome)
+	if(currentDevice == ui->btnHome)
 		currentDevice = ui->containerHome;
 
-	if (currentDevice == ui->btnAdd)
+	if(currentDevice == ui->btnAdd)
 		currentDevice = ui->containerAdd;
 
-	if (prevDevice == ui->btnHome)
+	if(prevDevice == ui->btnHome)
 		prevDevice = ui->containerHome;
 
-	if (prevDevice == ui->btnAdd)
+	if(prevDevice == ui->btnAdd)
 		prevDevice = ui->containerAdd;
 
 	setDynamicProperty(prevDevice, "selected", false);
 	setDynamicProperty(currentDevice, "selected", true);
 
-	qDebug(CAT_DEVBROWSER)<<"prev: "
-			     << "["<<prevIdx<<"] -"
-			     << getIdOfIndex(prevIdx)<<"-> current: "
-			     << "["<<currentIdx<<"] -"
-			     << getIdOfIndex(currentIdx);
+	qDebug(CAT_DEVBROWSER) << "prev: "
+			       << "[" << prevIdx << "] -" << getIdOfIndex(prevIdx) << "-> current: "
+			       << "[" << currentIdx << "] -" << getIdOfIndex(currentIdx);
 }
 
-void DeviceBrowser::connectDevice(QString id) {
-	auto w = dynamic_cast<DeviceIcon*>(getDeviceWidgetFor(id));
+void DeviceBrowser::connectDevice(QString id)
+{
+	auto w = dynamic_cast<DeviceIcon *>(getDeviceWidgetFor(id));
 	w->setConnected(true);
 }
 
-void DeviceBrowser::disconnectDevice(QString id) {
-	auto w = dynamic_cast<DeviceIcon*>(getDeviceWidgetFor(id));
+void DeviceBrowser::disconnectDevice(QString id)
+{
+	auto w = dynamic_cast<DeviceIcon *>(getDeviceWidgetFor(id));
 	w->setConnected(false);
 }
 
-DeviceIcon* DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent) {
-	return new DeviceIconImpl(d, parent);
-}
+DeviceIcon *DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent) { return new DeviceIconImpl(d, parent); }
 
 /*
    auto &&is = ui->wInfoPageStack;
@@ -212,7 +210,6 @@ DeviceIcon* DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent) {
     w1->setVisible(false);
     */
 
-
 /*
 	ui->setupUi(this);
 	auto &&is = ui->wInfoPageStack;
@@ -232,6 +229,5 @@ DeviceIcon* DeviceBrowser::buildDeviceIcon(Device *d, QWidget *parent) {
 	db->addDevice("dev2",w2);
 	w1->setVisible(false);
 	*/
-
 
 #include "moc_devicebrowser.cpp"

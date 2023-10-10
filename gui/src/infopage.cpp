@@ -1,13 +1,14 @@
 #include "infopage.h"
+
 #include "QFile"
 #include "qjsondocument.h"
 #include "qjsonobject.h"
 
 using namespace scopy;
 
-InfoPage::InfoPage(QWidget *parent) :
-	QWidget(parent)
-      , m_advancedMode(false)
+InfoPage::InfoPage(QWidget *parent)
+	: QWidget(parent)
+	, m_advancedMode(false)
 {
 	getKeyMap();
 	lay = new QVBoxLayout(this);
@@ -16,33 +17,32 @@ InfoPage::InfoPage(QWidget *parent) :
 
 InfoPage::~InfoPage()
 {
-	if (!map.empty()) {
+	if(!map.empty()) {
 		map.clear();
 	}
-	if (!wmap.empty()) {
+	if(!wmap.empty()) {
 		qDeleteAll(wmap);
 		wmap.clear();
 	}
-	if (!keyMap.empty()) {
+	if(!keyMap.empty()) {
 		keyMap.clear();
 	}
 }
 
 void InfoPage::update(QString key, QString value)
 {
-	if (!m_advancedMode) {
-		if (keyMap.contains(key)) {
+	if(!m_advancedMode) {
+		if(keyMap.contains(key)) {
 			key = keyMap[key];
 		} else {
 			return;
 		}
-
 	}
 	if(!map.contains(key)) {
-		map.insert(key,value);
-		InfoPageKeyValueWidget *w = new InfoPageKeyValueWidget(key,value, this);
-		w->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-		wmap.insert(key,w);
+		map.insert(key, value);
+		InfoPageKeyValueWidget *w = new InfoPageKeyValueWidget(key, value, this);
+		w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+		wmap.insert(key, w);
 		lay->addWidget(w);
 
 	} else {
@@ -53,10 +53,10 @@ void InfoPage::update(QString key, QString value)
 
 void InfoPage::clear()
 {
-	if (!map.empty()) {
+	if(!map.empty()) {
 		map.clear();
 	}
-	if (!wmap.empty()) {
+	if(!wmap.empty()) {
 		qDeleteAll(wmap);
 		wmap.clear();
 	}
@@ -71,10 +71,10 @@ void InfoPage::getKeyMap()
 	val = file.readAll();
 	file.close();
 
-	if (fileIsOpen) {
+	if(fileIsOpen) {
 		QJsonDocument d = QJsonDocument::fromJson(val.toUtf8());
 		QJsonObject json = d.object();
-		foreach(const QString& key, json.keys()) {
+		foreach(const QString &key, json.keys()) {
 			QJsonValue value = json.value(key);
 			keyMap[key] = value["value"].toString();
 		}
@@ -83,10 +83,6 @@ void InfoPage::getKeyMap()
 	}
 }
 
-void InfoPage::setAdvancedMode(bool newAdvancedMode)
-{
-	m_advancedMode = newAdvancedMode;
-}
-
+void InfoPage::setAdvancedMode(bool newAdvancedMode) { m_advancedMode = newAdvancedMode; }
 
 #include "moc_infopage.cpp"

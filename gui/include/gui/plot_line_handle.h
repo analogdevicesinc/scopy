@@ -21,14 +21,16 @@
 #ifndef PLOT_LINE_HANDLE_H
 #define PLOT_LINE_HANDLE_H
 
-#include <QWidget>
-#include <QPen>
-#include <plot_utils.hpp>
 #include "scopy-gui_export.h"
+
+#include <QPen>
+#include <QWidget>
+
+#include <plot_utils.hpp>
 
 class HandlesArea;
 
-class SCOPY_GUI_EXPORT PlotLineHandle: public QWidget
+class SCOPY_GUI_EXPORT PlotLineHandle : public QWidget
 {
 	Q_OBJECT
 
@@ -42,8 +44,8 @@ public:
 	virtual void moveWithinParent(int x, int y) = 0;
 	virtual void setPosition(int) = 0;
 	int position();
-	void setPen(const QPen&);
-	const QPen& pen();
+	void setPen(const QPen &);
+	const QPen &pen();
 
 Q_SIGNALS:
 	void positionChanged(int);
@@ -72,7 +74,8 @@ private:
 	void setGrabbed(bool);
 };
 
-class SCOPY_GUI_EXPORT PlotGateHandle: public PlotLineHandle{
+class SCOPY_GUI_EXPORT PlotGateHandle : public PlotLineHandle
+{
 public:
 	PlotGateHandle(const QPixmap &handleIcon, QWidget *parent = 0);
 	void triggerMove();
@@ -87,10 +90,12 @@ public:
 	int getCurrentPos();
 	bool reachedLimit();
 	void setOtherCursorPosition(int position);
+
 protected:
 	void paintEvent(QPaintEvent *event);
 	int originPosToCenter(int origin);
 	int centerPosToOrigin(int center);
+
 private:
 	int m_position;
 	int m_otherCursorPos;
@@ -100,11 +105,10 @@ private:
 	scopy::TimePrefixFormatter d_timeFormatter;
 };
 
-class SCOPY_GUI_EXPORT PlotLineHandleH: public PlotLineHandle
+class SCOPY_GUI_EXPORT PlotLineHandleH : public PlotLineHandle
 {
 public:
-	PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent = 0,
-			bool facingBottom = false);
+	PlotLineHandleH(const QPixmap &handleIcon, QWidget *parent = 0, bool facingBottom = false);
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
@@ -122,11 +126,10 @@ protected:
 	bool m_facingBottom;
 };
 
-class SCOPY_GUI_EXPORT PlotLineHandleV: public PlotLineHandle
+class SCOPY_GUI_EXPORT PlotLineHandleV : public PlotLineHandle
 {
 public:
-	PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent = 0,
-			bool facingRight = false);
+	PlotLineHandleV(const QPixmap &handleIcon, QWidget *parent = 0, bool facingRight = false);
 	void triggerMove();
 	void setPosition(int);
 	void setPositionSilenty(int);
@@ -143,14 +146,11 @@ protected:
 	bool m_facingRight;
 };
 
-class SCOPY_GUI_EXPORT FreePlotLineHandleH: public PlotLineHandleH
+class SCOPY_GUI_EXPORT FreePlotLineHandleH : public PlotLineHandleH
 {
 public:
-
-	FreePlotLineHandleH(const QPixmap &handleIcon,
-			const QPixmap &beyondLeftIcon,
-			const QPixmap &beyondRightIcon,
-			QWidget *parent = 0, bool facingRight = false);
+	FreePlotLineHandleH(const QPixmap &handleIcon, const QPixmap &beyondLeftIcon, const QPixmap &beyondRightIcon,
+			    QWidget *parent = 0, bool facingRight = false);
 	void moveWithinParent(int x, int y);
 
 protected:
@@ -163,15 +163,11 @@ private:
 	bool m_isBeyondLeft;
 };
 
-class SCOPY_GUI_EXPORT FreePlotLineHandleV: public PlotLineHandleV
+class SCOPY_GUI_EXPORT FreePlotLineHandleV : public PlotLineHandleV
 {
 public:
-
-	FreePlotLineHandleV(const QPixmap &handleIcon,
-			const QPixmap &beyondTopIcon,
-			const QPixmap &beyondBottomIcon,
-			QWidget *parent = 0, bool facingRight = false,
-			const QString &name = {});
+	FreePlotLineHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon, const QPixmap &beyondBottomIcon,
+			    QWidget *parent = 0, bool facingRight = false, const QString &name = {});
 	void moveWithinParent(int x, int y);
 
 	void setName(const QString &name);
@@ -188,15 +184,12 @@ private:
 	QString m_name;
 };
 
-class SCOPY_GUI_EXPORT RoundedHandleV: public FreePlotLineHandleV
+class SCOPY_GUI_EXPORT RoundedHandleV : public FreePlotLineHandleV
 {
 	Q_OBJECT
 public:
-	RoundedHandleV(const QPixmap &handleIcon,
-		       const QPixmap &beyondTopIcon,
-		       const QPixmap &beyondBottomIcon,
-		       QWidget *parent = 0, bool facingRight = false,
-		       const QString& name = {},
+	RoundedHandleV(const QPixmap &handleIcon, const QPixmap &beyondTopIcon, const QPixmap &beyondBottomIcon,
+		       QWidget *parent = 0, bool facingRight = false, const QString &name = {},
 		       bool selectable = false);
 
 	QColor roundRectColor();

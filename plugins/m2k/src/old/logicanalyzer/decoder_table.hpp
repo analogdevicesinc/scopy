@@ -21,52 +21,53 @@
 #ifndef DECODER_TABLE_H
 #define DECODER_TABLE_H
 
-#include <QAbstractTableModel>
-#include <QTableView>
 #include "decoder.h"
 #include "decoder_table_item.hpp"
 #include "logic_analyzer.h"
 
-namespace scopy::m2k {
+#include <QAbstractTableModel>
+#include <QTableView>
 
+namespace scopy::m2k {
 
 namespace logic {
 
 class DecoderTableModel;
 
-class DecoderTable : public QTableView {
-    Q_OBJECT
+class DecoderTable : public QTableView
+{
+	Q_OBJECT
 
 public:
-    DecoderTable(QWidget *parent = nullptr);
+	DecoderTable(QWidget *parent = nullptr);
 
-    void setLogicAnalyzer(LogicAnalyzer* logicAnalyzer);
-    void activate(bool logic);
-    void deactivate();
-    QVector<GenericLogicPlotCurve *> getDecoderCruves();
-    inline bool isActive() const { return m_active; }
+	void setLogicAnalyzer(LogicAnalyzer *logicAnalyzer);
+	void activate(bool logic);
+	void deactivate();
+	QVector<GenericLogicPlotCurve *> getDecoderCruves();
+	inline bool isActive() const { return m_active; }
 
-    // Shortcut to get a reference to the model.
-    DecoderTableModel* decoderModel() const;
-    bool eventFilter(QObject *object, QEvent *event);
+	// Shortcut to get a reference to the model.
+	DecoderTableModel *decoderModel() const;
+	bool eventFilter(QObject *object, QEvent *event);
 
 public Q_SLOTS:
-    void groupValuesChanged(int value);
-    void exportData();
+	void groupValuesChanged(int value);
+	void exportData();
 
 private:
-    bool m_active;
-    DecoderTableModel* tableModel;
-    LogicAnalyzer* m_logicAnalyzer;
-    QVector<GenericLogicPlotCurve *> *temp_curves;
-    bool exportCsv(QString fileName);
-    bool exportTxt(QString fileName);
-    QVector<QPair<uint64_t, uint64_t> > getSearchSampleMask();
+	bool m_active;
+	DecoderTableModel *tableModel;
+	LogicAnalyzer *m_logicAnalyzer;
+	QVector<GenericLogicPlotCurve *> *temp_curves;
+	bool exportCsv(QString fileName);
+	bool exportTxt(QString fileName);
+	QVector<QPair<uint64_t, uint64_t>> getSearchSampleMask();
 
 protected:
-    void showEvent(QShowEvent *event);
+	void showEvent(QShowEvent *event);
 };
 } // namespace logic
-} // namespace scopy
+} // namespace scopy::m2k
 
 #endif // DECODER_TABLE_H

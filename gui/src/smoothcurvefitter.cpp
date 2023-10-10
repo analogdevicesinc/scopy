@@ -20,26 +20,20 @@
 
 #include "smoothcurvefitter.h"
 
-#include <QPolygonF>
 #include <QPainterPath>
+#include <QPolygonF>
 #include <qwt_spline_cubic.h>
 #include <qwt_spline_parametrization.h>
 
 using namespace scopy;
 
-SmoothCurveFitter::SmoothCurveFitter():
-        QwtCurveFitter(QwtCurveFitter::Path),
-	d_spline(new QwtSplineCubic())
+SmoothCurveFitter::SmoothCurveFitter()
+	: QwtCurveFitter(QwtCurveFitter::Path)
+	, d_spline(new QwtSplineCubic())
 {
 	d_spline->setParametrization(QwtSplineParametrization::ParameterUniform);
 }
 
-QPolygonF SmoothCurveFitter::fitCurve(const QPolygonF &points) const
-{
-	return d_spline->polygon(points, 0.5);
-}
+QPolygonF SmoothCurveFitter::fitCurve(const QPolygonF &points) const { return d_spline->polygon(points, 0.5); }
 
-QPainterPath SmoothCurveFitter::fitCurvePath(const QPolygonF &points) const
-{
-	return d_spline->painterPath(points);
-}
+QPainterPath SmoothCurveFitter::fitCurvePath(const QPolygonF &points) const { return d_spline->painterPath(points); }

@@ -4,21 +4,21 @@ using namespace scopy;
 using namespace datalogger;
 using namespace gui;
 
-DataLoggerView::DataLoggerView(bool lastValue, bool average, bool all, QWidget *parent) :
-	QWidget(parent)
+DataLoggerView::DataLoggerView(bool lastValue, bool average, bool all, QWidget *parent)
+	: QWidget(parent)
 {
 	dataLoggingWidget = new QWidget(this);
 	dataLoggingLayout = new QVBoxLayout(dataLoggingWidget);
 	dataLoggingLayout->layout()->setSpacing(10);
 
 	dataLoggerFilter = new QComboBox(dataLoggingWidget);
-	if (lastValue) {
+	if(lastValue) {
 		dataLoggerFilter->addItem(QString("Last Value"));
 	}
-	if (average) {
+	if(average) {
 		dataLoggerFilter->addItem(QString("Average"));
 	}
-	if (all) {
+	if(all) {
 		dataLoggerFilter->addItem(QString("All"));
 	}
 	dataLoggerFilter->setCurrentIndex(0);
@@ -27,20 +27,19 @@ DataLoggerView::DataLoggerView(bool lastValue, bool average, bool all, QWidget *
 	init();
 }
 
-
 void DataLoggerView::init()
 {
 	dataLoggingSwitch = new CustomSwitch(dataLoggingWidget);
 	dataLoggingLayout->addWidget(dataLoggingSwitch);
-	dataLoggingLayout->setAlignment(dataLoggingSwitch,Qt::AlignRight);
+	dataLoggingLayout->setAlignment(dataLoggingSwitch, Qt::AlignRight);
 
 	dataLoggingLayout->addWidget(new QLabel("Choose file"));
 	dataLoggingFilePath = new QLineEdit(dataLoggingWidget);
 	dataLoggingFilePath->setReadOnly(true);
 	dataLoggingFilePath->setDisabled(true);
 
-	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=](QString path){
-		if (filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
+	connect(dataLoggingFilePath, &QLineEdit::textChanged, this, [=](QString path) {
+		if(filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
 			dataLoggingFilePath->setText(tr("No file selected"));
 			dataLoggingFilePath->setStyleSheet("color:red");
 		} else {
@@ -51,12 +50,12 @@ void DataLoggerView::init()
 
 	dataLoggingLayout->addWidget(dataLoggingFilePath);
 	dataLoggingBrowseBtn = new QPushButton("Browse");
-	dataLoggingBrowseBtn->setProperty("blue_button",true);
+	dataLoggingBrowseBtn->setProperty("blue_button", true);
 	dataLoggingBrowseBtn->setMinimumHeight(30);
 	dataLoggingBrowseBtn->setDisabled(true);
 	dataLoggingLayout->addWidget(dataLoggingBrowseBtn);
 
-	connect(dataLoggingBrowseBtn, &QPushButton::clicked, this , & DataLoggerView::chooseFile);
+	connect(dataLoggingBrowseBtn, &QPushButton::clicked, this, &DataLoggerView::chooseFile);
 
 	overwriteRadio = new QRadioButton("Overwrite");
 	overwriteRadio->setChecked(true);
@@ -66,30 +65,21 @@ void DataLoggerView::init()
 	dataLoggingLayout->addWidget(appendRadio);
 	appendRadio->setDisabled(true);
 
-	connect(overwriteRadio, &QRadioButton::toggled, [=](bool en) {
-		appendRadio->setChecked(!en);
-	});
+	connect(overwriteRadio, &QRadioButton::toggled, [=](bool en) { appendRadio->setChecked(!en); });
 
-	connect(appendRadio, &QRadioButton::toggled, [=](bool en) {
-		overwriteRadio->setChecked(!en);
-	});
+	connect(appendRadio, &QRadioButton::toggled, [=](bool en) { overwriteRadio->setChecked(!en); });
 
-	data_logging_timer = new PositionSpinButton({
-													{"s", 1},
-													{"min", 60},
-													{"h", 3600}
-												}, tr("Timer"), 0, 3600,
-												true, false, this);
+	data_logging_timer =
+		new PositionSpinButton({{"s", 1}, {"min", 60}, {"h", 3600}}, tr("Timer"), 0, 3600, true, false, this);
 
 	data_logging_timer->setValue(5);
 	data_logging_timer->setDisabled(true);
 
-	connect(data_logging_timer, &PositionSpinButton::valueChanged, this, [=](){
-		double interval = data_logging_timer->value() * 1000; //converts to seconds before emiting value
-		if (interval < 100) {
+	connect(data_logging_timer, &PositionSpinButton::valueChanged, this, [=]() {
+		double interval = data_logging_timer->value() * 1000; // converts to seconds before emiting value
+		if(interval < 100) {
 			interval = 100;
-			data_logging_timer->setValue(interval/1000);
-
+			data_logging_timer->setValue(interval / 1000);
 		}
 		Q_EMIT timeIntervalChanged(interval);
 	});
@@ -104,53 +94,38 @@ void DataLoggerView::init()
 
 	dataLoggingLayout->addWidget(warningMessage);
 
-	//on data logging switch pressed enable/disable data logging section and emit data loggin toggled
-	connect(dataLoggingSwitch,  &CustomSwitch::toggled, this, [=](bool toggled){
+	// on data logging switch pressed enable/disable data logging section and emit data loggin toggled
+	connect(dataLoggingSwitch, &CustomSwitch::toggled, this, [=](bool toggled) {
 		Q_EMIT toggleDataLogger(toggled);
 		enableDataLoggerFields(toggled);
 	});
-
 }
 
-void DataLoggerView::setUseNativeDialog(bool nativeDialog)
-{
-	useNativeDialog = nativeDialog;
-}
+void DataLoggerView::setUseNativeDialog(bool nativeDialog) { useNativeDialog = nativeDialog; }
 
 void DataLoggerView::chooseFile()
 {
 	QString selectedFilter;
 	if(!useNativeDialog)
-		filename = QFileDialog::getSaveFileName(this,tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),&selectedFilter, QFileDialog::Options(QFileDialog::DontUseNativeDialog));
+		filename = QFileDialog::getSaveFileName(
+			this, tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),
+			&selectedFilter, QFileDialog::Options(QFileDialog::DontUseNativeDialog));
 	else
-		filename = QFileDialog::getSaveFileName(this,tr("Export"), "", tr("Comma-separated values files (*.csv);;All Files(*)"),&selectedFilter, QFileDialog::Options());
+		filename = QFileDialog::getSaveFileName(this, tr("Export"), "",
+							tr("Comma-separated values files (*.csv);;All Files(*)"),
+							&selectedFilter, QFileDialog::Options());
 	dataLoggingFilePath->setText(filename);
 }
 
-QWidget* DataLoggerView::getDataLoggerViewWidget()
-{
-	return dataLoggingWidget;
-}
+QWidget *DataLoggerView::getDataLoggerViewWidget() { return dataLoggingWidget; }
 
-bool DataLoggerView::isDataLoggingOn()
-{
-	return dataLoggingSwitch->isChecked();
-}
+bool DataLoggerView::isDataLoggingOn() { return dataLoggingSwitch->isChecked(); }
 
-bool DataLoggerView::isOverwrite()
-{
-	return overwriteRadio->isChecked();
-}
+bool DataLoggerView::isOverwrite() { return overwriteRadio->isChecked(); }
 
-QString DataLoggerView::getFilter()
-{
-	return dataLoggerFilter->currentText();
-}
+QString DataLoggerView::getFilter() { return dataLoggerFilter->currentText(); }
 
-void DataLoggerView::setWarningMessage(QString message)
-{
-	warningMessage->setText(message);
-}
+void DataLoggerView::setWarningMessage(QString message) { warningMessage->setText(message); }
 
 void DataLoggerView::enableDataLoggerFields(bool en)
 {
@@ -162,21 +137,15 @@ void DataLoggerView::enableDataLoggerFields(bool en)
 	dataLoggerFilter->setDisabled(!en);
 	warningMessage->setVisible(en);
 
-	if (filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
+	if(filename.isEmpty() && dataLoggingFilePath->isEnabled()) {
 		dataLoggingFilePath->setText(tr("No file selected"));
 		dataLoggingFilePath->setStyleSheet("color:red");
 	}
 }
 
-void DataLoggerView::disableDataLogging(bool en)
-{
-	dataLoggingSwitch->setEnabled(!en);
-}
+void DataLoggerView::disableDataLogging(bool en) { dataLoggingSwitch->setEnabled(!en); }
 
-void DataLoggerView::toggleDataLoggerSwitch(bool toggle)
-{
-	dataLoggingSwitch->setChecked(toggle);
-}
+void DataLoggerView::toggleDataLoggerSwitch(bool toggle) { dataLoggingSwitch->setChecked(toggle); }
 
 void DataLoggerView::setDataLoggerPath(QString path)
 {
@@ -184,29 +153,20 @@ void DataLoggerView::setDataLoggerPath(QString path)
 	dataLoggingFilePath->setText(path);
 }
 
-QString DataLoggerView::getDataLoggerPath()
-{
-	return filename;
-}
+QString DataLoggerView::getDataLoggerPath() { return filename; }
 
 void DataLoggerView::setOverwrite(bool en)
 {
-	if (en) {
+	if(en) {
 		overwriteRadio->setChecked(true);
 	} else {
 		appendRadio->setChecked(true);
 	}
 }
 
-int DataLoggerView::getTimerInterval()
-{
-	return data_logging_timer->value();
-}
+int DataLoggerView::getTimerInterval() { return data_logging_timer->value(); }
 
-void DataLoggerView::setTimerInterval(int interval)
-{
-	data_logging_timer->setValue(interval);
-}
+void DataLoggerView::setTimerInterval(int interval) { data_logging_timer->setValue(interval); }
 
 void DataLoggerView::isDataLoggerRunning(bool en)
 {
@@ -225,4 +185,3 @@ DataLoggerView::~DataLoggerView()
 	delete dataLoggerFilter;
 	delete dataLoggingBrowseBtn;
 }
-

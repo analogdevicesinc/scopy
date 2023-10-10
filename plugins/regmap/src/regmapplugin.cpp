@@ -1,31 +1,34 @@
+#include "regmapplugin.h"
+
 #include "deviceregistermap.hpp"
+#include "iioutil/contextprovider.h"
+#include "jsonformatedelement.hpp"
+#include "logging_categories.h"
 #include "registermapinstrument.hpp"
 #include "registermaptemplate.hpp"
 #include "registermapvalues.hpp"
-#include "regmapplugin.h"
-#include "xmlfilemanager.hpp"
-#include <iio.h>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QDebug>
-#include <QWidget>
-#include <QVector>
-#include <QDir>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <src/readwrite/iioregisterreadstrategy.hpp>
-#include <src/readwrite/iioregisterwritestrategy.hpp>
-#include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
-#include <widgets/menucollapsesection.h>
-#include <widgets/menusectionwidget.h>
-#include "logging_categories.h"
-
-#include "iioutil/contextprovider.h"
-#include "jsonformatedelement.hpp"
 #include "scopy-regmapplugin_config.h"
 #include "utils.hpp"
+#include "xmlfilemanager.hpp"
+
+#include <iio.h>
+
+#include <QDebug>
+#include <QDir>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QLabel>
+#include <QVBoxLayout>
+#include <QVector>
+#include <QWidget>
+
+#include <pluginbase/preferences.h>
+#include <pluginbase/preferenceshelper.h>
+#include <src/readwrite/iioregisterreadstrategy.hpp>
+#include <src/readwrite/iioregisterwritestrategy.hpp>
+#include <widgets/menucollapsesection.h>
+#include <widgets/menusectionwidget.h>
 #if defined __APPLE__
 #include <QApplication>
 #endif
@@ -34,162 +37,165 @@ using namespace scopy;
 
 bool RegmapPlugin::loadPage()
 {
-    //TODO
-    m_page = new QWidget();
+	// TODO
+	m_page = new QWidget();
 
-    return true;
+	return true;
 }
 
 bool RegmapPlugin::loadIcon()
 {
-    m_icon = new QLabel("");
-    m_icon->setStyleSheet("border-image: url(:/icons/RegMap.svg);");
-    return true;
+	m_icon = new QLabel("");
+	m_icon->setStyleSheet("border-image: url(:/icons/RegMap.svg);");
+	return true;
 }
 
 void RegmapPlugin::loadToolList()
 {
-    m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap","Register Map",":/icons/RegMap.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap", "Register Map", ":/icons/RegMap.svg"));
 }
 
 void RegmapPlugin::unload()
 {
-    //TODO
+	// TODO
 }
 
 bool RegmapPlugin::compatible(QString m_param, QString category)
 {
-    m_name="REGMAP";
-    auto &&cp = ContextProvider::GetInstance();
-    iio_context* ctx = cp->open(m_param);
+	m_name = "REGMAP";
+	auto &&cp = ContextProvider::GetInstance();
+	iio_context *ctx = cp->open(m_param);
 
-    if (!ctx) {
-        cp->close(m_param);
-        return false;
-    } else {
+	if(!ctx) {
+		cp->close(m_param);
+		return false;
+	} else {
 
-        auto deviceCount = iio_context_get_devices_count(ctx);
-        for (int i = 0; i < deviceCount; i++) {
-            iio_device *dev = iio_context_get_device(ctx, i);
-            if (iio_device_find_debug_attr(dev,"direct_reg_access")) {
-                cp->close(m_param);
-                return true;
-            }
-        }
-    }
-    cp->close(m_param);
+		auto deviceCount = iio_context_get_devices_count(ctx);
+		for(int i = 0; i < deviceCount; i++) {
+			iio_device *dev = iio_context_get_device(ctx, i);
+			if(iio_device_find_debug_attr(dev, "direct_reg_access")) {
+				cp->close(m_param);
+				return true;
+			}
+		}
+	}
+	cp->close(m_param);
 
-    return false;
+	return false;
 }
 
 void RegmapPlugin::initPreferences()
 {
-    Preferences *p = Preferences::GetInstance();
-    p->init("regmap_color_by_value","Default");
-    #if defined __APPLE__
-        p->init("additional_regmap_xml_path",QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
-    #else
-        p->init("additional_regmap_xml_path",REGMAP_XML_PATH_LOCAL);
-    #endif
+	Preferences *p = Preferences::GetInstance();
+	p->init("regmap_color_by_value", "Default");
+#if defined __APPLE__
+	p->init("additional_regmap_xml_path", QCoreApplication::applicationDirPath() + "/plugins/plugins/xmls");
+#else
+	p->init("additional_regmap_xml_path", REGMAP_XML_PATH_LOCAL);
+#endif
 }
 
 bool RegmapPlugin::loadPreferencesPage()
 {
-    Preferences *p = Preferences::GetInstance();
+	Preferences *p = Preferences::GetInstance();
 
-    m_preferencesPage = new QWidget();
-    QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
-    MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-    MenuCollapseSection *generalSection = new MenuCollapseSection("General",MenuCollapseSection::MHCW_NONE, generalWidget);
-    generalWidget->contentLayout()->setSpacing(10);
-    generalWidget->contentLayout()->addWidget(generalSection);
-    generalSection->contentLayout()->setSpacing(10);
-    lay->setMargin(0);
-    lay->addWidget(generalWidget);
-    lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *generalSection =
+		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->setMargin(0);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-    generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"regmap_color_by_value","Use color to reflect value",
-										     {"Default","Bitfield background","Bitfield text",
-										      "Register background", "Register text", "Register background and Bitfield background",
-										      "Register text and Bitfield text", "Register background and Bitfield text",
-										      "Register text and Bitfield background"}, generalSection));
-    return true;
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
+		p, "regmap_color_by_value", "Use color to reflect value",
+		{"Default", "Bitfield background", "Bitfield text", "Register background", "Register text",
+		 "Register background and Bitfield background", "Register text and Bitfield text",
+		 "Register background and Bitfield text", "Register text and Bitfield background"},
+		generalSection));
+	return true;
 }
 
 bool RegmapPlugin::onConnect()
 {
-    auto &&cp = ContextProvider::GetInstance();
-    iio_context* ctx = cp->open(m_param);
+	auto &&cp = ContextProvider::GetInstance();
+	iio_context *ctx = cp->open(m_param);
 
-    m_deviceList = new QList<iio_device*>();
+	m_deviceList = new QList<iio_device *>();
 
-    auto deviceCount = iio_context_get_devices_count(ctx);
+	auto deviceCount = iio_context_get_devices_count(ctx);
 
+	for(int i = 0; i < deviceCount; i++) {
+		iio_device *dev = iio_context_get_device(ctx, i);
+		if(iio_device_find_debug_attr(dev, "direct_reg_access")) {
+			qDebug(CAT_REGMAP) << "DEVICE FOUND " << iio_device_get_name(dev);
+			m_deviceList->push_back(dev);
+		}
+	}
+	m_registerMapWidget = new QWidget();
+	QVBoxLayout *layout = new QVBoxLayout(m_registerMapWidget);
+	m_registerMapWidget->setLayout(layout);
 
-    for (int i = 0; i < deviceCount; i++) {
-        iio_device *dev = iio_context_get_device(ctx, i);
-        if (iio_device_find_debug_attr(dev,"direct_reg_access")) {
-            qDebug(CAT_REGMAP)<<"DEVICE FOUND " << iio_device_get_name(dev);
-            m_deviceList->push_back(dev);
-        }
-    }
-    m_registerMapWidget = new QWidget();
-    QVBoxLayout *layout  = new QVBoxLayout(m_registerMapWidget);
-    m_registerMapWidget->setLayout(layout);
+	scopy::regmap::Utils::applyJsonConfig();
 
-    scopy::regmap::Utils::applyJsonConfig();
+	if(m_deviceList && !m_deviceList->isEmpty()) {
+		QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
+		scopy::regmap::RegisterMapInstrument *regMapInstrument = new scopy::regmap::RegisterMapInstrument();
 
-    if (m_deviceList && !m_deviceList->isEmpty()) {
-        QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
-        scopy::regmap::RegisterMapInstrument *regMapInstrument = new scopy::regmap::RegisterMapInstrument();
+		layout->addWidget(regMapInstrument);
 
-        layout->addWidget(regMapInstrument);
+		for(int i = 0; i < m_deviceList->size(); ++i) {
+			iio_device *dev = m_deviceList->at(i);
+			QString devName = QString::fromStdString(iio_device_get_name(dev));
+			qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << devName;
+			QString templatePaths = scopy::regmap::Utils::getTemplate(devName);
+			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
+			if(!templatePaths.isEmpty()) {
+				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
+				regMapInstrument->addTab(dev, devName, xmlsPath.absoluteFilePath(templatePaths));
+			} else {
+				regMapInstrument->addTab(dev, iio_device_get_name(dev));
+			}
 
-        for (int i = 0; i < m_deviceList->size(); ++i) {
-            iio_device *dev = m_deviceList->at(i);
-            QString devName = QString::fromStdString(iio_device_get_name(dev));
-            qDebug(CAT_REGMAP)<<"CONNECTING TO DEVICE : " << devName;
-            QString templatePaths = scopy::regmap::Utils::getTemplate(devName);
-            qDebug(CAT_REGMAP)<<"templatePaths :" << templatePaths ;
-            if (!templatePaths.isEmpty()) {
-                qDebug(CAT_REGMAP)<<"TEMPLATE FORUND FOR DEVICE : " << devName;
-                regMapInstrument->addTab( dev, devName, xmlsPath.absoluteFilePath(templatePaths));
-            } else {
-                regMapInstrument->addTab(dev, iio_device_get_name(dev));
-            }
+			qDebug(CAT_REGMAP) << "";
+		}
 
-            qDebug(CAT_REGMAP) << "";
-        }
+		m_toolList[0]->setEnabled(true);
+		m_toolList[0]->setTool(m_registerMapWidget);
 
-        m_toolList[0]->setEnabled(true);
-        m_toolList[0]->setTool(m_registerMapWidget);
+		Preferences *p = Preferences::GetInstance();
+		QObject::connect(p, &Preferences::preferenceChanged, this, &RegmapPlugin::handlePreferenceChange);
 
-        Preferences *p = Preferences::GetInstance();
-        QObject::connect(p, &Preferences::preferenceChanged, this, &RegmapPlugin::handlePreferenceChange);
+		return true;
+	}
 
-        return true;
-    }
-
-    return false;
+	return false;
 }
 
 bool RegmapPlugin::onDisconnect()
 {
-    //TODO
-    auto &&cp = ContextProvider::GetInstance();
-    cp->close(m_param);
+	// TODO
+	auto &&cp = ContextProvider::GetInstance();
+	cp->close(m_param);
 
-    if (m_registerMapWidget) delete m_registerMapWidget;
-    if (m_deviceList) delete m_deviceList;
+	if(m_registerMapWidget)
+		delete m_registerMapWidget;
+	if(m_deviceList)
+		delete m_deviceList;
 
-    return true;
+	return true;
 }
 
 void RegmapPlugin::initMetadata()
 {
-    loadMetadata(
-        R"plugin(
+	loadMetadata(
+		R"plugin(
 	{
 	   "priority":3,
 	   "category":[
@@ -199,47 +205,41 @@ void RegmapPlugin::initMetadata()
 )plugin");
 }
 
-QString RegmapPlugin::description()
+QString RegmapPlugin::description() { return "Register map tool"; }
+
+QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
+
+struct iio_device *RegmapPlugin::getIioDevice(iio_context *ctx, const char *dev_name)
 {
-    return "Register map tool";
-}
+	auto deviceCount = iio_context_get_devices_count(ctx);
 
-QWidget *RegmapPlugin::getTool()
-{
-    return m_registerMapWidget;
-}
-
-
-struct iio_device* RegmapPlugin::getIioDevice(iio_context* ctx, const char *dev_name){
-    auto deviceCount = iio_context_get_devices_count(ctx);
-
-    for (int i = 0; i < deviceCount; i++) {
-        iio_device *dev = iio_context_get_device(ctx, i);
-        if (strcasecmp(iio_device_get_name(dev), dev_name) == 0) {
-            return dev;
-        }
-    }
-    return nullptr;
+	for(int i = 0; i < deviceCount; i++) {
+		iio_device *dev = iio_context_get_device(ctx, i);
+		if(strcasecmp(iio_device_get_name(dev), dev_name) == 0) {
+			return dev;
+		}
+	}
+	return nullptr;
 }
 
 bool RegmapPlugin::isBufferCapable(iio_device *dev)
 {
-    unsigned int i;
+	unsigned int i;
 
-    for (i = 0; i < iio_device_get_channels_count(dev); i++) {
-        struct iio_channel *chn = iio_device_get_channel(dev, i);
+	for(i = 0; i < iio_device_get_channels_count(dev); i++) {
+		struct iio_channel *chn = iio_device_get_channel(dev, i);
 
-        if (iio_channel_is_scan_element(chn)){
-            return true;
-        }
-    }
+		if(iio_channel_is_scan_element(chn)) {
+			return true;
+		}
+	}
 
-    return false;
+	return false;
 }
 
-void RegmapPlugin::handlePreferenceChange(QString id , QVariant val)
+void RegmapPlugin::handlePreferenceChange(QString id, QVariant val)
 {
-    if (id == "regmap_background_color_by_value") {
-        // TODO set backround color by value
-    }
+	if(id == "regmap_background_color_by_value") {
+		// TODO set backround color by value
+	}
 }

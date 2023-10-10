@@ -1,15 +1,26 @@
 #include "widgets/hoverwidget.h"
+
 #include "stylehelper.h"
+
 #include <QDebug>
 #include <QLoggingCategory>
+
 #include <stylehelper.h>
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
-	: QWidget(parent), m_parent(parent), m_anchor(anchor), m_content(content),
-	m_anchorPos(HP_TOPLEFT), m_contentPos(HP_TOPRIGHT), is_dragging(false),
-	m_draggable(false), m_relative(false), m_relativeOffset(nullptr) {
+	: QWidget(parent)
+	, m_parent(parent)
+	, m_anchor(anchor)
+	, m_content(content)
+	, m_anchorPos(HP_TOPLEFT)
+	, m_contentPos(HP_TOPRIGHT)
+	, is_dragging(false)
+	, m_draggable(false)
+	, m_relative(false)
+	, m_relativeOffset(nullptr)
+{
 	StyleHelper::TransparentWidget(this, "hoverWidget");
 	m_lay = new QHBoxLayout(this);
 	m_lay->setSizeConstraint(QLayout::SetFixedSize);
@@ -17,13 +28,13 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	setLayout(m_lay);
 	m_lay->addWidget(content);
 
-	if (m_content) {
+	if(m_content) {
 		setContent(m_content);
 	}
-	if (m_anchor) {
+	if(m_anchor) {
 		setAnchor(m_anchor);
 	}
-	if (m_parent) {
+	if(m_parent) {
 		setParent(m_parent);
 	}
 
@@ -34,7 +45,7 @@ void HoverWidget::setDraggable(bool draggable)
 {
 	m_draggable = draggable;
 	StyleHelper::HoverWidget(this, m_draggable);
-	if (!m_draggable) {
+	if(!m_draggable) {
 		updatePos();
 	}
 }
@@ -42,9 +53,7 @@ void HoverWidget::setDraggable(bool draggable)
 void HoverWidget::mousePressEvent(QMouseEvent *event)
 {
 	raise();
-	if (event->button() == Qt::LeftButton &&
-			m_content->geometry().contains(event->pos()) &&
-			m_draggable) {
+	if(event->button() == Qt::LeftButton && m_content->geometry().contains(event->pos()) && m_draggable) {
 		is_dragging = true;
 		mouse_pos = new QPoint(event->pos());
 	}
@@ -52,8 +61,7 @@ void HoverWidget::mousePressEvent(QMouseEvent *event)
 
 void HoverWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (event->button() == Qt::LeftButton &&
-			is_dragging) {
+	if(event->button() == Qt::LeftButton && is_dragging) {
 		is_dragging = false;
 		mouse_pos = new QPoint();
 		updateRelativeOffset();
@@ -62,7 +70,7 @@ void HoverWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void HoverWidget::mouseMoveEvent(QMouseEvent *event)
 {
-	if (!is_dragging) {
+	if(!is_dragging) {
 		return;
 	}
 
@@ -73,16 +81,16 @@ void HoverWidget::mouseMoveEvent(QMouseEvent *event)
 	QPoint new_bottomRight = mapToParent(m_content->geometry().bottomRight() + new_pos);
 
 	// restrict horizontal movement
-	if (new_topLeft.x() < 0) {
-		new_pos.rx() = - topLeft.x();
-	} else if (new_bottomRight.x() > m_parent->width()) {
+	if(new_topLeft.x() < 0) {
+		new_pos.rx() = -topLeft.x();
+	} else if(new_bottomRight.x() > m_parent->width()) {
 		new_pos.rx() = m_parent->width() - bottomRight.x();
 	}
 
 	// restrict vertical movement
-	if (new_topLeft.y() < 0) {
-		new_pos.ry() = - topLeft.y();
-	} else if (new_bottomRight.y() > m_parent->height()) {
+	if(new_topLeft.y() < 0) {
+		new_pos.ry() = -topLeft.y();
+	} else if(new_bottomRight.y() > m_parent->height()) {
 		new_pos.ry() = m_parent->height() - bottomRight.y();
 	}
 
@@ -95,13 +103,10 @@ void HoverWidget::updateRelativeOffset()
 	float width_diff = m_parent->width() - m_content->width();
 
 	m_relativeOffset = new QPointF((width_diff - mapToParent(m_content->geometry().topLeft()).x()) / width_diff,
-			(height_diff - mapToParent(m_content->geometry().topLeft()).y()) / height_diff);
+				       (height_diff - mapToParent(m_content->geometry().topLeft()).y()) / height_diff);
 }
 
-void HoverWidget::setRelative(bool relative)
-{
-	m_relative = relative;
-}
+void HoverWidget::setRelative(bool relative) { m_relative = relative; }
 
 void HoverWidget::setRelativeOffset(QPointF offset)
 {
@@ -111,7 +116,7 @@ void HoverWidget::setRelativeOffset(QPointF offset)
 
 void HoverWidget::setContent(QWidget *content)
 {
-	if (m_content) {
+	if(m_content) {
 		m_lay->removeWidget(m_content);
 		m_content->setParent(nullptr);
 		m_content->removeEventFilter(this);
@@ -127,7 +132,7 @@ void HoverWidget::setContent(QWidget *content)
 
 void HoverWidget::setAnchor(QWidget *anchor)
 {
-	if (m_anchor) {
+	if(m_anchor) {
 		m_anchor->removeEventFilter(this);
 	}
 
@@ -139,7 +144,7 @@ void HoverWidget::setAnchor(QWidget *anchor)
 
 void HoverWidget::setParent(QWidget *parent)
 {
-	if (m_parent) {
+	if(m_parent) {
 		m_parent->removeEventFilter(this);
 	}
 
@@ -151,17 +156,14 @@ void HoverWidget::setParent(QWidget *parent)
 	setVisible(visible);
 }
 
-HoverWidget::~HoverWidget()
-{
-
-}
+HoverWidget::~HoverWidget() {}
 
 bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 {
 	if(watched == m_content) {
-		if (event->type() == QEvent::HoverMove) {
-			QMouseEvent* e = static_cast<QMouseEvent*>(event);
-			if (m_content->geometry().contains(e->pos()) && m_draggable)
+		if(event->type() == QEvent::HoverMove) {
+			QMouseEvent *e = static_cast<QMouseEvent *>(event);
+			if(m_content->geometry().contains(e->pos()) && m_draggable)
 				m_content->setCursor(Qt::ClosedHandCursor);
 			else
 				m_content->setCursor(Qt::ArrowCursor);
@@ -176,21 +178,16 @@ bool HoverWidget::eventFilter(QObject *watched, QEvent *event)
 	return QObject::eventFilter(watched, event);
 }
 
-QPoint HoverWidget::getAnchorOffset()
-{
-	return m_anchorOffset;
-}
+QPoint HoverWidget::getAnchorOffset() { return m_anchorOffset; }
 
-void HoverWidget::setAnchorOffset(QPoint pt) {
+void HoverWidget::setAnchorOffset(QPoint pt)
+{
 	m_anchorOffset = pt;
 	m_relativeOffset = nullptr;
 	updatePos();
 }
 
-HoverPosition HoverWidget::getAnchorPos()
-{
-	return m_anchorPos;
-}
+HoverPosition HoverWidget::getAnchorPos() { return m_anchorPos; }
 
 void HoverWidget::setAnchorPos(HoverPosition pos)
 {
@@ -199,10 +196,7 @@ void HoverWidget::setAnchorPos(HoverPosition pos)
 	updatePos();
 }
 
-HoverPosition HoverWidget::getContentPos()
-{
-	return m_contentPos;
-}
+HoverPosition HoverWidget::getContentPos() { return m_contentPos; }
 
 void HoverWidget::setContentPos(HoverPosition pos)
 {
@@ -238,26 +232,26 @@ void HoverWidget::moveToAnchor()
 	if(!m_content || !m_anchor || !m_parent)
 		return;
 
-	QPoint global = m_anchor->mapToGlobal(QPoint(0,0));
-	QPoint mappedPoint =  m_parent->mapFromGlobal(global);
-	QPoint anchorPosition = QPoint(0,0);
-	QPoint contentPosition = QPoint(0,0);
+	QPoint global = m_anchor->mapToGlobal(QPoint(0, 0));
+	QPoint mappedPoint = m_parent->mapFromGlobal(global);
+	QPoint anchorPosition = QPoint(0, 0);
+	QPoint contentPosition = QPoint(0, 0);
 
-	switch (m_anchorPos) {
+	switch(m_anchorPos) {
 	case HP_LEFT:
-		anchorPosition = QPoint(0 , m_anchor->height() / 2);
+		anchorPosition = QPoint(0, m_anchor->height() / 2);
 		break;
 	case HP_TOPLEFT:
-		anchorPosition = QPoint(0,0);
+		anchorPosition = QPoint(0, 0);
 		break;
 	case HP_TOP:
-		anchorPosition = QPoint(m_anchor->width() / 2 , 0);
+		anchorPosition = QPoint(m_anchor->width() / 2, 0);
 		break;
 	case HP_TOPRIGHT:
 		anchorPosition = QPoint(m_anchor->width(), 0);
 		break;
 	case HP_RIGHT:
-		anchorPosition = QPoint(m_anchor->width(), m_anchor->height()/2);
+		anchorPosition = QPoint(m_anchor->width(), m_anchor->height() / 2);
 		break;
 	case HP_BOTTOMRIGHT:
 		anchorPosition = QPoint(m_anchor->width(), m_anchor->height());
@@ -269,48 +263,49 @@ void HoverWidget::moveToAnchor()
 		anchorPosition = QPoint(0, m_anchor->height());
 		break;
 	case HP_CENTER:
-		anchorPosition = QPoint(m_anchor->width() / 2, m_anchor->height()/2);
+		anchorPosition = QPoint(m_anchor->width() / 2, m_anchor->height() / 2);
 		break;
 	default:
-		anchorPosition = QPoint(0,0);
+		anchorPosition = QPoint(0, 0);
 		break;
 	}
 
-	switch (m_contentPos) {
+	switch(m_contentPos) {
 	case HP_LEFT:
-		contentPosition = QPoint(-m_content->width(), -m_content->height()/2);
+		contentPosition = QPoint(-m_content->width(), -m_content->height() / 2);
 		break;
 	case HP_TOPLEFT:
 		contentPosition = QPoint(-m_content->width(), -m_content->height());
 		break;
 	case HP_TOP:
-		contentPosition = QPoint(-m_content->width()/2, -m_content->height());
+		contentPosition = QPoint(-m_content->width() / 2, -m_content->height());
 		break;
 	case HP_TOPRIGHT:
 		contentPosition = QPoint(0, -m_content->height());
 		break;
 	case HP_RIGHT:
-		contentPosition = QPoint(0, -m_content->height()/2);
+		contentPosition = QPoint(0, -m_content->height() / 2);
 		break;
 	case HP_BOTTOMRIGHT:
 		contentPosition = QPoint(0, 0);
 		break;
 	case HP_BOTTOM:
-		contentPosition = QPoint(-m_content->width()/2, 0);
+		contentPosition = QPoint(-m_content->width() / 2, 0);
 		break;
 	case HP_BOTTOMLEFT:
 		contentPosition = QPoint(-m_content->width(), 0);
 		break;
 	case HP_CENTER:
-		contentPosition = QPoint(-m_content->width()/2, -m_content->height()/2);
+		contentPosition = QPoint(-m_content->width() / 2, -m_content->height() / 2);
 		break;
 	default:
-		contentPosition = QPoint(0,0);
+		contentPosition = QPoint(0, 0);
 		break;
 	}
 
-	qDebug(CAT_HOVERWIDGET)<<"moveAnchor"<<"mapped"<<mappedPoint<<"contentPosition"<<contentPosition<<
-		"anchorPosition"<<anchorPosition<<"offset"<<m_anchorOffset;
+	qDebug(CAT_HOVERWIDGET) << "moveAnchor"
+				<< "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
+				<< anchorPosition << "offset" << m_anchorOffset;
 	move(mappedPoint + contentPosition + anchorPosition + m_anchorOffset);
 }
 
@@ -322,3 +317,5 @@ void HoverWidget::showEvent(QShowEvent *event)
 	raise();
 	QWidget::showEvent(event);
 }
+
+#include "moc_hoverwidget.cpp"

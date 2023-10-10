@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 class IRegisterWriteStrategy : public QObject
 {
 	Q_OBJECT
@@ -14,5 +14,5 @@ Q_SIGNALS:
 	void writeError(const char *err);
 	void writeSuccess(uint32_t address);
 };
-}
+} // namespace scopy::regmap
 #endif // IREGISTERWRITESTRATEGY_HPP

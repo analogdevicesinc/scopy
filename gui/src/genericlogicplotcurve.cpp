@@ -18,95 +18,59 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "genericlogicplotcurve.h"
+
 #include <qwt_plot.h>
 #include <qwt_scale_map.h>
 
+GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, const QString &id, LogicPlotCurveType type,
+					     double pixelOffset, double traceHeight, double sampleRate,
+					     double timeTriggerOffset, uint64_t bufferSize)
+	: QObject()
+	, QwtPlotCurve()
+	, m_name(name)
+	, m_id(id)
+	, m_traceColor("dodgerblue")
+	, m_pixelOffset(pixelOffset)
+	, m_traceHeight(traceHeight)
+	, m_sampleRate(sampleRate)
+	, m_timeTriggerOffset(timeTriggerOffset)
+	, m_bufferSize(bufferSize)
+	, m_type(type)
+{}
 
-GenericLogicPlotCurve::GenericLogicPlotCurve(const QString &name, const QString &id, LogicPlotCurveType type, double pixelOffset,
-					     double traceHeight, double sampleRate,
-					     double timeTriggerOffset, uint64_t bufferSize):
-	QObject(),
-	QwtPlotCurve(),
-	m_name(name),
-	m_id(id),
-	m_traceColor("dodgerblue"),
-	m_pixelOffset(pixelOffset),
-	m_traceHeight(traceHeight),
-	m_sampleRate(sampleRate),
-	m_timeTriggerOffset(timeTriggerOffset),
-	m_bufferSize(bufferSize),
-	m_type(type)
-{
-}
+QString GenericLogicPlotCurve::getName() const { return m_name; }
 
-QString GenericLogicPlotCurve::getName() const
-{
-	return m_name;
-}
+QString GenericLogicPlotCurve::getId() const { return m_id; }
 
-QString GenericLogicPlotCurve::getId() const
-{
-	return m_id;
-}
+QColor GenericLogicPlotCurve::getTraceColor() const { return m_traceColor; }
 
-QColor GenericLogicPlotCurve::getTraceColor() const
-{
-	return m_traceColor;
-}
+double GenericLogicPlotCurve::getPixelOffset() const { return m_pixelOffset; }
 
+double GenericLogicPlotCurve::getTraceHeight() const { return m_traceHeight; }
 
-double GenericLogicPlotCurve::getPixelOffset() const
-{
-	return m_pixelOffset;
-}
-
-double GenericLogicPlotCurve::getTraceHeight() const
-{
-	return m_traceHeight;
-}
-
-double GenericLogicPlotCurve::getSampleRate() const
-{
-	return m_sampleRate;
-}
+double GenericLogicPlotCurve::getSampleRate() const { return m_sampleRate; }
 
 double GenericLogicPlotCurve::getTotalTime() const
 {
-	if (m_bufferSize == 0) return 0;
+	if(m_bufferSize == 0)
+		return 0;
 	return static_cast<double>(m_bufferSize) / m_sampleRate;
 }
 
+double GenericLogicPlotCurve::getTimeTriggerOffset() const { return m_timeTriggerOffset; }
 
-double GenericLogicPlotCurve::getTimeTriggerOffset() const
-{
-	return m_timeTriggerOffset;
-}
+uint64_t GenericLogicPlotCurve::getBufferSize() const { return m_bufferSize; }
 
-uint64_t GenericLogicPlotCurve::getBufferSize() const
-{
-	return m_bufferSize;
-}
+int GenericLogicPlotCurve::getVisibleRows() const { return 1; }
 
-int GenericLogicPlotCurve::getVisibleRows() const
-{
-	return 1;
-}
+double GenericLogicPlotCurve::getHeightOffset() const { return 0; }
 
-double GenericLogicPlotCurve::getHeightOffset() const
-{
-	return 0;
-}
-
-LogicPlotCurveType GenericLogicPlotCurve::getType() const
-{
-	return m_type;
-}
+LogicPlotCurveType GenericLogicPlotCurve::getType() const { return m_type; }
 
 void GenericLogicPlotCurve::setName(const QString &name)
 {
-	if (m_name != name) {
+	if(m_name != name) {
 		m_name = name;
 		Q_EMIT nameChanged(name);
 	}
@@ -114,14 +78,14 @@ void GenericLogicPlotCurve::setName(const QString &name)
 
 void GenericLogicPlotCurve::setId(const QString &id)
 {
-	if (m_id != id) {
+	if(m_id != id) {
 		m_id = id;
 	}
 }
 
 void GenericLogicPlotCurve::setPixelOffset(double pixelOffset)
 {
-	if (m_pixelOffset != pixelOffset) {
+	if(m_pixelOffset != pixelOffset) {
 		m_pixelOffset = pixelOffset;
 
 		setBaseline(m_pixelOffset + m_traceHeight);
@@ -132,35 +96,32 @@ void GenericLogicPlotCurve::setPixelOffset(double pixelOffset)
 
 void GenericLogicPlotCurve::setTraceHeight(double traceHeight)
 {
-	if (m_traceHeight != traceHeight) {
+	if(m_traceHeight != traceHeight) {
 		m_traceHeight = traceHeight;
 
 		setBaseline(m_pixelOffset + m_traceHeight);
 	}
 }
 
-void GenericLogicPlotCurve::setTraceColor(const QColor traceColor)
-{
-	m_traceColor = traceColor;
-}
+void GenericLogicPlotCurve::setTraceColor(const QColor traceColor) { m_traceColor = traceColor; }
 
 void GenericLogicPlotCurve::setSampleRate(double sampleRate)
 {
-	if (m_sampleRate != sampleRate) {
+	if(m_sampleRate != sampleRate) {
 		m_sampleRate = sampleRate;
 	}
 }
 
 void GenericLogicPlotCurve::setTimeTriggerOffset(double timeTriggerOffset)
 {
-	if (m_timeTriggerOffset != timeTriggerOffset) {
+	if(m_timeTriggerOffset != timeTriggerOffset) {
 		m_timeTriggerOffset = timeTriggerOffset;
 	}
 }
 
 void GenericLogicPlotCurve::setBufferSize(uint64_t bufferSize)
 {
-	if (m_bufferSize != bufferSize) {
+	if(m_bufferSize != bufferSize) {
 		m_bufferSize = bufferSize;
 	}
 }
@@ -173,11 +134,11 @@ uint64_t GenericLogicPlotCurve::fromTimeToSample(double time) const
 	const double smin = 0;
 	const double smax = m_bufferSize;
 
-	if (time > tmax) {
+	if(time > tmax) {
 		time = tmax;
 	}
 
-	if (time < tmin) {
+	if(time < tmin) {
 		time = tmin;
 	}
 
@@ -192,21 +153,22 @@ double GenericLogicPlotCurve::fromSampleToTime(uint64_t sample) const
 	const double smin = 0;
 	const double smax = m_bufferSize;
 
-	if (sample > smax) {
+	if(sample > smax) {
 		sample = smax;
 	}
 
 	return (sample - smin) / (smax - smin) * (tmax - tmin) + tmin;
 }
 
-QPointF GenericLogicPlotCurve::screenPosToCurvePoint(const QPoint& pos) const
+QPointF GenericLogicPlotCurve::screenPosToCurvePoint(const QPoint &pos) const
 {
-    const auto plt = plot();
-    if (plt == nullptr) return QPointF();
-    // TODO: Is there another way to do this?
-    const auto xmap = plt->canvasMap(xAxis().pos);
-    const auto ymap = plt->canvasMap(yAxis().pos);
-    return QPointF(xmap.invTransform(pos.x()), ymap.invTransform(pos.y()));
+	const auto plt = plot();
+	if(plt == nullptr)
+		return QPointF();
+	// TODO: Is there another way to do this?
+	const auto xmap = plt->canvasMap(xAxis().pos);
+	const auto ymap = plt->canvasMap(yAxis().pos);
+	return QPointF(xmap.invTransform(pos.x()), ymap.invTransform(pos.y()));
 }
 
 #include "moc_genericlogicplotcurve.cpp"

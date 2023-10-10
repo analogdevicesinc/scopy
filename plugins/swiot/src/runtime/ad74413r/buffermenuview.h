@@ -18,23 +18,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SWIOTGENERICMENU_H
 #define SWIOTGENERICMENU_H
 
-#include <QWidget>
-#include <gui/generic_menu.hpp>
 #include "buffermenu.h"
 #include "linked_button.hpp"
+
 #include <QMap>
 #include <QObject>
+#include <QWidget>
+
+#include <gui/generic_menu.hpp>
 
 namespace scopy {
 class CustomSwitch;
 class GenericMenu;
 
 namespace swiot {
-class BufferMenuView : public gui::GenericMenu {
+class BufferMenuView : public gui::GenericMenu
+{
 	Q_OBJECT
 public:
 	explicit BufferMenuView(QWidget *parent = nullptr);
@@ -55,7 +57,7 @@ private:
 	scopy::gui::SubsectionSeparator *m_verticalSettingsSection;
 	scopy::LinkedButton *m_btnInfoStatus;
 };
-}
-}
+} // namespace swiot
+} // namespace scopy
 
 #endif // SWIOTGENERICMENU_H

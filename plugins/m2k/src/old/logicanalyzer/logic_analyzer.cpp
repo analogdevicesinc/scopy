@@ -19,44 +19,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "logic_analyzer.h"
 
-#include "ui_logic_analyzer.h"
-#include "ui_cursors_settings.h"
-#include "oscilloscope_plot.hpp"
-
-#include <libsigrokdecode/libsigrokdecode.h>
-
+#include "filemanager.h"
+#include "filter.hpp"
+#include "gui/basemenu.h"
+#include "gui/dynamicWidget.h"
 #include "gui/logicdatacurve.h"
+#include "gui/osc_export_settings.h"
+#include "logicanalyzer/decoder_table_model.hpp"
+#include "logicanalyzer_api.h"
+#include "logicgroupitem.h"
+#include "oscilloscope_plot.hpp"
 #include "sigrok-gui/annotationcurve.h"
 #include "sigrok-gui/decoder.h"
-#include "logicanalyzer/decoder_table_model.hpp"
+#include "state_updater.h"
 
-#include "gui/basemenu.h"
-#include "logicgroupitem.h"
+#include "ui_cursors_settings.h"
+#include "ui_logic_analyzer.h"
 
-#include "logicanalyzer_api.h"
-
-#include "gui/dynamicWidget.h"
-
+#include <QDateTime>
 #include <QDebug>
 #include <QDockWidget>
 #include <QFileDialog>
-#include <QDateTime>
 #include <QFutureWatcher>
+#include <QTabWidget>
 #include <QtConcurrentRun>
 
-#include <QTabWidget>
-
-#include "filter.hpp"
-
 #include <libm2k/m2kexceptions.hpp>
+#include <libsigrokdecode/libsigrokdecode.h>
 #include <pluginbase/scopyjs.h>
-
-#include "gui/osc_export_settings.h"
-#include "filemanager.h"
-#include "state_updater.h"
 #include <unistd.h>
 
 using namespace scopy;
@@ -64,78 +56,71 @@ using namespace scopy::logic;
 using namespace scopy::m2k;
 using namespace scopy::m2k::logic;
 
-constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024; // 4M
+constexpr int MAX_BUFFER_SIZE_ONESHOT = 4 * 1024 * 1024;   // 4M
 constexpr int MAX_BUFFER_SIZE_STREAM = 1024 * 1024 * 1024; // 1Gb
-constexpr int MAX_SR_STREAM = 5e6; // 10M
+constexpr int MAX_SR_STREAM = 5e6;			   // 10M
 constexpr int MAX_KERNEL_BUFFERS = 64;
 
 /* helper method to sort srd_decoder objects based on ids(name) */
 static gint sort_pds(gconstpointer a, gconstpointer b)
 {
-    const struct srd_decoder *sda, *sdb;
+	const struct srd_decoder *sda, *sdb;
 
-    sda = (const struct srd_decoder *)a;
-    sdb = (const struct srd_decoder *)b;
-    return strcmp(sda->id, sdb->id);
+	sda = (const struct srd_decoder *)a;
+	sdb = (const struct srd_decoder *)b;
+	return strcmp(sda->id, sdb->id);
 }
 
-LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
-			     ToolMenuEntry *tme,
-			     QJSEngine *engine, QWidget *parent,
-			     bool offline_mode_):
-	M2kTool(nullptr, tme, new LogicAnalyzer_API(this), "Logic Analyzer", parent),
-	ui(new Ui::LogicAnalyzer),
-	m_plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter),
-	m_bufferPreviewer(new DigitalBufferPreviewer(40, this)),
-	m_plotScrollBar(new QScrollBar(Qt::Vertical, this)),
-	m_sampleRateButton(new ScaleSpinButton({
-					{"sps", 1E0},
-					{"ksps", 1E+3},
-					{"Msps", 1E+6}
-					}, tr("Sample Rate"), 1,
-					10e7,
-					true, false, this, {1, 2, 5})),
-	m_bufferSizeButton(new ScaleSpinButton({
-					{"samples", 1E0},
-					{"k samples", 1E+3},
-					{"M samples", 1E+6},
-					{"G samples", 1E+9},
-					}, tr("Nr of samples"), 1000,
-					MAX_BUFFER_SIZE_ONESHOT,
-					true, false, this, {1, 2, 5})),
-	m_timePositionButton(new PositionSpinButton({
-					 {"samples", 1E0},
-					 }, tr("Delay"), - (1 << 13),
-					 (1 << 13) - 1,
-					 true, false, this)),
-	m_sampleRate(1000000),
-	m_bufferSize(1000),
-	m_lastCapturedSample(0),
-	m_m2k_context(m2kOpen(ctx, "")),
-	m_m2kDigital(m_m2k_context->getDigital()),
-	m_nbChannels(DIGITAL_NR_CHANNELS),
-	m_horizOffset(0.0),
-	m_timeTriggerOffset(0.0),
-	m_resetHorizAxisOffset(true),
-	m_captureThread(nullptr),
-	m_stopRequested(false),
-	m_acquisitionStarted(false),
-	m_started(false),
-	m_selectedChannel(-1),
-	m_wheelEventGuard(nullptr),
-	m_decoderMenu(nullptr),
-	m_currentGroupMenu(nullptr),
-	m_autoMode(false),
-	m_timer(new QTimer(this)),
-	m_timerTimeout(1000),
-	m_exportSettings(nullptr),
-	m_saveRestoreSettings(nullptr),
-	m_oscPlot(nullptr),
-	m_oscChannelSelected(-1),
-	m_oscDecoderMenu(nullptr),
-	m_currentKernelBuffers(4),
-	m_triggerUpdater(new StateUpdater(250, this)),
-	m_buffer(nullptr)
+LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
+			     QWidget *parent, bool offline_mode_)
+	: M2kTool(nullptr, tme, new LogicAnalyzer_API(this), "Logic Analyzer", parent)
+	, ui(new Ui::LogicAnalyzer)
+	, m_plot(this, false, 16, 10, new TimePrefixFormatter, new MetricPrefixFormatter)
+	, m_bufferPreviewer(new DigitalBufferPreviewer(40, this))
+	, m_plotScrollBar(new QScrollBar(Qt::Vertical, this))
+	, m_sampleRateButton(new ScaleSpinButton({{"sps", 1E0}, {"ksps", 1E+3}, {"Msps", 1E+6}}, tr("Sample Rate"), 1,
+						 10e7, true, false, this, {1, 2, 5}))
+	, m_bufferSizeButton(new ScaleSpinButton(
+		  {
+			  {"samples", 1E0},
+			  {"k samples", 1E+3},
+			  {"M samples", 1E+6},
+			  {"G samples", 1E+9},
+		  },
+		  tr("Nr of samples"), 1000, MAX_BUFFER_SIZE_ONESHOT, true, false, this, {1, 2, 5}))
+	, m_timePositionButton(new PositionSpinButton(
+		  {
+			  {"samples", 1E0},
+		  },
+		  tr("Delay"), -(1 << 13), (1 << 13) - 1, true, false, this))
+	, m_sampleRate(1000000)
+	, m_bufferSize(1000)
+	, m_lastCapturedSample(0)
+	, m_m2k_context(m2kOpen(ctx, ""))
+	, m_m2kDigital(m_m2k_context->getDigital())
+	, m_nbChannels(DIGITAL_NR_CHANNELS)
+	, m_horizOffset(0.0)
+	, m_timeTriggerOffset(0.0)
+	, m_resetHorizAxisOffset(true)
+	, m_captureThread(nullptr)
+	, m_stopRequested(false)
+	, m_acquisitionStarted(false)
+	, m_started(false)
+	, m_selectedChannel(-1)
+	, m_wheelEventGuard(nullptr)
+	, m_decoderMenu(nullptr)
+	, m_currentGroupMenu(nullptr)
+	, m_autoMode(false)
+	, m_timer(new QTimer(this))
+	, m_timerTimeout(1000)
+	, m_exportSettings(nullptr)
+	, m_saveRestoreSettings(nullptr)
+	, m_oscPlot(nullptr)
+	, m_oscChannelSelected(-1)
+	, m_oscDecoderMenu(nullptr)
+	, m_currentKernelBuffers(4)
+	, m_triggerUpdater(new StateUpdater(250, this))
+	, m_buffer(nullptr)
 {
 	// setup ui
 	setupUi();
@@ -145,7 +130,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	m_plot.setLeftVertAxesCount(1);
 
-	for (uint8_t i = 0; i < m_nbChannels; ++i) {
+	for(uint8_t i = 0; i < m_nbChannels; ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 
 		QHBoxLayout *hBoxLayout = new QHBoxLayout();
@@ -161,20 +146,20 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		channelBox->setChecked(true);
 
-		triggerBox->setStyleSheet("QComboBox { max-width: 60px; } QComboBox QAbstractItemView { min-width: 130px; }");
+		triggerBox->setStyleSheet(
+			"QComboBox { max-width: 60px; } QComboBox QAbstractItemView { min-width: 130px; }");
 
 		triggerBox->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
-		for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
+		for(int i = 1; i < ui->triggerComboBox->count(); ++i) {
 			triggerBox->addItem(ui->triggerComboBox->itemText(i));
 		}
 
-		int condition = static_cast<int>(
-					m_m2kDigital->getTrigger()->getDigitalCondition(i));
+		int condition = static_cast<int>(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 		triggerBox->setCurrentIndex((condition + 1) % 6);
 
 		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-			m_m2kDigital->getTrigger()->setDigitalCondition(i,
-					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+			m_m2kDigital->getTrigger()->setDigitalCondition(
+				i, static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 		});
 
 		// 1 for each channel
@@ -185,16 +170,18 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		connect(this, &LogicAnalyzer::dataAvailable, this,
-			[=](uint64_t from, uint64_t to, uint16_t* m_buffer){
-			if (!m_oscPlot) {
-				curve->dataAvailable(from, to, m_buffer);
-			}
-		}, Qt::DirectConnection);
+		connect(
+			this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to, uint16_t *m_buffer) {
+				if(!m_oscPlot) {
+					curve->dataAvailable(from, to, m_buffer);
+				}
+			},
+			Qt::DirectConnection);
 
 		m_plotCurves.push_back(curve);
 
-		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(channelBox, &QCheckBox::toggled, [=](bool toggled) {
 			m_plot.enableDigitalPlotCurve(i, toggled);
 			m_plot.setOffsetWidgetVisible(i, toggled);
 			m_plot.positionInGroupChanged(i, 0, 0);
@@ -204,10 +191,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	}
 
 	// decoder table dropdown menu
-	connect(ui->btnCollapseSettings,&QPushButton::clicked,
-		[=](bool check) {
-			ui->wDecoderSettings_2->setVisible(check);
-		});
+	connect(ui->btnCollapseSettings, &QPushButton::clicked,
+		[=](bool check) { ui->wDecoderSettings_2->setVisible(check); });
 	ui->btnCollapseSettings->click();
 	ui->statusLabel->setStyleSheet("QLabel { color : #4A64FF; }");
 
@@ -218,11 +203,10 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	m_plot.zoomBaseUpdate();
 
-	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
-		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value) {
+		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0) / (1.0 / m_sampleRate);
 		onTimeTriggerValueChanged(static_cast<int>(delay));
 	});
-
 
 	m_plot.enableXaxisLabels();
 
@@ -247,8 +231,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_bufferSizeButton->setValue(m_bufferSize);
 
 	m_triggerUpdater->setOffState(CapturePlot::Stop);
-	connect(m_triggerUpdater, &StateUpdater::outputChanged,
-		&m_plot, &CapturePlot::setTriggerState);
+	connect(m_triggerUpdater, &StateUpdater::outputChanged, &m_plot, &CapturePlot::setTriggerState);
 
 	readPreferences();
 
@@ -268,7 +251,7 @@ LogicAnalyzer::~LogicAnalyzer()
 {
 	delete api;
 
-	if (m_captureThread) {
+	if(m_captureThread) {
 		m_stopRequested = true;
 		m_m2kDigital->cancelAcquisition();
 		m_captureThread->join();
@@ -276,12 +259,12 @@ LogicAnalyzer::~LogicAnalyzer()
 		m_captureThread = nullptr;
 	}
 
-	for (auto &curve : m_plotCurves) {
+	for(auto &curve : m_plotCurves) {
 		m_plot.removeDigitalPlotCurve(curve);
 		delete curve;
 	}
 
-	if (m_buffer) {
+	if(m_buffer) {
 		delete[] m_buffer;
 		m_buffer = nullptr;
 	}
@@ -296,12 +279,12 @@ void LogicAnalyzer::setNativeDialogs(bool nativeDialogs)
 	m_plot.setUseNativeDialog(nativeDialogs);
 }
 
-void LogicAnalyzer::setData(const uint16_t * const data, int size)
+void LogicAnalyzer::setData(const uint16_t *const data, int size)
 {
 
 	qDebug() << "Set data arrived: ";
 
-	if (m_buffer) {
+	if(m_buffer) {
 		delete m_buffer;
 		m_buffer = nullptr;
 	}
@@ -311,22 +294,20 @@ void LogicAnalyzer::setData(const uint16_t * const data, int size)
 	memcpy(m_buffer, data, size * sizeof(uint16_t));
 	Q_EMIT dataAvailable(0, size, m_buffer);
 
-//	if (m_oscPlot) {
-//		QMetaObject::invokeMethod(this, [=](){
-//			m_oscPlot->replot();
-//		}, Qt::QueuedConnection);
-//	}
-
+	//	if (m_oscPlot) {
+	//		QMetaObject::invokeMethod(this, [=](){
+	//			m_oscPlot->replot();
+	//		}, Qt::QueuedConnection);
+	//	}
 }
 
-QVector<GenericLogicPlotCurve*> LogicAnalyzer::getPlotCurves(bool logic) const
+QVector<GenericLogicPlotCurve *> LogicAnalyzer::getPlotCurves(bool logic) const
 {
-	if (logic) {
+	if(logic) {
 		return m_plotCurves;
 	} else {
 		return m_oscPlotCurves;
 	}
-
 }
 
 std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, int oscAnalogChannels)
@@ -334,8 +315,8 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	// save the state of the tool
 	m_saveRestoreSettings = std::unique_ptr<SaveRestoreToolSettings>(new SaveRestoreToolSettings(this));
 
-	if (m_started) {		
-			tme->setRunning(false);
+	if(m_started) {
+		tme->setRunning(false);
 	}
 
 	// disable the menu item for the logic analyzer when mixed signal view is enabled
@@ -364,7 +345,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	layout->insertLayout(0, chEnumeratorLayout);
 	// move plot curves (logic + decoder) to osc plot
-	for (uint8_t i = 0; i < m_nbChannels; ++i) {
+	for(uint8_t i = 0; i < m_nbChannels; ++i) {
 
 		LogicDataCurve *curve = new LogicDataCurve(nullptr, i);
 		curve->setTraceHeight(25);
@@ -372,14 +353,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		m_oscPlotCurves.push_back(curve);
 
-		auto handle = connect(this, &LogicAnalyzer::dataAvailable, this,
-			[=](uint64_t from, uint64_t to, uint16_t *buffer){
-			curve->dataAvailable(from, to, buffer);
-		}, Qt::DirectConnection);
+		auto handle = connect(
+			this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to, uint16_t *buffer) { curve->dataAvailable(from, to, buffer); },
+			Qt::DirectConnection);
 
-		connect(curve, &GenericLogicPlotCurve::destroyed, [=](){
-			disconnect(handle);
-		});
+		connect(curve, &GenericLogicPlotCurve::destroyed, [=]() { disconnect(handle); });
 
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 		curve->setName("DIO " + QString::number(i));
@@ -397,21 +376,19 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		channelBox->setChecked(true);
 
-		for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
-			triggerBox->addItem(ui->triggerComboBox->itemIcon(i),
-					    ui->triggerComboBox->itemText(i));
+		for(int i = 1; i < ui->triggerComboBox->count(); ++i) {
+			triggerBox->addItem(ui->triggerComboBox->itemIcon(i), ui->triggerComboBox->itemText(i));
 		}
 
-		int condition = static_cast<int>(
-					m_m2kDigital->getTrigger()->getDigitalCondition(i));
+		int condition = static_cast<int>(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 		triggerBox->setCurrentIndex((condition + 1) % 6);
 
 		connect(triggerBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-			m_m2kDigital->getTrigger()->setDigitalCondition(i,
-					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+			m_m2kDigital->getTrigger()->setDigitalCondition(
+				i, static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 		});
 
-		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(channelBox, &QCheckBox::toggled, [=](bool toggled) {
 			const int oscAnalogChannels = m_oscPlot->getAnalogChannels();
 			m_oscPlot->enableDigitalPlotCurve(i, toggled);
 			m_oscPlot->setOffsetWidgetVisible(i + oscAnalogChannels, toggled);
@@ -429,25 +406,24 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	decoderComboBox->addItem("Select a decoder to add");
 
-
 	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 	decoderList = g_slist_sort(decoderList, sort_pds);
 
-	for (const GSList *sl = decoderList; sl; sl = sl->next) {
+	for(const GSList *sl = decoderList; sl; sl = sl->next) {
 
-	    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		srd_decoder *dec = (struct srd_decoder *)sl->data;
 
-	    QString decoderInput = "";
+		QString decoderInput = "";
 
-	    GSList *dec_channels = g_slist_copy(dec->inputs);
-	    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
-		decoderInput = QString::fromUtf8((char*)sl->data);
-	    }
-	    g_slist_free(dec_channels);
+		GSList *dec_channels = g_slist_copy(dec->inputs);
+		for(const GSList *sl = dec_channels; sl; sl = sl->next) {
+			decoderInput = QString::fromUtf8((char *)sl->data);
+		}
+		g_slist_free(dec_channels);
 
-	    if (decoderInput == "logic") {
-		decoderComboBox->addItem(QString::fromUtf8(dec->id));
-	    }
+		if(decoderInput == "logic") {
+			decoderComboBox->addItem(QString::fromUtf8(dec->id));
+		}
 	}
 
 	g_slist_free(decoderList);
@@ -463,19 +439,19 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	QComboBox *stackDecoderComboBox = new QComboBox();
 	stackDecoderComboBox->setVisible(false);
-	auto updateButtonStackedDecoder = [=](){
-		if (m_oscChannelSelected < m_nbChannels) {
+	auto updateButtonStackedDecoder = [=]() {
+		if(m_oscChannelSelected < m_nbChannels) {
 			stackDecoderComboBox->setVisible(false);
 			return;
 		}
 
-		if (m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
+		if(m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
 			return;
 		}
 
 		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
 
-		if (!curve) {
+		if(!curve) {
 			return;
 		}
 
@@ -490,26 +466,26 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 		decoderList = g_slist_sort(decoderList, sort_pds);
 		GSList *dec_channels = g_slist_copy(top->decoder()->outputs);
-		for (const GSList *sl = dec_channels; sl; sl = sl->next) {
-		    decoderOutput = QString::fromUtf8((char*)sl->data);
+		for(const GSList *sl = dec_channels; sl; sl = sl->next) {
+			decoderOutput = QString::fromUtf8((char *)sl->data);
 		}
 		g_slist_free(dec_channels);
-		for (const GSList *sl = decoderList; sl; sl = sl->next) {
+		for(const GSList *sl = decoderList; sl; sl = sl->next) {
 
-		    srd_decoder *dec = (struct srd_decoder *)sl->data;
+			srd_decoder *dec = (struct srd_decoder *)sl->data;
 
-		    QString decoderInput = "";
+			QString decoderInput = "";
 
-		    GSList *dec_channels = g_slist_copy(dec->inputs);
-		    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
-			decoderInput = QString::fromUtf8((char*)sl->data);
-		    }
-		    g_slist_free(dec_channels);
+			GSList *dec_channels = g_slist_copy(dec->inputs);
+			for(const GSList *sl = dec_channels; sl; sl = sl->next) {
+				decoderInput = QString::fromUtf8((char *)sl->data);
+			}
+			g_slist_free(dec_channels);
 
-		    if (decoderInput == decoderOutput) {
-			qDebug() << "Added: " << QString::fromUtf8(dec->id);
-			stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
-		    }
+			if(decoderInput == decoderOutput) {
+				qDebug() << "Added: " << QString::fromUtf8(dec->id);
+				stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+			}
 		}
 		g_slist_free(decoderList);
 
@@ -518,21 +494,21 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		stackDecoderComboBox->setVisible(shouldBeVisible);
 	};
 
-	connect(decoderComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this ,[=](int index) {
+	connect(decoderComboBox, qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int index) {
 		const QString &decoder = decoderComboBox->itemText(index);
 		decoderComboBox->clearFocus();
-		if (!decoderComboBox->currentIndex()) {
+		if(!decoderComboBox->currentIndex()) {
 			return;
 		}
 
 		std::shared_ptr<scopy::logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
-		for (const GSList *sl = decoderList; sl; sl = sl->next) {
-		    srd_decoder *dec = (struct srd_decoder *)sl->data;
-		    if (QString::fromUtf8(dec->id) == decoder) {
-			initialDecoder = std::make_shared<scopy::logic::Decoder>(dec);
-		    }
+		for(const GSList *sl = decoderList; sl; sl = sl->next) {
+			srd_decoder *dec = (struct srd_decoder *)sl->data;
+			if(QString::fromUtf8(dec->id) == decoder) {
+				initialDecoder = std::make_shared<scopy::logic::Decoder>(dec);
+			}
 		}
 
 		AnnotationCurve *curve = new AnnotationCurve(initialDecoder);
@@ -543,7 +519,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		// be displayed properly due to lack of information about
 		// sr buffer size and trigger offset. We borrow this values
 		// from a logic curve on the plot
-		QwtPlotCurve* dummyCurve = m_oscPlot->getDigitalPlotCurve(0);
+		QwtPlotCurve *dummyCurve = m_oscPlot->getDigitalPlotCurve(0);
 		GenericLogicPlotCurve *logicCurve = dynamic_cast<GenericLogicPlotCurve *>(dummyCurve);
 		curve->setSampleRate(logicCurve->getSampleRate());
 		curve->setBufferSize(logicCurve->getBufferSize());
@@ -553,14 +529,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
-			this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
-			curve->dataAvailable(from, to, buffer);
-		}, Qt::DirectConnection);
+		auto connectionHandle = connect(
+			this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to, uint16_t *buffer) { curve->dataAvailable(from, to, buffer); },
+			Qt::DirectConnection);
 
-		connect(curve, &QObject::destroyed, [=](){
-			disconnect(connectionHandle);
-		});
+		connect(curve, &QObject::destroyed, [=]() { disconnect(connectionHandle); });
 
 		g_slist_free(decoderList);
 
@@ -583,23 +557,21 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		decoderBox->setVisible(true);
 		deleteBtn->setVisible(true);
 
-		connect(deleteBtn, &QPushButton::clicked, [=](){
+		connect(deleteBtn, &QPushButton::clicked, [=]() {
 			decoderMenuItem->deleteLater();
 
 			int chIdx = m_oscPlotCurves.indexOf(curve);
 
-			if (chIdx == m_oscChannelSelected) {
+			if(chIdx == m_oscChannelSelected) {
 				Q_EMIT m_oscPlot->channelSelected(chIdx + m_oscAnalogChannels, false);
-			} else if (chIdx < m_oscChannelSelected) {
+			} else if(chIdx < m_oscChannelSelected) {
 				m_oscChannelSelected--;
 			}
 
 			bool groupDeleted = false;
-			m_oscPlot->removeFromGroup(chIdx,
-					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
-					       groupDeleted);
+			m_oscPlot->removeFromGroup(chIdx, m_plot.getGroupOfChannel(chIdx).indexOf(chIdx), groupDeleted);
 
-			if (groupDeleted) {
+			if(groupDeleted) {
 				ui->groupWidget->setVisible(false);
 				m_currentGroup.clear();
 				ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
@@ -615,7 +587,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 			delete curve;
 
 			// reposition decoder menu items after deleting one
-			for (int i = chIdx; i < m_oscPlotCurves.size(); ++i) {
+			for(int i = chIdx; i < m_oscPlotCurves.size(); ++i) {
 				const int index = i - 16; // subtract logic channels count
 				QLayoutItem *next = decoderEnumerator->itemAtPosition((index + 1) / 2, (index + 1) % 2);
 				decoderEnumerator->removeItem(next);
@@ -630,7 +602,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		decoderComboBox->setCurrentIndex(0);
 
-		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled) {
 			const int analogChannels = m_oscPlot->getAnalogChannels();
 			m_oscPlot->enableDigitalPlotCurve(analogChannels + m_nbChannels + itemsInLayout, toggled);
 			m_oscPlot->setOffsetWidgetVisible(analogChannels + m_nbChannels + itemsInLayout, toggled);
@@ -640,12 +612,12 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 		int chId = m_oscPlotCurves.size() - 1;
 
-		connect(curve, &AnnotationCurve::decoderMenuChanged, [=](){
-			if (m_oscChannelSelected != chId) {
+		connect(curve, &AnnotationCurve::decoderMenuChanged, [=]() {
+			if(m_oscChannelSelected != chId) {
 				return;
 			}
 
-			if (m_oscDecoderMenu) {
+			if(m_oscDecoderMenu) {
 				decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
 				m_oscDecoderMenu->deleteLater();
 				m_oscDecoderMenu = nullptr;
@@ -686,8 +658,8 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	QComboBox *traceColorComboBox = new QComboBox();
 	traceColorComboBox->setObjectName("traceColorComboBox");
-	for (const auto &name : QColor::colorNames()) {
-		QPixmap pixmap(100,100);
+	for(const auto &name : QColor::colorNames()) {
+		QPixmap pixmap(100, 100);
 		QColor color(name);
 		pixmap.fill(color);
 		QIcon colorIcon(pixmap);
@@ -697,9 +669,9 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	QComboBox *currentChannelTriggerComboBox = new QComboBox();
 	currentChannelTriggerComboBox->addItem("-");
-	for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
+	for(int i = 1; i < ui->triggerComboBox->count(); ++i) {
 		currentChannelTriggerComboBox->addItem(ui->triggerComboBox->itemIcon(i),
-				    ui->triggerComboBox->itemText(i));
+						       ui->triggerComboBox->itemText(i));
 	}
 
 	currentChannelMenuLayout->addWidget(nameLineEdit);
@@ -758,13 +730,13 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 
 	comboBoxCondition->setDisabled(true);
 
-	connect(externalOnOff, &CustomSwitch::toggled, [=](bool on){
-		if (on) {
+	connect(externalOnOff, &CustomSwitch::toggled, [=](bool on) {
+		if(on) {
 			comboBoxCondition->setEnabled(true);
 			m_m2kDigital->getTrigger()->setDigitalSource(SRC_TRIGGER_IN);
 			const int condition = comboBoxCondition->currentIndex();
 			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+				static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
 		} else {
 			comboBoxCondition->setCurrentIndex(0);
 			comboBoxCondition->setDisabled(true);
@@ -772,14 +744,13 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 		}
 	});
 	comboBoxCondition->addItem("-");
-	for (int i = 1; i < ui->triggerComboBox->count(); ++i) {
-		comboBoxCondition->addItem(ui->triggerComboBox->itemIcon(i),
-				    ui->triggerComboBox->itemText(i));
+	for(int i = 1; i < ui->triggerComboBox->count(); ++i) {
+		comboBoxCondition->addItem(ui->triggerComboBox->itemIcon(i), ui->triggerComboBox->itemText(i));
 	}
 
-	connect(comboBoxCondition, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+	connect(comboBoxCondition, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
 		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+			static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
 	});
 
 	externalTriggerLayout->addLayout(externalGridLayout);
@@ -790,66 +761,73 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	tabWidget->addTab(channelEnumerator, "General");
 	const int channelMenuTabId = tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
-	m_oscChannelSelectedConnection = connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected){
-		chIdx -= m_oscAnalogChannels;
-		if (m_oscChannelSelected != chIdx && selected) {
-			m_oscChannelSelected = chIdx;
-			nameLineEdit->setEnabled(true);
-			nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
-			traceHeightLineEdit->setEnabled(true);
-			traceHeightLineEdit->setText(QString::number(m_oscPlotCurves[chIdx]->getTraceHeight()));
-			traceColorComboBox->setEnabled(true);
+	m_oscChannelSelectedConnection =
+		connect(m_oscPlot, &CapturePlot::channelSelected, [=](int chIdx, bool selected) {
+			chIdx -= m_oscAnalogChannels;
+			if(m_oscChannelSelected != chIdx && selected) {
+				m_oscChannelSelected = chIdx;
+				nameLineEdit->setEnabled(true);
+				nameLineEdit->setText(m_oscPlotCurves[chIdx]->getName());
+				traceHeightLineEdit->setEnabled(true);
+				traceHeightLineEdit->setText(QString::number(m_oscPlotCurves[chIdx]->getTraceHeight()));
+				traceColorComboBox->setEnabled(true);
 
-			if (m_oscChannelSelected < m_nbChannels) {
-				currentChannelTriggerComboBox->setEnabled(true);
-				QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
-														    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
-				currentChannelTriggerComboBox->setCurrentIndex(triggerBox->currentIndex());
-			} else {
+				if(m_oscChannelSelected < m_nbChannels) {
+					currentChannelTriggerComboBox->setEnabled(true);
+					QComboBox *triggerBox = qobject_cast<QComboBox *>(
+						chEnumeratorLayout
+							->itemAtPosition(m_oscChannelSelected % 8,
+									 m_oscChannelSelected / 8)
+							->layout()
+							->itemAt(1)
+							->widget());
+					currentChannelTriggerComboBox->setCurrentIndex(triggerBox->currentIndex());
+				} else {
+					currentChannelTriggerComboBox->setDisabled(true);
+					QSignalBlocker sb(currentChannelTriggerComboBox);
+					currentChannelTriggerComboBox->setCurrentIndex(0);
+				}
+
+				tabWidget->setCurrentIndex(channelMenuTabId);
+
+				if(m_oscChannelSelected < m_nbChannels) {
+					if(m_oscDecoderMenu) {
+						decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+						m_oscDecoderMenu->deleteLater();
+						m_oscDecoderMenu = nullptr;
+					}
+				} else {
+					if(m_oscDecoderMenu) {
+						decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
+						m_oscDecoderMenu->deleteLater();
+						m_oscDecoderMenu = nullptr;
+					}
+
+					AnnotationCurve *annCurve =
+						dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
+					m_oscDecoderMenu = annCurve->getCurrentDecoderStackMenu();
+					decoderSettingsLayout->addWidget(m_oscDecoderMenu);
+				}
+			} else if(m_oscChannelSelected == chIdx && !selected) {
+				m_oscChannelSelected = -1;
+				nameLineEdit->setDisabled(true);
+				nameLineEdit->setText("No channel selected!");
+				traceHeightLineEdit->setDisabled(true);
+				traceHeightLineEdit->setText("");
 				currentChannelTriggerComboBox->setDisabled(true);
-				QSignalBlocker sb(currentChannelTriggerComboBox);
 				currentChannelTriggerComboBox->setCurrentIndex(0);
-			}
 
-			tabWidget->setCurrentIndex(channelMenuTabId);
-
-			if (m_oscChannelSelected < m_nbChannels) {
-				if (m_oscDecoderMenu) {
+				if(m_oscDecoderMenu) {
 					decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
 					m_oscDecoderMenu->deleteLater();
 					m_oscDecoderMenu = nullptr;
 				}
-			} else {
-				if (m_oscDecoderMenu) {
-					decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
-					m_oscDecoderMenu->deleteLater();
-					m_oscDecoderMenu = nullptr;
-				}
-
-				AnnotationCurve *annCurve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
-				m_oscDecoderMenu = annCurve->getCurrentDecoderStackMenu();
-				decoderSettingsLayout->addWidget(m_oscDecoderMenu);
 			}
-		} else if (m_oscChannelSelected == chIdx && !selected) {
-			m_oscChannelSelected = -1;
-			nameLineEdit->setDisabled(true);
-			nameLineEdit->setText("No channel selected!");
-			traceHeightLineEdit->setDisabled(true);
-			traceHeightLineEdit->setText("");
-			currentChannelTriggerComboBox->setDisabled(true);
-			currentChannelTriggerComboBox->setCurrentIndex(0);
 
-			if (m_oscDecoderMenu) {
-				decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
-				m_oscDecoderMenu->deleteLater();
-				m_oscDecoderMenu = nullptr;
-			}
-		}
+			updateButtonStackedDecoder();
+		});
 
-		updateButtonStackedDecoder();
-	});
-
-	connect(traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+	connect(traceHeightLineEdit, &QLineEdit::editingFinished, [=]() {
 		int value = traceHeightLineEdit->text().toInt();
 		m_oscPlotCurves[m_oscChannelSelected]->setTraceHeight(value);
 		m_oscPlot->replot();
@@ -863,56 +841,63 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	});
 
 	connect(currentChannelTriggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-		if (m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
-			QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
-													    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
+		if(m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
+			QComboBox *triggerBox = qobject_cast<QComboBox *>(
+				chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8, m_oscChannelSelected / 8)
+					->layout()
+					->itemAt(1)
+					->widget());
 			triggerBox->setCurrentIndex(index);
 		}
 	});
 
-	connect(tabWidget, &QTabWidget::currentChanged, [=](int index){
-		if (index == tabWidget->indexOf(currentChannelMenuScrollArea)) {
-			if (m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
+	connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
+		if(index == tabWidget->indexOf(currentChannelMenuScrollArea)) {
+			if(m_oscChannelSelected != -1 && m_oscChannelSelected < m_nbChannels) {
 				currentChannelTriggerComboBox->setEnabled(true);
-				QComboBox *triggerBox = qobject_cast<QComboBox*>(chEnumeratorLayout->itemAtPosition(m_oscChannelSelected % 8,
-														    m_oscChannelSelected / 8)->layout()->itemAt(1)->widget());
+				QComboBox *triggerBox = qobject_cast<QComboBox *>(
+					chEnumeratorLayout
+						->itemAtPosition(m_oscChannelSelected % 8, m_oscChannelSelected / 8)
+						->layout()
+						->itemAt(1)
+						->widget());
 				currentChannelTriggerComboBox->setCurrentIndex(triggerBox->currentIndex());
 			}
 		}
 	});
 
 	connect(stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
-		if (m_oscChannelSelected < m_nbChannels) {
+		if(m_oscChannelSelected < m_nbChannels) {
 			return;
 		}
 
-		if (m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
+		if(m_oscChannelSelected > m_oscPlotCurves.size() - 1) {
 			return;
 		}
 
-		if (!stackDecoderComboBox->currentIndex()) {
+		if(!stackDecoderComboBox->currentIndex()) {
 			return;
 		}
 
 		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_oscPlotCurves[m_oscChannelSelected]);
 
-		if (!curve) {
+		if(!curve) {
 			return;
 		}
 
 		GSList *dl = g_slist_copy((GSList *)srd_decoder_list());
-		for (const GSList *sl = dl; sl; sl = sl->next) {
-		    srd_decoder *dec = (struct srd_decoder *)sl->data;
-		    if (QString::fromUtf8(dec->id) == text) {
-			curve->stackDecoder(std::make_shared<scopy::logic::Decoder>(dec));
-			break;
-		    }
+		for(const GSList *sl = dl; sl; sl = sl->next) {
+			srd_decoder *dec = (struct srd_decoder *)sl->data;
+			if(QString::fromUtf8(dec->id) == text) {
+				curve->stackDecoder(std::make_shared<scopy::logic::Decoder>(dec));
+				break;
+			}
 		}
 
 		// Update decoder menu. New decoder must be shown
 		// and it might also have some options that can
 		// be modified
-		if (m_oscDecoderMenu) {
+		if(m_oscDecoderMenu) {
 			decoderSettingsLayout->removeWidget(m_oscDecoderMenu);
 			m_oscDecoderMenu->deleteLater();
 			m_oscDecoderMenu = nullptr;
@@ -930,7 +915,7 @@ std::vector<QWidget *> LogicAnalyzer::enableMixedSignalView(CapturePlot *osc, in
 	tabWidget->addTab(generalScrollArea, "General");
 	tabWidget->addTab(currentChannelMenuScrollArea, "Channel");
 
-	MouseWheelWidgetGuard* m_wheelEventGuard1 = new MouseWheelWidgetGuard(generalScrollArea);
+	MouseWheelWidgetGuard *m_wheelEventGuard1 = new MouseWheelWidgetGuard(generalScrollArea);
 	m_wheelEventGuard1->installEventRecursively(generalScrollArea);
 
 	return {tabWidget, generalScrollArea};
@@ -946,7 +931,7 @@ void LogicAnalyzer::disableMixedSignalView()
 
 	// remove from osc plot the logic curves
 	QwtPlotCurve *curve = m_oscPlot->getDigitalPlotCurve(0);
-	while (curve != nullptr) {
+	while(curve != nullptr) {
 		m_oscPlot->removeDigitalPlotCurve(curve);
 		delete curve;
 
@@ -960,33 +945,22 @@ void LogicAnalyzer::disableMixedSignalView()
 	m_oscPlot = nullptr;
 }
 
-void LogicAnalyzer::addCurveToPlot(QwtPlotCurve *curve)
-{
+void LogicAnalyzer::addCurveToPlot(QwtPlotCurve *curve) {}
 
-}
+QwtPlot *LogicAnalyzer::getCurrentPlot() { return nullptr; }
 
-QwtPlot *LogicAnalyzer::getCurrentPlot()
-{
-	return nullptr;
-}
-
-void LogicAnalyzer::connectSignalsAndSlotsForPlot(CapturePlot *plot)
-{
-
-}
+void LogicAnalyzer::connectSignalsAndSlotsForPlot(CapturePlot *plot) {}
 
 void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 
-	if (checked && m_selectedChannel != -1) {
+	if(checked && m_selectedChannel != -1) {
 		ui->nameLineEdit->setText(m_plot.getChannelName(m_selectedChannel));
-		ui->traceHeightLineEdit->setText(QString::number(
-							 m_plotCurves[m_selectedChannel]->getTraceHeight()));
-		if (m_selectedChannel < m_nbChannels) {
-			int condition = static_cast<int>(
-						m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
+		ui->traceHeightLineEdit->setText(QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
+		if(m_selectedChannel < m_nbChannels) {
+			int condition =
+				static_cast<int>(m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
 			ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
 		}
 	}
@@ -994,14 +968,12 @@ void LogicAnalyzer::on_btnChannelSettings_toggled(bool checked)
 
 void LogicAnalyzer::on_btnCursors_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void LogicAnalyzer::on_btnTrigger_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 }
 
 void LogicAnalyzer::on_cursorsBox_toggled(bool on)
@@ -1014,12 +986,11 @@ void LogicAnalyzer::on_btnSettings_clicked(bool checked)
 {
 	CustomPushButton *btn = nullptr;
 
-	if (checked && !m_menuOrder.isEmpty()) {
+	if(checked && !m_menuOrder.isEmpty()) {
 		btn = m_menuOrder.back();
 		m_menuOrder.pop_back();
 	} else {
-		btn = static_cast<CustomPushButton *>(
-			ui->settings_group->checkedButton());
+		btn = static_cast<CustomPushButton *>(ui->settings_group->checkedButton());
 	}
 
 	btn->setChecked(checked);
@@ -1027,34 +998,31 @@ void LogicAnalyzer::on_btnSettings_clicked(bool checked)
 
 void LogicAnalyzer::on_btnGeneralSettings_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 	if(checked)
 		ui->btnSettings->setChecked(!checked);
 }
 
 void LogicAnalyzer::on_btnDecoderTable_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 
 	// When the bottom decoder button is clicked show/hide the right menu
 	// and ativate or deactivate the decoder table.
-	if (checked) {
-		if (!ui->btnStreamOneShot->isChecked()) {
+	if(checked) {
+		if(!ui->btnStreamOneShot->isChecked()) {
 			ui->btnStreamOneShot->click();
 		}
 
 		ui->decoderTableView->blockSignals(true);
 		QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
 		QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
-		connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
-			if (ui->btnDecoderTable->isChecked()) {
+		connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
+			if(ui->btnDecoderTable->isChecked()) {
 				ui->decoderTableView->blockSignals(false);
 				activateRunButton(false);
 				ui->decoderTableView->activate(true);
 			}
-
 		});
 		// delete the watcher when finished too
 		connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
@@ -1073,7 +1041,7 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 	// At the end of each animation, check if there are other button check
 	// actions that might have happened while animating and execute all
 	// these queued actions
-	while (m_menuButtonActions.size()) {
+	while(m_menuButtonActions.size()) {
 		auto pair = m_menuButtonActions.dequeue();
 		toggleRightMenu(pair.first, pair.second);
 	}
@@ -1081,13 +1049,12 @@ void LogicAnalyzer::rightMenuFinished(bool opened)
 
 void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 {
-	if (value > m_timePositionButton->maxValue() ||
-			value < m_timePositionButton->minValue()) {
+	if(value > m_timePositionButton->maxValue() || value < m_timePositionButton->minValue()) {
 		return;
 	}
 
 	const bool wasRunning = m_started;
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(false);
 	}
 
@@ -1099,7 +1066,7 @@ void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 	m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 	m_plot.replot();
 
-	if (m_resetHorizAxisOffset) {
+	if(m_resetHorizAxisOffset) {
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset;
 	}
 
@@ -1107,7 +1074,7 @@ void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 
 	updateBufferPreviewer(0, m_lastCapturedSample);
 
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(true);
 	}
 }
@@ -1115,7 +1082,7 @@ void LogicAnalyzer::onTimeTriggerValueChanged(double value)
 void LogicAnalyzer::onSampleRateValueChanged(double value)
 {
 	const bool wasRunning = m_started;
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(false);
 	}
 
@@ -1124,7 +1091,7 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 
 	resetViewport();
 
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(true);
 	}
 }
@@ -1132,13 +1099,13 @@ void LogicAnalyzer::onSampleRateValueChanged(double value)
 void LogicAnalyzer::onBufferSizeChanged(double value)
 {
 	const bool wasRunning = m_started;
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(false);
 	}
 
 	m_bufferSize = value;
 	resetViewport();
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(true);
 	}
 }
@@ -1146,7 +1113,7 @@ void LogicAnalyzer::onBufferSizeChanged(double value)
 void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 {
 	const bool wasRunning = m_started;
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(false);
 	}
 
@@ -1155,7 +1122,7 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 
 	m_m2kDigital->getTrigger()->setDigitalStreamingFlag(toggled);
 
-	if (toggled) { // oneshot
+	if(toggled) { // oneshot
 		m_plot.cancelZoom();
 		m_timePositionButton->setValue(m_timeTriggerOffset * m_sampleRate);
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
@@ -1171,11 +1138,10 @@ void LogicAnalyzer::on_btnStreamOneShot_toggled(bool toggled)
 		m_plot.zoomBaseUpdate();
 	}
 
-	m_bufferSizeButton->setMaxValue(toggled ? MAX_BUFFER_SIZE_ONESHOT
-						: MAX_BUFFER_SIZE_STREAM);
+	m_bufferSizeButton->setMaxValue(toggled ? MAX_BUFFER_SIZE_ONESHOT : MAX_BUFFER_SIZE_STREAM);
 	m_bufferPreviewer->setCursorVisible(toggled);
 
-	if (wasRunning) {
+	if(wasRunning) {
 		startStop(true);
 	}
 }
@@ -1185,11 +1151,11 @@ void LogicAnalyzer::on_btnGroupChannels_toggled(bool checked)
 	qDebug() << checked;
 	ui->btnGroupChannels->setText(checked ? "Done" : "Group");
 
-	if (checked) {
+	if(checked) {
 		m_plot.beginGroupSelection();
 	} else {
-		if (m_plot.endGroupSelection()) {
-//			channelSelectedChanged(m_selectedChannel, false);
+		if(m_plot.endGroupSelection()) {
+			//			channelSelectedChanged(m_selectedChannel, false);
 		}
 	}
 }
@@ -1200,9 +1166,9 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 	QSignalBlocker traceHeightLineEditBlocker(ui->traceHeightLineEdit);
 	QSignalBlocker traceColorComboBoxBlocker(ui->traceColorComboBox);
 	QSignalBlocker triggerComboBoxBlocker(ui->triggerComboBox);
-	if (m_selectedChannel != chIdx && selected) {
+	if(m_selectedChannel != chIdx && selected) {
 
-		if (!ui->btnChannelSettings->isChecked()) {
+		if(!ui->btnChannelSettings->isChecked()) {
 			ui->btnChannelSettings->setChecked(true);
 		}
 
@@ -1210,7 +1176,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 
 		m_selectedChannel = chIdx;
 
-		if (m_selectedChannel < m_nbChannels) {
+		if(m_selectedChannel < m_nbChannels) {
 			ui->hardwareName->setText("DIO " + QString::number(m_selectedChannel));
 		} else {
 			ui->hardwareName->setText("");
@@ -1219,14 +1185,13 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		ui->nameLineEdit->setEnabled(true);
 		ui->nameLineEdit->setText(m_plotCurves[m_selectedChannel]->getName());
 		ui->traceHeightLineEdit->setEnabled(true);
-		ui->traceHeightLineEdit->setText(
-					QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
+		ui->traceHeightLineEdit->setText(QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
 
 		// Sync color
 		ui->traceColorComboBox->setEnabled(true);
-		const auto traceColorindex = ui->traceColorComboBox->findData(
-			m_plotCurves[m_selectedChannel]->getTraceColor().name());
-		if (traceColorindex >= 0) {
+		const auto traceColorindex =
+			ui->traceColorComboBox->findData(m_plotCurves[m_selectedChannel]->getTraceColor().name());
+		if(traceColorindex >= 0) {
 			ui->traceColorComboBox->setCurrentIndex(traceColorindex);
 		}
 
@@ -1236,14 +1201,14 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 
 		updateChannelGroupWidget(true);
 
-		if (m_selectedChannel < m_nbChannels) {
+		if(m_selectedChannel < m_nbChannels) {
 			ui->triggerComboBox->setVisible(true);
 			ui->labelTrigger->setVisible(true);
-			int condition = static_cast<int>(
-						m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
+			int condition =
+				static_cast<int>(m_m2kDigital->getTrigger()->getDigitalCondition(m_selectedChannel));
 			ui->triggerComboBox->setCurrentIndex((condition + 1) % 6);
 
-			if (m_decoderMenu) {
+			if(m_decoderMenu) {
 				ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
 				m_decoderMenu->deleteLater();
 				m_decoderMenu = nullptr;
@@ -1254,7 +1219,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		} else {
 			ui->triggerComboBox->setVisible(false);
 			ui->labelTrigger->setVisible(false);
-			if (m_decoderMenu) {
+			if(m_decoderMenu) {
 				ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
 				m_decoderMenu->deleteLater();
 				m_decoderMenu = nullptr;
@@ -1265,7 +1230,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 
 			updateStackDecoderButton();
 		}
-	} else if (m_selectedChannel == chIdx && !selected) {
+	} else if(m_selectedChannel == chIdx && !selected) {
 		m_selectedChannel = -1;
 		ui->hardwareName->setText("");
 		ui->nameLineEdit->setDisabled(true);
@@ -1275,8 +1240,7 @@ void LogicAnalyzer::channelSelectedChanged(int chIdx, bool selected)
 		ui->triggerComboBox->setDisabled(true);
 		ui->triggerComboBox->setCurrentIndex(0);
 
-
-		if (m_decoderMenu) {
+		if(m_decoderMenu) {
 			ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
 			m_decoderMenu->deleteLater();
 			m_decoderMenu = nullptr;
@@ -1293,7 +1257,7 @@ void LogicAnalyzer::setupUi()
 	ui->setupUi(this);
 
 	// Hide the run button
-//	ui->runSingleWidget->enableRunButton(false);
+	//	ui->runSingleWidget->enableRunButton(false);
 
 	int gsettings_panel = ui->stackedWidget->indexOf(ui->generalSettings);
 	ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
@@ -1322,11 +1286,10 @@ void LogicAnalyzer::setupUi()
 	// Plot positioning and settings
 	m_plot.disableLegend();
 
-
 	// Build central widget
 
-	QWidget* centralWidget = new QWidget(this);
-	QVBoxLayout* vLayout = new QVBoxLayout(centralWidget);
+	QWidget *centralWidget = new QWidget(this);
+	QVBoxLayout *vLayout = new QVBoxLayout(centralWidget);
 	vLayout->setContentsMargins(0, 0, 0, 0);
 	vLayout->setSpacing(0);
 
@@ -1335,17 +1298,16 @@ void LogicAnalyzer::setupUi()
 	vLayout->addWidget(ui->hLayoutBufferPreview);
 
 	// add plot elements
-	QWidget* plotWidget = new QWidget(this);
+	QWidget *plotWidget = new QWidget(this);
 	plotWidget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
-	QGridLayout* gridLayout = new QGridLayout(plotWidget);
+	QGridLayout *gridLayout = new QGridLayout(plotWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
 	gridLayout->setContentsMargins(15, 0, 15, 0);
 	plotWidget->setLayout(gridLayout);
 	plotWidget->setMinimumWidth(200);
 
-	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
+	QSpacerItem *plotSpacer = new QSpacerItem(0, 5, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	gridLayout->addWidget(m_plot.topArea(), 0, 0, 1, 4);
 	gridLayout->addWidget(m_plot.topHandlesArea(), 1, 0, 1, 4);
@@ -1376,13 +1338,12 @@ void LogicAnalyzer::setupUi()
 	m_bufferPreviewer->setMinimumHeight(20);
 	m_bufferPreviewer->setMaximumHeight(20);
 	m_bufferPreviewer->setMinimumWidth(200);
-//	m_bufferPreviewer->setMaximumWidth(375);
+	//	m_bufferPreviewer->setMaximumWidth(375);
 	m_bufferPreviewer->setCursorPos(0.5);
 
 	m_bufferPreviewer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
 	ui->vLayoutBufferSlot->addWidget(m_bufferPreviewer);
-
 
 	// Setup sweep settings menu
 
@@ -1394,8 +1355,8 @@ void LogicAnalyzer::setupUi()
 
 	// Setup channel / decoder menu
 
-	for (const auto &name : QColor::colorNames()) {
-		QPixmap pixmap(100,100);
+	for(const auto &name : QColor::colorNames()) {
+		QPixmap pixmap(100, 100);
 		QColor color(name);
 		pixmap.fill(color);
 		QIcon colorIcon(pixmap);
@@ -1418,9 +1379,7 @@ void LogicAnalyzer::setupUi()
 
 	cursorsPositionButton = new CustomPlotPositionButton(cr_ui->posSelect);
 	connect(cursorsPositionButton, &CustomPlotPositionButton::positionChanged,
-		[=](CustomPlotPositionButton::ReadoutsPosition position){
-		m_plot.moveCursorReadouts(position);
-	});
+		[=](CustomPlotPositionButton::ReadoutsPosition position) { m_plot.moveCursorReadouts(position); });
 
 	cursorsPositionButton->setPosition(CustomPlotPositionButton::ReadoutsPosition::bottomRight);
 
@@ -1447,13 +1406,11 @@ void LogicAnalyzer::setupUi()
 	m_exportSettings = new ExportSettings(this);
 	m_exportSettings->enableExportButton(false);
 	ui->exportLayout->addWidget(m_exportSettings);
-	for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+	for(int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 		m_exportSettings->addChannel(i, "DIO" + QString::number(i));
 	}
 	m_exportSettings->disableUIMargins();
-	connect(m_exportSettings->getExportButton(), &QPushButton::clicked,
-		this, &LogicAnalyzer::exportData);
-
+	connect(m_exportSettings->getExportButton(), &QPushButton::clicked, this, &LogicAnalyzer::exportData);
 
 	// Filter in decoder table
 	filterMessages = new DropdownSwitchList(1, this);
@@ -1461,31 +1418,29 @@ void LogicAnalyzer::setupUi()
 	filterMessages->setColumnTitle(0, tr("Type"));
 	filterMessages->setColumnTitle(1, tr("Visible"));
 
-	connect(filterMessages->model(),
-			SIGNAL(itemChanged(QStandardItem*)),
-			SLOT(onFilterChanged(QStandardItem*)));
+	connect(filterMessages->model(), SIGNAL(itemChanged(QStandardItem *)), SLOT(onFilterChanged(QStandardItem *)));
 
 	ui->filterLayout->addWidget(filterMessages);
 
-	connect(ui->btnTableExport, &QPushButton::clicked,
-		ui->decoderTableView, &DecoderTable::exportData);
+	connect(ui->btnTableExport, &QPushButton::clicked, ui->decoderTableView, &DecoderTable::exportData);
 }
 
 void LogicAnalyzer::onFilterChanged(QStandardItem *item)
 {
-	if (!ui->decoderTableView->decoderModel())
+	if(!ui->decoderTableView->decoderModel())
 		return;
 	auto name = item->model()->item(item->index().row(), 0)->text();
 	int column = ui->decoderTableView->decoderModel()->getCurrentColumn();
 	auto filtered = ui->decoderTableView->decoderModel()->getFiltered()[column];
 
-	if (item->data(Qt::EditRole).toBool() && filtered.contains(name)) {
-		for (int i=0; i<filtered.size(); i++) {
-			if (filtered[i] == name) {
-				ui->decoderTableView->decoderModel()->getFiltered()[column].remove(i); ;
+	if(item->data(Qt::EditRole).toBool() && filtered.contains(name)) {
+		for(int i = 0; i < filtered.size(); i++) {
+			if(filtered[i] == name) {
+				ui->decoderTableView->decoderModel()->getFiltered()[column].remove(i);
+				;
 			}
 		}
-	} else if (!item->data(Qt::EditRole).toBool() && !filtered.contains(name)) {
+	} else if(!item->data(Qt::EditRole).toBool() && !filtered.contains(name)) {
 		ui->decoderTableView->decoderModel()->getFiltered()[column].append(name);
 	}
 
@@ -1496,21 +1451,18 @@ void LogicAnalyzer::onFilterChanged(QStandardItem *item)
 void LogicAnalyzer::addFilterRow(QIcon icon, QString name)
 {
 	filterMessages->addDropdownElement(icon, name);
-	filterCount ++;
+	filterCount++;
 }
 
 void LogicAnalyzer::clearFilter()
 {
-	for (int i = 0; i< filterCount; i++) {
+	for(int i = 0; i < filterCount; i++) {
 		filterMessages->removeItem(0);
 	}
 	filterCount = 0;
 }
 
-bool LogicAnalyzer::getTableInfo()
-{
-	return m_tableInfo;
-}
+bool LogicAnalyzer::getTableInfo() { return m_tableInfo; }
 
 bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
 {
@@ -1519,44 +1471,33 @@ bool LogicAnalyzer::setPrimaryAnntations(int column, int index)
 	auto curve = dynamic_cast<AnnotationCurve *>(getPlotCurves(true)[DIGITAL_NR_CHANNELS + column]);
 	std::map<Row, RowData> decoder(curve->getAnnotationRows());
 
-	for (int row = 0; row < curve->getAnnotationRows().size(); ++row) {
-		auto it = std::find_if(curve->getAnnotationRows().begin(), curve->getAnnotationRows().end(),
-				       [row](const std::pair<const Row, RowData> &t) -> bool{
-			return t.first.index() == row;
-		});
+	for(int row = 0; row < curve->getAnnotationRows().size(); ++row) {
+		auto it = std::find_if(
+			curve->getAnnotationRows().begin(), curve->getAnnotationRows().end(),
+			[row](const std::pair<const Row, RowData> &t) -> bool { return t.first.index() == row; });
 
-		if (!it->second.get_annotations().empty()) {
+		if(!it->second.get_annotations().empty()) {
 			auto title = curve->fromTitleToRowType(it->first.title());
 			ui->primaryAnnotationComboBox->addItem(title, it->first.index());
 		}
-
 	}
 
-	if (index != ui->primaryAnnotationComboBox->currentData().toInt()) {
+	if(index != ui->primaryAnnotationComboBox->currentData().toInt()) {
 		changed = true;
 	}
 
-	if (index != -1) {
+	if(index != -1) {
 		ui->primaryAnnotationComboBox->setCurrentIndex(ui->primaryAnnotationComboBox->findData(index));
 	}
 
 	return changed;
 }
 
-QComboBox* LogicAnalyzer::getDecoderComboBox()
-{
-	return ui->DecoderComboBox;
-}
+QComboBox *LogicAnalyzer::getDecoderComboBox() { return ui->DecoderComboBox; }
 
-void LogicAnalyzer::enableRunButton(bool flag)
-{
-	ui->runSingleWidget->getRunButton()->setEnabled(flag);
-}
+void LogicAnalyzer::enableRunButton(bool flag) { ui->runSingleWidget->getRunButton()->setEnabled(flag); }
 
-void LogicAnalyzer::enableSingleButton(bool flag)
-{
-	ui->runSingleWidget->getSingleButton()->setEnabled(flag);
-}
+void LogicAnalyzer::enableSingleButton(bool flag) { ui->runSingleWidget->getSingleButton()->setEnabled(flag); }
 
 void LogicAnalyzer::emitSearchSignal(int index)
 {
@@ -1566,7 +1507,7 @@ void LogicAnalyzer::emitSearchSignal(int index)
 
 void LogicAnalyzer::clearSearch(int index)
 {
-	if (!ui->decoderTableView->decoderModel())
+	if(!ui->decoderTableView->decoderModel())
 		return;
 
 	ui->searchBox->clear();
@@ -1577,16 +1518,17 @@ void LogicAnalyzer::PrimaryAnnotationChanged(int index)
 {
 	clearSearch();
 
-	if (index == -1) {
+	if(index == -1) {
 		index = 0;
 		ui->primaryAnnotationComboBox->setCurrentIndex(index);
 	}
-	ui->decoderTableView->decoderModel()->setPrimaryAnnotation(ui->primaryAnnotationComboBox->currentData().toInt());
+	ui->decoderTableView->decoderModel()->setPrimaryAnnotation(
+		ui->primaryAnnotationComboBox->currentData().toInt());
 }
 
 void LogicAnalyzer::selectedDecoderChanged(int index)
 {
-	if (ui->decoderTableView->decoderModel()) {
+	if(ui->decoderTableView->decoderModel()) {
 		ui->decoderTableView->decoderModel()->selectedDecoderChanged(index);
 	}
 }
@@ -1601,14 +1543,14 @@ void LogicAnalyzer::waitForDecoders()
 	while(this->isVisible()) {
 		usleep(100);
 		all_finished = true;
-		for (int row = DIGITAL_NR_CHANNELS; row < m_plotCurves.size(); row++) {
-			auto curve = dynamic_cast<AnnotationCurve*>(m_plotCurves[row]);
-			if (abs(curve->getState()) != 2) {
+		for(int row = DIGITAL_NR_CHANNELS; row < m_plotCurves.size(); row++) {
+			auto curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[row]);
+			if(abs(curve->getState()) != 2) {
 				all_finished = false;
 				break;
 			}
 		}
-		if (all_finished) {
+		if(all_finished) {
 			break;
 		}
 	}
@@ -1617,15 +1559,9 @@ void LogicAnalyzer::waitForDecoders()
 	setStatusLabel("");
 }
 
-int LogicAnalyzer::getGroupSize()
-{
-	return (ui->groupSizeSpinBox->value() != 0) ? ui->groupSizeSpinBox->value() : 1;
-}
+int LogicAnalyzer::getGroupSize() { return (ui->groupSizeSpinBox->value() != 0) ? ui->groupSizeSpinBox->value() : 1; }
 
-int LogicAnalyzer::getGroupOffset()
-{
-	return ui->groupOffsetSpinBox->value();
-}
+int LogicAnalyzer::getGroupOffset() { return ui->groupOffsetSpinBox->value(); }
 
 void LogicAnalyzer::setMaxGroupValues(int value)
 {
@@ -1636,14 +1572,11 @@ void LogicAnalyzer::setMaxGroupValues(int value)
 	ui->groupOffsetSpinBox->setMinimum(0);
 }
 
-void LogicAnalyzer::setStatusLabel(QString text)
-{
-	ui->statusLabel->setText(text);
-}
+void LogicAnalyzer::setStatusLabel(QString text) { ui->statusLabel->setText(text); }
 
 void LogicAnalyzer::activateRunButton(bool en)
 {
-	if (!en && getTme()->running()) {
+	if(!en && getTme()->running()) {
 		getTme()->setRunning(false);
 	}
 
@@ -1655,29 +1588,28 @@ void LogicAnalyzer::connectSignalsAndSlots()
 {
 	// connect all the signals and slots here
 
-
-	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(PrimaryAnnotationChanged(int)));
-//	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(emitSearchSignal(int)));
+	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this,
+		SLOT(PrimaryAnnotationChanged(int)));
+	//	connect(ui->primaryAnnotationComboBox, SIGNAL(currentIndexChanged(int)), this,
+	// SLOT(emitSearchSignal(int)));
 
 	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(selectedDecoderChanged(int)));
-//	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(clearSearch(int)));
+	//	connect(ui->DecoderComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(clearSearch(int)));
 
-	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled, this,
-		[=](bool checked){
-		if (checked) {
-			if (ui->decoderTableView->isActive()) {
+	connect(ui->runSingleWidget->getSingleButton(), &QPushButton::toggled, this, [=](bool checked) {
+		if(checked) {
+			if(ui->decoderTableView->isActive()) {
 				ui->decoderTableView->blockSignals(true);
 
 				QFuture<void> future = QtConcurrent::run(this, &LogicAnalyzer::waitForDecoders);
 				QFutureWatcher<void> *watcher = new QFutureWatcher<void>(this);
 
-				connect(watcher, &QFutureWatcher<void>::finished, this, [=](){
+				connect(watcher, &QFutureWatcher<void>::finished, this, [=]() {
 					ui->decoderTableView->blockSignals(false);
 					int currentCol = ui->decoderTableView->decoderModel()->getCurrentColumn();
 
 					ui->decoderTableView->decoderModel()->refreshSettings(currentCol);
 					ui->DecoderComboBox->setCurrentIndex(currentCol);
-
 				});
 				connect(watcher, SIGNAL(finished()), watcher, SLOT(deleteLater()));
 				watcher->setFuture(future);
@@ -1689,32 +1621,25 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 	connect(ui->groupOffsetSpinBox, SIGNAL(valueChanged(int)), ui->decoderTableView, SLOT(groupValuesChanged(int)));
 
-	connect(ui->searchBox, &QLineEdit::returnPressed,
-		[=](){
+	connect(ui->searchBox, &QLineEdit::returnPressed, [=]() {
 		QString text = ui->searchBox->text();
 		ui->decoderTableView->decoderModel()->searchBoxSlot(text);
 	});
 
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, [=](bool checked) {
 		tme->setRunning(checked);
-//		if (!checked) {
-//			m_plot.setTriggerState(CapturePlot::Stop);
-//		}
+		//		if (!checked) {
+		//			m_plot.setTriggerState(CapturePlot::Stop);
+		//		}
 	});
-	connect(tme, &ToolMenuEntry::runToggled,
-		ui->runSingleWidget, &RunSingleWidget::toggle);
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		this, &LogicAnalyzer::startStop);
+	connect(tme, &ToolMenuEntry::runToggled, ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, this, &LogicAnalyzer::startStop);
 
-
-	connect(ui->rightMenu, &MenuHAnim::finished,
-		this, &LogicAnalyzer::rightMenuFinished);
-
+	connect(ui->rightMenu, &MenuHAnim::finished, this, &LogicAnalyzer::rightMenuFinished);
 
 	// TODO: can be moved away from here into on_cursorsBox_toggled
-	connect(ui->cursorsBox, &QCheckBox::toggled, [=](bool toggled){
-		if (!toggled) {
+	connect(ui->cursorsBox, &QCheckBox::toggled, [=](bool toggled) {
+		if(!toggled) {
 			// make sure to deselect the cursors button if
 			// the cursors are disabled
 			ui->btnCursors->setChecked(false);
@@ -1726,66 +1651,58 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		}
 	});
 
-	connect(&m_plot, &CapturePlot::plotSizeChanged, [=](){
+	connect(&m_plot, &CapturePlot::plotSizeChanged, [=]() {
 		m_bufferPreviewer->setFixedWidth(m_plot.canvas()->size().width());
 		m_plotScrollBar->setFixedHeight(m_plot.canvas()->size().height());
 	});
 
 	// some conenctions for the cursors menu
-	connect(cr_ui->hCursorsEnable, &CustomSwitch::toggled,
-		&m_plot, &CapturePlot::setVertCursorsEnabled);
-	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled,
-		&m_plot, &CapturePlot::setHorizCursorsLocked);
+	connect(cr_ui->hCursorsEnable, &CustomSwitch::toggled, &m_plot, &CapturePlot::setVertCursorsEnabled);
+	connect(cr_ui->btnLockHorizontal, &QPushButton::toggled, &m_plot, &CapturePlot::setHorizCursorsLocked);
 
-	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value){
+	connect(cr_ui->horizontalSlider, &QSlider::valueChanged, [=](int value) {
 		cr_ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
 		m_plot.setCursorReadoutsTransparency(value);
 	});
 	// default: full transparency
 	cr_ui->horizontalSlider->setSliderPosition(100);
 
-	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
-		updateBufferPreviewer(0, m_lastCapturedSample);
-	});
+	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished,
+		[=](bool isZoomOut) { updateBufferPreviewer(0, m_lastCapturedSample); });
 
-	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged,
-		this, &LogicAnalyzer::onSampleRateValueChanged);
-	connect(m_bufferSizeButton, &ScaleSpinButton::valueChanged,
-		this, &LogicAnalyzer::onBufferSizeChanged);
+	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged, this, &LogicAnalyzer::onSampleRateValueChanged);
+	connect(m_bufferSizeButton, &ScaleSpinButton::valueChanged, this, &LogicAnalyzer::onBufferSizeChanged);
 
-	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value){
-		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0 ) / (1.0 / m_sampleRate);
+	connect(&m_plot, &CapturePlot::timeTriggerValueChanged, [=](double value) {
+		double delay = (value - 1.0 / m_sampleRate * m_bufferSize / 2.0) / (1.0 / m_sampleRate);
 		m_timePositionButton->setValue(static_cast<int>(delay));
 	});
 
-	connect(m_timePositionButton, &PositionSpinButton::valueChanged,
-		this, &LogicAnalyzer::onTimeTriggerValueChanged);
-
+	connect(m_timePositionButton, &PositionSpinButton::valueChanged, this,
+		&LogicAnalyzer::onTimeTriggerValueChanged);
 
 	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
 		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
 
-	connect(&m_plot, &CapturePlot::channelSelected,
-		this, &LogicAnalyzer::channelSelectedChanged);
+	connect(&m_plot, &CapturePlot::channelSelected, this, &LogicAnalyzer::channelSelectedChanged);
 
-	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text) {
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
 	});
 
-	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text) {
 		auto validator = ui->traceHeightLineEdit->validator();
 		QString toCheck = text;
 		int pos;
 
-		setDynamicProperty(ui->traceHeightLineEdit,
-				   "invalid",
+		setDynamicProperty(ui->traceHeightLineEdit, "invalid",
 				   validator->validate(toCheck, pos) == QIntValidator::Intermediate);
 	});
 
-	connect(ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+	connect(ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=]() {
 		int value = ui->traceHeightLineEdit->text().toInt();
 		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
 		m_plot.replot();
@@ -1799,47 +1716,48 @@ void LogicAnalyzer::connectSignalsAndSlots()
 	});
 
 	connect(ui->triggerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-		m_m2kDigital->getTrigger()->setDigitalCondition(m_selectedChannel,
-								static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
-		QLayout *widgetInLayout = ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8,
-							    m_selectedChannel / 8)->layout();
+		m_m2kDigital->getTrigger()->setDigitalCondition(
+			m_selectedChannel, static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+		QLayout *widgetInLayout =
+			ui->channelEnumeratorLayout->itemAtPosition(m_selectedChannel % 8, m_selectedChannel / 8)
+				->layout();
 		auto triggerBox = dynamic_cast<QComboBox *>(widgetInLayout->itemAt(1)->widget());
 		QSignalBlocker triggerBlocker(triggerBox);
 		triggerBox->setCurrentIndex(index);
 	});
 
 	connect(ui->stackDecoderComboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
-		if (m_selectedChannel < m_nbChannels) {
+		if(m_selectedChannel < m_nbChannels) {
 			return;
 		}
 
-		if (m_selectedChannel > m_plotCurves.size() - 1) {
+		if(m_selectedChannel > m_plotCurves.size() - 1) {
 			return;
 		}
 
-		if (!ui->stackDecoderComboBox->currentIndex()) {
+		if(!ui->stackDecoderComboBox->currentIndex()) {
 			return;
 		}
 
 		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[m_selectedChannel]);
 
-		if (!curve) {
+		if(!curve) {
 			return;
 		}
 
 		GSList *dl = g_slist_copy((GSList *)srd_decoder_list());
-		for (const GSList *sl = dl; sl; sl = sl->next) {
-		    srd_decoder *dec = (struct srd_decoder *)sl->data;
-		    if (QString::fromUtf8(dec->id) == text) {
-			curve->stackDecoder(std::make_shared<scopy::logic::Decoder>(dec));
-			break;
-		    }
+		for(const GSList *sl = dl; sl; sl = sl->next) {
+			srd_decoder *dec = (struct srd_decoder *)sl->data;
+			if(QString::fromUtf8(dec->id) == text) {
+				curve->stackDecoder(std::make_shared<scopy::logic::Decoder>(dec));
+				break;
+			}
 		}
 
 		// Update decoder menu. New decoder must be shown
 		// and it might also have some options that can
 		// be modified
-		if (m_decoderMenu) {
+		if(m_decoderMenu) {
 			ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
 			m_decoderMenu->deleteLater();
 			m_decoderMenu = nullptr;
@@ -1851,17 +1769,15 @@ void LogicAnalyzer::connectSignalsAndSlots()
 		updateStackDecoderButton();
 	});
 
-	connect(ui->printBtn, &QPushButton::clicked, [=](){
-		m_plot.printWithNoBackground("Logic Analyzer");
-	});
+	connect(ui->printBtn, &QPushButton::clicked, [=]() { m_plot.printWithNoBackground("Logic Analyzer"); });
 
-	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex& index) {
+	connect(ui->decoderTableView, &DecoderTable::clicked, [=](const QModelIndex &index) {
 		// When a row is clicked in the decoder table, update the plot
 		// to zoom into the sample area that was clicked.
 		// qDebug() << "Decoder item clicked " << index << Qt::endl;
-		if (index.data().canConvert<DecoderTableItem>()) {
+		if(index.data().canConvert<DecoderTableItem>()) {
 			DecoderTableItem item = qvariant_cast<DecoderTableItem>(index.data());
-			if (item.curve != nullptr) {
+			if(item.curve != nullptr) {
 				fitViewport(item.startTime(), item.endTime());
 			}
 		}
@@ -1873,9 +1789,8 @@ void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 	// Queue the action, if right menu animation is in progress. This way
 	// the action will be remembered and performed right after the animation
 	// finishes
-	if (ui->rightMenu->animInProgress()) {
-		m_menuButtonActions.enqueue(
-			QPair<CustomPushButton *, bool>(btn, checked));
+	if(ui->rightMenu->animInProgress()) {
+		m_menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
@@ -1888,8 +1803,8 @@ void LogicAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 
 	int id = btn->property("id").toInt();
 
-	if (id != -ui->stackedWidget->indexOf(ui->generalSettings)){
-		if (!m_menuOrder.contains(btn)){
+	if(id != -ui->stackedWidget->indexOf(ui->generalSettings)) {
+		if(!m_menuOrder.contains(btn)) {
 			m_menuOrder.push_back(btn);
 		} else {
 			m_menuOrder.removeOne(btn);
@@ -1897,7 +1812,7 @@ void LogicAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 		}
 	}
 
-	if (checked) {
+	if(checked) {
 		settingsPanelUpdate(id);
 	}
 
@@ -1906,16 +1821,16 @@ void LogicAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 
 void LogicAnalyzer::settingsPanelUpdate(int id)
 {
-	if (id >= 0) {
+	if(id >= 0) {
 		ui->stackedWidget->setCurrentIndex(0);
 	} else {
 		ui->stackedWidget->setCurrentIndex(-id);
 	}
 
-	for (int i = 0; i < ui->stackedWidget->count(); i++) {
+	for(int i = 0; i < ui->stackedWidget->count(); i++) {
 		QSizePolicy::Policy policy = QSizePolicy::Ignored;
 
-		if (i == ui->stackedWidget->currentIndex()) {
+		if(i == ui->stackedWidget->currentIndex()) {
 			policy = QSizePolicy::Expanding;
 		}
 		QWidget *widget = ui->stackedWidget->widget(i);
@@ -1933,9 +1848,8 @@ void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 	QwtInterval dataInterval(0.0, 0.0);
 	long long totalSamples = m_bufferSize;
 
-	if (totalSamples > 0) {
-		const int offset = ui->btnStreamOneShot->isChecked() ? m_timePositionButton->value()
-								     : 0;
+	if(totalSamples > 0) {
+		const int offset = ui->btnStreamOneShot->isChecked() ? m_timePositionButton->value() : 0;
 		dataInterval.setMinValue(offset / m_sampleRate);
 		dataInterval.setMaxValue((offset + max) / m_sampleRate);
 	}
@@ -1943,21 +1857,17 @@ void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 	// Use the two intervals to determine the width and position of the
 	// waveform and of the highlighted area
 	QwtInterval fullInterval = plotInterval | dataInterval;
-	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
-		fullInterval.width();
+	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) / fullInterval.width();
 	double wWidth = dataInterval.width() / fullInterval.width();
 
-	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
-		fullInterval.width();
+	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) / fullInterval.width();
 	double hWidth = plotInterval.width() / fullInterval.width();
 
 	// Determine the cursor position
-	QwtInterval containerInterval = (totalSamples > 0) ? dataInterval :
-		fullInterval;
+	QwtInterval containerInterval = (totalSamples > 0) ? dataInterval : fullInterval;
 	double containerWidth = (totalSamples > 0) ? wWidth : 1;
 	double containerPos = (totalSamples > 0) ? wPos : 0;
-	double cPosInContainer = 1 - (containerInterval.maxValue() - 0) /
-		containerInterval.width();
+	double cPosInContainer = 1 - (containerInterval.maxValue() - 0) / containerInterval.width();
 	double cPos = cPosInContainer * containerWidth + containerPos;
 
 	// Update the widget
@@ -1970,9 +1880,8 @@ void LogicAnalyzer::updateBufferPreviewer(int64_t min, int64_t max)
 
 void LogicAnalyzer::initBufferScrolling()
 {
-	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, [=](bool isZoomOut){
-		m_horizOffset = m_plot.HorizOffset();
-	});
+	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished,
+		[=](bool isZoomOut) { m_horizOffset = m_plot.HorizOffset(); });
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
 		m_resetHorizAxisOffset = false;
@@ -1988,27 +1897,28 @@ void LogicAnalyzer::initBufferScrolling()
 		m_plot.replot();
 		updateBufferPreviewer(0, m_lastCapturedSample);
 	});
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, [=](){
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, [=]() {
 		m_horizOffset = m_plot.HorizOffset();
 		m_resetHorizAxisOffset = true;
 	});
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=](){
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, [=]() {
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 +
 				      (ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate));
 		m_plot.replot();
 		updateBufferPreviewer(0, m_lastCapturedSample);
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 +
-				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
+			(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
 	});
 
 	// When the plot is clicked emit the clicked signal on the curve
 	m_plot.setMouseTracking(true);
 	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=](const QMouseEvent *event) {
-		if (event == nullptr) return;
+		if(event == nullptr)
+			return;
 
-		if (event->button() == Qt::LeftButton) {
+		if(event->button() == Qt::LeftButton) {
 			// qDebug() << "Plot clicked" << Qt::endl;
-			if (const auto curve = m_plot.curveAt(event->pos())) {
+			if(const auto curve = m_plot.curveAt(event->pos())) {
 				const QPointF p = curve->screenPosToCurvePoint(event->pos());
 				Q_EMIT curve->clicked(p);
 			}
@@ -2018,7 +1928,7 @@ void LogicAnalyzer::initBufferScrolling()
 
 void LogicAnalyzer::fitViewport(double min, double max)
 {
-	if (min > max) {
+	if(min > max) {
 		return;
 	}
 
@@ -2026,7 +1936,7 @@ void LogicAnalyzer::fitViewport(double min, double max)
 	auto dx = max - min;
 
 	// for 1 sample long annotations
-	if (min == max) {
+	if(min == max) {
 		dx = 0.0001;
 		min -= 0.00005;
 	}
@@ -2044,9 +1954,9 @@ void LogicAnalyzer::fitViewport(double min, double max)
 
 void LogicAnalyzer::resetViewport()
 {
-	if (ui->btnStreamOneShot->isChecked()) { // oneshot
+	if(ui->btnStreamOneShot->isChecked()) { // oneshot
 		m_plot.cancelZoom();
-//		m_timePositionButton->setValue(m_timeTriggerOffset * m_sampleRate);
+		//		m_timePositionButton->setValue(m_timeTriggerOffset * m_sampleRate);
 		m_plot.setHorizOffset(1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset);
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 + m_timeTriggerOffset;
 		m_plot.replot();
@@ -2069,23 +1979,25 @@ void LogicAnalyzer::resetViewport()
 
 	updateBufferPreviewer(0, m_lastCapturedSample);
 
-	double maxT = (1 << 13) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
-	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) - 1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
+	double maxT = (1 << 13) * (1.0 / m_sampleRate) -
+		1.0 / m_sampleRate * m_bufferSize / 2.0; // 8192 * time between samples
+	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) -
+		1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
 	m_plot.setTimeTriggerInterval(minT, maxT);
 }
 
 void LogicAnalyzer::startStop(bool start)
 {
-	if (m_started == start) {
-			return;
+	if(m_started == start) {
+		return;
 	}
 
 	m_started = start;
 	m_plot.startStop(start);
 
 	m_triggerUpdater->setEnabled(start);
-	if (start) {
-		if (m_captureThread) {
+	if(start) {
+		if(m_captureThread) {
 			m_stopRequested = true;
 			m_captureThread->join();
 			delete m_captureThread;
@@ -2100,24 +2012,22 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_m2kDigital->stopAcquisition();
 
-
 		const double sampleRate = m_sampleRateButton->value();
 		const uint64_t bufferSize = m_bufferSizeButton->value();
-		const int bufferSizeAdjusted = static_cast<int>(((bufferSize + 3 ) / 4) * 4);
+		const int bufferSizeAdjusted = static_cast<int>(((bufferSize + 3) / 4) * 4);
 		m_bufferSizeButton->setValue(bufferSizeAdjusted);
 
 		const bool oneShotOrStream = ui->btnStreamOneShot->isChecked();
 		qDebug() << "stream one shot is set to: " << oneShotOrStream;
 
-		const double delay = oneShotOrStream ? m_timeTriggerOffset * m_sampleRate
-					       : 0;
+		const double delay = oneShotOrStream ? m_timeTriggerOffset * m_sampleRate : 0;
 
 		const double setSampleRate = m_m2kDigital->setSampleRateIn((sampleRate + 1));
 		m_sampleRateButton->setValue(setSampleRate);
 
 		m_m2kDigital->getTrigger()->setDigitalStreamingFlag(!oneShotOrStream);
 
-		for (int i = 0; i < m_plotCurves.size(); ++i) {
+		for(int i = 0; i < m_plotCurves.size(); ++i) {
 			QwtPlotCurve *curve = m_plot.getDigitalPlotCurve(i);
 			GenericLogicPlotCurve *logic_curve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 			logic_curve->reset();
@@ -2129,17 +2039,15 @@ void LogicAnalyzer::startStop(bool start)
 
 		m_lastCapturedSample = 0;
 
-		m_captureThread = new std::thread([=](){
-
-			if (m_buffer) {
+		m_captureThread = new std::thread([=]() {
+			if(m_buffer) {
 				delete[] m_buffer;
 				m_buffer = nullptr;
 			}
 
 			m_buffer = new uint16_t[bufferSizeAdjusted];
-			QMetaObject::invokeMethod(this, [=](){
-				m_exportSettings->enableExportButton(true);
-			}, Qt::DirectConnection);
+			QMetaObject::invokeMethod(
+				this, [=]() { m_exportSettings->enableExportButton(true); }, Qt::DirectConnection);
 
 			uint64_t totalSamples = bufferSizeAdjusted;
 			uint64_t chunk_size = 0;
@@ -2149,10 +2057,10 @@ void LogicAnalyzer::startStop(bool start)
 			// clear any warning
 			m_plot.setMaxBufferSizeErrorLabel(false);
 
-			if (oneShotOrStream) { // oneshot
+			if(oneShotOrStream) { // oneshot
 				try {
 					m_m2kDigital->setKernelBuffersCountIn(1);
-				} catch (libm2k::m2k_exception &e) {
+				} catch(libm2k::m2k_exception &e) {
 					qDebug() << e.what();
 				}
 
@@ -2167,8 +2075,8 @@ void LogicAnalyzer::startStop(bool start)
 				/* ensure we have the minimum amount of kernel buffers to fit the buffer
 				 * ex: we want to capture a 40M buffer, we will use (at least) 10 kernel buffers
 				 * */
-				while (bufferSizeAdjusted > (m_currentKernelBuffers * oneBufferMaxSize)
-						&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+				while(bufferSizeAdjusted > (m_currentKernelBuffers * oneBufferMaxSize) &&
+				      m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
 					m_currentKernelBuffers++;
 				}
 
@@ -2176,9 +2084,9 @@ void LogicAnalyzer::startStop(bool start)
 				 * further divide it into smaller buffers (kernel buffers still available)
 				 * */
 				const double maxCaptureDuration = 0.1; // 100ms
-				while (((static_cast<double>(bufferSizeAdjusted) / setSampleRate)
-						/ static_cast<double>(m_currentKernelBuffers)) > maxCaptureDuration
-						&& m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
+				while(((static_cast<double>(bufferSizeAdjusted) / setSampleRate) /
+				       static_cast<double>(m_currentKernelBuffers)) > maxCaptureDuration &&
+				      m_currentKernelBuffers < MAX_KERNEL_BUFFERS) {
 					m_currentKernelBuffers++;
 				}
 
@@ -2191,30 +2099,32 @@ void LogicAnalyzer::startStop(bool start)
 				chunk_size = 4 * (chunk_size / 4);
 
 				/* If the chunk_size was not disible by 4 in the first place we would get a smaller
-				 * value for it. Let's check if we can increase the chunk_size to the next divisible by 4
-				 * number otherwise we need to add another kernel buffer if this is possible
+				 * value for it. Let's check if we can increase the chunk_size to the next divisible by
+				 * 4 number otherwise we need to add another kernel buffer if this is possible
 				 * */
-				if (chunk_size + 4 <= oneBufferMaxSize && chunkSizeBeforeAdjust != chunk_size) {
+				if(chunk_size + 4 <= oneBufferMaxSize && chunkSizeBeforeAdjust != chunk_size) {
 					chunk_size += 4;
 				}
 
 				// If the buffer size is > 64 * 4M we need to cap the chunk_size to 4M
-				if (chunk_size > oneBufferMaxSize) {
+				if(chunk_size > oneBufferMaxSize) {
 					chunk_size = oneBufferMaxSize;
 				}
 
-				if (bufferSizeAdjusted >= MAX_KERNEL_BUFFERS * oneBufferMaxSize) {
+				if(bufferSizeAdjusted >= MAX_KERNEL_BUFFERS * oneBufferMaxSize) {
 					/* in this case if the sample rate is greater than 5M samples / s
 					 * warn that data might not be continuos
 					 * */
-					if (setSampleRate > MAX_SR_STREAM) {
-						m_plot.setMaxBufferSizeErrorLabel(true, "Data might not be continuous, lower sample rate or buffer size");
+					if(setSampleRate > MAX_SR_STREAM) {
+						m_plot.setMaxBufferSizeErrorLabel(true,
+										  "Data might not be continuous, lower "
+										  "sample rate or buffer size");
 					}
 				}
 
 				try {
 					m_m2kDigital->setKernelBuffersCountIn(m_currentKernelBuffers);
-				} catch (libm2k::m2k_exception &e) {
+				} catch(libm2k::m2k_exception &e) {
 					qDebug() << e.what();
 				}
 
@@ -2237,56 +2147,51 @@ void LogicAnalyzer::startStop(bool start)
 				const uint64_t captureSize = std::min(chunk_size, totalSamples);
 
 				try {
-					if (m_autoMode) {
-						QMetaObject::invokeMethod(this, [=](){
-							m_timer->start(oneBufferTimeout);
-						});
+					if(m_autoMode) {
+						QMetaObject::invokeMethod(this,
+									  [=]() { m_timer->start(oneBufferTimeout); });
 					}
 
-					const uint16_t * const temp = m_m2kDigital->getSamplesP(chunk_size);
+					const uint16_t *const temp = m_m2kDigital->getSamplesP(chunk_size);
 					memcpy(m_buffer + absIndex, temp, sizeof(uint16_t) * captureSize);
 
 					absIndex += captureSize;
 					totalSamples -= captureSize;
 
-					if (m_autoMode) {
-						QMetaObject::invokeMethod(this, [=](){
-							m_timer->stop();
-						});
+					if(m_autoMode) {
+						QMetaObject::invokeMethod(this, [=]() { m_timer->stop(); });
 					}
 
-					if (m_triggerState.empty()) {
-						QMetaObject::invokeMethod(this, [=](){
-							m_triggerUpdater->setInput(CapturePlot::Triggered);
-						}, Qt::QueuedConnection);
+					if(m_triggerState.empty()) {
+						QMetaObject::invokeMethod(
+							this,
+							[=]() { m_triggerUpdater->setInput(CapturePlot::Triggered); },
+							Qt::QueuedConnection);
 					} else {
-						QMetaObject::invokeMethod(this, [=](){
-							m_triggerUpdater->setInput(CapturePlot::Auto);
-						}, Qt::QueuedConnection);
+						QMetaObject::invokeMethod(
+							this, [=]() { m_triggerUpdater->setInput(CapturePlot::Auto); },
+							Qt::QueuedConnection);
 					}
 
-				} catch (libm2k::m2k_exception &e) {
+				} catch(libm2k::m2k_exception &e) {
 					qDebug() << e.what() << " code: " << e.iioCode();
 					break;
 				}
 
-				if (m_stopRequested) {
+				if(m_stopRequested) {
 					break;
 				}
 
 				Q_EMIT dataAvailable(absIndex - captureSize, absIndex, m_buffer);
 
 				QMetaObject::invokeMethod(&m_plot, // trigger replot on Main Thread
-							  "replot",
-							  Qt::QueuedConnection);
+							  "replot", Qt::QueuedConnection);
 				m_lastCapturedSample = absIndex;
 				updateBufferPreviewer(0, m_lastCapturedSample);
 
-				QMetaObject::invokeMethod(this,
-							  "restoreTriggerState",
-							  Qt::QueuedConnection);
+				QMetaObject::invokeMethod(this, "restoreTriggerState", Qt::QueuedConnection);
 
-				if (!totalSamples && ui->runSingleWidget->runButtonChecked()) {
+				if(!totalSamples && ui->runSingleWidget->runButtonChecked()) {
 					m_m2kDigital->stopAcquisition();
 					{
 						std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
@@ -2310,42 +2215,37 @@ void LogicAnalyzer::startStop(bool start)
 					int ms = (int)(1000.0 / fps);
 					std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 				}
-			} while (totalSamples && !m_stopRequested);
+			} while(totalSamples && !m_stopRequested);
 
 			m_started = false;
 
-			if (ui->runSingleWidget->singleButtonChecked()) {
-				QMetaObject::invokeMethod(ui->runSingleWidget,
-							  "toggle",
-							  Qt::QueuedConnection,
+			if(ui->runSingleWidget->singleButtonChecked()) {
+				QMetaObject::invokeMethod(ui->runSingleWidget, "toggle", Qt::QueuedConnection,
 							  Q_ARG(bool, false));
 				m_triggerUpdater->setEnabled(false);
 			}
 			m_m2kDigital->stopAcquisition();
 
-			QMetaObject::invokeMethod(&m_plot,
-						  "replot");
+			QMetaObject::invokeMethod(&m_plot, "replot");
 
-			QMetaObject::invokeMethod(this, [=](){
-				m_exportSettings->enableExportButton(true);
-			}, Qt::DirectConnection);
-
+			QMetaObject::invokeMethod(
+				this, [=]() { m_exportSettings->enableExportButton(true); }, Qt::DirectConnection);
 		});
 
 	} else {
-		if (m_captureThread) {
+		if(m_captureThread) {
 			// a stop request might be triggered before getting to getSamplesP,
 			// thus cancelAcquisition in this case will be a no-op. In order to avoid
 			// this issue we wait for acquisition to be started
 			{
 				std::unique_lock<std::mutex> lock(m_acquisitionStartedMutex);
-				m_acquisitionStartedCv.wait(lock, [=]{ return m_acquisitionStarted; });
+				m_acquisitionStartedCv.wait(lock, [=] { return m_acquisitionStarted; });
 			}
 
 			m_stopRequested = true;
 			try {
 				m_m2kDigital->cancelAcquisition(); // cancelBufferIn
-			} catch (...) {
+			} catch(...) {
 				qDebug() << "Error";
 			}
 
@@ -2361,50 +2261,49 @@ void LogicAnalyzer::startStop(bool start)
 
 void LogicAnalyzer::setupDecoders()
 {
-	if (srd_decoder_load_all() != SRD_OK) {
+	if(srd_decoder_load_all() != SRD_OK) {
 		qDebug() << "Error: srd_decoder_load_all failed!";
 	}
 
 	ui->addDecoderComboBox->addItem(tr("Select a decoder to add"));
 
-
 	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 	decoderList = g_slist_sort(decoderList, sort_pds);
 
-	for (const GSList *sl = decoderList; sl; sl = sl->next) {
+	for(const GSList *sl = decoderList; sl; sl = sl->next) {
 
-	    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		srd_decoder *dec = (struct srd_decoder *)sl->data;
 
-	    QString decoderInput = "";
+		QString decoderInput = "";
 
-	    GSList *dec_channels = g_slist_copy(dec->inputs);
-	    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
-		decoderInput = QString::fromUtf8((char*)sl->data);
-	    }
-	    g_slist_free(dec_channels);
+		GSList *dec_channels = g_slist_copy(dec->inputs);
+		for(const GSList *sl = dec_channels; sl; sl = sl->next) {
+			decoderInput = QString::fromUtf8((char *)sl->data);
+		}
+		g_slist_free(dec_channels);
 
-	    if (decoderInput == "logic") {
-		ui->addDecoderComboBox->addItem(QString::fromUtf8(dec->id));
-	    }
+		if(decoderInput == "logic") {
+			ui->addDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+		}
 	}
 
 	g_slist_free(decoderList);
 
-	connect(ui->addDecoderComboBox,  qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) {
+	connect(ui->addDecoderComboBox, qOverload<int>(&QComboBox::currentIndexChanged), [=](int index) {
 		const QString &decoder = ui->addDecoderComboBox->itemText(index);
 		ui->addDecoderComboBox->clearFocus();
-		if (!ui->addDecoderComboBox->currentIndex()) {
+		if(!ui->addDecoderComboBox->currentIndex()) {
 			return;
 		}
 
 		std::shared_ptr<scopy::logic::Decoder> initialDecoder = nullptr;
 
 		GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
-		for (const GSList *sl = decoderList; sl; sl = sl->next) {
-		    srd_decoder *dec = (struct srd_decoder *)sl->data;
-		    if (QString::fromUtf8(dec->id) == decoder) {
-			initialDecoder = std::make_shared<scopy::logic::Decoder>(dec);
-		    }
+		for(const GSList *sl = decoderList; sl; sl = sl->next) {
+			srd_decoder *dec = (struct srd_decoder *)sl->data;
+			if(QString::fromUtf8(dec->id) == decoder) {
+				initialDecoder = std::make_shared<scopy::logic::Decoder>(dec);
+			}
 		}
 
 		g_slist_free(decoderList);
@@ -2415,18 +2314,19 @@ void LogicAnalyzer::setupDecoders()
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		auto connectionHandle = connect(this, &LogicAnalyzer::dataAvailable,
-			this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
-			if (!m_oscPlot) {
-				curve->dataAvailable(from, to, buffer);
-			}
-		}, Qt::DirectConnection);
+		auto connectionHandle = connect(
+			this, &LogicAnalyzer::dataAvailable, this,
+			[=](uint64_t from, uint64_t to, uint16_t *buffer) {
+				if(!m_oscPlot) {
+					curve->dataAvailable(from, to, buffer);
+				}
+			},
+			Qt::DirectConnection);
 
 		curve->setSampleRate(m_sampleRate);
 		curve->setBufferSize(m_bufferSize);
 
-		const double delay = ui->btnStreamOneShot ? m_timeTriggerOffset * m_sampleRate
-					       : 0;
+		const double delay = ui->btnStreamOneShot ? m_timeTriggerOffset * m_sampleRate : 0;
 		curve->setTimeTriggerOffset(delay);
 
 		curve->dataAvailable(0, m_lastCapturedSample, m_buffer);
@@ -2453,23 +2353,21 @@ void LogicAnalyzer::setupDecoders()
 		decoderBox->setVisible(true);
 		deleteBtn->setVisible(true);
 
-		connect(deleteBtn, &QPushButton::clicked, [=](){
+		connect(deleteBtn, &QPushButton::clicked, [=]() {
 			decoderMenuItem->deleteLater();
 
 			int chIdx = m_plotCurves.indexOf(curve);
 
-			if (chIdx == m_selectedChannel) {
+			if(chIdx == m_selectedChannel) {
 				channelSelectedChanged(chIdx, false);
-			} else if (chIdx < m_selectedChannel) {
+			} else if(chIdx < m_selectedChannel) {
 				m_selectedChannel--;
 			}
 
 			bool groupDeleted = false;
-			m_plot.removeFromGroup(chIdx,
-					       m_plot.getGroupOfChannel(chIdx).indexOf(chIdx),
-					       groupDeleted);
+			m_plot.removeFromGroup(chIdx, m_plot.getGroupOfChannel(chIdx).indexOf(chIdx), groupDeleted);
 
-			if (groupDeleted) {
+			if(groupDeleted) {
 				ui->groupWidget->setVisible(false);
 				m_currentGroup.clear();
 				ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
@@ -2485,21 +2383,21 @@ void LogicAnalyzer::setupDecoders()
 			delete curve;
 
 			// reposition decoder menu items after deleting one
-			for (int i = chIdx; i < m_plotCurves.size(); ++i) {
+			for(int i = chIdx; i < m_plotCurves.size(); ++i) {
 				const int index = i - 16; // subtract logic channels count
-				QLayoutItem *next = ui->decoderEnumeratorLayout->itemAtPosition((index + 1) / 2, (index + 1) % 2);
+				QLayoutItem *next =
+					ui->decoderEnumeratorLayout->itemAtPosition((index + 1) / 2, (index + 1) % 2);
 				ui->decoderEnumeratorLayout->removeItem(next);
 				ui->decoderEnumeratorLayout->addItem(next, index / 2, index % 2);
 			}
 		});
 
 		const int itemsInLayout = ui->decoderEnumeratorLayout->count();
-		ui->decoderEnumeratorLayout->addWidget(decoderMenuItem, itemsInLayout / 2,
-							itemsInLayout % 2);
+		ui->decoderEnumeratorLayout->addWidget(decoderMenuItem, itemsInLayout / 2, itemsInLayout % 2);
 
 		ui->addDecoderComboBox->setCurrentIndex(0);
 
-		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(decoderBox, &QCheckBox::toggled, [=](bool toggled) {
 			m_plot.enableDigitalPlotCurve(m_nbChannels + itemsInLayout, toggled);
 			m_plot.setOffsetWidgetVisible(m_nbChannels + itemsInLayout, toggled);
 			m_plot.positionInGroupChanged(m_nbChannels + itemsInLayout, 0, 0);
@@ -2508,12 +2406,12 @@ void LogicAnalyzer::setupDecoders()
 
 		decoderBox->setChecked(true);
 
-		connect(curve, &AnnotationCurve::decoderMenuChanged, [=](){
-			if (m_selectedChannel != chId) {
+		connect(curve, &AnnotationCurve::decoderMenuChanged, [=]() {
+			if(m_selectedChannel != chId) {
 				return;
 			}
 
-			if (m_decoderMenu) {
+			if(m_decoderMenu) {
 				ui->decoderSettingsLayout->removeWidget(m_decoderMenu);
 				m_decoderMenu->deleteLater();
 				m_decoderMenu = nullptr;
@@ -2525,7 +2423,8 @@ void LogicAnalyzer::setupDecoders()
 		});
 
 		connect(curve, &AnnotationCurve::annotationClicked, [=](AnnotationQueryResult result) {
-			if (!result.isValid() or !ui->decoderTableView->isActive()) return;
+			if(!result.isValid() or !ui->decoderTableView->isActive())
+				return;
 			const auto model = ui->decoderTableView->decoderModel();
 			const auto col = model->indexOfCurve(curve);
 			ui->DecoderComboBox->setCurrentIndex(col);
@@ -2534,9 +2433,9 @@ void LogicAnalyzer::setupDecoders()
 			title = title.erase(0, title.find(':') + 1);
 
 			int row_index = ui->primaryAnnotationComboBox->findText(QString::fromStdString(title));
-			if (row_index != -1) {
+			if(row_index != -1) {
 				int row = 0;
-				if (getGroupOffset() < result.index) {
+				if(getGroupOffset() < result.index) {
 					row = result.index / getGroupSize();
 				}
 				ui->primaryAnnotationComboBox->setCurrentIndex(row_index);
@@ -2544,25 +2443,24 @@ void LogicAnalyzer::setupDecoders()
 			}
 		});
 	});
-
 }
 
 void LogicAnalyzer::updateStackDecoderButton()
 {
 	qDebug() << "updateStackDecoderButton called!";
 
-	if (m_selectedChannel < m_nbChannels) {
+	if(m_selectedChannel < m_nbChannels) {
 		ui->stackDecoderWidget->setVisible(false);
 		return;
 	}
 
-	if (m_selectedChannel > m_plotCurves.size() - 1) {
+	if(m_selectedChannel > m_plotCurves.size() - 1) {
 		return;
 	}
 
 	AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[m_selectedChannel]);
 
-	if (!curve) {
+	if(!curve) {
 		return;
 	}
 
@@ -2577,26 +2475,26 @@ void LogicAnalyzer::updateStackDecoderButton()
 	GSList *decoderList = g_slist_copy((GSList *)srd_decoder_list());
 	decoderList = g_slist_sort(decoderList, sort_pds);
 	GSList *dec_channels = g_slist_copy(top->decoder()->outputs);
-	for (const GSList *sl = dec_channels; sl; sl = sl->next) {
-	    decoderOutput = QString::fromUtf8((char*)sl->data);
+	for(const GSList *sl = dec_channels; sl; sl = sl->next) {
+		decoderOutput = QString::fromUtf8((char *)sl->data);
 	}
 	g_slist_free(dec_channels);
-	for (const GSList *sl = decoderList; sl; sl = sl->next) {
+	for(const GSList *sl = decoderList; sl; sl = sl->next) {
 
-	    srd_decoder *dec = (struct srd_decoder *)sl->data;
+		srd_decoder *dec = (struct srd_decoder *)sl->data;
 
-	    QString decoderInput = "";
+		QString decoderInput = "";
 
-	    GSList *dec_channels = g_slist_copy(dec->inputs);
-	    for (const GSList *sl = dec_channels; sl; sl = sl->next) {
-		decoderInput = QString::fromUtf8((char*)sl->data);
-	    }
-	    g_slist_free(dec_channels);
+		GSList *dec_channels = g_slist_copy(dec->inputs);
+		for(const GSList *sl = dec_channels; sl; sl = sl->next) {
+			decoderInput = QString::fromUtf8((char *)sl->data);
+		}
+		g_slist_free(dec_channels);
 
-	    if (decoderInput == decoderOutput) {
-		qDebug() << "Added: " << QString::fromUtf8(dec->id);
-		ui->stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
-	    }
+		if(decoderInput == decoderOutput) {
+			qDebug() << "Added: " << QString::fromUtf8(dec->id);
+			ui->stackDecoderComboBox->addItem(QString::fromUtf8(dec->id));
+		}
 	}
 	g_slist_free(decoderList);
 
@@ -2614,20 +2512,20 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 
 	ui->groupWidget->setVisible(shouldBeVisible);
 
-	qDebug() << "channel group widget should be visible: " << shouldBeVisible
-		 << " visible: " << visible << " channelsInGroup: " << channelsInGroup.size();
+	qDebug() << "channel group widget should be visible: " << shouldBeVisible << " visible: " << visible
+		 << " channelsInGroup: " << channelsInGroup.size();
 
-	if (!shouldBeVisible) {
+	if(!shouldBeVisible) {
 		return;
 	}
 
-	if (channelsInGroup == m_currentGroup) {
+	if(channelsInGroup == m_currentGroup) {
 		return;
 	}
 
 	m_currentGroup = channelsInGroup;
 
-	if (m_currentGroupMenu) {
+	if(m_currentGroupMenu) {
 		ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
 		m_currentGroupMenu->deleteLater();
 		m_currentGroupMenu = nullptr;
@@ -2636,26 +2534,26 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 	m_currentGroupMenu = new BaseMenu(ui->groupWidget);
 	ui->groupWidgetLayout->addWidget(m_currentGroupMenu);
 
-	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
-		m_plot.positionInGroupChanged(m_selectedChannel, from, to);
-	});
+	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo,
+		[=](short from, short to) { m_plot.positionInGroupChanged(m_selectedChannel, from, to); });
 
-	for (int i = 0; i < channelsInGroup.size(); ++i) {
+	for(int i = 0; i < channelsInGroup.size(); ++i) {
 		QString name = m_plotCurves[channelsInGroup[i]]->getName();
 		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
-		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged,
-				item, &LogicGroupItem::setName);
-		connect(item, &LogicGroupItem::deleteBtnClicked, [=](){
+		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged, item,
+			&LogicGroupItem::setName);
+		connect(item, &LogicGroupItem::deleteBtnClicked, [=]() {
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
 
-			qDebug() << "m_selectedChannel: " << m_selectedChannel << " deleted: " << m_currentGroup[item->position()];
-			if (m_selectedChannel == m_currentGroup[item->position()] && !groupDeleted) {
+			qDebug() << "m_selectedChannel: " << m_selectedChannel
+				 << " deleted: " << m_currentGroup[item->position()];
+			if(m_selectedChannel == m_currentGroup[item->position()] && !groupDeleted) {
 				ui->groupWidget->setVisible(false);
 			}
 
 			m_currentGroup.removeAt(item->position());
-			if (groupDeleted) {
+			if(groupDeleted) {
 				ui->groupWidget->setVisible(false);
 				m_currentGroup.clear();
 				ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
@@ -2672,23 +2570,23 @@ void LogicAnalyzer::updateChannelGroupWidget(bool visible)
 
 void LogicAnalyzer::setupTriggerMenu()
 {
-	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled){
+	connect(ui->btnTriggerMode, &CustomSwitch::toggled, [=](bool toggled) {
 		m_autoMode = toggled;
-		if (m_autoMode && m_started) {
+		if(m_autoMode && m_started) {
 
 			double oneBufferTimeOut = m_timerTimeout;
 
-			if (!ui->btnStreamOneShot->isChecked()) {
+			if(!ui->btnStreamOneShot->isChecked()) {
 				oneBufferTimeOut /= m_currentKernelBuffers;
 			}
 
 			m_timer->start(oneBufferTimeOut);
 
-			qDebug() << "auto mode: " << m_autoMode << " with timeout: "
-				 << oneBufferTimeOut << " when logic is started: " << m_started;
+			qDebug() << "auto mode: " << m_autoMode << " with timeout: " << oneBufferTimeOut
+				 << " when logic is started: " << m_started;
 		}
 
-		if (toggled) {
+		if(toggled) {
 			m_triggerUpdater->setIdleState(CapturePlot::Auto);
 			m_triggerUpdater->setInput(CapturePlot::Auto);
 		} else {
@@ -2696,7 +2594,7 @@ void LogicAnalyzer::setupTriggerMenu()
 			m_triggerUpdater->setInput(CapturePlot::Waiting);
 		}
 
-		if (!m_autoMode) {
+		if(!m_autoMode) {
 			m_timer->stop();
 		}
 	});
@@ -2704,46 +2602,49 @@ void LogicAnalyzer::setupTriggerMenu()
 	ui->triggerLogicComboBox->addItem("OR");
 	ui->triggerLogicComboBox->addItem("AND");
 
-	connect(ui->triggerLogicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
+	connect(ui->triggerLogicComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
 		m_m2kDigital->getTrigger()->setDigitalMode(static_cast<libm2k::digital::DIO_TRIGGER_MODE>(index));
 	});
 
-	if (m_m2kDigital->getTrigger()->hasCrossInstrumentTrigger()) {
+	if(m_m2kDigital->getTrigger()->hasCrossInstrumentTrigger()) {
 		ui->externalWidget->setEnabled(true);
 		ui->lblWarningFw->setVisible(false);
 
 		ui->externalTriggerSourceComboBox->addItem(tr("External Trigger In"));
 		ui->externalTriggerSourceComboBox->addItem(tr("Oscilloscope"));
 
-		connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index){
-			m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
-			if (index) { // oscilloscope
-			/* set external trigger condition to none if the source is
-			* set to oscilloscope (trigger in)
-			* */
-				ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
-			}
+		connect(ui->externalTriggerSourceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			[=](int index) {
+				m_m2kDigital->getTrigger()->setDigitalSource(
+					static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(index));
+				if(index) { // oscilloscope
+					    /* set external trigger condition to none if the source is
+					     * set to oscilloscope (trigger in)
+					     * */
+					ui->externalTriggerConditionComboBox->setCurrentIndex(0); // None
+				}
 
-		/*
-		 * Disable the condition combo box if oscilloscope (trigger in) is selected
-		 * and enable it if external trigger in is selected (trigger logic)
-		 * */
-			ui->externalTriggerConditionComboBox->setDisabled(index);
-		});
+				/*
+				 * Disable the condition combo box if oscilloscope (trigger in) is selected
+				 * and enable it if external trigger in is selected (trigger logic)
+				 * */
+				ui->externalTriggerConditionComboBox->setDisabled(index);
+			});
 
-		connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](int index) {
-			m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-						static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
-		});
+		connect(ui->externalTriggerConditionComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+			[=](int index) {
+				m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((index + 5) % 6));
+			});
 
-
-		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on){
-			if (on) {
+		connect(ui->btnEnableExternalTrigger, &CustomSwitch::toggled, [=](bool on) {
+			if(on) {
 				const int source = ui->externalTriggerSourceComboBox->currentIndex();
 				const int condition = ui->externalTriggerConditionComboBox->currentIndex();
-				m_m2kDigital->getTrigger()->setDigitalSource(static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
+				m_m2kDigital->getTrigger()->setDigitalSource(
+					static_cast<M2K_TRIGGER_SOURCE_DIGITAL>(source));
 				m_m2kDigital->getTrigger()->setDigitalExternalCondition(
-							static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
+					static_cast<libm2k::M2K_TRIGGER_CONDITION_DIGITAL>((condition + 5) % 6));
 				ui->externalTriggerConditionComboBox->setDisabled(source);
 			} else {
 				m_m2kDigital->getTrigger()->setDigitalSource(M2K_TRIGGER_SOURCE_DIGITAL::SRC_NONE);
@@ -2751,8 +2652,7 @@ void LogicAnalyzer::setupTriggerMenu()
 		});
 
 		QSignalBlocker blockerExternalTriggerConditionComboBox(ui->externalTriggerConditionComboBox);
-		const int condition = static_cast<int>(
-					m_m2kDigital->getTrigger()->getDigitalExternalCondition());
+		const int condition = static_cast<int>(m_m2kDigital->getTrigger()->getDigitalExternalCondition());
 		ui->externalTriggerConditionComboBox->setCurrentIndex((condition + 1) % 6);
 
 		QSignalBlocker blockerExternalTriggerSourceComboBox(ui->externalTriggerSourceComboBox);
@@ -2763,29 +2663,30 @@ void LogicAnalyzer::setupTriggerMenu()
 		ui->lblWarningFw->setVisible(true);
 	}
 
-	connect(m_timer, &QTimer::timeout,
-		this, &LogicAnalyzer::saveTriggerState);
+	connect(m_timer, &QTimer::timeout, this, &LogicAnalyzer::saveTriggerState);
 }
 
 void LogicAnalyzer::saveTriggerState()
 {
 	// save trigger state and set to no trigger each channel
-	if (m_started && !m_triggerState.size()) {
+	if(m_started && !m_triggerState.size()) {
 		const bool streaming = !ui->btnStreamOneShot->isChecked();
-		if (streaming) {
+		if(streaming) {
 			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(false);
 		}
 
-		for (int i = 0; i < m_nbChannels; ++i) {
+		for(int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
-			m_m2kDigital->getTrigger()->setDigitalCondition(i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
+			m_m2kDigital->getTrigger()->setDigitalCondition(
+				i, M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
 		}
 
 		auto externalTriggerCondition = m_m2kDigital->getTrigger()->getDigitalExternalCondition();
 		m_triggerState.push_back(externalTriggerCondition);
-		m_m2kDigital->getTrigger()->setDigitalExternalCondition(M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
+		m_m2kDigital->getTrigger()->setDigitalExternalCondition(
+			M2K_TRIGGER_CONDITION_DIGITAL::NO_TRIGGER_DIGITAL);
 
-		if (streaming) {
+		if(streaming) {
 			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(true);
 		}
 	}
@@ -2794,20 +2695,20 @@ void LogicAnalyzer::saveTriggerState()
 void LogicAnalyzer::restoreTriggerState()
 {
 	// restored saved trigger state
-	if (m_triggerState.size()) {
+	if(m_triggerState.size()) {
 		const bool streaming = !ui->btnStreamOneShot->isChecked();
-		if (streaming) {
+		if(streaming) {
 			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(false);
 		}
 
-		for (int i = 0; i < m_nbChannels; ++i) {
+		for(int i = 0; i < m_nbChannels; ++i) {
 			m_triggerState.push_back(m_m2kDigital->getTrigger()->getDigitalCondition(i));
 			m_m2kDigital->getTrigger()->setDigitalCondition(i, m_triggerState[i]);
 		}
 
 		m_m2kDigital->getTrigger()->setDigitalExternalCondition(m_triggerState.back());
 
-		if (streaming) {
+		if(streaming) {
 			m_m2kDigital->getTrigger()->setDigitalStreamingFlag(true);
 		}
 
@@ -2819,18 +2720,20 @@ void LogicAnalyzer::readPreferences()
 {
 
 	bool showFps = p->get("general_show_plot_fps").toBool();
-	m_tableInfo =  p->get("m2k_logic_table_info").toBool(); //prefPanel->getTableInfo();
-	m_separateAnnotations =  p->get("m2k_logic_separate_annotations").toBool(); //prefPanel->getSeparateAnnotations();
+	m_tableInfo = p->get("m2k_logic_table_info").toBool(); // prefPanel->getTableInfo();
+	m_separateAnnotations =
+		p->get("m2k_logic_separate_annotations").toBool(); // prefPanel->getSeparateAnnotations();
 	m_plot.setVisibleFpsLabel(showFps);
 
-	for (GenericLogicPlotCurve *curve : qAsConst(m_plotCurves)) {
-		if (curve->getType() == LogicPlotCurveType::Data) {
-			LogicDataCurve *ldc = dynamic_cast<LogicDataCurve*>(curve);
-			if (!ldc) {
+	for(GenericLogicPlotCurve *curve : qAsConst(m_plotCurves)) {
+		if(curve->getType() == LogicPlotCurveType::Data) {
+			LogicDataCurve *ldc = dynamic_cast<LogicDataCurve *>(curve);
+			if(!ldc) {
 				continue;
 			}
 
-			ldc->setDisplaySampling(p->get("m2k_logic_display_sampling_points").toBool()/*prefPanel->getDisplaySamplingPoints()*/);
+			ldc->setDisplaySampling(p->get("m2k_logic_display_sampling_points")
+							.toBool() /*prefPanel->getDisplaySamplingPoints()*/);
 		}
 	}
 	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
@@ -2849,14 +2752,14 @@ void LogicAnalyzer::exportData()
 
 	m_exportConfig = m_exportSettings->getExportConfig();
 	auto keys = m_exportConfig.keys();
-	for (auto x : qAsConst(keys)) {
+	for(auto x : qAsConst(keys)) {
 		if(m_exportConfig[x]) {
-			noChannelEnabled =  false;
+			noChannelEnabled = false;
 			break;
 		}
 	}
 
-	if (noChannelEnabled)
+	if(noChannelEnabled)
 		return;
 
 	QStringList filter;
@@ -2865,16 +2768,16 @@ void LogicAnalyzer::exportData()
 	filter += QString(tr("Value Change Dump(*.vcd)"));
 	filter += QString(tr("All Files(*)"));
 
-	QString fileName = QFileDialog::getSaveFileName(this,
-	tr("Export"), "", filter.join(";;"),
-	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
+		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	if (fileName.isEmpty()) {
+	if(fileName.isEmpty()) {
 		return;
 	}
 
 	// Check the selected file type
-	if (selectedFilter != "") {
+	if(selectedFilter != "") {
 		if(selectedFilter.contains("comma", Qt::CaseInsensitive)) {
 			separator = ",";
 		}
@@ -2887,19 +2790,17 @@ void LogicAnalyzer::exportData()
 		}
 	}
 
-	if (fileName.split(".").size() <= 1) {
+	if(fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it
 		QString ext = selectedFilter.split(".")[1].split(")")[0];
 		fileName += "." + ext;
 	}
 
-
-
-	if (separator != "") {
+	if(separator != "") {
 		done = exportTabCsv(separator, fileName);
 	} else {
 		QFile file(fileName);
-		if (!file.open(QIODevice::WriteOnly)) {
+		if(!file.open(QIODevice::WriteOnly)) {
 			return;
 		}
 
@@ -2907,11 +2808,9 @@ void LogicAnalyzer::exportData()
 
 		/* Write the general information */
 		out << startRow << "date " << QDateTime::currentDateTime().toString() << endRow;
-//		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
-		out << startRow << "comment " << QString::number(m_bufferSize) <<
-		       " samples acquired at " << QString::number(m_sampleRate) <<
-		       " Hz " << endRow;
-
+		//		out << startRow << "version Scopy - " << QString(SCOPY_VERSION_GIT) << endRow;
+		out << startRow << "comment " << QString::number(m_bufferSize) << " samples acquired at "
+		    << QString::number(m_sampleRate) << " Hz " << endRow;
 
 		file.close();
 
@@ -2925,19 +2824,19 @@ bool LogicAnalyzer::exportTabCsv(const QString &separator, const QString &fileNa
 	fm.open(fileName, FileManager::EXPORT);
 
 	QStringList chNames;
-	for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
-		if (m_exportConfig[ch]) {
+	for(unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
+		if(m_exportConfig[ch]) {
 			chNames.push_back("Channel " + QString::number(ch));
 		}
 	}
-	for (unsigned int ch = DIGITAL_NR_CHANNELS; ch < m_plotCurves.size(); ch++){
+	for(unsigned int ch = DIGITAL_NR_CHANNELS; ch < m_plotCurves.size(); ch++) {
 		auto *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[ch]);
 		auto rows = curve->getAnnotationRows();
 
-		for (const auto& [key, value] : rows) {
+		for(const auto &[key, value] : rows) {
 			vector<Annotation> dest;
 			value.get_annotation_subset(dest, 0, m_lastCapturedSample);
-			if (!dest.empty()) {
+			if(!dest.empty()) {
 				chNames.push_back(key.title());
 			}
 		}
@@ -2945,13 +2844,13 @@ bool LogicAnalyzer::exportTabCsv(const QString &separator, const QString &fileNa
 
 	QVector<QVector<double>> data;
 
-	if (!m_buffer) {
+	if(!m_buffer) {
 		return false;
 	} else {
-		for (unsigned int i = 0; i < m_lastCapturedSample; ++i) {
+		for(unsigned int i = 0; i < m_lastCapturedSample; ++i) {
 			uint64_t sample = m_buffer[i];
 			QVector<double> line;
-			for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
+			for(unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
 				int bit = (sample >> ch) & 1;
 				if(m_exportConfig[ch]) {
 					line.push_back(bit);
@@ -2985,56 +2884,60 @@ QVector<QVector<QString>> LogicAnalyzer::createDecoderData(bool separate_annotat
 	QString repeated_value = "...";
 	QString empty_value = "";
 
-	for (int ch=DIGITAL_NR_CHANNELS; ch < m_plotCurves.size(); ch++) {
+	for(int ch = DIGITAL_NR_CHANNELS; ch < m_plotCurves.size(); ch++) {
 		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(m_plotCurves[ch]);
 		std::map<Row, RowData> decoder(curve->getAnnotationRows());
 		std::map<Row, RowData>::iterator it;
 
-		for (it = decoder.begin(); it != decoder.end(); it++) {
+		for(it = decoder.begin(); it != decoder.end(); it++) {
 			vector<Annotation> row;
 			it->second.get_annotation_subset(row, 0, m_lastCapturedSample);
 
-			if (!row.empty()) {
+			if(!row.empty()) {
 				rows.push_back(row);
 			}
 		}
 	}
 
-	for (unsigned int i = 0; i < m_lastCapturedSample; ++i) {
+	for(unsigned int i = 0; i < m_lastCapturedSample; ++i) {
 		decoder_line.clear();
 
-		for (unsigned int row_index = 0; row_index < rows.size(); row_index++) {
+		for(unsigned int row_index = 0; row_index < rows.size(); row_index++) {
 			colum_is_visible = false;
 
-			for(unsigned int col=0; col < rows[row_index].size(); col++){
+			for(unsigned int col = 0; col < rows[row_index].size(); col++) {
 				start_sample = rows[row_index][col].start_sample();
 				end_sample = rows[row_index][col].end_sample();
 				new_value = "";
 
-				if (separate_annotations) {
+				if(separate_annotations) {
 					// overlapping annotations
-					if ((col + 1) < rows[row_index].size()) {
+					if((col + 1) < rows[row_index].size()) {
 						if(end_sample == rows[row_index][col + 1].start_sample()) {
-							end_sample --;
+							end_sample--;
 						}
 					}
 
-					new_value = (start_sample == i && end_sample == i) ? start_separator + rows[row_index][col].annotations()[0] + end_separator
-							: (start_sample == i && end_sample > i) ? start_separator + rows[row_index][col].annotations()[0]
-							: (end_sample == i && start_sample < i) ? rows[row_index][col].annotations()[0] + end_separator
-							: (start_sample < i && end_sample > i) ? repeated_value
-												   : "";
-				} else if ((start_sample <= i && end_sample > i) || (start_sample == i && end_sample == i)) {
+					new_value = (start_sample == i && end_sample == i)
+						? start_separator + rows[row_index][col].annotations()[0] +
+							end_separator
+						: (start_sample == i && end_sample > i)
+							? start_separator + rows[row_index][col].annotations()[0]
+							: (end_sample == i && start_sample < i)
+								? rows[row_index][col].annotations()[0] + end_separator
+								: (start_sample < i && end_sample > i) ? repeated_value
+												       : "";
+				} else if((start_sample <= i && end_sample > i) ||
+					  (start_sample == i && end_sample == i)) {
 					new_value = rows[row_index][col].annotations()[0];
 				}
-				if (!new_value.isEmpty()) {
+				if(!new_value.isEmpty()) {
 					decoder_line.push_back(new_value);
 					colum_is_visible = true;
 					break;
 				}
-
 			}
-			if (!colum_is_visible) {
+			if(!colum_is_visible) {
 				decoder_line.push_back(empty_value);
 			}
 		}
@@ -3052,13 +2955,12 @@ bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, 
 	double timescale;
 	bool timestamp_written = false;
 
-	if (m_sampleRate == 0) {
+	if(m_sampleRate == 0) {
 		return false;
 	}
 
-
 	QFile file(fileName);
-	if (!file.open(QIODevice::Append)) {
+	if(!file.open(QIODevice::Append)) {
 		return false;
 	}
 
@@ -3066,13 +2968,13 @@ bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, 
 
 	/* Write the specific header */
 	timescale = 1 / m_sampleRate;
-	if (timescale < 1e-6) {
+	if(timescale < 1e-6) {
 		timescaleFormat = "ns";
 		timescale *= 1e9;
-	} else if (timescale < 1e-3) {
+	} else if(timescale < 1e-3) {
 		timescaleFormat = "us";
 		timescale *= 1e6;
-	} else if (timescale < 1) {
+	} else if(timescale < 1) {
 		timescaleFormat = "ms";
 		timescale *= 1e3;
 	} else {
@@ -3082,11 +2984,10 @@ bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, 
 	out << startSep << "timescale " << QString::number(timescale) << " " << timescaleFormat << endSep;
 	out << startSep << "scope module Scopy" << endSep;
 	int counter = 0;
-	for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
-		if (m_exportConfig[ch]) {
+	for(unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ++ch) {
+		if(m_exportConfig[ch]) {
 			char c = '!' + counter;
-			out << startSep << "var wire 1 " << c << " DIO" <<
-			       QString::number(ch) << endSep;
+			out << startSep << "var wire 1 " << c << " DIO" << QString::number(ch) << endSep;
 			counter++;
 		}
 	}
@@ -3094,28 +2995,28 @@ bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, 
 	out << startSep << "enddefinitions" << endSep;
 
 	/* Write the values */
-	if (m_buffer) {
-		for (uint64_t i = 0; i < m_lastCapturedSample; i++) {
+	if(m_buffer) {
+		for(uint64_t i = 0; i < m_lastCapturedSample; i++) {
 			current_sample = m_buffer[i];
-			if (i == 0) {
+			if(i == 0) {
 				prev_sample = current_sample;
 			} else {
 				prev_sample = m_buffer[i - 1];
 			}
 			timestamp_written = false;
 			p = 0;
-			for (unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
+			for(unsigned int ch = 0; ch < DIGITAL_NR_CHANNELS; ch++) {
 
 				current_bit = (current_sample >> ch) & 1;
 				prev_bit = (prev_sample >> ch) & 1;
 
-				if ((current_bit == prev_bit) && (i != 0)) {
+				if((current_bit == prev_bit) && (i != 0)) {
 					p++;
 					continue;
 				}
-				if (!timestamp_written)
+				if(!timestamp_written)
 					out << "#" << QString::number(i);
-				if (m_exportConfig[ch]) {
+				if(m_exportConfig[ch]) {
 					char c = '0' + current_bit;
 					char c2 = '!' + p;
 					out << ' ' << c << c2;
@@ -3123,7 +3024,7 @@ bool LogicAnalyzer::exportVcd(const QString &fileName, const QString &startSep, 
 					timestamp_written = true;
 				}
 			}
-			if (timestamp_written) {
+			if(timestamp_written) {
 				out << "\n";
 			}
 		}

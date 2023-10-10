@@ -1,7 +1,8 @@
-#include <QTest>
-#include <QList>
 #include "core/pluginrepository.h"
+
 #include <QLibrary>
+#include <QList>
+#include <QTest>
 
 using namespace scopy;
 
@@ -15,10 +16,8 @@ private:
 	QStringList libs;
 };
 
-
 #define NONPLUGIN_LIBRARY_LOCATION "../libscopycore.so"
 #define PLUGIN_LOCATION "../../plugins/plugins"
-
 
 void TST_PluginRepository::loadLibs()
 {
@@ -26,12 +25,10 @@ void TST_PluginRepository::loadLibs()
 	PluginManager *pm = p->getPluginManager();
 	QVERIFY(pm->metadata().isEmpty());
 	p->init(PLUGIN_LOCATION);
-//	QVERIFY(!pm->metadata().isEmpty());
-
+	//	QVERIFY(!pm->metadata().isEmpty());
 
 	delete p;
 }
-
 
 QTEST_MAIN(TST_PluginRepository)
 

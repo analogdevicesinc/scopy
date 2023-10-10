@@ -1,9 +1,10 @@
 #ifndef SEMIEXCLUSIVEBUTTONGROUP_H
 #define SEMIEXCLUSIVEBUTTONGROUP_H
 
+#include "scopy-gui_export.h"
+
 #include <QAbstractButton>
 #include <QButtonGroup>
-#include "scopy-gui_export.h"
 
 namespace scopy {
 class SCOPY_GUI_EXPORT SemiExclusiveButtonGroup : public QButtonGroup
@@ -29,5 +30,5 @@ protected:
 	bool m_exclusive;
 	QAbstractButton *m_lastBtn;
 };
-}
+} // namespace scopy
 #endif // SEMIEXCLUSIVEBUTTONGROUP_H

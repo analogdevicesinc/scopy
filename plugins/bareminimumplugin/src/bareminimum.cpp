@@ -1,26 +1,29 @@
 #include "bareminimum.h"
+
 #include <QBoxLayout>
 #include <QJsonDocument>
 #include <QLabel>
-#include <QPushButton>
 #include <QLoggingCategory>
+#include <QPushButton>
 #include <QSpacerItem>
-#include <pluginbase/preferences.h>
+
 #include <pluginbase/messagebroker.h>
+#include <pluginbase/preferences.h>
 #include <pluginbase/preferenceshelper.h>
 
-Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"BareMinimum");
+Q_LOGGING_CATEGORY(CAT_TESTPLUGIN, "BareMinimum");
 using namespace scopy;
 
-bool BareMinimum::compatible(QString m_param, QString category) {
-	qDebug(CAT_TESTPLUGIN)<<"compatible";
+bool BareMinimum::compatible(QString m_param, QString category)
+{
+	qDebug(CAT_TESTPLUGIN) << "compatible";
 	return true;
 }
 
-
 void BareMinimum::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("bareminimum_tool","MinimumTool",":/gui/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("bareminimum_tool", "MinimumTool",
+						  ":/gui/icons/scopy-default/icons/tool_home.svg"));
 }
 
 bool BareMinimum::onConnect()
@@ -37,12 +40,10 @@ bool BareMinimum::onDisconnect()
 	return true;
 }
 
-
-
 void BareMinimum::initMetadata() // not actually needed - putting it here to set priority
 {
 	loadMetadata(
-R"plugin(
+		R"plugin(
 	{
 	   "priority":-255,
 	   "category":[
@@ -51,7 +52,5 @@ R"plugin(
 	}
 )plugin");
 }
-
-
 
 #include "moc_bareminimum.cpp"

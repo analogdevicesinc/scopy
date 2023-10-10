@@ -1,15 +1,17 @@
 #ifndef MENULINEEDIT_H
 #define MENULINEEDIT_H
-#include <scopy-gui_export.h>
-#include <QWidget>
-#include <utils.h>
 #include <QHBoxLayout>
 #include <QLineEdit>
+#include <QWidget>
+
+#include <scopy-gui_export.h>
 #include <stylehelper.h>
+#include <utils.h>
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT MenuLineEdit : public QWidget {
+class SCOPY_GUI_EXPORT MenuLineEdit : public QWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
@@ -22,6 +24,6 @@ public:
 private:
 	QLineEdit *m_edit;
 };
-}
+} // namespace scopy
 
 #endif // MENULINEEDIT_H

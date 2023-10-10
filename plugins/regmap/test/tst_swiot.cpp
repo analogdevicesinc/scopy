@@ -7,7 +7,7 @@ private Q_SLOTS:
 	void hello();
 };
 
-void ScopyMainWindowTest::hello() {
+void ScopyMainWindowTest::hello(){
 
 };
 

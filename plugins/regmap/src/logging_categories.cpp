@@ -38,29 +38,27 @@ Q_LOGGING_CATEGORY(CAT_REGMAP, "REGISTERMAP")
 Q_LOGGING_CATEGORY(CAT_REGISTER_MAP_TABLE, "RegisterMapTable")
 #endif
 
-void SetScopyQDebugMessagePattern() {
+void SetScopyQDebugMessagePattern()
+{
 
-	qSetMessagePattern(
-        "[ "
-		#ifdef QDEBUG_LOG_MSG_TYPE
-			QDEBUG_LOG_MSG_TYPE_STR " "
-			QDEBUG_CATEGORY_STR " "
-		#endif
-		#ifdef QDEBUG_LOG_TIME
-			QDEBUG_LOG_TIME_STR
-		#endif
-		#ifdef QDEBUG_LOG_DATE
-			QDEBUG_LOG_DATE_STR
-		#endif
-		#ifdef QDEBUG_LOG_CATEGORY
-		QDEBUG_CATEGORY_STR
-		#endif
-		" ] "
-		#ifdef QDEBUG_LOG_FILE
-		QDEBUG_LOG_FILE_STR
-		#endif
+	qSetMessagePattern("[ "
+#ifdef QDEBUG_LOG_MSG_TYPE
+			   QDEBUG_LOG_MSG_TYPE_STR " " QDEBUG_CATEGORY_STR " "
+#endif
+#ifdef QDEBUG_LOG_TIME
+			   QDEBUG_LOG_TIME_STR
+#endif
+#ifdef QDEBUG_LOG_DATE
+				   QDEBUG_LOG_DATE_STR
+#endif
+#ifdef QDEBUG_LOG_CATEGORY
+					   QDEBUG_CATEGORY_STR
+#endif
+			   " ] "
+#ifdef QDEBUG_LOG_FILE
+			   QDEBUG_LOG_FILE_STR
+#endif
 
-		" - "
-		"%{message}"
-		);
+			   " - "
+			   "%{message}");
 }

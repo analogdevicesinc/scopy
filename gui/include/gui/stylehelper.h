@@ -2,18 +2,17 @@
 #define STYLEHELPER_H
 
 #include "widgets/hoverwidget.h"
-#include <QMap>
-#include <QLabel>
+
 #include <QCheckBox>
-#include <QPushButton>
+#include <QComboBox>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QMap>
+#include <QPushButton>
+#include <QVBoxLayout>
 
 #include <scopy-gui_export.h>
 #include <utils.h>
-
-
-#include <QVBoxLayout>
-#include <QComboBox>
 
 // Forward declarations
 namespace scopy {
@@ -23,10 +22,11 @@ class SpinBoxA;
 class MeasurementLabel;
 class StatsLabel;
 class MeasurementSelectorItem;
-}
+} // namespace scopy
 
 namespace scopy {
-class SCOPY_GUI_EXPORT StyleHelper : public QObject {
+class SCOPY_GUI_EXPORT StyleHelper : public QObject
+{
 	Q_OBJECT
 protected:
 	StyleHelper(QObject *parent = nullptr);
@@ -37,19 +37,20 @@ public:
 	StyleHelper(StyleHelper &other) = delete;
 	void operator=(const StyleHelper &) = delete;
 	static StyleHelper *GetInstance();
+
 public:
 	static void initColorMap();
 	static QString getColor(QString id);
-	static void SquareToggleButtonWithIcon(QPushButton* btn, QString objectName, bool checkable = false);
-	static void BlueButton(QPushButton *btn, QString objectName="");
-	static void SmallBlueButton(QPushButton *btn, QString objectName="");
-	static void BlueSquareCheckbox(QCheckBox *chk, QString objectName  = "");
+	static void SquareToggleButtonWithIcon(QPushButton *btn, QString objectName, bool checkable = false);
+	static void BlueButton(QPushButton *btn, QString objectName = "");
+	static void SmallBlueButton(QPushButton *btn, QString objectName = "");
+	static void BlueSquareCheckbox(QCheckBox *chk, QString objectName = "");
 	static void CollapseCheckbox(QCheckBox *chk, QString objectName = "");
 	static void ColoredCircleCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
 	static void ColoredSquareCheckbox(QCheckBox *chk, QColor color, QString objectName = "");
-	static void MenuMediumLabel(QLabel * lbl, QString objectName = "");
+	static void MenuMediumLabel(QLabel *lbl, QString objectName = "");
 	static void MenuControlButton(QPushButton *btn, QString objectName = "", bool checkable = true);
-	static void MenuControlWidget(QWidget* w, QColor color, QString objectName = "");
+	static void MenuControlWidget(QWidget *w, QColor color, QString objectName = "");
 	static void MenuLargeLabel(QLabel *lbl, QString objectName = "");
 	static void MenuHeaderLine(QFrame *line, QPen pen, QString objectName = "");
 	static void MenuHeaderWidget(QWidget *w, QString objectName = "");
@@ -79,19 +80,21 @@ public:
 	static void BackgroundWidget(QWidget *w, QString objectName = "");
 	static void TabWidgetLabel(QLabel *w, QString objectName = "");
 	static void TutorialChapterTitleLabel(QLabel *w, QString objectName = "");
-	static void MeasurementPanelLabel(MeasurementLabel* w, QString objectName = "");
-	static void StatsPanelLabel(StatsLabel* w, QString objectName = "");
-	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem* w, QString objectName = "");
+	static void MeasurementPanelLabel(MeasurementLabel *w, QString objectName = "");
+	static void StatsPanelLabel(StatsLabel *w, QString objectName = "");
+	static void MeasurementSelectorItemWidget(QString iconPath, MeasurementSelectorItem *w,
+						  QString objectName = "");
 	static void TimePlotHDivInfo(QLabel *w, QString objectName = "");
 	static void TimePlotSamplingInfo(QLabel *w, QString objectName = "");
-	static void DeviceIconBackgroundShadow(QAbstractButton* w, QString objectName = "");
-	static void FrameBackgroundShadow(QFrame* w, QString objectName = "");
+	static void DeviceIconBackgroundShadow(QAbstractButton *w, QString objectName = "");
+	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
+
 private:
-	QMap<QString,QString> colorMap;
-	static StyleHelper * pinstance_;
+	QMap<QString, QString> colorMap;
+	static StyleHelper *pinstance_;
 };
-}
+} // namespace scopy
 
 #endif // STYLEHELPER_H

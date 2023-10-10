@@ -21,14 +21,18 @@
 #include "customSwitch.h"
 
 #include <QDebug>
-#include <QResizeEvent>
 #include <QFile>
+#include <QResizeEvent>
 
 using namespace scopy;
 
-CustomSwitch::CustomSwitch(QWidget *parent) : QPushButton(parent),
-	on(this), off(this), handle(this), anim(&handle, "geometry"),
-	polarity(false)
+CustomSwitch::CustomSwitch(QWidget *parent)
+	: QPushButton(parent)
+	, on(this)
+	, off(this)
+	, handle(this)
+	, anim(&handle, "geometry")
+	, polarity(false)
 {
 	on.setObjectName("on");
 	off.setObjectName("off");
@@ -59,20 +63,19 @@ void CustomSwitch::updateOnOffLabels()
 
 bool CustomSwitch::event(QEvent *e)
 {
-	if (e->type() == QEvent::DynamicPropertyChange)
-	{
-		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent*>(e);
+	if(e->type() == QEvent::DynamicPropertyChange) {
+		QDynamicPropertyChangeEvent *const propEvent = static_cast<QDynamicPropertyChangeEvent *>(e);
 		QString propName = propEvent->propertyName();
-		if(propName=="leftText" && property("leftText").isValid())
+		if(propName == "leftText" && property("leftText").isValid())
 			on.setText(property("leftText").toString());
-		if(propName=="rightText" && property("rightText").isValid())
+		if(propName == "rightText" && property("rightText").isValid())
 			off.setText(property("rightText").toString());
-		if(propName=="polarity" && property("polarity").isValid())
+		if(propName == "polarity" && property("polarity").isValid())
 			polarity = property("polarity").toBool();
-		if(propName=="duration" && property("duration").isValid())
+		if(propName == "duration" && property("duration").isValid())
 			setDuration(property("duration").toInt());
-		if(propName=="bigBtn" && property("bigBtn").isValid()) {
-			if (property("bigBtn").toBool()) {
+		if(propName == "bigBtn" && property("bigBtn").isValid()) {
+			if(property("bigBtn").toBool()) {
 				QFile file(":/gui/stylesheets/bigCustomSwitch.qss");
 				file.open(QFile::ReadOnly);
 				QString styleSheet = QString::fromLatin1(file.readAll());
@@ -83,9 +86,7 @@ bool CustomSwitch::event(QEvent *e)
 	return QPushButton::event(e);
 }
 
-CustomSwitch::~CustomSwitch()
-{
-}
+CustomSwitch::~CustomSwitch() {}
 
 void CustomSwitch::setDuration(int ms)
 {
@@ -95,16 +96,15 @@ void CustomSwitch::setDuration(int ms)
 
 void CustomSwitch::toggleAnim(bool enabled)
 {
-	if (!isVisible())
+	if(!isVisible())
 		return;
 
 	QRect on_rect(0, handle.y(), handle.width(), handle.height());
-	QRect off_rect(width() - handle.width(), handle.y(),
-			handle.width(), handle.height());
+	QRect off_rect(width() - handle.width(), handle.y(), handle.width(), handle.height());
 
 	anim.stop();
 
-	if (enabled ^ polarity) {
+	if(enabled ^ polarity) {
 		anim.setStartValue(off_rect);
 		anim.setEndValue(on_rect);
 	} else {
@@ -119,39 +119,23 @@ void CustomSwitch::toggleAnim(bool enabled)
 void CustomSwitch::showEvent(QShowEvent *event)
 {
 	updateOnOffLabels();
-	if (isChecked() ^ polarity) {
-		handle.setGeometry(QRect(0, handle.y(), handle.width(),
-					 handle.height()));
+	if(isChecked() ^ polarity) {
+		handle.setGeometry(QRect(0, handle.y(), handle.width(), handle.height()));
+	} else {
+		handle.setGeometry(QRect(width() - handle.width(), handle.y(), handle.width(), handle.height()));
 	}
-	else {
-		handle.setGeometry(QRect(width() - handle.width(), handle.y(),
-					handle.width(), handle.height()));
-	}
-
 }
 
-const QLabel &CustomSwitch::getOn() const {
-        return on;
-}
+const QLabel &CustomSwitch::getOn() const { return on; }
 
-void CustomSwitch::setOnText(const QString &on_) {
-        this->on.setText(on_);
-}
+void CustomSwitch::setOnText(const QString &on_) { this->on.setText(on_); }
 
-const QLabel &CustomSwitch::getOff() const {
-        return off;
-}
+const QLabel &CustomSwitch::getOff() const { return off; }
 
-void CustomSwitch::setOffText(const QString &off_) {
-        this->off.setText(off_);
-}
+void CustomSwitch::setOffText(const QString &off_) { this->off.setText(off_); }
 
-void CustomSwitch::setOn(const QPixmap &pixmap) {
-        this->on.setPixmap(pixmap);
-}
+void CustomSwitch::setOn(const QPixmap &pixmap) { this->on.setPixmap(pixmap); }
 
-void CustomSwitch::setOff(const QPixmap &pixmap) {
-        this->off.setPixmap(pixmap);
-}
+void CustomSwitch::setOff(const QPixmap &pixmap) { this->off.setPixmap(pixmap); }
 
 #include "moc_customSwitch.cpp"

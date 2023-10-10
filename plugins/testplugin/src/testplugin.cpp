@@ -1,40 +1,44 @@
 #include "testplugin.h"
+
+#include "testtool.h"
+#include "tutorialoverlay.h"
+
 #include <QBoxLayout>
-#include <QJsonDocument>
-#include <QLabel>
-#include <QPushButton>
-#include <QLoggingCategory>
-#include <QSpacerItem>
-#include <pluginbase/preferences.h>
-#include <pluginbase/messagebroker.h>
-#include <pluginbase/preferenceshelper.h>
+#include <QDialog>
 #include <QFile>
 #include <QGraphicsEffect>
+#include <QJsonDocument>
+#include <QLabel>
+#include <QLoggingCategory>
 #include <QPainter>
-#include <QDialog>
+#include <QPushButton>
+#include <QSpacerItem>
+
 #include <cursorsettings.h>
-#include "tutorialoverlay.h"
 #include <gui/utils.h>
 #include <gui/widgets/hoverwidget.h>
+#include <pluginbase/messagebroker.h>
+#include <pluginbase/preferences.h>
+#include <pluginbase/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
-#include "testtool.h"
 
-Q_LOGGING_CATEGORY(CAT_TESTPLUGIN,"TestPlugin");
+Q_LOGGING_CATEGORY(CAT_TESTPLUGIN, "TestPlugin");
 using namespace scopy;
 
-bool TestPlugin::compatible(QString m_param, QString category) {
-	qDebug(CAT_TESTPLUGIN)<<"compatible";
+bool TestPlugin::compatible(QString m_param, QString category)
+{
+	qDebug(CAT_TESTPLUGIN) << "compatible";
 	return true;
 }
 
 void TestPlugin::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
-	p->init("pref1",false);
-	p->init("pref2",true);
-	p->init("prefstr","this is a string");
-	p->init("pref4","english");
+	p->init("pref1", false);
+	p->init("pref2", true);
+	p->init("prefstr", "this is a string");
+	p->init("pref4", "english");
 }
 
 bool TestPlugin::loadPreferencesPage()
@@ -46,18 +50,23 @@ bool TestPlugin::loadPreferencesPage()
 	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
 
 	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
-	MenuCollapseSection *generalSection = new MenuCollapseSection("General",MenuCollapseSection::MHCW_NONE, generalWidget);
+	MenuCollapseSection *generalSection =
+		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
 	generalWidget->contentLayout()->setSpacing(10);
 	generalWidget->contentLayout()->addWidget(generalSection);
 	generalSection->contentLayout()->setSpacing(10);
 	lay->setMargin(0);
 	lay->addWidget(generalWidget);
-	lay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Minimum,QSizePolicy::Expanding));
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"pref1","First Option",generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(p,"pref2","Second Option",generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceEdit(p,"prefstr","PreferenceString",generalSection));
-	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(p,"pref4","languages",{"english","french","italian"},generalSection));
+	generalSection->contentLayout()->addWidget(
+		PreferencesHelper::addPreferenceCheckBox(p, "pref1", "First Option", generalSection));
+	generalSection->contentLayout()->addWidget(
+		PreferencesHelper::addPreferenceCheckBox(p, "pref2", "Second Option", generalSection));
+	generalSection->contentLayout()->addWidget(
+		PreferencesHelper::addPreferenceEdit(p, "prefstr", "PreferenceString", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
+		p, "pref4", "languages", {"english", "french", "italian"}, generalSection));
 
 	return true;
 }
@@ -72,37 +81,39 @@ bool TestPlugin::loadPage()
 {
 	m_page = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_page);
-	lay->addWidget(new QLabel("TestPage",m_page));
-	QPushButton* restartBtn = new QPushButton("restartPlugin",m_page);
+	lay->addWidget(new QLabel("TestPage", m_page));
+	QPushButton *restartBtn = new QPushButton("restartPlugin", m_page);
 	lay->addWidget(restartBtn);
-	connect(restartBtn,SIGNAL(clicked()),this,SIGNAL(restartDevice()));
+	connect(restartBtn, SIGNAL(clicked()), this, SIGNAL(restartDevice()));
 	return true;
-
 }
 
 void TestPlugin::loadToolList()
 {
 	renameCnt = 0;
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1first","FirstPlugin",":/gui/icons/scopy-default/icons/tool_home.svg"));
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test1second","Second Plugin",":/gui/icons/scopy-default/icons/tool_io.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("test1first", "FirstPlugin", ":/gui/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("test1second", "Second Plugin", ":/gui/icons/scopy-default/icons/tool_io.svg"));
 }
 
 bool TestPlugin::loadExtraButtons()
 {
 	m_extraButtons.append(new QPushButton("Calibrate"));
 	m_extraButtons.append(new QPushButton("Register"));
-	connect(m_extraButtons[0],&QAbstractButton::clicked,this,[=](){edit->setText("Calibrating");});
-	connect(m_extraButtons[1],&QAbstractButton::clicked,this,[=](){edit->setText("Registering");});
+	connect(m_extraButtons[0], &QAbstractButton::clicked, this, [=]() { edit->setText("Calibrating"); });
+	connect(m_extraButtons[1], &QAbstractButton::clicked, this, [=]() { edit->setText("Registering"); });
 	return true;
 }
 
-void TestPlugin::startTutorial() {
+void TestPlugin::startTutorial()
+{
 
 	QWidget *window = Util::findContainingWindow(m_toolList[0]->tool());
 	gui::TutorialOverlay *tut = new gui::TutorialOverlay(window);
 
-	tut->addChapter({btn,lbl},
-R"story(
+	tut->addChapter({btn, lbl},
+			R"story(
 # First Button
 
 Two highlights with default **description** location.
@@ -112,7 +123,7 @@ Two highlights with default **description** location.
 
 One button, but tutorial *moved*
 )story");
-tut->addChapter(pic, R"story(
+	tut->addChapter(pic, R"story(
 # Picture
 
 Text overlayed on picture
@@ -120,19 +131,18 @@ Text overlayed on picture
 You can even put a picture on top
 ![ADALM2000 pic!](:/gui/icons/adalm.svg "svgg")
 )story");
-tut->addChapter(lbl, R"story(
+	tut->addChapter(lbl, R"story(
 # Cristi's Label
 
 This label is cool
 )story");
 
-tut->addChapter(nullptr,R"story(
+	tut->addChapter(nullptr, R"story(
 # Link
 
 For more info, visit [wiki](https://wiki.analog.com/)
 ![ADI](:/gui/icons/scopy-default/icons/logo.svg "ADI")
 )story");
-
 
 	tut->setTitle("Welcome to TestPlugin ! ");
 	tut->start();
@@ -141,8 +151,8 @@ For more info, visit [wiki](https://wiki.analog.com/)
 bool TestPlugin::onConnect()
 {
 	MessageBroker::GetInstance()->subscribe(this, "TestPlugin");
-	qDebug(CAT_TESTPLUGIN)<<"connect";
-	qDebug(CAT_TESTPLUGIN)<<m_toolList[0]->id()<<m_toolList[0]->name();
+	qDebug(CAT_TESTPLUGIN) << "connect";
+	qDebug(CAT_TESTPLUGIN) << m_toolList[0]->id() << m_toolList[0]->name();
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setName("TestPlugin");
@@ -156,22 +166,23 @@ bool TestPlugin::onConnect()
 	lay->addLayout(hlay);
 	lbl = new QLabel("TestPlugin", tool);
 
-	lbl->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Maximum);
+	lbl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 	hlay->addWidget(lbl);
-	hlay->addSpacerItem(new QSpacerItem(0,0,QSizePolicy::Expanding,QSizePolicy::Fixed));
+	hlay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Fixed));
 
-	pic = new QLabel("Picture",tool);
-	lbl2 = new QLabel("m_initText->"+m_initText,tool);
+	pic = new QLabel("Picture", tool);
+	lbl2 = new QLabel("m_initText->" + m_initText, tool);
 
-	btn = new QPushButton("detach",tool);
-	btn2 = new QPushButton("renameTool",tool);
-	btn3 = new QPushButton("tutorial",tool);
-	btn4 = new QPushButton("show hoverwidget",tool);
+	btn = new QPushButton("detach", tool);
+	btn2 = new QPushButton("renameTool", tool);
+	btn3 = new QPushButton("tutorial", tool);
+	btn4 = new QPushButton("show hoverwidget", tool);
 	btn4->setCheckable(true);
 
-	connect(btn,&QPushButton::clicked,this,[=](){m_toolList[0]->setAttached(!m_toolList[0]->attached());});
-	connect(btn2,&QPushButton::clicked,this,[=](){m_toolList[0]->setName("TestPlugin"+QString::number(renameCnt++));});
-	connect(btn3,&QPushButton::clicked,this,[=](){startTutorial();});
+	connect(btn, &QPushButton::clicked, this, [=]() { m_toolList[0]->setAttached(!m_toolList[0]->attached()); });
+	connect(btn2, &QPushButton::clicked, this,
+		[=]() { m_toolList[0]->setName("TestPlugin" + QString::number(renameCnt++)); });
+	connect(btn3, &QPushButton::clicked, this, [=]() { startTutorial(); });
 	edit = new QLineEdit(tool);
 	pic->setStyleSheet("border-image: url(\":/testplugin/testImage.png\") ");
 
@@ -201,7 +212,7 @@ void TestPlugin::initHoverWidgetTests()
 {
 	CursorSettings *cursorMenu = new CursorSettings();
 
-	HoverWidget* hover = new HoverWidget(cursorMenu, btn4, tool);
+	HoverWidget *hover = new HoverWidget(cursorMenu, btn4, tool);
 	hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hover->setContentPos(HoverPosition::HP_TOPRIGHT);
 	connect(btn4, &QPushButton::toggled, this, [=](bool b) {
@@ -211,71 +222,67 @@ void TestPlugin::initHoverWidgetTests()
 
 	QWidget *hoverTest = new QWidget(tool);
 	QHBoxLayout *hoverTestLayout = new QHBoxLayout(hoverTest);
-	QPushButton *testBtn = new  QPushButton(hoverTest);
+	QPushButton *testBtn = new QPushButton(hoverTest);
 
 	testBtn->setText("change content");
 	hoverTestLayout->addWidget(testBtn);
 	QLabel *testLabel = new QLabel("--HOVER TEST--");
 	testLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setContent(testLabel);});
+	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setContent(testLabel); });
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset content");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setContent(cursorMenu);});
+	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setContent(cursorMenu); });
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("change anchor");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setAnchor(edit);});
+	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setAnchor(edit); });
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset anchor");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setAnchor(btn4);});
+	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setAnchor(btn4); });
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("change parent");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setParent(lbl2);});
+	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setParent(lbl2); });
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset parent");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){hover->setParent(tool);});
+	connect(testBtn, &QPushButton::clicked, this, [=]() { hover->setParent(tool); });
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("change position");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){
+	connect(testBtn, &QPushButton::clicked, this, [=]() {
 		hover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 		hover->setContentPos(HoverPosition::HP_TOPLEFT);
 	});
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("reset position");
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::clicked, this, [=](){
+	connect(testBtn, &QPushButton::clicked, this, [=]() {
 		hover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 		hover->setContentPos(HoverPosition::HP_TOPRIGHT);
 	});
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("set draggable");
 	testBtn->setCheckable(true);
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled){
-		hover->setDraggable(toggled);
-	});
+	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled) { hover->setDraggable(toggled); });
 	testBtn->setStyleSheet("QPushButton::checked{background-color: grey;}");
 
-	testBtn = new  QPushButton(hoverTest);
+	testBtn = new QPushButton(hoverTest);
 	testBtn->setText("set relative");
 	testBtn->setCheckable(true);
 	hoverTestLayout->addWidget(testBtn);
-	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled){
-		hover->setRelative(toggled);
-	});
+	connect(testBtn, &QPushButton::toggled, this, [=](bool toggled) { hover->setRelative(toggled); });
 	testBtn->setStyleSheet("QPushButton::checked{background-color: grey;}");
 
 	tool->layout()->addWidget(hoverTest);
@@ -283,7 +290,7 @@ void TestPlugin::initHoverWidgetTests()
 
 bool TestPlugin::onDisconnect()
 {
-	qDebug(CAT_TESTPLUGIN)<<"disconnect";
+	qDebug(CAT_TESTPLUGIN) << "disconnect";
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunBtnVisible(false);
@@ -300,26 +307,17 @@ void TestPlugin::cloneExtra(Plugin *p)
 {
 	static int i = 0;
 
-	m_initText = dynamic_cast<TestPlugin*>(p)->m_initText;
+	m_initText = dynamic_cast<TestPlugin *>(p)->m_initText;
 
-	m_initText += " Cloned from original " +QString::number(i)+" times";
+	m_initText += " Cloned from original " + QString::number(i) + " times";
 	i++;
 }
 
-void TestPlugin::messageCallback(QString topic, QString message)
-{
-	qInfo(CAT_TESTPLUGIN) << topic <<": "<<message;
-}
+void TestPlugin::messageCallback(QString topic, QString message) { qInfo(CAT_TESTPLUGIN) << topic << ": " << message; }
 
-void TestPlugin::saveSettings(QSettings &s)
-{
-	m_pluginApi->save(s);
-}
+void TestPlugin::saveSettings(QSettings &s) { m_pluginApi->save(s); }
 
-void TestPlugin::loadSettings(QSettings &s)
-{
-	m_pluginApi->load(s);
-}
+void TestPlugin::loadSettings(QSettings &s) { m_pluginApi->load(s); }
 
 QString TestPlugin::about()
 {
@@ -330,7 +328,7 @@ QString TestPlugin::about()
 void TestPlugin::initMetadata()
 {
 	loadMetadata(
-R"plugin(
+		R"plugin(
 	{
 	   "priority":2,
 	   "category":[
@@ -340,25 +338,14 @@ R"plugin(
 )plugin");
 }
 
-void TestPlugin::init()
-{
-	m_initText = "This text was initialized";
-}
+void TestPlugin::init() { m_initText = "This text was initialized"; }
 
-QString TestPlugin::version() {
-	return "0.1";
-}
+QString TestPlugin::version() { return "0.1"; }
 
 // --------------------
 
-QString TestPlugin_API::testText() const
-{
-	return p->edit->text();
-}
+QString TestPlugin_API::testText() const { return p->edit->text(); }
 
-void TestPlugin_API::setTestText(const QString &newTestText)
-{
-	p->edit->setText(newTestText);
-}
+void TestPlugin_API::setTestText(const QString &newTestText) { p->edit->setText(newTestText); }
 
 #include "moc_testplugin.cpp"

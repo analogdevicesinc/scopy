@@ -18,22 +18,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef FAULTS_H
 #define FAULTS_H
 
-#include "pluginbase/toolmenuentry.h"
-#include "ui_swiotfaults.h"
-
 #include "faultspage.h"
-#include <gui/tool_view.hpp>
-#include <gui/generic_menu.hpp>
-#include <gui/channel_manager.hpp>
+#include "pluginbase/toolmenuentry.h"
+
+#include "ui_swiotfaults.h"
 
 #include <iio.h>
 
+#include <gui/channel_manager.hpp>
+#include <gui/generic_menu.hpp>
+#include <gui/tool_view.hpp>
+
 namespace scopy::swiot {
-class Faults : public QWidget {
+class Faults : public QWidget
+{
 	Q_OBJECT
 public:
 	explicit Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
@@ -42,7 +43,7 @@ public:
 	void pollFaults();
 
 Q_SIGNALS:
-        void backBtnPressed();
+	void backBtnPressed();
 
 public Q_SLOTS:
 	void runButtonClicked(bool toggled);
@@ -52,18 +53,19 @@ public Q_SLOTS:
 
 private Q_SLOTS:
 	void onBackBtnPressed();
-private:
-        void connectSignalsAndSlots();
-        void setupDynamicUi(QWidget *parent);
-	void initTutorialProperties();
-        static QPushButton* createBackButton();
 
-	struct iio_context* ctx;
+private:
+	void connectSignalsAndSlots();
+	void setupDynamicUi(QWidget *parent);
+	void initTutorialProperties();
+	static QPushButton *createBackButton();
+
+	struct iio_context *ctx;
 
 	Ui::Faults *ui;
-        QPushButton *m_backButton;
-	QLabel* m_statusLabel;
-	QWidget* m_statusContainer;
+	QPushButton *m_backButton;
+	QLabel *m_statusLabel;
+	QWidget *m_statusContainer;
 
 	QTimer *timer;
 	QThread *thread;
@@ -76,5 +78,5 @@ private:
 
 	ToolMenuEntry *m_tme;
 };
-}
+} // namespace scopy::swiot
 #endif // FAULTS_H

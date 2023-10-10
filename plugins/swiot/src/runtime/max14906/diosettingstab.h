@@ -18,11 +18,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DIOSETTINGSTAB_H
 #define DIOSETTINGSTAB_H
 
 #include <QWidget>
+
 #include <gui/spinbox_a.hpp>
 
 namespace Ui {
@@ -30,7 +30,8 @@ class DioSettingsTab;
 }
 
 namespace scopy::swiot {
-class DioSettingsTab : public QWidget {
+class DioSettingsTab : public QWidget
+{
 	Q_OBJECT
 public:
 	explicit DioSettingsTab(QWidget *parent = nullptr);
@@ -47,5 +48,5 @@ private:
 	Ui::DioSettingsTab *ui;
 	PositionSpinButton *m_max_spin_button;
 };
-}
+} // namespace scopy::swiot
 #endif // DIOSETTINGSTAB_H

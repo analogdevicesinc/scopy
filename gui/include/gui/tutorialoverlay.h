@@ -18,16 +18,17 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef TUTORIALOVERLAY_H
 #define TUTORIALOVERLAY_H
 
-#include <QWidget>
+#include "scopy-gui_export.h"
 #include "tintedoverlay.h"
 #include "tutorialchapter.h"
-#include <widgets/hoverwidget.h>
 #include "widgets/popupwidget.h"
-#include "scopy-gui_export.h"
+
+#include <QWidget>
+
+#include <widgets/hoverwidget.h>
 
 namespace Ui {
 class Tutorial;
@@ -42,16 +43,12 @@ public:
 	explicit TutorialOverlay(QWidget *parent = nullptr);
 	~TutorialOverlay();
 
-	TutorialChapter* addChapter(
-		const QList<QWidget*>& subjects,
-		const QString& description,
-		QWidget* mainWidget = nullptr,
-		int x_offset = 0,
-		int y_offset = 0,
-		HoverPosition anchor = HoverPosition::HP_CENTER,
-		HoverPosition content = HoverPosition::HP_CENTER);
-	TutorialChapter* addChapter(QWidget* subject, QString description);
-	void addChapter(TutorialChapter* ch);
+	TutorialChapter *addChapter(const QList<QWidget *> &subjects, const QString &description,
+				    QWidget *mainWidget = nullptr, int x_offset = 0, int y_offset = 0,
+				    HoverPosition anchor = HoverPosition::HP_CENTER,
+				    HoverPosition content = HoverPosition::HP_CENTER);
+	TutorialChapter *addChapter(QWidget *subject, QString description);
+	void addChapter(TutorialChapter *ch);
 
 	const QString &getTitle() const;
 	void setTitle(const QString &newTitle);
@@ -79,16 +76,15 @@ private:
 	void cleanupChapter();
 	bool eventFilter(QObject *watched, QEvent *event) override;
 
-	QList<TutorialChapter*> chapter;
+	QList<TutorialChapter *> chapter;
 	QWidget *parent;
 	TintedOverlay *overlay;
-	QList<TintedOverlay*> highlights;
+	QList<TintedOverlay *> highlights;
 	HoverWidget *m_hoverWidget;
 	QString title;
 	int cnt;
 	PopupWidget *m_popupWidget;
 };
-}
-
+} // namespace scopy::gui
 
 #endif // TUTORIALOVERLAY_H

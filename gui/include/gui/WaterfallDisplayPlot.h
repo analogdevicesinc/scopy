@@ -30,16 +30,19 @@
 #ifndef WATERFALL_DISPLAY_PLOT_H
 #define WATERFALL_DISPLAY_PLOT_H
 
-#include <gnuradio/high_res_timer.h>
 #include "DisplayPlot.h"
+
+#include <gnuradio/high_res_timer.h>
 //#include "spectrum_analyzer.hpp"
+#include "scopy-gui_export.h"
 #include "waterfallGlobalData.h"
+
+#include <qwt_interval.h>
 #include <qwt_plot_spectrogram.h>
+
 #include <cstdint>
 #include <cstdio>
 #include <vector>
-#include <qwt_interval.h>
-#include "scopy-gui_export.h"
 
 #if QWT_VERSION < 0x060000
 #include <gnuradio/qtgui/plot_waterfall.h>
@@ -56,17 +59,19 @@ typedef QwtInterval QwtDoubleInterval;
 class SCOPY_GUI_EXPORT ColorMap_DefaultDark : public QwtLinearColorMap
 {
 public:
-	ColorMap_DefaultDark() : QwtLinearColorMap(Qt::black, Qt::white)
+	ColorMap_DefaultDark()
+		: QwtLinearColorMap(Qt::black, Qt::white)
 	{
 		addColorStop(0.16, Qt::black);
-		addColorStop(0.33, QColor(58, 36, 59)); // deep purple
+		addColorStop(0.33, QColor(58, 36, 59));	 // deep purple
 		addColorStop(0.5, QColor(74, 100, 255)); // scopy blue
 		addColorStop(0.66, QColor(255, 144, 0)); // scopy orange
 		addColorStop(0.83, Qt::white);
 	}
 };
-enum {
-    INTENSITY_COLOR_MAP_TYPE_DEFAULT_DARK = 7
+enum
+{
+	INTENSITY_COLOR_MAP_TYPE_DEFAULT_DARK = 7
 };
 
 /*!
@@ -79,31 +84,25 @@ class SCOPY_GUI_EXPORT WaterfallDisplayPlot : public DisplayPlot
 	friend class SpectrumAnalyzer_API;
 	Q_OBJECT
 
-	Q_PROPERTY(int intensity_color_map_type1 READ getIntensityColorMapType1 WRITE
-		   setIntensityColorMapType1)
-	Q_PROPERTY(QColor low_intensity_color READ getUserDefinedLowIntensityColor WRITE
-		   setUserDefinedLowIntensityColor)
+	Q_PROPERTY(int intensity_color_map_type1 READ getIntensityColorMapType1 WRITE setIntensityColorMapType1)
+	Q_PROPERTY(
+		QColor low_intensity_color READ getUserDefinedLowIntensityColor WRITE setUserDefinedLowIntensityColor)
 	Q_PROPERTY(QColor high_intensity_color READ getUserDefinedHighIntensityColor WRITE
-		   setUserDefinedHighIntensityColor)
-	Q_PROPERTY(int color_map_title_font_size READ getColorMapTitleFontSize WRITE
-		   setColorMapTitleFontSize)
-
+			   setUserDefinedHighIntensityColor)
+	Q_PROPERTY(int color_map_title_font_size READ getColorMapTitleFontSize WRITE setColorMapTitleFontSize)
 
 public:
-	WaterfallDisplayPlot(int nplots, QWidget*);
+	WaterfallDisplayPlot(int nplots, QWidget *);
 	~WaterfallDisplayPlot() override;
 
 	void resetAxis(bool resetData = true);
 
-	void setFrequencyRange(const double,
-			       const double,
-			       const double units = 1000.0,
-			       const std::string& strunits = "kHz");
+	void setFrequencyRange(const double, const double, const double units = 1000.0,
+			       const std::string &strunits = "kHz");
 	double getStartFrequency() const;
 	double getStopFrequency() const;
 
-	void plotNewData(const std::vector<double*> &dataPoints,
-			 const int64_t numDataPoints,
+	void plotNewData(const std::vector<double *> &dataPoints, const int64_t numDataPoints,
 			 gr::high_res_timer_type acquisitionTime);
 
 	void setIntensityRange(double minIntensity, double maxIntensity);
@@ -151,8 +150,7 @@ public:
 	void useLogFreq(bool use_log_freq);
 	void updateZoomerBase();
 public Q_SLOTS:
-	void
-	setIntensityColorMapType(const unsigned int, const int, const QColor, const QColor);
+	void setIntensityColorMapType(const unsigned int, const int, const QColor, const QColor);
 	void setIntensityColorMapType1(int);
 	void setColorMapTitleFontSize(int tfs);
 	void setUserDefinedLowIntensityColor(QColor);
@@ -201,15 +199,15 @@ private:
 	double d_last_draw_time;
 	double d_center_plot_time;
 
-	std::vector<WaterfallData*> d_data;
+	std::vector<WaterfallData *> d_data;
 	TimePrefixFormatter d_TimeFormatter;
 	MetricPrefixFormatter freqFormatter;
 	PrefixFormatter *d_formatter;
 
 #if QWT_VERSION < 0x060000
-	std::vector<PlotWaterfall*> d_spectrogram;
+	std::vector<PlotWaterfall *> d_spectrogram;
 #else
-	std::vector<QwtPlotSpectrogram*> d_spectrogram;
+	std::vector<QwtPlotSpectrogram *> d_spectrogram;
 #endif
 
 	std::vector<int> d_intensity_color_map_type;
@@ -217,6 +215,6 @@ private:
 	QColor d_user_defined_high_intensity_color;
 	int d_color_bar_title_font_size;
 };
-}
+} // namespace scopy
 
 #endif /* WATERFALL_DISPLAY_PLOT_H */

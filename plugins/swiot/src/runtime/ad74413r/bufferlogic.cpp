@@ -18,30 +18,31 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "bufferlogic.h"
+
+#include "chnlinfobuilder.h"
 #include "src/runtime/ad74413r/ad74413r.h"
 #include "src/swiot_logging_categories.h"
-#include "chnlinfobuilder.h"
-#include <iioutil/iiocommand/iiochannelattributewrite.h>
+
 #include <iioutil/iiocommand/iiochannelattributeread.h>
+#include <iioutil/iiocommand/iiochannelattributewrite.h>
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 
 using namespace scopy::swiot;
 
-BufferLogic::BufferLogic(QMap<QString, iio_device*> devicesMap, CommandQueue *commandQueue)
+BufferLogic::BufferLogic(QMap<QString, iio_device *> devicesMap, CommandQueue *commandQueue)
 	: m_plotChnlsNo(0)
 	, m_iioDevicesMap(devicesMap)
 	, m_commandQueue(commandQueue)
 {
-	if (m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
+	if(m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
 		createChannels();
 	}
 }
 
 BufferLogic::~BufferLogic()
 {
-	if (m_chnlsInfo.size() > 0) {
+	if(m_chnlsInfo.size() > 0) {
 		qDeleteAll(m_chnlsInfo);
 		m_chnlsInfo.clear();
 	}
@@ -54,37 +55,36 @@ void BufferLogic::createChannels()
 		int plotChnlsNo = 0;
 		int chnlIdx = -1;
 		const QRegExp rx("[^0-9]+");
-		for (int i = 0; i < chnlsNumber; i++) {
-			struct iio_channel* iioChnl = iio_device_get_channel(m_iioDevicesMap[AD_NAME], i);
+		for(int i = 0; i < chnlsNumber; i++) {
+			struct iio_channel *iioChnl = iio_device_get_channel(m_iioDevicesMap[AD_NAME], i);
 			QString chnlId(iio_channel_get_id(iioChnl));
 			QString chnlName(iio_channel_get_name(iioChnl));
 			ChnlInfo *channelInfo = ChnlInfoBuilder::build(iioChnl, chnlId[0].toLower(), m_commandQueue);
-			const auto&& parts = chnlId.split(rx);
+			const auto &&parts = chnlId.split(rx);
 			chnlIdx = -1;
-			plotChnlsNo = (!channelInfo->isOutput() && channelInfo->isScanElement()) ? (plotChnlsNo + 1) : plotChnlsNo;
-			if (parts.size() <= 1) {
+			plotChnlsNo = (!channelInfo->isOutput() && channelInfo->isScanElement()) ? (plotChnlsNo + 1)
+												 : plotChnlsNo;
+			if(parts.size() <= 1) {
 				continue;
 			}
-			if(parts[1].compare("")){
+			if(parts[1].compare("")) {
 				chnlIdx = parts[1].toInt();
 				chnlIdx = (channelInfo->isOutput()) ? (chnlIdx + MAX_INPUT_CHNLS_NO) : chnlIdx;
 			}
 			m_chnlsInfo[chnlIdx] = channelInfo;
-			connect(channelInfo, &ChnlInfo::instantValueChanged, this, [=, this](double value) {
-				Q_EMIT instantValueChanged(chnlIdx, value);
-			});
+			connect(channelInfo, &ChnlInfo::instantValueChanged, this,
+				[=, this](double value) { Q_EMIT instantValueChanged(chnlIdx, value); });
 		}
 		m_plotChnlsNo = plotChnlsNo;
 	}
-
 }
 
 bool BufferLogic::verifyChannelsEnabledChanges(std::vector<bool> enabledChnls)
 {
 	bool changes = false;
-	for (int i = 0; i < enabledChnls.size(); i++) {
-		if (m_chnlsInfo.contains(i)) {
-			if (enabledChnls[i] != m_chnlsInfo[i]->isEnabled()) {
+	for(int i = 0; i < enabledChnls.size(); i++) {
+		if(m_chnlsInfo.contains(i)) {
+			if(enabledChnls[i] != m_chnlsInfo[i]->isEnabled()) {
 				changes = true;
 				break;
 			}
@@ -95,9 +95,9 @@ bool BufferLogic::verifyChannelsEnabledChanges(std::vector<bool> enabledChnls)
 
 void BufferLogic::applyChannelsEnabledChanges(std::vector<bool> enabledChnls)
 {
-	for (int i = 0; i < enabledChnls.size(); i++) {
-		if (m_chnlsInfo.contains(i)) {
-			if (enabledChnls[i] != m_chnlsInfo[i]->isEnabled()) {
+	for(int i = 0; i < enabledChnls.size(); i++) {
+		if(m_chnlsInfo.contains(i)) {
+			if(enabledChnls[i] != m_chnlsInfo[i]->isEnabled()) {
 				m_chnlsInfo[i]->setIsEnabled(enabledChnls[i]);
 			}
 		}
@@ -109,22 +109,26 @@ void BufferLogic::onSamplingFreqChanged(int idx)
 {
 	std::string newSamplingFreq = m_samplingFreqAvailable[idx].toStdString();
 
-	if (!m_chnlsInfo.size()) {
+	if(!m_chnlsInfo.size()) {
 		return;
 	}
 	Command *writeSrCmd = new IioChannelAttributeWrite(m_chnlsInfo.first()->iioChnl(), SAMPLING_FREQ_ATTR_NAME,
-			newSamplingFreq.c_str(), nullptr);
-	connect(writeSrCmd, &scopy::Command::finished, this, [=, this](scopy::Command *cmd) {
-		IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite*>(cmd);
-		if (!tcmd) {
-			return;
-		}
-		if (tcmd->getReturnCode() < 0) {
-			qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute write error " + QString::number(tcmd->getReturnCode());
-		} else {
-			readChnlsSamplingFreqAttr();
-		}
-	}, Qt::QueuedConnection);
+							   newSamplingFreq.c_str(), nullptr);
+	connect(
+		writeSrCmd, &scopy::Command::finished, this,
+		[=, this](scopy::Command *cmd) {
+			IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
+			if(!tcmd) {
+				return;
+			}
+			if(tcmd->getReturnCode() < 0) {
+				qDebug(CAT_SWIOT_AD74413R)
+					<< "Chnl attribute write error " + QString::number(tcmd->getReturnCode());
+			} else {
+				readChnlsSamplingFreqAttr();
+			}
+		},
+		Qt::QueuedConnection);
 	m_commandQueue->enqueue(writeSrCmd);
 }
 
@@ -132,28 +136,32 @@ void BufferLogic::readChnlsSamplingFreqAvailableAttr()
 {
 	std::string s_attrName = "sampling_frequency_available";
 
-	if (!m_chnlsInfo.size()) {
+	if(!m_chnlsInfo.size()) {
 		return;
 	}
-	Command *readSrCommand = new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
-	connect(readSrCommand, &scopy::Command::finished,
-		this, [=, this](scopy::Command* cmd) {
-		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
-		if (!tcmd) {
-			return;
-		}
-		QStringList attrValues;
-		char *sr_available = tcmd->getResult();
+	Command *readSrCommand =
+		new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
+	connect(
+		readSrCommand, &scopy::Command::finished, this,
+		[=, this](scopy::Command *cmd) {
+			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
+			if(!tcmd) {
+				return;
+			}
+			QStringList attrValues;
+			char *sr_available = tcmd->getResult();
 
-		if (tcmd->getReturnCode() < 0) {
-			qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
-		} else {
-			QString bufferValues(sr_available);
-			m_samplingFreqAvailable = bufferValues.split(" ");
-			m_samplingFreqAvailable.removeAll("");
-			Q_EMIT samplingFreqAvailableRead(m_samplingFreqAvailable);
-		}
-	}, Qt::QueuedConnection);
+			if(tcmd->getReturnCode() < 0) {
+				qDebug(CAT_SWIOT_AD74413R)
+					<< "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
+			} else {
+				QString bufferValues(sr_available);
+				m_samplingFreqAvailable = bufferValues.split(" ");
+				m_samplingFreqAvailable.removeAll("");
+				Q_EMIT samplingFreqAvailableRead(m_samplingFreqAvailable);
+			}
+		},
+		Qt::QueuedConnection);
 	m_commandQueue->enqueue(readSrCommand);
 }
 
@@ -161,44 +169,46 @@ void BufferLogic::readChnlsSamplingFreqAttr()
 {
 	std::string s_attrName = "sampling_frequency";
 
-	if (!m_chnlsInfo.size()) {
+	if(!m_chnlsInfo.size()) {
 		return;
 	}
-	Command *readSrCommand = new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
-	connect(readSrCommand, &scopy::Command::finished,
-		this, [=, this](scopy::Command* cmd) {
-		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead*>(cmd);
-		if (!tcmd) {
-			return;
-		}
-		QStringList attrValues;
-		char *srAttrValueStr = tcmd->getResult();
-
-		if (tcmd->getReturnCode() < 0) {
-			qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
-		} else {
-			try {
-				int samplingFreq = std::stoi(srAttrValueStr);
-				Q_EMIT samplingFreqRead(samplingFreq);
-			} catch (std::invalid_argument& exception) {
-				qDebug(CAT_SWIOT_AD74413R) << "Chnl attribute read error conversion: " + QString(srAttrValueStr);
+	Command *readSrCommand =
+		new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
+	connect(
+		readSrCommand, &scopy::Command::finished, this,
+		[=, this](scopy::Command *cmd) {
+			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
+			if(!tcmd) {
+				return;
 			}
-		}
-	}, Qt::QueuedConnection);
+			QStringList attrValues;
+			char *srAttrValueStr = tcmd->getResult();
+
+			if(tcmd->getReturnCode() < 0) {
+				qDebug(CAT_SWIOT_AD74413R)
+					<< "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
+			} else {
+				try {
+					int samplingFreq = std::stoi(srAttrValueStr);
+					Q_EMIT samplingFreqRead(samplingFreq);
+				} catch(std::invalid_argument &exception) {
+					qDebug(CAT_SWIOT_AD74413R)
+						<< "Chnl attribute read error conversion: " + QString(srAttrValueStr);
+				}
+			}
+		},
+		Qt::QueuedConnection);
 	m_commandQueue->enqueue(readSrCommand);
 }
 
-int BufferLogic::getPlotChnlsNo()
-{
-	return m_plotChnlsNo;
-}
+int BufferLogic::getPlotChnlsNo() { return m_plotChnlsNo; }
 
 QString BufferLogic::getPlotChnlUnitOfMeasure(int channel)
 {
 	QString unit = "";
 	ChnlInfo *chnlInfo = m_chnlsInfo[channel];
-	if (chnlInfo) {
-		if (chnlInfo->isScanElement() && !chnlInfo->isOutput()) {
+	if(chnlInfo) {
+		if(chnlInfo->isScanElement() && !chnlInfo->isOutput()) {
 			unit = chnlInfo->unitOfMeasure();
 		}
 	}
@@ -209,8 +219,8 @@ QVector<QString> BufferLogic::getPlotChnlsUnitOfMeasure()
 {
 	QVector<QString> chnlsUnitOfMeasure;
 
-	for (ChnlInfo* chnl : qAsConst(m_chnlsInfo)) {
-		if (chnl->isScanElement() && !chnl->isOutput()) {
+	for(ChnlInfo *chnl : qAsConst(m_chnlsInfo)) {
+		if(chnl->isScanElement() && !chnl->isOutput()) {
 			QString unitOfMeasure = chnl->unitOfMeasure();
 			chnlsUnitOfMeasure.push_back(unitOfMeasure);
 		}
@@ -222,8 +232,8 @@ std::pair<int, int> BufferLogic::getPlotChnlRangeValues(int channel)
 {
 	std::pair<int, int> range = {0, 0};
 	ChnlInfo *chnlInfo = m_chnlsInfo[channel];
-	if (chnlInfo) {
-		if (chnlInfo->isScanElement() && !chnlInfo->isOutput()) {
+	if(chnlInfo) {
+		if(chnlInfo->isScanElement() && !chnlInfo->isOutput()) {
 			range = chnlInfo->rangeValues();
 		}
 	}
@@ -233,8 +243,8 @@ std::pair<int, int> BufferLogic::getPlotChnlRangeValues(int channel)
 QVector<std::pair<int, int>> BufferLogic::getPlotChnlsRangeValues()
 {
 	QVector<std::pair<int, int>> chnlsRangeValues;
-	for (ChnlInfo* chnl : qAsConst(m_chnlsInfo)) {
-		if (chnl->isScanElement() && !chnl->isOutput()) {
+	for(ChnlInfo *chnl : qAsConst(m_chnlsInfo)) {
+		if(chnl->isScanElement() && !chnl->isOutput()) {
 			std::pair<int, int> rangeValues = chnl->rangeValues();
 			chnlsRangeValues.push_back(rangeValues);
 		}
@@ -246,8 +256,8 @@ QMap<int, QString> BufferLogic::getPlotChnlsId()
 {
 	QMap<int, QString> chnlsId;
 	auto keys = m_chnlsInfo.keys();
-	for (int key : keys){
-		if (m_chnlsInfo[key]->isScanElement() && !m_chnlsInfo[key]->isOutput()) {
+	for(int key : keys) {
+		if(m_chnlsInfo[key]->isScanElement() && !m_chnlsInfo[key]->isOutput()) {
 			QString chnlId = m_chnlsInfo[key]->chnlId();
 			chnlsId[key] = chnlId;
 		}
@@ -258,8 +268,8 @@ QMap<int, QString> BufferLogic::getPlotChnlsId()
 
 void BufferLogic::initAd74413rChnlsFunctions()
 {
-//	on the SWIOT board we have only 4 channels
-	for (int i = 0; i < 4; ++i) {
+	//	on the SWIOT board we have only 4 channels
+	for(int i = 0; i < 4; ++i) {
 		initChannelFunction(i);
 	}
 }
@@ -268,7 +278,7 @@ void BufferLogic::initDiagnosticChannels()
 {
 	//	The last 4 channels from context are always the diagnostic channels
 	//	(they are not physically on the board)
-	for (int i = 4; i < MAX_INPUT_CHNLS_NO; i++) {
+	for(int i = 4; i < MAX_INPUT_CHNLS_NO; i++) {
 		Q_EMIT channelFunctionDetermined(i, "diagnostic");
 	}
 }
@@ -276,31 +286,36 @@ void BufferLogic::initDiagnosticChannels()
 void BufferLogic::initChannelFunction(unsigned int i)
 {
 	std::string chnlEnableAttribute = "ch" + std::to_string(i) + "_enable";
-	Command *enabledChnCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
-							    chnlEnableAttribute.c_str(), nullptr);
-	connect(enabledChnCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
-		enabledChnCmdFinished(i, cmd);
-	}, Qt::QueuedConnection);
+	Command *enabledChnCmd =
+		new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME], chnlEnableAttribute.c_str(), nullptr);
+	connect(
+		enabledChnCmd, &scopy::Command::finished, this,
+		[=, this](scopy::Command *cmd) { enabledChnCmdFinished(i, cmd); }, Qt::QueuedConnection);
 	m_commandQueue->enqueue(enabledChnCmd);
 }
 
 void BufferLogic::enabledChnCmdFinished(unsigned int i, scopy::Command *cmd)
 {
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
-	if (!tcmd) { return; }
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
 
-	if (tcmd->getReturnCode() >= 0) {
+	if(tcmd->getReturnCode() >= 0) {
 		char *result = tcmd->getResult();
 		bool ok = false;
 		bool enabled = QString(result).toInt(&ok);
-		if (!ok) { return; }
-		if (enabled) {
+		if(!ok) {
+			return;
+		}
+		if(enabled) {
 			std::string deviceAttributeName = "ch" + std::to_string(i) + "_device";
 			Command *configuredDevCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
 									       deviceAttributeName.c_str(), nullptr);
-			connect(configuredDevCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
-				configuredDevCmdFinished(i, cmd);
-			}, Qt::QueuedConnection);
+			connect(
+				configuredDevCmd, &scopy::Command::finished, this,
+				[=, this](scopy::Command *cmd) { configuredDevCmdFinished(i, cmd); },
+				Qt::QueuedConnection);
 			m_commandQueue->enqueue(configuredDevCmd);
 
 		} else {
@@ -311,19 +326,22 @@ void BufferLogic::enabledChnCmdFinished(unsigned int i, scopy::Command *cmd)
 
 void BufferLogic::configuredDevCmdFinished(unsigned int i, scopy::Command *cmd)
 {
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
-	if (!tcmd) { return; }
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
 
-	if (tcmd->getReturnCode() >= 0) {
+	if(tcmd->getReturnCode() >= 0) {
 		char *result = tcmd->getResult();
 		std::string device = std::string(result);
-		if (device == "ad74413r") {
+		if(device == "ad74413r") {
 			std::string functionAttributeName = "ch" + std::to_string(i) + "_function";
 			Command *chnFunctionCmd = new IioDeviceAttributeRead(m_iioDevicesMap[SWIOT_DEVICE_NAME],
 									     functionAttributeName.c_str(), nullptr);
-			connect(chnFunctionCmd, &scopy::Command::finished, this, [=, this] (scopy::Command* cmd) {
-				chnFunctionCmdFinished(i, cmd);
-			}, Qt::QueuedConnection);
+			connect(
+				chnFunctionCmd, &scopy::Command::finished, this,
+				[=, this](scopy::Command *cmd) { chnFunctionCmdFinished(i, cmd); },
+				Qt::QueuedConnection);
 			m_commandQueue->enqueue(chnFunctionCmd);
 
 		} else {
@@ -334,30 +352,30 @@ void BufferLogic::configuredDevCmdFinished(unsigned int i, scopy::Command *cmd)
 
 void BufferLogic::chnFunctionCmdFinished(unsigned int i, scopy::Command *cmd)
 {
-	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead*>(cmd);
-	if (!tcmd) { return; }
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
 
-	if (tcmd->getReturnCode() >= 0) {
+	if(tcmd->getReturnCode() >= 0) {
 		char *result = tcmd->getResult();
 		QString function = QString(result);
 		Q_EMIT channelFunctionDetermined(i, function);
 	}
 }
 
-QMap<QString, iio_channel*> BufferLogic::getIioChnl(int chnlIdx)
+QMap<QString, iio_channel *> BufferLogic::getIioChnl(int chnlIdx)
 {
-	QMap<QString, iio_channel*> chnlsMap;
+	QMap<QString, iio_channel *> chnlsMap;
 	int outputChblIdx = chnlIdx + MAX_INPUT_CHNLS_NO;
 
-	if (m_chnlsInfo.contains(chnlIdx) && !m_chnlsInfo[chnlIdx]->isOutput()) {
+	if(m_chnlsInfo.contains(chnlIdx) && !m_chnlsInfo[chnlIdx]->isOutput()) {
 		chnlsMap["input"] = m_chnlsInfo[chnlIdx]->iioChnl();
 	}
 
-	if (m_chnlsInfo.contains(outputChblIdx) && m_chnlsInfo[outputChblIdx]->isOutput()) {
+	if(m_chnlsInfo.contains(outputChblIdx) && m_chnlsInfo[outputChblIdx]->isOutput()) {
 		chnlsMap["output"] = m_chnlsInfo[outputChblIdx]->iioChnl();
 	}
 
 	return chnlsMap;
 }
-
-

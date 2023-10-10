@@ -1,12 +1,14 @@
 #ifndef NAVIGATIONWIDGET_H
 #define NAVIGATIONWIDGET_H
 
-#include <QPushButton>
-#include <QWidget>
 #include "scopy-gui_export.h"
 
+#include <QPushButton>
+#include <QWidget>
+
 namespace scopy {
-class SCOPY_GUI_EXPORT PageNavigationWidget : public QWidget {
+class SCOPY_GUI_EXPORT PageNavigationWidget : public QWidget
+{
 	Q_OBJECT
 public:
 	PageNavigationWidget(bool hasHome = false, bool hasOpen = false, QWidget *parent = nullptr);
@@ -27,5 +29,5 @@ private:
 
 	void initUI(QWidget *parent);
 };
-}
+} // namespace scopy
 #endif // NAVIGATIONWIDGET_H

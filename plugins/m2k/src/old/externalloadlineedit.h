@@ -25,9 +25,9 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void valueChanged(double);
+
 protected:
 	double value;
-
 };
-}
+} // namespace scopy::m2k
 #endif // EXTERNALLOADLINEEDIT

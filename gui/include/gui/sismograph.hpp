@@ -21,95 +21,86 @@
 #ifndef SISMOGRAPH_HPP
 #define SISMOGRAPH_HPP
 
+#include "autoScaler.hpp"
+#include "customqwtscaledraw.hpp"
+#include "scopy-gui_export.h"
+
+#include <QMap>
 #include <QVector>
 #include <QWidget>
-#include <QMap>
-
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 
-#include "autoScaler.hpp"
-#include "scopy-gui_export.h"
-#include "customqwtscaledraw.hpp"
-
 namespace scopy {
-	class SCOPY_GUI_EXPORT Sismograph : public QwtPlot
+class SCOPY_GUI_EXPORT Sismograph : public QwtPlot
+{
+	Q_OBJECT
+
+	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples)
+
+	Q_PROPERTY(double sampleRate READ getSampleRate WRITE setSampleRate)
+
+	Q_PROPERTY(PlotDirection plotDirection READ getPlotDirection WRITE setPlotDirection)
+
+public:
+	explicit Sismograph(QWidget *parent = nullptr);
+	~Sismograph();
+
+	enum PlotDirection : bool
 	{
-		Q_OBJECT
-
-		Q_PROPERTY(int numSamples
-				READ getNumSamples
-				WRITE setNumSamples
-		)
-
-		Q_PROPERTY(double sampleRate
-				READ getSampleRate
-				WRITE setSampleRate
-		)
-
-		Q_PROPERTY(PlotDirection plotDirection
-				READ getPlotDirection
-				WRITE setPlotDirection
-		)
-
-	public:
-		explicit Sismograph(QWidget *parent = nullptr);
-		~Sismograph();
-
-		enum PlotDirection : bool {
-			LEFT_TO_RIGHT = false,
-			RIGHT_TO_LEFT = true
-		};
-
-		int getNumSamples() const;
-		void setNumSamples(int num);
-
-		Sismograph::PlotDirection getPlotDirection() const;
-		void setPlotDirection(PlotDirection plotDirection);
-
-		double getSampleRate() const;
-		void setSampleRate(double rate);
-
-		void setUnitOfMeasure(QString unitOfMeasureName,QString unitOfMeasureSymbol);
-		void setPlotAxisXTitle(const QString& title);
-
-		bool getAutoscale() const;
-		void setAutoscale(bool newAutoscale);
-		void addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize = 0.0 );
-
-	public Q_SLOTS:
-		void plot(double sample);
-		void reset();
-		void setColor(const QColor& color);
-		void updateScale(const QwtScaleDiv);
-		void updateYScale(double max, double min);
-		void setLineWidth(qreal width);
-		void setLineStyle(Qt::PenStyle lineStyle);
-		void setHistoryDuration(double time);
-
-	private:
-		QwtPlotCurve curve;
-		unsigned int numSamples;
-		double sampleRate;
-		double interval;
-		AutoScaler *scaler;
-		double m_currentScale;
-		QString m_unitOfMeasureName;
-		QString m_unitOfMeasureSymbol;
-		CustomQwtScaleDraw* scaleLabel;
-		double m_currentMaxValue;
-
-		QVector<double> ydata;
-		QVector<double> xdata;
-
-		void updateScale();
-		double findMaxInFifo();
-		bool autoscale;
-		enum PlotDirection plotDirection;
-
-	Q_SIGNALS:
-		void dataChanged(std::vector<double> data);
+		LEFT_TO_RIGHT = false,
+		RIGHT_TO_LEFT = true
 	};
-}
+
+	int getNumSamples() const;
+	void setNumSamples(int num);
+
+	Sismograph::PlotDirection getPlotDirection() const;
+	void setPlotDirection(PlotDirection plotDirection);
+
+	double getSampleRate() const;
+	void setSampleRate(double rate);
+
+	void setUnitOfMeasure(QString unitOfMeasureName, QString unitOfMeasureSymbol);
+	void setPlotAxisXTitle(const QString &title);
+
+	bool getAutoscale() const;
+	void setAutoscale(bool newAutoscale);
+	void addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize = 0.0);
+
+public Q_SLOTS:
+	void plot(double sample);
+	void reset();
+	void setColor(const QColor &color);
+	void updateScale(const QwtScaleDiv);
+	void updateYScale(double max, double min);
+	void setLineWidth(qreal width);
+	void setLineStyle(Qt::PenStyle lineStyle);
+	void setHistoryDuration(double time);
+
+private:
+	QwtPlotCurve curve;
+	unsigned int numSamples;
+	double sampleRate;
+	double interval;
+	AutoScaler *scaler;
+	double m_currentScale;
+	QString m_unitOfMeasureName;
+	QString m_unitOfMeasureSymbol;
+	CustomQwtScaleDraw *scaleLabel;
+	double m_currentMaxValue;
+
+	QVector<double> ydata;
+	QVector<double> xdata;
+
+	void updateScale();
+	double findMaxInFifo();
+	bool autoscale;
+	enum PlotDirection plotDirection;
+
+Q_SIGNALS:
+	void dataChanged(std::vector<double> data);
+};
+} // namespace scopy
 
 #endif /* SISMOGRAPH_HPP */

@@ -1,43 +1,45 @@
 #ifndef GRTIMECHANNELADDON_H
 #define GRTIMECHANNELADDON_H
 
-#include "tooladdon.h"
+#include "griiofloatchannelsrc.h"
+#include "grscaleoffsetproc.h"
 #include "grsignalpath.h"
 #include "grtimeplotaddon.h"
-#include "griiofloatchannelsrc.h"
-#include "measurementcontroller.h"
 #include "measure.h"
+#include "measurementcontroller.h"
 #include "measurementselector.h"
+#include "scopy-gr-util_export.h"
+#include "tooladdon.h"
 
 #include <QLabel>
-#include "scopy-gr-util_export.h"
+
 #include <gui/plotaxis.h>
 #include <gui/plotaxishandle.h>
 #include <gui/plotchannel.h>
-#include "grscaleoffsetproc.h"
 #include <gui/spinbox_a.hpp>
-
 #include <gui/widgets/menucombo.h>
-
 
 namespace scopy::grutil {
 class GRDeviceAddon;
-class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public QObject, public ToolAddon, public GRTopAddon {
+class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public QObject, public ToolAddon, public GRTopAddon
+{
 	Q_OBJECT
 public:
-	typedef enum {
+	typedef enum
+	{
 		YMODE_COUNT,
 		YMODE_FS,
 		YMODE_SCALE
 	} YMode;
-	GRTimeChannelAddon(QString ch, GRDeviceAddon* dev, GRTimePlotAddon* plotAddon, QPen pen, QObject *parent = nullptr);
+	GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlotAddon *plotAddon, QPen pen,
+			   QObject *parent = nullptr);
 	~GRTimeChannelAddon();
 
 	QString getName() override;
-	QWidget* getWidget() override;
+	QWidget *getWidget() override;
 
 	void setDevice(GRDeviceAddon *d);
-	GRDeviceAddon* getDevice();
+	GRDeviceAddon *getDevice();
 
 	QPen pen() const;
 	bool enabled() const;
@@ -56,31 +58,30 @@ public Q_SLOTS:
 	void onDeinit() override;
 	void preFlowBuild() override;
 
-	void onNewData(const float* xData, const float* yData, int size);
+	void onNewData(const float *xData, const float *yData, int size);
 
-	void onChannelAdded(ToolAddon*) override;
-	void onChannelRemoved(ToolAddon*) override;
+	void onChannelAdded(ToolAddon *) override;
+	void onChannelRemoved(ToolAddon *) override;
 
 	void toggleAutoScale();
 	void autoscale();
 	void setYMode(YMode mode);
 
 Q_SIGNALS:
-	void enableMeasurement(MeasurementLabel*);
-	void disableMeasurement(MeasurementLabel*);
+	void enableMeasurement(MeasurementLabel *);
+	void disableMeasurement(MeasurementLabel *);
 	void toggleAllMeasurement(bool b);
 	void toggleAllStats(bool b);
-	void enableStat(StatsLabel*);
-	void disableStat(StatsLabel*);
-
+	void enableStat(StatsLabel *);
+	void disableStat(StatsLabel *);
 
 private:
 	QString m_channelName;
-	GRDeviceAddon* m_dev;
-	GRScaleOffsetProc* m_scOff;
+	GRDeviceAddon *m_dev;
+	GRScaleOffsetProc *m_scOff;
 	GRSignalPath *m_signalPath;
 	GRIIOFloatChannelSrc *m_grch;
-	GRTimePlotAddon* m_plotAddon;
+	GRTimePlotAddon *m_plotAddon;
 	QPen m_pen;
 	QTimer *m_autoScaleTimer;
 
@@ -112,5 +113,5 @@ private:
 	void createMeasurementMenu(QWidget *parent);
 	QWidget *createMeasurementMenuSection(QString category, QWidget *parent);
 };
-}
+} // namespace scopy::grutil
 #endif // GRTIMECHANNELADDON_H

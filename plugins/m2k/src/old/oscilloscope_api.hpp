@@ -29,12 +29,11 @@ namespace scopy::m2k {
 class Oscilloscope;
 class Channel_API;
 /**
-  * @brief osc object
-  */
+ * @brief osc object
+ */
 class Oscilloscope_API : public ApiObject
 {
 	Q_OBJECT
-
 
 	Q_PROPERTY(QVariantList channels READ getChannels);
 
@@ -42,96 +41,72 @@ class Oscilloscope_API : public ApiObject
 	Q_PROPERTY(bool single READ isSingle WRITE single STORED false);
 
 	/**
-	  * @brief Enables the cursors
-	  */
+	 * @brief Enables the cursors
+	 */
 	Q_PROPERTY(bool cursors READ hasCursors WRITE setCursors);
 	Q_PROPERTY(bool measure READ hasMeasure WRITE setMeasure);
-	Q_PROPERTY(bool measure_all
-			READ measureAll WRITE setMeasureAll);
+	Q_PROPERTY(bool measure_all READ measureAll WRITE setMeasureAll);
 	Q_PROPERTY(bool counter READ hasCounter WRITE setCounter);
-	Q_PROPERTY(bool statistics
-			READ hasStatistics WRITE setStatistics);
+	Q_PROPERTY(bool statistics READ hasStatistics WRITE setStatistics);
 
-	Q_PROPERTY(bool horizontal_cursors READ horizontalCursors
-			WRITE setHorizontalCursors)
-	Q_PROPERTY(bool vertical_cursors READ verticalCursors
-			WRITE setVerticalCursors)
+	Q_PROPERTY(bool horizontal_cursors READ horizontalCursors WRITE setHorizontalCursors)
+	Q_PROPERTY(bool vertical_cursors READ verticalCursors WRITE setVerticalCursors)
 
 	Q_PROPERTY(double cursor_v1 READ cursorV1 WRITE setCursorV1);
 	Q_PROPERTY(double cursor_v2 READ cursorV2 WRITE setCursorV2);
 	Q_PROPERTY(double cursor_h1 READ cursorH1 WRITE setCursorH1);
 	Q_PROPERTY(double cursor_h2 READ cursorH2 WRITE setCursorH2);
-	Q_PROPERTY(int cursors_position READ getCursorsPosition
-		  WRITE setCursorsPosition)
-	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
-		  WRITE setCursorsTransparency)
+	Q_PROPERTY(int cursors_position READ getCursorsPosition WRITE setCursorsPosition)
+	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency WRITE setCursorsTransparency)
 
 	Q_PROPERTY(bool gating_enabled READ gatingEnabled WRITE setGatingEnabled);
 	Q_PROPERTY(double cursor_gateLeft READ cursorGateLeft WRITE setCursorGateLeft);
 	Q_PROPERTY(double cursor_gateRight READ cursorGateRight WRITE setCursorGateRight);
 
-	Q_PROPERTY(bool auto_trigger
-			READ autoTrigger WRITE setAutoTrigger)
-	Q_PROPERTY(bool internal_trigger
-			READ internalTrigger WRITE setInternalTrigger)
-	Q_PROPERTY(bool external_trigger
-			READ externalTrigger WRITE setExternalTrigger)
-	Q_PROPERTY(int external_trigger_source
-			READ externalTriggerSource WRITE setExternalTriggerSource)
-	Q_PROPERTY(int external_trigger_daisy_order
-			READ externalTriggerDaisyOrder WRITE setExternalTriggerDaisyOrder)
-	Q_PROPERTY(bool external_trigger_out
-		   READ externalTriggerOut WRITE setExternalTriggerOut)
-	Q_PROPERTY(int external_trigger_out_source
-		   READ externalTriggerOutSource WRITE setExternalTriggerOutSource)
+	Q_PROPERTY(bool auto_trigger READ autoTrigger WRITE setAutoTrigger)
+	Q_PROPERTY(bool internal_trigger READ internalTrigger WRITE setInternalTrigger)
+	Q_PROPERTY(bool external_trigger READ externalTrigger WRITE setExternalTrigger)
+	Q_PROPERTY(int external_trigger_source READ externalTriggerSource WRITE setExternalTriggerSource)
+	Q_PROPERTY(int external_trigger_daisy_order READ externalTriggerDaisyOrder WRITE setExternalTriggerDaisyOrder)
+	Q_PROPERTY(bool external_trigger_out READ externalTriggerOut WRITE setExternalTriggerOut)
+	Q_PROPERTY(int external_trigger_out_source READ externalTriggerOutSource WRITE setExternalTriggerOutSource)
 
-	Q_PROPERTY(int trigger_source
-			READ triggerSource WRITE setTriggerSource)
-	Q_PROPERTY(double trigger_level
-			READ getTriggerLevel WRITE setTriggerLevel)
-	Q_PROPERTY(double trigger_hysteresis READ getTriggerHysteresis
-			WRITE setTriggerHysteresis)
-	Q_PROPERTY(bool internal_condition READ internalCondition
-			WRITE setInternalCondition)
-	Q_PROPERTY(bool external_condition READ externalCondition
-			WRITE setExternalCondition)
-	Q_PROPERTY(bool trigger_input READ getTriggerInput
-			WRITE setTriggerInput STORED false)
+	Q_PROPERTY(int trigger_source READ triggerSource WRITE setTriggerSource)
+	Q_PROPERTY(double trigger_level READ getTriggerLevel WRITE setTriggerLevel)
+	Q_PROPERTY(double trigger_hysteresis READ getTriggerHysteresis WRITE setTriggerHysteresis)
+	Q_PROPERTY(bool internal_condition READ internalCondition WRITE setInternalCondition)
+	Q_PROPERTY(bool external_condition READ externalCondition WRITE setExternalCondition)
+	Q_PROPERTY(bool trigger_input READ getTriggerInput WRITE setTriggerInput STORED false)
 
-	Q_PROPERTY(QList<QString> math_channels
-			READ getMathChannels WRITE setMathChannels
-			SCRIPTABLE false /* too complex for now */);
+	Q_PROPERTY(QList<QString> math_channels READ getMathChannels WRITE setMathChannels
+			   SCRIPTABLE false /* too complex for now */);
 
-	Q_PROPERTY(double time_position
-			READ getTimePos WRITE setTimePos);
+	Q_PROPERTY(double time_position READ getTimePos WRITE setTimePos);
 	Q_PROPERTY(double time_base READ getTimeBase WRITE setTimeBase);
 
-	Q_PROPERTY(QList<int> measure_en
-			READ measureEn WRITE setMeasureEn);
+	Q_PROPERTY(QList<int> measure_en READ measureEn WRITE setMeasureEn);
 
-	Q_PROPERTY(QList<int> statistic_en
-			READ statisticEn WRITE setStatisticEn)
+	Q_PROPERTY(QList<int> statistic_en READ statisticEn WRITE setStatisticEn)
 
-	Q_PROPERTY(int current_channel READ getCurrentChannel
-			WRITE setCurrentChannel)
+	Q_PROPERTY(int current_channel READ getCurrentChannel WRITE setCurrentChannel)
 
 	Q_PROPERTY(bool fft_en READ getFftEn WRITE setFftEn)
 	Q_PROPERTY(bool xy_en READ getXyEn WRITE setXyEn)
 	Q_PROPERTY(bool hist_en READ getHistEn WRITE setHistEn)
-	Q_PROPERTY(bool export_all READ getExportAll
-		   WRITE setExportAll)
+	Q_PROPERTY(bool export_all READ getExportAll WRITE setExportAll)
 	Q_PROPERTY(bool autoset_en READ autosetEnabled WRITE enableAutoset)
 
-	Q_PROPERTY(int memory_depth READ getMemoryDepth
-		   WRITE setMemoryDepth)
+	Q_PROPERTY(int memory_depth READ getMemoryDepth WRITE setMemoryDepth)
 
 	Q_PROPERTY(int xy_thickness READ getXyThickness WRITE setXyThickness)
 
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
 public:
-	explicit Oscilloscope_API(Oscilloscope *osc) :
-		ApiObject(), osc(osc) {}
+	explicit Oscilloscope_API(Oscilloscope *osc)
+		: ApiObject()
+		, osc(osc)
+	{}
 	~Oscilloscope_API() {}
 
 	QVariantList getChannels();
@@ -225,7 +200,7 @@ public:
 	void setInternExtern(int option);
 
 	QList<QString> getMathChannels() const;
-	void setMathChannels(const QList<QString>& list);
+	void setMathChannels(const QList<QString> &list);
 
 	double getTimePos() const;
 	void setTimePos(double pos);
@@ -234,10 +209,10 @@ public:
 	void setTimeBase(double base);
 
 	QList<int> measureEn() const;
-	void setMeasureEn(const QList<int>& list);
+	void setMeasureEn(const QList<int> &list);
 
 	QList<int> statisticEn() const;
-	void setStatisticEn(const QList<int>& list);
+	void setStatisticEn(const QList<int> &list);
 
 	int getCurrentChannel() const;
 	void setCurrentChannel(int chn_id);
@@ -271,63 +246,62 @@ public:
 
 	Q_INVOKABLE void show();
 
-	private:
-		Oscilloscope *osc;
-	};
+private:
+	Oscilloscope *osc;
+};
 
-	class Channel_Digital_Filter_API : public ApiObject
-	{
-		Q_OBJECT
+class Channel_Digital_Filter_API : public ApiObject
+{
+	Q_OBJECT
 
-		Q_PROPERTY(bool enLow READ isEnableLow WRITE setEnableLow)
-		Q_PROPERTY(float tcLow READ TCLow WRITE setTCLow)
-		Q_PROPERTY(float gainLow READ gainLow WRITE setGainLow)
-		Q_PROPERTY(bool enHigh READ isEnableHigh WRITE setEnableHigh)
-		Q_PROPERTY(float tcHigh READ TCHigh WRITE setTCHigh)
-		Q_PROPERTY(float gainHigh READ gainHigh WRITE setGainHigh)
-	public:
-		explicit Channel_Digital_Filter_API(Oscilloscope *osc, Channel_API *ch_api, int index) :
-			ApiObject(), osc(osc), ch_api(ch_api), filterIndex(index) {}
-		~Channel_Digital_Filter_API() {}
-		bool isEnableLow() const;
-		bool isEnableHigh() const;
-		void setEnableLow(bool en);
-		void setEnableHigh(bool en);
-		float TCLow() const;
-		float TCHigh() const;
-		void setTCLow(float tc);
-		void setTCHigh(float tc);
-		float gainLow() const;
-		float gainHigh() const;
-		void setGainLow(float gain);
-		void setGainHigh(float gain);
+	Q_PROPERTY(bool enLow READ isEnableLow WRITE setEnableLow)
+	Q_PROPERTY(float tcLow READ TCLow WRITE setTCLow)
+	Q_PROPERTY(float gainLow READ gainLow WRITE setGainLow)
+	Q_PROPERTY(bool enHigh READ isEnableHigh WRITE setEnableHigh)
+	Q_PROPERTY(float tcHigh READ TCHigh WRITE setTCHigh)
+	Q_PROPERTY(float gainHigh READ gainHigh WRITE setGainHigh)
+public:
+	explicit Channel_Digital_Filter_API(Oscilloscope *osc, Channel_API *ch_api, int index)
+		: ApiObject()
+		, osc(osc)
+		, ch_api(ch_api)
+		, filterIndex(index)
+	{}
+	~Channel_Digital_Filter_API() {}
+	bool isEnableLow() const;
+	bool isEnableHigh() const;
+	void setEnableLow(bool en);
+	void setEnableHigh(bool en);
+	float TCLow() const;
+	float TCHigh() const;
+	void setTCLow(float tc);
+	void setTCHigh(float tc);
+	float gainLow() const;
+	float gainHigh() const;
+	void setGainLow(float gain);
+	void setGainHigh(float gain);
 
-	private:
-		Oscilloscope *osc;
-		Channel_API *ch_api;
-		int filterIndex;
-	};
+private:
+	Oscilloscope *osc;
+	Channel_API *ch_api;
+	int filterIndex;
+};
 
-
-	class Channel_API : public ApiObject
-	{
-		Q_OBJECT
+class Channel_API : public ApiObject
+{
+	Q_OBJECT
 
 	Q_PROPERTY(bool enabled READ channelEn WRITE setChannelEn)
 
-	Q_PROPERTY(double volts_per_div
-			READ getVoltsPerDiv WRITE setVoltsPerDiv)
+	Q_PROPERTY(double volts_per_div READ getVoltsPerDiv WRITE setVoltsPerDiv)
 
 	Q_PROPERTY(double v_offset READ getVOffset WRITE setVOffset)
 
-	Q_PROPERTY(double line_thickness
-			READ getLineThickness WRITE setLineThickness)
+	Q_PROPERTY(double line_thickness READ getLineThickness WRITE setLineThickness)
 
-	Q_PROPERTY(double probe_attenuation READ getProbeAttenuation
-			WRITE setProbeAttenuation)
+	Q_PROPERTY(double probe_attenuation READ getProbeAttenuation WRITE setProbeAttenuation)
 
-	Q_PROPERTY(bool ac_coupling READ getAcCoupling
-			WRITE setAcCoupling)
+	Q_PROPERTY(bool ac_coupling READ getAcCoupling WRITE setAcCoupling)
 
 	Q_PROPERTY(double period READ measured_period)
 	Q_PROPERTY(double frequency READ measured_frequency)
@@ -357,18 +331,20 @@ public:
 
 	Q_PROPERTY(QVariantList digFilter READ getDigFilters /*WRITE setDigFilter1 */)
 
-
 public:
-	explicit Channel_API(Oscilloscope *osc) :
-		ApiObject(), osc(osc) {
-			for(auto i=0;i<2;i++)
-				digFilters.append(new Channel_Digital_Filter_API(osc,this,i));
-		}
+	explicit Channel_API(Oscilloscope *osc)
+		: ApiObject()
+		, osc(osc)
+	{
+		for(auto i = 0; i < 2; i++)
+			digFilters.append(new Channel_Digital_Filter_API(osc, this, i));
+	}
 
-	~Channel_API() {
-			for(auto it = digFilters.begin();it != digFilters.end(); it++ )
-				delete *it;
-		}
+	~Channel_API()
+	{
+		for(auto it = digFilters.begin(); it != digFilters.end(); it++)
+			delete *it;
+	}
 
 	bool channelEn() const;
 	void setChannelEn(bool en);
@@ -419,9 +395,8 @@ public:
 
 private:
 	Oscilloscope *osc;
-	QList<Channel_Digital_Filter_API*> digFilters;
-
+	QList<Channel_Digital_Filter_API *> digFilters;
 };
-}
+} // namespace scopy::m2k
 
 #endif // OSCILLOSCOPE_API_HPP

@@ -18,76 +18,75 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef ANNOTATIONDECODER_H
 #define ANNOTATIONDECODER_H
-
-#include <atomic>
-#include <map>
-#include <vector>
-#include <memory>
-#include <thread>
-#include <mutex>
-#include <condition_variable>
-#include <queue>
-
-#include <libsigrokdecode/libsigrokdecode.h>
 
 #include "annotationcurve.h"
 #include "decoder.h"
 #include "scopy-sigrok-gui_export.h"
+
+#include <queue>
+
+#include <atomic>
+#include <condition_variable>
+#include <libsigrokdecode/libsigrokdecode.h>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 namespace scopy {
 
 class SCOPY_SIGROK_GUI_EXPORT AnnotationDecoder
 {
 public:
-    AnnotationDecoder(AnnotationCurve *annotationCurve, std::shared_ptr<logic::Decoder> initialDecoder);
-    ~AnnotationDecoder();
+	AnnotationDecoder(AnnotationCurve *annotationCurve, std::shared_ptr<logic::Decoder> initialDecoder);
+	~AnnotationDecoder();
 
-    void stackDecoder(std::shared_ptr<logic::Decoder> decoder);
-    void unstackDecoder(std::shared_ptr<logic::Decoder> decoder);
+	void stackDecoder(std::shared_ptr<logic::Decoder> decoder);
+	void unstackDecoder(std::shared_ptr<logic::Decoder> decoder);
 
-    void startDecode();
-    void stopDecode();
+	void startDecode();
+	void stopDecode();
 
-    void dataAvailable(uint64_t from, uint64_t to, uint16_t *data);
+	void dataAvailable(uint64_t from, uint64_t to, uint16_t *data);
 
-    std::vector<std::shared_ptr<logic::Decoder>> getDecoderStack();
+	std::vector<std::shared_ptr<logic::Decoder>> getDecoderStack();
 
-    void assignChannel(uint16_t chId, uint16_t bitId);
-    void unassignChannel(uint16_t chId);
+	void assignChannel(uint16_t chId, uint16_t bitId);
+	void unassignChannel(uint16_t chId);
 
-    std::vector<DecodeChannel *> getDecoderChannels();
+	std::vector<DecodeChannel *> getDecoderChannels();
 
-    void reset();
+	void reset();
 
-    int getNrOfChannels() const;
-private:
-    void stackChanged();
-
-    void decodeProc();
-
+	int getNrOfChannels() const;
 
 private:
-    AnnotationCurve *m_annotationCurve;
-    uint64_t m_lastSample;
-    uint16_t *m_data;
+	void stackChanged();
 
-    struct srd_session *m_srdSession;
-    std::vector<std::shared_ptr<logic::Decoder>> m_stack;
-    std::map<std::pair<const srd_decoder*, int>, Row> m_class_rows;
-    std::map<Row, RowData> m_annotation_rows;
-    std::vector<DecodeChannel> m_channels;
+	void decodeProc();
 
-    std::thread *m_decodeThread;
-    std::atomic<bool> m_decodeCanceled;
-    std::mutex m_newDataMutex;
-    std::condition_variable m_newDataCv;
-    static std::mutex g_sessionMutex;
-    std::queue<std::pair<uint64_t, uint64_t>> m_newDataQueue;
-    void initDecoderChannels();
+private:
+	AnnotationCurve *m_annotationCurve;
+	uint64_t m_lastSample;
+	uint16_t *m_data;
+
+	struct srd_session *m_srdSession;
+	std::vector<std::shared_ptr<logic::Decoder>> m_stack;
+	std::map<std::pair<const srd_decoder *, int>, Row> m_class_rows;
+	std::map<Row, RowData> m_annotation_rows;
+	std::vector<DecodeChannel> m_channels;
+
+	std::thread *m_decodeThread;
+	std::atomic<bool> m_decodeCanceled;
+	std::mutex m_newDataMutex;
+	std::condition_variable m_newDataCv;
+	static std::mutex g_sessionMutex;
+	std::queue<std::pair<uint64_t, uint64_t>> m_newDataQueue;
+	void initDecoderChannels();
 };
-}
+} // namespace scopy
 
 #endif // ANNOTATIONDECODER_H

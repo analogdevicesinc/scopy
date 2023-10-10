@@ -1,9 +1,10 @@
 #ifndef MAPSTACKEDWIDGET_H
 #define MAPSTACKEDWIDGET_H
 
-#include <QStackedWidget>
-#include <QMap>
 #include "scopy-gui_export.h"
+
+#include <QMap>
+#include <QStackedWidget>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT MapStackedWidget : public QStackedWidget
@@ -17,13 +18,12 @@ public:
 	virtual bool remove(QString key);
 	virtual QString getKey(QWidget *w);
 	virtual bool contains(QString key);
-	virtual QWidget* get(QString key);
+	virtual QWidget *get(QString key);
 public Q_SLOTS:
 	virtual bool show(QString key);
+
 protected:
-	QMap<QString, QWidget*> map;
+	QMap<QString, QWidget *> map;
 };
-}
+} // namespace scopy
 #endif // MAPSTACKEDWIDGET_H
-
-

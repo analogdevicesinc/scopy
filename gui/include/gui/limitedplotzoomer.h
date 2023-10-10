@@ -20,15 +20,16 @@
 #ifndef LIMITEDPLOTZOOMER_H
 #define LIMITEDPLOTZOOMER_H
 
-#include <qwt_plot_zoomer.h>
 #include "scopy-gui_export.h"
+
+#include <qwt_plot_zoomer.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT LimitedPlotZoomer : public QwtPlotZoomer
 {
 public:
-	LimitedPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget*, bool doReplot = false);
-	LimitedPlotZoomer(QWidget*, bool doReplot = false);
+	LimitedPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *, bool doReplot = false);
+	LimitedPlotZoomer(QWidget *, bool doReplot = false);
 	void resetZoom();
 	void popZoom();
 
@@ -42,6 +43,6 @@ private:
 	bool m_boundVertical;
 	bool m_updateBaseNextZoom;
 };
-}
+} // namespace scopy
 
 #endif // LIMITEDPLOTZOOMER_H

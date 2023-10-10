@@ -18,22 +18,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CONFIGCONTROLLER_H
 #define CONFIGCONTROLLER_H
 
 #include "QObject"
-#include "src/config/configchannelview.h"
 #include "configmodel.h"
+#include "src/config/configchannelview.h"
 
 namespace scopy::swiot {
 
-class ConfigController : public QObject {
-Q_OBJECT
+class ConfigController : public QObject
+{
+	Q_OBJECT
 public:
-	explicit ConfigController(ConfigChannelView *channelView,
-				  ConfigModel *model,
-				  int channelId);
+	explicit ConfigController(ConfigChannelView *channelView, ConfigModel *model, int channelId);
 
 	~ConfigController();
 
@@ -51,7 +49,6 @@ private:
 	int m_channelId;
 };
 
-}
-
+} // namespace scopy::swiot
 
 #endif // CONFIGCONTROLLER_H

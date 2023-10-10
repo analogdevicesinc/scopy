@@ -20,23 +20,24 @@
 
 #include "toolmenuitem.h"
 
-#include <QHBoxLayout>
-#include <QSpacerItem>
 #include "gui/dynamicWidget.h"
-#include "qdebug.h"
 #include "gui/utils.h"
+#include "qdebug.h"
+
+#include <QHBoxLayout>
 #include <QLoggingCategory>
+#include <QSpacerItem>
 
 using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_TOOLMENUITEM, "ToolMenuItem")
 
-ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *parent):
-	BaseMenuItem(parent),
-	toolBtn(nullptr),
-	toolRunBtn(nullptr),
-	id(id),
-	name(name),
-	iconPath(iconPath)
+ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *parent)
+	: BaseMenuItem(parent)
+	, toolBtn(nullptr)
+	, toolRunBtn(nullptr)
+	, id(id)
+	, name(name)
+	, iconPath(iconPath)
 {
 	_buildUI();
 
@@ -51,22 +52,13 @@ ToolMenuItem::ToolMenuItem(QString id, QString name, QString iconPath, QWidget *
 #endif
 }
 
-ToolMenuItem::~ToolMenuItem()
-{
+ToolMenuItem::~ToolMenuItem() {}
 
-}
+QPushButton *ToolMenuItem::getToolBtn() const { return toolBtn; }
 
-QPushButton *ToolMenuItem::getToolBtn() const
-{
-	return toolBtn;
-}
+QPushButton *ToolMenuItem::getToolRunBtn() const { return toolRunBtn; }
 
-QPushButton *ToolMenuItem::getToolRunBtn() const
-{
-	return toolRunBtn;
-}
-
-//void ToolMenuItem::setToolEnabled(bool enabled)
+// void ToolMenuItem::setToolEnabled(bool enabled)
 //{
 //	BaseMenuItem::setVisible(enabled);
 //	Util::retainWidgetSizeWhenHidden(this, enabled);
@@ -75,7 +67,7 @@ QPushButton *ToolMenuItem::getToolRunBtn() const
 
 void ToolMenuItem::enableDoubleClick(bool enable)
 {
-	if (enable) {
+	if(enable) {
 		toolBtn->installEventFilter(this);
 	} else {
 		toolBtn->removeEventFilter(this);
@@ -91,10 +83,10 @@ void ToolMenuItem::setSeparator(bool top, bool bot)
 
 bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 {
-	if (event->type() == QEvent::MouseButtonDblClick) {
+	if(event->type() == QEvent::MouseButtonDblClick) {
 		QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-		if (mouseEvent->button() == Qt::LeftButton) {
-			if (isEnabled()) {
+		if(mouseEvent->button() == Qt::LeftButton) {
+			if(isEnabled()) {
 				Q_EMIT doubleclick();
 				return true;
 			}
@@ -104,14 +96,14 @@ bool ToolMenuItem::eventFilter(QObject *watched, QEvent *event)
 	return QObject::event(event);
 }
 
-void ToolMenuItem::setName(QString str) {
+void ToolMenuItem::setName(QString str)
+{
 	this->name = str;
 	toolBtn->setText(name);
 }
 
-
 void ToolMenuItem::hideText(bool hidden)
-{	
+{
 	if(hidden) {
 		toolBtn->setText("");
 	} else {
@@ -119,10 +111,7 @@ void ToolMenuItem::hideText(bool hidden)
 	}
 }
 
-void ToolMenuItem::setDisabled(bool disabled)
-{
-	BaseMenuItem::setDisabled(disabled);
-}
+void ToolMenuItem::setDisabled(bool disabled) { BaseMenuItem::setDisabled(disabled); }
 
 void ToolMenuItem::mouseMoveEvent(QMouseEvent *event)
 {
@@ -132,10 +121,7 @@ void ToolMenuItem::mouseMoveEvent(QMouseEvent *event)
 #endif
 }
 
-const QString &ToolMenuItem::getId() const
-{
-	return id;
-}
+const QString &ToolMenuItem::getId() const { return id; }
 
 void ToolMenuItem::enterEvent(QEvent *event)
 {
@@ -181,8 +167,7 @@ void ToolMenuItem::_buildUI()
 	layout->setSpacing(0);
 	layout->setContentsMargins(0, 0, 0, 0);
 	toolBtn = new QPushButton(name);
-	toolBtn->setSizePolicy(QSizePolicy::Minimum,
-				 QSizePolicy::Minimum);
+	toolBtn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 	toolRunBtn = new CustomPushButton(this);
 	layout->addWidget(toolBtn);
 	layout->addWidget(toolRunBtn);
@@ -200,7 +185,7 @@ void ToolMenuItem::_buildUI()
 
 	toolBtn->setFlat(true);
 	toolRunBtn->setFlat(true);
-	qDebug(CAT_TOOLMENUITEM)<<toolRunBtn;
+	qDebug(CAT_TOOLMENUITEM) << toolRunBtn;
 
 	mainLayout->addWidget(toolOption);
 

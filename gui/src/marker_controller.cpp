@@ -18,12 +18,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "marker_controller.h"
+
 #include "spectrum_marker.hpp"
 
-#include <qwt_plot_picker.h>
-#include <qwt_picker_machine.h>
-#include <qwt_scale_div.h>
 #include <qwt_interval.h>
+#include <qwt_picker_machine.h>
+#include <qwt_plot_picker.h>
+#include <qwt_scale_div.h>
 
 using namespace scopy;
 
@@ -35,33 +36,25 @@ using namespace scopy;
  * It doesn't own the markers but shares them. It operates on a list of markers
  * that is modified using the registerMarker() and unRegisterMarker().
  */
-MarkerController::MarkerController(QwtPlot *plot):
-	QObject(static_cast<QObject *>(plot)),
-	d_picker(new QwtPlotPicker(plot->canvas())),
-	d_picked_mrk(nullptr),
-	d_item_moving(nullptr),
-	d_mrks_default_z(0.0)
+MarkerController::MarkerController(QwtPlot *plot)
+	: QObject(static_cast<QObject *>(plot))
+	, d_picker(new QwtPlotPicker(plot->canvas()))
+	, d_picked_mrk(nullptr)
+	, d_item_moving(nullptr)
+	, d_mrks_default_z(0.0)
 {
 	d_picker->setStateMachine(new QwtPickerDragPointMachine);
-	connect(d_picker, SIGNAL(selected(QPointF)),
-		this, SLOT(onPickerSelected(QPointF)));
-	connect(d_picker, SIGNAL(moved(QPoint)),
-		this, SLOT(onPickerMoved(QPoint)));
+	connect(d_picker, SIGNAL(selected(QPointF)), this, SLOT(onPickerSelected(QPointF)));
+	connect(d_picker, SIGNAL(moved(QPoint)), this, SLOT(onPickerMoved(QPoint)));
 }
 
-bool MarkerController::enabled() const
-{
-	return d_picker->isEnabled();
-}
+bool MarkerController::enabled() const { return d_picker->isEnabled(); }
 
-void MarkerController::setEnabled(bool en)
-{
-	d_picker->setEnabled(en);
-}
+void MarkerController::setEnabled(bool en) { d_picker->setEnabled(en); }
 
 void MarkerController::onPickerSelected(QPointF pf)
 {
-	if (d_item_moving) {
+	if(d_item_moving) {
 		d_item_moving = false;
 		Q_EMIT markerReleased(d_picked_mrk);
 		d_picked_mrk = nullptr;
@@ -71,15 +64,12 @@ void MarkerController::onPickerSelected(QPointF pf)
 	auto mrks = d_mrks_overlap_order;
 
 	d_selected_mkr = nullptr;
-	for (int i = 0; i < mrks.size(); i++) {
+	for(int i = 0; i < mrks.size(); i++) {
 		QPoint p = mrks[i]->plotValueToPixels(pf);
 
 		QRect rect = mrks[i]->boundingRectPixels();
-		if (p.x() >= rect.topLeft().x() &&
-				p.x() <= rect.bottomRight().x() &&
-				p.y() >= rect.topLeft().y() &&
-				p.y() <= rect.bottomRight().y() &&
-				!d_selected_mkr) {
+		if(p.x() >= rect.topLeft().x() && p.x() <= rect.bottomRight().x() && p.y() >= rect.topLeft().y() &&
+		   p.y() <= rect.bottomRight().y() && !d_selected_mkr) {
 
 			markerBringToFront(mrks[i]);
 
@@ -93,16 +83,13 @@ void MarkerController::onPickerSelected(QPointF pf)
 
 void MarkerController::onPickerMoved(QPoint p)
 {
-	if (!d_picked_mrk) {
+	if(!d_picked_mrk) {
 		auto mrks = d_mrks_overlap_order;
 
-		for (int i = 0; i < mrks.size(); i++) {
+		for(int i = 0; i < mrks.size(); i++) {
 			QRect rect = mrks[i]->boundingRectPixels();
-			if (p.x() >= rect.topLeft().x() &&
-				p.x() <= rect.bottomRight().x() &&
-				p.y() >= rect.topLeft().y() &&
-				p.y() <= rect.bottomRight().y() &&
-				!d_picked_mrk) {
+			if(p.x() >= rect.topLeft().x() && p.x() <= rect.bottomRight().x() &&
+			   p.y() >= rect.topLeft().y() && p.y() <= rect.bottomRight().y() && !d_picked_mrk) {
 
 				markerBringToFront(mrks[i]);
 
@@ -115,22 +102,20 @@ void MarkerController::onPickerMoved(QPoint p)
 		}
 	}
 
-	if (d_picked_mrk) {
+	if(d_picked_mrk) {
 		QPointF val = d_picked_mrk->plotPixelsToValue(p);
-		QwtInterval xItv = plot()->axisScaleDiv(
-			QwtAxis::XBottom).interval();
-		QwtInterval yItv = plot()->axisScaleDiv(
-			QwtAxis::YLeft).interval();
+		QwtInterval xItv = plot()->axisScaleDiv(QwtAxis::XBottom).interval();
+		QwtInterval yItv = plot()->axisScaleDiv(QwtAxis::YLeft).interval();
 
 		// Make sure the marker does not leave the plot canvas
-		if (val.x() < xItv.minValue()) {
+		if(val.x() < xItv.minValue()) {
 			val.setX(xItv.minValue());
-		} else if (val.x() > xItv.maxValue()) {
+		} else if(val.x() > xItv.maxValue()) {
 			val.setX(xItv.maxValue());
 		}
-		if (val.y() < yItv.minValue()) {
+		if(val.y() < yItv.minValue()) {
 			val.setY(yItv.minValue());
-		} else if (val.y() > yItv.maxValue()) {
+		} else if(val.y() > yItv.maxValue()) {
 			val.setY(yItv.maxValue());
 		}
 
@@ -146,7 +131,7 @@ void MarkerController::registerMarker(marker_sptr marker)
 	d_markers.push_back(marker);
 	d_mrks_overlap_order.push_front(marker);
 
-	if (d_markers.size() == 1) {
+	if(d_markers.size() == 1) {
 		d_mrks_default_z = marker->z();
 	}
 }
@@ -156,15 +141,12 @@ void MarkerController::unRegisterMarker(marker_sptr marker)
 	d_markers.removeOne(marker);
 	d_mrks_overlap_order.removeOne(marker);
 
-	if (marker == d_selected_mkr) {
+	if(marker == d_selected_mkr) {
 		d_selected_mkr = nullptr;
 	}
 }
 
-MarkerController::marker_sptr MarkerController::selectedMarker() const
-{
-	return d_selected_mkr;
-}
+MarkerController::marker_sptr MarkerController::selectedMarker() const { return d_selected_mkr; }
 
 void MarkerController::markerBringToFront(marker_sptr marker)
 {
@@ -175,19 +157,13 @@ void MarkerController::markerBringToFront(marker_sptr marker)
 	marker->setZ(d_mrks_default_z);
 }
 
-QwtPlot *MarkerController::plot()
-{
-	return static_cast<QwtPlot *>(parent());
-}
+QwtPlot *MarkerController::plot() { return static_cast<QwtPlot *>(parent()); }
 
-const QwtPlot *MarkerController::plot() const
-{
-	return static_cast<const QwtPlot *>(parent());
-}
+const QwtPlot *MarkerController::plot() const { return static_cast<const QwtPlot *>(parent()); }
 
 void MarkerController::selectMarker(marker_sptr marker)
 {
-	if (marker->isVisible()) {
+	if(marker->isVisible()) {
 		d_selected_mkr = marker;
 		Q_EMIT markerSelected(marker);
 	}

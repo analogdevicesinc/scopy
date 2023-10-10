@@ -37,8 +37,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "binding/binding.hpp"
 
-#include <cassert>
+#include "prop/property.hpp"
 
 #include <QFormLayout>
 #include <QHBoxLayout>
@@ -46,9 +47,7 @@
 #include <QLabel>
 #include <QPushButton>
 
-#include "prop/property.hpp"
-
-#include "binding/binding.hpp"
+#include <cassert>
 
 using std::shared_ptr;
 using std::string;
@@ -57,14 +56,11 @@ using std::vector;
 namespace scopy {
 namespace bind {
 
-const vector< shared_ptr<prop::Property> >& Binding::properties()
-{
-	return properties_;
-}
+const vector<shared_ptr<prop::Property>> &Binding::properties() { return properties_; }
 
 void Binding::commit()
 {
-	for (shared_ptr<scopy::prop::Property> p : properties_) {
+	for(shared_ptr<scopy::prop::Property> p : properties_) {
 		assert(p);
 		p->commit();
 	}
@@ -76,13 +72,13 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 
 	help_labels_.clear();
 
-	for (shared_ptr<scopy::prop::Property> p : properties_) {
+	for(shared_ptr<scopy::prop::Property> p : properties_) {
 		assert(p);
 
 		QWidget *widget;
 		QLabel *help_lbl = nullptr;
 
-		if (p->desc().isEmpty()) {
+		if(p->desc().isEmpty()) {
 			widget = p->get_widget(layout->parentWidget(), auto_commit);
 		} else {
 
@@ -90,8 +86,7 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 			help_btn->setFlat(true);
 			help_btn->setIcon(QIcon::fromTheme("info"));
 			help_btn->setToolTip(p->desc());
-			connect(help_btn, SIGNAL(clicked(bool)),
-				this, SLOT(on_help_clicked()));
+			connect(help_btn, SIGNAL(clicked(bool)), this, SLOT(on_help_clicked()));
 
 			QHBoxLayout *layout = new QHBoxLayout();
 			layout->setContentsMargins(0, 0, 0, 0);
@@ -107,7 +102,7 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 			help_labels_[help_btn] = help_lbl;
 		}
 
-		if (p->labeled_widget()) {
+		if(p->labeled_widget()) {
 			layout->addRow(widget);
 		} else {
 			auto *lbl = new QLabel(p->name());
@@ -116,12 +111,12 @@ void Binding::add_properties_to_form(QFormLayout *layout, bool auto_commit)
 			layout->setSpacing(10);
 		}
 
-		if (help_lbl)
+		if(help_lbl)
 			layout->addRow(help_lbl);
 	}
 }
 
-QWidget* Binding::get_property_form(QWidget *parent, bool auto_commit)
+QWidget *Binding::get_property_form(QWidget *parent, bool auto_commit)
 {
 	QWidget *const form = new QWidget(parent);
 	QFormLayout *const layout = new QFormLayout(form);
@@ -132,7 +127,7 @@ QWidget* Binding::get_property_form(QWidget *parent, bool auto_commit)
 
 void Binding::update_property_widgets()
 {
-	for (shared_ptr<scopy::prop::Property> p : properties_) {
+	for(shared_ptr<scopy::prop::Property> p : properties_) {
 		assert(p);
 		p->update_widget();
 	}
@@ -140,7 +135,7 @@ void Binding::update_property_widgets()
 
 QString Binding::print_variant(QVariant qvar)
 {
-	if (!qvar.isValid()) {
+	if(!qvar.isValid()) {
 		return QString::fromStdString("(null)");
 	} else {
 		return qvar.toString();
@@ -149,14 +144,14 @@ QString Binding::print_variant(QVariant qvar)
 
 void Binding::on_help_clicked()
 {
-	QPushButton *btn = qobject_cast<QPushButton*>(QObject::sender());
+	QPushButton *btn = qobject_cast<QPushButton *>(QObject::sender());
 	assert(btn);
 
 	QLabel *lbl = help_labels_.at(btn);
 	lbl->setVisible(!lbl->isVisible());
 }
 
-}  // namespace binding
-}  // namespace scopy
+} // namespace bind
+} // namespace scopy
 
 #include "binding/moc_binding.cpp"

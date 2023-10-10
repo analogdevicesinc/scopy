@@ -18,21 +18,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_DIOCONTROLLER_H
 #define SCOPY_DIOCONTROLLER_H
 
-#include <QString>
-#include <utility>
 #include <iio.h>
+
+#include <QString>
 #include <QThread>
 #include <QTimer>
 
+#include <utility>
+
 namespace scopy::swiot {
-class DioController : public QObject {
+class DioController : public QObject
+{
 	Q_OBJECT
 public:
-	explicit DioController(struct iio_context* context_, QString deviceName = "max14906");
+	explicit DioController(struct iio_context *context_, QString deviceName = "max14906");
 	~DioController() override;
 
 	int getChannelCount();
@@ -41,11 +43,12 @@ public:
 
 	QString getChannelName(unsigned int index);
 	QString getChannelType(unsigned int index);
+
 private:
 	QString m_deviceName;
-	struct iio_context* m_context;
-	struct iio_device* m_device;
+	struct iio_context *m_context;
+	struct iio_device *m_device;
 };
-}
+} // namespace scopy::swiot
 
-#endif //SCOPY_DIOCONTROLLER_H
+#endif // SCOPY_DIOCONTROLLER_H

@@ -1,17 +1,18 @@
 #include "debuggerplugin.h"
-#include "debuggerinstrument.h"
-#include <iio.h>
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QDebug>
-#include <QLoggingCategory>
 
-#include <iioutil/contextprovider.h>
+#include "debuggerinstrument.h"
+
+#include <iio.h>
+
+#include <QDebug>
+#include <QElapsedTimer>
+#include <QLabel>
+#include <QLoggingCategory>
+#include <QVBoxLayout>
+
 #include <core/detachedtoolwindow.h>
 #include <core/detachedtoolwindowmanager.h>
-#include <QElapsedTimer>
-
-
+#include <iioutil/contextprovider.h>
 
 using namespace scopy;
 using namespace scopy::debugger;
@@ -35,29 +36,26 @@ bool DebuggerPlugin::compatible(QString m_param, QString category)
 
 void DebuggerPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("debugger","Debugger",":/gui/icons/scopy-default/icons/tool_debugger.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("debugger", "Debugger", ":/gui/icons/scopy-default/icons/tool_debugger.svg"));
 	ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger")->setVisible(true);
 }
 
-QString DebuggerPlugin::description()
-{
-	return "IIO context explorer tool";
-}
+QString DebuggerPlugin::description() { return "IIO context explorer tool"; }
 
 bool DebuggerPlugin::onConnect()
 {
 	ContextProvider *c = ContextProvider::GetInstance();
 	iio_context *ctx = c->open(m_param);
-	if (!ctx) {
+	if(!ctx) {
 		return false;
 	}
-	auto dbgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList,"debugger");
+	auto dbgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger");
 	dbgTme->setTool(new DebuggerInstrument(ctx, nullptr, nullptr));
 	dbgTme->setEnabled(true);
 	dbgTme->setRunBtnVisible(true);
 
 	return true;
-
 }
 
 bool DebuggerPlugin::onDisconnect()
@@ -86,7 +84,7 @@ bool DebuggerPlugin::loadPage()
 void DebuggerPlugin::initMetadata()
 {
 	loadMetadata(
-R"plugin(
+		R"plugin(
 	{
 	   "priority":3,
 	   "category":[

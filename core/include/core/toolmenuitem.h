@@ -53,7 +53,6 @@ public:
 Q_SIGNALS:
 	void doubleclick();
 
-
 public Q_SLOTS:
 	void setDisabled(bool disabled);
 
@@ -65,6 +64,7 @@ protected:
 	void dragLeaveEvent(QDragLeaveEvent *event);
 
 	void mouseMoveEvent(QMouseEvent *event);
+
 private:
 	QPushButton *toolBtn;
 	CustomPushButton *toolRunBtn;
@@ -76,5 +76,5 @@ private:
 private:
 	void _buildUI();
 };
-}
+} // namespace scopy
 #endif // TOOLMENUITEM_H

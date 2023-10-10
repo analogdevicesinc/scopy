@@ -21,14 +21,15 @@
 #ifndef M2K_SYMBOL_CONTROLLER_H
 #define M2K_SYMBOL_CONTROLLER_H
 
+#include "scopy-gui_export.h"
+#include "symbol.h"
+
 #include <qpointer.h>
 #include <qwt_widget_overlay.h>
-#include "symbol.h"
-#include "scopy-gui_export.h"
 
 class QwtPlot;
 
-class SCOPY_GUI_EXPORT SymbolController: public QObject
+class SCOPY_GUI_EXPORT SymbolController : public QObject
 {
 	Q_OBJECT
 

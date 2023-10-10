@@ -21,22 +21,22 @@
 #ifndef SPECTRUM_MARKER_H
 #define SPECTRUM_MARKER_H
 
-#include <qwt_plot_marker.h>
-#include <QColor>
 #include "scopy-gui_export.h"
+
+#include <QColor>
+#include <qwt_plot_marker.h>
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT SpectrumMarker: public QwtPlotMarker
+class SCOPY_GUI_EXPORT SpectrumMarker : public QwtPlotMarker
 {
 public:
-	SpectrumMarker(const QString& title, bool movable = true);
-	SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis,
-		bool movable = true);
+	SpectrumMarker(const QString &title, bool movable = true);
+	SpectrumMarker(const QString &title, QwtAxisId xAxis, QwtAxisId yAxis, bool movable = true);
 	virtual ~SpectrumMarker();
 
 	QColor defaultColor() const;
-	void setDefaultColor(const QColor&);
+	void setDefaultColor(const QColor &);
 
 	bool selected() const;
 	void setSelected(bool on);
@@ -44,8 +44,8 @@ public:
 	bool movable() const;
 	void setMovable(bool on);
 
-	QPoint plotValueToPixels(const QPointF& point) const;
-	QPointF plotPixelsToValue(const QPoint& point) const;
+	QPoint plotValueToPixels(const QPointF &point) const;
+	QPointF plotPixelsToValue(const QPoint &point) const;
 
 	QRect boundingRectPixels() const;
 

@@ -1,21 +1,25 @@
 #ifndef GRTIMEPLOTADDONSETTINGS_H
 #define GRTIMEPLOTADDONSETTINGS_H
 
-#include "tooladdon.h"
-#include "scopy-gr-util_export.h"
-#include <QLabel>
 #include "grtimeplotaddon.h"
+#include "scopy-gr-util_export.h"
+#include "tooladdon.h"
+
+#include <QLabel>
+
 #include <gui/spinbox_a.hpp>
-#include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menucombo.h>
+#include <gui/widgets/menuonoffswitch.h>
 
 namespace scopy::grutil {
 class GRTimePlotAddon;
 class GRTimeChannelAddon;
-class SCOPY_GR_UTIL_EXPORT GRTimePlotAddonSettings : public QObject, public ToolAddon, public GRTopAddon {
+class SCOPY_GR_UTIL_EXPORT GRTimePlotAddonSettings : public QObject, public ToolAddon, public GRTopAddon
+{
 	Q_OBJECT
 public:
-	typedef enum {
+	typedef enum
+	{
 		XMODE_SAMPLES,
 		XMODE_TIME,
 		XMODE_OVERRIDE
@@ -25,7 +29,7 @@ public:
 	~GRTimePlotAddonSettings();
 
 	QString getName() override;
-	QWidget* getWidget() override;
+	QWidget *getWidget() override;
 
 	uint32_t bufferSize() const;
 
@@ -49,8 +53,8 @@ public Q_SLOTS:
 	void onInit() override;
 	void onDeinit() override;
 	void preFlowBuild() override;
-	void onChannelAdded(ToolAddon* t) override;
-	void onChannelRemoved(ToolAddon*) override;
+	void onChannelAdded(ToolAddon *t) override;
+	void onChannelRemoved(ToolAddon *) override;
 
 	void setBufferSize(uint32_t newBufferSize);
 	void computeSampleRateAvailable();
@@ -64,12 +68,12 @@ Q_SIGNALS:
 	void sampleRateChanged(double);
 
 private:
-	QWidget* createMenu(QWidget* parent = nullptr);
-	QWidget* createXAxisMenu(QWidget* parent = nullptr);
+	QWidget *createMenu(QWidget *parent = nullptr);
+	QWidget *createXAxisMenu(QWidget *parent = nullptr);
 
 private:
-	GRTimePlotAddon* m_plot;
-	QList<GRTimeChannelAddon*> grChannels;
+	GRTimePlotAddon *m_plot;
+	QList<GRTimeChannelAddon *> grChannels;
 	QString name;
 	QWidget *widget;
 	QPen m_pen;
@@ -83,7 +87,7 @@ private:
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuOnOffSwitch *m_showTagsSw;
-	MenuOnOffSwitch* m_showLabels;
+	MenuOnOffSwitch *m_showLabels;
 	MenuCombo *m_xModeCb;
 
 	bool m_sampleRateAvailable;
@@ -102,6 +106,6 @@ private:
 	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
 	double readSampleRate();
 };
-}
+} // namespace scopy::grutil
 
 #endif // GRTIMEPLOTADDONSETTINGS_H

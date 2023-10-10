@@ -1,41 +1,36 @@
 #include "plotinfo.h"
+
 #include "hoverwidget.h"
 #include "plotaxis.h"
 
 using namespace scopy;
 
-TimePlotHDivInfo::TimePlotHDivInfo(QWidget *parent) {
+TimePlotHDivInfo::TimePlotHDivInfo(QWidget *parent)
+{
 	StyleHelper::TimePlotHDivInfo(this);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_mpf = new MetricPrefixFormatter(this);
-
 }
 
-TimePlotHDivInfo::~TimePlotHDivInfo()
+TimePlotHDivInfo::~TimePlotHDivInfo() {}
+
+void TimePlotHDivInfo::update(double val) { setText(m_mpf->format(val, "s", 2) + "/div"); }
+
+TimePlotSamplingInfo::TimePlotSamplingInfo(QWidget *parent)
 {
-
-}
-
-void TimePlotHDivInfo::update(double val) {
-	setText(m_mpf->format(val, "s", 2) + "/div");
-}
-
-TimePlotSamplingInfo::TimePlotSamplingInfo(QWidget *parent) {
 	StyleHelper::TimePlotSamplingInfo(this);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	m_mpf = new MetricPrefixFormatter(this);
 }
 
-TimePlotSamplingInfo::~TimePlotSamplingInfo()
+TimePlotSamplingInfo::~TimePlotSamplingInfo() {}
+
+void TimePlotSamplingInfo::update(int ps, int bs, double sr)
 {
-
-}
-
-void TimePlotSamplingInfo::update(int ps, int bs, double sr) {
 	QString text;
-	text = QString("%1").arg(m_mpf->format(ps, "samples", 2));//.arg(m_mpf->format(bs, "samples", 2));
-//	if(sr != 1.0)
-		text += QString(" at %2").arg(m_mpf->format(sr, "sps", 2));
+	text = QString("%1").arg(m_mpf->format(ps, "samples", 2)); //.arg(m_mpf->format(bs, "samples", 2));
+								   //	if(sr != 1.0)
+	text += QString(" at %2").arg(m_mpf->format(sr, "sps", 2));
 
 	setText(text);
 }
@@ -46,12 +41,10 @@ TimePlotStatusInfo::TimePlotStatusInfo(QWidget *parent)
 	StyleHelper::TimePlotSamplingInfo(this);
 }
 
-TimePlotStatusInfo::~TimePlotStatusInfo()
+TimePlotStatusInfo::~TimePlotStatusInfo() {}
+
+void PlotBufferPreviewerController::setupBufferPreviewer()
 {
-
-}
-
-void PlotBufferPreviewerController::setupBufferPreviewer() {
 	m_bufferPreviewer->setMinimumHeight(20);
 	m_bufferPreviewer->setCursorPos(0.5);
 	m_bufferPreviewer->setHighlightPos(0.05);
@@ -62,8 +55,7 @@ void PlotBufferPreviewerController::setupBufferPreviewer() {
 
 	updateDataLimits(m_plot->xAxis()->min(), m_plot->xAxis()->max());
 
-	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {
-	});
+	connect(m_bufferPreviewer, &BufferPreviewer::bufferStopDrag, this, [=]() {});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferStartDrag, this, [=]() {
 		m_bufferPrevInitMin = m_plot->xAxis()->min();
@@ -77,28 +69,30 @@ void PlotBufferPreviewerController::setupBufferPreviewer() {
 		double xAxisWidth = m_bufferPrevData;
 
 		moveTo = value * xAxisWidth / width;
-		m_plot->xAxis()->setInterval(m_bufferPrevInitMin + moveTo,  m_bufferPrevInitMax + moveTo);
+		m_plot->xAxis()->setInterval(m_bufferPrevInitMin + moveTo, m_bufferPrevInitMax + moveTo);
 		m_plot->replot();
 
 		updateBufferPreviewer();
-	} );
+	});
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferResetPosition, this, [=]() {
-		m_plot->xAxis()->setInterval(m_bufferPrevInitMin,  m_bufferPrevInitMax);
+		m_plot->xAxis()->setInterval(m_bufferPrevInitMin, m_bufferPrevInitMax);
 		m_plot->replot();
 
 		updateBufferPreviewer();
-	} );
+	});
 }
 
-void PlotBufferPreviewerController::updateDataLimits(double min, double max) {
+void PlotBufferPreviewerController::updateDataLimits(double min, double max)
+{
 	m_bufferPrevData = max - min;
 	updateBufferPreviewer();
 }
 
-void PlotBufferPreviewerController::updateBufferPreviewer() {
+void PlotBufferPreviewerController::updateBufferPreviewer()
+{
 	// Time interval within the plot canvas
-	QwtInterval plotInterval(m_plot->xAxis()->min(),  m_plot->xAxis()->max());
+	QwtInterval plotInterval(m_plot->xAxis()->min(), m_plot->xAxis()->max());
 
 	// Time interval that represents the captured data
 	QwtInterval dataInterval(0.0, m_bufferPrevData);
@@ -106,14 +100,11 @@ void PlotBufferPreviewerController::updateBufferPreviewer() {
 	// Use the two intervals to determine the width and position of the
 	// waveform and of the highlighted area
 	QwtInterval fullInterval = plotInterval | dataInterval;
-	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) /
-						  fullInterval.width();
+	double wPos = 1 - (fullInterval.maxValue() - dataInterval.minValue()) / fullInterval.width();
 	double wWidth = dataInterval.width() / fullInterval.width();
 
-	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) /
-						  fullInterval.width();
+	double hPos = 1 - (fullInterval.maxValue() - plotInterval.minValue()) / fullInterval.width();
 	double hWidth = plotInterval.width() / fullInterval.width();
-
 
 	m_bufferPreviewer->setWaveformWidth(wWidth);
 	m_bufferPreviewer->setWaveformPos(wPos);
@@ -128,10 +119,7 @@ PlotBufferPreviewerController::PlotBufferPreviewerController(PlotWidget *p, Buff
 	setupBufferPreviewer();
 }
 
-PlotBufferPreviewerController::~PlotBufferPreviewerController()
-{
-
-}
+PlotBufferPreviewerController::~PlotBufferPreviewerController() {}
 
 TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 {
@@ -157,33 +145,31 @@ TimePlotInfo::TimePlotInfo(PlotWidget *plot, QWidget *parent)
 #ifdef HOVER_INFO
 	lay->addWidget(m_hdiv);
 	lay->addWidget(m_sampling);
-	lay->setAlignment(m_sampling,Qt::AlignRight);
+	lay->setAlignment(m_sampling, Qt::AlignRight);
 #else
 
 	HoverWidget *hdivhover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
 	hdivhover->setContent(m_hdiv);
 	hdivhover->setAnchorPos(HoverPosition::HP_TOPLEFT);
 	hdivhover->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-	hdivhover->setAnchorOffset(QPoint(8,6));
+	hdivhover->setAnchorOffset(QPoint(8, 6));
 	hdivhover->show();
 	m_hdiv->setAttribute(Qt::WA_TransparentForMouseEvents);
 
-	HoverWidget *samplinginfohover = new HoverWidget(nullptr,  plot->plot()->canvas(), plot->plot());
+	HoverWidget *samplinginfohover = new HoverWidget(nullptr, plot->plot()->canvas(), plot->plot());
 	samplinginfohover->setContent(m_sampling);
 	samplinginfohover->setAnchorPos(HoverPosition::HP_TOPRIGHT);
 	samplinginfohover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
-	samplinginfohover->setAnchorOffset(QPoint(-8,6));
+	samplinginfohover->setAnchorOffset(QPoint(-8, 6));
 	samplinginfohover->show();
 	samplinginfohover->setAttribute(Qt::WA_TransparentForMouseEvents);
 #endif
 }
 
-TimePlotInfo::~TimePlotInfo()
+TimePlotInfo::~TimePlotInfo() {}
+
+void TimePlotInfo::update(PlotSamplingInfo info)
 {
-
-}
-
-void TimePlotInfo::update(PlotSamplingInfo info) {
 	auto x = m_plot->xAxis();
 	auto max = x->max();
 	auto min = x->min();
@@ -194,7 +180,6 @@ void TimePlotInfo::update(PlotSamplingInfo info) {
 	m_bufferController->updateDataLimits(min, max);
 }
 
-void TimePlotInfo::updateBufferPreviewer()
-{
-	m_bufferController->updateBufferPreviewer();
-}
+void TimePlotInfo::updateBufferPreviewer() { m_bufferController->updateBufferPreviewer(); }
+
+#include "moc_plotinfo.cpp"

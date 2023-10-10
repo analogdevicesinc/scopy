@@ -19,14 +19,12 @@
  */
 #include "nyquistplotzoomer.h"
 
-
 using namespace scopy;
 
-NyquistPlotZoomer::NyquistPlotZoomer(QwtPolarCanvas* parent):
-    QwtPolarMagnifier(parent), zoom_count(0)
-{
-
-}
+NyquistPlotZoomer::NyquistPlotZoomer(QwtPolarCanvas *parent)
+	: QwtPolarMagnifier(parent)
+	, zoom_count(0)
+{}
 
 void NyquistPlotZoomer::zoomIn()
 {
@@ -37,14 +35,11 @@ void NyquistPlotZoomer::zoomIn()
 void NyquistPlotZoomer::zoomOut()
 {
 	QwtPolarMagnifier::rescale(1.25);
-	if (zoom_count > 0)
+	if(zoom_count > 0)
 		--zoom_count;
 }
 
-bool NyquistPlotZoomer::isZoomed()
-{
-	return (zoom_count != 0);
-}
+bool NyquistPlotZoomer::isZoomed() { return (zoom_count != 0); }
 
 void NyquistPlotZoomer::cancelZoom()
 {

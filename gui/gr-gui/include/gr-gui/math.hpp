@@ -21,42 +21,42 @@
 #ifndef SCOPY_MATH_HPP
 #define SCOPY_MATH_HPP
 
-#include <QAction>
-#include <QWidget>
 #include "scopy-gr-gui_export.h"
 
+#include <QAction>
+#include <QWidget>
+
 namespace Ui {
-	class Math;
+class Math;
 }
 
 namespace scopy {
-	class SCOPY_GR_GUI_EXPORT Math : public QWidget
-	{
-		Q_OBJECT
+class SCOPY_GR_GUI_EXPORT Math : public QWidget
+{
+	Q_OBJECT
 
-	public:
-		explicit Math(QWidget *parent = nullptr,
-				unsigned int num_inputs = 1);
+public:
+	explicit Math(QWidget *parent = nullptr, unsigned int num_inputs = 1);
 
-	public Q_SLOTS:
-		void setFunction(const QString& function);
+public Q_SLOTS:
+	void setFunction(const QString &function);
 
-	Q_SIGNALS:
-		void functionValid(const QString& function);
-		void stateReseted();
+Q_SIGNALS:
+	void functionValid(const QString &function);
+	void stateReseted();
 
-	private Q_SLOTS:
-		void handleButton();
-		void handleMenuButton(QAction *action);
-		void handleMenuButtonT(QAction *action);
-		void validateFunction();
-		void resetState();
-		void delLastChar();
+private Q_SLOTS:
+	void handleButton();
+	void handleMenuButton(QAction *action);
+	void handleMenuButtonT(QAction *action);
+	void validateFunction();
+	void resetState();
+	void delLastChar();
 
-	private:
-		Ui::Math *ui;
-		unsigned int num_inputs;
-	};
-}
+private:
+	Ui::Math *ui;
+	unsigned int num_inputs;
+};
+} // namespace scopy
 
 #endif /* SCOPY_MATH_HPP */

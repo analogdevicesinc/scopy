@@ -21,9 +21,10 @@
 #ifndef BASEMENU_H
 #define BASEMENU_H
 
-#include <QWidget>
-#include "scopy-gui_export.h"
 #include "basemenuitem.h"
+#include "scopy-gui_export.h"
+
+#include <QWidget>
 
 namespace Ui {
 class BaseMenu;
@@ -43,7 +44,7 @@ public:
 	void removeMenuItem(BaseMenuItem *menuItem);
 	void removeMenuItem(QVector<BaseMenuItem *> items);
 
-	int positionOf(BaseMenuItem* menuItem);
+	int positionOf(BaseMenuItem *menuItem);
 
 	void setMargins(int left, int top, int right, int bottom);
 
@@ -66,6 +67,6 @@ protected:
 	int d_items;
 	void _updateItemsPosition();
 };
-}
+} // namespace scopy
 
 #endif // BASEMENU_H

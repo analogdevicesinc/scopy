@@ -37,42 +37,37 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <cassert>
+#include "prop/string.hpp"
 
 #include <QDebug>
 #include <QLineEdit>
 #include <QSpinBox>
 
-#include "prop/string.hpp"
+#include <cassert>
 
 using std::string;
 
 namespace scopy {
 namespace prop {
 
-String::String(QString name,
-	QString desc,
-	Getter getter,
-	Setter setter) :
-	Property(name, desc, getter, setter),
-	line_edit_(nullptr)
-{
-}
+String::String(QString name, QString desc, Getter getter, Setter setter)
+	: Property(name, desc, getter, setter)
+	, line_edit_(nullptr)
+{}
 
-QWidget* String::get_widget(QWidget *parent, bool auto_commit)
+QWidget *String::get_widget(QWidget *parent, bool auto_commit)
 {
-	if (line_edit_)
+	if(line_edit_)
 		return line_edit_;
 
-	if (!getter_)
+	if(!getter_)
 		return nullptr;
 
 	try {
 		QVariant variant = getter_();
-		if (!variant.isValid())
+		if(!variant.isValid())
 			return nullptr;
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return nullptr;
 	}
@@ -81,23 +76,22 @@ QWidget* String::get_widget(QWidget *parent, bool auto_commit)
 
 	update_widget();
 
-	if (auto_commit)
-		connect(line_edit_, SIGNAL(textEdited(const QString&)),
-			this, SLOT(on_text_edited(const QString&)));
+	if(auto_commit)
+		connect(line_edit_, SIGNAL(textEdited(const QString &)), this, SLOT(on_text_edited(const QString &)));
 
 	return line_edit_;
 }
 
 void String::update_widget()
 {
-	if (!line_edit_)
+	if(!line_edit_)
 		return;
 
 	QVariant variant;
 
 	try {
 		variant = getter_();
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return;
 	}
@@ -112,19 +106,16 @@ void String::commit()
 {
 	assert(setter_);
 
-	if (!line_edit_)
+	if(!line_edit_)
 		return;
 
 	QString ba = line_edit_->text();
 	setter_(QVariant(ba));
 }
 
-void String::onTextEdited(const QString&)
-{
-	commit();
-}
+void String::onTextEdited(const QString &) { commit(); }
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #include "prop/moc_string.cpp"

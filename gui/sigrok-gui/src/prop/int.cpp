@@ -37,57 +37,51 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "prop/int.hpp"
+
+#include <QDebug>
+#include <QSpinBox>
 
 #include <cassert>
 #include <cstdint>
 
-#include <QDebug>
-#include <QSpinBox>
-#include "prop/int.hpp"
-
-using std::optional;
 using std::max;
 using std::min;
+using std::optional;
 using std::pair;
 
 namespace scopy {
 namespace prop {
 
-Int::Int(QString name,
-	QString desc,
-	QString suffix,
-	optional< pair<int64_t, int64_t> > range,
-	Getter getter,
-	Setter setter,
-	GVariantClass gvarClass) :
-	Property(name, desc, getter, setter),
-	suffix_(suffix),
-	range_(range),
-	spin_box_(nullptr),
-	gvar_class_type_(gvarClass)
-{
-}
+Int::Int(QString name, QString desc, QString suffix, optional<pair<int64_t, int64_t>> range, Getter getter,
+	 Setter setter, GVariantClass gvarClass)
+	: Property(name, desc, getter, setter)
+	, suffix_(suffix)
+	, range_(range)
+	, spin_box_(nullptr)
+	, gvar_class_type_(gvarClass)
+{}
 
-QWidget* Int::get_widget(QWidget *parent, bool auto_commit)
+QWidget *Int::get_widget(QWidget *parent, bool auto_commit)
 {
 	int64_t range_min = 0;
 	uint64_t range_max = 0;
 
-	if (spin_box_)
+	if(spin_box_)
 		return spin_box_;
 
-	if (!getter_)
+	if(!getter_)
 		return nullptr;
 
 	try {
 		value_ = getter_();
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return nullptr;
 	}
 
 	QVariant variant = value_;
-	if (!variant.isValid())
+	if(!variant.isValid())
 		return nullptr;
 
 	spin_box_ = new QSpinBox(parent);
@@ -96,19 +90,19 @@ QWidget* Int::get_widget(QWidget *parent, bool auto_commit)
 	QVariant::Type type = variant.type();
 	assert(type);
 
-	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
+	if(gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
 		range_min = 0, range_max = UINT8_MAX;
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT16) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT16) {
 		range_min = 0, range_max = INT16_MAX;
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
 		range_min = 0, range_max = UINT16_MAX;
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT32) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT32) {
 		range_min = 0, range_max = INT32_MAX;
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
 		range_min = 0, range_max = UINT32_MAX;
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT64) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT64) {
 		range_min = 0, range_max = INT64_MAX;
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
 		range_min = 0, range_max = UINT64_MAX;
 	} else {
 		assert(false);
@@ -122,28 +116,27 @@ QWidget* Int::get_widget(QWidget *parent, bool auto_commit)
 	range_min = max(range_min, (int64_t)INT_MIN);
 	range_max = min(range_max, (uint64_t)INT_MAX);
 
-	if (range_)
+	if(range_)
 		spin_box_->setRange((int)range_->first, (int)range_->second);
 	else
 		spin_box_->setRange((int)range_min, (int)range_max);
 
 	update_widget();
 
-	if (auto_commit)
-		connect(spin_box_, SIGNAL(valueChanged(int)),
-			this, SLOT(on_value_changed(int)));
+	if(auto_commit)
+		connect(spin_box_, SIGNAL(valueChanged(int)), this, SLOT(on_value_changed(int)));
 
 	return spin_box_;
 }
 
 void Int::update_widget()
 {
-	if (!spin_box_)
+	if(!spin_box_)
 		return;
 
 	try {
 		value_ = getter_();
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return;
 	}
@@ -156,19 +149,19 @@ void Int::update_widget()
 
 	int64_t int_val = 0;
 
-	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
+	if(gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
 		int_val = variant.value<uint8_t>();
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT16) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT16) {
 		int_val = variant.value<int16_t>();
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
 		int_val = variant.value<uint16_t>();
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT32) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT32) {
 		int_val = variant.value<int32_t>();
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
 		int_val = variant.value<uint32_t>();
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT64) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT64) {
 		int_val = variant.value<int64_t>();
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
 		int_val = variant.value<uint64_t>();
 	} else {
 		assert(false);
@@ -181,7 +174,7 @@ void Int::commit()
 {
 	assert(setter_);
 
-	if (!spin_box_)
+	if(!spin_box_)
 		return;
 
 	QVariant variant = value_;
@@ -192,19 +185,19 @@ void Int::commit()
 
 	auto spin_val = spin_box_->value();
 
-	if (gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
+	if(gvar_class_type_ == G_VARIANT_CLASS_BYTE) {
 		value_ = QVariant::fromValue<uint8_t>(spin_val);
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT16) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT16) {
 		value_ = QVariant::fromValue<int16_t>(spin_val);
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT16) {
 		value_ = QVariant::fromValue<uint16_t>(spin_val);
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT32) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT32) {
 		value_ = QVariant::fromValue<int32_t>(spin_val);
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT32) {
 		value_ = QVariant::fromValue<uint32_t>(spin_val);
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_INT64) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_INT64) {
 		value_ = QVariant::fromValue<int64_t>(spin_val);
-	} else if (gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
+	} else if(gvar_class_type_ == G_VARIANT_CLASS_UINT64) {
 		value_ = QVariant::fromValue<uint64_t>(spin_val);
 	} else {
 		assert(false);
@@ -213,12 +206,9 @@ void Int::commit()
 	setter_(value_);
 }
 
-void Int::on_value_changed(int)
-{
-	commit();
-}
+void Int::on_value_changed(int) { commit(); }
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #include "prop/moc_int.cpp"

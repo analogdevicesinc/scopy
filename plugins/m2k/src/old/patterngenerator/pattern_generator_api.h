@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PATTERNGENERATOR_API_H
 #define PATTERNGENERATOR_API_H
 
@@ -37,8 +36,8 @@ class PatternGenerator_API : public ApiObject
 	Q_PROPERTY(QVector<QVector<int>> currentGroups READ getCurrentGroups WRITE setCurrentGroups)
 
 	/* patterns from json */
-	Q_PROPERTY(QVector<QPair<QVector<int>, QString>> enabledPatterns READ getEnabledPatterns
-									WRITE setEnabledPatterns)
+	Q_PROPERTY(
+		QVector<QPair<QVector<int>, QString>> enabledPatterns READ getEnabledPatterns WRITE setEnabledPatterns)
 
 	/* common patterns + channels */
 	Q_PROPERTY(QStringList channelNames READ getChannelNames WRITE setChannelNames)
@@ -47,11 +46,11 @@ class PatternGenerator_API : public ApiObject
 
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 
-
 public:
 	explicit PatternGenerator_API(logic::PatternGenerator *pattern)
 		: ApiObject()
-		, m_pattern(pattern) {
+		, m_pattern(pattern)
+	{
 		qRegisterMetaType<QVector<int>>("vector(int)");
 		qRegisterMetaTypeStreamOperators<QVector<int>>("vector(int)");
 		qRegisterMetaType<QVector<QVector<int>>>("vector(vector(int))");
@@ -60,8 +59,8 @@ public:
 		qRegisterMetaType<QPair<QVector<int>, QString>>("pair(vector(int), string)");
 		qRegisterMetaTypeStreamOperators<QPair<QVector<int>, QString>>("pair(vector(int), string)");
 		qRegisterMetaType<QVector<QPair<QVector<int>, QString>>>("vector(pair(vector(int), string))");
-		qRegisterMetaTypeStreamOperators<QVector<QPair<QVector<int>, QString>>>("vector(pair(vector(int), string))");
-
+		qRegisterMetaTypeStreamOperators<QVector<QPair<QVector<int>, QString>>>(
+			"vector(pair(vector(int), string))");
 	}
 	~PatternGenerator_API() {}
 
@@ -78,7 +77,7 @@ public:
 	void setChannelPosition(const QList<double> &channelPosition);
 
 	QVector<QVector<int>> getCurrentGroups() const;
-	void setCurrentGroups(const QVector<QVector<int> > &groups);
+	void setCurrentGroups(const QVector<QVector<int>> &groups);
 
 	QVector<QPair<QVector<int>, QString>> getEnabledPatterns() const;
 	void setEnabledPatterns(const QVector<QPair<QVector<int>, QString>> &enabledPatterns);
@@ -89,6 +88,6 @@ public:
 private:
 	logic::PatternGenerator *m_pattern;
 };
-} // namespace logic
+} // namespace scopy::m2k::logic
 
 #endif // PATTERNGENERATOR_API_H

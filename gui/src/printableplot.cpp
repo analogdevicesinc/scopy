@@ -19,16 +19,17 @@
  */
 
 #include "printableplot.h"
+
 #include <QDateTime>
 #include <QFileDialog>
 #include <QImageWriter>
 
 using namespace scopy;
 
-PrintablePlot::PrintablePlot(QWidget *parent) :
-	BasicPlot(parent),
-	d_plotRenderer(new QwtPlotRenderer(this)),
-	d_useNativeDialog(true)
+PrintablePlot::PrintablePlot(QWidget *parent)
+	: BasicPlot(parent)
+	, d_plotRenderer(new QwtPlotRenderer(this))
+	, d_useNativeDialog(true)
 {
 	dropBackground(true);
 }
@@ -39,12 +40,9 @@ void PrintablePlot::dropBackground(bool drop)
 	d_plotRenderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground, drop);
 }
 
-void PrintablePlot::setUseNativeDialog(bool nativeDialog)
-{
-	d_useNativeDialog = nativeDialog;
-}
+void PrintablePlot::setUseNativeDialog(bool nativeDialog) { d_useNativeDialog = nativeDialog; }
 
-void PrintablePlot::printPlot(const QString& toolName)
+void PrintablePlot::printPlot(const QString &toolName)
 {
 	legendDisplay = new QwtLegend(this);
 	legendDisplay->setDefaultItemMode(QwtLegendData::ReadOnly);
@@ -61,34 +59,30 @@ void PrintablePlot::printPlot(const QString& toolName)
 	// native or qt based. So we reconstruct the file formats used by it and use our own
 	// call of QFileDialog::getSaveFileName(...) where we take into account the d_useNativeDialog
 	// boolean
-	const QList<QByteArray> imageFormats =
-			QImageWriter::supportedImageFormats();
+	const QList<QByteArray> imageFormats = QImageWriter::supportedImageFormats();
 	QStringList filter;
-	filter += QString( "PDF " ) + tr( "Documents" ) + " (*.pdf)";
-	filter += QString( "SVG " ) + tr( "Documents" ) + " (*.svg)";
-	filter += QString( "Postscript " ) + tr( "Documents" ) + " (*.ps)";
+	filter += QString("PDF ") + tr("Documents") + " (*.pdf)";
+	filter += QString("SVG ") + tr("Documents") + " (*.svg)";
+	filter += QString("Postscript ") + tr("Documents") + " (*.ps)";
 
-	if ( imageFormats.size() > 0 ) {
-		for ( int i = 0; i < imageFormats.size(); i++ ) {
-			filter += (imageFormats[i].toUpper() + " "
-                    + tr("Image") + " (*." +  imageFormats[i] + ")");
+	if(imageFormats.size() > 0) {
+		for(int i = 0; i < imageFormats.size(); i++) {
+			filter += (imageFormats[i].toUpper() + " " + tr("Image") + " (*." + imageFormats[i] + ")");
 		}
-
 	}
 
-	QString selectedFilter = QString( "PDF " ) + tr( "Documents" ) + " (*.pdf)";
+	QString selectedFilter = QString("PDF ") + tr("Documents") + " (*.pdf)";
 	fileName = QFileDialog::getSaveFileName(
-				nullptr, tr( "Export File Name" ), fileName,
-				filter.join( ";;" ), &selectedFilter,
-				(d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		nullptr, tr("Export File Name"), fileName, filter.join(";;"), &selectedFilter,
+		(d_useNativeDialog ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	if (fileName.split(".").size() <= 1) {
+	if(fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it
 		QString ext = selectedFilter.split(".")[1].split(")")[0];
 		fileName += "." + ext;
 	}
 
-	d_plotRenderer.renderDocument(this, fileName, QSizeF( 300, 200 ));
+	d_plotRenderer.renderDocument(this, fileName, QSizeF(300, 200));
 
 	insertLegend(nullptr);
 }

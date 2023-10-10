@@ -47,13 +47,14 @@
 #endif
 
 #include "WaterfallDisplayPlot.h"
+#include "scopy-gr-gui_export.h"
 
 #include <gnuradio/filter/firdes.h>
 #include <gnuradio/sync_block.h>
-#include <qapplication.h>
-#include <trigger_mode.h>
 
-#include "scopy-gr-gui_export.h"
+#include <qapplication.h>
+
+#include <trigger_mode.h>
 
 namespace scopy {
 
@@ -63,32 +64,26 @@ public:
 	typedef std::shared_ptr<waterfall_sink> sptr;
 
 	/*!
-     * \brief Build a complex number waterfall sink.
-     *
-     * \param size size of the FFT to compute and display. If using
-     *        the PDU message port to plot samples, the length of
-     *        each PDU must be a multiple of the FFT size.
-     * \param wintype type of window to apply (see gr::fft::window::win_type)
-     * \param fc center frequency of signal (use for x-axis labels)
-     * \param bw bandwidth of signal (used to set x-axis labels)
-     * \param name title for the plot
-     * \param nconnections number of signals to be connected to the
-     *        sink. The PDU message port is always available for a
-     *        connection, and this value must be set to 0 if only
-     *        the PDU message port is being used.
-     * \param parent a QWidget parent object, if any
-     */
-	static sptr make(int size,
-			 std::vector<float> win,
-			 double fc,
-			 double bw,
-			 const std::string& name,
-			 int nconnections = 1,
-			 WaterfallDisplayPlot* plot = NULL,
-			 bool fft_shift = false);
+	 * \brief Build a complex number waterfall sink.
+	 *
+	 * \param size size of the FFT to compute and display. If using
+	 *        the PDU message port to plot samples, the length of
+	 *        each PDU must be a multiple of the FFT size.
+	 * \param wintype type of window to apply (see gr::fft::window::win_type)
+	 * \param fc center frequency of signal (use for x-axis labels)
+	 * \param bw bandwidth of signal (used to set x-axis labels)
+	 * \param name title for the plot
+	 * \param nconnections number of signals to be connected to the
+	 *        sink. The PDU message port is always available for a
+	 *        connection, and this value must be set to 0 if only
+	 *        the PDU message port is being used.
+	 * \param parent a QWidget parent object, if any
+	 */
+	static sptr make(int size, std::vector<float> win, double fc, double bw, const std::string &name,
+			 int nconnections = 1, WaterfallDisplayPlot *plot = NULL, bool fft_shift = false);
 
 	virtual void reset() = 0;
-	virtual QWidget* qwidget() = 0;
+	virtual QWidget *qwidget() = 0;
 
 	virtual void clear_data() = 0;
 
@@ -102,14 +97,14 @@ public:
 	virtual void set_intensity_range(const double min, const double max) = 0;
 
 	virtual void set_update_time(double t) = 0;
-	virtual void set_line_label(unsigned int which, const std::string& line) = 0;
+	virtual void set_line_label(unsigned int which, const std::string &line) = 0;
 	virtual void set_line_alpha(unsigned int which, double alpha) = 0;
 
 	/*!
-     *  Pass "true" to this function to only show the positive half
-     *  of the spectrum. By default, this plotter shows the full
-     *  spectrum (positive and negative halves).
-     */
+	 *  Pass "true" to this function to only show the positive half
+	 *  of the spectrum. By default, this plotter shows the full
+	 *  spectrum (positive and negative halves).
+	 */
 	virtual void set_plot_pos_half(bool half) = 0;
 
 	virtual double line_alpha(unsigned int which) = 0;
@@ -120,9 +115,9 @@ public:
 	virtual double min_intensity(unsigned int which) = 0;
 	virtual double max_intensity(unsigned int which) = 0;
 	virtual void disable_legend() = 0;
-	virtual void set_trigger_mode(trigger_mode mode, int channel, const std::string &tag_key="") = 0;
+	virtual void set_trigger_mode(trigger_mode mode, int channel, const std::string &tag_key = "") = 0;
 
-	QApplication* d_qApplication;
+	QApplication *d_qApplication;
 };
 
 } /* namespace scopy */

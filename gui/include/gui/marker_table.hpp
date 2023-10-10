@@ -20,8 +20,9 @@
 #ifndef MARKER_TABLE_HPP
 #define MARKER_TABLE_HPP
 
-#include <QWidget>
 #include "scopy-gui_export.h"
+
+#include <QWidget>
 
 class QStandardItemModel;
 
@@ -39,15 +40,15 @@ public:
 	explicit MarkerTable(QWidget *parent = 0);
 	~MarkerTable();
 
-	void addMarker(int mkIdx, int chIdx, const QString& name,
-		double frequency, double magnitude, const QString& type);
+	void addMarker(int mkIdx, int chIdx, const QString &name, double frequency, double magnitude,
+		       const QString &type);
 	void removeMarker(int mkIdx, int chIdx);
-	void updateMarker(int mkIdx, int chIdx, double frequency,
-		double magnitude, const QString& type);
+	void updateMarker(int mkIdx, int chIdx, double frequency, double magnitude, const QString &type);
 	bool isMarker(int mkIdx, int chIdx);
 
 private:
-	enum Columns {
+	enum Columns
+	{
 		COL_ID = 0,
 		COL_NAME = 1,
 		COL_CH = 2,

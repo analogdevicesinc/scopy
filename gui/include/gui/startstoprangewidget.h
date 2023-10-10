@@ -21,10 +21,10 @@
 #ifndef STARTSTOPRANGEWIDGET_H
 #define STARTSTOPRANGEWIDGET_H
 
-#include <QWidget>
-
-#include "spinbox_a.hpp"
 #include "scopy-gui_export.h"
+#include "spinbox_a.hpp"
+
+#include <QWidget>
 
 namespace Ui {
 class StartStopRangeWidget;
@@ -36,10 +36,8 @@ class SCOPY_GUI_EXPORT StartStopRangeWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit StartStopRangeWidget(double min = 1.0, double max = 5e07,
-				      double minSpan = 1000,
-				      bool hasProgressWidget = false,
-				      QWidget *parent = nullptr);
+	explicit StartStopRangeWidget(double min = 1.0, double max = 5e07, double minSpan = 1000,
+				      bool hasProgressWidget = false, QWidget *parent = nullptr);
 	~StartStopRangeWidget();
 
 	double getStartValue() const;
@@ -79,6 +77,6 @@ private:
 	double maxValue;
 	double minSpan;
 };
-}
+} // namespace scopy
 
 #endif // STARTSTOPRANGEWIDGET_H

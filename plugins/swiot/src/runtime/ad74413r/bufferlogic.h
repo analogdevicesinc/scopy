@@ -18,25 +18,27 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef BUFFERLOGIC_H
 #define BUFFERLOGIC_H
 
 #include "chnlinfo.h"
 
-#include <QObject>
-#include <QMap>
 #include <iio.h>
+
+#include <QMap>
+#include <QObject>
+
+#include <cerrno>
 #include <iioutil/command.h>
 #include <iioutil/commandqueue.h>
-#include <cerrno>
 
-extern "C" {
-struct iio_context;
-struct iio_device;
-struct iio_channel;
+extern "C"
+{
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
 }
-Q_DECLARE_OPAQUE_POINTER(struct iio_buffer*)
+Q_DECLARE_OPAQUE_POINTER(struct iio_buffer *)
 
 namespace scopy::swiot {
 #define MAX_BUFFER_SIZE 160
@@ -44,14 +46,15 @@ namespace scopy::swiot {
 #define SAMPLING_FREQ_ATTR_NAME "sampling_frequency"
 #define MAX_INPUT_CHNLS_NO 8
 
-class BufferLogic : public QObject {
+class BufferLogic : public QObject
+{
 	Q_OBJECT
 public:
-	explicit BufferLogic(QMap<QString, iio_device*> devicesMap, CommandQueue *commandQueue);
+	explicit BufferLogic(QMap<QString, iio_device *> devicesMap, CommandQueue *commandQueue);
 
 	~BufferLogic();
 
-	QMap<QString, iio_channel*> getIioChnl(int chnlIdx);
+	QMap<QString, iio_channel *> getIioChnl(int chnlIdx);
 
 	bool verifyChannelsEnabledChanges(std::vector<bool> enabledChnls);
 	void applyChannelsEnabledChanges(std::vector<bool> enabledChnls);
@@ -72,7 +75,7 @@ public Q_SLOTS:
 	void onSamplingFreqChanged(int idx);
 
 Q_SIGNALS:
-	void chnlsChanged(QMap<int,  ChnlInfo *> chnlsInfo);
+	void chnlsChanged(QMap<int, ChnlInfo *> chnlsInfo);
 	void samplingFreqWritten(int samplingFreq);
 	void samplingFreqRead(int samplingFreq);
 	void channelFunctionDetermined(unsigned int i, QString function);
@@ -83,19 +86,19 @@ private Q_SLOTS:
 	void enabledChnCmdFinished(unsigned int i, scopy::Command *cmd);
 	void configuredDevCmdFinished(unsigned int i, scopy::Command *cmd);
 	void chnFunctionCmdFinished(unsigned int i, scopy::Command *cmd);
+
 private:
 	void createChannels();
 	void initChannelFunction(unsigned int i);
 
 private:
 	int m_plotChnlsNo;
-	QMap<QString, iio_device*> m_iioDevicesMap;
+	QMap<QString, iio_device *> m_iioDevicesMap;
 	QStringList m_samplingFreqAvailable;
 
 	QMap<int, ChnlInfo *> m_chnlsInfo;
 	CommandQueue *m_commandQueue;
 };
-}
-
+} // namespace scopy::swiot
 
 #endif // BUFFERLOGIC_H

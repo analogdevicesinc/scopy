@@ -1,14 +1,15 @@
 #include "chnlinfobuilder.h"
-#include "src/runtime/ad74413r/currentchnlinfo.h"
+
 #include "resistancechnlinfo.h"
+#include "src/runtime/ad74413r/currentchnlinfo.h"
 #include "voltagechnlinfo.h"
 
 using namespace scopy::swiot;
 
-ChnlInfo* ChnlInfoBuilder::build(iio_channel *iioChnl, QString id, CommandQueue *cmdQueue)
+ChnlInfo *ChnlInfoBuilder::build(iio_channel *iioChnl, QString id, CommandQueue *cmdQueue)
 {
 	int chnl_type = decodeId(id);
-	switch (chnl_type) {
+	switch(chnl_type) {
 	case VOLTAGE:
 		return new VoltageChnlInfo("V", "mV", iioChnl, cmdQueue);
 	case CURRENT:

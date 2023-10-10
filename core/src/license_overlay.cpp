@@ -1,23 +1,23 @@
 #include "qabstractbutton.h"
+
 #include <QCoreApplication>
-#include <QMessageBox>
-#include <license_overlay.h>
-
-#include <pluginbase/preferences.h>
-
 #include <QDesktopWidget>
 #include <QFile>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QStyle>
 #include <QTextBrowser>
+
+#include <license_overlay.h>
+#include <pluginbase/preferences.h>
 #include <stylehelper.h>
 #include <ui_licensedialogoverlay.h>
 
 using namespace scopy;
 
-LicenseOverlay::LicenseOverlay(QWidget* parent):
-	QWidget(parent),
-	parent(parent)
+LicenseOverlay::LicenseOverlay(QWidget *parent)
+	: QWidget(parent)
+	, parent(parent)
 {
 	overlay = new gui::TintedOverlay(parent);
 	ui = new Ui::LicenseDialogOverlay();
@@ -28,14 +28,12 @@ LicenseOverlay::LicenseOverlay(QWidget* parent):
 	StyleHelper::BlueButton(ui->btnExit, "btnExit");
 	StyleHelper::OverlayMenu(this, "licenseOverlay");
 
-	Preferences::connect(ui->btnContinue, &QAbstractButton::clicked, [&] () {
+	Preferences::connect(ui->btnContinue, &QAbstractButton::clicked, [&]() {
 		Preferences::GetInstance()->set("general_first_run", false);
 		overlay->deleteLater();
 		deleteLater();
 	});
-	Preferences::connect(ui->btnExit, &QAbstractButton::clicked, [&] () {
-		QCoreApplication::quit();
-	});
+	Preferences::connect(ui->btnExit, &QAbstractButton::clicked, [&]() { QCoreApplication::quit(); });
 }
 
 void LicenseOverlay::showOverlay()
@@ -47,10 +45,7 @@ void LicenseOverlay::showOverlay()
 	this->move(parent->rect().center() - this->rect().center());
 }
 
-QPushButton *LicenseOverlay::getContinueBtn()
-{
-	return ui->btnContinue;
-}
+QPushButton *LicenseOverlay::getContinueBtn() { return ui->btnContinue; }
 
 QString LicenseOverlay::getLicense()
 {
@@ -61,3 +56,5 @@ QString LicenseOverlay::getLicense()
 
 	return text;
 }
+
+#include "moc_license_overlay.cpp"

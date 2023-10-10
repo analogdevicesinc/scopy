@@ -37,16 +37,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_PROP_PROPERTY_HPP
 #define PULSEVIEW_PV_PROP_PROPERTY_HPP
 
-#include <functional>
+#include "scopy-sigrok-gui_export.h"
 
 #include <QString>
-#include <QWidget>
 #include <QVariant>
-#include "scopy-sigrok-gui_export.h"
+#include <QWidget>
+
+#include <functional>
 
 using std::function;
 
@@ -60,20 +60,20 @@ class SCOPY_SIGROK_GUI_EXPORT Property : public QObject
 	Q_OBJECT;
 
 public:
-	typedef function<QVariant ()> Getter;
-	typedef function<void (QVariant)> Setter;
+	typedef function<QVariant()> Getter;
+	typedef function<void(QVariant)> Setter;
 
 protected:
 	Property(QString name, QString desc, Getter getter, Setter setter);
 
 public:
-	const QString& name() const;
-	const QString& desc() const;
+	const QString &name() const;
+	const QString &desc() const;
 
 	QVariant get() const;
 	void set(QVariant val);
 
-	virtual QWidget* get_widget(QWidget *parent, bool auto_commit = false) = 0;
+	virtual QWidget *get_widget(QWidget *parent, bool auto_commit = false) = 0;
 	virtual bool labeled_widget() const;
 	virtual void update_widget() = 0;
 
@@ -88,7 +88,7 @@ protected:
 	QString desc_;
 };
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_PROP_PROPERTY_HPP

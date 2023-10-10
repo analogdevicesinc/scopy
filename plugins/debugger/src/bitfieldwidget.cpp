@@ -19,17 +19,18 @@
  */
 
 #include "bitfieldwidget.h"
-#include "ui_bitfieldwidget.h"
 
 #include "math.h"
+
+#include "ui_bitfieldwidget.h"
 
 using namespace scopy;
 using namespace scopy::debugger;
 
-BitfieldWidget::BitfieldWidget(QWidget *parent, QDomElement *bitfield) :
-	QWidget(parent),
-	ui(new Ui::BitfieldWidget()),
-	bitfield(bitfield)
+BitfieldWidget::BitfieldWidget(QWidget *parent, QDomElement *bitfield)
+	: QWidget(parent)
+	, ui(new Ui::BitfieldWidget())
+	, bitfield(bitfield)
 
 {
 	ui->setupUi(this);
@@ -46,12 +47,12 @@ BitfieldWidget::BitfieldWidget(QWidget *parent, QDomElement *bitfield) :
 
 	options = bitfield->firstChildElement("Options");
 
-	createWidget(); //build the widget
+	createWidget(); // build the widget
 }
 
-BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber) :
-	QWidget(parent),
-	ui(new Ui::BitfieldWidget())
+BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber)
+	: QWidget(parent)
+	, ui(new Ui::BitfieldWidget())
 {
 	ui->setupUi(this);
 
@@ -67,13 +68,10 @@ BitfieldWidget::BitfieldWidget(QWidget *parent, int bitNumber) :
 	ui->valueSpinBox->setEnabled(false);
 	ui->valueSpinBox->setMaximum(1);
 	connect(ui->valueSpinBox, SIGNAL(valueChanged(int)), this,
-	        SLOT(setValue(int))); //connect spinBox singnal to the value changed signal
+		SLOT(setValue(int))); // connect spinBox singnal to the value changed signal
 }
 
-BitfieldWidget::~BitfieldWidget()
-{
-	delete ui;
-}
+BitfieldWidget::~BitfieldWidget() { delete ui; }
 
 void BitfieldWidget::createWidget()
 {
@@ -82,43 +80,43 @@ void BitfieldWidget::createWidget()
 	ui->descriptionLabel->setText(name);
 	ui->bitLabel->setText(QString("Bit %1 ").arg(regOffset));
 
-	for (int i = 1; i < width; i++) {
+	for(int i = 1; i < width; i++) {
 		label = new QLabel(this);
 		label->setText(QString("Bit %1 ").arg(regOffset + i));
-		ui->bitHorizontalLayout->insertWidget(1,label);
+		ui->bitHorizontalLayout->insertWidget(1, label);
 	}
 
 	/*Set comboBox or spinBox*/
-	if (options.isNull()) {
+	if(options.isNull()) {
 		/*set spinBox*/
 		ui->stackedWidget->setCurrentIndex(1);
 		int temp = (int)pow(2, width) - 1;
 		ui->valueSpinBox->setMaximum(temp);
 		connect(ui->valueSpinBox, SIGNAL(valueChanged(int)), this,
-		        SLOT(setValue(int))); //connect spinBox singnal to the value changed signal
+			SLOT(setValue(int))); // connect spinBox singnal to the value changed signal
 	} else {
 		/*set comboBox*/
 		ui->stackedWidget->setCurrentIndex(0);
 
 		QDomElement temp = options.firstChildElement("Option");
 
-		while (options.lastChildElement() != temp) {
+		while(options.lastChildElement() != temp) {
 			ui->valueComboBox->addItem(temp.firstChildElement("Description").text());
 			temp = temp.nextSiblingElement();
 		}
 
 		ui->valueComboBox->addItem(temp.firstChildElement("Description").text());
 
-		connect(ui->valueComboBox,SIGNAL(currentIndexChanged(int)), this,
-		        SLOT(setValue(int))); //connect comboBox signal to the value changed signal
+		connect(ui->valueComboBox, SIGNAL(currentIndexChanged(int)), this,
+			SLOT(setValue(int))); // connect comboBox signal to the value changed signal
 	}
 }
 
-void BitfieldWidget::updateValue(uint32_t& value)
+void BitfieldWidget::updateValue(uint32_t &value)
 {
-	int temp = value & ((uint32_t)pow(2, width)  - 1);
+	int temp = value & ((uint32_t)pow(2, width) - 1);
 
-	if (ui->stackedWidget->currentIndex() == 1) {
+	if(ui->stackedWidget->currentIndex() == 1) {
 		ui->valueSpinBox->setValue(temp);
 	} else {
 		ui->valueComboBox->setCurrentIndex(value & ((uint32_t)pow(2, width) - 1));
@@ -127,15 +125,9 @@ void BitfieldWidget::updateValue(uint32_t& value)
 	value = (value >> width);
 }
 
-int BitfieldWidget::getRegOffset() const
-{
-	return regOffset;
-}
+int BitfieldWidget::getRegOffset() const { return regOffset; }
 
-int BitfieldWidget::getSliceWidth() const
-{
-	return sliceWidth;
-}
+int BitfieldWidget::getSliceWidth() const { return sliceWidth; }
 
 void BitfieldWidget::setValue(int value)
 {
@@ -145,7 +137,4 @@ void BitfieldWidget::setValue(int value)
 	Q_EMIT valueChanged(this->value, mask);
 }
 
-uint32_t BitfieldWidget::getDefaultValue(void) const
-{
-	return defaultValue;
-}
+uint32_t BitfieldWidget::getDefaultValue(void) const { return defaultValue; }

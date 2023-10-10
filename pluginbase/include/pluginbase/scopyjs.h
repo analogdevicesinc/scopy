@@ -21,14 +21,15 @@
 #ifndef SCOPY_QTJS_HPP
 #define SCOPY_QTJS_HPP
 
-#include <QObject>
+#include "apiobject.h"
+#include "qloggingcategory.h"
+#include "scopy-pluginbase_config.h"
+#include "scopy-pluginbase_export.h"
+
 #include <QFuture>
 #include <QFutureWatcher>
 #include <QJSEngine>
-#include "apiobject.h"
-#include "qloggingcategory.h"
-#include "scopy-pluginbase_export.h"
-#include "scopy-pluginbase_config.h"
+#include <QObject>
 #include <QSocketNotifier>
 
 class QJSEngine;
@@ -53,17 +54,17 @@ public:
 	Q_INVOKABLE void exit();
 	Q_INVOKABLE void sleep(unsigned long s);
 	Q_INVOKABLE void msleep(unsigned long ms);
-	Q_INVOKABLE void printToConsole(const QString& text);
-	Q_INVOKABLE QString readFromConsole(const QString& text);
+	Q_INVOKABLE void printToConsole(const QString &text);
+	Q_INVOKABLE QString readFromConsole(const QString &text);
 	Q_INVOKABLE void returnToApplication();
 	Q_INVOKABLE void suppressScopyMessages(bool b);
 
 	QJSEngine *engine();
 
-	void registerApi(ApiObject* obj);
-	void unregisterApi(ApiObject* obj);
-	void registerApi(ApiObject* obj, QJSValue parentObj);
-	void unregisterApi(ApiObject* obj, QJSValue parentObj);
+	void registerApi(ApiObject *obj);
+	void unregisterApi(ApiObject *obj);
+	void registerApi(ApiObject *obj, QJSValue parentObj);
+	void unregisterApi(ApiObject *obj, QJSValue parentObj);
 
 public Q_SLOTS:
 	void hasText();
@@ -79,11 +80,11 @@ private:
 #endif
 	QSocketNotifier *notifier;
 	bool done;
-	static ScopyJS * pinstance_;
+	static ScopyJS *pinstance_;
 	static QLoggingCategory::CategoryFilter oldCategoryFilter;
 	static void jsCategoryFilter(QLoggingCategory *category);
 };
 
-}
+} // namespace scopy
 
 #endif /* SCOPY_QTJS_HPP */

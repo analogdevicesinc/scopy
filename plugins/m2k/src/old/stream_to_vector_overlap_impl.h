@@ -49,13 +49,9 @@ namespace scopy {
 class stream_to_vector_overlap_impl : public stream_to_vector_overlap
 {
 public:
-	explicit stream_to_vector_overlap_impl(size_t itemsize,
-					       size_t nitems_per_block,
-					       double overlap_factor);
+	explicit stream_to_vector_overlap_impl(size_t itemsize, size_t nitems_per_block, double overlap_factor);
 
-	int work(int noutput_items,
-		 gr_vector_const_void_star& input_items,
-		 gr_vector_void_star& output_items);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
 	void set_overlap_factor(double);
 
 private:

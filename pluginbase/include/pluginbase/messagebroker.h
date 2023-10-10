@@ -1,9 +1,10 @@
 #ifndef MESSAGEBROKER_H
 #define MESSAGEBROKER_H
 
-#include <QObject>
 #include "scopy-pluginbase_export.h"
+
 #include <QMap>
+#include <QObject>
 #include <QSet>
 
 namespace scopy {
@@ -51,10 +52,9 @@ public:
 	void publish(QString topic, QString message);
 
 private:
-	QMap<QObject*, QSet<QString>> map;
-	static MessageBroker * pinstance_;
-
+	QMap<QObject *, QSet<QString>> map;
+	static MessageBroker *pinstance_;
 };
-}
+} // namespace scopy
 
 #endif // MESSAGEBROKER_H

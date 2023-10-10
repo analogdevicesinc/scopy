@@ -1,13 +1,15 @@
 #ifndef VERSIONCHECKER_H
 #define VERSIONCHECKER_H
 
-#include <QObject>
+#include "scopy-pluginbase_export.h"
+
 #include <QJsonDocument>
 #include <QNetworkAccessManager>
+#include <QObject>
+#include <QThread>
+
 #include <functional>
 #include <mutex>
-#include <QThread>
-#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 class SCOPY_PLUGINBASE_EXPORT VersionChecker : public QObject
@@ -25,14 +27,16 @@ public:
 
 	static VersionChecker *GetInstance();
 
-	typedef enum {
+	typedef enum
+	{
 		NOT_INIT,
 		IN_PROGRESS,
 		DONE
 	} state;
 
-	template<typename T, typename R>
-	void subscribe(T* object, R(T::* function)(QJsonDocument)){
+	template <typename T, typename R>
+	void subscribe(T *object, R (T::*function)(QJsonDocument))
+	{
 		auto f = std::bind(function, object, std::placeholders::_1);
 		m_subscriptions.push_back(f);
 		Q_EMIT addedNewSubscription();
@@ -46,7 +50,6 @@ private Q_SLOTS:
 	void updateSubscriptions();
 
 private:
-
 	/**
 	 * @brief Pull the json file with the current version from m_url and save it in the m_cache variable.
 	 * */
@@ -64,16 +67,15 @@ private:
 	 * */
 	bool cacheOutdated();
 
-	static VersionChecker * pinstance_;
+	static VersionChecker *pinstance_;
 	const QString m_url = "https://swdownloads.analog.com/cse/sw_versions.json";
 
-	QList< std::function<void(QJsonDocument)> > m_subscriptions;
+	QList<std::function<void(QJsonDocument)>> m_subscriptions;
 	QJsonDocument m_cache;
 	QString m_cacheFilePath;
 	QNetworkAccessManager *m_nam;
 	int m_ttl; // maximum number of redirects allowed
 	state currentState;
-
 };
-}
+} // namespace scopy
 #endif // VERSIONCHECKER_H

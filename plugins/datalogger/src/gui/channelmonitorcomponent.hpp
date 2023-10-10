@@ -1,8 +1,8 @@
 #ifndef CHANNELMONITORCOMPONENT_H
 #define CHANNELMONITORCOMPONENT_H
 
-#include <QWidget>
 #include <QResizeEvent>
+#include <QWidget>
 
 namespace Ui {
 class ChannelMonitorComponent;
@@ -20,7 +20,8 @@ public:
 	explicit ChannelMonitorComponent(QWidget *parent = nullptr);
 	~ChannelMonitorComponent();
 
-	void init(double value, QString nameOfUnitOfMeasure,QString symbolOfUnitOfMeasure, QString title, QColor color);
+	void init(double value, QString nameOfUnitOfMeasure, QString symbolOfUnitOfMeasure, QString title,
+		  QColor color);
 	std::string getChannelId();
 	void setChannelId(std::string channelId);
 	void checkPeakValues(double value, QString unitOfMeasure);
@@ -38,7 +39,6 @@ public:
 Q_SIGNALS:
 	void contentChanged();
 
-
 public Q_SLOTS:
 	void displayPeakHold(bool checked);
 	void resetPeakHolder();
@@ -49,7 +49,7 @@ public Q_SLOTS:
 	void setHistoryDuration(int duration);
 	void setRecordingInterval(double interval);
 	void setLineStyle(Qt::PenStyle lineStyle);
-	void updateValue(double value, QString nameOfUnitOfMeasure,QString symbolOfUnitOfMeasure);
+	void updateValue(double value, QString nameOfUnitOfMeasure, QString symbolOfUnitOfMeasure);
 
 private:
 	Ui::ChannelMonitorComponent *ui;
@@ -61,8 +61,8 @@ private:
 	int m_id;
 	void resizeEvent(QResizeEvent *event);
 };
-}
-}
-}
+} // namespace gui
+} // namespace datalogger
+} // namespace scopy
 
 #endif // CHANNELMONITORCOMPONENT_H

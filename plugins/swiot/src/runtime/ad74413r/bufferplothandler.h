@@ -18,18 +18,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef BUFFERPLOTHANDLER_H
 #define BUFFERPLOTHANDLER_H
 
-#include <gui/oscilloscope_plot.hpp>
-#include <qobject.h>
 #include "bufferlogic.h"
-#include "linked_button.hpp"
 #include "channelplotscalescontroller.h"
-#include <qmutex.h>
+#include "linked_button.hpp"
+
 #include <QWidget>
+#include <qmutex.h>
+#include <qobject.h>
+
 #include <deque>
+#include <gui/oscilloscope_plot.hpp>
 
 namespace scopy::swiot {
 #define DIAG_CHNLS_NUMBER 4
@@ -69,6 +70,7 @@ Q_SIGNALS:
 	void singleCaptureFinished();
 	void offsetHandleSelected(int hdlIdx, bool selected);
 	void unitPerDivisionChanged(int i, double val);
+
 private:
 	void initPlot(int plotChnlsNo);
 	void initStatusWidget();
@@ -84,15 +86,15 @@ private:
 	QWidget *m_plotWidget;
 	QLabel *m_samplesAquiredLabel;
 	QLabel *m_plotSamplesNumberLabel;
-	LinkedButton* m_btnInfoStatus;
+	LinkedButton *m_btnInfoStatus;
 	ChannelPlotScalesController *m_plotScalesController;
 
 	int m_samplingFreq = 4800;
 	double m_timespan = 1;
 	int m_plotChnlsNo;
 
-	//all of these will be calculated in functions; for example we will have a spinbox for timespan,
-	//and in a slot we will set its value and we will calculate plotSampleRate and the number of necessary buffers
+	// all of these will be calculated in functions; for example we will have a spinbox for timespan,
+	// and in a slot we will set its value and we will calculate plotSampleRate and the number of necessary buffers
 	int m_buffersNumber = 0;
 	int m_bufferIndex = 0;
 	int m_bufferSize = 0;
@@ -101,13 +103,13 @@ private:
 	bool m_singleCapture = false;
 
 	std::vector<std::deque<QVector<double>>> m_dataPointsDeque;
-	std::vector<double*> m_dataPoints;
+	std::vector<double *> m_dataPoints;
 	std::vector<bool> m_enabledPlots;
 	QMutex *m_lock;
 
 	QMap<int, double> m_unitPerDivision;
 	QMap<int, int> m_channelCurveId;
 };
-}
+} // namespace scopy::swiot
 
 #endif // BUFFERPLOTHANDLER_H

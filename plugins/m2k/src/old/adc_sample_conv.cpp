@@ -20,64 +20,56 @@
 
 #include "adc_sample_conv.hpp"
 
-#include <libm2k/m2k.hpp>
-#include <libm2k/contextbuilder.hpp>
-
-#include <libm2k/m2kexceptions.hpp>
-#include <libm2k/analog/m2kanalogin.hpp>
 #include "m2kpluginExceptionHandler.h"
+
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2k.hpp>
+#include <libm2k/m2kexceptions.hpp>
 
 using namespace gr;
 using namespace scopy;
 using namespace libm2k::analog;
 
-adc_sample_conv::adc_sample_conv(int nconnections,
-				 M2kAnalogIn* adc,
-				 bool inverse) :
-	gr::sync_block("adc_sample_conv",
-			gr::io_signature::make(nconnections, nconnections, sizeof(float)),
-			gr::io_signature::make(nconnections, nconnections, sizeof(float))),
-	d_nconnections(nconnections),
-	inverse(inverse),
-	m2k_adc(adc)
-{
-}
+adc_sample_conv::adc_sample_conv(int nconnections, M2kAnalogIn *adc, bool inverse)
+	: gr::sync_block("adc_sample_conv", gr::io_signature::make(nconnections, nconnections, sizeof(float)),
+			 gr::io_signature::make(nconnections, nconnections, sizeof(float)))
+	, d_nconnections(nconnections)
+	, inverse(inverse)
+	, m2k_adc(adc)
+{}
 
-adc_sample_conv::~adc_sample_conv()
-{
-}
+adc_sample_conv::~adc_sample_conv() {}
 
 double adc_sample_conv::conversionWrapper(unsigned int chn_idx, double sample, bool raw_to_volts)
 {
 	try {
-		if (raw_to_volts) {
+		if(raw_to_volts) {
 			return m2k_adc->convertRawToVolts(chn_idx, (short)sample);
 		} else {
 			return m2k_adc->convertVoltsToRaw(chn_idx, sample);
 		}
-	} catch (libm2k::m2k_exception &e) {
+	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e)
 		return 0;
 	}
 }
 
-int adc_sample_conv::work(int noutput_items,
-		gr_vector_const_void_star &input_items,
-		gr_vector_void_star &output_items)
+int adc_sample_conv::work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items)
 {
 	gr::thread::scoped_lock lock(d_setlock);
 
-	for (unsigned int i = 0; i < input_items.size(); i++) {
-		const float* in = static_cast<const float *>(input_items[i]);
+	for(unsigned int i = 0; i < input_items.size(); i++) {
+		const float *in = static_cast<const float *>(input_items[i]);
 		float *out = static_cast<float *>(output_items[i]);
 
-		if (inverse) {
-			for (int j = 0; j < noutput_items; j++) {
+		if(inverse) {
+			for(int j = 0; j < noutput_items; j++) {
 				out[j] = m2k_adc->convertVoltsToRaw(i, in[j]);
 			}
 		} else {
 
-			for (int j = 0; j < noutput_items; j++)
+			for(int j = 0; j < noutput_items; j++)
 				out[j] = m2k_adc->convertRawToVolts(i, in[j]);
 		}
 	}

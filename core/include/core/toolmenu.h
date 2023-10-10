@@ -22,12 +22,12 @@
 #define TOOLMENU_H
 
 #include "gui/basemenu.h"
+#include "scopy-core_export.h"
 #include "toolmenuitem.h"
 
-#include <QString>
-#include <QLabel>
 #include <QButtonGroup>
-#include "scopy-core_export.h"
+#include <QLabel>
+#include <QString>
 
 namespace scopy {
 /**
@@ -38,7 +38,7 @@ class SCOPY_CORE_EXPORT ToolMenu : public BaseMenu
 	Q_OBJECT
 public:
 	explicit ToolMenu(QWidget *parent = nullptr);
-	~ToolMenu();	
+	~ToolMenu();
 
 	ToolMenuItem *getToolMenuItemFor(QString toolId);
 	ToolMenuItem *addTool(QString id, QString name, QString icon, int position = -1);
@@ -60,9 +60,8 @@ public Q_SLOTS:
 	void attachSuccesful(QString);
 
 private:
-	QVector<ToolMenuItem*> tools;
+	QVector<ToolMenuItem *> tools;
 	QButtonGroup *buttonGroup;
-
 
 private Q_SLOTS:
 	void _updateToolList(short from, short to);
@@ -71,6 +70,6 @@ private:
 	void _saveState();
 	void _loadState();
 };
-}
+} // namespace scopy
 
 #endif // TOOLMENU_H

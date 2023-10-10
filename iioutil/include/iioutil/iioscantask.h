@@ -1,15 +1,17 @@
 #ifndef IIOSCANTASK_H
 #define IIOSCANTASK_H
 
-#include <QThread>
 #include "scopy-iioutil_export.h"
+
+#include <QThread>
 
 namespace scopy {
 /**
  * @brief The IIOScanTask class
  * IIOScanTask - scans for IIO context and emits a scanFinished signal
  */
-class SCOPY_IIOUTIL_EXPORT IIOScanTask : public QThread {
+class SCOPY_IIOUTIL_EXPORT IIOScanTask : public QThread
+{
 	Q_OBJECT
 public:
 	IIOScanTask(QObject *parent);
@@ -26,7 +28,6 @@ Q_SIGNALS:
 protected:
 	QString scanParams = "";
 	bool enabled;
-
 };
-}
+} // namespace scopy
 #endif // IIOSCANTASK_H

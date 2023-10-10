@@ -1,11 +1,13 @@
 #include "widgets/pagenavigationwidget.h"
+
 #include <QBoxLayout>
 #include <QDebug>
 #include <QLoggingCategory>
+
 #include <stylehelper.h>
 
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_NAVIGATIONWIDGET,"PageNavigationWidget")
+Q_LOGGING_CATEGORY(CAT_NAVIGATIONWIDGET, "PageNavigationWidget")
 
 PageNavigationWidget::PageNavigationWidget(bool hasHome, bool hasOpen, QWidget *parent)
 	: QWidget(parent)
@@ -16,10 +18,7 @@ PageNavigationWidget::PageNavigationWidget(bool hasHome, bool hasOpen, QWidget *
 	setOpenBtnVisible(hasOpen);
 }
 
-PageNavigationWidget::~PageNavigationWidget()
-{
-
-}
+PageNavigationWidget::~PageNavigationWidget() {}
 
 void PageNavigationWidget::initUI(QWidget *parent)
 {
@@ -46,7 +45,7 @@ void PageNavigationWidget::initUI(QWidget *parent)
 	buttonsLayout->addWidget(openButton);
 	openButton->hide();
 
-	buttonsLayout->addSpacerItem(new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed));
+	buttonsLayout->addSpacerItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed));
 }
 
 void PageNavigationWidget::setHomeBtnVisible(bool en)
@@ -61,22 +60,12 @@ void PageNavigationWidget::setOpenBtnVisible(bool en)
 	setMinimumSize(sizeHint());
 }
 
-QPushButton *PageNavigationWidget::getHomeBtn()
-{
-	return homeButton;
-}
+QPushButton *PageNavigationWidget::getHomeBtn() { return homeButton; }
 
-QPushButton *PageNavigationWidget::getBackwardBtn()
-{
-	return backwardButton;
-}
+QPushButton *PageNavigationWidget::getBackwardBtn() { return backwardButton; }
 
-QPushButton *PageNavigationWidget::getForwardBtn()
-{
-	return forwardButton;
-}
+QPushButton *PageNavigationWidget::getForwardBtn() { return forwardButton; }
 
-QPushButton *PageNavigationWidget::getOpenBtn()
-{
-	return openButton;
-}
+QPushButton *PageNavigationWidget::getOpenBtn() { return openButton; }
+
+#include "moc_pagenavigationwidget.cpp"

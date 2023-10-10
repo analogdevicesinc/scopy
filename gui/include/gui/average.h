@@ -21,19 +21,19 @@
 #ifndef AVERAGE_H
 #define AVERAGE_H
 
-#include <mutex>
 #include "scopy-gui_export.h"
+
+#include <mutex>
 
 namespace scopy {
 
-
-class SCOPY_GUI_EXPORT SpectrumAverage {
+class SCOPY_GUI_EXPORT SpectrumAverage
+{
 public:
 	SpectrumAverage(unsigned int data_width, unsigned int history, bool history_en);
 	virtual ~SpectrumAverage();
 	virtual void pushNewData(double *data) = 0;
-	virtual void getAverage(double *out_data,
-		unsigned int num_samples) const;
+	virtual void getAverage(double *out_data, unsigned int num_samples) const;
 	virtual void reset() = 0;
 	unsigned int dataWidth() const;
 	unsigned int history() const;
@@ -47,7 +47,7 @@ protected:
 	double *m_average;
 };
 
-class SCOPY_GUI_EXPORT AverageHistoryOne: public SpectrumAverage
+class SCOPY_GUI_EXPORT AverageHistoryOne : public SpectrumAverage
 {
 public:
 	AverageHistoryOne(unsigned int data_width, unsigned history);
@@ -57,7 +57,7 @@ protected:
 	bool m_anyDataPushed;
 };
 
-class SCOPY_GUI_EXPORT AverageHistoryN: public SpectrumAverage
+class SCOPY_GUI_EXPORT AverageHistoryN : public SpectrumAverage
 {
 public:
 	AverageHistoryN(unsigned int data_width, unsigned int history);
@@ -77,35 +77,35 @@ private:
 	void setHistory(unsigned int) override;
 };
 
-class SCOPY_GUI_EXPORT PeakHoldContinuous: public AverageHistoryOne
+class SCOPY_GUI_EXPORT PeakHoldContinuous : public AverageHistoryOne
 {
 public:
 	PeakHoldContinuous(unsigned int data_width, unsigned int history);
 	virtual void pushNewData(double *data);
 };
 
-class SCOPY_GUI_EXPORT MinHoldContinuous: public AverageHistoryOne
+class SCOPY_GUI_EXPORT MinHoldContinuous : public AverageHistoryOne
 {
 public:
 	MinHoldContinuous(unsigned int data_width, unsigned int history);
 	virtual void pushNewData(double *data);
 };
 
-class SCOPY_GUI_EXPORT ExponentialRMS: public AverageHistoryOne
+class SCOPY_GUI_EXPORT ExponentialRMS : public AverageHistoryOne
 {
 public:
 	ExponentialRMS(unsigned int data_width, unsigned int history);
 	virtual void pushNewData(double *data);
 };
 
-class SCOPY_GUI_EXPORT ExponentialAverage: public AverageHistoryOne
+class SCOPY_GUI_EXPORT ExponentialAverage : public AverageHistoryOne
 {
 public:
 	ExponentialAverage(unsigned int data_width, unsigned int history);
 	virtual void pushNewData(double *data);
 };
 
-class SCOPY_GUI_EXPORT LinearRMSOne: public AverageHistoryOne
+class SCOPY_GUI_EXPORT LinearRMSOne : public AverageHistoryOne
 {
 public:
 	LinearRMSOne(unsigned int data_width, unsigned int history);
@@ -117,7 +117,7 @@ private:
 	unsigned int m_inserted_count;
 };
 
-class SCOPY_GUI_EXPORT LinearAverageOne: public AverageHistoryOne
+class SCOPY_GUI_EXPORT LinearAverageOne : public AverageHistoryOne
 {
 public:
 	LinearAverageOne(unsigned int data_width, unsigned int history);
@@ -129,7 +129,7 @@ private:
 	unsigned int m_inserted_count;
 };
 
-class SCOPY_GUI_EXPORT PeakHold: public AverageHistoryN
+class SCOPY_GUI_EXPORT PeakHold : public AverageHistoryN
 {
 public:
 	PeakHold(unsigned int data_width, unsigned int history);
@@ -139,7 +139,7 @@ private:
 	double getPeakFromHistoryColumn(unsigned int col);
 };
 
-class SCOPY_GUI_EXPORT MinHold: public AverageHistoryN
+class SCOPY_GUI_EXPORT MinHold : public AverageHistoryN
 {
 public:
 	MinHold(unsigned int data_width, unsigned int history);
@@ -149,28 +149,26 @@ private:
 	double getMinFromHistoryColumn(unsigned int col);
 };
 
-class SCOPY_GUI_EXPORT LinearRMS: public AverageHistoryN
+class SCOPY_GUI_EXPORT LinearRMS : public AverageHistoryN
 {
 public:
 	LinearRMS(unsigned int data_width, unsigned int history);
 	~LinearRMS();
 	virtual void pushNewData(double *data);
-	virtual void getAverage(double *out_data,
-		unsigned int num_samples) const;
+	virtual void getAverage(double *out_data, unsigned int num_samples) const;
 	virtual void reset();
 
 private:
 	double *m_sqr_sums;
 };
 
-class SCOPY_GUI_EXPORT LinearAverage: public AverageHistoryN
+class SCOPY_GUI_EXPORT LinearAverage : public AverageHistoryN
 {
 public:
 	LinearAverage(unsigned int data_width, unsigned int history);
 	~LinearAverage();
 	virtual void pushNewData(double *data);
-	virtual void getAverage(double *out_data,
-		unsigned int num_samples) const;
+	virtual void getAverage(double *out_data, unsigned int num_samples) const;
 	virtual void reset();
 
 private:

@@ -24,19 +24,17 @@
 #include <QVariant>
 #include <QWidget>
 
-void scopy::setDynamicProperty(QWidget *widget,
-		const char *property, bool set)
+void scopy::setDynamicProperty(QWidget *widget, const char *property, bool set)
 {
 	widget->setProperty(property, QVariant(set));
 	widget->style()->unpolish(widget);
 	widget->style()->polish(widget);
 }
 
-bool scopy::getDynamicProperty(QWidget *widget,
-				  const char *property)
+bool scopy::getDynamicProperty(QWidget *widget, const char *property)
 {
 	QVariant val = widget->property(property);
-	if (val.canConvert<bool>()) {
+	if(val.canConvert<bool>()) {
 		return val.toBool();
 	}
 	return false;
