@@ -1,23 +1,24 @@
 #ifndef SCOPYMAINWINDOW_H
 #define SCOPYMAINWINDOW_H
 
-#include "detachedtoolwindowmanager.h"
-#include "devicemanager.h"
-#include "iioutil/cyclicaltask.h"
-#include "iioutil/iioscantask.h"
+#include <QMainWindow>
+
 #include "license_overlay.h"
-#include "pluginbase/preferences.h"
-#include "pluginbase/versionchecker.h"
-#include "pluginrepository.h"
+#include "scopyhomepage.h"
+#include "devicemanager.h"
 #include "scannediiocontextcollector.h"
+#include "toolmanager.h"
+#include "detachedtoolwindowmanager.h"
+#include "pluginrepository.h"
 #include "scopy-core_export.h"
 #include "scopyaboutpage.h"
-#include "scopyhomepage.h"
 #include "scopypreferencespage.h"
-#include "toolmanager.h"
+#include "pluginbase/preferences.h"
+#include "pluginbase/versionchecker.h"
+#include "iioutil/cyclicaltask.h"
+#include "iioutil/iioscantask.h"
+#include <gui/widgets/scopystatusbar.h>
 #include "versioncheckoverlay.h"
-
-#include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -67,6 +68,7 @@ private:
 
 	LicenseOverlay *license = nullptr;
 	VersionCheckOverlay *checkUpdate = nullptr;
+	ScopyStatusBar *statusBar;
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;
 
@@ -74,6 +76,7 @@ private:
 	void initPythonWIN32();
 	void loadDecoders();
 	void initApi();
+	void initStatusBar();
 
 protected:
 	void closeEvent(QCloseEvent *event) override;
