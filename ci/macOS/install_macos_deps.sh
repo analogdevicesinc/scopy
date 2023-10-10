@@ -19,7 +19,7 @@ SPDLOG_BRANCH=v1.x
 PYTHON="python3"
 QT_FORMULAE=qt@5
 
-PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog $PYTHON"
+PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog "
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
 
 STAGING_AREA=$PWD/staging
