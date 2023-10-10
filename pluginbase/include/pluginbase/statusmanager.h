@@ -26,7 +26,7 @@ public:
 	/**
 	 * @brief Ads temporary message in the queue to be displayed, when possible, in the Scopy status bar.
 	 * @param message QString with the message to be displayed
-	 * @param ms The time that the widget will be displayed (in milliseconds)
+	 * @param ms The time that the message will be displayed (in milliseconds)
 	 * */
 	void addTemporaryMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
 
@@ -37,9 +37,17 @@ public:
 	 * */
 	void addTemporaryWidget(QWidget *widget, int ms = DEFAULT_DISPLAY_TIME);
 
+	/**
+	 * @brief Overrides any message currently displayed with the message sent as parameter
+	 * @param message QString with the urgent message
+	 * @param ms The time that the message will be displayed (in milliseconds)
+	 * */
+	void addUrgentMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
+
 Q_SIGNALS:
 	void announceStatusAvailable();
 	void sendStatus(QVariant status, int ms);
+	void sendUrgentMessage(QString message, int ms);
 
 public Q_SLOTS:
 	void requestStatus();
