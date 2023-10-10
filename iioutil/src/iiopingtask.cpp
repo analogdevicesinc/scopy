@@ -1,12 +1,17 @@
 #include "iiopingtask.h"
+
 #include <QDebug>
 
 using namespace scopy;
-IIOPingTask::IIOPingTask(iio_context *c ,QObject *parent) : QThread(parent), c(c) {}
+IIOPingTask::IIOPingTask(iio_context *c, QObject *parent)
+	: QThread(parent)
+	, c(c)
+{}
 
 IIOPingTask::~IIOPingTask() {}
 
-void IIOPingTask::run() {
+void IIOPingTask::run()
+{
 
 	enabled = true;
 	bool ret = ping(c);
@@ -19,13 +24,14 @@ void IIOPingTask::run() {
 		Q_EMIT pingFailed();
 }
 
-bool IIOPingTask::ping(iio_context *ctx) {
+bool IIOPingTask::ping(iio_context *ctx)
+{
 	auto dev = iio_context_get_device(ctx, 0);
-	const iio_device* test_device = nullptr;
+	const iio_device *test_device = nullptr;
 
 	int ret = iio_device_get_trigger(dev, &test_device);
 
-	if (ret < 0 && ret != -ENOENT) {
+	if(ret < 0 && ret != -ENOENT) {
 		return false;
 	}
 	return true;

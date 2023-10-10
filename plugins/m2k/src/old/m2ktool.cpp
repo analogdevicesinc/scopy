@@ -19,19 +19,22 @@
  */
 
 #include "m2ktool.hpp"
-#include <QMimeData>
 
+#include <QMimeData>
 
 using namespace scopy;
 using namespace scopy::m2k;
 
-M2kTool::M2kTool(struct iio_context *ctx, ToolMenuEntry *tme,
-		ApiObject *api, const QString& name,
-		QWidget *parent) :
-	QWidget(parent),
-	ctx(ctx), api(api),
-	name(name), saveOnExit(true), isDetached(false), m_running(false),
-	window(nullptr), tme(tme)
+M2kTool::M2kTool(struct iio_context *ctx, ToolMenuEntry *tme, ApiObject *api, const QString &name, QWidget *parent)
+	: QWidget(parent)
+	, ctx(ctx)
+	, api(api)
+	, name(name)
+	, saveOnExit(true)
+	, isDetached(false)
+	, m_running(false)
+	, window(nullptr)
+	, tme(tme)
 {
 	tme->setEnabled(true);
 	p = Preferences::GetInstance();
@@ -45,64 +48,30 @@ M2kTool::~M2kTool()
 
 	tme->setRunning(false);
 	tme->setEnabled(false);
-
-
 }
 
-const QString &M2kTool::getName()
-{
-	return name;
-}
+const QString &M2kTool::getName() { return name; }
 
-void M2kTool::setName(const QString &name)
-{
-	this->name = name;
-}
+void M2kTool::setName(const QString &name) { this->name = name; }
 
-void M2kTool::settingsLoaded()
-{
-
-}
+void M2kTool::settingsLoaded() {}
 
 /* Tools that use file dialogs should overload this method
 to ensure their file dialogs are configured correspondingly */
-void M2kTool::setNativeDialogs(bool nativeDialogs)
-{
-	m_useNativeDialogs = nativeDialogs;
-}
+void M2kTool::setNativeDialogs(bool nativeDialogs) { m_useNativeDialogs = nativeDialogs; }
 
-ApiObject *M2kTool::getApi()
-{
-	return api;
-}
+ApiObject *M2kTool::getApi() { return api; }
 
 void M2kTool::readPreferences()
 {
 	saveOnExit = p->get("general_save_on_exit").toBool();
-	m_useNativeDialogs = p->get("general_native_dialogs").toBool();;
+	m_useNativeDialogs = p->get("general_native_dialogs").toBool();
+	;
 }
 
-ToolMenuEntry *M2kTool::getTme() const
-{
-	return tme;
-}
+ToolMenuEntry *M2kTool::getTme() const { return tme; }
 
-void M2kTool::run()
-{
-
-}
-void M2kTool::stop()
-{
-
-}
-void M2kTool::single()
-{
-
-}
-bool M2kTool::isRunning()
-{
-	return m_running;
-}
-
-
-
+void M2kTool::run() {}
+void M2kTool::stop() {}
+void M2kTool::single() {}
+bool M2kTool::isRunning() { return m_running; }

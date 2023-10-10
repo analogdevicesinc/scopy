@@ -1,11 +1,12 @@
 #ifndef FLEXGRIDLAYOUT_HPP
 #define FLEXGRIDLAYOUT_HPP
 
-#include <QWidget>
-#include <QVBoxLayout>
+#include "scopy-gui_export.h"
+
 #include <QResizeEvent>
 #include <QTimer>
-#include "scopy-gui_export.h"
+#include <QVBoxLayout>
+#include <QWidget>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT FlexGridLayout : public QWidget
@@ -19,7 +20,7 @@ public:
 	void toggleAll(bool toggled);
 	void addWidget(int index);
 	void removeWidget(int index);
-	QWidget* getWidget(int index);
+	QWidget *getWidget(int index);
 	bool isWidgetActive(int index);
 	int addQWidgetToList(QWidget *widget);
 
@@ -47,13 +48,13 @@ private:
 	int row;
 	double colWidth;
 	double availableWidth;
-	std::vector<QWidget*> m_widgetList;
+	std::vector<QWidget *> m_widgetList;
 	QVector<int> m_activeWidgetList;
 	QGridLayout *m_gridLayout;
 	QSpacerItem *m_hspacer;
 	QSpacerItem *m_vspacer;
 
-	//resize related
+	// resize related
 	bool updatePending;
 	void redrawWidgets();
 	void recomputeColCount();
@@ -61,5 +62,5 @@ private:
 	void resizeEvent(QResizeEvent *event) override;
 	void repositionWidgets(int index, int row, int col);
 };
-}
+} // namespace scopy
 #endif // FLEXGRIDLAYOUT_HPP

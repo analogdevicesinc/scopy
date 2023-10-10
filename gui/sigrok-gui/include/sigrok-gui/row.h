@@ -37,37 +37,35 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef ROW_H
 #define ROW_H
 
-#include <libsigrokdecode/libsigrokdecode.h>
+#include "scopy-sigrok-gui_export.h"
 
 #include <QString>
-#include "scopy-sigrok-gui_export.h"
+
+#include <libsigrokdecode/libsigrokdecode.h>
 
 class SCOPY_SIGROK_GUI_EXPORT Row
 {
 public:
-    Row();
+	Row();
 
-    Row(int index, const srd_decoder *decoder,
-        const srd_decoder_annotation_row *row = nullptr);
+	Row(int index, const srd_decoder *decoder, const srd_decoder_annotation_row *row = nullptr);
 
-    const srd_decoder* decoder() const;
-    const srd_decoder_annotation_row* row() const;
+	const srd_decoder *decoder() const;
+	const srd_decoder_annotation_row *row() const;
 
-    const QString title() const;
-    const QString class_name() const;
-    int index() const;
+	const QString title() const;
+	const QString class_name() const;
+	int index() const;
 
-    bool operator<(const Row &other) const;
+	bool operator<(const Row &other) const;
 
 private:
-    int index_;
-    const srd_decoder *decoder_;
-    const srd_decoder_annotation_row *row_;
-
+	int index_;
+	const srd_decoder *decoder_;
+	const srd_decoder_annotation_row *row_;
 };
 
 #endif // ROW_H

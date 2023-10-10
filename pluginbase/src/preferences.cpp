@@ -1,28 +1,26 @@
 #include "preferences.h"
-#include <QApplication>
 
+#include <QApplication>
 #include <QLoggingCategory>
 
-Q_LOGGING_CATEGORY(CAT_PREFERENCES,"Preferences");
+Q_LOGGING_CATEGORY(CAT_PREFERENCES, "Preferences");
 
 using namespace scopy;
 
-Preferences* Preferences::pinstance_{nullptr};
+Preferences *Preferences::pinstance_{nullptr};
 
-Preferences::Preferences(QObject *parent) : QObject(parent)
+Preferences::Preferences(QObject *parent)
+	: QObject(parent)
 {
-	connect(parent, SIGNAL(aboutToQuit()),this,SLOT(save()));
+	connect(parent, SIGNAL(aboutToQuit()), this, SLOT(save()));
 }
 
-Preferences::~Preferences()
-{
-
-}
+Preferences::~Preferences() {}
 
 void Preferences::_init(QString k, QVariant v)
 {
 	if(!p.contains(k)) {
-		p.insert(k,v);
+		p.insert(k, v);
 	}
 	// else - map contains key so it is already initialized to the correct value, nothing to do
 }
@@ -35,9 +33,7 @@ QVariant Preferences::_get(QString k)
 	return v;
 }
 
-void Preferences::set(QString k, QVariant v) {
-	return Preferences::GetInstance()->_set(k,v);
-}
+void Preferences::set(QString k, QVariant v) { return Preferences::GetInstance()->_set(k, v); }
 
 void Preferences::_set(QString k, QVariant v)
 {
@@ -47,29 +43,18 @@ void Preferences::_set(QString k, QVariant v)
 		Q_EMIT preferenceChanged(k, v);
 }
 
-void Preferences::clear()
-{
-	p.clear();
-}
+void Preferences::clear() { p.clear(); }
 
-QVariant Preferences::get(QString val) {
-	return Preferences::GetInstance()->_get(val);
-}
+QVariant Preferences::get(QString val) { return Preferences::GetInstance()->_get(val); }
 
-QMap<QString, QVariant> Preferences::getPreferences() const
-{
-	return p;
-}
+QMap<QString, QVariant> Preferences::getPreferences() const { return p; }
 
-void Preferences::setPreferences(QMap<QString, QVariant> s)
-{
-	p = s;
-}
+void Preferences::setPreferences(QMap<QString, QVariant> s) { p = s; }
 
 void Preferences::setPreferencesFilename(QString f)
 {
-	s = new QSettings(f,QSettings::IniFormat, this);
-	qInfo(CAT_PREFERENCES)<<s->fileName();
+	s = new QSettings(f, QSettings::IniFormat, this);
+	qInfo(CAT_PREFERENCES) << s->fileName();
 }
 
 void Preferences::save()
@@ -79,7 +64,7 @@ void Preferences::save()
 
 	QStringList keys = p.keys();
 	for(const QString &key : keys) {
-		s->setValue(key,p[key]);
+		s->setValue(key, p[key]);
 	}
 
 	s->sync();
@@ -98,19 +83,12 @@ void Preferences::load()
 
 Preferences *Preferences::GetInstance()
 {
-	if (pinstance_ == nullptr)
-	{
+	if(pinstance_ == nullptr) {
 		pinstance_ = new Preferences(QApplication::instance()); // singleton has the app as parent
 	}
 	return pinstance_;
 }
 
-void Preferences::init(QString k, QVariant v)
-{
-	return Preferences::GetInstance()->_init(k,v);
-}
-
-
-
+void Preferences::init(QString k, QVariant v) { return Preferences::GetInstance()->_init(k, v); }
 
 #include "moc_preferences.cpp"

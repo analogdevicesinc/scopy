@@ -18,30 +18,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "tutorialchapter.h"
+
 #include <QLoggingCategory>
 
 using namespace scopy::gui;
 
 Q_LOGGING_CATEGORY(CAT_TUTORIALCHAPTER, "TutorialChapter")
 
-TutorialChapter::TutorialChapter(QObject *parent) : QObject(parent)
-{
+TutorialChapter::TutorialChapter(QObject *parent)
+	: QObject(parent)
+{}
 
-}
+TutorialChapter::~TutorialChapter() {}
 
-TutorialChapter::~TutorialChapter()
-{
-
-}
-
-TutorialChapter *TutorialChapter::build(const QList<QWidget *>& subjects,
-					const QString& description,
-					QWidget* mainSubject,
-					int x_offset,
-					int y_offset,
-					HoverPosition anchor,
+TutorialChapter *TutorialChapter::build(const QList<QWidget *> &subjects, const QString &description,
+					QWidget *mainSubject, int x_offset, int y_offset, HoverPosition anchor,
 					HoverPosition content, QObject *parent)
 {
 	TutorialChapter *ch = new TutorialChapter(parent);
@@ -57,60 +49,36 @@ TutorialChapter *TutorialChapter::build(const QList<QWidget *>& subjects,
 	return ch;
 }
 
-void TutorialChapter::addSubject(QWidget *s)
+void TutorialChapter::addSubject(QWidget *s) { subjects.append(s); }
+
+const QString &TutorialChapter::getDescription() const { return description; }
+
+void TutorialChapter::setDescription(const QString &newDescription) { description = newDescription; }
+
+QWidget *TutorialChapter::getMainSubject() const { return mainSubject; }
+
+void TutorialChapter::setMainSubject(QWidget *newMainSubject)
 {
-	subjects.append(s);
-}
-
-const QString &TutorialChapter::getDescription() const
-{
-	return description;
-}
-
-void TutorialChapter::setDescription(const QString &newDescription)
-{
-	description = newDescription;
-}
-
-QWidget *TutorialChapter::getMainSubject() const {
-	return mainSubject;
-}
-
-void TutorialChapter::setMainSubject(QWidget *newMainSubject) {
-	if (!subjects.contains(newMainSubject)) {
+	if(!subjects.contains(newMainSubject)) {
 		qWarning(CAT_TUTORIALCHAPTER) << "The new main subject is not part of the subject list.";
 	}
 	this->mainSubject = newMainSubject;
 }
 
-int TutorialChapter::getXOffset() const {
-	return x_offset;
-}
+int TutorialChapter::getXOffset() const { return x_offset; }
 
-void TutorialChapter::setXOffset(int xOffset) {
-	x_offset = xOffset;
-}
+void TutorialChapter::setXOffset(int xOffset) { x_offset = xOffset; }
 
-int TutorialChapter::getYOffset() const {
-	return y_offset;
-}
+int TutorialChapter::getYOffset() const { return y_offset; }
 
-void TutorialChapter::setYOffset(int yOffset) {
-	y_offset = yOffset;
-}
+void TutorialChapter::setYOffset(int yOffset) { y_offset = yOffset; }
 
-scopy::HoverPosition TutorialChapter::getAnchor() const {
-	return anchor;
-}
+scopy::HoverPosition TutorialChapter::getAnchor() const { return anchor; }
 
-void TutorialChapter::setAnchor(scopy::HoverPosition newAnchor) {
-	anchor = newAnchor;
-}
+void TutorialChapter::setAnchor(scopy::HoverPosition newAnchor) { anchor = newAnchor; }
 
-scopy::HoverPosition TutorialChapter::getContent() const {
-	return content;
-}
+scopy::HoverPosition TutorialChapter::getContent() const { return content; }
 
-void TutorialChapter::setContent(scopy::HoverPosition newContent) {
-	content = newContent;
-}
+void TutorialChapter::setContent(scopy::HoverPosition newContent) { content = newContent; }
+
+#include "moc_tutorialchapter.cpp"

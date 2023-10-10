@@ -22,16 +22,17 @@
 #define DEBUGGERINSTRUMENT_H
 
 #include <iio.h>
+
 #include <gui/tool_view.hpp>
 
 /* Qt includes */
+#include <QFile>
 #include <QMainWindow>
 #include <QPushButton>
-#include <QFile>
 
 /* Local includes */
-#include "debuggercontroller.h"
 #include "bitfieldwidget.h"
+#include "debuggercontroller.h"
 #include "registerwidget.h"
 
 class QJSEngine;
@@ -47,8 +48,7 @@ class DebuggerInstrument : public QWidget
 	Q_OBJECT
 
 public:
-	explicit DebuggerInstrument(struct iio_context *ctx, QJSEngine *engine,
-				    QWidget *parent = 0);
+	explicit DebuggerInstrument(struct iio_context *ctx, QJSEngine *engine, QWidget *parent = 0);
 	~DebuggerInstrument();
 
 	void updateReadValue(QString value);
@@ -69,7 +69,6 @@ public Q_SLOTS:
 	void on_readRegPushButton_clicked();
 	void on_writeRegPushButton_clicked();
 
-
 private Q_SLOTS:
 	void on_detailedRegMapCheckBox_stateChanged(int arg1);
 
@@ -87,7 +86,7 @@ private:
 	RegisterWidget *reg;
 	QVector<BitfieldWidget *> bitfieldsVector;
 };
-}
-}
+} // namespace debugger
+} // namespace scopy
 
 #endif // DEBUGGERINSTRUMENT_H

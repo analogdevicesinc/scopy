@@ -18,25 +18,25 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_DIODIGITALCHANNELCONTROLLER_H
 #define SCOPY_DIODIGITALCHANNELCONTROLLER_H
 
 #include "diodigitalchannel.h"
-#include <iioutil/commandqueue.h>
 
-#include <string>
 #include <iio.h>
+
+#include <iioutil/commandqueue.h>
+#include <string>
 
 #define ATTR_BUFFER_LEN 200
 
 namespace scopy::swiot {
-class DioDigitalChannelController : public QWidget {
+class DioDigitalChannelController : public QWidget
+{
 	Q_OBJECT
 public:
-
-	explicit DioDigitalChannelController(struct iio_channel* channel, const QString& deviceName,
-					     const QString& deviceType, CommandQueue *cmdQueue, QWidget *parent);
+	explicit DioDigitalChannelController(struct iio_channel *channel, const QString &deviceName,
+					     const QString &deviceType, CommandQueue *cmdQueue, QWidget *parent);
 	~DioDigitalChannelController() override;
 
 	DioDigitalChannel *getDigitalChannel() const;
@@ -44,6 +44,7 @@ private Q_SLOTS:
 	void createWriteCurrentLimitCommand(int index);
 	void createWriteRawCommand(bool value);
 	void createWriteTypeCommand(int index);
+
 private:
 	DioDigitalChannel *m_digitalChannel;
 
@@ -58,9 +59,9 @@ private:
 
 	CommandQueue *m_cmdQueue;
 
-	struct iio_channel* m_channel;
+	struct iio_channel *m_channel;
 };
 
-} // scopy
+} // namespace scopy::swiot
 
-#endif //SCOPY_DIODIGITALCHANNELCONTROLLER_H
+#endif // SCOPY_DIODIGITALCHANNELCONTROLLER_H

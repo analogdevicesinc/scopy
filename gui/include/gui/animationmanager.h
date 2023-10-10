@@ -22,27 +22,29 @@
 #define ANIMATIONMANAGER_H
 
 #include "scopy-gui_export.h"
-#include <customanimation.h>
+
 #include <QObject>
+
+#include <customanimation.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT AnimationManager : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    static AnimationManager& getInstance();
-    void toggleAnimations(bool on);
+	static AnimationManager &getInstance();
+	void toggleAnimations(bool on);
 
-    void registerAnimation(CustomAnimation *animation);
+	void registerAnimation(CustomAnimation *animation);
 
 Q_SIGNALS:
-    void toggle(bool);
+	void toggle(bool);
 
 private:
 	AnimationManager();
-        bool m_animationsEnabled;
+	bool m_animationsEnabled;
 };
-}
+} // namespace scopy
 
 #endif // ANIMATIONMANAGER_H

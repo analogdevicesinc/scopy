@@ -21,31 +21,33 @@
 #ifndef FILEMANAGER_H
 #define FILEMANAGER_H
 
+#include "scopy-gui_export.h"
+
 #include <QString>
-#include <QVector>
 #include <QStringList>
+#include <QVector>
 
 #include <exception>
 #include <iostream>
-#include "scopy-gui_export.h"
-
 
 namespace scopy {
 class SCOPY_GUI_EXPORT FileManager
 {
 public:
-
-	enum FilePurpose {
+	enum FilePurpose
+	{
 		EXPORT,
 		IMPORT
 	};
 
-	enum FileFormat {
+	enum FileFormat
+	{
 		RAW,
 		SCOPY
 	};
 
-	enum FileType {
+	enum FileType
+	{
 		CSV,
 		TXT
 	};
@@ -75,15 +77,14 @@ public:
 	void performDecoderWrite(bool skip_empty_lines = false);
 
 	QStringList getAdditionalInformation() const;
-	void setAdditionalInformation(const QString& value);
+	void setAdditionalInformation(const QString &value);
 
 	FileFormat getFormat() const;
 	void setFormat(const FileFormat &value);
 
-	void writeToFile(bool overwrite, QMap<QString,QVector<QString>> data);
+	void writeToFile(bool overwrite, QMap<QString, QVector<QString>> data);
 
 private:
-
 	QVector<QVector<double>> data;
 	QVector<QVector<QString>> decoder_data;
 	QStringList columnNames;
@@ -97,20 +98,23 @@ private:
 	QString separator;
 	QString toolName;
 	QStringList additionalInformation;
-
 };
 
-class ScopyFileHeader {
+class ScopyFileHeader
+{
 public:
 	static bool hasValidHeader(QVector<QVector<QString>> data);
 	static QStringList getHeader();
 };
 
-class FileManagerException : public std::runtime_error {
+class FileManagerException : public std::runtime_error
+{
 public:
-	FileManagerException(const char* msg) : std::runtime_error(msg) {}
+	FileManagerException(const char *msg)
+		: std::runtime_error(msg)
+	{}
 	~FileManagerException() throw() {}
 };
-}
+} // namespace scopy
 
 #endif // FILEMANAGER_H

@@ -1,8 +1,10 @@
 #include "pluginfilter.h"
+
 #include <QJsonArray>
 
 namespace scopy {
-bool PluginFilter::pluginInCategory(Plugin* p, QString category) { // PluginFilter class (?)
+bool PluginFilter::pluginInCategory(Plugin *p, QString category)
+{			       // PluginFilter class (?)
 	if(category.isEmpty()) // no category selected
 		return true;
 	if(!p->metadata().contains("category")) // plugin metadata does not have category
@@ -18,16 +20,16 @@ bool PluginFilter::pluginInCategory(Plugin* p, QString category) { // PluginFilt
 			if(v.toString() == category) {
 				return true;
 			}
-
 		}
 	}
 	return false;
 }
 
-bool PluginFilter::pluginForcedInclusionList(QList<Plugin*> pl, Plugin *p) {
+bool PluginFilter::pluginForcedInclusionList(QList<Plugin *> pl, Plugin *p)
+{
 	bool ret = false;
 	QStringList includeList;
-	for(Plugin* test : pl) {
+	for(Plugin *test : pl) {
 		if(test->enabled() == false)
 			continue;
 		if(!test->metadata().contains("include-forced"))
@@ -53,10 +55,11 @@ bool PluginFilter::pluginForcedInclusionList(QList<Plugin*> pl, Plugin *p) {
 	return ret;
 }
 
-bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
+bool PluginFilter::pluginInExclusionList(QList<Plugin *> pl, Plugin *p)
+{
 	bool ret = false;
 	QStringList excludeList;
-	for(Plugin* test : pl) {
+	for(Plugin *test : pl) {
 		if(test->enabled() == false)
 			continue;
 		if(!test->metadata().contains("exclude"))
@@ -81,7 +84,7 @@ bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
 		if(exclude.toLower() == p->name().toLower()) {
 			ret = true;
 		}
-		if(exclude.toLower() == QString("!"+p->name()).toLower()) {
+		if(exclude.toLower() == QString("!" + p->name()).toLower()) {
 			ret = false;
 			break;
 		}
@@ -89,4 +92,4 @@ bool PluginFilter::pluginInExclusionList(QList<Plugin*> pl, Plugin *p) {
 	return ret;
 }
 
-}
+} // namespace scopy

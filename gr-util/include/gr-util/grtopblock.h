@@ -1,11 +1,13 @@
 #ifndef GRTOPBLOCK_H
 #define GRTOPBLOCK_H
 
-#include <QObject>
-#include <gnuradio/top_block.h>
 #include "griiodevicesource.h"
 #include "grsignalpath.h"
 #include "scopy-gr-util_export.h"
+
+#include <gnuradio/top_block.h>
+
+#include <QObject>
 
 namespace scopy::grutil {
 class SCOPY_GR_UTIL_EXPORT GRTopBlock : public QObject
@@ -14,9 +16,9 @@ class SCOPY_GR_UTIL_EXPORT GRTopBlock : public QObject
 public:
 	GRTopBlock(QString name, QObject *parent = nullptr);
 	~GRTopBlock();
-	void registerSignalPath(GRSignalPath* path);
-	void unregisterSignalPath(GRSignalPath* path);
-	QList<GRSignalPath*> signalPaths() { return m_signalPaths;}
+	void registerSignalPath(GRSignalPath *path);
+	void unregisterSignalPath(GRSignalPath *path);
+	QList<GRSignalPath *> signalPaths() { return m_signalPaths; }
 
 	void registerIIODeviceSource(GRIIODeviceSource *);
 	void unregisterIIODeviceSource(GRIIODeviceSource *);
@@ -49,9 +51,9 @@ private:
 	QString m_name;
 	bool running;
 	bool built;
-	QList<GRSignalPath*> m_signalPaths;
-	QList<GRIIODeviceSource*> m_iioDeviceSources;
+	QList<GRSignalPath *> m_signalPaths;
+	QList<GRIIODeviceSource *> m_iioDeviceSources;
 };
 
-}
+} // namespace scopy::grutil
 #endif // GRTOPBLOCK_H

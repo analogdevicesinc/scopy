@@ -21,8 +21,9 @@
 #ifndef COMPLETIONCIRCLE_H
 #define COMPLETIONCIRCLE_H
 
-#include <QDial>
 #include "scopy-gui_export.h"
+
+#include <QDial>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT CompletionCircle : public QDial
@@ -30,9 +31,9 @@ class SCOPY_GUI_EXPORT CompletionCircle : public QDial
 	Q_OBJECT
 
 	Q_PROPERTY(bool inverted MEMBER invert_circle);
+
 public:
-	explicit CompletionCircle(QWidget *parent = 0,
-	                          bool invert_circle = false);
+	explicit CompletionCircle(QWidget *parent = 0, bool invert_circle = false);
 
 	double valueDouble();
 	double minimumDouble();
@@ -62,15 +63,15 @@ protected:
 	void keyPressEvent(QKeyEvent *ev);
 	void wheelEvent(QWheelEvent *e);
 
-	bool pointInsideCircle(const QPoint&, int xc, int yc, int r);
+	bool pointInsideCircle(const QPoint &, int xc, int yc, int r);
 
 	// Hide setter/getter of the int value
-	using QAbstractSlider::value;
-	using QAbstractSlider::setValue;
-	using QAbstractSlider::minimum;
-	using QAbstractSlider::setMinimum;
 	using QAbstractSlider::maximum;
+	using QAbstractSlider::minimum;
 	using QAbstractSlider::setMaximum;
+	using QAbstractSlider::setMinimum;
+	using QAbstractSlider::setValue;
+	using QAbstractSlider::value;
 
 private:
 	double m_double_value;
@@ -85,6 +86,6 @@ private:
 	bool invert_circle;
 	bool m_toggleable;
 };
-}
+} // namespace scopy
 
 #endif // COMPLETIONCIRCLE_H

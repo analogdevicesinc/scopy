@@ -1,9 +1,10 @@
 #ifndef APPLICATIONRESTARTER_H
 #define APPLICATIONRESTARTER_H
 
+#include "scopy-core_export.h"
+
 #include <QString>
 #include <QStringList>
-#include "scopy-core_export.h"
 
 namespace scopy {
 class SCOPY_CORE_EXPORT ApplicationRestarter

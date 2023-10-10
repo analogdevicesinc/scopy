@@ -1,13 +1,13 @@
+#include "menu_header.hpp"
+
 #include "ui_menu_header.h"
 
 #include <QColor>
 #include <QIcon>
 
-#include "menu_header.hpp"
-
 using namespace scopy::gui;
 
-MenuHeader::MenuHeader(QWidget* parent)
+MenuHeader::MenuHeader(QWidget *parent)
 	: QWidget(parent)
 	, m_ui(new Ui::MenuHeader)
 {
@@ -15,7 +15,7 @@ MenuHeader::MenuHeader(QWidget* parent)
 	this->setEnableBtnVisible(false);
 }
 
-MenuHeader::MenuHeader(const QString& label, const QColor* color, bool enableBtnVisible, QWidget* parent)
+MenuHeader::MenuHeader(const QString &label, const QColor *color, bool enableBtnVisible, QWidget *parent)
 	: MenuHeader(parent)
 {
 	this->setLabel(label);
@@ -27,19 +27,21 @@ MenuHeader::~MenuHeader() { delete m_ui; }
 
 void MenuHeader::setEnabledBtnState(bool state) { m_ui->btnEnabled->setChecked(state); }
 
-void MenuHeader::setLabel(const QString& text) { m_ui->lblTitle->setText(text); }
+void MenuHeader::setLabel(const QString &text) { m_ui->lblTitle->setText(text); }
 
-void MenuHeader::setLineColor(const QColor* color)
+void MenuHeader::setLineColor(const QColor *color)
 {
 	m_ui->lineSeparator->setStyleSheet("border: 2px solid " + color->name());
 }
 
 void MenuHeader::setEnableBtnVisible(bool visible) { m_ui->btnEnabled->setVisible(visible); }
 
-QPushButton* MenuHeader::getEnableBtn() { return m_ui->btnEnabled; }
+QPushButton *MenuHeader::getEnableBtn() { return m_ui->btnEnabled; }
 
 void MenuHeader::addNewHeaderWidget(QWidget *widget)
 {
 	m_ui->stackedWidget->addWidget(widget);
 	m_ui->stackedWidget->setCurrentWidget(widget);
 }
+
+#include "moc_menu_header.cpp"

@@ -21,43 +21,43 @@
 #ifndef APIOBJECT_HPP
 #define APIOBJECT_HPP
 
-#include <QObject>
 #include "scopy-pluginbase_export.h"
+
+#include <QObject>
 
 class QJSEngine;
 class QSettings;
-template <typename T> class QList;
+template <typename T>
+class QList;
 
 namespace scopy {
-	class SCOPY_PLUGINBASE_EXPORT ApiObject : public QObject
-	{
-		Q_OBJECT
+class SCOPY_PLUGINBASE_EXPORT ApiObject : public QObject
+{
+	Q_OBJECT
 
-	Q_SIGNALS:
-		void loadingFinished();
+Q_SIGNALS:
+	void loadingFinished();
 
-	public:
-		ApiObject(QObject *parent = nullptr);
-		~ApiObject();
+public:
+	ApiObject(QObject *parent = nullptr);
+	~ApiObject();
 
-		virtual void load(QSettings& settings);
-		virtual void save(QSettings& settings);
+	virtual void load(QSettings &settings);
+	virtual void save(QSettings &settings);
 
-	private:
-		template <typename T> void save(QSettings& settings,
-				const QString& prop, const QList<T>& list);
-		template <typename T> QList<T> load(QSettings& settings,
-				const QString& prop);
+private:
+	template <typename T>
+	void save(QSettings &settings, const QString &prop, const QList<T> &list);
+	template <typename T>
+	QList<T> load(QSettings &settings, const QString &prop);
 
-		void save(QSettings& settings, const QString& prop,
-				const QVariantList& list);
-		void load(QSettings& settings, const QString& prop,
-				const QVariantList& list);
+	void save(QSettings &settings, const QString &prop, const QVariantList &list);
+	void load(QSettings &settings, const QString &prop, const QVariantList &list);
 
-		void save_nogroup(ApiObject *, QSettings&);
-		void load_nogroup(ApiObject *, QSettings&);
-	};
-}
+	void save_nogroup(ApiObject *, QSettings &);
+	void load_nogroup(ApiObject *, QSettings &);
+};
+} // namespace scopy
 
 Q_DECLARE_METATYPE(scopy::ApiObject *)
 

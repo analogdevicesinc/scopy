@@ -21,23 +21,25 @@
 #ifndef M2K_TOOL_HPP
 #define M2K_TOOL_HPP
 
-#include <QWidget>
-#include <QSettings>
-#include <QMouseEvent>
+#include "pluginbase/toolmenuentry.h"
+
 #include <QDragMoveEvent>
 #include <QDropEvent>
-#include <QString>
 #include <QMainWindow>
-#include "pluginbase/toolmenuentry.h"
+#include <QMouseEvent>
+#include <QSettings>
+#include <QString>
+#include <QWidget>
+
 #include <pluginbase/preferences.h>
 #include <pluginbase/resourcemanager.h>
-
 
 class QJSEngine;
 class QPushButton;
 
-extern "C" {
-struct iio_context;
+extern "C"
+{
+	struct iio_context;
 }
 
 namespace scopy {
@@ -50,17 +52,16 @@ class M2kTool : public QWidget, public ResourceUser
 	Q_OBJECT
 
 public:
-	explicit M2kTool(struct iio_context *ctx, ToolMenuEntry *tme,
-		      ApiObject *api, const QString& name,
-		      QWidget *parent);
+	explicit M2kTool(struct iio_context *ctx, ToolMenuEntry *tme, ApiObject *api, const QString &name,
+			 QWidget *parent);
 	~M2kTool();
 
-	const QString& getName();
-	void setName(const QString& name);
+	const QString &getName();
+	void setName(const QString &name);
 	virtual void settingsLoaded();
 	virtual void setNativeDialogs(bool nativeDialogs);
 
-	ApiObject* getApi();
+	ApiObject *getApi();
 
 	ToolMenuEntry *getTme() const;
 
@@ -75,7 +76,7 @@ public Q_SLOTS:
 	virtual void readPreferences();
 
 protected:
-	struct iio_context *ctx;	
+	struct iio_context *ctx;
 	ApiObject *api;
 	QString name;
 	bool saveOnExit;
@@ -87,6 +88,6 @@ protected:
 	bool m_useNativeDialogs;
 	QWidget *m_centralWidget;
 };
-}
-}
+} // namespace m2k
+} // namespace scopy
 #endif /* SCOPY_TOOL_HPP */

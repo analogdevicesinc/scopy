@@ -37,13 +37,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <cassert>
+#include "prop/double.hpp"
 
 #include <QDebug>
 #include <QDoubleSpinBox>
 
-#include "prop/double.hpp"
+#include <cassert>
 
 using std::optional;
 using std::pair;
@@ -51,36 +50,29 @@ using std::pair;
 namespace scopy {
 namespace prop {
 
-Double::Double(QString name,
-	QString desc,
-	int decimals,
-	QString suffix,
-	optional< pair<double, double> > range,
-	optional<double> step,
-	Getter getter,
-	Setter setter) :
-	Property(name, desc, getter, setter),
-	decimals_(decimals),
-	suffix_(suffix),
-	range_(range),
-	step_(step),
-	spin_box_(nullptr)
-{
-}
+Double::Double(QString name, QString desc, int decimals, QString suffix, optional<pair<double, double>> range,
+	       optional<double> step, Getter getter, Setter setter)
+	: Property(name, desc, getter, setter)
+	, decimals_(decimals)
+	, suffix_(suffix)
+	, range_(range)
+	, step_(step)
+	, spin_box_(nullptr)
+{}
 
-QWidget* Double::get_widget(QWidget *parent, bool auto_commit)
+QWidget *Double::get_widget(QWidget *parent, bool auto_commit)
 {
-	if (spin_box_)
+	if(spin_box_)
 		return spin_box_;
 
-	if (!getter_)
+	if(!getter_)
 		return nullptr;
 
 	try {
 		QVariant variant = getter_();
-		if (!variant.isValid())
+		if(!variant.isValid())
 			return nullptr;
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return nullptr;
 	}
@@ -88,30 +80,29 @@ QWidget* Double::get_widget(QWidget *parent, bool auto_commit)
 	spin_box_ = new QDoubleSpinBox(parent);
 	spin_box_->setDecimals(decimals_);
 	spin_box_->setSuffix(suffix_);
-	if (range_)
+	if(range_)
 		spin_box_->setRange(range_->first, range_->second);
-	if (step_)
+	if(step_)
 		spin_box_->setSingleStep(*step_);
 
 	update_widget();
 
-	if (auto_commit)
-		connect(spin_box_, SIGNAL(valueChanged(double)),
-			this, SLOT(on_value_changed(double)));
+	if(auto_commit)
+		connect(spin_box_, SIGNAL(valueChanged(double)), this, SLOT(on_value_changed(double)));
 
 	return spin_box_;
 }
 
 void Double::update_widget()
 {
-	if (!spin_box_)
+	if(!spin_box_)
 		return;
 
 	QVariant variant;
 
 	try {
 		variant = getter_();
-    } catch (const std::exception &e) {
+	} catch(const std::exception &e) {
 		qWarning() << tr("Querying config key %1 resulted in %2").arg(name_, e.what());
 		return;
 	}
@@ -126,18 +117,15 @@ void Double::commit()
 {
 	assert(setter_);
 
-	if (!spin_box_)
+	if(!spin_box_)
 		return;
 
 	setter_(QVariant(spin_box_->value()));
 }
 
-void Double::on_value_changed(double)
-{
-	commit();
-}
+void Double::on_value_changed(double) { commit(); }
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #include "prop/moc_double.cpp"

@@ -31,12 +31,12 @@ class ExportSettings;
 namespace scopy {
 class SCOPY_GUI_EXPORT ImportSettings : public ExportSettings
 {
-        Q_OBJECT
+	Q_OBJECT
 
 public:
-        ImportSettings(QWidget *parent = 0);
-        ~ImportSettings();
+	ImportSettings(QWidget *parent = 0);
+	~ImportSettings();
 };
-}
+} // namespace scopy
 
 #endif // OSC_IMPORT_SETTINGS_H

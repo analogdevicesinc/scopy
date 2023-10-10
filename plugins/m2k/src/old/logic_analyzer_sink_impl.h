@@ -8,9 +8,7 @@ class logic_analyzer_sink_impl : public logic_analyzer_sink
 public:
 	logic_analyzer_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize);
 
-	int work(int noutput_items,
-	         gr_vector_const_void_star &input_items,
-	         gr_vector_void_star &output_items);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
 
 	void clean_buffers();
 	void set_nsamps(int newsize);
@@ -30,7 +28,7 @@ private:
 	int d_end;
 	int d_start;
 
-	std::vector< std::vector<gr::tag_t> > d_tags;
+	std::vector<std::vector<gr::tag_t>> d_tags;
 	pmt::pmt_t d_trigger_tag_key;
 	bool d_triggered;
 

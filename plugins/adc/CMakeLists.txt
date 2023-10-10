@@ -8,8 +8,7 @@ project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
-# TODO: split stylesheet/resources and add here
-# TODO: export header files correctly
+# TODO: split stylesheet/resources and add here TODO: export header files correctly
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,48 +23,43 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
-FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
-FILE(GLOB UI_LIST ui/*.ui)
+file(GLOB SRC_LIST src/*.cpp src/*.cc)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(GLOB UI_LIST ui/*.ui)
 
 set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)
-    add_subdirectory(test)
+	add_subdirectory(test)
 endif()
 
-set(PROJECT_SOURCES
-        ${SRC_LIST}
-        ${HEADER_LIST}
-        ${UI_LIST}
-)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core )
-
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
-add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
-    ${PROJECT_RESOURCES}
-)
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
 
-generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
+generate_export_header(
+	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
+)
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt::Widgets Qt::Core
-	scopy-pluginbase
-	scopy-gui
-	scopy-iioutil
-	scopy-gr-util
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC Qt::Widgets
+	       Qt::Core
+	       scopy-pluginbase
+	       scopy-gui
+	       scopy-iioutil
+	       scopy-gr-util
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
 
-install(TARGETS ${PROJECT_NAME}
-    RUNTIME
-    DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${SCOPY_PLUGIN_INSTALL_DIR})

@@ -1,35 +1,39 @@
 #include "testpluginip.h"
+
 #include "qlabel.h"
 #include "qpushbutton.h"
-#include <QVBoxLayout>
+
 #include <QLoggingCategory>
+#include <QVBoxLayout>
+
 #include <pluginbase/messagebroker.h>
 
-Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP,"TestPluginIp");
+Q_LOGGING_CATEGORY(CAT_TESTPLUGINIP, "TestPluginIp");
 using namespace scopy;
 
-bool TestPluginIp::compatible(QString m_param, QString category) {
-	qDebug(CAT_TESTPLUGINIP)<<"compatible";
+bool TestPluginIp::compatible(QString m_param, QString category)
+{
+	qDebug(CAT_TESTPLUGINIP) << "compatible";
 	return m_param.startsWith("ip:");
 }
 
-void TestPluginIp::unload() {
+void TestPluginIp::unload()
+{
 	for(auto &tool : m_toolList) {
 		delete tool;
 	}
-
 }
 
 bool TestPluginIp::onConnect()
 {
-	qDebug(CAT_TESTPLUGINIP)<<"connect";
-	qDebug(CAT_TESTPLUGINIP)<<m_toolList[0]->id()<<m_toolList[0]->name();
+	qDebug(CAT_TESTPLUGINIP) << "connect";
+	qDebug(CAT_TESTPLUGINIP) << m_toolList[0]->id() << m_toolList[0]->name();
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setName("IP tool1");
 	m_toolList[0]->setRunBtnVisible(true);
 	m_toolList[0]->setTool(new QLabel("TestPage IP Renamed"));
 
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IP tool2","IP tool2", ""));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("IP tool2", "IP tool2", ""));
 	m_toolList[1]->setEnabled(true);
 	m_tool = new QWidget();
 	QVBoxLayout *lay = new QVBoxLayout(m_tool);
@@ -41,13 +45,13 @@ bool TestPluginIp::onConnect()
 	QPushButton *sendMessage = new QPushButton("SendMessage");
 	lay->addWidget(sendMessage);
 
-	connect(btn,&QPushButton::clicked,this,[=]() { requestTool(m_toolList[0]->id());});
-	connect(sendMessage,&QPushButton::clicked,this,[=]() {
-		MessageBroker::GetInstance()->publish("TestPlugin","testMessage");
-		MessageBroker::GetInstance()->publish("broadcast","testMessage");
-		MessageBroker::GetInstance()->publish("TestPlugin2","testMessage");
+	connect(btn, &QPushButton::clicked, this, [=]() { requestTool(m_toolList[0]->id()); });
+	connect(sendMessage, &QPushButton::clicked, this, [=]() {
+		MessageBroker::GetInstance()->publish("TestPlugin", "testMessage");
+		MessageBroker::GetInstance()->publish("broadcast", "testMessage");
+		MessageBroker::GetInstance()->publish("TestPlugin2", "testMessage");
 	});
-	connect(disc,&QPushButton::clicked,this,[=]() { Q_EMIT disconnectDevice();});
+	connect(disc, &QPushButton::clicked, this, [=]() { Q_EMIT disconnectDevice(); });
 
 	Q_EMIT toolListChanged();
 	m_toolList[1]->setTool(m_tool);
@@ -69,14 +73,11 @@ bool TestPluginIp::onDisconnect()
 	m_toolList.removeLast();
 	m_toolList[0]->setName("IP");
 
-	qDebug(CAT_TESTPLUGINIP)<<"disconnect";
+	qDebug(CAT_TESTPLUGINIP) << "disconnect";
 	return true;
 }
 
-void TestPluginIp::postload()
-{
-
-}
+void TestPluginIp::postload() {}
 
 bool TestPluginIp::loadIcon()
 {
@@ -93,15 +94,12 @@ bool TestPluginIp::loadPage()
 	return true;
 }
 
-void TestPluginIp::loadToolList()
-{
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test2","SecondPlugin",""));
-}
+void TestPluginIp::loadToolList() { m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("test2", "SecondPlugin", "")); }
 
 void TestPluginIp::initMetadata()
 {
 	loadMetadata(
-R"plugin(
+		R"plugin(
 	{
 	   "priority":2,
 	   "category":[
@@ -111,14 +109,8 @@ R"plugin(
 		)plugin");
 }
 
-void TestPluginIp::saveSettings(QSettings &s)
-{
-	s.setValue("ip",m_param);
-}
+void TestPluginIp::saveSettings(QSettings &s) { s.setValue("ip", m_param); }
 
-void TestPluginIp::loadSettings(QSettings &s)
-{
-	qInfo(CAT_TESTPLUGINIP)<<s.value("ip");
-}
+void TestPluginIp::loadSettings(QSettings &s) { qInfo(CAT_TESTPLUGINIP) << s.value("ip"); }
 
 #include "moc_testpluginip.cpp"

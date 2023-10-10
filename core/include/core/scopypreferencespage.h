@@ -1,9 +1,10 @@
 #ifndef SCOPYPREFERENCESPAGE_H
 #define SCOPYPREFERENCESPAGE_H
 
+#include "scopy-core_export.h"
+
 #include <QTabWidget>
 #include <QVBoxLayout>
-#include "scopy-core_export.h"
 
 namespace scopy {
 class SCOPY_CORE_EXPORT ScopyPreferencesPage : public QWidget
@@ -12,10 +13,11 @@ class SCOPY_CORE_EXPORT ScopyPreferencesPage : public QWidget
 public:
 	ScopyPreferencesPage(QWidget *parent = nullptr);
 	~ScopyPreferencesPage();
-	QWidget* buildGeneralPreferencesPage();
+	QWidget *buildGeneralPreferencesPage();
 	void addHorizontalTab(QWidget *w, QString text);
 private Q_SLOTS:
 	void resetScopyPreferences();
+
 private:
 	QTabWidget *tabWidget;
 	void initRestartWidget();
@@ -26,5 +28,5 @@ private:
 	void removeIniFiles(bool backup = true);
 	void initUI();
 };
-}
+} // namespace scopy
 #endif // SCOPYPREFERENCESPAGE_H

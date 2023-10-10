@@ -23,98 +23,107 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 set(SCOPY_QT_COMPONENTS Core Widgets UiTools)
 
-FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
-FILE(GLOB OLD_SCOPY_FILES
-    src/old/*.cpp
-    src/old/logicanalyzer/*.cpp
-    src/old/logicanalyzer/*.hpp
-    src/old/patterngenerator/*.cpp
-    src/old/patterngenerator/*.hpp
-    src/old/patterngenerator/patterns/*.cpp
-    src/old/patterngenerator/patterns/*.hpp
-    src/old/*.hpp
-    src/old/*.cc
-    src/old/*.hh
-    src/old/*.c
-    src/old/*.h)
-FILE(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
-FILE(GLOB UI_LIST ui/*.ui ui/patterns/*.ui)
+file(GLOB SRC_LIST src/*.cpp src/*.cc)
+file(
+	GLOB
+	OLD_SCOPY_FILES
+	src/old/*.cpp
+	src/old/logicanalyzer/*.cpp
+	src/old/logicanalyzer/*.hpp
+	src/old/patterngenerator/*.cpp
+	src/old/patterngenerator/*.hpp
+	src/old/patterngenerator/patterns/*.cpp
+	src/old/patterngenerator/patterns/*.hpp
+	src/old/*.hpp
+	src/old/*.cc
+	src/old/*.hh
+	src/old/*.c
+	src/old/*.h
+)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
+file(GLOB UI_LIST ui/*.ui ui/patterns/*.ui)
 
 set(ENABLE_TESTING ON)
 if(ENABLE_TESTING)
-    add_subdirectory(test)
+	add_subdirectory(test)
 endif()
 
-set(PROJECT_SOURCES
-        ${SRC_LIST}
-        ${OLD_SCOPY_FILES}
-        ${HEADER_LIST}
-        ${UI_LIST}
-)
+set(PROJECT_SOURCES ${SRC_LIST} ${OLD_SCOPY_FILES} ${HEADER_LIST} ${UI_LIST})
 
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH};/usr/local/lib/cmake)
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 find_package(libm2k REQUIRED)
 
-find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED) # workaround for Gnuradio not finding Boost::chrono
-find_package(Gnuradio "3.10" REQUIRED COMPONENTS runtime analog blocks fft filter volk pmt iio)
+find_package(Boost COMPONENTS system filesystem thread chrono REQUIRED) # workaround for Gnuradio not finding
+# Boost::chrono
+find_package(
+	Gnuradio "3.10" REQUIRED
+	COMPONENTS runtime
+		   analog
+		   blocks
+		   fft
+		   filter
+		   volk
+		   pmt
+		   iio
+)
 find_package(gnuradio-scopy REQUIRED PATH_SUFFIXES scopy)
 find_package(gnuradio-m2k REQUIRED PATH_SUFFIXES m2k)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
-         "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Scopy.app/Contents/MacOS/plugins/plugins")
 else()
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${SCOPY_PLUGIN_BUILD_PATH})
 endif()
-
 
 qt_add_resources(PROJECT_RESOURCES res/resources.qrc)
 
-add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
-    ${PROJECT_RESOURCES}
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES} ${PROJECT_RESOURCES})
+
+generate_export_header(
+	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
-
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE
-	Qt::Widgets
-	Qt::Core
-	scopy-gui
-	scopy-pluginbase
-	scopy-common
-	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} ${CMAKE_CURRENT_SOURCE_DIR}/src/old
-	)
+target_include_directories(
+	${PROJECT_NAME}
+	PRIVATE Qt::Widgets
+		Qt::Core
+		scopy-gui
+		scopy-pluginbase
+		scopy-common
+		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+		${CMAKE_CURRENT_SOURCE_DIR}/src/old
+)
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase ${QWT_INCLUDE_DIRS})
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
-    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
+	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    ${SCOPY_QT_LIBRARIES}
-    ${QWT_LIBRARIES}
-    scopy-common
-    scopy-pluginbase
-    scopy-iioutil
-    scopy-gui
-    scopy-gr-gui
-    scopy-sigrok-gui
-    libm2k::libm2k
-    gnuradio::gnuradio-runtime
-    gnuradio::gnuradio-analog
-    gnuradio::gnuradio-blocks
-    gnuradio::gnuradio-fft
-    gnuradio::gnuradio-filter
-    gnuradio::gnuradio-pmt
-    gnuradio::gnuradio-iio
-    gnuradio::gnuradio-scopy
-    gnuradio::gnuradio-m2k
+target_link_libraries(
+	${PROJECT_NAME}
+	PUBLIC ${SCOPY_QT_LIBRARIES}
+	       ${QWT_LIBRARIES}
+	       scopy-common
+	       scopy-pluginbase
+	       scopy-iioutil
+	       scopy-gui
+	       scopy-gr-gui
+	       scopy-sigrok-gui
+	       libm2k::libm2k
+	       gnuradio::gnuradio-runtime
+	       gnuradio::gnuradio-analog
+	       gnuradio::gnuradio-blocks
+	       gnuradio::gnuradio-fft
+	       gnuradio::gnuradio-filter
+	       gnuradio::gnuradio-pmt
+	       gnuradio::gnuradio-iio
+	       gnuradio::gnuradio-scopy
+	       gnuradio::gnuradio-m2k
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

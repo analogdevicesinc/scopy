@@ -1,10 +1,12 @@
 #ifndef TOOLMENUENTRY_H
 #define TOOLMENUENTRY_H
 
+#include "scopy-pluginbase_export.h"
+
 #include <QObject>
 #include <QString>
+
 #include <common/scopyconfig.h>
-#include "scopy-pluginbase_export.h"
 
 namespace scopy {
 /**
@@ -12,16 +14,27 @@ namespace scopy {
  * Class used by plugin and scopy to populate the tool menu
  * SCOPY_NEW_TOOLMENUENTRY macro can be used to instantiate ToolMenuEntry objects
  */
-class SCOPY_PLUGINBASE_EXPORT ToolMenuEntry : public QObject {
+class SCOPY_PLUGINBASE_EXPORT ToolMenuEntry : public QObject
+{
 	Q_OBJECT
 public:
-	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr) :
-		QObject(parent), m_id(id), m_uuid("tme_"+pluginName+"_"+id+"_"+scopy::config::getUuid()),
-		m_name(name), m_icon(icon), m_pluginName(pluginName), m_visible(true),
-		m_enabled(false), m_running(false), m_runBtnVisible(false),
-		m_attached(true), m_tool(nullptr) {}
+	ToolMenuEntry(QString id, QString name, QString icon, QString pluginName, QObject *parent = nullptr)
+		: QObject(parent)
+		, m_id(id)
+		, m_uuid("tme_" + pluginName + "_" + id + "_" + scopy::config::getUuid())
+		, m_name(name)
+		, m_icon(icon)
+		, m_pluginName(pluginName)
+		, m_visible(true)
+		, m_enabled(false)
+		, m_running(false)
+		, m_runBtnVisible(false)
+		, m_attached(true)
+		, m_tool(nullptr)
+	{}
 
-	ToolMenuEntry(const ToolMenuEntry &other) {
+	ToolMenuEntry(const ToolMenuEntry &other)
+	{
 		m_id = other.m_id;
 		m_uuid = other.m_uuid;
 		m_name = other.m_name;
@@ -45,13 +58,13 @@ public:
 	inline bool enabled() const { return m_enabled; }
 	inline bool running() const { return m_running; }
 	inline bool attached() const { return m_attached; }
-	inline bool runEnabled() const 	{ return m_runEnabled;	}
+	inline bool runEnabled() const { return m_runEnabled; }
 	inline bool runBtnVisible() const { return m_runBtnVisible; }
 	inline QWidget *tool() const { return m_tool; }
 
-	static ToolMenuEntry *findToolMenuEntryByName(QList<ToolMenuEntry*> list, QString id);
-	static ToolMenuEntry *findToolMenuEntryById(QList<ToolMenuEntry*> list, QString id);
-	static ToolMenuEntry *findToolMenuEntryByTool(QList<ToolMenuEntry*> list, QWidget *w);
+	static ToolMenuEntry *findToolMenuEntryByName(QList<ToolMenuEntry *> list, QString id);
+	static ToolMenuEntry *findToolMenuEntryById(QList<ToolMenuEntry *> list, QString id);
+	static ToolMenuEntry *findToolMenuEntryByTool(QList<ToolMenuEntry *> list, QWidget *w);
 	/**
 	 * @brief setName
 	 * @param newName
@@ -82,7 +95,7 @@ public Q_SLOTS:
 	 * @brief setRunning
 	 * @param newRunning
 	 * Sets the tool in run state
-	 */	
+	 */
 	void setRunning(bool newRunning);
 
 	/**
@@ -111,7 +124,7 @@ public Q_SLOTS:
 	 * @param newTool
 	 * links a widget to the tool menu entry. Remove tool from the menu entry by setting newtool to nullptr
 	 */
-	QWidget* setTool(QWidget *newTool);
+	QWidget *setTool(QWidget *newTool);
 
 Q_SIGNALS:
 	/**
@@ -124,7 +137,7 @@ Q_SIGNALS:
 	 * signal is emitted automatically when changing a tool linked to the tool entry
 	 */
 	void updateToolAttached(bool);
-	void updateTool(QWidget*);
+	void updateTool(QWidget *);
 
 	/**
 	 * @brief requestRun
@@ -150,13 +163,13 @@ private:
 	bool m_runEnabled;
 	bool m_runBtnVisible;
 	bool m_attached;
-	QWidget* m_tool;
+	QWidget *m_tool;
 };
 
 inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryByName(QList<ToolMenuEntry *> list, QString name)
 {
 	for(auto &&tme : list) {
-		if(tme->name()==name) {
+		if(tme->name() == name) {
 			return tme;
 		}
 	}
@@ -166,7 +179,7 @@ inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryByName(QList<ToolMenuEntry
 inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryById(QList<ToolMenuEntry *> list, QString id)
 {
 	for(auto &&tme : list) {
-		if(tme->id()==id) {
+		if(tme->id() == id) {
 			return tme;
 		}
 	}
@@ -176,7 +189,7 @@ inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryById(QList<ToolMenuEntry *
 inline ToolMenuEntry *ToolMenuEntry::findToolMenuEntryByTool(QList<ToolMenuEntry *> list, QWidget *w)
 {
 	for(auto &&tme : list) {
-		if(tme->tool()==w) {
+		if(tme->tool() == w) {
 			return tme;
 		}
 	}
@@ -219,9 +232,9 @@ inline void ToolMenuEntry::setRunBtnVisible(bool newRunBtnVisible)
 	Q_EMIT updateToolEntry();
 }
 
-inline QWidget* ToolMenuEntry::setTool(QWidget *newTool)
+inline QWidget *ToolMenuEntry::setTool(QWidget *newTool)
 {
-	QWidget* oldTool;
+	QWidget *oldTool;
 	oldTool = m_tool;
 	m_tool = newTool;
 	if(oldTool != m_tool) {
@@ -229,7 +242,6 @@ inline QWidget* ToolMenuEntry::setTool(QWidget *newTool)
 	}
 	return oldTool;
 }
-
 
 inline void ToolMenuEntry::setAttached(bool attach)
 {
@@ -240,13 +252,12 @@ inline void ToolMenuEntry::setAttached(bool attach)
 	}
 }
 
-
 inline void ToolMenuEntry::setRunEnabled(bool newRunEnabled)
 {
 	m_runEnabled = newRunEnabled;
 	Q_EMIT updateToolEntry();
 }
 
-}
+} // namespace scopy
 
 #endif // TOOLMENUENTRY_H

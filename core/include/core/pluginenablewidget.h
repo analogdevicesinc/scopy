@@ -1,14 +1,16 @@
 #ifndef PLUGINENABLEWIDGET_H
 #define PLUGINENABLEWIDGET_H
 
-#include <qwidget.h>
+#include "gui/utils.h"
 #include "qcheckbox.h"
 #include "qlabel.h"
-#include "gui/utils.h"
+
+#include <qwidget.h>
 
 namespace scopy {
 
-class PluginEnableWidget : public QWidget {
+class PluginEnableWidget : public QWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
@@ -23,7 +25,6 @@ private:
 	QLabel *m_descriptionLabel;
 };
 
-}
-
+} // namespace scopy
 
 #endif // PLUGINENABLEWIDGET_H

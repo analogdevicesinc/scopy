@@ -6,15 +6,15 @@
 class BitFieldOption
 {
 public:
-    BitFieldOption(QString value, QString description);
+	BitFieldOption(QString value, QString description);
 
-    QString getDescription() const;
+	QString getDescription() const;
 
-    QString getValue() const;
+	QString getValue() const;
 
 private:
-    QString value;
-    QString description;
+	QString value;
+	QString description;
 };
 
 #endif // BITFIELDOPTION_HPP

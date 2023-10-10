@@ -1,12 +1,12 @@
 #ifndef CMDLINEHANDLER_H
 #define CMDLINEHANDLER_H
 
-#include <QCommandLineParser>
 #include "scopy-core_export.h"
 #include "scopymainwindow_api.h"
 
-namespace scopy
-{
+#include <QCommandLineParser>
+
+namespace scopy {
 class SCOPY_CORE_EXPORT CmdLineHandler
 {
 public:
@@ -16,9 +16,8 @@ public:
 
 private:
 	static void logOutputHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
-	static FILE* logFile_;
-
+	static FILE *logFile_;
 };
-}
+} // namespace scopy
 
 #endif // CMDLINEHANDLER_H

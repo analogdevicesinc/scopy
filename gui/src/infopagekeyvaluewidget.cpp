@@ -1,12 +1,14 @@
 #include "infopagekeyvaluewidget.h"
 
 using namespace scopy;
-InfoPageKeyValueWidget::InfoPageKeyValueWidget(QString key, QString value, QWidget *parent) :
+InfoPageKeyValueWidget::InfoPageKeyValueWidget(QString key, QString value, QWidget *parent)
+	:
 
-	QWidget(parent) {
+	QWidget(parent)
+{
 	QHBoxLayout *lay = new QHBoxLayout(this);
 
-	lay->setContentsMargins(0,0,0,0);
+	lay->setContentsMargins(0, 0, 0, 0);
 	lay->setMargin(0);
 	lay->setSpacing(0);
 
@@ -18,6 +20,4 @@ InfoPageKeyValueWidget::InfoPageKeyValueWidget(QString key, QString value, QWidg
 	lay->setStretch(1, 3);
 }
 
-void InfoPageKeyValueWidget::updateValue(QString value) {
-	valueWidget->setText(value);
-}
+void InfoPageKeyValueWidget::updateValue(QString value) { valueWidget->setText(value); }

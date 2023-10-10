@@ -2,7 +2,9 @@
 
 using namespace scopy;
 
-MenuBigSwitch::MenuBigSwitch(QString on, QString off, QWidget *parent) : QWidget(parent) {
+MenuBigSwitch::MenuBigSwitch(QString on, QString off, QWidget *parent)
+	: QWidget(parent)
+{
 	auto lay = new QHBoxLayout(this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
@@ -17,11 +19,14 @@ MenuBigSwitch::MenuBigSwitch(QString on, QString off, QWidget *parent) : QWidget
 	applyStylesheet();
 }
 
-MenuBigSwitch::~MenuBigSwitch() { }
+MenuBigSwitch::~MenuBigSwitch() {}
 
 CustomSwitch *MenuBigSwitch::onOffswitch() { return m_switch; }
 
-void MenuBigSwitch::applyStylesheet() {
+void MenuBigSwitch::applyStylesheet()
+{
 	StyleHelper::MenuBigSwitchButton(m_switch, "menuButton");
 	StyleHelper::MenuBigSwitch(this, "menuBigSwitch");
 }
+
+#include "moc_menubigswitch.cpp"

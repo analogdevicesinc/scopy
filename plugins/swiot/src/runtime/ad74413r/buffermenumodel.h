@@ -18,30 +18,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef BUFFERMENUMODEL_H
 #define BUFFERMENUMODEL_H
 
 #include "qobject.h"
+
 #include <QMap>
+
 #include <iioutil/commandqueue.h>
 
-extern "C"{
-struct iio_channel;
+extern "C"
+{
+	struct iio_channel;
 }
 
 namespace scopy::swiot {
-class BufferMenuModel: public QObject{
+class BufferMenuModel : public QObject
+{
 	Q_OBJECT
 public:
-	explicit BufferMenuModel(QMap<QString, iio_channel*> chnlsMap, CommandQueue *cmdQueue);
+	explicit BufferMenuModel(QMap<QString, iio_channel *> chnlsMap, CommandQueue *cmdQueue);
 	~BufferMenuModel();
 
 	QMap<QString, QMap<QString, QStringList>> getChnlAttrValues();
 	void readChnlAttr(QString iioChannelKey, QString attrName, bool readback = false);
 	void writeChnlAttr(QString iioChannelKey, QString attrName, QString attrVal,
-			   QMap<QString, QMap<QString,QStringList>> newValues);
-	void updateChnlAttributes(QMap<QString, QMap<QString,QStringList>> newValues, QString attrName, QString chnlType);
+			   QMap<QString, QMap<QString, QStringList>> newValues);
+	void updateChnlAttributes(QMap<QString, QMap<QString, QStringList>> newValues, QString attrName,
+				  QString chnlType);
 public Q_SLOTS:
 	void onChannelAttributeRead(QString iioChannelKey, QString attrName, QStringList, bool readback);
 	void onChannelAttributeWritten(QString iioChannelKey, QString attrName);
@@ -51,13 +55,14 @@ Q_SIGNALS:
 	void attrWritten(QMap<QString, QMap<QString, QStringList>> chnlAttributes);
 	void channelAttributeRead(QString iioChannelKey, QString attrName, QStringList attrValues, bool readback);
 	void channelAttributeWritten(QString iioChannelKey, QString attrName);
+
 private:
-	QMap<QString, iio_channel*> m_chnlsMap;
+	QMap<QString, iio_channel *> m_chnlsMap;
 	QMap<QString, QMap<QString, QStringList>> m_chnlAttributes;
 	CommandQueue *m_commandQueue;
 	bool m_initialized;
 	void init();
 };
-}
+} // namespace scopy::swiot
 
 #endif // BUFFERMENUMODEL_H

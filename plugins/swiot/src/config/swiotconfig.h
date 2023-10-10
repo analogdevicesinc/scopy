@@ -18,32 +18,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SWIOTCONFIG_H
 #define SWIOTCONFIG_H
 
 #define AD_NAME "ad74413r"
 #define MAX_NAME "max14906"
 
-#include <iioutil/commandqueue.h>
 #include "configcontroller.h"
-#include "ui_swiotconfig.h"
-#include <gui/tool_view.hpp>
-#include <QPushButton>
-#include <QMap>
-#include <QScrollArea>
-
 #include "src/config/drawarea.h"
 
-extern "C"{
-struct iio_context;
-struct iio_device;
-struct iio_channel;
+#include "ui_swiotconfig.h"
+
+#include <QMap>
+#include <QPushButton>
+#include <QScrollArea>
+
+#include <gui/tool_view.hpp>
+#include <iioutil/commandqueue.h>
+
+extern "C"
+{
+	struct iio_context;
+	struct iio_device;
+	struct iio_channel;
 }
 
 namespace scopy::swiot {
 
-class SwiotConfig: public QWidget
+class SwiotConfig : public QWidget
 {
 	Q_OBJECT
 public:
@@ -60,30 +62,30 @@ Q_SIGNALS:
 	void configBtnPressed();
 
 private:
-	QMap<QString, struct iio_device*> m_iioDevices;
-	struct iio_context* m_context;
-	struct iio_device* m_swiotDevice;
+	QMap<QString, struct iio_device *> m_iioDevices;
+	struct iio_context *m_context;
+	struct iio_device *m_swiotDevice;
 
-	QVector<ConfigController*> m_controllers;
-	QVector<QStringList*> m_funcAvailable;
-	QPushButton* m_configBtn;
-	scopy::gui::ToolView* m_toolView;
+	QVector<ConfigController *> m_controllers;
+	QVector<QStringList *> m_funcAvailable;
+	QPushButton *m_configBtn;
+	scopy::gui::ToolView *m_toolView;
 	CommandQueue *m_commandQueue;
 
-	DrawArea* m_drawArea;
-	QScrollArea* m_scrollArea;
-	QWidget* m_mainView;
-	QLabel* m_statusLabel;
-	QWidget* m_statusContainer;
-	Ui::ConfigMenu* ui;
+	DrawArea *m_drawArea;
+	QScrollArea *m_scrollArea;
+	QWidget *m_mainView;
+	QLabel *m_statusLabel;
+	QWidget *m_statusContainer;
+	Ui::ConfigMenu *ui;
 
 	void initTutorialProperties();
-        void setupToolView(QWidget* parent);
+	void setupToolView(QWidget *parent);
 	void init();
-        void createPageLayout();
-	void setDevices(struct iio_context* ctx);
-	static QPushButton* createConfigBtn();
+	void createPageLayout();
+	void setDevices(struct iio_context *ctx);
+	static QPushButton *createConfigBtn();
 };
-}
+} // namespace scopy::swiot
 
 #endif // SWIOTCONFIG_H

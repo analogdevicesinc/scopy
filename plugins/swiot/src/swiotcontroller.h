@@ -18,20 +18,20 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SWIOTCONTROLLER_H
 #define SWIOTCONTROLLER_H
 
-#include <QObject>
-#include <iio.h>
-#include "iioutil/iiopingtask.h"
 #include "iioutil/cyclicaltask.h"
+#include "iioutil/iiopingtask.h"
 #include "src/externalpsreaderthread.h"
-#include "src/swiotswitchctxtask.h"
-#include "src/swiotreadtemperaturetask.h"
 #include "src/swiotidentifytask.h"
 #include "src/swiotpingtask.h"
+#include "src/swiotreadtemperaturetask.h"
+#include "src/swiotswitchctxtask.h"
 
+#include <iio.h>
+
+#include <QObject>
 
 namespace scopy::swiot {
 class SwiotController : public QObject
@@ -92,7 +92,6 @@ private:
 	CyclicalTask *powerSupplyTimer;
 	CyclicalTask *temperatureTimer;
 };
-}
-
+} // namespace scopy::swiot
 
 #endif // SWIOTCONTROLLER_H

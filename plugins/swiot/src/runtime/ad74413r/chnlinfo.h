@@ -2,21 +2,22 @@
 #define CHNLINFO_H
 
 #include "plot_utils.hpp"
-#include <qobject.h>
+
 #include <iio.h>
+
+#include <QMap>
+#include <qobject.h>
+
 #include <iioutil/command.h>
 #include <iioutil/commandqueue.h>
-#include <QMap>
 
-#define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
+#define SWAP_UINT32(x) (((x) >> 24) | (((x)&0x00FF0000) >> 8) | (((x)&0x0000FF00) << 8) | ((x) << 24))
 namespace scopy::swiot {
 class ChnlInfo : public QObject
 {
 	Q_OBJECT
 public:
-	explicit ChnlInfo(QString plotUm, QString hwUm,
-			  iio_channel *iioChnl,
-			  CommandQueue *cmdQueue);
+	explicit ChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQueue *cmdQueue);
 	~ChnlInfo();
 
 	virtual double convertData(unsigned int data) = 0;
@@ -62,6 +63,6 @@ private:
 	void initUnitOfMeasureFactor();
 	struct iio_channel *m_iioChnl;
 };
-}
+} // namespace scopy::swiot
 
 #endif // CHNLINFO_H

@@ -19,45 +19,40 @@
  */
 
 #include "manual_calibration_api.hpp"
-#include "ui_manualcalibration.h"
+
 #include "ui_calibratetemplate.h"
+#include "ui_manualcalibration.h"
 
 #include <QApplication>
+#include <QElapsedTimer>
 #include <QJSEngine>
 #include <QMetaProperty>
 #include <QThread>
-#include <QElapsedTimer>
 
 using namespace scopy::m2k;
 
-ManualCalibration_API::ManualCalibration_API(ManualCalibration *m_calib) :
-		ApiObject(),
-		calib(m_calib),
-		step_in_progress(-1)
-{
+ManualCalibration_API::ManualCalibration_API(ManualCalibration *m_calib)
+	: ApiObject()
+	, calib(m_calib)
+	, step_in_progress(-1)
+{}
 
-}
-
-void ManualCalibration_API::autoCalibration()
-{
-	calib->ui->autoButton->click();
-}
+void ManualCalibration_API::autoCalibration() { calib->ui->autoButton->click(); }
 
 int ManualCalibration_API::start(int story)
 {
-	if (step_in_progress >= 0) {
+	if(step_in_progress >= 0) {
 		// Reset the current step if another story
 		// was already started and did not end yet
 		step_in_progress = -1;
 	}
-	if (story >= calib->ui->calibList->count()) {
+	if(story >= calib->ui->calibList->count()) {
 		return -1;
 	}
 	calib->ui->calibList->setCurrentRow(story);
-	Q_EMIT calib->ui->calibList->itemClicked(
-				calib->ui->calibList->item(story));
+	Q_EMIT calib->ui->calibList->itemClicked(calib->ui->calibList->item(story));
 	int nb_steps = calib->stCalibrationStory.story.count();
-	if (nb_steps > 0) {
+	if(nb_steps > 0) {
 		step_in_progress = 0;
 	}
 	return nb_steps;
@@ -68,13 +63,13 @@ int ManualCalibration_API::next()
 	auto currentStory = calib->stCalibrationStory;
 
 	// If a story was not yet started, return -1
-	if (step_in_progress < 0) {
+	if(step_in_progress < 0) {
 		return -1;
 	}
 
 	calib->TempUi->nextButton->click();
 	step_in_progress++;
-	if ((step_in_progress + 1) > currentStory.story.count()) {
+	if((step_in_progress + 1) > currentStory.story.count()) {
 		return -1;
 	}
 	return step_in_progress + 1;
@@ -85,19 +80,19 @@ int ManualCalibration_API::finish()
 	auto currentStory = calib->stCalibrationStory;
 
 	// If a story was not yet started, return -1
-	if (step_in_progress < 0) {
+	if(step_in_progress < 0) {
 		return -1;
 	}
 
 	// Finish the story, if not all the steps are done yet
-	while (step_in_progress < currentStory.story.count()) {
+	while(step_in_progress < currentStory.story.count()) {
 		next();
 	}
 
 	calib->TempUi->finishButton->click();
 	step_in_progress = -1;
 
-	if ((currentStory.calibProcedure + 1) < calib->calibListString.count()) {
+	if((currentStory.calibProcedure + 1) < calib->calibListString.count()) {
 		return currentStory.calibProcedure + 1;
 	}
 	return -1;
@@ -106,7 +101,7 @@ int ManualCalibration_API::finish()
 bool ManualCalibration_API::setParam(double value)
 {
 	auto currentStory = calib->stCalibrationStory;
-	if (currentStory.story.count() > 0) {
+	if(currentStory.story.count() > 0) {
 		calib->TempUi->lineEdit->setText(QString::number(value));
 		return true;
 	}
@@ -116,66 +111,41 @@ bool ManualCalibration_API::setParam(double value)
 void ManualCalibration_API::saveCalibration(QString path)
 {
 	bool buttonEn = calib->ui->saveButton->isEnabled();
-	if  (!buttonEn) {
+	if(!buttonEn) {
 		calib->ui->saveButton->setEnabled(true);
 	}
 	calib->setCalibrationFilePath(path);
 	calib->ui->saveButton->click();
 	calib->setCalibrationFilePath("");
-	if  (!buttonEn) {
+	if(!buttonEn) {
 		calib->ui->saveButton->setEnabled(false);
 	}
 }
 
-
 void ManualCalibration_API::loadCalibration()
 {
 	bool buttonEn = calib->ui->loadButton->isEnabled();
-	if  (!buttonEn) {
+	if(!buttonEn) {
 		calib->ui->loadButton->setEnabled(true);
 	}
 	calib->ui->loadButton->click();
-	if  (!buttonEn) {
+	if(!buttonEn) {
 		calib->ui->loadButton->setEnabled(false);
 	}
 }
 
-double ManualCalibration_API::getOffsetPosDac() const
-{
-	return calib->paramTable->item(0, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetPosDac() const { return calib->paramTable->item(0, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainPosDac() const
-{
-	return calib->paramTable->item(1, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainPosDac() const { return calib->paramTable->item(1, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getOffsetPosAdc() const
-{
-	return calib->paramTable->item(2, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetPosAdc() const { return calib->paramTable->item(2, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainPosAdc() const
-{
-	return calib->paramTable->item(3, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainPosAdc() const { return calib->paramTable->item(3, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getOffsetNegDac() const
-{
-	return calib->paramTable->item(4, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetNegDac() const { return calib->paramTable->item(4, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainNegDac() const
-{
-	return calib->paramTable->item(5, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainNegDac() const { return calib->paramTable->item(5, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getOffsetNegAdc() const
-{
-	return calib->paramTable->item(6, 1)->text().toDouble();
-}
+double ManualCalibration_API::getOffsetNegAdc() const { return calib->paramTable->item(6, 1)->text().toDouble(); }
 
-double ManualCalibration_API::getGainNegAdc() const
-{
-	return calib->paramTable->item(7, 1)->text().toDouble();
-}
+double ManualCalibration_API::getGainNegAdc() const { return calib->paramTable->item(7, 1)->text().toDouble(); }

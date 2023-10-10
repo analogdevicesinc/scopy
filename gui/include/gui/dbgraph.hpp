@@ -21,15 +21,15 @@
 #ifndef DBGRAPH_HPP
 #define DBGRAPH_HPP
 
+#include "DisplayPlot.h"
+#include "cursor_readouts.h"
+#include "plot_line_handle.h"
+#include "scopy-gui_export.h"
+#include "symbol_controller.h"
+
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <qwt_plot_marker.h>
-
-#include "symbol_controller.h"
-#include "plot_line_handle.h"
-#include "cursor_readouts.h"
-#include "DisplayPlot.h"
-#include "scopy-gui_export.h"
 
 namespace scopy {
 class OscScaleDraw;
@@ -41,15 +41,9 @@ class SCOPY_GUI_EXPORT dBgraph : public DisplayPlot
 	friend class NetworkAnalyzer_API;
 	Q_OBJECT
 
-	Q_PROPERTY(int numSamples
-		   READ getNumSamples
-		   WRITE setNumSamples
-		  )
+	Q_PROPERTY(int numSamples READ getNumSamples WRITE setNumSamples)
 
-	Q_PROPERTY(QColor color
-		   READ getColor
-		   WRITE setColor
-		  )
+	Q_PROPERTY(QColor color READ getColor WRITE setColor)
 
 	Q_PROPERTY(QString xaxis_title READ xTitle WRITE setXTitle);
 	Q_PROPERTY(QString yaxis_title READ yTitle WRITE setYTitle);
@@ -69,9 +63,8 @@ public:
 
 	~dBgraph();
 
-	void setAxesScales(double xmin, double xmax,
-			   double ymin, double ymax);
-	void setAxesTitles(const QString& x, const QString& y);
+	void setAxesScales(double xmin, double xmax, double ymin, double ymax);
+	void setAxesTitles(const QString &x, const QString &y);
 
 	int getNumSamples() const;
 
@@ -83,7 +76,7 @@ public:
 	void setShowZero(bool en);
 	const QwtScaleWidget *getAxisWidget(QwtAxisId id);
 
-	const QColor& getColor() const;
+	const QColor &getColor() const;
 	double getThickness();
 	QString xTitle() const;
 	QString yTitle() const;
@@ -119,10 +112,10 @@ public Q_SLOTS:
 	void reset();
 
 	void setNumSamples(int num);
-	void setColor(const QColor& color);
+	void setColor(const QColor &color);
 	void setThickness(int index);
-	void setXTitle(const QString& title);
-	void setYTitle(const QString& title);
+	void setXTitle(const QString &title);
+	void setYTitle(const QString &title);
 	void setXMin(double val);
 	void setXMax(double val);
 	void setYMin(double val);
@@ -130,8 +123,8 @@ public Q_SLOTS:
 
 	QString xUnit() const;
 	QString yUnit() const;
-	void setXUnit(const QString& unit);
-	void setYUnit(const QString& unit);
+	void setXUnit(const QString &unit);
+	void setYUnit(const QString &unit);
 
 	void useLogFreq(bool use_log_freq);
 	void useDeltaLabel(bool use_delta);
@@ -183,6 +176,6 @@ private:
 	void setupVerticalBars();
 	void setupReadouts();
 };
-}
+} // namespace scopy
 
 #endif /* DBGRAPH_HPP */

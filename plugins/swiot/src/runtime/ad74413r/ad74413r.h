@@ -18,30 +18,33 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef AD74413R_H
 #define AD74413R_H
 
-#include <gui/tool_view.hpp>
-#include <qwidget.h>
 #include "bufferlogic.h"
+#include "buffermenucontroller.h"
+#include "bufferplothandler.h"
 #include "pluginbase/toolmenuentry.h"
 #include "src/runtime/readerthread.h"
-#include "buffermenucontroller.h"
+
+#include <iio.h>
+
+#include <QVector>
+#include <qwidget.h>
+
 #include <gui/channel_manager.hpp>
 #include <gui/osc_export_settings.h>
-#include <QVector>
-#include "bufferplothandler.h"
-#include <iio.h>
+#include <gui/tool_view.hpp>
 
 #define MAX_CURVES_NUMBER 8
 #define AD_NAME "ad74413r"
 #define SWIOT_DEVICE_NAME "swiot"
 
-extern "C"{
-struct iio_device;
-struct iio_channel;
-struct iio_buffer;
+extern "C"
+{
+	struct iio_device;
+	struct iio_channel;
+	struct iio_buffer;
 }
 
 namespace scopy {
@@ -50,11 +53,11 @@ class GenericMenu;
 }
 
 namespace swiot {
-class Ad74413r : public QWidget {
+class Ad74413r : public QWidget
+{
 	Q_OBJECT
 public:
-	explicit Ad74413r(iio_context *ctx = nullptr, ToolMenuEntry *tme = 0,
-			  QWidget *parent = nullptr);
+	explicit Ad74413r(iio_context *ctx = nullptr, ToolMenuEntry *tme = 0, QWidget *parent = nullptr);
 
 	~Ad74413r();
 
@@ -98,6 +101,7 @@ Q_SIGNALS:
 	void backBtnPressed();
 private Q_SLOTS:
 	void onBackBtnPressed();
+
 private:
 	void setupToolView(gui::GenericMenu *settingsMenu);
 
@@ -105,12 +109,12 @@ private:
 
 	void setupConnections();
 
-	QPushButton* createBackBtn();
+	QPushButton *createBackBtn();
 
 	void initTutorialProperties();
 
 private:
-	QMap<QString, iio_device*> m_iioDevicesMap;
+	QMap<QString, iio_device *> m_iioDevicesMap;
 	int m_enabledChnlsNo = 0;
 	int m_currentChannelSelected;
 
@@ -118,14 +122,14 @@ private:
 	scopy::gui::ToolView *m_toolView;
 	QWidget *m_widget;
 	QPushButton *m_backBtn;
-	QLabel* m_statusLabel;
-	QWidget* m_statusContainer;
+	QLabel *m_statusLabel;
+	QWidget *m_statusContainer;
 	ToolMenuEntry *m_tme;
 
 	QVector<BufferMenuController *> m_controllers;
 
 	std::vector<bool> m_enabledChannels;
-	std::vector<ChannelWidget*> m_channelWidgetList;
+	std::vector<ChannelWidget *> m_channelWidgetList;
 
 	BufferLogic *m_swiotAdLogic;
 	ReaderThread *m_readerThread;
@@ -138,6 +142,6 @@ private:
 
 	struct iio_context *m_ctx;
 };
-}
-}
+} // namespace swiot
+} // namespace scopy
 #endif // AD74413R_H

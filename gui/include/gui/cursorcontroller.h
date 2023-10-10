@@ -1,8 +1,10 @@
 #ifndef CURSORCONTROLLER_H
 #define CURSORCONTROLLER_H
 
-#include <QObject>
 #include "scopy-gui_export.h"
+
+#include <QObject>
+
 #include <plotcursors.h>
 #include <widgets/cursorsettings.h>
 #include <widgets/plotcursorreadouts.h>

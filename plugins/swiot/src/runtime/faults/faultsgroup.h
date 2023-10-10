@@ -18,27 +18,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef FAULTSGROUP_H
 #define FAULTSGROUP_H
 
-#include <set>
+#include "faultwidget.h"
+
+#include "ui_faultsgroup.h"
 
 #include <QVector>
 
-#include "faultwidget.h"
 #include <gui/flexgridlayout.hpp>
-#include "ui_faultsgroup.h"
+#include <set>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class FaultsGroup; }
+namespace Ui {
+class FaultsGroup;
+}
 QT_END_NAMESPACE
 
 namespace scopy::swiot {
-class FaultsGroup : public QWidget {
+class FaultsGroup : public QWidget
+{
 	Q_OBJECT
 public:
-	explicit FaultsGroup(QString name, const QString& path, QWidget *parent = nullptr);
+	explicit FaultsGroup(QString name, const QString &path, QWidget *parent = nullptr);
 	~FaultsGroup() override;
 
 	const QVector<FaultWidget *> &getFaults() const;
@@ -58,6 +61,7 @@ Q_SIGNALS:
 	void minimumSizeChanged();
 	void specialFaultsUpdated(unsigned int index, QString channelFunction);
 	void specialFaultExplanationChanged(unsigned int, QString);
+
 private:
 	Ui::FaultsGroup *ui;
 	QString m_name;
@@ -65,13 +69,13 @@ private:
 	std::set<unsigned int> m_currentlySelected;
 	std::set<unsigned int> m_actives;
 	int m_max_faults;
-	FlexGridLayout* m_customColGrid;
+	FlexGridLayout *m_customColGrid;
 
 protected:
 	void setupDynamicUi();
-	QWidget* buildActiveStoredWidget();
-	QJsonArray* getJsonArray(const QString& path);
+	QWidget *buildActiveStoredWidget();
+	QJsonArray *getJsonArray(const QString &path);
 };
-}
+} // namespace scopy::swiot
 
 #endif // FAULTSGROUP_H

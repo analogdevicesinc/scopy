@@ -19,13 +19,14 @@
  */
 
 #include "measure.h"
-#include <fstream>
-#include <cmath>
-#include <qmath.h>
+
 #include <QDebug>
 #include <QObject>
-#include <string>
+#include <qmath.h>
+
+#include <cmath>
 #include <fstream>
+#include <string>
 
 using namespace scopy;
 
@@ -33,15 +34,13 @@ namespace scopy::grutil {
 class CrossPoint
 {
 public:
-	CrossPoint(float value, size_t bufIndex, bool onRising, QString name):
-		m_value(value),
-		m_bufIdx(bufIndex),
-		m_onRising(onRising),
-		m_name(name)
+	CrossPoint(float value, size_t bufIndex, bool onRising, QString name)
+		: m_value(value)
+		, m_bufIdx(bufIndex)
+		, m_onRising(onRising)
+		, m_name(name)
 
-
-	{
-	}
+	{}
 
 public:
 	float m_value;
@@ -53,7 +52,8 @@ public:
 class HystLevelCross
 {
 public:
-	enum crossEvents {
+	enum crossEvents
+	{
 		NO_CROSS = 0,
 		POS_CROSS_LOW,
 		POS_CROSS_HIGH,
@@ -63,40 +63,35 @@ public:
 		NEG_CROSS_FULL,
 	};
 
-	HystLevelCross() :
-		m_low_trhold_crossed(false),
-		m_high_trhold_crossed(false),
-		m_is_between_trholds(false)
-	{
-	}
+	HystLevelCross()
+		: m_low_trhold_crossed(false)
+		, m_high_trhold_crossed(false)
+		, m_is_between_trholds(false)
+	{}
 
-	bool isBetweenThresholds()
-	{
-		return m_is_between_trholds;
-	}
+	bool isBetweenThresholds() { return m_is_between_trholds; }
 
 	virtual inline bool updateState(enum crossEvents crsEvent) = 0;
 
-	static inline enum crossEvents
-	get_crossing_type(double samp, double prevSamp,
-					  double low_trhold, double high_trhold)
+	static inline enum crossEvents get_crossing_type(double samp, double prevSamp, double low_trhold,
+							 double high_trhold)
 	{
 		enum crossEvents cross_type = NO_CROSS;
 
-		if (samp > prevSamp) {
-			if ((prevSamp <= low_trhold) && (samp >= low_trhold))
+		if(samp > prevSamp) {
+			if((prevSamp <= low_trhold) && (samp >= low_trhold))
 				cross_type = POS_CROSS_LOW;
-			if ((prevSamp <= high_trhold) && (samp >= high_trhold)) {
-				if (cross_type == POS_CROSS_LOW)
+			if((prevSamp <= high_trhold) && (samp >= high_trhold)) {
+				if(cross_type == POS_CROSS_LOW)
 					cross_type = POS_CROSS_FULL;
 				else
 					cross_type = POS_CROSS_HIGH;
 			}
-		} else if (samp < prevSamp) {
-			if ((prevSamp >= low_trhold) && (samp <= low_trhold))
+		} else if(samp < prevSamp) {
+			if((prevSamp >= low_trhold) && (samp <= low_trhold))
 				cross_type = NEG_CROSS_LOW;
-			if ((prevSamp >= high_trhold) && (samp <= high_trhold)) {
-				if (cross_type == NEG_CROSS_LOW)
+			if((prevSamp >= high_trhold) && (samp <= high_trhold)) {
+				if(cross_type == NEG_CROSS_LOW)
 					cross_type = NEG_CROSS_FULL;
 				else
 					cross_type = NEG_CROSS_HIGH;
@@ -119,24 +114,23 @@ protected:
 	bool m_is_between_trholds;
 };
 
-class HystLevelPosCross: public HystLevelCross
+class HystLevelPosCross : public HystLevelCross
 {
 public:
-	HystLevelPosCross() :
-		HystLevelCross()
-	{
-	}
+	HystLevelPosCross()
+		: HystLevelCross()
+	{}
 
 	inline bool updateState(enum crossEvents crsEvent)
 	{
 		bool level_crossed = false;
 
-		switch (crsEvent) {
+		switch(crsEvent) {
 		case POS_CROSS_LOW:
 			m_is_between_trholds = true;
 			break;
 		case POS_CROSS_HIGH:
-			if (m_is_between_trholds) {
+			if(m_is_between_trholds) {
 				level_crossed = true;
 				m_is_between_trholds = false;
 			}
@@ -154,24 +148,23 @@ public:
 	}
 };
 
-class HystLevelNegCross: public HystLevelCross
+class HystLevelNegCross : public HystLevelCross
 {
 public:
-	HystLevelNegCross() :
-		HystLevelCross()
-	{
-	}
+	HystLevelNegCross()
+		: HystLevelCross()
+	{}
 
 	inline bool updateState(enum crossEvents crsEvent)
 	{
 		bool level_crossed = false;
 
-		switch (crsEvent) {
+		switch(crsEvent) {
 		case NEG_CROSS_HIGH:
 			m_is_between_trholds = true;
 			break;
 		case NEG_CROSS_LOW:
-			if (m_is_between_trholds) {
+			if(m_is_between_trholds) {
 				level_crossed = true;
 				m_is_between_trholds = false;
 			}
@@ -192,59 +185,45 @@ public:
 class CrossingDetection
 {
 public:
-	CrossingDetection(double level, double hysteresis_span,
-					  const QString &name):
-		m_posCrossFound(false),
-		m_negCrossFound(false),
-		m_crossed(false),
-		m_posCrossPoint(0),
-		m_negCrossPoint(0),
-		m_level(level),
-		m_hysteresis_span(hysteresis_span),
-		m_low_level(level - hysteresis_span / 2),
-		m_high_level(level + hysteresis_span / 2),
-		m_name(name),
-		m_externList(NULL)
-	{
-	}
+	CrossingDetection(double level, double hysteresis_span, const QString &name)
+		: m_posCrossFound(false)
+		, m_negCrossFound(false)
+		, m_crossed(false)
+		, m_posCrossPoint(0)
+		, m_negCrossPoint(0)
+		, m_level(level)
+		, m_hysteresis_span(hysteresis_span)
+		, m_low_level(level - hysteresis_span / 2)
+		, m_high_level(level + hysteresis_span / 2)
+		, m_name(name)
+		, m_externList(NULL)
+	{}
 
-	double level()
-	{
-		return m_level;
-	}
+	double level() { return m_level; }
 
 	void setLevel(double level)
 	{
-		if (m_level != level) {
+		if(m_level != level) {
 			m_level = level;
 			m_low_level = level - m_hysteresis_span / 2;
 			m_high_level = level + m_hysteresis_span / 2;
 		}
 	}
 
-	double hysteresisSpan()
-	{
-		return m_hysteresis_span;
-	}
+	double hysteresisSpan() { return m_hysteresis_span; }
 
 	void setHysteresisSpan(double span)
 	{
-		if (m_hysteresis_span != span) {
+		if(m_hysteresis_span != span) {
 			m_hysteresis_span = span;
 			m_low_level = m_level - span / 2;
 			m_high_level = m_level + span / 2;
 		}
 	}
 
-	void setExternalList(QList<CrossPoint> *externList)
-	{
-		m_externList = externList;
-	}
+	void setExternalList(QList<CrossPoint> *externList) { m_externList = externList; }
 
-	QList<CrossPoint> detectedCrossings()
-	{
-		return m_detectedCrossings;
-	}
+	QList<CrossPoint> detectedCrossings() { return m_detectedCrossings; }
 
 	inline void store_closest_val_to_cross_lvl(const float *data, size_t i, size_t &point)
 	{
@@ -253,7 +232,7 @@ public:
 		double diff;
 		size_t idx;
 
-		if (diff1 < diff2) {
+		if(diff1 < diff2) {
 			idx = i - 1;
 			diff = diff1;
 		} else {
@@ -262,7 +241,7 @@ public:
 		}
 
 		double old_diff = qAbs(data[point] - m_level);
-		if (diff < old_diff)
+		if(diff < old_diff)
 			point = idx;
 	}
 
@@ -271,7 +250,7 @@ public:
 		double diff1 = qAbs(data[i - 1] - m_level);
 		double diff2 = qAbs(data[i] - m_level);
 
-		if (diff1 < diff2)
+		if(diff1 < diff2)
 			point = i - 1;
 		else
 			point = i;
@@ -279,49 +258,46 @@ public:
 
 	inline void crossDetectStep(const float *data, size_t i)
 	{
-		auto cross_type = HystLevelCross::get_crossing_type(data[i],
-															data[i - 1], m_low_level, m_high_level);
+		auto cross_type = HystLevelCross::get_crossing_type(data[i], data[i - 1], m_low_level, m_high_level);
 
-		if (m_posCross.isBetweenThresholds())
+		if(m_posCross.isBetweenThresholds())
 			store_closest_val_to_cross_lvl(data, i, m_posCrossPoint);
-		if (m_negCross.isBetweenThresholds())
+		if(m_negCross.isBetweenThresholds())
 			store_closest_val_to_cross_lvl(data, i, m_negCrossPoint);
 
-		if (cross_type != HystLevelCross::NO_CROSS) {
-			if (!m_posCrossFound) {
+		if(cross_type != HystLevelCross::NO_CROSS) {
+			if(!m_posCrossFound) {
 				bool old_between_thresh = m_posCross.isBetweenThresholds();
 				m_crossed = m_posCross.updateState(cross_type);
-				if (!old_between_thresh && m_posCross.isBetweenThresholds())
+				if(!old_between_thresh && m_posCross.isBetweenThresholds())
 					store_first_closest_val_to_cross_lvl(data, i, m_posCrossPoint);
 
-				if (m_crossed) {
+				if(m_crossed) {
 					m_posCrossFound = true;
 					m_negCrossFound = false;
 					m_negCross.resetState();
-					if (cross_type == HystLevelCross::POS_CROSS_FULL)
+					if(cross_type == HystLevelCross::POS_CROSS_FULL)
 						m_posCrossPoint = i;
 					m_detectedCrossings.push_back(
-						CrossPoint(data[m_posCrossPoint], m_posCrossPoint,
-								   true, m_name + "R"));
-					if (m_externList)
+						CrossPoint(data[m_posCrossPoint], m_posCrossPoint, true, m_name + "R"));
+					if(m_externList)
 						m_externList->push_back(m_detectedCrossings.last());
 				}
 			}
-			if (!m_negCrossFound) {
+			if(!m_negCrossFound) {
 				bool old_between_thresh = m_negCross.isBetweenThresholds();
 				m_crossed = m_negCross.updateState(cross_type);
-				if (!old_between_thresh && m_negCross.isBetweenThresholds())
+				if(!old_between_thresh && m_negCross.isBetweenThresholds())
 					store_first_closest_val_to_cross_lvl(data, i, m_negCrossPoint);
-				if (m_crossed) {
+				if(m_crossed) {
 					m_negCrossFound = true;
 					m_posCrossFound = false;
 					m_posCross.resetState();
-					if (cross_type == HystLevelCross::NEG_CROSS_FULL)
+					if(cross_type == HystLevelCross::NEG_CROSS_FULL)
 						m_negCrossPoint = i - 1;
-					m_detectedCrossings.push_back(
-						CrossPoint(data[m_negCrossPoint], m_negCrossPoint,
-								   false, m_name + "F"));
-					if (m_externList)
+					m_detectedCrossings.push_back(CrossPoint(data[m_negCrossPoint], m_negCrossPoint,
+										 false, m_name + "F"));
+					if(m_externList)
 						m_externList->push_back(m_detectedCrossings.last());
 				}
 			}
@@ -350,18 +326,20 @@ private:
 	QString m_name;
 };
 
-class SpectralDetection {
+class SpectralDetection
+{
 public:
-	SpectralDetection(const float *data, ssize_t data_length, int harmonics_number):
-		m_data(data),
-		m_data_length(data_length),
-		m_harmonics_number(harmonics_number)
-	{
-	}
+	SpectralDetection(const float *data, ssize_t data_length, int harmonics_number)
+		: m_data(data)
+		, m_data_length(data_length)
+		, m_harmonics_number(harmonics_number)
+	{}
 
-	void calculateSpectralDetectionParameters(double &spur, double &harm_dist, double &noise,
-											  double &average_noise, double &signal) {
-		struct harmonic_tuple {
+	void calculateSpectralDetectionParameters(double &spur, double &harm_dist, double &noise, double &average_noise,
+						  double &signal)
+	{
+		struct harmonic_tuple
+		{
 			double harm_value;
 			int harm_bin;
 		};
@@ -380,33 +358,31 @@ public:
 		noise = average_noise * (m_data_length - 1);
 
 		std::map<int, harmonic_tuple> harmonic;
-		for(int i = 0; i < m_harmonics_number; i++)
-		{
+		for(int i = 0; i < m_harmonics_number; i++) {
 			struct harmonic_tuple harm;
 			harm.harm_bin = m_harmonic_bins[i];
 			harm.harm_value = m_harmonics[i];
 			harm.harm_value -= average_noise * m_harmonic_bw[i];
-			harmonic[i+1] = harm;
+			harmonic[i + 1] = harm;
 		}
 
 		spur -= average_noise * spur_bw;
 		signal = harmonic[1].harm_value;
 
-		harm_dist = harmonic[2].harm_value + harmonic[3].harm_value +
-					harmonic[4].harm_value + harmonic[5].harm_value;
-
+		harm_dist = harmonic[2].harm_value + harmonic[3].harm_value + harmonic[4].harm_value +
+			harmonic[5].harm_value;
 	}
 
 private:
-
-	std::vector<int> calculateAutoMask() {
+	std::vector<int> calculateAutoMask()
+	{
 		const int BANDWIDTH_DIVIDER = 80;
 		const int NUM_INITAL_NOISE_HARMS = 5;
 
 		int bw = int(m_data_length / BANDWIDTH_DIVIDER);
 		std::vector<int> mask;
 		mask.resize(m_data_length, 1);
-		for (int i = 0; i < NUM_INITAL_NOISE_HARMS; i++)
+		for(int i = 0; i < NUM_INITAL_NOISE_HARMS; i++)
 			clearMask(mask, m_harmonic_bins[i] - bw, m_harmonic_bins[i] + bw);
 		mask[0] = 0;
 
@@ -416,31 +392,27 @@ private:
 		noise_est /= noise_bins;
 
 		std::fill(mask.begin(), mask.end(), 1);
-		//clear mask la dc.
+		// clear mask la dc.
 		clearMask(mask, 0, 1);
 		int j;
 		int low, high;
 
 		double sum;
 
-		for(size_t i = 0; i < m_harmonic_bins.size(); i++)
-		{
+		for(size_t i = 0; i < m_harmonic_bins.size(); i++) {
 			int h = m_harmonic_bins.at(i);
 			if(mask[h] == 0)
 				continue;
 			j = 1;
 			sum = 0.0F;
-			for(int s = h-j; s < h-j+3; s++)
-			{
+			for(int s = h - j; s < h - j + 3; s++) {
 				sum += m_data[s];
 			}
 			sum /= 3;
-			while ( h - j > 0 && mask[h-j] == 1 &&
-				   sum > noise_est ) {
+			while(h - j > 0 && mask[h - j] == 1 && sum > noise_est) {
 				j++;
 				sum = 0.0F;
-				for(int s = h-j; s < h-j+3; s++)
-				{
+				for(int s = h - j; s < h - j + 3; s++) {
 					sum += m_data[s];
 				}
 				sum /= 3;
@@ -449,17 +421,14 @@ private:
 
 			j = 1;
 			sum = 0.0F;
-			for(int s = h+j-2; s < h+j+1; s++)
-			{
+			for(int s = h + j - 2; s < h + j + 1; s++) {
 				sum += m_data[s];
 			}
 			sum /= 3;
-			while ( h + j < m_data_length && mask[h+j] == 1 &&
-				   sum > noise_est ) {
+			while(h + j < m_data_length && mask[h + j] == 1 && sum > noise_est) {
 				j++;
 				sum = 0.0F;
-				for(int s = h+j-2; s < h+j+1; s++)
-				{
+				for(int s = h + j - 2; s < h + j + 1; s++) {
 					sum += m_data[s];
 				}
 				sum /= 3;
@@ -476,46 +445,38 @@ private:
 		int nyq = mask.size();
 		int n = 2 * (nyq - 1);
 		std::vector<int> indices;
-		for(int i = start; i <= end; i++)
-		{
+		for(int i = start; i <= end; i++) {
 			int index_value = (i + n) % n;
-			if (index_value > nyq)
+			if(index_value > nyq)
 				index_value = n - index_value;
 			indices.push_back(index_value);
 		}
 
-		for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
-		{
+		for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it) {
 			mask.at(*it) = value;
 		}
 	}
 
-	void clearMask(std::vector<int> &mask, int start, int end)
-	{
-		setMask(mask, start, end, 0);
-	}
+	void clearMask(std::vector<int> &mask, int start, int end) { setMask(mask, start, end, 0); }
 
-	void maskedSubset(std::vector<int> &indices, std::vector<int> &new_mask, std::vector<int> mask, int start, int end)
+	void maskedSubset(std::vector<int> &indices, std::vector<int> &new_mask, std::vector<int> mask, int start,
+			  int end)
 	{
 		int nyq = mask.size();
 		int n = 2 * (nyq - 1);
 		std::vector<int> mapped_subset;
-		for(int i = start; i < end; i++)
-		{
+		for(int i = start; i < end; i++) {
 			int index_value = (i + n) % n;
-			if (index_value > nyq)
+			if(index_value > nyq)
 				index_value = n - index_value;
 			mapped_subset.push_back(index_value);
 		}
 
-		for(size_t i = 0; i < mapped_subset.size(); i++)
-		{
-			if(mask.at(mapped_subset.at(i)) == 1)
-			{
+		for(size_t i = 0; i < mapped_subset.size(); i++) {
+			if(mask.at(mapped_subset.at(i)) == 1) {
 				indices.push_back(mapped_subset.at(i));
 				new_mask.push_back(mask.at(mapped_subset.at(i)));
 			}
-
 		}
 	}
 
@@ -529,9 +490,7 @@ private:
 		maskedSubset(indices, new_mask, mask, start, end);
 		double sum = 0;
 
-
-		for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
-		{
+		for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it) {
 			sum = sum + (m_data[*it] * m_data[*it]);
 		}
 
@@ -549,9 +508,7 @@ private:
 		maskedSubset(indices, new_mask, mask, start, end);
 		double sum = 0;
 
-
-		for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it)
-		{
+		for(std::vector<int>::iterator it = indices.begin(); it != indices.end(); ++it) {
 			sum = sum + (m_data[*it]);
 		}
 
@@ -570,8 +527,7 @@ private:
 		std::vector<int> new_mask;
 		maskedSubset(indices, new_mask, mask, start, end);
 
-		for(size_t i=0; i<indices.size(); i++)
-		{
+		for(size_t i = 0; i < indices.size(); i++) {
 			data_at_index[i] = m_data[indices.at(i)];
 		}
 		data_at_index_size = indices.size();
@@ -588,10 +544,8 @@ private:
 	{
 		index = 0;
 		value = data[0];
-		for (int i = 0; i < size; i++)
-		{
-			if (data[i] > value)
-			{
+		for(int i = 0; i < size; i++) {
+			if(data[i] > value) {
 				index = i;
 				value = data[i];
 			}
@@ -608,71 +562,63 @@ private:
 		std::fill(m_harmonic_bw.begin(), m_harmonic_bw.end(), 0);
 		std::fill(m_harmonics.begin(), m_harmonics.end(), 0.0);
 
-		//find the fundamental bin (max value) from the data
+		// find the fundamental bin (max value) from the data
 		int fund_bin = 0;
 		double max = 0;
 		getMax(m_data, m_data_length, fund_bin, max);
 
 		m_harmonic_bins.at(0) = fund_bin;
 
-		for(int h = 1; h < max_harmonics + 1; h++)
-		{
+		for(int h = 1; h < max_harmonics + 1; h++) {
 			std::vector<int> mask;
 			mask.resize(m_data_length, 0);
 
 			int nominal_bin = h * fund_bin;
 			int h_2 = static_cast<int>(h / 2);
-			if(h > 1)
-			{
+			if(h > 1) {
 				setMask(mask, nominal_bin - h_2, nominal_bin + h_2, 1);
-				for(int i = 0; i < h - 1; i++)
-				{
+				for(int i = 0; i < h - 1; i++) {
 					clearMask(mask, m_harmonic_bins.at(i), m_harmonic_bins.at(i));
 				}
 				int index;
 				double value;
 				maskedMax(index, value, mask);
-				m_harmonic_bins.at(h-1) = index;
+				m_harmonic_bins.at(h - 1) = index;
 			}
 			clearMask(mask, nominal_bin - h_2, nominal_bin + h_2);
-			setMask(mask,  m_harmonic_bins.at(h-1) - BW, m_harmonic_bins.at(h-1) + BW, 1);
-			for(int i = 0; i < h - 1; i++)
-			{
+			setMask(mask, m_harmonic_bins.at(h - 1) - BW, m_harmonic_bins.at(h - 1) + BW, 1);
+			for(int i = 0; i < h - 1; i++) {
 				clearMask(mask, m_harmonic_bins.at(i) - BW, m_harmonic_bins.at(i) + BW);
 			}
 			double val_harm;
 			int val_hbws;
 			maskedSumOfSquares(val_hbws, val_harm, mask);
-			m_harmonics[h-1] = val_harm;
-			m_harmonic_bw[h-1] = val_hbws;
-
+			m_harmonics[h - 1] = val_harm;
+			m_harmonic_bw[h - 1] = val_hbws;
 		}
-
 	}
 
-	void findSpur(double &spur, int& spur_bw, bool find_in_harmonics, int fund_bin) {
+	void findSpur(double &spur, int &spur_bw, bool find_in_harmonics, int fund_bin)
+	{
 		if(find_in_harmonics == true) {
 			int index = std::max_element(m_harmonics.begin() + 1, m_harmonics.end()) - m_harmonics.begin();
 			spur = *std::max_element(m_harmonics.begin() + 1, m_harmonics.end());
 			spur_bw = m_harmonic_bw[index + 1];
-		}
-		else
-		{
+		} else {
 			findSpurInData(spur, spur_bw, fund_bin);
 		}
 	}
 
-	void findSpurInData(double &spur, int& spur_bw, int fund_bin) {
+	void findSpurInData(double &spur, int &spur_bw, int fund_bin)
+	{
 		std::vector<int> mask;
 		mask.resize(m_data_length, 1);
-		//clear mask la dc.
+		// clear mask la dc.
 		clearMask(mask, 0, 1);
 		clearMask(mask, fund_bin - BW, fund_bin + BW);
 		int index = 0;
-		for(size_t i = 0; i < mask.size(); i++)
-		{
-			if(mask.at(i) == 1)
-			{
+		for(size_t i = 0; i < mask.size(); i++) {
+			if(mask.at(i) == 1) {
 				index = i;
 				break;
 			}
@@ -684,13 +630,10 @@ private:
 		int masked_index = 0;
 
 		double value;
-		while(index < m_data_length)
-		{
-			if(mask.at(index) == 1)
-			{
+		while(index < m_data_length) {
+			if(mask.at(index) == 1) {
 				maskedSumOfSquares(masked_index, value, mask, index - BW, index + BW);
-				if(value > max_value)
-				{
+				if(value > max_value) {
 					max_value = value;
 					max_index = index;
 				}
@@ -701,7 +644,7 @@ private:
 		int spur_bin;
 		double spur_value;
 		maskedMax(spur_bin, spur_value, mask, max_index - BW, max_index + BW);
-//		maskedSumOfSquares(spur_bw, spur, mask, spur_bin - BW, spur_bin + BW);
+		//		maskedSumOfSquares(spur_bw, spur, mask, spur_bin - BW, spur_bin + BW);
 	}
 
 private:
@@ -714,34 +657,27 @@ private:
 	std::vector<double> m_harmonics;
 	int m_harmonics_number;
 	std::vector<int> m_mask;
-
 };
 
-
 MeasureModel::MeasureModel(const float *buffer, size_t length, QObject *parent)
-	: QObject(parent),
-	m_buffer(buffer),
-	m_buf_length(length),
-	m_sample_rate(1.0),
-	m_adc_bit_count(0),
-	m_cross_level(0),
-	m_hysteresis_span(0),
-	m_histogram(nullptr),
-	m_cross_detect(nullptr),
-	m_gatingEnabled(false)
+	: QObject(parent)
+	, m_buffer(buffer)
+	, m_buf_length(length)
+	, m_sample_rate(1.0)
+	, m_adc_bit_count(0)
+	, m_cross_level(0)
+	, m_hysteresis_span(0)
+	, m_histogram(nullptr)
+	, m_cross_detect(nullptr)
+	, m_gatingEnabled(false)
 
-{
+{}
 
-}
-
-MeasureModel::~MeasureModel()
-{
-
-}
+MeasureModel::~MeasureModel() {}
 
 void MeasureModel::clearMeasurements()
 {
-	for (int i = 0; i < m_measurements.size(); i++)
+	for(int i = 0; i < m_measurements.size(); i++)
 		m_measurements[i]->setMeasured(false);
 }
 
@@ -751,66 +687,60 @@ void MeasureModel::setDataSource(const float *buffer, size_t length)
 	m_buf_length = length;
 }
 
-TimeMeasureModel::TimeMeasureModel(const float *buffer, size_t length, QObject *parent) : MeasureModel(buffer, length, parent) {
-
-	// Create a set of measurements
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Period"),
-															   MeasurementData::HORIZONTAL, "s"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Frequency"),
-															   MeasurementData::HORIZONTAL, "Hz"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Min"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Max"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Peak-peak"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Mean"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Mean"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("RMS"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle RMS"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("AC RMS"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Area"),
-															   MeasurementData::VERTICAL, "Vs"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Cycle Area"),
-															   MeasurementData::VERTICAL, "Vs"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Low"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("High"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Amplitude"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Middle"),
-															   MeasurementData::VERTICAL, "V"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Over"),
-															   MeasurementData::VERTICAL, "%"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Over"),
-															   MeasurementData::VERTICAL, "%"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Rise"),
-															   MeasurementData::HORIZONTAL, "s"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Fall"),
-															   MeasurementData::HORIZONTAL, "s"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Width"),
-															   MeasurementData::HORIZONTAL, "s"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Width"),
-															   MeasurementData::HORIZONTAL, "s"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("+Duty"),
-															   MeasurementData::HORIZONTAL, "%"));
-	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("-Duty"),
-															   MeasurementData::HORIZONTAL, "%"));
-}
-
-TimeMeasureModel::~TimeMeasureModel()
+TimeMeasureModel::TimeMeasureModel(const float *buffer, size_t length, QObject *parent)
+	: MeasureModel(buffer, length, parent)
 {
 
+	// Create a set of measurements
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Period"), MeasurementData::HORIZONTAL, "s"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Frequency"), MeasurementData::HORIZONTAL, "Hz"));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Min"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Max"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Peak-peak"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Mean"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Cycle Mean"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("RMS"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Cycle RMS"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("AC RMS"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Area"), MeasurementData::VERTICAL, "Vs"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Cycle Area"), MeasurementData::VERTICAL, "Vs"));
+	m_measurements.push_back(std::make_shared<MeasurementData>(QObject::tr("Low"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("High"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Amplitude"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Middle"), MeasurementData::VERTICAL, "V"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("+Over"), MeasurementData::VERTICAL, "%"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("-Over"), MeasurementData::VERTICAL, "%"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Rise"), MeasurementData::HORIZONTAL, "s"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("Fall"), MeasurementData::HORIZONTAL, "s"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("+Width"), MeasurementData::HORIZONTAL, "s"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("-Width"), MeasurementData::HORIZONTAL, "s"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("+Duty"), MeasurementData::HORIZONTAL, "%"));
+	m_measurements.push_back(
+		std::make_shared<MeasurementData>(QObject::tr("-Duty"), MeasurementData::HORIZONTAL, "%"));
 }
 
-bool TimeMeasureModel::highLowFromHistogram(double &low, double &high,
-									   double min, double max)
+TimeMeasureModel::~TimeMeasureModel() {}
+
+bool TimeMeasureModel::highLowFromHistogram(double &low, double &high, double min, double max)
 {
 	bool success = false;
 	int *hist = m_histogram;
@@ -822,7 +752,7 @@ bool TimeMeasureModel::highLowFromHistogram(double &low, double &high,
 	minRaw += hlf_scale;
 	maxRaw += hlf_scale;
 
-	int middleRaw = minRaw + (maxRaw - minRaw)  / 2;
+	int middleRaw = minRaw + (maxRaw - minRaw) / 2;
 
 	auto lowIt = std::max_element(hist + minRaw, hist + middleRaw + 1);
 	int lowRaw = std::distance(hist, lowIt);
@@ -834,8 +764,7 @@ bool TimeMeasureModel::highLowFromHistogram(double &low, double &high,
 	   clearly identified (weight of a level should be 5 times
 	   greater than a peak weight - there probably is a better method) */
 
-	if (hist[lowRaw] / 5.0 >= hist[minRaw] &&
-		hist[highRaw] / 5.0 >= hist[maxRaw]) {
+	if(hist[lowRaw] / 5.0 >= hist[minRaw] && hist[highRaw] / 5.0 >= hist[maxRaw]) {
 		low = lowRaw - hlf_scale;
 		high = highRaw - hlf_scale;
 
@@ -845,33 +774,25 @@ bool TimeMeasureModel::highLowFromHistogram(double &low, double &high,
 	return success;
 }
 
-SpectralMeasure::SpectralMeasure(const float *buffer, size_t length) : MeasureModel(buffer, length) {
-	//Spectral Measurements
-	m_measurements.push_back(std::make_shared<MeasurementData>("Noise_Floor",
-															   MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("SINAD",
-															   MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("SNR",
-															   MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("THD",
-															   MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("THDN",
-															   MeasurementData::HORIZONTAL_F, "dB"));
-	m_measurements.push_back(std::make_shared<MeasurementData>("SFDR",
-															   MeasurementData::VERTICAL_F, "dBc"));
-}
-
-SpectralMeasure::~SpectralMeasure()
+SpectralMeasure::SpectralMeasure(const float *buffer, size_t length)
+	: MeasureModel(buffer, length)
 {
-
+	// Spectral Measurements
+	m_measurements.push_back(std::make_shared<MeasurementData>("Noise_Floor", MeasurementData::HORIZONTAL_F, "dB"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("SINAD", MeasurementData::HORIZONTAL_F, "dB"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("SNR", MeasurementData::HORIZONTAL_F, "dB"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("THD", MeasurementData::HORIZONTAL_F, "dB"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("THDN", MeasurementData::HORIZONTAL_F, "dB"));
+	m_measurements.push_back(std::make_shared<MeasurementData>("SFDR", MeasurementData::VERTICAL_F, "dBc"));
 }
 
+SpectralMeasure::~SpectralMeasure() {}
 
 void TimeMeasureModel::measure()
 {
 	clearMeasurements();
 
-	if (!m_buffer || m_buf_length == 0)
+	if(!m_buffer || m_buf_length == 0)
 		return;
 
 	measureTime();
@@ -918,17 +839,17 @@ void TimeMeasureModel::measureTime()
 	int startIndex;
 	int endIndex;
 
-	if (qIsNaN(data[0])) {
+	if(qIsNaN(data[0])) {
 		return;
 	}
 
-	//if gating is enabled measure only on data between the gates
-	if(m_gatingEnabled){
-		//make sure that start/end indexes are valid
-		if(m_startIndex < 0 || m_startIndex > m_buf_length){
+	// if gating is enabled measure only on data between the gates
+	if(m_gatingEnabled) {
+		// make sure that start/end indexes are valid
+		if(m_startIndex < 0 || m_startIndex > m_buf_length) {
 			m_startIndex = 0;
 		}
-		if(m_endIndex < 0 || m_endIndex > m_buf_length ){
+		if(m_endIndex < 0 || m_endIndex > m_buf_length) {
 			m_endIndex = m_buf_length;
 		}
 
@@ -936,12 +857,11 @@ void TimeMeasureModel::measureTime()
 		min = data[m_startIndex];
 		sum = data[m_startIndex];
 		sqr_sum = data[m_startIndex] * data[m_startIndex];
-		startIndex = m_startIndex+1;
+		startIndex = m_startIndex + 1;
 		endIndex = m_endIndex;
 
 		count = (m_endIndex - m_startIndex) ?: 1;
-	}
-	else{
+	} else {
 		max = data[0];
 		min = data[0];
 		sum = data[0];
@@ -950,14 +870,13 @@ void TimeMeasureModel::measureTime()
 		endIndex = data_length;
 	}
 
-	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span,
-										   "P");
-	if (using_histogram_method)
+	m_cross_detect = new CrossingDetection(m_cross_level, m_hysteresis_span, "P");
+	if(using_histogram_method)
 		m_histogram = new int[adc_span]{};
 
-	for (ssize_t i = startIndex; i < endIndex; i++) {
+	for(ssize_t i = startIndex; i < endIndex; i++) {
 
-		if (qIsNaN(data[i])) {
+		if(qIsNaN(data[i])) {
 			count--;
 			continue;
 		}
@@ -965,12 +884,12 @@ void TimeMeasureModel::measureTime()
 		m_cross_detect->crossDetectStep(data, i);
 
 		// Min
-		if (data[i] < min) {
+		if(data[i] < min) {
 			min = data[i];
 		}
 
 		// Max
-		if (data[i] > max) {
+		if(data[i] > max) {
 			max = data[i];
 		}
 
@@ -981,11 +900,11 @@ void TimeMeasureModel::measureTime()
 		sqr_sum += data[i] * data[i];
 
 		// Build histogram
-		if (using_histogram_method) {			
+		if(using_histogram_method) {
 			int raw = data[i];
 			raw += hlf_scale;
 
-			if (raw >= 0 && raw  < adc_span)
+			if(raw >= 0 && raw < adc_span)
 				m_histogram[raw] += 1;
 		}
 	}
@@ -1006,15 +925,14 @@ void TimeMeasureModel::measureTime()
 	m_measurements[RMS]->setValue(rms);
 
 	// AC RMS
-	rms_ac = sqrt((sqr_sum - 2 * mean * sum +
-				   count *  mean * mean) / count);
+	rms_ac = sqrt((sqr_sum - 2 * mean * sum + count * mean * mean) / count);
 	m_measurements[AC_RMS]->setValue(rms_ac);
 
 	low = min;
 	high = max;
 
 	// Try to use Histogram method
-	if (using_histogram_method)
+	if(using_histogram_method)
 		highLowFromHistogram(low, high, min, max);
 
 	// Low, High, Middle, Amplitude, Overshoot positive/negative
@@ -1033,7 +951,7 @@ void TimeMeasureModel::measureTime()
 	overshoot_n = (low - min) / amplitude * 100;
 	m_measurements[N_OVER]->setValue(overshoot_n);
 
-	if (m_histogram != NULL) {
+	if(m_histogram != NULL) {
 		delete[] m_histogram;
 		m_histogram = NULL;
 	}
@@ -1041,28 +959,25 @@ void TimeMeasureModel::measureTime()
 	// Find Period / Frequency
 	QList<CrossPoint> periodPoints = m_cross_detect->detectedCrossings();
 	int n = periodPoints.size();
-	if (n > 2) {
+	if(n > 2) {
 		double sample_period;
 		double first_hlf_cycl = 0;
 		double secnd_hlf_cycl = 0;
 		int j = 0;
 		int k = 0;
 
-		for (int i = 0; i < n - 1; i++) {
-			size_t diff = periodPoints[i + 1].m_bufIdx -
-						  periodPoints[i].m_bufIdx;
-			if (i % 2) {
+		for(int i = 0; i < n - 1; i++) {
+			size_t diff = periodPoints[i + 1].m_bufIdx - periodPoints[i].m_bufIdx;
+			if(i % 2) {
 				secnd_hlf_cycl += diff;
 				j++;
-			}
-			else {
+			} else {
 				first_hlf_cycl += diff;
 				k++;
 			}
 		}
 
-		sample_period = first_hlf_cycl / (n / 2) +
-						secnd_hlf_cycl / ((n + 1) / 2 - 1);
+		sample_period = first_hlf_cycl / (n / 2) + secnd_hlf_cycl / ((n + 1) / 2 - 1);
 		period = sample_period * (1 / m_sample_rate);
 		m_measurements[PERIOD]->setValue(period);
 
@@ -1090,40 +1005,39 @@ void TimeMeasureModel::measureTime()
 		double period_sum = data[period_start];
 		double period_sqr_sum = data[period_start] * data[period_start];
 
-		for (size_t i = period_start + 1; i <= period_start + 2 * length; i++) {
-			size_t idx = period_start + (i  % length);
+		for(size_t i = period_start + 1; i <= period_start + 2 * length; i++) {
+			size_t idx = period_start + (i % length);
 
 			cdLow.crossDetectStep(data, idx);
 			cdMid.crossDetectStep(data, idx);
 			cdHigh.crossDetectStep(data, idx);
 		}
 
-		for (size_t i = period_start + 1; i <= period_end; i++) {
+		for(size_t i = period_start + 1; i <= period_end; i++) {
 			period_sum += data[i];
 			period_sqr_sum += data[i] * data[i];
 		}
 
-		for (int i = 1; i < crossSequence.size(); i++) {
+		for(int i = 1; i < crossSequence.size(); i++) {
 			CrossPoint &p0 = crossSequence[i - 1];
 			CrossPoint &p1 = crossSequence[i];
-			if ((p1.m_bufIdx == p0.m_bufIdx) && (p1.m_onRising == p0.m_onRising)) {
-				if ((p0.m_name == "MR" && p1.m_name == "LR") ||
-					(p0.m_name == "HR" && p1.m_name == "MR"))
+			if((p1.m_bufIdx == p0.m_bufIdx) && (p1.m_onRising == p0.m_onRising)) {
+				if((p0.m_name == "MR" && p1.m_name == "LR") || (p0.m_name == "HR" && p1.m_name == "MR"))
 					crossSequence.swapItemsAt(i, i - 1);
-				else if ((p0.m_name == "MF" && p1.m_name == "HF") ||
-						 (p0.m_name == "LF" && p1.m_name == "MF"))
+				else if((p0.m_name == "MF" && p1.m_name == "HF") ||
+					(p0.m_name == "LF" && p1.m_name == "MF"))
 					crossSequence.swapItemsAt(i, i - 1);
 			}
 		}
 
 		QString sequence = "";
-		for (int i = 0; i < crossSequence.size(); i++)
+		for(int i = 0; i < crossSequence.size(); i++)
 			sequence += crossSequence[i].m_name;
 
 		QString periodSequence = "LRMRHRHFMFLF";
 		int pos = sequence.indexOf(periodSequence);
 
-		if (pos < 0) {
+		if(pos < 0) {
 			qDebug() << "Unable to find 2 transitions for each of the 10%, 50%, 90% levels";
 		} else {
 			pos /= 2;
@@ -1134,42 +1048,39 @@ void TimeMeasureModel::measureTime()
 			CrossPoint &midFalling = crossSequence[pos + 4];
 			CrossPoint &lowFalling = crossSequence[pos + 5];
 
-			//Cycle Mean
+			// Cycle Mean
 			cycle_mean = period_sum / length;
 			m_measurements[CYCLE_MEAN]->setValue(cycle_mean);
 
-			//Cycle RMS
+			// Cycle RMS
 			cycle_rms = sqrt(period_sqr_sum / length);
 			m_measurements[CYCLE_RMS]->setValue(cycle_rms);
 
-			//Area
+			// Area
 			area = sum * (1 / m_sample_rate);
 			m_measurements[AREA]->setValue(area);
 
-			//Cycle Area
+			// Cycle Area
 			cycle_area = period_sum * (1 / m_sample_rate);
 			m_measurements[CYCLE_AREA]->setValue(cycle_area);
 
 			// Rise Time
-			long long rise = (long long)(highRising.m_bufIdx -
-										  lowRising.m_bufIdx);
-			if (rise < 0)
+			long long rise = (long long)(highRising.m_bufIdx - lowRising.m_bufIdx);
+			if(rise < 0)
 				rise += length;
 			rise_time = rise / m_sample_rate;
 			m_measurements[RISE]->setValue(rise_time);
 
 			// Fall Time
-			long long fall = (long long)(lowFalling.m_bufIdx -
-										  highFalling.m_bufIdx);
-			if (fall < 0)
+			long long fall = (long long)(lowFalling.m_bufIdx - highFalling.m_bufIdx);
+			if(fall < 0)
 				fall += length;
 			fall_time = fall / m_sample_rate;
 			m_measurements[FALL]->setValue(fall_time);
 
 			// Positive Width
-			long long posWidth = (long long)(midFalling.m_bufIdx -
-											  midRising.m_bufIdx);
-			if (posWidth < 0)
+			long long posWidth = (long long)(midFalling.m_bufIdx - midRising.m_bufIdx);
+			if(posWidth < 0)
 				posWidth += length;
 			width_p = posWidth / m_sample_rate;
 			m_measurements[P_WIDTH]->setValue(width_p);
@@ -1190,21 +1101,22 @@ void TimeMeasureModel::measureTime()
 
 	delete m_cross_detect;
 	m_cross_detect = NULL;
-
 }
 
-void SpectralMeasure::measure() {
+void SpectralMeasure::measure()
+{
 	clearMeasurements();
 
-	if (!m_buffer || m_buf_length == 0)
+	if(!m_buffer || m_buf_length == 0)
 		return;
 
 	measureSpectral();
 }
 
-void SpectralMeasure::measureSpectral() {
+void SpectralMeasure::measureSpectral()
+{
 
-	//TODO - reconsider computation of measurements
+	// TODO - reconsider computation of measurements
 	double spur, harm_dist, noise, average_noise = 0, signal;
 
 	SpectralDetection detection(m_buffer, m_buf_length, m_harmonics_number);
@@ -1231,66 +1143,29 @@ void SpectralMeasure::measureSpectral() {
 	m_measurements[SFDR]->setValue(sfdr);
 }
 
-void SpectralMeasure::setMask(std::vector<int> mask)
-{
-	std::vector<int> m_mask = mask;
-}
+void SpectralMeasure::setMask(std::vector<int> mask) { std::vector<int> m_mask = mask; }
 
+double MeasureModel::sampleRate() { return m_sample_rate; }
 
-double MeasureModel::sampleRate()
-{
-	return m_sample_rate;
-}
+void MeasureModel::setSampleRate(double value) { m_sample_rate = value; }
 
-void MeasureModel::setSampleRate(double value)
-{
-	m_sample_rate = value;
-}
+unsigned int MeasureModel::adcBitCount() { return m_adc_bit_count; }
 
-unsigned int MeasureModel::adcBitCount()
-{
-	return m_adc_bit_count;
-}
+void MeasureModel::setAdcBitCount(unsigned int val) { m_adc_bit_count = val; }
 
-void MeasureModel::setAdcBitCount(unsigned int val)
-{
-	m_adc_bit_count = val;
-}
+double MeasureModel::crossLevel() { return m_cross_level; }
 
-double MeasureModel::crossLevel()
-{
-	return m_cross_level;
-}
+void MeasureModel::setCrossLevel(double value) { m_cross_level = value; }
 
-void MeasureModel::setCrossLevel(double value)
-{
-	m_cross_level = value;
-}
+double MeasureModel::hysteresisSpan() { return m_hysteresis_span; }
 
-double MeasureModel::hysteresisSpan()
-{
-	return m_hysteresis_span;
-}
+void MeasureModel::setHysteresisSpan(double value) { m_hysteresis_span = value; }
 
-void MeasureModel::setHysteresisSpan(double value)
-{
-	m_hysteresis_span = value;
-}
+void MeasureModel::setStartIndex(int index) { m_startIndex = index; }
 
+void MeasureModel::setEndIndex(int index) { m_endIndex = index; }
 
-void MeasureModel::setStartIndex(int index)
-{
-	m_startIndex = index;
-}
-
-void MeasureModel::setEndIndex(int index)
-{
-	m_endIndex = index;
-}
-
-void MeasureModel::setGatingEnabled(bool enable){
-	m_gatingEnabled = enable;
-}
+void MeasureModel::setGatingEnabled(bool enable) { m_gatingEnabled = enable; }
 
 void MeasureModel::clearStats()
 {
@@ -1299,34 +1174,25 @@ void MeasureModel::clearStats()
 	}
 }
 
+QList<std::shared_ptr<MeasurementData>> MeasureModel::measurments() { return m_measurements; }
 
-QList<std::shared_ptr<MeasurementData>> MeasureModel::measurments()
+std::shared_ptr<MeasurementData> MeasureModel::measurement(int id) { return m_measurements[id]; }
+
+std::shared_ptr<MeasurementData> MeasureModel::measurement(QString str)
 {
-	return m_measurements;
-}
-
-std::shared_ptr<MeasurementData> MeasureModel::measurement(int id)
-{
-	return m_measurements[id];
-}
-
-std::shared_ptr<MeasurementData> MeasureModel::measurement(QString str) {
 	for(auto meas : m_measurements) {
 		if(meas->name() == str)
 			return meas;
 	}
 	return nullptr;
-
 }
-
-
 
 int MeasureModel::activeMeasurementsCount() const
 {
 	int count = 0;
 
-	for (int i = 0; i < m_measurements.size(); i++)
-		if (m_measurements[i]->enabled())
+	for(int i = 0; i < m_measurements.size(); i++)
+		if(m_measurements[i]->enabled())
 			count++;
 
 	return count;
@@ -1336,40 +1202,33 @@ int MeasureModel::activeMeasurementsCount() const
  * Class MeasurementData implementation
  */
 
-MeasurementData::MeasurementData(const QString& name, axisType axis,
-								 const QString& unit):
-	m_name(name),
-	m_value(0),
-	m_measured(false),
-	m_enabled(false),
-	m_unit(unit),
-	m_unitType(DIMENSIONLESS),
-	m_axis(axis),
-	m_statEnabled(false)
+MeasurementData::MeasurementData(const QString &name, axisType axis, const QString &unit)
+	: m_name(name)
+	, m_value(0)
+	, m_measured(false)
+	, m_enabled(false)
+	, m_unit(unit)
+	, m_unitType(DIMENSIONLESS)
+	, m_axis(axis)
+	, m_statEnabled(false)
 {
-	if (unit.isEmpty())
+	if(unit.isEmpty())
 		m_unitType = DIMENSIONLESS;
-	else if (unit == "%")
+	else if(unit == "%")
 		m_unitType = PERCENTAGE;
-	else if (unit.toLower() == "s" || unit.toLower() == "seconds")
+	else if(unit.toLower() == "s" || unit.toLower() == "seconds")
 		m_unitType = TIME;
-	else if ((unit.toLower() == "db" || unit.toLower() == "decibels"))
+	else if((unit.toLower() == "db" || unit.toLower() == "decibels"))
 		m_unitType = DECIBELS;
-	else if ((unit.toLower() == "dbc" || unit.toLower() == "decibels_to_carrier"))
+	else if((unit.toLower() == "dbc" || unit.toLower() == "decibels_to_carrier"))
 		m_unitType = DECIBELS_TO_CARRIER;
 	else
 		m_unitType = METRIC;
 }
 
-QString MeasurementData::name() const
-{
-	return m_name;
-}
+QString MeasurementData::name() const { return m_name; }
 
-double MeasurementData::value() const
-{
-	return m_value;
-}
+double MeasurementData::value() const { return m_value; }
 
 void MeasurementData::setValue(double value)
 {
@@ -1379,45 +1238,21 @@ void MeasurementData::setValue(double value)
 		m_stat.pushNewData(value);
 }
 
-bool MeasurementData::measured() const
-{
-	return m_measured;
-}
+bool MeasurementData::measured() const { return m_measured; }
 
-void MeasurementData::setMeasured(bool state)
-{
-	m_measured = state;
-}
+void MeasurementData::setMeasured(bool state) { m_measured = state; }
 
-bool MeasurementData::enabled() const
-{
-	return m_enabled;
-}
+bool MeasurementData::enabled() const { return m_enabled; }
 
-void MeasurementData::setEnabled(bool en)
-{
-	m_enabled = en;
-}
+void MeasurementData::setEnabled(bool en) { m_enabled = en; }
 
-QString MeasurementData::unit() const
-{
-	return m_unit;
-}
+QString MeasurementData::unit() const { return m_unit; }
 
-MeasurementData::unitTypes MeasurementData::unitType() const
-{
-	return m_unitType;
-}
+MeasurementData::unitTypes MeasurementData::unitType() const { return m_unitType; }
 
-MeasurementData::axisType MeasurementData::axis() const
-{
-	return m_axis;
-}
+MeasurementData::axisType MeasurementData::axis() const { return m_axis; }
 
-bool MeasurementData::statEnabled() const
-{
-	return m_statEnabled;
-}
+bool MeasurementData::statEnabled() const { return m_statEnabled; }
 
 void MeasurementData::setStatEnabled(bool newStatEnabled)
 {
@@ -1426,40 +1261,33 @@ void MeasurementData::setStatEnabled(bool newStatEnabled)
 		m_stat.clear();
 }
 
-void MeasurementData::clearStat()
-{
-	m_stat.clear();
-}
+void MeasurementData::clearStat() { m_stat.clear(); }
 
-Statistic MeasurementData::stat() const
-{
-	return m_stat;
-}
+Statistic MeasurementData::stat() const { return m_stat; }
 
 /*
  * Class Statistic implementation
  */
 
-Statistic::Statistic():
-	m_sum(0),
-	m_min(0),
-	m_max(0),
-	m_dataCount(0),
-	m_average(0)
-{
-}
+Statistic::Statistic()
+	: m_sum(0)
+	, m_min(0)
+	, m_max(0)
+	, m_dataCount(0)
+	, m_average(0)
+{}
 
 void Statistic::pushNewData(double data)
 {
 	m_sum += data;
 
-	if (!m_dataCount) {
+	if(!m_dataCount) {
 		m_min = data;
 		m_max = data;
 	} else {
-		if (data < m_min)
+		if(data < m_min)
 			m_min = data;
-		else if (data > m_max)
+		else if(data > m_max)
 			m_max = data;
 	}
 
@@ -1476,23 +1304,11 @@ void Statistic::clear()
 	m_average = 0;
 }
 
-double Statistic::average() const
-{
-	return m_average;
-}
+double Statistic::average() const { return m_average; }
 
-double Statistic::min() const
-{
-	return m_min;
-}
+double Statistic::min() const { return m_min; }
 
-double Statistic::max() const
-{
-	return m_max;
-}
+double Statistic::max() const { return m_max; }
 
-double Statistic::numPushedData() const
-{
-	return m_dataCount;
-}
-}
+double Statistic::numPushedData() const { return m_dataCount; }
+} // namespace scopy::grutil

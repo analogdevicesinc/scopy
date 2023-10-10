@@ -3,8 +3,8 @@
 
 #include "bitfieldoption.hpp"
 
-#include <QWidget>
 #include <QFrame>
+#include <QWidget>
 
 class QLabel;
 class QLineEdit;
@@ -13,28 +13,22 @@ class QComboBox;
 class QVBoxLayout;
 
 class QHBoxLayout;
-namespace scopy::regmap{
+namespace scopy::regmap {
 
 class BitFieldDetailedWidget : public QFrame
 {
-    friend class RegmapStyleHelper;
+	friend class RegmapStyleHelper;
 
 	Q_OBJECT
 public:
-    explicit BitFieldDetailedWidget(QString name,
-                                    QString access,
-                                    int defaultValue,
-                                    QString description,
-                                    int width,
-                                    QString notes,
-                                    int regOffset,
-                                    QVector<BitFieldOption*> *options,
-                                    QWidget *parent = nullptr);
-    ~BitFieldDetailedWidget();
+	explicit BitFieldDetailedWidget(QString name, QString access, int defaultValue, QString description, int width,
+					QString notes, int regOffset, QVector<BitFieldOption *> *options,
+					QWidget *parent = nullptr);
+	~BitFieldDetailedWidget();
 
 	QString getToolTip() const;
 	void updateValue(QString newValue);
-    void registerValueUpdated(QString newValue);
+	void registerValueUpdated(QString newValue);
 	QString getValue();
 
 	int getWidth() const;
@@ -42,32 +36,31 @@ public:
 	int getRegOffset() const;
 
 private:
-    QFrame *mainFrame;
+	QFrame *mainFrame;
 	QVBoxLayout *layout;
 	QString toolTip;
 	int width;
 	QString description;
 	bool reserved;
 	int regOffset;
-    QString access;
+	QString access;
 
-    QVector<BitFieldOption*> *options;
-    QLabel *nameLabel;
-    QLabel *descriptionLabel;
-    QLabel *lastReadValue;
-    QLabel *defaultValueLabel;
-    QLabel *value = nullptr;
+	QVector<BitFieldOption *> *options;
+	QLabel *nameLabel;
+	QLabel *descriptionLabel;
+	QLabel *lastReadValue;
+	QLabel *defaultValueLabel;
+	QLabel *value = nullptr;
 	QComboBox *valueComboBox = nullptr;
 	QCheckBox *valueCheckBox = nullptr;
-    QLineEdit *valueLineEdit = nullptr;
+	QLineEdit *valueLineEdit = nullptr;
 
-    bool isFirstRead = true;
+	bool isFirstRead = true;
 
-    void firstRead();
+	void firstRead();
 
 Q_SIGNALS:
-    void valueUpdated(QString value);
-
+	void valueUpdated(QString value);
 };
-}
+} // namespace scopy::regmap
 #endif // BitFieldDetailedWidget_HPP

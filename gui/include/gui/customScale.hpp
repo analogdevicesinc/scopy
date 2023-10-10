@@ -21,10 +21,10 @@
 #ifndef CUSTOM_SCALE_HPP
 #define CUSTOM_SCALE_HPP
 
-#include <qwt_thermo.h>
-
 #include "autoScaler.hpp"
 #include "scopy-gui_export.h"
+
+#include <qwt_thermo.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT CustomScale : public QwtThermo
@@ -36,7 +36,7 @@ public:
 	~CustomScale();
 
 	void setScaleForTemp(bool temp);
-	void addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize = 0.0 );
+	void addScale(double x1, double x2, int maxMajorSteps, int maxMinorSteps, double stepSize = 0.0);
 
 	bool getAutoScaler() const;
 	void setAutoScaler(bool newAutoScaler);
@@ -54,6 +54,6 @@ private:
 	int m_currentScale;
 	bool autoScale;
 };
-}
+} // namespace scopy
 
 #endif /* CUSTOM_SCALE_HPP */

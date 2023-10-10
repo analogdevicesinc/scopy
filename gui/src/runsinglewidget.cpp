@@ -19,33 +19,28 @@
  */
 
 #include "runsinglewidget.h"
-#include "ui_runsinglewidget.h"
 
-#include "utils.h"
-#include "dynamicWidget.h"
 #include "customPushButton.h"
+#include "dynamicWidget.h"
+#include "utils.h"
+
+#include "ui_runsinglewidget.h"
 
 using namespace scopy;
 
-RunSingleWidget::RunSingleWidget(QWidget *parent) :
-	QWidget(parent),
-	d_ui(new Ui::RunSingleWidget),
-	d_singleButtonEnabled(true),
-	d_runButtonEnabled(true)
+RunSingleWidget::RunSingleWidget(QWidget *parent)
+	: QWidget(parent)
+	, d_ui(new Ui::RunSingleWidget)
+	, d_singleButtonEnabled(true)
+	, d_runButtonEnabled(true)
 {
 	d_ui->setupUi(this);
 
-	connect(d_ui->runButton, &QPushButton::toggled,
-		this, &RunSingleWidget::_toggle);
-	connect(d_ui->singleButton, &QPushButton::toggled,
-		this, &RunSingleWidget::_toggle);
-
+	connect(d_ui->runButton, &QPushButton::toggled, this, &RunSingleWidget::_toggle);
+	connect(d_ui->singleButton, &QPushButton::toggled, this, &RunSingleWidget::_toggle);
 }
 
-RunSingleWidget::~RunSingleWidget()
-{
-	delete d_ui;
-}
+RunSingleWidget::~RunSingleWidget() { delete d_ui; }
 
 void RunSingleWidget::enableSingleButton(bool enable)
 {
@@ -57,10 +52,7 @@ void RunSingleWidget::enableSingleButton(bool enable)
 	}
 }
 
-bool RunSingleWidget::singleButtonEnabled() const
-{
-	return d_singleButtonEnabled;
-}
+bool RunSingleWidget::singleButtonEnabled() const { return d_singleButtonEnabled; }
 
 void RunSingleWidget::enableRunButton(bool enable)
 {
@@ -69,28 +61,19 @@ void RunSingleWidget::enableRunButton(bool enable)
 	d_runButtonEnabled = enable;
 }
 
-bool RunSingleWidget::runButtonEnabled() const
-{
-	return d_runButtonEnabled;
-}
+bool RunSingleWidget::runButtonEnabled() const { return d_runButtonEnabled; }
 
-bool RunSingleWidget::singleButtonChecked() const
-{
-	return d_ui->singleButton->isChecked();
-}
+bool RunSingleWidget::singleButtonChecked() const { return d_ui->singleButton->isChecked(); }
 
-bool RunSingleWidget::runButtonChecked() const
-{
-	return d_ui->runButton->isChecked();
-}
+bool RunSingleWidget::runButtonChecked() const { return d_ui->runButton->isChecked(); }
 
-QPushButton* RunSingleWidget::getRunButton() { return d_ui->runButton; }
+QPushButton *RunSingleWidget::getRunButton() { return d_ui->runButton; }
 
-QPushButton* RunSingleWidget::getSingleButton() { return d_ui->singleButton; }
+QPushButton *RunSingleWidget::getSingleButton() { return d_ui->singleButton; }
 
 void RunSingleWidget::toggle(bool checked)
 {
-	if (!checked) {
+	if(!checked) {
 		QSignalBlocker blockerRunButton(d_ui->runButton);
 		QSignalBlocker blockerSingleButton(d_ui->singleButton);
 		d_ui->runButton->setChecked(false);
@@ -100,12 +83,12 @@ void RunSingleWidget::toggle(bool checked)
 		d_ui->runButton->setText(tr("Run"));
 		d_ui->singleButton->setText(tr("Single"));
 
-	} else if (!d_ui->singleButton->isChecked()) {
+	} else if(!d_ui->singleButton->isChecked()) {
 		QSignalBlocker blockerRunButton(d_ui->runButton);
-		if (runButtonEnabled()) {
+		if(runButtonEnabled()) {
 			d_ui->runButton->setChecked(true);
 			d_ui->runButton->setText(tr("Stop"));
-		} else if (singleButtonEnabled()) {
+		} else if(singleButtonEnabled()) {
 			d_ui->singleButton->setChecked(true);
 			d_ui->singleButton->setText(tr("Stop"));
 		}
@@ -116,28 +99,25 @@ void RunSingleWidget::toggle(bool checked)
 	Q_EMIT toggled(checked);
 }
 
-void RunSingleWidget::single()
-{
-	d_ui->singleButton->setChecked(true);
-}
+void RunSingleWidget::single() { d_ui->singleButton->setChecked(true); }
 
 void RunSingleWidget::_toggle(bool checked)
 {
 	QPushButton *btn = dynamic_cast<QPushButton *>(QObject::sender());
 	setDynamicProperty(btn, "running", checked);
 
-	if (btn == d_ui->singleButton) {
+	if(btn == d_ui->singleButton) {
 		btn->setText(checked ? tr("Stop") : tr("Single"));
-	} else if (btn == d_ui->runButton) {
+	} else if(btn == d_ui->runButton) {
 		btn->setText(checked ? tr("Stop") : tr("Run"));
 	}
 
-	if (btn == d_ui->singleButton && d_ui->runButton->isChecked()) {
+	if(btn == d_ui->singleButton && d_ui->runButton->isChecked()) {
 		QSignalBlocker blocker(d_ui->runButton);
 		d_ui->runButton->setChecked(false);
 		setDynamicProperty(d_ui->runButton, "running", false);
 		d_ui->runButton->setText(tr("Run"));
-	} else if (btn == d_ui->runButton && d_ui->singleButton->isChecked()) {
+	} else if(btn == d_ui->runButton && d_ui->singleButton->isChecked()) {
 		QSignalBlocker blocker(d_ui->singleButton);
 		d_ui->singleButton->setChecked(false);
 		setDynamicProperty(d_ui->singleButton, "running", false);

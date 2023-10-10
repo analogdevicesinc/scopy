@@ -18,21 +18,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CONFIGCHANNELVIEW_H
 #define CONFIGCHANNELVIEW_H
 
 #include "qwidget.h"
+
 #include "ui_configchannelview.h"
 
+#include <QCheckBox>
+#include <QComboBox>
+#include <QLabel>
 #include <QObject>
 #include <QString>
-#include <QLabel>
-#include <QComboBox>
-#include <QCheckBox>
 
 namespace scopy::swiot {
-class ConfigChannelView: public QFrame
+class ConfigChannelView : public QFrame
 {
 	Q_OBJECT
 public:
@@ -46,7 +46,7 @@ public:
 	void setSelectedDevice(const QString &selectedDevice);
 
 protected:
-	bool eventFilter(QObject* object, QEvent *event) override;
+	bool eventFilter(QObject *object, QEvent *event) override;
 
 public:
 	const QStringList &getDeviceAvailable() const;
@@ -62,10 +62,10 @@ public:
 
 Q_SIGNALS:
 	void enabledChanged(int channelIndex, bool enabled);
-	void deviceChanged(int channelIndex, const QString& device);
-	void functionChanged(int channelIndex, const QString& function);
+	void deviceChanged(int channelIndex, const QString &device);
+	void functionChanged(int channelIndex, const QString &function);
 
-	void showPath(int channelIndex, const QString& device);
+	void showPath(int channelIndex, const QString &device);
 	void hidePaths();
 
 private:
@@ -82,6 +82,6 @@ private:
 
 	void initTutorialProperties();
 };
-}
+} // namespace scopy::swiot
 
 #endif // CONFIGCHANNELVIEW_H

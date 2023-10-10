@@ -1,24 +1,23 @@
 #include "fileregisterwritestrategy.hpp"
 
+#include "../logging_categories.h"
+
 #include <QFile>
 #include <QTextStream>
-#include "../logging_categories.h"
 
 using namespace scopy;
 using namespace regmap;
 
 FileRegisterWriteStrategy::FileRegisterWriteStrategy(QString path)
-	:path(path)
-{
-
-}
+	: path(path)
+{}
 
 void FileRegisterWriteStrategy::write(uint32_t address, uint32_t val)
 {
-	//TODO HOW SHOULD WE TREAT WRITE ?
+	// TODO HOW SHOULD WE TREAT WRITE ?
 	QFile file(path);
 	QTextStream exportStream(&file);
-	if (!file.isOpen()) {
+	if(!file.isOpen()) {
 		file.open(QIODevice::Append);
 		exportStream << QString::number(address, 16) << "," << QString::number(val, 16) << "\n";
 	} else {
@@ -26,5 +25,6 @@ void FileRegisterWriteStrategy::write(uint32_t address, uint32_t val)
 		Q_EMIT writeError("device write err");
 	}
 
-	if (file.isOpen()) file.close();
+	if(file.isOpen())
+		file.close();
 }

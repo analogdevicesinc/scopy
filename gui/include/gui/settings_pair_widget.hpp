@@ -1,10 +1,10 @@
 #ifndef SETTINGSCUSTOMWIDGET_H
 #define SETTINGSCUSTOMWIDGET_H
 
+#include "customPushButton.h"
+
 #include <QButtonGroup>
 #include <QWidget>
-
-#include "customPushButton.h"
 
 using namespace scopy;
 
@@ -19,14 +19,14 @@ class SettingsPairWidget : public QWidget
 	Q_OBJECT
 
 public:
-	explicit SettingsPairWidget(QWidget* parent = nullptr);
+	explicit SettingsPairWidget(QWidget *parent = nullptr);
 	~SettingsPairWidget();
 
-	CustomPushButton* getGeneralSettingsBtn();
-	QPushButton* getSettingsBtn();
+	CustomPushButton *getGeneralSettingsBtn();
+	QPushButton *getSettingsBtn();
 
 private:
-	Ui::SettingsPairWidget* m_ui;
+	Ui::SettingsPairWidget *m_ui;
 };
 } // namespace gui
 } // namespace scopy

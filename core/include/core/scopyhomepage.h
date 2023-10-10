@@ -1,12 +1,13 @@
 #ifndef SCOPYHOMEPAGE_H
 #define SCOPYHOMEPAGE_H
 
-#include "pluginmanager.h"
-#include "scopyhomeaddpage.h"
-#include <QWidget>
-#include <QPushButton>
-#include "scopy-core_export.h"
 #include "device.h"
+#include "pluginmanager.h"
+#include "scopy-core_export.h"
+#include "scopyhomeaddpage.h"
+
+#include <QPushButton>
+#include <QWidget>
 
 namespace Ui {
 class ScopyHomePage;
@@ -20,7 +21,7 @@ class SCOPY_CORE_EXPORT ScopyHomePage : public QWidget
 public:
 	explicit ScopyHomePage(QWidget *parent = nullptr, PluginManager *pm = nullptr);
 	~ScopyHomePage();
-	QPushButton* scanControlBtn();
+	QPushButton *scanControlBtn();
 Q_SIGNALS:
 
 	void requestAddDevice(QString cat, QString id);
@@ -30,7 +31,7 @@ Q_SIGNALS:
 	void newDeviceAvailable(DeviceImpl *d);
 
 public Q_SLOTS:
-	void addDevice(QString id, Device*);
+	void addDevice(QString id, Device *);
 	void removeDevice(QString id);
 	void viewDevice(QString id);
 	void connectDevice(QString);
@@ -40,6 +41,6 @@ private:
 	Ui::ScopyHomePage *ui;
 	ScopyHomeAddPage *add;
 };
-}
+} // namespace scopy
 
 #endif // SCOPYHOMEPAGE_H

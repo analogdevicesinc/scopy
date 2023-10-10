@@ -1,15 +1,14 @@
 #include "guitestplugin.h"
+
 #include <QBoxLayout>
+#include <QLabel>
 #include <QLoggingCategory>
 #include <QSpacerItem>
-#include <QLabel>
 
-Q_LOGGING_CATEGORY(CAT_GUITESTPLUGIN,"GUITestPlugin");
+Q_LOGGING_CATEGORY(CAT_GUITESTPLUGIN, "GUITestPlugin");
 using namespace scopy;
 
-bool TestPlugin::compatible(QString m_param, QString category) {
-	return (m_param=="gui");
-}
+bool TestPlugin::compatible(QString m_param, QString category) { return (m_param == "gui"); }
 
 bool TestPlugin::loadIcon()
 {
@@ -21,12 +20,12 @@ bool TestPlugin::loadPage()
 {
 	m_page = new QWidget();
 	return true;
-
 }
 
 void TestPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("Buttons","Buttons",":/gui/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("Buttons", "Buttons", ":/gui/icons/scopy-default/icons/tool_home.svg"));
 }
 
 bool TestPlugin::onConnect()
@@ -38,19 +37,16 @@ bool TestPlugin::onConnect()
 	QVBoxLayout *lay = new QVBoxLayout(tool);
 	QLabel *lbl = new QLabel("TestPlugin", tool);
 	lay->addWidget(lbl);
-	lay->addSpacerItem(new QSpacerItem(20,20,QSizePolicy::Expanding,QSizePolicy::Expanding));
-
-
+	lay->addSpacerItem(new QSpacerItem(20, 20, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	m_toolList[0]->setTool(tool);
 
 	return true;
 }
 
-
 bool TestPlugin::onDisconnect()
 {
-	qDebug(CAT_GUITESTPLUGIN)<<"disconnect";
+	qDebug(CAT_GUITESTPLUGIN) << "disconnect";
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunBtnVisible(false);
@@ -66,7 +62,7 @@ bool TestPlugin::onDisconnect()
 void TestPlugin::initMetadata()
 {
 	loadMetadata(
-R"plugin(
+		R"plugin(
 	{
 	   "priority":2,
 	   "category":[

@@ -37,7 +37,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_PROP_STRING_HPP
 #define PULSEVIEW_PV_PROP_STRING_HPP
 
@@ -56,19 +55,19 @@ class SCOPY_SIGROK_GUI_EXPORT String : public Property
 public:
 	String(QString name, QString desc, Getter getter, Setter setter);
 
-	QWidget* get_widget(QWidget *parent, bool auto_commit);
+	QWidget *get_widget(QWidget *parent, bool auto_commit);
 	void update_widget();
 
 	void commit();
 
 private Q_SLOTS:
-	void onTextEdited(const QString&);
+	void onTextEdited(const QString &);
 
 private:
 	QLineEdit *line_edit_;
 };
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_PROP_STRING_HPP

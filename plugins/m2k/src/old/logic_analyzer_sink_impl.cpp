@@ -6,18 +6,13 @@
 
 using namespace gr;
 
-logic_analyzer_sink::sptr logic_analyzer_sink::make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
-						    int bufferSize)
+logic_analyzer_sink::sptr logic_analyzer_sink::make(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize)
 {
-	return gnuradio::get_initial_sptr(
-				new logic_analyzer_sink_impl(logicAnalyzer, bufferSize));
+	return gnuradio::get_initial_sptr(new logic_analyzer_sink_impl(logicAnalyzer, bufferSize));
 }
 
-logic_analyzer_sink_impl::logic_analyzer_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer,
-						   int bufferSize)
-	: sync_block("logic_analyzer_sync",
-		     io_signature::make(1, 1, sizeof(uint16_t)),
-		     io_signature::make(0, 0, 0))
+logic_analyzer_sink_impl::logic_analyzer_sink_impl(scopy::m2k::logic::LogicAnalyzer *logicAnalyzer, int bufferSize)
+	: sync_block("logic_analyzer_sync", io_signature::make(1, 1, sizeof(uint16_t)), io_signature::make(0, 0, 0))
 	, d_logic_analyzer(logicAnalyzer)
 	, d_buffer(nullptr)
 	, d_buffer_temp(nullptr)
@@ -25,26 +20,24 @@ logic_analyzer_sink_impl::logic_analyzer_sink_impl(scopy::m2k::logic::LogicAnaly
 	, d_buffer_size(2 * bufferSize)
 	, d_index(0)
 	, d_end(d_size)
-	, d_tags(std::vector< std::vector<gr::tag_t> >(1))
+	, d_tags(std::vector<std::vector<gr::tag_t>>(1))
 	, d_trigger_tag_key(pmt::intern("buffer_start"))
 	, d_triggered(false)
 	, d_update_time(0.1 * gr::high_res_timer_tps())
 	, d_last_time(0)
 {
 
-	d_buffer = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
+	d_buffer = (uint16_t *)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
 	memset(d_buffer, 0, sizeof(uint16_t) * d_buffer_size);
 
-	d_buffer_temp = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
+	d_buffer_temp = (uint16_t *)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
 	memset(d_buffer_temp, 0, sizeof(uint16_t) * d_buffer_size);
 
-	const int alignment_multiple =
-	  volk_get_alignment() / sizeof(uint16_t);
-	set_alignment(std::max(1,alignment_multiple));
+	const int alignment_multiple = volk_get_alignment() / sizeof(uint16_t);
+	set_alignment(std::max(1, alignment_multiple));
 }
 
-int logic_analyzer_sink_impl::work(int noutput_items,
-				   gr_vector_const_void_star &input_items,
+int logic_analyzer_sink_impl::work(int noutput_items, gr_vector_const_void_star &input_items,
 				   gr_vector_void_star &output_items)
 {
 	gr::thread::scoped_lock lock(d_setlock);
@@ -72,8 +65,8 @@ int logic_analyzer_sink_impl::work(int noutput_items,
 
 	d_index += nitems;
 
-	if (d_triggered && (d_index == d_end) && d_end != 0) {
-		if (gr::high_res_timer_now() - d_last_time > d_update_time) {
+	if(d_triggered && (d_index == d_end) && d_end != 0) {
+		if(gr::high_res_timer_now() - d_last_time > d_update_time) {
 			d_last_time = gr::high_res_timer_now();
 			d_logic_analyzer->setData(d_buffer_temp + d_start, d_size);
 		}
@@ -81,7 +74,7 @@ int logic_analyzer_sink_impl::work(int noutput_items,
 		_reset();
 	}
 
-	if (d_index == d_end) {
+	if(d_index == d_end) {
 		_reset();
 	}
 
@@ -95,11 +88,11 @@ void logic_analyzer_sink_impl::clean_buffers()
 	d_buffer_size = 2 * d_size;
 
 	volk_free(d_buffer);
-	d_buffer = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
+	d_buffer = (uint16_t *)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
 	memset(d_buffer, 0, sizeof(uint16_t) * d_buffer_size);
 
 	volk_free(d_buffer_temp);
-	d_buffer_temp = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
+	d_buffer_temp = (uint16_t *)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
 	memset(d_buffer_temp, 0, sizeof(uint16_t) * d_buffer_size);
 
 	_reset();
@@ -107,7 +100,7 @@ void logic_analyzer_sink_impl::clean_buffers()
 
 void logic_analyzer_sink_impl::set_nsamps(int newsize)
 {
-	if (newsize != d_size) {
+	if(newsize != d_size) {
 		gr::thread::scoped_lock lock(d_setlock);
 
 		// set new size
@@ -119,9 +112,9 @@ void logic_analyzer_sink_impl::set_nsamps(int newsize)
 		volk_free(d_buffer_temp);
 
 		// create new buffers
-		d_buffer = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
+		d_buffer = (uint16_t *)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
 		memset(d_buffer, 0, sizeof(uint16_t) * d_buffer_size);
-		d_buffer_temp = (uint16_t*)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
+		d_buffer_temp = (uint16_t *)volk_malloc(d_buffer_size * sizeof(uint16_t), volk_get_alignment());
 		memset(d_buffer_temp, 0, sizeof(uint16_t) * d_buffer_size);
 
 		_reset();
@@ -132,7 +125,7 @@ void logic_analyzer_sink_impl::_adjust_tags(int adj)
 {
 	for(size_t n = 0; n < d_tags.size(); n++) {
 		for(size_t t = 0; t < d_tags[n].size(); t++) {
-		d_tags[n][t].offset += adj;
+			d_tags[n][t].offset += adj;
 		}
 	}
 }
@@ -144,7 +137,7 @@ void logic_analyzer_sink_impl::_test_trigger_tags(int nitems)
 	uint64_t nr = nitems_read(0);
 	std::vector<gr::tag_t> tags;
 	get_tags_in_range(tags, 0, nr, nr + nitems + 1, d_trigger_tag_key);
-	if (tags.size() > 0) {
+	if(tags.size() > 0) {
 		d_triggered = true;
 		trigger_index = tags[0].offset - nr;
 		d_start = d_index + trigger_index;

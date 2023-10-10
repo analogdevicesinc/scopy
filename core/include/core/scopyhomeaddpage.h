@@ -1,16 +1,18 @@
 #ifndef SCOPYHOMEADDPAGE_H
 #define SCOPYHOMEADDPAGE_H
 
-#include <QWidget>
 #include "deviceimpl.h"
+#include "emuwidget.h"
+#include "iiotabwidget.h"
 #include "infopage.h"
 #include "pluginenablewidget.h"
 #include "pluginmanager.h"
 #include "scopy-core_export.h"
-#include <QFuture>
-#include "emuwidget.h"
-#include "iiotabwidget.h"
+
 #include <iio.h>
+
+#include <QFuture>
+#include <QWidget>
 
 namespace Ui {
 class ScopyHomeAddPage;
@@ -57,7 +59,7 @@ private:
 	InfoPage *deviceInfoPage;
 	PluginManager *pluginManager;
 	DeviceImpl *deviceImpl;
-	QList<PluginEnableWidget*> pluginDescriptionList;
+	QList<PluginEnableWidget *> pluginDescriptionList;
 };
-}
+} // namespace scopy
 #endif // SCOPYHOMEADDPAGE_H

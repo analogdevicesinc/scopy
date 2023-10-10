@@ -1,8 +1,9 @@
 #include "commandqueue.h"
 
-#include <functional>
-#include <QtConcurrent/QtConcurrent>
 #include <QDebug>
+#include <QtConcurrent/QtConcurrent>
+
+#include <functional>
 
 using namespace std;
 using namespace scopy;
@@ -25,11 +26,10 @@ CommandQueue::~CommandQueue()
 	requestStop();
 	wait();
 
-	for (auto c : m_commandQueue) {
+	for(auto c : m_commandQueue) {
 		delete c;
 	}
 	m_commandQueue.clear();
-
 }
 
 void CommandQueue::enqueue(Command *command)
@@ -43,16 +43,15 @@ void CommandQueue::enqueue(Command *command)
 	m_commandQueue.push_back(command);
 }
 
-
 void CommandQueue::start()
 {
-	if (!m_running) {
+	if(!m_running) {
 		qDebug(CAT_COMMANDQUEUE) << "CommandQueue set running to true (start)";
 		m_running = true;
-		if (m_workNewThread) {
+		if(m_workNewThread) {
 			m_commandExecThreadPool.start(std::bind(&CommandQueue::work, this));
 		} else {
-			 // trigger work on Main Thread
+			// trigger work on Main Thread
 			QMetaObject::invokeMethod(this, "work", Qt::QueuedConnection);
 		}
 	}
@@ -60,10 +59,10 @@ void CommandQueue::start()
 
 void CommandQueue::requestStop()
 {
-	if (m_running) {
+	if(m_running) {
 		qDebug(CAT_COMMANDQUEUE) << "CommandQueue set running to false (stop)";
 		m_running = false;
-		if (m_workNewThread) {
+		if(m_workNewThread) {
 			std::unique_lock<std::mutex> lock(m_commandMutex);
 			m_commandQueue.clear();
 		}
@@ -72,33 +71,32 @@ void CommandQueue::requestStop()
 
 void CommandQueue::wait()
 {
-	if (m_running) {
+	if(m_running) {
 		qDebug(CAT_COMMANDQUEUE) << "CommandQueue set running to true (wait)";
 		m_running = false;
 	}
-	if (m_workNewThread) {
+	if(m_workNewThread) {
 		m_commandExecThreadPool.waitForDone();
 	}
 }
 
 void CommandQueue::work()
 {
-	while (m_running) {
+	while(m_running) {
 		std::unique_lock<std::mutex> lock(m_commandMutex);
-		if (m_commandQueue.empty()) {
+		if(m_commandQueue.empty()) {
 			m_running = false;
 			break;
 		}
 
 		m_currentCommand = m_commandQueue.front();
-		if (m_async) {
-			QtConcurrent::run(&m_commandExecThreadPool, std::bind([=]() {
-				m_currentCommand->execute();
-			}));
+		if(m_async) {
+			QtConcurrent::run(&m_commandExecThreadPool, std::bind([=]() { m_currentCommand->execute(); }));
 		} else {
 			int size = m_commandQueue.size();
 			lock.unlock();
-			qDebug(CAT_COMMANDQUEUE) << "CommandQueue executing " << m_currentCommand << " cmdq size: " << size;
+			qDebug(CAT_COMMANDQUEUE)
+				<< "CommandQueue executing " << m_currentCommand << " cmdq size: " << size;
 			m_currentCommand->execute();
 			m_currentCommand->deleteLater();
 			m_currentCommand = nullptr;
@@ -110,20 +108,22 @@ void CommandQueue::work()
 
 void CommandQueue::cmdFinished(scopy::Command *cmd)
 {
-	if (!cmd) {
-		cmd = dynamic_cast<Command*>(QObject::sender());
+	if(!cmd) {
+		cmd = dynamic_cast<Command *>(QObject::sender());
 	}
-	if (cmd) {
+	if(cmd) {
 		Q_EMIT finished(cmd);
 	}
 }
 
 void CommandQueue::cmdStarted(scopy::Command *cmd)
 {
-	if (!cmd) {
-		cmd = dynamic_cast<Command*>(QObject::sender());
+	if(!cmd) {
+		cmd = dynamic_cast<Command *>(QObject::sender());
 	}
-	if (cmd) {
+	if(cmd) {
 		Q_EMIT started(cmd);
 	}
 }
+
+#include "moc_commandqueue.cpp"

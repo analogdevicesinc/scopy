@@ -18,43 +18,37 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "tutorialoverlay.h"
-#include <QLoggingCategory>
-#include <QResizeEvent>
-#include <utility>
+
 #include "ui_tutorial.h"
 
-Q_LOGGING_CATEGORY(CAT_TUTORIALOVERLAY,"TutorialOverlay");
+#include <QLoggingCategory>
+#include <QResizeEvent>
+
+#include <utility>
+
+Q_LOGGING_CATEGORY(CAT_TUTORIALOVERLAY, "TutorialOverlay");
 using namespace scopy::gui;
 TutorialOverlay::TutorialOverlay(QWidget *parent)
-    : QWidget(parent), parent(parent)
+	: QWidget(parent)
+	, parent(parent)
 {
-	qDebug(CAT_TUTORIALOVERLAY)<<"ctor";
+	qDebug(CAT_TUTORIALOVERLAY) << "ctor";
 	overlay = nullptr;
 }
 
-TutorialOverlay::~TutorialOverlay()
-{
-	qDebug(CAT_TUTORIALOVERLAY)<<"dtor";
-}
+TutorialOverlay::~TutorialOverlay() { qDebug(CAT_TUTORIALOVERLAY) << "dtor"; }
 
-TutorialChapter* TutorialOverlay::addChapter(const QList<QWidget *>& subjects,
-					     const QString& description,
-					     QWidget* mainWidget,
-					     int x_offset,
-					     int y_offset,
-					     HoverPosition anchor,
+TutorialChapter *TutorialOverlay::addChapter(const QList<QWidget *> &subjects, const QString &description,
+					     QWidget *mainWidget, int x_offset, int y_offset, HoverPosition anchor,
 					     HoverPosition content)
 {
 	// in case TutorialOverlay is used without TutorialBuilder
-	if (!mainWidget) {
+	if(!mainWidget) {
 		mainWidget = subjects[0];
 	}
-	TutorialChapter* ch = TutorialChapter::build(subjects, description,
-						     mainWidget,
-						     x_offset, y_offset,
-						     anchor, content, this);
+	TutorialChapter *ch =
+		TutorialChapter::build(subjects, description, mainWidget, x_offset, y_offset, anchor, content, this);
 	chapter.append(ch);
 	ch->setMainSubject(mainWidget);
 	return ch;
@@ -62,7 +56,7 @@ TutorialChapter* TutorialOverlay::addChapter(const QList<QWidget *>& subjects,
 
 TutorialChapter *TutorialOverlay::addChapter(QWidget *subject, QString description)
 {
-	QList<QWidget*> list;
+	QList<QWidget *> list;
 
 	// pass empty list if subject is nullptr
 	if(subject != nullptr)
@@ -71,14 +65,11 @@ TutorialChapter *TutorialOverlay::addChapter(QWidget *subject, QString descripti
 	return addChapter(list, description, subject); // if there is only one widget, it will be the main widget
 }
 
-void TutorialOverlay::addChapter(TutorialChapter *ch)
-{
-	chapter.append(ch);
-}
+void TutorialOverlay::addChapter(TutorialChapter *ch) { chapter.append(ch); }
 
 void TutorialOverlay::start()
 {
-	qInfo(CAT_TUTORIALOVERLAY)<<"Tutorial started";
+	qInfo(CAT_TUTORIALOVERLAY) << "Tutorial started";
 	cnt = 0;
 
 	buildUi();
@@ -106,7 +97,7 @@ void TutorialOverlay::next()
 	overlay->raise();
 	overlay->clearHoles();
 
-	QList<QWidget*> subjects = chapter[cnt]->subjects;
+	QList<QWidget *> subjects = chapter[cnt]->subjects;
 	if(!subjects.isEmpty()) {
 		overlay->setHoles(subjects);
 
@@ -117,10 +108,10 @@ void TutorialOverlay::next()
 
 		m_hoverWidget->raise();
 		m_hoverWidget->setVisible(true);
-		for (QWidget *subj : qAsConst(subjects)) {
+		for(QWidget *subj : qAsConst(subjects)) {
 			subj->raise();
 			m_popupWidget->setFocusOnContinueButton();
-			auto* highlight = new TintedOverlay(subj,QColor(255,255,255,35));
+			auto *highlight = new TintedOverlay(subj, QColor(255, 255, 255, 35));
 			highlight->raise();
 			highlight->show();
 			highlights.append(highlight);
@@ -139,15 +130,17 @@ void TutorialOverlay::next()
 		m_popupWidget->getContinueBtn()->setText("Finish");
 }
 
-void TutorialOverlay::finish() {
-	qInfo(CAT_TUTORIALOVERLAY)<<"Tutorial Finished";
+void TutorialOverlay::finish()
+{
+	qInfo(CAT_TUTORIALOVERLAY) << "Tutorial Finished";
 	overlay->deleteLater();
 	cleanupChapter();
 
 	Q_EMIT finished();
 }
 
-void TutorialOverlay::abort() {
+void TutorialOverlay::abort()
+{
 	qInfo(CAT_TUTORIALOVERLAY) << "Tutorial Aborted";
 	cleanupChapter();
 	overlay->deleteLater();
@@ -158,7 +151,7 @@ void TutorialOverlay::abort() {
 
 void TutorialOverlay::buildUi()
 {
-	qDebug(CAT_TUTORIALOVERLAY)<<"build";
+	qDebug(CAT_TUTORIALOVERLAY) << "build";
 	overlay = new TintedOverlay(parent);
 
 	initPopupWidget();
@@ -167,17 +160,19 @@ void TutorialOverlay::buildUi()
 	overlay->show();
 }
 
-void TutorialOverlay::initPopupWidget() {
+void TutorialOverlay::initPopupWidget()
+{
 	m_popupWidget = new PopupWidget();
 	m_popupWidget->setFocusOnContinueButton();
 	connect(m_popupWidget, &PopupWidget::continueButtonClicked, this, &TutorialOverlay::next);
 	connect(m_popupWidget, &PopupWidget::exitButtonClicked, this, &TutorialOverlay::abort);
 }
 
-void TutorialOverlay::cleanupChapter() {
+void TutorialOverlay::cleanupChapter()
+{
 	if(!highlights.isEmpty()) {
 		// delete previous highlight
-		for (TintedOverlay *highlight : qAsConst(highlights)) {
+		for(TintedOverlay *highlight : qAsConst(highlights)) {
 			delete highlight;
 		}
 		highlights.clear();
@@ -187,21 +182,15 @@ void TutorialOverlay::cleanupChapter() {
 	}
 }
 
+const QString &TutorialOverlay::getTitle() const { return title; }
 
-const QString &TutorialOverlay::getTitle() const
+void TutorialOverlay::setTitle(const QString &newTitle) { title = newTitle; }
+
+bool TutorialOverlay::eventFilter(QObject *watched, QEvent *event)
 {
-	return title;
-}
-
-void TutorialOverlay::setTitle(const QString &newTitle)
-{
-	title = newTitle;
-}
-
-bool TutorialOverlay::eventFilter(QObject *watched, QEvent *event) {
-	if (watched == this->parent && event->type() == QEvent::Resize) {
-		QWidget* w = qobject_cast<QWidget*>(watched);
-		if (w) {
+	if(watched == this->parent && event->type() == QEvent::Resize) {
+		QWidget *w = qobject_cast<QWidget *>(watched);
+		if(w) {
 			QSize s = w->size();
 			this->overlay->resize(s);
 		}

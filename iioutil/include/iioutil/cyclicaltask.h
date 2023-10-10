@@ -1,12 +1,14 @@
 #ifndef CYCLICALTASK_H
 #define CYCLICALTASK_H
 
-#include <QObject>
-#include <QTimer>
-#include <QThread>
-#include <iio.h>
 #include "scopy-iioutil_export.h"
+
+#include <iio.h>
+
 #include <QLoggingCategory>
+#include <QObject>
+#include <QThread>
+#include <QTimer>
 
 namespace scopy {
 /**
@@ -24,14 +26,13 @@ public:
 
 private Q_SLOTS:
 	void startThread();
+
 private:
 	QTimer *t;
 	bool enabled = false;
-	QThread* task;
+	QThread *task;
 	const int THREAD_FINISH_TIMEOUT = 30000;
 };
-}
-
-
+} // namespace scopy
 
 #endif // CYCLICALTASK_H

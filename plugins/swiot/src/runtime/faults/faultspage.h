@@ -18,41 +18,43 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef FAULTSPAGE_H
 #define FAULTSPAGE_H
 
-#include <QWidget>
-#include <QPushButton>
-#include <QTextEdit>
+#include "faultsdevice.h"
+#include "faultsgroup.h"
 
 #include <iio.h>
 
-#include "faultsgroup.h"
-#include "faultsdevice.h"
+#include <QPushButton>
+#include <QTextEdit>
+#include <QWidget>
 
-namespace Ui { class FaultsPage; }
+namespace Ui {
+class FaultsPage;
+}
 
 namespace scopy::swiot {
 class FaultsDevice;
 
-class FaultsPage : public QWidget {
+class FaultsPage : public QWidget
+{
 	Q_OBJECT
 public:
-	explicit FaultsPage(struct iio_context* context, QWidget *parent = nullptr);
+	explicit FaultsPage(struct iio_context *context, QWidget *parent = nullptr);
 	~FaultsPage();
 
 	void update();
 
 private:
-	struct iio_context* m_context;
+	struct iio_context *m_context;
 
 	Ui::FaultsPage *ui;
 
-	FaultsDevice* m_ad74413rFaultsDevice;
-	FaultsDevice* m_max14906FaultsDevice;
+	FaultsDevice *m_ad74413rFaultsDevice;
+	FaultsDevice *m_max14906FaultsDevice;
 
 	void setupDevices();
 };
-}
+} // namespace scopy::swiot
 #endif // FAULTSPAGE_H

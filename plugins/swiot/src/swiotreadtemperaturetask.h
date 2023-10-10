@@ -18,20 +18,22 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_SWIOTREADTEMPERATURETASK_H
 #define SCOPY_SWIOTREADTEMPERATURETASK_H
 
-#include <QThread>
 #include <iio.h>
+
+#include <QThread>
+
 #include <iioutil/command.h>
 #include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
-class SwiotReadTemperatureTask : public QThread {
+class SwiotReadTemperatureTask : public QThread
+{
 	Q_OBJECT
 public:
-	explicit SwiotReadTemperatureTask(QString  uri, QObject* parent = nullptr);
+	explicit SwiotReadTemperatureTask(QString uri, QObject *parent = nullptr);
 	~SwiotReadTemperatureTask();
 	void run() override;
 
@@ -50,8 +52,7 @@ private:
 	struct iio_device *m_device;
 	CommandQueue *m_commandQueue;
 	double m_raw, m_scale, m_offset;
-
 };
-} // scopy::swiot
+} // namespace scopy::swiot
 
-#endif //SCOPY_SWIOTREADTEMPERATURETASK_H
+#endif // SCOPY_SWIOTREADTEMPERATURETASK_H

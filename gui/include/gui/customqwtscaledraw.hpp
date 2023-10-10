@@ -1,12 +1,13 @@
 #ifndef CUSTOMQWTSCALEDRAW_HPP
 #define CUSTOMQWTSCALEDRAW_HPP
 
-#include <qwt_text.h>
+#include "plot_utils.hpp"
+#include "scopy-gui_export.h"
+
 #include <qwt_interval.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_engine.h>
-#include "plot_utils.hpp"
-#include "scopy-gui_export.h"
+#include <qwt_text.h>
 
 namespace scopy {
 
@@ -22,7 +23,6 @@ protected:
 
 private:
 	QString m_unitOfMeasure;
-
 };
-}
+} // namespace scopy
 #endif // CUSTOMQWTSCALEDRAW_HPP

@@ -21,16 +21,16 @@
 #define EXTENDINGPLOTZOOMER_H
 
 #include "limitedplotzoomer.h"
+#include "scopy-gui_export.h"
 
 #include <qwt_plot_shapeitem.h>
-#include "scopy-gui_export.h"
 
 namespace scopy {
 class SCOPY_GUI_EXPORT ExtendingPlotZoomer : public LimitedPlotZoomer
 {
 public:
-	explicit ExtendingPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget*, bool doReplot = false);
-	explicit ExtendingPlotZoomer(QWidget*, bool doReplot = false);
+	explicit ExtendingPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *, bool doReplot = false);
+	explicit ExtendingPlotZoomer(QWidget *, bool doReplot = false);
 	virtual ~ExtendingPlotZoomer();
 
 protected:
@@ -43,9 +43,9 @@ private:
 	mutable bool extendWidth;
 	mutable bool extendHeight;
 
-	QVector<QwtPlotShapeItem*> cornerMarkers;
-	QVector<QwtPlotShapeItem*> extendMarkers;
+	QVector<QwtPlotShapeItem *> cornerMarkers;
+	QVector<QwtPlotShapeItem *> extendMarkers;
 };
-}
+} // namespace scopy
 
 #endif // EXTENDINGPLOTZOOMER_H

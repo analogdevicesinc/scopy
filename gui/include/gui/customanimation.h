@@ -21,8 +21,9 @@
 #ifndef CUSTOMANIMATION_H
 #define CUSTOMANIMATION_H
 
-#include <QPropertyAnimation>
 #include "scopy-gui_export.h"
+
+#include <QPropertyAnimation>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT CustomAnimation : public QPropertyAnimation
@@ -32,14 +33,14 @@ public:
 	CustomAnimation(QObject *target, const QByteArray &propertyName, QObject *parent = nullptr);
 	~CustomAnimation();
 
-        void setDuration(int msec);
+	void setDuration(int msec);
 
 public Q_SLOTS:
-        void toggle(bool);
+	void toggle(bool);
 
 private:
-        bool m_enabled;
-        int m_duration;
+	bool m_enabled;
+	int m_duration;
 };
-}
+} // namespace scopy
 #endif // CUSTOMANIMATION_H
