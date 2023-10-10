@@ -5,7 +5,7 @@ SCOPY_REPO=$(git rev-parse --show-toplevel)
 
 IN_PLACE="-i"
 VERBOSE="--verbose"
-CLANG_FORMAT="clang-format-10"
+CLANG_FORMAT="clang-format-12"
 CMAKE_FORMAT="cmake-format"
 
 find $SCOPY_REPO -type f -name "*.cpp" | xargs $CLANG_FORMAT $VERBOSE $IN_PLACE

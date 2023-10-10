@@ -2918,15 +2918,14 @@ QVector<QVector<QString>> LogicAnalyzer::createDecoderData(bool separate_annotat
 						}
 					}
 
-					new_value = (start_sample == i && end_sample == i)
-						? start_separator + rows[row_index][col].annotations()[0] +
-							end_separator
+					new_value = (start_sample == i && end_sample == i) ? start_separator +
+							rows[row_index][col].annotations()[0] + end_separator
 						: (start_sample == i && end_sample > i)
-							? start_separator + rows[row_index][col].annotations()[0]
-							: (end_sample == i && start_sample < i)
-								? rows[row_index][col].annotations()[0] + end_separator
-								: (start_sample < i && end_sample > i) ? repeated_value
-												       : "";
+						? start_separator + rows[row_index][col].annotations()[0]
+						: (end_sample == i && start_sample < i)
+						? rows[row_index][col].annotations()[0] + end_separator
+						: (start_sample < i && end_sample > i) ? repeated_value
+										       : "";
 				} else if((start_sample <= i && end_sample > i) ||
 					  (start_sample == i && end_sample == i)) {
 					new_value = rows[row_index][col].annotations()[0];
