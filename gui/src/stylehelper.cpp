@@ -1,16 +1,14 @@
 #include "stylehelper.h"
-
+#include <QApplication>
 #include "ui_spinbox_a.h"
 
-#include <QApplication>
-
-#include <customSwitch.h>
 #include <dynamicWidget.h>
-#include <measurementselector.h>
 #include <menu_anim.hpp>
+#include <measurementselector.h>
 #include <semiexclusivebuttongroup.h>
-#include <smallOnOffSwitch.h>
 #include <spinbox_a.hpp>
+#include <smallOnOffSwitch.h>
+#include <customSwitch.h>
 #include <widgets/measurementlabel.h>
 
 using namespace scopy;
@@ -1033,6 +1031,34 @@ void StyleHelper::TransparentWidget(QWidget *w, QString objectName)
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 	QString style = QString(R"css(background-color: transparent;)css");
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::ScopyStatusBar(QStatusBar *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QString style = QString(R"css(
+				QStatusBar {
+					background-color: &&UIElementBackground&&;
+				}
+				)css");
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::ScopyHistoryList(QListWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+				QListWidget {
+					background-color: &&ScopyBackground&&;
+					border: 1px solid grey;
+				}
+				)css");
+	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
 	w->setStyleSheet(style);
 }
 
