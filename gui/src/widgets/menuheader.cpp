@@ -1,9 +1,11 @@
-#include <widgets/menuheader.h>
 #include <stylehelper.h>
+#include <widgets/menuheader.h>
 
 using namespace scopy;
 
-MenuHeaderWidget::MenuHeaderWidget(QString title, QPen pen, QWidget *parent) : QWidget(parent) {
+MenuHeaderWidget::MenuHeaderWidget(QString title, QPen pen, QWidget *parent)
+	: QWidget(parent)
+{
 	auto lay = new QVBoxLayout(this);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -21,12 +23,15 @@ MenuHeaderWidget::MenuHeaderWidget(QString title, QPen pen, QWidget *parent) : Q
 	applyStylesheet();
 }
 
-MenuHeaderWidget::~MenuHeaderWidget() { }
+MenuHeaderWidget::~MenuHeaderWidget() {}
 
 QLabel *MenuHeaderWidget::label() { return m_label; }
 
-void MenuHeaderWidget::applyStylesheet() {
+void MenuHeaderWidget::applyStylesheet()
+{
 	StyleHelper::MenuHeaderLabel(m_label, "menuLabel");
 	StyleHelper::MenuHeaderLine(m_line, m_pen, "menuSeparator");
 	StyleHelper::MenuHeaderWidget(this, "menuHeader");
 }
+
+#include "moc_menuheader.cpp"

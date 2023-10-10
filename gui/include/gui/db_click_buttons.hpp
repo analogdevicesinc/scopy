@@ -20,11 +20,12 @@
 #ifndef DB_CLICK_BUTTONS_HPP
 #define DB_CLICK_BUTTONS_HPP
 
-#include <QWidget>
-#include <QPushButton>
-#include <QList>
-#include <QString>
 #include "scopy-gui_export.h"
+
+#include <QList>
+#include <QPushButton>
+#include <QString>
+#include <QWidget>
 
 namespace Ui {
 class DbClickButtons;
@@ -32,7 +33,7 @@ class DbClickButtons;
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT DbClickButtons: public QWidget
+class SCOPY_GUI_EXPORT DbClickButtons : public QWidget
 {
 	Q_OBJECT
 

@@ -18,20 +18,23 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef READERTHREAD_H
 #define READERTHREAD_H
 
 #include "src/runtime/ad74413r/chnlinfo.h"
-#include <QThread>
+
+#include <iio.h>
+
 #include <QMap>
 #include <QMutex>
+#include <QThread>
+
 #include <atomic>
-#include <iio.h>
 #include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
-class ReaderThread : public QThread {
+class ReaderThread : public QThread
+{
 	Q_OBJECT
 public:
 	explicit ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *parent = nullptr);
@@ -44,7 +47,7 @@ public:
 	void addBufferedDevice(iio_device *device);
 
 	void runDio();
-        void singleDio();
+	void singleDio();
 
 	void runBuffered(int requiredBuffersNumber = 0);
 
@@ -96,12 +99,12 @@ private:
 
 	struct iio_device *m_iioDev;
 	struct iio_buffer *m_iioBuff;
-	QMap<int, ChnlInfo*> m_chnlsInfo;
+	QMap<int, ChnlInfo *> m_chnlsInfo;
 	QVector<ChnlInfo *> m_bufferedChnls;
 	QVector<QVector<double>> m_bufferData;
 	std::atomic<bool> m_running, m_bufferInvalid;
 	std::mutex m_mutex;
 };
-}
+} // namespace scopy::swiot
 
 #endif // READERTHREAD_H

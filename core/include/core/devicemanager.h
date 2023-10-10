@@ -1,23 +1,25 @@
 #ifndef DEVICEMANAGER_H
 #define DEVICEMANAGER_H
 
-#include <QObject>
-#include <QMap>
-#include <QSet>
 #include "device.h"
 #include "deviceimpl.h"
 #include "pluginmanager.h"
 #include "scopy-core_export.h"
+
+#include <QMap>
+#include <QObject>
+#include <QSet>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT DeviceManager : public QObject
 {
 	Q_OBJECT
 	friend class ScopyMainWindow_API;
+
 public:
 	explicit DeviceManager(PluginManager *pm, QObject *parent = nullptr);
 	~DeviceManager();
-	Device* getDevice(QString id);
+	Device *getDevice(QString id);
 	void setExclusive(bool);
 	bool getExclusive() const;
 
@@ -33,8 +35,7 @@ public Q_SLOTS:
 
 	void save(QSettings &s);
 	void load(QSettings &s);
-//	void updateScan(QStringList ls);
-
+	//	void updateScan(QStringList ls);
 
 private Q_SLOTS:
 	void changeToolListDevice();
@@ -43,28 +44,30 @@ private Q_SLOTS:
 	void restartDevice();
 
 Q_SIGNALS:
-	void deviceChangedToolList(QString, QList<ToolMenuEntry*>);
+	void deviceChangedToolList(QString, QList<ToolMenuEntry *>);
 	void deviceAddStarted(QString);
-	void deviceAdded(QString, Device*);
-	void deviceRemoveStarted(QString, Device*);
+	void deviceAdded(QString, Device *);
+	void deviceRemoveStarted(QString, Device *);
 	void deviceRemoved(QString);
-	void deviceConnected(QString id, Device*);
-	void deviceDisconnected(QString id, Device*);
+	void deviceConnected(QString id, Device *);
+	void deviceDisconnected(QString id, Device *);
 	void requestDevice(QString id);
 	void requestTool(QString id);
+
 private:
 	void connectDeviceToManager(DeviceImpl *d);
 	void disconnectDeviceFromManager(DeviceImpl *d);
+
 private:
 	bool exclusive = false;
 	QStringList scannedDev;
 	QStringList connectedDev;
-	QMap<QString,Device*> map;
+	QMap<QString, Device *> map;
 	PluginManager *pm;
 
 	void disconnectDevice(QString id);
 	void connectDevice(QString id);
 };
-}
+} // namespace scopy
 
 #endif // DEVICEMANAGER_H

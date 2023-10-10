@@ -22,9 +22,10 @@
 #define DEBUGGERCONTROLLER_H
 
 #include <iio.h>
+
 #include <QDebug>
-#include <QVector>
 #include <QObject>
+#include <QVector>
 
 namespace scopy {
 
@@ -44,26 +45,21 @@ public:
 	struct iio_context *getIioContext(void);
 	void setIioContext(struct iio_context *ctx);
 
-	QString readAttribute(const QString& devName, QString& channel,
-	                      const QString& attribute);
-	QString writeAttribute(const QString& devName, QString& channel,
-	                    const QString& attribute,
-	                    const QString& value);
-	QStringList getAvailableValues(const QString& devName, QString& channel,
-	                               QString& attribute) const;
-	QString getAttributeValue(const QString& devName, const QString& channel,
-	                          const QString& attribute) const;
-	void setAttributeValue(const QString& devName, const QString& channel,
-	                       const QString& attribute,
-	                       const QString& value);
+	QString readAttribute(const QString &devName, QString &channel, const QString &attribute);
+	QString writeAttribute(const QString &devName, QString &channel, const QString &attribute,
+			       const QString &value);
+	QStringList getAvailableValues(const QString &devName, QString &channel, QString &attribute) const;
+	QString getAttributeValue(const QString &devName, const QString &channel, const QString &attribute) const;
+	void setAttributeValue(const QString &devName, const QString &channel, const QString &attribute,
+			       const QString &value);
 
 Q_SIGNALS:
 	void channelsChanged(const QStringList channelList);
 
 public Q_SLOTS:
 	void scanDevices(void);
-	void scanChannels(const QString& devName);
-	void scanChannelAttributes(QString devName, QString& channel);
+	void scanChannels(const QString &devName);
+	void scanChannelAttributes(QString devName, QString &channel);
 
 private:
 	struct iio_context *ctx;
@@ -74,7 +70,7 @@ private:
 	bool connected = false;
 	QVector<QString> attributeAvailable;
 };
-}
-}
+} // namespace debugger
+} // namespace scopy
 
 #endif // DEBUGGERCONTROLLER_H

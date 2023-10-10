@@ -21,81 +21,81 @@
 #ifndef DECODER_TABLE_MODEL_H
 #define DECODER_TABLE_MODEL_H
 
-#include <bitset>
-#include <QAbstractTableModel>
-#include <QMap>
 #include "annotationcurve.h"
 #include "decoder_table.hpp"
 #include "decoder_table_item.hpp"
 
+#include <QAbstractTableModel>
+#include <QMap>
+
+#include <bitset>
 
 namespace scopy::m2k {
 
-
 namespace logic {
 
-class DecoderTableModel : public QAbstractTableModel {
-    Q_OBJECT
+class DecoderTableModel : public QAbstractTableModel
+{
+	Q_OBJECT
 
 public:
-    DecoderTableModel(DecoderTable *decoderTable, LogicAnalyzer *logicAnalyzer);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    void setDefaultPrimaryAnnotations();
+	DecoderTableModel(DecoderTable *decoderTable, LogicAnalyzer *logicAnalyzer);
+	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	void setDefaultPrimaryAnnotations();
 
-    // resize table cells and hide/show rows
-    void refreshColumn(double column = -1) const;
+	// resize table cells and hide/show rows
+	void refreshColumn(double column = -1) const;
 
-    // Get index of the curve
-    int indexOfCurve(const AnnotationCurve* curve) const;
+	// Get index of the curve
+	int indexOfCurve(const AnnotationCurve *curve) const;
 
-    void setPrimaryAnnotation(int index);
-    void selectedDecoderChanged(int index) const;
+	void setPrimaryAnnotation(int index);
+	void selectedDecoderChanged(int index) const;
 
-    void populateFilter(int index) const;
-    QMap<int, QVector<QString>>& getFiltered();
-    int getCurrentColumn() const;
-    void setCurrentRow(int index);
-    void setMaxRowCount();
-    mutable int to_be_refreshed;
-    void refreshSettings(int column = -1);
-    void setSearchString(QString str) const;
-    QVector<int> getSearchMask();
-    QString getsearchString();
-    int getPrimaryAnnotationIndex() const;
+	void populateFilter(int index) const;
+	QMap<int, QVector<QString>> &getFiltered();
+	int getCurrentColumn() const;
+	void setCurrentRow(int index);
+	void setMaxRowCount();
+	mutable int to_be_refreshed;
+	void refreshSettings(int column = -1);
+	void setSearchString(QString str) const;
+	QVector<int> getSearchMask();
+	QString getsearchString();
+	int getPrimaryAnnotationIndex() const;
 
 public Q_SLOTS:
 
-    // This slot should be used when any of the decoders / annotation curves
-    // have been modified (eg adding/removing decoders, etc..). This clears
-    // the curves vecotr reconnects up signals to watch for annotation changes.
-    void reloadDecoders(bool logic);
+	// This slot should be used when any of the decoders / annotation curves
+	// have been modified (eg adding/removing decoders, etc..). This clears
+	// the curves vecotr reconnects up signals to watch for annotation changes.
+	void reloadDecoders(bool logic);
 
-    void searchBoxSlot(QString text);
+	void searchBoxSlot(QString text);
 
 protected:
+	// Set of curves to observe. Each should have an entry in the dataset
+	std::vector<QPointer<AnnotationCurve>> m_curves;
 
-    // Set of curves to observe. Each should have an entry in the dataset
-    std::vector<QPointer<AnnotationCurve>> m_curves;
+	DecoderTable *m_decoderTable;
+	LogicAnalyzer *m_logic;
+	QVector<GenericLogicPlotCurve *> m_plotCurves;
+	bool m_active = false;
+	QMap<int, int> *m_primary_annoations;
+	void populateDecoderComboBox() const;
+	mutable int m_current_column;
+	QMap<int, QVector<QString>> m_filteredMessages;
+	mutable int max_row_count = 0;
+	mutable QString searchString;
+	QVector<int> searchMask;
 
-    DecoderTable *m_decoderTable;
-    LogicAnalyzer *m_logic;
-    QVector<GenericLogicPlotCurve*> m_plotCurves;
-    bool m_active = false;
-    QMap<int, int> *m_primary_annoations;
-    void populateDecoderComboBox() const;
-    mutable int m_current_column;
-    QMap<int, QVector<QString>> m_filteredMessages;
-    mutable int max_row_count = 0;
-    mutable QString searchString;
-    QVector<int> searchMask;
 private:
-    void searchTable(QString text);
+	void searchTable(QString text);
 };
 
 } // namespace logic
-} // namespace scopy
+} // namespace scopy::m2k
 
 #endif // DECODER_TABLE_MODEL_H
-

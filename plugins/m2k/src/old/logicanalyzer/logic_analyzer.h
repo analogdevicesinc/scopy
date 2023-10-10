@@ -18,13 +18,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef LOGIC_ANALYZER_H
 #define LOGIC_ANALYZER_H
 
-#include <thread>
-#include <mutex>
-#include <condition_variable>
+#include "../m2ktool.hpp"
+#include "buffer_previewer.hpp"
+#include "genericlogicplotcurve.h"
+#include "gui/customPushButton.h"
+#include "gui/spinbox_a.hpp"
+#include "mousewheelwidgetguard.h"
+#include "oscilloscope_plot.hpp"
+#include "saverestoretoolsettings.h"
 
 #include <QList>
 #include <QQueue>
@@ -32,21 +36,14 @@
 #include <QStandardItem>
 #include <QTimer>
 
-#include "../m2ktool.hpp"
-#include "oscilloscope_plot.hpp"
-#include "buffer_previewer.hpp"
-#include "gui/spinbox_a.hpp"
-#include "gui/customPushButton.h"
-#include "mousewheelwidgetguard.h"
-#include "saverestoretoolsettings.h"
-
-#include "genericlogicplotcurve.h"
-
-#include <libm2k/m2k.hpp>
+#include <condition_variable>
+#include <gui/dropdown_switch_list.h>
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/enums.hpp>
-#include <gui/dropdown_switch_list.h>
+#include <libm2k/m2k.hpp>
+#include <mutex>
+#include <thread>
 
 constexpr int DIGITAL_NR_CHANNELS = 16;
 
@@ -61,9 +58,9 @@ class CursorsSettings;
 } // namespace Ui
 
 namespace scopy {
-	class ExportSettings;
-	class BaseMenu;
-}
+class ExportSettings;
+class BaseMenu;
+} // namespace scopy
 namespace scopy::m2k {
 
 class Filter;
@@ -72,19 +69,19 @@ class StateUpdater;
 
 namespace logic {
 
-class LogicAnalyzer : public M2kTool {
+class LogicAnalyzer : public M2kTool
+{
 	Q_OBJECT
 
 	friend class LogicAnalyzer_API;
+
 public:
-	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt,
-			 ToolMenuEntry *toolMenuItem, QJSEngine *engine,
-			 QWidget *parent, bool offline_mode_ = 0);
+	explicit LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, QJSEngine *engine,
+			       QWidget *parent, bool offline_mode_ = 0);
 	~LogicAnalyzer();
 	void setNativeDialogs(bool nativeDialogs) override;
 
 public: // Mixed Signal View Interface
-
 	// enable mixed signal view
 	// return a list with all the controls available for the Logic Analyzer
 	std::vector<QWidget *> enableMixedSignalView(CapturePlot *osc, int oscAnalogChannels);
@@ -99,12 +96,12 @@ public: // Mixed Signal View Interface
 	QwtPlot *getCurrentPlot();
 
 	// get list of plot curves
-	QVector<GenericLogicPlotCurve*> getPlotCurves(bool logic) const;
+	QVector<GenericLogicPlotCurve *> getPlotCurves(bool logic) const;
 
 	// connect signals and slots for the plot (logic or osc)
 	void connectSignalsAndSlotsForPlot(CapturePlot *plot);
 
-	void setData(const uint16_t * const data, int size);
+	void setData(const uint16_t *const data, int size);
 
 	// Update the viewport to fit the min and max time
 	void fitViewport(double min, double max);
@@ -165,6 +162,7 @@ private Q_SLOTS:
 	void onFilterChanged(QStandardItem *item);
 
 	void activateRunButton(bool en);
+
 protected:
 	uint16_t *m_buffer;
 
@@ -209,7 +207,7 @@ private:
 	uint64_t m_bufferSize;
 	uint64_t m_lastCapturedSample;
 
-	M2k* m_m2k_context;
+	M2k *m_m2k_context;
 	M2kDigital *m_m2kDigital;
 	int m_nbChannels;
 
@@ -244,7 +242,6 @@ private:
 	double m_timerTimeout;
 	QVector<M2K_TRIGGER_CONDITION_DIGITAL> m_triggerState;
 
-
 	ExportSettings *m_exportSettings;
 	QMap<int, bool> m_exportConfig;
 
@@ -261,12 +258,10 @@ private:
 
 	StateUpdater *m_triggerUpdater;
 
-	DropdownSwitchList* filterMessages;
+	DropdownSwitchList *filterMessages;
 	int filterCount = 0;
-
-
 };
 } // namespace logic
-} // namespace scopy
+} // namespace scopy::m2k
 
 #endif // LOGIC_ANALYZER_H

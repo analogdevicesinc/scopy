@@ -20,23 +20,23 @@
 #ifndef DIGITAL_CHANNEL_MANAGER_H
 #define DIGITAL_CHANNEL_MANAGER_H
 
+#include "filter.hpp"
 
-#include <QWidget>
-#include <QPushButton>
-#include <QJsonArray>
 #include <QIntValidator>
+#include <QJsonArray>
+#include <QPushButton>
+#include <QWidget>
 #include <QtQml/QJSEngine>
 #include <QtUiTools/QUiLoader>
-#include <vector>
-#include <string>
 
-#include "filter.hpp"
+#include <string>
+#include <vector>
 
 //#include "pg_patterns.hpp"
 
-#include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
+#include <libm2k/m2k.hpp>
 
 using namespace libm2k::context;
 using namespace libm2k::digital;
@@ -52,7 +52,7 @@ class DIOManager : public QObject
 	int gpo;
 	int gpi;
 	bool outputEnabled;
-	M2k* m_m2k_context;
+	M2k *m_m2k_context;
 	M2kDigital *digital;
 
 public:
@@ -83,7 +83,6 @@ Q_SIGNALS:
 	void unlocked();
 };
 
-}
+} // namespace scopy::m2k
 
 #endif // PG_CHANNEL_MANAGER_H
-

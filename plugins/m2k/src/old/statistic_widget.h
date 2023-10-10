@@ -24,7 +24,7 @@
 #include <QLabel>
 
 namespace Ui {
-	class Statistic;
+class Statistic;
 }
 
 namespace scopy {
@@ -33,7 +33,7 @@ class M2kMeasurementData;
 class M2kStatistic;
 class Formatter;
 
-class StatisticWidget: public QWidget
+class StatisticWidget : public QWidget
 {
 public:
 	explicit StatisticWidget(QWidget *parent = nullptr);
@@ -43,11 +43,11 @@ public:
 	int channelId() const;
 	int positionIndex() const;
 
-	void setTitleColor(const QColor& color);
+	void setTitleColor(const QColor &color);
 	void setPositionIndex(int pos);
-	
-	void initForMeasurement(const M2kMeasurementData & data);
-	void updateStatistics(const M2kStatistic & data);
+
+	void initForMeasurement(const M2kMeasurementData &data);
+	void updateStatistics(const M2kStatistic &data);
 
 private:
 	Ui::Statistic *m_ui;

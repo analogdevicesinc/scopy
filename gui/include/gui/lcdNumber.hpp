@@ -21,27 +21,27 @@
 #ifndef LCD_NUMBER_HPP
 #define LCD_NUMBER_HPP
 
-#include <QLCDNumber>
 #include "scopy-gui_export.h"
 
+#include <QLCDNumber>
+
 namespace scopy {
-	class SCOPY_GUI_EXPORT LcdNumber : public QLCDNumber
-	{
-		Q_OBJECT
+class SCOPY_GUI_EXPORT LcdNumber : public QLCDNumber
+{
+	Q_OBJECT
 
-		public:
-			explicit LcdNumber(QWidget *parent = 0,
-					unsigned precision = 3);
-			~LcdNumber() {}
+public:
+	explicit LcdNumber(QWidget *parent = 0, unsigned precision = 3);
+	~LcdNumber() {}
 
-		public Q_SLOTS:
-			void display(double num);
-			void setPrecision(unsigned precision);
-			unsigned getPrecision();
+public Q_SLOTS:
+	void display(double num);
+	void setPrecision(unsigned precision);
+	unsigned getPrecision();
 
-		private:
-			unsigned precision;
-	};
-}
+private:
+	unsigned precision;
+};
+} // namespace scopy
 
 #endif /* LCD_NUMBER_HPP */

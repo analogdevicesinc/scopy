@@ -40,49 +40,42 @@
  */
 
 #include "stream_to_vector_overlap_impl.h"
+
 #include <gnuradio/sync_decimator.h>
 
 using namespace gr;
 namespace scopy {
 
-stream_to_vector_overlap::sptr
-stream_to_vector_overlap::make(size_t itemsize,
-			       size_t nitems_per_block,
-			       double overlap_factor)
+stream_to_vector_overlap::sptr stream_to_vector_overlap::make(size_t itemsize, size_t nitems_per_block,
+							      double overlap_factor)
 {
-	return gnuradio::get_initial_sptr(new stream_to_vector_overlap_impl(
-						  itemsize,
-						  nitems_per_block,
-						  overlap_factor));
+	return gnuradio::get_initial_sptr(
+		new stream_to_vector_overlap_impl(itemsize, nitems_per_block, overlap_factor));
 }
 
-stream_to_vector_overlap_impl::stream_to_vector_overlap_impl(size_t itemsize,
-							     size_t nitems_per_block,
+stream_to_vector_overlap_impl::stream_to_vector_overlap_impl(size_t itemsize, size_t nitems_per_block,
 							     double overlap_factor)
-	: gr::sync_decimator("stream_to_vector_overlap",
-			 io_signature::make(1, 1, itemsize),
-			 io_signature::make(1, 1, itemsize * nitems_per_block),
-			 nitems_per_block),
-	  m_overlap_factor(overlap_factor),
-	  m_itemsize(itemsize),
-	  m_nitems_per_block(nitems_per_block)
+	: gr::sync_decimator("stream_to_vector_overlap", io_signature::make(1, 1, itemsize),
+			     io_signature::make(1, 1, itemsize * nitems_per_block), nitems_per_block)
+	, m_overlap_factor(overlap_factor)
+	, m_itemsize(itemsize)
+	, m_nitems_per_block(nitems_per_block)
 {
 	m_nb_overlapped_items = (size_t)(nitems_per_block * m_overlap_factor);
 }
 
-int stream_to_vector_overlap_impl::work(int noutput_items,
-					gr_vector_const_void_star& input_items,
-					gr_vector_void_star& output_items)
+int stream_to_vector_overlap_impl::work(int noutput_items, gr_vector_const_void_star &input_items,
+					gr_vector_void_star &output_items)
 {
 	size_t block_size = output_signature()->sizeof_stream_item(0);
 	size_t nb_input_items = noutput_items * block_size;
 	size_t nb_total_copied_items = 0;
 	size_t overlap_size = m_nb_overlapped_items * m_itemsize;
-	const char* in = (const char*)input_items[0];
-	char* out = (char*)output_items[0];
+	const char *in = (const char *)input_items[0];
+	char *out = (char *)output_items[0];
 
 	size_t src_index = 0;
-	while (src_index + block_size <= nb_input_items) {
+	while(src_index + block_size <= nb_input_items) {
 		memcpy(out + nb_total_copied_items, in + src_index, block_size);
 		nb_total_copied_items += block_size;
 		src_index = src_index + block_size - overlap_size;
@@ -96,4 +89,4 @@ void stream_to_vector_overlap_impl::set_overlap_factor(double factor)
 	m_nb_overlapped_items = m_nitems_per_block * m_overlap_factor;
 }
 
-}
+} // namespace scopy

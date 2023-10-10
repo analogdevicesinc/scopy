@@ -18,23 +18,22 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "x_axis_scale_zoomer.h"
+
 #include "qwt_scale_draw.h"
+
 #include <qwt_text.h>
 
 #include <dbgraph.hpp>
 
 using namespace scopy;
 
-XAxisScaleZoomer::XAxisScaleZoomer(QWidget *parent):
-	OscScaleZoomer(parent)
-{
-}
+XAxisScaleZoomer::XAxisScaleZoomer(QWidget *parent)
+	: OscScaleZoomer(parent)
+{}
 
-XAxisScaleZoomer::~XAxisScaleZoomer()
-{
-}
+XAxisScaleZoomer::~XAxisScaleZoomer() {}
 
-void XAxisScaleZoomer::zoom(const QRectF& rect)
+void XAxisScaleZoomer::zoom(const QRectF &rect)
 {
 	QRectF boundedRect = rect & zoomBase();
 	QRectF baseRect = zoomBase();
@@ -55,3 +54,5 @@ QwtText XAxisScaleZoomer::trackerText(const QPoint &p) const
 		  plt->getScaleValueFormat(dp.y(), QwtAxis::YLeft));
 	return t;
 }
+
+#include "moc_x_axis_scale_zoomer.cpp"

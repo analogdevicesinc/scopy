@@ -1,23 +1,19 @@
 #include "currentchnlinfo.h"
 
 using namespace scopy::swiot;
-CurrentChnlInfo::CurrentChnlInfo(QString plotUm, QString hwUm,
-				 iio_channel *iioChnl, CommandQueue *cmdQueue)
+CurrentChnlInfo::CurrentChnlInfo(QString plotUm, QString hwUm, iio_channel *iioChnl, CommandQueue *cmdQueue)
 	: ChnlInfo(plotUm, hwUm, iioChnl, cmdQueue)
 {
 	m_rangeValues = {MIN_CURRENT_VALUE, MAX_CURRENT_VALUE};
 }
 
-CurrentChnlInfo::~CurrentChnlInfo()
-{}
+CurrentChnlInfo::~CurrentChnlInfo() {}
 
 double CurrentChnlInfo::convertData(unsigned int data)
 {
 	double convertedData = 0.0;
-	double defaultFactor = m_unitOfMeasureFactor.contains(m_hwUm.at(0))
-			? m_unitOfMeasureFactor[m_hwUm.at(0)] : 1;
-	double newFactor = m_unitOfMeasureFactor.contains(m_plotUm.at(0))
-			? m_unitOfMeasureFactor[m_plotUm.at(0)] : 1;
+	double defaultFactor = m_unitOfMeasureFactor.contains(m_hwUm.at(0)) ? m_unitOfMeasureFactor[m_hwUm.at(0)] : 1;
+	double newFactor = m_unitOfMeasureFactor.contains(m_plotUm.at(0)) ? m_unitOfMeasureFactor[m_plotUm.at(0)] : 1;
 	double factor = defaultFactor / newFactor;
 	data <<= 8;
 	data = SWAP_UINT32(data);

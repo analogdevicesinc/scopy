@@ -22,6 +22,7 @@
 #define TIME_SINK_F_IMPL_H
 
 #include "time_sink_f.h"
+
 #include <QString>
 namespace scopy {
 
@@ -53,21 +54,17 @@ public:
 
 	bool start() override;
 	bool stop() override;
-	int work(int noutput_items,
-		 gr_vector_const_void_star &input_items,
-			 gr_vector_void_star &output_items) override;
-
-
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items) override;
 
 private:
-	std::vector <std::deque <float>> m_buffers;
-	std::vector< std::vector<gr::tag_t> > m_localtags;
-	std::vector< std::deque<gr::tag_t> > m_tags;
+	std::vector<std::deque<float>> m_buffers;
+	std::vector<std::vector<gr::tag_t>> m_localtags;
+	std::vector<std::deque<gr::tag_t>> m_tags;
 
 	std::vector<float> m_time;
 
 	std::vector<std::vector<float>> m_data;
-	std::vector< std::vector<PlotTag_t> > m_dataTags;
+	std::vector<std::vector<PlotTag_t>> m_dataTags;
 
 	int m_size;
 	float m_sampleRate;

@@ -18,25 +18,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "pattern_generator.h"
 
-#include <QDebug>
-#include <QDockWidget>
-#include "ui_pattern_generator.h"
-#include "digitalchannel_manager.hpp"
-#include "gui/dynamicWidget.h"
-#include "gui/basemenu.h"
 #include "../logicanalyzer/logicgroupitem.h"
-
+#include "digitalchannel_manager.hpp"
+#include "gui/basemenu.h"
+#include "gui/dynamicWidget.h"
 #include "gui/logicdatacurve.h"
+#include "m2kpluginExceptionHandler.h"
+#include "pattern_generator_api.h"
 #include "patterns/patterns.hpp"
 #include "sigrok-gui/annotationcurve.h"
 #include "sigrok-gui/annotationdecoder.h"
-#include "pattern_generator_api.h"
+
+#include "ui_pattern_generator.h"
+
+#include <QDebug>
+#include <QDockWidget>
 
 #include <libm2k/m2kexceptions.hpp>
-#include "m2kpluginExceptionHandler.h"
 #include <pluginbase/scopyjs.h>
 
 using namespace scopy;
@@ -51,10 +51,14 @@ constexpr int MAX_SAMPLE_RATE = 100000000;
 namespace detail {
 int gcd(int a, int b)
 {
-	for (;;) {
-		if (!a) { return b; }
+	for(;;) {
+		if(!a) {
+			return b;
+		}
 		b %= a;
-		if (!b) { return a; }
+		if(!b) {
+			return a;
+		}
 		a %= b;
 	}
 }
@@ -68,8 +72,7 @@ int lcm(int a, int b)
 
 } // namespace detail
 
-PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
-				   ToolMenuEntry *tme, QJSEngine *engine,
+PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 				   DIOManager *diom, QWidget *parent)
 	: M2kTool(nullptr, tme, new PatternGenerator_API(this), "Pattern Generator", parent)
 	, m_ui(new Ui::PatternGenerator)
@@ -94,7 +97,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 	m_plot.setLeftVertAxesCount(1);
 
-	for (uint8_t i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+	for(uint8_t i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 		QCheckBox *channelBox = new QCheckBox("DIO " + QString::number(i));
 		m_ui->channelEnumeratorLayout->addWidget(channelBox, i % 8, i / 8);
 
@@ -109,14 +112,14 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 		// use direct connection we want the processing
 		// of the available data to be done in the capture thread
-		connect(this, &PatternGenerator::dataAvailable, this,
-			[=](uint64_t from, uint64_t to, uint16_t *buffer){
-			curve->dataAvailable(from, to, buffer);
-		}, Qt::DirectConnection);
+		connect(
+			this, &PatternGenerator::dataAvailable, this,
+			[=](uint64_t from, uint64_t to, uint16_t *buffer) { curve->dataAvailable(from, to, buffer); },
+			Qt::DirectConnection);
 
 		m_plotCurves.push_back(curve);
 
-		connect(channelBox, &QCheckBox::toggled, [=](bool toggled){
+		connect(channelBox, &QCheckBox::toggled, [=](bool toggled) {
 			m_plot.enableDigitalPlotCurve(i, toggled);
 			m_plot.setOffsetWidgetVisible(i, toggled);
 			m_plot.positionInGroupChanged(i, 0, 0);
@@ -124,7 +127,7 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt,
 
 			checkEnabledChannels();
 
-			if (m_running) {
+			if(m_running) {
 				startStop(false);
 				startStop(true);
 			}
@@ -167,22 +170,22 @@ PatternGenerator::~PatternGenerator()
 {
 	delete api;
 
-	if (m_running) {
+	if(m_running) {
 		tme->setRunning(false);
 	}
 
-	for (auto &curve : m_plotCurves) {
+	for(auto &curve : m_plotCurves) {
 		m_plot.removeDigitalPlotCurve(curve);
 		delete curve;
 	}
 
-	if (m_buffer) {
+	if(m_buffer) {
 		delete[] m_buffer;
 		m_buffer = nullptr;
 	}
 
 	auto i = m_annotationCurvePatternUiMap.begin();
-	while (i != m_annotationCurvePatternUiMap.end()) {
+	while(i != m_annotationCurvePatternUiMap.end()) {
 		delete i.key();
 		disconnect(i.value().second);
 		++i;
@@ -215,16 +218,15 @@ void PatternGenerator::setupUi()
 	// disable time trigger
 	m_plot.enableTimeTrigger(false);
 
-
 	int gsettings_panel = m_ui->stackedWidget->indexOf(m_ui->generalSettings);
 	m_ui->btnGeneralSettings->setProperty("id", QVariant(-gsettings_panel));
 
-//	/* Cursors Settings */
-//	ui->btnCursors->setProperty("id", QVariant(-1));
+	//	/* Cursors Settings */
+	//	ui->btnCursors->setProperty("id", QVariant(-1));
 
-//	/* Trigger Settings */
-//	int triggers_panel = ui->stackedWidget->indexOf(ui->triggerSettings);
-//	ui->btnTrigger->setProperty("id", QVariant(-triggers_panel));
+	//	/* Trigger Settings */
+	//	int triggers_panel = ui->stackedWidget->indexOf(ui->triggerSettings);
+	//	ui->btnTrigger->setProperty("id", QVariant(-triggers_panel));
 
 	/* Channel Settings */
 	int channelSettings_panel = m_ui->stackedWidget->indexOf(m_ui->channelSettings);
@@ -233,17 +235,15 @@ void PatternGenerator::setupUi()
 	// set default menu width to 0
 	m_ui->rightMenu->setMaximumWidth(0);
 
-
 	// plot widget
-	QWidget* centralWidget = new QWidget(this);
-	QGridLayout* gridLayout = new QGridLayout(centralWidget);
+	QWidget *centralWidget = new QWidget(this);
+	QGridLayout *gridLayout = new QGridLayout(centralWidget);
 	gridLayout->setVerticalSpacing(0);
 	gridLayout->setHorizontalSpacing(0);
 	gridLayout->setContentsMargins(25, 0, 25, 0);
 	centralWidget->setLayout(gridLayout);
 
-	QSpacerItem *plotSpacer = new QSpacerItem(0, 5,
-		QSizePolicy::Fixed, QSizePolicy::Fixed);
+	QSpacerItem *plotSpacer = new QSpacerItem(0, 5, QSizePolicy::Fixed, QSizePolicy::Fixed);
 
 	gridLayout->addWidget(m_plot.topArea(), 0, 0, 1, 4);
 	gridLayout->addWidget(m_plot.topHandlesArea(), 1, 0, 1, 4);
@@ -258,7 +258,6 @@ void PatternGenerator::setupUi()
 	gridLayout->addItem(plotSpacer, 4, 0, 1, 4);
 
 	m_ui->gridLayoutPlot->addWidget(centralWidget, 0, 0, 1, 1);
-
 
 	// TODO: do we want the buffer previewer in this tool?
 	m_ui->hLayoutBufferPreview->hide();
@@ -287,13 +286,11 @@ void PatternGenerator::setupUi()
 
 void PatternGenerator::on_btnChannelSettings_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 
-	if (checked && m_selectedChannel != -1) {
+	if(checked && m_selectedChannel != -1) {
 		m_ui->nameLineEdit->setText(m_plot.getChannelName(m_selectedChannel));
-		m_ui->traceHeightLineEdit->setText(QString::number(
-							 m_plotCurves[m_selectedChannel]->getTraceHeight()));
+		m_ui->traceHeightLineEdit->setText(QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
 	}
 }
 
@@ -301,12 +298,11 @@ void PatternGenerator::on_btnSettings_clicked(bool checked)
 {
 	CustomPushButton *btn = nullptr;
 
-	if (checked && !m_menuOrder.isEmpty()) {
+	if(checked && !m_menuOrder.isEmpty()) {
 		btn = m_menuOrder.back();
 		m_menuOrder.pop_back();
 	} else {
-		btn = static_cast<CustomPushButton *>(
-			m_ui->settings_group->checkedButton());
+		btn = static_cast<CustomPushButton *>(m_ui->settings_group->checkedButton());
 	}
 
 	btn->setChecked(checked);
@@ -314,8 +310,7 @@ void PatternGenerator::on_btnSettings_clicked(bool checked)
 
 void PatternGenerator::on_btnGeneralSettings_toggled(bool checked)
 {
-	triggerRightMenuToggle(
-		static_cast<CustomPushButton *>(QObject::sender()), checked);
+	triggerRightMenuToggle(static_cast<CustomPushButton *>(QObject::sender()), checked);
 	if(checked) {
 		m_ui->btnSettings->setChecked(!checked);
 	}
@@ -328,7 +323,7 @@ void PatternGenerator::rightMenuFinished(bool opened)
 	// At the end of each animation, check if there are other button check
 	// actions that might have happened while animating and execute all
 	// these queued actions
-	while (m_menuButtonActions.size()) {
+	while(m_menuButtonActions.size()) {
 		auto pair = m_menuButtonActions.dequeue();
 		toggleRightMenu(pair.first, pair.second);
 	}
@@ -338,8 +333,8 @@ void PatternGenerator::channelSelectedChanged(int chIdx, bool selected)
 {
 	QSignalBlocker nameLineEditBlocker(m_ui->nameLineEdit);
 	QSignalBlocker traceHeightLineEditBlocker(m_ui->traceHeightLineEdit);
-	if (m_selectedChannel != chIdx && selected) {
-		if (!m_ui->btnChannelSettings->isChecked()) {
+	if(m_selectedChannel != chIdx && selected) {
+		if(!m_ui->btnChannelSettings->isChecked()) {
 			m_ui->btnChannelSettings->setChecked(true);
 		}
 
@@ -347,23 +342,20 @@ void PatternGenerator::channelSelectedChanged(int chIdx, bool selected)
 		m_ui->nameLineEdit->setEnabled(true);
 		m_ui->nameLineEdit->setText(m_plotCurves[m_selectedChannel]->getName());
 		m_ui->traceHeightLineEdit->setEnabled(true);
-		m_ui->traceHeightLineEdit->setText(
-					QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
+		m_ui->traceHeightLineEdit->setText(QString::number(m_plotCurves[m_selectedChannel]->getTraceHeight()));
 		m_ui->patternComboBox->setEnabled(true);
 		m_ui->btnOutputMode->setEnabled(true);
 
-		if (m_selectedChannel < m_nbChannels) {
+		if(m_selectedChannel < m_nbChannels) {
 			const DIO_MODE outputMode = m_m2kDigital->getOutputMode(m_selectedChannel);
-			const bool btnOutputModeSelected = (outputMode == DIO_MODE::DIO_OPENDRAIN ? true
-												  :false);
+			const bool btnOutputModeSelected = (outputMode == DIO_MODE::DIO_OPENDRAIN ? true : false);
 			m_ui->btnOutputMode->setChecked(btnOutputModeSelected);
 		}
 
 		updateChannelGroupWidget(true);
 		updateChannelGroupPattern(true);
 
-
-	} else if (m_selectedChannel == chIdx && !selected) {
+	} else if(m_selectedChannel == chIdx && !selected) {
 		m_selectedChannel = -1;
 		m_ui->nameLineEdit->setDisabled(true);
 		m_ui->nameLineEdit->setText("");
@@ -374,7 +366,6 @@ void PatternGenerator::channelSelectedChanged(int chIdx, bool selected)
 
 		updateChannelGroupWidget(false);
 		updateChannelGroupPattern(false);
-
 	}
 }
 
@@ -382,11 +373,11 @@ void PatternGenerator::on_btnGroupChannels_toggled(bool checked)
 {
 	m_ui->btnGroupChannels->setText(checked ? "Done" : "Group");
 
-	if (checked) {
+	if(checked) {
 		m_plot.beginGroupSelection();
 	} else {
-		if (m_plot.endGroupSelection(true)) {
-//			channelSelectedChanged(m_selectedChannel, false);
+		if(m_plot.endGroupSelection(true)) {
+			//			channelSelectedChanged(m_selectedChannel, false);
 			updateGroupsAndPatterns();
 		}
 	}
@@ -394,7 +385,7 @@ void PatternGenerator::on_btnGroupChannels_toggled(bool checked)
 
 void PatternGenerator::removeAnnotationCurveOfPattern(PatternUI *pattern)
 {
-	if (m_annotationCurvePatternUiMap.contains(pattern)) {
+	if(m_annotationCurvePatternUiMap.contains(pattern)) {
 		disconnect(m_annotationCurvePatternUiMap[pattern].second);
 
 		GenericLogicPlotCurve *curve = m_annotationCurvePatternUiMap[pattern].first;
@@ -402,8 +393,7 @@ void PatternGenerator::removeAnnotationCurveOfPattern(PatternUI *pattern)
 		bool dummy = false;
 		int removeIndx = m_plotCurves.indexOf(curve);
 		m_plot.removeFromGroup(m_selectedChannel,
-				       m_plot.getGroupOfChannel(m_selectedChannel).indexOf(removeIndx),
-				       dummy);
+				       m_plot.getGroupOfChannel(m_selectedChannel).indexOf(removeIndx), dummy);
 
 		m_plot.removeDigitalPlotCurve(curve);
 
@@ -417,18 +407,21 @@ void PatternGenerator::removeAnnotationCurveOfPattern(PatternUI *pattern)
 
 void PatternGenerator::updateAnnotationCurveChannelsForPattern(const QPair<QVector<int>, PatternUI *> &pattern)
 {
-	if (pattern.second->getAnnotationCurve()) {
-		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(
-					pattern.second->getAnnotationCurve());
+	if(pattern.second->getAnnotationCurve()) {
+		AnnotationCurve *curve = dynamic_cast<AnnotationCurve *>(pattern.second->getAnnotationCurve());
 		QVector<int> chToAssign = pattern.second->getChannelsToAssign();
 		int skipped = 0;
-		for (int i = 0; i < curve->getAnnotationDecoder()->getNrOfChannels(); ++i) {
-			if (!chToAssign.empty() && !chToAssign.contains(i)) {
+		for(int i = 0; i < curve->getAnnotationDecoder()->getNrOfChannels(); ++i) {
+			if(!chToAssign.empty() && !chToAssign.contains(i)) {
 				skipped++;
 				continue;
 			}
-			if (i - skipped >= pattern.first.size()) { break; }
-			if (pattern.first[i - skipped] >= DIGITAL_NR_CHANNELS) { continue; }
+			if(i - skipped >= pattern.first.size()) {
+				break;
+			}
+			if(pattern.first[i - skipped] >= DIGITAL_NR_CHANNELS) {
+				continue;
+			}
 			curve->getAnnotationDecoder()->assignChannel(i, pattern.first[i - skipped]);
 		}
 	}
@@ -437,10 +430,10 @@ void PatternGenerator::updateAnnotationCurveChannelsForPattern(const QPair<QVect
 void PatternGenerator::patternSelected(const QString &pattern, int ch, const QString &json)
 {
 	int selected = ch != -1 ? ch : m_selectedChannel;
-	if (pattern != "-") {
+	if(pattern != "-") {
 		qDebug() << "Selected: " << pattern;
 		Pattern *patternObj = nullptr;
-		if (pattern == "") {
+		if(pattern == "") {
 			patternObj = Pattern_API::fromString(json);
 		} else {
 			patternObj = PatternFactory::create(pattern);
@@ -450,19 +443,17 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 		m_ui->patternLayout->addWidget(patternUi);
 		patternUi->setVisible(true);
 
-		connect(patternUi, &PatternUI::patternParamsChanged,
-			this, &PatternGenerator::regenerate);
-		connect(patternUi, &PatternUI::patternParamsChanged,
-			this, &PatternGenerator::generateBuffer);
+		connect(patternUi, &PatternUI::patternParamsChanged, this, &PatternGenerator::regenerate);
+		connect(patternUi, &PatternUI::patternParamsChanged, this, &PatternGenerator::generateBuffer);
 
 		bool didSet = false;
-		for (auto &ep : m_enabledPatterns) {
-			if (ep.first.contains(selected)) {
+		for(auto &ep : m_enabledPatterns) {
+			if(ep.first.contains(selected)) {
 				m_ui->patternLayout->removeWidget(ep.second);
 
 				removeAnnotationCurveOfPattern(ep.second);
 
-				if (patternUi->getDecoder()) {
+				if(patternUi->getDecoder()) {
 					qDebug() << "This pattern has a decoder!";
 
 					AnnotationCurve *curve = new AnnotationCurve(patternUi->getDecoder());
@@ -473,16 +464,19 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 
 					// use direct connection we want the processing
 					// of the available data to be done in the capture thread
-					QMetaObject::Connection connectionHandle = connect(this, &PatternGenerator::dataAvailable,
-						this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
-						curve->dataAvailable(from, to, buffer);
-					}, Qt::DirectConnection);
+					QMetaObject::Connection connectionHandle = connect(
+						this, &PatternGenerator::dataAvailable, this,
+						[=](uint64_t from, uint64_t to, uint16_t *buffer) {
+							curve->dataAvailable(from, to, buffer);
+						},
+						Qt::DirectConnection);
 
 					m_plotCurves.push_back(curve);
 
 					m_plot.addToGroup(selected, m_plotCurves.size() - 1);
-		//			m_plot.setOffsetHandleVisible(m_plotCurves.size() - 1, false);
-					m_annotationCurvePatternUiMap[patternUi] = { curve, connectionHandle };
+					//			m_plot.setOffsetHandleVisible(m_plotCurves.size() - 1,
+					// false);
+					m_annotationCurvePatternUiMap[patternUi] = {curve, connectionHandle};
 
 					m_plot.setChannelSelectable(m_plotCurves.size() - 1, false);
 				}
@@ -503,17 +497,17 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 			}
 		}
 
-		if (!didSet) {
+		if(!didSet) {
 			// we have a new <group, pattern> configuration
 			QVector<int> group = m_plot.getGroupOfChannel(selected);
-			if (group.empty()) {
+			if(group.empty()) {
 				m_enabledPatterns.push_back({{selected}, patternUi});
 
 			} else {
 				m_enabledPatterns.push_back({group, patternUi});
 			}
 
-			if (patternUi->getDecoder()) {
+			if(patternUi->getDecoder()) {
 				qDebug() << "This pattern has a decoder!";
 
 				AnnotationCurve *curve = new AnnotationCurve(patternUi->getDecoder());
@@ -524,16 +518,18 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 
 				// use direct connection we want the processing
 				// of the available data to be done in the capture thread
-				QMetaObject::Connection connectionHandle = connect(this, &PatternGenerator::dataAvailable,
-					this, [=](uint64_t from, uint64_t to, uint16_t *buffer){
-					curve->dataAvailable(from, to, buffer);
-				}, Qt::DirectConnection);
+				QMetaObject::Connection connectionHandle = connect(
+					this, &PatternGenerator::dataAvailable, this,
+					[=](uint64_t from, uint64_t to, uint16_t *buffer) {
+						curve->dataAvailable(from, to, buffer);
+					},
+					Qt::DirectConnection);
 
 				m_plotCurves.push_back(curve);
 
 				m_plot.addToGroup(selected, m_plotCurves.size() - 1);
-	//			m_plot.setOffsetHandleVisible(m_plotCurves.size() - 1, false);
-				m_annotationCurvePatternUiMap[patternUi] = { curve, connectionHandle };
+				//			m_plot.setOffsetHandleVisible(m_plotCurves.size() - 1, false);
+				m_annotationCurvePatternUiMap[patternUi] = {curve, connectionHandle};
 
 				m_plot.setChannelSelectable(m_plotCurves.size() - 1, false);
 			}
@@ -544,13 +540,13 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 		}
 	} else {
 		int remove = -1;
-		for (int i = 0; i < m_enabledPatterns.size(); ++i) {
-			if (m_enabledPatterns[i].first.contains(selected)) {
+		for(int i = 0; i < m_enabledPatterns.size(); ++i) {
+			if(m_enabledPatterns[i].first.contains(selected)) {
 				remove = i;
 				break;
 			}
 		}
-		if (remove != -1) {
+		if(remove != -1) {
 
 			// TODO: remove annotation curve if it has one!!!
 
@@ -569,7 +565,7 @@ void PatternGenerator::patternSelected(const QString &pattern, int ch, const QSt
 
 void PatternGenerator::on_btnOutputMode_toggled(bool checked)
 {
-	if (m_selectedChannel >= DIGITAL_NR_CHANNELS) {
+	if(m_selectedChannel >= DIGITAL_NR_CHANNELS) {
 		return;
 	}
 
@@ -580,17 +576,17 @@ void PatternGenerator::on_btnOutputMode_toggled(bool checked)
 uint64_t PatternGenerator::computeSampleRate() const
 {
 	uint64_t sr = 1;
-	for (const QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
+	for(const QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
 		const uint64_t patternSamplingFrequency = pattern.second->get_pattern()->get_min_sampling_freq();
 
-		if (!patternSamplingFrequency) {
+		if(!patternSamplingFrequency) {
 			continue;
 		}
 
 		sr = detail::lcm(patternSamplingFrequency, sr);
 	}
 
-	if (!sr || sr > MAX_SAMPLE_RATE) {
+	if(!sr || sr > MAX_SAMPLE_RATE) {
 		sr = MAX_SAMPLE_RATE;
 	} else {
 		sr = MAX_SAMPLE_RATE / (MAX_SAMPLE_RATE / sr);
@@ -604,36 +600,36 @@ uint64_t PatternGenerator::computeBufferSize(uint64_t sampleRate) const
 	const uint64_t divconst = 50000000 / 256;
 	uint64_t size = sampleRate / divconst;
 	uint64_t minSize = 4;
-	if (size < minSize) {
+	if(size < minSize) {
 		size = minSize;
 	}
 
 	uint64_t bufferSize = detail::lcm(size, 4);
 	uint64_t maxNonPeriodic = size;
 
-	for (const QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
-		const uint64_t patternBufferSize = pattern.second->get_pattern()
-				->get_required_nr_of_samples(sampleRate, pattern.first.size());
+	for(const QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
+		const uint64_t patternBufferSize =
+			pattern.second->get_pattern()->get_required_nr_of_samples(sampleRate, pattern.first.size());
 
 		qDebug() << patternBufferSize;
 
-		if (!patternBufferSize) {
+		if(!patternBufferSize) {
 			continue;
 		}
 
-		if (pattern.second->get_pattern()->is_periodic()) {
+		if(pattern.second->get_pattern()->is_periodic()) {
 			bufferSize = detail::lcm(patternBufferSize, bufferSize);
 		} else {
-			if (maxNonPeriodic < patternBufferSize) {
+			if(maxNonPeriodic < patternBufferSize) {
 				maxNonPeriodic = patternBufferSize;
 			}
 		}
 	}
 
-	if (maxNonPeriodic > bufferSize) {
+	if(maxNonPeriodic > bufferSize) {
 		uint64_t result = 1;
 
-		for (int i = 1; result < MAX_BUFFER_SIZE && maxNonPeriodic > result; ++i) {
+		for(int i = 1; result < MAX_BUFFER_SIZE && maxNonPeriodic > result; ++i) {
 			result = bufferSize * i;
 		}
 
@@ -645,23 +641,22 @@ uint64_t PatternGenerator::computeBufferSize(uint64_t sampleRate) const
 
 uint16_t PatternGenerator::remapBuffer(uint8_t *mapping, uint32_t val)
 {
-	short ret=0;
-	int i=0;
+	short ret = 0;
+	int i = 0;
 
-	while (val) {
-		if (val&0x01) {
-			ret = ret | (1<<mapping[i]);
+	while(val) {
+		if(val & 0x01) {
+			ret = ret | (1 << mapping[i]);
 		}
 
 		i++;
-		val>>=1;
+		val >>= 1;
 	}
 
 	return ret;
 }
 
-void PatternGenerator::commitBuffer(const QPair<QVector<int>, PatternUI *> &pattern,
-				    uint16_t *buffer,
+void PatternGenerator::commitBuffer(const QPair<QVector<int>, PatternUI *> &pattern, uint16_t *buffer,
 				    uint32_t bufferSize)
 {
 	uint8_t channelMapping[16];
@@ -671,12 +666,12 @@ void PatternGenerator::commitBuffer(const QPair<QVector<int>, PatternUI *> &patt
 	uint16_t chgMask = 0;
 
 	auto bufferChannelMask = (1 << pattern.first.size()) - 1;
-	for (int i = 0; i < pattern.first.size(); ++i) {
+	for(int i = 0; i < pattern.first.size(); ++i) {
 		channelMapping[i] = pattern.first[i];
 		chgMask = chgMask | (1 << pattern.first[i]);
 	}
 
-	for (size_t i = 0; i < bufferSize; ++i) {
+	for(size_t i = 0; i < bufferSize; ++i) {
 		auto val = (bufferPtr[i] & bufferChannelMask);
 		buffer[i] = (buffer[i] & ~(chgMask)) | remapBuffer(channelMapping, val);
 	}
@@ -685,9 +680,9 @@ void PatternGenerator::commitBuffer(const QPair<QVector<int>, PatternUI *> &patt
 void PatternGenerator::checkEnabledChannels()
 {
 	bool foundOneEnabled = false;
-	for (int i = 0; i < m_plotCurves.size(); ++i) {
+	for(int i = 0; i < m_plotCurves.size(); ++i) {
 		const bool enabled = !!m_plotCurves[i]->plot();
-		if (enabled) {
+		if(enabled) {
 			foundOneEnabled = true;
 			break;
 		}
@@ -699,7 +694,7 @@ void PatternGenerator::checkEnabledChannels()
 
 void PatternGenerator::regenerate()
 {
-	if (m_running) {
+	if(m_running) {
 		startStop(false);
 		startStop(true);
 	}
@@ -708,9 +703,9 @@ void PatternGenerator::regenerate()
 void PatternGenerator::startStop(bool start)
 {
 	qDebug() << "Started status: " << start;
-	if (start) {
+	if(start) {
 
-		if (m_singleTimer->isActive()) {
+		if(m_singleTimer->isActive()) {
 			m_singleTimer->stop();
 			startStop(false);
 		}
@@ -722,10 +717,10 @@ void PatternGenerator::startStop(bool start)
 		m_plot.replot();
 
 		uint16_t lockMask = 0;
-		for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+		for(int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 			bool enabled = !!m_plotCurves[i]->plot();
 			lockMask = lockMask | enabled << i;
-			if (enabled) {
+			if(enabled) {
 				m_m2kDigital->setDirection(i, DIO_OUTPUT);
 			}
 			m_m2kDigital->enableChannel(i, enabled);
@@ -741,11 +736,12 @@ void PatternGenerator::startStop(bool start)
 			m_m2kDigital->push(m_buffer, m_bufferSize);
 
 			// timeout = buffer duration for the given samplerate + 200 milliseconds usb transfer (push)
-			const double timeout = 0.2 + static_cast<double>(m_bufferSize) / static_cast<double>(m_sampleRate);
+			const double timeout =
+				0.2 + static_cast<double>(m_bufferSize) / static_cast<double>(m_sampleRate);
 			// * 1000.0 (timeout is in seconds, start expects milliseconds)
 			m_singleTimer->start(timeout * 1000.0);
 
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
@@ -757,13 +753,13 @@ void PatternGenerator::startStop(bool start)
 			m_m2kDigital->cancelBufferOut();
 			m_m2kDigital->stopBufferOut();
 
-			for (int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
+			for(int i = 0; i < DIGITAL_NR_CHANNELS; ++i) {
 				bool enabled = !!m_plotCurves[i]->plot();
-				if (enabled) {
+				if(enabled) {
 					m_m2kDigital->enableChannel(i, false);
 				}
 			}
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e);
 			qDebug() << e.what();
 		}
@@ -788,18 +784,17 @@ void PatternGenerator::generateBuffer()
 
 	m_plot.setSampleRatelabelValue(m_sampleRate);
 	m_plot.setBufferSizeLabelValue(m_bufferSize);
-	m_plot.setTimeBaseLabelValue(static_cast<double>(m_bufferSize) /
-				     static_cast<double>(m_sampleRate) /
+	m_plot.setTimeBaseLabelValue(static_cast<double>(m_bufferSize) / static_cast<double>(m_sampleRate) /
 				     m_plot.xAxisNumDiv());
 
-	if (m_buffer) {
+	if(m_buffer) {
 		delete[] m_buffer;
 	}
 
 	m_buffer = new uint16_t[bufferSize];
 	memset(m_buffer, 0x0000, bufferSize * sizeof(uint16_t));
 
-	for (int i = 0; i < m_plotCurves.size(); ++i) {
+	for(int i = 0; i < m_plotCurves.size(); ++i) {
 		QwtPlotCurve *curve = m_plot.getDigitalPlotCurve(i);
 		GenericLogicPlotCurve *logic_curve = dynamic_cast<GenericLogicPlotCurve *>(curve);
 		logic_curve->reset();
@@ -814,7 +809,7 @@ void PatternGenerator::generateBuffer()
 	m_plot.cancelZoom();
 	m_plot.zoomBaseUpdate(true);
 
-	for (QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
+	for(QPair<QVector<int>, PatternUI *> &pattern : m_enabledPatterns) {
 		pattern.second->get_pattern()->generate_pattern(sr, bufferSize, pattern.first.size());
 		commitBuffer(pattern, m_buffer, bufferSize);
 		pattern.second->get_pattern()->delete_buffer();
@@ -822,7 +817,7 @@ void PatternGenerator::generateBuffer()
 		pattern.second->get_pattern()->setNrOfChannels(pattern.first.size());
 	}
 
-	Q_EMIT dataAvailable(0, bufferSize,m_buffer);
+	Q_EMIT dataAvailable(0, bufferSize, m_buffer);
 }
 
 void PatternGenerator::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
@@ -830,9 +825,8 @@ void PatternGenerator::triggerRightMenuToggle(CustomPushButton *btn, bool checke
 	// Queue the action, if right menu animation is in progress. This way
 	// the action will be remembered and performed right after the animation
 	// finishes
-	if (m_ui->rightMenu->animInProgress()) {
-		m_menuButtonActions.enqueue(
-			QPair<CustomPushButton *, bool>(btn, checked));
+	if(m_ui->rightMenu->animInProgress()) {
+		m_menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
@@ -842,8 +836,8 @@ void PatternGenerator::toggleRightMenu(CustomPushButton *btn, bool checked)
 {
 	int id = btn->property("id").toInt();
 
-	if (id != -m_ui->stackedWidget->indexOf(m_ui->generalSettings)){
-		if (!m_menuOrder.contains(btn)){
+	if(id != -m_ui->stackedWidget->indexOf(m_ui->generalSettings)) {
+		if(!m_menuOrder.contains(btn)) {
 			m_menuOrder.push_back(btn);
 		} else {
 			m_menuOrder.removeOne(btn);
@@ -851,7 +845,7 @@ void PatternGenerator::toggleRightMenu(CustomPushButton *btn, bool checked)
 		}
 	}
 
-	if (checked) {
+	if(checked) {
 		settingsPanelUpdate(id);
 	}
 
@@ -860,16 +854,16 @@ void PatternGenerator::toggleRightMenu(CustomPushButton *btn, bool checked)
 
 void PatternGenerator::settingsPanelUpdate(int id)
 {
-	if (id >= 0) {
+	if(id >= 0) {
 		m_ui->stackedWidget->setCurrentIndex(0);
 	} else {
 		m_ui->stackedWidget->setCurrentIndex(-id);
 	}
 
-	for (int i = 0; i < m_ui->stackedWidget->count(); i++) {
+	for(int i = 0; i < m_ui->stackedWidget->count(); i++) {
 		QSizePolicy::Policy policy = QSizePolicy::Ignored;
 
-		if (i == m_ui->stackedWidget->currentIndex()) {
+		if(i == m_ui->stackedWidget->currentIndex()) {
 			policy = QSizePolicy::Expanding;
 		}
 		QWidget *widget = m_ui->stackedWidget->widget(i);
@@ -881,65 +875,53 @@ void PatternGenerator::settingsPanelUpdate(int id)
 void PatternGenerator::connectSignalsAndSlots()
 {
 
-	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
-		disconnect(tme, &ToolMenuEntry::runToggled,
-			m_ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled, [=](bool checked) {
+		disconnect(tme, &ToolMenuEntry::runToggled, m_ui->runSingleWidget, &RunSingleWidget::toggle);
 		tme->setRunning(checked);
-		connect(tme, &ToolMenuEntry::runToggled,
-			m_ui->runSingleWidget, &RunSingleWidget::toggle);
+		connect(tme, &ToolMenuEntry::runToggled, m_ui->runSingleWidget, &RunSingleWidget::toggle);
 		// TODO: play with the trigger state when the pattern generator will support
 		// trigger features, till then do not show any trigger state on the plot
-//		if (!checked) {
-//			m_plot.setTriggerState(CapturePlot::Stop);
-//		}
+		//		if (!checked) {
+		//			m_plot.setTriggerState(CapturePlot::Stop);
+		//		}
 	});
-	connect(tme, &ToolMenuEntry::runToggled,
-		m_ui->runSingleWidget, &RunSingleWidget::toggle);
-	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled,
-		this, &PatternGenerator::startStop);
+	connect(tme, &ToolMenuEntry::runToggled, m_ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(m_ui->runSingleWidget, &RunSingleWidget::toggled, this, &PatternGenerator::startStop);
 
+	connect(m_ui->rightMenu, &MenuHAnim::finished, this, &PatternGenerator::rightMenuFinished);
 
-	connect(m_ui->rightMenu, &MenuHAnim::finished,
-		this, &PatternGenerator::rightMenuFinished);
-
-	connect(&m_plot, &CapturePlot::channelSelected,
-		this, &PatternGenerator::channelSelectedChanged);
-
+	connect(&m_plot, &CapturePlot::channelSelected, this, &PatternGenerator::channelSelectedChanged);
 
 	connect(m_plotScrollBar, &QScrollBar::valueChanged, [=](double value) {
 		m_plot.setAllYAxis(-5 - (value * 0.05), 5 - (value * 0.05));
 		m_plot.replot();
 	});
 
-	connect(m_ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(m_ui->traceHeightLineEdit, &QLineEdit::textChanged, [=](const QString &text) {
 		auto validator = m_ui->traceHeightLineEdit->validator();
 		QString toCheck = text;
 		int pos;
 
-		setDynamicProperty(m_ui->traceHeightLineEdit,
-				   "invalid",
+		setDynamicProperty(m_ui->traceHeightLineEdit, "invalid",
 				   validator->validate(toCheck, pos) == QIntValidator::Intermediate);
 	});
 
-	connect(m_ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=](){
+	connect(m_ui->traceHeightLineEdit, &QLineEdit::editingFinished, [=]() {
 		int value = m_ui->traceHeightLineEdit->text().toInt();
 		m_plotCurves[m_selectedChannel]->setTraceHeight(value);
 		m_plot.replot();
 		m_plot.positionInGroupChanged(m_selectedChannel, 0, 0);
 	});
 
-	connect(m_ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text){
+	connect(m_ui->nameLineEdit, &QLineEdit::textChanged, [=](const QString &text) {
 		m_plot.setChannelName(text, m_selectedChannel);
 		m_plotCurves[m_selectedChannel]->setName(text);
 	});
 
-	connect(m_ui->printBtn, &QPushButton::clicked, [=](){
-		m_plot.printWithNoBackground("Pattern Generator");
-	});
+	connect(m_ui->printBtn, &QPushButton::clicked, [=]() { m_plot.printWithNoBackground("Pattern Generator"); });
 
-	connect(m_singleTimer, &QTimer::timeout, [=](){
-		if (m_ui->runSingleWidget->singleButtonChecked()) {
+	connect(m_singleTimer, &QTimer::timeout, [=]() {
+		if(m_ui->runSingleWidget->singleButtonChecked()) {
 			m_ui->runSingleWidget->toggle(false);
 		}
 	});
@@ -950,8 +932,8 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 	QVector<int> channelsInGroup = m_plot.getGroupOfChannel(m_selectedChannel);
 
 	int channelsInGroupSize = channelsInGroup.size();
-	for (int i = 0; i < channelsInGroup.size(); ++i) {
-		if (channelsInGroup[i] >= DIGITAL_NR_CHANNELS) {
+	for(int i = 0; i < channelsInGroup.size(); ++i) {
+		if(channelsInGroup[i] >= DIGITAL_NR_CHANNELS) {
 			channelsInGroupSize--;
 		}
 	}
@@ -959,17 +941,17 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 	const bool shouldBeVisible = visible & (channelsInGroupSize > 1);
 	m_ui->groupWidget->setVisible(shouldBeVisible);
 
-	if (!shouldBeVisible) {
+	if(!shouldBeVisible) {
 		return;
 	}
 
-	if (channelsInGroup == m_currentGroup) {
+	if(channelsInGroup == m_currentGroup) {
 		return;
 	}
 
 	m_currentGroup = channelsInGroup;
 
-	if (m_currentGroupMenu) {
+	if(m_currentGroupMenu) {
 		m_ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
 		m_currentGroupMenu->deleteLater();
 		m_currentGroupMenu = nullptr;
@@ -978,31 +960,32 @@ void PatternGenerator::updateChannelGroupWidget(bool visible)
 	m_currentGroupMenu = new BaseMenu(m_ui->groupWidget);
 	m_ui->groupWidgetLayout->addWidget(m_currentGroupMenu);
 
-	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=](short from, short to){
+	connect(m_currentGroupMenu, &BaseMenu::itemMovedFromTo, [=](short from, short to) {
 		m_plot.positionInGroupChanged(m_selectedChannel, from, to);
 		channelInGroupChangedPosition(from, to);
 	});
 
-	for (int i = 0; i < channelsInGroup.size(); ++i) {
-		if (channelsInGroup[i] >= DIGITAL_NR_CHANNELS) {
+	for(int i = 0; i < channelsInGroup.size(); ++i) {
+		if(channelsInGroup[i] >= DIGITAL_NR_CHANNELS) {
 			continue;
 		}
 
 		QString name = m_plotCurves[channelsInGroup[i]]->getName();
 		LogicGroupItem *item = new LogicGroupItem(name, m_currentGroupMenu);
-		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged,
-				item, &LogicGroupItem::setName);
-		connect(item, &LogicGroupItem::deleteBtnClicked, [=](){
+		connect(m_plotCurves[channelsInGroup[i]], &GenericLogicPlotCurve::nameChanged, item,
+			&LogicGroupItem::setName);
+		connect(item, &LogicGroupItem::deleteBtnClicked, [=]() {
 			bool groupDeleted = false;
 			m_plot.removeFromGroup(m_selectedChannel, item->position(), groupDeleted);
 
-			qDebug() << "m_selectedChannel: " << m_selectedChannel << " deleted: " << m_currentGroup[item->position()];
-			if (m_selectedChannel == m_currentGroup[item->position()] && !groupDeleted) {
+			qDebug() << "m_selectedChannel: " << m_selectedChannel
+				 << " deleted: " << m_currentGroup[item->position()];
+			if(m_selectedChannel == m_currentGroup[item->position()] && !groupDeleted) {
 				m_ui->groupWidget->setVisible(false);
 			}
 
 			m_currentGroup.removeAt(item->position());
-			if (groupDeleted) {
+			if(groupDeleted) {
 				m_ui->groupWidget->setVisible(false);
 				m_currentGroup.clear();
 				m_ui->groupWidgetLayout->removeWidget(m_currentGroupMenu);
@@ -1024,9 +1007,7 @@ void PatternGenerator::setupPatterns()
 	m_ui->patternComboBox->addItems(PatternFactory::get_ui_list());
 
 	connect(m_ui->patternComboBox, &QComboBox::currentTextChanged,
-		[=](const QString &pattern){
-		patternSelected(pattern);
-	});
+		[=](const QString &pattern) { patternSelected(pattern); });
 }
 
 void PatternGenerator::updateChannelGroupPattern(bool visible)
@@ -1039,8 +1020,8 @@ void PatternGenerator::updateChannelGroupPattern(bool visible)
 	qDebug() << "Enabled patterns: " << m_enabledPatterns;
 	qDebug() << "################################################################";
 
-	for (const auto &ep : qAsConst(m_enabledPatterns)) {
-		if (ep.first.contains(m_selectedChannel)) {
+	for(const auto &ep : qAsConst(m_enabledPatterns)) {
+		if(ep.first.contains(m_selectedChannel)) {
 			pattern = QString::fromStdString(ep.second->get_pattern()->get_name());
 			ep.second->setVisible(visible);
 		} else {
@@ -1060,13 +1041,13 @@ void PatternGenerator::updateChannelGroupPattern(bool visible)
 void PatternGenerator::updateGroupsAndPatterns()
 {
 	QVector<QVector<int>> allGroups = m_plot.getAllGroups();
-	for (int i = 0; i < allGroups.size(); ++i) {
+	for(int i = 0; i < allGroups.size(); ++i) {
 		PatternUI *firstFound = nullptr;
-		for (int c = 0; c < allGroups[i].size(); ++c) {
+		for(int c = 0; c < allGroups[i].size(); ++c) {
 			int currentIndex = 0;
-			while (currentIndex < m_enabledPatterns.size()) {
-				if (m_enabledPatterns[currentIndex].first.contains(allGroups[i][c])) {
-					if (!firstFound) {
+			while(currentIndex < m_enabledPatterns.size()) {
+				if(m_enabledPatterns[currentIndex].first.contains(allGroups[i][c])) {
+					if(!firstFound) {
 						firstFound = m_enabledPatterns[currentIndex].second;
 					}
 					m_enabledPatterns.removeAt(currentIndex);
@@ -1075,7 +1056,7 @@ void PatternGenerator::updateGroupsAndPatterns()
 				}
 			}
 		}
-		if (firstFound) {
+		if(firstFound) {
 			m_enabledPatterns.append({allGroups[i], firstFound});
 			firstFound = nullptr;
 		}
@@ -1084,14 +1065,14 @@ void PatternGenerator::updateGroupsAndPatterns()
 	generateBuffer();
 	regenerate();
 
-//	qDebug() << "#### Update groups and patterns ####";
-//	qDebug() << m_enabledPatterns;
+	//	qDebug() << "#### Update groups and patterns ####";
+	//	qDebug() << m_enabledPatterns;
 }
 
 void PatternGenerator::channelInGroupChangedPosition(int from, int to)
 {
-	for (int i = 0; i < m_enabledPatterns.size(); ++i) {
-		if (m_enabledPatterns[i].first.contains(m_selectedChannel)) {
+	for(int i = 0; i < m_enabledPatterns.size(); ++i) {
+		if(m_enabledPatterns[i].first.contains(m_selectedChannel)) {
 			auto item = m_enabledPatterns[i].first.takeAt(from);
 			m_enabledPatterns[i].first.insert(to, item);
 			break;
@@ -1101,14 +1082,14 @@ void PatternGenerator::channelInGroupChangedPosition(int from, int to)
 	generateBuffer();
 	regenerate();
 
-//	qDebug() << "#### channel in group changed position ####";
-//	qDebug() << m_enabledPatterns;
+	//	qDebug() << "#### channel in group changed position ####";
+	//	qDebug() << m_enabledPatterns;
 }
 
 void PatternGenerator::channelInGroupRemoved(int position)
 {
-	for (int i = 0; i < m_enabledPatterns.size(); ++i) {
-		if (m_enabledPatterns[i].first.contains(m_selectedChannel)) {
+	for(int i = 0; i < m_enabledPatterns.size(); ++i) {
+		if(m_enabledPatterns[i].first.contains(m_selectedChannel)) {
 			m_enabledPatterns[i].first.removeAt(position);
 			break;
 		}
@@ -1123,7 +1104,6 @@ void PatternGenerator::channelInGroupRemoved(int position)
 
 void PatternGenerator::loadTriggerMenu()
 {
-//	auto trigger = m_m2kDigital->getOutTrigger();
+	//	auto trigger = m_m2kDigital->getOutTrigger();
 	// TODO: currently not available on libm2k master branch
 }
-

@@ -29,10 +29,10 @@
 //#define QDEBUG_CATEGORY
 //#define QDEBUG_FUNCTION
 
-
 #define QDEBUG_LOG_TIME_STR "%{time h:mm:ss.zzz}"
 #define QDEBUG_LOG_DATE_STR "%{time yyyyMMdd }"
-#define QDEBUG_LOG_MSG_TYPE_STR "%{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}"
+#define QDEBUG_LOG_MSG_TYPE_STR                                                                                        \
+	"%{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}"
 #define QDEBUG_LOG_FILE_PREFIX_STR "file://"
 #define QDEBUG_LOG_FILE_NAME_STR "%{file}:"
 #define QDEBUG_LOG_LINE_NR_STR "%{line}"
@@ -42,7 +42,6 @@
 #define QDEBUG_THREAD_STR "%{threadid}"
 #define QDEBUG_PID_STR "%{pid}"
 #define QDEBUG_APP_STR "%{appname}"
-
 
 #ifndef QT_NO_DEBUG_OUTPUT
 Q_DECLARE_LOGGING_CATEGORY(CAT_IIO_OPERATION)

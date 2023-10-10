@@ -22,10 +22,11 @@
 #define BASEMENUITEM_H
 
 #include "scopy-gui_export.h"
-#include <QFrame>
-#include <QMouseEvent>
+
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QFrame>
+#include <QMouseEvent>
 
 namespace Ui {
 class BaseMenuItem;
@@ -76,7 +77,6 @@ protected:
 	void leaveEvent(QEvent *event);
 
 protected:
-
 	void _enableBotSeparator(bool enable);
 	void _enableTopSeparator(bool enable);
 
@@ -95,6 +95,6 @@ private:
 	bool d_allowDrag;
 	bool d_draggable;
 };
-}
+} // namespace scopy
 
 #endif // BASEMENUITEM_H

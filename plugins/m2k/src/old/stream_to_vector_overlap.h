@@ -49,7 +49,7 @@ namespace scopy {
 class stream_to_vector_overlap : virtual public gr::sync_decimator
 {
 public:
-    typedef std::shared_ptr<stream_to_vector_overlap> sptr;
+	typedef std::shared_ptr<stream_to_vector_overlap> sptr;
 	static sptr make(size_t itemsize, size_t nitems_per_block, double overlap_factor);
 	virtual void set_overlap_factor(double) = 0;
 };

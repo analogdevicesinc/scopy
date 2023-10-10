@@ -19,39 +19,34 @@
  */
 #include "cancel_dc_offset_block.h"
 
+#include <gnuradio/blocks/copy.h>
+#include <gnuradio/blocks/keep_one_in_n.h>
 #include <gnuradio/blocks/moving_average.h>
 #include <gnuradio/blocks/repeat.h>
 #include <gnuradio/blocks/sub.h>
-#include <gnuradio/blocks/copy.h>
-#include <gnuradio/blocks/keep_one_in_n.h>
 
 using namespace scopy::m2k;
 using namespace gr;
 
-cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled):
-	hier_block2("DCOFFSET",
-		    io_signature::make(1, 1, sizeof(float)),
-		    io_signature::make(1, 1, sizeof(float))),
-	QObject(),
-	d_enabled(enabled),
-	d_buffer_size(buffer_size),
-	d_dc_offset(0.0),
-	d_signal(std::make_shared<signal_sample>())
+cancel_dc_offset_block::cancel_dc_offset_block(size_t buffer_size, bool enabled)
+	: hier_block2("DCOFFSET", io_signature::make(1, 1, sizeof(float)), io_signature::make(1, 1, sizeof(float)))
+	, QObject()
+	, d_enabled(enabled)
+	, d_buffer_size(buffer_size)
+	, d_dc_offset(0.0)
+	, d_signal(std::make_shared<signal_sample>())
 {
 	_build_and_connect_blocks();
 
-	QObject::connect(&*d_signal, &signal_sample::triggered, [=](std::vector<float> samples){
-		d_dc_offset = samples[0];
-	});
+	QObject::connect(&*d_signal, &signal_sample::triggered,
+			 [=](std::vector<float> samples) { d_dc_offset = samples[0]; });
 }
 
-cancel_dc_offset_block::~cancel_dc_offset_block()
-{
-}
+cancel_dc_offset_block::~cancel_dc_offset_block() {}
 
 void cancel_dc_offset_block::set_enabled(bool enabled)
 {
-	if (d_enabled != enabled) {
+	if(d_enabled != enabled) {
 		d_enabled = enabled;
 		_build_and_connect_blocks();
 	}
@@ -59,23 +54,20 @@ void cancel_dc_offset_block::set_enabled(bool enabled)
 
 void cancel_dc_offset_block::set_buffer_size(size_t buffer_size)
 {
-	if (d_buffer_size != buffer_size) {
+	if(d_buffer_size != buffer_size) {
 		d_buffer_size = buffer_size;
 		_build_and_connect_blocks();
 	}
 }
 
-float cancel_dc_offset_block::get_dc_offset() const
-{
-	return d_dc_offset;
-}
+float cancel_dc_offset_block::get_dc_offset() const { return d_dc_offset; }
 
 void cancel_dc_offset_block::_build_and_connect_blocks()
 {
 	// Remove all connections
 	hier_block2::disconnect_all();
 
-	if (d_enabled) {
+	if(d_enabled) {
 		if(d_buffer_size == 0)
 			d_buffer_size = 1;
 		auto avg = gr::blocks::moving_average_ff::make(d_buffer_size, 1.0 / d_buffer_size, d_buffer_size);

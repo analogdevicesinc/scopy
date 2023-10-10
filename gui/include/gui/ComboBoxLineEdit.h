@@ -36,6 +36,6 @@ protected Q_SLOTS:
 	void enterEvent(QEvent *event);
 	void leaveEvent(QEvent *event);
 };
-}
+} // namespace scopy
 
 #endif // ComboBoxLineEdit_H

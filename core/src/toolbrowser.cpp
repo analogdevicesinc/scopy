@@ -1,47 +1,48 @@
 #include "toolbrowser.h"
+
 #include "ui_toolbrowser.h"
+
 #include <QDebug>
+
 #include <gui/utils.h>
 
 using namespace scopy;
 
-ToolBrowser::ToolBrowser(QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::ToolBrowser),
-	m_collapsed(false)
+ToolBrowser::ToolBrowser(QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::ToolBrowser)
+	, m_collapsed(false)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
-    ToolMenu *tm = ui->wToolMenu;   
+	ToolMenu *tm = ui->wToolMenu;
 
-    tm->getButtonGroup()->addButton(ui->btnPreferences);
-    tm->getButtonGroup()->addButton(ui->btnAbout);
+	tm->getButtonGroup()->addButton(ui->btnPreferences);
+	tm->getButtonGroup()->addButton(ui->btnAbout);
 
-	ToolMenuItem* homeTmi = tm->createTool("home","Home",":/gui/icons/scopy-default/icons/tool_home.svg");
-	homeTmi->setSeparator(true,true);
+	ToolMenuItem *homeTmi = tm->createTool("home", "Home", ":/gui/icons/scopy-default/icons/tool_home.svg");
+	homeTmi->setSeparator(true, true);
 	homeTmi->getToolRunBtn()->setVisible(false);
 	homeTmi->setEnabled(true);
 	ui->homePlaceholder->layout()->addWidget(homeTmi);
 	Util::retainWidgetSizeWhenHidden(ui->logo);
 	homeTmi->setDraggable(false);
 
-
 	connect(ui->btnCollapse, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
 	connect(ui->btnCollapseMini, &QPushButton::clicked, this, &ToolBrowser::toggleCollapse);
-    connect(ui->btnPreferences,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("preferences");});
-    connect(ui->btnAbout,&QPushButton::clicked,this,[=](){Q_EMIT requestTool("about");});
+	connect(ui->btnPreferences, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("preferences"); });
+	connect(ui->btnAbout, &QPushButton::clicked, this, [=]() { Q_EMIT requestTool("about"); });
 
-    connect(ui->btnSave,&QPushButton::clicked,this,[=](){Q_EMIT requestSave();});
-    connect(ui->btnLoad,&QPushButton::clicked,this,[=](){Q_EMIT requestLoad();});
+	connect(ui->btnSave, &QPushButton::clicked, this, [=]() { Q_EMIT requestSave(); });
+	connect(ui->btnLoad, &QPushButton::clicked, this, [=]() { Q_EMIT requestLoad(); });
 
-    connect(tm,SIGNAL(requestToolSelect(QString)),this,SIGNAL(requestTool(QString)));
+	connect(tm, SIGNAL(requestToolSelect(QString)), this, SIGNAL(requestTool(QString)));
 }
 
-ToolMenu* ToolBrowser::getToolMenu() {
-	return ui->wToolMenu;
-}
+ToolMenu *ToolBrowser::getToolMenu() { return ui->wToolMenu; }
 
-void ToolBrowser::hideMenuText(bool collapsed) {
+void ToolBrowser::hideMenuText(bool collapsed)
+{
 	ToolMenu *tm = ui->wToolMenu;
 
 	if(collapsed) {
@@ -70,13 +71,10 @@ void ToolBrowser::toggleCollapse()
 	Q_EMIT collapsed(m_collapsed);
 }
 
-ToolBrowser::~ToolBrowser()
-{
-    delete ui;
-}
+ToolBrowser::~ToolBrowser() { delete ui; }
 
-//TEST
-/*         
+// TEST
+/*
  ts->detachTool("home");
  tm->addTool("home1","Home12","");
  tm->addTool("home2","Home2","");
@@ -89,6 +87,5 @@ ToolBrowser::~ToolBrowser()
  ts->addTool("home2", new QLabel("home2"));
  ts->addTool("home3", new QLabel("home3"));
 */
-
 
 #include "moc_toolbrowser.cpp"

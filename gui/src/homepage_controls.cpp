@@ -19,13 +19,14 @@
  */
 
 #include "homepage_controls.h"
+
 #include <QDebug>
 
 using namespace scopy;
 
-HomepageControls::HomepageControls(QWidget *parent) :
-	HoverWidget(),
-	controls(new PageNavigationWidget(false, false, this))
+HomepageControls::HomepageControls(QWidget *parent)
+	: HoverWidget()
+	, controls(new PageNavigationWidget(false, false, this))
 {
 	setContent(controls);
 	setAnchor(parent);
@@ -37,32 +38,17 @@ HomepageControls::HomepageControls(QWidget *parent) :
 	connectSignals();
 }
 
-HomepageControls::~HomepageControls()
-{
-
-}
+HomepageControls::~HomepageControls() {}
 
 void HomepageControls::connectSignals()
 {
-	connect(controls->getBackwardBtn(), &QPushButton::clicked, this, [=](){
-		Q_EMIT goLeft();
-	});
-	connect(controls->getForwardBtn(), &QPushButton::clicked, this, [=](){
-		Q_EMIT goRight();
-	});
-	connect(controls->getOpenBtn(), &QPushButton::clicked, this, [=](){
-		Q_EMIT openFile();
-	});
+	connect(controls->getBackwardBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT goLeft(); });
+	connect(controls->getForwardBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT goRight(); });
+	connect(controls->getOpenBtn(), &QPushButton::clicked, this, [=]() { Q_EMIT openFile(); });
 }
 
-void HomepageControls::enableLeft(bool en)
-{
-	controls->getBackwardBtn()->setEnabled(en);
-}
+void HomepageControls::enableLeft(bool en) { controls->getBackwardBtn()->setEnabled(en); }
 
-void HomepageControls::enableRight(bool en)
-{
-	controls->getForwardBtn()->setEnabled(en);
-}
+void HomepageControls::enableRight(bool en) { controls->getForwardBtn()->setEnabled(en); }
 
 #include "moc_homepage_controls.cpp"

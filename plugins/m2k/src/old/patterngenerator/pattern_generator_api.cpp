@@ -18,11 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #include "pattern_generator_api.h"
-#include "ui_pattern_generator.h"
 
 #include "patterns/patterns.hpp"
+
+#include "ui_pattern_generator.h"
 
 #include <QCheckBox>
 
@@ -31,15 +31,14 @@ using namespace scopy::m2k;
 using namespace scopy::logic;
 using namespace scopy::m2k::logic;
 
-
 QList<int> PatternGenerator_API::getEnabledChannels() const
 {
 	QList<int> enabledChannels;
-	for (int i = 0; i < 16; ++i) {
-		QWidget *widgetInLayout = m_pattern->m_ui->channelEnumeratorLayout->itemAtPosition(i % 8,
-							    i / 8)->widget();
+	for(int i = 0; i < 16; ++i) {
+		QWidget *widgetInLayout =
+			m_pattern->m_ui->channelEnumeratorLayout->itemAtPosition(i % 8, i / 8)->widget();
 		auto channelBox = dynamic_cast<QCheckBox *>(widgetInLayout);
-		if (channelBox->isChecked()) {
+		if(channelBox->isChecked()) {
 			enabledChannels.push_back(i);
 		}
 	}
@@ -48,9 +47,9 @@ QList<int> PatternGenerator_API::getEnabledChannels() const
 
 void PatternGenerator_API::setEnabledChannels(const QList<int> &enabledChannels)
 {
-	for (const auto &channel : enabledChannels) {
-		QWidget *widgetInLayout = m_pattern->m_ui->channelEnumeratorLayout->itemAtPosition(channel % 8,
-							    channel / 8)->widget();
+	for(const auto &channel : enabledChannels) {
+		QWidget *widgetInLayout =
+			m_pattern->m_ui->channelEnumeratorLayout->itemAtPosition(channel % 8, channel / 8)->widget();
 		auto channelBox = dynamic_cast<QCheckBox *>(widgetInLayout);
 		channelBox->setChecked(true);
 	}
@@ -59,7 +58,7 @@ void PatternGenerator_API::setEnabledChannels(const QList<int> &enabledChannels)
 QStringList PatternGenerator_API::getChannelNames() const
 {
 	QStringList names;
-	for (int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
+	for(int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
 		names.push_back(m_pattern->m_plotCurves[i]->getName());
 	}
 	return names;
@@ -67,8 +66,10 @@ QStringList PatternGenerator_API::getChannelNames() const
 
 void PatternGenerator_API::setChannelNames(const QStringList &channelNames)
 {
-	for (int i = 0; i < channelNames.size(); ++i) {
-		if (i >= m_pattern->m_plotCurves.size()) { break; }
+	for(int i = 0; i < channelNames.size(); ++i) {
+		if(i >= m_pattern->m_plotCurves.size()) {
+			break;
+		}
 		m_pattern->m_plotCurves[i]->setName(channelNames[i]);
 	}
 }
@@ -76,7 +77,7 @@ void PatternGenerator_API::setChannelNames(const QStringList &channelNames)
 QList<double> PatternGenerator_API::getChannelHeights() const
 {
 	QList<double> heights;
-	for (int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
+	for(int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
 		heights.push_back(m_pattern->m_plotCurves[i]->getTraceHeight());
 	}
 	return heights;
@@ -84,8 +85,10 @@ QList<double> PatternGenerator_API::getChannelHeights() const
 
 void PatternGenerator_API::setChannelHeights(const QList<double> &channelHeights)
 {
-	for (int i = 0; i < channelHeights.size(); ++i) {
-		if (i >= m_pattern->m_plotCurves.size()) { break; }
+	for(int i = 0; i < channelHeights.size(); ++i) {
+		if(i >= m_pattern->m_plotCurves.size()) {
+			break;
+		}
 		m_pattern->m_plotCurves[i]->setTraceHeight(channelHeights[i]);
 	}
 }
@@ -93,7 +96,7 @@ void PatternGenerator_API::setChannelHeights(const QList<double> &channelHeights
 QList<double> PatternGenerator_API::getChannelPosition() const
 {
 	QList<double> channelPosition;
-	for (int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
+	for(int i = 0; i < m_pattern->m_plotCurves.size(); ++i) {
 		channelPosition.push_back(m_pattern->m_plotCurves[i]->getPixelOffset());
 	}
 	return channelPosition;
@@ -101,18 +104,20 @@ QList<double> PatternGenerator_API::getChannelPosition() const
 
 void PatternGenerator_API::setChannelPosition(const QList<double> &channelPosition)
 {
-	for (int i = 0; i < channelPosition.size(); ++i) {
-		if (i >= m_pattern->m_plotCurves.size()) { break; }
+	for(int i = 0; i < channelPosition.size(); ++i) {
+		if(i >= m_pattern->m_plotCurves.size()) {
+			break;
+		}
 		m_pattern->m_plotCurves[i]->setPixelOffset(channelPosition[i]);
 	}
 }
 
-QVector<QVector<int> > PatternGenerator_API::getCurrentGroups() const
+QVector<QVector<int>> PatternGenerator_API::getCurrentGroups() const
 {
-	QVector<QVector<int> > groups = m_pattern->m_plot.getAllGroups();
-	for (auto &group : groups) {
-		for (auto &ch : group) {
-			if (ch >= 16) {
+	QVector<QVector<int>> groups = m_pattern->m_plot.getAllGroups();
+	for(auto &group : groups) {
+		for(auto &ch : group) {
+			if(ch >= 16) {
 				group.removeOne(ch);
 			}
 		}
@@ -120,35 +125,27 @@ QVector<QVector<int> > PatternGenerator_API::getCurrentGroups() const
 	return groups;
 }
 
-void PatternGenerator_API::setCurrentGroups(const QVector<QVector<int> > &groups)
+void PatternGenerator_API::setCurrentGroups(const QVector<QVector<int>> &groups)
 {
 	m_pattern->m_plot.setGroups(groups);
 }
 
-QVector<QPair<QVector<int>, QString> > PatternGenerator_API::getEnabledPatterns() const
+QVector<QPair<QVector<int>, QString>> PatternGenerator_API::getEnabledPatterns() const
 {
-	QVector<QPair<QVector<int>, QString> > enabledPatterns;
-	for (const QPair<QVector<int>, PatternUI *> &pattern : qAsConst(m_pattern->m_enabledPatterns)) {
-		enabledPatterns.push_back({pattern.first,
-					Pattern_API::toString(pattern.second->get_pattern())});
+	QVector<QPair<QVector<int>, QString>> enabledPatterns;
+	for(const QPair<QVector<int>, PatternUI *> &pattern : qAsConst(m_pattern->m_enabledPatterns)) {
+		enabledPatterns.push_back({pattern.first, Pattern_API::toString(pattern.second->get_pattern())});
 	}
 
 	return enabledPatterns;
 }
 
-void PatternGenerator_API::setEnabledPatterns(const QVector<QPair<QVector<int>, QString> > &enabledPatterns)
+void PatternGenerator_API::setEnabledPatterns(const QVector<QPair<QVector<int>, QString>> &enabledPatterns)
 {
-	for (const QPair<QVector<int>, QString> &pattern : enabledPatterns) {
+	for(const QPair<QVector<int>, QString> &pattern : enabledPatterns) {
 		m_pattern->patternSelected("", pattern.first.first(), pattern.second);
 	}
 }
 
-QString PatternGenerator_API::getNotes()
-{
-	return m_pattern->m_ui->instrumentNotes->getNotes();
-}
-void PatternGenerator_API::setNotes(QString str)
-{
-	m_pattern->m_ui->instrumentNotes->setNotes(str);
-}
-
+QString PatternGenerator_API::getNotes() { return m_pattern->m_ui->instrumentNotes->getNotes(); }
+void PatternGenerator_API::setNotes(QString str) { m_pattern->m_ui->instrumentNotes->setNotes(str); }

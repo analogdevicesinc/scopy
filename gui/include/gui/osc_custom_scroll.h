@@ -20,11 +20,12 @@
 #ifndef OSCCUSTOMSCROLL_H
 #define OSCCUSTOMSCROLL_H
 
-#include <QScrollArea>
-#include <QEvent>
-#include <QTimer>
-#include <QScroller>
 #include "scopy-gui_export.h"
+
+#include <QEvent>
+#include <QScrollArea>
+#include <QScroller>
+#include <QTimer>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT OscCustomScrollArea : public QScrollArea
@@ -41,9 +42,9 @@ public Q_SLOTS:
 private:
 	QScroller *scroll;
 	bool inside;
-	//QScrollBar *bar;
+	// QScrollBar *bar;
 	bool disableCursor;
 };
-}
+} // namespace scopy
 
 #endif // OSCCUSTOMSCROLL_H

@@ -1,31 +1,31 @@
 #include "griiofloatchannelsrc.h"
-#include "grlog.h"
-#include "gnuradio/blocks/int_to_float.h"
-#include "gnuradio/blocks/short_to_float.h"
-#include "gnuradio/blocks/copy.h"
 
 #include "gnuradio/blocks/char_to_float.h"
-
+#include "gnuradio/blocks/copy.h"
+#include "gnuradio/blocks/int_to_float.h"
+#include "gnuradio/blocks/short_to_float.h"
+#include "grlog.h"
 
 using namespace scopy::grutil;
-GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent) :
-	GRIIOChannel(channelName, dev, parent)
+GRIIOFloatChannelSrc::GRIIOFloatChannelSrc(GRIIODeviceSource *dev, QString channelName, QObject *parent)
+	: GRIIOChannel(channelName, dev, parent)
 {
 	m_iioCh = iio_device_find_channel(dev->iioDev(), channelName.toStdString().c_str(), false);
-	fmt =  iio_channel_get_data_format(m_iioCh);
+	fmt = iio_channel_get_data_format(m_iioCh);
 
-	m_sampleRateAttribute = findAttribute( {
-					       "sample_rate",
-					       "sampling_rate",
-					       "sample_frequency",
-					       "sampling_frequency",
-					       }, m_iioCh);
-
+	m_sampleRateAttribute = findAttribute(
+		{
+			"sample_rate",
+			"sampling_rate",
+			"sample_frequency",
+			"sampling_frequency",
+		},
+		m_iioCh);
 }
 
 void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
 {
-	qDebug(SCOPY_GR_UTIL)<<"Building GRIIOFloatChannelSrc";
+	qDebug(SCOPY_GR_UTIL) << "Building GRIIOFloatChannelSrc";
 	dev->addChannel(this);
 	switch(fmt->length) {
 	case 16:
@@ -34,9 +34,9 @@ void GRIIOFloatChannelSrc::build_blks(GRTopBlock *top)
 	case 32:
 		x2f = gr::blocks::int_to_float::make();
 		break;
-	default:		
-		qInfo(SCOPY_GR_UTIL)<<"creating copy block of size " << fmt->length/8;
-		x2f = gr::blocks::copy::make(fmt->length/8);
+	default:
+		qInfo(SCOPY_GR_UTIL) << "creating copy block of size " << fmt->length / 8;
+		x2f = gr::blocks::copy::make(fmt->length / 8);
 		break;
 	}
 	end_blk = x2f;
@@ -76,7 +76,4 @@ double GRIIOFloatChannelSrc::readSampleRate()
 	}
 }
 
-const iio_data_format *GRIIOFloatChannelSrc::getFmt() const
-{
-	return fmt;
-}
+const iio_data_format *GRIIOFloatChannelSrc::getFmt() const { return fmt; }

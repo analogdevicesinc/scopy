@@ -22,15 +22,15 @@
 
 using namespace scopy;
 
-ImportSettings::ImportSettings(QWidget *parent) :
-        ExportSettings(parent)
+ImportSettings::ImportSettings(QWidget *parent)
+	: ExportSettings(parent)
 {
-        getExportButton()->setVisible(false);
+	getExportButton()->setVisible(false);
 	exportChannels->setColumnTitle(1, tr("Import"));
-        setTitleLabelVisible(false);
+	setTitleLabelVisible(false);
 	setExportAllButtonLabel(tr("Import all"));
 }
 
-ImportSettings::~ImportSettings()
-{
-}
+ImportSettings::~ImportSettings() {}
+
+#include "moc_osc_import_settings.cpp"

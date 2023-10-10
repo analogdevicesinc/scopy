@@ -18,32 +18,34 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef MAX14906TOOL_H
 #define MAX14906TOOL_H
 
-#include "pluginbase/toolmenuentry.h"
-#include "ui_max14906.h"
 #include "diocontroller.h"
 #include "diodigitalchannelcontroller.h"
-#include "src/runtime/readerthread.h"
 #include "diosettingstab.h"
-#include <gui/tool_view.hpp>
+#include "pluginbase/toolmenuentry.h"
+#include "src/runtime/readerthread.h"
+
+#include "ui_max14906.h"
+
 #include <gui/flexgridlayout.hpp>
+#include <gui/tool_view.hpp>
 
 namespace scopy::swiot {
 #define MAX_NAME "max14906"
 class DioDigitalChannel;
 class DioController;
 
-class Max14906 : public QWidget {
+class Max14906 : public QWidget
+{
 	Q_OBJECT
 public:
 	explicit Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Max14906() override;
 
 Q_SIGNALS:
-        void backBtnPressed();
+	void backBtnPressed();
 
 public Q_SLOTS:
 	void externalPowerSupply(bool ps);
@@ -54,38 +56,40 @@ private Q_SLOTS:
 	void timerChanged(double value);
 
 	void onBackBtnPressed();
+
 private:
-        static QPushButton* createBackButton();
+	static QPushButton *createBackButton();
 	void initChannels();
 	void setupDynamicUi(QWidget *parent);
 	void initMonitorToolView();
-	scopy::gui::GenericMenu* createGeneralSettings(const QString& title, QColor* color);
+	scopy::gui::GenericMenu *createGeneralSettings(const QString &title, QColor *color);
 	void connectSignalsAndSlots();
 
-	static QFrame* createVLine(QWidget* parent);
-	static QFrame* createHLine(QWidget* parent);
-	static QMainWindow* createDockableMainWindow(const QString& title, DioDigitalChannel* digitalChannel, QWidget* parent);
+	static QFrame *createVLine(QWidget *parent);
+	static QFrame *createHLine(QWidget *parent);
+	static QMainWindow *createDockableMainWindow(const QString &title, DioDigitalChannel *digitalChannel,
+						     QWidget *parent);
 
 	struct iio_context *m_ctx;
 
-        QPushButton *m_backButton;
-	QWidget* m_statusContainer;
-	QLabel* m_statusLabel;
+	QPushButton *m_backButton;
+	QWidget *m_statusContainer;
+	QLabel *m_statusLabel;
 	int m_nbDioChannels;
 
 	DioController *max14906ToolController;
 	Ui::Max14906 *ui;
 	DioSettingsTab *m_max14906SettingsTab;
 	scopy::gui::ToolView *m_toolView;
-	scopy::gui::GenericMenu* m_generalSettingsMenu;
+	scopy::gui::GenericMenu *m_generalSettingsMenu;
 	scopy::gui::SubsectionSeparator *settingsWidgetSeparator;
 	QTimer *m_qTimer;
 
 	CommandQueue *m_cmdQueue;
 	ReaderThread *m_readerThread;
-	QMap<int, DioDigitalChannelController*> m_channelControls;
+	QMap<int, DioDigitalChannelController *> m_channelControls;
 
 	ToolMenuEntry *m_tme;
 };
-}
+} // namespace scopy::swiot
 #endif // MAX14906TOOL_H

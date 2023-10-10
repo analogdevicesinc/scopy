@@ -18,23 +18,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "limitedplotzoomer.h"
-#include <qwt_plot.h>
+
 #include <QtDebug>
+#include <qwt_plot.h>
 
 using namespace scopy;
 
-LimitedPlotZoomer::LimitedPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis,QWidget *parent, bool doReplot):
-	QwtPlotZoomer(xAxis, yAxis,parent, doReplot),
-	m_boundVertical(false), m_updateBaseNextZoom(true)
+LimitedPlotZoomer::LimitedPlotZoomer(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *parent, bool doReplot)
+	: QwtPlotZoomer(xAxis, yAxis, parent, doReplot)
+	, m_boundVertical(false)
+	, m_updateBaseNextZoom(true)
 {
 	setMaxStackDepth(5);
 }
 
-LimitedPlotZoomer::LimitedPlotZoomer(QWidget *parent, bool doReplot):
-	QwtPlotZoomer(parent, doReplot),
-	m_boundVertical(false), m_updateBaseNextZoom(true)
+LimitedPlotZoomer::LimitedPlotZoomer(QWidget *parent, bool doReplot)
+	: QwtPlotZoomer(parent, doReplot)
+	, m_boundVertical(false)
+	, m_updateBaseNextZoom(true)
 {
-        setMaxStackDepth(5);
+	setMaxStackDepth(5);
 }
 
 void LimitedPlotZoomer::resetZoom()
@@ -43,15 +46,9 @@ void LimitedPlotZoomer::resetZoom()
 	m_updateBaseNextZoom = true;
 }
 
-void LimitedPlotZoomer::popZoom()
-{
-	QwtPlotZoomer::zoom(-1);
-}
+void LimitedPlotZoomer::popZoom() { QwtPlotZoomer::zoom(-1); }
 
-void LimitedPlotZoomer::setBoundVertical(bool bound)
-{
-	m_boundVertical = bound;
-}
+void LimitedPlotZoomer::setBoundVertical(bool bound) { m_boundVertical = bound; }
 
 void LimitedPlotZoomer::zoom(const QRectF &rect)
 {
@@ -62,7 +59,7 @@ void LimitedPlotZoomer::zoom(const QRectF &rect)
 	}
 	QRectF boundedRect = rect & zoomBase();
 
-	if (m_boundVertical) {
+	if(m_boundVertical) {
 		QRectF baseRect = zoomBase();
 		boundedRect.setTop(baseRect.top());
 		boundedRect.setBottom(baseRect.bottom());

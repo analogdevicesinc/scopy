@@ -9,45 +9,40 @@
 class QLabel;
 class QHBoxLayout;
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 class BitFieldSimpleWidget;
 
 class RegisterSimpleWidget : public QFrame
 {
-    friend class RegmapStyleHelper;
+	friend class RegmapStyleHelper;
 
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit RegisterSimpleWidget(QString name,
-                                  QString address,
-                                  QString description,
-                                  QString notes,
-                                  int registerWidth,
-                                  QVector<BitFieldSimpleWidget*> *bitFields,
-                                  QWidget *parent = nullptr);
+	explicit RegisterSimpleWidget(QString name, QString address, QString description, QString notes,
+				      int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields,
+				      QWidget *parent = nullptr);
 
-    ~RegisterSimpleWidget();
+	~RegisterSimpleWidget();
 
-
-    void valueUpdated(uint32_t value);
-    void setRegisterSelected(bool selected);
+	void valueUpdated(uint32_t value);
+	void setRegisterSelected(bool selected);
 
 public Q_SLOTS:
-    void checkPreferences();
+	void checkPreferences();
 
 private:
-    QHBoxLayout *layout;
-    QLabel *value;
-    QVector<BitFieldSimpleWidget*> *bitFields;
-    QString address;
-    int registerWidth;
-    QFrame *regBaseInfoWidget = nullptr;
-    QLabel *registerNameLabel;
+	QHBoxLayout *layout;
+	QLabel *value;
+	QVector<BitFieldSimpleWidget *> *bitFields;
+	QString address;
+	int registerWidth;
+	QFrame *regBaseInfoWidget = nullptr;
+	QLabel *registerNameLabel;
 
 protected:
-    bool eventFilter(QObject *object, QEvent *event) override;
+	bool eventFilter(QObject *object, QEvent *event) override;
 Q_SIGNALS:
-    void registerSelected(uint32_t address);
+	void registerSelected(uint32_t address);
 };
-}
+} // namespace scopy::regmap
 #endif // REGISTERSIMPLEWIDGET_HPP

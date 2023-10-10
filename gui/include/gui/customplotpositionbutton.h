@@ -20,9 +20,10 @@
 #ifndef CUSTOMPLOTPOSITIONBUTTON_H
 #define CUSTOMPLOTPOSITIONBUTTON_H
 
-#include <QWidget>
-#include <QButtonGroup>
 #include "scopy-gui_export.h"
+
+#include <QButtonGroup>
+#include <QWidget>
 
 namespace Ui {
 class CustomPlotPositionButton;
@@ -34,8 +35,8 @@ class SCOPY_GUI_EXPORT CustomPlotPositionButton : public QWidget
 	Q_OBJECT
 
 public:
-
-	enum ReadoutsPosition {
+	enum ReadoutsPosition
+	{
 		topLeft,
 		topRight,
 		bottomLeft,
@@ -49,12 +50,10 @@ public:
 Q_SIGNALS:
 	void positionChanged(CustomPlotPositionButton::ReadoutsPosition position);
 
-
 private:
 	Ui::CustomPlotPositionButton *ui;
 	QButtonGroup *btns;
 };
-}
-
+} // namespace scopy
 
 #endif // CUSTOMPLOTPOSITIONBUTTON_H

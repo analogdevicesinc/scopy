@@ -18,37 +18,36 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "detachdragzone.h"
-#include <QMimeData>
 
 #include "basemenuitem.h"
 
+#include <QMimeData>
+
 using namespace scopy;
 
-DetachDragZone::DetachDragZone(QWidget *parent) :
-	QWidget(parent)
+DetachDragZone::DetachDragZone(QWidget *parent)
+	: QWidget(parent)
 {
 	setAttribute(Qt::WA_StyledBackground, true);
 	setAcceptDrops(true);
 	this->installEventFilter(this);
 }
 
-DetachDragZone::~DetachDragZone()
-{
-}
+DetachDragZone::~DetachDragZone() {}
 
 bool DetachDragZone::eventFilter(QObject *watched, QEvent *event)
 {
-	if (event->type() == QEvent::DragEnter){
+	if(event->type() == QEvent::DragEnter) {
 		QDragEnterEvent *enterEvent = static_cast<QDragEnterEvent *>(event);
-		if (!enterEvent->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType))
+		if(!enterEvent->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType))
 			return true;
-		}
+	}
 	return QWidget::event(event);
 }
 
 void DetachDragZone::dragEnterEvent(QDragEnterEvent *event)
 {
-	if (!event->source()) {
+	if(!event->source()) {
 		event->ignore();
 		return;
 	}
@@ -57,10 +56,7 @@ void DetachDragZone::dragEnterEvent(QDragEnterEvent *event)
 	event->accept();
 }
 
-void DetachDragZone::dragMoveEvent(QDragMoveEvent *event)
-{
-	event->accept();
-}
+void DetachDragZone::dragMoveEvent(QDragMoveEvent *event) { event->accept(); }
 
 void DetachDragZone::dragLeaveEvent(QDragLeaveEvent *event)
 {
@@ -70,17 +66,17 @@ void DetachDragZone::dragLeaveEvent(QDragLeaveEvent *event)
 
 void DetachDragZone::dropEvent(QDropEvent *event)
 {
-	if (event->source() == this && event->possibleActions() & Qt::MoveAction){
+	if(event->source() == this && event->possibleActions() & Qt::MoveAction) {
 		return;
 	}
-	if (event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)){
+	if(event->mimeData()->hasFormat(BaseMenuItem::menuItemMimeDataType)) {
 		QObject *source = event->source();
-//		if (source) {
-//			ToolMenuItem *toolMenuItem = qobject_cast<ToolMenuItem *>(source);
-//			if (toolMenuItem) {
-//				toolMenuItem->detach();
-//			}
-//		}
+		//		if (source) {
+		//			ToolMenuItem *toolMenuItem = qobject_cast<ToolMenuItem *>(source);
+		//			if (toolMenuItem) {
+		//				toolMenuItem->detach();
+		//			}
+		//		}
 	}
 }
 

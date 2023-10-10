@@ -21,50 +21,50 @@
 #ifndef CUSTOM_SWITCH_HPP
 #define CUSTOM_SWITCH_HPP
 
-#include <QLabel>
 #include "customanimation.h"
+#include "scopy-gui_export.h"
+
+#include <QLabel>
 #include <QPushButton>
 #include <QWidget>
-#include "scopy-gui_export.h"
 
 class QShowEvent;
 
 namespace scopy {
-	class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
-	{
-		Q_OBJECT
+class SCOPY_GUI_EXPORT CustomSwitch : public QPushButton
+{
+	Q_OBJECT
 
-		Q_PROPERTY(int duration_ms MEMBER duration_ms
-				WRITE setDuration);
+	Q_PROPERTY(int duration_ms MEMBER duration_ms WRITE setDuration);
 
-	public:
-		explicit CustomSwitch(QWidget *parent = nullptr);
-		~CustomSwitch();
+public:
+	explicit CustomSwitch(QWidget *parent = nullptr);
+	~CustomSwitch();
 
-                const QLabel &getOn() const;
-                void setOnText(const QString &on_);
-                void setOn(const QPixmap &pixmap);
+	const QLabel &getOn() const;
+	void setOnText(const QString &on_);
+	void setOn(const QPixmap &pixmap);
 
-                const QLabel &getOff() const;
-                void setOffText(const QString &off_);
-                void setOff(const QPixmap &pixmap);
+	const QLabel &getOff() const;
+	void setOffText(const QString &off_);
+	void setOff(const QPixmap &pixmap);
 
-	private:
-		QLabel on, off;
-		QWidget handle;
-		CustomAnimation anim;
-		int duration_ms;
-		bool polarity;
+private:
+	QLabel on, off;
+	QWidget handle;
+	CustomAnimation anim;
+	int duration_ms;
+	bool polarity;
 
-		void setDuration(int ms);
-		void updateOnOffLabels();
+	void setDuration(int ms);
+	void updateOnOffLabels();
 
-		void showEvent(QShowEvent *event);
-		bool event(QEvent*);
+	void showEvent(QShowEvent *event);
+	bool event(QEvent *);
 
-	private Q_SLOTS:
-		void toggleAnim(bool enabled);
-	};
-}
+private Q_SLOTS:
+	void toggleAnim(bool enabled);
+};
+} // namespace scopy
 
 #endif /* CUSTOM_SWITCH_HPP */

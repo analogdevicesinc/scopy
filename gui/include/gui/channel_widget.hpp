@@ -20,11 +20,12 @@
 #ifndef CHANNEL_WIDGET_HPP
 #define CHANNEL_WIDGET_HPP
 
-#include <QWidget>
-#include <QString>
-#include <QAbstractButton>
 #include "scopy-gui_export.h"
+
+#include <QAbstractButton>
 #include <QSpacerItem>
+#include <QString>
+#include <QWidget>
 
 namespace Ui {
 class Channel;
@@ -32,21 +33,20 @@ class Channel;
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT ChannelWidget: public QWidget
+class SCOPY_GUI_EXPORT ChannelWidget : public QWidget
 {
 
 	Q_OBJECT
 
 public:
-	explicit ChannelWidget(int id, bool deletable, bool simplified,
-		QColor color, QWidget *parent = 0);
+	explicit ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget *parent = 0);
 	~ChannelWidget();
 
-	QAbstractButton* enableButton() const;
-	QAbstractButton* nameButton() const;
-	QAbstractButton* menuButton() const;
-	QAbstractButton* deleteButton() const;
-	QAbstractButton* toggleChannelsButton() const;
+	QAbstractButton *enableButton() const;
+	QAbstractButton *nameButton() const;
+	QAbstractButton *menuButton() const;
+	QAbstractButton *deleteButton() const;
+	QAbstractButton *toggleChannelsButton() const;
 
 	int id() const;
 	void setId(int);
@@ -54,19 +54,19 @@ public:
 	QColor color() const;
 
 	QString fullName() const;
-	void setFullName(const QString&);
+	void setFullName(const QString &);
 
 	QString shortName() const;
-	void setShortName(const QString&);
+	void setShortName(const QString &);
 
 	QString function() const;
 	void setFunction(const QString &);
 
 	bool isMathChannel() const;
-	void setMathChannel(const bool&);
+	void setMathChannel(const bool &);
 
 	bool isReferenceChannel() const;
-	void setReferenceChannel(const bool&);
+	void setReferenceChannel(const bool &);
 
 	void setMenuFloating(bool floating);
 

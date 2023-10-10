@@ -19,18 +19,18 @@
  */
 
 #include "startstoprangewidget.h"
+
 #include "ui_startstoprangewidget.h"
 
 using namespace scopy;
 
-StartStopRangeWidget::StartStopRangeWidget(double min, double max, double minSpan,
-		bool hasProgressWidget,
-		QWidget *parent) :
-	QWidget(parent),
-	ui(new Ui::StartStopRangeWidget),
-	minValue(min),
-	maxValue(max),
-	minSpan(minSpan)
+StartStopRangeWidget::StartStopRangeWidget(double min, double max, double minSpan, bool hasProgressWidget,
+					   QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::StartStopRangeWidget)
+	, minValue(min)
+	, maxValue(max)
+	, minSpan(minSpan)
 {
 	ui->setupUi(this);
 
@@ -38,35 +38,17 @@ StartStopRangeWidget::StartStopRangeWidget(double min, double max, double minSpa
 	_setupSignalsAndSlots();
 }
 
-StartStopRangeWidget::~StartStopRangeWidget()
-{
-	delete ui;
-}
+StartStopRangeWidget::~StartStopRangeWidget() { delete ui; }
 
-double StartStopRangeWidget::getStartValue() const
-{
-	return start_freq->value();
-}
+double StartStopRangeWidget::getStartValue() const { return start_freq->value(); }
 
-void StartStopRangeWidget::setStartValue(double value)
-{
-	start_freq->setValue(value);
-}
+void StartStopRangeWidget::setStartValue(double value) { start_freq->setValue(value); }
 
-double StartStopRangeWidget::getStopValue() const
-{
-	return stop_freq->value();
-}
+double StartStopRangeWidget::getStopValue() const { return stop_freq->value(); }
 
-void StartStopRangeWidget::setStopValue(double value)
-{
-	stop_freq->setValue(value);
-}
+void StartStopRangeWidget::setStopValue(double value) { stop_freq->setValue(value); }
 
-double StartStopRangeWidget::getCenterValue() const
-{
-	return center_freq->value();
-}
+double StartStopRangeWidget::getCenterValue() const { return center_freq->value(); }
 
 void StartStopRangeWidget::insertWidgetIntoLayout(QWidget *widget, int row, int column)
 {
@@ -103,15 +85,15 @@ void StartStopRangeWidget::_onCenterSpanFrequencyChanged()
 	double start = center - (span / 2);
 	double stop = center + (span / 2);
 
-	if (QObject::sender() == center_freq) {
+	if(QObject::sender() == center_freq) {
 		// Center value was changed by the user, so we
 		// check if the span value is valid, if not we
 		// adjust it
-		if (start < 0) {
+		if(start < 0) {
 			start = 1;
 			span = (center - start) * 2;
 			stop = center + (span / 2);
-		} else if (stop > stop_freq->maxValue()) {
+		} else if(stop > stop_freq->maxValue()) {
 			stop = stop_freq->maxValue();
 			span = (stop - center) * 2;
 			start = center - (span / 2);
@@ -122,11 +104,11 @@ void StartStopRangeWidget::_onCenterSpanFrequencyChanged()
 		// Span value was changed by the user, so we
 		// check if the center value is valid, if not we
 		// adjust it
-		if (start < 0) {
+		if(start < 0) {
 			start = 1;
 			center = start + (span / 2);
 			stop = center + (span / 2);
-		} else if (stop > stop_freq->maxValue()) {
+		} else if(stop > stop_freq->maxValue()) {
 			stop = stop_freq->maxValue();
 			center = stop - (span / 2);
 			start = center - (span / 2);
@@ -156,34 +138,14 @@ void StartStopRangeWidget::setMinimumValue(double value)
 void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget)
 {
 	// Create spin buttons
-	start_freq = new ScaleSpinButton({
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
-	},tr("Start"), minValue, maxValue,
-	hasProgressWidget, false, this,
-	{1, 2.5, 5, 7.5});
-	stop_freq = new ScaleSpinButton({
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
-	},tr("Stop"), minValue, maxValue,
-	hasProgressWidget, false, this,
-	{1, 2.5, 5, 7.5});
-	center_freq = new ScaleSpinButton({
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
-	},tr("Center"), minValue, maxValue - 1,
-	hasProgressWidget, false, this,
-	{1, 2.5, 5, 7.5});
-	span_freq = new ScaleSpinButton({
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
-	},tr("Span"), minValue, maxValue - 1,
-	hasProgressWidget, false, this,
-	{1, 2.5, 5, 7.5});
+	start_freq = new ScaleSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, tr("Start"), minValue, maxValue,
+					 hasProgressWidget, false, this, {1, 2.5, 5, 7.5});
+	stop_freq = new ScaleSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, tr("Stop"), minValue, maxValue,
+					hasProgressWidget, false, this, {1, 2.5, 5, 7.5});
+	center_freq = new ScaleSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, tr("Center"), minValue,
+					  maxValue - 1, hasProgressWidget, false, this, {1, 2.5, 5, 7.5});
+	span_freq = new ScaleSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, tr("Span"), minValue, maxValue - 1,
+					hasProgressWidget, false, this, {1, 2.5, 5, 7.5});
 
 	// Set limits and initial values
 	start_freq->setValue(1000);
@@ -202,12 +164,11 @@ void StartStopRangeWidget::_createSpinButtons(bool hasProgressWidget)
 
 void StartStopRangeWidget::_setupSignalsAndSlots()
 {
-	connect(start_freq, &ScaleSpinButton::valueChanged,
-		this, &StartStopRangeWidget::_onStartStopFrequencyChanged);
-	connect(stop_freq, &ScaleSpinButton::valueChanged,
-		this, &StartStopRangeWidget::_onStartStopFrequencyChanged);
-	connect(center_freq, &ScaleSpinButton::valueChanged,
-		this, &StartStopRangeWidget::_onCenterSpanFrequencyChanged);
-	connect(span_freq, &ScaleSpinButton::valueChanged,
-		this, &StartStopRangeWidget::_onCenterSpanFrequencyChanged);
+	connect(start_freq, &ScaleSpinButton::valueChanged, this, &StartStopRangeWidget::_onStartStopFrequencyChanged);
+	connect(stop_freq, &ScaleSpinButton::valueChanged, this, &StartStopRangeWidget::_onStartStopFrequencyChanged);
+	connect(center_freq, &ScaleSpinButton::valueChanged, this,
+		&StartStopRangeWidget::_onCenterSpanFrequencyChanged);
+	connect(span_freq, &ScaleSpinButton::valueChanged, this, &StartStopRangeWidget::_onCenterSpanFrequencyChanged);
 }
+
+#include "moc_startstoprangewidget.cpp"

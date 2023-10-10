@@ -22,14 +22,16 @@
 #define PRINTABLEPLOT_H
 
 /*Qwt includes*/
+#include <qwt_legend.h>
 #include <qwt_plot.h>
 #include <qwt_plot_renderer.h>
-#include <qwt_legend.h>
 
 /*Qt includes*/
-#include <QWidget>
-#include <BasicPlot.h>
 #include "scopy-gui_export.h"
+
+#include <QWidget>
+
+#include <BasicPlot.h>
 
 namespace scopy {
 class SCOPY_GUI_EXPORT PrintablePlot : public BasicPlot
@@ -42,13 +44,13 @@ public:
 	void setUseNativeDialog(bool nativeDialog);
 
 public Q_SLOTS:
-	void printPlot(const QString& toolName = "");
+	void printPlot(const QString &toolName = "");
 
 private:
 	QwtPlotRenderer d_plotRenderer;
 	QwtLegend *legendDisplay;
 	bool d_useNativeDialog;
 };
-}
+} // namespace scopy
 
 #endif // PRINTABLEPLOT_H

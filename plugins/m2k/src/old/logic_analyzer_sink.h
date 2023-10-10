@@ -1,9 +1,9 @@
 #ifndef LOGIC_ANALYZER_SINK_H
 #define LOGIC_ANALYZER_SINK_H
 
-#include <gnuradio/sync_block.h>
-
 #include "logicanalyzer/logic_analyzer.h"
+
+#include <gnuradio/sync_block.h>
 
 class logic_analyzer_sink : virtual public gr::sync_block
 {

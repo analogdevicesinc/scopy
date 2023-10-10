@@ -41,8 +41,7 @@ public:
 	 * \param gain - gain of the filter
 	 * \param sample_rate - sample rate used in filter response
 	 */
-	static sptr make(bool enable = true, float TC = 1, float gain = 0,
-			 float sample_rate = 100000000);
+	static sptr make(bool enable = true, float TC = 1, float gain = 0, float sample_rate = 100000000);
 	virtual void set_enable(bool en, int gain_mode = 2) = 0;
 	virtual bool get_enable(int gain_mode = 2) = 0;
 	virtual void set_TC(float TC, int gain_mode = 2) = 0;

@@ -1,10 +1,11 @@
 #ifndef PLUGINREPOSITORY_H
 #define PLUGINREPOSITORY_H
 
-#include <QMap>
-#include <QObject>
 #include "pluginmanager.h"
 #include "scopy-core_export.h"
+
+#include <QMap>
+#include <QObject>
 
 namespace scopy {
 
@@ -15,12 +16,12 @@ public:
 	PluginRepository(QObject *parent);
 	~PluginRepository();
 	void init(QString location);
-	PluginManager *getPluginManager() {return pm;}
+	PluginManager *getPluginManager() { return pm; }
 
 private:
 	PluginManager *pm;
 	QJsonObject metadata;
 };
-}
+} // namespace scopy
 
 #endif // PLUGINREPOSITORY_H

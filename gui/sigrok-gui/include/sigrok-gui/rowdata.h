@@ -37,61 +37,56 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef ROWDATA_H
 #define ROWDATA_H
 
-#include <libsigrokdecode/libsigrokdecode.h>
-
 #include "annotation.h"
-
-#include <vector>
-#include <set>
 #include "scopy-sigrok-gui_export.h"
+
+#include <libsigrokdecode/libsigrokdecode.h>
+#include <set>
+#include <vector>
 
 class Row;
 
 class SCOPY_SIGROK_GUI_EXPORT RowData
 {
 public:
-    RowData() = default;
+	RowData() = default;
 
 public:
-    uint64_t get_max_sample() const;
+	uint64_t get_max_sample() const;
 
-    uint64_t size() const {
-        return annotations_.size();
-    }
+	uint64_t size() const { return annotations_.size(); }
 
-    /**
-     * Extracts annotations between the given sample range into a vector.
-     * Note: The annotations are unsorted and only annotations that fully
-     * fit into the sample range are considered.
-     */
-    void get_annotation_subset(
-        vector<Annotation> &dest,
-        uint64_t start_sample, uint64_t end_sample) const;
+	/**
+	 * Extracts annotations between the given sample range into a vector.
+	 * Note: The annotations are unsorted and only annotations that fully
+	 * fit into the sample range are considered.
+	 */
+	void get_annotation_subset(vector<Annotation> &dest, uint64_t start_sample, uint64_t end_sample) const;
 
-    vector<Annotation> get_annotations() const;
+	vector<Annotation> get_annotations() const;
 
-    void emplace_annotation(srd_proto_data *pdata, const Row *row);
+	void emplace_annotation(srd_proto_data *pdata, const Row *row);
 
-    std::pair<uint64_t, uint64_t> get_annotation_subset(uint64_t start_sample,
-                                                        uint64_t end_sample) const;
+	std::pair<uint64_t, uint64_t> get_annotation_subset(uint64_t start_sample, uint64_t end_sample) const;
 
-    Annotation getAnnAt(uint64_t index) const;
-    const Annotation* annAt(uint64_t index) const;
+	Annotation getAnnAt(uint64_t index) const;
+	const Annotation *annAt(uint64_t index) const;
 
-    void sort_annotations();
+	void sort_annotations();
 
 private:
-    struct annotation_compare {
-        bool operator() (const Annotation &a, const Annotation &b) const {
-            return a.start_sample() < b.start_sample();
-        }
-    };
+	struct annotation_compare
+	{
+		bool operator()(const Annotation &a, const Annotation &b) const
+		{
+			return a.start_sample() < b.start_sample();
+		}
+	};
 
-    std::vector<Annotation/*, annotation_compare*/> annotations_;
+	std::vector<Annotation /*, annotation_compare*/> annotations_;
 };
 
 #endif // ROWDATA_H

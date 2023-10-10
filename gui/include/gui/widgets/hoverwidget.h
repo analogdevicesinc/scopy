@@ -1,14 +1,16 @@
 #ifndef HOVERWIDGET_H
 #define HOVERWIDGET_H
 
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QEvent>
 #include "scopy-gui_export.h"
 #include "utils.h"
 
+#include <QEvent>
+#include <QHBoxLayout>
+#include <QWidget>
+
 namespace scopy {
-enum HoverPosition {
+enum HoverPosition
+{
 	HP_LEFT,
 	HP_TOPLEFT,
 	HP_TOP,
@@ -20,7 +22,8 @@ enum HoverPosition {
 	HP_CENTER,
 };
 
-class SCOPY_GUI_EXPORT HoverWidget : public QWidget {
+class SCOPY_GUI_EXPORT HoverWidget : public QWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
@@ -45,11 +48,12 @@ public:
 	void setDraggable(bool draggable);
 	void setRelative(bool relative);
 	void setRelativeOffset(QPointF offset);
+
 private:
 	QHBoxLayout *m_lay;
-	QWidget* m_parent;
-	QWidget* m_anchor;
-	QWidget* m_content;
+	QWidget *m_parent;
+	QWidget *m_anchor;
+	QWidget *m_content;
 	QPoint m_anchorOffset;
 	HoverPosition m_anchorPos;
 	HoverPosition m_contentPos;
@@ -69,5 +73,5 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event) override;
 	void mouseMoveEvent(QMouseEvent *event) override;
 };
-}
+} // namespace scopy
 #endif // HOVERWIDGET_H

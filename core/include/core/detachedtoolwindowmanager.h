@@ -1,15 +1,18 @@
 #ifndef DETACHEDTOOLMANAGER_H
 #define DETACHEDTOOLMANAGER_H
 
-#include <QWidget>
-#include <QMap>
-#include <pluginbase/toolmenuentry.h>
-#include "scopy-core_export.h"
 #include "detachedtoolwindow.h"
+#include "scopy-core_export.h"
+
+#include <QMap>
+#include <QWidget>
+
+#include <pluginbase/toolmenuentry.h>
 
 namespace scopy {
 
-class SCOPY_CORE_EXPORT DetachedToolWindowManager : public QObject {
+class SCOPY_CORE_EXPORT DetachedToolWindowManager : public QObject
+{
 	Q_OBJECT
 public:
 	DetachedToolWindowManager(QObject *parent = nullptr);
@@ -22,9 +25,10 @@ public:
 
 public Q_SLOTS:
 	void show(QString id);
+
 private:
-	QMap<QString, DetachedToolWindow*> map;
+	QMap<QString, DetachedToolWindow *> map;
 };
-}
+} // namespace scopy
 
 #endif // DETACHEDTOOLMANAGER_H

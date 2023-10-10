@@ -1,14 +1,15 @@
 #ifndef PLUGIN_H
 #define PLUGIN_H
 
+#include "apiobject.h"
+#include "scopy-pluginbase_export.h"
+#include "toolmenuentry.h"
+
+#include <QAbstractButton>
+#include <QSettings>
 #include <QString>
 #include <QWidget>
-#include "toolmenuentry.h"
-#include "scopy-pluginbase_export.h"
 #include <QtPlugin>
-#include <QSettings>
-#include <QAbstractButton>
-#include "apiobject.h"
 
 namespace scopy {
 
@@ -21,7 +22,8 @@ namespace scopy {
  * onConnect()
  * onDisconnect()
  */
-class SCOPY_PLUGINBASE_EXPORT Plugin {
+class SCOPY_PLUGINBASE_EXPORT Plugin
+{
 public:
 	virtual ~Plugin() {}
 
@@ -42,7 +44,6 @@ public:
 	 */
 
 	virtual void setEnabled(bool) = 0;
-
 
 	/**
 	 * @brief initMetadata
@@ -110,7 +111,6 @@ public:
 	 */
 	virtual bool loadPreferencesPage() = 0;
 
-
 	/**
 	 * @brief compatible
 	 * @param param
@@ -133,7 +133,7 @@ public:
 	 * @return
 	 * Default implementation in SCOPY_PLUGIN macro - override not recomended
 	 */
-	virtual Plugin* clone(QObject *parent = nullptr) = 0;
+	virtual Plugin *clone(QObject *parent = nullptr) = 0;
 
 	/**
 	 * @brief cloneExtra
@@ -141,7 +141,7 @@ public:
 	 * which is not part of the boilerplate implementation
 	 * Default implementation in PluginBase - can be overriden
 	 */
-	virtual void cloneExtra(Plugin*) = 0;
+	virtual void cloneExtra(Plugin *) = 0;
 
 	/**
 	 * @brief preload
@@ -209,7 +209,6 @@ public:
 	 */
 	virtual void unload() = 0;
 
-
 	/**
 	 * @brief param
 	 * @return plugin m_enabled getter - shows whether the plugin will load or not on loadPlugin()
@@ -257,35 +256,35 @@ public:
 	 * @return plugin m_icon getter - icon widget
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QWidget* icon() = 0;
+	virtual QWidget *icon() = 0;
 
 	/**
 	 * @brief page
 	 * @return plugin m_page getter - plugin infopage widget. used to create device infopage
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QWidget* page() = 0;
+	virtual QWidget *page() = 0;
 
 	/**
 	 * @brief preferencesPage
 	 * @return plugin m_preferencesPage getter - preferences widget
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QWidget* preferencesPage() = 0;
+	virtual QWidget *preferencesPage() = 0;
 
 	/**
 	 * @brief extraButtons
 	 * @return plugin m_extraButtons getter - list of buttons used to create device infopage
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QList<QAbstractButton*> extraButtons() = 0;
+	virtual QList<QAbstractButton *> extraButtons() = 0;
 
 	/**
 	 * @brief toolList
 	 * @return plugin m_toolList getter - list of tools used to populate device toolmenu
 	 * Default implementation in PluginBase - override not recommended
 	 */
-	virtual QList<scopy::ToolMenuEntry*> toolList() = 0;
+	virtual QList<scopy::ToolMenuEntry *> toolList() = 0;
 
 	/**
 	 * @brief metadata
@@ -318,17 +317,15 @@ public Q_SLOTS:
 
 	/**
 	 * @brief showPageCallback
-	 * is called postcompatible. when the Device infopage comes in foreground (by selecting the device in the DeviceBrowser)
-	 * useful for interactive infopages
-	 * Default implementation in PluginBase - can be overriden
+	 * is called postcompatible. when the Device infopage comes in foreground (by selecting the device in the
+	 * DeviceBrowser) useful for interactive infopages Default implementation in PluginBase - can be overriden
 	 */
 	virtual void showPageCallback() = 0;
 
 	/**
 	 * @brief hidePageCallback
-	 * is called postcompatible when the device infopage goes in the background (by selecting another device in the DeviceBrowser)
-	 * useful for interactive infopages
-	 * Default implementation in PluginBase - can be overriden
+	 * is called postcompatible when the device infopage goes in the background (by selecting another device in the
+	 * DeviceBrowser) useful for interactive infopages Default implementation in PluginBase - can be overriden
 	 */
 	virtual void hidePageCallback() = 0;
 
@@ -340,7 +337,7 @@ public Q_SLOTS:
 	 * Default implementation in PluginBase - can be overriden
 	 */
 	virtual void messageCallback(QString topic, QString message) = 0;
-//Q_SIGNALS:
+	// Q_SIGNALS:
 
 	/**
 	 * @brief connectDevice
@@ -371,10 +368,8 @@ public Q_SLOTS:
 	 */
 	virtual void toolListChanged() = 0;
 	virtual void restartDevice() = 0;
-
-
 };
-}
+} // namespace scopy
 
 #define ScopyPlugin_iid "org.adi.Scopy.Plugins.Pluginbase/0.1"
 Q_DECLARE_INTERFACE(scopy::Plugin, ScopyPlugin_iid)

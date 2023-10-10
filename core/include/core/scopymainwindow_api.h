@@ -1,8 +1,8 @@
 #ifndef SCOPYMAINWINDOW_API_H
 #define SCOPYMAINWINDOW_API_H
 
-#include "scopymainwindow.h"
 #include "scopy-core_export.h"
+#include "scopymainwindow.h"
 
 namespace scopy {
 class SCOPY_CORE_EXPORT ScopyMainWindow_API : public ApiObject
@@ -21,11 +21,12 @@ public:
 	Q_INVOKABLE void switchTool(QString devID, QString toolName);
 	Q_INVOKABLE void switchTool(QString toolName);
 	Q_INVOKABLE void runScript(QString content, QString fileName);
+
 private:
 	static bool sortByUUID(const QString &k1, const QString &k2);
 	ScopyMainWindow *m_w;
 };
 
-}
+} // namespace scopy
 
 #endif // SCOPYMAINWINDOW_API_H

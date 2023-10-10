@@ -18,47 +18,43 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef ANNOTATIONCURVE_H
 #define ANNOTATIONCURVE_H
 
+#include "annotation.h"
+#include "genericlogicplotcurve.h"
+#include "row.h"
+#include "rowdata.h"
+#include "scopy-sigrok-gui_export.h"
+
+#include <QWidget>
 #include <qwt_point_mapper.h>
 
 #include <libsigrokdecode/libsigrokdecode.h>
-
 #include <memory>
 #include <mutex>
-
-#include <QWidget>
-
-#include "annotation.h"
-#include "row.h"
-#include "rowdata.h"
-#include "genericlogicplotcurve.h"
-#include "scopy-sigrok-gui_export.h"
 
 namespace scopy {
 namespace logic {
 class Decoder;
 }
-}
-
+} // namespace scopy
 
 namespace scopy {
 namespace bind {
 class Decoder;
 }
-}
+} // namespace scopy
 
 namespace scopy {
 
 class AnnotationDecoder;
 
-
-struct AnnotationQueryResult {
-    uint64_t index;
-    const Annotation* ann;
-    inline bool isValid() const { return ann != nullptr; }
+struct AnnotationQueryResult
+{
+	uint64_t index;
+	const Annotation *ann;
+	inline bool isValid() const { return ann != nullptr; }
 };
 
 class SCOPY_SIGROK_GUI_EXPORT AnnotationCurve : public GenericLogicPlotCurve
@@ -71,27 +67,27 @@ public:
 Q_SIGNALS:
 	void decoderMenuChanged();
 
-    // Emitted when an annotation is clicked
-    void annotationClicked(AnnotationQueryResult result);
+	// Emitted when an annotation is clicked
+	void annotationClicked(AnnotationQueryResult result);
 
 public:
-    static void annotationCallback(srd_proto_data *pdata, void *annotationCurve);
+	static void annotationCallback(srd_proto_data *pdata, void *annotationCurve);
 
-    virtual void dataAvailable(uint64_t from, uint64_t to, uint16_t *data) override;
+	virtual void dataAvailable(uint64_t from, uint64_t to, uint16_t *data) override;
 
-    void setClassRows(const std::map<std::pair<const srd_decoder*, int>, Row> &classRows);
-    void setAnnotationRows(const std::map<Row, RowData> &annotationRows);
-    const std::map<Row, RowData>& getAnnotationRows() const;
+	void setClassRows(const std::map<std::pair<const srd_decoder *, int>, Row> &classRows);
+	void setAnnotationRows(const std::map<Row, RowData> &annotationRows);
+	const std::map<Row, RowData> &getAnnotationRows() const;
 
-    void sort_rows();
+	void sort_rows();
 
-    uint64_t getMaxAnnotationCount(int index = -1);
+	uint64_t getMaxAnnotationCount(int index = -1);
 
-    void newAnnotations();
+	void newAnnotations();
 
-    virtual void reset() override;
+	virtual void reset() override;
 
-    QWidget * getCurrentDecoderStackMenu();
+	QWidget *getCurrentDecoderStackMenu();
 	void stackDecoder(std::shared_ptr<scopy::logic::Decoder> decoder);
 	std::vector<std::shared_ptr<scopy::logic::Decoder>> getDecoderStack();
 
@@ -101,72 +97,61 @@ public:
 	AnnotationDecoder *getAnnotationDecoder();
 	std::vector<std::shared_ptr<scopy::bind::Decoder>> getDecoderBindings();
 
-    // Get the annotation at the given point
-    AnnotationQueryResult annotationAt(const QPointF& p) const;
-    bool testHit(const QPointF& p) const override;
+	// Get the annotation at the given point
+	AnnotationQueryResult annotationAt(const QPointF &p) const;
+	bool testHit(const QPointF &p) const override;
 
-    void drawAnnotation(int row, const Annotation &ann, QPainter *painter,
-                        const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-			const QRectF &canvasRect, const QwtPointMapper &mapper,
-			const QwtInterval &interval, const QSizeF &titleSize) const;
+	void drawAnnotation(int row, const Annotation &ann, QPainter *painter, const QwtScaleMap &xMap,
+			    const QwtScaleMap &yMap, const QRectF &canvasRect, const QwtPointMapper &mapper,
+			    const QwtInterval &interval, const QSizeF &titleSize) const;
 
-    void drawBlock(int row, uint64_t start, uint64_t end, QPainter *painter,
-                   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                   const QRectF &canvasRect, const QwtPointMapper &mapper) const;
+	void drawBlock(int row, uint64_t start, uint64_t end, QPainter *painter, const QwtScaleMap &xMap,
+		       const QwtScaleMap &yMap, const QRectF &canvasRect, const QwtPointMapper &mapper) const;
 
-    void drawAnnotationInfo(int row, uint64_t start, uint64_t end, QPainter *painter,
-		   const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-		   const QRectF &canvasRect) const;
+	void drawAnnotationInfo(int row, uint64_t start, uint64_t end, QPainter *painter, const QwtScaleMap &xMap,
+				const QwtScaleMap &yMap, const QRectF &canvasRect) const;
 
-    const double m_infoHeight = 17 * 2;
+	const double m_infoHeight = 17 * 2;
 
-    int getState();
+	int getState();
 
-    QString fromTitleToRowType(QString title) const;
+	QString fromTitleToRowType(QString title) const;
 
-    void setState(int st);
+	void setState(int st);
 
 protected:
-    void drawLines( QPainter *painter,
-        const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-        const QRectF &canvasRect, int from, int to ) const override;
+	void drawLines(QPainter *painter, const QwtScaleMap &xMap, const QwtScaleMap &yMap, const QRectF &canvasRect,
+		       int from, int to) const override;
 
 private:
-    void fillAnnotationCurve(int row, uint32_t annClass, QPainter *painter,
-                             const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-                             const QRectF &canvasRect, QPolygonF &polygon) const;
+	void fillAnnotationCurve(int row, uint32_t annClass, QPainter *painter, const QwtScaleMap &xMap,
+				 const QwtScaleMap &yMap, const QRectF &canvasRect, QPolygonF &polygon) const;
 
-    void closePolyline(int row, uint32_t annClass, QPainter *painter,
-        const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-        QPolygonF &polygon ) const;
+	void closePolyline(int row, uint32_t annClass, QPainter *painter, const QwtScaleMap &xMap,
+			   const QwtScaleMap &yMap, QPolygonF &polygon) const;
 
-    void drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
-                                 const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-				 const QRectF &canvasRect, const QwtPointMapper &mapper,
-				 const QwtInterval &interval, const QSizeF &titleSize) const;
+	void drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter, const QwtScaleMap &xMap,
+				     const QwtScaleMap &yMap, const QRectF &canvasRect, const QwtPointMapper &mapper,
+				     const QwtInterval &interval, const QSizeF &titleSize) const;
 
-    void drawOneSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
-                                 const QwtScaleMap &xMap, const QwtScaleMap &yMap,
-				 const QRectF &canvasRect, const QwtPointMapper &mapper,
-				 const QwtInterval &interval, const QSizeF &titleSize) const;
+	void drawOneSampleAnnotation(int row, const Annotation &ann, QPainter *painter, const QwtScaleMap &xMap,
+				     const QwtScaleMap &yMap, const QRectF &canvasRect, const QwtPointMapper &mapper,
+				     const QwtInterval &interval, const QSizeF &titleSize) const;
 
-    QString formatSeconds(double time) const;
-
-
+	QString formatSeconds(double time) const;
 
 private:
+	AnnotationDecoder *m_annotationDecoder;
+	mutable std::mutex m_mutex;
 
-    AnnotationDecoder *m_annotationDecoder;
-    mutable std::mutex m_mutex;
+	std::map<std::pair<const srd_decoder *, int>, Row> m_classRows;
+	std::map<Row, RowData> m_annotationRows;
 
-    std::map<std::pair<const srd_decoder*, int>, Row> m_classRows;
-    std::map<Row, RowData> m_annotationRows;
+	std::vector<std::shared_ptr<scopy::bind::Decoder>> m_bindings;
 
-    std::vector<std::shared_ptr<scopy::bind::Decoder>> m_bindings;
-
-    mutable int m_visibleRows;
-    mutable int state = -1;
+	mutable int m_visibleRows;
+	mutable int state = -1;
 };
-}
+} // namespace scopy
 
 #endif // ANNOTATIONCURVE_H

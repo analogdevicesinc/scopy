@@ -18,12 +18,11 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SWIOTSWITCHCTXTASK_H
 #define SWIOTSWITCHCTXTASK_H
 
-#include <QThread>
 #include <QObject>
+#include <QThread>
 
 namespace scopy::swiot {
 class SwiotSwitchCtxTask : public QThread
@@ -35,11 +34,11 @@ public:
 
 Q_SIGNALS:
 	void contextSwitched();
+
 private:
 	QString m_uri;
 	bool m_wasRuntime;
 };
-}
-
+} // namespace scopy::swiot
 
 #endif // SWIOTSWITCHCTXTASK_H

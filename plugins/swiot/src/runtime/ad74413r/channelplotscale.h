@@ -18,12 +18,12 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CHANNELPLOTSCALE_H
 #define CHANNELPLOTSCALE_H
 
-#include <QWidget>
 #include <QLabel>
+#include <QWidget>
+
 #include <gui/plot_utils.hpp>
 
 namespace scopy::swiot {
@@ -44,6 +44,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
 	void update();
+
 private:
 	QString m_unit;
 	QLabel *m_unitPerDivisionLbl;
@@ -54,9 +55,7 @@ private:
 	double m_instantValue;
 	bool m_enabled;
 	MetricPrefixFormatter *m_formatter;
-
 };
-}
+} // namespace scopy::swiot
 
-
-#endif //CHANNELPLOTSCALE_H
+#endif // CHANNELPLOTSCALE_H

@@ -1,14 +1,17 @@
 #include "widgets/measurementpanel.h"
+
+#include <QGridLayout>
 #include <QScrollArea>
 #include <QWidget>
-#include <QGridLayout>
+
 #include <measurementlabel.h>
 
 using namespace scopy;
 
-MeasurementsPanel::MeasurementsPanel(QWidget *parent) : QWidget(parent)
+MeasurementsPanel::MeasurementsPanel(QWidget *parent)
+	: QWidget(parent)
 {
-	QVBoxLayout* lay = new QVBoxLayout(this);
+	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
 
 	QScrollBar *scrollBar = new QScrollBar(this);
@@ -40,10 +43,11 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent) : QWidget(parent)
 	lay->addWidget(scrollBar);
 	lay->addWidget(scrollArea);
 
-	connect(scrollArea->horizontalScrollBar(), &QAbstractSlider::rangeChanged, scrollBar, [=](double min, double max) {
-		auto singleStep = scrollArea->horizontalScrollBar()->singleStep();
-		scrollBar->setVisible(singleStep < (max-min));
-	});
+	connect(scrollArea->horizontalScrollBar(), &QAbstractSlider::rangeChanged, scrollBar,
+		[=](double min, double max) {
+			auto singleStep = scrollArea->horizontalScrollBar()->singleStep();
+			scrollBar->setVisible(singleStep < (max - min));
+		});
 
 	m_cursor = new QWidget(panel);
 	panelLayout->addWidget(m_cursor);
@@ -51,13 +55,13 @@ MeasurementsPanel::MeasurementsPanel(QWidget *parent) : QWidget(parent)
 	spacer = new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Expanding);
 	panelLayout->addSpacerItem(spacer);
 
-	int idx = panelLayout->indexOf(spacer);	
+	int idx = panelLayout->indexOf(spacer);
 	m_stacks.append(new VerticalWidgetStack(this));
 	panelLayout->insertWidget(idx, m_stacks.last());
-
 }
 
-void MeasurementsPanel::addWidget(QWidget *meas) {
+void MeasurementsPanel::addWidget(QWidget *meas)
+{
 	if(m_stacks.last()->full()) {
 		m_stacks.append(new VerticalWidgetStack(this));
 		int idx = panelLayout->indexOf(spacer);
@@ -66,27 +70,30 @@ void MeasurementsPanel::addWidget(QWidget *meas) {
 	m_stacks.last()->addWidget(meas);
 }
 
-void MeasurementsPanel::addMeasurement(MeasurementLabel *meas) {
+void MeasurementsPanel::addMeasurement(MeasurementLabel *meas)
+{
 	addWidget(meas);
 	m_labels.append(meas);
 }
 
-void MeasurementsPanel::removeMeasurement(MeasurementLabel *meas) {
+void MeasurementsPanel::removeMeasurement(MeasurementLabel *meas)
+{
 	m_labels.removeAll(meas);
-//	updateOrder();
+	//	updateOrder();
 }
 
-void MeasurementsPanel::sort(int sortType) {
+void MeasurementsPanel::sort(int sortType)
+{
 
 	if(sortType == 0) {
-		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel* first, MeasurementLabel* second){
+		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel *first, MeasurementLabel *second) {
 			if(first->idx() == second->idx()) {
 				return first->color().name() > second->color().name();
 			}
 			return first->idx() < second->idx();
 		});
 	} else {
-		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel* first, MeasurementLabel* second){
+		std::sort(m_labels.begin(), m_labels.end(), [=](MeasurementLabel *first, MeasurementLabel *second) {
 			if(first->color().name() == second->color().name()) {
 				return first->idx() < second->idx();
 			}
@@ -102,8 +109,9 @@ void MeasurementsPanel::sort(int sortType) {
 		updateOrder();
 }*/
 
-void MeasurementsPanel::updateOrder() {
-	for(VerticalWidgetStack* stack : m_stacks) {
+void MeasurementsPanel::updateOrder()
+{
+	for(VerticalWidgetStack *stack : m_stacks) {
 		stack->reparentWidgets(nullptr);
 		panelLayout->removeWidget(stack);
 		delete stack;
@@ -117,18 +125,13 @@ void MeasurementsPanel::updateOrder() {
 	for(QWidget *label : m_labels) {
 		addWidget(label);
 	}
-
 }
 
-QWidget *MeasurementsPanel::cursorArea() {
-	return m_cursor;
-}
-
-
+QWidget *MeasurementsPanel::cursorArea() { return m_cursor; }
 
 StatsPanel::StatsPanel(QWidget *parent)
 {
-	QVBoxLayout* lay = new QVBoxLayout(this);
+	QVBoxLayout *lay = new QVBoxLayout(this);
 	setLayout(lay);
 
 	lay->setMargin(0);
@@ -150,10 +153,7 @@ StatsPanel::StatsPanel(QWidget *parent)
 	lay->addWidget(scrollArea);
 }
 
-StatsPanel::~StatsPanel()
-{
-
-}
+StatsPanel::~StatsPanel() {}
 
 void StatsPanel::addStat(StatsLabel *stat)
 {
@@ -178,18 +178,17 @@ void StatsPanel::updateOrder()
 	}
 }
 
-
 void StatsPanel::sort(int sortType)
 {
 	if(sortType == 0) {
-		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel* first, StatsLabel* second){
+		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel *first, StatsLabel *second) {
 			if(first->idx() == second->idx()) {
 				return first->color().name() > second->color().name();
 			}
 			return first->idx() < second->idx();
 		});
 	} else {
-		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel* first, StatsLabel* second){
+		std::sort(m_labels.begin(), m_labels.end(), [=](StatsLabel *first, StatsLabel *second) {
 			if(first->color().name() == second->color().name()) {
 				return first->idx() < second->idx();
 			}
@@ -198,3 +197,5 @@ void StatsPanel::sort(int sortType)
 	}
 	updateOrder();
 }
+
+#include "moc_measurementpanel.cpp"

@@ -18,35 +18,38 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef CONFIGMODEL_H
 #define CONFIGMODEL_H
 
 #include "qobject.h"
-#include <QMap>
-#include <string>
-#include <iioutil/commandqueue.h>
 
-extern "C"{
-struct iio_channel;
-struct iio_device;
+#include <QMap>
+
+#include <iioutil/commandqueue.h>
+#include <string>
+
+extern "C"
+{
+	struct iio_channel;
+	struct iio_device;
 }
 
 namespace scopy::swiot {
-class ConfigModel : public QObject {
+class ConfigModel : public QObject
+{
 	Q_OBJECT
 public:
-	explicit ConfigModel(struct iio_device* device, int channelId, CommandQueue *m_commandQueue);
+	explicit ConfigModel(struct iio_device *device, int channelId, CommandQueue *m_commandQueue);
 	~ConfigModel();
 
 	void readEnabled();
-	void writeEnabled(const QString& enabled);
+	void writeEnabled(const QString &enabled);
 
 	void readDevice();
-	void writeDevice(const QString& device);
+	void writeDevice(const QString &device);
 
 	void readFunction();
-	void writeFunction(const QString& function);
+	void writeFunction(const QString &function);
 
 	void readDeviceAvailable();
 	void readFunctionAvailable();
@@ -62,7 +65,7 @@ Q_SIGNALS:
 	void configChannelFunction();
 
 private:
-	struct iio_device* m_device;
+	struct iio_device *m_device;
 	int m_channelId;
 
 	std::string m_enableAttribute;
@@ -76,5 +79,5 @@ private:
 	QStringList m_availableFunctions;
 	CommandQueue *m_commandQueue;
 };
-}
+} // namespace scopy::swiot
 #endif // CONFIGMODEL_H

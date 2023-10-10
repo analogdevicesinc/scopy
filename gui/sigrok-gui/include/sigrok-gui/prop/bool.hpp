@@ -37,7 +37,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_PROP_BOOL_HPP
 #define PULSEVIEW_PV_PROP_BOOL_HPP
 
@@ -58,7 +57,7 @@ public:
 
 	virtual ~Bool() = default;
 
-	QWidget* get_widget(QWidget *parent, bool auto_commit);
+	QWidget *get_widget(QWidget *parent, bool auto_commit);
 	bool labeled_widget() const;
 	void update_widget();
 
@@ -71,7 +70,7 @@ private:
 	QCheckBox *check_box_;
 };
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_PROP_BOOL_HPP

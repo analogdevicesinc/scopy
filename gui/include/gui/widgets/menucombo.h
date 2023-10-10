@@ -1,16 +1,18 @@
 #ifndef MENUCOMBO_H
 #define MENUCOMBO_H
 
+#include <QComboBox>
+#include <QLabel>
+#include <QPen>
+#include <QWidget>
+
 #include <scopy-gui_export.h>
 #include <utils.h>
-#include <QWidget>
-#include <QLabel>
-#include <QComboBox>
-#include <QPen>
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT MenuCombo : public QWidget {
+class SCOPY_GUI_EXPORT MenuCombo : public QWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
@@ -25,7 +27,8 @@ private:
 	QComboBox *m_combo;
 };
 
-class SCOPY_GUI_EXPORT MenuComboWidget : public QWidget {
+class SCOPY_GUI_EXPORT MenuComboWidget : public QWidget
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
@@ -39,6 +42,6 @@ private:
 	MenuCombo *m_combo;
 	QPen m_pen;
 };
-}
+} // namespace scopy
 
 #endif // MENUCOMBO_H

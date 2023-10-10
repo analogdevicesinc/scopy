@@ -18,26 +18,25 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PATTERNGENERATOR_H
 #define PATTERNGENERATOR_H
 
-#include "m2ktool.hpp"
-#include "oscilloscope_plot.hpp"
 #include "buffer_previewer.hpp"
-#include "gui/spinbox_a.hpp"
-#include "mousewheelwidgetguard.h"
 #include "gui/genericlogicplotcurve.h"
+#include "gui/spinbox_a.hpp"
+#include "m2ktool.hpp"
+#include "mousewheelwidgetguard.h"
+#include "oscilloscope_plot.hpp"
 
-#include <libm2k/m2k.hpp>
+#include <QMap>
+#include <QQueue>
+#include <QScrollBar>
+#include <QTimer>
+
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/enums.hpp>
-
-#include <QScrollBar>
-#include <QQueue>
-#include <QTimer>
-#include <QMap>
+#include <libm2k/m2k.hpp>
 
 using namespace libm2k;
 using namespace libm2k::digital;
@@ -50,7 +49,7 @@ class PatternGenerator;
 namespace scopy {
 class BaseMenu;
 class CustomPushButton;
-}
+} // namespace scopy
 
 namespace scopy::m2k {
 class Filter;
@@ -65,9 +64,9 @@ class PatternGenerator : public M2kTool
 	Q_OBJECT
 
 	friend class PatternGenerator_API;
+
 public:
-	explicit PatternGenerator(struct iio_context *ctx, Filter *filt,
-				  ToolMenuEntry *tme, QJSEngine *engine,
+	explicit PatternGenerator(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QJSEngine *engine,
 				  DIOManager *diom, QWidget *parent);
 	~PatternGenerator();
 	void setNativeDialogs(bool nativeDialogs) override;
@@ -86,7 +85,7 @@ private Q_SLOTS:
 	void rightMenuFinished(bool opened);
 	void channelSelectedChanged(int chIdx, bool selected);
 	void on_btnGroupChannels_toggled(bool checked);
-	void patternSelected(const QString& pattern, int ch = -1, const QString &json = {});
+	void patternSelected(const QString &pattern, int ch = -1, const QString &json = {});
 	void on_btnOutputMode_toggled(bool);
 	void regenerate();
 	void readPreferences();
@@ -110,9 +109,7 @@ private:
 	uint64_t computeSampleRate() const;
 	uint64_t computeBufferSize(uint64_t sampleRate) const;
 	uint16_t remapBuffer(uint8_t *mapping, uint32_t val);
-	void commitBuffer(const QPair<QVector<int>, PatternUI *> &pattern,
-			  uint16_t *buffer,
-			  uint32_t bufferSize);
+	void commitBuffer(const QPair<QVector<int>, PatternUI *> &pattern, uint16_t *buffer, uint32_t bufferSize);
 	void checkEnabledChannels();
 	void removeAnnotationCurveOfPattern(PatternUI *pattern);
 	void updateAnnotationCurveChannelsForPattern(const QPair<QVector<int>, PatternUI *> &pattern);
@@ -136,7 +133,7 @@ private:
 
 	QVector<QPair<QVector<int>, PatternUI *>> m_enabledPatterns;
 
-	M2k* m_m2k_context;
+	M2k *m_m2k_context;
 	M2kDigital *m_m2kDigital;
 	uint64_t m_bufferSize;
 	uint64_t m_sampleRate;
@@ -146,9 +143,9 @@ private:
 
 	QTimer *m_singleTimer;
 
-	QMap<PatternUI*, QPair<GenericLogicPlotCurve*, QMetaObject::Connection>> m_annotationCurvePatternUiMap;
+	QMap<PatternUI *, QPair<GenericLogicPlotCurve *, QMetaObject::Connection>> m_annotationCurvePatternUiMap;
 };
 
 } // namespace logic
-} // namespace scopy
+} // namespace scopy::m2k
 #endif // PATTERNGENERATOR_H

@@ -18,7 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include <QTest>
 
 class ScopyMainWindowTest : public QObject
@@ -28,7 +27,7 @@ private Q_SLOTS:
 	void hello();
 };
 
-void ScopyMainWindowTest::hello() {
+void ScopyMainWindowTest::hello(){
 
 };
 

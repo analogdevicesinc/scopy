@@ -1,8 +1,10 @@
 #ifndef GRPROXYBLOCK_H
 #define GRPROXYBLOCK_H
 
-#include <gnuradio/basic_block.h>
 #include "scopy-gr-util_export.h"
+
+#include <gnuradio/basic_block.h>
+
 #include <QObject>
 
 namespace scopy::grutil {
@@ -34,9 +36,9 @@ protected:
 	QList<gr::basic_block_sptr> start_blk; // QList of (?)
 	gr::basic_block_sptr end_blk;
 	bool m_enabled;
-//	bool m_built;
+	//	bool m_built;
 };
 
-}
+} // namespace scopy::grutil
 
 #endif // GRPROXYBLOCK_H

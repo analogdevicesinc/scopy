@@ -21,35 +21,19 @@
 
 namespace scopy {
 
-Calibration_API::Calibration_API(Calibration *calib) : ApiObject(),
-	calib(calib)
-{
-}
+Calibration_API::Calibration_API(Calibration *calib)
+	: ApiObject()
+	, calib(calib)
+{}
 
-bool Calibration_API::calibrateAll()
-{
-	return calib->calibrateAll();
-}
+bool Calibration_API::calibrateAll() { return calib->calibrateAll(); }
 
-bool Calibration_API::calibrateAdc()
-{
-	return calib->calibrateAdc();
-}
+bool Calibration_API::calibrateAdc() { return calib->calibrateAdc(); }
 
-bool Calibration_API::calibrateDac()
-{
-	return calib->calibrateDac();
-}
+bool Calibration_API::calibrateDac() { return calib->calibrateDac(); }
 
-bool Calibration_API::resetCalibration()
-{
-	return calib->resetCalibration();
-}
+bool Calibration_API::resetCalibration() { return calib->resetCalibration(); }
 
-double Calibration_API::devTemp(const QString& devName)
-{
-	return calib->getIioDevTemp(devName);
-}
+double Calibration_API::devTemp(const QString &devName) { return calib->getIioDevTemp(devName); }
 
-
-}
+} // namespace scopy

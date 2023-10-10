@@ -1,8 +1,9 @@
 #ifndef INSTRUMENTNOTES_H
 #define INSTRUMENTNOTES_H
 
-#include <QWidget>
 #include "scopy-gui_export.h"
+
+#include <QWidget>
 
 namespace Ui {
 class InstrumentNotes;
@@ -23,6 +24,6 @@ public Q_SLOTS:
 private:
 	Ui::InstrumentNotes *ui;
 };
-}
+} // namespace scopy
 
 #endif // INSTRUMENTNOTES_H

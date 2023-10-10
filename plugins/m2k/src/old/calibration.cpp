@@ -19,47 +19,46 @@
  */
 
 #include "calibration.hpp"
-#include <libm2k/m2kexceptions.hpp>
-
-#include <errno.h>
-#include <QDebug>
-#include <QtGlobal>
-#include <iio.h>
-#include <QThread>
 
 #include "calibration_api.hpp"
-#include <QLoggingCategory>
 #include "pluginbase/scopyjs.h"
 
-Q_LOGGING_CATEGORY(CAT_M2K_CALIBRATION,"M2KCalibration");
+#include <iio.h>
+
+#include <QDebug>
+#include <QLoggingCategory>
+#include <QThread>
+#include <QtGlobal>
+
+#include <errno.h>
+#include <libm2k/m2kexceptions.hpp>
+
+Q_LOGGING_CATEGORY(CAT_M2K_CALIBRATION, "M2KCalibration");
 
 using namespace scopy;
 
-Calibration::Calibration(struct iio_context *ctx):
-	m_api(new Calibration_API(this)),
-	m_cancel(false),
-	m_ctx(ctx),
-	m_initialized(false)
+Calibration::Calibration(struct iio_context *ctx)
+	: m_api(new Calibration_API(this))
+	, m_cancel(false)
+	, m_ctx(ctx)
+	, m_initialized(false)
 {
 	m_api->setObjectName("calib");
 	ScopyJS::GetInstance()->registerApi(m_api);
 }
 
-Calibration::~Calibration()
-{
-	delete m_api;
-}
+Calibration::~Calibration() { delete m_api; }
 
 bool Calibration::initialize()
 {
 	m_initialized = false;
 
-	if (!m_ctx) {
+	if(!m_ctx) {
 		return false;
 	}
 
 	m_m2k = libm2k::context::m2kOpen(m_ctx, "");
-	if (!m_m2k) {
+	if(!m_m2k) {
 		return false;
 	}
 
@@ -68,20 +67,13 @@ bool Calibration::initialize()
 	return m_initialized;
 }
 
-bool Calibration::isInitialized() const
-{
-	return m_initialized;
-}
+bool Calibration::isInitialized() const { return m_initialized; }
 
-bool Calibration::isCalibrated()
-{
-	return m_m2k->isCalibrated();
-}
-
+bool Calibration::isCalibrated() { return m_m2k->isCalibrated(); }
 
 bool Calibration::resetCalibration()
 {
-	if (!m_initialized) {
+	if(!m_initialized) {
 		qDebug(CAT_M2K_CALIBRATION) << "Rx path is not initialized for calibration.";
 		return false;
 	}
@@ -93,14 +85,14 @@ bool Calibration::resetCalibration()
 
 bool Calibration::calibrateAll()
 {
-	if (!m_m2k) {
+	if(!m_m2k) {
 		return false;
 	}
 
 	bool ok = false;
 	try {
 		ok = m_m2k->calibrateADC();
-	} catch (libm2k::m2k_exception &e) {
+	} catch(libm2k::m2k_exception &e) {
 		qDebug(CAT_M2K_CALIBRATION) << e.what();
 		ok = false;
 	}
@@ -109,7 +101,7 @@ bool Calibration::calibrateAll()
 
 	try {
 		ok = m_m2k->calibrateDAC();
-	} catch (libm2k::m2k_exception &e) {
+	} catch(libm2k::m2k_exception &e) {
 		qDebug(CAT_M2K_CALIBRATION) << e.what();
 		ok = false;
 	}
@@ -119,47 +111,30 @@ bool Calibration::calibrateAll()
 	return true;
 
 calibration_fail:
-	m_cancel=false;
+	m_cancel = false;
 	return false;
 }
 
-bool Calibration::calibrateAdc()
-{
-	return m_m2k->calibrateADC();
-}
+bool Calibration::calibrateAdc() { return m_m2k->calibrateADC(); }
 
-bool Calibration::calibrateDac()
-{
-	return m_m2k->calibrateDAC();
-}
+bool Calibration::calibrateDac() { return m_m2k->calibrateDAC(); }
 
-void Calibration::cancelCalibration()
-{
-	m_cancel = true;
-}
+void Calibration::cancelCalibration() { m_cancel = true; }
 
-bool Calibration::hasContextCalibration() const
-{
-	return m_m2k->hasContextCalibration();
-}
+bool Calibration::hasContextCalibration() const { return m_m2k->hasContextCalibration(); }
 
-float Calibration::calibrateFromContext()
-{
-	return m_m2k->calibrateFromContext();
-}
+float Calibration::calibrateFromContext() { return m_m2k->calibrateFromContext(); }
 
 /* FIXME: TODO: Move this into a HW class / lib M2k */
-double Calibration::getIioDevTemp(const QString& devName) const
+double Calibration::getIioDevTemp(const QString &devName) const
 {
 	double temp = -273.15;
 
-	struct iio_device *dev = iio_context_find_device(m_ctx,
-		devName.toLatin1().data());
+	struct iio_device *dev = iio_context_find_device(m_ctx, devName.toLatin1().data());
 
-	if (dev) {
-		struct iio_channel *chn = iio_device_find_channel(dev, "temp0",
-			false);
-		if (chn) {
+	if(dev) {
+		struct iio_channel *chn = iio_device_find_channel(dev, "temp0", false);
+		if(chn) {
 			double offset;
 			double raw;
 			double scale;
