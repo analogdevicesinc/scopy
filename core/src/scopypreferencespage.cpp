@@ -1,23 +1,20 @@
 #include "scopypreferencespage.h"
-
-#include "application_restarter.h"
-#include "pluginbase/preferenceshelper.h"
-
-#include <QCoreApplication>
-#include <QDebug>
-#include <QDesktopServices>
-#include <QDir>
-#include <QLabel>
-#include <QLoggingCategory>
-#include <QPushButton>
-#include <QScrollArea>
-#include <QTabBar>
 #include <QTabWidget>
-#include <QUrl>
 #include <QVBoxLayout>
-
-#include <common/scopyconfig.h>
+#include <QPushButton>
+#include <QLabel>
+#include <QTabBar>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QCoreApplication>
+#include <QScrollArea>
 #include <stylehelper.h>
+#include "pluginbase/preferenceshelper.h"
+#include "application_restarter.h"
+#include <QDir>
+#include <QDebug>
+#include <QLoggingCategory>
+#include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
@@ -204,6 +201,9 @@ QWidget *ScopyPreferencesPage::buildGeneralPreferencesPage()
 		p, "general_use_animations", "Enable menu animations", generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "general_check_online_version", "Enable automatic online check for updates.", generalSection));
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
+		p, "general_show_status_bar", "Enable the status bar for displaying important messages.",
+		generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
 		p, "general_theme", "Theme", {"default", "light"}, generalSection));
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
