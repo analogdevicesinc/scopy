@@ -1,37 +1,37 @@
-#include "scopymainwindow.h"
-
-#include "animationmanager.h"
-#include "device.h"
-#include "iioutil/contextprovider.h"
-#include "logging_categories.h"
-#include "pluginbase/messagebroker.h"
-#include "pluginbase/preferences.h"
-#include "pluginbase/scopyjs.h"
-#include "popupwidget.h"
-#include "qmessagebox.h"
-#include "scanbuttoncontroller.h"
-#include "scopy-core_config.h"
-#include "scopyaboutpage.h"
-#include "scopyhomepage.h"
-#include "scopypreferencespage.h"
-
-#include "ui_scopymainwindow.h"
-
-#include <QFileDialog>
-#include <QLabel>
-#include <QLoggingCategory>
 #include <QOpenGLWidget>
-#include <QStandardPaths>
 #include <QSurfaceFormat>
+#include <QLabel>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QLoggingCategory>
 #include <QTranslator>
 
+#include "logging_categories.h"
+#include "qmessagebox.h"
+#include "scopymainwindow.h"
+#include "animationmanager.h"
+
+#include "scanbuttoncontroller.h"
+#include "ui_scopymainwindow.h"
+#include "scopyhomepage.h"
+#include "scopyaboutpage.h"
+#include "scopypreferencespage.h"
+#include "device.h"
+
+#include "pluginbase/preferences.h"
+#include "pluginbase/scopyjs.h"
+#include "iioutil/contextprovider.h"
+#include "pluginbase/messagebroker.h"
+#include "scopy-core_config.h"
+#include "popupwidget.h"
+#include "pluginbase/statusmanager.h"
 #include <common/scopyconfig.h>
-#include <functional>
-#include <libsigrokdecode/libsigrokdecode.h>
-#include <scopymainwindow_api.h>
-#include <stylehelper.h>
 #include <translationsrepository.h>
+#include <libsigrokdecode/libsigrokdecode.h>
+#include <functional>
 #include <utility>
+#include <stylehelper.h>
+#include <scopymainwindow_api.h>
 
 using namespace scopy;
 
@@ -153,6 +153,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	qInfo(CAT_BENCHMARK) << "ScopyMainWindow constructor took: " << timer.elapsed() << "ms";
 }
 
+void ScopyMainWindow::initStatusBar()
+{
+	statusBar = new ScopyStatusBar(this);
+	ui->mainWidget->layout()->addWidget(statusBar);
+}
+
 void ScopyMainWindow::save()
 {
 	QString selectedFilter;
@@ -251,6 +257,7 @@ void ScopyMainWindow::initPreferences()
 	p->init("general_load_decoders", true);
 	p->init("general_doubleclick_ctrl_opens_menu", true);
 	p->init("general_check_online_version", false);
+	p->init("general_show_status_bar", true);
 
 	connect(p, SIGNAL(preferenceChanged(QString, QVariant)), this, SLOT(handlePreferences(QString, QVariant)));
 
@@ -259,6 +266,9 @@ void ScopyMainWindow::initPreferences()
 	}
 	if(p->get("general_load_decoders").toBool()) {
 		loadDecoders();
+	}
+	if(p->get("general_show_status_bar").toBool()) {
+		initStatusBar();
 	}
 	if(p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);

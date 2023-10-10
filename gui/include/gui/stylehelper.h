@@ -2,17 +2,19 @@
 #define STYLEHELPER_H
 
 #include "widgets/hoverwidget.h"
-
-#include <QCheckBox>
-#include <QComboBox>
-#include <QHBoxLayout>
-#include <QLabel>
 #include <QMap>
+#include <QLabel>
+#include <QCheckBox>
 #include <QPushButton>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QStatusBar>
 
 #include <scopy-gui_export.h>
 #include <utils.h>
+
+#include <QVBoxLayout>
+#include <QComboBox>
+#include <QListWidget>
 
 // Forward declarations
 namespace scopy {
@@ -90,6 +92,8 @@ public:
 	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
+	static void ScopyStatusBar(QStatusBar *w, QString objectName = "");
+	static void ScopyHistoryList(QListWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
