@@ -1002,6 +1002,7 @@ void StyleHelper::FrameBackgroundShadow(QFrame *w, QString objectName)
 					border-radius: 4px;
 				}
 				)css");
+	w->setStyleSheet(style);
 }
 
 void StyleHelper::HoverWidget(QWidget *w, bool draggable, QString objectName)
