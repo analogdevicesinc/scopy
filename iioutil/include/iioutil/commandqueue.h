@@ -1,18 +1,18 @@
 #ifndef IIOCOMMANDQUEUE_H
 #define IIOCOMMANDQUEUE_H
 
-#include <deque>
-#include <QThreadPool>
-#include <QThread>
-
 #include "command.h"
+
+#include <QThread>
+#include <QThreadPool>
+
+#include <deque>
 
 namespace scopy {
 class SCOPY_IIOUTIL_EXPORT CommandQueue : public QObject
 {
 	Q_OBJECT
 public:
-
 	/**
 	 * @brief IioCommandQueue::IioCommandQueue
 	 * @param numberOfThreads
@@ -31,9 +31,10 @@ private Q_SLOTS:
 	void work();
 	void cmdStarted(scopy::Command *cmd);
 	void cmdFinished(scopy::Command *cmd);
+
 private:
 	Command *m_currentCommand;
-	std::deque<Command*> m_commandQueue;
+	std::deque<Command *> m_commandQueue;
 	std::mutex m_commandMutex;
 	std::atomic<bool> m_running;
 	QThreadPool m_commandExecThreadPool;
@@ -41,5 +42,5 @@ private:
 	bool m_async;
 	bool m_workNewThread;
 };
-}
+} // namespace scopy
 #endif // IIOCOMMANDQUEUE_H

@@ -37,15 +37,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_BINDING_DECODER_HPP
 #define PULSEVIEW_PV_BINDING_DECODER_HPP
 
-#include "binding.hpp"
-
-#include "../prop/property.hpp"
-
 #include "../annotationdecoder.h"
+#include "../prop/property.hpp"
+#include "binding.hpp"
 #include "scopy-sigrok-gui_export.h"
 
 using std::shared_ptr;
@@ -56,7 +53,7 @@ namespace scopy {
 namespace logic {
 class Decoder;
 }
-}
+} // namespace scopy
 
 namespace scopy {
 
@@ -65,14 +62,15 @@ namespace bind {
 class SCOPY_SIGROK_GUI_EXPORT Decoder : public Binding
 {
 public:
-	Decoder(scopy::AnnotationDecoder *annDec,
-	shared_ptr<scopy::logic::Decoder> decoder);
+	Decoder(scopy::AnnotationDecoder *annDec, shared_ptr<scopy::logic::Decoder> decoder);
 
 	static QVariant gVariantToQVariant(GVariant *value);
+
 private:
-	static shared_ptr<scopy::prop::Property> bind_enum(const QString &name,
-		const QString &desc, const srd_decoder_option *option,
-		prop::Property::Getter getter, prop::Property::Setter setter);
+	static shared_ptr<scopy::prop::Property> bind_enum(const QString &name, const QString &desc,
+							   const srd_decoder_option *option,
+							   prop::Property::Getter getter,
+							   prop::Property::Setter setter);
 
 	QVariant getter(const char *id);
 
@@ -80,10 +78,10 @@ private:
 
 private:
 	scopy::AnnotationDecoder *m_annDecoder;
-    shared_ptr<logic::Decoder> decoder_;
+	shared_ptr<logic::Decoder> decoder_;
 };
 
-}  // namespace binding
-}  // namespace pv
+} // namespace bind
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_BINDING_DECODER_HPP

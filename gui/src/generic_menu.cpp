@@ -1,9 +1,10 @@
-#include <QVBoxLayout>
 #include "generic_menu.hpp"
+
+#include <QVBoxLayout>
 
 using namespace scopy::gui;
 
-GenericMenu::GenericMenu(QWidget* parent)
+GenericMenu::GenericMenu(QWidget *parent)
 	: QWidget(parent)
 	, m_menuHeader(new MenuHeader(parent))
 	, m_menu(new BaseMenu(parent))
@@ -12,15 +13,15 @@ GenericMenu::GenericMenu(QWidget* parent)
 
 GenericMenu::~GenericMenu()
 {
-//	delete m_menuHeader;
-//	delete m_menu;
+	//	delete m_menuHeader;
+	//	delete m_menu;
 }
 
 void GenericMenu::initInteractiveMenu()
 {
 	this->setStyleSheet(".QWidget { background-color: none; }");
 
-	QVBoxLayout* layout = new QVBoxLayout(this);
+	QVBoxLayout *layout = new QVBoxLayout(this);
 	layout->setSpacing(10);
 	layout->setContentsMargins(18, 20, 18, 9);
 
@@ -30,16 +31,16 @@ void GenericMenu::initInteractiveMenu()
 	this->setLayout(layout);
 }
 
-void GenericMenu::setMenuHeader(const QString& title, const QColor* lineColor, bool hasEnableBtn)
+void GenericMenu::setMenuHeader(const QString &title, const QColor *lineColor, bool hasEnableBtn)
 {
 	m_menuHeader->setLabel(title);
 	m_menuHeader->setLineColor(lineColor);
 	m_menuHeader->setEnabledBtnState(hasEnableBtn);
 }
 
-void GenericMenu::insertSection(SubsectionSeparator* section)
+void GenericMenu::insertSection(SubsectionSeparator *section)
 {
-	BaseMenuItem* item = new BaseMenuItem(m_menu);
+	BaseMenuItem *item = new BaseMenuItem(m_menu);
 	item->setWidget(section);
 
 	m_menu->insertMenuItem(item, m_lastOpenPosition);
@@ -62,17 +63,10 @@ void GenericMenu::setMenuWidget(QWidget *widget)
 	this->layout()->addWidget(widget);
 }
 
-void GenericMenu::hideEvent(QHideEvent *)
-{
-    Q_EMIT menuVisibilityChanged(false);
-}
+void GenericMenu::hideEvent(QHideEvent *) { Q_EMIT menuVisibilityChanged(false); }
 
-void GenericMenu::showEvent(QShowEvent *)
-{
-    Q_EMIT menuVisibilityChanged(true);
-}
+void GenericMenu::showEvent(QShowEvent *) { Q_EMIT menuVisibilityChanged(true); }
 
-void GenericMenu::addNewHeaderWidget(QWidget *widget)
-{
-	m_menuHeader->addNewHeaderWidget(widget);
-}
+void GenericMenu::addNewHeaderWidget(QWidget *widget) { m_menuHeader->addNewHeaderWidget(widget); }
+
+#include "moc_generic_menu.cpp"

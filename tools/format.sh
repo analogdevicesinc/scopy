@@ -13,6 +13,7 @@ find $SCOPY_REPO -type f -name "*.cc" | xargs $CLANG_FORMAT $VERBOSE $IN_PLACE
 find $SCOPY_REPO -type f -name "*.hpp" | xargs $CLANG_FORMAT $VERBOSE $IN_PLACE
 find $SCOPY_REPO -type f -name "*.h" | xargs $CLANG_FORMAT $VERBOSE $IN_PLACE
 find $SCOPY_REPO -type f -name "CMakeLists.txt" | xargs $CMAKE_FORMAT $IN_PLACE
+find $SCOPY_REPO -type f -name "*.cmake" | xargs $CMAKE_FORMAT $IN_PLACE
 pushd $SCOPY_REPO/tools
 ./includemocs.sh
 popd

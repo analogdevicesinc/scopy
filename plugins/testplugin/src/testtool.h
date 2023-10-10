@@ -1,13 +1,15 @@
 #ifndef TESTTOOL_H
 #define TESTTOOL_H
 
-#include <QWidget>
+#include "gui/mapstackedwidget.h"
 #include "gui/tooltemplate.h"
-#include <QPushButton>
+
 #include <QCheckBox>
 #include <QLabel>
+#include <QPushButton>
+#include <QWidget>
+
 #include <scopy-testplugin_export.h>
-#include "gui/mapstackedwidget.h"
 
 using namespace scopy;
 
@@ -18,6 +20,7 @@ public:
 	void initData();
 public Q_SLOTS:
 	void acquireData();
+
 private:
 	int testDataSize = 128;
 	double amplitude = 0.5;
@@ -26,10 +29,9 @@ private:
 	std::vector<double> y1Volt;
 	std::vector<double> xTime;
 
-
 	ToolTemplate *tool;
 	QPushButton *btn1, *btn2, *btn3;
-	QWidget* createMenu(QWidget* parent);
+	QWidget *createMenu(QWidget *parent);
 };
 //};
 #endif // TESTTOOL_H

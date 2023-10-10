@@ -22,8 +22,7 @@
 
 #include <network_analyzer.hpp>
 
-namespace scopy::m2k
-{
+namespace scopy::m2k {
 
 class NetworkAnalyzer_API : public ApiObject
 {
@@ -31,10 +30,8 @@ class NetworkAnalyzer_API : public ApiObject
 
 	Q_PROPERTY(double min_freq READ getMinFreq WRITE setMinFreq);
 	Q_PROPERTY(double max_freq READ getMaxFreq WRITE setMaxFreq);
-	Q_PROPERTY(double samples_count READ getSamplesCount
-			WRITE setSamplesCount);
-	Q_PROPERTY(double amplitude READ getAmplitude
-			WRITE setAmplitude);
+	Q_PROPERTY(double samples_count READ getSamplesCount WRITE setSamplesCount);
+	Q_PROPERTY(double amplitude READ getAmplitude WRITE setAmplitude);
 	Q_PROPERTY(double offset READ getOffset WRITE setOffset);
 
 	Q_PROPERTY(double min_mag READ getMinMag WRITE setMinMag);
@@ -44,18 +41,14 @@ class NetworkAnalyzer_API : public ApiObject
 
 	Q_PROPERTY(bool log_freq READ isLogFreq WRITE setLogFreq);
 
-	Q_PROPERTY(int ref_channel READ getRefChannel
-			WRITE setRefChannel);
+	Q_PROPERTY(int ref_channel READ getRefChannel WRITE setRefChannel);
 
 	Q_PROPERTY(bool running READ running WRITE run STORED false);
 	Q_PROPERTY(bool cursors READ getCursors WRITE setCursors);
 	Q_PROPERTY(int line_thickness READ getLineThickness WRITE setLineThickness);
-	Q_PROPERTY(int cursors_position READ getCursorsPosition
-      WRITE setCursorsPosition)
-	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency
-      WRITE setCursorsTransparency)
-	Q_PROPERTY(int plot_type READ getPlotType
-      WRITE setPlotType)
+	Q_PROPERTY(int cursors_position READ getCursorsPosition WRITE setCursorsPosition)
+	Q_PROPERTY(int cursors_transparency READ getCursorsTransparency WRITE setCursorsTransparency)
+	Q_PROPERTY(int plot_type READ getPlotType WRITE setPlotType)
 	Q_PROPERTY(QList<double> data READ data STORED false)
 	Q_PROPERTY(QList<double> phase READ phase STORED false)
 	Q_PROPERTY(QList<double> freq READ freq STORED false)
@@ -63,8 +56,10 @@ class NetworkAnalyzer_API : public ApiObject
 	Q_PROPERTY(int periods READ getPeriods WRITE setPeriods)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
 public:
-	explicit NetworkAnalyzer_API(NetworkAnalyzer *net) :
-		ApiObject(), net(net) {}
+	explicit NetworkAnalyzer_API(NetworkAnalyzer *net)
+		: ApiObject()
+		, net(net)
+	{}
 	~NetworkAnalyzer_API() {}
 
 	double getMinFreq() const;
@@ -131,5 +126,5 @@ public:
 private:
 	NetworkAnalyzer *net;
 };
-}
+} // namespace scopy::m2k
 #endif // NETWORK_ANALYZER_API_HPP

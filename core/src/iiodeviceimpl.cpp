@@ -1,5 +1,7 @@
 #include "iiodeviceimpl.h"
+
 #include "iioutil/contextprovider.h"
+
 #include <QLoggingCategory>
 
 Q_LOGGING_CATEGORY(CAT_IIO_DEVICEIMPL, "IIODevice")
@@ -19,7 +21,7 @@ void IIODeviceImpl::init()
 bool IIODeviceImpl::verify()
 {
 	iio_context *ctx = ContextProvider::GetInstance()->open(m_param);
-	if (!ctx) {
+	if(!ctx) {
 		return false;
 	}
 	ContextProvider::GetInstance()->close(m_param);
@@ -28,15 +30,15 @@ bool IIODeviceImpl::verify()
 
 QMap<QString, QString> IIODeviceImpl::readDeviceInfo()
 {
-	QMap <QString, QString> contextAttributes;
+	QMap<QString, QString> contextAttributes;
 	iio_context *ctx = ContextProvider::GetInstance()->open(m_param);
-	if (!ctx) {
+	if(!ctx) {
 		qWarning(CAT_IIO_DEVICEIMPL) << "Cannot read the device info! (unavailable context)";
 	} else {
-		for(int i=0;i<iio_context_get_attrs_count(ctx);i++) {
+		for(int i = 0; i < iio_context_get_attrs_count(ctx); i++) {
 			const char *name;
 			const char *value;
-			int ret = iio_context_get_attr(ctx,i,&name,&value);
+			int ret = iio_context_get_attr(ctx, i, &name, &value);
 			if(ret != 0)
 				continue;
 			contextAttributes[name] = value;
@@ -46,4 +48,3 @@ QMap<QString, QString> IIODeviceImpl::readDeviceInfo()
 
 	return contextAttributes;
 }
-

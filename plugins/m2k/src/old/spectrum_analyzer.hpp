@@ -21,37 +21,39 @@
 #ifndef SPECTRUM_ANALYZER_HPP
 #define SPECTRUM_ANALYZER_HPP
 
-#include <gnuradio/top_block.h>
-#include <gnuradio/fft/window.h>
-#include <gnuradio/blocks/complex_to_mag_squared.h>
-
-#include "iio_manager.hpp"
-#include "scope_sink_f.h"
-#include "waterfall_sink.h"
-#include "fft_block.hpp"
 #include "FftDisplayPlot.h"
+#include "WaterfallDisplayPlot.h"
+#include "fft_block.hpp"
+#include "gui/customPushButton.h"
+#include "gui/spinbox_a.hpp"
+#include "gui/startstoprangewidget.h"
+#include "iio_manager.hpp"
 #include "m2ktool.hpp"
 #include "plot_utils.hpp"
-#include "WaterfallDisplayPlot.h"
-#include "gui/spinbox_a.hpp"
-#include "gui/customPushButton.h"
-#include "gui/startstoprangewidget.h"
+#include "scope_sink_f.h"
+#include "waterfall_sink.h"
+
+#include <gnuradio/blocks/complex_to_mag_squared.h>
+#include <gnuradio/fft/window.h>
+#include <gnuradio/top_block.h>
 
 #ifdef SPECTRAL_MSR
 #include "gui/measure.h"
 #endif
 
-#include <QWidget>
 #include <QQueue>
+#include <QWidget>
 
 /* libm2k includes */
-#include <libm2k/analog/genericanalogin.hpp>
-#include <libm2k/analog/m2kanalogin.hpp>
-#include <libm2k/m2k.hpp>
-#include <libm2k/generic.hpp>
 #include "gui/smallOnOffSwitch.h"
 
-extern "C" {
+#include <libm2k/analog/genericanalogin.hpp>
+#include <libm2k/analog/m2kanalogin.hpp>
+#include <libm2k/generic.hpp>
+#include <libm2k/m2k.hpp>
+
+extern "C"
+{
 	struct iio_buffer;
 	struct iio_channel;
 	struct iio_context;
@@ -66,13 +68,13 @@ class CursorsSettings;
 #ifdef SPECTRAL_MSR
 class MeasurementsPanel;
 #endif
-}
+} // namespace Ui
 
 namespace scopy {
 class DbClickButtons;
 class ChannelWidget;
 class ApiObject;
-}
+} // namespace scopy
 namespace scopy::m2k {
 class SpectrumChannel;
 class Filter;
@@ -81,7 +83,7 @@ class Filter;
 class MeasurementData;
 class MeasurementGui;
 #endif
-}
+} // namespace scopy::m2k
 
 class QPushButton;
 class QButtonGroup;
@@ -96,7 +98,7 @@ class SpectrumMarker_API;
 class MeasureSettings;
 #endif
 
-class SpectrumAnalyzer: public M2kTool
+class SpectrumAnalyzer : public M2kTool
 {
 	friend class SpectrumChannel_API;
 	friend class SpectrumAnalyzer_API;
@@ -106,8 +108,8 @@ class SpectrumAnalyzer: public M2kTool
 	Q_OBJECT
 
 public:
-
-	enum FftWinType {
+	enum FftWinType
+	{
 		FLAT_TOP = 0,
 		RECTANGULAR = 1,
 		TRIANGULAR = 2,
@@ -119,15 +121,14 @@ public:
 
 	typedef std::shared_ptr<SpectrumChannel> channel_sptr;
 
-	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt,
-				  ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
+	explicit SpectrumAnalyzer(struct iio_context *iio, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
 				  QJSEngine *engine, QWidget *parent);
 	~SpectrumAnalyzer();
-	QPushButton* getRunButton();
-	void setNativeDialogs(bool nativeDialogs) override;	
+	QPushButton *getRunButton();
+	void setNativeDialogs(bool nativeDialogs) override;
 	void setCurrentAverageIndexLabel(uint chnIdx);
 public Q_SLOTS:
-	void readPreferences();	
+	void readPreferences();
 	void run() override;
 	void stop() override;
 	void setWaterfallWindow(std::vector<float> window, int channel_id);
@@ -172,10 +173,10 @@ private Q_SLOTS:
 	void onCursorReadoutsChanged(struct cursorReadoutsText);
 	void toggleCursorsMode(bool toggled);
 
-	void on_comboBox_type_currentIndexChanged(const QString&);
-	void on_comboBox_window_currentIndexChanged(const QString&);
-    void on_comboBox_line_thickness_currentIndexChanged(int index);
-    void on_spinBox_averaging_valueChanged(int);
+	void on_comboBox_type_currentIndexChanged(const QString &);
+	void on_comboBox_window_currentIndexChanged(const QString &);
+	void on_comboBox_line_thickness_currentIndexChanged(int index);
+	void on_spinBox_averaging_valueChanged(int);
 	void runStopToggled(bool);
 	void onChannelSettingsToggled(bool);
 	void onChannelSelected(bool);
@@ -188,7 +189,7 @@ private Q_SLOTS:
 	void on_btnDnAmplPeak_clicked();
 	void on_btnMaxPeak_clicked();
 	void on_cmb_rbw_currentIndexChanged(int index);
-	void on_cmb_units_currentIndexChanged(const QString&);
+	void on_cmb_units_currentIndexChanged(const QString &);
 	void onPlotNewMarkerData();
 	void onPlotMarkerSelected(uint chIdx, uint mkIdx);
 	void onMarkerFreqPosChanged(double);
@@ -199,7 +200,7 @@ private Q_SLOTS:
 	void onTopValueChanged(double);
 	void onScalePerDivValueChanged(double);
 	void onBottomValueChanged(double);
-	void rightMenuFinished(bool opened);	
+	void rightMenuFinished(bool opened);
 	void btnExportClicked();
 	void updateRunButton(bool);
 	void on_btnAddRef_toggled(bool checked);
@@ -210,6 +211,7 @@ private Q_SLOTS:
 	void validateSpinboxAveraging();
 	void onWaterfallSizeChanged(double);
 	void waterfallToggled(bool visible);
+
 private:
 	void initInstrumentStrings();
 	void build_gnuradio_block_chain();
@@ -229,13 +231,12 @@ private:
 	void add_ref_waveform(QVector<double> xData, QVector<double> yData);
 	void add_ref_waveform(unsigned int chIdx);
 	QString getReferenceChannelName() const;
-	void setYAxisUnit(const QString& type);
+	void setYAxisUnit(const QString &type);
 
 	QList<SpectrumChannel_API *> ch_api;
 	QList<SpectrumMarker_API *> marker_api;
 
-	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout,
-	                int index) const;
+	QPair<int, int> getGridLayoutPosFromIndex(QGridLayout *layout, int index) const;
 
 	QQueue<QPair<CustomPushButton *, bool>> menuButtonActions;
 	QList<CustomPushButton *> menuOrder;
@@ -249,10 +250,10 @@ private:
 	bool use_float_sink;
 
 private:
-	libm2k::context::M2k* m_m2k_context;
-	libm2k::analog::M2kAnalogIn* m_m2k_analogin;
-	libm2k::context::Generic* m_generic_context;
-	libm2k::analog::GenericAnalogIn* m_generic_analogin;
+	libm2k::context::M2k *m_m2k_context;
+	libm2k::analog::M2kAnalogIn *m_m2k_analogin;
+	libm2k::context::Generic *m_generic_context;
+	libm2k::analog::GenericAnalogIn *m_generic_analogin;
 	Ui::SpectrumAnalyzer *ui;
 	scopy::SmallOnOffSwitch *btnSyncPlotCursors;
 	QHBoxLayout *horizontalLockLayout;
@@ -294,7 +295,7 @@ private:
 
 	QList<channel_sptr> channels;
 	QTimer *sample_timer;
-	std::chrono::time_point<std::chrono::system_clock>  m_time_start;
+	std::chrono::time_point<std::chrono::system_clock> m_time_start;
 
 	scopy::scope_sink_f::sptr fft_sink;
 	scopy::waterfall_sink::sptr waterfall_sink;
@@ -322,10 +323,8 @@ private:
 
 	bool marker_menu_opened;
 
-	std::vector<std::pair<QString,
-	       FftDisplayPlot::MagnitudeType>> mag_types;
-	std::vector<std::pair<QString,
-	       FftDisplayPlot::AverageType>> avg_types;
+	std::vector<std::pair<QString, FftDisplayPlot::MagnitudeType>> mag_types;
+	std::vector<std::pair<QString, FftDisplayPlot::AverageType>> avg_types;
 	std::vector<std::pair<QString, FftWinType>> win_types;
 	std::vector<QString> markerTypes;
 	void triggerRightMenuToggle(CustomPushButton *btn, bool checked);
@@ -351,18 +350,18 @@ private:
 	QDockWidget *waterfallDocker;
 
 #ifdef SPECTRAL_MSR
-	//din capture plot
+	// din capture plot
 	QList<std::shared_ptr<MeasurementData>> measurements(int chnIdx);
 	std::shared_ptr<MeasurementData> measurement(int id, int chnIdx);
 	void measure();
 	int activeMeasurementsCount(int chnIdx);
-	Measure* measureOfChannel(int chnIdx) const;
+	Measure *measureOfChannel(int chnIdx) const;
 	bool measurementsEnabled();
 	void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
 
 	void cleanUpMeasurementsBeforeChannelRemoval(int chnIdx);
 
-	//functii normale
+	// functii normale
 	void settings_panel_update(int id);
 	void settings_panel_size_adjust();
 	void update_measure_for_channel(int ch_idx);
@@ -372,11 +371,11 @@ private:
 	void init_selected_measurements(int, std::vector<int>);
 	void measureUpdateValues();
 	void measureLabelsRearrange();
-	void measureCreateAndAppendGuiFrom(const MeasurementData&);
+	void measureCreateAndAppendGuiFrom(const MeasurementData &);
 #endif
 };
 
-class SpectrumChannel: public QObject
+class SpectrumChannel : public QObject
 {
 	Q_OBJECT
 	friend class SpectrumChannel_API;
@@ -385,20 +384,11 @@ public:
 	std::shared_ptr<scopy::fft_block> fft_block;
 	gr::blocks::complex_to_mag_squared::sptr ctm_block;
 
-	SpectrumChannel(int id, const QString& name, FftDisplayPlot *plot);
+	SpectrumChannel(int id, const QString &name, FftDisplayPlot *plot);
 
-	int id() const
-	{
-		return m_id;
-	}
-	QString name() const
-	{
-		return m_name;
-	}
-	ChannelWidget *widget() const
-	{
-		return m_widget;
-	}
+	int id() const { return m_id; }
+	QString name() const { return m_name; }
+	ChannelWidget *widget() const { return m_widget; }
 
 	bool isSettingsOn() const;
 	void setSettingsOn(bool on);
@@ -407,7 +397,7 @@ public:
 	void setLinewidth(float);
 
 	QColor color() const;
-	void setColor(const QColor&);
+	void setColor(const QColor &);
 
 	uint averaging() const;
 	void setAveraging(uint);
@@ -429,8 +419,7 @@ public:
 	libm2k::analog::M2K_RANGE getGainMode();
 	static double win_overlap_factor(SpectrumAnalyzer::FftWinType type);
 
-	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type,
-					    int ntaps);
+	static std::vector<float> build_win(SpectrumAnalyzer::FftWinType type, int ntaps);
 
 	std::vector<float> getWindow();
 
@@ -452,9 +441,9 @@ private:
 	ChannelWidget *m_widget;
 	std::vector<float> d_window;
 
-	float calcCoherentPowerGain(const std::vector<float>& win) const;
-	void scaletFftWindow(std::vector<float>& win, float gain);
+	float calcCoherentPowerGain(const std::vector<float> &win) const;
+	void scaletFftWindow(std::vector<float> &win, float gain);
 };
-} // namespace scopy
+} // namespace scopy::m2k
 
 #endif // SPECTRUM_ANALYZER_HPP

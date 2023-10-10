@@ -37,20 +37,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
-#include <libsigrokdecode/libsigrokdecode.h>
+#include "binding/decoder.hpp"
 
 #include "prop/double.hpp"
 #include "prop/enum.hpp"
 #include "prop/int.hpp"
 #include "prop/string.hpp"
 
-#include "binding/decoder.hpp"
-#include <glib.h>
 #include <QVariant>
 
-using std::nullopt;
+#include <glib.h>
+#include <libsigrokdecode/libsigrokdecode.h>
+
 using std::map;
+using std::nullopt;
 using std::pair;
 using std::shared_ptr;
 using std::string;
@@ -62,45 +62,37 @@ using scopy::prop::Int;
 using scopy::prop::Property;
 using scopy::prop::String;
 
-
 namespace scopy {
 namespace bind {
 
-Decoder::Decoder(
-    scopy::AnnotationDecoder *annDecoder,
-    shared_ptr<scopy::logic::Decoder> decoder) :
-    m_annDecoder(annDecoder),
-	decoder_(decoder)
+Decoder::Decoder(scopy::AnnotationDecoder *annDecoder, shared_ptr<scopy::logic::Decoder> decoder)
+	: m_annDecoder(annDecoder)
+	, decoder_(decoder)
 {
 	assert(decoder_);
 
 	const srd_decoder *const dec = decoder_->decoder();
 	assert(dec);
 
-	for (GSList *l = dec->options; l; l = l->next) {
-		const srd_decoder_option *const opt =
-			(srd_decoder_option*)l->data;
+	for(GSList *l = dec->options; l; l = l->next) {
+		const srd_decoder_option *const opt = (srd_decoder_option *)l->data;
 
 		const QString name = QString::fromUtf8(opt->desc);
 
-		const Property::Getter get = [&, opt]() {
-			return getter(opt->id); };
-		const Property::Setter set = [&, opt](QVariant value) {
-			setter(opt->id, value); };
+		const Property::Getter get = [&, opt]() { return getter(opt->id); };
+		const Property::Setter set = [&, opt](QVariant value) { setter(opt->id, value); };
 
 		shared_ptr<Property> prop;
 
-		if (opt->values)
+		if(opt->values)
 			prop = bind_enum(name, "", opt, get, set);
-		else if (g_variant_is_of_type(opt->def, G_VARIANT_TYPE("d")))
-			prop = shared_ptr<Property>(new Double(name, "", 2, "",
-				std::nullopt, std::nullopt, get, set));
-		else if (g_variant_is_of_type(opt->def, G_VARIANT_TYPE("x")))
+		else if(g_variant_is_of_type(opt->def, G_VARIANT_TYPE("d")))
+			prop = shared_ptr<Property>(new Double(name, "", 2, "", std::nullopt, std::nullopt, get, set));
+		else if(g_variant_is_of_type(opt->def, G_VARIANT_TYPE("x")))
 			prop = shared_ptr<Property>(
 				new Int(name, "", "", std::nullopt, get, set, g_variant_classify(opt->def)));
-		else if (g_variant_is_of_type(opt->def, G_VARIANT_TYPE("s")))
-			prop = shared_ptr<Property>(
-				new String(name, "", get, set));
+		else if(g_variant_is_of_type(opt->def, G_VARIANT_TYPE("s")))
+			prop = shared_ptr<Property>(new String(name, "", get, set));
 		else
 			continue;
 
@@ -108,15 +100,12 @@ Decoder::Decoder(
 	}
 }
 
-
-shared_ptr<Property> Decoder::bind_enum(
-	const QString &name, const QString &desc,
-	const srd_decoder_option *option,
-	Property::Getter getter, Property::Setter setter)
+shared_ptr<Property> Decoder::bind_enum(const QString &name, const QString &desc, const srd_decoder_option *option,
+					Property::Getter getter, Property::Setter setter)
 {
-	vector< pair<QVariant, QString> > values;
-	for (GSList *l = option->values; l; l = l->next) {
-		QVariant var = gVariantToQVariant((GVariant*)l->data);
+	vector<pair<QVariant, QString>> values;
+	for(GSList *l = option->values; l; l = l->next) {
+		QVariant var = gVariantToQVariant((GVariant *)l->data);
 		values.emplace_back(var, print_variant(var));
 	}
 
@@ -125,11 +114,11 @@ shared_ptr<Property> Decoder::bind_enum(
 
 QVariant Decoder::gVariantToQVariant(GVariant *value)
 {
-	if (!value)
+	if(!value)
 		return QVariant();
 
 	auto classify = g_variant_classify(value);
-	switch (classify) {
+	switch(classify) {
 	case G_VARIANT_CLASS_BOOLEAN:
 		return QVariant::fromValue(bool(g_variant_get_boolean(value)));
 	case G_VARIANT_CLASS_BYTE:
@@ -160,19 +149,19 @@ QVariant Decoder::gVariantToQVariant(GVariant *value)
 	}
 	case G_VARIANT_CLASS_TUPLE: {
 		// we only handle the (dd) case in enum type property (just 2 children)
-		if (g_variant_n_children(value) == 2) {
+		if(g_variant_n_children(value) == 2) {
 			std::vector<double> doubleVector;
-			for (int i = 0; i < g_variant_n_children(value); i++) {
+			for(int i = 0; i < g_variant_n_children(value); i++) {
 				GVariant *childVariant = g_variant_get_child_value(value, i);
 				QVariant qVariant = gVariantToQVariant(childVariant);
-				if (qVariant.isValid()) {
+				if(qVariant.isValid()) {
 					g_variant_unref(childVariant);
 					return QVariant();
 				}
 				doubleVector.push_back(qVariant.toDouble());
 				g_variant_unref(childVariant);
 			}
-			if (doubleVector.size() != 2) {
+			if(doubleVector.size() != 2) {
 				return QVariant();
 			}
 			return QVariant::fromValue<std::pair<double, double>>(
@@ -182,7 +171,7 @@ QVariant Decoder::gVariantToQVariant(GVariant *value)
 	}
 	default: {
 		const GVariantType *type = g_variant_get_type(value);
-		if (g_variant_type_equal(type, G_VARIANT_TYPE_BYTESTRING)) {
+		if(g_variant_type_equal(type, G_VARIANT_TYPE_BYTESTRING)) {
 			return QVariant::fromValue(QByteArray(g_variant_get_bytestring(value)));
 		}
 	}
@@ -190,7 +179,6 @@ QVariant Decoder::gVariantToQVariant(GVariant *value)
 
 	return QVariant();
 }
-
 
 QVariant Decoder::getter(const char *id)
 {
@@ -200,19 +188,18 @@ QVariant Decoder::getter(const char *id)
 	assert(decoder_);
 
 	// Get the value from the hash table if it is already present
-	const map<string, GVariant*>& options = decoder_->options();
+	const map<string, GVariant *> &options = decoder_->options();
 	const auto iter = options.find(id);
 
-	if (iter != options.end()) {
+	if(iter != options.end()) {
 		val = (*iter).second;
 	} else {
 		assert(decoder_->decoder());
 
 		// Get the default value if not
-		for (GSList *l = decoder_->decoder()->options; l; l = l->next) {
-			const srd_decoder_option *const opt =
-				(srd_decoder_option*)l->data;
-			if (strcmp(opt->id, id) == 0) {
+		for(GSList *l = decoder_->decoder()->options; l; l = l->next) {
+			const srd_decoder_option *const opt = (srd_decoder_option *)l->data;
+			if(strcmp(opt->id, id) == 0) {
 				val = opt->def;
 				break;
 			}
@@ -231,39 +218,37 @@ void Decoder::setter(const char *id, QVariant value)
 
 	QString prop_val = "";
 	QMetaType::Type type = static_cast<QMetaType::Type>(value.type());
-	if (type == QMetaType::QString) {
+	if(type == QMetaType::QString) {
 		variant = g_variant_new_string(value.toString().toUtf8().constData());
-	} else if (type == QMetaType::Bool) {
+	} else if(type == QMetaType::Bool) {
 		variant = g_variant_new_boolean(value.toBool());
-	} else if (type == QMetaType::Char) {
+	} else if(type == QMetaType::Char) {
 		variant = g_variant_new_byte(value.toChar().toLatin1());
-	} else if (type == QMetaType::Short) {
+	} else if(type == QMetaType::Short) {
 		variant = g_variant_new_int16(value.value<int16_t>());
-	} else if (type == QMetaType::UShort) {
+	} else if(type == QMetaType::UShort) {
 		variant = g_variant_new_uint16(value.value<uint16_t>());
-	} else if (type == QMetaType::Int) {
+	} else if(type == QMetaType::Int) {
 		variant = g_variant_new_int32(value.value<int32_t>());
-	} else if (type == QMetaType::UInt) {
+	} else if(type == QMetaType::UInt) {
 		variant = g_variant_new_uint32(value.value<uint32_t>());
-	} else if (type == QMetaType::Long) {
+	} else if(type == QMetaType::Long) {
 		variant = g_variant_new_int64(value.value<int64_t>());
-	} else if (type == QMetaType::LongLong) {
+	} else if(type == QMetaType::LongLong) {
 		variant = g_variant_new_int64(value.value<int64_t>());
-	} else if (type == QMetaType::ULong) {
+	} else if(type == QMetaType::ULong) {
 		variant = g_variant_new_uint64(value.value<uint64_t>());
-	} else if (type == QMetaType::ULongLong) {
+	} else if(type == QMetaType::ULongLong) {
 		variant = g_variant_new_uint64(value.value<uint64_t>());
-	} else if (type == QMetaType::Double) {
+	} else if(type == QMetaType::Double) {
 		variant = g_variant_new_double(value.toDouble());
 	} else {
 		// Check if we got a tuple (dd) from the decoders
 		bool pairDD = value.canConvert<std::pair<double, double>>();
-		if (pairDD) {
+		if(pairDD) {
 			auto pairData = value.value<std::pair<double, double>>();
-			GVariant *tupleVariants[] = {
-				g_variant_new_double(pairData.first),
-				g_variant_new_double(pairData.second)
-			};
+			GVariant *tupleVariants[] = {g_variant_new_double(pairData.first),
+						     g_variant_new_double(pairData.second)};
 			variant = g_variant_new_tuple(tupleVariants, 2);
 		} else {
 			variant = g_variant_new_string(value.toString().toUtf8().constData());
@@ -275,5 +260,5 @@ void Decoder::setter(const char *id, QVariant value)
 	m_annDecoder->startDecode();
 }
 
-}  // namespace binding
-}  // namespace scopy
+} // namespace bind
+} // namespace scopy

@@ -1,8 +1,9 @@
 #ifndef MOVINGAVERAGE_H
 #define MOVINGAVERAGE_H
 
-#include <QVector>
 #include "scopy-gui_export.h"
+
+#include <QVector>
 
 class SCOPY_GUI_EXPORT MovingAverage
 {
@@ -19,7 +20,6 @@ private:
 	QVector<double> history;
 	int capacity;
 	double sum;
-
 };
 
 #endif // MOVINGAVERAGE_H

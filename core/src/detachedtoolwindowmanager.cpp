@@ -2,15 +2,18 @@
 
 using namespace scopy;
 
-DetachedToolWindowManager::DetachedToolWindowManager(QObject *parent) : QObject(parent) {}
+DetachedToolWindowManager::DetachedToolWindowManager(QObject *parent)
+	: QObject(parent)
+{}
 
 DetachedToolWindowManager::~DetachedToolWindowManager() {}
 
-void DetachedToolWindowManager::add(QString id, ToolMenuEntry *tme) {
+void DetachedToolWindowManager::add(QString id, ToolMenuEntry *tme)
+{
 	if(map.contains(id)) {
 		delete map.take(id);
 	}
-	map.insert(id, new DetachedToolWindow(nullptr,tme));
+	map.insert(id, new DetachedToolWindow(nullptr, tme));
 }
 
 bool DetachedToolWindowManager::remove(QString id)
@@ -22,7 +25,8 @@ bool DetachedToolWindowManager::remove(QString id)
 	return false;
 }
 
-void DetachedToolWindowManager::show(QString id) {
+void DetachedToolWindowManager::show(QString id)
+{
 	if(map.contains(id)) {
 		map[id]->raise();
 		map[id]->show();
@@ -36,8 +40,6 @@ QWidget *DetachedToolWindowManager::getWidget(QString key)
 	return nullptr;
 }
 
+bool DetachedToolWindowManager::contains(QString key) { return map.contains(key); }
 
-bool DetachedToolWindowManager::contains(QString key) {
-	return map.contains(key);
-}
-
+#include "moc_detachedtoolwindowmanager.cpp"

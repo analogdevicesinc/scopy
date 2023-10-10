@@ -1,13 +1,13 @@
 #ifndef INFOPAGE_H
 #define INFOPAGE_H
 
-#include <QWidget>
-#include <QMap>
-#include <QScrollArea>
-#include <QVBoxLayout>
 #include "infopagekeyvaluewidget.h"
 #include "scopy-gui_export.h"
 
+#include <QMap>
+#include <QScrollArea>
+#include <QVBoxLayout>
+#include <QWidget>
 
 namespace scopy {
 
@@ -29,10 +29,9 @@ private:
 	bool m_advancedMode;
 	QVBoxLayout *lay;
 	QMap<QString, QString> keyMap;
-	QMap<QString,QString> map;
-	QMap<QString, InfoPageKeyValueWidget*> wmap;
+	QMap<QString, QString> map;
+	QMap<QString, InfoPageKeyValueWidget *> wmap;
 };
 
-
-}
+} // namespace scopy
 #endif // INFOPAGE_H

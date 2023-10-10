@@ -21,8 +21,9 @@
 #ifndef MOUSEWHEELWIDGETGUARD
 #define MOUSEWHEELWIDGETGUARD
 
-#include <QObject>
 #include "scopy-gui_export.h"
+
+#include <QObject>
 
 namespace scopy {
 
@@ -36,6 +37,6 @@ protected:
 	bool eventFilter(QObject *, QEvent *) override;
 };
 
-}
+} // namespace scopy
 
 #endif

@@ -37,17 +37,16 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef PULSEVIEW_PV_PROP_ENUM_HPP
 #define PULSEVIEW_PV_PROP_ENUM_HPP
 
-#include <utility>
-#include <vector>
-
 #include "property.hpp"
+#include "scopy-sigrok-gui_export.h"
 
 #include <QMetaType>
-#include "scopy-sigrok-gui_export.h"
+
+#include <utility>
+#include <vector>
 
 using std::pair;
 using std::vector;
@@ -64,13 +63,11 @@ class SCOPY_SIGROK_GUI_EXPORT Enum : public Property
 	Q_OBJECT;
 
 public:
-	Enum(QString name, QString desc,
-		vector<pair<QVariant, QString> > values,
-		Getter getter, Setter setter);
+	Enum(QString name, QString desc, vector<pair<QVariant, QString>> values, Getter getter, Setter setter);
 
 	virtual ~Enum() = default;
 
-	QWidget* get_widget(QWidget *parent, bool auto_commit);
+	QWidget *get_widget(QWidget *parent, bool auto_commit);
 	void update_widget();
 
 	void commit();
@@ -80,7 +77,7 @@ private Q_SLOTS:
 	void on_value_changed(int);
 
 private:
-	const vector< pair<QVariant, QString> > values_;
+	const vector<pair<QVariant, QString>> values_;
 	bool is_range_;
 
 	QComboBox *selector_;
@@ -90,7 +87,7 @@ private:
 	QLabel *slider_label_;
 };
 
-}  // namespace prop
-}  // namespace pv
+} // namespace prop
+} // namespace scopy
 
 #endif // PULSEVIEW_PV_PROP_ENUM_HPP

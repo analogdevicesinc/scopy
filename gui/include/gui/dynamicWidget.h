@@ -26,10 +26,8 @@
 class QWidget;
 
 namespace scopy {
-	void SCOPY_GUI_EXPORT setDynamicProperty(QWidget *widget,
-			const char *property, bool set);
-	bool SCOPY_GUI_EXPORT getDynamicProperty(QWidget *widget,
-				const char *property);
-}
+void SCOPY_GUI_EXPORT setDynamicProperty(QWidget *widget, const char *property, bool set);
+bool SCOPY_GUI_EXPORT getDynamicProperty(QWidget *widget, const char *property);
+} // namespace scopy
 
 #endif /* DYNAMIC_WIDGET_HPP */

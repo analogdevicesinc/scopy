@@ -1,10 +1,11 @@
 #ifndef CURSORSETTINGS_H
 #define CURSORSETTINGS_H
 
+#include <QVBoxLayout>
+#include <QWidget>
+
 #include <scopy-gui_export.h>
 #include <utils.h>
-#include <QWidget>
-#include <QVBoxLayout>
 #include <widgets/menuonoffswitch.h>
 #include <widgets/menusectionwidget.h>
 

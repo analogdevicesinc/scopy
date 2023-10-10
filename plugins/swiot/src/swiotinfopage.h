@@ -18,20 +18,21 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_SWIOTINFOPAGE_H
 #define SCOPY_SWIOTINFOPAGE_H
 
-#include <QWidget>
-#include <QPushButton>
 #include <QCheckBox>
+#include <QPushButton>
+#include <QWidget>
+
 #include <infopage.h>
 
 namespace scopy::swiot {
-class SwiotInfoPage : public InfoPage {
+class SwiotInfoPage : public InfoPage
+{
 	Q_OBJECT
 public:
-	explicit SwiotInfoPage(QWidget* parent = nullptr);
+	explicit SwiotInfoPage(QWidget *parent = nullptr);
 	void enableTemperatureReadBtn(bool enable);
 
 Q_SIGNALS:
@@ -42,6 +43,6 @@ private:
 
 	QCheckBox *m_enTempReadCheckBox;
 };
-}
+} // namespace scopy::swiot
 
-#endif //SCOPY_SWIOTINFOPAGE_H
+#endif // SCOPY_SWIOTINFOPAGE_H

@@ -1,8 +1,9 @@
 #ifndef REGISTERCONTROLLER_HPP
 #define REGISTERCONTROLLER_HPP
 
-#include <QWidget>
 #include "scopy-regmapplugin_export.h"
+
+#include <QWidget>
 
 class QHBoxLayout;
 class QSpinBox;
@@ -12,9 +13,7 @@ class QPushButton;
 class QLineEdit;
 class QVBoxLayout;
 
-
-
-namespace scopy::regmap{
+namespace scopy::regmap {
 class RegisterModel;
 class RegisterValueWidget;
 class AddressPicker;
@@ -28,24 +27,23 @@ public:
 	~RegisterController();
 
 	void registerChanged(uint32_t address);
-    void registerValueChanged(QString value);
-    void addNameAndDescription(QString name, QString description);
+	void registerValueChanged(QString value);
+	void addNameAndDescription(QString name, QString description);
 
 private:
+	QHBoxLayout *mainLayout;
 
-    QHBoxLayout *mainLayout;
-
-    QSpinBox *addressPicker;
-    QPushButton *readButton;
-    QPushButton *writeButton;
-    QLineEdit *regValue;
-    QLabel *addressLabel;
-    QLabel *valueLabel;
+	QSpinBox *addressPicker;
+	QPushButton *readButton;
+	QPushButton *writeButton;
+	QLineEdit *regValue;
+	QLabel *addressLabel;
+	QLabel *valueLabel;
 
 	bool addressChanged = false;
-    QLabel *nameLabel = nullptr;
-    QLabel *descriptionLabel = nullptr;
-    void applyStyle();
+	QLabel *nameLabel = nullptr;
+	QLabel *descriptionLabel = nullptr;
+	void applyStyle();
 
 Q_SIGNALS:
 	void requestRead(uint32_t address);
@@ -53,5 +51,5 @@ Q_SIGNALS:
 	void registerAddressChanged(uint32_t address);
 	void valueChanged(QString value);
 };
-}
+} // namespace scopy::regmap
 #endif // REGISTERCONTROLLER_HPP

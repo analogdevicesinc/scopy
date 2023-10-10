@@ -21,11 +21,13 @@
 #ifndef CHANNELPLOTSCALESCONTROLLER_H
 #define CHANNELPLOTSCALESCONTROLLER_H
 
-#include <QWidget>
-#include <QMap>
-#include <QHBoxLayout>
-#include <gui/plot_utils.hpp>
 #include "channelplotscale.h"
+
+#include <QHBoxLayout>
+#include <QMap>
+#include <QWidget>
+
+#include <gui/plot_utils.hpp>
 
 namespace scopy::swiot {
 class ChannelPlotScalesController : public QWidget
@@ -39,15 +41,16 @@ public:
 	void setChannelEnabled(int channel, bool enabled);
 	void setUnitPerDivision(int channel, double unitPerDivision);
 	void setInstantValue(int channel, double value);
+
 private:
 	void updateLayout();
+
 private:
 	QString m_unit;
 	QColor *m_channelColor;
 	QVector<ChannelPlotScale *> m_channelPlotScales;
 	QHBoxLayout *m_layout;
 };
-}
+} // namespace scopy::swiot
 
-
-#endif //CHANNELPLOTSCALESCONTROLLER_H
+#endif // CHANNELPLOTSCALESCONTROLLER_H

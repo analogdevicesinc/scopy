@@ -6,15 +6,16 @@
 
 #include <QObject>
 //#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
+#include "iio_manager.hpp"
+#include "m2kcontroller.h"
 #include "scopy-m2kplugin_export.h"
+
 #include <QLineEdit>
 #include <QPushButton>
-#include "m2kcontroller.h"
-#include <gui/infopage.h>
-#include <calibration.hpp>
-#include "iio_manager.hpp"
 
+#include <calibration.hpp>
+#include <gui/infopage.h>
+#include <pluginbase/pluginbase.h>
 
 namespace scopy {
 
@@ -23,11 +24,10 @@ class SCOPY_M2KPLUGIN_EXPORT M2kPlugin : public QObject, public PluginBase
 {
 	Q_OBJECT
 	SCOPY_PLUGIN;
-public:
 
+public:
 	void initMetadata() override;
 	bool compatible(QString m_param, QString category) override;
-
 
 	void preload() override;
 	void loadToolList() override;
@@ -71,17 +71,16 @@ private:
 	InfoPage *m_m2kInfoPage;
 
 	const int infoPageTimerTimeout = 1000;
-	const QStringList calibrationToolNames = {"Oscilloscope", "Spectrum Analyzer", "Network Analyzer", "Signal Generator", "Voltmeter", "Calibration"};
+	const QStringList calibrationToolNames = {"Oscilloscope",     "Spectrum Analyzer", "Network Analyzer",
+						  "Signal Generator", "Voltmeter",	   "Calibration"};
 
-	QMap<QString, M2kTool*> tools;
-	QMap<QString,ToolMenuEntry*> toolMenuEntryCalibrationCache;
+	QMap<QString, M2kTool *> tools;
+	QMap<QString, ToolMenuEntry *> toolMenuEntryCalibrationCache;
 	void storeToolState(QStringList tools);
 	void restoreToolState(QStringList tools);
 	void cleanup();
-
 };
-}
-}
-
+} // namespace m2k
+} // namespace scopy
 
 #endif // M2KPLUGIN_H

@@ -18,10 +18,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "channel_widget.hpp"
-#include "ui_channel.h"
+
 #include "dynamicWidget.h"
 
+#include "ui_channel.h"
+
 #include <QButtonGroup>
+
 #include <utils.h>
 
 using namespace scopy;
@@ -34,24 +37,24 @@ using namespace scopy;
  * thin line which is visible only when the channel is selected, thus increasing
  * the visibility of the selected state of the channel.
  */
-ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified,
-		QColor color, QWidget *parent) :
-	QWidget(parent),
-	m_ui(new Ui::Channel),
-	m_id(id),
-	m_deletable(deletable),
-	m_simplified(simplified),
-	m_color(color),
-	m_math(false),
-	m_function(""),
-	m_ref(false),
-	m_isMainChannel(false),
-	m_isPhysicalChannel(false)
+ChannelWidget::ChannelWidget(int id, bool deletable, bool simplified, QColor color, QWidget *parent)
+	: QWidget(parent)
+	, m_ui(new Ui::Channel)
+	, m_id(id)
+	, m_deletable(deletable)
+	, m_simplified(simplified)
+	, m_color(color)
+	, m_math(false)
+	, m_function("")
+	, m_ref(false)
+	, m_isMainChannel(false)
+	, m_isPhysicalChannel(false)
 {
 	init();
 	nameButton()->installEventFilter(this);
-	m_channelWSpacer = new QSpacerItem(1,1,QSizePolicy::Expanding,QSizePolicy::Fixed);
-	setStyleSheet("scopy--ChannelWidget QPushButton#btn:hover:!pressed:!checked {		      border-image: url(:/gui/icons/setup_btn_hover.svg)		     }");
+	m_channelWSpacer = new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Fixed);
+	setStyleSheet("scopy--ChannelWidget QPushButton#btn:hover:!pressed:!checked {		      border-image: "
+		      "url(:/gui/icons/setup_btn_hover.svg)		     }");
 }
 
 ChannelWidget::~ChannelWidget()
@@ -74,58 +77,36 @@ void ChannelWidget::init()
 	m_ui->delBtn->setVisible(m_deletable);
 	setColor(m_color);
 
-	if (m_simplified) {
+	if(m_simplified) {
 		m_ui->name->hide();
 		m_ui->line->hide();
 		QString stylesheet = styleSheet();
 		stylesheet += QString("QCheckBox#box { spacing: 12px; }");
 		setStyleSheet(stylesheet);
 	} else {
-		connect(m_ui->name, &QPushButton::toggled,
-			[=] (bool checked) {
-				setDynamicProperty(m_ui->widget, "selected",
-					checked);
-				setDynamicProperty(m_ui->line, "selected",
-					checked);
-			}
-		);
+		connect(m_ui->name, &QPushButton::toggled, [=](bool checked) {
+			setDynamicProperty(m_ui->widget, "selected", checked);
+			setDynamicProperty(m_ui->line, "selected", checked);
+		});
 	}
 	m_ui->horizontalLayout->setAlignment(Qt::AlignLeft);
-	m_ui->horizontalLayout->setAlignment(m_ui->btn,Qt::AlignRight);
-	Util::setWidgetNrOfChars(m_ui->name,6,15);
-//	m_ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Fixed,
-//		QSizePolicy::Fixed);
+	m_ui->horizontalLayout->setAlignment(m_ui->btn, Qt::AlignRight);
+	Util::setWidgetNrOfChars(m_ui->name, 6, 15);
+	//	m_ui->verticalSpacer->changeSize(0, 0, QSizePolicy::Fixed,
+	//		QSizePolicy::Fixed);
 }
 
-QAbstractButton* ChannelWidget::enableButton() const
-{
-	return m_ui->box;
-}
+QAbstractButton *ChannelWidget::enableButton() const { return m_ui->box; }
 
-QAbstractButton* ChannelWidget::nameButton() const
-{
-	return m_ui->name;
-}
+QAbstractButton *ChannelWidget::nameButton() const { return m_ui->name; }
 
-QAbstractButton* ChannelWidget::menuButton() const
-{
-	return m_ui->btn;
-}
+QAbstractButton *ChannelWidget::menuButton() const { return m_ui->btn; }
 
-QAbstractButton* ChannelWidget::deleteButton() const
-{
-	return m_ui->delBtn;
-}
+QAbstractButton *ChannelWidget::deleteButton() const { return m_ui->delBtn; }
 
-QAbstractButton* ChannelWidget::toggleChannelsButton() const
-{
-	return m_ui->toggleChannels;
-}
+QAbstractButton *ChannelWidget::toggleChannelsButton() const { return m_ui->toggleChannels; }
 
-int ChannelWidget::id() const
-{
-	return m_id;
-}
+int ChannelWidget::id() const { return m_id; }
 
 void ChannelWidget::setId(int id)
 {
@@ -137,57 +118,37 @@ void ChannelWidget::setId(int id)
 	m_id = id;
 }
 
-QColor ChannelWidget::color() const
-{
-	return m_color;
-}
+QColor ChannelWidget::color() const { return m_color; }
 
 void ChannelWidget::setColor(QColor color)
 {
-	QString boxStyleSheet = QString(
-		"QCheckBox#box::indicator {"
-		"border: 2px solid %1;"
-		"}"
-		"QCheckBox#box::indicator:checked {"
-		"background-color: %1;"
-		"}"
-	).arg(color.name());
+	QString boxStyleSheet = QString("QCheckBox#box::indicator {"
+					"border: 2px solid %1;"
+					"}"
+					"QCheckBox#box::indicator:checked {"
+					"background-color: %1;"
+					"}")
+					.arg(color.name());
 	m_ui->box->setStyleSheet(boxStyleSheet);
 
-	QString lineStyleSheet = QString(
-		"QFrame#line[selected=true] {"
-		"border: 2px solid %1;"
-		"}"
-	).arg(color.name());
+	QString lineStyleSheet = QString("QFrame#line[selected=true] {"
+					 "border: 2px solid %1;"
+					 "}")
+					 .arg(color.name());
 	m_ui->line->setStyleSheet(lineStyleSheet);
 
 	m_color = color;
 }
 
-QString ChannelWidget::fullName() const
-{
-	return m_fullName;
-}
+QString ChannelWidget::fullName() const { return m_fullName; }
 
-void ChannelWidget::setFullName(const QString& name)
-{
-	m_fullName = name;
-}
+void ChannelWidget::setFullName(const QString &name) { m_fullName = name; }
 
-QString ChannelWidget::shortName() const
-{
-	return m_shortName;
-}
+QString ChannelWidget::shortName() const { return m_shortName; }
 
-void ChannelWidget::setShortName(const QString &name)
-{
-	m_shortName = name;
-}
+void ChannelWidget::setShortName(const QString &name) { m_shortName = name; }
 
-QString ChannelWidget::function() const
-{
-	return m_function;
-}
+QString ChannelWidget::function() const { return m_function; }
 
 void ChannelWidget::setFunction(const QString &function)
 {
@@ -195,40 +156,27 @@ void ChannelWidget::setFunction(const QString &function)
 	setProperty("function", QVariant(function));
 }
 
-bool ChannelWidget::isMathChannel() const
-{
-	return m_math;
-}
+bool ChannelWidget::isMathChannel() const { return m_math; }
 
-void ChannelWidget::setMathChannel(const bool &math)
-{
-	m_math = math;
-}
+void ChannelWidget::setMathChannel(const bool &math) { m_math = math; }
 
-bool ChannelWidget::isReferenceChannel() const
-{
-	return m_ref;
-}
+bool ChannelWidget::isReferenceChannel() const { return m_ref; }
 
-void ChannelWidget::setReferenceChannel(const bool &ref)
-{
-	m_ref = ref;
-}
+void ChannelWidget::setReferenceChannel(const bool &ref) { m_ref = ref; }
 
 void ChannelWidget::setMenuFloating(bool floating) { m_floatingMenu = floating; }
 
 bool ChannelWidget::eventFilter(QObject *object, QEvent *event)
 {
-	if (event->type() == QEvent::MouseButtonPress) {
-		if (!m_ui->box->isChecked()) {
+	if(event->type() == QEvent::MouseButtonPress) {
+		if(!m_ui->box->isChecked()) {
 			m_ui->box->setChecked(true);
 			m_ui->name->setChecked(true);
-		} else if (!m_ui->btn->isChecked() &&
-			   m_ui->name->isChecked()){
+		} else if(!m_ui->btn->isChecked() && m_ui->name->isChecked()) {
 			m_ui->btn->setChecked(true);
 		}
-	} else if (event->type() == QEvent::MouseButtonDblClick) {
-		if (!m_ui->box->isChecked()) {
+	} else if(event->type() == QEvent::MouseButtonDblClick) {
+		if(!m_ui->box->isChecked()) {
 			m_ui->box->setChecked(true);
 			m_ui->name->setChecked(true);
 		}
@@ -240,37 +188,36 @@ bool ChannelWidget::eventFilter(QObject *object, QEvent *event)
 
 void ChannelWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-	if (!m_ui->box->isChecked()) {
+	if(!m_ui->box->isChecked()) {
 		m_ui->box->setChecked(true);
 		m_ui->name->setChecked(true);
 	}
 	m_ui->btn->setChecked(true);
-
 }
 
 void ChannelWidget::on_box_toggled(bool checked)
 {
-	if (checked) {
-		if (!m_simplified)
+	if(checked) {
+		if(!m_simplified)
 			m_ui->name->setEnabled(true);
 		m_ui->btn->setEnabled(true);
 		// When enabling ChannelWidget select it as well
-		if (!m_simplified)
+		if(!m_simplified)
 			m_ui->name->setChecked(true);
 
 	} else {
 		// Unselect the ChannelWidget when it's about to be disabled
-		if (!m_simplified) {
+		if(!m_simplified) {
 			QButtonGroup *group = m_ui->name->group();
 			bool exclusive;
-			if (group) {
+			if(group) {
 				exclusive = group->exclusive();
-				if (m_ui->name->isChecked()) {
+				if(m_ui->name->isChecked()) {
 					group->setExclusive(false);
 				}
 			}
 			m_ui->name->setChecked(false);
-			if (group) {
+			if(group) {
 				group->setExclusive(exclusive);
 			}
 		}
@@ -278,7 +225,7 @@ void ChannelWidget::on_box_toggled(bool checked)
 		// Uncheck the menu button when disabling the ChannelWidget
 		m_ui->btn->setChecked(false);
 
-		if (!m_simplified)
+		if(!m_simplified)
 			m_ui->name->setEnabled(false);
 
 		m_ui->btn->setEnabled(false);
@@ -287,15 +234,9 @@ void ChannelWidget::on_box_toggled(bool checked)
 	Q_EMIT enabled(checked);
 }
 
-void ChannelWidget::on_name_toggled(bool checked)
-{
-	Q_EMIT selected(checked);
-}
+void ChannelWidget::on_name_toggled(bool checked) { Q_EMIT selected(checked); }
 
-void ChannelWidget::on_btn_toggled(bool checked)
-{
-	Q_EMIT menuToggled(checked);
-}
+void ChannelWidget::on_btn_toggled(bool checked) { Q_EMIT menuToggled(checked); }
 
 void ChannelWidget::on_delBtn_clicked()
 {
@@ -306,33 +247,21 @@ void ChannelWidget::on_delBtn_clicked()
 	Q_EMIT deleteClicked();
 }
 
-bool ChannelWidget::isMainChannel() const
-{
-	return m_isMainChannel;
-}
+bool ChannelWidget::isMainChannel() const { return m_isMainChannel; }
 
-bool ChannelWidget::isPhysicalChannel() const
-{
-	return m_isPhysicalChannel;
-}
+bool ChannelWidget::isPhysicalChannel() const { return m_isPhysicalChannel; }
 
 void ChannelWidget::setButtonNoGroup(QAbstractButton *btn)
 {
 	QButtonGroup *group = btn->group();
-	if (group) {
+	if(group) {
 		group->removeButton(btn);
 	}
 }
 
-void ChannelWidget::setMenuButtonVisibility(bool visible)
-{
-	m_ui->btn->setVisible(visible);
-}
+void ChannelWidget::setMenuButtonVisibility(bool visible) { m_ui->btn->setVisible(visible); }
 
-void ChannelWidget::setBottomLineVIsibility(bool visible)
-{
-	m_ui->line->setVisible(visible);
-}
+void ChannelWidget::setBottomLineVIsibility(bool visible) { m_ui->line->setVisible(visible); }
 
 void ChannelWidget::toggleChannel(bool toggled)
 {
@@ -342,17 +271,15 @@ void ChannelWidget::toggleChannel(bool toggled)
 
 void ChannelWidget::setIsMainChannel(bool mainChannel)
 {
-	if (mainChannel) {
+	if(mainChannel) {
 		m_isMainChannel = true;
 		m_ui->box->hide();
 		m_ui->toggleChannels->show();
-		connect(m_ui->toggleChannels, &QPushButton::toggled, this, [=](bool toggled){
-			Q_EMIT enabled(toggled);
-		});
+		connect(m_ui->toggleChannels, &QPushButton::toggled, this,
+			[=](bool toggled) { Q_EMIT enabled(toggled); });
 	}
 }
 
-void ChannelWidget::setIsPhysicalChannel(bool physChannel)
-{
-	m_isPhysicalChannel = physChannel;
-}
+void ChannelWidget::setIsPhysicalChannel(bool physChannel) { m_isPhysicalChannel = physChannel; }
+
+#include "moc_channel_widget.cpp"

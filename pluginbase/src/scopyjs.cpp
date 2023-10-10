@@ -19,18 +19,19 @@
  */
 
 #include "scopyjs.h"
+
 #include "jsfileio.h"
-#include <unistd.h>
 
 #include <QApplication>
-
+#include <QElapsedTimer>
 #include <QMetaProperty>
 #include <QThread>
-#include <QElapsedTimer>
 #include <QtConcurrent>
-#include <thread>
-#include <iostream>
+
 #include <common/common.h>
+#include <iostream>
+#include <thread>
+#include <unistd.h>
 
 Q_LOGGING_CATEGORY(CAT_JS, "Scopy_JS")
 
@@ -39,49 +40,42 @@ using namespace scopy;
 
 QLoggingCategory::CategoryFilter ScopyJS::oldCategoryFilter{nullptr};
 
-ScopyJS* ScopyJS::pinstance_{nullptr};
-ScopyJS::ScopyJS(QObject *parent) : QObject(parent) {
-}
+ScopyJS *ScopyJS::pinstance_{nullptr};
+ScopyJS::ScopyJS(QObject *parent)
+	: QObject(parent)
+{}
 
-ScopyJS::~ScopyJS()
-{
-
-}
+ScopyJS::~ScopyJS() {}
 
 ScopyJS *ScopyJS::GetInstance()
 {
-	if (pinstance_ == nullptr)
-	{
+	if(pinstance_ == nullptr) {
 		pinstance_ = new ScopyJS(QApplication::instance()); // singleton has the app as parent
 		pinstance_->init();
 	}
 	return pinstance_;
 }
 
-void ScopyJS::exit()
-{
-	QApplication::closeAllWindows();
-}
+void ScopyJS::exit() { QApplication::closeAllWindows(); }
 
-void ScopyJS::init() {
+void ScopyJS::init()
+{
 	QJSValue js_obj = m_engine.newQObject(this);
 	auto meta = metaObject();
 	input = "";
 
-	for (int i = meta->methodOffset();
-			i < meta->methodCount(); i++) {
+	for(int i = meta->methodOffset(); i < meta->methodCount(); i++) {
 		QString name(meta->method(i).name());
 
 		m_engine.globalObject().setProperty(name, js_obj.property(name));
 	}
 
 	m_engine.globalObject().setProperty("inspect()",
-					  m_engine.evaluate("(function(o) { for (each in o) { print(each); } })"));
+					    m_engine.evaluate("(function(o) { for (each in o) { print(each); } })"));
 	m_engine.installExtensions(QJSEngine::ConsoleExtension);
-	m_engine.globalObject().setProperty("fileIO",
-					     m_engine.newQObject(new JsFileIo(this)));
+	m_engine.globalObject().setProperty("fileIO", m_engine.newQObject(new JsFileIo(this)));
 
-	if (isatty(STDIN_FILENO)) {
+	if(isatty(STDIN_FILENO)) {
 		// verify if stdin is a true TTY - prevents QtCreator Application output from flooding the application
 		// notifier->setEnabled(false);
 		notifier = new QSocketNotifier(STDIN_FILENO, QSocketNotifier::Read);
@@ -89,13 +83,10 @@ void ScopyJS::init() {
 	}
 }
 
-
 void ScopyJS::returnToApplication()
 {
 	bool done;
-	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,[&done](){
-		done=true;
-	});
+	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, [&done]() { done = true; });
 
 	while(!done) {
 		QCoreApplication::processEvents();
@@ -105,79 +96,60 @@ void ScopyJS::returnToApplication()
 
 void ScopyJS::suppressScopyMessages(bool b)
 {
-	if (b) {
+	if(b) {
 		QLoggingCategory::installFilter(jsCategoryFilter);
 	} else {
 		QLoggingCategory::installFilter(oldCategoryFilter);
 	}
 }
 
-QJSEngine *ScopyJS::engine()
-{
-	return &m_engine;
-}
+QJSEngine *ScopyJS::engine() { return &m_engine; }
 
-void ScopyJS::registerApi(ApiObject *obj)
-{
-	registerApi(obj,m_engine.globalObject());
-}
+void ScopyJS::registerApi(ApiObject *obj) { registerApi(obj, m_engine.globalObject()); }
 
-void ScopyJS::unregisterApi(ApiObject *obj)
-{
-	unregisterApi(obj,m_engine.globalObject());
-}
+void ScopyJS::unregisterApi(ApiObject *obj) { unregisterApi(obj, m_engine.globalObject()); }
 
 void ScopyJS::registerApi(ApiObject *obj, QJSValue parentObj)
 {
 	auto newjsobj = m_engine.newQObject(obj);
 	parentObj.setProperty(obj->objectName(), newjsobj);
 
-//	auto meta = obj->metaObject();
+	//	auto meta = obj->metaObject();
 
-//	for (int i = meta->propertyOffset();
-//			i < meta->propertyCount(); i++) {
-//		auto prop = meta->property(i);
+	//	for (int i = meta->propertyOffset();
+	//			i < meta->propertyCount(); i++) {
+	//		auto prop = meta->property(i);
 
-//		auto data = prop.read(obj);
-//		if (data.canConvert<ApiObject *>()) {
-//			registerApi(data.value<ApiObject*>(),newjsobj);
-//		}
-//	}
+	//		auto data = prop.read(obj);
+	//		if (data.canConvert<ApiObject *>()) {
+	//			registerApi(data.value<ApiObject*>(),newjsobj);
+	//		}
+	//	}
 
-//	QList<ApiObject*> list = obj->findChildren<ApiObject*>(QString(),Qt::FindDirectChildrenOnly);
-//	for(auto &&apiobj : list) {
-//		registerApi(apiobj,newjsobj);
-//	}
-
+	//	QList<ApiObject*> list = obj->findChildren<ApiObject*>(QString(),Qt::FindDirectChildrenOnly);
+	//	for(auto &&apiobj : list) {
+	//		registerApi(apiobj,newjsobj);
+	//	}
 }
 
-void ScopyJS::unregisterApi(ApiObject *obj, QJSValue parentObj)
-{
-	parentObj.deleteProperty(obj->objectName());
-}
+void ScopyJS::unregisterApi(ApiObject *obj, QJSValue parentObj) { parentObj.deleteProperty(obj->objectName()); }
 
-void ScopyJS::sleep(unsigned long s)
-{
-	msleep(s * 1000);
-}
+void ScopyJS::sleep(unsigned long s) { msleep(s * 1000); }
 
 void ScopyJS::msleep(unsigned long ms)
 {
 	QElapsedTimer timer;
 
 	timer.start();
-	while (!timer.hasExpired(ms)) {
+	while(!timer.hasExpired(ms)) {
 		QCoreApplication::processEvents();
 		QThread::msleep(1);
 	}
 }
 
-void ScopyJS::printToConsole(const QString& text)
-{
-	cout << text.toStdString() << std::endl;
-}
+void ScopyJS::printToConsole(const QString &text) { cout << text.toStdString() << std::endl; }
 
-QString ScopyJS::readFromConsole(const QString& request)
+QString ScopyJS::readFromConsole(const QString &request)
 {
 	done = false;
 	input = "";
@@ -187,13 +159,13 @@ QString ScopyJS::readFromConsole(const QString& request)
 		input = watcher.result();
 		done = true;
 	});
-	future = QtConcurrent::run(std::bind(&ScopyJS::readInput,this));
+	future = QtConcurrent::run(std::bind(&ScopyJS::readInput, this));
 	watcher.setFuture(future);
 
 	do {
 		QCoreApplication::processEvents();
 		QThread::msleep(10);
-	} while (!done && (input == ""));
+	} while(!done && (input == ""));
 
 	return input;
 }
@@ -213,16 +185,16 @@ void ScopyJS::hasText()
 	QString str = in.readLine();
 	js_cmd.append(str);
 
-	qWarning()<<str;
+	qWarning() << str;
 	unsigned int nb_open_braces = js_cmd.count(QChar('{'));
 	unsigned int nb_closing_braces = js_cmd.count(QChar('}'));
 
-	if (nb_open_braces == nb_closing_braces) {
+	if(nb_open_braces == nb_closing_braces) {
 		QJSValue val = m_engine.evaluate(js_cmd);
 
-		if (val.isError()) {
+		if(val.isError()) {
 			out << "Exception:" << val.toString() << Qt::endl;
-		} else if (!val.isUndefined()) {
+		} else if(!val.isUndefined()) {
 			out << val.toString() << Qt::endl;
 		}
 
@@ -239,7 +211,7 @@ void ScopyJS::hasText()
 
 void ScopyJS::jsCategoryFilter(QLoggingCategory *category)
 {
-	if (oldCategoryFilter) {
+	if(oldCategoryFilter) {
 		oldCategoryFilter(category);
 	}
 	category->setEnabled(QtDebugMsg, false);
@@ -248,7 +220,7 @@ void ScopyJS::jsCategoryFilter(QLoggingCategory *category)
 	category->setEnabled(QtCriticalMsg, false);
 	category->setEnabled(QtFatalMsg, false);
 
-	if (qstrcmp(category->categoryName(), "Scopy_JS") == 0) {
+	if(qstrcmp(category->categoryName(), "Scopy_JS") == 0) {
 		category->setEnabled(QtDebugMsg, true);
 		category->setEnabled(QtInfoMsg, true);
 		category->setEnabled(QtWarningMsg, true);
@@ -256,7 +228,7 @@ void ScopyJS::jsCategoryFilter(QLoggingCategory *category)
 		category->setEnabled(QtFatalMsg, true);
 	}
 
-	if (qstrcmp(category->categoryName(), "Scopy_API") == 0) {
+	if(qstrcmp(category->categoryName(), "Scopy_API") == 0) {
 		category->setEnabled(QtWarningMsg, true);
 	}
 }

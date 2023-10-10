@@ -1,23 +1,23 @@
-#include "ui_custom_menu_button.h"
-
 #include "custom_menu_button.hpp"
+
+#include "ui_custom_menu_button.h"
 
 using namespace scopy::gui;
 
-CustomMenuButton::CustomMenuButton(QString labelText, bool checkboxVisible, bool checkBoxChecked, QWidget* parent)
+CustomMenuButton::CustomMenuButton(QString labelText, bool checkboxVisible, bool checkBoxChecked, QWidget *parent)
 	: CustomMenuButton(parent)
 {
 
 	m_ui->lblCustomMenuButton->setText(labelText);
 	m_ui->checkBoxCustomMenuButton->setVisible(checkboxVisible);
 
-	if (checkboxVisible) {
+	if(checkboxVisible) {
 		checkBoxToggled(checkBoxChecked);
 		m_ui->checkBoxCustomMenuButton->setChecked(checkBoxChecked);
 	}
 }
 
-CustomMenuButton::CustomMenuButton(QWidget* parent)
+CustomMenuButton::CustomMenuButton(QWidget *parent)
 	: QWidget(parent)
 	, m_ui(new Ui::CustomMenuButton)
 	, m_floatingMenu(false)
@@ -28,13 +28,13 @@ CustomMenuButton::CustomMenuButton(QWidget* parent)
 
 CustomMenuButton::~CustomMenuButton() { delete m_ui; }
 
-void CustomMenuButton::setLabel(const QString& text) { m_ui->lblCustomMenuButton->setText(text); }
+void CustomMenuButton::setLabel(const QString &text) { m_ui->lblCustomMenuButton->setText(text); }
 
 void CustomMenuButton::setCheckboxVisible(bool visible) { m_ui->checkBoxCustomMenuButton->setVisible(visible); }
 
-CustomPushButton* CustomMenuButton::getBtn() { return m_ui->btnCustomMenuButton; }
+CustomPushButton *CustomMenuButton::getBtn() { return m_ui->btnCustomMenuButton; }
 
-QCheckBox* CustomMenuButton::getCheckBox() { return m_ui->checkBoxCustomMenuButton; }
+QCheckBox *CustomMenuButton::getCheckBox() { return m_ui->checkBoxCustomMenuButton; }
 
 bool CustomMenuButton::getCheckBoxState() { return getCheckBox()->isChecked(); }
 
@@ -44,11 +44,13 @@ void CustomMenuButton::setMenuFloating(bool floating) { m_floatingMenu = floatin
 
 void CustomMenuButton::checkBoxToggled(bool toggled)
 {
-	if (!toggled) {
+	if(!toggled) {
 		m_ui->btnCustomMenuButton->setChecked(false);
 	}
 
-	if (!m_floatingMenu) {
+	if(!m_floatingMenu) {
 		m_ui->btnCustomMenuButton->setEnabled(toggled);
 	}
 }
+
+#include "moc_custom_menu_button.cpp"

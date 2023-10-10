@@ -22,66 +22,70 @@
 #define MENU_ANIM_HPP
 
 #include "customanimation.h"
-#include <QSize>
-#include <QWidget>
 #include "scopy-gui_export.h"
 
+#include <QSize>
+#include <QWidget>
+
 namespace scopy {
-	class SCOPY_GUI_EXPORT MenuAnim : public QWidget
-	{
-		Q_OBJECT
+class SCOPY_GUI_EXPORT MenuAnim : public QWidget
+{
+	Q_OBJECT
 
-	public:
-		explicit MenuAnim(QByteArray minAnimationProperty, QByteArray maxAnimationProperty, QWidget *parent = nullptr);
-		~MenuAnim() {}
+public:
+	explicit MenuAnim(QByteArray minAnimationProperty, QByteArray maxAnimationProperty, QWidget *parent = nullptr);
+	~MenuAnim() {}
 
-		bool animInProgress() const;
+	bool animInProgress() const;
 
-		int getAnimationDuration() const;
-		void setAnimationDuration(int newAnimationDuration);
+	int getAnimationDuration() const;
+	void setAnimationDuration(int newAnimationDuration);
 
-		void setAnimMin(int min);
-		void setAnimMax(int max);
+	void setAnimMin(int min);
+	void setAnimMax(int max);
 
-	protected:
-		virtual int getImplicitMin() = 0;
-		virtual int getImplicitMax() = 0;
-	Q_SIGNALS:
-		void finished(bool opened);
+protected:
+	virtual int getImplicitMin() = 0;
+	virtual int getImplicitMax() = 0;
+Q_SIGNALS:
+	void finished(bool opened);
 
-	public Q_SLOTS:
-		void toggleMenu(bool open);
+public Q_SLOTS:
+	void toggleMenu(bool open);
 
-	private Q_SLOTS:
-		void closeAnimFinished();
-		void openAnimFinished();
+private Q_SLOTS:
+	void closeAnimFinished();
+	void openAnimFinished();
 
-	private:
-		CustomAnimation close_anim_max, close_anim_min,
-				   open_anim_max, open_anim_min;
-		int min_val;
-		int max_val;
-		int animationDuration;
-		bool animInProg;
-	};
+private:
+	CustomAnimation close_anim_max, close_anim_min, open_anim_max, open_anim_min;
+	int min_val;
+	int max_val;
+	int animationDuration;
+	bool animInProg;
+};
 
-	class SCOPY_GUI_EXPORT MenuVAnim : public MenuAnim {
-		Q_OBJECT
-	public:
-		explicit MenuVAnim(QWidget *parent = nullptr);
-	protected:
-		int getImplicitMin() override;
-		int getImplicitMax() override;
-	};
+class SCOPY_GUI_EXPORT MenuVAnim : public MenuAnim
+{
+	Q_OBJECT
+public:
+	explicit MenuVAnim(QWidget *parent = nullptr);
 
-	class SCOPY_GUI_EXPORT MenuHAnim : public MenuAnim {
-		Q_OBJECT
-	public:
-		explicit MenuHAnim(QWidget *parent = nullptr);
-	protected:
-		int getImplicitMin() override;
-		int getImplicitMax() override;
-	};
-}
+protected:
+	int getImplicitMin() override;
+	int getImplicitMax() override;
+};
+
+class SCOPY_GUI_EXPORT MenuHAnim : public MenuAnim
+{
+	Q_OBJECT
+public:
+	explicit MenuHAnim(QWidget *parent = nullptr);
+
+protected:
+	int getImplicitMin() override;
+	int getImplicitMax() override;
+};
+} // namespace scopy
 
 #endif /* MENU_ANIM_HPP */

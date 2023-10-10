@@ -1,9 +1,11 @@
 #ifndef TOOLBROWSER_H
 #define TOOLBROWSER_H
 
-#include <QWidget>
-#include <toolmenu.h>
 #include "scopy-core_export.h"
+
+#include <QWidget>
+
+#include <toolmenu.h>
 
 namespace Ui {
 class ToolBrowser;
@@ -12,12 +14,12 @@ class ToolBrowser;
 namespace scopy {
 class SCOPY_CORE_EXPORT ToolBrowser : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit ToolBrowser(QWidget *parent = nullptr);
 	~ToolBrowser();
-	ToolMenu* getToolMenu();
+	ToolMenu *getToolMenu();
 
 public Q_SLOTS:
 	void toggleCollapse();
@@ -32,6 +34,6 @@ private:
 	Ui::ToolBrowser *ui;
 	void hideMenuText(bool collapesd);
 };
-}
+} // namespace scopy
 
 #endif // TOOLBROWSER_H

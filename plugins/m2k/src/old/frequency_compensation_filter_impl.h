@@ -22,6 +22,7 @@
 #define OVERSHOOT_FILTER_HPP
 
 #include "frequency_compensation_filter.h"
+
 #include <inttypes.h>
 
 using namespace gr;
@@ -30,7 +31,8 @@ namespace scopy {
 class frequency_compensation_filter_impl : public frequency_compensation_filter
 {
 private:
-	typedef struct {
+	typedef struct
+	{
 		bool enable;
 		float TC, gain;
 	} filter_config_t;
@@ -41,11 +43,8 @@ private:
 
 public:
 	typedef std::shared_ptr<frequency_compensation_filter> sptr;
-	frequency_compensation_filter_impl(bool enable, float TC, float gain,
-					   float sample_rate);
-	int work(int noutput_items,
-		 gr_vector_const_void_star& input_items,
-		 gr_vector_void_star& output_items);
+	frequency_compensation_filter_impl(bool enable, float TC, float gain, float sample_rate);
+	int work(int noutput_items, gr_vector_const_void_star &input_items, gr_vector_void_star &output_items);
 
 	void set_enable(bool en, int gain_mode);
 	bool get_enable(int gain_mode) override;
@@ -57,5 +56,5 @@ public:
 	bool get_high_gain() override;
 	void set_high_gain(bool en);
 };
-}
+} // namespace scopy
 #endif

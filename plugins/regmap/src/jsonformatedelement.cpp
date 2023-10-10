@@ -2,50 +2,30 @@
 
 using namespace scopy::regmap;
 
-JsonFormatedElement::JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices, bool isAxiCompatible, bool useRegisterDescriptionAsName, bool useBifieldDescriptionAsName)
-    : fileName(fileName),
-    compatibleDevices(compatibleDevices),
-    isAxiCompatible(isAxiCompatible),
-    useRegisterDescriptionAsName(useRegisterDescriptionAsName),
-    useBifieldDescriptionAsName(useBifieldDescriptionAsName)
-{
+JsonFormatedElement::JsonFormatedElement(QString fileName, QList<QString> *compatibleDevices, bool isAxiCompatible,
+					 bool useRegisterDescriptionAsName, bool useBifieldDescriptionAsName)
+	: fileName(fileName)
+	, compatibleDevices(compatibleDevices)
+	, isAxiCompatible(isAxiCompatible)
+	, useRegisterDescriptionAsName(useRegisterDescriptionAsName)
+	, useBifieldDescriptionAsName(useBifieldDescriptionAsName)
+{}
 
-}
+QString JsonFormatedElement::getFileName() const { return fileName; }
 
-QString JsonFormatedElement::getFileName() const
-{
-    return fileName;
-}
+QList<QString> *JsonFormatedElement::getCompatibleDevices() const { return compatibleDevices; }
 
-QList<QString>* JsonFormatedElement::getCompatibleDevices() const
-{
-    return compatibleDevices;
-}
+void JsonFormatedElement::addCompatibleDevice(QString device) { compatibleDevices->push_back(device); }
 
-void JsonFormatedElement::addCompatibleDevice(QString device)
-{
-    compatibleDevices->push_back(device);
-}
+bool JsonFormatedElement::getIsAxiCompatible() const { return isAxiCompatible; }
 
-bool JsonFormatedElement::getIsAxiCompatible() const
-{
-    return isAxiCompatible;
-}
-
-bool JsonFormatedElement::getUseBifieldNameAsDescription() const
-{
-    return useBifieldDescriptionAsName;
-}
+bool JsonFormatedElement::getUseBifieldNameAsDescription() const { return useBifieldDescriptionAsName; }
 
 QString JsonFormatedElement::toString()
 {
-    return QString("Filename : " + fileName + " Compatible Dev: " + compatibleDevices->length() +
-                   " isAxiCompatible :"  + isAxiCompatible +
-                   " useRegisterDescriptionAsName: " + useRegisterDescriptionAsName +
-                   " useBifieldDescriptionAsName: " + useBifieldDescriptionAsName);
+	return QString("Filename : " + fileName + " Compatible Dev: " + compatibleDevices->length() +
+		       " isAxiCompatible :" + isAxiCompatible + " useRegisterDescriptionAsName: " +
+		       useRegisterDescriptionAsName + " useBifieldDescriptionAsName: " + useBifieldDescriptionAsName);
 }
 
-bool JsonFormatedElement::getUseRegisterNameAsDescription() const
-{
-    return useRegisterDescriptionAsName;
-}
+bool JsonFormatedElement::getUseRegisterNameAsDescription() const { return useRegisterDescriptionAsName; }

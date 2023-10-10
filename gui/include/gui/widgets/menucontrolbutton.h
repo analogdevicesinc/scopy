@@ -2,24 +2,28 @@
 #define MENUCONTROLBUTTON_H
 
 #include "scopy-gui_export.h"
-#include <QWidget>
+
 #include <QAbstractButton>
-#include <utils.h>
-#include <QHBoxLayout>
 #include <QCheckBox>
-#include <QPushButton>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+#include <QWidget>
+
+#include <utils.h>
 
 namespace scopy {
-    class SCOPY_GUI_EXPORT MenuControlButton : public QAbstractButton {
+class SCOPY_GUI_EXPORT MenuControlButton : public QAbstractButton
+{
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-	typedef enum {
-	CS_CIRCLE,
-	CS_SQUARE,
-	CS_BLUESQUARE,
-	CS_COLLAPSE,
+	typedef enum
+	{
+		CS_CIRCLE,
+		CS_SQUARE,
+		CS_BLUESQUARE,
+		CS_COLLAPSE,
 	} CheckboxStyle;
 
 	MenuControlButton(QWidget *parent = nullptr);
@@ -32,9 +36,8 @@ public:
 	void setDoubleClickToOpenMenu(bool b);
 	void setOpenMenuChecksThis(bool b);
 
-	QCheckBox* checkBox();
-	QPushButton* button();
-
+	QCheckBox *checkBox();
+	QPushButton *button();
 
 Q_SIGNALS:
 	void doubleClicked();
@@ -57,9 +60,8 @@ protected:
 	void mousePressEvent(QMouseEvent *event) override;
 };
 
-
-
-class SCOPY_GUI_EXPORT CollapsableMenuControlButton : public QWidget {
+class SCOPY_GUI_EXPORT CollapsableMenuControlButton : public QWidget
+{
 	Q_OBJECT
 public:
 	CollapsableMenuControlButton(QWidget *parent = nullptr);
@@ -73,8 +75,7 @@ private:
 	QWidget *m_container;
 	QVBoxLayout *m_contLayout;
 	QVBoxLayout *m_lay;
-
 };
 
-}
+} // namespace scopy
 #endif // MENUCONTROLBUTTON_H

@@ -18,30 +18,32 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_TUTORIALBUILDER_H
 #define SCOPY_TUTORIALBUILDER_H
-
-#include <QMap>
 
 #include "scopy-gui_export.h"
 #include "tutorialoverlay.h"
 
+#include <QMap>
+
 namespace scopy::gui {
-class SCOPY_GUI_EXPORT TutorialBuilder : public scopy::gui::TutorialOverlay {
+class SCOPY_GUI_EXPORT TutorialBuilder : public scopy::gui::TutorialOverlay
+{
 	Q_OBJECT
 public:
 	/**
 	 * @brief This acts as a wrapper to the scopy::gui::TutorialOverlay class that is meant to simplify adding
 	 * chapters in order.
 	 * @param topWidget The topmost widget that contains all the children widgets that will be part of the tutorial.
-	 * @param jsonFile A json file that describes each chapter and attributes related to it (e.g. description, order).
+	 * @param jsonFile A json file that describes each chapter and attributes related to it (e.g. description,
+	 * order).
 	 * @param jsonEntry The entry in the jsonFile that represents the current tutorial.
 	 * @param parent The widget that will receive the tinted overlay meant to highlight tutorial subjects.
 	 * @inherit scopy::gui::TutorialOverlay
 	 * */
-	explicit TutorialBuilder(QWidget* topWidget, const QString& jsonFile, QString jsonEntry, QWidget* parent = nullptr);
-	explicit TutorialBuilder(QWidget* parent = nullptr);
+	explicit TutorialBuilder(QWidget *topWidget, const QString &jsonFile, QString jsonEntry,
+				 QWidget *parent = nullptr);
+	explicit TutorialBuilder(QWidget *parent = nullptr);
 
 	QString getJsonFileName() const;
 	void setJsonFileName(const QString &jsonFile);
@@ -72,19 +74,20 @@ public:
 
 public Q_SLOTS:
 	/**
- 	 * @brief Calls collectChapters() and readTutorialRequirements() before calling the start() method from the
- 	 * base class.
- 	 * */
+	 * @brief Calls collectChapters() and readTutorialRequirements() before calling the start() method from the
+	 * base class.
+	 * */
 	void start() override;
 
 private:
 	QFile m_jsonFile;
 	QString m_jsonEntry;
-	QWidget* m_topWidget;
+	QWidget *m_topWidget;
 
-	struct ChapterInstructions {
+	struct ChapterInstructions
+	{
 		// map representing the widget property string related to the tutorial and the related widget
-		QMap<QString, QWidget*> widgets;
+		QMap<QString, QWidget *> widgets;
 
 		// this is a name of the widget from the map declared above, the description of the chapter will
 		// be anchored to this widget
@@ -96,7 +99,7 @@ private:
 		HoverPosition content;
 	};
 
-	QMap<uint16_t, ChapterInstructions*> m_chapters;
+	QMap<uint16_t, ChapterInstructions *> m_chapters;
 
 	/**
 	 * @brief Searches for the ChapterInstructions entries that have the name field matching the name parameter
@@ -104,15 +107,16 @@ private:
 	 * @throws std::runtime_error Thrown when the name is not found in the m_chapters QMap
 	 * @return The list of pointers to the ChapterInstructions that were found with this name
 	 * */
-	QList<TutorialBuilder::ChapterInstructions*> getChapterInstructionFromName(const QString& name);
+	QList<TutorialBuilder::ChapterInstructions *> getChapterInstructionFromName(const QString &name);
 
 	/**
-	 * @brief Converts a QString to the corresponding HoverPosition value (e.g. "HP_TOPLEFT" -> scopy::HoverPosition::HP_TOPLEFT)
+	 * @brief Converts a QString to the corresponding HoverPosition value (e.g. "HP_TOPLEFT" ->
+	 * scopy::HoverPosition::HP_TOPLEFT)
 	 * @param position QString that matches an entry of HoverPosition
 	 * @return HoverPosition entry, if there is no match, the default value of CENTER will be returned
 	 * */
-	 static HoverPosition convertStringToHoverPosition(const QString& position) noexcept;
+	static HoverPosition convertStringToHoverPosition(const QString &position) noexcept;
 };
-}
+} // namespace scopy::gui
 
-#endif //SCOPY_TUTORIALBUILDER_H
+#endif // SCOPY_TUTORIALBUILDER_H

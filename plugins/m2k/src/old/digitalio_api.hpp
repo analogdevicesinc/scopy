@@ -29,7 +29,7 @@ class DigitalIO_API : public ApiObject
 
 	Q_PROPERTY(QList<bool> group READ grouped WRITE setGrouped SCRIPTABLE false);
 	Q_PROPERTY(QList<bool> dir READ direction WRITE setDirection SCRIPTABLE true);
-	Q_PROPERTY(QList<bool> out READ output    WRITE setOutput SCRIPTABLE true);
+	Q_PROPERTY(QList<bool> out READ output WRITE setOutput SCRIPTABLE true);
 
 	Q_PROPERTY(QList<bool> gpi READ gpi STORED false);
 	Q_PROPERTY(QList<bool> locked READ locked STORED false);
@@ -37,16 +37,19 @@ class DigitalIO_API : public ApiObject
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes);
 
 public:
-	explicit DigitalIO_API(DigitalIO *dio) : ApiObject(), dio(dio) {}
+	explicit DigitalIO_API(DigitalIO *dio)
+		: ApiObject()
+		, dio(dio)
+	{}
 	~DigitalIO_API() {}
 
 	QList<bool> direction() const;
-	void setDirection(const QList<bool>& list);
+	void setDirection(const QList<bool> &list);
 	QList<bool> output() const;
-	void setOutput(const QList<bool>& list);
+	void setOutput(const QList<bool> &list);
 	void setOutput(int ch, int direction);
 	QList<bool> grouped() const;
-	void setGrouped(const QList<bool>& grouped);
+	void setGrouped(const QList<bool> &grouped);
 
 	QList<bool> gpi() const;
 	QList<bool> locked() const;
@@ -61,6 +64,6 @@ public:
 private:
 	DigitalIO *dio;
 };
-}
+} // namespace scopy::m2k
 
 #endif // DIGITALIO_API_HPP

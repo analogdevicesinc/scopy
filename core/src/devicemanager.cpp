@@ -1,28 +1,30 @@
 #include "devicemanager.h"
+
+#include "QApplication"
+#include "devicefactory.h"
 #include "deviceimpl.h"
 #include "deviceloader.h"
 #include "iiodeviceimpl.h"
-#include <QtConcurrent>
-#include "devicefactory.h"
-#include "QApplication"
-#include <QLoggingCategory>
+
 #include <QDebug>
+#include <QLoggingCategory>
 #include <QThread>
+#include <QtConcurrent>
 
 Q_LOGGING_CATEGORY(CAT_DEVICEMANAGER, "DeviceManager")
 using namespace scopy;
 DeviceManager::DeviceManager(PluginManager *pm, QObject *parent)
-	: QObject{parent}, pm(pm)
+	: QObject{parent}
+	, pm(pm)
 {
 
-	connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()),this,SLOT(disconnectAll()));
+	connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(disconnectAll()));
 }
 
-DeviceManager::~DeviceManager()
+DeviceManager::~DeviceManager() {}
+
+Device *DeviceManager::getDevice(QString id)
 {
-}
-
-Device* DeviceManager::getDevice(QString id) {
 
 	Device *d = nullptr;
 	if(map.contains(id)) {
@@ -31,9 +33,10 @@ Device* DeviceManager::getDevice(QString id) {
 	return d;
 }
 
-void DeviceManager::addDevice(Device* d) {
+void DeviceManager::addDevice(Device *d)
+{
 
-	DeviceImpl* di = dynamic_cast<DeviceImpl*>(d);
+	DeviceImpl *di = dynamic_cast<DeviceImpl *>(d);
 	QString id = d->id();
 	map[id] = d;
 	di->setParent(this);
@@ -44,30 +47,31 @@ void DeviceManager::addDevice(Device* d) {
 
 QString DeviceManager::createDevice(QString category, QString param, bool async)
 {
-	qInfo(CAT_DEVICEMANAGER) <<category<< "device with params" << param << "added";
+	qInfo(CAT_DEVICEMANAGER) << category << "device with params" << param << "added";
 	Q_EMIT deviceAddStarted(param);
 
 	DeviceImpl *d = DeviceFactory::build(param, pm, category);
-	DeviceLoader* dl = new DeviceLoader(d,this);
+	DeviceLoader *dl = new DeviceLoader(d, this);
 
-	connect(dl, &DeviceLoader::initialized, this, [=](){addDevice(d);}); // add device to manager once it is initialized
-	connect(dl, &DeviceLoader::initialized, dl, &QObject::deleteLater); // don't forget to delete loader once we're done
+	connect(dl, &DeviceLoader::initialized, this,
+		[=]() { addDevice(d); }); // add device to manager once it is initialized
+	connect(dl, &DeviceLoader::initialized, dl,
+		&QObject::deleteLater); // don't forget to delete loader once we're done
 	dl->init(async);
 
 	return d->id();
 }
 
-
 // This is only used by scan context collector - should I rethink this ?
 // Map all devices to uris in scan context collector
-void DeviceManager::removeDevice(QString category, QString param) {
+void DeviceManager::removeDevice(QString category, QString param)
+{
 
-	for(Device* d : qAsConst(map)) {
+	for(Device *d : qAsConst(map)) {
 		if(d->category() == category && d->param() == param) {
 			removeDeviceById(d->id());
 			return;
 		}
-
 	}
 }
 
@@ -80,13 +84,13 @@ void DeviceManager::removeDeviceById(QString id)
 	}
 
 	if(!map.contains(id)) {
-		qWarning(CAT_DEVICEMANAGER) << id <<"Device does not exist";
+		qWarning(CAT_DEVICEMANAGER) << id << "Device does not exist";
 		return;
 	}
 	d = map.take(id);
 	Q_EMIT deviceRemoveStarted(id, d);
 
-	disconnectDeviceFromManager(dynamic_cast<DeviceImpl*>(d));
+	disconnectDeviceFromManager(dynamic_cast<DeviceImpl *>(d));
 	d->unloadPlugins();
 	delete(d);
 
@@ -95,22 +99,23 @@ void DeviceManager::removeDeviceById(QString id)
 	Q_EMIT deviceRemoved(id);
 }
 
-void DeviceManager::connectDeviceToManager(DeviceImpl *d) {
-	connect(d,&DeviceImpl::connected,this,[=](){connectDevice(d->id());});
-	connect(d,&DeviceImpl::disconnected,this,[=](){disconnectDevice(d->id());});
-	connect(d,&DeviceImpl::forget,this,[=](){removeDeviceById(d->id());});
-	connect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
-	connect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
-	connect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
-
+void DeviceManager::connectDeviceToManager(DeviceImpl *d)
+{
+	connect(d, &DeviceImpl::connected, this, [=]() { connectDevice(d->id()); });
+	connect(d, &DeviceImpl::disconnected, this, [=]() { disconnectDevice(d->id()); });
+	connect(d, &DeviceImpl::forget, this, [=]() { removeDeviceById(d->id()); });
+	connect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
+	connect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
+	connect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
 }
-void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d) {
-	disconnect(d,SIGNAL(connected()));
-	disconnect(d,SIGNAL(disconnected()));
-	disconnect(d,SIGNAL(forget()));
-	disconnect(d,SIGNAL(requestedRestart()), this,SLOT(restartDevice()));
-	disconnect(d,SIGNAL(toolListChanged()),this,SLOT(changeToolListDevice()));
-	disconnect(d,SIGNAL(requestTool(QString)),this,SIGNAL(requestTool(QString)));
+void DeviceManager::disconnectDeviceFromManager(DeviceImpl *d)
+{
+	disconnect(d, SIGNAL(connected()));
+	disconnect(d, SIGNAL(disconnected()));
+	disconnect(d, SIGNAL(forget()));
+	disconnect(d, SIGNAL(requestedRestart()), this, SLOT(restartDevice()));
+	disconnect(d, SIGNAL(toolListChanged()), this, SLOT(changeToolListDevice()));
+	disconnect(d, SIGNAL(requestTool(QString)), this, SIGNAL(requestTool(QString)));
 }
 
 QString DeviceManager::restartDevice(QString id)
@@ -143,26 +148,29 @@ void DeviceManager::load(QSettings &s)
 	}
 }
 
-void DeviceManager::changeToolListDevice() {
-	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+void DeviceManager::changeToolListDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
 	Q_EMIT deviceChangedToolList(id, map[id]->toolList());
 }
 
-void DeviceManager::connectDevice() {
-	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+void DeviceManager::connectDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
 	connectDevice(id);
 }
 
-void DeviceManager::connectDevice(QString id) {
-	qDebug(CAT_DEVICEMANAGER)<<"connecting " << id << "...";
+void DeviceManager::connectDevice(QString id)
+{
+	qDebug(CAT_DEVICEMANAGER) << "connecting " << id << "...";
 	if(connectedDev.contains(id)) {
-		qDebug(CAT_DEVICEMANAGER)<<"connecting to the same device, disconnecting first .. ";
+		qDebug(CAT_DEVICEMANAGER) << "connecting to the same device, disconnecting first .. ";
 		map[id]->disconnectDev();
 	}
 	if(exclusive) {
 		if(connectedDev.size() > 0) {
-			qDebug(CAT_DEVICEMANAGER)<<"exclusive mode, disconnecting all connected devices .. ";
-			for(int i = 0;i<connectedDev.count();i++)
+			qDebug(CAT_DEVICEMANAGER) << "exclusive mode, disconnecting all connected devices .. ";
+			for(int i = 0; i < connectedDev.count(); i++)
 				map[connectedDev[i]]->disconnectDev();
 		}
 	}
@@ -171,34 +179,30 @@ void DeviceManager::connectDevice(QString id) {
 	Q_EMIT deviceConnected(id, map[id]);
 }
 
-
-
-void DeviceManager::disconnectDevice() {
-	QString id = dynamic_cast<Device*>(QObject::sender())->id();
+void DeviceManager::disconnectDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
 	disconnectDevice(id);
 }
 
-void DeviceManager::disconnectDevice(QString id) {
-	qDebug(CAT_DEVICEMANAGER)<<"disconnecting "<< id << "...";
+void DeviceManager::disconnectDevice(QString id)
+{
+	qDebug(CAT_DEVICEMANAGER) << "disconnecting " << id << "...";
 	connectedDev.removeOne(id);
 	Q_EMIT requestTool("home");
 	Q_EMIT deviceDisconnected(id, map[id]);
 }
 
-void DeviceManager::setExclusive(bool val) {
-	exclusive = val;
-}
-bool DeviceManager::getExclusive() const {
-	return exclusive;
-}
+void DeviceManager::setExclusive(bool val) { exclusive = val; }
+bool DeviceManager::getExclusive() const { return exclusive; }
 
-void DeviceManager::restartDevice() {
-	QString id = dynamic_cast<Device*>(QObject::sender())->id();
-	qDebug(CAT_DEVICEMANAGER)<<"restarting "<< id << "...";
+void DeviceManager::restartDevice()
+{
+	QString id = dynamic_cast<Device *>(QObject::sender())->id();
+	qDebug(CAT_DEVICEMANAGER) << "restarting " << id << "...";
 	QString newId = restartDevice(id);
-//	connect(this,SIGNAL(deviceAdded(QString,Device*)),this,SIGNAL(requestDevice(QString)));
-//	Q_EMIT requestDevice(newId);
+	//	connect(this,SIGNAL(deviceAdded(QString,Device*)),this,SIGNAL(requestDevice(QString)));
+	//	Q_EMIT requestDevice(newId);
 }
-
 
 #include "moc_devicemanager.cpp"

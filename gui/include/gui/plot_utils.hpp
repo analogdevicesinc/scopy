@@ -21,92 +21,93 @@
 #ifndef PLOT_UTILS_HPP
 #define PLOT_UTILS_HPP
 
-#include <vector>
-#include <qstring.h>
-#include <QObject>
 #include "scopy-gui_export.h"
 
+#include <QObject>
+#include <qstring.h>
+
+#include <vector>
+
 namespace scopy {
-	class SCOPY_GUI_EXPORT PrefixFormatter : public QObject
-	{
+class SCOPY_GUI_EXPORT PrefixFormatter : public QObject
+{
 	Q_OBJECT
-	public:
-		PrefixFormatter(const std::vector<std::pair<QString, double>>&, QObject *parent = nullptr);
-		virtual ~PrefixFormatter();
-		void setTwoDecimalMode(bool);
-		bool getTwoDecimalMode();
-		virtual QString format(double value, QString unitType, int precision) const;
-		void getFormatAttributes(double value, QString& prefix, double& scale) const;
+public:
+	PrefixFormatter(const std::vector<std::pair<QString, double>> &, QObject *parent = nullptr);
+	virtual ~PrefixFormatter();
+	void setTwoDecimalMode(bool);
+	bool getTwoDecimalMode();
+	virtual QString format(double value, QString unitType, int precision) const;
+	void getFormatAttributes(double value, QString &prefix, double &scale) const;
 
-		QString getFormatedMeasureUnit(double value);
-		double getFormatedValue(double value);
+	QString getFormatedMeasureUnit(double value);
+	double getFormatedValue(double value);
 
-		bool getTrimZeroes() const;
-		void setTrimZeroes(bool trimZeroes);
+	bool getTrimZeroes() const;
+	void setTrimZeroes(bool trimZeroes);
 
-	protected:
-		virtual QString buildString(double value, QString prefix, QString unitType, int precision) const;
-		int findPrefixIndex(double value) const;
+protected:
+	virtual QString buildString(double value, QString prefix, QString unitType, int precision) const;
+	int findPrefixIndex(double value) const;
 
-	private:
-		std::vector<std::pair<QString, double>> m_prefixes;
-		int m_defaultPrefixIndex;
-		bool m_twoDecimalMode;
-		bool m_trimZeroes;
-	};
+private:
+	std::vector<std::pair<QString, double>> m_prefixes;
+	int m_defaultPrefixIndex;
+	bool m_twoDecimalMode;
+	bool m_trimZeroes;
+};
 
-	class SCOPY_GUI_EXPORT MetricPrefixFormatter: public PrefixFormatter
-	{
-	public:
-		MetricPrefixFormatter(QObject *parent = nullptr);
-	};
+class SCOPY_GUI_EXPORT MetricPrefixFormatter : public PrefixFormatter
+{
+public:
+	MetricPrefixFormatter(QObject *parent = nullptr);
+};
 
-	class SCOPY_GUI_EXPORT TimePrefixFormatter: public PrefixFormatter
-	{
-	public:
-		TimePrefixFormatter(QObject *parent = nullptr);
-	};
+class SCOPY_GUI_EXPORT TimePrefixFormatter : public PrefixFormatter
+{
+public:
+	TimePrefixFormatter(QObject *parent = nullptr);
+};
 
-	/*
-	 * CLASS NumberSeries contains a series of number that is being built
-	 * upon contruction. The series is being build by the following rules:
-	 * limits: [lower, upper]
-	 * step: {step1, step2, ..., stepN} X stepPower
-	 * E.g. powerStep = 10, steps = {1, 2, 5} -> ..., 0.1, 0.2, 0.5, 1.0,
-	 *      2.0, 5.0, 10.0, 20.0, 50.0, ...
-	 */
-	class SCOPY_GUI_EXPORT NumberSeries
-	{
-	public:
-		NumberSeries(double lower = 1E-3, double upper = 1E3,
-			     unsigned int powerStep = 10,
-			     const std::vector<double>& steps = {1, 2, 5});
-		~NumberSeries();
+/*
+ * CLASS NumberSeries contains a series of number that is being built
+ * upon contruction. The series is being build by the following rules:
+ * limits: [lower, upper]
+ * step: {step1, step2, ..., stepN} X stepPower
+ * E.g. powerStep = 10, steps = {1, 2, 5} -> ..., 0.1, 0.2, 0.5, 1.0,
+ *      2.0, 5.0, 10.0, 20.0, 50.0, ...
+ */
+class SCOPY_GUI_EXPORT NumberSeries
+{
+public:
+	NumberSeries(double lower = 1E-3, double upper = 1E3, unsigned int powerStep = 10,
+		     const std::vector<double> &steps = {1, 2, 5});
+	~NumberSeries();
 
-		const std::vector<double>& getNumbers();
+	const std::vector<double> &getNumbers();
 
-		double getNumberAfter(double value);
-		double getNumberBefore(double value);
+	double getNumberAfter(double value);
+	double getNumberBefore(double value);
 
-		void setLower(double value);
-		double lower();
+	void setLower(double value);
+	double lower();
 
-		void setUpper(double value);
-		double upper();
+	void setUpper(double value);
+	double upper();
 
-		void setPowerStep(unsigned int value);
-		unsigned int stepPower();
+	void setPowerStep(unsigned int value);
+	unsigned int stepPower();
 
-	protected:
-		void buildNumberSeries();
+protected:
+	void buildNumberSeries();
 
-	private:
-		double m_lowerLimit;
-		double m_upperLimit;
-		int m_powerStep;
-		std::vector<double> m_templateSteps;
-		std::vector<double>m_numbers;
-	};
-}
+private:
+	double m_lowerLimit;
+	double m_upperLimit;
+	int m_powerStep;
+	std::vector<double> m_templateSteps;
+	std::vector<double> m_numbers;
+};
+} // namespace scopy
 
-#endif //PLOT_UTILS_HPP
+#endif // PLOT_UTILS_HPP

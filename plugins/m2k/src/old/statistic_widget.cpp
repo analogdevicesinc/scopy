@@ -19,71 +19,54 @@
  */
 
 #include "statistic_widget.h"
+
 #include "gui/m2kmeasure.h"
 #include "plot_utils.hpp"
+
 #include "ui_statistic.h"
 
 namespace scopy {
 class Formatter
 {
 public:
-	Formatter()
-	{
-	}
+	Formatter() {}
 
-	virtual ~Formatter()
-	{
-	}
+	virtual ~Formatter() {}
 
 	virtual QString format(double value) const = 0;
 };
 
-class MetricFormatter: public Formatter
+class MetricFormatter : public Formatter
 {
 public:
-	MetricFormatter(QString unit = ""):
-	m_unit(unit)
-	{
-	}
+	MetricFormatter(QString unit = "")
+		: m_unit(unit)
+	{}
 
-	void setUnit(QString unit)
-	{
-		m_unit = unit;
-	}
+	void setUnit(QString unit) { m_unit = unit; }
 
-	QString format(double value) const
-	{
-		return m_formatter.format(value, m_unit, 3);
-	}
+	QString format(double value) const { return m_formatter.format(value, m_unit, 3); }
 
 private:
 	MetricPrefixFormatter m_formatter;
 	QString m_unit;
-
 };
 
-class TimeFormatter: public Formatter
+class TimeFormatter : public Formatter
 {
 public:
-	TimeFormatter()
-	{
-	}
+	TimeFormatter() {}
 
-	QString format(double value) const
-	{
-		return m_formatter.format(value, "", 3);
-	}
+	QString format(double value) const { return m_formatter.format(value, "", 3); }
 
 private:
 	TimePrefixFormatter m_formatter;
 };
 
-class PercentageFormatter: public Formatter
+class PercentageFormatter : public Formatter
 {
 public:
-	PercentageFormatter()
-	{
-	}
+	PercentageFormatter() {}
 
 	QString format(double value) const
 	{
@@ -96,12 +79,10 @@ public:
 	}
 };
 
-class DimensionlessFormatter: public Formatter
+class DimensionlessFormatter : public Formatter
 {
 public:
-	DimensionlessFormatter()
-	{
-	}
+	DimensionlessFormatter() {}
 
 	QString format(double value) const
 	{
@@ -113,18 +94,18 @@ public:
 	}
 };
 
-}
+} // namespace scopy
 
 using namespace scopy;
 
-StatisticWidget::StatisticWidget(QWidget *parent):
-	QWidget(parent),
-	m_ui(new Ui::Statistic),
-	m_title(""),
-	m_channelId(-1),
-	m_posIndex(-1),
-	m_formatter(new DimensionlessFormatter()),
-	m_valueLabelWidth(0)
+StatisticWidget::StatisticWidget(QWidget *parent)
+	: QWidget(parent)
+	, m_ui(new Ui::Statistic)
+	, m_title("")
+	, m_channelId(-1)
+	, m_posIndex(-1)
+	, m_formatter(new DimensionlessFormatter())
+	, m_valueLabelWidth(0)
 {
 	m_ui->setupUi(this);
 }
@@ -135,22 +116,17 @@ StatisticWidget::~StatisticWidget()
 	delete m_ui;
 }
 
-QString StatisticWidget::title() const
-{
-	return m_title;
-}
+QString StatisticWidget::title() const { return m_title; }
 
-int StatisticWidget::channelId() const
-{
-	return m_channelId;
-}
+int StatisticWidget::channelId() const { return m_channelId; }
 
-void StatisticWidget::setTitleColor(const QColor& color)
+void StatisticWidget::setTitleColor(const QColor &color)
 {
 	QString stylesheet = QString(""
-		"font-size: 14px;"
-		"font-weight: bold;"
-		"color: %1;").arg(color.name());
+				     "font-size: 14px;"
+				     "font-weight: bold;"
+				     "color: %1;")
+				     .arg(color.name());
 
 	m_ui->label_count->setStyleSheet(stylesheet);
 	m_ui->label_title->setStyleSheet(stylesheet);
@@ -158,7 +134,7 @@ void StatisticWidget::setTitleColor(const QColor& color)
 
 void StatisticWidget::setPositionIndex(int pos)
 {
-	if (m_posIndex != pos) {
+	if(m_posIndex != pos) {
 		m_posIndex = pos;
 		QString posText;
 		posText.setNum(pos);
@@ -216,13 +192,13 @@ void StatisticWidget::initForMeasurement(const M2kMeasurementData &data)
 	delete label;
 }
 
-void StatisticWidget::updateStatistics(const M2kStatistic& data)
+void StatisticWidget::updateStatistics(const M2kStatistic &data)
 {
 	QString avg_text;
 	QString min_text;
 	QString max_text;
 
-	if (data.numPushedData() == 0) {
+	if(data.numPushedData() == 0) {
 		avg_text = "--";
 		min_text = "--";
 		max_text = "--";

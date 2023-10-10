@@ -19,6 +19,7 @@
  */
 
 #include "channelplotscalescontroller.h"
+
 #include <QHBoxLayout>
 #include <QSpacerItem>
 using namespace scopy::swiot;
@@ -30,15 +31,15 @@ ChannelPlotScalesController::ChannelPlotScalesController(QWidget *parent)
 	auto layout = new QHBoxLayout(this);
 	layout->setMargin(0);
 	layout->setSpacing(10);
-	layout->addSpacerItem(new QSpacerItem(0,0, QSizePolicy::Expanding));
+	layout->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
 	this->setLayout(m_layout);
 }
 
 ChannelPlotScalesController::~ChannelPlotScalesController()
 {
-	if (m_layout) {
+	if(m_layout) {
 		QLayoutItem *child;
-		while ((child = m_layout->takeAt(0)) != nullptr) {
+		while((child = m_layout->takeAt(0)) != nullptr) {
 			delete child->widget();
 			delete child;
 		}
@@ -57,10 +58,10 @@ void ChannelPlotScalesController::addChannel(int index, QColor color, QString un
 
 void ChannelPlotScalesController::updateLayout()
 {
-	QHBoxLayout* mainLayout = (QHBoxLayout* )this->layout();
-	if (m_layout) {
+	QHBoxLayout *mainLayout = (QHBoxLayout *)this->layout();
+	if(m_layout) {
 		QLayoutItem *child;
-		while ((child = m_layout->takeAt(0)) != nullptr) {
+		while((child = m_layout->takeAt(0)) != nullptr) {
 			delete child;
 		}
 		mainLayout->removeItem(m_layout);
@@ -69,7 +70,7 @@ void ChannelPlotScalesController::updateLayout()
 	m_layout = new QHBoxLayout(this);
 	m_layout->setMargin(0);
 	m_layout->setSpacing(20);
-	for (auto chnPlotScale : qAsConst(m_channelPlotScales)) {
+	for(auto chnPlotScale : qAsConst(m_channelPlotScales)) {
 		m_layout->addWidget(chnPlotScale);
 	}
 	mainLayout->insertLayout(0, m_layout);
@@ -77,8 +78,8 @@ void ChannelPlotScalesController::updateLayout()
 
 void ChannelPlotScalesController::setChannelEnabled(int channel, bool enable)
 {
-	for (auto chn : qAsConst(m_channelPlotScales)) {
-		if (chn->getChannelId() == channel) {
+	for(auto chn : qAsConst(m_channelPlotScales)) {
+		if(chn->getChannelId() == channel) {
 			chn->setEnabled(enable);
 			chn->setVisible(enable);
 			break;
@@ -89,8 +90,8 @@ void ChannelPlotScalesController::setChannelEnabled(int channel, bool enable)
 
 void ChannelPlotScalesController::setUnitPerDivision(int channel, double unitPerDivision)
 {
-	for (auto chn : qAsConst(m_channelPlotScales)) {
-		if (chn->getChannelId() == channel) {
+	for(auto chn : qAsConst(m_channelPlotScales)) {
+		if(chn->getChannelId() == channel) {
 			chn->setUnitPerDivision(unitPerDivision);
 			break;
 		}
@@ -99,8 +100,8 @@ void ChannelPlotScalesController::setUnitPerDivision(int channel, double unitPer
 
 void ChannelPlotScalesController::setInstantValue(int channel, double value)
 {
-	for (auto chn : qAsConst(m_channelPlotScales)) {
-		if (chn->getChannelId() == channel) {
+	for(auto chn : qAsConst(m_channelPlotScales)) {
+		if(chn->getChannelId() == channel) {
 			chn->setInstantValue(value);
 			break;
 		}

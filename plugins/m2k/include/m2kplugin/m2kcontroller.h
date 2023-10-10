@@ -1,16 +1,16 @@
 #ifndef M2KCONTROLLER_H
 #define M2KCONTROLLER_H
 
+#include "iioutil/cyclicaltask.h"
+#include "iioutil/iiopingtask.h"
+#include "libm2k/m2k.hpp"
+#include "m2kidentifytask.h"
+#include "m2kreadtemperaturetask.h"
+
 #include <QObject>
 #include <QtConcurrent/QtConcurrent>
-#include "m2kreadtemperaturetask.h"
-#include "m2kidentifytask.h"
-#include "iioutil/iiopingtask.h"
-#include "iioutil/cyclicaltask.h"
 
-#include "libm2k/m2k.hpp"
 #include <libm2k/contextbuilder.hpp>
-
 
 namespace scopy::m2k {
 class M2kController : public QObject
@@ -56,6 +56,5 @@ private:
 	CyclicalTask *pingTimer;
 };
 
-
-}
+} // namespace scopy::m2k
 #endif // M2KCONTROLLER_H

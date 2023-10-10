@@ -4,21 +4,20 @@
 #include "src/datalogger_api.h"
 #define SCOPY_PLUGIN_NAME DataLoggerPlugin
 
-#include <pluginbase/plugin.h>
-#include <pluginbase/pluginbase.h>
-#include "scopy-dataloggerplugin_export.h"
-#include <iioutil/contextprovider.h>
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iiopingtask.h"
+#include "scopy-dataloggerplugin_export.h"
 
-#include <QPushButton>
 #include <QMap>
+#include <QPushButton>
 #include <QScrollArea>
 
+#include <iioutil/contextprovider.h>
+#include <pluginbase/plugin.h>
+#include <pluginbase/pluginbase.h>
 
 Q_DECLARE_LOGGING_CATEGORY(CAT_DATALOGGER);
 Q_DECLARE_LOGGING_CATEGORY(CAT_DATALOGGER_TOOL);
-
 
 namespace Ui {
 class DataLoggerInfoPage;
@@ -57,7 +56,7 @@ private:
 
 	libm2k::context::Context *libm2k_context;
 };
-}
-}
+} // namespace datalogger
+} // namespace scopy
 
 #endif // DATALOGGERPLUGIN_H

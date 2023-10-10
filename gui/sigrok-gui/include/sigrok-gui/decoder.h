@@ -37,28 +37,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 #ifndef DECODER_H
 #define DECODER_H
-
-#include <map>
-#include <memory>
-#include <set>
-#include <vector>
-
-#include <glib.h>
-#include <QString>
-#include <memory>
 
 #include "annotation.h"
 #include "row.h"
 #include "rowdata.h"
 #include "scopy-sigrok-gui_export.h"
 
+#include <QString>
+
+#include <glib.h>
+#include <map>
+#include <memory>
+#include <set>
+#include <vector>
+
 using std::map;
+using std::shared_ptr;
 using std::string;
 using std::vector;
-using std::shared_ptr;
 
 struct srd_decoder;
 struct srd_decoder_inst;
@@ -69,26 +67,26 @@ namespace scopy {
 namespace logic {
 class Decoder;
 }
-}
+} // namespace scopy
 
 struct SCOPY_SIGROK_GUI_EXPORT DecodeChannel
 {
-    uint16_t id;     ///< Global numerical ID for the decode channels in the stack
-    uint16_t bit_id; ///< Tells which bit within a sample represents this channel
-    const bool is_optional;
-    bool assigned_signal;
-    const QString name, desc;
-    int initial_pin_state;
+	uint16_t id;	 ///< Global numerical ID for the decode channels in the stack
+	uint16_t bit_id; ///< Tells which bit within a sample represents this channel
+	const bool is_optional;
+	bool assigned_signal;
+	const QString name, desc;
+	int initial_pin_state;
 	const shared_ptr<scopy::logic::Decoder> decoder_;
-    const srd_channel *pdch_;
+	const srd_channel *pdch_;
 };
 
 struct SCOPY_SIGROK_GUI_EXPORT DecodeSegment
 {
-    map<const Row, RowData> annotation_rows;
-//    pv::util::Timestamp start_time;
-    double samplerate;
-    int64_t samples_decoded_incl, samples_decoded_excl;
+	map<const Row, RowData> annotation_rows;
+	//    pv::util::Timestamp start_time;
+	double samplerate;
+	int64_t samples_decoded_incl, samples_decoded_excl;
 };
 
 namespace scopy {
@@ -97,39 +95,39 @@ namespace logic {
 class SCOPY_SIGROK_GUI_EXPORT Decoder
 {
 public:
-    Decoder(const srd_decoder *const dec);
+	Decoder(const srd_decoder *const dec);
 
-    virtual ~Decoder();
+	virtual ~Decoder();
 
-    const srd_decoder* decoder() const;
+	const srd_decoder *decoder() const;
 
-    bool shown() const;
-    void show(bool show = true);
+	bool shown() const;
+	void show(bool show = true);
 
-    const vector<DecodeChannel*>& channels() const;
-    void set_channels(vector<DecodeChannel*> channels);
+	const vector<DecodeChannel *> &channels() const;
+	void set_channels(vector<DecodeChannel *> channels);
 
-    const map<string, GVariant*>& options() const;
+	const map<string, GVariant *> &options() const;
 
-    void set_option(const char *id, GVariant *value);
+	void set_option(const char *id, GVariant *value);
 
-    void apply_all_options();
+	void apply_all_options();
 
-    bool have_required_channels() const;
+	bool have_required_channels() const;
 
-    srd_decoder_inst* create_decoder_inst(srd_session *session);
-    void invalidate_decoder_inst();
+	srd_decoder_inst *create_decoder_inst(srd_session *session);
+	void invalidate_decoder_inst();
 
 private:
-    const srd_decoder *const decoder_;
+	const srd_decoder *const decoder_;
 
-    bool shown_;
+	bool shown_;
 
-    vector<DecodeChannel*> channels_;
-    map<string, GVariant*> options_;
-    srd_decoder_inst *decoder_inst_;
+	vector<DecodeChannel *> channels_;
+	map<string, GVariant *> options_;
+	srd_decoder_inst *decoder_inst_;
 };
 
-}
-}
+} // namespace logic
+} // namespace scopy
 #endif // DECODER_H

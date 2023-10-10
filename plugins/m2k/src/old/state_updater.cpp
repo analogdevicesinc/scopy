@@ -22,14 +22,14 @@
 
 using namespace scopy::m2k;
 
-StateUpdater::StateUpdater(int msecTimeout, QObject *parent):
-	QObject(parent),
-	m_enabled(false),
-	m_off_state(0),
-	m_idle_state(0),
-	m_last_input(0),
-	m_output_state(0),
-	m_timeout(msecTimeout)
+StateUpdater::StateUpdater(int msecTimeout, QObject *parent)
+	: QObject(parent)
+	, m_enabled(false)
+	, m_off_state(0)
+	, m_idle_state(0)
+	, m_last_input(0)
+	, m_output_state(0)
+	, m_timeout(msecTimeout)
 
 {
 	m_timer.setSingleShot(true);
@@ -44,20 +44,17 @@ void StateUpdater::onTimerTimeout()
 	Q_EMIT outputChanged(m_output_state);
 }
 
-bool StateUpdater::enabled() const
-{
-	return m_enabled;
-}
+bool StateUpdater::enabled() const { return m_enabled; }
 
 void StateUpdater::setEnabled(bool en)
 {
-	if (m_enabled != en) {
+	if(m_enabled != en) {
 		m_enabled = en;
 
-		if (en) {
+		if(en) {
 			m_output_state = m_idle_state;
 		} else {
-			if (m_timer.isActive())
+			if(m_timer.isActive())
 				m_timer.stop();
 			m_output_state = m_off_state;
 		}
@@ -65,44 +62,23 @@ void StateUpdater::setEnabled(bool en)
 	}
 }
 
-int StateUpdater::timeout() const
-{
-	return m_timeout;
-}
+int StateUpdater::timeout() const { return m_timeout; }
 
-void StateUpdater::setTimeout(int msec)
-{
-	m_timeout = msec;
-}
+void StateUpdater::setTimeout(int msec) { m_timeout = msec; }
 
-int StateUpdater::idleState() const
-{
-	return m_idle_state;
-}
+int StateUpdater::idleState() const { return m_idle_state; }
 
-void StateUpdater::setIdleState(int state)
-{
-	m_idle_state = state;
-}
+void StateUpdater::setIdleState(int state) { m_idle_state = state; }
 
-int StateUpdater::offState() const
-{
-	return m_off_state;
-}
+int StateUpdater::offState() const { return m_off_state; }
 
-void StateUpdater::setOffState(int state)
-{
-	m_off_state = state;
-}
+void StateUpdater::setOffState(int state) { m_off_state = state; }
 
-int StateUpdater::inputState() const
-{
-	return m_last_input;
-}
+int StateUpdater::inputState() const { return m_last_input; }
 
 void StateUpdater::setInput(int input)
 {
-	if (!m_enabled)
+	if(!m_enabled)
 		return;
 
 	int old_output_state = m_output_state;
@@ -112,11 +88,8 @@ void StateUpdater::setInput(int input)
 
 	m_timer.start(m_timeout);
 
-	if (old_output_state != input)
+	if(old_output_state != input)
 		Q_EMIT outputChanged(input);
 }
 
-int StateUpdater::outputState() const
-{
-	return m_output_state;
-}
+int StateUpdater::outputState() const { return m_output_state; }

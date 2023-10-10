@@ -2,19 +2,18 @@
 #define BASICPLOT_H
 
 /*Qwt includes*/
-#include <qwt_plot.h>
-#include <qwt_plot_renderer.h>
 #include <qwt_legend.h>
+#include <qwt_plot.h>
 #include <qwt_plot_canvas.h>
-#include <qwt_scale_engine.h>
+#include <qwt_plot_renderer.h>
 #include <qwt_plot_textlabel.h>
+#include <qwt_scale_engine.h>
 #include <qwt_text.h>
 
-
 /*Qt includes*/
+#include <QElapsedTimer>
 #include <QObject>
 #include <QTimer>
-#include <QElapsedTimer>
 
 /*Own includes */
 #include <movingaverage.h>
@@ -28,7 +27,7 @@ class SCOPY_GUI_EXPORT BasicPlot : public QwtPlot
 {
 	Q_OBJECT
 public:
-	BasicPlot(QWidget* parent);
+	BasicPlot(QWidget *parent);
 
 public Q_SLOTS:
 	void start();
@@ -47,6 +46,7 @@ public Q_SLOTS:
 
 protected:
 	QTimer replotTimer;
+
 private:
 	static int staticPlotId;
 	bool started;
@@ -62,10 +62,8 @@ private:
 	QwtText fpsTxt;
 	QElapsedTimer fpsTimer;
 	QElapsedTimer fpsLabelTimer;
-
-
 };
 
-}
+} // namespace scopy
 
 #endif // BASICPLOT_H

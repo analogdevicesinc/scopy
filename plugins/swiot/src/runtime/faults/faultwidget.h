@@ -18,23 +18,26 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_FAULTWIDGET_H
 #define SCOPY_FAULTWIDGET_H
 
-#include <QWidget>
-#include <QJsonObject>
-#include "ui_faultwidget.h"
 #include "gui/dynamicWidget.h"
+
+#include "ui_faultwidget.h"
+
+#include <QJsonObject>
+#include <QWidget>
 #include <qcoreevent.h>
 
-
 QT_BEGIN_NAMESPACE
-namespace Ui { class FaultWidget; }
+namespace Ui {
+class FaultWidget;
+}
 QT_END_NAMESPACE
 
 namespace scopy::swiot {
-class FaultWidget : public QWidget {
+class FaultWidget : public QWidget
+{
 	Q_OBJECT
 
 public:
@@ -82,6 +85,6 @@ private:
 	QString m_faultExplanation;
 	QJsonObject m_faultExplanationOptions;
 };
-}
+} // namespace scopy::swiot
 
-#endif //SCOPY_FAULTWIDGET_H
+#endif // SCOPY_FAULTWIDGET_H

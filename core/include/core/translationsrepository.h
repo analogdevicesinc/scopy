@@ -1,8 +1,9 @@
 #ifndef TRANSLATIONS_CONTROLLER
 #define TRANSLATIONS_CONTROLLER
 
-#include <QObject>
 #include "scopy-core_export.h"
+
+#include <QObject>
 
 namespace scopy {
 class SCOPY_CORE_EXPORT TranslationsRepository : public QObject
@@ -19,8 +20,8 @@ public:
 	void loadTranslations(QString language);
 
 private:
-	static TranslationsRepository * pinstance_;
+	static TranslationsRepository *pinstance_;
 };
-}
+} // namespace scopy
 
 #endif // TRANSLATIONS_CONTROLLER

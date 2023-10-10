@@ -18,17 +18,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SCOPY_DIODIGITALCHANNEL_H
 #define SCOPY_DIODIGITALCHANNEL_H
 
-#include <QWidget>
 #include "ui_diodigitalchannel.h"
-#include <gui/generic_menu.hpp>
+
 #include <QDockWidget>
+#include <QWidget>
+
+#include <gui/generic_menu.hpp>
 
 namespace scopy::swiot {
-class DioDigitalChannel : public QWidget {
+class DioDigitalChannel : public QWidget
+{
 	Q_OBJECT
 public:
 	explicit DioDigitalChannel(const QString &deviceName, const QString &deviceType, QWidget *parent = nullptr);
@@ -57,6 +59,6 @@ private:
 Q_SIGNALS:
 	void outputValueChanged(bool value);
 };
-}
+} // namespace scopy::swiot
 
-#endif //SCOPY_DIODIGITALCHANNEL_H
+#endif // SCOPY_DIODIGITALCHANNEL_H

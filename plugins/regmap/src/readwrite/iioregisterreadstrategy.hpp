@@ -2,10 +2,12 @@
 #define IIOREGISTERREADSTRATEGY_HPP
 
 #include "iregisterreadstrategy.hpp"
+
 #include <iio.h>
+
 #include <QObject>
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 
 class IIORegisterReadStrategy : public IRegisterReadStrategy
 {
@@ -17,5 +19,5 @@ Q_SIGNALS:
 private:
 	struct iio_device *dev;
 };
-}
+} // namespace scopy::regmap
 #endif // IIOREGISTERREADSTRATEGY_HPP

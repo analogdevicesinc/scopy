@@ -21,65 +21,53 @@
 #define DECODER_TABLE_ITEM_H
 
 #include "annotationcurve.h"
-#include <bitset>
+
 #include <QPainter>
 #include <QStyledItemDelegate>
 
+#include <bitset>
 
 namespace scopy::m2k {
 namespace logic {
 
-
-class DecoderTableItemDelegate : public QStyledItemDelegate {
-    Q_OBJECT
+class DecoderTableItemDelegate : public QStyledItemDelegate
+{
+	Q_OBJECT
 
 public:
-    using QStyledItemDelegate::QStyledItemDelegate;
-    virtual ~DecoderTableItemDelegate() {};
+	using QStyledItemDelegate::QStyledItemDelegate;
+	virtual ~DecoderTableItemDelegate(){};
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option,
-               const QModelIndex &index) const override;
-    QSize sizeHint(const QStyleOptionViewItem &option,
-                   const QModelIndex &index) const override;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
-
-
-class DecoderTableItem {
+class DecoderTableItem
+{
 
 public:
+	explicit DecoderTableItem(AnnotationCurve *curve = nullptr, uint64_t start = 0, uint64_t end = 0,
+				  QVector<QString> filter = QVector<QString>(), bool flag = true);
 
-    explicit DecoderTableItem(
-        AnnotationCurve* curve=nullptr,
-        uint64_t start=0,
-	uint64_t end=0,
-	QVector<QString> filter= QVector<QString>(),
-	bool flag=true
-    );
+	void paint(QPainter *painter, const QRect &rect, const QPalette &palette) const;
+	QSize sizeHint() const;
 
-    void paint(QPainter *painter, const QRect &rect, const QPalette &palette) const;
-    QSize sizeHint() const;
+	double startTime() const;
+	double endTime() const;
 
-    double startTime() const;
-    double endTime() const;
+	AnnotationCurve *curve;
+	uint64_t startSample;
+	uint64_t endSample;
+	QSize itemSize = QSize(300, 40);
+	QVector<QString> filteredMessages;
 
-    AnnotationCurve* curve;
-    uint64_t startSample;
-    uint64_t endSample;
-    QSize itemSize = QSize(300, 40);
-    QVector<QString> filteredMessages;
-
-    bool tableInfoFlag;
-
+	bool tableInfoFlag;
 };
 
 } // namespace logic
-} // namespace scopy
-
+} // namespace scopy::m2k
 
 // This is needed so it can be stored as a QVariant
 Q_DECLARE_METATYPE(scopy::m2k::logic::DecoderTableItem)
-
-
 
 #endif // DECODER_TABLE_ITEM_H

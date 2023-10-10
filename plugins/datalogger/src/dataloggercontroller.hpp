@@ -1,14 +1,13 @@
 #ifndef DATALOGGERCONTROLLER_H
 #define DATALOGGERCONTROLLER_H
 
-#include "gui/dataloggerview.hpp"
 #include "dataloggermodel.h"
-
+#include "gui/dataloggerview.hpp"
 
 namespace scopy {
 namespace datalogger {
 
-class DataLoggerController: public QObject
+class DataLoggerController : public QObject
 {
 	Q_OBJECT
 public:
@@ -48,9 +47,8 @@ private:
 	gui::DataLoggerView *dataLoggerView;
 	bool isRunningOn;
 	void attemptDataLogging();
-
 };
-}
-}
+} // namespace datalogger
+} // namespace scopy
 
 #endif // DATALOGGERCONTROLLER_H

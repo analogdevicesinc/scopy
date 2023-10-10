@@ -21,19 +21,21 @@
 #ifndef PLOTPICKERWRAPPER_H
 #define PLOTPICKERWRAPPER_H
 
-#include<qwt_plot_picker.h>
-#include<QPoint>
-#include<QPointF>
-#include<qwt_axis_id.h>
-#include<QWidget>
 #include "scopy-gui_export.h"
+
+#include <QPoint>
+#include <QPointF>
+#include <QWidget>
+#include <qwt_axis_id.h>
+#include <qwt_plot_picker.h>
 
 class SCOPY_GUI_EXPORT PlotPickerWrapper : public QwtPlotPicker
 {
 public:
 	PlotPickerWrapper(QwtAxisId xAxis, QwtAxisId yAxis, QWidget *);
 
-	QPointF pointCoordinates(const QPoint& pos) const;
+	QPointF pointCoordinates(const QPoint &pos) const;
+
 private:
 };
 

@@ -1,8 +1,10 @@
-#include <widgets/menusectionwidget.h>
 #include <stylehelper.h>
+#include <widgets/menusectionwidget.h>
 
 using namespace scopy;
-MenuSectionWidget::MenuSectionWidget(QWidget *parent) : QWidget(parent) {
+MenuSectionWidget::MenuSectionWidget(QWidget *parent)
+	: QWidget(parent)
+{
 	m_layout = new QVBoxLayout(this);
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
@@ -12,7 +14,7 @@ MenuSectionWidget::MenuSectionWidget(QWidget *parent) : QWidget(parent) {
 	StyleHelper::MenuSectionWidget(this, "menuSection");
 }
 
-MenuSectionWidget::~MenuSectionWidget() { }
+MenuSectionWidget::~MenuSectionWidget() {}
 
 QVBoxLayout *MenuSectionWidget::contentLayout() const { return m_layout; }
 
@@ -28,12 +30,8 @@ MenuVScrollArea::MenuVScrollArea(QWidget *parent)
 	m_layout->setMargin(0);
 }
 
-MenuVScrollArea::~MenuVScrollArea()
-{
+MenuVScrollArea::~MenuVScrollArea() {}
 
-}
+QVBoxLayout *MenuVScrollArea::contentLayout() const { return m_layout; }
 
-QVBoxLayout *MenuVScrollArea::contentLayout() const
-{
-	return m_layout;
-}
+#include "moc_menusectionwidget.cpp"

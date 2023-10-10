@@ -1,7 +1,8 @@
-#include <QTest>
-#include <QList>
 #include "core/translationsrepository.h"
+
 #include <QLibrary>
+#include <QList>
+#include <QTest>
 
 using namespace scopy;
 

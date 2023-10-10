@@ -1,11 +1,16 @@
 #include "iiotabwidget.h"
+
+#include "iioutil/scopy-iioutil_config.h"
 #include "qtconcurrentrun.h"
+
 #include "ui_iiotabwidget.h"
+
+#include <iio.h>
+
 #include <QCheckBox>
 #include <QLoggingCategory>
-#include <iio.h>
+
 #include <iioutil/iioscantask.h>
-#include "iioutil/scopy-iioutil_config.h"
 
 Q_LOGGING_CATEGORY(CAT_IIO_ADD_PAGE, "IIOTabWidget")
 
@@ -20,39 +25,29 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 	verifyIioBackend();
 
 	connect(m_ui->btnVerify, &QPushButton::clicked, this, &IioTabWidget::verifyBtnClicked, Qt::QueuedConnection);
-	//scan
+	// scan
 	fwScan = new QFutureWatcher<int>(this);
-	connect(fwScan, &QFutureWatcher<int>::started, m_ui->btnScan, &AnimationPushButton::startAnimation, Qt::QueuedConnection);
+	connect(fwScan, &QFutureWatcher<int>::started, m_ui->btnScan, &AnimationPushButton::startAnimation,
+		Qt::QueuedConnection);
 	connect(fwScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::scanFinished, Qt::QueuedConnection);
 	connect(m_ui->btnScan, SIGNAL(clicked()), this, SLOT(futureScan()), Qt::QueuedConnection);
 
-	connect(m_ui->comboBoxContexts,&QComboBox::textActivated, this, [=](){
-		Q_EMIT uriChanged(m_ui->comboBoxContexts->currentText());
-	});
+	connect(m_ui->comboBoxContexts, &QComboBox::textActivated, this,
+		[=]() { Q_EMIT uriChanged(m_ui->comboBoxContexts->currentText()); });
 
-	//serial widget connections
-	connect(m_ui->comboBoxSerialPort, &QComboBox::textActivated, this, [=](){
-		Q_EMIT uriChanged(getSerialPath());
-	});
-	connect(m_ui->comboBoxBaudRate, &QComboBox::textActivated, this, [=](){
-		Q_EMIT uriChanged(getSerialPath());
-	});
-	connect(m_ui->editSerialFrameConfig, &QLineEdit::returnPressed, this, [=](){
-		Q_EMIT uriChanged(getSerialPath());
-	});
+	// serial widget connections
+	connect(m_ui->comboBoxSerialPort, &QComboBox::textActivated, this,
+		[=]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_ui->comboBoxBaudRate, &QComboBox::textActivated, this, [=]() { Q_EMIT uriChanged(getSerialPath()); });
+	connect(m_ui->editSerialFrameConfig, &QLineEdit::returnPressed, this,
+		[=]() { Q_EMIT uriChanged(getSerialPath()); });
 	connect(this, &IioTabWidget::uriChanged, this, &IioTabWidget::updateUri);
-	connect(m_ui->editUri, &QLineEdit::returnPressed, this, [=](){
-		Q_EMIT m_ui->btnVerify->clicked();
-	});
-	connect(m_ui->editUri, &QLineEdit::textChanged, this, [=](QString uri){
-		m_ui->btnVerify->setEnabled(!uri.isEmpty());
-	});
+	connect(m_ui->editUri, &QLineEdit::returnPressed, this, [=]() { Q_EMIT m_ui->btnVerify->clicked(); });
+	connect(m_ui->editUri, &QLineEdit::textChanged, this,
+		[=](QString uri) { m_ui->btnVerify->setEnabled(!uri.isEmpty()); });
 }
 
-IioTabWidget::~IioTabWidget()
-{
-	delete m_ui;
-}
+IioTabWidget::~IioTabWidget() { delete m_ui; }
 
 void IioTabWidget::init()
 {
@@ -79,11 +74,11 @@ void IioTabWidget::init()
 	m_ui->btnVerify->setEnabled(false);
 	m_ui->btnScan->setProperty("blue_button", QVariant(true));
 	m_ui->btnScan->setIcon(QIcon(":/gui/icons/refresh.svg"));
-	m_ui->btnScan->setIconSize(QSize(25,25));
+	m_ui->btnScan->setIconSize(QSize(25, 25));
 	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
 	m_ui->btnScan->setAutoDefault(true);
 	m_ui->btnVerify->setAutoDefault(true);
-	for (int baudRate : availableBaudRates) {
+	for(int baudRate : availableBaudRates) {
 		m_ui->comboBoxBaudRate->addItem(QString::number(baudRate));
 	}
 }
@@ -96,9 +91,9 @@ void IioTabWidget::verifyIioBackend()
 #ifdef WITH_LIBSERIALPORT
 	hasLibSerialPort = true;
 #endif
-	for (int i = 0; i < backEndsCount; i++) {
+	for(int i = 0; i < backEndsCount; i++) {
 		QString backEnd(iio_get_backend(i));
-		if (backEnd.compare("xml") == 0 || (!hasLibSerialPort && backEnd.compare("serial") == 0)) {
+		if(backEnd.compare("xml") == 0 || (!hasLibSerialPort && backEnd.compare("serial") == 0)) {
 			continue;
 		}
 		createBackEndCheckBox(backEnd);
@@ -112,17 +107,17 @@ void IioTabWidget::createBackEndCheckBox(QString backEnd)
 	QCheckBox *cb = new QCheckBox();
 	cb->setText(backEnd);
 	connect(cb, &QCheckBox::toggled, this, [=](bool en) {
-		if (en) {
+		if(en) {
 			scanParamsList.push_back(backEnd + ":");
 		} else {
 			scanParamsList.removeOne(backEnd + ":");
 		}
-		if (backEnd.compare("serial") == 0) {
+		if(backEnd.compare("serial") == 0) {
 			m_ui->serialSettingsWidget->setEnabled(en);
 		}
-		if (scanParamsList.empty()) {
+		if(scanParamsList.empty()) {
 			m_ui->btnScan->setEnabled(false);
-		} else if (!m_ui->btnScan->isEnabled()) {
+		} else if(!m_ui->btnScan->isEnabled()) {
 			m_ui->btnScan->setEnabled(true);
 		}
 	});
@@ -132,10 +127,11 @@ void IioTabWidget::createBackEndCheckBox(QString backEnd)
 
 void IioTabWidget::verifyBtnClicked()
 {
-	QRegExp ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])$");
+	QRegExp ipRegex("^(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-"
+			"4][0-9]|25[0-5])$");
 	QString uri(m_ui->editUri->text());
 	bool isIp = uri.contains(ipRegex);
-	if (isIp && !m_ui->editUri->text().contains("ip:")) {
+	if(isIp && !m_ui->editUri->text().contains("ip:")) {
 		m_ui->editUri->blockSignals(true);
 		m_ui->editUri->setText("ip:" + uri);
 		m_ui->editUri->blockSignals(false);
@@ -148,8 +144,8 @@ void IioTabWidget::verifyBtnClicked()
 void IioTabWidget::onVerifyFinished(bool result)
 {
 	m_ui->uriMessageLabel->clear();
-	if (!result) {
-		m_ui->uriMessageLabel->setText("\""+m_ui->editUri->text() + "\" not a valid context!");
+	if(!result) {
+		m_ui->uriMessageLabel->setText("\"" + m_ui->editUri->text() + "\" not a valid context!");
 	}
 	m_ui->btnVerify->stopAnimation();
 	m_ui->btnScan->setEnabled(true);
@@ -169,19 +165,19 @@ void IioTabWidget::scanFinished()
 	m_ui->btnScan->stopAnimation();
 	m_ui->comboBoxContexts->clear();
 	m_ui->uriMessageLabel->clear();
-	if (retCode < 0) {
+	if(retCode < 0) {
 		addScanFeedbackMsg("Scan command failed!");
-		qWarning(CAT_IIO_ADD_PAGE) <<"iio_scan_context_get_info_list error " << retCode;
+		qWarning(CAT_IIO_ADD_PAGE) << "iio_scan_context_get_info_list error " << retCode;
 		return;
 	}
-	if (scanList.isEmpty()) {
+	if(scanList.isEmpty()) {
 		addScanFeedbackMsg("No scanned contexts available!");
 		return;
 	}
-	if (!m_ui->comboBoxContexts->isEnabled()) {
+	if(!m_ui->comboBoxContexts->isEnabled()) {
 		m_ui->comboBoxContexts->setEnabled(true);
 	}
-	for (const auto &ctx: qAsConst(scanList)) {
+	for(const auto &ctx : qAsConst(scanList)) {
 		m_ui->comboBoxContexts->addItem(ctx);
 	}
 	findAvailableSerialPorts();
@@ -190,11 +186,11 @@ void IioTabWidget::scanFinished()
 
 void IioTabWidget::findAvailableSerialPorts()
 {
-	if (scanParamsList.contains("serial:")) {
+	if(scanParamsList.contains("serial:")) {
 		QVector<QString> portsName = IIOScanTask::getSerialPortsName();
 		m_ui->comboBoxSerialPort->clear();
-		if (!portsName.empty()) {
-			for (const QString &port : portsName) {
+		if(!portsName.empty()) {
+			for(const QString &port : portsName) {
 				m_ui->comboBoxSerialPort->addItem(port);
 			}
 		}
@@ -214,7 +210,7 @@ void IioTabWidget::updateUri(QString uri)
 {
 	m_ui->editUri->clear();
 	m_ui->editUri->setText(uri);
-	if (!uri.isEmpty()) {
+	if(!uri.isEmpty()) {
 		m_ui->btnVerify->setFocus();
 	}
 }
@@ -234,4 +230,3 @@ void IioTabWidget::showEvent(QShowEvent *event)
 }
 
 #include "moc_iiotabwidget.cpp"
-

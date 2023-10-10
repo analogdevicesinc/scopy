@@ -18,15 +18,14 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "buffermenucontroller.h"
 
 using namespace scopy::swiot;
 
-BufferMenuController::BufferMenuController(BufferMenuView* genericMenu, BufferMenuModel* model, int chnlIdx):
-	m_chnlIdx(chnlIdx)
-      ,m_genericMenu(genericMenu)
-      ,m_model(model)
+BufferMenuController::BufferMenuController(BufferMenuView *genericMenu, BufferMenuModel *model, int chnlIdx)
+	: m_chnlIdx(chnlIdx)
+	, m_genericMenu(genericMenu)
+	, m_model(model)
 {}
 
 BufferMenuController::~BufferMenuController()
@@ -35,44 +34,42 @@ BufferMenuController::~BufferMenuController()
 	delete m_genericMenu;
 }
 
-void BufferMenuController::addMenuAttrValues(QMap<QString, QMap<QString, QStringList> > values)
+void BufferMenuController::addMenuAttrValues(QMap<QString, QMap<QString, QStringList>> values)
 {
-	if (!values.empty()) {
+	if(!values.empty()) {
 		m_genericMenu->initAdvMenu(values);
 	}
 }
 
 void BufferMenuController::createConnections()
 {
-	BufferMenu* advMenu = m_genericMenu->getAdvMenu();
+	BufferMenu *advMenu = m_genericMenu->getAdvMenu();
 	connect(advMenu, &BufferMenu::attrValuesChanged, this, &BufferMenuController::attributesChanged);
 	connect(m_model, &BufferMenuModel::attrWritten, advMenu, &BufferMenu::onAttrWritten);
 	connect(m_model, &BufferMenuModel::menuModelInitDone, this, &BufferMenuController::addMenuAttrValues);
 
-	connect(advMenu, &BufferMenu::setUnitPerDivision, this, [=, this] (double unitPerDiv) {
-		Q_EMIT setUnitPerDivision(m_chnlIdx, unitPerDiv);
-	});
-	connect(this, &BufferMenuController::unitPerDivisionChanged, this, [=, this] (int chnl, double unitPerDiv) {
-		if (m_chnlIdx == chnl) {
+	connect(advMenu, &BufferMenu::setUnitPerDivision, this,
+		[=, this](double unitPerDiv) { Q_EMIT setUnitPerDivision(m_chnlIdx, unitPerDiv); });
+	connect(this, &BufferMenuController::unitPerDivisionChanged, this, [=, this](int chnl, double unitPerDiv) {
+		if(m_chnlIdx == chnl) {
 			Q_EMIT advMenu->unitPerDivisionChanged(unitPerDiv);
 		}
 	});
 
-	connect(advMenu, &BufferMenu::diagnosticFunctionUpdated, this, &BufferMenuController::diagnosticFunctionUpdated);
-	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this, SIGNAL(broadcastThresholdReadForward(QString)));
-	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu, SIGNAL(broadcastThresholdReadBackward(QString)));
+	connect(advMenu, &BufferMenu::diagnosticFunctionUpdated, this,
+		&BufferMenuController::diagnosticFunctionUpdated);
+	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this,
+		SIGNAL(broadcastThresholdReadForward(QString)));
+	connect(this, SIGNAL(broadcastThresholdReadBackward(QString)), advMenu,
+		SIGNAL(broadcastThresholdReadBackward(QString)));
 	connect(this, &BufferMenuController::thresholdControlEnable, advMenu, &BufferMenu::thresholdControlEnable);
 }
 
 void BufferMenuController::attributesChanged(QString attrName, QString chnlType)
 {
-	BufferMenu* menu=m_genericMenu->getAdvMenu();
+	BufferMenu *menu = m_genericMenu->getAdvMenu();
 	QMap<QString, QMap<QString, QStringList>> attributes = menu->getAttrValues();
 	m_model->updateChnlAttributes(attributes, attrName, chnlType);
 }
 
-int BufferMenuController::getChnlIdx()
-{
-	return m_chnlIdx;
-}
-
+int BufferMenuController::getChnlIdx() { return m_chnlIdx; }

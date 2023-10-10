@@ -25,14 +25,11 @@ static const size_t maxAttrSize = 512;
 using namespace scopy;
 using namespace scopy::debugger;
 
-DebuggerController::DebuggerController(QObject *parent) : QObject(parent)
-{
+DebuggerController::DebuggerController(QObject *parent)
+	: QObject(parent)
+{}
 
-}
-
-DebuggerController::~DebuggerController()
-{
-}
+DebuggerController::~DebuggerController() {}
 
 void DebuggerController::scanDevices(void)
 {
@@ -44,13 +41,12 @@ void DebuggerController::scanDevices(void)
 	scan_ctx = iio_create_scan_context(NULL, 0);
 	Size = iio_scan_context_get_info_list(scan_ctx, &info);
 
-	if (Size) {
+	if(Size) {
 		connected = true;
 
 		/*Display context info*/
-		for (size_t i = 0; i < (size_t)Size; i++) {
-			qDebug("\t %d: %s [%s]\n\r", (int)i,
-			       iio_context_info_get_description(info[i]),
+		for(size_t i = 0; i < (size_t)Size; i++) {
+			qDebug("\t %d: %s [%s]\n\r", (int)i, iio_context_info_get_description(info[i]),
 			       iio_context_info_get_uri(info[i]));
 		}
 
@@ -59,7 +55,7 @@ void DebuggerController::scanDevices(void)
 
 		Size = iio_context_get_devices_count(ctx);
 
-		for (size_t i = 0; i < (size_t)Size; i++) {
+		for(size_t i = 0; i < (size_t)Size; i++) {
 			device = iio_context_get_device(ctx, i);
 
 			deviceList.append(iio_device_get_name(device));
@@ -67,8 +63,6 @@ void DebuggerController::scanDevices(void)
 	} else {
 		connected = false;
 	}
-
-
 }
 
 void DebuggerController::setIioContext(struct iio_context *ctx)
@@ -81,56 +75,41 @@ void DebuggerController::setIioContext(struct iio_context *ctx)
 
 	Size = iio_context_get_devices_count(ctx);
 
-	for (size_t i = 0; i < (size_t)Size; i++) {
+	for(size_t i = 0; i < (size_t)Size; i++) {
 		device = iio_context_get_device(ctx, i);
 
 		deviceList.append(iio_device_get_name(device));
 	}
 }
 
-QStringList DebuggerController::getDeviceList() const
-{
-	return deviceList;
-}
+QStringList DebuggerController::getDeviceList() const { return deviceList; }
 
-QStringList DebuggerController::getChannelList() const
-{
-	return channelList;
-}
+QStringList DebuggerController::getChannelList() const { return channelList; }
 
-QStringList DebuggerController::getAttributeList() const
-{
-	return attributeList;
-}
+QStringList DebuggerController::getAttributeList() const { return attributeList; }
 
-QStringList DebuggerController::getFileName() const
-{
-	return filename;
-}
+QStringList DebuggerController::getFileName() const { return filename; }
 
-QVector<QString> DebuggerController::getAttributeVector() const
-{
-	return attributeAvailable;
-}
+QVector<QString> DebuggerController::getAttributeVector() const { return attributeAvailable; }
 
-void DebuggerController::scanChannels(const QString& devName)
+void DebuggerController::scanChannels(const QString &devName)
 {
 	int nb_channels;
 	struct iio_device *device;
 	struct iio_channel *ch;
 	QString type;
 
-	if (connected) {
+	if(connected) {
 		device = iio_context_find_device(ctx, devName.toLatin1().data());
 		nb_channels = iio_device_get_channels_count(device);
 
 		channelList.clear();
 
-		for (int j = 0; j < nb_channels; j++) {
+		for(int j = 0; j < nb_channels; j++) {
 			/*get channel*/
 			ch = iio_device_get_channel(device, j);
 
-			if (iio_channel_is_output(ch)) {
+			if(iio_channel_is_output(ch)) {
 				type = "output ";
 			} else {
 				type = "input ";
@@ -145,7 +124,7 @@ void DebuggerController::scanChannels(const QString& devName)
 	}
 }
 
-void DebuggerController::scanChannelAttributes(QString devName, QString& channel)
+void DebuggerController::scanChannelAttributes(QString devName, QString &channel)
 {
 	struct iio_device *device;
 	struct iio_channel *ch = nullptr;
@@ -153,10 +132,10 @@ void DebuggerController::scanChannelAttributes(QString devName, QString& channel
 	unsigned int nb_attrs;
 	bool isOutput;
 
-	if (connected) { //check if M2K is connected
+	if(connected) { // check if M2K is connected
 		isOutput = channel.contains("output", Qt::CaseInsensitive);
 
-		if (isOutput) {
+		if(isOutput) {
 			channel.remove("output ", Qt::CaseInsensitive);
 		} else {
 			channel.remove("input ", Qt::CaseInsensitive);
@@ -168,30 +147,30 @@ void DebuggerController::scanChannelAttributes(QString devName, QString& channel
 		filename.clear();
 
 		const bool isGlobal = (channel == QString("Global"));
-		if (isGlobal) {
+		if(isGlobal) {
 			nb_attrs = iio_device_get_attrs_count(device);
 		} else {
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
 			nb_attrs = iio_channel_get_attrs_count(ch);
 		}
 
-		for (unsigned int k = 0; k < nb_attrs; k++) {
-			if (isGlobal) {
+		for(unsigned int k = 0; k < nb_attrs; k++) {
+			if(isGlobal) {
 				attr = iio_device_get_attr(device, k);
 			} else {
 				attr = iio_channel_get_attr(ch, k);
 			}
 
-			if (QString(attr).contains("available", Qt::CaseInsensitive)) {
+			if(QString(attr).contains("available", Qt::CaseInsensitive)) {
 				std::string tmp_attr = std::string(attr);
 				std::string to_erase = "_available";
 				size_t pos = tmp_attr.find(to_erase);
-				if (pos != std::string::npos) {
+				if(pos != std::string::npos) {
 					tmp_attr.erase(pos, to_erase.length());
 				}
 				attributeAvailable.append(QString::fromStdString(tmp_attr));
 			} else {
-				if (isGlobal) {
+				if(isGlobal) {
 					filename << QString(attr);
 				} else {
 					filename << QString(iio_channel_attr_get_filename(ch, attr));
@@ -200,11 +179,9 @@ void DebuggerController::scanChannelAttributes(QString devName, QString& channel
 			}
 		}
 	}
-
 }
 
-QStringList DebuggerController::getAvailableValues(const QString& devName, QString& channel,
-                                      QString& attribute) const
+QStringList DebuggerController::getAvailableValues(const QString &devName, QString &channel, QString &attribute) const
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
@@ -214,20 +191,20 @@ QStringList DebuggerController::getAvailableValues(const QString& devName, QStri
 
 	attribute.append("_available");
 
-	if (channel.contains("Global", Qt::CaseInsensitive)) {
+	if(channel.contains("Global", Qt::CaseInsensitive)) {
 		channel.clear();
 	}
 
-	if (connected) {
+	if(connected) {
 
 		device = iio_context_find_device(ctx, devName.toLatin1().data());
 
-		if (channel.isNull()) {
+		if(channel.isNull()) {
 			iio_device_attr_read(device, attribute.toLatin1().data(), value, maxAttrSize);
 		} else {
 			isOutput = channel.contains("output", Qt::CaseInsensitive);
 
-			if (isOutput) {
+			if(isOutput) {
 				channel.remove("output ", Qt::CaseInsensitive);
 			} else {
 				channel.remove("input ", Qt::CaseInsensitive);
@@ -245,74 +222,65 @@ QStringList DebuggerController::getAvailableValues(const QString& devName, QStri
 	}
 }
 
-QString DebuggerController::readAttribute(const QString& devName, QString& channel,
-                             const QString& attribute)
+QString DebuggerController::readAttribute(const QString &devName, QString &channel, const QString &attribute)
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
 	char value[maxAttrSize] = "";
 	bool isOutput;
 
-	if (connected) {
+	if(connected) {
 		device = iio_context_find_device(ctx, devName.toLatin1().data());
 
-		if (channel.isNull()) {
+		if(channel.isNull()) {
 			iio_device_attr_read(device, attribute.toLatin1().data(), value, maxAttrSize);
 		} else {
 			isOutput = channel.contains("output", Qt::CaseInsensitive);
 
-			if (isOutput) {
+			if(isOutput) {
 				channel.remove("output ", Qt::CaseInsensitive);
 			} else {
 				channel.remove("input ", Qt::CaseInsensitive);
 			}
 
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
-			ssize_t ret = iio_channel_attr_read(ch, attribute.toLatin1().data(),value, maxAttrSize);
+			ssize_t ret = iio_channel_attr_read(ch, attribute.toLatin1().data(), value, maxAttrSize);
 		}
 	}
 
 	return QString(value);
 }
 
-QString DebuggerController::writeAttribute(const QString& devName, QString& channel,
-                           const QString& attribute,
-                           const QString& value)
+QString DebuggerController::writeAttribute(const QString &devName, QString &channel, const QString &attribute,
+					   const QString &value)
 {
 	struct iio_device *device;
 	struct iio_channel *ch;
 	bool isOutput;
 	char feedbackValue[maxAttrSize] = "";
 
-	if (connected) {
+	if(connected) {
 		device = iio_context_find_device(ctx, devName.toLatin1().data());
 
-		if (channel.isNull()) {
-			iio_device_attr_write(device, attribute.toLatin1().data(),
-			                      value.toLatin1().data());
-			iio_device_attr_read(device, attribute.toLatin1().data(),
-					     feedbackValue, maxAttrSize);
+		if(channel.isNull()) {
+			iio_device_attr_write(device, attribute.toLatin1().data(), value.toLatin1().data());
+			iio_device_attr_read(device, attribute.toLatin1().data(), feedbackValue, maxAttrSize);
 
 		} else {
 			isOutput = channel.contains("output", Qt::CaseInsensitive);
 
-			if (isOutput) {
+			if(isOutput) {
 				channel.remove("output ", Qt::CaseInsensitive);
 			} else {
 				channel.remove("input ", Qt::CaseInsensitive);
 			}
 
 			ch = iio_device_find_channel(device, channel.toLatin1().data(), isOutput);
-			ssize_t ret = iio_channel_attr_write(ch, attribute.toLatin1().data(),
-			                       value.toLatin1().data());
-			ret = iio_channel_attr_read(ch, attribute.toLatin1().data(),feedbackValue, maxAttrSize);
+			ssize_t ret = iio_channel_attr_write(ch, attribute.toLatin1().data(), value.toLatin1().data());
+			ret = iio_channel_attr_read(ch, attribute.toLatin1().data(), feedbackValue, maxAttrSize);
 		}
 	}
 	return QString(feedbackValue);
 }
 
-struct iio_context *DebuggerController::getIioContext(void)
-{
-	return ctx;
-}
-
+struct iio_context *DebuggerController::getIioContext(void) { return ctx; }

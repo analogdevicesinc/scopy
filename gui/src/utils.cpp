@@ -40,15 +40,17 @@
  */
 
 #include "utils.h"
+
 #include "QtSvg/qsvgrenderer.h"
 #include "qpainter.h"
+
+#include <QDebug>
+#include <QFile>
+#include <QSizePolicy>
+
+#include <algorithm>
 #include <sstream>
 #include <string>
-#include <algorithm>
-#include <QDebug>
-#include <QSizePolicy>
-#include <QFile>
-
 
 void Util::retainWidgetSizeWhenHidden(QWidget *w, bool retain)
 {
@@ -57,16 +59,15 @@ void Util::retainWidgetSizeWhenHidden(QWidget *w, bool retain)
 	w->setSizePolicy(sp_retain);
 }
 
-void Util::setWidgetNrOfChars(QWidget *w,
-			      int minNrOfChars, int maxNrOfChars)
+void Util::setWidgetNrOfChars(QWidget *w, int minNrOfChars, int maxNrOfChars)
 {
 	QFontMetrics labelm(w->font());
 
-	auto label_min_width = labelm.horizontalAdvance(QString(minNrOfChars,'X'));
+	auto label_min_width = labelm.horizontalAdvance(QString(minNrOfChars, 'X'));
 	w->setMinimumWidth(label_min_width);
 
-	if (maxNrOfChars!=0) {
-		auto label_max_width = labelm.horizontalAdvance(QString(maxNrOfChars,'X'));
+	if(maxNrOfChars != 0) {
+		auto label_max_width = labelm.horizontalAdvance(QString(maxNrOfChars, 'X'));
 		w->setMaximumWidth(label_max_width);
 	}
 }
@@ -79,19 +80,20 @@ QString Util::loadStylesheetFromFile(const QString &path)
 	return stylesheet;
 }
 
-bool Util::compareNatural(const std::string& a, const std::string& b) {
-	if (a == b) {
+bool Util::compareNatural(const std::string &a, const std::string &b)
+{
+	if(a == b) {
 		return (a < b);
-	} else if (a.empty()) {
+	} else if(a.empty()) {
 		return true;
-	} else if (b.empty()) {
+	} else if(b.empty()) {
 		return false;
-	} else if (std::isdigit(a[0]) && !std::isdigit(b[0])) {
+	} else if(std::isdigit(a[0]) && !std::isdigit(b[0])) {
 		return true;
-	} else if (!std::isdigit(a[0]) && std::isdigit(b[0])) {
+	} else if(!std::isdigit(a[0]) && std::isdigit(b[0])) {
 		return false;
-	} else if (!std::isdigit(a[0]) && !std::isdigit(b[0])) {
-		if (a[0] == b[0]) {
+	} else if(!std::isdigit(a[0]) && !std::isdigit(b[0])) {
+		if(a[0] == b[0]) {
 			return compareNatural(a.substr(1), b.substr(1));
 		}
 		return (a < b);
@@ -105,7 +107,7 @@ bool Util::compareNatural(const std::string& a, const std::string& b) {
 
 	string_stream_a >> int_a;
 	string_stream_b >> int_b;
-	if (int_a != int_b) {
+	if(int_a != int_b) {
 		return (int_a < int_b);
 	}
 
@@ -116,21 +118,21 @@ bool Util::compareNatural(const std::string& a, const std::string& b) {
 
 QWidget *Util::findContainingWindow(QWidget *w)
 {
-	while(dynamic_cast<QWidget*>(w->parent())!=nullptr)
-		w = dynamic_cast<QWidget*>(w->parent());
+	while(dynamic_cast<QWidget *>(w->parent()) != nullptr)
+		w = dynamic_cast<QWidget *>(w->parent());
 	return w;
 }
 
 QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *widget, const QString &title)
 {
-	QDockWidget* dockWidget = new QDockWidget(title, mainWindow);
+	QDockWidget *dockWidget = new QDockWidget(title, mainWindow);
 	dockWidget->setFeatures(dockWidget->features() & ~QDockWidget::DockWidgetClosable);
 	dockWidget->setAllowedAreas(Qt::AllDockWidgetAreas);
 	dockWidget->setWidget(widget);
 
 #ifdef __ANDROID__
-	dockWidget->setFeatures(dockWidget->features() & ~QDockWidget::DockWidgetClosable
-				& ~QDockWidget::DockWidgetFloatable);
+	dockWidget->setFeatures(dockWidget->features() & ~QDockWidget::DockWidgetClosable &
+				~QDockWidget::DockWidgetFloatable);
 #endif
 
 	return dockWidget;
@@ -138,30 +140,32 @@ QDockWidget *DockerUtils::createDockWidget(QMainWindow *mainWindow, QWidget *wid
 
 void DockerUtils::configureTopBar(QDockWidget *docker)
 {
-	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel){
+	connect(docker, &QDockWidget::topLevelChanged, [=](bool topLevel) {
 		QString icon_path = "";
 
-		if (QIcon::themeName() == "scopy-default") {
-			icon_path +=":/gui/icons/scopy-default/icons";
+		if(QIcon::themeName() == "scopy-default") {
+			icon_path += ":/gui/icons/scopy-default/icons";
 		} else {
-			icon_path +=":/gui/icons/scopy-light/icons";
+			icon_path += ":/gui/icons/scopy-light/icons";
 		}
 
 		if(topLevel) {
-			docker->setWindowFlags(Qt::CustomizeWindowHint |
-					       Qt::Window |
-					       Qt::WindowMinimizeButtonHint |
+			docker->setWindowFlags(Qt::CustomizeWindowHint | Qt::Window | Qt::WindowMinimizeButtonHint |
 					       Qt::WindowMaximizeButtonHint);
 			docker->show();
 
 			docker->setStyleSheet("QDockWidget {"
-					      "titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow.svg);"
-											 "}");
+					      "titlebar-normal-icon: url(" +
+					      icon_path +
+					      "/sba_cmb_box_arrow.svg);"
+					      "}");
 			docker->setContentsMargins(10, 0, 10, 10);
 		} else {
 			docker->setStyleSheet("QDockWidget {"
-					      "titlebar-normal-icon: url(" + icon_path + "/sba_cmb_box_arrow_right.svg);"
-											 "}");
+					      "titlebar-normal-icon: url(" +
+					      icon_path +
+					      "/sba_cmb_box_arrow_right.svg);"
+					      "}");
 			docker->setContentsMargins(0, 0, 0, 0);
 		}
 	});
@@ -170,15 +174,12 @@ void DockerUtils::configureTopBar(QDockWidget *docker)
 void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, QString strattrval)
 {
 	// if it has the tagname then overwritte desired attribute
-	if (elem.tagName().compare(strtagname) == 0)
-	{
+	if(elem.tagName().compare(strtagname) == 0) {
 		elem.setAttribute(strattr, strattrval);
 	}
 	// loop all children
-	for (int i = 0; i < elem.childNodes().count(); i++)
-	{
-		if (!elem.childNodes().at(i).isElement())
-		{
+	for(int i = 0; i < elem.childNodes().count(); i++) {
+		if(!elem.childNodes().at(i).isElement()) {
 			continue;
 		}
 		QDomElement docElem = elem.childNodes().at(i).toElement(); //<-- make const "variable"
@@ -199,7 +200,7 @@ void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, 
 	// recurivelly change color
 	QDomElement docElem = doc.documentElement(); //<-- make const "variable"
 	SetAttrRecur(docElem, "path", "fill", color);
-	SetAttrRecur(docElem, "path", "opacity", QString::number(opacity,'g', 2));
+	SetAttrRecur(docElem, "path", "opacity", QString::number(opacity, 'g', 2));
 	// create svg renderer with edited contents
 	QSvgRenderer svgRenderer(doc.toByteArray());
 	// create pixmap target (could be a QImage)
@@ -210,6 +211,6 @@ void Util::SetAttrRecur(QDomElement &elem, QString strtagname, QString strattr, 
 	// use renderer to render over painter which paints on pixmap
 	svgRenderer.render(&pixPainter);
 	return pix;
-//	QIcon myicon(pix);
-//	return myicon;
+	//	QIcon myicon(pix);
+	//	return myicon;
 }

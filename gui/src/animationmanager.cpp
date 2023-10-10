@@ -36,15 +36,12 @@ void AnimationManager::toggleAnimations(bool on)
 void AnimationManager::registerAnimation(CustomAnimation *animation)
 {
 	// register the animation for enable/disable signal
-	connect(this, &AnimationManager::toggle,
-		animation, &CustomAnimation::toggle);
+	connect(this, &AnimationManager::toggle, animation, &CustomAnimation::toggle);
 	animation->toggle(m_animationsEnabled);
-
 }
 
-AnimationManager::AnimationManager():
-	m_animationsEnabled(true)
-{
-}
+AnimationManager::AnimationManager()
+	: m_animationsEnabled(true)
+{}
 
 #include "moc_animationmanager.cpp"

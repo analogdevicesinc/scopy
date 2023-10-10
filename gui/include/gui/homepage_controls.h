@@ -21,11 +21,13 @@
 #ifndef HOMEPAGE_CONTROLS_H
 #define HOMEPAGE_CONTROLS_H
 
-#include <QWidget>
+#include "scopy-gui_export.h"
+
 #include <QString>
+#include <QWidget>
+
 #include <widgets/hoverwidget.h>
 #include <widgets/pagenavigationwidget.h>
-#include "scopy-gui_export.h"
 
 namespace scopy {
 class SCOPY_GUI_EXPORT HomepageControls : public HoverWidget
@@ -49,5 +51,5 @@ private:
 	PageNavigationWidget *controls;
 	void connectSignals();
 };
-}
+} // namespace scopy
 #endif // HOMEPAGE_CONTROLS_H

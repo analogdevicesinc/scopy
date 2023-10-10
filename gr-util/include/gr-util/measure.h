@@ -21,11 +21,13 @@
 #ifndef MEASURE_H
 #define MEASURE_H
 
-#include <QList>
-#include <QString>
-#include <memory>
-#include <QObject>
 #include "scopy-gr-util_export.h"
+
+#include <QList>
+#include <QObject>
+#include <QString>
+
+#include <memory>
 
 namespace scopy::grutil {
 class CrossingDetection;
@@ -55,7 +57,8 @@ private:
 class SCOPY_GR_UTIL_EXPORT MeasurementData
 {
 public:
-	enum unitTypes {
+	enum unitTypes
+	{
 		METRIC,
 		TIME,
 		PERCENTAGE,
@@ -64,15 +67,15 @@ public:
 		DECIBELS_TO_CARRIER
 	};
 
-	enum axisType {
+	enum axisType
+	{
 		HORIZONTAL,
 		VERTICAL,
 		HORIZONTAL_F,
 		VERTICAL_F
 	};
 
-	MeasurementData(const QString& name, axisType axis,
-					const QString& unit = "");
+	MeasurementData(const QString &name, axisType axis, const QString &unit = "");
 
 	QString name() const;
 	double value() const;
@@ -107,7 +110,6 @@ class SCOPY_GR_UTIL_EXPORT MeasureModel : public QObject
 {
 	Q_OBJECT
 public:
-
 	MeasureModel(const float *buffer = NULL, size_t length = 0, QObject *parent = nullptr);
 	virtual ~MeasureModel();
 
@@ -127,7 +129,6 @@ public:
 	void setEndIndex(int);
 	void setGatingEnabled(bool);
 	void clearStats();
-
 
 	QList<std::shared_ptr<MeasurementData>> measurments();
 	std::shared_ptr<MeasurementData> measurement(int id);
@@ -155,8 +156,10 @@ protected:
 	QList<std::shared_ptr<MeasurementData>> m_measurements;
 };
 
-class SCOPY_GR_UTIL_EXPORT TimeMeasureModel : public MeasureModel {
-	enum defaultMeasurements {
+class SCOPY_GR_UTIL_EXPORT TimeMeasureModel : public MeasureModel
+{
+	enum defaultMeasurements
+	{
 		PERIOD = 0,
 		FREQUENCY,
 		MIN,
@@ -191,14 +194,14 @@ public:
 	void measure() override;
 
 private:
-
 	void measureTime();
-	bool highLowFromHistogram(double &low, double &high,
-							  double min, double max);
+	bool highLowFromHistogram(double &low, double &high, double min, double max);
 };
 
-class SCOPY_GR_UTIL_EXPORT SpectralMeasure : public MeasureModel {
-	enum defaultSpectralMeasurements {
+class SCOPY_GR_UTIL_EXPORT SpectralMeasure : public MeasureModel
+{
+	enum defaultSpectralMeasurements
+	{
 		NOISE_FLOOR = 0,
 		SINAD,
 		SNR,
@@ -207,6 +210,7 @@ class SCOPY_GR_UTIL_EXPORT SpectralMeasure : public MeasureModel {
 		SFDR,
 		DEFAULT_SPECTRAL_MEASUREMENT_COUNT
 	};
+
 public:
 	SpectralMeasure(const float *buffer = NULL, size_t length = 0);
 	~SpectralMeasure();
@@ -216,12 +220,11 @@ public:
 	void setMask(std::vector<int> mask);
 
 private:
-
 	int m_harmonics_number;
 	std::vector<int> m_mask;
 
 	void measureSpectral();
 };
-}
+} // namespace scopy::grutil
 
 #endif // MEASURE_H

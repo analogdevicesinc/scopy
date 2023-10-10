@@ -21,14 +21,15 @@
 #ifndef SPIN_BOX_A_H
 #define SPIN_BOX_A_H
 
-#include <QStringList>
-#include <QWidget>
-#include <vector>
-#include <QSettings>
-
 #include "plot_utils.hpp"
 #include "scopy-gui_export.h"
 #include "utils.h"
+
+#include <QSettings>
+#include <QStringList>
+#include <QWidget>
+
+#include <vector>
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -69,11 +70,9 @@ class SCOPY_GUI_EXPORT SpinBoxA : public QWidget
 
 public:
 	explicit SpinBoxA(QWidget *parent = nullptr);
-	explicit SpinBoxA(std::vector<std::pair<QString, double> >units,
-	                  const QString& name = "",
-	                  double min_value = 0.0, double max_value = 0.0,
-	                  bool hasProgressWidget = true,
-	                  bool invertCircle = false, QWidget *parent = 0);
+	explicit SpinBoxA(std::vector<std::pair<QString, double>> units, const QString &name = "",
+			  double min_value = 0.0, double max_value = 0.0, bool hasProgressWidget = true,
+			  bool invertCircle = false, QWidget *parent = 0);
 	~SpinBoxA();
 
 	QPushButton *upButton();
@@ -107,7 +106,7 @@ public:
 	void triggerCircleRedraw();
 
 	QString getName() const;
-	void setName(const QString& name);
+	void setName(const QString &name);
 
 	void setDisplayScale(double value);
 
@@ -140,9 +139,9 @@ protected Q_SLOTS:
 
 protected:
 	virtual bool eventFilter(QObject *obj, QEvent *event);
-	double findUnitOfValue(double val,int *posInUnitsList = NULL);
-	void setUnits(const QStringList& map);
-	bool isUnitMatched(const QString& unit, double value);
+	double findUnitOfValue(double val, int *posInUnitsList = NULL);
+	void setUnits(const QStringList &map);
+	bool isUnitMatched(const QString &unit, double value);
 
 protected:
 	Ui::SpinBoxA *ui;
@@ -152,7 +151,7 @@ protected:
 	double m_min_value;
 	double m_max_value;
 	int m_decimal_count;
-	std::vector<std::pair<QString, double> > m_units;
+	std::vector<std::pair<QString, double>> m_units;
 	QRegExpValidator *m_validator;
 	double m_displayScale;
 #ifdef SPINBOX_API
@@ -207,23 +206,21 @@ public:
 	void setFineModeAvailable(bool available);
 
 	QString getName() const;
-	void setName(const QString& name);
+	void setName(const QString &name);
 
 private:
 	SpinBoxA *sba;
 };
 #endif
 
-class SCOPY_GUI_EXPORT ScaleSpinButton: public SpinBoxA
+class SCOPY_GUI_EXPORT ScaleSpinButton : public SpinBoxA
 {
 	Q_OBJECT
 public:
 	explicit ScaleSpinButton(QWidget *parent = nullptr);
-	explicit ScaleSpinButton(std::vector<std::pair<QString, double> >units,
-	                         const QString& name = "",
-	                         double min_value = 0.0, double max_value = 0.0,
-	                         bool hasProgressWidget = true,
-	                         bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1,2,5});
+	explicit ScaleSpinButton(std::vector<std::pair<QString, double>> units, const QString &name = "",
+				 double min_value = 0.0, double max_value = 0.0, bool hasProgressWidget = true,
+				 bool invertCircle = false, QWidget *parent = 0, std::vector<double> steps = {1, 2, 5});
 	int getIntegerDivider();
 	void setIntegerDivider(int integer = 0);
 
@@ -245,16 +242,14 @@ protected:
 	int integer_step;
 };
 
-class SCOPY_GUI_EXPORT PositionSpinButton: public SpinBoxA
+class SCOPY_GUI_EXPORT PositionSpinButton : public SpinBoxA
 {
 	Q_OBJECT
 public:
 	explicit PositionSpinButton(QWidget *parent = nullptr);
-	explicit PositionSpinButton(std::vector<std::pair<QString, double> >units,
-	                            const QString& name ="",
-	                            double min_value = 0.0, double max_value = 0.0,
-	                            bool hasProgressWidget = true,
-	                            bool invertCircle = false, QWidget *parent = 0);
+	explicit PositionSpinButton(std::vector<std::pair<QString, double>> units, const QString &name = "",
+				    double min_value = 0.0, double max_value = 0.0, bool hasProgressWidget = true,
+				    bool invertCircle = false, QWidget *parent = 0);
 
 	double step();
 	void setStep(double);
@@ -267,17 +262,14 @@ protected:
 	double m_step;
 };
 
-
-class SCOPY_GUI_EXPORT PhaseSpinButton: public SpinBoxA
+class SCOPY_GUI_EXPORT PhaseSpinButton : public SpinBoxA
 {
 	Q_OBJECT
 public:
 	explicit PhaseSpinButton(QWidget *parent = nullptr);
-	explicit PhaseSpinButton(std::vector<std::pair<QString, double> >units,
-	                         const QString& name ="",
-	                         double min_value = 0.0, double max_value = 360.0,
-	                         bool hasProgressWidget = true,
-	                         bool invertCircle = false, QWidget *parent = 0);
+	explicit PhaseSpinButton(std::vector<std::pair<QString, double>> units, const QString &name = "",
+				 double min_value = 0.0, double max_value = 360.0, bool hasProgressWidget = true,
+				 bool invertCircle = false, QWidget *parent = 0);
 
 	void setStep(double);
 
@@ -309,9 +301,8 @@ protected:
 	bool m_inSeconds;
 	double m_scale;
 	int m_indexValue;
-
 };
 
-}
+} // namespace scopy
 
 #endif // SPIN_BOX_A_H

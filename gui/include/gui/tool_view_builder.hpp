@@ -1,8 +1,8 @@
 #ifndef TOOLBUILDER_HPP
 #define TOOLBUILDER_HPP
 
-#include "tool_view.hpp"
 #include "scopy-gui_export.h"
+#include "tool_view.hpp"
 
 namespace scopy {
 namespace gui {
@@ -29,12 +29,13 @@ struct ToolViewRecipe
 class SCOPY_GUI_EXPORT ToolViewBuilder
 {
 public:
-	ToolViewBuilder(const ToolViewRecipe& recipe, ChannelManager* channelManager = nullptr, QWidget* parent = nullptr);
+	ToolViewBuilder(const ToolViewRecipe &recipe, ChannelManager *channelManager = nullptr,
+			QWidget *parent = nullptr);
 
-	ToolView* build();
+	ToolView *build();
 
 private:
-	ToolView* m_toolView;
+	ToolView *m_toolView;
 };
 } // namespace gui
 } // namespace scopy

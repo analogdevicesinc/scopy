@@ -1,8 +1,9 @@
 #ifndef LINKEDBUTTON_HPP
 #define LINKEDBUTTON_HPP
 
-#include <QPushButton>
 #include "scopy-gui_export.h"
+
+#include <QPushButton>
 
 namespace scopy {
 
@@ -11,7 +12,7 @@ class SCOPY_GUI_EXPORT LinkedButton : public QPushButton
 	Q_OBJECT
 
 public:
-	explicit LinkedButton(QWidget* parent = Q_NULLPTR);
+	explicit LinkedButton(QWidget *parent = Q_NULLPTR);
 
 	void setUrl(QString url);
 
@@ -21,6 +22,6 @@ private:
 public Q_SLOTS:
 	void openUrl();
 };
-}
+} // namespace scopy
 
 #endif // LINKEDBUTTON_HPP

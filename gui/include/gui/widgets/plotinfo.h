@@ -1,17 +1,20 @@
 #ifndef PLOTINFO_H
 #define PLOTINFO_H
 
-#include <QWidget>
 #include "buffer_previewer.hpp"
+#include "plotwidget.h"
+
 #include <QLabel>
-#include <stylehelper.h>
+#include <QWidget>
+
 #include <plot_utils.hpp>
 #include <scopy-gui_export.h>
-#include "plotwidget.h"
+#include <stylehelper.h>
 
 namespace scopy {
 
-class SCOPY_GUI_EXPORT TimePlotHDivInfo : public QLabel {
+class SCOPY_GUI_EXPORT TimePlotHDivInfo : public QLabel
+{
 	Q_OBJECT
 public:
 	TimePlotHDivInfo(QWidget *parent = nullptr);
@@ -24,7 +27,8 @@ private:
 	MetricPrefixFormatter *m_mpf;
 };
 
-class SCOPY_GUI_EXPORT TimePlotSamplingInfo : public QLabel {
+class SCOPY_GUI_EXPORT TimePlotSamplingInfo : public QLabel
+{
 	Q_OBJECT
 public:
 	TimePlotSamplingInfo(QWidget *parent = nullptr);
@@ -37,23 +41,22 @@ private:
 	MetricPrefixFormatter *m_mpf;
 };
 
-
-class SCOPY_GUI_EXPORT TimePlotStatusInfo : public QLabel {
+class SCOPY_GUI_EXPORT TimePlotStatusInfo : public QLabel
+{
 	Q_OBJECT
 public:
 	TimePlotStatusInfo(QWidget *parent = nullptr);
 	virtual ~TimePlotStatusInfo();
 };
 
-class SCOPY_GUI_EXPORT TimePlotVDivInfo : public QWidget {
+class SCOPY_GUI_EXPORT TimePlotVDivInfo : public QWidget
+{};
 
-};
-
-
-class SCOPY_GUI_EXPORT PlotBufferPreviewerController : public QWidget {
+class SCOPY_GUI_EXPORT PlotBufferPreviewerController : public QWidget
+{
 	Q_OBJECT
 public:
-	explicit PlotBufferPreviewerController(PlotWidget* p, BufferPreviewer *b, QWidget *parent = nullptr);
+	explicit PlotBufferPreviewerController(PlotWidget *p, BufferPreviewer *b, QWidget *parent = nullptr);
 	~PlotBufferPreviewerController();
 
 	void updateDataLimits(double min, double max);
@@ -67,32 +70,30 @@ private:
 	double m_bufferPrevData;
 
 	void setupBufferPreviewer();
-	PlotWidget* m_plot;
-	BufferPreviewer* m_bufferPreviewer;
-
-
+	PlotWidget *m_plot;
+	BufferPreviewer *m_bufferPreviewer;
 };
 
-class SCOPY_GUI_EXPORT TimePlotInfo : public QWidget {
+class SCOPY_GUI_EXPORT TimePlotInfo : public QWidget
+{
 	Q_OBJECT
 public:
-	TimePlotInfo(PlotWidget* plot, QWidget *parent = nullptr);
+	TimePlotInfo(PlotWidget *plot, QWidget *parent = nullptr);
 	virtual ~TimePlotInfo();
 
 public Q_SLOTS:
 	void update(PlotSamplingInfo info);
 	void updateBufferPreviewer();
+
 private:
-	PlotWidget* m_plot;
+	PlotWidget *m_plot;
 	TimePlotHDivInfo *m_hdiv;
-	TimePlotSamplingInfo* m_sampling;
+	TimePlotSamplingInfo *m_sampling;
 	TimePlotStatusInfo *m_status;
 	PlotBufferPreviewerController *m_bufferController;
-	AnalogBufferPreviewer* m_bufferPreviewer;
-
-
+	AnalogBufferPreviewer *m_bufferPreviewer;
 };
 
-}
+} // namespace scopy
 
 #endif // PLOTINFO_H

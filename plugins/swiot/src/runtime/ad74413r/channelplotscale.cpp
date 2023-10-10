@@ -19,6 +19,7 @@
  */
 
 #include "channelplotscale.h"
+
 #include <QVBoxLayout>
 
 using namespace scopy::swiot;
@@ -43,28 +44,26 @@ ChannelPlotScale::ChannelPlotScale(int channel, QString unit, QColor color, QWid
 	layout->addWidget(m_unitPerDivisionLbl);
 	layout->addWidget(m_instantValueLbl);
 
-
 	connect(this, &ChannelPlotScale::requestUpdate, this, &ChannelPlotScale::update);
 	m_unitPerDivisionLbl->setStyleSheet(QString("QLabel {"
 						    "color: %1;"
 						    "font-weight: bold;"
-						    "}").arg(m_channelColor.name()));
+						    "}")
+						    .arg(m_channelColor.name()));
 	m_instantValueLbl->setStyleSheet(QString("QLabel {"
-						    "color: %1;"
-						    "font-weight: bold;"
-						    "}").arg(m_channelColor.name()));
+						 "color: %1;"
+						 "font-weight: bold;"
+						 "}")
+						 .arg(m_channelColor.name()));
 	setInstantValue(0);
 	setUnitPerDivision(0);
 }
 
-ChannelPlotScale::~ChannelPlotScale()
-{
-	delete m_formatter;
-}
+ChannelPlotScale::~ChannelPlotScale() { delete m_formatter; }
 
 void ChannelPlotScale::setInstantValue(double value)
 {
-	if (qFuzzyCompare(m_instantValue, value))
+	if(qFuzzyCompare(m_instantValue, value))
 		return;
 	m_instantValue = value;
 	Q_EMIT requestUpdate();
@@ -72,7 +71,7 @@ void ChannelPlotScale::setInstantValue(double value)
 
 void ChannelPlotScale::setUnitPerDivision(double value)
 {
-	if (qFuzzyCompare(m_unitPerDivision, value))
+	if(qFuzzyCompare(m_unitPerDivision, value))
 		return;
 	m_unitPerDivision = value;
 	Q_EMIT requestUpdate();
@@ -80,23 +79,12 @@ void ChannelPlotScale::setUnitPerDivision(double value)
 
 void ChannelPlotScale::update()
 {
-	m_unitPerDivisionLbl->setText(m_formatter->format(
-				m_unitPerDivision, m_unit + "/div", 2));
-	m_instantValueLbl->setText(m_formatter->format(
-				m_instantValue, m_unit, 2));
+	m_unitPerDivisionLbl->setText(m_formatter->format(m_unitPerDivision, m_unit + "/div", 2));
+	m_instantValueLbl->setText(m_formatter->format(m_instantValue, m_unit, 2));
 }
 
-int ChannelPlotScale::getChannelId()
-{
-	return m_channel;
-}
+int ChannelPlotScale::getChannelId() { return m_channel; }
 
-bool ChannelPlotScale::getEnabled()
-{
-	return m_enabled;
-}
+bool ChannelPlotScale::getEnabled() { return m_enabled; }
 
-void ChannelPlotScale::setEnabled(bool en)
-{
-	m_enabled = en;
-}
+void ChannelPlotScale::setEnabled(bool en) { m_enabled = en; }

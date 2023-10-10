@@ -1,19 +1,21 @@
 #ifndef TINTEDOVERLAY_H
 #define TINTEDOVERLAY_H
 
-#include <QWidget>
+#include "scopy-gui_export.h"
+
+#include <QDebug>
+#include <QMouseEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPixmap>
-#include <QDebug>
-#include <QMouseEvent>
-#include "scopy-gui_export.h"
+#include <QWidget>
 
 namespace scopy::gui {
-class SCOPY_GUI_EXPORT TintedOverlay : public QWidget {
+class SCOPY_GUI_EXPORT TintedOverlay : public QWidget
+{
 	Q_OBJECT
 public:
-	explicit TintedOverlay(QWidget *parent = nullptr, QColor color = QColor(0,0,0,220));
+	explicit TintedOverlay(QWidget *parent = nullptr, QColor color = QColor(0, 0, 0, 220));
 	~TintedOverlay();
 
 	const QList<QWidget *> &getHoles() const;
@@ -26,10 +28,9 @@ protected:
 
 private:
 	QWidget *parent;
-	QList<QWidget*> holes;
+	QList<QWidget *> holes;
 	QColor color;
 };
-}
-
+} // namespace scopy::gui
 
 #endif // TINTEDOVERLAY_H

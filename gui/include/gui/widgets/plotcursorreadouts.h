@@ -1,11 +1,12 @@
 #ifndef PLOTCURSORREADOUTS_H
 #define PLOTCURSORREADOUTS_H
 
-#include <QWidget>
-#include <QVBoxLayout>
-#include <scopy-gui_export.h>
-#include <plot_utils.hpp>
 #include <QLabel>
+#include <QVBoxLayout>
+#include <QWidget>
+
+#include <plot_utils.hpp>
+#include <scopy-gui_export.h>
 #include <stylehelper.h>
 
 namespace scopy {
@@ -31,14 +32,14 @@ public Q_SLOTS:
 private:
 	QWidget *vert_contents;
 	QWidget *horiz_contents;
-	double v1,v2,h1,h2;
-	QLabel *V1_val,*V2_val,*H1_val,*H2_val;
+	double v1, v2, h1, h2;
+	QLabel *V1_val, *V2_val, *H1_val, *H2_val;
 	QLabel *deltaV_val, *deltaH_val;
 	QLabel *invDeltaH_val;
 	PrefixFormatter *formatter;
 
 	void initContent();
 };
-}
+} // namespace scopy
 
 #endif // PLOTCURSORREADOUTS_H

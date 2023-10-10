@@ -24,44 +24,48 @@
 #include <iio.h>
 
 /*Qt includes*/
+#include <QListWidgetItem>
 #include <QObject>
 #include <QString>
-#include <QListWidgetItem>
 #include <QTableWidget>
 
 /*Local includes*/
 #include "filter.hpp"
-#include <QPushButton>
-#include <libm2k/analog/dmm.hpp>
-#include <calibration.hpp>
-#include "pluginbase/toolmenuentry.h"
 #include "m2ktool.hpp"
+#include "pluginbase/toolmenuentry.h"
+
+#include <QPushButton>
+
+#include <calibration.hpp>
+#include <libm2k/analog/dmm.hpp>
 
 class QJSEngine;
 
 namespace libm2k {
 namespace context {
-	class M2k;
+class M2k;
 }
 namespace analog {
-	class M2kPowerSupply;
+class M2kPowerSupply;
 }
-}
+} // namespace libm2k
 namespace Ui {
 class ManualCalibration;
 class CalibrationTemplate;
-}
+} // namespace Ui
 
 namespace scopy::m2k {
 
-struct stCalibStory {
+struct stCalibStory
+{
 	int calibProcedure;
 	int calibStep;
 	QStringList story;
 	QString storyName;
 };
 
-struct stCalibParam {
+struct stCalibParam
+{
 	double offset_pos_dac;
 	double offset_neg_dac;
 	double gain_pos_dac;
@@ -73,14 +77,16 @@ struct stCalibParam {
 	double gain_neg_adc;
 };
 
-enum calibrations {
+enum calibrations
+{
 	POSITIVE_OFFSET = 0,
 	NEGATIVE_OFFSET,
 	CALIB_PARAM,
 	START_CALIB_PARAM
 };
 
-enum steps {
+enum steps
+{
 	STEP1 = 0,
 	STEP2,
 	STEP3,
@@ -96,8 +102,8 @@ class ManualCalibration : public M2kTool
 	Q_OBJECT
 
 public:
-	explicit ManualCalibration(struct iio_context *ctx, Filter *filt,
-				   ToolMenuEntry *tme, QWidget *parent = 0, Calibration *cal = 0);
+	explicit ManualCalibration(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, QWidget *parent = 0,
+				   Calibration *cal = 0);
 
 	~ManualCalibration();
 
@@ -157,10 +163,10 @@ private:
 	QMap<QString, int> calibOption;
 
 	QString calibrationFilePath;
-	libm2k::context::M2k* m_m2k_context;
-	libm2k::analog::M2kPowerSupply* m_m2k_powersupply;
-	libm2k::analog::DMM* m_dmm_ad9963;
-	libm2k::analog::DMM* m_dmm_xadc;
+	libm2k::context::M2k *m_m2k_context;
+	libm2k::analog::M2kPowerSupply *m_m2k_powersupply;
+	libm2k::analog::DMM *m_dmm_ad9963;
+	libm2k::analog::DMM *m_dmm_xadc;
 };
-}
+} // namespace scopy::m2k
 #endif // MANUALCALIBRATION_H

@@ -18,17 +18,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "gui/dynamicWidget.h"
 #include "network_analyzer.hpp"
-#include "signal_generator.hpp"
-#include "gui/spinbox_a.hpp"
-#include "hardware_trigger.hpp"
-#include "gui/utils.h"
-#include "ui_network_analyzer.h"
+
 #include "filemanager.h"
+#include "gui/dynamicWidget.h"
+#include "gui/spinbox_a.hpp"
+#include "gui/utils.h"
+#include "hardware_trigger.hpp"
+#include "signal_generator.hpp"
+
+#include "ui_network_analyzer.h"
+
+#include <iio.h>
 
 #include <gnuradio/analog/sig_source.h>
-
 #include <gnuradio/analog/sig_source_waveform.h>
 #include <gnuradio/blocks/float_to_short.h>
 #include <gnuradio/blocks/head.h>
@@ -39,33 +42,31 @@
 #include <gnuradio/blocks/null_source.h>
 #include <gnuradio/blocks/rotator_cc.h>
 #include <gnuradio/blocks/skiphead.h>
-#include <gnuradio/blocks/vector_sink.h>
-#include <gnuradio/top_block.h>
 #include <gnuradio/blocks/stream_to_vector.h>
+#include <gnuradio/blocks/vector_sink.h>
 #include <gnuradio/blocks/vector_to_stream.h>
 #include <gnuradio/scopy/goertzel_scopy_fc.h>
+#include <gnuradio/top_block.h>
+
+#include <QDateTime>
+#include <QDockWidget>
+#include <QElapsedTimer>
+#include <QFileDialog>
+#include <QImageWriter>
+#include <QSignalBlocker>
+#include <QThread>
 
 #include <algorithm>
-
-#include <QThread>
-#include <QFileDialog>
-#include <QDateTime>
-#include <QSignalBlocker>
-#include <QImageWriter>
-#include <QDockWidget>
-
-#include <iio.h>
 #include <network_analyzer_api.hpp>
 
-#include <QElapsedTimer>
-
 /* libm2k includes */
-#include <libm2k/contextbuilder.hpp>
-#include <libm2k/m2kexceptions.hpp>
 #include "m2kpluginExceptionHandler.h"
-#include <pluginbase/scopyjs.h>
 
 #include <QLoggingCategory>
+
+#include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2kexceptions.hpp>
+#include <pluginbase/scopyjs.h>
 
 Q_LOGGING_CATEGORY(CAT_M2K_NETWORK_ANALYZER, "M2kNetworkAnalyzer")
 
@@ -81,8 +82,7 @@ void NetworkAnalyzer::_configureDacFlowgraph()
 {
 	// Create the blocks that are used to generate sine waves
 	top_block = make_top_block("Signal Generator");
-	source_block = gr::analog::sig_source_f::make(1, gr::analog::GR_SIN_WAVE,
-			1, 1, 1);
+	source_block = gr::analog::sig_source_f::make(1, gr::analog::GR_SIN_WAVE, 1, 1, 1);
 	head_block = blocks::head::make(sizeof(float), 1);
 	vector_block = blocks::vector_sink_f::make();
 
@@ -93,8 +93,7 @@ void NetworkAnalyzer::_configureDacFlowgraph()
 
 void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 {
-	if (m_initFlowgraph) {
-
+	if(m_initFlowgraph) {
 
 		capture_top_block = make_top_block("Network capture processing");
 
@@ -102,10 +101,8 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		// Make sure the values are sorted in ascending order (1000,..,100e6)
 		sampleRates = m_m2k_analogin->getAvailableSampleRates();
 
-		dc_cancel1 = gnuradio::get_initial_sptr(
-					new cancel_dc_offset_block(1, false));
-		dc_cancel2 = gnuradio::get_initial_sptr(
-					new cancel_dc_offset_block(1, false));
+		dc_cancel1 = gnuradio::get_initial_sptr(new cancel_dc_offset_block(1, false));
+		dc_cancel2 = gnuradio::get_initial_sptr(new cancel_dc_offset_block(1, false));
 
 		capture1 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
 		capture2 = gr::blocks::vector_source_s::make(std::vector<short>(), false, 1);
@@ -155,8 +152,7 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 		capture_top_block->connect(c2a, 0, signal, 2);
 
 		mag1 = 0.0, mag2 = 0.0, phase = 0.0;
-		connect(&*signal, &signal_sample::triggered,
-		[&](const std::vector<float> values) {
+		connect(&*signal, &signal_sample::triggered, [&](const std::vector<float> values) {
 			mag1 = values[0];
 			mag2 = values[1];
 			phase = values[2];
@@ -175,36 +171,38 @@ void NetworkAnalyzer::_configureAdcFlowgraph(size_t buffer_size)
 	ui->btnHelp->setUrl("https://wiki.analog.com/university/tools/m2k/scopy/networkanalyzer");
 }
 
-NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
-				 ToolMenuEntry *tme, m2k_iio_manager* m2k_man,
-				 QJSEngine *engine,
-				 QWidget *parent) :
-	M2kTool(ctx, tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent),
-	ui(new Ui::NetworkAnalyzer),
-	m_m2k_context(nullptr),
-	m_m2k_analogin(nullptr),
-	m_m2k_analogout(nullptr),
-	m_adc_nb_channels(0),
-	m_dac_nb_channels(0),
-	d_cursorsEnabled(false),
-	m_stop(true),
-	m_dBgraph(this, true),
-	m_phaseGraph(this, true),
-	wheelEventGuard(nullptr), wasChecked(false),
-	justStarted(false),
-	iterationsThreadCanceled(false), iterationsThreadReady(false),
-	iterationsThread(nullptr), autoAdjustGain(true),
-	filterDc(false), m_initFlowgraph(true), m_hasReference(false),
-	m_importDataLoaded(false),
-	m_nb_averaging(1),
-	m_nb_periods(2)
+NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntry *tme, m2k_iio_manager *m2k_man,
+				 QJSEngine *engine, QWidget *parent)
+	: M2kTool(ctx, tme, new NetworkAnalyzer_API(this), "Network Analyzer", parent)
+	, ui(new Ui::NetworkAnalyzer)
+	, m_m2k_context(nullptr)
+	, m_m2k_analogin(nullptr)
+	, m_m2k_analogout(nullptr)
+	, m_adc_nb_channels(0)
+	, m_dac_nb_channels(0)
+	, d_cursorsEnabled(false)
+	, m_stop(true)
+	, m_dBgraph(this, true)
+	, m_phaseGraph(this, true)
+	, wheelEventGuard(nullptr)
+	, wasChecked(false)
+	, justStarted(false)
+	, iterationsThreadCanceled(false)
+	, iterationsThreadReady(false)
+	, iterationsThread(nullptr)
+	, autoAdjustGain(true)
+	, filterDc(false)
+	, m_initFlowgraph(true)
+	, m_hasReference(false)
+	, m_importDataLoaded(false)
+	, m_nb_averaging(1)
+	, m_nb_periods(2)
 {
-	if (ctx) {
-		iio = m2k_man->get_instance(ctx,
-						filt->device_name(TOOL_NETWORK_ANALYZER, 2));
+	if(ctx) {
+		iio = m2k_man->get_instance(ctx, filt->device_name(TOOL_NETWORK_ANALYZER, 2));
 
 		m_m2k_context = m2kOpen(ctx, "");
-		if (m_m2k_context) {
+		if(m_m2k_context) {
 			m_m2k_analogin = m_m2k_context->getAnalogIn();
 			m_m2k_analogout = m_m2k_context->getAnalogOut();
 			m_adc_nb_channels = m_m2k_analogin->getNbChannels();
@@ -221,28 +219,19 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->statusLabel->setText(tr("Stopped"));
 
-	connect(ui->bufferPreviewSwitch, &QCheckBox::toggled,
-		this, &NetworkAnalyzer::toggleBufferPreview);
+	connect(ui->bufferPreviewSwitch, &QCheckBox::toggled, this, &NetworkAnalyzer::toggleBufferPreview);
 
-	connect(ui->prevBtn, &QPushButton::pressed,
-		bufferPreviewer, &NetworkAnalyzerBufferViewer::btnPreviousClicked);
-	connect(ui->nextBtn, &QPushButton::pressed,
-		bufferPreviewer, &NetworkAnalyzerBufferViewer::btnNextClicked);
-	connect(ui->viewInOscBtn, &QPushButton::pressed,
-		bufferPreviewer, &NetworkAnalyzerBufferViewer::sendBufferToOscilloscope);
+	connect(ui->prevBtn, &QPushButton::pressed, bufferPreviewer, &NetworkAnalyzerBufferViewer::btnPreviousClicked);
+	connect(ui->nextBtn, &QPushButton::pressed, bufferPreviewer, &NetworkAnalyzerBufferViewer::btnNextClicked);
+	connect(ui->viewInOscBtn, &QPushButton::pressed, bufferPreviewer,
+		&NetworkAnalyzerBufferViewer::sendBufferToOscilloscope);
 
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		[=](bool checked){
-		tme->setRunning(checked);
-	});
-	connect(tme, &ToolMenuEntry::runClicked,
-		ui->runSingleWidget, &RunSingleWidget::toggle);
-	connect(ui->runSingleWidget, &RunSingleWidget::toggled,
-		this, &NetworkAnalyzer::startStop);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, [=](bool checked) { tme->setRunning(checked); });
+	connect(tme, &ToolMenuEntry::runClicked, ui->runSingleWidget, &RunSingleWidget::toggle);
+	connect(ui->runSingleWidget, &RunSingleWidget::toggled, this, &NetworkAnalyzer::startStop);
 
-	connect(this, &NetworkAnalyzer::sweepDone,
-	[=]() {
-		if (ui->runSingleWidget->runButtonChecked()) {
+	connect(this, &NetworkAnalyzer::sweepDone, [=]() {
+		if(ui->runSingleWidget->runButtonChecked()) {
 			thd = QtConcurrent::run(this, &NetworkAnalyzer::goertzel);
 			return;
 		}
@@ -250,32 +239,30 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		tme->setRunning(false);
 	});
 
-
 	startStopRange = new StartStopRangeWidget(1.0, 25e06);
 	ui->sweepRangeLayout->addWidget(startStopRange);
 	ui->rightMenu->setMaximumWidth(0);
 
-	connect(startStopRange, &StartStopRangeWidget::rangeChanged,
-		[=](double start, double stop){
+	connect(startStopRange, &StartStopRangeWidget::rangeChanged, [=](double start, double stop) {
 		// Update plot settings
 		m_dBgraph.setXMin(start);
 		m_dBgraph.setXMax(stop);
 		m_phaseGraph.setXMin(start);
 		m_phaseGraph.setXMax(stop);
 
-		QMetaObject::invokeMethod(this,
-		    [=](){
-			    computeIterations();
-			    updateNumSamples(true);
-		    },
-		    Qt::QueuedConnection);
+		QMetaObject::invokeMethod(
+			this,
+			[=]() {
+				computeIterations();
+				updateNumSamples(true);
+			},
+			Qt::QueuedConnection);
 	});
-
 
 	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(0);
 	double max_samplerate = values.back();
 
-	m_dBgraph.setColor(QColor(255,114,0));
+	m_dBgraph.setColor(QColor(255, 114, 0));
 	m_dBgraph.setXTitle(tr("Frequency (Hz)"));
 	m_dBgraph.setYTitle(tr("Magnitude(dB)"));
 	m_dBgraph.setXMin(1000.000000);
@@ -284,7 +271,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_dBgraph.setYMax(20.000000);
 	m_dBgraph.useLogFreq(true);
 
-	m_phaseGraph.setColor(QColor(144,19,254));
+	m_phaseGraph.setColor(QColor(144, 19, 254));
 	m_phaseGraph.setYTitle(tr("Phase (°)"));
 	m_phaseGraph.setYUnit("°");
 	m_phaseGraph.setXMin(1000.000000);
@@ -294,75 +281,55 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_phaseGraph.useLogFreq(true);
 
 	sampleStackedWidget = new QStackedWidget(this);
-	samplesCount = new ScaleSpinButton({
-		{"samples",1e0},
-	}, tr("Samples count"), 10, 10000, false, false, this);
+	samplesCount = new ScaleSpinButton(
+		{
+			{"samples", 1e0},
+		},
+		tr("Samples count"), 10, 10000, false, false, this);
 	samplesCount->setValue(1000);
 
-	samplesPerDecadeCount = new ScaleSpinButton({
-		{"samples",1e0},
-	}, tr("Samps/decade"), 1, 10000, false, false, this);
+	samplesPerDecadeCount = new ScaleSpinButton(
+		{
+			{"samples", 1e0},
+		},
+		tr("Samps/decade"), 1, 10000, false, false, this);
 	samplesPerDecadeCount->setValue(1000);
 
-	samplesStepSize = new ScaleSpinButton({
-		{"Hz",1e0},
-		{"kHz",1e3},
-		{"MHz",1e6}
-	},tr("Step"), 1.0, 25e06,
-	false, false, this,
-	{1, 2.5, 5, 7.5});
+	samplesStepSize = new ScaleSpinButton({{"Hz", 1e0}, {"kHz", 1e3}, {"MHz", 1e6}}, tr("Step"), 1.0, 25e06, false,
+					      false, this, {1, 2.5, 5, 7.5});
 
 	sampleStackedWidget->addWidget(samplesStepSize);
 	sampleStackedWidget->addWidget(samplesPerDecadeCount);
 	startStopRange->insertWidgetIntoLayout(sampleStackedWidget, 2, 0);
 
-	amplitude = new ScaleSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	},tr("Amplitude"), 1e-6, 1e1, false, false, this);
+	amplitude = new ScaleSpinButton({{"μVolts", 1e-6}, {"mVolts", 1e-3}, {"Volts", 1e0}}, tr("Amplitude"), 1e-6,
+					1e1, false, false, this);
 	amplitude->setValue(1);
 
-	offset = new PositionSpinButton({
-		{"μVolts",1e-6},
-		{"mVolts",1e-3},
-		{"Volts",1e0}
-	},tr("Offset"), -5, 5, false, false, this);
+	offset = new PositionSpinButton({{"μVolts", 1e-6}, {"mVolts", 1e-3}, {"Volts", 1e0}}, tr("Offset"), -5, 5,
+					false, false, this);
 
 	offset->setValue(0);
 
-	magMax = new PositionSpinButton({
-		{"dB",1e0}
-	}, tr("Max. Magnitude"), -120, 120, false, false, this);
+	magMax = new PositionSpinButton({{"dB", 1e0}}, tr("Max. Magnitude"), -120, 120, false, false, this);
 	magMax->setValue(20);
 
-	magMin = new PositionSpinButton({
-		{"dB",1e0}
-	}, tr("Min. Magnitude"), -120, 120, false, false, this);
+	magMin = new PositionSpinButton({{"dB", 1e0}}, tr("Min. Magnitude"), -120, 120, false, false, this);
 	magMin->setValue(-80);
 
-	phaseMax = new PositionSpinButton({
-		{"°",1e0}
-	}, tr("Max. Phase"), -360, 360, false, false, this);
+	phaseMax = new PositionSpinButton({{"°", 1e0}}, tr("Max. Phase"), -360, 360, false, false, this);
 	phaseMax->setValue(180);
 
-	phaseMin = new PositionSpinButton({
-		{"°",1e0}
-	}, tr("Min. Phase"), -360, 360, false, false, this);
+	phaseMin = new PositionSpinButton({{"°", 1e0}}, tr("Min. Phase"), -360, 360, false, false, this);
 	phaseMin->setValue(-180);
 
-	pushDelay = new PositionSpinButton({
-		{"ms",1e0},
-		{"s",1e3}
-	}, tr("Settling time"), 0, 2000, false, false, this);
+	pushDelay = new PositionSpinButton({{"ms", 1e0}, {"s", 1e3}}, tr("Settling time"), 0, 2000, false, false, this);
 	pushDelay->setValue(0);
 	pushDelay->setStep(10);
 	pushDelay->setToolTip(tr("Before Buffer"));
 
-	captureDelay = new PositionSpinButton({
-		{"ms",1e0},
-		{"s",1e3}
-	}, tr("Settling time"), 0, 2000, false, false, this);
+	captureDelay =
+		new PositionSpinButton({{"ms", 1e0}, {"s", 1e3}}, tr("Settling time"), 0, 2000, false, false, this);
 	captureDelay->setValue(0);
 	captureDelay->setStep(10);
 	captureDelay->setToolTip(tr("After Buffer"));
@@ -382,32 +349,20 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	setMinimumDistanceBetween(magMin, magMax, 1);
 	setMinimumDistanceBetween(phaseMin, phaseMax, 1);
 
-	connect(magMax, &PositionSpinButton::valueChanged,
-		ui->xygraph, &NyquistGraph::setMax);
-	connect(magMax, &PositionSpinButton::valueChanged,
-		ui->nicholsgraph, &dBgraph::setYMax);
-	connect(magMin, &PositionSpinButton::valueChanged,
-		ui->xygraph, &NyquistGraph::setMin);
-	connect(magMin, &PositionSpinButton::valueChanged,
-		ui->nicholsgraph, &dBgraph::setYMin);
-	connect(phaseMax, &PositionSpinButton::valueChanged,
-		ui->nicholsgraph, &dBgraph::setXMax);
-	connect(phaseMin, &PositionSpinButton::valueChanged,
-		ui->nicholsgraph, &dBgraph::setXMin);
+	connect(magMax, &PositionSpinButton::valueChanged, ui->xygraph, &NyquistGraph::setMax);
+	connect(magMax, &PositionSpinButton::valueChanged, ui->nicholsgraph, &dBgraph::setYMax);
+	connect(magMin, &PositionSpinButton::valueChanged, ui->xygraph, &NyquistGraph::setMin);
+	connect(magMin, &PositionSpinButton::valueChanged, ui->nicholsgraph, &dBgraph::setYMin);
+	connect(phaseMax, &PositionSpinButton::valueChanged, ui->nicholsgraph, &dBgraph::setXMax);
+	connect(phaseMin, &PositionSpinButton::valueChanged, ui->nicholsgraph, &dBgraph::setXMin);
 
-	connect(magMin, SIGNAL(valueChanged(double)),
-		&m_dBgraph, SLOT(setYMin(double)));
-	connect(magMax, SIGNAL(valueChanged(double)),
-		&m_dBgraph, SLOT(setYMax(double)));
-	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
-		&m_dBgraph, SLOT(useLogFreq(bool)));
+	connect(magMin, SIGNAL(valueChanged(double)), &m_dBgraph, SLOT(setYMin(double)));
+	connect(magMax, SIGNAL(valueChanged(double)), &m_dBgraph, SLOT(setYMax(double)));
+	connect(ui->btnIsLog, SIGNAL(toggled(bool)), &m_dBgraph, SLOT(useLogFreq(bool)));
 
-	connect(phaseMin, SIGNAL(valueChanged(double)),
-		&m_phaseGraph, SLOT(setYMin(double)));
-	connect(phaseMax, SIGNAL(valueChanged(double)),
-		&m_phaseGraph, SLOT(setYMax(double)));
-	connect(ui->btnIsLog, SIGNAL(toggled(bool)),
-		&m_phaseGraph, SLOT(useLogFreq(bool)));
+	connect(phaseMin, SIGNAL(valueChanged(double)), &m_phaseGraph, SLOT(setYMin(double)));
+	connect(phaseMax, SIGNAL(valueChanged(double)), &m_phaseGraph, SLOT(setYMax(double)));
+	connect(ui->btnIsLog, SIGNAL(toggled(bool)), &m_phaseGraph, SLOT(useLogFreq(bool)));
 	connect(ui->btnIsLog, &CustomSwitch::toggled, [=](bool value) {
 		sampleStackedWidget->setCurrentIndex(value);
 		computeIterations();
@@ -417,26 +372,19 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	ui->nicholsgraph->setAxisVisible(QwtAxis::XTop, true);
 	ui->nicholsgraph->setAxisVisible(QwtAxis::YLeft, true);
 
-	connect(phaseMin, &PositionSpinButton::valueChanged,
-		this, &NetworkAnalyzer::onMinMaxPhaseChanged);
-	connect(phaseMax, &PositionSpinButton::valueChanged,
-		this, &NetworkAnalyzer::onMinMaxPhaseChanged);
+	connect(phaseMin, &PositionSpinButton::valueChanged, this, &NetworkAnalyzer::onMinMaxPhaseChanged);
+	connect(phaseMax, &PositionSpinButton::valueChanged, this, &NetworkAnalyzer::onMinMaxPhaseChanged);
 
-
-	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_dBgraph,
-		SLOT(setThickness(int)));
-	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),&m_phaseGraph,
-		SLOT(setThickness(int)));
-	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->nicholsgraph,
-		SLOT(setThickness(int)));
-	connect(ui->cbLineThickness,SIGNAL(currentIndexChanged(int)),ui->xygraph,
-		SLOT(setThickness(int)));
+	connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)), &m_dBgraph, SLOT(setThickness(int)));
+	connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)), &m_phaseGraph, SLOT(setThickness(int)));
+	connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)), ui->nicholsgraph, SLOT(setThickness(int)));
+	connect(ui->cbLineThickness, SIGNAL(currentIndexChanged(int)), ui->xygraph, SLOT(setThickness(int)));
 
 	m_phaseGraph.setVertCursorsHandleEnabled(false);
 
 	// plot widget
-	QWidget* centralWidget = new QWidget(this);
-	QGridLayout* gridLayout = new QGridLayout(centralWidget);
+	QWidget *centralWidget = new QWidget(this);
+	QGridLayout *gridLayout = new QGridLayout(centralWidget);
 	gridLayout->setContentsMargins(9, 0, 0, 9);
 	gridLayout->setHorizontalSpacing(10);
 	gridLayout->setVerticalSpacing(0);
@@ -461,36 +409,35 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	if(dockingEnabled) {
 		// bode graph
-		QMainWindow* bodeWindow = new QMainWindow(this);
+		QMainWindow *bodeWindow = new QMainWindow(this);
 		bodeWindow->setCentralWidget(0);
 		bodeWindow->setWindowFlags(Qt::Widget);
 		ui->gridLayout_plots->addWidget(bodeWindow, 0, 0);
 
-		QDockWidget* bodeDockWidget = DockerUtils::createDockWidget(bodeWindow, centralWidget, "Bode");
+		QDockWidget *bodeDockWidget = DockerUtils::createDockWidget(bodeWindow, centralWidget, "Bode");
 		bodeWindow->addDockWidget(Qt::LeftDockWidgetArea, bodeDockWidget);
 
-
 		// nyquist graph
-		QMainWindow* nyquistWindow = new QMainWindow(this);
+		QMainWindow *nyquistWindow = new QMainWindow(this);
 		nyquistWindow->setCentralWidget(0);
 		nyquistWindow->setWindowFlags(Qt::Widget);
 
 		ui->stackedWidgetPage2->layout()->removeWidget(ui->xygraph);
 		ui->stackedWidgetPage2->layout()->addWidget(nyquistWindow);
 
-		QDockWidget* nyquistDockWidget = DockerUtils::createDockWidget(nyquistWindow, ui->xygraph, "Nyquist");
+		QDockWidget *nyquistDockWidget = DockerUtils::createDockWidget(nyquistWindow, ui->xygraph, "Nyquist");
 		nyquistWindow->addDockWidget(Qt::LeftDockWidgetArea, nyquistDockWidget);
 
-
 		// nichols graph
-		QMainWindow* nicholsWindow = new QMainWindow(this);
+		QMainWindow *nicholsWindow = new QMainWindow(this);
 		nicholsWindow->setCentralWidget(0);
 		nicholsWindow->setWindowFlags(Qt::Widget);
 
 		ui->stackedWidgetPage3->layout()->removeWidget(ui->nicholsgraph);
 		ui->stackedWidgetPage3->layout()->addWidget(nicholsWindow);
 
-		QDockWidget* nicholsDockWidget = DockerUtils::createDockWidget(nicholsWindow, ui->nicholsgraph, "Nichols");
+		QDockWidget *nicholsDockWidget =
+			DockerUtils::createDockWidget(nicholsWindow, ui->nicholsgraph, "Nichols");
 		nicholsWindow->addDockWidget(Qt::LeftDockWidgetArea, nicholsDockWidget);
 
 #ifdef PLOT_MENU_BAR_ENABLED
@@ -504,7 +451,6 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->gridLayout_plots->addWidget(centralWidget);
 	}
 
-
 	m_phaseGraph.enableXaxisLabels();
 	m_dBgraph.enableXaxisLabels();
 
@@ -512,77 +458,60 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	m_dBgraph.enableYaxisLabels();
 
 	connect(m_dBgraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
-	{
-		m_phaseGraph.vBar1()->setPosition(x);
-	});
+		[=](double x) { m_phaseGraph.vBar1()->setPosition(x); });
 
 	connect(m_dBgraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
-	{
-		m_phaseGraph.vBar2()->setPosition(x);
-	});
+		[=](double x) { m_phaseGraph.vBar2()->setPosition(x); });
 
-	//The inverse connection is neccesary for the change of the boundaries for sweep
-	connect(m_phaseGraph.vBar1(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
-	{
-		m_dBgraph.vBar1()->setPosition(x);
-	});
+	// The inverse connection is neccesary for the change of the boundaries for sweep
+	connect(m_phaseGraph.vBar1(),
+		static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
+		[=](double x) { m_dBgraph.vBar1()->setPosition(x); });
 
-	connect(m_phaseGraph.vBar2(), static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
-		[=](double x)
-	{
-		m_dBgraph.vBar2()->setPosition(x);
-	});
-
+	connect(m_phaseGraph.vBar2(),
+		static_cast<void (HorizDebugSymbol::*)(double)>(&HorizDebugSymbol::positionChanged),
+		[=](double x) { m_dBgraph.vBar2()->setPosition(x); });
 
 	ui->currentFrequencyLabel->setVisible(false);
 	ui->currentSampleLabel->setVisible(false);
 	ui->currentAverageLabel->setVisible(false);
 
 	d_frequencyHandle = new FreePlotLineHandleH(
-				QPixmap(":/gui/icons/time_trigger_handle.svg"),
-				QPixmap(":/gui/icons/time_trigger_left.svg"),
-				QPixmap(":/gui/icons/time_trigger_right.svg"),
-				m_dBgraph.bottomHandlesArea());
+		QPixmap(":/gui/icons/time_trigger_handle.svg"), QPixmap(":/gui/icons/time_trigger_left.svg"),
+		QPixmap(":/gui/icons/time_trigger_right.svg"), m_dBgraph.bottomHandlesArea());
 	d_frequencyHandle->setPen(QPen(QColor(74, 100, 255), 2, Qt::SolidLine));
 	d_frequencyHandle->setVisible(true);
 	d_frequencyHandle->triggerMove();
 
 	ui->nicholsgraph->enableFrequencyBar(false);
 
-	connect(d_frequencyHandle, &FreePlotLineHandleH::positionChanged,
-		&m_dBgraph, &dBgraph::onFrequencyCursorPositionChanged);
-	connect(d_frequencyHandle, &FreePlotLineHandleH::positionChanged,
-		&m_phaseGraph, &dBgraph::onFrequencyCursorPositionChanged);
-	connect(&m_dBgraph, &dBgraph::frequencyBarPositionChanged,
-		this, &NetworkAnalyzer::onFrequencyBarMoved);
-	connect(&m_phaseGraph, &dBgraph::frequencyBarPositionChanged,
-		this, &NetworkAnalyzer::onFrequencyBarMoved);
+	connect(d_frequencyHandle, &FreePlotLineHandleH::positionChanged, &m_dBgraph,
+		&dBgraph::onFrequencyCursorPositionChanged);
+	connect(d_frequencyHandle, &FreePlotLineHandleH::positionChanged, &m_phaseGraph,
+		&dBgraph::onFrequencyCursorPositionChanged);
+	connect(&m_dBgraph, &dBgraph::frequencyBarPositionChanged, this, &NetworkAnalyzer::onFrequencyBarMoved);
+	connect(&m_phaseGraph, &dBgraph::frequencyBarPositionChanged, this, &NetworkAnalyzer::onFrequencyBarMoved);
 
-	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::moveHandleAt,
-		&m_dBgraph, &dBgraph::onFrequencyBarMoved);
-	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::moveHandleAt,
-		&m_phaseGraph, &dBgraph::onFrequencyBarMoved);
-	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::indexChanged,
-		[=](int value) {
+	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::moveHandleAt, &m_dBgraph, &dBgraph::onFrequencyBarMoved);
+	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::moveHandleAt, &m_phaseGraph,
+		&dBgraph::onFrequencyBarMoved);
+	connect(bufferPreviewer, &NetworkAnalyzerBufferViewer::indexChanged, [=](int value) {
 		ui->currentFrequencyLabel->setVisible(true);
 		ui->currentSampleLabel->setVisible(true);
-		ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + value)
-							+ " / " + QString::number(m_dBgraph.getNumSamples()) + " "));
+		ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + value) + " / " +
+							QString::number(m_dBgraph.getNumSamples()) + " "));
 		ui->currentAverageLabel->setVisible(true);
 		MetricPrefixFormatter d_cursorTimeFormatter;
 		d_cursorTimeFormatter.setTwoDecimalMode(false);
 		QString text = d_cursorTimeFormatter.format(iterations[value].frequency, "Hz", 3);
 		ui->currentFrequencyLabel->setText(QString(tr("Current Frequency: ") + text));
 
-		if (value < iterationStats.size()) {
+		if(value < iterationStats.size()) {
 			double dcVoltage = iterationStats[value].dcVoltage;
 			text = d_cursorTimeFormatter.format(dcVoltage, "V", 2);
 			ui->dcLabel->setText(tr("DC Voltage: ") + text);
 
-			if (iterationStats[value].hasError) {
+			if(iterationStats[value].hasError) {
 				ui->errorLabel->setText(tr("Response channel voltage < 50mV!"));
 			} else {
 				ui->errorLabel->setText("");
@@ -593,24 +522,17 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		}
 	});
 
+	connect(&m_dBgraph, &dBgraph::frequencySelected, bufferPreviewer, &NetworkAnalyzerBufferViewer::selectBuffers);
 
-	connect(&m_dBgraph, &dBgraph::frequencySelected,
-		bufferPreviewer, &NetworkAnalyzerBufferViewer::selectBuffers);
+	startStopRange->setStopValue((double)max_samplerate / 3.0 - 1.0);
 
-	startStopRange->setStopValue((double) max_samplerate / 3.0 - 1.0);
+	connect(samplesCount, SIGNAL(valueChanged(double)), this, SLOT(updateNumSamples()));
+	connect(samplesPerDecadeCount, SIGNAL(valueChanged(double)), this, SLOT(updateNumSamplesPerDecade()));
+	connect(samplesStepSize, SIGNAL(valueChanged(double)), this, SLOT(updateSampleStepSize()));
 
-	connect(samplesCount, SIGNAL(valueChanged(double)),
-		this, SLOT(updateNumSamples()));
-	connect(samplesPerDecadeCount, SIGNAL(valueChanged(double)),
-		this, SLOT(updateNumSamplesPerDecade()));
-	connect(samplesStepSize, SIGNAL(valueChanged(double)),
-		this, SLOT(updateSampleStepSize()));
+	connect(ui->boxCursors, SIGNAL(toggled(bool)), SLOT(toggleCursors(bool)));
 
-	connect(ui->boxCursors,SIGNAL(toggled(bool)),
-		SLOT(toggleCursors(bool)));
-
-	connect(ui->cmb_graphs,SIGNAL(currentIndexChanged(int)),
-		SLOT(onGraphIndexChanged(int)));
+	connect(ui->cmb_graphs, SIGNAL(currentIndexChanged(int)), SLOT(onGraphIndexChanged(int)));
 
 	readPreferences();
 
@@ -620,38 +542,33 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ScopyJS::GetInstance()->registerApi(api);
 
-	connect((m_dBgraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()),
-		&m_phaseGraph, SLOT(scaleDivChanged()));
-	connect((m_phaseGraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()),
-		&m_dBgraph, SLOT(scaleDivChanged()));
+	connect((m_dBgraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()), &m_phaseGraph,
+		SLOT(scaleDivChanged()));
+	connect((m_phaseGraph.getAxisWidget(QwtAxis::XTop)), SIGNAL(scaleDivChanged()), &m_dBgraph,
+		SLOT(scaleDivChanged()));
 
-	connect(&m_dBgraph,SIGNAL(resetZoom()),&m_phaseGraph,SLOT(onResetZoom()));
-	connect(&m_phaseGraph,SIGNAL(resetZoom()),&m_dBgraph,SLOT(onResetZoom()));
+	connect(&m_dBgraph, SIGNAL(resetZoom()), &m_phaseGraph, SLOT(onResetZoom()));
+	connect(&m_phaseGraph, SIGNAL(resetZoom()), &m_dBgraph, SLOT(onResetZoom()));
 
 #ifdef __ANDROID__
 	connect(&m_dBgraph, &dBgraph::zoomOut, &m_phaseGraph, &dBgraph::onZoomOut);
 	connect(&m_phaseGraph, &dBgraph::zoomOut, &m_dBgraph, &dBgraph::onZoomOut);
 #endif
 
-	connect(ui->rightMenu, &MenuHAnim::finished, this,
-		&NetworkAnalyzer::rightMenuFinished);
+	connect(ui->rightMenu, &MenuHAnim::finished, this, &NetworkAnalyzer::rightMenuFinished);
 
-	connect(ui->btnSettings, &CustomPushButton::toggled, [=](bool checked) {
-		triggerRightMenuToggle(ui->btnSettings, checked);
-	});
-	connect(ui->btnGeneralSettings, &CustomPushButton::toggled, [=](bool checked) {
-		triggerRightMenuToggle(ui->btnGeneralSettings, checked);
-	});
-	connect(ui->btnCursors, &CustomPushButton::toggled, [=](bool checked) {
-		triggerRightMenuToggle(ui->btnCursors, checked);
-	});
+	connect(ui->btnSettings, &CustomPushButton::toggled,
+		[=](bool checked) { triggerRightMenuToggle(ui->btnSettings, checked); });
+	connect(ui->btnGeneralSettings, &CustomPushButton::toggled,
+		[=](bool checked) { triggerRightMenuToggle(ui->btnGeneralSettings, checked); });
+	connect(ui->btnCursors, &CustomPushButton::toggled,
+		[=](bool checked) { triggerRightMenuToggle(ui->btnCursors, checked); });
 	connect(ui->btnApplyAverage, SIGNAL(clicked()), this, SLOT(validateSpinboxAveraging()));
 	connect(ui->btnApplyPeriod, SIGNAL(clicked()), this, SLOT(validateSpinboxPeriods()));
 
-	ui->btnSettings->setProperty("id",QVariant(-1));
-	ui->btnGeneralSettings->setProperty("id",QVariant(-2));
-	ui->btnCursors->setProperty("id",QVariant(-3));
-
+	ui->btnSettings->setProperty("id", QVariant(-1));
+	ui->btnGeneralSettings->setProperty("id", QVariant(-2));
+	ui->btnCursors->setProperty("id", QVariant(-3));
 
 	connect(ui->horizontalSlider, &QSlider::valueChanged, [=](int value) {
 		ui->transLabel->setText(tr("Transparency ") + QString::number(value) + "%");
@@ -661,25 +578,21 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	setDynamicProperty(ui->btnLockHorizontal, "use_icon", true);
 
-	connect(ui->btnLockHorizontal, &QPushButton::toggled,
-		&m_dBgraph, &dBgraph::setHorizCursorsLocked);
+	connect(ui->btnLockHorizontal, &QPushButton::toggled, &m_dBgraph, &dBgraph::setHorizCursorsLocked);
 
-	connect(ui->btnLockHorizontal, &QPushButton::toggled,
-		&m_phaseGraph, &dBgraph::setHorizCursorsLocked);
+	connect(ui->btnLockHorizontal, &QPushButton::toggled, &m_phaseGraph, &dBgraph::setHorizCursorsLocked);
 
-	connect(ui->hCursorsEnable,  &QPushButton::toggled,
-		&m_dBgraph,  &dBgraph::toggleCursors);
+	connect(ui->hCursorsEnable, &QPushButton::toggled, &m_dBgraph, &dBgraph::toggleCursors);
 
-	connect(ui->hCursorsEnable,  &QPushButton::toggled,
-		&m_phaseGraph,  &dBgraph::toggleCursors);
+	connect(ui->hCursorsEnable, &QPushButton::toggled, &m_phaseGraph, &dBgraph::toggleCursors);
 
 	connect(ui->posSelect, &CustomPlotPositionButton::positionChanged,
-	[=](CustomPlotPositionButton::ReadoutsPosition position) {
-		m_dBgraph.moveCursorReadouts(position);
-		m_phaseGraph.moveCursorReadouts(position);
-	});
+		[=](CustomPlotPositionButton::ReadoutsPosition position) {
+			m_dBgraph.moveCursorReadouts(position);
+			m_phaseGraph.moveCursorReadouts(position);
+		});
 
-	if (!wheelEventGuard) {
+	if(!wheelEventGuard) {
 		wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
 	}
 
@@ -695,26 +608,25 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 		QString fileNameHint = "Scopy-" + api->objectName() + "-" + date;
 
-		const QList<QByteArray> imageFormats =
-		    QImageWriter::supportedImageFormats();
+		const QList<QByteArray> imageFormats = QImageWriter::supportedImageFormats();
 
 		QStringList filter;
-		if ( imageFormats.size() > 0 ) {
-		    for ( int i = 0; i < imageFormats.size(); i++ ) {
-			filter += (imageFormats[i].toUpper() + " "
-				+ tr("Image") + " (*." +  imageFormats[i] + ")");
-		    }
+		if(imageFormats.size() > 0) {
+			for(int i = 0; i < imageFormats.size(); i++) {
+				filter += (imageFormats[i].toUpper() + " " + tr("Image") + " (*." + imageFormats[i] +
+					   ")");
+			}
 		}
 
 		QString selectedFilter = filter[0];
-			QString fileName = QFileDialog::getSaveFileName(this,
-		    tr("Save to"), fileNameHint, filter.join(";;"),
-		    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+		QString fileName = QFileDialog::getSaveFileName(
+			this, tr("Save to"), fileNameHint, filter.join(";;"), &selectedFilter,
+			(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-		if (fileName.split(".").size() <= 1) {
-		    // file name w/o extension. Let's append it
-		    QString ext = selectedFilter.split(".")[1].split(")")[0];
-		    fileName += "." + ext;
+		if(fileName.split(".").size() <= 1) {
+			// file name w/o extension. Let's append it
+			QString ext = selectedFilter.split(".")[1].split(")")[0];
+			fileName += "." + ext;
 		}
 
 		painter.end();
@@ -723,22 +635,20 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	ui->deltaBtn->setDisabled(ui->btnIsLog->isChecked());
 
-	connect(ui->deltaBtn, &QPushButton::toggled,
-		&m_dBgraph, &dBgraph::useDeltaLabel);
-	connect(ui->deltaBtn, &QPushButton::toggled,
-		&m_phaseGraph, &dBgraph::useDeltaLabel);
+	connect(ui->deltaBtn, &QPushButton::toggled, &m_dBgraph, &dBgraph::useDeltaLabel);
+	connect(ui->deltaBtn, &QPushButton::toggled, &m_phaseGraph, &dBgraph::useDeltaLabel);
 	connect(ui->btnIsLog, &QPushButton::toggled, [=](bool checked) {
 		ui->deltaBtn->setDisabled(checked);
 
-		if (checked) {
+		if(checked) {
 			wasChecked = ui->deltaBtn->isChecked();
 			ui->deltaBtn->setChecked(false);
 		} else {
 			ui->deltaBtn->setChecked(wasChecked);
 		}
 	});
-	connect(ui->dcFilterBtn, &QPushButton::toggled, [=](bool checked){
-		if (checked != filterDc) {
+	connect(ui->dcFilterBtn, &QPushButton::toggled, [=](bool checked) {
+		if(checked != filterDc) {
 			filterDc = checked;
 			dc_cancel1->set_enabled(filterDc);
 			dc_cancel2->set_enabled(filterDc);
@@ -746,16 +656,14 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 	});
 
 	connect(ui->responseGainCmb, QOverload<int>::of(&QComboBox::currentIndexChanged),
-		[=](int value) {
-		autoAdjustGain = (value == 0);
-	});
+		[=](int value) { autoAdjustGain = (value == 0); });
 
-	connect(ui->snapshotBtn, &QCheckBox::clicked, [=](){
+	connect(ui->snapshotBtn, &QCheckBox::clicked, [=]() {
 		m_hasReference = true;
 		bool didAddDbgraph = m_dBgraph.addReferenceWaveformFromPlot();
 		bool didAddPhasegraph = m_phaseGraph.addReferenceWaveformFromPlot();
 
-		if (didAddDbgraph || didAddPhasegraph) {
+		if(didAddDbgraph || didAddPhasegraph) {
 			ui->removeReferenceBtn->setEnabled(true);
 		}
 	});
@@ -766,11 +674,12 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 		ui->removeReferenceBtn->setDisabled(true);
 	});
 
-	connect(ui->importBtn, &QPushButton::clicked, [=](){
-		QString fileName = QFileDialog::getOpenFileName(this,
-		    tr("Import"), "", tr("Comma-separated values files (*.csv);;"
-					       "Tab-delimited values files (*.txt)"),
-		    nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	connect(ui->importBtn, &QPushButton::clicked, [=]() {
+		QString fileName = QFileDialog::getOpenFileName(
+			this, tr("Import"), "",
+			tr("Comma-separated values files (*.csv);;"
+			   "Tab-delimited values files (*.txt)"),
+			nullptr, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
 		FileManager fm("Network Analyzer");
 
@@ -785,7 +694,7 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			QVector<double> frequency, magnitude, phase;
 
-			for (size_t i = 0; i < m_importData.size(); ++i) {
+			for(size_t i = 0; i < m_importData.size(); ++i) {
 				frequency.push_back(m_importData[i][0]);
 				qDebug() << frequency.back();
 				magnitude.push_back(m_importData[i][1]);
@@ -797,10 +706,9 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			m_hasReference = true;
 			ui->removeReferenceBtn->setEnabled(true);
-		} catch (FileManagerException &e) {
+		} catch(FileManagerException &e) {
 			ui->importFileLineEdit->setText(e.what());
 		}
-
 	});
 
 	connect(this, SIGNAL(sweepStart()), ui->xygraph, SLOT(reset()));
@@ -810,19 +718,19 @@ NetworkAnalyzer::NetworkAnalyzer(struct iio_context *ctx, Filter *filt,
 
 NetworkAnalyzer::~NetworkAnalyzer()
 {
-//	disconnect(prefPanel,&Preferences::notify,this,
-//		   &NetworkAnalyzer::readPreferences);
+	//	disconnect(prefPanel,&Preferences::notify,this,
+	//		   &NetworkAnalyzer::readPreferences);
 	startStop(false);
 	ui->runSingleWidget->toggle(false);
 
-//	if (saveOnExit) {
-//		api->save(*settings);
-//	}
+	//	if (saveOnExit) {
+	//		api->save(*settings);
+	//	}
 
 	top_block->disconnect_all();
 
-	if (iterationsThread) {
-		if (iterationsThread->joinable()) {
+	if(iterationsThread) {
+		if(iterationsThread->joinable()) {
 			iterationsThreadCanceled = true;
 			iterationsThread->join();
 		}
@@ -836,36 +744,25 @@ NetworkAnalyzer::~NetworkAnalyzer()
 	delete ui;
 }
 
-QPushButton *NetworkAnalyzer::getRunButton()
+QPushButton *NetworkAnalyzer::getRunButton() { return ui->runSingleWidget->getRunButton(); }
+
+void NetworkAnalyzer::setOscilloscope(Oscilloscope *osc) { bufferPreviewer->setOscilloscope(osc); }
+
+bool NetworkAnalyzer::isIterationsThreadReady() { return iterationsThreadReady; }
+
+bool NetworkAnalyzer::isIterationsThreadCanceled() { return iterationsThreadCanceled; }
+
+void NetworkAnalyzer::onMinMaxPhaseChanged(double value)
 {
-	return ui->runSingleWidget->getRunButton();
-}
 
-void NetworkAnalyzer::setOscilloscope(Oscilloscope *osc)
-{
-	bufferPreviewer->setOscilloscope(osc);
-}
-
-bool NetworkAnalyzer::isIterationsThreadReady()
-{
-	return iterationsThreadReady;
-}
-
-bool NetworkAnalyzer::isIterationsThreadCanceled()
-{
-	return iterationsThreadCanceled;
-}
-
-void NetworkAnalyzer::onMinMaxPhaseChanged(double value) {
-
-	if (QObject::sender() == phaseMin) {
+	if(QObject::sender() == phaseMin) {
 		double phaseMaxValue = phaseMax->value();
-		if (qAbs(phaseMaxValue - value) > 360) {
+		if(qAbs(phaseMaxValue - value) > 360) {
 			phaseMax->setValue(phaseMaxValue - ((int)qAbs(phaseMaxValue - value) % 360));
 		}
 	} else {
 		double phaseMinValue = phaseMin->value();
-		if (qAbs(value - phaseMinValue) > 360) {
+		if(qAbs(value - phaseMinValue) > 360) {
 			phaseMin->setValue(phaseMinValue + ((int)qAbs(value - phaseMinValue) % 360));
 		}
 	}
@@ -876,8 +773,8 @@ void NetworkAnalyzer::onMinMaxPhaseChanged(double value) {
 
 void NetworkAnalyzer::computeIterations()
 {
-	if (iterationsThread) {
-		if (iterationsThread->joinable()) {
+	if(iterationsThread) {
+		if(iterationsThread->joinable()) {
 			iterationsThreadCanceled = true;
 			iterationsThread->join();
 			delete iterationsThread;
@@ -895,26 +792,23 @@ void NetworkAnalyzer::computeIterations()
 	iterationsThread = new std::thread(std::bind(&NetworkAnalyzer::computeFrequencyArray, this));
 }
 
-void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max,
-		double distance)
+void NetworkAnalyzer::setMinimumDistanceBetween(SpinBoxA *min, SpinBoxA *max, double distance)
 {
 
 	connect(max, &SpinBoxA::valueChanged, [=](double value) {
 		min->setMaxValue(value - distance);
-//		min->setValue(min->value());
+		//		min->setValue(min->value());
 	});
 	connect(min, &SpinBoxA::valueChanged, [=](double value) {
 		max->setMinValue(value + distance);
-//		max->setValue(max->value());
+		//		max->setValue(max->value());
 	});
 }
 
-void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn,
-		bool checked)
+void NetworkAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
 {
-	if (ui->rightMenu->animInProgress()) {
-		menuButtonActions.enqueue(
-			QPair<CustomPushButton *, bool>(btn, checked));
+	if(ui->rightMenu->animInProgress()) {
+		menuButtonActions.enqueue(QPair<CustomPushButton *, bool>(btn, checked));
 	} else {
 		toggleRightMenu(btn, checked);
 	}
@@ -924,8 +818,8 @@ void NetworkAnalyzer::toggleRightMenu(CustomPushButton *btn, bool checked)
 {
 	int id = btn->property("id").toInt();
 
-	if (checked) {
-		ui->stackedWidget_2->setCurrentIndex(-id-1);
+	if(checked) {
+		ui->stackedWidget_2->setCurrentIndex(-id - 1);
 	}
 
 	ui->rightMenu->toggleMenu(checked);
@@ -935,16 +829,13 @@ void NetworkAnalyzer::rightMenuFinished(bool opened)
 {
 	Q_UNUSED(opened)
 
-	while (menuButtonActions.size()) {
+	while(menuButtonActions.size()) {
 		auto pair = menuButtonActions.dequeue();
 		toggleRightMenu(pair.first, pair.second);
 	}
 }
 
-void NetworkAnalyzer::showEvent(QShowEvent *event)
-{
-	M2kTool::showEvent(event);
-}
+void NetworkAnalyzer::showEvent(QShowEvent *event) { M2kTool::showEvent(event); }
 
 void NetworkAnalyzer::on_btnExport_clicked()
 {
@@ -955,23 +846,23 @@ void NetworkAnalyzer::on_btnExport_clicked()
 
 	QString selectedFilter = filter[0];
 
-	QString fileName = QFileDialog::getSaveFileName(this,
-	    tr("Export"), "", filter.join(";;"),
-	    &selectedFilter, (m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
+	QString fileName = QFileDialog::getSaveFileName(
+		this, tr("Export"), "", filter.join(";;"), &selectedFilter,
+		(m_useNativeDialogs ? QFileDialog::Options() : QFileDialog::DontUseNativeDialog));
 
-	if (fileName.split(".").size() <= 1) {
+	if(fileName.split(".").size() <= 1) {
 		// file name w/o extension. Let's append it
 		QString ext = selectedFilter.split(".")[1].split(")")[0];
 		fileName += "." + ext;
 	}
 
-	if (!fileName.isEmpty()) {
+	if(!fileName.isEmpty()) {
 		FileManager fm("Network Analyzer");
 
 		fm.open(fileName, FileManager::EXPORT);
 
-		fm.setAdditionalInformation(ui->btnRefChn->isChecked() ?
-					    "Reference channel: 1" : "Reference channel: 2");
+		fm.setAdditionalInformation(ui->btnRefChn->isChecked() ? "Reference channel: 1"
+								       : "Reference channel: 2");
 
 		fm.save(m_dBgraph.getXAxisData(), "Frequency(Hz)");
 		fm.save(m_dBgraph.getYAxisData(), "Magnitude(dB)");
@@ -985,10 +876,10 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 {
 	unsigned int num_samples;
 
-	if (force) {
+	if(force) {
 		num_samples = iterations.size();
 	} else {
-		num_samples = (unsigned int) samplesCount->value();
+		num_samples = (unsigned int)samplesCount->value();
 	}
 
 	m_dBgraph.setNumSamples(num_samples);
@@ -997,7 +888,7 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 	ui->nicholsgraph->setNumSamples(num_samples);
 	bufferPreviewer->setNumBuffers(num_samples);
 
-	if (ui->btnIsLog->isChecked()) {
+	if(ui->btnIsLog->isChecked()) {
 		double num_of_decades = log10(startStopRange->getStopValue() / startStopRange->getStartValue());
 		samplesPerDecadeCount->blockSignals(true);
 		samplesPerDecadeCount->setValue(num_samples / num_of_decades);
@@ -1013,7 +904,7 @@ void NetworkAnalyzer::updateNumSamples(bool force)
 		updateSampleStepSize();
 	}
 
-	if (QObject::sender() == samplesCount) {
+	if(QObject::sender() == samplesCount) {
 		computeIterations();
 	}
 }
@@ -1023,12 +914,12 @@ void NetworkAnalyzer::updateNumSamplesPerDecade(bool force)
 	unsigned int num_samples;
 	unsigned int num_samples_per_decade;
 	double num_of_decades;
-	num_samples_per_decade = (unsigned int) samplesPerDecadeCount->value();
+	num_samples_per_decade = (unsigned int)samplesPerDecadeCount->value();
 	num_of_decades = log10(startStopRange->getStopValue() / startStopRange->getStartValue());
 
 	num_samples = num_samples_per_decade * num_of_decades;
 
-	if (QObject::sender() == samplesPerDecadeCount) {
+	if(QObject::sender() == samplesPerDecadeCount) {
 		samplesCount->setValue(num_samples);
 	}
 }
@@ -1038,9 +929,9 @@ void NetworkAnalyzer::updateSampleStepSize(bool force)
 	double step = samplesStepSize->value();
 	double stop_freq = startStopRange->getStopValue();
 	double start_freq = startStopRange->getStartValue();
-	unsigned int new_num_samples = (unsigned int) (stop_freq - start_freq) / step + 1;
+	unsigned int new_num_samples = (unsigned int)(stop_freq - start_freq) / step + 1;
 
-	if (QObject::sender() == samplesStepSize) {
+	if(QObject::sender() == samplesStepSize) {
 		samplesCount->setValue(new_num_samples);
 	}
 }
@@ -1051,25 +942,25 @@ void NetworkAnalyzer::updateGainMode()
 	int responseChannel = ui->btnRefChn->isChecked() ? 1 : 0;
 	int referenceChannel = 1 - responseChannel;
 
-	if (m_m2k_analogin) {
+	if(m_m2k_analogin) {
 		double sweep_ampl = amplitude->value();
 		auto adc_range_limits = m_m2k_analogin->getRangeLimits(libm2k::analog::PLUS_MINUS_2_5V);
 		double threshold = adc_range_limits.second; // - range.first
 		libm2k::analog::M2K_RANGE gain_mode;
 
-		if ((sweep_ampl / 2.0) + offset->value() > threshold
-				|| -(sweep_ampl / 2.0) + offset->value() < -threshold) {
+		if((sweep_ampl / 2.0) + offset->value() > threshold ||
+		   -(sweep_ampl / 2.0) + offset->value() < -threshold) {
 			gain_mode = libm2k::analog::PLUS_MINUS_25V;
 		} else {
 			gain_mode = libm2k::analog::PLUS_MINUS_2_5V;
 		}
 
-		for (unsigned int chn = 0; chn < m_adc_nb_channels; chn++) {
+		for(unsigned int chn = 0; chn < m_adc_nb_channels; chn++) {
 			libm2k::analog::ANALOG_IN_CHANNEL channel = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(chn);
-			if (chn == referenceChannel) {
+			if(chn == referenceChannel) {
 				m_m2k_analogin->setRange(channel, gain_mode);
-			} else if (chn == responseChannel) {
-				if (!autoAdjustGain) {
+			} else if(chn == responseChannel) {
+				if(!autoAdjustGain) {
 					auto gain = responseGainCmbIndex == 1 ? libm2k::analog::PLUS_MINUS_25V
 									      : libm2k::analog::PLUS_MINUS_2_5V;
 					m_m2k_analogin->setRange(channel, gain);
@@ -1086,26 +977,26 @@ unsigned long NetworkAnalyzer::_getBestSampleRate(double frequency, unsigned int
 	std::vector<double> values = m_m2k_analogout->getAvailableSampleRates(chn_idx);
 	std::sort(values.begin(), values.end(), std::less<double>());
 
-	for (const auto &rate : values) {
-		if (rate == values[0]) {
+	for(const auto &rate : values) {
+		if(rate == values[0]) {
 			continue;
 		}
 
 		size_t bufferSize = _getSamplesCount(frequency, rate, true);
 
-		if (bufferSize) {
+		if(bufferSize) {
 			return rate;
 		}
 	}
 
-	for (const auto &rate : values) {
-		if (rate == values[0]) {
+	for(const auto &rate : values) {
+		if(rate == values[0]) {
 			continue;
 		}
 
 		size_t bufferSize = _getSamplesCount(frequency, rate);
 
-		if (bufferSize) {
+		if(bufferSize) {
 			return rate;
 		}
 	}
@@ -1120,34 +1011,34 @@ size_t NetworkAnalyzer::_getSamplesCount(double frequency, unsigned long rate, b
 
 	double ratio = static_cast<double>(rate) / frequency;
 
-	if (ratio < 10.0 && rate < 75e06) {
+	if(ratio < 10.0 && rate < 75e06) {
 		return 0;
 	}
 
-	if (ratio < 2.5) {
+	if(ratio < 2.5) {
 		return 0;
 	}
 
 	double fract = 0.0;
 	ratio = SignalGenerator::get_best_ratio(ratio, static_cast<double>(maxBufferSize / 4), &fract);
 
-	if (perfect && fract != 0.0) {
+	if(perfect && fract != 0.0) {
 		return 0;
 	}
 
 	size_t size = ratio;
 
 	/* The buffer size must be a multiple of 4 */
-	while (size & 0x3) {
+	while(size & 0x3) {
 		size <<= 1;
 	}
 
 	/* The buffer size shouldn't be too small */
-	while (size < minBufferSize) {
+	while(size < minBufferSize) {
 		size <<= 1;
 	}
 
-	if (size > maxBufferSize) {
+	if(size > maxBufferSize) {
 		return 0;
 	}
 
@@ -1160,7 +1051,7 @@ void NetworkAnalyzer::computeFrequencyArray()
 
 	iterations.clear();
 
-	unsigned int steps = (unsigned int) samplesCount->value();
+	unsigned int steps = (unsigned int)samplesCount->value();
 	double min_freq = startStopRange->getStartValue();
 	double max_freq = startStopRange->getStopValue();
 	double log10_min_freq = log10(min_freq);
@@ -1169,25 +1060,24 @@ void NetworkAnalyzer::computeFrequencyArray()
 
 	bool is_log = ui->btnIsLog->isChecked();
 
-	if (is_log) {
+	if(is_log) {
 		step = (log10_max_freq - log10_min_freq) / (double)(steps - 1);
 	} else {
 		step = (max_freq - min_freq) / (double)(steps - 1);
 	}
 
-	for (unsigned int i = 0; i < steps; ++i) {
+	for(unsigned int i = 0; i < steps; ++i) {
 
-		if (iterationsThreadCanceled) {
+		if(iterationsThreadCanceled) {
 			return;
 		}
 
 		double frequency = 0.0;
 
-		if (is_log) {
-			frequency = pow(10.0,
-					log10_min_freq + (double) i * step);
+		if(is_log) {
+			frequency = pow(10.0, log10_min_freq + (double)i * step);
 		} else {
-			frequency = min_freq + (double) i * step;
+			frequency = min_freq + (double)i * step;
 		}
 
 		unsigned long rate = _getBestSampleRate(frequency, 0);
@@ -1197,10 +1087,7 @@ void NetworkAnalyzer::computeFrequencyArray()
 	}
 
 	// Needs to be invoked on the main thread
-	QMetaObject::invokeMethod(this,
-				  "updateNumSamples",
-				  Qt::QueuedConnection,
-				  Q_ARG(bool, true));
+	QMetaObject::invokeMethod(this, "updateNumSamples", Qt::QueuedConnection, Q_ARG(bool, true));
 
 	iterationsThreadReady = true;
 	lock.unlock();
@@ -1224,7 +1111,7 @@ void NetworkAnalyzer::setFilterParameters()
 	f21->set_filter_gain(iio->freq_comp_filt[1][0]->get_filter_gain());
 	f22->set_filter_gain(iio->freq_comp_filt[1][1]->get_filter_gain());
 
-	if (m_m2k_analogin) {
+	if(m_m2k_analogin) {
 		try {
 			double adc_samplerate = m_m2k_analogin->getSampleRate();
 			f11->set_sample_rate(adc_samplerate);
@@ -1238,7 +1125,7 @@ void NetworkAnalyzer::setFilterParameters()
 			f12->set_high_gain(range0);
 			f21->set_high_gain(range1);
 			f22->set_high_gain(range1);
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
@@ -1260,7 +1147,7 @@ void NetworkAnalyzer::goertzel()
 	// Wait for the iterations thread to finish
 	std::unique_lock<std::mutex> lock(iterationsReadyMutex);
 	iterationsReadyCv.wait(lock, std::bind(&NetworkAnalyzer::isIterationsThreadReady, this));
-	if (iterationsThread) {
+	if(iterationsThread) {
 		iterationsThread->join();
 		delete iterationsThread;
 		iterationsThread = nullptr;
@@ -1268,14 +1155,14 @@ void NetworkAnalyzer::goertzel()
 
 	justStarted = true;
 
-	if (m_m2k_analogin) {
-		for (unsigned int chn_idx = 0; chn_idx < m_adc_nb_channels; chn_idx++) {
+	if(m_m2k_analogin) {
+		for(unsigned int chn_idx = 0; chn_idx < m_adc_nb_channels; chn_idx++) {
 			m_m2k_analogin->enableChannel(chn_idx, true);
 		}
 	}
 
 	Q_EMIT sweepStart();
-	for (int i = 0; !m_stop && i < iterations.size(); ++i) {
+	for(int i = 0; !m_stop && i < iterations.size(); ++i) {
 
 		// Get current sweep settings
 		unsigned long rate = iterations[i].rate;
@@ -1288,24 +1175,22 @@ void NetworkAnalyzer::goertzel()
 		// Create and push the generated sine waves to the DACs
 		std::vector<std::vector<double>> buffers;
 
-		if (m_m2k_analogout) {
+		if(m_m2k_analogout) {
 			try {
-				for (unsigned int chn_idx = 0; chn_idx < m_dac_nb_channels; chn_idx++) {
+				for(unsigned int chn_idx = 0; chn_idx < m_dac_nb_channels; chn_idx++) {
 					m_m2k_analogout->enableChannel(chn_idx, true);
-					std::vector<double> buf_dac = generateSinWave(chn_idx,
-										      frequency, amplitudeValue, offsetValue,
-										      rate, samples_count);
+					std::vector<double> buf_dac = generateSinWave(
+						chn_idx, frequency, amplitudeValue, offsetValue, rate, samples_count);
 					buffers.push_back(buf_dac);
 				}
 				// Sleep before DACs start
 				QThread::msleep(pushDelay->value());
 				m_m2k_analogout->push(buffers);
-			} catch (libm2k::m2k_exception &e) {
+			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
 				return;
 			}
 		}
-
 
 		size_t buffer_size = 0;
 		size_t adc_rate = 0;
@@ -1313,7 +1198,7 @@ void NetworkAnalyzer::goertzel()
 		// Compute capture params for the ADC
 		computeCaptureParams(frequency, buffer_size, adc_rate);
 
-		if (buffer_size == 0) {
+		if(buffer_size == 0) {
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << "buffer size 0";
 			return;
 		}
@@ -1328,41 +1213,39 @@ void NetworkAnalyzer::goertzel()
 		goertzel1->set_rate(adc_rate);
 		goertzel2->set_rate(adc_rate);
 
-
-		if (m_m2k_analogin) {
+		if(m_m2k_analogin) {
 			try {
 				m_m2k_analogin->setOversamplingRatio(1);
 				m_m2k_analogin->setSampleRate(adc_rate);
-			} catch (libm2k::m2k_exception &e) {
+			} catch(libm2k::m2k_exception &e) {
 				HANDLE_EXCEPTION(e)
 				qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 			}
 		}
-
 
 		setFilterParameters();
 
 		// Sleep before ADC capture
 		QThread::msleep(captureDelay->value());
 
-		for (unsigned int avg = 1; avg <= m_nb_averaging; avg++) {
-			const short* buffer_p = nullptr;
-			if (m_m2k_analogin) {
+		for(unsigned int avg = 1; avg <= m_nb_averaging; avg++) {
+			const short *buffer_p = nullptr;
+			if(m_m2k_analogin) {
 				try {
 					buffer_p = m_m2k_analogin->getSamplesRawInterleaved(buffer_size);
-				} catch (libm2k::m2k_exception &e) {
+				} catch(libm2k::m2k_exception &e) {
 					HANDLE_EXCEPTION(e)
 					qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 					return;
 				}
-				if (m_stop) {
+				if(m_stop) {
 					return;
 				}
 			}
 
 			std::vector<short> data0;
 			std::vector<short> data1;
-			for (unsigned int data_i = 0; data_i < buffer_size; data_i++) {
+			for(unsigned int data_i = 0; data_i < buffer_size; data_i++) {
 				data0.push_back(buffer_p[data_i * 2]);
 				data1.push_back(buffer_p[data_i * 2 + 1]);
 			}
@@ -1390,55 +1273,43 @@ void NetworkAnalyzer::goertzel()
 			mag1_averaged_sum += mag1;
 			mag2_averaged_sum += mag2;
 			dcOffset_averaged_sum += dcOffset;
-			ui->currentAverageLabel->setText(QString(tr("Average: ") + QString::number(avg)
-								 + " / " + QString::number(m_nb_averaging)));
-			if (avg == m_nb_averaging) {
+			ui->currentAverageLabel->setText(QString(tr("Average: ") + QString::number(avg) + " / " +
+								 QString::number(m_nb_averaging)));
+			if(avg == m_nb_averaging) {
 				mag1 = mag1_averaged_sum / m_nb_averaging;
 				mag2 = mag2_averaged_sum / m_nb_averaging;
 				dcOffset = dcOffset_averaged_sum / m_nb_averaging;
 
 				dcOffset = m_m2k_analogin->convertRawToVolts(1, dcOffset);
 
-				QMetaObject::invokeMethod(this,
-							  "_saveChannelBuffers",
-							  Qt::QueuedConnection,
-							  Q_ARG(double, frequency),
-							  Q_ARG(double, adc_rate),
+				QMetaObject::invokeMethod(this, "_saveChannelBuffers", Qt::QueuedConnection,
+							  Q_ARG(double, frequency), Q_ARG(double, adc_rate),
 							  Q_ARG(std::vector<float>, sink1->data()),
 							  Q_ARG(std::vector<float>, sink2->data()));
 
 				// Plot the data captured for this iteration
-				QMetaObject::invokeMethod(this,
-							  "plot",
-							  Qt::QueuedConnection,
-							  Q_ARG(double, frequency),
-							  Q_ARG(double, mag1),
-							  Q_ARG(double, mag2),
-							  Q_ARG(double, phase),
-							  Q_ARG(float, dcOffset));
+				QMetaObject::invokeMethod(this, "plot", Qt::QueuedConnection, Q_ARG(double, frequency),
+							  Q_ARG(double, mag1), Q_ARG(double, mag2),
+							  Q_ARG(double, phase), Q_ARG(float, dcOffset));
 
 				mag1_averaged_sum = 0;
 				mag2_averaged_sum = 0;
 				dcOffset_averaged_sum = 0;
 				m_averaged_count = 0;
-
 			}
 		}
 
 		m_m2k_analogout->stop();
 
 		// Process was cancelled
-		if (m_stop) {
+		if(m_stop) {
 			return;
 		}
 	}
 	Q_EMIT sweepDone();
 }
 
-void NetworkAnalyzer::onFrequencyBarMoved(int pos)
-{
-	d_frequencyHandle->setPositionSilenty(pos);
-}
+void NetworkAnalyzer::onFrequencyBarMoved(int pos) { d_frequencyHandle->setPositionSilenty(pos); }
 
 void NetworkAnalyzer::toggleBufferPreview(bool toggle)
 {
@@ -1449,7 +1320,8 @@ void NetworkAnalyzer::toggleBufferPreview(bool toggle)
 	ui->nextBtn->setEnabled(toggle);
 }
 
-void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1, std::vector<float> data2)
+void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, std::vector<float> data1,
+					  std::vector<float> data2)
 {
 	std::unique_lock<std::mutex> lock(bufferMutex);
 
@@ -1459,29 +1331,28 @@ void NetworkAnalyzer::_saveChannelBuffers(double frequency, double sample_rate, 
 	bufferPreviewer->pushBuffers(QPair<Buffer, Buffer>(buffer1, buffer2));
 }
 
-void NetworkAnalyzer::computeCaptureParams(double frequency,
-		size_t& buffer_size, size_t& adc_rate)
+void NetworkAnalyzer::computeCaptureParams(double frequency, size_t &buffer_size, size_t &adc_rate)
 {
 	size_t nrOfPeriods = m_nb_periods;
 
-	for (const auto& rate : sampleRates) {
+	for(const auto &rate : sampleRates) {
 
-		if (rate == sampleRates[0]) {
+		if(rate == sampleRates[0]) {
 			continue;
 		}
 
 		double ratio = rate / frequency;
 		buffer_size = ratio * nrOfPeriods;
 
-		if (ratio < 2.5) {
+		if(ratio < 2.5) {
 			continue;
 		}
 
-		if (ratio < 10 && rate < sampleRates.back()) {
+		if(ratio < 10 && rate < sampleRates.back()) {
 			continue;
 		}
 
-		while (buffer_size < 160) {
+		while(buffer_size < 160) {
 			buffer_size <<= 1;
 		}
 
@@ -1504,7 +1375,7 @@ QPair<double, double> NetworkAnalyzer::getPhaseInterval()
 	intervalMax = maxValue;
 	intervalMin = intervalMax - 360;
 
-	if (intervalMin < lo) {
+	if(intervalMin < lo) {
 		intervalMin = lo;
 		intervalMax = lo + 360;
 	}
@@ -1512,14 +1383,13 @@ QPair<double, double> NetworkAnalyzer::getPhaseInterval()
 	return QPair<double, double>(intervalMin, intervalMax);
 }
 
-void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
-			   double phase, float dcVoltage)
+void NetworkAnalyzer::plot(double frequency, double mag1, double mag2, double phase, float dcVoltage)
 {
 	double mag;
 	static double magBonus = 0;
 	static int currentSample = 0;
 
-	if (ui->btnRefChn->isChecked()) {
+	if(ui->btnRefChn->isChecked()) {
 		phase = -phase;
 
 		mag = 10.0 * log10(mag2) - 10.0 * log10(mag1);
@@ -1533,14 +1403,14 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 
 	auto interval = getPhaseInterval();
 
-	if (phase_deg > interval.second) {
+	if(phase_deg > interval.second) {
 		adjusted_phase_deg = (int)phase_deg - 360;
-	} else if (phase_deg < interval.first) {
+	} else if(phase_deg < interval.first) {
 		adjusted_phase_deg = (int)phase_deg + 360;
 	}
 
 	static int index = 0;
-	if (justStarted) {
+	if(justStarted) {
 		currentSample = 0;
 		justStarted = false;
 		ui->currentFrequencyLabel->setVisible(true);
@@ -1550,8 +1420,8 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 		magBonus = autoUpdateGainMode(mag, magBonus, dcVoltage);
 	}
 
-	ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + currentSample++ )
-						+ " / " + QString::number(m_dBgraph.getNumSamples()) + " "));
+	ui->currentSampleLabel->setText(QString(tr("Sample: ") + QString::number(1 + currentSample++) + " / " +
+						QString::number(m_dBgraph.getNumSamples()) + " "));
 
 	MetricPrefixFormatter d_cursorTimeFormatter;
 	d_cursorTimeFormatter.setTwoDecimalMode(false);
@@ -1576,11 +1446,11 @@ void NetworkAnalyzer::plot(double frequency, double mag1, double mag2,
 	QString gain = !m_m2k_analogin->getRange(chn) ? tr("Low") : tr("High");
 	ui->gainLabel->setText(tr("Gain Mode: ") + gain);
 
-	if (iterationStats.size() < samplesCount->value()) {
+	if(iterationStats.size() < samplesCount->value()) {
 		iterationStats.push_back(NetworkIterationStats(dcVoltage, m_m2k_analogin->getRange(chn), hasError));
 	} else {
 		iterationStats[index++] = NetworkIterationStats(dcVoltage, m_m2k_analogin->getRange(chn), hasError);
-		if (index == iterationStats.size()) {
+		if(index == iterationStats.size()) {
 			index = 0;
 		}
 	}
@@ -1595,7 +1465,7 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 
 	try {
 		vlsb = m_m2k_analogin->getScalingFactor(static_cast<ANALOG_IN_CHANNEL>(responseChannel));
-	} catch (libm2k::m2k_exception &e) {
+	} catch(libm2k::m2k_exception &e) {
 		HANDLE_EXCEPTION(e)
 		qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		return false;
@@ -1603,7 +1473,7 @@ bool NetworkAnalyzer::_checkMagForOverrange(double magnitude)
 
 	double magnitudeThreshold = 20 * std::log10(3 * vlsb / amplitude->value());
 
-	if (magnitude < magnitudeThreshold) {
+	if(magnitude < magnitudeThreshold) {
 		ui->errorLabel->setText(tr("Response channel voltage < 50mV!"));
 		m_dBgraph.parametersOverrange(true);
 		m_phaseGraph.parametersOverrange(true);
@@ -1635,21 +1505,20 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 	libm2k::analog::M2K_RANGE gain;
 
 	auto insideDeltaZone = [&](double voltage) {
-		return (voltage > hi_lo && voltage < hi_hi)
-				|| (voltage < lo_hi && voltage > lo_lo);
+		return (voltage > hi_lo && voltage < hi_hi) || (voltage < lo_hi && voltage > lo_lo);
 	};
 
 	bool noAdjustAllowedUp = insideDeltaZone(Vout / 2.0 + dcVoltage);
 	bool noAdjustAllowedDown = insideDeltaZone(-Vout / 2.0 + dcVoltage);
 
-	if (Vout / 2.0 + dcVoltage >= hi_lo || -Vout / 2.0 + dcVoltage <= lo_hi) {
-		if (noAdjustAllowedDown && noAdjustAllowedUp) {
+	if(Vout / 2.0 + dcVoltage >= hi_lo || -Vout / 2.0 + dcVoltage <= lo_hi) {
+		if(noAdjustAllowedDown && noAdjustAllowedUp) {
 			return magnitudeGain;
 		}
 		gain = libm2k::analog::PLUS_MINUS_25V;
 	}
-	if (Vout / 2.0 + dcVoltage < hi_hi && -Vout / 2.0 + dcVoltage > lo_lo) {
-		if (noAdjustAllowedDown || noAdjustAllowedUp) {
+	if(Vout / 2.0 + dcVoltage < hi_hi && -Vout / 2.0 + dcVoltage > lo_lo) {
+		if(noAdjustAllowedDown || noAdjustAllowedUp) {
 			return magnitudeGain;
 		}
 		gain = libm2k::analog::PLUS_MINUS_2_5V;
@@ -1658,13 +1527,12 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 	int responseChannel = ui->btnRefChn->isChecked() ? 1 : 0;
 	libm2k::analog::ANALOG_IN_CHANNEL chn = static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(responseChannel);
 
-	double value = m_m2k_analogin->getValueForRange(PLUS_MINUS_25V) /
-			m_m2k_analogin->getValueForRange(PLUS_MINUS_2_5V);
+	double value =
+		m_m2k_analogin->getValueForRange(PLUS_MINUS_25V) / m_m2k_analogin->getValueForRange(PLUS_MINUS_2_5V);
 	double magnitudeGainBetweenGainModes = 10.0 * log10(1.0 / value) - 10.0 * log10(1.0 * value);
 
-
-	if (m_m2k_analogin->getRange(chn) != gain) {
-		if (autoAdjustGain) {
+	if(m_m2k_analogin->getRange(chn) != gain) {
+		if(autoAdjustGain) {
 			m_m2k_analogin->setRange(chn, gain);
 		} else {
 			int selectedResponseGain = ui->responseGainCmb->currentIndex();
@@ -1672,14 +1540,18 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 							  : libm2k::analog::PLUS_MINUS_2_5V);
 		}
 
-		if (gain == libm2k::analog::PLUS_MINUS_25V) {
-			if (gain != m_m2k_analogin->getRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(1 - responseChannel))) {
+		if(gain == libm2k::analog::PLUS_MINUS_25V) {
+			if(gain !=
+			   m_m2k_analogin->getRange(
+				   static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(1 - responseChannel))) {
 				return magnitudeGainBetweenGainModes;
 			} else {
 				return 0.0;
 			}
 		} else {
-			if (gain != m_m2k_analogin->getRange(static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(1 - responseChannel))) {
+			if(gain !=
+			   m_m2k_analogin->getRange(
+				   static_cast<libm2k::analog::ANALOG_IN_CHANNEL>(1 - responseChannel))) {
 				return -magnitudeGainBetweenGainModes;
 			} else {
 				return 0.0;
@@ -1689,7 +1561,6 @@ double NetworkAnalyzer::autoUpdateGainMode(double magnitude, double magnitudeGai
 
 	return magnitudeGain;
 }
-
 
 void NetworkAnalyzer::run()
 {
@@ -1706,7 +1577,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 {
 	m_stop = !pressed;
 
-	if (m_running == pressed) {
+	if(m_running == pressed) {
 		return;
 	}
 
@@ -1715,7 +1586,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 	m_phaseGraph.startStop(pressed);
 
 	bool shouldClear = false;
-	if (QObject::sender() == ui->runSingleWidget) {
+	if(QObject::sender() == ui->runSingleWidget) {
 		shouldClear = true;
 	}
 
@@ -1734,11 +1605,11 @@ void NetworkAnalyzer::startStop(bool pressed)
 	ui->spinBox_averaging->setEnabled(!pressed);
 	ui->spinBox_periods->setEnabled(!pressed);
 
-	if (pressed) {
-		ResourceManager::open("m2k-adc",this);
-		ResourceManager::open("m2k-dac",this);
+	if(pressed) {
+		ResourceManager::open("m2k-adc", this);
+		ResourceManager::open("m2k-dac", this);
 		m_m2k_analogin->setKernelBuffersCount(1);
-		if (shouldClear) {
+		if(shouldClear) {
 			m_dBgraph.reset();
 			m_phaseGraph.reset();
 			ui->xygraph->reset();
@@ -1761,7 +1632,7 @@ void NetworkAnalyzer::startStop(bool pressed)
 			thd.waitForFinished();
 			m_m2k_analogin->stopAcquisition();
 			m_m2k_analogout->stop();
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
@@ -1772,26 +1643,24 @@ void NetworkAnalyzer::startStop(bool pressed)
 		ResourceManager::close("m2k-adc");
 		try {
 			m_m2k_analogin->setKernelBuffersCount(KERNEL_BUFFERS_DEFAULT);
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			qDebug() << e.what();
 		}
 	}
 }
 
-std::vector<double> NetworkAnalyzer::generateSinWave(
-	unsigned int chn_idx, double frequency,
-	double amplitude, double offset,
-	unsigned long rate, size_t samples_count)
+std::vector<double> NetworkAnalyzer::generateSinWave(unsigned int chn_idx, double frequency, double amplitude,
+						     double offset, unsigned long rate, size_t samples_count)
 {
 
-	if (m_m2k_analogout) {
+	if(m_m2k_analogout) {
 		try {
 			m_m2k_analogout->setSampleRate(chn_idx, rate);
 			m_m2k_analogout->setOversamplingRatio(chn_idx, 1);
-			if (!m_m2k_analogout->isChannelEnabled(chn_idx)) {
+			if(!m_m2k_analogout->isChannelEnabled(chn_idx)) {
 				return {};
 			}
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
@@ -1811,7 +1680,7 @@ std::vector<double> NetworkAnalyzer::generateSinWave(
 	head_block->set_length(samples_count);
 	top_block->run();
 
-	const std::vector<float>& f_samples = vector_block->data();
+	const std::vector<float> &f_samples = vector_block->data();
 	std::vector<double> samples(f_samples.begin(), f_samples.end());
 
 	return samples;
@@ -1819,23 +1688,23 @@ std::vector<double> NetworkAnalyzer::generateSinWave(
 
 void NetworkAnalyzer::configHwForNetworkAnalyzing()
 {
-	if (m_m2k_analogin) {
+	if(m_m2k_analogin) {
 		try {
 			m_m2k_analogin->setOversamplingRatio(1);
-			for (unsigned int i = 0; i < m_m2k_analogin->getNbChannels(); i++) {
+			for(unsigned int i = 0; i < m_m2k_analogin->getNbChannels(); i++) {
 				m_m2k_analogin->setVerticalOffset(static_cast<ANALOG_IN_CHANNEL>(i), 0);
 			}
 
 			auto trigger = m_m2k_analogin->getTrigger();
-			if (!trigger) {
+			if(!trigger) {
 				return;
 			}
-			for (unsigned int i = 0; i < m_m2k_analogin->getNbChannels(); i++) {
+			for(unsigned int i = 0; i < m_m2k_analogin->getNbChannels(); i++) {
 				trigger->setAnalogMode(i, libm2k::ALWAYS);
 				trigger->setAnalogDelay(0);
 			}
 
-		} catch (libm2k::m2k_exception &e) {
+		} catch(libm2k::m2k_exception &e) {
 			HANDLE_EXCEPTION(e)
 			qDebug(CAT_M2K_NETWORK_ANALYZER) << e.what();
 		}
@@ -1844,11 +1713,11 @@ void NetworkAnalyzer::configHwForNetworkAnalyzing()
 
 void NetworkAnalyzer::toggleCursors(bool en)
 {
-	if (!en) {
+	if(!en) {
 		ui->btnCursors->setChecked(en);
 	}
 
-	if (d_cursorsEnabled != en) {
+	if(d_cursorsEnabled != en) {
 		d_cursorsEnabled = en;
 		m_dBgraph.toggleCursors(en);
 		m_phaseGraph.toggleCursors(en);
@@ -1869,30 +1738,15 @@ void NetworkAnalyzer::readPreferences()
 
 	ui->instrumentNotes->setVisible(p->get("m2k_instrument_notes_active").toBool());
 
-//	autoAdjustGain = prefPanel->getNaGainUpdateEnabled();
+	//	autoAdjustGain = prefPanel->getNaGainUpdateEnabled();
 }
 
-void NetworkAnalyzer::onGraphIndexChanged(int index)
-{
-	ui->stackedWidget->setCurrentIndex(index);
-}
+void NetworkAnalyzer::onGraphIndexChanged(int index) { ui->stackedWidget->setCurrentIndex(index); }
 
-void NetworkAnalyzer::on_spinBox_averaging_valueChanged(int n)
-{
-	m_nb_averaging = n;
-}
+void NetworkAnalyzer::on_spinBox_averaging_valueChanged(int n) { m_nb_averaging = n; }
 
-void NetworkAnalyzer::validateSpinboxAveraging()
-{
-	on_spinBox_averaging_valueChanged(ui->spinBox_averaging->value());
-}
+void NetworkAnalyzer::validateSpinboxAveraging() { on_spinBox_averaging_valueChanged(ui->spinBox_averaging->value()); }
 
-void NetworkAnalyzer::on_spinBox_periods_valueChanged(int n)
-{
-	m_nb_periods = n;
-}
+void NetworkAnalyzer::on_spinBox_periods_valueChanged(int n) { m_nb_periods = n; }
 
-void NetworkAnalyzer::validateSpinboxPeriods()
-{
-	on_spinBox_periods_valueChanged(ui->spinBox_periods->value());
-}
+void NetworkAnalyzer::validateSpinboxPeriods() { on_spinBox_periods_valueChanged(ui->spinBox_periods->value()); }

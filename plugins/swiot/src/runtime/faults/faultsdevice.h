@@ -18,28 +18,30 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef FAULTSDEVICE_H
 #define FAULTSDEVICE_H
 
-#include <QWidget>
-#include <QTextEdit>
-#include "ui_faultsdevice.h"
 #include "faultsgroup.h"
-#include <gui/subsection_separator.hpp>
+
+#include "ui_faultsdevice.h"
+
 #include <iio.h>
+
+#include <QTextEdit>
+#include <QWidget>
+
+#include <gui/subsection_separator.hpp>
 #include <iioutil/commandqueue.h>
 
 namespace scopy::swiot {
 class FaultsGroup;
 
-class FaultsDevice : public QWidget {
+class FaultsDevice : public QWidget
+{
 	Q_OBJECT
 public:
-	explicit FaultsDevice(const QString& name, QString path, struct iio_device* device,
-			      struct iio_device* swiot, struct iio_context *context,
-			      QVector<uint32_t> &registers,
-			      QWidget* parent = nullptr);
+	explicit FaultsDevice(const QString &name, QString path, struct iio_device *device, struct iio_device *swiot,
+			      struct iio_context *context, QVector<uint32_t> &registers, QWidget *parent = nullptr);
 	~FaultsDevice();
 
 	void update();
@@ -74,23 +76,23 @@ private:
 
 	CommandQueue *m_cmdQueue;
 
-	FaultsGroup* m_faultsGroup;
-	QVector<QWidget*> m_faultExplanationWidgets;
+	FaultsGroup *m_faultsGroup;
+	QVector<QWidget *> m_faultExplanationWidgets;
 
 	QString m_name;
 	QString m_path;
 
-	struct iio_device* m_device;
-	struct iio_device* m_swiot;
-	struct iio_context* m_context;
+	struct iio_device *m_device;
+	struct iio_device *m_swiot;
+	struct iio_context *m_context;
 
 	uint32_t m_faultNumeric;
 	QVector<uint32_t> m_registers;
 	QVector<uint32_t> m_registerValues;
-	QVector<Command*> m_deviceConfigCmds;
-	QVector<Command*> m_functionConfigCmds;
+	QVector<Command *> m_deviceConfigCmds;
+	QVector<Command *> m_functionConfigCmds;
 };
 
-} // scopy::swiot
+} // namespace scopy::swiot
 
-#endif //FAULTSDEVICE_H
+#endif // FAULTSDEVICE_H

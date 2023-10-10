@@ -1,4 +1,5 @@
 #include "pluginenablewidget.h"
+
 #include "qboxlayout.h"
 
 using namespace scopy;
@@ -19,12 +20,11 @@ PluginEnableWidget::PluginEnableWidget(QWidget *parent)
 	layout->setAlignment(m_checkBox, Qt::AlignTop);
 	layout->addWidget(m_descriptionLabel);
 	layout->setAlignment(m_descriptionLabel, Qt::AlignTop);
-	layout->setStretch(0,1);
-	layout->setStretch(1,3);
+	layout->setStretch(0, 1);
+	layout->setStretch(1, 3);
 }
 
-PluginEnableWidget::~PluginEnableWidget()
-{}
+PluginEnableWidget::~PluginEnableWidget() {}
 
 void PluginEnableWidget::setDescription(QString description)
 {
@@ -32,7 +32,6 @@ void PluginEnableWidget::setDescription(QString description)
 	m_descriptionLabel->setText(description);
 }
 
-QCheckBox *PluginEnableWidget::checkBox() const
-{
-	return m_checkBox;
-}
+QCheckBox *PluginEnableWidget::checkBox() const { return m_checkBox; }
+
+#include "moc_pluginenablewidget.cpp"

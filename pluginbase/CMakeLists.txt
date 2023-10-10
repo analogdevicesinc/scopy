@@ -5,8 +5,7 @@ project(scopy-${SCOPY_MODULE} VERSION 0.1 LANGUAGES CXX)
 
 include(GenerateExportHeader)
 
-# TODO: split stylesheet/resources and add here
-# TODO: export header files correctly
+# TODO: split stylesheet/resources and add here TODO: export header files correctly
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -22,52 +21,55 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
-FILE(GLOB SRC_LIST  src/*.cpp src/*.cc)
-FILE(GLOB HEADER_LIST src/*.hpp src/*.h include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
-FILE(GLOB UI_LIST ui/*.ui)
+file(GLOB SRC_LIST src/*.cpp src/*.cc)
+file(
+	GLOB
+	HEADER_LIST
+	src/*.hpp
+	src/*.h
+	include/${SCOPY_MODULE}/*.h
+	include/${SCOPY_MODULE}/*.hpp
+)
+file(GLOB UI_LIST ui/*.ui)
 
 if(ENABLE_TESTING)
-    add_subdirectory(test)
+	add_subdirectory(test)
 endif()
 
 set(SCOPY_QT_COMPONENTS Core Widgets Concurrent)
 
 option(ENABLE_SCOPYJS "Enable plugin scripting via JSEngine - requires QML" ON)
 if(ENABLE_SCOPYJS)
-    set(SCOPY_QT_COMPONENTS ${SCOPY_QT_COMPONENTS} Qml)
-    message(STATUS "PLUGINBASE: scopy-js enabled")
+	set(SCOPY_QT_COMPONENTS ${SCOPY_QT_COMPONENTS} Qml)
+	message(STATUS "PLUGINBASE: scopy-js enabled")
 endif()
 
-configure_file(include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
-    ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY)
+configure_file(
+	include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h.cmakein
+	${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h @ONLY
+)
 set(SRC_LIST ${SRC_LIST} ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/scopy-${SCOPY_MODULE}_config.h)
 
-set(PROJECT_SOURCES
-        ${SRC_LIST}
-        ${HEADER_LIST}
-        ${UI_LIST}
-)
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS ${SCOPY_QT_COMPONENTS} REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED
-    ${PROJECT_SOURCES}
+add_library(${PROJECT_NAME} SHARED ${PROJECT_SOURCES})
+
+generate_export_header(
+	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-generate_export_header(${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h)
-
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} scopy-common)
+target_include_directories(
+	${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
+				scopy-common
+)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
-    set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
+	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-	${SCOPY_QT_LIBRARIES}
-        ${IIO_LIBRARIES}
-	scopy-common)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} ${IIO_LIBRARIES} scopy-common)
 
-install(TARGETS ${PROJECT_NAME}
-	LIBRARY DESTINATION ${SCOPY_DLL_PATH}
-	RUNTIME DESTINATION ${SCOPY_DLL_PATH})
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_PATH} RUNTIME DESTINATION ${SCOPY_DLL_PATH})

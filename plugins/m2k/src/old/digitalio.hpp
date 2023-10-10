@@ -21,22 +21,23 @@
 #ifndef DIGITAL_IO_H
 #define DIGITAL_IO_H
 
-#include <QWidget>
-#include <QPushButton>
-#include <QVector>
-#include <vector>
-#include <string>
+#include "digitalchannel_manager.hpp"
+#include "filter.hpp"
+#include "m2ktool.hpp"
+#include "pluginbase/apiobject.h"
+
 #include <QList>
 #include <QPair>
+#include <QPushButton>
 #include <QTimer>
-#include "filter.hpp"
-#include "digitalchannel_manager.hpp"
+#include <QVector>
+#include <QWidget>
 
-#include "pluginbase/apiobject.h"
-#include "m2ktool.hpp"
+#include <string>
+#include <vector>
 
-
-extern "C" {
+extern "C"
+{
 	struct iio_context;
 	struct iio_device;
 	struct iio_channel;
@@ -49,7 +50,7 @@ class DigitalIoMenu;
 class dioElement;
 class dioGroup;
 class dioChannel;
-}
+} // namespace Ui
 
 namespace scopy::m2k {
 class DigitalIO;
@@ -64,12 +65,12 @@ class DigitalIoGroup : public QWidget
 	int ch_mask;
 	int io_mask;
 	DigitalIO *dio;
+
 public:
-	DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio,
-	               QWidget *parent=0);
+	DigitalIoGroup(QString label, int ch_mask, int io_mask, DigitalIO *dio, QWidget *parent = 0);
 	~DigitalIoGroup();
 	Ui::dioElement *ui;
-	QList<QPair<QWidget *,Ui::dioChannel *>*> chui;
+	QList<QPair<QWidget *, Ui::dioChannel *> *> chui;
 
 Q_SIGNALS:
 	void slider(int val);
@@ -97,15 +98,14 @@ private:
 	DIOManager *diom;
 	int polling_rate = 500; // ms
 
-	QPair<QWidget *,Ui::dioChannel *>  *findIndividualUi(int ch);
+	QPair<QWidget *, Ui::dioChannel *> *findIndividualUi(int ch);
 
 private Q_SLOTS:
 	void readPreferences() override;
 
 public:
-	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem,
-	                   DIOManager *diom, QJSEngine *engine,
-			   QWidget *parent, bool offline_mode = 0);
+	explicit DigitalIO(struct iio_context *ctx, Filter *filt, ToolMenuEntry *toolMenuItem, DIOManager *diom,
+			   QJSEngine *engine, QWidget *parent, bool offline_mode = 0);
 	~DigitalIO();
 	void setDirection(int ch, int direction);
 	void setOutput(int ch, int out);
@@ -123,7 +123,6 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void showTool();
 };
-} /* namespace scopy */
+} // namespace scopy::m2k
 
 #endif // DIGITAL_IO_H
-

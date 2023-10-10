@@ -1,20 +1,22 @@
 #ifndef REGREADWRITE_HPP
 #define REGREADWRITE_HPP
 
-#include <QObject>
-#include <iio.h>
 #include "scopy-regmapplugin_export.h"
+
+#include <iio.h>
+
+#include <QObject>
 
 // TODO set the right buf size
 #define BUF_SIZE 16384
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 class SCOPY_REGMAPPLUGIN_EXPORT RegReadWrite : public QObject
 {
 	Q_OBJECT
 
 public:
-	explicit RegReadWrite( struct iio_device *dev, QObject *parent = nullptr);
+	explicit RegReadWrite(struct iio_device *dev, QObject *parent = nullptr);
 
 	~RegReadWrite();
 
@@ -30,5 +32,5 @@ Q_SIGNALS:
 private:
 	struct iio_device *dev;
 };
-}
+} // namespace scopy::regmap
 #endif // REGREADWRITE_HPP

@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 class BitFieldModel;
 class BitFieldDetailedWidget;
 
@@ -15,7 +15,6 @@ public:
 
 	BitFieldDetailedWidget *buildWidget(BitFieldModel *model);
 Q_SIGNALS:
-
 };
-}
+} // namespace scopy::regmap
 #endif // BITFIELDDETAILEDWIDGETFACTORY_HPP

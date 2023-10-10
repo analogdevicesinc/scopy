@@ -18,8 +18,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include "marker_table.hpp"
-#include "ui_marker_table.h"
+
 #include "plot_utils.hpp"
+
+#include "ui_marker_table.h"
 
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
@@ -32,9 +34,9 @@ using namespace scopy;
 class FrequencyDelegate : public QStyledItemDelegate
 {
 public:
-	FrequencyDelegate(QObject *parent = 0): QStyledItemDelegate(parent)
-	{
-	}
+	FrequencyDelegate(QObject *parent = 0)
+		: QStyledItemDelegate(parent)
+	{}
 
 	virtual QString displayText(const QVariant &value, const QLocale &locale) const
 	{
@@ -43,6 +45,7 @@ public:
 		double freq = value.toDouble();
 		return formatter.format(freq, "Hz", 3);
 	}
+
 private:
 	scopy::MetricPrefixFormatter formatter;
 };
@@ -53,9 +56,9 @@ private:
 class ChannelDelegate : public QStyledItemDelegate
 {
 public:
-	ChannelDelegate(QObject *parent = 0): QStyledItemDelegate(parent)
-	{
-	}
+	ChannelDelegate(QObject *parent = 0)
+		: QStyledItemDelegate(parent)
+	{}
 
 	virtual QString displayText(const QVariant &value, const QLocale &locale) const
 	{
@@ -70,9 +73,9 @@ public:
  * Class MarkerTable
  */
 
-MarkerTable::MarkerTable(QWidget *parent) :
-QWidget(parent),
-ui(new Ui::MarkerTable)
+MarkerTable::MarkerTable(QWidget *parent)
+	: QWidget(parent)
+	, ui(new Ui::MarkerTable)
 {
 	ui->setupUi(this);
 
@@ -89,8 +92,7 @@ ui(new Ui::MarkerTable)
 	ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 	ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 	ui->tableView->horizontalHeader()->setStretchLastSection(true);
-	ui->tableView->horizontalHeader()->setSectionResizeMode(
-		QHeaderView::ResizeToContents);
+	ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	ui->tableView->horizontalHeader()->setHighlightSections(false);
 	ui->tableView->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft);
 	ui->tableView->verticalHeader()->hide();
@@ -106,20 +108,17 @@ ui(new Ui::MarkerTable)
 	ui->tableView->setItemDelegateForColumn(COL_CH, chnDelegate);
 }
 
-MarkerTable::~MarkerTable()
-{
-	delete ui;
-}
+MarkerTable::~MarkerTable() { delete ui; }
 
 int MarkerTable::rowOfMarker(int mkIdx, int chIdx) const
 {
 	int markerRow = -1;
 
-	for (int r = 0; r < model->rowCount(); r++) {
+	for(int r = 0; r < model->rowCount(); r++) {
 		int id = model->item(r, COL_ID)->data(Qt::DisplayRole).toInt();
 		int ch = model->item(r, COL_CH)->data(Qt::DisplayRole).toInt();
 
-		if (id == mkIdx && ch == chIdx) {
+		if(id == mkIdx && ch == chIdx) {
 			markerRow = r;
 			break;
 		}
@@ -128,8 +127,8 @@ int MarkerTable::rowOfMarker(int mkIdx, int chIdx) const
 	return markerRow;
 }
 
-void MarkerTable::addMarker(int mkIdx, int chIdx, const QString& name,
-		double frequency, double magnitude, const QString& type)
+void MarkerTable::addMarker(int mkIdx, int chIdx, const QString &name, double frequency, double magnitude,
+			    const QString &type)
 {
 	model->insertRow(0);
 	model->setData(model->index(0, COL_ID), mkIdx);
@@ -144,19 +143,18 @@ void MarkerTable::removeMarker(int mkIdx, int chIdx)
 {
 	int row = rowOfMarker(mkIdx, chIdx);
 
-	if (row < 0) {
+	if(row < 0) {
 		return;
 	}
 
 	model->removeRow(row);
 }
 
-void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency,
-	double magnitude, const QString &type)
+void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency, double magnitude, const QString &type)
 {
 	int row = rowOfMarker(mkIdx, chIdx);
 
-	if (row < 0) {
+	if(row < 0) {
 		return;
 	}
 
@@ -167,8 +165,10 @@ void MarkerTable::updateMarker(int mkIdx, int chIdx, double frequency,
 
 bool MarkerTable::isMarker(int mkIdx, int chIdx)
 {
-	if (rowOfMarker(mkIdx, chIdx) > 0) {
+	if(rowOfMarker(mkIdx, chIdx) > 0) {
 		return true;
 	}
 	return false;
 }
+
+#include "moc_marker_table.cpp"

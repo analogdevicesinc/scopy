@@ -1,7 +1,8 @@
-#include <QTest>
-#include <QList>
-#include <pluginbase/preferences.h>
 #include <QDir>
+#include <QList>
+#include <QTest>
+
+#include <pluginbase/preferences.h>
 
 using namespace scopy;
 
@@ -16,15 +17,15 @@ private:
 	QSettings *s;
 };
 
-const QString filePath = QDir::currentPath()+"Pref.ini";
+const QString filePath = QDir::currentPath() + "Pref.ini";
 
 void TST_Preferences::initPreferences()
 {
 	Preferences *p = Preferences::GetInstance();
 	p->setPreferencesFilename(filePath);
-	p->init("test","true");
+	p->init("test", "true");
 	QString t = p->get("test").toString();
-	QVERIFY("true"==t);
+	QVERIFY("true" == t);
 	p->save();
 	p->clear();
 }
@@ -35,9 +36,8 @@ void TST_Preferences::getPreferences()
 	p->setPreferencesFilename(filePath);
 	p->load();
 	QString t = p->get("test").toString();
-	QVERIFY("true"==t);
+	QVERIFY("true" == t);
 }
-
 
 QTEST_MAIN(TST_Preferences)
 

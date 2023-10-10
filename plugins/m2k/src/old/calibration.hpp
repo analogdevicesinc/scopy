@@ -25,12 +25,13 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <string>
-#include <memory>
-#include <libm2k/m2k.hpp>
 #include <libm2k/contextbuilder.hpp>
+#include <libm2k/m2k.hpp>
+#include <memory>
+#include <string>
 
-extern "C" {
+extern "C"
+{
 	struct iio_context;
 	struct iio_device;
 	struct iio_channel;
@@ -48,7 +49,8 @@ class Calibration
 	friend class Calibration_API;
 
 public:
-	enum calibration_mode {
+	enum calibration_mode
+	{
 		ADC_REF1,
 		ADC_REF2,
 		ADC_GND,
@@ -56,10 +58,11 @@ public:
 		NONE
 	};
 
-        enum gain_mode {
-                LOW,
-                HIGH
-        };
+	enum gain_mode
+	{
+		LOW,
+		HIGH
+	};
 
 	Calibration(struct iio_context *ctx);
 	~Calibration();
@@ -77,11 +80,11 @@ public:
 	bool resetCalibration();
 	void updateCorrections();
 
-	double getIioDevTemp(const QString& devName) const;
+	double getIioDevTemp(const QString &devName) const;
 
 	void cancelCalibration();
-private:
 
+private:
 	ApiObject *m_api;
 	volatile bool m_cancel;
 
@@ -89,7 +92,6 @@ private:
 	libm2k::context::M2k *m_m2k;
 	bool m_initialized;
 };
-
 
 } // namespace scopy
 

@@ -18,7 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #ifndef SWIOTRUNTIME_H
 #define SWIOTRUNTIME_H
 
@@ -28,7 +27,7 @@ namespace scopy {
 namespace gui {
 class GenericMenu;
 class ChannelManager;
-}
+} // namespace gui
 
 namespace swiot {
 #define AD_NAME "ad74413r"
@@ -47,18 +46,20 @@ public Q_SLOTS:
 	void writeTriggerDevice();
 	void onIsRuntimeCtxChanged(bool isRuntimeCtx);
 private Q_SLOTS:
-	void setTriggerCommandFinished(scopy::Command*);
+	void setTriggerCommandFinished(scopy::Command *);
 Q_SIGNALS:
 	void writeModeAttribute(std::string mode);
 	void backBtnPressed();
+
 private:
 	void createDevicesMap();
+
 private:
 	iio_context *m_iioCtx;
-	QMap<QString, struct iio_device*> m_iioDevices;
+	QMap<QString, struct iio_device *> m_iioDevices;
 	CommandQueue *m_cmdQueue;
 };
-}
-}
+} // namespace swiot
+} // namespace scopy
 
 #endif // SWIOTRUNTIME_H

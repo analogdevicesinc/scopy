@@ -24,7 +24,7 @@
 
 namespace scopy {
 
-class Calibration_API: public ApiObject
+class Calibration_API : public ApiObject
 {
 	Q_OBJECT
 
@@ -35,11 +35,11 @@ public:
 	Q_INVOKABLE bool calibrateAdc();
 	Q_INVOKABLE bool calibrateDac();
 
-	Q_INVOKABLE double devTemp(const QString& devName);
+	Q_INVOKABLE double devTemp(const QString &devName);
 
 private:
 	Calibration *calib;
 };
-}
+} // namespace scopy
 
 #endif // CALIBRATION_API_HPP

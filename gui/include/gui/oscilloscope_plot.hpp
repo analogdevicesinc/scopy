@@ -22,281 +22,282 @@
 #define M2K_OSCILLOSCOPE_PLOT_H
 
 #include "TimeDomainDisplayPlot.h"
-#include "m2kmeasure.h"
 #include "customplotpositionbutton.h"
+#include "genericlogicplotcurve.h"
 #include "graticule.h"
-
-#include <functional>
+#include "m2kmeasure.h"
+#include "qstackedwidget.h"
+#include "scopy-gui_export.h"
 
 #include <qwt_plot_zoneitem.h>
 
-#include "genericlogicplotcurve.h"
-#include "scopy-gui_export.h"
-#include "qstackedwidget.h"
-
+#include <functional>
 
 class QLabel;
 
 namespace scopy {
-	class Oscilloscope_API;
-	class PlotWidget;
+class Oscilloscope_API;
+class PlotWidget;
 
-	class SCOPY_GUI_EXPORT OscilloscopePlot : public TimeDomainDisplayPlot
+class SCOPY_GUI_EXPORT OscilloscopePlot : public TimeDomainDisplayPlot
+{
+	Q_OBJECT
+
+public:
+	OscilloscopePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDiv = 10,
+			 PrefixFormatter *pfXaxis = nullptr, PrefixFormatter *pfYaxis = nullptr,
+			 int qwtAxis = QwtAxis::YLeft);
+	~OscilloscopePlot();
+};
+
+class SCOPY_GUI_EXPORT CapturePlot : public OscilloscopePlot
+{
+	friend class Oscilloscope_API;
+	friend class LogicAnalyzer_API;
+	friend class Channel_API;
+
+	Q_OBJECT
+
+public:
+	enum TriggerState
 	{
-		Q_OBJECT
-
-	public:
-		OscilloscopePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10,
-				 unsigned int yNumDiv = 10, PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr, int qwtAxis = QwtAxis::YLeft);
-		~OscilloscopePlot();
+		Waiting,
+		Triggered,
+		Stop,
+		Auto,
 	};
 
-	class SCOPY_GUI_EXPORT CapturePlot: public OscilloscopePlot
-	{
-		friend class Oscilloscope_API;
-		friend class LogicAnalyzer_API;
-		friend class Channel_API;
+public:
+	CapturePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10,
+		    PrefixFormatter *pfXaxis = nullptr, PrefixFormatter *pfYaxis = nullptr,
+		    int qwtAxis = QwtAxis::YLeft);
+	~CapturePlot();
 
-		Q_OBJECT
+	void replot();
 
-	public:
-		enum TriggerState {
-			Waiting,
-			Triggered,
-			Stop,
-			Auto,
-		};
+	HorizBar *levelTriggerA();
+	HorizBar *levelTriggerB();
 
-	public:
-		CapturePlot(QWidget *parent, bool isdBgraph = false, unsigned int xNumDivs = 10, unsigned int yNumDivs = 10,
-			    PrefixFormatter* pfXaxis = nullptr, PrefixFormatter* pfYaxis = nullptr, int qwtAxis = QwtAxis::YLeft);
-		~CapturePlot();
+	QWidget *topArea();
+	QWidget *topHandlesArea();
 
-		void replot();
+	void setBonusWidthForHistogram(int width);
 
-		HorizBar *levelTriggerA();
-		HorizBar *levelTriggerB();
+	bool triggerAEnabled();
+	bool triggerBEnabled();
+	int selectedChannel();
+	bool measurementsEnabled();
 
-		QWidget *topArea();
-		QWidget *topHandlesArea();
+	void setOffsetWidgetVisible(int chnIdx, bool visible);
+	void removeOffsetWidgets(int chnIdx);
+	void removeLeftVertAxis(unsigned int axis);
 
-		void setBonusWidthForHistogram(int width);
+	QList<M2kMeasure *> *getMeasurements();
+	void measure();
+	int activeMeasurementsCount(int chnIdx);
+	QList<std::shared_ptr<M2kMeasurementData>> measurements(int chnIdx);
+	std::shared_ptr<M2kMeasurementData> measurement(int id, int chnIdx);
 
-		bool triggerAEnabled();
-		bool triggerBEnabled();
-		int selectedChannel();
-		bool measurementsEnabled();
+	OscPlotZoomer *getZoomer();
+	void setOffsetInterval(double minValue, double maxValue);
+	double getMaxOffsetValue();
+	double getMinOffsetValue();
 
-		void setOffsetWidgetVisible(int chnIdx, bool visible);
-		void removeOffsetWidgets(int chnIdx);
-		void removeLeftVertAxis(unsigned int axis);
+	void bringCurveToFront(unsigned int curveIdx);
 
-		QList<M2kMeasure *>* getMeasurements();
-		void measure();
-		int activeMeasurementsCount(int chnIdx);
-		QList<std::shared_ptr<M2kMeasurementData>> measurements(int chnIdx);
-		std::shared_ptr<M2kMeasurementData> measurement(int id, int chnIdx);
+	void setTimeBaseZoomed(bool zoomed);
 
-		OscPlotZoomer* getZoomer();
-		void setOffsetInterval(double minValue, double maxValue);
-		double getMaxOffsetValue();
-		double getMinOffsetValue();
+	void enableLabels(bool enabled);
+	bool eventFilter(QObject *, QEvent *);
+	void setActiveVertAxis(unsigned int axisIdx, bool selected = true);
+	void showYAxisWidget(unsigned int axisIdx, bool en);
+	void enableAxisLabels(bool enabled);
 
-		void bringCurveToFront(unsigned int curveIdx);
+	void setDisplayScale(double value);
 
-		void setTimeBaseZoomed(bool zoomed);
+	void setTimeTriggerInterval(double min, double max);
+	bool labelsEnabled();
 
-		void enableLabels(bool enabled);
-		bool eventFilter(QObject *, QEvent *);
-		void setActiveVertAxis(unsigned int axisIdx, bool selected = true);
-		void showYAxisWidget(unsigned int axisIdx, bool en);
-		void enableAxisLabels(bool enabled);
+	void setGraticuleEnabled(bool enabled);
+	void setGatingEnabled(bool enabled);
 
-		void setDisplayScale(double value);
+	void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
 
-		void setTimeTriggerInterval(double min, double max);
-		bool labelsEnabled();
+	void setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp);
 
-		void setGraticuleEnabled(bool enabled);
-		void setGatingEnabled(bool enabled);
+	void enableXaxisLabels();
+	void enableTimeTrigger(bool enable);
+	QString getChannelName(int chIdx) const;
+	void setChannelName(const QString &name, int chIdx);
 
-		void computeMeasurementsForChannel(unsigned int chnIdx, unsigned int sampleRate);
+	QString formatXValue(double value, int precision) const;
+	QString formatYValue(double value, int precision) const;
 
-		void setConversionFunction(const std::function<double(unsigned int, double, bool)> &fp);
+	CursorReadouts *getCursorReadouts() const;
 
-		void enableXaxisLabels();
-		void enableTimeTrigger(bool enable);
-		QString getChannelName(int chIdx) const;
-		void setChannelName(const QString &name, int chIdx);
+	// Get the curve at the given point. May return nullptr.
+	GenericLogicPlotCurve *curveAt(const QPoint &pos) const;
 
-		QString formatXValue(double value, int precision) const;
-		QString formatYValue(double value, int precision) const;
+	void setAllAxes(int ch_id);
+	VertBar *getMeasurementGateBar1();
+	VertBar *getMeasurementGateBar2();
 
-		CursorReadouts * getCursorReadouts() const;
+	QList<RoundedHandleV *> getOffsetHandles() const;
 
-		// Get the curve at the given point. May return nullptr.
-		GenericLogicPlotCurve* curveAt(const QPoint& pos) const;
+	void setStatusWidget(QWidget *newStatusWidget);
 
-		void setAllAxes(int ch_id);
-		VertBar* getMeasurementGateBar1();
-		VertBar* getMeasurementGateBar2();
+Q_SIGNALS:
+	void timeTriggerValueChanged(double);
+	void channelOffsetChanged(unsigned int, double);
+	void measurementsAvailable();
+	void canvasSizeChanged();
+	void leftGateChanged(double);
+	void rightGateChanged(double);
+	void channelSelected(int, bool);
 
-		QList<RoundedHandleV *> getOffsetHandles() const;
+	// These are only emitted if you set setMouseTracking(true) (not done by default)
+	void mouseButtonPress(const QMouseEvent *event);
+	void mouseButtonRelease(const QMouseEvent *event);
+	void mouseMove(const QMouseEvent *event);
 
-		void setStatusWidget(QWidget *newStatusWidget);
+public Q_SLOTS:
+	void setTriggerAEnabled(bool en);
+	void setTriggerBEnabled(bool en);
+	void setSelectedChannel(int id);
+	void setMeasuremensEnabled(bool en);
+	void setPeriodDetectLevel(int chnIdx, double lvl);
+	void setPeriodDetectHyst(int chnIdx, double hyst);
+	void setTimeBaseLabelValue(double timebase);
+	void setBufferSizeLabelValue(int numSamples);
+	void setSampleRatelabelValue(double sampleRate);
+	void setTriggerState(int triggerState);
+	void setMaxBufferSizeErrorLabel(bool reached, const QString &customWarning = "");
 
-	Q_SIGNALS:
-		void timeTriggerValueChanged(double);
-		void channelOffsetChanged(unsigned int, double);
-		void measurementsAvailable();
-		void canvasSizeChanged();
-		void leftGateChanged(double);
-		void rightGateChanged(double);
-		void channelSelected(int, bool);
+	void showEvent(QShowEvent *event);
+	void printWithNoBackground(const QString &toolName = "", bool editScaleDraw = true);
 
-		// These are only emitted if you set setMouseTracking(true) (not done by default)
-		void mouseButtonPress(const QMouseEvent *event);
-		void mouseButtonRelease(const QMouseEvent *event);
-		void mouseMove(const QMouseEvent *event);
+	int getAnalogChannels() const;
 
-	public Q_SLOTS:
-		void setTriggerAEnabled(bool en);
-		void setTriggerBEnabled(bool en);
-		void setSelectedChannel(int id);
-		void setMeasuremensEnabled(bool en);
-		void setPeriodDetectLevel(int chnIdx, double lvl);
-		void setPeriodDetectHyst(int chnIdx, double hyst);
-		void setTimeBaseLabelValue(double timebase);
-		void setBufferSizeLabelValue(int numSamples);
-		void setSampleRatelabelValue(double sampleRate);
-		void setTriggerState(int triggerState);
-		void setMaxBufferSizeErrorLabel(bool reached, const QString &customWarning = "");
+	/* digital channels */
+	void onDigitalChannelAdded(int chnIdx);
+	void setChannelSelectable(int chnIdx, bool selectable);
+	void removeDigitalPlotCurve(QwtPlotCurve *curve);
+	void setOffsetHandleVisible(int chIdx, bool visible);
 
-		void showEvent(QShowEvent *event);
-		void printWithNoBackground(const QString& toolName = "", bool editScaleDraw = true);
+	/* channel group */
+	void addToGroup(int currentGroup, int toAdd);
+	void beginGroupSelection();
+	bool endGroupSelection(bool moveAnnotationCurvesLast = false); // TODO: toggle group selection
+	QVector<int> getGroupOfChannel(int chnIdx);
+	QVector<QVector<int>> getAllGroups();
+	void removeFromGroup(int chnIdx, int removedChnIdx, bool &didGroupVanish);
+	void positionInGroupChanged(int chnIdx, int from, int to);
+	void setGroups(const QVector<QVector<int>> &groups);
 
-		int getAnalogChannels() const;
+protected:
+	virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
 
-		/* digital channels */
-		void onDigitalChannelAdded(int chnIdx);
-		void setChannelSelectable(int chnIdx, bool selectable);
-		void removeDigitalPlotCurve(QwtPlotCurve *curve);
-		void setOffsetHandleVisible(int chIdx, bool visible);
+private:
+	M2kMeasure *measureOfChannel(int chnIdx) const;
+	void updateBufferSizeSampleRateLabel(int nsamples, double sr);
+	void updateHandleAreaPadding(bool);
+	void updateGateMargins();
 
-		/* channel group */
-		void addToGroup(int currentGroup, int toAdd);
-		void beginGroupSelection();
-		bool endGroupSelection(bool moveAnnotationCurvesLast = false);    // TODO: toggle group selection
-		QVector<int> getGroupOfChannel(int chnIdx);
-		QVector<QVector<int>> getAllGroups();
-		void removeFromGroup(int chnIdx, int removedChnIdx, bool &didGroupVanish);
-		void positionInGroupChanged(int chnIdx, int from, int to);
-		void setGroups(const QVector<QVector<int>> &groups);
+private Q_SLOTS:
+	void onChannelAdded(int);
+	void onNewDataReceived();
 
-	protected:
-		virtual void cleanUpJustBeforeChannelRemoval(int chnIdx);
+	void onGateBar1PixelPosChanged(int);
+	void onGateBar2PixelPosChanged(int);
 
-	private:
-		M2kMeasure* measureOfChannel(int chnIdx) const;
-		void updateBufferSizeSampleRateLabel(int nsamples, double sr);
-		void updateHandleAreaPadding(bool);
-		void updateGateMargins();
+	void onGateBar1Moved(double);
+	void onGateBar2Moved(double);
 
-	private Q_SLOTS:
-		void onChannelAdded(int);
-		void onNewDataReceived();
+	void onTimeTriggerHandlePosChanged(int);
+	void onTimeTriggerHandleGrabbed(bool);
 
-		void onGateBar1PixelPosChanged(int);
-		void onGateBar2PixelPosChanged(int);
+	void onTriggerAHandleGrabbed(bool);
+	void onTriggerBHandleGrabbed(bool);
 
-		void onGateBar1Moved(double);
-		void onGateBar2Moved(double);
+	void handleInGroupChangedPosition(int position);
 
-		void onTimeTriggerHandlePosChanged(int);
-		void onTimeTriggerHandleGrabbed(bool);
+	void onHCursor1Moved(double);
+	void onHCursor2Moved(double);
+	void onVCursor1Moved(double);
+	void onVCursor2Moved(double);
 
-		void onTriggerAHandleGrabbed(bool);
-		void onTriggerBHandleGrabbed(bool);
+private:
+	std::function<double(unsigned int, double, bool)> m_conversion_function;
 
-		void handleInGroupChangedPosition(int position);
+	bool d_triggerAEnabled;
+	bool d_triggerBEnabled;
+	bool d_measurementsEnabled;
+	bool d_labelsEnabled;
 
-		void onHCursor1Moved(double);
-		void onHCursor2Moved(double);
-		void onVCursor1Moved(double);
-		void onVCursor2Moved(double);
+	QStackedWidget *d_topWidget;
+	GateHandlesArea *d_topGateHandlesArea;
+	int d_bonusWidth;
 
-	private:
-		std::function<double(unsigned int, double, bool)> m_conversion_function;
+	QWidget *m_statusWidget;
+	QLabel *d_timeBaseLabel;
+	QLabel *d_sampleRateLabel;
+	QLabel *d_triggerStateLabel;
+	QLabel *d_maxBufferError;
 
-		bool d_triggerAEnabled;
-		bool d_triggerBEnabled;
-		bool d_measurementsEnabled;
-		bool d_labelsEnabled;
+	int d_bufferSizeLabelVal;
+	double d_sampleRateLabelVal;
 
-		QStackedWidget *d_topWidget;
-		GateHandlesArea *d_topGateHandlesArea;
-		int d_bonusWidth;
+	QList<HorizBar *> d_offsetBars;
+	QList<RoundedHandleV *> d_offsetHandles;
 
-		QWidget *m_statusWidget;
-		QLabel *d_timeBaseLabel;
-		QLabel *d_sampleRateLabel;
-		QLabel *d_triggerStateLabel;
-		QLabel *d_maxBufferError;
+	// Channel grouping
+	QVector<QList<RoundedHandleV *>> d_groupHandles;
+	bool d_startedGrouping;
+	QVector<QwtPlotZoneItem *> d_groupMarkers;
 
-		int d_bufferSizeLabelVal;
-		double d_sampleRateLabelVal;
+	PlotGateHandle *d_hGatingHandle1;
+	PlotGateHandle *d_hGatingHandle2;
 
-		QList<HorizBar*> d_offsetBars;
-		QList<RoundedHandleV*> d_offsetHandles;
+	VertBar *d_gateBar1;
+	VertBar *d_gateBar2;
 
-		// Channel grouping
-		QVector<QList<RoundedHandleV*>> d_groupHandles;
-		bool d_startedGrouping;
-		QVector<QwtPlotZoneItem *> d_groupMarkers;
+	VertBar *d_timeTriggerBar;
+	HorizBar *d_levelTriggerABar;
+	HorizBar *d_levelTriggerBBar;
+	FreePlotLineHandleH *d_timeTriggerHandle;
+	FreePlotLineHandleV *d_levelTriggerAHandle;
+	FreePlotLineHandleV *d_levelTriggerBHandle;
 
-		PlotGateHandle *d_hGatingHandle1;
-		PlotGateHandle *d_hGatingHandle2;
+	MetricPrefixFormatter d_cursorMetricFormatter;
+	TimePrefixFormatter d_cursorTimeFormatter;
 
-		VertBar *d_gateBar1;
-		VertBar *d_gateBar2;
+	QPen d_trigAactiveLinePen;
+	QPen d_trigAinactiveLinePen;
+	QPen d_trigBactiveLinePen;
+	QPen d_trigBinactiveLinePen;
+	QPen d_timeTriggerInactiveLinePen;
+	QPen d_timeTriggerActiveLinePen;
 
-		VertBar *d_timeTriggerBar;
-		HorizBar *d_levelTriggerABar;
-		HorizBar *d_levelTriggerBBar;
-		FreePlotLineHandleH *d_timeTriggerHandle;
-		FreePlotLineHandleV *d_levelTriggerAHandle;
-		FreePlotLineHandleV *d_levelTriggerBHandle;
+	QList<M2kMeasure *> d_measureObjs;
 
-		MetricPrefixFormatter d_cursorMetricFormatter;
-		TimePrefixFormatter d_cursorTimeFormatter;
+	double value_v1, value_v2, value_h1, value_h2;
+	double value_gateLeft, value_gateRight;
+	double d_minOffsetValue, d_maxOffsetValue;
+	double d_timeTriggerMinValue, d_timeTriggerMaxValue;
 
-	        QPen d_trigAactiveLinePen;
-	        QPen d_trigAinactiveLinePen;
-	        QPen d_trigBactiveLinePen;
-	        QPen d_trigBinactiveLinePen;
-		QPen d_timeTriggerInactiveLinePen;
-		QPen d_timeTriggerActiveLinePen;
+	bool displayGraticule;
+	Graticule *graticule;
 
-	        QList<M2kMeasure *> d_measureObjs;
+	QwtPlotShapeItem *leftGate, *rightGate;
+	QRectF leftGateRect, rightGateRect;
+	bool d_gatingEnabled;
 
-		double value_v1, value_v2, value_h1, value_h2;
-		double value_gateLeft, value_gateRight;
-		double d_minOffsetValue, d_maxOffsetValue;
-		double d_timeTriggerMinValue, d_timeTriggerMaxValue;
+	QPair<double, double> d_xAxisInterval;
+	int d_currentHandleInitPx;
+	void pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar);
 
-		bool displayGraticule;
-		Graticule *graticule;
-
-		QwtPlotShapeItem *leftGate, *rightGate;
-		QRectF leftGateRect, rightGateRect;
-		bool d_gatingEnabled;
-
-		QPair<double, double> d_xAxisInterval;
-		int d_currentHandleInitPx;
-		void pushBackNewOffsetWidgets(RoundedHandleV *chOffsetHdl, HorizBar *chOffsetBar);
-
-		QVector<GenericLogicPlotCurve *> plot_logic_curves;
-	};
-}
+	QVector<GenericLogicPlotCurve *> plot_logic_curves;
+};
+} // namespace scopy
 
 #endif /* M2K_OSCILLOSCOPE_PLOT_H */

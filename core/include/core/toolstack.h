@@ -2,8 +2,9 @@
 #define TOOLSTACK_H
 
 #include "gui/mapstackedwidget.h"
-#include <QMap>
 #include "scopy-core_export.h"
+
+#include <QMap>
 
 namespace Ui {
 class SCOPY_CORE_EXPORT ToolStack;
@@ -20,6 +21,6 @@ public:
 	explicit ToolStack(QWidget *parent = nullptr);
 	~ToolStack();
 };
-}
+} // namespace scopy
 
 #endif // TOOLSTACK_H

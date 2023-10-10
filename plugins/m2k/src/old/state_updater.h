@@ -26,7 +26,7 @@
 
 namespace scopy::m2k {
 
-class StateUpdater: public QObject
+class StateUpdater : public QObject
 {
 	Q_OBJECT
 
@@ -64,6 +64,6 @@ private:
 	QTimer m_timer;
 };
 
-} // namespace scopy
+} // namespace scopy::m2k
 
 #endif // STATE_UPDATER_H

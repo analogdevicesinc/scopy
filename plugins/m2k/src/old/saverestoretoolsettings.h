@@ -14,6 +14,7 @@ class SaveRestoreToolSettings
 
 	SaveRestoreToolSettings(SaveRestoreToolSettings &&) = delete;
 	SaveRestoreToolSettings &operator=(SaveRestoreToolSettings &&) = delete;
+
 public:
 	SaveRestoreToolSettings(M2kTool *tool);
 	~SaveRestoreToolSettings();
@@ -22,6 +23,6 @@ private:
 	QTemporaryFile m_temp;
 	M2kTool *m_tool;
 };
-} // namespace scopy
+} // namespace scopy::m2k
 
 #endif // SAVERESTORETOOLSETTINGS_H

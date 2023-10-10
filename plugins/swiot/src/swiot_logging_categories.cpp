@@ -18,7 +18,6 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-
 #include "swiot_logging_categories.h"
 
 #ifndef QT_NO_DEBUG_OUTPUT

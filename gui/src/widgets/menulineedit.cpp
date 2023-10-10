@@ -2,7 +2,9 @@
 
 using namespace scopy;
 
-MenuLineEdit::MenuLineEdit(QWidget *parent) : QWidget(parent) {
+MenuLineEdit::MenuLineEdit(QWidget *parent)
+	: QWidget(parent)
+{
 	auto lay = new QHBoxLayout(this);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	setLayout(lay);
@@ -15,11 +17,14 @@ MenuLineEdit::MenuLineEdit(QWidget *parent) : QWidget(parent) {
 	applyStylesheet();
 }
 
-MenuLineEdit::~MenuLineEdit() { }
+MenuLineEdit::~MenuLineEdit() {}
 
 QLineEdit *MenuLineEdit::edit() { return m_edit; }
 
-void MenuLineEdit::applyStylesheet() {
+void MenuLineEdit::applyStylesheet()
+{
 	StyleHelper::MenuLineEdit(m_edit, "menuButton");
 	StyleHelper::MenuLineEditWidget(this, "menuBigSwitch");
 }
+
+#include "moc_menulineedit.cpp"

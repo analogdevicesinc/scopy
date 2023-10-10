@@ -3,20 +3,15 @@
 
 #include <QObject>
 
-namespace scopy::regmap{
+namespace scopy::regmap {
 class BitFieldModel;
 
 class RegisterModel : public QObject
 {
 	Q_OBJECT
 public:
-	RegisterModel( QString name,
-		       uint32_t address,
-		       QString description,
-		       bool exists,
-		       int width,
-		       QString notes,
-		       QVector<BitFieldModel*> *bitFields);
+	RegisterModel(QString name, uint32_t address, QString description, bool exists, int width, QString notes,
+		      QVector<BitFieldModel *> *bitFields);
 
 	QString getName() const;
 	uint32_t getAddress() const;
@@ -33,9 +28,8 @@ private:
 	bool exists;
 	int width;
 	QString notes;
-	QVector<BitFieldModel*> *bitFields;
+	QVector<BitFieldModel *> *bitFields;
 Q_SIGNALS:
-
 };
-}
+} // namespace scopy::regmap
 #endif // REGISTERMODEL_HPP

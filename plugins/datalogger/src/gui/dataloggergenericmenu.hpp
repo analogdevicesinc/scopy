@@ -1,10 +1,11 @@
 #ifndef DATALOGGERGENERICMENU_H
 #define DATALOGGERGENERICMENU_H
 
-#include <QWidget>
-#include <generic_menu.hpp>
 #include "qcombobox.h"
 
+#include <QWidget>
+
+#include <generic_menu.hpp>
 
 namespace scopy {
 class CustomSwitch;
@@ -19,7 +20,7 @@ public:
 	explicit DataLoggerGenericMenu(QWidget *parent = nullptr);
 	~DataLoggerGenericMenu();
 
-	void init(QString title, QColor* color);
+	void init(QString title, QColor *color);
 
 public Q_SLOTS:
 	void scaleToggle(bool toggled);
@@ -52,8 +53,8 @@ private:
 	QComboBox *historyStyle;
 	QComboBox *historySize;
 };
-}
-}
-}
+} // namespace gui
+} // namespace datalogger
+} // namespace scopy
 
 #endif // DATALOGGERGENERICMENU_H

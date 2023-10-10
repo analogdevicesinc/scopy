@@ -1,31 +1,29 @@
 #include "translationsrepository.h"
+
 #include "common/scopyconfig.h"
+
+#include <QApplication>
 #include <QDir>
 #include <QLoggingCategory>
 #include <QTranslator>
-#include <pluginbase/preferences.h>
-#include <QApplication>
 
-Q_LOGGING_CATEGORY(CAT_TRANSLATIONREPOSITORY,"ScopyTranslations");
+#include <pluginbase/preferences.h>
+
+Q_LOGGING_CATEGORY(CAT_TRANSLATIONREPOSITORY, "ScopyTranslations");
 
 using namespace scopy;
 
-TranslationsRepository* TranslationsRepository::pinstance_{nullptr};
+TranslationsRepository *TranslationsRepository::pinstance_{nullptr};
 
-TranslationsRepository::TranslationsRepository(QObject *parent) : QObject(parent)
-{
+TranslationsRepository::TranslationsRepository(QObject *parent)
+	: QObject(parent)
+{}
 
-}
-
-TranslationsRepository::~TranslationsRepository()
-{
-
-}
+TranslationsRepository::~TranslationsRepository() {}
 
 TranslationsRepository *TranslationsRepository::GetInstance()
 {
-	if (pinstance_ == nullptr)
-	{
+	if(pinstance_ == nullptr) {
 		pinstance_ = new TranslationsRepository(QApplication::instance()); // singleton has the app as parent
 	}
 	return pinstance_;
@@ -35,7 +33,7 @@ QString TranslationsRepository::getTranslationsPath()
 {
 	// Check the local plugins folder first
 	QDir pathDir(config::localTranslationFolderPath());
-	if (pathDir.exists()){
+	if(pathDir.exists()) {
 		return config::localTranslationFolderPath();
 	}
 
@@ -46,12 +44,13 @@ QStringList TranslationsRepository::getLanguages()
 {
 	QDir directory(TranslationsRepository::getTranslationsPath());
 	QStringList languages = directory.entryList(QStringList() << "*.qm", QDir::Files).replaceInStrings(".qm", "");
-	for (const QString& lang: languages) {
-		if (lang.contains("_")) languages.removeOne(lang);
+	for(const QString &lang : languages) {
+		if(lang.contains("_"))
+			languages.removeOne(lang);
 	}
 
 	// no languages found
-	if (languages.empty()) {
+	if(languages.empty()) {
 		languages.append("default");
 	}
 
@@ -60,7 +59,7 @@ QStringList TranslationsRepository::getLanguages()
 
 void TranslationsRepository::loadTranslations(QString language)
 {
-	if (language == "default") {
+	if(language == "default") {
 		qDebug(CAT_TRANSLATIONREPOSITORY) << "No languages loaded (default)";
 		return;
 	}
@@ -69,8 +68,8 @@ void TranslationsRepository::loadTranslations(QString language)
 	QDir directory(TranslationsRepository::getTranslationsPath());
 	QFileInfoList languages = directory.entryInfoList(QStringList() << "*.qm", QDir::Files);
 
-	for (const QFileInfo& lang: languages) {
-		if (lang.fileName().endsWith("_" + language + ".qm") || lang.fileName() == language + ".qm") {
+	for(const QFileInfo &lang : languages) {
+		if(lang.fileName().endsWith("_" + language + ".qm") || lang.fileName() == language + ".qm") {
 			translatorList.append(new QTranslator());
 			translatorList.last()->load(lang.filePath());
 			QApplication::installTranslator(translatorList.last());
@@ -79,6 +78,5 @@ void TranslationsRepository::loadTranslations(QString language)
 		}
 	}
 }
-
 
 #include "moc_translationsrepository.cpp"

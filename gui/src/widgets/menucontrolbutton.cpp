@@ -1,22 +1,24 @@
-#include <widgets/menucontrolbutton.h>
 #include <dynamicWidget.h>
-#include <stylehelper.h>
 #include <pluginbase/preferences.h>
+#include <stylehelper.h>
+#include <widgets/menucontrolbutton.h>
 
 using namespace scopy;
 
-MenuControlButton::MenuControlButton(QWidget *parent) : QAbstractButton(parent) {
+MenuControlButton::MenuControlButton(QWidget *parent)
+	: QAbstractButton(parent)
+{
 	lay = new QHBoxLayout(this);
 	lay->setMargin(16);
 	lay->setSpacing(16);
 
-	setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+	setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	setCheckable(true);
 	setLayout(lay);
 
-	m_chk = new QCheckBox("",this);
+	m_chk = new QCheckBox("", this);
 	m_label = new QLabel("", this);
-	m_btn = new QPushButton("",this);
+	m_btn = new QPushButton("", this);
 	m_color = StyleHelper::getColor("ScopyBlue");
 	m_cs = CS_SQUARE;
 
@@ -25,38 +27,33 @@ MenuControlButton::MenuControlButton(QWidget *parent) : QAbstractButton(parent) 
 	lay->addWidget(m_btn);
 	applyStylesheet();
 
-	connect(this, &QAbstractButton::toggled, this, [=](bool b){
-		setDynamicProperty(this,"selected",b);
-	}); // Hackish - QStyle should be implemented
+	connect(this, &QAbstractButton::toggled, this,
+		[=](bool b) { setDynamicProperty(this, "selected", b); }); // Hackish - QStyle should be implemented
 
 	dblClickToOpenMenu = QMetaObject::Connection();
 	openMenuChecksThis = QMetaObject::Connection();
 }
 
-MenuControlButton::~MenuControlButton()
+MenuControlButton::~MenuControlButton() {}
+
+void MenuControlButton::setColor(QColor c)
 {
-
-}
-
-void MenuControlButton::setColor(QColor c) {
 	m_color = c;
 	applyStylesheet();
 }
 
-void MenuControlButton::setCheckBoxStyle(CheckboxStyle cs) {
+void MenuControlButton::setCheckBoxStyle(CheckboxStyle cs)
+{
 	m_cs = cs;
 	applyStylesheet();
 }
 
-void MenuControlButton::setName(QString s) {
-	m_label->setText(s);
-}
+void MenuControlButton::setName(QString s) { m_label->setText(s); }
 
 void MenuControlButton::setDoubleClickToOpenMenu(bool b)
 {
 	if(b) {
-		dblClickToOpenMenu =
-			connect(this, &MenuControlButton::doubleClicked, this, [=](){
+		dblClickToOpenMenu = connect(this, &MenuControlButton::doubleClicked, this, [=]() {
 			setChecked(true);
 			if(m_btn->isVisible()) {
 				m_btn->toggle();
@@ -70,8 +67,7 @@ void MenuControlButton::setDoubleClickToOpenMenu(bool b)
 void MenuControlButton::setOpenMenuChecksThis(bool b)
 {
 	if(b) {
-		openMenuChecksThis =
-			connect(m_btn, &QAbstractButton::toggled, this, [=](bool b) {
+		openMenuChecksThis = connect(m_btn, &QAbstractButton::toggled, this, [=](bool b) {
 			if(b)
 				setChecked(true);
 		});
@@ -80,8 +76,9 @@ void MenuControlButton::setOpenMenuChecksThis(bool b)
 	}
 }
 
-void MenuControlButton::mouseDoubleClickEvent(QMouseEvent * e) {
-	if ( e->button() == Qt::LeftButton ) {
+void MenuControlButton::mouseDoubleClickEvent(QMouseEvent *e)
+{
+	if(e->button() == Qt::LeftButton) {
 		if(Preferences::get("general_doubleclick_ctrl_opens_menu").toBool() == true) {
 			Q_EMIT doubleClicked();
 			return;
@@ -90,8 +87,9 @@ void MenuControlButton::mouseDoubleClickEvent(QMouseEvent * e) {
 	QAbstractButton::mouseDoubleClickEvent(e);
 }
 
-void MenuControlButton::mousePressEvent(QMouseEvent *e) {
-	if (e->button() == Qt::LeftButton) {
+void MenuControlButton::mousePressEvent(QMouseEvent *e)
+{
+	if(e->button() == Qt::LeftButton) {
 		if(Preferences::get("general_doubleclick_ctrl_opens_menu").toBool() == true) {
 			if(m_btn->isChecked()) {
 				m_btn->setChecked(false);
@@ -102,38 +100,41 @@ void MenuControlButton::mousePressEvent(QMouseEvent *e) {
 	QAbstractButton::mousePressEvent(e);
 }
 
-QCheckBox *MenuControlButton::checkBox() { return m_chk;}
+QCheckBox *MenuControlButton::checkBox() { return m_chk; }
 
-QPushButton *MenuControlButton::button() { return m_btn;}
+QPushButton *MenuControlButton::button() { return m_btn; }
 
-void MenuControlButton::applyStylesheet() {
+void MenuControlButton::applyStylesheet()
+{
 
-	StyleHelper::MenuControlWidget(this,m_color,"controlButton");
+	StyleHelper::MenuControlWidget(this, m_color, "controlButton");
 	switch(m_cs) {
 	case CS_CIRCLE:
-		StyleHelper::ColoredCircleCheckbox(m_chk,m_color,"chk");
+		StyleHelper::ColoredCircleCheckbox(m_chk, m_color, "chk");
 		break;
 	case CS_SQUARE:
-		StyleHelper::ColoredSquareCheckbox(m_chk,0xFFFFFF,"chk");
+		StyleHelper::ColoredSquareCheckbox(m_chk, 0xFFFFFF, "chk");
 		break;
 	case CS_COLLAPSE:
-		StyleHelper::CollapseCheckbox(m_chk,"chk");
+		StyleHelper::CollapseCheckbox(m_chk, "chk");
 		break;
 	default:
-		StyleHelper::BlueSquareCheckbox(m_chk,"chk");
+		StyleHelper::BlueSquareCheckbox(m_chk, "chk");
 		break;
 	}
-	StyleHelper::MenuControlLabel(m_label,"name");
+	StyleHelper::MenuControlLabel(m_label, "name");
 	StyleHelper::MenuControlButton(m_btn, "btn");
 }
 
-CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent) : QWidget(parent) {
+CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent)
+	: QWidget(parent)
+{
 	m_lay = new QVBoxLayout(this);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
 	setLayout(m_lay);
 	m_ctrl = new MenuControlButton(this);
-	m_ctrl->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+	m_ctrl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	m_ctrl->setCheckBoxStyle(MenuControlButton::CS_COLLAPSE);
 	m_ctrl->setCheckable(false);
 	m_ctrl->checkBox()->setChecked(true);
@@ -145,16 +146,17 @@ CollapsableMenuControlButton::CollapsableMenuControlButton(QWidget *parent) : QW
 	m_contLayout->setMargin(0);
 	m_contLayout->setSpacing(0);
 
-	connect(m_ctrl->checkBox(),SIGNAL(toggled(bool)),container,SLOT(setVisible(bool)));
+	connect(m_ctrl->checkBox(), SIGNAL(toggled(bool)), container, SLOT(setVisible(bool)));
 }
 
 CollapsableMenuControlButton::~CollapsableMenuControlButton() {}
 
-void CollapsableMenuControlButton::add(QWidget *ch) {
-	ch->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+void CollapsableMenuControlButton::add(QWidget *ch)
+{
+	ch->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	m_contLayout->addWidget(ch);
 }
 
-MenuControlButton *CollapsableMenuControlButton::getControlBtn() {
-	return m_ctrl;
-}
+MenuControlButton *CollapsableMenuControlButton::getControlBtn() { return m_ctrl; }
+
+#include "moc_menucontrolbutton.cpp"

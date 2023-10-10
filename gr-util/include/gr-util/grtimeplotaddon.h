@@ -3,16 +3,17 @@
 
 #include "plotinfo.h"
 #include "scopy-gr-util_export.h"
-#include "tooladdon.h"
-#include <gui/oscilloscope_plot.hpp>
-
-#include <QGridLayout>
 #include "time_sink_f.h"
-#include <plotwidget.h>
+#include "tooladdon.h"
+
+#include <QFuture>
+#include <QGridLayout>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QFuture>
 #include <QtConcurrent>
+
+#include <gui/oscilloscope_plot.hpp>
+#include <plotwidget.h>
 
 namespace scopy {
 class TimePlotHDivInfo;
@@ -24,7 +25,8 @@ class GRTopBlock;
 class GRTimeChannelAddon;
 class GRTimePlotAddonSettings;
 
-class SCOPY_GR_UTIL_EXPORT GRTimePlotAddon : public QObject, public ToolAddon, public GRTopAddon {
+class SCOPY_GR_UTIL_EXPORT GRTimePlotAddon : public QObject, public ToolAddon, public GRTopAddon
+{
 	Q_OBJECT
 public:
 	GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent = nullptr);
@@ -52,8 +54,8 @@ public Q_SLOTS:
 	void postFlowStart() override;
 	void preFlowStop() override;
 	void postFlowStop() override;
-	void onChannelAdded(ToolAddon* t) override;
-	void onChannelRemoved(ToolAddon*) override;
+	void onChannelAdded(ToolAddon *t) override;
+	void onChannelRemoved(ToolAddon *) override;
 
 	void replot();
 	void connectSignalPaths();
@@ -67,7 +69,7 @@ public Q_SLOTS:
 	double sampleRate();
 	void setBufferSize(uint32_t size);
 	void setPlotSize(uint32_t size);
-	void handlePreferences(QString,QVariant);
+	void handlePreferences(QString, QVariant);
 	void setSingleShot(bool);
 	void setFrameRate(double);
 	void setXMode(int mode);
@@ -77,7 +79,6 @@ private Q_SLOTS:
 	void startPlotRefresh();
 	void drawPlot();
 
-
 private:
 	QString name;
 	QWidget *widget;
@@ -86,15 +87,14 @@ private:
 	PlotWidget *m_plotWidget;
 	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
-	QList<GRTimeChannelAddon*> grChannels;
-	QVBoxLayout* m_lay;
+	QList<GRTimeChannelAddon *> grChannels;
+	QVBoxLayout *m_lay;
 	void setupBufferPreviewer();
 
 	QFuture<void> refillFuture;
 	QFutureWatcher<void> *fw;
 	QMetaObject::Connection futureWatcherConn;
 	std::mutex refillMutex;
-
 
 	PlotSamplingInfo m_currentSamplingInfo;
 	bool m_started;
@@ -104,14 +104,14 @@ private:
 	bool m_refreshTimerRunning;
 	int m_xmode;
 
-	QMap<QString,int> time_channel_map;
+	QMap<QString, int> time_channel_map;
 
 	void setRawSamplesPtr();
 	void updateXAxis();
 	void updateFrameRate();
 	void drawTags();
 };
-}
-}
+} // namespace grutil
+} // namespace scopy
 
 #endif // GRTIMEPLOTADDON_H

@@ -1,21 +1,24 @@
 #ifndef PLOTCHANNEL_H
 #define PLOTCHANNEL_H
 
-#include <QwtPlotCurve>
-#include <QwtPlot>
-#include <QwtPlotMarker>
 #include "scopy-gui_export.h"
+
 #include <QPen>
+#include <QwtPlot>
+#include <QwtPlotCurve>
+#include <QwtPlotMarker>
 #include <QwtSymbol>
 
 namespace scopy {
 class PlotAxis;
 class PlotWidget;
 class PlotAxisHandle;
-class SCOPY_GUI_EXPORT PlotChannel : public QObject {
+class SCOPY_GUI_EXPORT PlotChannel : public QObject
+{
 	Q_OBJECT
 public:
-	typedef enum {
+	typedef enum
+	{
 		PCS_LINES = 0,
 		PCS_DOTS,
 		PCS_STEPS,
@@ -23,7 +26,8 @@ public:
 		PCS_SMOOTH
 	} PlotCurveStyle;
 
-	PlotChannel(QString name, QPen pen, PlotWidget *plot, PlotAxis* xAxis, PlotAxis *yAxis, QObject *parent = nullptr);
+	PlotChannel(QString name, QPen pen, PlotWidget *plot, PlotAxis *xAxis, PlotAxis *yAxis,
+		    QObject *parent = nullptr);
 	~PlotChannel();
 
 	QwtPlotCurve *curve() const;
@@ -54,13 +58,13 @@ private:
 	PlotAxis *m_xAxis, *m_yAxis;
 	PlotAxisHandle *m_handle;
 	QwtPlotCurve *m_curve;
-	QList<QwtPlotMarker*> m_markers;
+	QList<QwtPlotMarker *> m_markers;
 	QwtSymbol *symbol;
 	PlotWidget *m_plotWidget;
 	QwtPlot *m_plot;
 	QPen m_pen;
 	float *m_data;
 };
-}
+} // namespace scopy
 
 #endif // PLOTCHANNEL_H
