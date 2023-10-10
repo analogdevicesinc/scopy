@@ -19,6 +19,7 @@ ScopyStatusBar::ScopyStatusBar(QWidget *parent)
 	connect(statusManager, &StatusManager::sendStatus, this, &ScopyStatusBar::processStatus);
 
 	connect(statusManager, &StatusManager::announceStatusAvailable, this, &ScopyStatusBar::shouldDisplayNewStatus);
+	connect(statusManager, &StatusManager::sendUrgentMessage, this, &ScopyStatusBar::receiveUrgentMessage);
 	connect(this, &ScopyStatusBar::messageChanged, this, &ScopyStatusBar::shouldDisplayNewStatus);
 
 	statusManager->requestStatus(); // initially, the status bar should tell StatusManager that messages are enabled
@@ -89,6 +90,12 @@ void ScopyStatusBar::showHistory(bool checked)
 		m_hoverWidget->raise();
 	}
 	m_hoverWidget->setVisible(checked);
+}
+
+void ScopyStatusBar::receiveUrgentMessage(QString message, int ms)
+{
+	// the current message will be erased in favor of the urgent message
+	this->showMessage(message, ms);
 }
 
 #include "moc_scopystatusbar.cpp"
