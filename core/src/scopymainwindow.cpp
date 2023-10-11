@@ -155,6 +155,12 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 
 void ScopyMainWindow::initStatusBar()
 {
+	// clear all margin, except the bottom one, to make room the status bar
+	int margin = ui->centralwidget->layout()->margin();
+	ui->centralwidget->layout()->setMargin(0);
+	ui->centralwidget->setContentsMargins(margin, margin, margin, 0);
+	ui->animHolder->setContentsMargins(0, 0, 0, margin); // the left panel should keep the margin
+
 	statusBar = new ScopyStatusBar(this);
 	ui->mainWidget->layout()->addWidget(statusBar);
 }
