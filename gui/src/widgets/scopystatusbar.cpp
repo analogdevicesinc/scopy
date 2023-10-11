@@ -4,6 +4,7 @@
 #include <QLoggingCategory>
 #include <QApplication>
 #include <QTimer>
+#include <QSizeGrip>
 
 using namespace scopy;
 
@@ -28,7 +29,19 @@ ScopyStatusBar::ScopyStatusBar(QWidget *parent)
 void ScopyStatusBar::initUi()
 {
 	StyleHelper::ScopyStatusBar(this, "ScopyStatusBar");
-	m_historyButton = new QPushButton("History", this);
+
+	auto *sizeGrip = this->findChild<QSizeGrip *>();
+	if(sizeGrip) {
+		// hackish, but hide() and setVisible(false) do not work here
+		sizeGrip->setStyleSheet("width: 0; height: 0;");
+	}
+
+	m_historyButton = new QPushButton(this);
+	m_historyButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	m_historyButton->setFixedSize(20, 20);
+	m_historyButton->setStyleSheet("background-color: #272730");
+	m_historyButton->setIcon(QIcon(":/gui/icons/scopy-default/icons/tool_calibration.svg"));
+	m_historyButton->setIconSize(m_historyButton->size());
 	m_historyButton->setCheckable(true);
 	connect(m_historyButton, &QPushButton::toggled, this, &ScopyStatusBar::showHistory);
 
@@ -44,7 +57,7 @@ void ScopyStatusBar::initHistory()
 	m_hoverWidget->setObjectName("statusHover");
 	m_hoverWidget->setAnchorPos(HP_TOP);
 	m_hoverWidget->setContentPos(HP_TOPLEFT);
-	m_hoverWidget->setAnchorOffset(QPoint(45, -20));
+	m_hoverWidget->setAnchorOffset(QPoint(0, -20));
 }
 
 void ScopyStatusBar::shouldDisplayNewStatus()
