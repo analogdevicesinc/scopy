@@ -16,7 +16,9 @@ public:
 
 private:
 	static void logOutputHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+	static void removeTempLogFile();
 	static FILE *logFile_;
+	static bool tempLogFile_;
 };
 } // namespace scopy
 
