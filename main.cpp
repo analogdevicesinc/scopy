@@ -8,6 +8,7 @@
 #include <core/cmdlinehandler.h>
 #include <core/scopymainwindow_api.h>
 #include <gui/utils.h>
+#include <core/crashreport.h>
 
 using namespace scopy;
 
@@ -70,11 +71,13 @@ void printRuntimeEnvironmentInfo()
 
 int main(int argc, char *argv[])
 {
-	initLogging();
 	QCoreApplication::setOrganizationName("ADI");
 	QCoreApplication::setOrganizationDomain("analog.com");
 	QCoreApplication::setApplicationName("Scopy-v2");
 	QSettings::setDefaultFormat(QSettings::IniFormat);
+
+	initLogging();
+	CrashReport::initSignalHandler();
 
 	QApplication::setAttribute(Qt::AA_ShareOpenGLContexts, true);
 	QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
