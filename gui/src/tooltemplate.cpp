@@ -98,6 +98,18 @@ void ToolTemplate::openTopContainerHelper(bool open) { m_ui->topCentral->toggleM
 
 void ToolTemplate::openBottomContainerHelper(bool open) { m_ui->bottomCentral->toggleMenu(open); }
 
+QSpacerItem *ToolTemplate::getContainerSpacer(QWidget *container)
+{
+	if(m_ui->topContainer == container)
+		return m_ui->topContainerSpacer;
+	else if(m_ui->topContainerMenuControl == container)
+		return m_ui->topContainerMenuControlSpacer;
+	else if(m_ui->bottomContainer == container)
+		return m_ui->bottomContainerSpacer;
+	else
+		return nullptr;
+}
+
 void ToolTemplate::addWidgetToTopContainerHelper(QWidget *w, ToolTemplateAlignment a)
 {
 	auto lay1 = dynamic_cast<QHBoxLayout *>(topContainer()->layout());
