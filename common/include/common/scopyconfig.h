@@ -10,6 +10,7 @@ namespace scopy {
 class SCOPY_COMMON_EXPORT config
 {
 public:
+	static QString tempLogFilePath();
 	static QString defaultPluginFolderPath();
 	static QString localPluginFolderPath();
 	static QString defaultTranslationFolderPath();
