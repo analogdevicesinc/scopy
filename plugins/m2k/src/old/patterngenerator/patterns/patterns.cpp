@@ -1781,15 +1781,14 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_sa
 
 	for(std::deque<uint8_t>::iterator it = v.begin(); it != v.end(); ++it) {
 		uint8_t val = *it;
-		bool oldbit = 0;
 		bool bit;
 
 		if(CPHA && start_new_frame) {
 			for(auto i = samples_per_bit / 2; i < samples_per_bit && buf_ptr < buf_ptr_end;
 			    i++, buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
-				*buf_ptr = changeBit(*buf_ptr, outputBit, oldbit);
+				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, CPOL);
+				*buf_ptr = changeBit(*buf_ptr, outputBit, 0); // start high-Z state is=0
 			}
 		}
 
@@ -1805,23 +1804,26 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_sa
 
 			for(size_t i = 0; i < samples_per_bit / 2 && buf_ptr < buf_ptr_end; i++, buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, CPOL);
+				*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
 
 				if(!CPHA) {
-					*buf_ptr = changeBit(*buf_ptr, outputBit, oldbit);
+					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, CPOL);
 				} else {
-					*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
+					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
 				}
 			}
 
 			for(auto i = samples_per_bit / 2; i < samples_per_bit && buf_ptr < buf_ptr_end;
 			    i++, buf_ptr++) {
 				*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-				*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
 				*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
-			}
 
-			oldbit = bit;
+				if(!CPHA) {
+					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
+				} else {
+					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, CPOL);
+				}
+			}
 		}
 
 		frameBytesLeft--;
@@ -1831,7 +1833,7 @@ uint8_t SPIPattern::generate_pattern(uint32_t sample_rate, uint32_t number_of_sa
 				for(auto i = samples_per_bit / 2; i < samples_per_bit && buf_ptr < buf_ptr_end;
 				    i++, buf_ptr++) {
 					*buf_ptr = changeBit(*buf_ptr, csBit, CSPOL);
-					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, !CPOL);
+					*buf_ptr = changeBit(*buf_ptr, clkActiveBit, CPOL);
 					*buf_ptr = changeBit(*buf_ptr, outputBit, bit);
 				}
 			}
