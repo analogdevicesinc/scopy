@@ -1,6 +1,6 @@
 #include "registercontroller.hpp"
 
-#include "qtextspinbox.hpp"
+#include "textspinbox.hpp"
 #include "regmapstylehelper.hpp"
 #include "utils.hpp"
 
@@ -10,7 +10,12 @@
 #include <qdebug.h>
 #include <qlabel.h>
 #include <qlineedit.h>
-#include <qspinbox.h>
+#include <qdebug.h>
+#include <QPushButton>
+#include <QSpinBox>
+#include <QAbstractSpinBox>
+#include <titlespinbox.hpp>
+#include <utils.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -19,62 +24,75 @@ RegisterController::RegisterController(QWidget *parent)
 	: QWidget{parent}
 {
 	mainLayout = new QHBoxLayout(this);
+	Utils::removeLayoutMargins(mainLayout);
 	setLayout(mainLayout);
 
-	QHBoxLayout *addressValueLayout = new QHBoxLayout();
+	QWidget *readWidget = new QWidget(this);
+	readWidget->setFixedHeight(72);
+	mainLayout->addWidget(readWidget);
+	QHBoxLayout *readWidgetLayout = new QHBoxLayout(readWidget);
+	Utils::removeLayoutMargins(readWidgetLayout);
+	readWidget->setLayout(readWidgetLayout);
+	readWidgetLayout->setMargin(16);
 
-	QVBoxLayout *leftLayout = new QVBoxLayout();
-	QHBoxLayout *labelLayout = new QHBoxLayout();
-	QHBoxLayout *widgetsLayout = new QHBoxLayout();
+	QVBoxLayout *readWidgetLeftLayout = new QVBoxLayout();
+	Utils::removeLayoutMargins(readWidgetLeftLayout);
+	adrPck = new TitleSpinBox("Address 1: ", readWidget);
+	adrPck->setMaximumHeight(40);
+	readWidgetLeftLayout->addWidget(adrPck);
 
-	QVBoxLayout *buttonLayout = new QVBoxLayout();
+	addressPicker = adrPck->getSpinBox();
 
-	leftLayout->addLayout(labelLayout, 1);
-	leftLayout->addLayout(widgetsLayout, 1);
-	addressValueLayout->addLayout(leftLayout);
-	addressValueLayout->addLayout(buttonLayout);
-	mainLayout->addLayout(addressValueLayout, 1);
-
-	addressLabel = new QLabel("Address: ", this);
-	valueLabel = new QLabel("Value: ", this);
-
-	labelLayout->addWidget(addressLabel, 1);
-	labelLayout->addWidget(valueLabel, 1);
-
-	addressPicker = new QSpinBox(this);
 	addressPicker->setDisplayIntegerBase(16);
 	addressPicker->setMinimum(0);
 	addressPicker->setMaximum(INT_MAX);
 	addressPicker->setPrefix("0x");
+	addressPicker->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QObject::connect(addressPicker, &QSpinBox::textChanged, this, [=](QString address) {
 		bool ok;
 		Q_EMIT registerAddressChanged(address.toInt(&ok, 16));
 	});
+	readWidgetLayout->addLayout(readWidgetLeftLayout, 3);
 
-	regValue = new QLineEdit(this);
-	regValue->setText("N/R");
-	regValue->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-	QObject::connect(regValue, &QLineEdit::textChanged, this, &RegisterController::valueChanged);
-
-	widgetsLayout->addWidget(addressPicker, 1);
-	widgetsLayout->addWidget(regValue, 1);
-
-	readButton = new QPushButton("Read", this);
+	readButton = new QPushButton("Read", readWidget);
 	// request read
 	QObject::connect(readButton, &QPushButton::clicked, this, [=]() {
 		bool ok;
 		Q_EMIT requestRead(addressPicker->text().toInt(&ok, 16));
 	});
 
-	writeButton = new QPushButton("Write", this);
+	readWidgetLayout->addWidget(readButton, 1, Qt::AlignRight);
+
+	QWidget *writeWidget = new QWidget(this);
+	writeWidget->setFixedHeight(72);
+	mainLayout->addWidget(writeWidget);
+	writeWidgetLayout = new QHBoxLayout(writeWidget);
+	Utils::removeLayoutMargins(writeWidgetLayout);
+	writeWidget->setLayout(writeWidgetLayout);
+	writeWidgetLayout->setMargin(16);
+
+	QVBoxLayout *writeWidgetLeftLayout = new QVBoxLayout();
+	Utils::removeLayoutMargins(writeWidgetLeftLayout);
+	writeWidgetLeftLayout->setSpacing(0);
+	valueLabel = new QLabel("Value: ", writeWidget);
+	writeWidgetLeftLayout->addWidget(valueLabel);
+
+	regValue = new QLineEdit(writeWidget);
+	regValue->setText("N/R");
+	regValue->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	QObject::connect(regValue, &QLineEdit::textChanged, this, &RegisterController::valueChanged);
+
+	writeWidgetLeftLayout->addWidget(regValue);
+	writeWidgetLayout->addLayout(writeWidgetLeftLayout, 3);
+
+	writeButton = new QPushButton("Write", writeWidget);
 	// request write on register
 	QObject::connect(writeButton, &QPushButton::clicked, this, [=]() {
 		bool ok;
 		Q_EMIT requestWrite(addressPicker->value(), regValue->text().toInt(&ok, 16));
 	});
 
-	buttonLayout->addWidget(readButton);
-	buttonLayout->addWidget(writeButton);
+	writeWidgetLayout->addWidget(writeButton, 1, Qt::AlignRight);
 
 	applyStyle();
 }
@@ -84,11 +102,10 @@ RegisterController::~RegisterController()
 
 	delete regValue;
 	delete addressPicker;
-	if(nameLabel)
-		delete nameLabel;
-	if(descriptionLabel)
-		delete descriptionLabel;
 	delete mainLayout;
+	if(detailedRegisterToggle) {
+		delete detailedRegisterToggle;
+	}
 }
 
 void RegisterController::registerChanged(uint32_t address)
@@ -102,30 +119,37 @@ void RegisterController::registerChanged(uint32_t address)
 
 void RegisterController::registerValueChanged(QString value) { regValue->setText(value); }
 
-void RegisterController::addNameAndDescription(QString name, QString description)
+QString RegisterController::getAddress() { return addressPicker->text(); }
+
+void RegisterController::setHasMap(bool hasMap)
 {
-	if(nameLabel) {
-		nameLabel->setText(QString("Name: " + name));
-		descriptionLabel->setText(QString("Description: " + description));
-	} else {
-		QVBoxLayout *nameDescriptionLayout = new QVBoxLayout();
-		nameLabel = new QLabel("Name: " + name);
-		descriptionLabel = new QLabel("Description: " + description);
-		nameDescriptionLayout->addWidget(nameLabel);
-		nameDescriptionLayout->addWidget(descriptionLabel);
-		mainLayout->addLayout(nameDescriptionLayout, 1);
+	this->hasMap = hasMap;
+
+	if(hasMap) {
+		detailedRegisterToggle = new QPushButton(this);
+		detailedRegisterToggle->setCheckable(true);
+		QIcon detailedRegisterToggleIcon;
+		detailedRegisterToggleIcon.addPixmap(
+			Util::ChangeSVGColor(":/gui/icons/scopy-default/icons/tool_calibration.svg", "white", 1));
+		detailedRegisterToggle->setIcon(detailedRegisterToggleIcon);
+		detailedRegisterToggle->setChecked(true);
+		QObject::connect(detailedRegisterToggle, &QPushButton::toggled, this,
+				 &RegisterController::toggleDetailedMenu);
+		writeWidgetLayout->addWidget(detailedRegisterToggle, 0.5, Qt::AlignRight);
+		RegmapStyleHelper::smallBlueButton(detailedRegisterToggle);
+		detailedRegisterToggle->setFixedSize(40, 40);
 	}
 }
 
 void RegisterController::applyStyle()
 {
-	setMaximumHeight(90);
-	RegmapStyleHelper::BlueButton(readButton, "");
-	RegmapStyleHelper::BlueButton(writeButton, "");
-	RegmapStyleHelper::labelStyle(addressLabel, "");
-	RegmapStyleHelper::labelStyle(valueLabel, "");
-	if(nameLabel)
-		RegmapStyleHelper::labelStyle(nameLabel, "");
-	if(descriptionLabel)
-		RegmapStyleHelper::labelStyle(descriptionLabel, "");
+	setFixedHeight(72);
+
+	readButton->setStyleSheet(RegmapStyleHelper::BlueButton(nullptr));
+	readButton->setFixedHeight(40);
+	writeButton->setStyleSheet(RegmapStyleHelper::BlueButton(nullptr));
+	writeButton->setFixedHeight(40);
+	valueLabel->setStyleSheet(RegmapStyleHelper::grayLabel(nullptr));
+
+	setStyleSheet(RegmapStyleHelper::regmapControllerStyle(nullptr));
 }

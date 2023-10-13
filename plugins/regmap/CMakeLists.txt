@@ -37,8 +37,8 @@ file(
 	src/register/bitfield/*.hpp
 	src/readwrite/*.cpp
 	src/readwrite/*.hpp
-	src/recycerview/*.cpp
-	src/recycerview/*.hpp
+	src/recyclerview/*.cpp
+	src/recyclerview/*.hpp
 )
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)

@@ -6,6 +6,8 @@
 #include <QMap>
 #include <QObject>
 #include <QWidget>
+#include <tooltemplate.h>
+#include "scopy-regmapplugin_export.h"
 
 class QVBoxLayout;
 
@@ -34,6 +36,7 @@ public:
 	bool hasTemplate();
 
 private:
+	ToolTemplate *tool;
 	bool autoread = false;
 	QVBoxLayout *layout;
 	RegisterMapTemplate *registerMapTemplate;

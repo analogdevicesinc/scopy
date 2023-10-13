@@ -1,5 +1,5 @@
-#ifndef QTEXTSPINBOX_HPP
-#define QTEXTSPINBOX_HPP
+#ifndef TEXTSPINBOX_H
+#define TEXTSPINBOX_H
 
 #include "scopy-regmapplugin_export.h"
 
@@ -7,10 +7,10 @@
 #include <QSpinBox>
 #include <QWidget>
 
-class SCOPY_REGMAPPLUGIN_EXPORT QTextSpinBox : public QSpinBox
+class SCOPY_REGMAPPLUGIN_EXPORT TextSpinBox : public QSpinBox
 {
 public:
-	explicit QTextSpinBox(QWidget *parent = 0);
+	explicit TextSpinBox(QWidget *parent = 0);
 
 	void setValues(QList<QString> *acceptedValues);
 
@@ -21,4 +21,4 @@ private:
 	QList<QString> *acceptedValues;
 };
 
-#endif // QTEXTSPINBOX_HPP
+#endif // TEXTSPINBOX_H

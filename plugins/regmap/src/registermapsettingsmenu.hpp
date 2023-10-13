@@ -2,9 +2,9 @@
 #define REGISTERMAPSETTINGSMENU_HPP
 
 #include <QObject>
+#include <QPushButton>
 #include <QWidget>
-
-#include <generic_menu.hpp>
+#include <menuheader.h>
 
 class QCheckBox;
 
@@ -12,9 +12,12 @@ class QLineEdit;
 namespace scopy {
 namespace regmap {
 
-class RegisterMapSettingsMenu : public ::scopy::gui::GenericMenu
+class RegisterMapSettingsMenu : public QWidget
 {
+	friend class RegmapStyleHelper;
+
 	Q_OBJECT
+
 public:
 	explicit RegisterMapSettingsMenu(QWidget *parent = nullptr);
 
@@ -25,6 +28,7 @@ Q_SIGNALS:
 	void requestRegisterDump(QString path);
 
 private:
+	MenuHeaderWidget *header;
 	void applyStyle();
 	QCheckBox *autoread;
 	QLabel *hexaPrefix1;
