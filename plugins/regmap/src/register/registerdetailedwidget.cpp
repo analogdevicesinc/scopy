@@ -10,6 +10,12 @@
 #include <QtMath>
 #include <qboxlayout.h>
 #include <qlabel.h>
+#include <regmapstylehelper.hpp>
+#include "registermodel.hpp"
+#include "qdebug.h"
+#include "utils.hpp"
+#include <QtMath>
+#include <menucollapsesection.h>
 
 using namespace scopy;
 using namespace regmap;
@@ -18,13 +24,27 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	: QWidget{parent}
 {
 	QVBoxLayout *layout = new QVBoxLayout(this);
+	Utils::removeLayoutMargins(layout);
 	setLayout(layout);
+	layout->setSpacing(5);
+
+	regWidth = regModel->getWidth();
+
+	QWidget *nameDescriptionWidget = new QWidget(this);
+	nameDescriptionWidget->setStyleSheet(RegmapStyleHelper::simpleWidgetStyle(nullptr));
+	QHBoxLayout *nameDescriptionLayout = new QHBoxLayout(nameDescriptionWidget);
+	nameDescriptionWidget->setLayout(nameDescriptionLayout);
+	QLabel *nameLabel = new QLabel("Name: " + regModel->getName(), this);
+	QLabel *descriptionLabel = new QLabel("Description: " + regModel->getDescription(), this);
+	nameDescriptionLayout->addWidget(nameLabel);
+	nameDescriptionLayout->addWidget(descriptionLabel);
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 
 	QGridLayout *bitFieldsWidgetLayout = new QGridLayout();
 	bitFieldsWidgetLayout->setMargin(0);
-	bitFieldsWidgetLayout->setSpacing(0);
+	bitFieldsWidgetLayout->setSpacing(4);
 
 	bitFieldList = new QVector<BitFieldDetailedWidget *>();
 	BitFieldDetailedWidgetFactory bitFieldDetailedWidgetFactory;
@@ -33,19 +53,18 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	VerticalScrollArea *scrollArea = new VerticalScrollArea();
 	scrollArea->setWidget(bitFieldsWidget);
 	layout->addWidget(scrollArea);
+
+	bitFieldsWidgetLayout->addWidget(nameDescriptionWidget, 0, 0, 1, 8);
 	int currentBitFieldCount = 0;
-	int row = 0;
+	int row = 1;
 	int col = 0;
 	for(int i = regModel->getBitFields()->size() - 1; i >= 0; --i) {
 		BitFieldDetailedWidget *bitFieldDetailedWidget =
 			bitFieldDetailedWidgetFactory.buildWidget(regModel->getBitFields()->at(i));
 		bitFieldList->push_back(bitFieldDetailedWidget);
-
 		bitFieldsWidgetLayout->addWidget(bitFieldDetailedWidget, row, col);
-
 		bitFieldsWidgetLayout->setColumnStretch(col, 1);
 		col++;
-
 		currentBitFieldCount += bitFieldDetailedWidget->getWidth();
 
 		if(col > scopy::regmap::Utils::getBitsPerRowDetailed()) {
@@ -56,7 +75,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 				 [=]() { Q_EMIT bitFieldValueChanged(getBitFieldsValue()); });
 	}
 	// add spacers to keep the shape of the detailed bitfileds when the number of bitfields didn't fill a row
-	if(row == 0) {
+	if(row == 1) {
 		while(col <= scopy::regmap::Utils::getBitsPerRowDetailed()) {
 			BitFieldDetailedWidget *aux = new BitFieldDetailedWidget("", "", 0, "", 1, "", 0, nullptr);
 			aux->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -113,6 +132,6 @@ QString RegisterDetailedWidget::getBitFieldsValue()
 		result += qPow(2, regOffset) * aux;
 		qDebug() << "aux = " << aux << " result = " << result;
 	}
-	return QString::number(result, 16);
+	return Utils::convertToHexa(result, regWidth);
 	;
 }

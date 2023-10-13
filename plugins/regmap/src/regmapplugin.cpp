@@ -1,34 +1,34 @@
 #include "regmapplugin.h"
 
 #include "deviceregistermap.hpp"
-#include "iioutil/contextprovider.h"
-#include "jsonformatedelement.hpp"
-#include "logging_categories.h"
-#include "registermapinstrument.hpp"
 #include "registermaptemplate.hpp"
 #include "registermapvalues.hpp"
-#include "scopy-regmapplugin_config.h"
-#include "utils.hpp"
+#include "regmapplugin.h"
 #include "xmlfilemanager.hpp"
-
 #include <iio.h>
-
-#include <QDebug>
-#include <QDir>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QLabel>
 #include <QVBoxLayout>
-#include <QVector>
+#include <QDebug>
 #include <QWidget>
-
-#include <pluginbase/preferences.h>
-#include <pluginbase/preferenceshelper.h>
+#include <QVector>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <registermaptool.hpp>
 #include <src/readwrite/iioregisterreadstrategy.hpp>
 #include <src/readwrite/iioregisterwritestrategy.hpp>
+#include <pluginbase/preferences.h>
+#include <pluginbase/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+#include "logging_categories.h"
+
+#include "iioutil/contextprovider.h"
+#include "jsonformatedelement.hpp"
+#include "scopy-regmapplugin_config.h"
+#include "utils.hpp"
+#include "utils.hpp"
 #if defined __APPLE__
 #include <QApplication>
 #endif
@@ -46,13 +46,14 @@ bool RegmapPlugin::loadPage()
 bool RegmapPlugin::loadIcon()
 {
 	m_icon = new QLabel("");
-	m_icon->setStyleSheet("border-image: url(:/icons/RegMap.svg);");
+	m_icon->setStyleSheet("border-image: url(:/gui/icons/scopy-default/icons/RegMap.svg);");
 	return true;
 }
 
 void RegmapPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("regmap", "Register Map", ":/icons/RegMap.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("regmap", "Register Map", ":/gui/icons/scopy-default/icons/RegMap.svg"));
 }
 
 void RegmapPlugin::unload()
@@ -128,7 +129,6 @@ bool RegmapPlugin::onConnect()
 	iio_context *ctx = cp->open(m_param);
 
 	m_deviceList = new QList<iio_device *>();
-
 	auto deviceCount = iio_context_get_devices_count(ctx);
 
 	for(int i = 0; i < deviceCount; i++) {
@@ -140,15 +140,14 @@ bool RegmapPlugin::onConnect()
 	}
 	m_registerMapWidget = new QWidget();
 	QVBoxLayout *layout = new QVBoxLayout(m_registerMapWidget);
+	layout->setMargin(0);
 	m_registerMapWidget->setLayout(layout);
-
 	scopy::regmap::Utils::applyJsonConfig();
 
 	if(m_deviceList && !m_deviceList->isEmpty()) {
 		QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
-		scopy::regmap::RegisterMapInstrument *regMapInstrument = new scopy::regmap::RegisterMapInstrument();
-
-		layout->addWidget(regMapInstrument);
+		scopy::regmap::RegisterMapTool *registerMapTool = new scopy::regmap::RegisterMapTool();
+		layout->addWidget(registerMapTool);
 
 		for(int i = 0; i < m_deviceList->size(); ++i) {
 			iio_device *dev = m_deviceList->at(i);
@@ -158,11 +157,10 @@ bool RegmapPlugin::onConnect()
 			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
 			if(!templatePaths.isEmpty()) {
 				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
-				regMapInstrument->addTab(dev, devName, xmlsPath.absoluteFilePath(templatePaths));
+				registerMapTool->addTab(dev, devName, xmlsPath.absoluteFilePath(templatePaths));
 			} else {
-				regMapInstrument->addTab(dev, iio_device_get_name(dev));
+				registerMapTool->addTab(dev, iio_device_get_name(dev));
 			}
-
 			qDebug(CAT_REGMAP) << "";
 		}
 

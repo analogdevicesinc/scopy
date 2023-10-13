@@ -91,7 +91,7 @@ void BitFieldSimpleWidget::checkPreferences()
 
 	if(background.contains("Bitfield background")) {
 		bool ok;
-		this->setStyleSheet(
+		mainFrame->setStyleSheet(
 			QString("background-color: " + Util::getColors().at(value->text().toInt(&ok, 16) % 16)));
 	}
 

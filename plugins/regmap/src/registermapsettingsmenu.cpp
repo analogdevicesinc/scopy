@@ -14,25 +14,30 @@
 
 #include <src/readwrite/fileregisterreadstrategy.hpp>
 
+#include <menusectionwidget.h>
+
 using namespace scopy;
 using namespace regmap;
 
 RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
-	: GenericMenu{parent}
+	: QWidget{parent}
 {
-	initInteractiveMenu();
-	const QColor *color = new QColor(RegmapStyleHelper::getColor("ScopyBlue"));
-	setMenuHeader("Settings", color, false);
+	QVBoxLayout *layout = new QVBoxLayout(this);
+	layout->setMargin(0);
+	layout->setSpacing(10);
+	setLayout(layout);
 
-	scopy::gui::SubsectionSeparator *menuSection = new scopy::gui::SubsectionSeparator("", false);
-	menuSection->setLineVisible(false);
-	insertSection(menuSection);
-	menuSection->getContentWidget()->layout()->setSpacing(5);
+	header = new MenuHeaderWidget("Settings", QPen(RegmapStyleHelper::getColor("ScopyBlue")), this);
 
-	autoread = new QCheckBox("Autoread");
+	layout->addWidget(header);
+
+	MenuSectionWidget *menuSection = new MenuSectionWidget(this);
+	layout->addWidget(menuSection);
+
+	autoread = new QCheckBox("Autoread", menuSection);
 
 	QObject::connect(autoread, &QCheckBox::toggled, this, &RegisterMapSettingsMenu::autoreadToggled);
-	menuSection->getContentWidget()->layout()->addWidget(autoread);
+	menuSection->contentLayout()->addWidget(autoread);
 
 	QWidget *setIntervalWidget = new QWidget();
 	QVBoxLayout *setIntervalWidgetLayout = new QVBoxLayout(setIntervalWidget);
@@ -84,8 +89,9 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 		}
 	});
 
-	menuSection->getContentWidget()->layout()->addWidget(setIntervalWidget);
-	menuSection->getContentWidget()->layout()->addWidget(readInterval);
+	menuSection->contentLayout()->addWidget(setIntervalWidget);
+	menuSection->contentLayout()->addWidget(readInterval);
+	menuSection->contentLayout()->setSpacing(10);
 
 	QWidget *findPathWidget = new QWidget();
 	QHBoxLayout *findPathLayout = new QHBoxLayout();
@@ -101,7 +107,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 
 	findPathLayout->addWidget(filePath);
 	findPathLayout->addWidget(pathButton);
-	menuSection->getContentWidget()->layout()->addWidget(findPathWidget);
+	menuSection->contentLayout()->addWidget(findPathWidget);
 
 	writeListOfValuesButton = new QPushButton("Write values");
 	writeListOfValuesButton->setEnabled(false);
@@ -121,7 +127,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 		}
 	});
 
-	menuSection->getContentWidget()->layout()->addWidget(writeListOfValuesButton);
+	menuSection->contentLayout()->addWidget(writeListOfValuesButton);
 
 	registerDump = new QPushButton("Register dump");
 	registerDump->setEnabled(false);
@@ -134,7 +140,7 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 		Q_EMIT requestRegisterDump(filePath->text());
 	});
 
-	menuSection->getContentWidget()->layout()->addWidget(registerDump);
+	menuSection->contentLayout()->addWidget(registerDump);
 
 	QObject::connect(filePath, &QLineEdit::textChanged, this, [=](QString text) {
 		writeListOfValuesButton->setEnabled(!text.isEmpty());
@@ -147,13 +153,4 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	applyStyle();
 }
 
-void RegisterMapSettingsMenu::applyStyle()
-{
-	RegmapStyleHelper::checkboxStyle(autoread, "");
-	RegmapStyleHelper::bigTextLabelStyle(hexaPrefix1, "");
-	RegmapStyleHelper::bigTextLabelStyle(hexaPrefix2, "");
-	RegmapStyleHelper::BlueButton(readInterval, "");
-	RegmapStyleHelper::BlueButton(writeListOfValuesButton, "");
-	RegmapStyleHelper::BlueButton(registerDump, "");
-	RegmapStyleHelper::BlueButton(pathButton, "");
-}
+void RegisterMapSettingsMenu::applyStyle() { RegmapStyleHelper::regmapSettingsMenu(this); }

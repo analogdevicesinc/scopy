@@ -137,6 +137,7 @@
         <file>icons/scopy-default/icons/play_stop.svg</file>
         <file>icons/scopy-default/icons/preferences.svg</file>
         <file>icons/scopy-default/icons/save.svg</file>
+        <file>icons/scopy-default/icons/search.svg</file>
         <file>icons/scopy-default/icons/sba_cmb_box_arrow.svg</file>
         <file>icons/scopy-default/icons/sba_cmb_box_arrow_right.svg</file>
         <file>icons/scopy-default/icons/setup3_checked_hover.svg</file>
@@ -156,5 +157,9 @@
         <file>icons/scopy-default/icons/tool_voltmeter.svg</file>
         <file>icons/scopy-default/icons/unlocked.svg</file>
         <file>icons/warning.svg</file>
+        <file>icons/scopy-default/icons/RegMap.svg</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>icons/scopy-default/icons/search.svg</file>
     </qresource>
 </RCC>
