@@ -9,6 +9,10 @@
 #include <qcombobox.h>
 #include <qlabel.h>
 #include <qlineedit.h>
+#include <QtMath>
+#include <utils.hpp>
+#include <regmapstylehelper.hpp>
+#include <stylehelper.h>
 
 #include <regmapstylehelper.hpp>
 #include <utils.hpp>
@@ -28,7 +32,8 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 
 	mainFrame = new QFrame();
 	layout = new QVBoxLayout(this);
-	layout->setSpacing(4);
+	layout->setSpacing(0);
+	layout->setMargin(4);
 
 	QHBoxLayout *firstLayout = new QHBoxLayout();
 	nameLabel = new QLabel(name);
@@ -64,8 +69,8 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 
 	QVBoxLayout *mainLayout = new QVBoxLayout();
 	mainLayout->addWidget(mainFrame);
-	mainLayout->setSpacing(4);
-	mainLayout->setMargin(4);
+	mainLayout->setSpacing(0);
+	mainLayout->setMargin(0);
 	setLayout(mainLayout);
 
 	if(description == "Reserved") {
@@ -84,8 +89,8 @@ BitFieldDetailedWidget::~BitFieldDetailedWidget()
 		delete value;
 	if(valueComboBox)
 		delete valueComboBox;
-	if(valueCheckBox)
-		delete valueCheckBox;
+	if(valueSwitch)
+		delete valueSwitch;
 	if(valueLineEdit)
 		delete valueLineEdit;
 	delete mainFrame;
@@ -96,14 +101,14 @@ QString BitFieldDetailedWidget::getToolTip() const { return toolTip; }
 void BitFieldDetailedWidget::firstRead()
 {
 	if(description == "Reserved") {
-		valueLineEdit = new QLineEdit();
+		valueLineEdit = new QLineEdit(this);
 		valueLineEdit->setText("0x0");
-		valueLineEdit->setReadOnly(true);
+		valueLineEdit->setEnabled(false);
 		layout->addWidget(valueLineEdit);
 	} else if(access == "R") {
-		value = new QLabel();
+		value = new QLabel(this);
 	} else if(options && !options->isEmpty()) {
-		valueComboBox = new QComboBox();
+		valueComboBox = new QComboBox(this);
 
 		// check if there are enough options to cover all posible cases for the number of bits
 		if(!(options->count() == qPow(2, width))) {
@@ -127,11 +132,12 @@ void BitFieldDetailedWidget::firstRead()
 
 		// if is only one bit we will use a toggle button
 	} else if(width == 1) {
-		valueCheckBox = new QCheckBox();
-		layout->addWidget(valueCheckBox);
+		valueSwitch = new SmallOnOffSwitch(this);
+		layout->addWidget(valueSwitch);
+		layout->setAlignment(valueSwitch, Qt::AlignRight);
 
-		QObject::connect(valueCheckBox, &QCheckBox::toggled, this, [=]() {
-			if(valueCheckBox->isChecked()) {
+		QObject::connect(valueSwitch, &SmallOnOffSwitch::toggled, this, [=]() {
+			if(valueSwitch->isChecked()) {
 				Q_EMIT valueUpdated("1");
 			} else {
 				Q_EMIT valueUpdated("0");
@@ -139,9 +145,8 @@ void BitFieldDetailedWidget::firstRead()
 		});
 
 	} else {
-		valueLineEdit = new QLineEdit();
+		valueLineEdit = new QLineEdit(this);
 		layout->addWidget(valueLineEdit);
-
 		QObject::connect(valueLineEdit, &QLineEdit::textChanged, this,
 				 [=](QString val) { Q_EMIT valueUpdated(val); });
 	}
@@ -165,8 +170,8 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
 		if(valueLineEdit) {
 			valueLineEdit->setText(newValue);
 
-		} else if(valueCheckBox) {
-			valueCheckBox->setChecked(newValue == "1");
+		} else if(valueSwitch) {
+			valueSwitch->setChecked(newValue == "1");
 		} else if(valueComboBox) {
 
 			for(int i = 0; i < options->length(); i++) {
@@ -195,8 +200,8 @@ QString BitFieldDetailedWidget::getValue()
 	if(valueLineEdit) {
 		return valueLineEdit->text();
 	}
-	if(valueCheckBox) {
-		if(valueCheckBox->isChecked()) {
+	if(valueSwitch) {
+		if(valueSwitch->isChecked()) {
 			return "1";
 		} else {
 			return "0";
