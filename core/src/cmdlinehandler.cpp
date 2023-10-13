@@ -3,6 +3,7 @@
 using namespace scopy;
 
 FILE *CmdLineHandler::logFile_{nullptr};
+bool CmdLineHandler::tempLogFile_{false};
 
 int CmdLineHandler::handle(QCommandLineParser &parser, ScopyMainWindow_API &scopyApi)
 {
@@ -46,12 +47,13 @@ int CmdLineHandler::handle(QCommandLineParser &parser, ScopyMainWindow_API &scop
 void CmdLineHandler::withLogFileOption(QCommandLineParser &parser)
 {
 	QString fileName = parser.value("logfile");
-	if(!fileName.isEmpty()) {
-		QString filePath = scopy::config::settingsFolderPath() + "/" + fileName;
-		logFile_ = fopen(filePath.toStdString().c_str(), "w");
-		if(logFile_) {
-			qInstallMessageHandler(logOutputHandler);
-		}
+	if(fileName.isEmpty()) {
+		fileName = scopy::config::tempLogFilePath();
+		tempLogFile_ = true;
+	}
+	logFile_ = fopen(fileName.toStdString().c_str(), "w");
+	if(logFile_) {
+		qInstallMessageHandler(logOutputHandler);
 	}
 }
 
@@ -60,6 +62,14 @@ void CmdLineHandler::closeLogFile()
 	if(logFile_) {
 		fclose(logFile_);
 		logFile_ = nullptr;
+		removeTempLogFile();
+	}
+}
+
+void CmdLineHandler::removeTempLogFile()
+{
+	if(tempLogFile_) {
+		QFile::remove(scopy::config::tempLogFilePath());
 	}
 }
 
