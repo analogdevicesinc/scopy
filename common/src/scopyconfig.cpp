@@ -8,6 +8,8 @@
 #include <QSysInfo>
 #include <QUuid>
 
+QString scopy::config::tempLogFilePath() { return QDir::cleanPath(settingsFolderPath() + "/" + SCOPY_TEMP_LOG_FILE); }
+
 QString scopy::config::defaultPluginFolderPath()
 {
 	// Plugin path is different per system
