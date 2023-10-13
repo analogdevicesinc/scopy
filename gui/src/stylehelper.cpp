@@ -215,7 +215,7 @@ void StyleHelper::BlueButton(QPushButton *btn, QString objectName)
 						}
 
 						QPushButton:disabled {
-							background-color:#4A64FF; /* design token - uiElement*/
+							background-color:#727273; /* design token - uiElement*/
 						}
 
 						QPushButton:checked {
@@ -251,7 +251,7 @@ void StyleHelper::SmallBlueButton(QPushButton *btn, QString objectName)
 						}
 
 						QPushButton:disabled {
-							background-color:#4A64FF; /* design token - uiElement*/
+							background-color:#727273; /* design token - uiElement*/
 						}
 
 						QPushButton:checked {
@@ -380,7 +380,7 @@ void StyleHelper::MenuMediumLabel(QLabel *lbl, QString objectName)
 	if(!objectName.isEmpty())
 		lbl->setObjectName(objectName);
 	lbl->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	lbl->setMinimumWidth(80);
+	lbl->setMinimumWidth(50);
 	//	lbl->setMaximumWidth(80);
 	QString style = QString(R"css(
 				QLabel {

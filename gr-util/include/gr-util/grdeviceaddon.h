@@ -36,14 +36,12 @@ public Q_SLOTS:
 	void onDeinit() override;
 	void preFlowStart() override;
 	void postFlowStart() override;
-	void preFlowStop() override {}
-	void postFlowStop() override {}
+	void preFlowStop() override;
+	void postFlowStop() override;
 	void preFlowBuild() override;
-	void postFlowBuild() override {}
-	void preFlowTeardown() override {}
-	void postFlowTeardown() override {}
-	void onChannelAdded(ToolAddon *) override;
-	void onChannelRemoved(ToolAddon *) override;
+	void postFlowBuild() override;
+	void preFlowTeardown() override;
+	void postFlowTeardown() override;
 
 private:
 	QString name;
