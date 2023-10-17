@@ -7,6 +7,7 @@
 #include <QScrollEvent>
 #include <QSlider>
 #include <qlabel.h>
+#include <regmapstylehelper.hpp>
 
 #include <src/verticalscrollarea.hpp>
 
@@ -37,6 +38,8 @@ RecyclerView::RecyclerView(QList<int> *widgets, QWidget *parent)
 	slider = new QSlider(this);
 	slider->setInvertedAppearance(true);
 	slider->setInvertedControls(true);
+	slider->setFixedWidth(8);
+	slider->setStyleSheet(RegmapStyleHelper::sliderStyle(nullptr));
 
 	QObject::connect(m_scrollArea->verticalScrollBar(), &QAbstractSlider::valueChanged, this, [=](int value) {
 		if(value == m_scrollArea->verticalScrollBar()->minimum()) {

@@ -26,7 +26,7 @@ public:
 	static JsonFormatedElement *getJsonTemplate(QString xml);
 
 	static void applyJsonConfig();
-	static QString getTemplate(QString devName);
+	static JsonFormatedElement *getTemplate(QString devName);
 
 private:
 	static const int bitsPerRow = 7;

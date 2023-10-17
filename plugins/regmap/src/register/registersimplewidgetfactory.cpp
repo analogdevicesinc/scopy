@@ -38,9 +38,7 @@ RegisterSimpleWidget *RegisterSimpleWidgetFactory::buildWidget(RegisterModel *mo
 		}
 	}
 
-	RegisterSimpleWidget *rsw =
-		new RegisterSimpleWidget(model->getName(), QString::number(model->getAddress(), 16),
-					 model->getDescription(), model->getNotes(), model->getWidth(), bitFields);
+	RegisterSimpleWidget *rsw = new RegisterSimpleWidget(model, bitFields);
 
 	rsw->setStyleSheet(RegmapStyleHelper::simpleRegisterStyle(rsw, "rsw") +
 			   RegmapStyleHelper::frameBorderHover(rsw, "rsw"));

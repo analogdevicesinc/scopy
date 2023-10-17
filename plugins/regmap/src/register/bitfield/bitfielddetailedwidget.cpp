@@ -133,14 +133,15 @@ void BitFieldDetailedWidget::firstRead()
 		// if is only one bit we will use a toggle button
 	} else if(width == 1) {
 		valueSwitch = new SmallOnOffSwitch(this);
+		valueSwitch->setChecked(false);
 		layout->addWidget(valueSwitch);
 		layout->setAlignment(valueSwitch, Qt::AlignRight);
 
-		QObject::connect(valueSwitch, &SmallOnOffSwitch::toggled, this, [=]() {
-			if(valueSwitch->isChecked()) {
-				Q_EMIT valueUpdated("1");
-			} else {
+		QObject::connect(valueSwitch, &SmallOnOffSwitch::toggled, this, [=](bool toggled) {
+			if(toggled) {
 				Q_EMIT valueUpdated("0");
+			} else {
+				Q_EMIT valueUpdated("1");
 			}
 		});
 
@@ -171,7 +172,13 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
 			valueLineEdit->setText(newValue);
 
 		} else if(valueSwitch) {
-			valueSwitch->setChecked(newValue == "1");
+			if(newValue == "0x0" && valueSwitch->isChecked()) {
+				valueSwitch->toggle();
+			}
+			if(newValue == "0x1" && !valueSwitch->isChecked()) {
+				valueSwitch->toggle();
+			}
+
 		} else if(valueComboBox) {
 
 			for(int i = 0; i < options->length(); i++) {
@@ -192,7 +199,7 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
 void BitFieldDetailedWidget::registerValueUpdated(QString newValue)
 {
 	lastReadValue->setText(QString("Current : 0x") + newValue);
-	updateValue(newValue);
+	updateValue(QString("0x") + newValue);
 }
 
 QString BitFieldDetailedWidget::getValue()
