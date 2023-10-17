@@ -11,104 +11,67 @@ using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_SCOPYSTATUSBAR, "ScopyStatusBar")
 
 ScopyStatusBar::ScopyStatusBar(QWidget *parent)
-	: QStatusBar(parent)
+	: MenuVAnim(parent)
 {
 	initUi();
-	initHistory();
 
 	auto statusManager = StatusManager::GetInstance();
-	connect(statusManager, &StatusManager::sendStatus, this, &ScopyStatusBar::processStatus);
+	connect(statusManager, &StatusManager::sendStatus, this,
+		[this](StatusMessage *message) { displayStatus(message); });
 
-	connect(statusManager, &StatusManager::announceStatusAvailable, this, &ScopyStatusBar::shouldDisplayNewStatus);
-	connect(statusManager, &StatusManager::sendUrgentMessage, this, &ScopyStatusBar::receiveUrgentMessage);
-	connect(this, &ScopyStatusBar::messageChanged, this, &ScopyStatusBar::shouldDisplayNewStatus);
-
-	statusManager->requestStatus(); // initially, the status bar should tell StatusManager that messages are enabled
+	connect(statusManager, &StatusManager::clearDisplay, this, [this]() { clearStatus(); });
 }
 
 void ScopyStatusBar::initUi()
 {
+	// general layout
+	auto mainLayout = new QHBoxLayout(this);
+	mainLayout->setContentsMargins(0, 0, 0, 0);
+	setLayout(mainLayout);
+
+	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	setAnimMin(0);
+	setAnimMax(20);
+	setMinimumHeight(20);
+	setMaximumHeight(20);
+
+	m_leftWidget = new QWidget(this);
+	auto leftLayout = new QHBoxLayout(m_leftWidget);
+	leftLayout->setContentsMargins(0, 0, 0, 0);
+	m_leftWidget->setLayout(leftLayout);
+
+	m_rightWidget = new QWidget(this);
+	auto rightLayout = new QHBoxLayout(m_rightWidget);
+	rightLayout->setContentsMargins(0, 3, 0, 3);
+	m_rightWidget->setLayout(rightLayout);
+
+	layout()->addWidget(m_leftWidget);
+	layout()->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
+	layout()->addWidget(m_rightWidget);
+
+	// right layout
 	StyleHelper::ScopyStatusBar(this, "ScopyStatusBar");
 
-	auto *sizeGrip = this->findChild<QSizeGrip *>();
-	if(sizeGrip) {
-		// hackish, but hide() and setVisible(false) do not work here
-		sizeGrip->setStyleSheet("width: 0; height: 0;");
-	}
-
-	m_historyButton = new QPushButton(this);
-	m_historyButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	m_historyButton->setFixedSize(20, 20);
-	m_historyButton->setStyleSheet("background-color: #272730");
-	m_historyButton->setIcon(QIcon(":/gui/icons/scopy-default/icons/tool_calibration.svg"));
-	m_historyButton->setIconSize(m_historyButton->size());
-	m_historyButton->setCheckable(true);
-	connect(m_historyButton, &QPushButton::toggled, this, &ScopyStatusBar::showHistory);
-
-	this->addPermanentWidget(m_historyButton);
+	hide();
 }
 
-void ScopyStatusBar::initHistory()
-{
-	m_historyList = new QListWidget(this);
-	StyleHelper::ScopyHistoryList(m_historyList, "HistoryList");
+void ScopyStatusBar::addToRight(QWidget *widget) { m_rightWidget->layout()->addWidget(widget); }
 
-	m_hoverWidget = new HoverWidget(m_historyList, m_historyButton, parentWidget());
-	m_hoverWidget->setObjectName("statusHover");
-	m_hoverWidget->setAnchorPos(HP_TOP);
-	m_hoverWidget->setContentPos(HP_TOPLEFT);
-	m_hoverWidget->setAnchorOffset(QPoint(0, -20));
+void ScopyStatusBar::addToLeft(QWidget *widget) { m_leftWidget->layout()->addWidget(widget); }
+
+void ScopyStatusBar::displayStatus(StatusMessage *statusMessage)
+{
+	m_message = statusMessage;
+	addToLeft(statusMessage->getWidget());
+	this->toggleMenu(true);
+	this->show();
 }
 
-void ScopyStatusBar::shouldDisplayNewStatus()
+void ScopyStatusBar::clearStatus()
 {
-	if(this->currentMessage() == "") {
-		auto statusManager = StatusManager::GetInstance();
-		statusManager->requestStatus();
-	}
-}
-
-void ScopyStatusBar::processStatus(QVariant status, int ms)
-{
-	if(status.canConvert<QString>()) {
-		QString statusString = status.toString();
-		this->showMessage(statusString, ms);
-
-		m_historyList->addItem(statusString);
-		if(m_historyList->count() > 10) {
-			m_historyList->takeItem(0); // see if item needs to be deleted
-		}
-	} else if(status.canConvert<QWidget *>()) {
-		auto *statusWidget = qvariant_cast<QWidget *>(status);
-		auto *time = new QTimer(this);
-		time->start(ms);
-		connect(time, &QTimer::timeout, this, [this, time, statusWidget]() {
-			this->removeWidget(statusWidget);
-			delete time;
-		});
-		this->addWidget(statusWidget);
-
-		//		auto* listItem = new QListWidgetItem();
-		//		listItem->setData(Qt::UserRole, QVariant::fromValue(statusWidget));
-		//		if (m_historyList->count() > 10) {
-		//			m_historyList->takeItem(0); // see if item needs to be deleted
-		//		}
-		// TODO: find workaround to display items in history as well
-	}
-}
-
-void ScopyStatusBar::showHistory(bool checked)
-{
-	if(checked) {
-		m_hoverWidget->raise();
-	}
-	m_hoverWidget->setVisible(checked);
-}
-
-void ScopyStatusBar::receiveUrgentMessage(QString message, int ms)
-{
-	// the current message will be erased in favor of the urgent message
-	this->showMessage(message, ms);
+	this->toggleMenu(false);
+	delete m_message;
+	m_message = nullptr;
 }
 
 #include "moc_scopystatusbar.cpp"

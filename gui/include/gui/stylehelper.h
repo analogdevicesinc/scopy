@@ -92,8 +92,7 @@ public:
 	static void FrameBackgroundShadow(QFrame *w, QString objectName = "");
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
-	static void ScopyStatusBar(QStatusBar *w, QString objectName = "");
-	static void ScopyHistoryList(QListWidget *w, QString objectName = "");
+	static void ScopyStatusBar(QWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
