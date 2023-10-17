@@ -10,7 +10,8 @@ class TabInfo : public QObject
 {
 	Q_OBJECT
 public:
-	explicit TabInfo(struct iio_device *dev, QString deviceName, QString xmlPath, QObject *parent = nullptr);
+	explicit TabInfo(struct iio_device *dev, QString deviceName, QString xmlPath, bool isAxi,
+			 QObject *parent = nullptr);
 
 	iio_device *getDev() const;
 
@@ -18,12 +19,15 @@ public:
 
 	QString getXmlPath() const;
 
+	bool getIsAxi() const;
+
 signals:
 
 private:
 	struct iio_device *dev;
 	QString deviceName;
 	QString xmlPath;
+	bool isAxi;
 };
 
 #endif // TABINFO_HPP

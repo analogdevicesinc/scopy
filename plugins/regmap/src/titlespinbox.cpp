@@ -50,13 +50,7 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	setStyleSheet(scopy::regmap::RegmapStyleHelper::titleSpinBoxStyle(nullptr));
 }
 
-TitleSpinBox::~TitleSpinBox()
-{
-	delete spinBoxUpButton;
-	delete spinBoxDownButton;
-	delete titleLabel;
-	delete spinBox;
-}
+TitleSpinBox::~TitleSpinBox() {}
 
 void TitleSpinBox::setTitle(QString title) { titleLabel->setText(title); }
 

@@ -28,9 +28,9 @@ public:
 	explicit RegisterMapTool(QWidget *parent = nullptr);
 	~RegisterMapTool();
 
-	void addTab(struct iio_device *dev, QString title, QString xmlPath);
-	void addTab(struct iio_device *dev, QString title);
-	void addTab(QString filePath, QString title);
+	void addTab(struct iio_device *dev, QString title, QString xmlPath, bool isAxi);
+	void addTab(struct iio_device *dev, QString title, bool isAxi);
+	void addTab(QString filePath, QString title, bool isAxi);
 
 signals:
 

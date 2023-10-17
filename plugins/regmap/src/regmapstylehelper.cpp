@@ -637,3 +637,38 @@ QString RegmapStyleHelper::widgetidthRoundCornersStyle(QWidget *widget, QString 
 
 	return style;
 }
+
+QString RegmapStyleHelper::sliderStyle(QSlider *slider, QString objectName)
+{
+	if(!objectName.isEmpty() && slider)
+		slider->setObjectName(objectName);
+
+	QString style = QString(R"css(
+						QSlider::handle {
+						 background: #404040;
+						 border: 0px;
+						 max-width: 8px;
+						 margin: -8px 0;
+						 border-radius: 3px;
+						}
+						QSlider::handle:vertical:hover {
+						 background: #4a4a4b;
+						}
+						QSlider::groove {
+						 border: 0px;
+						 background: &&grooveBackground&& ;
+						 margin: 2px 0;
+						 border-radius: 0px;
+						 max-width: 8px;
+						}
+						)css");
+
+	style.replace("&&handleBackground&&", RegmapStyleHelper::getColor("LabelText"));
+	style.replace("&&grooveBackground&&", RegmapStyleHelper::getColor("Transparent"));
+
+	if(slider) {
+		slider->setStyleSheet(style);
+	}
+
+	return style;
+}

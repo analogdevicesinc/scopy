@@ -16,7 +16,6 @@ public:
 	explicit RegisterDetailedWidget(RegisterModel *regModel, QWidget *parent = nullptr);
 
 	void updateBitFieldsValue(uint32_t value);
-	void registerValueUpdated(uint32_t value);
 	QString getBitFieldsValue();
 
 private:
