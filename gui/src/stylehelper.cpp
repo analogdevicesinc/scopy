@@ -1034,31 +1034,17 @@ void StyleHelper::TransparentWidget(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
-void StyleHelper::ScopyStatusBar(QStatusBar *w, QString objectName)
+void StyleHelper::ScopyStatusBar(QWidget *w, QString objectName)
 {
 	if(!objectName.isEmpty())
 		w->setObjectName(objectName);
 
 	QString style = QString(R"css(
-				QStatusBar {
+				QWidget {
 					background-color: &&UIElementBackground&&;
 				}
 				)css");
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
-	w->setStyleSheet(style);
-}
-
-void StyleHelper::ScopyHistoryList(QListWidget *w, QString objectName)
-{
-	if(!objectName.isEmpty())
-		w->setObjectName(objectName);
-	QString style = QString(R"css(
-				QListWidget {
-					background-color: &&ScopyBackground&&;
-					border: 1px solid grey;
-				}
-				)css");
-	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
 	w->setStyleSheet(style);
 }
 
