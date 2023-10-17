@@ -5,49 +5,40 @@
 #include <QStatusBar>
 #include <QPushButton>
 #include <QListWidget>
+#include <QLabel>
+#include <QList>
 #include "hoverwidget.h"
+#include "pluginbase/statusmessage.h"
+#include "utils.h"
+#include "menu_anim.hpp"
 #include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPY_GUI_EXPORT ScopyStatusBar : public QStatusBar
+class SCOPY_GUI_EXPORT ScopyStatusBar : public MenuVAnim
 {
 	Q_OBJECT
+	QWIDGET_PAINT_EVENT_HELPER
 public:
 	explicit ScopyStatusBar(QWidget *parent = nullptr);
 
+Q_SIGNALS:
+	void requestHistory();
+
 public Q_SLOTS:
-	/**
-	 * @brief Verifies weather ScopyStatusBar can display a new status. It can display it if the current status
-	 * is empty.
-	 * */
-	void shouldDisplayNewStatus();
-
-	/**
-	 * @brief Displays the received status.
-	 * @param status A QString or a QWidget* that will be processed and displayed.
-	 * @param ms The time the status will appear on screen, in milliseconds.
-	 * */
-	void processStatus(QVariant status, int ms);
-
-	/**
-	 * @brief Pops up the history of the last statuses.
-	 * */
-	void showHistory(bool checked);
-
-	/**
-	 * @brief overrides the current message with the one send as parameter.
-	 * @param message QString with the urgent message
-	 * @param ms The time that the message will be displayed (in milliseconds)
-	 * */
-	void receiveUrgentMessage(QString message, int ms);
+	void displayStatus(StatusMessage *statusMessage);
+	void clearStatus();
 
 private:
 	void initUi();
-	void initHistory();
 
-	QPushButton *m_historyButton;
-	QListWidget *m_historyList;
-	HoverWidget *m_hoverWidget;
+	void addToRight(QWidget *widget);
+	void addToLeft(QWidget *widget);
+
+	StatusMessage *m_message;
+
+	// UI elements
+	QWidget *m_leftWidget;
+	QWidget *m_rightWidget;
 };
 } // namespace scopy
 
