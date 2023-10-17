@@ -97,23 +97,12 @@ void RegisterDetailedWidget::updateBitFieldsValue(uint32_t value)
 		bitFieldList->at(i)->blockSignals(true);
 
 		int width = bitFieldList->at(i)->getWidth();
-		int bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
-		QString bitFieldValue = QString::number(bfVal, 16);
-		bitFieldList->at(i)->updateValue(bitFieldValue);
-		regOffset += width;
-
-		bitFieldList->at(i)->blockSignals(false);
-	}
-}
-
-void RegisterDetailedWidget::registerValueUpdated(uint32_t value)
-{
-	int regOffset = 0;
-	for(int i = bitFieldList->length() - 1; i >= 0; --i) {
-		bitFieldList->at(i)->blockSignals(true);
-
-		int width = bitFieldList->at(i)->getWidth();
-		int bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
+		uint32_t bfVal = 0;
+		if(width == regWidth) {
+			bfVal = value;
+		} else {
+			bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
+		}
 		QString bitFieldValue = QString::number(bfVal, 16);
 		bitFieldList->at(i)->registerValueUpdated(bitFieldValue);
 		regOffset += width;
@@ -124,10 +113,10 @@ void RegisterDetailedWidget::registerValueUpdated(uint32_t value)
 
 QString RegisterDetailedWidget::getBitFieldsValue()
 {
-	int result = 0;
+	uint32_t result = 0;
 	for(int i = 0; i < bitFieldList->length(); ++i) {
 		bool ok;
-		int aux = bitFieldList->at(i)->getValue().toInt(&ok, 16);
+		uint32_t aux = bitFieldList->at(i)->getValue().toLongLong(&ok, 16);
 		int regOffset = bitFieldList->at(i)->getRegOffset();
 		result += qPow(2, regOffset) * aux;
 		qDebug() << "aux = " << aux << " result = " << result;

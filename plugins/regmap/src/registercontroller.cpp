@@ -50,7 +50,7 @@ RegisterController::RegisterController(QWidget *parent)
 	addressPicker->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QObject::connect(addressPicker, &QSpinBox::textChanged, this, [=](QString address) {
 		bool ok;
-		Q_EMIT registerAddressChanged(address.toInt(&ok, 16));
+		Q_EMIT registerAddressChanged(address.toUInt(&ok, 16));
 	});
 	readWidgetLayout->addLayout(readWidgetLeftLayout, 3);
 
@@ -58,7 +58,7 @@ RegisterController::RegisterController(QWidget *parent)
 	// request read
 	QObject::connect(readButton, &QPushButton::clicked, this, [=]() {
 		bool ok;
-		Q_EMIT requestRead(addressPicker->text().toInt(&ok, 16));
+		Q_EMIT requestRead(addressPicker->text().toUInt(&ok, 16));
 	});
 
 	readWidgetLayout->addWidget(readButton, 1, Qt::AlignRight);
@@ -89,7 +89,9 @@ RegisterController::RegisterController(QWidget *parent)
 	// request write on register
 	QObject::connect(writeButton, &QPushButton::clicked, this, [=]() {
 		bool ok;
-		Q_EMIT requestWrite(addressPicker->value(), regValue->text().toInt(&ok, 16));
+		uint32_t address = addressPicker->value();
+		uint32_t value = static_cast<uint32_t>(regValue->text().toLongLong(&ok, 16));
+		Q_EMIT requestWrite(address, value);
 	});
 
 	writeWidgetLayout->addWidget(writeButton, 1, Qt::AlignRight);

@@ -1,3 +1,4 @@
+#include "jsonformatedelement.hpp"
 #include "regmapplugin.h"
 
 #include "deviceregistermap.hpp"
@@ -153,13 +154,15 @@ bool RegmapPlugin::onConnect()
 			iio_device *dev = m_deviceList->at(i);
 			QString devName = QString::fromStdString(iio_device_get_name(dev));
 			qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << devName;
-			QString templatePaths = scopy::regmap::Utils::getTemplate(devName);
+			regmap::JsonFormatedElement *templatePaths = scopy::regmap::Utils::getTemplate(devName);
 			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
-			if(!templatePaths.isEmpty()) {
+			if(templatePaths) {
 				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
-				registerMapTool->addTab(dev, devName, xmlsPath.absoluteFilePath(templatePaths));
+				registerMapTool->addTab(dev, devName,
+							xmlsPath.absoluteFilePath(templatePaths->getFileName()),
+							templatePaths->getIsAxiCompatible());
 			} else {
-				registerMapTool->addTab(dev, iio_device_get_name(dev));
+				registerMapTool->addTab(dev, iio_device_get_name(dev), false);
 			}
 			qDebug(CAT_REGMAP) << "";
 		}

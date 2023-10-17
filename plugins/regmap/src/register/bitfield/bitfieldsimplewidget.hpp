@@ -23,6 +23,8 @@ public:
 	QString getDescription() const;
 
 	int getStreach() const;
+	QString getName() const;
+
 public Q_SLOTS:
 	void checkPreferences();
 	void setSelected(bool selected);
@@ -33,6 +35,7 @@ private:
 	int width;
 	int streach;
 	QString description;
+	QString name;
 	QFrame *mainFrame;
 
 Q_SIGNALS:

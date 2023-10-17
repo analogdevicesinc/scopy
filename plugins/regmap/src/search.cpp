@@ -20,7 +20,8 @@ QList<uint32_t> Search::searchForRegisters(QMap<uint32_t, RegisterModel *> *regi
 	QMap<uint32_t, RegisterModel *>::iterator mapIterator;
 	for(mapIterator = registers->begin(); mapIterator != registers->end(); ++mapIterator) {
 		QString address = QString::number(mapIterator.key(), 16);
-		if(address.contains(searchParam) || mapIterator.value()->getName().contains(searchParam)) {
+		if(address.contains(searchParam) || mapIterator.value()->getName().toLower().contains(searchParam) ||
+		   mapIterator.value()->getDescription().toLower().contains(searchParam)) {
 			result.push_back(mapIterator.key());
 		} else {
 			for(int i = 0; i < mapIterator.value()->getBitFields()->size(); ++i) {

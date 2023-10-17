@@ -82,9 +82,9 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 
 RegisterMapTool::~RegisterMapTool() { delete tabs; }
 
-void RegisterMapTool::addTab(iio_device *dev, QString title, QString xmlPath)
+void RegisterMapTool::addTab(iio_device *dev, QString title, QString xmlPath, bool isAxi)
 {
-	tabsInfo->insert(title, new TabInfo(dev, title, xmlPath));
+	tabsInfo->insert(title, new TabInfo(dev, title, xmlPath, isAxi));
 
 	registerDeviceList->addItem(title);
 
@@ -93,15 +93,14 @@ void RegisterMapTool::addTab(iio_device *dev, QString title, QString xmlPath)
 		activeRegisterMap = title;
 		first = false;
 		generateDeviceRegisterMap(tabsInfo->value(title));
-		//  toolView->setGeneralSettingsMenu(settings, true);
 		tabs->value(title)->show();
 		toggleSettingsMenu(title, true);
 	}
 }
 
-void RegisterMapTool::addTab(iio_device *dev, QString title) { addTab(dev, title, ""); }
+void RegisterMapTool::addTab(iio_device *dev, QString title, bool isAxi) { addTab(dev, title, "", isAxi); }
 
-void RegisterMapTool::addTab(QString filePath, QString title) { addTab(nullptr, title, filePath); }
+void RegisterMapTool::addTab(QString filePath, QString title, bool isAxi) { addTab(nullptr, title, filePath, isAxi); }
 
 RegisterMapValues *RegisterMapTool::getRegisterMapValues(iio_device *dev)
 {
@@ -143,10 +142,9 @@ void RegisterMapTool::generateDeviceRegisterMap(TabInfo *tabInfo)
 		registerMapValues = getRegisterMapValues(tabInfo->getXmlPath());
 	}
 
-	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
+	DeviceRegisterMap *regMap =
+		new DeviceRegisterMap(registerMapTemplate, registerMapValues, tabInfo->getIsAxi(), this);
 	tabs->insert(tabInfo->getDeviceName(), regMap);
-	//    mainWidget->layout()->addWidget(regMap);
-	// TODO add widget to central
 	tool->addWidgetToCentralContainerHelper(regMap);
 	tabs->value(tabInfo->getDeviceName())->hide();
 }

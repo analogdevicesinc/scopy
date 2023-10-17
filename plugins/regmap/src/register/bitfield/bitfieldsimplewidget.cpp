@@ -18,6 +18,7 @@ using namespace regmap;
 BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QString description, int width,
 					   QString notes, int regOffset, int streach, QWidget *parent)
 	: width(width)
+	, name(name)
 	, description(description)
 	, streach(streach)
 	, QFrame{parent}
@@ -102,3 +103,5 @@ void BitFieldSimpleWidget::checkPreferences()
 }
 
 void BitFieldSimpleWidget::setSelected(bool selected) { scopy::setDynamicProperty(mainFrame, "is_selected", selected); }
+
+QString BitFieldSimpleWidget::getName() const { return name; }
