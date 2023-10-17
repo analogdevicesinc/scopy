@@ -9,6 +9,7 @@
 #include <QMap>
 #include <QObject>
 #include <QPushButton>
+#include <QSlider>
 #include <QSpinBox>
 
 #include <register/bitfield/bitfielddetailedwidget.hpp>
@@ -63,6 +64,7 @@ public:
 	static QString smallBlueButton(QPushButton *button, QString objectName = "");
 	static QString regmapControllerStyle(QWidget *widget, QString objectName = "");
 	static QString widgetidthRoundCornersStyle(QWidget *widget, QString objectName = "");
+	static QString sliderStyle(QSlider *slider, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;

@@ -1,6 +1,7 @@
 #include "registersimplewidget.hpp"
 
 #include "bitfield/bitfieldsimplewidget.hpp"
+#include "bitfield/bitfieldmodel.hpp"
 #include "dynamicWidget.h"
 
 #include <QLabel>
@@ -16,17 +17,15 @@
 using namespace scopy;
 using namespace regmap;
 
-RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QString description, QString notes,
-					   int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields,
+RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector<BitFieldSimpleWidget *> *bitFields,
 					   QWidget *parent)
-	: bitFields(bitFields)
-	, registerWidth(registerWidth)
-	, address(address)
+	: registerModel(registerModel)
+	, bitFields(bitFields)
 {
 	installEventFilter(this);
 
 	setMinimumWidth(10);
-	setFixedHeight(60 * (registerWidth / 8));
+	setFixedHeight(60 * (registerModel->getWidth() / 8));
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
 	bool ok;
@@ -42,17 +41,18 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 	rightLayout->setAlignment(Qt::AlignRight);
 
 	QLabel *registerAddressLable =
-		new QLabel(scopy::regmap::Utils::convertToHexa(address.toInt(&ok, 16), registerWidth));
+		new QLabel(scopy::regmap::Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()));
 	registerAddressLable->setAlignment(Qt::AlignRight);
 	rightLayout->addWidget(registerAddressLable);
 	value = new QLabel("N/R");
-	rightLayout->addWidget(value);
+	value->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	value->setAlignment(Qt::AlignBottom | Qt::AlignRight);
+	rightLayout->addWidget(value, Qt::AlignRight);
 
 	QVBoxLayout *leftLayout = new QVBoxLayout();
 	leftLayout->setAlignment(Qt::AlignTop);
-	registerNameLabel = new QLabel(name);
+	registerNameLabel = new QLabel(registerModel->getName());
 	registerNameLabel->setWordWrap(true);
-	registerNameLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 	leftLayout->addWidget(registerNameLabel);
 
 	regBaseInfo->addLayout(leftLayout);
@@ -60,7 +60,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
 	regBaseInfoWidget->setLayout(regBaseInfo);
 	// to make sure table proportions are good we use a fixed size for this
-	regBaseInfoWidget->setFixedWidth(130);
+	regBaseInfoWidget->setFixedWidth(180);
 	layout->addWidget(regBaseInfoWidget, 1);
 
 	// add bitfield widgets
@@ -87,9 +87,10 @@ RegisterSimpleWidget::RegisterSimpleWidget(QString name, QString address, QStrin
 
 	layout->addLayout(bitFieldsWidgetLayout, 8);
 
-	QString toolTip = "Name : " + name + "\n" +
-		"Address : " + scopy::regmap::Utils::convertToHexa(address.toInt(&ok, 16), registerWidth) + "\n" +
-		"Description : " + description + "\n" + "Notes : " + notes + "\n";
+	QString toolTip = "Name : " + registerModel->getName() + "\n" + "Address : " +
+		scopy::regmap::Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()) + "\n" +
+		"Description : " + registerModel->getDescription() + "\n" + "Notes : " + registerModel->getNotes() +
+		"\n";
 
 	setToolTip(toolTip);
 }
@@ -104,18 +105,32 @@ RegisterSimpleWidget::~RegisterSimpleWidget()
 void RegisterSimpleWidget::valueUpdated(uint32_t value)
 {
 	int regOffset = 0;
-	for(int i = 0; i < bitFields->length(); ++i) {
-		bitFields->at(i)->blockSignals(true);
+	int j = 0;
+	for(int i = 0; i < registerModel->getBitFields()->length(); ++i) {
 
-		int width = bitFields->at(i)->getWidth();
-		int bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
+		int width = registerModel->getBitFields()->at(i)->getWidth();
+		uint32_t bfVal = 0;
+		if(width == registerModel->getWidth()) {
+			bfVal = value;
+		} else {
+			bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
+		}
 		QString bitFieldValue = scopy::regmap::Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
-		bitFields->at(i)->updateValue(bitFieldValue);
+
 		regOffset += width;
 
-		bitFields->at(i)->blockSignals(false);
+		// some bitfileds will be on multiple rows
+		while(bitFields->length() > j &&
+		      bitFields->at(j)->getName() == registerModel->getBitFields()->at(i)->getName()) {
+			bitFields->at(j)->blockSignals(true);
+
+			bitFields->at(j)->updateValue(bitFieldValue);
+
+			bitFields->at(j)->blockSignals(false);
+			j++;
+		}
 	}
-	this->value->setText(scopy::regmap::Utils::convertToHexa(value, registerWidth));
+	this->value->setText(scopy::regmap::Utils::convertToHexa(value, registerModel->getWidth()));
 	checkPreferences();
 }
 
@@ -135,12 +150,12 @@ void RegisterSimpleWidget::checkPreferences()
 	if(background.contains("Register background")) {
 		bool ok;
 		regBaseInfoWidget->setStyleSheet(
-			QString("background-color: " + Util::getColors().at(value->text().toInt(&ok, 16) % 16)));
+			QString("background-color: " + Util::getColors().at(value->text().toUInt(&ok, 16) % 16)));
 	}
 
 	if(background.contains("Register text")) {
 		bool ok;
-		value->setStyleSheet(QString("color: " + Util::getColors().at(value->text().toInt(&ok, 16) % 16)));
+		value->setStyleSheet(QString("color: " + Util::getColors().at(value->text().toUInt(&ok, 16) % 16)));
 	}
 }
 
@@ -148,7 +163,7 @@ bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
 {
 	if(event->type() == QEvent::MouseButtonPress) {
 		bool ok;
-		Q_EMIT registerSelected(address.toInt(&ok, 16));
+		Q_EMIT registerSelected(registerModel->getAddress());
 	}
 
 	return QWidget::eventFilter(object, event);

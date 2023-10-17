@@ -24,7 +24,7 @@ Utils::Utils(QObject *parent)
 
 QString Utils::convertToHexa(uint32_t value, int size)
 {
-	return QStringLiteral("0x%1").arg(value, (size / getBitsPerRow()) + 1, 16, QLatin1Char('0'));
+	return QStringLiteral("0x%1").arg(value, (size / 4), 16, QLatin1Char('0'));
 }
 
 void Utils::removeLayoutMargins(QLayout *layout)
@@ -69,13 +69,13 @@ JsonFormatedElement *Utils::getJsonTemplate(QString xml)
 	return nullptr;
 }
 
-QString Utils::getTemplate(QString devName)
+JsonFormatedElement *Utils::getTemplate(QString devName)
 {
 	// search for SPI template
 	foreach(QString key, spiJson->keys()) {
 		for(int i = 0; i < spiJson->value(key)->getCompatibleDevices()->size(); i++) {
 			if(spiJson->value(key)->getCompatibleDevices()->at(i).contains(devName)) {
-				return QString(key);
+				return spiJson->value(key);
 			}
 		}
 	}
@@ -83,12 +83,12 @@ QString Utils::getTemplate(QString devName)
 	foreach(QString key, axiJson->keys()) {
 		for(int i = 0; i < axiJson->value(key)->getCompatibleDevices()->size(); i++) {
 			if(axiJson->value(key)->getCompatibleDevices()->at(i).contains(devName)) {
-				return QString(key);
+				return axiJson->value(key);
 			}
 		}
 	}
 
-	return QString("");
+	return nullptr;
 }
 
 void Utils::applyJsonConfig()

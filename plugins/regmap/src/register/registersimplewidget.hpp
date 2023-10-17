@@ -1,6 +1,8 @@
 #ifndef REGISTERSIMPLEWIDGET_HPP
 #define REGISTERSIMPLEWIDGET_HPP
 
+#include "registermodel.hpp"
+
 #include <QColor>
 #include <QFrame>
 #include <QWidget>
@@ -18,10 +20,8 @@ class RegisterSimpleWidget : public QFrame
 
 	Q_OBJECT
 public:
-	explicit RegisterSimpleWidget(QString name, QString address, QString description, QString notes,
-				      int registerWidth, QVector<BitFieldSimpleWidget *> *bitFields,
+	explicit RegisterSimpleWidget(RegisterModel *registerModel, QVector<BitFieldSimpleWidget *> *bitFields,
 				      QWidget *parent = nullptr);
-
 	~RegisterSimpleWidget();
 
 	void valueUpdated(uint32_t value);
@@ -34,10 +34,9 @@ private:
 	QHBoxLayout *layout;
 	QLabel *value;
 	QVector<BitFieldSimpleWidget *> *bitFields;
-	QString address;
-	int registerWidth;
 	QFrame *regBaseInfoWidget = nullptr;
 	QLabel *registerNameLabel;
+	RegisterModel *registerModel;
 
 protected:
 	bool eventFilter(QObject *object, QEvent *event) override;
