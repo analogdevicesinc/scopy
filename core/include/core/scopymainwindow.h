@@ -18,7 +18,7 @@
 #include "iioutil/cyclicaltask.h"
 #include "iioutil/iioscantask.h"
 #include <gui/widgets/scopystatusbar.h>
-#include "versioncheckoverlay.h"
+#include "versioncheckmessage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -67,7 +67,7 @@ private:
 	DetachedToolWindowManager *dtm;
 
 	LicenseOverlay *license = nullptr;
-	VersionCheckOverlay *checkUpdate = nullptr;
+	VersionCheckMessage *checkUpdate = nullptr;
 	ScopyStatusBar *statusBar;
 	ScopyMainWindow_API *api;
 	Ui::ScopyMainWindow *ui;

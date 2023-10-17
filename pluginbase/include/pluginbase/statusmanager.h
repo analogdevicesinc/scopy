@@ -3,10 +3,12 @@
 
 #include <QWidget>
 #include <QVariant>
+#include <QTimer>
 
 #include "scopy-pluginbase_export.h"
+#include "statusmessage.h"
 
-#define NO_RETAINED_MESSAGES 10
+#define NUMBER_OF_RETAINED_MESSAGES 10
 #define DEFAULT_DISPLAY_TIME 5000
 
 namespace scopy {
@@ -31,11 +33,14 @@ public:
 	void addTemporaryMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
 
 	/**
-	 * @brief Ads temporary QWidget in the queue to be displayed, when possible, in the Scopy status bar.
+	 * @brief Ads temporary QWidget in the queue to be displayed, when possible, in the Scopy status bar. If there
+	 * is no display time specified in the "ms" parameter, the creator of the widget is responsible for deleting
+	 * it. This will enable StatusManager to send a signal that closes the display, ensuring a smooth transition.
 	 * @param message QWidget* to be displayed
+	 * @param title QString with the name of the message
 	 * @param ms The time that the widget will be displayed (in milliseconds)
 	 * */
-	void addTemporaryWidget(QWidget *widget, int ms = DEFAULT_DISPLAY_TIME);
+	void addTemporaryWidget(QWidget *widget, QString title, int ms = -1);
 
 	/**
 	 * @brief Overrides any message currently displayed with the message sent as parameter
@@ -44,17 +49,24 @@ public:
 	 * */
 	void addUrgentMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
 
+	void setEnabled(bool enabled);
+	bool isEnabled() const;
+
 Q_SIGNALS:
-	void announceStatusAvailable();
-	void sendStatus(QVariant status, int ms);
-	void sendUrgentMessage(QString message, int ms);
+	void sendStatus(StatusMessage *);
+
+	void startDisplay(StatusMessage *);
+	void clearDisplay();
+	void messageAdded();
 
 public Q_SLOTS:
-	void requestStatus();
+	void processStatusMessage();
 
 private:
 	static StatusManager *pinstance_;
-	QList<QPair<QVariant, int>> m_itemQueue;
+	QList<StatusMessage *> *m_itemQueue;
+	QTimer *m_timer;
+	bool m_enabled;
 };
 } // namespace scopy
 
