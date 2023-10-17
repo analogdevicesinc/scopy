@@ -32,6 +32,7 @@
 #include <utility>
 #include <stylehelper.h>
 #include <scopymainwindow_api.h>
+#include <QVersionNumber>
 
 using namespace scopy;
 
@@ -49,6 +50,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	StyleHelper::GetInstance()->initColorMap();
 	setAttribute(Qt::WA_QuitOnClose, true);
 	initPythonWIN32();
+	initStatusBar();
 	initPreferences();
 
 	ContextProvider::GetInstance();
@@ -156,11 +158,6 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 void ScopyMainWindow::initStatusBar()
 {
 	// clear all margin, except the bottom one, to make room the status bar
-	int margin = ui->centralwidget->layout()->margin();
-	ui->centralwidget->layout()->setMargin(0);
-	ui->centralwidget->setContentsMargins(margin, margin, margin, 0);
-	ui->animHolder->setContentsMargins(0, 0, 0, margin); // the left panel should keep the margin
-
 	statusBar = new ScopyStatusBar(this);
 	ui->mainWidget->layout()->addWidget(statusBar);
 }
@@ -274,13 +271,15 @@ void ScopyMainWindow::initPreferences()
 		loadDecoders();
 	}
 	if(p->get("general_show_status_bar").toBool()) {
-		initStatusBar();
+		StatusManager::GetInstance()->setEnabled(true);
 	}
 	if(p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
-		checkUpdate = new VersionCheckOverlay(this);
+		auto versionCheckInfo = new VersionCheckMessage(this);
 
-		QMetaObject::invokeMethod(checkUpdate, &VersionCheckOverlay::showOverlay, Qt::QueuedConnection);
+		StatusManager::GetInstance()->addTemporaryWidget(versionCheckInfo,
+								 "Should Scopy check for online versions?");
+
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
 	QString theme = p->get("general_theme").toString();
@@ -345,6 +344,8 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 
 	} else if(str == "general_language") {
 		Q_EMIT p->restartRequired();
+	} else if(str == "general_show_status_bar") {
+		StatusManager::GetInstance()->setEnabled(val.toBool());
 	}
 }
 
@@ -444,7 +445,32 @@ void ScopyMainWindow::removeDeviceFromUi(QString id)
 
 void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)
 {
-	qInfo(CAT_SCOPY) << "The upstream scopy version is" << document << "and the current one is" << SCOPY_VERSION;
+	QJsonValue scopyJson = document["scopy"];
+	if(scopyJson.isNull()) {
+		qWarning(CAT_SCOPY) << "Could not find the entry \"scopy\" in the json document";
+		return;
+	}
+
+	QJsonValue scopyVersion = scopyJson["version"];
+	if(scopyVersion.isNull()) {
+		qWarning(CAT_SCOPY)
+			<< R"(Could not find the entry "version" in the "scopy" entry of the json document)";
+		return;
+	}
+
+	QVersionNumber currentScopyVersion = QVersionNumber::fromString(SCOPY_VERSION).normalized();
+	QVersionNumber upstreamScopyVersion =
+		QVersionNumber::fromString(scopyVersion.toString().remove(0, 1)).normalized();
+
+	if(upstreamScopyVersion > currentScopyVersion) {
+		StatusManager::GetInstance()->addTemporaryMessage(
+			"Your Scopy version of outdated. Please consider updating it. The newest version is " +
+				upstreamScopyVersion.toString(),
+			10000); // 10 sec
+	}
+
+	qInfo(CAT_SCOPY) << "The upstream scopy version is" << upstreamScopyVersion << "and the current one is"
+			 << currentScopyVersion;
 }
 
 #include "moc_scopymainwindow.cpp"
