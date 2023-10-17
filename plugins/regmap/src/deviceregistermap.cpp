@@ -39,7 +39,7 @@ using namespace scopy;
 using namespace regmap;
 
 DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, RegisterMapValues *registerMapValues,
-				     QWidget *parent)
+				     bool isAxi, QWidget *parent)
 	: QWidget(parent)
 	, registerMapValues(registerMapValues)
 	, registerMapTemplate(registerMapTemplate)
@@ -92,7 +92,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 		QLabel *registerTableHeadName = new QLabel("Register", registerTableHead);
 		registerTableHeadLayout->addWidget(registerTableHeadName);
-		registerTableHead->setFixedWidth(130);
+		registerTableHead->setFixedWidth(180);
 
 		QWidget *colBitCount = new QWidget(tableHeadWidget);
 		scopy::regmap::RegmapStyleHelper::widgetidthRoundCornersStyle(colBitCount);
@@ -132,16 +132,29 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	}
 
 	QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
-			 &RegisterMapValues::requestRead);
+			 [=](uint32_t address) {
+				 if(isAxi) {
+					 address << 800000;
+				 }
+				 registerMapValues->requestRead(address);
+			 });
 	QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
-			 &RegisterMapValues::requestWrite);
+			 [=](uint32_t address, uint32_t value) {
+				 if(isAxi) {
+					 address << 800000;
+				 }
+				 registerMapValues->requestWrite(address, value);
+			 });
 	QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
 			 [=](uint32_t address, uint32_t value) {
-				 registerController->registerValueChanged(Utils::convertToHexa(value, 8));
+				 int regSize = 8;
+				 if(registerMapTemplate) {
+					 regSize = registerMapTemplate->getRegisterTemplate(0)->getWidth();
+				 }
+				 registerController->registerValueChanged(Utils::convertToHexa(value, regSize));
 				 if(registerMapTemplate) {
 					 registerMapTableWidget->valueUpdated(address, value);
 					 registerDetailedWidget->updateBitFieldsValue(value);
-					 registerDetailedWidget->registerValueUpdated(value);
 				 }
 			 });
 
@@ -183,6 +196,13 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 	registerDetailedWidget->setMaximumHeight(140);
 	tool->bottomCentral()->layout()->addWidget(registerDetailedWidget);
 
+	QObject::connect(registerDetailedWidget, &RegisterDetailedWidget::bitFieldValueChanged, registerController,
+			 &RegisterController::registerValueChanged);
+	QObject::connect(registerController, &RegisterController::valueChanged, this, [=](QString val) {
+		bool ok;
+		registerDetailedWidget->updateBitFieldsValue(val.toUInt(&ok, 16));
+	});
+
 	if(registerMapValues) {
 		uint32_t address = regModel->getAddress();
 		if(registerMapValues->hasValue(address)) {
@@ -191,13 +211,6 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 			registerController->registerValueChanged(Utils::convertToHexa(value, regModel->getWidth()));
 		}
 	}
-
-	QObject::connect(registerDetailedWidget, &RegisterDetailedWidget::bitFieldValueChanged, registerController,
-			 &RegisterController::registerValueChanged);
-	QObject::connect(registerController, &RegisterController::valueChanged, this, [=](QString val) {
-		bool ok;
-		registerDetailedWidget->updateBitFieldsValue(val.toUInt(&ok, 16));
-	});
 }
 
 void DeviceRegisterMap::toggleAutoread(bool toggled) { autoread = toggled; }

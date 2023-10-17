@@ -25,9 +25,9 @@ void FileRegisterReadStrategy::read(uint32_t address)
 			QString addr(line.split(',').first());
 			if(addr.contains(QString::number(address, 16))) {
 				bool ok;
-				Q_EMIT readDone(address, line.split(',').at(1).toInt(&ok, 16));
+				Q_EMIT readDone(address, line.split(',').at(1).toUInt(&ok, 16));
 				qDebug(CAT_IIO_OPERATION) << "device read success for " << address << " with value "
-							  << line.split(',').at(1).toInt(&ok, 16);
+							  << line.split(',').at(1).toUInt(&ok, 16);
 				break;
 			}
 		}
