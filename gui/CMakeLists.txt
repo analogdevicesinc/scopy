@@ -41,11 +41,14 @@ else()
 		PATH_SUFFIXES qwt-${QWT_QT_VERSION} qwt qwt6 qwt5 ${QWT_QT_VERSION}/qwt
 		REQUIRED)
 
+		set (CMAKE_FIND_DEBUG_MODE ON)
 	find_library(QWT_LIBRARIES
-		NAMES qwt
+		NAMES qwt libqwt-qt5
 		HINTS ${CMAKE_INSTALL_PREFIX}/lib /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64 /opt/local/lib /opt/local/lib64
 		REQUIRED)
 	message("QWT LIBRARIES: " ${QWT_LIBRARIES})
+	set (CMAKE_FIND_DEBUG_MODE OFF)
+
 
 endif()
 
