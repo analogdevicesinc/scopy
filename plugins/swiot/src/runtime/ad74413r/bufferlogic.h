@@ -59,27 +59,21 @@ public:
 	bool verifyChannelsEnabledChanges(std::vector<bool> enabledChnls);
 	void applyChannelsEnabledChanges(std::vector<bool> enabledChnls);
 
+	void applySamplingFrequencyChanges(int channelId, int value);
+
 	int getPlotChnlsNo();
 	QString getPlotChnlUnitOfMeasure(int channel);
 	QVector<QString> getPlotChnlsUnitOfMeasure();
 	std::pair<int, int> getPlotChnlRangeValues(int channel);
 	QVector<std::pair<int, int>> getPlotChnlsRangeValues();
 	QMap<int, QString> getPlotChnlsId();
-
-	void readChnlsSamplingFreqAttr();
-	void readChnlsSamplingFreqAvailableAttr();
 	void initAd74413rChnlsFunctions();
 	void initDiagnosticChannels();
 
-public Q_SLOTS:
-	void onSamplingFreqChanged(int idx);
-
 Q_SIGNALS:
 	void chnlsChanged(QMap<int, ChnlInfo *> chnlsInfo);
-	void samplingFreqWritten(int samplingFreq);
-	void samplingFreqRead(int samplingFreq);
+	void samplingFrequencyComputed(double value);
 	void channelFunctionDetermined(unsigned int i, QString function);
-	void samplingFreqAvailableRead(QStringList freqAvailable);
 	void instantValueChanged(int channel, double value);
 
 private Q_SLOTS:
@@ -90,11 +84,13 @@ private Q_SLOTS:
 private:
 	void createChannels();
 	void initChannelFunction(unsigned int i);
+	void computeSamplingFrequency();
 
 private:
 	int m_plotChnlsNo;
 	QMap<QString, iio_device *> m_iioDevicesMap;
-	QStringList m_samplingFreqAvailable;
+	QMap<int, int> m_samplingFrequencies;
+	double m_samplingFrequency;
 
 	QMap<int, ChnlInfo *> m_chnlsInfo;
 	CommandQueue *m_commandQueue;

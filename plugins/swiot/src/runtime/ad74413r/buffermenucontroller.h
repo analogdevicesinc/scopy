@@ -48,6 +48,7 @@ Q_SIGNALS:
 	void broadcastThresholdReadBackward(QString value);
 	void thresholdControlEnable(bool enable);
 	void diagnosticFunctionUpdated();
+	void samplingFrequencyUpdated(int idx, int srValue);
 	void setUnitPerDivision(int chnl, double unitPerDiv);
 	void unitPerDivisionChanged(int chnl, double unitPerDiv);
 
