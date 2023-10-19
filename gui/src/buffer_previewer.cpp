@@ -45,8 +45,6 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget 
 	, m_verticalSpacing(0)
 	, m_pixelsPerPeriod(pixelsPerPeriod)
 	, m_startingPhase(wavePhase)
-	, m_fullWaveNumPoints(1)
-	, m_fullWavePoints(new QPointF[m_fullWaveNumPoints])
 	, m_rightBtnClick(false)
 	, m_gatingEnabled(false)
 	, m_leftGateWidth(0)
@@ -54,7 +52,7 @@ BufferPreviewer::BufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget 
 	, m_cursorVisible(true)
 {}
 
-BufferPreviewer::~BufferPreviewer() { delete[] m_fullWavePoints; }
+BufferPreviewer::~BufferPreviewer() { delete[] m_wavePoints; }
 
 double BufferPreviewer::waveformPos() const { return m_waveformPos; }
 
@@ -120,7 +118,7 @@ void BufferPreviewer::setVerticalSpacing(int spacing)
 	if(m_verticalSpacing != spacing) {
 		m_verticalSpacing = spacing;
 
-		buildFullWaveform(m_fullWavePoints, m_fullWaveNumPoints);
+		buildFullWaveform();
 		update();
 	}
 }
@@ -152,6 +150,45 @@ void BufferPreviewer::setCursorVisible(bool visible)
 	if(m_cursorVisible != visible) {
 		m_cursorVisible = visible;
 		update();
+	}
+}
+
+void BufferPreviewer::drawBufferWave(QPainter *p, int start, int width, int widget_width)
+{
+	if(pixelsPerPeriod() >= widget_width) {
+		p->drawPolyline(m_wavePoints + start, width);
+		return;
+	}
+
+	int index, count, i;
+	QPointF tmp_wavePoints[pixelsPerPeriod() + 1]; // +1 is needed for storing a connecting point
+
+	// create temporary wave points offset by index amout of pixels
+	index = start % pixelsPerPeriod();
+	for(i = 0; index < std::min(pixelsPerPeriod(), widget_width); i++) {
+		tmp_wavePoints[i] = QPointF(i + start, m_wavePoints[index].y());
+		index++;
+	}
+	index = 0;
+	for(; index < start % pixelsPerPeriod(); i++) {
+		tmp_wavePoints[i] = QPointF(i + start, m_wavePoints[index].y());
+		index++;
+	}
+
+	// this is a point which connects periods so we don't have any empty space between them
+	QPointF last_point = QPointF(start + pixelsPerPeriod(), tmp_wavePoints[0].y());
+	index = 0;
+
+	// offset points for each period and draw it
+	while(index < width) {
+		count = std::min(pixelsPerPeriod(), width - index);
+		tmp_wavePoints[pixelsPerPeriod()] = last_point;
+		p->drawPolyline(tmp_wavePoints, count + 1);
+		for(i = 0; i < count; i++) {
+			tmp_wavePoints[i].rx() += pixelsPerPeriod();
+		}
+		last_point = QPointF(tmp_wavePoints[i - 1].x() + 1, tmp_wavePoints[0].y());
+		index += i;
 	}
 }
 
@@ -192,7 +229,8 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	// Draw the visible part of the entire wave
 	p.setRenderHint(QPainter::Antialiasing, true);
 	p.setPen(linePen);
-	p.drawPolyline(m_fullWavePoints + wave_start, wave_width);
+
+	drawBufferWave(&p, wave_start, wave_width, w);
 
 	// Draw the highlight rectangle
 	p.setRenderHint(QPainter::Antialiasing, false);
@@ -204,7 +242,8 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	p.setRenderHint(QPainter::Antialiasing, true);
 	linePen.setColor(palette().color(QPalette::HighlightedText));
 	p.setPen(linePen);
-	p.drawPolyline(m_fullWavePoints + hlightedWaveStartPos, hlightedWaveWidth);
+
+	drawBufferWave(&p, hlightedWaveStartPos, hlightedWaveWidth, w);
 
 	// Draw two vertical lines at the start and end of the highlight;
 	if(hlight_start + hlight_width > wave_start && wave_start + wave_width > hlight_start) {
@@ -240,12 +279,11 @@ void BufferPreviewer::paintEvent(QPaintEvent *)
 	}
 }
 
-void BufferPreviewer::resizeEvent(QResizeEvent *)
+void BufferPreviewer::resizeEvent(QResizeEvent *event)
 {
-	delete[] m_fullWavePoints;
-	m_fullWaveNumPoints = contentsRect().width();
-	m_fullWavePoints = new QPointF[m_fullWaveNumPoints];
-	buildFullWaveform(m_fullWavePoints, m_fullWaveNumPoints);
+	if(event->oldSize().height() != event->size().height()) {
+		buildFullWaveform();
+	}
 }
 
 void BufferPreviewer::mouseDoubleClickEvent(QMouseEvent *event) { Q_EMIT bufferResetPosition(); }
@@ -296,14 +334,15 @@ AnalogBufferPreviewer::AnalogBufferPreviewer(int pixelsPerPeriod, double wavePha
 	: BufferPreviewer(pixelsPerPeriod, wavePhase, parent)
 {}
 
-void AnalogBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
+void AnalogBufferPreviewer::buildFullWaveform()
 {
+	m_wavePoints = new QPointF[pixelsPerPeriod()];
 	int middle = contentsRect().height() / 2;
 	int amplitude = middle - verticalSpacing() / 2;
 
-	for(int i = 0; i < numPts; i++) {
+	for(int i = 0; i < pixelsPerPeriod(); i++) {
 		qreal y = middle + amplitude * qSin(2 * M_PI * i / pixelsPerPeriod() + wavePhase());
-		wavePoints[i] = QPointF(i, y);
+		m_wavePoints[i] = QPointF(i, y);
 	}
 }
 
@@ -325,9 +364,10 @@ void DigitalBufferPreviewer::setNoOfSteps(double val) { m_noOfSteps = val; }
 
 double DigitalBufferPreviewer::noOfSteps() { return m_noOfSteps; }
 
-void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
+void DigitalBufferPreviewer::buildFullWaveform()
 {
-	for(int i = 0; i < numPts; i++) {
+	m_wavePoints = new QPointF[pixelsPerPeriod()];
+	for(int i = 0; i < pixelsPerPeriod(); i++) {
 		qreal y;
 		int pos = i % pixelsPerPeriod();
 		if(pos < pixelsPerPeriod() / 2) {
@@ -335,7 +375,7 @@ void DigitalBufferPreviewer::buildFullWaveform(QPointF *wavePoints, int numPts)
 		} else {
 			y = verticalSpacing() / 2;
 		}
-		wavePoints[i] = QPointF(i, y);
+		m_wavePoints[i] = QPointF(i, y);
 	}
 }
 
