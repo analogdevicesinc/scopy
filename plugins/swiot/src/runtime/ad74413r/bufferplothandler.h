@@ -62,7 +62,7 @@ public Q_SLOTS:
 	void onBufferRefilled(QVector<QVector<double>>, int bufferCounter);
 	void onBtnExportClicked(QMap<int, bool> exportConfig);
 	void onTimespanChanged(double value);
-	void onSamplingFreqWritten(int samplingFreq);
+	void onSamplingFrequencyComputed(double samplingFrequency);
 	void onChannelWidgetEnabled(int curveId, bool en);
 	void onChannelWidgetSelected(int curveId);
 	void onPrintBtnClicked();
@@ -89,7 +89,7 @@ private:
 	LinkedButton *m_btnInfoStatus;
 	ChannelPlotScalesController *m_plotScalesController;
 
-	int m_samplingFreq = 4800;
+	double m_plotSamplingFreq = 4800;
 	double m_timespan = 1;
 	int m_plotChnlsNo;
 

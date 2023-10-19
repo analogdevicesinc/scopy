@@ -28,14 +28,61 @@ BufferMenu::BufferMenu(QWidget *parent, QString chnlFunction)
 	: QWidget(parent)
 	, m_widget(parent)
 	, m_chnlFunction(chnlFunction)
-{}
+{
+	// channels sampling freq
+	QHBoxLayout *samplingFreqLayout = new QHBoxLayout();
+	m_samplingFreqOptions = new QComboBox(m_widget);
+	samplingFreqLayout->addWidget(new QLabel("Sampling frequency", m_widget));
+	samplingFreqLayout->addWidget(m_samplingFreqOptions);
+	addMenuLayout(samplingFreqLayout);
+
+	connectSignalsToSlots();
+}
 
 BufferMenu::~BufferMenu() {}
 
+void BufferMenu::connectSignalsToSlots()
+{
+	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+		&BufferMenu::onSamplingFreqChanged);
+}
+
 void BufferMenu::init()
 {
+	setAvailableOptions(m_samplingFreqOptions, "sampling_frequency_available");
+	(m_attrValues[INPUT_CHNL].contains("sampling_frequency") &&
+	 !m_attrValues[INPUT_CHNL]["sampling_frequency"].isEmpty())
+		? m_samplingFreqOptions->setCurrentText(m_attrValues[INPUT_CHNL]["sampling_frequency"].first())
+		: m_samplingFreqOptions->setCurrentText("ERROR");
 	m_unitPerDivision->setValue(1);
 	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
+}
+
+void BufferMenu::setAvailableOptions(QComboBox *list, QString attrName)
+{
+	if(!m_attrValues.contains(INPUT_CHNL)) {
+		return;
+	}
+	QStringList availableValues = m_attrValues[INPUT_CHNL][attrName];
+	for(const auto &srValue : qAsConst(availableValues)) {
+		list->addItem(srValue);
+	}
+}
+
+void BufferMenu::onSamplingFreqChanged(int idx)
+{
+	QString attrName = "sampling_frequency";
+	if(!m_attrValues.contains(INPUT_CHNL)) {
+		qWarning() << "There is no input channel available!";
+		return;
+	}
+	const auto &srAvail = m_attrValues[INPUT_CHNL]["sampling_frequency_available"][idx];
+	m_attrValues[INPUT_CHNL][attrName].clear();
+	m_attrValues[INPUT_CHNL][attrName].push_back(srAvail);
+
+	Q_EMIT attrValuesChanged(attrName, INPUT_CHNL);
+	// TBD should be emitted on readback
+	Q_EMIT samplingFrequencyUpdated(srAvail.toInt());
 }
 
 QString BufferMenu::getInfoMessage()

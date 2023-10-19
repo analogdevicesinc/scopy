@@ -89,6 +89,9 @@ public Q_SLOTS:
 	void onActivateRunBtns(bool activate);
 
 	void handleConnectionDestroyed();
+
+	void onSamplingFrequencyUpdated(int channelId, int sampFreq);
+
 Q_SIGNALS:
 	void broadcastReadThreshold(QString value);
 	void thresholdControlEnable(bool enable);
@@ -139,7 +142,6 @@ private:
 	BufferPlotHandler *m_plotHandler;
 	CommandQueue *m_cmdQueue;
 
-	QComboBox *m_samplingFreqOptions;
 	PositionSpinButton *m_timespanSpin;
 	ExportSettings *m_exportSettings;
 
