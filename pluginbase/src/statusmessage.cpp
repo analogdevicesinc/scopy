@@ -1,5 +1,6 @@
 #include "statusmessage.h"
 #include <QLabel>
+#include <QDateTime>
 #include <utility>
 
 StatusMessage::StatusMessage(QString text, int ms, QWidget *parent)
@@ -9,6 +10,7 @@ StatusMessage::StatusMessage(QString text, int ms, QWidget *parent)
 	, m_widget(nullptr)
 {
 	m_permanent = (m_ms == -1);
+	prependDateTime();
 }
 
 StatusMessage::~StatusMessage()
@@ -27,7 +29,6 @@ QWidget *StatusMessage::getWidget()
 {
 	if(!m_widget) {
 		auto label = new QLabel(this);
-		label->setTextFormat(Qt::MarkdownText);
 		label->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
 		label->setText(m_text);
 		label->setStyleSheet("border: none;");
@@ -45,5 +46,12 @@ void StatusMessage::setWidget(QWidget *widget) { m_widget = widget; }
 int StatusMessage::getDisplayTime() { return m_ms; }
 
 void StatusMessage::setDisplayTime(int ms) { m_ms = ms; }
+
+void StatusMessage::prependDateTime()
+{
+	QDateTime dateTime = QDateTime::currentDateTime();
+	QString formattedTime = dateTime.toString(TIMESTAMP_FORMAT);
+	m_text.push_front(formattedTime);
+}
 
 #include "moc_statusmessage.cpp"
