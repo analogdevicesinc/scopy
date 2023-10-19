@@ -9,7 +9,11 @@ VersionCheckMessage::VersionCheckMessage(QWidget *parent)
 {
 	setLayout(new QHBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
-	auto textLabel = new QLabel("Should Scopy check for online versions?    [Yes](yes)    [No](no)", this);
+	auto textLabel =
+		new QLabel("<p>Should Scopy check for online versions?&nbsp;&nbsp;&nbsp;&nbsp;<a style='color: white; "
+			   "font-weight: bold;' href='yes'>Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;<a style='color: white; "
+			   "font-weight: bold;' href='no'>No</a></p>",
+			   this);
 	connect(textLabel, &QLabel::linkActivated, this, [this](const QString &text) {
 		if(text == "yes") {
 			setCheckVersion(true);
@@ -19,7 +23,6 @@ VersionCheckMessage::VersionCheckMessage(QWidget *parent)
 
 		delete this;
 	});
-	textLabel->setTextFormat(Qt::MarkdownText);
 	textLabel->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
 	layout()->addWidget(textLabel);
 
