@@ -68,7 +68,7 @@ Q_SIGNALS:
 protected:
 	void paintEvent(QPaintEvent *) override;
 	void resizeEvent(QResizeEvent *) override;
-	virtual void buildFullWaveform(QPointF *wavePoints, int numPts) = 0;
+	virtual void buildFullWaveform() = 0;
 
 	void mouseDoubleClickEvent(QMouseEvent *event) override;
 	void mousePressEvent(QMouseEvent *event) override;
@@ -76,6 +76,9 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event) override;
 	void enterEvent(QEvent *event) override;
 	void leaveEvent(QEvent *event) override;
+	void drawBufferWave(QPainter *p, int start, int width, int widget_width);
+
+	QPointF *m_wavePoints;
 
 private:
 	double m_waveformPos;
@@ -87,9 +90,6 @@ private:
 	int m_verticalSpacing;
 	int m_pixelsPerPeriod;
 	double m_startingPhase;
-
-	int m_fullWaveNumPoints;
-	QPointF *m_fullWavePoints;
 
 	QPoint m_offset;
 	int m_pixelLeft;
@@ -110,7 +110,7 @@ public:
 	explicit AnalogBufferPreviewer(int pixelsPerPeriod, double wavePhase, QWidget *parent = 0);
 
 protected:
-	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+	virtual void buildFullWaveform();
 };
 
 class SCOPY_GUI_EXPORT DigitalBufferPreviewer : public BufferPreviewer
@@ -122,7 +122,7 @@ public:
 	double noOfSteps();
 
 protected:
-	virtual void buildFullWaveform(QPointF *wavePoints, int numPts);
+	virtual void buildFullWaveform();
 
 private:
 	double m_noOfSteps;
