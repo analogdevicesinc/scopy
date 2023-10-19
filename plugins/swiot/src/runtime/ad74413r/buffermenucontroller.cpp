@@ -56,6 +56,8 @@ void BufferMenuController::createConnections()
 		}
 	});
 
+	connect(advMenu, &BufferMenu::samplingFrequencyUpdated, this,
+		[=, this](int srValue) { Q_EMIT samplingFrequencyUpdated(m_chnlIdx, srValue); });
 	connect(advMenu, &BufferMenu::diagnosticFunctionUpdated, this,
 		&BufferMenuController::diagnosticFunctionUpdated);
 	connect(advMenu, SIGNAL(broadcastThresholdReadForward(QString)), this,

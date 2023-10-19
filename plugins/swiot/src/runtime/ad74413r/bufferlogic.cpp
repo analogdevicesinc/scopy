@@ -103,102 +103,31 @@ void BufferLogic::applyChannelsEnabledChanges(std::vector<bool> enabledChnls)
 		}
 	}
 	Q_EMIT chnlsChanged(m_chnlsInfo);
+	computeSamplingFrequency();
 }
 
-void BufferLogic::onSamplingFreqChanged(int idx)
+void BufferLogic::applySamplingFrequencyChanges(int channelId, int value)
 {
-	std::string newSamplingFreq = m_samplingFreqAvailable[idx].toStdString();
-
-	if(!m_chnlsInfo.size()) {
-		return;
+	if(m_samplingFrequencies.contains(channelId)) {
+		m_samplingFrequencies[channelId] = value;
+	} else {
+		m_samplingFrequencies.insert(channelId, value);
 	}
-	Command *writeSrCmd = new IioChannelAttributeWrite(m_chnlsInfo.first()->iioChnl(), SAMPLING_FREQ_ATTR_NAME,
-							   newSamplingFreq.c_str(), nullptr);
-	connect(
-		writeSrCmd, &scopy::Command::finished, this,
-		[=, this](scopy::Command *cmd) {
-			IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
-			if(!tcmd) {
-				return;
-			}
-			if(tcmd->getReturnCode() < 0) {
-				qDebug(CAT_SWIOT_AD74413R)
-					<< "Chnl attribute write error " + QString::number(tcmd->getReturnCode());
-			} else {
-				readChnlsSamplingFreqAttr();
-			}
-		},
-		Qt::QueuedConnection);
-	m_commandQueue->enqueue(writeSrCmd);
+	computeSamplingFrequency();
 }
 
-void BufferLogic::readChnlsSamplingFreqAvailableAttr()
+void BufferLogic::computeSamplingFrequency()
 {
-	std::string s_attrName = "sampling_frequency_available";
-
-	if(!m_chnlsInfo.size()) {
-		return;
+	double newSamplingFrequency = 0.0;
+	auto keys = m_samplingFrequencies.keys();
+	for(int channelId : keys) {
+		if(m_chnlsInfo[channelId]->isEnabled()) {
+			newSamplingFrequency += (1.0 / m_samplingFrequencies[channelId]);
+		}
 	}
-	Command *readSrCommand =
-		new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
-	connect(
-		readSrCommand, &scopy::Command::finished, this,
-		[=, this](scopy::Command *cmd) {
-			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-			if(!tcmd) {
-				return;
-			}
-			QStringList attrValues;
-			char *sr_available = tcmd->getResult();
-
-			if(tcmd->getReturnCode() < 0) {
-				qDebug(CAT_SWIOT_AD74413R)
-					<< "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
-			} else {
-				QString bufferValues(sr_available);
-				m_samplingFreqAvailable = bufferValues.split(" ");
-				m_samplingFreqAvailable.removeAll("");
-				Q_EMIT samplingFreqAvailableRead(m_samplingFreqAvailable);
-			}
-		},
-		Qt::QueuedConnection);
-	m_commandQueue->enqueue(readSrCommand);
-}
-
-void BufferLogic::readChnlsSamplingFreqAttr()
-{
-	std::string s_attrName = "sampling_frequency";
-
-	if(!m_chnlsInfo.size()) {
-		return;
-	}
-	Command *readSrCommand =
-		new IioChannelAttributeRead(m_chnlsInfo.first()->iioChnl(), s_attrName.c_str(), nullptr);
-	connect(
-		readSrCommand, &scopy::Command::finished, this,
-		[=, this](scopy::Command *cmd) {
-			IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-			if(!tcmd) {
-				return;
-			}
-			QStringList attrValues;
-			char *srAttrValueStr = tcmd->getResult();
-
-			if(tcmd->getReturnCode() < 0) {
-				qDebug(CAT_SWIOT_AD74413R)
-					<< "Chnl attribute read error " + QString::number(tcmd->getReturnCode());
-			} else {
-				try {
-					int samplingFreq = std::stoi(srAttrValueStr);
-					Q_EMIT samplingFreqRead(samplingFreq);
-				} catch(std::invalid_argument &exception) {
-					qDebug(CAT_SWIOT_AD74413R)
-						<< "Chnl attribute read error conversion: " + QString(srAttrValueStr);
-				}
-			}
-		},
-		Qt::QueuedConnection);
-	m_commandQueue->enqueue(readSrCommand);
+	newSamplingFrequency = (newSamplingFrequency != 0.0) ? (1.0 / newSamplingFrequency) : 1.0;
+	m_samplingFrequency = newSamplingFrequency;
+	Q_EMIT samplingFrequencyComputed(newSamplingFrequency);
 }
 
 int BufferLogic::getPlotChnlsNo() { return m_plotChnlsNo; }
