@@ -4,6 +4,8 @@
 #include <QLabel>
 #include "scopy-pluginbase_export.h"
 
+#define TIMESTAMP_FORMAT "[hh:mm ap] "
+
 class SCOPY_PLUGINBASE_EXPORT StatusMessage : public QWidget
 {
 	Q_OBJECT
@@ -21,6 +23,8 @@ public:
 	void setDisplayTime(int ms);
 
 private:
+	void prependDateTime();
+
 	int m_ms; // display time
 	bool m_permanent;
 	QString m_text;	   // display text
