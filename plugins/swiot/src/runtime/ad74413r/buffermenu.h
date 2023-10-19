@@ -55,8 +55,10 @@ public:
 	void setupVerticalSettingsMenu(QWidget *settingsWidget, QString unit, double yMin, double yMax);
 	void setAttrValues(QMap<QString, QMap<QString, QStringList>> values);
 	double convertFromRaw(int rawValue, QString chnlType = OUTPUT_CHNL);
-public
-	Q_SLOT : void onAttrWritten(QMap<QString, QMap<QString, QStringList>> values);
+	void connectSignalsToSlots();
+public Q_SLOTS:
+	void onAttrWritten(QMap<QString, QMap<QString, QStringList>> values);
+	void onSamplingFreqChanged(int idx);
 Q_SIGNALS:
 	void attrValuesChanged(QString attrName, QString chnlType);
 	void mapUpdated();
@@ -64,14 +66,19 @@ Q_SIGNALS:
 	void broadcastThresholdReadForward(QString value);
 	void broadcastThresholdReadBackward(QString value);
 	void diagnosticFunctionUpdated();
+	void samplingFrequencyUpdated(int sr);
 	void setUnitPerDivision(double val);
 	void unitPerDivisionChanged(double val);
+
+protected:
+	void setAvailableOptions(QComboBox *list, QString attrName);
 
 protected:
 	QWidget *m_widget;
 	QString m_chnlFunction;
 	QMap<QString, QMap<QString, QStringList>> m_attrValues;
 	PositionSpinButton *m_unitPerDivision;
+	QComboBox *m_samplingFreqOptions;
 
 private:
 	QVector<QBoxLayout *> m_menuLayers;

@@ -73,8 +73,6 @@ Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
 				createSettingsMenu("General settings", new QColor(0x4a, 0x64, 0xff));
 			setupToolView(settingsMenu);
 			setupConnections();
-			m_swiotAdLogic->readChnlsSamplingFreqAvailableAttr();
-			m_swiotAdLogic->readChnlsSamplingFreqAttr();
 			m_swiotAdLogic->initAd74413rChnlsFunctions();
 		}
 	}
@@ -150,6 +148,10 @@ void Ad74413r::setupConnections()
 	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::onBackBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFrequencyComputed, m_plotHandler,
+		&BufferPlotHandler::onSamplingFrequencyComputed);
+	connect(m_swiotAdLogic, &BufferLogic::samplingFrequencyComputed, m_readerThread,
+		&ReaderThread::onSamplingFrequencyComputed);
 	connect(this, &Ad74413r::activateRunBtns, this, &Ad74413r::onActivateRunBtns);
 
 	connect(m_monitorChannelManager, &scopy::gui::ChannelManager::enabledChannel, this,
@@ -164,23 +166,11 @@ void Ad74413r::setupConnections()
 	connect(m_toolView->getSingleBtn(), &QPushButton::toggled, this, &Ad74413r::onSingleBtnPressed);
 	connect(m_plotHandler, &BufferPlotHandler::singleCaptureFinished, this, &Ad74413r::onSingleCaptureFinished);
 
-	connect(m_swiotAdLogic, &BufferLogic::samplingFreqRead, m_plotHandler,
-		&BufferPlotHandler::onSamplingFreqWritten);
-	connect(m_swiotAdLogic, &BufferLogic::samplingFreqRead, m_readerThread, &ReaderThread::onSamplingFreqWritten);
 	connect(m_swiotAdLogic, &BufferLogic::channelFunctionDetermined, this, &Ad74413r::initChannelToolView);
-	connect(m_swiotAdLogic, &BufferLogic::samplingFreqRead, this, [=, this](int sampFreq) {
-		if(m_samplingFreqOptions->currentText() != QString::number(sampFreq)) {
-			m_samplingFreqOptions->setCurrentText(QString::number(sampFreq));
-		}
-	});
-	connect(m_swiotAdLogic, &BufferLogic::samplingFreqAvailableRead, this,
-		[=, this](QStringList availableFreq) { m_samplingFreqOptions->addItems(availableFreq); });
 	connect(m_swiotAdLogic, &BufferLogic::instantValueChanged, m_plotHandler, &BufferPlotHandler::setInstantValue);
 
 	connect(m_timespanSpin, &PositionSpinButton::valueChanged, m_plotHandler,
 		&BufferPlotHandler::onTimespanChanged);
-	connect(m_samplingFreqOptions, QOverload<int>::of(&QComboBox::currentIndexChanged), m_swiotAdLogic,
-		&BufferLogic::onSamplingFreqChanged);
 
 	connect(m_tme, &ToolMenuEntry::runToggled, m_toolView->getRunBtn(), &QPushButton::setChecked);
 
@@ -237,6 +227,8 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 		connect(m_plotHandler, &BufferPlotHandler::unitPerDivisionChanged, controller,
 			&BufferMenuController::unitPerDivisionChanged);
 
+		connect(controller, &BufferMenuController::samplingFrequencyUpdated, this,
+			&Ad74413r::onSamplingFrequencyUpdated);
 		connect(controller, &BufferMenuController::diagnosticFunctionUpdated, this,
 			&Ad74413r::onDiagnosticFunctionUpdated);
 		connect(controller, SIGNAL(broadcastThresholdReadForward(QString)), this,
@@ -282,12 +274,6 @@ scopy::gui::GenericMenu *Ad74413r::createSettingsMenu(QString title, QColor *col
 	generalSubsection->layout()->setSpacing(10);
 	generalSubsection->getContentWidget()->layout()->setSpacing(10);
 
-	// channels sampling freq
-	auto *samplingFreqLayout = new QHBoxLayout();
-	m_samplingFreqOptions = new QComboBox(generalSubsection->getContentWidget());
-	samplingFreqLayout->addWidget(new QLabel("Sampling frequency", generalSubsection->getContentWidget()));
-	samplingFreqLayout->addWidget(m_samplingFreqOptions);
-
 	// plot timespan
 	auto *timespanLayout = new QHBoxLayout();
 	m_timespanSpin = new PositionSpinButton({{"ms", 1E-3}, {"s", 1E0}}, "Timespan", 0.1, 10, true, false,
@@ -301,7 +287,6 @@ scopy::gui::GenericMenu *Ad74413r::createSettingsMenu(QString title, QColor *col
 
 	initExportSettings(generalSubsection->getContentWidget());
 	exportLayout->addWidget(m_exportSettings);
-	generalSubsection->getContentWidget()->layout()->addItem(samplingFreqLayout);
 	generalSubsection->getContentWidget()->layout()->addItem(timespanLayout);
 	generalSubsection->getContentWidget()->layout()->addItem(exportLayout);
 
@@ -378,7 +363,6 @@ void Ad74413r::onRunBtnPressed(bool toggled)
 	if(toggled) {
 		m_toolView->getSingleBtn()->setChecked(false);
 		m_toolView->getSingleBtn()->setEnabled(false);
-		m_samplingFreqOptions->setEnabled(false);
 		verifyChnlsChanges();
 		if(!m_readerThread->isRunning()) {
 			m_plotHandler->setSingleCapture(false);
@@ -390,7 +374,6 @@ void Ad74413r::onRunBtnPressed(bool toggled)
 		}
 	} else {
 		m_toolView->getSingleBtn()->setEnabled(true);
-		m_samplingFreqOptions->setEnabled(true);
 		m_readerThread->requestStop();
 		if(m_tme->running()) {
 			m_tme->setRunning(toggled);
@@ -426,7 +409,6 @@ void Ad74413r::onSingleCaptureFinished()
 			m_tme->setRunning(false);
 		}
 		Q_EMIT thresholdControlEnable(true);
-		m_samplingFreqOptions->setEnabled(true);
 		m_toolView->getSingleBtn()->setEnabled(true);
 	}
 	m_readerThread->requestStop();
@@ -504,6 +486,12 @@ void Ad74413r::externalPowerSupply(bool ps)
 		m_statusContainer->show();
 		m_statusLabel->show();
 	}
+}
+
+void Ad74413r::onSamplingFrequencyUpdated(int channelId, int value)
+{
+	m_readerThread->requestStop();
+	m_swiotAdLogic->applySamplingFrequencyChanges(channelId, value);
 }
 
 void Ad74413r::onDiagnosticFunctionUpdated()

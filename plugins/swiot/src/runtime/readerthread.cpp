@@ -302,7 +302,7 @@ void ReaderThread::destroyIioBuffer()
 
 void ReaderThread::onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo) { m_chnlsInfo = chnlsInfo; }
 
-void ReaderThread::onSamplingFreqWritten(int samplingFreq) { m_samplingFreq = samplingFreq; }
+void ReaderThread::onSamplingFrequencyComputed(double samplingFrequency) { m_samplingFreq = samplingFrequency; }
 
 void ReaderThread::runBuffered(int requiredBuffersNumber)
 {

@@ -71,7 +71,7 @@ public:
 public Q_SLOTS:
 	void handleConnectionDestroyed();
 	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
-	void onSamplingFreqWritten(int samplingFreq);
+	void onSamplingFrequencyComputed(double samplingFreq);
 
 Q_SIGNALS:
 	void readerThreadFinished();
@@ -92,7 +92,7 @@ private:
 	bool m_deinit;
 	QMap<int, struct iio_channel *> m_dioChannels;
 
-	int m_samplingFreq = 4800;
+	double m_samplingFreq = 4800;
 	int m_enabledChnlsNo;
 	std::atomic<int> bufferCounter;
 	std::atomic<int> m_requiredBuffersNumber;
