@@ -91,14 +91,15 @@ void BitFieldSimpleWidget::checkPreferences()
 	QString background = p->get("regmap_color_by_value").toString();
 
 	if(background.contains("Bitfield background")) {
-		bool ok;
-		mainFrame->setStyleSheet(
-			QString("background-color: " + Util::getColors().at(value->text().toInt(&ok, 16) % 16)));
+		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
+		QString color = Util::getColors().at(colorIndex);
+		mainFrame->setStyleSheet(QString("background-color: " + color));
 	}
 
 	if(background.contains("Bitfield text")) {
-		bool ok;
-		value->setStyleSheet(QString("color: " + Util::getColors().at(value->text().toInt(&ok, 16) % 16)));
+		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
+		QString color = Util::getColors().at(colorIndex);
+		value->setStyleSheet(QString("color: " + color));
 	}
 }
 

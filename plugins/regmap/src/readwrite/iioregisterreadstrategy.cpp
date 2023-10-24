@@ -28,12 +28,6 @@ void IIORegisterReadStrategy::read(uint32_t address)
 	}
 }
 
-uint32_t IIORegisterReadStrategy::getOffset() const
-{
-	return offset;
-}
+uint32_t IIORegisterReadStrategy::getOffset() const { return offset; }
 
-void IIORegisterReadStrategy::setOffset(uint32_t newOffset)
-{
-	offset = newOffset;
-}
+void IIORegisterReadStrategy::setOffset(uint32_t newOffset) { offset = newOffset; }

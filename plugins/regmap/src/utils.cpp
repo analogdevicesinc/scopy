@@ -27,6 +27,13 @@ QString Utils::convertToHexa(uint32_t value, int size)
 	return QStringLiteral("0x%1").arg(value, (size / 4), 16, QLatin1Char('0'));
 }
 
+uint32_t Utils::convertQStringToUint32(QString value)
+{
+	bool ok;
+	uint32_t convertedValue = static_cast<uint32_t>(value.toLongLong(&ok, 16));
+	return convertedValue;
+}
+
 void Utils::removeLayoutMargins(QLayout *layout)
 {
 	layout->setMargin(0);

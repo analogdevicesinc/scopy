@@ -17,6 +17,7 @@ public:
 	explicit Utils(QObject *parent = nullptr);
 
 	static QString convertToHexa(uint32_t value, int size);
+	static uint32_t convertQStringToUint32(QString value);
 	static void removeLayoutMargins(QLayout *layout);
 	static QDir setXmlPath();
 
