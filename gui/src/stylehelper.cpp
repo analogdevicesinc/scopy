@@ -516,9 +516,8 @@ void StyleHelper::MenuComboWidget(QWidget *w, QString objectName)
 	w->setFixedHeight(72);
 	w->layout()->setContentsMargins(10, 2, 10, 2);
 	QString style = QString(R"css(
-			scopy--MenuComboWidget {background-color: &&UIElementBackground&&;
-			border-radius: 4px;
-			}
+				background-color: &&UIElementBackground&&;
+				border-radius: 4px;
 			)css");
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
 	w->setStyleSheet(style);
