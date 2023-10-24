@@ -39,7 +39,7 @@ using namespace scopy;
 using namespace regmap;
 
 DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, RegisterMapValues *registerMapValues,
-				     bool isAxi, QWidget *parent)
+					  QWidget *parent)
 	: QWidget(parent)
 	, registerMapValues(registerMapValues)
 	, registerMapTemplate(registerMapTemplate)
@@ -133,16 +133,10 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 
 	QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
 			 [=](uint32_t address) {
-				 if(isAxi) {
-					 address << 800000;
-				 }
 				 registerMapValues->requestRead(address);
 			 });
 	QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
 			 [=](uint32_t address, uint32_t value) {
-				 if(isAxi) {
-					 address << 800000;
-				 }
 				 registerMapValues->requestWrite(address, value);
 			 });
 	QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
