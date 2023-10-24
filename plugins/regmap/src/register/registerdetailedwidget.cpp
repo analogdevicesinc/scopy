@@ -115,8 +115,7 @@ QString RegisterDetailedWidget::getBitFieldsValue()
 {
 	uint32_t result = 0;
 	for(int i = 0; i < bitFieldList->length(); ++i) {
-		bool ok;
-		uint32_t aux = bitFieldList->at(i)->getValue().toLongLong(&ok, 16);
+		uint32_t aux = Utils::convertQStringToUint32(bitFieldList->at(i)->getValue());
 		int regOffset = bitFieldList->at(i)->getRegOffset();
 		result += qPow(2, regOffset) * aux;
 		qDebug() << "aux = " << aux << " result = " << result;

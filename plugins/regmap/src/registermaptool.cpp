@@ -142,8 +142,7 @@ void RegisterMapTool::generateDeviceRegisterMap(TabInfo *tabInfo)
 		registerMapValues = getRegisterMapValues(tabInfo->getXmlPath());
 	}
 
-	DeviceRegisterMap *regMap =
-		new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
+	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
 	tabs->insert(tabInfo->getDeviceName(), regMap);
 	tool->addWidgetToCentralContainerHelper(regMap);
 	tabs->value(tabInfo->getDeviceName())->hide();

@@ -65,9 +65,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	readInterval->setEnabled(false);
 
 	QObject::connect(readInterval, &QPushButton::clicked, this, [=]() {
-		bool ok;
-		int startInterval = startReadInterval->text().toUInt(&ok, 16);
-		int endInterval = endReadInterval->text().toUInt(&ok, 16);
+		int startInterval = Utils::convertQStringToUint32(startReadInterval->text());
+		int endInterval = Utils::convertQStringToUint32(endReadInterval->text());
 		for(int i = startInterval; i <= endInterval; i++) {
 			Q_EMIT requestRead(i);
 		}
@@ -113,9 +112,8 @@ RegisterMapSettingsMenu::RegisterMapSettingsMenu(QWidget *parent)
 	writeListOfValuesButton->setEnabled(false);
 
 	QObject::connect(writeListOfValuesButton, &QPushButton::clicked, this, [=]() {
-		bool ok;
-		int startInterval = startReadInterval->text().toUInt(&ok, 16);
-		int endInterval = endReadInterval->text().toUInt(&ok, 16);
+		int startInterval = Utils::convertQStringToUint32(startReadInterval->text());
+		int endInterval = Utils::convertQStringToUint32(endReadInterval->text());
 
 		FileRegisterReadStrategy *fileRead = new FileRegisterReadStrategy(filePath->text());
 

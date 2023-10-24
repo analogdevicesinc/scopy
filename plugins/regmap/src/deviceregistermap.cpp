@@ -39,7 +39,7 @@ using namespace scopy;
 using namespace regmap;
 
 DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, RegisterMapValues *registerMapValues,
-					  QWidget *parent)
+				     QWidget *parent)
 	: QWidget(parent)
 	, registerMapValues(registerMapValues)
 	, registerMapTemplate(registerMapTemplate)
@@ -132,13 +132,9 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	}
 
 	QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
-			 [=](uint32_t address) {
-				 registerMapValues->requestRead(address);
-			 });
+			 [=](uint32_t address) { registerMapValues->requestRead(address); });
 	QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
-			 [=](uint32_t address, uint32_t value) {
-				 registerMapValues->requestWrite(address, value);
-			 });
+			 [=](uint32_t address, uint32_t value) { registerMapValues->requestWrite(address, value); });
 	QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
 			 [=](uint32_t address, uint32_t value) {
 				 int regSize = 8;
@@ -193,8 +189,7 @@ void DeviceRegisterMap::registerChanged(RegisterModel *regModel)
 	QObject::connect(registerDetailedWidget, &RegisterDetailedWidget::bitFieldValueChanged, registerController,
 			 &RegisterController::registerValueChanged);
 	QObject::connect(registerController, &RegisterController::valueChanged, this, [=](QString val) {
-		bool ok;
-		registerDetailedWidget->updateBitFieldsValue(val.toUInt(&ok, 16));
+		registerDetailedWidget->updateBitFieldsValue(Utils::convertQStringToUint32(val));
 	});
 
 	if(registerMapValues) {
