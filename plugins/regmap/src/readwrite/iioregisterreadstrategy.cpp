@@ -12,6 +12,7 @@ IIORegisterReadStrategy::IIORegisterReadStrategy(struct iio_device *dev)
 
 void IIORegisterReadStrategy::read(uint32_t address)
 {
+	address = address | offset;
 	uint32_t reg_val;
 
 	ssize_t read = iio_device_reg_read(dev, address, &reg_val);
@@ -25,4 +26,14 @@ void IIORegisterReadStrategy::read(uint32_t address)
 			<< "device read success for register " << address << " with value " << reg_val;
 		Q_EMIT readDone(address, reg_val);
 	}
+}
+
+uint32_t IIORegisterReadStrategy::getOffset() const
+{
+	return offset;
+}
+
+void IIORegisterReadStrategy::setOffset(uint32_t newOffset)
+{
+	offset = newOffset;
 }

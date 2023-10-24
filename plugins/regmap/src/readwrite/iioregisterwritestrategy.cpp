@@ -10,6 +10,7 @@ IIORegisterWriteStrategy::IIORegisterWriteStrategy(struct iio_device *dev)
 
 void IIORegisterWriteStrategy::write(uint32_t address, uint32_t val)
 {
+	address = address | offset;
 	ssize_t write = iio_device_reg_write(dev, address, val);
 	if(write < 0) {
 		char err[1024];
@@ -21,4 +22,14 @@ void IIORegisterWriteStrategy::write(uint32_t address, uint32_t val)
 			<< "device write successfull for register " << address << " with value " << val;
 		Q_EMIT writeSuccess(address);
 	}
+}
+
+uint32_t IIORegisterWriteStrategy::getOffset() const
+{
+	return offset;
+}
+
+void IIORegisterWriteStrategy::setOffset(uint32_t newOffset)
+{
+	offset = newOffset;
 }
