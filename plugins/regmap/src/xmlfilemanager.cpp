@@ -58,8 +58,8 @@ QMap<uint32_t, RegisterModel *> *XmlFileManager::getAllRegisters()
 	QDomElement reg = root.firstChildElement("Register");
 
 	while(!reg.isNull()) {
-		bool ok;
-		int address = reg.firstChildElement("Address").firstChild().toText().data().toUInt(&ok, 16);
+		uint32_t address =
+			Utils::convertQStringToUint32(reg.firstChildElement("Address").firstChild().toText().data());
 		regList->insert(address, getRegister(reg));
 		reg = reg.nextSibling().toElement();
 	}
@@ -95,8 +95,6 @@ QVector<BitFieldModel *> *XmlFileManager::getBitFields(QString regAddr)
 RegisterModel *XmlFileManager::getRegister(QDomElement reg)
 {
 	if(!reg.isNull()) {
-		bool ok;
-
 		QString name = "";
 		QString description = "";
 		bool isAxiCompatible = false;
@@ -114,9 +112,10 @@ RegisterModel *XmlFileManager::getRegister(QDomElement reg)
 		}
 
 		return new RegisterModel(
-			name, reg.firstChildElement("Address").firstChild().toText().data().toUInt(&ok, 16),
+			name,
+			Utils::convertQStringToUint32(reg.firstChildElement("Address").firstChild().toText().data()),
 			description, reg.firstChildElement("Exists").toText().data().toUpper() == "TRUE",
-			reg.firstChildElement("Width").firstChild().toText().data().toUInt(),
+			reg.firstChildElement("Width").firstChild().toText().data().toInt(),
 			reg.firstChildElement("Notes").firstChild().toText().data(),
 			getBitFieldsOfRegister(reg, isAxiCompatible));
 	}
@@ -136,7 +135,7 @@ QVector<BitFieldModel *> *XmlFileManager::getBitFieldsOfRegister(QDomElement reg
 		QDomElement bitFields = reg.firstChildElement("BitFields");
 		QDomElement bf;
 		bf = bitFields.firstChild().toElement();
-		int regWidth = reg.firstChildElement("Width").firstChild().toText().data().toUInt();
+		int regWidth = reg.firstChildElement("Width").firstChild().toText().data().toInt();
 		int numberOfBits = 0;
 		while(!bf.isNull()) {
 			BitFieldModel *bitField = getBitField(bf);
@@ -187,10 +186,9 @@ BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
 		QDomElement bitFieldOptions = bitField.firstChildElement("Options");
 		QDomElement bfOption = bitFieldOptions.firstChildElement("Option");
 		while(!bfOption.isNull()) {
-			bool ok;
 			options->push_back(new BitFieldOption(
-				QString::number(bfOption.firstChildElement("Value").firstChild().toText().data().toUInt(
-					&ok, 16)),
+				QString::number(Utils::convertQStringToUint32(
+					bfOption.firstChildElement("Value").firstChild().toText().data())),
 				bfOption.firstChildElement("Description").firstChild().toText().data()));
 			bfOption = bfOption.nextSibling().toElement();
 		}
@@ -211,13 +209,16 @@ BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
 
 		return new BitFieldModel(
 			name, bitField.firstChildElement("Access").firstChild().toText().data(),
-			bitField.firstChildElement("DefaultValue").firstChild().toText().data().toUInt(), description,
-			bitField.firstChildElement("Visibility").firstChild().toText().data(),
-			bitField.firstChildElement("Width").firstChild().toText().data().toUInt(),
+			Utils::convertQStringToUint32(
+				bitField.firstChildElement("DefaultValue").firstChild().toText().data()),
+			description, bitField.firstChildElement("Visibility").firstChild().toText().data(),
+			bitField.firstChildElement("Width").firstChild().toText().data().toInt(),
 			bitField.firstChildElement("Notes").firstChild().toText().data(),
-			bitField.firstChildElement("BitOffset").firstChild().toText().data().toUInt(),
-			bitField.firstChildElement("RegOffset").firstChild().toText().data().toUInt(),
-			bitField.firstChildElement("SliceWidth").firstChild().toText().data().toUInt(), options);
+			Utils::convertQStringToUint32(
+				bitField.firstChildElement("BitOffset").firstChild().toText().data()),
+			Utils::convertQStringToUint32(
+				bitField.firstChildElement("RegOffset").firstChild().toText().data()),
+			bitField.firstChildElement("SliceWidth").firstChild().toText().data().toInt(), options);
 	}
 	return nullptr;
 }
