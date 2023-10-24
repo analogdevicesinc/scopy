@@ -49,17 +49,14 @@ RegisterController::RegisterController(QWidget *parent)
 	addressPicker->setPrefix("0x");
 	addressPicker->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QObject::connect(addressPicker, &QSpinBox::textChanged, this, [=](QString address) {
-		bool ok;
-		Q_EMIT registerAddressChanged(address.toUInt(&ok, 16));
+		Q_EMIT registerAddressChanged(Utils::convertQStringToUint32(address));
 	});
 	readWidgetLayout->addLayout(readWidgetLeftLayout, 3);
 
 	readButton = new QPushButton("Read", readWidget);
 	// request read
-	QObject::connect(readButton, &QPushButton::clicked, this, [=]() {
-		bool ok;
-		Q_EMIT requestRead(addressPicker->text().toUInt(&ok, 16));
-	});
+	QObject::connect(readButton, &QPushButton::clicked, this,
+			 [=]() { Q_EMIT requestRead(Utils::convertQStringToUint32(addressPicker->text())); });
 
 	readWidgetLayout->addWidget(readButton, 1, Qt::AlignRight);
 
@@ -88,9 +85,8 @@ RegisterController::RegisterController(QWidget *parent)
 	writeButton = new QPushButton("Write", writeWidget);
 	// request write on register
 	QObject::connect(writeButton, &QPushButton::clicked, this, [=]() {
-		bool ok;
 		uint32_t address = addressPicker->value();
-		uint32_t value = static_cast<uint32_t>(regValue->text().toLongLong(&ok, 16));
+		uint32_t value = Utils::convertQStringToUint32(regValue->text());
 		Q_EMIT requestWrite(address, value);
 	});
 

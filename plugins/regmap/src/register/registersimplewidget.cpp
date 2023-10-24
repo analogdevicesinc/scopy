@@ -28,7 +28,6 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 	setFixedHeight(60 * (registerModel->getWidth() / 8));
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
 
-	bool ok;
 	QHBoxLayout *layout = new QHBoxLayout();
 	layout->setMargin(2);
 	layout->setSpacing(4);
@@ -148,21 +147,21 @@ void RegisterSimpleWidget::checkPreferences()
 	QString background = p->get("regmap_color_by_value").toString();
 
 	if(background.contains("Register background")) {
-		bool ok;
-		regBaseInfoWidget->setStyleSheet(
-			QString("background-color: " + Util::getColors().at(value->text().toUInt(&ok, 16) % 16)));
+		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
+		QString color = Util::getColors().at(colorIndex);
+		regBaseInfoWidget->setStyleSheet(QString("background-color: " + color));
 	}
 
 	if(background.contains("Register text")) {
-		bool ok;
-		value->setStyleSheet(QString("color: " + Util::getColors().at(value->text().toUInt(&ok, 16) % 16)));
+		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
+		QString color = Util::getColors().at(colorIndex);
+		value->setStyleSheet(QString("color: " + color));
 	}
 }
 
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
 {
 	if(event->type() == QEvent::MouseButtonPress) {
-		bool ok;
 		Q_EMIT registerSelected(registerModel->getAddress());
 	}
 

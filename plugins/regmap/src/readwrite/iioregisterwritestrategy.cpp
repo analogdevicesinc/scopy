@@ -24,12 +24,6 @@ void IIORegisterWriteStrategy::write(uint32_t address, uint32_t val)
 	}
 }
 
-uint32_t IIORegisterWriteStrategy::getOffset() const
-{
-	return offset;
-}
+uint32_t IIORegisterWriteStrategy::getOffset() const { return offset; }
 
-void IIORegisterWriteStrategy::setOffset(uint32_t newOffset)
-{
-	offset = newOffset;
-}
+void IIORegisterWriteStrategy::setOffset(uint32_t newOffset) { offset = newOffset; }
