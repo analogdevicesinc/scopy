@@ -27,7 +27,7 @@ class SCOPY_REGMAPPLUGIN_EXPORT DeviceRegisterMap : public QWidget
 	Q_OBJECT
 public:
 	explicit DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate = nullptr,
-				   RegisterMapValues *registerMapValues = nullptr, bool isAxi = false,
+				   RegisterMapValues *registerMapValues = nullptr,
 				   QWidget *parent = nullptr);
 	~DeviceRegisterMap();
 
