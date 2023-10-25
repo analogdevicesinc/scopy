@@ -28,7 +28,7 @@ public:
 	void setRegisterSelected(bool selected);
 
 public Q_SLOTS:
-	void checkPreferences();
+	void applyStyle();
 
 private:
 	QHBoxLayout *layout;

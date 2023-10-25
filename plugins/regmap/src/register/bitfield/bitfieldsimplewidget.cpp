@@ -76,7 +76,7 @@ BitFieldSimpleWidget::~BitFieldSimpleWidget()
 void BitFieldSimpleWidget::updateValue(QString newValue)
 {
 	value->setText(newValue);
-	checkPreferences();
+	applyStyle();
 }
 
 int BitFieldSimpleWidget::getWidth() const { return width; }
@@ -85,23 +85,7 @@ QString BitFieldSimpleWidget::getDescription() const { return description; }
 
 int BitFieldSimpleWidget::getStreach() const { return streach; }
 
-void BitFieldSimpleWidget::checkPreferences()
-{
-	scopy::Preferences *p = scopy::Preferences::GetInstance();
-	QString background = p->get("regmap_color_by_value").toString();
-
-	if(background.contains("Bitfield background")) {
-		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
-		QString color = Util::getColors().at(colorIndex);
-		mainFrame->setStyleSheet(QString("background-color: " + color));
-	}
-
-	if(background.contains("Bitfield text")) {
-		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
-		QString color = Util::getColors().at(colorIndex);
-		value->setStyleSheet(QString("color: " + color));
-	}
-}
+void BitFieldSimpleWidget::applyStyle() { setStyleSheet(RegmapStyleHelper::simpleBitFieldStyle(this)); }
 
 void BitFieldSimpleWidget::setSelected(bool selected) { scopy::setDynamicProperty(mainFrame, "is_selected", selected); }
 
