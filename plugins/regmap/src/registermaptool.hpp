@@ -21,6 +21,9 @@ class DeviceRegisterMap;
 class RegisterMapSettingsMenu;
 
 class SearchBarWidget;
+
+#define AXI_OFFSET "80000000"
+
 class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapTool : public QWidget
 {
 	Q_OBJECT
@@ -45,7 +48,7 @@ private:
 	QMap<QString, DeviceRegisterMap *> *tabs;
 	bool first = true;
 
-	RegisterMapValues *getRegisterMapValues(struct iio_device *dev);
+	RegisterMapValues *getRegisterMapValues(struct iio_device *dev, uint32_t offset = 0);
 	RegisterMapValues *getRegisterMapValues(QString filePath);
 	void generateDeviceRegisterMap(TabInfo *tabInfo);
 	void toggleSettingsMenu(QString registerName, bool toggle);
