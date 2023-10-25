@@ -198,8 +198,8 @@ void BitFieldDetailedWidget::updateValue(QString newValue)
 
 void BitFieldDetailedWidget::registerValueUpdated(QString newValue)
 {
-	lastReadValue->setText(QString("Current : 0x") + newValue);
-	updateValue(QString("0x") + newValue);
+	lastReadValue->setText(newValue);
+	updateValue(newValue);
 }
 
 QString BitFieldDetailedWidget::getValue()
