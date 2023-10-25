@@ -1,12 +1,14 @@
 #include "regmapstylehelper.hpp"
+#include "utils.hpp"
 
-#include "dynamicWidget.h"
+#include <QApplication>
 #include <QComboBox>
 #include <QLineEdit>
+#include "dynamicWidget.h"
+#include <pluginbase/preferences.h>
 #include <qboxlayout.h>
 #include <registermapsettingsmenu.hpp>
 #include <stylehelper.h>
-#include <QApplication>
 
 using namespace scopy::regmap;
 
@@ -308,6 +310,41 @@ QString RegmapStyleHelper::detailedBitFieldStyle(BitFieldDetailedWidget *widget,
 	return style;
 }
 
+QString RegmapStyleHelper::simpleBitFieldStyle(BitFieldSimpleWidget *widget, QString objectName)
+{
+	if(!objectName.isEmpty())
+		widget->setObjectName(objectName);
+
+	QString style = QString(R"css(
+						QWidget {
+								background-color: &&widgetBackground&& ;
+						}
+						*[is_selected=true] {
+						 background-color: &&selectedBackground&& ;
+						}
+						)css");
+	style.replace("&&widgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
+	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
+	widget->value->setStyleSheet(grayLabel(nullptr));
+	widget->mainFrame->setStyleSheet(grayBackgroundHoverWidget(nullptr));
+
+	if(widget->value->text() != "N/R") {
+		scopy::Preferences *p = scopy::Preferences::GetInstance();
+		QString background = p->get("regmap_color_by_value").toString();
+
+		if(background.contains("Bitfield background")) {
+			widget->mainFrame->setStyleSheet("background-color: " +
+							 getColorBasedOnValue(widget->value->text()));
+		}
+
+		if(background.contains("Bitfield text")) {
+			widget->value->setStyleSheet("color: " + getColorBasedOnValue(widget->value->text()));
+		}
+	}
+
+	return style;
+}
+
 QString RegmapStyleHelper::simpleRegisterStyle(RegisterSimpleWidget *widget, QString objectName)
 {
 	if(!objectName.isEmpty())
@@ -331,12 +368,25 @@ QString RegmapStyleHelper::simpleRegisterStyle(RegisterSimpleWidget *widget, QSt
 
 	style.replace("&&frameBackground&&", RegmapStyleHelper::getColor("WidgetBackground"));
 	style.replace("&&childWidgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
-	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("ButtonHover"));
 	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
 	widget->setStyleSheet(style);
 	widget->regBaseInfoWidget->setStyleSheet(grayBackgroundHoverWidget(nullptr));
 	widget->registerNameLabel->setStyleSheet(whiteSmallTextLable(nullptr));
+	widget->value->setStyleSheet(grayLabel(nullptr));
 
+	if(widget->value->text() != "N/R") {
+		scopy::Preferences *p = scopy::Preferences::GetInstance();
+		QString background = p->get("regmap_color_by_value").toString();
+
+		if(background.contains("Register background")) {
+			widget->regBaseInfoWidget->setStyleSheet("background-color: " +
+								 getColorBasedOnValue(widget->value->text()));
+		}
+
+		if(background.contains("Register text")) {
+			widget->value->setStyleSheet("color: " + getColorBasedOnValue(widget->value->text()));
+		}
+	}
 	return style;
 }
 
@@ -671,4 +721,10 @@ QString RegmapStyleHelper::sliderStyle(QSlider *slider, QString objectName)
 	}
 
 	return style;
+}
+
+QString RegmapStyleHelper::getColorBasedOnValue(QString value)
+{
+	uint32_t colorIndex = Utils::convertQStringToUint32(value) % 16;
+	return Util::getColors().at(colorIndex);
 }
