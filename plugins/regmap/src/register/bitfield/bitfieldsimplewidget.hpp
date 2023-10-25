@@ -11,6 +11,7 @@ class QLabel;
 namespace scopy::regmap {
 class BitFieldSimpleWidget : public QFrame
 {
+	friend class RegmapStyleHelper;
 	Q_OBJECT
 public:
 	explicit BitFieldSimpleWidget(QString name, int defaultValue, QString description, int width, QString notes,
@@ -26,7 +27,7 @@ public:
 	QString getName() const;
 
 public Q_SLOTS:
-	void checkPreferences();
+	void applyStyle();
 	void setSelected(bool selected);
 
 private:

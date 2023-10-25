@@ -16,6 +16,7 @@
 #include <register/registersimplewidget.hpp>
 
 #include <register/bitfield/bitfielddetailedwidget.hpp>
+#include <register/bitfield/bitfieldsimplewidget.hpp>
 
 #include <register/registersimplewidget.hpp>
 
@@ -49,7 +50,8 @@ public:
 	static QString BlueButton(QPushButton *btn, QString objectName = "");
 	static QString checkboxStyle(QCheckBox *checkbox, QString objectName = "");
 	static QString detailedBitFieldStyle(BitFieldDetailedWidget *widget, QString objectName);
-	static QString simpleRegisterStyle(RegisterSimpleWidget *widget, QString objectName);
+	static QString simpleBitFieldStyle(BitFieldSimpleWidget *widget, QString objectName = "");
+	static QString simpleRegisterStyle(RegisterSimpleWidget *widget, QString objectName = "");
 	static QString valueLabel(QLabel *label, QString objectName = "");
 	static QString grayLabel(QLabel *label, QString objectName = "");
 	static QString whiteSmallTextLable(QLabel *label, QString objectName = "");
@@ -65,6 +67,7 @@ public:
 	static QString regmapControllerStyle(QWidget *widget, QString objectName = "");
 	static QString widgetidthRoundCornersStyle(QWidget *widget, QString objectName = "");
 	static QString sliderStyle(QSlider *slider, QString objectName = "");
+	static QString getColorBasedOnValue(QString value);
 
 private:
 	QMap<QString, QString> colorMap;

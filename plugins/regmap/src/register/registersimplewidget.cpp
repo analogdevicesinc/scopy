@@ -130,7 +130,7 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 		}
 	}
 	this->value->setText(scopy::regmap::Utils::convertToHexa(value, registerModel->getWidth()));
-	checkPreferences();
+	applyStyle();
 }
 
 void RegisterSimpleWidget::setRegisterSelected(bool selected)
@@ -141,22 +141,10 @@ void RegisterSimpleWidget::setRegisterSelected(bool selected)
 	}
 }
 
-void RegisterSimpleWidget::checkPreferences()
+void RegisterSimpleWidget::applyStyle()
 {
-	scopy::Preferences *p = scopy::Preferences::GetInstance();
-	QString background = p->get("regmap_color_by_value").toString();
-
-	if(background.contains("Register background")) {
-		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
-		QString color = Util::getColors().at(colorIndex);
-		regBaseInfoWidget->setStyleSheet(QString("background-color: " + color));
-	}
-
-	if(background.contains("Register text")) {
-		uint32_t colorIndex = Utils::convertQStringToUint32(value->text()) % 16;
-		QString color = Util::getColors().at(colorIndex);
-		value->setStyleSheet(QString("color: " + color));
-	}
+	setStyleSheet(RegmapStyleHelper::simpleRegisterStyle(this, "rsw") +
+		      RegmapStyleHelper::frameBorderHover(this, "rsw"));
 }
 
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
