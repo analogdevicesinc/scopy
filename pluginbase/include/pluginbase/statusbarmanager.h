@@ -1,5 +1,5 @@
-#ifndef SCOPY_STATUSMANAGER_H
-#define SCOPY_STATUSMANAGER_H
+#ifndef SCOPY_STATUSBARMANAGER_H
+#define SCOPY_STATUSBARMANAGER_H
 
 #include <QWidget>
 #include <QVariant>
@@ -12,25 +12,25 @@
 #define DEFAULT_DISPLAY_TIME 5000
 
 namespace scopy {
-class SCOPY_PLUGINBASE_EXPORT StatusManager : public QObject
+class SCOPY_PLUGINBASE_EXPORT StatusBarManager : public QObject
 {
 	Q_OBJECT
 protected:
-	StatusManager(QObject *parent = nullptr);
-	~StatusManager();
+	StatusBarManager(QObject *parent = nullptr);
+	~StatusBarManager();
 
 public:
 	// singleton
-	StatusManager(StatusManager &other) = delete;
-	void operator=(const StatusManager &) = delete;
-	static StatusManager *GetInstance();
+	StatusBarManager(StatusBarManager &other) = delete;
+	void operator=(const StatusBarManager &) = delete;
+	static StatusBarManager *GetInstance();
 
 	/**
 	 * @brief Ads temporary message in the queue to be displayed, when possible, in the Scopy status bar.
 	 * @param message QString with the message to be displayed
 	 * @param ms The time that the message will be displayed (in milliseconds)
 	 * */
-	void addTemporaryMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
+	static void pushMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
 
 	/**
 	 * @brief Ads temporary QWidget in the queue to be displayed, when possible, in the Scopy status bar. If there
@@ -40,14 +40,14 @@ public:
 	 * @param title QString with the name of the message
 	 * @param ms The time that the widget will be displayed (in milliseconds)
 	 * */
-	void addTemporaryWidget(QWidget *widget, QString title, int ms = -1);
+	static void pushWidget(QWidget *widget, QString title, int ms = -1);
 
 	/**
 	 * @brief Overrides any message currently displayed with the message sent as parameter
 	 * @param message QString with the urgent message
 	 * @param ms The time that the message will be displayed (in milliseconds)
 	 * */
-	void addUrgentMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
+	static void pushUrgentMessage(const QString &message, int ms = DEFAULT_DISPLAY_TIME);
 
 	void setEnabled(bool enabled);
 	bool isEnabled() const;
@@ -63,11 +63,15 @@ public Q_SLOTS:
 	void processStatusMessage();
 
 private:
-	static StatusManager *pinstance_;
+	void _pushMessage(const QString &message, int ms);
+	void _pushWidget(QWidget *widget, QString title, int ms);
+	void _pushUrgentMessage(const QString &message, int ms);
+
+	static StatusBarManager *pinstance_;
 	QList<StatusMessage *> *m_itemQueue;
 	QTimer *m_timer;
 	bool m_enabled;
 };
 } // namespace scopy
 
-#endif // SCOPY_STATUSMANAGER_H
+#endif // SCOPY_STATUSBARMANAGER_H
