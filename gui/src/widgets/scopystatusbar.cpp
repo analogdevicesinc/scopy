@@ -1,6 +1,6 @@
 #include "scopystatusbar.h"
 #include "stylehelper.h"
-#include <pluginbase/statusmanager.h>
+#include <pluginbase/statusbarmanager.h>
 #include <QLoggingCategory>
 #include <QApplication>
 #include <QTimer>
@@ -15,11 +15,9 @@ ScopyStatusBar::ScopyStatusBar(QWidget *parent)
 {
 	initUi();
 
-	auto statusManager = StatusManager::GetInstance();
-	connect(statusManager, &StatusManager::sendStatus, this,
-		[this](StatusMessage *message) { displayStatus(message); });
-
-	connect(statusManager, &StatusManager::clearDisplay, this, [this]() { clearStatus(); });
+	auto statusManager = StatusBarManager::GetInstance();
+	connect(statusManager, &StatusBarManager::sendStatus, this, &ScopyStatusBar::displayStatusMessage);
+	connect(statusManager, &StatusBarManager::clearDisplay, this, &ScopyStatusBar::clearStatusMessage);
 }
 
 void ScopyStatusBar::initUi()
@@ -59,7 +57,7 @@ void ScopyStatusBar::addToRight(QWidget *widget) { m_rightWidget->layout()->addW
 
 void ScopyStatusBar::addToLeft(QWidget *widget) { m_leftWidget->layout()->addWidget(widget); }
 
-void ScopyStatusBar::displayStatus(StatusMessage *statusMessage)
+void ScopyStatusBar::displayStatusMessage(StatusMessage *statusMessage)
 {
 	m_message = statusMessage;
 	addToLeft(statusMessage->getWidget());
@@ -67,7 +65,7 @@ void ScopyStatusBar::displayStatus(StatusMessage *statusMessage)
 	this->show();
 }
 
-void ScopyStatusBar::clearStatus()
+void ScopyStatusBar::clearStatusMessage()
 {
 	this->toggleMenu(false);
 	delete m_message;

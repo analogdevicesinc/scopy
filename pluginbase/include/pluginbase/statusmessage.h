@@ -6,29 +6,52 @@
 
 #define TIMESTAMP_FORMAT "[hh:mm ap] "
 
-class SCOPY_PLUGINBASE_EXPORT StatusMessage : public QWidget
+namespace scopy {
+class StatusMessage : public QWidget
+{
+public:
+	virtual ~StatusMessage() = default;
+
+	virtual QString getText() = 0;
+	virtual QWidget *getWidget() = 0;
+	virtual int getDisplayTime() = 0;
+};
+
+class SCOPY_PLUGINBASE_EXPORT StatusMessageText : public StatusMessage
 {
 	Q_OBJECT
 public:
-	explicit StatusMessage(QString text, int ms = -1, QWidget *parent = nullptr);
-	~StatusMessage();
+	StatusMessageText(QString text, int ms = -1, QWidget *parent = nullptr);
+	~StatusMessageText();
 
-	QString getText();
-	void setText(QString text);
-
-	QWidget *getWidget();
-	void setWidget(QWidget *widget);
-
-	int getDisplayTime();
-	void setDisplayTime(int ms);
+	QString getText() override;
+	QWidget *getWidget() override;
+	int getDisplayTime() override;
 
 private:
 	void prependDateTime();
 
-	int m_ms; // display time
-	bool m_permanent;
+	int m_ms;	   // display time
 	QString m_text;	   // display text
-	QWidget *m_widget; // widget, optional
+	QWidget *m_widget; // widget
 };
+
+class SCOPY_PLUGINBASE_EXPORT StatusMessageWidget : public StatusMessage
+{
+	Q_OBJECT
+public:
+	StatusMessageWidget(QWidget *widget, QString description, int ms = -1, QWidget *parent = nullptr);
+	~StatusMessageWidget();
+
+	QString getText() override;
+	QWidget *getWidget() override;
+	int getDisplayTime() override;
+
+private:
+	int m_ms;	   // display time
+	QString m_text;	   // display text
+	QWidget *m_widget; // widget
+};
+}
 
 #endif // SCOPY_STATUSMESSAGE_H

@@ -1,57 +1,64 @@
 #include "statusmessage.h"
 #include <QLabel>
 #include <QDateTime>
-#include <utility>
 
-StatusMessage::StatusMessage(QString text, int ms, QWidget *parent)
-	: QWidget(parent)
-	, m_ms(ms)
-	, m_text(std::move(text))
-	, m_widget(nullptr)
+using namespace scopy;
+
+// ---------------------------------- STATUS_MESSAGE_TEXT ----------------------------------
+
+StatusMessageText::StatusMessageText(QString text, int ms, QWidget *parent)
+	: m_ms(ms)
+	, m_text(text)
 {
-	m_permanent = (m_ms == -1);
+	setParent(parent);
 	prependDateTime();
+
+	auto *label = new QLabel(m_text, this);
+	label->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+	label->setStyleSheet("border: none;");
+	label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	label->setMaximumHeight(15);
+	m_widget = label;
 }
 
-StatusMessage::~StatusMessage()
-{
-	if(!m_permanent) {
-		delete m_widget;
-		m_widget = nullptr;
-	}
-}
+StatusMessageText::~StatusMessageText() { delete m_widget; }
 
-QString StatusMessage::getText() { return m_text; }
+QString StatusMessageText::getText() { return m_text; }
 
-void StatusMessage::setText(QString text) { m_text = std::move(text); }
+QWidget *StatusMessageText::getWidget() { return m_widget; }
 
-QWidget *StatusMessage::getWidget()
-{
-	if(!m_widget) {
-		auto label = new QLabel(this);
-		label->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
-		label->setText(m_text);
-		label->setStyleSheet("border: none;");
-		label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-		label->setMaximumHeight(15);
+int StatusMessageText::getDisplayTime() { return m_ms; }
 
-		m_widget = label;
-	}
-
-	return m_widget;
-}
-
-void StatusMessage::setWidget(QWidget *widget) { m_widget = widget; }
-
-int StatusMessage::getDisplayTime() { return m_ms; }
-
-void StatusMessage::setDisplayTime(int ms) { m_ms = ms; }
-
-void StatusMessage::prependDateTime()
+void StatusMessageText::prependDateTime()
 {
 	QDateTime dateTime = QDateTime::currentDateTime();
 	QString formattedTime = dateTime.toString(TIMESTAMP_FORMAT);
 	m_text.push_front(formattedTime);
 }
+
+// ---------------------------------- STATUS_MESSAGE_WIDGET ----------------------------------
+
+StatusMessageWidget::StatusMessageWidget(QWidget *widget, QString description, int ms, QWidget *parent)
+	: m_ms(ms)
+	, m_text(description)
+	, m_widget(widget)
+{
+	setParent(parent);
+}
+
+StatusMessageWidget::~StatusMessageWidget()
+{
+	// the widget is not permanently displayed, so the responsibility of deleting it belongs to this class
+	if(m_ms != -1) {
+		delete m_widget;
+		m_widget = nullptr;
+	}
+}
+
+QString StatusMessageWidget::getText() { return m_text; }
+
+QWidget *StatusMessageWidget::getWidget() { return m_widget; }
+
+int StatusMessageWidget::getDisplayTime() { return m_ms; }
 
 #include "moc_statusmessage.cpp"
