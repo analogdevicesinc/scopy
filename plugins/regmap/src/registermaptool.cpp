@@ -102,10 +102,12 @@ void RegisterMapTool::addTab(iio_device *dev, QString title, bool isAxi) { addTa
 
 void RegisterMapTool::addTab(QString filePath, QString title, bool isAxi) { addTab(nullptr, title, filePath, isAxi); }
 
-RegisterMapValues *RegisterMapTool::getRegisterMapValues(iio_device *dev)
+RegisterMapValues *RegisterMapTool::getRegisterMapValues(iio_device *dev, uint32_t offset)
 {
 	IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(dev);
+	iioReadStrategy->setOffset(offset);
 	IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(dev);
+	iioWriteStrategy->setOffset(offset);
 	RegisterMapValues *registerMapValues = new RegisterMapValues();
 	registerMapValues->setReadStrategy(iioReadStrategy);
 	registerMapValues->setWriteStrategy(iioWriteStrategy);
@@ -137,7 +139,11 @@ void RegisterMapTool::generateDeviceRegisterMap(TabInfo *tabInfo)
 	}
 	RegisterMapValues *registerMapValues = nullptr;
 	if(tabInfo->getDev()) {
-		registerMapValues = getRegisterMapValues(tabInfo->getDev());
+		uint32_t offset = 0;
+		if(tabInfo->getIsAxi()) {
+			offset = Utils::convertQStringToUint32(AXI_OFFSET);
+		}
+		registerMapValues = getRegisterMapValues(tabInfo->getDev(), offset);
 	} else {
 		registerMapValues = getRegisterMapValues(tabInfo->getXmlPath());
 	}
