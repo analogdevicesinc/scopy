@@ -5,7 +5,7 @@
 #include "deviceimpl.h"
 #include "deviceloader.h"
 #include "iiodeviceimpl.h"
-#include "pluginbase/statusmanager.h"
+#include "pluginbase/statusbarmanager.h"
 
 #include <QDebug>
 #include <QLoggingCategory>
@@ -177,7 +177,7 @@ void DeviceManager::connectDevice(QString id)
 	}
 
 	connectedDev.append(id);
-	StatusManager::GetInstance()->addTemporaryMessage("Connected to " + map[id]->id(), 3000);
+	StatusBarManager::pushMessage("Connected to " + map[id]->id(), 3000);
 	Q_EMIT deviceConnected(id, map[id]);
 }
 
@@ -191,7 +191,7 @@ void DeviceManager::disconnectDevice(QString id)
 {
 	qDebug(CAT_DEVICEMANAGER) << "disconnecting " << id << "...";
 	connectedDev.removeOne(id);
-	StatusManager::GetInstance()->addTemporaryMessage("Disconnected from " + map[id]->id(), 3000);
+	StatusBarManager::pushMessage("Disconnected from " + map[id]->id(), 3000);
 	Q_EMIT requestTool("home");
 	Q_EMIT deviceDisconnected(id, map[id]);
 }
