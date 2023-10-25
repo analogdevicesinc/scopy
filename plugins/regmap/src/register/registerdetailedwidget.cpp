@@ -103,7 +103,7 @@ void RegisterDetailedWidget::updateBitFieldsValue(uint32_t value)
 		} else {
 			bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
 		}
-		QString bitFieldValue = QString::number(bfVal, 16);
+		QString bitFieldValue = Utils::convertToHexa(bfVal, width);
 		bitFieldList->at(i)->registerValueUpdated(bitFieldValue);
 		regOffset += width;
 
