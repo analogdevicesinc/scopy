@@ -25,8 +25,8 @@ Q_SIGNALS:
 	void requestHistory();
 
 public Q_SLOTS:
-	void displayStatus(StatusMessage *statusMessage);
-	void clearStatus();
+	void displayStatusMessage(StatusMessage *statusMessage);
+	void clearStatusMessage();
 
 private:
 	void initUi();

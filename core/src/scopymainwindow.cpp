@@ -24,7 +24,7 @@
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
 #include "popupwidget.h"
-#include "pluginbase/statusmanager.h"
+#include "pluginbase/statusbarmanager.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
@@ -271,14 +271,13 @@ void ScopyMainWindow::initPreferences()
 		loadDecoders();
 	}
 	if(p->get("general_show_status_bar").toBool()) {
-		StatusManager::GetInstance()->setEnabled(true);
+		StatusBarManager::GetInstance()->setEnabled(true);
 	}
 	if(p->get("general_first_run").toBool()) {
 		license = new LicenseOverlay(this);
 		auto versionCheckInfo = new VersionCheckMessage(this);
 
-		StatusManager::GetInstance()->addTemporaryWidget(versionCheckInfo,
-								 "Should Scopy check for online versions?");
+		StatusBarManager::pushWidget(versionCheckInfo, "Should Scopy check for online versions?");
 
 		QMetaObject::invokeMethod(license, &LicenseOverlay::showOverlay, Qt::QueuedConnection);
 	}
@@ -345,7 +344,7 @@ void ScopyMainWindow::handlePreferences(QString str, QVariant val)
 	} else if(str == "general_language") {
 		Q_EMIT p->restartRequired();
 	} else if(str == "general_show_status_bar") {
-		StatusManager::GetInstance()->setEnabled(val.toBool());
+		StatusBarManager::GetInstance()->setEnabled(val.toBool());
 	}
 }
 
@@ -463,7 +462,7 @@ void ScopyMainWindow::receiveVersionDocument(QJsonDocument document)
 		QVersionNumber::fromString(scopyVersion.toString().remove(0, 1)).normalized();
 
 	if(upstreamScopyVersion > currentScopyVersion) {
-		StatusManager::GetInstance()->addTemporaryMessage(
+		StatusBarManager::pushMessage(
 			"Your Scopy version of outdated. Please consider updating it. The newest version is " +
 				upstreamScopyVersion.toString(),
 			10000); // 10 sec
