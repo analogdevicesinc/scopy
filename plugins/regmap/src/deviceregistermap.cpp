@@ -132,9 +132,10 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	}
 
 	QObject::connect(registerController, &RegisterController::requestRead, registerMapValues,
-			 [=](uint32_t address) { registerMapValues->requestRead(address); });
-	QObject::connect(registerController, &RegisterController::requestWrite, registerMapValues,
-			 [=](uint32_t address, uint32_t value) { registerMapValues->requestWrite(address, value); });
+			 [=](uint32_t address) { Q_EMIT registerMapValues->requestRead(address); });
+	QObject::connect(
+		registerController, &RegisterController::requestWrite, registerMapValues,
+		[=](uint32_t address, uint32_t value) { Q_EMIT registerMapValues->requestWrite(address, value); });
 	QObject::connect(registerMapValues, &RegisterMapValues::registerValueChanged, this,
 			 [=](uint32_t address, uint32_t value) {
 				 int regSize = 8;
