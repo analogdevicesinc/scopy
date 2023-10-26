@@ -772,12 +772,6 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry 
 
 		auto max_elem = max_element(probe_attenuation.begin(), probe_attenuation.begin() + nb_channels);
 
-		auto const values = math_rails.values();
-		for(auto rail : values) {
-			rail->set_lo(MIN_MATH_RANGE);
-			rail->set_hi(MAX_MATH_RANGE);
-		}
-
 		if(started)
 			iio->unlock();
 
@@ -2306,7 +2300,6 @@ void Oscilloscope::add_math_channel(const std::string &function)
 		return;
 	}
 
-	auto rail = gr::analog::rail_ff::make(MIN_MATH_RANGE, MAX_MATH_RANGE);
 	auto math = gr::scopy::iio_math::make(function, nb_channels);
 	unsigned int curve_id = nb_channels + nb_math_channels + nb_ref_channels;
 	unsigned int curve_number = find_curve_number();
@@ -2327,7 +2320,6 @@ void Oscilloscope::add_math_channel(const std::string &function)
 	 * we can disconnect them when removing the math channel later */
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(math, math_sink);
 	math_sinks.insert(qname, math_pair);
-	math_rails.insert(qname, rail);
 
 	/* Lock the flowgraph if we are already started */
 	bool started = isIioManagerStarted();
@@ -2339,8 +2331,7 @@ void Oscilloscope::add_math_channel(const std::string &function)
 	for(unsigned int i = 0; i < nb_channels; i++) {
 		iio->connect(math_probe_atten.at(i), 0, math, i);
 	}
-	iio->connect(math, 0, rail, 0);
-	iio->connect(rail, 0, math_sink, 0);
+	iio->connect(math, 0, math_sink, 0);
 
 	if(started)
 		iio->unlock();
@@ -2491,14 +2482,12 @@ void Oscilloscope::onChannelWidgetDeleteClicked()
 
 		/* Disconnect the blocks from the running flowgraph */
 		auto pair = math_sinks.take(qname);
-		auto rail = math_rails.take(qname);
 
 		for(unsigned int i = 0; i < nb_channels; i++) {
 			iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
 		}
 
-		iio->disconnect(pair.first, 0, rail, 0);
-		iio->disconnect(rail, 0, pair.second, 0);
+		iio->disconnect(pair.first, 0, pair.second, 0);
 
 		if(xy_is_visible) {
 			setup_xy_channels();
@@ -4005,23 +3994,19 @@ void Oscilloscope::editMathChannelFunction(int id, const std::string &new_functi
 		setup_xy_channels();
 	}
 	auto pair = math_sinks.value(qname);
-	auto rail_old = math_rails.value(qname);
 	for(unsigned int i = 0; i < nb_channels; ++i) {
 		iio->disconnect(math_probe_atten.at(i), 0, pair.first, i);
 	}
-	iio->disconnect(pair.first, 0, rail_old, 0);
-	iio->disconnect(rail_old, 0, pair.second, 0);
+	iio->disconnect(pair.first, 0, pair.second, 0);
 
 	auto math_pair = QPair<gr::basic_block_sptr, gr::basic_block_sptr>(math, pair.second);
 
 	math_sinks.insert(qname, math_pair);
-	math_rails.insert(qname, rail);
 
 	for(unsigned int i = 0; i < nb_channels; ++i) {
 		iio->connect(math_probe_atten.at(i), 0, math, i);
 	}
-	iio->connect(math, 0, rail, 0);
-	iio->connect(rail, 0, pair.second, 0);
+	iio->connect(math, 0, pair.second, 0);
 
 	if(xy_is_visible) {
 		gsettings_ui->cmb_x_channel->blockSignals(true);
