@@ -13,7 +13,6 @@
 #include <regmapstylehelper.hpp>
 #include <searchbarwidget.hpp>
 #include <stylehelper.h>
-#include <tabinfo.hpp>
 #include <toolbuttons.h>
 #include <xmlfilemanager.hpp>
 
@@ -52,7 +51,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 		tool->openRightContainerHelper(toggled);
 		tool->requestMenu("settings");
 	});
-	settingsMenu->toggled(false);
+	Q_EMIT settingsMenu->toggled(false);
 	tool->topContainerMenuControl()->setStyleSheet("background : transparent; ");
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu, TTA_RIGHT);
 
@@ -61,7 +60,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 
 	QObject::connect(searchBarWidget, &scopy::regmap::SearchBarWidget::requestSearch, this,
 			 [=](QString searchParam) {
-				 tabs->value(registerDeviceList->currentText())->applyFilters(searchParam);
+				 deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
 			 });
 
 	tool->addWidgetToTopContainerHelper(searchBarWidget, TTA_LEFT);
@@ -73,122 +72,64 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 			 &RegisterMapTool::updateActiveRegisterMap);
 	tool->addWidgetToTopContainerMenuControlHelper(registerDeviceList, TTA_LEFT);
 
-	tabs = new QMap<QString, DeviceRegisterMap *>();
-	tabsInfo = new QMap<QString, TabInfo *>();
+	deviceList = new QMap<QString, DeviceRegisterMap *>();
 	tool->getContainerSpacer(tool->topContainer())->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
 	tool->getContainerSpacer(tool->topContainerMenuControl())
 		->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
-RegisterMapTool::~RegisterMapTool() { delete tabs; }
+RegisterMapTool::~RegisterMapTool() { delete deviceList; }
 
-void RegisterMapTool::addTab(iio_device *dev, QString title, QString xmlPath, bool isAxi)
+void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMapTemplate,
+				RegisterMapValues *registerMapValues)
 {
-	tabsInfo->insert(title, new TabInfo(dev, title, xmlPath, isAxi));
+	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
+	deviceList->insert(devName, regMap);
+	tool->addWidgetToCentralContainerHelper(regMap);
+	deviceList->value(devName)->hide();
 
-	registerDeviceList->addItem(title);
+	registerDeviceList->addItem(devName);
 
 	if(first) {
 		// the first regmap is set active
-		activeRegisterMap = title;
+		activeRegisterMap = devName;
 		first = false;
-		generateDeviceRegisterMap(tabsInfo->value(title));
-		tabs->value(title)->show();
-		toggleSettingsMenu(title, true);
+		deviceList->value(devName)->show();
+		toggleSettingsMenu(devName, true);
 	}
-}
-
-void RegisterMapTool::addTab(iio_device *dev, QString title, bool isAxi) { addTab(dev, title, "", isAxi); }
-
-void RegisterMapTool::addTab(QString filePath, QString title, bool isAxi) { addTab(nullptr, title, filePath, isAxi); }
-
-RegisterMapValues *RegisterMapTool::getRegisterMapValues(iio_device *dev, uint32_t offset)
-{
-	IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(dev);
-	iioReadStrategy->setOffset(offset);
-	IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(dev);
-	iioWriteStrategy->setOffset(offset);
-	RegisterMapValues *registerMapValues = new RegisterMapValues();
-	registerMapValues->setReadStrategy(iioReadStrategy);
-	registerMapValues->setWriteStrategy(iioWriteStrategy);
-
-	return registerMapValues;
-}
-
-RegisterMapValues *RegisterMapTool::getRegisterMapValues(QString filePath)
-{
-	FileRegisterReadStrategy *fileRegisterReadStrategy = new FileRegisterReadStrategy(filePath);
-	FileRegisterWriteStrategy *fileRegisterWriteStrategy = new FileRegisterWriteStrategy(filePath);
-	RegisterMapValues *registerMapValues = new RegisterMapValues();
-	registerMapValues->setReadStrategy(fileRegisterReadStrategy);
-	registerMapValues->setWriteStrategy(fileRegisterWriteStrategy);
-
-	return registerMapValues;
-}
-
-void RegisterMapTool::generateDeviceRegisterMap(TabInfo *tabInfo)
-{
-	RegisterMapTemplate *registerMapTemplate = nullptr;
-	if(!tabInfo->getXmlPath().isEmpty()) {
-		registerMapTemplate = new RegisterMapTemplate(this);
-		XmlFileManager xmlFileManager(tabInfo->getDev(), tabInfo->getXmlPath());
-		auto aux = xmlFileManager.getAllRegisters();
-		if(!aux->isEmpty()) {
-			registerMapTemplate->setRegisterList(aux);
-		}
-	}
-	RegisterMapValues *registerMapValues = nullptr;
-	if(tabInfo->getDev()) {
-		uint32_t offset = 0;
-		if(tabInfo->getIsAxi()) {
-			offset = Utils::convertQStringToUint32(AXI_OFFSET);
-		}
-		registerMapValues = getRegisterMapValues(tabInfo->getDev(), offset);
-	} else {
-		registerMapValues = getRegisterMapValues(tabInfo->getXmlPath());
-	}
-
-	DeviceRegisterMap *regMap = new DeviceRegisterMap(registerMapTemplate, registerMapValues, this);
-	tabs->insert(tabInfo->getDeviceName(), regMap);
-	tool->addWidgetToCentralContainerHelper(regMap);
-	tabs->value(tabInfo->getDeviceName())->hide();
 }
 
 void RegisterMapTool::toggleSettingsMenu(QString registerName, bool toggle)
 {
 	if(toggle) {
 		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::autoreadToggled,
-				 tabs->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
+				 deviceList->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
 		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRead,
-				 tabs->value(registerName), &regmap::DeviceRegisterMap::requestRead);
+				 deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRead);
 		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRegisterDump,
-				 tabs->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
+				 deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
 		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestWrite,
-				 tabs->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
+				 deviceList->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
 	} else {
 		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::autoreadToggled,
-				    tabs->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
+				    deviceList->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
 		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRead,
-				    tabs->value(registerName), &regmap::DeviceRegisterMap::requestRead);
+				    deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRead);
 		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRegisterDump,
-				    tabs->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
+				    deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
 		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestWrite,
-				    tabs->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
+				    deviceList->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
 	}
 }
 
 void RegisterMapTool::updateActiveRegisterMap(QString registerName)
 {
 	if(activeRegisterMap != "" && registerName != activeRegisterMap) {
-		tabs->value(activeRegisterMap)->hide();
+		deviceList->value(activeRegisterMap)->hide();
 		toggleSettingsMenu(activeRegisterMap, false);
-
-		if(!tabs->value(registerName)) {
-			generateDeviceRegisterMap(tabsInfo->value(registerName));
-		}
-		tabs->value(registerName)->show();
+		deviceList->value(registerName)->show();
 		toggleSettingsMenu(registerName, true);
-		toggleSearchBarVisible(tabs->value(registerName)->hasTemplate());
+		toggleSearchBarVisible(deviceList->value(registerName)->hasTemplate());
 
 		activeRegisterMap = registerName;
 	}
