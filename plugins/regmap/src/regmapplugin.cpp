@@ -1,5 +1,7 @@
 #include "jsonformatedelement.hpp"
 #include "regmapplugin.h"
+#include "utils.hpp"
+#include "xmlfilemanager.hpp"
 
 #include "deviceregistermap.hpp"
 #include "registermaptemplate.hpp"
@@ -23,6 +25,8 @@
 #include <pluginbase/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
 #include <widgets/menusectionwidget.h>
+#include <readwrite/fileregisterreadstrategy.hpp>
+#include <readwrite/fileregisterwritestrategy.hpp>
 #include "logging_categories.h"
 
 #include "iioutil/contextprovider.h"
@@ -147,24 +151,30 @@ bool RegmapPlugin::onConnect()
 
 	if(m_deviceList && !m_deviceList->isEmpty()) {
 		QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
-		scopy::regmap::RegisterMapTool *registerMapTool = new scopy::regmap::RegisterMapTool();
+		registerMapTool = new scopy::regmap::RegisterMapTool();
 		layout->addWidget(registerMapTool);
 
 		for(int i = 0; i < m_deviceList->size(); ++i) {
 			iio_device *dev = m_deviceList->at(i);
+			regmap::IIORegisterReadStrategy *iioReadStrategy = new regmap::IIORegisterReadStrategy(dev);
+			regmap::IIORegisterWriteStrategy *iioWriteStrategy = new regmap::IIORegisterWriteStrategy(dev);
+
 			QString devName = QString::fromStdString(iio_device_get_name(dev));
 			qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << devName;
 			regmap::JsonFormatedElement *templatePaths = scopy::regmap::Utils::getTemplate(devName);
 			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
+			QString templatePath = "";
+
 			if(templatePaths) {
 				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
-				registerMapTool->addTab(dev, devName,
-							xmlsPath.absoluteFilePath(templatePaths->getFileName()),
-							templatePaths->getIsAxiCompatible());
-			} else {
-				registerMapTool->addTab(dev, iio_device_get_name(dev), false);
+				templatePath = xmlsPath.absoluteFilePath(templatePaths->getFileName());
+				if(templatePaths->getIsAxiCompatible()) {
+					uint32_t axiOffset = regmap::Utils::convertQStringToUint32("80000000");
+					iioReadStrategy->setOffset(axiOffset);
+					iioWriteStrategy->setOffset(axiOffset);
+				}
 			}
-			qDebug(CAT_REGMAP) << "";
+			generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy);
 		}
 
 		m_toolList[0]->setEnabled(true);
@@ -209,6 +219,28 @@ void RegmapPlugin::initMetadata()
 QString RegmapPlugin::description() { return "Register map tool"; }
 
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
+
+void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
+				  regmap::IRegisterReadStrategy *readStrategy,
+				  regmap::IRegisterWriteStrategy *writeStrategy)
+{
+
+	regmap::RegisterMapTemplate *registerMapTemplate = nullptr;
+	if(!xmlPath.isEmpty()) {
+		registerMapTemplate = new regmap::RegisterMapTemplate(this);
+		regmap::XmlFileManager xmlFileManager(dev, xmlPath);
+		auto aux = xmlFileManager.getAllRegisters();
+		if(!aux->isEmpty()) {
+			registerMapTemplate->setRegisterList(aux);
+		}
+	}
+
+	regmap::RegisterMapValues *registerMapValues = new regmap::RegisterMapValues();
+	registerMapValues->setReadStrategy(readStrategy);
+	registerMapValues->setWriteStrategy(writeStrategy);
+
+	registerMapTool->addDevice(devName, registerMapTemplate, registerMapValues);
+}
 
 struct iio_device *RegmapPlugin::getIioDevice(iio_context *ctx, const char *dev_name)
 {
