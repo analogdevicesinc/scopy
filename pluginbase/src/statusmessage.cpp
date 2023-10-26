@@ -53,7 +53,7 @@ void StatusMessageText::prependDateTime()
 {
 	QDateTime dateTime = QDateTime::currentDateTime();
 	QString formattedTime = dateTime.toString(TIMESTAMP_FORMAT);
-	m_text.push_front(formattedTime);
+	m_text = formattedTime + " - " + m_text;
 }
 
 // ---------------------------------- STATUS_MESSAGE_WIDGET ----------------------------------
