@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QWidget>
 #include <toolbuttons.h>
+#include "registermaptemplate.hpp"
 #include "scopy-regmapplugin_export.h"
 #include "gui/tooltemplate.h"
 #include <iio.h>
@@ -11,7 +12,6 @@
 class QComboBox;
 using namespace scopy;
 
-class TabInfo;
 namespace scopy::regmap {
 
 class RegisterMapValues;
@@ -22,8 +22,6 @@ class RegisterMapSettingsMenu;
 
 class SearchBarWidget;
 
-#define AXI_OFFSET "80000000"
-
 class SCOPY_REGMAPPLUGIN_EXPORT RegisterMapTool : public QWidget
 {
 	Q_OBJECT
@@ -31,9 +29,8 @@ public:
 	explicit RegisterMapTool(QWidget *parent = nullptr);
 	~RegisterMapTool();
 
-	void addTab(struct iio_device *dev, QString title, QString xmlPath, bool isAxi);
-	void addTab(struct iio_device *dev, QString title, bool isAxi);
-	void addTab(QString filePath, QString title, bool isAxi);
+	void addDevice(QString devName, RegisterMapTemplate *registerMapTemplate = nullptr,
+		       regmap::RegisterMapValues *registerMapValues = nullptr);
 
 signals:
 
@@ -44,13 +41,8 @@ private:
 	QString activeRegisterMap;
 	SearchBarWidget *searchBarWidget;
 	scopy::regmap::RegisterMapSettingsMenu *settings;
-	QMap<QString, TabInfo *> *tabsInfo;
-	QMap<QString, DeviceRegisterMap *> *tabs;
+	QMap<QString, DeviceRegisterMap *> *deviceList;
 	bool first = true;
-
-	RegisterMapValues *getRegisterMapValues(struct iio_device *dev, uint32_t offset = 0);
-	RegisterMapValues *getRegisterMapValues(QString filePath);
-	void generateDeviceRegisterMap(TabInfo *tabInfo);
 	void toggleSettingsMenu(QString registerName, bool toggle);
 
 private Q_SLOTS:
