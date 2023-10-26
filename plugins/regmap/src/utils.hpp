@@ -18,6 +18,7 @@ public:
 
 	static QString convertToHexa(uint32_t value, int size);
 	static uint32_t convertQStringToUint32(QString value);
+	static uint32_t getBitMask(int offset, int width);
 	static void removeLayoutMargins(QLayout *layout);
 	static QDir setXmlPath();
 
