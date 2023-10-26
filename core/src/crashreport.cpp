@@ -31,7 +31,6 @@ void CrashReport::signalHandler(int)
 			   "%{message}");
 
 	qCritical(CAT_CRASH_REPORT) << "Scopy finished with error\n";
-	exit(EXIT_FAILURE);
 }
 
 void CrashReport::initSignalHandler()
