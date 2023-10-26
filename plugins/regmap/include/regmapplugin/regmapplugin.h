@@ -58,9 +58,6 @@ private:
 	struct iio_device *getIioDevice(iio_context *ctx, const char *dev_name);
 	bool isBufferCapable(iio_device *dev);
 	scopy::regmap::RegisterMapTool *registerMapTool;
-
-private Q_SLOTS:
-	void handlePreferenceChange(QString, QVariant);
 };
 } // namespace scopy
 

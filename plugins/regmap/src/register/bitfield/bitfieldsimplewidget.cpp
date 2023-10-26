@@ -65,6 +65,13 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 	mainFrameLayout->setSpacing(0);
 	mainFrameLayout->addWidget(mainFrame);
 	setLayout(mainFrameLayout);
+
+	Preferences *p = Preferences::GetInstance();
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
+		if(id.contains("regmap")) {
+			applyStyle();
+		}
+	});
 }
 
 BitFieldSimpleWidget::~BitFieldSimpleWidget()

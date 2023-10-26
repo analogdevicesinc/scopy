@@ -92,6 +92,13 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 		"\n";
 
 	setToolTip(toolTip);
+
+	Preferences *p = Preferences::GetInstance();
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
+		if(id.contains("regmap")) {
+			applyStyle();
+		}
+	});
 }
 
 RegisterSimpleWidget::~RegisterSimpleWidget()
