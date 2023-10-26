@@ -180,9 +180,6 @@ bool RegmapPlugin::onConnect()
 		m_toolList[0]->setEnabled(true);
 		m_toolList[0]->setTool(m_registerMapWidget);
 
-		Preferences *p = Preferences::GetInstance();
-		QObject::connect(p, &Preferences::preferenceChanged, this, &RegmapPlugin::handlePreferenceChange);
-
 		return true;
 	}
 
@@ -268,11 +265,4 @@ bool RegmapPlugin::isBufferCapable(iio_device *dev)
 	}
 
 	return false;
-}
-
-void RegmapPlugin::handlePreferenceChange(QString id, QVariant val)
-{
-	if(id == "regmap_background_color_by_value") {
-		// TODO set backround color by value
-	}
 }
