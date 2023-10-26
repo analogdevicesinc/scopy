@@ -115,12 +115,9 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 	for(int i = 0; i < registerModel->getBitFields()->length(); ++i) {
 
 		int width = registerModel->getBitFields()->at(i)->getWidth();
-		uint32_t bfVal = 0;
-		if(width == registerModel->getWidth()) {
-			bfVal = value;
-		} else {
-			bfVal = (((1 << (regOffset + width)) - 1) & value) >> regOffset;
-		}
+		uint32_t bfMask = Utils::getBitMask(regOffset,width);
+		uint32_t bfVal = (bfMask & value) >> regOffset;
+
 		QString bitFieldValue = scopy::regmap::Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
 
 		regOffset += width;
