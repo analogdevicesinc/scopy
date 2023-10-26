@@ -34,6 +34,15 @@ uint32_t Utils::convertQStringToUint32(QString value)
 	return convertedValue;
 }
 
+uint32_t Utils::getBitMask(int offset, int width)
+{
+	if (width == 32) {
+		return static_cast<uint32_t>(0xffffffff);
+	}
+
+	return (1 << (offset + width)) - 1;
+}
+
 void Utils::removeLayoutMargins(QLayout *layout)
 {
 	layout->setMargin(0);
