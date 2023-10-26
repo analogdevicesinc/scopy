@@ -24,7 +24,7 @@
 #include <QLabel>
 #include "scopy-pluginbase_export.h"
 
-#define TIMESTAMP_FORMAT "[hh:mm ap] "
+#define TIMESTAMP_FORMAT "hh:mm:ss"
 
 namespace scopy {
 class StatusMessage : public QWidget
