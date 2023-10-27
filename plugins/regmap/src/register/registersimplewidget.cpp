@@ -40,7 +40,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 	rightLayout->setAlignment(Qt::AlignRight);
 
 	QLabel *registerAddressLable =
-		new QLabel(scopy::regmap::Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()));
+		new QLabel(Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()));
 	registerAddressLable->setAlignment(Qt::AlignRight);
 	rightLayout->addWidget(registerAddressLable);
 	value = new QLabel("N/R");
@@ -73,7 +73,7 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 		int streach = bitFields->at(bits)->getStreach();
 		bitFieldsWidgetLayout->addWidget(bitFields->at(bits), row, col, 1, streach);
 		col += streach;
-		if(col > scopy::regmap::Utils::getBitsPerRow()) {
+		if(col > Utils::getBitsPerRow()) {
 			row++;
 			col = 0;
 		}
@@ -86,8 +86,8 @@ RegisterSimpleWidget::RegisterSimpleWidget(RegisterModel *registerModel, QVector
 
 	layout->addLayout(bitFieldsWidgetLayout, 8);
 
-	QString toolTip = "Name : " + registerModel->getName() + "\n" + "Address : " +
-		scopy::regmap::Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()) + "\n" +
+	QString toolTip = "Name : " + registerModel->getName() + "\n" +
+		"Address : " + Utils::convertToHexa(registerModel->getAddress(), registerModel->getWidth()) + "\n" +
 		"Description : " + registerModel->getDescription() + "\n" + "Notes : " + registerModel->getNotes() +
 		"\n";
 
@@ -115,10 +115,10 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 	for(int i = 0; i < registerModel->getBitFields()->length(); ++i) {
 
 		int width = registerModel->getBitFields()->at(i)->getWidth();
-		uint32_t bfMask = Utils::getBitMask(regOffset,width);
+		uint32_t bfMask = Utils::getBitMask(regOffset, width);
 		uint32_t bfVal = (bfMask & value) >> regOffset;
 
-		QString bitFieldValue = scopy::regmap::Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
+		QString bitFieldValue = Utils::convertToHexa(bfVal, bitFields->at(i)->getWidth());
 
 		regOffset += width;
 
@@ -133,7 +133,7 @@ void RegisterSimpleWidget::valueUpdated(uint32_t value)
 			j++;
 		}
 	}
-	this->value->setText(scopy::regmap::Utils::convertToHexa(value, registerModel->getWidth()));
+	this->value->setText(Utils::convertToHexa(value, registerModel->getWidth()));
 	applyStyle();
 }
 
@@ -145,11 +145,7 @@ void RegisterSimpleWidget::setRegisterSelected(bool selected)
 	}
 }
 
-void RegisterSimpleWidget::applyStyle()
-{
-	setStyleSheet(RegmapStyleHelper::simpleRegisterStyle(this, "rsw") +
-		      RegmapStyleHelper::frameBorderHover(this, "rsw"));
-}
+void RegisterSimpleWidget::applyStyle() { RegmapStyleHelper::RegisterSimpleWidgetStyle(this); }
 
 bool RegisterSimpleWidget::eventFilter(QObject *object, QEvent *event)
 {

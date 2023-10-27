@@ -143,11 +143,11 @@ void RegisterController::applyStyle()
 {
 	setFixedHeight(72);
 
-	readButton->setStyleSheet(RegmapStyleHelper::BlueButton(nullptr));
+	RegmapStyleHelper::BlueButton(readButton);
 	readButton->setFixedHeight(40);
-	writeButton->setStyleSheet(RegmapStyleHelper::BlueButton(nullptr));
+	RegmapStyleHelper::BlueButton(writeButton);
 	writeButton->setFixedHeight(40);
-	valueLabel->setStyleSheet(RegmapStyleHelper::grayLabel(nullptr));
+	valueLabel->setStyleSheet(RegmapStyleHelper::grayLabelStyle());
 
 	setStyleSheet(RegmapStyleHelper::regmapControllerStyle(nullptr));
 }

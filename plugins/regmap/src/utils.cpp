@@ -36,7 +36,7 @@ uint32_t Utils::convertQStringToUint32(QString value)
 
 uint32_t Utils::getBitMask(int offset, int width)
 {
-	if (width == 32) {
+	if(width == 32) {
 		return static_cast<uint32_t>(0xffffffff);
 	}
 
@@ -109,7 +109,7 @@ JsonFormatedElement *Utils::getTemplate(QString devName)
 
 void Utils::applyJsonConfig()
 {
-	QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
+	QDir xmlsPath = Utils::setXmlPath();
 	QString filePath = xmlsPath.filePath("regmap-config.json");
 	generateJsonTemplate(filePath);
 }
@@ -166,7 +166,7 @@ void Utils::generateJsonTemplate(QString filePath)
 {
 	getConfigurationFromJson(filePath);
 
-	foreach(const QString &xmlName, scopy::regmap::Utils::setXmlPath().entryList()) {
+	foreach(const QString &xmlName, Utils::setXmlPath().entryList()) {
 		if(xmlName.contains(".xml")) {
 			auto deviceName = xmlName.toLower();
 			deviceName.chop(4);

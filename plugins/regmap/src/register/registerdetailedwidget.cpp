@@ -31,7 +31,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	regWidth = regModel->getWidth();
 
 	QWidget *nameDescriptionWidget = new QWidget(this);
-	nameDescriptionWidget->setStyleSheet(RegmapStyleHelper::simpleWidgetStyle(nullptr));
+	nameDescriptionWidget->setStyleSheet(RegmapStyleHelper::simpleWidgetStyle());
 	QHBoxLayout *nameDescriptionLayout = new QHBoxLayout(nameDescriptionWidget);
 	nameDescriptionWidget->setLayout(nameDescriptionLayout);
 	QLabel *nameLabel = new QLabel("Name: " + regModel->getName(), this);
@@ -67,7 +67,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 		col++;
 		currentBitFieldCount += bitFieldDetailedWidget->getWidth();
 
-		if(col > scopy::regmap::Utils::getBitsPerRowDetailed()) {
+		if(col > Utils::getBitsPerRowDetailed()) {
 			row++;
 			col = 0;
 		}
@@ -76,7 +76,7 @@ RegisterDetailedWidget::RegisterDetailedWidget(RegisterModel *regModel, QWidget 
 	}
 	// add spacers to keep the shape of the detailed bitfileds when the number of bitfields didn't fill a row
 	if(row == 1) {
-		while(col <= scopy::regmap::Utils::getBitsPerRowDetailed()) {
+		while(col <= Utils::getBitsPerRowDetailed()) {
 			BitFieldDetailedWidget *aux = new BitFieldDetailedWidget("", "", 0, "", 1, "", 0, nullptr);
 			aux->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 			aux->sizePolicy().setRetainSizeWhenHidden(true);

@@ -39,7 +39,7 @@ RecyclerView::RecyclerView(QList<int> *widgets, QWidget *parent)
 	slider->setInvertedAppearance(true);
 	slider->setInvertedControls(true);
 	slider->setFixedWidth(8);
-	slider->setStyleSheet(RegmapStyleHelper::sliderStyle(nullptr));
+	slider->setStyleSheet(RegmapStyleHelper::sliderStyle());
 
 	QObject::connect(m_scrollArea->verticalScrollBar(), &QAbstractSlider::valueChanged, this, [=](int value) {
 		if(value == m_scrollArea->verticalScrollBar()->minimum()) {

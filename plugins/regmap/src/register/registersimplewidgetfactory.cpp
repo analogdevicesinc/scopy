@@ -40,7 +40,6 @@ RegisterSimpleWidget *RegisterSimpleWidgetFactory::buildWidget(RegisterModel *mo
 
 	RegisterSimpleWidget *rsw = new RegisterSimpleWidget(model, bitFields);
 
-	rsw->setStyleSheet(RegmapStyleHelper::simpleRegisterStyle(rsw, "rsw") +
-			   RegmapStyleHelper::frameBorderHover(rsw, "rsw"));
+	RegmapStyleHelper::RegisterSimpleWidgetStyle(rsw);
 	return rsw;
 }
