@@ -30,23 +30,25 @@
 #include <QVBoxLayout>
 
 #include <gui/tool_view_builder.hpp>
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 
 using namespace scopy::swiot;
 
-SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent)
+SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
 	: QWidget(parent)
-	, m_context(ctx)
+	, m_uri(uri)
 	, m_drawArea(nullptr)
 	, m_scrollArea(nullptr)
 	, m_toolView(nullptr)
 	, m_mainView(new QWidget(this))
 	, m_statusLabel(new QLabel(this))
 	, m_statusContainer(new QWidget(this))
-	, m_commandQueue(CommandQueueProvider::GetInstance()->open(ctx))
 	, ui(new Ui::ConfigMenu)
 {
-	m_swiotDevice = iio_context_find_device(ctx, "swiot");
+	Connection *conn = ConnectionProvider::open(m_uri);
+	m_context = conn->context();
+	m_commandQueue = conn->commandQueue();
+	m_swiotDevice = iio_context_find_device(m_context, "swiot");
 	if(m_swiotDevice == nullptr) {
 		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
 	}
@@ -63,14 +65,7 @@ SwiotConfig::SwiotConfig(struct iio_context *ctx, QWidget *parent)
 	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
 }
 
-SwiotConfig::~SwiotConfig()
-{
-	if(m_commandQueue) {
-		CommandQueueProvider::GetInstance()->close(m_context);
-		m_commandQueue = nullptr;
-		m_context = nullptr;
-	}
-}
+SwiotConfig::~SwiotConfig() { ConnectionProvider::close(m_uri); }
 
 void SwiotConfig::init()
 {

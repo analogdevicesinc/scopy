@@ -22,8 +22,7 @@
 
 #include "src/swiot_logging_categories.h"
 
-#include <iioutil/commandqueueprovider.h>
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <iioutil/iiocommand/iiochannelattributeread.h>
 #include <utility>
 
@@ -35,36 +34,24 @@ using namespace scopy::swiot;
 SwiotReadTemperatureTask::SwiotReadTemperatureTask(QString uri, QObject *parent)
 	: QThread(parent)
 	, m_uri(std::move(uri))
-	, m_context(nullptr)
 	, m_channel(nullptr)
 	, m_device(nullptr)
-	, m_commandQueue(nullptr)
+	, m_conn(nullptr)
 	, m_raw(0.0)
 	, m_scale(0.0)
 	, m_offset(0.0)
 {
-	m_context = ContextProvider::GetInstance()->open(m_uri);
-
-	if(!m_context) {
-		qDebug(CAT_SWIOT) << "Error, empty context received by temperature task.";
+	m_conn = ConnectionProvider::open(m_uri);
+	if(!m_conn) {
+		qDebug(CAT_SWIOT) << "Error, no context available for the temperature task.";
 		return;
 	}
+	connect(m_conn, &Connection::aboutToBeDestroyed, this, [=, this]() { m_conn = nullptr; });
 
-	m_device = iio_context_find_device(m_context, DEVICE_NAME);
+	m_device = iio_context_find_device(m_conn->context(), DEVICE_NAME);
 	if(!m_device) {
 		qDebug(CAT_SWIOT) << "Error, could not find" << DEVICE_NAME
 				  << "from the given context. Temperature not available.";
-		ContextProvider::GetInstance()->close(m_uri);
-		return;
-	}
-
-	if(isInterruptionRequested()) {
-		return;
-	}
-
-	m_commandQueue = CommandQueueProvider::GetInstance()->open(m_context);
-	if(!m_commandQueue) {
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 
@@ -72,7 +59,6 @@ SwiotReadTemperatureTask::SwiotReadTemperatureTask(QString uri, QObject *parent)
 	if(!m_channel) {
 		qDebug(CAT_SWIOT) << "Error, could not find channel " << CHANNEL_NAME << "from device" << DEVICE_NAME
 				  << ". Temperature not available.";
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 	Command *attrReadScale = new IioChannelAttributeRead(m_channel, "scale", nullptr, true);
@@ -82,11 +68,17 @@ SwiotReadTemperatureTask::SwiotReadTemperatureTask(QString uri, QObject *parent)
 		Qt::QueuedConnection);
 	connect(attrReadOffset, &scopy::Command::finished, this, &SwiotReadTemperatureTask::readOffsetCommandFinished,
 		Qt::QueuedConnection);
-	m_commandQueue->enqueue(attrReadScale);
-	m_commandQueue->enqueue(attrReadOffset);
+	m_conn->commandQueue()->enqueue(attrReadScale);
+	m_conn->commandQueue()->enqueue(attrReadOffset);
 }
 
-SwiotReadTemperatureTask::~SwiotReadTemperatureTask() { m_commandQueue = nullptr; }
+SwiotReadTemperatureTask::~SwiotReadTemperatureTask()
+{
+	if(m_conn) {
+		m_conn = nullptr;
+		ConnectionProvider::close(m_uri);
+	}
+}
 
 void SwiotReadTemperatureTask::run()
 {
@@ -98,19 +90,16 @@ void SwiotReadTemperatureTask::run()
 	connect(attrReadRaw, &scopy::Command::finished, this, &SwiotReadTemperatureTask::readRawCommandFinished,
 		Qt::QueuedConnection);
 
-	m_commandQueue->enqueue(attrReadRaw);
+	m_conn->commandQueue()->enqueue(attrReadRaw);
 }
 
 void SwiotReadTemperatureTask::readRawCommandFinished(Command *cmd)
 {
 	if(isInterruptionRequested()) {
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
 	if(!tcmd) {
-		CommandQueueProvider::GetInstance()->close(m_context);
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 	if(tcmd->getReturnCode() >= 0) {
@@ -126,8 +115,6 @@ void SwiotReadTemperatureTask::readRawCommandFinished(Command *cmd)
 	} else {
 		qDebug(CAT_SWIOT) << "Error, could not read \"raw\" attribute from " << DEVICE_NAME
 				  << ". Temperature not available.";
-		CommandQueueProvider::GetInstance()->close(m_context);
-		ContextProvider::GetInstance()->close(m_uri);
 	}
 }
 
@@ -135,8 +122,6 @@ void SwiotReadTemperatureTask::readScaleCommandFinished(Command *cmd)
 {
 	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
 	if(!tcmd) {
-		CommandQueueProvider::GetInstance()->close(m_context);
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 	if(tcmd->getReturnCode() >= 0) {
@@ -149,8 +134,6 @@ void SwiotReadTemperatureTask::readScaleCommandFinished(Command *cmd)
 	} else {
 		qDebug(CAT_SWIOT) << "Error, could not read \"scale\" attribute from " << DEVICE_NAME
 				  << ". Temperature not available.";
-		CommandQueueProvider::GetInstance()->close(m_context);
-		ContextProvider::GetInstance()->close(m_uri);
 	}
 }
 
@@ -158,8 +141,6 @@ void SwiotReadTemperatureTask::readOffsetCommandFinished(Command *cmd)
 {
 	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
 	if(!tcmd) {
-		CommandQueueProvider::GetInstance()->close(m_context);
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 	if(tcmd->getReturnCode() >= 0) {
@@ -173,8 +154,6 @@ void SwiotReadTemperatureTask::readOffsetCommandFinished(Command *cmd)
 		qDebug(CAT_SWIOT) << "Error, could not read \"offset\" attribute from " << DEVICE_NAME
 				  << ". Temperature not available.";
 	}
-	CommandQueueProvider::GetInstance()->close(m_context);
-	ContextProvider::GetInstance()->close(m_uri);
 }
 
 #include "moc_swiotreadtemperaturetask.cpp"

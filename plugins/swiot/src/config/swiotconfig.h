@@ -49,7 +49,7 @@ class SwiotConfig : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit SwiotConfig(struct iio_context *ctx, QWidget *parent = nullptr);
+	explicit SwiotConfig(QString uri, QWidget *parent = nullptr);
 	~SwiotConfig();
 
 public Q_SLOTS:
@@ -62,6 +62,7 @@ Q_SIGNALS:
 	void configBtnPressed();
 
 private:
+	QString m_uri;
 	QMap<QString, struct iio_device *> m_iioDevices;
 	struct iio_context *m_context;
 	struct iio_device *m_swiotDevice;

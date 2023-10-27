@@ -22,31 +22,23 @@
 
 #include "src/swiot_logging_categories.h"
 
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <iioutil/iiocommand/iiodevicesettrigger.h>
 #include <string>
 
 using namespace scopy::swiot;
 
-SwiotRuntime::SwiotRuntime(struct iio_context *ctx, QObject *parent)
+SwiotRuntime::SwiotRuntime(QString uri, QObject *parent)
 	: QObject(parent)
-	, m_iioCtx(ctx)
-	, m_cmdQueue(nullptr)
+	, m_uri(uri)
 {
-	if(m_iioCtx) {
-		m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_iioCtx);
-	}
+	Connection *conn = ConnectionProvider::open(m_uri);
+	m_iioCtx = conn->context();
+	m_cmdQueue = conn->commandQueue();
 	createDevicesMap();
 }
 
-SwiotRuntime::~SwiotRuntime()
-{
-	if(m_cmdQueue) {
-		CommandQueueProvider::GetInstance()->close(m_iioCtx);
-		m_cmdQueue = nullptr;
-		m_iioCtx = nullptr;
-	}
-}
+SwiotRuntime::~SwiotRuntime() { ConnectionProvider::close(m_uri); }
 
 void SwiotRuntime::onIsRuntimeCtxChanged(bool isRuntimeCtx)
 {

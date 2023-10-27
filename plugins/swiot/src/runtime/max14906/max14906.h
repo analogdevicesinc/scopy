@@ -31,6 +31,7 @@
 
 #include <gui/flexgridlayout.hpp>
 #include <gui/tool_view.hpp>
+#include <iioutil/connection.h>
 
 namespace scopy::swiot {
 #define MAX_NAME "max14906"
@@ -41,7 +42,7 @@ class Max14906 : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
+	explicit Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Max14906() override;
 
 Q_SIGNALS:
@@ -49,6 +50,7 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void externalPowerSupply(bool ps);
+	void handleConnectionDestroyed();
 
 private Q_SLOTS:
 	void runButtonToggled();
@@ -70,8 +72,6 @@ private:
 	static QMainWindow *createDockableMainWindow(const QString &title, DioDigitalChannel *digitalChannel,
 						     QWidget *parent);
 
-	struct iio_context *m_ctx;
-
 	QPushButton *m_backButton;
 	QWidget *m_statusContainer;
 	QLabel *m_statusLabel;
@@ -87,6 +87,9 @@ private:
 
 	CommandQueue *m_cmdQueue;
 	ReaderThread *m_readerThread;
+	Connection *m_conn;
+	struct iio_context *m_ctx;
+	QString m_uri;
 	QMap<int, DioDigitalChannelController *> m_channelControls;
 
 	ToolMenuEntry *m_tme;
