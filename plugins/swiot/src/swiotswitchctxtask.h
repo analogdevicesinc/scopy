@@ -23,6 +23,7 @@
 
 #include <QObject>
 #include <QThread>
+#include <iioutil/connection.h>
 
 namespace scopy::swiot {
 class SwiotSwitchCtxTask : public QThread
@@ -30,14 +31,20 @@ class SwiotSwitchCtxTask : public QThread
 	Q_OBJECT
 public:
 	SwiotSwitchCtxTask(QString uri, bool wasRuntime);
+	~SwiotSwitchCtxTask();
 	void run() override;
 
 Q_SIGNALS:
 	void contextSwitched();
+	void contextSwitchFailed();
+
+private Q_SLOTS:
+	void onReadModeFinished(scopy::Command *cmd);
 
 private:
 	QString m_uri;
 	bool m_wasRuntime;
+	Connection *m_conn;
 };
 } // namespace scopy::swiot
 

@@ -4,35 +4,40 @@
 
 #include <iio.h>
 
-#include <iioutil/commandqueueprovider.h>
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <iioutil/iiocommand/iiodeviceattributewrite.h>
 
 using namespace scopy::swiot;
 SwiotIdentifyTask::SwiotIdentifyTask(QString uri, QObject *parent)
 	: QThread(parent)
 	, m_uri(uri)
-{}
+	, m_conn(nullptr)
+{
+	m_conn = ConnectionProvider::open(m_uri);
+	if(!m_conn) {
+		qDebug(CAT_SWIOT) << "Error, no context available for the identify task.";
+	}
+	connect(m_conn, &Connection::aboutToBeDestroyed, this, [=, this]() { m_conn = nullptr; });
+}
 
-SwiotIdentifyTask::~SwiotIdentifyTask() {}
+SwiotIdentifyTask::~SwiotIdentifyTask()
+{
+	if(m_conn) {
+		m_conn = nullptr;
+		ConnectionProvider::close(m_uri);
+	}
+}
 
 void SwiotIdentifyTask::run()
 {
-	iio_context *ctx = ContextProvider::GetInstance()->open(m_uri);
+	if(!m_conn) {
+		return;
+	}
 
-	if(!ctx) {
-		return;
-	}
 	if(isInterruptionRequested()) {
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
-	CommandQueue *commandQueue = CommandQueueProvider::GetInstance()->open(ctx);
-	if(!commandQueue) {
-		ContextProvider::GetInstance()->close(m_uri);
-		return;
-	}
-	iio_device *swiotDevice = iio_context_find_device(ctx, "swiot");
+	iio_device *swiotDevice = iio_context_find_device(m_conn->context(), "swiot");
 
 	if(swiotDevice) {
 		IioDeviceAttributeWrite *iioAttrWrite =
@@ -43,22 +48,15 @@ void SwiotIdentifyTask::run()
 			[=, this](scopy::Command *cmd) {
 				IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
 				if(!tcmd) {
-					CommandQueueProvider::GetInstance()->close(ctx);
-					ContextProvider::GetInstance()->close(m_uri);
 					return;
 				}
 				if(tcmd->getReturnCode() < 0) {
 					qCritical(CAT_SWIOT) << "Error, could not identify swiot, error code"
 							     << tcmd->getReturnCode();
 				}
-				CommandQueueProvider::GetInstance()->close(ctx);
-				ContextProvider::GetInstance()->close(m_uri);
 			},
 			Qt::QueuedConnection);
 
-		commandQueue->enqueue(iioAttrWrite);
-	} else {
-		CommandQueueProvider::GetInstance()->close(ctx);
-		ContextProvider::GetInstance()->close(m_uri);
+		m_conn->commandQueue()->enqueue(iioAttrWrite);
 	}
 }
