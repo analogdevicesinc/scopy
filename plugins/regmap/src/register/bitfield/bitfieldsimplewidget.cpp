@@ -23,9 +23,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 	, streach(streach)
 	, QFrame{parent}
 {
-
 	mainFrame = new QFrame;
-	RegmapStyleHelper::grayBackgroundHoverWidget(mainFrame, "");
 
 	setMinimumWidth(60);
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
@@ -55,7 +53,7 @@ BitFieldSimpleWidget::BitFieldSimpleWidget(QString name, int defaultValue, QStri
 
 	QString toolTip = "Name : " + name + "\n" + QString::number(regOffset + width - 1) + ":" +
 		QString::number(regOffset) + "\n" + "Description : " + description + "\n" + "Notes : " + notes + "\n" +
-		"Default Value : " + scopy::regmap::Utils::convertToHexa(defaultValue, width);
+		"Default Value : " + Utils::convertToHexa(defaultValue, width);
 
 	setToolTip(toolTip);
 
@@ -92,7 +90,7 @@ QString BitFieldSimpleWidget::getDescription() const { return description; }
 
 int BitFieldSimpleWidget::getStreach() const { return streach; }
 
-void BitFieldSimpleWidget::applyStyle() { setStyleSheet(RegmapStyleHelper::simpleBitFieldStyle(this)); }
+void BitFieldSimpleWidget::applyStyle() { RegmapStyleHelper::BitFieldSimpleWidgetStyle(this); }
 
 void BitFieldSimpleWidget::setSelected(bool selected) { scopy::setDynamicProperty(mainFrame, "is_selected", selected); }
 
