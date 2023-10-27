@@ -13,7 +13,7 @@ ChnlInfo *ChnlInfoBuilder::build(iio_channel *iioChnl, QString id, CommandQueue 
 	case VOLTAGE:
 		return new VoltageChnlInfo("V", "mV", iioChnl, cmdQueue);
 	case CURRENT:
-		return new CurrentChnlInfo("mA", "mA", iioChnl, cmdQueue);
+		return new CurrentChnlInfo("A", "mA", iioChnl, cmdQueue);
 	case RESISTANCE:
 		return new ResistanceChnlInfo("Ω", "Ω", iioChnl, cmdQueue);
 	default:
