@@ -55,7 +55,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 	tool->bottomCentral()->setVisible(true);
 	layout->addWidget(tool);
 
-	RegmapStyleHelper::RegisterMapStyle(this);
+	RegmapStyleHelper::DeviceRegisterMap(this);
 
 	initSettings();
 
