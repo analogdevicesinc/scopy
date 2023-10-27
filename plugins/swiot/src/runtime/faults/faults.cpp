@@ -33,11 +33,11 @@ using namespace scopy::swiot;
 
 #define POLLING_INTERVAL 1000
 
-Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
+Faults::Faults(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
-	, ctx(ctx)
+	, m_uri(uri)
 	, ui(new Ui::Faults)
-	, m_faultsPage(new FaultsPage(ctx, this))
+	, m_faultsPage(new FaultsPage(m_uri, this))
 	, m_statusLabel(new QLabel(this))
 	, m_statusContainer(new QWidget(this))
 	, timer(new QTimer())
@@ -48,7 +48,6 @@ Faults::Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	, m_tme(tme)
 {
 	qInfo(CAT_SWIOT_FAULTS) << "Initialising SWIOT faults page.";
-
 	ui->setupUi(this);
 
 	this->setupDynamicUi(parent);

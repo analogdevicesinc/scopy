@@ -23,7 +23,7 @@
 #include "faultsgroup.h"
 #include "src/swiot_logging_categories.h"
 
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <iioutil/iiocommand/iiochannelattributeread.h>
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include <iioutil/iiocommand/iioregisterread.h>
@@ -34,25 +34,27 @@
 
 using namespace scopy::swiot;
 
-FaultsDevice::FaultsDevice(const QString &name, QString path, struct iio_device *device, struct iio_device *swiot,
-			   struct iio_context *context, QVector<uint32_t> &registers, QWidget *parent)
+FaultsDevice::FaultsDevice(const QString &name, QString path, QString uri, QVector<uint32_t> &registers,
+			   QWidget *parent)
 	: ui(new Ui::FaultsDevice)
 	, QWidget(parent)
+	, m_uri(uri)
 	, m_faults_explanation(new QWidget(this))
 	, m_subsectionSeparator(new scopy::gui::SubsectionSeparator("Faults Explanation", true, this))
 	, m_name(name.toUpper())
 	, m_path(std::move(path))
-	, m_device(device)
-	, m_swiot(swiot)
-	, m_context(context)
-	, m_cmdQueue(nullptr)
 	, m_faultNumeric(0)
 	, m_registers(registers)
 {
 	ui->setupUi(this);
+	Connection *conn = ConnectionProvider::open(m_uri);
+	m_context = conn->context();
+	m_cmdQueue = conn->commandQueue();
+	m_device = iio_context_find_device(m_context, name.toStdString().c_str());
+	m_swiot = iio_context_find_device(m_context, "swiot");
+
 	ui->reset_button->setProperty("blue_button", QVariant(true));
 	ui->clear_selection_button->setProperty("blue_button", QVariant(true));
-	m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_context);
 	initSpecialFaults();
 	m_faultsGroup = new FaultsGroup(name, m_path, this);
 	connect(this, &FaultsDevice::specialFaultsUpdated, m_faultsGroup, &FaultsGroup::specialFaultsUpdated);
@@ -89,9 +91,7 @@ FaultsDevice::FaultsDevice(const QString &name, QString path, struct iio_device 
 
 FaultsDevice::~FaultsDevice()
 {
-	if(m_cmdQueue) {
-		CommandQueueProvider::GetInstance()->close(m_context);
-	}
+	ConnectionProvider::close(m_uri);
 	delete ui;
 }
 

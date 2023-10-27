@@ -34,7 +34,6 @@
 #include "src/swiotinfopage.h"
 
 #include <gui/tutorialbuilder.h>
-#include <iioutil/commandqueue.h>
 #include <iioutil/cyclicaltask.h>
 #include <pluginbase/plugin.h>
 #include <pluginbase/pluginbase.h>

@@ -2,6 +2,8 @@
 #define SWIOTIDENTIFYTASK_H
 
 #include <QThread>
+#include <iioutil/connection.h>
+
 namespace scopy::swiot {
 class SwiotIdentifyTask : public QThread
 {
@@ -12,6 +14,7 @@ public:
 
 private:
 	QString m_uri;
+	Connection *m_conn;
 };
 } // namespace scopy::swiot
 #endif // SWIOTIDENTIFYTASK_H

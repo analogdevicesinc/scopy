@@ -22,6 +22,7 @@
 #define SCOPY_EXTERNALPSREADERTHREAD_H
 
 #include <QThread>
+#include <iioutil/connection.h>
 
 namespace scopy::swiot {
 class ExternalPsReaderThread : public QThread
@@ -29,14 +30,16 @@ class ExternalPsReaderThread : public QThread
 	Q_OBJECT
 public:
 	explicit ExternalPsReaderThread(QString uri, QString attr, QObject *parent = nullptr);
-	void run() override;
+	~ExternalPsReaderThread();
 
+	void run() override;
 Q_SIGNALS:
 	void hasConnectedPowerSupply(bool ps);
 
 private:
 	QString m_uri;
 	QString m_attribute;
+	Connection *m_conn;
 };
 } // namespace scopy::swiot
 

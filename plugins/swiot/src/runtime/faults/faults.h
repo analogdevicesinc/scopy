@@ -37,7 +37,7 @@ class Faults : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Faults(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent = nullptr);
+	explicit Faults(QString uri, ToolMenuEntry *tme, QWidget *parent = nullptr);
 	~Faults();
 
 	void pollFaults();
@@ -60,7 +60,7 @@ private:
 	void initTutorialProperties();
 	static QPushButton *createBackButton();
 
-	struct iio_context *ctx;
+	QString m_uri;
 
 	Ui::Faults *ui;
 	QPushButton *m_backButton;

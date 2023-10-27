@@ -28,16 +28,16 @@
 #include <QMainWindow>
 
 #include <gui/tool_view_builder.hpp>
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 
 #define MAX14906_POLLING_TIME 1000
 
 using namespace scopy::swiot;
 
-Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
+Max14906::Max14906(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
-	, max14906ToolController(new DioController(ctx))
 	, ui(new Ui::Max14906)
+	, m_uri(uri)
 	, m_backButton(Max14906::createBackButton())
 	, m_qTimer(new QTimer(this))
 	, m_toolView(nullptr)
@@ -47,11 +47,15 @@ Max14906::Max14906(struct iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
 	, settingsWidgetSeparator()
 	, m_statusLabel(new QLabel(this))
 	, m_statusContainer(new QWidget(this))
-	, m_ctx(ctx)
-	, m_cmdQueue(CommandQueueProvider::GetInstance()->open(m_ctx))
-	, m_readerThread(new ReaderThread(false, m_cmdQueue))
 {
 	this->ui->setupUi(this);
+	m_conn = ConnectionProvider::open(m_uri);
+	connect(m_conn, &Connection::aboutToBeDestroyed, this, &Max14906::handleConnectionDestroyed);
+	m_ctx = m_conn->context();
+	m_cmdQueue = m_conn->commandQueue();
+	max14906ToolController = new DioController(m_ctx);
+	m_readerThread = new ReaderThread(false, m_cmdQueue);
+
 	m_nbDioChannels = max14906ToolController->getChannelCount();
 
 	this->setupDynamicUi(this);
@@ -131,6 +135,7 @@ scopy::gui::GenericMenu *Max14906::createGeneralSettings(const QString &title, Q
 
 void Max14906::connectSignalsAndSlots()
 {
+	connect(m_conn, &Connection::aboutToBeDestroyed, m_readerThread, &ReaderThread::handleConnectionDestroyed);
 	connect(this->m_toolView->getRunBtn(), &QPushButton::toggled, this, &Max14906::runButtonToggled);
 	//	connect(this->m_toolView->getSingleBtn(), &QPushButton::clicked, this, &Max14906::singleButtonToggled);
 	QObject::connect(m_backButton, &QPushButton::clicked, this, &Max14906::onBackBtnPressed);
@@ -158,23 +163,29 @@ void Max14906::onBackBtnPressed()
 
 Max14906::~Max14906()
 {
-	if(this->m_toolView) {
-		if(this->m_toolView->getRunBtn()->isChecked()) {
-			this->m_toolView->getRunBtn()->setChecked(false);
+	if(m_conn) {
+		if(this->m_toolView) {
+			if(this->m_toolView->getRunBtn()->isChecked()) {
+				this->m_toolView->getRunBtn()->setChecked(false);
+			}
+			if(this->m_readerThread->isRunning()) {
+				this->m_readerThread->forcedStop();
+				this->m_readerThread->wait();
+			}
+			delete m_readerThread;
 		}
-		if(this->m_readerThread->isRunning()) {
-			this->m_readerThread->forcedStop();
-			this->m_readerThread->wait();
-		}
-		delete m_readerThread;
-	}
-	if(m_cmdQueue) {
-		CommandQueueProvider::GetInstance()->close(m_ctx);
-		m_cmdQueue = nullptr;
-		m_ctx = nullptr;
+		ConnectionProvider::close(m_uri);
 	}
 	delete m_toolView;
 	delete ui;
+}
+
+void Max14906::handleConnectionDestroyed()
+{
+	qDebug(CAT_SWIOT_MAX14906) << "Max14906 connection destroyed slot";
+	m_ctx = nullptr;
+	m_cmdQueue = nullptr;
+	m_conn = nullptr;
 }
 
 void Max14906::runButtonToggled()

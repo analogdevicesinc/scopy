@@ -36,6 +36,7 @@
 #include <gui/osc_export_settings.h>
 #include <gui/tool_view.hpp>
 
+#include <iioutil/connection.h>
 #define MAX_CURVES_NUMBER 8
 #define AD_NAME "ad74413r"
 #define SWIOT_DEVICE_NAME "swiot"
@@ -57,7 +58,7 @@ class Ad74413r : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit Ad74413r(iio_context *ctx = nullptr, ToolMenuEntry *tme = 0, QWidget *parent = nullptr);
+	explicit Ad74413r(QString uri = "", ToolMenuEntry *tme = 0, QWidget *parent = nullptr);
 
 	~Ad74413r();
 
@@ -87,6 +88,7 @@ public Q_SLOTS:
 
 	void onActivateRunBtns(bool activate);
 
+	void handleConnectionDestroyed();
 Q_SIGNALS:
 	void broadcastReadThreshold(QString value);
 	void thresholdControlEnable(bool enable);
@@ -117,6 +119,7 @@ private:
 	QMap<QString, iio_device *> m_iioDevicesMap;
 	int m_enabledChnlsNo = 0;
 	int m_currentChannelSelected;
+	bool m_backBtnPressed;
 
 	scopy::gui::ChannelManager *m_monitorChannelManager;
 	scopy::gui::ToolView *m_toolView;
@@ -141,6 +144,8 @@ private:
 	ExportSettings *m_exportSettings;
 
 	struct iio_context *m_ctx;
+	Connection *m_conn;
+	QString m_uri;
 };
 } // namespace swiot
 } // namespace scopy
