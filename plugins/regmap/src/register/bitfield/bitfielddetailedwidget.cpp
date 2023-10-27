@@ -52,12 +52,12 @@ BitFieldDetailedWidget::BitFieldDetailedWidget(QString name, QString access, int
 	lastReadValue = new QLabel("Current : N/R");
 	secondLayout->addWidget(lastReadValue);
 
-	defaultValueLabel = new QLabel("Default : " + scopy::regmap::Utils::convertToHexa(defaultValue, width));
+	defaultValueLabel = new QLabel("Default : " + Utils::convertToHexa(defaultValue, width));
 	secondLayout->addWidget(defaultValueLabel, Qt::AlignRight, Qt::AlignRight);
 
 	layout->addLayout(secondLayout);
 
-	QString defaultValueString = scopy::regmap::Utils::convertToHexa(defaultValue, width);
+	QString defaultValueString = Utils::convertToHexa(defaultValue, width);
 
 	toolTip = "Name : " + name + "\n" + QString::number(regOffset + width - 1) + ":" + QString::number(regOffset) +
 		"\n" + "Description : " + description + "\n" + "Notes : " + notes + "\n" +

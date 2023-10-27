@@ -34,7 +34,6 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	buttonWidgetLayout->addWidget(spinBoxDownButton);
 
 	titleLabel = new QLabel(title);
-	titleLabel->setStyleSheet(scopy::regmap::RegmapStyleHelper::grayLabel(nullptr));
 
 	spinBox = new QSpinBox(spinboxWidget);
 	spinBox->setButtonSymbols(spinBox->ButtonSymbols::NoButtons);
@@ -47,7 +46,7 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	mainLayout->addWidget(buttonWidget);
 	mainLayout->addWidget(spinboxWidget);
 
-	setStyleSheet(scopy::regmap::RegmapStyleHelper::titleSpinBoxStyle(nullptr));
+	scopy::regmap::RegmapStyleHelper::titleSpinBoxStyle(this);
 }
 
 TitleSpinBox::~TitleSpinBox() {}
