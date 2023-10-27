@@ -33,6 +33,7 @@ SwiotInfoPage::SwiotInfoPage(QWidget *parent)
 	this->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	this->initTempCheckBox();
 	this->layout()->addWidget(m_enTempReadCheckBox);
+	this->setAdvancedMode(true);
 }
 
 void SwiotInfoPage::enableTemperatureReadBtn(bool enable)
