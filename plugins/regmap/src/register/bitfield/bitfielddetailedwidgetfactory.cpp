@@ -17,6 +17,6 @@ BitFieldDetailedWidget *BitFieldDetailedWidgetFactory::buildWidget(BitFieldModel
 	BitFieldDetailedWidget *bfdw = new BitFieldDetailedWidget(
 		model->getName(), model->getAccess(), model->getDefaultValue(), model->getDescription(),
 		model->getWidth(), model->getNotes(), model->getRegOffset(), model->getOptions());
-	bfdw->setStyleSheet(RegmapStyleHelper::detailedBitFieldStyle(bfdw, ""));
+	RegmapStyleHelper::BitFieldDetailedWidgetStyle(bfdw);
 	return bfdw;
 }

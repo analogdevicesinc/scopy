@@ -66,7 +66,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(searchBarWidget, TTA_LEFT);
 
 	registerDeviceList = new QComboBox(tool->topContainer());
-	registerDeviceList->setStyleSheet(RegmapStyleHelper::comboboxStyle(nullptr));
+	RegmapStyleHelper::comboboxStyle(registerDeviceList);
 	registerDeviceList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 	QObject::connect(registerDeviceList, &QComboBox::currentTextChanged, this,
 			 &RegisterMapTool::updateActiveRegisterMap);

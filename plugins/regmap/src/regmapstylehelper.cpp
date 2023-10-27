@@ -50,7 +50,7 @@ QString RegmapStyleHelper::getColor(QString id)
 	return sh->colorMap[id];
 }
 
-void RegmapStyleHelper::PartialFrameWidget(QWidget *widget)
+QString RegmapStyleHelper::PartialFrameWidgetStyle()
 {
 	QString style = QString(R"css(
                         .QWidget {
@@ -59,10 +59,11 @@ void RegmapStyleHelper::PartialFrameWidget(QWidget *widget)
                                  border-left: 2px solid black;
                         }
                         )css");
-	widget->setStyleSheet(style);
+
+	return style;
 }
 
-QString RegmapStyleHelper::FrameWidget(QWidget *widget)
+QString RegmapStyleHelper::FrameWidgetStyle()
 {
 	QString style = QString(R"css(
                         .QWidget {
@@ -80,13 +81,10 @@ QString RegmapStyleHelper::FrameWidget(QWidget *widget)
                         )css");
 	style.replace("&&background&&", RegmapStyleHelper::getColor("WidgetBackground"));
 
-	if(widget) {
-		widget->setStyleSheet(style);
-	}
 	return style;
 }
 
-void RegmapStyleHelper::RegisterMapStyle(QWidget *widget)
+void RegmapStyleHelper::DeviceRegisterMap(QWidget *widget)
 {
 	QString style = QString(R"css(
                         .QWidget {
@@ -97,11 +95,8 @@ void RegmapStyleHelper::RegisterMapStyle(QWidget *widget)
 	widget->setStyleSheet(style);
 }
 
-void RegmapStyleHelper::bigTextLabelStyle(QLabel *label, QString objectName)
+QString RegmapStyleHelper::bigTextLabelStyle()
 {
-	if(!objectName.isEmpty())
-		label->setObjectName(objectName);
-
 	QString style = QString(R"css(
                         QLabel {
                         font: normal;
@@ -110,14 +105,20 @@ void RegmapStyleHelper::bigTextLabelStyle(QLabel *label, QString objectName)
                         }
                         )css");
 	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("LabelText"));
-	label->setStyleSheet(style);
+
+	return style;
 }
 
-QString RegmapStyleHelper::BlueButton(QPushButton *btn, QString objectName)
+void RegmapStyleHelper::bigTextLabel(QLabel *label, QString objectName)
 {
 	if(!objectName.isEmpty())
-		btn->setObjectName(objectName);
+		label->setObjectName(objectName);
 
+	label->setStyleSheet(RegmapStyleHelper::bigTextLabelStyle());
+}
+
+QString RegmapStyleHelper::BlueButtonStyle()
+{
 	QString style = QString(R"css(
                         QPushButton {
                              background-color: &&buttonBackground&& ;
@@ -139,46 +140,52 @@ QString RegmapStyleHelper::BlueButton(QPushButton *btn, QString objectName)
 	style.replace("&&hoverColor&&", RegmapStyleHelper::getColor("ButtonHover"));
 	style.replace("&&diabledColor&&", RegmapStyleHelper::getColor("ButtonDisabled"));
 
-	if(btn) {
-		btn->setStyleSheet(style);
-	}
-
 	return style;
 }
 
-QString RegmapStyleHelper::checkboxStyle(QCheckBox *checkbox, QString objectName)
+void RegmapStyleHelper::BlueButton(QPushButton *btn, QString objectName)
 {
 	if(!objectName.isEmpty())
-		checkbox->setObjectName(objectName);
+		btn->setObjectName(objectName);
 
+	btn->setStyleSheet(RegmapStyleHelper::BlueButtonStyle());
+}
+
+QString RegmapStyleHelper::checkBoxStyle()
+{
 	QString style = QString(R"css(
-                         QCheckBox {
-                         spacing: 8px;
-                            background-color: &&checkBoxBackgroundColor&& ;
-                            font-size: 14px;
-                            font-weight: bold;
-                            color: &&checkBoxColor&&
-                         ;
-                         }
-                         QCheckBox::indicator {
-                         width: 14px;
-                         height: 14px;
-                         border: 2px solid &&checkBoxIndicatorBorderColor&& ;
-                         border-radius: 4px;
-                         }
-                         QCheckBox::indicator:unchecked { background-color: &&checkBoxIndicatorUnchecked&&; }
-                         QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
-                        )css");
+						 QCheckBox {
+						 spacing: 8px;
+							background-color: &&checkBoxBackgroundColor&& ;
+							font-size: 14px;
+							font-weight: bold;
+							color: &&checkBoxColor&&
+						 ;
+						 }
+						 QCheckBox::indicator {
+							 width: 14px;
+							 height: 14px;
+							 border: 2px solid &&checkBoxIndicatorBorderColor&& ;
+							 border-radius: 4px;
+						 }
+						 QCheckBox::indicator:unchecked { background-color: &&checkBoxIndicatorUnchecked&&; }
+						 QCheckBox::indicator:checked { background-color: rgb(74,100,255); }
+						)css");
 
 	style.replace("&&checkBoxIndicatorUnchecked&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&checkBoxBackgroundColor&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&checkBoxColor&&", RegmapStyleHelper::getColor("CheckBoxTextColor"));
 	style.replace("&&checkBoxIndicatorBorderColor&&", RegmapStyleHelper::getColor("CheckBoxIndicatorBorderColor"));
 
-	if(checkbox) {
-		checkbox->setStyleSheet(style);
-	}
 	return style;
+}
+
+void RegmapStyleHelper::checkBox(QCheckBox *checkbox, QString objectName)
+{
+	if(!objectName.isEmpty())
+		checkbox->setObjectName(objectName);
+
+	checkbox->setStyleSheet(RegmapStyleHelper::checkBoxStyle());
 }
 
 void RegmapStyleHelper::labelStyle(QLabel *label, QString objectName)
@@ -199,7 +206,7 @@ void RegmapStyleHelper::labelStyle(QLabel *label, QString objectName)
 	label->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QString objectName)
+void RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings, QString objectName)
 {
 	if(!objectName.isEmpty() && settings)
 		settings->setObjectName(objectName);
@@ -218,20 +225,16 @@ QString RegmapStyleHelper::regmapSettingsMenu(RegisterMapSettingsMenu *settings,
 	style.replace("&&background&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
-	RegmapStyleHelper::checkboxStyle(settings->autoread, "");
-	RegmapStyleHelper::bigTextLabelStyle(settings->hexaPrefix1, "");
-	RegmapStyleHelper::bigTextLabelStyle(settings->hexaPrefix2, "");
-	RegmapStyleHelper::BlueButton(settings->readInterval, "");
-	RegmapStyleHelper::BlueButton(settings->writeListOfValuesButton, "");
-	RegmapStyleHelper::BlueButton(settings->registerDump, "");
-	RegmapStyleHelper::BlueButton(settings->pathButton, "");
+	style += RegmapStyleHelper::BlueButtonStyle();
+
+	RegmapStyleHelper::checkBox(settings->autoread);
+	RegmapStyleHelper::bigTextLabel(settings->hexaPrefix1);
+	RegmapStyleHelper::bigTextLabel(settings->hexaPrefix2);
 
 	settings->setStyleSheet(style);
-
-	return style;
 }
 
-QString RegmapStyleHelper::grayBackgroundHoverWidget(QWidget *widget, QString objectName)
+void RegmapStyleHelper::grayBackgroundHoverWidget(QWidget *widget, QString objectName)
 {
 	if(!objectName.isEmpty() && widget)
 		widget->setObjectName(objectName);
@@ -264,13 +267,10 @@ QString RegmapStyleHelper::grayBackgroundHoverWidget(QWidget *widget, QString ob
 	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("ButtonHover"));
 	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
 
-	if(widget) {
-		widget->setStyleSheet(style);
-	}
-	return style;
+	widget->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::detailedBitFieldStyle(BitFieldDetailedWidget *widget, QString objectName)
+void RegmapStyleHelper::BitFieldDetailedWidgetStyle(BitFieldDetailedWidget *widget, QString objectName)
 {
 	if(!objectName.isEmpty())
 		widget->setObjectName(objectName);
@@ -299,18 +299,18 @@ QString RegmapStyleHelper::detailedBitFieldStyle(BitFieldDetailedWidget *widget,
 
 	widget->setMinimumWidth(10);
 	widget->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+	widget->nameLabel->setStyleSheet(RegmapStyleHelper::whiteSmallTextLableStyle());
 
-	widget->nameLabel->setStyleSheet(whiteSmallTextLable(nullptr));
 	if(widget->valueSwitch) {
 		StyleHelper::MenuOnOffSwitchButton(dynamic_cast<SmallOnOffSwitch *>(widget->valueSwitch),
 						   "onOffSwitch");
 	}
 	widget->setFixedHeight(96);
 
-	return style;
+	widget->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::simpleBitFieldStyle(BitFieldSimpleWidget *widget, QString objectName)
+void RegmapStyleHelper::BitFieldSimpleWidgetStyle(BitFieldSimpleWidget *widget, QString objectName)
 {
 	if(!objectName.isEmpty())
 		widget->setObjectName(objectName);
@@ -325,8 +325,8 @@ QString RegmapStyleHelper::simpleBitFieldStyle(BitFieldSimpleWidget *widget, QSt
 						)css");
 	style.replace("&&widgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
-	widget->value->setStyleSheet(grayLabel(nullptr));
-	widget->mainFrame->setStyleSheet(grayBackgroundHoverWidget(nullptr));
+	widget->value->setStyleSheet(RegmapStyleHelper::grayLabelStyle());
+	grayBackgroundHoverWidget(widget->mainFrame);
 
 	if(widget->value->text() != "N/R") {
 		scopy::Preferences *p = scopy::Preferences::GetInstance();
@@ -342,10 +342,10 @@ QString RegmapStyleHelper::simpleBitFieldStyle(BitFieldSimpleWidget *widget, QSt
 		}
 	}
 
-	return style;
+	widget->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::simpleRegisterStyle(RegisterSimpleWidget *widget, QString objectName)
+void RegmapStyleHelper::RegisterSimpleWidgetStyle(RegisterSimpleWidget *widget, QString objectName)
 {
 	if(!objectName.isEmpty())
 		widget->setObjectName(objectName);
@@ -364,15 +364,21 @@ QString RegmapStyleHelper::simpleRegisterStyle(RegisterSimpleWidget *widget, QSt
                         *[is_selected=true] {
                          background-color: &&selectedBackground&& ;
                         }
-                        )css");
 
+						.scopy--regmap--RegisterSimpleWidget:hover  {
+							border: 1px solid &&hoverBackground&& ;
+							border-radius: 4px;
+						}
+						)css");
+
+	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("LabelText"));
 	style.replace("&&frameBackground&&", RegmapStyleHelper::getColor("WidgetBackground"));
 	style.replace("&&childWidgetBackground&&", RegmapStyleHelper::getColor("Transparent"));
 	style.replace("&&selectedBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
-	widget->setStyleSheet(style);
-	widget->regBaseInfoWidget->setStyleSheet(grayBackgroundHoverWidget(nullptr));
-	widget->registerNameLabel->setStyleSheet(whiteSmallTextLable(nullptr));
-	widget->value->setStyleSheet(grayLabel(nullptr));
+
+	grayBackgroundHoverWidget(widget->regBaseInfoWidget);
+	widget->registerNameLabel->setStyleSheet(RegmapStyleHelper::whiteSmallTextLableStyle());
+	widget->value->setStyleSheet(RegmapStyleHelper::grayLabelStyle());
 
 	if(widget->value->text() != "N/R") {
 		scopy::Preferences *p = scopy::Preferences::GetInstance();
@@ -387,35 +393,11 @@ QString RegmapStyleHelper::simpleRegisterStyle(RegisterSimpleWidget *widget, QSt
 			widget->value->setStyleSheet("color: " + getColorBasedOnValue(widget->value->text()));
 		}
 	}
-	return style;
+	widget->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::valueLabel(QLabel *label, QString objectName)
+QString RegmapStyleHelper::grayLabelStyle()
 {
-	if(!objectName.isEmpty())
-		label->setObjectName(objectName);
-
-	QString style = QString(R"css(
-                        *[value_label=true] {
-
-                             font-size: 12px;
-                             font-style: normal;
-                             font-weight: normal;
-                             text-align: left;
-                             color: &&labelColor&& ;
-
-                        }
-                        )css");
-	style.replace("&&labelColor&&", RegmapStyleHelper::getColor("ScopyOrange"));
-
-	return style;
-}
-
-QString RegmapStyleHelper::grayLabel(QLabel *label, QString objectName)
-{
-	if(!objectName.isEmpty())
-		label->setObjectName(objectName);
-
 	QString style = QString(R"css(
                         QLabel {
                          font-size: 12px;
@@ -430,11 +412,8 @@ QString RegmapStyleHelper::grayLabel(QLabel *label, QString objectName)
 	return style;
 }
 
-QString RegmapStyleHelper::whiteSmallTextLable(QLabel *label, QString objectName)
+QString RegmapStyleHelper::whiteSmallTextLableStyle()
 {
-	if(!objectName.isEmpty())
-		label->setObjectName(objectName);
-
 	QString style = QString(R"css(
                         QLabel {
                         font: normal;
@@ -447,39 +426,8 @@ QString RegmapStyleHelper::whiteSmallTextLable(QLabel *label, QString objectName
 	return style;
 }
 
-QString RegmapStyleHelper::frameBorderHover(QFrame *frame, QString objectName)
+QString RegmapStyleHelper::simpleWidgetStyle()
 {
-	if(!objectName.isEmpty() && frame)
-		frame->setObjectName(objectName);
-
-	QString style = QString(R"css(
-                        .scopy--regmap--RegisterSimpleWidget:hover  {
-                            border: 1px solid &&hoverBackground&& ;
-                            border-radius: 4px;
-                        }
-                        )css");
-	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("LabelText"));
-
-	return style;
-}
-
-QString RegmapStyleHelper::simpleWidgetWithButtonStyle(QWidget *widget, QString objectName)
-{
-	if(!objectName.isEmpty() && widget)
-		widget->setObjectName(objectName);
-
-	QString style = "";
-	style += RegmapStyleHelper::simpleWidgetStyle(nullptr);
-	style += RegmapStyleHelper::BlueButton(nullptr);
-
-	return style;
-}
-
-QString RegmapStyleHelper::simpleWidgetStyle(QWidget *widget, QString objectName)
-{
-	if(!objectName.isEmpty() && widget)
-		widget->setObjectName(objectName);
-
 	QString style = QString(R"css(
                         QWidget  {
                             background-color: &&widgetBackground&& ;
@@ -491,7 +439,7 @@ QString RegmapStyleHelper::simpleWidgetStyle(QWidget *widget, QString objectName
 	return style;
 }
 
-QString RegmapStyleHelper::comboboxStyle(QComboBox *combobox, QString objectName)
+void RegmapStyleHelper::comboboxStyle(QComboBox *combobox, QString objectName)
 {
 	if(!objectName.isEmpty() && combobox)
 		combobox->setObjectName(objectName);
@@ -518,50 +466,10 @@ QString RegmapStyleHelper::comboboxStyle(QComboBox *combobox, QString objectName
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 	style.replace("&&widgetBackground&&", RegmapStyleHelper::getColor("WidgetBackground"));
 
-	return style;
+	combobox->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::lineEditStyle(QLineEdit *lineEdit, QString objectName)
-{
-	if(!objectName.isEmpty() && lineEdit)
-		lineEdit->setObjectName(objectName);
-
-	QString style = QString(R"css(
-						QLineEdit  {
-						 font-size: 18px;
-						 font-style: normal;
-						 font-weight: normal;
-						 text-align: left;
-						 color: &&textColor&& ;
-						}
-						)css");
-
-	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
-
-	return style;
-}
-
-QString RegmapStyleHelper::spinboxStyle(QSpinBox *spinbox, QString objectName)
-{
-	if(!objectName.isEmpty() && spinbox)
-		spinbox->setObjectName(objectName);
-
-	QString style = QString(R"css(
-						QSpinBox  {
-						 font-size: 18px;
-						 font-style: normal;
-						 font-weight: normal;
-						 text-align: left;
-						 color: &&textColor&& ;
-						}
-						)css");
-
-	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
-
-	return style;
-}
-
-QString RegmapStyleHelper::titleSpinBoxStyle(TitleSpinBox *spinbox, QString objectName)
+void RegmapStyleHelper::titleSpinBoxStyle(TitleSpinBox *spinbox, QString objectName)
 {
 	if(!objectName.isEmpty() && spinbox)
 		spinbox->setObjectName(objectName);
@@ -580,12 +488,12 @@ QString RegmapStyleHelper::titleSpinBoxStyle(TitleSpinBox *spinbox, QString obje
 						)css");
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
-	style += grayLabel(nullptr);
+	style += RegmapStyleHelper::grayLabelStyle();
 
-	return style;
+	spinbox->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::searchBarStyle(SearchBarWidget *searchBar, QString objectName)
+void RegmapStyleHelper::searchBarStyle(SearchBarWidget *searchBar, QString objectName)
 {
 	if(!objectName.isEmpty() && searchBar)
 		searchBar->setObjectName(objectName);
@@ -606,14 +514,16 @@ QString RegmapStyleHelper::searchBarStyle(SearchBarWidget *searchBar, QString ob
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
 
-	style += simpleWidgetStyle(nullptr);
-	return style;
+	style += RegmapStyleHelper::simpleWidgetStyle();
+
+	searchBar->setStyleSheet(style);
 }
 
-QString RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectName)
+void RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectName)
 {
 	if(!objectName.isEmpty())
 		button->setObjectName(objectName);
+
 	QString style = QString(R"css(
 						QPushButton {
 							 background-color: &&buttonBackground&& ;
@@ -632,19 +542,14 @@ QString RegmapStyleHelper::smallBlueButton(QPushButton *button, QString objectNa
 	style.replace("&&hoverColor&&", RegmapStyleHelper::getColor("ButtonHover"));
 	style.replace("&&diabledColor&&", RegmapStyleHelper::getColor("ButtonDisabled"));
 
-	if(button) {
-		button->setStyleSheet(style);
-		button->setFixedSize(16, 16);
-		button->setIconSize(QSize(30, 30));
-		button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	}
-	return style;
+	button->setFixedSize(16, 16);
+	button->setIconSize(QSize(30, 30));
+	button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	button->setStyleSheet(style);
 }
 
 QString RegmapStyleHelper::regmapControllerStyle(QWidget *widget, QString objectName)
 {
-	//	if (!objectName.isEmpty() && widget) widget->setObjectName(objectName);
-
 	QString style = QString(R"css(
 						.QWidget  {
 							margin-top: 4px ;
@@ -663,7 +568,7 @@ QString RegmapStyleHelper::regmapControllerStyle(QWidget *widget, QString object
 
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 
-	style += simpleWidgetStyle(widget);
+	style += RegmapStyleHelper::simpleWidgetStyle();
 
 	return style;
 }
@@ -679,7 +584,7 @@ QString RegmapStyleHelper::widgetidthRoundCornersStyle(QWidget *widget, QString 
 						}
 						)css");
 
-	style += FrameWidget(widget);
+	style += FrameWidgetStyle();
 
 	if(widget) {
 		widget->setStyleSheet(style);
@@ -688,11 +593,8 @@ QString RegmapStyleHelper::widgetidthRoundCornersStyle(QWidget *widget, QString 
 	return style;
 }
 
-QString RegmapStyleHelper::sliderStyle(QSlider *slider, QString objectName)
+QString RegmapStyleHelper::sliderStyle()
 {
-	if(!objectName.isEmpty() && slider)
-		slider->setObjectName(objectName);
-
 	QString style = QString(R"css(
 						QSlider::handle {
 						 background: #404040;
@@ -715,10 +617,6 @@ QString RegmapStyleHelper::sliderStyle(QSlider *slider, QString objectName)
 
 	style.replace("&&handleBackground&&", RegmapStyleHelper::getColor("LabelText"));
 	style.replace("&&grooveBackground&&", RegmapStyleHelper::getColor("Transparent"));
-
-	if(slider) {
-		slider->setStyleSheet(style);
-	}
 
 	return style;
 }

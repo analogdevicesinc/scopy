@@ -18,7 +18,7 @@ BitFieldSimpleWidget *BitFieldSimpleWidgetFactory::buildWidget(BitFieldModel *mo
 		new BitFieldSimpleWidget(model->getName(), model->getDefaultValue(), model->getDescription(),
 					 model->getWidth(), model->getNotes(), model->getRegOffset(), streach);
 
-	bfsw->setStyleSheet(RegmapStyleHelper::simpleBitFieldStyle(bfsw));
+	RegmapStyleHelper::BitFieldSimpleWidgetStyle(bfsw);
 
 	return bfsw;
 }
