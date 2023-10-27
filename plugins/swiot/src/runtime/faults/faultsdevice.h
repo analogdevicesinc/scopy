@@ -40,8 +40,8 @@ class FaultsDevice : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit FaultsDevice(const QString &name, QString path, struct iio_device *device, struct iio_device *swiot,
-			      struct iio_context *context, QVector<uint32_t> &registers, QWidget *parent = nullptr);
+	explicit FaultsDevice(const QString &name, QString path, QString uri, QVector<uint32_t> &registers,
+			      QWidget *parent = nullptr);
 	~FaultsDevice();
 
 	void update();
@@ -70,11 +70,12 @@ private:
 	void connectSignalsAndSlots();
 	void initSpecialFaults();
 
+	QString m_uri;
+	CommandQueue *m_cmdQueue;
+
 	Ui::FaultsDevice *ui;
 	QWidget *m_faults_explanation;
 	scopy::gui::SubsectionSeparator *m_subsectionSeparator;
-
-	CommandQueue *m_cmdQueue;
 
 	FaultsGroup *m_faultsGroup;
 	QVector<QWidget *> m_faultExplanationWidgets;

@@ -19,21 +19,23 @@
  */
 
 #include "faultspage.h"
-
 #include "src/swiot_logging_categories.h"
-
 #include "ui_faultspage.h"
+#include <iioutil/connectionprovider.h>
 
 using namespace scopy::swiot;
 
-FaultsPage::FaultsPage(struct iio_context *context, QWidget *parent)
+FaultsPage::FaultsPage(QString uri, QWidget *parent)
 	: QWidget(parent)
-	, m_context(context)
+	, m_uri(uri)
 	, ui(new Ui::FaultsPage)
 	, m_ad74413rFaultsDevice(nullptr)
 	, m_max14906FaultsDevice(nullptr)
 {
 	ui->setupUi(this);
+	Connection *conn = ConnectionProvider::open(m_uri);
+
+	m_context = conn->context();
 	this->setupDevices();
 
 	// needed for subsection separator resize
@@ -47,7 +49,11 @@ FaultsPage::FaultsPage(struct iio_context *context, QWidget *parent)
 	this->ui->frame->setStyleSheet("QFrame#frame{background-color:#1C1C20;}");
 }
 
-FaultsPage::~FaultsPage() { delete ui; }
+FaultsPage::~FaultsPage()
+{
+	delete ui;
+	ConnectionProvider::close(m_uri);
+}
 
 void FaultsPage::update()
 {
@@ -64,16 +70,16 @@ void FaultsPage::setupDevices()
 	if(swiot) {
 		if(ad74413r) {
 			QVector<uint32_t> faultRegistersAddr = {0x02e};
-			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", ad74413r,
-								  swiot, m_context, faultRegistersAddr, this);
+			m_ad74413rFaultsDevice = new FaultsDevice("ad74413r", ":/swiot/swiot_faults.json", m_uri,
+								  faultRegistersAddr, this);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find ad74413r device.";
 		}
 
 		if(max14906) {
 			QVector<uint32_t> faultRegistersAddr = {0x04, 0x05, 0x06, 0x07};
-			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiot/swiot_faults.json", max14906,
-								  swiot, m_context, faultRegistersAddr, this);
+			m_max14906FaultsDevice = new FaultsDevice("max14906", ":/swiot/swiot_faults.json", m_uri,
+								  faultRegistersAddr, this);
 		} else {
 			qCritical(CAT_SWIOT_FAULTS) << "Error: did not find max14906 device.";
 		}

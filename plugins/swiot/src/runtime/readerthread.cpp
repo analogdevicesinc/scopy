@@ -45,9 +45,15 @@ ReaderThread::ReaderThread(bool isBuffered, CommandQueue *cmdQueue, QObject *par
 	, bufferCounter(0)
 	, m_running(false)
 	, m_bufferInvalid(false)
+	, m_deinit(true)
 {}
 
-ReaderThread::~ReaderThread() { forcedStop(); }
+ReaderThread::~ReaderThread()
+{
+	if(m_deinit) {
+		forcedStop();
+	}
+}
 
 void ReaderThread::addDioChannel(int index, struct iio_channel *channel) { m_dioChannels.insert(index, channel); }
 
@@ -363,4 +369,10 @@ void ReaderThread::forcedStop()
 		cancelIioBuffer();
 	}
 	wait();
+}
+
+void ReaderThread::handleConnectionDestroyed()
+{
+	m_deinit = false;
+	requestInterruption();
 }
