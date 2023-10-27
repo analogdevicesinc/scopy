@@ -106,7 +106,7 @@ void BufferMenu::setupVerticalSettingsMenu(QWidget *settingsWidget, QString unit
 		{
 			{unit, 1e0},
 		},
-		"Unit/Div", 0.1, yMax, false, false, settingsWidget);
+		"Unit/Div", 10e-6, yMax, false, false, settingsWidget);
 
 	yMinMaxLayout->addWidget(m_unitPerDivision);
 	settingsWidget->layout()->addItem(yMinMaxLayout);
@@ -166,6 +166,8 @@ CurrentInLoopMenu::~CurrentInLoopMenu() {}
 void CurrentInLoopMenu::init()
 {
 	BufferMenu::init();
+	m_unitPerDivision->setValue(0.001);
+	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
 	(m_attrValues[OUTPUT_CHNL].contains("raw") && !m_attrValues[OUTPUT_CHNL]["raw"].isEmpty())
 		? m_dacCodeSpinButton->setValue(m_attrValues[OUTPUT_CHNL]["raw"].first().toDouble())
 		: m_dacCodeSpinButton->setValue(0);
@@ -253,6 +255,8 @@ DigitalInLoopMenu::~DigitalInLoopMenu() {}
 void DigitalInLoopMenu::init()
 {
 	BufferMenu::init();
+	m_unitPerDivision->setValue(0.001);
+	Q_EMIT m_unitPerDivision->valueChanged(m_unitPerDivision->value());
 	(m_attrValues[INPUT_CHNL].contains("threshold") && !m_attrValues[INPUT_CHNL]["threshold"].isEmpty())
 		? m_thresholdLineEdit->setText(m_attrValues[INPUT_CHNL]["threshold"].first()),
 		m_thresholdLineEdit->setPlaceholderText(m_attrValues[INPUT_CHNL]["threshold"].first())
