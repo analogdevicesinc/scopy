@@ -186,7 +186,7 @@ void Ad74413r::setupConnections()
 void Ad74413r::initChannelToolView(unsigned int i, QString function)
 {
 	if(function.compare("no_config") != 0) {
-		bool enabled = (function.compare("diagnostic") != 0);
+		bool enabled = false;
 		int nextColorId = m_monitorChannelManager->getChannelsCount();
 		QString menuTitle(((QString(AD_NAME).toUpper() + " - Channel ") + QString::number(i + 1)) +
 				  (": " + function));
@@ -218,9 +218,7 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 		chWidget->setIsPhysicalChannel(true);
 		controller->createConnections();
 		m_channelWidgetList.push_back(chWidget);
-		if(!enabled) {
-			chWidget->enableButton()->setChecked(false);
-		}
+		chWidget->enableButton()->setChecked(enabled);
 
 		connect(controller, &BufferMenuController::setUnitPerDivision, m_plotHandler,
 			&BufferPlotHandler::setUnitPerDivision);
@@ -241,9 +239,6 @@ void Ad74413r::initChannelToolView(unsigned int i, QString function)
 	m_currentChannelSelected++;
 	if(m_currentChannelSelected == 4) {
 		m_swiotAdLogic->initDiagnosticChannels();
-	}
-	if(m_currentChannelSelected == MAX_INPUT_CHNLS_NO) {
-		m_monitorChannelManager->getChannelAt(0)->nameButton()->click();
 	}
 }
 
