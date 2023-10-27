@@ -22,7 +22,7 @@
 
 #include "src/swiot_logging_categories.h"
 
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include <iioutil/iiocommand/iiodeviceattributewrite.h>
 
@@ -49,7 +49,7 @@ SwiotController::~SwiotController() {}
 
 void SwiotController::startPingTask()
 {
-	pingTask = new SwiotPingTask(m_iioCtx);
+	pingTask = new SwiotPingTask(m_conn);
 	pingTimer = new CyclicalTask(pingTask);
 	connect(pingTask, SIGNAL(pingSuccess()), this, SIGNAL(pingSuccess()));
 	connect(pingTask, SIGNAL(pingFailed()), this, SIGNAL(pingFailed()));
@@ -66,35 +66,33 @@ void SwiotController::stopPingTask()
 void SwiotController::startSwitchContextTask(bool isRuntime)
 {
 	switchCtxTask = new SwiotSwitchCtxTask(uri, isRuntime);
-	switchCtxTimer = new CyclicalTask(switchCtxTask, this);
 	connect(switchCtxTask, &SwiotSwitchCtxTask::contextSwitched, this, &SwiotController::contextSwitched);
-	switchCtxTimer->start(1000);
+	switchCtxTask->start();
 }
 
 void SwiotController::stopSwitchContextTask()
 {
-	switchCtxTimer->stop();
 	switchCtxTask->requestInterruption();
 	disconnect(switchCtxTask, &SwiotSwitchCtxTask::contextSwitched, this, &SwiotController::contextSwitched);
 }
 
-void SwiotController::connectSwiot(iio_context *ctx)
+void SwiotController::connectSwiot()
 {
-	m_iioCtx = ctx;
-	if(m_iioCtx) {
-		m_cmdQueue = CommandQueueProvider::GetInstance()->open(m_iioCtx);
-		readModeAttribute();
-	}
+	m_conn = ConnectionProvider::open(uri);
+	m_iioCtx = m_conn->context();
+	m_cmdQueue = m_conn->commandQueue();
+	readModeAttribute();
 }
 
 void SwiotController::disconnectSwiot()
 {
-	if(m_cmdQueue) {
-		m_cmdQueue->requestStop();
-		CommandQueueProvider::GetInstance()->close(m_iioCtx);
-		m_cmdQueue = nullptr;
+	if(!m_conn || !m_iioCtx || !m_cmdQueue) {
+		return;
 	}
+	ConnectionProvider::close(uri);
+	m_conn = nullptr;
 	m_iioCtx = nullptr;
+	m_cmdQueue = nullptr;
 }
 
 void SwiotController::startPowerSupplyTask(QString attribute)
@@ -177,7 +175,7 @@ void SwiotController::writeModeCommandFinished(scopy::Command *cmd)
 	}
 	if(tcmd->getReturnCode() >= 0) {
 		Q_EMIT modeAttributeChanged(tcmd->getAttributeValue());
-		qInfo(CAT_SWIOT) << R"(Successfully changed the swiot mode)";
+		qInfo(CAT_SWIOT) << R"(Successfully written swiot mode)";
 	} else {
 		qDebug(CAT_SWIOT) << R"(Error, could not change swiot mode)" << tcmd->getReturnCode();
 	}

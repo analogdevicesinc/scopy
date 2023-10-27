@@ -37,7 +37,7 @@ class SwiotRuntime : public QObject
 {
 	Q_OBJECT
 public:
-	SwiotRuntime(struct iio_context *ctx, QObject *parent = nullptr);
+	SwiotRuntime(QString m_uri, QObject *parent = nullptr);
 	~SwiotRuntime();
 
 public Q_SLOTS:
@@ -55,6 +55,7 @@ private:
 	void createDevicesMap();
 
 private:
+	QString m_uri;
 	iio_context *m_iioCtx;
 	QMap<QString, struct iio_device *> m_iioDevices;
 	CommandQueue *m_cmdQueue;

@@ -21,9 +21,7 @@
 #include "externalpsreaderthread.h"
 
 #include "src/swiot_logging_categories.h"
-
-#include <iioutil/commandqueueprovider.h>
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <iioutil/iiocommand/iiodeviceattributeread.h>
 #include <utility>
 
@@ -33,25 +31,32 @@ ExternalPsReaderThread::ExternalPsReaderThread(QString uri, QString attr, QObjec
 	: QThread(parent)
 	, m_uri(uri)
 	, m_attribute(attr)
-{}
+{
+	m_conn = ConnectionProvider::open(m_uri);
+	if(!m_conn) {
+		qDebug(CAT_SWIOT) << "Error, no context available for the external ps task.";
+	}
+	connect(m_conn, &Connection::aboutToBeDestroyed, this, [=, this]() { m_conn = nullptr; });
+}
+
+ExternalPsReaderThread::~ExternalPsReaderThread()
+{
+	if(m_conn) {
+		m_conn = nullptr;
+		ConnectionProvider::close(m_uri);
+	}
+}
 
 void ExternalPsReaderThread::run()
 {
-	iio_context *ctx = ContextProvider::GetInstance()->open(m_uri);
-	if(!ctx) {
+	if(!m_conn) {
 		return;
 	}
 	if(isInterruptionRequested()) {
-		ContextProvider::GetInstance()->close(m_uri);
-		return;
-	}
-	CommandQueue *commandQueue = CommandQueueProvider::GetInstance()->open(ctx);
-	if(!commandQueue) {
-		ContextProvider::GetInstance()->close(m_uri);
 		return;
 	}
 
-	iio_device *swiotDevice = iio_context_find_device(ctx, "swiot");
+	iio_device *swiotDevice = iio_context_find_device(m_conn->context(), "swiot");
 	if(swiotDevice) {
 		IioDeviceAttributeRead *iioAttrRead =
 			new IioDeviceAttributeRead(swiotDevice, m_attribute.toStdString().c_str(), nullptr, true);
@@ -61,8 +66,6 @@ void ExternalPsReaderThread::run()
 			[=, this](scopy::Command *cmd) {
 				IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 				if(!tcmd) {
-					CommandQueueProvider::GetInstance()->close(ctx);
-					ContextProvider::GetInstance()->close(m_uri);
 					return;
 				}
 				if(tcmd->getReturnCode() >= 0) {
@@ -77,15 +80,10 @@ void ExternalPsReaderThread::run()
 								"device, error code"
 							     << tcmd->getReturnCode();
 				}
-				CommandQueueProvider::GetInstance()->close(ctx);
-				ContextProvider::GetInstance()->close(m_uri);
 			},
 			Qt::QueuedConnection);
 
-		commandQueue->enqueue(iioAttrRead);
-	} else {
-		CommandQueueProvider::GetInstance()->close(ctx);
-		ContextProvider::GetInstance()->close(m_uri);
+		m_conn->commandQueue()->enqueue(iioAttrRead);
 	}
 }
 

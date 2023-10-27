@@ -28,23 +28,28 @@
 
 #include <gui/generic_menu.hpp>
 #include <gui/tool_view_builder.hpp>
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 
 using namespace scopy;
 using namespace scopy::swiot;
 
-Ad74413r::Ad74413r(iio_context *ctx, ToolMenuEntry *tme, QWidget *parent)
+Ad74413r::Ad74413r(QString uri, ToolMenuEntry *tme, QWidget *parent)
 	: QWidget(parent)
+	, m_uri(uri)
 	, m_tme(tme)
 	, m_statusLabel(new QLabel(this))
 	, m_swiotAdLogic(nullptr)
 	, m_widget(this)
 	, m_readerThread(nullptr)
 	, m_statusContainer(new QWidget(this))
-	, m_ctx(ctx)
-	, m_cmdQueue(CommandQueueProvider::GetInstance()->open(ctx))
 	, m_currentChannelSelected(0)
+	, m_backBtnPressed(false)
 {
+	m_conn = ConnectionProvider::open(m_uri);
+	connect(m_conn, &Connection::aboutToBeDestroyed, this, &Ad74413r::handleConnectionDestroyed);
+	m_ctx = m_conn->context();
+	m_cmdQueue = m_conn->commandQueue();
+
 	createDevicesMap(m_ctx);
 	if(m_iioDevicesMap.contains(AD_NAME) && m_iioDevicesMap.contains(SWIOT_DEVICE_NAME)) {
 		char mode[64];
@@ -86,11 +91,15 @@ Ad74413r::~Ad74413r()
 	if(m_controllers.size() > 0) {
 		m_controllers.clear();
 	}
-	if(m_cmdQueue) {
-		CommandQueueProvider::GetInstance()->close(m_ctx);
-		m_cmdQueue = nullptr;
-		m_ctx = nullptr;
-	}
+	ConnectionProvider::close(m_uri);
+}
+
+void Ad74413r::handleConnectionDestroyed()
+{
+	qDebug(CAT_SWIOT_AD74413R) << "Ad74413R connection destroyed slot";
+	m_ctx = nullptr;
+	m_cmdQueue = nullptr;
+	m_conn = nullptr;
 }
 
 void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
@@ -137,6 +146,7 @@ void Ad74413r::setupToolView(gui::GenericMenu *settingsMenu)
 
 void Ad74413r::setupConnections()
 {
+	connect(m_conn, &Connection::aboutToBeDestroyed, m_readerThread, &ReaderThread::handleConnectionDestroyed);
 	connect(m_backBtn, &QPushButton::pressed, this, &Ad74413r::onBackBtnPressed);
 	connect(m_toolView->getRunBtn(), &QPushButton::toggled, this, &Ad74413r::onRunBtnPressed);
 	connect(m_swiotAdLogic, &BufferLogic::chnlsChanged, m_readerThread, &ReaderThread::onChnlsChange);
@@ -504,7 +514,15 @@ void Ad74413r::onDiagnosticFunctionUpdated()
 
 void Ad74413r::onBackBtnPressed()
 {
-	m_readerThread->forcedStop();
+	bool runBtnChecked = m_toolView->getRunBtn()->isChecked();
+	bool singleBtnChecked = m_toolView->getSingleBtn()->isChecked();
+
+	if(runBtnChecked) {
+		m_toolView->getRunBtn()->setChecked(false);
+	}
+	if(singleBtnChecked) {
+		m_toolView->getSingleBtn()->setChecked(false);
+	}
 	Q_EMIT backBtnPressed();
 }
 

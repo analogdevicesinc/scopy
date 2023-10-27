@@ -8,13 +8,14 @@
 #include <QThread>
 
 #include <iioutil/command.h>
+#include <iioutil/connection.h>
 
 namespace scopy::swiot {
 class SwiotPingTask : public QThread
 {
 	Q_OBJECT
 public:
-	SwiotPingTask(iio_context *c, QObject *parent = nullptr);
+	SwiotPingTask(Connection *conn, QObject *parent = nullptr);
 	~SwiotPingTask();
 	virtual void run() override;
 Q_SIGNALS:
@@ -22,7 +23,8 @@ Q_SIGNALS:
 	void pingFailed();
 
 protected:
-	iio_context *c;
+	QString m_uri;
+	Connection *c;
 	bool enabled;
 
 private Q_SLOTS:

@@ -69,7 +69,7 @@ public:
 	void requestStop();
 	void forcedStop();
 public Q_SLOTS:
-
+	void handleConnectionDestroyed();
 	void onChnlsChange(QMap<int, ChnlInfo *> chnlsInfo);
 	void onSamplingFreqWritten(int samplingFreq);
 
@@ -89,6 +89,7 @@ private:
 	void run() override;
 
 	bool isBuffered;
+	bool m_deinit;
 	QMap<int, struct iio_channel *> m_dioChannels;
 
 	int m_samplingFreq = 4800;

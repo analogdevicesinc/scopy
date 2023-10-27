@@ -53,7 +53,7 @@ public:
 	void startTemperatureTask();
 	void stopTemperatureTask();
 
-	void connectSwiot(iio_context *ctx);
+	void connectSwiot();
 	void disconnectSwiot();
 
 public Q_SLOTS:
@@ -83,12 +83,12 @@ private:
 	SwiotReadTemperatureTask *temperatureTask;
 	CommandQueue *m_cmdQueue;
 	iio_context *m_iioCtx;
+	Connection *m_conn;
 	QString uri;
 	bool m_isRuntimeCtx;
 	bool m_temperatureReadEn;
 
 	CyclicalTask *pingTimer;
-	CyclicalTask *switchCtxTimer;
 	CyclicalTask *powerSupplyTimer;
 	CyclicalTask *temperatureTimer;
 };

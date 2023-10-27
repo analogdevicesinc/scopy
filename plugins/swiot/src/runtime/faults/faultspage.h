@@ -41,12 +41,13 @@ class FaultsPage : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit FaultsPage(struct iio_context *context, QWidget *parent = nullptr);
+	explicit FaultsPage(QString uri, QWidget *parent = nullptr);
 	~FaultsPage();
 
 	void update();
 
 private:
+	QString m_uri;
 	struct iio_context *m_context;
 
 	Ui::FaultsPage *ui;
