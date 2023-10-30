@@ -100,8 +100,7 @@ RegisterModel *XmlFileManager::getRegister(QDomElement reg)
 		bool isAxiCompatible = false;
 		QStringList xmlName = filePath.split(QLatin1Char('/'));
 
-		JsonFormatedElement *jsonFormatedElement =
-			scopy::regmap::Utils::getJsonTemplate(xmlName.at(xmlName.length() - 1));
+		JsonFormatedElement *jsonFormatedElement = Utils::getJsonTemplate(xmlName.at(xmlName.length() - 1));
 		if(jsonFormatedElement && jsonFormatedElement->getUseRegisterNameAsDescription()) {
 			name = reg.firstChildElement("Description").firstChild().toText().data();
 			description = reg.firstChildElement("Name").firstChild().toText().data();
@@ -197,8 +196,7 @@ BitFieldModel *XmlFileManager::getBitField(QDomElement bitField)
 		QString description = "";
 		QStringList xmlName = filePath.split(QLatin1Char('/'));
 
-		JsonFormatedElement *jsonFormatedElement =
-			scopy::regmap::Utils::getJsonTemplate(xmlName.at(xmlName.length() - 1));
+		JsonFormatedElement *jsonFormatedElement = Utils::getJsonTemplate(xmlName.at(xmlName.length() - 1));
 		if(jsonFormatedElement && jsonFormatedElement->getUseBifieldNameAsDescription()) {
 			name = bitField.firstChildElement("Description").firstChild().toText().data();
 			description = bitField.firstChildElement("Name").firstChild().toText().data();
