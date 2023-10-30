@@ -10,9 +10,8 @@
 #include <iio.h>
 
 class QComboBox;
-using namespace scopy;
-
-namespace scopy::regmap {
+namespace scopy {
+namespace regmap {
 
 class RegisterMapValues;
 
@@ -30,7 +29,7 @@ public:
 	~RegisterMapTool();
 
 	void addDevice(QString devName, RegisterMapTemplate *registerMapTemplate = nullptr,
-		       regmap::RegisterMapValues *registerMapValues = nullptr);
+		       RegisterMapValues *registerMapValues = nullptr);
 
 signals:
 
@@ -40,7 +39,7 @@ private:
 	QComboBox *registerDeviceList;
 	QString activeRegisterMap;
 	SearchBarWidget *searchBarWidget;
-	scopy::regmap::RegisterMapSettingsMenu *settings;
+	RegisterMapSettingsMenu *settings;
 	QMap<QString, DeviceRegisterMap *> *deviceList;
 	bool first = true;
 	void toggleSettingsMenu(QString registerName, bool toggle);
@@ -49,5 +48,6 @@ private Q_SLOTS:
 	void updateActiveRegisterMap(QString registerName);
 	void toggleSearchBarVisible(bool visible);
 };
-} // namespace scopy::regmap
+} // namespace regmap
+} // namespace scopy
 #endif // REGISTERMAPTOOL_HPP

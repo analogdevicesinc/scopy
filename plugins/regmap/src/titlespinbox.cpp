@@ -5,6 +5,9 @@
 #include <QBoxLayout>
 #include <utils.h>
 
+using namespace scopy;
+using namespace regmap;
+
 TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	: QWidget(parent)
 {
@@ -25,10 +28,10 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	buttonWidgetLayout->setMargin(0);
 
 	spinBoxUpButton = new QPushButton("+", buttonWidget);
-	scopy::regmap::RegmapStyleHelper::smallBlueButton(spinBoxUpButton);
+	RegmapStyleHelper::smallBlueButton(spinBoxUpButton);
 
 	spinBoxDownButton = new QPushButton("-", buttonWidget);
-	scopy::regmap::RegmapStyleHelper::smallBlueButton(spinBoxDownButton);
+	RegmapStyleHelper::smallBlueButton(spinBoxDownButton);
 
 	buttonWidgetLayout->addWidget(spinBoxUpButton);
 	buttonWidgetLayout->addWidget(spinBoxDownButton);
@@ -46,7 +49,7 @@ TitleSpinBox::TitleSpinBox(QString title, QWidget *parent)
 	mainLayout->addWidget(buttonWidget);
 	mainLayout->addWidget(spinboxWidget);
 
-	scopy::regmap::RegmapStyleHelper::titleSpinBoxStyle(this);
+	RegmapStyleHelper::titleSpinBoxStyle(this);
 }
 
 TitleSpinBox::~TitleSpinBox() {}
