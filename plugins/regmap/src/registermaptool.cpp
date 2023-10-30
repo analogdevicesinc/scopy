@@ -21,7 +21,8 @@
 #include <readwrite/iioregisterreadstrategy.hpp>
 #include <readwrite/iioregisterwritestrategy.hpp>
 
-using namespace scopy::regmap;
+using namespace scopy;
+using namespace regmap;
 
 RegisterMapTool::RegisterMapTool(QWidget *parent)
 	: QWidget{parent}
@@ -41,7 +42,7 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	// TODO on info btn click open wiki page
 
-	settings = new scopy::regmap::RegisterMapSettingsMenu(this);
+	settings = new RegisterMapSettingsMenu(this);
 	tool->rightStack()->add("settings", settings);
 	tool->setRightContainerWidth(settings->sizeHint().width());
 
@@ -55,13 +56,12 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->topContainerMenuControl()->setStyleSheet("background : transparent; ");
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu, TTA_RIGHT);
 
-	searchBarWidget = new scopy::regmap::SearchBarWidget();
+	searchBarWidget = new SearchBarWidget();
 	searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
 
-	QObject::connect(searchBarWidget, &scopy::regmap::SearchBarWidget::requestSearch, this,
-			 [=](QString searchParam) {
-				 deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
-			 });
+	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam) {
+		deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
+	});
 
 	tool->addWidgetToTopContainerHelper(searchBarWidget, TTA_LEFT);
 
@@ -102,23 +102,23 @@ void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMa
 void RegisterMapTool::toggleSettingsMenu(QString registerName, bool toggle)
 {
 	if(toggle) {
-		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::autoreadToggled,
-				 deviceList->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
-		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRead,
-				 deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRead);
-		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRegisterDump,
-				 deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
-		QObject::connect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestWrite,
-				 deviceList->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
+		QObject::connect(settings, &RegisterMapSettingsMenu::autoreadToggled, deviceList->value(registerName),
+				 &DeviceRegisterMap::toggleAutoread);
+		QObject::connect(settings, &RegisterMapSettingsMenu::requestRead, deviceList->value(registerName),
+				 &DeviceRegisterMap::requestRead);
+		QObject::connect(settings, &RegisterMapSettingsMenu::requestRegisterDump,
+				 deviceList->value(registerName), &DeviceRegisterMap::requestRegisterDump);
+		QObject::connect(settings, &RegisterMapSettingsMenu::requestWrite, deviceList->value(registerName),
+				 &DeviceRegisterMap::requestWrite);
 	} else {
-		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::autoreadToggled,
-				    deviceList->value(registerName), &regmap::DeviceRegisterMap::toggleAutoread);
-		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRead,
-				    deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRead);
-		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestRegisterDump,
-				    deviceList->value(registerName), &regmap::DeviceRegisterMap::requestRegisterDump);
-		QObject::disconnect(settings, &scopy::regmap::RegisterMapSettingsMenu::requestWrite,
-				    deviceList->value(registerName), &regmap::DeviceRegisterMap::requestWrite);
+		QObject::disconnect(settings, &RegisterMapSettingsMenu::autoreadToggled,
+				    deviceList->value(registerName), &DeviceRegisterMap::toggleAutoread);
+		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestRead, deviceList->value(registerName),
+				    &DeviceRegisterMap::requestRead);
+		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestRegisterDump,
+				    deviceList->value(registerName), &DeviceRegisterMap::requestRegisterDump);
+		QObject::disconnect(settings, &RegisterMapSettingsMenu::requestWrite, deviceList->value(registerName),
+				    &DeviceRegisterMap::requestWrite);
 	}
 }
 
