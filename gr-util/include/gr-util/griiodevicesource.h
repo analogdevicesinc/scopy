@@ -2,6 +2,7 @@
 #define GRIIODEVICESOURCE_H
 
 #include "grproxyblock.h"
+#include "iioutil/triggerhandlerimpl.h"
 #include "scopy-gr-util_export.h"
 
 #include <iio.h>
@@ -48,6 +49,9 @@ public:
 	unsigned int getBuffersize() const;
 	void setBuffersize(unsigned int newBuffersize);
 
+	void setTriggerHandler(TriggerHandlerImpl *triggerHandler);
+	TriggerHandlerImpl *getTriggerHandler();
+
 	std::vector<std::string> channelNames() const;
 
 	QString deviceName() const;
@@ -67,6 +71,8 @@ protected:
 	unsigned int m_buffersize;
 
 	gr::iio::device_source::sptr src;
+
+	TriggerHandlerImpl *m_triggerHandler;
 
 private:
 	QString m_sampleRateAttribute;

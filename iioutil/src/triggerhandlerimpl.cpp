@@ -65,8 +65,7 @@ void TriggerHandlerImpl::setTrigger(QString deviceName, QString triggerName)
 	int readbackResult = iio_device_get_trigger(device, &triggerReadback);
 
 	if(trigger == triggerReadback) {
-		qInfo(CAT_TRIGGER_HANDLER)
-			<< "Trigger" << triggerName << "is successfully set on device" << deviceName;
+		qInfo(CAT_TRIGGER_HANDLER) << "Trigger" << triggerName << "is successfully set on device" << deviceName;
 		m_connections[deviceName] = triggerName;
 	}
 
@@ -83,7 +82,7 @@ void TriggerHandlerImpl::removeTrigger(QString deviceName)
 {
 	if(!m_connections.contains(deviceName)) {
 		qWarning(CAT_TRIGGER_HANDLER) << "Cannot remove trigger from device" << deviceName
-						 << "as the device cannot be found in the list";
+					      << "as the device cannot be found in the list";
 		return;
 	}
 

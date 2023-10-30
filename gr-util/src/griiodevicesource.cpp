@@ -179,6 +179,10 @@ void GRIIODeviceSource::setBuffersize(unsigned int newBuffersize)
 	Q_EMIT requestRebuild();
 }
 
+void GRIIODeviceSource::setTriggerHandler(TriggerHandlerImpl *triggerHandler) { m_triggerHandler = triggerHandler; }
+
+scopy::TriggerHandlerImpl *GRIIODeviceSource::getTriggerHandler() { return m_triggerHandler; }
+
 std::vector<std::string> GRIIODeviceSource::channelNames() const { return m_channelNames; }
 
 QString GRIIODeviceSource::deviceName() const { return m_deviceName; }

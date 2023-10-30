@@ -2,6 +2,7 @@
 
 #include "adcinstrument.h"
 #include "gui/stylehelper.h"
+#include "iioutil/triggerhandlerimpl.h"
 
 #include <QBoxLayout>
 #include <QJsonDocument>
@@ -165,10 +166,12 @@ PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 	GRTimePlotAddonSettings *s = new GRTimePlotAddonSettings(p, this);
 
 	recipe->setPlotAddon(p, s);
+	TriggerHandlerImpl *triggerList = new TriggerHandlerImpl(m_ctx, this);
 
 	int i = 0;
 	for(const QString &iio_dev : deviceList) {
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx, iio_dev, iio_dev, 0x400, this);
+		gr_dev->setTriggerHandler(triggerList);
 		top->registerIIODeviceSource(gr_dev);
 
 		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);

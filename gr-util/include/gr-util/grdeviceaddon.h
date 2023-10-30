@@ -5,6 +5,9 @@
 #include "scopy-gr-util_export.h"
 #include "tooladdon.h"
 
+#include <iioutil/triggerhandlerimpl.h>
+#include <gui/widgets/triggermenusection.h>
+
 #include <QLabel>
 
 namespace scopy::grutil {
@@ -53,6 +56,20 @@ private:
 
 private Q_SLOTS:
 	void setBufferSize(uint32_t bufferSize);
+};
+
+class TriggerController : public QObject
+{
+	Q_OBJECT
+public:
+	explicit TriggerController(GRIIODeviceSource *src, QObject *parent = nullptr);
+
+	TriggerHandler *getTriggerHandler();
+	TriggerMenuSection *getTriggerMenuSection();
+
+private:
+	TriggerMenuSection *m_triggerMenuSection;
+	TriggerHandlerImpl *m_triggerHandler;
 };
 } // namespace scopy::grutil
 
