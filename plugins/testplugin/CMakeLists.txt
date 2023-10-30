@@ -62,6 +62,6 @@ foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopy-pluginbase scopy-gui)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopy-pluginbase scopy-gui scopy-iioutil)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)
