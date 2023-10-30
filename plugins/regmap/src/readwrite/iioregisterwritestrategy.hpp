@@ -13,13 +13,13 @@ public:
 
 private:
 	struct iio_device *dev;
-	uint32_t offset = 0;
+	uint32_t addressSpace = 0;
 
 	// IRegisterWriteStrategy interface
 public:
 	void write(uint32_t address, uint32_t val);
-	uint32_t getOffset() const;
-	void setOffset(uint32_t newOffset);
+	uint32_t getAddressSpace() const;
+	void setAddressSpace(uint32_t newAddressSpace);
 };
 } // namespace scopy::regmap
 #endif // IIOREGISTERWRITESTRATEGY_HPP

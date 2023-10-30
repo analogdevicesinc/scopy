@@ -10,8 +10,8 @@ IIORegisterWriteStrategy::IIORegisterWriteStrategy(struct iio_device *dev)
 
 void IIORegisterWriteStrategy::write(uint32_t address, uint32_t val)
 {
-	uint32_t offSetAddress = address | offset;
-	ssize_t write = iio_device_reg_write(dev, offSetAddress, val);
+	uint32_t auxAddress = address | addressSpace;
+	ssize_t write = iio_device_reg_write(dev, auxAddress, val);
 	if(write < 0) {
 		char err[1024];
 		iio_strerror(-(int)write, err, sizeof(err));
@@ -24,6 +24,6 @@ void IIORegisterWriteStrategy::write(uint32_t address, uint32_t val)
 	}
 }
 
-uint32_t IIORegisterWriteStrategy::getOffset() const { return offset; }
+uint32_t IIORegisterWriteStrategy::getAddressSpace() const { return addressSpace; }
 
-void IIORegisterWriteStrategy::setOffset(uint32_t newOffset) { offset = newOffset; }
+void IIORegisterWriteStrategy::setAddressSpace(uint32_t newAddressSpace) { addressSpace = newAddressSpace; }

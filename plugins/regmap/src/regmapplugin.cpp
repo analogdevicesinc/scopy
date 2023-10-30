@@ -170,9 +170,9 @@ bool RegmapPlugin::onConnect()
 				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
 				templatePath = xmlsPath.absoluteFilePath(templatePaths->getFileName());
 				if(templatePaths->getIsAxiCompatible()) {
-					uint32_t axiOffset = Utils::convertQStringToUint32("80000000");
-					iioReadStrategy->setOffset(axiOffset);
-					iioWriteStrategy->setOffset(axiOffset);
+					uint32_t axiAddressSpace = Utils::convertQStringToUint32("80000000");
+					iioReadStrategy->setAddressSpace(axiAddressSpace);
+					iioWriteStrategy->setAddressSpace(axiAddressSpace);
 				}
 			}
 			generateDevice(templatePath, dev, devName, iioReadStrategy, iioWriteStrategy);
