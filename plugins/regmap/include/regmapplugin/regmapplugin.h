@@ -24,7 +24,6 @@ namespace regmap {
 
 class RegisterMapTool;
 class JsonFormatedElement;
-} // namespace regmap
 
 class SCOPY_REGMAPPLUGIN_EXPORT RegmapPlugin : public QObject, public PluginBase
 {
@@ -46,7 +45,7 @@ public:
 	QWidget *getTool();
 
 	void generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
-			    regmap::IRegisterReadStrategy *readStrategy, regmap::IRegisterWriteStrategy *writeStrategy);
+			    IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy);
 
 public Q_SLOTS:
 	bool onConnect() override;
@@ -57,8 +56,9 @@ private:
 	QList<iio_device *> *m_deviceList = nullptr;
 	struct iio_device *getIioDevice(iio_context *ctx, const char *dev_name);
 	bool isBufferCapable(iio_device *dev);
-	scopy::regmap::RegisterMapTool *registerMapTool;
+	RegisterMapTool *registerMapTool;
 };
+} // namespace regmap
 } // namespace scopy
 
 #endif // REGMAPPLUGIN_H
