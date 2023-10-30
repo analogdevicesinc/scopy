@@ -12,10 +12,10 @@ IIORegisterReadStrategy::IIORegisterReadStrategy(struct iio_device *dev)
 
 void IIORegisterReadStrategy::read(uint32_t address)
 {
-	uint32_t offSetAddress = address | offset;
+	uint32_t auxAddress = address | addressSpace;
 	uint32_t reg_val;
 
-	ssize_t read = iio_device_reg_read(dev, offSetAddress, &reg_val);
+	ssize_t read = iio_device_reg_read(dev, auxAddress, &reg_val);
 	if(read < 0) {
 		char err[1024];
 		iio_strerror(-(int)read, err, sizeof(err));
@@ -28,6 +28,6 @@ void IIORegisterReadStrategy::read(uint32_t address)
 	}
 }
 
-uint32_t IIORegisterReadStrategy::getOffset() const { return offset; }
+uint32_t IIORegisterReadStrategy::getAddressSpace() const { return addressSpace; }
 
-void IIORegisterReadStrategy::setOffset(uint32_t newOffset) { offset = newOffset; }
+void IIORegisterReadStrategy::setAddressSpace(uint32_t newAddressSpace) { addressSpace = newAddressSpace; }
