@@ -84,7 +84,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		tableHeadWidget->setLayout(tableHeadWidgetLayout);
 
 		QWidget *registerTableHead = new QWidget(tableHeadWidget);
-		scopy::regmap::RegmapStyleHelper::widgetidthRoundCornersStyle(registerTableHead);
+		RegmapStyleHelper::widgetidthRoundCornersStyle(registerTableHead);
 
 		QHBoxLayout *registerTableHeadLayout = new QHBoxLayout(registerTableHead);
 		registerTableHeadLayout->setSpacing(0);
@@ -95,7 +95,7 @@ DeviceRegisterMap::DeviceRegisterMap(RegisterMapTemplate *registerMapTemplate, R
 		registerTableHead->setFixedWidth(180);
 
 		QWidget *colBitCount = new QWidget(tableHeadWidget);
-		scopy::regmap::RegmapStyleHelper::widgetidthRoundCornersStyle(colBitCount);
+		RegmapStyleHelper::widgetidthRoundCornersStyle(colBitCount);
 		QHBoxLayout *tableHead = new QHBoxLayout(colBitCount);
 		colBitCount->setLayout(tableHead);
 

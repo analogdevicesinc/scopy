@@ -39,6 +39,7 @@
 #endif
 
 using namespace scopy;
+using namespace regmap;
 
 bool RegmapPlugin::loadPage()
 {
@@ -147,21 +148,21 @@ bool RegmapPlugin::onConnect()
 	QVBoxLayout *layout = new QVBoxLayout(m_registerMapWidget);
 	layout->setMargin(0);
 	m_registerMapWidget->setLayout(layout);
-	scopy::regmap::Utils::applyJsonConfig();
+	Utils::applyJsonConfig();
 
 	if(m_deviceList && !m_deviceList->isEmpty()) {
-		QDir xmlsPath = scopy::regmap::Utils::setXmlPath();
-		registerMapTool = new scopy::regmap::RegisterMapTool();
+		QDir xmlsPath = Utils::setXmlPath();
+		registerMapTool = new RegisterMapTool();
 		layout->addWidget(registerMapTool);
 
 		for(int i = 0; i < m_deviceList->size(); ++i) {
 			iio_device *dev = m_deviceList->at(i);
-			regmap::IIORegisterReadStrategy *iioReadStrategy = new regmap::IIORegisterReadStrategy(dev);
-			regmap::IIORegisterWriteStrategy *iioWriteStrategy = new regmap::IIORegisterWriteStrategy(dev);
+			IIORegisterReadStrategy *iioReadStrategy = new IIORegisterReadStrategy(dev);
+			IIORegisterWriteStrategy *iioWriteStrategy = new IIORegisterWriteStrategy(dev);
 
 			QString devName = QString::fromStdString(iio_device_get_name(dev));
 			qDebug(CAT_REGMAP) << "CONNECTING TO DEVICE : " << devName;
-			regmap::JsonFormatedElement *templatePaths = scopy::regmap::Utils::getTemplate(devName);
+			JsonFormatedElement *templatePaths = Utils::getTemplate(devName);
 			qDebug(CAT_REGMAP) << "templatePaths :" << templatePaths;
 			QString templatePath = "";
 
@@ -169,7 +170,7 @@ bool RegmapPlugin::onConnect()
 				qDebug(CAT_REGMAP) << "TEMPLATE FORUND FOR DEVICE : " << devName;
 				templatePath = xmlsPath.absoluteFilePath(templatePaths->getFileName());
 				if(templatePaths->getIsAxiCompatible()) {
-					uint32_t axiOffset = regmap::Utils::convertQStringToUint32("80000000");
+					uint32_t axiOffset = Utils::convertQStringToUint32("80000000");
 					iioReadStrategy->setOffset(axiOffset);
 					iioWriteStrategy->setOffset(axiOffset);
 				}
@@ -218,21 +219,20 @@ QString RegmapPlugin::description() { return "Register map tool"; }
 QWidget *RegmapPlugin::getTool() { return m_registerMapWidget; }
 
 void RegmapPlugin::generateDevice(QString xmlPath, struct iio_device *dev, QString devName,
-				  regmap::IRegisterReadStrategy *readStrategy,
-				  regmap::IRegisterWriteStrategy *writeStrategy)
+				  IRegisterReadStrategy *readStrategy, IRegisterWriteStrategy *writeStrategy)
 {
 
-	regmap::RegisterMapTemplate *registerMapTemplate = nullptr;
+	RegisterMapTemplate *registerMapTemplate = nullptr;
 	if(!xmlPath.isEmpty()) {
-		registerMapTemplate = new regmap::RegisterMapTemplate(this);
-		regmap::XmlFileManager xmlFileManager(dev, xmlPath);
+		registerMapTemplate = new RegisterMapTemplate(this);
+		XmlFileManager xmlFileManager(dev, xmlPath);
 		auto aux = xmlFileManager.getAllRegisters();
 		if(!aux->isEmpty()) {
 			registerMapTemplate->setRegisterList(aux);
 		}
 	}
 
-	regmap::RegisterMapValues *registerMapValues = new regmap::RegisterMapValues();
+	RegisterMapValues *registerMapValues = new RegisterMapValues();
 	registerMapValues->setReadStrategy(readStrategy);
 	registerMapValues->setWriteStrategy(writeStrategy);
 

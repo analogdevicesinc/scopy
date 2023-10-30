@@ -5,7 +5,8 @@
 #include <QPushButton>
 #include <QSpinBox>
 #include <QWidget>
-
+namespace scopy {
+namespace regmap {
 class TitleSpinBox : public QWidget
 {
 	Q_OBJECT
@@ -25,5 +26,6 @@ private:
 	QLabel *titleLabel;
 	QSpinBox *spinBox = nullptr;
 };
-
+} // namespace regmap
+} // namespace scopy
 #endif // TITLESPINBOX_H
