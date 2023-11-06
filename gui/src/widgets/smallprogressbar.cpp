@@ -12,8 +12,8 @@ SmallProgressBar::SmallProgressBar(QWidget *parent)
 	setMinimum(0);
 	setMaximum(100);
 
-	connect(m_timer, &QTimer::timeout, this, [this](){
-		if (value() + m_increment <= maximum()) {
+	connect(m_timer, &QTimer::timeout, this, [this]() {
+		if(value() + m_increment <= maximum()) {
 			setValue(value() + m_increment);
 		} else {
 			setValue(minimum());
@@ -23,7 +23,8 @@ SmallProgressBar::SmallProgressBar(QWidget *parent)
 	});
 }
 
-void SmallProgressBar::startProgress(int progressDuration, int steps) {
+void SmallProgressBar::startProgress(int progressDuration, int steps)
+{
 	setValue(minimum());
 	m_increment = maximum() / steps;
 	m_timer->start(progressDuration / steps);
