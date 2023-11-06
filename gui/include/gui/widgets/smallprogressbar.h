@@ -7,11 +7,11 @@
 #include "scopy-gui_export.h"
 
 namespace scopy {
-class SCOPY_GUI_EXPORT SmallProgressBar : public QProgressBar {
+class SCOPY_GUI_EXPORT SmallProgressBar : public QProgressBar
+{
 	Q_OBJECT
 public:
 	explicit SmallProgressBar(QWidget *parent = nullptr);
-
 
 public Q_SLOTS:
 	void startProgress(int progressDurationMs = 1000, int steps = 10); // time is 1 second
@@ -23,6 +23,6 @@ private:
 	QTimer *m_timer;
 	int m_increment;
 };
-}
+} // namespace scopy
 
 #endif // SCOPY_SMALLPROGRESSBAR_H
