@@ -2,6 +2,7 @@
 
 #include "testtool.h"
 #include "tutorialoverlay.h"
+#include "attrfactory.h"
 
 #include <QBoxLayout>
 #include <QDialog>
@@ -332,7 +333,7 @@ void TestPlugin::initMetadata()
 	{
 	   "priority":2,
 	   "category":[
-	      "test"
+	      "test", "iio"
 	   ]
 	}
 )plugin");
