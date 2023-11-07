@@ -6,8 +6,6 @@
 #include <qwt_polar_curve.h>
 #include <qwt_polar_marker.h>
 
-
-
 namespace scopy {
 class PolarPlotWidget;
 class SCOPY_GUI_EXPORT PolarPlotChannel : public QObject
@@ -37,6 +35,6 @@ private:
 	QPen m_pen;
 	QwtArraySeriesData<QwtPointPolar> *m_data;
 };
-}
+} // namespace scopy
 
 #endif // POLARPLOTCHANNEL_H
