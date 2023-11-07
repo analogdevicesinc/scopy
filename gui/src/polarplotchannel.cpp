@@ -24,8 +24,7 @@ PolarPlotChannel::PolarPlotChannel(QString name, QPen pen, PolarPlotWidget *plot
 	m_curve->setData(m_data);
 }
 
-PolarPlotChannel::~PolarPlotChannel()
-{}
+PolarPlotChannel::~PolarPlotChannel() {}
 
 QwtPolarCurve *PolarPlotChannel::curve() const { return m_curve; }
 
@@ -43,7 +42,7 @@ void PolarPlotChannel::detach() { m_curve->detach(); }
 
 void PolarPlotChannel::setEnabled(bool b)
 {
-	if (b) {
+	if(b) {
 		m_curve->attach(m_plot);
 	} else {
 		m_curve->detach();
