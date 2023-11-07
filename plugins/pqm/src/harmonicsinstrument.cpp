@@ -1,0 +1,235 @@
+#include "harmonicsinstrument.h"
+#include "plotaxis.h"
+#include "qheaderview.h"
+
+#include <gui/stylehelper.h>
+#include <gui/widgets/menuheader.h>
+#include <gui/widgets/menucombo.h>
+#include <gui/widgets/verticalchannelmanager.h>
+#include <gui/widgets/menucontrolbutton.h>
+
+using namespace scopy::pqm;
+
+HarmonicsInstrument::HarmonicsInstrument(QWidget *parent)
+	: QWidget(parent)
+{
+	initData();
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QHBoxLayout *instrumentLayout = new QHBoxLayout(this);
+	setLayout(instrumentLayout);
+	StyleHelper::GetInstance()->initColorMap();
+
+	ToolTemplate *tool = new ToolTemplate(this);
+	tool->topContainer()->setVisible(true);
+	tool->centralContainer()->setVisible(true);
+	tool->bottomContainer()->setVisible(true);
+	tool->rightContainer()->setVisible(true);
+	tool->openRightContainerHelper(false);
+	tool->topContainerMenuControl()->setVisible(false);
+	instrumentLayout->addWidget(tool);
+
+	createThdWidget(tool);
+	initTable();
+	tool->addWidgetToCentralContainerHelper(m_table);
+
+	m_plot = new PlotWidget(this);
+	setupPlotChannels();
+	initPlot();
+	tool->addWidgetToCentralContainerHelper(m_plot);
+
+	GearBtn *settingsMenuBtn = new GearBtn(this);
+	QWidget *settingsMenu = createSettingsMenu();
+	HoverWidget *menuHover = new HoverWidget(settingsMenu, settingsMenuBtn, tool);
+	menuHover->setAnchorPos(HoverPosition::HP_BOTTOMRIGHT);
+	menuHover->setContentPos(HoverPosition::HP_BOTTOMLEFT);
+	menuHover->setAnchorOffset({0, 10});
+	connect(settingsMenuBtn, &QPushButton::toggled, this, [=, this](bool b) {
+		menuHover->setVisible(b);
+		menuHover->raise();
+	});
+
+	m_runBtn = new RunBtn(this);
+	m_singleBtn = new SingleShotBtn(this);
+	tool->addWidgetToTopContainerHelper(m_runBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(m_singleBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(settingsMenuBtn, TTA_RIGHT);
+	connect(this, &HarmonicsInstrument::runTme, m_runBtn, &QAbstractButton::setChecked);
+	connect(m_runBtn, &QAbstractButton::toggled, m_singleBtn, &QAbstractButton::setDisabled);
+	connect(m_runBtn, SIGNAL(toggled(bool)), this, SIGNAL(enableTool(bool)));
+	connect(m_singleBtn, &QAbstractButton::toggled, m_runBtn, &QAbstractButton::setDisabled);
+	connect(m_singleBtn, SIGNAL(toggled(bool)), this, SIGNAL(enableTool(bool)));
+}
+
+HarmonicsInstrument::~HarmonicsInstrument()
+{
+	m_xTime.clear();
+	m_yValues.clear();
+	m_labels.clear();
+	m_plotChnls.clear();
+}
+
+void HarmonicsInstrument::initTable()
+{
+	m_table = new QTableWidget(MAX_CHNLS, HARMONICS_MAX_DEGREE, this);
+
+	m_table->setVerticalHeaderLabels(m_chnls.keys());
+	m_table->verticalHeader()->setDefaultAlignment(Qt::AlignCenter);
+	m_table->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	m_table->setFixedHeight(220);
+	StyleHelper::TableViewWidget(m_table->parentWidget(), "HarmonicsTable");
+	for(int i = 0; i < MAX_CHNLS; i++) {
+		for(int j = 0; j < HARMONICS_MAX_DEGREE; j++) {
+			m_table->setItem(i, j, new QTableWidgetItem());
+		}
+	}
+}
+
+void HarmonicsInstrument::initPlot()
+{
+	m_plot->yAxis()->setInterval(0, 100);
+	m_plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	m_plot->yAxis()->scaleDraw()->setFloatPrecision(2);
+	m_plot->yAxis()->scaleDraw()->setUnitType("%");
+	m_plot->setShowYAxisLabels(true);
+	m_plot->yAxis()->setVisible(true);
+
+	m_plot->xAxis()->setInterval(1, HARMONICS_MAX_DEGREE);
+	m_plot->xAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
+	m_plot->xAxis()->scaleDraw()->setFloatPrecision(0);
+	m_plot->xAxis()->scaleDraw()->setUnitType("");
+	m_plot->setShowXAxisLabels(true);
+	m_plot->xAxis()->setVisible(true);
+	m_plot->replot();
+}
+
+void HarmonicsInstrument::setupPlotChannels()
+{
+	int chNumber = 0;
+	bool first = true;
+	for(const QString &ch : m_chnls) {
+		QPen chPen = QPen(QColor(StyleHelper::getColor("CH" + QString::number(chNumber))), 1);
+		PlotChannel *plotCh =
+			new PlotChannel(m_chnls.key(ch), chPen, m_plot, m_plot->xAxis(), m_plot->yAxis(), this);
+		plotCh->setStyle(PlotChannel::PCS_STICKS);
+		plotCh->setThickness(10);
+		plotCh->curve()->setRawSamples(m_xTime.data(), m_yValues[ch].data(), m_xTime.size());
+		m_plotChnls[ch] = plotCh;
+		if(first) {
+			plotCh->setEnabled(true);
+			m_plot->selectChannel(plotCh);
+			first = false;
+		}
+		chNumber++;
+	}
+}
+
+void HarmonicsInstrument::createThdWidget(ToolTemplate *tool)
+{
+	QWidget *thdWidget = new QWidget(this);
+	thdWidget->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	QGridLayout *layout = new QGridLayout(thdWidget);
+
+	QLabel *title = new QLabel("THD:", this);
+	layout->addWidget(title);
+	int row = 1;
+	int chnlIdx = 0;
+	for(const QString &ch : m_chnls) {
+		MeasurementLabel *ml = new MeasurementLabel(this);
+		QString color = StyleHelper::getColor("CH" + QString::number(chnlIdx));
+		ml->setColor(QColor(color));
+		ml->setName(m_chnls.key(ch));
+		ml->setPrecision(7);
+		m_labels[ch] = ml;
+		layout->addWidget(ml, row, chnlIdx);
+		chnlIdx++;
+	}
+	tool->addWidgetToCentralContainerHelper(thdWidget);
+}
+
+void HarmonicsInstrument::updateTable()
+{
+	int i = 0;
+	for(const QString &ch : m_chnls) {
+		for(int j = 0; j < HARMONICS_MAX_DEGREE; j++) {
+			QTableWidgetItem *item = m_table->item(i, j);
+			item->setText(QString::number(m_yValues[ch][j]));
+		}
+		i++;
+	}
+}
+
+void HarmonicsInstrument::onActiveChnlChannged(QString chnlId)
+{
+	QString ctxCh = m_chnls[chnlId];
+	if(m_plotChnls.contains(ctxCh)) {
+		PlotChannel *ch = m_plotChnls[ctxCh];
+		if(m_plot->selectedChannel()) {
+			m_plot->selectedChannel()->setEnabled(false);
+		}
+		ch->setEnabled(true);
+		m_plot->selectChannel(ch);
+		m_plot->replot();
+	}
+}
+
+QWidget *HarmonicsInstrument::createSettingsMenu()
+{
+	QWidget *menu = new QWidget(this);
+	menu->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	menu->setFixedWidth(185);
+	menu->setStyleSheet("background-color:" + StyleHelper::getColor("UIElementBackground"));
+
+	QVBoxLayout *lay = new QVBoxLayout(menu);
+	MenuCombo *harmonicType = new MenuCombo(tr("Harmonics Type"), this);
+	harmonicType->combo()->addItem("harmonics");
+	harmonicType->combo()->addItem("inter_harmonics");
+	m_harmonicsType = harmonicType->combo()->currentText();
+	connect(harmonicType->combo(), &QComboBox::currentTextChanged, this,
+		[=, this](QString h) { m_harmonicsType = h; });
+
+	MenuCombo *activeChnlCb = new MenuCombo(tr("Active channel"), this);
+	for(const QString &ch : m_chnls) {
+		activeChnlCb->combo()->addItem(m_chnls.key(ch));
+	}
+	activeChnlCb->combo()->setCurrentIndex(0);
+	m_table->selectRow(0);
+	connect(activeChnlCb->combo(), &QComboBox::currentTextChanged, this,
+		&HarmonicsInstrument::onActiveChnlChannged);
+	connect(activeChnlCb->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), m_table,
+		&QTableWidget::selectRow);
+	lay->addWidget(harmonicType);
+	lay->addWidget(activeChnlCb);
+
+	return menu;
+}
+
+void HarmonicsInstrument::initData()
+{
+	for(int i = 1; i <= HARMONICS_MAX_DEGREE; i++) {
+		m_xTime.push_back(i);
+	}
+	for(const QString &ch : m_chnls) {
+		m_yValues[ch] = std::vector<double>(50, 0);
+	}
+}
+
+void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> attr)
+{
+	if(m_runBtn->isChecked() || m_singleBtn->isChecked()) {
+		QString h = m_harmonicsType;
+		for(const QString &ch : m_chnls) {
+			QStringList harmonics = attr[ch][h].split(" ");
+			m_yValues[ch].clear();
+			for(const QString &val : qAsConst(harmonics)) {
+				m_yValues[ch].push_back(val.toDouble());
+			}
+			// thd labels update
+			m_labels[ch]->setValue(attr[ch]["thd"].toDouble());
+		}
+		updateTable();
+		m_plot->replot();
+		if(m_singleBtn->isChecked()) {
+			m_singleBtn->setChecked(false);
+		}
+	}
+}
