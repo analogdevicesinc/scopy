@@ -98,6 +98,7 @@ public:
 	static void IIOWidgetElement(QWidget *w, QString objectName = "");
 	static void IIOComboBox(QComboBox *w, QString objectName = "");
 	static void IIOLineEdit(QLineEdit *w, QString objectName = "");
+	static void TableViewWidget(QWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
