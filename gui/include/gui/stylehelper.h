@@ -93,6 +93,7 @@ public:
 	static void HoverWidget(QWidget *w, bool draggable = false, QString objectName = "");
 	static void TransparentWidget(QWidget *w, QString objectName = "");
 	static void ScopyStatusBar(QWidget *w, QString objectName = "");
+	static void TableViewWidget(QWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;

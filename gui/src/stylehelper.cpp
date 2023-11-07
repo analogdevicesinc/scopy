@@ -1048,4 +1048,24 @@ void StyleHelper::ScopyStatusBar(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::TableViewWidget(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+				QHeaderView::section {
+					font: 11pt;
+					border: 1px solid &&UIElementHighlight&&;
+					background-color:&&ScopyBackground&&;
+				}
+				QTableWidget::item {
+					border-right:1px dashed &&UIElementHighlight&&;
+					border-bottom:1px dashed &&UIElementHighlight&&;
+				}
+				)css");
+	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	style.replace("&&UIElementHighlight&&", StyleHelper::getColor("UIElementHighlight"));
+	w->setStyleSheet(style);
+}
+
 #include "moc_stylehelper.cpp"
