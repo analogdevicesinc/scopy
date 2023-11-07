@@ -135,7 +135,7 @@ void PlotChannel::raise()
 {
 	detach();
 	attach();
-	if(m_handle->handle()) {
+	if(m_handle && m_handle->handle()) {
 		m_handle->handle()->raise();
 	}
 }
