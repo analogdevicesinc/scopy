@@ -139,6 +139,7 @@ private:
 				     const QwtInterval &interval, const QSizeF &titleSize) const;
 
 	QString formatSeconds(double time) const;
+	QString shortenAnnotationText(const QString text, const double maxWidth, QPainter *painter) const;
 
 private:
 	AnnotationDecoder *m_annotationDecoder;
