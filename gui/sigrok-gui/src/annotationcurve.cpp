@@ -669,6 +669,21 @@ uint64_t AnnotationCurve::getMaxAnnotationCount(int index)
 	return count;
 }
 
+// shorten text to fit maxWidth pixels in width
+QString AnnotationCurve::shortenAnnotationText(const QString text, const double maxWidth, QPainter *painter) const
+{
+	const int padding = 12;
+	const QString extension = "...";
+	int count = 0;
+
+	// find maximum number of characters that fit
+	while(QSizeF(QwtText(text.left(count) + extension).textSize(painter->font())).width() <= maxWidth - padding) {
+		count++;
+	}
+
+	return count ? text.left(count) + extension : "";
+}
+
 void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QPainter *painter,
 					      const QwtScaleMap &xMap, const QwtScaleMap &yMap,
 					      const QRectF &canvasRect, const QwtPointMapper &mapper,
@@ -745,6 +760,11 @@ void AnnotationCurve::drawTwoSampleAnnotation(int row, const Annotation &ann, QP
 		}
 	}
 
+	if(text == "") {
+		text = shortenAnnotationText(*ann.annotations().begin(), maxWidth, painter);
+		size = QwtText(text).textSize(painter->font());
+	}
+
 	QRectF textRect(QPointF(0.0, 0.0), size);
 	textRect.moveCenter(QPointF(x, y));
 
@@ -811,6 +831,11 @@ void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QP
 			size = sz;
 			break; // found something
 		}
+	}
+
+	if(text == "") {
+		text = shortenAnnotationText(*ann.annotations().begin(), maxWidth, painter);
+		size = QwtText(text).textSize(painter->font());
 	}
 
 	QRectF textRect(QPointF(0.0, 0.0), size);
