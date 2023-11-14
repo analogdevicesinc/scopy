@@ -26,16 +26,15 @@ HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	m_lay->setSizeConstraint(QLayout::SetFixedSize);
 	m_lay->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_lay);
-	m_lay->addWidget(content);
 
-	if(m_content) {
-		setContent(m_content);
+	if(content) {
+		setContent(content);
 	}
-	if(m_anchor) {
-		setAnchor(m_anchor);
+	if(anchor) {
+		setAnchor(anchor);
 	}
-	if(m_parent) {
-		setParent(m_parent);
+	if(parent) {
+		setParent(parent);
 	}
 
 	hide();
