@@ -35,6 +35,7 @@
 #include <QScrollBar>
 #include <QStandardItem>
 #include <QTimer>
+#include <hoverwidget.h>
 
 #include <condition_variable>
 #include <gui/dropdown_switch_list.h>
@@ -186,6 +187,8 @@ private:
 	QVector<QVector<QString>> createDecoderData(bool separate_annotations);
 
 	void waitForDecoders();
+
+	HoverWidget *createHoverToolTip(QString info, QPoint position);
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
