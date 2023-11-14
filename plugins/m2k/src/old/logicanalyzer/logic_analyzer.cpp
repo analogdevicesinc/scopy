@@ -34,6 +34,7 @@
 #include "sigrok-gui/annotationcurve.h"
 #include "sigrok-gui/decoder.h"
 #include "state_updater.h"
+#include "stylehelper.h"
 
 #include "ui_cursors_settings.h"
 #include "ui_logic_analyzer.h"
@@ -1912,18 +1913,49 @@ void LogicAnalyzer::initBufferScrolling()
 
 	// When the plot is clicked emit the clicked signal on the curve
 	m_plot.setMouseTracking(true);
-	connect(&m_plot, &CapturePlot::mouseButtonRelease, [=](const QMouseEvent *event) {
+	connect(&m_plot, &CapturePlot::mouseButtonPress, [=](const QMouseEvent *event) {
 		if(event == nullptr)
 			return;
 
 		if(event->button() == Qt::LeftButton) {
-			// qDebug() << "Plot clicked" << Qt::endl;
-			if(const auto curve = m_plot.curveAt(event->pos())) {
-				const QPointF p = curve->screenPosToCurvePoint(event->pos());
-				Q_EMIT curve->clicked(p);
+			const auto curve = m_plot.curveAt(event->pos());
+
+			if(curve) {
+				const QPointF curvePos = curve->screenPosToCurvePoint(event->pos());
+				const QString annInfo = dynamic_cast<AnnotationCurve *>(curve)
+								->annotationAt(curvePos)
+								.ann->annotations()[0];
+				HoverWidget *toolTip = createHoverToolTip(annInfo, event->pos());
+
+				QTimer::singleShot(2000, toolTip, &HoverWidget::deleteLater);
+				connect(&m_plot, &CapturePlot::mouseButtonRelease, toolTip, &HoverWidget::show);
+				connect(&m_plot, &CapturePlot::mouseButtonPress, toolTip, &HoverWidget::deleteLater);
+				connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, toolTip,
+					&HoverWidget::deleteLater);
+
+				Q_EMIT curve->clicked(curvePos);
 			}
 		}
 	});
+}
+
+HoverWidget *LogicAnalyzer::createHoverToolTip(QString info, QPoint position)
+{
+	QLabel *label = new QLabel(info);
+	StyleHelper::TutorialChapterTitleLabel(label);
+
+	QWidget *content = new QWidget();
+	StyleHelper::BackgroundWidget(content);
+
+	QHBoxLayout *layout = new QHBoxLayout(content);
+	layout->addWidget(label);
+
+	HoverWidget *toolTip = new HoverWidget(content, &m_plot, QApplication::activeWindow());
+	toolTip->setAnchorPos(HoverPosition::HP_TOPLEFT);
+	toolTip->setContentPos(HoverPosition::HP_TOPLEFT);
+	toolTip->setAnchorOffset(position);
+
+	return toolTip;
 }
 
 void LogicAnalyzer::fitViewport(double min, double max)
