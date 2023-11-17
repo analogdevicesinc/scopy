@@ -2,10 +2,8 @@
 #include "qevent.h"
 
 #include <QDebug>
-#include <QLoggingCategory>
 
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_HOVERWIDGET, "HoverWidget")
 
 HoverWidget::HoverWidget(QWidget *content, QWidget *anchor, QWidget *parent)
 	: QWidget(parent)
@@ -316,7 +314,7 @@ void HoverWidget::moveToAnchor()
 		break;
 	}
 
-	qDebug(CAT_HOVERWIDGET) << "moveAnchor"
+	qDebug() << "moveAnchor"
 				<< "mapped" << mappedPoint << "contentPosition" << contentPosition << "anchorPosition"
 				<< anchorPosition << "offset" << m_anchorOffset;
 	move(mappedPoint + contentPosition + anchorPosition + m_anchorOffset);
