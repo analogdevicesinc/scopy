@@ -11,9 +11,12 @@
 namespace scopy {
 
 class CollapsableMenuControlButton;
-
 class FlexGridLayout;
+
 namespace datamonitor {
+
+class DataMonitorModel;
+class DataMonitorController;
 
 class DataMonitorTool : public QWidget
 {
@@ -35,6 +38,8 @@ private:
 
 	FlexGridLayout *m_flexGridLayout;
 	QScrollArea *m_scrollArea;
+	QMap<int, DataMonitorController *> *m_monitors;
+	void generateMonitor(DataMonitorModel *model, CollapsableMenuControlButton *channelManager);
 
 	QButtonGroup *grp;
 };
