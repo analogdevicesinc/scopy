@@ -30,8 +30,8 @@ file(
 	SRC_LIST
 	src/*.cpp
 	src/*.hpp
-	src/gui/*.cpp
-	src/gui/*.hpp
+	src/datamonitor/*.cpp
+	src/datamonitor/*.hpp
 )
 
 file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
