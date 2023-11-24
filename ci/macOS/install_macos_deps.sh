@@ -13,11 +13,6 @@ GRM2K_BRANCH=master
 QWT_BRANCH=qwt-multiaxes
 LIBSIGROKDECODE_BRANCH=master
 LIBTINYIIOD_BRANCH=master
-GLOG_BRANCH=v0.4.0
-SPDLOG_BRANCH=v1.x
-
-PYTHON="python3"
-QT_FORMULAE=qt@5
 
 PACKAGES=" ${QT_FORMULAE} volk spdlog boost pkg-config cmake fftw bison gettext autoconf automake libtool libzip glib libusb glog "
 PACKAGES="$PACKAGES doxygen wget gnu-sed libmatio dylibbundler libxml2 ghr libserialport libsndfile"
@@ -26,11 +21,14 @@ STAGING_AREA=$PWD/staging
 JOBS=-j8
 STAGINGDIR=$STAGING_AREA/dependencies
 
+OS_VERSION=${1:-$(sw_vers -productVersion)}
+echo "MacOS version $OS_VERSION"
+
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
 	brew search ${QT_FORMULAE}
-	brew install $PACKAGES
+	brew install --display-times $PACKAGES
 	for pkg in gcc bison gettext cmake python; do
 		brew link --overwrite --force $pkg
 	done
