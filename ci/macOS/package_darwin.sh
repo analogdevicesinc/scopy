@@ -4,9 +4,11 @@ STAGING_AREA=$PWD/staging
 STAGINGDIR=$STAGING_AREA/dependencies
 REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 BUILDDIR=$REPO_SRC/build
-pwd
-cd $BUILDDIR
+QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
 
+export PATH="${QT_PATH}:$PATH"
+
+cd $BUILDDIR
 
 echo "### Copy DLLs to Frameworks folder"
 mkdir -p $BUILDDIR/Scopy.app/Contents/Frameworks
@@ -39,7 +41,7 @@ sudo install_name_tool -id @executable_path/../Frameworks/${m2kid} ./Scopy.app/C
 
 
 echo "### Check available python version"
-for version in 3.8 3.9 3.10 3.11
+for version in 3.8 3.9 3.10 3.11 3.12
 do
 	if [ -e /usr/local/opt/python@$version/Frameworks/Python.framework/Versions/$version/Python ] ; then
 		pythonpath=/usr/local/opt/python@$version/Frameworks/Python.framework/Versions/$version/Python
@@ -49,7 +51,7 @@ do
 done
 
 if [ -z $pyversion ] ; then
-	echo "No Python 3.8, 3.9, 3.10, 3.11 paths found"
+	echo "No Python 3.8, 3.9, 3.10, 3.11, 3.12 paths found"
 	exit 1
 fi
 echo " - Found python$version at $pythonpath"
@@ -118,6 +120,8 @@ python_sigrokdecode=$(otool -L ./Scopy.app/Contents/Frameworks/libsigrokdecode* 
 sudo install_name_tool -change ${python_sigrokdecode} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/libsigrokdecode*
 python_scopy=$(otool -L ./Scopy.app/Contents/MacOS/Scopy | grep python | cut -d " " -f 1 | awk '{$1=$1};1')
 sudo install_name_tool -change ${python_scopy} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
+python_libscopycore=$(otool -L ./Scopy.app/Contents/Frameworks/libscopy-core.dylib | grep python | cut -d " " -f 1 | awk '{$1=$1};1')
+sudo install_name_tool -change ${python_libscopycore} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
 
 echo "=== Fixing libserialport"
 libserialportpath="$(otool -L ./Scopy.app/Contents/Frameworks/iio.framework/iio | grep libserialport | cut -d " " -f 1 | awk '{$1=$1};1')"
@@ -130,11 +134,6 @@ sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioi
 sudo install_name_tool -change ${iiorpath} @executable_path/../Frameworks/${iioid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
 sudo install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-m2k*
 sudo install_name_tool -change ${m2krpath} @executable_path/../Frameworks/${m2kid} ./Scopy.app/Contents/Frameworks/libgnuradio-scopy*
-
-if command -v brew ; then
-	QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
-	export PATH="${QT_PATH}:$PATH"
-fi
 
 echo "=== Fixing iio-emu + libtinyiiod"
 cp $REPO_SRC/iio-emu/build/iio-emu ./Scopy.app/Contents/MacOS/
