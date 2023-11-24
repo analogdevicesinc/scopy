@@ -3,17 +3,12 @@ set -ex
 
 STAGING_AREA=$PWD/staging
 STAGING_AREA_DEPS=$STAGING_AREA/dependencies
-JOBS=-j4
+JOBS=-j8
 REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 
 QT_PATH="$(brew --prefix ${QT_FORMULAE})/bin"
 export PATH="${QT_PATH}:$PATH"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH;$STAGING_AREA_DEPS;$STAGING_AREA_DEPS/lib"
-
-MACOS_VERSION=$(/usr/libexec/PlistBuddy -c "Print:ProductVersion" /System/Library/CoreServices/SystemVersion.plist)
-if [[ "$MACOS_VERSION" == "10.14."* ]] ; then
-	export MACOSX_DEPLOYMENT_TARGET=10.13
-fi
 
 build_iio-emu(){
 	echo "### Clone and Build IIO-Emulator"
