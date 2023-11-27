@@ -24,7 +24,8 @@
 #include <gui/widgets/menusectionwidget.h>
 #include <gui/widgets/toolbuttons.h>
 #include <gui/widgets/verticalchannelmanager.h>
-#include <widgets/hoverwidget.h>
+#include <gui/widgets/errorbox.h>
+#include <gui/widgets/hoverwidget.h>
 
 using namespace scopy;
 
@@ -343,9 +344,26 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	for(auto item : attrWidgets) {
 		if(item) {
 			auto container = new QFrame(channelAttrMenu);
-//			container->setStyleSheet(".QFrame {background-color: " + StyleHelper::getColor("ScopyBackground") + ";}");
-			auto header = new QLabel(item->getRecipe().data, channelAttrMenu);
-//			StyleHelper::MenuHeaderLabel(header);
+			//			container->setStyleSheet(".QFrame {background-color: " +
+			//StyleHelper::getColor("ScopyBackground") + ";}");
+			auto header = new QWidget(channelAttrMenu);
+			auto title = new QLabel(item->getRecipe().data, header);
+			auto errorBox = new ErrorBox(header);
+			header->setLayout(new QHBoxLayout(header));
+			header->layout()->addWidget(title);
+			header->layout()->addWidget(errorBox);
+			errorBox->changeColor(ErrorBox::AvailableColors::Green);
+			connect(item, &AttrWidget::currentStateChanged, this, [errorBox](int state, QString explanation) {
+				if(state == 0) {
+					errorBox->changeColor(ErrorBox::AvailableColors::Yellow);
+				} else if(state == 1) {
+					errorBox->changeColor(ErrorBox::AvailableColors::Green);
+				} else if(state == 2) {
+					errorBox->changeColor(ErrorBox::AvailableColors::Red);
+				}
+				errorBox->setToolTip(explanation);
+			});
+			//			StyleHelper::MenuHeaderLabel(header);
 			header->setContentsMargins(0, 0, 0, 0);
 
 			container->setLayout(new QVBoxLayout(container));
