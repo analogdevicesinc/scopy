@@ -38,6 +38,9 @@ void TriggerDataStrategy::save(QString data)
 			qWarning(CAT_TRIGGER_DATA_STRATEGY) << "Cannot set trigger" << data;
 		}
 	}
+
+	Q_EMIT emitStatus((int)(res));
+	requestData();
 }
 
 void TriggerDataStrategy::requestData()
