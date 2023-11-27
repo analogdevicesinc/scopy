@@ -16,6 +16,7 @@ public Q_SLOTS:
 
 Q_SIGNALS:
 	void sendData(QString data, QString dataOptions);
+	void emitStatus(int status);
 
 protected:
 	AttributeFactoryRecipe m_recipe;
