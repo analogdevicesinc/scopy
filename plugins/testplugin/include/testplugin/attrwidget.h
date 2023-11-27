@@ -43,6 +43,12 @@ public:
 	 * */
 	void setRecipe(AttributeFactoryRecipe recipe);
 
+Q_SIGNALS:
+	/**
+	 * @brief 0 - busy, 1 - correct, 2 error
+	 * */
+	void currentStateChanged(int currentState, QString explanation = "");
+
 protected:
 	attr::SaveStrategyInterface *m_saveStrategy;
 	attr::AttrUiStrategyInterface *m_uiStrategy;

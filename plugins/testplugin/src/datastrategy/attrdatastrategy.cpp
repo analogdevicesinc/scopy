@@ -24,6 +24,9 @@ void AttrDataStrategy::save(QString data)
 	if(res < 0) {
 		qWarning(CAT_ATTR_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
 	}
+
+	Q_EMIT emitStatus((int)(res));
+	requestData(); // readback
 }
 
 void AttrDataStrategy::requestData()

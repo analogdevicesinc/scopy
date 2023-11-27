@@ -28,6 +28,19 @@ AttrWidget::AttrWidget(attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStra
 	connect(m_saveStrategy, &attr::SaveStrategyInterface::saveData, m_dataStrategy,
 		&attr::DataStrategyInterface::save);
 
+	connect(m_saveStrategy, &attr::SaveStrategyInterface::saveData, this, [this](QString data) {
+		Q_EMIT currentStateChanged(0);
+		m_dataStrategy->save(data);
+	});
+
+	connect(m_dataStrategy, &attr::DataStrategyInterface::emitStatus, this, [this](int status) {
+		if (status < 0) {
+			Q_EMIT currentStateChanged(2, "Error code: " + QString::number(status));
+		} else {
+			Q_EMIT currentStateChanged(1);
+		}
+	});
+
 	connect(m_uiStrategy, &attr::AttrUiStrategyInterface::requestData, m_dataStrategy,
 		&attr::DataStrategyInterface::requestData);
 	connect(m_dataStrategy, &attr::DataStrategyInterface::sendData, m_uiStrategy,
