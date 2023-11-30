@@ -79,7 +79,10 @@ Q_SIGNALS:
 private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createXAxisMenu(QWidget *parent = nullptr);
-	QWidget *createYAxisMenu(QWidget *parent);
+	QWidget *createYAxisMenu(QWidget *parent = nullptr);
+	QWidget *createXYMenu(QWidget *parent = nullptr);
+	QWidget *createFFTMenu(QWidget *parent = nullptr);
+
 	double readSampleRate();
 
 	GRTimePlotAddon *m_plot;
@@ -95,6 +98,13 @@ private:
 
 	ScaleSpinButton *m_bufferSizeSpin;
 	ScaleSpinButton *m_plotSizeSpin;
+
+	MenuComboWidget *xy_xaxis;
+	MenuComboWidget *xy_yaxis;
+
+	MenuOnOffSwitch *fft_complex_mode;
+	MenuComboWidget *fft_i;
+	MenuComboWidget *fft_q;
 
 	PositionSpinButton *m_xmin;
 	PositionSpinButton *m_xmax;
