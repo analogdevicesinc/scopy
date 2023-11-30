@@ -43,11 +43,15 @@ QWidget *GRTimePlotAddonSettings::createMenu(QWidget *parent)
 	MenuHeaderWidget *header = new MenuHeaderWidget("PLOT", m_pen, w);
 	QWidget *xaxismenu = createXAxisMenu(w);
 	QWidget *yaxismenu = createYAxisMenu(w);
+	QWidget *fftmenu = createFFTMenu(w);
+	QWidget *xymenu = createXYMenu(w);
 	//	QWidget* curvemenu = createCurveMenu(w);
 
 	lay->addWidget(header);
 	lay->addWidget(xaxismenu);
 	lay->addWidget(yaxismenu);
+	lay->addWidget(fftmenu);
+	lay->addWidget(xymenu);
 	//	lay->addWidget(curvemenu);
 
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
@@ -273,6 +277,55 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 	return xaxiscontainer;
 }
 
+
+QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
+{
+	MenuSectionWidget *xycontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *xy = new MenuCollapseSection("X-Y", MenuCollapseSection::MHCW_NONE, xycontainer);
+	QHBoxLayout *chLayout = new QHBoxLayout(xy);
+
+	xy_xaxis = new MenuComboWidget("X-Axis",xy);
+	xy_yaxis = new MenuComboWidget("Y-Axis",xy);
+
+	chLayout->addWidget(xy_xaxis);
+	chLayout->addWidget(xy_yaxis);
+
+	xycontainer->contentLayout()->addWidget(xy);
+	xy->contentLayout()->addLayout(chLayout);
+
+	return xycontainer;
+}
+
+QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
+{
+	MenuSectionWidget *fftcontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *fft = new MenuCollapseSection("FFT", MenuCollapseSection::MHCW_NONE, fftcontainer);
+
+
+	QVBoxLayout *fftLayout = new QVBoxLayout(fft);
+	QHBoxLayout *iqLayout = new QHBoxLayout(fft);
+
+	fft_i = new MenuComboWidget("FFT Real",fft);
+	fft_q = new MenuComboWidget("FFT Imag",fft);
+
+	fft_complex_mode = new MenuOnOffSwitch("ComplexMode",fft,true);
+	fft_complex_mode->onOffswitch()->setChecked(true);
+	connect(fft_complex_mode->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b){
+		fft_q->setVisible(b);
+	});
+
+	fftLayout->addWidget(fft_complex_mode);
+	fftLayout->addLayout(iqLayout);
+	iqLayout->addWidget(fft_i);
+	iqLayout->addWidget(fft_q);
+
+
+	fftcontainer->contentLayout()->addWidget(fft);
+	fft->contentLayout()->addLayout(fftLayout);
+	return fftcontainer;
+}
+
+
 double GRTimePlotAddonSettings::sampleRate() const { return m_sampleRate; }
 
 void GRTimePlotAddonSettings::setSampleRate(double newSampleRate)
@@ -335,6 +388,14 @@ void GRTimePlotAddonSettings::onChannelAdded(ChannelAddon *t)
 {
 	channels.append(t);
 	autoscaler->addChannels(t->plotCh());
+
+	QString channelName = t->getName();
+	xy_xaxis->combo()->addItem(channelName);
+	xy_yaxis->combo()->addItem(channelName);
+
+	fft_i->combo()->addItem(channelName);
+	fft_q->combo()->addItem(channelName);
+
 }
 
 void GRTimePlotAddonSettings::onChannelRemoved(ChannelAddon *t)
