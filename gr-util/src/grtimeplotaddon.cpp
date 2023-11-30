@@ -37,12 +37,21 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	Preferences *p = Preferences::GetInstance();
 
 	this->name = name;
-	widget = new QWidget();
+	widget = new QTabWidget();
 	m_lay = new QVBoxLayout(widget);
 	m_lay->setMargin(0);
 	m_lay->setSpacing(0);
+
 	m_plotWidget = new PlotWidget(widget);
-	widget->setLayout(m_lay);
+	dynamic_cast<QTabWidget*>(widget)->addTab(m_plotWidget,"Time");
+
+	m_fftPlotWidget = new PlotWidget(widget);
+	dynamic_cast<QTabWidget*>(widget)->addTab(m_fftPlotWidget,"FFT");
+
+	m_xyPlotWidget = new PlotWidget(widget);
+	dynamic_cast<QTabWidget*>(widget)->addTab(m_xyPlotWidget,"X-Y");
+
+//	widget->setLayout(m_lay);
 
 	m_plotWidget->xAxis()->setInterval(0, 1);
 	m_plotWidget->leftHandlesArea()->setVisible(true);
@@ -54,7 +63,7 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_info = new TimePlotInfo(m_plotWidget, widget);
 	m_plotWidget->addPlotInfoSlot(m_info);
 
-	m_lay->addWidget(m_plotWidget);
+//	m_lay->addWidget(m_plotWidget);
 	m_plotTimer = new QTimer(this);
 	m_plotTimer->setSingleShot(true);
 	connect(m_plotTimer, &QTimer::timeout, this, &GRTimePlotAddon::replot);
@@ -148,6 +157,11 @@ void GRTimePlotAddon::drawPlot()
 		Q_EMIT requestStop();
 }
 
+QList<GRTimeChannelAddon *> GRTimePlotAddon::getGrChannels() const
+{
+	return grChannels;
+}
+
 void GRTimePlotAddon::onStart()
 {
 	if(!m_started) {
@@ -189,7 +203,7 @@ void GRTimePlotAddon::setRawSamplesPtr()
 								     time_sink->data()[index].size());
 
 				gr->onNewData(time_sink->time().data(), time_sink->data()[index].data(),
-					      time_sink->data()[index].size());
+						  time_sink->data()[index].size());
 
 			} else {
 				//			gr->plotCh()->curve()->setRawSamples(
@@ -282,8 +296,10 @@ void GRTimePlotAddon::connectSignalPaths()
 				      name.toStdString(), sigpaths.count());
 	time_sink->setRollingMode(m_rollingMode);
 	time_sink->setSingleShot(m_singleShot);
-	time_sink->setComputeTags(m_showPlotTags);
+	time_sink->setComputeTags(m_showPlotTags);	
 	updateXAxis();
+
+	// add fft_sink here
 
 	int i = 0;
 
