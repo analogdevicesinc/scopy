@@ -50,6 +50,8 @@ public:
 	double sampleRate() override;
 	int xMode();
 
+	QList<GRTimeChannelAddon *> getGrChannels() const;
+
 Q_SIGNALS:
 	void requestRebuild();
 	void requestStop();
@@ -97,7 +99,11 @@ private:
 	GRTopBlock *m_top;
 	QString name;
 	QWidget *widget;
+
 	PlotWidget *m_plotWidget;
+	PlotWidget *m_fftPlotWidget;
+	PlotWidget *m_xyPlotWidget;
+
 	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
 	QList<GRTimeChannelAddon *> grChannels;

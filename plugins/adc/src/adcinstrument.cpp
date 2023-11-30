@@ -48,14 +48,14 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	channelsBtn = new MenuControlButton(this);
 	setupChannelsButtonHelper(channelsBtn);
 
-	MenuControlButton *timeBtn = new MenuControlButton(this);
-	setupTimeButtonHelper(timeBtn);
+//	MenuControlButton *timeBtn = new MenuControlButton(this);
+//	setupTimeButtonHelper(timeBtn);
 
-	MenuControlButton *xyBtn = new MenuControlButton(this);
-	setupXyButtonHelper(xyBtn);
+//	MenuControlButton *xyBtn = new MenuControlButton(this);
+//	setupXyButtonHelper(xyBtn);
 
-	MenuControlButton *fftBtn = new MenuControlButton(this);
-	setupFFTButtonHelper(fftBtn);
+//	MenuControlButton *fftBtn = new MenuControlButton(this);
+//	setupFFTButtonHelper(fftBtn);
 
 	plotAddon = dynamic_cast<GRTimePlotAddon *>(proxy->getPlotAddon());
 	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
@@ -113,9 +113,9 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(xyBtn, TTA_LEFT);
-	tool->addWidgetToBottomContainerHelper(fftBtn, TTA_LEFT);
+//	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
+//	tool->addWidgetToBottomContainerHelper(xyBtn, TTA_LEFT);
+//	tool->addWidgetToBottomContainerHelper(fftBtn, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(cursor, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
