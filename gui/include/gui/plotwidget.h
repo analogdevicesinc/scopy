@@ -19,11 +19,12 @@ class PlotAxisHandle;
 
 typedef struct _PlotSamplingInfo
 {
-	_PlotSamplingInfo() { startingPoint = 0; }
+	_PlotSamplingInfo() { startingPoint = 0;  freqOffset = 0;}
 	uint32_t bufferSize;
 	uint32_t plotSize;
 	double sampleRate;
 	double startingPoint;
+	double freqOffset;
 } PlotSamplingInfo;
 
 class SCOPY_GUI_EXPORT PlotWidget : public QWidget
