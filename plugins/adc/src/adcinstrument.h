@@ -65,6 +65,7 @@ private:
 	QButtonGroup *channelGroup;
 
 	CursorController *cursorController;
+	CursorController *fftcursorController;
 
 	void setupTimeButtonHelper(MenuControlButton *time);
 	void setupXyButtonHelper(MenuControlButton *xy);
