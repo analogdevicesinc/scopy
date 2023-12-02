@@ -46,9 +46,16 @@ public:
 	bool computeTags() override;
 	void setComputeTags(bool newComputeTags) override;
 
+	float freqOffset() override;
+	void setFreqOffset(float) override;
+
+	bool fftComplex() override;
+	void setFftComplex(bool) override;
+
 	bool finishedAcquisition() override;
 
 	const std::vector<float> &time() const override;
+	const std::vector<float> &freq() const override;
 	const std::vector<std::vector<float>> &data() const override;
 	const std::vector<std::vector<PlotTag_t>> &tags() const override;
 
@@ -62,6 +69,7 @@ private:
 	std::vector<std::deque<gr::tag_t>> m_tags;
 
 	std::vector<float> m_time;
+	std::vector<float> m_freq;
 
 	std::vector<std::vector<float>> m_data;
 	std::vector<std::vector<PlotTag_t>> m_dataTags;
@@ -75,6 +83,8 @@ private:
 	bool m_workFinished;
 	bool m_dataUpdated;
 	bool m_computeTags;
+	float m_freqOffset;
+	bool m_complexFft;
 
 	void generate_time_axis();
 };

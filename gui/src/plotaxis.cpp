@@ -27,7 +27,7 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 		auto prefixFormatter = new MetricPrefixFormatter();
 		prefixFormatter->setTrimZeroes(true);
 		prefixFormatter->setTwoDecimalMode(true);
-		m_scaleDraw = new OscScaleDraw(prefixFormatter, "s");
+		m_scaleDraw = new OscScaleDraw(prefixFormatter, "");
 	} else {
 		auto prefixFormatter = new MetricPrefixFormatter();
 		prefixFormatter->setTrimZeroes(true);
@@ -128,7 +128,7 @@ void PlotAxis::setMin(double newMin)
 	if(qFuzzyCompare(m_min, newMin))
 		return;
 	m_min = newMin;
-	emit minChanged();
+	emit minChanged(newMin);
 }
 
 void PlotAxis::setMax(double newMax)
@@ -136,7 +136,7 @@ void PlotAxis::setMax(double newMax)
 	if(qFuzzyCompare(m_max, newMax))
 		return;
 	m_max = newMax;
-	emit maxChanged();
+	emit maxChanged(newMax);
 }
 
 OscScaleDraw *PlotAxis::scaleDraw() const { return m_scaleDraw; }

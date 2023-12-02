@@ -48,7 +48,6 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 
 	m_channelName = m_grch->getChannelName();
 	auto plot = plotAddon->plot();
-	;
 
 	m_plotAxis = new PlotAxis(yPlotAxisPosition, plot, pen, this);
 	m_plotCh = new PlotChannel(m_channelName, pen, plot, plot->xAxis(), m_plotAxis, this);
