@@ -53,6 +53,19 @@ void time_sink_f_impl::generate_time_axis()
 	for(int i = 0; i <= m_size; i++) {
 		m_time.push_back(timeoffset + i / m_sampleRate);
 	}
+
+	double freqoffset = m_freqOffset;
+	double rbw = m_sampleRate / m_size;
+	m_freq.clear();
+	if(m_complexFft) {
+		for(int i = 0; i < m_size; i++) {
+			m_freq.push_back(freqoffset + (i * rbw) - m_sampleRate/2);
+		}
+	} else {
+		for(int i = 0; i < m_size; i++) {
+			m_freq.push_back(freqoffset + (i * rbw));
+		}
+	}
 }
 
 time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string &name, int nconnections)
@@ -65,6 +78,7 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	, m_rollingMode(false)
 	, m_workFinished(false)
 	, m_dataUpdated(false)
+	, m_freqOffset(0)
 {
 	qInfo(CAT_TIME_SINK_F) << "ctor";
 	// reserve memory for n buffers
@@ -83,6 +97,7 @@ time_sink_f_impl::time_sink_f_impl(int size, float sampleRate, const std::string
 	}
 
 	m_time.reserve(size + 1);
+	m_freq.reserve(size + 1);
 	generate_time_axis();
 }
 
@@ -137,6 +152,8 @@ void time_sink_f_impl::setSingleShot(bool b) { m_singleShot = b; }
 bool time_sink_f_impl::finishedAcquisition() { return m_workFinished && m_dataUpdated; }
 
 const std::vector<float> &time_sink_f_impl::time() const { return m_time; }
+
+const std::vector<float> &time_sink_f_impl::freq() const { return m_freq; }
 
 const std::vector<std::vector<float>> &time_sink_f_impl::data() const { return m_data; }
 
@@ -209,4 +226,25 @@ void time_sink_f_impl::setComputeTags(bool newComputeTags)
 	//		m_localtags[i].clear();
 	//	}
 }
+
+float time_sink_f_impl::freqOffset()
+{
+	return m_freqOffset;
+}
+
+void time_sink_f_impl::setFreqOffset(float val)
+{
+	m_freqOffset = val;
+	generate_time_axis();
+}
+
+bool time_sink_f_impl::fftComplex() {
+	return m_complexFft;
+}
+
+void time_sink_f_impl::setFftComplex(bool v) {
+	m_complexFft = v;
+	generate_time_axis();
+}
+
 } // namespace scopy

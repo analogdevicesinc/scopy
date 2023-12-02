@@ -68,7 +68,7 @@ PlotWidget::PlotWidget(QWidget *parent)
 	connect(this, SIGNAL(canvasSizeChanged()), graticule, SLOT(onCanvasSizeChanged()));
 	setDisplayGraticule(false);
 
-	m_plot->plotLayout()->setAlignCanvasToScales(false);
+	m_plot->plotLayout()->setAlignCanvasToScales(true);
 	m_plot->plotLayout()->setCanvasMargin(0);
 	m_plot->plotLayout()->setSpacing(0);
 	setupZoomer();
