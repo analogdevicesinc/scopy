@@ -52,6 +52,9 @@ public:
 	double sampleRate() const;
 	void setSampleRate(double newSampleRate);
 
+	double freqOffset() const;
+	void setFreqOffset(double newFreqOffset);
+
 public Q_SLOTS:
 	void enable() override {}
 	void disable() override {}
@@ -75,6 +78,8 @@ Q_SIGNALS:
 	void showPlotTagsChanged(bool);
 	void sampleRateChanged(double);
 	void singleYMode(bool);
+	void fftComplexModeChanged(bool);
+	void freqOffsetChanged(double);
 
 private:
 	QWidget *createMenu(QWidget *parent = nullptr);
@@ -82,8 +87,10 @@ private:
 	QWidget *createYAxisMenu(QWidget *parent = nullptr);
 	QWidget *createXYMenu(QWidget *parent = nullptr);
 	QWidget *createFFTMenu(QWidget *parent = nullptr);
+	QWidget *createCurveMenu(PlotChannel *ch, QWidget *parent = nullptr);
 
 	double readSampleRate();
+	QString getComboNameFromChannelHelper(ChannelAddon *t);
 
 	GRTimePlotAddon *m_plot;
 	QList<ChannelAddon *> channels;
@@ -99,16 +106,17 @@ private:
 	ScaleSpinButton *m_bufferSizeSpin;
 	ScaleSpinButton *m_plotSizeSpin;
 
-	MenuComboWidget *xy_xaxis;
-	MenuComboWidget *xy_yaxis;
+	MenuCombo *xy_xaxis;
+	MenuCombo *xy_yaxis;
 
 	MenuOnOffSwitch *fft_complex_mode;
-	MenuComboWidget *fft_i;
-	MenuComboWidget *fft_q;
+	MenuCombo *fft_i;
+	MenuCombo *fft_q;
 
 	PositionSpinButton *m_xmin;
 	PositionSpinButton *m_xmax;
 	PositionSpinButton *m_sampleRateSpin;
+	PositionSpinButton *m_freqOffsetSpin;
 	MenuOnOffSwitch *m_rollingModeSw;
 	MenuOnOffSwitch *m_syncBufferPlot;
 	MenuOnOffSwitch *m_showTagsSw;
@@ -120,6 +128,7 @@ private:
 	uint32_t m_bufferSize;
 	uint32_t m_plotSize;
 	double m_sampleRate;
+	double m_freqOffset;
 	bool m_rollingMode;
 	bool m_showPlotTags;
 
@@ -129,6 +138,7 @@ private:
 	Q_PROPERTY(bool showPlotTags READ showPlotTags WRITE setShowPlotTags NOTIFY showPlotTagsChanged)
 
 	Q_PROPERTY(double sampleRate READ sampleRate WRITE setSampleRate NOTIFY sampleRateChanged)
+	Q_PROPERTY(double freqOffset READ freqOffset WRITE setFreqOffset NOTIFY freqOffsetChanged)
 };
 } // namespace grutil
 } // namespace scopy

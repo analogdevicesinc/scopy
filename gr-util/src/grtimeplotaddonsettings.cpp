@@ -1,6 +1,7 @@
 #include "grtimeplotaddonsettings.h"
 
 #include "grtimechanneladdon.h"
+#include "grdeviceaddon.h"
 #include "plotaxis.h"
 #include "plotwidget.h"
 
@@ -282,18 +283,109 @@ QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 {
 	MenuSectionWidget *xycontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *xy = new MenuCollapseSection("X-Y", MenuCollapseSection::MHCW_NONE, xycontainer);
-	QHBoxLayout *chLayout = new QHBoxLayout(xy);
+	QVBoxLayout *xyMenuLayout = new QVBoxLayout(xy);
+	xyMenuLayout->setMargin(0);
+	xyMenuLayout->setSpacing(10);
+	QVBoxLayout *xyLayout = new QVBoxLayout(xy);
+	xyLayout->setSpacing(10);
+	xyLayout->setMargin(0);
 
-	xy_xaxis = new MenuComboWidget("X-Axis",xy);
-	xy_yaxis = new MenuComboWidget("Y-Axis",xy);
 
-	chLayout->addWidget(xy_xaxis);
-	chLayout->addWidget(xy_yaxis);
+	xy_xaxis = new MenuCombo("X-Axis",xy);
+	xy_xaxis->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+	xy_yaxis = new MenuCombo("Y-Axis",xy);
+	xy_yaxis->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+	connect(xy_xaxis->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+
+		int xindex = -1;
+		int yindex = -1;
+		for(int i=0; i < channels.count();i++) {
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == xy_xaxis->combo()->currentText()) {
+				xindex = i;
+			}
+			if(channelName == xy_yaxis->combo()->currentText()) {
+				yindex = i;
+			}
+		}
+
+		if(xindex != -1  && yindex != -1) {
+			m_plot->setXYSource(dynamic_cast<GRTimeChannelAddon*>(channels[xindex]), dynamic_cast<GRTimeChannelAddon*>(channels[yindex]));
+		}
+	});
+
+
+	connect(xy_yaxis->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+
+		int xindex = -1;
+		int yindex = -1;
+		for(int i=0; i < channels.count();i++) {
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == xy_xaxis->combo()->currentText()) {
+				xindex = i;
+			}
+			if(channelName == xy_yaxis->combo()->currentText()) {
+				yindex = i;
+			}
+		}
+
+		if(xindex != -1  && yindex != -1) {
+			m_plot->setXYSource(dynamic_cast<GRTimeChannelAddon*>(channels[xindex]), dynamic_cast<GRTimeChannelAddon*>(channels[yindex]));
+		}
+	});
+
+
+	xyLayout->addWidget(xy_xaxis);
+	xyLayout->addWidget(xy_yaxis);
+
+	auto curve = createCurveMenu(m_plot->xyplotch(),xy);
+
 
 	xycontainer->contentLayout()->addWidget(xy);
-	xy->contentLayout()->addLayout(chLayout);
+	xy->contentLayout()->addLayout(xyMenuLayout);
+	xyMenuLayout->addLayout(xyLayout);
+	xyMenuLayout->addWidget(curve);
 
 	return xycontainer;
+}
+
+
+QWidget *GRTimePlotAddonSettings::createCurveMenu(PlotChannel*ch, QWidget *parent) {
+	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, parent);
+
+	QWidget *curveSettings = new QWidget(curve);
+	QHBoxLayout *curveSettingsLay = new QHBoxLayout(curveSettings);
+	curveSettingsLay->setMargin(0);
+	curveSettingsLay->setSpacing(10);
+	curveSettings->setLayout(curveSettingsLay);
+
+	MenuCombo *cbThicknessW = new MenuCombo("Thickness", curve);
+	auto cbThickness = cbThicknessW->combo();
+	cbThickness->addItem("1");
+	cbThickness->addItem("2");
+	cbThickness->addItem("3");
+	cbThickness->addItem("4");
+	cbThickness->addItem("5");
+
+	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this,
+			[=](int idx) { ch->setThickness(cbThickness->itemText(idx).toFloat()); });
+	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
+	auto cbStyle = cbStyleW->combo();
+	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
+	cbStyle->addItem("Dots", PlotChannel::PCS_DOTS);
+	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
+	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
+	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
+	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
+
+	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this,
+			[=](int idx) { ch->setStyle(cbStyle->itemData(idx).toInt()); });
+
+	curveSettingsLay->addWidget(cbThicknessW);
+	curveSettingsLay->addWidget(cbStyleW);
+	curve->contentLayout()->addWidget(curveSettings);
+	return curve;
 }
 
 QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
@@ -301,24 +393,104 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 	MenuSectionWidget *fftcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *fft = new MenuCollapseSection("FFT", MenuCollapseSection::MHCW_NONE, fftcontainer);
 
-
 	QVBoxLayout *fftLayout = new QVBoxLayout(fft);
-	QHBoxLayout *iqLayout = new QHBoxLayout(fft);
+	fftLayout->setMargin(0);
+	fftLayout->setSpacing(10);
 
-	fft_i = new MenuComboWidget("FFT Real",fft);
-	fft_q = new MenuComboWidget("FFT Imag",fft);
+	QVBoxLayout *iqLayout = new QVBoxLayout(fft);
+	iqLayout->setMargin(0);
+	iqLayout->setSpacing(10);
+
+	fft_i = new MenuCombo("FFT Real",fft);
+	fft_i->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+	fft_q = new MenuCombo("FFT Imag",fft);
+	fft_q->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
 	fft_complex_mode = new MenuOnOffSwitch("ComplexMode",fft,true);
-	fft_complex_mode->onOffswitch()->setChecked(true);
+	fft_complex_mode->onOffswitch()->setChecked(false);
+	fft_q->setVisible(false);
 	connect(fft_complex_mode->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b){
 		fft_q->setVisible(b);
+		Q_EMIT fftComplexModeChanged(b);
 	});
+
+	connect(fft_i->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+
+		int iindex = -1;
+		int qindex = -1;
+		for(int i=0; i < channels.count();i++) {
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == fft_i->combo()->currentText()) {
+				iindex = i;
+			}
+			if(channelName == fft_q->combo()->currentText()) {
+				qindex = i;
+			}
+		}
+
+		if(iindex != -1  && qindex != -1)
+			m_plot->setFFTSource(dynamic_cast<GRTimeChannelAddon*>(channels[iindex]), dynamic_cast<GRTimeChannelAddon*>(channels[qindex]));
+	});
+
+
+	connect(fft_q->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
+
+		int iindex = -1;
+		int qindex = -1;
+		for(int i=0; i < channels.count();i++) {
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == fft_i->combo()->currentText()) {
+				iindex = i;
+			}
+			if(channelName == fft_q->combo()->currentText()) {
+				qindex = i;
+			}
+		}
+
+		if(iindex != -1  && qindex != -1) {
+			m_plot->setFFTSource(dynamic_cast<GRTimeChannelAddon*>(channels[iindex]), dynamic_cast<GRTimeChannelAddon*>(channels[qindex]));
+		}
+	});
+
+
+	m_freqOffsetSpin = new PositionSpinButton(
+		{
+		 {"Hz", 1e0},
+		 {"kHz", 1e3},
+		 {"MHz", 1e6},
+		 {"GHz", 1e9},
+		 },
+		"Frequency Offset", 0, (double)((long)1 << 40), false, false, fft);
+
+	m_freqOffsetSpin->setEnabled(true);
+	connect(m_freqOffsetSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setFreqOffset(val); });
+	connect(this, &GRTimePlotAddonSettings::freqOffsetChanged, m_freqOffsetSpin, &PositionSpinButton::setValue);
+	connect(this, &GRTimePlotAddonSettings::freqOffsetChanged, m_plot, &GRTimePlotAddon::setFreqOffset);
+	connect(this, &GRTimePlotAddonSettings::fftComplexModeChanged,m_plot, &GRTimePlotAddon::setComplexMode);
 
 	fftLayout->addWidget(fft_complex_mode);
 	fftLayout->addLayout(iqLayout);
 	iqLayout->addWidget(fft_i);
 	iqLayout->addWidget(fft_q);
 
+	auto m_fftwindow = new MenuCombo("Window",fft);
+	m_fftwindow->combo()->addItem("Hamming",0);
+	m_fftwindow->combo()->addItem("Hann",1);
+	m_fftwindow->combo()->addItem("Blackman",2);
+	m_fftwindow->combo()->addItem("Rectangular",3);
+	m_fftwindow->combo()->addItem("Blackman-Harris",5);
+	m_fftwindow->combo()->addItem("Bartlett",6);
+	m_fftwindow->combo()->addItem("Flattop",7);
+//	m_fftwindow->combo()->addItem("None",-1);
+
+	connect(m_fftwindow->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx) {
+		m_plot->setFftWindow(m_fftwindow->combo()->itemData(idx).toInt());
+	});
+
+	fftLayout->addWidget(m_fftwindow);
+	fftLayout->addWidget(m_freqOffsetSpin);
+	auto curve = createCurveMenu(m_plot->fftplotch(),fft);
+	fftLayout->addWidget(curve);
 
 	fftcontainer->contentLayout()->addWidget(fft);
 	fft->contentLayout()->addLayout(fftLayout);
@@ -379,17 +551,30 @@ void GRTimePlotAddonSettings::onInit()
 	m_singleYModeSw->setEnabled(true);
 	m_singleYModeSw->onOffswitch()->setChecked(false);
 	m_autoscaleBtn->setEnabled(false);
+
+	fft_complex_mode->onOffswitch()->setChecked(false);
 	//	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
 void GRTimePlotAddonSettings::onDeinit() {}
+
+QString GRTimePlotAddonSettings::getComboNameFromChannelHelper(ChannelAddon *t) {
+	GRTimeChannelAddon* grch = dynamic_cast<GRTimeChannelAddon*>(t);
+	QString suffix = "";
+	if(grch) {
+		suffix= " @ " + grch->getDevice()->getName();
+	}
+
+	return t->getName() + suffix;
+}
 
 void GRTimePlotAddonSettings::onChannelAdded(ChannelAddon *t)
 {
 	channels.append(t);
 	autoscaler->addChannels(t->plotCh());
 
-	QString channelName = t->getName();
+	QString channelName = getComboNameFromChannelHelper(t);
+
 	xy_xaxis->combo()->addItem(channelName);
 	xy_yaxis->combo()->addItem(channelName);
 
@@ -402,6 +587,19 @@ void GRTimePlotAddonSettings::onChannelRemoved(ChannelAddon *t)
 {
 	channels.removeAll(t);
 	autoscaler->addChannels(t->plotCh());
+
+	QString channelName = getComboNameFromChannelHelper(t);
+	int idx = 0;
+	for(idx=0; xy_xaxis->combo()->itemText(idx) != channelName;idx++);
+	xy_xaxis->combo()->removeItem(idx);
+	for(idx=0; xy_xaxis->combo()->itemText(idx) != channelName;idx++);
+	xy_yaxis->combo()->removeItem(idx);
+
+	for(idx=0; xy_xaxis->combo()->itemText(idx) != channelName;idx++);
+	fft_i->combo()->removeItem(idx);
+	for(idx=0; xy_xaxis->combo()->itemText(idx) != channelName;idx++);
+	fft_q->combo()->removeItem(idx);
+
 }
 
 double GRTimePlotAddonSettings::readSampleRate()
@@ -417,6 +615,19 @@ double GRTimePlotAddonSettings::readSampleRate()
 		break;
 	}
 	return sr;
+}
+
+double GRTimePlotAddonSettings::freqOffset() const
+{
+	return m_freqOffset;
+}
+
+void GRTimePlotAddonSettings::setFreqOffset(double newFreqOffset)
+{
+	if (qFuzzyCompare(m_freqOffset, newFreqOffset))
+		return;
+	m_freqOffset = newFreqOffset;
+	emit freqOffsetChanged(newFreqOffset);
 }
 
 void GRTimePlotAddonSettings::preFlowBuild()
@@ -467,3 +678,4 @@ void GRTimePlotAddonSettings::showPlotLabels(bool b)
 QString GRTimePlotAddonSettings::getName() { return name; }
 
 QWidget *GRTimePlotAddonSettings::getWidget() { return widget; }
+
