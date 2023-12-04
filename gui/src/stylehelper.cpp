@@ -1069,4 +1069,21 @@ void StyleHelper::ScopyStatusBar(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::IIOWidget(QWidget *w, QString objectName)
+{
+	if (!objectName.isEmpty()) {
+		w->setObjectName(objectName);
+	}
+
+	w->layout()->setContentsMargins(10, 10, 10, 10);
+	QString style = QString(R"css(
+		background-color: &&UIElementBackground&&;
+		border-radius: 4px;
+		margin-bottom: 3px;
+	)css");
+
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
 #include "moc_stylehelper.cpp"

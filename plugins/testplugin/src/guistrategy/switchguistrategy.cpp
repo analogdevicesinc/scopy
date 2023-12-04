@@ -1,6 +1,9 @@
 #include "guistrategy/switchguistrategy.h"
+#include <QLoggingCategory>
 
 using namespace scopy::attr;
+
+Q_LOGGING_CATEGORY(CAT_SWITCHGUISTRATEGY, "SwitchGuiStrategy")
 
 SwitchAttrUi::SwitchAttrUi(AttributeFactoryRecipe recipe, QObject *parent)
 	: m_ui(new QWidget(nullptr))
@@ -20,7 +23,11 @@ SwitchAttrUi::SwitchAttrUi(AttributeFactoryRecipe recipe, QObject *parent)
 	});
 }
 
-SwitchAttrUi::~SwitchAttrUi() { m_ui->deleteLater(); }
+SwitchAttrUi::~SwitchAttrUi()
+{
+	delete m_optionsList;
+	m_ui->deleteLater();
+}
 
 QWidget *SwitchAttrUi::ui() { return m_ui; }
 
@@ -34,7 +41,15 @@ bool SwitchAttrUi::isValid()
 
 void SwitchAttrUi::receiveData(QString currentData, QString optionalData)
 {
+	QSignalBlocker blocker(m_menuBigSwitch);
 	QStringList optionsList = QString(optionalData).split(" ", Qt::SkipEmptyParts);
+	if(optionsList.size() < 2) {
+		qWarning(CAT_SWITCHGUISTRATEGY) << "Received less than 2 options, should this be a switch?";
+		return;
+	}
+	if(optionsList.size() > 2) {
+		qDebug(CAT_SWITCHGUISTRATEGY) << "Received more than 2 options, only the first 2 will be used.";
+	}
 	*m_optionsList = optionsList;
 	m_menuBigSwitch->setOnText(optionsList[0]);
 	m_menuBigSwitch->setOffText(optionsList[1]);

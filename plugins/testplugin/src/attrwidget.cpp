@@ -2,29 +2,25 @@
 
 using namespace scopy;
 
-AttrWidget::AttrWidget(QString title, attr::AttrUiStrategyInterface *uiStrategy,
-		       attr::SaveStrategyInterface *saveStrategy, attr::DataStrategyInterface *dataStrategy,
-		       QWidget *parent)
+AttrWidget::AttrWidget(attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy,
+		       attr::DataStrategyInterface *dataStrategy, QWidget *parent)
 	: QWidget(parent)
 	, m_uiStrategy(uiStrategy)
 	, m_saveStrategy(saveStrategy)
 	, m_dataStrategy(dataStrategy)
-	, m_menuSectionWidget(new MenuSectionWidget(this))
-	, m_collapseSection(new MenuCollapseSection(title.toUpper(), MenuCollapseSection::MHCW_NONE, this))
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-	layout()->addWidget(m_menuSectionWidget);
-	m_menuSectionWidget->contentLayout()->addWidget(m_collapseSection);
-	QWidget *ui = m_uiStrategy->ui();
+
+	QWidget *ui = uiStrategy->ui();
 	if(ui) {
-		m_collapseSection->contentLayout()->addWidget(ui);
+		layout()->addWidget(ui);
 	}
 
-	QWidget *saveUi = m_saveStrategy->ui();
+	QWidget *saveUi = saveStrategy->ui();
 	if(saveUi) {
-		m_collapseSection->contentLayout()->addWidget(saveUi);
+		layout()->addWidget(saveUi);
 	}
 
 	connect(m_uiStrategy, &attr::AttrUiStrategyInterface::emitData, m_saveStrategy,
@@ -45,5 +41,9 @@ attr::SaveStrategyInterface *AttrWidget::getSaveStrategy() { return m_saveStrate
 attr::AttrUiStrategyInterface *AttrWidget::getUiStrategy() { return m_uiStrategy; }
 
 attr::DataStrategyInterface *AttrWidget::getDataStrategy() { return m_dataStrategy; }
+
+AttributeFactoryRecipe AttrWidget::getRecipe() { return m_recipe; }
+
+void AttrWidget::setRecipe(AttributeFactoryRecipe recipe) { m_recipe = recipe; }
 
 #include "moc_attrwidget.cpp"

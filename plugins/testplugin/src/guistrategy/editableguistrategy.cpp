@@ -4,16 +4,16 @@ using namespace scopy::attr;
 
 EditableGuiStrategy::EditableGuiStrategy(AttributeFactoryRecipe recipe, QObject *parent)
 	: m_ui(new QWidget(nullptr))
-	, m_lineEdit(new MenuLineEdit(m_ui))
+	, m_lineEdit(new QLineEdit(m_ui))
 {
 	setParent(parent);
 	m_recipe = std::move(recipe);
 
 	m_ui->setLayout(new QVBoxLayout(m_ui));
+	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 	m_ui->layout()->addWidget(m_lineEdit);
 
-	connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this,
-		[this]() { Q_EMIT emitData(m_lineEdit->edit()->text()); });
+	connect(m_lineEdit, &QLineEdit::editingFinished, this, [this]() { Q_EMIT emitData(m_lineEdit->text()); });
 
 	Q_EMIT requestData();
 }
@@ -32,7 +32,8 @@ bool EditableGuiStrategy::isValid()
 
 void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 {
-	m_lineEdit->edit()->setText(currentData);
+	QSignalBlocker blocker(m_lineEdit);
+	m_lineEdit->setText(currentData);
 }
 
 #include "moc_editableguistrategy.cpp"
