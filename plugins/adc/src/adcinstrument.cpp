@@ -75,7 +75,7 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 
 	cursorController = new CursorController(plotAddon->plot(), this);
 	fftcursorController = new CursorController(plotAddon->fftplot(), this);
-	fftcursorController->getCursorSettings()->hide();
+	fftcursorController->getCursorSettings()->hide();	
 
 	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
@@ -179,7 +179,14 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);
 	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
-	connect(cursor, &QAbstractButton::toggled, fftcursorController, &CursorController::setVisible);
+	connect(cursor, &QAbstractButton::toggled, this, [=](bool b){
+//		fftcursorController->setVisible(b);
+
+//		plotAddon->fftplot()->leftHandlesArea()->setVisible(true);
+//		plotAddon->fftplot()->bottomHandlesArea()->setVisible(b);
+//		plotAddon->fftplot()->bottomHandlesArea()->setLeftPadding(60);
+	}
+	);
 	connect(measure, &MenuControlButton::toggled, this, &AdcInstrument::showMeasurements);
 
 	channelStack->show("voltage02");

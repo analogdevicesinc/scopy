@@ -51,6 +51,8 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 
 /////
 	m_fftPlotWidget = new PlotWidget(widget);
+	m_fftPlotWidget->xAxis()->setVisible(false);
+	m_fftPlotWidget->yAxis()->setVisible(false);
 	dynamic_cast<QTabWidget*>(widget)->addTab(m_fftPlotWidget,"FFT");
 	QPen fftchannel_pen = QPen(StyleHelper::getColor("ScopyBlue"));
 
@@ -67,11 +69,14 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_fft_channel->setEnabled(true);
 	m_fftPlotWidget->selectChannel(m_fft_channel);
 	m_fftPlotWidget->replot();
-//	m_fftPlotWidget->bottomHandlesArea()->setVisible(true);
+
+	m_fftPlotWidget->setShowXAxisLabels(true);
+	m_fftPlotWidget->setShowYAxisLabels(true);
+	m_fftPlotWidget->showAxisLabels();
 
 	////
 	m_xyPlotWidget = new PlotWidget(widget);
-	dynamic_cast<QTabWidget*>(widget)->addTab(m_xyPlotWidget,"X-Y");	
+	dynamic_cast<QTabWidget*>(widget)->addTab(m_xyPlotWidget,"X-Y");
 	QPen xychannel_pen = QPen(StyleHelper::getColor("ScopyBlue"));
 
 	xy_xPlotAxis = new PlotAxis(QwtAxis::XBottom, m_xyPlotWidget, xychannel_pen);
@@ -88,6 +93,9 @@ GRTimePlotAddon::GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent)
 	m_xyPlotWidget->selectChannel(m_xy_channel);
 	m_xyPlotWidget->replot();
 
+	m_xyPlotWidget->setShowXAxisLabels(true);
+	m_xyPlotWidget->setShowYAxisLabels(true);
+	m_xyPlotWidget->showAxisLabels();
 
 //	widget->setLayout(m_lay);
 
@@ -415,15 +423,15 @@ void GRTimePlotAddon::connectSignalPaths()
 			time_channel_map.insert(gr->signalPath()->name(), i);
 
 			if(!fftComplexMode) {
-				if(gr->getName() == m_fft_source[0]->getName()) {
+				if(gr == m_fft_source[0]) {
 					m_top->connect(gr->signalPath()->getGrEndPoint(),0,f2c,0);
 					m_top->connect(gr->signalPath()->getGrEndPoint(),0,f2c,1);
 				}
 			} else {
-				if(gr->getName() == m_fft_source[0]->getName()) {
+				if(gr == m_fft_source[0]) {
 					m_top->connect(gr->signalPath()->getGrEndPoint(),0,f2c,0);
 				}
-				if(gr->getName() == m_fft_source[1]->getName()) {
+				if(gr == m_fft_source[1]) {
 					m_top->connect(gr->signalPath()->getGrEndPoint(),0,f2c,1);
 				}
 			}

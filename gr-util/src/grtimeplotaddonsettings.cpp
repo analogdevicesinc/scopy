@@ -1,6 +1,7 @@
 #include "grtimeplotaddonsettings.h"
 
 #include "grtimechanneladdon.h"
+#include "grdeviceaddon.h"
 #include "plotaxis.h"
 #include "plotwidget.h"
 
@@ -285,27 +286,33 @@ QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 	QVBoxLayout *xyMenuLayout = new QVBoxLayout(xy);
 	xyMenuLayout->setMargin(0);
 	xyMenuLayout->setSpacing(10);
-	QHBoxLayout *xyLayout = new QHBoxLayout(xy);
+	QVBoxLayout *xyLayout = new QVBoxLayout(xy);
 	xyLayout->setSpacing(10);
 	xyLayout->setMargin(0);
 
 
 	xy_xaxis = new MenuCombo("X-Axis",xy);
+	xy_xaxis->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	xy_yaxis = new MenuCombo("Y-Axis",xy);
+	xy_yaxis->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
 	connect(xy_xaxis->combo(), qOverload<int>(&QComboBox::currentIndexChanged), this, [=](int idx){
 
 		int xindex = -1;
 		int yindex = -1;
 		for(int i=0; i < channels.count();i++) {
-			if(channels[i]->getName() == xy_xaxis->combo()->currentText())
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == xy_xaxis->combo()->currentText()) {
 				xindex = i;
-			if(channels[i]->getName() == xy_yaxis->combo()->currentText())
+			}
+			if(channelName == xy_yaxis->combo()->currentText()) {
 				yindex = i;
+			}
 		}
 
-		if(xindex != -1  && yindex != -1)
+		if(xindex != -1  && yindex != -1) {
 			m_plot->setXYSource(dynamic_cast<GRTimeChannelAddon*>(channels[xindex]), dynamic_cast<GRTimeChannelAddon*>(channels[yindex]));
+		}
 	});
 
 
@@ -314,14 +321,18 @@ QWidget *GRTimePlotAddonSettings::createXYMenu(QWidget *parent)
 		int xindex = -1;
 		int yindex = -1;
 		for(int i=0; i < channels.count();i++) {
-			if(channels[i]->getName() == xy_xaxis->combo()->currentText())
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == xy_xaxis->combo()->currentText()) {
 				xindex = i;
-			if(channels[i]->getName() == xy_yaxis->combo()->currentText())
+			}
+			if(channelName == xy_yaxis->combo()->currentText()) {
 				yindex = i;
+			}
 		}
 
-		if(xindex != -1  && yindex != -1)
+		if(xindex != -1  && yindex != -1) {
 			m_plot->setXYSource(dynamic_cast<GRTimeChannelAddon*>(channels[xindex]), dynamic_cast<GRTimeChannelAddon*>(channels[yindex]));
+		}
 	});
 
 
@@ -386,12 +397,14 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 	fftLayout->setMargin(0);
 	fftLayout->setSpacing(10);
 
-	QHBoxLayout *iqLayout = new QHBoxLayout(fft);
+	QVBoxLayout *iqLayout = new QVBoxLayout(fft);
 	iqLayout->setMargin(0);
 	iqLayout->setSpacing(10);
 
 	fft_i = new MenuCombo("FFT Real",fft);
+	fft_i->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	fft_q = new MenuCombo("FFT Imag",fft);
+	fft_q->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 
 	fft_complex_mode = new MenuOnOffSwitch("ComplexMode",fft,true);
 	fft_complex_mode->onOffswitch()->setChecked(false);
@@ -406,10 +419,13 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 		int iindex = -1;
 		int qindex = -1;
 		for(int i=0; i < channels.count();i++) {
-			if(channels[i]->getName() == fft_i->combo()->currentText())
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == fft_i->combo()->currentText()) {
 				iindex = i;
-			if(channels[i]->getName() == fft_q->combo()->currentText())
+			}
+			if(channelName == fft_q->combo()->currentText()) {
 				qindex = i;
+			}
 		}
 
 		if(iindex != -1  && qindex != -1)
@@ -422,14 +438,18 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 		int iindex = -1;
 		int qindex = -1;
 		for(int i=0; i < channels.count();i++) {
-			if(channels[i]->getName() == fft_i->combo()->currentText())
+			QString channelName = getComboNameFromChannelHelper(channels[i]);
+			if(channelName == fft_i->combo()->currentText()) {
 				iindex = i;
-			if(channels[i]->getName() == fft_q->combo()->currentText())
+			}
+			if(channelName == fft_q->combo()->currentText()) {
 				qindex = i;
+			}
 		}
 
-		if(iindex != -1  && qindex != -1)
+		if(iindex != -1  && qindex != -1) {
 			m_plot->setFFTSource(dynamic_cast<GRTimeChannelAddon*>(channels[iindex]), dynamic_cast<GRTimeChannelAddon*>(channels[qindex]));
+		}
 	});
 
 
@@ -538,12 +558,23 @@ void GRTimePlotAddonSettings::onInit()
 
 void GRTimePlotAddonSettings::onDeinit() {}
 
+QString GRTimePlotAddonSettings::getComboNameFromChannelHelper(ChannelAddon *t) {
+	GRTimeChannelAddon* grch = dynamic_cast<GRTimeChannelAddon*>(t);
+	QString suffix = "";
+	if(grch) {
+		suffix= " @ " + grch->getDevice()->getName();
+	}
+
+	return t->getName() + suffix;
+}
+
 void GRTimePlotAddonSettings::onChannelAdded(ChannelAddon *t)
 {
 	channels.append(t);
 	autoscaler->addChannels(t->plotCh());
 
-	QString channelName = t->getName();
+	QString channelName = getComboNameFromChannelHelper(t);
+
 	xy_xaxis->combo()->addItem(channelName);
 	xy_yaxis->combo()->addItem(channelName);
 
@@ -557,7 +588,7 @@ void GRTimePlotAddonSettings::onChannelRemoved(ChannelAddon *t)
 	channels.removeAll(t);
 	autoscaler->addChannels(t->plotCh());
 
-	QString channelName = t->getName();
+	QString channelName = getComboNameFromChannelHelper(t);
 	int idx = 0;
 	for(idx=0; xy_xaxis->combo()->itemText(idx) != channelName;idx++);
 	xy_xaxis->combo()->removeItem(idx);

@@ -90,6 +90,7 @@ private:
 	QWidget *createCurveMenu(PlotChannel *ch, QWidget *parent = nullptr);
 
 	double readSampleRate();
+	QString getComboNameFromChannelHelper(ChannelAddon *t);
 
 	GRTimePlotAddon *m_plot;
 	QList<ChannelAddon *> channels;
