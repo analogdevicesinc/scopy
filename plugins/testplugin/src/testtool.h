@@ -22,6 +22,8 @@ public Q_SLOTS:
 	void acquireData();
 
 private:
+	QWidget* iioWidgetsSettingsHelper();
+
 	int testDataSize = 128;
 	double amplitude = 0.5;
 	double phase = 0;
