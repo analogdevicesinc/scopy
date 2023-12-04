@@ -42,6 +42,11 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 	// TODO on info btn click open wiki page
 
+	searchBarWidget = new SearchBarWidget();
+	searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	tool->addWidgetToTopContainerHelper(searchBarWidget, TTA_LEFT);
+	searchBarWidget->setEnabled(false);
+
 	settings = new RegisterMapSettingsMenu(this);
 	tool->rightStack()->add("settings", settings);
 	tool->setRightContainerWidth(settings->sizeHint().width());
@@ -56,15 +61,6 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->topContainerMenuControl()->setStyleSheet("background : transparent; ");
 	tool->addWidgetToTopContainerMenuControlHelper(settingsMenu, TTA_RIGHT);
 
-	searchBarWidget = new SearchBarWidget();
-	searchBarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-
-	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam) {
-		deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
-	});
-
-	tool->addWidgetToTopContainerHelper(searchBarWidget, TTA_LEFT);
-
 	registerDeviceList = new QComboBox(tool->topContainer());
 	RegmapStyleHelper::comboboxStyle(registerDeviceList);
 	registerDeviceList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -76,6 +72,10 @@ RegisterMapTool::RegisterMapTool(QWidget *parent)
 	tool->getContainerSpacer(tool->topContainer())->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
 	tool->getContainerSpacer(tool->topContainerMenuControl())
 		->changeSize(0, 0, QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+	QObject::connect(searchBarWidget, &SearchBarWidget::requestSearch, this, [=](QString searchParam) {
+		deviceList->value(registerDeviceList->currentText())->applyFilters(searchParam);
+	});
 }
 
 RegisterMapTool::~RegisterMapTool() { delete deviceList; }
@@ -96,6 +96,7 @@ void RegisterMapTool::addDevice(QString devName, RegisterMapTemplate *registerMa
 		first = false;
 		deviceList->value(devName)->show();
 		toggleSettingsMenu(devName, true);
+		toggleSearchBarEnabled(deviceList->value(devName)->hasTemplate());
 	}
 }
 
@@ -129,10 +130,10 @@ void RegisterMapTool::updateActiveRegisterMap(QString registerName)
 		toggleSettingsMenu(activeRegisterMap, false);
 		deviceList->value(registerName)->show();
 		toggleSettingsMenu(registerName, true);
-		toggleSearchBarVisible(deviceList->value(registerName)->hasTemplate());
+		toggleSearchBarEnabled(deviceList->value(registerName)->hasTemplate());
 
 		activeRegisterMap = registerName;
 	}
 }
 
-void RegisterMapTool::toggleSearchBarVisible(bool visible) { searchBarWidget->setVisible(visible); }
+void RegisterMapTool::toggleSearchBarEnabled(bool enabled) { searchBarWidget->setEnabled(enabled); }
