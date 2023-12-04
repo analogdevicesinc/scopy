@@ -16,6 +16,7 @@ public:
 	virtual double readSampleRate() override;
 
 	const iio_data_format *getFmt() const;
+	iio_channel *channel() const;
 
 protected:
 	gr::basic_block_sptr x2f;

@@ -9,6 +9,7 @@
 #include "guistrategy/guistrategyinterface.h"
 #include "savestrategy/savestrategyinterface.h"
 #include "datastrategy/datastrategyinterface.h"
+#include <scopy-gr-util_export.h>
 
 namespace scopy {
 namespace attr {
@@ -17,7 +18,7 @@ class SaveStrategyInterface;
 class DataStrategyInterface;
 } // namespace attr
 
-class AttrWidget : public QWidget
+class SCOPY_GR_UTIL_EXPORT AttrWidget : public QWidget
 {
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER

@@ -3,7 +3,7 @@
 #include "plotaxis.h"
 #include "plotwidget.h"
 #include "spinbox_a.hpp"
-#include "attrfactory.h"
+//#include "attrfactory.h"
 
 #include <QButtonGroup>
 #include <QDebug>
@@ -160,10 +160,10 @@ TestTool::TestTool(QWidget *parent)
 	QWidget *wch0 = createMenu(tool);
 	QLabel *wch1 = new QLabel("Channel1Label");
 
-	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
-	struct iio_device *device = iio_context_find_device(context, "ad74413r");
-	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
-	auto attrFactory = new AttrFactory(this);
+//	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
+//	struct iio_device *device = iio_context_find_device(context, "ad74413r");
+//	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
+//	auto attrFactory = new AttrFactory(this);
 	auto *wch2Scroll = new QScrollArea(this);
 
 	wch2Scroll->setWidgetResizable(true);
@@ -172,7 +172,7 @@ TestTool::TestTool(QWidget *parent)
 	auto *wch2 = new QWidget(this);
 	wch2Scroll->setWidget(wch2);
 	wch2->setLayout(new QVBoxLayout(wch2));
-	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
+//	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
 
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
@@ -186,17 +186,17 @@ TestTool::TestTool(QWidget *parent)
 	//	attrWidgets.append(attrFactory->buildSingle(AttrFactory::AFH::InstantSave | AttrFactory::AFH::EditableUi
 	//| 							    AttrFactory::AFH::AttrData,
 	//						    {.channel = attrChannel, .data = "offset"}));
-	attrWidgets.append(
-		attrFactory->buildSingle(AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::TriggerData,
-					 {.context = context, .device = device, .data = "device_to_set_trigger_on"}));
-	attrWidgets.append(attrFactory->buildSingle(
-		AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::FileDemoData, {.data = "The Office Cast"}));
+//	attrWidgets.append(
+//		attrFactory->buildSingle(AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::TriggerData,
+//					 {.context = context, .device = device, .data = "device_to_set_trigger_on"}));
+//	attrWidgets.append(attrFactory->buildSingle(
+//		AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::FileDemoData, {.data = "The Office Cast"}));
 
-	for(auto item : attrWidgets) {
-		if(item) {
-			wch2->layout()->addWidget(item);
-		}
-	}
+//	for(auto item : attrWidgets) {
+//		if(item) {
+//			wch2->layout()->addWidget(item);
+//		}
+//	}
 	wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
 
 	tool->rightStack()->add("ch0", wch0);

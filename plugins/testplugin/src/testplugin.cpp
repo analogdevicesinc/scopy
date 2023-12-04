@@ -2,7 +2,7 @@
 
 #include "testtool.h"
 #include "tutorialoverlay.h"
-#include "attrfactory.h"
+//#include "attrfactory.h"
 
 #include <QBoxLayout>
 #include <QDialog>

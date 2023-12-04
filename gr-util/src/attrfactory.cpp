@@ -117,4 +117,4 @@ AttrWidget *AttrFactory::buildSingle(uint32_t hint, AttributeFactoryRecipe recip
 	return attrWidget;
 }
 
-#include "moc_attrfactory.cpp"
+

@@ -9,9 +9,10 @@
 #include <iio.h>
 #include "attrdata.h"
 #include "attrwidget.h"
+#include <scopy-gr-util_export.h>
 
 namespace scopy {
-class AttrFactory : public QWidget
+class SCOPY_GR_UTIL_EXPORT AttrFactory : public QWidget
 {
 	Q_OBJECT
 public:

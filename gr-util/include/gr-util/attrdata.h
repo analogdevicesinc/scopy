@@ -3,8 +3,9 @@
 
 #include <iio.h>
 #include <QString>
+#include <scopy-gr-util_export.h>
 
-struct AttributeFactoryRecipe
+struct SCOPY_GR_UTIL_EXPORT AttributeFactoryRecipe
 {
 	struct iio_context *context = nullptr; // the context in which to search for iio structures
 	struct iio_device *device = nullptr;   // the device in which to search for iio structures

@@ -46,4 +46,4 @@ attr::AttrUiStrategyInterface *AttrWidget::getUiStrategy() { return m_uiStrategy
 
 attr::DataStrategyInterface *AttrWidget::getDataStrategy() { return m_dataStrategy; }
 
-#include "moc_attrwidget.cpp"
+

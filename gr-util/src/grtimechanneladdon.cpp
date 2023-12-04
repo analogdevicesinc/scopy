@@ -1,5 +1,7 @@
 #include "grtimechanneladdon.h"
 
+#include "attrfactory.h"
+#include "attrwidget.h"
 #include "grdeviceaddon.h"
 
 #include <QComboBox>
@@ -65,6 +67,25 @@ GRTimeChannelAddon::GRTimeChannelAddon(QString ch, GRDeviceAddon *dev, GRTimePlo
 }
 
 GRTimeChannelAddon::~GRTimeChannelAddon() {}
+
+
+QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent) {
+	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	AttrFactory *attrFactory = new AttrFactory(attrcontainer);
+	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(grch()->channel());
+
+	auto layout = new QVBoxLayout(attrcontainer);
+
+	for(auto w : attrWidgets) {
+		layout->addWidget(w);
+	}
+
+	attr->contentLayout()->addLayout(layout);
+	attrcontainer->contentLayout()->addWidget(attr);
+	attr->header()->setChecked(false);
+	return attrcontainer;
+}
 
 QWidget *GRTimeChannelAddon::createYAxisMenu(QWidget *parent)
 {
@@ -157,6 +178,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	QWidget *yaxismenu = createYAxisMenu(w);
 	QWidget *curvemenu = createCurveMenu(w);
 	QWidget *measuremenu = m_measureMgr->createMeasurementMenu(w);
+	QWidget *attrmenu = createAttrMenu(w);
 	m_snapBtn = createSnapshotButton(w);
 
 	lay->addWidget(header);
@@ -164,6 +186,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	layScroll->addWidget(yaxismenu);
 	layScroll->addWidget(curvemenu);
 	layScroll->addWidget(measuremenu);
+	layScroll->addWidget(attrmenu);
 	layScroll->addWidget(m_snapBtn);
 
 	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
