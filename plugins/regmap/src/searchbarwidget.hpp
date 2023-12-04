@@ -16,6 +16,8 @@ public:
 	explicit SearchBarWidget(QWidget *parent = nullptr);
 	~SearchBarWidget();
 
+	void setEnabled(bool enabled);
+
 Q_SIGNALS:
 	void requestSearch(QString searchParam);
 
