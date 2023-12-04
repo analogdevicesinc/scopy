@@ -179,9 +179,6 @@ public:
 	void saveSettings(QSettings &) override;
 	void loadSettings(QSettings &) override;
 
-public slots:
-	void addChannel();
-
 private:
 	iio_context *m_ctx;
 	QWidget *time;
