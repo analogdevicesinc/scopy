@@ -42,6 +42,7 @@ void RegmapStyleHelper::initColorMap()
 	sh->colorMap.insert("CheckBoxTextColor", "rgba(255, 255, 255, 153)");
 	sh->colorMap.insert("CheckBoxIndicatorBorderColor", "rgb(74,100,255)");
 	sh->colorMap.insert("ScopyOrange", "#FF7200");
+	sh->colorMap.insert("DisabledWidget", "#555555");
 }
 
 QString RegmapStyleHelper::getColor(QString id)
@@ -510,9 +511,19 @@ void RegmapStyleHelper::searchBarStyle(SearchBarWidget *searchBar, QString objec
 							border: 1px solid &&hoverBackground&& ;
 							border-radius: 4px;
 						}
+
+						QLineEdit:disabled { color: &&disabledColor&& ; }
+						QPushButton:disable {
+						background-color: qlineargradient(spread:pad, x1:0.5, y1:0, x2:0.501, y2:0, stop:0 #727273, stop:1 #141416);
+						}
+
+
+
 						)css");
+
 	style.replace("&&textColor&&", RegmapStyleHelper::getColor("LabelText"));
 	style.replace("&&hoverBackground&&", RegmapStyleHelper::getColor("ScopyBlue"));
+	style.replace("&&disabledColor&&", RegmapStyleHelper::getColor("DisabledWidget"));
 
 	style += RegmapStyleHelper::simpleWidgetStyle();
 

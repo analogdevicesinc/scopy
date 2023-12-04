@@ -46,4 +46,10 @@ SearchBarWidget::~SearchBarWidget()
 	delete searchButton;
 }
 
+void SearchBarWidget::setEnabled(bool enabled)
+{
+	this->searchBar->setEnabled(enabled);
+	this->searchButton->setVisible(enabled);
+}
+
 void SearchBarWidget::applyStyle() { RegmapStyleHelper::searchBarStyle(this); }
