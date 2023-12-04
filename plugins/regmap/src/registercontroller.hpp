@@ -41,7 +41,7 @@ private:
 	QSpinBox *addressPicker;
 	QPushButton *readButton;
 	QPushButton *writeButton;
-	QPushButton *detailedRegisterToggle;
+	QPushButton *detailedRegisterToggle = nullptr;
 	QLineEdit *regValue;
 	QLabel *addressLabel;
 	QLabel *valueLabel;
