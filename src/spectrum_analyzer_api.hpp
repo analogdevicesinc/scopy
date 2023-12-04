@@ -54,6 +54,7 @@ class SpectrumAnalyzer_API : public ApiObject
 
 	Q_PROPERTY(bool logScale READ getLogScale WRITE setLogScale)
 	Q_PROPERTY(QString notes READ getNotes WRITE setNotes)
+	Q_PROPERTY(bool waterfall_visible READ getWaterfallVisible WRITE setWaterfallVisible)
 
 public:
 	Q_INVOKABLE void show();
@@ -121,6 +122,8 @@ private:
 	QString getNotes();
 	void setNotes(QString str);
 
+	bool getWaterfallVisible() const;
+	void setWaterfallVisible(bool en);
 };
 
 class SpectrumChannel_API : public ApiObject

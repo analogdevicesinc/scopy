@@ -464,4 +464,14 @@ void SpectrumAnalyzer_API::setNotes(QString str)
 {
 	sp->ui->instrumentNotes->setNotes(str);
 }
+
+bool SpectrumAnalyzer_API::getWaterfallVisible() const
+{
+	return sp->waterfall_visible;
+}
+
+void SpectrumAnalyzer_API::setWaterfallVisible(bool en)
+{
+	sp->ui->btnToggleWaterfall->setChecked(en);
+}
 }

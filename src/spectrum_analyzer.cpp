@@ -156,7 +156,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	}), nb_ref_channels(0),
 	selected_ch_settings(-1),
 	fft_ids(nullptr),
-	m_nb_overlapping_avg(1)
+	m_nb_overlapping_avg(1),
+	use_float_sink(true)
 {
 	initInstrumentStrings();
 	// Get the list of names of the available channels
@@ -236,6 +237,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	receivedFFTData = false;
 	fft_plot = new FftDisplayPlot(m_adc_nb_channels, this);
 	fft_plot->disableLegend();
+	fft_plot->adjustHandleAreasSize();
 
 	// Disable mouse interactions with the axes until they are in a working state
 	fft_plot->setXaxisMouseGesturesEnabled(false);
@@ -264,10 +266,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	waterfall_plot->setAxisVisible(QwtAxis::XTop, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YLeft, false);
 	waterfall_plot->setAxisVisible(QwtAxis::YRight, false);
-//	waterfall_plot->setVisibleSampleCount(200);
 	waterfall_plot->setFlowDirection(WaterfallFlowDirection::DOWN);
 	waterfall_plot->enableYaxisLabels();
 	waterfall_plot->enableXaxisLabels();
+	waterfall_plot->adjustHandleAreasSize();
 	waterfall_plot->replot();
 
 	// plot widget
@@ -290,10 +292,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fftDocker = DockerUtils::createDockWidget(mainWindow, fft_plot->getPlotwithElements(), "FFT");
 	waterfallDocker = DockerUtils::createDockWidget(mainWindow, waterfall_plot->getPlotwithElements(), "Waterfall");
 
+	fftDocker->setMinimumHeight(150);
+	waterfallDocker->setMinimumHeight(150);
 
 	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, fftDocker);
 	mainWindow->addDockWidget(Qt::LeftDockWidgetArea, waterfallDocker);
-	//		mainWindow->tabifyDockWidget(fftDocker, waterfallDocker);
+	connect(ui->btnToggleWaterfall, SIGNAL(toggled(bool)), this, SLOT(waterfallToggled(bool)));
 
 #ifdef PLOT_MENU_BAR_ENABLED
 	DockerUtils::configureTopBar(fftDocker);
@@ -407,7 +411,6 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		fft_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		fft_plot->replot();
 		fft_plot->bottomHandlesArea()->repaint();
-		fft_plot->resetZoomerStack();
 
 		waterfall_plot->setAxisScale(QwtAxis::XBottom, start, stop);
 		waterfall_sink->set_frequency_range(start, stop * 2 - start * 2);
@@ -433,6 +436,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 		marker_freq_pos->setStep(2 * (stop -
 						  start) / bin_sizes[ui->cmb_rbw->currentIndex()]);
 
+		fft_plot->updateZoomerBase();
+		waterfall_plot->updateZoomerBase();
 	});
 
 	connect(ui->cmb_rbw, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -554,11 +559,15 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(fft_plot, &FftDisplayPlot::newFFTData, this, [=](){
 		receivedFFTData = true;
-		if (receivedWaterfallData) {
+		if (receivedWaterfallData || !waterfall_visible) {
 			singleCaptureDone();
 
 			receivedWaterfallData = false;
 			receivedFFTData = false;
+		} else if (ui->runSingleWidget->singleButtonChecked()){
+			for (size_t i = 0; i < m_adc_nb_channels; i++) {
+				iio->stop(fft_ids[i]);
+			}
 		}
 	});
 
@@ -569,6 +578,10 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			receivedWaterfallData = false;
 			receivedFFTData = false;
+		} else if (ui->runSingleWidget->singleButtonChecked()){
+			for (size_t i = 0; i < m_adc_nb_channels; i++) {
+				iio->stop(waterfall_ids[i]);
+			}
 		}
 	});
 
@@ -618,6 +631,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			if (flow != waterfall_plot->getFlowDirection()) waterfall_plot->setFlowDirection(flow);
 		}
+		updateVisibleCursorHandles();
 	});
 
 	connect(fftDocker, &QDockWidget::topLevelChanged, this, [=](bool floating){
@@ -627,10 +641,12 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 			if (flow != waterfall_plot->getFlowDirection()) waterfall_plot->setFlowDirection(flow);
 		}
+		updateVisibleCursorHandles();
 	});
 
 	// UI default
 	waterfall_size->setValue(200);
+	waterfallToggled(false);
 
 	ui->comboBox_window->setCurrentText("Hamming");
 	ui->comboBox_line_thickness->setCurrentText("1");
@@ -668,6 +684,8 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 
 	connect(ui->logBtn, &QPushButton::toggled,
 		fft_plot, &FftDisplayPlot::useLogFreq);
+	connect(ui->logBtn, &QPushButton::toggled,
+		waterfall_plot, &WaterfallDisplayPlot::useLogFreq);
 	connect(ui->logBtn, &QPushButton::toggled,
 		[=](bool use_log_freq){
 		startStopRange->setMinimumValue(use_log_freq);
@@ -1083,6 +1101,9 @@ void SpectrumAnalyzer::on_boxCursors_toggled(bool on)
 
 		menuOrder.removeOne(ui->btnCursors);
 	}
+	updateVisibleCursorHandles();
+	fft_plot->adjustHandleAreasSize(on);
+	waterfall_plot->adjustHandleAreasSize(on);
 }
 
 void SpectrumAnalyzer::on_btnToolSettings_toggled(bool checked)
@@ -1654,11 +1675,11 @@ void SpectrumAnalyzer::cursor_panel_init()
 
 	// add cursor lock botween waterfall and fft plot
 
-	btnLockHPlots = new adiscope::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
-	btnLockHPlots->setObjectName(QString::fromUtf8("btnLockHPlots"));
-	btnLockHPlots->setStyleSheet(QString::fromUtf8("QPushButton[use_icon=true]"));
-	btnLockHPlots->setCheckable(true);
-	setDynamicProperty(btnLockHPlots, "use_icon", true);
+	btnSyncPlotCursors = new adiscope::SmallOnOffSwitch(cr_ui->scrollAreaWidgetContents);
+	btnSyncPlotCursors->setObjectName(QString::fromUtf8("btnSyncPlotCursors"));
+	btnSyncPlotCursors->setStyleSheet(QString::fromUtf8("QPushButton[use_icon=true]"));
+	btnSyncPlotCursors->setCheckable(true);
+	setDynamicProperty(btnSyncPlotCursors, "use_icon", true);
 
 	auto lock_line = new QFrame(this);
 	lock_line->setObjectName(QString::fromUtf8("lock_line"));
@@ -1673,9 +1694,9 @@ void SpectrumAnalyzer::cursor_panel_init()
 	cr_ui->verticalLayout_2->addSpacing(10);
 	cr_ui->verticalLayout_2->addItem(horizontalLockLayout);
 
-	horizontalLockLayout->addWidget(new QLabel(tr("Lock plots cursors"), cr_ui->scrollAreaWidgetContents));
+	horizontalLockLayout->addWidget(new QLabel(tr("Sync plots cursors"), cr_ui->scrollAreaWidgetContents));
 	horizontalLockLayout->addSpacerItem(new QSpacerItem(0,0, QSizePolicy::Expanding, QSizePolicy::Fixed));
-	horizontalLockLayout->addWidget(btnLockHPlots);
+	horizontalLockLayout->addWidget(btnSyncPlotCursors);
 
 	connectCursorHandles();
 	connectZoomers();
@@ -1683,6 +1704,9 @@ void SpectrumAnalyzer::cursor_panel_init()
 
 void SpectrumAnalyzer::connectZoomers()
 {
+	fft_plot->getZoomer()->zoom(0);
+	waterfall_plot->getZoomer()->zoom(0);
+
 	connect(fft_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
 		auto waterfall_zoomer = waterfall_plot->getZoomer();
 		auto const new_rect = QRectF(rect.left(), waterfall_zoomer->zoomBase().top(), rect.width(), waterfall_zoomer->zoomBase().height());
@@ -1720,7 +1744,7 @@ void SpectrumAnalyzer::connectZoomers()
 		waterfall_plot->getZoomer()->blockSignals(true);
 
 
-		// if fft was zoomed out
+		// if waterfall was zoomed out
 		if (fft_zoomer->zoomRectIndex() > waterfall_plot->getZoomer()->zoomRectIndex()) {
 			auto fft_stack = fft_zoomer->zoomStack();
 			auto wf_stack = waterfall_plot->getZoomer()->zoomStack();
@@ -1730,7 +1754,7 @@ void SpectrumAnalyzer::connectZoomers()
 			fft_zoomer->setZoomStack(fft_stack, fft_zoomer->zoomRectIndex() - 1);
 			waterfall_plot->getZoomer()->setZoomStack(wf_stack, waterfall_plot->getZoomer()->zoomRectIndex());
 
-			// if fft was zoomed in
+			// if waterfall was zoomed in
 		} else if (fft_zoomer->zoomRectIndex() < waterfall_plot->getZoomer()->zoomRectIndex()){
 			auto fft_stack = fft_zoomer->zoomStack();
 			fft_stack.push(new_rect);
@@ -1742,27 +1766,74 @@ void SpectrumAnalyzer::connectZoomers()
 	});
 }
 
+void SpectrumAnalyzer::waterfallToggled(bool visible)
+{
+	waterfallDocker->setVisible(visible);
+	waterfall_visible = visible;
+
+	if (isIioManagerStarted() && isRunning()) {
+		if (visible) {
+			for (size_t i = 0; i < m_adc_nb_channels; i++) {
+				iio->start(waterfall_ids[i]);
+				Q_EMIT waterfall_plot->resetWaterfallData();
+			}
+		} else {
+			for (int i = 0; i < channels.size(); i++) {
+				iio->stop(waterfall_ids[i]);
+			}
+		}
+	}
+	updateVisibleCursorHandles();
+}
+
+void SpectrumAnalyzer::updateVisibleCursorHandles()
+{
+	int wf_pos = waterfallDocker->pos().y();
+	int fft_pos = fftDocker->pos().y();
+	bool sync_toggled = btnSyncPlotCursors->isChecked();
+	bool floatingDockers = waterfallDocker->isFloating() || fftDocker->isFloating();
+	bool cursors_enabled = ui->boxCursors->isChecked();
+
+	bool wf_toggle = cursors_enabled;
+	bool fft_toggle = cursors_enabled;
+
+	if (wf_pos <= fft_pos && !floatingDockers && waterfall_visible && cursors_enabled) {
+		wf_toggle = !sync_toggled;
+	} else if (fft_pos <= wf_pos && !floatingDockers && waterfall_visible && cursors_enabled) {
+		fft_toggle = !sync_toggled;
+	}
+
+	fft_plot->d_hCursorHandle1->setVisible(fft_toggle);
+	fft_plot->d_hCursorHandle2->setVisible(fft_toggle);
+	waterfall_plot->d_hCursorHandle1->setVisible(wf_toggle);
+	waterfall_plot->d_hCursorHandle2->setVisible(wf_toggle);
+}
+
 void SpectrumAnalyzer::connectCursorHandles()
 {
-	if (!btnLockHPlots) return;
+	if (!btnSyncPlotCursors) return;
+
+	connect(btnSyncPlotCursors, &QPushButton::toggled, this, [=](bool toggled){
+		updateVisibleCursorHandles();
+	});
 
 	connect(fft_plot->d_hCursorHandle1, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			waterfall_plot->d_hCursorHandle1->setPosition(pos);
 	});
 
 	connect(fft_plot->d_hCursorHandle2, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			waterfall_plot->d_hCursorHandle2->setPosition(pos);
 	});
 
 	connect(waterfall_plot->d_hCursorHandle1, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			fft_plot->d_hCursorHandle1->setPosition(pos);
 	});
 
 	connect(waterfall_plot->d_hCursorHandle2, &PlotLineHandleH::positionChanged, this, [=](int pos){
-		if (btnLockHPlots->isChecked())
+		if (btnSyncPlotCursors->isChecked())
 			fft_plot->d_hCursorHandle2->setPosition(pos);
 	});
 }
@@ -2069,18 +2140,20 @@ void SpectrumAnalyzer::runStopToggled(bool checked)
 void SpectrumAnalyzer::build_gnuradio_block_chain()
 {
 	auto window = SpectrumChannel::build_win(FftWinType::HAMMING, fft_size);
-	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
+	waterfall_sink = adiscope::waterfall_sink::make(fft_size,
 							  window,
 							  0,
 							  m_max_sample_rate,
 							  "Waterfall Plot",
 							  m_adc_nb_channels,
-							  waterfall_plot);
+							  waterfall_plot,
+							  !use_float_sink);
 
 	fft_sink = adiscope::scope_sink_f::make(fft_size, m_max_sample_rate,
 						"Osc Frequency", m_adc_nb_channels,
 						(QObject *)fft_plot);
 	fft_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
+	waterfall_sink->set_trigger_mode(TRIG_MODE_TAG, 0, "buffer_start");
 
 	double targetFps = getScopyPreferences()->getTarget_fps();
 	double samplingTime = sample_rate * fft_size;
@@ -2108,15 +2181,22 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 	for (size_t i = 0; i < m_adc_nb_channels; i++) {
 		auto fft = gnuradio::get_initial_sptr(
-		                   new fft_block(false, fft_size));
+				   new fft_block(!use_float_sink, fft_size));
 		auto ctm = gr::blocks::complex_to_mag_squared::make(1);
 
 		// iio(i)->fft->ctm->fft_sink
-		fft_ids[i] = iio->connect(fft, i, 0, true, fft_size);
+		fft_ids[i] = iio->connect(fft, i, 0, use_float_sink, fft_size);
 		iio->connect(fft, 0, ctm, 0);
 		iio->connect(ctm, 0, fft_sink, i);
 
-		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size);
+		if (use_float_sink) {
+			auto floatToComplex = gr::blocks::float_to_complex::make();
+			waterfall_ids[i] = iio->connect(floatToComplex, i, 0, true, fft_size);
+			iio->connect(floatToComplex, 0, waterfall_sink, i);
+		} else {
+			waterfall_ids[i] = iio->connect(waterfall_sink, i, i, use_float_sink, fft_size);
+			startStopRange->setDisabled(true);
+		}
 
 		channels[i]->fft_block = fft;
 		channels[i]->ctm_block = ctm;
@@ -2129,8 +2209,10 @@ void SpectrumAnalyzer::build_gnuradio_block_chain()
 
 void SpectrumAnalyzer::build_gnuradio_block_chain_no_ctx()
 {
+	waterfall_plot->setPlotPosHalf(use_float_sink);
+
 	auto window = SpectrumChannel::build_win(FftWinType::HAMMING, fft_size);
-	waterfall_sink = adiscope::waterfall_sink_f::make(fft_size,
+	waterfall_sink = adiscope::waterfall_sink::make(fft_size,
 							  window,
 							  0,
 							  m_max_sample_rate,
@@ -2180,10 +2262,15 @@ void SpectrumAnalyzer::start_blockchain_flow()
 	if (iio) {
 		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->start(fft_ids[i]);
-			iio->start(waterfall_ids[i]);
+
+			if (waterfall_visible) {
+				iio->start(waterfall_ids[i]);
+				Q_EMIT waterfall_plot->resetWaterfallData();
+			}
 		}
 	} else {
 		fft_sink->reset();
+		waterfall_sink->reset();
 		top_block->start();
 	}
 }
@@ -2193,7 +2280,11 @@ void SpectrumAnalyzer::stop_blockchain_flow()
 	if (iio) {
 		for (size_t i = 0; i < m_adc_nb_channels; i++) {
 			iio->stop(fft_ids[i]);
-			iio->stop(waterfall_ids[i]);
+
+			if (waterfall_visible) {
+				iio->stop(waterfall_ids[i]);
+				waterfall_sink->reset();
+			}
 		}
 	} else {
 		top_block->stop();
@@ -2731,6 +2822,9 @@ void SpectrumAnalyzer::on_cmb_rbw_currentIndexChanged(int index)
 
 	if (new_fft_size != fft_size) {
 		setFftSize(new_fft_size);
+
+		fft_plot->updateZoomerBase();
+		waterfall_plot->updateZoomerBase();
 	}
 
 	marker_freq_pos->setMinValue(startStopRange->getStartValue());
@@ -2806,22 +2900,31 @@ void SpectrumAnalyzer::setFftSize(uint size)
 
 	for (int i = 0; i < channels.size(); i++) {
 		auto fft = gnuradio::get_initial_sptr(
-		                   new fft_block(false, size));
+				   new fft_block(!use_float_sink, size));
 
 		iio->disconnect(fft_ids[i]);
 		iio->disconnect(waterfall_ids[i]);
 
-		fft_ids[i] = iio->connect(fft, i, 0, true, fft_size * m_nb_overlapping_avg);
+		fft_ids[i] = iio->connect(fft, i, 0, use_float_sink, fft_size * m_nb_overlapping_avg);
 
 		iio->connect(fft, 0, channels[i]->ctm_block, 0);
 		iio->connect(channels[i]->ctm_block, 0, fft_sink, i);
 
-		waterfall_ids[i] = iio->connect(waterfall_sink, i, i, true, fft_size * m_nb_overlapping_avg);
-//		iio->connect(channels[i]->ctm_block, 0, waterfall_sink, i);
+		if (use_float_sink) {
+			auto floatToComplex = gr::blocks::float_to_complex::make();
+			waterfall_ids[i] = iio->connect(floatToComplex, i, 0, true, fft_size * m_nb_overlapping_avg);
+			iio->connect(floatToComplex, 0, waterfall_sink, i);
+		} else {
+			waterfall_ids[i] = iio->connect(waterfall_sink, i, i, use_float_sink, fft_size * m_nb_overlapping_avg);
+		}
 
 		if (started) {
 			iio->start(fft_ids[i]);
-			iio->start(waterfall_ids[i]);
+
+			if (waterfall_visible) {
+				iio->start(waterfall_ids[i]);
+				Q_EMIT waterfall_plot->resetWaterfallData();
+			}
 		}
 
 		channels[i]->fft_block = fft;
@@ -3272,7 +3375,8 @@ void SpectrumAnalyzer::onWaterfallSizeChanged(double value)
 	waterfall_plot->setVisibleSampleCount((int) value);
 	waterfall_plot->replot();
 
-	fft_plot->resetZoomerStack();
+	waterfall_plot->updateZoomerBase();
+	fft_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onTopValueChanged(double top_value)
@@ -3300,6 +3404,9 @@ void SpectrumAnalyzer::onTopValueChanged(double top_value)
 	fft_plot->leftHandlesArea()->repaint();
 
 	fft_plot->setAmplitude(top_value, bottom_value);
+
+	fft_plot->updateZoomerBase();
+	waterfall_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
@@ -3337,6 +3444,9 @@ void SpectrumAnalyzer::onScalePerDivValueChanged(double perDiv)
 	fft_plot->leftHandlesArea()->repaint();
 
 	fft_plot->setAmplitude(topValue, bottomValue);
+
+	fft_plot->updateZoomerBase();
+	waterfall_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
@@ -3364,6 +3474,9 @@ void SpectrumAnalyzer::onBottomValueChanged(double bottom_value)
 	fft_plot->leftHandlesArea()->repaint();
 
 	fft_plot->setAmplitude(top_value, bottom_value);
+
+	fft_plot->updateZoomerBase();
+	waterfall_plot->updateZoomerBase();
 }
 
 void SpectrumAnalyzer::onCurrentAverageIndexChanged(uint chnIdx, uint avgIdx)

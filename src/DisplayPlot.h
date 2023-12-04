@@ -428,6 +428,7 @@ public:
   virtual QString formatXValue(double value, int precision) const;
   virtual QString formatYValue(double value, int precision) const;
 
+  void adjustHandleAreasSize(bool cursors = false);
   void setCursorAxes(QwtAxisId fixed_axis, QwtAxisId mobile_axis);
 public Q_SLOTS:
   virtual void disableLegend();
