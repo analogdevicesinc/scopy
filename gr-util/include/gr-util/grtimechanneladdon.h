@@ -88,6 +88,7 @@ private:
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QPushButton *createSnapshotButton(QWidget *parent);
+	QWidget *createAttrMenu(QWidget *parent);
 };
 
 class SCOPY_GR_UTIL_EXPORT ImportChannelAddon : public TimeChannelAddon
@@ -115,6 +116,7 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QPushButton *createForgetButton(QWidget *parent);
+
 };
 } // namespace grutil
 } // namespace scopy
