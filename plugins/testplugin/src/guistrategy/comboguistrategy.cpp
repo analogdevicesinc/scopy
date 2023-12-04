@@ -12,15 +12,13 @@ ComboAttrUi::ComboAttrUi(AttributeFactoryRecipe recipe, QObject *parent)
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_menuComboWidget = new MenuComboWidget(m_recipe.data, m_ui);
-	m_menuComboWidget->layout()->setContentsMargins(0, 0, 0, 0);
-	m_menuComboWidget->layout()->setMargin(0);
-	m_ui->layout()->addWidget(m_menuComboWidget);
+	m_comboWidget = new QComboBox(m_ui);
+	m_ui->layout()->addWidget(m_comboWidget);
 	Q_EMIT requestData();
 
-	connect(m_menuComboWidget->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+	connect(m_comboWidget, QOverload<int>::of(&QComboBox::currentIndexChanged), this,
 		[this](int index) {
-			QString currentData = m_menuComboWidget->combo()->currentText();
+			QString currentData = m_comboWidget->currentText();
 			Q_EMIT emitData(currentData);
 		});
 }
@@ -39,12 +37,13 @@ bool ComboAttrUi::isValid()
 
 void ComboAttrUi::receiveData(QString currentData, QString optionalData)
 {
+	QSignalBlocker blocker(m_comboWidget);
 	QStringList optionsList = QString(optionalData).split(" ", Qt::SkipEmptyParts);
 	for(const QString &item : optionsList) {
-		m_menuComboWidget->combo()->addItem(item);
+		m_comboWidget->addItem(item);
 	}
 
-	m_menuComboWidget->combo()->setCurrentText(currentData);
+	m_comboWidget->setCurrentText(currentData);
 }
 
 #include "moc_comboguistrategy.cpp"

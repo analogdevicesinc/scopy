@@ -111,7 +111,8 @@ AttrWidget *AttrFactory::buildSingle(uint32_t hint, AttributeFactoryRecipe recip
 	}
 
 	if(uiStrategy && saveStrategy && dataStrategy) {
-		attrWidget = new AttrWidget(recipe.data, uiStrategy, saveStrategy, dataStrategy, this);
+		attrWidget = new AttrWidget(uiStrategy, saveStrategy, dataStrategy, this);
+		attrWidget->setRecipe(recipe);
 	}
 
 	return attrWidget;

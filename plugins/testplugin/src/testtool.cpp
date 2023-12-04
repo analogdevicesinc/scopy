@@ -8,6 +8,7 @@
 #include <QButtonGroup>
 #include <QDebug>
 #include <QHBoxLayout>
+#include <QLabel>
 
 #include <gui/cursorcontroller.h>
 #include <gui/menu_anim.hpp>
@@ -160,48 +161,11 @@ TestTool::TestTool(QWidget *parent)
 	QWidget *wch0 = createMenu(tool);
 	QLabel *wch1 = new QLabel("Channel1Label");
 
-	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
-	struct iio_device *device = iio_context_find_device(context, "ad74413r");
-	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
-	auto attrFactory = new AttrFactory(this);
-	auto *wch2Scroll = new QScrollArea(this);
-
-	wch2Scroll->setWidgetResizable(true);
-	wch2Scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	wch2Scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	auto *wch2 = new QWidget(this);
-	wch2Scroll->setWidget(wch2);
-	wch2->setLayout(new QVBoxLayout(wch2));
-	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
-
-	//	attrWidgets.append(attrFactory->buildSingle(
-	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
-	//		{.channel = attrChannel, .data = "sampling_frequency", .dataOptions =
-	//"sampling_frequency_available"}));
-	//
-	//	attrWidgets.append(attrFactory->buildSingle(
-	//		AttrFactory::AFH::TimeSave | AttrFactory::AFH::RangeUi | AttrFactory::AFH::AttrData,
-	//		{.channel = attrChannel, .data = "raw", .dataOptions = "raw_available"}));
-	//
-	//	attrWidgets.append(attrFactory->buildSingle(AttrFactory::AFH::InstantSave | AttrFactory::AFH::EditableUi
-	//| 							    AttrFactory::AFH::AttrData,
-	//						    {.channel = attrChannel, .data = "offset"}));
-	attrWidgets.append(
-		attrFactory->buildSingle(AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::TriggerData,
-					 {.context = context, .device = device, .data = "device_to_set_trigger_on"}));
-	attrWidgets.append(attrFactory->buildSingle(
-		AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::FileDemoData, {.data = "The Office Cast"}));
-
-	for(auto item : attrWidgets) {
-		if(item) {
-			wch2->layout()->addWidget(item);
-		}
-	}
-	wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
+	auto *wch2 = iioWidgetsSettingsHelper();
 
 	tool->rightStack()->add("ch0", wch0);
 	tool->rightStack()->add("ch1", wch1);
-	tool->rightStack()->add("ch2", wch2Scroll);
+	tool->rightStack()->add("ch2", wch2);
 
 	connect(channels->button(), &QAbstractButton::pressed, this, [=]() { tool->requestMenu("ch0"); });
 	connect(ch1->button(), &QAbstractButton::pressed, this, [=]() { tool->requestMenu("ch1"); });
@@ -336,4 +300,63 @@ void TestTool::acquireData()
 		y2Volt.push_back(amplitude * sin(2 * 17 * 3.1416 * i / (double)testDataSize + 2 * phase));
 	}
 	phase++;
+}
+
+QWidget *TestTool::iioWidgetsSettingsHelper()
+{
+	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
+	struct iio_device *device = iio_context_find_device(context, "ad74413r");
+	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
+	auto attrFactory = new AttrFactory(this);
+	auto *wch2Scroll = new QScrollArea(this);
+
+	wch2Scroll->setWidgetResizable(true);
+	wch2Scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	wch2Scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	auto wch2 = new QWidget(this);
+	auto channelAttrMenu =
+		new MenuCollapseSection("Channel attributes", scopy::MenuCollapseSection::MHCW_ARROW, wch2);
+	channelAttrMenu->contentLayout()->setContentsMargins(0, 0, 0, 0);
+	wch2Scroll->setWidget(wch2);
+	wch2->setLayout(new QVBoxLayout(wch2));
+	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
+
+	//	attrWidgets.append(attrFactory->buildSingle(
+	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
+	//		{.channel = attrChannel, .data = "sampling_frequency", .dataOptions =
+	//"sampling_frequency_available"}));
+	//
+	//	attrWidgets.append(attrFactory->buildSingle(
+	//		AttrFactory::AFH::TimeSave | AttrFactory::AFH::RangeUi | AttrFactory::AFH::AttrData,
+	//		{.channel = attrChannel, .data = "raw", .dataOptions = "raw_available"}));
+	//
+	//	attrWidgets.append(attrFactory->buildSingle(AttrFactory::AFH::InstantSave | AttrFactory::AFH::EditableUi
+	//| 							    AttrFactory::AFH::AttrData,
+	//						    {.channel = attrChannel, .data = "offset"}));
+	attrWidgets.append(
+		attrFactory->buildSingle(AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::TriggerData,
+					 {.context = context, .device = device, .data = "device_to_set_trigger_on"}));
+	attrWidgets.append(attrFactory->buildSingle(
+		AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::FileDemoData, {.data = "The Office Cast"}));
+
+	StyleHelper::IIOWidget(channelAttrMenu, "IIOWidget");
+	for(auto item : attrWidgets) {
+		if(item) {
+			auto container = new QFrame(channelAttrMenu);
+//			container->setStyleSheet(".QFrame {background-color: " + StyleHelper::getColor("ScopyBackground") + ";}");
+			auto header = new QLabel(item->getRecipe().data, channelAttrMenu);
+//			StyleHelper::MenuHeaderLabel(header);
+			header->setContentsMargins(0, 0, 0, 0);
+
+			container->setLayout(new QVBoxLayout(container));
+			container->layout()->addWidget(header);
+			container->layout()->addWidget(item);
+
+			channelAttrMenu->contentLayout()->addWidget(container);
+		}
+	}
+	wch2->layout()->addWidget(channelAttrMenu);
+	wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
+
+	return wch2Scroll;
 }
