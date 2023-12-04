@@ -46,7 +46,7 @@ private:
 
 private Q_SLOTS:
 	void updateActiveRegisterMap(QString registerName);
-	void toggleSearchBarVisible(bool visible);
+	void toggleSearchBarEnabled(bool enabled);
 };
 } // namespace regmap
 } // namespace scopy
