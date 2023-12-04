@@ -271,10 +271,6 @@ void FftDisplayPlot::updateHandleAreaPadding()
 {
 	d_leftHandlesArea->update();
 	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
-	d_bottomHandlesArea->setRightPadding(50);
-
-	d_rightHandlesArea->setTopPadding(50);
-	d_rightHandlesArea->setBottomPadding(50);
 
 	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
 	d_hCursorHandle1->updatePosition();
@@ -870,11 +866,6 @@ void FftDisplayPlot::_resetXAxisPoints()
 	}
 }
 
-void FftDisplayPlot::resetZoomerStack()
-{
-	getZoomer()->setZoomStack(getZoomer()->zoomStack(), 0);
-}
-
 int64_t FftDisplayPlot::posAtFrequency(double freq, int chIdx) const
 {
 	int64_t pos = 0;
@@ -903,6 +894,18 @@ void FftDisplayPlot::setAmplitude(double top, double bottom)
 	m_bottom = bottom;
 }
 
+void FftDisplayPlot::updateZoomerBase()
+{
+	QRectF rect = QRectF(m_sweepStart, m_bottom, m_sweepStop - m_sweepStart, m_top - m_bottom);
+	getZoomer()->zoom(rect);
+
+	getZoomer()->blockSignals(true);
+	getZoomer()->setZoomBase(rect);
+	getZoomer()->QwtPlotZoomer::zoom(rect);
+	getZoomer()->blockSignals(false);
+
+}
+
 void FftDisplayPlot::customEvent(QEvent *e)
 {
 	if (e->type() == TimeUpdateEvent::Type()) {
@@ -910,22 +913,6 @@ void FftDisplayPlot::customEvent(QEvent *e)
 
 		this->plotData(ev->getTimeDomainPoints(),
 			       ev->getNumTimeDomainDataPoints());
-
-		// reset zoomer base if plot horizontal axis changed
-		if (getZoomer()->zoomBase().left() != m_sweepStart || getZoomer()->zoomBase().width() != m_sweepStop - m_sweepStart) {
-			getZoomer()->blockSignals(true);
-
-			auto rect = QRectF(m_sweepStart, m_top, m_sweepStop - m_sweepStart, m_bottom - m_top);
-			getZoomer()->zoom(rect);
-			getZoomer()->setZoomBase(rect);
-			getZoomer()->zoom(0);
-
-			auto stack = QStack<QRectF>();
-			stack.push(getZoomer()->zoomStack().first());
-			getZoomer()->setZoomStack(stack, 0);
-
-			getZoomer()->blockSignals(false);
-		}
 	}
 }
 

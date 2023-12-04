@@ -56,7 +56,6 @@
 
 using QwtAxis::XBottom;
 
-namespace pt = boost::posix_time;
 using namespace adiscope;
 #include <QDebug>
 
@@ -218,7 +217,7 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 
 	replot();
 
-	connect(this, SIGNAL(resetWaterfallData), SLOT(resetAvgAcquisitionTime));
+	connect(this, SIGNAL(resetWaterfallData()), this, SLOT(resetAvgAcquisitionTime()));
 
 	setupReadouts();
 	installEventFilter(this);
@@ -378,10 +377,6 @@ void WaterfallDisplayPlot::updateHandleAreaPadding()
 {
 	d_leftHandlesArea->update();
 	d_bottomHandlesArea->setLeftPadding(d_leftHandlesArea->width());
-	d_bottomHandlesArea->setRightPadding(50);
-
-	d_rightHandlesArea->setTopPadding(50);
-	d_rightHandlesArea->setBottomPadding(50);
 
 	//update handle position to avoid cursors getting out of the plot bounds when changing the padding;
 	d_hCursorHandle1->updatePosition();
@@ -465,7 +460,7 @@ QString WaterfallDisplayPlot::formatYValue(double value, int precision) const
 }
 
 void WaterfallDisplayPlot::autoScale()
-{	
+{
 	qDebug() << d_min_val << d_max_val;
 
 	setIntensityRange(d_min_val, d_max_val);
@@ -549,14 +544,17 @@ double WaterfallDisplayPlot::getResolutionBW() const { return d_resolution_bw; }
 
 double WaterfallDisplayPlot::getStopFrequency() const { return d_stop_frequency; }
 
-void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
+void WaterfallDisplayPlot::plotNewData(const std::vector<double*> &dataPoints,
 				       const int64_t numDataPoints,
-				       gr::high_res_timer_type acquisitionTime,
-				       const int droppedFrames)
+				       gr::high_res_timer_type acquisitionTime)
 {
 	// Display first half of the plot if d_half_freq is true
 	int64_t _npoints_in = d_half_freq ? (getStopFrequency() - getStartFrequency()) / getResolutionBW() : numDataPoints;
 	int64_t _in_index = d_half_freq ? getStartFrequency() / getResolutionBW() : 0;
+
+	// there was a fft resize meanwhile event was being sent
+	if (_npoints_in > numDataPoints - _in_index) return;
+
 	double current_time = gr::high_res_timer_now();
 
 	// convert to seconds
@@ -584,26 +582,21 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 	updateCursorsData();
 
 	if (!d_stop && _npoints_in > 0) {
-			if (_npoints_in != d_numPoints) {
-				d_numPoints = _npoints_in;
-				resetAxis();
+		d_leftHandlesArea->update();
+		d_bottomHandlesArea->update();
 
-				for (unsigned int i = 0; i < d_nplots; ++i) {
-					d_spectrogram[i]->invalidateCache();
-					d_spectrogram[i]->itemChanged();
-				}
+		((WaterfallZoomer*)d_zoomer[0])->setSecondsPerLine(time_per_line);
+		((WaterfallZoomer*)d_zoomer[0])->setCenterTime(centerTime);
 
-				if (isVisible()) {
-					replot();
-				}
+		if (_npoints_in != d_numPoints) {
+			d_numPoints = _npoints_in;
+			resetAxis();
+
+			for (unsigned int i = 0; i < d_nplots; ++i) {
+				d_spectrogram[i]->invalidateCache();
+				d_spectrogram[i]->itemChanged();
 			}
-
-			d_leftHandlesArea->update();
-			d_bottomHandlesArea->update();
-
-			((WaterfallZoomer*)d_zoomer[0])->setSecondsPerLine(time_per_line);
-			((WaterfallZoomer*)d_zoomer[0])->setCenterTime(centerTime);
-
+		} else {
 			for (int i = 0; i<d_nplots; i++) {
 				if (enabledChannelID != i) {
 					setAlpha(i, 0);
@@ -612,17 +605,37 @@ void WaterfallDisplayPlot::plotNewData(const std::vector<double*> dataPoints,
 					setAlpha(i, 255);
 				}
 
-				d_data[i]->addFFTData(&(dataPoints[i][_in_index]), _npoints_in, droppedFrames);
+				d_data[i]->addFFTData(&dataPoints[i][_in_index], _npoints_in);
 				d_data[i]->incrementNumLinesToUpdate();
 				d_spectrogram[i]->invalidateCache();
 				d_spectrogram[i]->itemChanged();
 			}
+		}
 
-			replot();
-			d_visible_line_count = std::min(d_visible_line_count + 1, d_nrows);
+		replot();
+		d_visible_line_count = std::min(d_visible_line_count + 1, d_nrows);
 		}
 
 	Q_EMIT newWaterfallData();
+}
+
+void WaterfallDisplayPlot::useLogFreq(bool use_log_freq)
+{
+	if (use_log_freq && d_half_freq) {
+		setPlotLogaritmic(true);
+		setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
+		replot();
+		auto div = axisScaleDiv(QwtAxis::XBottom);
+		setXaxisMajorTicksPos(div.ticks(2));
+	} else {
+		setPlotLogaritmic(false);
+		OscScaleEngine *scaleEngine = new OscScaleEngine();
+		this->setAxisScaleEngine(QwtAxis::XBottom, (QwtScaleEngine *)scaleEngine);
+		replot();
+		auto div = axisScaleDiv(QwtAxis::XBottom);
+		setXaxisNumDiv((div.ticks(2)).size() - 1);
+	}
+	replot();
 }
 
 void WaterfallDisplayPlot::setIntensityRange(double minIntensity,
@@ -700,7 +713,7 @@ void WaterfallDisplayPlot::replot()
 		((WaterfallZoomer*)d_zoomer[0])->updateTrackerText();
 	}
 
-	QwtPlot::replot();
+	BasicPlot::replot();
 }
 
 void WaterfallDisplayPlot::clearData()
@@ -965,6 +978,18 @@ void WaterfallDisplayPlot::setUpdateTime(double t)
 	d_time_per_fft = t;
 }
 
+void WaterfallDisplayPlot::updateZoomerBase()
+{
+	QRectF rect = QRectF(d_start_frequency, 0, d_stop_frequency - d_start_frequency, d_visible_samples);
+	getZoomer()->zoom(rect);
+
+	getZoomer()->blockSignals(true);
+	getZoomer()->setZoomBase(rect);
+	getZoomer()->QwtPlotZoomer::zoom(rect);
+	getZoomer()->blockSignals(false);
+
+}
+
 void WaterfallDisplayPlot::customEvent(QEvent *e)
 {
 	if (e->type() == WaterfallUpdateEvent::Type()) {
@@ -973,37 +998,7 @@ void WaterfallDisplayPlot::customEvent(QEvent *e)
 		const uint64_t numDataPoints = event->getNumDataPoints();
 		const gr::high_res_timer_type dataTimestamp = event->getDataTimestamp();
 
-		for (unsigned int i = 0; i < d_nplots; ++i) {
-			const double* min_val =
-					std::min_element(&dataPoints[i][0], &dataPoints[i][numDataPoints - 1]);
-			const double* max_val =
-					std::max_element(&dataPoints[i][0], &dataPoints[i][numDataPoints - 1]);
-			if (*min_val < d_min_val || i == 0)
-				d_min_val = *min_val;
-			if (*max_val > d_max_val || i == 0)
-				d_max_val = *max_val;
-		}
-		//		autoScale();
-		//		qDebug() << d_min_val << d_max_val;
-
-		plotNewData(dataPoints, numDataPoints, dataTimestamp, 0);
-
-		// reset zoomer base if plot axis changed
-		if (getZoomer()->zoomBase().left() != d_start_frequency || getZoomer()->zoomBase().width() != d_stop_frequency - d_start_frequency) {
-			getZoomer()->blockSignals(true);
-
-			auto vert_interval = axisInterval(QwtAxis::YLeft);
-			auto rect = QRectF(d_start_frequency, vert_interval.minValue(), d_stop_frequency - d_start_frequency, vert_interval.maxValue() - vert_interval.minValue());
-			getZoomer()->zoom(rect);
-			getZoomer()->setZoomBase(rect);
-			getZoomer()->zoom(0);
-
-			auto stack = QStack<QRectF>();
-			stack.push(getZoomer()->zoomStack().first());
-			getZoomer()->setZoomStack(stack, 0);
-
-			getZoomer()->blockSignals(false);
-		}
+		plotNewData(dataPoints, numDataPoints, dataTimestamp);
 	}
 }
 

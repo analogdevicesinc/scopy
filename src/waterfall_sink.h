@@ -39,30 +39,29 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef INCLUDED_QTGUI_WATERFALL_SINK_F_H
-#define INCLUDED_QTGUI_WATERFALL_SINK_F_H
+#ifndef INCLUDED_QTGUI_WATERFALL_SINK_H
+#define INCLUDED_QTGUI_WATERFALL_SINK_H
 
 #ifdef ENABLE_PYTHON
 #include <Python.h>
 #endif
 
 #include "WaterfallDisplayPlot.h"
-
 #include <gnuradio/filter/firdes.h>
-//#include <gnuradio/qtgui/api.h>
 #include <gnuradio/sync_block.h>
+#include <WaterfallDisplayPlot.h>
 #include <qapplication.h>
+#include <trigger_mode.h>
 
 namespace adiscope {
 
-class waterfall_sink_f : virtual public gr::sync_block
+class waterfall_sink : virtual public gr::sync_block
 {
 public:
-//	 adiscope::waterfall_sink_f::sptr
-	typedef std::shared_ptr<waterfall_sink_f> sptr;
+	typedef std::shared_ptr<waterfall_sink> sptr;
 
 	/*!
-     * \brief Build a floating point waterfall sink.
+     * \brief Build a complex number waterfall sink.
      *
      * \param size size of the FFT to compute and display. If using
      *        the PDU message port to plot samples, the length of
@@ -83,9 +82,10 @@ public:
 			 double bw,
 			 const std::string& name,
 			 int nconnections = 1,
-			 WaterfallDisplayPlot* plot = NULL);
+			 WaterfallDisplayPlot* plot = NULL,
+			 bool fft_shift = false);
 
-	virtual void exec_() = 0;
+	virtual void reset() = 0;
 	virtual QWidget* qwidget() = 0;
 
 	virtual void clear_data() = 0;
@@ -118,10 +118,11 @@ public:
 	virtual double min_intensity(unsigned int which) = 0;
 	virtual double max_intensity(unsigned int which) = 0;
 	virtual void disable_legend() = 0;
+	virtual void set_trigger_mode(trigger_mode mode, int channel, const std::string &tag_key="") = 0;
 
 	QApplication* d_qApplication;
 };
 
-} /* namespace adiscope */
+} /* namespace scopy */
 
-#endif /* WATERFALL_SINK_F_H */
+#endif /* waterfall_sink_H */

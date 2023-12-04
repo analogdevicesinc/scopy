@@ -32,6 +32,7 @@
 
 #include <qwt_raster_data.h>
 #include <cinttypes>
+#include <deque>
 
 #if QWT_VERSION >= 0x060000
 #include <qwt_interval.h>
@@ -69,10 +70,10 @@ public:
     double value(double x, double y) const override;
 
     virtual uint64_t getNumFFTPoints() const;
-    virtual void addFFTData(const double*, const uint64_t, const int);
+    virtual void addFFTData(const double*, const uint64_t);
 
-    virtual const double* getSpectrumDataBuffer() const;
-    virtual void setSpectrumDataBuffer(const double*);
+    virtual const std::deque<std::vector<double>> getSpectrumDataBuffer() const;
+    virtual void setSpectrumDataBuffer(const std::deque<std::vector<double>>);
 
     virtual int getNumLinesToUpdate() const;
     virtual void setNumLinesToUpdate(const int);
@@ -81,7 +82,7 @@ public:
     void setFlowDirection(WaterfallFlowDirection direction);
     WaterfallFlowDirection getFlowDirection();
 protected:
-    std::vector<double> _spectrumData;
+    std::deque<std::vector<double>> _spectrumData;
     uint64_t _fftPoints;
     uint64_t _historyLength;
     int _numLinesToUpdate;
