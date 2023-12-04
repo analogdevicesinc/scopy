@@ -32,6 +32,7 @@ SIGROK_GUI_DLL=$BUILD_FOLDER/gui/sigrok-gui
 GR_GUI_DLL=$BUILD_FOLDER/gui/gr-gui
 IIOUTIL_DLL=$BUILD_FOLDER/iioutil
 COMMON_DLL=$BUILD_FOLDER/common
+GRUTIL_DLL=$BUILD_FOLDER/gr-util
 
 REGMAP_XMLS=$BUILD_FOLDER/plugins/regmap/xmls
 
@@ -91,6 +92,7 @@ deploy_app(){
 	cp $SIGROK_GUI_DLL/libscopy-sigrok-gui.dll $DEST_FOLDER
 	cp $GR_GUI_DLL/libscopy-gr-gui.dll $DEST_FOLDER
 	cp $COMMON_DLL/libscopy-common.dll $DEST_FOLDER
+	cp $GRUTIL_DLL/libscopy-gr-util.dll $DEST_FOLDER
 
 	PLUGINS_DLL=$(find $BUILD_FOLDER/plugins -type f -name "*.dll")
 	mkdir -p $DEST_FOLDER/plugins/plugins
