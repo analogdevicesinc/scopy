@@ -2,12 +2,8 @@
 #define SCOPY_EDITABLEGUISTRATEGY_H
 
 #include <QWidget>
+#include <QLineEdit>
 #include <iio.h>
-#include <gui/widgets/menulineedit.h>
-#include <gui/widgets/menucollapsesection.h>
-#include <gui/customSwitch.h>
-#include <gui/spinbox_a.hpp>
-#include <gui/widgets/menucombo.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "attrdata.h"
 

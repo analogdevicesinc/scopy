@@ -76,6 +76,8 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent) {
 	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(grch()->channel());
 
 	auto layout = new QVBoxLayout(attrcontainer);
+	layout->setSpacing(10);
+	layout->setMargin(0);
 
 	for(auto w : attrWidgets) {
 		layout->addWidget(w);

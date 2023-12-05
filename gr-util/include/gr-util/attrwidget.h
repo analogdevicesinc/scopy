@@ -9,7 +9,6 @@
 #include "guistrategy/guistrategyinterface.h"
 #include "savestrategy/savestrategyinterface.h"
 #include "datastrategy/datastrategyinterface.h"
-#include <scopy-gr-util_export.h>
 
 namespace scopy {
 namespace attr {
@@ -18,25 +17,37 @@ class SaveStrategyInterface;
 class DataStrategyInterface;
 } // namespace attr
 
-class SCOPY_GR_UTIL_EXPORT AttrWidget : public QWidget
+class AttrWidget : public QWidget
 {
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-	AttrWidget(QString title, attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy,
+	AttrWidget(attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy,
 		   attr::DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
 
 	attr::SaveStrategyInterface *getSaveStrategy();
 	attr::AttrUiStrategyInterface *getUiStrategy();
 	attr::DataStrategyInterface *getDataStrategy();
 
+	/**
+	 * @brief Returns the recipe that this widget is based on. This is optional, currently serves as a way to pass
+	 * information about the current widget.
+	 * @return AttributeFactoryRecipe
+	 * */
+	AttributeFactoryRecipe getRecipe();
+
+	/**
+	 * @brief Sets the recipe that this widget is based on. This is optional, currently serves as a way to pass
+	 * information about the current widget.
+	 * @return void
+	 * */
+	void setRecipe(AttributeFactoryRecipe recipe);
+
 protected:
 	attr::SaveStrategyInterface *m_saveStrategy;
 	attr::AttrUiStrategyInterface *m_uiStrategy;
 	attr::DataStrategyInterface *m_dataStrategy;
-
-	MenuCollapseSection *m_collapseSection;
-	MenuSectionWidget *m_menuSectionWidget;
+	AttributeFactoryRecipe m_recipe;
 };
 } // namespace scopy
 

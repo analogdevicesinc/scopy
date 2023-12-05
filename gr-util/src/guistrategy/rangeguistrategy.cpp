@@ -8,7 +8,6 @@ RangeAttrUi::RangeAttrUi(AttributeFactoryRecipe recipe, QObject *parent)
 	: m_ui(new QWidget(nullptr))
 {
 	setParent(parent);
-	m_recipe = std::move(recipe);
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 
 	// FIXME: this does not look right when uninitialized, also crashes...
@@ -35,6 +34,7 @@ bool RangeAttrUi::isValid()
 
 void RangeAttrUi::receiveData(QString currentData, QString optionalData)
 {
+	QSignalBlocker blocker(m_positionSpinButton);
 	QString availableAttributeValue = QString(optionalData).mid(1, QString(optionalData).size() - 2);
 	QStringList optionsList = availableAttributeValue.split(" ", Qt::SkipEmptyParts);
 	bool ok = true, finalOk = true;

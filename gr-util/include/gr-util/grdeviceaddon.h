@@ -4,7 +4,7 @@
 #include "griiodevicesource.h"
 #include "scopy-gr-util_export.h"
 #include "tooladdon.h"
-
+#include <QPen>
 #include <QLabel>
 
 namespace scopy::grutil {
@@ -47,7 +47,10 @@ private:
 	QString name;
 	QWidget *widget;
 	GRIIODeviceSource *m_src;
+	QPen m_pen;
 	QList<GRTimeChannelAddon *> m_channels;
+	QWidget *createAttrMenu(QWidget *parent);
+	QWidget *createMenu(QWidget *parent = nullptr);
 
 private Q_SLOTS:
 	void setBufferSize(uint32_t bufferSize);

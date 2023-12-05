@@ -1,6 +1,16 @@
 #include "grdeviceaddon.h"
 
 #include "grtimechanneladdon.h"
+#include <gui/stylehelper.h>
+#include <gui/widgets/menubigswitch.h>
+#include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/menucombo.h>
+#include <gui/widgets/menuheader.h>
+#include <gui/widgets/menulineedit.h>
+#include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menusectionwidget.h>
+#include "attrfactory.h"
+#include "attrwidget.h"
 
 #include <QDebug>
 
@@ -10,10 +20,66 @@ GRDeviceAddon::GRDeviceAddon(GRIIODeviceSource *src, QObject *parent)
 	: QObject(parent)
 {
 	name = src->deviceName();
-	widget = new QLabel("devicename" + src->deviceName());
+	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
 	m_src = src;
 	connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
+	widget = createMenu();
 }
+
+QWidget *GRDeviceAddon::createAttrMenu(QWidget *parent) {
+	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *attr = new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	AttrFactory *attrFactory = new AttrFactory(attrcontainer);
+	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForDevice(m_src->iioDev());
+
+	auto layout = new QVBoxLayout(attrcontainer);
+	layout->setSpacing(10);
+	layout->setMargin(0);
+
+	for(auto w : attrWidgets) {
+		layout->addWidget(w);
+	}
+
+	attr->contentLayout()->addLayout(layout);
+	attrcontainer->contentLayout()->addWidget(attr);
+	attr->header()->setChecked(false);
+	return attrcontainer;
+}
+
+QWidget *GRDeviceAddon::createMenu(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QVBoxLayout *lay = new QVBoxLayout(w);
+
+	QScrollArea *scroll = new QScrollArea(parent);
+	QWidget *wScroll = new QWidget(scroll);
+	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
+	layScroll->setMargin(0);
+	layScroll->setSpacing(10);
+
+	wScroll->setLayout(layScroll);
+	scroll->setWidgetResizable(true);
+	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	// if ScrollBarAlwaysOn - layScroll->setContentsMargins(0,0,6,0);
+
+	scroll->setWidget(wScroll);
+
+	lay->setMargin(0);
+	lay->setSpacing(10);
+	w->setLayout(lay);
+
+	MenuHeaderWidget *header = new MenuHeaderWidget(name, m_pen, w);
+	QWidget *attrmenu = createAttrMenu(w);
+
+	lay->addWidget(header);
+	lay->addWidget(scroll);
+	layScroll->addWidget(attrmenu);
+
+	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	return w;
+}
+
 
 GRDeviceAddon::~GRDeviceAddon() {}
 

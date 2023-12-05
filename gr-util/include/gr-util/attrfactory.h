@@ -42,6 +42,7 @@ public:
 
 	AttrWidget *buildSingle(uint32_t hint = AutoHint, AttributeFactoryRecipe recipe = {});
 	QList<AttrWidget *> buildAllAttrsForChannel(struct iio_channel *channel);
+	QList<AttrWidget *> buildAllAttrsForDevice(struct iio_device *dev);
 
 private:
 	struct iio_channel *m_channel;

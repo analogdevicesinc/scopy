@@ -8,7 +8,8 @@ using namespace scopy::attr;
 
 AttrDataStrategy::AttrDataStrategy(AttributeFactoryRecipe recipe, QObject *parent)
 {
-	m_recipe = std::move(recipe);
+//	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	setParent(parent);
 }
 
@@ -19,11 +20,19 @@ void AttrDataStrategy::save(QString data)
 		return;
 	}
 
-	ssize_t res = iio_channel_attr_write(m_recipe.channel, m_recipe.data.toStdString().c_str(),
-					     data.toStdString().c_str());
+	ssize_t res = -1;
+	if(m_recipe.device != nullptr)
+		res = iio_device_attr_write(m_recipe.device, m_recipe.data.toStdString().c_str(),
+						     data.toStdString().c_str());
+	else {
+		res = iio_channel_attr_write(m_recipe.channel, m_recipe.data.toStdString().c_str(),
+						     data.toStdString().c_str());
+	}
 	if(res < 0) {
 		qWarning(CAT_ATTR_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
 	}
+
+	requestData();
 }
 
 void AttrDataStrategy::requestData()
@@ -35,16 +44,24 @@ void AttrDataStrategy::requestData()
 
 	char options[256] = {0}, currentValue[256] = {0};
 
-	ssize_t currentValueResult =
-		iio_channel_attr_read(m_recipe.channel, m_recipe.data.toStdString().c_str(), currentValue, 256);
+	ssize_t currentValueResult = - 1;
+	if(m_recipe.device != nullptr) {
+		currentValueResult = iio_device_attr_read(m_recipe.device, m_recipe.data.toStdString().c_str(), currentValue, 256);
+	} else {
+		currentValueResult = iio_channel_attr_read(m_recipe.channel, m_recipe.data.toStdString().c_str(), currentValue, 256);
+	}
 	if(currentValueResult < 0) {
 		qWarning(CAT_ATTR_DATA_STRATEGY)
 			<< "Could not read" << m_recipe.data << "error code:" << currentValueResult;
 	}
 
 	if(m_recipe.dataOptions != "") {
-		ssize_t optionsResult = iio_channel_attr_read(m_recipe.channel,
-							      m_recipe.dataOptions.toStdString().c_str(), options, 256);
+		ssize_t optionsResult = -1;
+		if(m_recipe.device != nullptr) {
+			optionsResult = iio_device_attr_read(m_recipe.device, m_recipe.dataOptions.toStdString().c_str(), options, 256);
+		} else {
+			optionsResult = iio_channel_attr_read(m_recipe.channel, m_recipe.dataOptions.toStdString().c_str(), options, 256);
+		}
 		if(optionsResult < 0) {
 			qWarning(CAT_ATTR_DATA_STRATEGY)
 				<< "Could not read" << m_recipe.data << "error code:" << optionsResult;

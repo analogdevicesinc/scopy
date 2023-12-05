@@ -8,19 +8,17 @@ ComboAttrUi::ComboAttrUi(AttributeFactoryRecipe recipe, QObject *parent)
 	: m_ui(new QWidget(nullptr))
 {
 	setParent(parent);
-	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
-	m_menuComboWidget = new MenuComboWidget(m_recipe.data, m_ui);
-	m_menuComboWidget->layout()->setContentsMargins(0, 0, 0, 0);
-	m_menuComboWidget->layout()->setMargin(0);
-	m_ui->layout()->addWidget(m_menuComboWidget);
+	m_comboWidget = new MenuCombo(m_recipe.data, m_ui);
+	m_ui->layout()->addWidget(m_comboWidget);
 	Q_EMIT requestData();
 
-	connect(m_menuComboWidget->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+	connect(m_comboWidget->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this,
 		[this](int index) {
-			QString currentData = m_menuComboWidget->combo()->currentText();
+			QString currentData = m_comboWidget->combo()->currentText();
 			Q_EMIT emitData(currentData);
 		});
 }
@@ -39,12 +37,14 @@ bool ComboAttrUi::isValid()
 
 void ComboAttrUi::receiveData(QString currentData, QString optionalData)
 {
+	auto combo = m_comboWidget->combo();
+	QSignalBlocker blocker(combo);
 	QStringList optionsList = QString(optionalData).split(" ", Qt::SkipEmptyParts);
 	for(const QString &item : optionsList) {
-		m_menuComboWidget->combo()->addItem(item);
+		combo->addItem(item);
 	}
 
-	m_menuComboWidget->combo()->setCurrentText(currentData);
+	combo->setCurrentText(currentData);
 }
 
 #include "moc_comboguistrategy.cpp"
