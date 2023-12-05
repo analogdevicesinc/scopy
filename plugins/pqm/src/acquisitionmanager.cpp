@@ -82,18 +82,17 @@ void AcquisitionManager::readBufferedData()
 		if(ret > 0) {
 			int i = 0;
 			int idx = 0;
-			uint32_t data = 0.0;
 			QString chnl;
-			uint32_t *startAdr = (uint32_t *)iio_buffer_start(m_buffer);
-			uint32_t *endAdr = (uint32_t *)iio_buffer_end(m_buffer);
+			float *startAdr = (float *)iio_buffer_start(m_buffer);
+			float *endAdr = (float *)iio_buffer_end(m_buffer);
 			for(const QString &ch : qAsConst(m_chnlsName)) {
 				m_bufferData[ch].clear();
 				m_bufferData[ch] = {};
 			}
-			for(uint32_t *ptr = startAdr; ptr != endAdr; ptr++) {
+			for(float *ptr = startAdr; ptr != endAdr; ptr++) {
 				idx = i % m_chnlsName.size();
 				chnl = m_chnlsName[idx];
-				uint32_t d_ptr = (uint32_t)*ptr;
+				float d_ptr = (float)*ptr;
 				m_bufferData[chnl].push_back(d_ptr);
 				i++;
 			}

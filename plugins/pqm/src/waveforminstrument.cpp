@@ -25,12 +25,12 @@ WaveformInstrument::WaveformInstrument(QWidget *parent)
 
 	m_voltagePlot = new PlotWidget(this);
 	m_tool->addWidgetToCentralContainerHelper(m_voltagePlot);
-	initPlot(m_voltagePlot, "V");
+	initPlot(m_voltagePlot, "V", -400, 400);
 	setupChannels(m_voltagePlot, m_chnls["voltage"]);
 
 	m_currentPlot = new PlotWidget(this);
 	m_tool->addWidgetToCentralContainerHelper(m_currentPlot);
-	initPlot(m_currentPlot, "A");
+	initPlot(m_currentPlot, "A", -20, 20);
 	setupChannels(m_currentPlot, m_chnls["current"]);
 
 	m_runBtn = new RunBtn(this);
