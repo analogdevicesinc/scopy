@@ -54,7 +54,7 @@ QDir Utils::setXmlPath()
 	QDir xmlsPath(REGMAP_XML_BUILD_PATH);
 	if(xmlsPath.entryList().empty()) {
 #ifdef Q_OS_WINDOWS
-		xmlsPath.setPath("/plugins/regmap/xmls");
+		xmlsPath.setPath(REGMAP_XML_PATH_LOCAL);
 #else
 		xmlsPath.setPath(REGMAP_XML_SYSTEM_PATH);
 #endif
