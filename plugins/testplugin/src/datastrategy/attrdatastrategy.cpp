@@ -8,7 +8,7 @@ using namespace scopy::attr;
 
 AttrDataStrategy::AttrDataStrategy(AttributeFactoryRecipe recipe, QObject *parent)
 {
-	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	setParent(parent);
 }
 
