@@ -107,7 +107,7 @@ bool ADCPlugin::loadPreferencesPage()
 
 bool ADCPlugin::loadIcon()
 {
-	SCOPY_PLUGIN_ICON(":/gui/icons/adalm.svg");
+	SCOPY_PLUGIN_ICON(":/gui/icons/scopy-default/icons/tool_oscilloscope.svg");
 	return true;
 }
 
@@ -120,7 +120,7 @@ bool ADCPlugin::loadPage()
 
 void ADCPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_home.svg"));
+	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
 PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
@@ -238,7 +238,7 @@ void ADCPlugin::initMetadata()
 	loadMetadata(
 		R"plugin(
 	{
-	   "priority":2,
+	   "priority":10,
 	   "category":[
 		  "iio",
 		  "adc"
