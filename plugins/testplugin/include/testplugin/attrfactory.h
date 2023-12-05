@@ -33,7 +33,8 @@ public:
 		// data hint mask is 0xnn____
 		AttrData = 0x010000,
 		TriggerData = 0x020000,
-		FileDemoData = 0x040000,
+		DeviceAttrData = 0x040000,
+		FileDemoData = 0x080000,
 	};
 
 	explicit AttrFactory(QWidget *parent = nullptr);

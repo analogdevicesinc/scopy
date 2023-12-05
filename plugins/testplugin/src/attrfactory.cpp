@@ -6,6 +6,7 @@
 #include "guistrategy/switchguistrategy.h"
 #include "datastrategy/attrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
+#include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/filedemodatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
@@ -73,6 +74,57 @@ QList<AttrWidget *> AttrFactory::buildAllAttrsForChannel(struct iio_channel *cha
 	return result;
 }
 
+QList<AttrWidget *> AttrFactory::buildAllAttrsForDevice(struct iio_device *dev)
+{
+	QList<AttrWidget *> result;
+
+	QList<QString> devAttributes;
+	ssize_t devAttrCount = iio_device_get_attrs_count(dev);
+	for(int i = 0; i < devAttrCount; ++i) {
+		const char *attrName = iio_device_get_attr(dev, i);
+		if(attrName != nullptr) {
+			devAttributes.append(attrName);
+		}
+	}
+
+	for(const auto &attributeName : devAttributes) {
+		if(attributeName.endsWith("_available")) {
+			continue;
+		}
+
+		uint32_t hint = DeviceAttrData;
+		AttributeFactoryRecipe recipe;
+		recipe.device = dev;
+		recipe.data = attributeName;
+		QString availableAttrName = attributeName + "_available";
+		if(devAttributes.contains(availableAttrName)) {
+			recipe.dataOptions = availableAttrName;
+			char buffer[ATTR_BUFFER_SIZE] = {0};
+			ssize_t res = iio_device_attr_read(dev, availableAttrName.toStdString().c_str(), buffer,
+							    ATTR_BUFFER_SIZE);
+			if(res < 0) {
+				qWarning(CAT_ATTRFACTORY) << "Could not read data from" << availableAttrName;
+				continue;
+			}
+
+			QString readOptions(buffer);
+			if(readOptions.startsWith("[")) {
+				hint |= RangeUi | TimeSave;
+				/*} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) { // CustomSwitch is broken
+					hint |= SwitchUi | InstantSave;*/
+			} else {
+				hint |= ComboUi | TimeSave;
+			}
+		} else {
+			hint |= EditableUi | TimeSave;
+		}
+
+		result.append(this->buildSingle(hint, recipe));
+	}
+
+	return result;
+}
+
 AttrWidget *AttrFactory::buildSingle(uint32_t hint, AttributeFactoryRecipe recipe)
 {
 	attr::AttrUiStrategyInterface *uiStrategy = nullptr;
@@ -106,6 +158,8 @@ AttrWidget *AttrFactory::buildSingle(uint32_t hint, AttributeFactoryRecipe recip
 		dataStrategy = new attr::AttrDataStrategy(recipe, this);
 	} else if(hint & TriggerData) {
 		dataStrategy = new attr::TriggerDataStrategy(recipe, this);
+	} else if (hint & DeviceAttrData) {
+		dataStrategy = new attr::DeviceAttrDataStrategy(recipe, this);
 	} else if(hint & FileDemoData) {
 		dataStrategy = new attr::FileDemoDataStrategy(recipe, this);
 	}
