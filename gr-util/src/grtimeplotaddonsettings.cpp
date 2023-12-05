@@ -114,7 +114,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 			{"ksamples", 1e3},
 			{"Msamples", 1e6},
 		},
-		"Buffer Size", 16, (double)((long)1 << 31), false, false, bufferPlotSize);
+		"Buffer Size", 16, DBL_MAX, false, false, bufferPlotSize);
 
 	connect(m_bufferSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) {
 		if(m_plotSizeSpin->value() < val) {
@@ -132,7 +132,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 			{"Msamples", 1e6},
 			{"Gsamples", 1e9},
 		},
-		"Plot Size", 16, (double)((long)1 << 31), false, false, bufferPlotSize);
+		"Plot Size", 16, DBL_MAX, false, false, bufferPlotSize);
 
 	connect(m_plotSizeSpin, &ScaleSpinButton::valueChanged, this, [=](double val) { setPlotSize((uint32_t)val); });
 	connect(this, &GRTimePlotAddonSettings::plotSizeChanged, m_plot, &GRTimePlotAddon::setPlotSize);
@@ -175,7 +175,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 			{"Ms", 1e6},
 			{"Gs", 1e9},
 		},
-		"XMin", (double)((-((long)1 << 31))), (double)((long)1 << 31), false, false, xMinMax);
+		"XMin", -DBL_MAX, DBL_MAX, false, false, xMinMax);
 
 	m_xmax = new PositionSpinButton(
 		{
@@ -187,7 +187,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 			{"Ms", 1e6},
 			{"Gs", 1e9},
 		},
-		"XMax", (double)((-((long)1 << 31))), (double)((long)1 << 31), false, false, xMinMax);
+		"XMax", -DBL_MAX, DBL_MAX, false, false, xMinMax);
 
 	auto m_plotAxis = m_plot->plot()->xAxis();
 	// Connects
@@ -247,7 +247,7 @@ QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
 			{"MHz", 1e6},
 			{"GHz", 1e9},
 		},
-		"SampleRate", 1, (double)((long)1 << 31), false, false, xaxis);
+		"SampleRate", 1, DBL_MAX, false, false, xaxis);
 
 	m_sampleRateSpin->setEnabled(false);
 	connect(m_sampleRateSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setSampleRate(val); });
@@ -460,7 +460,7 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 		 {"MHz", 1e6},
 		 {"GHz", 1e9},
 		 },
-		"Frequency Offset", 0, (double)((long)1 << 40), false, false, fft);
+		"Frequency Offset", 0, DBL_MAX, false, false, fft);
 
 	m_freqOffsetSpin->setEnabled(true);
 	connect(m_freqOffsetSpin, &PositionSpinButton::valueChanged, this, [=](double val) { setFreqOffset(val); });
