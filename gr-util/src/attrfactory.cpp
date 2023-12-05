@@ -6,6 +6,7 @@
 #include "guistrategy/switchguistrategy.h"
 #include "datastrategy/attrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
+#include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/filedemodatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
@@ -91,7 +92,7 @@ QList<AttrWidget *> AttrFactory::buildAllAttrsForDevice(struct iio_device *dev)
 			continue;
 		}
 
-		uint32_t hint = AttrData;
+		uint32_t hint = DeviceAttrData;
 		AttributeFactoryRecipe recipe;
 		recipe.device = dev;
 		recipe.data = attributeName;
@@ -157,6 +158,8 @@ AttrWidget *AttrFactory::buildSingle(uint32_t hint, AttributeFactoryRecipe recip
 		dataStrategy = new attr::AttrDataStrategy(recipe, this);
 	} else if(hint & TriggerData) {
 		dataStrategy = new attr::TriggerDataStrategy(recipe, this);
+	} else if (hint & DeviceAttrData) {
+		dataStrategy = new attr::DeviceAttrDataStrategy(recipe, this);
 	} else if(hint & FileDemoData) {
 		dataStrategy = new attr::FileDemoDataStrategy(recipe, this);
 	}
