@@ -1,4 +1,5 @@
 #include "time_ycontrol.h"
+#include <cfloat>
 
 using namespace scopy::grutil;
 TimeYControl::TimeYControl(PlotAxis *m_plotAxis, QWidget *parent)
@@ -17,7 +18,7 @@ TimeYControl::TimeYControl(PlotAxis *m_plotAxis, QWidget *parent)
 			{"M", 1e6},
 			{"G", 1e9},
 		},
-		"YMin", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, this);
+		"YMin", -DBL_MAX, DBL_MAX, false, false, this);
 
 	m_ymax = new PositionSpinButton(
 		{
@@ -26,7 +27,7 @@ TimeYControl::TimeYControl(PlotAxis *m_plotAxis, QWidget *parent)
 			{"M", 1e6},
 			{"G", 1e9},
 		},
-		"YMax", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, this);
+		"YMax", -DBL_MAX, DBL_MAX, false, false, this);
 
 	yMinMaxLayout->addWidget(m_ymin);
 	yMinMaxLayout->addWidget(m_ymax);
