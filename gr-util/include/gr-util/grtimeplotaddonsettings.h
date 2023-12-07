@@ -99,6 +99,7 @@ private:
 	QPen m_pen;
 
 	TimeYControl *m_yctrl;
+	TimeYControl *m_fftyctrl;
 	MenuOnOffSwitch *m_singleYModeSw;
 	QPushButton *m_autoscaleBtn;
 	TimeYAutoscale *autoscaler;
