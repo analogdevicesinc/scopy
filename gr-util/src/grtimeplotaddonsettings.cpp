@@ -489,6 +489,10 @@ QWidget *GRTimePlotAddonSettings::createFFTMenu(QWidget *parent)
 
 	fftLayout->addWidget(m_fftwindow);
 	fftLayout->addWidget(m_freqOffsetSpin);
+
+	m_fftyctrl = new TimeYControl(m_plot->fftplotch()->yAxis(), fft);
+	fftLayout->addWidget(m_fftyctrl);
+
 	auto curve = createCurveMenu(m_plot->fftplotch(),fft);
 	fftLayout->addWidget(curve);
 
@@ -551,6 +555,8 @@ void GRTimePlotAddonSettings::onInit()
 	m_singleYModeSw->setEnabled(true);
 	m_singleYModeSw->onOffswitch()->setChecked(false);
 	m_autoscaleBtn->setEnabled(false);
+	m_fftyctrl->setMax(5);
+	m_fftyctrl->setMin(-145);
 
 	fft_complex_mode->onOffswitch()->setChecked(false);
 	//	m_rollingModeSw->onOffswitch()->setChecked(false);
