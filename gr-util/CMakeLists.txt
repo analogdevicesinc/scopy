@@ -72,3 +72,5 @@ target_link_libraries(
 	       gnuradio::gnuradio-iio
 	       gnuradio::gnuradio-scopy
 )
+
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION ${SCOPY_DLL_PATH} RUNTIME DESTINATION ${SCOPY_DLL_PATH})
