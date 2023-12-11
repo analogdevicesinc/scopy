@@ -98,6 +98,10 @@ namespace Ui {
 	class CursorsSettings;
 }
 
+namespace scopy {
+	class MousePlotMagnifier;
+}
+
 namespace adiscope {
 	class CustomPushButton;
 	class Oscilloscope_API;

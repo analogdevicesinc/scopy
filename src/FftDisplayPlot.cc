@@ -445,6 +445,18 @@ void FftDisplayPlot::setZoomerEnabled()
         }
 }
 
+void FftDisplayPlot::setMagnifierEnabled(bool enabled)
+{
+	d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+	d_magnifier[0]->setEnabled(enabled);
+	d_magnifier[0]->setYAxisEnabled(false);
+	connect(d_magnifier[0], &scopy::MousePlotMagnifier::reset, this, [=](){
+		d_zoomer[0]->zoom(0);
+	});
+
+	d_magnifier[0]->setBaseRect(d_zoomer[0]->zoomBase());
+}
+
 void FftDisplayPlot::setNumPoints(uint64_t num_points)
 {
 	d_numPoints = num_points;
@@ -897,13 +909,11 @@ void FftDisplayPlot::setAmplitude(double top, double bottom)
 void FftDisplayPlot::updateZoomerBase()
 {
 	QRectF rect = QRectF(m_sweepStart, m_bottom, m_sweepStop - m_sweepStart, m_top - m_bottom);
-	getZoomer()->zoom(rect);
 
-	getZoomer()->blockSignals(true);
-	getZoomer()->setZoomBase(rect);
-	getZoomer()->QwtPlotZoomer::zoom(rect);
-	getZoomer()->blockSignals(false);
+	getMagnifier()->setBaseRect(rect);
+	Q_EMIT getMagnifier()->reset();
 
+	getZoomer()->setZoomBase();
 }
 
 void FftDisplayPlot::customEvent(QEvent *e)

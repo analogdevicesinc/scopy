@@ -80,6 +80,8 @@ Q_DECLARE_METATYPE ( QColorList )
 #else /* QWT_VERSION < 0x060100 */
 #include <qwt_legend_data.h>
 #include <qwt_legend_label.h>
+
+#include <gui/mouseplotmagnifier.hpp>
 #endif /* QWT_VERSION < 0x060100 */
 
 namespace adiscope {
@@ -430,6 +432,8 @@ public:
 
   void adjustHandleAreasSize(bool cursors = false);
   void setCursorAxes(QwtAxisId fixed_axis, QwtAxisId mobile_axis);
+  scopy::MousePlotMagnifier *getMagnifier();
+  QVector<scopy::MousePlotMagnifier*> getMagnifierList();
 public Q_SLOTS:
   virtual void disableLegend();
   virtual void setYaxis(double min, double max);
@@ -620,6 +624,7 @@ protected:
 
   QwtPlotPanner* d_panner;
   QVector<QwtPlotZoomer*> d_zoomer;
+  QVector<scopy::MousePlotMagnifier *> d_magnifier;
   QwtPlotGrid *d_grid;
 
   QwtDblClickPlotPicker *d_picker;

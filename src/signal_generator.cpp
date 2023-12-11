@@ -593,6 +593,7 @@ SignalGenerator::SignalGenerator(struct iio_context *_ctx, Filter *filt,
 		this, SLOT(loadFileCurrentChannelData()));
 
 	m_plot->addZoomer(0);
+	m_plot->addMagnifier(0);
 	resetZoom();
 
 	auto ptr = getCurrentData();
@@ -739,8 +740,8 @@ void SignalGenerator::resetZoom()
 	m_plot->setVertOffset(0);
 	m_plot->setHorizUnitsPerDiv(period/10);
 	m_plot->setHorizOffset(period/2);
-	m_plot->zoomBaseUpdate();
 	rescale();
+	m_plot->zoomBaseUpdate(true);
 	if(slowSignalId != -1) {
 		m_plot->DetachCurve(slowSignalId);
 		m_plot->AttachCurve(slowSignalId);
