@@ -320,6 +320,7 @@ SpectrumAnalyzer::SpectrumAnalyzer(struct iio_context *ctx, Filter *filt,
 	fft_plot->setAxisVisible(QwtAxis::YRight, false);
 	fft_plot->setAxisVisible(QwtAxis::XTop, false);
 	fft_plot->setUsingLeftAxisScales(false);
+	fft_plot->setMagnifierEnabled(true);
 
 	ui->gridLayout_plot->addWidget(centralWidget, 1, 0, 1, 1);
 
@@ -1704,65 +1705,44 @@ void SpectrumAnalyzer::cursor_panel_init()
 
 void SpectrumAnalyzer::connectZoomers()
 {
-	fft_plot->getZoomer()->zoom(0);
-	waterfall_plot->getZoomer()->zoom(0);
+	// force zoom to base to set the m_updateBaseNextZoom flag to false
+	waterfall_plot->getZoomer()->zoom(waterfall_plot->getZoomer()->zoomBase());
+	fft_plot->getZoomer()->zoom(fft_plot->getZoomer()->zoomBase());
 
-	connect(fft_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
-		auto waterfall_zoomer = waterfall_plot->getZoomer();
-		auto const new_rect = QRectF(rect.left(), waterfall_zoomer->zoomBase().top(), rect.width(), waterfall_zoomer->zoomBase().height());
+	// plot magnifiers
+	connect(fft_plot->getMagnifier(), &scopy::MousePlotMagnifier::zoomed, waterfall_plot->getMagnifier(), &scopy::MousePlotMagnifier::silentZoom);
+	connect(fft_plot->getMagnifier(), &scopy::MousePlotMagnifier::panned, waterfall_plot->getMagnifier(), &scopy::MousePlotMagnifier::silentPan);
 
-		waterfall_zoomer->blockSignals(true);
-		fft_plot->getZoomer()->blockSignals(true);
+	connect(waterfall_plot->getMagnifier(), &scopy::MousePlotMagnifier::zoomed, fft_plot->getMagnifier(), &scopy::MousePlotMagnifier::silentZoom);
+	connect(waterfall_plot->getMagnifier(), &scopy::MousePlotMagnifier::panned, fft_plot->getMagnifier(), &scopy::MousePlotMagnifier::silentPan);
 
-		// if fft was zoomed out
-		if (waterfall_zoomer->zoomRectIndex() > fft_plot->getZoomer()->zoomRectIndex()) {
-			auto wf_stack = waterfall_zoomer->zoomStack();
-			auto fft_stack = fft_plot->getZoomer()->zoomStack();
+	// plot zoomers
+	connect(fft_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF &rect) {
+		uint fft_zoomer_index = fft_plot->getZoomer()->zoomRectIndex();
+		QwtPlotZoomer *wf_zoomer = waterfall_plot->getZoomer();
 
-			fft_stack.pop();
-			wf_stack.pop();
-			waterfall_zoomer->setZoomStack(wf_stack, waterfall_zoomer->zoomRectIndex() - 1);
-			fft_plot->getZoomer()->setZoomStack(fft_stack, fft_plot->getZoomer()->zoomRectIndex());
+		if(wf_zoomer->zoomRectIndex() > fft_zoomer_index) { // zoom out
+			wf_zoomer->zoom(-1);
 
-			// if fft was zoomed in
-		} else if (waterfall_zoomer->zoomRectIndex() < fft_plot->getZoomer()->zoomRectIndex()) {
-			auto wf_stack = waterfall_zoomer->zoomStack();
-
-			wf_stack.push(new_rect);
-			waterfall_zoomer->setZoomStack(wf_stack, waterfall_zoomer->zoomRectIndex() + 1);
+		} else if(wf_zoomer->zoomRectIndex() < fft_zoomer_index) { // zoom in
+			QRectF const new_rect = QRectF(rect.left(), wf_zoomer->zoomBase().top(), rect.width(),
+						       wf_zoomer->zoomBase().height());
+			wf_zoomer->zoom(new_rect);
 		}
-
-		waterfall_zoomer->blockSignals(false);
-		fft_plot->getZoomer()->blockSignals(false);
 	});
 
-	connect(waterfall_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF& rect){
-		auto fft_zoomer = fft_plot->getZoomer();
-		auto const new_rect = QRectF(rect.left(), fft_zoomer->zoomBase().top(), rect.width(), fft_zoomer->zoomBase().height());
+	connect(waterfall_plot->getZoomer(), &QwtPlotZoomer::zoomed, this, [=](const QRectF &rect) {
+		uint wf_zoomer_index = waterfall_plot->getZoomer()->zoomRectIndex();
+		QwtPlotZoomer *fft_zoomer = fft_plot->getZoomer();
 
-		fft_zoomer->blockSignals(true);
-		waterfall_plot->getZoomer()->blockSignals(true);
+		if(fft_zoomer->zoomRectIndex() > wf_zoomer_index) { // zoom out
+			fft_zoomer->zoom(-1);
 
-
-		// if waterfall was zoomed out
-		if (fft_zoomer->zoomRectIndex() > waterfall_plot->getZoomer()->zoomRectIndex()) {
-			auto fft_stack = fft_zoomer->zoomStack();
-			auto wf_stack = waterfall_plot->getZoomer()->zoomStack();
-
-			fft_stack.pop();
-			wf_stack.pop();
-			fft_zoomer->setZoomStack(fft_stack, fft_zoomer->zoomRectIndex() - 1);
-			waterfall_plot->getZoomer()->setZoomStack(wf_stack, waterfall_plot->getZoomer()->zoomRectIndex());
-
-			// if waterfall was zoomed in
-		} else if (fft_zoomer->zoomRectIndex() < waterfall_plot->getZoomer()->zoomRectIndex()){
-			auto fft_stack = fft_zoomer->zoomStack();
-			fft_stack.push(new_rect);
-			fft_zoomer->setZoomStack(fft_stack, fft_zoomer->zoomRectIndex() + 1);
+		} else if(fft_zoomer->zoomRectIndex() < wf_zoomer_index) { // zoom in
+			QRectF const new_rect = QRectF(rect.left(), fft_zoomer->zoomBase().top(), rect.width(),
+						       fft_zoomer->zoomBase().height());
+			fft_zoomer->zoom(new_rect);
 		}
-
-		fft_zoomer->blockSignals(false);
-		waterfall_plot->getZoomer()->blockSignals(false);
 	});
 }
 

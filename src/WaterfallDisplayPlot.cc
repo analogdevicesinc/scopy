@@ -174,6 +174,13 @@ WaterfallDisplayPlot::WaterfallDisplayPlot(int nplots, QWidget* parent)
 	font.setWeight(75);
 	d_zoomer[0]->setTrackerFont(font);
 
+	d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+	d_magnifier[0]->setEnabled(true);
+	d_magnifier[0]->setYAxisEnabled(false);
+	connect(d_magnifier[0], &scopy::MousePlotMagnifier::reset, this, [=](){
+		d_zoomer[0]->zoom(0);
+	});
+
 	_updateIntensityRangeDisplay();
 
 	// offset between fft plot and waterfall plot raw values
@@ -416,12 +423,7 @@ void WaterfallDisplayPlot::resetAxis(bool resetData)
 
 	setAxisScale(QwtAxis::XBottom, d_start_frequency, d_stop_frequency);
 
-	// Load up the new base zoom settings
-	QwtDoubleRect zbase = d_zoomer[0]->zoomBase();
-	d_zoomer[0]->zoom(zbase);
-	d_zoomer[0]->setZoomBase(zbase);
-	d_zoomer[0]->setZoomBase(true);
-	d_zoomer[0]->zoom(0);
+	updateZoomerBase();
 }
 
 void WaterfallDisplayPlot::setLeftVertAxisUnit(const QString &unit)
@@ -981,13 +983,11 @@ void WaterfallDisplayPlot::setUpdateTime(double t)
 void WaterfallDisplayPlot::updateZoomerBase()
 {
 	QRectF rect = QRectF(d_start_frequency, 0, d_stop_frequency - d_start_frequency, d_visible_samples);
-	getZoomer()->zoom(rect);
 
-	getZoomer()->blockSignals(true);
-	getZoomer()->setZoomBase(rect);
-	getZoomer()->QwtPlotZoomer::zoom(rect);
-	getZoomer()->blockSignals(false);
+	getMagnifier()->setBaseRect(rect);
+	Q_EMIT getMagnifier()->reset();
 
+	getZoomer()->setZoomBase();
 }
 
 void WaterfallDisplayPlot::customEvent(QEvent *e)

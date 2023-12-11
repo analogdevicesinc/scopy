@@ -186,6 +186,11 @@ dBgraph::dBgraph(QWidget *parent, bool isdBgraph)
 	zoomer->setMousePattern(QwtEventPattern::MouseSelect2,
 				Qt::RightButton, Qt::ControlModifier);
 
+	d_magnifier.push_back(new scopy::MousePlotMagnifier(canvas()));
+	d_magnifier[0]->setXAxis(QwtAxis::XTop);
+	d_magnifier[0]->setYAxisEnabled(false);
+	d_magnifier[0]->setEnabled(true);
+
 	installEventFilter(this);
 
 	static_cast<QFrame *>(canvas())->setLineWidth(0);
@@ -438,11 +443,13 @@ void dBgraph::setYTitle(const QString& title)
 void dBgraph::setXMin(double val)
 {
 	zoomer->resetZoom();
+	Q_EMIT d_magnifier[0]->reset();
 	setAxisScale(QwtAxis::XTop, val, xmax);
 	xmin = val;
 	draw_x->invalidateCache();
 
 	zoomer->setZoomBase();
+	d_magnifier[0]->setBaseRect(zoomer->zoomBase());
 	replot();
 	auto div = axisScaleDiv(QwtAxis::XTop);
 	setXaxisNumDiv((div.ticks(2)).size() - 1);
@@ -452,11 +459,13 @@ void dBgraph::setXMin(double val)
 void dBgraph::setXMax(double val)
 {
 	zoomer->resetZoom();
+	Q_EMIT d_magnifier[0]->reset();
 	setAxisScale(QwtAxis::XTop, xmin, val);
 	xmax = val;
 	draw_x->invalidateCache();
 
 	zoomer->setZoomBase();
+	d_magnifier[0]->setBaseRect(zoomer->zoomBase());
 	replot();
 	auto div = axisScaleDiv(QwtAxis::XTop);
 	setXaxisNumDiv((div.ticks(2)).size() - 1);
@@ -474,6 +483,7 @@ void dBgraph::setYMin(double val)
 	double width = xmax - xmin;
 	double height = ymax - ymin;
 	zoomer->setZoomBase(QRectF(xmin, ymin, width, height));
+	d_magnifier[0]->setBaseRect(zoomer->zoomBase());
 }
 
 void dBgraph::setYMax(double val)
@@ -485,6 +495,7 @@ void dBgraph::setYMax(double val)
 	double width = xmax - xmin;
 	double height = ymax - ymin;
 	zoomer->setZoomBase(QRectF(xmin, ymin, width, height));
+	d_magnifier[0]->setBaseRect(zoomer->zoomBase());
 }
 
 QString dBgraph::xUnit() const
@@ -775,6 +786,7 @@ void dBgraph::mousePressEvent(QMouseEvent *event)
 void dBgraph::onResetZoom()
 {
 	zoomer->resetZoom();
+	Q_EMIT d_magnifier[0]->reset();
 }
 
 #ifdef __ANDROID__
