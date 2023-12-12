@@ -25,27 +25,8 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN TRUE)
 
 set(SCOPY_QT_COMPONENTS Widgets Core)
 
-file(
-	GLOB
-	SRC_LIST
-	src/*.cpp
-	src/*.cc
-	src/datastrategy/*.cpp
-	src/guistrategy/*.cpp
-	src/savestrategy/*.cpp
-)
-file(
-	GLOB
-	HEADER_LIST
-	include/${SCOPY_MODULE}/*.h
-	include/${SCOPY_MODULE}/*.hpp
-	include/${SCOPY_MODULE}/datastrategy/*.h
-	include/${SCOPY_MODULE}/datastrategy/*.hpp
-	include/${SCOPY_MODULE}/guistrategy/*.h
-	include/${SCOPY_MODULE}/guistrategy/*.hpp
-	include/${SCOPY_MODULE}/savestrategy/*.h
-	include/${SCOPY_MODULE}/savestrategy/*.hpp
-)
+file(GLOB SRC_LIST src/*.cpp src/*.cc)
+file(GLOB HEADER_LIST include/${SCOPY_MODULE}/*.h include/${SCOPY_MODULE}/*.hpp)
 file(GLOB UI_LIST ui/*.ui)
 
 set(ENABLE_TESTING ON)
@@ -72,26 +53,15 @@ generate_export_header(
 	${PROJECT_NAME} EXPORT_FILE_NAME ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/${PROJECT_NAME}_export.h
 )
 
-target_include_directories(
-	${PROJECT_NAME}
-	INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include ${CMAKE_CURRENT_SOURCE_DIR}/include/datastrategy
-		  ${CMAKE_CURRENT_SOURCE_DIR}/include/guistrategy ${CMAKE_CURRENT_SOURCE_DIR}/include/savestrategy
-)
-target_include_directories(
-	${PROJECT_NAME}
-	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/datastrategy
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/guistrategy
-		${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE}/savestrategy
-		scopy-gui
-)
+target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} scopy-gui)
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-iio-widgets)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})
 endforeach()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopy-pluginbase scopy-gui)
+target_link_libraries(${PROJECT_NAME} PUBLIC ${SCOPY_QT_LIBRARIES} scopy-pluginbase scopy-gui scopy-iio-widgets)
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

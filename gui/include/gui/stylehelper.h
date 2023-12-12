@@ -95,6 +95,7 @@ public:
 	static void TransparentWidget(QWidget *w, QString objectName = "");
 	static void ScopyStatusBar(QWidget *w, QString objectName = "");
 	static void IIOWidget(QWidget *w, QString objectName = "");
+	static void IIOWidgetElement(QWidget *w, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
