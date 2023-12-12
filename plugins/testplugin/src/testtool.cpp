@@ -3,7 +3,7 @@
 #include "plotaxis.h"
 #include "plotwidget.h"
 #include "spinbox_a.hpp"
-#include "attrfactory.h"
+#include <iio-widgets/iiowidgetfactory.h>
 
 #include <QButtonGroup>
 #include <QDebug>
@@ -162,7 +162,8 @@ TestTool::TestTool(QWidget *parent)
 	QWidget *wch0 = createMenu(tool);
 	QLabel *wch1 = new QLabel("Channel1Label");
 
-	auto *wch2 = iioWidgetsSettingsHelper();
+	//	auto *wch2 = iioWidgetsSettingsHelper();
+	auto *wch2 = new QLabel("Channel2Label");
 
 	tool->rightStack()->add("ch0", wch0);
 	tool->rightStack()->add("ch1", wch1);
@@ -308,7 +309,7 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
 	struct iio_device *device = iio_context_find_device(context, "ad74413r");
 	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
-	auto attrFactory = new AttrFactory(this);
+	auto attrFactory = new IIOWidgetFactory(this);
 	auto *wch2Scroll = new QScrollArea(this);
 
 	wch2Scroll->setWidgetResizable(true);
@@ -318,9 +319,12 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	auto channelAttrMenu =
 		new MenuCollapseSection("Channel attributes", scopy::MenuCollapseSection::MHCW_ARROW, wch2);
 	channelAttrMenu->contentLayout()->setContentsMargins(0, 0, 0, 0);
+	channelAttrMenu->contentLayout()->setSpacing(10);
+	channelAttrMenu->setObjectName("this object");
 	wch2Scroll->setWidget(wch2);
 	wch2->setLayout(new QVBoxLayout(wch2));
-	QList<AttrWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
+	wch2->layout()->setContentsMargins(0, 0, 0, 0);
+	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
 
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
@@ -334,42 +338,43 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	//	attrWidgets.append(attrFactory->buildSingle(AttrFactory::AFH::InstantSave | AttrFactory::AFH::EditableUi
 	//| 							    AttrFactory::AFH::AttrData,
 	//						    {.channel = attrChannel, .data = "offset"}));
-	attrWidgets.append(
-		attrFactory->buildSingle(AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::TriggerData,
-					 {.context = context, .device = device, .data = "device_to_set_trigger_on"}));
 	attrWidgets.append(attrFactory->buildSingle(
-		AttrFactory::TimeSave | AttrFactory::ComboUi | AttrFactory::FileDemoData, {.data = "The Office Cast"}));
+		IIOWidgetFactory::TimeSave | IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
+		{.context = context, .device = device, .data = "device_to_set_trigger_on"}));
+	attrWidgets.append(attrFactory->buildSingle(IIOWidgetFactory::TimeSave | IIOWidgetFactory::ComboUi |
+							    IIOWidgetFactory::FileDemoData,
+						    {.data = "The Office Cast"}));
 
-	StyleHelper::IIOWidget(channelAttrMenu, "IIOWidget");
+	StyleHelper::IIOWidgetElement(channelAttrMenu, "IIOWidget");
 	for(auto item : attrWidgets) {
 		if(item) {
 			auto container = new QFrame(channelAttrMenu);
-			//			container->setStyleSheet(".QFrame {background-color: " +
-			//StyleHelper::getColor("ScopyBackground") + ";}");
 			auto header = new QWidget(channelAttrMenu);
-			auto title = new QLabel(item->getRecipe().data, header);
+			auto title = new QLabel(item->getRecipe().data.replace("_", " ").toUpper(), header);
 			auto errorBox = new ErrorBox(header);
 			header->setLayout(new QHBoxLayout(header));
+			header->layout()->setContentsMargins(0, 0, 0, 0);
 			header->layout()->addWidget(title);
 			header->layout()->addWidget(errorBox);
 			errorBox->changeColor(ErrorBox::AvailableColors::Green);
-			connect(item, &AttrWidget::currentStateChanged, this, [errorBox](int state, QString explanation) {
-				if(state == 0) {
-					errorBox->changeColor(ErrorBox::AvailableColors::Yellow);
-				} else if(state == 1) {
-					errorBox->changeColor(ErrorBox::AvailableColors::Green);
-				} else if(state == 2) {
-					errorBox->changeColor(ErrorBox::AvailableColors::Red);
-				}
-				errorBox->setToolTip(explanation);
-			});
-			//			StyleHelper::MenuHeaderLabel(header);
-			header->setContentsMargins(0, 0, 0, 0);
+			connect(item, &IIOWidget::currentStateChanged, this,
+				[errorBox](IIOWidget::State state, QString explanation) {
+					if(state == IIOWidget::Busy) {
+						errorBox->changeColor(ErrorBox::Yellow);
+					} else if(state == IIOWidget::Correct) {
+						errorBox->changeColor(ErrorBox::Green);
+					} else if(state == IIOWidget::Error) {
+						errorBox->changeColor(ErrorBox::Red);
+					}
+					errorBox->setToolTip(explanation);
+				});
 
 			container->setLayout(new QVBoxLayout(container));
+			container->layout()->setContentsMargins(0, 0, 0, 0);
 			container->layout()->addWidget(header);
 			container->layout()->addWidget(item);
 
+			StyleHelper::IIOWidget(container, "iioWidgetElement");
 			channelAttrMenu->contentLayout()->addWidget(container);
 		}
 	}

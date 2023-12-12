@@ -48,7 +48,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{df46c8fb-8238-48ed-90ee-07611e86d192}</object>
-                         <name>AttrFactory</name>
+                         <name>IIOWidgetFactory</name>
                          <pos>x:35;y:120</pos>
                          <rect>x:-680;y:-110;w:1360;h:220</rect>
                          <auto-sized>false</auto-sized>
@@ -71,7 +71,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{56833509-e358-4b55-8555-7383b9ff9cb9}</object>
-                         <name>AttrWidget</name>
+                         <name>IIOWidget</name>
                          <pos>x:-385;y:495</pos>
                          <rect>x:-460;y:-115;w:920;h:230</rect>
                          <visual-role>0</visual-role>
@@ -458,7 +458,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{96c28b9d-354d-42d3-a3fe-95f093ab2862}</object>
-                         <name>AttrDataStrategy</name>
+                         <name>ChannelAttrDataStrategy</name>
                          <pos>x:190;y:780</pos>
                          <rect>x:-225;y:-50;w:450;h:100</rect>
                          <visual-role>6</visual-role>
@@ -575,7 +575,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{6d544db8-de8b-45dc-9e5a-88757979ab58}</object>
-                         <name>AttributeFactoryRecipe</name>
+                         <name>IIOWidgetFactoryRecipe</name>
                          <pos>x:-920;y:215</pos>
                          <rect>x:-80;y:-60;w:160;h:120</rect>
                          <visual-role>0</visual-role>
@@ -683,7 +683,7 @@
                     <uid>{df46c8fb-8238-48ed-90ee-07611e86d192}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>AttrFactory</name>
+                  <name>IIOWidgetFactory</name>
                   <relations>
                    <handles>
                     <handles>
@@ -738,7 +738,7 @@
                     <uid>{751c9af5-d15e-4cfa-ba2d-83005f866c62}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit AttrFactory(QWidget *parent = nullptr)</declaration>
+                    <declaration>explicit IIOWidgetFactory(QWidget *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -746,7 +746,7 @@
                     <uid>{e7777817-8967-4e07-99d9-dfec7f55c2b7}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>~AttrFactory()</declaration>
+                    <declaration>IIOWidgetFactoryctory()</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -754,7 +754,7 @@
                     <uid>{8d6070f8-a57c-4cb4-940d-45fd4d37f564}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>AttrWidget *buildSingle(uint32_t hint = AutoHint, AttributeFactoryRecipe recipe = {})</declaration>
+                    <declaration>IIOWidget *buildSingle(uint32_t hint = AutoHint, IIOWidgetFactoryRecipe recipe = {})</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -762,7 +762,7 @@
                     <uid>{c38c76dd-917c-45c7-af44-325c309203ce}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>QList&lt;AttrWidget *&gt; buildAllAttrsForChannel(struct iio_channel *channel)</declaration>
+                    <declaration>QList&lt;IIOWidget *&gt; buildAllAttrsForChannel(struct iio_channel *channel)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -793,7 +793,7 @@
                     <uid>{56833509-e358-4b55-8555-7383b9ff9cb9}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>AttrWidget</name>
+                  <name>IIOWidget</name>
                   <relations>
                    <handles>
                     <handles>
@@ -1139,7 +1139,7 @@
                     <uid>{ab980556-499c-4303-a883-4f61cd7fcb14}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>AttrWidget(QString title, attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy, 		   attr::DataStrategyInterface *dataStrategy, QWidget *parent = nullptr)</declaration>
+                    <declaration>IIOWidget(QString title, attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy, 		   attr::DataStrategyInterface *dataStrategy, QWidget *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1376,7 +1376,7 @@
                     <uid>{5fd4c65a-4b40-45ea-b7df-c954af4fec60}</uid>
                     <visibility>2</visibility>
                     <type>1</type>
-                    <declaration>AttributeFactoryRecipe m_recipe</declaration>
+                    <declaration>IIOWidgetFactoryRecipe m_recipe</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -1645,7 +1645,7 @@
                     <uid>{79c703fb-23de-4585-9aaa-df9d8d398960}</uid>
                     <visibility>2</visibility>
                     <type>1</type>
-                    <declaration>AttributeFactoryRecipe m_recipe</declaration>
+                    <declaration>IIOWidgetFactoryRecipe m_recipe</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -1678,7 +1678,7 @@
                     <uid>{0e47d26b-19ef-4c99-9408-bf2609573d2c}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit EditableGuiStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1762,7 +1762,7 @@
                     <uid>{242a7568-7174-4f14-bfb3-2fda1fa3e24a}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit SwitchAttrUi(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit SwitchAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1854,7 +1854,7 @@
                     <uid>{42c20467-b3db-4a18-b1ff-4a7b04dcb76c}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit RangeAttrUi(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit RangeAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -1938,7 +1938,7 @@
                     <uid>{9ef91fde-4f41-457b-9ce8-b018a905e0c9}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit ComboAttrUi(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit ComboAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2023,7 +2023,7 @@
                     <uid>{62e7a104-905c-4daf-bd45-4a12fa0e7edb}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit TimerSaveStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit TimerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2066,7 +2066,7 @@
                     <uid>{3b2abe13-73d7-4465-bacf-fc9986069536}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>AttributeFactoryRecipe m_recipe</declaration>
+                    <declaration>IIOWidgetFactoryRecipe m_recipe</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2115,7 +2115,7 @@
                     <uid>{1ff2dc4f-1d93-4d40-8618-a3a155bf1935}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit ExternalTriggerSaveStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit ExternalTriggerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2166,7 +2166,7 @@
                     <uid>{174a06b6-5542-48b0-99a1-5f09646fb0d2}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>AttributeFactoryRecipe m_recipe</declaration>
+                    <declaration>IIOWidgetFactoryRecipe m_recipe</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2224,7 +2224,7 @@
                     <uid>{af6c5d66-18eb-4000-bd4d-43ddde03f0e1}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit InstantSaveStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit InstantSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2259,7 +2259,7 @@
                     <uid>{ced33a84-6e57-4bfd-8bd1-457f4482a497}</uid>
                     <visibility>3</visibility>
                     <type>1</type>
-                    <declaration>AttributeFactoryRecipe m_recipe</declaration>
+                    <declaration>IIOWidgetFactoryRecipe m_recipe</declaration>
                    </MClassMember>
                   </item>
                  </qlist>
@@ -2282,7 +2282,7 @@
                     <uid>{96c28b9d-354d-42d3-a3fe-95f093ab2862}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>AttrDataStrategy</name>
+                  <name>ChannelAttrDataStrategy</name>
                  </MObject>
                 </base-MObject>
                 <members>
@@ -2292,7 +2292,7 @@
                     <uid>{e4e3691e-8845-4213-bd6a-81848b7570ff}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit AttrDataStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2343,7 +2343,7 @@
                     <uid>{891d8479-9443-420a-ac53-10b36ee00a9e}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit TriggerDataStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2394,7 +2394,7 @@
                     <uid>{178cc256-6b60-4612-bfc5-0797020bd3de}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit FileDemoDataStrategy(AttributeFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit FileDemoDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2435,7 +2435,7 @@
                     <uid>{6d544db8-de8b-45dc-9e5a-88757979ab58}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>AttributeFactoryRecipe</name>
+                  <name>IIOWidgetFactoryRecipe</name>
                  </MObject>
                 </base-MObject>
                 <template>
