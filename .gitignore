@@ -50,6 +50,7 @@ gui/include/gui/scopy-gui_export.h
 gui/include/gui/scopy-gui_config.h
 gui/sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_export.h
 gui/sigrok-gui/include/sigrok-gui/scopy-sigrok-gui_config.h
+iio-widgets/include/iio-widgets/scopy-iio-widgets_export.h
 iioutil/include/iioutil/scopy-iioutil_export.h
 pluginbase/include/pluginbase/scopy-pluginbase_config.h
 pluginbase/include/pluginbase/scopy-pluginbase_export.h
