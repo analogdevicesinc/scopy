@@ -1050,15 +1050,47 @@ void StyleHelper::ScopyStatusBar(QWidget *w, QString objectName)
 
 void StyleHelper::IIOWidget(QWidget *w, QString objectName)
 {
-	if (!objectName.isEmpty()) {
+	if(!objectName.isEmpty()) {
+		w->setObjectName(objectName);
+	}
+
+	w->layout()->setContentsMargins(10, 10, 10, 10);
+	// background-color: &&ScopyBackground&&;
+
+	QString style = QString(R"css(
+		QFrame#&&ObjectName&& {
+			border: 3px solid &&ScopyBackground&&;
+			border-radius: 4px;
+			margin-bottom: 3px;
+		}
+
+		QProgressBar {
+			background-color: #F5A623;
+		}
+	)css");
+
+	style.replace("&&ObjectName&&", objectName);
+	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::IIOWidgetElement(QWidget *w, QString objectName)
+{
+	if(!objectName.isEmpty()) {
 		w->setObjectName(objectName);
 	}
 
 	w->layout()->setContentsMargins(10, 10, 10, 10);
 	QString style = QString(R"css(
-		background-color: &&UIElementBackground&&;
-		border-radius: 4px;
-		margin-bottom: 3px;
+		QWidget {
+			background-color: &&UIElementBackground&&;
+			border-radius: 4px;
+			margin-bottom: 3px;
+		}
+
+		QProgressBar {
+			background-color: #F5A623;
+		}
 	)css");
 
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
