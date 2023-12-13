@@ -62,6 +62,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-gui
 	       scopy-gr-gui
+	       scopy-iio-widgets
 	       gnuradio::gnuradio-runtime
 	       gnuradio::gnuradio-analog
 	       gnuradio::gnuradio-blocks

@@ -2,8 +2,8 @@
 #define SCOPY_COMBOGUISTRATEGY_H
 
 #include <QWidget>
-#include <QComboBox>
 #include <iio.h>
+#include <gui/widgets/menucombo.h>
 #include "guistrategy/guistrategyinterface.h"
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
@@ -30,7 +30,7 @@ public:
 
 private:
 	QWidget *m_ui;
-	QComboBox *m_comboWidget;
+	MenuCombo *m_comboWidget;
 };
 } // namespace scopy::attr
 
