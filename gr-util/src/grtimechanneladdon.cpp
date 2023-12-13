@@ -16,6 +16,7 @@
 #include <gui/widgets/menuonoffswitch.h>
 #include <gui/widgets/menusectionwidget.h>
 #include <pluginbase/preferences.h>
+#include <iio-widgets/iiowidgetfactory.h>
 
 Q_LOGGING_CATEGORY(CAT_GR_TIME_CHANNEL, "GRTimeChannel");
 using namespace scopy::grutil;
@@ -278,6 +279,7 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	MenuHeaderWidget *header = new MenuHeaderWidget(m_channelName, m_pen, w);
 	QWidget *yaxismenu = createYAxisMenu(w);
 	QWidget *curvemenu = createCurveMenu(w);
+	QWidget *attrmenu = createAttrMenu(w);
 
 	QWidget *hMeasure = createMeasurementMenuSection("HORIZONTAL", parent);
 	QWidget *vMeasure = createMeasurementMenuSection("VERTICAL", parent);
@@ -288,10 +290,33 @@ QWidget *GRTimeChannelAddon::createMenu(QWidget *parent)
 	layScroll->addWidget(curvemenu);
 	layScroll->addWidget(hMeasure);
 	layScroll->addWidget(vMeasure);
+	layScroll->addWidget(attrmenu);
 
 	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	return w;
+}
+
+QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
+{
+	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *attr =
+		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
+	IIOWidgetFactory *attrFactory = new IIOWidgetFactory(attrcontainer);
+	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(grch()->channel());
+
+	auto layout = new QVBoxLayout(attrcontainer);
+	layout->setSpacing(10);
+	layout->setMargin(0);
+
+	for(auto w : attrWidgets) {
+		layout->addWidget(w);
+	}
+
+	attr->contentLayout()->addLayout(layout);
+	attrcontainer->contentLayout()->addWidget(attr);
+	attr->header()->setChecked(false);
+	return attrcontainer;
 }
 
 QString GRTimeChannelAddon::getName() { return name; }
