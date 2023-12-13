@@ -6,6 +6,7 @@
 #include "tooladdon.h"
 
 #include <QLabel>
+#include <QPen>
 
 namespace scopy::grutil {
 class GRTimeChannelAddon;
@@ -49,7 +50,10 @@ private:
 	QString name;
 	QWidget *widget;
 	GRIIODeviceSource *m_src;
+	QPen m_pen;
 	QList<GRTimeChannelAddon *> m_channels;
+	QWidget *createAttrMenu(QWidget *parent);
+	QWidget *createMenu(QWidget *parent = nullptr);
 
 private Q_SLOTS:
 	void setBufferSize(uint32_t bufferSize);
