@@ -54,9 +54,9 @@ generate_export_header(
 )
 
 target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE} scopy-gui)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
-target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui scopy-iio-widgets)
+target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
 
 foreach(comp ${SCOPY_QT_COMPONENTS})
 	set(SCOPY_QT_LIBRARIES ${SCOPY_QT_LIBRARIES} Qt${QT_VERSION_MAJOR}::${comp})

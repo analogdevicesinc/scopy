@@ -1,4 +1,9 @@
 #include "grdeviceaddon.h"
+#include "menusectionwidget.h"
+#include "menucollapsesection.h"
+#include "menuheader.h"
+#include <iio-widgets/iiowidgetfactory.h>
+#include <iio-widgets/iiowidget.h>
 
 #include <QDebug>
 
@@ -8,9 +13,65 @@ GRDeviceAddon::GRDeviceAddon(GRIIODeviceSource *src, QObject *parent)
 	: QObject(parent)
 {
 	name = src->deviceName();
-	widget = new QLabel("devicename" + src->deviceName());
+	m_pen = QPen(StyleHelper::getColor("ScopyBlue"));
 	m_src = src;
 	connect(this, &GRDeviceAddon::updateBufferSize, this, &GRDeviceAddon::setBufferSize);
+	widget = createMenu();
+}
+
+QWidget *GRDeviceAddon::createAttrMenu(QWidget *parent)
+{
+	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *attr =
+		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
+	IIOWidgetFactory *attrFactory = new IIOWidgetFactory(attrContainer);
+	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForDevice(m_src->iioDev());
+
+	auto layout = new QVBoxLayout(attrContainer);
+	layout->setSpacing(10);
+	layout->setMargin(0);
+
+	for(auto w : attrWidgets) {
+		layout->addWidget(w);
+	}
+
+	attr->contentLayout()->addLayout(layout);
+	attrContainer->contentLayout()->addWidget(attr);
+	attr->header()->setChecked(false);
+	return attrContainer;
+}
+
+QWidget *GRDeviceAddon::createMenu(QWidget *parent)
+{
+	QWidget *w = new QWidget(parent);
+	QVBoxLayout *lay = new QVBoxLayout(w);
+
+	QScrollArea *scroll = new QScrollArea(parent);
+	QWidget *wScroll = new QWidget(scroll);
+	QVBoxLayout *layScroll = new QVBoxLayout(wScroll);
+	layScroll->setMargin(0);
+	layScroll->setSpacing(10);
+
+	wScroll->setLayout(layScroll);
+	scroll->setWidgetResizable(true);
+	scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	scroll->setWidget(wScroll);
+
+	lay->setMargin(0);
+	lay->setSpacing(10);
+	w->setLayout(lay);
+
+	MenuHeaderWidget *header = new MenuHeaderWidget(name, m_pen, w);
+	QWidget *attrMenu = createAttrMenu(w);
+
+	lay->addWidget(header);
+	lay->addWidget(scroll);
+	layScroll->addWidget(attrMenu);
+
+	layScroll->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+	return w;
 }
 
 GRDeviceAddon::~GRDeviceAddon() {}
