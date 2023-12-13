@@ -2,9 +2,9 @@
 #define SCOPY_EDITABLEGUISTRATEGY_H
 
 #include <QWidget>
-#include <QLineEdit>
 #include <iio.h>
 #include "guistrategy/guistrategyinterface.h"
+#include <gui/widgets/menulineedit.h>
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
 
@@ -30,7 +30,7 @@ public:
 
 private:
 	QWidget *m_ui;
-	QLineEdit *m_lineEdit;
+	MenuLineEdit *m_lineEdit;
 };
 } // namespace scopy::attr
 

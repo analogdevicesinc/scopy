@@ -106,6 +106,7 @@ private:
 	QString name;
 	QWidget *widget;
 	QWidget *createMenu(QWidget *parent = nullptr);
+	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QWidget *createCurveMenu(QWidget *parent);
 
