@@ -26,6 +26,10 @@ QWidget *GRDeviceAddon::createAttrMenu(QWidget *parent)
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
 	IIOWidgetFactory *attrFactory = new IIOWidgetFactory(attrContainer);
 	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForDevice(m_src->iioDev());
+	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
+	attrWidgets.append(attrFactory->buildSingle(
+		IIOWidgetFactory::ExternalSave | IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
+		{.context = const_cast<iio_context *>(ctx), .device = m_src->iioDev(), .data = "Triggers"}));
 
 	auto layout = new QVBoxLayout(attrContainer);
 	layout->setSpacing(10);
