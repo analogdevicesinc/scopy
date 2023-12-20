@@ -59,8 +59,8 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel 
 			QString readOptions(buffer);
 			if(readOptions.startsWith("[")) {
 				hint |= RangeUi | TimeSave;
-			} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) {
-				hint |= SwitchUi | InstantSave;
+				// } else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) {
+				// hint |= SwitchUi | InstantSave;
 			} else {
 				hint |= ComboUi | InstantSave;
 			}
