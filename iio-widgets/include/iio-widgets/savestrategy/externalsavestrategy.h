@@ -13,12 +13,12 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy::attr {
-class SCOPY_IIO_WIDGETS_EXPORT ExternalTriggerSaveStrategy : public SaveStrategyInterface
+class SCOPY_IIO_WIDGETS_EXPORT ExternalSaveStrategy : public SaveStrategyInterface
 {
 	Q_OBJECT
 public:
-	explicit ExternalTriggerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr);
-	~ExternalTriggerSaveStrategy();
+	explicit ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr);
+	~ExternalSaveStrategy();
 
 	/**
 	 * @overload SaveStrategyInterface::ui()
@@ -26,6 +26,9 @@ public:
 	QWidget *ui() override;
 
 	bool isValid() override;
+
+Q_SIGNALS:
+	void receivedData();
 
 public Q_SLOTS:
 	void receiveData(QString data) override;

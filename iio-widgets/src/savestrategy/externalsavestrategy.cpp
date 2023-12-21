@@ -2,27 +2,26 @@
 
 #include <gui/stylehelper.h>
 #include <QLoggingCategory>
-#include <utility>
 
 using namespace scopy::attr;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_SAVE_STRATEGY, "AttrSaveStrategy")
 
-ExternalTriggerSaveStrategy::ExternalTriggerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_recipe(std::move(recipe))
+ExternalSaveStrategy::ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+	: m_recipe(recipe)
 	, m_ui(new QPushButton("Write"))
 	, m_dataReceived(false)
 {
 	setParent(parent);
 	StyleHelper::SmallBlueButton(m_ui, "SaveButton" + m_recipe.data);
-	connect(m_ui, &QPushButton::clicked, this, &ExternalTriggerSaveStrategy::writeData);
+	connect(m_ui, &QPushButton::clicked, this, &ExternalSaveStrategy::writeData);
 }
 
-ExternalTriggerSaveStrategy::~ExternalTriggerSaveStrategy() { m_ui->deleteLater(); }
+ExternalSaveStrategy::~ExternalSaveStrategy() { m_ui->deleteLater(); }
 
-QWidget *ExternalTriggerSaveStrategy::ui() { return m_ui; }
+QWidget *ExternalSaveStrategy::ui() { return m_ui; }
 
-bool ExternalTriggerSaveStrategy::isValid()
+bool ExternalSaveStrategy::isValid()
 {
 	if(m_recipe.channel != nullptr && m_recipe.data != "") {
 		return true;
@@ -30,14 +29,15 @@ bool ExternalTriggerSaveStrategy::isValid()
 	return false;
 }
 
-void ExternalTriggerSaveStrategy::receiveData(QString data)
+void ExternalSaveStrategy::receiveData(QString data)
 {
 	qDebug(CAT_ATTR_SAVE_STRATEGY) << "received" << data;
 	m_data = data;
 	m_dataReceived = true;
+	Q_EMIT receivedData();
 }
 
-void ExternalTriggerSaveStrategy::writeData()
+void ExternalSaveStrategy::writeData()
 {
 	if(m_dataReceived) {
 		Q_EMIT saveData(m_data);
