@@ -1,10 +1,8 @@
 #include "datastrategy/channelattrdatastrategy.h"
 #include <QFile>
-
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 16384
 
 Q_LOGGING_CATEGORY(CAT_ATTR_DATA_STRATEGY, "AttrDataStrategy")
-
 using namespace scopy::attr;
 
 ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)

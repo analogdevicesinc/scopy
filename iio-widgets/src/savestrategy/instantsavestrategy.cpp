@@ -8,7 +8,7 @@ using namespace scopy::attr;
 Q_LOGGING_CATEGORY(CAT_INSTANT_DATA_STRATEGY, "InstantDataSaveStrategy")
 
 InstantSaveStrategy::InstantSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_recipe(std::move(recipe))
+	: m_recipe(recipe)
 {
 	setParent(parent);
 }
