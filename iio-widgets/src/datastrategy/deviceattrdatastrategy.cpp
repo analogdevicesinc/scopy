@@ -1,8 +1,7 @@
 #include "datastrategy/deviceattrdatastrategy.h"
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 16384
 
 Q_LOGGING_CATEGORY(CAT_DEVICE_DATA_STRATEGY, "DeviceDataStrategy")
-
 using namespace scopy::attr;
 
 DeviceAttrDataStrategy::DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
@@ -24,6 +23,7 @@ void DeviceAttrDataStrategy::save(QString data)
 		qWarning(CAT_DEVICE_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
 	}
 
+	Q_EMIT emitStatus((int)(res));
 	requestData();
 }
 

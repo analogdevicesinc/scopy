@@ -17,7 +17,7 @@ void ErrorBox::changeColor(AvailableColors color)
 		colorString = "green";
 		break;
 	case Yellow:
-		colorString = "yellow";
+		colorString = "#808000";
 		break;
 	case Red:
 		colorString = "red";
