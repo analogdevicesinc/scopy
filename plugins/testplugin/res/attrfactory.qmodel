@@ -361,7 +361,7 @@
                           </DElement>
                          </base-DElement>
                          <object>{fed0b2b3-9c09-4ec9-bfbd-cc259a37a54a}</object>
-                         <name>ExternalTriggerSaveStrategy</name>
+                         <name>ExternalSaveStrategy</name>
                          <pos>x:765;y:1360</pos>
                          <rect>x:-250;y:-100;w:500;h:200</rect>
                          <visual-role>8</visual-role>
@@ -2105,7 +2105,7 @@
                     <uid>{fed0b2b3-9c09-4ec9-bfbd-cc259a37a54a}</uid>
                    </MElement>
                   </base-MElement>
-                  <name>ExternalTriggerSaveStrategy</name>
+                  <name>ExternalSaveStrategy</name>
                  </MObject>
                 </base-MObject>
                 <members>
@@ -2115,7 +2115,7 @@
                     <uid>{1ff2dc4f-1d93-4d40-8618-a3a155bf1935}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>explicit ExternalTriggerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
+                    <declaration>explicit ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr)</declaration>
                    </MClassMember>
                   </item>
                   <item>
@@ -2123,7 +2123,7 @@
                     <uid>{744f2f2e-bc31-4225-8511-cf865f432807}</uid>
                     <visibility>1</visibility>
                     <type>2</type>
-                    <declaration>~ExternalTriggerSaveStrategy()</declaration>
+                    <declaration>ExternalSaveStrategylaration>
                    </MClassMember>
                   </item>
                   <item>
