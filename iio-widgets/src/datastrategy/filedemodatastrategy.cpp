@@ -6,7 +6,7 @@ using namespace scopy::attr;
 
 FileDemoDataStrategy::FileDemoDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
 {
-	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	setParent(parent);
 }
 

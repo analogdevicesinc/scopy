@@ -10,7 +10,7 @@ SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent)
 	, m_optionsList(new QStringList)
 {
 	setParent(parent);
-	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setMargin(0);
 	m_menuBigSwitch = new CustomSwitch(m_ui);

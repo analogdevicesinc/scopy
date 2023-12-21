@@ -8,7 +8,7 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent)
 	: m_ui(new QWidget(nullptr))
 {
 	setParent(parent);
-	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 
 	// FIXME: this does not look right when uninitialized, also crashes...

@@ -35,7 +35,7 @@ IIOWidget::IIOWidget(attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrate
 
 	connect(m_dataStrategy, &attr::DataStrategyInterface::emitStatus, this, [this](int status) {
 		if(status < 0) {
-			Q_EMIT currentStateChanged(State::Error, "Error code: " + QString::number(status));
+			Q_EMIT currentStateChanged(State::Error, "Error: " + QString(strerror(-status)));
 		} else {
 			Q_EMIT currentStateChanged(State::Correct, "Operation finished successfully.");
 		}
