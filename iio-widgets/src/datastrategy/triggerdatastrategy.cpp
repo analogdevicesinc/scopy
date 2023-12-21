@@ -8,7 +8,7 @@ Q_LOGGING_CATEGORY(CAT_TRIGGER_DATA_STRATEGY, "TriggerDataStrategy")
 
 TriggerDataStrategy::TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
 {
-	m_recipe = std::move(recipe);
+	m_recipe = recipe;
 	setParent(parent);
 }
 

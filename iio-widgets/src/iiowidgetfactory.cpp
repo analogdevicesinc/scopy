@@ -141,7 +141,7 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 	} else if(hint & InstantSave) {
 		saveStrategy = new attr::InstantSaveStrategy(recipe, this);
 	} else if(hint & ExternalSave) {
-		saveStrategy = new attr::ExternalTriggerSaveStrategy(recipe, this);
+		saveStrategy = new attr::ExternalSaveStrategy(recipe, this);
 	}
 
 	if(hint & EditableUi) {

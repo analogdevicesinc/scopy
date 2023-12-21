@@ -1,6 +1,7 @@
 #include "grtimechanneladdon.h"
 
 #include "grdeviceaddon.h"
+#include "errorbox.h"
 
 #include <QComboBox>
 #include <QDebug>
@@ -310,7 +311,28 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 	layout->setMargin(0);
 
 	for(auto w : attrWidgets) {
-		layout->addWidget(w);
+		auto container = new QWidget(attr);
+		auto errBox = new ErrorBox(container);
+		container->setLayout(new QHBoxLayout(container));
+		container->layout()->addWidget(w);
+		container->layout()->addWidget(errBox);
+		connect(w, &IIOWidget::currentStateChanged, this,
+			[errBox](IIOWidget::State state, QString explanation) {
+				switch(state) {
+				case IIOWidget::Busy:
+					errBox->changeColor(ErrorBox::Yellow);
+					break;
+				case IIOWidget::Correct:
+					errBox->changeColor(ErrorBox::Green);
+					break;
+				case IIOWidget::Error:
+					errBox->changeColor(ErrorBox::Red);
+					break;
+				}
+				errBox->setToolTip(explanation);
+			});
+
+		layout->addWidget(container);
 	}
 
 	attr->contentLayout()->addLayout(layout);

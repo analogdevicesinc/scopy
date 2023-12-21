@@ -8,7 +8,7 @@ using namespace scopy::attr;
 Q_LOGGING_CATEGORY(CAT_TIME_DATA_STRATEGY, "TimeSaveStrategy")
 
 TimerSaveStrategy::TimerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_recipe(std::move(recipe))
+	: m_recipe(recipe)
 	, m_progressBar(new SmallProgressBar(nullptr))
 {
 	setParent(parent);
