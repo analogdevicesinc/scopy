@@ -45,6 +45,7 @@ public:
 	static QString getColor(QString id);
 	static void SquareToggleButtonWithIcon(QPushButton *btn, QString objectName, bool checkable = false);
 	static void BlueButton(QPushButton *btn, QString objectName = "");
+	static void RefreshButton(QPushButton *btn, QString objectName = "");
 	static void SmallBlueButton(QPushButton *btn, QString objectName = "");
 	static void BlueSquareCheckbox(QCheckBox *chk, QString objectName = "");
 	static void CollapseCheckbox(QCheckBox *chk, QString objectName = "");

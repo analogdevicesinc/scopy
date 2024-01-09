@@ -232,6 +232,27 @@ void StyleHelper::BlueButton(QPushButton *btn, QString objectName)
 	btn->setIconSize(QSize(48, 48));
 }
 
+void StyleHelper::RefreshButton(QPushButton *btn, QString objectName)
+{
+	if(!objectName.isEmpty())
+		btn->setObjectName(objectName);
+	btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	btn->setFixedSize(30, 30);
+	QString style = QString(R"css(
+						QPushButton {
+							font-size: 12px;
+							text-align: center;
+							font-weight: bold;
+						}
+						)css");
+
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
+	btn->setStyleSheet(style);
+	btn->setProperty("blue_button", true);
+	btn->setIcon(QIcon(":/gui/icons/refresh.svg"));
+	btn->setIconSize(QSize(25, 25));
+}
+
 void StyleHelper::SmallBlueButton(QPushButton *btn, QString objectName)
 {
 	if(!objectName.isEmpty())
