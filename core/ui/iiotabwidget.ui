@@ -205,12 +205,7 @@
                </sizepolicy>
               </property>
               <property name="styleSheet">
-               <string notr="true">QPushButton{width: 30px;
-								height: 30px;
-						 		font-size: 12px;
-						   		text-align: center;
-						   		font-weight: bold;
-						 		}</string>
+               <string notr="true"/>
               </property>
               <property name="text" stdset="0">
                <string/>
@@ -234,30 +229,10 @@
         <property name="layoutDirection">
          <enum>Qt::LeftToRight</enum>
         </property>
-        <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,3,2,2">
+        <layout class="QGridLayout" name="gridLayout_4" columnstretch="1,3,2,1,1">
          <property name="horizontalSpacing">
           <number>8</number>
          </property>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="comboBoxSerialPort"/>
-         </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="labelFrameFormat">
-           <property name="text">
-            <string>Port Config</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLabel" name="labelBaudRate">
-           <property name="text">
-            <string>Baud rate</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QComboBox" name="comboBoxBaudRate"/>
-         </item>
          <item row="0" column="0">
           <widget class="QLabel" name="labelSerial">
            <property name="sizePolicy">
@@ -287,10 +262,43 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="labelFrameFormat">
+           <property name="text">
+            <string>Port Config</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="labelBaudRate">
+           <property name="text">
+            <string>Baud rate</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QComboBox" name="comboBoxBaudRate"/>
+         </item>
          <item row="1" column="1">
           <widget class="QLabel" name="labelPortName">
            <property name="text">
             <string>Port name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBoxSerialPort"/>
+         </item>
+         <item row="0" column="4">
+          <widget class="scopy::AnimationPushButton" name="btnSerialScan" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
           </widget>
          </item>
@@ -392,7 +400,7 @@
   <customwidget>
    <class>scopy::AnimationPushButton</class>
    <extends>QWidget</extends>
-   <header>animationpushbutton.h</header>
+   <header location="global">animationpushbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
