@@ -9,6 +9,7 @@
 
 #include <QCheckBox>
 #include <QLoggingCategory>
+#include <stylehelper.h>
 
 #include <iioutil/iioscantask.h>
 
@@ -34,7 +35,13 @@ IioTabWidget::IioTabWidget(QWidget *parent)
 
 	connect(m_ui->comboBoxContexts, &QComboBox::textActivated, this,
 		[=]() { Q_EMIT uriChanged(m_ui->comboBoxContexts->currentText()); });
-
+	// serial scan
+	fwSerialScan = new QFutureWatcher<QVector<QString>>(this);
+	connect(fwSerialScan, &QFutureWatcher<int>::started, m_ui->btnSerialScan, &AnimationPushButton::startAnimation,
+		Qt::QueuedConnection);
+	connect(fwSerialScan, &QFutureWatcher<int>::finished, this, &IioTabWidget::serialScanFinished,
+		Qt::QueuedConnection);
+	connect(m_ui->btnSerialScan, SIGNAL(clicked()), this, SLOT(futureSerialScan()), Qt::QueuedConnection);
 	// serial widget connections
 	connect(m_ui->comboBoxSerialPort, &QComboBox::textActivated, this,
 		[=]() { Q_EMIT uriChanged(getSerialPath()); });
@@ -55,7 +62,7 @@ void IioTabWidget::init()
 #ifdef WITH_LIBSERIALPORT
 	hasLibSerialPort = true;
 #endif
-	bool serialBackEnd = iio_has_backend("serial");
+	bool hasSerialBackend = iio_has_backend("serial");
 
 	QMovie *veifyIcon(new QMovie(this));
 	veifyIcon->setFileName(":/gui/loading.gif");
@@ -64,20 +71,26 @@ void IioTabWidget::init()
 	QMovie *scanIcon(new QMovie(this));
 	scanIcon->setFileName(":/gui/loading.gif");
 	m_ui->btnScan->setAnimation(scanIcon);
+	StyleHelper::RefreshButton(m_ui->btnScan);
+
+	QMovie *serialScanIcon(new QMovie(this));
+	serialScanIcon->setFileName(":/gui/loading.gif");
+	m_ui->btnSerialScan->setAnimation(serialScanIcon);
+	StyleHelper::RefreshButton(m_ui->btnSerialScan);
 
 	QRegExp re("[5-9]{1}(n|o|e|m|s){1}[1-2]{1}(x|r|d){0,1}$");
 	QRegExpValidator *validator = new QRegExpValidator(re, this);
 
 	m_ui->editSerialFrameConfig->setValidator(validator);
-	m_ui->serialSettingsWidget->setEnabled(hasLibSerialPort && serialBackEnd);
+	m_ui->serialSettingsWidget->setEnabled(hasLibSerialPort && hasSerialBackend);
 	m_ui->btnVerify->setProperty("blue_button", QVariant(true));
 	m_ui->btnVerify->setEnabled(false);
-	m_ui->btnScan->setProperty("blue_button", QVariant(true));
-	m_ui->btnScan->setIcon(QIcon(":/gui/icons/refresh.svg"));
-	m_ui->btnScan->setIconSize(QSize(25, 25));
+
 	addScanFeedbackMsg("No scanned contexts... Press the refresh button!");
 	m_ui->btnScan->setAutoDefault(true);
 	m_ui->btnVerify->setAutoDefault(true);
+	m_ui->editSerialFrameConfig->setFocusPolicy(Qt::ClickFocus);
+	m_ui->editUri->setFocusPolicy(Qt::ClickFocus);
 	for(int baudRate : availableBaudRates) {
 		m_ui->comboBoxBaudRate->addItem(QString::number(baudRate));
 	}
@@ -87,13 +100,9 @@ void IioTabWidget::verifyIioBackend()
 {
 	bool scan = false;
 	int backEndsCount = iio_get_backends_count();
-	bool hasLibSerialPort = false;
-#ifdef WITH_LIBSERIALPORT
-	hasLibSerialPort = true;
-#endif
 	for(int i = 0; i < backEndsCount; i++) {
 		QString backEnd(iio_get_backend(i));
-		if(backEnd.compare("xml") == 0 || (!hasLibSerialPort && backEnd.compare("serial") == 0)) {
+		if(backEnd.compare("xml") == 0 || backEnd.compare("serial") == 0) {
 			continue;
 		}
 		createBackEndCheckBox(backEnd);
@@ -112,16 +121,8 @@ void IioTabWidget::createBackEndCheckBox(QString backEnd)
 		} else {
 			scanParamsList.removeOne(backEnd + ":");
 		}
-		if(backEnd.compare("serial") == 0) {
-			m_ui->serialSettingsWidget->setEnabled(en);
-		}
-		if(scanParamsList.empty()) {
-			m_ui->btnScan->setEnabled(false);
-		} else if(!m_ui->btnScan->isEnabled()) {
-			m_ui->btnScan->setEnabled(true);
-		}
+		m_ui->btnScan->setFocus();
 	});
-	cb->setChecked(true);
 	m_ui->filterCheckBoxes->layout()->addWidget(cb);
 }
 
@@ -137,6 +138,7 @@ void IioTabWidget::verifyBtnClicked()
 		m_ui->editUri->blockSignals(false);
 	}
 	m_ui->btnScan->setDisabled(true);
+	m_ui->btnSerialScan->setDisabled(true);
 	m_ui->btnVerify->startAnimation();
 	Q_EMIT startVerify(m_ui->editUri->text(), "iio");
 }
@@ -149,14 +151,21 @@ void IioTabWidget::onVerifyFinished(bool result)
 	}
 	m_ui->btnVerify->stopAnimation();
 	m_ui->btnScan->setEnabled(true);
+	m_ui->btnSerialScan->setEnabled(true);
 }
 
 void IioTabWidget::futureScan()
 {
 	scanList.clear();
-	QString scanParams = scanParamsList.join("").remove("serial:");
+	QString scanParams = scanParamsList.join("");
 	QFuture<int> f = QtConcurrent::run(std::bind(&IIOScanTask::scan, &scanList, scanParams));
 	fwScan->setFuture(f);
+}
+
+void IioTabWidget::futureSerialScan()
+{
+	QFuture<QVector<QString>> f = QtConcurrent::run(std::bind(&IIOScanTask::getSerialPortsName));
+	fwSerialScan->setFuture(f);
 }
 
 void IioTabWidget::scanFinished()
@@ -180,19 +189,17 @@ void IioTabWidget::scanFinished()
 	for(const auto &ctx : qAsConst(scanList)) {
 		m_ui->comboBoxContexts->addItem(ctx);
 	}
-	findAvailableSerialPorts();
 	updateUri(m_ui->comboBoxContexts->currentText());
 }
 
-void IioTabWidget::findAvailableSerialPorts()
+void IioTabWidget::serialScanFinished()
 {
-	if(scanParamsList.contains("serial:")) {
-		QVector<QString> portsName = IIOScanTask::getSerialPortsName();
-		m_ui->comboBoxSerialPort->clear();
-		if(!portsName.empty()) {
-			for(const QString &port : portsName) {
-				m_ui->comboBoxSerialPort->addItem(port);
-			}
+	QVector<QString> portsName = fwSerialScan->result();
+	m_ui->btnSerialScan->stopAnimation();
+	m_ui->comboBoxSerialPort->clear();
+	if(!portsName.empty()) {
+		for(const QString &port : portsName) {
+			m_ui->comboBoxSerialPort->addItem(port);
 		}
 	}
 }
