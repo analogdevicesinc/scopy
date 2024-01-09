@@ -28,18 +28,20 @@ protected:
 	void showEvent(QShowEvent *event) override;
 private Q_SLOTS:
 	void scanFinished();
+	void serialScanFinished();
 	void futureScan();
+	void futureSerialScan();
 	void verifyBtnClicked();
 
 private:
 	Ui::IioTabWidget *m_ui;
 	QFutureWatcher<int> *fwScan;
+	QFutureWatcher<QVector<QString>> *fwSerialScan;
 	QStringList scanParamsList;
 	QStringList scanList;
 
 	void init();
 	void verifyIioBackend();
-	void findAvailableSerialPorts();
 	void addScanFeedbackMsg(QString message);
 	void createBackEndCheckBox(QString backEnd);
 	QString getSerialPath();
