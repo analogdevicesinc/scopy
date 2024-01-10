@@ -2,12 +2,12 @@
 #define BUFFER_SIZE 16384
 
 Q_LOGGING_CATEGORY(CAT_DEVICE_DATA_STRATEGY, "DeviceDataStrategy")
-using namespace scopy::attr;
+using namespace scopy;
 
-DeviceAttrDataStrategy::DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+DeviceAttrDataStrategy::DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
 {
 	m_recipe = recipe;
-	setParent(parent);
 }
 
 void DeviceAttrDataStrategy::save(QString data)

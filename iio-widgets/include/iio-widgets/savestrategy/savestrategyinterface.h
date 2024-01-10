@@ -12,11 +12,12 @@
 #include <iio.h>
 #include "scopy-iio-widgets_export.h"
 
-namespace scopy::attr {
-class SCOPY_IIO_WIDGETS_EXPORT SaveStrategyInterface : public QObject
+namespace scopy {
+class SCOPY_IIO_WIDGETS_EXPORT SaveStrategyInterface
 {
-	Q_OBJECT
 public:
+	~SaveStrategyInterface() = default;
+
 	/**
 	 * @brief This should contain any extra widgets needed to save or manipulate the data received from the main UI.
 	 * In case there is no extra UI needed, return nullptr.
@@ -36,8 +37,9 @@ public Q_SLOTS:
 	virtual void receiveData(QString data) = 0;
 
 Q_SIGNALS:
-	void saveData(QString data);
+	virtual void saveData(QString data) = 0;
 };
-} // namespace scopy::attr
+} // namespace scopy
 
+Q_DECLARE_INTERFACE(scopy::SaveStrategyInterface, "scopy::SaveStrategyInterface")
 #endif // SCOPY_SAVESTRATEGYINTERFACE_H
