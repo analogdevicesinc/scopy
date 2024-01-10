@@ -12,12 +12,13 @@
 #include <iio.h>
 #include "scopy-iio-widgets_export.h"
 
-namespace scopy::attr {
-class SCOPY_IIO_WIDGETS_EXPORT InstantSaveStrategy : public SaveStrategyInterface
+namespace scopy {
+class SCOPY_IIO_WIDGETS_EXPORT InstantSaveStrategy : public QWidget, public SaveStrategyInterface
 {
 	Q_OBJECT
+	Q_INTERFACES(scopy::SaveStrategyInterface)
 public:
-	explicit InstantSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr);
+	explicit InstantSaveStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
 
 	/**
 	 * @overload SaveStrategyInterface::ui()
@@ -26,12 +27,15 @@ public:
 
 	bool isValid() override;
 
+Q_SIGNALS:
+	void saveData(QString data);
+
 public Q_SLOTS:
 	void receiveData(QString data) override;
 
 private:
 	IIOWidgetFactoryRecipe m_recipe;
 };
-} // namespace scopy::attr
+} // namespace scopy
 
 #endif // SCOPY_INSTANTSAVESTRATEGY_H
