@@ -127,9 +127,9 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *d
 
 IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe)
 {
-	attr::AttrUiStrategyInterface *uiStrategy = nullptr;
-	attr::SaveStrategyInterface *saveStrategy = nullptr;
-	attr::DataStrategyInterface *dataStrategy = nullptr;
+	AttrUiStrategyInterface *uiStrategy = nullptr;
+	SaveStrategyInterface *saveStrategy = nullptr;
+	DataStrategyInterface *dataStrategy = nullptr;
 	IIOWidget *attrWidget = nullptr;
 
 	if(hint & AutoHint) {
@@ -137,31 +137,31 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 	}
 
 	if(hint & TimeSave) {
-		saveStrategy = new attr::TimerSaveStrategy(recipe, this);
+		saveStrategy = new TimerSaveStrategy(recipe, this);
 	} else if(hint & InstantSave) {
-		saveStrategy = new attr::InstantSaveStrategy(recipe, this);
+		saveStrategy = new InstantSaveStrategy(recipe, this);
 	} else if(hint & ExternalSave) {
-		saveStrategy = new attr::ExternalSaveStrategy(recipe, this);
+		saveStrategy = new ExternalSaveStrategy(recipe, this);
 	}
 
 	if(hint & EditableUi) {
-		uiStrategy = new attr::EditableGuiStrategy(recipe, this);
+		uiStrategy = new EditableGuiStrategy(recipe, this);
 	} else if(hint & SwitchUi) {
-		uiStrategy = new attr::SwitchAttrUi(recipe, this);
+		uiStrategy = new SwitchAttrUi(recipe, this);
 	} else if(hint & ComboUi) {
-		uiStrategy = new attr::ComboAttrUi(recipe, this);
+		uiStrategy = new ComboAttrUi(recipe, this);
 	} else if(hint & RangeUi) {
-		uiStrategy = new attr::RangeAttrUi(recipe, this);
+		uiStrategy = new RangeAttrUi(recipe, this);
 	}
 
 	if(hint & AttrData) {
-		dataStrategy = new attr::ChannelAttrDataStrategy(recipe, this);
+		dataStrategy = new ChannelAttrDataStrategy(recipe, this);
 	} else if(hint & TriggerData) {
-		dataStrategy = new attr::TriggerDataStrategy(recipe, this);
+		dataStrategy = new TriggerDataStrategy(recipe, this);
 	} else if(hint & DeviceAttrData) {
-		dataStrategy = new attr::DeviceAttrDataStrategy(recipe, this);
+		dataStrategy = new DeviceAttrDataStrategy(recipe, this);
 	} else if(hint & FileDemoData) {
-		dataStrategy = new attr::FileDemoDataStrategy(recipe, this);
+		dataStrategy = new FileDemoDataStrategy(recipe, this);
 	}
 
 	if(uiStrategy && saveStrategy && dataStrategy) {

@@ -12,12 +12,13 @@
 #include <iio.h>
 #include "scopy-iio-widgets_export.h"
 
-namespace scopy::attr {
-class SCOPY_IIO_WIDGETS_EXPORT ExternalSaveStrategy : public SaveStrategyInterface
+namespace scopy {
+class SCOPY_IIO_WIDGETS_EXPORT ExternalSaveStrategy : public QWidget, public SaveStrategyInterface
 {
 	Q_OBJECT
+	Q_INTERFACES(scopy::SaveStrategyInterface)
 public:
-	explicit ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr);
+	explicit ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
 	~ExternalSaveStrategy();
 
 	/**
@@ -29,6 +30,7 @@ public:
 
 Q_SIGNALS:
 	void receivedData();
+	void saveData(QString data);
 
 public Q_SLOTS:
 	void receiveData(QString data) override;
@@ -40,6 +42,6 @@ private:
 	QString m_data;
 	bool m_dataReceived;
 };
-} // namespace scopy::attr
+} // namespace scopy
 
 #endif // SCOPY_EXTERNALSAVESTRATEGY_H

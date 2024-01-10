@@ -1,13 +1,13 @@
 #include "guistrategy/rangeguistrategy.h"
 
-using namespace scopy::attr;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_GUI_STRATEGY, "AttrGuiStrategy")
 
-RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_ui(new QWidget(nullptr))
+RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
+	, m_ui(new QWidget(nullptr))
 {
-	setParent(parent);
 	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 

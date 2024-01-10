@@ -1,15 +1,15 @@
 #include "guistrategy/switchguistrategy.h"
 #include <QLoggingCategory>
 
-using namespace scopy::attr;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_SWITCHGUISTRATEGY, "SwitchGuiStrategy")
 
-SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_ui(new QWidget(nullptr))
+SwitchAttrUi::SwitchAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
+	, m_ui(new QWidget(nullptr))
 	, m_optionsList(new QStringList)
 {
-	setParent(parent);
 	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setMargin(0);

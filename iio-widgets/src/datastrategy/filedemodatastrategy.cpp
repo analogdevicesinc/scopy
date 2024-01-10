@@ -2,12 +2,12 @@
 #include <utility>
 #include <QFile>
 
-using namespace scopy::attr;
+using namespace scopy;
 
-FileDemoDataStrategy::FileDemoDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+FileDemoDataStrategy::FileDemoDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
 {
 	m_recipe = recipe;
-	setParent(parent);
 }
 
 void FileDemoDataStrategy::save(QString data)

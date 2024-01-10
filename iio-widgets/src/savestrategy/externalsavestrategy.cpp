@@ -3,16 +3,16 @@
 #include <gui/stylehelper.h>
 #include <QLoggingCategory>
 
-using namespace scopy::attr;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_ATTR_SAVE_STRATEGY, "AttrSaveStrategy")
 
-ExternalSaveStrategy::ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_recipe(recipe)
+ExternalSaveStrategy::ExternalSaveStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
+	, m_recipe(recipe)
 	, m_ui(new QPushButton("Write"))
 	, m_dataReceived(false)
 {
-	setParent(parent);
 	StyleHelper::SmallBlueButton(m_ui, "SaveButton" + m_recipe.data);
 	connect(m_ui, &QPushButton::clicked, this, &ExternalSaveStrategy::writeData);
 }
