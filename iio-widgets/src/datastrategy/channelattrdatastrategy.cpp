@@ -3,12 +3,12 @@
 #define BUFFER_SIZE 16384
 
 Q_LOGGING_CATEGORY(CAT_ATTR_DATA_STRATEGY, "AttrDataStrategy")
-using namespace scopy::attr;
+using namespace scopy;
 
-ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
 {
 	m_recipe = recipe;
-	setParent(parent);
 }
 
 void ChannelAttrDataStrategy::save(QString data)
