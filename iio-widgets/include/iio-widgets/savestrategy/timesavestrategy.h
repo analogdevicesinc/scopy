@@ -10,17 +10,18 @@
 #include <iio.h>
 #include "scopy-iio-widgets_export.h"
 
-namespace scopy::attr {
-class SCOPY_IIO_WIDGETS_EXPORT TimerSaveStrategy : public SaveStrategyInterface
+namespace scopy {
+class SCOPY_IIO_WIDGETS_EXPORT TimerSaveStrategy : public QWidget, public SaveStrategyInterface
 {
 	Q_OBJECT
+	Q_INTERFACES(scopy::SaveStrategyInterface)
 public:
 	/**
 	 * @brief This implements a saving method that only saved the data to the iio device only after the class did
 	 * not receive any data for a set time. This is meant to reduce the amount of iio calls in case the UI will send
 	 * a lot data in a short time and only the last one needs to become an iio call.
 	 * */
-	explicit TimerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent = nullptr);
+	explicit TimerSaveStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
 
 	/**
 	 * @overload SaveStrategyInterface::ui()
@@ -28,6 +29,9 @@ public:
 	QWidget *ui() override;
 
 	bool isValid() override;
+
+Q_SIGNALS:
+	void saveData(QString data);
 
 public Q_SLOTS:
 	void receiveData(QString data) override;
@@ -38,5 +42,5 @@ private:
 	SmallProgressBar *m_progressBar;
 	QString m_lastData;
 };
-} // namespace scopy::attr
+} // namespace scopy
 #endif // SCOPY_TIMESAVESTRATEGY_H

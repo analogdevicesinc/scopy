@@ -3,15 +3,14 @@
 #include <QLoggingCategory>
 #include <utility>
 
-using namespace scopy::attr;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_INSTANT_DATA_STRATEGY, "InstantDataSaveStrategy")
 
-InstantSaveStrategy::InstantSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_recipe(recipe)
-{
-	setParent(parent);
-}
+InstantSaveStrategy::InstantSaveStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
+	, m_recipe(recipe)
+{}
 
 QWidget *InstantSaveStrategy::ui() { return nullptr; }
 

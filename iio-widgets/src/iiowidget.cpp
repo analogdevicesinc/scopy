@@ -2,8 +2,10 @@
 
 using namespace scopy;
 
-IIOWidget::IIOWidget(attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrategyInterface *saveStrategy,
-		     attr::DataStrategyInterface *dataStrategy, QWidget *parent)
+Q_LOGGING_CATEGORY(CAT_IIOWIDGET, "iioWidget")
+
+IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, SaveStrategyInterface *saveStrategy,
+		     DataStrategyInterface *dataStrategy, QWidget *parent)
 	: QWidget(parent)
 	, m_uiStrategy(uiStrategy)
 	, m_saveStrategy(saveStrategy)
@@ -23,37 +25,44 @@ IIOWidget::IIOWidget(attr::AttrUiStrategyInterface *uiStrategy, attr::SaveStrate
 		layout()->addWidget(saveUi);
 	}
 
-	connect(m_uiStrategy, &attr::AttrUiStrategyInterface::emitData, m_saveStrategy,
-		&attr::SaveStrategyInterface::receiveData);
-	connect(m_saveStrategy, &attr::SaveStrategyInterface::saveData, m_dataStrategy,
-		&attr::DataStrategyInterface::save);
+	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(emitData(QString)),
+		dynamic_cast<QWidget *>(m_saveStrategy), SLOT(receiveData(QString)));
+	connect(dynamic_cast<QWidget *>(m_saveStrategy), SIGNAL(saveData(QString)),
+		dynamic_cast<QWidget *>(m_dataStrategy), SLOT(save(QString)));
 
-	connect(m_saveStrategy, &attr::SaveStrategyInterface::saveData, this, [this](QString data) {
-		Q_EMIT currentStateChanged(State::Busy, "Operation in progress.");
-		m_dataStrategy->save(data);
-	});
+	connect(dynamic_cast<QWidget *>(m_saveStrategy), SIGNAL(saveData(QString)), this, SLOT(saveData(QString)));
 
-	connect(m_dataStrategy, &attr::DataStrategyInterface::emitStatus, this, [this](int status) {
-		if(status < 0) {
-			Q_EMIT currentStateChanged(State::Error, "Error: " + QString(strerror(-status)));
-		} else {
-			Q_EMIT currentStateChanged(State::Correct, "Operation finished successfully.");
-		}
-	});
+	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(emitStatus(int)), this, SLOT(emitDataStatus(int)));
 
-	connect(m_uiStrategy, &attr::AttrUiStrategyInterface::requestData, m_dataStrategy,
-		&attr::DataStrategyInterface::requestData);
-	connect(m_dataStrategy, &attr::DataStrategyInterface::sendData, m_uiStrategy,
-		&attr::AttrUiStrategyInterface::receiveData);
+	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(requestData()), dynamic_cast<QWidget *>(m_dataStrategy),
+		SLOT(requestData()));
+	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(sendData(QString, QString)),
+		dynamic_cast<QWidget *>(m_uiStrategy), SLOT(receiveData(QString, QString)));
 
 	m_dataStrategy->requestData();
 }
 
-attr::SaveStrategyInterface *IIOWidget::getSaveStrategy() { return m_saveStrategy; }
+void IIOWidget::saveData(QString data)
+{
+	Q_EMIT currentStateChanged(State::Busy, "Operation in progress.");
+	m_dataStrategy->save(data);
+}
 
-attr::AttrUiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
+void IIOWidget::emitDataStatus(int status)
+{
+	if(status < 0) {
+		Q_EMIT currentStateChanged(
+			State::Error, "Error: " + QString(strerror(-status)) + " (" + QString::number(status) + ")");
+	} else {
+		Q_EMIT currentStateChanged(State::Correct, "Operation finished successfully.");
+	}
+}
 
-attr::DataStrategyInterface *IIOWidget::getDataStrategy() { return m_dataStrategy; }
+SaveStrategyInterface *IIOWidget::getSaveStrategy() { return m_saveStrategy; }
+
+AttrUiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
+
+DataStrategyInterface *IIOWidget::getDataStrategy() { return m_dataStrategy; }
 
 IIOWidgetFactoryRecipe IIOWidget::getRecipe() { return m_recipe; }
 

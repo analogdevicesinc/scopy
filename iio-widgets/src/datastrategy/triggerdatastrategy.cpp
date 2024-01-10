@@ -2,14 +2,14 @@
 #include <utility>
 #include <QFile>
 
-using namespace scopy::attr;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_TRIGGER_DATA_STRATEGY, "TriggerDataStrategy")
 
-TriggerDataStrategy::TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
+TriggerDataStrategy::TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
 {
 	m_recipe = recipe;
-	setParent(parent);
 }
 
 void TriggerDataStrategy::save(QString data)

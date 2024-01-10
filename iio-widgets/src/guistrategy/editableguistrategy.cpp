@@ -1,12 +1,12 @@
 #include "guistrategy/editableguistrategy.h"
 
-using namespace scopy::attr;
+using namespace scopy;
 
-EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_ui(new QWidget(nullptr))
+EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
+	, m_ui(new QWidget(nullptr))
 	, m_lineEdit(new MenuLineEdit(m_ui))
 {
-	setParent(parent);
 	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);

@@ -12,11 +12,12 @@
 #include "iiowidgetdata.h"
 #include "scopy-iio-widgets_export.h"
 
-namespace scopy::attr {
-class SCOPY_IIO_WIDGETS_EXPORT AttrUiStrategyInterface : public QObject
+namespace scopy {
+class SCOPY_IIO_WIDGETS_EXPORT AttrUiStrategyInterface
 {
-	Q_OBJECT
 public:
+	~AttrUiStrategyInterface() = default;
+
 	/**
 	 * @brief This should implement the main method for displaying the value of an attribute and also editing data
 	 * from that attribute.
@@ -41,14 +42,15 @@ Q_SIGNALS:
 	 * and set accordingly.
 	 * @warning Do not override this.
 	 * */
-	void emitData(QString data);
+	virtual void emitData(QString data) = 0;
 
 	// sends a request to the data handler to be able to complete the display
-	void requestData();
+	virtual void requestData() = 0;
 
 protected:
 	IIOWidgetFactoryRecipe m_recipe;
 };
-} // namespace scopy::attr
+} // namespace scopy
 
+Q_DECLARE_INTERFACE(scopy::AttrUiStrategyInterface, "scopy::AttrUiStrategyInterface")
 #endif // SCOPY_GUISTRATEGYINTERFACE_H

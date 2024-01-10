@@ -20,22 +20,21 @@ public:
 	{
 		AutoHint = 0x00, // auto hint is 0x0, might change to NoHint
 
-		// save hint mask is 0x____nn
 		TimeSave = 0x000001,
 		InstantSave = 0x000002,
 		ExternalSave = 0x000004,
 
-		// ui hint mask is 0x__nn__
-		EditableUi = 0x000100,
-		ComboUi = 0x000200,
-		SwitchUi = 0x00400,
-		RangeUi = 0x000800,
+		EditableUi = 0x000008,
+		ComboUi = 0x000010,
+		SwitchUi = 0x00020,
+		RangeUi = 0x000040,
 
-		// data hint mask is 0xnn____
-		AttrData = 0x010000,
-		TriggerData = 0x020000,
-		DeviceAttrData = 0x040000,
-		FileDemoData = 0x080000,
+		AttrData = 0x000080,
+		TriggerData = 0x000100,
+		DeviceAttrData = 0x000200,
+		FileDemoData = 0x000400,
+
+		ProgressLineEditUi = 0x000800,
 	};
 
 	explicit IIOWidgetFactory(QWidget *parent = nullptr);

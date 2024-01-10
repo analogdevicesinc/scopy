@@ -1,12 +1,11 @@
 #include "guistrategy/comboguistrategy.h"
 #include <QLoggingCategory>
 
-using namespace scopy::attr;
+using namespace scopy;
 
-ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, QObject *parent)
+ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
 	: m_ui(new QWidget(nullptr))
 {
-	setParent(parent);
 	m_recipe = recipe;
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);

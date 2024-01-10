@@ -3,15 +3,15 @@
 #include <QLoggingCategory>
 #include <utility>
 
-using namespace scopy::attr;
+using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_TIME_DATA_STRATEGY, "TimeSaveStrategy")
 
-TimerSaveStrategy::TimerSaveStrategy(IIOWidgetFactoryRecipe recipe, QObject *parent)
-	: m_recipe(recipe)
+TimerSaveStrategy::TimerSaveStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
+	: QWidget(parent)
+	, m_recipe(recipe)
 	, m_progressBar(new SmallProgressBar(nullptr))
 {
-	setParent(parent);
 	connect(m_progressBar, &SmallProgressBar::progressFinished, this, &TimerSaveStrategy::writeData);
 }
 
