@@ -11,6 +11,12 @@ option(ENABLE_PLUGIN_REGMAP "Enable regmap plugin" ON)
 option(ENABLE_PLUGIN_DEBUGGER "Enable debugger plugin" ON)
 option(ENABLE_PLUGIN_DATALOGGER "Enable datalogger plugin" OFF)
 option(ENABLE_PLUGIN_ADC "Enable ADC plugin" ON)
+option(ENABLE_PLUGIN_IIODEBUGPLUGIN "Enable IIODEBUGPLUGIN plugin" ON)
+
+if(ENABLE_PLUGIN_IIODEBUGPLUGIN)
+	add_subdirectory(iiodebugplugin)
+	list(APPEND PLUGINS ${PLUGIN_NAME})
+endif()
 
 if(ENABLE_PLUGIN_TEST)
 	add_subdirectory(guitestplugin)
