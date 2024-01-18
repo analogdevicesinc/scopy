@@ -1,0 +1,33 @@
+{
+    "plugin": {
+        "dir_name": "iiodebugplugin",
+        "plugin_name": "iiodebugplugin",
+        "class_name": "IIODebugPlugin",
+        "cmakelists": true,
+        "namespace": "scopy::iiodebugplugin",
+        "device_category": "iio",
+        "tools": [
+            {
+                "id": "iiodebugplugin",
+                "tool_name": "IIO Debugger",
+                "file_name": "IIODebugInstrument",
+                "class_name": "IIODebugInstrument",
+                "namespace": "scopy::iiodebugplugin"
+            }
+        ]
+    },
+    "cmakelists": {
+        "cmake_min_required": 3.9,
+        "cxx_standard": 20,
+        "enable_testing": "ON"
+    },
+    "test": {
+        "cmakelists": true,
+        "cmake_min_required": 3.5,
+        "tst_pluginloader": true
+    },
+    "resources": {
+        "resources_qrc": true
+    },
+    "doc": true
+}
