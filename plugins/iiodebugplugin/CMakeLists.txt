@@ -32,7 +32,10 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
-set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST}
+		include/iiodebugplugin/iiostandarditemview.h
+		src/iiostandarditemview.cpp
+		include/iiodebugplugin/iiostandarditemtypes.h)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")

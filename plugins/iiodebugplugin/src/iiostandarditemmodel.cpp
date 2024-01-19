@@ -2,7 +2,7 @@
 
 using namespace scopy::iiodebugplugin;
 
-IIOStandardItemModel::IIOStandardItemModel(IIOType type, QWidget *parent)
+IIOStandardItemModel::IIOStandardItemModel(IIOStandardItemType type, QWidget *parent)
 	: QWidget(parent)
 	, m_type(type)
 {
