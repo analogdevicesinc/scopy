@@ -3,9 +3,10 @@
 #include <QLoggingCategory>
 #include <QLabel>
 
-#include "IIODebugInstrument.h"
+#include "iiodebuginstrument.h"
+#include "iioutil/contextprovider.h"
 
-Q_LOGGING_CATEGORY(CAT_IIODEBUGPLUGIN, "IIODebugPlugin");
+Q_LOGGING_CATEGORY(CAT_IIODEBUGPLUGIN, "IIODebugPlugin")
 using namespace scopy::iiodebugplugin;
 
 bool IIODebugPlugin::compatible(QString m_param, QString category)
@@ -71,7 +72,9 @@ bool IIODebugPlugin::onConnect()
 	// compatible to that device
 	// In case of success the function must return true and false otherwise
 
-	IIODebugInstrument *iio_debugger = new IIODebugInstrument();
+	auto *cp = ContextProvider::GetInstance();
+	struct iio_context *context = cp->open(m_param);
+	auto *iio_debugger = new IIODebugInstrument(context);
 	m_toolList[0]->setTool(iio_debugger);
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
@@ -81,8 +84,8 @@ bool IIODebugPlugin::onConnect()
 
 bool IIODebugPlugin::onDisconnect()
 {
-	// This method is called when the discconect button is pressed
-	// It must remove all connections that were established om the connection
+	// This method is called when the disconnect button is pressed
+	// It must remove all connections that were established on the connection
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunning(false);
