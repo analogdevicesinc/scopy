@@ -4,17 +4,19 @@
 #include <QWidget>
 #include <QStandardItem>
 #include "iiostandarditemmodel.h"
+#include "iiostandarditemtypes.h"
+#include "iiostandarditemview.h"
 
 namespace scopy::iiodebugplugin {
 class IIOStandardItem : public QStandardItem
 {
 public:
-	explicit IIOStandardItem(const QString &text,
-				 IIOStandardItemModel::IIOType type = IIOStandardItemModel::Undefined);
+	explicit IIOStandardItem(const QString &text, IIOStandardItemType type = IIOStandardItemType::Undefined);
 	~IIOStandardItem() override;
 
 private:
 	IIOStandardItemModel *m_itemModel;
+	IIOStandardItemView *m_itemView;
 };
 } // namespace scopy::iiodebugplugin
 
