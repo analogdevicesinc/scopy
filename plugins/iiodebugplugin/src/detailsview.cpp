@@ -35,4 +35,20 @@ void DetailsView::setTitle(QString title)
 	m_titleLabel->setText(title);
 }
 
-void DetailsView::setIIOStandardItem(IIOStandardItem *item) { setTitle(item->text()); }
+void DetailsView::setIIOStandardItem(IIOStandardItem *item) {
+	setTitle(item->text());
+	clearWidgets();
+	auto iioWidgets = item->getIIOWidgets();
+	for (auto widget: iioWidgets) {
+		widget->show();
+		m_currentWidgets.append(widget);
+		layout()->addWidget(widget);
+	}
+}
+
+void DetailsView::clearWidgets() {
+	for (auto widget: m_currentWidgets) {
+		widget->hide();
+	}
+	m_currentWidgets.clear();
+}

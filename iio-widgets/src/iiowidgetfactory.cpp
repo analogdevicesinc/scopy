@@ -33,9 +33,10 @@
 #include "guistrategy/rangeguistrategy.h"
 #include <QLoggingCategory>
 
-#define ATTR_BUFFER_SIZE 256
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory");
+
+#define ATTR_BUFFER_SIZE 256
+Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory")
 
 IIOWidgetFactory::IIOWidgetFactory(QWidget *parent)
 	: QWidget(parent)

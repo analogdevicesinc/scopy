@@ -10,7 +10,7 @@ include(GenerateExportHeader)
 
 # TODO: split stylesheet/resources and add here TODO: export header files correctly
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_SOURCE_DIR}/ui)
@@ -32,10 +32,7 @@ if(ENABLE_TESTING)
 	add_subdirectory(test)
 endif()
 
-set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST}
-		include/iiodebugplugin/iiostandarditemview.h
-		src/iiostandarditemview.cpp
-		include/iiodebugplugin/iiostandarditemtypes.h)
+set(PROJECT_SOURCES ${SRC_LIST} ${HEADER_LIST} ${UI_LIST})
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS REQUIRED Widgets Core)
 
 if(NOT "${SCOPY_PLUGIN_BUILD_PATH}" STREQUAL "")
@@ -53,7 +50,6 @@ target_include_directories(${PROJECT_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include/${SCOPY_MODULE})
 
 target_include_directories(${PROJECT_NAME} PUBLIC scopy-pluginbase scopy-gui)
-
 target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC Qt::Widgets
@@ -61,6 +57,7 @@ target_link_libraries(
 	       scopy-pluginbase
 	       scopy-gui
 	       scopy-iioutil
+           scopy-iio-widgets
 )
 
 set(PLUGIN_NAME ${PROJECT_NAME} PARENT_SCOPE)

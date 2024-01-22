@@ -19,6 +19,9 @@ public:
 private:
 	QLabel *m_titleLabel;
 	gui::SubsectionSeparator *m_topSeparator;
+	QList<IIOWidget *> m_currentWidgets;
+
+	void clearWidgets();
 };
 } // namespace scopy::iiodebugplugin
 

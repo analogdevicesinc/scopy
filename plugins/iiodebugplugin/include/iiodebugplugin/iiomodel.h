@@ -16,7 +16,6 @@ public:
 	QStringList getEntries();
 
 private:
-	void demoSetup();
 	void iioTreeSetup();
 
 	QStandardItemModel *m_model;
