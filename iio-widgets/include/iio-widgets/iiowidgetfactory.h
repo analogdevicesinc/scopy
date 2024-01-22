@@ -36,7 +36,7 @@ class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetFactory : public QWidget
 {
 	Q_OBJECT
 public:
-	enum // Attribute factory hint, might have to move to smth like scopy::AFH
+	enum // Attribute factory hint
 	{
 		AutoHint = 0x00, // auto hint is 0x0, might change to NoHint
 
@@ -52,9 +52,10 @@ public:
 		AttrData = 0x000080,
 		TriggerData = 0x000100,
 		DeviceAttrData = 0x000200,
-		FileDemoData = 0x000400,
+		FileDemoData = 0x000400, // TODO: remove this DataStrategy
+		ContextAttrData = 0x000800,
 
-		ProgressLineEditUi = 0x000800,
+		ProgressLineEditUi = 0x001000,
 	};
 
 	explicit IIOWidgetFactory(QWidget *parent = nullptr);
@@ -63,9 +64,6 @@ public:
 	IIOWidget *buildSingle(uint32_t hint = AutoHint, IIOWidgetFactoryRecipe recipe = {});
 	QList<IIOWidget *> buildAllAttrsForChannel(struct iio_channel *channel);
 	QList<IIOWidget *> buildAllAttrsForDevice(struct iio_device *dev);
-
-private:
-	struct iio_channel *m_channel;
 };
 } // namespace scopy
 
