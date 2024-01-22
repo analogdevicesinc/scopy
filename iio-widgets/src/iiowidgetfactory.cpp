@@ -145,6 +145,31 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *d
 	return result;
 }
 
+QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForContext(struct iio_context *context)
+{
+	QList<IIOWidget *> result;
+	ssize_t attrCount = iio_context_get_attrs_count(context);
+	for(int i = 0; i < attrCount; ++i) {
+		const char *name;
+		const char *value;
+		int res = iio_context_get_attr(context, i, &name, &value);
+
+		if(res < 0) {
+			qWarning(CAT_ATTRFACTORY) << "Could not read any data from context attr with index" << i;
+			continue;
+		}
+
+		IIOWidgetFactoryRecipe recipe = {
+			.context = context,
+			.data = QString(name),
+		};
+
+		result.append(this->buildSingle(EditableUi | InstantSave | ContextAttrData, recipe));
+	}
+
+	return result;
+}
+
 IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe)
 {
 	AttrUiStrategyInterface *uiStrategy = nullptr;
