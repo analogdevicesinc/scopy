@@ -28,6 +28,7 @@
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/filedemodatastrategy.h"
+#include "datastrategy/contextattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
 #include <QLoggingCategory>
@@ -37,20 +38,19 @@ using namespace scopy;
 Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory");
 
 IIOWidgetFactory::IIOWidgetFactory(QWidget *parent)
-	: m_channel(nullptr)
+	: QWidget(parent)
 {}
 
 IIOWidgetFactory::~IIOWidgetFactory() {}
 
 QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel *channel)
 {
-	m_channel = channel;
 	QList<IIOWidget *> result;
 
 	QList<QString> channelAttributes;
-	ssize_t channelCount = iio_channel_get_attrs_count(m_channel);
+	ssize_t channelCount = iio_channel_get_attrs_count(channel);
 	for(int i = 0; i < channelCount; ++i) {
-		const char *attrName = iio_channel_get_attr(m_channel, i);
+		const char *attrName = iio_channel_get_attr(channel, i);
 		if(attrName != nullptr) {
 			channelAttributes.append(attrName);
 		}
@@ -63,13 +63,13 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel 
 
 		uint32_t hint = AttrData;
 		IIOWidgetFactoryRecipe recipe;
-		recipe.channel = m_channel;
+		recipe.channel = channel;
 		recipe.data = attributeName;
 		QString availableAttrName = attributeName + "_available";
 		if(channelAttributes.contains(availableAttrName)) {
 			recipe.dataOptions = availableAttrName;
 			char buffer[ATTR_BUFFER_SIZE] = {0};
-			ssize_t res = iio_channel_attr_read(m_channel, availableAttrName.toStdString().c_str(), buffer,
+			ssize_t res = iio_channel_attr_read(channel, availableAttrName.toStdString().c_str(), buffer,
 							    ATTR_BUFFER_SIZE);
 			if(res < 0) {
 				qWarning(CAT_ATTRFACTORY) << "Could not read data from" << availableAttrName;
@@ -79,8 +79,8 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel 
 			QString readOptions(buffer);
 			if(readOptions.startsWith("[")) {
 				hint |= RangeUi | TimeSave;
-				// } else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) {
-				// hint |= SwitchUi | InstantSave;
+			} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) {
+				hint |= SwitchUi | InstantSave;
 			} else {
 				hint |= ComboUi | InstantSave;
 			}
@@ -130,8 +130,8 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *d
 			QString readOptions(buffer);
 			if(readOptions.startsWith("[")) {
 				hint |= RangeUi | TimeSave;
-				/*} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) { // CustomSwitch is
-				   broken hint |= SwitchUi | InstantSave;*/
+			} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) { // CustomSwitch is broken
+				hint |= SwitchUi | InstantSave;
 			} else {
 				hint |= ComboUi | TimeSave;
 			}
@@ -182,6 +182,8 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 		dataStrategy = new DeviceAttrDataStrategy(recipe, this);
 	} else if(hint & FileDemoData) {
 		dataStrategy = new FileDemoDataStrategy(recipe, this);
+	} else if(hint & ContextAttrData) {
+		dataStrategy = new ContextAttrDataStrategy(recipe, this);
 	}
 
 	if(uiStrategy && saveStrategy && dataStrategy) {
