@@ -64,6 +64,7 @@ public:
 	IIOWidget *buildSingle(uint32_t hint = AutoHint, IIOWidgetFactoryRecipe recipe = {});
 	QList<IIOWidget *> buildAllAttrsForChannel(struct iio_channel *channel);
 	QList<IIOWidget *> buildAllAttrsForDevice(struct iio_device *dev);
+	QList<IIOWidget *> buildAllAttrsForContext(struct iio_context *context);
 };
 } // namespace scopy
 
