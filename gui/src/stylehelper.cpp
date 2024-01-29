@@ -46,6 +46,7 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("ScopyBlueHover", "#4A34FF");
 	sh->colorMap.insert("ScopyBlueSelected", "#3324B1");
 
+	sh->colorMap.insert("ProgressBarIdle", "#7D7D83");
 	sh->colorMap.insert("ProgressBarSuccess", "#27B34F");
 	sh->colorMap.insert("ProgressBarError", "#F44336");
 	sh->colorMap.insert("ProgressBarBusy", "#F8E71C");
