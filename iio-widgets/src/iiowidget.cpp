@@ -19,6 +19,7 @@
  */
 
 #include "iiowidget.h"
+#include <QDateTime>
 
 using namespace scopy;
 
@@ -64,22 +65,27 @@ void IIOWidget::saveData(QString data)
 
 void IIOWidget::emitDataStatus(int status)
 {
+	QString timestamp = QDateTime::currentDateTime().toString("hh:mm:ss");
 	if(status < 0) {
 		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarError"));
-		setToolTip("Error: " + QString(strerror(-status)) + " (" + QString::number(status) + ")");
+		QString statusString = "Tried to write \"" + m_lastData +
+			"\", but failed.\nError: " + QString(strerror(-status)) + " (" + QString::number(status) + ").";
+		setToolTip("[" + timestamp + "] " + statusString);
+		qDebug(CAT_IIOWIDGET) << statusString;
 	} else {
 		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarSuccess"));
-		setToolTip("Operation finished successfully.");
-		auto *timer = new QTimer();
-		timer->setSingleShot(true);
-		QObject::connect(timer, &QTimer::timeout, this, [this, timer]() {
-			qDebug(CAT_IIOWIDGET) << "Timeout for displaying success finished.";
-			m_progressBar->resetBarColor();
-			this->setToolTip("");
-			timer->deleteLater();
-		});
-		timer->start(4000);
+		QString statusString = "Operation finished successfully.";
+		setToolTip("[" + timestamp + "] " + statusString);
+		qDebug(CAT_IIOWIDGET) << statusString << ". Wrote " + m_lastData + ".";
 	}
+	auto *timer = new QTimer();
+	timer->setSingleShot(true);
+	QObject::connect(timer, &QTimer::timeout, this, [this, timer]() {
+		qDebug(CAT_IIOWIDGET) << "Timeout for displaying success finished.";
+		m_progressBar->resetBarColor();
+		timer->deleteLater();
+	});
+	timer->start(4000);
 }
 
 AttrUiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
@@ -93,6 +99,7 @@ void IIOWidget::setRecipe(IIOWidgetFactoryRecipe recipe) { m_recipe = recipe; }
 void IIOWidget::startTimer(QString data)
 {
 	m_lastData = data;
+	m_progressBar->setBarColor(StyleHelper::getColor("ScopyBlue"));
 	m_progressBar->startProgress();
 }
 
