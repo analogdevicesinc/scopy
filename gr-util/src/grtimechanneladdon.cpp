@@ -303,36 +303,15 @@ QWidget *GRTimeChannelAddon::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrcontainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrcontainer);
-	IIOWidgetFactory *attrFactory = new IIOWidgetFactory(attrcontainer);
-	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(grch()->channel());
+	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(grch()->channel());
 
 	auto layout = new QVBoxLayout(attrcontainer);
 	layout->setSpacing(10);
 	layout->setMargin(0);
+	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 
 	for(auto w : attrWidgets) {
-		auto container = new QWidget(attr);
-		auto errBox = new ErrorBox(container);
-		container->setLayout(new QHBoxLayout(container));
-		container->layout()->addWidget(w);
-		container->layout()->addWidget(errBox);
-		connect(w, &IIOWidget::currentStateChanged, this,
-			[errBox](IIOWidget::State state, QString explanation) {
-				switch(state) {
-				case IIOWidget::Busy:
-					errBox->changeColor(ErrorBox::Yellow);
-					break;
-				case IIOWidget::Correct:
-					errBox->changeColor(ErrorBox::Green);
-					break;
-				case IIOWidget::Error:
-					errBox->changeColor(ErrorBox::Red);
-					break;
-				}
-				errBox->setToolTip(explanation);
-			});
-
-		layout->addWidget(container);
+		layout->addWidget(w);
 	}
 
 	attr->contentLayout()->addLayout(layout);

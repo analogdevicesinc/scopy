@@ -309,7 +309,6 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
 	struct iio_device *device = iio_context_find_device(context, "ad74413r");
 	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
-	auto attrFactory = new IIOWidgetFactory(this);
 	auto *wch2Scroll = new QScrollArea(this);
 
 	wch2Scroll->setWidgetResizable(true);
@@ -324,7 +323,7 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	wch2Scroll->setWidget(wch2);
 	wch2->setLayout(new QVBoxLayout(wch2));
 	wch2->layout()->setContentsMargins(0, 0, 0, 0);
-	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForChannel(attrChannel);
+	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(attrChannel);
 
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
@@ -338,12 +337,12 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	//	attrWidgets.append(attrFactory->buildSingle(AttrFactory::AFH::InstantSave | AttrFactory::AFH::EditableUi
 	//| 							    AttrFactory::AFH::AttrData,
 	//						    {.channel = attrChannel, .data = "offset"}));
-	attrWidgets.append(attrFactory->buildSingle(
-		IIOWidgetFactory::TimeSave | IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
-		{.context = context, .device = device, .data = "device_to_set_trigger_on"}));
-	attrWidgets.append(attrFactory->buildSingle(IIOWidgetFactory::TimeSave | IIOWidgetFactory::ComboUi |
-							    IIOWidgetFactory::FileDemoData,
-						    {.data = "The Office Cast"}));
+	//	attrWidgets.append(IIOWidgetFactory::buildSingle(
+	//		IIOWidgetFactory::TimeSave | IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
+	//		{.context = context, .device = device, .data = "device_to_set_trigger_on"}));
+	//	attrWidgets.append(IIOWidgetFactory::buildSingle(IIOWidgetFactory::TimeSave | IIOWidgetFactory::ComboUi
+	//| 								 IIOWidgetFactory::FileDemoData,
+	//							 {.data = "The Office Cast"}));
 
 	StyleHelper::IIOWidgetElement(channelAttrMenu, "IIOWidget");
 	for(auto item : attrWidgets) {

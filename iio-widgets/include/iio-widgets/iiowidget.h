@@ -26,14 +26,13 @@
 #include "utils.h"
 #include <gui/widgets/menucollapsesection.h>
 #include <gui/widgets/menusectionwidget.h>
+#include <gui/widgets/smallprogressbar.h>
 #include "guistrategy/guistrategyinterface.h"
-#include "savestrategy/savestrategyinterface.h"
 #include "datastrategy/datastrategyinterface.h"
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
 class AttrUiStrategyInterface;
-class SaveStrategyInterface;
 class DataStrategyInterface;
 
 class SCOPY_IIO_WIDGETS_EXPORT IIOWidget : public QWidget
@@ -41,10 +40,9 @@ class SCOPY_IIO_WIDGETS_EXPORT IIOWidget : public QWidget
 	Q_OBJECT
 	QWIDGET_PAINT_EVENT_HELPER
 public:
-	IIOWidget(AttrUiStrategyInterface *uiStrategy, SaveStrategyInterface *saveStrategy,
-		  DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
+	IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
 
-	SaveStrategyInterface *getSaveStrategy();
+	//	SaveStrategyInterface *getSaveStrategy();
 	AttrUiStrategyInterface *getUiStrategy();
 	DataStrategyInterface *getDataStrategy();
 
@@ -79,11 +77,16 @@ protected Q_SLOTS:
 	void saveData(QString data);
 	void emitDataStatus(int status);
 
+	void startTimer(QString data);
+
 protected:
-	SaveStrategyInterface *m_saveStrategy;
+	//	SaveStrategyInterface *m_saveStrategy;
 	AttrUiStrategyInterface *m_uiStrategy;
 	DataStrategyInterface *m_dataStrategy;
 	IIOWidgetFactoryRecipe m_recipe;
+
+	QString m_lastData;
+	SmallProgressBar *m_progressBar;
 };
 } // namespace scopy
 

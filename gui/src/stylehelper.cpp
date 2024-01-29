@@ -45,6 +45,10 @@ void StyleHelper::initColorMap()
 	sh->colorMap.insert("ScopyBackground", "#141416");
 	sh->colorMap.insert("ScopyBlueHover", "#4A34FF");
 	sh->colorMap.insert("ScopyBlueSelected", "#3324B1");
+
+	sh->colorMap.insert("ProgressBarSuccess", "#27B34F");
+	sh->colorMap.insert("ProgressBarError", "#F44336");
+	sh->colorMap.insert("ProgressBarBusy", "#F8E71C");
 }
 
 QString StyleHelper::getColor(QString id)
@@ -1115,6 +1119,79 @@ void StyleHelper::IIOWidgetElement(QWidget *w, QString objectName)
 	)css");
 
 	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::IIOComboBox(QComboBox *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+	QString style = QString(R"css(
+QWidget {
+}
+QComboBox {
+ color: white;
+ height: 24px;
+ border: none;
+ font-weight: normal;
+ font-size: 16px;
+ background-color: transparent;
+}
+QComboBox:disabled, QLineEdit:disabled { color: #555555; }
+QComboBox QAbstractItemView {
+ border: none;
+ text-align: left;
+ color: transparent;
+ outline: none;
+ background-color: &&ScopyBackground&&;
+ selection-background-color: &&UIElementBackground&&;
+ border-bottom: 1px solid #bebebe;
+ border-top: 1px solid #bebebe;
+}
+QComboBox::item:selected {
+ font-weight: bold;
+ font-size: 18px;
+ border-bottom: 0px solid none;
+ background-color: transparent;
+}
+QComboBox::drop-down {
+ subcontrol-position: center right;
+ border-image: url(:/gui/icons/scopy-default/icons/sba_cmb_box_arrow.svg);
+ width: 10px;
+ height: 6px;
+ font-size: 16px;
+ text-align: left;
+ color: transparent;
+}
+QComboBox::indicator {
+ background-color: transparent;
+ selection-background-color: transparent;
+ color: transparent;
+ selection-color: transparent;
+}
+)css");
+
+	style.replace("&&ScopyBackground&&", StyleHelper::getColor("ScopyBackground"));
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	w->setStyleSheet(style);
+}
+
+void StyleHelper::IIOLineEdit(QLineEdit *w, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+	QString style = QString(R"css(
+QLineEdit {
+ background-color: transparent;
+ color: white;
+ font-size: 16px;
+ border: 0px solid gray;
+ padding: 2px;
+}
+	)css");
+	style.replace("&&UIElementBackground&&", StyleHelper::getColor("UIElementBackground"));
+	style.replace("&&ScopyBlue&&", StyleHelper::getColor("ScopyBlue"));
 	w->setStyleSheet(style);
 }
 

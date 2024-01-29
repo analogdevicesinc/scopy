@@ -25,40 +25,19 @@ QWidget *GRDeviceAddon::createAttrMenu(QWidget *parent)
 	MenuSectionWidget *attrContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *attr =
 		new MenuCollapseSection("ATTRIBUTES", MenuCollapseSection::MHCW_NONE, attrContainer);
-	IIOWidgetFactory *attrFactory = new IIOWidgetFactory(attrContainer);
-	QList<IIOWidget *> attrWidgets = attrFactory->buildAllAttrsForDevice(m_src->iioDev());
+	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForDevice(m_src->iioDev());
 	const struct iio_context *ctx = iio_device_get_context(m_src->iioDev());
-	attrWidgets.append(attrFactory->buildSingle(
-		IIOWidgetFactory::ExternalSave | IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
+	attrWidgets.append(IIOWidgetFactory::buildSingle(
+		IIOWidgetFactory::ComboUi | IIOWidgetFactory::TriggerData,
 		{.context = const_cast<iio_context *>(ctx), .device = m_src->iioDev(), .data = "Triggers"}));
 
 	auto layout = new QVBoxLayout(attrContainer);
 	layout->setSpacing(10);
+	layout->setContentsMargins(0, 0, 0, 10); // bottom margin
 	layout->setMargin(0);
 
 	for(auto w : attrWidgets) {
-		auto container = new QWidget(attr);
-		auto errBox = new ErrorBox(container);
-		container->setLayout(new QHBoxLayout(container));
-		container->layout()->addWidget(w);
-		container->layout()->addWidget(errBox);
-		connect(w, &IIOWidget::currentStateChanged, this,
-			[errBox](IIOWidget::State state, QString explanation) {
-				switch(state) {
-				case IIOWidget::Busy:
-					errBox->changeColor(ErrorBox::Yellow);
-					break;
-				case IIOWidget::Correct:
-					errBox->changeColor(ErrorBox::Green);
-					break;
-				case IIOWidget::Error:
-					errBox->changeColor(ErrorBox::Red);
-					break;
-				}
-				errBox->setToolTip(explanation);
-			});
-
-		layout->addWidget(container);
+		layout->addWidget(w);
 	}
 
 	attr->contentLayout()->addLayout(layout);
