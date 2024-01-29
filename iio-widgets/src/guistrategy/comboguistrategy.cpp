@@ -31,6 +31,8 @@ ComboAttrUi::ComboAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 	m_comboWidget = new MenuCombo(recipe.data, m_ui);
+	StyleHelper::IIOComboBox(m_comboWidget->combo(), "IIOComboBox");
+
 	m_ui->layout()->addWidget(m_comboWidget);
 	Q_EMIT requestData();
 

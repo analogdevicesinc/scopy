@@ -15,6 +15,8 @@ public:
 
 public Q_SLOTS:
 	void startProgress(int progressDurationMs = 1000, int steps = 10); // time is 1 second
+	void setBarColor(QColor color);
+	void resetBarColor();
 
 Q_SIGNALS:
 	void progressFinished();
