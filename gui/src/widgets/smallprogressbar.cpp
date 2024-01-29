@@ -9,7 +9,7 @@ SmallProgressBar::SmallProgressBar(QWidget *parent)
 	, m_increment(10)
 {
 	setTextVisible(false);
-	setFixedHeight(3);
+	setFixedHeight(1);
 	setMinimum(0);
 	setMaximum(100);
 	setValue(maximum());
@@ -39,6 +39,6 @@ void SmallProgressBar::setBarColor(QColor color)
 	setStyleSheet(style);
 }
 
-void SmallProgressBar::resetBarColor() { setBarColor(StyleHelper::getColor("ScopyBlue")); }
+void SmallProgressBar::resetBarColor() { setBarColor(StyleHelper::getColor("ProgressBarIdle")); }
 
 #include "moc_smallprogressbar.cpp"
