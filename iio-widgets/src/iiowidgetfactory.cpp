@@ -19,15 +19,11 @@
  */
 
 #include "iiowidgetfactory.h"
-#include "savestrategy/timesavestrategy.h"
-#include "savestrategy/instantsavestrategy.h"
-#include "savestrategy/externalsavestrategy.h"
 #include "guistrategy/editableguistrategy.h"
 #include "guistrategy/switchguistrategy.h"
 #include "datastrategy/channelattrdatastrategy.h"
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
-#include "datastrategy/filedemodatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
@@ -35,15 +31,15 @@
 
 #define ATTR_BUFFER_SIZE 256
 using namespace scopy;
-Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory");
+Q_LOGGING_CATEGORY(CAT_ATTRFACTORY, "AttrFactory")
 
-IIOWidgetFactory::IIOWidgetFactory(QWidget *parent)
-	: QWidget(parent)
+IIOWidgetFactory::IIOWidgetFactory(QObject *parent)
+	: QObject(parent)
 {}
 
 IIOWidgetFactory::~IIOWidgetFactory() {}
 
-QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel *channel)
+QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel *channel, QWidget *parent)
 {
 	QList<IIOWidget *> result;
 
@@ -78,23 +74,23 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel 
 
 			QString readOptions(buffer);
 			if(readOptions.startsWith("[")) {
-				hint |= RangeUi | TimeSave;
-			} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) {
-				hint |= SwitchUi | InstantSave;
+				hint |= RangeUi;
+				//} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() ==2) {
+				// hint |= SwitchUi | InstantSave;
 			} else {
-				hint |= ComboUi | InstantSave;
+				hint |= ComboUi;
 			}
 		} else {
-			hint |= EditableUi | InstantSave;
+			hint |= EditableUi;
 		}
 
-		result.append(this->buildSingle(hint, recipe));
+		result.append(IIOWidgetFactory::buildSingle(hint, recipe, parent));
 	}
 
 	return result;
 }
 
-QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *dev)
+QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *dev, QWidget *parent)
 {
 	QList<IIOWidget *> result;
 
@@ -129,23 +125,24 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *d
 
 			QString readOptions(buffer);
 			if(readOptions.startsWith("[")) {
-				hint |= RangeUi | TimeSave;
-			} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2) { // CustomSwitch is broken
-				hint |= SwitchUi | InstantSave;
+				hint |= RangeUi;
+				//} else if(readOptions.split(" ", Qt::SkipEmptyParts).size() == 2)
+				// hint |= SwitchUi | InstantSave;
+				//{ // CustomSwitch is broken
 			} else {
-				hint |= ComboUi | TimeSave;
+				hint |= ComboUi;
 			}
 		} else {
-			hint |= EditableUi | TimeSave;
+			hint |= EditableUi;
 		}
 
-		result.append(this->buildSingle(hint, recipe));
+		result.append(IIOWidgetFactory::buildSingle(hint, recipe, parent));
 	}
 
 	return result;
 }
 
-QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForContext(struct iio_context *context)
+QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForContext(struct iio_context *context, QWidget *parent)
 {
 	QList<IIOWidget *> result;
 	ssize_t attrCount = iio_context_get_attrs_count(context);
@@ -164,16 +161,15 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForContext(struct iio_context 
 			.data = QString(name),
 		};
 
-		result.append(this->buildSingle(EditableUi | InstantSave | ContextAttrData, recipe));
+		result.append(IIOWidgetFactory::buildSingle(EditableUi | ContextAttrData, recipe, parent));
 	}
 
 	return result;
 }
 
-IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe)
+IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe, QWidget *parent)
 {
 	AttrUiStrategyInterface *uiStrategy = nullptr;
-	SaveStrategyInterface *saveStrategy = nullptr;
 	DataStrategyInterface *dataStrategy = nullptr;
 	IIOWidget *attrWidget = nullptr;
 
@@ -181,38 +177,28 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 		// TODO: implement
 	}
 
-	if(hint & TimeSave) {
-		saveStrategy = new TimerSaveStrategy(recipe, this);
-	} else if(hint & InstantSave) {
-		saveStrategy = new InstantSaveStrategy(recipe, this);
-	} else if(hint & ExternalSave) {
-		saveStrategy = new ExternalSaveStrategy(recipe, this);
-	}
-
 	if(hint & EditableUi) {
-		uiStrategy = new EditableGuiStrategy(recipe, this);
+		uiStrategy = new EditableGuiStrategy(recipe, parent);
 	} else if(hint & SwitchUi) {
-		uiStrategy = new SwitchAttrUi(recipe, this);
+		uiStrategy = new SwitchAttrUi(recipe, parent);
 	} else if(hint & ComboUi) {
-		uiStrategy = new ComboAttrUi(recipe, this);
+		uiStrategy = new ComboAttrUi(recipe, parent);
 	} else if(hint & RangeUi) {
-		uiStrategy = new RangeAttrUi(recipe, this);
+		uiStrategy = new RangeAttrUi(recipe, parent);
 	}
 
 	if(hint & AttrData) {
-		dataStrategy = new ChannelAttrDataStrategy(recipe, this);
+		dataStrategy = new ChannelAttrDataStrategy(recipe, parent);
 	} else if(hint & TriggerData) {
-		dataStrategy = new TriggerDataStrategy(recipe, this);
+		dataStrategy = new TriggerDataStrategy(recipe, parent);
 	} else if(hint & DeviceAttrData) {
-		dataStrategy = new DeviceAttrDataStrategy(recipe, this);
-	} else if(hint & FileDemoData) {
-		dataStrategy = new FileDemoDataStrategy(recipe, this);
+		dataStrategy = new DeviceAttrDataStrategy(recipe, parent);
 	} else if(hint & ContextAttrData) {
-		dataStrategy = new ContextAttrDataStrategy(recipe, this);
+		dataStrategy = new ContextAttrDataStrategy(recipe, parent);
 	}
 
-	if(uiStrategy && saveStrategy && dataStrategy) {
-		attrWidget = new IIOWidget(uiStrategy, saveStrategy, dataStrategy, this);
+	if(uiStrategy && dataStrategy) {
+		attrWidget = new IIOWidget(uiStrategy, dataStrategy, parent);
 		attrWidget->setRecipe(recipe);
 	}
 

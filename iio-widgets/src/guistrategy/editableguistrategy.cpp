@@ -32,13 +32,19 @@ EditableGuiStrategy::EditableGuiStrategy(IIOWidgetFactoryRecipe recipe, QWidget 
 	m_ui->layout()->setContentsMargins(0, 0, 0, 0);
 
 	auto label = new QLabel(recipe.data, m_ui);
-	StyleHelper::MenuSmallLabel(label, "label");
+	StyleHelper::MenuSmallLabel(label, "MenuSmallLabel");
+	StyleHelper::IIOLineEdit(m_lineEdit->edit(), "IIOLineEdit");
 
 	m_ui->layout()->addWidget(label);
 	m_ui->layout()->addWidget(m_lineEdit);
 
-	connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this,
-		[this]() { Q_EMIT emitData(m_lineEdit->edit()->text()); });
+	connect(m_lineEdit->edit(), &QLineEdit::editingFinished, this, [this]() {
+		QString currentText = m_lineEdit->edit()->text();
+		if(currentText != m_lastEmittedText) {
+			m_lastEmittedText = currentText;
+			Q_EMIT emitData(currentText);
+		}
+	});
 
 	Q_EMIT requestData();
 }
@@ -58,6 +64,7 @@ bool EditableGuiStrategy::isValid()
 void EditableGuiStrategy::receiveData(QString currentData, QString optionalData)
 {
 	QSignalBlocker blocker(m_lineEdit);
+	m_lastEmittedText = currentData;
 	m_lineEdit->edit()->setText(currentData);
 }
 
