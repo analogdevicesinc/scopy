@@ -57,6 +57,7 @@ Q_SIGNALS:
 private:
 	QWidget *m_ui;
 	MenuLineEdit *m_lineEdit;
+	QString m_lastEmittedText;
 };
 } // namespace scopy
 

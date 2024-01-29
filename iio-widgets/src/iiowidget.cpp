@@ -24,34 +24,25 @@ using namespace scopy;
 
 Q_LOGGING_CATEGORY(CAT_IIOWIDGET, "iioWidget")
 
-IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, SaveStrategyInterface *saveStrategy,
-		     DataStrategyInterface *dataStrategy, QWidget *parent)
+IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent)
 	: QWidget(parent)
 	, m_uiStrategy(uiStrategy)
-	, m_saveStrategy(saveStrategy)
 	, m_dataStrategy(dataStrategy)
+	, m_progressBar(new SmallProgressBar(this))
 {
 	setLayout(new QVBoxLayout(this));
 	layout()->setContentsMargins(0, 0, 0, 0);
+	layout()->setSpacing(0);
 	setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 	QWidget *ui = uiStrategy->ui();
 	if(ui) {
 		layout()->addWidget(ui);
 	}
+	layout()->addWidget(m_progressBar);
+	connect(m_progressBar, &SmallProgressBar::progressFinished, this, [this]() { this->saveData(m_lastData); });
 
-	QWidget *saveUi = saveStrategy->ui();
-	if(saveUi) {
-		layout()->addWidget(saveUi);
-	}
-
-	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(emitData(QString)),
-		dynamic_cast<QWidget *>(m_saveStrategy), SLOT(receiveData(QString)));
-	connect(dynamic_cast<QWidget *>(m_saveStrategy), SIGNAL(saveData(QString)),
-		dynamic_cast<QWidget *>(m_dataStrategy), SLOT(save(QString)));
-
-	connect(dynamic_cast<QWidget *>(m_saveStrategy), SIGNAL(saveData(QString)), this, SLOT(saveData(QString)));
-
+	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(emitData(QString)), this, SLOT(startTimer(QString)));
 	connect(dynamic_cast<QWidget *>(m_dataStrategy), SIGNAL(emitStatus(int)), this, SLOT(emitDataStatus(int)));
 
 	connect(dynamic_cast<QWidget *>(m_uiStrategy), SIGNAL(requestData()), dynamic_cast<QWidget *>(m_dataStrategy),
@@ -64,21 +55,32 @@ IIOWidget::IIOWidget(AttrUiStrategyInterface *uiStrategy, SaveStrategyInterface 
 
 void IIOWidget::saveData(QString data)
 {
-	Q_EMIT currentStateChanged(State::Busy, "Operation in progress.");
+	m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarBusy"));
+	setToolTip("Operation in progress.");
+
+	qDebug(CAT_IIOWIDGET) << "Sending data" << data << "to data strategy.";
 	m_dataStrategy->save(data);
 }
 
 void IIOWidget::emitDataStatus(int status)
 {
 	if(status < 0) {
-		Q_EMIT currentStateChanged(
-			State::Error, "Error: " + QString(strerror(-status)) + " (" + QString::number(status) + ")");
+		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarError"));
+		setToolTip("Error: " + QString(strerror(-status)) + " (" + QString::number(status) + ")");
 	} else {
-		Q_EMIT currentStateChanged(State::Correct, "Operation finished successfully.");
+		m_progressBar->setBarColor(StyleHelper::getColor("ProgressBarSuccess"));
+		setToolTip("Operation finished successfully.");
+		auto *timer = new QTimer();
+		timer->setSingleShot(true);
+		QObject::connect(timer, &QTimer::timeout, this, [this, timer]() {
+			qDebug(CAT_IIOWIDGET) << "Timeout for displaying success finished.";
+			m_progressBar->resetBarColor();
+			this->setToolTip("");
+			timer->deleteLater();
+		});
+		timer->start(4000);
 	}
 }
-
-SaveStrategyInterface *IIOWidget::getSaveStrategy() { return m_saveStrategy; }
 
 AttrUiStrategyInterface *IIOWidget::getUiStrategy() { return m_uiStrategy; }
 
@@ -87,5 +89,11 @@ DataStrategyInterface *IIOWidget::getDataStrategy() { return m_dataStrategy; }
 IIOWidgetFactoryRecipe IIOWidget::getRecipe() { return m_recipe; }
 
 void IIOWidget::setRecipe(IIOWidgetFactoryRecipe recipe) { m_recipe = recipe; }
+
+void IIOWidget::startTimer(QString data)
+{
+	m_lastData = data;
+	m_progressBar->startProgress();
+}
 
 #include "moc_iiowidget.cpp"
