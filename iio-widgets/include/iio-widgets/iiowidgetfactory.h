@@ -32,7 +32,7 @@
 #include "scopy-iio-widgets_export.h"
 
 namespace scopy {
-class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetFactory : public QWidget
+class SCOPY_IIO_WIDGETS_EXPORT IIOWidgetFactory : public QObject
 {
 	Q_OBJECT
 public:
@@ -40,31 +40,24 @@ public:
 	{
 		AutoHint = 0x00, // auto hint is 0x0, might change to NoHint
 
-		TimeSave = 0x000001,
-		InstantSave = 0x000002,
-		ExternalSave = 0x000004,
+		EditableUi = 0x000001,
+		ComboUi = 0x000002,
+		SwitchUi = 0x00004,
+		RangeUi = 0x000008,
 
-		EditableUi = 0x000008,
-		ComboUi = 0x000010,
-		SwitchUi = 0x00020,
-		RangeUi = 0x000040,
-
-		AttrData = 0x000080,
-		TriggerData = 0x000100,
-		DeviceAttrData = 0x000200,
-		FileDemoData = 0x000400, // TODO: remove this DataStrategy
-		ContextAttrData = 0x000800,
-
-		ProgressLineEditUi = 0x001000,
+		AttrData = 0x000010,
+		TriggerData = 0x000020,
+		DeviceAttrData = 0x000040,
+		ContextAttrData = 0x000080,
 	};
 
-	explicit IIOWidgetFactory(QWidget *parent = nullptr);
+	explicit IIOWidgetFactory(QObject *parent = nullptr);
 	~IIOWidgetFactory();
 
-	IIOWidget *buildSingle(uint32_t hint = AutoHint, IIOWidgetFactoryRecipe recipe = {});
-	QList<IIOWidget *> buildAllAttrsForChannel(struct iio_channel *channel);
-	QList<IIOWidget *> buildAllAttrsForDevice(struct iio_device *dev);
-	QList<IIOWidget *> buildAllAttrsForContext(struct iio_context *context);
+	static IIOWidget *buildSingle(uint32_t hint, IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
+	static QList<IIOWidget *> buildAllAttrsForChannel(struct iio_channel *channel, QWidget *parent = nullptr);
+	static QList<IIOWidget *> buildAllAttrsForDevice(struct iio_device *dev, QWidget *parent = nullptr);
+	static QList<IIOWidget *> buildAllAttrsForContext(struct iio_context *context, QWidget *parent = nullptr);
 };
 } // namespace scopy
 

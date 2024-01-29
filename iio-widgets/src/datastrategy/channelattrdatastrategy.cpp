@@ -22,7 +22,7 @@
 #include <QFile>
 #define BUFFER_SIZE 16384
 
-Q_LOGGING_CATEGORY(CAT_ATTR_DATA_STRATEGY, "AttrDataStrategy")
+Q_LOGGING_CATEGORY(CAT_IIO_DATA_STRATEGY, "AttrDataStrategy")
 using namespace scopy;
 
 ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
@@ -34,14 +34,14 @@ ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, 
 void ChannelAttrDataStrategy::save(QString data)
 {
 	if(m_recipe.channel == nullptr || m_recipe.data == "") {
-		qWarning(CAT_ATTR_DATA_STRATEGY) << "Invalid arguments, cannot write any data";
+		qWarning(CAT_IIO_DATA_STRATEGY) << "Invalid arguments, cannot write any data";
 		return;
 	}
 
 	ssize_t res = iio_channel_attr_write(m_recipe.channel, m_recipe.data.toStdString().c_str(),
 					     data.toStdString().c_str());
 	if(res < 0) {
-		qWarning(CAT_ATTR_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
+		qWarning(CAT_IIO_DATA_STRATEGY) << "Cannot write" << data << "to" << m_recipe.data;
 	}
 
 	Q_EMIT emitStatus((int)(res));
@@ -51,7 +51,7 @@ void ChannelAttrDataStrategy::save(QString data)
 void ChannelAttrDataStrategy::requestData()
 {
 	if(m_recipe.channel == nullptr || m_recipe.data.isEmpty()) {
-		qWarning(CAT_ATTR_DATA_STRATEGY) << "Invalid arguments, cannot read any data";
+		qWarning(CAT_IIO_DATA_STRATEGY) << "Invalid arguments, cannot read any data";
 		return;
 	}
 
@@ -60,7 +60,7 @@ void ChannelAttrDataStrategy::requestData()
 	ssize_t currentValueResult =
 		iio_channel_attr_read(m_recipe.channel, m_recipe.data.toStdString().c_str(), currentValue, BUFFER_SIZE);
 	if(currentValueResult < 0) {
-		qWarning(CAT_ATTR_DATA_STRATEGY)
+		qWarning(CAT_IIO_DATA_STRATEGY)
 			<< "Could not read" << m_recipe.data << "error code:" << currentValueResult;
 	}
 
@@ -68,7 +68,7 @@ void ChannelAttrDataStrategy::requestData()
 		ssize_t optionsResult = iio_channel_attr_read(
 			m_recipe.channel, m_recipe.dataOptions.toStdString().c_str(), options, BUFFER_SIZE);
 		if(optionsResult < 0) {
-			qWarning(CAT_ATTR_DATA_STRATEGY)
+			qWarning(CAT_IIO_DATA_STRATEGY)
 				<< "Could not read" << m_recipe.data << "error code:" << optionsResult;
 		}
 	}
