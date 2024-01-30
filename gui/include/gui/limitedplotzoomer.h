@@ -35,6 +35,9 @@ public:
 
 	void setBoundVertical(bool bound);
 
+public Q_SLOTS:
+	void updateZoomBase();
+
 protected:
 	virtual void zoom(const QRectF &);
 	virtual QSizeF minZoomSize() const override;

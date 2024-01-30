@@ -48,6 +48,7 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void maxChanged();
 	void minChanged();
+	void axisScaleUpdated();
 
 private:
 	QwtAxisId m_axisId;
