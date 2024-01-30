@@ -179,12 +179,14 @@ QWidget *HarmonicsInstrument::createSettingsMenu()
 	for(const QString &ch : m_chnls) {
 		activeChnlCb->combo()->addItem(m_chnls.key(ch));
 	}
-	activeChnlCb->combo()->setCurrentIndex(0);
 	m_table->selectRow(0);
 	connect(activeChnlCb->combo(), &QComboBox::currentTextChanged, this,
 		&HarmonicsInstrument::onActiveChnlChannged);
-	connect(activeChnlCb->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), m_table,
-		&QTableWidget::selectRow);
+	connect(activeChnlCb->combo(), QOverload<int>::of(&QComboBox::activated), m_table, &QTableView::selectRow);
+	connect(m_table->selectionModel(), &QItemSelectionModel::currentRowChanged, this,
+		[=, this](const QModelIndex &current) { activeChnlCb->combo()->setCurrentIndex(current.row()); });
+	connect(m_table->selectionModel(), &QItemSelectionModel::selectionChanged, this,
+		&HarmonicsInstrument::onSelectionChanged);
 
 	lay->addWidget(harmonicType);
 	lay->addWidget(activeChnlCb);
@@ -228,6 +230,32 @@ void HarmonicsInstrument::toggleHarmonics(bool en)
 		ResourceManager::close("pqm");
 	}
 	Q_EMIT enableTool(en);
+}
+bool HarmonicsInstrument::selectedFromSameCol(QModelIndexList list)
+{
+	int rowsNumber = m_chnls.size();
+	int selectedIndexNumber = list.size();
+	if(selectedIndexNumber > rowsNumber) {
+		return false;
+	}
+	int firstIndexColumn = list.first().column();
+	int cellsWithSameColumn = std::count_if(list.begin(), list.end(), [&firstIndexColumn](const QModelIndex &item) {
+		return item.column() == firstIndexColumn;
+	});
+	return cellsWithSameColumn == selectedIndexNumber;
+}
+
+void HarmonicsInstrument::onSelectionChanged()
+{
+	QModelIndexList selectedIndexList = m_table->selectionModel()->selectedIndexes();
+	if(selectedIndexList.size() <= 1 || selectedFromSameCol(selectedIndexList)) {
+		m_plot->xAxis()->setInterval(1, HARMONICS_MAX_DEGREE);
+		return;
+	}
+	int firstColumnSelected = selectedIndexList.front().column() + 1;
+	int lastColumnSelected = selectedIndexList.back().column() + 1;
+	m_plot->xAxis()->setInterval(std::min(firstColumnSelected, lastColumnSelected),
+				     std::max(firstColumnSelected, lastColumnSelected));
 }
 
 void HarmonicsInstrument::onAttrAvailable(QMap<QString, QMap<QString, QString>> attr)
