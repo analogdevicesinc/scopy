@@ -50,6 +50,8 @@ void LimitedPlotZoomer::popZoom() { QwtPlotZoomer::zoom(-1); }
 
 void LimitedPlotZoomer::setBoundVertical(bool bound) { m_boundVertical = bound; }
 
+void LimitedPlotZoomer::updateZoomBase() { m_updateBaseNextZoom = true; }
+
 void LimitedPlotZoomer::zoom(const QRectF &rect)
 {
 

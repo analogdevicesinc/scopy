@@ -119,6 +119,7 @@ void PlotAxis::updateAxisScale()
 {
 	m_plot->setAxisScale(m_axisId, m_min, m_max, (m_max - m_min) / m_divs); // set Divs, limits
 	m_plot->replot();
+	Q_EMIT axisScaleUpdated();
 }
 
 void PlotAxis::setMin(double newMin)
