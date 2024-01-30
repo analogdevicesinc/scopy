@@ -130,6 +130,10 @@ void PlotWidget::setupZoomer()
 	m_zoomer->setZoomBase(false);
 	m_plot->setMouseTracking(true);
 
+	connect(m_xAxis, &PlotAxis::axisScaleUpdated, dynamic_cast<LimitedPlotZoomer *>(m_zoomer),
+		&LimitedPlotZoomer::updateZoomBase);
+	connect(m_yAxis, &PlotAxis::axisScaleUpdated, dynamic_cast<LimitedPlotZoomer *>(m_zoomer),
+		&LimitedPlotZoomer::updateZoomBase);
 	/*connect(m_zoomer,&ExtendingPlotZoomer::zoomed,this, [=](const QRectF &rect ) {
 		for(int i = 0; i < 4;i++) {
 			for(int j = 0 ;j < m_plotAxis[i].count();j++) {
