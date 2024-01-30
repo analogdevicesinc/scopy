@@ -34,6 +34,7 @@ Q_SIGNALS:
 private Q_SLOTS:
 	void updateTable();
 	void onActiveChnlChannged(QString chnlId);
+	void onSelectionChanged();
 
 private:
 	void initData();
@@ -42,6 +43,7 @@ private:
 	void setupPlotChannels();
 	QWidget *createThdWidget();
 	QWidget *createSettingsMenu();
+	bool selectedFromSameCol(QModelIndexList list);
 
 	QString m_harmonicsType;
 	RunBtn *m_runBtn;
