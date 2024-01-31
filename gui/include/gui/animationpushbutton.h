@@ -14,7 +14,7 @@ public:
 	explicit AnimationPushButton(QWidget *parent = Q_NULLPTR);
 	~AnimationPushButton();
 
-	void setAnimation(QMovie *animation);
+	void setAnimation(QMovie *animation, int maxRunningTimeMsec = 10000);
 
 public Q_SLOTS:
 	void startAnimation();
@@ -24,6 +24,7 @@ private Q_SLOTS:
 	void setBtnIcon();
 
 private:
+	QTimer *m_timer;
 	QMovie *m_animation;
 	QString m_currentText;
 	QIcon m_currentIcon;
