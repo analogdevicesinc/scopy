@@ -1,23 +1,41 @@
 #include "datamonitormodel.hpp"
 
+#include <pluginbase/preferences.h>
+
 using namespace scopy;
 using namespace datamonitor;
 
-DataMonitorModel::DataMonitorModel(QString title, QColor color, UnitOfMeasurement *unitOfMeasure, QObject *parent)
-	: title(title)
+DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure, QObject *parent)
+	: name(name)
 	, color(color)
 	, unitOfMeasure(unitOfMeasure)
 	, m_minValue(Q_INFINITY)
 	, m_maxValue(-Q_INFINITY)
 	, QObject{parent}
 {
-	values = new QList<QPair<uint32_t, double>>();
-	m_lastReadValue = 0;
+	//TODO RESERVE SPACE FOR X AND Y DATA
+	Preferences *p = Preferences::GetInstance();
+	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
+		if (id.contains("datamonitor")) {
+			auto dataSizePref = p->get("datamonitor_data_storage_size").toString().split(" ");
+			int dataSize = dataSizePref[0].toInt();
+			if (dataSizePref[1] == "Kb") {
+				dataSize *= 1000;
+			} else if (dataSizePref[1] == "Mb") {
+				dataSize *= 1000000;
+			}
+
+			//if any data stored should we delete it ?
+			//?? can user update while program is running (between runs )
+			xdata.reserve(dataSize);
+			ydata.reserve(dataSize);
+		}
+	});
 }
 
-QString DataMonitorModel::getTitle() const { return title; }
+QString DataMonitorModel::getName() const { return name; }
 
-void DataMonitorModel::setTitle(QString newTitle) { title = newTitle; }
+void DataMonitorModel::setName(QString newName) { name = newName; }
 
 QColor DataMonitorModel::getColor() const { return color; }
 
@@ -27,19 +45,26 @@ UnitOfMeasurement *DataMonitorModel::getUnitOfMeasure() const { return unitOfMea
 
 void DataMonitorModel::setUnitOfMeasure(UnitOfMeasurement *newUnitOfMeasure) { unitOfMeasure = newUnitOfMeasure; }
 
-double DataMonitorModel::getLastReadValue() const { return m_lastReadValue; }
+QPair<double,double> DataMonitorModel::getLastReadValue() const { return qMakePair(xdata.last(), ydata.last()); }
 
-double DataMonitorModel::getValueAtTime(uint32_t time)
+double DataMonitorModel::getValueAtTime(double time)
 {
-	for(int i = 0; i < values->length(); i++) {
-		if(values->at(i).first == time) {
-			return values->at(i).second;
-		}
+	if (ydata.contains(time)) {
+		return xdata.at(ydata.indexOf(time));
 	}
+
 	return 0.0;
 }
 
-QList<QPair<uint32_t, double>> *DataMonitorModel::getValues() const { return values; }
+QList<QPair<double, double>> *DataMonitorModel::getValues() const {
+	QList<QPair<double, double>> *result = new QList<QPair<double, double>>();
+
+	for( int i = 0; i < xdata.length(); i++) {
+		result->push_back(qMakePair(xdata.at(i),ydata.at(i)));
+	}
+
+	return result;
+}
 
 void DataMonitorModel::checkMinMaxUpdate(double value)
 {
@@ -53,11 +78,37 @@ void DataMonitorModel::checkMinMaxUpdate(double value)
 	}
 }
 
-void DataMonitorModel::updateValue(uint32_t time, double value)
+IReadStrategy *DataMonitorModel::getReadStrategy() const
 {
-	m_lastReadValue = value;
-	values->append(qMakePair(time, value));
+	return readStrategy;
+}
+
+void DataMonitorModel::setReadStrategy(IReadStrategy *newReadStrategy)
+{
+	readStrategy = newReadStrategy;
+
+	connect(readStrategy, &IReadStrategy::readDone, this, &DataMonitorModel::updateValue);
+}
+
+void DataMonitorModel::clearMonitorData()
+{
+	xdata.erase(xdata.begin(), xdata.end());
+	ydata.erase(ydata.begin(), ydata.end());
+	resetMinMax();
+	Q_EMIT dataCleared();
+}
+
+void DataMonitorModel::read()
+{
+	readStrategy->read();
+}
+
+void DataMonitorModel::updateValue(double time, double value)
+{
+	xdata.push_back(time);
+	ydata.push_back(value);
 	checkMinMaxUpdate(value);
+
 	Q_EMIT valueUpdated(time, value);
 }
 
