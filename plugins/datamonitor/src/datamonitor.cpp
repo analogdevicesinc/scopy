@@ -8,9 +8,14 @@
 #include <QLabel>
 #include <QUuid>
 #include <QVBoxLayout>
+#include <menucollapsesection.h>
+#include <menusectionwidget.h>
 
 #include <libm2k/contextbuilder.hpp>
 #include "datamonitortool.hpp"
+
+#include <pluginbase/preferences.h>
+#include <pluginbase/preferenceshelper.h>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -133,5 +138,35 @@ void DataMonitorPlugin::initMetadata()
 void DataMonitorPlugin::saveSettings(QSettings &s) {}
 
 void DataMonitorPlugin::loadSettings(QSettings &s) {}
+
+void DataMonitorPlugin::initPreferences()
+{
+	Preferences *p = Preferences::GetInstance();
+	p->init("datamonitor_data_storage_size", "10 Kb");
+}
+
+bool DataMonitorPlugin::loadPreferencesPage()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	m_preferencesPage = new QWidget();
+	QVBoxLayout *lay = new QVBoxLayout(m_preferencesPage);
+
+	MenuSectionWidget *generalWidget = new MenuSectionWidget(m_preferencesPage);
+	MenuCollapseSection *generalSection =
+		new MenuCollapseSection("General", MenuCollapseSection::MHCW_NONE, generalWidget);
+	generalWidget->contentLayout()->setSpacing(10);
+	generalWidget->contentLayout()->addWidget(generalSection);
+	generalSection->contentLayout()->setSpacing(10);
+	lay->setMargin(0);
+	lay->addWidget(generalWidget);
+	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
+
+	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
+		p, "datamonitor_data_storage_size", "Maximum data stored for each monitor",
+		{"10 Kb", "1 Mb"},
+		generalSection));
+	return true;
+}
 
 QString DataMonitorPlugin::description() { return "Use IIO raw and scale attributes to plot and save data"; }
