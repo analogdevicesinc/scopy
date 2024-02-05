@@ -7,8 +7,13 @@
 #include <stylehelper.h>
 #include <verticalchannelmanager.h>
 
-#include <src/datamonitor/datamonitorcontroller.hpp>
-#include <src/datamonitor/datamonitormodel.hpp>
+//#include <src/datamonitor/datamonitormodel.hpp>
+//#include <src/datamonitor/testreadstrategy.hpp>
+
+#include <datamonitormodel.hpp>
+#include <testreadstrategy.hpp>
+
+#include <QDebug>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -96,28 +101,35 @@ void DataMonitorTool::initDataMonitor()
 	});
 
 	// generate channel monitors
-	m_monitors = new QMap<int, DataMonitorController *>();
+
+	dataAcquisitionManager = new DataAcquisitionManager(this);
 
 	// TODO get a list of DataMonitorModel for each device we want to add
 	// ?? use de generateMonitor function outside the tool ? tool->generateMonitor( monitor data ) ;
 	for(int i = 0; i < 4; i++) {
-		DataMonitorModel *channelModel = new DataMonitorModel("test:" + QString::number(i),
+		DataMonitorModel *channelModel = new DataMonitorModel("dev0:test " + QString::number(i),
 								      StyleHelper::getColor("CH" + QString::number(i)),
 								      new UnitOfMeasurement("Volt", "V"));
 
-		generateMonitor(channelModel, channelManager);
+		channelModel->setReadStrategy(new TestReadStrategy());
+
+		dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
+	}
+	for(int i = 0; i < 3; i++) {
+		DataMonitorModel *channelModel = new DataMonitorModel("dev1:test " + QString::number(i + 4),
+															  StyleHelper::getColor("CH" + QString::number(i)),
+															  new UnitOfMeasurement("Volt", "V"));
+
+		channelModel->setReadStrategy(new TestReadStrategy());
+
+		dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
 	}
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
+
+	//TODO connect to UI
 }
 
 void DataMonitorTool::generateMonitor(DataMonitorModel *model, CollapsableMenuControlButton *channelManager)
 {
 	// Generate controller
-	DataMonitorController *dataMonitorController = new DataMonitorController(model);
-	int controllerId = m_flexGridLayout->addQWidgetToList(dataMonitorController->getDataMonitorView());
-	m_monitors->insert(controllerId, dataMonitorController);
-	// add the monitor to layout
-	m_flexGridLayout->addWidget(controllerId);
 }
-
-void DataMonitorTool::initDataMonitor() {}
