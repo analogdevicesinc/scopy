@@ -22,13 +22,12 @@ class DataMonitorModel;
 
 class DataMonitorTool : public QWidget
 {
+	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
 	explicit DataMonitorTool(iio_context *ctx, QWidget *parent = nullptr);
 
 	RunBtn *getRunButton() const;
-
-	void initDataMonitor();
 
 private:
 	ToolTemplate *tool;
@@ -36,7 +35,8 @@ private:
 	GearBtn *settingsButton;
 	InfoBtn *infoBtn;
 	RunBtn *runBtn;
-	SingleShotBtn *singleBtn;
+	QPushButton *clearBtn;
+	QPushButton *addMonitorButton;
 
 	FlexGridLayout *m_flexGridLayout;
 	QScrollArea *m_scrollArea;
