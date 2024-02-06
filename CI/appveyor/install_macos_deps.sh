@@ -20,6 +20,8 @@ REPO_SRC=$BUILD_REPOSITORY_LOCALPATH
 WORKDIR=${PWD}
 JOBS=4
 
+brew update
+brew upgrade
 brew search ${QT_FORMULAE}
 brew install $PACKAGES
 
