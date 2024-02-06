@@ -32,6 +32,7 @@ signals:
 	void activeMonitorsUpdated();
 
 private:
+
 	QMap<QString, int> *m_activeMonitorsMap;
 	QMap<QString, DataMonitorModel *> *m_dataMonitorMap;
 };
