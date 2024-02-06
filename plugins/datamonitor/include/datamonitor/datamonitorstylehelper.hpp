@@ -3,7 +3,6 @@
 
 #include <QObject>
 
-#include <src/datamonitor/datamonitorview.hpp>
 #include "datamonitortool.hpp"
 
 namespace scopy {

@@ -21,21 +21,12 @@ DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement
 	// TODO RESERVE SPACE FOR X AND Y DATA
 	Preferences *p = Preferences::GetInstance();
 	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
-		if(id.contains("datamonitor")) {
-			auto dataSizePref = p->get("datamonitor_data_storage_size").toString().split(" ");
-			int dataSize = dataSizePref[0].toInt();
-			if(dataSizePref[1] == "Kb") {
-				dataSize *= 1000;
-			} else if(dataSizePref[1] == "Mb") {
-				dataSize *= 1000000;
-			}
-
-			// if any data stored should we delete it ?
-			//?? can user update while program is running (between runs )
-			xdata.reserve(dataSize);
-			ydata.reserve(dataSize);
+		if (id.contains("datamonitor")) {
+			setDataStorageSize();
 		}
 	});
+
+	setDataStorageSize();
 }
 
 QString DataMonitorModel::getName() const { return name; }
@@ -54,8 +45,8 @@ QPair<double, double> DataMonitorModel::getLastReadValue() const { return qMakeP
 
 double DataMonitorModel::getValueAtTime(double time)
 {
-	if(ydata.contains(time)) {
-		return xdata.at(ydata.indexOf(time));
+	if (xdata.contains(time)) {
+		return ydata.at(xdata.indexOf(time));
 	}
 
 	return 0.0;
@@ -84,14 +75,40 @@ void DataMonitorModel::checkMinMaxUpdate(double value)
 	}
 }
 
+
 IReadStrategy *DataMonitorModel::getReadStrategy() const { return readStrategy; }
+
+void DataMonitorModel::setDataStorageSize()
+{
+	Preferences *p = Preferences::GetInstance();
+
+	auto dataSizePref = p->get("datamonitor_data_storage_size").toString().split(" ");
+	int dataSize = dataSizePref[0].toInt();
+	if (dataSizePref[1] == "Kb") {
+		dataSize *= 1000;
+	} else if (dataSizePref[1] == "Mb") {
+		dataSize *= 1000000;
+	}
+
+	//if any data stored should we delete it ?
+	//?? can user update while program is running (between runs )
+	xdata.reserve(dataSize);
+	ydata.reserve(dataSize);
+}
+
+QVector<double> *DataMonitorModel::getXdata() { return &xdata; }
+
+QVector<double> *DataMonitorModel::getYdata() { return &ydata; }
 
 void DataMonitorModel::setReadStrategy(IReadStrategy *newReadStrategy)
 {
 	readStrategy = newReadStrategy;
-
 	connect(readStrategy, &IReadStrategy::readDone, this, &DataMonitorModel::updateValue);
 }
+
+QVector<double> *DataMonitorModel::getXdata() { return &xdata; }
+
+QVector<double> *DataMonitorModel::getYdata() { return &ydata; }
 
 void DataMonitorModel::clearMonitorData()
 {
