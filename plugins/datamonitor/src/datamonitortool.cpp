@@ -5,6 +5,7 @@
 #include <flexgridlayout.hpp>
 #include <hoverwidget.h>
 #include <menucontrolbutton.h>
+
 #include <stylehelper.h>
 #include <verticalchannelmanager.h>
 
@@ -14,6 +15,7 @@
 #include <QDebug>
 #include <dmm.hpp>
 #include <dmmreadstrategy.hpp>
+#include <datamonitorcontroller.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -70,6 +72,11 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
 
 	connect(addMonitorButton, &QPushButton::clicked, this, [=]() {
+		MonitorPlot *monitorPlot = new MonitorPlot(this);
+
+		int controllerId = m_flexGridLayout->addQWidgetToList(monitorPlot);
+		m_flexGridLayout->addWidget(controllerId);
+
 	});
 
 	// generate channel monitors
@@ -87,6 +94,59 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
 	// TODO connect to UI
+	///////// end add monitor
+
+	DataMonitorStyleHelper::DataMonitorToolStyle(this);
+
+	// generate channel monitors
+
+	dataAcquisitionManager = new DataAcquisitionManager(this);
+
+	// TODO get a list of DataMonitorModel for each device we want to add
+	// ?? use de generateMonitor function outside the tool ? tool->generateMonitor( monitor data ) ;
+	for(int i = 0; i < 4; i++) {
+		DataMonitorModel *channelModel = new DataMonitorModel("dev0:test " + QString::number(i),
+									  StyleHelper::getColor("CH" + QString::number(i)),
+									  new UnitOfMeasurement("Volt", "V"));
+
+		channelModel->setReadStrategy(new TestReadStrategy());
+
+		dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
+	}
+	for(int i = 0; i < 3; i++) {
+		DataMonitorModel *channelModel = new DataMonitorModel("dev1:test " + QString::number(i + 4),
+															  StyleHelper::getColor("CH" + QString::number(i)),
+															  new UnitOfMeasurement("Volt", "V"));
+
+		channelModel->setReadStrategy(new TestReadStrategy());
+
+		dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
+	}
+	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
+
+	//TODO connect to UI
+
+	dataAcquisitionManager->updateActiveMonitors(true, dataAcquisitionManager->getDataMonitorMap()->begin().key());
+
+	connect(runBtn, &QPushButton::toggled, this, [=](){
+		dataAcquisitionManager->readData();
+	});
+
+	//// add monitors
+	addMonitorButton = new QPushButton(this);
+
+	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
+
+	connect(addMonitorButton, &QPushButton::clicked, this, [=]() {
+		DataMonitorController *dataMonitorController = new DataMonitorController(this);
+
+
+
+		int controllerId = m_flexGridLayout->addQWidgetToList(dataMonitorController->dataMonitorView());
+		m_flexGridLayout->addWidget(controllerId);
+
+	});
+
 	///////// end add monitor
 
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);

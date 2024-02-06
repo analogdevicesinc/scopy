@@ -30,12 +30,16 @@ public:
 	void setUnitOfMeasure(UnitOfMeasurement *newUnitOfMeasure);
 
 	QPair<double, double> getLastReadValue() const;
+
 	double getValueAtTime(double time);
 	void updateValue(double time, double value);
 	void resetMinMax();
 
 	QList<QPair<double, double>> *getValues() const;
 	void clearMonitorData();
+
+	QVector<double> *getXdata();
+	QVector<double> *getYdata();
 
 	IReadStrategy *getReadStrategy() const;
 	void setReadStrategy(IReadStrategy *newReadStrategy);
@@ -57,6 +61,8 @@ private:
 	QVector<double> xdata;
 	void checkMinMaxUpdate(double value);
 	IReadStrategy *readStrategy;
+
+	void setDataStorageSize();
 };
 } // namespace datamonitor
 } // namespace scopy
