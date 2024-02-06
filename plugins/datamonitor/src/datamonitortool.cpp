@@ -1,6 +1,7 @@
 #include "datamonitortool.hpp"
 
 #include <QBoxLayout>
+#include <datamonitorstylehelper.hpp>
 #include <flexgridlayout.hpp>
 #include <hoverwidget.h>
 #include <menucontrolbutton.h>
@@ -43,13 +44,15 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	settingsButton = new GearBtn(this);
 	infoBtn = new InfoBtn(this);
 	runBtn = new RunBtn(this);
-	singleBtn = new SingleShotBtn(this);
+	clearBtn = new QPushButton("Clear", this);
+
+	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
 
 	tool->addWidgetToTopContainerMenuControlHelper(openLatMenuBtn, TTA_RIGHT);
 	tool->addWidgetToTopContainerMenuControlHelper(settingsButton, TTA_LEFT);
 
 	tool->addWidgetToTopContainerHelper(runBtn, TTA_RIGHT);
-	tool->addWidgetToTopContainerHelper(singleBtn, TTA_RIGHT);
+	tool->addWidgetToTopContainerHelper(clearBtn, TTA_RIGHT);
 
 	grp = static_cast<OpenLastMenuBtn *>(openLatMenuBtn)->getButtonGroup();
 	grp->addButton(settingsButton);
@@ -61,43 +64,12 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	m_scrollArea->setWidget(m_flexGridLayout);
 	tool->addWidgetToCentralContainerHelper(m_scrollArea);
 
-	initDataMonitor();
-}
+	//// add monitors
+	addMonitorButton = new QPushButton(this);
 
-RunBtn *DataMonitorTool::getRunButton() const { return runBtn; }
+	tool->addWidgetToTopContainerHelper(addMonitorButton, TTA_LEFT);
 
-void DataMonitorTool::initDataMonitor()
-{
-	// CHANNEL MANAGER
-	MenuControlButton *channels = new MenuControlButton(this);
-	channels->setCheckBoxStyle(MenuControlButton::CS_COLLAPSE);
-	channels->setName("Channels");
-	channels->button()->setVisible(false);
-	channels->checkBox()->setChecked(true);
-
-	tool->addWidgetToTopContainerHelper(channels, TTA_LEFT);
-	tool->addWidgetToTopContainerHelper(infoBtn, TTA_LEFT);
-
-	VerticalChannelManager *vcm = new VerticalChannelManager(tool->leftContainer());
-	vcm->setFixedWidth(145);
-
-	// create one for each device
-	CollapsableMenuControlButton *channelManager = new CollapsableMenuControlButton(this);
-	channelManager->getControlBtn()->setName("Dev");
-	vcm->add(channelManager);
-
-	HoverWidget *hv = new HoverWidget(nullptr, channels, tool);
-	hv->setContent(vcm);
-	hv->setAnchorOffset(QPoint(0, 10));
-	hv->setAnchorPos(HoverPosition::HP_BOTTOMLEFT);
-	hv->setContentPos(HoverPosition::HP_BOTTOMRIGHT);
-
-	hv->setVisible(true);
-	hv->raise();
-
-	connect(channels->checkBox(), &QCheckBox::toggled, this, [=](bool toggled) {
-		hv->setVisible(toggled);
-		hv->raise();
+	connect(addMonitorButton, &QPushButton::clicked, this, [=]() {
 	});
 
 	// generate channel monitors
@@ -115,7 +87,12 @@ void DataMonitorTool::initDataMonitor()
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
 	// TODO connect to UI
+	///////// end add monitor
+
+	DataMonitorStyleHelper::DataMonitorToolStyle(this);
 }
+
+RunBtn *DataMonitorTool::getRunButton() const { return runBtn; }
 
 void DataMonitorTool::generateMonitor(DataMonitorModel *model, CollapsableMenuControlButton *channelManager)
 {
