@@ -53,7 +53,7 @@ QWidget *SwitchAttrUi::ui() { return m_ui; }
 
 bool SwitchAttrUi::isValid()
 {
-	if(m_recipe.channel != nullptr && m_recipe.data != "" && m_recipe.dataOptions != "") {
+	if(m_recipe.channel != nullptr && m_recipe.data != "" && m_recipe.iioDataOptions != "") {
 		return true;
 	}
 	return false;
