@@ -328,12 +328,12 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
-	//		{.channel = attrChannel, .data = "sampling_frequency", .dataOptions =
+	//		{.channel = attrChannel, .data = "sampling_frequency", .iioDataOptions =
 	//"sampling_frequency_available"}));
 	//
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::TimeSave | AttrFactory::AFH::RangeUi | AttrFactory::AFH::AttrData,
-	//		{.channel = attrChannel, .data = "raw", .dataOptions = "raw_available"}));
+	//		{.channel = attrChannel, .data = "raw", .iioDataOptions = "raw_available"}));
 	//
 	//	attrWidgets.append(attrFactory->buildSingle(AttrFactory::AFH::InstantSave | AttrFactory::AFH::EditableUi
 	//| 							    AttrFactory::AFH::AttrData,

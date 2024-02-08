@@ -62,13 +62,23 @@ void DeviceAttrDataStrategy::requestData()
 			<< "Could not read" << m_recipe.data << "error code:" << currentValueResult;
 	}
 
-	if(m_recipe.dataOptions != "") {
+	if(m_recipe.iioDataOptions != "") {
 		ssize_t optionsResult = iio_device_attr_read(
-			m_recipe.device, m_recipe.dataOptions.toStdString().c_str(), options, BUFFER_SIZE);
+			m_recipe.device, m_recipe.iioDataOptions.toStdString().c_str(), options, BUFFER_SIZE);
 		if(optionsResult < 0) {
 			qWarning(CAT_DEVICE_DATA_STRATEGY)
 				<< "Could not read" << m_recipe.data << "error code:" << optionsResult;
 		}
+	}
+
+	if(m_recipe.constDataOptions != "") {
+		if(m_recipe.constDataOptions.size() >= BUFFER_SIZE) {
+			qWarning(CAT_DEVICE_DATA_STRATEGY) << "The data from constDataOptions exceeds the buffer size. "
+							      "Consider updating one of them.";
+		}
+
+		strncpy(options, m_recipe.constDataOptions.toStdString().c_str(), m_recipe.constDataOptions.size());
+		options[m_recipe.constDataOptions.size()] = '\0'; // safety measures
 	}
 
 	Q_EMIT sendData(QString(currentValue), QString(options));

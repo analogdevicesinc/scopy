@@ -63,7 +63,7 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForChannel(struct iio_channel 
 		recipe.data = attributeName;
 		QString availableAttrName = attributeName + "_available";
 		if(channelAttributes.contains(availableAttrName)) {
-			recipe.dataOptions = availableAttrName;
+			recipe.iioDataOptions = availableAttrName;
 			char buffer[ATTR_BUFFER_SIZE] = {0};
 			ssize_t res = iio_channel_attr_read(channel, availableAttrName.toStdString().c_str(), buffer,
 							    ATTR_BUFFER_SIZE);
@@ -114,7 +114,7 @@ QList<IIOWidget *> IIOWidgetFactory::buildAllAttrsForDevice(struct iio_device *d
 		recipe.data = attributeName;
 		QString availableAttrName = attributeName + "_available";
 		if(devAttributes.contains(availableAttrName)) {
-			recipe.dataOptions = availableAttrName;
+			recipe.iioDataOptions = availableAttrName;
 			char buffer[ATTR_BUFFER_SIZE] = {0};
 			ssize_t res = iio_device_attr_read(dev, availableAttrName.toStdString().c_str(), buffer,
 							   ATTR_BUFFER_SIZE);
