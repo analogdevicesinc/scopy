@@ -29,10 +29,14 @@ RangeAttrUi::RangeAttrUi(IIOWidgetFactoryRecipe recipe, QWidget *parent)
 	, m_ui(new QWidget(nullptr))
 {
 	m_recipe = recipe;
+	if(!isValid()) {
+		qCritical(CAT_ATTR_GUI_STRATEGY)
+			<< "The data you sent to this range gui strategy is not complete. Cannot create object";
+	}
 	m_ui->setLayout(new QVBoxLayout(m_ui));
 
 	// FIXME: this does not look right when uninitialized, also crashes...
-	m_positionSpinButton = new PositionSpinButton({{m_recipe.dataOptions, 1}}, m_recipe.data);
+	m_positionSpinButton = new PositionSpinButton({{"-", 1}}, m_recipe.data);
 	StyleHelper::MenuSpinBox(m_positionSpinButton, "RangeSpinButton");
 	m_ui->layout()->addWidget(m_positionSpinButton);
 	Q_EMIT requestData();
@@ -47,7 +51,8 @@ QWidget *RangeAttrUi::ui() { return m_ui; }
 
 bool RangeAttrUi::isValid()
 {
-	if(m_recipe.channel != nullptr && m_recipe.data != "" && m_recipe.dataOptions != "") {
+	if(m_recipe.channel != nullptr && m_recipe.data != "" &&
+	   (m_recipe.iioDataOptions != "" || m_recipe.constDataOptions != "")) {
 		return true;
 	}
 	return false;
