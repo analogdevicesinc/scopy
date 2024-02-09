@@ -25,8 +25,10 @@
 #include "datastrategy/triggerdatastrategy.h"
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
+#include "datastrategy/cmdqchannelattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
+#include <iioutil/commandqueueprovider.h>
 #include <QLoggingCategory>
 
 #define ATTR_BUFFER_SIZE 256
@@ -195,6 +197,9 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 		dataStrategy = new DeviceAttrDataStrategy(recipe, parent);
 	} else if(hint & ContextAttrData) {
 		dataStrategy = new ContextAttrDataStrategy(recipe, parent);
+	} else if(hint & CMDQAttrData) {
+		auto cmdq = CommandQueueProvider::GetInstance()->open(nullptr);
+		dataStrategy = new CmdQChannelAttrDataStrategy(recipe, cmdq, parent);
 	}
 
 	if(uiStrategy && dataStrategy) {
