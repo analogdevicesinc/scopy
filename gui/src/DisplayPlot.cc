@@ -594,6 +594,15 @@ DisplayPlot::DisplayPlot(int nplots, QWidget *parent, bool isdBgraph, unsigned i
 	setupReadouts();
 }
 
+scopy::MousePlotMagnifier *DisplayPlot::getMagnifier()
+{
+	if(d_magnifier.size())
+		return d_magnifier[0];
+	return nullptr;
+}
+
+QVector<scopy::MousePlotMagnifier *> DisplayPlot::getMagnifierList() { return d_magnifier; }
+
 void DisplayPlot::setupDisplayPlotDiv(bool isdBgraph)
 {
 	if(!isdBgraph) {
@@ -1162,8 +1171,10 @@ void DisplayPlot::setAllYAxis(double min, double max)
 	}
 
 	if(!d_autoscale_state) {
-		for(int i = 0; i < d_zoomer.size(); ++i)
+		for(int i = 0; i < d_zoomer.size(); ++i) {
 			d_zoomer[i]->setZoomBase();
+			d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
+		}
 	}
 }
 
@@ -1171,16 +1182,20 @@ void DisplayPlot::setYaxis(double min, double max)
 {
 	setAxisScale(m_qwtYAxis, min, max);
 	if(!d_autoscale_state) {
-		for(unsigned int i = 0; i < d_zoomer.size(); ++i)
+		for(int i = 0; i < d_zoomer.size(); ++i) {
 			d_zoomer[i]->setZoomBase();
+			d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
+		}
 	}
 }
 
 void DisplayPlot::setXaxis(double min, double max)
 {
 	setAxisScale(QwtAxis::XBottom, min, max);
-	for(unsigned int i = 0; i < d_zoomer.size(); ++i)
+	for(unsigned int i = 0; i < d_zoomer.size(); ++i) {
 		d_zoomer[i]->setZoomBase();
+		d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
+	}
 }
 
 void DisplayPlot::setLineLabel(int which, QString label) { d_plot_curve[which]->setTitle(label); }
@@ -1507,8 +1522,10 @@ void DisplayPlot::onPickerPointSelected6(const QPointF &p)
 
 void DisplayPlot::zoomBaseUpdate(bool force)
 {
-	for(unsigned int i = 0; i < d_zoomer.size(); ++i)
+	for(unsigned int i = 0; i < d_zoomer.size(); ++i) {
 		d_zoomer[i]->setZoomBase(force);
+		d_magnifier[i]->setBaseRect(d_zoomer[i]->zoomBase());
+	}
 }
 
 void DisplayPlot::AddAxisOffset(int axisPos, int axisIdx, double offset)
@@ -1818,6 +1835,7 @@ void DisplayPlot::mousePressEvent(QMouseEvent *event)
 		for(unsigned int i = 0; i < d_zoomer.size(); ++i) {
 			OscPlotZoomer *zoomer = static_cast<OscPlotZoomer *>(d_zoomer[i]);
 			zoomer->popZoom();
+			Q_EMIT d_magnifier[i]->reset();
 		}
 	}
 }
@@ -1837,9 +1855,14 @@ void DisplayPlot::setZoomerParams(bool bounded, int maxStackDepth)
 		return;
 	}
 
-	auto zoomer = dynamic_cast<LimitedPlotZoomer *>(d_zoomer[0]);
-	zoomer->setMaxStackDepth(maxStackDepth);
-	zoomer->setBoundVertical(bounded);
+	for(auto zoomer : d_zoomer) {
+		zoomer->setMaxStackDepth(maxStackDepth);
+		dynamic_cast<LimitedPlotZoomer *>(zoomer)->setBoundVertical(bounded);
+	}
+
+	for(auto magnifier : d_magnifier) {
+		magnifier->setBounded(bounded);
+	}
 }
 
 void DisplayPlot::horizAxisScaleIncrease()

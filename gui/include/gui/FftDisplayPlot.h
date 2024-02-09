@@ -245,6 +245,7 @@ public:
 	void recalculateMagnitudes();
 	void replot();
 	void setZoomerEnabled();
+	void setMagnifierEnabled(bool enabled);
 	double sampleRate();
 	void setNumPoints(uint64_t num_points);
 
