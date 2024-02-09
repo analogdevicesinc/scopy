@@ -137,8 +137,12 @@ PatternGenerator::PatternGenerator(struct iio_context *ctx, Filter *filt, ToolMe
 
 	// Add propper zoomer
 	m_plot.addZoomer(0);
+	m_plot.addMagnifier(0);
+	m_plot.getMagnifier()->setYAxisEnabled(false);
+	m_plot.getMagnifier()->setXAxis(true);
 	m_plot.setZoomerParams(true, 20);
 	m_plot.zoomBaseUpdate();
+	m_plot.getMagnifier()->setBaseRect(m_plot.getZoomer()->zoomBase());
 
 	m_plot.enableXaxisLabels();
 	m_plotScrollBar->setRange(0, 140);
