@@ -277,8 +277,8 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry 
 	onTriggerModeChanged(trigger_settings.triggerMode());
 	connect(triggerUpdater, SIGNAL(outputChanged(int)), &plot, SLOT(setTriggerState(int)));
 
-	// plot.setZoomerEnabled(true);
 	fft_plot.setZoomerEnabled();
+	fft_plot.setMagnifierEnabled(false);
 	create_add_channel_panel();
 
 	/* Gnuradio Blocks Connections */
@@ -483,6 +483,12 @@ Oscilloscope::Oscilloscope(struct iio_context *ctx, Filter *filt, ToolMenuEntry 
 	for(unsigned int i = 0; i < nb_channels; i++) {
 		plot.Curve(i)->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, i));
 		plot.addZoomer(i);
+		plot.addMagnifier(i);
+		connect(plot.getMagnifierList()[i], &::scopy::MousePlotMagnifier::zoomed, this,
+			&Oscilloscope::updateBufferPreviewer);
+		connect(plot.getMagnifierList()[i], &::scopy::MousePlotMagnifier::panned, this,
+			&Oscilloscope::updateBufferPreviewer);
+
 		probe_attenuation.push_back(1);
 		auto multiply = gr::blocks::multiply_const_ff::make(1);
 		auto null_sink = gr::blocks::null_sink::make(sizeof(float));
@@ -1041,6 +1047,12 @@ void Oscilloscope::add_ref_waveform(QString name, QVector<double> xData, QVector
 	plot.Curve(curve_id)->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
+	plot.addMagnifier(curve_id);
+	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this,
+		&Oscilloscope::updateBufferPreviewer);
+	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this,
+		&Oscilloscope::updateBufferPreviewer);
+
 	plot.replot();
 
 	nb_ref_channels++;
@@ -1148,6 +1160,12 @@ void Oscilloscope::add_ref_waveform(unsigned int chIdx)
 	plot.Curve(curve_id)->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("REF " + QString::number(nb_ref_channels + 1));
 	plot.addZoomer(curve_id);
+	plot.addMagnifier(curve_id);
+	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this,
+		&Oscilloscope::updateBufferPreviewer);
+	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this,
+		&Oscilloscope::updateBufferPreviewer);
+
 	plot.replot();
 
 	nb_ref_channels++;
@@ -2380,6 +2398,12 @@ void Oscilloscope::add_math_channel(const std::string &function)
 	plot.Curve(curve_id)->setAxes(QwtAxisId(QwtAxis::XBottom, 0), QwtAxisId(QwtAxis::YLeft, curve_id));
 	plot.Curve(curve_id)->setTitle("M " + QString::number(curve_number + 1));
 	plot.addZoomer(curve_id);
+	plot.addMagnifier(curve_id);
+	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::zoomed, this,
+		&Oscilloscope::updateBufferPreviewer);
+	connect(plot.getMagnifierList()[curve_id], &::scopy::MousePlotMagnifier::panned, this,
+		&Oscilloscope::updateBufferPreviewer);
+
 	plot.replot();
 
 	/* We added a Math channel that is enabled by default,
@@ -3049,8 +3073,11 @@ void Oscilloscope::onTriggerSourceChanged(int chnIdx)
 
 void Oscilloscope::onTimeTriggerDelayChanged(double value)
 {
-	if(timePosition->value() != value)
+	if(timePosition->value() != value) {
+		cancelZoom();
+		plot.zoomBaseUpdate();
 		Q_EMIT triggerPositionChanged(value);
+	}
 }
 
 void Oscilloscope::onTriggerLevelChanged(double value)
@@ -3294,10 +3321,13 @@ void Oscilloscope::onVertScaleValueChanged(double value)
 	}
 	str.append(getChannelRangeStringVDivHelper(current_ch_widget));
 	label->setText(str);
+
+	plot.zoomBaseUpdate();
 }
 
 void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 {
+	cancelZoom();
 	bool ok, started;
 	unsigned long bufferSize = value.toInt(&ok);
 	if(!ok) {
@@ -3337,7 +3367,6 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	plot.setHorizOffset(params.timePos);
 	plot.setDataStartingPoint(active_trig_sample_count);
 	plot.resetXaxisOnNextReceivedData();
-	plot.cancelZoom();
 
 	if(zoom_level == 0) {
 		noZoomXAxisWidth = plot.axisInterval(QwtAxis::XBottom).width();
@@ -3388,6 +3417,8 @@ void Oscilloscope::onCmbMemoryDepthChanged(QString value)
 	double maxT =
 		(1 << 13) * (1.0 / active_sample_rate) - 1.0 / active_sample_rate * active_plot_sample_count / 2.0;
 	plot.setTimeTriggerInterval(-36E2, maxT);
+
+	plot.zoomBaseUpdate();
 }
 
 void Oscilloscope::setSinksDisplayOneBuffer(bool val)
@@ -3566,6 +3597,8 @@ void Oscilloscope::onHorizScaleValueChanged(double value)
 	double maxT =
 		(1 << 13) * (1.0 / active_sample_rate) - 1.0 / active_sample_rate * active_plot_sample_count / 2.0;
 	plot.setTimeTriggerInterval(-36E2, maxT);
+
+	plot.zoomBaseUpdate();
 }
 
 bool Oscilloscope::gainUpdateNeeded()
@@ -3598,8 +3631,6 @@ void Oscilloscope::updateXyPlotScales()
 
 void Oscilloscope::onVertOffsetValueChanged(double value)
 {
-	cancelZoom();
-
 	if(value != -plot.VertOffset(current_ch_widget)) {
 		plot.setVertOffset(-value, current_ch_widget);
 	}
@@ -3731,6 +3762,8 @@ void Oscilloscope::onTimePositionChanged(double value)
 	fft_plot_size = pow(2, power);
 	fft_size = active_sample_count;
 	onFFT_view_toggled(fft_is_visible);
+
+	plot.zoomBaseUpdate();
 }
 
 void Oscilloscope::rightMenuFinished(bool opened)

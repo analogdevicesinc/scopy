@@ -3,10 +3,11 @@
 
 #include <QwtPlot>
 #include <qwt_scale_map.h>
+#include "scopy-gui_export.h"
 
 namespace scopy {
 
-class MousePlotMagnifier : public QObject
+class SCOPY_GUI_EXPORT MousePlotMagnifier : public QObject
 {
 	Q_OBJECT
 
