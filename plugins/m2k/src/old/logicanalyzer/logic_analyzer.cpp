@@ -199,6 +199,8 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntr
 
 	// Add propper zoomer
 	m_plot.addZoomer(0);
+	m_plot.addMagnifier(0);
+	m_plot.getMagnifier()->setYAxis(false);
 
 	m_plot.setZoomerParams(true, 20);
 
@@ -240,6 +242,7 @@ LogicAnalyzer::LogicAnalyzer(struct iio_context *ctx, Filter *filt, ToolMenuEntr
 
 	api->setObjectName(Filter::tool_name(TOOL_LOGIC_ANALYZER));
 	ScopyJS::GetInstance()->registerApi(api);
+	m_plot.zoomBaseUpdate();
 
 	// Scroll wheel event filter
 	m_wheelEventGuard = new MouseWheelWidgetGuard(ui->mainWidget);
@@ -1670,6 +1673,10 @@ void LogicAnalyzer::connectSignalsAndSlots()
 
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished,
 		[=](bool isZoomOut) { updateBufferPreviewer(0, m_lastCapturedSample); });
+	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::zoomed,
+		[=](double factor, QPointF cursorPos) { updateBufferPreviewer(0, m_lastCapturedSample); });
+	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::panned,
+		[=](double factor) { updateBufferPreviewer(0, m_lastCapturedSample); });
 
 	connect(m_sampleRateButton, &ScaleSpinButton::valueChanged, this, &LogicAnalyzer::onSampleRateValueChanged);
 	connect(m_bufferSizeButton, &ScaleSpinButton::valueChanged, this, &LogicAnalyzer::onBufferSizeChanged);
@@ -1883,6 +1890,10 @@ void LogicAnalyzer::initBufferScrolling()
 {
 	connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished,
 		[=](bool isZoomOut) { m_horizOffset = m_plot.HorizOffset(); });
+	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::zoomed,
+		[=](double factor, QPointF cursorPos) { m_horizOffset = m_plot.HorizOffset(); });
+	connect(m_plot.getMagnifier(), &scopy::MousePlotMagnifier::panned,
+		[=](double factor) { m_horizOffset = m_plot.HorizOffset(); });
 
 	connect(m_bufferPreviewer, &BufferPreviewer::bufferMovedBy, [=](int value) {
 		m_resetHorizAxisOffset = false;
@@ -2006,7 +2017,6 @@ void LogicAnalyzer::resetViewport()
 	m_timerTimeout = 1.0 / m_sampleRate * m_bufferSize * 1000.0 + 100;
 
 	m_plot.cancelZoom();
-	m_plot.zoomBaseUpdate();
 	m_plot.replot();
 
 	updateBufferPreviewer(0, m_lastCapturedSample);
@@ -2016,6 +2026,8 @@ void LogicAnalyzer::resetViewport()
 	double minT = -((1 << 13) - 1) * (1.0 / m_sampleRate) -
 		1.0 / m_sampleRate * m_bufferSize / 2.0; // (2 << 13) - 1 max hdl fifo depth
 	m_plot.setTimeTriggerInterval(minT, maxT);
+
+	m_plot.zoomBaseUpdate();
 }
 
 void LogicAnalyzer::startStop(bool start)
