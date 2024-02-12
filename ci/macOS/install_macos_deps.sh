@@ -27,6 +27,8 @@ echo "MacOS version $OS_VERSION"
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
+	brew update
+	brew upgrade
 	brew search ${QT_FORMULAE}
 	brew install --display-times $PACKAGES
 	for pkg in gcc bison gettext cmake python; do
