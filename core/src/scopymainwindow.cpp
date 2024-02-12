@@ -25,6 +25,7 @@
 #include "scopy-core_config.h"
 #include "popupwidget.h"
 #include "pluginbase/statusbarmanager.h"
+#include "scopytitlemanager.h"
 #include <common/scopyconfig.h>
 #include <translationsrepository.h>
 #include <libsigrokdecode/libsigrokdecode.h>
@@ -45,7 +46,11 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	QElapsedTimer timer;
 	timer.start();
 	ui->setupUi(this);
-	setWindowTitle("Scopy-" + scopy::config::fullversion());
+
+	ScopyTitleManager::setMainWindow(this);
+	ScopyTitleManager::setApplicationName("Scopy");
+	ScopyTitleManager::setScopyVersion("v" + QString(scopy::config::version()));
+	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
 
 	StyleHelper::GetInstance()->initColorMap();
 	setAttribute(Qt::WA_QuitOnClose, true);
@@ -167,6 +172,7 @@ void ScopyMainWindow::save()
 	QString selectedFilter;
 	QString fileName = QFileDialog::getSaveFileName(this, tr("Save"), "", "", &selectedFilter);
 	save(fileName);
+	ScopyTitleManager::setIniFileName(fileName);
 }
 
 void ScopyMainWindow::load()
@@ -174,18 +180,21 @@ void ScopyMainWindow::load()
 	QString selectedFilter;
 	QString fileName = QFileDialog::getOpenFileName(this, tr("Open"), "", "", &selectedFilter);
 	load(fileName);
+	ScopyTitleManager::setIniFileName(fileName);
 }
 
 void ScopyMainWindow::save(QString file)
 {
 	QSettings s(file, QSettings::Format::IniFormat);
 	dm->save(s);
+	ScopyTitleManager::setIniFileName(file);
 }
 
 void ScopyMainWindow::load(QString file)
 {
 	QSettings s(file, QSettings::Format::IniFormat);
 	dm->load(s);
+	ScopyTitleManager::setIniFileName(file);
 }
 
 void ScopyMainWindow::closeEvent(QCloseEvent *event) { dm->disconnectAll(); }
