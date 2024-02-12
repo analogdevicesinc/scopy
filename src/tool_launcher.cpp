@@ -37,6 +37,7 @@
 #include "gui/animationmanager.h"
 #include "singletone_wrapper.h"
 #include "phonehome.h"
+#include "scopytitlemanager.h"
 
 #include "ui_device.h"
 #include "ui_tool_launcher.h"
@@ -143,7 +144,10 @@ ToolLauncher::ToolLauncher(QString prevCrashDump, QWidget *parent) :
 #endif
 
 	// TO DO: remove this when the About menu becomes available
-	setWindowTitle(QString("Scopy - ") + QString("v"+QString(PROJECT_VERSION)) + " - " + QString(SCOPY_VERSION_GIT));
+	ScopyTitleManager::setMainWindow(this);
+	ScopyTitleManager::setApplicationName("Scopy");
+	ScopyTitleManager::setScopyVersion("v" + QString(PROJECT_VERSION));
+	ScopyTitleManager::setGitHash(QString(SCOPY_VERSION_GIT));
 
 	prefPanel = new Preferences(this);
 	prefPanel->setVisible(false);
@@ -549,6 +553,7 @@ void ToolLauncher::saveSession()
 		qDebug()<<fi.absoluteFilePath();
 		if (!fileName.isEmpty()) {
 			this->tl_api->save(fileName);
+			ScopyTitleManager::setIniFileName(fileName);
 		}
 	}
 }
@@ -595,6 +600,7 @@ void ToolLauncher::loadSession()
 		this->tl_api->load(fileName);
 		updateHomepage();
 		setupHomepage();
+		ScopyTitleManager::setIniFileName(fileName);
 	}
 }
 
