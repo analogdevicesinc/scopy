@@ -2,8 +2,10 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QLoggingCategory>
 
 #define TITLE_SEPARATOR " - "
+Q_LOGGING_CATEGORY(CAT_SCOPYTITLEMANAGER, "ScopyTitleManager")
 
 using namespace scopy;
 
@@ -12,10 +14,10 @@ ScopyTitleManager *ScopyTitleManager::pinstance_{nullptr};
 ScopyTitleManager::ScopyTitleManager(QObject *parent)
 	: QObject(parent)
 {
-	qDebug() << "ctor";
+	qDebug(CAT_SCOPYTITLEMANAGER) << "ctor";
 }
 
-ScopyTitleManager::~ScopyTitleManager() { qDebug() << "dtor"; }
+ScopyTitleManager::~ScopyTitleManager() { qDebug(CAT_SCOPYTITLEMANAGER) << "dtor"; }
 
 void ScopyTitleManager::buildTitle()
 {
@@ -58,8 +60,9 @@ void ScopyTitleManager::buildTitle()
 	auto instance = ScopyTitleManager::GetInstance();
 	if(instance->m_mainWindow) {
 		instance->m_mainWindow->setWindowTitle(instance->m_currentTitle);
+		qDebug(CAT_SCOPYTITLEMANAGER) << "Title was built: " << m_currentTitle;
 	} else {
-		qWarning() << "Cannot set title, no mainWidget was specified";
+		qWarning(CAT_SCOPYTITLEMANAGER) << "Cannot set title, no mainWidget was specified";
 	}
 }
 
@@ -68,7 +71,7 @@ ScopyTitleManager *ScopyTitleManager::GetInstance()
 	if(pinstance_ == nullptr) {
 		pinstance_ = new ScopyTitleManager(QApplication::instance()); // singleton has the app as parent
 	} else {
-		qDebug() << "Singleton instance already created.";
+		qDebug(CAT_SCOPYTITLEMANAGER) << "Singleton instance already created.";
 	}
 	return pinstance_;
 }
@@ -140,6 +143,10 @@ void ScopyTitleManager::clearAll()
 
 QString ScopyTitleManager::getCurrentTitle() { return ScopyTitleManager::GetInstance()->m_currentTitle; }
 
-void ScopyTitleManager::setMainWindow(QWidget *window) { ScopyTitleManager::GetInstance()->m_mainWindow = window; }
+void ScopyTitleManager::setMainWindow(QWidget *window)
+{
+	ScopyTitleManager::GetInstance()->m_mainWindow = window;
+	qDebug(CAT_SCOPYTITLEMANAGER) << "Main window was set.";
+}
 
 #include "moc_scopytitlemanager.cpp"
