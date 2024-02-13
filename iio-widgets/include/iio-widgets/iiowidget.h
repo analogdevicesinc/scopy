@@ -42,7 +42,6 @@ class SCOPY_IIO_WIDGETS_EXPORT IIOWidget : public QWidget
 public:
 	IIOWidget(AttrUiStrategyInterface *uiStrategy, DataStrategyInterface *dataStrategy, QWidget *parent = nullptr);
 
-	//	SaveStrategyInterface *getSaveStrategy();
 	AttrUiStrategyInterface *getUiStrategy();
 	DataStrategyInterface *getDataStrategy();
 
@@ -80,7 +79,6 @@ protected Q_SLOTS:
 	void startTimer(QString data);
 
 protected:
-	//	SaveStrategyInterface *m_saveStrategy;
 	AttrUiStrategyInterface *m_uiStrategy;
 	DataStrategyInterface *m_dataStrategy;
 	IIOWidgetFactoryRecipe m_recipe;
