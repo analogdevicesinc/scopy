@@ -26,6 +26,7 @@
 #include "datastrategy/deviceattrdatastrategy.h"
 #include "datastrategy/contextattrdatastrategy.h"
 #include "datastrategy/cmdqchannelattrdatastrategy.h"
+#include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
 #include <iioutil/commandqueueprovider.h>
@@ -200,6 +201,9 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 	} else if(hint & CMDQAttrData) {
 		auto cmdq = CommandQueueProvider::GetInstance()->open(nullptr);
 		dataStrategy = new CmdQChannelAttrDataStrategy(recipe, cmdq, parent);
+	} else if(hint & CMDQDeviceAttrData) {
+		auto cmdq = CommandQueueProvider::GetInstance()->open(nullptr);
+		dataStrategy = new CmdQDeviceAttrDataStrategy(recipe, cmdq, parent);
 	}
 
 	if(uiStrategy && dataStrategy) {
