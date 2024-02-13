@@ -17,7 +17,7 @@ class SCOPY_DATAMONITOR_EXPORT DataMonitorModel : public QObject
 
 	Q_OBJECT
 public:
-	explicit DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure,
+	explicit DataMonitorModel(QString name, QColor color, UnitOfMeasurement *unitOfMeasure = nullptr,
 				  QObject *parent = nullptr);
 
 	QString getName() const;
@@ -29,7 +29,7 @@ public:
 	UnitOfMeasurement *getUnitOfMeasure() const;
 	void setUnitOfMeasure(UnitOfMeasurement *newUnitOfMeasure);
 
-	QPair<double,double> getLastReadValue() const;
+	QPair<double, double> getLastReadValue() const;
 	double getValueAtTime(double time);
 	void updateValue(double time, double value);
 	void resetMinMax();
