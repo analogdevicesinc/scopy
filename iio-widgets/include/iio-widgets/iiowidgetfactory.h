@@ -51,6 +51,7 @@ public:
 		ContextAttrData = 0x000080,
 
 		CMDQAttrData = 0x000100,
+		CMDQDeviceAttrData = 0x000200,
 	};
 
 	explicit IIOWidgetFactory(QObject *parent = nullptr);

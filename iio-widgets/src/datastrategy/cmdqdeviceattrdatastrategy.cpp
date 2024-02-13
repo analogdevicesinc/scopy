@@ -18,18 +18,19 @@
  * along with this program. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "datastrategy/cmdqchannelattrdatastrategy.h"
+#include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include <iioutil/command.h>
-#include <iioutil/iiocommand/iiochannelattributeread.h>
-#include <iioutil/iiocommand/iiochannelattributewrite.h>
+#include <iioutil/iiocommand/iiodeviceattributeread.h>
+#include <iioutil/iiocommand/iiodeviceattributewrite.h>
+#include <QLoggingCategory>
 
 #define BUFFER_SIZE 16384
-Q_LOGGING_CATEGORY(CAT_CMDQ_CHANNEL_DATA_STATEGY, "CmdQChannelDataStrategy")
+Q_LOGGING_CATEGORY(CAT_CMDQ_DEVICE_DATA_STRATEGY, "CmdQDeviceDataStrategy")
 
 using namespace scopy;
 
-CmdQChannelAttrDataStrategy::CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, CommandQueue *commandQueue,
-							 QWidget *parent)
+CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, CommandQueue *commandQueue,
+						       QWidget *parent)
 	: QWidget(parent)
 	, m_cmdQueue(commandQueue)
 	, m_dataRead("")
@@ -38,25 +39,25 @@ CmdQChannelAttrDataStrategy::CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe 
 	m_recipe = recipe;
 }
 
-void CmdQChannelAttrDataStrategy::save(QString data)
+void CmdQDeviceAttrDataStrategy::save(QString data)
 {
-	if(m_recipe.channel == nullptr || m_recipe.data == "") {
-		qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Invalid arguments, cannot write any data.";
+	if(m_recipe.device == nullptr || m_recipe.data == "") {
+		qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Invalid arguments, cannot write any data.";
 		return;
 	}
 
-	Command *writeCommand = new IioChannelAttributeWrite(m_recipe.channel, m_recipe.data.toStdString().c_str(),
-							     data.toStdString().c_str(), nullptr);
+	Command *writeCommand = new IioDeviceAttributeWrite(m_recipe.device, m_recipe.data.toStdString().c_str(),
+							    data.toStdString().c_str(), nullptr);
 	QObject::connect(
 		writeCommand, &Command::finished, this,
 		[data, this](Command *cmd) {
-			IioChannelAttributeWrite *tcmd = dynamic_cast<IioChannelAttributeWrite *>(cmd);
+			IioDeviceAttributeWrite *tcmd = dynamic_cast<IioDeviceAttributeWrite *>(cmd);
 			if(!tcmd) {
 				return;
 			}
 
 			if(tcmd->getReturnCode() < 0) {
-				qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Could not write the value " << data;
+				qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Could not write the value " << data;
 			}
 
 			Q_EMIT emitStatus((int)(tcmd->getReturnCode()));
@@ -67,24 +68,24 @@ void CmdQChannelAttrDataStrategy::save(QString data)
 	m_cmdQueue->enqueue(writeCommand);
 }
 
-void CmdQChannelAttrDataStrategy::requestData()
+void CmdQDeviceAttrDataStrategy::requestData()
 {
-	if(m_recipe.channel == nullptr || m_recipe.data.isEmpty()) {
-		qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Invalid arguments, cannot read any data.";
+	if(m_recipe.device == nullptr || m_recipe.data.isEmpty()) {
+		qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Invalid arguments, cannot read any data.";
 		return;
 	}
 
 	Command *readDataCommand =
-		new IioChannelAttributeRead(m_recipe.channel, m_recipe.data.toStdString().c_str(), nullptr);
+		new IioDeviceAttributeRead(m_recipe.device, m_recipe.data.toStdString().c_str(), nullptr);
 
 	QObject::connect(readDataCommand, &Command::finished, this, [this](Command *cmd) {
-		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
+		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 		if(!tcmd) {
 			return;
 		}
 
 		if(tcmd->getReturnCode() < 0) {
-			qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Could not read the value for" << m_recipe.data;
+			qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Could not read the value for" << m_recipe.data;
 			return;
 		}
 
@@ -97,16 +98,18 @@ void CmdQChannelAttrDataStrategy::requestData()
 			m_dataRead.clear();
 			m_optionalDataRead.clear();
 		} else if(!m_recipe.iioDataOptions.isEmpty()) {
-			Command *readOptionalCommand = new IioChannelAttributeRead(
-				m_recipe.channel, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
+			// if we have an attribute we have to read, we should read it, increase the counter and emit if
+			// possible
+			Command *readOptionalCommand = new IioDeviceAttributeRead(
+				m_recipe.device, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
 			QObject::connect(readOptionalCommand, &Command::finished, this, [this](Command *cmd) {
-				IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
+				IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
 				if(!tcmd) {
 					return;
 				}
 
 				if(tcmd->getReturnCode() < 0) {
-					qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY)
+					qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY)
 						<< "Could not read the value for" << m_recipe.data;
 					return;
 				}
