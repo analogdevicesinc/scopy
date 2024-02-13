@@ -77,7 +77,7 @@ bool DataMonitorPlugin::onConnect()
 		m_deviceList->push_back(dev);
 	}
 
-	tool = new DataMonitorTool();
+	tool = new DataMonitorTool(ctx);
 
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setTool(tool);
@@ -163,8 +163,7 @@ bool DataMonitorPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	generalSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCombo(
-		p, "datamonitor_data_storage_size", "Maximum data stored for each monitor",
-		{"10 Kb", "1 Mb"},
+		p, "datamonitor_data_storage_size", "Maximum data stored for each monitor", {"10 Kb", "1 Mb"},
 		generalSection));
 	return true;
 }
