@@ -22,7 +22,6 @@
 #define CMDQCHANNELATTRDATASTRATEGY_H
 
 #include <QWidget>
-#include <QAtomicInteger>
 #include <iioutil/commandqueue.h>
 #include "iiowidgetdata.h"
 #include "datastrategyinterface.h"
@@ -47,9 +46,6 @@ Q_SIGNALS:
 
 private:
 	CommandQueue *m_cmdQueue;
-
-	// 2 commandq operations are needed, this variable will keep track of how many are made
-	std::mutex m_mutex;
 	QString m_dataRead;
 	QString m_optionalDataRead;
 };
