@@ -3,6 +3,7 @@
 
 #include "dataacquisitionmanager.hpp"
 
+#include "iio.h"
 #include <QPushButton>
 #include <QWidget>
 #include <tooltemplate.h>
@@ -23,7 +24,7 @@ class DataMonitorTool : public QWidget
 {
 	Q_OBJECT
 public:
-	explicit DataMonitorTool(QWidget *parent = nullptr);
+	explicit DataMonitorTool(iio_context *ctx, QWidget *parent = nullptr);
 
 	RunBtn *getRunButton() const;
 
@@ -44,6 +45,8 @@ private:
 	QButtonGroup *grp;
 
 	DataAcquisitionManager *dataAcquisitionManager;
+
+	iio_context *ctx;
 };
 } // namespace datamonitor
 } // namespace scopy
