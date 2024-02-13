@@ -8,7 +8,7 @@ JOBS=-j1
 
 USE_STAGING=OFF
 
-LIBIIO_VERSION=master
+LIBIIO_VERSION=v0.25
 LIBM2K_BRANCH=master
 SPDLOG_BRANCH=v1.x
 VOLK_BRANCH=main
@@ -16,9 +16,9 @@ GNURADIO_BRANCH=maint-3.10
 GRSCOPY_BRANCH=3.10
 GRM2K_BRANCH=master
 LIBSIGROKDECODE_BRANCH=master
-QWT_BRANCH=qwt-multiaxes
+QWT_BRANCH=qwt-multiaxes-updated
 LIBTINYIIOD_BRANCH=master
-
+IIOEMU_BRANCH=master
 SCOPY_BRANCH=dev
 
 if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
@@ -65,24 +65,28 @@ build_with_cmake() {
 clone() {
 	echo "#######CLONE#######"
 	pushd $STAGING_AREA
-	git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
-	git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
-	git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
-	git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
-	git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
-	git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
-	git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
-	git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
-	git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
-	git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
-	git clone --recursive https://github.com/analogdevicesinc/scopy -b $SCOPY_BRANCH scopy
+	[ -d 'libiio' ]		|| git clone --recursive https://github.com/analogdevicesinc/libiio.git -b $LIBIIO_VERSION libiio
+	[ -d 'libm2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/libm2k.git -b $LIBM2K_BRANCH libm2k
+	[ -d 'spdlog' ]		|| git clone --recursive https://github.com/gabime/spdlog.git -b $SPDLOG_BRANCH spdlog
+	[ -d 'volk' ]		|| git clone --recursive https://github.com/gnuradio/volk.git -b $VOLK_BRANCH volk
+	[ -d 'gnuradio' ]	|| git clone --recursive https://github.com/gnuradio/gnuradio.git -b $GNURADIO_BRANCH gnuradio
+	[ -d 'gr-scopy' ]	|| git clone --recursive https://github.com/analogdevicesinc/gr-scopy.git -b $GRSCOPY_BRANCH gr-scopy
+	[ -d 'gr-m2k' ]		|| git clone --recursive https://github.com/analogdevicesinc/gr-m2k.git -b $GRM2K_BRANCH gr-m2k
+	[ -d 'qwt' ]		|| git clone --recursive https://github.com/cseci/qwt.git -b $QWT_BRANCH qwt
+	[ -d 'libsigrokdecode' ] || git clone --recursive https://github.com/sigrokproject/libsigrokdecode.git -b $LIBSIGROKDECODE_BRANCH libsigrokdecode
+	[ -d 'libtinyiiod' ]	|| git clone --recursive https://github.com/analogdevicesinc/libtinyiiod.git -b $LIBTINYIIOD_BRANCH libtinyiiod
+	[ -d 'iio-emu' ]	|| git clone --recursive https://github.com/analogdevicesinc/iio-emu -b $IIOEMU_BRANCH iio-emu
+	[ -d 'scopy' ]		|| git clone --recursive https://github.com/analogdevicesinc/scopy -b $SCOPY_BRANCH scopy
 	popd
 }
 
 instal_apt() {
 	sudo apt-get update
 	sudo apt-get -y upgrade
-	sudo apt-get install libsndfile-dev -y
+	sudo apt-get -y install build-essential cmake vim bison flex swig swig4.0 python3 mlocate \
+		libusb-1.0-* libavahi-client* libavahi-common* libxml2* libsndfile-dev libfuse2 libboost1.74-* \
+		qtbase5-dev* qt5-qmake* qttools5-dev* qtdeclarative5-dev libqt5qml* libqt5svg5*
+	pip install mako --break-system-packages
 }
 
 build_libiio() {
@@ -159,7 +163,7 @@ build_gr_m2k() {
 build_qwt() {
 	echo "#######build_qwt#######"
 	pushd $STAGING_AREA/qwt
-
+	git clean -xdf
 	if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
 	then
 		qmake INCLUDEPATH=$STAGING_AREA_DEPS/include LIBS=-L$STAGING_AREA_DEPS/lib qwt.pro
@@ -179,6 +183,7 @@ build_qwt() {
 build_libsigrokdecode() {
 	echo "#######build_libsigrokdecode#######"
 	pushd $STAGING_AREA/libsigrokdecode
+	git clean -xdf
 	./autogen.sh
 
 	if [ ! -z "$USE_STAGING" ] && [ "$USE_STAGING" == "ON" ]
@@ -198,6 +203,13 @@ build_libtinyiiod() {
 	echo "#######build_libtinyiiod#######"
 	pushd $STAGING_AREA/libtinyiiod
 	build_with_cmake -DBUILD_EXAMPLES=OFF ../
+	popd
+}
+
+build_iio-emu() {
+	echo "#######build_iio-emu#######"
+	pushd $STAGING_AREA/iio-emu
+	build_with_cmake ../
 	popd
 }
 
@@ -230,8 +242,13 @@ buid_deps() {
 }
 
 
-instal_apt
-clone
-buid_deps
-build_scopy
-#test_scopy
+# instal_apt
+# clone
+# buid_deps
+# build_scopy
+# test_scopy
+
+for arg in $@; do
+	$arg
+done
+
