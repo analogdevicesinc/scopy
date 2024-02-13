@@ -1,0 +1,126 @@
+--- new/qt-everywhere-src-5.15.2/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf
++++ qt-everywhere-src-5.15.2/qtbase/mkspecs/linux-arm-gnueabihf-g++/qmake.conf
+@@ -0,0 +1,26 @@
++#
++# qmake configuration for building with arm-linux-gnueabihf-g++
++#
++
++MAKEFILE_GENERATOR      = UNIX
++CONFIG                 += incremental
++QMAKE_INCREMENTAL_STYLE = sublib
++
++include(../common/linux.conf)
++include(../common/gcc-base-unix.conf)
++include(../common/g++-unix.conf)
++
++QMAKE_LIBS_EGL          = -lEGL
++
++# modifications to g++.conf
++QMAKE_CC                = arm-linux-gnueabihf-gcc
++QMAKE_CXX               = arm-linux-gnueabihf-g++
++QMAKE_LINK              = arm-linux-gnueabihf-g++
++QMAKE_LINK_SHLIB        = arm-linux-gnueabihf-g++
++
++# modifications to linux.conf
++QMAKE_AR                = arm-linux-gnueabihf-ar cqs
++QMAKE_OBJCOPY           = arm-linux-gnueabihf-objcopy
++QMAKE_NM                = arm-linux-gnueabihf-nm -P
++QMAKE_STRIP             = arm-linux-gnueabihf-strip
++load(qt_config)
+--- new/qt-everywhere-src-5.15.2/qtbase/mkspecs/linux-arm-gnueabihf-g++/qplatformdefs.h
++++ qt-everywhere-src-5.15.2/qtbase/mkspecs/linux-arm-gnueabihf-g++/qplatformdefs.h
+@@ -0,0 +1,40 @@
++/****************************************************************************
++**
++** Copyright (C) 2016 The Qt Company Ltd.
++** Contact: https://www.qt.io/licensing/
++**
++** This file is part of the qmake spec of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see https://www.qt.io/terms-conditions. For further
++** information use the contact form at https://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 3 as published by the Free Software
++** Foundation and appearing in the file LICENSE.LGPL3 included in the
++** packaging of this file. Please review the following information to
++** ensure the GNU Lesser General Public License version 3 requirements
++** will be met: https://www.gnu.org/licenses/lgpl-3.0.html.
++**
++** GNU General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU
++** General Public License version 2.0 or (at your option) the GNU General
++** Public license version 3 or any later version approved by the KDE Free
++** Qt Foundation. The licenses are as published by the Free Software
++** Foundation and appearing in the file LICENSE.GPL2 and LICENSE.GPL3
++** included in the packaging of this file. Please review the following
++** information to ensure the GNU General Public License requirements will
++** be met: https://www.gnu.org/licenses/gpl-2.0.html and
++** https://www.gnu.org/licenses/gpl-3.0.html.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "../linux-g++/qplatformdefs.h"
+--- new/qt-everywhere-src-5.15.2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
++++ qt-everywhere-src-5.15.2/qtbase/src/3rdparty/angle/include/EGL/eglplatform.h
+@@ -141,6 +141,7 @@
+  */
+ typedef khronos_int32_t EGLint;
+ 
++typedef uint32_t DISPMANX_ELEMENT_HANDLE_T;
+ 
+ /* C++ / C typecast macros for special EGL handle values */
+ #if defined(__cplusplus)
+--- new/qt-everywhere-src-5.15.2/qtbase/src/gui/configure.json
++++ qt-everywhere-src-5.15.2/qtbase/src/gui/configure.json
+@@ -862,7 +862,10 @@
+             "type": "compile",
+             "test": {
+                 "include": [ "EGL/egl.h", "bcm_host.h" ],
+-                "main": "vc_dispmanx_display_open(0);"
++                "main": [
++                    "vc_dispmanx_display_open(0);",
++                    "EGL_DISPMANX_WINDOW_T *eglWindow = new EGL_DISPMANX_WINDOW_T;"
++                ]
+             },
+             "use": "egl bcm_host"
+         },
+--- new/qt-everywhere-src-5.15.2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
++++ qt-everywhere-src-5.15.2/qtbase/src/plugins/platforms/eglfs/deviceintegration/eglfs_brcm/qeglfsbrcmintegration.cpp
+@@ -44,6 +44,12 @@
+ 
+ static DISPMANX_DISPLAY_HANDLE_T dispman_display = 0;
+ 
++typedef struct {
++  DISPMANX_ELEMENT_HANDLE_T element;
++  int width;   /* This is necessary because dispmanx elements are not queriable. */
++  int height;
++} EGL_DISPMANX_WINDOW_T;
++
+ static EGLNativeWindowType createDispmanxLayer(const QPoint &pos, const QSize &size, int z, DISPMANX_FLAGS_ALPHA_T flags)
+ {
+     VC_RECT_T dst_rect;
+@@ -76,12 +82,12 @@
+     eglWindow->width = size.width();
+     eglWindow->height = size.height();
+ 
+-    return eglWindow;
++    return (EGLNativeWindowType)eglWindow;
+ }
+ 
+ static void destroyDispmanxLayer(EGLNativeWindowType window)
+ {
+-    EGL_DISPMANX_WINDOW_T *eglWindow = static_cast<EGL_DISPMANX_WINDOW_T *>(window);
++    EGL_DISPMANX_WINDOW_T *eglWindow = (EGL_DISPMANX_WINDOW_T*)(window);
+     DISPMANX_UPDATE_HANDLE_T dispman_update = vc_dispmanx_update_start(0);
+     vc_dispmanx_element_remove(dispman_update, eglWindow->element);
+     vc_dispmanx_update_submit_sync(dispman_update);
