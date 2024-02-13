@@ -8,7 +8,6 @@ DataAcquisitionManager::DataAcquisitionManager(QObject *parent)
 {
 	m_activeMonitorsMap = new QMap<QString, int>();
 	m_dataMonitorMap = new QMap<QString, DataMonitorModel *>();
-
 }
 
 void DataAcquisitionManager::clearMonitorsData()
@@ -55,12 +54,6 @@ void DataAcquisitionManager::updateActiveMonitors(bool toggled, QString monitorN
 	Q_EMIT activeMonitorsUpdated();
 }
 
-QList<QString> DataAcquisitionManager::getActiveMonitors()
-{
-	return m_activeMonitorsMap->keys();
-}
+QList<QString> DataAcquisitionManager::getActiveMonitors() { return m_activeMonitorsMap->keys(); }
 
-QMap<QString, DataMonitorModel *> *DataAcquisitionManager::getDataMonitorMap() const
-{
-	return m_dataMonitorMap;
-}
+QMap<QString, DataMonitorModel *> *DataAcquisitionManager::getDataMonitorMap() const { return m_dataMonitorMap; }

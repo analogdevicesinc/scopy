@@ -7,19 +7,19 @@
 #include <stylehelper.h>
 #include <verticalchannelmanager.h>
 
-//#include <src/datamonitor/datamonitormodel.hpp>
-//#include <src/datamonitor/testreadstrategy.hpp>
-
 #include <datamonitormodel.hpp>
 #include <testreadstrategy.hpp>
 
 #include <QDebug>
+#include <dmm.hpp>
+#include <dmmreadstrategy.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
 
-DataMonitorTool::DataMonitorTool(QWidget *parent)
-	: QWidget{parent}
+DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
+	: ctx(ctx)
+	, QWidget{parent}
 {
 	QHBoxLayout *lay = new QHBoxLayout(this);
 	setLayout(lay);
@@ -102,31 +102,19 @@ void DataMonitorTool::initDataMonitor()
 
 	// generate channel monitors
 
+	DMM dmm;
+
+	QList<DataMonitorModel *> dmmList = dmm.getDmmMonitors(ctx);
+
 	dataAcquisitionManager = new DataAcquisitionManager(this);
 
-	// TODO get a list of DataMonitorModel for each device we want to add
-	// ?? use de generateMonitor function outside the tool ? tool->generateMonitor( monitor data ) ;
-	for(int i = 0; i < 4; i++) {
-		DataMonitorModel *channelModel = new DataMonitorModel("dev0:test " + QString::number(i),
-								      StyleHelper::getColor("CH" + QString::number(i)),
-								      new UnitOfMeasurement("Volt", "V"));
-
-		channelModel->setReadStrategy(new TestReadStrategy());
-
-		dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
+	foreach(DataMonitorModel *monitor, dmmList) {
+		dataAcquisitionManager->getDataMonitorMap()->insert(monitor->getName(), monitor);
 	}
-	for(int i = 0; i < 3; i++) {
-		DataMonitorModel *channelModel = new DataMonitorModel("dev1:test " + QString::number(i + 4),
-															  StyleHelper::getColor("CH" + QString::number(i)),
-															  new UnitOfMeasurement("Volt", "V"));
 
-		channelModel->setReadStrategy(new TestReadStrategy());
-
-		dataAcquisitionManager->getDataMonitorMap()->insert(channelModel->getName(), channelModel);
-	}
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
-	//TODO connect to UI
+	// TODO connect to UI
 }
 
 void DataMonitorTool::generateMonitor(DataMonitorModel *model, CollapsableMenuControlButton *channelManager)
