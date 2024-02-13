@@ -17,11 +17,10 @@ DataMonitorModel::DataMonitorModel(QString name, QColor color, UnitOfMeasurement
 	} else {
 		this->unitOfMeasure = new UnitOfMeasurement("Volt", "V");
 	}
-
 	// TODO RESERVE SPACE FOR X AND Y DATA
 	Preferences *p = Preferences::GetInstance();
 	QObject::connect(p, &Preferences::preferenceChanged, this, [=](QString id, QVariant var) {
-		if (id.contains("datamonitor")) {
+		if(id.contains("datamonitor")) {
 			setDataStorageSize();
 		}
 	});
@@ -45,7 +44,7 @@ QPair<double, double> DataMonitorModel::getLastReadValue() const { return qMakeP
 
 double DataMonitorModel::getValueAtTime(double time)
 {
-	if (xdata.contains(time)) {
+	if(xdata.contains(time)) {
 		return ydata.at(xdata.indexOf(time));
 	}
 
@@ -75,7 +74,6 @@ void DataMonitorModel::checkMinMaxUpdate(double value)
 	}
 }
 
-
 IReadStrategy *DataMonitorModel::getReadStrategy() const { return readStrategy; }
 
 void DataMonitorModel::setDataStorageSize()
@@ -84,21 +82,17 @@ void DataMonitorModel::setDataStorageSize()
 
 	auto dataSizePref = p->get("datamonitor_data_storage_size").toString().split(" ");
 	int dataSize = dataSizePref[0].toInt();
-	if (dataSizePref[1] == "Kb") {
+	if(dataSizePref[1] == "Kb") {
 		dataSize *= 1000;
-	} else if (dataSizePref[1] == "Mb") {
+	} else if(dataSizePref[1] == "Mb") {
 		dataSize *= 1000000;
 	}
 
-	//if any data stored should we delete it ?
+	// if any data stored should we delete it ?
 	//?? can user update while program is running (between runs )
 	xdata.reserve(dataSize);
 	ydata.reserve(dataSize);
 }
-
-QVector<double> *DataMonitorModel::getXdata() { return &xdata; }
-
-QVector<double> *DataMonitorModel::getYdata() { return &ydata; }
 
 void DataMonitorModel::setReadStrategy(IReadStrategy *newReadStrategy)
 {
@@ -119,6 +113,10 @@ void DataMonitorModel::clearMonitorData()
 }
 
 void DataMonitorModel::read() { readStrategy->read(); }
+
+double DataMonitorModel::minValue() const { return m_minValue; }
+
+double DataMonitorModel::maxValue() const { return m_maxValue; }
 
 void DataMonitorModel::updateValue(double time, double value)
 {

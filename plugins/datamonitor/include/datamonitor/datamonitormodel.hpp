@@ -30,7 +30,6 @@ public:
 	void setUnitOfMeasure(UnitOfMeasurement *newUnitOfMeasure);
 
 	QPair<double, double> getLastReadValue() const;
-
 	double getValueAtTime(double time);
 	void updateValue(double time, double value);
 	void resetMinMax();
@@ -44,6 +43,10 @@ public:
 	IReadStrategy *getReadStrategy() const;
 	void setReadStrategy(IReadStrategy *newReadStrategy);
 	void read();
+
+	double minValue() const;
+
+	double maxValue() const;
 
 Q_SIGNALS:
 	void valueUpdated(double time, double value);
