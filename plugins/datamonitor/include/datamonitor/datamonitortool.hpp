@@ -47,6 +47,7 @@ private:
 	DataAcquisitionManager *dataAcquisitionManager;
 
 	iio_context *ctx;
+	int activeMonitor = -1;
 };
 } // namespace datamonitor
 } // namespace scopy

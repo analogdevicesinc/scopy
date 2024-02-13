@@ -6,20 +6,16 @@
 #include <plotwidget.h>
 #include <plotaxis.h>
 #include <datamonitormodel.hpp>
+#include "scopy-datamonitor_export.h"
 
 namespace scopy {
 
 class TimePlotInfo;
 namespace datamonitor {
 
-struct PlotData
-{
-	PlotChannel *plotch;
-	QVector<double> *ydata;
-	QVector<double> *xdata;
-};
+class MonitorPlotCurve;
 
-class MonitorPlot : public QWidget
+class SCOPY_DATAMONITOR_EXPORT MonitorPlot : public QWidget
 {
 	Q_OBJECT
 public:
@@ -27,23 +23,29 @@ public:
 
 	PlotWidget *plot() const;
 	void addMonitor(DataMonitorModel *dataMonitorModel);
-	void removeMonitor(QString monitorTitle);
-	void toggleMonitor(bool toggled, QString monitorTitle);
+	void removeMonitor(QString monitorName);
+	void toggleMonitor(bool toggled, QString monitorName);
 	bool hasMonitor(QString title);
 
-	bool firstMonitor() const;
-	void setFirstMonitor(bool newFirstMonitor);
-
-	void changeCurveStyle(QString curve, int style);
+	void changeCurveStyle(QString monitorName, int style);
 
 	void setMainMonitor(QString newMainMonitor);
 	void clearMonitor();
 
+	void updateXAxis(int newValue);
+	void updateYAxisIntervalMin(QString monitorName, double min);
+	void updateYAxisIntervalMax(QString monitorName, double max);
+
+	QString mainMonitor() const;
+
+	void plotYAxisAutoscaleToggled(QString monitorName, bool toggled);
+
 private:
 	PlotWidget *m_plot;
 	TimePlotInfo *m_plotInfo;
-	QMap<QString, PlotData *> *m_monitorCurves;
+	QMap<QString, MonitorPlotCurve *> *m_monitorCurves;
 	bool m_firstMonitor = true;
+	QString m_mainMonitor;
 };
 } // namespace datamonitor
 } // namespace scopy
