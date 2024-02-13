@@ -1,6 +1,7 @@
 #include "monitorplot.hpp"
 
 #include <cursorcontroller.h>
+#include <monitorplotcurve.hpp>
 #include <plotinfo.h>
 
 #include <pluginbase/preferences.h>
@@ -19,7 +20,7 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	m_plot = new PlotWidget(this);
 
 	// TODO set this and set autoscale
-	m_plot->xAxis()->setInterval(0, 100);
+	m_plot->xAxis()->setInterval(0, 10);
 	m_plot->xAxis()->setVisible(true);
 
 	m_plotInfo = new TimePlotInfo(m_plot, this);
@@ -30,135 +31,100 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	TimePlotStatusInfo *status = new TimePlotStatusInfo(this);
 	layout->addWidget(status);
 
-	m_monitorCurves = new QMap<QString, PlotData *>();
+	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
+
+	m_mainMonitor = "";
 }
 
 PlotWidget *MonitorPlot::plot() const { return m_plot; }
 
 void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 {
-	QPen chpen = QPen(dataMonitorModel->getColor(), 1);
-	PlotAxis *chPlotAxis = new PlotAxis(QwtAxis::YLeft, m_plot, chpen);
+	MonitorPlotCurve *plotCurve = new MonitorPlotCurve(dataMonitorModel, m_plot);
 
-	m_plot->plot()->setAxisScale(chPlotAxis->axisId(), 0, 10);
-	chPlotAxis->setVisible(true);
-
-
-	PlotChannel *plotch =
-		new PlotChannel(dataMonitorModel->getName(), chpen, m_plot, m_plot->xAxis(), chPlotAxis, this);
-	plotch->setEnabled(true);
-
-	PlotData *pd = new PlotData();
-	pd->plotch = plotch;
-	pd->xdata = dataMonitorModel->getXdata();
-	pd->ydata = dataMonitorModel->getYdata();
-
-	// size from pref
-	Preferences *p = Preferences::GetInstance();
-	auto dataSizePref = p->get("datamonitor_data_storage_size").toString().split(" ");
-	int dataSize = dataSizePref[0].toInt();
-	if (dataSizePref[1] == "Kb") {
-		dataSize *= 1000;
-	} else if (dataSizePref[1] == "Mb") {
-		dataSize *= 1000000;
+	// ?? move to function
+	if(m_mainMonitor.isEmpty()) {
+		m_mainMonitor = dataMonitorModel->getName();
+		plotCurve->togglePlotAxisVisible(true);
 	}
-
 
 	// TODO CLEAR PLOT ON CLEAR DATA
 	connect(dataMonitorModel, &DataMonitorModel::dataCleared, this, [=]() {
-		pd->xdata = dataMonitorModel->getXdata();
-		pd->ydata = dataMonitorModel->getYdata();
-		plotch->curve()->setRawSamples(pd->xdata->data(), pd->ydata->data(), dataSize);
+		plotCurve->clearCurveData();
 		m_plot->replot();
 	});
 
-	plotch->curve()->setRawSamples(pd->xdata->data(), pd->ydata->data(), dataSize);
-
-	m_monitorCurves->insert(dataMonitorModel->getName(), pd);
-
-	connect(dataMonitorModel, &DataMonitorModel::valueUpdated, m_plot, [=]() { m_plot->replot(); });
+	m_monitorCurves->insert(dataMonitorModel->getName(), plotCurve);
 
 	m_plot->replot();
 }
 
-void MonitorPlot::removeMonitor(QString monitorTitle)
+void MonitorPlot::removeMonitor(QString monitorName)
 {
-	m_plot->removePlotChannel(m_monitorCurves->value(monitorTitle)->plotch);
-	m_monitorCurves->remove(monitorTitle);
-	delete m_monitorCurves->value(monitorTitle);
+	m_plot->removePlotChannel(m_monitorCurves->value(monitorName)->plotch());
+	m_monitorCurves->remove(monitorName);
+	delete m_monitorCurves->value(monitorName);
 }
 
-void MonitorPlot::toggleMonitor(bool toggled, QString monitorTitle)
+void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
 {
-	if(m_monitorCurves->contains(monitorTitle)) {
-		m_monitorCurves->value(monitorTitle)->plotch->setEnabled(toggled);
+	if(m_monitorCurves->contains(monitorName)) {
+		m_monitorCurves->value(monitorName)->toggleActive(toggled);
 		m_plot->replot();
 	}
 }
 
 bool MonitorPlot::hasMonitor(QString title) { return m_monitorCurves->contains(title); }
 
-bool MonitorPlot::firstMonitor() const { return m_firstMonitor; }
-
-void MonitorPlot::setFirstMonitor(bool newFirstMonitor) { m_firstMonitor = newFirstMonitor; }
-
-void MonitorPlot::changeCurveStyle(QString plotCurve, int style)
+void MonitorPlot::changeCurveStyle(QString monitorName, int style)
 {
-	if(m_monitorCurves->contains(plotCurve)) {
-
-		auto curve = m_monitorCurves->value(plotCurve)->plotch->curve();
-
-		curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
-		curve->setCurveAttribute(QwtPlotCurve::Fitted, false);
-
-		switch(style) {
-		case 0:
-			curve->setStyle(QwtPlotCurve::CurveStyle::Lines);
-			m_plot->replot();
-			break;
-		case 1:
-			curve->setStyle(QwtPlotCurve::CurveStyle::Dots);
-			m_plot->replot();
-			break;
-		case 2:
-			curve->setStyle(QwtPlotCurve::CurveStyle::Steps);
-			m_plot->replot();
-			break;
-		case 3:
-			curve->setStyle(QwtPlotCurve::CurveStyle::Sticks);
-			m_plot->replot();
-			break;
-		case 4:
-			curve->setPaintAttribute(QwtPlotCurve::ClipPolygons, false);
-			curve->setCurveAttribute(QwtPlotCurve::Fitted, true);
-			curve->setStyle(QwtPlotCurve::CurveStyle::Lines);
-			m_plot->replot();
-			break;
-		}
+	if(m_monitorCurves->contains(monitorName)) {
+		m_monitorCurves->value(monitorName)->changeCurveStyle(style);
+		m_plot->replot();
 	}
 }
 
 void MonitorPlot::setMainMonitor(QString newMainMonitor)
 {
 	if(m_monitorCurves->contains(newMainMonitor)) {
-		m_monitorCurves->value(newMainMonitor)->plotch->detach();
-		m_monitorCurves->value(newMainMonitor)->plotch->attach();
+		m_monitorCurves->value(newMainMonitor)->refreshCurve();
+		m_monitorCurves->value(newMainMonitor)->setCurveAxisVisible(true);
+		m_monitorCurves->value(m_mainMonitor)->setCurveAxisVisible(false);
+		m_mainMonitor = newMainMonitor;
 	}
 	m_plot->replot();
 }
 
-void MonitorPlot::clearMonitor()
+void MonitorPlot::clearMonitor() {}
+
+void MonitorPlot::updateXAxis(int newValue)
 {
-	//	m_monitorCurves->values()
+	m_plot->xAxis()->setInterval(0, newValue);
+	m_plot->replot();
+}
 
-	// int size = 10000;
-	// m_monitorCurves->begin().value()->plotch->curve()->setRawSamples(m_monitorCurves->begin().value()->ydata->data(),
-	// m_monitorCurves->begin().value()->xdata->data(), size);
+void MonitorPlot::updateYAxisIntervalMin(QString monitorName, double min)
+{
+	if(m_monitorCurves->contains(monitorName)) {
+		m_monitorCurves->value(monitorName)->updateAxisIntervalMin(min);
+		m_plot->replot();
+	}
+}
 
-	//	for (auto monitor: m_monitorCurves->keys()){
-	//		m_monitorCurves->value(monitor)->xdata->erase(m_monitorCurves->value(monitor)->xdata->begin(),
-	// m_monitorCurves->value(monitor)->xdata->end());
-	//		m_monitorCurves->value(monitor)->ydata->erase(m_monitorCurves->value(monitor)->ydata->begin(),
-	// m_monitorCurves->value(monitor)->ydata->end());
-	//	}
+void MonitorPlot::updateYAxisIntervalMax(QString monitorName, double max)
+{
+	if(m_monitorCurves->contains(monitorName)) {
+		m_monitorCurves->value(monitorName)->updateAxisIntervalMax(max);
+		m_plot->replot();
+	}
+}
+
+QString MonitorPlot::mainMonitor() const { return m_mainMonitor; }
+
+void MonitorPlot::plotYAxisAutoscaleToggled(QString monitorName, bool toggled)
+{
+	if(m_monitorCurves->contains(monitorName)) {
+		m_plot->plot()->setAxisAutoScale(m_monitorCurves->value(m_mainMonitor)->getAxisId(), toggled);
+		m_plot->replot();
+	}
 }
