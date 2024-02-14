@@ -27,8 +27,16 @@ echo "MacOS version $OS_VERSION"
 source ${REPO_SRC}/ci/macOS/before_install_lib.sh
 
 install_packages() {
+
+	# Workaround: Homebrew fails to upgrade Python's 2to3 due to conflicting symlinks  https://github.com/actions/runner-images/issues/6817
+	rm /usr/local/bin/2to3 || true
+	rm /usr/local/bin/idle3 || true
+	rm /usr/local/bin/pydoc3 || true
+	rm /usr/local/bin/python3 || true
+	rm /usr/local/bin/python3-config || true
+
 	brew update
-	brew upgrade
+	brew upgrade || true #ignore homebrew upgrade errors
 	brew search ${QT_FORMULAE}
 	brew install --display-times $PACKAGES
 	for pkg in gcc bison gettext cmake python; do
