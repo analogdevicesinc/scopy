@@ -60,3 +60,5 @@ void PolarPlotChannel::setThickness(int thickness)
 	m_curve->setPen(pen);
 	m_plot->replot();
 }
+
+#include "moc_polarplotchannel.cpp"

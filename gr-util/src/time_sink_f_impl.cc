@@ -59,7 +59,7 @@ void time_sink_f_impl::generate_time_axis()
 	m_freq.clear();
 	if(m_complexFft) {
 		for(int i = 0; i < m_size; i++) {
-			m_freq.push_back(freqoffset + (i * rbw) - m_sampleRate/2);
+			m_freq.push_back(freqoffset + (i * rbw) - m_sampleRate / 2);
 		}
 	} else {
 		for(int i = 0; i < m_size; i++) {
@@ -227,10 +227,7 @@ void time_sink_f_impl::setComputeTags(bool newComputeTags)
 	//	}
 }
 
-float time_sink_f_impl::freqOffset()
-{
-	return m_freqOffset;
-}
+float time_sink_f_impl::freqOffset() { return m_freqOffset; }
 
 void time_sink_f_impl::setFreqOffset(float val)
 {
@@ -238,11 +235,10 @@ void time_sink_f_impl::setFreqOffset(float val)
 	generate_time_axis();
 }
 
-bool time_sink_f_impl::fftComplex() {
-	return m_complexFft;
-}
+bool time_sink_f_impl::fftComplex() { return m_complexFft; }
 
-void time_sink_f_impl::setFftComplex(bool v) {
+void time_sink_f_impl::setFftComplex(bool v)
+{
 	m_complexFft = v;
 	generate_time_axis();
 }

@@ -111,3 +111,5 @@ void PolarPlotWidget::setData(QVector<QVector<QwtPointPolar>> data)
 }
 
 void PolarPlotWidget::replot() { m_plot->replot(); }
+
+#include "moc_polarplotwidget.cpp"
