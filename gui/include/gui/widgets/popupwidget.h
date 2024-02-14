@@ -44,6 +44,7 @@ public:
 
 	void enableTitleBar(bool enable = true);
 	void enableTintedOverlay(bool enable = true);
+	void setEnableExternalLinks(bool enable = true);
 
 	QString getDescription();
 	void setDescription(const QString &description);
