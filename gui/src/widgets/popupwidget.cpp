@@ -130,4 +130,9 @@ void PopupWidget::enableTintedOverlay(bool enable)
 	}
 }
 
+void PopupWidget::setEnableExternalLinks(bool enable)
+{
+	m_descriptionTextBrowser->setProperty("openExternalLinks", enable);
+}
+
 #include "moc_popupwidget.cpp"
