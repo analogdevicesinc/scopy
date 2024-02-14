@@ -16,6 +16,9 @@ public:
 	explicit CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, CommandQueue *commandQueue,
 					    QWidget *parent = nullptr);
 
+	QString data() override;
+	QString optionalData() override;
+
 public Q_SLOTS:
 	void save(QString data) override;
 	void requestData() override;

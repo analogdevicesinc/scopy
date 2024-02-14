@@ -31,14 +31,41 @@ namespace scopy {
 class SCOPY_IIO_WIDGETS_EXPORT DataStrategyInterface
 {
 public:
+	/**
+	 * @brief Interface for manipulating data in the IIO Widget system
+	 * */
 	virtual ~DataStrategyInterface() = default;
 
+	/**
+	 * @brief Returns the last data read
+	 * */
+	virtual QString data() = 0;
+
+	/**
+	 * @brief Return the last piece of optional data or empty string is not available
+	 * */
+	virtual QString optionalData() = 0;
+
 public Q_SLOTS:
+	/**
+	 * @brief Performs a write operation
+	 * */
 	virtual void save(QString data) = 0;
+
+	/**
+	 * @brief Performs a read operation and emits the data
+	 * */
 	virtual void requestData() = 0;
 
 Q_SIGNALS:
+	/**
+	 * @brief Emits the data read
+	 * */
 	virtual void sendData(QString data, QString dataOptions) = 0;
+
+	/**
+	 * @brief Emits the status of the operations (e.g. error code)
+	 * */
 	virtual void emitStatus(int status) = 0;
 
 protected:
