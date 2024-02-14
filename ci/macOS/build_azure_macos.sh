@@ -51,6 +51,7 @@ build_scopy(){
 		../
 	CFLAGS=-I${STAGING_AREA_DEPS}/include LDFLAGS=-L${STAGING_AREA_DEPS}/lib make ${JOBS}
 	otool -l ./Scopy.app/Contents/MacOS/Scopy
+	otool -L ./Scopy.app/Contents/MacOS/Scopy
 	popd
 }
 
