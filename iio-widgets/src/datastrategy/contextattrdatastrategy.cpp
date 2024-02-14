@@ -8,7 +8,12 @@ ContextAttrDataStrategy::ContextAttrDataStrategy(IIOWidgetFactoryRecipe recipe, 
 	: QWidget(parent)
 {
 	m_recipe = recipe;
+	m_optionalData = "";
 }
+
+QString ContextAttrDataStrategy::data() { return m_data; }
+
+QString ContextAttrDataStrategy::optionalData() { return m_optionalData; }
 
 void ContextAttrDataStrategy::save(QString data)
 {
@@ -30,7 +35,8 @@ void ContextAttrDataStrategy::requestData()
 		return;
 	}
 
-	Q_EMIT sendData(QString(value), "");
+	m_data = value;
+	Q_EMIT sendData(m_data, "");
 }
 
 #include "moc_contextattrdatastrategy.cpp"

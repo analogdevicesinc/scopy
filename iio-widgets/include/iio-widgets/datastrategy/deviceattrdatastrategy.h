@@ -35,13 +35,20 @@ class SCOPY_IIO_WIDGETS_EXPORT DeviceAttrDataStrategy : public QWidget, public D
 public:
 	explicit DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
 
+	QString data() override;
+	QString optionalData() override;
+
 public Q_SLOTS:
 	void save(QString data) override;
 	void requestData() override;
 
 Q_SIGNALS:
-	void sendData(QString data, QString dataOptions);
-	void emitStatus(int status);
+	void sendData(QString data, QString dataOptions) override;
+	void emitStatus(int status) override;
+
+private:
+	QString m_data;
+	QString m_optionalData;
 };
 } // namespace scopy
 
