@@ -48,14 +48,14 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	channelsBtn = new MenuControlButton(this);
 	setupChannelsButtonHelper(channelsBtn);
 
-//	MenuControlButton *timeBtn = new MenuControlButton(this);
-//	setupTimeButtonHelper(timeBtn);
+	//	MenuControlButton *timeBtn = new MenuControlButton(this);
+	//	setupTimeButtonHelper(timeBtn);
 
-//	MenuControlButton *xyBtn = new MenuControlButton(this);
-//	setupXyButtonHelper(xyBtn);
+	//	MenuControlButton *xyBtn = new MenuControlButton(this);
+	//	setupXyButtonHelper(xyBtn);
 
-//	MenuControlButton *fftBtn = new MenuControlButton(this);
-//	setupFFTButtonHelper(fftBtn);
+	//	MenuControlButton *fftBtn = new MenuControlButton(this);
+	//	setupFFTButtonHelper(fftBtn);
 
 	plotAddon = dynamic_cast<GRTimePlotAddon *>(proxy->getPlotAddon());
 	tool->addWidgetToCentralContainerHelper(plotAddon->getWidget());
@@ -75,7 +75,7 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 
 	cursorController = new CursorController(plotAddon->plot(), this);
 	fftcursorController = new CursorController(plotAddon->fftplot(), this);
-	fftcursorController->getCursorSettings()->hide();	
+	fftcursorController->getCursorSettings()->hide();
 
 	HoverWidget *hoverSettings = new HoverWidget(cursorController->getCursorSettings(), cursor, tool);
 	hoverSettings->setAnchorPos(HoverPosition::HP_TOPRIGHT);
@@ -116,9 +116,9 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	tool->addWidgetToTopContainerHelper(printBtn, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(channelsBtn, TTA_LEFT);
-//	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
-//	tool->addWidgetToBottomContainerHelper(xyBtn, TTA_LEFT);
-//	tool->addWidgetToBottomContainerHelper(fftBtn, TTA_LEFT);
+	//	tool->addWidgetToBottomContainerHelper(timeBtn, TTA_LEFT);
+	//	tool->addWidgetToBottomContainerHelper(xyBtn, TTA_LEFT);
+	//	tool->addWidgetToBottomContainerHelper(fftBtn, TTA_LEFT);
 
 	tool->addWidgetToBottomContainerHelper(cursor, TTA_RIGHT);
 	tool->addWidgetToBottomContainerHelper(measure, TTA_RIGHT);
@@ -179,14 +179,13 @@ AdcInstrument::AdcInstrument(PlotProxy *proxy, QWidget *parent)
 	connect(plotAddon, &GRTimePlotAddon::requestStop, this, &AdcInstrument::stop, Qt::QueuedConnection);
 	connect(cursor->button(), &QAbstractButton::toggled, hoverSettings, &HoverWidget::setVisible);
 	connect(cursor, &QAbstractButton::toggled, cursorController, &CursorController::setVisible);
-	connect(cursor, &QAbstractButton::toggled, this, [=](bool b){
-//		fftcursorController->setVisible(b);
+	connect(cursor, &QAbstractButton::toggled, this, [=](bool b) {
+		//		fftcursorController->setVisible(b);
 
-//		plotAddon->fftplot()->leftHandlesArea()->setVisible(true);
-//		plotAddon->fftplot()->bottomHandlesArea()->setVisible(b);
-//		plotAddon->fftplot()->bottomHandlesArea()->setLeftPadding(60);
-	}
-	);
+		//		plotAddon->fftplot()->leftHandlesArea()->setVisible(true);
+		//		plotAddon->fftplot()->bottomHandlesArea()->setVisible(b);
+		//		plotAddon->fftplot()->bottomHandlesArea()->setLeftPadding(60);
+	});
 	connect(measure, &MenuControlButton::toggled, this, &AdcInstrument::showMeasurements);
 
 	channelStack->show("voltage02");

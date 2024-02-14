@@ -19,8 +19,7 @@ ChannelAddon::ChannelAddon(QString ch, PlotAddon *plotAddon, QPen pen, QObject *
 	, m_channelName(ch)
 	, m_plotAddon(plotAddon)
 	, m_pen(pen)
-{
-}
+{}
 
 ChannelAddon::~ChannelAddon() {}
 
@@ -116,7 +115,6 @@ QWidget *ChannelAddon::createCurveMenu(QWidget *parent)
 
 TimeChannelAddon::TimeChannelAddon(QString ch, PlotAddon *plotAddon, QPen pen, QObject *parent)
 	: ChannelAddon(ch, plotAddon, pen, parent)
-{
-}
+{}
 
 TimeChannelAddon::~TimeChannelAddon() {}
