@@ -162,7 +162,7 @@ TestTool::TestTool(QWidget *parent)
 	QWidget *wch0 = createMenu(tool);
 	QLabel *wch1 = new QLabel("Channel1Label");
 
-//		auto *wch2 = iioWidgetsSettingsHelper();
+	//		auto *wch2 = iioWidgetsSettingsHelper();
 	auto *wch2 = new QLabel("Channel2Label");
 	wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
 

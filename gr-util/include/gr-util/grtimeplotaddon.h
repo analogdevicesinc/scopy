@@ -24,7 +24,6 @@
 #include <gnuradio/blocks/nlog10_ff.h>
 #include <gnuradio/blocks/multiply_const.h>
 
-
 namespace scopy {
 class TimePlotHDivInfo;
 class TimePlotSamplingInfo;
@@ -107,8 +106,8 @@ public Q_SLOTS:
 	void setFrameRate(double);
 	void setXMode(int mode);
 
-	void setXYSource(GRTimeChannelAddon*, GRTimeChannelAddon*);
-	void setFFTSource(GRTimeChannelAddon*, GRTimeChannelAddon*);
+	void setXYSource(GRTimeChannelAddon *, GRTimeChannelAddon *);
+	void setFFTSource(GRTimeChannelAddon *, GRTimeChannelAddon *);
 	void setFftWindow(int idx);
 
 private Q_SLOTS:
@@ -136,16 +135,16 @@ private:
 	PlotAxis *fft_yPlotAxis;
 	QMetaObject::Connection xy_min_max_connections[4];
 
-	GRTimeChannelAddon* m_xy_source[2];
+	GRTimeChannelAddon *m_xy_source[2];
 
-	GRTimeChannelAddon* m_fft_source[2];
+	GRTimeChannelAddon *m_fft_source[2];
 
 	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;
-//	fft_sink_f::sptr fft_sink;
+	//	fft_sink_f::sptr fft_sink;
 	gr::blocks::stream_to_vector::sptr s2v, s2v_complex;
 	gr::fft::fft_v<float, true>::sptr fft;
-	gr::fft::fft_v<gr_complex, true>::sptr	fft_complex;
+	gr::fft::fft_v<gr_complex, true>::sptr fft_complex;
 	gr::blocks::vector_sink_f::sptr vector_sink;
 	gr::blocks::vector_sink_c::sptr vector_complex_sink;
 	gr::blocks::float_to_complex::sptr f2c;

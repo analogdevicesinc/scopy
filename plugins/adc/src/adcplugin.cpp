@@ -120,7 +120,8 @@ bool ADCPlugin::loadPage()
 
 void ADCPlugin::loadToolList()
 {
-	m_toolList.append(SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
+	m_toolList.append(
+		SCOPY_NEW_TOOLMENUENTRY("time", "Time", ":/gui/icons/scopy-default/icons/tool_oscilloscope.svg"));
 }
 
 PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)

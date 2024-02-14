@@ -115,7 +115,6 @@ private:
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createYAxisMenu(QWidget *parent);
 	QPushButton *createForgetButton(QWidget *parent);
-
 };
 } // namespace grutil
 } // namespace scopy
