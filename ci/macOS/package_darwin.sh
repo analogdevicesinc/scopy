@@ -118,9 +118,9 @@ echo "=== Fixing python"
 sudo install_name_tool -id @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/${pythonid}
 python_sigrokdecode=$(otool -L ./Scopy.app/Contents/Frameworks/libsigrokdecode* | grep python | cut -d " " -f 1 | awk '{$1=$1};1')
 sudo install_name_tool -change ${python_sigrokdecode} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/Frameworks/libsigrokdecode*
-python_scopy=$(otool -L ./Scopy.app/Contents/MacOS/Scopy | grep python | cut -d " " -f 1 | awk '{$1=$1};1')
+python_scopy=$(otool -L ./Scopy.app/Contents/MacOS/Scopy | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
 sudo install_name_tool -change ${python_scopy} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
-python_libscopycore=$(otool -L ./Scopy.app/Contents/Frameworks/libscopy-core.dylib | grep python | cut -d " " -f 1 | awk '{$1=$1};1')
+python_libscopycore=$(otool -L ./Scopy.app/Contents/Frameworks/libscopy-core.dylib | grep -i python | cut -d " " -f 1 | awk '{$1=$1};1')
 sudo install_name_tool -change ${python_libscopycore} @executable_path/../Frameworks/${pythonid} ./Scopy.app/Contents/MacOS/Scopy
 
 echo "=== Fixing libserialport"
