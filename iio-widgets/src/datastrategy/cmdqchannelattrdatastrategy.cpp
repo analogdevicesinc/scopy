@@ -38,6 +38,10 @@ CmdQChannelAttrDataStrategy::CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe 
 	m_recipe = recipe;
 }
 
+QString CmdQChannelAttrDataStrategy::data() { return m_dataRead; }
+
+QString CmdQChannelAttrDataStrategy::optionalData() { return m_optionalDataRead; }
+
 void CmdQChannelAttrDataStrategy::save(QString data)
 {
 	if(m_recipe.channel == nullptr || m_recipe.data == "") {
@@ -92,10 +96,8 @@ void CmdQChannelAttrDataStrategy::requestData()
 		m_dataRead = QString(currentValue);
 
 		if(!m_recipe.constDataOptions.isEmpty()) {
-			Q_EMIT sendData(m_dataRead, m_recipe.constDataOptions);
-
-			m_dataRead.clear();
-			m_optionalDataRead.clear();
+			m_optionalDataRead = m_recipe.constDataOptions;
+			Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 		} else if(!m_recipe.iioDataOptions.isEmpty()) {
 			Command *readOptionalCommand = new IioChannelAttributeRead(
 				m_recipe.channel, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
@@ -113,21 +115,12 @@ void CmdQChannelAttrDataStrategy::requestData()
 
 				char *currentOptValue = tcmd->getResult();
 				m_optionalDataRead = QString(currentOptValue);
-
-				if(!m_dataRead.isEmpty() && !m_optionalDataRead.isEmpty()) {
-					Q_EMIT sendData(m_dataRead, m_optionalDataRead);
-
-					m_dataRead.clear();
-					m_optionalDataRead.clear();
-				}
+				Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 			});
 			m_cmdQueue->enqueue(readOptionalCommand);
 		} else {
 			// no optional data available, emit empty string for it
 			Q_EMIT sendData(m_dataRead, QString());
-
-			m_dataRead.clear();
-			m_optionalDataRead.clear();
 		}
 	});
 	m_cmdQueue->enqueue(readDataCommand);

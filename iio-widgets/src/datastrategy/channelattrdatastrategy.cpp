@@ -31,6 +31,10 @@ ChannelAttrDataStrategy::ChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, 
 	m_recipe = recipe;
 }
 
+QString ChannelAttrDataStrategy::data() { return m_data; }
+
+QString ChannelAttrDataStrategy::optionalData() { return m_optionalData; }
+
 void ChannelAttrDataStrategy::save(QString data)
 {
 	if(m_recipe.channel == nullptr || m_recipe.data == "") {
@@ -83,7 +87,9 @@ void ChannelAttrDataStrategy::requestData()
 		options[m_recipe.constDataOptions.size()] = '\0'; // safety measures
 	}
 
-	Q_EMIT sendData(QString(currentValue), QString(options));
+	m_data = currentValue;
+	m_optionalData = options;
+	Q_EMIT sendData(m_data, m_optionalData);
 }
 
 #include "moc_channelattrdatastrategy.cpp"
