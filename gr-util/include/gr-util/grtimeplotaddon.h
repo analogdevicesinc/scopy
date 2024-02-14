@@ -4,6 +4,7 @@
 #include "plotinfo.h"
 #include "scopy-gr-util_export.h"
 #include "time_sink_f.h"
+#include "timechanneladdon.h"
 #include "tooladdon.h"
 
 #include <QFuture>
@@ -18,23 +19,35 @@
 namespace scopy {
 class TimePlotHDivInfo;
 class TimePlotSamplingInfo;
-
 namespace grutil {
-using namespace scopy;
 class GRTopBlock;
 class GRTimeChannelAddon;
 class GRTimePlotAddonSettings;
+class ChannelAddon;
 
-class SCOPY_GR_UTIL_EXPORT GRTimePlotAddon : public QObject, public ToolAddon, public GRTopAddon
+class SCOPY_GR_UTIL_EXPORT PlotAddon
+{
+public:
+	virtual PlotWidget *plot() = 0;
+	virtual void replot() = 0;
+	virtual double sampleRate() = 0;
+};
+
+class SCOPY_GR_UTIL_EXPORT GRTimePlotAddon : public QObject,
+					     public ToolAddon,
+					     public ChannelConfigAware,
+					     public PlotAddon,
+					     public GRTopAddon
 {
 	Q_OBJECT
 public:
 	GRTimePlotAddon(QString name, GRTopBlock *top, QObject *parent = nullptr);
-	~GRTimePlotAddon();
+	virtual ~GRTimePlotAddon();
 
 	QString getName() override;
 	QWidget *getWidget() override;
-	PlotWidget *plot();
+	PlotWidget *plot() override;
+	double sampleRate() override;
 	int xMode();
 
 Q_SIGNALS:
@@ -54,10 +67,11 @@ public Q_SLOTS:
 	void postFlowStart() override;
 	void preFlowStop() override;
 	void postFlowStop() override;
-	void onChannelAdded(ToolAddon *t) override;
-	void onChannelRemoved(ToolAddon *) override;
 
-	void replot();
+	void onChannelAdded(ChannelAddon *t) override;
+	void onChannelRemoved(ChannelAddon *t) override;
+
+	void replot() override;
 	void connectSignalPaths();
 	void tearDownSignalPaths();
 	void onNewData();
@@ -66,7 +80,6 @@ public Q_SLOTS:
 	void setRollingMode(bool b);
 	void setDrawPlotTags(bool b);
 	void setSampleRate(double);
-	double sampleRate();
 	void setBufferSize(uint32_t size);
 	void setPlotSize(uint32_t size);
 	void handlePreferences(QString, QVariant);
@@ -80,10 +93,10 @@ private Q_SLOTS:
 	void drawPlot();
 
 private:
-	QString name;
-	QWidget *widget;
 	QTimer *m_plotTimer;
 	GRTopBlock *m_top;
+	QString name;
+	QWidget *widget;
 	PlotWidget *m_plotWidget;
 	TimePlotInfo *m_info;
 	time_sink_f::sptr time_sink;

@@ -317,6 +317,9 @@ void PlotWidget::selectChannel(PlotChannel *ch)
 	m_selectedChannel = ch;
 	showAxisLabels();
 
+	if(!m_selectedChannel)
+		return;
+
 	if(m_selectedChannel->curve()) {
 		m_selectedChannel->raise();
 	}

@@ -245,15 +245,18 @@ void GRTimePlotAddon::preFlowStop() { stopPlotRefresh(); }
 
 void GRTimePlotAddon::postFlowStop() {}
 
-void GRTimePlotAddon::onChannelAdded(ToolAddon *t)
+void GRTimePlotAddon::onChannelAdded(ChannelAddon *t)
 {
 	auto ch = dynamic_cast<GRTimeChannelAddon *>(t);
 	if(ch)
 		grChannels.append(ch);
 }
 
-void GRTimePlotAddon::onChannelRemoved(ToolAddon *t)
+void GRTimePlotAddon::onChannelRemoved(ChannelAddon *t)
 {
+
+	if(plot()->selectedChannel() == t->plotCh())
+		plot()->selectChannel(nullptr);
 	auto ch = dynamic_cast<GRTimeChannelAddon *>(t);
 	if(ch)
 		grChannels.removeAll(ch);

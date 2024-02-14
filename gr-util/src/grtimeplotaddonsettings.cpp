@@ -29,7 +29,10 @@ GRTimePlotAddonSettings::~GRTimePlotAddonSettings() {}
 
 QWidget *GRTimePlotAddonSettings::createMenu(QWidget *parent)
 {
-	QWidget *w = new QWidget(parent);
+	QScrollArea *scroll = new QScrollArea(parent);
+	scroll->setWidgetResizable(true);
+	QWidget *w = new QWidget(scroll);
+	scroll->setWidget(w);
 	QVBoxLayout *lay = new QVBoxLayout(w);
 	lay->setMargin(0);
 	lay->setSpacing(10);
@@ -39,15 +42,54 @@ QWidget *GRTimePlotAddonSettings::createMenu(QWidget *parent)
 
 	MenuHeaderWidget *header = new MenuHeaderWidget("PLOT", m_pen, w);
 	QWidget *xaxismenu = createXAxisMenu(w);
+	QWidget *yaxismenu = createYAxisMenu(w);
 	//	QWidget* curvemenu = createCurveMenu(w);
 
 	lay->addWidget(header);
 	lay->addWidget(xaxismenu);
+	lay->addWidget(yaxismenu);
 	//	lay->addWidget(curvemenu);
 
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
-	return w;
+	return scroll;
+}
+
+QWidget *GRTimePlotAddonSettings::createYAxisMenu(QWidget *parent)
+{
+	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *yaxis = new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
+
+	m_yctrl = new TimeYControl(m_plot->plot()->yAxis(), yaxis);
+	m_singleYModeSw = new MenuOnOffSwitch("Single Y Mode", yaxis);
+	m_autoscaleBtn = new QPushButton("Autoscale", yaxis);
+
+	autoscaler = new TimeYAutoscale(this);
+	connect(autoscaler, &TimeYAutoscale::newMin, m_yctrl, &TimeYControl::setMin);
+	connect(autoscaler, &TimeYAutoscale::newMax, m_yctrl, &TimeYControl::setMax);
+	StyleHelper::BlueButton(m_autoscaleBtn, "autoscale");
+
+	connect(m_autoscaleBtn, &QPushButton::clicked, this, [=]() { autoscaler->autoscale(); });
+
+	yaxis->contentLayout()->addWidget(m_singleYModeSw);
+	yaxis->contentLayout()->addWidget(m_yctrl);
+	yaxis->contentLayout()->addSpacerItem(new QSpacerItem(0, 5, QSizePolicy::Fixed, QSizePolicy::Fixed));
+	yaxis->contentLayout()->addWidget(m_autoscaleBtn);
+	yaxiscontainer->contentLayout()->addWidget(yaxis);
+
+	connect(m_singleYModeSw->onOffswitch(), &QAbstractButton::toggled, this, [=](bool b) {
+		m_yctrl->setEnabled(b);
+		m_autoscaleBtn->setEnabled(b);
+		for(auto ch : channels) {
+			SingleYModeAware *singleyaware = dynamic_cast<SingleYModeAware *>(ch);
+			if(singleyaware) {
+				singleyaware->setSingleYMode(b);
+			}
+		}
+		m_plot->replot();
+	});
+
+	return yaxiscontainer;
 }
 
 QWidget *GRTimePlotAddonSettings::createXAxisMenu(QWidget *parent)
@@ -280,32 +322,37 @@ void GRTimePlotAddonSettings::onInit()
 	m_syncBufferPlot->onOffswitch()->setChecked(true);
 	m_showLabels->onOffswitch()->setChecked(false);
 	m_xModeCb->combo()->setCurrentIndex(0);
+	m_yctrl->setEnabled(false);
+	m_singleYModeSw->setEnabled(true);
+	m_singleYModeSw->onOffswitch()->setChecked(false);
+	m_autoscaleBtn->setEnabled(false);
 	//	m_rollingModeSw->onOffswitch()->setChecked(false);
 }
 
 void GRTimePlotAddonSettings::onDeinit() {}
 
-void GRTimePlotAddonSettings::onChannelAdded(ToolAddon *t)
+void GRTimePlotAddonSettings::onChannelAdded(ChannelAddon *t)
 {
-	auto ch = dynamic_cast<GRTimeChannelAddon *>(t);
-	if(ch)
-		grChannels.append(ch);
+	channels.append(t);
+	autoscaler->addChannels(t->plotCh());
 }
 
-void GRTimePlotAddonSettings::onChannelRemoved(ToolAddon *t)
+void GRTimePlotAddonSettings::onChannelRemoved(ChannelAddon *t)
 {
-	auto ch = dynamic_cast<GRTimeChannelAddon *>(t);
-	if(ch)
-		grChannels.removeAll(ch);
+	channels.removeAll(t);
+	autoscaler->addChannels(t->plotCh());
 }
 
 double GRTimePlotAddonSettings::readSampleRate()
 {
 	double sr = 1;
-	for(GRTimeChannelAddon *gr : grChannels) {
-		if(!gr->enabled())
+	for(ChannelAddon *ch : channels) {
+		if(!ch->enabled())
 			continue;
-		sr = gr->grch()->readSampleRate();
+		SampleRateProvider *srp = dynamic_cast<SampleRateProvider *>(ch);
+		if(!srp)
+			continue;
+		sr = srp->sampleRate();
 		break;
 	}
 	return sr;
@@ -335,10 +382,13 @@ void GRTimePlotAddonSettings::setBufferSize(uint32_t newBufferSize)
 void GRTimePlotAddonSettings::computeSampleRateAvailable()
 {
 	bool sampleRateAvailable = false;
-	for(GRTimeChannelAddon *gr : grChannels) {
-		if(!gr->enabled())
+	for(ChannelAddon *ch : channels) {
+		if(!ch->enabled())
 			continue;
-		if(gr->sampleRateAvailable()) {
+		SampleRateProvider *srp = dynamic_cast<SampleRateProvider *>(ch);
+		if(!srp)
+			continue;
+		if(srp->sampleRateAvailable()) {
 			sampleRateAvailable = true;
 			break;
 		}
