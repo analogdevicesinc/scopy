@@ -166,9 +166,10 @@ PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 
 	recipe->setPlotAddon(p, s);
 
-	int i = 0;
+	ChannelIdProvider *chIdProvider = recipe->getChannelIdProvider();
 	for(const QString &iio_dev : deviceList) {
 		GRIIODeviceSource *gr_dev = new GRIIODeviceSource(m_ctx, iio_dev, iio_dev, 0x400, this);
+
 		top->registerIIODeviceSource(gr_dev);
 
 		GRDeviceAddon *d = new GRDeviceAddon(gr_dev, this);
@@ -176,11 +177,10 @@ PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 		recipe->addDeviceAddon(d);
 
 		for(const QString &ch : devChannelMap.value(iio_dev, {})) {
-			GRTimeChannelAddon *t = new GRTimeChannelAddon(
-				ch, d, p, QPen(StyleHelper::getColor("CH" + QString::number(i))), this);
+			int idx = chIdProvider->next();
+			GRTimeChannelAddon *t = new GRTimeChannelAddon(ch, d, p, chIdProvider->pen(idx), this);
 			top->registerSignalPath(t->signalPath());
 			recipe->addChannelAddon(t);
-			i++;
 		}
 	}
 	recipe->setTopBlock(top);
