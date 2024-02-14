@@ -39,6 +39,10 @@ CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe re
 	m_recipe = recipe;
 }
 
+QString CmdQDeviceAttrDataStrategy::data() { return m_dataRead; }
+
+QString CmdQDeviceAttrDataStrategy::optionalData() { return m_optionalDataRead; }
+
 void CmdQDeviceAttrDataStrategy::save(QString data)
 {
 	if(m_recipe.device == nullptr || m_recipe.data == "") {
@@ -93,10 +97,8 @@ void CmdQDeviceAttrDataStrategy::requestData()
 		m_dataRead = QString(currentValue);
 
 		if(!m_recipe.constDataOptions.isEmpty()) {
-			Q_EMIT sendData(m_dataRead, m_recipe.constDataOptions);
-
-			m_dataRead.clear();
-			m_optionalDataRead.clear();
+			m_optionalDataRead = m_recipe.constDataOptions;
+			Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 		} else if(!m_recipe.iioDataOptions.isEmpty()) {
 			// if we have an attribute we have to read, we should read it, increase the counter and emit if
 			// possible
@@ -117,20 +119,12 @@ void CmdQDeviceAttrDataStrategy::requestData()
 				char *currentOptValue = tcmd->getResult();
 				m_optionalDataRead = QString(currentOptValue);
 
-				if(!m_dataRead.isEmpty() && !m_optionalDataRead.isEmpty()) {
-					Q_EMIT sendData(m_dataRead, m_optionalDataRead);
-
-					m_dataRead.clear();
-					m_optionalDataRead.clear();
-				}
+				Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 			});
 			m_cmdQueue->enqueue(readOptionalCommand);
 		} else {
 			// no optional data available, emit empty string for it
 			Q_EMIT sendData(m_dataRead, QString());
-
-			m_dataRead.clear();
-			m_optionalDataRead.clear();
 		}
 	});
 	m_cmdQueue->enqueue(readDataCommand);

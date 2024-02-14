@@ -30,6 +30,10 @@ DeviceAttrDataStrategy::DeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QW
 	m_recipe = recipe;
 }
 
+QString DeviceAttrDataStrategy::data() { return m_data; }
+
+QString DeviceAttrDataStrategy::optionalData() { return m_optionalData; }
+
 void DeviceAttrDataStrategy::save(QString data)
 {
 	if(m_recipe.device == nullptr || m_recipe.data == "") {
@@ -81,7 +85,9 @@ void DeviceAttrDataStrategy::requestData()
 		options[m_recipe.constDataOptions.size()] = '\0'; // safety measures
 	}
 
-	Q_EMIT sendData(QString(currentValue), QString(options));
+	m_data = currentValue;
+	m_optionalData = options;
+	Q_EMIT sendData(m_data, m_optionalData);
 }
 
 #include "moc_deviceattrdatastrategy.cpp"
