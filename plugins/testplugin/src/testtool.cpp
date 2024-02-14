@@ -164,7 +164,7 @@ TestTool::TestTool(QWidget *parent)
 
 	//		auto *wch2 = iioWidgetsSettingsHelper();
 	auto *wch2 = new QLabel("Channel2Label");
-	wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
+	// wch2->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::MinimumExpanding));
 
 	tool->rightStack()->add("ch0", wch0);
 	tool->rightStack()->add("ch1", wch1);
@@ -307,9 +307,9 @@ void TestTool::acquireData()
 
 QWidget *TestTool::iioWidgetsSettingsHelper()
 {
-	struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
-	struct iio_device *device = iio_context_find_device(context, "ad74413r");
-	struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
+	// struct iio_context *context = iio_create_context_from_uri("ip:127.0.0.1");
+	// struct iio_device *device = iio_context_find_device(context, "ad74413r");
+	// struct iio_channel *attrChannel = iio_device_find_channel(device, "voltage7", false);
 	auto *wch2Scroll = new QScrollArea(this);
 
 	wch2Scroll->setWidgetResizable(true);
@@ -324,7 +324,7 @@ QWidget *TestTool::iioWidgetsSettingsHelper()
 	wch2Scroll->setWidget(wch2);
 	wch2->setLayout(new QVBoxLayout(wch2));
 	wch2->layout()->setContentsMargins(0, 0, 0, 0);
-	QList<IIOWidget *> attrWidgets = IIOWidgetFactory::buildAllAttrsForChannel(attrChannel);
+	QList<IIOWidget *> attrWidgets = {}; // IIOWidgetFactory::buildAllAttrsForChannel(attrChannel);
 
 	//	attrWidgets.append(attrFactory->buildSingle(
 	//		AttrFactory::AFH::ExternalSave | AttrFactory::AFH::SwitchUi | AttrFactory::AFH::AttrData,
