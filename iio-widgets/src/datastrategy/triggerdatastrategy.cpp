@@ -32,6 +32,10 @@ TriggerDataStrategy::TriggerDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget 
 	m_recipe = recipe;
 }
 
+QString TriggerDataStrategy::data() { return m_data; }
+
+QString TriggerDataStrategy::optionalData() { return m_optionalData; }
+
 void TriggerDataStrategy::save(QString data)
 {
 	if(m_recipe.context == nullptr || m_recipe.device == nullptr) {
@@ -100,7 +104,9 @@ void TriggerDataStrategy::requestData()
 		}
 	}
 
-	Q_EMIT sendData(currentTriggerName, triggerOptions);
+	m_data = currentTriggerName;
+	m_optionalData = triggerOptions;
+	Q_EMIT sendData(m_data, m_optionalData);
 }
 
 #include "moc_triggerdatastrategy.cpp"
