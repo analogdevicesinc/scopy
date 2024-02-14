@@ -25,6 +25,8 @@ PlotAxis::PlotAxis(int position, PlotWidget *p, QPen pen, QObject *parent)
 	// move this outside (?)
 	if(isHorizontal()) {
 		auto prefixFormatter = new MetricPrefixFormatter();
+		prefixFormatter->setTrimZeroes(true);
+		prefixFormatter->setTwoDecimalMode(true);
 		m_scaleDraw = new OscScaleDraw(prefixFormatter, "s");
 	} else {
 		auto prefixFormatter = new MetricPrefixFormatter();

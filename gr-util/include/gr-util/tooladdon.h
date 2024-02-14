@@ -17,8 +17,6 @@ public:
 	virtual void onStop() {}
 	virtual void onInit() {}
 	virtual void onDeinit() {}
-	virtual void onChannelAdded(ToolAddon *) {}
-	virtual void onChannelRemoved(ToolAddon *) {}
 };
 
 class SCOPY_GR_UTIL_EXPORT GRTopAddon

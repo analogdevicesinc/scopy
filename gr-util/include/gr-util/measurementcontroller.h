@@ -61,5 +61,42 @@ public:
 	TimeChannelMeasurementController(TimeMeasureModel *msr, QPen m_pen, QObject *parent = nullptr);
 };
 
+class SCOPY_GR_UTIL_EXPORT MeasureManagerInterface : public QObject
+{
+	Q_OBJECT
+Q_SIGNALS:
+	void enableMeasurement(MeasurementLabel *);
+	void disableMeasurement(MeasurementLabel *);
+	void toggleAllMeasurement(bool b);
+	void toggleAllStats(bool b);
+	void enableStat(StatsLabel *);
+	void disableStat(StatsLabel *);
+
+public:
+	virtual void initMeasure(QPen) = 0;
+	virtual QWidget *createMeasurementMenu(QWidget *parent) = 0;
+	virtual MeasurementController *getController() = 0;
+	virtual MeasureModel *getModel() = 0;
+};
+
+class SCOPY_GR_UTIL_EXPORT TimeMeasureManager : public MeasureManagerInterface
+{
+public:
+	TimeMeasureManager(QObject *parent = nullptr);
+	~TimeMeasureManager();
+
+public:
+	virtual void initMeasure(QPen);
+	virtual QWidget *createMeasurementMenu(QWidget *parent);
+	virtual MeasurementController *getController();
+	virtual MeasureModel *getModel();
+
+protected:
+	virtual QWidget *createMeasurementMenuSection(QString category, QWidget *parent);
+
+	TimeChannelMeasurementController *m_measureController;
+	TimeMeasureModel *m_measureModel;
+};
+
 } // namespace scopy::grutil
 #endif // MEASUREMENTCONTROLLER_H
