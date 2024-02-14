@@ -2,6 +2,8 @@
 #define ADCINSTRUMENT_H
 
 #include "gui/tooltemplate.h"
+#include "measurementsettings.h"
+#include "verticalchannelmanager.h"
 
 #include <QPushButton>
 #include <QWidget>
@@ -27,13 +29,16 @@ public:
 
 	bool running() const;
 	void setRunning(bool newRunning);
-
 public Q_SLOTS:
 	void run(bool);
 	void stop();
 	void start();
 	void restart();
 	void showMeasurements(bool b);
+	void createSnapshotChannel(SnapshotProvider::SnapshotRecipe rec);
+	MenuControlButton *addChannel(ChannelAddon *ch, QWidget *parent);
+	void deleteChannel(ChannelAddon *);
+	CollapsableMenuControlButton *addDevice(GRDeviceAddon *dev, QWidget *parent);
 Q_SIGNALS:
 	void runningChanged(bool);
 
@@ -48,10 +53,12 @@ private:
 	MenuControlButton *channelsBtn;
 
 	MeasurementsPanel *measure_panel;
+	MeasurementSettings *measureSettings;
 	StatsPanel *stats_panel;
 
 	GRTimePlotAddon *plotAddon;
 	GRTimePlotAddonSettings *plotAddonSettings;
+	VerticalChannelManager *vcm;
 
 	MapStackedWidget *channelStack;
 	QButtonGroup *rightMenuBtnGrp;
@@ -59,12 +66,16 @@ private:
 
 	CursorController *cursorController;
 
+	void setupTimeButtonHelper(MenuControlButton *time);
+	void setupXyButtonHelper(MenuControlButton *xy);
+	void setupFFTButtonHelper(MenuControlButton *fft);
 	void setupCursorButtonHelper(MenuControlButton *cursor);
 	void setupMeasureButtonHelper(MenuControlButton *measure);
 	void setupChannelsButtonHelper(MenuControlButton *channelsBtn);
 	void setupDeviceMenuControlButtonHelper(MenuControlButton *devBtn, GRDeviceAddon *dev);
-	void setupChannelMenuControlButtonHelper(MenuControlButton *btn, GRTimeChannelAddon *ch);
+	void setupChannelMenuControlButtonHelper(MenuControlButton *btn, ChannelAddon *ch);
 	void initCursors();
+	void setupChannelDelete(ChannelAddon *ch);
 
 	Q_PROPERTY(bool running READ running WRITE setRunning NOTIFY runningChanged)
 
@@ -73,6 +84,8 @@ private:
 	const QString measureMenuId = "measure";
 	const QString statsMenuId = "stats";
 	const QString verticalChannelManagerId = "vcm";
+	void setupChannelMeasurement(ChannelAddon *ch);
+	void setupChannelSnapshot(ChannelAddon *ch);
 };
 } // namespace scopy
 #endif // ADCINSTRUMENT_H

@@ -6,6 +6,8 @@
 #include <iio-widgets/iiowidgetfactory.h>
 #include <iio-widgets/iiowidget.h>
 
+#include "grtimechanneladdon.h"
+
 #include <QDebug>
 
 using namespace scopy::grutil;
@@ -87,27 +89,103 @@ QWidget *GRDeviceAddon::getWidget() { return widget; }
 
 GRIIODeviceSource *GRDeviceAddon::src() const { return m_src; }
 
-void GRDeviceAddon::enable() {}
+void GRDeviceAddon::enable()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->enable();
+	}
+}
 
-void GRDeviceAddon::disable() {}
+void GRDeviceAddon::disable()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->disable();
+	}
+}
 
-void GRDeviceAddon::onStart() {}
+void GRDeviceAddon::onStart()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->onStart();
+	}
+}
 
-void GRDeviceAddon::onStop() {}
+void GRDeviceAddon::onStop()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->onStop();
+	}
+}
 
-void GRDeviceAddon::onInit() {}
+void GRDeviceAddon::onInit()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->onInit();
+	}
+}
 
-void GRDeviceAddon::onDeinit() {}
+void GRDeviceAddon::onDeinit()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->onDeinit();
+	}
+}
 
-void GRDeviceAddon::preFlowStart() {}
+void GRDeviceAddon::preFlowStart()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->preFlowStart();
+	}
+}
 
-void GRDeviceAddon::postFlowStart() {}
+void GRDeviceAddon::postFlowStart()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->postFlowStart();
+	}
+}
 
-void GRDeviceAddon::preFlowBuild() {}
+void GRDeviceAddon::preFlowStop()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->preFlowStop();
+	}
+}
 
-void GRDeviceAddon::onChannelAdded(ToolAddon *) {}
+void GRDeviceAddon::postFlowStop()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->postFlowStop();
+	}
+}
 
-void GRDeviceAddon::onChannelRemoved(ToolAddon *) {}
+void GRDeviceAddon::preFlowBuild()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->preFlowBuild();
+	}
+}
+
+void GRDeviceAddon::postFlowBuild()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->postFlowBuild();
+	}
+}
+
+void GRDeviceAddon::preFlowTeardown()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->preFlowTeardown();
+	}
+}
+
+void GRDeviceAddon::postFlowTeardown()
+{
+	for(auto ch : getRegisteredChannels()) {
+		ch->postFlowTeardown();
+	}
+}
 
 void GRDeviceAddon::setBufferSize(uint32_t bufferSize) { m_src->setBuffersize(bufferSize); }
 

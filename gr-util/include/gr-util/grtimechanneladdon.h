@@ -5,10 +5,11 @@
 #include "grscaleoffsetproc.h"
 #include "grsignalpath.h"
 #include "grtimeplotaddon.h"
-#include "measure.h"
 #include "measurementcontroller.h"
-#include "measurementselector.h"
 #include "scopy-gr-util_export.h"
+#include "time_yautoscale.h"
+#include "time_ycontrol.h"
+#include "timechanneladdon.h"
 #include "tooladdon.h"
 
 #include <QLabel>
@@ -19,9 +20,12 @@
 #include <gui/spinbox_a.hpp>
 #include <gui/widgets/menucombo.h>
 
-namespace scopy::grutil {
+namespace scopy {
+class MenuOnOffSwitch;
+
+namespace grutil {
 class GRDeviceAddon;
-class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public QObject, public ToolAddon, public GRTopAddon
+class SCOPY_GR_UTIL_EXPORT GRTimeChannelAddon : public TimeChannelAddon, public GRTopAddon
 {
 	Q_OBJECT
 public:
@@ -35,19 +39,14 @@ public:
 			   QObject *parent = nullptr);
 	~GRTimeChannelAddon();
 
-	QString getName() override;
-	QWidget *getWidget() override;
-
 	void setDevice(GRDeviceAddon *d);
 	GRDeviceAddon *getDevice();
 
-	QPen pen() const;
-	bool enabled() const;
 	GRSignalPath *signalPath() const;
-	PlotChannel *plotCh() const;
-
-	bool sampleRateAvailable() const;
 	GRIIOFloatChannelSrc *grch() const;
+	bool sampleRateAvailable() override;
+	double sampleRate() override;
+	MeasureManagerInterface *getMeasureManager() override;
 
 public Q_SLOTS:
 	void enable() override;
@@ -60,59 +59,63 @@ public Q_SLOTS:
 
 	void onNewData(const float *xData, const float *yData, int size);
 
-	void onChannelAdded(ToolAddon *) override;
-	void onChannelRemoved(ToolAddon *) override;
-
 	void toggleAutoScale();
-	void autoscale();
 	void setYMode(YMode mode);
+	void setSingleYMode(bool) override;
 
 Q_SIGNALS:
-	void enableMeasurement(MeasurementLabel *);
-	void disableMeasurement(MeasurementLabel *);
-	void toggleAllMeasurement(bool b);
-	void toggleAllStats(bool b);
-	void enableStat(StatsLabel *);
-	void disableStat(StatsLabel *);
+	void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;
 
 private:
-	QString m_channelName;
 	GRDeviceAddon *m_dev;
 	GRScaleOffsetProc *m_scOff;
 	GRSignalPath *m_signalPath;
 	GRIIOFloatChannelSrc *m_grch;
-	GRTimePlotAddon *m_plotAddon;
-	QPen m_pen;
-	QTimer *m_autoScaleTimer;
-
-	TimeChannelMeasurementController *m_measureController;
-	TimeMeasureModel *m_measureModel;
-
-	PositionSpinButton *m_ymin;
-	PositionSpinButton *m_ymax;
+	TimeMeasureManager *m_measureMgr;
+	TimeYControl *m_yCtrl;
+	TimeYAutoscale *m_autoscale;
 	MenuCombo *m_ymodeCb;
+	MenuOnOffSwitch *m_autoscaleBtn;
+	QPushButton *m_snapBtn;
 
-	PlotChannel *m_plotCh;
-	PlotAxis *m_plotAxis;
-	PlotAxisHandle *m_plotAxisHandle;
-
-	bool m_enabled;
 	bool m_scaleAvailable;
 	bool m_sampleRateAvailable;
-	bool m_running;
 	bool m_autoscaleEnabled;
+	bool m_running;
 
 	QString m_unit;
-	QString name;
-	QWidget *widget;
 	QWidget *createMenu(QWidget *parent = nullptr);
 	QWidget *createAttrMenu(QWidget *parent);
 	QWidget *createYAxisMenu(QWidget *parent);
-	QWidget *createCurveMenu(QWidget *parent);
-
-	void initMeasure();
-	void createMeasurementMenu(QWidget *parent);
-	QWidget *createMeasurementMenuSection(QString category, QWidget *parent);
+	QPushButton *createSnapshotButton(QWidget *parent);
 };
-} // namespace scopy::grutil
+
+class SCOPY_GR_UTIL_EXPORT ImportChannelAddon : public TimeChannelAddon
+{
+	Q_OBJECT
+public:
+	ImportChannelAddon(QString name, PlotAddon *plotAddon, QPen pen, QObject *parent = nullptr);
+	virtual ~ImportChannelAddon();
+	void setData(std::vector<float> x, std::vector<float> y);
+
+	MeasureManagerInterface *getMeasureManager() override;
+	void setSingleYMode(bool) override;
+	bool sampleRateAvailable() override;
+	double sampleRate() override;
+
+	void onDeinit() override;
+Q_SIGNALS:
+	void addNewSnapshot(SnapshotProvider::SnapshotRecipe) override;
+
+private:
+	TimeMeasureManager *m_measureMgr;
+	TimeYControl *m_yCtrl;
+	TimeYAutoscale *m_autoscale;
+
+	QWidget *createMenu(QWidget *parent = nullptr);
+	QWidget *createYAxisMenu(QWidget *parent);
+	QPushButton *createForgetButton(QWidget *parent);
+};
+} // namespace grutil
+} // namespace scopy
 #endif // GRTIMECHANNELADDON_H

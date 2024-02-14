@@ -2,10 +2,18 @@
 
 #include "gui/widgets/measurementlabel.h"
 #include "measure.h"
+#include "measurementselector.h"
 
 #include <QLoggingCategory>
 
 #include <grtimechanneladdon.h>
+#include <gui/stylehelper.h>
+#include <gui/widgets/menubigswitch.h>
+#include <gui/widgets/menucollapsesection.h>
+#include <gui/widgets/menucombo.h>
+#include <gui/widgets/menulineedit.h>
+#include <gui/widgets/menuonoffswitch.h>
+#include <gui/widgets/menusectionwidget.h>
 
 Q_LOGGING_CATEGORY(CAT_MEASUREMENT_CONTROLLER, "MeasurementController");
 
@@ -174,6 +182,91 @@ TimeChannelMeasurementController::TimeChannelMeasurementController(TimeMeasureMo
 	addMeasurement({"+Duty", ":/gui/icons/measurements/p_duty.svg", "%", "metric", "Horizontal"});
 	addMeasurement({"-Duty", ":/gui/icons/measurements/n_duty.svg", "%", "metric", "Horizontal"});
 }
+
+TimeMeasureManager::TimeMeasureManager(QObject *parent) {}
+
+TimeMeasureManager::~TimeMeasureManager() {}
+
+void TimeMeasureManager::initMeasure(QPen m_pen)
+{
+	m_measureModel = new TimeMeasureModel(nullptr, 0, this);
+	m_measureController = new TimeChannelMeasurementController(m_measureModel, m_pen, this);
+
+	connect(m_measureController, &TimeChannelMeasurementController::measurementEnabled, this,
+		&TimeMeasureManager::enableMeasurement);
+	connect(m_measureController, &TimeChannelMeasurementController::measurementDisabled, this,
+		&TimeMeasureManager::disableMeasurement);
+	connect(m_measureController, &TimeChannelMeasurementController::statsEnabled, this,
+		&TimeMeasureManager::enableStat);
+	connect(m_measureController, &TimeChannelMeasurementController::statsDisabled, this,
+		&TimeMeasureManager::disableStat);
+}
+
+QWidget *TimeMeasureManager::createMeasurementMenu(QWidget *parent)
+{
+
+	QWidget *w = new QWidget(parent);
+	QVBoxLayout *lay = new QVBoxLayout(w);
+	w->setLayout(lay);
+	lay->setSpacing(6);
+	lay->setMargin(0);
+
+	QWidget *hMeasure = createMeasurementMenuSection("HORIZONTAL", parent);
+	QWidget *vMeasure = createMeasurementMenuSection("VERTICAL", parent);
+	lay->addWidget(hMeasure);
+	lay->addWidget(vMeasure);
+	return w;
+}
+
+MeasurementController *TimeMeasureManager::getController() { return m_measureController; }
+
+MeasureModel *TimeMeasureManager::getModel() { return m_measureModel; }
+
+QWidget *TimeMeasureManager::createMeasurementMenuSection(QString category, QWidget *parent)
+{
+
+	auto m_measureController = getController();
+	MenuSectionWidget *measureContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *measureSection =
+		new MenuCollapseSection("MEASUREMENT " + category, MenuCollapseSection::MHCW_ARROW, measureContainer);
+	QScrollArea *measureScroll = new QScrollArea(measureSection);
+	MeasurementSelector *measureSelector = new MeasurementSelector();
+	measureContainer->contentLayout()->addWidget(measureSection);
+	measureSection->contentLayout()->addWidget(measureScroll);
+	measureScroll->setWidget(measureSelector);
+	measureScroll->setWidgetResizable(true);
+
+	measureScroll->setFixedHeight(150);
+
+	for(auto &meas : m_measureController->availableMeasurements()) {
+		if(meas.type.toUpper() == category.toUpper()) {
+			measureSelector->addMeasurement(meas.name, meas.icon);
+			connect(measureSelector->measurement(meas.name)->measureCheckbox(), &QCheckBox::toggled,
+				[=](bool b) {
+					if(b)
+						m_measureController->enableMeasurement(meas.name);
+					else
+						m_measureController->disableMeasurement(meas.name);
+				});
+
+			connect(measureSelector->measurement(meas.name)->statsCheckbox(), &QCheckBox::toggled,
+				[=](bool b) {
+					if(b)
+						m_measureController->enableStats(meas.name);
+					else
+						m_measureController->disableStats(meas.name);
+				});
+		}
+	}
+	measureSection->header()->setChecked(false);
+
+	connect(this, &MeasureManagerInterface::toggleAllMeasurement, measureSelector,
+		&MeasurementSelector::toggleAllMeasurement);
+	connect(this, &MeasureManagerInterface::toggleAllStats, measureSelector, &MeasurementSelector::toggleAllStats);
+
+	return measureContainer;
+}
+
 /*
 
 static const std::map<int, QString> icons_spect = {
