@@ -290,7 +290,7 @@ bool M2kPlugin::loadPreferencesPage()
 	lay->addSpacerItem(new QSpacerItem(0, 0, QSizePolicy::Minimum, QSizePolicy::Expanding));
 
 	logicSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
-		p, "m2k_logic_separate_annotations", "Separate decoder annotaions when exporting", logicSection));
+		p, "m2k_logic_separate_annotations", "Separate decoder annotations when exporting", logicSection));
 	logicSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
 		p, "m2k_logic_display_sampling_points", "Display sampling points when zoomed", logicSection));
 	logicSection->contentLayout()->addWidget(PreferencesHelper::addPreferenceCheckBox(
