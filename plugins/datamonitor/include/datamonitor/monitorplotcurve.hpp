@@ -18,24 +18,19 @@ public:
 	void clearCurveData();
 	void refreshCurve();
 	void toggleActive(bool toggled);
-	void setCurveAxisVisible(bool visible);
-	void updateAxisIntervalMin(double min);
-	void updateAxisIntervalMax(double max);
-	void togglePlotAxisVisible(bool toggle);
 	void changeCurveStyle(int style);
-	const QwtAxisId getAxisId();
+	void changeCurveThickness(double thickness);
 
 	PlotChannel *plotch() const;
-
-signals:
+	int curveStyleIndex() const;
+	double curveMinVal();
+	double curveMaxVal();
 
 private:
 	PlotChannel *m_plotch;
 	PlotAxis *chPlotAxis;
-	QVector<double> *ydata;
-	QVector<double> *xdata;
-	double yAxisMin;
-	double yAxisMax;
+	int m_curveStyleIndex;
+	DataMonitorModel *m_dataMonitorModel;
 };
 } // namespace datamonitor
 } // namespace scopy
