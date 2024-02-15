@@ -2,6 +2,7 @@
 
 #include <QDebug>
 #include <QScrollArea>
+#include <QTimer>
 #include <datamonitorstylehelper.hpp>
 #include <datamonitorutils.hpp>
 #include <menucollapsesection.h>
@@ -43,154 +44,104 @@ void DataMonitorSettings::init(QString title, QColor color)
 	scrollArea->setWidget(settingsBody);
 	mainLayout->addWidget(scrollArea);
 
-	// YAxis settings
-	QWidget *yaxismenu = generateYAxisSettings(this);
-	layout->addWidget(yaxismenu);
-
-	MenuSectionWidget *plotSection = new MenuSectionWidget(this);
-	layout->addWidget(plotSection);
-
-	plotSwitch = new MenuOnOffSwitch("Plot", plotSection, false);
-	plotSwitch->onOffswitch()->setChecked(true);
-	plotSection->contentLayout()->addWidget(plotSwitch);
-
-	plotSize = new MenuComboWidget("Plot Size (s)", plotSection);
-	plotSize->combo()->addItem(QString("1"));
-	plotSize->combo()->addItem(QString("10"));
-	plotSize->combo()->addItem(QString("60"));
-	plotSize->combo()->setCurrentIndex(1);
-
-	connect(plotSize->combo(), &QComboBox::currentTextChanged, this,
-		[=](QString newTimeValue) { Q_EMIT changeTimePeriod(newTimeValue.toInt()); });
-
-	plotSection->contentLayout()->addWidget(plotSize);
-
-	MenuSectionWidget *peakHolderSection = new MenuSectionWidget(this);
-	peakHolderSection->contentLayout()->setSpacing(10);
-	layout->addWidget(peakHolderSection);
-
-	peakHolderSwitch = new MenuOnOffSwitch("Peak Holder ", peakHolderSection, false);
-	peakHolderSwitch->onOffswitch()->setChecked(true);
-	peakHolderReset = new QPushButton("Reset", peakHolderSection);
-
-	peakHolderSection->contentLayout()->addWidget(peakHolderSwitch);
-	peakHolderSection->contentLayout()->addWidget(peakHolderReset);
-
-	connect(plotSwitch->onOffswitch(), &QAbstractButton::toggled, this, &DataMonitorSettings::togglePlot);
-	connect(peakHolderReset, &QPushButton::clicked, this, &DataMonitorSettings::resetPeakHolder);
-	connect(peakHolderSwitch->onOffswitch(), &QAbstractButton::toggled, this,
-		&DataMonitorSettings::togglePeakHolder);
-	connect(plotSize->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&DataMonitorSettings::plotSizeIndexChanged);
-
 	MenuSectionWidget *removeMonitorSection = new MenuSectionWidget(this);
 	layout->addWidget(removeMonitorSection);
 
-	deleteMonitor = new QPushButton("Remove monitor");
+	deleteMonitor = new QPushButton("Delete monitor view");
 	removeMonitorSection->contentLayout()->addWidget(deleteMonitor);
 	connect(deleteMonitor, &QPushButton::clicked, this, &DataMonitorSettings::removeMonitor);
+
+	MenuSectionWidget *togglePlotContainer = new MenuSectionWidget(this);
+
+	plotSwitch = new MenuOnOffSwitch("Toggle Plot ", togglePlotContainer, false);
+	plotSwitch->onOffswitch()->setChecked(true);
+
+	togglePlotContainer->contentLayout()->addWidget(plotSwitch);
+	layout->addWidget(togglePlotContainer);
+
+	connect(plotSwitch->onOffswitch(), &QAbstractButton::toggled, this, &DataMonitorSettings::togglePlot);
+
+	// XAxis settings
+	layout->addWidget(generateXAxisSettings(this));
+	// YAxis settings
+	layout->addWidget(generateYAxisSettings(this));
+
+	layout->addWidget(createCurveMenu(this));
 
 	DataMonitorStyleHelper::DataMonitorSettingsStyle(this);
 }
 
-void DataMonitorSettings::peakHolderToggle(bool toggled) { peakHolderSwitch->onOffswitch()->setChecked(toggled); }
-
 void DataMonitorSettings::plotToggle(bool toggled) { plotSwitch->onOffswitch()->setChecked(toggled); }
 
-void DataMonitorSettings::peakHolderResetClicked() { peakHolderReset->click(); }
+void DataMonitorSettings::changeCurveStyle(int index) { Q_EMIT curveStyleIndexChanged(index); }
 
-void DataMonitorSettings::changeLineStyle(int index)
+void DataMonitorSettings::addMonitorsList(QMap<QString, DataMonitorModel *> *monitorList)
 {
-	Q_EMIT lineStyleIndexChanged(mainMonitorCombo->combo()->currentText(), index);
-}
-
-void DataMonitorSettings::addMonitorsList(QList<QString> monitorList)
-{
-	monitorsCheckboxList = new QList<QPair<QString, QCheckBox *>>();
-	activeMonitors = new QList<QString>;
 
 	MenuSectionWidget *selectMonitorsWidgets = new MenuSectionWidget(this);
 
-	mainMonitorCombo = new MenuComboWidget("Main Monitor", selectMonitorsWidgets);
-	selectMonitorsWidgets->contentLayout()->addWidget(mainMonitorCombo);
-
 	layout->addWidget(selectMonitorsWidgets);
 
-	selectMonitorsWidgets->contentLayout()->addWidget(new QLabel("Toggle monitors: "));
+	selectMonitorsWidgets->contentLayout()->addWidget(new QLabel("Available monitors: "));
 
-	for(int i = 0; i < monitorList.length(); i++) {
-		addMonitor(monitorList.at(i));
+	monitorsGroup = new QButtonGroup(this);
+
+	foreach(QString monitor, monitorList->keys()) {
+		addMonitor(monitor, monitorList->value(monitor)->getColor());
 	}
-
-	mainMonitorCombo->combo()->setCurrentIndex(0);
-
-	connect(mainMonitorCombo->combo(), &QComboBox::currentTextChanged, this,
-		&DataMonitorSettings::mainMonitorChanged);
 
 	QSpacerItem *spacer = new QSpacerItem(10, 10, QSizePolicy::Preferred, QSizePolicy::Expanding);
 	layout->addItem(spacer);
 }
 
-void DataMonitorSettings::addMonitor(QString monitor)
+void DataMonitorSettings::addMonitor(QString monitor, QColor monitorColor)
 {
 	auto dev = monitor.split(":")[0];
 
 	if(!deviceMap.contains(dev)) {
-		// TODO move to function
-		CollapsableMenuControlButton *devMontirosCtrl = new CollapsableMenuControlButton(this);
-		devMontirosCtrl->getControlBtn()->setName(dev);
-		devMontirosCtrl->getControlBtn()->setOpenMenuChecksThis(true);
-		devMontirosCtrl->getControlBtn()->setDoubleClickToOpenMenu(true);
-		devMontirosCtrl->getControlBtn()->button()->setVisible(false);
-		devMontirosCtrl->getControlBtn()->checkBox()->setChecked(false);
-
-		layout->addWidget(devMontirosCtrl);
-
-		MenuSectionWidget *activeMonitorsWidget = new MenuSectionWidget(devMontirosCtrl);
-
-		activeMonitorsWidget->setVisible(false);
-		activeMonitorsWidget->contentLayout()->setSpacing(4);
-
-		connect(devMontirosCtrl->getControlBtn()->checkBox(), &QCheckBox::toggled, activeMonitorsWidget,
-			&QWidget::setVisible);
-
-		devMontirosCtrl->add(activeMonitorsWidget);
-
-		deviceMap.insert(dev, activeMonitorsWidget);
+		generateDeviceSection(dev);
 	}
 
-	QCheckBox *select = new QCheckBox(deviceMap.value(dev));
-	deviceMap.value(dev)->contentLayout()->addWidget(select);
-	select->setText(monitor);
+	MenuControlButton *monitorChannel = new MenuControlButton(deviceMap.value(dev));
+	deviceMap.value(dev)->contentLayout()->addWidget(monitorChannel);
+	monitorChannel->setName(monitor);
+	monitorChannel->setCheckBoxStyle(MenuControlButton::CS_CIRCLE);
+	monitorChannel->setOpenMenuChecksThis(true);
+	monitorChannel->setColor(monitorColor);
+	monitorChannel->button()->setVisible(false);
+	monitorChannel->setCheckable(false);
 
-	monitorsCheckboxList->push_back(qMakePair(monitor, select));
+	monitorsGroup->addButton(monitorChannel);
 
-	connect(select, &QCheckBox::toggled, this, [=](bool toggled) {
-		if(toggled) {
-			activeMonitors->append(monitor);
-		} else {
-			activeMonitors->removeAt(activeMonitors->indexOf(monitor));
-		}
-		if(mainMonitorCombo->combo()->count() > 0) {
-			mainMonitorCombo->combo()->blockSignals(true);
-		}
+	// apply hover to the buttons based on the color they have
+	// ?? hover as option for MenuControlButton
+	monitorChannel->setStyleSheet(QString(":hover{ background-color: %1 ; }").arg(monitorColor.name()));
 
-		mainMonitorCombo->combo()->clear();
-		mainMonitorCombo->combo()->addItems(*activeMonitors);
-		mainMonitorCombo->combo()->blockSignals(false);
+	connect(monitorChannel, &MenuControlButton::clicked, monitorChannel->checkBox(), &QCheckBox::toggle);
 
-		Q_EMIT monitorToggled(toggled, QString(monitor));
-	});
+	connect(monitorChannel->checkBox(), &QCheckBox::toggled, this,
+		[=](bool toggled) { Q_EMIT monitorToggled(toggled, monitor); });
+}
+
+void DataMonitorSettings::generateDeviceSection(QString device)
+{
+	MenuSectionWidget *devMontirosContainer = new MenuSectionWidget(this);
+
+	MenuCollapseSection *devMonitorsSection =
+		new MenuCollapseSection(device, MenuCollapseSection::MHCW_NONE, devMontirosContainer);
+	devMontirosContainer->contentLayout()->addWidget(devMonitorsSection);
+	layout->addWidget(devMontirosContainer);
+
+	devMonitorsSection->header()->setChecked(false);
+
+	deviceMap.insert(device, devMonitorsSection);
 }
 
 void DataMonitorSettings::updateTitle(QString title) { header->label()->setText(title); }
 
-void DataMonitorSettings::updateMainMonitor(QString monitorName)
-{
-	mainMonitorCombo->combo()->setCurrentText(monitorName);
-}
+void DataMonitorSettings::plotYAxisMinValueUpdate(double value) { m_ymin->setValue(value); }
 
-QList<QString> *DataMonitorSettings::getActiveMonitors() { return activeMonitors; }
+void DataMonitorSettings::plotYAxisMaxValueUpdate(double value) { m_ymax->setValue(value); }
 
 Qt::PenStyle DataMonitorSettings::lineStyleFromIdx(int idx)
 {
@@ -211,13 +162,16 @@ Qt::PenStyle DataMonitorSettings::lineStyleFromIdx(int idx)
 
 QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 {
-	MenuSectionWidget *yaxiscontainer = new MenuSectionWidget(parent);
+	MenuSectionWidget *yaxisContainer = new MenuSectionWidget(parent);
 	MenuCollapseSection *yAxisSection =
-		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxiscontainer);
+		new MenuCollapseSection("Y-AXIS", MenuCollapseSection::MHCW_NONE, yaxisContainer);
 
-	yaxiscontainer->contentLayout()->addWidget(yAxisSection);
+	yaxisContainer->contentLayout()->addWidget(yAxisSection);
 
 	MenuOnOffSwitch *autoscale = new MenuOnOffSwitch(tr("AUTOSCALE"), yAxisSection, false);
+
+	QTimer *m_autoScaleTimer = new QTimer(this);
+	m_autoScaleTimer->setInterval(1000);
 
 	yAxisSection->contentLayout()->addWidget(autoscale);
 
@@ -239,7 +193,7 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 		},
 		"YMin", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, yMinMax);
 
-	m_ymin->setValue(DataMonitorUtils::getYAxisDefaultMinValue());
+	m_ymin->setValue(DataMonitorUtils::getAxisDefaultMinValue());
 
 	m_ymax = new PositionSpinButton(
 		{
@@ -250,41 +204,125 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 		},
 		"YMax", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, yMinMax);
 
-	m_ymax->setValue(DataMonitorUtils::getYAxisDefaultMaxValue());
+	m_ymax->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
 
 	yMinMaxLayout->addWidget(m_ymin);
 	yMinMaxLayout->addWidget(m_ymax);
 
 	yAxisSection->contentLayout()->addWidget(yMinMax);
 
-	MenuComboWidget *plotStyle = new MenuComboWidget("Curve Style", yAxisSection);
-	plotStyle->combo()->addItem("Lines", PlotChannel::PCS_LINES);
-	plotStyle->combo()->addItem("Dots", PlotChannel::PCS_DOTS);
-	plotStyle->combo()->addItem("Steps", PlotChannel::PCS_STEPS);
-	plotStyle->combo()->addItem("Sticks", PlotChannel::PCS_STICKS);
-	plotStyle->combo()->addItem("Smooth", PlotChannel::PCS_SMOOTH);
-	plotStyle->combo()->setCurrentIndex(0);
-
-	yAxisSection->contentLayout()->addWidget(plotStyle);
+	connect(m_autoScaleTimer, &QTimer::timeout, this, &DataMonitorSettings::requestYMinMaxValues);
 
 	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, yMinMax, [=](bool toggled) {
-		plotYAxisAutoscaleToggled(mainMonitorCombo->combo()->currentText(), toggled);
+		plotYAxisAutoscale(toggled);
 		yMinMax->setEnabled(!toggled);
+		if(toggled) {
+			m_autoScaleTimer->start();
+		} else {
+			m_autoScaleTimer->stop();
+		}
 	});
 
 	connect(m_ymin, &PositionSpinButton::valueChanged, this, [=](double value) {
-		Q_EMIT plotYAxisMinValueChange(mainMonitorCombo->combo()->currentText(), value);
+		Q_EMIT plotYAxisMinValueChange(value);
 		m_ymax->setMinValue(value);
 	});
 	connect(m_ymax, &PositionSpinButton::valueChanged, this, [=](double value) {
-		Q_EMIT plotYAxisMaxValueChange(mainMonitorCombo->combo()->currentText(), value);
+		Q_EMIT plotYAxisMaxValueChange(value);
 		m_ymin->setMaxValue(value);
 	});
 
-	connect(plotStyle->combo(), QOverload<int>::of(&QComboBox::currentIndexChanged), this,
-		&DataMonitorSettings::changeLineStyle);
+	return yaxisContainer;
+}
 
-	// create value checked for min and max so min < max and max > min
+QWidget *DataMonitorSettings::generateXAxisSettings(QWidget *parent)
+{
+	MenuSectionWidget *xAxisContainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *xAxisSection =
+		new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xAxisContainer);
 
-	return yaxiscontainer;
+	xAxisContainer->contentLayout()->addWidget(xAxisSection);
+
+	// X-MIN-MAX
+	QWidget *xMinMax = new QWidget(xAxisSection);
+	QHBoxLayout *xMinMaxLayout = new QHBoxLayout(xMinMax);
+	xMinMaxLayout->setMargin(0);
+	xMinMaxLayout->setSpacing(10);
+	xMinMax->setLayout(xMinMaxLayout);
+
+	// TODO replace UM with the unit of measure of main monitor
+
+	m_xmin = new PositionSpinButton(
+		{
+			{"s", 1},
+			{"min", 60},
+		},
+		"XMin", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, xMinMax);
+
+	m_xmin->setValue(DataMonitorUtils::getAxisDefaultMinValue());
+
+	m_xmax = new PositionSpinButton(
+		{
+			{"s", 1},
+			{"min", 60},
+		},
+		"XMax", (double)((long)(-1 << 31)), (double)((long)1 << 31), false, false, xMinMax);
+
+	m_xmax->setValue(DataMonitorUtils::getAxisDefaultMaxValue());
+
+	xMinMaxLayout->addWidget(m_xmin);
+	xMinMaxLayout->addWidget(m_xmax);
+
+	xAxisSection->contentLayout()->addWidget(xMinMax);
+
+	connect(m_xmin, &PositionSpinButton::valueChanged, this, [=](double value) {
+		Q_EMIT plotXAxisMinValueChange(value);
+		m_ymax->setMinValue(value);
+	});
+	connect(m_xmax, &PositionSpinButton::valueChanged, this, [=](double value) {
+		Q_EMIT plotXAxisMaxValueChange(value);
+		m_ymin->setMaxValue(value);
+	});
+
+	return xAxisContainer;
+}
+
+QWidget *DataMonitorSettings::createCurveMenu(QWidget *parent)
+{
+	MenuSectionWidget *curvecontainer = new MenuSectionWidget(parent);
+	MenuCollapseSection *curve = new MenuCollapseSection("CURVE", MenuCollapseSection::MHCW_NONE, curvecontainer);
+
+	QWidget *curveSettings = new QWidget(curve);
+	QHBoxLayout *curveSettingsLay = new QHBoxLayout(curveSettings);
+	curveSettingsLay->setMargin(0);
+	curveSettingsLay->setSpacing(10);
+	curveSettings->setLayout(curveSettingsLay);
+
+	MenuCombo *cbThicknessW = new MenuCombo("Thickness", curve);
+	auto cbThickness = cbThicknessW->combo();
+	cbThickness->addItem("1");
+	cbThickness->addItem("2");
+	cbThickness->addItem("3");
+	cbThickness->addItem("4");
+	cbThickness->addItem("5");
+
+	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this,
+		[=](int idx) { Q_EMIT changeCurveThickness(cbThickness->itemText(idx).toFloat()); });
+	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
+	auto cbStyle = cbStyleW->combo();
+	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
+	cbStyle->addItem("Dots", PlotChannel::PCS_DOTS);
+	cbStyle->addItem("Steps", PlotChannel::PCS_STEPS);
+	cbStyle->addItem("Sticks", PlotChannel::PCS_STICKS);
+	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
+	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
+
+	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this, &DataMonitorSettings::changeCurveStyle);
+
+	curveSettingsLay->addWidget(cbThicknessW);
+	curveSettingsLay->addWidget(cbStyleW);
+	curve->contentLayout()->addWidget(curveSettings);
+	curvecontainer->contentLayout()->addWidget(curve);
+
+	return curvecontainer;
 }

@@ -98,13 +98,21 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 		tool->rightStack()->add(QString::number(controllerId), dataMonitorController->dataMonitorSettings());
 
-		tool->openRightContainerHelper(true);
-		tool->requestMenu(QString::number(controllerId));
-
 		// toggle active monitors
 		connect(dataMonitorController->dataMonitorView(), &DataMonitorView::widgetClicked, this, [=]() {
+			tool->openRightContainerHelper(true);
+			tool->requestMenu(QString::number(controllerId));
 			// TODO toggle menu for the montiro
 			dataMonitorController->dataMonitorView()->toggleSelected();
+			// TODO handle active monitor
+		});
+
+		// remove the monitor
+		connect(dataMonitorController->dataMonitorSettings(), &DataMonitorSettings::removeMonitor, [=]() {
+			m_flexGridLayout->removeWidget(controllerId);
+			tool->rightStack()->remove(QString::number(controllerId));
+			tool->openRightContainerHelper(false);
+			delete dataMonitorController;
 		});
 	});
 

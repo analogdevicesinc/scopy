@@ -7,6 +7,8 @@ DataMonitorUtils::DataMonitorUtils(QObject *parent)
 	: QObject{parent}
 {}
 
-double DataMonitorUtils::getYAxisDefaultMinValue() { return 0; }
+double DataMonitorUtils::getAxisDefaultMinValue() { return 0; }
 
-double DataMonitorUtils::getYAxisDefaultMaxValue() { return 10; }
+double DataMonitorUtils::getAxisDefaultMaxValue() { return 10; }
+
+double DataMonitorUtils::getXAxisDefaultViewPortSize() { return 10; }
