@@ -19,9 +19,6 @@ void DMMReadStrategy::read()
 	double scale = 0;
 	int readScale = iio_channel_attr_read_double(chn, "scale", &scale);
 
-	double offset = 0;
-	int readOffset = iio_channel_attr_read_double(chn, "offset", &offset);
-
 	if(readRaw < 0) {
 		char err[1024];
 		iio_strerror(-(int)readRaw, err, sizeof(err));
@@ -31,14 +28,14 @@ void DMMReadStrategy::read()
 		char err[1024];
 		iio_strerror(-(int)readScale, err, sizeof(err));
 		qDebug() << "device read error " << err;
-	} else if(readOffset < 0) {
-		char err[1024];
-		iio_strerror(-(int)readOffset, err, sizeof(err));
-		qDebug() << "device read error " << err;
 	} else {
-		double result = (raw + offset) * scale * m_umScale;
+		double result = (raw + m_offset) * scale * m_umScale;
 		qDebug() << "dmm read success  ";
 		testDataTime += 1;
 		Q_EMIT readDone(testDataTime, result);
 	}
 }
+
+double DMMReadStrategy::offset() const { return m_offset; }
+
+void DMMReadStrategy::setOffset(double newOffset) { m_offset = newOffset; }

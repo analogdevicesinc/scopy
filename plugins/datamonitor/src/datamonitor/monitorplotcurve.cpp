@@ -7,33 +7,28 @@ using namespace scopy;
 using namespace datamonitor;
 
 MonitorPlotCurve::MonitorPlotCurve(DataMonitorModel *dataMonitorModel, PlotWidget *plot, QObject *parent)
+	: m_dataMonitorModel(dataMonitorModel)
 {
-	yAxisMin = DataMonitorUtils::getYAxisDefaultMinValue();
-	yAxisMax = DataMonitorUtils::getYAxisDefaultMaxValue();
-
+	m_curveStyleIndex = 0;
 	QPen chpen = QPen(dataMonitorModel->getColor(), 1);
-	chPlotAxis = new PlotAxis(QwtAxis::YLeft, plot, chpen);
 
-	plot->plot()->setAxisScale(chPlotAxis->axisId(), yAxisMin, yAxisMax);
-
-	m_plotch = new PlotChannel(dataMonitorModel->getName(), chpen, plot, plot->xAxis(), chPlotAxis, this);
+	m_plotch = new PlotChannel(dataMonitorModel->getName(), chpen, plot, plot->xAxis(), plot->yAxis(), this);
 	m_plotch->setEnabled(true);
 
-	xdata = dataMonitorModel->getXdata();
-	ydata = dataMonitorModel->getYdata();
-
-	m_plotch->curve()->setRawSamples(xdata->data(), ydata->data(), ydata->size());
+	m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(), m_dataMonitorModel->getYdata()->data(),
+					 m_dataMonitorModel->getYdata()->size());
 
 	connect(dataMonitorModel, &DataMonitorModel::valueUpdated, plot, [=]() {
-		m_plotch->curve()->setRawSamples(xdata->data(), ydata->data(), ydata->size());
+		m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(),
+						 m_dataMonitorModel->getYdata()->data(),
+						 m_dataMonitorModel->getYdata()->size());
 		plot->replot();
 	});
 }
 
-void MonitorPlotCurve::togglePlotAxisVisible(bool toggle) { chPlotAxis->setVisible(toggle); }
-
 void MonitorPlotCurve::changeCurveStyle(int style)
 {
+	m_curveStyleIndex = style;
 	m_plotch->curve()->setPaintAttribute(QwtPlotCurve::ClipPolygons, true);
 	m_plotch->curve()->setCurveAttribute(QwtPlotCurve::Fitted, false);
 
@@ -58,9 +53,12 @@ void MonitorPlotCurve::changeCurveStyle(int style)
 	}
 }
 
+void MonitorPlotCurve::changeCurveThickness(double thickness) { m_plotch->setThickness(thickness); }
+
 void MonitorPlotCurve::clearCurveData()
 {
-	m_plotch->curve()->setRawSamples(xdata->data(), ydata->data(), ydata->size());
+	m_plotch->curve()->setRawSamples(m_dataMonitorModel->getXdata()->data(), m_dataMonitorModel->getYdata()->data(),
+					 m_dataMonitorModel->getYdata()->size());
 }
 
 void MonitorPlotCurve::refreshCurve()
@@ -71,12 +69,10 @@ void MonitorPlotCurve::refreshCurve()
 
 void MonitorPlotCurve::toggleActive(bool toggled) { m_plotch->setEnabled(toggled); }
 
-void MonitorPlotCurve::setCurveAxisVisible(bool visible) { m_plotch->yAxis()->setVisible(visible); }
-
-void MonitorPlotCurve::updateAxisIntervalMin(double min) { m_plotch->yAxis()->setMin(min); }
-
-void MonitorPlotCurve::updateAxisIntervalMax(double max) { m_plotch->yAxis()->setMax(max); }
-
-const QwtAxisId MonitorPlotCurve::getAxisId() { return m_plotch->yAxis()->axisId(); }
-
 PlotChannel *MonitorPlotCurve::plotch() const { return m_plotch; }
+
+int MonitorPlotCurve::curveStyleIndex() const { return m_curveStyleIndex; }
+
+double MonitorPlotCurve::curveMinVal() { return m_dataMonitorModel->minValue(); }
+
+double MonitorPlotCurve::curveMaxVal() { return m_dataMonitorModel->maxValue(); }

@@ -15,21 +15,34 @@ DataMonitorController::DataMonitorController(DataAcquisitionManager *dataAcquisi
 	m_dataMonitorSettings->init(m_dataMonitorView->getTitle(), StyleHelper::getColor("ScopyBlue"));
 
 	// populate available monitors list in settings
-	m_dataMonitorSettings->addMonitorsList(m_dataAcquisitionManager->getDataMonitorMap()->keys());
+	m_dataMonitorSettings->addMonitorsList(m_dataAcquisitionManager->getDataMonitorMap());
 
 	// plot settings
-	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisAutoscaleToggled,
-		m_dataMonitorView->monitorPlot(), &MonitorPlot::plotYAxisAutoscaleToggled);
+
+	connect(m_dataMonitorSettings, &DataMonitorSettings::requestYMinMaxValues, this, [=]() {
+		m_dataMonitorView->monitorPlot()->plotYAxisAutoscale();
+
+		m_dataMonitorSettings->plotYAxisMinValueUpdate(m_dataMonitorView->monitorPlot()->getYAxisIntervalMin());
+		m_dataMonitorSettings->plotYAxisMaxValueUpdate(m_dataMonitorView->monitorPlot()->getYAxisIntervalMax());
+	});
+
+	connect(m_dataMonitorSettings, &DataMonitorSettings::plotXAxisMinValueChange, m_dataMonitorView->monitorPlot(),
+		&MonitorPlot::updateXAxisIntervalMin);
+	connect(m_dataMonitorSettings, &DataMonitorSettings::plotXAxisMaxValueChange, m_dataMonitorView->monitorPlot(),
+		&MonitorPlot::updateXAxisIntervalMax);
+
+	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisAutoscale, m_dataMonitorView->monitorPlot(),
+		&MonitorPlot::plotYAxisAutoscale);
 	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisMinValueChange, m_dataMonitorView->monitorPlot(),
 		&MonitorPlot::updateYAxisIntervalMin);
 	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisMaxValueChange, m_dataMonitorView->monitorPlot(),
 		&MonitorPlot::updateYAxisIntervalMax);
 
-	connect(m_dataMonitorSettings, &DataMonitorSettings::changeTimePeriod, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::updateXAxis);
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::lineStyleIndexChanged, m_dataMonitorView->monitorPlot(),
+	connect(m_dataMonitorSettings, &DataMonitorSettings::curveStyleIndexChanged, m_dataMonitorView->monitorPlot(),
 		&MonitorPlot::changeCurveStyle);
+
+	connect(m_dataMonitorSettings, &DataMonitorSettings::changeCurveThickness, m_dataMonitorView->monitorPlot(),
+		&MonitorPlot::changeCurveThickness);
 
 	connect(m_dataMonitorSettings, &DataMonitorSettings::monitorToggled, m_dataMonitorView->monitorPlot(),
 		[=](bool toggled, QString monitorName) {
@@ -37,39 +50,20 @@ DataMonitorController::DataMonitorController(DataAcquisitionManager *dataAcquisi
 			m_dataAcquisitionManager->updateActiveMonitors(toggled, monitorName);
 
 			// handle monitor on plot
-			if(m_dataMonitorView->monitorPlot()->hasMonitor(monitorName)) {
-				m_dataMonitorView->monitorPlot()->toggleMonitor(toggled, monitorName);
-
-			} else {
+			if(toggled) {
 				m_dataMonitorView->monitorPlot()->addMonitor(
 					m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName));
+			} else {
+				m_dataMonitorView->monitorPlot()->removeMonitor(monitorName);
 			}
 		});
 
 	// view settings
 	connect(m_dataMonitorSettings, &DataMonitorSettings::togglePlot, m_dataMonitorView,
 		&DataMonitorView::togglePlot);
-	connect(m_dataMonitorSettings, &DataMonitorSettings::togglePeakHolder, m_dataMonitorView,
-		&DataMonitorView::togglePeakHolder);
+
 	connect(m_dataMonitorView, &DataMonitorView::titleChanged, m_dataMonitorSettings,
 		&DataMonitorSettings::updateTitle);
-
-	// devide in 2 connects one for plot one for view
-	connect(m_dataMonitorSettings, &DataMonitorSettings::mainMonitorChanged, m_dataMonitorView,
-		[=](QString monitorName) {
-			// TODO disconnect old monitor connect to new monitor
-
-			m_dataMonitorView->configureMonitor(
-				m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName));
-
-			disconnect(m_dataMonitorSettings, &DataMonitorSettings::resetPeakHolder,
-				   m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName),
-				   &DataMonitorModel::resetMinMax);
-
-			connect(m_dataMonitorSettings, &DataMonitorSettings::resetPeakHolder,
-				m_dataAcquisitionManager->getDataMonitorMap()->value(monitorName),
-				&DataMonitorModel::resetMinMax);
-		});
 }
 
 DataMonitorController::~DataMonitorController() {}

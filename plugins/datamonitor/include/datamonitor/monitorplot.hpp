@@ -27,25 +27,25 @@ public:
 	void toggleMonitor(bool toggled, QString monitorName);
 	bool hasMonitor(QString title);
 
-	void changeCurveStyle(QString monitorName, int style);
+	void changeCurveStyle(int style);
+	void changeCurveThickness(double thickness);
 
-	void setMainMonitor(QString newMainMonitor);
-	void clearMonitor();
-
-	void updateXAxis(int newValue);
-	void updateYAxisIntervalMin(QString monitorName, double min);
-	void updateYAxisIntervalMax(QString monitorName, double max);
-
-	QString mainMonitor() const;
-
-	void plotYAxisAutoscaleToggled(QString monitorName, bool toggled);
+	void updateXAxisIntervalMin(double min);
+	void updateXAxisIntervalMax(double max);
+	void updateYAxisIntervalMin(double min);
+	void updateYAxisIntervalMax(double max);
+	void plotYAxisAutoscale();
+	double getYAxisIntervalMin();
+	double getYAxisIntervalMax();
 
 private:
 	PlotWidget *m_plot;
 	TimePlotInfo *m_plotInfo;
 	QMap<QString, MonitorPlotCurve *> *m_monitorCurves;
 	bool m_firstMonitor = true;
-	QString m_mainMonitor;
+
+	int m_currentCurveStyle = 0;
+	double m_currentCurveThickness = 1;
 };
 } // namespace datamonitor
 } // namespace scopy

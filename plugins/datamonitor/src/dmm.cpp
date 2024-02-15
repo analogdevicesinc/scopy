@@ -45,6 +45,13 @@ QList<DataMonitorModel *> DMM::getDmmMonitors(iio_context *ctx)
 					DMMReadStrategy *dmmReadStrategy = new DMMReadStrategy(dev, chn);
 					dmmReadStrategy->setUmScale(dmmInfo.umScale);
 					channelModel->setReadStrategy(dmmReadStrategy);
+
+					if(iioChannelHasAttribute(chn, "offset")) {
+						double offset = 0;
+						iio_channel_attr_read_double(chn, "offset", &offset);
+
+						dmmReadStrategy->setOffset(offset);
+					}
 				}
 
 				result.push_back(channelModel);
