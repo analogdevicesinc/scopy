@@ -12,8 +12,9 @@ class SCOPY_DATAMONITOR_EXPORT DataMonitorUtils : public QObject
 public:
 	explicit DataMonitorUtils(QObject *parent = nullptr);
 
-	static double getYAxisDefaultMinValue();
-	static double getYAxisDefaultMaxValue();
+	static double getAxisDefaultMinValue();
+	static double getAxisDefaultMaxValue();
+	static double getXAxisDefaultViewPortSize();
 };
 } // namespace datamonitor
 } // namespace scopy

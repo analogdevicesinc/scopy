@@ -5,6 +5,7 @@
 #include <menucombo.h>
 #include <menuheader.h>
 #include <menuonoffswitch.h>
+#include <monitorplotcurve.hpp>
 #include <spinbox_a.hpp>
 #include "scopy-datamonitor_export.h"
 #include "qloggingcategory.h"
@@ -12,6 +13,8 @@
 Q_DECLARE_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS)
 
 namespace scopy {
+
+class MenuCollapseSection;
 
 class MenuSectionWidget;
 
@@ -28,44 +31,43 @@ public:
 	void init(QString title, QColor color);
 
 public Q_SLOTS:
-	void peakHolderToggle(bool toggled);
 	void plotToggle(bool toggled);
-	void peakHolderResetClicked();
-	void changeLineStyle(int index);
-	void addMonitorsList(QList<QString> monitoList);
+	void changeCurveStyle(int index);
+	void addMonitorsList(QMap<QString, DataMonitorModel *> *monitoList);
 	void updateTitle(QString title);
-	void updateMainMonitor(QString monitorName);
-	QList<QString> *getActiveMonitors();
+	void plotYAxisMinValueUpdate(double value);
+	void plotYAxisMaxValueUpdate(double value);
 
 Q_SIGNALS:
 	void monitorColorChanged(QString color);
 	void togglePlot(bool toggled);
-	void changeTimePeriod(int newValue);
-	void lineStyleChanged(Qt::PenStyle lineStyle);
-	void lineStyleIndexChanged(QString monitorName, int index);
+	void curveStyleIndexChanged(int index);
+	void changeCurveThickness(double thickness);
 	void plotSizeIndexChanged(int index);
-	void resetPeakHolder();
-	void togglePeakHolder(bool toggled);
-	void toggleAll(bool toggle);
 	void monitorToggled(bool toggled, QString monitorName);
 	void removeMonitor();
-	void mainMonitorChanged(QString monitorName);
-	void plotYAxisAutoscaleToggled(QString monitorName, bool toggled);
-	void plotYAxisMinValueChange(QString monitorName, double value);
-	void plotYAxisMaxValueChange(QString monitorName, double value);
+	void plotYAxisAutoscale(bool toggled);
+	void plotYAxisMinValueChange(double value);
+	void plotYAxisMaxValueChange(double value);
+	void plotXAxisMinValueChange(double value);
+	void plotXAxisMaxValueChange(double value);
+	void requestYMinMaxValues();
 
 private:
 	Qt::PenStyle lineStyleFromIdx(int idx);
 	MenuOnOffSwitch *peakHolderSwitch;
 	MenuOnOffSwitch *plotSwitch;
 	QPushButton *peakHolderReset;
-	MenuComboWidget *plotSize;
 
 	PositionSpinButton *m_ymin;
 	PositionSpinButton *m_ymax;
+	PositionSpinButton *m_xmin;
+	PositionSpinButton *m_xmax;
 	QWidget *generateYAxisSettings(QWidget *parent);
+	QWidget *generateXAxisSettings(QWidget *parent);
+	QWidget *createCurveMenu(QWidget *parent);
 
-	MenuComboWidget *mainMonitorCombo;
+	// MenuComboWidget *mainMonitorCombo;
 	QPushButton *deleteMonitor;
 
 	MenuHeaderWidget *header;
@@ -74,14 +76,12 @@ private:
 	QWidget *settingsBody;
 	QVBoxLayout *mainLayout;
 
-	QList<QPair<QString, QCheckBox *>> *monitorsCheckboxList;
+	QButtonGroup *monitorsGroup;
 
-	// activeMonitors dropdown
-	QList<QString> *activeMonitors;
+	QMap<QString, MenuCollapseSection *> deviceMap;
 
-	QMap<QString, MenuSectionWidget *> deviceMap;
-
-	void addMonitor(QString monitor);
+	void addMonitor(QString monitor, QColor monitorColor);
+	void generateDeviceSection(QString device);
 };
 } // namespace datamonitor
 } // namespace scopy

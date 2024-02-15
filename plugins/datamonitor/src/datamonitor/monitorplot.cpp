@@ -1,6 +1,7 @@
 #include "monitorplot.hpp"
 
 #include <cursorcontroller.h>
+#include <datamonitorutils.hpp>
 #include <monitorplotcurve.hpp>
 #include <plotinfo.h>
 
@@ -19,9 +20,13 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 
 	m_plot = new PlotWidget(this);
 
-	// TODO set this and set autoscale
-	m_plot->xAxis()->setInterval(0, 10);
+	m_plot->xAxis()->setInterval(DataMonitorUtils::getAxisDefaultMaxValue(),
+				     DataMonitorUtils::getAxisDefaultMinValue());
 	m_plot->xAxis()->setVisible(true);
+
+	m_plot->yAxis()->setInterval(DataMonitorUtils::getAxisDefaultMinValue(),
+				     DataMonitorUtils::getAxisDefaultMaxValue());
+	m_plot->yAxis()->setVisible(true);
 
 	m_plotInfo = new TimePlotInfo(m_plot, this);
 
@@ -32,8 +37,6 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 	layout->addWidget(status);
 
 	m_monitorCurves = new QMap<QString, MonitorPlotCurve *>();
-
-	m_mainMonitor = "";
 }
 
 PlotWidget *MonitorPlot::plot() const { return m_plot; }
@@ -41,14 +44,9 @@ PlotWidget *MonitorPlot::plot() const { return m_plot; }
 void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 {
 	MonitorPlotCurve *plotCurve = new MonitorPlotCurve(dataMonitorModel, m_plot);
+	plotCurve->changeCurveStyle(m_currentCurveStyle);
+	plotCurve->changeCurveThickness(m_currentCurveThickness);
 
-	// ?? move to function
-	if(m_mainMonitor.isEmpty()) {
-		m_mainMonitor = dataMonitorModel->getName();
-		plotCurve->togglePlotAxisVisible(true);
-	}
-
-	// TODO CLEAR PLOT ON CLEAR DATA
 	connect(dataMonitorModel, &DataMonitorModel::dataCleared, this, [=]() {
 		plotCurve->clearCurveData();
 		m_plot->replot();
@@ -61,9 +59,11 @@ void MonitorPlot::addMonitor(DataMonitorModel *dataMonitorModel)
 
 void MonitorPlot::removeMonitor(QString monitorName)
 {
-	m_plot->removePlotChannel(m_monitorCurves->value(monitorName)->plotch());
-	m_monitorCurves->remove(monitorName);
-	delete m_monitorCurves->value(monitorName);
+	if(m_monitorCurves->contains(monitorName)) {
+		m_plot->removePlotChannel(m_monitorCurves->value(monitorName)->plotch());
+		m_monitorCurves->remove(monitorName);
+		delete m_monitorCurves->value(monitorName);
+	}
 }
 
 void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
@@ -76,55 +76,67 @@ void MonitorPlot::toggleMonitor(bool toggled, QString monitorName)
 
 bool MonitorPlot::hasMonitor(QString title) { return m_monitorCurves->contains(title); }
 
-void MonitorPlot::changeCurveStyle(QString monitorName, int style)
+void MonitorPlot::changeCurveStyle(int style)
 {
-	if(m_monitorCurves->contains(monitorName)) {
-		m_monitorCurves->value(monitorName)->changeCurveStyle(style);
-		m_plot->replot();
-	}
-}
-
-void MonitorPlot::setMainMonitor(QString newMainMonitor)
-{
-	if(m_monitorCurves->contains(newMainMonitor)) {
-		m_monitorCurves->value(newMainMonitor)->refreshCurve();
-		m_monitorCurves->value(newMainMonitor)->setCurveAxisVisible(true);
-		m_monitorCurves->value(m_mainMonitor)->setCurveAxisVisible(false);
-		m_mainMonitor = newMainMonitor;
+	m_currentCurveStyle = style;
+	foreach(QString curve, m_monitorCurves->keys()) {
+		m_monitorCurves->value(curve)->changeCurveStyle(style);
 	}
 	m_plot->replot();
 }
 
-void MonitorPlot::clearMonitor() {}
-
-void MonitorPlot::updateXAxis(int newValue)
+void MonitorPlot::changeCurveThickness(double thickness)
 {
-	m_plot->xAxis()->setInterval(0, newValue);
+	m_currentCurveThickness = thickness;
+	foreach(QString curve, m_monitorCurves->keys()) {
+		m_monitorCurves->value(curve)->changeCurveThickness(thickness);
+	}
 	m_plot->replot();
 }
 
-void MonitorPlot::updateYAxisIntervalMin(QString monitorName, double min)
+void MonitorPlot::updateXAxisIntervalMin(double min)
 {
-	if(m_monitorCurves->contains(monitorName)) {
-		m_monitorCurves->value(monitorName)->updateAxisIntervalMin(min);
-		m_plot->replot();
-	}
+	m_plot->xAxis()->setMax(min);
+	m_plot->replot();
 }
 
-void MonitorPlot::updateYAxisIntervalMax(QString monitorName, double max)
+void MonitorPlot::updateXAxisIntervalMax(double max)
 {
-	if(m_monitorCurves->contains(monitorName)) {
-		m_monitorCurves->value(monitorName)->updateAxisIntervalMax(max);
-		m_plot->replot();
-	}
+	m_plot->xAxis()->setMin(max);
+	m_plot->replot();
 }
 
-QString MonitorPlot::mainMonitor() const { return m_mainMonitor; }
-
-void MonitorPlot::plotYAxisAutoscaleToggled(QString monitorName, bool toggled)
+void MonitorPlot::updateYAxisIntervalMin(double min)
 {
-	if(m_monitorCurves->contains(monitorName)) {
-		m_plot->plot()->setAxisAutoScale(m_monitorCurves->value(m_mainMonitor)->getAxisId(), toggled);
-		m_plot->replot();
-	}
+	m_plot->yAxis()->setMin(min);
+	m_plot->replot();
 }
+
+void MonitorPlot::updateYAxisIntervalMax(double max)
+{
+	m_plot->yAxis()->setMax(max);
+	m_plot->replot();
+}
+
+void MonitorPlot::plotYAxisAutoscale()
+{
+	double max = getYAxisIntervalMin();
+	double min = getYAxisIntervalMax();
+
+	foreach(QString curve, m_monitorCurves->keys()) {
+		double curveMin = m_monitorCurves->value(curve)->curveMinVal();
+		double curveMax = m_monitorCurves->value(curve)->curveMaxVal();
+
+		if(max < curveMax)
+			max = curveMax;
+		if(min > curveMin)
+			min = curveMin;
+	}
+
+	updateYAxisIntervalMin(min);
+	updateYAxisIntervalMax(max);
+}
+
+double MonitorPlot::getYAxisIntervalMin() { return m_plot->yAxis()->min(); }
+
+double MonitorPlot::getYAxisIntervalMax() { return m_plot->yAxis()->max(); }
