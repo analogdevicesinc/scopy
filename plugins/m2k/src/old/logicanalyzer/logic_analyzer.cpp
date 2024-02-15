@@ -1582,7 +1582,7 @@ void LogicAnalyzer::activateRunButton(bool en)
 	}
 
 	enableRunButton(en);
-	getTme()->setEnabled(en);
+	getTme()->setRunBtnVisible(en);
 }
 
 void LogicAnalyzer::connectSignalsAndSlots()
@@ -2752,7 +2752,7 @@ void LogicAnalyzer::readPreferences()
 {
 
 	bool showFps = p->get("general_show_plot_fps").toBool();
-	m_tableInfo = p->get("m2k_logic_table_info").toBool(); // prefPanel->getTableInfo();
+	m_tableInfo = p->get("m2k_logic_display_sample_time").toBool(); // prefPanel->getTableInfo();
 	m_separateAnnotations =
 		p->get("m2k_logic_separate_annotations").toBool(); // prefPanel->getSeparateAnnotations();
 	m_plot.setVisibleFpsLabel(showFps);
