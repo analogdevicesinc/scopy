@@ -441,6 +441,74 @@ void PatternGenerator::updateAnnotationCurveChannelsForPattern(const QPair<QVect
 	}
 }
 
+
+scopy::HoverWidget *PatternGenerator::createHoverToolTip(QString info, QPoint position)
+{
+	QLabel *label = new QLabel(info);
+	label->setStyleSheet("QLabel {"
+			     "	font-weight: bold;"
+			     "	color: #FFFFFF;"
+			     "}");
+
+	QWidget *content = new QWidget();
+	content->setStyleSheet("QWidget {"
+			     "	background-color: #272730;"
+			     "}");
+
+	QHBoxLayout *layout = new QHBoxLayout(content);
+	layout->addWidget(label);
+
+	scopy::HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, QApplication::activeWindow());
+	toolTip->setAnchorPos(scopy::HoverPosition::HP_TOPLEFT);
+	toolTip->setContentPos(scopy::HoverPosition::HP_TOPLEFT);
+	toolTip->setAnchorOffset(position);
+
+	return toolTip;
+}
+
+void PatternGenerator::initDecoderToolTips()
+{
+	QTimer *timer = new QTimer(this);
+	timer->setInterval(500);
+	lastToolTipAnn = NULL;
+
+	connect(timer, &QTimer::timeout, this, [=]() {
+		QPoint pos = m_plot.mapFromGlobal(QCursor::pos());
+		if(!m_plot.underMouse()) {
+			lastToolTipAnn = NULL;
+			Q_EMIT deleteToolTips();
+			return;
+		}
+
+		GenericLogicPlotCurve *curve = m_plot.curveAt(pos);
+		if(curve) {
+			const QPointF curvePos = curve->screenPosToCurvePoint(pos);
+			const QString *annInfo =
+				&dynamic_cast<AnnotationCurve *>(curve)->annotationAt(curvePos).ann->annotations()[0];
+
+			if(lastToolTipAnn != annInfo) {
+				scopy::HoverWidget *toolTip = createHoverToolTip(*annInfo, pos);
+				QTimer::singleShot(500, [toolTip, annInfo, this]() {
+					if(toolTip && lastToolTipAnn == annInfo)
+						toolTip->show();
+				});
+				Q_EMIT deleteToolTips();
+
+				lastToolTipAnn = annInfo;
+				connect(this, &PatternGenerator::deleteToolTips, toolTip,
+					&scopy::HoverWidget::deleteLater);
+			}
+		} else {
+			if(lastToolTipAnn != NULL) {
+				Q_EMIT deleteToolTips();
+			}
+			lastToolTipAnn = NULL;
+		}
+	});
+
+	timer->start();
+}
+
 void PatternGenerator::patternSelected(const QString &pattern, int ch, const QString &json)
 {
 	int selected = ch != -1 ? ch : m_selectedChannel;
@@ -951,6 +1019,8 @@ void PatternGenerator::connectSignalsAndSlots()
 			m_ui->runSingleWidget->toggle(false);
 		}
 	});
+
+	initDecoderToolTips();
 }
 
 void PatternGenerator::updateChannelGroupWidget(bool visible)

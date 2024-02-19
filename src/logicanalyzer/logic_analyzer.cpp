@@ -1869,6 +1869,8 @@ void LogicAnalyzer::connectSignalsAndSlots()
 			}
 		}
 	});
+
+	initDecoderToolTips();
 }
 
 void LogicAnalyzer::triggerRightMenuToggle(CustomPushButton *btn, bool checked)
@@ -2009,32 +2011,6 @@ void LogicAnalyzer::initBufferScrolling()
 		m_horizOffset = 1.0 / m_sampleRate * m_bufferSize / 2.0 +
 				(ui->btnStreamOneShot ? 0 : m_timeTriggerOffset / m_sampleRate);
 	});
-
-	// When the plot is clicked emit the clicked signal on the curve
-	m_plot.setMouseTracking(true);
-	connect(&m_plot, &CapturePlot::mouseButtonPress, [=](const QMouseEvent *event) {
-		if (event == nullptr) return;
-
-		if (event->button() == Qt::LeftButton) {
-			const auto curve = m_plot.curveAt(event->pos());
-
-			if(curve) {
-				const QPointF curvePos = curve->screenPosToCurvePoint(event->pos());
-				const QString annInfo = dynamic_cast<AnnotationCurve *>(curve)
-								->annotationAt(curvePos)
-								.ann->annotations()[0];
-				scopy::HoverWidget *toolTip = createHoverToolTip(annInfo, event->pos());
-
-				QTimer::singleShot(2000, toolTip, &scopy::HoverWidget::deleteLater);
-				connect(&m_plot, &CapturePlot::mouseButtonRelease, toolTip, &scopy::HoverWidget::show);
-				connect(&m_plot, &CapturePlot::mouseButtonPress, toolTip, &scopy::HoverWidget::deleteLater);
-				connect(m_plot.getZoomer(), &OscPlotZoomer::zoomFinished, toolTip,
-					&scopy::HoverWidget::deleteLater);
-
-				Q_EMIT curve->clicked(curvePos);
-			}
-		}
-	});
 }
 
 
@@ -2060,6 +2036,49 @@ scopy::HoverWidget *LogicAnalyzer::createHoverToolTip(QString info, QPoint posit
 	toolTip->setAnchorOffset(position);
 
 	return toolTip;
+}
+
+void LogicAnalyzer::initDecoderToolTips()
+{
+	QTimer *timer = new QTimer(this);
+	timer->setInterval(500);
+	lastToolTipAnn = NULL;
+
+	connect(timer, &QTimer::timeout, this, [=]() {
+		QPoint pos = m_plot.mapFromGlobal(QCursor::pos());
+		if(!m_plot.underMouse()) {
+			lastToolTipAnn = NULL;
+			Q_EMIT deleteToolTips();
+			return;
+		}
+
+		GenericLogicPlotCurve *curve = m_plot.curveAt(pos);
+		if(curve) {
+			const QPointF curvePos = curve->screenPosToCurvePoint(pos);
+			const QString *annInfo =
+				&dynamic_cast<AnnotationCurve *>(curve)->annotationAt(curvePos).ann->annotations()[0];
+
+			if(lastToolTipAnn != annInfo) {
+				scopy::HoverWidget *toolTip = createHoverToolTip(*annInfo, pos);
+				QTimer::singleShot(500, [toolTip, annInfo, this]() {
+					if(toolTip && lastToolTipAnn == annInfo)
+						toolTip->show();
+				});
+				Q_EMIT deleteToolTips();
+
+				lastToolTipAnn = annInfo;
+				connect(this, &LogicAnalyzer::deleteToolTips, toolTip,
+					&scopy::HoverWidget::deleteLater);
+			}
+		} else {
+			if(lastToolTipAnn != NULL) {
+				Q_EMIT deleteToolTips();
+			}
+			lastToolTipAnn = NULL;
+		}
+	});
+
+	timer->start();
 }
 
 void LogicAnalyzer::fitViewport(double min, double max)

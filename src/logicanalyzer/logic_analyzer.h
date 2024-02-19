@@ -122,6 +122,7 @@ public: // Mixed Signal View Interface
 	int getGroupOffset();
 Q_SIGNALS:
 	void showTool();
+	void deleteToolTips();
 
 private Q_SLOTS:
 
@@ -183,6 +184,7 @@ private:
 	void waitForDecoders();
 
 	scopy::HoverWidget *createHoverToolTip(QString info, QPoint position);
+	void initDecoderToolTips();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -259,7 +261,7 @@ private:
 	DropdownSwitchList* filterMessages;
 	int filterCount = 0;
 
-
+	const QString *lastToolTipAnn;
 };
 } // namespace logic
 } // namespace adiscope

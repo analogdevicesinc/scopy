@@ -33,6 +33,7 @@
 #include <libm2k/contextbuilder.hpp>
 #include <libm2k/digital/m2kdigital.hpp>
 #include <libm2k/enums.hpp>
+#include <gui/hoverwidget.h>
 
 #include <QScrollBar>
 #include <QQueue>
@@ -70,6 +71,7 @@ public:
 
 Q_SIGNALS:
 	void showTool();
+	void deleteToolTips();
 
 private Q_SLOTS:
 	void startStop(bool start);
@@ -108,6 +110,8 @@ private:
 	void checkEnabledChannels();
 	void removeAnnotationCurveOfPattern(PatternUI *pattern);
 	void updateAnnotationCurveChannelsForPattern(const QPair<QVector<int>, PatternUI *> &pattern);
+	scopy::HoverWidget *createHoverToolTip(QString info, QPoint position);
+	void initDecoderToolTips();
 
 private:
 	Ui::PatternGenerator *m_ui;
@@ -139,6 +143,7 @@ private:
 	QTimer *m_singleTimer;
 
 	QMap<PatternUI*, QPair<GenericLogicPlotCurve*, QMetaObject::Connection>> m_annotationCurvePatternUiMap;
+	const QString *lastToolTipAnn;
 };
 
 } // namespace logic
