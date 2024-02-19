@@ -1131,6 +1131,10 @@ void CapturePlot::removeDigitalPlotCurve(QwtPlotCurve *curve)
 
 	TimeDomainDisplayPlot::removeDigitalPlotCurve(curve);
 
+	if(dynamic_cast<GenericLogicPlotCurve*>(curve)) {
+		plot_logic_curves.removeOne(dynamic_cast<GenericLogicPlotCurve*>(curve));
+	}
+
 	replot();
 }
 
