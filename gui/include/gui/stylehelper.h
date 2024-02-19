@@ -99,6 +99,7 @@ public:
 	static void IIOComboBox(QComboBox *w, QString objectName = "");
 	static void IIOLineEdit(QLineEdit *w, QString objectName = "");
 	static void TableViewWidget(QWidget *w, QString objectName = "");
+	static void HoverToolTip(QWidget *w, QString info, QString objectName = "");
 
 private:
 	QMap<QString, QString> colorMap;
