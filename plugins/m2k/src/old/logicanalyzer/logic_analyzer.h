@@ -123,6 +123,7 @@ public: // Mixed Signal View Interface
 Q_SIGNALS:
 	void dataAvailable(uint64_t, uint64_t, uint16_t *data);
 	void showTool();
+	void deleteToolTips();
 
 private Q_SLOTS:
 
@@ -189,6 +190,7 @@ private:
 	void waitForDecoders();
 
 	HoverWidget *createHoverToolTip(QString info, QPoint position);
+	void initDecoderToolTips();
 
 private:
 	// TODO: consisten naming (m_ui, m_crUi)
@@ -263,6 +265,8 @@ private:
 
 	DropdownSwitchList *filterMessages;
 	int filterCount = 0;
+
+	const QString *lastToolTipAnn;
 };
 } // namespace logic
 } // namespace scopy::m2k

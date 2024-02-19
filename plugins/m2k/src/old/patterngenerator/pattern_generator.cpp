@@ -35,6 +35,7 @@
 
 #include <QDebug>
 #include <QDockWidget>
+#include <stylehelper.h>
 
 #include <libm2k/m2kexceptions.hpp>
 #include <pluginbase/scopyjs.h>
@@ -929,6 +930,64 @@ void PatternGenerator::connectSignalsAndSlots()
 			m_ui->runSingleWidget->toggle(false);
 		}
 	});
+
+	initDecoderToolTips();
+}
+
+scopy::HoverWidget *PatternGenerator::createHoverToolTip(QString info, QPoint position)
+{
+	QWidget *content = new QWidget(this);
+	StyleHelper::HoverToolTip(content, info);
+
+	HoverWidget *toolTip = new scopy::HoverWidget(content, &m_plot, QApplication::activeWindow());
+	toolTip->setAnchorPos(scopy::HoverPosition::HP_TOPLEFT);
+	toolTip->setContentPos(scopy::HoverPosition::HP_TOPLEFT);
+	toolTip->setAnchorOffset(position);
+
+	return toolTip;
+}
+
+void PatternGenerator::initDecoderToolTips()
+{
+	QTimer *timer = new QTimer(this);
+	timer->setInterval(500);
+	lastToolTipAnn = NULL;
+
+	connect(timer, &QTimer::timeout, this, [=]() {
+		QPoint pos = m_plot.mapFromGlobal(QCursor::pos());
+		if(!m_plot.underMouse()) {
+			lastToolTipAnn = NULL;
+			Q_EMIT deleteToolTips();
+			return;
+		}
+
+		GenericLogicPlotCurve *curve = m_plot.curveAt(pos);
+		if(curve) {
+			const QPointF curvePos = curve->screenPosToCurvePoint(pos);
+			const QString *annInfo =
+				&dynamic_cast<AnnotationCurve *>(curve)->annotationAt(curvePos).ann->annotations()[0];
+
+			if(lastToolTipAnn != annInfo) {
+				scopy::HoverWidget *toolTip = createHoverToolTip(*annInfo, pos);
+				QTimer::singleShot(500, [toolTip, annInfo, this]() {
+					if(toolTip && lastToolTipAnn == annInfo)
+						toolTip->show();
+				});
+				Q_EMIT deleteToolTips();
+
+				lastToolTipAnn = annInfo;
+				connect(this, &PatternGenerator::deleteToolTips, toolTip,
+					&scopy::HoverWidget::deleteLater);
+			}
+		} else {
+			if(lastToolTipAnn != NULL) {
+				Q_EMIT deleteToolTips();
+			}
+			lastToolTipAnn = NULL;
+		}
+	});
+
+	timer->start();
 }
 
 void PatternGenerator::updateChannelGroupWidget(bool visible)
