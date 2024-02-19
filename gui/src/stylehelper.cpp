@@ -1216,4 +1216,23 @@ void StyleHelper::TableViewWidget(QWidget *w, QString objectName)
 	w->setStyleSheet(style);
 }
 
+void StyleHelper::HoverToolTip(QWidget *w, QString info, QString objectName)
+{
+	if(!objectName.isEmpty())
+		w->setObjectName(objectName);
+
+	QLabel *label = new QLabel(info);
+	label->setStyleSheet("QLabel {"
+			     "	font-weight: bold;"
+			     "	color: #FFFFFF;"
+			     "}");
+
+	w->setStyleSheet("QWidget {"
+			 "	background-color: #272730;"
+			 "}");
+
+	QHBoxLayout *layout = new QHBoxLayout(w);
+	layout->addWidget(label);
+}
+
 #include "moc_stylehelper.cpp"
