@@ -848,54 +848,64 @@ void AnnotationCurve::drawOneSampleAnnotation(int row, const Annotation &ann, QP
 
 AnnotationQueryResult AnnotationCurve::annotationAt(const QPointF &p) const
 {
+	AnnotationQueryResult result = {0, nullptr};
+
 	if(m_visibleRows == 0)
-		return {0, nullptr};
+		return result;
 
-	const auto plt = plot();
+	const QwtPlot *plt = plot();
 	if(plt == nullptr)
-		return {0, nullptr};
-	const uint64_t sample = fromTimeToSample(p.x());
+		return result;
 
+	// offset is used for single sample annotations to make them easier to click
+	// gives it an extra 15 pixels on left and on right of the sample
+	// here we convert pixels to samples
+	const QwtScaleMap xmap = plt->canvasMap(xAxis());
+	double offset_time1 = xmap.invTransform(0);
+	double offset_time2 = xmap.invTransform(15);
+	const uint64_t offset_samples =
+		std::max(fromTimeToSample(offset_time2) - fromTimeToSample(offset_time1), uint64_t(1));
+
+	const uint64_t sample = fromTimeToSample(p.x());
 	const auto &ymap = plt->canvasMap(yAxis().pos);
 	// NOTE: Row height is negative
 	const double rowHeight = ymap.invTransform(m_traceHeight) - ymap.invTransform(0);
-
 	int empty_ann_count = 0;
+
 	for(int index = 0; index <= m_annotationRows.size(); index++) {
 		for(const auto &entry : m_annotationRows) {
 			if(entry.first.index() != index)
 				continue;
+
 			const Row &row = entry.first;
 			const RowData &data = entry.second;
-
 			const auto maxY = m_pixelOffset + (row.index() - empty_ann_count) * rowHeight;
 			const auto minY = maxY + rowHeight;
-
 			const auto y = p.y();
+
 			if(data.size() == 0) {
 				empty_ann_count++;
 				continue;
 			}
 			if(y < minY or y > maxY)
 				continue;
-			uint64_t prev_end_sample = 0, next_start_sample = 0;
+
 			for(uint64_t i = 0; i < data.size(); i++) {
 				const Annotation *ann = data.annAt(i);
-				next_start_sample = (i + 1 == data.size()) ? sample + (sample - prev_end_sample) / 2
-									   : data.annAt(i + 1)->start_sample();
+
 				if(ann->end_sample() - ann->start_sample() < 2 &&
-				   sample + (sample - prev_end_sample) / 2 >= ann->start_sample() and
-				   sample - (next_start_sample - sample) / 2 <= ann->end_sample()) {
-					return {i, ann};
+				   sample > ann->start_sample() - offset_samples &&
+				   sample < ann->end_sample() + offset_samples) {
+					result = {i, ann};
 				}
-				if(sample >= ann->start_sample() and sample <= ann->end_sample()) {
-					return {i, ann};
+				if(sample >= ann->start_sample() && sample < ann->end_sample()) {
+					result = {i, ann};
 				}
-				prev_end_sample = ann->end_sample();
 			}
 		}
 	}
-	return {0, nullptr};
+
+	return result;
 }
 
 bool AnnotationCurve::testHit(const QPointF &p) const { return annotationAt(p).isValid(); }
