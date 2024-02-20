@@ -94,6 +94,7 @@ target_link_libraries(
 	       scopy-iioutil
 	       scopy-gui
 	       scopy-core
+	       scopy-iio-widgets
 	       ${QWT_LIBRARIES}
 )
 
