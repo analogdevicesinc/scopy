@@ -81,47 +81,52 @@ void CmdQChannelAttrDataStrategy::requestData()
 	Command *readDataCommand =
 		new IioChannelAttributeRead(m_recipe.channel, m_recipe.data.toStdString().c_str(), nullptr);
 
-	QObject::connect(readDataCommand, &Command::finished, this, [this](Command *cmd) {
-		IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-		if(!tcmd) {
-			return;
-		}
-
-		if(tcmd->getReturnCode() < 0) {
-			qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Could not read the value for" << m_recipe.data;
-			return;
-		}
-
-		char *currentValue = tcmd->getResult();
-		m_dataRead = QString(currentValue);
-
-		if(!m_recipe.constDataOptions.isEmpty()) {
-			m_optionalDataRead = m_recipe.constDataOptions;
-			Q_EMIT sendData(m_dataRead, m_optionalDataRead);
-		} else if(!m_recipe.iioDataOptions.isEmpty()) {
-			Command *readOptionalCommand = new IioChannelAttributeRead(
-				m_recipe.channel, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
-			QObject::connect(readOptionalCommand, &Command::finished, this, [this](Command *cmd) {
-				IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
-				if(!tcmd) {
-					return;
-				}
-
-				if(tcmd->getReturnCode() < 0) {
-					qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY)
-						<< "Could not read the value for" << m_recipe.data;
-					return;
-				}
-
-				char *currentOptValue = tcmd->getResult();
-				m_optionalDataRead = QString(currentOptValue);
-				Q_EMIT sendData(m_dataRead, m_optionalDataRead);
-			});
-			m_cmdQueue->enqueue(readOptionalCommand);
-		} else {
-			// no optional data available, emit empty string for it
-			Q_EMIT sendData(m_dataRead, QString());
-		}
-	});
+	QObject::connect(readDataCommand, &Command::finished, this,
+			 &CmdQChannelAttrDataStrategy::attributeReadFinished);
 	m_cmdQueue->enqueue(readDataCommand);
+}
+
+void CmdQChannelAttrDataStrategy::attributeReadFinished(Command *cmd)
+{
+	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
+
+	if(tcmd->getReturnCode() < 0) {
+		qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Could not read the value for" << m_recipe.data;
+		return;
+	}
+
+	m_dataRead = QString(tcmd->getResult());
+	if(!m_recipe.constDataOptions.isEmpty()) {
+		m_optionalDataRead = m_recipe.constDataOptions;
+		Q_EMIT sendData(m_dataRead, m_optionalDataRead);
+	} else if(!m_recipe.iioDataOptions.isEmpty()) {
+		Command *readOptionalCommand = new IioChannelAttributeRead(
+			m_recipe.channel, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
+		QObject::connect(readOptionalCommand, &Command::finished, this,
+				 &CmdQChannelAttrDataStrategy::optionalAttrReadFinished);
+		m_cmdQueue->enqueue(readOptionalCommand);
+	} else {
+		// no optional data available, emit empty string for it
+		Q_EMIT sendData(m_dataRead, QString());
+	}
+}
+
+void CmdQChannelAttrDataStrategy::optionalAttrReadFinished(Command *cmd)
+{
+	IioChannelAttributeRead *tcmd = dynamic_cast<IioChannelAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
+
+	if(tcmd->getReturnCode() < 0) {
+		qWarning(CAT_CMDQ_CHANNEL_DATA_STATEGY) << "Could not read the value for" << m_recipe.data;
+		return;
+	}
+
+	char *currentOptValue = tcmd->getResult();
+	m_optionalDataRead = QString(currentOptValue);
+	Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 }
