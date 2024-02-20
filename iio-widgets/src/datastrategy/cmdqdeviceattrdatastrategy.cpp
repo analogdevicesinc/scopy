@@ -82,50 +82,54 @@ void CmdQDeviceAttrDataStrategy::requestData()
 	Command *readDataCommand =
 		new IioDeviceAttributeRead(m_recipe.device, m_recipe.data.toStdString().c_str(), nullptr);
 
-	QObject::connect(readDataCommand, &Command::finished, this, [this](Command *cmd) {
-		IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-		if(!tcmd) {
-			return;
-		}
-
-		if(tcmd->getReturnCode() < 0) {
-			qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Could not read the value for" << m_recipe.data;
-			return;
-		}
-
-		char *currentValue = tcmd->getResult();
-		m_dataRead = QString(currentValue);
-
-		if(!m_recipe.constDataOptions.isEmpty()) {
-			m_optionalDataRead = m_recipe.constDataOptions;
-			Q_EMIT sendData(m_dataRead, m_optionalDataRead);
-		} else if(!m_recipe.iioDataOptions.isEmpty()) {
-			// if we have an attribute we have to read, we should read it, increase the counter and emit if
-			// possible
-			Command *readOptionalCommand = new IioDeviceAttributeRead(
-				m_recipe.device, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
-			QObject::connect(readOptionalCommand, &Command::finished, this, [this](Command *cmd) {
-				IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
-				if(!tcmd) {
-					return;
-				}
-
-				if(tcmd->getReturnCode() < 0) {
-					qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY)
-						<< "Could not read the value for" << m_recipe.data;
-					return;
-				}
-
-				char *currentOptValue = tcmd->getResult();
-				m_optionalDataRead = QString(currentOptValue);
-
-				Q_EMIT sendData(m_dataRead, m_optionalDataRead);
-			});
-			m_cmdQueue->enqueue(readOptionalCommand);
-		} else {
-			// no optional data available, emit empty string for it
-			Q_EMIT sendData(m_dataRead, QString());
-		}
-	});
+	QObject::connect(readDataCommand, &Command::finished, this, &CmdQDeviceAttrDataStrategy::attributeReadFinished);
 	m_cmdQueue->enqueue(readDataCommand);
+}
+
+void CmdQDeviceAttrDataStrategy::attributeReadFinished(Command *cmd)
+{
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
+
+	if(tcmd->getReturnCode() < 0) {
+		qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Could not read the value for" << m_recipe.data;
+		return;
+	}
+
+	m_dataRead = QString(tcmd->getResult());
+	if(!m_recipe.constDataOptions.isEmpty()) {
+		m_optionalDataRead = m_recipe.constDataOptions;
+		Q_EMIT sendData(m_dataRead, m_optionalDataRead);
+	} else if(!m_recipe.iioDataOptions.isEmpty()) {
+		// if we have an attribute we have to read, we should read it, increase the counter and emit if
+		// possible
+		Command *readOptionalCommand = new IioDeviceAttributeRead(
+			m_recipe.device, m_recipe.iioDataOptions.toStdString().c_str(), nullptr);
+		QObject::connect(readOptionalCommand, &Command::finished, this,
+				 &CmdQDeviceAttrDataStrategy::optionalAttrReadFinished);
+		m_cmdQueue->enqueue(readOptionalCommand);
+	} else {
+		// no optional data available, emit empty string for it
+		Q_EMIT sendData(m_dataRead, QString());
+	}
+}
+
+void CmdQDeviceAttrDataStrategy::optionalAttrReadFinished(Command *cmd)
+{
+	IioDeviceAttributeRead *tcmd = dynamic_cast<IioDeviceAttributeRead *>(cmd);
+	if(!tcmd) {
+		return;
+	}
+
+	if(tcmd->getReturnCode() < 0) {
+		qWarning(CAT_CMDQ_DEVICE_DATA_STRATEGY) << "Could not read the value for" << m_recipe.data;
+		return;
+	}
+
+	char *currentOptValue = tcmd->getResult();
+	m_optionalDataRead = QString(currentOptValue);
+
+	Q_EMIT sendData(m_dataRead, m_optionalDataRead);
 }
