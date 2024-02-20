@@ -23,27 +23,42 @@
 #include "configcontroller.h"
 #include "configmodel.h"
 #include "src/swiot_logging_categories.h"
-
-#include <iio.h>
-
 #include <QMessageBox>
 #include <QVBoxLayout>
 
-#include <gui/tool_view_builder.hpp>
 #include <iioutil/connectionprovider.h>
+#include <gui/stylehelper.h>
 
 using namespace scopy::swiot;
 
 SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
 	: QWidget(parent)
 	, m_uri(uri)
-	, m_drawArea(nullptr)
-	, m_scrollArea(nullptr)
-	, m_toolView(nullptr)
-	, m_mainView(new QWidget(this))
-	, m_statusLabel(new QLabel(this))
-	, m_statusContainer(new QWidget(this))
-	, ui(new Ui::ConfigMenu)
+	, m_ui(new Ui::ConfigMenu)
+{
+	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	setLayout(layout);
+
+	// tool template configuration
+	m_tool = new ToolTemplate(this);
+	m_tool->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	m_tool->centralContainer()->setVisible(true);
+	m_tool->topContainerMenuControl()->setVisible(false);
+	layout->addWidget(m_tool);
+
+	provideDeviceConnection();
+
+	setupUiElements();
+	buildGridLayout();
+	createPageLayout();
+	initTutorialProperties();
+	QObject::connect(m_applyBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
+}
+
+SwiotConfig::~SwiotConfig() { ConnectionProvider::close(m_uri); }
+
+void SwiotConfig::provideDeviceConnection()
 {
 	Connection *conn = ConnectionProvider::open(m_uri);
 	m_context = conn->context();
@@ -52,30 +67,27 @@ SwiotConfig::SwiotConfig(QString uri, QWidget *parent)
 	if(m_swiotDevice == nullptr) {
 		qCritical(CAT_SWIOT_CONFIG) << "Critical error: the \"swiot\" device was not found.";
 	}
-
-	this->ui->setupUi(this);
-	m_configBtn = createConfigBtn();
-	this->setLayout(new QVBoxLayout(this));
-	this->layout()->addWidget(m_configBtn);
-
-	this->setupToolView(parent);
-	this->init();
-	this->createPageLayout();
-	this->initTutorialProperties();
-	QObject::connect(m_configBtn, &QPushButton::pressed, this, &SwiotConfig::onConfigBtnPressed);
 }
 
-SwiotConfig::~SwiotConfig() { ConnectionProvider::close(m_uri); }
-
-void SwiotConfig::init()
+void SwiotConfig::setupUiElements()
 {
-	for(int i = 0; i < 4; i++) { // there can only be 4 channels
+	m_ui->setupUi(this);
+	StyleHelper::MenuSmallLabel(m_ui->deviceLabel);
+	StyleHelper::MenuSmallLabel(m_ui->functionLabel);
+
+	m_applyBtn = createApplyBtn();
+	m_drawArea = new DrawArea(this);
+	m_scrollArea = new QScrollArea(this);
+}
+
+void SwiotConfig::buildGridLayout()
+{
+	for(int i = 0; i < NUMBER_OF_CHANNELS; i++) { // there can only be 4 channels
 		auto *channelView = new ConfigChannelView(i);
 		auto *configModel = new ConfigModel(m_swiotDevice, i, m_commandQueue);
 		auto *configController = new ConfigController(channelView, configModel, i);
 		m_controllers.push_back(configController);
-		ui->gridLayout->addWidget(channelView, i + 1, 0, 1, 4);
-
+		m_ui->gridLayout->addWidget(channelView, i + 1, 0, 1, 4);
 		QObject::connect(channelView, &ConfigChannelView::showPath, this,
 				 [this, i](int channelIndex, const QString &deviceName) {
 					 if(channelIndex == i) {
@@ -92,40 +104,36 @@ void SwiotConfig::init()
 		QObject::connect(configController, &ConfigController::clearDrawArea, this,
 				 [this]() { m_drawArea->deactivateConnections(); });
 	}
+	// The apply button will always be at the end of the channel widgets
+	m_ui->gridLayout->addWidget(m_applyBtn, NUMBER_OF_CHANNELS + 1, 0, 1, 4);
 }
 
-void SwiotConfig::setDevices(iio_context *ctx)
+void SwiotConfig::createPageLayout()
 {
-	ssize_t devicesNumber = iio_context_get_devices_count(ctx);
-	for(int i = 0; i < devicesNumber; i++) {
-		struct iio_device *iioDev = iio_context_get_device(ctx, i);
-		if(iioDev) {
-			QString deviceName = QString(iio_device_get_name(iioDev));
-			m_iioDevices[deviceName] = iioDev;
-		}
-	}
+	auto scrollWidget = new QWidget(this);
+	scrollWidget->setLayout(new QHBoxLayout(this));
+	scrollWidget->layout()->addWidget(this->m_ui->mainGridContainer);
+	scrollWidget->layout()->addWidget(m_drawArea);
+	scrollWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+	scrollWidget->layout()->setSpacing(40);
+	m_scrollArea->setWidget(scrollWidget);
+
+	m_tool->addWidgetToCentralContainerHelper(m_scrollArea);
 }
 
-QPushButton *SwiotConfig::createConfigBtn()
+void SwiotConfig::initTutorialProperties()
 {
-	auto *configBtn = new QPushButton();
-	configBtn->setObjectName(QString::fromUtf8("configBtn"));
-	configBtn->setLayoutDirection(Qt::RightToLeft);
-	configBtn->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-						   "  width: 95px;\n"
-						   "  height: 40px;\n"
-						   "  font-size: 12px;\n"
-						   "  text-align: left;\n"
-						   "  font-weight: bold;\n"
-						   "  padding-left: 15px;\n"
-						   "  padding-right: 15px;\n"
-						   "}"));
-	configBtn->setProperty("blue_button", QVariant(true));
-	QIcon icon = QIcon(":/gui/icons/scopy-default/icons/save.svg");
-	configBtn->setIcon(icon);
-	configBtn->setIconSize(QSize(13, 13));
-	configBtn->setText("Apply");
-	return configBtn;
+	m_applyBtn->setProperty("tutorial_name", "APPLY_BUTTON");
+	m_drawArea->setProperty("tutorial_name", "DRAW_AREA");
+}
+
+QPushButton *SwiotConfig::createApplyBtn()
+{
+	auto *applyBtn = new QPushButton();
+	StyleHelper::BlueGrayButton(applyBtn, "applyBtn");
+	applyBtn->setCheckable(false);
+	applyBtn->setText("Apply");
+	return applyBtn;
 }
 
 void SwiotConfig::onConfigBtnPressed() { Q_EMIT writeModeAttribute("runtime"); }
@@ -135,76 +143,6 @@ void SwiotConfig::modeAttributeChanged(std::string mode)
 	if(mode == "runtime") {
 		Q_EMIT configBtnPressed();
 	}
-}
-
-void SwiotConfig::setupToolView(QWidget *parent)
-{
-	scopy::gui::ToolViewRecipe recipe;
-	recipe.helpBtnUrl = "";
-	recipe.hasRunBtn = false;
-	recipe.hasSingleBtn = false;
-	recipe.hasPairSettingsBtn = false;
-	recipe.hasPrintBtn = false;
-	recipe.hasChannels = false;
-	recipe.hasHelpBtn = true;
-
-	m_toolView = scopy::gui::ToolViewBuilder(recipe, nullptr, parent).build();
-
-	m_drawArea = new DrawArea(this);
-	m_scrollArea = new QScrollArea(this);
-}
-
-void SwiotConfig::createPageLayout()
-{
-	auto scrollWidget = new QWidget(this);
-	m_scrollArea->setStyleSheet("background-color: black;");
-	scrollWidget->setLayout(new QHBoxLayout(this));
-	scrollWidget->layout()->addWidget(this->ui->mainGridContainer);
-	scrollWidget->layout()->addWidget(m_drawArea);
-	scrollWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	m_scrollArea->setWidget(scrollWidget);
-
-	m_statusLabel->setText("The system is powered at limited capacity.");
-	m_statusLabel->setWordWrap(true);
-
-	m_statusContainer->setLayout(new QHBoxLayout(m_statusContainer));
-	m_statusContainer->layout()->setSpacing(0);
-	m_statusContainer->layout()->setContentsMargins(0, 0, 0, 0);
-	m_statusContainer->setStyleSheet("QWidget{color: #ffc904; background-color: rgba(0, 0, 0, 60); border: 1px "
-					 "solid rgba(0, 0, 0, 30); font-size: 11pt}");
-
-	auto exclamationButton = new QPushButton(m_statusContainer);
-	exclamationButton->setIcon(QIcon::fromTheme(":/swiot/warning.svg"));
-	exclamationButton->setIconSize(QSize(32, 32));
-	exclamationButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-
-	m_statusContainer->layout()->addWidget(exclamationButton);
-	m_statusContainer->layout()->addWidget(m_statusLabel);
-
-	m_mainView->setLayout(new QVBoxLayout(m_mainView));
-	m_mainView->layout()->setContentsMargins(0, 0, 0, 0);
-	m_mainView->layout()->addWidget(m_scrollArea);
-
-	m_toolView->addPlotInfoWidget(m_statusContainer);
-	m_toolView->addFixedCentralWidget(m_mainView, 0, 0, 0, 0);
-	m_toolView->addTopExtraWidget(m_configBtn);
-	this->layout()->addWidget(m_toolView);
-}
-
-void SwiotConfig::externalPowerSupply(bool ps)
-{
-	if(ps) {
-		m_statusContainer->hide();
-	} else {
-		m_statusContainer->show();
-		m_statusLabel->show();
-	}
-}
-
-void SwiotConfig::initTutorialProperties()
-{
-	m_configBtn->setProperty("tutorial_name", "APPLY_BUTTON");
-	m_drawArea->setProperty("tutorial_name", "DRAW_AREA");
 }
 
 #include "moc_swiotconfig.cpp"
