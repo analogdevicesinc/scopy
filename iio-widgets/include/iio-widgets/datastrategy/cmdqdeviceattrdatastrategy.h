@@ -27,6 +27,10 @@ Q_SIGNALS:
 	void sendData(QString data, QString dataOptions) override;
 	void emitStatus(int status) override;
 
+private Q_SLOTS:
+	void attributeReadFinished(Command *cmd);
+	void optionalAttrReadFinished(Command *cmd);
+
 private:
 	CommandQueue *m_cmdQueue;
 	QString m_dataRead;
