@@ -214,8 +214,6 @@ void SWIOTPlugin::setupToolList()
 		dynamic_cast<Max14906 *>(max14906Tme->tool()), &Max14906::externalPowerSupply);
 	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply,
 		dynamic_cast<Ad74413r *>(ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
-	connect(m_swiotController, &SwiotController::hasConnectedPowerSupply,
-		dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::externalPowerSupply);
 	connect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
 
 	if(!m_isRuntime) {
@@ -290,8 +288,7 @@ bool SWIOTPlugin::onDisconnect()
 		   dynamic_cast<Max14906 *>(max14906Tme->tool()), &Max14906::externalPowerSupply);
 	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply,
 		   dynamic_cast<Ad74413r *>(ad74413rTme->tool()), &Ad74413r::externalPowerSupply);
-	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply,
-		   dynamic_cast<SwiotConfig *>(configTme->tool()), &SwiotConfig::externalPowerSupply);
+
 	disconnect(m_swiotController, &SwiotController::hasConnectedPowerSupply, this, &SWIOTPlugin::powerSupplyStatus);
 
 	disconnect(m_swiotController, &SwiotController::pingFailed, this, &SWIOTPlugin::disconnectDevice);
@@ -439,7 +436,7 @@ void SWIOTPlugin::createStatusContainer()
 	auto exclamationIcon = new QPushButton(m_statusContainer);
 	StyleHelper::NoBackgroundIconButton(exclamationIcon, QIcon::fromTheme(":/swiot/warning.svg"));
 
-	auto statusLabel = new QLabel("AD-SWIOT1L-SL:The system is powered at limited capacity.");
+	auto statusLabel = new QLabel("AD-SWIOT1L-SL: The system is powered at limited capacity.");
 	statusLabel->setWordWrap(true);
 	StyleHelper::WarningLabel(statusLabel, "extPsuStatusLabel");
 

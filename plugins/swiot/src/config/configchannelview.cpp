@@ -19,7 +19,7 @@
  */
 
 #include "configchannelview.h"
-
+#include "gui/stylehelper.h"
 #include "src/swiot_logging_categories.h"
 
 using namespace scopy::swiot;
@@ -32,17 +32,27 @@ ConfigChannelView::ConfigChannelView(int channelIndex, QWidget *parent)
 {
 	this->installEventFilter(this);
 	this->ui->setupUi(this);
+	applyUiElementsStyle();
 
 	this->setAttribute(Qt::WA_Hover, true);
 
 	this->ui->channelLabel->setText(QString::fromStdString("Channel ") + QString::number(m_channelIndex + 1));
 	this->ui->enabledCheckBox->toggled(true);
+
 	this->connectSignalsAndSlots();
 
 	this->initTutorialProperties();
 }
 
 ConfigChannelView::~ConfigChannelView() { delete ui; }
+
+void ConfigChannelView::applyUiElementsStyle()
+{
+	StyleHelper::MenuSmallLabel(this->ui->channelLabel);
+	StyleHelper::BlueSquareCheckbox(this->ui->enabledCheckBox);
+	StyleHelper::MenuComboBox(this->ui->deviceOptions);
+	StyleHelper::MenuComboBox(this->ui->functionOptions);
+}
 
 void ConfigChannelView::connectSignalsAndSlots()
 {
