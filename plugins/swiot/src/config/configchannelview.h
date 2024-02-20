@@ -80,6 +80,7 @@ private:
 	// UI elements
 	Ui::ConfigChannelView *ui;
 
+	void applyUiElementsStyle();
 	void initTutorialProperties();
 };
 } // namespace scopy::swiot
