@@ -29,10 +29,9 @@ Q_LOGGING_CATEGORY(CAT_CMDQ_DEVICE_DATA_STRATEGY, "CmdQDeviceDataStrategy")
 
 using namespace scopy;
 
-CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, CommandQueue *commandQueue,
-						       QWidget *parent)
+CmdQDeviceAttrDataStrategy::CmdQDeviceAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent)
 	: QWidget(parent)
-	, m_cmdQueue(commandQueue)
+	, m_cmdQueue(recipe.connection->commandQueue())
 	, m_dataRead("")
 	, m_optionalDataRead("")
 {
