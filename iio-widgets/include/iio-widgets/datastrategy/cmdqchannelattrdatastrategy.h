@@ -33,8 +33,7 @@ class SCOPY_IIO_WIDGETS_EXPORT CmdQChannelAttrDataStrategy : public QWidget, pub
 	Q_OBJECT
 	Q_INTERFACES(scopy::DataStrategyInterface)
 public:
-	explicit CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, CommandQueue *commandQueue,
-					     QWidget *parent = nullptr);
+	explicit CmdQChannelAttrDataStrategy(IIOWidgetFactoryRecipe recipe, QWidget *parent = nullptr);
 
 	QString data() override;
 	QString optionalData() override;
