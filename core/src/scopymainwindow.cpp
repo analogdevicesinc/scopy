@@ -20,7 +20,7 @@
 
 #include "pluginbase/preferences.h"
 #include "pluginbase/scopyjs.h"
-#include "iioutil/contextprovider.h"
+#include "iioutil/connectionprovider.h"
 #include "pluginbase/messagebroker.h"
 #include "scopy-core_config.h"
 #include "popupwidget.h"
@@ -58,7 +58,7 @@ ScopyMainWindow::ScopyMainWindow(QWidget *parent)
 	initStatusBar();
 	initPreferences();
 
-	ContextProvider::GetInstance();
+	ConnectionProvider::GetInstance();
 	MessageBroker::GetInstance();
 
 	// get the version document

@@ -5,7 +5,6 @@
 #include <QFuture>
 #include <QFutureWatcher>
 
-#include <iioutil/contextprovider.h>
 #include <libm2k/m2kexceptions.hpp>
 
 using namespace libm2k;

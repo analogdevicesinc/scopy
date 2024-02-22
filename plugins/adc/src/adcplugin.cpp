@@ -10,7 +10,7 @@
 #include <QPushButton>
 #include <QSpacerItem>
 
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <pluginbase/preferences.h>
 #include <pluginbase/preferenceshelper.h>
 #include <widgets/menucollapsesection.h>
@@ -25,13 +25,13 @@ bool ADCPlugin::compatible(QString m_param, QString category)
 	qDebug(CAT_ADCPLUGIN) << "compatible";
 
 	bool ret = false;
-	iio_context *ctx = ContextProvider::GetInstance()->open(m_param);
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
-	if(ctx == nullptr)
+	if(conn == nullptr)
 		return ret;
 
-	for(int i = 0; i < iio_context_get_devices_count(ctx); i++) {
-		iio_device *dev = iio_context_get_device(ctx, i);
+	for(int i = 0; i < iio_context_get_devices_count(conn->context()); i++) {
+		iio_device *dev = iio_context_get_device(conn->context(), i);
 		for(int j = 0; j < iio_device_get_channels_count(dev); j++) {
 			struct iio_channel *chn = iio_device_get_channel(dev, j);
 			if(iio_channel_is_scan_element(chn)) {
@@ -43,7 +43,7 @@ bool ADCPlugin::compatible(QString m_param, QString category)
 
 finish:
 
-	ContextProvider::GetInstance()->close(m_param);
+	ConnectionProvider::GetInstance()->close(m_param);
 	return ret;
 }
 
@@ -194,7 +194,10 @@ PlotProxy *ADCPlugin::createRecipe(iio_context *ctx)
 
 bool ADCPlugin::onConnect()
 {
-	m_ctx = ContextProvider::GetInstance()->open(m_param);
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
+	if(conn == nullptr)
+		return false;
+	m_ctx = conn->context();
 	m_toolList[0]->setEnabled(true);
 	m_toolList[0]->setRunBtnVisible(true);
 
@@ -212,6 +215,8 @@ bool ADCPlugin::onConnect()
 bool ADCPlugin::onDisconnect()
 {
 	qDebug(CAT_ADCPLUGIN) << "disconnect";
+	if(m_ctx)
+		ConnectionProvider::GetInstance()->close(m_param);
 	for(auto &tool : m_toolList) {
 		tool->setEnabled(false);
 		tool->setRunBtnVisible(false);
