@@ -4,7 +4,7 @@
 
 #include <QDebug>
 
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 
 using namespace scopy::m2k;
 
@@ -21,10 +21,10 @@ void M2kReadTemperatureTask::run()
 	iio_channel *ch;
 	int ret;
 
-	iio_context *ctx = ContextProvider::GetInstance()->open(m_uri);
-	if(!ctx)
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
+	if(!conn)
 		goto finish;
-	dev = iio_context_find_device(ctx, "ad9963");
+	dev = iio_context_find_device(conn->context(), "ad9963");
 	if(!dev)
 		goto finish;
 	ch = iio_device_find_channel(dev, "temp0", false);
@@ -47,6 +47,7 @@ void M2kReadTemperatureTask::run()
 	Q_EMIT newTemperature(temperature);
 
 finish:
-	ContextProvider::GetInstance()->close(m_uri);
+	if(conn)
+		ConnectionProvider::GetInstance()->close(m_uri);
 	return;
 }

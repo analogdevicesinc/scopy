@@ -4,7 +4,7 @@
 #include "digitalio.hpp"
 #include "dmm.hpp"
 #include "filter.hpp"
-#include "iioutil/contextprovider.h"
+#include "iioutil/connectionprovider.h"
 #include "m2kcommon.h"
 #include "manualcalibration.h"
 #include "network_analyzer.hpp"
@@ -43,17 +43,17 @@ bool M2kPlugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_M2KPLUGIN) << "compatible";
 	bool ret = false;
-	ContextProvider *c = ContextProvider::GetInstance();
-	iio_context *ctx = c->open(m_param);
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
 
-	if(!ctx)
+	if(!conn)
 		return false;
 
 	//	ret = !!iio_context_find_device(ctx,"m2k-adc");
 	//	ret = ret && !!iio_context_find_device(ctx,"m2k-dac-a");
 	//	ret = ret && !!iio_context_find_device(ctx,"m2k-dac-b");
 
-	Filter *f = new Filter(ctx);
+	Filter *f = new Filter(conn->context());
 	ret = (f->hw_name().compare("M2K") == 0);
 	delete(f);
 
@@ -113,12 +113,12 @@ bool M2kPlugin::loadPage()
 	lay->addWidget(textBrowser);
 
 	m_m2kInfoPage->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-	ContextProvider *c = ContextProvider::GetInstance();
-	iio_context *ctx = c->open(m_param);
-	for(int i = 0; i < iio_context_get_attrs_count(ctx); i++) {
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
+	for(int i = 0; i < iio_context_get_attrs_count(conn->context()); i++) {
 		const char *name;
 		const char *value;
-		int ret = iio_context_get_attr(ctx, i, &name, &value);
+		int ret = iio_context_get_attr(conn->context(), i, &name, &value);
 		if(ret != 0)
 			continue;
 
@@ -348,18 +348,19 @@ void M2kPlugin::cleanup()
 	m_m2kController->disconnectM2k();
 	m_btnCalibrate->setDisabled(true);
 
-	ContextProvider *c = ContextProvider::GetInstance();
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
 	c->close(m_param);
 }
 
 bool M2kPlugin::onConnect()
 {
-	ContextProvider *c = ContextProvider::GetInstance();
-	iio_context *ctx = c->open(m_param);
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
 
-	if(!ctx) {
+	if(!conn) {
 		return false;
 	}
+	struct iio_context *ctx = conn->context();
 	try {
 		m2k_man = new m2k_iio_manager();
 		m_btnCalibrate->setDisabled(false);

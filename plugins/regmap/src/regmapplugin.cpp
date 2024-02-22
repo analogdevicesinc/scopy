@@ -29,7 +29,7 @@
 #include <readwrite/fileregisterwritestrategy.hpp>
 #include "logging_categories.h"
 
-#include "iioutil/contextprovider.h"
+#include "iioutil/connectionprovider.h"
 #include "jsonformatedelement.hpp"
 #include "scopy-regmapplugin_config.h"
 #include "utils.hpp"
@@ -70,14 +70,14 @@ void RegmapPlugin::unload()
 bool RegmapPlugin::compatible(QString m_param, QString category)
 {
 	m_name = "REGMAP";
-	auto &&cp = ContextProvider::GetInstance();
-	iio_context *ctx = cp->open(m_param);
+	auto &&cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
 
-	if(!ctx) {
+	if(!conn) {
 		cp->close(m_param);
 		return false;
 	} else {
-
+		struct iio_context *ctx = conn->context();
 		auto deviceCount = iio_context_get_devices_count(ctx);
 		for(int i = 0; i < deviceCount; i++) {
 			iio_device *dev = iio_context_get_device(ctx, i);
@@ -131,9 +131,12 @@ bool RegmapPlugin::loadPreferencesPage()
 
 bool RegmapPlugin::onConnect()
 {
-	auto &&cp = ContextProvider::GetInstance();
-	iio_context *ctx = cp->open(m_param);
+	auto &&cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
+	if(conn == nullptr)
+		return false;
 
+	iio_context *ctx = conn->context();
 	m_deviceList = new QList<iio_device *>();
 	auto deviceCount = iio_context_get_devices_count(ctx);
 
@@ -190,7 +193,7 @@ bool RegmapPlugin::onConnect()
 bool RegmapPlugin::onDisconnect()
 {
 	// TODO
-	auto &&cp = ContextProvider::GetInstance();
+	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
 	if(m_registerMapWidget)
