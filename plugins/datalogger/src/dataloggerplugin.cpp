@@ -11,6 +11,7 @@
 #include <QUuid>
 #include <QVBoxLayout>
 
+#include <iioutil/connectionprovider.h>
 #include <libm2k/contextbuilder.hpp>
 
 using namespace scopy;
@@ -43,11 +44,11 @@ void DataLoggerPlugin::unload() {}
 bool DataLoggerPlugin::compatible(QString param, QString cateogory)
 {
 	m_name = "Datalogger";
-	ContextProvider *cp = ContextProvider::GetInstance();
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 
-	iio_context *ctx = cp->open(param);
+	Connection *conn = cp->open(param);
 
-	if(!ctx) {
+	if(!conn) {
 		qWarning(CAT_DATALOGGER) << "No context available for datalogger";
 		return false;
 	}
@@ -59,8 +60,11 @@ bool DataLoggerPlugin::compatible(QString param, QString cateogory)
 
 bool DataLoggerPlugin::onConnect()
 {
-	ContextProvider *cp = ContextProvider::GetInstance();
-	iio_context *ctx = cp->open(m_param);
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
+	if(conn == nullptr)
+		return false;
+	iio_context *ctx = conn->context();
 	libm2k_context = libm2k::context::contextOpen(ctx, "");
 	ping = new IIOPingTask(ctx);
 	cs = new CyclicalTask(ping, this);
@@ -107,7 +111,7 @@ bool DataLoggerPlugin::onDisconnect()
 		qDebug(CAT_DATALOGGER) << ex.what();
 	}
 
-	auto &&cp = ContextProvider::GetInstance();
+	auto &&cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 
 	return true;

@@ -11,7 +11,7 @@
 #include <waveforminstrument.h>
 
 #include <pluginbase/preferences.h>
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 
 Q_LOGGING_CATEGORY(CAT_PQMPLUGIN, "PQMPlugin");
 using namespace scopy::pqm;
@@ -21,14 +21,14 @@ void PQMPlugin::preload() { m_pqmController = new PqmController(m_param); }
 bool PQMPlugin::compatible(QString m_param, QString category)
 {
 	bool ret = false;
-	auto &&cp = ContextProvider::GetInstance();
+	auto &&cp = ConnectionProvider::GetInstance();
 
-	iio_context *ctx = cp->open(m_param);
-	if(!ctx) {
+	Connection *conn = cp->open(m_param);
+	if(!conn) {
 		qInfo(CAT_PQMPLUGIN) << "The context is not compatible with the PQMPlugin!";
 		return ret;
 	}
-	iio_device *pqmDevice = iio_context_find_device(ctx, "pqm");
+	iio_device *pqmDevice = iio_context_find_device(conn->context(), "pqm");
 	if(pqmDevice) {
 		ret = true;
 	}
@@ -48,8 +48,11 @@ bool PQMPlugin::loadPage()
 	m_page->layout()->addWidget(m_infoPage);
 	m_page->layout()->addItem(new QSpacerItem(0, 0, QSizePolicy::Preferred, QSizePolicy::Expanding));
 
-	auto cp = ContextProvider::GetInstance();
-	struct iio_context *context = cp->open(m_param);
+	auto cp = ConnectionProvider::GetInstance();
+	Connection *conn = cp->open(m_param);
+	if(conn == nullptr)
+		return false;
+	struct iio_context *context = conn->context();
 	ssize_t attributeCount = iio_context_get_attrs_count(context);
 	for(int i = 0; i < attributeCount; ++i) {
 		const char *name;
@@ -99,11 +102,12 @@ QString PQMPlugin::description() { return "Adds functionality specific to PQM bo
 
 bool PQMPlugin::onConnect()
 {
-	iio_context *ctx = ContextProvider::GetInstance()->open(m_param);
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_param);
 
-	if(!ctx) {
+	if(!conn) {
 		return false;
 	}
+	struct iio_context *ctx = conn->context();
 	connect(m_pqmController, &PqmController::pingFailed, this, &PQMPlugin::disconnectDevice);
 	m_pqmController->startPingTask(ctx);
 
@@ -168,7 +172,7 @@ bool PQMPlugin::onDisconnect()
 	delete m_acqManager;
 	m_acqManager = nullptr;
 
-	ContextProvider *cp = ContextProvider::GetInstance();
+	ConnectionProvider *cp = ConnectionProvider::GetInstance();
 	cp->close(m_param);
 	return true;
 }

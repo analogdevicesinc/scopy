@@ -12,7 +12,7 @@
 
 #include <core/detachedtoolwindow.h>
 #include <core/detachedtoolwindowmanager.h>
-#include <iioutil/contextprovider.h>
+#include <iioutil/connectionprovider.h>
 
 using namespace scopy;
 using namespace scopy::debugger;
@@ -24,10 +24,10 @@ bool DebuggerPlugin::compatible(QString m_param, QString category)
 {
 	qDebug(CAT_DEBUGGERPLUGIN) << " compatible";
 	bool ret = true;
-	ContextProvider *c = ContextProvider::GetInstance();
-	iio_context *ctx = c->open(m_param);
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	Connection *conn = c->open(m_param);
 
-	if(!ctx) {
+	if(!conn) {
 		return false;
 	}
 	c->close(m_param);
@@ -45,13 +45,13 @@ QString DebuggerPlugin::description() { return "IIO context explorer tool"; }
 
 bool DebuggerPlugin::onConnect()
 {
-	ContextProvider *c = ContextProvider::GetInstance();
-	iio_context *ctx = c->open(m_param);
-	if(!ctx) {
+	ConnectionProvider *c = ConnectionProvider::GetInstance();
+	m_conn = c->open(m_param);
+	if(!m_conn) {
 		return false;
 	}
 	auto dbgTme = ToolMenuEntry::findToolMenuEntryById(m_toolList, "debugger");
-	dbgTme->setTool(new DebuggerInstrument(ctx, nullptr, nullptr));
+	dbgTme->setTool(new DebuggerInstrument(m_conn->context(), nullptr, nullptr));
 	dbgTme->setEnabled(true);
 	dbgTme->setRunBtnVisible(true);
 
@@ -68,8 +68,10 @@ bool DebuggerPlugin::onDisconnect()
 		tme->setTool(nullptr);
 	}
 
-	ContextProvider *c = ContextProvider::GetInstance();
-	c->close(m_param);
+	if(m_conn) {
+		ConnectionProvider *c = ConnectionProvider::GetInstance();
+		c->close(m_param);
+	}
 	return true;
 }
 
