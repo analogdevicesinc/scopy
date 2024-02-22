@@ -29,7 +29,7 @@
 #include "datastrategy/cmdqdeviceattrdatastrategy.h"
 #include "guistrategy/comboguistrategy.h"
 #include "guistrategy/rangeguistrategy.h"
-#include <iioutil/commandqueueprovider.h>
+#include <iioutil/connectionprovider.h>
 #include <QLoggingCategory>
 
 #define ATTR_BUFFER_SIZE 256
@@ -199,16 +199,26 @@ IIOWidget *IIOWidgetFactory::buildSingle(uint32_t hint, IIOWidgetFactoryRecipe r
 	} else if(hint & ContextAttrData) {
 		dataStrategy = new ContextAttrDataStrategy(recipe, parent);
 	} else if(hint & CMDQAttrData) {
-		auto cmdq = CommandQueueProvider::GetInstance()->open(nullptr);
-		dataStrategy = new CmdQChannelAttrDataStrategy(recipe, cmdq, parent);
+		if(recipe.connection) {
+			dataStrategy = new CmdQChannelAttrDataStrategy(recipe, parent);
+		} else {
+			qWarning(CAT_ATTRFACTORY)
+				<< "Cannot create a CmdQDeviceAttrDataStrategy, no Connection object provided.";
+		}
 	} else if(hint & CMDQDeviceAttrData) {
-		auto cmdq = CommandQueueProvider::GetInstance()->open(nullptr);
-		dataStrategy = new CmdQDeviceAttrDataStrategy(recipe, cmdq, parent);
+		if(recipe.connection) {
+			dataStrategy = new CmdQDeviceAttrDataStrategy(recipe, parent);
+		} else {
+			qWarning(CAT_ATTRFACTORY)
+				<< "Cannot create a CmdQDeviceAttrDataStrategy, no Connection object provided.";
+		}
 	}
 
 	if(uiStrategy && dataStrategy) {
 		attrWidget = new IIOWidget(uiStrategy, dataStrategy, parent);
 		attrWidget->setRecipe(recipe);
+	} else {
+		qCritical(CAT_ATTRFACTORY) << "Cannot create an IIOWidget, strategy mismatch.";
 	}
 
 	return attrWidget;
