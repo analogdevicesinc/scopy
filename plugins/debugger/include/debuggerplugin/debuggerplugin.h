@@ -9,6 +9,7 @@
 #include <QObject>
 
 #include <pluginbase/pluginbase.h>
+#include <iioutil/connection.h>
 
 namespace scopy::debugger {
 class SCOPY_DEBUGGERPLUGIN_EXPORT DebuggerPlugin : public QObject, public PluginBase
@@ -26,6 +27,9 @@ public:
 public Q_SLOTS:
 	bool onConnect() override;
 	bool onDisconnect() override;
+
+private:
+	Connection *m_conn;
 };
 } // namespace scopy::debugger
 

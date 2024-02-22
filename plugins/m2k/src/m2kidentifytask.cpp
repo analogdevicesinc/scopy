@@ -1,6 +1,6 @@
 #include "m2kidentifytask.h"
 
-#include "iioutil/contextprovider.h"
+#include "iioutil/connectionprovider.h"
 
 #include <iio.h>
 
@@ -14,13 +14,13 @@ M2kIdentifyTask::~M2kIdentifyTask() {}
 
 void M2kIdentifyTask::run()
 {
-	iio_context *ctx = ContextProvider::GetInstance()->open(m_uri);
+	Connection *conn = ConnectionProvider::GetInstance()->open(m_uri);
 	iio_device *dev;
 	iio_channel *ch;
 
-	if(!ctx)
+	if(!conn)
 		return;
-	dev = iio_context_find_device(ctx, "m2k-fabric");
+	dev = iio_context_find_device(conn->context(), "m2k-fabric");
 	if(!dev)
 		return;
 	ch = iio_device_find_channel(dev, "voltage4", true);
@@ -39,6 +39,6 @@ void M2kIdentifyTask::run()
 	}
 
 finish:
-	ContextProvider::GetInstance()->close(m_uri);
+	ConnectionProvider::GetInstance()->close(m_uri);
 	return;
 }
