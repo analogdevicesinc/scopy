@@ -21,13 +21,23 @@ public:
 	void operator=(const ConnectionProvider &) = delete;
 
 	static ConnectionProvider *GetInstance();
+	static Connection *open(struct iio_context *ctx);
 	static Connection *open(QString uri);
+	static void close(struct iio_context *ctx);
+	static void close(Connection *conn);
 	static void close(QString uri);
+	static void closeAll(struct iio_context *ctx);
+	static void closeAll(Connection *conn);
 	static void closeAll(QString uri);
 
 private:
+	Connection *_open(struct iio_context *ctx);
 	Connection *_open(QString uri);
+	void _close(struct iio_context *ctx);
+	void _close(Connection *conn);
 	void _close(QString uri);
+	void _closeAll(struct iio_context *ctx);
+	void _closeAll(Connection *conn);
 	void _closeAll(QString uri);
 	void _closeAndRemove(QString uri);
 	static ConnectionProvider *pinstance_;
