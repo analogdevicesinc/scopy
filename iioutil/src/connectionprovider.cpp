@@ -28,7 +28,21 @@ ConnectionProvider *ConnectionProvider::GetInstance()
 	return pinstance_;
 }
 
+Connection *ConnectionProvider::open(struct iio_context *ctx) { return ConnectionProvider::GetInstance()->_open(ctx); }
+
 Connection *ConnectionProvider::open(QString uri) { return ConnectionProvider::GetInstance()->_open(uri); }
+
+Connection *ConnectionProvider::_open(struct iio_context *ctx)
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	for(auto it = map.keyValueBegin(); it != map.keyValueEnd(); ++it) {
+		if(ctx == it->second->context()) {
+			lock.unlock();
+			return _open(it->first);
+		}
+	}
+	return nullptr;
+}
 
 Connection *ConnectionProvider::_open(QString uri)
 {
@@ -53,9 +67,65 @@ Connection *ConnectionProvider::_open(QString uri)
 	return connectionObject;
 }
 
+void ConnectionProvider::closeAll(struct iio_context *ctx) { return ConnectionProvider::GetInstance()->_closeAll(ctx); }
+
+void ConnectionProvider::close(struct iio_context *ctx) { return ConnectionProvider::GetInstance()->_close(ctx); }
+
+void ConnectionProvider::closeAll(Connection *conn) { return ConnectionProvider::GetInstance()->_closeAll(conn); }
+
+void ConnectionProvider::close(Connection *conn) { return ConnectionProvider::GetInstance()->_close(conn); }
+
 void ConnectionProvider::closeAll(QString uri) { return ConnectionProvider::GetInstance()->_closeAll(uri); }
 
 void ConnectionProvider::close(QString uri) { return ConnectionProvider::GetInstance()->_close(uri); }
+
+void ConnectionProvider::_closeAll(struct iio_context *ctx)
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	for(auto it = map.keyValueBegin(); it != map.keyValueEnd(); ++it) {
+		if(ctx == it->second->context()) {
+			lock.unlock();
+			_closeAll(it->first);
+			break;
+		}
+	}
+}
+
+void ConnectionProvider::_close(struct iio_context *ctx)
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	for(auto it = map.keyValueBegin(); it != map.keyValueEnd(); ++it) {
+		if(ctx == it->second->context()) {
+			lock.unlock();
+			_close(it->first);
+			break;
+		}
+	}
+}
+
+void ConnectionProvider::_closeAll(Connection *conn)
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	for(auto it = map.keyValueBegin(); it != map.keyValueEnd(); ++it) {
+		if(conn == it->second) {
+			lock.unlock();
+			_closeAll(it->first);
+			break;
+		}
+	}
+}
+
+void ConnectionProvider::_close(Connection *conn)
+{
+	std::unique_lock<std::mutex> lock(mutex_);
+	for(auto it = map.keyValueBegin(); it != map.keyValueEnd(); ++it) {
+		if(conn == it->second) {
+			lock.unlock();
+			_close(it->first);
+			break;
+		}
+	}
+}
 
 void ConnectionProvider::_closeAll(QString uri)
 {
