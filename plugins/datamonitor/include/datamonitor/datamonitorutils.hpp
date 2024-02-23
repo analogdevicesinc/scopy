@@ -15,6 +15,8 @@ public:
 	static double getAxisDefaultMinValue();
 	static double getAxisDefaultMaxValue();
 	static double getXAxisDefaultViewPortSize();
+	static QString getToolSettingsId();
+	static double getReadIntervalDefaul();
 };
 } // namespace datamonitor
 } // namespace scopy

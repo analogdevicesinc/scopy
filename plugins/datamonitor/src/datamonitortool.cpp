@@ -1,4 +1,5 @@
 #include "datamonitortool.hpp"
+#include <datamonitortoolsettings.hpp>
 
 #include <QBoxLayout>
 #include <datamonitorstylehelper.hpp>
@@ -16,6 +17,8 @@
 #include <dmm.hpp>
 #include <dmmreadstrategy.hpp>
 #include <datamonitorcontroller.hpp>
+#include <datamonitorutils.hpp>
+#include <timetracker.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -66,6 +69,18 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	m_scrollArea->setWidget(m_flexGridLayout);
 	tool->addWidgetToCentralContainerHelper(m_scrollArea);
 
+	// tool settings
+	DataMonitorToolSettings *toolSettings = new DataMonitorToolSettings(this);
+	tool->rightStack()->add(DataMonitorUtils::getToolSettingsId(), toolSettings);
+
+	connect(settingsButton, &GearBtn::clicked, this, [=]() {
+		tool->openRightContainerHelper(true);
+		tool->requestMenu(DataMonitorUtils::getToolSettingsId());
+	});
+
+	connect(toolSettings, &DataMonitorToolSettings::readIntervalChanged, this,
+		[=](double newInterval) { m_readTimer->setInterval(newInterval * 1000); });
+
 	// generate channel monitors
 
 	DMM dmm;
@@ -82,8 +97,28 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
 	// TODO connect to UI
+	auto &&timeTracker = TimeTracker::GetInstance();
+	m_readTimer = new QTimer(this);
+	m_readTimer->setInterval(DataMonitorUtils::getReadIntervalDefaul() * 1000);
+	connect(m_readTimer, &QTimer::timeout, dataAcquisitionManager, &DataAcquisitionManager::readData);
+	connect(runBtn, &QPushButton::toggled, this, [=](bool toggled) {
+		if(toggled) {
+			m_readTimer->start();
+			if(first) {
+				timeTracker->setStartTime();
+				first = false;
+			}
+		} else {
+			m_readTimer->stop();
+		}
+	});
 
-	connect(runBtn, &QPushButton::toggled, this, [=]() { dataAcquisitionManager->readData(); });
+	connect(clearBtn, &QPushButton::clicked, this, [=]() {
+		if(!first) {
+			timeTracker->setStartTime();
+			first = true;
+		}
+	});
 
 	//// add monitors
 	addMonitorButton = new QPushButton(this);
