@@ -10,6 +10,7 @@
 #include <toolbuttons.h>
 #include <QMap>
 #include <QScrollArea>
+#include <QTimer>
 
 namespace scopy {
 
@@ -48,6 +49,9 @@ private:
 
 	iio_context *ctx;
 	int activeMonitor = -1;
+	bool first = true;
+
+	QTimer *m_readTimer;
 };
 } // namespace datamonitor
 } // namespace scopy
