@@ -1,5 +1,6 @@
 #include "dmmreadstrategy.hpp"
 #include <QDebug>
+#include <timetracker.hpp>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -31,7 +32,10 @@ void DMMReadStrategy::read()
 	} else {
 		double result = (raw + m_offset) * scale * m_umScale;
 		qDebug() << "dmm read success  ";
-		testDataTime += 1;
+
+		auto &&timeTracker = TimeTracker::GetInstance();
+		double testDataTime = timeTracker->time() / 1000;
+
 		Q_EMIT readDone(testDataTime, result);
 	}
 }

@@ -25,7 +25,6 @@ public:
 private:
 	iio_device *dev;
 	iio_channel *chn;
-	double testDataTime = 0;
 	double m_umScale = 1;
 	double m_offset = 0;
 };
