@@ -96,23 +96,25 @@ void AcquisitionManager::futureReadData()
 void AcquisitionManager::readData()
 {
 	if(m_tools["rms"] || m_tools["harmonics"] || m_tools["settings"]) {
-		readPqmAttributes();
-		m_attrHaveBeenRead = true;
+		m_attrHaveBeenRead = readPqmAttributes();
 	}
 	if(m_tools["waveform"]) {
-		readBufferedData();
-		m_buffHaveBeenRead = true;
+		m_buffHaveBeenRead = readBufferedData();
 	}
 }
 
-void AcquisitionManager::readPqmAttributes()
+bool AcquisitionManager::readPqmAttributes()
 {
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
+	if(!isMeasurementAvailable(dev)) {
+		qWarning(CAT_PQM_ACQ) << "Measurement is unavailable!";
+		return false;
+	}
 	int attrNo = iio_device_get_attrs_count(dev);
 	int chnlsNo = iio_device_get_channels_count(dev);
 	const char *attrName = nullptr;
 	const char *chnlId = nullptr;
-	char *dest = new char[MAX_ATTR_SIZE];
+	char dest[MAX_ATTR_SIZE];
 	for(int i = 0; i < attrNo; i++) {
 		attrName = iio_device_get_attr(dev, i);
 		iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
@@ -128,20 +130,19 @@ void AcquisitionManager::readPqmAttributes()
 			m_pqmAttr[chnlId][attrName] = QString(dest);
 		}
 	}
-	delete[] dest;
-	dest = nullptr;
+	return true;
 }
 
-void AcquisitionManager::readBufferedData()
+bool AcquisitionManager::readBufferedData()
 {
 	if(!m_buffer) {
 		qWarning(CAT_PQM_ACQ) << "The buffer is NULL!";
-		return;
+		return false;
 	}
 	ssize_t ret = iio_buffer_refill(m_buffer);
 	if(ret < 0) {
 		qWarning(CAT_PQM_ACQ) << "An error occurred while refilling! [" << ret << "]";
-		return;
+		return false;
 	}
 	int samplesCounter = 0;
 	int chnlIdx = 0;
@@ -159,6 +160,7 @@ void AcquisitionManager::readBufferedData()
 		m_bufferData[chnl].push_back(d_ptr);
 		samplesCounter++;
 	}
+	return true;
 }
 
 void AcquisitionManager::onReadFinished()
@@ -171,6 +173,34 @@ void AcquisitionManager::onReadFinished()
 		m_buffHaveBeenRead = false;
 		Q_EMIT bufferDataAvailable(m_bufferData);
 	}
+}
+
+int AcquisitionManager::readGetNewMeasurement(iio_device *dev)
+{
+	char dest[MAX_ATTR_SIZE];
+	int measurementNumber = 0;
+	bool ok = false;
+	iio_device_attr_read(dev, NEW_MEASUREMENT_ATTR, dest, MAX_ATTR_SIZE);
+	QString value(dest);
+	measurementNumber = value.toInt(&ok);
+	if(!ok) {
+		qWarning(CAT_PQM_ACQ) << "get_new_measurment attribute cannot be read!";
+		return -1;
+	}
+	return measurementNumber;
+}
+
+bool AcquisitionManager::isMeasurementAvailable(iio_device *dev)
+{
+	int measurementNumber = readGetNewMeasurement(dev);
+	if(measurementNumber < 0) {
+		return false;
+	}
+	if(m_pqmAttr.empty()) {
+		return true;
+	}
+	int oldMeasurementNumber = m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR].toInt();
+	return (measurementNumber != oldMeasurementNumber);
 }
 
 void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr)

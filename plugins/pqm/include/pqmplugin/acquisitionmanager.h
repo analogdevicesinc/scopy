@@ -12,6 +12,7 @@
 #define MAX_ATTR_SIZE 1024
 #define BUFFER_SIZE 1024
 #define DEVICE_PQM "pqm"
+#define NEW_MEASUREMENT_ATTR "get_new_measurement"
 #define SWAP_UINT32(x) (((x) >> 24) | (((x)&0x00FF0000) >> 8) | (((x)&0x0000FF00) << 8) | ((x) << 24))
 namespace scopy::pqm {
 class AcquisitionManager : public QObject
@@ -33,10 +34,12 @@ private Q_SLOTS:
 	void onReadFinished();
 
 private:
+	int readGetNewMeasurement(iio_device *dev);
+	bool isMeasurementAvailable(iio_device *dev);
 	void enableBufferChnls(iio_device *dev);
 	void readData();
-	void readPqmAttributes();
-	void readBufferedData();
+	bool readPqmAttributes();
+	bool readBufferedData();
 	void setData(QMap<QString, QMap<QString, QString>>);
 
 	iio_context *m_ctx;
