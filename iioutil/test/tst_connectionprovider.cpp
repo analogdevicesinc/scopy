@@ -49,15 +49,34 @@ public:
 		}
 	}
 
-	virtual ~Plugin1() { ConnectionProvider::close(uri); }
-
-	void close()
+	explicit Plugin1(struct iio_context *context)
 	{
-		qInfo() << "Plugin1 close connection";
-		ConnectionProvider::close(uri);
+		ctx = context;
+		conn = ConnectionProvider::open(ctx);
+		if(conn) {
+			uri = conn->uri();
+			connect(conn, &Connection::aboutToBeDestroyed, this, &Plugin1::handleClose);
+			commandQueue = conn->commandQueue();
+		} else {
+			conn = nullptr;
+			commandQueue = nullptr;
+			uri = nullptr;
+		}
 	}
 
+	virtual ~Plugin1() { ConnectionProvider::close(uri); }
+
+	void close() { ConnectionProvider::close(uri); }
+
+	void closeCtx() { ConnectionProvider::close(ctx); }
+
+	void closeConn() { ConnectionProvider::close(conn); }
+
 	void closeAll() { ConnectionProvider::closeAll(uri); }
+
+	void closeAllCtx() { ConnectionProvider::closeAll(ctx); }
+
+	void closeAllConn() { ConnectionProvider::closeAll(conn); }
 
 	const QString &getUri() const { return uri; }
 
@@ -93,6 +112,11 @@ private Q_SLOTS:
 	void testSignalAboutToBeDestroyed();
 	void testForceClose();
 	void testConnectionCmdQ();
+	void testOpenCtx();
+	void testCloseCtx();
+	void testCloseConn();
+	void testCloseAllCtx();
+	void testCloseAllConn();
 
 private:
 	int TEST_A = 100;
@@ -218,6 +242,98 @@ void TST_ConnectionProvider::testConnectionCmdQ()
 	QVERIFY2(p1->getConn() == nullptr, "P1 object connection not closed");
 	QVERIFY2(p2->getConn() == nullptr, "P2 object connection not closed");
 	QVERIFY2(p3->getConn() == nullptr, "P3 object connection not closed");
+}
+
+void TST_ConnectionProvider::testOpenCtx()
+{
+	QString uri = "ip:192.168.2.1";
+	Plugin1 *p1 = new Plugin1(uri);
+	if(!p1->getConn()) {
+		QSKIP("No context. Skipping");
+	}
+	QVERIFY2(p1->getConn() != nullptr, "P1 object connection not opened");
+
+	Plugin1 *p2 = new Plugin1(p1->getCtx());
+	QVERIFY2(p2->getConn() != nullptr, "P2 object connection by iio_context not opened");
+	QVERIFY2(p2->getUri() == uri, "P2 object connection by iio_context - bad uri");
+	QVERIFY2(p1->getConn()->refCount() == 2, "Connection by iio_context and uri not opened");
+
+	p2->close();
+	p1->close();
+	QVERIFY2(p1->getConn() == nullptr, "P1 object connection not closed");
+	QVERIFY2(p2->getConn() == nullptr, "P2 object connection not closed");
+}
+
+void TST_ConnectionProvider::testCloseCtx()
+{
+	QString uri = "ip:192.168.2.1";
+	Plugin1 *p1 = new Plugin1(uri);
+	Plugin1 *p2 = new Plugin1(uri);
+	if(!p1->getConn()) {
+		QSKIP("No context. Skipping");
+	}
+
+	QVERIFY2(p1->getConn() != nullptr, "P1 object connection not opened");
+	QVERIFY2(p2->getConn() != nullptr, "P2 object connection not opened");
+
+	p1->closeCtx();
+	QVERIFY2(p1->getConn()->refCount() == 1, "P1 object close by iio_context failed");
+	p2->close();
+	QVERIFY2(p1->getConn() == nullptr, "P1 object connection not closed");
+	QVERIFY2(p2->getConn() == nullptr, "P2 object connection not closed");
+}
+
+void TST_ConnectionProvider::testCloseConn()
+{
+	QString uri = "ip:192.168.2.1";
+	Plugin1 *p1 = new Plugin1(uri);
+	Plugin1 *p2 = new Plugin1(uri);
+	if(!p1->getConn()) {
+		QSKIP("No context. Skipping");
+	}
+
+	QVERIFY2(p1->getConn() != nullptr, "P1 object connection not opened");
+	QVERIFY2(p2->getConn() != nullptr, "P2 object connection not opened");
+
+	p1->closeConn();
+	QVERIFY2(p1->getConn()->refCount() == 1, "P1 object close by Connection failed");
+	p2->close();
+	QVERIFY2(p1->getConn() == nullptr, "P1 object connection not closed");
+	QVERIFY2(p2->getConn() == nullptr, "P2 object connection not closed");
+}
+
+void TST_ConnectionProvider::testCloseAllCtx()
+{
+	QString uri = "ip:192.168.2.1";
+	Plugin1 *p1 = new Plugin1(uri);
+	Plugin1 *p2 = new Plugin1(uri);
+	if(!p1->getConn()) {
+		QSKIP("No context. Skipping");
+	}
+
+	QVERIFY2(p1->getConn() != nullptr, "P1 object connection not opened");
+	QVERIFY2(p2->getConn() != nullptr, "P2 object connection not opened");
+
+	p2->closeAllCtx();
+	QVERIFY2(p1->getConn() == nullptr, "P1 object connection not closed");
+	QVERIFY2(p2->getConn() == nullptr, "P2 object connection not closed");
+}
+
+void TST_ConnectionProvider::testCloseAllConn()
+{
+	QString uri = "ip:192.168.2.1";
+	Plugin1 *p1 = new Plugin1(uri);
+	Plugin1 *p2 = new Plugin1(uri);
+	if(!p1->getConn()) {
+		QSKIP("No context. Skipping");
+	}
+
+	QVERIFY2(p1->getConn() != nullptr, "P1 object connection not opened");
+	QVERIFY2(p2->getConn() != nullptr, "P2 object connection not opened");
+
+	p2->closeAllConn();
+	QVERIFY2(p1->getConn() == nullptr, "P1 object connection not closed");
+	QVERIFY2(p2->getConn() == nullptr, "P2 object connection not closed");
 }
 
 QTEST_MAIN(TST_ConnectionProvider)
