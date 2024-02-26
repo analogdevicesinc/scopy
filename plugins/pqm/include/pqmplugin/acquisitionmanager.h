@@ -36,6 +36,7 @@ private Q_SLOTS:
 private:
 	int readGetNewMeasurement(iio_device *dev);
 	bool isMeasurementAvailable(iio_device *dev);
+	double convertFromHwToHost(int value, QString chnlId);
 	void enableBufferChnls(iio_device *dev);
 	void readData();
 	bool readPqmAttributes();

@@ -16,6 +16,7 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
+		readPqmAttributes();
 		// might need to set a trigger for the pqm device
 		enableBufferChnls(dev);
 		m_buffer = iio_device_create_buffer(dev, BUFFER_SIZE, false);
@@ -107,7 +108,7 @@ bool AcquisitionManager::readPqmAttributes()
 {
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(!isMeasurementAvailable(dev)) {
-		qWarning(CAT_PQM_ACQ) << "Measurement is unavailable!";
+		qDebug(CAT_PQM_ACQ) << "Measurement is unavailable!";
 		return false;
 	}
 	int attrNo = iio_device_get_attrs_count(dev);
@@ -156,7 +157,7 @@ bool AcquisitionManager::readBufferedData()
 	for(int *ptr = startAdr; ptr != endAdr; ptr++) {
 		chnlIdx = samplesCounter % m_chnlsName.size();
 		chnl = m_chnlsName[chnlIdx];
-		int d_ptr = (int)*ptr;
+		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
 		m_bufferData[chnl].push_back(d_ptr);
 		samplesCounter++;
 	}
@@ -201,6 +202,18 @@ bool AcquisitionManager::isMeasurementAvailable(iio_device *dev)
 	}
 	int oldMeasurementNumber = m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR].toInt();
 	return (measurementNumber != oldMeasurementNumber);
+}
+
+double AcquisitionManager::convertFromHwToHost(int value, QString chnlId)
+{
+	bool okScale = false, okOffset = false;
+	double scale = m_pqmAttr[chnlId]["scale"].toDouble(&okScale);
+	double offset = m_pqmAttr[chnlId]["offset"].toDouble(&okOffset);
+	double result = 0.0;
+	if(okScale && okOffset) {
+		result = (value + offset) * scale;
+	}
+	return result;
 }
 
 void AcquisitionManager::setConfigAttr(QMap<QString, QMap<QString, QString>> attr)
