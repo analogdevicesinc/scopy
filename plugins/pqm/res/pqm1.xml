@@ -52,6 +52,7 @@
 		<attribute name="sampling_frequency" value="1000" />
 		<attribute name="nominal_frequency" value="50" />
 		<attribute name="nominal_frequency_available" value="50 60" />
+		<attribute name="get_new_measurement" value="0" />
 		<channel id="voltage0" name="ua" type="input" >
 			<scan-element index="0" format="be:u24/32&gt;&gt;0" />
 			<attribute name="rms" filename="in_voltage0_rms" value="200.6921" />
@@ -65,6 +66,8 @@
             <attribute name="harmonics" filename="in_voltage0_harmonics" value="100 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54 92 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54" />
 			<attribute name="inter_harmonics" filename="in_voltage0_inter_harmonics" value="100 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54 92 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54" />
             <attribute name="raw" filename="in_voltage0_raw" value="0.000" />
+			<attribute name="scale" filename="in_voltage0_scale" value="1.000" />
+			<attribute name="offset" filename="in_voltage0_offset" value="0.000" />
 		</channel>
         <channel id="voltage1" name="ub" type="input" >
 			<scan-element index="1" format="be:u24/32&gt;&gt;0" />
@@ -79,6 +82,8 @@
             <attribute name="harmonics" filename="in_voltage1_harmonics" value="72 61 44 87 6 6 44 98 56 70 86 27 67 89 27 66 74 34 32 82 46 86 90 21 64 92 44 81 72 0 97 17 46 50 61 26 53 49 9 42 39 55 64 98 97 66 89 7 95 23" />
 			<attribute name="inter_harmonics" filename="in_voltage1_inter_harmonics" value="72 61 44 87 6 6 44 98 56 70 86 27 67 89 27 66 74 34 32 82 46 86 90 21 64 92 44 81 72 0 97 17 46 50 61 26 53 49 9 42 39 55 64 98 97 66 89 7 95 23" />
             <attribute name="raw" filename="in_voltage1_raw" value="0.000" />
+			<attribute name="scale" filename="in_voltage1_scale" value="1.000" />
+			<attribute name="offset" filename="in_voltage1_offset" value="0.000" />
 		</channel>
         <channel id="voltage2" name="uc" type="input" >
 			<scan-element index="2" format="be:u24/32&gt;&gt;0" />
@@ -93,6 +98,8 @@
             <attribute name="harmonics" filename="in_voltage2_harmonics" value="27 41 32 18 67 84 20 84 33 24 13 38 63 31 90 33 47 79 62 10 74 73 99 40 72 7 2 32 68 81 94 64 41 36 9 50 91 92 52 57 72 92 61 90 6 82 90 36 19 10" />
 			<attribute name="inter_harmonics" filename="in_voltage2_inter_harmonics" value="27 41 32 18 67 84 20 84 33 24 13 38 63 31 90 33 47 79 62 10 74 73 99 40 72 7 2 32 68 81 94 64 41 36 9 50 91 92 52 57 72 92 61 90 6 82 90 36 19 10" />
             <attribute name="raw" filename="in_voltage2_raw" value="0.000" />
+			<attribute name="scale" filename="in_voltage2_scale" value="1.000" />
+			<attribute name="offset" filename="in_voltage2_offset" value="0.000" />
 		</channel>
 		<channel id="current0" name="ia" type="input" >
 			<scan-element index="3" format="be:u24/32&gt;&gt;0" />
@@ -102,6 +109,8 @@
 			<attribute name="harmonics" filename="in_current0_harmonics" value="100 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54 92 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54" />
 			<attribute name="inter_harmonics" filename="in_current0_inter_harmonics" value="100 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54 92 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54" />
             <attribute name="raw" filename="in_current0_raw" value="0.000" />
+			<attribute name="scale" filename="in_current0_scale" value="1.000" />
+			<attribute name="offset" filename="in_current0_offset" value="0.000" />
 		</channel>
 		<channel id="current1" name="ib" type="input" >
 			<scan-element index="4" format="be:u24/32&gt;&gt;0" />
@@ -111,6 +120,8 @@
 			<attribute name="harmonics" filename="in_current1_harmonics" value="17 32 75 33 99 65 25 43 14 40 99 96 37 9 25 55 9 11 84 78 80 84 26 51 0 20 97 8 2 47 83 43 85 50 29 28 57 10 92 56 43 100 64 11 2 43 96 83 89 75" />
 			<attribute name="inter_harmonics" filename="in_current1_inter_harmonics" value="17 32 75 33 99 65 25 43 14 40 99 96 37 9 25 55 9 11 84 78 80 84 26 51 0 20 97 8 2 47 83 43 85 50 29 28 57 10 92 56 43 100 64 11 2 43 96 83 89 75" />
             <attribute name="raw" filename="in_current1_raw" value="0.000" />
+			<attribute name="scale" filename="in_current3_scale" value="1.000" />
+			<attribute name="offset" filename="in_current3_offset" value="0.000" />
 		</channel>
 		<channel id="current2" name="ic" type="input" >
 			<scan-element index="5" format="be:u24/32&gt;&gt;0" />
@@ -120,12 +131,16 @@
 			<attribute name="harmonics" filename="in_current2_harmonics" value="100 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54 92 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54" />
 			<attribute name="inter_harmonics" filename="in_current2_inter_harmonics" value="100 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54 92 21 32.12 54.12 23 42 53 87 12 32 43 12 89 99 31 42 12 53 64 48 58 91 23 3 4.54" />
             <attribute name="raw" filename="in_current2_raw" value="0.000" />
+			<attribute name="scale" filename="in_current2_scale" value="1.000" />
+			<attribute name="offset" filename="in_current2_offset" value="0.000" />
 		</channel>
 		<channel id="current3" name="in" type="input" >
 			<scan-element index="6" format="be:u24/32&gt;&gt;0" />
 			<attribute name="rms" filename="in_current3_rms" value="0.000" />
 			<attribute name="angle" filename="in_current3_angle" value="0.000" />
             <attribute name="raw" filename="in_current3_raw" value="0.000" />
+			<attribute name="scale" filename="in_current3_scale" value="1.000" />
+			<attribute name="offset" filename="in_current3_offset" value="0.000" />
 		</channel>
 	</device>
 	<device id="trigger0" name="pqm-dev0" ></device>
