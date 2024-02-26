@@ -66,7 +66,7 @@ void WaveformInstrument::initData()
 void WaveformInstrument::initPlot(PlotWidget *plot, QString unitType, int yMin, int yMax)
 {
 	plot->plot()->insertLegend(new QwtLegend(), QwtPlot::TopLegend);
-	plot->xAxis()->setInterval(0, 1);
+	plot->xAxis()->setInterval(XMIN, XMAX);
 	plot->xAxis()->setVisible(true);
 	plot->yAxis()->setInterval(yMin, yMax);
 	plot->yAxis()->scaleDraw()->setFormatter(new MetricPrefixFormatter());
