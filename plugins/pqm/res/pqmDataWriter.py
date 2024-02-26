@@ -35,4 +35,6 @@ while True:
             ch.attrs["harmonics"]._write(strHarmonics)
         if "inter_harmonics" in ch.attrs:
             ch.attrs["inter_harmonics"]._write(strInterHarmonics)
-    time.sleep(2)
+    time.sleep(3)
+    measurementIdx = int(device.attrs["get_new_measurement"]._read()) + 1
+    device.attrs["get_new_measurement"]._write(str(measurementIdx))
