@@ -11,6 +11,7 @@
 #include <QMap>
 #include <QScrollArea>
 #include <QTimer>
+#include <QLabel>
 
 namespace scopy {
 
@@ -49,9 +50,12 @@ private:
 
 	iio_context *ctx;
 	int activeMonitor = -1;
-	bool first = true;
 
+	bool first = true;
 	QTimer *m_readTimer;
+
+	QLabel *startTime;
+	void resetStartTime();
 };
 } // namespace datamonitor
 } // namespace scopy

@@ -10,6 +10,7 @@
 #include <stylehelper.h>
 #include <verticalchannelmanager.h>
 
+#include <QDate>
 #include <datamonitormodel.hpp>
 #include <testreadstrategy.hpp>
 
@@ -19,6 +20,7 @@
 #include <datamonitorcontroller.hpp>
 #include <datamonitorutils.hpp>
 #include <timetracker.hpp>
+#include "dynamicWidget.h"
 
 using namespace scopy;
 using namespace datamonitor;
@@ -97,15 +99,17 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	Q_EMIT m_flexGridLayout->reqestLayoutUpdate();
 
 	// TODO connect to UI
-	auto &&timeTracker = TimeTracker::GetInstance();
 	m_readTimer = new QTimer(this);
 	m_readTimer->setInterval(DataMonitorUtils::getReadIntervalDefaul() * 1000);
 	connect(m_readTimer, &QTimer::timeout, dataAcquisitionManager, &DataAcquisitionManager::readData);
+
+	startTime = new QLabel();
+
 	connect(runBtn, &QPushButton::toggled, this, [=](bool toggled) {
 		if(toggled) {
 			m_readTimer->start();
 			if(first) {
-				timeTracker->setStartTime();
+				resetStartTime();
 				first = false;
 			}
 		} else {
@@ -115,7 +119,7 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	connect(clearBtn, &QPushButton::clicked, this, [=]() {
 		if(!first) {
-			timeTracker->setStartTime();
+			resetStartTime();
 			first = true;
 		}
 	});
@@ -153,6 +157,8 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 
 	///////// end add monitor
 
+	tool->addWidgetToTopContainerHelper(startTime, TTA_LEFT);
+
 	DataMonitorStyleHelper::DataMonitorToolStyle(this);
 }
 
@@ -161,4 +167,15 @@ RunBtn *DataMonitorTool::getRunButton() const { return runBtn; }
 void DataMonitorTool::generateMonitor(DataMonitorModel *model, CollapsableMenuControlButton *channelManager)
 {
 	// Generate controller
+}
+
+void DataMonitorTool::resetStartTime()
+{
+	auto &&timeTracker = TimeTracker::GetInstance();
+	timeTracker->setStartTime();
+
+	QDateTime date = QDateTime::currentDateTime();
+	QString formattedTime = date.toString("dd/MM/yyyy hh:mm:ss");
+	QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
+	startTime->setText(QString(formattedTimeMsg));
 }
