@@ -81,17 +81,12 @@ void DataMonitorModel::setDataStorageSize()
 	Preferences *p = Preferences::GetInstance();
 
 	auto dataSizePref = p->get("datamonitor_data_storage_size").toString().split(" ");
-	int dataSize = dataSizePref[0].toInt();
+	m_dataSize = dataSizePref[0].toDouble();
 	if(dataSizePref[1] == "Kb") {
-		dataSize *= 1000;
+		m_dataSize *= 1000;
 	} else if(dataSizePref[1] == "Mb") {
-		dataSize *= 1000000;
+		m_dataSize *= 1000000;
 	}
-
-	// if any data stored should we delete it ?
-	//?? can user update while program is running (between runs )
-	xdata.reserve(dataSize);
-	ydata.reserve(dataSize);
 }
 
 void DataMonitorModel::setReadStrategy(IReadStrategy *newReadStrategy)
@@ -120,6 +115,11 @@ double DataMonitorModel::maxValue() const { return m_maxValue; }
 
 void DataMonitorModel::updateValue(double time, double value)
 {
+	// make sure the total amout of data won't be more than what is set in prefferences
+	if(xdata.length() >= m_dataSize) {
+		xdata.pop_front();
+		ydata.pop_front();
+	}
 	xdata.push_back(time);
 	ydata.push_back(value);
 	checkMinMaxUpdate(value);

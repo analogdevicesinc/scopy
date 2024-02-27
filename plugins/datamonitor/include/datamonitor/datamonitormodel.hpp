@@ -66,6 +66,7 @@ private:
 	IReadStrategy *readStrategy;
 
 	void setDataStorageSize();
+	double m_dataSize;
 };
 } // namespace datamonitor
 } // namespace scopy
