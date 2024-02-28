@@ -58,6 +58,7 @@ stages:
             export JOB_ID=$(System.JobId)
             export JOB_NAME=$(System.JobName)
             export RUNNER_ARCH=$(Agent.OSArchitecture)
+            export MACOSX_DEPLOYMENT_TARGET=11.0
             ./ci/macOS/build_azure_macos.sh
       displayName: 'Build Scopy'
       workingDirectory: $(Build.Repository.LocalPath)
