@@ -148,13 +148,13 @@ bool AcquisitionManager::readBufferedData()
 	int samplesCounter = 0;
 	int chnlIdx = 0;
 	QString chnl;
-	int *startAdr = (int *)iio_buffer_start(m_buffer);
-	int *endAdr = (int *)iio_buffer_end(m_buffer);
+	int16_t *startAdr = (int16_t *)iio_buffer_start(m_buffer);
+	int16_t *endAdr = (int16_t *)iio_buffer_end(m_buffer);
 	for(const QString &ch : qAsConst(m_chnlsName)) {
 		m_bufferData[ch].clear();
 		m_bufferData[ch] = {};
 	}
-	for(int *ptr = startAdr; ptr != endAdr; ptr++) {
+	for(int16_t *ptr = startAdr; ptr != endAdr; ptr++) {
 		chnlIdx = samplesCounter % m_chnlsName.size();
 		chnl = m_chnlsName[chnlIdx];
 		double d_ptr = convertFromHwToHost((int)*ptr, chnl);
