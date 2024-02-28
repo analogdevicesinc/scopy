@@ -16,7 +16,6 @@ AcquisitionManager::AcquisitionManager(iio_context *ctx, QObject *parent)
 	m_setFw = new QFutureWatcher<void>(this);
 	iio_device *dev = iio_context_find_device(m_ctx, DEVICE_PQM);
 	if(dev) {
-		readPqmAttributes();
 		// might need to set a trigger for the pqm device
 		enableBufferChnls(dev);
 		m_buffer = iio_device_create_buffer(dev, BUFFER_SIZE, false);
@@ -118,8 +117,10 @@ bool AcquisitionManager::readPqmAttributes()
 	char dest[MAX_ATTR_SIZE];
 	for(int i = 0; i < attrNo; i++) {
 		attrName = iio_device_get_attr(dev, i);
-		iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
-		m_pqmAttr[DEVICE_PQM][attrName] = QString(dest);
+		if(strcmp(attrName, NEW_MEASUREMENT_ATTR) != 0) {
+			iio_device_attr_read(dev, attrName, dest, MAX_ATTR_SIZE);
+			m_pqmAttr[DEVICE_PQM][attrName] = QString(dest);
+		}
 	}
 	for(int i = 0; i < chnlsNo; i++) {
 		iio_channel *chnl = iio_device_get_channel(dev, i);
@@ -198,9 +199,11 @@ bool AcquisitionManager::isMeasurementAvailable(iio_device *dev)
 		return false;
 	}
 	if(m_pqmAttr.empty()) {
+		m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR] = QString::number(measurementNumber);
 		return true;
 	}
 	int oldMeasurementNumber = m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR].toInt();
+	m_pqmAttr[DEVICE_PQM][NEW_MEASUREMENT_ATTR] = QString::number(measurementNumber);
 	return (measurementNumber != oldMeasurementNumber);
 }
 
