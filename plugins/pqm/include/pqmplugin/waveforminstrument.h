@@ -10,7 +10,9 @@
 #include <gui/widgets/toolbuttons.h>
 #include <pluginbase/resourcemanager.h>
 
-#define SAMPLE_RATE 1024
+#define SAMPLE_RATE 256
+#define XMIN 0
+#define XMAX 0.08
 namespace scopy::pqm {
 class SCOPY_PQMPLUGIN_EXPORT WaveformInstrument : public QWidget, public ResourceUser
 {
