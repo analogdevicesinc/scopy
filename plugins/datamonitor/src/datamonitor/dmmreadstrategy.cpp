@@ -1,5 +1,7 @@
 #include "dmmreadstrategy.hpp"
+#include <QDate>
 #include <QDebug>
+#include <QwtDate>
 #include <timetracker.hpp>
 
 using namespace scopy;
@@ -33,10 +35,9 @@ void DMMReadStrategy::read()
 		double result = (raw + m_offset) * scale * m_umScale;
 		qDebug() << "dmm read success  ";
 
-		auto &&timeTracker = TimeTracker::GetInstance();
-		double testDataTime = timeTracker->time() / 1000;
+		double currentTime = QwtDate::toDouble(QDateTime::currentDateTime());
 
-		Q_EMIT readDone(testDataTime, result);
+		Q_EMIT readDone(currentTime, result);
 	}
 }
 

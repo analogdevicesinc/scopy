@@ -1,6 +1,9 @@
 #include "datamonitormodel.hpp"
 
 #include <pluginbase/preferences.h>
+#include <QDateTime>
+#include <QDebug>
+#include <QwtDate>
 
 using namespace scopy;
 using namespace datamonitor;
@@ -120,6 +123,7 @@ void DataMonitorModel::updateValue(double time, double value)
 		xdata.pop_front();
 		ydata.pop_front();
 	}
+
 	xdata.push_back(time);
 	ydata.push_back(value);
 	checkMinMaxUpdate(value);
