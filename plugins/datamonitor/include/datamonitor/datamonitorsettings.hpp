@@ -5,6 +5,7 @@
 #include <menucombo.h>
 #include <menuheader.h>
 #include <menuonoffswitch.h>
+#include <monitorplot.hpp>
 #include <monitorplotcurve.hpp>
 #include <spinbox_a.hpp>
 #include "scopy-datamonitor_export.h"
@@ -25,14 +26,13 @@ class SCOPY_DATAMONITOR_EXPORT DataMonitorSettings : public QWidget
 	friend class DataMonitorStyleHelper;
 	Q_OBJECT
 public:
-	explicit DataMonitorSettings(QWidget *parent = nullptr);
+	explicit DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent = nullptr);
 	~DataMonitorSettings();
 
 	void init(QString title, QColor color);
 
 public Q_SLOTS:
 	void plotToggle(bool toggled);
-	void changeCurveStyle(int index);
 	void addMonitorsList(QMap<QString, DataMonitorModel *> *monitoList);
 	void updateTitle(QString title);
 	void plotYAxisMinValueUpdate(double value);
@@ -52,6 +52,7 @@ Q_SIGNALS:
 	void plotXAxisMinValueChange(double value);
 	void plotXAxisMaxValueChange(double value);
 	void requestYMinMaxValues();
+	void toggleRealTime(bool toggled);
 
 private:
 	Qt::PenStyle lineStyleFromIdx(int idx);
@@ -82,6 +83,8 @@ private:
 
 	void addMonitor(QString monitor, QColor monitorColor);
 	void generateDeviceSection(QString device);
+
+	MonitorPlot *m_plot;
 };
 } // namespace datamonitor
 } // namespace scopy

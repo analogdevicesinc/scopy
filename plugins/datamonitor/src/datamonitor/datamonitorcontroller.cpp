@@ -11,38 +11,13 @@ DataMonitorController::DataMonitorController(DataAcquisitionManager *dataAcquisi
 	m_dataAcquisitionManager = dataAcquisitionManager;
 	m_dataMonitorView = new DataMonitorView();
 
-	m_dataMonitorSettings = new DataMonitorSettings();
+	m_dataMonitorSettings = new DataMonitorSettings(m_dataMonitorView->monitorPlot());
 	m_dataMonitorSettings->init(m_dataMonitorView->getTitle(), StyleHelper::getColor("ScopyBlue"));
 
 	// populate available monitors list in settings
 	m_dataMonitorSettings->addMonitorsList(m_dataAcquisitionManager->getDataMonitorMap());
 
 	// plot settings
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::requestYMinMaxValues, this, [=]() {
-		m_dataMonitorView->monitorPlot()->plotYAxisAutoscale();
-
-		m_dataMonitorSettings->plotYAxisMinValueUpdate(m_dataMonitorView->monitorPlot()->getYAxisIntervalMin());
-		m_dataMonitorSettings->plotYAxisMaxValueUpdate(m_dataMonitorView->monitorPlot()->getYAxisIntervalMax());
-	});
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::plotXAxisMinValueChange, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::updateXAxisIntervalMin);
-	connect(m_dataMonitorSettings, &DataMonitorSettings::plotXAxisMaxValueChange, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::updateXAxisIntervalMax);
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisAutoscale, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::plotYAxisAutoscale);
-	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisMinValueChange, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::updateYAxisIntervalMin);
-	connect(m_dataMonitorSettings, &DataMonitorSettings::plotYAxisMaxValueChange, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::updateYAxisIntervalMax);
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::curveStyleIndexChanged, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::changeCurveStyle);
-
-	connect(m_dataMonitorSettings, &DataMonitorSettings::changeCurveThickness, m_dataMonitorView->monitorPlot(),
-		&MonitorPlot::changeCurveThickness);
 
 	connect(m_dataMonitorSettings, &DataMonitorSettings::monitorToggled, m_dataMonitorView->monitorPlot(),
 		[=](bool toggled, QString monitorName) {

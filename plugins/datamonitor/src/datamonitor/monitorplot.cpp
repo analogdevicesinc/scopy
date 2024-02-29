@@ -1,5 +1,8 @@
 #include "monitorplot.hpp"
 
+#include <QDateTime>
+#include <QwtScaleDraw>
+#include <QwtScaleEngine>
 #include <cursorcontroller.h>
 #include <datamonitorutils.hpp>
 #include <monitorplotcurve.hpp>
@@ -20,13 +23,16 @@ MonitorPlot::MonitorPlot(QWidget *parent)
 
 	m_plot = new PlotWidget(this);
 
-	m_plot->xAxis()->setInterval(DataMonitorUtils::getAxisDefaultMaxValue(),
-				     DataMonitorUtils::getAxisDefaultMinValue());
-	m_plot->xAxis()->setVisible(true);
-
 	m_plot->yAxis()->setInterval(DataMonitorUtils::getAxisDefaultMinValue(),
 				     DataMonitorUtils::getAxisDefaultMaxValue());
 	m_plot->yAxis()->setVisible(true);
+
+	m_xAxisIntervalMin = DataMonitorUtils::getAxisDefaultMinValue();
+	m_xAxisIntervalMax = DataMonitorUtils::getAxisDefaultMaxValue();
+
+	m_startTime = QwtDate::toDouble(QDateTime::currentDateTimeUtc());
+
+	setupXAxis();
 
 	m_plotInfo = new TimePlotInfo(m_plot, this);
 
@@ -96,13 +102,15 @@ void MonitorPlot::changeCurveThickness(double thickness)
 
 void MonitorPlot::updateXAxisIntervalMin(double min)
 {
-	m_plot->xAxis()->setMax(min);
+	m_xAxisIntervalMin = min;
+	m_plot->xAxis()->setMin(m_startTime + (min * 1000));
 	m_plot->replot();
 }
 
 void MonitorPlot::updateXAxisIntervalMax(double max)
 {
-	m_plot->xAxis()->setMin(max);
+	m_xAxisIntervalMax = max;
+	m_plot->xAxis()->setMax(m_startTime + (max * 1000));
 	m_plot->replot();
 }
 
@@ -133,6 +141,9 @@ void MonitorPlot::plotYAxisAutoscale()
 			min = curveMin;
 	}
 
+	// make the min/max value to be 10% extra so the curve is not on the edge of the axis
+	min = min - min * 0.1;
+	max = max + max * 0.1;
 	updateYAxisIntervalMin(min);
 	updateYAxisIntervalMax(max);
 }
@@ -140,3 +151,60 @@ void MonitorPlot::plotYAxisAutoscale()
 double MonitorPlot::getYAxisIntervalMin() { return m_plot->yAxis()->min(); }
 
 double MonitorPlot::getYAxisIntervalMax() { return m_plot->yAxis()->max(); }
+
+void MonitorPlot::setIsRealTime(bool newIsRealTime)
+{
+	m_isRealTime = newIsRealTime;
+	updateAxisScaleDraw();
+}
+
+void MonitorPlot::setupXAxis()
+{
+	m_plot->xAxis()->setVisible(true);
+
+	scaleEngine = new QwtDateScaleEngine(Qt::OffsetFromUTC);
+	m_plot->plot()->setAxisScaleEngine(m_plot->xAxis()->axisId(), scaleEngine);
+
+	updateAxisScaleDraw();
+
+	m_plot->replot();
+}
+
+QwtDateScaleDraw *MonitorPlot::genereateScaleDraw(QString format, double offset, QwtDate::IntervalType intervalType)
+{
+	QwtDateScaleDraw *scaleDraw = new QwtDateScaleDraw(Qt::OffsetFromUTC);
+	scaleDraw->setDateFormat(intervalType, format);
+	scaleDraw->setUtcOffset(offset);
+
+	return scaleDraw;
+}
+
+void MonitorPlot::setStartTime()
+{
+	m_startTime = QwtDate::toDouble(QDateTime::currentDateTimeUtc());
+	updateAxisScaleDraw();
+}
+
+void MonitorPlot::updateAxisScaleDraw()
+{
+	if(m_isRealTime) {
+
+		QwtDateScaleDraw *scaleDraw = genereateScaleDraw(
+			"hh:mm:ss", QDateTime::currentDateTime().offsetFromUtc(), QwtDate::IntervalType::Second);
+		m_plot->plot()->setAxisScaleDraw(m_plot->xAxis()->axisId(), scaleDraw);
+
+	} else {
+
+		double offset = (-1) * m_startTime / 1000;
+		QwtDateScaleDraw *scaleDraw = genereateScaleDraw("hh:mm:ss", offset, QwtDate::IntervalType::Second);
+		m_plot->plot()->setAxisScaleDraw(m_plot->xAxis()->axisId(), scaleDraw);
+	}
+
+	m_plot->xAxis()->setInterval(m_startTime + (m_xAxisIntervalMin * 1000),
+				     m_startTime + (m_xAxisIntervalMax * 1000));
+
+	//make label more readable
+	m_plot->plot()->setAxisLabelRotation(m_plot->xAxis()->axisId(), -50.0);
+	m_plot->plot()->setAxisLabelAlignment(m_plot->xAxis()->axisId(), Qt::AlignLeft | Qt::AlignBottom);
+	m_plot->replot();
+}

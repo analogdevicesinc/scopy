@@ -3,6 +3,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QLoggingCategory>
+#include <QwtDate>
 
 Q_LOGGING_CATEGORY(CAT_TIME_TRACKER, "TimeTracker")
 
@@ -31,6 +32,14 @@ TimeTracker *TimeTracker::GetInstance()
 
 void TimeTracker::setStartTime() { m_startTime = QDateTime::currentMSecsSinceEpoch(); }
 
-double TimeTracker::time() { return QDateTime::currentMSecsSinceEpoch() - m_startTime; }
+double TimeTracker::time()
+{
+	if(m_realTime) {
+		return QwtDate::toDouble(QDateTime::currentDateTime());
+	}
+	return (QDateTime::currentMSecsSinceEpoch() - m_startTime) / 1000;
+}
+
+void TimeTracker::toggleRealTime(bool toggled) { m_realTime = toggled; }
 
 double TimeTracker::startTime() const { return m_startTime; }

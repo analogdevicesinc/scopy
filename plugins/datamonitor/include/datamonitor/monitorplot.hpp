@@ -6,6 +6,8 @@
 #include <plotwidget.h>
 #include <plotaxis.h>
 #include <datamonitormodel.hpp>
+#include <QwtDateScaleDraw>
+#include <QwtDateScaleEngine>
 #include "scopy-datamonitor_export.h"
 
 namespace scopy {
@@ -38,6 +40,11 @@ public:
 	double getYAxisIntervalMin();
 	double getYAxisIntervalMax();
 
+
+	void setIsRealTime(bool newIsRealTime);
+
+	void setStartTime();
+
 private:
 	PlotWidget *m_plot;
 	TimePlotInfo *m_plotInfo;
@@ -46,6 +53,17 @@ private:
 
 	int m_currentCurveStyle = 0;
 	double m_currentCurveThickness = 1;
+	bool m_isRealTime = false;
+
+	void setupXAxis();
+	QwtDateScaleDraw *genereateScaleDraw(QString format, double offset, QwtDate::IntervalType intervalType);
+	QwtDateScaleEngine *scaleEngine;
+
+	double m_startTime = 0;
+
+	void updateAxisScaleDraw();
+	double m_xAxisIntervalMin;
+	double m_xAxisIntervalMax;
 };
 } // namespace datamonitor
 } // namespace scopy
