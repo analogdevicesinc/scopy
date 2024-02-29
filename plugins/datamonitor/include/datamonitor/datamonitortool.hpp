@@ -31,6 +31,9 @@ public:
 
 	RunBtn *getRunButton() const;
 
+Q_SIGNALS:
+	void setStartTime();
+
 private:
 	ToolTemplate *tool;
 	QPushButton *openLatMenuBtn;

@@ -15,8 +15,9 @@ using namespace datamonitor;
 
 Q_LOGGING_CATEGORY(CAT_DATAMONITOR_SETTINGS, "DataMonitorSettings")
 
-DataMonitorSettings::DataMonitorSettings(QWidget *parent)
-	: QWidget{parent}
+DataMonitorSettings::DataMonitorSettings(MonitorPlot *m_plot, QWidget *parent)
+	: m_plot(m_plot)
+	, QWidget{parent}
 {
 	mainLayout = new QVBoxLayout(this);
 	mainLayout->setMargin(0);
@@ -72,8 +73,6 @@ void DataMonitorSettings::init(QString title, QColor color)
 }
 
 void DataMonitorSettings::plotToggle(bool toggled) { plotSwitch->onOffswitch()->setChecked(toggled); }
-
-void DataMonitorSettings::changeCurveStyle(int index) { Q_EMIT curveStyleIndexChanged(index); }
 
 void DataMonitorSettings::addMonitorsList(QMap<QString, DataMonitorModel *> *monitorList)
 {
@@ -211,7 +210,11 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 
 	yAxisSection->contentLayout()->addWidget(yMinMax);
 
-	connect(m_autoScaleTimer, &QTimer::timeout, this, &DataMonitorSettings::requestYMinMaxValues);
+	connect(m_autoScaleTimer, &QTimer::timeout, this, [=]() {
+		m_plot->plotYAxisAutoscale();
+		plotYAxisMinValueUpdate(m_plot->getYAxisIntervalMin());
+		plotYAxisMaxValueUpdate(m_plot->getYAxisIntervalMax());
+	});
 
 	connect(autoscale->onOffswitch(), &QAbstractButton::toggled, yMinMax, [=](bool toggled) {
 		plotYAxisAutoscale(toggled);
@@ -224,11 +227,11 @@ QWidget *DataMonitorSettings::generateYAxisSettings(QWidget *parent)
 	});
 
 	connect(m_ymin, &PositionSpinButton::valueChanged, this, [=](double value) {
-		Q_EMIT plotYAxisMinValueChange(value);
+		m_plot->updateYAxisIntervalMin(value);
 		m_ymax->setMinValue(value);
 	});
 	connect(m_ymax, &PositionSpinButton::valueChanged, this, [=](double value) {
-		Q_EMIT plotYAxisMaxValueChange(value);
+		m_plot->updateYAxisIntervalMax(value);
 		m_ymin->setMaxValue(value);
 	});
 
@@ -242,6 +245,11 @@ QWidget *DataMonitorSettings::generateXAxisSettings(QWidget *parent)
 		new MenuCollapseSection("X-AXIS", MenuCollapseSection::MHCW_NONE, xAxisContainer);
 
 	xAxisContainer->contentLayout()->addWidget(xAxisSection);
+
+	MenuOnOffSwitch *realTimeToggle = new MenuOnOffSwitch(tr("Real Time"), xAxisSection, false);
+	xAxisSection->contentLayout()->addWidget(realTimeToggle);
+
+	connect(realTimeToggle->onOffswitch(), &QAbstractButton::toggled, m_plot, &MonitorPlot::setIsRealTime);
 
 	// X-MIN-MAX
 	QWidget *xMinMax = new QWidget(xAxisSection);
@@ -276,12 +284,12 @@ QWidget *DataMonitorSettings::generateXAxisSettings(QWidget *parent)
 	xAxisSection->contentLayout()->addWidget(xMinMax);
 
 	connect(m_xmin, &PositionSpinButton::valueChanged, this, [=](double value) {
-		Q_EMIT plotXAxisMinValueChange(value);
-		m_ymax->setMinValue(value);
+		m_plot->updateXAxisIntervalMin(value);
+		m_xmax->setMinValue(value);
 	});
 	connect(m_xmax, &PositionSpinButton::valueChanged, this, [=](double value) {
-		Q_EMIT plotXAxisMaxValueChange(value);
-		m_ymin->setMaxValue(value);
+		m_plot->updateXAxisIntervalMax(value);
+		m_xmin->setMaxValue(value);
 	});
 
 	return xAxisContainer;
@@ -306,8 +314,9 @@ QWidget *DataMonitorSettings::createCurveMenu(QWidget *parent)
 	cbThickness->addItem("4");
 	cbThickness->addItem("5");
 
-	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[=](int idx) { Q_EMIT changeCurveThickness(cbThickness->itemText(idx).toFloat()); });
+	connect(cbThickness, qOverload<int>(&QComboBox::currentIndexChanged), m_plot,
+		[=](int idx) { m_plot->changeCurveThickness(cbThickness->itemText(idx).toFloat()); });
+
 	MenuCombo *cbStyleW = new MenuCombo("Style", curve);
 	auto cbStyle = cbStyleW->combo();
 	cbStyle->addItem("Lines", PlotChannel::PCS_LINES);
@@ -317,7 +326,7 @@ QWidget *DataMonitorSettings::createCurveMenu(QWidget *parent)
 	cbStyle->addItem("Smooth", PlotChannel::PCS_SMOOTH);
 	StyleHelper::MenuComboBox(cbStyle, "cbStyle");
 
-	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), this, &DataMonitorSettings::changeCurveStyle);
+	connect(cbStyle, qOverload<int>(&QComboBox::currentIndexChanged), m_plot, &MonitorPlot::changeCurveStyle);
 
 	curveSettingsLay->addWidget(cbThicknessW);
 	curveSettingsLay->addWidget(cbStyleW);
