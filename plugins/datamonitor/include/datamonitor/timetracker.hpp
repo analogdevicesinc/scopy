@@ -23,10 +23,13 @@ public:
 
 	double time();
 
+	void toggleRealTime(bool toggled);
+
 private:
 	static TimeTracker *pinstance_;
 
 	double m_startTime = 0;
+	bool m_realTime = false;
 };
 } // namespace datamonitor
 } // namespace scopy

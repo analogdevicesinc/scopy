@@ -118,6 +118,9 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 	});
 
 	connect(clearBtn, &QPushButton::clicked, this, [=]() {
+		if(runBtn->isChecked()) {
+			Q_EMIT runBtn->toggled(false);
+		}
 		if(!first) {
 			resetStartTime();
 			first = true;
@@ -153,6 +156,10 @@ DataMonitorTool::DataMonitorTool(iio_context *ctx, QWidget *parent)
 			tool->openRightContainerHelper(false);
 			delete dataMonitorController;
 		});
+
+		// updatePlotRealTime
+		connect(this, &DataMonitorTool::setStartTime, dataMonitorController->dataMonitorView()->monitorPlot(),
+			&MonitorPlot::setStartTime);
 	});
 
 	///////// end add monitor
@@ -178,4 +185,5 @@ void DataMonitorTool::resetStartTime()
 	QString formattedTime = date.toString("dd/MM/yyyy hh:mm:ss");
 	QByteArray formattedTimeMsg = formattedTime.toLocal8Bit();
 	startTime->setText(QString(formattedTimeMsg));
+	Q_EMIT setStartTime();
 }
