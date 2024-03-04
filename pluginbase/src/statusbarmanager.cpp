@@ -79,7 +79,10 @@ void StatusBarManager::processStatusMessage()
 		if(m_enabled) {
 			qDebug(CAT_STATUSBARMANAGER) << "Displaying message:" << message->getText();
 			Q_EMIT sendStatus(message);
-			m_timer->start(message->getDisplayTime());
+			// must not block the timer for a permanent widget
+			if(message->getDisplayTime() >= 0) {
+				m_timer->start(message->getDisplayTime());
+			}
 		}
 	}
 }
@@ -102,7 +105,6 @@ void StatusBarManager::_pushWidget(QWidget *widget, QString title, int ms)
 	if(ms == -1) {
 		// permanent widget, the creator of this widget is responsible for calling delete on the widget
 		connect(widget, &QWidget::destroyed, this, [this]() {
-			m_timer->stop();
 			clearDisplay();
 			processStatusMessage();
 		});
@@ -119,8 +121,10 @@ void StatusBarManager::_pushWidget(QWidget *widget, QString title, int ms)
 
 void StatusBarManager::_pushUrgentMessage(const QString &message, int ms)
 {
-	m_timer->stop();
-	clearDisplay();
+	if(m_timer->isActive()) {
+		m_timer->stop();
+		clearDisplay();
+	}
 	auto statusMessage = new StatusMessageText(message, ms);
 	Q_EMIT sendStatus(statusMessage);
 	m_timer->start(statusMessage->getDisplayTime());
